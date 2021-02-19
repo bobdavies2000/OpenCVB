@@ -25,7 +25,7 @@ def on_trackbar(val):
     if trackerName == "CSRT":       tracker = cv.TrackerCSRT_create()    
 
 def OpenCVCode(imgRGB, frameCount):
-    global trackerName, saveIndex, sr, algorithmList
+    global saveIndex, sr, algorithmList
 
     drawRect = getDrawRect()
     if saveIndex != currentIndex: # when the tracker is changed, use must redraw the rectangle.
@@ -51,13 +51,12 @@ def OpenCVCode(imgRGB, frameCount):
             p1 = (int(rectNew[0]), int(rectNew[1]))
             p2 = (int(rectNew[0] + rectNew[2]), int(rectNew[1] + rectNew[3]))
             cv.rectangle(imgRGB, p1, p2, (255,0,0), 2, 1)
-            cv.putText(imgRGB, trackerName + " Tracker", (40,100), cv.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50),2)
+            cv.putText(imgRGB, algorithmList[saveIndex] + " Tracker", (40,100), cv.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50),2)
         else :
             cv.putText(imgRGB, "Tracking failure detected", (40, 100), cv.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
     else :
-        cv.putText(imgRGB, "Draw anywhere to start tracking", (40, 100), cv.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
-        cv.putText(imgRGB, "Click to clear rect and start again", (40, 200), cv.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
-
+        cv.putText(imgRGB, "Draw anywhere to start tracking", (40, 100), cv.FONT_HERSHEY_SIMPLEX, 0.75,(255,255,255),2)
+        cv.putText(imgRGB, "Click to clear rect and start again", (40, 200), cv.FONT_HERSHEY_SIMPLEX, 0.75,(255,255,255),2)
 
 cv.namedWindow(title_window)
 cv.createTrackbar('Tracking', title_window , currentIndex, len(algorithmList) - 1, on_trackbar)

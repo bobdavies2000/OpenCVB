@@ -76,7 +76,6 @@ Public Class PyStream_2
     Public memMap As Python_MemMap
     Public Sub New()
         initParent()
-        Static PipeTaskIndex As Integer
         pipeName = "PyStream2Way" + CStr(PipeTaskIndex)
         PipeTaskIndex += 1
         pipeOut = New NamedPipeServerStream(pipeName, PipeDirection.Out)
