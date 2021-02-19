@@ -6,7 +6,7 @@ MOSSE tracking sample
 This sample implements correlation-based tracking approach, described in [1].
 
 Usage:
-  Tracker_PS.py 
+  Tracker_MOSSE_PS.py 
 
   Draw rectangles around objects with a mouse to track them.
 
@@ -170,5 +170,5 @@ class App:
 if __name__ == '__main__':
     print (__doc__)
     import sys
-    title_window = "Tracker_PS.py"
+    title_window = "Tracker_MOSSE_PS.py"
     App().Open()

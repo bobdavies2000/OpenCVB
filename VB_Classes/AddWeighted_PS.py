@@ -5,7 +5,7 @@ title_window = 'AddWeighted_PS.py'
 saveAlpha = 50
     
 def on_trackbar(val):
-    global saveAlpha # force the callback to reference the global variable.
+    global saveAlpha 
     saveAlpha = val 
 
 def OpenCVCode(imgRGB, depth_colormap, frameCount):
@@ -15,8 +15,7 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
     cv.imshow(title_window, dst1)
 
 cv.namedWindow(title_window)
-trackbar_name = 'Alpha'
-cv.createTrackbar(trackbar_name, title_window , saveAlpha, alpha_slider_max, on_trackbar)
+cv.createTrackbar('Alpha', title_window , saveAlpha, alpha_slider_max, on_trackbar)
 on_trackbar(saveAlpha)
 from PyStream import PyStreamRun
 PyStreamRun(OpenCVCode, title_window)

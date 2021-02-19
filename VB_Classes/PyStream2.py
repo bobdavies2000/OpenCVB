@@ -9,11 +9,9 @@ import ctypes
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxW(0, text, title, style)
 
-
 def getDrawRect():
     global drawRect
     return drawRect
-
 
 def PyStreamRun(OpenCVCode, scriptName):
     global drawRect
@@ -52,7 +50,10 @@ def PyStreamRun(OpenCVCode, scriptName):
             rows = int(arrayDoubles[3])
             cols = int(arrayDoubles[4])
             # this is the task.drawRect in OpenCVB
-            drawRect = (int(arrayDoubles[5]),int(arrayDoubles[6]),int(arrayDoubles[7]),int(arrayDoubles[8]))
+            tmpRect = (int(arrayDoubles[5]),int(arrayDoubles[6]),int(arrayDoubles[7]),int(arrayDoubles[8]))
+
+            if drawRect != tmpRect:
+                drawRect = tmpRect
 
             if rows > 0:
                 if arrayDoubles[0] == frameCount:
