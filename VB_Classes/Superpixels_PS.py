@@ -2,6 +2,7 @@ import numpy as np
 import cv2 as cv
 import common
 import sys
+from PyStream import PyStreamRun
 title_window = "SuperPixel_PS.py - use spacebar to switch views."
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
@@ -61,5 +62,4 @@ if __name__ == '__main__':
     prior = 2
     num_levels = 4
     num_histogram_bins = 5
-    from PyStream import PyStreamRun
     PyStreamRun(OpenCVCode, title_window)

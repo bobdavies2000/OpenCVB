@@ -21,6 +21,7 @@ Keys:
 import sys
 import numpy as np
 import cv2 as cv
+from PyStream import PyStreamRun
 from common import draw_str, RectSelector
 title_window = "Tracker_MOSSE_PS.py"
 
@@ -140,7 +141,6 @@ class App:
         cv.namedWindow(title_window)
         self.rect_sel = RectSelector(title_window, self.onrect)
         self.trackers = []
-        from PyStream import PyStreamRun
         PyStreamRun(self.OpenCVCode, title_window)
 
     def onrect(self, rect):

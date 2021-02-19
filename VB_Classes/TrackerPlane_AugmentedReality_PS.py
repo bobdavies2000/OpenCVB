@@ -23,6 +23,7 @@ import numpy as np
 import cv2 as cv
 import common
 from TrackerPlane_PS import PlaneTracker
+from PyStream import PyStreamRun
 import sys
 title_window = "TrackerPlane_Reality_PS.py"
 
@@ -44,7 +45,6 @@ class App:
         cv.namedWindow(title_window)
         cv.createTrackbar('focal', title_window, 25, 50, common.nothing)
         self.rect_sel = common.RectSelector(title_window, self.on_rect)
-        from PyStream import PyStreamRun
         PyStreamRun(self.OpenCVCode,  title_window)
 
     def on_rect(self, rect):

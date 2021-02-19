@@ -1,5 +1,6 @@
 import cv2 as cv
 import argparse
+from PyStream import PyStreamRun
 title_window = "Threshold_inRange_PS.py"
 
 ## [low]
@@ -56,6 +57,8 @@ def OpenCVCode(frame, depth_colormap, frameCount):
     cv.imshow(window_detection_name, frame_threshold)
 
     key = cv.waitKey(1)
+    vis = cv.cvtColor(frame_threshold, cv.COLOR_GRAY2BGR)
+    return vis
 
 max_value = 255
 max_value_H = 360//2
@@ -84,5 +87,4 @@ cv.createTrackbar(high_S_name, window_detection_name , high_S, max_value, on_hig
 cv.createTrackbar(low_V_name, window_detection_name , low_V, max_value, on_low_V_thresh_trackbar)
 cv.createTrackbar(high_V_name, window_detection_name , high_V, max_value, on_high_V_thresh_trackbar)
 
-from PyStream import PyStreamRun
 PyStreamRun(OpenCVCode, title_window)

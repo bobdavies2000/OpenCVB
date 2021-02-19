@@ -28,6 +28,7 @@ import numpy as np
 import cv2 as cv
 import os, time
 from time import sleep
+from PyStream import PyStreamRun
 title_window = 'Camshift_PS.py'
 
 class App(object):
@@ -54,8 +55,8 @@ class App(object):
         return img
 
     def Open(self):
-        cv.namedWindow('camshift')
-        cv.setMouseCallback('camshift', self.onmouse)
+        cv.namedWindow('camshift - Draw below to start or restart tracking')
+        cv.setMouseCallback('camshift - Draw below to start or restart tracking', self.onmouse)
 
         self.selection = None
         self.drag_start = None
@@ -66,7 +67,6 @@ class App(object):
         self.vis = None
         self.img = None
         print(__doc__)
-        from PyStream import PyStreamRun
         PyStreamRun(self.OpenCVCode, title_window)
 
     def OpenCVCode(self, vis, depth32f, frameCount):
@@ -108,11 +108,12 @@ class App(object):
 
         graph = cv.cvtColor(self.img, cv.COLOR_HSV2BGR)
         both = cv.hconcat([vis, graph])
-        cv.imshow('camshift', both)
+        cv.imshow('camshift - Draw below to start or restart tracking', both)
 
         ch = cv.waitKey(1)
         if ch == ord('b'):
             self.show_backproj = not self.show_backproj
+        return vis
 
 App().Open()
 

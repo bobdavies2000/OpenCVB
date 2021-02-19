@@ -1,6 +1,7 @@
 import numpy as np
 import cv2 as cv
 import sys
+from PyStream import PyStreamRun
 title_window = 'OpticalFlow_PS.py'
 
 def set_ShowHSV(val):
@@ -99,6 +100,5 @@ if __name__ == '__main__':
     inst.setUseSpatialPropagation(use_spatial_propagation)
     flow = None
 
-from PyStream import PyStreamRun
 PyStreamRun(OpenCVCode, title_window)
 

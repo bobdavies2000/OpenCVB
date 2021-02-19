@@ -2,6 +2,7 @@
 import numpy as np
 import cv2 as cv
 import sys
+from PyStream import PyStreamRun
 title_window = "MotionTemplate_PS.py"
 
 MHI_DURATION = 0.5
@@ -80,5 +81,4 @@ cv.namedWindow(title_window)
 visuals = ['input', 'frame_diff', 'motion_hist', 'grad_orient']
 cv.createTrackbar('visual', title_window, 2, len(visuals)-1, nothing)
 cv.createTrackbar('threshold', title_window, DEFAULT_THRESHOLD, 255, nothing)
-from PyStream import PyStreamRun
 PyStreamRun(OpenCVCode, title_window)

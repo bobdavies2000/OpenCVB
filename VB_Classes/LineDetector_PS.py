@@ -1,6 +1,7 @@
 from lsd_ctypes import *
 import cv2 as cv
 import numpy as np
+from PyStream import PyStreamRun
 # https://github.com/primetang/pylsd
 title_window = 'LineDetector_PS.py'
 
@@ -32,6 +33,5 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     cv.imshow("LineDetector_PS.py", imgRGB)
     return imgRGB
 
-from PyStream import PyStreamRun
 cv.namedWindow(title_window)
 PyStreamRun(OpenCVCode, title_window)

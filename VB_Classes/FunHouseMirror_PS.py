@@ -2,6 +2,7 @@
 import numpy as np
 import math
 import sys
+from PyStream import PyStreamRun
 # https://github.com/spmallick/learnopencv/blob/master/FunnyMirrors/FunnyMirrorsVideo.py
 # https://www.learnopencv.com/funny-mirrors-using-opencv/?ck_subscriber_id=785741175
 
@@ -58,12 +59,11 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
 	out1 = np.hstack((imgRGB,output))
 	out1 = cv.resize(out1,(700,350))
 	cv.imshow(title_window,out1)
-	return out1
+	return output
 
 cv.namedWindow(title_window)
 trackbar_name = 'Distort'
 cv.createTrackbar(trackbar_name, title_window, saveMode, 7, on_trackbar)
 on_trackbar(saveMode)
 
-from PyStream import PyStreamRun
 PyStreamRun(OpenCVCode, title_window)

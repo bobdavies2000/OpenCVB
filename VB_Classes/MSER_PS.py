@@ -1,6 +1,7 @@
 import numpy as np
 import cv2 as cv
 import sys
+from PyStream import PyStreamRun
 title_window = 'MSER_PS.py'
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
@@ -16,5 +17,4 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
 
 if __name__ == '__main__':
     mser = cv.MSER_create()
-    from PyStream import PyStreamRun
     PyStreamRun(OpenCVCode, title_window)

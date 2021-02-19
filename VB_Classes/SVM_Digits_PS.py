@@ -4,6 +4,7 @@
 
 import numpy as np
 import cv2 as cv
+from PyStream import PyStreamRun
 
 # built-in modules
 import os
@@ -90,5 +91,4 @@ if __name__ == '__main__':
         model = cv.ml.SVM_create()
         model.load_(classifier_fn) #Known bug: https://github.com/opencv/opencv/issues/4969
 
-from PyStream import PyStreamRun
 PyStreamRun(OpenCVCode, title_window)

@@ -6,6 +6,7 @@ Alexander Mordvintsev 6/10/12
 import sys
 import numpy as np
 import cv2 as cv
+from PyStream import PyStreamRun
 title_window = 'Laplacian_PyramidFilter_PS.py'
 
 from common import nothing, getsize
@@ -50,5 +51,4 @@ if __name__ == '__main__':
         cv.createTrackbar(switcher.get(i, "invalid"), 'level control', 5, 50, nothing)
 
 
-from PyStream import PyStreamRun
 PyStreamRun(OpenCVCode, title_window)

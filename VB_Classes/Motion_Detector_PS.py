@@ -27,6 +27,7 @@
 
 import cv2 as cv
 import numpy as np
+from PyStream import PyStreamRun
 
 title_window = 'MotionDetector_PS.py'
 
@@ -140,5 +141,4 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
 movement_persistent_counter = 0
 font = cv.FONT_HERSHEY_SIMPLEX
 delay_counter = 0
-from PyStream import PyStreamRun
 PyStreamRun(OpenCVCode, title_window)

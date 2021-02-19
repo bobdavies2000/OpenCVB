@@ -22,6 +22,7 @@ Select a textured planar object to track by drawing a box with a mouse.
 import sys
 import numpy as np
 import cv2 as cv
+from PyStream import PyStreamRun
 title_window = "PlaneDetector_PS.py"
 
 # built-in modules
@@ -136,7 +137,6 @@ class App:
 
         cv.namedWindow(title_window)
         self.rect_sel = common.RectSelector(title_window, self.on_rect)
-        from PyStream import PyStreamRun
         PyStreamRun(self.OpenCVCode, title_window)
 
     def on_rect(self, rect):
