@@ -4,14 +4,14 @@ import common
 import sys
 title_window = "SuperPixel_PS.py - use spacebar to switch views."
 
-def OpenCVCode(imgRGB, depth_colormap, frameCount):
-    global seeds, display_mode, num_superpixels, prior, num_levels, num_histogram_bins, myFrameCount, scalarRed
+def OpenCVCode(imgRGB, depth32f, frameCount):
+    global seeds, display_mode, num_superpixels, prior, num_levels, num_histogram_bins, scalarRed
     converted_img = cv.cvtColor(imgRGB, cv.COLOR_BGR2HSV)
     height,width,channels = converted_img.shape
     num_SuperPixel_new = cv.getTrackbarPos('Number of Superpixels', title_window)
     num_iterations = cv.getTrackbarPos('Iterations', title_window)
 
-    if myFrameCount == 0:
+    if frameCount == 0:
         scalarRed = np.zeros((height,width,3), np.uint8)
         scalarRed[:] = (0, 0, 255)
 
@@ -48,14 +48,13 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
     ch = cv.waitKey(1)
     if ch & 0xff == ord(' '):
         display_mode = (display_mode + 1) % 2 # set this to 3 to get the labels working but it won't display...
-    myFrameCount += 1
+    return result
 
 if __name__ == '__main__':
     cv.namedWindow(title_window)
     cv.createTrackbar('Number of Superpixels', title_window, 400, 1000, common.nothing)
     cv.createTrackbar('Iterations', title_window, 4, 12, common.nothing)
 
-    myFrameCount = 0
     seeds = None
     display_mode = 0
     num_superpixels = 400

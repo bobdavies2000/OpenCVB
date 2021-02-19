@@ -13,7 +13,7 @@ def on_trackbar(val):
 	global saveMode 
 	saveMode = val 
 
-def OpenCVCode(imgRGB, depth_colormap, frameCount):
+def OpenCVCode(imgRGB, depth32f, frameCount):
 	H,W = imgRGB.shape[:2]
 	# Creating the virtual camera object
 	c1 = vcam(H=H,W=W)
@@ -58,6 +58,7 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
 	out1 = np.hstack((imgRGB,output))
 	out1 = cv.resize(out1,(700,350))
 	cv.imshow(title_window,out1)
+	return out1
 
 cv.namedWindow(title_window)
 trackbar_name = 'Distort'

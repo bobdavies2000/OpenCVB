@@ -14,7 +14,7 @@ title_window = 'SVM_Digits_PS.py'
 from common import mosaic
 from digits import *
 
-def OpenCVCode(imgRGB, depth_colormap, frameCount):
+def OpenCVCode(imgRGB, depth32f, frameCount):
     gray = cv.cvtColor(imgRGB, cv.COLOR_BGR2GRAY)
 
     bin = cv.adaptiveThreshold(gray, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 31, 10)
@@ -68,13 +68,14 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
         cv.putText(imgRGB, '%d'%digit, (x, y), cv.FONT_HERSHEY_PLAIN, 1.0, (200, 0, 0), thickness = 1)
 
     h, w = imgRGB.shape[:2]
-    imgRGB = cv.resize(imgRGB, (int(w / 2), int(h / 2)))
+    rgb = cv.resize(imgRGB, (int(w / 2), int(h / 2)))
     bin = cv.resize(bin, (int(w / 2), int(h / 2)))
-    binRGB = np.empty(imgRGB.shape, imgRGB.dtype)
+    binRGB = np.empty(rgb.shape, rgb.dtype)
     cv.cvtColor(bin, cv.COLOR_GRAY2BGR, binRGB)
-    images = np.empty((h, w*2, imgRGB.shape[2]), imgRGB.dtype)
-    images = cv.hconcat([imgRGB, binRGB])
+    images = np.empty((h, w*2, rgb.shape[2]), rgb.dtype)
+    images = cv.hconcat([rgb, binRGB])
     cv.imshow(title_window, images)
+    return imgRGB
 
 
 if __name__ == '__main__':

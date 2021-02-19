@@ -50,7 +50,7 @@ class App:
     def on_rect(self, rect):
         self.tracker.add_target(self.frame, rect)
 
-    def OpenCVCode(self, frame, depth_colormap, frameCount):
+    def OpenCVCode(self, frame, depth32f, frameCount):
         playing = not self.paused and not self.rect_sel.dragging
         if playing:
             self.frame = frame.copy()
@@ -71,6 +71,7 @@ class App:
             self.paused = not self.paused
         if ch == ord('c'):
             self.tracker.clear()
+        return vis
 
     def draw_overlay(self, vis, tracked):
         x0, y0, x1, y1 = tracked.target.rect

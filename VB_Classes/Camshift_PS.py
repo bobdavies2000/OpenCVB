@@ -69,7 +69,7 @@ class App(object):
         from PyStream import PyStreamRun
         PyStreamRun(self.OpenCVCode, title_window)
 
-    def OpenCVCode(self, vis, depth_colormap, frameCount):
+    def OpenCVCode(self, vis, depth32f, frameCount):
         if self.initialized == False:
             self.both = np.empty((vis.shape[0], vis.shape[1]*2, 3), vis.dtype)
             self.img = vis

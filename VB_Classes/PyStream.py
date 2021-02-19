@@ -9,7 +9,14 @@ import ctypes
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxW(0, text, title, style)
 
+def getDrawRect():
+    global drawRect
+    return drawRect
+
 def PyStreamRun(OpenCVCode, scriptName):
+    global drawRect
+    drawRect = (0,0,0,0)
+
     parser = argparse.ArgumentParser(description='Pass in length of MemMap region.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--MemMapLength', type=int, default=0, help='The number of bytes are in the memory mapped file.')
     parser.add_argument('--pipeName', default='', help='The name of the input pipe for image data.')
@@ -19,7 +26,7 @@ def PyStreamRun(OpenCVCode, scriptName):
     MemMapLength = args.MemMapLength
     if MemMapLength == 0:
         MemMapLength = 400 # these values have been generously padded (on both sides) but if they grow...
-        args.pipeName = 'OpenCVBImages0' # we always start with 0 and since it is only invoked once, 0 is all it will ever be.
+        args.pipeName = 'PyStream2Way0' # we always start with 0 and since it is only invoked once, 0 is all it will ever be.
         ocvb = os.getcwd() + '/../bin/Debug/OpenCVB.exe'
         if os.path.exists(ocvb):
             tupleArg = (' ', scriptName)
@@ -29,6 +36,7 @@ def PyStreamRun(OpenCVCode, scriptName):
     while True:
         try:
             pipeIn = open(pipeName, 'rb')
+            pipeOut = open(pipeName + 'Results', 'wb')
             break
         except Exception as exception:
             time.sleep(0.1) # sleep for a bit to wait for OpenCVB to start...
@@ -42,6 +50,8 @@ def PyStreamRun(OpenCVCode, scriptName):
             depthBufferSize = int(arrayDoubles[2])
             rows = int(arrayDoubles[3])
             cols = int(arrayDoubles[4])
+            # this is the task.drawRect in OpenCVB
+            drawRect = (int(arrayDoubles[5]),int(arrayDoubles[6]),int(arrayDoubles[7]),int(arrayDoubles[8]))
 
             if rows > 0:
                 if arrayDoubles[0] == frameCount:
@@ -52,18 +62,18 @@ def PyStreamRun(OpenCVCode, scriptName):
                     depthData = pipeIn.read(int(depthBufferSize))
                     depthSize = rows, cols, 1
                     try:
-                        depth = np.array(np.frombuffer(depthData, np.float32).reshape(depthSize))
+                        depth32f = np.array(np.frombuffer(depthData, np.float32).reshape(depthSize))
                     except:
                         print("unable to reshape the depth data")
                         sys.exit()
-                    depth_colormap = cv.applyColorMap(cv.convertScaleAbs(depth, alpha=0.03), cv.COLORMAP_HSV)
                     rgbSize = rows, cols, 3
                     try:
                         imgRGB = np.array(np.frombuffer(rgb, np.uint8).reshape(rgbSize))
                     except:
                         print("Unable to reshape the RGB data")
                         sys.exit()
-                    OpenCVCode(imgRGB, depth_colormap, frameCount)
+                    imgRGB = OpenCVCode(imgRGB, depth32f, frameCount)
+                    pipeOut.write(np.asarray(imgRGB))
                     cv.waitKey(1)
                     
     except Exception as exception:

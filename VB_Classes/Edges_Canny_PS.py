@@ -5,7 +5,7 @@ title_window = 'Edges_Canny_PS.py'
 
 def nothing(*arg):
     pass
-def OpenCVCode(imgRGB, depth_colormap, frameCount):
+def OpenCVCode(imgRGB, depth32f, frameCount):
     gray = cv.cvtColor(imgRGB, cv.COLOR_BGR2GRAY)
     thrs1 = cv.getTrackbarPos('thrs1', 'edge')
     thrs2 = cv.getTrackbarPos('thrs2', 'edge')
@@ -14,6 +14,7 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
     vis = np.uint8(vis/2.)
     vis[edge != 0] = (0, 255, 0)
     cv.imshow('edge', vis)
+    return vis
 
 print(__doc__)
 cv.namedWindow('edge')

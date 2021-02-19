@@ -67,17 +67,13 @@ End Module
 Public Class Python_Run
     Inherits VBparent
     Dim tryCount As Integer
-    Dim backEndPython As Boolean
     Public Sub New()
         initParent()
         If ocvb.pythonTaskName = "" Then ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/PythonPackages.py"
         Dim pythonApp = New FileInfo(ocvb.pythonTaskName)
 
         If pythonApp.Name.EndsWith("_PS.py") Then
-            pyStream = New PyStream_Basics()
-        ElseIf pythonApp.Name.EndsWith("_PS2.py") Then
-            pyStream = New PyStream_2()
-            backEndPython = True
+            pyStream = New Python_Stream()
         Else
             StartPython("")
         End If
@@ -90,12 +86,8 @@ Public Class Python_Run
         If pyStream IsNot Nothing Then
             pyStream.src = src
             pyStream.Run()
-            If backEndPython Then
-                dst1 = pyStream.dst1
-                dst2 = pyStream.dst2
-                label1 = pyStream.label1
-                label2 = pyStream.label2
-            End If
+            dst1 = pyStream.dst1
+            label1 = pyStream.label1
         Else
             Dim proc = Process.GetProcessesByName("python")
             If proc.Count = 0 Then
@@ -201,3 +193,69 @@ Public Class Python_SurfaceBlit
     End Sub
 End Class
 
+
+
+
+
+
+
+
+Public Class Python_Stream
+    Inherits VBparent
+    Dim pipeName As String
+    Dim pipeIn As NamedPipeServerStream
+    Dim pipeOut As NamedPipeServerStream
+    Dim rgbBuffer(1) As Byte
+    Dim depthBuffer(1) As Byte
+    Dim pythonReady As Boolean
+    Dim memMap As Python_MemMap
+    Public Sub New()
+        initParent()
+        pipeName = "PyStream2Way" + CStr(PipeTaskIndex)
+        pipeOut = New NamedPipeServerStream(pipeName, PipeDirection.Out)
+        pipeIn = New NamedPipeServerStream(pipeName + "Results", PipeDirection.In)
+        PipeTaskIndex += 1
+
+        ' Was this class invoked standalone?  Then just run something that works with RGB and depth...
+        If ocvb.pythonTaskName.EndsWith("Python_Stream") Then
+            ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/PutText_PS.py"
+        End If
+
+        memMap = New Python_MemMap()
+
+        If ocvb.parms.externalPythonInvocation Then
+            pythonReady = True ' python was already running and invoked OpenCVB.
+        Else
+            pythonReady = StartPython("--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
+        End If
+        If pythonReady Then
+            pipeOut.WaitForConnection()
+            pipeIn.WaitForConnection()
+        End If
+        label1 = "Output of Python Backend"
+        task.desc = "General purpose class to pipe RGB and Depth to Python scripts."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If pythonReady Then
+            For i = 0 To memMap.memMapValues.Length - 1
+                memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, src.Total * src.ElemSize,
+                                                task.depth32f.Total * task.depth32f.ElemSize, src.Rows, src.Cols,
+                                                task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height)
+            Next
+            memMap.Run()
+
+            If rgbBuffer.Length <> src.Total * src.ElemSize Then ReDim rgbBuffer(src.Total * src.ElemSize - 1)
+            If depthBuffer.Length <> task.depth32f.Total * task.depth32f.ElemSize Then ReDim depthBuffer(task.depth32f.Total * task.depth32f.ElemSize - 1)
+            Marshal.Copy(src.Data, rgbBuffer, 0, src.Total * src.ElemSize)
+            Marshal.Copy(task.depth32f.Data, depthBuffer, 0, depthBuffer.Length)
+            If pipeOut.IsConnected Then
+                On Error Resume Next
+                pipeOut.Write(rgbBuffer, 0, rgbBuffer.Length)
+                pipeOut.Write(depthBuffer, 0, depthBuffer.Length)
+                pipeIn.Read(rgbBuffer, 0, rgbBuffer.Length)
+            End If
+            Marshal.Copy(rgbBuffer, 0, dst1.Data, rgbBuffer.Length)
+        End If
+    End Sub
+End Class

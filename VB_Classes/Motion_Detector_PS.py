@@ -51,7 +51,7 @@ MOVEMENT_DETECTED_PERSISTENCE = 100
 # =============================================================================
 # CORE PROGRAM
 # =============================================================================
-def OpenCVCode(imgRGB, depth_colormap, frameCount):
+def OpenCVCode(imgRGB, depth32f, frameCount):
     global first_frame, next_frame, font, delay_counter, movement_persistent_counter
     # Set transient motion detected as false
     transient_movement_flag = False
@@ -135,6 +135,7 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
     # Splice the two video frames together to make one long horizontal one
     cv.imshow(title_window,cv.hconcat([delta, img]))
     frameCount += 1
+    return imgRGB
 
 movement_persistent_counter = 0
 font = cv.FONT_HERSHEY_SIMPLEX

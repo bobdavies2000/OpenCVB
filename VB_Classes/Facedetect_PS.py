@@ -18,7 +18,7 @@ def draw_rects(img, rects, color):
     for x1, y1, x2, y2 in rects:
         cv.rectangle(img, (x1, y1), (x2, y2), color, 2)
 
-def OpenCVCode(imgRGB, depth_colormap, frameCount):
+def OpenCVCode(imgRGB, depth32f, frameCount):
     global cascade, nested
     gray = cv.cvtColor(imgRGB, cv.COLOR_BGR2GRAY)
     gray = cv.equalizeHist(gray)
@@ -37,6 +37,7 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
 
     draw_str(vis, (20, 20), 'time: %.1f ms' % (dt*1000))
     cv.imshow('facedetect', vis)
+    return vis
 
 if __name__ == '__main__':
     print('This example works only occasionally!  Same face model in C# works ok when face is vertical.')

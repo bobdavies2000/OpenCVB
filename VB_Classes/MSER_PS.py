@@ -3,7 +3,7 @@ import cv2 as cv
 import sys
 title_window = 'MSER_PS.py'
 
-def OpenCVCode(imgRGB, depth_colormap, frameCount):
+def OpenCVCode(imgRGB, depth32f, frameCount):
     global mser
     gray = cv.cvtColor(imgRGB, cv.COLOR_BGR2GRAY)
     vis = imgRGB.copy()
@@ -12,6 +12,7 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
     hulls = [cv.convexHull(p.reshape(-1, 1, 2)) for p in regions]
     cv.polylines(vis, hulls, 1, (0, 255, 0))
     cv.imshow('imgRGB', vis)
+    return vis
 
 if __name__ == '__main__':
     mser = cv.MSER_create()

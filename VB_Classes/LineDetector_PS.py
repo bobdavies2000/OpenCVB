@@ -4,7 +4,7 @@ import numpy as np
 # https://github.com/primetang/pylsd
 title_window = 'LineDetector_PS.py'
 
-def OpenCVCode(imgRGB, depth_colormap, frameCount):
+def OpenCVCode(imgRGB, depth32f, frameCount):
     gray = cv.cvtColor(imgRGB, cv.COLOR_BGR2GRAY)
     rows, cols = gray.shape
     gray64 = np.float64(gray)
@@ -30,6 +30,7 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
         width = lines[i, 4]
         cv.line(imgRGB, pt1, pt2, (0, 0, 255), int(np.ceil(width / 2)))
     cv.imshow("LineDetector_PS.py", imgRGB)
+    return imgRGB
 
 from PyStream import PyStreamRun
 cv.namedWindow(title_window)

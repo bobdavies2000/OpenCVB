@@ -278,7 +278,6 @@
     </Compile>
     <Compile Include="ORB.vb" />
     <Compile Include="PointCloud.vb" />
-    <Compile Include="PyStream.vb" />
     <Compile Include="Pixel.vb" />
     <Compile Include="Plane.vb" />
     <Compile Include="Plot.vb" />
@@ -395,7 +394,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="AddWeightedTest.py" />
-    <Content Include="PutText_PS2.py" />
+    <Content Include="PutText_PS.py" />
     <Content Include="AddWeighted_PS.py" />
     <Content Include="BGSubtract.py" />
     <Content Include="Facedetect_PS.py" />
@@ -426,6 +425,7 @@
     <Content Include="MSER_PS.py" />
     <Content Include="ICP_SyntheticExample.py" />
     <Content Include="ICP_Models.py" />
+    <Content Include="PyStream.py" />
     <Content Include="Reg_shift.py" />
     <Content Include="RotateImage.py" />
     <Content Include="SelectiveSearchSegmentation_Demo.py" />
@@ -450,7 +450,7 @@
     <Content Include="Depth_RGB_PS.py" />
     <Content Include="Python_SurfaceBlit.py" />
     <Content Include="Sobel_AnisotropicSegmentation.py" />
-    <Content Include="Tracker_PS2.py" />
+    <Content Include="Tracker_PS.py" />
     <Content Include="Turing.py" />
     <Content Include="WarpAffine_SIFT.py" />
     <Content Include="PythonPackages.py" />
@@ -507,7 +507,6 @@
     <Content Include="Laplace_demo.py" />
     <Content Include="ML_letters.py" />
     <Content Include="Mat_mask_operations.py" />
-    <Content Include="Python_SurfaceBlit_PS.py" />
     <Content Include="Moments_demo.py" />
     <Content Include="Morphology.py" />
     <Content Include="Morphology_1.py" />

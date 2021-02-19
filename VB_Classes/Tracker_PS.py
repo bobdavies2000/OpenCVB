@@ -1,9 +1,10 @@
 import cv2 as cv
 import sys
-from PyStream2 import PyStreamRun
-from PyStream2 import getDrawRect
+from PyStream import PyStreamRun
+from PyStream import getDrawRect
 
-title_window = 'Tracker_PS2.py'
+# https://learnopencv.com/object-tracking-using-opencv-cpp-python/
+title_window = 'Tracker_PS.py'
 trackerName = ""
 currentIndex = 2
 tracker = cv.TrackerKCF_create()
@@ -24,7 +25,7 @@ def on_trackbar(val):
     if trackerName == 'MOSSE':      tracker = cv.TrackerMOSSE_create()
     if trackerName == "CSRT":       tracker = cv.TrackerCSRT_create()    
 
-def OpenCVCode(imgRGB, frameCount):
+def OpenCVCode(imgRGB, depth32f, frameCount):
     global saveIndex, sr, algorithmList
 
     drawRect = getDrawRect()
@@ -35,7 +36,7 @@ def OpenCVCode(imgRGB, frameCount):
     cv.waitKey(1)
 
     # when the width of the drawRect is nonzero, then there is something to track
-    if drawRect[3] != 0:
+    if drawRect[3]:
         if sr != drawRect :
             on_trackbar(currentIndex) # this will reinitialize the tracker if just the drawRect changed
             sr = drawRect
@@ -57,8 +58,9 @@ def OpenCVCode(imgRGB, frameCount):
     else :
         cv.putText(imgRGB, "Draw anywhere to start tracking", (40, 100), cv.FONT_HERSHEY_SIMPLEX, 0.75,(255,255,255),2)
         cv.putText(imgRGB, "Click to clear rect and start again", (40, 200), cv.FONT_HERSHEY_SIMPLEX, 0.75,(255,255,255),2)
+    return imgRGB
 
 cv.namedWindow(title_window)
-cv.createTrackbar('Tracking', title_window , currentIndex, len(algorithmList) - 1, on_trackbar)
+cv.createTrackbar('Methods', title_window , currentIndex, len(algorithmList) - 1, on_trackbar)
 on_trackbar(currentIndex)
 PyStreamRun(OpenCVCode, title_window)

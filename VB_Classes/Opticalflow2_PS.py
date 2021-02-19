@@ -37,18 +37,19 @@ def warp_flow(img, flow):
     res = cv.remap(img, flow, None, cv.INTER_LINEAR)
     return res
 
-def OpenCVCode(imgRGB, depth_colormap, frameCount):
+def OpenCVCode(imgRGB, depth32f, frameCount):
     global myFrameCount, prev_imgRGB, prev, show_hsv, show_glitch, cur_glitch
     gray = cv.cvtColor(imgRGB, cv.COLOR_BGR2GRAY)
     if myFrameCount == 0:
         show_hsv = True
         show_glitch = True
-        prev = imgRGB.copy()
+        prev_imgRGB = gray.copy()
         cur_glitch = imgRGB.copy()
     else:
         flow = cv.calcOpticalFlowFarneback(prev_imgRGB, gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
         prev_imgRGB = gray
 
+        flowRGB = draw_flow(gray, flow)
         cv.imshow('flow', draw_flow(gray, flow))
         if show_hsv:
             cv.imshow('flow HSV', draw_hsv(flow))
@@ -66,6 +67,8 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
             print('glitch is', ['off', 'on'][show_glitch])
     prev_imgRGB = gray.copy()
     myFrameCount += 1
+    if myFrameCount == 1: return imgRGB
+    return flowRGB
 
 if __name__ == '__main__':
     myFrameCount = 0

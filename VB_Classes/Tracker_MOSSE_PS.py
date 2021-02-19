@@ -22,6 +22,7 @@ import sys
 import numpy as np
 import cv2 as cv
 from common import draw_str, RectSelector
+title_window = "Tracker_MOSSE_PS.py"
 
 def rnd_warp(a):
     h, w = a.shape[:2]
@@ -147,7 +148,7 @@ class App:
         tracker = MOSSE(frame_gray, rect)
         self.trackers.append(tracker)
 
-    def OpenCVCode(self, vis, depth_colormap, frameCount    ):
+    def OpenCVCode(self, vis, depth32f, frameCount    ):
         self.frame = vis.copy()
         if not self.paused:
             frame_gray = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
@@ -166,9 +167,9 @@ class App:
             self.paused = not self.paused
         if ch == ord('c'):
             self.trackers = []
+        return vis
 
 if __name__ == '__main__':
     print (__doc__)
     import sys
-    title_window = "Tracker_MOSSE_PS.py"
     App().Open()

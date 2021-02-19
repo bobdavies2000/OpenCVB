@@ -986,7 +986,6 @@ Public Class OpenCVB
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e) ' close the log file if needed.
         textDesc = ""
         saveLayout()
-        Console.WriteLine("exit_clidk complete")
         Application.DoEvents()
     End Sub
     Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click

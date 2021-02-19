@@ -67,7 +67,7 @@ Module IndexMain
                 If line.EndsWith("_MT.py") Then MTnames.Add(line, line)
             Else
                 If line <> "" Then
-                    If line.Contains("PyStream_Basics") = False And line.Contains("Python") = False Then
+                    If line.Contains("Python_Stream") = False And line.Contains("Python") = False Then
                         nonPYnames.Add(line, line)
                         apiList.Add(line)
                         apiListLCase.Add(LCase(line))

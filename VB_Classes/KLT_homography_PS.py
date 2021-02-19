@@ -53,7 +53,7 @@ class App:
         from PyStream import PyStreamRun
         PyStreamRun(self.OpenCVCode, title_window)
 
-    def OpenCVCode(self, frame, depth_colormap, frameCount):
+    def OpenCVCode(self, frame, depth32f, frameCount):
             frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
             vis = frame.copy()
             if self.p0 is not None:

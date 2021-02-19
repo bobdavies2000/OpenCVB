@@ -50,10 +50,7 @@ def PyStreamRun(OpenCVCode, scriptName):
             rows = int(arrayDoubles[3])
             cols = int(arrayDoubles[4])
             # this is the task.drawRect in OpenCVB
-            tmpRect = (int(arrayDoubles[5]),int(arrayDoubles[6]),int(arrayDoubles[7]),int(arrayDoubles[8]))
-
-            if drawRect != tmpRect:
-                drawRect = tmpRect
+            drawRect = (int(arrayDoubles[5]),int(arrayDoubles[6]),int(arrayDoubles[7]),int(arrayDoubles[8]))
 
             if rows > 0:
                 if arrayDoubles[0] == frameCount:

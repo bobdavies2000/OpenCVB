@@ -21,7 +21,7 @@ def draw_motion_comp(vis, rect, angle, color):
     cv.circle(vis, (int(cx), int(cy)), int(r), color, 3)
     cv.line(vis, (int(cx), int(cy)), (int(cx+np.cos(angle)*r), int(cy+np.sin(angle)*r)), color, 3)
 
-def OpenCVCode(imgRGB, depth_colormap, frameCount):
+def OpenCVCode(imgRGB, depth32f, frameCount):
     global myFrameCount, prev_imgRGB
     height, width = imgRGB.shape[:2]
     motion_history = np.zeros((height, width), np.float32)
@@ -68,6 +68,9 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
 
         cv.putText(vis, visual_name, (20, 20), cv.FONT_HERSHEY_PLAIN, 1.0, (200,0,0))
         cv.imshow(title_window, vis)
+        return vis
+    else :
+        return imgRGB
 
     prev_imgRGB = imgRGB.copy()
     myFrameCount += 1

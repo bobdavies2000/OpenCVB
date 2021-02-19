@@ -57,7 +57,7 @@ def warp_flow(img, flow):
     return res
 
 
-def OpenCVCode(imgRGB, depth_colormap, frameCount):
+def OpenCVCode(imgRGB, depth32f, frameCount):
     global show_hsv, show_glitch, use_spatial_propagation, use_temporal_propagation, cur_glitch, prevgray, inst, flow, initialized 
     if initialized == False:
         initialized = True
@@ -77,12 +77,14 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
         flow = inst.calc(prevgray, gray, None)
     prevgray = gray
 
-    cv.imshow('flow', draw_flow(gray, flow))
+    flowRGB = draw_flow(gray, flow)
+    cv.imshow('flow', flowRGB)
     if show_hsv:
         cv.imshow('flow HSV', draw_hsv(flow))
     if show_glitch:
         cur_glitch = warp_flow(cur_glitch, flow)
         cv.imshow('glitch', cur_glitch)
+    return flowRGB
 
 if __name__ == '__main__':
     print(__doc__)

@@ -29,7 +29,7 @@ def merge_lappyr(levels):
     return np.uint8(np.clip(img, 0, 255))
 
 
-def OpenCVCode(imgRGB, depth_colormap, frameCount):
+def OpenCVCode(imgRGB, depth32f, frameCount):
     global leveln
     pyr = build_lappyr(imgRGB, leveln)
     for i in range(leveln):
@@ -39,6 +39,7 @@ def OpenCVCode(imgRGB, depth_colormap, frameCount):
     res = merge_lappyr(pyr)
 
     cv.imshow('laplacian pyramid filter', res)
+    return res
 
 if __name__ == '__main__':
     print(__doc__)
