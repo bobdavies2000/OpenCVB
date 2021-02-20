@@ -21,7 +21,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     img = cv.resize(imgRGB, (int(vis.shape[1] * imgRGB.shape[1] / imgRGB.shape[0]), vis.shape[1]))
     cv.imshow('img', img)
     cv.imshow('hist', vis)
-    return imgRGB
+    return imgRGB, None
 
 hsv_map = np.zeros((180, 256, 3), np.uint8)
 h, s = np.indices(hsv_map.shape[:2])

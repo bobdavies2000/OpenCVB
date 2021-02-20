@@ -13,7 +13,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     hulls = [cv.convexHull(p.reshape(-1, 1, 2)) for p in regions]
     cv.polylines(vis, hulls, 1, (0, 255, 0))
     cv.imshow('imgRGB', vis)
-    return vis
+    return vis, None
 
 if __name__ == '__main__':
     mser = cv.MSER_create()

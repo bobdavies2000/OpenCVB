@@ -73,10 +73,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     bin = cv.resize(bin, (int(w / 2), int(h / 2)))
     binRGB = np.empty(rgb.shape, rgb.dtype)
     cv.cvtColor(bin, cv.COLOR_GRAY2BGR, binRGB)
-    images = np.empty((h, w*2, rgb.shape[2]), rgb.dtype)
-    images = cv.hconcat([rgb, binRGB])
-    cv.imshow(titleWindow, images)
-    return imgRGB
+    return rgb, binRGB
 
 
 if __name__ == '__main__':

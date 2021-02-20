@@ -69,7 +69,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     prev_imgRGB = gray.copy()
     myFrameCount += 1
     if myFrameCount == 1: return imgRGB
-    return flowRGB
+    return flowRGB, None
 
 if __name__ == '__main__':
     myFrameCount = 0

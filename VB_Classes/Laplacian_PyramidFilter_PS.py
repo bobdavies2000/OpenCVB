@@ -40,7 +40,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     res = merge_lappyr(pyr)
 
     cv.imshow('laplacian pyramid filter', res)
-    return res
+    return res, None
 
 if __name__ == '__main__':
     print(__doc__)

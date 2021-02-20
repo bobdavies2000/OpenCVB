@@ -49,7 +49,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     ch = cv.waitKey(1)
     if ch & 0xff == ord(' '):
         display_mode = (display_mode + 1) % 2 # set this to 3 to get the labels working but it won't display...
-    return result
+    return result, None
 
 if __name__ == '__main__':
     cv.namedWindow(titleWindow)

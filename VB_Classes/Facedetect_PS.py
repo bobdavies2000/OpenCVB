@@ -38,7 +38,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
 
     draw_str(vis, (20, 20), 'time: %.1f ms' % (dt*1000))
     cv.imshow('facedetect', vis)
-    return vis
+    return vis, None
 
 if __name__ == '__main__':
     print('This example works only occasionally!  Same face model in C# works ok when face is vertical.')

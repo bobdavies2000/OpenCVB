@@ -53,9 +53,9 @@ class App:
         print(__doc__)
         PyStreamRun(self.OpenCVCode, titleWindow)
 
-    def OpenCVCode(self, frame, depth32f, frameCount):
-        frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-        vis = frame.copy()
+    def OpenCVCode(self, imgRGB, depth32f, frameCount):
+        frame_gray = cv.cvtColor(imgRGB, cv.COLOR_BGR2GRAY)
+        vis = imgRGB.copy()
         if self.p0 is not None:
             p2, trace_status = checkedTrace(self.gray1, frame_gray, self.p1)
 
@@ -67,7 +67,7 @@ class App:
                 self.p0 = None
                 exit
             H, status = cv.findHomography(self.p0, self.p1, (0, cv.RANSAC)[self.use_ransac], 10.0)
-            h, w = frame.shape[:2]
+            h, w = imgRGB.shape[:2]
             overlay = cv.warpPerspective(self.frame0, H, (w, h))
             vis = cv.addWeighted(vis, 0.5, overlay, 0.5, 0.0)
 
@@ -88,7 +88,7 @@ class App:
         cv.imshow('lk_homography', vis)
         ch = cv.waitKey(1)
         if ch == ord(' '):
-            self.frame0 = frame.copy()
+            self.frame0 = imgRGB.copy()
             self.p0 = cv.goodFeaturesToTrack(frame_gray, **feature_params)
             if self.p0 is not None:
                 self.p1 = self.p0
@@ -96,6 +96,6 @@ class App:
                 self.gray1 = frame_gray
         if ch == ord('r'):
             self.use_ransac = not self.use_ransac
-        return vis
+        return vis, None
 
 App().Open()

@@ -85,7 +85,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     if show_glitch:
         cur_glitch = warp_flow(cur_glitch, flow)
         cv.imshow('glitch', cur_glitch)
-    return flowRGB
+    return flowRGB, None
 
 if __name__ == '__main__':
     print(__doc__)

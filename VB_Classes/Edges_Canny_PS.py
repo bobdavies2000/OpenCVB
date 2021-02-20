@@ -15,7 +15,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     vis = np.uint8(vis/2.)
     vis[edge != 0] = (0, 255, 0)
     cv.imshow('edge', vis)
-    return vis
+    return vis, None
 
 print(__doc__)
 cv.namedWindow('edge')

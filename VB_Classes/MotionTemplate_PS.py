@@ -69,9 +69,9 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
 
         cv.putText(vis, visual_name, (20, 20), cv.FONT_HERSHEY_PLAIN, 1.0, (200,0,0))
         cv.imshow(titleWindow, vis)
-        return vis
+        return vis, None
     else :
-        return imgRGB
+        return imgRGB, None
 
     prev_imgRGB = imgRGB.copy()
     myFrameCount += 1

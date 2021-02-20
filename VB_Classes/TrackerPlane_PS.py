@@ -161,7 +161,7 @@ class App:
             self.paused = not self.paused
         if ch == ord('c'):
             self.tracker.clear()
-        return vis
+        return vis, None
 
 if __name__ == '__main__':
     print(__doc__)

@@ -1,9 +1,9 @@
 import cv2 as cv
-from PyStream import PyStreamRun1
-titleWindow = 'BGSubtract_PS1.py'
+from PyStream import PyStreamRun
+titleWindow = 'BGSubtract_MOG2_PS1.py'
 fileName = '../Data/vtest.avi'
 
-def OpenCVCode(frameCount):
+def OpenCVCode(imgRGB, depth32f, frameCount):
     global backSub, capture, fileName
     ret, frame = capture.read()
     if frame is None:
@@ -17,7 +17,6 @@ def OpenCVCode(frameCount):
 
     return frame, fgMask
 
-#backSub = cv.createBackgroundSubtractorKNN()
 backSub = cv.createBackgroundSubtractorMOG2()
 capture = cv.VideoCapture(cv.samples.findFileOrKeep(fileName))
-PyStreamRun1(OpenCVCode, titleWindow)
+PyStreamRun(OpenCVCode, titleWindow)

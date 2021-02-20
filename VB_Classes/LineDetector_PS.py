@@ -31,7 +31,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
         width = lines[i, 4]
         cv.line(imgRGB, pt1, pt2, (0, 0, 255), int(np.ceil(width / 2)))
     cv.imshow("LineDetector_PS.py", imgRGB)
-    return imgRGB
+    return imgRGB, None
 
 cv.namedWindow(titleWindow)
 PyStreamRun(OpenCVCode, titleWindow)

@@ -59,7 +59,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
 	out1 = np.hstack((imgRGB,output))
 	out1 = cv.resize(out1,(700,350))
 	cv.imshow(titleWindow,out1)
-	return output
+	return output, None
 
 cv.namedWindow(titleWindow)
 trackbar_name = 'Distort'

@@ -77,6 +77,6 @@ class App:
         self.frame_idx += 1
         self.prev_gray = frame_gray
         cv.imshow('KLT_track_PS', vis)
-        return vis
+        return vis, None
 
 App().Open()

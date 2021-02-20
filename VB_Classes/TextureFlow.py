@@ -9,7 +9,7 @@ Usage:
 '''
 import numpy as np
 import cv2 as cv
-task.desc = "Painterly Effect"
+taskdesc = "Painterly Effect"
 titleWindow = 'TextureFlow.py'
 
 def main():
@@ -32,7 +32,7 @@ def main():
     flow = eigen[:,:,2]
 
     vis = img.copy()
-    vis[:] = (192 + np.uinteger(vis)) / 2
+    vis[:] = (192 + np.uint32(vis)) / 2
     d = 12
     points =  np.dstack( np.mgrid[d/2:width:d, d/2:height:d] ).reshape(-1, 2)
     for x, y in np.int32(points):

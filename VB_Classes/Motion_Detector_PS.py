@@ -136,7 +136,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     # Splice the two video frames together to make one long horizontal one
     cv.imshow(titleWindow,cv.hconcat([delta, img]))
     frameCount += 1
-    return imgRGB
+    return imgRGB, None
 
 movement_persistent_counter = 0
 font = cv.FONT_HERSHEY_SIMPLEX

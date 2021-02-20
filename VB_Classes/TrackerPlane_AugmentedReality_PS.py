@@ -38,7 +38,7 @@ ar_edges = [(0, 1), (1, 2), (2, 3), (3, 0),
 
 class App:
     def Open(self):
-        self.frame = None
+        self.imgRGB = None
         self.paused = False
         self.tracker = PlaneTracker()
 
@@ -48,16 +48,16 @@ class App:
         PyStreamRun(self.OpenCVCode,  titleWindow)
 
     def on_rect(self, rect):
-        self.tracker.add_target(self.frame, rect)
+        self.tracker.add_target(self.imgRGB, rect)
 
-    def OpenCVCode(self, frame, depth32f, frameCount):
+    def OpenCVCode(self, imgRGB, depth32f, frameCount):
         playing = not self.paused and not self.rect_sel.dragging
         if playing:
-            self.frame = frame.copy()
+            self.imgRGB = imgRGB.copy()
 
-        vis = self.frame.copy()
+        vis = self.imgRGB.copy()
         if playing:
-            tracked = self.tracker.track(self.frame)
+            tracked = self.tracker.track(self.imgRGB)
             for tr in tracked:
                 cv.polylines(vis, [np.int32(tr.quad)], True, (255, 255, 255), 2)
                 for (x, y) in np.int32(tr.p1):
@@ -71,7 +71,7 @@ class App:
             self.paused = not self.paused
         if ch == ord('c'):
             self.tracker.clear()
-        return vis
+        return vis, None
 
     def draw_overlay(self, vis, tracked):
         x0, y0, x1, y1 = tracked.target.rect

@@ -64,7 +64,7 @@ Public Class BGSubtract_MotionDetect_MT
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Correlation Threshold X1000", 0, 1000, 980)
+            sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
         End If
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 6)
@@ -96,7 +96,7 @@ Public Class BGSubtract_MotionDetect_MT
         Dim taskArray(threadCount - 1) As System.Threading.Tasks.Task
         Dim xfactor = CInt(src.Width / width)
         Dim yfactor = Math.Max(CInt(src.Height / height), CInt(src.Width / width))
-        Static correlationSlider = findSlider("Correlation Threshold X1000")
+        Static correlationSlider = findSlider("Correlation Threshold")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         dst1.SetTo(0)
         For i = 0 To threadCount - 1
@@ -128,7 +128,7 @@ Public Class BGSubtract_Basics_MT
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Correlation Threshold X1000", 0, 1000, 980)
+            sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
         End If
 
         task.desc = "Detect Motion in the color image"
@@ -136,25 +136,26 @@ Public Class BGSubtract_Basics_MT
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run()
-        dst1 = src
-        If dst1.Channels = 3 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        If ocvb.frameCount = 0 Then dst2 = dst1.Clone()
-        Static correlationSlider = findSlider("Correlation Threshold X1000")
+        Dim input = src
+        If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = input.EmptyClone.SetTo(0)
+        If ocvb.frameCount = 0 Then dst2 = input.Clone()
+        Static correlationSlider = findSlider("Correlation Threshold")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
+        dst1.SetTo(0)
         Dim updateCount As Integer
-        Parallel.ForEach(grid.roiList,
+        Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
             Dim correlation As New cv.Mat
-            cv.Cv2.MatchTemplate(dst1(roi), dst2(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+            cv.Cv2.MatchTemplate(input(roi), dst2(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
             If correlation.Get(Of Single)(0, 0) < CCthreshold Then
                 Interlocked.Increment(updateCount)
-                dst1(roi).CopyTo(dst2(roi))
+                input(roi).CopyTo(dst2(roi))
             End If
+            input(roi).CopyTo(dst1(roi))
         End Sub)
-        dst1.SetTo(255, grid.gridMask)
         label1 = "Motion added to dst2 for " + CStr(updateCount) + " segments out of " + CStr(grid.roiList.Count)
-        label2 = CStr(grid.roiList.Count - updateCount) + " segments out of " + CStr(grid.roiList.Count) + " had > " + Format(correlationSlider.value / 1000, "0.0%") + " correlation"
+        label2 = CStr(grid.roiList.Count - updateCount) + " segments had > " + Format(correlationSlider.value / 1000, "0.0%") + " correlation"
     End Sub
 End Class
 

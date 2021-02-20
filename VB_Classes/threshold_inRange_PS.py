@@ -49,16 +49,13 @@ def on_high_V_thresh_trackbar(val):
     high_V = max(high_V, low_V+1)
     cv.setTrackbarPos(high_V_name, window_detection_name, high_V)
     
-def OpenCVCode(frame, depth_colormap, frameCount):
-    frame_HSV = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
+def OpenCVCode(imgRGB, depth_colormap, frameCount):
+    frame_HSV = cv.cvtColor(imgRGB, cv.COLOR_BGR2HSV)
     frame_threshold = cv.inRange(frame_HSV, (low_H, low_S, low_V), (high_H, high_S, high_V))
 
-    cv.imshow(window_capture_name, frame)
     cv.imshow(window_detection_name, frame_threshold)
 
-    key = cv.waitKey(1)
-    vis = cv.cvtColor(frame_threshold, cv.COLOR_GRAY2BGR)
-    return vis
+    return imgRGB, frame_threshold
 
 max_value = 255
 max_value_H = 360//2
@@ -68,7 +65,6 @@ low_V = 10
 high_H = max_value_H
 high_S = max_value
 high_V = max_value
-window_capture_name = 'Video Capture'
 window_detection_name = 'Object Detection'
 low_H_name = 'Low H'
 low_S_name = 'Low S'
@@ -77,7 +73,6 @@ high_H_name = 'High H'
 high_S_name = 'High S'
 high_V_name = 'High V'
 
-cv.namedWindow(window_capture_name)
 cv.namedWindow(window_detection_name)
 
 cv.createTrackbar(low_H_name, window_detection_name , low_H, max_value_H, on_low_H_thresh_trackbar)

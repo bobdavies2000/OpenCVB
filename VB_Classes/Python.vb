@@ -212,6 +212,8 @@ Public Class Python_Stream
     Dim pipeOut As NamedPipeServerStream
     Dim rgbBuffer(1) As Byte
     Dim depthBuffer(1) As Byte
+    Dim dst1Buffer(1) As Byte
+    Dim dst2Buffer(1) As Byte
     Dim pythonReady As Boolean
     Dim memMap As Python_MemMap
     Public Sub New()
@@ -252,15 +254,19 @@ Public Class Python_Stream
 
             If rgbBuffer.Length <> src.Total * src.ElemSize Then ReDim rgbBuffer(src.Total * src.ElemSize - 1)
             If depthBuffer.Length <> task.depth32f.Total * task.depth32f.ElemSize Then ReDim depthBuffer(task.depth32f.Total * task.depth32f.ElemSize - 1)
+            If dst1Buffer.Length <> dst1.Total * dst1.ElemSize Then ReDim dst1Buffer(dst1.Total * dst1.ElemSize - 1)
+            If dst2Buffer.Length <> dst2.Total * dst2.ElemSize Then ReDim dst2Buffer(dst2.Total * dst2.ElemSize - 1)
             Marshal.Copy(src.Data, rgbBuffer, 0, src.Total * src.ElemSize)
             Marshal.Copy(task.depth32f.Data, depthBuffer, 0, depthBuffer.Length)
             If pipeOut.IsConnected Then
                 On Error Resume Next
                 pipeOut.Write(rgbBuffer, 0, rgbBuffer.Length)
                 pipeOut.Write(depthBuffer, 0, depthBuffer.Length)
-                pipeIn.Read(rgbBuffer, 0, rgbBuffer.Length)
+                pipeIn.Read(dst1Buffer, 0, dst1Buffer.Length)
+                pipeIn.Read(dst2Buffer, 0, dst2Buffer.Length)
             End If
-            Marshal.Copy(rgbBuffer, 0, dst1.Data, rgbBuffer.Length)
+            Marshal.Copy(dst1Buffer, 0, dst1.Data, dst1Buffer.Length)
+            Marshal.Copy(dst2Buffer, 0, dst2.Data, dst2Buffer.Length)
         End If
     End Sub
 End Class

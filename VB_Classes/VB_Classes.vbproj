@@ -108,6 +108,7 @@
   <ItemGroup>
     <Compile Include="AddWeighted.vb" />
     <Compile Include="BestOf.vb" />
+    <Compile Include="BGSubtract.vb" />
     <Compile Include="ImageSeg.vb" />
     <Compile Include="MFD.vb" />
     <Compile Include="MiniPC.vb" />
@@ -171,7 +172,6 @@
     <Compile Include="Grayscale.vb" />
     <Compile Include="Harris.vb" />
     <Compile Include="Area.vb" />
-    <Compile Include="BGSubtract.vb" />
     <Compile Include="Binarize.vb" />
     <Compile Include="Blob.vb" />
     <Compile Include="BlockMatching.vb" />
@@ -393,7 +393,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="BGSubtract_PS1.py" />
+    <Content Include="BGSubtract_KNN_PS.py" />
+    <Content Include="BGSubtract_MOG2_PS.py" />
+    <Content Include="Camshift1_PS.py" />
+    <Content Include="DFT_PS.py" />
     <Content Include="PutText_PS.py" />
     <Content Include="AddWeighted_PS.py" />
     <Content Include="BGSubtract.py" />

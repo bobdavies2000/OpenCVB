@@ -27,6 +27,6 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
 
     cv.imshow(titleWindow, imgRGB)
     if saveRect == (0, 0, 0, 0): cv.putText(imgRGB, "Draw here to select an object to track", (40,100), cv.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50),2)
-    return imgRGB
+    return imgRGB, None
 
 PyStreamRun(OpenCVCode, titleWindow)

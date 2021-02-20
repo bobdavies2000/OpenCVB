@@ -148,26 +148,26 @@ class App:
         tracker = MOSSE(frame_gray, rect)
         self.trackers.append(tracker)
 
-    def OpenCVCode(self, vis, depth32f, frameCount    ):
-        self.frame = vis.copy()
+    def OpenCVCode(self, imgRGB, depth32f, frameCount    ):
+        self.frame = imgRGB.copy()
         if not self.paused:
             frame_gray = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
             for tracker in self.trackers:
                 tracker.update(frame_gray)
 
         for tracker in self.trackers:
-            tracker.draw_state(vis)
+            tracker.draw_state(imgRGB)
         if len(self.trackers) > 0:
             cv.imshow('tracker state', self.trackers[-1].state_vis)
-        self.rect_sel.draw(vis)
+        self.rect_sel.draw(imgRGB)
 
-        cv.imshow(titleWindow, vis)
+        cv.imshow(titleWindow, imgRGB)
         ch = cv.waitKey(10)
         if ch == ord(' '):
             self.paused = not self.paused
         if ch == ord('c'):
             self.trackers = []
-        return vis
+        return imgRGB, None
 
 if __name__ == '__main__':
     print (__doc__)

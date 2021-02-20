@@ -58,7 +58,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     else :
         cv.putText(imgRGB, "Draw anywhere to start tracking", (40, 100), cv.FONT_HERSHEY_SIMPLEX, 0.75,(255,255,255),2)
         cv.putText(imgRGB, "Click to clear rect and start again", (40, 200), cv.FONT_HERSHEY_SIMPLEX, 0.75,(255,255,255),2)
-    return imgRGB
+    return imgRGB, None
 
 cv.namedWindow(titleWindow)
 cv.createTrackbar('Methods', titleWindow , currentIndex, len(algorithmList) - 1, on_trackbar)

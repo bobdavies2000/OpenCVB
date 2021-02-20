@@ -15,7 +15,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     depth_colormap = cv.applyColorMap(cv.convertScaleAbs(depth32f, alpha=0.03), cv.COLORMAP_HSV)
     dst = cv.addWeighted(imgRGB, alpha, depth_colormap, beta, 0.0)
     cv.imshow(titleWindow, dst)
-    return dst
+    return dst, None
 
 cv.namedWindow(titleWindow)
 cv.createTrackbar('Alpha', titleWindow , saveAlpha, alpha_slider_max, on_trackbar)

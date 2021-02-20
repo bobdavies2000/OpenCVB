@@ -78,13 +78,11 @@ def main():
 
     cv.imshow('image',im)
     while True:
+        curve = hist_curve(im)
+        cv.imshow('histogram',curve)
+        cv.imshow('image',im)
         k = cv.waitKey(0)
-        if k == ord('a'):
-            curve = hist_curve(im)
-            cv.imshow('histogram',curve)
-            cv.imshow('image',im)
-            print('a')
-        elif k == ord('b'):
+        if k == ord('b'):
             print('b')
             lines = hist_lines(im)
             cv.imshow('histogram',lines)
