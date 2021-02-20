@@ -12,8 +12,8 @@ def OpenCVCode(frameCount):
 
     fgMask = backSub.apply(frame)
 
-    cv.rectangle(frame, (10, 2), (100,20), (255,255,255), -1)
-    cv.putText(frame, str(capture.get(cv.CAP_PROP_POS_FRAMES)), (15, 15), cv.FONT_HERSHEY_SIMPLEX, 0.5 , (0,0,0))
+    cv.rectangle(frame, (40, 100), (90, 120), (255,255,255), -1)
+    cv.putText(frame, str(capture.get(cv.CAP_PROP_POS_FRAMES)), (40, 115), cv.FONT_HERSHEY_SIMPLEX, 0.5 , (0,0,0))
 
     return frame, fgMask
 
