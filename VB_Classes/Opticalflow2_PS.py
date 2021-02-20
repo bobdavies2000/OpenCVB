@@ -39,40 +39,24 @@ def warp_flow(img, flow):
     return res
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
-    global myFrameCount, prev_imgRGB, prev, show_hsv, show_glitch, cur_glitch
+    global prev_imgRGB, prev, show_hsv, show_glitch, cur_glitch
     gray = cv.cvtColor(imgRGB, cv.COLOR_BGR2GRAY)
-    if myFrameCount == 0:
+    if frameCount == 0:
         show_hsv = True
         show_glitch = True
         prev_imgRGB = gray.copy()
         cur_glitch = imgRGB.copy()
+        return imgRGB, None
     else:
         flow = cv.calcOpticalFlowFarneback(prev_imgRGB, gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
-        prev_imgRGB = gray
+        prev_imgRGB = gray.copy()
 
-        flowRGB = draw_flow(gray, flow)
-        cv.imshow('flow', draw_flow(gray, flow))
-        if show_hsv:
-            cv.imshow('flow HSV', draw_hsv(flow))
-        if show_glitch:
-            cur_glitch = warp_flow(cur_glitch, flow)
-            cv.imshow('glitch', cur_glitch)
+        cur_glitch = warp_flow(cur_glitch, flow)
+        cv.imshow('glitch', cur_glitch)
 
-        ch = cv.waitKey(5)
-        if ch == ord('1'):
-            show_hsv = not show_hsv
-        if ch == ord('2'):
-            show_glitch = not show_glitch
-            if show_glitch:
-                cur_glitch = imgRGB.copy()
-            print('glitch is', ['off', 'on'][show_glitch])
-    prev_imgRGB = gray.copy()
-    myFrameCount += 1
-    if myFrameCount == 1: return imgRGB
-    return flowRGB, None
+        if frameCount % 30 == 0: cur_glitch = imgRGB.copy()
+    return draw_flow(gray, flow), draw_hsv(flow)
 
 if __name__ == '__main__':
-    myFrameCount = 0
-
     PyStreamRun(OpenCVCode, titleWindow)
     

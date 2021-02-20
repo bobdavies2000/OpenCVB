@@ -72,17 +72,12 @@ Public Class Python_Run
         initParent()
         If ocvb.pythonTaskName = "" Then ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/PythonPackages.py"
         Dim pythonApp = New FileInfo(ocvb.pythonTaskName)
-
         If pythonApp.Name.EndsWith("_PS.py") Then
             pyStream = New Python_Stream()
-        ElseIf pythonApp.Name.EndsWith("_PS1.py") Then
-            pyStream = New Python_Stream1()
         Else
             StartPython("")
         End If
         task.desc = "Run Python app: " + pythonApp.Name
-        label1 = ""
-        label2 = ""
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -94,6 +89,13 @@ Public Class Python_Run
             label1 = "Output of Python Backend"
             label2 = "Second Output of Python Backend"
         Else
+            Dim pythonApp = New FileInfo(ocvb.pythonTaskName)
+            If pythonApp.Name.StartsWith("OakD") Then
+                ocvb.trueText("The " + pythonApp.Name + " python script is merely a placeholder while working on the OakD support " + vbCrLf +
+                          "It can only be run outside of OpenCVB.")
+                Exit Sub
+            End If
+
             Dim proc = Process.GetProcessesByName("python")
             If proc.Count = 0 Then
                 If tryCount < 3 Then StartPython("")
