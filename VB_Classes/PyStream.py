@@ -129,7 +129,7 @@ def PyStreamRun1(OpenCVCode, scriptName):
                     frameCount = arrayDoubles[0] 
                     dst1, dst2 = OpenCVCode(frameCount)
                     dst1 = cv.resize(dst1, (width, height))
-                    #dst2 = cv.resize(dst1, (width, height))
+                    dst2 = cv.resize(dst1, (width, height))
                     pipeOut.write(np.asarray(dst1))
                     pipeOut.write(np.asarray(dst1))
                     cv.waitKey(1) # this is only needed if the OpenCVCode function is calling imshow

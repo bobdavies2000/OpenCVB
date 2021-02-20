@@ -320,7 +320,6 @@ Public Class Python_Stream1
             End If
             Marshal.Copy(dst1Buffer, 0, dst1.Data, dst1Buffer.Length)
             Marshal.Copy(dst2Buffer, 0, dst2.Data, dst2Buffer.Length)
-            cv.Cv2.ImShow("dst2", dst2)
         End If
     End Sub
 End Class
