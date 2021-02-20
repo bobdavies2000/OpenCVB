@@ -2,6 +2,7 @@ Imports System.IO
 Imports System.Runtime.InteropServices
 Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
+Imports cv = OpenCvSharp
 
 Module Python_Module
     Public Function checkPythonPackage( packageName As String) As Boolean
@@ -74,6 +75,8 @@ Public Class Python_Run
 
         If pythonApp.Name.EndsWith("_PS.py") Then
             pyStream = New Python_Stream()
+        ElseIf pythonApp.Name.EndsWith("_PS1.py") Then
+            pyStream = New Python_Stream1()
         Else
             StartPython("")
         End If
@@ -87,7 +90,9 @@ Public Class Python_Run
             pyStream.src = src
             pyStream.Run()
             dst1 = pyStream.dst1
-            label1 = pyStream.label1
+            dst2 = pyStream.dst2
+            label1 = "Output of Python Backend"
+            label2 = "Second Output of Python Backend"
         Else
             Dim proc = Process.GetProcessesByName("python")
             If proc.Count = 0 Then
@@ -256,6 +261,66 @@ Public Class Python_Stream
                 pipeIn.Read(rgbBuffer, 0, rgbBuffer.Length)
             End If
             Marshal.Copy(rgbBuffer, 0, dst1.Data, rgbBuffer.Length)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Python_Stream1
+    Inherits VBparent
+    Dim pipeName As String
+    Dim pipeIn As NamedPipeServerStream
+    Dim dst1Buffer(1) As Byte
+    Dim dst2Buffer(1) As Byte
+    Dim pythonReady As Boolean
+    Dim memMap As Python_MemMap
+    Public Sub New()
+        initParent()
+        pipeName = "PyStreamResults" + CStr(PipeTaskIndex)
+        pipeIn = New NamedPipeServerStream(pipeName, PipeDirection.In)
+        PipeTaskIndex += 1
+
+        ' Was this class invoked standalone?  Then just run something that works with RGB and depth...
+        If ocvb.pythonTaskName.EndsWith("Python_Stream") Then
+            ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/BG_Subtract_PS1.py"
+        End If
+
+        memMap = New Python_MemMap()
+
+        If ocvb.parms.externalPythonInvocation Then
+            pythonReady = True ' python was already running and invoked OpenCVB.
+        Else
+            pythonReady = StartPython("--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
+        End If
+        If pythonReady Then pipeIn.WaitForConnection()
+        task.desc = "General purpose class to invoke a Python script and get the outputs - dst1 and dst2 - back."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If pythonReady Then
+            For i = 0 To memMap.memMapValues.Length - 1
+                memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, dst1.Total * dst1.ElemSize,
+                                                dst2.Total * dst2.ElemSize, dst1.Rows, dst1.Cols,
+                                                task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height)
+            Next
+            memMap.Run()
+
+            If dst1Buffer.Length <> dst1.Total * dst1.ElemSize Then ReDim dst1Buffer(dst1.Total * dst1.ElemSize - 1)
+            If dst2Buffer.Length <> dst2.Total * dst2.ElemSize Then ReDim dst2Buffer(dst2.Total * dst2.ElemSize - 1)
+            If pipeIn.IsConnected Then
+                On Error Resume Next
+                pipeIn.Read(dst1Buffer, 0, dst1Buffer.Length)
+                pipeIn.Read(dst2Buffer, 0, dst2Buffer.Length)
+            End If
+            Marshal.Copy(dst1Buffer, 0, dst1.Data, dst1Buffer.Length)
+            Marshal.Copy(dst2Buffer, 0, dst2.Data, dst2Buffer.Length)
+            cv.Cv2.ImShow("dst2", dst2)
         End If
     End Sub
 End Class

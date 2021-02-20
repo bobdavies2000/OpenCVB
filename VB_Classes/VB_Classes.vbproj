@@ -393,7 +393,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="AddWeightedTest.py" />
+    <Content Include="BGSubtract_PS1.py" />
     <Content Include="PutText_PS.py" />
     <Content Include="AddWeighted_PS.py" />
     <Content Include="BGSubtract.py" />

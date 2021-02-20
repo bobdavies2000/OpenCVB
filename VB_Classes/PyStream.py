@@ -74,8 +74,66 @@ def PyStreamRun(OpenCVCode, scriptName):
                         sys.exit()
                     imgRGB = OpenCVCode(imgRGB, depth32f, frameCount)
                     pipeOut.write(np.asarray(imgRGB))
-                    cv.waitKey(1)
+                    cv.waitKey(1) # this is only needed if the OpenCVCode function is calling imshow
                     
     except Exception as exception:
         print(exception)
-        Mbox('PyStream.py', 'Failure - see console output', 1)    
+        Mbox('PyStream.py', str(exception), 1)    
+
+
+
+
+
+
+
+
+
+def PyStreamRun1(OpenCVCode, scriptName):
+    parser = argparse.ArgumentParser(description='Pass in length of MemMap region.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--MemMapLength', type=int, default=0, help='The number of bytes are in the memory mapped file.')
+    parser.add_argument('--pipeName', default='', help='The name of the input pipe for image data.')
+    args = parser.parse_args()
+
+    # When the PythonDebug project runs a Python script, this code will start OpenCVB.exe and invoke the script.
+    MemMapLength = args.MemMapLength
+    if MemMapLength == 0:
+        MemMapLength = 400 # these values have been generously padded (on both sides) but if they grow...
+        args.pipeName = 'PyStreamResults0' # we always start with 0 and since it is only invoked once, 0 is all it will ever be.
+        ocvb = os.getcwd() + '/../bin/Debug/OpenCVB.exe'
+        if os.path.exists(ocvb):
+            tupleArg = (' ', scriptName)
+            pid = os.spawnv(os.P_NOWAIT, ocvb, tupleArg) # OpenCVB.exe will be run with this .py script
+
+    pipeName = '\\\\.\\pipe\\' + args.pipeName
+    while True:
+        try:
+            pipeOut = open(pipeName, 'wb')
+            break
+        except Exception as exception:
+            time.sleep(0.1) # sleep for a bit to wait for OpenCVB to start...
+    try: 
+        mm = mmap.mmap(0, MemMapLength, tagname='Python_MemMap')
+        frameCount = -1
+        while True:
+            mm.seek(0)
+            arrayDoubles = array.array('d', mm.read(MemMapLength))
+            dst1BufferSize = int(arrayDoubles[1])
+            dst2BufferSize = int(arrayDoubles[2])
+            height = int(arrayDoubles[3])
+            width = int(arrayDoubles[4])
+
+            if width > 0:
+                if arrayDoubles[0] == frameCount:
+                    sleep(0.001)
+                else:
+                    frameCount = arrayDoubles[0] 
+                    dst1, dst2 = OpenCVCode(frameCount)
+                    dst1 = cv.resize(dst1, (width, height))
+                    #dst2 = cv.resize(dst1, (width, height))
+                    pipeOut.write(np.asarray(dst1))
+                    pipeOut.write(np.asarray(dst1))
+                    cv.waitKey(1) # this is only needed if the OpenCVCode function is calling imshow
+                    
+    except Exception as exception:
+        print(exception)
+        Mbox('PyStream.py', str(exception), 1)    
