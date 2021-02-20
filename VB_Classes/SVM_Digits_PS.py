@@ -9,7 +9,7 @@ from PyStream import PyStreamRun
 # built-in modules
 import os
 import sys
-title_window = 'SVM_Digits_PS.py'
+titleWindow = 'SVM_Digits_PS.py'
 
 # local modules
 from common import mosaic
@@ -75,7 +75,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     cv.cvtColor(bin, cv.COLOR_GRAY2BGR, binRGB)
     images = np.empty((h, w*2, rgb.shape[2]), rgb.dtype)
     images = cv.hconcat([rgb, binRGB])
-    cv.imshow(title_window, images)
+    cv.imshow(titleWindow, images)
     return imgRGB
 
 
@@ -91,4 +91,4 @@ if __name__ == '__main__':
         model = cv.ml.SVM_create()
         model.load_(classifier_fn) #Known bug: https://github.com/opencv/opencv/issues/4969
 
-PyStreamRun(OpenCVCode, title_window)
+PyStreamRun(OpenCVCode, titleWindow)

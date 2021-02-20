@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 import argparse
-title_window = 'Remap_Demo.py'
+titleWindow = 'Remap_Demo.py'
 
 def update_map(ind, map_x, map_y):
     if ind == 0:
@@ -38,14 +38,14 @@ src = cv.imread("../Data/starry_night.jpg")
 map_x = np.zeros((src.shape[0], src.shape[1]), dtype=np.float32)
 map_y = np.zeros((src.shape[0], src.shape[1]), dtype=np.float32)
 
-cv.namedWindow(title_window)
+cv.namedWindow(titleWindow)
 
 ind = 0
 while True:
     update_map(ind, map_x, map_y)
     ind = (ind + 1) % 4
     dst1 = cv.remap(src, map_x, map_y, cv.INTER_LINEAR)
-    cv.imshow(title_window, dst1)
+    cv.imshow(titleWindow, dst1)
     c = cv.waitKey(1000)
     if c == 27:
         break

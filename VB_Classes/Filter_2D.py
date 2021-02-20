@@ -5,7 +5,7 @@
 import sys
 import cv2 as cv
 import numpy as np
-title_window = 'Filter_2D.py'
+titleWindow = 'Filter_2D.py'
 
 def main(argv):
     window_name = 'filter2D Demo'

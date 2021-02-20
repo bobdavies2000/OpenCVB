@@ -2,7 +2,7 @@ import ctypes
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxW(0, text, title, style)
 
-title_window = 'PythonPackages.py'
+titleWindow = 'PythonPackages.py'
 
 print("Checking the packages used by the OpenCVB Python scripts.")
 warningMsg = False

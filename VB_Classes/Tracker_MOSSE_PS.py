@@ -23,7 +23,7 @@ import numpy as np
 import cv2 as cv
 from PyStream import PyStreamRun
 from common import draw_str, RectSelector
-title_window = "Tracker_MOSSE_PS.py"
+titleWindow = "Tracker_MOSSE_PS.py"
 
 def rnd_warp(a):
     h, w = a.shape[:2]
@@ -138,10 +138,10 @@ class MOSSE:
 class App:
     def Open(self):
         self.paused = False
-        cv.namedWindow(title_window)
-        self.rect_sel = RectSelector(title_window, self.onrect)
+        cv.namedWindow(titleWindow)
+        self.rect_sel = RectSelector(titleWindow, self.onrect)
         self.trackers = []
-        PyStreamRun(self.OpenCVCode, title_window)
+        PyStreamRun(self.OpenCVCode, titleWindow)
 
     def onrect(self, rect):
         frame_gray = cv.cvtColor(self.frame, cv.COLOR_BGR2GRAY)
@@ -161,7 +161,7 @@ class App:
             cv.imshow('tracker state', self.trackers[-1].state_vis)
         self.rect_sel.draw(vis)
 
-        cv.imshow(title_window, vis)
+        cv.imshow(titleWindow, vis)
         ch = cv.waitKey(10)
         if ch == ord(' '):
             self.paused = not self.paused

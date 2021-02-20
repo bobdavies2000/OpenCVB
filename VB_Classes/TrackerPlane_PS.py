@@ -23,7 +23,7 @@ import sys
 import numpy as np
 import cv2 as cv
 from PyStream import PyStreamRun
-title_window = "PlaneDetector_PS.py"
+titleWindow = "TrackerPlane_PS.py"
 
 # built-in modules
 from collections import namedtuple
@@ -135,9 +135,9 @@ class App:
         self.paused = False
         self.tracker = PlaneTracker()
 
-        cv.namedWindow(title_window)
-        self.rect_sel = common.RectSelector(title_window, self.on_rect)
-        PyStreamRun(self.OpenCVCode, title_window)
+        cv.namedWindow(titleWindow)
+        self.rect_sel = common.RectSelector(titleWindow, self.on_rect)
+        PyStreamRun(self.OpenCVCode, titleWindow)
 
     def on_rect(self, rect):
         self.tracker.add_target(self.frame, rect)
@@ -155,7 +155,7 @@ class App:
                     cv.circle(vis, (x, y), 2, (255, 255, 255))
 
         self.rect_sel.draw(vis)
-        cv.imshow(title_window, vis)
+        cv.imshow(titleWindow, vis)
         ch = cv.waitKey(1)
         if ch == ord(' '):
             self.paused = not self.paused

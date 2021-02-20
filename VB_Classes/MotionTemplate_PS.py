@@ -3,7 +3,7 @@ import numpy as np
 import cv2 as cv
 import sys
 from PyStream import PyStreamRun
-title_window = "MotionTemplate_PS.py"
+titleWindow = "MotionTemplate_PS.py"
 
 MHI_DURATION = 0.5
 DEFAULT_THRESHOLD = 32
@@ -32,14 +32,14 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     if myFrameCount > 0:
         frame_diff = cv.absdiff(imgRGB, prev_imgRGB)
         gray_diff = cv.cvtColor(frame_diff, cv.COLOR_BGR2GRAY)
-        thrs = cv.getTrackbarPos('threshold', title_window)
+        thrs = cv.getTrackbarPos('threshold', titleWindow)
         ret, motion_mask = cv.threshold(gray_diff, thrs, 1, cv.THRESH_BINARY)
         timestamp = cv.getTickCount() / cv.getTickFrequency()
         cv.motempl.updateMotionHistory(motion_mask, motion_history, timestamp, MHI_DURATION)
         mg_mask, mg_orient = cv.motempl.calcMotionGradient( motion_history, MAX_TIME_DELTA, MIN_TIME_DELTA, apertureSize=5 )
         seg_mask, seg_bounds = cv.motempl.segmentMotion(motion_history, timestamp, MAX_TIME_DELTA)
 
-        visual_name = visuals[cv.getTrackbarPos('visual', title_window)]
+        visual_name = visuals[cv.getTrackbarPos('visual', titleWindow)]
         if visual_name == 'input':
             vis = imgRGB.copy()
         elif visual_name == 'frame_diff':
@@ -68,7 +68,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
             draw_motion_comp(vis, rect, angle, color)
 
         cv.putText(vis, visual_name, (20, 20), cv.FONT_HERSHEY_PLAIN, 1.0, (200,0,0))
-        cv.imshow(title_window, vis)
+        cv.imshow(titleWindow, vis)
         return vis
     else :
         return imgRGB
@@ -77,8 +77,8 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     myFrameCount += 1
 
 myFrameCount = 0
-cv.namedWindow(title_window)
+cv.namedWindow(titleWindow)
 visuals = ['input', 'frame_diff', 'motion_hist', 'grad_orient']
-cv.createTrackbar('visual', title_window, 2, len(visuals)-1, nothing)
-cv.createTrackbar('threshold', title_window, DEFAULT_THRESHOLD, 255, nothing)
-PyStreamRun(OpenCVCode, title_window)
+cv.createTrackbar('visual', titleWindow, 2, len(visuals)-1, nothing)
+cv.createTrackbar('threshold', titleWindow, DEFAULT_THRESHOLD, 255, nothing)
+PyStreamRun(OpenCVCode, titleWindow)

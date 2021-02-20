@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 import argparse
-title_window = 'Harris_Corners.py'
+titleWindow = 'Harris_Corners.py'
 
 source_window = 'Source image'
 corners_window = 'Corners detected'

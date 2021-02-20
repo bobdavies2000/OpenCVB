@@ -25,7 +25,7 @@ import common
 from TrackerPlane_PS import PlaneTracker
 from PyStream import PyStreamRun
 import sys
-title_window = "TrackerPlane_Reality_PS.py"
+titleWindow = "TrackerPlane_Reality_PS.py"
 
 # Simple model of a house - cube with a triangular prism "roof"
 ar_verts = np.float32([[0, 0, 0], [0, 1, 0], [1, 1, 0], [1, 0, 0],
@@ -42,10 +42,10 @@ class App:
         self.paused = False
         self.tracker = PlaneTracker()
 
-        cv.namedWindow(title_window)
-        cv.createTrackbar('focal', title_window, 25, 50, common.nothing)
-        self.rect_sel = common.RectSelector(title_window, self.on_rect)
-        PyStreamRun(self.OpenCVCode,  title_window)
+        cv.namedWindow(titleWindow)
+        cv.createTrackbar('focal', titleWindow, 25, 50, common.nothing)
+        self.rect_sel = common.RectSelector(titleWindow, self.on_rect)
+        PyStreamRun(self.OpenCVCode,  titleWindow)
 
     def on_rect(self, rect):
         self.tracker.add_target(self.frame, rect)
@@ -65,7 +65,7 @@ class App:
                 self.draw_overlay(vis, tr)
 
         self.rect_sel.draw(vis)
-        cv.imshow(title_window, vis)
+        cv.imshow(titleWindow, vis)
         ch = cv.waitKey(1)
         if ch == ord(' '):
             self.paused = not self.paused
@@ -76,7 +76,7 @@ class App:
     def draw_overlay(self, vis, tracked):
         x0, y0, x1, y1 = tracked.target.rect
         quad_3d = np.float32([[x0, y0, 0], [x1, y0, 0], [x1, y1, 0], [x0, y1, 0]])
-        fx = 0.5 + cv.getTrackbarPos('focal', title_window) / 50.0
+        fx = 0.5 + cv.getTrackbarPos('focal', titleWindow) / 50.0
         h, w = vis.shape[:2]
         K = np.float64([[fx*w, 0, 0.5*(w-1)],
                         [0, fx*w, 0.5*(h-1)],

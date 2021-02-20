@@ -10,7 +10,7 @@ A trackbar is put up which controls the contour level from -3 to 3
 '''
 
 import sys
-title_window = 'Contours.py'
+titleWindow = 'Contours.py'
 import numpy as np
 import cv2 as cv
 
@@ -55,6 +55,6 @@ if __name__ == '__main__':
     for i in range(10):
         cv.drawContours( vis, contours, (-1, 2)[(i - 3) <= 0], (128,255,255), 3, cv.LINE_AA, hierarchy, abs(i) )
         both = cv.hconcat([vis, img])
-        cv.imshow(title_window, both)
+        cv.imshow(titleWindow, both)
         cv.waitKey(1000)
     cv.waitKey()

@@ -17,7 +17,7 @@ import numpy as np
 import cv2 as cv
 import sys
 from PyStream import PyStreamRun
-title_window = 'KLT_track_PS.py'
+titleWindow = 'KLT_track_PS.py'
 
 from common import anorm2, draw_str
 
@@ -37,7 +37,7 @@ class App:
         self.tracks = []
         self.frame_idx = 0
         print(__doc__)
-        PyStreamRun(self.OpenCVCode, title_window)
+        PyStreamRun(self.OpenCVCode, titleWindow)
 
     def OpenCVCode(self, frame, depth_colormap, frameCount):
         frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)

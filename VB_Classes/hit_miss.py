@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np
-title_window = 'Hit_miss.py'
+titleWindow = 'Hit_miss.py'
 
 input_image = np.array((
     [0, 0, 0, 0, 0, 0, 0, 0],
@@ -24,16 +24,16 @@ kernel = (kernel + 1) * 127
 kernel = np.uint8(kernel)
 
 kernel = cv.resize(kernel, None, fx = rate, fy = rate, interpolation = cv.INTER_NEAREST)
-cv.imshow(title_window + " - kernel", kernel)
-cv.moveWindow(title_window + " - kernel", 0, 0)
+cv.imshow(titleWindow + " - kernel", kernel)
+cv.moveWindow(titleWindow + " - kernel", 0, 0)
 
 input_image = cv.resize(input_image, None, fx = rate, fy = rate, interpolation = cv.INTER_NEAREST)
-cv.imshow(title_window + " - Original", input_image)
-cv.moveWindow(title_window + " - Original", 0, 200)
+cv.imshow(titleWindow + " - Original", input_image)
+cv.moveWindow(titleWindow + " - Original", 0, 200)
 
 output_image = cv.resize(output_image, None , fx = rate, fy = rate, interpolation = cv.INTER_NEAREST)
-cv.imshow(title_window + " - Hit or Miss", output_image)
-cv.moveWindow(title_window + " - Hit or Miss", 500, 200)
+cv.imshow(titleWindow + " - Hit or Miss", output_image)
+cv.moveWindow(titleWindow + " - Hit or Miss", 500, 200)
 
 cv.waitKey(0)
 cv.destroyAllWindows()

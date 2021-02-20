@@ -2,7 +2,7 @@
 import cv2 as cv
 import numpy as np
 import argparse
-title_window = 'KAZE_match.py'
+titleWindow = 'KAZE_match.py'
 from math import sqrt
 
 ## [load]

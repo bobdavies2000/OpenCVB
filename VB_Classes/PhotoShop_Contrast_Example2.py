@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 import argparse
-title_window = 'PhotoShop_Contrast_Example2.py'
+titleWindow = 'PhotoShop_Contrast_Example2.py'
 
 alpha = 1.0
 alpha_max = 500
@@ -15,7 +15,7 @@ def basicLinearTransform():
     text = 'alpha = ' + repr(alpha) + " beta = " + repr(beta)
     print(text)
     img_corrected = cv.hconcat([img_original, res])
-    cv.imshow(title_window, img_corrected)
+    cv.imshow(titleWindow, img_corrected)
 
 def gammaCorrection():
     ## [changing-contrast-brightness-gamma-correction]
@@ -27,7 +27,7 @@ def gammaCorrection():
     ## [changing-contrast-brightness-gamma-correction]
 
     img_gamma_corrected = cv.hconcat([img_original, res]);
-    cv.imshow(title_window + " Gamma correction", img_gamma_corrected);
+    cv.imshow(titleWindow + " Gamma correction", img_gamma_corrected);
 
 def on_linear_transform_alpha_trackbar(val):
     global alpha
@@ -59,15 +59,15 @@ img_gamma_corrected = np.empty((img_original.shape[0], img_original.shape[1]*2, 
 img_corrected = cv.hconcat([img_original, img_original])
 img_gamma_corrected = cv.hconcat([img_original, img_original])
 
-cv.namedWindow(title_window)
-cv.namedWindow(title_window + ' Gamma correction')
+cv.namedWindow(titleWindow)
+cv.namedWindow(titleWindow + ' Gamma correction')
 
 alpha_init = int(alpha *100)
-cv.createTrackbar('Alpha gain (contrast)', title_window, alpha_init, alpha_max, on_linear_transform_alpha_trackbar)
+cv.createTrackbar('Alpha gain (contrast)', titleWindow, alpha_init, alpha_max, on_linear_transform_alpha_trackbar)
 beta_init = beta + 100
-cv.createTrackbar('Beta bias (brightness)', title_window, beta_init, beta_max, on_linear_transform_beta_trackbar)
+cv.createTrackbar('Beta bias (brightness)', titleWindow, beta_init, beta_max, on_linear_transform_beta_trackbar)
 gamma_init = int(gamma * 100)
-cv.createTrackbar('Gamma correction', title_window + ' Gamma correction', gamma_init, gamma_max, on_gamma_correction_trackbar)
+cv.createTrackbar('Gamma correction', titleWindow + ' Gamma correction', gamma_init, gamma_max, on_gamma_correction_trackbar)
 
 on_linear_transform_alpha_trackbar(alpha_init)
 on_gamma_correction_trackbar(gamma_init)

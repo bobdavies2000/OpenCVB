@@ -1,7 +1,7 @@
 import numpy as np
 import cv2 as cv
 from PyStream import PyStreamRun
-title_window = 'Histogram_Color_PS.py'
+titleWindow = 'Histogram_Color_PS.py'
  
 # built-in modules
 import sys
@@ -36,4 +36,4 @@ hist_scale = 10
 
 cv.createTrackbar('scale', 'hist', hist_scale, 32, set_scale)
 
-PyStreamRun(OpenCVCode, title_window)
+PyStreamRun(OpenCVCode, titleWindow)

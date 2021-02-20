@@ -29,9 +29,9 @@ import cv2 as cv
 import numpy as np
 from PyStream import PyStreamRun
 
-title_window = 'MotionDetector_PS.py'
+titleWindow = 'MotionDetector_PS.py'
 
-cv.namedWindow(title_window)
+cv.namedWindow(titleWindow)
 
 # =============================================================================
 # USER-SET PARAMETERS
@@ -134,11 +134,11 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     delta = cv.resize(frame_delta, (int(w / 2), int(h / 2)))
     img = cv.resize(imgRGB, (int(w / 2), int(h / 2)))
     # Splice the two video frames together to make one long horizontal one
-    cv.imshow(title_window,cv.hconcat([delta, img]))
+    cv.imshow(titleWindow,cv.hconcat([delta, img]))
     frameCount += 1
     return imgRGB
 
 movement_persistent_counter = 0
 font = cv.FONT_HERSHEY_SIMPLEX
 delay_counter = 0
-PyStreamRun(OpenCVCode, title_window)
+PyStreamRun(OpenCVCode, titleWindow)

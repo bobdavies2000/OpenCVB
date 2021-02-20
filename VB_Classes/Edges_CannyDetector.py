@@ -1,6 +1,6 @@
 import cv2 as cv
 import argparse
-title_window = 'Edges_CannyDetector.py'
+titleWindow = 'Edges_CannyDetector.py'
 
 max_lowThreshold = 100
 window_name = 'Edge Map'

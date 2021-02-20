@@ -4,7 +4,7 @@ from PyStream import PyStreamRun
 from PyStream import getDrawRect
 
 # https://learnopencv.com/object-tracking-using-opencv-cpp-python/
-title_window = 'Tracker_PS.py'
+titleWindow = 'Tracker_PS.py'
 trackerName = ""
 currentIndex = 2
 tracker = cv.TrackerKCF_create()
@@ -32,7 +32,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     if saveIndex != currentIndex: # when the tracker is changed, use must redraw the rectangle.
         if sr == drawRect: drawRect = (0, 0, 0, 0)
 
-    cv.imshow(title_window, imgRGB)
+    cv.imshow(titleWindow, imgRGB)
     cv.waitKey(1)
 
     # when the width of the drawRect is nonzero, then there is something to track
@@ -60,7 +60,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
         cv.putText(imgRGB, "Click to clear rect and start again", (40, 200), cv.FONT_HERSHEY_SIMPLEX, 0.75,(255,255,255),2)
     return imgRGB
 
-cv.namedWindow(title_window)
-cv.createTrackbar('Track Methods', title_window , currentIndex, len(algorithmList) - 1, on_trackbar)
+cv.namedWindow(titleWindow)
+cv.createTrackbar('Track Methods', titleWindow , currentIndex, len(algorithmList) - 1, on_trackbar)
 on_trackbar(currentIndex)
-PyStreamRun(OpenCVCode, title_window)
+PyStreamRun(OpenCVCode, titleWindow)

@@ -7,7 +7,7 @@ inspired by
   http://www.mia.uni-saarland.de/Publications/weickert-dagm03.pdf
 '''
 import sys
-title_window = 'Coherence.py'
+titleWindow = 'Coherence.py'
 import numpy as np
 import cv2 as cv
 #"Painterly Effect" #include this to put this example in the 'Painterly Effect' group.

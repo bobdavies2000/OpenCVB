@@ -23,7 +23,7 @@ import numpy as np
 import cv2 as cv
 import sys
 from PyStream import PyStreamRun
-title_window = 'KLT_homography_PS.py'
+titleWindow = 'KLT_homography_PS.py'
 
 from common import draw_str
 
@@ -51,7 +51,7 @@ class App:
         self.p0 = None
         self.use_ransac = True
         print(__doc__)
-        PyStreamRun(self.OpenCVCode, title_window)
+        PyStreamRun(self.OpenCVCode, titleWindow)
 
     def OpenCVCode(self, frame, depth32f, frameCount):
         frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)

@@ -10,7 +10,7 @@ Usage:
 import numpy as np
 import cv2 as cv
 task.desc = "Painterly Effect"
-title_window = 'TextureFlow.py'
+titleWindow = 'TextureFlow.py'
 
 def main():
     import sys

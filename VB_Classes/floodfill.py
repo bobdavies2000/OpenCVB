@@ -12,7 +12,7 @@ Keys:
 '''
 import numpy as np
 import cv2 as cv
-title_window = 'Floodfill.py'
+titleWindow = 'Floodfill.py'
 
 import sys
 
@@ -20,18 +20,18 @@ class App():
 
     def update(self, dummy=None):
         if self.seed_pt is None:
-            cv.imshow(title_window, self.img)
+            cv.imshow(titleWindow, self.img)
             return
         flooded = self.img.copy()
         self.mask[:] = 0
-        lo = cv.getTrackbarPos('lo', title_window)
-        hi = cv.getTrackbarPos('hi', title_window)
+        lo = cv.getTrackbarPos('lo', titleWindow)
+        hi = cv.getTrackbarPos('hi', titleWindow)
         flags = self.connectivity
         if self.fixed_range:
             flags |= cv.FLOODFILL_FIXED_RANGE
         cv.floodFill(flooded, self.mask, self.seed_pt, (255, 255, 255), (lo,)*3, (hi,)*3, flags)
         cv.circle(flooded, self.seed_pt, 2, (0, 0, 255), -1)
-        cv.imshow(title_window, flooded)
+        cv.imshow(titleWindow, flooded)
 
     def onmouse(self, event, x, y, flags, param):
         if flags & cv.EVENT_FLAG_LBUTTON:
@@ -47,9 +47,9 @@ class App():
         self.connectivity = 4
 
         self.update()
-        cv.setMouseCallback(title_window, self.onmouse)
-        cv.createTrackbar('lo', title_window, 20, 255, self.update)
-        cv.createTrackbar('hi', title_window, 20, 255, self.update)
+        cv.setMouseCallback(titleWindow, self.onmouse)
+        cv.createTrackbar('lo', titleWindow, 20, 255, self.update)
+        cv.createTrackbar('hi', titleWindow, 20, 255, self.update)
 
         while True:
             ch = cv.waitKey()

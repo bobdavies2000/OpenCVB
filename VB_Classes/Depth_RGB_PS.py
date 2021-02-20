@@ -1,5 +1,5 @@
 import cv2 as cv
-title_window = 'Depth_RGB_PS.py'
+titleWindow = 'Depth_RGB_PS.py'
 import numpy as np
 from PyStream import PyStreamRun
 

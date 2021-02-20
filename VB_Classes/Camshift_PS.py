@@ -29,7 +29,7 @@ import cv2 as cv
 import os, time
 from time import sleep
 from PyStream import PyStreamRun
-title_window = 'Camshift_PS.py'
+titleWindow = 'Camshift_PS.py'
 
 class App(object):
     def onmouse(self, event, x, y, flags, param):
@@ -67,7 +67,7 @@ class App(object):
         self.vis = None
         self.img = None
         print(__doc__)
-        PyStreamRun(self.OpenCVCode, title_window)
+        PyStreamRun(self.OpenCVCode, titleWindow)
 
     def OpenCVCode(self, vis, depth32f, frameCount):
         if self.initialized == False:

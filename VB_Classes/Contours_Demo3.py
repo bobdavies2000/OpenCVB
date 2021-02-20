@@ -4,7 +4,7 @@ import argparse
 import random as rng
 
 rng.seed(12345)
-title_window = 'Contours_Demo3.py'
+titleWindow = 'Contours_Demo3.py'
 
 def thresh_callback(val):
     threshold = val

@@ -1,7 +1,7 @@
 import numpy as np
 import cv2 as cv
 import math
-title_window = 'Fourier_descriptors_demo.py'
+titleWindow = 'Fourier_descriptors_demo.py'
 
 class ThParameters:
     def __init__(self):

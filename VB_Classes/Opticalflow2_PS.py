@@ -2,7 +2,7 @@ import numpy as np
 import cv2 as cv
 import sys
 from PyStream import PyStreamRun
-title_window = 'OpticalFlow2_PS.py'
+titleWindow = 'OpticalFlow2_PS.py'
 
 def draw_flow(img, flow, step=16):
     height, width = img.shape[:2]
@@ -74,5 +74,5 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
 if __name__ == '__main__':
     myFrameCount = 0
 
-    PyStreamRun(OpenCVCode, title_window)
+    PyStreamRun(OpenCVCode, titleWindow)
     

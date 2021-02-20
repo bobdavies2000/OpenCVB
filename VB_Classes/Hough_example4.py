@@ -7,7 +7,7 @@ Usage:
 '''
 import numpy as np
 import cv2 as cv
-title_window = 'Hough_example4.py'
+titleWindow = 'Hough_example4.py'
 
 import sys
 

@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 import argparse
 from math import atan2, cos, sin, sqrt, pi
-title_window = 'Introduction_to_PCA.py'
+titleWindow = 'Introduction_to_PCA.py'
 
 def drawAxis(img, p_, q_, colour, scale):
     p = list(p_)

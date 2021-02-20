@@ -26,7 +26,7 @@ import cv2 as cv
 
 from common import Sketcher
 
-title_window = 'Watershed.py'
+titleWindow = 'Watershed.py'
 
 class App:
     def __init__(self, fn):
@@ -51,7 +51,7 @@ class App:
         cv.watershed(self.img, m)
         overlay = self.colors[np.maximum(m, 0)]
         vis = cv.addWeighted(self.img, 0.5, overlay, 0.5, 0.0, dtype=cv.CV_8UC3)
-        cv.imshow(title_window, vis)
+        cv.imshow(titleWindow, vis)
 
     def run(self):
         while cv.getWindowProperty('img', 0) != -1 or cv.getWindowProperty('watershed', 0) != -1:

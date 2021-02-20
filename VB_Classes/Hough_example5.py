@@ -14,7 +14,7 @@ def Mbox(title, text, style):
 
 import sys
 import math
-title_window = 'Hough_example5.py'
+titleWindow = 'Hough_example5.py'
 
 def main():
     fn = '../Data/pic1.png'

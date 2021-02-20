@@ -2,7 +2,7 @@ import cv2 as cv
 from PyStream import PyStreamRun
 
 alpha_slider_max = 100
-title_window = 'AddWeighted_PS.py'
+titleWindow = 'AddWeighted_PS.py'
 saveAlpha = 50
     
 def on_trackbar(val):
@@ -14,10 +14,10 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     beta = ( 1.0 - alpha )
     depth_colormap = cv.applyColorMap(cv.convertScaleAbs(depth32f, alpha=0.03), cv.COLORMAP_HSV)
     dst = cv.addWeighted(imgRGB, alpha, depth_colormap, beta, 0.0)
-    cv.imshow(title_window, dst)
+    cv.imshow(titleWindow, dst)
     return dst
 
-cv.namedWindow(title_window)
-cv.createTrackbar('Alpha', title_window , saveAlpha, alpha_slider_max, on_trackbar)
+cv.namedWindow(titleWindow)
+cv.createTrackbar('Alpha', titleWindow , saveAlpha, alpha_slider_max, on_trackbar)
 on_trackbar(saveAlpha)
-PyStreamRun(OpenCVCode, title_window)
+PyStreamRun(OpenCVCode, titleWindow)

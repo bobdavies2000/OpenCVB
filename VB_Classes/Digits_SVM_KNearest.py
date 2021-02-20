@@ -22,7 +22,7 @@ Usage:
 '''
 import numpy as np
 import cv2 as cv
-title_window = 'Digits_SVM_KNearest.py'
+titleWindow = 'Digits_SVM_KNearest.py'
 
 # built-in modules
 from multiprocessing.pool import ThreadPool

@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np
-title_window = 'Hough_LineProbalistic.py'
+titleWindow = 'Hough_LineProbalistic.py'
 
 img = cv.imread(cv.samples.findFile('../Data/sudoku.png'))
 gray = cv.cvtColor(img,cv.COLOR_BGR2GRAY)

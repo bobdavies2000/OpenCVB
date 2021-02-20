@@ -4,7 +4,7 @@
 """
 import sys
 import cv2 as cv
-title_window = 'Sobel_demo.py'
+titleWindow = 'Sobel_demo.py'
 
 def main(argv):
     ## [variables]

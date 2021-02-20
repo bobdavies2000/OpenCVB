@@ -10,7 +10,7 @@ import cv2 as cv
 from common import draw_str
 import getopt, sys
 from itertools import count
-title_window = "Turing.py"
+titleWindow = "Turing.py"
 
 help_message = '''
 USAGE: turing.py [-o <output.avi>]
@@ -57,7 +57,7 @@ def main():
             out.write(turing)
         vis = turing.copy()
         draw_str(vis, (20, 20), 'frame %d' % frame_i)
-        cv.imshow(title_window, vis)
+        cv.imshow(titleWindow, vis)
         if cv.waitKey(5) == 27:
             break
 

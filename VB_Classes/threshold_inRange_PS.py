@@ -1,7 +1,7 @@
 import cv2 as cv
 import argparse
 from PyStream import PyStreamRun
-title_window = "Threshold_inRange_PS.py"
+titleWindow = "Threshold_inRange_PS.py"
 
 ## [low]
 def on_low_H_thresh_trackbar(val):
@@ -87,4 +87,4 @@ cv.createTrackbar(high_S_name, window_detection_name , high_S, max_value, on_hig
 cv.createTrackbar(low_V_name, window_detection_name , low_V, max_value, on_low_V_thresh_trackbar)
 cv.createTrackbar(high_V_name, window_detection_name , high_V, max_value, on_high_V_thresh_trackbar)
 
-PyStreamRun(OpenCVCode, title_window)
+PyStreamRun(OpenCVCode, titleWindow)

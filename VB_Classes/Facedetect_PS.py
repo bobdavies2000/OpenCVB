@@ -5,7 +5,7 @@ import sys, getopt
 # local modules
 from common import clock, draw_str
 from PyStream import PyStreamRun
-title_window = 'Facedetect_PS.py'
+titleWindow = 'Facedetect_PS.py'
 
 def detect(img, cascade):
     rects = cascade.detectMultiScale(img, scaleFactor=1.1, minNeighbors=10, minSize=(20, 20),
@@ -48,4 +48,4 @@ if __name__ == '__main__':
     cascade = cv.CascadeClassifier(cv.samples.findFile(cascade_fn))
     nested = cv.CascadeClassifier(cv.samples.findFile(nested_fn))
 
-    PyStreamRun(OpenCVCode, title_window)
+    PyStreamRun(OpenCVCode, titleWindow)

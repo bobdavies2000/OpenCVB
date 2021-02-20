@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import cv2 as cv
-title_window = 'Calibrate_ShowExtrinsics.py'
+titleWindow = 'Calibrate_ShowExtrinsics.py'
 
 from numpy import linspace
 import ctypes

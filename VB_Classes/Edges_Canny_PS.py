@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 import sys
 from PyStream import PyStreamRun
-title_window = 'Edges_Canny_PS.py'
+titleWindow = 'Edges_Canny_PS.py'
 
 def nothing(*arg):
     pass
@@ -21,4 +21,4 @@ print(__doc__)
 cv.namedWindow('edge')
 cv.createTrackbar('thrs1', 'edge', 2000, 5000, nothing)
 cv.createTrackbar('thrs2', 'edge', 4000, 5000, nothing)
-PyStreamRun(OpenCVCode, title_window)
+PyStreamRun(OpenCVCode, titleWindow)

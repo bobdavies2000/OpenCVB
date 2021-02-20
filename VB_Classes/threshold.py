@@ -6,7 +6,7 @@ max_type = 4
 max_binary_value = 255
 trackbar_type = 'Type: \n 0: Binary \n 1: Binary Inverted \n 2: Truncate \n 3: To Zero \n 4: To Zero Inverted'
 trackbar_value = 'Value'
-title_window = 'Threshold.py'
+titleWindow = 'Threshold.py'
 
 ## [Threshold_Demo]
 def Threshold_Demo(val):
@@ -15,10 +15,10 @@ def Threshold_Demo(val):
     #2: Threshold Truncated
     #3: Threshold to Zero
     #4: Threshold to Zero Inverted
-    threshold_type = cv.getTrackbarPos(trackbar_type, title_window)
-    threshold_value = cv.getTrackbarPos(trackbar_value, title_window)
+    threshold_type = cv.getTrackbarPos(trackbar_type, titleWindow)
+    threshold_value = cv.getTrackbarPos(trackbar_value, titleWindow)
     _, dst1 = cv.threshold(src_gray, threshold_value, max_binary_value, threshold_type )
-    cv.imshow(title_window, dst1)
+    cv.imshow(titleWindow, dst1)
 ## [Threshold_Demo]
 
 parser = argparse.ArgumentParser(description='Code for Basic Thresholding Operations tutorial.')
@@ -37,14 +37,14 @@ src_gray = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
 
 ## [window]
 # Create a window to display results
-cv.namedWindow(title_window)
+cv.namedWindow(titleWindow)
 ## [window]
 
 ## [trackbar]
 # Create Trackbar to choose type of Threshold
-cv.createTrackbar(trackbar_type, title_window , 3, max_type, Threshold_Demo)
+cv.createTrackbar(trackbar_type, titleWindow , 3, max_type, Threshold_Demo)
 # Create Trackbar to choose Threshold value
-cv.createTrackbar(trackbar_value, title_window , 0, max_value, Threshold_Demo)
+cv.createTrackbar(trackbar_value, titleWindow , 0, max_value, Threshold_Demo)
 ## [trackbar]
 
 # Call the function to initialize

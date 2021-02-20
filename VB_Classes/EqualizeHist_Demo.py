@@ -1,7 +1,7 @@
 import cv2 as cv
 import argparse
 import numpy as np
-title_window = 'EqualizedHist_Demo.py'
+titleWindow = 'EqualizedHist_Demo.py'
 
 parser = argparse.ArgumentParser(description='Code for Histogram Equalization tutorial.')
 parser.add_argument('--input', help='Path to input image.', default='../Data/lena.jpg')

@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import *
-title_window = 'OpenGL_Cube.py'
+titleWindow = 'OpenGL_Cube.py'
 
 from OpenGL.GL import *
 from OpenGL.GLU import *

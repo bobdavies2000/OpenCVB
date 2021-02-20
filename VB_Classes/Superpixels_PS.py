@@ -3,14 +3,14 @@ import cv2 as cv
 import common
 import sys
 from PyStream import PyStreamRun
-title_window = "SuperPixel_PS.py - use spacebar to switch views."
+titleWindow = "SuperPixel_PS.py - use spacebar to switch views."
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
     global seeds, display_mode, num_superpixels, prior, num_levels, num_histogram_bins, scalarRed
     converted_img = cv.cvtColor(imgRGB, cv.COLOR_BGR2HSV)
     height,width,channels = converted_img.shape
-    num_SuperPixel_new = cv.getTrackbarPos('Number of Superpixels', title_window)
-    num_iterations = cv.getTrackbarPos('Iterations', title_window)
+    num_SuperPixel_new = cv.getTrackbarPos('Number of Superpixels', titleWindow)
+    num_iterations = cv.getTrackbarPos('Iterations', titleWindow)
 
     if frameCount == 0:
         scalarRed = np.zeros((height,width,3), np.uint8)
@@ -40,11 +40,11 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     result = cv.add(result_bg, result_fg)
 
     if display_mode == 0:
-        cv.imshow(title_window, result)
+        cv.imshow(titleWindow, result)
     elif display_mode == 1:
-        cv.imshow(title_window, mask)
+        cv.imshow(titleWindow, mask)
     else:
-        cv.imshow(title_window, labels)
+        cv.imshow(titleWindow, labels)
 
     ch = cv.waitKey(1)
     if ch & 0xff == ord(' '):
@@ -52,9 +52,9 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     return result
 
 if __name__ == '__main__':
-    cv.namedWindow(title_window)
-    cv.createTrackbar('Number of Superpixels', title_window, 400, 1000, common.nothing)
-    cv.createTrackbar('Iterations', title_window, 4, 12, common.nothing)
+    cv.namedWindow(titleWindow)
+    cv.createTrackbar('Number of Superpixels', titleWindow, 400, 1000, common.nothing)
+    cv.createTrackbar('Iterations', titleWindow, 4, 12, common.nothing)
 
     seeds = None
     display_mode = 0
@@ -62,4 +62,4 @@ if __name__ == '__main__':
     prior = 2
     num_levels = 4
     num_histogram_bins = 5
-    PyStreamRun(OpenCVCode, title_window)
+    PyStreamRun(OpenCVCode, titleWindow)

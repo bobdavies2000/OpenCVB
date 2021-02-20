@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np
-title_window = 'PointPolygonTest_demo.py'
+titleWindow = 'PointPolygonTest_demo.py'
 
 # Create an image
 r = 100
@@ -49,5 +49,5 @@ cv.circle(drawing,maxDistPt, int(maxVal),255, 1, cv.LINE_8, 0)
 dst1 = np.zeros((src.shape[0], src.shape[1], 3), dtype=np.uint8)
 cv.cvtColor(src, cv.COLOR_GRAY2BGR, dst1)
 CombinedImages = cv.hconcat([dst1, drawing])
-cv.imshow(title_window, CombinedImages)
+cv.imshow(titleWindow, CombinedImages)
 cv.waitKey()

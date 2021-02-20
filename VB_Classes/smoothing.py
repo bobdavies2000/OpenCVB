@@ -10,10 +10,10 @@ MAX_KERNEL_LENGTH = 31
 
 src = None
 dst1 = None
-title_window = 'Smoothing.py'
+titleWindow = 'Smoothing.py'
 
 def main(argv):
-    cv.namedWindow(title_window, cv.WINDOW_AUTOSIZE)
+    cv.namedWindow(titleWindow, cv.WINDOW_AUTOSIZE)
 
     # Load the source image
     imageName = argv[0] if len(argv) > 0 else '../Data/lena.jpg'
@@ -96,7 +96,7 @@ def display_caption(caption):
 
 
 def display_dst(delay):
-    cv.imshow(title_window, dst1)
+    cv.imshow(titleWindow, dst1)
     c = cv.waitKey(delay)
     if c >= 0 : return -1
     return 0
