@@ -281,6 +281,8 @@ Public Class OpenCVB
         cameraZed2 = New CameraZED2
         cameraMyntD = New CameraMyntD
         cameraOakD = New CameraOakD
+        cameraOakD.pythonApp = New FileInfo(HomeDir.FullName + "OpenCVB\CameraOakD.py")
+        cameraOakD.pythonexename = optionsForm.PythonExeName.Text
 
         startCamera()
 

@@ -47,6 +47,8 @@ Public Class Palette_Basics
         If colormap = 20 Then
             saveColorMap = colormap
             gradMap.Run()
+        Else
+            gradMap.transitionCount = -1
         End If
         If saveColorMap <> colormap Then
             saveColorMap = colormap
@@ -346,6 +348,7 @@ End Class
 Public Class Palette_BuildGradientColorMap
     Inherits VBparent
     Public gradientColorMap As New cv.Mat
+    Public transitionCount As Integer = -1
     Public Sub New()
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -359,7 +362,6 @@ Public Class Palette_BuildGradientColorMap
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static paletteSlider = findSlider("Number of color transitions (Used only with Random)")
-        Static transitionCount As Integer = -1
         If standalone Or transitionCount <> paletteSlider.value Then
             transitionCount = paletteSlider.value
 

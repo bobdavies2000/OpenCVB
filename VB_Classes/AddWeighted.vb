@@ -80,3 +80,29 @@ Public Class AddWeighted_ImageAccumulate
         cv.Cv2.AccumulateWeighted(task.depth32f, dst1, weightSlider.value / 100, New cv.Mat)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class AddWeighted_RightView
+    Inherits VBparent
+    Dim addw As AddWeighted_Basics
+    Dim src2 As New cv.Mat
+    Public Sub New()
+        initParent()
+        addw = New AddWeighted_Basics
+        task.desc = "The OakD depth image is not aligned with the RGB data but with the right view input."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        If standalone Or task.intermediateReview = caller Then src2 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Dim alpha = addw.weightSlider.Value / 100
+        cv.Cv2.AddWeighted(task.RGBDepth, alpha, src2, 1.0 - alpha, 0, dst1)
+        If standalone Then dst2.SetTo(0)
+        label1 = "depth " + Format(1 - alpha, "#0%") + " RGB " + Format(alpha, "#0%")
+    End Sub
+End Class

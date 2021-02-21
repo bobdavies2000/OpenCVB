@@ -30,6 +30,8 @@ Public Class CameraOakD
     Dim depth8bit As New cv.Mat()
     Dim OakProcess As Process
     Dim pipelineClosed As Boolean = True
+    Public pythonApp As FileInfo
+    Public pythonExeName As String
     Public Sub New()
     End Sub
     Public Function queryDeviceCount() As Integer
@@ -52,11 +54,9 @@ Public Class CameraOakD
         pipeImages = New NamedPipeServerStream(pipeName, PipeDirection.In)
         pipeSync = New NamedPipeServerStream(pipeName + "in", PipeDirection.Out)
 
-        Dim pythonApp = New FileInfo(OpenCVB.HomeDir.FullName + "OpenCVB/CameraOakD.py")
-
         If pythonApp.Exists Then
             OakProcess = New Process
-            OakProcess.StartInfo.FileName = OpenCVB.optionsForm.PythonExeName.Text
+            OakProcess.StartInfo.FileName = pythonExeName
             OakProcess.StartInfo.WorkingDirectory = pythonApp.DirectoryName
             OakProcess.StartInfo.Arguments = """" + pythonApp.Name + """" + " --Width=" + CStr(width) + " --Height=" + CStr(height) + " --pipeName=" + pipeName
             OakProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
