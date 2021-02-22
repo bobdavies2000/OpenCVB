@@ -658,32 +658,27 @@ functional enough to support all algorithms, old and new, and continuous testing
 ensures that all algorithms are supported equally.
 
 What this means is that The Repository IS The Release – TRISTR. If there is a
-problem with a recent download, “Sync” with the repository, rebuild OpenCVB, and
-test again. If the problem is still there, post an issue. There will be problems
-with the infrastructure supporting the algorithms, but the greater likelihood is
-that only specific algorithms will have deficiencies. The value of avoiding
+problem with a recent download, it is just a few seconds to “Sync” with the
+repository, rebuild the OpenCVB.sln, and test again. OpenCVB is closely tracking
+new versions of all components so if problems persist, it may be useful to take
+the time to upgrade to the latest with “PrepareTree.bat”. There can certainly be
+problems with the infrastructure, but the greater likelihood is that only
+recently added algorithms will have deficiencies. The value of avoiding
 versioning is that issues will produce fixes that will flow immediately into the
 repository.
-
-OpenCVB’s repository is built with the latest edition of all of the constituent
-libraries – OpenCV, LibRealSense, Kinect4Azure. If there are still problems
-after syncing with the latest repository, then try getting the latest editions
-of these libraries. The “PrepareTree.bat” will bring in the latest versions of
-each but in OpenCVB’s Support directory there are .bat files to update the
-individual components.
 
 How to Contribute
 =================
 
 Adding more examples is the goal and that is the best way to contribute to this
 effort. There are plenty of examples to use as a model but there are also
-snippets that assist in the process of adding new examples. Any pull request
-that adds an algorithm will be welcome and quickly reviewed. Changing OpenCVB’s
-infrastructure – not the algorithms – is discouraged but always welcome. It is
-much more difficult to test infrastructure that can cripple all the algorithms.
-Adding support for a new camera is a notable exception. New cameras should have
-depth, point cloud support, and an IMU but when added, all algorithms should run
-on it.
+snippets that assist in the process of adding new examples (See “Building New
+Experiments with Snippets” above.) Any pull request that adds an algorithm will
+be welcome and quickly reviewed. Changing OpenCVB’s infrastructure – not the
+algorithms – is discouraged but always welcome. It is much more difficult to
+test infrastructure that can cripple all the algorithms. Adding support for a
+new camera is a notable exception. New cameras should have depth, point cloud
+support, and an IMU.
 
 Sample Results
 ==============
