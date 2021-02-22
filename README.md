@@ -600,10 +600,11 @@ bottom 2 images.
 Pixel Viewer
 ============
 
-The Pixel Viewer allows detailed inspection of any of the 4 images. The size of
-the rectangle depends on the size of the window that the user has sized for the
-Pixel Viewer output. Supported formats include CV_8U, CV_8UC3, CV_32F, and
-CV_32FC3 but more could be added if needed.
+The Pixel Viewer allows detailed inspection of any of the 4 images. The
+dimensions of the rectangle depend on the window that the user has sized for the
+Pixel Viewer output – the larger the window, the larger the rectangle. Supported
+formats include CV_8U, CV_8UC3, CV_32F, and CV_32FC3 but more could be added if
+needed.
 
 ![](media/a6f56e72871b653bdc9c8ede74ed5645.png)
 
