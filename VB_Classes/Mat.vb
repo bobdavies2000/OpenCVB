@@ -1,3 +1,5 @@
+Imports System.Runtime.InteropServices
+Imports DlibDotNet
 Imports cv = OpenCvSharp
 Public Class Mat_Repeat
     Inherits VBparent
@@ -6,7 +8,7 @@ Public Class Mat_Repeat
         task.desc = "Use the repeat method to replicate data."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim small = src.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
         dst1 = small.Repeat(10, 10)
         small = task.RGBDepth.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
@@ -522,5 +524,71 @@ Public Class Mat_2Click
         If task.mouseClickFlag And task.mousePicTag = 2 Then
             If task.mouseClickPoint.Y < dst1.Height / 2 Then dst2 = mats.mat(0) Else dst2 = mats.mat(1)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://github.com/takuya-takeuchi/DlibDotNet/tree/master/examples/3rdparty/OpenCVSharp/MatToArray2D
+Public Class Mat_2Dlib
+    Inherits VBparent
+    Public dRGB As Array2D(Of BgrPixel)
+    Public dGray As Array2D(Of Byte)
+    Public Sub New()
+        initParent()
+        task.desc = "Convert a Mat to the expected Array2D for a DLib API"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Dim array(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, array, 0, array.Length)
+
+        If src.Type = cv.MatType.CV_8U Then
+            dGray = Dlib.LoadImageData(Of Byte)(array, src.Rows, src.Cols, src.Cols * src.ElemSize)
+        Else
+            dRGB = Dlib.LoadImageData(Of BgrPixel)(array, src.Rows, src.Cols, src.Cols * src.ElemSize)
+        End If
+        If standalone Then
+            ocvb.trueText("OpenCVB Mat converted to an Array2D for use with DlibDotNet")
+        End If
+
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+' https://github.com/takuya-takeuchi/DlibDotNet/tree/master/examples/3rdparty/OpenCVSharp/MatToArray2D
+Public Class Mat_Dlib2Mat
+    Inherits VBparent
+    Public dGray As Array2D(Of Byte)
+    Public dRGB As Array2D(Of BgrPixel)
+    Public dImage32f As Array2D(Of Single)
+    Public Sub New()
+        initParent()
+        task.desc = "Convert a Dlib Array2D to an OpenCV Mat"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        If dGray IsNot Nothing Then
+            dst1 = New cv.Mat(dGray.Rows, dGray.Columns, cv.MatType.CV_8U)
+            Marshal.Copy(dGray.ToBytes, 0, dst1.Data, dst1.Total)
+        End If
+
+        If dRGB IsNot Nothing Then
+
+        End If
+        '' Marshal.Copy(dImage, 0, dst1.Data, dImage.Length)
+        'If standalone Then ocvb.trueText("Dlib Array2D was converted to cv.mat")
     End Sub
 End Class

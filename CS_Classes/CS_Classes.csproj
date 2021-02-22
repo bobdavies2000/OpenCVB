@@ -87,6 +87,7 @@
     <Compile Include="Aruco.cs" />
     <Compile Include="Blob.cs" />
     <Compile Include="Blur.cs" />
+    <Compile Include="Dlib.cs" />
     <Compile Include="DNN.cs" />
     <Compile Include="Kaze.cs" />
     <Compile Include="MatrixInverse.cs" />
@@ -102,6 +103,9 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="DlibDotNet">
+      <Version>19.21.0.20210230</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.CSharp">
       <Version>4.7.0</Version>
     </PackageReference>

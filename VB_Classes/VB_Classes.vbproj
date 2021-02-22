@@ -109,6 +109,7 @@
     <Compile Include="AddWeighted.vb" />
     <Compile Include="BestOf.vb" />
     <Compile Include="BGSubtract.vb" />
+    <Compile Include="DLib.vb" />
     <Compile Include="ImageSeg.vb" />
     <Compile Include="MFD.vb" />
     <Compile Include="MiniPC.vb" />
@@ -534,6 +535,9 @@
     <Content Include="Watershed.py" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="DlibDotNet">
+      <Version>19.21.0.20210230</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.CSharp">
       <Version>4.7.0</Version>
     </PackageReference>

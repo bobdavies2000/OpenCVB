@@ -2,6 +2,7 @@ Imports System.IO
 Imports System.Runtime.InteropServices
 Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
+Imports DlibDotNet
 Imports cv = OpenCvSharp
 
 Module Python_Module
