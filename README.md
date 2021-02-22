@@ -6,8 +6,7 @@ Recent Changes – 2/15/2021
 -   New pixel viewer to inspect image pixels in 8UC1, 8UC3, 32F, and 32FC3
     formats
 
--   Versioning policy set – The Release IS The Repository, The Repository IS The
-    Release - TRISTR
+-   Versioning policy set - The Repository IS The Release - TRISTR
 
 -   Improved threading support for switching between camera interfaces
 
@@ -36,16 +35,10 @@ algorithms grouped by OpenCV API or OpenCVB algorithm. The default grouping is
 to select “\<All\>” algorithms while other special groupings allow selecting
 Python or C++ algorithms.
 
-![](media/3dcdb4ef057b7696445216bbe30b4286.png)
+![](media/0094dd80a047099af3fa5ecf92dee723.png)
 
-The output images above are the RGB output (upper left), the colorized depth
-image (upper right), the output of the current algorithm (lower left) and an
-optional second image output from the algorithm (lower right). In this example
-the lower left image shows the point cloud as if seen from directly above. The
-lower right views the same data from the side. Both perspectives show the camera
-field of view (FOV) and a scale for the distance to each of the objects.
-
-The “Sample Results” section below provides numerous additional examples.
+The “Sample Results” section below provides numerous additional examples with
+explanations.
 
 Pre-Install Requirements
 ========================
@@ -84,8 +77,9 @@ that enables any of the solutions to be reused. The result is a toolkit for
 solving incrementally bigger problems. The philosophy behind this approach is
 that human vision is not computationally intensive but is built on many almost
 trivial algorithms working together. Computer vision problem are not huge but
-there are an unmanageable number of them. Putting a lot of algorithms together
-in a single app seems like an important step. Time will tell.
+there are an unmanageable number of them. The first step – combining many
+different algorithms into a single app – is the motivation for OpenCVB’s
+organization.
 
 OpenCVB is targeting only cameras that produce depth and color and have an IMU
 to detect gravity and motion. These newer cameras have prompted a review of
@@ -93,7 +87,8 @@ existing vision algorithms to see how they can be improved if depth and gravity
 are known. To enable revisiting existing algorithms, this software provides a
 single application that can run OpenCV algorithms on any of the cameras listed
 above. Adding more cameras is a multiplier. If there are 1000 algorithms and 6
-cameras, testing all of them requires 6000 tests.
+cameras, testing all of them requires 6000 tests which is the reason for the
+integrated regression testing.
 
 There are many computer vision examples on the web but too often something is
 missing, or setup is difficult. OpenCVB is designed to collect algorithms into a
@@ -103,10 +98,11 @@ experiments. OpenCVB is more work to install than a typical app but it has been
 reduced to a few steps using standard (and free) packages.
 
 The languages used are those often found in OpenCV projects - C++, C\#, Python
-and VB.Net. Secondly, it is important to get access to multiple libraries -
-OpenCV, OpenCVSharp, OpenGL, Emgu, NumPy, NAudio, VTK, and OpenMP. And lastly,
-it is important to enable all possible image representations - 3D, bitmaps,
-plots, bar charts, spreadsheets, and text.
+and VB.Net. OpenCVB also provides access to multiple libraries - OpenCV,
+OpenCVSharp, OpenGL, Emgu, Dlib, NumPy, NAudio, VTK, and OpenMP. And OpenCVB
+enables all possible image representations - 3D, bitmaps, plots, bar charts,
+spreadsheets, and text. Examples of all of these features are included in
+OpenCVB.
 
 Making these languages and libraries available while using the same
 infrastructure shaped a standardized class for OpenCVB algorithms. Implementing
@@ -131,12 +127,12 @@ cameras and apply the same algorithm to all cameras.
 
 The algorithms are notably short, almost always less than a page of code,
 labelled reasonably well, easily searched, and easily combined, while often
-providing links to online documentation and versions for other platforms. Many
-downloadable algorithms are encumbered by environmental considerations that can
-obscure the meaning or context of an algorithm. All the algorithms here contain
-just the algorithm separate from any camera dependencies and will work with each
-of the supported cameras. Isolating just the algorithm functionality enables
-easy adaptation to other environments or platforms.
+providing links in the code to online documentation and versions for other
+platforms. Many downloadable algorithms are encumbered by environmental
+considerations that can obscure the meaning or context of an algorithm. All the
+algorithms here contain just the algorithm separate from any camera dependencies
+and will work with each of the supported cameras. Isolating just the algorithm
+functionality enables easy adaptation to other environments or platforms.
 
 Pre-Install Notes
 =================
@@ -164,8 +160,8 @@ Installation – Quick Reference
 ==============================
 
 This is the short description of install process. It is not as simple as cloning
-and then opening the OpenCVB.sln file but it is not much more than just
-“PrepareTree.bat” and then open and run the OpenCVB.sln file.
+the GitHub repository and then opening the OpenCVB.sln file but it is not much
+more than just “PrepareTree.bat” and then open and run the OpenCVB.sln file.
 
 -   Run the “PrepareTree.bat” script that comes with OpenCVB. It will download
     and run CMake for needed libraries. After building it will occupy about 18Gb
@@ -180,7 +176,7 @@ and then opening the OpenCVB.sln file but it is not much more than just
 -   Set Environmental variable OpenCV_Version to 450. – This depends on the
     version of OpenCV, currently 4.50.
 
--   Download the Kinect4Azure propriety binaries:
+-   Download the Kinect4Azure proprietary binaries:
     <https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/usage.md>
 
 -   Build and run OpenCVB.sln – set OpenCVB as the “Startup Project” (GitHub
@@ -194,7 +190,7 @@ degree – just click on “PrepareTree.bat” after downloading OpenCVB from Gi
 The key to remember is that getting one example to work gets all the examples to
 work.
 
-The first step is to download OpenCVB from GitHub:
+The first step is to clone the OpenCVB repository in GitHub:
 
 1.  <https://github.com/bobdavies2000/OpenCVB>
 
@@ -249,7 +245,8 @@ The first step is to download OpenCVB from GitHub:
             (luxonis.com)](https://docs.luxonis.com/en/latest/pages/api/#python-api)
 
 2.  Edit “Cameras/CameraDefines.hpp” file to add OpenCVB’s support for
-    StereoLabs Zed 2 or Mynt Eye D 1000 support.
+    StereoLabs Zed 2 or Mynt Eye D 1000 support. No changes are required for
+    Oak-D.
 
 Trouble-Shooting New Install
 ============================
@@ -273,15 +270,15 @@ Some typical problems with new installations:
     version. Test Python scripts by setting “PythonDebug” as the Startup Project
     in Visual Studio.
 
-Build New Experiments
-=====================
+Building New Experiments With Snippets
+======================================
 
 OpenCVB is a WinForms application and most of the algorithms were written using
-Microsoft's managed code but C++ examples are provided as well - each with an
-appropriate VB.Net wrapper. Python examples don’t require a VB.Net wrapper.
-There are several VB.Net examples that demonstrate how to move images to Python
-and get them back into the OpenCVB user interface (see
-AddWeighted_Trackbar_PS.py as an example that is only a few lines of code.)
+Microsoft's managed code but C++ any Python examples are provided as well.
+Python examples don’t require a VB.Net wrapper. There are several VB.Net
+examples that demonstrate how to move images to Python and get them back into
+the OpenCVB user interface (see AddWeighted_Trackbar_PS.py as an example that is
+only a few lines of code.)
 
 For C++, C\#, and VB.Net writing a new experiment requires a new class to be
 added in the “VB_Classes” project. OpenCVB will automatically detect the new
@@ -310,11 +307,11 @@ Experimental Subsets
 ====================
 
 The complete list of algorithms may be grouped into smaller subsets to study
-some shared API reference. Algorithm subsets may be created and accessed through
-the Subset Combo Box in the toolbar (indicated below.) The list of subsets is
-built from all the OpenCVB algorithm names and all the OpenCV API’s referenced.
-For instance, selecting “Threshold” in the Subset Combo Box, will update the
-Algorithm Combo Box with all the algorithms that use the OpenCV “Threshold” API.
+some shared API. Algorithm subsets are selected through the Subset Combo Box in
+the toolbar (indicated below.) The list of subsets is built from all the OpenCVB
+algorithm names and all the OpenCV API’s referenced. For instance, selecting
+“Threshold” in the Subset Combo Box, will update the Algorithm Combo Box with
+all the algorithms that use the OpenCV “Threshold” API.
 
 ![](media/f9431efec6cb8ae1599689669c57c1db.png)
 
@@ -328,25 +325,25 @@ The ability to create subsets from the hundreds of algorithms makes it easier to
 study examples of an OpenCV API or OpenCVB algorithm usage. In addition to all
 the OpenCV API’s or OpenCVB algorithms, the Subset Combo Box has several
 higher-level groupings. For example, “\<Python\>” selects all Python algorithms.
-Or “\<OpenGL\>” selects only the algorithms that use OpenGL. The “\<All\>” entry
-in the Subset Combo Box will restore the complete list of algorithms.
+Or “\<OpenGL\>” selects only the OpenGL algorithms. The “\<All\>” entry in the
+Subset Combo Box will restore the complete list of algorithms.
 
 Regression Testing All Experiments
 ==================================
 
 Testing is integrated into OpenCVB. Clicking the icon below runs through a
-checklist of all the algorithms at all the resolutions with all the supported
-cameras available on the system. The duration of each test can be selected in
-the Options dialog.
+checklist of all the algorithms on all the attached depth cameras attached to
+the system at all the supported resolutions. The duration of each test can be
+selected in the Global Options dialog.
 
 ![](media/f54f2d71170e1f23b640f4e07cf295d5.png)
 
 When using a subset of the algorithms, the “Test All” button will test only the
 algorithms in the subset. This can be useful when changing an algorithm that is
 reused frequently by other algorithms. For instance, if the Edges_Sobel
-algorithm is changed, first select the subset of all algorithms using
-Edges_Sobel using the Subset Combo Box, then click the regression test or “Test
-All” button to visually review each algorithm using the updated Edges_Sobel.
+algorithm is changed, select “Edges_Sobel” in the Subset Combo Box, then click
+the regression test button to visually review each algorithm using the updated
+Edges_Sobel.
 
 One side benefit of the “Test All” feature is that is provides a way to visually
 review all the algorithms. When used in combination with the subset feature, it
@@ -359,18 +356,17 @@ VB.Net is not a language associated with computer vision algorithms. But the
 abundance of examples in OpenCVB suggests this may be an oversight. Even the
 seasoned developer should recognize what is obvious to the beginner: VB.Net can
 keep the code simple to read and write. Papers and articles on software often
-use something called “pseudo-code” to present an algorithm. In many respects,
-VB.Net code resembles pseudo-code except it is an actual working implementation
-of the algorithm.
+use pseudo-code to present an algorithm. In many respects, VB.Net code resembles
+pseudo-code except it is an actual working implementation of the algorithm.
 
 VB.Net provides a full-featured language just like C\# with lambda functions and
 multi-threading except VB.Net uses only a small subset of the keys available on
-the standard keyboard. Contrasted with Python or C++, VB.Net need make no
-apologies for using real words instead of the keyboard hieroglyphics defined in
-Python or C++. VB.Net includes user interface tools that are flexible and
-complete (check boxes, radio buttons, sliders, TrueType fonts, and much more) -
-options missing from OpenCV's popular HighGUI library. (All existing HighGUI
-interfaces are still supported in OpenCVB.)
+the keyboard. Contrasted with Python or C++, VB.Net need make no apologies for
+using real words instead of the keyboard hieroglyphics defined in Python or C++.
+VB.Net includes user interface tools that are flexible and complete (check
+boxes, radio buttons, sliders, TrueType fonts, and much more) - options missing
+from OpenCV's popular HighGUI library. (All existing HighGUI interfaces are
+still supported in OpenCVB.)
 
 The main caution in using VB.Net is to treat it as a scripting language like
 Python. Most of the algorithms avoid pixel-by-pixel details – VB.Net can be
@@ -401,7 +397,7 @@ cameraKinect.vb class and a supporting Kinect4Azure DLL that provides the
 interface code to the Kinect for Azure libraries. Since there is likely to be
 little interest in debugging the Kinect4Azure DLL, the Release version is used
 even in the Debug configuration. If it is necessary to debug the camera
-interface, set any Build Configuration components to the Debug version. Using
+interface, set any Build Configuration entries to the Debug version. Using
 Release versions naturally enables a higher framerate. As a result, the VB.Net
 code – which is usually run in Debug mode - is almost as fast as the Release
 configuration.
@@ -419,8 +415,8 @@ a page and does not require much memory or CPU usage. The OpenGL C++ code
 provided with OpenCVB is customized for specific applications in a format that
 should be familiar to OpenGL developers. There are several examples – displaying
 RGB and Depth, 3D histograms, 3D drawing, and IMU usage. A code snippet (See
-‘Build New Experiments’ above) provides everything needed to add a new OpenGL
-algorithm that will consume RGB and a point cloud.
+‘Building New Experiments With Snippets’ above) provides everything needed to
+add a new OpenGL algorithm that will consume RGB and a point cloud.
 
 NOTE: it is easy to forget to include any new OpenGL project in the Project
 Dependencies. This can be confusing because the new project will not build
@@ -600,6 +596,16 @@ outputs in the main OpenCVB form: 1) the output of the clicked algorithm’s
 objective is to show and understand the intermediate stages of compound
 algorithms while running. All output will show up in OpenCVB’s main form in the
 bottom 2 images.
+
+Pixel Viewer
+============
+
+The Pixel Viewer allows detailed inspection of any of the 4 images. The size of
+the rectangle depends on the size of the window that the user has sized for the
+Pixel Viewer output. Supported formats include CV_8U, CV_8UC3, CV_32F, and
+CV_32FC3 but more could be added if needed.
+
+![](media/a6f56e72871b653bdc9c8ede74ed5645.png)
 
 VTK Support
 ===========

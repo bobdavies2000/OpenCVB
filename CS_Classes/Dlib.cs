@@ -1,6 +1,8 @@
 ﻿using DlibDotNet;
 using cv = OpenCvSharp;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
+
 namespace CS_Classes
 {
     public class Dlib_GaussianBlur
@@ -20,7 +22,7 @@ namespace CS_Classes
 
     public class Dlib_EdgesSobel
     {
-        public Array2D<byte> heatmap = new Array2D<byte>();
+        // public Array2D<byte> heatmap = new Array2D<byte>();
         public Array2D<byte> edgeImage = new Array2D<byte>();
         public void New() { }
         public void Run(cv.Mat src)
@@ -38,7 +40,15 @@ namespace CS_Classes
 
                 // now we do the non-maximum edge suppression step so that our edges are nice and thin
                 Dlib.SuppressNonMaximumEdges(horzGradient, vertGradient, edgeImage);
-                // heatmap = Dlib.Heatmap(edgeImage))
+                var heatmap = Dlib.Heatmap(edgeImage);
+                //using (var winHot = new ImageWindow(heatmap))
+                //using (var jet = Dlib.Jet(edgeImage))
+                //using (var winJet = new ImageWindow(jet))
+                //{
+                //    winHot.WaitUntilClosed();
+                //    winJet.WaitUntilClosed();
+                //}
+
             }
         }
     }
