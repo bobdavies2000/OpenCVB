@@ -4,8 +4,6 @@ namespace CS_Classes
 {
     public class Blob_Basics
     {
-        public void New() { }
-
         public void Run(cv.Mat input, cv.Mat output, cv.SimpleBlobDetector.Params detectorParams)
         {
             var binaryImage = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY);

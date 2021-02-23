@@ -5,6 +5,7 @@ Public Class Blob_Basics
     Dim blobDetector As New CS_Classes.Blob_Basics
     Public Sub New()
         initParent()
+        blobDetector = New CS_Classes.Blob_Basics
         blob = New Blob_Input()
         blob.updateFrequency = 1 ' it is pretty fast but sloppy...
         If findfrm(caller + " CheckBox Options") Is Nothing Then

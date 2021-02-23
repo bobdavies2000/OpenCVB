@@ -11,7 +11,7 @@ namespace CS_Classes
     {
         private string[] classNames;
         Net net;
-        public DNN(string protoTxt, string caffeModel, string synsetWords)
+        public void initialize(string protoTxt, string caffeModel, string synsetWords)
         {
             classNames = File.ReadAllLines(synsetWords).Select(line => line.Split(' ').Last()).ToArray();
 
@@ -31,7 +31,7 @@ namespace CS_Classes
                 {
                     // find the best class
                     GetMaxClass(prob, out int classId, out double classProb);
-                    return String.Format("Best class: #{0} '{1}' Probability: {0:P2}", classId, classNames[classId], classProb);
+                    return String.Format("Best class: #{0} '{1}' Probability: {2:P2}", classId, classNames[classId], classProb);
                 }
             }
         }

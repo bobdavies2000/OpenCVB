@@ -7,24 +7,34 @@ namespace CS_Classes
 {
     public class Dlib_GaussianBlur
     {
-        public Array2D<byte> blurredImg = new Array2D<byte>();
-        public void New() { }
+        public Array2D<byte> blurredGray = new Array2D<byte>();
+        public Array2D<BgrPixel> blurredRGB = new Array2D<BgrPixel>();
         public void Run(cv.Mat src)
         {
             var array = new byte[src.Width * src.Height * src.ElemSize()];
             Marshal.Copy(src.Data, array, 0, array.Length);
-            using (var image = Dlib.LoadImageData<byte>(array, (uint)src.Height, (uint)src.Width, (uint)(src.Width * src.ElemSize())))
+            if (src.Channels() == 1)
             {
-                Dlib.GaussianBlur(image, blurredImg); // there appears to be no provision for a kernel size with the DlibDotNet interface...
+                using (var image = Dlib.LoadImageData<byte>(array, (uint)src.Height, (uint)src.Width, (uint)(src.Width * src.ElemSize())))
+                {
+                    Dlib.GaussianBlur(image, blurredGray);
+                }
+            }
+            else
+            {
+                using (var image = Dlib.LoadImageData<BgrPixel>(array, (uint)src.Height, (uint)src.Width, (uint)(src.Width * src.ElemSize())))
+                {
+                    Dlib.GaussianBlur(image, blurredRGB);
+                }
             }
         }
     }
 
+    // http://dlib.net/image_ex.cpp.html
     public class Dlib_EdgesSobel
     {
         // public Array2D<byte> heatmap = new Array2D<byte>();
         public Array2D<byte> edgeImage = new Array2D<byte>();
-        public void New() { }
         public void Run(cv.Mat src)
         {
             var array = new byte[src.Width * src.Height * src.ElemSize()];
@@ -40,15 +50,32 @@ namespace CS_Classes
 
                 // now we do the non-maximum edge suppression step so that our edges are nice and thin
                 Dlib.SuppressNonMaximumEdges(horzGradient, vertGradient, edgeImage);
-                var heatmap = Dlib.Heatmap(edgeImage);
-                //using (var winHot = new ImageWindow(heatmap))
-                //using (var jet = Dlib.Jet(edgeImage))
-                //using (var winJet = new ImageWindow(jet))
-                //{
-                //    winHot.WaitUntilClosed();
-                //    winJet.WaitUntilClosed();
-                //}
+            }
+        }
+    }
 
+    // https://github.com/KingCobrass/face.image.extractor/blob/master/face.image.extractor/face.image.extractor.consoleapp/FaceExtractor.cs
+    public class Dlib_FaceDetectHOG
+    {
+        FrontalFaceDetector detector;
+        public Rectangle[] rects;
+
+        // the C# spec says that one class cannot call another's constructor.  Thank goodness this is not the case in VB.Net.
+        // https://stackoverflow.com/questions/19162656/why-is-this-c-sharp-constructor-not-working-as-expected/19162779
+        public void initialize() 
+        {
+            detector = Dlib.GetFrontalFaceDetector();
+        }
+        public void Run(cv.Mat src)
+        {
+            var array = new byte[src.Width * src.Height * src.ElemSize()];
+            Marshal.Copy(src.Data, array, 0, array.Length);
+            using (var image = Dlib.LoadImageData<byte>(array, (uint)src.Height, (uint)src.Width, (uint)(src.Width * src.ElemSize())))
+            {
+                Dlib.PyramidUp(image);
+                rects = detector.Operator(image);
+                //var win = new ImageWindow();
+                //win.AddOverlay(rects);
             }
         }
     }

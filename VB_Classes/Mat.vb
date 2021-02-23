@@ -572,7 +572,7 @@ Public Class Mat_Dlib2Mat
     Inherits VBparent
     Public dGray As Array2D(Of Byte)
     Public dRGB As Array2D(Of BgrPixel)
-    Public dImage32f As Array2D(Of Single)
+    Public d32f As Array2D(Of Single)
     Public Sub New()
         initParent()
         task.desc = "Convert a Dlib Array2D to an OpenCV Mat"
@@ -586,9 +586,8 @@ Public Class Mat_Dlib2Mat
         End If
 
         If dRGB IsNot Nothing Then
-
+            dst2 = New cv.Mat(dRGB.Rows, dRGB.Columns, cv.MatType.CV_8UC3)
+            Marshal.Copy(dRGB.ToBytes, 0, dst2.Data, dst2.Total * dst2.ElemSize)
         End If
-        '' Marshal.Copy(dImage, 0, dst1.Data, dImage.Length)
-        'If standalone Then ocvb.trueText("Dlib Array2D was converted to cv.mat")
     End Sub
 End Class

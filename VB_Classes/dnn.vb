@@ -7,13 +7,10 @@ Imports System.IO
 Public Class DNN_Test
     Inherits VBparent
     Dim net As Net
+    Dim classnames() As String
     Public Sub New()
         initParent()
-        label2 = "Input Image"
-        task.desc = "Download and use a Caffe database"
-    End Sub
-    Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
         Dim modelFile As New FileInfo(ocvb.parms.homeDir + "Data/bvlc_googlenet.caffemodel")
         If File.Exists(modelFile.FullName) = False Then
             ' this site is apparently gone.  caffemodel is in the Data directory in OpenCVB_HomeDir
@@ -24,15 +21,29 @@ Public Class DNN_Test
             responseStream.CopyTo(memory)
             File.WriteAllBytes(modelFile.FullName, memory.ToArray)
         End If
-        net = Net.ReadNetFromCaffe(ocvb.parms.homeDir + "Data/bvlc_googlenet.prototxt")
+        Dim protoTxt = ocvb.parms.homeDir + "Data/bvlc_googlenet.prototxt"
+        net = CvDnn.ReadNetFromCaffe(protoTxt, modelFile.FullName)
+        Dim synsetWords = ocvb.parms.homeDir + "Data/synset_words.txt"
+        classnames = File.ReadAllLines(synsetWords) ' .Select(line >= line.Split(' ').Last()).ToArray()
+        For i = 0 To classNames.Count - 1
+            classNames(i) = classNames(i).Split(" ").Last
+        Next
+
+        label2 = "Input Image"
+        task.desc = "Download and use a Caffe database"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         Dim image = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/space_shuttle.jpg")
         dst2 = image.Resize(dst2.Size())
         Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cv.Size(224, 224), New cv.Scalar(104, 117, 123))
         net.SetInput(inputBlob, "data")
-        ocvb.trueText("This example is not working.  Forward fails with 'blobs.size() != 0'.", 10, 100)
-        'Dim prob = net.Forward("prob") ' <--- this fails in VB.Net but works in C# (below)
-        ' finish this ...
+        Dim prob = net.Forward("prob")
+        Dim minVal As Double, maxVal As Double
+        Dim minLoc As cv.Point, maxLoc As cv.Point
+        cv.Cv2.MinMaxLoc(prob.Reshape(1, 1), minVal, maxVal, minLoc, maxLoc)
+        ocvb.trueText("Best class: " + CStr(maxLoc.X) + " '" + classnames(maxLoc.X) + "' with Probability " + Format(maxVal, "#0.00%"))
     End Sub
 End Class
 
@@ -42,7 +53,7 @@ End Class
 
 Public Class DNN_Caffe_CS
     Inherits VBparent
-    Dim caffeCS As CS_Classes.DNN
+    Dim caffeCS As New CS_Classes.DNN
     Public Sub New()
         initParent()
         label2 = "Input Image"
@@ -51,7 +62,7 @@ Public Class DNN_Caffe_CS
         Dim protoTxt = ocvb.parms.homeDir + "Data/bvlc_googlenet.prototxt"
         Dim modelFile = ocvb.parms.homeDir + "Data/bvlc_googlenet.caffemodel"
         Dim synsetWords = ocvb.parms.homeDir + "Data/synset_words.txt"
-        caffeCS = New CS_Classes.DNN(protoTxt, modelFile, synsetWords)
+        caffeCS.initialize(protoTxt, modelFile, synsetWords)
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me

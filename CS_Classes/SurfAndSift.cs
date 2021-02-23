@@ -9,7 +9,6 @@ namespace CS_Classes
     {
         public bool drawPoints = true;
         public KeyPoint[] keypoints1, keypoints2;
-        public void New() { }
         public void Run(Mat gray1, Mat gray2, out Mat output, int hessianThreshold, bool useBFMatcher)
         {
             var surf = SURF.Create(hessianThreshold, 4, 2, true);
@@ -43,7 +42,6 @@ namespace CS_Classes
 
     public class CS_SiftBasics
     {
-        public void New() { }
         public void Run(Mat gray1, Mat gray2, Mat dst1, bool useBFMatcher, int pointsToMatch)
         {
             var sift = SIFT.Create(pointsToMatch);

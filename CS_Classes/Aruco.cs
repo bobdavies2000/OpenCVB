@@ -10,7 +10,6 @@ namespace CS_Classes
     {
         public cv.Mat detectedMarkers;
         public cv.Mat normalizedImage;
-        public void New() { }
         public void Run(cv.Mat src)
         {
             // The locations of the markers in the image at FilePath.Image.Aruco.
