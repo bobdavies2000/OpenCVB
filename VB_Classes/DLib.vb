@@ -100,7 +100,7 @@ End Class
 
 
 
-' https://sandervandevelde.wordpress.com/2017/12/20/zip-and-unzip-a-string-of-data-in-memory/
+' https://ibug.doc.ic.ac.uk/resources/300-W/
 ' https://stackoverflow.com/questions/30887979/i-want-to-create-a-script-for-unzip-tar-gz-file-via-python
 Public Class Dlib_iBug300WDownload
     Inherits VBparent
@@ -115,7 +115,7 @@ Public Class Dlib_iBug300WDownload
             check.Box(0).Text = "Download the 1.7 Gb 300 Faces In-The-Wild database"
         End If
 
-        task.desc = "Download the iBug 300W face database.  Not using it yet but planning to..."
+        task.desc = "Multi-threaded (responsive) download of the iBug 300W face database.  Not using iBug yet but planning to..."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me

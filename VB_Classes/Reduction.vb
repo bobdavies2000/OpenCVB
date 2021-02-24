@@ -275,15 +275,12 @@ Public Class Reduction_XYZ
     Public Sub New()
         initParent()
         reduction = New Reduction_Basics()
-        reduction.radio.check(0).Checked = True
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 3)
             check.Box(0).Text = "Slice point cloud in X direction"
             check.Box(1).Text = "Slice point cloud in Y direction"
             check.Box(2).Text = "Slice point cloud in Z direction"
-            check.Box(0).Checked = True
-            check.Box(1).Checked = True
             check.Box(2).Checked = True
         End If
 

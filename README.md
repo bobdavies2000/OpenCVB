@@ -24,10 +24,9 @@ Introduction
 
 There is no better documentation of an algorithm than a working example. Now
 imagine over 900 OpenCV examples in a single app where each algorithm is less
-than a page of code and is in a familiar language – C++, C\#, Python, or VB.Net.
-And each algorithm is *just the algorithm* without the baggage from a user
-interface. Each algorithm is reusable. New algorithms can reuse existing
-algorithms to build variations and combinations.
+than a page of code and uses familiar languages. And each algorithm is *just the
+algorithm* without the baggage from a user interface. New algorithms can reuse
+existing algorithms and build variations and combinations.
 
 In the sample output below, any of the algorithms can be selected from the first
 combo box at the top of the form. The second combo box is used to select
@@ -101,7 +100,7 @@ The languages used are those often found in OpenCV projects - C++, C\#, Python
 and VB.Net. OpenCVB also provides access to multiple libraries - OpenCV,
 OpenCVSharp, OpenGL, Emgu, Dlib, NumPy, NAudio, VTK, and OpenMP. And OpenCVB
 enables all possible image representations - 3D, bitmaps, plots, bar charts,
-spreadsheets, and text. Examples of all of these features are included in
+spreadsheets, and text. Examples of all of these representations are included in
 OpenCVB.
 
 Making these languages and libraries available while using the same
