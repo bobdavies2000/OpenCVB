@@ -43,7 +43,7 @@ Public Class DNN_Test
         Dim minVal As Double, maxVal As Double
         Dim minLoc As cv.Point, maxLoc As cv.Point
         cv.Cv2.MinMaxLoc(prob.Reshape(1, 1), minVal, maxVal, minLoc, maxLoc)
-        ocvb.trueText("Best class: " + CStr(maxLoc.X) + " '" + classnames(maxLoc.X) + "' with Probability " + Format(maxVal, "#0.00%"))
+        ocvb.trueText("Best classification: index = " + CStr(maxLoc.X) + " which is for '" + classnames(maxLoc.X) + "' with Probability " + Format(maxVal, "#0.00%"), 40, 200)
     End Sub
 End Class
 

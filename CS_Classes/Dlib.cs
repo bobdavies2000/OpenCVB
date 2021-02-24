@@ -1,7 +1,7 @@
 ﻿using DlibDotNet;
 using cv = OpenCvSharp;
 using System.Runtime.InteropServices;
-using System.Diagnostics;
+using System.Drawing;
 
 namespace CS_Classes
 {
@@ -58,7 +58,7 @@ namespace CS_Classes
     public class Dlib_FaceDetectHOG
     {
         FrontalFaceDetector detector;
-        public Rectangle[] rects;
+        public DlibDotNet.Rectangle[] rects;
 
         // the C# spec says that one class cannot call another's constructor.  Thank goodness this is not the case in VB.Net.
         // https://stackoverflow.com/questions/19162656/why-is-this-c-sharp-constructor-not-working-as-expected/19162779
@@ -74,8 +74,6 @@ namespace CS_Classes
             {
                 Dlib.PyramidUp(image);
                 rects = detector.Operator(image);
-                //var win = new ImageWindow();
-                //win.AddOverlay(rects);
             }
         }
     }

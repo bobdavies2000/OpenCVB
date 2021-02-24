@@ -1,6 +1,7 @@
 ﻿Imports cv = OpenCvSharp
-Imports dl = DlibDotNet
-Imports System.Runtime.InteropServices
+Imports System.IO
+Imports System.Net
+Imports System.Threading
 Public Class Dlib_Sobel_CS
     Inherits VBparent
     Dim d2Mat As Mat_Dlib2Mat
@@ -70,6 +71,7 @@ Public Class Dlib_FaceDetectHOG_CS
     Dim d2Mat As Mat_Dlib2Mat
     Public Sub New()
         initParent()
+
         faces.initialize()
         d2Mat = New Mat_Dlib2Mat
         task.desc = "Use DlibDotNet to detect faces using the HOG detector"
@@ -84,8 +86,98 @@ Public Class Dlib_FaceDetectHOG_CS
 
         dst1 = src
         For Each r In faces.rects
-            Dim rect = New cv.Rect(r.Left, r.Top, r.Width, r.Height)
+            ' why divide by 2?  The algorithm did a pyramidUp to "allow the algorithm to detect more faces".
+            Dim rect = New cv.Rect(r.Left / 2, r.Top / 2, r.Width / 2, r.Height / 2)
             dst1.Rectangle(rect, cv.Scalar.Yellow, 1)
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+' https://sandervandevelde.wordpress.com/2017/12/20/zip-and-unzip-a-string-of-data-in-memory/
+' https://stackoverflow.com/questions/30887979/i-want-to-create-a-script-for-unzip-tar-gz-file-via-python
+Public Class Dlib_iBug300WDownload
+    Inherits VBparent
+    Dim zippedBuffer As New MemoryStream()
+    Dim downloadActive As Boolean
+    Dim pythonActive As Boolean
+    Public Sub New()
+        initParent()
+
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Download the 1.7 Gb 300 Faces In-The-Wild database"
+        End If
+
+        task.desc = "Download the iBug 300W face database.  Not using it yet but planning to..."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim ibugDir = New DirectoryInfo(ocvb.parms.homeDir + "Data/ibug_300W_large_face_landmark_dataset")
+        If ibugDir.Exists And downloadActive = False And pythonActive = False Then
+            ocvb.trueText("The iBug 300W face database was downloaded and is ready for use.", 40, 200)
+            Exit Sub
+        End If
+        Dim fileToDecompress As New FileInfo(ocvb.parms.homeDir + "Data/ibug_300W_large_face_landmark_dataset.tar.gz")
+        If downloadActive And pythonActive = False Then
+            ocvb.trueText("Downloading active (takes a while).  Current download size = " + Format(zippedBuffer.Length / 1000, "###,##0") + "k bytes" + vbCrLf +
+                          "Download is " + Format(zippedBuffer.Length / 1797000000, "#0%") + " complete", 40, 200)
+        Else
+            If pythonActive Then
+                ocvb.trueText("iBug files are being unzipped to " + ibugDir.FullName, 40, 200)
+            Else
+                Static checkDownload = findCheckBox("Download the 1.7 Gb 300 Faces In-The-Wild database")
+                If checkDownload.checked Then
+                    Static client = HttpWebRequest.CreateHttp("http://dlib.net/files/data/ibug_300W_large_face_landmark_dataset.tar.gz")
+                    Static response = client.GetResponse()
+                    Static responseStream = response.GetResponseStream()
+                    downloadActive = True
+                    Static downloadthread As New Thread(
+                        Sub()
+                            If fileToDecompress.Exists = False Then
+                                responseStream.CopyTo(zippedBuffer)
+                                File.WriteAllBytes(fileToDecompress.FullName, zippedBuffer.ToArray)
+                            End If
+
+                            Dim saveConsoleSetting = ocvb.parms.ShowConsoleLog
+                            ocvb.parms.ShowConsoleLog = False
+                            pythonActive = True
+                            Dim pyScript = ocvb.parms.homeDir + "Data/extractiBug.py"
+                            Dim fs = New StreamWriter(pyScript)
+                            fs.WriteLine("import tarfile")
+                            fs.WriteLine("import os")
+                            fs.WriteLine("os.chdir(""" + ocvb.parms.homeDir + "Data/" + """)")
+                            fs.WriteLine("tar = tarfile.open(""" + fileToDecompress.Name + """)")
+                            fs.WriteLine("tar.extractall()")
+                            fs.WriteLine("tar.close")
+                            fs.Close()
+
+                            ocvb.pythonTaskName = pyScript
+                            Dim p As New Process
+                            p.StartInfo.FileName = ocvb.parms.PythonExe
+                            p.StartInfo.WorkingDirectory = ocvb.parms.homeDir + "Data"
+                            p.StartInfo.Arguments = """" + ocvb.pythonTaskName + """"
+                            If ocvb.parms.ShowConsoleLog = False Then p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
+                            p.Start()
+                            p.WaitForExit()
+
+                            ocvb.parms.ShowConsoleLog = saveConsoleSetting
+                            My.Computer.FileSystem.DeleteFile(pyScript)
+                            My.Computer.FileSystem.DeleteFile(fileToDecompress.FullName)
+                            downloadActive = False
+                            pythonActive = False
+                        End Sub)
+                    downloadthread.Start()
+                Else
+                    ocvb.trueText("Check the box in the Options to download the iBug 300W face database", 40, 200)
+                End If
+            End If
+        End If
     End Sub
 End Class
