@@ -76,8 +76,8 @@ The objective is to solve many small computer vision problems and do so in a way
 that enables any of the solutions to be reused. The result is a toolkit for
 solving incrementally bigger problems. The philosophy behind this approach is
 that human vision is not computationally intensive but is built on many almost
-trivial algorithms working together. Computer vision problem are not huge but
-there are an unmanageable number of them. The first step – combining many
+trivial algorithms working together. Computer vision problems are not huge;
+there are just an unmanageable number of them. The first step – combining many
 different algorithms into a single app – is the motivation for OpenCVB’s
 organization.
 
