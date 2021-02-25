@@ -259,7 +259,7 @@ Public Class MatchTemplate_Movement
 
         Parallel.ForEach(grid.roiList,
         Sub(roi)
-            Dim mean As Single = 0, stdev As Single = 0
+            Dim mean As Single, stdev As Single
             cv.Cv2.MeanStdDev(dst1(roi), mean, stdev)
             If stdev > stdevThreshold Then
                 Dim correlation As New cv.Mat
