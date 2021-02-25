@@ -24,9 +24,9 @@ Introduction
 
 There is no better documentation of an algorithm than a working example. Now
 imagine over 900 OpenCV examples in a single app where each algorithm is less
-than a page of code and uses familiar languages. And each algorithm is *just the
-algorithm* without the baggage from a user interface. New algorithms can reuse
-existing algorithms and build variations and combinations.
+than a page of code and uses a familiar language. And each algorithm is *just
+the algorithm* without the baggage from a user interface or environment. New
+algorithms can reuse existing algorithms and build variations and combinations.
 
 In the sample output below, any of the algorithms can be selected from the first
 combo box at the top of the form. The second combo box is used to select
@@ -158,9 +158,10 @@ downloaded for Windows 10:
 Installation – Quick Reference
 ==============================
 
-This is the short description of install process. It is not as simple as cloning
-the GitHub repository and then opening the OpenCVB.sln file but it is not much
-more than just “PrepareTree.bat” and then open and run the OpenCVB.sln file.
+This is the short description of install process. Installation is not as simple
+as cloning the GitHub repository and then opening the OpenCVB.sln file but it is
+not much more than just “PrepareTree.bat” and then open and run the OpenCVB.sln
+file.
 
 -   Run the “PrepareTree.bat” script that comes with OpenCVB. It will download
     and run CMake for needed libraries. After building it will occupy about 18Gb

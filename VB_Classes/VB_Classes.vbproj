@@ -110,6 +110,7 @@
     <Compile Include="BestOf.vb" />
     <Compile Include="BGSubtract.vb" />
     <Compile Include="DLib.vb" />
+    <Compile Include="Download.vb" />
     <Compile Include="ImageSeg.vb" />
     <Compile Include="MFD.vb" />
     <Compile Include="MiniPC.vb" />
@@ -394,7 +395,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="align-depth2color.py" />
+    <Content Include="LRS_align-depth2color.py" />
     <Content Include="BGSubtract_KNN_PS.py" />
     <Content Include="BGSubtract_MOG2_PS.py" />
     <Content Include="Camshift1_PS.py" />

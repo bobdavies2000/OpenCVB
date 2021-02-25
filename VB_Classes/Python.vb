@@ -30,6 +30,14 @@ Module Python_Module
         If checkPythonPackage("cv2") = False Then Return False
         Dim pythonApp = New FileInfo(ocvb.pythonTaskName)
 
+        If pythonApp.Name.StartsWith("LRS_") Then
+            If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Or ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D455 Then
+                ocvb.trueText("The current OpenCVB camera is an Intel RealSense camera and it is also used by this Python script." + vbCrLf +
+                              "The Python script will only run when using a non-RealSense camera in OpenCVB")
+                Return False
+            End If
+        End If
+
         ' when running the regression tests, some python processes are not completing before the next starts.  Then they build up.  What a mess.  This prevents it
         If ocvb.parms.testAllRunning Then
             For Each p In Process.GetProcesses
