@@ -1,153 +1,94 @@
+## License: Apache 2.0. See LICENSE file in root directory.
+## Copyright(c) 2017 Intel Corporation. All Rights Reserved.
+
+#####################################################
+##              Align Depth to Color               ##
+#####################################################
+
+# First import the library
 import pyrealsense2 as rs
+# Import Numpy for easy array manipulation
 import numpy as np
+# Import OpenCV for easy image rendering
 import cv2
-from tensorflow import keras
-import time, sys
 
-# Configure depth and color streams
+# Create a pipeline
 pipeline = rs.pipeline()
+
+# Create a config and configure the pipeline to stream
+#  different resolutions of color and depth streams
 config = rs.config()
-config.enable_stream(rs.stream.depth, 848, 480, rs.format.z16, 30)
-config.enable_stream(rs.stream.infrared, 1, 848, 480, rs.format.y8, 30) # 1 for left frame
+
+# Get device product line for setting a supporting resolution
+pipeline_wrapper = rs.pipeline_wrapper(pipeline)
+pipeline_profile = config.resolve(pipeline_wrapper)
+device = pipeline_profile.get_device()
+device_product_line = str(device.get_info(rs.camera_info.product_line))
+
+config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+
+if device_product_line == 'L500':
+    config.enable_stream(rs.stream.color, 960, 540, rs.format.bgr8, 30)
+else:
+    config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+
 # Start streaming
-pipeline.start(config)
+profile = pipeline.start(config)
 
-channels = 2
-cropped_w, cropped_h = 480, 480
+# Getting the depth sensor's depth scale (see rs-align example for explanation)
+depth_sensor = profile.get_device().first_depth_sensor()
+depth_scale = depth_sensor.get_depth_scale()
+print("Depth Scale is: " , depth_scale)
 
-test_model_name = ""
-if (len(sys.argv) > 1):
-    test_model_name = str(sys.argv[1])
+# We will be removing the background of objects more than
+#  clipping_distance_in_meters meters away
+clipping_distance_in_meters = 1 #1 meter
+clipping_distance = clipping_distance_in_meters / depth_scale
 
-t1 = time.perf_counter()
-model = keras.models.load_model(test_model_name)
-t2 = time.perf_counter()
-print('model loading : ', t2 - t1, 'seconds')
+# Create an align object
+# rs.align allows us to perform alignment of depth frames to others frames
+# The "align_to" is the stream type to which we plan to align depth frames.
+align_to = rs.stream.color
+align = rs.align(align_to)
 
-def predict(noisy_image, ir_image):
-    t1 = time.perf_counter()
-    ir_image = np.array(ir_image).astype("uint16")
-    cropped_ir , cropped_noisy = [], []
-    width, height = 848, 480
-    w, h = cropped_w, cropped_h
-    for col_i in range(0, width, w):
-        for row_i in range(0, height, h):
-            cropped_ir.append(ir_image[row_i:row_i+h, col_i:col_i+w])
-            cropped_noisy.append(noisy_image[row_i:row_i+h, col_i:col_i+w])
-
-    # fill with zero to get size 480x480 for both images
-    fill = np.zeros((h, w - cropped_ir[-1].shape[1]), dtype="uint16")
-    cropped_ir[-1] = np.hstack((cropped_ir[-1], fill))
-    cropped_noisy[-1] = np.hstack((cropped_noisy[-1], fill))
-    t2 = time.perf_counter()
-    print('image cropping : ', t2 - t1, 'seconds')
-
-    cropped_image_offsets = [(0,0), (0,480)]
-    whole_image = np.zeros((height, width, channels), dtype="float32")
-
-    for i in range(len(cropped_ir)):
-        t1 = time.perf_counter()
-        noisy_images_plt = cropped_noisy[i].reshape(1, cropped_w, cropped_h, 1)
-        ir_images_plt = cropped_ir[i].reshape(1, cropped_w, cropped_h, 1)
-        im_and_ir = np.stack((noisy_images_plt, ir_images_plt), axis=3)
-        im_and_ir = im_and_ir.reshape(1, cropped_w, cropped_h, channels)
-        img = np.array(im_and_ir)
-        # Parse numbers as floats
-        img = img.astype('float32')
-
-        # Normalize data : remove average then devide by standard deviation
-        img = img / 65535
-        sample = img
-        row, col = cropped_image_offsets[i]
-        t2 = time.perf_counter()
-        print('image channeling : ', t2 - t1, 'seconds')
-
-        t1 = time.perf_counter()
-        denoised_image = model.predict(sample)
-        t2 = time.perf_counter()
-        print('prediction only : ', t2 - t1, 'seconds')
-        row_end = row + cropped_h
-        col_end = col + cropped_w
-        denoised_row = cropped_h
-        denoised_col = cropped_w
-        if row + cropped_h >= height:
-            row_end = height - 1
-            denoised_row = abs(row - row_end)
-        if col + cropped_w >= width:
-            col_end = width - 1
-            denoised_col = abs(col - col_end)
-        # combine tested images
-        whole_image[row:row_end, col:col_end] = denoised_image[:, 0:denoised_row, 0:denoised_col, :]
-    return whole_image[:, :, 0]
-
-#=============================================================================================================
-def convert_image(i):
-    m = np.min(i)
-    M = np.max(i)
-    i = np.divide(i, np.array([M - m], dtype=np.float)).astype(np.float)
-    i = (i - m).astype(np.float)
-    i8 = (i * 255.0).astype(np.uint8)
-    if i8.ndim == 3:
-        i8 = cv2.cvtColor(i8, cv2.COLOR_BGRA2GRAY)
-    i8 = cv2.equalizeHist(i8)
-    colorized = cv2.applyColorMap(i8, cv2.COLORMAP_JET)
-    colorized[i8 == int(m)] = 0
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    m = float("{:.2f}".format(m))
-    M = float("{:.2f}".format(M))
-    colorized = cv2.putText(colorized, str(m) + " .. " + str(M) + "[m]", (20, 50), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
-    return colorized
-
-
+# Streaming loop
 try:
-    c = rs.colorizer()
     while True:
-        print("==============================================================")
-        t0 = time.perf_counter()
-        # Wait for a coherent pair of frames: depth and ir
-        t1 = time.perf_counter()
+        # Get frameset of color and depth
         frames = pipeline.wait_for_frames()
-        depth_frame = frames.get_depth_frame()
-        ir_frame = frames.get_infrared_frame()
-        t2 = time.perf_counter()
-        print('getting depth + ir frames : ', t2 - t1, 'seconds')
+        # frames.get_depth_frame() is a 640x360 depth image
 
-        if not depth_frame or not ir_frame:
+        # Align the depth frame to color frame
+        aligned_frames = align.process(frames)
+
+        # Get aligned frames
+        aligned_depth_frame = aligned_frames.get_depth_frame() # aligned_depth_frame is a 640x480 depth image
+        color_frame = aligned_frames.get_color_frame()
+
+        # Validate that both frames are valid
+        if not aligned_depth_frame or not color_frame:
             continue
 
-        # Convert images to numpy arrays
-        t1 = time.perf_counter()
-        depth_image = np.asanyarray(depth_frame.get_data())
-        ir_image = np.asanyarray(ir_frame.get_data())
-        t2 = time.perf_counter()
-        print('convert frames to numpy arrays : ', t2 - t1, 'seconds')
+        depth_image = np.asanyarray(aligned_depth_frame.get_data())
+        color_image = np.asanyarray(color_frame.get_data())
 
-        t1 = time.perf_counter()
-        predicted_image = predict(depth_image, ir_image)
-        t2 = time.perf_counter()
-        print('processing + prediction : ', t2 - t1, 'seconds')
+        # Remove background - Set pixels further than clipping_distance to grey
+        grey_color = 153
+        depth_image_3d = np.dstack((depth_image,depth_image,depth_image)) #depth image is 1 channel, color is 3 channels
+        bg_removed = np.where((depth_image_3d > clipping_distance) | (depth_image_3d <= 0), grey_color, color_image)
 
-        # Stack both images horizontally
-        # depth_image = convert_image(depth_image)
-        t1 = time.perf_counter()
-        depth_image = np.asanyarray(c.process(depth_frame).get_data())
-        predicted_image = convert_image(predicted_image)
+        # Render images:
+        #   depth align to color on left
+        #   depth on right
+        depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
+        images = np.hstack((bg_removed, depth_colormap))
 
-        red = depth_image[:, :, 2].copy()
-        blue = depth_image[:, :, 0].copy()
-        depth_image[:, :, 0] = red
-        depth_image[:, :, 2] = blue
-        images = np.hstack((depth_image, predicted_image))
-
-        # Show images
-        cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
-        cv2.imshow('RealSense', images)
-        cv2.waitKey(1)
-        t2 = time.perf_counter()
-        print('show image : ', t2 - t1, 'seconds')
-        print('TOTAL TIME : ', t2 - t0, 'seconds')
-
+        cv2.namedWindow('Align Example', cv2.WINDOW_NORMAL)
+        cv2.imshow('Align Example', images)
+        key = cv2.waitKey(1)
+        # Press esc or 'q' to close the image window
+        if key & 0xFF == ord('q') or key == 27:
+            cv2.destroyAllWindows()
+            break
 finally:
-
-    # Stop streaming
     pipeline.stop()
