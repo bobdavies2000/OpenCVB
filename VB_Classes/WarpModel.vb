@@ -251,82 +251,82 @@ End Class
 
 
 
-Public Class WarpModel_Image
-    Inherits VBparent
-    Public wbasics As WarpModel_Basics
-    Dim sobel As Edges_Sobel
-    Public lastFrame As cv.Mat
-    Dim match As MatchTemplate_DrawRect
-    Public Sub New()
-        initParent()
-        match = New MatchTemplate_DrawRect
+'Public Class WarpModel_Image
+'    Inherits VBparent
+'    Public wbasics As WarpModel_Basics
+'    Dim sobel As Edges_Sobel
+'    Public lastFrame As cv.Mat
+'    Dim match As MatchTemplate_DrawRect
+'    Public Sub New()
+'        initParent()
+'        match = New MatchTemplate_DrawRect
 
-        sobel = New Edges_Sobel
-        wbasics = New WarpModel_Basics
+'        sobel = New Edges_Sobel
+'        wbasics = New WarpModel_Basics
 
-        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
-        dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
+'        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
+'        dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Correlation Threshold X1000", 0, 1000, 950)
-            sliders.setupTrackBar(1, "Stdev Threshold", 0, 100, 10)
-        End If
+'        If findfrm(caller + " Slider Options") Is Nothing Then
+'            sliders.Setup(caller)
+'            sliders.setupTrackBar(0, "Correlation Threshold X1000", 0, 1000, 950)
+'            sliders.setupTrackBar(1, "Stdev Threshold", 0, 100, 10)
+'        End If
 
-        task.drawRect = New cv.Rect(100, 100, 100, 100)
-        label1 = "Previous ROI (align to this image)"
-        label2 = "Current ROI aligned to previous frame (dst1)"
-        task.desc = "Find the Translation and Euclidean warp matrix for the current grayscale image to the previous - needs more work"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        task.drawRect = New cv.Rect(100, 100, 100, 100)
+'        label1 = "Previous ROI (align to this image)"
+'        label2 = "Current ROI aligned to previous frame (dst1)"
+'        task.desc = "Find the Translation and Euclidean warp matrix for the current grayscale image to the previous - needs more work"
+'    End Sub
+'    Public Sub Run()
+'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        sobel.src = src
-        sobel.Run()
+'        sobel.src = src
+'        sobel.Run()
 
-        dst1 = sobel.dst1
-        If lastFrame Is Nothing Then lastFrame = dst1.Clone
+'        dst1 = sobel.dst1
+'        If lastFrame Is Nothing Then lastFrame = dst1.Clone
 
-        ' if the ROI has low stdev or low correlation between the 2 images, it may never converge.
-        ' Try to prevent failure by measuring stdev and correlation before findTransformECC
-        wbasics.src = dst1(task.drawRect)
-        wbasics.src2 = lastFrame(task.drawRect)
+'        ' if the ROI has low stdev or low correlation between the 2 images, it may never converge.
+'        ' Try to prevent failure by measuring stdev and correlation before findTransformECC
+'        wbasics.src = dst1(task.drawRect)
+'        wbasics.src2 = lastFrame(task.drawRect)
 
-        Static stdevSlider = findSlider("Stdev Threshold")
-        Dim stdevThreshold = CSng(stdevSlider.Value)
+'        Static stdevSlider = findSlider("Stdev Threshold")
+'        Dim stdevThreshold = CSng(stdevSlider.Value)
 
-        Static correlationSlider = findSlider("Correlation Threshold X1000")
-        Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
+'        Static correlationSlider = findSlider("Correlation Threshold X1000")
+'        Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
 
-        Dim mean As Single, stdev As Single
-        cv.Cv2.MeanStdDev(dst1(task.drawRect), mean, stdev)
-        Dim thresholdError As String = ""
-        If stdev > stdevThreshold Then
-            Dim correlation As New cv.Mat
-            cv.Cv2.MatchTemplate(dst1(task.drawRect), lastFrame(task.drawRect), correlation, cv.TemplateMatchModes.CCoeffNormed)
-            dst2 = lastFrame.Clone
-            Dim corr = correlation.Get(Of Single)(0, 0)
-
-
-            ' This line makes the algorithm work but also makes it a tautology (or just plain useless.)  This needs more study...
-            wbasics.src2 = dst1(task.drawRect)
+'        Dim mean As Single, stdev As Single
+'        cv.Cv2.MeanStdDev(dst1(task.drawRect), mean, stdev)
+'        Dim thresholdError As String = ""
+'        If stdev > stdevThreshold Then
+'            Dim correlation As New cv.Mat
+'            cv.Cv2.MatchTemplate(dst1(task.drawRect), lastFrame(task.drawRect), correlation, cv.TemplateMatchModes.CCoeffNormed)
+'            dst2 = lastFrame.Clone
+'            Dim corr = correlation.Get(Of Single)(0, 0)
 
 
+'            ' This line makes the algorithm work but also makes it a tautology (or just plain useless.)  This needs more study...
+'            wbasics.src2 = dst1(task.drawRect)
 
-            If corr < CCthreshold Then
-                thresholdError = "The correlation is only " + Format(corr, "#0.00") + " which is below the threshold of " + Format(CCthreshold, "#0.00")
-            End If
-            wbasics.Run()
-            dst1(wbasics.outputRect) = wbasics.dst1(wbasics.outputRect)
-            dst2(wbasics.outputRect) = wbasics.dst2(wbasics.outputRect)
-        Else
-            thresholdError = "The stdev was only " + Format(stdev, "#0.00") + " which is below the threshold of " + Format(stdevThreshold, "#0.00")
-        End If
 
-        If thresholdError.Length > 0 Then ocvb.trueText(thresholdError)
-        lastFrame = dst1.Clone
-    End Sub
-End Class
+
+'            If corr < CCthreshold Then
+'                thresholdError = "The correlation is only " + Format(corr, "#0.00") + " which is below the threshold of " + Format(CCthreshold, "#0.00")
+'            End If
+'            wbasics.Run()
+'            dst1(wbasics.outputRect) = wbasics.dst1(wbasics.outputRect)
+'            dst2(wbasics.outputRect) = wbasics.dst2(wbasics.outputRect)
+'        Else
+'            thresholdError = "The stdev was only " + Format(stdev, "#0.00") + " which is below the threshold of " + Format(stdevThreshold, "#0.00")
+'        End If
+
+'        If thresholdError.Length > 0 Then ocvb.trueText(thresholdError)
+'        lastFrame = dst1.Clone
+'    End Sub
+'End Class
 
 
 
