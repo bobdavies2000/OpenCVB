@@ -173,8 +173,8 @@ file.
     -   After “PrepareTree.bat” completes, Visual Studio projects will open. Run
         “Batch Build” and “Select All” in each Visual Studio project.
 
--   Set Environmental variable OpenCV_Version to 450. – This depends on the
-    version of OpenCV, currently 4.50.
+-   Set Environmental variable OpenCV_Version to 451. – This depends on the
+    version of OpenCV, currently 4.51.
 
 -   Download the Kinect4Azure proprietary binaries:
     <https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/usage.md>
@@ -214,10 +214,10 @@ The first step is to clone the OpenCVB repository in GitHub:
     variable that needs to be set and it will depend on which version of OpenCV
     was just downloaded and built.
 
-    -   Environmental variable “OpenCV_Version” should be set to 450
+    -   Environmental variable “OpenCV_Version” should be set to 451
 
-    -   The currently available OpenCV download is 4.50 so setting
-        OpenCV_Version to 450 reflects that but note that OpenCV is updated
+    -   The currently available OpenCV download is 4.51 so setting
+        OpenCV_Version to 451 reflects that but note that OpenCV is updated
         several times a year and the environmental variable may need to be
         updated.
 
@@ -254,8 +254,8 @@ Trouble-Shooting New Install
 Some typical problems with new installations:
 
 -   Link problems: check the “OpenCV_Version” environmental variable for OpenCV
-    version. It may need to reflect a newer version of OpenCV. For OpenCV 4.5,
-    the environmental variable is OpenCV_Version = 450. Make sure that OpenCV
+    version. It may need to reflect a newer version of OpenCV. For OpenCV 4.51,
+    the environmental variable is OpenCV_Version = 451. Make sure that OpenCV
     Debug and Release versions were built successfully.
 
 -   Camera Failure: check the camera installation by testing the examples
