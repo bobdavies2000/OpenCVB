@@ -16,9 +16,9 @@ def Mbox(titleWindow, text, style):
 if path.exists("../Data/faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph.pb") == False:
     Mbox('DNN_Inception_PS.py', "Use the 'Download_Databases' algorithm to get this database: \n\n faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph.pb", 1)
     databaseMissing = True
-
-# download model from: https://github.com/opencv/opencv/wiki/TensorFlow-Object-Detection-API#run-network-in-opencv
-net = cv.dnn.readNetFromTensorflow("../Data/faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph.pb", 
+else:
+    # download model from: https://github.com/opencv/opencv/wiki/TensorFlow-Object-Detection-API#run-network-in-opencv
+    net = cv.dnn.readNetFromTensorflow("../Data/faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph.pb", 
                                    "../Data/faster_rcnn_inception_v2_coco_2018_01_28.pbtxt")
     
 def OpenCVCode(imgRGB, depth32f, frameCount):
