@@ -14,7 +14,7 @@ def Mbox(titleWindow, text, style):
     return ctypes.windll.user32.MessageBoxW(0, text, titleWindow, style)
 
 if path.exists("../Data/faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph.pb") == False:
-    Mbox('DNN_Inception_PS.py', "Use the 'Download_Databases' algorithm to get this database: \n\n faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph.pb", 1)
+    Mbox('DNN_Inception_PS.py', "Use the 'Download_Databases' algorithm to get this database: \n\n Select: 'TensorFlow Faster-RCNN Inception v2'", 1)
     databaseMissing = True
 else:
     # download model from: https://github.com/opencv/opencv/wiki/TensorFlow-Object-Detection-API#run-network-in-opencv
