@@ -395,6 +395,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DNN_Inception_PS.py" />
     <Content Include="LRS_align-depth2color.py" />
     <Content Include="BGSubtract_KNN_PS.py" />
     <Content Include="BGSubtract_MOG2_PS.py" />

@@ -65,13 +65,13 @@ def PyStreamRun(OpenCVCode, scriptName):
                         depth32f = np.array(np.frombuffer(depthData, np.float32).reshape(depthSize))
                     except:
                         print("unable to reshape the depth data")
-                        sys.exit()
+                        sys.exit(0)
                     rgbSize = rows, cols, 3
                     try:
                         imgRGB = np.array(np.frombuffer(rgb, np.uint8).reshape(rgbSize))
                     except:
                         print("Unable to reshape the RGB data")
-                        sys.exit()
+                        sys.exit(0)
                     dst1, dst2 = OpenCVCode(imgRGB, depth32f, frameCount)
                     dst1 = cv.resize(dst1, (cols, rows))
                     if len(dst1.shape) == 2:
@@ -82,7 +82,7 @@ def PyStreamRun(OpenCVCode, scriptName):
                             dst2 = cv.cvtColor(dst2, cv.COLOR_GRAY2BGR)
                     else:
                         dst2 = np.zeros(dst1.shape, np.uint8)
-                    pipeOut.write(np.asarray(dst1))
+                    pipeOut.write(np.asarray(dst1)) # Assumption here is that we are always returning 8uC3.  Needs more work to generalize...
                     pipeOut.write(np.asarray(dst2))
 
                     cv.waitKey(1) # this is only needed if the OpenCVCode function is calling imshow
