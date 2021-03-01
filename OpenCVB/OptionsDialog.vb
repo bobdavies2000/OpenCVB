@@ -61,21 +61,23 @@ Public Class OptionsDialog
         End Select
     End Sub
     Public Sub OptionsDialog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        For i = 0 To cameraRadioButton.Count - 1
-            cameraRadioButton(i) = New RadioButton
-            CameraGroup.Controls.Add(cameraRadioButton(i))
-            cameraRadioButton(i).Visible = True
-            If cameraDeviceCount(i) = 0 Then cameraRadioButton(i).Enabled = False
-            cameraRadioButton(i).AutoSize = True
-            cameraRadioButton(i).BringToFront()
-            cameraRadioButton(i).Tag = i ' this will manage the public type for the camera - see VB_Classes.vb.
-            cameraRadioButton(i).Location = New Point(16, (i + 1) * 20)
-            cameraRadioButton(i).Text = Choose(i + 1, "Microsoft Kinect for Azure Camera", "StereoLabs ZED 2 camera",
-                                               "MyntEyeD 1000 camera", "Intel RealSense D435i", "Intel RealSense D455", "D455 Python Interface", "OpenCV Oak-D")
-            'If cameraRadioButton(i).Text = "D455 Python Interface" Then cameraRadioButton(i).Enabled = False
-            'If cameraRadioButton(i).Text = "OpenCV Oak-D" Then cameraRadioButton(i).Enabled = False
-            AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
-        Next
+        Static radioButtonsPresent = False
+        If radioButtonsPresent = False Then
+            radioButtonsPresent = True
+            For i = 0 To cameraRadioButton.Count - 1
+                cameraRadioButton(i) = New RadioButton
+                CameraGroup.Controls.Add(cameraRadioButton(i))
+                cameraRadioButton(i).Visible = True
+                If cameraDeviceCount(i) = 0 Then cameraRadioButton(i).Enabled = False
+                cameraRadioButton(i).AutoSize = True
+                cameraRadioButton(i).Tag = i ' this will manage the public type for the camera - see VB_Classes.vb.
+                ' cameraRadioButton(i).Location = New Point(16, (i + 1) * 20)
+                cameraRadioButton(i).Text = Choose(i + 1, "Microsoft Kinect for Azure Camera", "StereoLabs ZED 2 camera",
+                                               "MyntEyeD 1000 camera", "Intel RealSense D435i", "Intel RealSense D455",
+                                               "D455 Python Interface (experimental)", "OpenCV Oak-D (experimental)")
+                AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
+            Next
+        End If
 
         OpenCVB.workingRes.Width = GetSetting("OpenCVB", "resolutionWidth", "resolutionWidth", 640)
         OpenCVB.workingRes.Height = GetSetting("OpenCVB", "resolutionHeight", "resolutionHeight", 480)

@@ -22,7 +22,6 @@ Partial Class OptionsDialog
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.CameraGroup = New System.Windows.Forms.GroupBox()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.SnapToGrid = New System.Windows.Forms.CheckBox()
         Me.resolution1280 = New System.Windows.Forms.RadioButton()
@@ -45,6 +44,7 @@ Partial Class OptionsDialog
         Me.Button1 = New System.Windows.Forms.Button()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.FontDialog1 = New System.Windows.Forms.FontDialog()
+        Me.CameraGroup = New System.Windows.Forms.FlowLayoutPanel()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
@@ -52,15 +52,6 @@ Partial Class OptionsDialog
         Me.GroupBox6.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
         Me.SuspendLayout()
-        '
-        'CameraGroup
-        '
-        Me.CameraGroup.Location = New System.Drawing.Point(21, 12)
-        Me.CameraGroup.Name = "CameraGroup"
-        Me.CameraGroup.Size = New System.Drawing.Size(771, 255)
-        Me.CameraGroup.TabIndex = 3
-        Me.CameraGroup.TabStop = False
-        Me.CameraGroup.Text = "Camera"
         '
         'GroupBox1
         '
@@ -267,11 +258,21 @@ Partial Class OptionsDialog
         Me.Label4.TabIndex = 1
         Me.Label4.Text = "Select the font for all TrueType text"
         '
+        'CameraGroup
+        '
+        Me.CameraGroup.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.CameraGroup.FlowDirection = System.Windows.Forms.FlowDirection.TopDown
+        Me.CameraGroup.Location = New System.Drawing.Point(24, 17)
+        Me.CameraGroup.Name = "CameraGroup"
+        Me.CameraGroup.Size = New System.Drawing.Size(821, 229)
+        Me.CameraGroup.TabIndex = 13
+        '
         'OptionsDialog
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1008, 887)
+        Me.Controls.Add(Me.CameraGroup)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.Cancel_Button)
         Me.Controls.Add(Me.OKButton)
@@ -279,7 +280,6 @@ Partial Class OptionsDialog
         Me.Controls.Add(Me.GroupBox4)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
-        Me.Controls.Add(Me.CameraGroup)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.KeyPreview = True
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
@@ -302,7 +302,6 @@ Partial Class OptionsDialog
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents CameraGroup As GroupBox
     Friend WithEvents GroupBox1 As GroupBox
     Friend WithEvents resolution1280 As RadioButton
     Friend WithEvents resolution640 As RadioButton
@@ -325,4 +324,5 @@ Partial Class OptionsDialog
     Friend WithEvents fontInfo As Label
     Friend WithEvents FontDialog1 As FontDialog
     Friend WithEvents SnapToGrid As CheckBox
+    Friend WithEvents CameraGroup As FlowLayoutPanel
 End Class
