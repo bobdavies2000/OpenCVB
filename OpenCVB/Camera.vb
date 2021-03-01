@@ -1,6 +1,59 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Numerics
-Imports rs = Intel.Realsense
+Imports rs = Intel.RealSense
+Imports System.Runtime.InteropServices
+
+
+
+
+Module Palette_Custom_Module
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub Palette_Custom(img As IntPtr, map As IntPtr, dst1 As IntPtr, rows As Integer, cols As Integer, channels As Integer)
+    End Sub
+    Public mapNames() As String = {"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
+                                   "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "TwilightShifted", "Viridis", "Winter", "Random - use slider to adjust"}
+    Public Function Palette_Custom_Apply(src As cv.Mat, customColorMap As cv.Mat) As cv.Mat
+        ' the VB.Net interface to OpenCV doesn't support adding a random lookup table to ApplyColorMap API.  It is available in C++ though.
+        Dim srcData(src.Total * src.ElemSize - 1) As Byte
+        Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
+        Marshal.Copy(src.Data, srcData, 0, srcData.Length)
+
+        Dim mapData(customColorMap.Total * customColorMap.ElemSize - 1) As Byte
+        Dim handleMap = GCHandle.Alloc(mapData, GCHandleType.Pinned)
+        Marshal.Copy(customColorMap.Data, mapData, 0, mapData.Length)
+
+        Dim dstData(src.Total * 3 - 1) As Byte ' it always comes back in color...
+        Dim handledst1 = GCHandle.Alloc(dstData, GCHandleType.Pinned)
+
+        ' the custom colormap API is not implemented for custom color maps.  Only colormapTypes can be provided.
+        Palette_Custom(handleSrc.AddrOfPinnedObject, handleMap.AddrOfPinnedObject, handledst1.AddrOfPinnedObject, src.Rows, src.Cols, src.Channels)
+
+        Dim output = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+        Marshal.Copy(dstData, 0, output.Data, dstData.Length)
+        handleSrc.Free()
+        handleMap.Free()
+        handledst1.Free()
+        Return output
+    End Function
+    Public Function colorTransition(color1 As cv.Scalar, color2 As cv.Scalar, width As Integer) As cv.Mat
+        Dim f As Double = 1.0
+        Dim gradientColors As New cv.Mat(1, width, cv.MatType.CV_64FC3)
+        For i = 0 To width - 1
+            gradientColors.Set(Of cv.Scalar)(0, i, New cv.Scalar(f * color2(0) + (1 - f) * color1(0), f * color2(1) + (1 - f) * color1(1),
+                                                                     f * color2(2) + (1 - f) * color1(2)))
+            f -= 1 / width
+        Next
+        Dim result = New cv.Mat(1, width, cv.MatType.CV_8UC3)
+        For i = 0 To width - 1
+            result.Col(i).SetTo(gradientColors.Get(Of cv.Scalar)(0, i))
+        Next
+        Return result
+    End Function
+End Module
+
+
+
+
 Public Class Camera
     Public transformationMatrix() As Single
     Public IMU_Barometer As Single
@@ -26,6 +79,7 @@ Public Class Camera
     Public rightView As New cv.Mat
     Public pointCloud As New cv.Mat
     Public depth16 As New cv.Mat
+    Public depth32f As New cv.Mat
     Public width As Integer, height As Integer
 
     Public deviceCount As Integer
@@ -45,6 +99,8 @@ Public Class Camera
     Public deviceIndex As Integer
     Public failedImageCount As Integer
     Public modelInverse As Boolean
+    Public cameraRGBDepth As Boolean = True
+    Dim customColorMap As New cv.Mat
     Public Structure imuDataStruct
         Dim r00 As Single
         Dim r01 As Single
@@ -84,6 +140,7 @@ Public Class Camera
         Return intrinsics
     End Function
     Public Sub New()
+        customColorMap = colorTransition(cv.Scalar.Blue, cv.Scalar.Yellow, 256)
     End Sub
     Public Sub GetNextFrameCounts(frameTime As Double)
         Static imageCounter As Integer
@@ -106,6 +163,17 @@ Public Class Camera
         Static lastCPUTime = CPU_TimeStamp
         CPU_FrameTime = CPU_TimeStamp - lastCPUTime
         lastCPUTime = CPU_TimeStamp
+
+        ' if the camera is not providing the depth then build it manually here.
+        If cameraRGBDepth = False Then
+            Dim minDepth = 0
+            Dim maxDepth = 4000
+            Dim depthNormalized = (depth16 * 255 / (maxDepth - minDepth)).ToMat
+            depthNormalized.ConvertTo(depthNormalized, cv.MatType.CV_8U)
+            Dim mask = depthNormalized.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+            RGBDepth = Palette_Custom_Apply(depthNormalized.CvtColor(cv.ColorConversionCodes.GRAY2BGR), customColorMap)
+            RGBDepth.SetTo(0, mask)
+        End If
 
         frameCount += 1
     End Sub

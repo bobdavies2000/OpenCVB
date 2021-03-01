@@ -61,7 +61,6 @@ try:
         shape = (args.Height, args.Width)
         depth_image = np.asanyarray(aligned_depth_frame.get_data())
         imgRGB = np.asanyarray(color_frame.get_data())
-        depth_colormap = cv.applyColorMap(cv.convertScaleAbs(depth_image, alpha=0.03), cv.COLORMAP_JET)
         left_image = np.empty(shape, imgRGB.dtype) #  TEMP TEMP TEMP - until we get things working...
         right_image = np.empty(shape, imgRGB.dtype) #  TEMP TEMP TEMP - until we get things working...
 
@@ -72,19 +71,16 @@ try:
         pipeOut.write(np.asarray(left_image))
         pipeOut.write(np.asarray(right_image))
         pipeOut.write(np.asarray(depth_image))
-        pipeOut.write(np.asarray(depth_colormap))
         pipeOut.write(np.asarray(verts))
 
         frameIndex = pipeIn.read(1)
 
 except Exception as exception:
     rsPipeline.stop()   
-    Mbox("CameraPyRS2.py", str(exception), 1)
     print(str(exception))
     sys.exit(0)
 
 finally:
     rsPipeline.stop()
-    Mbox("CameraPyRS2.py", "Terminating", 1)
     print("PythonRS2 complete")
     sys.exit(0)

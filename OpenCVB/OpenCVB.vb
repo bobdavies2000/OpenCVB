@@ -69,6 +69,7 @@ Public Class OpenCVB
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
     Public workingRes As cv.Size
     Dim stopCameraThread As Boolean
+    Dim cameraThreadStopped As Boolean = True
     Dim textDesc As String = ""
     Dim totalBytesOfMemoryUsed As Integer
     Dim ttTextData As List(Of VB_Classes.TTtext)
@@ -268,11 +269,11 @@ Public Class OpenCVB
         For i = 0 To RS2count - 1
             Dim deviceName = cameraRS2Generic.queryDevice(i)
             Select Case deviceName
-                'Case "Intel RealSense D455"
-                '    cameraD455 = New CameraRS2
-                '    cameraD455.deviceIndex = i
-                '    cameraD455.serialNumber = cameraRS2Generic.querySerialNumber(i)
-                '    cameraD455.cameraName = deviceName
+                Case "Intel RealSense D455"
+                    cameraD455 = New CameraRS2
+                    cameraD455.deviceIndex = i
+                    cameraD455.serialNumber = cameraRS2Generic.querySerialNumber(i)
+                    cameraD455.cameraName = deviceName
                 Case "Intel RealSense D435I"
                     cameraD435i = New CameraRS2
                     cameraD435i.deviceIndex = i
@@ -515,11 +516,16 @@ Public Class OpenCVB
     End Sub
     Private Sub startCamera()
         stopCameraThread = True
-        If cameraTaskHandle IsNot Nothing Then camera.stopCamera()
+        If cameraTaskHandle IsNot Nothing Then
+            SyncLock delegateLock
+                camera.stopCamera()
+            End SyncLock
+        End If
 
         ' order is same as in optionsdialog enum
         camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraPyRS2, cameraOakD)
 
+        If cameraThreadStopped = False Then cameraTaskHandle.Abort()
         SyncLock cameraThreadLock
             cameraRefresh = False
             newImagesAvailable = False
@@ -536,20 +542,24 @@ Public Class OpenCVB
         SyncLock cameraThreadLock
             taskCam.initialize(workingRes.Width, workingRes.Height, fps)
             stopCameraThread = False
+            cameraThreadStopped = False
             While stopCameraThread = False
                 SyncLock bufferLock
                     taskCam.GetNextFrame()
                 End SyncLock
                 cameraRefresh = True ' trigger the paint 
                 newImagesAvailable = True ' trigger the algorithm task
+
                 Static delegateX As New delegateEvent(AddressOf raiseEventCamera)
                 Me.Invoke(delegateX)
 
+                GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
+
                 Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
                 totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
-                GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
             End While
         End SyncLock
+        cameraThreadStopped = True
     End Sub
     Private Sub TreeButton_Click(sender As Object, e As EventArgs) Handles TreeButton.Click
         TreeButton.Checked = Not TreeButton.Checked
@@ -795,20 +805,6 @@ Public Class OpenCVB
             MsgBox(neededDirectory + " was not found.  " + notFoundMessage)
         End If
         Environment.SetEnvironmentVariable("Path", systemPath)
-    End Sub
-
-    Public Sub DisplayOfficeFile(ByVal WorkingDir As String, ByVal FileName As String)
-        Try
-            Dim MyProcess As New Process
-            Dim BaseName As String = Dir$(FileName)
-            MyProcess.StartInfo.FileName = FileName
-            MyProcess.StartInfo.WorkingDirectory = WorkingDir
-            MyProcess.StartInfo.Verb = "OPEN"
-            MyProcess.StartInfo.CreateNoWindow = False
-            MyProcess.Start()
-        Catch ex As Exception
-            MsgBox("DisplayOfficeFile failed with error = " + ex.Message)
-        End Try
     End Sub
     Public Function validateRect(r As cv.Rect, width As Integer, height As Integer) As cv.Rect
         Dim ratio = imgResult.Width / camPic(2).Width
@@ -1062,6 +1058,7 @@ Public Class OpenCVB
         StartAlgorithmTask()
     End Sub
     Private Sub StartAlgorithmTask()
+        If algorithmTaskHandle IsNot Nothing Then algorithmTaskHandle.Abort()
         openFileForm.Hide()
         openFileForm.PlayButton.Text = "Start"
         openFileDialogName = ""
@@ -1160,11 +1157,12 @@ Public Class OpenCVB
                     If newImagesAvailable And pauseAlgorithmThread = False And camera.color.width > 0 Then
                         ' bring the data into the algorithm task.
                         task.color = camera.color.Resize(workingRes)
+
                         task.RGBDepth = camera.RGBDepth.Resize(workingRes)
                         task.leftView = camera.leftView.Resize(workingRes)
                         task.rightView = camera.rightView.Resize(workingRes)
                         task.pointCloud = camera.PointCloud.clone.resize(workingRes)
-                        task.depth16 = camera.depth16.clone
+                        camera.depth16.convertto(task.depth32f, cv.MatType.CV_32F)
 
                         task.transformationMatrix = camera.transformationMatrix
                         task.IMU_TimeStamp = camera.IMU_TimeStamp

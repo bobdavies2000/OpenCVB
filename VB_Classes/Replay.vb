@@ -3,7 +3,7 @@ Imports System.IO
 Imports System.Runtime.InteropServices
 Module recordPlaybackCommon
     Public bytesPerColor As Int64
-    Public bytesPerDepth16 As Int64
+    Public bytesPerdepth32f As Int64
     Public bytesPerRGBDepth As Int64
     Public bytesPerCloud As Int64
     Public Structure fileHeader
@@ -14,8 +14,8 @@ Module recordPlaybackCommon
         Public colorElemsize As integer
 
         Public depthWidth As integer
-        Public depthHeight As integer
-        Public depth16Elemsize As integer
+        Public depthHeight As Integer
+        Public depth32fElemsize As Integer
 
         Public RGBDepthWidth As integer
         Public RGBDepthHeight As integer
@@ -30,9 +30,9 @@ Module recordPlaybackCommon
         binWrite.Write(task.color.Height)
         binWrite.Write(task.color.ElemSize)
 
-        binWrite.Write(task.depth16.Width)
-        binWrite.Write(task.depth16.Height)
-        binWrite.Write(task.depth16.ElemSize)
+        binWrite.Write(task.depth32f.Width)
+        binWrite.Write(task.depth32f.Height)
+        binWrite.Write(task.depth32f.ElemSize)
 
         binWrite.Write(task.RGBDepth.Width)
         binWrite.Write(task.RGBDepth.Height)
@@ -49,7 +49,7 @@ Module recordPlaybackCommon
 
         header.depthWidth = binRead.ReadInt32()
         header.depthHeight = binRead.ReadInt32()
-        header.depth16Elemsize = binRead.ReadInt32()
+        header.depth32fElemsize = binRead.ReadInt32()
 
         header.RGBDepthWidth = binRead.ReadInt32()
         header.RGBDepthHeight = binRead.ReadInt32()
@@ -70,7 +70,7 @@ Public Class Replay_Record
     Dim recordingActive As Boolean
     Dim colorBytes() As Byte
     Dim RGBDepthBytes() As Byte
-    Dim depth16Bytes() As Byte
+    Dim depth32fBytes() As Byte
     Dim cloudBytes() As Byte
     Dim maxBytes As Single = 20000000000
     Dim recordingFilename As FileInfo
@@ -100,10 +100,10 @@ Public Class Replay_Record
             If recordingActive = False Then
                 bytesPerColor = task.color.Total * task.color.ElemSize
                 bytesPerRGBDepth = task.RGBDepth.Total * task.RGBDepth.ElemSize
-                bytesPerDepth16 = task.depth16.Total * task.depth16.ElemSize
+                bytesPerdepth32f = task.depth32f.Total * task.depth32f.ElemSize
                 ' start recording...
                 ReDim colorBytes(bytesPerColor - 1)
-                ReDim depth16Bytes(bytesPerDepth16 - 1)
+                ReDim depth32fBytes(bytesPerdepth32f - 1)
                 ReDim RGBDepthBytes(bytesPerRGBDepth - 1)
                 Dim pcSize = task.pointCloud.Total * task.pointCloud.ElemSize
                 ReDim cloudBytes(pcSize - 1)
@@ -116,9 +116,9 @@ Public Class Replay_Record
                 binWrite.Write(colorBytes)
                 bytesTotal += colorBytes.Length
 
-                Marshal.Copy(task.depth16.Data, depth16Bytes, 0, depth16Bytes.Length)
-                binWrite.Write(depth16Bytes)
-                bytesTotal += depth16Bytes.Length
+                Marshal.Copy(task.depth32f.Data, depth32fBytes, 0, depth32fBytes.Length)
+                binWrite.Write(depth32fBytes)
+                bytesTotal += depth32fBytes.Length
 
                 Marshal.Copy(task.RGBDepth.Data, RGBDepthBytes, 0, RGBDepthBytes.Length)
                 binWrite.Write(RGBDepthBytes)
@@ -158,7 +158,7 @@ Public Class Replay_Play
     Dim binRead As BinaryReader
     Dim playbackActive As Boolean
     Dim colorBytes() As Byte
-    Dim depth16Bytes() As Byte
+    Dim depth32fBytes() As Byte
     Dim RGBDepthBytes() As Byte
     Dim cloudBytes() As Byte
     Dim fh As New fileHeader
@@ -189,9 +189,9 @@ Public Class Replay_Play
                 task.color = tmpMat.Resize(task.color.Size())
                 bytesTotal += colorBytes.Length
 
-                depth16Bytes = binRead.ReadBytes(bytesPerDepth16)
-                tmpMat = New cv.Mat(fh.depthHeight, fh.depthWidth, cv.MatType.CV_16U, depth16Bytes)
-                bytesTotal += depth16Bytes.Length
+                depth32fBytes = binRead.ReadBytes(bytesPerdepth32f)
+                tmpMat = New cv.Mat(fh.depthHeight, fh.depthWidth, cv.MatType.CV_16U, depth32fBytes)
+                bytesTotal += depth32fBytes.Length
 
                 RGBDepthBytes = binRead.ReadBytes(bytesPerRGBDepth)
                 tmpMat = New cv.Mat(fh.RGBDepthHeight, fh.RGBDepthWidth, cv.MatType.CV_8UC3, RGBDepthBytes)
@@ -219,7 +219,7 @@ Public Class Replay_Play
 
                 If fh.cloudWidth = src.Width Then ' the current width/height don't agree with the recorded data.  Often happens during "Test All"
                     bytesPerColor = fh.colorWidth * fh.colorHeight * fh.colorElemsize
-                    bytesPerDepth16 = fh.cloudWidth * fh.cloudHeight * fh.depth16Elemsize
+                    bytesPerdepth32f = fh.cloudWidth * fh.cloudHeight * fh.depth32fElemsize
                     bytesPerRGBDepth = fh.colorWidth * fh.colorHeight * fh.RGBDepthElemsize
                     bytesPerCloud = fh.cloudWidth * fh.cloudHeight * fh.cloudElemsize
 

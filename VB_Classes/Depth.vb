@@ -1407,31 +1407,6 @@ End Class
 
 
 
-Public Class Depth_TestMinFunction
-    Inherits VBparent
-    Public Sub New()
-        initParent()
-        label1 = "32-bit format brightened version of dst2"
-        label2 = "32-bit format stable depth (if camera is stable)"
-        task.desc = "Test min function with depth data"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        Dim depth32f As New cv.Mat
-        task.depth16.ConvertTo(depth32f, cv.MatType.CV_32F)
-        If ocvb.frameCount Mod 30 = 0 Then dst2 = depth32f
-        cv.Cv2.Min(dst2, depth32f, dst2)
-        dst1 = dst2.ConvertScaleAbs(180)
-        dst1 += 64
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 ' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
