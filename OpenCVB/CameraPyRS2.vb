@@ -76,6 +76,8 @@ Public Class CameraPyRS2
         leftView = New cv.Mat(height, width, cv.MatType.CV_8U)
         rightView = New cv.Mat(height, width, cv.MatType.CV_8U)
         pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3)
+        ReDim Extrinsics_VB.rotation(9 - 1)
+        ReDim Extrinsics_VB.translation(3 - 1)
         pipelineClosed = False
         cameraRGBDepth = False
     End Sub
