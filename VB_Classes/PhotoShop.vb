@@ -48,6 +48,9 @@ End Class
 
 
 
+
+
+
 Public Class PhotoShop_AlphaBeta
     Inherits VBparent
     Public Sub New()
@@ -64,6 +67,10 @@ Public Class PhotoShop_AlphaBeta
         dst1 = src.ConvertScaleAbs(sliders.trackbar(0).Value / 500, sliders.trackbar(1).Value)
     End Sub
 End Class
+
+
+
+
 
 
 

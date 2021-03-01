@@ -40,7 +40,7 @@ End Class
 
 
 
-Public Class Entropy_Highest_MT
+Public Class Entropy_Highest
     Inherits VBparent
     Dim entropyCalc As Entropy_Simple
     Public grid As Thread_Grid
@@ -107,11 +107,11 @@ End Class
 Public Class Entropy_FAST
     Inherits VBparent
     Dim fast As FAST_Basics
-    Dim entropy As Entropy_Highest_MT
+    Dim entropy As Entropy_Highest
     Public Sub New()
         initParent()
         fast = New FAST_Basics()
-        entropy = New Entropy_Highest_MT()
+        entropy = New Entropy_Highest()
 
         label1 = "Output of Fast_Basics, input to entropy calculation"
         label2 = "Lighter color is higher entropy, Red marks highest"

@@ -225,3 +225,30 @@ End Class
 
 
 
+
+
+Public Class LeftRightView_BrightnessContrast
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.OakDCamera Then
+                sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 10000, 1200)
+                sliders.setupTrackBar(1, "Brightness Beta (brightness)", -255, 255, -50)
+            Else
+                sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 10000, 5000)
+                sliders.setupTrackBar(1, "Brightness Beta (brightness)", -255, 255, -100)
+            End If
+        End If
+
+        label1 = "Left View"
+        label2 = "Right View"
+        task.desc = "Enhance the left/right views with brightness and contrast."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        dst1 = task.leftView.ConvertScaleAbs(sliders.trackbar(0).Value / 500, sliders.trackbar(1).Value)
+        dst2 = task.rightView.ConvertScaleAbs(sliders.trackbar(0).Value / 500, sliders.trackbar(1).Value)
+    End Sub
+End Class

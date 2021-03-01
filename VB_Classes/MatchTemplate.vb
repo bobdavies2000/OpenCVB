@@ -177,14 +177,14 @@ End Class
 
 Public Class MatchTemplate_BestEntropy_MT
     Inherits VBparent
-    Dim entropy As Entropy_Highest_MT
+    Dim entropy As Entropy_Highest
     Dim match As MatchTemplate_DrawRect
     Public Sub New()
         initParent()
 
         match = New MatchTemplate_DrawRect()
 
-        entropy = New Entropy_Highest_MT()
+        entropy = New Entropy_Highest()
 
         label1 = "Probabilities that the template matches image"
         label2 = "Red is the best template to match (highest entropy)"
