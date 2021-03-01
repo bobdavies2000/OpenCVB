@@ -5,10 +5,10 @@ Imports CS_Classes
 Public Class Sift_Basics
     Inherits VBparent
     Dim siftCS As New CS_SiftBasics
-    Dim fisheye As FishEye_Rectified
+    Dim lrView As LeftRightView_BrightnessContrast
     Public Sub New()
         initParent()
-        fisheye = New FishEye_Rectified()
+        lrView = New LeftRightView_BrightnessContrast
 
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 2)
@@ -25,9 +25,12 @@ Public Class Sift_Basics
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim doubleSize As New cv.Mat(task.leftView.Rows, task.leftView.Cols * 2, cv.MatType.CV_8UC3)
 
-        siftCS.Run(task.leftView, task.rightView, doubleSize, radio.check(0).Checked, sliders.trackbar(0).Value)
+        lrView.Run()
+
+        Dim doubleSize As New cv.Mat(lrView.dst1.Rows, lrView.dst1.Cols * 2, cv.MatType.CV_8UC3)
+
+        siftCS.Run(lrView.dst1, lrView.dst2, doubleSize, radio.check(0).Checked, sliders.trackbar(0).Value)
 
         doubleSize(New cv.Rect(0, 0, dst1.Width, dst1.Height)).CopyTo(dst1)
         doubleSize(New cv.Rect(dst1.Width, 0, dst1.Width, dst1.Height)).CopyTo(dst2)
@@ -44,11 +47,11 @@ Public Class Sift_Basics_MT
     Dim grid As Thread_Grid
     Dim siftCS As New CS_SiftBasics
     Dim siftBasics As Sift_Basics
-    Dim fisheye As FishEye_Rectified
+    Dim lrView As LeftRightView_BrightnessContrast
     Dim numPointSlider As System.Windows.Forms.TrackBar
     Public Sub New()
         initParent()
-        fisheye = New FishEye_Rectified()
+        lrView = New LeftRightView_BrightnessContrast()
 
         grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
@@ -67,20 +70,16 @@ Public Class Sift_Basics_MT
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim leftView As cv.Mat
-        Dim rightView As cv.Mat
-
-        leftView = task.leftView
-        rightView = task.rightView
         grid.Run()
 
-        Dim output As New cv.Mat(src.Rows, src.Cols * 2, cv.MatType.CV_8UC3)
+        lrView.Run()
 
+        Dim output As New cv.Mat(src.Rows, src.Cols * 2, cv.MatType.CV_8UC3)
         Dim numFeatures = numPointSlider.Value
         Parallel.ForEach(grid.roiList,
         Sub(roi)
-            Dim left = leftView(roi).Clone()  ' sift wants the inputs to be continuous and roi-modified Mats are not continuous.
-            Dim right = rightView(roi).Clone()
+            Dim left = lrView.dst1(roi).Clone()  ' sift wants the inputs to be continuous and roi-modified Mats are not continuous.
+            Dim right = lrView.dst2(roi).Clone()
             Dim dstROI = New cv.Rect(roi.X, roi.Y, roi.Width * 2, roi.Height)
             Dim dstTmp = output(dstROI).Clone()
             siftCS.Run(left, right, dstTmp, siftBasics.radio.check(0).Checked, numFeatures)
