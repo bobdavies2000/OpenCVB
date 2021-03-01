@@ -517,7 +517,9 @@ Public Class OpenCVB
     Private Sub startCamera()
         SyncLock bufferLock
             stopCameraThread = True
-            If cameraTaskHandle IsNot Nothing Then camera.stopCamera()
+            SyncLock delegateLock
+                If cameraTaskHandle IsNot Nothing Then camera.stopCamera()
+            End SyncLock
         End SyncLock
 
         ' order is same as in optionsdialog enum
