@@ -524,7 +524,6 @@ Public Class OpenCVB
 
         ' order is same as in optionsdialog enum
         camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraPyRS2, cameraOakD)
-        camera.initialize(workingRes.Width, workingRes.Height, fps)
 
         If cameraThreadStopped = False Then cameraTaskHandle.Abort()
         SyncLock cameraThreadLock
@@ -539,13 +538,13 @@ Public Class OpenCVB
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub
     Private Sub CameraTask()
-        Dim taskCam = camera
+        camera.initialize(workingRes.Width, workingRes.Height, fps)
         SyncLock cameraThreadLock
             stopCameraThread = False
             cameraThreadStopped = False
             While stopCameraThread = False
                 SyncLock bufferLock
-                    taskCam.GetNextFrame()
+                    camera.GetNextFrame()
                 End SyncLock
                 cameraRefresh = True ' trigger the paint 
                 newImagesAvailable = True ' trigger the algorithm task

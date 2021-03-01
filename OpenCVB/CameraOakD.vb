@@ -79,6 +79,7 @@ Public Class CameraOakD
         rightView = New cv.Mat(height, width, cv.MatType.CV_8U)
         pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3)
         pipelineClosed = False
+        cameraRGBDepth = False
     End Sub
     Public Sub GetNextFrame()
         If pipelineClosed Then Exit Sub
@@ -103,7 +104,7 @@ Public Class CameraOakD
         Marshal.Copy(depthRGBBuffer, 0, RGBDepth.Data, depthRGBBuffer.Length)
 
         depth8bit.ConvertTo(depth16, cv.MatType.CV_16U)
-        depth16 *= 15 ' not sure what the units are but this lands approximately on the typical range for depth camera - up to 4 meters.
+        depth16 *= 100 ' not sure what the units are but this lands approximately on the typical range for depth camera - up to 4 meters.
 
         cv.Cv2.Flip(leftView, leftView, cv.FlipMode.Y)
         cv.Cv2.Flip(rightView, rightView, cv.FlipMode.Y)
