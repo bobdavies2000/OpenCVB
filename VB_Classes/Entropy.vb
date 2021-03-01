@@ -42,17 +42,22 @@ End Class
 
 Public Class Entropy_Highest_MT
     Inherits VBparent
-    Dim entropies(0) As Entropy_Simple
+    Dim entropyCalc As Entropy_Simple
     Public grid As Thread_Grid
     Public eMaxRect As cv.Rect
+    Dim addw As AddWeighted_Basics
     Public Sub New()
         initParent()
+
+        addw = New AddWeighted_Basics
 
         grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 64
         gridHeightSlider.Value = 80
+
+        entropyCalc = New Entropy_Simple
 
         label1 = "Highest entropy marked with red rectangle"
         task.desc = "Find the highest entropy section of the color image."
@@ -61,33 +66,27 @@ Public Class Entropy_Highest_MT
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run()
 
-        If entropies.Length <> grid.roiList.Count Then
-            ReDim entropies(grid.roiList.Count - 1)
-            For i = 0 To entropies.Length - 1
-                entropies(i) = New Entropy_Simple()
-            Next
-        End If
-
         Dim entropyMap = New cv.Mat(src.Size(), cv.MatType.CV_32F)
-        Parallel.For(0, grid.roiList.Count,
-         Sub(i)
-             entropies(i).Run(src(grid.roiList(i)))
-             entropyMap(grid.roiList(i)).SetTo(entropies(i).entropy)
-         End Sub)
-
+        Dim entropyList(grid.roiList.Count - 1) As Single
         Dim maxEntropy As Single = Single.MinValue
         Dim minEntropy As Single = Single.MaxValue
-        Dim maxIndex As Integer
-        For i = 0 To entropies.Count - 1
-            If entropies(i).entropy > maxEntropy Then
-                maxEntropy = entropies(i).entropy
-                maxIndex = i
+        For Each roi In grid.roiList
+            entropyCalc.Run(src(roi))
+            entropyMap(roi).SetTo(entropyCalc.entropy)
+
+            If entropyCalc.entropy > maxEntropy Then
+                maxEntropy = entropyCalc.entropy
+                eMaxRect = roi
             End If
-            If entropies(i).entropy < minEntropy Then minEntropy = entropies(i).entropy
+            If entropyCalc.entropy < minEntropy Then minEntropy = entropyCalc.entropy
         Next
+
         dst2 = entropyMap.ConvertScaleAbs(255 / (maxEntropy - minEntropy), minEntropy)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.AddWeighted(dst2, 0.5, src, 0.5, 0, dst2)
+        addw.src = dst2
+        addw.src2 = src
+        addw.Run()
+        dst2 = addw.dst1
 
         Dim minval As Double, maxval As Double
         Dim tmp = entropyMap.ConvertScaleAbs(255 / (maxEntropy - minEntropy))
@@ -95,7 +94,6 @@ Public Class Entropy_Highest_MT
 
         dst1 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        eMaxRect = grid.roiList(maxIndex)
         If standalone Or task.intermediateReview = caller Then dst1.Rectangle(eMaxRect, cv.Scalar.Red, 4)
         label2 = "Lighter = higher entropy. Range: " + Format(minEntropy, "0.0") + " to " + Format(maxEntropy, "0.0")
     End Sub

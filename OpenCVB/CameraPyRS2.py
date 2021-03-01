@@ -29,11 +29,17 @@ device = rsPipeline_profile.get_device()
 device_product_line = str(device.get_info(rs.camera_info.product_line))
 
 rsConfig.enable_stream(rs.stream.depth, args.Width, args.Height, rs.format.z16, 30)
-
 rsConfig.enable_stream(rs.stream.color, args.Width, args.Height, rs.format.bgr8, 30)
+rsConfig.enable_stream(rs.stream.infrared, 1, args.Width, args.Height, rs.format.y8, 30)
+rsConfig.enable_stream(rs.stream.infrared, 2, args.Width, args.Height, rs.format.y8, 30)
+rsConfig.enable_stream(rs.stream.gyro)
+rsConfig.enable_stream(rs.stream.accel)
 
 # Start streaming
 profile = rsPipeline.start(rsConfig)
+
+stream = rsPipeline_profile.get_stream(rs.stream.color)
+intrinsicsLeft = stream.as_video_stream_profile().get_intrinsics()
 
 depth_sensor = profile.get_device().first_depth_sensor()
 depth_scale = depth_sensor.get_depth_scale()
@@ -53,6 +59,8 @@ try:
         # Get aligned frames
         aligned_depth_frame = aligned_frames.get_depth_frame() # aligned_depth_frame is a 640x480 depth image
         color_frame = aligned_frames.get_color_frame()
+        leftImage = aligned_frames.get_infrared_frame(1).get_data()
+        rightImage = aligned_frames.get_infrared_frame(2).get_data()
 
         # Validate that both frames are valid
         if not aligned_depth_frame or not color_frame:
@@ -61,15 +69,13 @@ try:
         shape = (args.Height, args.Width)
         depth_image = np.asanyarray(aligned_depth_frame.get_data())
         imgRGB = np.asanyarray(color_frame.get_data())
-        left_image = np.empty(shape, imgRGB.dtype) #  TEMP TEMP TEMP - until we get things working...
-        right_image = np.empty(shape, imgRGB.dtype) #  TEMP TEMP TEMP - until we get things working...
 
         points = point_cloud.calculate(aligned_depth_frame)
         verts = np.asanyarray(points.get_vertices()).view(np.float32).reshape(-1, args.Width , 3) 
 
         pipeOut.write(np.asarray(imgRGB))
-        pipeOut.write(np.asarray(left_image))
-        pipeOut.write(np.asarray(right_image))
+        pipeOut.write(np.asarray(leftImage))
+        pipeOut.write(np.asarray(rightImage))
         pipeOut.write(np.asarray(depth_image))
         pipeOut.write(np.asarray(verts))
 

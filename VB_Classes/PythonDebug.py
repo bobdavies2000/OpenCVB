@@ -33,6 +33,11 @@ if device_product_line == 'L500':
 else:
     config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
 
+config.enable_stream(rs.stream.infrared, 1, 640, 480, rs.format.y8, 30)
+config.enable_stream(rs.stream.infrared, 2, 640, 480, rs.format.y8, 30)
+config.enable_stream(rs.stream.gyro)
+config.enable_stream(rs.stream.accel)
+
 # Start streaming
 profile = pipeline.start(config)
 
@@ -40,6 +45,9 @@ profile = pipeline.start(config)
 depth_sensor = profile.get_device().first_depth_sensor()
 depth_scale = depth_sensor.get_depth_scale()
 print("Depth Scale is: " , depth_scale)
+
+stream = pipeline_profile.get_stream(rs.stream.color)
+intrinsicsLeft = stream.as_video_stream_profile().get_intrinsics()
 
 # We will be removing the background of objects more than
 #  clipping_distance_in_meters meters away
@@ -51,7 +59,6 @@ clipping_distance = clipping_distance_in_meters / depth_scale
 # The "align_to" is the stream type to which we plan to align depth frames.
 align_to = rs.stream.color
 align = rs.align(align_to)
-point_cloud = rs.pointcloud()
 
 # Streaming loop
 try:
@@ -73,8 +80,6 @@ try:
 
         depth_image = np.asanyarray(aligned_depth_frame.get_data())
         color_image = np.asanyarray(color_frame.get_data())
-        points = point_cloud.calculate(aligned_depth_frame)
-        verts = np.asanyarray(points.get_vertices()).view(np.float32).reshape(-1, 640, 3) 
 
         # Remove background - Set pixels further than clipping_distance to grey
         grey_color = 153
