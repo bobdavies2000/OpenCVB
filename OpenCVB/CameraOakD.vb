@@ -81,41 +81,37 @@ Public Class CameraOakD
         pipelineClosed = False
     End Sub
     Public Sub GetNextFrame()
-        SyncLock bufferLock
-            If pipelineClosed Then Exit Sub
-            If rgbBuffer.Length <> color.Total * color.ElemSize Then ReDim rgbBuffer(color.Total * color.ElemSize - 1)
-            If depthBuffer.Length <> depth8bit.Total Then ReDim depthBuffer(depth8bit.Total - 1)
-            If depthRGBBuffer.Length <> RGBDepth.Total * RGBDepth.ElemSize Then ReDim depthRGBBuffer(RGBDepth.Total * RGBDepth.ElemSize - 1)
-            If leftBuffer.Length <> leftView.Total Then ReDim leftBuffer(leftView.Total - 1)
-            If rightBuffer.Length <> rightView.Total Then ReDim rightBuffer(rightView.Total - 1)
-            pipeImages.Read(rgbBuffer, 0, rgbBuffer.Length)
-            pipeImages.Read(leftBuffer, 0, leftBuffer.Length)
-            pipeImages.Read(rightBuffer, 0, rightBuffer.Length)
-            pipeImages.Read(depthBuffer, 0, depthBuffer.Length)
-            pipeImages.Read(depthRGBBuffer, 0, depthRGBBuffer.Length)
+        If pipelineClosed Then Exit Sub
+        If rgbBuffer.Length <> color.Total * color.ElemSize Then ReDim rgbBuffer(color.Total * color.ElemSize - 1)
+        If depthBuffer.Length <> depth8bit.Total Then ReDim depthBuffer(depth8bit.Total - 1)
+        If depthRGBBuffer.Length <> RGBDepth.Total * RGBDepth.ElemSize Then ReDim depthRGBBuffer(RGBDepth.Total * RGBDepth.ElemSize - 1)
+        If leftBuffer.Length <> leftView.Total Then ReDim leftBuffer(leftView.Total - 1)
+        If rightBuffer.Length <> rightView.Total Then ReDim rightBuffer(rightView.Total - 1)
+        pipeImages.Read(rgbBuffer, 0, rgbBuffer.Length)
+        pipeImages.Read(leftBuffer, 0, leftBuffer.Length)
+        pipeImages.Read(rightBuffer, 0, rightBuffer.Length)
+        pipeImages.Read(depthBuffer, 0, depthBuffer.Length)
+        pipeImages.Read(depthRGBBuffer, 0, depthRGBBuffer.Length)
 
-            Dim buff() = {CByte(frameCount Mod 255)}
-            pipeSync.Write(buff, 0, 1)
+        Dim buff() = {CByte(frameCount Mod 255)}
+        pipeSync.Write(buff, 0, 1)
 
-            Marshal.Copy(rgbBuffer, 0, color.Data, rgbBuffer.Length)
-            Marshal.Copy(leftBuffer, 0, leftView.Data, leftBuffer.Length)
-            Marshal.Copy(rightBuffer, 0, rightView.Data, rightBuffer.Length)
-            Marshal.Copy(depthBuffer, 0, depth8bit.Data, depthBuffer.Length)
-            Marshal.Copy(depthRGBBuffer, 0, RGBDepth.Data, depthRGBBuffer.Length)
+        Marshal.Copy(rgbBuffer, 0, color.Data, rgbBuffer.Length)
+        Marshal.Copy(leftBuffer, 0, leftView.Data, leftBuffer.Length)
+        Marshal.Copy(rightBuffer, 0, rightView.Data, rightBuffer.Length)
+        Marshal.Copy(depthBuffer, 0, depth8bit.Data, depthBuffer.Length)
+        Marshal.Copy(depthRGBBuffer, 0, RGBDepth.Data, depthRGBBuffer.Length)
 
-            depth8bit.ConvertTo(depth16, cv.MatType.CV_16U)
-            depth16 *= 15 ' not sure what the units are but this lands approximately on the typical range for depth camera - up to 4 meters.
+        depth8bit.ConvertTo(depth16, cv.MatType.CV_16U)
+        depth16 *= 15 ' not sure what the units are but this lands approximately on the typical range for depth camera - up to 4 meters.
 
-            cv.Cv2.Flip(leftView, leftView, cv.FlipMode.Y)
-            cv.Cv2.Flip(rightView, rightView, cv.FlipMode.Y)
-            MyBase.GetNextFrameCounts(IMU_FrameTime)
-        End SyncLock
+        cv.Cv2.Flip(leftView, leftView, cv.FlipMode.Y)
+        cv.Cv2.Flip(rightView, rightView, cv.FlipMode.Y)
+        MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()
-        SyncLock bufferLock
-            OakProcess.Kill()
-            pipelineClosed = True
-            frameCount = 0
-        End SyncLock
+        OakProcess.Kill()
+        pipelineClosed = True
+        frameCount = 0
     End Sub
 End Class

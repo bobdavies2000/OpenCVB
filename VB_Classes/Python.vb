@@ -41,7 +41,7 @@ Module Python_Module
         ' when running the regression tests, some python processes are not completing before the next starts.  Then they build up.  What a mess.  This prevents it
         If ocvb.parms.testAllRunning Then
             For Each p In Process.GetProcesses
-                If p.ProcessName.ToUpper.Contains("PYTHON") Then
+                If p.ProcessName.ToUpper.Contains("PYTHON") And p.StartInfo.WorkingDirectory.EndsWith("VB_Classes") Then
                     Try
                         ' if it is not our process, we won't be able to kill it.
                         p.Kill()

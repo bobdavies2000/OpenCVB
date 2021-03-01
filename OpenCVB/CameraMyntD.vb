@@ -161,42 +161,38 @@ Public Class CameraMyntD
 
     Public Sub GetNextFrame()
         If frameCount = 10 And width = 640 Then initialize(640, 480, 30)
-        SyncLock bufferLock
-            If cPtr = 0 Then Exit Sub
-            Dim imagePtr = MyntDWaitFrame(cPtr)
-            Dim acc = MyntDAcceleration(cPtr)
-            IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)
-            IMU_Acceleration.Y *= -1 ' make it consistent with the other cameras.
+        If cPtr = 0 Then Exit Sub
+        Dim imagePtr = MyntDWaitFrame(cPtr)
+        Dim acc = MyntDAcceleration(cPtr)
+        IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)
+        IMU_Acceleration.Y *= -1 ' make it consistent with the other cameras.
 
-            Dim ang = MyntDGyro(cPtr)
-            IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
-            IMU_AngularVelocity *= 0.0174533 ' MyntD gyro is in degrees/sec
+        Dim ang = MyntDGyro(cPtr)
+        IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
+        IMU_AngularVelocity *= 0.0174533 ' MyntD gyro is in degrees/sec
 
-            IMU_Temperature = MyntDIMU_Temperature(cPtr)
+        IMU_Temperature = MyntDIMU_Temperature(cPtr)
 
-            Static startTime = MyntDIMU_TimeStamp(cPtr)
-            IMU_TimeStamp = MyntDIMU_TimeStamp(cPtr) - startTime
+        Static startTime = MyntDIMU_TimeStamp(cPtr)
+        IMU_TimeStamp = MyntDIMU_TimeStamp(cPtr) - startTime
 
-            Dim depthRGBPtr = MyntDImageRGBdepth(cPtr)
-            Dim depth16Ptr = MyntDRawDepth(cPtr)
-            Dim rightPtr = MyntDRightImage(cPtr)
-            Dim pcPtr = MyntDPointCloud(cPtr)
-            If imagePtr <> 0 And depthRGBPtr <> 0 And rightPtr <> 0 And depth16Ptr <> 0 And pcPtr <> 0 Then
-                color = New cv.Mat(height, width, cv.MatType.CV_8UC3, imagePtr).Clone()
-                leftView = color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                rightView = New cv.Mat(height, width, cv.MatType.CV_8UC3, rightPtr).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, depthRGBPtr).Clone()
-                pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, pcPtr).Clone()
-                depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, depth16Ptr).Clone()
-                MyBase.GetNextFrameCounts(IMU_FrameTime)
-            End If
-        End SyncLock
+        Dim depthRGBPtr = MyntDImageRGBdepth(cPtr)
+        Dim depth16Ptr = MyntDRawDepth(cPtr)
+        Dim rightPtr = MyntDRightImage(cPtr)
+        Dim pcPtr = MyntDPointCloud(cPtr)
+        If imagePtr <> 0 And depthRGBPtr <> 0 And rightPtr <> 0 And depth16Ptr <> 0 And pcPtr <> 0 Then
+            color = New cv.Mat(height, width, cv.MatType.CV_8UC3, imagePtr).Clone()
+            leftView = color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            rightView = New cv.Mat(height, width, cv.MatType.CV_8UC3, rightPtr).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, depthRGBPtr).Clone()
+            pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, pcPtr).Clone()
+            depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, depth16Ptr).Clone()
+            MyBase.GetNextFrameCounts(IMU_FrameTime)
+        End If
     End Sub
     Public Sub stopCamera()
-        SyncLock bufferLock
-            Application.DoEvents()
-            frameCount = 0
-            cPtr = 0
-        End SyncLock
+        Application.DoEvents()
+        frameCount = 0
+        cPtr = 0
     End Sub
 End Class

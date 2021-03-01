@@ -89,4 +89,3 @@ def PyStreamRun(OpenCVCode, scriptName):
                     
     except Exception as exception:
         print(exception)
-        Mbox('PyStream.py', str(exception), 1)    

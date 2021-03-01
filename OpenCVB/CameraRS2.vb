@@ -107,35 +107,31 @@ Public Class CameraRS2
         rightView = New cv.Mat(height, width, cv.MatType.CV_8U, 0)
     End Sub
     Public Sub GetNextFrame()
-        SyncLock bufferLock
-            If cPtr = 0 Then Exit Sub
-            RS2WaitForFrame(cPtr)
-            color = New cv.Mat(height, width, cv.MatType.CV_8UC3, RS2Color(cPtr)).Clone()
+        If cPtr = 0 Then Exit Sub
+        RS2WaitForFrame(cPtr)
+        color = New cv.Mat(height, width, cv.MatType.CV_8UC3, RS2Color(cPtr)).Clone()
 
-            Dim accelFrame = RS2Accel(cPtr)
-            If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
-            IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
+        Dim accelFrame = RS2Accel(cPtr)
+        If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
+        IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
 
-            Dim gyroFrame = RS2Gyro(cPtr)
-            If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
+        Dim gyroFrame = RS2Gyro(cPtr)
+        If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
 
-            Static imuStartTime = RS2IMUTimeStamp(cPtr)
-            IMU_TimeStamp = RS2IMUTimeStamp(cPtr) - imuStartTime
+        Static imuStartTime = RS2IMUTimeStamp(cPtr)
+        IMU_TimeStamp = RS2IMUTimeStamp(cPtr) - imuStartTime
 
-            RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, RS2RGBDepth(cPtr)).Clone()
-            depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, RS2RawDepth(cPtr)) * depthScale
-            leftView = New cv.Mat(height, width, cv.MatType.CV_8U, RS2LeftRaw(cPtr)).Clone()
-            rightView = New cv.Mat(height, width, cv.MatType.CV_8U, RS2RightRaw(cPtr)).Clone()
-            pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, RS2PointCloud(cPtr)).Clone()
-            MyBase.GetNextFrameCounts(IMU_FrameTime)
-        End SyncLock
+        RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, RS2RGBDepth(cPtr)).Clone()
+        depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, RS2RawDepth(cPtr)) * depthScale
+        leftView = New cv.Mat(height, width, cv.MatType.CV_8U, RS2LeftRaw(cPtr)).Clone()
+        rightView = New cv.Mat(height, width, cv.MatType.CV_8U, RS2RightRaw(cPtr)).Clone()
+        pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, RS2PointCloud(cPtr)).Clone()
+        MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()
-        SyncLock bufferLock
-            Application.DoEvents()
-            RS2Stop(cPtr)
-            frameCount = 0
-            cPtr = 0
-        End SyncLock
+        Application.DoEvents()
+        RS2Stop(cPtr)
+        frameCount = 0
+        cPtr = 0
     End Sub
 End Class

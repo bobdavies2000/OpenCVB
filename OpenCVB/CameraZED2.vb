@@ -163,60 +163,56 @@ Public Class CameraZED2
     Public Sub GetNextFrame()
         Zed2WaitForFrame(cPtr)
 
-        SyncLock bufferLock
-            If cPtr = 0 Then Exit Sub
-            Zed2GetData(cPtr)
+        If cPtr = 0 Then Exit Sub
+        Zed2GetData(cPtr)
 
-            color = New cv.Mat(height, width, cv.MatType.CV_8UC3, Zed2Color(cPtr)).Clone()
-            RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, Zed2RGBDepth(cPtr)).Clone()
-            depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, Zed2Depth16(cPtr)).Clone()
-            leftView = New cv.Mat(height, width, cv.MatType.CV_8UC1, Zed2LeftView(cPtr)).Clone()
-            rightView = New cv.Mat(height, width, cv.MatType.CV_8UC1, Zed2RightView(cPtr)).Clone()
-            pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, Zed2PointCloud(cPtr)).Clone()
+        color = New cv.Mat(height, width, cv.MatType.CV_8UC3, Zed2Color(cPtr)).Clone()
+        RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, Zed2RGBDepth(cPtr)).Clone()
+        depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, Zed2Depth16(cPtr)).Clone()
+        leftView = New cv.Mat(height, width, cv.MatType.CV_8UC1, Zed2LeftView(cPtr)).Clone()
+        rightView = New cv.Mat(height, width, cv.MatType.CV_8UC1, Zed2RightView(cPtr)).Clone()
+        pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, Zed2PointCloud(cPtr)).Clone()
 
-            Dim imuFrame = Zed2GetPoseData(cPtr)
-            Dim acc = Zed2Acceleration(cPtr)
-            IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)
-            IMU_Acceleration.Y *= -1 ' make it consistent with the other cameras.
+        Dim imuFrame = Zed2GetPoseData(cPtr)
+        Dim acc = Zed2Acceleration(cPtr)
+        IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)
+        IMU_Acceleration.Y *= -1 ' make it consistent with the other cameras.
 
-            Dim ang = Zed2AngularVelocity(cPtr)
-            IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
-            IMU_AngularVelocity *= 0.0174533 ' Zed 2 gyro is in degrees/sec
-            IMU_AngularVelocity.Z *= -1 ' make it consistent with the other cameras.
+        Dim ang = Zed2AngularVelocity(cPtr)
+        IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
+        IMU_AngularVelocity *= 0.0174533 ' Zed 2 gyro is in degrees/sec
+        IMU_AngularVelocity.Z *= -1 ' make it consistent with the other cameras.
 
-            Dim rt = Marshal.PtrToStructure(Of imuDataStruct)(imuFrame)
-            Dim t = New cv.Point3f(rt.tx, rt.ty, rt.tz)
-            Dim mat() As Single = {-rt.r00, rt.r01, -rt.r02, 0.0,
+        Dim rt = Marshal.PtrToStructure(Of imuDataStruct)(imuFrame)
+        Dim t = New cv.Point3f(rt.tx, rt.ty, rt.tz)
+        Dim mat() As Single = {-rt.r00, rt.r01, -rt.r02, 0.0,
                                            -rt.r10, rt.r11, rt.r12, 0.0,
                                            -rt.r20, rt.r21, -rt.r22, 0.0,
                                             t.X, t.Y, t.Z, 1.0}
-            transformationMatrix = mat
+        transformationMatrix = mat
 
-            Dim rot = Zed2RotationMatrix(cPtr)
-            Marshal.Copy(rot, IMU_RotationMatrix, 0, IMU_RotationMatrix.Length)
+        Dim rot = Zed2RotationMatrix(cPtr)
+        Marshal.Copy(rot, IMU_RotationMatrix, 0, IMU_RotationMatrix.Length)
 
-            Dim vec = Zed2RotationVector(cPtr)
-            IMU_RotationVector = Marshal.PtrToStructure(Of cv.Point3f)(vec)
+        Dim vec = Zed2RotationVector(cPtr)
+        IMU_RotationVector = Marshal.PtrToStructure(Of cv.Point3f)(vec)
 
-            Dim tran = Zed2Translation(cPtr)
-            IMU_Translation = Marshal.PtrToStructure(Of cv.Point3f)(tran)
+        Dim tran = Zed2Translation(cPtr)
+        IMU_Translation = Marshal.PtrToStructure(Of cv.Point3f)(tran)
 
-            IMU_Barometer = Zed2IMU_Barometer(cPtr)
-            Dim mag = Zed2IMU_Magnetometer(cPtr)
-            IMU_Magnetometer = Marshal.PtrToStructure(Of cv.Point3f)(mag)
+        IMU_Barometer = Zed2IMU_Barometer(cPtr)
+        Dim mag = Zed2IMU_Magnetometer(cPtr)
+        IMU_Magnetometer = Marshal.PtrToStructure(Of cv.Point3f)(mag)
 
-            IMU_Temperature = Zed2IMU_Temperature(cPtr)
+        IMU_Temperature = Zed2IMU_Temperature(cPtr)
 
-            IMU_TimeStamp = Zed2IMU_TimeStamp(cPtr)
-            Static imuStartTime = IMU_TimeStamp
-            IMU_TimeStamp -= imuStartTime
-            MyBase.GetNextFrameCounts(IMU_FrameTime)
-        End SyncLock
+        IMU_TimeStamp = Zed2IMU_TimeStamp(cPtr)
+        Static imuStartTime = IMU_TimeStamp
+        IMU_TimeStamp -= imuStartTime
+        MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()
-        SyncLock bufferLock
-            frameCount = 0
-            cPtr = 0
-        End SyncLock
+        frameCount = 0
+        cPtr = 0
     End Sub
 End Class

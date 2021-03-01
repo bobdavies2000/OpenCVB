@@ -515,12 +515,10 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub startCamera()
-        stopCameraThread = True
-        If cameraTaskHandle IsNot Nothing Then
-            SyncLock delegateLock
-                camera.stopCamera()
-            End SyncLock
-        End If
+        SyncLock bufferLock
+            stopCameraThread = True
+            If cameraTaskHandle IsNot Nothing Then camera.stopCamera()
+        End SyncLock
 
         ' order is same as in optionsdialog enum
         camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraPyRS2, cameraOakD)

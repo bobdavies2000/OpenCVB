@@ -80,37 +80,33 @@ Public Class CameraPyRS2
         cameraRGBDepth = False
     End Sub
     Public Sub GetNextFrame()
-        SyncLock bufferLock
-            If pipelineClosed Then Exit Sub
-            If rgbBuffer.Length <> color.Total * color.ElemSize Then ReDim rgbBuffer(color.Total * color.ElemSize - 1)
-            If depthBuffer.Length <> depth16.Total * depth16.ElemSize Then ReDim depthBuffer(depth16.Total * depth16.ElemSize - 1)
-            If leftBuffer.Length <> leftView.Total Then ReDim leftBuffer(leftView.Total - 1)
-            If rightBuffer.Length <> rightView.Total Then ReDim rightBuffer(rightView.Total - 1)
-            If pointCloudBuffer.Length <> color.Total * 12 Then ReDim pointCloudBuffer(color.Total * 12 - 1)
-            pipeImages.Read(rgbBuffer, 0, rgbBuffer.Length)
-            pipeImages.Read(leftBuffer, 0, leftBuffer.Length)
-            pipeImages.Read(rightBuffer, 0, rightBuffer.Length)
-            pipeImages.Read(depthBuffer, 0, depthBuffer.Length)
-            pipeImages.Read(pointCloudBuffer, 0, pointCloudBuffer.Length)
+        If pipelineClosed Then Exit Sub
+        If rgbBuffer.Length <> color.Total * color.ElemSize Then ReDim rgbBuffer(color.Total * color.ElemSize - 1)
+        If depthBuffer.Length <> depth16.Total * depth16.ElemSize Then ReDim depthBuffer(depth16.Total * depth16.ElemSize - 1)
+        If leftBuffer.Length <> leftView.Total Then ReDim leftBuffer(leftView.Total - 1)
+        If rightBuffer.Length <> rightView.Total Then ReDim rightBuffer(rightView.Total - 1)
+        If pointCloudBuffer.Length <> color.Total * 12 Then ReDim pointCloudBuffer(color.Total * 12 - 1)
+        pipeImages.Read(rgbBuffer, 0, rgbBuffer.Length)
+        pipeImages.Read(leftBuffer, 0, leftBuffer.Length)
+        pipeImages.Read(rightBuffer, 0, rightBuffer.Length)
+        pipeImages.Read(depthBuffer, 0, depthBuffer.Length)
+        pipeImages.Read(pointCloudBuffer, 0, pointCloudBuffer.Length)
 
-            Dim buff() = {CByte(frameCount Mod 255)}
-            pipeSync.Write(buff, 0, 1)
+        Dim buff() = {CByte(frameCount Mod 255)}
+        pipeSync.Write(buff, 0, 1)
 
-            Marshal.Copy(rgbBuffer, 0, color.Data, rgbBuffer.Length)
-            Marshal.Copy(leftBuffer, 0, leftView.Data, leftBuffer.Length)
-            Marshal.Copy(rightBuffer, 0, rightView.Data, rightBuffer.Length)
-            Marshal.Copy(depthBuffer, 0, depth16.Data, depthBuffer.Length)
-            Marshal.Copy(pointCloudBuffer, 0, pointCloud.Data, pointCloudBuffer.Length)
+        Marshal.Copy(rgbBuffer, 0, color.Data, rgbBuffer.Length)
+        Marshal.Copy(leftBuffer, 0, leftView.Data, leftBuffer.Length)
+        Marshal.Copy(rightBuffer, 0, rightView.Data, rightBuffer.Length)
+        Marshal.Copy(depthBuffer, 0, depth16.Data, depthBuffer.Length)
+        Marshal.Copy(pointCloudBuffer, 0, pointCloud.Data, pointCloudBuffer.Length)
 
-            MyBase.GetNextFrameCounts(IMU_FrameTime)
-        End SyncLock
+        MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()
-        SyncLock bufferLock
-            pythonProcess.Kill()
-            Thread.Sleep(100)
-            pipelineClosed = True
-            frameCount = 0
-        End SyncLock
+        pythonProcess.Kill()
+        Thread.Sleep(100)
+        pipelineClosed = True
+        frameCount = 0
     End Sub
 End Class
