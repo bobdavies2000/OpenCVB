@@ -59,6 +59,7 @@ Public Class VBparent : Implements IDisposable
             dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         End If
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
+        On Error Resume Next
         algorithm.Run()
         If standalone And src.Width > 0 Then
             ocvb.label1 = label1
