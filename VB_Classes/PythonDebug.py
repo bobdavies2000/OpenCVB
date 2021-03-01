@@ -1,55 +1,98 @@
+## License: Apache 2.0. See LICENSE file in root directory.
+## Copyright(c) 2017 Intel Corporation. All Rights Reserved.
+
+#####################################################
+##              Align Depth to Color               ##
+#####################################################
+
+# First import the library
 import pyrealsense2 as rs
+
+# Import Numpy for easy array manipulation
 import numpy as np
-import cv2 as cv
-import os.path
-from os import path
-import sys
-from PyStream import PyStreamRun
-titleWindow = 'DNN_Inception_PS.py'
-import ctypes
-def Mbox(titleWindow, text, style):
-    return ctypes.windll.user32.MessageBoxW(0, text, titleWindow, style)
+# Import OpenCV for easy image rendering
+import cv2
 
-if path.exists("../Data/faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph.pb") == False:
-    Mbox('DNN_Inception_PS.py', "Use the 'Download_Databases' algorithm to get this database: \n\n faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph.pb", 1)
-    sys.exit(0)
+# Create a pipeline
+pipeline = rs.pipeline()
 
-# download model from: https://github.com/opencv/opencv/wiki/TensorFlow-Object-Detection-API#run-network-in-opencv
-net = cv.dnn.readNetFromTensorflow("../Data/faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph.pb", 
-                                   "../Data/faster_rcnn_inception_v2_coco_2018_01_28.pbtxt")
-    
-def OpenCVCode(imgRGB, depth32f, frameCount):
-    H, W, depth = imgRGB.shape
-    
-    scaled_size = (int(W), int(H))
-    net.setInput(cv.dnn.blobFromImage(imgRGB, size=scaled_size, swapRB=True, crop=False))
-    detections = net.forward()
+# Create a config and configure the pipeline to stream
+#  different resolutions of color and depth streams
+config = rs.config()
 
-    for detection in detections[0,0]:
-        score = float(detection[2])
-        idx = int(detection[1])
+# Get device product line for setting a supporting resolution
+pipeline_wrapper = rs.pipeline_wrapper(pipeline)
+pipeline_profile = config.resolve(pipeline_wrapper)
+device = pipeline_profile.get_device()
+device_product_line = str(device.get_info(rs.camera_info.product_line))
 
-        if score > 0.8 and idx == 0:
-            left = detection[3] * W
-            top = detection[4] * H
-            right = detection[5] * W
-            bottom = detection[6] * H
-            width = right - left
-            height = bottom - top
+config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
 
-            bbox = (int(left), int(top), int(width), int(height))
+if device_product_line == 'L500':
+    config.enable_stream(rs.stream.color, 960, 540, rs.format.bgr8, 30)
+else:
+    config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
 
-            p1 = (int(bbox[0]), int(bbox[1]))
-            p2 = (int(bbox[0] + bbox[2]), int(bbox[1] + bbox[3]))
-            cv.rectangle(imgRGB, p1, p2, (255, 0, 0), 2, 1)
+# Start streaming
+profile = pipeline.start(config)
 
-            font = cv.FONT_HERSHEY_SIMPLEX
-            bottomLeftCornerOfText = (p1[0], p1[1]+20)
-            fontScale = 1
-            fontColor = (255, 255, 255)
-            lineType = 2
-            cv.putText(imgRGB, "Person", bottomLeftCornerOfText, font, fontScale, fontColor, lineType)
+# Getting the depth sensor's depth scale (see rs-align example for explanation)
+depth_sensor = profile.get_device().first_depth_sensor()
+depth_scale = depth_sensor.get_depth_scale()
+print("Depth Scale is: " , depth_scale)
+
+# We will be removing the background of objects more than
+#  clipping_distance_in_meters meters away
+clipping_distance_in_meters = 1 #1 meter
+clipping_distance = clipping_distance_in_meters / depth_scale
+
+# Create an align object
+# rs.align allows us to perform alignment of depth frames to others frames
+# The "align_to" is the stream type to which we plan to align depth frames.
+align_to = rs.stream.color
+align = rs.align(align_to)
+point_cloud = rs.pointcloud()
+
+# Streaming loop
+try:
+    while True:
+        # Get frameset of color and depth
+        frames = pipeline.wait_for_frames()
+        # frames.get_depth_frame() is a 640x360 depth image
+
+        # Align the depth frame to color frame
+        aligned_frames = align.process(frames)
+
+        # Get aligned frames
+        aligned_depth_frame = aligned_frames.get_depth_frame() # aligned_depth_frame is a 640x480 depth image
+        color_frame = aligned_frames.get_color_frame()
+
+        # Validate that both frames are valid
+        if not aligned_depth_frame or not color_frame:
+            continue
+
+        depth_image = np.asanyarray(aligned_depth_frame.get_data())
+        color_image = np.asanyarray(color_frame.get_data())
+        points = point_cloud.calculate(aligned_depth_frame)
+        verts = np.asanyarray(points.get_vertices()).view(np.float32).reshape(-1, 640, 3) 
+
+        # Remove background - Set pixels further than clipping_distance to grey
+        grey_color = 153
+        depth_image_3d = np.dstack((depth_image,depth_image,depth_image)) #depth image is 1 channel, color is 3 channels
+        bg_removed = np.where((depth_image_3d > clipping_distance) | (depth_image_3d <= 0), grey_color, color_image)
+
+        # Render images:
+        #   depth align to color on left
+        #   depth on right
+        depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
+        images = np.hstack((bg_removed, depth_colormap))
+
+        cv2.namedWindow('Align Example', cv2.WINDOW_NORMAL)
+        cv2.imshow('Align Example', images)
+        key = cv2.waitKey(1)
+        # Press esc or 'q' to close the image window
+        if key & 0xFF == ord('q') or key == 27:
+            cv2.destroyAllWindows()
             break
-    return imgRGB, None
-
-PyStreamRun(OpenCVCode, titleWindow)
+finally:
+    pipeline.stop()

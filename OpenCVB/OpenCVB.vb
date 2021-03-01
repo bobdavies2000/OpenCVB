@@ -32,6 +32,7 @@ Public Class OpenCVB
     Dim cameraD435i As Object
     Dim cameraD455 As Object
     Dim cameraOakD As Object
+    Dim cameraPyRS2 As Object
     Dim cameraKinect As Object
     Dim cameraMyntD As Object
     Dim cameraZed2 As Object
@@ -176,9 +177,10 @@ Public Class OpenCVB
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
 
+        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam) = USBenumeration("Azure Kinect 4K Camera")
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D435i) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth")
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D455) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 455  RGB")
-        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam) = USBenumeration("Azure Kinect 4K Camera")
+        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.PythonRS2) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 455  RGB")
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) = USBenumeration("Movidius MyriadX")
 
         ' Some devices may be present but their opencvb camera interface needs to be present as well.
@@ -218,6 +220,7 @@ Public Class OpenCVB
             If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D435i) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.D435i
             If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D455) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.D455
             If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.OakDCamera
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.PythonRS2) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.PythonRS2
             If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
                 MsgBox("There are no supported cameras present!" + vbCrLf + vbCrLf +
                        "Connect any of these cameras: " + vbCrLf + vbCrLf + "Intel RealSense2 D455" + vbCrLf + "Intel RealSense2 D435i" + vbCrLf +
@@ -265,11 +268,11 @@ Public Class OpenCVB
         For i = 0 To RS2count - 1
             Dim deviceName = cameraRS2Generic.queryDevice(i)
             Select Case deviceName
-                Case "Intel RealSense D455"
-                    cameraD455 = New CameraRS2
-                    cameraD455.deviceIndex = i
-                    cameraD455.serialNumber = cameraRS2Generic.querySerialNumber(i)
-                    cameraD455.cameraName = deviceName
+                'Case "Intel RealSense D455"
+                '    cameraD455 = New CameraRS2
+                '    cameraD455.deviceIndex = i
+                '    cameraD455.serialNumber = cameraRS2Generic.querySerialNumber(i)
+                '    cameraD455.cameraName = deviceName
                 Case "Intel RealSense D435I"
                     cameraD435i = New CameraRS2
                     cameraD435i.deviceIndex = i
@@ -283,6 +286,10 @@ Public Class OpenCVB
         cameraOakD = New CameraOakD
         cameraOakD.pythonApp = New FileInfo(HomeDir.FullName + "OpenCVB\CameraOakD.py")
         cameraOakD.pythonexename = optionsForm.PythonExeName.Text
+
+        cameraPyRS2 = New CameraPyRS2
+        cameraPyRS2.pythonApp = New FileInfo(HomeDir.FullName + "OpenCVB\CameraPyRS2.py")
+        cameraPyRS2.pythonexename = optionsForm.PythonExeName.Text
 
         startCamera()
 
@@ -511,7 +518,7 @@ Public Class OpenCVB
         If cameraTaskHandle IsNot Nothing Then camera.stopCamera()
 
         ' order is same as in optionsdialog enum
-        camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraOakD)
+        camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraPyRS2, cameraOakD)
 
         SyncLock cameraThreadLock
             cameraRefresh = False

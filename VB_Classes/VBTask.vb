@@ -192,6 +192,7 @@ Public Class ActiveTask : Implements IDisposable
             MyntD1000
             D435i
             D455
+            PythonRS2
             OakDCamera
         End Enum
 
@@ -272,10 +273,11 @@ Public Class ActiveTask : Implements IDisposable
         ' https://www.mynteye.com/pages/mynt-eye-d
         ' https://www.intelrealsense.com/depth-camera-d435i/
         ' https://www.intelrealsense.com/depth-camera-d455/
+        ' https://towardsdatascience.com/opinion-26190c7fed1b
         ' order of cameras is the same as the order above...
-        ' Microsoft Kinect4Azure, StereoLabs Zed 2, Mynt EyeD 1000, RealSense D435i, RealSense D455
-        Dim hFOVangles() As Single = {90, 104, 105, 69.4, 86, 72} ' all values from the specification.
-        Dim vFOVangles() As Single = {59, 72, 58, 42.5, 57, 81} ' all values from the specification.
+        ' Microsoft Kinect4Azure, StereoLabs Zed 2, Mynt EyeD 1000, RealSense D435i, RealSense D455, Python RS2, Oak-D
+        Dim hFOVangles() As Single = {90, 104, 105, 69.4, 86, 86, 72} ' all values from the specification.
+        Dim vFOVangles() As Single = {59, 72, 58, 42.5, 57, 57, 81} ' all values from the specification.
         ocvb.hFov = hFOVangles(parms.cameraName)
         ocvb.vFov = vFOVangles(parms.cameraName)
 

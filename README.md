@@ -96,12 +96,12 @@ software automation and aids simplify the process of adding variants and
 experiments. OpenCVB is more work to install than a typical app but it has been
 reduced to a few steps using standard (and free) packages.
 
-The languages used are those often found in OpenCV projects - C++, C\#, Python
-and VB.Net. OpenCVB also provides access to multiple libraries - OpenCV,
-OpenCVSharp, OpenGL, Emgu, Dlib, NumPy, NAudio, VTK, and OpenMP. And OpenCVB
-enables all possible image representations - 3D, bitmaps, plots, bar charts,
-spreadsheets, and text. Examples of all of these representations are included in
-OpenCVB.
+The languages used are those often found in OpenCV projects - C++, C\#, and
+Python - but also include VB.Net, hence the name OpenCVB. OpenCVB also provides
+access to multiple libraries - OpenCV, OpenCVSharp, OpenGL, Dlib, NumPy, NAudio,
+VTK, and OpenMP. And OpenCVB enables all possible image representations - 3D,
+bitmaps, plots, bar charts, spreadsheets, and text. Examples of all of these
+representations are included in OpenCVB.
 
 Making these languages and libraries available while using the same
 infrastructure shaped a standardized class for OpenCVB algorithms. Implementing
@@ -611,8 +611,8 @@ needed.
 VTK Support
 ===========
 
-It takes some time to get VTK (the Visualization Took Kit) working with OpenCV.
-The instructions to install VTK are here:
+It takes some time and lots of disk space to get VTK (the Visualization Took
+Kit) working with OpenCV. The instructions to install VTK are here:
 
 <https://vtk.org/Wiki/VTK/Configure_and_Build>
 
@@ -646,6 +646,8 @@ Some notes on preparing VTK for use with OpenCV and OpenCVB:
 
     -   Rebuild OpenCVB and the VTK algorithms will run (they all start with
         “VTK”)
+
+That is a lot of work. It might be easier to use “Pyglet” with Python.
 
 TRISTR – The Release IS The Repository
 ======================================

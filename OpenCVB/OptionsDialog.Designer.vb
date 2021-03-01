@@ -57,7 +57,7 @@ Partial Class OptionsDialog
         '
         Me.CameraGroup.Location = New System.Drawing.Point(21, 12)
         Me.CameraGroup.Name = "CameraGroup"
-        Me.CameraGroup.Size = New System.Drawing.Size(771, 238)
+        Me.CameraGroup.Size = New System.Drawing.Size(771, 255)
         Me.CameraGroup.TabIndex = 3
         Me.CameraGroup.TabStop = False
         Me.CameraGroup.Text = "Camera"
@@ -67,7 +67,7 @@ Partial Class OptionsDialog
         Me.GroupBox1.Controls.Add(Me.SnapToGrid)
         Me.GroupBox1.Controls.Add(Me.resolution1280)
         Me.GroupBox1.Controls.Add(Me.resolution640)
-        Me.GroupBox1.Location = New System.Drawing.Point(21, 256)
+        Me.GroupBox1.Location = New System.Drawing.Point(21, 273)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(936, 105)
         Me.GroupBox1.TabIndex = 4
@@ -110,7 +110,7 @@ Partial Class OptionsDialog
         '
         Me.GroupBox2.Controls.Add(Me.ShowConsoleLog)
         Me.GroupBox2.Controls.Add(Me.ShowLabels)
-        Me.GroupBox2.Location = New System.Drawing.Point(21, 367)
+        Me.GroupBox2.Location = New System.Drawing.Point(21, 389)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(936, 113)
         Me.GroupBox2.TabIndex = 5
@@ -142,7 +142,7 @@ Partial Class OptionsDialog
         '
         Me.GroupBox4.Controls.Add(Me.TestAllDuration)
         Me.GroupBox4.Controls.Add(Me.Label1)
-        Me.GroupBox4.Location = New System.Drawing.Point(21, 495)
+        Me.GroupBox4.Location = New System.Drawing.Point(21, 513)
         Me.GroupBox4.Name = "GroupBox4"
         Me.GroupBox4.Size = New System.Drawing.Size(935, 99)
         Me.GroupBox4.TabIndex = 8

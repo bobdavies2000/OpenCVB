@@ -121,6 +121,7 @@
   <ItemGroup>
     <Compile Include="Camera.vb" />
     <Compile Include="CameraOakD.vb" />
+    <Compile Include="CameraPyRS2.vb" />
     <Compile Include="CameraRS2.vb" />
     <Compile Include="CameraMyntD.vb" />
     <Compile Include="OpenFilename.Designer.vb">
@@ -251,6 +252,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="CameraOakD.py" />
+    <Content Include="CameraPyRS2.py" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
