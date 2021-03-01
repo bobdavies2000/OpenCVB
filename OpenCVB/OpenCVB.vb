@@ -1056,7 +1056,7 @@ Public Class OpenCVB
         StartAlgorithmTask()
     End Sub
     Private Sub StartAlgorithmTask()
-        If algorithmTaskHandle IsNot Nothing Then algorithmTaskHandle.Abort()
+        ' If algorithmTaskHandle IsNot Nothing Then algorithmTaskHandle.Abort()
         openFileForm.Hide()
         openFileForm.PlayButton.Text = "Start"
         openFileDialogName = ""
