@@ -9,14 +9,18 @@ Public Class Extrinsics_Basics
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim nextline = "Rotation MatrixTranslation" + vbCrLf
         Dim fmt = "#0.0000"
-        nextline += Format(ocvb.parms.extrinsics.rotation(0), fmt) + vbTab + Format(ocvb.parms.extrinsics.rotation(1), fmt) + vbTab +
-                       Format(ocvb.parms.extrinsics.rotation(2), fmt) + vbTab + vbTab + vbTab + Format(ocvb.parms.extrinsics.translation(0), fmt) + vbCrLf
+        If ocvb.parms.extrinsics.rotation Is Nothing Then
+            nextline = "Rotation and translation matrices are missing!"
+        Else
+            nextline += Format(ocvb.parms.extrinsics.rotation(0), fmt) + vbTab + Format(ocvb.parms.extrinsics.rotation(1), fmt) + vbTab +
+                           Format(ocvb.parms.extrinsics.rotation(2), fmt) + vbTab + vbTab + vbTab + Format(ocvb.parms.extrinsics.translation(0), fmt) + vbCrLf
 
-        nextline += Format(ocvb.parms.extrinsics.rotation(3), fmt) + vbTab + Format(ocvb.parms.extrinsics.rotation(4), fmt) + vbTab +
+            nextline += Format(ocvb.parms.extrinsics.rotation(3), fmt) + vbTab + Format(ocvb.parms.extrinsics.rotation(4), fmt) + vbTab +
                        Format(ocvb.parms.extrinsics.rotation(5), fmt) + vbTab + vbTab + vbTab + Format(ocvb.parms.extrinsics.translation(1), fmt) + vbCrLf
 
-        nextline += Format(ocvb.parms.extrinsics.rotation(6), fmt) + vbTab + Format(ocvb.parms.extrinsics.rotation(7), fmt) + vbTab +
-                       Format(ocvb.parms.extrinsics.rotation(8), fmt) + vbTab + vbTab + vbTab + Format(ocvb.parms.extrinsics.translation(2), fmt) + vbCrLf
+            nextline += Format(ocvb.parms.extrinsics.rotation(6), fmt) + vbTab + Format(ocvb.parms.extrinsics.rotation(7), fmt) + vbTab +
+                           Format(ocvb.parms.extrinsics.rotation(8), fmt) + vbTab + vbTab + vbTab + Format(ocvb.parms.extrinsics.translation(2), fmt) + vbCrLf
+        End If
         ocvb.trueText(nextline)
     End Sub
 End Class

@@ -524,6 +524,7 @@ Public Class OpenCVB
 
         ' order is same as in optionsdialog enum
         camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraPyRS2, cameraOakD)
+        camera.initialize(workingRes.Width, workingRes.Height, fps)
 
         If cameraThreadStopped = False Then cameraTaskHandle.Abort()
         SyncLock cameraThreadLock
@@ -540,7 +541,6 @@ Public Class OpenCVB
     Private Sub CameraTask()
         Dim taskCam = camera
         SyncLock cameraThreadLock
-            taskCam.initialize(workingRes.Width, workingRes.Height, fps)
             stopCameraThread = False
             cameraThreadStopped = False
             While stopCameraThread = False

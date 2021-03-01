@@ -50,12 +50,12 @@ Public Class CameraPyRS2
         deviceName = "PyRS2"
 
         ' Get the extrinsics before starting up the Python pipeline rather than getting them with the Python code.
-        'Dim cPtr = RS2Open(width, height, deviceIndex)
-        'Dim extrin = RS2Extrinsics(cPtr)
-        'Dim extrinsics As rs.Extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(extrin) ' they are both float's
-        'Extrinsics_VB.rotation = extrinsics.rotation
-        'Extrinsics_VB.translation = extrinsics.translation
-        'RS2Stop(cPtr)
+        Dim cPtr = RS2Open(width, height, deviceIndex)
+        Dim extrin = RS2Extrinsics(cPtr)
+        Dim extrinsics As rs.Extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(extrin) ' they are both float's
+        Extrinsics_VB.rotation = extrinsics.rotation
+        Extrinsics_VB.translation = extrinsics.translation
+        RS2Stop(cPtr)
 
         Static PipeTaskIndex As Integer
         pipeName = "PyRS2Images" + CStr(PipeTaskIndex)
@@ -85,8 +85,6 @@ Public Class CameraPyRS2
         leftView = New cv.Mat(height, width, cv.MatType.CV_8U)
         rightView = New cv.Mat(height, width, cv.MatType.CV_8U)
         pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3)
-        ReDim Extrinsics_VB.rotation(9 - 1)
-        ReDim Extrinsics_VB.translation(3 - 1)
         pipelineClosed = False
         cameraRGBDepth = False
     End Sub
