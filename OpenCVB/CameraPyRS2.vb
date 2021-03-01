@@ -3,6 +3,7 @@ Imports System.Runtime.InteropServices
 Imports System.IO.Pipes
 Imports System.IO
 Imports System.Threading
+Imports rs = Intel.RealSense
 Structure PyRS2data ' not working - no interface to the IMU available yet.
     Public translation As cv.Point3f
     Public acceleration As cv.Point3f
@@ -47,6 +48,14 @@ Public Class CameraPyRS2
         width = _width
         height = _height
         deviceName = "PyRS2"
+
+        ' Get the extrinsics before starting up the Python pipeline rather than getting them with the Python code.
+        'Dim cPtr = RS2Open(width, height, deviceIndex)
+        'Dim extrin = RS2Extrinsics(cPtr)
+        'Dim extrinsics As rs.Extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(extrin) ' they are both float's
+        'Extrinsics_VB.rotation = extrinsics.rotation
+        'Extrinsics_VB.translation = extrinsics.translation
+        'RS2Stop(cPtr)
 
         Static PipeTaskIndex As Integer
         pipeName = "PyRS2Images" + CStr(PipeTaskIndex)

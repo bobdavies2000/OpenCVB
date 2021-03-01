@@ -1,71 +1,56 @@
-## License: Apache 2.0. See LICENSE file in root directory.
-## Copyright(c) 2017 Intel Corporation. All Rights Reserved.
-
-#####################################################
-##              Align Depth to Color               ##
-#####################################################
-
-# First import the library
 import pyrealsense2 as rs
-
-# Import Numpy for easy array manipulation
+import argparse
+import mmap
+import array
+import cv2 as cv
 import numpy as np
-# Import OpenCV for easy image rendering
-import cv2
+import os, time, sys
+from time import sleep
+import ctypes
+def Mbox(title, text, style):
+    return ctypes.windll.user32.MessageBoxW(0, text, title, style)
 
-# Create a pipeline
-pipeline = rs.pipeline()
+parser = argparse.ArgumentParser(description='Pass in width and height of buffers.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('--Width', type=int, default=1280, help='Image width expected by OpenCVB')
+parser.add_argument('--Height', type=int, default=720, help='Image height expected by OpenCVB')
+parser.add_argument('--pipeName', default='', help='The name of the input pipe for image data.')
+args = parser.parse_args()
 
-# Create a config and configure the pipeline to stream
-#  different resolutions of color and depth streams
-config = rs.config()
+pipeName = '//./pipe/' + args.pipeName
+pipeOut = open(pipeName, 'wb')
+pipeIn = open(pipeName + 'in', 'rb')
 
-# Get device product line for setting a supporting resolution
-pipeline_wrapper = rs.pipeline_wrapper(pipeline)
-pipeline_profile = config.resolve(pipeline_wrapper)
-device = pipeline_profile.get_device()
+rsPipeline = rs.pipeline()
+rsConfig = rs.config()
+
+rsPipeline_wrapper = rs.pipeline_wrapper(rsPipeline)
+rsPipeline_profile = rsConfig.resolve(rsPipeline_wrapper)
+device = rsPipeline_profile.get_device()
 device_product_line = str(device.get_info(rs.camera_info.product_line))
 
-config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
-
-if device_product_line == 'L500':
-    config.enable_stream(rs.stream.color, 960, 540, rs.format.bgr8, 30)
-else:
-    config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
-
-config.enable_stream(rs.stream.infrared, 1, 640, 480, rs.format.y8, 30)
-config.enable_stream(rs.stream.infrared, 2, 640, 480, rs.format.y8, 30)
-config.enable_stream(rs.stream.gyro)
-config.enable_stream(rs.stream.accel)
+rsConfig.enable_stream(rs.stream.depth, args.Width, args.Height, rs.format.z16, 30)
+rsConfig.enable_stream(rs.stream.color, args.Width, args.Height, rs.format.bgr8, 30)
+rsConfig.enable_stream(rs.stream.infrared, 1, args.Width, args.Height, rs.format.y8, 30)
+rsConfig.enable_stream(rs.stream.infrared, 2, args.Width, args.Height, rs.format.y8, 30)
+rsConfig.enable_stream(rs.stream.gyro)
+rsConfig.enable_stream(rs.stream.accel)
 
 # Start streaming
-profile = pipeline.start(config)
+profile = rsPipeline.start(rsConfig)
 
-# Getting the depth sensor's depth scale (see rs-align example for explanation)
 depth_sensor = profile.get_device().first_depth_sensor()
 depth_scale = depth_sensor.get_depth_scale()
-print("Depth Scale is: " , depth_scale)
+point_cloud = rs.pointcloud()
 
-stream = pipeline_profile.get_stream(rs.stream.color)
-intrinsicsLeft = stream.as_video_stream_profile().get_intrinsics()
-
-# We will be removing the background of objects more than
-#  clipping_distance_in_meters meters away
-clipping_distance_in_meters = 1 #1 meter
-clipping_distance = clipping_distance_in_meters / depth_scale
-
-# Create an align object
-# rs.align allows us to perform alignment of depth frames to others frames
-# The "align_to" is the stream type to which we plan to align depth frames.
 align_to = rs.stream.color
 align = rs.align(align_to)
 
-# Streaming loop
 try:
     while True:
         # Get frameset of color and depth
-        frames = pipeline.wait_for_frames()
-        # frames.get_depth_frame() is a 640x360 depth image
+        frames = rsPipeline.wait_for_frames()
+		#gyro = frames.first_or_default(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F)
+		#accel = frames.first_or_default(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F)
 
         # Align the depth frame to color frame
         aligned_frames = align.process(frames)
@@ -73,31 +58,34 @@ try:
         # Get aligned frames
         aligned_depth_frame = aligned_frames.get_depth_frame() # aligned_depth_frame is a 640x480 depth image
         color_frame = aligned_frames.get_color_frame()
+        leftImage = aligned_frames.get_infrared_frame(1).get_data()
+        rightImage = aligned_frames.get_infrared_frame(2).get_data()
 
         # Validate that both frames are valid
         if not aligned_depth_frame or not color_frame:
             continue
 
+        shape = (args.Height, args.Width)
         depth_image = np.asanyarray(aligned_depth_frame.get_data())
-        color_image = np.asanyarray(color_frame.get_data())
+        imgRGB = np.asanyarray(color_frame.get_data())
 
-        # Remove background - Set pixels further than clipping_distance to grey
-        grey_color = 153
-        depth_image_3d = np.dstack((depth_image,depth_image,depth_image)) #depth image is 1 channel, color is 3 channels
-        bg_removed = np.where((depth_image_3d > clipping_distance) | (depth_image_3d <= 0), grey_color, color_image)
+        points = point_cloud.calculate(aligned_depth_frame)
+        verts = np.asanyarray(points.get_vertices()).view(np.float32).reshape(-1, args.Width , 3) 
 
-        # Render images:
-        #   depth align to color on left
-        #   depth on right
-        depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
-        images = np.hstack((bg_removed, depth_colormap))
+        pipeOut.write(np.asarray(imgRGB))
+        pipeOut.write(np.asarray(leftImage))
+        pipeOut.write(np.asarray(rightImage))
+        pipeOut.write(np.asarray(depth_image))
+        pipeOut.write(np.asarray(verts))
 
-        cv2.namedWindow('Align Example', cv2.WINDOW_NORMAL)
-        cv2.imshow('Align Example', images)
-        key = cv2.waitKey(1)
-        # Press esc or 'q' to close the image window
-        if key & 0xFF == ord('q') or key == 27:
-            cv2.destroyAllWindows()
-            break
+        frameIndex = pipeIn.read(1)
+
+except Exception as exception:
+    rsPipeline.stop()   
+    print(str(exception))
+    sys.exit(0)
+
 finally:
-    pipeline.stop()
+    rsPipeline.stop()
+    print("PythonRS2 complete")
+    sys.exit(0)

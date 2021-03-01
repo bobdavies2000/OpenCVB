@@ -38,9 +38,6 @@ rsConfig.enable_stream(rs.stream.accel)
 # Start streaming
 profile = rsPipeline.start(rsConfig)
 
-stream = rsPipeline_profile.get_stream(rs.stream.color)
-intrinsicsLeft = stream.as_video_stream_profile().get_intrinsics()
-
 depth_sensor = profile.get_device().first_depth_sensor()
 depth_scale = depth_sensor.get_depth_scale()
 point_cloud = rs.pointcloud()
@@ -52,6 +49,8 @@ try:
     while True:
         # Get frameset of color and depth
         frames = rsPipeline.wait_for_frames()
+		#gyro = frames.first_or_default(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F)
+		#accel = frames.first_or_default(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F)
 
         # Align the depth frame to color frame
         aligned_frames = align.process(frames)
