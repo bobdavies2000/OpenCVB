@@ -72,6 +72,8 @@ Public Class OptionsDialog
             cameraRadioButton(i).Location = New Point(16, (i + 1) * 20)
             cameraRadioButton(i).Text = Choose(i + 1, "Microsoft Kinect for Azure Camera", "StereoLabs ZED 2 camera",
                                                "MyntEyeD 1000 camera", "Intel RealSense D435i", "Intel RealSense D455", "D455 Python Interface", "OpenCV Oak-D")
+            If cameraRadioButton(i).Text = "D455 Python Interface" Then cameraRadioButton(i).Enabled = False
+            If cameraRadioButton(i).Text = "OpenCV Oak-D" Then cameraRadioButton(i).Enabled = False
             AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
         Next
 
