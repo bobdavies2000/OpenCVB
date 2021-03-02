@@ -141,19 +141,21 @@ Public Class TView_Centroids
             dst2.Circle(tflood.floodSide.centroids(i), ocvb.dotSize, cv.Scalar.Yellow, -1)
         Next
 
-        Static saveTopQueries = New List(Of cv.Point2f)(tflood.floodTop.centroids)
-        knn.knnQT.trainingPoints = saveTopQueries
-        knn.knnQT.queryPoints = New List(Of cv.Point2f)(tflood.floodTop.centroids)
-        knn.Run()
-        For i = 0 To knn.neighbors.Rows - 1
-            Dim qPoint = tflood.floodTop.centroids(i)
-            cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
-            Dim pt = saveTopQueries(knn.neighbors.Get(Of Single)(i, 0))
-            Dim cpt = New cv.Point(CInt(pt.x), CInt(pt.y))
-            dst1.Line(cpt, qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
-        Next
+        Dim saveTopQueries = New List(Of cv.Point2f)(tflood.floodTop.centroids)
+        If saveTopQueries.Count > 0 Then
+            knn.knnQT.trainingPoints = saveTopQueries
+            knn.knnQT.queryPoints = New List(Of cv.Point2f)(tflood.floodTop.centroids)
+            knn.Run()
+            For i = 0 To knn.neighbors.Rows - 1
+                Dim qPoint = tflood.floodTop.centroids(i)
+                cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
+                Dim pt = saveTopQueries(knn.neighbors.Get(Of Single)(i, 0))
+                Dim cpt = New cv.Point(CInt(pt.X), CInt(pt.Y))
+                dst1.Line(cpt, qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+            Next
 
-        saveTopQueries = New List(Of cv.Point2f)(tflood.floodTop.centroids)
+            saveTopQueries = New List(Of cv.Point2f)(tflood.floodTop.centroids)
+        End If
     End Sub
 End Class
 
