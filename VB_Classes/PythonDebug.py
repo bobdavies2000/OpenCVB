@@ -1,102 +1,99 @@
-import depthai as dai
-import argparse
-import mmap
-import array
-import cv2 as cv
+## License: Apache 2.0. See LICENSE file in root directory.
+## Copyright(c) 2017 Intel Corporation. All Rights Reserved.
+
+#####################################################
+##              Align Depth to Color               ##
+#####################################################
+
+# First import the library
+import pyrealsense2 as rs
+
+# Import Numpy for easy array manipulation
 import numpy as np
-import os, time, sys
-from time import sleep
-import ctypes
-def Mbox(title, text, style):
-    return ctypes.windll.user32.MessageBoxW(0, text, title, style)
+# Import OpenCV for easy image rendering
+import cv2
 
-parser = argparse.ArgumentParser(description='Pass in width and height of buffers.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('--Width', type=int, default=1280, help='Image width expected by OpenCVB')
-parser.add_argument('--Height', type=int, default=720, help='Image height expected by OpenCVB')
-parser.add_argument('--pipeName', default='', help='The name of the input pipe for image data.')
-args = parser.parse_args()
+# Create a pipeline
+pipeline = rs.pipeline()
 
-pipeName = '//./pipe/' + args.pipeName
-pipeOut = open(pipeName, 'wb')
-pipeIn = open(pipeName + 'in', 'rb')
+# Create a config and configure the pipeline to stream
+#  different resolutions of color and depth streams
+config = rs.config()
 
-pipeline = dai.Pipeline()
+# Get device product line for setting a supporting resolution
+pipeline_wrapper = rs.pipeline_wrapper(pipeline)
+pipel ine_profile = config.resolve(pipeline_wrapper)
+device = pipeline_profile.get_device()
+device_product_line = str(device.get_info(rs.camera_info.product_line))
 
-left = pipeline.createMonoCamera()
-left.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
-left.setBoardSocket(dai.CameraBoardSocket.LEFT)
+config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
 
-right = pipeline.createMonoCamera()
-right.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
-right.setBoardSocket(dai.CameraBoardSocket.RIGHT)
+if device_product_line == 'L500':
+    config.enable_stream(rs.stream.color, 960, 540, rs.format.bgr8, 30)
+else:
+    config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
 
-depth = pipeline.createStereoDepth()
-depth.setConfidenceThreshold(200)
-# Note: the rectified streams are horizontally mirrored by default
-depth.setOutputRectified(True)
-depth.setRectifyEdgeFillColor(0) # Black, to better see the cutout
-left.out.link(depth.left)
-right.out.link(depth.right)
+config.enable_stream(rs.stream.gyro)
+config.enable_stream(rs.stream.accel)
 
-# Define a source - color camera
-cam_rgb = pipeline.createColorCamera()
-cam_rgb.setPreviewSize(1280, 720)
-cam_rgb.setBoardSocket(dai.CameraBoardSocket.RGB)
-cam_rgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
-cam_rgb.setInterleaved(False)
+# Start streaming
+profile = pipeline.start(config)
 
-xout_depth = pipeline.createXLinkOut()
-xout_depth.setStreamName("depth")
-depth.disparity.link(xout_depth.input)
+# Getting the depth sensor's depth scale (see rs-align example for explanation)
+depth_sensor = profile.get_device().first_depth_sensor()
+depth_scale = depth_sensor.get_depth_scale()
+print("Depth Scale is: " , depth_scale)
 
-xout_left = pipeline.createXLinkOut()
-xout_left.setStreamName("rect_left")
-depth.rectifiedLeft.link(xout_left.input)
+# We will be removing the background of objects more than
+#  clipping_distance_in_meters meters away
+clipping_distance_in_meters = 1 #1 meter
+clipping_distance = clipping_distance_in_meters / depth_scale
 
-xout_right = pipeline.createXLinkOut()
-xout_right.setStreamName('rect_right')
-depth.rectifiedRight.link(xout_right.input)
+# Create an align object
+# rs.align allows us to perform alignment of depth frames to others frames
+# The "align_to" is the stream type to which we plan to align depth frames.
+align_to = rs.stream.color
+align = rs.align(align_to)
 
-# Create output
-xout_rgb = pipeline.createXLinkOut()
-xout_rgb.setStreamName("rgb")
-cam_rgb.preview.link(xout_rgb.input)
+# Streaming loop
+try:
+    while True:
+        # Get frameset of color and depth
+        frames = pipeline.wait_for_frames()
+        gyro = frames.first_or_default(rs.stream.gyro, rs.format.xyz32f)
+        accel = frames.first_or_default(rs.stream.accel, rs.format.xyz32f)
 
-device = dai.Device(pipeline)
-device.startPipeline()
+        # Align the depth frame to color frame
+        aligned_frames = align.process(frames)
 
-q_left = device.getOutputQueue(name="rect_left", maxSize=8, blocking=False)
-q_right = device.getOutputQueue(name="rect_right", maxSize=8, blocking=False)
-q_depth = device.getOutputQueue(name="depth", maxSize=8, blocking=False)
-q_rgb = device.getOutputQueue(name="rgb", maxSize=4, blocking=True)
+        # Get aligned frames
+        aligned_depth_frame = aligned_frames.get_depth_frame() # aligned_depth_frame is a 640x480 depth image
+        color_frame = aligned_frames.get_color_frame()
 
-frame_left = None
-frame_right = None
-frame_manip = None
-frame_depth = None
-frame_rgb = None
+        # Validate that both frames are valid
+        if not aligned_depth_frame or not color_frame:
+            continue
 
-while True:
-    in_rgb = q_rgb.get()  # blocking call, will wait until a new data has arrived
-    in_left = q_left.tryGet()
-    in_right = q_right.tryGet()
-    in_depth = q_depth.tryGet()
+        depth_image = np.asanyarray(aligned_depth_frame.get_data())
+        color_image = np.asanyarray(color_frame.get_data())
 
-    if in_left is None: continue
-    if in_right is None: continue 
-    if in_depth is None: continue
-    
-    shape = (3, in_rgb.getHeight(), in_rgb.getWidth())
-    pipeOut.write(bytearray(in_rgb.getData().reshape(shape).transpose(1, 2, 0).astype(np.uint8)))
+        # Remove background - Set pixels further than clipping_distance to grey
+        grey_color = 153
+        depth_image_3d = np.dstack((depth_image,depth_image,depth_image)) #depth image is 1 channel, color is 3 channels
+        bg_removed = np.where((depth_image_3d > clipping_distance) | (depth_image_3d <= 0), grey_color, color_image)
 
-    shape = (in_right.getHeight(), in_right.getWidth())
-    pipeOut.write(bytearray(in_left.getData().reshape(shape).astype(np.uint8)))
-    pipeOut.write(bytearray(in_right.getData().reshape(shape).astype(np.uint8)))
-    pipeOut.write(bytearray(in_depth.getData().reshape((in_depth.getHeight(), in_depth.getWidth())).astype(np.uint8)))
+        # Render images:
+        #   depth align to color on left
+        #   depth on right
+        depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
+        images = np.hstack((bg_removed, depth_colormap))
 
-    frame_depth = in_depth.getData().reshape((in_depth.getHeight(), in_depth.getWidth())).astype(np.uint8)
-    frame_depth = np.ascontiguousarray(frame_depth)
-    frame_depth = cv.applyColorMap(frame_depth, cv.COLORMAP_HSV)
-    pipeOut.write(np.asarray(frame_depth))
-
-    frameIndex = pipeIn.read(1)
+        cv2.namedWindow('Align Example', cv2.WINDOW_NORMAL)
+        cv2.imshow('Align Example', images)
+        key = cv2.waitKey(1)
+        # Press esc or 'q' to close the image window
+        if key & 0xFF == ord('q') or key == 27:
+            cv2.destroyAllWindows()
+            break
+finally:
+    pipeline.stop()

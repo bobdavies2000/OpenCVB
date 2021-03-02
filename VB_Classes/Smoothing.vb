@@ -56,7 +56,7 @@ Public Class Smoothing_Exterior
 	End Sub
 	Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-		If standalone or task.intermediateReview = caller Then
+		If standalone Or task.intermediateReview = caller Then
 			If ocvb.frameCount Mod 30 Then Exit Sub
 
 			hull.src = src
@@ -66,8 +66,10 @@ Public Class Smoothing_Exterior
 			dst1.SetTo(0)
 			inputPoints = drawPoly(dst1, nextHull, cv.Scalar.White)
 		End If
-		smoothPoints = getSplineInterpolationCatmullRom(inputPoints, sliders.trackbar(0).Value)
-		If smoothPoints.Count > 0 Then drawPoly(dst1, smoothPoints.ToArray, plotColor)
+		If inputPoints.Count > 0 Then
+			smoothPoints = getSplineInterpolationCatmullRom(inputPoints, sliders.trackbar(0).Value)
+			drawPoly(dst1, smoothPoints.ToArray, plotColor)
+		End If
 	End Sub
 End Class
 

@@ -33,6 +33,9 @@ if device_product_line == 'L500':
 else:
     config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
 
+#config.enable_stream(rs.stream.gyro)
+#config.enable_stream(rs.stream.accel)
+
 # Start streaming
 profile = pipeline.start(config)
 
@@ -57,7 +60,9 @@ try:
     while True:
         # Get frameset of color and depth
         frames = pipeline.wait_for_frames()
-        # frames.get_depth_frame() is a 640x360 depth image
+
+        #gyro = frames.first_or_default(rs.stream.gyro, rs.format.xyz32f)
+        #accel = frames.first_or_default(rs.stream.accel, rs.format.xyz32f)
 
         # Align the depth frame to color frame
         aligned_frames = align.process(frames)

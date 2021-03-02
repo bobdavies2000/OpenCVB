@@ -32,8 +32,8 @@ rsConfig.enable_stream(rs.stream.depth, args.Width, args.Height, rs.format.z16, 
 rsConfig.enable_stream(rs.stream.color, args.Width, args.Height, rs.format.bgr8, 30)
 rsConfig.enable_stream(rs.stream.infrared, 1, args.Width, args.Height, rs.format.y8, 30)
 rsConfig.enable_stream(rs.stream.infrared, 2, args.Width, args.Height, rs.format.y8, 30)
-rsConfig.enable_stream(rs.stream.gyro)
-rsConfig.enable_stream(rs.stream.accel)
+#rsConfig.enable_stream(rs.stream.gyro)
+#rsConfig.enable_stream(rs.stream.accel)
 
 # Start streaming
 profile = rsPipeline.start(rsConfig)
@@ -49,8 +49,8 @@ try:
     while True:
         # Get frameset of color and depth
         frames = rsPipeline.wait_for_frames()
-		#gyro = frames.first_or_default(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F)
-		#accel = frames.first_or_default(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F)
+        #gyro = frames.first_or_default(rs.stream.gyro, rs.format.xyz32f)
+        #accel = frames.first_or_default(rs.stream.accel, rs.format.xyz32f)
 
         # Align the depth frame to color frame
         aligned_frames = align.process(frames)
