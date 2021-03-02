@@ -66,7 +66,7 @@ Public Class Smoothing_Exterior
 			dst1.SetTo(0)
 			inputPoints = drawPoly(dst1, nextHull, cv.Scalar.White)
 		End If
-		If inputPoints.Count > 0 Then
+		If inputPoints.Count > 1 Then
 			smoothPoints = getSplineInterpolationCatmullRom(inputPoints, sliders.trackbar(0).Value)
 			drawPoly(dst1, smoothPoints.ToArray, plotColor)
 		End If
