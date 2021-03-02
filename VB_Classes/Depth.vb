@@ -1918,7 +1918,7 @@ Public Class Depth_ForegroundHead
         fgnd.Run()
 
         trustworthy = False
-        If fgnd.dst1.CountNonZero() Then
+        If fgnd.dst1.CountNonZero() And fgnd.maxIndex >= 0 Then
             Dim rectSize = 50
             If src.Width > 1000 Then rectSize = 250
             Dim xx = fgnd.blobLocation.Item(fgnd.maxIndex).X - rectSize / 2
