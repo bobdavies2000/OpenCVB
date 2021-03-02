@@ -1068,6 +1068,12 @@ Public Class OpenCVB
         Dim parms As New VB_Classes.ActiveTask.algParms
         ReDim parms.IMU_RotationMatrix(9 - 1)
         parms.IMU_RotationMatrix = camera.IMU_RotationMatrix
+        For i = 0 To camera.imu_rotationmatrix.length - 1
+            If camera.imu_rotationmatrix(i) <> 0 Then
+                parms.IMU_Present = True
+                Exit For
+            End If
+        Next
         parms.IMU_RotationVector = camera.IMU_RotationVector
 
         parms.cameraName = GetSetting("OpenCVB", "CameraIndex", "CameraIndex", VB_Classes.ActiveTask.algParms.camNames.D435i)

@@ -204,6 +204,7 @@ Public Class ActiveTask : Implements IDisposable
         Public IMU_RotationMatrix() As Single
         Public IMU_RotationVector As cv.Point3f
         Public VTK_Present As Boolean
+        Public IMU_Present As Boolean
         Public pixelViewerOn As Boolean
 
         Public intrinsicsLeft As intrinsics_VB

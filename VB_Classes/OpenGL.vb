@@ -241,10 +241,14 @@ Public Class OpenGL_IMU
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        imu.Run()
-        ogl.OpenGL.dataInput = New cv.Mat(100, 100, cv.MatType.CV_32F, 0)
-        ogl.src = src
-        ogl.Run() ' we are not moving any images to OpenGL - just the IMU value which are already in the memory mapped file.
+        If ocvb.parms.IMU_Present Then
+            imu.Run()
+            ogl.OpenGL.dataInput = New cv.Mat(100, 100, cv.MatType.CV_32F, 0)
+            ogl.src = src
+            ogl.Run() ' we are not moving any images to OpenGL - just the IMU value which are already in the memory mapped file.
+        Else
+            ocvb.trueText("The IMU is not working or unavailable")
+        End If
     End Sub
 End Class
 
@@ -391,12 +395,16 @@ Public Class OpenGL_GravityTransform
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        gCloud.src = task.pointCloud
-        gCloud.Run()
+        If ocvb.parms.IMU_Present Then
+            gCloud.src = task.pointCloud
+            gCloud.Run()
 
-        ogl.pointCloudInput = gCloud.dst1
-        ogl.src = src
-        ogl.Run()
+            ogl.pointCloudInput = gCloud.dst1
+            ogl.src = src
+            ogl.Run()
+        Else
+            ocvb.trueText("The IMU is not working or unavailable")
+        End If
     End Sub
 End Class
 
@@ -421,13 +429,17 @@ Public Class OpenGL_Floor
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        plane.Run()
-        dst1 = plane.dst1
-        dst2 = plane.dst2
+        If ocvb.parms.IMU_Present Then
+            plane.Run()
+            dst1 = plane.dst1
+            dst2 = plane.dst2
 
-        ogl.pointCloudInput = plane.imuPointCloud
-        ogl.src = src
-        ogl.Run()
+            ogl.pointCloudInput = plane.imuPointCloud
+            ogl.src = src
+            ogl.Run()
+        Else
+            ocvb.trueText("The IMU is not working or unavailable")
+        End If
     End Sub
 End Class
 
@@ -452,20 +464,24 @@ Public Class OpenGL_FloorPlane
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        plane.Run()
-        dst1 = plane.dst1
-        dst2 = plane.dst2
+        If ocvb.parms.IMU_Present Then
+            plane.Run()
+            dst1 = plane.dst1
+            dst2 = plane.dst2
 
-        Dim floorColor = task.color.Mean(plane.maskPlane)
-        Dim data As New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
-        data.Set(Of Single)(0, 0, floorColor.Item(0))
-        data.Set(Of Single)(1, 0, floorColor.Item(0))
-        data.Set(Of Single)(2, 0, floorColor.Item(0))
-        data.Set(Of Single)(3, 0, plane.floor.floorYplane)
-        ogl.dataInput = data
-        ogl.pointCloudInput = plane.imuPointCloud
-        ogl.src = src
-        ogl.Run()
+            Dim floorColor = task.color.Mean(plane.maskPlane)
+            Dim data As New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
+            data.Set(Of Single)(0, 0, floorColor.Item(0))
+            data.Set(Of Single)(1, 0, floorColor.Item(0))
+            data.Set(Of Single)(2, 0, floorColor.Item(0))
+            data.Set(Of Single)(3, 0, plane.floor.floorYplane)
+            ogl.dataInput = data
+            ogl.pointCloudInput = plane.imuPointCloud
+            ogl.src = src
+            ogl.Run()
+        Else
+            ocvb.trueText("The IMU is not working or unavailable")
+        End If
     End Sub
 End Class
 
@@ -491,24 +507,28 @@ Public Class OpenGL_FloorTexture
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        floor.plane.Run()
-        dst1 = floor.plane.dst1
-        dst2 = floor.plane.dst2
+        If ocvb.parms.IMU_Present Then
+            floor.plane.Run()
+            dst1 = floor.plane.dst1
+            dst2 = floor.plane.dst2
 
-        shuffle.src = floor.plane.maskPlane
-        shuffle.Run()
-        floor.ogl.textureInput = shuffle.rgbaTexture
+            shuffle.src = floor.plane.maskPlane
+            shuffle.Run()
+            floor.ogl.textureInput = shuffle.rgbaTexture
 
-        Dim data = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
-        data.Set(Of Single)(0, 0, ocvb.maxZ)
-        data.Set(Of Single)(1, 0, 0)
-        data.Set(Of Single)(2, 0, 0)
-        data.Set(Of Single)(3, 0, floor.plane.floor.floorYplane)
-        floor.ogl.dataInput = data
-        floor.ogl.pointCloudInput = floor.plane.imuPointCloud
-        floor.ogl.pointCloudInput.SetTo(0, floor.plane.maskPlane)
-        floor.ogl.src = src
-        floor.ogl.Run()
+            Dim data = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
+            data.Set(Of Single)(0, 0, ocvb.maxZ)
+            data.Set(Of Single)(1, 0, 0)
+            data.Set(Of Single)(2, 0, 0)
+            data.Set(Of Single)(3, 0, floor.plane.floor.floorYplane)
+            floor.ogl.dataInput = data
+            floor.ogl.pointCloudInput = floor.plane.imuPointCloud
+            floor.ogl.pointCloudInput.SetTo(0, floor.plane.maskPlane)
+            floor.ogl.src = src
+            floor.ogl.Run()
+        Else
+            ocvb.trueText("The IMU is not working or not available.")
+        End If
     End Sub
 End Class
 
