@@ -382,7 +382,7 @@ Public Class Motion_ThruCorrelation
                 correlation.MinMaxLoc(minVal, maxVal)
                 If maxVal < ccThreshold / 1000 Then
                     If (i Mod grid.tilesPerRow) <> 0 Then dst2(grid.roiList(i - 1)).SetTo(255)
-                    If (i Mod grid.tilesPerRow) < grid.tilesPerRow Then dst2(grid.roiList(i + 1)).SetTo(255)
+                    If (i Mod grid.tilesPerRow) < grid.tilesPerRow And i < grid.roiList.Count - 1 Then dst2(grid.roiList(i + 1)).SetTo(255)
                     If i > grid.tilesPerRow Then
                         dst2(grid.roiList(i - grid.tilesPerRow)).SetTo(255)
                         dst2(grid.roiList(i - grid.tilesPerRow + 1)).SetTo(255)
