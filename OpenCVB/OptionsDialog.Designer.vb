@@ -264,7 +264,7 @@ Partial Class OptionsDialog
         Me.CameraGroup.FlowDirection = System.Windows.Forms.FlowDirection.TopDown
         Me.CameraGroup.Location = New System.Drawing.Point(24, 17)
         Me.CameraGroup.Name = "CameraGroup"
-        Me.CameraGroup.Size = New System.Drawing.Size(821, 229)
+        Me.CameraGroup.Size = New System.Drawing.Size(821, 195)
         Me.CameraGroup.TabIndex = 13
         '
         'OptionsDialog

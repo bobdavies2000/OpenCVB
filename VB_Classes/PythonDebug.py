@@ -12,6 +12,10 @@ import pyrealsense2 as rs
 import numpy as np
 # Import OpenCV for easy image rendering
 import cv2
+import ctypes
+import os, time, sys
+def Mbox(title, text, style):
+    return ctypes.windll.user32.MessageBoxW(0, text, title, style)
 
 # Create a pipeline
 pipeline = rs.pipeline()
@@ -22,7 +26,7 @@ config = rs.config()
 
 # Get device product line for setting a supporting resolution
 pipeline_wrapper = rs.pipeline_wrapper(pipeline)
-pipel ine_profile = config.resolve(pipeline_wrapper)
+pipeline_profile = config.resolve(pipeline_wrapper)
 device = pipeline_profile.get_device()
 device_product_line = str(device.get_info(rs.camera_info.product_line))
 
@@ -33,11 +37,15 @@ if device_product_line == 'L500':
 else:
     config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
 
-config.enable_stream(rs.stream.gyro)
-config.enable_stream(rs.stream.accel)
+#config.enable_stream(rs.stream.gyro)
+#config.enable_stream(rs.stream.accel)
 
 # Start streaming
-profile = pipeline.start(config)
+try:
+    profile = pipeline.start(config)
+except Exception as exception:
+    Mbox("libRealSense_Align.py", "Camera is in use of unavailable", 1)
+    sys.exit(0)
 
 # Getting the depth sensor's depth scale (see rs-align example for explanation)
 depth_sensor = profile.get_device().first_depth_sensor()
@@ -60,8 +68,9 @@ try:
     while True:
         # Get frameset of color and depth
         frames = pipeline.wait_for_frames()
-        gyro = frames.first_or_default(rs.stream.gyro, rs.format.xyz32f)
-        accel = frames.first_or_default(rs.stream.accel, rs.format.xyz32f)
+
+        #gyro = frames.first_or_default(rs.stream.gyro, rs.format.xyz32f)
+        #accel = frames.first_or_default(rs.stream.accel, rs.format.xyz32f)
 
         # Align the depth frame to color frame
         aligned_frames = align.process(frames)
