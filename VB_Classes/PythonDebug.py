@@ -1,4 +1,4 @@
-import pyrealsense2 as rs
+import depthai as dai
 import argparse
 import mmap
 import array
@@ -20,72 +20,83 @@ pipeName = '//./pipe/' + args.pipeName
 pipeOut = open(pipeName, 'wb')
 pipeIn = open(pipeName + 'in', 'rb')
 
-rsPipeline = rs.pipeline()
-rsConfig = rs.config()
+pipeline = dai.Pipeline()
 
-rsPipeline_wrapper = rs.pipeline_wrapper(rsPipeline)
-rsPipeline_profile = rsConfig.resolve(rsPipeline_wrapper)
-device = rsPipeline_profile.get_device()
-device_product_line = str(device.get_info(rs.camera_info.product_line))
+left = pipeline.createMonoCamera()
+left.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
+left.setBoardSocket(dai.CameraBoardSocket.LEFT)
 
-rsConfig.enable_stream(rs.stream.depth, args.Width, args.Height, rs.format.z16, 30)
-rsConfig.enable_stream(rs.stream.color, args.Width, args.Height, rs.format.bgr8, 30)
-rsConfig.enable_stream(rs.stream.infrared, 1, args.Width, args.Height, rs.format.y8, 30)
-rsConfig.enable_stream(rs.stream.infrared, 2, args.Width, args.Height, rs.format.y8, 30)
-rsConfig.enable_stream(rs.stream.gyro)
-rsConfig.enable_stream(rs.stream.accel)
+right = pipeline.createMonoCamera()
+right.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
+right.setBoardSocket(dai.CameraBoardSocket.RIGHT)
 
-# Start streaming
-profile = rsPipeline.start(rsConfig)
+depth = pipeline.createStereoDepth()
+depth.setConfidenceThreshold(200)
+# Note: the rectified streams are horizontally mirrored by default
+depth.setOutputRectified(True)
+depth.setRectifyEdgeFillColor(0) # Black, to better see the cutout
+left.out.link(depth.left)
+right.out.link(depth.right)
 
-depth_sensor = profile.get_device().first_depth_sensor()
-depth_scale = depth_sensor.get_depth_scale()
-point_cloud = rs.pointcloud()
+# Define a source - color camera
+cam_rgb = pipeline.createColorCamera()
+cam_rgb.setPreviewSize(1280, 720)
+cam_rgb.setBoardSocket(dai.CameraBoardSocket.RGB)
+cam_rgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
+cam_rgb.setInterleaved(False)
 
-align_to = rs.stream.color
-align = rs.align(align_to)
+xout_depth = pipeline.createXLinkOut()
+xout_depth.setStreamName("depth")
+depth.disparity.link(xout_depth.input)
 
-try:
-    while True:
-        # Get frameset of color and depth
-        frames = rsPipeline.wait_for_frames()
-		#gyro = frames.first_or_default(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F)
-		#accel = frames.first_or_default(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F)
+xout_left = pipeline.createXLinkOut()
+xout_left.setStreamName("rect_left")
+depth.rectifiedLeft.link(xout_left.input)
 
-        # Align the depth frame to color frame
-        aligned_frames = align.process(frames)
+xout_right = pipeline.createXLinkOut()
+xout_right.setStreamName('rect_right')
+depth.rectifiedRight.link(xout_right.input)
 
-        # Get aligned frames
-        aligned_depth_frame = aligned_frames.get_depth_frame() # aligned_depth_frame is a 640x480 depth image
-        color_frame = aligned_frames.get_color_frame()
-        leftImage = aligned_frames.get_infrared_frame(1).get_data()
-        rightImage = aligned_frames.get_infrared_frame(2).get_data()
+# Create output
+xout_rgb = pipeline.createXLinkOut()
+xout_rgb.setStreamName("rgb")
+cam_rgb.preview.link(xout_rgb.input)
 
-        # Validate that both frames are valid
-        if not aligned_depth_frame or not color_frame:
-            continue
+device = dai.Device(pipeline)
+device.startPipeline()
 
-        shape = (args.Height, args.Width)
-        depth_image = np.asanyarray(aligned_depth_frame.get_data())
-        imgRGB = np.asanyarray(color_frame.get_data())
+q_left = device.getOutputQueue(name="rect_left", maxSize=8, blocking=False)
+q_right = device.getOutputQueue(name="rect_right", maxSize=8, blocking=False)
+q_depth = device.getOutputQueue(name="depth", maxSize=8, blocking=False)
+q_rgb = device.getOutputQueue(name="rgb", maxSize=4, blocking=True)
 
-        points = point_cloud.calculate(aligned_depth_frame)
-        verts = np.asanyarray(points.get_vertices()).view(np.float32).reshape(-1, args.Width , 3) 
+frame_left = None
+frame_right = None
+frame_manip = None
+frame_depth = None
+frame_rgb = None
 
-        pipeOut.write(np.asarray(imgRGB))
-        pipeOut.write(np.asarray(leftImage))
-        pipeOut.write(np.asarray(rightImage))
-        pipeOut.write(np.asarray(depth_image))
-        pipeOut.write(np.asarray(verts))
+while True:
+    in_rgb = q_rgb.get()  # blocking call, will wait until a new data has arrived
+    in_left = q_left.tryGet()
+    in_right = q_right.tryGet()
+    in_depth = q_depth.tryGet()
 
-        frameIndex = pipeIn.read(1)
+    if in_left is None: continue
+    if in_right is None: continue 
+    if in_depth is None: continue
+    
+    shape = (3, in_rgb.getHeight(), in_rgb.getWidth())
+    pipeOut.write(bytearray(in_rgb.getData().reshape(shape).transpose(1, 2, 0).astype(np.uint8)))
 
-except Exception as exception:
-    rsPipeline.stop()   
-    print(str(exception))
-    sys.exit(0)
+    shape = (in_right.getHeight(), in_right.getWidth())
+    pipeOut.write(bytearray(in_left.getData().reshape(shape).astype(np.uint8)))
+    pipeOut.write(bytearray(in_right.getData().reshape(shape).astype(np.uint8)))
+    pipeOut.write(bytearray(in_depth.getData().reshape((in_depth.getHeight(), in_depth.getWidth())).astype(np.uint8)))
 
-finally:
-    rsPipeline.stop()
-    print("PythonRS2 complete")
-    sys.exit(0)
+    frame_depth = in_depth.getData().reshape((in_depth.getHeight(), in_depth.getWidth())).astype(np.uint8)
+    frame_depth = np.ascontiguousarray(frame_depth)
+    frame_depth = cv.applyColorMap(frame_depth, cv.COLORMAP_HSV)
+    pipeOut.write(np.asarray(frame_depth))
+
+    frameIndex = pipeIn.read(1)

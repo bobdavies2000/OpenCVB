@@ -79,7 +79,7 @@ Public Class OpenGL_Basics
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Or pointCloudInput Is Nothing Then
             src = src
             pointCloudInput = task.pointCloud
         End If
