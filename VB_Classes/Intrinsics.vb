@@ -7,7 +7,11 @@ Public Class intrinsicsLeft_Basics
         label2 = "ppx/ppy location"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If ocvb.parms.intrinsicsLeft.coeffs Is Nothing Then
+            ocvb.trueText("This camera is missing the intrinsics.")
+            Exit Sub
+        End If
         Dim ttStart = 40
         Dim ttStr As String = "Width = " + CStr(src.Width) + vbTab + " height = " + CStr(src.Height) + vbCrLf
         ttStr += "fx = " + CStr(ocvb.parms.intrinsicsLeft.fx) + vbTab + " fy = " + CStr(ocvb.parms.intrinsicsLeft.fy) + vbCrLf
