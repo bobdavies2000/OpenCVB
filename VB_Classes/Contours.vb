@@ -161,6 +161,7 @@ Public Class Contours_RGB
             End If
         Next
 
+        If contours0.Length = 0 Then Exit Sub
         If contours0(maxIndex).Length = 0 Then Exit Sub
 
         Dim hull() = cv.Cv2.ConvexHull(contours0(maxIndex), True)
