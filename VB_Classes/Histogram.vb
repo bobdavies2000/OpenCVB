@@ -1339,19 +1339,21 @@ Public Class Histogram_ViewIntersections
             End If
         Next
 
-        dst1.Rectangle(rIntersect(maxIndex), cv.Scalar.Yellow, 2)
-        minZ = ocvb.maxZ * (h - rIntersect(maxIndex).Y - rIntersect(maxIndex).Height) / h
-        maxZ = ocvb.maxZ * (h - rIntersect(maxIndex).Y) / h
-        ocvb.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", rIntersect(maxIndex).X, rIntersect(maxIndex).Y - offset)
+        If rIntersect.Count > 0 Then
+            dst1.Rectangle(rIntersect(maxIndex), cv.Scalar.Yellow, 2)
+            minZ = ocvb.maxZ * (h - rIntersect(maxIndex).Y - rIntersect(maxIndex).Height) / h
+            maxZ = ocvb.maxZ * (h - rIntersect(maxIndex).Y) / h
+            ocvb.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", rIntersect(maxIndex).X, rIntersect(maxIndex).Y - offset)
 
-        Dim pc = histCO.histC.sideview.gCloud.dst1
-        Dim split = pc.Split()
-        Dim mask As New cv.Mat
-        cv.Cv2.InRange(split(2), minZ, maxZ, mask)
-        cv.Cv2.BitwiseNot(mask, mask)
-        split(2).SetTo(0, mask)
+            Dim pc = histCO.histC.sideview.gCloud.dst1
+            Dim split = pc.Split()
+            Dim mask As New cv.Mat
+            cv.Cv2.InRange(split(2), minZ, maxZ, mask)
+            cv.Cv2.BitwiseNot(mask, mask)
+            split(2).SetTo(0, mask)
 
-        cv.Cv2.Merge(split, dst2)
+            cv.Cv2.Merge(split, dst2)
+        End If
     End Sub
 End Class
 
