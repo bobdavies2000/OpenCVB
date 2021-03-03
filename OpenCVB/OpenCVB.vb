@@ -549,6 +549,7 @@ Public Class OpenCVB
     End Sub
     Private Sub CameraTask()
         camera.initialize(workingRes.Width, workingRes.Height, fps)
+        On Error Resume Next
         SyncLock cameraThreadLock
             stopCameraThread = False
             cameraThreadStopped = False
