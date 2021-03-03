@@ -130,7 +130,7 @@ Public Class CameraRS2
     End Sub
     Public Sub stopCamera()
         Application.DoEvents()
-        RS2Stop(cPtr)
+        If cPtr Then RS2Stop(cPtr)
         cPtr = 0
     End Sub
 End Class
