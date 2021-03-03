@@ -181,8 +181,12 @@ Public Class OpenCVB
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam) = USBenumeration("Azure Kinect 4K Camera")
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D435i) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth")
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D455) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 455  RGB")
-        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.PythonRS2) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 455  RGB")
-        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) = USBenumeration("Movidius MyriadX")
+        optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) = 0 ' USBenumeration("Movidius MyriadX")
+
+        If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D435i) +
+                optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D455) > 0 Then
+            optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.PythonRS2) = 1
+        End If
 
         ' Some devices may be present but their opencvb camera interface needs to be present as well.
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.MyntD1000) = USBenumeration("MYNT-EYE-D1000")
@@ -211,24 +215,7 @@ Public Class OpenCVB
             End If
         End If
 
-        ' if the default camera is not present, try to find another.
-        If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam) Then
-                optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
-            End If
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.MyntD1000) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.MyntD1000
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D435i) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.D435i
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D455) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.D455
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.OakDCamera
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.PythonRS2) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.PythonRS2
-            If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
-                MsgBox("There are no supported cameras present!" + vbCrLf + vbCrLf +
-                       "Connect any of these cameras: " + vbCrLf + vbCrLf + "Intel RealSense2 D455" + vbCrLf + "Intel RealSense2 D435i" + vbCrLf +
-                       "OpenCV Oak-D camera" + vbCrLf + "Microsoft Kinect 4 Azure" + vbCrLf + "MyntEyeD 1000" + vbCrLf + "StereoLabs Zed2")
-            End If
-        End If
-
+        checkCameraDefault()
 
         ' OpenCV needs to be in the path and the librealsense and kinect open source code needs to be in the path.
         updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
@@ -288,14 +275,18 @@ Public Class OpenCVB
         cameraOakD.pythonApp = New FileInfo(HomeDir.FullName + "OpenCVB\CameraOakD.py")
         cameraOakD.pythonexename = optionsForm.PythonExeName.Text
 
-        cameraPyRS2 = New CameraPyRS2
-        cameraPyRS2.pythonApp = New FileInfo(HomeDir.FullName + "OpenCVB\CameraPyRS2.py")
-        cameraPyRS2.pythonexename = optionsForm.PythonExeName.Text
+        If cameraD435i IsNot Nothing Or cameraD455 IsNot Nothing Then
+            cameraPyRS2 = New CameraPyRS2
+            cameraPyRS2.pythonApp = New FileInfo(HomeDir.FullName + "OpenCVB\CameraPyRS2.py")
+            cameraPyRS2.pythonexename = optionsForm.PythonExeName.Text
+        End If
 
         startCamera()
 
         optionsForm.cameraRadioButton(optionsForm.cameraIndex).Checked = True ' make sure any switch is reflected in the UI.
         optionsForm.enableCameras()
+
+        If cameraPyRS2 Is Nothing Then optionsForm.cameraRadioButton(VB_Classes.ActiveTask.algParms.camNames.PythonRS2).Enabled = False
 
         setupCamPics()
         loadAlgorithmComboBoxes()
@@ -304,6 +295,25 @@ Public Class OpenCVB
         FindPython()
         If GetSetting("OpenCVB", "TreeButton", "TreeButton", False) Then TreeButton_Click(sender, e)
         If GetSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", False) Then PixelViewerButton_Click(sender, e)
+    End Sub
+    Private Sub checkCameraDefault()
+        ' if the default camera is not present, try to find another.
+        If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam) Then
+                optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
+            End If
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.MyntD1000) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.MyntD1000
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D435i) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.D435i
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D455) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.D455
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.OakDCamera
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.PythonRS2) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.PythonRS2
+            If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
+                MsgBox("There are no supported cameras present!" + vbCrLf + vbCrLf +
+                       "Connect any of these cameras: " + vbCrLf + vbCrLf + "Intel RealSense2 D455" + vbCrLf + "Intel RealSense2 D435i" + vbCrLf +
+                       "OpenCV Oak-D camera" + vbCrLf + "Microsoft Kinect 4 Azure" + vbCrLf + "MyntEyeD 1000" + vbCrLf + "StereoLabs Zed2")
+            End If
+        End If
     End Sub
     Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
         Dim g As Graphics = e.Graphics
