@@ -528,14 +528,16 @@ Public Class OpenCVB
         SyncLock bufferLock
             stopCameraThread = True
             SyncLock delegateLock
-                If cameraTaskHandle IsNot Nothing Then camera.stopCamera()
+                If camera IsNot Nothing Then camera.stopCamera()
             End SyncLock
         End SyncLock
 
         ' order is same as in optionsdialog enum
         camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraPyRS2, cameraOakD)
 
-        If cameraThreadStopped = False Then cameraTaskHandle.Abort()
+        While cameraThreadStopped = False
+            Application.DoEvents()
+        End While
         SyncLock cameraThreadLock
             cameraRefresh = False
             newImagesAvailable = False
@@ -548,9 +550,9 @@ Public Class OpenCVB
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub
     Private Sub CameraTask()
-        camera.initialize(workingRes.Width, workingRes.Height, fps)
         On Error Resume Next
         SyncLock cameraThreadLock
+            camera.initialize(workingRes.Width, workingRes.Height, fps)
             stopCameraThread = False
             cameraThreadStopped = False
             While stopCameraThread = False
@@ -568,8 +570,8 @@ Public Class OpenCVB
                 Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
                 totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
             End While
+            cameraThreadStopped = True
         End SyncLock
-        cameraThreadStopped = True
     End Sub
     Private Sub TreeButton_Click(sender As Object, e As EventArgs) Handles TreeButton.Click
         TreeButton.Checked = Not TreeButton.Checked
@@ -1068,7 +1070,12 @@ Public Class OpenCVB
         StartAlgorithmTask()
     End Sub
     Private Sub StartAlgorithmTask()
-        ' If algorithmTaskHandle IsNot Nothing Then algorithmTaskHandle.Abort()
+        saveAlgorithmName = AvailableAlgorithms.Text ' this tells the algorithmTask to terminate.
+        If algorithmTaskHandle IsNot Nothing Then
+            While algorithmTaskHandle IsNot Nothing
+                Application.DoEvents()
+            End While
+        End If
         openFileForm.Hide()
         openFileForm.PlayButton.Text = "Start"
         openFileDialogName = ""
@@ -1110,7 +1117,6 @@ Public Class OpenCVB
         Thread.CurrentThread.Priority = ThreadPriority.Lowest
 
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
-        saveAlgorithmName = AvailableAlgorithms.Text
         algorithmTaskHandle.Name = AvailableAlgorithms.Text
         algorithmTaskHandle.Start(parms)
         camera.frameCount = 0
@@ -1162,6 +1168,7 @@ Public Class OpenCVB
             frameCount = 0
             If parms.testAllRunning Then Console.WriteLine(vbTab + "Ending " + algName)
         End SyncLock
+        algorithmTaskHandle = Nothing
     End Sub
     Private Sub Run(task As VB_Classes.ActiveTask, algName As String)
         While 1

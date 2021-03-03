@@ -131,7 +131,6 @@ Public Class CameraRS2
     Public Sub stopCamera()
         Application.DoEvents()
         RS2Stop(cPtr)
-        frameCount = 0
         cPtr = 0
     End Sub
 End Class

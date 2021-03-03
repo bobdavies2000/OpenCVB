@@ -191,8 +191,6 @@ Public Class CameraMyntD
         End If
     End Sub
     Public Sub stopCamera()
-        Application.DoEvents()
-        frameCount = 0
         cPtr = 0
     End Sub
 End Class

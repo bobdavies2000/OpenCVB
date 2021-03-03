@@ -159,9 +159,7 @@ Public Class CameraKinect
         End If
     End Sub
     Public Sub stopCamera()
-        Application.DoEvents()
         KinectClose(cPtr)
-        frameCount = 0
         cPtr = 0
     End Sub
 End Class

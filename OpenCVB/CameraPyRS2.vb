@@ -113,9 +113,7 @@ Public Class CameraPyRS2
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()
-        pythonProcess.Kill()
-        Thread.Sleep(100)
+        If pythonProcess IsNot Nothing Then pythonProcess.Kill()
         pipelineClosed = True
-        frameCount = 0
     End Sub
 End Class

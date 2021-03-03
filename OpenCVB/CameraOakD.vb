@@ -111,8 +111,7 @@ Public Class CameraOakD
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()
-        OakProcess.Kill()
+        If OakProcess IsNot Nothing Then OakProcess.Kill()
         pipelineClosed = True
-        frameCount = 0
     End Sub
 End Class
