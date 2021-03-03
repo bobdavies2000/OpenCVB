@@ -159,7 +159,7 @@ Public Class CameraKinect
         End If
     End Sub
     Public Sub stopCamera()
-        If cPtr Then KinectClose(cPtr)
+        If cPtr <> 0 Then KinectClose(cPtr)
         cPtr = 0
     End Sub
 End Class
