@@ -84,7 +84,7 @@ Public Class OpenGL_Basics
             pointCloudInput = task.pointCloud
         End If
 
-        pointCloudInput.SetTo(0, task.inrange.noDepthMask)
+        If task.inrange.noDepthMask.width = pointCloudInput.Width Then pointCloudInput.SetTo(0, task.inrange.noDepthMask)
 
         Dim pcSize = pointCloudInput.Total * pointCloudInput.ElemSize
         If ocvb.frameCount = 0 Then startOpenGLWindow()
