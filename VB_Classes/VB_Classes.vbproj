@@ -396,6 +396,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ANMS.py" />
+    <Content Include="ANMS_PS.py" />
     <Content Include="DNN_Inception_PS.py" />
     <Content Include="LibRealSense_Align.py" />
     <Content Include="BGSubtract_KNN_PS.py" />
