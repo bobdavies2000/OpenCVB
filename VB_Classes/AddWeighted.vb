@@ -87,22 +87,47 @@ End Class
 
 
 
-Public Class AddWeighted_RightView
+Public Class AddWeighted_InfraRed
     Inherits VBparent
     Dim addw As AddWeighted_Basics
+    Dim infra As LeftRightView_BrightnessContrast
     Dim src2 As New cv.Mat
     Public Sub New()
         initParent()
+        infra = New LeftRightView_BrightnessContrast
         addw = New AddWeighted_Basics
-        task.desc = "The OakD depth image is not aligned with the RGB data but with the right view input."
+
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 2)
+            radio.check(0).Text = "Use LeftView"
+            radio.check(1).Text = "Use RightView"
+            radio.check(1).Checked = True
+        End If
+
+        task.desc = "Align the depth data with the left or right view.  Oak-D is aligned with the right image."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If standalone Or task.intermediateReview = caller Then src2 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        Dim alpha = addw.weightSlider.Value / 100
-        cv.Cv2.AddWeighted(task.RGBDepth, alpha, src2, 1.0 - alpha, 0, dst1)
-        If standalone Then dst2.SetTo(0)
-        label1 = "depth " + Format(1 - alpha, "#0%") + " RGB " + Format(alpha, "#0%")
+        infra.Run()
+
+        Static rightRadio = findRadio("Use RightView")
+        Dim leftOrRight As String = "Right"
+        If rightRadio.checked Then
+            addw.src2 = infra.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Else
+            addw.src2 = infra.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            leftOrRight = "Left"
+        End If
+        addw.src = task.RGBDepth
+        addw.Run()
+        dst1 = addw.dst1.Clone
+
+        addw.src = task.color
+        addw.Run()
+        dst2 = addw.dst1
+        Dim weightSlider = findSlider("Weight")
+        label1 = "InfraRed " + leftOrRight + " " + Format(1 - weightSlider.Value / 100, "#0%") + " Depth " + Format(weightSlider.Value / 100, "#0%")
+        label2 = "InfraRed " + leftOrRight + " " + Format(1 - weightSlider.Value / 100, "#0%") + " RGB" + Format(weightSlider.Value / 100, "#0%")
     End Sub
 End Class

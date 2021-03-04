@@ -39,7 +39,7 @@ config.enable_stream(rs.stream.gyro)
 try:
     profile = pipeline.start(config)
 except Exception as exception:
-    Mbox("libRealSense_Align.py", "Camera is in use of unavailable \nUse a non-RealSense2 camera in OpenCVB \nand this Python script will work", 1)
+    Mbox("libRealSense_Align.py", "RealSense Camera is in use of unavailable \nUse a non-RealSense2 camera in OpenCVB \nand this Python script will work", 1)
     sys.exit(0)
 
 # Getting the depth sensor's depth scale (see rs-align example for explanation)
