@@ -54,9 +54,9 @@ Public Class VBparent : Implements IDisposable
     End Sub
     Public Sub NextFrame()
         If standalone Or task.intermediateReview = caller Then src = task.color
-        If src.Width <> dst1.Width Or src.Width <> dst2.Width Then
-            dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
-            dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+        If task.depth32f.Width <> dst1.Width Or task.depth32f.Width <> dst2.Width Then
+            dst1 = New cv.Mat(task.depth32f.Size(), cv.MatType.CV_8UC3)
+            dst2 = New cv.Mat(task.depth32f.Size(), cv.MatType.CV_8UC3)
         End If
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
         ' On Error Resume Next

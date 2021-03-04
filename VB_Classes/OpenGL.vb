@@ -247,7 +247,7 @@ Public Class OpenGL_IMU
             ogl.src = src
             ogl.Run() ' we are not moving any images to OpenGL - just the IMU value which are already in the memory mapped file.
         Else
-            ocvb.trueText("The IMU is not working or unavailable")
+            ocvb.trueText("The IMU is not working or is unavailable")
         End If
     End Sub
 End Class
@@ -403,7 +403,7 @@ Public Class OpenGL_GravityTransform
             ogl.src = src
             ogl.Run()
         Else
-            ocvb.trueText("The IMU is not working or unavailable")
+            ocvb.trueText("The IMU is not working or is unavailable")
         End If
     End Sub
 End Class
@@ -438,7 +438,7 @@ Public Class OpenGL_Floor
             ogl.src = src
             ogl.Run()
         Else
-            ocvb.trueText("The IMU is not working or unavailable")
+            ocvb.trueText("The IMU is not working or is unavailable")
         End If
     End Sub
 End Class
@@ -480,7 +480,7 @@ Public Class OpenGL_FloorPlane
             ogl.src = src
             ogl.Run()
         Else
-            ocvb.trueText("The IMU is not working or unavailable")
+            ocvb.trueText("The IMU is not working or is unavailable")
         End If
     End Sub
 End Class
