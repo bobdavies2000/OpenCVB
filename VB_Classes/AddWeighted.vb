@@ -126,8 +126,7 @@ Public Class AddWeighted_InfraRed
         addw.src = task.color
         addw.Run()
         dst2 = addw.dst1
-        Dim weightSlider = findSlider("Weight")
-        label1 = "InfraRed " + leftOrRight + " " + Format(1 - weightSlider.Value / 100, "#0%") + " Depth " + Format(weightSlider.Value / 100, "#0%")
-        label2 = "InfraRed " + leftOrRight + " " + Format(1 - weightSlider.Value / 100, "#0%") + " RGB" + Format(weightSlider.Value / 100, "#0%")
+        label1 = "InfraRed " + leftOrRight + " " + Format(1 - addw.weightSlider.Value / 100, "#0%") + " Depth " + Format(addw.weightSlider.Value / 100, "#0%")
+        label2 = "InfraRed " + leftOrRight + " " + Format(1 - addw.weightSlider.Value / 100, "#0%") + " RGB " + Format(addw.weightSlider.Value / 100, "#0%")
     End Sub
 End Class

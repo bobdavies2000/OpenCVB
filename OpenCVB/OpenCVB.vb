@@ -501,6 +501,7 @@ Public Class OpenCVB
                 Dim cameraIndex = optionsForm.cameraIndex + 1
                 For i = 0 To optionsForm.cameraRadioButton.Count - 1
                     If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
+                    ' If optionsForm.cameraRadioButton(cameraIndex).Enabled And optionsForm.cameraRadioButton(cameraIndex).Text.Contains("experimental") = False Then
                     If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
                         optionsForm.cameraRadioButton(cameraIndex).Checked = True
                         optionsForm.cameraIndex = cameraIndex
