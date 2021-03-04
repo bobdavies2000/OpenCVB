@@ -34,8 +34,8 @@ public:
 	Translation extrinsicsTranslation;
 	Rotation extrinsicsRotationMatrix;
 	float acceleration[3] = { 0, 0, 0 };
-	sl::float3 IMU_RotationVector;
-	Rotation IMU_RotationMatrix;
+	sl::float3 RotationVector;
+	Rotation RotationMatrix;
 	Translation IMU_Translation;
 	SensorsData sensordata;
 	Orientation orientation;
@@ -134,8 +134,8 @@ public:
 		}
 
 		zed.getPosition(zed_pose, REFERENCE_FRAME::WORLD);
-		IMU_RotationMatrix = zed_pose.getRotationMatrix();
-		IMU_RotationVector = zed_pose.getRotationVector();
+		RotationMatrix = zed_pose.getRotationMatrix();
+		RotationVector = zed_pose.getRotationVector();
 		IMU_Translation = zed_pose.getTranslation();
 
 		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
@@ -170,11 +170,11 @@ extern "C" __declspec(dllexport) int* Zed2Translation(StereoLabsZed2 * Zed2)
 }
 extern "C" __declspec(dllexport) int* Zed2RotationMatrix(StereoLabsZed2 * Zed2)
 {
-	return (int*)&Zed2->IMU_RotationMatrix;
+	return (int*)&Zed2->RotationMatrix;
 }
 extern "C" __declspec(dllexport) int* Zed2RotationVector(StereoLabsZed2 * Zed2)
 {
-	return (int*)&Zed2->IMU_RotationVector;
+	return (int*)&Zed2->RotationVector;
 }
 extern "C" __declspec(dllexport) int Zed2Confidence(StereoLabsZed2 * Zed2)
 {

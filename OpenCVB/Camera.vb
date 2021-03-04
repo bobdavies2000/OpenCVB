@@ -61,8 +61,8 @@ Public Class Camera
     Public IMU_Temperature As Single
     Public IMU_TimeStamp As Double
     Public IMU_Rotation As System.Numerics.Quaternion
-    Public IMU_RotationMatrix(9 - 1) As Single
-    Public IMU_RotationVector As cv.Point3f
+    Public RotationMatrix(9 - 1) As Single
+    Public RotationVector As cv.Point3f
     Public IMU_Translation As cv.Point3f
     Public IMU_Acceleration As cv.Point3f
     Public IMU_Velocity As cv.Point3f

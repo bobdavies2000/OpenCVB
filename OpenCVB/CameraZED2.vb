@@ -192,10 +192,10 @@ Public Class CameraZED2
         transformationMatrix = mat
 
         Dim rot = Zed2RotationMatrix(cPtr)
-        Marshal.Copy(rot, IMU_RotationMatrix, 0, IMU_RotationMatrix.Length)
+        Marshal.Copy(rot, RotationMatrix, 0, RotationMatrix.Length)
 
         Dim vec = Zed2RotationVector(cPtr)
-        IMU_RotationVector = Marshal.PtrToStructure(Of cv.Point3f)(vec)
+        RotationVector = Marshal.PtrToStructure(Of cv.Point3f)(vec)
 
         Dim tran = Zed2Translation(cPtr)
         IMU_Translation = Marshal.PtrToStructure(Of cv.Point3f)(tran)

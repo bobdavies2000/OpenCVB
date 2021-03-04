@@ -185,7 +185,7 @@ Public Class OpenCVB
 
         If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D435i) +
                 optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D455) > 0 Then
-            optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.PythonRS2) = 1
+            optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.PythonRS2) = 0 ' turned off for now...
         End If
 
         ' Some devices may be present but their opencvb camera interface needs to be present as well.
@@ -476,6 +476,10 @@ Public Class OpenCVB
         End If
         For i = 0 To recentList.Count - 1
             If recentList(i) <> "" Then
+                If recentMenu(i) Is Nothing Then
+                    recentMenu(i) = New ToolStripMenuItem() With {.Text = recentList(i), .Name = recentList(i)}
+                    AddHandler recentMenu(i).Click, AddressOf recentList_Clicked
+                End If
                 recentMenu(i).Text = recentList(i)
                 recentMenu(i).Name = recentList(i)
                 SaveSetting("OpenCVB", "RecentList" + CStr(i), "RecentList" + CStr(i), recentList(i))
@@ -501,8 +505,7 @@ Public Class OpenCVB
                 Dim cameraIndex = optionsForm.cameraIndex + 1
                 For i = 0 To optionsForm.cameraRadioButton.Count - 1
                     If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
-                    If optionsForm.cameraRadioButton(cameraIndex).Enabled And optionsForm.cameraRadioButton(cameraIndex).Text.Contains("experimental") = False Then
-                        'If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
+                    If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
                         optionsForm.cameraRadioButton(cameraIndex).Checked = True
                         optionsForm.cameraIndex = cameraIndex
                         LineUpCamPics(False)
@@ -1085,15 +1088,9 @@ Public Class OpenCVB
         openFileFormLocated = False
 
         Dim parms As New VB_Classes.ActiveTask.algParms
-        ReDim parms.IMU_RotationMatrix(9 - 1)
-        parms.IMU_RotationMatrix = camera.IMU_RotationMatrix
-        For i = 0 To camera.imu_rotationmatrix.length - 1
-            If camera.imu_rotationmatrix(i) <> 0 Then
-                parms.IMU_Present = True
-                Exit For
-            End If
-        Next
-        parms.IMU_RotationVector = camera.IMU_RotationVector
+        ReDim parms.RotationMatrix(9 - 1)
+        parms.RotationVector = camera.RotationVector
+        parms.IMU_Present = True ' always present!
 
         parms.cameraName = GetSetting("OpenCVB", "CameraIndex", "CameraIndex", VB_Classes.ActiveTask.algParms.camNames.D435i)
         parms.PythonExe = optionsForm.PythonExeName.Text
