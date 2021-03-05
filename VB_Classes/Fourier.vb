@@ -45,3 +45,27 @@ Public Class Fourier_MathNet
 End Class
 
 
+
+
+
+
+
+
+
+Public Class Fourier_Shapes
+    Inherits VBparent
+    Dim dft As DFT_Basics
+    Public Sub New()
+        initParent()
+        dft = New DFT_Basics
+        task.desc = "Show the spectrum magnitude for some standard shapes."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+
+
+    End Sub
+End Class
+
+

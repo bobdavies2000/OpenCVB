@@ -76,7 +76,6 @@ End Module
 
 Public Class Python_Run
     Inherits VBparent
-    Dim tryCount As Integer
     Public Sub New()
         initParent()
         If ocvb.pythonTaskName = "" Then ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/PythonPackages.py"
@@ -106,10 +105,6 @@ Public Class Python_Run
             End If
 
             Dim proc = Process.GetProcessesByName("python")
-            If proc.Count = 0 Then
-                If tryCount < 3 Then StartPython("")
-                tryCount += 1
-            End If
         End If
     End Sub
 End Class

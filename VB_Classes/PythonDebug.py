@@ -1,122 +1,85 @@
-from random import shuffle
-from PyStream import PyStreamRun
-import cv2  
-import math
-titleWindow = 'ANMS_PS.py'
+import ctypes
+def Mbox(title, text, style):
+    return ctypes.windll.user32.MessageBoxW(0, text, title, style)
 
-# https://github.com/BAILOOL/ANMS-Codes
+titleWindow = 'PythonPackages.py'
 
-def ssc(keypoints, num_ret_points, tolerance, cols, rows):
-    exp1 = rows + cols + 2 * num_ret_points
-    exp2 = (
-        4 * cols
-        + 4 * num_ret_points
-        + 4 * rows * num_ret_points
-        + rows * rows
-        + cols * cols
-        - 2 * rows * cols
-        + 4 * rows * cols * num_ret_points
-    )
-    exp3 = math.sqrt(exp2)
-    exp4 = num_ret_points - 1
+print("Checking the packages used by the OpenCVB Python scripts.")
+warningMsg = False
+try:
+    import numpy
+except ImportError as err:
+    print('You need to install numpy', err)
+    warningMsg = True
 
-    sol1 = -round(float(exp1 + exp3) / exp4)  # first solution
-    sol2 = -round(float(exp1 - exp3) / exp4)  # second solution
+try:
+    import cv2
+except ImportError as err:
+    print('You need to install opencv-python and opencv-contrib-python', err)
+    warningMsg = True
 
-    high = ( sol1 if (sol1 > sol2) else sol2)  # binary search range initialization with positive solution
-    low = math.floor(math.sqrt(len(keypoints) / num_ret_points))
+try:
+    import sklearn
+except ImportError as err:
+    print('You need to install scikit-learn', err)
+    warningMsg = True
 
-    prev_width = -1
-    selected_keypoints = []
-    result_list = []
-    result = []
-    complete = False
-    k = num_ret_points
-    k_min = round(k - (k * tolerance))
-    k_max = round(k + (k * tolerance))
+try:
+    import matplotlib.pyplot as plt
+except ImportError as err:
+    print('You need to install matplotlib', err)
+    warningMsg = True
 
-    while not complete:
-        width = low + (high - low) / 2
-        if (width == prev_width or low > high):  # needed to reassure the same radius is not repeated again
-            result_list = result  # return the keypoints from the previous iteration
-            break
-
-        c = width / 2  # initializing Grid
-        num_cell_cols = int(math.floor(cols / c))
-        num_cell_rows = int(math.floor(rows / c))
-        covered_vec = [
-            [False for _ in range(num_cell_cols + 1)] for _ in range(num_cell_rows + 1)
-        ]
-        result = []
-
-        for i in range(len(keypoints)):
-            row = int(
-                math.floor(keypoints[i].pt[1] / c)
-            )  # get position of the cell current point is located at
-            col = int(math.floor(keypoints[i].pt[0] / c))
-            if not covered_vec[row][col]:  # if the cell is not covered
-                result.append(i)
-                # get range which current radius is covering
-                row_min = int(
-                    (row - math.floor(width / c))
-                    if ((row - math.floor(width / c)) >= 0)
-                    else 0
-                )
-                row_max = int(
-                    (row + math.floor(width / c))
-                    if ((row + math.floor(width / c)) <= num_cell_rows)
-                    else num_cell_rows
-                )
-                col_min = int(
-                    (col - math.floor(width / c))
-                    if ((col - math.floor(width / c)) >= 0)
-                    else 0
-                )
-                col_max = int(
-                    (col + math.floor(width / c))
-                    if ((col + math.floor(width / c)) <= num_cell_cols)
-                    else num_cell_cols
-                )
-                for row_to_cover in range(row_min, row_max + 1):
-                    for col_to_cover in range(col_min, col_max + 1):
-                        if not covered_vec[row_to_cover][col_to_cover]:
-                            # cover cells within the square bounding box with width w
-                            covered_vec[row_to_cover][col_to_cover] = True
-
-        if k_min <= len(result) <= k_max:  # solution found
-            result_list = result
-            complete = True
-        elif len(result) < k_min:
-            high = width - 1  # update binary search range
-        else:
-            low = width + 1
-        prev_width = width
-
-    for i in range(len(result_list)):
-        selected_keypoints.append(keypoints[result_list[i]])
-
-    return selected_keypoints
-
-def OpenCVCode(img, depth32f, frameCount):
-    img2 = img.copy()
-    img3 = img.copy()
-    fast = cv2.FastFeatureDetector_create()
+try:
+    import OpenGL
+except ImportError as err:
+    print('You need to install PyOpenGL', err)
+    warningMsg = True
     
-    fast.setNonmaxSuppression(0)
-    fast.setThreshold(10)
+try:
+    import pygame
+except ImportError as err:
+    print('You need to install Pygame', err)
+    warningMsg = True
+	        
+try:
+    import vcam
+except ImportError as err:
+    print('You need to install vcam', err)
+    warningMsg = True
+	    
+try:
+    import imutils
+except ImportError as err:
+    print('You need to install imutils', err)
+    warningMsg = True
 
-    keypoints = fast.detect(img, None)
-    cv2.drawKeypoints(img, keypoints, img2, color=(255, 0, 0))
+try:
+    from cv2_rolling_ball import subtract_background_rolling_ball
+except ImportError as err:
+    print('You need to install opencv-rolling-ball')
+    warningMsg = True
+    
+try:
+    import tensorflow as tf
+except ImportError as err:
+    print('You need to install tensorflow')
+    warningMsg = True
+    
+try:
+    import pyglet
+except ImportError as err:
+    print('You need to install pyglet')
+    warningMsg = True
+    
+try:
+    import pyrealsense2
+except ImportError as err:
+    print('You need to install pyrealsense2')
+    warningMsg = True
 
-    # keypoints should be sorted by strength in descending order before feeding to SSC to work correctly
-    shuffle(keypoints)  # simulating sorting by score with random shuffle
-
-    selected_keypoints = ssc(keypoints, num_ret_points, tolerance, img2.shape[1], img2.shape[0])
-
-    cv2.drawKeypoints(img, selected_keypoints, img3, color=(0, 255, 0))
-    # img2 contains the FAST keypoints while img3 contains the Adaptive Non-Maximum Suppression keypoints
-    return img2, img3
-
-num_ret_points = 750
-tolerance = 0.1
-PyStreamRun(OpenCVCode, titleWindow)
+if warningMsg:
+    Mbox('PythonPackages', 'Needed packages are not present.  Review console log.', 1)
+else:
+    Mbox('PythonPackages', 'Python is present and all the necessary packages appear to be installed.', 1)
+cv2.waitKey(3000)

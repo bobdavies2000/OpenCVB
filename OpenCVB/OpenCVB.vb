@@ -233,15 +233,12 @@ Public Class OpenCVB
         ' the Kinect depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
         ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
         ' Post an issue if this Is Not a valid assumption
-        Dim kinectDLL As New FileInfo("C:\Program Files\Azure Kinect SDK v1.3.0\sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll")
-        If kinectDLL.Exists = False Then ' try a later version.
-            kinectDLL = New FileInfo("C:\Program Files\Azure Kinect SDK v1.4.0\sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll")
-        End If
+        Dim kinectDLL As New FileInfo("C:\Program Files\Azure Kinect SDK v1.4.1\sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll")
         If kinectDLL.Exists = False Then
             MsgBox("The Microsoft installer for the Kinect camera proprietary portion" + vbCrLf +
                    "was not installed in:" + vbCrLf + vbCrLf + kinectDLL.FullName + vbCrLf + vbCrLf +
                    "Did a new Version get installed?" + vbCrLf +
-                   "Support for the Kinect camera may not work up you update the code near this message.")
+                   "Support for the Kinect camera may not work until you update the code near this message.")
             optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam) = 0 ' we can't use this device
         Else
             updatePath(kinectDLL.Directory.FullName, "Kinect depth engine dll.")
@@ -711,14 +708,14 @@ Public Class OpenCVB
         saveLayout()
     End Sub
     Private Sub FindPython()
-        Dim pythonStr = GetSetting("OpenCVB", "PythonExe", "PythonExe", "Python.exe")
-        If pythonStr = "" Then pythonStr = "Python.exe" ' Legacy issue... New users won't hit this...
+        Dim pythonStr = GetSetting("OpenCVB", "PythonExe", "PythonExe", "")
+        If pythonStr = "" Then pythonStr = GetFolderPath(SpecialFolder.ApplicationData)
         Dim currentName = New FileInfo(pythonStr)
         If currentName.Exists = False Then
             Dim appData = GetFolderPath(SpecialFolder.ApplicationData)
             Dim directoryInfo As New DirectoryInfo(appData + "\..\Local\Programs\Python\")
             If directoryInfo.Exists = False Then
-                MsgBox("OpenCVB cannot find an active Python.  Use Options/Python to specify Python.exe.")
+                MsgBox("OpenCVB cannot find an active Python." + vbCrLf + "Use OpenCVB's Global Settings to specify Python.exe.")
                 Exit Sub
             End If
             For Each Dir As String In System.IO.Directory.GetDirectories(directoryInfo.FullName)
@@ -1078,6 +1075,7 @@ Public Class OpenCVB
         If algorithmTaskHandle IsNot Nothing Then
             While algorithmTaskHandle IsNot Nothing
                 Application.DoEvents()
+                If stopCameraThread Then Exit Sub  ' If the app is shutting down.
             End While
         End If
         openFileForm.Hide()

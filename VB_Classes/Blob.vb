@@ -67,7 +67,7 @@ Public Class Blob_Input
     Dim circles As Draw_Circles
     Dim ellipses As Draw_Ellipses
     Dim poly As Draw_Polygon
-    Dim Mats As Mat_4to1
+    Public Mats As Mat_4to1
     Public updateFrequency = 30
     Public Sub New()
         initParent()
