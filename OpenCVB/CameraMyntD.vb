@@ -90,12 +90,12 @@ Public Class CameraMyntD
     '  left: fx' cx' fy' cy' 1
     '  right: fx' cx' tx fy' cy' 1
     Public projectionMatrix(12 - 1) As Double ' 
-    Public rotationMatrix(9 - 1) As Double ' 3x3 rectification transform (rotation matrix) for the left camera.
     Dim IMUtask As Task
     Private Sub IMUdataCollection()
         MyntDtaskIMU(cPtr)
     End Sub
     Public Sub initialize(_width As Integer, _height As Integer, fps As Integer)
+        ReDim RotationMatrix(9 - 1) ' 3x3 rectification transform (rotation matrix) for the left camera.
         If frameCount = 10 Then
             width = _width
             height = _height
