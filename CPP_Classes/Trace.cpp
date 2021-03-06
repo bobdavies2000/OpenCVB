@@ -47,18 +47,3 @@ int* Trace_OpenCV_Run(Trace_OpenCV * Trace_OpenCVPtr, int* rgbPtr, int rows, int
 	CV_TRACE_REGION("read"); // we are off to read the next frame...
 	return (int*)Trace_OpenCVPtr->processed.data; // return this C++ allocated data to managed code
 }
-
-
-
-#define NO_EXPAND_VTK
-#include "../VTK_Apps/VTK.h"
-extern "C" __declspec(dllexport)
-int VTKPresentTest()
-{
-#ifdef WITH_VTK
-	return 1;
-#else
-	return 0;
-#endif
-}
-

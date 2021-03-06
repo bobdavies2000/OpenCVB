@@ -15,9 +15,6 @@ Module opencv_module
     Public callTraceLock As New Mutex(True, "callTraceLock")
     Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
     Public cameraThreadLock As New Mutex(True, "CameraThreadLock")
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function VTKPresentTest() As Integer
-    End Function
 End Module
 Public Class OpenCVB
 #Region "Globals"
@@ -93,7 +90,6 @@ Public Class OpenCVB
     Dim recentList As New List(Of String)
     Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
     Public intermediateReview As String
-    Dim VTK_Present As Boolean
     Dim meActivateNeeded As Boolean
     Dim pixelViewerOn As Boolean
     Dim pixelViewerRect As cv.Rect
@@ -222,13 +218,6 @@ Public Class OpenCVB
         updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Release\", "Kinect camera support.")
         updatePath(HomeDir.FullName + "OpenCV\Build\bin\Debug\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
         updatePath(HomeDir.FullName + "OpenCV\Build\bin\Release\", "OpenCV and OpenCV Contrib are needed for C++ classes.")
-
-        Dim vizDir = New DirectoryInfo(HomeDir.FullName + "OpenCV\Build\bin\Debug\")
-        Dim vizFiles = vizDir.GetFiles("opencv_viz*")
-        If vizFiles.Count > 0 Then VTK_Present = True
-        If VTK_Present Then updatePath("c:/Program Files/VTK/bin/", "VTK directory needed for VTK examples")
-        ' Check that the VTK apps are built with "WITH_VTK" as well.
-        If VTKPresentTest() = 0 Then VTK_Present = False ' "WITH_VTK" has not been set in VTK.h
 
         ' the Kinect depthEngine DLL is not included in the SDK.  It is distributed separately because it is NOT open source.
         ' The depthEngine DLL is supposed to be installed in C:\Program Files\Azure Kinect SDK v1.1.0\sdk\windows-desktop\amd64\$(Configuration)
@@ -954,7 +943,6 @@ Public Class OpenCVB
         If lastCameraFrame > camera.frameCount Then lastCameraFrame = 0
         If AvailableAlgorithms.Text.Contains(".py") Then meActivateNeeded = False
         If AvailableAlgorithms.Text.StartsWith("OpenGL") Then meActivateNeeded = False
-        If AvailableAlgorithms.Text.StartsWith("VTK") Then meActivateNeeded = False
         If meActivateNeeded Then
             Me.Activate()
             meActivateNeeded = False
@@ -1103,7 +1091,6 @@ Public Class OpenCVB
         parms.intrinsicsRight = camera.intrinsicsRight_VB
         parms.extrinsics = camera.Extrinsics_VB
         parms.homeDir = HomeDir.FullName
-        parms.VTK_Present = VTK_Present
 
         PausePlayButton.Image = PausePlay
 
