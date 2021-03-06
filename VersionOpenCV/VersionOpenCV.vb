@@ -14,7 +14,7 @@ Module VersionOpenCV
                     Dim sw = New StreamWriter("../../Data/PragmaLibs.h")
                     Dim swd = New StreamWriter("../../Data/PragmaLibsD.h")
                     For Each libfile In libList
-                        If libfile.Name.StartsWith("opencv_") Then
+                        If libfile.Name.StartsWith("opencv_") And libfile.Name.Contains("python") = False Then
                             Dim nextName = "OpenCV/Build/lib/Release/" + libfile.Name
                             sw.WriteLine("#pragma comment(lib, """ + nextName + """)")
                             nextName = "OpenCV/Build/lib/Debug/" + libfile.Name.Replace(".lib", "d.lib")
