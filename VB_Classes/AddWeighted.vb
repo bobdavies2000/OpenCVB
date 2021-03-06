@@ -47,7 +47,7 @@ Public Class AddWeighted_Edges
         edges.Run()
         dst1 = edges.dst2
 
-        addw.src = task.color
+        addw.src = src
         addw.src2 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         addw.Run()
         dst2 = addw.dst1
@@ -123,7 +123,7 @@ Public Class AddWeighted_InfraRed
         addw.Run()
         dst1 = addw.dst1.Clone
 
-        addw.src = task.color
+        addw.src = src
         addw.Run()
         dst2 = addw.dst1
         label1 = "InfraRed " + leftOrRight + " " + Format(1 - addw.weightSlider.Value / 100, "#0%") + " Depth " + Format(addw.weightSlider.Value / 100, "#0%")

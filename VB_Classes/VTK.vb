@@ -143,9 +143,9 @@ Public Class VTK_Histogram3Drgb
 
         vtk.memMapUserData(0) = binSlider.Value
         vtk.memMapUserData(1) = threshSlider.Value / 1000000
-        dst1 = task.color
+        dst1 = src
 
-        vtk.rgbInput = task.color
+        vtk.rgbInput = src
         vtk.Run()
     End Sub
 End Class

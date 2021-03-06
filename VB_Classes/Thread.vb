@@ -29,7 +29,6 @@ Public Class Thread_Grid
     End Sub
     Public Sub New()
         initParent()
-        src = task.color
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "ThreadGrid Width", 2, src.Width, 32)
