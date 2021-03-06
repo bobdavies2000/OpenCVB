@@ -48,6 +48,8 @@ Here are the requirements:
 
 -   Visual Studio 2019 Community Edition (Free version of Visual Studio)
 
+    -   Be sure to install the Python that comes with Visual Studio.
+
 -   Any of the following RGBZ cameras:
 
     -   Microsoft Kinect for Azure
@@ -133,8 +135,8 @@ algorithms here contain just the algorithm separate from any camera dependencies
 and will work with each of the supported cameras. Isolating just the algorithm
 functionality enables easy adaptation to other environments or platforms.
 
-Pre-Install Notes
-=================
+Before You Start
+================
 
 You should be familiar with the following software. Each is free and easily
 downloaded for Windows 10:
@@ -182,10 +184,8 @@ file.
 Installation – Full Description with Discussion
 ===============================================
 
-The installation of OpenCVB may seem formidable but it is automated to a high
-degree – just click on “PrepareTree.bat” after downloading OpenCVB from GitHub.
-The key to remember is that getting one example to work gets all the examples to
-work.
+The installation of OpenCVB takes some time but it is automated – just click on
+“PrepareTree.bat” after downloading OpenCVB from GitHub.
 
 The first step is to clone the OpenCVB repository in GitHub:
 
@@ -194,9 +194,7 @@ The first step is to clone the OpenCVB repository in GitHub:
 2.  Python should have been installed with Visual Studio. Only Python 3.x is
     supported.
 
-3.  The third step is where all the work is.
-
-    -   Run the “PrepareTree.bat” script in the OpenCVB directory.
+3.  Run the “PrepareTree.bat” script in the OpenCVB directory.
 
 >   The “PrepareTree.bat” script will download OpenCV, OpenCV-Contrib,
 >   librealsense, and Kinect4Azure from their respective GitHub locations and
@@ -214,25 +212,27 @@ The first step is to clone the OpenCVB repository in GitHub:
 
     -   <https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/usage.md>
 
-2.  Support for some optional cameras can be added:
+Optionally Install Additional Cameras
+=====================================
 
-    -   For the StereoLabs ZED 2 camera (released Q1 2020), install the
-        StereoLabs SDK from
+Support for some optional cameras can be added.
 
-        -   <https://www.stereolabs.com/>
+-   For the StereoLabs ZED 2 camera (released Q1 2020), install the StereoLabs
+    SDK from
 
-    -   For the Mynt Eye D 1000 camera, download the SDK from:
+    -   <https://www.stereolabs.com/>
 
-        -   <https://mynt-eye-d-sdk.readthedocs.io/en/latest/sdk/install_win_exe.html>
+-   For the Mynt Eye D 1000 camera, download the SDK from:
 
-    -   For OpenCV’s Oak-D camera, download the SDK from:
+    -   <https://mynt-eye-d-sdk.readthedocs.io/en/latest/sdk/install_win_exe.html>
 
-        -   [Python API — DepthAI Docs 0.3.0.0 documentation
-            (luxonis.com)](https://docs.luxonis.com/en/latest/pages/api/#python-api)
+-   For OpenCV’s Oak-D camera, download the SDK from:
 
-3.  Edit “Cameras/CameraDefines.hpp” file to add OpenCVB’s support for
-    StereoLabs Zed 2 or Mynt Eye D 1000 support. No changes are required for
-    Oak-D.
+    -   [Python API — DepthAI Docs 0.3.0.0 documentation
+        (luxonis.com)](https://docs.luxonis.com/en/latest/pages/api/#python-api)
+
+Edit “Cameras/CameraDefines.hpp” file to add OpenCVB’s support for StereoLabs
+Zed 2 or Mynt Eye D 1000 support. No changes are required for Oak-D.
 
 Trouble-Shooting New Install
 ============================
@@ -246,16 +246,15 @@ Some typical problems with new installations:
 
 -   Python Scripts Fail: this is likely a missing package. Run the algorithm
     “PythonPackages.py” inside OpenCVB to verify that all the necessary packages
-    are installed. If still failing, check the Python setting in the Options
-    (click the Settings icon for OpenCVB.) Make sure it points to a Python 3.x
-    version. Test Python scripts by setting “PythonDebug” as the Startup Project
-    in Visual Studio.
+    are installed. If still failing, check the Python setting in OpenCVB’s
+    Global Settings. Make sure it points to a Python 3.x version. Test Python
+    scripts with “PythonDebug” as the Startup Project in Visual Studio.
 
--   Link problems: Most C++ code in OpenCVB relies on PragmaLibs.h which is
-    automatically created as part of the build process. PragmaLibs.h defines
-    where to load the OpenCV libraries. It should automatically be updated with
-    the current OpenCV version that is in use. If not, run the “VersionOpenCV”
-    application included in the OpenCVB.sln file
+-   Link problems: the C++ code in OpenCVB relies on PragmaLibs.h which is
+    automatically created as part of the build process. PragmaLibs.h defines the
+    names of the OpenCV libraries. It should automatically be updated with the
+    current OpenCV version that is in use. If not, run the “VersionOpenCV”
+    application included in the OpenCVB.sln file.
 
 Building New Experiments With Snippets
 ======================================
