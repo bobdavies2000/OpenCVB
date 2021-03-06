@@ -22,4 +22,3 @@ msbuild.exe librealsense/Build/librealsense2.sln /p:Configuration=Release
 
 msbuild.exe Azure-Kinect-Sensor-SDK/Build/k4a.sln /p:Configuration=Debug
 msbuild.exe Azure-Kinect-Sensor-SDK/Build/k4a.sln /p:Configuration=Release
-start OpenCV.sln
