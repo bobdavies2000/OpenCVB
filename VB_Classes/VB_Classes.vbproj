@@ -258,7 +258,6 @@
     </Compile>
     <Compile Include="Objects.vb" />
     <Compile Include="OilPaint.vb" />
-    <Compile Include="OpenCVGL.vb" />
     <Compile Include="OpenGL.vb" />
     <Compile Include="OpticalFlow.vb" />
     <Compile Include="AlphaChannelFrm.Designer.vb">

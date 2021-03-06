@@ -42,7 +42,6 @@
     <ClCompile Include="HMM.cpp" />
     <ClCompile Include="LineDetector.cpp" />
     <ClCompile Include="MinTriangle.cpp" />
-    <ClCompile Include="OpenCVGL.cpp" />
     <ClCompile Include="Palette.cpp" />
     <ClCompile Include="ParticleFilter.cpp" />
     <ClCompile Include="Plot_OpenCV.cpp" />

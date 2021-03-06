@@ -157,8 +157,8 @@ downloaded for Windows 10:
 
     -   <https://git-scm.com/downloads>
 
-Installation 
-=============
+Installation
+============
 
 Installation is not as simple as cloning the GitHub repository and then opening
 the OpenCVB.sln file but it is not much more than just “PrepareTree.bat” and
@@ -388,27 +388,6 @@ update dependencies, select “Project/Dependencies” from the Visual Studio me
 and make sure that the “OpenCVB” project depends on any new OpenGL projects.
 This ensures that the new project will always be rebuilt when OpenCVB is
 restarted.
-
-OpenCV’s OpenGL Interface
-=========================
-
-The “PrepareTree.bat” script will have configured OpenCV with OpenGL support.
-OpenCVB can use this OpenGL interface – see the OpenCVGL algorithm. The
-interface is sluggish and the C++ code looks different from most OpenGL
-applications so the alternative interface to OpenGL (discussed above) is
-preferred. Both interfaces use the same sliders and options to control the
-OpenGL interface.
-
-NOTE: why use sliders instead of OpenGL mouse or keyboard callbacks? The answer
-in a single word is precision. It is often desirable to set appropriate defaults
-with each of the numerous ways to change the display. Also, sliders were
-valuable in learning which OpenGL API was controlling which feature of the 3D
-effect. Preconfiguring the sliders allows the user to program a specific setup
-for viewing 3D data.
-
-OpenGL mouse and keyboard callbacks are also available. An example
-“OpenGL_Callbacks” provides everything needed. The snippets for OpenCVB setup
-any new OpenGL example with callbacks as well.
 
 Python Interface
 ================
