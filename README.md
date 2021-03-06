@@ -220,6 +220,12 @@ Some typical problems with new installations:
     current OpenCV version that is in use. If not, run the “VersionOpenCV”
     application included in the OpenCVB.sln file.
 
+-   If the installation of Visual Studio has not put MSBuild into the path, then
+    it should be added. The usual location for it is:
+
+    -   C:\\Program Files (x86)\\Microsoft Visual
+        Studio\\2019\\Community\\MSBuild\\Current\\Bin
+
 -   OpenCV, OpenCV-Contrib, LibRealSense2, Kinect4Azure libraries are all
     downloaded, configured, and built automatically as part of
     “PrepareTree.bat”. If the libraries are missing, open the .sln file in the
