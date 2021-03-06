@@ -157,60 +157,24 @@ downloaded for Windows 10:
 
     -   <https://git-scm.com/downloads>
 
-Installation – Quick Reference
-==============================
+Installation 
+=============
 
-This is the short description of install process. Installation is not as simple
-as cloning the GitHub repository and then opening the OpenCVB.sln file but it is
-not much more than just “PrepareTree.bat” and then open and run the OpenCVB.sln
-file.
+Installation is not as simple as cloning the GitHub repository and then opening
+the OpenCVB.sln file but it is not much more than just “PrepareTree.bat” and
+then open and run the OpenCVB.sln file.
 
 -   Run the “PrepareTree.bat” script that comes with OpenCVB. It will download
     and run CMake for needed libraries. After building it will occupy about 18Gb
-    of disk space – plan accordingly.
-
-    -   This will take the majority of time for the install depending on the
-        network and system.
-
-    -   After “PrepareTree.bat” completes, Visual Studio projects will open. Run
-        “Batch Build” and “Select All” in each Visual Studio project.
+    of disk space – plan accordingly. The process takes 20-40 minutes to
+    download/configure/build.
 
 -   Download the Kinect4Azure proprietary binaries:
-    <https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/usage.md>
+
+    -   <https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/usage.md>
 
 -   Build and run OpenCVB.sln – set OpenCVB as the “Startup Project” (GitHub
     seems to forget the startup project.)
-
-Installation – Full Description with Discussion
-===============================================
-
-The installation of OpenCVB takes some time but it is automated – just click on
-“PrepareTree.bat” after downloading OpenCVB from GitHub.
-
-The first step is to clone the OpenCVB repository in GitHub:
-
-1.  <https://github.com/bobdavies2000/OpenCVB>
-
-2.  Python should have been installed with Visual Studio. Only Python 3.x is
-    supported.
-
-3.  Run the “PrepareTree.bat” script in the OpenCVB directory.
-
->   The “PrepareTree.bat” script will download OpenCV, OpenCV-Contrib,
->   librealsense, and Kinect4Azure from their respective GitHub locations and
->   install them in the OpenCVB tree. In addition, the script will run the CMake
->   commands for OpenCVB’s use. The script will then open Visual Studio for each
->   solution file. Build the Debug and Release versions of each with the
->   “Build/Batch Build” Visual Studio menu entry. The steps to download and run
->   CMake take about 20 minutes depending on the network and system. The Visual
->   Studio builds may take a comparable amount of time.
-
-1.  The last step before building OpenCVB is to download the proprietary
-    binaries from Microsoft for the Kinect4Azure camera. The “PrepareTree.bat”
-    script built the open source portion of the Kinect4Azure camera but this
-    step will complete the installation of the Kinect4Azure camera:
-
-    -   <https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/usage.md>
 
 Optionally Install Additional Cameras
 =====================================
@@ -255,6 +219,18 @@ Some typical problems with new installations:
     names of the OpenCV libraries. It should automatically be updated with the
     current OpenCV version that is in use. If not, run the “VersionOpenCV”
     application included in the OpenCVB.sln file.
+
+-   OpenCV, OpenCV-Contrib, LibRealSense2, Kinect4Azure libraries are all
+    downloaded, configured, and built automatically as part of
+    “PrepareTree.bat”. If the libraries are missing, open the .sln file in the
+    respective Build directory for each and investigate further. The solution
+    files are:
+
+    -   \<OpenCVB Dir\>/Azure-Kinect-Sensor-SDK/Build/K4A.sln
+
+    -   \<OpenCVB Dir\>/librealsense/Build/librealsense2.sln
+
+    -   \<OpenCVB Dir\>/opencv/Build/opencv.sln
 
 Building New Experiments With Snippets
 ======================================
