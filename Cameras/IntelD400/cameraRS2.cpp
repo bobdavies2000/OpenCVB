@@ -17,6 +17,11 @@
 #include "opencv2/highgui.hpp"
 #include <map>
 #include "example.hpp"
+#ifdef _DEBUG
+#include "../Data/PragmaLibsD.h"
+#else
+#include "../Data/PragmaLibs.h"
+#endif
 
 using namespace std;
 using namespace cv;

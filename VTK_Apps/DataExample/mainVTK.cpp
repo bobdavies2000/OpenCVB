@@ -8,6 +8,11 @@
 #endif
 
 #include <iostream>
+#ifdef _DEBUG
+#include "../Data/PragmaLibsD.h"
+#else
+#include "../Data/PragmaLibs.h"
+#endif
 
 using namespace std;
 

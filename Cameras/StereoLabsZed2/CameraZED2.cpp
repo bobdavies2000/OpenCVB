@@ -20,6 +20,11 @@
 #include <opencv2/highgui.hpp>
 #include <sl/Camera.hpp>
 #include "../../CPP_Classes/DepthColorizer.hpp"
+#ifdef _DEBUG
+#include "../Data/PragmaLibsD.h"
+#else
+#include "../Data/PragmaLibs.h"
+#endif
 
 using namespace sl;
 using namespace std;

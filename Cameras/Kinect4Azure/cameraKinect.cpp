@@ -20,6 +20,11 @@
 #include <k4a/k4a.hpp>
 #include <k4apixel.h>
 #include "../../CPP_Classes/DepthColorizer.hpp"
+#ifdef _DEBUG
+#include "../Data/PragmaLibsD.h"
+#else
+#include "../Data/PragmaLibs.h"
+#endif
 
 using namespace std;
 using namespace cv;

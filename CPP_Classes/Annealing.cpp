@@ -12,6 +12,11 @@
 #include <sstream>
 #include <random>
 #include <intrin.h>
+#ifdef _DEBUG
+#include "../Data/PragmaLibsD.h"
+#else
+#include "../Data/PragmaLibs.h"
+#endif
 
 using namespace std;
 using namespace cv;

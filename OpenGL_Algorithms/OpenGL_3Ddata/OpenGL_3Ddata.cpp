@@ -1,6 +1,7 @@
 #include "../OpenGL_Basics/OpenGLcommon.h"
 #define GLFW_INCLUDE_GLU
 #include <GLFW/glfw3.h>
+
 int main(int argc, char * argv[])
 { 
 	windowTitle << "OpenCVB Data Cloud"; // this will create the window title.

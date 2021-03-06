@@ -13,6 +13,12 @@
 #include <tchar.h>
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
+#ifdef _DEBUG
+#include "../Data/PragmaLibsD.h"
+#else
+#include "../Data/PragmaLibs.h"
+#endif
+
 using namespace cv;
 
 #ifndef NOGLFW

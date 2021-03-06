@@ -14,6 +14,11 @@
 #include "util/counter.h"
 
 #include "../../CPP_Classes/DepthColorizer.hpp"
+#ifdef _DEBUG
+#include "../Data/PragmaLibsD.h"
+#else
+#include "../Data/PragmaLibs.h"
+#endif
 
 MYNTEYE_USE_NAMESPACE
 using namespace cv;

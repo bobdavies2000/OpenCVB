@@ -173,9 +173,6 @@ file.
     -   After “PrepareTree.bat” completes, Visual Studio projects will open. Run
         “Batch Build” and “Select All” in each Visual Studio project.
 
--   Set Environmental variable OpenCV_Version to 452. – This depends on the
-    version of OpenCV, currently 4.52.
-
 -   Download the Kinect4Azure proprietary binaries:
     <https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/usage.md>
 
@@ -210,25 +207,14 @@ The first step is to clone the OpenCVB repository in GitHub:
 >   CMake take about 20 minutes depending on the network and system. The Visual
 >   Studio builds may take a comparable amount of time.
 
-1.  After all the packages have been built, then there is one environmental
-    variable that needs to be set and it will depend on which version of OpenCV
-    was just downloaded and built.
-
-    -   Environmental variable “OpenCV_Version” should be set to 452
-
-    -   The currently available OpenCV download is 4.52 so setting
-        OpenCV_Version to 452 reflects that but note that OpenCV is updated
-        several times a year and the environmental variable may need to be
-        updated.
-
-2.  The last step before building OpenCVB is to download the proprietary
+1.  The last step before building OpenCVB is to download the proprietary
     binaries from Microsoft for the Kinect4Azure camera. The “PrepareTree.bat”
     script built the open source portion of the Kinect4Azure camera but this
     step will complete the installation of the Kinect4Azure camera:
 
--   <https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/usage.md>
+    -   <https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/usage.md>
 
-1.  Support for some optional cameras can be added:
+2.  Support for some optional cameras can be added:
 
     -   For the StereoLabs ZED 2 camera (released Q1 2020), install the
         StereoLabs SDK from
@@ -244,7 +230,7 @@ The first step is to clone the OpenCVB repository in GitHub:
         -   [Python API — DepthAI Docs 0.3.0.0 documentation
             (luxonis.com)](https://docs.luxonis.com/en/latest/pages/api/#python-api)
 
-2.  Edit “Cameras/CameraDefines.hpp” file to add OpenCVB’s support for
+3.  Edit “Cameras/CameraDefines.hpp” file to add OpenCVB’s support for
     StereoLabs Zed 2 or Mynt Eye D 1000 support. No changes are required for
     Oak-D.
 
@@ -252,11 +238,6 @@ Trouble-Shooting New Install
 ============================
 
 Some typical problems with new installations:
-
--   Link problems: check the “OpenCV_Version” environmental variable for OpenCV
-    version. It may need to reflect a newer version of OpenCV. For OpenCV 4.52,
-    the environmental variable is OpenCV_Version = 452. Make sure that OpenCV
-    Debug and Release versions were built successfully.
 
 -   Camera Failure: check the camera installation by testing the examples
     provided by the camera vendor. Did the Kinect4Azure support get upgraded
@@ -269,6 +250,12 @@ Some typical problems with new installations:
     (click the Settings icon for OpenCVB.) Make sure it points to a Python 3.x
     version. Test Python scripts by setting “PythonDebug” as the Startup Project
     in Visual Studio.
+
+-   Link problems: Most C++ code in OpenCVB relies on PragmaLibs.h which is
+    automatically created as part of the build process. PragmaLibs.h defines
+    where to load the OpenCV libraries. It should automatically be updated with
+    the current OpenCV version that is in use. If not, run the “VersionOpenCV”
+    application included in the OpenCVB.sln file
 
 Building New Experiments With Snippets
 ======================================
