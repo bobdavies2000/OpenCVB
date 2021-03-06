@@ -44,7 +44,6 @@
 #pragma comment(lib, "OpenCV/Build/lib/Release/opencv_video452.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Release/opencv_videoio452.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Release/opencv_videostab452.lib")
-#pragma comment(lib, "OpenCV/Build/lib/Release/opencv_viz452.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Release/opencv_wechat_qrcode452.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Release/opencv_xfeatures2d452.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Release/opencv_ximgproc452.lib")

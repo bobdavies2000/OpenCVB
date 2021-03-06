@@ -9,10 +9,12 @@ Module VersionOpenCV
             Else
                 Dim coreLibName = New FileInfo(coreList(0).FullName)
                 Dim currentCore = New FileInfo(GetSetting("OpenCVB", "CoreLibName", "CoreLibName", "NotThereYet"))
-                If coreLibName.FullName <> currentCore.FullName Then
+                Dim pragmaLibs As New FileInfo("../../Data/PragmaLibs.h")
+                Dim pragmaLibsD As New FileInfo("../../Data/PragmaLibsD.h")
+                If coreLibName.FullName <> currentCore.FullName Or pragmaLibs.Exists = False Or pragmaLibsD.Exists = False Then
                     Dim libList = openCVLibDir.GetFiles("*.lib")
-                    Dim sw = New StreamWriter("../../Data/PragmaLibs.h")
-                    Dim swd = New StreamWriter("../../Data/PragmaLibsD.h")
+                    Dim sw = New StreamWriter(pragmaLibs.FullName)
+                    Dim swd = New StreamWriter(pragmaLibsD.FullName)
                     For Each libfile In libList
                         If libfile.Name.StartsWith("opencv_") And libfile.Name.Contains("python") = False Then
                             Dim nextName = "OpenCV/Build/lib/Release/" + libfile.Name

@@ -44,7 +44,6 @@
 #pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_video452d.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_videoio452d.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_videostab452d.lib")
-#pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_viz452d.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_wechat_qrcode452d.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_xfeatures2d452d.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_ximgproc452d.lib")
