@@ -131,6 +131,9 @@ Public Class Fourier_Shapes
         dft.src = dst1
         dft.Run()
         dst2 = dft.dst2
+
+        ' uncomment the following line to view the inverse of the DFT transform.  It is the grayscale image of the input - no surprise.  It works!
+        ' dst1 = inverseDFT(dft.complexImage)
     End Sub
 End Class
 
