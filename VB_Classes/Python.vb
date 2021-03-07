@@ -6,28 +6,7 @@ Imports DlibDotNet
 Imports cv = OpenCvSharp
 
 Module Python_Module
-    Public Function checkPythonPackage( packageName As String) As Boolean
-        If ocvb.parms.PythonExe = "" Then
-            ocvb.trueText("Python is not present and needs to be installed." + vbCrLf +
-                                                  "Get Python 3.7+ with Visual Studio's Install app.")
-            Return False
-        End If
-        Dim pythonFileInfo = New FileInfo(ocvb.parms.pythonExe)
-        Dim packageDir = New FileInfo(pythonFileInfo.DirectoryName + "\Lib\site-packages\")
-        Dim packageFolder As New IO.DirectoryInfo(packageDir.DirectoryName + "\")
-        Dim packageFiles = packageFolder.GetDirectories(packageName, IO.SearchOption.TopDirectoryOnly)
-
-        If packageFiles.Count = 0 Then
-            ocvb.trueText("Python is present but the packages needed by this Python script are not present." + vbCrLf +
-                                                  "Use the PythonPackages.py script to show which imports are missing.'" + vbCrLf +
-                                                  "Go to the Visual Studio menu 'Tools/Python/Python Environments'" + vbCrLf +
-                                                  "Select 'Packages' in the combo box and search for packages required by this script.")
-        End If
-        Return True
-    End Function
-
-    Public Function StartPython( arguments As String) As Boolean
-        If checkPythonPackage("cv2") = False Then Return False
+    Public Function StartPython(arguments As String) As Boolean
         Dim pythonApp = New FileInfo(ocvb.pythonTaskName)
 
         If pythonApp.Name.StartsWith("LRS_") Then
@@ -159,11 +138,6 @@ Public Class Python_SurfaceBlit
     Dim PythonReady As Boolean
     Public Sub New()
         initParent()
-        ' this Python script requires pygame to be present...
-        If checkPythonPackage("pygame") = False Then
-            PythonReady = False
-            Exit Sub
-        End If
         pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
         pipe = New NamedPipeServerStream(pipeName, PipeDirection.InOut)
         PipeTaskIndex += 1

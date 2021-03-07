@@ -463,7 +463,6 @@
     <Content Include="Tracker_PS.py" />
     <Content Include="Turing.py" />
     <Content Include="WarpAffine_SIFT.py" />
-    <Content Include="PythonPackages.py" />
     <Content Include="PhotoShop_Contrast_Example1.py" />
     <Content Include="Draw_Basic.py" />
     <Content Include="Polyline_Browse.py" />
@@ -525,7 +524,6 @@
     <Content Include="Mouse_and_match.py" />
     <Content Include="Non_linear_svms.py" />
     <Content Include="Opencv_version.py" />
-    <Content Include="OpenGL_Cube.py" />
     <Content Include="Peopledetect.py" />
     <Content Include="PointPolygonTest_demo.py" />
     <Content Include="Hough_LineProbalistic.py" />

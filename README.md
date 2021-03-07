@@ -1,23 +1,28 @@
-Recent Changes – 2/15/2021
-==========================
+Recent Changes – March 2021
+===========================
 
--   Over 900 algorithms – almost all less than a page of code
+-   Almost 940 algorithms – almost all less than a page of code
 
--   New pixel viewer to inspect image pixels in 8UC1, 8UC3, 32F, and 32FC3
-    formats
+-   Stream-lined install: no more environmental variables, library builds are
+    automated.
 
--   Versioning policy set - The Repository IS The Release - TRISTR
+-   Latest version of the OpenCV library - 4.5.2
 
--   Improved threading support for switching between camera interfaces
+-   Improved Python package support – now using requirements.txt
 
--   Oak-D camera support is working – still missing IMU and point cloud support
+-   An experimental Python interface to the LibRealSense2 cameras has been added
 
--   VTK support was improved – still optional (it is a lot to install)
+-   VTK support is being dropped – it is too big and cumbersome. Recommended:
+    Python Pyglet
 
--   Upgraded to the latest RealSense2, OpenCVSharp, and Kinect4Azure software
+-   Oak-D camera Python interface is present but turned off pending IMU support
+    from the vendor
 
--   Motion Filtered Data series of algorithms – an attempt at reducing data
-    analysis at input
+-   “PyStream” support is now a 2-way pipeline. Output can appear in the OpenCVB
+    interface
+
+-   Tensorflow database downloads are automated with algorithm
+    “Download_Database”
 
 Introduction
 ============
@@ -32,7 +37,7 @@ In the sample output below, any of the algorithms can be selected from the first
 combo box at the top of the form. The second combo box is used to select
 algorithms grouped by OpenCV API or OpenCVB algorithm. The default grouping is
 to select “\<All\>” algorithms while other special groupings allow selecting
-Python or C++ algorithms.
+“\<Python\>” or “\<C++\>” algorithms.
 
 ![](media/0094dd80a047099af3fa5ecf92dee723.png)
 
@@ -46,9 +51,7 @@ Here are the requirements:
 
 -   Windows 10
 
--   Visual Studio 2019 Community Edition (Free version of Visual Studio)
-
-    -   Be sure to install the Python that comes with Visual Studio.
+-   Visual Studio 2019 Community Edition (include Python support)
 
 -   Any of the following RGBZ cameras:
 
@@ -208,11 +211,9 @@ Some typical problems with new installations:
     recently? Post if some configuration problems prevent the camera from
     working in OpenCVB.
 
--   Python Scripts Fail: this is likely a missing package. Run the algorithm
-    “PythonPackages.py” inside OpenCVB to verify that all the necessary packages
-    are installed. If still failing, check the Python setting in OpenCVB’s
-    Global Settings. Make sure it points to a Python 3.x version. Test Python
-    scripts with “PythonDebug” as the Startup Project in Visual Studio.
+-   Python Scripts Fail: Python setup has 2 parts – telling OpenCVB which Python
+    to use and running the requirements.txt. There is a description below on how
+    to set those up.
 
 -   Link problems: the C++ code in OpenCVB relies on PragmaLibs.h which is
     automatically created as part of the build process. PragmaLibs.h defines the
@@ -404,38 +405,43 @@ add a script in the Python directory of the VB_Classes project. It is convenient
 for edits to add any script to the VB_Classes project but, more importantly, any
 changes to a Python script will automatically show the new or renamed Python
 files in the user interface. Python scripts don’t require a VB.Net wrapper –
-just add them to the VB_Classes Project – and the script will be present in the
-user interface.
+just add them to the VB_Classes Project – and it will appear in the user
+interface.
 
 Python scripts can get a stream of images from the camera and return resulting
-images. There are numerous examples of how to do this: see
-AddWeighted_Trackbar_PS.py or Camshift_PS.py. The “_PS” suffix is an OpenCVB
-convention that indicates it is a Python Streaming script that expects a stream
-of RGB and Depth images and will return images. NOTE: The Python script name
-MUST END WITH \_PS to stream images to and from Python code. To see the list of
-all the Python Streaming scripts, select the pre-defined subset group called
-“\<PyStream\>”.
+images. There are numerous examples of how to do this: see AddWeighted_PS.py or
+Camshift_PS.py. The “_PS” suffix is an OpenCVB convention that indicates it is a
+Python Streaming script that expects a stream of RGB and Depth images and will
+return images. NOTE: The Python script name MUST end with “_PS.py” to stream
+images to and from Python code. To see the list of all the Python Streaming
+scripts, select the pre-defined subset group called “\<PyStream\>”.
 
-Python scripts show up in the list of algorithms in the OpenCVB user interface
-and each Python script will be run when performing the regression tests. To
-change which version of Python is used, open the “Options” dialog. In the
-“Python” section, there is a browse button to select any Python.exe available on
-the system.
+Some care is required when first using an OpenCVB “PyStream” script. The
+algorithm thread is writing to a pipe received by the Python script. However, if
+the right version of Python is not set in OpenCVB or some of the packages are
+missing, it will appear to hang the algorithm thread in OpenCVB. See the section
+below on setting up Python packages.
 
 Python Packages
 ===============
 
-The Python libraries “opencv-python” or “NumPy” are required for many of the
-OpenCVB Python scripts but are not installed by default. To update missing
-packages in Visual Studio, use the “Tools/Python/Python Environments” in the
-Visual Studio menu:
+There are 2 parts to getting all the Python scripts to run: 1) set which
+Python.exe to use in OpenCVB’s Global Settings; 2) installing all the needed
+libraries in the “requirements.txt” file. Use the OpenCVB.sln project
+“PythonDebug” to accomplish both of these efforts.
 
--   In the Visual Studio menus, click “Tools/Python/Python Environments” –
-    select “Packages” in the combo box then enter “opencv-python” or “numpy” or
-    any Python import and then select the package from the list.
+![](media/a62e018d706f46c3211b29a15772bcf8.png)
 
-To check that all the necessary packages are installed, run the
-‘PythonPackages.py’ algorithm from OpenCVB’s user interface.
+*In the “PythonDebug” project of OpenCVB, right-click on the Python version in
+use and use the “Install from requirements.txt” and “Copy Full Path” to
+respectively install libraries and set the active Python in OpenCVB*
+
+Click on “Copy Full Path” above to paste the name of the Python.exe to use in
+OpenCVB’s Global Settings. Next, use the “Install from requirements.txt” option
+to install all the libraries imported by the Python scripts that come with
+OpenCVB. Use the “Generate requirements.txt” to install libraries for new Python
+scripts that are added. It may be necessary to restart Visual Studio for the
+changes to come into effect.
 
 Python Debugging
 ================
@@ -459,8 +465,8 @@ be active and single-stepping through the script and reading the error messages
 will be possible.
 
 All OpenCVB Python scripts can be debugged with the PythonDebug project
-including those that stream data from OpenCVB. For Python scripts requiring a
-stream of images, the startup process of OpenCVB is reversed and the OpenCVB
+including those that stream data from OpenCVB. For Python scripts using
+“PyStream”, the startup process of OpenCVB is reversed and the OpenCVB
 executable is invoked automatically from Python and run in a separate address
 space. Camera images from OpenCVB are then be streamed to the Python script
 running in the Python debugger.
@@ -542,12 +548,13 @@ outputs in the main OpenCVB form: 1) the output of the clicked algorithm’s
 “standalone” run; or 2) the output of the currently running algorithm. The
 objective is to show and understand the intermediate stages of compound
 algorithms while running. All output will show up in OpenCVB’s main form in the
-bottom 2 images.
+bottom 2 images. Play with this when running OpenCVB. It is a fun feature and
+helps understand the composition of the increasingly complex algorithms.
 
 Pixel Viewer
 ============
 
-The Pixel Viewer allows detailed inspection of any of the 4 images. The
+The Pixel Viewer allows detailed inspection of any of the 4 OpenCVB images. The
 dimensions of the rectangle depend on the window that the user has sized for the
 Pixel Viewer output – the larger the window, the larger the rectangle. Supported
 formats include CV_8U, CV_8UC3, CV_32F, and CV_32FC3 but more could be added if
@@ -555,49 +562,8 @@ needed.
 
 ![](media/a6f56e72871b653bdc9c8ede74ed5645.png)
 
-VTK Support
-===========
-
-It takes some time and lots of disk space to get VTK (the Visualization Took
-Kit) working with OpenCV. The instructions to install VTK are here:
-
-<https://vtk.org/Wiki/VTK/Configure_and_Build>
-
-Some notes on preparing VTK for use with OpenCV and OpenCVB:
-
--   Run OpenCVB’s “Support/PrepareVTK.bat” file to download and prepare the VTK
-    directory.
-
-    -   Visual Studio will open the VTK.sln file. Select “Build/Batch Build” and
-        “Select All” to build VTK
-
--   Close Visual Studio and run Visual Studio as Administrator, click on the
-    INSTALL Project and select Build
-
-    -   Upon completion of the Build Install, c:\\Program Files\\VTK should
-        contain VTK.
-
--   Open CMake for OpenCV and run Configure/Generate and then build the OpenCV
-    project
-
-    -   Make sure that the VTK_DIR points to where VTK was installed
-        (c:\\Program Files\\VTK)
-
--   Validate that VTK was correctly installed by looking at the
-    OpenCVB/opencv/Build/Bin/Debug
-
-    -   Make sure that the opencv_viz\* dll’s are present
-
--   In OpenCVB’s VTKDataExample, open the VTK.h file and uncomment the first
-    line “\#define WITH_VTK”
-
-    -   Rebuild OpenCVB and the VTK algorithms will run (they all start with
-        “VTK”)
-
-That is a lot of work. It might be easier to use “Pyglet” with Python.
-
-TRISTR – The Release IS The Repository
-======================================
+Continuous Release
+==================
 
 Evolution would have been easier for Darwin to discover if nature had provided
 versioning. Software applications always have a version identifier but OpenCVB
@@ -615,6 +581,10 @@ problems with the infrastructure, but the greater likelihood is that only
 recently added algorithms will have deficiencies. The value of avoiding
 versioning is that issues will produce fixes that will flow immediately into the
 repository.
+
+It is a lot simpler for a small project like OpenCVB to have just one release
+that is in focus. If there is interest, a versioning system is not hard to
+implement.
 
 How to Contribute
 =================
@@ -1199,3 +1169,24 @@ Recent Changes - 1/12/2021
 
 -   PythonDebug project is now integrated into the OpenCVB.sln. Python debugging
     is easier.
+
+Recent Changes – 2/15/2021
+==========================
+
+-   Over 900 algorithms – almost all less than a page of code
+
+-   New pixel viewer to inspect image pixels in 8UC1, 8UC3, 32F, and 32FC3
+    formats
+
+-   Versioning policy set - The Repository IS The Release - TRISTR
+
+-   Improved threading support for switching between camera interfaces
+
+-   Oak-D camera support is working – still missing IMU and point cloud support
+
+-   VTK support was improved – still optional (it is a lot to install)
+
+-   Upgraded to the latest RealSense2, OpenCVSharp, and Kinect4Azure software
+
+-   Motion Filtered Data series of algorithms – an attempt at reducing data
+    analysis at input
