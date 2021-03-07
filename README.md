@@ -430,7 +430,7 @@ Python.exe to use in OpenCVB’s Global Settings; 2) installing all the needed
 libraries in the “requirements.txt” file. Use the OpenCVB.sln project
 “PythonDebug” to accomplish both of these efforts.
 
-![](media/a62e018d706f46c3211b29a15772bcf8.png)
+![](media/0b518f67d187f6a79e7b10b2b3c359b3.png)
 
 *In the “PythonDebug” project of OpenCVB, right-click on the Python version in
 use and use the “Install from requirements.txt” and “Copy Full Path” to
