@@ -711,6 +711,7 @@ Public Class OpenCVB
                     Exit Sub
                 Else
                     SaveSetting("OpenCVB", "PythonExe", "PythonExe", pyFile.FullName)
+                    Exit Sub
                 End If
             End If
             For Each Dir As String In System.IO.Directory.GetDirectories(directoryInfo.FullName)
