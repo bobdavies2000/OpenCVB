@@ -705,7 +705,7 @@ Public Class OpenCVB
             Dim directoryInfo As New DirectoryInfo(appData + "\..\Local\Programs\Python\")
             If directoryInfo.Exists = False Then
                 ' let's try to find python.exe in appData\Local\Microsoft\WindowsApp
-                Dim pyFile = New FileInfo(appData + "\Local\Microsoft\WindowsApps\python.exe")
+                Dim pyFile = New FileInfo(appData + "\..\Local\Microsoft\WindowsApps\python.exe")
                 If pyFile.Exists = False Then
                     MsgBox("OpenCVB cannot find an active Python." + vbCrLf + "Use OpenCVB's Global Settings to specify Python.exe.")
                     Exit Sub
