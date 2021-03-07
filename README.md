@@ -51,7 +51,7 @@ Here are the requirements:
 
 -   Windows 10
 
--   Visual Studio 2019 Community Edition (include Python support)
+-   Visual Studio 2019 Community Edition (be sure to include Python support)
 
 -   Any of the following RGBZ cameras:
 
@@ -104,7 +104,7 @@ reduced to a few steps using standard (and free) packages.
 The languages used are those often found in OpenCV projects - C++, C\#, and
 Python - but also include VB.Net, hence the name OpenCVB. OpenCVB also provides
 access to multiple libraries - OpenCV, OpenCVSharp, OpenGL, Dlib, NumPy, NAudio,
-VTK, and OpenMP. And OpenCVB enables all possible image representations - 3D,
+and OpenMP. And OpenCVB enables all possible image representations - 3D,
 bitmaps, plots, bar charts, spreadsheets, and text. Examples of all of these
 representations are included in OpenCVB.
 
@@ -777,12 +777,6 @@ image.)*
 *This example of a compound class shows an image that has been motion-blurred
 (lower left) and then de-blurred in the lower right. The options for the motion
 blur and de-blur are also shown.*
-
-![](media/a3f9a39a4f120ef7829003267332a9b3.jpg)
-
-*It is an option to use VTK (Visualization Tool Kit) but it is turned off by
-default in the distribution. The test pattern in the lower right image behind
-the VTK output is sent to VTK where the 3D histogram is computed and displayed.*
 
 ![](media/2f8061c17229863e8216ee67ee5cfb4f.png)
 
