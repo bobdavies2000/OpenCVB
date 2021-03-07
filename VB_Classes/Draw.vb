@@ -166,7 +166,7 @@ Public Class Draw_Polygon
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Poly Count", 1, 255, 1)
+            sliders.setupTrackBar(0, "Polygon Count", 1, 255, 1)
         End If
         task.desc = "Draw Polygon figures"
         label2 = "Convex Hull for the same polygon"
@@ -221,7 +221,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
-Public Class Draw_RngImage
+Public Class Draw_Shapes
     Inherits VBparent
     Public Sub New()
         initParent()

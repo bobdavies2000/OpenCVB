@@ -48,33 +48,31 @@ Public Class DFT_Basics
         cv.Cv2.Merge(planes, complexImage)
         cv.Cv2.Dft(complexImage, complexImage)
 
-        If standalone or task.intermediateReview = caller Then
-            ' compute the magnitude And switch to logarithmic scale => log(1 + sqrt(Re(DFT(I))^2 + Im(DFT(I))^2))
-            planes = complexImage.Split
+        ' compute the magnitude And switch to logarithmic scale => log(1 + sqrt(Re(DFT(I))^2 + Im(DFT(I))^2))
+        planes = complexImage.Split
 
-            cv.Cv2.Magnitude(planes(0), planes(1), magnitude)
-            magnitude += cv.Scalar.All(1) ' switch To logarithmic scale
-            cv.Cv2.Log(magnitude, magnitude)
+        cv.Cv2.Magnitude(planes(0), planes(1), magnitude)
+        magnitude += cv.Scalar.All(1) ' switch To logarithmic scale
+        cv.Cv2.Log(magnitude, magnitude)
 
-            ' crop the spectrum, if it has an odd number of rows Or columns
-            spectrum = magnitude(New cv.Rect(0, 0, magnitude.Cols And -2, magnitude.Rows And -2))
-            ' Transform the matrix with float values into range 0-255
-            spectrum = spectrum.Normalize(0, 255, cv.NormTypes.MinMax)
-            spectrum.ConvertTo(padded, cv.MatType.CV_8U)
+        ' crop the spectrum, if it has an odd number of rows Or columns
+        spectrum = magnitude(New cv.Rect(0, 0, magnitude.Cols And -2, magnitude.Rows And -2))
+        ' Transform the matrix with float values into range 0-255
+        spectrum = spectrum.Normalize(0, 255, cv.NormTypes.MinMax)
+        spectrum.ConvertTo(padded, cv.MatType.CV_8U)
 
-            ' rearrange the quadrants of Fourier image  so that the origin is at the image center
-            Dim cx = CInt(padded.Cols / 2)
-            Dim cy = CInt(padded.Rows / 2)
+        ' rearrange the quadrants of Fourier image  so that the origin is at the image center
+        Dim cx = CInt(padded.Cols / 2)
+        Dim cy = CInt(padded.Rows / 2)
 
-            mats.mat(3) = padded(New cv.Rect(0, 0, cx, cy)).Clone()
-            mats.mat(2) = padded(New cv.Rect(cx, 0, cx, cy)).Clone()
-            mats.mat(1) = padded(New cv.Rect(0, cy, cx, cy)).Clone()
-            mats.mat(0) = padded(New cv.Rect(cx, cy, cx, cy)).Clone()
-            mats.Run()
-            dst2 = mats.dst1
+        mats.mat(3) = padded(New cv.Rect(0, 0, cx, cy)).Clone()
+        mats.mat(2) = padded(New cv.Rect(cx, 0, cx, cy)).Clone()
+        mats.mat(1) = padded(New cv.Rect(0, cy, cx, cy)).Clone()
+        mats.mat(0) = padded(New cv.Rect(cx, cy, cx, cy)).Clone()
+        mats.Run()
+        dst2 = mats.dst1
 
-            dst1 = inverseDFT(complexImage)
-        End If
+        dst1 = inverseDFT(complexImage)
     End Sub
 End Class
 

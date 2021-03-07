@@ -283,12 +283,12 @@ End Class
 Public Class Palette_DrawTest
     Inherits VBparent
     Dim palette As Palette_Basics
-    Dim draw As Draw_RngImage
+    Dim draw As Draw_Shapes
     Public Sub New()
         initParent()
         palette = New Palette_Basics()
 
-        draw = New Draw_RngImage()
+        draw = New Draw_Shapes()
         palette.src = dst1
 
         task.desc = "Experiment with palette using a drawn image"
