@@ -12,7 +12,7 @@ Public Class Download_Databases
         initParent()
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
-            radio.Setup(caller, 10)
+            radio.Setup(caller, 9)
             radio.check(0).Text = "Download the 1.7 Gb 300 Faces In-The-Wild database"
             radio.check(1).Text = "Download TensorFlow MobileNet-SSD v1"
             radio.check(2).Text = "Download TensorFlow MobileNet-SSD v1 PPN"
@@ -22,7 +22,6 @@ Public Class Download_Databases
             radio.check(6).Text = "Download TensorFlow Faster-RCNN Inception v2"
             radio.check(7).Text = "Download TensorFlow Faster-RCNN ResNet-50"
             radio.check(8).Text = "Download TensorFlow Mask-RCNN Inception v2"
-            radio.check(9).Text = "Download TensorFlow EfficientDet-D0"
             radio.check(6).Checked = True
         End If
 
