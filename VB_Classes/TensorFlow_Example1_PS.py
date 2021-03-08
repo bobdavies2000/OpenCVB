@@ -4,7 +4,7 @@ import cv2
 import tensorflow as tf
 titleWindow = 'TensorFlow_Example1_PS.py'
 from PyStream import PyStreamRun
-
+# https://github.com/IntelRealSense/librealsense/blob/master/wrappers/tensorflow/example1%20-%20object%20detection.py
 def OpenCVCode(color_image, depth32f, frameCount):
     global image_tensor, detection_boxes, detection_scores, detection_classes, num_detections, colors_hash
     width = color_image.shape[1]
