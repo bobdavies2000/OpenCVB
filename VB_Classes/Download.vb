@@ -23,6 +23,7 @@ Public Class Download_Databases
             radio.check(7).Text = "Download TensorFlow Faster-RCNN ResNet-50"
             radio.check(8).Text = "Download TensorFlow Mask-RCNN Inception v2"
             radio.check(9).Text = "Download TensorFlow EfficientDet-D0"
+            radio.check(6).Checked = True
         End If
 
         task.desc = "Multi-threaded (responsive) download of the iBug 300W face database.  Not using iBug yet but planning to..."

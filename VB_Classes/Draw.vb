@@ -631,7 +631,7 @@ Public Class Draw_Hexagon
         alpha.Show()
         alpha.Size = New System.Drawing.Size(src.Width + 10, src.Height + 10)
 
-        task.desc = "What it means to recognize a cube."
+        task.desc = "What it means to recognize a cube.  Zygmunt Pizlo UC Irvine"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me

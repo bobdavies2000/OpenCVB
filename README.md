@@ -3,12 +3,12 @@ Recent Changes – March 2021
 
 -   Almost 940 algorithms – almost all less than a page of code
 
--   Stream-lined install: no more environmental variables, library builds are
+-   Stream-lined install: no environmental variable, library builds are
     automated.
 
 -   Latest version of the OpenCV library - 4.5.2
 
--   Improved Python package support – now using requirements.txt
+-   Improved Python support – now using “requirements.txt”
 
 -   An experimental Python interface to the LibRealSense2 cameras has been added
 
