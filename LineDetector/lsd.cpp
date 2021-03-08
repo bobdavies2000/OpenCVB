@@ -2089,7 +2089,7 @@ ntuple_list lsd(image_double image)
 void writeNtl(ntuple_list ntl, wchar_t *file)
 {
     FILE *fp;
-    if ((fp = _wfopen(file, L"w")) == NULL)
+    if ((fp = _wfopen_s(file L"w")) == NULL)
     {
         printf("cannot open file\n");
         return;

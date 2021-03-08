@@ -67,19 +67,7 @@ Module fastLineDetector_Exports
     Public Function lineDetector_Lines() As IntPtr
     End Function
 
-
-
-    <DllImport(("lsd.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function lsd_scaleVB(image As IntPtr, rows As Integer, cols As Integer, scale As Double) As Integer
-    End Function
-    <DllImport(("lsd.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function lsd_lines() As IntPtr
-    End Function
-
-
-
-
-    Public Sub find3DLineSegment( dst2 As cv.Mat, _mask As cv.Mat, _depth32f As cv.Mat, aa As cv.Vec6f, maskLineWidth As Integer)
+    Public Sub find3DLineSegment(dst2 As cv.Mat, _mask As cv.Mat, _depth32f As cv.Mat, aa As cv.Vec6f, maskLineWidth As Integer)
         Dim pt1 = New cv.Point(aa(0), aa(1))
         Dim pt2 = New cv.Point(aa(2), aa(3))
         Dim centerPoint = New cv.Point((aa(0) + aa(2)) / 2, (aa(1) + aa(3)) / 2)
@@ -664,55 +652,5 @@ Public Class LineDetector_Depth
         mats.mat(1) = topView.dst1
         mats.Run()
         dst2 = mats.dst1
-    End Sub
-End Class
-
-
-
-
-
-
-
-' http://www.ipol.im/pub/art/2012/gjmr-lsd/
-' https://github.com/primetang/pylsd
-Public Class LineDetector_LSD
-    Inherits VBparent
-    Public Sub New()
-        initParent()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "LSD - Min Length (in pixels)", 1, 200, 30)
-        End If
-        task.desc = "Use the LSD.cpp line detector to find a list of lines"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        Dim input = src
-        dst1 = src
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim gray64 As New cv.Mat
-        input.ConvertTo(gray64, cv.MatType.CV_64F)
-        Dim scale As Double = 0.8
-
-        Dim data(gray64.Total * 8 - 1) As Byte
-        Marshal.Copy(gray64.Data, data, 0, data.Length)
-        Dim handle = GCHandle.Alloc(data, GCHandleType.Pinned)
-
-        Dim lineCount = lsd_scaleVB(handle.AddrOfPinnedObject, gray64.Rows, gray64.Cols, scale)
-        handle.Free()
-
-        Dim lines(lineCount * 5 - 1) As Double
-        Dim linePtr = lsd_lines()
-        If lineCount Then Marshal.Copy(linePtr, lines, 0, lines.Length)
-
-        Static minSlider = findSlider("LSD - Min Length (in pixels)")
-        Dim minLen As Double = CDbl(minSlider.value)
-        Dim distance As New cv.Mat
-        For i = 0 To lines.Count / 5 - 1 Step 5
-            Dim pt1 = New cv.Point(CInt(lines(i)), CInt(lines(i + 1)))
-            Dim pt2 = New cv.Point(CInt(lines(i + 2)), CInt(lines(i + 3)))
-            If pt1.DistanceTo(pt2) > minLen Then dst1.Line(pt1, pt2, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
-        Next
     End Sub
 End Class
