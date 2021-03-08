@@ -22,32 +22,32 @@ Partial Class AlphaChannelFrm
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.AlphaPic = New System.Windows.Forms.PictureBox()
-        CType(Me.AlphaPic, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.imagePic = New System.Windows.Forms.PictureBox()
+        CType(Me.imagePic, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
-        'AlphaPic
+        'imagePic
         '
-        Me.AlphaPic.Location = New System.Drawing.Point(3, 4)
-        Me.AlphaPic.Name = "AlphaPic"
-        Me.AlphaPic.Size = New System.Drawing.Size(1195, 394)
-        Me.AlphaPic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize
-        Me.AlphaPic.TabIndex = 0
-        Me.AlphaPic.TabStop = False
+        Me.imagePic.Location = New System.Drawing.Point(3, 4)
+        Me.imagePic.Name = "imagePic"
+        Me.imagePic.Size = New System.Drawing.Size(1195, 394)
+        Me.imagePic.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize
+        Me.imagePic.TabIndex = 0
+        Me.imagePic.TabStop = False
         '
         'AlphaChannelFrm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1440, 997)
-        Me.Controls.Add(Me.AlphaPic)
+        Me.Controls.Add(Me.imagePic)
         Me.Name = "AlphaChannelFrm"
         Me.Text = "OptionsAlphaBlend"
-        CType(Me.AlphaPic, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.imagePic, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
 
-    Friend WithEvents AlphaPic As Windows.Forms.PictureBox
+    Friend WithEvents imagePic As Windows.Forms.PictureBox
 End Class

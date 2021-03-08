@@ -25,7 +25,8 @@ laplacian=np.array([[0, 1, 0],
                     [1,-4, 1],
                     [0, 1, 0]])
 filters = [mean_filter, gaussian, laplacian, sobel_x, sobel_y, scharr]
-filter_name = ['mean_filter', 'gaussian','laplacian', 'sobel_x', 'sobel_y', 'scharr_x']
+filter_name = ['mean_filter', 'gaussian','laplacian', 'sobel_x', \
+                'sobel_y', 'scharr_x']
 fft_filters = [np.fft.fft2(x) for x in filters]
 fft_shift = [np.fft.fftshift(y) for y in fft_filters]
 mag_spectrum = [np.log(np.abs(z)+1) for z in fft_shift]

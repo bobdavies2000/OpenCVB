@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-
+Imports System.Drawing
 Module Draw_Exports
     Dim rng As System.Random
     Public Sub drawRotatedRectangle(rotatedRect As cv.RotatedRect, dst1 As cv.Mat, color As cv.Scalar)
@@ -615,3 +615,25 @@ Public Class Draw_Intersection
     End Sub
 End Class
 
+
+
+
+
+
+
+' http://www3.psych.purdue.edu/~zpizlo/GestaltCube
+Public Class Draw_Hexagon
+    Inherits VBparent
+    Dim alpha As New AlphaChannelFrm
+    Public Sub New()
+        initParent()
+        alpha.imagePic.Image = Image.FromFile(ocvb.parms.homeDir + "Data/GestaltCube.gif")
+        alpha.Show()
+        alpha.Size = New System.Drawing.Size(src.Width + 10, src.Height + 10)
+
+        task.desc = "What it means to recognize a cube."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+    End Sub
+End Class

@@ -224,3 +224,109 @@ Public Class DFT_ButterworthDepth
     End Sub
 End Class
 
+
+
+
+
+
+
+
+
+
+
+
+Public Class DFT_Shapes
+    Inherits VBparent
+    Dim dft As DFT_Basics
+    Dim circle As Draw_Circles
+    Dim ellipse As Draw_Ellipses
+    Dim polygon As Draw_Polygon
+    Dim rectangle As Rectangle_Basics
+    Dim lines As Draw_Line
+    Dim symShapes As Draw_SymmetricalShapes
+    Public Sub New()
+        initParent()
+        dft = New DFT_Basics
+
+        circle = New Draw_Circles
+        ellipse = New Draw_Ellipses
+        polygon = New Draw_Polygon
+        rectangle = New Rectangle_Basics
+        lines = New Draw_Line
+        symShapes = New Draw_SymmetricalShapes
+
+        Dim circleSlider = findSlider("Circle Count")
+        circleSlider.Value = 1
+        Dim ellipseSlider = findSlider("Ellipse Count")
+        ellipseSlider.Value = 1
+        Dim polySlider = findSlider("Polygon Count")
+        polySlider.Value = 1
+        Dim rectangleSlider = findSlider("Rectangle Count")
+        rectangleSlider.Value = 1
+        Dim lineslider = findSlider("Line Count")
+        lineslider.Value = 1
+
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 7)
+            radio.check(0).Text = "Draw Circle"
+            radio.check(1).Text = "Draw Ellipse"
+            radio.check(2).Text = "Draw Rectangle"
+            radio.check(3).Text = "Draw Polygon"
+            radio.check(4).Text = "Draw Line"
+            radio.check(5).Text = "Draw Symmetrical Shapes"
+            radio.check(6).Text = "Draw Point"
+            radio.check(0).Checked = True
+        End If
+
+        label1 = "Input to the DFT"
+        label2 = "Discrete Fourier Transform Output"
+        task.desc = "Show the spectrum magnitude for some standard shapes. Painterly"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Static circleRadio = findRadio("Draw Circle")
+        Static ellipseRadio = findRadio("Draw Ellipse")
+        Static lineRadio = findRadio("Draw Line")
+        Static rectangleRadio = findRadio("Draw Rectangle")
+        Static polygonRadio = findRadio("Draw Polygon")
+        Static symShapeRadio = findRadio("Draw Symmetrical Shapes")
+        Static pointRadio = findRadio("Draw Point")
+
+        If circleRadio.checked Then
+            circle.Run()
+            dst1 = circle.dst1
+        ElseIf ellipseRadio.checked Then
+            ellipse.Run()
+            dst1 = ellipse.dst1
+        ElseIf rectangleRadio.checked Then
+            rectangle.Run()
+            dst1 = rectangle.dst1
+        ElseIf polygonRadio.checked Then
+            polygon.Run()
+            dst1 = polygon.dst1
+        ElseIf symShapeRadio.checked Then
+            symShapes.Run()
+            dst1 = symShapes.dst1
+        ElseIf lineRadio.checked Then
+            lines.Run()
+            dst1 = lines.dst1
+        ElseIf pointRadio.checked Then
+            If ocvb.frameCount Mod 30 = 0 Then
+                dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+                Dim pt1 = New cv.Point(msRNG.Next(0, dst1.Width / 10), msRNG.Next(0, dst1.Height / 10))
+                Dim pt2 = New cv.Point(msRNG.Next(0, dst1.Width / 10), msRNG.Next(0, dst1.Height / 10))
+                dst1.Set(Of Byte)(pt1.Y, pt1.X, 255)
+                dst1.Set(Of Byte)(pt2.Y, pt2.X, 255)
+                label1 = "pt1 = (" + CStr(pt1.X) + "," + CStr(pt1.Y) + ")  pt2 = (" + CStr(pt2.X) + "," + CStr(pt2.Y) + ")"
+            End If
+        End If
+
+        dft.src = dst1
+        dft.Run()
+        dst2 = dft.dst2
+
+        ' uncomment the following line to view the inverse of the DFT transform.  It is the grayscale image of the input - no surprise.  It works!
+        ' dst1 = inverseDFT(dft.complexImage)
+    End Sub
+End Class

@@ -260,10 +260,10 @@
     <Compile Include="OilPaint.vb" />
     <Compile Include="OpenGL.vb" />
     <Compile Include="OpticalFlow.vb" />
-    <Compile Include="AlphaChannelFrm.Designer.vb">
-      <DependentUpon>AlphaChannelFrm.vb</DependentUpon>
+    <Compile Include="imageForm.Designer.vb">
+      <DependentUpon>imageForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="AlphaChannelFrm.vb">
+    <Compile Include="imageForm.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="OptionsCombo.Designer.vb">
@@ -357,8 +357,8 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="AlphaChannelFrm.resx">
-      <DependentUpon>AlphaChannelFrm.vb</DependentUpon>
+    <EmbeddedResource Include="imageForm.resx">
+      <DependentUpon>imageForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsCheckbox.resx">
       <DependentUpon>OptionsCheckbox.vb</DependentUpon>
@@ -398,6 +398,8 @@
     <Content Include="FAST_ANMS.py" />
     <Content Include="FAST_ANMS_PS.py" />
     <Content Include="DNN_Inception_PS.py" />
+    <Content Include="Filter_LowPass.py" />
+    <Content Include="FourierTransforms.py" />
     <Content Include="LibRealSense_Align.py" />
     <Content Include="BGSubtract_KNN_PS.py" />
     <Content Include="BGSubtract_MOG2_PS.py" />

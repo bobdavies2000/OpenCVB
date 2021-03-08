@@ -20,7 +20,7 @@ Public Class AlphaChannel_Basics
         Dim split = src.Split()
         split(3) = task.inrange.depthMask
         cv.Cv2.Merge(split, src)
-        alpha.AlphaPic.Image = cvext.BitmapConverter.ToBitmap(src, System.Drawing.Imaging.PixelFormat.Format32bppArgb)
+        alpha.imagePic.Image = cvext.BitmapConverter.ToBitmap(src, System.Drawing.Imaging.PixelFormat.Format32bppArgb)
     End Sub
 End Class
 
