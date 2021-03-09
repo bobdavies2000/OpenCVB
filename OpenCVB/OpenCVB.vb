@@ -797,11 +797,9 @@ Public Class OpenCVB
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
         If AvailableAlgorithms.Enabled Then
             If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e) ' if paused, then restart.
-            If OpenCVkeyword.Text <> "" Then
-                SaveSetting("OpenCVB", OpenCVkeyword.Text, OpenCVkeyword.Text, AvailableAlgorithms.Text)
-                StartAlgorithmTask()
-                updateRecentList()
-            End If
+            SaveSetting("OpenCVB", OpenCVkeyword.Text, OpenCVkeyword.Text, AvailableAlgorithms.Text)
+            StartAlgorithmTask()
+            updateRecentList()
         End If
     End Sub
     Private Sub updatePath(neededDirectory As String, notFoundMessage As String)
