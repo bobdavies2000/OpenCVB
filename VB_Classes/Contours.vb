@@ -373,6 +373,8 @@ Public Class Contours_Binarized
         Dim kernelSlider = findSlider("Sobel kernel Size")
         kernelSlider.Value = 3
 
+        label1 = "Sobel output of grayscale input"
+        label2 = "DrawContours output after FindContours"
         task.desc = "Find contours using Edges after image is binarized"
     End Sub
     Public Sub Run()

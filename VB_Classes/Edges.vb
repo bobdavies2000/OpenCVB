@@ -809,13 +809,22 @@ Public Class Edges_Sobel
     Public grayX As cv.Mat
     Public grayY As cv.Mat
     Public horizontalOnly As Boolean
+    Dim addw As AddWeighted_Basics
     Public Sub New()
         initParent()
+        addw = New AddWeighted_Basics
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Sobel kernel Size", 1, 32, 3)
             sliders.setupTrackBar(1, "Threshold to zero pixels below this value", 0, 255, 100)
         End If
+
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Threshold Sobel Results"
+            check.Box(0).Checked = True
+        End If
+
         task.desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
     Public Sub Run()
@@ -826,15 +835,19 @@ Public Class Edges_Sobel
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         grayX = src.Sobel(cv.MatType.CV_32F, 1, 0, kernelSize)
         If horizontalOnly = False Then
-            Dim abs_grayX = grayX.ConvertScaleAbs()
             grayY = src.Sobel(cv.MatType.CV_32F, 0, 1, kernelSize)
-            Dim abs_grayY = grayY.ConvertScaleAbs()
-            cv.Cv2.AddWeighted(abs_grayX, 0.5, abs_grayY, 0.5, 0, dst1)
+            addw.src = grayX
+            addw.src2 = grayY
+            addw.Run()
+            dst1 = addw.dst1.ConvertScaleAbs()
         Else
             dst1 = grayX.ConvertScaleAbs()
         End If
-        Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
-        dst1 = dst1.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Tozero).Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
+        Static thresholdCheck = findCheckBox("Threshold Sobel Results")
+        If thresholdCheck.checked Then
+            Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
+            dst1 = dst1.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Tozero).Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
+        End If
     End Sub
 End Class
 
@@ -1156,7 +1169,9 @@ Public Class Edges_RGB
     Public Sub New()
         initParent()
         sobel = New Edges_Sobel
-        task.desc = "Combine the edges from all 3 channels."
+        Dim thresholdCheck = findCheckBox("Threshold Sobel Results")
+        thresholdCheck.Checked = False
+        task.desc = "Combine the edges from all 3 channels.  Painterly"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -1193,7 +1208,7 @@ Public Class Edges_HSV
         edges = New Edges_RGB
         Dim thresholdSlider = findSlider("Threshold to zero pixels below this value")
         thresholdSlider.Value = 25
-        task.desc = "Combine the edges from all 3 HSV channels."
+        task.desc = "Combine the edges from all 3 HSV channels.  Painterly"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
