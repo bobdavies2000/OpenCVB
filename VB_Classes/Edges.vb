@@ -33,6 +33,9 @@ End Class
 
 
 
+
+
+
 Public Class Edges_DepthAndColor
     Inherits VBparent
     Dim shadow As Depth_Holes
@@ -68,6 +71,8 @@ Public Class Edges_DepthAndColor
         dst1 = dilate.dst1
     End Sub
 End Class
+
+
 
 
 
@@ -127,6 +132,9 @@ End Class
 
 
 
+
+
+
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
 Public Class Edges_Preserving
     Inherits VBparent
@@ -166,6 +174,9 @@ End Class
 
 
 
+
+
+
 Module Edges_Exports
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Edges_RandomForest_Open(modelFileName As String) As IntPtr
@@ -176,7 +187,21 @@ Module Edges_Exports
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Edges_RandomForest_Run(Edges_RandomForestPtr As IntPtr, inputPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
     End Function
+
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Edges_Deriche_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub Edges_Deriche_Close(Edges_DerichePtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Edges_Deriche_Run(Edges_DerichePtr As IntPtr, rgbPtr As IntPtr, rows As Integer, cols As Integer, alpha As Single, omega As Single) As IntPtr
+    End Function
 End Module
+
+
+
+
 
 
 
@@ -224,9 +249,6 @@ End Class
 
 
 
-
-
-
 Public Class Edges_ResizeAdd
     Inherits VBparent
     Public Sub New()
@@ -252,6 +274,9 @@ Public Class Edges_ResizeAdd
         cv.Cv2.Add(gray, dst1, dst2)
     End Sub
 End Class
+
+
+
 
 
 
@@ -289,20 +314,6 @@ End Class
 
 
 
-
-
-
-Module Edges_Deriche_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edges_Deriche_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Edges_Deriche_Close(Edges_DerichePtr As IntPtr)
-    End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edges_Deriche_Run(Edges_DerichePtr As IntPtr, rgbPtr As IntPtr, rows As Integer, cols As Integer, alpha As Single, omega As Single) As IntPtr
-    End Function
-End Module
 
 
 
@@ -1129,5 +1140,57 @@ Public Class Edges_MotionOverlay
         dst2 = diff.dst2
         dst2.SetTo(0, task.inrange.noDepthMask)
         label1 = "Src offset (x,y) = (" + CStr(xDisp) + "," + CStr(yDisp) + ")"
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://scikit-image.org/docs/dev/auto_examples/color_exposure/plot_adapt_rgb.html#sphx-glr-auto-examples-color-exposure-plot-adapt-rgb-py
+Public Class Edges_RGB
+    Inherits VBparent
+    Dim sobel As Edges_Sobel
+    Public Sub New()
+        initParent()
+        sobel = New Edges_Sobel
+        task.desc = "Combine the edges from all 3 channels."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        Dim split = src.Split()
+        For i = 0 To 3 - 1
+            sobel.src = split(i)
+            sobel.Run()
+            split(i) = 255 - sobel.dst1
+        Next
+        cv.Cv2.Merge(split, dst1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://scikit-image.org/docs/dev/auto_examples/color_exposure/plot_adapt_rgb.html#sphx-glr-auto-examples-color-exposure-plot-adapt-rgb-py
+Public Class Edges_HSV
+    Inherits VBparent
+    Dim edges As Edges_RGB
+    Public Sub New()
+        initParent()
+        edges = New Edges_RGB
+        task.desc = "Combine the edges from all 3 HSV channels."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        edges.src = hsv
+        edges.Run()
+        dst1 = edges.dst1
     End Sub
 End Class

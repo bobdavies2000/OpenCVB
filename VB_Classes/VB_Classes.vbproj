@@ -395,6 +395,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Edges_RGBHSV_PS.py" />
     <Content Include="FAST_ANMS.py" />
     <Content Include="FAST_ANMS_PS.py" />
     <Content Include="DNN_Inception_PS.py" />
