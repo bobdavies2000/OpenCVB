@@ -164,7 +164,7 @@ Public Class VBparent : Implements IDisposable
         src.Dispose()
         dst1.Dispose()
         dst2.Dispose()
-        If task.pixelViewerOn Then task.PixelViewer.closeViewer()
+        '  If task.pixelViewerOn Then task.PixelViewer.closeViewer()
     End Sub
 
     Public Const QUAD0 = 0 ' there are 4 images to the user interface when using Mat_4to1.

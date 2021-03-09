@@ -1066,8 +1066,10 @@ Public Class OpenCVB
         StartAlgorithmTask()
     End Sub
     Private Sub StartAlgorithmTask()
+        Dim currentAlgorithm = saveAlgorithmName
         saveAlgorithmName = AvailableAlgorithms.Text ' this tells the algorithmTask to terminate.
         If algorithmTaskHandle IsNot Nothing Then
+            Dim loopCount As Integer = 0
             While algorithmTaskHandle IsNot Nothing
                 Application.DoEvents()
                 If stopCameraThread Then Exit Sub  ' If the app is shutting down.

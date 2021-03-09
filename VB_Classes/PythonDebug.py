@@ -1,16 +1,32 @@
-import sys
-import cv2 as cv
 import numpy as np
+import cv2 as cv
+import sys
 from PyStream import PyStreamRun
-titleWindow = 'Filter_2D_PS.py'
+from PyStream import getDrawRect
+
+titleWindow = "MultiTracker_PS.py"
+# https://docs.opencv.org/3.4/d8/d77/classcv_1_1MultiTracker.html
+
+cv.namedWindow(titleWindow)
+tracker = cv.legacy.MultiTracker_create()
+saveRect = (0, 0, 0, 0)
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
-    ddepth = -1
-    kernel_size = 3 + 2 * (int(frameCount) % 5)
-    kernel = np.ones((kernel_size, kernel_size), dtype=np.float32)
-    kernel /= (kernel_size * kernel_size)
-    dst1 = cv.filter2D(imgRGB, ddepth, kernel)
-    dst2 = cv.filter2D(depth32f, ddepth, kernel)
-    return dst1, np.asarray(dst2, dtype=np.uint8)
+    global saveRect
+    drawRect = getDrawRect()
+    if saveRect != drawRect :
+        ok = tracker.add(cv.TrackerMIL_create(), imgRGB, drawRect)
+        saveRect = drawRect
+
+    ok, boxes = tracker.update(imgRGB)
+
+    for newbox in boxes:
+        p1 = (int(newbox[0]), int(newbox[1]))
+        p2 = (int(newbox[0] + newbox[2]), int(newbox[1] + newbox[3]))
+        cv.rectangle(imgRGB, p1, p2, (200,0,0))
+
+    cv.imshow(titleWindow, imgRGB)
+    if saveRect == (0, 0, 0, 0): cv.putText(imgRGB, "Draw here to select an object to track", (40,100), cv.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50),2)
+    return imgRGB, None
 
 PyStreamRun(OpenCVCode, titleWindow)
