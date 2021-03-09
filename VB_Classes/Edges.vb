@@ -1161,7 +1161,14 @@ Public Class Edges_RGB
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Dim split = src.Split()
+        Dim img32f As New cv.Mat
+        src.ConvertTo(img32f, cv.MatType.CV_32FC3)
+        Dim split = img32f.Split()
+        For i = 0 To 3 - 1
+            split(i) = split(i).Normalize(0, 255, cv.NormTypes.MinMax)
+        Next
+        cv.Cv2.Merge(split, img32f)
+        img32f.ConvertTo(dst1, cv.MatType.CV_8UC3)
         For i = 0 To 3 - 1
             sobel.src = split(i)
             sobel.Run()
@@ -1184,6 +1191,8 @@ Public Class Edges_HSV
     Public Sub New()
         initParent()
         edges = New Edges_RGB
+        Dim thresholdSlider = findSlider("Threshold to zero pixels below this value")
+        thresholdSlider.Value = 25
         task.desc = "Combine the edges from all 3 HSV channels."
     End Sub
     Public Sub Run()
