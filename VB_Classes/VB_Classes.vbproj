@@ -450,7 +450,6 @@
     <Content Include="Threshold_inRange_PS.py" />
     <Content Include="TrackerPlane_AugmentedReality_PS.py" />
     <Content Include="TrackerPlane_PS.py" />
-    <Content Include="TrackerMultiObject_PS.py" />
     <Content Include="OpticalFlow2_PS.py" />
     <Content Include="Tracker_MOSSE_PS.py" />
     <Content Include="SVM_Digits_PS.py" />
