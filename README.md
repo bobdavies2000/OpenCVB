@@ -33,11 +33,19 @@ than a page of code and uses a familiar language. And each algorithm is *just
 the algorithm* without the baggage from a user interface or environment. New
 algorithms can reuse existing algorithms and build variations and combinations.
 
+A full installation can take about 30-50 minutes using the 1-step
+“PrepareTree.bat” file discussed below. But there is no obligation to install
+all the libraries to just read the code for an algorithm. Open the OpenCVB.sln
+file after download and inspect the code in the VB_Classes (which includes all
+the Python examples), CPP_Classes, or CS_Classes. All algorithms are
+automatically provided color, depth, and point cloud along with IMU data as
+input and there are usually just 2 outputs – dst1 and dst2.
+
 In the sample output below, any of the algorithms can be selected from the first
 combo box at the top of the form. The second combo box is used to select
 algorithms grouped by OpenCV API or OpenCVB algorithm. The default grouping is
-to select “\<All\>” algorithms while other special groupings allow selecting
-“\<Python\>” or “\<C++\>” algorithms.
+to select “\<All\>” algorithms while other special groupings allow selecting all
+Python or C++ algorithms.
 
 ![](media/0094dd80a047099af3fa5ecf92dee723.png)
 
@@ -144,11 +152,14 @@ Before You Start
 You should be familiar with the following software. Each is free and easily
 downloaded for Windows 10:
 
--   Microsoft Visual Studio 2019 Community Edition (Free)
+-   Microsoft Visual Studio 2019 Community Edition
 
     -   Download: <https://visualstudio.microsoft.com/downloads/>
 
     -   Be sure to install the latest Python that comes with Visual Studio
+
+    -   Check that MSBuild is in the path. It is needed for the 1-step
+        “PrepareTree.bat” install.
 
 -   CMAKE 3.0 or later
 
@@ -169,8 +180,8 @@ then open and run the OpenCVB.sln file.
 
 -   Run the “PrepareTree.bat” script that comes with OpenCVB. It will download
     and run CMake for needed libraries. After building it will occupy about 18Gb
-    of disk space – plan accordingly. The process takes 20-40 minutes to
-    download/configure/build.
+    of disk space – plan accordingly. The process can take 30-50 minutes to
+    download/configure/build on some systems.
 
 -   Download the Kinect4Azure proprietary binaries:
 
@@ -243,9 +254,9 @@ Building New Experiments With Snippets
 ======================================
 
 OpenCVB is a WinForms application and most of the algorithms were written using
-Microsoft's managed code but C++ any Python examples are provided as well.
+Microsoft's managed code but C++ and Python examples are provided as well.
 Python examples don’t require a VB.Net wrapper. There are several VB.Net
-examples that demonstrate how to move images to Python and get them back into
+examples that demonstrate how to move images to Python and get results back into
 the OpenCVB user interface (see AddWeighted_Trackbar_PS.py as an example that is
 only a few lines of code.)
 

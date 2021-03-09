@@ -491,7 +491,7 @@
     <Content Include="DFT_Example2.py" />
     <Content Include="Distance_LabeledTransform.py" />
     <Content Include="EqualizeHist_Demo.py" />
-    <Content Include="Filter_2D.py" />
+    <Content Include="Filter_2D_PS.py" />
     <Content Include="Contours_Demo3.py" />
     <Content Include="Contours_Draw.py" />
     <Content Include="Fitline.py" />
