@@ -54,7 +54,7 @@ Public Class VBparent : Implements IDisposable
     End Sub
     Public Sub NextFrame()
         If standalone Or task.intermediateReview = caller Then src = task.color
-        If task.depth32f.Width <> dst1.Width Or task.depth32f.Width <> src.Width Then
+        If task.depth32f.Size <> dst1.Size Or task.depth32f.Size <> src.Size Then
             src = src.Resize(task.depth32f.Size)
             dst1 = New cv.Mat(task.depth32f.Size(), cv.MatType.CV_8UC3)
             dst2 = New cv.Mat(task.depth32f.Size(), cv.MatType.CV_8UC3)
