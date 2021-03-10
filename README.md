@@ -36,16 +36,16 @@ algorithms can reuse existing algorithms and build variations and combinations.
 A full installation can take about 30-50 minutes using the 1-step
 “PrepareTree.bat” file discussed below. But there is no obligation to install
 all the libraries to just read the code for an algorithm. Open the OpenCVB.sln
-file after download and inspect the code in the VB_Classes (which includes all
-the Python examples), CPP_Classes, or CS_Classes. All algorithms are
-automatically provided color, depth, and point cloud along with IMU data as
-input and there are usually just 2 outputs – dst1 and dst2.
+file after download and inspect the code in the VB_Classes (which includes
+VB.Net and Python examples), CPP_Classes, or CS_Classes. All algorithms are
+automatically provided with color, depth, point cloud, and IMU data and there
+are usually just 2 outputs – dst1 and dst2.
 
 In the sample output below, any of the algorithms can be selected from the first
 combo box at the top of the form. The second combo box is used to select
 algorithms grouped by OpenCV API or OpenCVB algorithm. The default grouping is
-to select “\<All\>” algorithms while other special groupings allow selecting all
-Python or C++ algorithms.
+to select the special grouping “\<All\>” while other special groupings allow
+selecting all Python or C++ algorithms.
 
 ![](media/0094dd80a047099af3fa5ecf92dee723.png)
 
