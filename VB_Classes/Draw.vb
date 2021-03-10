@@ -624,13 +624,13 @@ End Class
 ' http://www3.psych.purdue.edu/~zpizlo/GestaltCube
 Public Class Draw_Hexagon
     Inherits VBparent
-    Dim alpha As New AlphaChannelFrm
+    Dim alpha As New imageForm
     Public Sub New()
         initParent()
         alpha.imagePic.Image = Image.FromFile(ocvb.parms.homeDir + "Data/GestaltCube.gif")
         alpha.Show()
         alpha.Size = New System.Drawing.Size(src.Width + 10, src.Height + 10)
-
+        alpha.Text = "Perception is the key"
         task.desc = "What it means to recognize a cube.  Zygmunt Pizlo UC Irvine"
     End Sub
     Public Sub Run()

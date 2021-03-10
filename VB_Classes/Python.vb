@@ -42,7 +42,11 @@ Module Python_Module
             If ocvb.parms.ShowConsoleLog = False Then p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
             If p.Start() = False Then MsgBox("The Python script " + pythonApp.Name + " failed to start")
         Else
-            ocvb.trueText(pythonApp.FullName + " is missing.")
+            If pythonApp.Name.EndsWith("Python_MemMap") Or pythonApp.Name.EndsWith("Python_Run") Then
+                ocvb.trueText(pythonApp.Name + " is a support algorithm for PyStream apps.")
+            Else
+                ocvb.trueText(pythonApp.FullName + " is missing.")
+            End If
             Return False
         End If
         Return True
@@ -242,65 +246,6 @@ Public Class Python_Stream
                 On Error Resume Next
                 pipeOut.Write(rgbBuffer, 0, rgbBuffer.Length)
                 pipeOut.Write(depthBuffer, 0, depthBuffer.Length)
-                pipeIn.Read(dst1Buffer, 0, dst1Buffer.Length)
-                pipeIn.Read(dst2Buffer, 0, dst2Buffer.Length)
-            End If
-            Marshal.Copy(dst1Buffer, 0, dst1.Data, dst1Buffer.Length)
-            Marshal.Copy(dst2Buffer, 0, dst2.Data, dst2Buffer.Length)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Python_Stream1
-    Inherits VBparent
-    Dim pipeName As String
-    Dim pipeIn As NamedPipeServerStream
-    Dim dst1Buffer(1) As Byte
-    Dim dst2Buffer(1) As Byte
-    Dim pythonReady As Boolean
-    Dim memMap As Python_MemMap
-    Public Sub New()
-        initParent()
-        pipeName = "PyStreamResults" + CStr(PipeTaskIndex)
-        pipeIn = New NamedPipeServerStream(pipeName, PipeDirection.In)
-        PipeTaskIndex += 1
-
-        ' Was this class invoked standalone?  Then just run something that works with RGB and depth...
-        If ocvb.pythonTaskName.EndsWith("Python_Stream") Then
-            ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/BG_Subtract_PS1.py"
-        End If
-
-        memMap = New Python_MemMap()
-
-        If ocvb.parms.externalPythonInvocation Then
-            pythonReady = True ' python was already running and invoked OpenCVB.
-        Else
-            pythonReady = StartPython("--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
-        End If
-        If pythonReady Then pipeIn.WaitForConnection()
-        task.desc = "General purpose class to invoke a Python script and get the outputs - dst1 and dst2 - back."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If pythonReady Then
-            For i = 0 To memMap.memMapValues.Length - 1
-                memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, dst1.Total * dst1.ElemSize,
-                                                dst2.Total * dst2.ElemSize, dst1.Rows, dst1.Cols,
-                                                task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height)
-            Next
-            memMap.Run()
-
-            If dst1Buffer.Length <> dst1.Total * dst1.ElemSize Then ReDim dst1Buffer(dst1.Total * dst1.ElemSize - 1)
-            If dst2Buffer.Length <> dst2.Total * dst2.ElemSize Then ReDim dst2Buffer(dst2.Total * dst2.ElemSize - 1)
-            If pipeIn.IsConnected Then
-                On Error Resume Next
                 pipeIn.Read(dst1Buffer, 0, dst1Buffer.Length)
                 pipeIn.Read(dst2Buffer, 0, dst2Buffer.Length)
             End If

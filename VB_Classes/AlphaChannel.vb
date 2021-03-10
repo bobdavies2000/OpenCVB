@@ -4,7 +4,7 @@ Imports cvext = OpenCvSharp.Extensions
 ' https://docs.microsoft.com/en-us/dotnet/api/system.drawing.bitmap.maketransparent?view=dotnet-plat-ext-3.1
 Public Class AlphaChannel_Basics
     Inherits VBparent
-    Dim alpha As New AlphaChannelFrm
+    Dim alpha As New imageForm
     Public Sub New()
         initParent()
 
