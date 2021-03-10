@@ -505,7 +505,7 @@
     <Content Include="Hist.py" />
     <Content Include="Hit_miss.py" />
     <Content Include="SVM_HOG.py" />
-    <Content Include="Hough_example4.py" />
+    <Content Include="Hough_example4_PS.py" />
     <Content Include="Hough_example5.py" />
     <Content Include="Hough_example2.py" />
     <Content Include="Hough_example3.py" />
