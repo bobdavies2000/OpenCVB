@@ -24,6 +24,10 @@ Recent Changes – March 2021
 -   Tensorflow database downloads are automated with algorithm
     “Download_Database”
 
+-   Emgu examples removed. LineDetector library removed – it was redundant
+
+-   Version 1.0.0 defined and released
+
 Introduction
 ============
 
@@ -577,25 +581,13 @@ Continuous Release
 ==================
 
 Evolution would have been easier for Darwin to discover if nature had provided
-versioning. Software applications always have a version identifier but OpenCVB
-is attempting something different. Older algorithms are not deleted but carried
-forward as new algorithms appear and improve. The core infrastructure is
-functional enough to support all algorithms, old and new, and continuous testing
-ensures that all algorithms are supported equally.
-
-What this means is that The Repository IS The Release – TRISTR. If there is a
-problem with a recent download, it is just a few seconds to “Sync” with the
-repository, rebuild the OpenCVB.sln, and test again. OpenCVB is closely tracking
-new versions of all components so if problems persist, it may be useful to take
-the time to upgrade to the latest with “PrepareTree.bat”. There can certainly be
-problems with the infrastructure, but the greater likelihood is that only
-recently added algorithms will have deficiencies. The value of avoiding
-versioning is that issues will produce fixes that will flow immediately into the
-repository.
-
-It is a lot simpler for a small project like OpenCVB to have just one release
-that is in focus. If there is interest, a versioning system is not hard to
-implement.
+versioning. Software applications always have a version identifier and OpenCVB
+is no different. Every effort is made to make sure that the released version is
+working but if not, the repository version is the one getting all the testing.
+Test with the repository version before posting with an issue. OpenCVB is a
+small project and only repository version is really maintained. If there is a
+problem with a released version, it is a good idea to just download the latest
+repository and test again.
 
 How to Contribute
 =================
