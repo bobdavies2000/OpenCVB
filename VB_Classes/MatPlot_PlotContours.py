@@ -1,4 +1,4 @@
-"""
+﻿"""
 =========================
 Frontpage contour example
 =========================
@@ -8,9 +8,22 @@ This example reproduces the frontpage contour example.
 
 import matplotlib.pyplot as plt
 import numpy as np
-from MatPlot_Legacy import bivariate_norm
 from matplotlib import mlab, cm
+def bivariate_normal(X, Y, sigmax=1.0, sigmay=1.0,
+                     mux=0.0, muy=0.0, sigmaxy=0.0):
+    """
+    Bivariate Gaussian distribution for equal shape *X*, *Y*.
+    See `bivariate normal
+    <http://mathworld.wolfram.com/BivariateNormalDistribution.html>`_
+    at mathworld.
+    """
+    Xmu = X-mux
+    Ymu = Y-muy
 
+    rho = sigmaxy/(sigmax*sigmay)
+    z = Xmu**2/sigmax**2 + Ymu**2/sigmay**2 - 2*rho*Xmu*Ymu/(sigmax*sigmay)
+    denom = 2*np.pi*sigmax*sigmay*np.sqrt(1-rho**2)
+    return np.exp(-z/(2*(1-rho**2))) / denom
 
 extent = (-3, 3, -3, 3)
 
@@ -33,4 +46,5 @@ ax.set_xlim(-3, 3)
 ax.set_ylim(-3, 3)
 ax.set_xticks([])
 ax.set_yticks([])
+#fig.savefig("../Data/contour_frontpage.png", dpi=25)  # results in 160x120 px image
 plt.show()

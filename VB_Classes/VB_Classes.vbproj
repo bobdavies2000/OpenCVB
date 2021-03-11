@@ -408,6 +408,8 @@
     <Content Include="Camshift1_PS.py" />
     <Content Include="DFT_PS.py" />
     <Content Include="LibRealSense_NoAlign.py" />
+    <Content Include="MatPlot_Animate.py" />
+    <Content Include="MatPlot_PlotContours.py" />
     <Content Include="PutText_PS.py" />
     <Content Include="AddWeighted_PS.py" />
     <Content Include="BGSubtract.py" />
