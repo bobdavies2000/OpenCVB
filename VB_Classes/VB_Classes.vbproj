@@ -263,9 +263,7 @@
     <Compile Include="imageForm.Designer.vb">
       <DependentUpon>imageForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="imageForm.vb">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="imageForm.vb" />
     <Compile Include="OptionsCombo.Designer.vb">
       <DependentUpon>OptionsCombo.vb</DependentUpon>
     </Compile>
@@ -408,8 +406,10 @@
     <Content Include="Camshift1_PS.py" />
     <Content Include="DFT_PS.py" />
     <Content Include="LibRealSense_NoAlign.py" />
-    <Content Include="MatPlot_Animate.py" />
-    <Content Include="MatPlot_PlotContours.py" />
+    <Content Include="MPL_Animate.py" />
+    <Content Include="MPL_Histogram.py" />
+    <Content Include="MPL_Histogram_PS.py" />
+    <Content Include="MPL_PlotContours_PS.py" />
     <Content Include="PutText_PS.py" />
     <Content Include="AddWeighted_PS.py" />
     <Content Include="BGSubtract.py" />

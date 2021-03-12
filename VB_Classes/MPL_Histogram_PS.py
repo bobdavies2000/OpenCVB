@@ -1,4 +1,4 @@
-#https://matplotlib.org/2.0.2/examples/animation/histogram.html
+﻿#https://matplotlib.org/2.0.2/examples/animation/histogram.html
 import numpy as np
 from PyStream import PyStreamRun
 import cv2 as cv
@@ -46,13 +46,14 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
 
     buf = io.BytesIO()
     plt.savefig(buf, format='rgba', dpi=100)
+
     img_byte_arr = buf.getvalue()
-    rgbaSize = imgRGB.shape[0], imgRGB.shape[1], 4
+    rgbaSize = 480, 640, 4 
     tmp = np.array(np.frombuffer(img_byte_arr, np.uint8).reshape(rgbaSize)) 
     tmp = cv.cvtColor(tmp, cv.COLOR_RGBA2BGR)
+    tmp = cv.resize(tmp, (imgRGB.shape[0], imgRGB.shape[1]))
     buf.close()
     plt.close()
-    #fig.savefig("../Data/contour_frontpage.png", dpi=25)  # results in 160x120 px image
     return tmp, None
 
 PyStreamRun(OpenCVCode, titleWindow)

@@ -363,3 +363,5 @@ Data/ssd_mobilenet_v1_coco_2017_11_17/
 Data/ssd_mobilenet_v1_ppn_shared_box_predictor_300x300_coco14_sync_2018_07_03/
 Data/ssd_mobilenet_v2_coco_2018_03_29/
 Data/ssd_mobilenet_v3_large_coco_2020_01_14/
+VB_Classes/env/
+VB_Classes/Share/
