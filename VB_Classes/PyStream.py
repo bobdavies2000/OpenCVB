@@ -13,8 +13,8 @@ def getDrawRect():
     global drawRect
     return drawRect
 
-def PyStreamRun(OpenCVCode, scriptName):
-    global drawRect
+def PyStreamRun(OpenCVCode, titleWindow):
+    global drawRect 
     drawRect = (0,0,0,0)
 
     parser = argparse.ArgumentParser(description='Pass in length of MemMap region.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -29,7 +29,7 @@ def PyStreamRun(OpenCVCode, scriptName):
         args.pipeName = 'PyStream2Way0' # we always start with 0 and since it is only invoked once, 0 is all it will ever be.
         ocvb = os.getcwd() + '/../bin/Debug/OpenCVB.exe'
         if os.path.exists(ocvb):
-            tupleArg = (' ', scriptName)
+            tupleArg = (' ', titleWindow)
             pid = os.spawnv(os.P_NOWAIT, ocvb, tupleArg) # OpenCVB.exe will be run with this .py script
 
     pipeName = '\\\\.\\pipe\\' + args.pipeName

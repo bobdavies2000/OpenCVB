@@ -51,7 +51,8 @@ class App(object):
         bin_w = int(img.shape[1] / bin_count)
         for i in range(bin_count):
             h = int(self.hist[i])
-            cv.rectangle(img, (i*bin_w+2, 255), ((i+1)*bin_w-2, 255-h), (int(180.0*i/bin_count), 255, 255), -1)
+            c = int(180.0*i/bin_count)
+            cv.rectangle(img, (i*bin_w+2, 255), ((i+1)*bin_w-2, 255-h), (c, 255, 255), -1)
         return img
 
     def Open(self):

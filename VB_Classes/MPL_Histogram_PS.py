@@ -55,7 +55,4 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     plt.close()
     return tmp, None
 
-try:
-    PyStreamRun(OpenCVCode, titleWindow)
-finally:
-    print("done")
+PyStreamRun(OpenCVCode, titleWindow)

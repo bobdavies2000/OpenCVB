@@ -1,62 +1,91 @@
-#https://matplotlib.org/2.0.2/examples/animation/histogram.html
+'''
+Camshift tracker
+================
+
+This is a demo that shows mean-shift based tracking
+You select a color objects such as your face and it tracks it.
+This reads the pipe connected to OpenCVB
+
+http://www.robinhewitt.com/research/track/camshift.html
+
+Usage:
+------
+    camshift.py 
+
+    To initialize tracking, select the object with mouse
+
+Keys:
+-----
+    ESC   - exit
+    b     - toggle back-projected probability visualization
+'''
+
+import sys
+import mmap
+import array
+import argparse
 import numpy as np
-from PyStream import PyStreamRun
 import cv2 as cv
-import io
+import os, time
+from time import sleep
+from PyStream import PyStreamRun
+from PyStream import getDrawRect
+titleWindow = 'Camshift1_PS.py'
 
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import matplotlib.path as path
-titleWindow = 'MPL_Histogram_PS.py'
+class App(object):
+    def show_hist(self, img):
+        bin_count = self.hist.shape[0]
+        bin_w = int(img.shape[1] / bin_count)
+        for i in range(bin_count):
+            h = int(self.hist[i])
+            c = int(180.0*i/bin_count)
+            cv.rectangle(img, (i*bin_w+2, 255), ((i+1)*bin_w-2, 255-h), (c, 255, 255), -1)
+        img = cv.cvtColor(img, cv.COLOR_HSV2BGR)
+        return img
 
-def OpenCVCode(imgRGB, depth32f, frameCount):
-    global fig, ax
-    data = depth32f.flatten('C')
-    n, bins = np.histogram(data, 20)
-    n[0] = 0 # we don't care about the zero counts
-    # get the corners of the rectangles for the histogram
-    left = np.array(bins[:-1])
-    right = np.array(bins[1:])
-    bottom = np.zeros(len(left))
-    top = bottom + n
-    nrects = len(left)
+    def Open(self):
+        self.selectWindow = (0, 0, 0, 0)
+        self.track_window = None
+        self.drag_start = None
+        self.initialized = False
+        self.show_backproj = False
+        self.hist = None
+        PyStreamRun(self.OpenCVCode, titleWindow)
 
-    # for each rect: 1 for the MOVETO, 3 for the LINETO, 1 for the
-    # CLOSEPOLY; the vert for the closepoly is ignored but we still need
-    # it to keep the codes aligned with the vertices
-    nverts = nrects*(1 + 3 + 1)
-    verts = np.zeros((nverts, 2))
-    codes = np.ones(nverts, int) * path.Path.LINETO
-    codes[0::5] = path.Path.MOVETO
-    codes[4::5] = path.Path.CLOSEPOLY
-    verts[0::5, 0] = left
-    verts[0::5, 1] = bottom
-    verts[1::5, 0] = left
-    verts[1::5, 1] = top
-    verts[2::5, 0] = right
-    verts[2::5, 1] = top
-    verts[3::5, 0] = right
-    verts[3::5, 1] = bottom
+    def OpenCVCode(self, imgRGB, depth32f, frameCount):
+        hsv = cv.cvtColor(imgRGB, cv.COLOR_BGR2HSV)
+        mask = cv.inRange(hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
+        self.img = np.copy(imgRGB)
+        self.img[mask == 0] = 0
 
-    barpath = path.Path(verts, codes)
-    patch = patches.PathPatch(barpath, facecolor='green', edgecolor='yellow', alpha=0.5)
-    ax.add_patch(patch)
+        rect = getDrawRect()
+        if rect != self.selectWindow:
+            self.track_window = rect
+            self.selectWindow = rect
+            x1, y1, x0, y0 = rect
+            hsv_roi = hsv[y0:y1, x0:x1]
+            mask_roi = mask[y0:y1, x0:x1]
 
-    ax.set_xlim(left[1], right[-1])
-    ax.set_ylim(bottom.min(), top.max())
+            hist = cv.calcHist( [hsv_roi], [0], mask_roi, [32], [0, 180] )
+            cv.normalize(hist, hist, 0, 255, cv.NORM_MINMAX)
+            self.hist = hist.reshape(-1)
+            imgRGB[mask == 0] = 0
 
-    buf = io.BytesIO()
-    plt.savefig(buf, format='rgba', dpi=100)
+        if np.any(self.hist != None):
+            prob = cv.calcBackProject([hsv], [0], self.hist, [0, 180], 1)
+            prob &= mask
+            term_crit = ( cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 1 )
+            track_box, self.track_window = cv.CamShift(prob, self.track_window, term_crit)
+            graph = cv.cvtColor(imgRGB, cv.COLOR_HSV2BGR)
+            self.img = self.show_hist(np.zeros(imgRGB.shape, np.uint8))
 
-    img_byte_arr = buf.getvalue()
-    rgbaSize = 480, 640, 4 
-    tmp = np.array(np.frombuffer(img_byte_arr, np.uint8).reshape(rgbaSize)) 
-    buf.close()
-    return tmp, None
+            if self.show_backproj:
+                imgRGB[:] = prob[...,np.newaxis]
+            try:
+                cv.ellipse(imgRGB, track_box, (0, 0, 255), 2)
+            except:
+                print(track_box)
 
-fig, ax = plt.subplots()
-try:
-    PyStreamRun(OpenCVCode, titleWindow)
-finally:
-    plt.close()
-    print("done")
+        return imgRGB, self.img
+
+App().Open()

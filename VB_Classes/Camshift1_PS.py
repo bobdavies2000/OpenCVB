@@ -38,7 +38,9 @@ class App(object):
         bin_w = int(img.shape[1] / bin_count)
         for i in range(bin_count):
             h = int(self.hist[i])
-            cv.rectangle(img, (i*bin_w+2, 255), ((i+1)*bin_w-2, 255-h), (int(180.0*i/bin_count), 255, 255), -1)
+            c = int(180.0*i/bin_count)
+            cv.rectangle(img, (i*bin_w+2, 255), ((i+1)*bin_w-2, 255-h), (c, 255, 255), -1)
+        img = cv.cvtColor(img, cv.COLOR_HSV2BGR)
         return img
 
     def Open(self):
@@ -47,42 +49,35 @@ class App(object):
         self.drag_start = None
         self.initialized = False
         self.show_backproj = False
-        self.img = None
+        self.hist = None
         PyStreamRun(self.OpenCVCode, titleWindow)
 
     def OpenCVCode(self, imgRGB, depth32f, frameCount):
-        if self.initialized == False:
-            self.both = np.empty((imgRGB.shape[0], imgRGB.shape[1]*2, 3), imgRGB.dtype)
-            self.img = imgRGB
-            self.initialized = True
-        
         hsv = cv.cvtColor(imgRGB, cv.COLOR_BGR2HSV)
         mask = cv.inRange(hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
+        self.img = np.copy(imgRGB)
+        self.img[mask == 0] = 0
 
         rect = getDrawRect()
-        if self.selectWindow != rect:
+        if rect != self.selectWindow:
             self.track_window = rect
             self.selectWindow = rect
-            self.img = np.zeros(imgRGB.shape, np.uint8)
-            x0, y0, x1, y1 = self.track_window
+            x1, y1, x0, y0 = rect
             hsv_roi = hsv[y0:y1, x0:x1]
             mask_roi = mask[y0:y1, x0:x1]
+
             hist = cv.calcHist( [hsv_roi], [0], mask_roi, [32], [0, 180] )
             cv.normalize(hist, hist, 0, 255, cv.NORM_MINMAX)
             self.hist = hist.reshape(-1)
-            self.img = self.show_hist(self.img)
-
-            vis_roi = imgRGB[y0:y1, x0:x1]
-            cv.bitwise_not(vis_roi, vis_roi)
             imgRGB[mask == 0] = 0
 
-        tmp = np.copy(imgRGB)
-        if self.track_window != None :
+        if np.any(self.hist != None):
             prob = cv.calcBackProject([hsv], [0], self.hist, [0, 180], 1)
             prob &= mask
             term_crit = ( cv.TERM_CRITERIA_EPS | cv.TERM_CRITERIA_COUNT, 10, 1 )
             track_box, self.track_window = cv.CamShift(prob, self.track_window, term_crit)
-            graph = cv.cvtColor(self.img, cv.COLOR_HSV2BGR)
+            graph = cv.cvtColor(imgRGB, cv.COLOR_HSV2BGR)
+            self.img = self.show_hist(np.zeros(imgRGB.shape, np.uint8))
 
             if self.show_backproj:
                 imgRGB[:] = prob[...,np.newaxis]
@@ -91,10 +86,6 @@ class App(object):
             except:
                 print(track_box)
 
-        #if ch == ord('b'):
-        #    self.show_backproj = not self.show_backproj
-        tmp[mask == 0] = 0
-        return imgRGB, tmp
+        return imgRGB, self.img
 
 App().Open()
-

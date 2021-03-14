@@ -415,7 +415,6 @@
     <Content Include="AddWeighted_PS.py" />
     <Content Include="BGSubtract.py" />
     <Content Include="Facedetect_PS.py" />
-    <Content Include="LineDetector_PS.py" />
     <Content Include="OakD_Images.py" />
     <Content Include="OakD_Rectified.py" />
     <Content Include="PhotoShop_60sTV.py" />
@@ -443,6 +442,7 @@
     <Content Include="ICP_SyntheticExample.py" />
     <Content Include="ICP_Models.py" />
     <Content Include="PyStream.py" />
+    <Content Include="PythonDebug.py" />
     <Content Include="Reg_shift.py" />
     <Content Include="RotateImage.py" />
     <Content Include="SelectiveSearchSegmentation_Demo.py" />
