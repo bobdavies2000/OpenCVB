@@ -7,12 +7,13 @@ import io
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.path as path
-titleWindow = 'MatPlot_Histogram_PS.py'
+titleWindow = 'MPL_Histogram_PS.py'
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
+    fig, ax = plt.subplots()
     data = depth32f.flatten('C')
     n, bins = np.histogram(data, 20)
-    fig, ax = plt.subplots()
+    n[0] = 0 # we don't care about the zero counts
     # get the corners of the rectangles for the histogram
     left = np.array(bins[:-1])
     right = np.array(bins[1:])
@@ -41,7 +42,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     patch = patches.PathPatch(barpath, facecolor='green', edgecolor='yellow', alpha=0.5)
     ax.add_patch(patch)
 
-    ax.set_xlim(left[0], right[-1])
+    ax.set_xlim(left[1], right[-1])
     ax.set_ylim(bottom.min(), top.max())
 
     buf = io.BytesIO()
@@ -50,10 +51,11 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     img_byte_arr = buf.getvalue()
     rgbaSize = 480, 640, 4 
     tmp = np.array(np.frombuffer(img_byte_arr, np.uint8).reshape(rgbaSize)) 
-    tmp = cv.cvtColor(tmp, cv.COLOR_RGBA2BGR)
-    tmp = cv.resize(tmp, (imgRGB.shape[0], imgRGB.shape[1]))
     buf.close()
     plt.close()
     return tmp, None
 
-PyStreamRun(OpenCVCode, titleWindow)
+try:
+    PyStreamRun(OpenCVCode, titleWindow)
+finally:
+    print("done")

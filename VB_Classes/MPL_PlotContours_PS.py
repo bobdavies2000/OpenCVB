@@ -13,7 +13,7 @@ import io
 from PIL import Image
 from PyStream import PyStreamRun
 import cv2 as cv
-titleWindow = 'MatPlot_PlotContours_PS.py'
+titleWindow = 'MPL_PlotContours_PS.py'
 
 def bivariate_normal(X, Y, sigmax=1.0, sigmay=1.0,
                      mux=0.0, muy=0.0, sigmaxy=0.0):
@@ -58,8 +58,6 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
         img_byte_arr = buf.getvalue()
         rgbaSize = 480, 640, 4 
         tmp = np.array(np.frombuffer(img_byte_arr, np.uint8).reshape(rgbaSize)) 
-        tmp = cv.cvtColor(tmp, cv.COLOR_RGBA2BGR)
-        tmp = cv.resize(tmp, (imgRGB.shape[0], imgRGB.shape[1]))
         buf.close()
         plt.close()
     return tmp, None
