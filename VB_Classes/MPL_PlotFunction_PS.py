@@ -1,11 +1,11 @@
-#https://matplotlib.org/2.0.2/examples/animation/animate_decay.html
+﻿#https://matplotlib.org/2.0.2/examples/animation/animate_decay.html
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from PyStream import PyStreamRun
 import cv2 as cv
 import io
-titleWindow = 'MPL_Animate_PS.py'
+titleWindow = 'MPL_PlotFunction_PS.py'
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
     global xdata, ydata, ax, line

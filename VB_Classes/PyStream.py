@@ -92,5 +92,5 @@ def PyStreamRun(OpenCVCode, titleWindow):
                     cv.waitKey(1) # this is only needed if the OpenCVCode function is calling imshow
                     
     except Exception as exception:
-        Mbox("test", str(exception), 1)
+        Mbox("PyStream", str(exception), 1)
         print(exception)
