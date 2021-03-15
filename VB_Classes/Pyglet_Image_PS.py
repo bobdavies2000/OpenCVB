@@ -1,4 +1,4 @@
-import pyglet
+﻿import pyglet
 import threading
 from PyStream import PyStreamRun
 import cv2 as cv

@@ -1,6 +1,5 @@
 ﻿#https://matplotlib.org/2.0.2/examples/animation/histogram.html
 import numpy as np
-
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.path as path
