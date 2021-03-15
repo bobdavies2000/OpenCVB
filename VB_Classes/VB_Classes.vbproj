@@ -410,7 +410,7 @@
     <Content Include="MPL_PlotFunction_PS.py" />
     <Content Include="MPL_Histogram_PS.py" />
     <Content Include="MPL_PlotContours_PS.py" />
-    <Content Include="PutText_PS.py" />
+    <Content Include="Python_Stream_PS.py" />
     <Content Include="AddWeighted_PS.py" />
     <Content Include="BGSubtract.py" />
     <Content Include="Facedetect_PS.py" />
@@ -442,7 +442,6 @@
     <Content Include="ICP_Models.py" />
     <Content Include="Pyglet_Image_PS.py" />
     <Content Include="Pyglet_Image.py" />
-    <Content Include="Pyglet_PointCloud_PS.py" />
     <Content Include="PyStream.py" />
     <Content Include="PythonDebug.py" />
     <Content Include="Reg_shift.py" />

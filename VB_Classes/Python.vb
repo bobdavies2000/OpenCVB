@@ -209,7 +209,7 @@ Public Class Python_Stream
 
         ' Was this class invoked standalone?  Then just run something that works with RGB and depth...
         If ocvb.pythonTaskName.EndsWith("Python_Stream") Then
-            ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/PutText_PS.py"
+            ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/Python_Stream_PS.py"
         End If
 
         memMap = New Python_MemMap()
