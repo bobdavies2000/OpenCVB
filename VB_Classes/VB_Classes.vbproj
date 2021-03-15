@@ -406,8 +406,8 @@
     <Content Include="Camshift1_PS.py" />
     <Content Include="DFT_PS.py" />
     <Content Include="LibRealSense_NoAlign.py" />
+    <Content Include="MPL_HistogramRandom_PS.py" />
     <Content Include="MPL_PlotFunction_PS.py" />
-    <Content Include="MPL_Histogram.py" />
     <Content Include="MPL_Histogram_PS.py" />
     <Content Include="MPL_PlotContours_PS.py" />
     <Content Include="PutText_PS.py" />

@@ -38,7 +38,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     tmp = np.array(np.frombuffer(img_byte_arr, np.uint8).reshape(rgbaSize)) 
     buf.close()
     plt.close()
-    return imgRGB, tmp
+    return tmp, None
 
 xdata, ydata = [], []
 PyStreamRun(OpenCVCode, titleWindow)
