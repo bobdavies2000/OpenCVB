@@ -410,6 +410,7 @@
     <Content Include="MPL_PlotFunction_PS.py" />
     <Content Include="MPL_Histogram_PS.py" />
     <Content Include="MPL_PlotContours_PS.py" />
+    <Content Include="plane.py" />
     <Content Include="Python_Stream_PS.py" />
     <Content Include="AddWeighted_PS.py" />
     <Content Include="BGSubtract.py" />
