@@ -482,26 +482,27 @@ Public Class OpenCVB
     End Sub
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
         If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Then
-            If optionsForm.resolution640.Enabled And optionsForm.resolution1280.Checked Then
-                optionsForm.resolution640.Checked = True
-                LineUpCamPics(False)
-                startCamera()
-            Else
-                optionsForm.resolution1280.Checked = True ' start every camera at 1280x720
-                Dim cameraIndex = optionsForm.cameraIndex + 1
-                For i = 0 To optionsForm.cameraRadioButton.Count - 1
-                    If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
-                    If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
-                        optionsForm.cameraRadioButton(cameraIndex).Checked = True
-                        optionsForm.cameraIndex = cameraIndex
-                        LineUpCamPics(False)
-                        startCamera()
-                        Exit For
-                    Else
-                        cameraIndex += 1
-                    End If
-                Next
-            End If
+            ' Testing overnight with only 1280 resolution.  Switching between 640 and 1280 seems to cause camera interface to fail after a while.
+            'If optionsForm.resolution640.Enabled And optionsForm.resolution1280.Checked Then
+            '    optionsForm.resolution640.Checked = True
+            '    LineUpCamPics(False)
+            '    startCamera()
+            'Else
+            optionsForm.resolution1280.Checked = True ' start every camera at 1280x720
+            Dim cameraIndex = optionsForm.cameraIndex + 1
+            For i = 0 To optionsForm.cameraRadioButton.Count - 1
+                If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
+                If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
+                    optionsForm.cameraRadioButton(cameraIndex).Checked = True
+                    optionsForm.cameraIndex = cameraIndex
+                    LineUpCamPics(False)
+                    startCamera()
+                    Exit For
+                Else
+                    cameraIndex += 1
+                End If
+            Next
+            'End If
         End If
 
         If AvailableAlgorithms.SelectedIndex < AvailableAlgorithms.Items.Count - 1 Then
@@ -918,6 +919,10 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
+        optionsForm.resolution1280.Checked = True
+        LineUpCamPics(False)
+        startCamera()
+
         If TestAllButton.Text = "Test All" Then
             TestAllButton.Text = "Stop Test"
             TestAllButton.Image = stopTest
