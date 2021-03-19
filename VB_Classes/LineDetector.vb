@@ -34,10 +34,9 @@ Public Class LineDetector_Basics
 
         For Each v In lines
             If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And
-                   v(2) >= 0 And v(2) <= dst1.Cols And v(3) >= 0 And v(3) <= dst1.Rows Then
+               v(2) >= 0 And v(2) <= dst1.Cols And v(3) >= 0 And v(3) <= dst1.Rows Then
                 Dim pt1 = New cv.Point(CInt(v(0)), CInt(v(1)))
                 Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
-                dst1.Line(pt1, pt2, cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
                 Dim pixelLen = Math.Sqrt((pt1.X - pt2.X) * (pt1.X - pt2.X) + (pt1.Y - pt2.Y) * (pt1.Y - pt2.Y))
                 If pixelLen > pixelThreshold Then
                     dst1.Line(pt1, pt2, cv.Scalar.Yellow, thickness, cv.LineTypes.AntiAlias)

@@ -127,6 +127,7 @@ Public Class Structured_MultiSliceH
             inrange.src = Split(1).Clone
             inrange.Run()
             maskPlane.SetTo(255, inrange.depthMask)
+            maskPlane.SetTo(0, task.inrange.noDepthMask)
         Next
 
         dst1 = task.color.Clone
@@ -179,6 +180,7 @@ Public Class Structured_MultiSliceV
             inrange.src = split(0).Clone
             inrange.Run()
             maskPlane.SetTo(255, inrange.depthMask)
+            maskPlane.SetTo(0, task.inrange.noDepthMask)
         Next
 
         dst1 = task.color.Clone
@@ -235,6 +237,7 @@ Public Class Structured_MultiSlice
             inrange.src = split(0).Clone
             inrange.Run()
             maskPlane = inrange.depthMask
+            maskPlane.SetTo(0, task.inrange.noDepthMask)
             dst2.SetTo(255, maskPlane)
         Next
 
@@ -351,7 +354,7 @@ Public Class Structured_SliceXPlot
         dst2 = structD.dst2
         multi.Run()
 
-        Static offsetSlider = findSlider("Offset for the slice")
+        Static offsetSlider = findSlider("Offset for the vertical slice")
         Dim col = CInt(offsetSlider.value)
 
         Dim cushion = cushionSlider.Value
@@ -513,12 +516,13 @@ Public Class Structured_SliceH
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 100, 1)
-            sliders.setupTrackBar(1, "Offset for the slice", 0, src.Width - 1, src.Height / 2)
-            sliders.setupTrackBar(2, "Slice step size in pixels (multi-slice option only)", 1, 100, 20)
+            sliders.setupTrackBar(1, "Offset for the horizontal slice", 0, src.Height - 1, src.Height / 2)
+            sliders.setupTrackBar(2, "Offset for the vertical slice", 0, src.Width - 1, src.Width / 2)
+            sliders.setupTrackBar(3, "Slice step size in pixels (multi-slice option only)", 1, 100, 20)
         End If
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
-        offsetSlider = findSlider("Offset for the slice")
+        offsetSlider = findSlider("Offset for the horizontal slice")
 
         label2 = "Yellow bar is ceiling.  Yellow line is camera level."
         task.desc = "Find and isolate planes (floor and ceiling) in a side view histogram."
@@ -581,7 +585,8 @@ Public Class Structured_SliceV
         sideStruct = New Structured_SliceH()
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
-        offsetSlider = findSlider("Offset for the slice")
+        offsetSlider = findSlider("Offset for the vertical slice")
+        offsetSlider.Maximum = src.Width - 1
         offsetSlider.Value = src.Width / 2
 
         task.desc = "Find and isolate planes using the top view histogram data"
@@ -651,8 +656,8 @@ Public Class Structured_SliceVStable
         sideStruct = New Structured_SliceH()
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
-        offsetSlider = findSlider("Offset for the slice")
-        offsetSlider.Value = src.Width / 2 - 20
+        offsetSlider = findSlider("Offset for the vertical slice")
+        offsetSlider.Value = src.Width / 2
 
         task.desc = "Find and isolate planes using the top view histogram data"
     End Sub
@@ -675,6 +680,7 @@ Public Class Structured_SliceVStable
         inrange.src = split(0).Clone
         inrange.Run()
         maskPlane = inrange.depthMask
+        maskPlane.SetTo(0, task.inrange.noDepthMask)
 
         label1 = "At offset " + CStr(xCoordinate) + " x = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
                  Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
@@ -692,48 +698,113 @@ End Class
 
 
 
-Public Class Structured_Cloud
+Public Class Structured_CenterLines
     Inherits VBparent
+    Dim vSlice As Structured_SliceV
+    Dim hSlice As Structured_SliceH
+    Dim line As LineDetector_Basics
+    Dim kalman As Kalman_Basics
+    Dim stable As IMU_IscameraStable
+    Dim leftPt As cv.Point2f, rightPt As cv.Point2f, topPt As cv.Point2f, botPt As cv.Point2f
     Public Sub New()
         initParent()
+        stable = New IMU_IscameraStable
+        kalman = New Kalman_Basics
+        ReDim kalman.kInput(8 - 1)
+        vSlice = New Structured_SliceV
+        hSlice = New Structured_SliceH
+        line = New LineDetector_Basics
+        task.desc = "Find the vertical and horizontal center lines with accurate depth data.."
+    End Sub
+    Private Sub getHLine(lines As List(Of cv.Point2f))
+        Dim minX = Single.MaxValue, maxX = Single.MinValue
+        For Each pt In lines
+            If pt.X < minX Then
+                leftPt = pt
+                minX = pt.X
+            End If
+            If pt.X > maxX Then
+                rightPt = pt
+                maxX = pt.X
+            End If
+        Next
+    End Sub
+    Private Sub getVLine(lines As List(Of cv.Point2f))
+        Dim minY = Single.MaxValue, maxY = Single.MinValue
+        For Each pt In lines
+            If pt.Y < minY Then
+                topPt = pt
+                minY = pt.Y
+            End If
+            If pt.Y > maxY Then
+                botPt = pt
+                maxY = pt.Y
+            End If
+        Next
+    End Sub
+    Private Function getPoints(input As cv.Mat) As List(Of cv.Point2f)
+        line.src = input
+        line.Run()
+        dst2 = line.dst1
+
+        Dim pts As New List(Of cv.Point2f)
+        For Each nl In line.sortlines
+            Dim p1 = New cv.Point2f(nl.Value.Item0, nl.Value.Item1)
+            Dim p2 = New cv.Point2f(nl.Value.Item2, nl.Value.Item3)
+            pts.Add(p1)
+            pts.Add(p2)
+            If pts.Count >= 4 Then Exit For
+        Next
+        Return pts
+    End Function
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        stable.Run()
+        Static kalmanCheck = findCheckBox("Turn Kalman filtering on")
+        kalmanCheck.checked = stable.cameraStable
+        vSlice.Run()
+        hSlice.Run()
+        dst1 = task.color
+
+        getHLine(getPoints(hSlice.maskPlane))
+        getVLine(getPoints(vSlice.maskPlane))
+
+        kalman.kInput = {leftPt.X, leftPt.Y, rightPt.X, rightPt.Y, topPt.X, topPt.Y, botPt.X, botPt.Y}
+        kalman.Run()
+        leftPt = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
+        rightPt = New cv.Point2f(kalman.kOutput(2), kalman.kOutput(3))
+        topPt = New cv.Point2f(kalman.kOutput(4), kalman.kOutput(5))
+        botPt = New cv.Point2f(kalman.kOutput(6), kalman.kOutput(7))
+
+        dst2.Line(leftPt, rightPt, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        dst2.Line(topPt, botPt, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+
+        dst2.Circle(leftPt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        dst2.Circle(rightPt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        dst2.Circle(topPt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        dst2.Circle(botPt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Structured_Cloud
+    Inherits VBparent
+    Dim lines As Structured_CenterLines
+    Public Sub New()
+        initParent()
+        lines = New Structured_CenterLines
         task.desc = "Attempt to impose a structure on the point cloud data."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
+        lines.Run()
         dst1 = src
-        If dst1.Type <> cv.MatType.CV_32FC3 Then dst1 = task.pointCloud
-
-        Dim xChange As Integer, yChange As Integer
-        For y = dst1.Height / 2 + 1 To dst1.Height - 1
-            For x = dst1.Width / 2 + 1 To dst1.Width - 1
-                Dim pixel = dst1.Get(Of cv.Point3f)(y, x)
-                Dim lastX = dst1.Get(Of cv.Point3f)(y, x - 1)
-                If Math.Abs(pixel.Z - lastX.Z) < 0.1 Then
-                    If pixel.X < lastX.X Then
-                        pixel.X = lastX.X
-                        xChange += 1
-                    End If
-                    If pixel.Y > lastX.Y Then
-                        pixel.Y = lastX.Y
-                        yChange += 1
-                    End If
-                End If
-
-                Dim pixelTop = dst1.Get(Of cv.Point3f)(y - 1, x)
-                If Math.Abs(pixel.Z - pixelTop.Z) < 0.1 Then
-                    If pixel.X > pixelTop.X Then
-                        pixel.X = pixelTop.X
-                        xChange += 1
-                    End If
-                    If pixel.Y > pixelTop.Y Then
-                        pixel.Y = pixelTop.Y
-                        yChange += 1
-                    End If
-                End If
-                dst1.Set(Of cv.Point3f)(y, x, 0, pixel)
-            Next
-        Next
-        label1 = CStr(xChange) + " X values and " + CStr(yChange) + " Y values changed " + Format((xChange + yChange) / (dst1.Width * dst1.Height) / 2, "#.0%")
     End Sub
 End Class

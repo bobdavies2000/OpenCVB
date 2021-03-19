@@ -139,7 +139,7 @@
     <Compile Include="ProCon.vb" />
     <Compile Include="Sieve.vb" />
     <Compile Include="SLR.vb" />
-    <Compile Include="StructuredDepth.vb" />
+    <Compile Include="Structured.vb" />
     <Compile Include="Texture.vb" />
     <Compile Include="TView.vb" />
     <Compile Include="VBocvb.vb" />
