@@ -538,16 +538,16 @@ Public Class StructuredDepth_SliceH
         Dim metersPerPixel = Math.Abs(side2D.meterMax - side2D.meterMin) / dst2.Height
         Dim cushion = cushionSlider.Value
         Dim thicknessMeters = cushion * metersPerPixel
+        dst1 = task.color.Clone
         inrange.minVal = planeY - thicknessMeters
         inrange.maxVal = planeY + thicknessMeters
         inrange.src = Split(1).Clone
         inrange.Run()
         maskPlane = inrange.depthMask
+        maskPlane.SetTo(0, task.inrange.noDepthMask)
 
         label1 = "At offset " + CStr(yCoordinate) + " y = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
                  Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
-
-        dst1 = task.color.Clone
         dst1.SetTo(cv.Scalar.White, maskPlane)
         label2 = side2D.label2
 
@@ -605,6 +605,7 @@ Public Class StructuredDepth_SliceV
         inrange.src = split(0).Clone
         inrange.Run()
         maskPlane = inrange.depthMask
+        maskPlane.SetTo(0, task.inrange.noDepthMask)
 
         label1 = "At offset " + CStr(xCoordinate) + " x = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
                  Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"

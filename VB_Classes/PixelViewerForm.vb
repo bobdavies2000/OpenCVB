@@ -15,6 +15,7 @@ Public Class PixelViewerForm
 
         Me.Width = GetSetting("OpenCVB", "PixelViewerWidth", "PixelViewerWidth", 1280)
         Me.Height = GetSetting("OpenCVB", "PixelViewerHeight", "PixelViewerHeight", 720)
+        GrayScaleOnly.Checked = GetSetting("OpenCVB", "grayscaleOnly", "grayscaleOnly", False)
         PixelViewerForm_ResizeEnd(sender, e)
     End Sub
     Private Sub PixelViewerForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
@@ -48,5 +49,9 @@ Public Class PixelViewerForm
             Case Keys.Right
                 mousePoint.X += 1
         End Select
+    End Sub
+    Private Sub ToolStripButton5_Click(sender As Object, e As EventArgs) Handles GrayScaleOnly.Click
+        GrayScaleOnly.Checked = Not GrayScaleOnly.Checked
+        SaveSetting("OpenCVB", "grayscaleOnly", "grayscaleOnly", GrayScaleOnly.Checked)
     End Sub
 End Class

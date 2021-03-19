@@ -19,7 +19,9 @@ Public Class Pixel_Viewer
             pixels.Show()
 
             dst1 = Choose(task.mousePicTag + 1, task.color, task.RGBDepth, task.algorithmObject.dst1, task.algorithmObject.dst2)
-
+            If pixels.GrayScaleOnly.Checked And dst1.Channels <> 1 Then
+                dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            End If
             Dim displayType = -1 ' default is 8uc3
             If dst1.Type = cv.MatType.CV_8UC3 Then displayType = 0
             If dst1.Type = cv.MatType.CV_8U Then displayType = 1
