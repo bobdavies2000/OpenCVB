@@ -405,6 +405,7 @@ Public Class Puzzle_Solver
         dst1 = puzzle.dst1
         Dim cornerlist = fitCheck(dst1, roilist, fitlist)
 
+        If cornerlist.Count = 0 Then Exit Sub ' rare condition, found no corner tiles.  How is this possible?
         Dim bestCorner = cornerlist.ElementAt(0)
         For i = 0 To cornerlist.Count - 1
             bestCorner = cornerlist.ElementAt(i)

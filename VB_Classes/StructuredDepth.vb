@@ -1,14 +1,14 @@
 ﻿Imports cv = OpenCvSharp
-Public Class StructuredDepth_Floor
+Public Class Structured_Floor
     Inherits VBparent
-    Public structD As StructuredDepth_SliceH
+    Public structD As Structured_SliceH
     Dim kalman As Kalman_VB_Basics
     Public floorYplane As Single
     Public Sub New()
         initParent()
         kalman = New Kalman_VB_Basics()
 
-        structD = New StructuredDepth_SliceH()
+        structD = New Structured_SliceH()
         task.thresholdSlider.Value = 10 ' some cameras can show data below ground level...
         structD.cushionSlider.Value = 5 ' floor runs can use a thinner slice that ceilings...
 
@@ -49,16 +49,16 @@ End Class
 
 
 
-Public Class StructuredDepth_Ceiling
+Public Class Structured_Ceiling
     Inherits VBparent
-    Public structD As StructuredDepth_SliceH
+    Public structD As Structured_SliceH
     Dim kalman As Kalman_Basics
     Public Sub New()
         initParent()
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(0)
 
-        structD = New StructuredDepth_SliceH()
+        structD = New Structured_SliceH()
         structD.cushionSlider.Value = 10
         task.desc = "Find the ceiling plane"
     End Sub
@@ -89,17 +89,17 @@ End Class
 
 
 
-Public Class StructuredDepth_MultiSliceH
+Public Class Structured_MultiSliceH
     Inherits VBparent
     Public side2D As Histogram_SideData
-    Public structD As StructuredDepth_SliceH
+    Public structD As Structured_SliceH
     Public maskPlane As cv.Mat
     Dim inrange As Depth_InRange
     Public Sub New()
         initParent()
         side2D = New Histogram_SideData()
         inrange = New Depth_InRange()
-        structD = New StructuredDepth_SliceH()
+        structD = New Structured_SliceH()
 
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
@@ -140,17 +140,17 @@ End Class
 
 
 
-Public Class StructuredDepth_MultiSliceV
+Public Class Structured_MultiSliceV
     Inherits VBparent
     Public top2D As Histogram_TopData
-    Public structD As StructuredDepth_SliceH
+    Public structD As Structured_SliceH
     Dim inrange As Depth_InRange
     Public Sub New()
         initParent()
 
         top2D = New Histogram_TopData()
         inrange = New Depth_InRange()
-        structD = New StructuredDepth_SliceH()
+        structD = New Structured_SliceH()
 
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
@@ -192,11 +192,11 @@ End Class
 
 
 
-Public Class StructuredDepth_MultiSlice
+Public Class Structured_MultiSlice
     Inherits VBparent
     Public top2D As Histogram_TopData
     Public side2D As Histogram_SideData
-    Dim struct As StructuredDepth_SliceV
+    Dim struct As Structured_SliceV
     Public inrange As Depth_InRange
     Public maskPlane As cv.Mat
     Public split() As cv.Mat
@@ -206,7 +206,7 @@ Public Class StructuredDepth_MultiSlice
         side2D = New Histogram_SideData()
         top2D = New Histogram_TopData()
         inrange = New Depth_InRange()
-        struct = New StructuredDepth_SliceV()
+        struct = New Structured_SliceV()
 
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
@@ -243,7 +243,7 @@ Public Class StructuredDepth_MultiSlice
             If yCoordinate > ocvb.sideCameraPoint.Y Then planeY = side2D.meterMax * (yCoordinate - ocvb.sideCameraPoint.Y) / (dst2.Height - ocvb.sideCameraPoint.Y)
             inrange.minVal = planeY - thicknessMeters
             inrange.maxVal = planeY + thicknessMeters
-            inrange.src = Split(1).Clone
+            inrange.src = split(1).Clone
             inrange.Run()
             Dim tmp = inrange.depthMask
             cv.Cv2.BitwiseOr(tmp, maskPlane, maskPlane)
@@ -261,16 +261,16 @@ End Class
 
 
 
-Public Class StructuredDepth_MultiSliceLines
+Public Class Structured_MultiSliceLines
     Inherits VBparent
-    Dim multi As StructuredDepth_MultiSlice
+    Dim multi As Structured_MultiSlice
     Public ldetect As LineDetector_Basics
     Public Sub New()
         initParent()
         ldetect = New LineDetector_Basics()
         Dim lenSlider = findSlider("Line length threshold in pixels")
         lenSlider.Value = lenSlider.Maximum ' don't need the yellow line...
-        multi = New StructuredDepth_MultiSlice()
+        multi = New Structured_MultiSlice()
         task.desc = "Detect lines in the multiSlice output"
     End Sub
     Public Sub Run()
@@ -289,12 +289,12 @@ End Class
 
 
 
-Public Class StructuredDepth_MultiSlicePolygon
+Public Class Structured_MultiSlicePolygon
     Inherits VBparent
-    Dim multi As StructuredDepth_MultiSlice
+    Dim multi As Structured_MultiSlice
     Public Sub New()
         initParent()
-        multi = New StructuredDepth_MultiSlice()
+        multi = New Structured_MultiSlice()
         label1 = "Input to FindContours"
         label2 = "ApproxPolyDP 4-corner object from FindContours input"
 
@@ -332,15 +332,15 @@ End Class
 
 
 
-Public Class StructuredDepth_SliceXPlot
+Public Class Structured_SliceXPlot
     Inherits VBparent
-    Dim multi As StructuredDepth_MultiSlice
-    Dim structD As StructuredDepth_SliceV
+    Dim multi As Structured_MultiSlice
+    Dim structD As Structured_SliceV
     Dim cushionSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
-        multi = New StructuredDepth_MultiSlice()
-        structD = New StructuredDepth_SliceV()
+        multi = New Structured_MultiSlice()
+        structD = New Structured_SliceV()
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         cushionSlider.Value = 25
         task.desc = "Find any plane around a peak value in the top-down histogram"
@@ -387,9 +387,9 @@ End Class
 
 
 
-Public Class StructuredDepth_LinearizeFloor
+Public Class Structured_LinearizeFloor
     Inherits VBparent
-    Public floor As StructuredDepth_Floor
+    Public floor As Structured_Floor
     Dim kalman As Kalman_VB_Basics
     Public imuPointCloud As cv.Mat
     Public maskPlane As cv.Mat
@@ -397,7 +397,7 @@ Public Class StructuredDepth_LinearizeFloor
     Public Sub New()
         initParent()
         kalman = New Kalman_VB_Basics()
-        floor = New StructuredDepth_Floor()
+        floor = New Structured_Floor()
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 3)
@@ -497,7 +497,7 @@ End Class
 
 
 
-Public Class StructuredDepth_SliceH
+Public Class Structured_SliceH
     Inherits VBparent
     Public side2D As Histogram_SideData
     Dim inrange As Depth_InRange
@@ -513,7 +513,7 @@ Public Class StructuredDepth_SliceH
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 100, 1)
-            sliders.setupTrackBar(1, "Offset for the slice", 0, src.Width - 1, src.Height / 2 - 20)
+            sliders.setupTrackBar(1, "Offset for the slice", 0, src.Width - 1, src.Height / 2)
             sliders.setupTrackBar(2, "Slice step size in pixels (multi-slice option only)", 1, 100, 20)
         End If
 
@@ -566,11 +566,11 @@ End Class
 
 
 
-Public Class StructuredDepth_SliceV
+Public Class Structured_SliceV
     Inherits VBparent
     Public top2D As Histogram_TopData
     Public inrange As Depth_InRange
-    Dim sideStruct As StructuredDepth_SliceH
+    Dim sideStruct As Structured_SliceH
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
     Public maskPlane As cv.Mat
@@ -578,11 +578,11 @@ Public Class StructuredDepth_SliceV
         initParent()
         top2D = New Histogram_TopData()
         inrange = New Depth_InRange()
-        sideStruct = New StructuredDepth_SliceH()
+        sideStruct = New Structured_SliceH()
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         offsetSlider = findSlider("Offset for the slice")
-        offsetSlider.Value = src.Width / 2 - 20
+        offsetSlider.Value = src.Width / 2
 
         task.desc = "Find and isolate planes using the top view histogram data"
     End Sub
@@ -636,11 +636,11 @@ End Class
 
 
 
-Public Class StructuredDepth_SliceVStable
+Public Class Structured_SliceVStable
     Inherits VBparent
     Public top2D As Histogram_TopData
     Public inrange As Depth_InRange
-    Dim sideStruct As StructuredDepth_SliceH
+    Dim sideStruct As Structured_SliceH
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
     Public maskPlane As cv.Mat
@@ -648,7 +648,7 @@ Public Class StructuredDepth_SliceVStable
         initParent()
         top2D = New Histogram_TopData()
         inrange = New Depth_InRange()
-        sideStruct = New StructuredDepth_SliceH()
+        sideStruct = New Structured_SliceH()
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         offsetSlider = findSlider("Offset for the slice")
@@ -682,5 +682,58 @@ Public Class StructuredDepth_SliceVStable
         dst1 = task.color.Clone
         dst1.SetTo(cv.Scalar.White, maskPlane)
         label2 = top2D.label2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Structured_Cloud
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+        task.desc = "Attempt to impose a structure on the point cloud data."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        dst1 = src
+        If dst1.Type <> cv.MatType.CV_32FC3 Then dst1 = task.pointCloud
+
+        Dim xChange As Integer, yChange As Integer
+        For y = dst1.Height / 2 + 1 To dst1.Height - 1
+            For x = dst1.Width / 2 + 1 To dst1.Width - 1
+                Dim pixel = dst1.Get(Of cv.Point3f)(y, x)
+                Dim lastX = dst1.Get(Of cv.Point3f)(y, x - 1)
+                If Math.Abs(pixel.Z - lastX.Z) < 0.1 Then
+                    If pixel.X < lastX.X Then
+                        pixel.X = lastX.X
+                        xChange += 1
+                    End If
+                    If pixel.Y > lastX.Y Then
+                        pixel.Y = lastX.Y
+                        yChange += 1
+                    End If
+                End If
+
+                Dim pixelTop = dst1.Get(Of cv.Point3f)(y - 1, x)
+                If Math.Abs(pixel.Z - pixelTop.Z) < 0.1 Then
+                    If pixel.X > pixelTop.X Then
+                        pixel.X = pixelTop.X
+                        xChange += 1
+                    End If
+                    If pixel.Y > pixelTop.Y Then
+                        pixel.Y = pixelTop.Y
+                        yChange += 1
+                    End If
+                End If
+                dst1.Set(Of cv.Point3f)(y, x, 0, pixel)
+            Next
+        Next
+        label1 = CStr(xChange) + " X values and " + CStr(yChange) + " Y values changed " + Format((xChange + yChange) / (dst1.Width * dst1.Height) / 2, "#.0%")
     End Sub
 End Class
