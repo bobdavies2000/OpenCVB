@@ -475,8 +475,8 @@ Public Class IMU_GVector
         Else
             If xCheckbox.checked = False Then ocvb.angleZ = 0
             If zCheckbox.checked = False Then ocvb.angleX = 0
-            task.xRotateSlider.Value = CInt(ocvb.angleZ * 57.2958)
-            task.zRotateSlider.Value = CInt(ocvb.angleX * 57.2958)
+            task.xRotateSlider.Value = CInt(ocvb.angleZ * 57.2958) Mod 90
+            task.zRotateSlider.Value = CInt(ocvb.angleX * 57.2958) Mod 90
         End If
 
         kalman.kInput = {gx, gy, gz, ocvb.angleX, ocvb.angleY, ocvb.angleZ}

@@ -702,11 +702,12 @@ Public Class Structured_CenterSlice
     Inherits VBparent
     Dim vSlice As Structured_SliceV
     Dim line As LineDetector_Basics
-    Public topPt As cv.Point2f, botPt As cv.Point2f
     Public Sub New()
         initParent()
         vSlice = New Structured_SliceV
         line = New LineDetector_Basics
+        label1 = "Center Slice in yellow"
+        label2 = "White=SliceV output, Red Dot is avgPt"
         task.desc = "Find the vertical and horizontal center lines with accurate depth data.."
     End Sub
     Public Sub Run()
@@ -719,40 +720,52 @@ Public Class Structured_CenterSlice
         line.Run()
         dst2 = line.dst1
 
-        Dim pts As New List(Of cv.Point2f)
-        Dim slope As Single, b As Single
-        For Each nl In line.sortlines
-            Dim p1 = New cv.Point2f(nl.Value.Item0, nl.Value.Item1)
-            Dim p2 = New cv.Point2f(nl.Value.Item2, nl.Value.Item3)
-            pts.Add(p1)
-            pts.Add(p2)
-            Dim nextSlope = (botPt.Y - topPt.Y) / If(botPt.X = topPt.X, 10000, botPt.X - topPt.X)
-            Dim nextB = topPt.Y - slope * topPt.X ' y = slope * x + b
-            slope = If(slope = 0, nextSlope, (nextSlope + slope) / 2)
-            b = If(b = 0, nextB, (nextB + ) / 2)
-        Next
-        topPt = New cv.Point2f(-b / slope, 0)  ' y = 0, 0 = slope * x + b, x = -b / slope
-        botPt = New cv.Point2f((dst1.Height - b) / slope, dst1.Height)
+        If line.sortlines.Count > 0 Then
+            Dim slope As Single
+            Dim count As Integer
+            Dim avgPt As cv.Point2f
+            Dim topPt As cv.Point2f, botPt As cv.Point2f
+            Dim minY = Single.MaxValue, maxY = Single.MinValue
+            For Each nl In line.sortlines
+                Dim p1 = New cv.Point2f(nl.Value.Item0, nl.Value.Item1)
+                Dim p2 = New cv.Point2f(nl.Value.Item2, nl.Value.Item3)
+                If Math.Abs(p2.X - p1.X) > 1 Then
+                    avgPt += p1
+                    avgPt += p2
+                    Dim nextSlope = (p2.Y - p1.Y) / (p2.X - p1.X)
+                    slope = If(slope = 0, nextSlope, (nextSlope + slope) / 2)
+                    count += 2
+                End If
+                If p1.Y < minY Then
+                    topPt = p1
+                    minY = p1.Y
+                End If
+                If p1.Y > maxY Then
+                    botPt = p1
+                    maxY = p1.Y
+                End If
+                If p2.Y < minY Then
+                    topPt = p2
+                    minY = p2.Y
+                End If
+                If p2.Y > maxY Then
+                    botPt = p2
+                    maxY = p2.Y
+                End If
+            Next
 
-        Dim minY = Single.MaxValue, maxY = Single.MinValue
-        For Each pt In pts
-            If pt.Y < minY Then
-                If minY <> Single.MinValue Then pt.X = (topPt.X + pt.X) / 2
-                topPt = pt
-                minY = pt.Y
-            End If
-            If pt.Y > maxY Then
-                If maxY <> Single.MaxValue Then pt.X = (botPt.X + pt.X) / 2
-                botPt = pt
-                maxY = pt.Y
-            End If
-        Next
+            If slope = 0 And topPt.X <> botPt.X Then slope = (topPt.Y - botPt.Y) / (topPt.X - botPt.X)
+            avgPt = New cv.Point2f(avgPt.X / count, avgPt.Y / count)
+            dst2.Circle(avgPt, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            Dim b = avgPt.Y - slope * avgPt.X ' y = slope * x + b, b = y - slope * x
+            topPt = New cv.Point2f(-b / slope, 0)  ' y = 0, 0 = slope * x + b, x = -b / slope
+            botPt = New cv.Point2f((dst1.Height - b) / slope, dst1.Height)
 
-
-        dst2.Line(topPt, botPt, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
-        dst1.Line(topPt, botPt, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-        dst1.Circle(topPt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-        dst1.Circle(botPt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst2.Line(topPt, botPt, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+            dst1.Line(topPt, botPt, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+            dst1.Circle(topPt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(botPt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        End If
     End Sub
 End Class
 
