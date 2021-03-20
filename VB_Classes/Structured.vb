@@ -93,7 +93,7 @@ Public Class Structured_MultiSliceH
     Inherits VBparent
     Public side2D As Histogram_SideData
     Public structD As Structured_SliceH
-    Public maskPlane As cv.Mat
+    Public sliceMask As cv.Mat
     Dim inrange As Depth_InRange
     Public Sub New()
         initParent()
@@ -118,7 +118,7 @@ Public Class Structured_MultiSliceH
         Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
         Dim stepsize = stepSlider.value
 
-        maskPlane = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        sliceMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For yCoordinate = 0 To src.Height - 1 Step stepsize
             Dim planeY = side2D.meterMin * (ocvb.sideCameraPoint.Y - yCoordinate) / ocvb.sideCameraPoint.Y
             If yCoordinate > ocvb.sideCameraPoint.Y Then planeY = side2D.meterMax * (yCoordinate - ocvb.sideCameraPoint.Y) / (dst2.Height - ocvb.sideCameraPoint.Y)
@@ -126,12 +126,12 @@ Public Class Structured_MultiSliceH
             inrange.maxVal = planeY + thicknessMeters
             inrange.src = Split(1).Clone
             inrange.Run()
-            maskPlane.SetTo(255, inrange.depthMask)
-            maskPlane.SetTo(0, task.inrange.noDepthMask)
+            sliceMask.SetTo(255, inrange.depthMask)
+            sliceMask.SetTo(0, task.inrange.noDepthMask)
         Next
 
         dst1 = task.color.Clone
-        dst1.SetTo(cv.Scalar.White, maskPlane)
+        dst1.SetTo(cv.Scalar.White, sliceMask)
         label2 = side2D.label2
     End Sub
 End Class
@@ -171,7 +171,7 @@ Public Class Structured_MultiSliceV
         Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
         Dim stepsize = stepSlider.value
 
-        Dim maskPlane = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        Dim sliceMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For xCoordinate = 0 To src.Width - 1 Step stepsize
             Dim planeX = top2D.meterMin * (ocvb.topCameraPoint.X - xCoordinate) / ocvb.topCameraPoint.X
             If xCoordinate > ocvb.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - ocvb.topCameraPoint.X) / (dst2.Width - ocvb.topCameraPoint.X)
@@ -179,12 +179,12 @@ Public Class Structured_MultiSliceV
             inrange.maxVal = planeX + thicknessMeters
             inrange.src = split(0).Clone
             inrange.Run()
-            maskPlane.SetTo(255, inrange.depthMask)
-            maskPlane.SetTo(0, task.inrange.noDepthMask)
+            sliceMask.SetTo(255, inrange.depthMask)
+            sliceMask.SetTo(0, task.inrange.noDepthMask)
         Next
 
         dst1 = task.color.Clone
-        dst1.SetTo(cv.Scalar.White, maskPlane)
+        dst1.SetTo(cv.Scalar.White, sliceMask)
         label2 = top2D.label2
     End Sub
 End Class
@@ -200,7 +200,7 @@ Public Class Structured_MultiSlice
     Public side2D As Histogram_SideData
     Dim struct As Structured_SliceV
     Public inrange As Depth_InRange
-    Public maskPlane As cv.Mat
+    Public sliceMask As cv.Mat
     Public split() As cv.Mat
     Public Sub New()
         initParent()
@@ -236,9 +236,9 @@ Public Class Structured_MultiSlice
             inrange.maxVal = planeX + thicknessMeters
             inrange.src = split(0).Clone
             inrange.Run()
-            maskPlane = inrange.depthMask
-            maskPlane.SetTo(0, task.inrange.noDepthMask)
-            dst2.SetTo(255, maskPlane)
+            sliceMask = inrange.depthMask
+            sliceMask.SetTo(0, task.inrange.noDepthMask)
+            dst2.SetTo(255, sliceMask)
         Next
 
         For yCoordinate = 0 To src.Height - 1 Step stepsize
@@ -249,8 +249,8 @@ Public Class Structured_MultiSlice
             inrange.src = split(1).Clone
             inrange.Run()
             Dim tmp = inrange.depthMask
-            cv.Cv2.BitwiseOr(tmp, maskPlane, maskPlane)
-            dst2.SetTo(255, maskPlane)
+            cv.Cv2.BitwiseOr(tmp, sliceMask, sliceMask)
+            dst2.SetTo(255, sliceMask)
         Next
 
         dst1 = task.color.Clone
@@ -375,7 +375,7 @@ Public Class Structured_SliceXPlot
             maskZplane = multi.inrange.depthMask
         End If
 
-        If filterZ > 0 Then cv.Cv2.BitwiseAnd(multi.maskPlane, maskZplane, maskZplane)
+        If filterZ > 0 Then cv.Cv2.BitwiseAnd(multi.sliceMask, maskZplane, maskZplane)
 
         dst1 = task.color.Clone
         dst1.SetTo(cv.Scalar.White, maskZplane)
@@ -395,7 +395,7 @@ Public Class Structured_LinearizeFloor
     Public floor As Structured_Floor
     Dim kalman As Kalman_VB_Basics
     Public imuPointCloud As cv.Mat
-    Public maskPlane As cv.Mat
+    Public sliceMask As cv.Mat
     Public floorYPlane As Single
     Public Sub New()
         initParent()
@@ -419,10 +419,10 @@ Public Class Structured_LinearizeFloor
         floor.Run()
         dst1 = floor.dst1
         dst2 = floor.dst2
-        maskPlane = floor.structD.maskPlane
-        If maskPlane.CountNonZero() > 0 Then
+        sliceMask = floor.structD.sliceMask
+        If sliceMask.CountNonZero() > 0 Then
             Dim nonFloorMask As New cv.Mat
-            cv.Cv2.BitwiseNot(maskPlane, nonFloorMask)
+            cv.Cv2.BitwiseNot(sliceMask, nonFloorMask)
             imuPC = task.pointCloud.Clone
             imuPointCloud = imuPC.Clone
             imuPC.SetTo(0, nonFloorMask)
@@ -430,48 +430,48 @@ Public Class Structured_LinearizeFloor
             Dim split = imuPC.Split()
             Static xCheck = findCheckBox("Smooth in X-direction")
             If xCheck.Checked Then
-                split(0).MinMaxLoc(minVal, maxVal, minLoc, maxLoc, maskPlane)
+                split(0).MinMaxLoc(minVal, maxVal, minLoc, maxLoc, sliceMask)
 
                 Dim firstCol As Integer, lastCol As Integer
-                For firstCol = 0 To maskPlane.Width - 1
-                    If maskPlane.Col(firstCol).CountNonZero() > 0 Then Exit For
+                For firstCol = 0 To sliceMask.Width - 1
+                    If sliceMask.Col(firstCol).CountNonZero() > 0 Then Exit For
                 Next
-                For lastCol = maskPlane.Width - 1 To 0 Step -1
-                    If maskPlane.Col(lastCol).CountNonZero() Then Exit For
+                For lastCol = sliceMask.Width - 1 To 0 Step -1
+                    If sliceMask.Col(lastCol).CountNonZero() Then Exit For
                 Next
 
                 Dim xIncr = (maxVal - minVal) / (lastCol - firstCol)
                 For i = firstCol To lastCol
-                    Dim maskCol = maskPlane.Col(i)
+                    Dim maskCol = sliceMask.Col(i)
                     If maskCol.CountNonZero > 0 Then split(0).Col(i).SetTo(minVal + xIncr * i, maskCol)
                 Next
             End If
 
             Static yCheck = findCheckBox("Smooth in Y-direction")
             If yCheck.Checked Then
-                split(1).MinMaxLoc(minVal, maxVal, minLoc, maxLoc, maskPlane)
+                split(1).MinMaxLoc(minVal, maxVal, minLoc, maxLoc, sliceMask)
                 kalman.kInput = (minVal + maxVal) / 2
                 kalman.Run()
                 floorYPlane = kalman.kAverage
-                split(1).SetTo(floorYPlane, maskPlane)
+                split(1).SetTo(floorYPlane, sliceMask)
             End If
 
             Static zCheck = findCheckBox("Smooth in Z-direction")
             If zCheck.Checked Then
                 Dim firstRow As Integer, lastRow As Integer
-                For firstRow = 0 To maskPlane.Height - 1
-                    If maskPlane.Row(firstRow).CountNonZero() > 20 Then Exit For
+                For firstRow = 0 To sliceMask.Height - 1
+                    If sliceMask.Row(firstRow).CountNonZero() > 20 Then Exit For
                 Next
-                For lastRow = maskPlane.Height - 1 To 0 Step -1
-                    If maskPlane.Row(lastRow).CountNonZero() > 20 Then Exit For
+                For lastRow = sliceMask.Height - 1 To 0 Step -1
+                    If sliceMask.Row(lastRow).CountNonZero() > 20 Then Exit For
                 Next
 
-                If lastRow >= 0 And firstRow < maskPlane.Height Then
-                    Dim meanMin = split(2).Row(lastRow).Mean(maskPlane.Row(lastRow))
-                    Dim meanMax = split(2).Row(firstRow).Mean(maskPlane.Row(firstRow))
+                If lastRow >= 0 And firstRow < sliceMask.Height Then
+                    Dim meanMin = split(2).Row(lastRow).Mean(sliceMask.Row(lastRow))
+                    Dim meanMax = split(2).Row(firstRow).Mean(sliceMask.Row(firstRow))
                     Dim zIncr = (meanMax.Item(0) - meanMin.Item(0)) / Math.Abs(lastRow - firstRow)
                     For i = firstRow To lastRow
-                        Dim maskRow = maskPlane.Row(i)
+                        Dim maskRow = sliceMask.Row(i)
                         Dim mean = split(2).Row(i).Mean(maskRow)
                         If maskRow.CountNonZero > 0 Then
                             split(2).Row(i).SetTo(mean.Item(0))
@@ -489,7 +489,7 @@ Public Class Structured_LinearizeFloor
 
             cv.Cv2.Merge(split, imuPC)
 
-            imuPC.CopyTo(imuPointCloud, maskPlane)
+            imuPC.CopyTo(imuPointCloud, sliceMask)
         End If
     End Sub
 End Class
@@ -506,7 +506,7 @@ Public Class Structured_SliceH
     Dim inrange As Depth_InRange
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
-    Public maskPlane As cv.Mat
+    Public sliceMask As cv.Mat
     Public yPlaneOffset As Integer
     Public Sub New()
         initParent()
@@ -547,12 +547,12 @@ Public Class Structured_SliceH
         inrange.maxVal = planeY + thicknessMeters
         inrange.src = Split(1).Clone
         inrange.Run()
-        maskPlane = inrange.depthMask
-        maskPlane.SetTo(0, task.inrange.noDepthMask)
+        sliceMask = inrange.depthMask
+        sliceMask.SetTo(0, task.inrange.noDepthMask)
 
         label1 = "At offset " + CStr(yCoordinate) + " y = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
                  Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
-        dst1.SetTo(cv.Scalar.White, maskPlane)
+        dst1.SetTo(cv.Scalar.White, sliceMask)
         label2 = side2D.label2
 
         dst2 = side2D.dst1.ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
@@ -577,7 +577,7 @@ Public Class Structured_SliceV
     Dim sideStruct As Structured_SliceH
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
-    Public maskPlane As cv.Mat
+    Public sliceMask As cv.Mat
     Public Sub New()
         initParent()
         top2D = New Histogram_TopData()
@@ -609,14 +609,14 @@ Public Class Structured_SliceV
         inrange.maxVal = planeX + thicknessMeters
         inrange.src = split(0).Clone
         inrange.Run()
-        maskPlane = inrange.depthMask
-        maskPlane.SetTo(0, task.inrange.noDepthMask)
+        sliceMask = inrange.depthMask
+        sliceMask.SetTo(0, task.inrange.noDepthMask)
 
         label1 = "At offset " + CStr(xCoordinate) + " x = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
                  Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
 
         dst1 = task.color.Clone
-        dst1.SetTo(cv.Scalar.White, maskPlane)
+        dst1.SetTo(cv.Scalar.White, sliceMask)
         label2 = top2D.label2
 
         dst2 = top2D.dst1.Normalize(0, 255, cv.NormTypes.MinMax)
@@ -648,7 +648,7 @@ Public Class Structured_SliceVStable
     Dim sideStruct As Structured_SliceH
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
-    Public maskPlane As cv.Mat
+    Public sliceMask As cv.Mat
     Public Sub New()
         initParent()
         top2D = New Histogram_TopData()
@@ -679,14 +679,14 @@ Public Class Structured_SliceVStable
         inrange.maxVal = planeX + thicknessMeters
         inrange.src = split(0).Clone
         inrange.Run()
-        maskPlane = inrange.depthMask
-        maskPlane.SetTo(0, task.inrange.noDepthMask)
+        sliceMask = inrange.depthMask
+        sliceMask.SetTo(0, task.inrange.noDepthMask)
 
         label1 = "At offset " + CStr(xCoordinate) + " x = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
                  Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
 
         dst1 = task.color.Clone
-        dst1.SetTo(cv.Scalar.White, maskPlane)
+        dst1.SetTo(cv.Scalar.White, sliceMask)
         label2 = top2D.label2
     End Sub
 End Class
@@ -698,92 +698,61 @@ End Class
 
 
 
-Public Class Structured_CenterLines
+Public Class Structured_CenterSlice
     Inherits VBparent
     Dim vSlice As Structured_SliceV
-    Dim hSlice As Structured_SliceH
     Dim line As LineDetector_Basics
-    Dim kalman As Kalman_Basics
-    Dim stable As IMU_IscameraStable
-    Dim leftPt As cv.Point2f, rightPt As cv.Point2f, topPt As cv.Point2f, botPt As cv.Point2f
+    Public topPt As cv.Point2f, botPt As cv.Point2f
     Public Sub New()
         initParent()
-        stable = New IMU_IscameraStable
-        kalman = New Kalman_Basics
-        ReDim kalman.kInput(8 - 1)
         vSlice = New Structured_SliceV
-        hSlice = New Structured_SliceH
         line = New LineDetector_Basics
         task.desc = "Find the vertical and horizontal center lines with accurate depth data.."
     End Sub
-    Private Sub getHLine(lines As List(Of cv.Point2f))
-        Dim minX = Single.MaxValue, maxX = Single.MinValue
-        For Each pt In lines
-            If pt.X < minX Then
-                leftPt = pt
-                minX = pt.X
-            End If
-            If pt.X > maxX Then
-                rightPt = pt
-                maxX = pt.X
-            End If
-        Next
-    End Sub
-    Private Sub getVLine(lines As List(Of cv.Point2f))
-        Dim minY = Single.MaxValue, maxY = Single.MinValue
-        For Each pt In lines
-            If pt.Y < minY Then
-                topPt = pt
-                minY = pt.Y
-            End If
-            If pt.Y > maxY Then
-                botPt = pt
-                maxY = pt.Y
-            End If
-        Next
-    End Sub
-    Private Function getPoints(input As cv.Mat) As List(Of cv.Point2f)
-        line.src = input
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        vSlice.Run()
+        dst1 = task.color
+
+        line.src = vSlice.sliceMask
         line.Run()
         dst2 = line.dst1
 
         Dim pts As New List(Of cv.Point2f)
+        Dim slope As Single, b As Single
         For Each nl In line.sortlines
             Dim p1 = New cv.Point2f(nl.Value.Item0, nl.Value.Item1)
             Dim p2 = New cv.Point2f(nl.Value.Item2, nl.Value.Item3)
             pts.Add(p1)
             pts.Add(p2)
-            If pts.Count >= 4 Then Exit For
+            Dim nextSlope = (botPt.Y - topPt.Y) / If(botPt.X = topPt.X, 10000, botPt.X - topPt.X)
+            Dim nextB = topPt.Y - slope * topPt.X ' y = slope * x + b
+            slope = If(slope = 0, nextSlope, (nextSlope + slope) / 2)
+            b = If(b = 0, nextB, (nextB + ) / 2)
         Next
-        Return pts
-    End Function
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        topPt = New cv.Point2f(-b / slope, 0)  ' y = 0, 0 = slope * x + b, x = -b / slope
+        botPt = New cv.Point2f((dst1.Height - b) / slope, dst1.Height)
 
-        stable.Run()
-        Static kalmanCheck = findCheckBox("Turn Kalman filtering on")
-        kalmanCheck.checked = stable.cameraStable
-        vSlice.Run()
-        hSlice.Run()
-        dst1 = task.color
+        Dim minY = Single.MaxValue, maxY = Single.MinValue
+        For Each pt In pts
+            If pt.Y < minY Then
+                If minY <> Single.MinValue Then pt.X = (topPt.X + pt.X) / 2
+                topPt = pt
+                minY = pt.Y
+            End If
+            If pt.Y > maxY Then
+                If maxY <> Single.MaxValue Then pt.X = (botPt.X + pt.X) / 2
+                botPt = pt
+                maxY = pt.Y
+            End If
+        Next
 
-        getHLine(getPoints(hSlice.maskPlane))
-        getVLine(getPoints(vSlice.maskPlane))
 
-        kalman.kInput = {leftPt.X, leftPt.Y, rightPt.X, rightPt.Y, topPt.X, topPt.Y, botPt.X, botPt.Y}
-        kalman.Run()
-        leftPt = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
-        rightPt = New cv.Point2f(kalman.kOutput(2), kalman.kOutput(3))
-        topPt = New cv.Point2f(kalman.kOutput(4), kalman.kOutput(5))
-        botPt = New cv.Point2f(kalman.kOutput(6), kalman.kOutput(7))
-
-        dst2.Line(leftPt, rightPt, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-        dst2.Line(topPt, botPt, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-
-        dst2.Circle(leftPt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-        dst2.Circle(rightPt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-        dst2.Circle(topPt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-        dst2.Circle(botPt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        dst2.Line(topPt, botPt, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+        dst1.Line(topPt, botPt, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        dst1.Circle(topPt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        dst1.Circle(botPt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 
@@ -795,10 +764,10 @@ End Class
 
 Public Class Structured_Cloud
     Inherits VBparent
-    Dim lines As Structured_CenterLines
+    Dim lines As Structured_CenterSlice
     Public Sub New()
         initParent()
-        lines = New Structured_CenterLines
+        lines = New Structured_CenterSlice
         task.desc = "Attempt to impose a structure on the point cloud data."
     End Sub
     Public Sub Run()

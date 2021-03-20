@@ -469,7 +469,7 @@ Public Class OpenGL_FloorPlane
             dst1 = plane.dst1
             dst2 = plane.dst2
 
-            Dim floorColor = task.color.Mean(plane.maskPlane)
+            Dim floorColor = task.color.Mean(plane.sliceMask)
             Dim data As New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
             data.Set(Of Single)(0, 0, floorColor.Item(0))
             data.Set(Of Single)(1, 0, floorColor.Item(0))
@@ -512,7 +512,7 @@ Public Class OpenGL_FloorTexture
             dst1 = floor.plane.dst1
             dst2 = floor.plane.dst2
 
-            shuffle.src = floor.plane.maskPlane
+            shuffle.src = floor.plane.sliceMask
             shuffle.Run()
             floor.ogl.textureInput = shuffle.rgbaTexture
 
@@ -523,7 +523,7 @@ Public Class OpenGL_FloorTexture
             data.Set(Of Single)(3, 0, floor.plane.floor.floorYplane)
             floor.ogl.dataInput = data
             floor.ogl.pointCloudInput = floor.plane.imuPointCloud
-            floor.ogl.pointCloudInput.SetTo(0, floor.plane.maskPlane)
+            floor.ogl.pointCloudInput.SetTo(0, floor.plane.sliceMask)
             floor.ogl.src = src
             floor.ogl.Run()
         Else
@@ -556,7 +556,7 @@ Public Class OpenGL_DepthSliceH
         slices.Run()
         dst1 = slices.dst1
         Dim mask As New cv.Mat
-        cv.Cv2.BitwiseNot(slices.maskPlane, mask)
+        cv.Cv2.BitwiseNot(slices.sliceMask, mask)
 
         ogl.pointCloudInput = slices.side2D.gCloud.dst1.Clone
         ogl.pointCloudInput.SetTo(0, mask)

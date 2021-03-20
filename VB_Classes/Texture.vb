@@ -163,9 +163,9 @@ Public Class Texture_Shuffle
         If standalone or task.intermediateReview = caller Then
             floor.plane.Run()
             dst2.SetTo(0)
-            src.CopyTo(dst2, floor.plane.maskPlane)
+            src.CopyTo(dst2, floor.plane.sliceMask)
             dst1 = floor.plane.dst1
-            texture.src = floor.plane.maskPlane
+            texture.src = floor.plane.sliceMask
         Else
             texture.src = src
         End If
