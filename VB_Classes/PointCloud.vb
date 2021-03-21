@@ -117,6 +117,50 @@ End Class
 
 
 
+Public Class PointCloud_Continuous
+    Inherits VBparent
+    Public discontinuityMask As cv.Mat
+    Public Sub New()
+        initParent()
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Threshold of continuity in mm", 0, 1000, 5)
+        End If
+
+        dst1 = New cv.Mat(src.Size, cv.MatType.CV_8U)
+        discontinuityMask = New cv.Mat(src.Size, cv.MatType.CV_8U)
+        task.desc = "Show where the pointcloud is continuous"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static thresholdSlider = findSlider("Threshold of continuity in mm")
+        Dim threshold = thresholdSlider.value
+
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32F Then input = task.depth32f
+
+        dst1.SetTo(0)
+        discontinuityMask.SetTo(0)
+        For y = 0 To input.Height - 1
+            For x = 1 To input.Width - 1
+                Dim p1 = input.Get(Of Single)(y, x - 1)
+                Dim p2 = input.Get(Of Single)(y, x)
+                If Math.Abs(p1 - p2) <= threshold Then dst1.Set(Of Byte)(y, x, 255) Else discontinuityMask.Set(Of Byte)(y, x, 255)
+            Next
+        Next
+
+        discontinuityMask.SetTo(0, task.inrange.nodepthmask)
+        dst1.SetTo(0, task.inrange.nodepthmask)
+        dst2 = input
+        dst2.SetTo(0, discontinuityMask)
+    End Sub
+End Class
+
+
+
+
+
 ' https://www.intelrealsense.com/depth-camera-d435i/
 ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
 ' https://www.stereolabs.com/zed/

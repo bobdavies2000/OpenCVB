@@ -35,7 +35,7 @@ Public Class Structured_Floor
 
         floorYplane = structD.side2D.meterMax * (yCoordinate - ocvb.sideCameraPoint.Y) / (dst2.Height - ocvb.sideCameraPoint.Y)
 
-        structD.offsetSlider.Value = If(yCoordinate >= 0, yCoordinate, dst2.Height)
+        structD.offsetSlider.Value = If(yCoordinate >= 0, yCoordinate, 0)
 
         dst1 = structD.dst1
         dst2 = structD.dst2
