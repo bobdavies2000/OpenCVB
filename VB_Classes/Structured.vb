@@ -848,6 +848,7 @@ Public Class Structured_Cloud
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Lines in X-Direction", 0, 100, 30)
             sliders.setupTrackBar(1, "Lines in Y-Direction", 0, 100, 30)
+            sliders.setupTrackBar(2, "CenterLine", 0, dst1.Width, dst1.Width / 2)
         End If
 
         dst1 = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
@@ -858,8 +859,10 @@ Public Class Structured_Cloud
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static xLineSlider = findSlider("Lines in X-Direction")
         Static yLineSlider = findSlider("Lines in Y-Direction")
+        Static cLineSlider = findSlider("CenterLine")
         Dim xLines = xLineSlider.value
         Dim yLines = yLineSlider.value
+        Dim cLine = cLineSlider.value
 
         Dim topPt = New cv.Point2f(dst1.Width / 2, 0)
         Dim botPt = New cv.Point2f(dst1.Width / 2, dst1.Height)
@@ -872,9 +875,9 @@ Public Class Structured_Cloud
             Dim pt2 = New cv.Point2f(0, i * stepY)
             dst1.Line(pt1, pt2, 255, 1, cv.LineTypes.Link4)
 
-            Dim pt = New cv.Point(dst1.Width / 2, i * stepY)
+            Dim pt = New cv.Point2f(cLine, i * stepY)
             Dim xyz = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
-            cv.Cv2.PutText(dst1, Format(xyz.Item1, "#0.000"), pt, cv.HersheyFonts.HersheyComplexSmall, 0.7, cv.Scalar.White, 2)
+            cv.Cv2.PutText(dst1, Format(xyz.Item0, "#0.00") + " " + Format(xyz.Item1, "#0.00") + " " + Format(xyz.Item2, "#0.00"), pt, cv.HersheyFonts.HersheyComplexSmall, 0.7, cv.Scalar.White, 2)
         Next
 
         Dim count = 0

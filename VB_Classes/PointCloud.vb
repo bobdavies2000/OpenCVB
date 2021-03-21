@@ -1297,15 +1297,26 @@ Public Class PointCloud_ObjectsTop
         Dim xpt1 As cv.Point2f, xpt2 As cv.Point2f
         If standalone Or task.intermediateReview = caller Then
             Static distanceSlider = findSlider("Test Bar Distance from camera in mm")
-            Dim pixeldistance = src.Width * (distanceSlider.Value / 1000) / ocvb.maxZ
+            Dim pixeldistance = src.Height * (distanceSlider.Value / 1000) / ocvb.maxZ
             Dim lineHalf = CInt(Math.Tan(FOV * 0.0174533) * pixeldistance)
 
             xpt1 = New cv.Point2f(ocvb.topCameraPoint.X - lineHalf, src.Height - pixeldistance)
             xpt2 = New cv.Point2f(ocvb.topCameraPoint.X + lineHalf, src.Height - pixeldistance)
-            distanceSlider.Maximum = ocvb.maxZ * 1000
             If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Blue, 3)
-            ocvb.trueText("Test line (blue) is " + CStr(pixeldistance) + " pixels or " + Format(pixeldistance / ocvb.pixelsPerMeter, "#0.00") + " meters from the camera" + vbCrLf +
-                          "The length of the line is " + CStr(lineHalf * 2 / ocvb.pixelsPerMeter) + " meters or " + CStr(lineHalf * 2) + " pixels", 10, 40, 3)
+            Dim lineWidth = xpt2.X - xpt1.X
+            Dim blueLineMeters As Single
+            If lineWidth = 0 Then
+                lineWidth = 1
+                blueLineMeters = 0
+            Else
+                blueLineMeters = distanceSlider.Value * lineWidth / (1000 * pixeldistance)
+            End If
+            ocvb.trueText("Blue Line is " + CStr(pixeldistance) + " pixels from the camera" + vbCrLf +
+                          "Blue Line is " + CStr(lineWidth) + " pixels long" + vbCrLf +
+                          "Blue Line is " + Format(distanceSlider.Value / 1000, "#0.00") + " meters from the camera" + vbCrLf +
+                          "Blue Line is " + Format(blueLineMeters, "#0.00") + " meters long" + vbCrLf +
+                          "At the Blue Line there are " + Format(1000 * blueLineMeters / lineWidth, "#0.00") + " mm per pixel " +
+                          "in this projection", 10, 60, 3)
         End If
 
         viewObjects.Clear()
@@ -1400,10 +1411,21 @@ Public Class PointCloud_ObjectsSide
 
             xpt1 = New cv.Point2f(ocvb.sideCameraPoint.X + pixeldistance, ocvb.sideCameraPoint.Y - lineHalf)
             xpt2 = New cv.Point2f(ocvb.sideCameraPoint.X + pixeldistance, ocvb.sideCameraPoint.Y + lineHalf)
-            distanceSlider.Maximum = ocvb.maxZ * 1000
             If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Blue, 3)
-            ocvb.trueText("Test line (blue) is " + CStr(pixeldistance) + " pixels or " + Format(pixeldistance / ocvb.pixelsPerMeter, "#0.00") + " meters from the camera" + vbCrLf +
-                          "The length of the line is " + CStr(lineHalf * 2 / ocvb.pixelsPerMeter) + " meters or " + CStr(lineHalf * 2) + " pixels", 10, 40, 3)
+            Dim lineWidth = xpt2.Y - xpt1.Y
+            Dim blueLineMeters As Single
+            If lineWidth = 0 Then
+                lineWidth = 1
+                blueLineMeters = 0
+            Else
+                blueLineMeters = distanceSlider.Value * lineWidth / (1000 * pixeldistance)
+            End If
+            ocvb.trueText("Blue Line is " + CStr(pixeldistance) + " pixels from the camera" + vbCrLf +
+                          "Blue Line is " + CStr(lineWidth) + " pixels long" + vbCrLf +
+                          "Blue Line is " + Format(distanceSlider.Value / 1000, "#0.00") + " meters from the camera" + vbCrLf +
+                          "Blue Line is " + Format(blueLineMeters, "#0.00") + " meters long" + vbCrLf +
+                          "At the Blue Line there are " + Format(1000 * blueLineMeters / lineWidth, "#0.00") + " mm per pixel " +
+                          "in this projection", 10, 60, 3)
         End If
 
         viewObjects.Clear()
