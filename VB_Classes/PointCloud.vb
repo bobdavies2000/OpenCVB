@@ -98,6 +98,25 @@ End Module
 
 
 
+
+
+Public Class PointCloud_Basics
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+        task.desc = "Display the point cloud in a 2D image for use with the PixelViewer"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        dst1 = task.pointCloud
+    End Sub
+End Class
+
+
+
+
+
+
 ' https://www.intelrealsense.com/depth-camera-d435i/
 ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
 ' https://www.stereolabs.com/zed/

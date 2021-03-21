@@ -702,13 +702,17 @@ Public Class Structured_CenterSlice
     Inherits VBparent
     Dim vSlice As Structured_SliceV
     Dim line As LineDetector_Basics
+    Public topPt As cv.Point2f, botPt As cv.Point2f
+    Public slope As Single
+    Public avgPt As cv.Point2f
+    Public b As Integer
     Public Sub New()
         initParent()
         vSlice = New Structured_SliceV
         line = New LineDetector_Basics
         label1 = "Center Slice in yellow"
-        label2 = "White=SliceV output, Red Dot is avgPt"
-        task.desc = "Find the vertical and horizontal center lines with accurate depth data.."
+        label2 = "White = SliceV output, Red Dot is avgPt"
+        task.desc = "Find the vertical center line with accurate depth data.."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
@@ -721,11 +725,9 @@ Public Class Structured_CenterSlice
         dst2 = line.dst1
 
         If line.sortlines.Count > 0 Then
-            Dim slope As Single
             Dim count As Integer
-            Dim avgPt As cv.Point2f
-            Dim topPt As cv.Point2f, botPt As cv.Point2f
             Dim minY = Single.MaxValue, maxY = Single.MinValue
+            avgPt = New cv.Point2f
             For Each nl In line.sortlines
                 Dim p1 = New cv.Point2f(nl.Value.Item0, nl.Value.Item1)
                 Dim p2 = New cv.Point2f(nl.Value.Item2, nl.Value.Item3)
@@ -754,18 +756,22 @@ Public Class Structured_CenterSlice
                 End If
             Next
 
-            If slope = 0 And topPt.X <> botPt.X Then slope = (topPt.Y - botPt.Y) / (topPt.X - botPt.X)
-            avgPt = New cv.Point2f(avgPt.X / count, avgPt.Y / count)
-            dst2.Circle(avgPt, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            Dim b = avgPt.Y - slope * avgPt.X ' y = slope * x + b, b = y - slope * x
-            topPt = New cv.Point2f(-b / slope, 0)  ' y = 0, 0 = slope * x + b, x = -b / slope
-            botPt = New cv.Point2f((dst1.Height - b) / slope, dst1.Height)
-
-            dst2.Line(topPt, botPt, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
-            dst1.Line(topPt, botPt, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-            dst1.Circle(topPt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-            dst1.Circle(botPt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            If count > 0 Then
+                If slope = 0 And topPt.X <> botPt.X Then slope = (topPt.Y - botPt.Y) / (topPt.X - botPt.X)
+                avgPt = New cv.Point2f(avgPt.X / count, avgPt.Y / count)
+                b = avgPt.Y - slope * avgPt.X ' y = slope * x + b, b = y - slope * x
+                topPt = New cv.Point2f(-b / slope, 0)  ' y = 0, 0 = slope * x + b, x = -b / slope
+                botPt = New cv.Point2f((dst1.Height - b) / slope, dst1.Height)
+            End If
         End If
+
+        If Math.Abs(topPt.X - botPt.X) < 1 Or topPt.Y <> 0 Or botPt.Y <> dst1.Height Then
+            topPt = New cv.Point2f(topPt.X, 0)
+            botPt = New cv.Point2f(topPt.X, dst1.Height)
+        End If
+        dst2.Circle(avgPt, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst2.Line(topPt, botPt, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+        dst1.Line(topPt, botPt, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 
@@ -775,18 +781,111 @@ End Class
 
 
 
-Public Class Structured_Cloud
+Public Class Structured_CloudOld
     Inherits VBparent
-    Dim lines As Structured_CenterSlice
+    Dim line As Structured_CenterSlice
     Public Sub New()
         initParent()
-        lines = New Structured_CenterSlice
+        line = New Structured_CenterSlice
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Lines in X-Direction", 0, 100, 30)
+            sliders.setupTrackBar(1, "Lines in Y-Direction", 0, 100, 30)
+        End If
+
+        dst2 = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
+
         task.desc = "Attempt to impose a structure on the point cloud data."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static xLineSlider = findSlider("Lines in X-Direction")
+        Static yLineSlider = findSlider("Lines in Y-Direction")
+        Dim xLines = xLineSlider.value
+        Dim yLines = yLineSlider.value
 
-        lines.Run()
+        line.Run()
         dst1 = src
+
+        Dim topPt = line.topPt
+        Dim botPt = line.botPt
+        dst2.SetTo(0)
+        dst2.Line(topPt, botPt, 255, 1, cv.LineTypes.AntiAlias)
+
+        Dim stepX = -(topPt.X - botPt.X) / yLines ' negative because the y-axis is increasing down.
+        Dim stepY = dst1.Height / yLines
+        If stepX < 0.5 Then stepX = 0
+
+        Dim slope = 1 / line.slope ' perpendiculars have inverse slope
+        If topPt.X = botPt.X Then slope = 0
+        For i = 0 To yLines - 1
+            Dim x = topPt.X + stepX * i
+            Dim pt = New cv.Point2f(x, line.slope * x + line.b)
+            If stepX = 0 Then pt = New cv.Point2f(x, stepY * i)
+            Dim b = pt.Y + slope * pt.X
+            Dim pt1 = New cv.Point2f(dst1.Width, -slope * dst1.Width + b)
+            Dim pt2 = New cv.Point2f(0, b)
+            dst2.Line(pt1, pt2, 255, 1, cv.LineTypes.AntiAlias)
+        Next
+
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Structured_Cloud
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Lines in X-Direction", 0, 100, 30)
+            sliders.setupTrackBar(1, "Lines in Y-Direction", 0, 100, 30)
+        End If
+
+        dst1 = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
+
+        task.desc = "Attempt to impose a structure on the point cloud data."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static xLineSlider = findSlider("Lines in X-Direction")
+        Static yLineSlider = findSlider("Lines in Y-Direction")
+        Dim xLines = xLineSlider.value
+        Dim yLines = yLineSlider.value
+
+        Dim topPt = New cv.Point2f(dst1.Width / 2, 0)
+        Dim botPt = New cv.Point2f(dst1.Width / 2, dst1.Height)
+        dst1.SetTo(0)
+        dst1.Line(topPt, botPt, 255, 1, cv.LineTypes.AntiAlias)
+
+        Dim stepY = dst1.Height / yLines
+        For i = 0 To yLines - 1
+            Dim pt1 = New cv.Point2f(dst1.Width, i * stepY)
+            Dim pt2 = New cv.Point2f(0, i * stepY)
+            dst1.Line(pt1, pt2, 255, 1, cv.LineTypes.Link4)
+
+            Dim pt = New cv.Point(dst1.Width / 2, i * stepY)
+            Dim xyz = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
+            cv.Cv2.PutText(dst1, Format(xyz.Item1, "#0.000"), pt, cv.HersheyFonts.HersheyComplexSmall, 0.7, cv.Scalar.White, 2)
+        Next
+
+        Dim count = 0
+        For y = 0 To dst1.Height - 1
+            For x = 0 To dst1.Width - 1
+                Dim test = dst1.Get(Of Byte)(y, x)
+                If test = 255 Then
+                    count += 1
+                End If
+            Next
+        Next
+        label1 = CStr(count) + " pixels analyzed or " + Format(count / dst1.Total, "#0.0%")
     End Sub
 End Class

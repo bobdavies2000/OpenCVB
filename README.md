@@ -45,11 +45,17 @@ VB.Net and Python examples), CPP_Classes, or CS_Classes. All algorithms are
 automatically provided with color, depth, point cloud, and IMU data and there
 are usually just 2 outputs – dst1 and dst2.
 
+It is deliberate that the algorithms fit in one page of code or less. Reading
+the code is one way to review the algorithms but it is a lot faster and easier
+to review the output of each algorithm after installation. The output is often
+self-documenting or a natural representation of the algorithm’s intent.
+
 In the sample output below, any of the algorithms can be selected from the first
 combo box at the top of the form. The second combo box is used to select
 algorithms grouped by OpenCV API or OpenCVB algorithm. The default grouping is
-to select the special grouping “\<All\>” while other special groupings allow
-selecting all Python or C++ algorithms.
+to select the special grouping “\<All\>”. There are a variety of other special
+groupings that select, for example, all Python or all C++ algorithms or all
+multi-threaded algorithms.
 
 ![](media/0094dd80a047099af3fa5ecf92dee723.png)
 

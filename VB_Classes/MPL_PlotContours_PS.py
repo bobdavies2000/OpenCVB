@@ -53,6 +53,8 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
         ax.set_ylim(-3, 3)
         ax.set_xticks([])
         ax.set_yticks([])
+        plt.title("Bivariate Normal Distribution example")
+
         buf.seek(0) 
         plt.savefig(buf, format='rgba', dpi=100)
         img_byte_arr = buf.getvalue()

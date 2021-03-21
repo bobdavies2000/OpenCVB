@@ -8,20 +8,23 @@ import io
 titleWindow = 'MPL_PlotFunction_PS.py'
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
-    global xdata, ydata, line, maxX
+    global xdata, ydata, line, maxX, myFrameCount
     fig, ax = plt.subplots()
-    if frameCount == 0: 
+    if frameCount % 60 == 0:
+        myFrameCount = 0
         line, = ax.plot([], [], lw=2)    # update the data
         ax.set_ylim(-1.1, 1.1)
+        xdata, ydata = [], []
         maxX = 10
     
     for i in range(0, 9):
-        t = frameCount + i / 10
+        t = myFrameCount + i / 10
         xdata.append(t)
         ydata.append(np.sin(2*np.pi*t) * np.exp(-t/10.))
-    line.set_data(xdata, ydata)
 
-    if frameCount >= maxX:
+    line.set_data(xdata, ydata)
+    myFrameCount += 1
+    if myFrameCount >= maxX:
         maxX *= 2
         ax.set_xlim(0, maxX)
         ax.figure.canvas.draw()
@@ -29,6 +32,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     ax.set_xlim(0, maxX)
     ax.grid()
     plt.plot(xdata, ydata)
+    plt.title("An example showing a decay function plot")
 
     buf = io.BytesIO()
     plt.savefig(buf, format='rgba', dpi=100)
@@ -40,5 +44,6 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     plt.close()
     return tmp, None
 
+myFrameCount = 0
 xdata, ydata = [], []
 PyStreamRun(OpenCVCode, titleWindow)

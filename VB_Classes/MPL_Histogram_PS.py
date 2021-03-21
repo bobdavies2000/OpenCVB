@@ -44,6 +44,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
 
     ax.set_xlim(left[1], right[-1])
     ax.set_ylim(bottom.min(), top.max())
+    plt.title("Depth data from camera - SampleCount histogram")
 
     buf = io.BytesIO()
     plt.savefig(buf, format='rgba', dpi=100)

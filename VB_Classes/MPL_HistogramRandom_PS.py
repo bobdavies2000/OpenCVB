@@ -49,6 +49,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
 
     ax.set_xlim(left[0], right[-1])
     ax.set_ylim(bottom.min(), top.max())    # simulate new data coming in
+    plt.title("Histogram with 1000 random points in 100 bins")
 
     buf = io.BytesIO()
     plt.savefig(buf, format='rgba', dpi=100)
