@@ -119,17 +119,55 @@ End Class
 
 Public Class PointCloud_Continuous
     Inherits VBparent
-    Public discontinuityMask As cv.Mat
     Public Sub New()
         initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Threshold of continuity in mm", 0, 1000, 5)
+            sliders.setupTrackBar(0, "Threshold of continuity in mm", 0, 1000, 10)
+        End If
+
+        task.desc = "Show where the pointcloud is continuous"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static thresholdSlider = findSlider("Threshold of continuity in mm")
+        Dim threshold = thresholdSlider.value
+
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32F Then input = task.depth32f
+
+        Dim tmp32f = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        Dim r1 = New cv.Rect(1, 0, dst1.Width - 1, dst1.Height)
+        Dim r2 = New cv.Rect(0, 0, dst1.Width - 1, dst1.Height)
+        cv.Cv2.Absdiff(input(r1), input(r2), tmp32f(r1))
+        tmp32f = tmp32f.Threshold(threshold, 255, cv.ThresholdTypes.BinaryInv)
+        dst1 = tmp32f.ConvertScaleAbs(255)
+        cv.Cv2.BitwiseNot(dst1, dst2)
+        dst1.SetTo(0, task.inrange.nodepthmask)
+        dst2.SetTo(0, task.inrange.nodepthmask)
+        label1 = "White pixels: Z-values within " + CStr(thresholdSlider.value) + " mm's of X neighbor"
+        label2 = "Mask showing discontinuities > " + CStr(thresholdSlider.value) + " mm's of X neighbor"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class PointCloud_Continuous_VB
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Threshold of continuity in mm", 0, 1000, 10)
         End If
 
         dst1 = New cv.Mat(src.Size, cv.MatType.CV_8U)
-        discontinuityMask = New cv.Mat(src.Size, cv.MatType.CV_8U)
+        dst2 = New cv.Mat(src.Size, cv.MatType.CV_8U)
         task.desc = "Show where the pointcloud is continuous"
     End Sub
     Public Sub Run()
@@ -141,19 +179,19 @@ Public Class PointCloud_Continuous
         If input.Type <> cv.MatType.CV_32F Then input = task.depth32f
 
         dst1.SetTo(0)
-        discontinuityMask.SetTo(0)
+        dst2.SetTo(0)
         For y = 0 To input.Height - 1
             For x = 1 To input.Width - 1
                 Dim p1 = input.Get(Of Single)(y, x - 1)
                 Dim p2 = input.Get(Of Single)(y, x)
-                If Math.Abs(p1 - p2) <= threshold Then dst1.Set(Of Byte)(y, x, 255) Else discontinuityMask.Set(Of Byte)(y, x, 255)
+                If Math.Abs(p1 - p2) <= threshold Then dst1.Set(Of Byte)(y, x, 255) Else dst2.Set(Of Byte)(y, x, 255)
             Next
         Next
 
-        discontinuityMask.SetTo(0, task.inrange.nodepthmask)
+        dst2.SetTo(0, task.inrange.nodepthmask)
         dst1.SetTo(0, task.inrange.nodepthmask)
-        dst2 = input
-        dst2.SetTo(0, discontinuityMask)
+        label1 = "White pixels: Z-values within " + CStr(thresholdSlider.value) + " mm's of X neighbor"
+        label2 = "Mask showing discontinuities > " + CStr(thresholdSlider.value) + " mm's of X neighbor"
     End Sub
 End Class
 
