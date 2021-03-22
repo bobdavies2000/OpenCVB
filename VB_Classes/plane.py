@@ -1,7 +1,6 @@
 import open3d as o3d
 import numpy as np
 import random
-import copy 
 import pyransac3d as pyrsc
 
 class Plane:

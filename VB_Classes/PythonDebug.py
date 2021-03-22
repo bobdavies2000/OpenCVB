@@ -1,47 +1,99 @@
-# https://towardsdatascience.com/animations-with-matplotlib-d96375c5442c
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
-import pandas as pd
-import seaborn as sns
-
+import open3d as o3d
 import numpy as np
-from PyStream import PyStreamRun
-import cv2 as cv
-import io
-titleWindow = 'MPL_Graph3D_PS.py'
+import random
+import pyransac3d as pyrsc
 
-def OpenCVCode(imgRGB, depth32f, frameCount):
-    global df, angle
+class Plane:
+    """ 
+    Implementation of planar RANSAC.
 
-    angle += 10
-    if angle > 210: angle = 70
+    Class for Plane object, which finds the equation of a infinite plane using RANSAC algorithim. 
 
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    ax.plot_trisurf(df['Y'], df['X'], df['Z'], cmap=plt.cm.viridis, linewidth=0.2)
+    Call `fit(.)` to randomly take 3 points of pointcloud to verify inliers based on a threshold.
 
-    ax.view_init(30,angle)
+    ![Plane](https://raw.githubusercontent.com/leomariga/pyRANSAC-3D/master/doc/plano.gif "Plane")
 
-    buf = io.BytesIO()
-    plt.savefig(buf, format='rgba', dpi=100)
-    img_byte_arr = buf.getvalue()
-    rgbaSize = 480, 640, 4 
-    tmp = np.array(np.frombuffer(img_byte_arr, np.uint8).reshape(rgbaSize)) 
-    buf.close()
-    plt.close()
-    return tmp, None
+    ---
+    """
 
-# Get the data (csv file is hosted on the web)
-url = 'https://raw.githubusercontent.com/holtzy/The-Python-Graph-Gallery/master/static/data/volcano.csv'
-data = pd.read_csv(url)
+    def __init__(self):
+        self.inliers = []
+        self.equation = []
 
-# Transform it to a long format
-df=data.unstack().reset_index()
-df.columns=["X","Y","Z"]
 
-# And transform the old column name in something numeric
-df['X']=pd.Categorical(df['X'])
-df['X']=df['X'].cat.codes
-angle = 70
 
-PyStreamRun(OpenCVCode, titleWindow)
+    def fit(self, pts, thresh=0.05, minPoints=100, maxIteration=1000):
+        """ 
+        Find the best equation for a plane.
+
+        :param pts: 3D point cloud as a `np.array (N,3)`.
+        :param thresh: Threshold distance from the plane which is considered inlier.
+        :param maxIteration: Number of maximum iteration which RANSAC will loop over.
+        :returns:
+        - `self.equation`:  Parameters of the plane using Ax+By+Cy+D `np.array (1, 4)`
+        - `self.inliers`: points from the dataset considered inliers
+
+        ---
+        """
+        n_points = pts.shape[0]
+        print(n_points)
+        best_eq = []
+        best_inliers = []
+
+        for it in range(maxIteration):
+
+            # Samples 3 random points 
+            id_samples = random.sample(range(1, n_points-1), 3)
+            pt_samples = pts[id_samples]
+
+            # We have to find the plane equation described by those 3 points
+            # We find first 2 vectors that are part of this plane
+            # A = pt2 - pt1
+            # B = pt3 - pt1
+
+            vecA = pt_samples[1,:] - pt_samples[0,:]
+            vecB = pt_samples[2,:] - pt_samples[0,:]
+
+            # Now we compute the cross product of vecA and vecB to get vecC which is normal to the plane
+            vecC = np.cross(vecA, vecB)
+            
+
+            # The plane equation will be vecC[0]*x + vecC[1]*y + vecC[0]*z = -k
+            # We have to use a point to find k
+            vecC = vecC / np.linalg.norm(vecC)
+            k = -np.sum(np.multiply(vecC, pt_samples[1,:]))
+            plane_eq = [vecC[0], vecC[1], vecC[2], k]
+
+            # Distance from a point to a plane 
+            # https://mathworld.wolfram.com/Point-PlaneDistance.html
+            pt_id_inliers = [] # list of inliers ids
+            dist_pt = (plane_eq[0]*pts[:,0]+plane_eq[1]*pts[:, 1]+plane_eq[2]*pts[:, 2]+plane_eq[3])/np.sqrt(plane_eq[0]**2+plane_eq[1]**2+plane_eq[2]**2)
+            
+            # Select indexes where distance is biggers than the threshold
+            pt_id_inliers = np.where(np.abs(dist_pt) <= thresh)[0]
+            if(len(pt_id_inliers) > len(best_inliers)):
+                best_eq = plane_eq
+                best_inliers = pt_id_inliers
+            self.inliers = best_inliers
+            self.equation = best_eq
+
+        return self.equation, self.inliers
+
+
+
+# Load saved point cloud and visualize it
+pcd_load = o3d.io.read_point_cloud("../Data/color.ply")
+#o3d.visualization.draw_geometries([pcd_load])
+points = np.asarray(pcd_load.points)
+
+plano1 = pyrsc.Plane()
+
+best_eq, best_inliers = plano1.fit(points, 0.01)
+plane = pcd_load.select_by_index(best_inliers).paint_uniform_color([1, 0, 0])
+obb = plane.get_oriented_bounding_box()
+obb2 = plane.get_axis_aligned_bounding_box()
+obb.color = [0, 0, 1]
+obb2.color = [0, 1, 0]
+not_plane = pcd_load.select_by_index(best_inliers, invert=True)
+
+o3d.visualization.draw_geometries([not_plane, plane, obb, obb2])
