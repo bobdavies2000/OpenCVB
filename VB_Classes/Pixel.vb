@@ -236,8 +236,6 @@ End Class
 
 Public Class Pixel_Measure
     Inherits VBparent
-    Public distanceIn As Single
-    Public pixelsPerMeter As Single
     Public Sub New()
         initParent()
 
@@ -248,23 +246,19 @@ Public Class Pixel_Measure
 
         task.desc = "Compute how many pixels per meter at a requested distance"
     End Sub
+    Public Function Compute(mmDist As Single) As Single
+        Dim halfLineInMeters = Math.Tan(0.0174533 * ocvb.hFov / 2) * mmDist
+        Return halfLineInMeters * 2 / src.Width
+    End Function
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static distanceSlider = findSlider("Distance in mm")
-        Dim xDist = distanceSlider.value
-        If distanceIn <> 0 Then xDist = distanceIn ' alternate input from another algorithm.
-        Dim pixeldistance = src.Height * (xDist / 1000) / ocvb.maxZ
-        Dim FOV = ocvb.hFov / 2
-        Dim lineHalf = CInt(Math.Tan(FOV * 0.0174533) * pixeldistance)
-
-        Dim xpt1 = New cv.Point2f(ocvb.topCameraPoint.X - lineHalf, src.Height - pixeldistance)
-        Dim xpt2 = New cv.Point2f(ocvb.topCameraPoint.X + lineHalf, src.Height - pixeldistance)
-        Dim lineWidth = xpt2.X - xpt1.X
-        Dim blueLineMeters = (xDist * lineWidth / (1000 * pixeldistance))
+        Dim mmPP = Compute(distanceSlider.value)
         If standalone Then
-            ocvb.trueText("At a distance of " + CStr(xDist) + " mm's the camera's FOV is " +
-                           Format(blueLineMeters, "#0.00") + " meters wide" + vbCrLf +
-                          "There are " + Format(1000 * blueLineMeters / dst1.Width, "#0.00") + " mm per pixel ", 10, 60)
+            ocvb.trueText("At a distance of " + CStr(distanceSlider.value) + " mm's the camera's FOV is " +
+                           Format(mmPP * src.Width / 1000, "#0.00") + " meters wide" + vbCrLf +
+                          "Pixels are " + Format(mmPP, "#0.00") + " mm per pixel at " +
+                           CStr(distanceSlider.value) + " mm's in the image view", 10, 60)
         End If
     End Sub
 End Class

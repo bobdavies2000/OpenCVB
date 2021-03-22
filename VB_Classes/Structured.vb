@@ -841,9 +841,10 @@ End Class
 
 Public Class Structured_Cloud
     Inherits VBparent
+    Dim mmPixel As Pixel_Measure
     Public Sub New()
         initParent()
-
+        mmPixel = New Pixel_Measure
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Lines in X-Direction", 0, 100, 30)
@@ -864,20 +865,25 @@ Public Class Structured_Cloud
         Dim yLines = yLineSlider.value
         Dim cLine = cLineSlider.value
 
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32F Then input = task.depth32f
+
         Dim topPt = New cv.Point2f(dst1.Width / 2, 0)
         Dim botPt = New cv.Point2f(dst1.Width / 2, dst1.Height)
         dst1.SetTo(0)
         dst1.Line(topPt, botPt, 255, 1, cv.LineTypes.AntiAlias)
 
         Dim stepY = dst1.Height / yLines
-        For i = 0 To yLines - 1
+        For i = 0 To yLines / 2 - 1
             Dim pt1 = New cv.Point2f(dst1.Width, i * stepY)
             Dim pt2 = New cv.Point2f(0, i * stepY)
-            dst1.Line(pt1, pt2, 255, 1, cv.LineTypes.Link4)
+            ' dst1.Line(pt1, pt2, 255, 1, cv.LineTypes.Link4)
+
 
             Dim pt = New cv.Point2f(cLine, i * stepY)
             Dim xyz = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
-            cv.Cv2.PutText(dst1, Format(xyz.Item0, "#0.00") + " " + Format(xyz.Item1, "#0.00") + " " + Format(xyz.Item2, "#0.00"), pt, cv.HersheyFonts.HersheyComplexSmall, 0.7, cv.Scalar.White, 2)
+            'cv.Cv2.PutText(dst1, Format(xyz.Item0, "#0.00") + " " + Format(xyz.Item1, "#0.00") + " " + Format(xyz.Item2, "#0.00"), pt,
+            '               cv.HersheyFonts.HersheyComplexSmall, 0.7, cv.Scalar.White, 2)
         Next
 
         Dim count = 0
