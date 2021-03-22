@@ -847,9 +847,9 @@ Public Class Structured_Cloud
         mmPixel = New Pixel_Measure
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Lines in X-Direction", 0, 100, 30)
-            sliders.setupTrackBar(1, "Lines in Y-Direction", 0, 100, 30)
-            sliders.setupTrackBar(2, "CenterLine", 0, dst1.Width, dst1.Width / 2)
+            sliders.setupTrackBar(0, "Lines in X-Direction", 0, 200, 100)
+            sliders.setupTrackBar(1, "Lines in Y-Direction", 0, 200, 100)
+            sliders.setupTrackBar(2, "Continuity threshold in mm", 0, 100, 10)
         End If
 
         dst1 = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
@@ -860,41 +860,38 @@ Public Class Structured_Cloud
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static xLineSlider = findSlider("Lines in X-Direction")
         Static yLineSlider = findSlider("Lines in Y-Direction")
-        Static cLineSlider = findSlider("CenterLine")
+        Static thresholdSlider = findSlider("Continuity threshold in mm")
         Dim xLines = xLineSlider.value
         Dim yLines = yLineSlider.value
-        Dim cLine = cLineSlider.value
+        Dim threshold = thresholdSlider.value
 
         Dim input = src
         If input.Type <> cv.MatType.CV_32F Then input = task.depth32f
 
         Dim topPt = New cv.Point2f(dst1.Width / 2, 0)
         Dim botPt = New cv.Point2f(dst1.Width / 2, dst1.Height)
-        dst1.SetTo(0)
-        dst1.Line(topPt, botPt, 255, 1, cv.LineTypes.AntiAlias)
+        dst1 = task.RGBDepth
 
+        Dim stepX = dst1.Width / xLines
         Dim stepY = dst1.Height / yLines
-        For i = 0 To yLines / 2 - 1
-            Dim pt1 = New cv.Point2f(dst1.Width, i * stepY)
-            Dim pt2 = New cv.Point2f(0, i * stepY)
-            ' dst1.Line(pt1, pt2, 255, 1, cv.LineTypes.Link4)
-
-
-            Dim pt = New cv.Point2f(cLine, i * stepY)
-            Dim xyz = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
-            'cv.Cv2.PutText(dst1, Format(xyz.Item0, "#0.00") + " " + Format(xyz.Item1, "#0.00") + " " + Format(xyz.Item2, "#0.00"), pt,
-            '               cv.HersheyFonts.HersheyComplexSmall, 0.7, cv.Scalar.White, 2)
-        Next
-
-        Dim count = 0
-        For y = 0 To dst1.Height - 1
-            For x = 0 To dst1.Width - 1
-                Dim test = dst1.Get(Of Byte)(y, x)
-                If test = 255 Then
-                    count += 1
+        dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
+        For y = 0 To yLines - 1
+            For x = 1 To xLines - 1
+                Dim pt1 = New cv.Point2f((x - 1) * stepX, y * stepY)
+                Dim pt2 = New cv.Point2f(x * stepX, y * stepY)
+                Dim d1 = task.depth32f.Get(Of Single)(pt1.Y, pt1.X)
+                Dim d2 = task.depth32f.Get(Of Single)(pt2.Y, pt2.X)
+                If stepX * threshold > Math.Abs(d1 - d2) And d1 > 0 And d2 > 0 Then
+                    Dim p = task.pointCloud.Get(Of cv.Vec3f)(pt1.Y, pt1.X)
+                    dst1.Line(pt1, pt2, cv.Scalar.White, 1)
+                    Dim mmPP = mmPixel.Compute(p.Item2)
+                    For i = 0 To stepX - 1
+                        p.Item0 += mmPP
+                        dst2.Set(Of cv.Vec3f)(y, x, p)
+                    Next
                 End If
             Next
         Next
-        label1 = CStr(count) + " pixels analyzed or " + Format(count / dst1.Total, "#0.0%")
+        dst2 = dst2(New cv.Rect(0, 0, xLines, yLines)).Resize(dst1.Size, 0, 0, cv.InterpolationFlags.Nearest)
     End Sub
 End Class

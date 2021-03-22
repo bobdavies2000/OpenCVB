@@ -847,3 +847,35 @@ End Class
 
 
 
+
+
+
+
+Public Class OpenGL_Structured_PointCloud
+    Inherits VBparent
+    Dim sCloud As Structured_Cloud
+    Dim ogl As OpenGL_Callbacks
+    Public Sub New()
+        initParent()
+        sCloud = New Structured_Cloud
+        ogl = New OpenGL_Callbacks
+
+        label1 = "Structured Cloud connected regions"
+        label2 = "Structured cloud 32fC3 data"
+        task.desc = "Visualize the Structured_Cloud"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        sCloud.Run()
+        dst1 = sCloud.dst1
+        dst2 = sCloud.dst2
+
+        ogl.pointCloudInput = dst2
+        ogl.src = New cv.Mat(src.Size, cv.MatType.CV_8UC3, cv.Scalar.White)
+        ogl.Run()
+    End Sub
+End Class
+
+
+

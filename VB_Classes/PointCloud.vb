@@ -155,6 +155,56 @@ End Class
 
 
 
+Public Class PointCloud_Inspector
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Inspection Line", 0, dst1.Width, dst1.Width / 2)
+            sliders.setupTrackBar(1, "Y-Direction intervals", 0, 100, 30)
+        End If
+
+        dst1 = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
+
+        task.desc = "Inspect x, y, and z values in a row or column"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static yLineSlider = findSlider("Y-Direction intervals")
+        Static cLineSlider = findSlider("Inspection Line")
+        Dim yLines = yLineSlider.value
+        Dim cLine = cLineSlider.value
+
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32F Then input = task.depth32f
+
+        Dim topPt = New cv.Point2f(cLine, 0)
+        Dim botPt = New cv.Point2f(cLine, dst1.Height)
+        dst1 = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1.Line(topPt, botPt, 255, 3, cv.LineTypes.AntiAlias)
+
+        Dim stepY = dst1.Height / yLines
+        For i = 0 To yLines - 1
+            Dim pt1 = New cv.Point2f(dst1.Width, i * stepY)
+            Dim pt2 = New cv.Point2f(0, i * stepY)
+            dst1.Line(pt1, pt2, 255, 1, cv.LineTypes.Link4)
+
+            Dim pt = New cv.Point2f(cLine, i * stepY)
+            Dim xyz = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
+            pt.Y += stepY
+            pt.X += 20
+            If pt.X > dst1.Width * 3 / 4 Then pt.X = dst1.Width * 3 / 4
+            cv.Cv2.PutText(dst1, "Row " + CStr(i) + " " + Format(xyz.Item0, "#0.00") + " " + Format(xyz.Item1, "#0.00") + " " +
+                           Format(xyz.Item2, "#0.00"), pt, cv.HersheyFonts.HersheyComplexSmall, 0.7, cv.Scalar.White, 2)
+        Next
+        label1 = "Values displayed are for column " + CStr(cLine)
+    End Sub
+End Class
+
+
+
+
 
 Public Class PointCloud_Continuous_VB
     Inherits VBparent
