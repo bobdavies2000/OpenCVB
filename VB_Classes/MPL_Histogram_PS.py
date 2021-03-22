@@ -3,11 +3,11 @@ import numpy as np
 from PyStream import PyStreamRun
 import cv2 as cv
 import io
+titleWindow = 'MPL_Histogram_PS.py'
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.path as path
-titleWindow = 'MPL_Histogram_PS.py'
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
     fig, ax = plt.subplots()
