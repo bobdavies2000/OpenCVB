@@ -919,7 +919,9 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
+        saveAlgorithmName = ""
         optionsForm.resolution1280.Checked = True
+        saveLayout()
         LineUpCamPics(False)
         startCamera()
 
@@ -935,7 +937,7 @@ Public Class OpenCVB
             TestAllButton.Text = "Test All"
             If logActive Then logAlgorithms.Close()
             TestAllButton.Image = testAll
-            If saveAlgorithmName <> "" Then StartAlgorithmTask()
+            StartAlgorithmTask()
         End If
     End Sub
     Private Sub OpenCVB_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
