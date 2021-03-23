@@ -995,3 +995,26 @@ Public Class Structured_OrderedLines
         Next
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Structured_Lines
+    Inherits VBparent
+    Dim lines As LineDetector_Basics
+    Public Sub New()
+        initParent()
+        lines = New LineDetector_Basics
+        task.desc = "Use the detected lines in RGB to create depth lines"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        lines.src = src
+        lines.Run()
+        dst1 = lines.dst1
+    End Sub
+End Class

@@ -3,7 +3,6 @@ Imports System.Runtime.InteropServices
 Public Class LineDetector_Basics
     Inherits VBparent
     Dim ld As cv.XImgProc.FastLineDetector
-    Public lines As cv.Vec4f()
     Public drawLines = False
     Public sortlines As New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
@@ -20,10 +19,10 @@ Public Class LineDetector_Basics
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        dst1 = src.Clone
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        lines = ld.Detect(src)
+        Dim lines = ld.Detect(src)
         src.CopyTo(dst2)
-        dst1 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Static thicknessSlider = findSlider("Line thickness")
         Dim thickness = thicknessSlider.Value
         Static pixelSlider = findSlider("Line length threshold in pixels")
@@ -39,7 +38,7 @@ Public Class LineDetector_Basics
                 Dim pixelLen = Math.Sqrt((pt1.X - pt2.X) * (pt1.X - pt2.X) + (pt1.Y - pt2.Y) * (pt1.Y - pt2.Y))
                 If pixelLen > pixelThreshold Then
                     dst1.Line(pt1, pt2, cv.Scalar.Yellow, thickness, cv.LineTypes.AntiAlias)
-                    sortlines.Add(pixelLen, v)
+                    sortlines.Add(pixelLen, New cv.Vec4f(pt1.X, pt1.Y, pt2.X, pt2.Y))
                 End If
             End If
         Next
@@ -345,111 +344,109 @@ End Class
 
 
 
+'Public Class LineDetector_3D_FitLineZ
+'    Inherits VBparent
+'    Dim linesFLD As lineDetector_FLD_CPP
+'    Public Sub New()
+'        initParent()
+'        linesFLD = New lineDetector_FLD_CPP()
 
-Public Class LineDetector_3D_FitLineZ
-    Inherits VBparent
-    Dim linesFLD As lineDetector_FLD_CPP
-    Public Sub New()
-        initParent()
-        linesFLD = New lineDetector_FLD_CPP()
+'        If findfrm(caller + " Slider Options") Is Nothing Then
+'            sliders.Setup(caller)
+'            sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 3)
+'            sliders.setupTrackBar(1, "Point count threshold", 5, 500, 50)
+'            sliders.setupTrackBar(2, "Update frequency (in frames)", 1, 100, 1)
+'        End If
+'        If findfrm(caller + " CheckBox Options") Is Nothing Then
+'            check.Setup(caller, 2)
+'            check.Box(0).Text = "Fitline using x and z (unchecked it will use y and z)"
+'            check.Box(1).Text = "Display only the longest line"
+'            check.Box(1).Checked = True
+'        End If
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 3)
-            sliders.setupTrackBar(1, "Point count threshold", 5, 500, 50)
-            sliders.setupTrackBar(2, "Update frequency (in frames)", 1, 100, 1)
-        End If
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
-            check.Box(0).Text = "Fitline using x and z (unchecked it will use y and z)"
-            check.Box(1).Text = "Display only the longest line"
-            check.Box(1).Checked = True
-        End If
+'        task.desc = "Use Fitline with the sparse Z data and X or Y (in RGB pixels)."
+'        label2 = ""
+'    End Sub
+'    Public Sub Run()
+'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        If ocvb.frameCount Mod sliders.trackbar(2).Value Then Exit Sub
+'        Dim useX As Boolean = check.Box(0).Checked
+'        linesFLD.src = src
+'        linesFLD.Run()
+'        src.CopyTo(dst1)
 
-        task.desc = "Use Fitline with the sparse Z data and X or Y (in RGB pixels)."
-        label2 = ""
-    End Sub
-    Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount Mod sliders.trackbar(2).Value Then Exit Sub
-        Dim useX As Boolean = check.Box(0).Checked
-        linesFLD.src = src
-        linesFLD.Run()
-        src.CopyTo(dst1)
+'        Dim sortedlines As SortedList(Of cv.Vec6f, Integer)
+'        sortedlines = linesFLD.sortedLines
 
-        Dim sortedlines As SortedList(Of cv.Vec6f, Integer)
-        sortedlines = linesFLD.sortedLines
+'        If sortedlines.Count > 0 Then
+'            ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will likely get full length.
+'            Dim maskLineWidth As Integer = sliders.trackbar(0).Value
+'            Dim mask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, 0)
 
-        If sortedlines.Count > 0 Then
-            ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will likely get full length.
-            Dim maskLineWidth As Integer = sliders.trackbar(0).Value
-            Dim mask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, 0)
+'            Dim longestLineOnly As Boolean = check.Box(1).Checked
+'            Dim pointCountThreshold = sliders.trackbar(1).Value
+'            Parallel.For(0, sortedlines.Count,
+'                Sub(i)
+'                    If longestLineOnly And i < sortedlines.Count - 1 Then Exit Sub
+'                    Dim aa = sortedlines.ElementAt(i).Key
+'                    Dim pt1 = New cv.Point(aa(0), aa(1))
+'                    Dim pt2 = New cv.Point(aa(2), aa(3))
+'                    dst1.Line(pt1, pt2, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
+'                    mask.Line(pt1, pt2, New cv.Scalar(i), maskLineWidth, cv.LineTypes.AntiAlias)
 
-            Dim longestLineOnly As Boolean = check.Box(1).Checked
-            Dim pointCountThreshold = sliders.trackbar(1).Value
-            Parallel.For(0, sortedlines.Count,
-                Sub(i)
-                    If longestLineOnly And i < sortedlines.Count - 1 Then Exit Sub
-                    Dim aa = sortedlines.ElementAt(i).Key
-                    Dim pt1 = New cv.Point(aa(0), aa(1))
-                    Dim pt2 = New cv.Point(aa(2), aa(3))
-                    dst1.Line(pt1, pt2, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
-                    mask.Line(pt1, pt2, New cv.Scalar(i), maskLineWidth, cv.LineTypes.AntiAlias)
+'                    Dim roi = New cv.Rect(Math.Min(aa(0), aa(2)), Math.Min(aa(1), aa(3)), Math.Abs(aa(0) - aa(2)), Math.Abs(aa(1) - aa(3)))
 
-                    Dim roi = New cv.Rect(Math.Min(aa(0), aa(2)), Math.Min(aa(1), aa(3)), Math.Abs(aa(0) - aa(2)), Math.Abs(aa(1) - aa(3)))
+'                    Dim worldDepth As New List(Of cv.Vec6f)
+'                    If roi.Width = 0 Then roi.Width = 1
+'                    If roi.Height = 0 Then roi.Height = 1
+'                    If roi.X + roi.Width >= mask.Width Then roi.Width = mask.Width - roi.X - 1
+'                    If roi.Y + roi.Height >= mask.Height Then roi.Height = mask.Height - roi.Y - 1
 
-                    Dim worldDepth As New List(Of cv.Vec6f)
-                    If roi.Width = 0 Then roi.Width = 1
-                    If roi.Height = 0 Then roi.Height = 1
-                    If roi.X + roi.Width >= mask.Width Then roi.Width = mask.Width - roi.X - 1
-                    If roi.Y + roi.Height >= mask.Height Then roi.Height = mask.Height - roi.Y - 1
+'                    Dim _mask = mask(roi).Clone()
+'                    Dim points As New List(Of cv.Point2f)
+'                    For y = 0 To roi.Height - 1
+'                        For x = 0 To roi.Width - 1
+'                            If _mask.Get(Of Byte)(y, x) = i Then
+'                                Dim w = getWorldCoordinatesD6(New cv.Point3f(x + roi.X, y + roi.Y, task.depth32f.Get(Of Single)(y, x)))
+'                                points.Add(New cv.Point(If(useX, w.Item0, w.Item1), w.Item2))
+'                                worldDepth.Add(w)
+'                            End If
+'                        Next
+'                    Next
 
-                    Dim _mask = mask(roi).Clone()
-                    Dim points As New List(Of cv.Point2f)
-                    For y = 0 To roi.Height - 1
-                        For x = 0 To roi.Width - 1
-                            If _mask.Get(Of Byte)(y, x) = i Then
-                                Dim w = getWorldCoordinatesD6(New cv.Point3f(x + roi.X, y + roi.Y, task.depth32f.Get(Of Single)(y, x)))
-                                points.Add(New cv.Point(If(useX, w.Item0, w.Item1), w.Item2))
-                                worldDepth.Add(w)
-                            End If
-                        Next
-                    Next
+'                    ' without a sufficient number of points, the results can vary widely.
+'                    If points.Count < pointCountThreshold Then Exit Sub
 
-                    ' without a sufficient number of points, the results can vary widely.
-                    If points.Count < pointCountThreshold Then Exit Sub
+'                    Dim line = cv.Cv2.FitLine(points, cv.DistanceTypes.L2, 1, 0.01, 0.01)
+'                    Dim mm = line.Vy / line.Vx
+'                    Dim bb = line.Y1 - mm * line.X1
+'                    Dim endPoints(2) As cv.Vec6f
+'                    Dim lastW = worldDepth.Count - 1
+'                    endPoints(0) = worldDepth(0)
+'                    endPoints(1) = worldDepth(lastW)
+'                    endPoints(0).Item2 = bb + mm * If(useX, worldDepth(0).Item3, worldDepth(0).Item4)
+'                    endPoints(1).Item2 = bb + mm * If(useX, worldDepth(lastW).Item3, worldDepth(lastW).Item4)
 
-                    Dim line = cv.Cv2.FitLine(points, cv.DistanceTypes.L2, 1, 0.01, 0.01)
-                    Dim mm = line.Vy / line.Vx
-                    Dim bb = line.Y1 - mm * line.X1
-                    Dim endPoints(2) As cv.Vec6f
-                    Dim lastW = worldDepth.Count - 1
-                    endPoints(0) = worldDepth(0)
-                    endPoints(1) = worldDepth(lastW)
-                    endPoints(0).Item2 = bb + mm * If(useX, worldDepth(0).Item3, worldDepth(0).Item4)
-                    endPoints(1).Item2 = bb + mm * If(useX, worldDepth(lastW).Item3, worldDepth(lastW).Item4)
+'                    Dim b = endPoints(0)
+'                    Dim d = endPoints(1)
+'                    Dim lenBD = Math.Sqrt((b.Item0 - d.Item0) * (b.Item0 - d.Item0) + (b.Item1 - d.Item1) * (b.Item1 - d.Item1) + (b.Item2 - d.Item2) * (b.Item2 - d.Item2))
 
-                    Dim b = endPoints(0)
-                    Dim d = endPoints(1)
-                    Dim lenBD = Math.Sqrt((b.Item0 - d.Item0) * (b.Item0 - d.Item0) + (b.Item1 - d.Item1) * (b.Item1 - d.Item1) + (b.Item2 - d.Item2) * (b.Item2 - d.Item2))
+'                    Dim ptIndex = (i / sortedlines.Count) * (worldDepth.Count - 1)
+'                    Dim textPoint = New cv.Point(worldDepth(ptIndex).Item3, worldDepth(ptIndex).Item4)
+'                    If textPoint.X > mask.Width - 50 Then textPoint.X = mask.Width - 50
+'                    If textPoint.Y > mask.Height - 50 Then textPoint.Y = mask.Height - 50
+'                    cv.Cv2.PutText(dst1, Format(lenBD / 1000, "#0.00") + "m", textPoint, cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+'                    If endPoints(0).Item2 = endPoints(1).Item2 Then endPoints(0).Item2 += 1 ' prevent NaN
+'                    cv.Cv2.PutText(dst1, Format((endPoints(1).Item1 - endPoints(0).Item1) / (endPoints(1).Item2 - endPoints(0).Item2), "#0.00") + If(useX, "x/z", "y/z"),
+'                                    New cv.Point(textPoint.X, textPoint.Y + 10), cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
-                    Dim ptIndex = (i / sortedlines.Count) * (worldDepth.Count - 1)
-                    Dim textPoint = New cv.Point(worldDepth(ptIndex).Item3, worldDepth(ptIndex).Item4)
-                    If textPoint.X > mask.Width - 50 Then textPoint.X = mask.Width - 50
-                    If textPoint.Y > mask.Height - 50 Then textPoint.Y = mask.Height - 50
-                    cv.Cv2.PutText(dst1, Format(lenBD / 1000, "#0.00") + "m", textPoint, cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-                    If endPoints(0).Item2 = endPoints(1).Item2 Then endPoints(0).Item2 += 1 ' prevent NaN
-                    cv.Cv2.PutText(dst1, Format((endPoints(1).Item1 - endPoints(0).Item1) / (endPoints(1).Item2 - endPoints(0).Item2), "#0.00") + If(useX, "x/z", "y/z"),
-                                    New cv.Point(textPoint.X, textPoint.Y + 10), cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-
-                    ' show the final endpoints in xy projection.
-                    dst1.Circle(New cv.Point(b.Item3, b.Item4), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-                    dst1.Circle(New cv.Point(d.Item3, d.Item4), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-                End Sub)
-        End If
-    End Sub
-End Class
-
+'                    ' show the final endpoints in xy projection.
+'                    dst1.Circle(New cv.Point(b.Item3, b.Item4), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+'                    dst1.Circle(New cv.Point(d.Item3, d.Item4), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+'                End Sub)
+'        End If
+'    End Sub
+'End Class
 
 
 
@@ -525,47 +522,6 @@ End Class
 
 
 
-Public Class LineDetector_LongLines
-    Inherits VBparent
-    Public lDetect As LineDetector_Basics
-    Public sortlines As New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
-    Public Sub New()
-        initParent()
-        lDetect = New LineDetector_Basics()
-
-        label1 = "Longest lines in pixels (yellow)"
-        task.desc = "Find and measure the longest x number of lines in actual length (not in pixels)"
-    End Sub
-    Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        lDetect.src = src
-        lDetect.Run()
-        dst1 = src.Clone
-
-        Static thicknessSlider = findSlider("Line thickness")
-        Dim thickness = thicknessSlider.value
-        Static pixelSlider = findSlider("Line length threshold in pixels")
-        Dim pixelThreshold = pixelSlider.value
-
-        sortlines.Clear()
-        For Each v In lDetect.lines
-            If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And
-                   v(2) >= 0 And v(2) <= dst1.Cols And v(3) >= 0 And v(3) <= dst1.Rows Then
-                Dim pt1 = New cv.Point(CInt(v(0)), CInt(v(1)))
-                Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
-                Dim pixelLen = Math.Sqrt((pt1.X - pt2.X) * (pt1.X - pt2.X) + (pt1.Y - pt2.Y) * (pt1.Y - pt2.Y))
-                If pixelLen > pixelThreshold Then
-                    dst1.Line(pt1, pt2, cv.Scalar.Yellow, thickness, cv.LineTypes.AntiAlias)
-                    sortlines.Add(pixelLen, v)
-                End If
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
 
 
 Public Class LineDetector_Reduction
@@ -591,62 +547,5 @@ Public Class LineDetector_Reduction
         lDetect.src = reduction.dst1
         lDetect.Run()
         dst1 = lDetect.dst1
-    End Sub
-End Class
-
-
-
-
-
-Public Class LineDetector_Depth
-    Inherits VBparent
-    Dim longline As LineDetector_LongLines
-    Dim sideView As Histogram_SideView2D
-    Dim topView As Histogram_TopView2D
-    Dim mats As Mat_4to1
-    Public Sub New()
-        initParent()
-        mats = New Mat_4to1()
-        sideView = New Histogram_SideView2D()
-        topView = New Histogram_TopView2D()
-        longline = New LineDetector_LongLines()
-
-        task.desc = "Detect the lines in the depth data before trying to model the line in 3D space"
-    End Sub
-    Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        longline.src = task.RGBDepth
-        longline.Run()
-        dst1 = longline.dst1
-
-        Static thicknessSlider = findSlider("Line thickness")
-        Dim thickness = thicknessSlider.value
-        Static radiusSlider = findSlider("Depth search radius in pixels")
-        Dim pixelRadius = radiusSlider.value
-
-        sideView.src = New cv.Mat(src.Size, cv.MatType.CV_32FC3, 0)
-        topView.src = New cv.Mat(src.Size, cv.MatType.CV_32FC3, 0)
-        For i = 0 To longline.sortlines.Count - 1
-            Dim line = longline.sortlines.ElementAt(i).Value
-            Dim p1 = New cv.Point(CInt(line(0)), CInt(line(1)))
-            Dim p2 = New cv.Point(CInt(line(2)), CInt(line(3)))
-
-            Dim topleft = New cv.Point(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y))
-            Dim width = Math.Max(p1.X, p2.X) - topleft.X
-            Dim height = Math.Max(p1.Y, p2.Y) - topleft.Y
-
-            If width < pixelRadius * 2 Then
-                width = Math.Min(src.Width - topleft.X, pixelRadius * 2)
-                height = Math.Min(src.Height - topleft.Y, pixelRadius * 2)
-            End If
-            Dim rect = New cv.Rect(topleft.X, topleft.Y, width, height)
-            If rect.Width > 0 And rect.Height > 0 Then task.pointCloud(rect).CopyTo(sideView.src(rect))
-        Next
-        sideView.Run()
-        topView.Run()
-        mats.mat(0) = sideView.dst1
-        mats.mat(1) = topView.dst1
-        mats.Run()
-        dst2 = mats.dst1
     End Sub
 End Class
