@@ -186,11 +186,11 @@ Public Class Blob_DepthClusters
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        histBlobs.src = task.inrange.noDepthMask
+        histBlobs.src = task.noDepthMask
         histBlobs.Run()
         dst1 = histBlobs.dst1
         flood.src = histBlobs.dst2
-        flood.fBasics.initialMask = task.inrange.noDepthMask
+        flood.fBasics.initialMask = task.noDepthMask
         flood.Run()
         dst2 = flood.fBasics.dst2
         label1 = CStr(histBlobs.valleys.rangeBoundaries.Count) + " Depth Clusters"

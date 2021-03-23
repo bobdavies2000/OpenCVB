@@ -148,7 +148,7 @@ Public Class Contours_RGB
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim img = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        img.SetTo(0, task.inrange.noDepthMask)
+        img.SetTo(0, task.noDepthMask)
 
         Dim contours0 = cv.Cv2.FindContoursAsArray(img, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
         Dim maxIndex As Integer
@@ -175,7 +175,7 @@ Public Class Contours_RGB
         cv.Cv2.DrawContours(dst1, listOfPoints, 0, New cv.Scalar(255, 0, 0), -1)
         cv.Cv2.DrawContours(dst1, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
         dst2.SetTo(0)
-        src.CopyTo(dst2, task.inrange.noDepthMask)
+        src.CopyTo(dst2, task.noDepthMask)
     End Sub
 End Class
 
@@ -244,9 +244,9 @@ Public Class Contours_Depth
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        dst1 = task.inrange.noDepthMask
+        dst1 = task.noDepthMask
         dst2.SetTo(0)
-        Dim input As cv.Mat = task.inrange.depthmask
+        Dim input As cv.Mat = task.depthmask
         Dim contours0 = cv.Cv2.FindContoursAsArray(input, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
         Dim maxIndex As Integer
         Dim maxNodes As Integer

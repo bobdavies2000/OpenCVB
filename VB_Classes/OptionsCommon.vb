@@ -1,8 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class OptionsCommon_Depth
     Inherits VBparent
-    Public depthMask As New cv.Mat
-    Public noDepthMask As New cv.Mat
     Public minVal As Single
     Public maxVal As Single
     Public bins As Integer
@@ -18,7 +16,6 @@ Public Class OptionsCommon_Depth
         sliders.setupTrackBar(3, "Amount to rotate pointcloud around X-axis (degrees)", -90, 90, 0)
         sliders.setupTrackBar(4, "Amount to rotate pointcloud around Y-axis (degrees)", -90, 90, 0)
         sliders.setupTrackBar(5, "Amount to rotate pointcloud around Z-axis (degrees)", -90, 90, 0)
-        'sliders.setupTrackBar(6, "Number of depth frames to fuse (eliminates noise)", 1, 10, 2)
 
         task.minRangeSlider = sliders.trackbar(0) ' one of the few places we can be certain there is only one...
         task.maxRangeSlider = sliders.trackbar(1)
@@ -26,7 +23,6 @@ Public Class OptionsCommon_Depth
         task.xRotateSlider = sliders.trackbar(3)
         task.yRotateSlider = sliders.trackbar(4)
         task.zRotateSlider = sliders.trackbar(5)
-        ' task.fuseSlider = sliders.trackbar(6)
 
         label1 = "Depth values that are in-range"
         label2 = "Depth values that are out of range (and < 8m)"
@@ -53,26 +49,12 @@ Public Class OptionsCommon_Depth
             task.depthOptionsChanged = False
         End If
 
-#If 0 Then
-        Dim fuseCount = task.fuseSlider.Value
-        Static saveFuseCount = fuseCount
-        Static fuseFrames As New List(Of cv.Mat)
-        If saveFuseCount <> fuseCount Then
-            fuseFrames.clear()
-            saveFuseCount = fuseCount
-        End If
-
-        fuseFrames.Add(task.depth32f.Clone)
-        If fuseFrames.Count > fuseCount Then fuseFrames.RemoveAt(0)
-        For i = 1 To fuseFrames.Count - 1
-            cv.Cv2.Max(fuseFrames(i), task.depth32f, task.depth32f)
-        Next
-#End If
-
-        cv.Cv2.InRange(task.depth32f, minVal, maxVal, depthMask)
-        cv.Cv2.BitwiseNot(depthMask, noDepthMask)
-        dst1 = task.depth32f.SetTo(0, noDepthMask)
-        If task.pointCloud.Width = noDepthMask.Width Then task.pointCloud.SetTo(0, noDepthMask) ' reflect the range bounds into the task.pointcloud as well.
+        If task.depth32f.Size <> src.Size Then task.depth32f = task.depth32f.Resize(src.Size, 0, 0, cv.InterpolationFlags.Nearest)
+        If task.pointCloud.Size <> src.Size Then task.pointCloud = task.pointCloud.Resize(src.Size, 0, 0, cv.InterpolationFlags.Nearest)
+        cv.Cv2.InRange(task.depth32f, minVal, maxVal, task.depthMask)
+        cv.Cv2.BitwiseNot(task.depthMask, task.noDepthMask)
+        dst1 = task.depth32f.SetTo(0, task.noDepthMask)
+        If task.pointCloud.Width = task.noDepthMask.Width Then task.pointCloud.SetTo(0, task.noDepthMask) ' reflect the range bounds into the task.pointcloud as well.
     End Sub
 End Class
 

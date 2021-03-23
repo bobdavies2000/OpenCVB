@@ -438,7 +438,7 @@ Public Class FloodFill_WithDepth
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         range.src = src
         range.Run()
-        dst2 = task.inrange.noDepthMask
+        dst2 = task.noDepthMask
         dst1 = range.dst2
         dst1.SetTo(0, dst2)
     End Sub

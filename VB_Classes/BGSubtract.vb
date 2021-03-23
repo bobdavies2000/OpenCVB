@@ -180,7 +180,7 @@ Public Class BGSubtract_Depth_MT
         bgsub.Run()
         dst1 = bgsub.src
         dst2 = bgsub.dst2
-        dst2.SetTo(0, task.inrange.nodepthmask)
+        dst2.SetTo(0, task.noDepthMask)
     End Sub
 End Class
 

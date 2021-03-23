@@ -105,7 +105,6 @@ Public Class ActiveTask : Implements IDisposable
     Public RGBDepth As cv.Mat
     Public result As New cv.Mat
     Public pointCloud As cv.Mat
-    Public depth32f As New cv.Mat
     Public leftView As cv.Mat
     Public rightView As cv.Mat
     Public viewOptions As Object
@@ -113,6 +112,9 @@ Public Class ActiveTask : Implements IDisposable
 
     ' add any global option algorithms here
     Public inrange As Object
+    Public noDepthMask As New cv.Mat
+    Public depthMask As New cv.Mat
+    Public depth32f As New cv.Mat
     Public depthOptionsChanged As Boolean
     Public minRangeSlider As Windows.Forms.TrackBar
     Public maxRangeSlider As Windows.Forms.TrackBar

@@ -14,12 +14,12 @@ Public Class Object_Basics
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
-            dst1 = task.inrange.depthMask
-            dst2 = task.inrange.noDepthMask
+            dst1 = task.depthmask
+            dst2 = task.noDepthMask
         End If
 
         ccomp.src.SetTo(0)
-        src.CopyTo(ccomp.src, task.inrange.depthMask)
+        src.CopyTo(ccomp.src, task.depthmask)
         ccomp.Run()
         dst1 = ccomp.dst1
     End Sub

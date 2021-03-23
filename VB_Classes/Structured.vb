@@ -127,7 +127,7 @@ Public Class Structured_MultiSliceH
             inrange.src = Split(1).Clone
             inrange.Run()
             sliceMask.SetTo(255, inrange.depthMask)
-            sliceMask.SetTo(0, task.inrange.noDepthMask)
+            sliceMask.SetTo(0, task.noDepthMask)
         Next
 
         dst1 = task.color.Clone
@@ -180,7 +180,7 @@ Public Class Structured_MultiSliceV
             inrange.src = split(0).Clone
             inrange.Run()
             sliceMask.SetTo(255, inrange.depthMask)
-            sliceMask.SetTo(0, task.inrange.noDepthMask)
+            sliceMask.SetTo(0, task.noDepthMask)
         Next
 
         dst1 = task.color.Clone
@@ -237,7 +237,7 @@ Public Class Structured_MultiSlice
             inrange.src = split(0).Clone
             inrange.Run()
             sliceMask = inrange.depthMask
-            sliceMask.SetTo(0, task.inrange.noDepthMask)
+            sliceMask.SetTo(0, task.noDepthMask)
             dst2.SetTo(255, sliceMask)
         Next
 
@@ -531,7 +531,7 @@ Public Class Structured_SliceH
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         side2D.Run()
 
-        Dim depthShadow = task.inrange.noDepthMask
+        Dim depthShadow = task.noDepthMask
         Dim Split = side2D.gCloud.dst1.Split()
 
         Dim yCoordinate = CInt(offsetSlider.Value)
@@ -548,7 +548,7 @@ Public Class Structured_SliceH
         inrange.src = Split(1).Clone
         inrange.Run()
         sliceMask = inrange.depthMask
-        sliceMask.SetTo(0, task.inrange.noDepthMask)
+        sliceMask.SetTo(0, task.noDepthMask)
 
         label1 = "At offset " + CStr(yCoordinate) + " y = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
                  Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
@@ -610,7 +610,7 @@ Public Class Structured_SliceV
         inrange.src = split(0).Clone
         inrange.Run()
         sliceMask = inrange.depthMask
-        sliceMask.SetTo(0, task.inrange.noDepthMask)
+        sliceMask.SetTo(0, task.noDepthMask)
 
         label1 = "At offset " + CStr(xCoordinate) + " x = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
                  Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
@@ -680,7 +680,7 @@ Public Class Structured_SliceVStable
         inrange.src = split(0).Clone
         inrange.Run()
         sliceMask = inrange.depthMask
-        sliceMask.SetTo(0, task.inrange.noDepthMask)
+        sliceMask.SetTo(0, task.noDepthMask)
 
         label1 = "At offset " + CStr(xCoordinate) + " x = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
                  Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
@@ -839,7 +839,7 @@ End Class
 
 
 
-Public Class Structured_Cloud
+Public Class Structured_CloudFail
     Inherits VBparent
     Dim mmPixel As Pixel_Measure
     Public Sub New()
@@ -847,10 +847,20 @@ Public Class Structured_Cloud
         mmPixel = New Pixel_Measure
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Lines in X-Direction", 0, 200, 100)
-            sliders.setupTrackBar(1, "Lines in Y-Direction", 0, 200, 100)
+            sliders.setupTrackBar(0, "Lines in X-Direction", 0, 200, 50)
+            sliders.setupTrackBar(1, "Lines in Y-Direction", 0, 200, 50)
             sliders.setupTrackBar(2, "Continuity threshold in mm", 0, 100, 10)
         End If
+
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 3)
+            check.Box(0).Text = "Impose constraints on X"
+            check.Box(1).Text = "Impose constraints on Y"
+            check.Box(2).Text = "Impose constraints on neither"
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+        End If
+
 
         dst1 = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
 
@@ -865,6 +875,17 @@ Public Class Structured_Cloud
         Dim yLines = yLineSlider.value
         Dim threshold = thresholdSlider.value
 
+        Static xCheck = findCheckBox("Impose constraints on X")
+        Static yCheck = findCheckBox("Impose constraints on Y")
+        Static noCheck = findCheckBox("Impose constraints on neither")
+        Dim xconstraint = xCheck.checked
+        Dim yconstraint = yCheck.checked
+        Dim noconstraint = noCheck.checked
+        If noconstraint Then
+            xconstraint = False
+            yconstraint = False
+        End If
+
         Dim input = src
         If input.Type <> cv.MatType.CV_32F Then input = task.depth32f
 
@@ -875,20 +896,81 @@ Public Class Structured_Cloud
         Dim stepX = dst1.Width / xLines
         Dim stepY = dst1.Height / yLines
         dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
-        For y = 0 To yLines - 1
-            For x = 1 To xLines - 1
-                Dim pt1 = New cv.Point2f((x - 1) * stepX, y * stepY)
-                Dim pt2 = New cv.Point2f(x * stepX, y * stepY)
+        Dim midX = dst1.Width / 2
+        Dim midY = dst1.Height / 2
+        Dim halfStepX = stepX / 2
+        Dim halfStepy = stepY / 2
+        For y = 1 To yLines - 2
+            For x = 1 To xLines - 2
+                Dim pt1 = New cv.Point2f(x * stepX, y * stepY)
+                Dim pt2 = New cv.Point2f((x + 1) * stepX, y * stepY)
                 Dim d1 = task.depth32f.Get(Of Single)(pt1.Y, pt1.X)
                 Dim d2 = task.depth32f.Get(Of Single)(pt2.Y, pt2.X)
                 If stepX * threshold > Math.Abs(d1 - d2) And d1 > 0 And d2 > 0 Then
                     Dim p = task.pointCloud.Get(Of cv.Vec3f)(pt1.Y, pt1.X)
-                    p.Item2 = (d1 + d2) / 2000
+                    Dim mmPP = mmPixel.Compute(d1)
+                    If noconstraint = False Then
+                        If xconstraint Then
+                            p.Item0 = (pt1.X - midX) * mmPP / 1000
+                            If pt1.X = midX Then p.Item0 = mmPP / 1000
+                        End If
+                        If yconstraint Then
+                            p.Item1 = (pt1.Y - midY) * mmPP / 1000
+                            If pt1.Y = midY Then p.Item1 = mmPP / 1000
+                        End If
+                    End If
+                    Dim r = New cv.Rect(pt1.X - halfStepX, pt1.Y - halfStepy, stepX, stepY)
+                    Dim meanVal = cv.Cv2.Mean(task.depth32f(r), task.depthMask(r))
+                    p.Item2 = (d1 + d2) / 2000 ' meanVal.Item(0) / 1000
                     dst1.Line(pt1, pt2, cv.Scalar.White, 1)
                     dst2.Set(Of cv.Vec3f)(y, x, p)
                 End If
             Next
         Next
         dst2 = dst2(New cv.Rect(0, 0, xLines, yLines)).Resize(dst1.Size, 0, 0, cv.InterpolationFlags.Nearest)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Structured_Cloud
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Lines in X-Direction", 0, 200, 100)
+            sliders.setupTrackBar(1, "Lines in Y-Direction", 0, 200, 100)
+        End If
+
+        task.desc = "Attempt to impose a linear structure on the pointcloud."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static xLineSlider = findSlider("Lines in X-Direction")
+        Static yLineSlider = findSlider("Lines in Y-Direction")
+        Dim xLines = xLineSlider.value
+        Dim yLines = yLineSlider.value
+
+        Dim stepX = dst2.Width / xLines
+        Dim stepY = dst2.Height / yLines
+        dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
+        For y = 0 To yLines - 1
+            For x = 0 To xLines - 1
+                Dim pt1 = New cv.Point(CInt(x * stepX), CInt(y * stepY))
+                Dim pt2 = New cv.Point(CInt((x + 1) * stepX), CInt(y * stepY))
+                Dim p1 = task.pointCloud.Get(Of cv.Vec3f)(pt1.Y, pt1.X)
+                Dim p2 = task.pointCloud.Get(Of cv.Vec3f)(pt2.Y, pt2.X)
+                If p1.Item2 > 0 And p2.Item2 > 0 Then
+                    dst2.Set(Of cv.Vec3f)(y, x, p1)
+                End If
+            Next
+        Next
+        dst1 = dst2(New cv.Rect(0, 0, xLines, yLines)).Resize(dst1.Size, 0, 0, cv.InterpolationFlags.Nearest)
     End Sub
 End Class

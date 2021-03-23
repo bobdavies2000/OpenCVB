@@ -1151,7 +1151,7 @@ Public Class Edges_MotionOverlay
         diff.Run()
         dst1 = diff.dst1
         dst2 = diff.dst2
-        dst2.SetTo(0, task.inrange.noDepthMask)
+        dst2.SetTo(0, task.noDepthMask)
         label1 = "Src offset (x,y) = (" + CStr(xDisp) + "," + CStr(yDisp) + ")"
     End Sub
 End Class

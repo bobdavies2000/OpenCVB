@@ -84,7 +84,7 @@ Public Class OpenGL_Basics
             pointCloudInput = task.pointCloud
         End If
 
-        If task.inrange.noDepthMask.width = pointCloudInput.Width Then pointCloudInput.SetTo(0, task.inrange.noDepthMask)
+        If task.noDepthMask.width = pointCloudInput.Width Then pointCloudInput.SetTo(0, task.noDepthMask)
 
         Dim pcSize = pointCloudInput.Total * pointCloudInput.ElemSize
         If ocvb.frameCount = 0 Then startOpenGLWindow()
@@ -860,8 +860,7 @@ Public Class OpenGL_Structured_PointCloud
         sCloud = New Structured_Cloud
         ogl = New OpenGL_Callbacks
 
-        label1 = "Structured Cloud connected regions"
-        label2 = "Structured cloud 32fC3 data"
+        label1 = "Structured cloud 32fC3 data"
         task.desc = "Visualize the Structured_Cloud"
     End Sub
     Public Sub Run()
@@ -869,9 +868,8 @@ Public Class OpenGL_Structured_PointCloud
 
         sCloud.Run()
         dst1 = sCloud.dst1
-        dst2 = sCloud.dst2
 
-        ogl.pointCloudInput = dst2
+        ogl.pointCloudInput = dst1
         ogl.src = New cv.Mat(src.Size, cv.MatType.CV_8UC3, cv.Scalar.White)
         ogl.Run()
     End Sub

@@ -109,7 +109,7 @@ Public Class Depth_FlatData
         Dim gray As New cv.Mat
         Dim gray8u As New cv.Mat
 
-        Dim depthMask As cv.Mat = task.inrange.depthMask
+        Dim depthMask As cv.Mat = task.depthmask
         gray = task.depth32f.Normalize(0, 255, cv.NormTypes.MinMax, -1, depthMask)
         gray.ConvertTo(gray8u, cv.MatType.CV_8U)
 
@@ -258,7 +258,7 @@ Public Class Depth_MeanStdevPlot
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
         Dim mean As Single = 0, stdev As Single = 0
-        Dim depthMask As cv.Mat = task.inrange.depthMask
+        Dim depthMask As cv.Mat = task.depthmask
         cv.Cv2.MeanStdDev(task.depth32f, mean, stdev, depthMask)
 
         If mean > plot1.maxScale Then plot1.maxScale = mean + 1000 - (mean + 1000) Mod 1000
@@ -324,7 +324,7 @@ Public Class Depth_Palette
 
         Dim depthNorm = (task.depth32f * 255 / (maxDepth - minDepth)).ToMat ' do the normalize manually to use the min and max Depth (more stable)
         depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)
-        dst1 = Palette_Custom_Apply(depthNorm.CvtColor(cv.ColorConversionCodes.GRAY2BGR), customColorMap).SetTo(0, task.inrange.noDepthMask)
+        dst1 = Palette_Custom_Apply(depthNorm.CvtColor(cv.ColorConversionCodes.GRAY2BGR), customColorMap).SetTo(0, task.noDepthMask)
     End Sub
 End Class
 
@@ -424,7 +424,7 @@ Public Class Depth_ColorizerFastFade_CPP
         Dim input = src
         If input.Type <> cv.MatType.CV_32F Then input = task.depth32f
 
-        dst2 = task.inrange.nodepthMask
+        dst2 = task.noDepthMask
 
         Dim depthData(input.Total * input.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
@@ -686,7 +686,7 @@ Public Class Depth_LocalMinMax_Kalman_MT
         dst1.SetTo(cv.Scalar.White, grid.gridMask)
 
         Dim depth32f As cv.Mat = task.depth32f
-        Dim depthmask As cv.Mat = task.inrange.depthmask
+        Dim depthmask As cv.Mat = task.depthmask
 
         Parallel.For(0, grid.roiList.Count,
         Sub(i)
@@ -954,9 +954,9 @@ Public Class Depth_HolesOverTime
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        recentImages.Add(task.inrange.noDepthMask.clone) ' To see the value of clone, remove it temporarily.  Only the most recent depth holes are added in.
+        recentImages.Add(task.noDepthMask.clone) ' To see the value of clone, remove it temporarily.  Only the most recent depth holes are added in.
 
-        dst2 = task.inrange.noDepthMask
+        dst2 = task.noDepthMask
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For Each img In recentImages
             cv.Cv2.BitwiseOr(dst1, img, dst1)
@@ -1019,7 +1019,7 @@ Public Class Depth_TooClose
         depth32f = task.depth32f
         Dim maxval As Double
         Dim minLoc As cv.Point, maxLoc As cv.Point
-        dst1 = task.inrange.depthMask
+        dst1 = task.depthmask
         depth32f.MinMaxLoc(minVal, maxval, minLoc, maxLoc, dst1)
         label1 = "Min Z = " + Format(minVal, "#0") + " Max Z = " + Format(maxval, "#0")
     End Sub
@@ -1215,7 +1215,7 @@ Public Class Depth_LowQualityMask
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        dst1 = task.inrange.noDepthMask
+        dst1 = task.noDepthMask
 
         dilate.src = dst1
         dilate.Run()
@@ -1863,7 +1863,7 @@ Public Class Depth_Foreground
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        Dim tmp As cv.Mat = task.inrange.depthMask.Clone
+        Dim tmp As cv.Mat = task.depthmask.Clone
         ' find the largest blob and use that define that to be the foreground object.
         Dim blobSize As New List(Of Integer)
         blobLocation.clear
@@ -1887,7 +1887,7 @@ Public Class Depth_Foreground
                 maxIndex = i
             End If
         Next
-        dst1 = task.inrange.depthMask.clone
+        dst1 = task.depthmask.clone
     End Sub
 End Class
 

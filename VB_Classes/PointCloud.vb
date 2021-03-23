@@ -144,8 +144,8 @@ Public Class PointCloud_Continuous
         tmp32f = tmp32f.Threshold(threshold, 255, cv.ThresholdTypes.BinaryInv)
         dst1 = tmp32f.ConvertScaleAbs(255)
         cv.Cv2.BitwiseNot(dst1, dst2)
-        dst1.SetTo(0, task.inrange.nodepthmask)
-        dst2.SetTo(0, task.inrange.nodepthmask)
+        dst1.SetTo(0, task.noDepthMask)
+        dst2.SetTo(0, task.noDepthMask)
         label1 = "White pixels: Z-values within " + CStr(thresholdSlider.value) + " mm's of X neighbor"
         label2 = "Mask showing discontinuities > " + CStr(thresholdSlider.value) + " mm's of X neighbor"
     End Sub
@@ -238,8 +238,8 @@ Public Class PointCloud_Continuous_VB
             Next
         Next
 
-        dst2.SetTo(0, task.inrange.nodepthmask)
-        dst1.SetTo(0, task.inrange.nodepthmask)
+        dst2.SetTo(0, task.noDepthMask)
+        dst1.SetTo(0, task.noDepthMask)
         label1 = "White pixels: Z-values within " + CStr(thresholdSlider.value) + " mm's of X neighbor"
         label2 = "Mask showing discontinuities > " + CStr(thresholdSlider.value) + " mm's of X neighbor"
     End Sub
@@ -520,7 +520,7 @@ Public Class PointCloud_Raw
              Sub(roi)
                  For y = roi.Y To roi.Y + roi.Height - 1
                      For x = roi.X To roi.X + roi.Width - 1
-                         Dim m = task.inrange.depthMask.Get(Of Byte)(y, x)
+                         Dim m = task.depthmask.Get(Of Byte)(y, x)
                          If m > 0 Then
                              Dim depth = task.depth32f.Get(Of Single)(y, x)
                              Dim dy = CInt(h * (depth - task.inrange.minval) / range)

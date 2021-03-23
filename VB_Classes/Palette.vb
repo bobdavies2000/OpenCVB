@@ -423,7 +423,7 @@ Public Class Palette_DepthColorMap
         Dim depth8u = task.depth32f.ConvertScaleAbs(cvtScaleSlider.Value / 100)
         dst1 = Palette_Custom_Apply(depth8u, gradientColorMap)
 
-        dst1.SetTo(0, task.inrange.noDepthMask)
+        dst1.SetTo(0, task.noDepthMask)
     End Sub
 End Class
 
@@ -518,7 +518,7 @@ Public Class Palette_ObjectColors
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         reduction.src = src
-        reduction.src.SetTo(0, task.inrange.nodepthMask)
+        reduction.src.SetTo(0, task.noDepthMask)
         reduction.Run()
         dst2 = reduction.dst2
 
@@ -531,7 +531,7 @@ Public Class Palette_ObjectColors
             If vo.mask IsNot Nothing Then
                 Dim mask = vo.mask.Clone
                 Dim r = vo.preKalmanRect
-                mask.SetTo(0, task.inrange.noDepthMask(r)) ' count only points with depth
+                mask.SetTo(0, task.noDepthMask(r)) ' count only points with depth
                 Dim countDepthPixels = mask.CountNonZero()
                 If countDepthPixels > 30 Then
                     Dim depth = task.depth32f(r).Mean(mask)
@@ -559,7 +559,7 @@ Public Class Palette_ObjectColors
             dst1.Rectangle(New cv.Rect(blob.centroid.X, blob.centroid.Y, 60 * ocvb.fontSize, 30 * ocvb.fontSize), cv.Scalar.Black, -1)
             ocvb.trueText(CStr(CInt(blobList.ElementAt(i).Key)), blob.centroid)
         Next
-        dst1.SetTo(0, task.inrange.nodepthmask)
+        dst1.SetTo(0, task.noDepthMask)
         label1 = CStr(blobList.Count) + " regions between " + Format(minDepth / 1000, "0.0") + " and " + Format(maxDepth / 1000, "0.0") + " meters"
     End Sub
 End Class

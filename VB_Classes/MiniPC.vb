@@ -19,7 +19,7 @@ Public Class MiniPC_Basics
         resize.Run()
 
         Dim split = resize.dst1.Split()
-        split(2).SetTo(0, task.inrange.nodepthMask.resize(split(2).Size))
+        split(2).SetTo(0, task.noDepthMask.resize(split(2).Size))
         rect = New cv.Rect(0, 0, resize.dst1.Width, resize.dst1.Height)
         If rect.Height < dst1.Height / 2 Then rect.Y = dst1.Height / 4 ' move it below the dst1 caption
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
