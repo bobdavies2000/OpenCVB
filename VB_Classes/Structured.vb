@@ -883,12 +883,9 @@ Public Class Structured_Cloud
                 Dim d2 = task.depth32f.Get(Of Single)(pt2.Y, pt2.X)
                 If stepX * threshold > Math.Abs(d1 - d2) And d1 > 0 And d2 > 0 Then
                     Dim p = task.pointCloud.Get(Of cv.Vec3f)(pt1.Y, pt1.X)
+                    p.Item2 = (d1 + d2) / 2000
                     dst1.Line(pt1, pt2, cv.Scalar.White, 1)
-                    Dim mmPP = mmPixel.Compute(p.Item2)
-                    For i = 0 To stepX - 1
-                        p.Item0 += mmPP
-                        dst2.Set(Of cv.Vec3f)(y, x, p)
-                    Next
+                    dst2.Set(Of cv.Vec3f)(y, x, p)
                 End If
             Next
         Next

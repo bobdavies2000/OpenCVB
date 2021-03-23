@@ -920,10 +920,13 @@ Public Class OpenCVB
     End Sub
     Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
         saveAlgorithmName = ""
+        Dim saveRes = optionsForm.resolution1280.Checked
         optionsForm.resolution1280.Checked = True
-        saveLayout()
-        LineUpCamPics(False)
-        startCamera()
+        If saveRes = False Then
+            saveLayout()
+            LineUpCamPics(False)
+            startCamera()
+        End If
 
         If TestAllButton.Text = "Test All" Then
             TestAllButton.Text = "Stop Test"
