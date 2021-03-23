@@ -781,63 +781,6 @@ End Class
 
 
 
-Public Class Structured_CloudOld
-    Inherits VBparent
-    Dim line As Structured_CenterSlice
-    Public Sub New()
-        initParent()
-        line = New Structured_CenterSlice
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Lines in X-Direction", 0, 100, 30)
-            sliders.setupTrackBar(1, "Lines in Y-Direction", 0, 100, 30)
-        End If
-
-        dst2 = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
-
-        task.desc = "Attempt to impose a structure on the point cloud data."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static xLineSlider = findSlider("Lines in X-Direction")
-        Static yLineSlider = findSlider("Lines in Y-Direction")
-        Dim xLines = xLineSlider.value
-        Dim yLines = yLineSlider.value
-
-        line.Run()
-        dst1 = src
-
-        Dim topPt = line.topPt
-        Dim botPt = line.botPt
-        dst2.SetTo(0)
-        dst2.Line(topPt, botPt, 255, 1, cv.LineTypes.AntiAlias)
-
-        Dim stepX = -(topPt.X - botPt.X) / yLines ' negative because the y-axis is increasing down.
-        Dim stepY = dst1.Height / yLines
-        If stepX < 0.5 Then stepX = 0
-
-        Dim slope = 1 / line.slope ' perpendiculars have inverse slope
-        If topPt.X = botPt.X Then slope = 0
-        For i = 0 To yLines - 1
-            Dim x = topPt.X + stepX * i
-            Dim pt = New cv.Point2f(x, line.slope * x + line.b)
-            If stepX = 0 Then pt = New cv.Point2f(x, stepY * i)
-            Dim b = pt.Y + slope * pt.X
-            Dim pt1 = New cv.Point2f(dst1.Width, -slope * dst1.Width + b)
-            Dim pt2 = New cv.Point2f(0, b)
-            dst2.Line(pt1, pt2, 255, 1, cv.LineTypes.AntiAlias)
-        Next
-
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class Structured_CloudFail
     Inherits VBparent
@@ -860,9 +803,6 @@ Public Class Structured_CloudFail
             check.Box(0).Checked = True
             check.Box(1).Checked = True
         End If
-
-
-        dst1 = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
 
         task.desc = "Attempt to impose a structure on the point cloud data."
     End Sub
@@ -888,10 +828,6 @@ Public Class Structured_CloudFail
 
         Dim input = src
         If input.Type <> cv.MatType.CV_32F Then input = task.depth32f
-
-        Dim topPt = New cv.Point2f(dst1.Width / 2, 0)
-        Dim botPt = New cv.Point2f(dst1.Width / 2, dst1.Height)
-        dst1 = task.RGBDepth
 
         Dim stepX = dst1.Width / xLines
         Dim stepY = dst1.Height / yLines
@@ -922,12 +858,11 @@ Public Class Structured_CloudFail
                     Dim r = New cv.Rect(pt1.X - halfStepX, pt1.Y - halfStepy, stepX, stepY)
                     Dim meanVal = cv.Cv2.Mean(task.depth32f(r), task.depthMask(r))
                     p.Item2 = (d1 + d2) / 2000 ' meanVal.Item(0) / 1000
-                    dst1.Line(pt1, pt2, cv.Scalar.White, 1)
                     dst2.Set(Of cv.Vec3f)(y, x, p)
                 End If
             Next
         Next
-        dst2 = dst2(New cv.Rect(0, 0, xLines, yLines)).Resize(dst1.Size, 0, 0, cv.InterpolationFlags.Nearest)
+        dst1 = dst2(New cv.Rect(0, 0, xLines, yLines)).Resize(dst1.Size, 0, 0, cv.InterpolationFlags.Nearest)
     End Sub
 End Class
 
@@ -940,22 +875,23 @@ End Class
 
 Public Class Structured_Cloud
     Inherits VBparent
+    Public data As New cv.Mat
     Public Sub New()
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Lines in X-Direction", 0, 200, 100)
-            sliders.setupTrackBar(1, "Lines in Y-Direction", 0, 200, 100)
+            sliders.setupTrackBar(0, "Number of slices", 0, 200, 100)
+            sliders.setupTrackBar(1, "Slice index X", 1, 200, 50)
+            sliders.setupTrackBar(2, "Slice index Y", 1, 200, 50)
         End If
 
         task.desc = "Attempt to impose a linear structure on the pointcloud."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static xLineSlider = findSlider("Lines in X-Direction")
-        Static yLineSlider = findSlider("Lines in Y-Direction")
-        Dim xLines = xLineSlider.value
-        Dim yLines = yLineSlider.value
+        Static sliceSlider = findSlider("Number of slices")
+        Dim xLines = sliceSlider.value
+        Dim yLines = CInt(xLines * dst1.Height / dst1.Width)
 
         Dim stepX = dst2.Width / xLines
         Dim stepY = dst2.Height / yLines
@@ -971,6 +907,91 @@ Public Class Structured_Cloud
                 End If
             Next
         Next
-        dst1 = dst2(New cv.Rect(0, 0, xLines, yLines)).Resize(dst1.Size, 0, 0, cv.InterpolationFlags.Nearest)
+        Dim rect = New cv.Rect(0, 0, xLines, yLines)
+        data = dst2(rect).Clone
+        label1 = "Structured_Cloud with " + CStr(yLines) + " rows " + CStr(xLines) + " columns"
+        dst1 = dst2(rect).Resize(dst1.Size, 0, 0, cv.InterpolationFlags.Nearest)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Structured_OrderedLines
+    Inherits VBparent
+    Dim sCloud As Structured_Cloud
+    Public Sub New()
+        initParent()
+        sCloud = New Structured_Cloud
+        task.desc = "Connect vertical and horizontal dots that are in the same column and row."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static sliceSlider = findSlider("Number of slices")
+        Static xSlider = findSlider("Slice index X")
+        Static ySlider = findSlider("Slice index Y")
+        Dim xLines = sliceSlider.value
+        Dim yLines = CInt(xLines * dst1.Width / dst1.Height)
+        Dim indexX = xSlider.value
+        Dim indexY = ySlider.value
+        If indexX > xLines Then indexX = xLines - 1
+        If indexY > yLines Then indexY = yLines - 1
+
+        sCloud.Run()
+        Dim data = sCloud.data
+        Dim split = cv.Cv2.Split(data)
+        Dim minX As Double, maxX As Double
+        cv.Cv2.MinMaxLoc(split(0), minX, maxX)
+
+        Dim minY As Double, maxY As Double
+        cv.Cv2.MinMaxLoc(split(1), minY, maxY)
+
+        ' using the above min/max values to establish a rigid grid to reduce shakiness in the output.
+        minX = -2.5
+        maxX = 2.0
+        minY = -2.0
+        maxY = 1.25
+
+        dst1.SetTo(0)
+        Dim white = New cv.Vec3b(255, 255, 255)
+        Dim pointX As New cv.Mat(data.Size, cv.MatType.CV_32S, 0)
+        Dim pointY As New cv.Mat(data.Size, cv.MatType.CV_32S, 0)
+        Dim yy As Integer, xx As Integer
+        For y = 0 To data.Height - 1
+            For x = 0 To data.Width - 1
+                Dim p = data.Get(Of cv.Vec3f)(y, x)
+                If p.Item2 > 0 Then
+                    xx = dst1.Width * (maxX - p.Item0) / (maxX - minX)
+                    yy = dst1.Height * (maxY - p.Item1) / (maxY - minY)
+                    If xx < 0 Then xx = 0
+                    If yy < 0 Then yy = 0
+                    If xx >= dst1.Width Then xx = dst1.Width - 1
+                    If yy >= dst1.Height Then yy = dst1.Height - 1
+                    yy = dst1.Height - yy
+                    xx = dst1.Width - xx
+                    dst1.Set(Of cv.Vec3b)(yy, xx, white)
+                    pointX.Set(Of Integer)(y, x, xx)
+                    pointY.Set(Of Integer)(y, x, yy)
+                    If x = indexX Then
+                        Dim p1 = New cv.Point(pointX.Get(Of Integer)(y - 1, x), pointY.Get(Of Integer)(y - 1, x))
+                        If p1.X > 0 Then
+                            Dim p2 = New cv.Point(xx, yy)
+                            dst1.Line(p1, p2, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+                        End If
+                    End If
+                    If y = indexY Then
+                        Dim p1 = New cv.Point(pointX.Get(Of Integer)(y, x - 1), pointY.Get(Of Integer)(y, x - 1))
+                        If p1.X > 0 Then
+                            Dim p2 = New cv.Point(xx, yy)
+                            dst1.Line(p1, p2, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+                        End If
+                    End If
+                End If
+            Next
+        Next
     End Sub
 End Class

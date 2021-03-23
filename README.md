@@ -121,10 +121,10 @@ reduced to a few steps using standard (and free) packages.
 
 The languages used are those often found in OpenCV projects - C++, C\#, and
 Python - but also include VB.Net, hence the name OpenCVB. OpenCVB also provides
-access to multiple libraries - OpenCV, OpenCVSharp, OpenGL, Dlib, NumPy, NAudio,
-and OpenMP. And OpenCVB enables all possible image representations - 3D,
-bitmaps, plots, bar charts, spreadsheets, and text. Examples of all of these
-representations are included in OpenCVB.
+access to multiple libraries - OpenCV, OpenCVSharp, OpenGL, Open3D, MatPlotLib,
+Dlib, NumPy, NAudio, and OpenMP. And OpenCVB enables all possible image
+representations - 3D, bitmaps, ply format, plots, bar charts, spreadsheets, and
+text. Examples of all of these representations are included in OpenCVB.
 
 Making these languages and libraries available while using the same
 infrastructure shaped a standardized class for OpenCVB algorithms. Implementing

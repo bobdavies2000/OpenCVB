@@ -11,12 +11,11 @@ Public Class LineDetector_Basics
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Line thickness", 1, 20, 2)
-            sliders.setupTrackBar(1, "Line length threshold (mm)", 1, 2000, 100) ' not used in Run below but externally...
-            sliders.setupTrackBar(2, "Line length threshold in pixels", 1, src.Width + src.Height, 50)
-            sliders.setupTrackBar(3, "Depth search radius in pixels", 1, 20, 2) ' not used in Run below but externally...
+            sliders.setupTrackBar(1, "Line length threshold in pixels", 1, src.Width + src.Height, 50)
+            sliders.setupTrackBar(2, "Depth search radius in pixels", 1, 20, 2) ' not used in Run below but externally...
         End If
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        label1 = "Yellow > length threshold, red < length threshold"
+        label1 = "Yellow > length threshold"
         task.desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
     Public Sub Run()
@@ -622,8 +621,6 @@ Public Class LineDetector_Depth
 
         Static thicknessSlider = findSlider("Line thickness")
         Dim thickness = thicknessSlider.value
-        Static lenSlider = findSlider("Line length threshold (mm)")
-        Dim mmThreshold = lenSlider.value
         Static radiusSlider = findSlider("Depth search radius in pixels")
         Dim pixelRadius = radiusSlider.value
 
