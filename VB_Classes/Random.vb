@@ -585,3 +585,33 @@ Public Class Random_60sTVFastSimple
         label2 = "Mat of random values < " + CStr(valSlider.value)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Random_KalmanPoints
+    Inherits VBparent
+    Dim random As Random_Points
+    Dim knn As KNN_Basics
+    Dim kalman As Kalman_Basics
+    Dim countSlider As Windows.Forms.TrackBar
+    Public Sub New()
+        initParent()
+        random = New Random_Points
+        knn = New KNN_Basics
+        kalman = New Kalman_Basics
+        countSlider = findSlider("Random Pixel Count")
+        countSlider.Value = 1
+        task.desc = "Smoothly transition a random point from location to location."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        random.Run()
+
+
+
+    End Sub
+End Class

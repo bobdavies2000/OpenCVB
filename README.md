@@ -31,31 +31,32 @@ Recent Changes – March 2021
 Introduction
 ============
 
-There is no better documentation of an algorithm than a working example. Now
-imagine over 900 OpenCV examples in a single app where each algorithm is less
-than a page of code and uses a familiar language. And each algorithm is *just
-the algorithm* without the baggage from a user interface or environment. New
-algorithms can reuse existing algorithms and build variations and combinations.
+There is no better documentation of an algorithm than a working example –
+especially if the output is visual and self-explanatory. Now imagine over 900
+OpenCV examples in a single app where each algorithm is less than a page of code
+and uses a familiar language. And each algorithm is *just the algorithm* without
+baggage from a user interface or environment. Each algorithm is designed to be
+reused in other algorithms so variations can be easily built.
 
 A full installation can take about 30-50 minutes using the 1-step
 “PrepareTree.bat” file discussed below. But there is no obligation to install
-all the libraries to just read the code for an algorithm. Open the OpenCVB.sln
-file after download and inspect the code in the VB_Classes (which includes
-VB.Net and Python examples), CPP_Classes, or CS_Classes. All algorithms are
-automatically provided with color, depth, point cloud, and IMU data and there
-are usually just 2 outputs – dst1 and dst2.
+needed libraries just to read the code for an algorithm. Open the OpenCVB.sln
+file after download and inspect the code in the VB_Classes, CPP_Classes, or
+CS_Classes. VB_Classes also contains all the Python examples. All algorithms are
+automatically provided with color, depth, point cloud, and IMU data.
 
-It is deliberate that the algorithms fit in one page of code or less. Reading
-the code is one way to review the algorithms but it is a lot faster and easier
-to review the output of each algorithm after installation. The output is often
-self-documenting or a natural representation of the algorithm’s intent.
+However, a full installation is recommended. The algorithms may fit in one page
+of code and reading the code is one way to review them but understanding the
+algorithms is a lot faster and easier when the output is visualized by running
+it. The output is often self-documenting or a natural representation of the
+algorithm’s intent.
 
-In the sample output below, any of the algorithms can be selected from the first
-combo box at the top of the form. The second combo box is used to select
-algorithms grouped by OpenCV API or OpenCVB algorithm. The default grouping is
-to select the special grouping “\<All\>”. There are a variety of other special
-groupings that select, for example, all Python or all C++ algorithms or all
-multi-threaded algorithms.
+The basic layout of OpenCVB is shown below. Any of the algorithms can be
+selected from the first combo box at the top of the form. The second combo box
+is used to select algorithms grouped by OpenCV API or OpenCVB algorithm. The
+default grouping is to select the special grouping “\<All\>”. There are a
+variety of other special groupings that select, for example, all Python or all
+C++ algorithms or all multi-threaded algorithms.
 
 ![](media/0094dd80a047099af3fa5ecf92dee723.png)
 

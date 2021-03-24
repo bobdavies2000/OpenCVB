@@ -1,6 +1,6 @@
 import cv2 as cv
 from PyStream import PyStreamRun
-titleWindow = 'BGSubtract_MOG2_PS1.py'
+titleWindow = 'BGSubtract_MOG2_PS.py'
 fileName = '../Data/vtest.avi'
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
