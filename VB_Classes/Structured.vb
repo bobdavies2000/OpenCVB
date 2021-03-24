@@ -1012,7 +1012,7 @@ Public Class Structured_Lines
         fLess = New Featureless_Basics
         lines = New LineDetector_Basics
         Dim thresholdSlider = findSlider("Line length threshold in pixels")
-        thresholdSlider.Value = 150
+        thresholdSlider.Value = 1
         task.desc = "Use the detected lines in RGB to create depth lines"
     End Sub
     Public Sub Run()
@@ -1033,13 +1033,13 @@ Public Class Structured_Lines
         For Each nl In lines.sortlines
             Dim p1 = New cv.Point2f(nl.Value.Item0, nl.Value.Item1)
             Dim p2 = New cv.Point2f(nl.Value.Item2, nl.Value.Item3)
-            mask.Line(p1, p2, cv.Scalar.White, 3, cv.LineTypes.AntiAlias)
+            ' mask.Line(p1, p2, cv.Scalar.White, 1, cv.LineTypes.Link4)
 
-            Dim minX = Math.Min(p1.X, p2.X)
-            Dim minY = Math.Min(p1.Y, p2.Y)
+            Dim minXX = Math.Min(p1.X, p2.X)
+            Dim minYY = Math.Min(p1.Y, p2.Y)
             Dim w = Math.Abs(p1.X - p2.X)
             Dim h = Math.Abs(p1.Y - p2.Y)
-            Dim r = New cv.Rect(minX, minY, If(w > 0, w, 4), If(h > 0, h, 4))
+            Dim r = New cv.Rect(minXX, minYY, If(w > 0, w, 4), If(h > 0, h, 4))
             ' dst1.Rectangle(r, cv.Scalar.Yellow, 1)
             rList.Add(r)
 
@@ -1049,10 +1049,33 @@ Public Class Structured_Lines
             End If
         Next
 
-        dst1.Line(lp1, lp2, cv.Scalar.Yellow, 3, cv.LineTypes.AntiAlias)
+        dst1.Line(lp1, lp2, cv.Scalar.Red, 12, cv.LineTypes.AntiAlias)
+        mask.Line(lp1, lp2, 255, 3, cv.LineTypes.AntiAlias)
+        mask.SetTo(0, task.noDepthMask)
         Dim rect = rList.ElementAt(0)
-        dst1.Rectangle(rect, cv.Scalar.White, 1)
+        ' dst1.Rectangle(rect, cv.Scalar.White, 1)
         dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
-        task.pointCloud(rect).CopyTo(dst2(rect), mask(rect))
+        task.pointCloud.CopyTo(dst2, mask)
+
+        Dim cloudMat = task.pointCloud(rect)
+        Dim maskMat = mask(rect)
+        Dim mean = cloudMat.Mean(maskMat)
+        Console.WriteLine("mean z = " + CStr(mean.Item(2)))
+
+        Dim split = dst2.Split()
+
+        Dim min As Double, max As Double, Loc(4 - 1) As cv.Point
+        cv.Cv2.MinMaxLoc(dst2.Split(0), min, max, Loc(0), Loc(1), mask)
+
+        cv.Cv2.MinMaxLoc(dst2.Split(1), min, max, Loc(2), Loc(3), mask)
+        Dim len1 = Math.Sqrt((Loc(0).X - Loc(1).X) * (Loc(0).X - Loc(1).X) + (Loc(0).Y - Loc(1).Y) * (Loc(0).Y - Loc(1).Y))
+        Dim len2 = Math.Sqrt((Loc(2).X - Loc(3).X) * (Loc(2).X - Loc(3).X) + (Loc(2).Y - Loc(3).Y) * (Loc(2).Y - Loc(3).Y))
+        If len1 > len2 Then
+            dst1.Line(Loc(0), Loc(1), cv.Scalar.Yellow, 4, cv.LineTypes.AntiAlias)
+        Else
+            dst1.Line(Loc(2), Loc(3), cv.Scalar.Yellow, 4, cv.LineTypes.AntiAlias)
+        End If
+
+        label2 = "Mask " + CStr(mask.CountNonZero()) + " pCloud: " + CStr(split(2).CountNonZero)
     End Sub
 End Class

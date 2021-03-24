@@ -5,6 +5,7 @@ Imports System.ComponentModel
 Public Class PixelViewerForm
     Public mousePoint As cv.Point
     Public saveText As String
+    Dim secondCount As Integer
     Private Sub PixelShow_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Left = GetSetting("OpenCVB", "PixelViewerLeft", "PixelViewerLeft", Me.Left)
         Me.Top = GetSetting("OpenCVB", "PixelViewerTop", "PixelViewerTop", Me.Top)
@@ -60,7 +61,6 @@ Public Class PixelViewerForm
         SaveSetting("OpenCVB", "grayscaleOnly", "grayscaleOnly", GrayScaleOnly.Checked)
     End Sub
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        Static secondCount = 0
         If UpdateFrequency.SelectedIndex = 1 Then
             rtb.Text = saveText
         ElseIf UpdateFrequency.SelectedIndex = 2 Then
@@ -82,6 +82,7 @@ Public Class PixelViewerForm
     End Sub
 
     Private Sub ToolStripButton5_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton5.Click
+        secondcount = 0
         rtb.Text = saveText
     End Sub
 End Class
