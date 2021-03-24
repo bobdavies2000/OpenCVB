@@ -399,7 +399,7 @@
     <Content Include="DNN_Inception_PS.py" />
     <Content Include="Filter_LowPass.py" />
     <Content Include="FourierTransforms.py" />
-    <Content Include="Histogram_Matching.py" />
+    <Content Include="MPL_Histogram_Matching.py" />
     <Content Include="LibRealSense_Align.py" />
     <Content Include="BGSubtract_KNN_PS.py" />
     <Content Include="BGSubtract_MOG2_PS.py" />
@@ -433,7 +433,7 @@
     <Content Include="Edges_Canny_PS.py" />
     <Content Include="KLT_homography_PS.py" />
     <Content Include="KLT_track_PS.py" />
-    <Content Include="LaplaceEquations.py" />
+    <Content Include="MPL_LaplaceEquations.py" />
     <Content Include="Logpolar.py" />
     <Content Include="Make_gaussians.py" />
     <Content Include="MatchTemplate.py" />
@@ -466,7 +466,7 @@
     <Content Include="Edges_Deriche.py" />
     <Content Include="Histogram_Color_PS.py" />
     <Content Include="Gabor_Filter.py" />
-    <Content Include="GradientDescent.py" />
+    <Content Include="MPL_GradientDescent.py" />
     <Content Include="KAZE_match.py" />
     <Content Include="Depth_RGB_PS.py" />
     <Content Include="Python_SurfaceBlit.py" />

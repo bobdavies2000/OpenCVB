@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import cv2 as cv
-titleWindow = 'Calibrate_ShowExtrinsics.py'
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 from numpy import linspace
 import ctypes
 def Mbox(title, text, style):
     return ctypes.windll.user32.MessageBoxW(0, text, title, style)
+titleWindow = 'Calibrate_ShowExtrinsics.py'
 
 def inverse_homogeneoux_matrix(M):
     R = M[0:3, 0:3]
@@ -181,9 +183,6 @@ def main():
     square_size = fs.getNode('square_size').real()
     camera_matrix = fs.getNode('camera_matrix').mat()
     extrinsics = fs.getNode('extrinsic_parameters').mat()
-
-    import matplotlib.pyplot as plt
-    from mpl_toolkits.mplot3d import Axes3D
 
     fig = plt.figure()
     ax = fig.gca(projection='3d')
