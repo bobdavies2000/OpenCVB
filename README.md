@@ -100,9 +100,8 @@ that enables any of the solutions to be reused. The result is a toolkit for
 solving incrementally bigger problems. The philosophy behind this approach is
 that human vision is not computationally intensive but is built on many almost
 trivial algorithms working together. Computer vision problems are not huge;
-there are just an unmanageable number of them. The first step – combining many
-different algorithms into a single app – is the motivation for OpenCVB’s
-organization.
+there are just an unmanageable number of them. Combining many reusable
+algorithms into a single app is the motivation for OpenCVB’s organization.
 
 OpenCVB is targeting only cameras that produce depth and color and have an IMU
 to detect gravity and motion. These newer cameras have prompted a review of
