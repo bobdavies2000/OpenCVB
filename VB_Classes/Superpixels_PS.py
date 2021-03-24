@@ -3,7 +3,7 @@ import cv2 as cv
 import common
 import sys
 from PyStream import PyStreamRun
-titleWindow = "SuperPixel_PS.py - use spacebar to switch views."
+titleWindow = "SuperPixels_PS.py"
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
     global seeds, display_mode, num_superpixels, prior, num_levels, num_histogram_bins, scalarRed
@@ -34,7 +34,7 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     mask = seeds.getLabelContourMask(False)
 
     # stitch foreground & background together
-    mask_inv = cv.bitwise_not(mask)
+    mask_inv = cv.bitwise_not(mask) 
     result_bg = cv.bitwise_and(imgRGB, imgRGB, mask=mask_inv)
     result_fg = cv.bitwise_and(scalarRed, scalarRed, mask=mask)
     result = cv.add(result_bg, result_fg)

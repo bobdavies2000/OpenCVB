@@ -1,55 +1,65 @@
-import cv2 as cv
 import numpy as np
-# https://docs.opencv.org/master/de/dbc/tutorial_py_fourier_transform.html
-from matplotlib import pyplot as plt
-from PyStream import PyStreamRun
 import cv2 as cv
-import io
-titleWindow = 'MPL_FourierTransforms.py'
-
-# simple averaging filter without scaling parameter
-mean_filter = np.ones((3,3))
-
-# creating a gaussian filter
-x = cv.getGaussianKernel(5,10)
-gaussian = x*x.T
-# different edge detecting filters
-# scharr in x-direction
-scharr = np.array([[-3, 0, 3],
-                   [-10,0,10],
-                   [-3, 0, 3]])
-# sobel in x direction
-sobel_x= np.array([[-1, 0, 1],
-                   [-2, 0, 2],
-                   [-1, 0, 1]])
-# sobel in y direction
-sobel_y= np.array([[-1,-2,-1],
-                   [0, 0, 0],
-                   [1, 2, 1]])
-# laplacian
-laplacian=np.array([[0, 1, 0],
-                    [1,-4, 1],
-                    [0, 1, 0]])
-filters = [mean_filter, gaussian, laplacian, sobel_x, sobel_y, scharr]
-filter_name = ['mean_filter', 'gaussian','laplacian', 'sobel_x', \
-                'sobel_y', 'scharr_x']
-fft_filters = [np.fft.fft2(x) for x in filters]
-fft_shift = [np.fft.fftshift(y) for y in fft_filters]
-mag_spectrum = [np.log(np.abs(z)+1) for z in fft_shift]
-for i in range(6):
-    plt.subplot(2,3,i+1),plt.imshow(mag_spectrum[i],cmap = 'gray')
-    plt.title(filter_name[i]), plt.xticks([]), plt.yticks([])
-
-buf = io.BytesIO()
-plt.savefig(buf, format='rgba', dpi=100)
-
-img_byte_arr = buf.getvalue()
-rgbaSize = 480, 640, 4 
-plotImage = np.array(np.frombuffer(img_byte_arr, np.uint8).reshape(rgbaSize)) 
-buf.close()
-plt.close()
+import common
+import sys
+from PyStream import PyStreamRun
+titleWindow = "SuperPixels_P.py"
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
-    return plotImage, None
+    global seeds, display_mode, num_superpixels, prior, num_levels, num_histogram_bins, scalarRed
+    converted_img = cv.cvtColor(imgRGB, cv.COLOR_BGR2HSV)
+    height,width,channels = converted_img.shape
+    num_SuperPixel_new = cv.getTrackbarPos('Number of Superpixels', titleWindow)
+    num_iterations = cv.getTrackbarPos('Iterations', titleWindow)
 
-PyStreamRun(OpenCVCode, titleWindow)
+    if frameCount == 0:
+        scalarRed = np.zeros((height,width,3), np.uint8)
+        scalarRed[:] = (0, 0, 255)
+
+    if not seeds or num_SuperPixel_new != num_superpixels:
+        num_superpixels = num_SuperPixel_new
+        seeds = cv.ximgproc.createSuperpixelSEEDS(width, height, channels,
+                num_superpixels, num_levels, prior, num_histogram_bins)
+
+    seeds.iterate(converted_img, num_iterations)
+
+    # retrieve the segmentation result
+    labels = seeds.getLabels()
+
+    # labels output: use the last x bits to determine the color
+    num_label_bits = 2
+    labels &= (1<<num_label_bits)-1
+    labels *= 1<<(16-num_label_bits)
+
+    mask = seeds.getLabelContourMask(False)
+
+    # stitch foreground & background together
+    mask_inv = cv.bitwise_not(mask) 
+    result_bg = cv.bitwise_and(imgRGB, imgRGB, mask=mask_inv)
+    result_fg = cv.bitwise_and(scalarRed, scalarRed, mask=mask)
+    result = cv.add(result_bg, result_fg)
+
+    if display_mode == 0:
+        cv.imshow(titleWindow, result)
+    elif display_mode == 1:
+        cv.imshow(titleWindow, mask)
+    else:
+        cv.imshow(titleWindow, labels)
+
+    ch = cv.waitKey(1)
+    if ch & 0xff == ord(' '):
+        display_mode = (display_mode + 1) % 2 # set this to 3 to get the labels working but it won't display...
+    return result, None
+
+if __name__ == '__main__':
+    cv.namedWindow(titleWindow)
+    cv.createTrackbar('Number of Superpixels', titleWindow, 400, 1000, common.nothing)
+    cv.createTrackbar('Iterations', titleWindow, 4, 12, common.nothing)
+
+    seeds = None
+    display_mode = 0
+    num_superpixels = 400
+    prior = 2
+    num_levels = 4
+    num_histogram_bins = 5
+    PyStreamRun(OpenCVCode, titleWindow)
