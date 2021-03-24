@@ -2,8 +2,14 @@ import cv2 as cv
 import numpy as np
 # https://docs.opencv.org/master/de/dbc/tutorial_py_fourier_transform.html
 from matplotlib import pyplot as plt
+from PyStream import PyStreamRun
+import cv2 as cv
+import io
+titleWindow = 'MPL_FourierTransforms_PS.py'
+
 # simple averaging filter without scaling parameter
 mean_filter = np.ones((3,3))
+
 # creating a gaussian filter
 x = cv.getGaussianKernel(5,10)
 gaussian = x*x.T
@@ -33,4 +39,17 @@ mag_spectrum = [np.log(np.abs(z)+1) for z in fft_shift]
 for i in range(6):
     plt.subplot(2,3,i+1),plt.imshow(mag_spectrum[i],cmap = 'gray')
     plt.title(filter_name[i]), plt.xticks([]), plt.yticks([])
-plt.show()
+
+buf = io.BytesIO()
+plt.savefig(buf, format='rgba', dpi=100)
+
+img_byte_arr = buf.getvalue()
+rgbaSize = 480, 640, 4 
+plotImage = np.array(np.frombuffer(img_byte_arr, np.uint8).reshape(rgbaSize)) 
+buf.close()
+plt.close()
+
+def OpenCVCode(imgRGB, depth32f, frameCount):
+    return plotImage, None
+
+PyStreamRun(OpenCVCode, titleWindow)

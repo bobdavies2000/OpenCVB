@@ -398,7 +398,7 @@
     <Content Include="FAST_ANMS_PS.py" />
     <Content Include="DNN_Inception_PS.py" />
     <Content Include="Filter_LowPass.py" />
-    <Content Include="FourierTransforms.py" />
+    <Content Include="MPL_FourierTransforms_PS.py" />
     <Content Include="MPL_Histogram_Matching.py" />
     <Content Include="LibRealSense_Align.py" />
     <Content Include="BGSubtract_KNN_PS.py" />

@@ -961,8 +961,8 @@ Public Class Structured_OrderedLines
         Dim pointX As New cv.Mat(data.Size, cv.MatType.CV_32S, 0)
         Dim pointY As New cv.Mat(data.Size, cv.MatType.CV_32S, 0)
         Dim yy As Integer, xx As Integer
-        For y = 0 To data.Height - 1
-            For x = 0 To data.Width - 1
+        For y = 1 To data.Height - 1
+            For x = 1 To data.Width - 1
                 Dim p = data.Get(Of cv.Vec3f)(y, x)
                 If p.Item2 > 0 Then
                     xx = dst1.Width * (maxX - p.Item0) / (maxX - minX)
@@ -971,9 +971,10 @@ Public Class Structured_OrderedLines
                     If yy < 0 Then yy = 0
                     If xx >= dst1.Width Then xx = dst1.Width - 1
                     If yy >= dst1.Height Then yy = dst1.Height - 1
-                    yy = dst1.Height - yy
-                    xx = dst1.Width - xx
+                    yy = dst1.Height - yy - 1
+                    xx = dst1.Width - xx - 1
                     dst1.Set(Of cv.Vec3b)(yy, xx, white)
+
                     pointX.Set(Of Integer)(y, x, xx)
                     pointY.Set(Of Integer)(y, x, yy)
                     If x = indexX Then

@@ -16,81 +16,84 @@ def getDrawRect():
 def PyStreamRun(OpenCVCode, titleWindow):
     global drawRect 
     drawRect = (0,0,0,0)
+    if titleWindow.endswith("_PS.py") == False:
+        Mbox("PyStream", "PyStream scripts need to end with '_PS.py' to be recognized in OpenCVB. " +
+             "And be sure to run OpenCVB after renaming the Python script so it appears in the user interface to OpenCVB.", 1) 
+    else:
+        parser = argparse.ArgumentParser(description='Pass in length of MemMap region.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+        parser.add_argument('--MemMapLength', type=int, default=0, help='The number of bytes are in the memory mapped file.')
+        parser.add_argument('--pipeName', default='', help='The name of the input pipe for image data.')
+        args = parser.parse_args()
 
-    parser = argparse.ArgumentParser(description='Pass in length of MemMap region.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--MemMapLength', type=int, default=0, help='The number of bytes are in the memory mapped file.')
-    parser.add_argument('--pipeName', default='', help='The name of the input pipe for image data.')
-    args = parser.parse_args()
+        # When the PythonDebug project runs a Python script, this code will start OpenCVB.exe and invoke the script.
+        MemMapLength = args.MemMapLength
+        if MemMapLength == 0:
+            MemMapLength = 400 # these values have been generously padded (on both sides) but if they grow...
+            args.pipeName = 'PyStream2Way0' # we always start with 0 and since it is only invoked once, 0 is all it will ever be.
+            ocvb = os.getcwd() + '/../bin/Debug/OpenCVB.exe'
+            if os.path.exists(ocvb):
+                tupleArg = (' ', titleWindow)
+                pid = os.spawnv(os.P_NOWAIT, ocvb, tupleArg) # OpenCVB.exe will be run with this .py script
 
-    # When the PythonDebug project runs a Python script, this code will start OpenCVB.exe and invoke the script.
-    MemMapLength = args.MemMapLength
-    if MemMapLength == 0:
-        MemMapLength = 400 # these values have been generously padded (on both sides) but if they grow...
-        args.pipeName = 'PyStream2Way0' # we always start with 0 and since it is only invoked once, 0 is all it will ever be.
-        ocvb = os.getcwd() + '/../bin/Debug/OpenCVB.exe'
-        if os.path.exists(ocvb):
-            tupleArg = (' ', titleWindow)
-            pid = os.spawnv(os.P_NOWAIT, ocvb, tupleArg) # OpenCVB.exe will be run with this .py script
-
-    pipeName = '\\\\.\\pipe\\' + args.pipeName
-    while True:
-        try:
-            pipeIn = open(pipeName, 'rb')
-            pipeOut = open(pipeName + 'Results', 'wb')
-            break
-        except Exception as exception:
-            time.sleep(0.1) # sleep for a bit to wait for OpenCVB to start...
-    try: 
-        mm = mmap.mmap(0, MemMapLength, tagname='Python_MemMap')
-        frameCount = -1
+        pipeName = '\\\\.\\pipe\\' + args.pipeName
         while True:
-            mm.seek(0)
-            arrayDoubles = array.array('d', mm.read(MemMapLength))
-            rgbBufferSize = int(arrayDoubles[1])
-            depthBufferSize = int(arrayDoubles[2])
-            rows = int(arrayDoubles[3])
-            cols = int(arrayDoubles[4])
-            # this is the task.drawRect in OpenCVB
-            drawRect = (int(arrayDoubles[5]),int(arrayDoubles[6]),int(arrayDoubles[7]),int(arrayDoubles[8]))
+            try:
+                pipeIn = open(pipeName, 'rb')
+                pipeOut = open(pipeName + 'Results', 'wb')
+                break
+            except Exception as exception:
+                time.sleep(0.1) # sleep for a bit to wait for OpenCVB to start...
+        try: 
+            mm = mmap.mmap(0, MemMapLength, tagname='Python_MemMap')
+            frameCount = -1
+            while True:
+                mm.seek(0)
+                arrayDoubles = array.array('d', mm.read(MemMapLength))
+                rgbBufferSize = int(arrayDoubles[1])
+                depthBufferSize = int(arrayDoubles[2])
+                rows = int(arrayDoubles[3])
+                cols = int(arrayDoubles[4])
+                # this is the task.drawRect in OpenCVB
+                drawRect = (int(arrayDoubles[5]),int(arrayDoubles[6]),int(arrayDoubles[7]),int(arrayDoubles[8]))
 
-            if rows > 0:
-                if arrayDoubles[0] == frameCount:
-                    sleep(0.001)
-                else:
-                    frameCount = arrayDoubles[0] 
-                    rgb = pipeIn.read(int(rgbBufferSize))
-                    depthData = pipeIn.read(int(depthBufferSize))
-                    depthSize = rows, cols, 1
-                    try:
-                        depth32f = np.array(np.frombuffer(depthData, np.float32).reshape(depthSize))
-                    except:
-                        print("unable to reshape the depth data")
-                        sys.exit(0)
-                    rgbSize = rows, cols, 3
-                    try:
-                        imgRGB = np.array(np.frombuffer(rgb, np.uint8).reshape(rgbSize))
-                    except:
-                        print("Unable to reshape the RGB data")
-                        sys.exit(0)
-                    dst1, dst2 = OpenCVCode(imgRGB, depth32f, frameCount)
-                    if len(dst1.shape) == 2:
-                        dst1 = cv.cvtColor(dst1, cv.COLOR_GRAY2BGR)
-                    if dst1.shape[2]==4:
-                        dst1 = cv.cvtColor(dst1, cv.COLOR_RGBA2BGR)
-                    dst1 = cv.resize(dst1, (cols, rows))
-                    if np.any(dst2 != None):
-                        if len(dst2.shape) == 2:
-                            dst2 = cv.cvtColor(dst2, cv.COLOR_GRAY2BGR)
-                        if dst2.shape[2] == 4:
-                            dst2 = cv.cvtColor(dst2, cv.COLOR_RGBA2BGR)
-                        dst2 = cv.resize(dst2, (cols, rows))
+                if rows > 0:
+                    if arrayDoubles[0] == frameCount:
+                        sleep(0.001)
                     else:
-                        dst2 = np.zeros(dst1.shape, np.uint8)
-                    pipeOut.write(np.asarray(dst1)) # Assumption here is that we are always returning 8uC3.  Needs more work to generalize...
-                    pipeOut.write(np.asarray(dst2))
+                        frameCount = arrayDoubles[0] 
+                        rgb = pipeIn.read(int(rgbBufferSize))
+                        depthData = pipeIn.read(int(depthBufferSize))
+                        depthSize = rows, cols, 1
+                        try:
+                            depth32f = np.array(np.frombuffer(depthData, np.float32).reshape(depthSize))
+                        except:
+                            print("unable to reshape the depth data")
+                            sys.exit(0)
+                        rgbSize = rows, cols, 3
+                        try:
+                            imgRGB = np.array(np.frombuffer(rgb, np.uint8).reshape(rgbSize))
+                        except:
+                            print("Unable to reshape the RGB data")
+                            sys.exit(0)
+                        dst1, dst2 = OpenCVCode(imgRGB, depth32f, frameCount)
+                        if len(dst1.shape) == 2:
+                            dst1 = cv.cvtColor(dst1, cv.COLOR_GRAY2BGR)
+                        if dst1.shape[2]==4:
+                            dst1 = cv.cvtColor(dst1, cv.COLOR_RGBA2BGR)
+                        dst1 = cv.resize(dst1, (cols, rows))
+                        if np.any(dst2 != None):
+                            if len(dst2.shape) == 2:
+                                dst2 = cv.cvtColor(dst2, cv.COLOR_GRAY2BGR)
+                            if dst2.shape[2] == 4:
+                                dst2 = cv.cvtColor(dst2, cv.COLOR_RGBA2BGR)
+                            dst2 = cv.resize(dst2, (cols, rows))
+                        else:
+                            dst2 = np.zeros(dst1.shape, np.uint8)
+                        pipeOut.write(np.asarray(dst1)) # Assumption here is that we are always returning 8uC3.  Needs more work to generalize...
+                        pipeOut.write(np.asarray(dst2))
 
-                    cv.waitKey(1) # this is only needed if the OpenCVCode function is calling imshow
+                        cv.waitKey(1) # this is only needed if the OpenCVCode function is calling imshow
                     
-    except Exception as exception:
-        Mbox("PyStream", str(exception), 1)
-        print(exception)
+        except Exception as exception:
+            Mbox("PyStream", str(exception), 1)
+            print(exception)
