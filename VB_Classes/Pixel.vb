@@ -3,6 +3,7 @@ Imports System.Runtime.InteropServices
 Public Class Pixel_Viewer
     Inherits VBparent
     Public pixels As PixelViewerForm
+    Dim firstUpdate = True
     Public Sub New()
         initParent()
 
@@ -19,17 +20,18 @@ Public Class Pixel_Viewer
             pixels.Show()
 
             dst1 = Choose(task.mousePicTag + 1, task.color, task.RGBDepth, task.algorithmObject.dst1, task.algorithmObject.dst2)
-            If pixels.GrayScaleOnly.Checked And dst1.Channels <> 1 Then
-                dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            End If
+
             Dim displayType = -1 ' default is 8uc3
             If dst1.Type = cv.MatType.CV_8UC3 Then displayType = 0
             If dst1.Type = cv.MatType.CV_8U Then displayType = 1
             If dst1.Type = cv.MatType.CV_32F Then displayType = 2
             If dst1.Type = cv.MatType.CV_32FC3 Then displayType = 3
             If displayType < 0 Or dst1.Channels > 4 Then
-                ocvb.trueText("The pixel Viewer does not support this cv.Mat!")
+                ocvb.trueText("The pixel Viewer does not support this cv.Mat!  Please add support.")
                 Exit Sub
+            End If
+            If pixels.GrayScaleOnly.Checked And dst1.Channels <> 1 And displayType < 2 Then
+                dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             End If
 
             Dim formatType = Choose(displayType + 1, "8UC3", "8UC1", "32FC1", "32FC3")
@@ -143,14 +145,18 @@ Public Class Pixel_Viewer
             task.pixelViewerRect = dw
 
             If pixels.rtb.Text <> imgText Then
-                pixels.rtb.Text = imgText
-                pixels.Refresh()
+                If pixels.UpdateFrequency.SelectedIndex = 0 Or firstUpdate Then pixels.rtb.Text = imgText Else pixels.saveText = imgText
+                firstUpdate = False
             End If
         Else
             If pixels IsNot Nothing Then
                 pixels.Close()
                 pixels = Nothing
             End If
+        End If
+        If task.desc = "Display pixels under the cursor" Then
+            ocvb.trueText("Move the mouse to location that you want to inspect." + vbCrLf +
+                          "Click and hold the right-mouse button to move away from that location")
         End If
     End Sub
     Public Sub closeViewer()

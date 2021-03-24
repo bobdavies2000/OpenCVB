@@ -20,15 +20,14 @@ Public Class Featureless_Basics
             sliders.setupTrackBar(0, "FeatureLess rho", 1, 100, 1)
             sliders.setupTrackBar(1, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
             sliders.setupTrackBar(2, "FeatureLess threshold", 1, 100, 3)
-            sliders.setupTrackBar(3, "FeatureLess Flood Threshold", 1, 10000, ocvb.resfactor * 500)
         End If
         flood = New FloodFill_8bit()
 
-        label1 = "Featureless regions with mask in depth color"
+        label1 = "Featureless mask"
         task.desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         grid.Run()
 
         edges.src = src
@@ -37,10 +36,9 @@ Public Class Featureless_Basics
         Dim rhoIn = sliders.trackbar(0).Value
         Dim thetaIn = sliders.trackbar(1).Value / 1000
         Dim threshold = sliders.trackbar(2).Value
-        Dim floodCountThreshold = sliders.trackbar(3).Value
 
         src.CopyTo(dst1)
-        Dim mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+        Dim mask = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
         Parallel.ForEach(grid.roiList,
         Sub(roi)
             Dim segments() = cv.Cv2.HoughLines(edges.dst1(roi), rhoIn, thetaIn, threshold)
@@ -51,7 +49,10 @@ Public Class Featureless_Basics
         flood.Run()
         dst1 = flood.dst1
 
-        label2 = "FeatureLess Regions = " + CStr(flood.basics.centroids.Count)
+        dst2.SetTo(0)
+        src.CopyTo(dst2, flood.allRegionMask)
+        Static floodSlider = findSlider("FloodFill Minimum Size")
+        label2 = "FeatureLess Regions = " + CStr(flood.basics.centroids.Count) + " with more than " + CStr(floodSlider.value) + " pixels"
     End Sub
 End Class
 

@@ -57,6 +57,8 @@ Public Class OpenCVB
     Dim mouseDownPoint As New cv.Point
     Dim mouseMovePoint As New cv.Point
     Dim mousePoint As New cv.Point
+    Dim ignoreMouseMove As Boolean
+
     Dim myBrush = New SolidBrush(Color.White)
     Dim openCVKeywords As New List(Of String)
     Public optionsForm As OptionsDialog
@@ -798,6 +800,7 @@ Public Class OpenCVB
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
         If AvailableAlgorithms.Enabled Then
             If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e) ' if paused, then restart.
+            If OpenCVkeyword.Text = "" Then Exit Sub ' we are terminating...
             SaveSetting("OpenCVB", OpenCVkeyword.Text, OpenCVkeyword.Text, AvailableAlgorithms.Text)
             StartAlgorithmTask()
             updateRecentList()
@@ -839,6 +842,7 @@ Public Class OpenCVB
                 DrawingRectangle = False
                 GrabRectangleData = True
             End If
+            ignoremousemove = False
         Catch ex As Exception
             Console.WriteLine("Error in camPic_MouseUp: " + ex.Message)
         End Try
@@ -847,7 +851,10 @@ Public Class OpenCVB
     Private Sub camPic_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
         Try
             Dim pic = DirectCast(sender, PictureBox)
-            If e.Button = Windows.Forms.MouseButtons.Left Or e.Button = Windows.Forms.MouseButtons.Right Then
+            If e.Button = Windows.Forms.MouseButtons.Right Then
+                ignoreMouseMove = True
+            End If
+            If e.Button = Windows.Forms.MouseButtons.Left Then
                 DrawingRectangle = True
                 BothFirstAndLastReady = False ' we have to see some movement after mousedown.
                 drawRect.Width = 0
@@ -867,6 +874,7 @@ Public Class OpenCVB
     Private Sub camPic_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
         Try
             Dim pic = DirectCast(sender, PictureBox)
+            If ignoreMouseMove Then Exit Sub
             If DrawingRectangle Then
                 mouseMovePoint.X = e.X
                 mouseMovePoint.Y = e.Y
@@ -1220,12 +1228,13 @@ Public Class OpenCVB
                             BothFirstAndLastReady = False
                         End If
 
-                        task.mousePoint = mousePoint
-                        task.mousePicTag = mousePicTag
-                        task.mouseClickFlag = mouseClickFlag
-                        If mouseClickFlag Then task.mouseClickPoint = mousePoint
-                        mouseClickFlag = False
-
+                        If ignoreMouseMove = False Then
+                            task.mousePoint = mousePoint
+                            task.mousePicTag = mousePicTag
+                            task.mouseClickFlag = mouseClickFlag
+                            If mouseClickFlag Then task.mouseClickPoint = mousePoint
+                            mouseClickFlag = False
+                        End If
                         task.fileStarted = openFileStarted ' UI may have stopped play.
                         newImagesAvailable = False
                         Exit While

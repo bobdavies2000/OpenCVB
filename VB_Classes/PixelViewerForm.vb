@@ -2,9 +2,9 @@
 Imports System.Windows.Forms
 Imports System.Drawing
 Imports System.ComponentModel
-
 Public Class PixelViewerForm
     Public mousePoint As cv.Point
+    Public saveText As String
     Private Sub PixelShow_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Left = GetSetting("OpenCVB", "PixelViewerLeft", "PixelViewerLeft", Me.Left)
         Me.Top = GetSetting("OpenCVB", "PixelViewerTop", "PixelViewerTop", Me.Top)
@@ -17,6 +17,11 @@ Public Class PixelViewerForm
         Me.Height = GetSetting("OpenCVB", "PixelViewerHeight", "PixelViewerHeight", 720)
         GrayScaleOnly.Checked = GetSetting("OpenCVB", "grayscaleOnly", "grayscaleOnly", False)
         PixelViewerForm_ResizeEnd(sender, e)
+        UpdateFrequency.Items.Add("Instantaneously")
+        UpdateFrequency.Items.Add("Once a second")
+        UpdateFrequency.Items.Add("Once every 5 seconds")
+        UpdateFrequency.Items.Add("Once every 30 seconds")
+        UpdateFrequency.SelectedIndex = GetSetting("OpenCVB", "UpdateFrequency", "UpdateFrequency", 1)
     End Sub
     Private Sub PixelViewerForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         rtb.Width = Me.Width - 40
@@ -53,5 +58,30 @@ Public Class PixelViewerForm
     Private Sub ToolStripButton5_Click(sender As Object, e As EventArgs) Handles GrayScaleOnly.Click
         GrayScaleOnly.Checked = Not GrayScaleOnly.Checked
         SaveSetting("OpenCVB", "grayscaleOnly", "grayscaleOnly", GrayScaleOnly.Checked)
+    End Sub
+    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
+        Static secondCount = 0
+        If UpdateFrequency.SelectedIndex = 1 Then
+            rtb.Text = saveText
+        ElseIf UpdateFrequency.SelectedIndex = 2 Then
+            secondCount += 1
+            If secondCount >= 5 Then
+                rtb.Text = saveText
+                secondCount = 0
+            End If
+        ElseIf UpdateFrequency.SelectedIndex = 3 Then
+            secondCount += 1
+            If secondCount >= 30 Then
+                rtb.Text = saveText
+                secondCount = 0
+            End If
+        End If
+    End Sub
+    Private Sub UpdateFrequency_SelectedIndexChanged(sender As Object, e As EventArgs) Handles UpdateFrequency.SelectedIndexChanged
+        SaveSetting("OpenCVB", "UpdateFrequency", "UpdateFrequency", UpdateFrequency.SelectedIndex)
+    End Sub
+
+    Private Sub ToolStripButton5_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton5.Click
+        rtb.Text = saveText
     End Sub
 End Class

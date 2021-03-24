@@ -1005,16 +1005,54 @@ End Class
 Public Class Structured_Lines
     Inherits VBparent
     Dim lines As LineDetector_Basics
+    Dim fLess As Featureless_Basics
+
     Public Sub New()
         initParent()
+        fLess = New Featureless_Basics
         lines = New LineDetector_Basics
+        Dim thresholdSlider = findSlider("Line length threshold in pixels")
+        thresholdSlider.Value = 150
         task.desc = "Use the detected lines in RGB to create depth lines"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
+        fLess.src = src
+        fLess.Run()
+        dst1 = fLess.dst2
+        label1 = fLess.label2
+
         lines.src = src
         lines.Run()
-        dst1 = lines.dst1
+
+        dst1 = src
+        Dim mask As New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        Dim rList = New List(Of cv.Rect)
+        Dim lp1 As cv.Point2f, lp2 As cv.Point2f
+        For Each nl In lines.sortlines
+            Dim p1 = New cv.Point2f(nl.Value.Item0, nl.Value.Item1)
+            Dim p2 = New cv.Point2f(nl.Value.Item2, nl.Value.Item3)
+            mask.Line(p1, p2, cv.Scalar.White, 3, cv.LineTypes.AntiAlias)
+
+            Dim minX = Math.Min(p1.X, p2.X)
+            Dim minY = Math.Min(p1.Y, p2.Y)
+            Dim w = Math.Abs(p1.X - p2.X)
+            Dim h = Math.Abs(p1.Y - p2.Y)
+            Dim r = New cv.Rect(minX, minY, If(w > 0, w, 4), If(h > 0, h, 4))
+            ' dst1.Rectangle(r, cv.Scalar.Yellow, 1)
+            rList.Add(r)
+
+            If rList.Count = 1 Then
+                lp1 = p1
+                lp2 = p2
+            End If
+        Next
+
+        dst1.Line(lp1, lp2, cv.Scalar.Yellow, 3, cv.LineTypes.AntiAlias)
+        Dim rect = rList.ElementAt(0)
+        dst1.Rectangle(rect, cv.Scalar.White, 1)
+        dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
+        task.pointCloud(rect).CopyTo(dst2(rect), mask(rect))
     End Sub
 End Class

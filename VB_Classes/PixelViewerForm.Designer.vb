@@ -22,6 +22,7 @@ Partial Class PixelViewerForm
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(PixelViewerForm))
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
         Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
@@ -29,17 +30,20 @@ Partial Class PixelViewerForm
         Me.ToolStripButton3 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton4 = New System.Windows.Forms.ToolStripButton()
         Me.GrayScaleOnly = New System.Windows.Forms.ToolStripButton()
+        Me.UpdateFrequency = New System.Windows.Forms.ToolStripComboBox()
         Me.rtb = New System.Windows.Forms.RichTextBox()
+        Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
+        Me.ToolStripButton5 = New System.Windows.Forms.ToolStripButton()
         Me.ToolStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'ToolStrip1
         '
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.ToolStripButton3, Me.ToolStripButton4, Me.GrayScaleOnly})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.ToolStripButton3, Me.ToolStripButton4, Me.GrayScaleOnly, Me.UpdateFrequency, Me.ToolStripButton5})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(1707, 34)
+        Me.ToolStrip1.Size = New System.Drawing.Size(1707, 38)
         Me.ToolStrip1.TabIndex = 1
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -49,7 +53,7 @@ Partial Class PixelViewerForm
         Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
         Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton1.Name = "ToolStripButton1"
-        Me.ToolStripButton1.Size = New System.Drawing.Size(34, 29)
+        Me.ToolStripButton1.Size = New System.Drawing.Size(34, 33)
         Me.ToolStripButton1.Text = "ToolStripButton1"
         '
         'ToolStripButton2
@@ -58,7 +62,7 @@ Partial Class PixelViewerForm
         Me.ToolStripButton2.Image = CType(resources.GetObject("ToolStripButton2.Image"), System.Drawing.Image)
         Me.ToolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton2.Name = "ToolStripButton2"
-        Me.ToolStripButton2.Size = New System.Drawing.Size(34, 29)
+        Me.ToolStripButton2.Size = New System.Drawing.Size(34, 33)
         Me.ToolStripButton2.Text = "ToolStripButton2"
         '
         'ToolStripButton3
@@ -67,7 +71,7 @@ Partial Class PixelViewerForm
         Me.ToolStripButton3.Image = CType(resources.GetObject("ToolStripButton3.Image"), System.Drawing.Image)
         Me.ToolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton3.Name = "ToolStripButton3"
-        Me.ToolStripButton3.Size = New System.Drawing.Size(34, 29)
+        Me.ToolStripButton3.Size = New System.Drawing.Size(34, 33)
         Me.ToolStripButton3.Text = "ToolStripButton3"
         '
         'ToolStripButton4
@@ -76,7 +80,7 @@ Partial Class PixelViewerForm
         Me.ToolStripButton4.Image = CType(resources.GetObject("ToolStripButton4.Image"), System.Drawing.Image)
         Me.ToolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ToolStripButton4.Name = "ToolStripButton4"
-        Me.ToolStripButton4.Size = New System.Drawing.Size(34, 29)
+        Me.ToolStripButton4.Size = New System.Drawing.Size(34, 33)
         Me.ToolStripButton4.Text = "ToolStripButton4"
         '
         'GrayScaleOnly
@@ -84,8 +88,14 @@ Partial Class PixelViewerForm
         Me.GrayScaleOnly.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
         Me.GrayScaleOnly.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.GrayScaleOnly.Name = "GrayScaleOnly"
-        Me.GrayScaleOnly.Size = New System.Drawing.Size(90, 29)
+        Me.GrayScaleOnly.Size = New System.Drawing.Size(90, 33)
         Me.GrayScaleOnly.Text = "Grayscale"
+        '
+        'UpdateFrequency
+        '
+        Me.UpdateFrequency.BackColor = System.Drawing.SystemColors.ScrollBar
+        Me.UpdateFrequency.Name = "UpdateFrequency"
+        Me.UpdateFrequency.Size = New System.Drawing.Size(200, 38)
         '
         'rtb
         '
@@ -96,6 +106,21 @@ Partial Class PixelViewerForm
         Me.rtb.TabIndex = 2
         Me.rtb.Text = ""
         Me.rtb.WordWrap = False
+        '
+        'Timer1
+        '
+        Me.Timer1.Enabled = True
+        Me.Timer1.Interval = 1000
+        '
+        'ToolStripButton5
+        '
+        Me.ToolStripButton5.BackColor = System.Drawing.SystemColors.ControlLight
+        Me.ToolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text
+        Me.ToolStripButton5.Image = CType(resources.GetObject("ToolStripButton5.Image"), System.Drawing.Image)
+        Me.ToolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton5.Name = "ToolStripButton5"
+        Me.ToolStripButton5.Size = New System.Drawing.Size(116, 33)
+        Me.ToolStripButton5.Text = "Update Now"
         '
         'PixelViewerForm
         '
@@ -120,4 +145,7 @@ Partial Class PixelViewerForm
     Friend WithEvents ToolStripButton4 As Windows.Forms.ToolStripButton
     Friend WithEvents rtb As Windows.Forms.RichTextBox
     Friend WithEvents GrayScaleOnly As Windows.Forms.ToolStripButton
+    Friend WithEvents UpdateFrequency As Windows.Forms.ToolStripComboBox
+    Friend WithEvents Timer1 As Windows.Forms.Timer
+    Friend WithEvents ToolStripButton5 As Windows.Forms.ToolStripButton
 End Class
