@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Public Class KNN_Basics
     Inherits VBparent
     Public neighbors As New cv.Mat
-    Public testMode As Boolean
     Public desiredMatches = 1
     Public knn As cv.ML.KNearest
     Public lastSet As New List(Of cv.Point2f)
@@ -38,7 +37,7 @@ Public Class KNN_Basics
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
         knn.FindNearest(queries, desiredMatches, New cv.Mat, neighbors)
 
-        If standalone Or testMode Then
+        If standalone Then
             For i = 0 To neighbors.Rows - 1
                 Dim qPoint = queries.Get(Of cv.Point2f)(i, 0)
                 cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
