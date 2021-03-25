@@ -1,5 +1,61 @@
 Imports cv = OpenCvSharp
-Public Class KNN_Basics
+Public Class KNN_BasicsTest
+    Inherits VBparent
+    Public neighbors As New cv.Mat
+    Public testMode As Boolean
+    Public desiredMatches = 1
+    Public knn As cv.ML.KNearest
+    Public lastSet As New List(Of cv.Point2f)
+    Public currSet As New List(Of cv.Point2f)
+    Dim random As Random_Points
+    Public Sub New()
+        initParent()
+
+        random = New Random_Points
+        label1 = "White=TrainingData, Red=queries"
+        knn = cv.ML.KNearest.Create()
+        task.desc = "Test knn with random points in the image.  Find the nearest n points."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        dst1.SetTo(cv.Scalar.Black)
+
+        If standalone Then
+            random.Run()
+            lastSet = New List(Of cv.Point2f)(random.Points2f)
+            random.Run()
+            currSet = New List(Of cv.Point2f)(random.Points2f)
+        End If
+
+        Dim queries = New cv.Mat(currSet.Count, 2, cv.MatType.CV_32F, currSet.ToArray)
+        Dim trainData = New cv.Mat(lastSet.Count, 2, cv.MatType.CV_32F, lastSet.ToArray)
+
+        Dim response = New cv.Mat(trainData.Rows, 1, cv.MatType.CV_32S)
+        For i = 0 To trainData.Rows - 1
+            response.Set(Of Integer)(i, 0, i)
+            cv.Cv2.Circle(dst1, trainData.Get(Of cv.Point2f)(i, 0), 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
+        Next
+        knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
+        knn.FindNearest(queries, desiredMatches, New cv.Mat, neighbors)
+
+        If standalone Or testMode Then
+            For i = 0 To neighbors.Rows - 1
+                Dim qPoint = queries.Get(Of cv.Point2f)(i, 0)
+                cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
+                Dim pt = trainData.Get(Of cv.Point2f)(neighbors.Get(Of Single)(i, 0), 0)
+                dst1.Line(pt, qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+            Next
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class KNN_BasicsQT
     Inherits VBparent
     Public neighbors As New cv.Mat
     Public testMode As Boolean
@@ -51,6 +107,7 @@ Public Class KNN_Basics
         End If
     End Sub
 End Class
+
 
 
 
@@ -132,11 +189,11 @@ Public Class KNN_1_to_1
     Inherits VBparent
     Public matchedPoints() As cv.Point2f
     Public unmatchedPoints As New List(Of cv.Point2f)
-    Public basics As KNN_Basics
+    Public basics As KNN_BasicsQT
     Public Sub New()
         initParent()
 
-        basics = New KNN_Basics()
+        basics = New KNN_BasicsQT()
         If standalone Then basics.knnQT.useRandomData = True
         basics.desiredMatches = 4 ' more than 1 to insure there are secondary choices below for 1:1 matching below.
 
@@ -265,7 +322,7 @@ End Class
 Public Class KNN_Test
     Inherits VBparent
     Public grid As Thread_Grid
-    Dim knn As KNN_Basics
+    Dim knn As KNN_BasicsQT
     Public Sub New()
         initParent()
         grid = New Thread_Grid
@@ -276,7 +333,7 @@ Public Class KNN_Test
         gridWidthSlider.Value = 100
         gridHeightSlider.Value = 100
 
-        knn = New KNN_Basics()
+        knn = New KNN_BasicsQT()
         knn.testMode = True
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -559,11 +616,11 @@ End Class
 Public Class KNN_Contours
     Inherits VBparent
     Dim outline As Contours_Depth
-    Dim knn As KNN_Basics
+    Dim knn As KNN_BasicsQT
     Public Sub New()
         initParent()
         outline = New Contours_Depth()
-        knn = New KNN_Basics()
+        knn = New KNN_BasicsQT()
         task.desc = "Use KNN to streamline the outline of a contour"
     End Sub
     Public Sub Run()
@@ -709,13 +766,13 @@ End Class
 
 Public Class KNN_Point2d
     Inherits VBparent
-    Public knn As KNN_Basics
+    Public knn As KNN_BasicsQT
     Public findXnearest As Integer = 1
     Public responseSet() As Integer
     Public Sub New()
         initParent()
 
-        knn = New KNN_Basics()
+        knn = New KNN_BasicsQT()
         If standalone Then knn.knnQT.useRandomData = True
 
         task.desc = "Use KNN to find n matching points for each query."
@@ -966,5 +1023,57 @@ Public Class KNN_PointTracker
                 dst1 = drawRC.dst1
             End If
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class KNN_1_to_1FIFO
+    Inherits VBparent
+    Public neighbors As New cv.Mat
+    Public lastSet As New List(Of cv.Point2f)
+    Public currSet As New List(Of cv.Point2f)
+    Public knn As cv.ML.KNearest
+    Dim random As Random_Points
+    Public Sub New()
+        initParent()
+
+        random = New Random_Points
+        random.rangeRect = New cv.Rect(0, 0, dst1.Width, dst1.Height)
+        label1 = "White=TrainingData, Red=queries"
+        knn = cv.ML.KNearest.Create()
+        task.desc = "Using the last set of points, find the nearest point for each the current set - first come, first served."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        dst1.SetTo(cv.Scalar.Black)
+
+        If standalone Then
+            random.Run()
+            lastSet = New List(Of cv.Point2f)(random.Points2f)
+            random.Run()
+            currSet = New List(Of cv.Point2f)(random.Points2f)
+        End If
+
+        Dim queries = New cv.Mat(currSet.Count, 2, cv.MatType.CV_32F, currSet.ToArray)
+
+        For i = 0 To currSet.Count - 1
+            Dim trainData = New cv.Mat(lastSet.Count, 2, cv.MatType.CV_32F, lastSet.ToArray)
+            Dim responses = New List(Of Integer)(Enumerable.Range(start:=0, count:=lastSet.Count).Select(Function(x) x))
+            Dim response = New cv.Mat(trainData.Rows, 1, cv.MatType.CV_32S, responses.ToArray)
+            knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
+            knn.FindNearest(queries.Row(i), responses.Count, New cv.Mat, neighbors) ' rank each point with each point in the lastSet
+            Dim index = neighbors.Get(Of Single)(0, 0)
+            responses.RemoveAt(index)
+            lastSet.RemoveAt(index)
+            Dim pt = trainData.Get(Of cv.Point2f)(index, 0)
+            Dim qpoint = currSet(i)
+            cv.Cv2.Circle(dst1, qpoint, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
+            dst1.Line(pt, qpoint, cv.Scalar.Red, ocvb.lineSize, cv.LineTypes.AntiAlias)
+            cv.Cv2.Circle(dst1, pt, ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
+        Next
     End Sub
 End Class

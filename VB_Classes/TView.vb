@@ -114,14 +114,14 @@ End Class
 
 Public Class TView_Centroids
     Inherits VBparent
-    Public knn As KNN_Basics
+    Public knn As KNN_BasicsQT
     Dim tflood As TView_FloodFill
     Public queryPoints As New List(Of cv.Point2f)
     Public responses As New List(Of cv.Point2f)
     Public Sub New()
         initParent()
         tflood = New TView_FloodFill
-        knn = New KNN_Basics
+        knn = New KNN_BasicsQT
 
         label1 = "Top view with centroids in yellow"
         label2 = "Side view with centroids in yellow"

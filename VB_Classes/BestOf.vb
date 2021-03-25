@@ -182,20 +182,31 @@ End Class
 
 Public Class BestOf_Kalman
     Inherits VBparent
-    Dim knnKalman As BestOf_KNN
+    Dim kalman As Kalman_Basics
     Public Sub New()
         initParent()
-        knnKalman = New BestOf_KNN
-        task.desc = "Best example of using Kalman to calm the points in the point tracker"
+        kalman = New Kalman_Basics
+        Dim r = initRandomRect(src.Width, src.Height, 50)
+        kalman.kInput = New Single() {r.X, r.Y, r.Width, r.Height}
+        task.desc = "A simple example to show how to use Kalman"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        knnKalman.Run()
-        dst1 = knnKalman.dst1
-        dst2 = knnKalman.dst2
-        label1 = knnKalman.label1
-        label2 = knnKalman.label2
+        kalman.Run()
+
+        dst1 = src
+        Dim rect = New cv.Rect(CInt(kalman.kOutput(0)), CInt(kalman.kOutput(1)), CInt(kalman.kOutput(2)), CInt(kalman.kOutput(3)))
+        rect = validateRect(rect)
+        Static lastRect = rect
+        If rect = lastRect Then
+            Dim r = initRandomRect(src.Width, src.Height, 50)
+            kalman.kInput = New Single() {r.X, r.Y, r.Width, r.Height}
+        End If
+        lastRect = rect
+        dst1.Rectangle(rect, cv.Scalar.White, 6)
+        dst1.Rectangle(rect, cv.Scalar.Red, 1)
+        label1 = kalman.label1
     End Sub
 End Class
 

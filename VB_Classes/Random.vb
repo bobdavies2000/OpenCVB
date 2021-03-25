@@ -352,7 +352,7 @@ Public Class Random_CustomDistribution
             Next
         Next
 
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             plotHist.hist = outputHistogram
             plotHist.Run()
             dst1 = plotHist.dst1
@@ -398,7 +398,7 @@ Public Class Random_MonteCarlo
             End While
         Next
 
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             plotHist.hist = histogram
             plotHist.Run()
             dst1 = plotHist.dst1
@@ -447,7 +447,7 @@ Public Class Random_CustomHistogram
         random.inputCDF = saveHist ' it will convert the histogram into a cdf where the last value must be near one.
         random.Run()
 
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             hist.plotHist.fixedMaxVal = 100
             hist.plotHist.hist = random.outputHistogram
             hist.plotHist.Run()
@@ -594,24 +594,63 @@ End Class
 Public Class Random_KalmanPoints
     Inherits VBparent
     Dim random As Random_Points
-    Dim knn As KNN_Basics
+    Dim knn As KNN_1_to_1FIFO
     Dim kalman As Kalman_Basics
     Dim countSlider As Windows.Forms.TrackBar
+    Dim kalmanPoints As New List(Of cv.Point2f)
+    Dim refreshPoints As Boolean = True
+    Dim savePoints(0) As cv.Point
     Public Sub New()
         initParent()
-        random = New Random_Points
-        knn = New KNN_Basics
+        knn = New KNN_1_to_1FIFO
         kalman = New Kalman_Basics
+        random = New Random_Points
+
+        Dim offset = 100
+        random.rangeRect = New cv.Rect(offset, offset, dst1.Width - offset * 2, dst1.Height - offset * 2)
         countSlider = findSlider("Random Pixel Count")
-        countSlider.Value = 1
+        countSlider.Value = 5
         task.desc = "Smoothly transition a random point from location to location."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        random.Run()
+        If refreshPoints Then
+            random.Run()
+            knn.lastSet = New List(Of cv.Point2f)(random.Points2f)
+            random.Run() ' now find the new locations.
+            knn.currSet = New List(Of cv.Point2f)(random.Points2f)
+            refreshPoints = False
 
+            If knn.lastSet.Count * 2 <> kalman.kInput.Length Then
+                ReDim kalman.kInput(knn.lastSet.Count * 2 - 1)
+                ReDim savePoints(knn.currSet.Count - 1)
+            End If
+            For i = 0 To savePoints.Count - 1
+                Dim pt = knn.lastSet(i)
+                savePoints(i) = New cv.Point(CInt(pt.X), CInt(pt.Y))
+                kalman.kInput(i * 2) = pt.X
+                kalman.kInput(i * 2 + 1) = pt.Y
+            Next
+        End If
 
+        kalman.Run()
+        For i = 0 To kalman.kOutput.Count - 1 Step 2
+            knn.currSet(i / 2) = New cv.Point2f(kalman.kOutput(i), kalman.kOutput(i + 1))
+        Next
 
+        dst1.SetTo(0)
+        For i = 0 To knn.currSet.Count - 1
+            dst1.Circle(knn.currSet(i), ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(knn.lastSet(i), ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        Next
+
+        Dim noChanges As Boolean = True
+        For i = 0 To savePoints.Count - 1
+            Dim kPt = knn.currSet(i)
+            Dim pt = New cv.Point(CInt(kPt.X), CInt(kPt.Y))
+            If savePoints(i) <> pt Then noChanges = False
+        Next
+        If noChanges Then refreshPoints = True
     End Sub
 End Class

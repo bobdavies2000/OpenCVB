@@ -58,7 +58,7 @@ Public Class Kalman_Basics
         End If
 
         If standalone or task.intermediateReview = caller Then
-            dst1 = src.Clone()
+            dst1 = src
             Dim rect = New cv.Rect(CInt(kOutput(0)), CInt(kOutput(1)), CInt(kOutput(2)), CInt(kOutput(3)))
             rect = validateRect(rect)
             Static lastRect = rect
