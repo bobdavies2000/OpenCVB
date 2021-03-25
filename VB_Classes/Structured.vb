@@ -1084,12 +1084,15 @@ Public Class Structured_LineOrder
         lines = New LineDetector_Basics
         Dim lenSlider = findSlider("Line length threshold in pixels")
         lenSlider.Value = 1
+        label1 = "Move mouse in image to see corresponding lines"
         task.desc = "Consolidate RGB lines using the x- and y-intercepts"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static thickSlider = findSlider("Line thickness")
+        Static searchSlider = findSlider("Intercept search range in pixels")
         Dim thickness = thickSlider.value
+        Dim searchRange = searchSlider.value
 
         lines.src = src
         lines.Run()
@@ -1131,8 +1134,25 @@ Public Class Structured_LineOrder
             dst1.Line(New cv.Point(CInt(x), dst1.Height), New cv.Point(CInt(x), dst1.Height - 10), cv.Scalar.White, ocvb.lineSize)
         Next
 
+        Dim mx = task.mousePoint.X
+        For Each inter In xIntercepts
+            Dim x = inter.Key
+            If Math.Abs(mx - x) < searchRange Then
+                index = inter.Value
+                Dim m1 = ms(index)
+                dst1.Line(pt1(index), pt2(index), cv.Scalar.White, thickness + 4, cv.LineTypes.AntiAlias)
+                dst1.Line(pt1(index), pt2(index), cv.Scalar.Blue, thickness, cv.LineTypes.AntiAlias)
+            End If
+        Next
+        Dim my = task.mousePoint.Y
         For Each inter In yIntercepts
-
+            Dim y = inter.Key
+            If Math.Abs(my - y) < searchRange Then
+                index = inter.Value
+                Dim m1 = ms(index)
+                dst1.Line(pt1(index), pt2(index), cv.Scalar.White, thickness + 4, cv.LineTypes.AntiAlias)
+                dst1.Line(pt1(index), pt2(index), cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
+            End If
         Next
     End Sub
 End Class
