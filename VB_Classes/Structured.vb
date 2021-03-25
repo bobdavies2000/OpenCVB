@@ -921,7 +921,7 @@ End Class
 
 
 
-Public Class Structured_OrderedLines
+Public Class Structured_Crosshairs
     Inherits VBparent
     Dim sCloud As Structured_Cloud
     Public Sub New()
@@ -1006,79 +1006,133 @@ End Class
 Public Class Structured_Lines
     Inherits VBparent
     Dim lines As LineDetector_Basics
-    Dim fLess As Featureless_Basics
-
+    Public pt1 As New List(Of cv.Point2f)
+    Public pt2 As New List(Of cv.Point2f)
     Public Sub New()
         initParent()
-        fLess = New Featureless_Basics
         lines = New LineDetector_Basics
-        Dim thresholdSlider = findSlider("Line length threshold in pixels")
-        thresholdSlider.Value = 1
-        task.desc = "Use the detected lines in RGB to create depth lines"
+        label1 = "Lines defined in RGB"
+        label2 = "Lines in RGB confirmed in the point cloud"
+        task.desc = "Find the RGB lines and confirm they are present in the cloud data."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-
-        fLess.src = src
-        fLess.Run()
-        dst1 = fLess.dst2
-        label1 = fLess.label2
-
+        Static thickSlider = findSlider("Line thickness")
+        Dim thickness = thickSlider.value
         lines.src = src
         lines.Run()
+        dst1 = lines.dst1
 
-        dst1 = src
-        Dim mask As New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        Dim rList = New List(Of cv.Rect)
-        Dim lp1 As cv.Point2f, lp2 As cv.Point2f
+        If lines.sortlines.Count = 0 Then Exit Sub
+        Dim lineList = New List(Of cv.Rect)
+        Dim split = task.pointCloud.Split()
+        dst2.SetTo(0)
+        pt1.Clear()
+        pt2.Clear()
         For Each nl In lines.sortlines
             Dim p1 = New cv.Point2f(nl.Value.Item0, nl.Value.Item1)
             Dim p2 = New cv.Point2f(nl.Value.Item2, nl.Value.Item3)
-            ' mask.Line(p1, p2, cv.Scalar.White, 1, cv.LineTypes.Link4)
 
             Dim minXX = Math.Min(p1.X, p2.X)
             Dim minYY = Math.Min(p1.Y, p2.Y)
             Dim w = Math.Abs(p1.X - p2.X)
             Dim h = Math.Abs(p1.Y - p2.Y)
-            Dim r = New cv.Rect(minXX, minYY, If(w > 0, w, 4), If(h > 0, h, 4))
-            ' dst1.Rectangle(r, cv.Scalar.Yellow, 1)
-            rList.Add(r)
+            Dim r = New cv.Rect(minXX, minYY, If(w > 0, w, 2), If(h > 0, h, 2))
+            Dim mask = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, 0)
+            mask.Line(New cv.Point(CInt(p1.X - r.X), CInt(p1.Y - r.Y)), New cv.Point(CInt(p2.X - r.X), CInt(p2.Y - r.Y)), 255, thickness, cv.LineTypes.Link4)
+            Dim mean = task.pointCloud(r).Mean(mask)
 
-            If rList.Count = 1 Then
-                lp1 = p1
-                lp2 = p2
+            If mean <> New cv.Scalar Then
+                Dim min As Double, max As Double, Loc(4 - 1) As cv.Point
+                cv.Cv2.MinMaxLoc(split(0)(r), min, max, Loc(0), Loc(1), mask)
+
+                cv.Cv2.MinMaxLoc(split(1)(r), min, max, Loc(2), Loc(3), mask)
+                Dim len1 = Loc(0).DistanceTo(Loc(1))
+                Dim len2 = Loc(2).DistanceTo(Loc(3))
+                If len1 > len2 Then
+                    p1 = New cv.Point(Loc(0).X + r.X, Loc(0).Y + r.Y)
+                    p2 = New cv.Point(Loc(1).X + r.X, Loc(1).Y + r.Y)
+                Else
+                    p1 = New cv.Point(Loc(2).X + r.X, Loc(2).Y + r.Y)
+                    p2 = New cv.Point(Loc(3).X + r.X, Loc(3).Y + r.Y)
+                End If
+                If p1.DistanceTo(p2) > 1 Then
+                    dst2.Line(p1, p2, cv.Scalar.Yellow, thickness, cv.LineTypes.AntiAlias)
+                    pt1.Add(p1)
+                    pt2.Add(p2)
+                End If
             End If
         Next
+    End Sub
+End Class
 
-        dst1.Line(lp1, lp2, cv.Scalar.Red, 12, cv.LineTypes.AntiAlias)
-        mask.Line(lp1, lp2, 255, 3, cv.LineTypes.AntiAlias)
-        mask.SetTo(0, task.noDepthMask)
-        If rList.Count > 0 Then
-            Dim rect = rList.ElementAt(0)
-            ' dst1.Rectangle(rect, cv.Scalar.White, 1)
-            dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
-            task.pointCloud.CopyTo(dst2, mask)
 
-            Dim cloudMat = task.pointCloud(rect)
-            Dim maskMat = mask(rect)
-            Dim mean = cloudMat.Mean(maskMat)
-            Console.WriteLine("mean z = " + CStr(mean.Item(2)))
 
-            Dim split = dst2.Split()
 
-            Dim min As Double, max As Double, Loc(4 - 1) As cv.Point
-            cv.Cv2.MinMaxLoc(dst2.Split(0), min, max, Loc(0), Loc(1), mask)
 
-            cv.Cv2.MinMaxLoc(dst2.Split(1), min, max, Loc(2), Loc(3), mask)
-            Dim len1 = Math.Sqrt((Loc(0).X - Loc(1).X) * (Loc(0).X - Loc(1).X) + (Loc(0).Y - Loc(1).Y) * (Loc(0).Y - Loc(1).Y))
-            Dim len2 = Math.Sqrt((Loc(2).X - Loc(3).X) * (Loc(2).X - Loc(3).X) + (Loc(2).Y - Loc(3).Y) * (Loc(2).Y - Loc(3).Y))
-            If len1 > len2 Then
-                dst1.Line(Loc(0), Loc(1), cv.Scalar.Yellow, 4, cv.LineTypes.AntiAlias)
+
+
+
+Public Class Structured_LineOrder
+    Inherits VBparent
+    Dim lines As LineDetector_Basics
+    Public pt1 As New List(Of cv.Point2f)
+    Public pt2 As New List(Of cv.Point2f)
+    Public ms As New List(Of Single)
+    Public Sub New()
+        initParent()
+        lines = New LineDetector_Basics
+        Dim lenSlider = findSlider("Line length threshold in pixels")
+        lenSlider.Value = 1
+        task.desc = "Consolidate RGB lines using the x- and y-intercepts"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static thickSlider = findSlider("Line thickness")
+        Dim thickness = thickSlider.value
+
+        lines.src = src
+        lines.Run()
+        If lines.sortlines.Count = 0 Then Exit Sub
+
+        dst1 = src
+        Dim xIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+        Dim yIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+        pt1.Clear()
+        pt2.Clear()
+        Dim index = 0
+        For Each nl In lines.sortlines
+            Dim p1 = New cv.Point2f(nl.Value.Item0, nl.Value.Item1)
+            Dim p2 = New cv.Point2f(nl.Value.Item2, nl.Value.Item3)
+            pt1.Add(p1)
+            pt2.Add(p2)
+            dst1.Line(p1, p2, cv.Scalar.Yellow, thickness, cv.LineTypes.AntiAlias)
+            ' compute slope/intercept form
+            If p1.X = p2.X Then
+                yIntercepts.Add(p1.X, index)
+                ms.Add(Single.MaxValue)
             Else
-                dst1.Line(Loc(2), Loc(3), cv.Scalar.Yellow, 4, cv.LineTypes.AntiAlias)
+                Dim m = (p1.Y - p2.Y) / (p1.X - p2.X)
+                ms.Add(m)
+                Dim b = p1.Y - p1.X * m
+                Dim b2 = p2.Y - p2.X * m
+                Dim xint = (dst1.Height - b) / m  ' x = (y - b) / m
+                If b >= 0 And b <= dst1.Height Then yIntercepts.Add(b, index) Else xIntercepts.Add(xint, index)
             End If
+            index += 1
+        Next
 
-            label2 = "Mask " + CStr(mask.CountNonZero()) + " pCloud: " + CStr(split(2).CountNonZero)
-        End If
+        For Each inter In yIntercepts
+            Dim y = inter.Key
+            dst1.Line(New cv.Point(0, CInt(y)), New cv.Point(10, CInt(y)), cv.Scalar.White, ocvb.lineSize)
+        Next
+        For Each inter In xIntercepts
+            Dim x = inter.Key
+            dst1.Line(New cv.Point(CInt(x), dst1.Height), New cv.Point(CInt(x), dst1.Height - 10), cv.Scalar.White, ocvb.lineSize)
+        Next
+
+        For Each inter In yIntercepts
+
+        Next
     End Sub
 End Class

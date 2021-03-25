@@ -192,6 +192,7 @@ DISOpticalFlow
 DISOpticalFlow_create
 displayOverlay
 displayStatusBar
+DistanceTo
 distanceTransform
 distanceTransformWithLabels
 divide
