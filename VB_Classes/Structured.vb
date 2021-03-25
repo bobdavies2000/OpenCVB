@@ -1079,6 +1079,8 @@ Public Class Structured_LineOrder
     Public pt1 As New List(Of cv.Point2f)
     Public pt2 As New List(Of cv.Point2f)
     Public ms As New List(Of Single)
+    Public xIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+    Public yIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public Sub New()
         initParent()
         lines = New LineDetector_Basics
@@ -1099,20 +1101,29 @@ Public Class Structured_LineOrder
         If lines.sortlines.Count = 0 Then Exit Sub
 
         dst1 = src
-        Dim xIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
-        Dim yIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         pt1.Clear()
         pt2.Clear()
+        xIntercepts.Clear()
+        yIntercepts.Clear()
+        ms.Clear()
         Dim index = 0
         For Each nl In lines.sortlines
             Dim p1 = New cv.Point2f(nl.Value.Item0, nl.Value.Item1)
             Dim p2 = New cv.Point2f(nl.Value.Item2, nl.Value.Item3)
+
+            Dim minXX = Math.Min(p1.X, p2.X)
+            If p1.X <> minXX Then ' leftmost point is always in pt1
+                Dim tmp = p1
+                p1 = p2
+                p2 = tmp
+            End If
+
             pt1.Add(p1)
             pt2.Add(p2)
             dst1.Line(p1, p2, cv.Scalar.Yellow, thickness, cv.LineTypes.AntiAlias)
             ' compute slope/intercept form
             If p1.X = p2.X Then
-                yIntercepts.Add(p1.X, index)
+                xIntercepts.Add(p1.X, index)
                 ms.Add(Single.MaxValue)
             Else
                 Dim m = (p1.Y - p2.Y) / (p1.X - p2.X)
@@ -1134,25 +1145,86 @@ Public Class Structured_LineOrder
             dst1.Line(New cv.Point(CInt(x), dst1.Height), New cv.Point(CInt(x), dst1.Height - 10), cv.Scalar.White, ocvb.lineSize)
         Next
 
+        If standalone Then
+            Dim mx = task.mousePoint.X
+            For Each inter In xIntercepts
+                Dim x = inter.Key
+                If Math.Abs(mx - x) < searchRange Then
+                    index = inter.Value
+                    Dim m1 = ms(index)
+                    dst1.Line(pt1(index), pt2(index), cv.Scalar.White, thickness + 4, cv.LineTypes.AntiAlias)
+                    dst1.Line(pt1(index), pt2(index), cv.Scalar.Blue, thickness, cv.LineTypes.AntiAlias)
+                End If
+            Next
+            Dim my = task.mousePoint.Y
+            For Each inter In yIntercepts
+                Dim y = inter.Key
+                If Math.Abs(my - y) < searchRange Then
+                    index = inter.Value
+                    Dim m1 = ms(index)
+                    dst1.Line(pt1(index), pt2(index), cv.Scalar.White, thickness + 4, cv.LineTypes.AntiAlias)
+                    dst1.Line(pt1(index), pt2(index), cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
+                End If
+            Next
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Structured_LineClusters
+    Inherits VBparent
+    Dim lines As Structured_LineOrder
+    Public Sub New()
+        initParent()
+        lines = New Structured_LineOrder
+        task.desc = "Cluster lines that have similar intercept and slope"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static thickSlider = findSlider("Line thickness")
+        Static searchSlider = findSlider("Intercept search range in pixels")
+        Static lenSlider = findSlider("Line length threshold in pixels")
+        Dim thickness = thickSlider.value
+        Dim searchRange = searchSlider.value
+        Dim maxLen = lenSlider.value
+
+        lines.src = src.Clone
+        lines.Run()
+        dst1 = src
+
         Dim mx = task.mousePoint.X
-        For Each inter In xIntercepts
+        Dim index
+        Dim msX = New List(Of Single)
+        For Each inter In lines.xIntercepts
             Dim x = inter.Key
             If Math.Abs(mx - x) < searchRange Then
                 index = inter.Value
-                Dim m1 = ms(index)
-                dst1.Line(pt1(index), pt2(index), cv.Scalar.White, thickness + 4, cv.LineTypes.AntiAlias)
-                dst1.Line(pt1(index), pt2(index), cv.Scalar.Blue, thickness, cv.LineTypes.AntiAlias)
+                Dim p1 = lines.pt1(index)
+                Dim p2 = lines.pt2(index)
+                msX.Add(lines.ms(index))
+                dst1.Line(p1, p2, cv.Scalar.White, thickness + 4, cv.LineTypes.AntiAlias)
+                dst1.Line(p1, p2, cv.Scalar.Blue, thickness, cv.LineTypes.AntiAlias)
             End If
         Next
         Dim my = task.mousePoint.Y
-        For Each inter In yIntercepts
+        Dim msY = New List(Of Single)
+        For Each inter In lines.yIntercepts
             Dim y = inter.Key
             If Math.Abs(my - y) < searchRange Then
                 index = inter.Value
-                Dim m1 = ms(index)
-                dst1.Line(pt1(index), pt2(index), cv.Scalar.White, thickness + 4, cv.LineTypes.AntiAlias)
-                dst1.Line(pt1(index), pt2(index), cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
+                Dim p1 = lines.pt1(index)
+                Dim p2 = lines.pt2(index)
+                msY.Add(lines.ms(index))
+                dst1.Line(lines.pt1(index), lines.pt2(index), cv.Scalar.White, thickness + 4, cv.LineTypes.AntiAlias)
+                dst1.Line(lines.pt1(index), lines.pt2(index), cv.Scalar.Red, thickness, cv.LineTypes.AntiAlias)
             End If
         Next
+        label2 = CStr(msY.Count) + " X intercepts, " + CStr(msY.Count) + " Y intercepts"
     End Sub
 End Class
