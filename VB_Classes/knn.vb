@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class KNN_BasicsTest
+Public Class KNN_Basics
     Inherits VBparent
     Public neighbors As New cv.Mat
     Public testMode As Boolean
