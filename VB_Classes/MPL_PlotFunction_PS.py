@@ -1,7 +1,6 @@
 ﻿#https://matplotlib.org/2.0.2/examples/animation/animate_decay.html
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 from PyStream import PyStreamRun
 import cv2 as cv
 import io
