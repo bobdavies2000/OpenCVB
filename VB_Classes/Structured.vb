@@ -1008,6 +1008,9 @@ Public Class Structured_Lines
     Dim lines As LineDetector_Basics
     Public pt1 As New List(Of cv.Point2f)
     Public pt2 As New List(Of cv.Point2f)
+    Public z1 As New List(Of cv.Point3f) ' the point cloud values corresponding to pt1 and pt2
+    Public z2 As New List(Of cv.Point3f)
+    Public cloudInput As cv.Mat
     Public Sub New()
         initParent()
         lines = New LineDetector_Basics
@@ -1025,10 +1028,13 @@ Public Class Structured_Lines
 
         If lines.sortlines.Count = 0 Then Exit Sub
         Dim lineList = New List(Of cv.Rect)
-        Dim split = task.pointCloud.Split()
+        If cloudInput Is Nothing Then cloudInput = task.pointCloud
+        Dim split = cloudInput.Split()
         dst2.SetTo(0)
         pt1.Clear()
         pt2.Clear()
+        z1.Clear()
+        z2.Clear()
         For Each nl In lines.sortlines
             Dim p1 = New cv.Point2f(nl.Value.Item0, nl.Value.Item1)
             Dim p2 = New cv.Point2f(nl.Value.Item2, nl.Value.Item3)
@@ -1040,7 +1046,7 @@ Public Class Structured_Lines
             Dim r = New cv.Rect(minXX, minYY, If(w > 0, w, 2), If(h > 0, h, 2))
             Dim mask = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, 0)
             mask.Line(New cv.Point(CInt(p1.X - r.X), CInt(p1.Y - r.Y)), New cv.Point(CInt(p2.X - r.X), CInt(p2.Y - r.Y)), 255, thickness, cv.LineTypes.Link4)
-            Dim mean = task.pointCloud(r).Mean(mask)
+            Dim mean = cloudInput(r).Mean(mask)
 
             If mean <> New cv.Scalar Then
                 Dim min As Double, max As Double, Loc(4 - 1) As cv.Point
@@ -1060,6 +1066,8 @@ Public Class Structured_Lines
                     dst2.Line(p1, p2, cv.Scalar.Yellow, thickness, cv.LineTypes.AntiAlias)
                     pt1.Add(p1)
                     pt2.Add(p2)
+                    z1.Add(cloudInput.Get(Of cv.Point3f)(p1.Y, p1.X))
+                    z2.Add(cloudInput.Get(Of cv.Point3f)(p2.Y, p2.X))
                 End If
             End If
         Next
@@ -1226,5 +1234,86 @@ Public Class Structured_LineClusters
             End If
         Next
         label2 = CStr(msY.Count) + " X intercepts, " + CStr(msY.Count) + " Y intercepts"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Structured_LinesV
+    Inherits VBparent
+    Dim gCloud As Depth_PointCloud_IMU
+    Public lines As Structured_Lines
+    Public thickness As Integer
+    Public toleranceInMMs As Single
+    Public Sub New()
+        initParent()
+        gCloud = New Depth_PointCloud_IMU
+        lines = New Structured_Lines
+
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Error tolerance when measuring vertical lines in 3D (mm's)", 0, 300, 50)
+        End If
+
+        task.desc = "Find all the vertical lines in the IMU rectified cloud"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static thickSlider = findSlider("Line thickness")
+        Static errorSlider = findSlider("Error tolerance when measuring vertical lines in 3D (mm's)")
+        toleranceInMMs = errorSlider.value / 1000
+        thickness = thickSlider.value
+        dst1 = src.Clone
+
+        gCloud.Run()
+        lines.cloudInput = gCloud.dst1
+        lines.src = src
+        lines.Run()
+
+        For i = 0 To lines.z1.Count - 1
+            Dim p1 = lines.z1(i)
+            Dim p2 = lines.z2(i)
+            If Math.Abs(p1.X - p2.X) < toleranceInMMs And Math.Abs(p1.Z - p2.Z) < toleranceInMMs Then
+                dst1.Line(lines.pt1(i), lines.pt2(i), cv.Scalar.Yellow, thickness, cv.LineTypes.AntiAlias)
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Structured_LinesH
+    Inherits VBparent
+    Dim vLines As Structured_LinesV
+    Public Sub New()
+        initParent()
+        vLines = New Structured_LinesV
+        task.desc = "Find all the horizontal lines in the IMU rectified cloud"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        dst1 = src.Clone
+
+        vLines.src = src
+        vLines.Run()
+
+        For i = 0 To vLines.lines.z1.Count - 1
+            Dim p1 = vLines.lines.z1(i)
+            Dim p2 = vLines.lines.z2(i)
+            If Math.Abs(p1.Y - p2.Y) < vLines.toleranceInMMs And Math.Abs(p1.Z - p2.Z) < vLines.toleranceInMMs Then
+                dst1.Line(vLines.lines.pt1(i), vLines.lines.pt2(i), cv.Scalar.Yellow, vLines.thickness, cv.LineTypes.AntiAlias)
+            End If
+        Next
     End Sub
 End Class
