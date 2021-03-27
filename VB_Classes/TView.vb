@@ -19,7 +19,7 @@ Public Class TView_Basics
         task.desc = "Triple View that highlights concentrations of depth pixels"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static countSlider = findSlider("Show counts > X")
 
         sideView.Run()
@@ -70,7 +70,7 @@ Public Class TView_FloodFill
         task.desc = "FloodFill the histograms of side and top views - TView_Basics"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         tBasics.Run()
         dst1 = tBasics.dst1.Clone
@@ -128,7 +128,7 @@ Public Class TView_Centroids
         task.desc = "Use KNN to track the query points"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         tflood.Run()
         dst1 = tflood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -181,7 +181,7 @@ Public Class TView_Rectangles
         task.desc = "Use KNN to track the query points"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         tflood.Run()
         dst1 = tflood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -226,7 +226,7 @@ Public Class TView_Colorized
         task.desc = "Colorize the back and side views"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         tView.Run()
         mats.mat(0) = tView.dst1.Clone
@@ -264,7 +264,7 @@ Public Class TView_BackProjectTop
         task.desc = "Backproject the side and top views into the image view"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         tFlood.Run()
         dst2 = tFlood.dst1
@@ -304,7 +304,7 @@ Public Class TView_BackProjectTop
             palette.Run()
             dst1 = palette.dst1
         Else
-            ocvb.trueText("No objects found")
+            task.trueText("No objects found")
         End If
     End Sub
 End Class

@@ -8,7 +8,7 @@ Public Class BestOf_Binarize
         task.desc = "Best way to binarize an image"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         binarize.src = src
         binarize.Run()
         dst1 = binarize.dst1
@@ -32,7 +32,7 @@ Public Class BestOf_Edges
         task.desc = "Best way to get edges from an image"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         edges.src = src
         edges.Run()
         dst1 = edges.dst1
@@ -58,7 +58,7 @@ Public Class BestOf_Contours
         task.desc = "Best example of how to use contours"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         contours.src = src
         contours.Run()
         dst1 = contours.dst1
@@ -83,7 +83,7 @@ Public Class BestOf_Blobs
         task.desc = "Best example of using depth to identify blobs"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         blobs.src = src
         blobs.Run()
         dst1 = blobs.dst1
@@ -108,7 +108,7 @@ Public Class BestOf_CComp
         task.desc = "Best example of using the connected components feature"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         ccomp.src = src
         ccomp.Run()
         dst1 = ccomp.dst1
@@ -134,7 +134,7 @@ Public Class BestOf_FloodFill
         task.desc = "Best example of using the FloodFill feature"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         flood.src = src
         flood.Run()
         dst1 = flood.dst1
@@ -160,7 +160,7 @@ Public Class BestOf_KNN
         task.desc = "Best example of using KNN to track objects"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         myTopView.src = task.pointCloud
         myTopView.Run()
@@ -191,7 +191,7 @@ Public Class BestOf_Kalman
         task.desc = "A simple example to show how to use Kalman"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         kalman.Run()
 
@@ -225,7 +225,7 @@ Public Class BestOf_MotionDetection
         task.desc = "Best example of detecting motion and isolating in the image."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         motion.src = src
         motion.Run()
@@ -253,7 +253,7 @@ Public Class BestOf_MSER
         task.desc = "Best example of how to detect the main objects of interest in a scene"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         mser.src = src
         mser.Run()
@@ -279,7 +279,7 @@ Public Class BestOf_Stabilizer
         task.desc = "Best example of how to stabilize the rgb image."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         stable.src = src
         stable.Run()

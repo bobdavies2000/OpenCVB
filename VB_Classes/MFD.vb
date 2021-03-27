@@ -18,7 +18,7 @@ Public Class MFD_Basics
         task.desc = "Motion-Filtered basics - update only the changed regions"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         dMax.src = src
         dMax.Run()
@@ -61,7 +61,7 @@ Public Class MFD_Depth
         task.desc = "Stabilize the depth image but update any areas with motion"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         mfd.src = task.depth32f
         mfd.Run()
@@ -86,7 +86,7 @@ Public Class MFD_PointCloud
         task.desc = "Stabilize the PointCloud but update any areas with motion"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         mfd.src = task.pointCloud
         mfd.Run()
@@ -121,7 +121,7 @@ Public Class MFD_Sobel
         task.desc = "Stabilize the Sobel output with MFD"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         mfd.src = src
         mfd.Run()
@@ -153,7 +153,7 @@ Public Class MFD_BinarizedSobel
         task.desc = "Stabilize the binarized Sobel output with MFD"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         mfd.src = src
         mfd.Run()
@@ -202,7 +202,7 @@ Public Class MFD_FloodFill
         task.desc = "Floodfill the image of MFD edges (binarized Sobel output)"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static stepSlider = findSlider("FloodFill Step Size")
         Static fillSlider = findSlider("FloodFill point distance from edge")
         Dim fill = fillSlider.value

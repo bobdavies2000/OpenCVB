@@ -6,7 +6,7 @@ Public Class imShow_Basics
         task.desc = "This is just a reminder that all HighGUI methods are available in OpenCVB"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         cv.Cv2.ImShow("color", src)
     End Sub
 End Class
@@ -27,7 +27,7 @@ Public Class imShow_WaitKey
         task.desc = "You can use the HighGUI WaitKey call to pause an algorithm and review output one frame at a time."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         vDemo.Run()
         cv.Cv2.ImShow("Hit space bar to advance to the next frame", vDemo.dst1)
         cv.Cv2.WaitKey(1000) ' It will halt the test all run if 0 but 0 is the useful value for debugging interactively.

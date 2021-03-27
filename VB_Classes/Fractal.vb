@@ -35,7 +35,7 @@ Public Class Fractal_Mandelbrot
         Next
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim iterations = sliders.trackbar(0).Value
         If saveIterations <> iterations Then
             saveIterations = iterations
@@ -60,7 +60,7 @@ Public Class Fractal_Mandelbrot_MT
         task.desc = "Run a multi-threaded version of the Mandalbrot algorithm"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim iterations = mandel.sliders.trackbar(0).Value
         Parallel.For(0, src.Height,
         Sub(y)
@@ -89,7 +89,7 @@ Public Class Fractal_MandelbrotZoom
         task.desc = "Run the classic Mandalbrot algorithm and allow zooming in"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim iterations = mandel.sliders.trackbar(0).Value
 
         If check.Box(0).Checked Then
@@ -141,7 +141,7 @@ Public Class Fractal_MandelbrotZoomColor
         task.desc = "Classic Mandelbrot in color"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         mandel.Run()
         palette.src = mandel.dst1
         palette.Run()
@@ -181,7 +181,7 @@ Public Class Fractal_Julia
         Return julia_point(x, y, r, depth - 1, max, c, Complex.Pow(z, 2) + c)
     End Function
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static savedMouse = New cv.Point(-1, -1)
         If savedMouse <> task.mousePoint Or mandel.mandel.check.Box(0).Checked Then
             savedMouse = task.mousePoint

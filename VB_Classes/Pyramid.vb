@@ -11,7 +11,7 @@ Public Class Pyramid_Basics
         task.desc = "Use pyrup and pyrdown to zoom in and out of an image."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim zoom = sliders.trackbar(0).Value
         If zoom <> 0 Then
             If zoom < 0 Then
@@ -44,7 +44,7 @@ Public Class Pyramid_Filter
         task.desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         laplace.src = src
         laplace.Run()
         dst1 = laplace.dst1

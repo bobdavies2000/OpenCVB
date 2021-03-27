@@ -13,7 +13,7 @@ Public Class AddWeighted_Basics
         task.desc = "Add 2 images with specified weights."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then src2 = task.RGBDepth ' external use must provide src2!
         Dim alpha = weightSlider.Value / 100
         cv.Cv2.AddWeighted(src, alpha, src2, 1.0 - alpha, 0, dst1)
@@ -41,7 +41,7 @@ Public Class AddWeighted_Edges
         task.desc = "Add in the edges separating light and dark to the color image"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         edges.src = src
         edges.Run()
@@ -73,7 +73,7 @@ Public Class AddWeighted_ImageAccumulate
         task.desc = "Update a running average of the image"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         dst1 = New cv.Mat(task.depth32f.Size, cv.MatType.CV_32F)
         Static weightSlider = findSlider("Accumulation weight of each image X100")
@@ -107,7 +107,7 @@ Public Class AddWeighted_InfraRed
         task.desc = "Align the depth data with the left or right view.  Oak-D is aligned with the right image."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         infra.Run()
 

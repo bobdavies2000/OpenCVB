@@ -34,7 +34,7 @@ Public Class DFT_Basics
         label2 = "DFT_Basics Spectrum Magnitude"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         gray = src
         If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -91,7 +91,7 @@ Public Class DFT_Inverse
         label1 = "Image after Inverse DFT"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         src.ConvertTo(gray32f, cv.MatType.CV_32F)
@@ -150,7 +150,7 @@ Public Class DFT_ButterworthFilter_MT
         label2 = "Same filter with radius / 2"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         dft.src = src
         dft.Run()
 
@@ -216,7 +216,7 @@ Public Class DFT_ButterworthDepth
         label2 = "Same filter with radius / 2"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         bfilter.src = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         bfilter.Run()
         dst1 = bfilter.dst1
@@ -283,7 +283,7 @@ Public Class DFT_Shapes
         task.desc = "Show the spectrum magnitude for some standard shapes. Painterly"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static circleRadio = findRadio("Draw Circle")
         Static ellipseRadio = findRadio("Draw Ellipse")

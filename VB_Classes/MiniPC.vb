@@ -11,7 +11,7 @@ Public Class MiniPC_Basics
         task.desc = "Create a mini point cloud for use with histograms"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         gCloud.Run()
 
@@ -19,7 +19,7 @@ Public Class MiniPC_Basics
         resize.Run()
 
         Dim split = resize.dst1.Split()
-        split(2).SetTo(0, task.noDepthMask.resize(split(2).Size))
+        split(2).SetTo(0, task.noDepthMask.Resize(split(2).Size))
         rect = New cv.Rect(0, 0, resize.dst1.Width, resize.dst1.Height)
         If rect.Height < dst1.Height / 2 Then rect.Y = dst1.Height / 4 ' move it below the dst1 caption
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -52,7 +52,7 @@ Public Class MiniPC_Rotate
         task.desc = "Create a histogram for the mini point cloud"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim input = src
         If standalone Then
@@ -124,7 +124,7 @@ Public Class MiniPC_RotateAngle
         task.desc = "Find a peak value in the side view histograms"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If src.Type <> cv.MatType.CV_32FC3 Then
             peak.mini.Run()
@@ -182,7 +182,7 @@ Public Class MiniPC_RotateSinglePass
         task.desc = "Same operation as MiniPC_RotateAngle but in a single pass."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         peak.mini.Run()
         peak.src = peak.mini.dst2

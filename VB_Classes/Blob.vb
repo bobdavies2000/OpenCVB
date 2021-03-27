@@ -27,7 +27,7 @@ Public Class Blob_Basics
         task.desc = "Test C# Blob Detector."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim blobParams = New cv.SimpleBlobDetector.Params
         blobParams.FilterByArea = check.Box(0).Checked
         blobParams.FilterByCircularity = check.Box(1).Checked
@@ -96,7 +96,7 @@ Public Class Blob_Input
         task.desc = "Generate data to test Blob Detector."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         rectangles.src = src
         rectangles.Run()
         Mats.mat(0) = rectangles.dst1
@@ -135,7 +135,7 @@ Public Class Blob_RenderBlobs
         label2 = "Showing only the largest blob in test data"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod 100 = 0 Then
             blob.src = src
             blob.Run()
@@ -185,7 +185,7 @@ Public Class Blob_DepthClusters
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         histBlobs.src = task.noDepthMask
         histBlobs.Run()
         dst1 = histBlobs.dst1
@@ -221,7 +221,7 @@ Public Class Blob_Rectangles
         task.desc = "Get the blobs and their masks and outline them with a rectangle."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         blobs.Run()
         dst1 = src.Clone()
         dst2 = blobs.dst2
@@ -275,7 +275,7 @@ Public Class Blob_Largest
         task.desc = "Gather all the blob data and display the largest."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         blobs.src = src
         blobs.Run()
         dst2 = blobs.dst2
@@ -310,7 +310,7 @@ Public Class Blob_LargestDepthCluster
         task.desc = "Display only the largest depth cluster (might not be contiguous.)"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         blobs.src = src
         blobs.Run()
         dst2 = blobs.dst2

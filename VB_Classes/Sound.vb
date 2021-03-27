@@ -51,7 +51,7 @@ Public Class Sound_ToPCM
         task.desc = "Load an audio file, play it, and convert to PCM"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If inputFileName <> task.openFileDialogName Then
             inputFileName = task.openFileDialogName
             Dim fileinfo = New FileInfo(inputFileName)
@@ -89,7 +89,7 @@ Public Class Sound_ToPCM
             inputFileName = ""
             player?.Stop()
         End If
-        If standalone or task.intermediateReview = caller Then ocvb.trueText("Requested sound data is in the pcm32f cv.Mat")
+        If standalone Or task.intermediateReview = caller Then task.trueText("Requested sound data is in the pcm32f cv.Mat")
     End Sub
     Public Sub Close()
         player?.Stop()
@@ -146,7 +146,7 @@ Public Class Sound_SignalGenerator
         task.desc = "Generate sound with a sine waveform."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static radioIndex As Integer
         If task.openFileSliderPercent = 0 Or sliders.trackbar(0).Value <> wGen.Frequency Or sliders.trackbar(4).Value <> pcmDuration Or
             radio.check(radioIndex).Checked = False Then
@@ -180,7 +180,7 @@ Public Class Sound_SignalGenerator
             pcm32f = New cv.Mat(pcmData.Length, 1, cv.MatType.CV_32F, pcmData)
             player.Play()
         End If
-        If standalone or task.intermediateReview = caller Then ocvb.trueText("Requested sound data is in the pcm32f cv.Mat")
+        If standalone Or task.intermediateReview = caller Then task.trueText("Requested sound data is in the pcm32f cv.Mat")
 
         task.openFileSliderPercent = ((Now - startTime).TotalSeconds Mod pcmDuration) / pcmDuration
         If task.openFileSliderPercent >= 0.99 Then task.openFileSliderPercent = 0
@@ -223,7 +223,7 @@ Public Class Sound_Display
         task.desc = "Display a sound buffer in several styles"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static useGenerated As Boolean
         If useGenerated <> check.Box(0).Checked Or sound Is Nothing Then
             useGenerated = check.Box(0).Checked

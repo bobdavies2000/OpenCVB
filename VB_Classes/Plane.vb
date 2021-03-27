@@ -107,7 +107,7 @@ Public Class Plane_Detect
         label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run()
 
         dst2.SetTo(0)
@@ -180,7 +180,7 @@ Public Class Plane_DetectDebug
         label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run()
 
         dst2.SetTo(0)

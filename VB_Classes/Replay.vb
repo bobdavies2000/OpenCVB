@@ -88,11 +88,11 @@ Public Class Replay_Record
         task.desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static bytesTotal As Int64
         recordingFilename = New FileInfo(task.openFileDialogName)
         If task.parms.useRecordedData And recordingFilename.Exists = False Then
-            ocvb.trueText("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125)
+            task.trueText("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125)
             Exit Sub
         End If
 
@@ -177,10 +177,10 @@ Public Class Replay_Play
         task.desc = "Playback a file recorded by OpenCVB"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static bytesTotal As Int64
         recordingFilename = New FileInfo(task.openFileDialogName)
-        If recordingFilename.Exists = False Then ocvb.trueText("File not found: " + recordingFilename.FullName, 10, 125)
+        If recordingFilename.Exists = False Then task.trueText("File not found: " + recordingFilename.FullName, 10, 125)
         If task.fileStarted And recordingFilename.Exists Then
             Dim maxBytes = recordingFilename.Length
             If playbackActive Then
@@ -228,7 +228,7 @@ Public Class Replay_Play
                     ReDim cloudBytes(bytesPerCloud - 1)
                     playbackActive = True
                 Else
-                    ocvb.trueText("Recorded data was saved at " + CStr(fh.cloudWidth) + "x" + CStr(fh.cloudHeight) + vbCrLf +
+                    task.trueText("Recorded data was saved at " + CStr(fh.cloudWidth) + "x" + CStr(fh.cloudHeight) + vbCrLf +
                                       "and the current format is " + CStr(src.Width) + "x" + CStr(src.Height))
                 End If
             End If
@@ -261,7 +261,7 @@ Public Class Replay_OpenGL
         task.desc = "Replay a recorded session with OpenGL"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         replay.Run()
         ogl.pointCloudInput = task.pointCloud
         ogl.src = task.color

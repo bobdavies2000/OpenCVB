@@ -29,7 +29,7 @@ Public Class OptionsCommon_Depth
         task.desc = "Show depth with OpenCV using varying min and max depths."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         minVal = task.minRangeSlider.Value
         maxVal = task.maxRangeSlider.Value
@@ -137,7 +137,7 @@ Public Class OptionsCommon_Histogram
         task.desc = "The options for the side view are shared with this algorithm"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         task.sideFrustrumAdjust = task.maxZ * sideFrustrumSlider.Value / 100 / 2
         task.topFrustrumAdjust = task.maxZ * topFrustrumSlider.Value / 100 / 2
@@ -145,7 +145,7 @@ Public Class OptionsCommon_Histogram
         task.topCameraPoint = New cv.Point(CInt(src.Width / 2 + cameraXSlider.Value), CInt(src.Height))
 
         If sliders.Visible = False Then
-            ocvb.trueText("This algorithm was created to tune the frustrum and camera locations." + vbCrLf +
+            task.trueText("This algorithm was created to tune the frustrum and camera locations." + vbCrLf +
                           "Without these tuning parameters the side and top views would not be correct." + vbCrLf +
                           "To see how these adjustments work and to add a new camera, " + vbCrLf +
                           "use the Histogram_TopView2D or Histogram_SideView2D algorithms." + vbCrLf +

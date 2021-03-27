@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Imports System.IO
 Imports System.Windows.Forms
 Module Algorithm_Module
-    Public ocvb As VBocvb
     Public task As ActiveTask
     Public aOptions As OptionsContainer
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
@@ -189,6 +188,17 @@ Public Class ActiveTask : Implements IDisposable
     Public Const MAXZ_DEFAULT = 4
     Public maxZ As Single = MAXZ_DEFAULT
 
+    Public pixelsPerMeter As Single
+    Public hFov As Single
+    Public vFov As Single
+    Public angleX As Single  ' rotation angle in radians around x-axis to align with gravity
+    Public angleY As Single  ' this angle is only used manually - no IMU connection.
+    Public angleZ As Single  ' rotation angle in radians around z-axis to align with gravity
+
+    Public intermediateObject As VBparent
+
+    Public pythonTaskName As String
+
     Public ttTextData As New List(Of TTtext)
     Public callTrace As New List(Of String)
 
@@ -266,7 +276,6 @@ Public Class ActiveTask : Implements IDisposable
         pointCloud = New cv.Mat(camHeight, camWidth, cv.MatType.CV_32FC3, cv.Scalar.All(0))
         result = New cv.Mat(color.Height, color.Width * 2, cv.MatType.CV_8UC3, cv.Scalar.All(0))
 
-        ocvb = New VBocvb(Me)
         task = Me
         task.parms = parms
         task.defaultRect = _defaultRect
@@ -290,7 +299,7 @@ Public Class ActiveTask : Implements IDisposable
         End Select
 
         buildColors()
-        ocvb.pythonTaskName = task.parms.homeDir + "VB_Classes\" + algName
+        task.pythonTaskName = task.parms.homeDir + "VB_Classes\" + algName
 
         aOptions = New OptionsContainer
         If algName.EndsWith(".py") = False Then aOptions.Show()
@@ -316,8 +325,8 @@ Public Class ActiveTask : Implements IDisposable
         ' Microsoft Kinect4Azure, StereoLabs Zed 2, Mynt EyeD 1000, RealSense D435i, RealSense D455, Python RS2, Oak-D
         Dim hFOVangles() As Single = {90, 104, 105, 69.4, 86, 86, 72} ' all values from the specification.
         Dim vFOVangles() As Single = {59, 72, 58, 42.5, 57, 57, 81} ' all values from the specification.
-        ocvb.hFov = hFOVangles(parms.cameraName)
-        ocvb.vFov = vFOVangles(parms.cameraName)
+        task.hFov = hFOVangles(parms.cameraName)
+        task.vFov = vFOVangles(parms.cameraName)
 
         If aOptions IsNot Nothing Then aOptions.layoutOptions()
 
@@ -328,7 +337,7 @@ Public Class ActiveTask : Implements IDisposable
             If task.parms.useRecordedData Then
                 Dim recordingFilename = New FileInfo(task.openFileDialogName)
                 If task.parms.useRecordedData And recordingFilename.Exists = False Then
-                    ocvb.trueText("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125)
+                    task.trueText("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125)
                     Exit Sub
                 End If
                 recordedData.Run()
@@ -339,8 +348,8 @@ Public Class ActiveTask : Implements IDisposable
 
             algorithmObject.NextFrame()
 
-            label1 = ocvb.label1
-            label2 = ocvb.label2
+            label1 = task.label1
+            label2 = task.label2
             intermediateReview = task.intermediateReview
         Catch ex As Exception
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)
@@ -349,5 +358,13 @@ Public Class ActiveTask : Implements IDisposable
     Public Sub Dispose() Implements IDisposable.Dispose
         If recordedData IsNot Nothing Then recordedData.Dispose()
         If algorithmObject IsNot Nothing Then algorithmObject.Dispose()
+    End Sub
+    Public Sub trueText(text As String, Optional x As Integer = 10, Optional y As Integer = 40, Optional picTag As Integer = 2)
+        Dim str As New TTtext(text, x, y, picTag)
+        task.ttTextData.Add(str)
+    End Sub
+    Public Sub trueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
+        Dim str As New TTtext(text, pt.X, pt.Y, picTag)
+        task.ttTextData.Add(str)
     End Sub
 End Class

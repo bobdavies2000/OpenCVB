@@ -28,7 +28,7 @@ Public Class Etch_ASketch
         task.desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         keys.Run()
         Dim Input = New List(Of String)(keys.keyInput)
 

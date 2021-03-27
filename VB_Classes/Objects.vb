@@ -12,7 +12,7 @@ Public Class Object_Basics
         task.desc = "Identify objects in the foreground."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             dst1 = task.depthmask
             dst2 = task.noDepthMask

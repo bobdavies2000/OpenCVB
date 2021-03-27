@@ -11,7 +11,7 @@ Public Class Transform_Resize
         task.desc = "Resize an image based on the slider value."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim resizeFactor = sliders.trackbar(0).Value / 100
         Dim w = CInt(resizeFactor * src.Width)
         Dim h = CInt(resizeFactor * src.Height)
@@ -45,7 +45,7 @@ Public Class Transform_Rotate
         task.desc = "Rotate and scale and image based on the slider values."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         imageCenter = New cv.Point2f(sliders.trackbar(2).Value, sliders.trackbar(3).Value)
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.trackbar(0).Value, sliders.trackbar(1).Value / 100)
         cv.Cv2.WarpAffine(src, dst1, rotationMat, New cv.Size())
@@ -71,7 +71,7 @@ Public Class Transform_Sort
         task.desc = "Sort the pixels of a grayscale image."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim sortOption = cv.SortFlags.Ascending
         If radio.check(1).Checked Then sortOption = cv.SortFlags.Descending
@@ -100,7 +100,7 @@ Public Class Transform_SortReshape
         task.desc = "Sort the pixels of a grayscale image."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim sortOption = cv.SortFlags.Ascending
         If radio.check(1).Checked Then sortOption = cv.SortFlags.Descending
@@ -126,7 +126,7 @@ Public Class Transform_Affine3D
         task.desc = "Using 2 point clouds compute the 3D affine transform between them"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim output = "Use the check boxes to snapshot the different point clouds" + vbCrLf
         Static pc1 As cv.Mat
         Static pc2 As cv.Mat
@@ -173,7 +173,7 @@ Public Class Transform_Affine3D
             Next
             output += "0" + vbTab + "0" + vbTab + "0" + vbTab + "1" + vbCrLf
         End If
-        ocvb.trueText(output)
+        task.trueText(output)
     End Sub
 End Class
 

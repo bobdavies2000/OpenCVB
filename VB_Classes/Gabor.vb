@@ -26,7 +26,7 @@ Public Class Gabor_Basics
         task.desc = "Explore Gabor kernel - Painterly Effect"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             ksize = sliders.trackbar(0).Value * 2 + 1
             Sigma = sliders.trackbar(1).Value
@@ -69,7 +69,7 @@ Public Class Gabor_Basics_MT
         task.desc = "Apply multiple Gabor filters sweeping through different values of theta - Painterly Effect."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static ksizeSlider = findSlider("Gabor Kernel Size")
         Static sigmaSlider = findSlider("Gabor Sigma")

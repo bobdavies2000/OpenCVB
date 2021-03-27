@@ -12,7 +12,7 @@ Public Class Keyboard_Basics
         task.desc = "Test the keyboard interface available to all algorithms"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         keyInput = New List(Of String)(checkKeys.inputText)
         checkKeys.inputText.Clear()
         If standalone or task.intermediateReview = caller Then

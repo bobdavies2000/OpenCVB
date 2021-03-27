@@ -23,7 +23,7 @@ Public Class PhaseCorrelate_Basics
         task.desc = "Look for a shift between the current frame and the previous"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -93,7 +93,7 @@ Public Class PhaseCorrelate_BasicsTest
         task.desc = "Test the PhaseCorrelate_Basics with random movement"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         random.src = src
         random.Run()
@@ -124,7 +124,7 @@ Public Class PhaseCorrelate_Depth
         task.desc = "Use phase correlation on the depth data"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static lastFrame = task.depth32f.Clone
         phaseC.src = task.depth32f
@@ -160,7 +160,7 @@ Public Class PhaseCorrelate_HanningWindow
         task.desc = "Show what a Hanning window looks like"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         cv.Cv2.CreateHanningWindow(dst1, src.Size, cv.MatType.CV_32F)
     End Sub
 End Class

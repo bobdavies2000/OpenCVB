@@ -42,7 +42,7 @@ Public Class Thread_Grid
         task.desc = "Create a grid for use with parallel.ForEach."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static lastWidth As Integer
         Static lastHeight As Integer
         Static lastBorder As Integer
@@ -130,7 +130,7 @@ Public Class Thread_GridTest
         task.desc = "Validation test for thread_grid algorithm"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run()
         Dim mean = cv.Cv2.Mean(src)
 

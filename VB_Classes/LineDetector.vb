@@ -19,7 +19,7 @@ Public Class LineDetector_Basics
         task.desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.Clone
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim lines = ld.Detect(src)
@@ -244,7 +244,7 @@ Public Class lineDetector_FLD_CPP
         task.desc = "Basics for a Fast Line Detector"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         sortedLines.Clear()
 
         Dim length_threshold = sliders.trackbar(0).Value
@@ -291,7 +291,7 @@ Public Class LineDetector_3D_LongestLine
         label2 = ""
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
         lines.src = src
         lines.Run()
@@ -325,7 +325,7 @@ Public Class LineDetector_3D_FLD_MT
         label2 = ""
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
         lines.src = src
         lines.Run()
@@ -369,7 +369,7 @@ End Class
 '        label2 = ""
 '    End Sub
 '    Public Sub Run()
-'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        If task.intermediateReview = caller Then task.intermediateObject = Me
 '        If task.frameCount Mod sliders.trackbar(2).Value Then Exit Sub
 '        Dim useX As Boolean = check.Box(0).Checked
 '        linesFLD.src = src
@@ -477,7 +477,7 @@ Public Class lineDetector_FLD
         task.desc = "A Fast Line Detector"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         lines.Clear()
 
         Dim length_threshold = sliders.trackbar(0).Value
@@ -509,7 +509,7 @@ Public Class lineDetector_FLD
                 Next
             End If
         End If
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             For j = 0 To lines.Count - 1 Step 4
                 Dim v = lines(j)
                 Dim pt1 = New cv.Point(v(0), v(1))
@@ -540,7 +540,7 @@ Public Class LineDetector_Reduction
         task.desc = "Use the reduced rgb image as input to the line detector"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         reduction.src = src
         reduction.Run()
         dst2 = reduction.dst1

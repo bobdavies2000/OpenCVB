@@ -72,7 +72,7 @@ Public Class Annealing_Basics_CPP
         task.desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If closed = True Then Exit Sub
         If standalone Or task.intermediateReview = caller Then
             If task.frameCount = 0 Then
@@ -173,7 +173,7 @@ Public Class Annealing_CPP_MT
         task.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If anneal(0) Is Nothing Then setup() ' setup here rather than in algorithm so all threads work on the same problem.
         Static CityCountSlider = findSlider("Anneal Number of Cities")
         If anneal(0).numberOfCities <> CityCountSlider.Value Or check.Box(0).Checked Or check.Box(2).Checked <> anneal(0).circularPattern Then setup()
@@ -271,7 +271,7 @@ Public Class Annealing_Options
         task.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static randomSlider = findSlider("Random Pixel Count")
         Dim numberOfCities = randomSlider.Value
         Dim circularPattern = check.Box(1).Checked ' do they want a circular pattern?

@@ -60,7 +60,7 @@ Public Class WarpAffine_Captcha
                                cv.BorderTypes.Constant, cv.Scalar.White)
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim characters() As String = {"a", "A", "b", "B", "c", "C", "D", "d", "e", "E", "f", "F", "g", "G", "h", "H", "j", "J", "k", "K", "m", "M", "n", "N", "q", "Q", "R", "t", "T", "w", "W", "x", "X", "y", "Y", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
         Dim charactersSize = characters.Length / characters(0).Length
 
@@ -106,7 +106,7 @@ Public Class WarpAffine_Basics
         task.desc = "Use WarpAffine to transform input images."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static frm = findfrm("WarpAffine_Basics Radio Options")
 
         rotateOptions.Run()
@@ -145,7 +145,7 @@ Public Class WarpAffine_3Points
         label2 = "Image with affine transform applied"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static M As New cv.Mat
         If task.frameCount Mod 60 = 0 Then
             Dim triangles(1) As cv.Mat
@@ -192,7 +192,7 @@ Public Class WarpAffine_3Points
                 dst2.Circle(pt, 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
             Next
         End If
-        ocvb.trueText("M defined as: " + vbCrLf +
+        task.trueText("M defined as: " + vbCrLf +
                       Format(M.Get(Of Double)(0, 0), "#0.00") + vbTab +
                       Format(M.Get(Of Double)(0, 1), "#0.00") + vbTab +
                       Format(M.Get(Of Double)(0, 2), "#0.00") + vbCrLf +
@@ -218,7 +218,7 @@ Public Class WarpAffine_4Points
         label1 = "Color image with perspective transform applied"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static M As New cv.Mat
         If task.frameCount Mod 60 = 0 Then
 
@@ -251,7 +251,7 @@ Public Class WarpAffine_4Points
             Next
         End If
 
-        ocvb.trueText("M defined as: " + vbCrLf +
+        task.trueText("M defined as: " + vbCrLf +
                       Format(M.Get(Of Double)(0, 0), "#0.00") + vbTab +
                       Format(M.Get(Of Double)(0, 1), "#0.00") + vbTab +
                       Format(M.Get(Of Double)(0, 2), "#0.00") + vbCrLf +

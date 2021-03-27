@@ -58,7 +58,7 @@ Public Class FishEye_Rectified
         label2 = "Right View"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         label1 = "Left View (no fisheye lens present)"
         label2 = "Right View (no fisheye lens present)"
         leftView = task.leftView
@@ -79,7 +79,7 @@ Public Class FishEye_Raw
         task.desc = "Display the Raw FishEye images for the T265 (only)"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         label1 = "Left Fisheye Image"
         label2 = "Right Fisheye Image"
         dst1 = task.leftView

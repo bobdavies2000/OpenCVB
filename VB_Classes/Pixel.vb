@@ -12,7 +12,7 @@ Public Class Pixel_Viewer
         task.desc = "Display pixels under the cursor"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.pixelViewerOn Then
             If pixels Is Nothing Then pixels = New PixelViewerForm
@@ -27,7 +27,7 @@ Public Class Pixel_Viewer
             If dst1.Type = cv.MatType.CV_32F Then displayType = 2
             If dst1.Type = cv.MatType.CV_32FC3 Then displayType = 3
             If displayType < 0 Or dst1.Channels > 4 Then
-                ocvb.trueText("The pixel Viewer does not support this cv.Mat!  Please add support.")
+                task.trueText("The pixel Viewer does not support this cv.Mat!  Please add support.")
                 Exit Sub
             End If
             If pixels.GrayScaleOnly.Checked And dst1.Channels <> 1 And displayType < 2 Then
@@ -155,7 +155,7 @@ Public Class Pixel_Viewer
             End If
         End If
         If task.desc = "Display pixels under the cursor" Then
-            ocvb.trueText("Move the mouse to location that you want to inspect." + vbCrLf +
+            task.trueText("Move the mouse to location that you want to inspect." + vbCrLf +
                           "Click and hold the right-mouse button to move away from that location")
         End If
     End Sub
@@ -184,7 +184,7 @@ Public Class Pixel_GetSet
         task.desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim rows = src.Height
         Dim cols = src.Width
         Dim output As String = ""
@@ -224,7 +224,7 @@ Public Class Pixel_GetSet
         watch.Stop()
         output += "Marshal Copy took " + CStr(watch.ElapsedMilliseconds) + "ms" + vbCrLf
 
-        ocvb.trueText(output, src.Width / 2 + 10, src.Height / 2 + 20)
+        task.trueText(output, src.Width / 2 + 10, src.Height / 2 + 20)
 
         mats.Run()
         dst1 = mats.dst1
@@ -253,15 +253,15 @@ Public Class Pixel_Measure
         task.desc = "Compute how many pixels per meter at a requested distance"
     End Sub
     Public Function Compute(mmDist As Single) As Single
-        Dim halfLineInMeters = Math.Tan(0.0174533 * ocvb.hFov / 2) * mmDist
+        Dim halfLineInMeters = Math.Tan(0.0174533 * task.hFov / 2) * mmDist
         Return halfLineInMeters * 2 / src.Width
     End Function
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static distanceSlider = findSlider("Distance in mm")
         Dim mmPP = Compute(distanceSlider.value)
         If standalone Then
-            ocvb.trueText("At a distance of " + CStr(distanceSlider.value) + " mm's the camera's FOV is " +
+            task.trueText("At a distance of " + CStr(distanceSlider.value) + " mm's the camera's FOV is " +
                            Format(mmPP * src.Width / 1000, "#0.00") + " meters wide" + vbCrLf +
                           "Pixels are " + Format(mmPP, "#0.00") + " mm per pixel at " +
                            CStr(distanceSlider.value) + " mm's in the image view", 10, 60)

@@ -15,7 +15,7 @@ Public Class TransformationMatrix_Basics
         task.desc = "Show the contents of the transformation matrix"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.transformationMatrix IsNot Nothing Then
             Dim t = task.transformationMatrix
             Dim mul = sliders.trackbar(0).Value
@@ -36,7 +36,7 @@ Public Class TransformationMatrix_Basics
 
             If topLocations.Count > 20 Then topLocations.RemoveAt(0) ' just show the last x points
         Else
-            ocvb.trueText("The transformation matrix for the current camera has not been set", 10, 125)
+            task.trueText("The transformation matrix for the current camera has not been set", 10, 125)
         End If
     End Sub
 End Class

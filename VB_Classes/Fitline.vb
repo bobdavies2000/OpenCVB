@@ -17,8 +17,8 @@ Public Class Fitline_Basics
         task.desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone or task.intermediateReview = caller Then
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        If standalone Or task.intermediateReview = caller Then
             draw.Run()
             dst2 = draw.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
             dst1 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -40,7 +40,7 @@ Public Class Fitline_Basics
             Dim rightY = Math.Round((src.Cols - line2d.X1) * slope + line2d.Y1)
             Dim p1 = New cv.Point(0, leftY)
             Dim p2 = New cv.Point(src.Cols - 1, rightY)
-            If standalone or task.intermediateReview = caller Then
+            If standalone Or task.intermediateReview = caller Then
                 lines.Add(p1)
                 lines.Add(p2)
             End If
@@ -61,7 +61,7 @@ Public Class Fitline_3DBasics_MT
         label2 = "White is featureless RGB, blue depth shadow"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         hlines.src = src
         hlines.Run()
         dst2 = hlines.dst2
@@ -133,7 +133,7 @@ Public Class Fitline_RawInput
         task.desc = "Generate a noisy line in a field of random data."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If check.Box(1).Checked Or task.frameCount = 0 Then
             If task.parms.testAllRunning = False Then check.Box(1).Checked = False
             dst1.SetTo(0)
@@ -204,7 +204,7 @@ Public Class Fitline_EigenFit
         task.desc = "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static eigenVec As New cv.Mat(2, 2, cv.MatType.CV_32F, 0), eigenVal As New cv.Mat(2, 2, cv.MatType.CV_32F, 0)
         Static theta As Single
         Static len As Single
@@ -283,7 +283,7 @@ Public Class Fitline_EigenFit
             p2 = New cv.Point(width, noisyLine.m * width + noisyLine.bb)
             dst1.Line(p1, p2, cv.Scalar.Blue, 3, cv.LineTypes.AntiAlias)
         End If
-        ocvb.trueText("GT m = " + Format(noisyLine.m, "#0.00") + " eigen m = " + Format(m2, "#0.00") + "    len = " + CStr(CInt(len)) + vbCrLf +
+        task.trueText("GT m = " + Format(noisyLine.m, "#0.00") + " eigen m = " + Format(m2, "#0.00") + "    len = " + CStr(CInt(len)) + vbCrLf +
                                               "Confidence = " + Format(eigenVal.Get(Of Single)(0, 0) / eigenVal.Get(Of Single)(1, 0), "#0.0") + vbCrLf +
                                               "theta: atan2(" + Format(eigenVec.Get(Of Single)(1, 0), "#0.0") + ", " + Format(eigenVec.Get(Of Single)(0, 0), "#0.0") + ") = " +
                                               Format(theta, "#0.0000"))

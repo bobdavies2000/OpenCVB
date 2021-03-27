@@ -27,7 +27,7 @@ Public Class FloodFill_Basics
         task.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
         Static loDiffSlider = findSlider("FloodFill LoDiff")
         Static hiDiffSlider = findSlider("FloodFill HiDiff")
@@ -113,7 +113,7 @@ Public Class FloodFill_Image
         task.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         basics.src = src.Clone
         basics.Run()
         dst1 = src
@@ -159,7 +159,7 @@ Public Class FloodFill_8Bit
         task.desc = "Create a floodfill image that is only 8-bit for use with a palette"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         basics.src = src
         basics.Run()
 
@@ -203,7 +203,7 @@ Public Class FloodFill_Top16_MT
         task.desc = "Use floodfill to build image segments with a grayscale image."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim minFloodSize = sliders.trackbar(0).Value
         Dim loDiff = cv.Scalar.All(sliders.trackbar(1).Value)
         Dim hiDiff = cv.Scalar.All(sliders.trackbar(2).Value)
@@ -243,7 +243,7 @@ Public Class FloodFill_Color_MT
         task.desc = "Use floodfill to build image segments in an RGB image."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim minFloodSize = flood.sliders.trackbar(0).Value
         Dim loDiff = cv.Scalar.All(flood.sliders.trackbar(1).Value)
         Dim hiDiff = cv.Scalar.All(flood.sliders.trackbar(2).Value)
@@ -287,7 +287,7 @@ Public Class FloodFill_DCT
         task.desc = "Find surfaces that lack any texture with DCT (highest frequency removed) and use floodfill to isolate those surfaces."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         dct.src = src
         dct.Run()
 
@@ -316,7 +316,7 @@ Public Class FloodFill_CComp
         task.desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         ccomp.src = src
         ccomp.Run()
@@ -354,7 +354,7 @@ Public Class FloodFill_RelativeRange
         task.desc = "Experiment with 'relative' range option to floodfill.  Compare to fixed range option."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         fBasics.floodFlag = 0
         If check.Box(0).Checked Then fBasics.floodFlag += cv.FloodFillFlags.FixedRange
         If check.Box(1).Checked Then fBasics.floodFlag += cv.FloodFillFlags.Link4 Else fBasics.floodFlag += cv.FloodFillFlags.Link8
@@ -390,7 +390,7 @@ Public Class Floodfill_Objects
         task.desc = "Use floodfill to identify the desired number of objects"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         basics.src = src
         basics.Run()
         dst1 = basics.dst2
@@ -435,7 +435,7 @@ Public Class FloodFill_WithDepth
         task.desc = "Floodfill only the areas where there is depth"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         range.src = src
         range.Run()
         dst2 = task.noDepthMask
@@ -464,7 +464,7 @@ Public Class Floodfill_Identifiers
         task.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
         Static loDiffSlider = findSlider("FloodFill LoDiff")
         Static hiDiffSlider = findSlider("FloodFill HiDiff")
@@ -528,7 +528,7 @@ Public Class Floodfill_ColorObjects
         task.desc = "Use floodfill to identify each of the region candidates using only color."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         pFlood.src = src
         pFlood.Run()
         dst1 = pFlood.dst2.Clone
@@ -563,7 +563,7 @@ Public Class FloodFill_PointTracker
         task.desc = "Test the FloodFill output as input into the point tracker"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         flood.src = src
         flood.Run()
         dst2 = flood.dst1
@@ -605,7 +605,7 @@ Public Class FloodFill_Top16
         task.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         flood.src = src
@@ -659,7 +659,7 @@ Public Class FloodFill_Click
         task.desc = "FloodFill where the mouse clicks"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.mouseClickFlag Then
             flood.pt = task.mouseClickPoint
@@ -705,7 +705,7 @@ Public Class FloodFill_Point
         task.desc = "Use floodfill at a single location in a grayscale image."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         dst1 = src.Clone()
         If standalone Then
@@ -780,7 +780,7 @@ Public Class FloodFill_FullImage
         task.desc = "Floodfill each of the segments outlined by the Edges_BinarizedSobel algorithm"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static stepSlider = findSlider("FloodFill Step Size")
         Static fillSlider = findSlider("FloodFill point distance from edge")
         Dim fill = fillSlider.value
@@ -937,7 +937,7 @@ Public Class FloodFill_Step
         task.desc = "Step through the current image to floodfill using colors from the previous image"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Then
             contours.src = src

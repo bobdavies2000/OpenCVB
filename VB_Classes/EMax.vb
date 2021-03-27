@@ -41,9 +41,9 @@ Public Class EMax_Basics
         task.desc = "OpenCV expectation maximization example."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone or task.intermediateReview = caller Then
-            ocvb.trueText("The EMax VBocvb class fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        If standalone Or task.intermediateReview = caller Then
+            task.trueText("The EMax VBocvb class fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
                           "The C++ version works fine (EMax_CPP) and the 2 are functionally identical.", 20, 100)
             Exit Sub ' comment this line to see the bug in the VB.Net version of this Predict2 below.
         End If
@@ -67,7 +67,7 @@ Public Class EMax_Basics
         samples = samples.Reshape(1, 0)
 
         dst1.SetTo(cv.Scalar.Black)
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             Dim em_model = cv.EM.Create()
             em_model.ClustersNumber = regionCount
             Static frm = findfrm("EMax_Basics Radio Options")
@@ -138,7 +138,7 @@ Public Class EMax_CPP
         task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         basics.Run()
         dst1 = basics.dst1
         Dim srcCount = basics.sliders.trackbar(0).Value
@@ -207,7 +207,7 @@ Public Class EMax_Centroids
         task.desc = "Get the Emax cluster centroids using floodfill "
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         emaxCPP.Run()
 
@@ -218,7 +218,7 @@ Public Class EMax_Centroids
         Static lastCentroids As New List(Of cv.Point2f)
         For i = 0 To flood.centroids.Count - 1
             dst1.Circle(flood.centroids(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-            If i < lastCentroids.count Then
+            If i < lastCentroids.Count Then
                 dst1.Circle(lastCentroids(i), 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
             End If
         Next
@@ -249,7 +249,7 @@ Public Class EMax_PointTracker
         task.desc = "Use KNN and Kalman to track the EMax Centroids and map consisten colors"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         emax.Run()
         dst1 = emax.dst1
 

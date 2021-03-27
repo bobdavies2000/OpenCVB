@@ -14,7 +14,7 @@ Public Class Threshold_LaplacianFilter
         task.desc = "Threshold the output of a Laplacian derivative, mask with depth foreground.  needs more work"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         edges.src = src
         edges.Run()
         dst2 = edges.dst2

@@ -13,7 +13,7 @@ Public Class MotionBlur_Basics
         task.desc = "Use Filter2D to create a motion blur"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             If sliders.trackbar(1).Value < sliders.trackbar(1).Maximum Then
                 sliders.trackbar(1).Value += 1
@@ -140,7 +140,7 @@ Public Class MotionBlur_Deblur
         label2 = "Deblurred Image Output"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         mblur.src = src
         If check.Box(0).Checked Then
             check.Box(0).Checked = False

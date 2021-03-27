@@ -42,8 +42,8 @@ Public Class Benford_Basics
         use99 = True
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone or task.intermediateReview = caller Then
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        If standalone Or task.intermediateReview = caller Then
             benford.src = src
             benford.Run()
             dst1 = benford.dst1
@@ -114,7 +114,7 @@ Public Class Benford_NormalizedImage
         task.desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
@@ -144,7 +144,7 @@ Public Class Benford_NormalizedImage99
         task.desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
@@ -178,7 +178,7 @@ Public Class Benford_JPEG
         task.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim jpeg = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, sliders.trackbar(0).Value})
         benford.src = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
         dst1 = cv.Cv2.ImDecode(jpeg, cv.ImreadModes.Color)
@@ -210,7 +210,7 @@ Public Class Benford_JPEG99
         task.desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static qualitySlider = findSlider("JPEG Quality")
         Dim jpeg = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, qualitySlider.Value})
         benford.src = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
@@ -243,7 +243,7 @@ Public Class Benford_PNG
         task.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static compressionSlider = findSlider("PNG Compression")
         Dim png = src.ImEncode(".png", New Integer() {cv.ImwriteFlags.PngCompression, compressionSlider.Value})
         benford.src = New cv.Mat(png.Count, 1, cv.MatType.CV_8U, png)
@@ -268,7 +268,7 @@ Public Class Benford_Depth
         task.desc = "Apply Benford to the depth data"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         benford.src = task.depth32f
         benford.Run()
         dst1 = benford.dst1
@@ -290,7 +290,7 @@ Public Class Benford_DepthRGB
         task.desc = "Apply Benford to the depth RGB image that is compressed with JPEG"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         benford.src = task.RGBDepth
         benford.Run()
         dst1 = benford.dst2
@@ -318,9 +318,9 @@ Public Class Benford_Primes
         task.desc = "Apply Benford to a list of primes"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount = 0 Then sieve.Run() ' only need to compute this once...
-        ocvb.trueText(CStr(sieve.primes.Count) + " primes were found")
+        task.trueText(CStr(sieve.primes.Count) + " primes were found")
 
         Dim tmp = New cv.Mat(sieve.primes.Count, 1, cv.MatType.CV_32S, sieve.primes.ToArray())
         tmp.ConvertTo(benford.src, cv.MatType.CV_32F)

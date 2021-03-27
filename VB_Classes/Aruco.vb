@@ -9,7 +9,7 @@ Public Class Aruco_Basics
         task.desc = "Show how to use the Aruco markers and rotate the image accordingly."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim tmp = cv.Cv2.ImRead(task.parms.homeDir + "Data/aruco_markers_photo.jpg")
         Static detectorParameters = cv.Aruco.DetectorParameters.Create()
         detectorParameters.CornerRefinementMethod = cv.Aruco.CornerRefineMethod.Subpix
@@ -20,7 +20,7 @@ Public Class Aruco_Basics
         Dim rejectedPoints()() As cv.Point2f = Nothing
         ' this fails!  Cannot cast a Mat to an InputArray!  Bug?
         ' cv.Aruco.CvAruco.DetectMarkers(tmp, dictionary, corners, ids, detectorParameters, rejectedPoints)
-        ocvb.trueText("This algorithm is currently failing in VB.Net (works in C#)." + vbCrLf +
+        task.trueText("This algorithm is currently failing in VB.Net (works in C#)." + vbCrLf +
                                                   "The DetectMarkers API works in C# but fails in VB.Net." + vbCrLf +
                                                   "To see the correct output, use Aruco_CS.", 10, 140)
     End Sub
@@ -39,7 +39,7 @@ Public Class Aruco_Test
         task.desc = "Testing the Aruco marker detection in C#"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim tmp = cv.Cv2.ImRead(task.parms.homeDir + "Data/aruco_markers_photo.jpg")
         aruco.Run(tmp)
         dst1 = aruco.detectedMarkers.Resize(src.Size())

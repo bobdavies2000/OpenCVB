@@ -61,7 +61,7 @@ Public Class CellAuto_Basics
         Return dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Function
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             src = New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_8UC1, 0)
             src.Set(Of Byte)(0, src.Width / 2, 1)
@@ -124,7 +124,7 @@ Public Class CellAuto_Life
         task.desc = "Use OpenCV to implement the Game of Life"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static savePointCount As Integer
         Static randomSlider = findSlider("Random Pixel Count")
         If randomSlider.Value <> savePointCount Or generation = 0 Then
@@ -198,7 +198,7 @@ Public Class CellAuto_LifeColor
         task.desc = "Game of Life but with color added"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         game.Run()
         dst1 = game.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static lastBoard = dst1.Clone
@@ -237,7 +237,7 @@ Public Class CellAuto_LifePopulation
         task.desc = "Show Game of Life display with plot of population"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         game.Run()
         dst1 = game.dst1
 
@@ -267,7 +267,7 @@ Public Class CellAuto_Basics_MP
         task.desc = "Multi-threaded version of CellAuto_Basics"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             cell.src = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
             cell.src.Set(Of Byte)(0, cell.src.Width / 2, 1)
@@ -321,7 +321,7 @@ Public Class CellAuto_All256
         Return outstr
     End Function
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim index = sliders.trackbar(0).Value
         Dim mtOn = cell.check.Box(0).Checked
 
@@ -361,7 +361,7 @@ Public Class CellAuto_MultiPoint
         task.desc = "All256 above starts with just one point.  Here we start with multiple points."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         cell.src = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
         Static pt1 = 0
         Static pt2 = cell.src.Width / 2

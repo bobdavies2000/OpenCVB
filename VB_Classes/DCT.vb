@@ -20,7 +20,7 @@ Public Class DCT_Basics
         label2 = "Difference from original"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
@@ -61,7 +61,7 @@ Public Class DCT_RGB
         task.desc = "Apply OpenCV's Discrete Cosine Transform to an RGB image and use slider to remove the highest frequencies."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim srcPlanes = src.Split()
 
         Dim dctFlag As cv.DctFlags
@@ -106,7 +106,7 @@ Public Class DCT_Depth
         task.desc = "Find featureless surfaces in the depth data - expected to be useful only on the Kinect for Azure camera."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
@@ -140,7 +140,7 @@ Public Class DCT_FeatureLess
         label2 = "FeatureLess RGB regions"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         dct.src = src
         dct.Run()
         Dim runLenMin = dct.sliders.trackbar(1).Value
@@ -204,7 +204,7 @@ Public Class DCT_Surfaces_debug
         task.desc = "Find plane equation for a featureless surface - debugging one region for now."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run()
 
         Mats.mat(0) = src.Clone
@@ -279,7 +279,7 @@ Public Class DCT_CComponents
         task.desc = "Find surfaces that lack texture with DCT (Discrete Cosine Transform) and use connected components to isolate those surfaces."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         dct.src = src
         dct.Run()
 

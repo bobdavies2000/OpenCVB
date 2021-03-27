@@ -26,7 +26,7 @@ Public Class Stabilizer_Basics
         task.desc = "if reasonable stdev and no motion in correlation rectangle, stabilize image across frames"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim resetImage As Boolean
 
         Static widthSlider = findSlider("Width of input to matchtemplate")
@@ -118,7 +118,7 @@ Public Class Stabilizer_BasicsRandomInput
         task.desc = "Generate images that have been arbitrarily shifted"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -174,7 +174,7 @@ Public Class Stabilizer_BasicsTest
         task.desc = "Test the Stabilizer_Basics with random movement"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         random.src = src
         random.Run()
@@ -210,7 +210,7 @@ Public Class Stabilizer_OpticalFlow
         label1 = "Stabilized Image"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim vert_Border = borderCrop * src.Rows / src.Cols
         If task.frameCount = 0 Then
             errScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 1)
@@ -262,7 +262,7 @@ Public Class Stabilizer_OpticalFlow
             Dim saveDX = dx, saveDY = dy, saveDA = da
 
             Dim text = "Original dx = " + Format(dx, "#0.00") + vbNewLine + " dy = " + Format(dy, "#0.00") + vbNewLine + " da = " + Format(da, "#0.00")
-            ocvb.trueText(text)
+            task.trueText(text)
 
             Dim sx = ds_x, sy = ds_y
 
@@ -280,7 +280,7 @@ Public Class Stabilizer_OpticalFlow
             If Math.Abs(da) > 50 Then da = saveDA
 
             text = "dx = " + Format(dx, "#0.00") + vbNewLine + " dy = " + Format(dy, "#0.00") + vbNewLine + " da = " + Format(da, "#0.00")
-            ocvb.trueText(text, 10, 100)
+            task.trueText(text, 10, 100)
 
             Dim smoothedMat = New cv.Mat(2, 3, cv.MatType.CV_64F)
             smoothedMat.Set(Of Double)(0, 0, sx * Math.Cos(da))
@@ -329,7 +329,7 @@ Public Class Stabilizer_MotionDetect
         task.desc = "Detect motiion in the stabilizer output"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         stable.src = src
         stable.Run()

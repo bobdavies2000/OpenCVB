@@ -8,7 +8,7 @@ Public Class Mat_Repeat
         task.desc = "Use the repeat method to replicate data."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim small = src.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
         dst1 = small.Repeat(10, 10)
         small = task.RGBDepth.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
@@ -35,7 +35,7 @@ Public Class Mat_PointToMat
         task.desc = "Convert pointf3 into a mat of points"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         mask.Run() ' generates a set of points
         dst1 = mask.dst1
         Dim rows = mask.Points.Length
@@ -64,7 +64,7 @@ Public Class Mat_MatToPoint
         label1 = "Reconstructed RGB Image"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim points(src.Total - 1) As cv.Vec3b
         Dim vec As New cv.Vec3b
         Dim index As integer = 0
@@ -96,7 +96,7 @@ Public Class Mat_Transpose
         label2 = "Color Image Transposed back (artifacts)"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim trColor = src.T()
         dst1 = trColor.ToMat.Resize(New cv.Size(src.Cols, src.Rows))
         Dim trBack = dst1.T()
@@ -119,7 +119,7 @@ Public Class Mat_Tricks
         task.desc = "Show some Mat tricks."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim mat = src.Resize(New cv.Size(src.Height, src.Height))
         Dim roi = New cv.Rect(0, 0, mat.Width, mat.Height)
         dst1(roi) = mat
@@ -158,7 +158,7 @@ Public Class Mat_4to1
         mat = {mat1, mat2, mat3, mat4}
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static nSize = New cv.Size(src.Width / 2, src.Height / 2)
         Static roiTopLeft = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
@@ -202,7 +202,7 @@ Public Class Mat_2to1
         task.desc = "Fill a Mat with 2 images"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static nSize = New cv.Size(src.Width, src.Height / 2)
         Static roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
@@ -256,7 +256,7 @@ Public Class Mat_ImageXYZ_MT
         task.desc = "Create a cv.Point3f vector with x, y, and z."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run()
         Parallel.ForEach(grid.roiList,
           Sub(roi)
@@ -264,7 +264,7 @@ Public Class Mat_ImageXYZ_MT
           End Sub)
 
         cv.Cv2.Merge(xyzPlanes, xyDepth)
-        If standalone or task.intermediateReview = caller Then ocvb.trueText("Mat built with X, Y, and Z (Depth)", 10, 125)
+        If standalone or task.intermediateReview = caller Then task.trueText("Mat built with X, Y, and Z (Depth)", 10, 125)
     End Sub
 End Class
 
@@ -282,7 +282,7 @@ Public Class Mat_RowColRange
         task.desc = "Perform operation on a range of cols and/or Rows."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim midX = src.Width / 2
         Dim midY = src.Height / 2
         dst1 = src
@@ -303,7 +303,7 @@ Public Class Mat_Managed
         task.desc = "There is a limited ability to use Mat data in Managed code directly."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static autoRand As New Random()
         Static img(src.Total) As cv.Vec3b
         dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, img)
@@ -333,7 +333,7 @@ Public Class Mat_MultiplyReview
         task.desc = "Review matrix multiplication"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim a(,) = {{1, 4, 2}, {2, 5, 1}}
         Dim b(,) = {{3, 4, 2}, {3, 5, 7}, {1, 2, 1}}
         Dim nextLine = ""
@@ -411,7 +411,7 @@ Public Class Mat_Inverse
         task.desc = "Given a 3x3 matrix, invert it and present results."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim nextline = ""
 
         Dim decompType = cv.DecompTypes.Cholesky
@@ -483,7 +483,7 @@ Public Class Mat_4Click
         task.desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst2"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Or task.intermediateReview = caller Then mats.defaultMats
         mats.Run()
@@ -511,7 +511,7 @@ Public Class Mat_2Click
         task.desc = "Split an image into 2 segments and allow clicking on each half to open it in dst2"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Then
             mats.mat(0) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -543,7 +543,7 @@ Public Class Mat_2Dlib
         task.desc = "Convert a Mat to the expected Array2D for a DLib API"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim array(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, array, 0, array.Length)
@@ -554,7 +554,7 @@ Public Class Mat_2Dlib
             dRGB = Dlib.LoadImageData(Of BgrPixel)(array, src.Rows, src.Cols, src.Cols * src.ElemSize)
         End If
         If standalone Then
-            ocvb.trueText("OpenCVB Mat converted to an Array2D for use with DlibDotNet")
+            task.trueText("OpenCVB Mat converted to an Array2D for use with DlibDotNet")
         End If
 
     End Sub
@@ -578,7 +578,7 @@ Public Class Mat_Dlib2Mat
         task.desc = "Convert a Dlib Array2D to an OpenCV Mat"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If dGray IsNot Nothing Then
             dst1 = New cv.Mat(dGray.Rows, dGray.Columns, cv.MatType.CV_8U)

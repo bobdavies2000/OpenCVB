@@ -14,7 +14,7 @@ Public Class Watershed_Basics
         task.desc = "Watershed API experiment.  Draw on the image to test."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then rects.Add(task.drawRect)
 
         If (standalone Or UseCorners) And task.frameCount = 0 Then
@@ -77,7 +77,7 @@ Public Class Watershed_DepthReduction
         task.desc = "Watershed the depth image using shadow, close, and far points."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         reduction.src = task.RGBDepth
         reduction.Run()
         dst2 = reduction.dst1
@@ -106,7 +106,7 @@ Public Class Watershed_DepthAuto
         task.desc = "Watershed the four corners of the depth image."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         watershed.src = task.RGBDepth
         watershed.Run()
         dst1 = watershed.dst1

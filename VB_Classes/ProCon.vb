@@ -70,7 +70,7 @@ Public Class ProCon_Basics
         End While
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         If sliders.trackbar(0).Value <> buffer.Length Then
             SyncLock mutex
                 ReDim buffer(sliders.trackbar(0).Value - 1)
@@ -110,7 +110,7 @@ Public Class ProCon_Variation
         task.desc = "DijKstra's Producer/Consumer - similar to Basics above but producer is the algorithm thread."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         SyncLock procon.mutex
             procon.tail = procon.success(procon.tail)
             If procon.buffer(procon.tail) = -1 Then

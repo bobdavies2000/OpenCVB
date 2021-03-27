@@ -9,7 +9,7 @@ Public Class EigenVecVals_Basics
         label2 = "Relationship between Eigen Vec and Vals"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim a() As Double = {1.96, -6.49, -0.47, -7.2, -0.65,
                              -6.49, 3.8, -6.39, 1.5, -6.34,
                              -0.47, -6.39, 4.17, -1.51, 2.67,
@@ -45,7 +45,7 @@ Public Class EigenVecVals_Basics
             Next
             nextLine += " = " + vbTab + "0.0" + vbCrLf
         Next
-        ocvb.trueText(nextLine, 10, 80)
+        task.trueText(nextLine, 10, 80)
     End Sub
 End Class
 

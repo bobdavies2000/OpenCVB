@@ -28,10 +28,10 @@ Public Class SemiGlobalMatching_CPP
         task.desc = "Find depth using the semi-global matching algorithm."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         'If task.frameCount < 10 Then Exit Sub
         'If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
-        '    ocvb.trueText("The left and right views are identical with the Microsoft Kinect 4 Azure camera.")
+        '    task.trueText("The left and right views are identical with the Microsoft Kinect 4 Azure camera.")
         '    Exit Sub
         'End If
 
@@ -52,7 +52,7 @@ Public Class SemiGlobalMatching_CPP
         'handleRight.Free()
 
         'Dim dst1 = New cv.Mat(task.leftView.Rows, task.leftView.Cols, cv.MatType.CV_8U, imagePtr)
-        ocvb.trueText("This algorithm runs but always returns zero - a bug in the C++ algorithm as ported." + vbCrLf +
+        task.trueText("This algorithm runs but always returns zero - a bug in the C++ algorithm as ported." + vbCrLf +
                       "Needs work but investing further is not needed - we have disparity from the device.", 10, 40, 3)
     End Sub
     Public Sub Close()

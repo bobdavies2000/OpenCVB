@@ -10,7 +10,7 @@ Public Class FREAK_Basics
         task.desc = "Find keypoints using ORB and FREAK algorithm"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         orb.src = src
         orb.Run()
 

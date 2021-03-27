@@ -24,7 +24,7 @@ Module VB_EditorMain
         Static insideRunFunction As Boolean
         'If Trim(line) = "End Sub" And insideRunFunction Then
         If insideRunFunction Then
-            Console.WriteLine(vbTab + vbTab + "If task.intermediateReview = caller Then ocvb.intermediateObject = Me")
+            Console.WriteLine(vbTab + vbTab + "If task.intermediateReview = caller Then task.intermediateObject = Me")
             changeLines += 1
             insideRunFunction = False
             Return True
@@ -84,7 +84,7 @@ Module VB_EditorMain
                 Dim sw = New StreamWriter(filename)
                 For i = 0 To lines.Count - 1
                     If insertLine(lines(i)) Then
-                        sw.WriteLine(vbTab + vbTab + "If task.intermediateReview = caller Then ocvb.intermediateObject = Me")
+                        sw.WriteLine(vbTab + vbTab + "If task.intermediateReview = caller Then task.intermediateObject = Me")
                     End If
                     sw.WriteLine(lines(i))
                     'If deleteLine(lines(i)) Then

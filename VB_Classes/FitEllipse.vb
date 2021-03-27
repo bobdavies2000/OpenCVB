@@ -24,7 +24,7 @@ Public Class FitEllipse_Basics_CPP
         task.desc = "Use FitEllipse to draw around a set of points"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         area.Run()  ' get some random clusters of points
         dst1.SetTo(0)
         If area.srcPoints.Count >= 5 Then

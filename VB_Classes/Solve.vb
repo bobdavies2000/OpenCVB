@@ -7,7 +7,7 @@ Public Class Solve_ByMat
         task.desc = "Solve a set of equations with OpenCV's Solve API."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         ' x + y = 10
         ' 2x + 3y = 26
         ' (x=4, y=6)
@@ -18,7 +18,7 @@ Public Class Solve_ByMat
         Dim x As New cv.Mat
         cv.Cv2.Solve(a, y, x, cv.DecompTypes.LU)
 
-        ocvb.trueText("Solution ByMat: X1 = " + CStr(x.Get(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(Of Double)(0, 1)), 10, 125)
+        task.trueText("Solution ByMat: X1 = " + CStr(x.Get(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(Of Double)(0, 1)), 10, 125)
     End Sub
 End Class
 
@@ -33,7 +33,7 @@ Public Class Solve_ByArray
         task.desc = "Solve a set of equations with OpenCV's Solve API with a normal array as input  "
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         ' x + y = 10
         ' 2x + 3y = 26
         ' (x=4, y=6)
@@ -42,7 +42,7 @@ Public Class Solve_ByArray
         Dim x As New cv.Mat
         cv.Cv2.Solve(cv.InputArray.Create(av), cv.InputArray.Create(yv), x, cv.DecompTypes.LU)
 
-        ocvb.trueText("Solution ByArray: X1 = " + CStr(x.Get(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(Of Double)(0, 1)), 10, 125)
+        task.trueText("Solution ByArray: X1 = " + CStr(x.Get(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(Of Double)(0, 1)), 10, 125)
     End Sub
 End Class
 

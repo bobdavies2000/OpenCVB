@@ -64,11 +64,11 @@ Public Class VTK_Basics
         If standalone = False Then pipe.WaitForConnection()
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.VTK_Present = False Then Exit Sub
 
         If standalone Then
-            ocvb.trueText("VTK_Basics is used by any VTK algorithm but has no output by itself.")
+            task.trueText("VTK_Basics is used by any VTK algorithm but has no output by itself.")
             Exit Sub
         End If
 
@@ -78,7 +78,7 @@ Public Class VTK_Basics
         If task.frameCount <> 0 Then
             Dim bytesRead = pipe.Read(readPipe, 0, 4)
             If bytesRead = 0 Then
-                ocvb.trueText("The VTK process appears to have stopped.", 20, 100)
+                task.trueText("The VTK process appears to have stopped.", 20, 100)
             End If
         End If
 
@@ -131,7 +131,7 @@ Public Class VTK_Histogram3Drgb
         task.desc = "Plot a histogram of the RGB data in 3D"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.VTK_Present = False Then Exit Sub
 
         Static binSlider = findSlider("Hist 3D bins")
@@ -180,7 +180,7 @@ Public Class VTK_Histogram3DpointCloud
         task.desc = "Plot a histogram of the point cloud in 3D"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.VTK_Present = False Then Exit Sub
 
         vtk.memMapUserData(2) = 0 ' assume no need to recompute 3D histogram.

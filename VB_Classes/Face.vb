@@ -23,7 +23,7 @@ Public Class Face_Haar_LBP
         label2 = "Faces detected with LBP"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.Clone()
         detectFace(dst1, haarCascade)
         dst2 = src.Clone()
@@ -43,7 +43,7 @@ Public Class Face_Haar_Alt
         label1 = "Faces detected with Haar_Alt"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.Clone()
         detectFace(dst1, haarCascade)
     End Sub

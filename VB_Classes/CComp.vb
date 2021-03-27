@@ -47,7 +47,7 @@ Public Class CComp_Basics
         Return count
     End Function
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         rects.Clear()
         centroids.Clear()
         masks.Clear()
@@ -145,7 +145,7 @@ Public Class CComp_Basics_FullImage
         Return count
     End Function
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1.SetTo(0)
 
@@ -178,7 +178,7 @@ Public Class CComp_PointTracker
         task.desc = "Track connected componenent centroids and use it to match coloring"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         basics.src = src
         basics.Run()
 
@@ -231,7 +231,7 @@ Public Class CComp_MaxBlobs
         task.desc = "Find the best CComp threshold to maximize the number of blobs"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount < 10 Then Exit Sub
         Static thresholdSlider = findSlider("CComp threshold")
         If task.frameCount = 0 Then thresholdSlider.value = 0
@@ -284,7 +284,7 @@ Public Class CComp_MaxPixels
         task.desc = "Find the best CComp threshold to maximize pixels"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount < 10 Then Exit Sub
         Static pixelValues(255) As Integer ' march through all 255 values and find the best...
         Static thresholdSlider = findSlider("CComp threshold")
@@ -338,9 +338,9 @@ Public Class CComp_DepthEdges
         task.desc = "Use depth edges to isolate connected components in depth"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         depth.Run()
-        If standalone or task.intermediateReview = caller Then dst2 = depth.dst2
+        If standalone Or task.intermediateReview = caller Then dst2 = depth.dst2
 
         'If check.Box(0).Checked Then ccomp.basics.edgeMask = depth.dst2 Else ccomp.basics.edgeMask = Nothing
         If check.Box(0).Checked Then src.SetTo(0, depth.dst2)
@@ -370,7 +370,7 @@ Public Class CComp_EdgeMask
         label2 = "Blob Rectangles with centroids (white)"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         edges.src = src
         edges.Run()
         dst1 = edges.dst1
@@ -396,7 +396,7 @@ Public Class CComp_ColorDepth
         task.desc = "Color connected components based on their depth"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
         dst1 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -433,7 +433,7 @@ Public Class CComp_InRange_MT
         label2 = "Blob rectangles - largest to smallest"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Integer = sliders.trackbar(0).Value
@@ -485,7 +485,7 @@ Public Class CComp_InRange
         task.desc = "Connect components in specific ranges"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Integer = sliders.trackbar(0).Value
@@ -531,7 +531,7 @@ Public Class CComp_Shapes
         task.desc = "Use connected components to isolate objects in image."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gray = shapes.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu + cv.ThresholdTypes.Binary)
         Dim labelview = shapes.EmptyClone()
@@ -582,7 +582,7 @@ Public Class CComp_Simple
         task.desc = "Draw bounding boxes around RGB binarized connected Components"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         rects.Clear()
         centroids.Clear()
 
@@ -633,7 +633,7 @@ Public Class CComp_Binarized
         task.desc = "Find connected components using an image with binarized edges"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         edges.src = src
         edges.Run()
         dst1 = edges.dst2

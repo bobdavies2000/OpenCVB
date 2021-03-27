@@ -107,7 +107,7 @@ Public Class PointCloud_Basics
         task.desc = "Display the point cloud in a 2D image for use with the PixelViewer"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = task.pointCloud
     End Sub
 End Class
@@ -130,7 +130,7 @@ Public Class PointCloud_Continuous
         task.desc = "Show where the pointcloud is continuous"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static thresholdSlider = findSlider("Threshold of continuity in mm")
         Dim threshold = thresholdSlider.value
 
@@ -170,7 +170,7 @@ Public Class PointCloud_Inspector
         task.desc = "Inspect x, y, and z values in a row or column"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static yLineSlider = findSlider("Y-Direction intervals")
         Static cLineSlider = findSlider("Inspection Line")
         Dim yLines = yLineSlider.value
@@ -221,7 +221,7 @@ Public Class PointCloud_Continuous_VB
         task.desc = "Show where the pointcloud is continuous"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static thresholdSlider = findSlider("Threshold of continuity in mm")
         Dim threshold = thresholdSlider.value
 
@@ -275,7 +275,7 @@ Public Class PointCloud_ColorizeSide
         task.desc = "Create the colorized mat used for side projections"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Then src = dst1 Else dst1 = src
 
@@ -291,14 +291,14 @@ Public Class PointCloud_ColorizeSide
 
         Dim cam = task.sideCameraPoint
         Dim marker As New cv.Point2f(dst1.Width / (task.maxZ * distanceRatio), 0)
-        marker.Y = marker.X * Math.Tan((ocvb.vFov / 2) * cv.Cv2.PI / 180)
-        Dim topLen = marker.X * Math.Tan((ocvb.hFov / 2) * cv.Cv2.PI / 180)
+        marker.Y = marker.X * Math.Tan((task.vFov / 2) * cv.Cv2.PI / 180)
+        Dim topLen = marker.X * Math.Tan((task.hFov / 2) * cv.Cv2.PI / 180)
         Dim markerLeft = New cv.Point(marker.X, cam.Y - marker.Y)
         Dim markerRight = New cv.Point(marker.X, cam.Y + marker.Y)
 
         If task.xRotateSlider.Value <> 0 Then
-            Dim offset = Math.Sin(ocvb.angleX) * marker.Y
-            If ocvb.angleX > 0 Then
+            Dim offset = Math.Sin(task.angleX) * marker.Y
+            If task.angleX > 0 Then
                 markerLeft.Y = markerLeft.Y - offset
                 markerRight.Y = markerRight.Y + offset
             Else
@@ -309,13 +309,13 @@ Public Class PointCloud_ColorizeSide
 
         If task.zRotateSlider.Value <> 0 Then
             markerLeft = New cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y) ' Change the origin
-            markerLeft = New cv.Point(markerLeft.X * Math.Cos(ocvb.angleZ) - markerLeft.Y * Math.Sin(ocvb.angleZ), ' rotate around x-axis using angleZ
-                                      markerLeft.Y * Math.Cos(ocvb.angleZ) + markerLeft.X * Math.Sin(ocvb.angleZ))
+            markerLeft = New cv.Point(markerLeft.X * Math.Cos(task.angleZ) - markerLeft.Y * Math.Sin(task.angleZ), ' rotate around x-axis using angleZ
+                                      markerLeft.Y * Math.Cos(task.angleZ) + markerLeft.X * Math.Sin(task.angleZ))
             markerLeft = New cv.Point(markerLeft.X + cam.X, markerLeft.Y + cam.Y) ' Move the origin to the side camera location.
 
             ' Same as above for markerLeft but consolidated algebraically.
-            markerRight = New cv.Point((markerRight.X - cam.X) * Math.Cos(ocvb.angleZ) - (markerRight.Y - cam.Y) * Math.Sin(ocvb.angleZ) + cam.X,
-                                       (markerRight.Y - cam.Y) * Math.Cos(ocvb.angleZ) + (markerRight.X - cam.X) * Math.Sin(ocvb.angleZ) + cam.Y)
+            markerRight = New cv.Point((markerRight.X - cam.X) * Math.Cos(task.angleZ) - (markerRight.Y - cam.Y) * Math.Sin(task.angleZ) + cam.X,
+                                       (markerRight.Y - cam.Y) * Math.Cos(task.angleZ) + (markerRight.X - cam.X) * Math.Sin(task.angleZ) + cam.Y)
         End If
 
         If standalone = False Then
@@ -324,7 +324,7 @@ Public Class PointCloud_ColorizeSide
         End If
 
         ' draw the arc enclosing the camera FOV
-        Dim startAngle = (180 - ocvb.vFov) / 2
+        Dim startAngle = (180 - task.vFov) / 2
         Dim y = dst1.Width / Math.Tan(startAngle * cv.Cv2.PI / 180)
 
         Dim fovTop = New cv.Point(dst1.Width, cam.Y - y)
@@ -375,7 +375,7 @@ Public Class PointCloud_ColorizeTop
         task.desc = "Create the colorize the mat for a topdown projections"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Then src = dst1 Else dst1 = src
 
@@ -390,14 +390,14 @@ Public Class PointCloud_ColorizeTop
 
         Dim cam = task.topCameraPoint
         Dim marker As New cv.Point2f(cam.X, dst1.Height / (task.maxZ * distanceRatio))
-        Dim topLen = marker.Y * Math.Tan((ocvb.hFov / 2) * cv.Cv2.PI / 180)
-        Dim sideLen = marker.Y * Math.Tan((ocvb.vFov / 2) * cv.Cv2.PI / 180)
+        Dim topLen = marker.Y * Math.Tan((task.hFov / 2) * cv.Cv2.PI / 180)
+        Dim sideLen = marker.Y * Math.Tan((task.vFov / 2) * cv.Cv2.PI / 180)
         Dim markerLeft = New cv.Point(cam.X - topLen, dst1.Height - marker.Y)
         Dim markerRight = New cv.Point(cam.X + topLen, dst1.Height - marker.Y)
 
         If task.zRotateSlider.Value <> 0 Then
-            Dim offset = Math.Sin(ocvb.angleZ) * topLen
-            If ocvb.angleZ > 0 Then
+            Dim offset = Math.Sin(task.angleZ) * topLen
+            If task.angleZ > 0 Then
                 markerLeft.X = markerLeft.X - offset
                 markerRight.X = markerRight.X + offset
             Else
@@ -407,7 +407,7 @@ Public Class PointCloud_ColorizeTop
         End If
 
         ' draw the arc enclosing the camera FOV
-        Dim startAngle = (180 - ocvb.hFov) / 2
+        Dim startAngle = (180 - task.hFov) / 2
         Dim x = dst1.Height / Math.Tan(startAngle * cv.Cv2.PI / 180)
 
         Dim fovRight = New cv.Point(task.topCameraPoint.X + x, 0)
@@ -454,7 +454,7 @@ Public Class PointCloud_Raw_CPP
         cPtr = SimpleProjectionOpen()
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run()
 
         Dim h = src.Height
@@ -505,7 +505,7 @@ Public Class PointCloud_Raw
         cPtr = SimpleProjectionOpen()
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run()
 
         Dim h = src.Height
@@ -561,7 +561,7 @@ Public Class PointCloud_Kalman_TopView
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         topView.Run()
 
@@ -580,8 +580,8 @@ Public Class PointCloud_Kalman_TopView
             topView.cmat.Run()
             dst1 = topView.cmat.dst1
         End If
-        Dim FOV = ocvb.hFov
-        label1 = Format(ocvb.pixelsPerMeter, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
+        Dim FOV = task.hFov
+        label1 = Format(task.pixelsPerMeter, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
     End Sub
 End Class
 
@@ -611,7 +611,7 @@ Public Class PointCloud_Kalman_SideView
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         sideView.Run()
 
         flood.src = sideView.histOutput.ConvertScaleAbs(255)
@@ -630,8 +630,8 @@ Public Class PointCloud_Kalman_SideView
             dst1 = cmat.dst1
         End If
 
-        Dim FOV = (180 - ocvb.vFov) / 2
-        label1 = Format(ocvb.pixelsPerMeter, "0") + " pixels per meter at " + Format(task.maxZ, "0.0") + " meters"
+        Dim FOV = (180 - task.vFov) / 2
+        label1 = Format(task.pixelsPerMeter, "0") + " pixels per meter at " + Format(task.maxZ, "0.0") + " meters"
     End Sub
 End Class
 
@@ -659,7 +659,7 @@ Public Class PointCloud_BackProject
     End Sub
 
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.mouseClickFlag Then
             ' lower left image is the mat_4to1
             If task.mousePicTag = 2 Then
@@ -710,7 +710,7 @@ Public Class PointCloud_FrustrumTop
         task.desc = "Translate only the frustrum with gravity"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         frustrum.Run()
         topView.src = frustrum.dst2
@@ -752,7 +752,7 @@ Public Class PointCloud_FrustrumSide
         task.desc = "Translate only the frustrum with gravity"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         frustrum.Run()
         sideView.src = frustrum.dst2
@@ -795,7 +795,7 @@ End Class
 '        task.desc = "Present the top view with and without the IMU filter."
 '    End Sub
 '    Public Sub Run()
-'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        If task.intermediateReview = caller Then task.intermediateObject = Me
 
 '        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
 '        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using angleX of the gravity vector")
@@ -845,7 +845,7 @@ End Class
 '        task.desc = "Present the side view with and without the IMU filter."
 '    End Sub
 '    Public Sub Run()
-'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        If task.intermediateReview = caller Then task.intermediateObject = Me
 '        Dim pointcloud = task.pointCloud.Clone
 
 '        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using angleZ of the gravity vector")
@@ -890,7 +890,7 @@ End Class
 '        task.desc = "Click to find distance from the camera in the rotated side view"
 '    End Sub
 '    Public Sub Run()
-'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        If task.intermediateReview = caller Then task.intermediateObject = Me
 '        Static saveMaxZ As Single
 
 '        If task.maxZ <> saveMaxZ Then
@@ -913,8 +913,8 @@ End Class
 '            dst2.Circle(pt, task.dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
 '            Dim side1 = (pt.X - task.sideCameraPoint.X)
 '            Dim side2 = (pt.Y - task.sideCameraPoint.Y)
-'            Dim cameraDistance = Math.Sqrt(side1 * side1 + side2 * side2) / ocvb.pixelsPerMeter
-'            ocvb.trueText(Format(cameraDistance, "#0.00") + "m xdist = " + Format(side1 / ocvb.pixelsPerMeter, "#0.00") + "m", pt, 3)
+'            Dim cameraDistance = Math.Sqrt(side1 * side1 + side2 * side2) / task.pixelsPerMeter
+'            task.trueText(Format(cameraDistance, "#0.00") + "m xdist = " + Format(side1 / task.pixelsPerMeter, "#0.00") + "m", pt, 3)
 '        Next
 
 '        dst1.Line(New cv.Point(task.sideCameraPoint.X, 0), New cv.Point(task.sideCameraPoint.X, dst1.Height), cv.Scalar.White, 1)
@@ -939,7 +939,7 @@ End Class
 '        task.desc = "Find the floor plane in a side view oriented by gravity vector"
 '    End Sub
 '    Public Sub Run()
-'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        If task.intermediateReview = caller Then task.intermediateObject = Me
 
 '        floor.Run()
 '        dst1 = floor.dst1
@@ -971,7 +971,7 @@ End Class
 '        task.desc = "Find the floor and ceiling planes in a side view oriented by gravity vector"
 '    End Sub
 '    Public Sub Run()
-'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        If task.intermediateReview = caller Then task.intermediateObject = Me
 
 '        ceiling.Run()
 '        dst1 = ceiling.dst1
@@ -1012,7 +1012,7 @@ End Class
 '        task.desc = "Find the floor or ceiling plane and translate it back to unrotated coordinates"
 '    End Sub
 '    Public Sub Run()
-'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        If task.intermediateReview = caller Then task.intermediateObject = Me
 '        Static cushionSlider = findSlider("Cushion when estimating the floor or ceiling plane (mm)")
 '        Dim cushion = cushionSlider.value / 1000
 '        gLine.floorRun = floorRun
@@ -1027,12 +1027,12 @@ End Class
 
 '        Static consistencySlider = findSlider("Y-coordinate consistency check count")
 '        If leftPoints.Count > consistencySlider.value Then
-'            planeHeight = CInt(ocvb.pixelsPerMeter * cushion)
+'            planeHeight = CInt(task.pixelsPerMeter * cushion)
 '            If planeHeight = 0 Then planeHeight = 1
 '            Dim cam = task.sideCameraPoint
 
 '            Static adjustmentSlider = findSlider("Y-coordinate up/down adjustment (mm)")
-'            Dim adjustPixels = ocvb.pixelsPerMeter * adjustmentSlider.value / 1000
+'            Dim adjustPixels = task.pixelsPerMeter * adjustmentSlider.value / 1000
 
 '            planePoint1 = New cv.Point(0, leftPoint.Y + CInt(If(floorRun, planeHeight / 2, -planeHeight / 2) + adjustPixels))
 '            planePoint2 = New cv.Point(dst2.Width, planePoint1.Y)
@@ -1043,7 +1043,7 @@ End Class
 '            Dim maxAngle = Math.Atan(dst2.Width / gPlaneDeltaY) * 57.2958
 '            Dim minRow = dst2.Height * maxAngle / 180
 
-'            Dim planeY = gPlaneDeltaY / ocvb.pixelsPerMeter * If(floorRun, 1, -1) + adjustmentSlider.value / 1000
+'            Dim planeY = gPlaneDeltaY / task.pixelsPerMeter * If(floorRun, 1, -1) + adjustmentSlider.value / 1000
 '            Dim split = task.pointCloud.Split()
 '            Dim ySplit = split(1)
 '            inrange.src = split(1)
@@ -1096,7 +1096,7 @@ End Class
 '        task.desc = "Find the floor in a side view squared up with gravity"
 '    End Sub
 '    Public Sub Run()
-'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        If task.intermediateReview = caller Then task.intermediateObject = Me
 '        Static saveFrameCount = -1
 '        If saveFrameCount <> task.frameCount Then
 '            saveFrameCount = task.frameCount
@@ -1240,7 +1240,7 @@ Public Class PointCloud_Singletons
         task.desc = "Find floor and ceiling using gravity aligned top-down view and selecting bins with exactly 1 sample"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount = 0 Then
             For i = 0 To singleFrames.Count - 1
                 singleFrames(i) = New cv.Mat(task.pointCloud.Size, cv.MatType.CV_8U, 0)
@@ -1283,7 +1283,7 @@ Public Class PointCloud_ReducedSideView
         task.desc = "Create a stable side view of the point cloud"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         gCloud.Run()
 
@@ -1322,7 +1322,7 @@ Public Class PointCloud_ReducedTopView
         task.desc = "Create a stable side view of the point cloud"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         gCloud.Run()
 
@@ -1371,16 +1371,16 @@ Public Class PointCloud_ObjectsTop
         task.desc = "Validate the formula for pixel height as a function of distance"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim drawLines = showRectanglesCheck.checked
         measureTop.Run()
         dst1 = measureTop.dst1
 
-        ocvb.pixelsPerMeter = dst1.Height / task.maxZ
-        label1 = "Pixels/Meter horizontal: " + CStr(CInt(dst1.Width / task.maxZ)) + " vertical: " + CStr(CInt(ocvb.pixelsPerMeter))
+        task.pixelsPerMeter = dst1.Height / task.maxZ
+        label1 = "Pixels/Meter horizontal: " + CStr(CInt(dst1.Width / task.maxZ)) + " vertical: " + CStr(CInt(task.pixelsPerMeter))
 
-        Dim FOV = ocvb.hFov / 2
+        Dim FOV = task.hFov / 2
 
         Dim xpt1 As cv.Point2f, xpt2 As cv.Point2f
         If standalone Or task.intermediateReview = caller Then
@@ -1399,7 +1399,7 @@ Public Class PointCloud_ObjectsTop
             Else
                 blueLineMeters = distanceSlider.Value * lineWidth / (1000 * pixeldistance)
             End If
-            ocvb.trueText("Blue Line is " + CStr(pixeldistance) + " pixels from the camera" + vbCrLf +
+            task.trueText("Blue Line is " + CStr(pixeldistance) + " pixels from the camera" + vbCrLf +
                           "Blue Line is " + CStr(lineWidth) + " pixels long" + vbCrLf +
                           "Blue Line is " + Format(distanceSlider.Value / 1000, "#0.00") + " meters from the camera" + vbCrLf +
                           "Blue Line is " + Format(blueLineMeters, "#0.00") + " meters long" + vbCrLf +
@@ -1482,14 +1482,14 @@ Public Class PointCloud_ObjectsSide
         task.desc = "Validate the formula for pixel height as a function of distance"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim drawLines = showRectanglesCheck.checked
         measureSide.Run()
         dst1 = measureSide.dst1
 
-        label1 = "Pixels/Meter horizontal: " + CStr(CInt(dst1.Width / task.maxZ)) + " vertical: " + CStr(CInt(ocvb.pixelsPerMeter))
-        Dim FOV = ocvb.vFov / 2
+        label1 = "Pixels/Meter horizontal: " + CStr(CInt(dst1.Width / task.maxZ)) + " vertical: " + CStr(CInt(task.pixelsPerMeter))
+        Dim FOV = task.vFov / 2
 
         Dim xpt1 As cv.Point2f, xpt2 As cv.Point2f
         If standalone Or task.intermediateReview = caller Then
@@ -1508,7 +1508,7 @@ Public Class PointCloud_ObjectsSide
             Else
                 blueLineMeters = distanceSlider.Value * lineWidth / (1000 * pixeldistance)
             End If
-            ocvb.trueText("Blue Line is " + CStr(pixeldistance) + " pixels from the camera" + vbCrLf +
+            task.trueText("Blue Line is " + CStr(pixeldistance) + " pixels from the camera" + vbCrLf +
                           "Blue Line is " + CStr(lineWidth) + " pixels long" + vbCrLf +
                           "Blue Line is " + Format(distanceSlider.Value / 1000, "#0.00") + " meters from the camera" + vbCrLf +
                           "Blue Line is " + Format(blueLineMeters, "#0.00") + " meters long" + vbCrLf +
@@ -1606,7 +1606,7 @@ Public Class PointCloud_BothViews
         task.desc = "Find the actual width in pixels for the objects detected in the top view"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim showDetails = showRectanglesCheck.checked
 
@@ -1629,8 +1629,8 @@ Public Class PointCloud_BothViews
             End If
 
             Dim pad = CInt(src.Width / 15)
-            ocvb.trueText(accMsg1 + vbCrLf + instructions, 10, src.Height - pad)
-            ocvb.trueText(accMsg2 + vbCrLf + instructions, 10, src.Height - pad, 3)
+            task.trueText(accMsg1 + vbCrLf + instructions, 10, src.Height - pad)
+            task.trueText(accMsg2 + vbCrLf + instructions, 10, src.Height - pad, 3)
         End If
 
         Static minDepth As Single, maxDepth As Single
@@ -1652,13 +1652,13 @@ Public Class PointCloud_BothViews
 
             minDepth = task.maxZ * (task.topCameraPoint.Y - rView.Y - rView.Height) / src.Height
             maxDepth = task.maxZ * (task.topCameraPoint.Y - rView.Y) / src.Height
-            widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Width / ocvb.pixelsPerMeter, "0.0") + "m"
+            widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Width / task.pixelsPerMeter, "0.0") + "m"
             detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m" + widthInfo
 
             roi = New cv.Rect(rFront.X, 0, rFront.Width, src.Height)
             vw = vwTop
             If showDetails Then
-                ocvb.trueText(detailText, detailPoint.X, detailPoint.Y, picTag:=If(standalone, 2, 3))
+                task.trueText(detailText, detailPoint.X, detailPoint.Y, picTag:=If(standalone, 2, 3))
                 If standalone Or task.intermediateReview = caller Then label1 = "Clicked: " + detailText Else label2 = "Clicked: " + detailText
             End If
         End If
@@ -1671,13 +1671,13 @@ Public Class PointCloud_BothViews
             minDepth = task.maxZ * (rView.X - task.sideCameraPoint.X) / src.Height
             maxDepth = task.maxZ * (rView.X + rView.Width - task.sideCameraPoint.X) / src.Height
 
-            widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Height / ocvb.pixelsPerMeter, "0.0") + "m"
+            widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Height / task.pixelsPerMeter, "0.0") + "m"
             detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m " + widthInfo
 
             roi = New cv.Rect(0, rFront.Y, src.Width, rFront.Y + rFront.Height)
             vw = vwSide
             If showDetails Then
-                ocvb.trueText(detailText, detailPoint.X, detailPoint.Y, 3)
+                task.trueText(detailText, detailPoint.X, detailPoint.Y, 3)
                 label2 = "Clicked: " + detailText
             End If
         End If
@@ -1726,7 +1726,7 @@ Public Class PointCloud_BackProjectTopView
         task.desc = "Display only the top view of the depth data and backproject the histogram onto the RGB image."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         view.Run()
         dst2 = view.dst1
 
@@ -1769,7 +1769,7 @@ Public Class PointCloud_BackProjectTopView
             palette.Run()
             dst1 = palette.dst1
         Else
-            ocvb.trueText("No objects found")
+            task.trueText("No objects found")
         End If
     End Sub
 End Class
@@ -1795,7 +1795,7 @@ Public Class PointCloud_BackProjectSideView
         task.desc = "Display only the side view of the depth data - with and without the IMU active"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         view.Run()
         cmatSide.src = view.dst1
         cmatSide.Run()
@@ -1840,7 +1840,7 @@ Public Class PointCloud_BackProjectSideView
             palette.Run()
             dst1 = palette.dst1
         Else
-            ocvb.trueText("No objects found")
+            task.trueText("No objects found")
         End If
     End Sub
 End Class

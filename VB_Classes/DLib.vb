@@ -12,7 +12,7 @@ Public Class Dlib_Sobel_CS
         task.desc = "Testing the DLib interface with a simple Sobel example"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -42,7 +42,7 @@ Public Class Dlib_GaussianBlur_CS
         task.desc = "Use DlibDotNet to blur an image"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -77,7 +77,7 @@ Public Class Dlib_FaceDetectHOG_CS
         task.desc = "Use DlibDotNet to detect faces using the HOG detector"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -118,19 +118,19 @@ Public Class Dlib_iBug300WDownload
         task.desc = "Multi-threaded (responsive) download of the iBug 300W face database.  Not using iBug yet but planning to..."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim ibugDir = New DirectoryInfo(task.parms.homeDir + "Data/ibug_300W_large_face_landmark_dataset")
         If ibugDir.Exists And downloadActive = False And pythonActive = False Then
-            ocvb.trueText("The iBug 300W face database was downloaded and is ready for use.", 40, 200)
+            task.trueText("The iBug 300W face database was downloaded and is ready for use.", 40, 200)
             Exit Sub
         End If
         Dim fileToDecompress As New FileInfo(task.parms.homeDir + "Data/ibug_300W_large_face_landmark_dataset.tar.gz")
         If downloadActive And pythonActive = False Then
-            ocvb.trueText("Downloading active (takes a while).  Current download size = " + Format(zippedBuffer.Length / 1000, "###,##0") + "k bytes" + vbCrLf +
+            task.trueText("Downloading active (takes a while).  Current download size = " + Format(zippedBuffer.Length / 1000, "###,##0") + "k bytes" + vbCrLf +
                           "Download is " + Format(zippedBuffer.Length / 1797000000, "#0%") + " complete", 40, 200)
         Else
             If pythonActive Then
-                ocvb.trueText("iBug files are being unzipped to " + ibugDir.FullName, 40, 200)
+                task.trueText("iBug files are being unzipped to " + ibugDir.FullName, 40, 200)
             Else
                 Static checkDownload = findCheckBox("Download the 1.7 Gb 300 Faces In-The-Wild database")
                 If checkDownload.checked Then
@@ -158,11 +158,11 @@ Public Class Dlib_iBug300WDownload
                             fs.WriteLine("tar.close")
                             fs.Close()
 
-                            ocvb.pythonTaskName = pyScript
+                            task.pythonTaskName = pyScript
                             Dim p As New Process
                             p.StartInfo.FileName = task.parms.PythonExe
                             p.StartInfo.WorkingDirectory = task.parms.homeDir + "Data"
-                            p.StartInfo.Arguments = """" + ocvb.pythonTaskName + """"
+                            p.StartInfo.Arguments = """" + task.pythonTaskName + """"
                             If task.parms.ShowConsoleLog = False Then p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
                             p.Start()
                             p.WaitForExit()
@@ -175,7 +175,7 @@ Public Class Dlib_iBug300WDownload
                         End Sub)
                     downloadthread.Start()
                 Else
-                    ocvb.trueText("Check the box in the Options to download the iBug 300W face database", 40, 200)
+                    task.trueText("Check the box in the Options to download the iBug 300W face database", 40, 200)
                 End If
             End If
         End If

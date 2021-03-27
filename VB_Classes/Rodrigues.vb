@@ -14,10 +14,10 @@ Public Class Rodrigues_ValidateKinect
         task.desc = "Validate the Rodrigues calibration for Kinect camera (only)"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
             dst2.SetTo(0)
-            ocvb.trueText("Only the Kinect4Azure camera is currently supported for the Rodrigues calibration", 10, 140)
+            task.trueText("Only the Kinect4Azure camera is currently supported for the Rodrigues calibration", 10, 140)
             Exit Sub
         End If
 
@@ -29,7 +29,7 @@ Public Class Rodrigues_ValidateKinect
         For i = 0 To split.Length - 1
             output += split(i) + vbCrLf
         Next
-        ocvb.trueText(output)
+        task.trueText(output)
     End Sub
 End Class
 
@@ -43,10 +43,10 @@ Public Class Rodrigues_ValidateVector
         task.desc = "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2 Then
             dst2.SetTo(0)
-            ocvb.trueText("Only the StereoLabs Zed 2 and Intel T265 cameras are supported for this Rodrigues validation")
+            task.trueText("Only the StereoLabs Zed 2 and Intel T265 cameras are supported for this Rodrigues validation")
             Exit Sub
         End If
 
@@ -69,7 +69,7 @@ Public Class Rodrigues_ValidateVector
         output += vbTab + Format(task.parms.RotationVector.X, "#0.000000000") + vbTab
         output += vbTab + Format(task.parms.RotationVector.Y, "#0.000000000") + vbTab
         output += vbTab + Format(task.parms.RotationVector.Z, "#0.000000000") + vbTab
-        ocvb.trueText(output)
+        task.trueText(output)
     End Sub
 End Class
 
@@ -84,7 +84,7 @@ Public Class Rodrigues_RotationMatrix
         task.desc = "Display the contents of the IMU Rotation Matrix"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim rot = task.parms.RotationMatrix
         Dim output = "IMU Rotation Matrix (rotate the camera to see if it is working)" + vbCrLf
         For i = 0 To 2
@@ -99,7 +99,7 @@ Public Class Rodrigues_RotationMatrix
         For i = 0 To 2
             output += vbTab + Format(dst1.Get(Of Single)(i), "#0.000000000") + vbTab
         Next
-        ocvb.trueText(output)
+        task.trueText(output)
     End Sub
 End Class
 
@@ -116,7 +116,7 @@ Public Class Rodrigues_Extrinsics
         task.desc = "Convert Camera extrinsics array to a Vector with Rodrigues"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim rot = task.parms.extrinsics.rotation
         Dim output As String = "Extrinsics Rotation Matrix" + vbCrLf
         For i = 0 To 2
@@ -134,7 +134,7 @@ Public Class Rodrigues_Extrinsics
         For i = 0 To 2
             output += vbTab + Format(dst1.Get(Of Double)(i), "#0.000000000") + vbTab
         Next
-        ocvb.trueText(output)
+        task.trueText(output)
     End Sub
 End Class
 

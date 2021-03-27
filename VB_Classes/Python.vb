@@ -7,11 +7,11 @@ Imports cv = OpenCvSharp
 
 Module Python_Module
     Public Function StartPython(arguments As String) As Boolean
-        Dim pythonApp = New FileInfo(ocvb.pythonTaskName)
+        Dim pythonApp = New FileInfo(task.pythonTaskName)
 
         If pythonApp.Name.StartsWith("LRS_") Then
             If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Or task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D455 Then
-                ocvb.trueText("The current OpenCVB camera is an Intel RealSense camera and it is also used by this Python script." + vbCrLf +
+                task.trueText("The current OpenCVB camera is an Intel RealSense camera and it is also used by this Python script." + vbCrLf +
                               "The Python script will only run when using a non-RealSense camera in OpenCVB")
                 Return False
             End If
@@ -43,9 +43,9 @@ Module Python_Module
             If p.Start() = False Then MsgBox("The Python script " + pythonApp.Name + " failed to start")
         Else
             If pythonApp.Name.EndsWith("Python_MemMap") Or pythonApp.Name.EndsWith("Python_Run") Then
-                ocvb.trueText(pythonApp.Name + " is a support algorithm for PyStream apps.")
+                task.trueText(pythonApp.Name + " is a support algorithm for PyStream apps.")
             Else
-                ocvb.trueText(pythonApp.FullName + " is missing.")
+                task.trueText(pythonApp.FullName + " is missing.")
             End If
             Return False
         End If
@@ -61,8 +61,8 @@ Public Class Python_Run
     Inherits VBparent
     Public Sub New()
         initParent()
-        If ocvb.pythonTaskName = "" Then ocvb.pythonTaskName = task.parms.homeDir + "VB_Classes/PythonPackages.py"
-        Dim pythonApp = New FileInfo(ocvb.pythonTaskName)
+        If task.pythonTaskName = "" Then task.pythonTaskName = task.parms.homeDir + "VB_Classes/PythonPackages.py"
+        Dim pythonApp = New FileInfo(task.pythonTaskName)
         If pythonApp.Name.EndsWith("_PS.py") Then
             pyStream = New Python_Stream()
         Else
@@ -71,7 +71,7 @@ Public Class Python_Run
         task.desc = "Run Python app: " + pythonApp.Name
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If pyStream IsNot Nothing Then
             pyStream.src = src
             pyStream.Run()
@@ -80,9 +80,9 @@ Public Class Python_Run
             label1 = "Output of Python Backend"
             label2 = "Second Output of Python Backend"
         Else
-            Dim pythonApp = New FileInfo(ocvb.pythonTaskName)
+            Dim pythonApp = New FileInfo(task.pythonTaskName)
             If pythonApp.Name.StartsWith("OakD") Then
-                ocvb.trueText("The " + pythonApp.Name + " python script is merely a placeholder while working on the OakD support " + vbCrLf +
+                task.trueText("The " + pythonApp.Name + " python script is merely a placeholder while working on the OakD support " + vbCrLf +
                           "It can only be run outside of OpenCVB.")
                 Exit Sub
             End If
@@ -116,14 +116,14 @@ Public Class Python_MemMap
             If task.parms.externalPythonInvocation = False Then
                 StartPython("--MemMapLength=" + CStr(memMapbufferSize))
             End If
-            Dim pythonApp = New FileInfo(ocvb.pythonTaskName)
+            Dim pythonApp = New FileInfo(task.pythonTaskName)
             label1 = "No output for Python_MemMap - see Python console"
             task.desc = "Run Python app: " + pythonApp.Name + " to share memory with OpenCVB and Python."
         End If
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone or task.intermediateReview = caller Then memMapValues(0) = task.frameCount
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        If standalone Or task.intermediateReview = caller Then memMapValues(0) = task.frameCount
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
     End Sub
@@ -146,7 +146,7 @@ Public Class Python_SurfaceBlit
         pipe = New NamedPipeServerStream(pipeName, PipeDirection.InOut)
         PipeTaskIndex += 1
 
-        ocvb.pythonTaskName = task.parms.homeDir + "VB_Classes/Python_SurfaceBlit.py"
+        task.pythonTaskName = task.parms.homeDir + "VB_Classes/Python_SurfaceBlit.py"
         memMap = New Python_MemMap()
 
         If task.parms.externalPythonInvocation Then
@@ -158,7 +158,7 @@ Public Class Python_SurfaceBlit
         task.desc = "Stream data to Python_SurfaceBlit Python script."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If PythonReady Then
             For i = 0 To memMap.memMapValues.Length - 1
                 memMap.memMapValues(i) = Choose(i + 1, task.frameCount, src.Total * src.ElemSize, 0, src.Rows, src.Cols)
@@ -173,11 +173,11 @@ Public Class Python_SurfaceBlit
                 On Error Resume Next
                 pipe.Write(rgbBuffer, 0, rgbBuffer.Length)
             End If
-            ocvb.trueText("Blit works fine when here (Python_SurfaceBlit) but the same operation in Python_SurfaceBlit_PS.py fails." + vbCrLf +
+            task.trueText("Blit works fine when here (Python_SurfaceBlit) but the same operation in Python_SurfaceBlit_PS.py fails." + vbCrLf +
                           "The callback in the PyStream interface does not allow the SurfaceBlit API to work." + vbCrLf +
                           "See 'Python_SurfaceBlit.py' to see how the surfaceBlit works then review Python_SurfaceBlit_PS.py failure.")
         Else
-            ocvb.trueText("Python is not available")
+            task.trueText("Python is not available")
         End If
     End Sub
 End Class
@@ -208,8 +208,8 @@ Public Class Python_Stream
         PipeTaskIndex += 1
 
         ' Was this class invoked standalone?  Then just run something that works with RGB and depth...
-        If ocvb.pythonTaskName.EndsWith("Python_Stream") Then
-            ocvb.pythonTaskName = task.parms.homeDir + "VB_Classes/Python_Stream_PS.py"
+        If task.pythonTaskName.EndsWith("Python_Stream") Then
+            task.pythonTaskName = task.parms.homeDir + "VB_Classes/Python_Stream_PS.py"
         End If
 
         memMap = New Python_MemMap()
@@ -227,7 +227,7 @@ Public Class Python_Stream
         task.desc = "General purpose class to pipe RGB and Depth to Python scripts."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If pythonReady Then
             For i = 0 To memMap.memMapValues.Length - 1
                 memMap.memMapValues(i) = Choose(i + 1, task.frameCount, src.Total * src.ElemSize,

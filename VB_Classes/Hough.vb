@@ -50,7 +50,7 @@ Public Class Hough_Circles
         label2 = "Hough Circles found"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         circles.src = src
         circles.Run()
         dst1 = circles.dst1
@@ -89,7 +89,7 @@ Public Class Hough_Lines
     End Sub
 
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         edges.src = src.Clone()
         edges.Run()
 
@@ -141,7 +141,7 @@ Public Class Hough_Lines_MT
     End Sub
 
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.frameCount = 0 Then
             Static gridWidthSlider = findSlider("ThreadGrid Width")

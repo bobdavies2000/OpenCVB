@@ -25,11 +25,11 @@ Public Class Video_Basics
         task.desc = "Show a video file"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim fileInfo = New FileInfo(task.openFileDialogName)
         If srcVideo <> task.openFileDialogName Then
             If fileInfo.Exists = False Then
-                ocvb.trueText("File not found: " + fileInfo.FullName, 10, 125)
+                task.trueText("File not found: " + fileInfo.FullName, 10, 125)
                 Exit Sub
             End If
             srcVideo = task.openFileDialogName
@@ -69,7 +69,7 @@ Public Class Video_CarCounting
         task.desc = "Count cars in a video file"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         video.Run()
         If video.dst1.Empty() = False And video.image.Empty() = False Then
             dst1.SetTo(0)
@@ -126,7 +126,7 @@ Public Class Video_CarCComp
         task.desc = "Outline cars with a rectangle"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         video.Run()
         If video.dst1.Empty() = False Then
             bgSub.src = video.dst1
@@ -158,7 +158,7 @@ Public Class Video_MinRect
         task.desc = "Find area of car outline - example of using minAreaRect"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         video.Run()
         If video.dst1.Empty() = False Then
             bgSub.src = video.dst1
@@ -166,7 +166,7 @@ Public Class Video_MinRect
 
             contours = cv.Cv2.FindContoursAsArray(bgSub.dst1, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
             dst1 = bgSub.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            If standalone or task.intermediateReview = caller Then
+            If standalone Or task.intermediateReview = caller Then
                 For i = 0 To contours.Length - 1
                     Dim minRect = cv.Cv2.MinAreaRect(contours(i))
                     drawRotatedRectangle(minRect, dst1, cv.Scalar.Red)
@@ -190,7 +190,7 @@ Public Class Video_MinCircle
         task.desc = "Find area of car outline - example of using MinEnclosingCircle"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         video.Run()
         dst1 = video.dst1
         dst2 = video.dst2

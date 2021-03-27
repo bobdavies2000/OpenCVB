@@ -17,7 +17,7 @@ Public Class Entropy_Basics
         task.desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static binSlider = findSlider("Number of Bins")
         simple.bins = binSlider.Value
         simple.run(src)
@@ -63,7 +63,7 @@ Public Class Entropy_Highest
         task.desc = "Find the highest entropy section of the color image."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run()
 
         Dim entropyMap = New cv.Mat(src.Size(), cv.MatType.CV_32F)
@@ -118,7 +118,7 @@ Public Class Entropy_FAST
         task.desc = "Use FAST markings to add to entropy"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         fast.src = src
         fast.Run()
 

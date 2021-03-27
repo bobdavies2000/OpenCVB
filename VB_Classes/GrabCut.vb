@@ -14,7 +14,7 @@ Public Class GrabCut_Basics
         task.desc = "Use grabcut with just a foreground and background definition."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         fgnd.src = src
         fgnd.Run()
         dst1 = fgnd.dst1
@@ -68,7 +68,7 @@ Public Class GrabCut_FineTune
         task.desc = "There are probably mistakes in the initial Grabcut_Basics.  Use the checkbox to fine tune what is background and foreground"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static clearCheck = findRadio("Clear all foreground and background fine tuning")
         If clearCheck.checked Then

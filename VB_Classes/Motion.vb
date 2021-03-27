@@ -30,7 +30,7 @@ Public Class Motion_Basics
         task.desc = "Detect contours in the motion data and the resulting rectangles"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         diff.src = src
         If diff.src.Channels = 3 Then diff.src = diff.src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else diff.src = diff.src.Clone
@@ -114,7 +114,7 @@ Public Class Motion_WithBlurDilate
         task.desc = "Detect contours in the motion data using blur and dilate"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If src.Channels = 3 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = src.Clone
         blur.src = dst1
@@ -184,7 +184,7 @@ Public Class Motion_MinMaxDepth
         task.desc = "While minimizing options and dependencies, use RGB motion to figure out what depth values should change."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim input = src
         If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f.Clone
 
@@ -229,7 +229,7 @@ Public Class Motion_MinMaxPointCloud
         task.desc = "Use the stable depth values to create a stable point cloud"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim input = src.Clone
         If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud
@@ -272,7 +272,7 @@ Public Class Motion_MinMaxDepthColorized
         task.desc = "Colorize the stable depth (keeps Motion_MinMaxDepth at a minimum complexity)"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static saveMin = task.minRangeSlider.Value
         Static saveMax = task.maxRangeSlider.Value
@@ -313,7 +313,7 @@ Public Class Motion_DepthShadow
         task.desc = "Use the motion in the depth shadow to enhance Motion_Basics use of RGB"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         noiseRemover.src = src
         noiseRemover.Run()
 
@@ -355,7 +355,7 @@ Public Class Motion_ThruCorrelation
         task.desc = "Detect motion through the correlation coefficient"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run()
 
         Dim input = src.Clone
@@ -425,7 +425,7 @@ Public Class Motion_CCmerge
         task.desc = "Use the correlation coefficient to maintain an up-to-date image"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount < 10 Then dst1 = src.Clone
 
         motionCC.src = src

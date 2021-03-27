@@ -37,9 +37,9 @@ Public Class MatrixInverse_Basics_CS
         task.desc = "Manually invert a matrix"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         If input.Width <> input.Height Then
-            ocvb.trueText("The src matrix must be square!")
+            task.trueText("The src matrix must be square!")
             Exit Sub
         End If
 
@@ -48,7 +48,7 @@ Public Class MatrixInverse_Basics_CS
         Dim result = matrix.Run(input) ' C# class Run - see MatrixInverse.cs file...
 
         Dim outstr = printMatrixResults(input, result)
-        ocvb.trueText(outstr + vbCrLf + "Intermediate results are optionally available in the console log.")
+        task.trueText(outstr + vbCrLf + "Intermediate results are optionally available in the console log.")
     End Sub
 End Class
 
@@ -67,16 +67,16 @@ Public Class MatrixInverse_OpenCV
         task.desc = "Use OpenCV to invert a matrix"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         If input.Width <> input.Height Then
-            ocvb.trueText("The input matrix must be square!")
+            task.trueText("The input matrix must be square!")
             Exit Sub
         End If
 
         Dim result As New cv.Mat
         cv.Cv2.Invert(input, result, cv.DecompTypes.LU)
         Dim outstr = printMatrixResults(input, result)
-        ocvb.trueText(outstr)
+        task.trueText(outstr)
     End Sub
 End Class
 

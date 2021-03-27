@@ -15,7 +15,7 @@ Public Class Clone_Basics
         task.drawRect = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim mask As New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         If task.drawRect = New cv.Rect Then
             mask.SetTo(255)
@@ -57,7 +57,7 @@ Public Class Clone_ColorChange
         task.desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         clone.cloneSpec = 0
         clone.colorChangeValues = New cv.Point3f(sliders.trackbar(0).Value / 10, sliders.trackbar(1).Value / 10, sliders.trackbar(0).Value / 10)
         clone.Run()
@@ -86,7 +86,7 @@ Public Class Clone_IlluminationChange
         task.desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         clone.cloneSpec = 1
         clone.illuminationChangeValues = New cv.Vec2f(sliders.trackbar(0).Value / 10, sliders.trackbar(1).Value / 10)
         clone.Run()
@@ -116,7 +116,7 @@ Public Class Clone_TextureFlattening
         task.desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         clone.cloneSpec = 2
         clone.textureFlatteningValues = New cv.Vec2f(sliders.trackbar(0).Value, sliders.trackbar(1).Value)
         clone.Run()
@@ -167,7 +167,7 @@ Public Class Clone_Eagle
         task.desc = "Clone an eagle into the video stream."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.Clone()
         If task.mouseClickFlag Then
             pt = task.mouseClickPoint  ' pt corresponds To the center Of the source image.  Roi can't be outside image boundary.
@@ -210,7 +210,7 @@ Public Class Clone_Seamless
         task.desc = "Use the seamlessclone API to merge color and depth..."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim center As New cv.Point(src.Width / 2, src.Height / 2)
         Dim radius = 100
         If task.drawRect = New cv.Rect Then

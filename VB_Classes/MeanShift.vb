@@ -12,7 +12,7 @@ Public Class MeanShift_Basics
         task.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track.  Tracker Algorithm"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then usingDrawRect = True
         If usingDrawRect Then inputRect = task.drawRect
         If inputRect.X + inputRect.Width > src.Width Then inputRect.Width = src.Width - inputRect.X
@@ -58,7 +58,7 @@ Public Class MeanShift_Depth
         task.desc = "Use depth to start mean shift algorithm.  Tracker Algorithm"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.drawRect.Width > 0 Then
             ms.usingDrawRect = True
             ms.inputRect = New cv.Rect
@@ -101,7 +101,7 @@ Public Class MeanShift_PyrFilter
         task.desc = "Use PyrMeanShiftFiltering to segment an image."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim spatialRadius = sliders.trackbar(0).Value
         Dim colorRadius = sliders.trackbar(1).Value
         Dim maxPyrLevel = sliders.trackbar(2).Value
@@ -138,7 +138,7 @@ Public Class Meanshift_TopObjects
         task.desc = "Track - tracking algorithm"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         blob.src = src
         blob.Run()
 

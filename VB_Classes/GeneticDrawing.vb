@@ -29,8 +29,8 @@ Public Class GeneticDrawing_Options
         task.desc = "Display all the options available to genetic drawing algorithms."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        ocvb.trueText("There is no output for this algorithm - just controls showing the genetic drawing options")
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        task.trueText("There is no output for this algorithm - just controls showing the genetic drawing options")
     End Sub
 End Class
 
@@ -151,7 +151,7 @@ Public Class GeneticDrawing_Basics
         totalError = calculateError(mats.mat(3))
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static genSlider = findSlider("Number of Generations")
         Static stageSlider = findSlider("Number of Stages")
@@ -266,7 +266,7 @@ Public Class GeneticDrawing_Color
         task.desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes. Painterly"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim split() As cv.Mat
         split = src.Split()
 
@@ -314,7 +314,7 @@ Public Class GeneticDrawing_Photo
         task.desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes. Painterly"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If inputFileName <> task.openFileDialogName Or task.frameCount = 0 Then
             Dim fileinfo = New FileInfo(task.openFileDialogName)

@@ -28,7 +28,7 @@ Public Class Histogram_Basics
         task.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static splitIndex = -1
         Static colorName As String
         If standalone Or task.intermediateReview = caller Then
@@ -105,7 +105,7 @@ Public Class Histogram_Graph
         task.desc = "Plot histograms for up to 3 channels."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static histBinSlider = findSlider("Histogram Bins")
         bins = histBinSlider.Value
 
@@ -241,7 +241,7 @@ Public Class Histogram_NormalizeGray
         task.desc = "Create a histogram of a normalized image"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         histogram.src = src
         If check.Box(0).Checked Then
             cv.Cv2.Normalize(histogram.src, histogram.src, sliders.trackbar(0).Value, sliders.trackbar(1).Value, cv.NormTypes.MinMax) ' only minMax is working...
@@ -272,7 +272,7 @@ Public Class Histogram_2D_HueSaturation
         task.desc = "Create a histogram for hue and saturation."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         hsv = src.CvtColor(cv.ColorConversionCodes.RGB2HSV)
         Dim hbins = sliders.trackbar(0).Value
         Dim sbins = sliders.trackbar(1).Value
@@ -306,7 +306,7 @@ Public Class Histogram_Depth
         task.desc = "Show depth data as a histogram."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         inrange.src = src
         If inrange.src.Type = cv.MatType.CV_32F Then
@@ -358,7 +358,7 @@ Public Class Histogram_2D_XZ_YZ
         label2 = "Left is XZ (Top View) and Right is YZ (Side View)"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim xbins = sliders.trackbar(0).Value
         Dim ybins = sliders.trackbar(1).Value
         Dim zbins = sliders.trackbar(2).Value
@@ -410,7 +410,7 @@ Public Class Histogram_EqualizeColor
         label1 = "Image Enhanced with Equalized Histogram"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim rgb(2) As cv.Mat
         Dim rgbEq(2) As cv.Mat
@@ -461,7 +461,7 @@ Public Class Histogram_EqualizeGray
         task.desc = "Create an equalized histogram of the grayscale image."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static binSlider = findSlider("Histogram Bins")
         Static eqCheckBox = findCheckBox("Turn Kalman filtering on")
@@ -507,7 +507,7 @@ Public Class Histogram_Equalize255
         task.desc = "Reproduce the results of the hist.py example with existing algorithms"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         For i = 0 To 3 - 1
             If radio.check(i).Checked Then eqHist.channel = i
         Next
@@ -537,7 +537,7 @@ Public Class Histogram_Simple
         task.desc = "Build a simple and reusable histogram for grayscale images."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         plotHist.bins = sliders.trackbar(0).Value
 
@@ -589,7 +589,7 @@ Public Class Histogram_ColorsAndGray
         task.desc = "Create a histogram of a normalized image"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim split = src.Split()
         ReDim Preserve split(4 - 1)
         split(4 - 1) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) ' add a 4th image - the grayscale image to the R G and B images.
@@ -629,7 +629,7 @@ Public Class Histogram_BackProjectionPeak
         label2 = "Grayscale Histogram"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.src = input
@@ -677,7 +677,7 @@ Public Class Histogram_BackProjection2D
         label2 = "Backprojection of detected hue and saturation."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         hist.src = src
         hist.Run()
         dst1 = hist.dst1
@@ -740,7 +740,7 @@ Public Class Histogram_HueSaturation2DPlot
         task.desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         hueSat.src = src
         hueSat.Run()
         mats.mat(0) = hueSat.dst1
@@ -794,7 +794,7 @@ Public Class Histogram_TopData
     End Sub
 
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         gCloud.Run()
 
         Static minSlider = findSlider("X scale negative value in meters (meterMin) X100")
@@ -842,7 +842,7 @@ Public Class Histogram_SideData
         task.desc = "Create a 2D side view for ZY histogram of depth in meters - NOTE: x and y scales differ!"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         gCloud.Run()
 
         Static minSlider = findSlider("Y scale negative value in meters (meterMin) X100")
@@ -884,7 +884,7 @@ Public Class Histogram_SmoothTopView2D
         task.desc = "Create a 2D top view with stable depth data."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         topView.gCloud.Run()
 
         stable.src = topView.gCloud.dst1
@@ -928,7 +928,7 @@ Public Class Histogram_SmoothSideView2D
         task.desc = "Create a 2D side view of stable depth data"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         sideView.gCloud.Run()
 
         stable.src = sideView.gCloud.dst1
@@ -964,7 +964,7 @@ Public Class Histogram_DepthClusters
         task.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If src.Type <> cv.MatType.CV_32F Then src = task.depth32f.Clone
 
@@ -1010,7 +1010,7 @@ Public Class Histogram_StableDepthClusters
         task.desc = "Use the stable depth to identify the depth_clusters using histogram valleys"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         motionSD.Run()
         clusters.src = motionSD.dst1
         clusters.Run()
@@ -1072,7 +1072,7 @@ Public Class Histogram_DepthValleys
         task.desc = "Identify valleys in the Depth histogram."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         hist.src = src
         If hist.src.Type <> cv.MatType.CV_32F Then hist.src = task.depth32f
         hist.Run()
@@ -1166,7 +1166,7 @@ Public Class Histogram_TopView2D
         task.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Then task.viewOptions.run()
 
         gCloud.src = src
@@ -1219,7 +1219,7 @@ Public Class Histogram_SideView2D
         task.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Then task.viewOptions.run()
 
         gCloud.src = src
@@ -1267,7 +1267,7 @@ Public Class Histogram_BackProjectionGrayscale
         task.desc = "Explore Backprojection of each element of a grayscale histogram."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         hist.src = src
         hist.Run()
         dst1 = hist.dst1
@@ -1305,7 +1305,7 @@ Public Class Histogram_ViewIntersections
         task.desc = "Find the intersections of the rectangles found in the Histogram_ConcentrationObjects"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         histCO.Run()
         dst1 = histCO.dst2
@@ -1343,7 +1343,7 @@ Public Class Histogram_ViewIntersections
             dst1.Rectangle(rIntersect(maxIndex), cv.Scalar.Yellow, 2)
             minZ = task.maxZ * (h - rIntersect(maxIndex).Y - rIntersect(maxIndex).Height) / h
             maxZ = task.maxZ * (h - rIntersect(maxIndex).Y) / h
-            ocvb.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", rIntersect(maxIndex).X, rIntersect(maxIndex).Y - offset)
+            task.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", rIntersect(maxIndex).X, rIntersect(maxIndex).Y - offset)
 
             Dim pc = histCO.histC.sideview.gCloud.dst1
             Dim split = pc.Split()
@@ -1398,7 +1398,7 @@ Public Class Histogram_ViewObjects
         task.desc = "Use the histogram concentrations to identify objects in the field of view"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         histC.Run()
 
@@ -1420,7 +1420,7 @@ Public Class Histogram_ViewObjects
             dst1.Rectangle(r, cv.Scalar.White, 1)
             minZ = task.maxZ * r.X / w
             maxZ = task.maxZ * (r.X + r.Width) / w
-            If standalone Or task.intermediateReview = caller Then ocvb.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset)
+            If standalone Or task.intermediateReview = caller Then task.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset)
         Next
         label1 = CStr(flood.rects.Count) + " objects were identified in the side view"
 
@@ -1434,7 +1434,7 @@ Public Class Histogram_ViewObjects
             dst2.Rectangle(r, cv.Scalar.White, 1)
             minZ = task.maxZ * (h - r.Y - r.Height) / h
             maxZ = task.maxZ * (h - r.Y) / h
-            If standalone Or task.intermediateReview = caller Then ocvb.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset, 3)
+            If standalone Or task.intermediateReview = caller Then task.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset, 3)
         Next
 
         label2 = CStr(flood.rects.Count) + " objects identified.  Largest is yellow."
@@ -1463,7 +1463,7 @@ Public Class Histogram_SmoothConcentration
         task.desc = "Using stable depth data, highlight the histogram projections where concentrations are highest"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         sideview.Run()
         dst1 = sideview.dst1
         Dim noDepth = sideview.sideView.histOutput.Get(Of Single)(sideview.sideView.histOutput.Height / 2, 0)
@@ -1513,7 +1513,7 @@ Public Class Histogram_ViewConcentrationsTopX
         Static cThresholdSlider = findSlider("Concentration Threshold")
         Dim concentrationThreshold = cThresholdSlider.Value
 
-        Dim minPixel = CInt(resizeFactor * task.minRangeSlider.Value * ocvb.pixelsPerMeter / 1000)
+        Dim minPixel = CInt(resizeFactor * task.minRangeSlider.Value * task.pixelsPerMeter / 1000)
 
         Dim tmp = histOutput.Resize(New cv.Size(CInt(histOutput.Width * resizeFactor), CInt(histOutput.Height * resizeFactor)))
         Dim pts As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
@@ -1538,7 +1538,7 @@ Public Class Histogram_ViewConcentrationsTopX
         Return CStr(pts.Count) + " highlights. Max=" + CStr(maxConcentration)
     End Function
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         sideview.Run()
         dst1 = sideview.dst1
         Dim noDepth = sideview.histOutput.Get(Of Single)(sideview.histOutput.Height / 2, 0)

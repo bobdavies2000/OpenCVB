@@ -55,7 +55,7 @@ Public Class Smoothing_Exterior
 		task.desc = "Smoothing the line connecting a series of points."
 	End Sub
 	Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
 		If standalone Or task.intermediateReview = caller Then
 			If task.frameCount Mod 30 Then Exit Sub
 
@@ -140,7 +140,7 @@ Public Class Smoothing_Interior
 		task.desc = "Smoothing the line connecting a series of points staying inside the outline."
 	End Sub
 	Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
 		If standalone or task.intermediateReview = caller Then
 			If task.frameCount Mod 30 Then Exit Sub
 
@@ -192,7 +192,7 @@ Public Class Smoothing_Contours
 		task.desc = "Use Smoothing exterior or interior to get a smoother representation of a contour"
 	End Sub
 	Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
 		outline.Run()
 
 		Dim stepsize = sliders.trackbar(0).Value

@@ -9,7 +9,7 @@ Public Class Fourier_MathNet
         task.desc = "Use the 1D Fourier support in MathNet to do a 2D Fourier transform"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

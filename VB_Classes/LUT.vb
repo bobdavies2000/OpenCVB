@@ -13,7 +13,7 @@ Public Class LUT_Basics
         task.desc = "Use a palette to provide the lookup table for LUT - Painterly Effect"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone or task.intermediateReview = caller Then
             reduction.src = src
@@ -46,7 +46,7 @@ Public Class LUT_Simple
         task.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         reduction.src = src
         reduction.Run()
         dst1 = reduction.dst1.LUT(colorMat)
@@ -80,7 +80,7 @@ Public Class LUT_Gray
         task.desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         sliders.sLabels(0).Text = "LUT zero through " + CStr(sliders.trackbar(0).Value)
         sliders.sLabels(1).Text = "LUT " + CStr(sliders.trackbar(0).Value) + " through " + CStr(sliders.trackbar(1).Value)
         sliders.sLabels(2).Text = "LUT " + CStr(sliders.trackbar(1).Value) + " through " + CStr(sliders.trackbar(2).Value)
@@ -119,7 +119,7 @@ Public Class LUT_Color
         task.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim reduction = sliders.trackbar(0).Value
         If standalone or task.intermediateReview = caller Then
             src /= reduction
@@ -146,7 +146,7 @@ Public Class LUT_Rebuild
         task.desc = "Rebuild any grayscale image with a 256 element Look-Up Table"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim lut = New cv.Mat(1, 256, cv.MatType.CV_8U, paletteMap)
         dst1 = src.LUT(lut)
         If standalone or task.intermediateReview = caller Then dst2 = lut.Resize(src.Size())

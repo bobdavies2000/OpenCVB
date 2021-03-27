@@ -241,9 +241,9 @@ Public Class Puzzle_Basics
         Shuffle = collection.OrderBy(Function(a) r.Next()).ToList()
     End Function
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static width As integer
-        Static height As integer
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        Static width As Integer
+        Static height As Integer
         If width <> gridWidthSlider.Value Or height <> gridHeightSlider.Value Or task.frameCount = 0 Or restartRequested Then
             restartRequested = False
             grid.Run()
@@ -313,10 +313,10 @@ Public Class Puzzle_Solver
         Return bfit
     End Function
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If src.Width = 640 Then
-            ocvb.trueText("This algorithm was not setup to work at 640x480.  It works only at 1280x720")
+            task.trueText("This algorithm was not setup to work at 640x480.  It works only at 1280x720")
             Exit Sub
         End If
         If task.frameCount = 0 Then

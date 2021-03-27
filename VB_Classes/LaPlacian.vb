@@ -13,7 +13,7 @@ Public Class Laplacian_Basics
         task.desc = "Laplacian filter - the second derivative."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim kernelSize = sliders.trackbar(0).Value()
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         Dim scale = sliders.trackbar(1).Value / 100
@@ -53,7 +53,7 @@ Public Class Laplacian_Blur
         task.desc = "Laplacian filter - the second derivative - with different bluring techniques"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim kernelSize = sliders.trackbar(0).Value()
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         Dim scale = sliders.trackbar(1).Value / 100
@@ -99,7 +99,7 @@ Public Class Laplacian_PyramidFilter
         task.desc = "VB.Net version of the Laplacian Pyramid Filter - see reference."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim levelMat(sliders.trackbar.Length - 1) As cv.Mat
         Dim img As New cv.Mat
         src.ConvertTo(img, cv.MatType.CV_32F)

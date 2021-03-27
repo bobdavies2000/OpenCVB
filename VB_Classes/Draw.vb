@@ -56,7 +56,7 @@ Public Class Draw_Noise
         task.desc = "Add Noise to the color image"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         maxNoiseWidth = sliders.trackbar(1).Value
         src.CopyTo(dst1)
         noiseMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1).SetTo(0)
@@ -90,7 +90,7 @@ Public Class Draw_Ellipses
         task.desc = "Draw the requested number of ellipses."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.Black)
             For i = 0 To sliders.trackbar(0).Value - 1
@@ -118,7 +118,7 @@ Public Class Draw_Circles
         task.desc = "Draw the requested number of circles."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.Black)
             For i = 0 To sliders.trackbar(0).Value - 1
@@ -145,7 +145,7 @@ Public Class Draw_Line
         task.desc = "Draw the requested number of Lines."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod updateFrequency Then Exit Sub
         dst1.SetTo(cv.Scalar.Black)
         For i = 0 To sliders.trackbar(0).Value - 1
@@ -179,7 +179,7 @@ Public Class Draw_Polygon
         End If
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim height = src.Height / 8
         Dim width = src.Width / 8
         Dim polyColor = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
@@ -228,7 +228,7 @@ Public Class Draw_Shapes
         task.desc = "Use RNG to draw the same set of shapes every time"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim offsetX = 50, offsetY = 25, lineLength = 50, thickness = 2
 
         dst1.SetTo(cv.Scalar.White)
@@ -286,7 +286,7 @@ Public Class Draw_SymmetricalShapes
         task.desc = "Generate shapes programmatically"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static rotateAngle As Single = 0
         Static fillColor = cv.Scalar.Red
         If check.Box(4).Checked Then
@@ -389,7 +389,7 @@ Public Class Draw_Arc
         kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If kalman.check.Box(0).Checked Then
             kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
             kalman.Run()
@@ -441,9 +441,9 @@ Public Class Draw_ViewObjects
         task.desc = "Draw rectangles and centroids"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then
-            ocvb.trueText("Draw_ViewObjects has no standalone version." + vbCrLf + "It just draws rectangles and centroids for other algorithms.")
+            task.trueText("Draw_ViewObjects has no standalone version." + vbCrLf + "It just draws rectangles and centroids for other algorithms.")
         Else
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             Dim incr = If(viewObjects.Count < 10, 25, 255 / viewObjects.Count)  'reduces flicker of slightly different colors when < 10
@@ -491,7 +491,7 @@ Public Class Draw_Frustrum
         task.desc = "Draw a frustrum for a camera viewport"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = New cv.Mat(task.pointCloud.Height, task.pointCloud.Height, cv.MatType.CV_32F, 0)
         Dim mid = task.pointCloud.Height / 2
         Dim zIncr = task.maxZ / mid
@@ -535,7 +535,7 @@ Public Class Draw_ClipLine
         task.desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst2 = src
         kalman.kInput = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
         kalman.Run()
@@ -556,7 +556,7 @@ Public Class Draw_ClipLine
 
         Static hitCount = 0
         hitCount += If(clipped, 1, 0)
-        ocvb.trueText("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
+        task.trueText("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
                      CInt(src.Width / 2), 200)
         If r = rect Then setup()
         flow.Run()
@@ -582,7 +582,7 @@ Public Class Draw_Intersection
         task.desc = "Determine if 2 lines intersect"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then
             If task.frameCount Mod 100 <> 0 Then Exit Sub
             p1 = New cv.Point(Rnd() * src.Width, Rnd() * src.Height)
@@ -634,6 +634,6 @@ Public Class Draw_Hexagon
         task.desc = "What it means to recognize a cube.  Zygmunt Pizlo UC Irvine"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
     End Sub
 End Class

@@ -10,7 +10,7 @@ Public Class KAZE_KeypointsKAZE_CS
         label1 = "KAZE key points"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         CS_Kaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         src.CopyTo(dst1)
         For i = 0 To CS_Kaze.kazeKeyPoints.Count - 1
@@ -31,7 +31,7 @@ Public Class KAZE_KeypointsAKAZE_CS
         label1 = "AKAZE key points"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         CS_AKaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         src.CopyTo(dst1)
         For i = 0 To CS_AKaze.akazeKeyPoints.Count - 1
@@ -54,7 +54,7 @@ Public Class KAZE_Sample_CS
         task.desc = "Match keypoints in 2 photos."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim result = CS_Kaze.Run(box, box_in_scene)
         dst1 = result.Resize(src.Size())
     End Sub
@@ -73,7 +73,7 @@ Public Class KAZE_Match_CS
         task.desc = "Match keypoints in the left and right images."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         red.Run()
         dst1 = red.dst1
         dst2 = red.dst2
@@ -101,7 +101,7 @@ Public Class KAZE_LeftAligned_CS
         task.desc = "Match keypoints in the left and right images but display it as movement in the right image."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         CS_KazeLeft.GetKeypoints(task.leftView)
         CS_KazeRight.GetKeypoints(task.rightView)
 

@@ -78,20 +78,20 @@ Public Class OpenGL_Basics
         pipe.WaitForConnection()
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Or pointCloudInput Is Nothing Then
             src = src
             pointCloudInput = task.pointCloud
         End If
 
-        If task.noDepthMask.width = pointCloudInput.Width Then pointCloudInput.SetTo(0, task.noDepthMask)
+        If task.noDepthMask.Width = pointCloudInput.Width Then pointCloudInput.SetTo(0, task.noDepthMask)
 
         Dim pcSize = pointCloudInput.Total * pointCloudInput.ElemSize
         If task.frameCount = 0 Then startOpenGLWindow()
         Dim readPipe(4) As Byte ' we read 4 bytes because that is the signal that the other end of the named pipe wrote 4 bytes to indicate iteration complete.
         If task.frameCount > 0 And pipe IsNot Nothing Then
             Dim bytesRead = pipe.Read(readPipe, 0, 4)
-            If bytesRead = 0 Then ocvb.trueText("The OpenGL process appears to have stopped.", 20, 100)
+            If bytesRead = 0 Then task.trueText("The OpenGL process appears to have stopped.", 20, 100)
         End If
 
         Dim rgb = src.CvtColor(cv.ColorConversionCodes.BGR2RGB) ' OpenGL needs RGB, not BGR
@@ -170,7 +170,7 @@ Public Class OpenGL_Options
         label1 = ""
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         OpenGL.FOV = sliders.trackbar(0).Value
         OpenGL.yaw = sliders.trackbar(1).Value
@@ -211,7 +211,7 @@ Public Class OpenGL_Callbacks
         task.desc = "Show the point cloud of 3D data and use callbacks to modify view."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         ogl.src = src
         If standalone Then pointCloudInput = task.pointCloud
         ogl.pointCloudInput = pointCloudInput
@@ -240,14 +240,14 @@ Public Class OpenGL_IMU
         task.desc = "Show how to use IMU coordinates in OpenGL"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.IMU_Present Then
             imu.Run()
             ogl.OpenGL.dataInput = New cv.Mat(100, 100, cv.MatType.CV_32F, 0)
             ogl.src = src
             ogl.Run() ' we are not moving any images to OpenGL - just the IMU value which are already in the memory mapped file.
         Else
-            ocvb.trueText("The IMU is not working or is unavailable")
+            task.trueText("The IMU is not working or is unavailable")
         End If
     End Sub
 End Class
@@ -286,7 +286,7 @@ Public Class OpenGL_3Ddata
         task.desc = "Plot the results of a 3D histogram in OpenGL."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim bins = sliders.trackbar(0).Value
 
         If histInput Is Nothing Then ReDim histInput(src.Total * src.ElemSize - 1)
@@ -330,7 +330,7 @@ Public Class OpenGL_Draw3D
         task.desc = "Draw in an image show it in 3D in OpenGL without any explicit math"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         circle.Run()
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ogl.OpenGL.dataInput = dst2
@@ -357,7 +357,7 @@ Public Class OpenGL_Voxels
         task.desc = "Show the voxel representation in OpenGL"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         voxels.src = src
         voxels.Run()
         Static intermediateResults = findCheckBox("Display intermediate results")
@@ -394,7 +394,7 @@ Public Class OpenGL_GravityTransform
         task.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.IMU_Present Then
             gCloud.src = task.pointCloud
             gCloud.Run()
@@ -403,7 +403,7 @@ Public Class OpenGL_GravityTransform
             ogl.src = src
             ogl.Run()
         Else
-            ocvb.trueText("The IMU is not working or is unavailable")
+            task.trueText("The IMU is not working or is unavailable")
         End If
     End Sub
 End Class
@@ -427,7 +427,7 @@ Public Class OpenGL_Floor
         task.desc = "Convert depth cloud floor to a plane and visualize it with OpenGL"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.parms.IMU_Present Then
             plane.Run()
@@ -438,7 +438,7 @@ Public Class OpenGL_Floor
             ogl.src = src
             ogl.Run()
         Else
-            ocvb.trueText("The IMU is not working or is unavailable")
+            task.trueText("The IMU is not working or is unavailable")
         End If
     End Sub
 End Class
@@ -462,7 +462,7 @@ Public Class OpenGL_FloorPlane
         task.desc = "Show the floor in the pointcloud as a plane"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.parms.IMU_Present Then
             plane.Run()
@@ -480,7 +480,7 @@ Public Class OpenGL_FloorPlane
             ogl.src = src
             ogl.Run()
         Else
-            ocvb.trueText("The IMU is not working or is unavailable")
+            task.trueText("The IMU is not working or is unavailable")
         End If
     End Sub
 End Class
@@ -505,7 +505,7 @@ Public Class OpenGL_FloorTexture
         task.desc = "Texture the plane of the floor with a good sample of the texture from the mask"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.parms.IMU_Present Then
             floor.plane.Run()
@@ -527,7 +527,7 @@ Public Class OpenGL_FloorTexture
             floor.ogl.src = src
             floor.ogl.Run()
         Else
-            ocvb.trueText("The IMU is not working or not available.")
+            task.trueText("The IMU is not working or not available.")
         End If
     End Sub
 End Class
@@ -552,7 +552,7 @@ Public Class OpenGL_DepthSliceH
         task.desc = "View depth slices in 3D with OpenGL"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         slices.Run()
         dst1 = slices.dst1
         Dim mask As New cv.Mat
@@ -585,7 +585,7 @@ Public Class OpenGL_StableDepth
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         pcValid.Run()
         dst1 = pcValid.dst1
@@ -615,7 +615,7 @@ Public Class OpenGL_AverageDepth
         task.desc = "Use the depth_stabilizer output as input the an OpenGL display"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim split = task.pointCloud.Split()
 
@@ -654,7 +654,7 @@ Public Class OpenGL_StableDepthMouse
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         pcValid.Run()
         dst1 = pcValid.dst1
@@ -685,7 +685,7 @@ Public Class OpenGL_SmoothSurfaces
         task.desc = "Filter the 3D image to show only smooth surfaces."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         smooth.Run()
         dst1 = smooth.dst2
@@ -714,7 +714,7 @@ Public Class OpenGL_Stable
         task.desc = "Use the Motion_MinMaxPointCloud in 3D"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         stable.Run()
         dst1 = stable.dst1
@@ -745,7 +745,7 @@ Public Class OpenGL_ReducedXYZ
         task.desc = "Display the pointCloud after reduction in X, Y, or Z dimensions."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         reduction.Run()
         dst2 = reduction.dst2
 
@@ -773,7 +773,7 @@ Public Class OpenGL_Reduced
         task.desc = "Use the reduced depth pointcloud in OpenGL"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         reduction.Run()
         dst1 = reduction.dst1
         dst2 = reduction.dst2
@@ -801,7 +801,7 @@ Public Class OpenGL_ReducedSideView
         task.desc = "Use the reduced depth pointcloud in 3D but allow it to be rotated in Options_Common"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         reduced.Run()
         dst1 = reduced.dst1
@@ -831,7 +831,7 @@ Public Class OpenGL_MFD_PointCloud
         task.desc = "Use the MFD_PointCloud in 3D"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         mfd.Run()
         dst1 = mfd.dst1
@@ -864,7 +864,7 @@ Public Class OpenGL_Structured_PointCloud
         task.desc = "Visualize the Structured_Cloud"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         sCloud.Run()
         dst1 = sCloud.dst1

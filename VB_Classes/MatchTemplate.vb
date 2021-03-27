@@ -45,7 +45,7 @@ Public Class MatchTemplate_Basics
         Return matchOption
     End Function
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static sampleSlider = findSlider("Sample Size")
         If standalone Or task.intermediateReview = caller Then
             searchArea = New cv.Mat(New cv.Size(CInt(sampleSlider.Value), 1), cv.MatType.CV_32FC1)
@@ -84,7 +84,7 @@ Public Class MatchTemplate_RowCorrelation
         task.desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim line1 = msRNG.Next(0, src.Height - 1)
         Dim line2 = msRNG.Next(0, src.Height - 1)
 
@@ -132,7 +132,7 @@ Public Class MatchTemplate_DrawRect
         task.desc = "Find the requested template in an image.  Tracker Algorithm"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then Exit Sub
         If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
             If task.drawRect.X + task.drawRect.Width >= src.Width Then task.drawRect.Width = src.Width - task.drawRect.X
@@ -191,7 +191,7 @@ Public Class MatchTemplate_BestEntropy_MT
         task.desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate.  Tracker Algorithm"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod 30 = 0 Then
             entropy.src = src
             entropy.Run()
@@ -237,7 +237,7 @@ Public Class MatchTemplate_Movement
         task.desc = "Assign each segment a correlation coefficient and stdev to the previous frame"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim fsize = task.fontSize / 3
 
         grid.Run()

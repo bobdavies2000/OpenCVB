@@ -52,7 +52,7 @@ Public Class Contours_Basics
         Next
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         setOptions()
         Static dontchange As Boolean
         If task.mouseClickFlag And dontchange Then
@@ -146,7 +146,7 @@ Public Class Contours_RGB
         label2 = "Background"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim img = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         img.SetTo(0, task.noDepthMask)
 
@@ -199,7 +199,7 @@ Public Class Contours_RemoveLines
         task.desc = "Remove the lines from an invoice image"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim tmp = cv.Cv2.ImRead(task.parms.homeDir + "Data/invoice.jpg")
         Dim dstSize = New cv.Size(src.Height / tmp.Height * src.Width, src.Height)
         Dim dstRect = New cv.Rect(0, 0, dstSize.Width, src.Height)
@@ -243,10 +243,10 @@ Public Class Contours_Depth
         label2 = "DepthContour output"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = task.noDepthMask
         dst2.SetTo(0)
-        Dim input As cv.Mat = task.depthmask
+        Dim input As cv.Mat = task.depthMask
         Dim contours0 = cv.Cv2.FindContoursAsArray(input, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
         Dim maxIndex As Integer
         Dim maxNodes As Integer
@@ -291,7 +291,7 @@ Public Class Contours_Prediction
         task.desc = "Predict the next contour point with Kalman to smooth the outline"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         outline.Run()
         dst1 = outline.dst2
         dst2.SetTo(0)
@@ -333,7 +333,7 @@ Public Class Contours_FindandDraw
         task.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         rotatedRect.src = src
         rotatedRect.Run()
         dst1 = rotatedRect.dst1
@@ -378,7 +378,7 @@ Public Class Contours_Binarized
         task.desc = "Find contours using Edges after image is binarized"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         sobel.src = src
         sobel.Run()
         dst1 = sobel.dst1

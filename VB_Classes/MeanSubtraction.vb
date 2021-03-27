@@ -11,7 +11,7 @@ Public Class MeanSubtraction_Basics
         task.desc = "Subtract the mean from the image with a scaling factor"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim mean = cv.Cv2.Mean(src)
         cv.Cv2.Subtract(mean, src, dst1)
         Dim scalingFactor = sliders.trackbar(0).Value / 100

@@ -17,7 +17,7 @@ Public Class IMU_Basics
         task.desc = "Read and display the IMU coordinates"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim alpha As Double = sliders.trackbar(0).Value / 1000
         If task.frameCount = 0 Then
             lastTimeStamp = task.IMU_TimeStamp
@@ -42,7 +42,7 @@ Public Class IMU_Basics
             theta.X = theta.X * alpha + accelAngle.X * (1 - alpha)
             theta.Z = theta.Z * alpha + accelAngle.Z * (1 - alpha)
         End If
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             flow.msgs.Add("ts = " + Format(task.IMU_TimeStamp, "#0.00") + " Acceleration (m/sec^2) x = " + Format(task.IMU_Acceleration.X, "#0.00") +
                                   " y = " + Format(task.IMU_Acceleration.Y, "#0.00") + " z = " + Format(task.IMU_Acceleration.Z, "#0.00") + vbTab +
                                   " Motion (rads/sec) pitch = " + Format(task.IMU_AngularVelocity.X, "#0.00") +
@@ -70,7 +70,7 @@ Public Class IMU_Stabilizer
         label2 = "Difference from Color Image"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim borderCrop = 5
         Dim vert_Border = borderCrop * src.Rows / src.Cols
         Dim dx = task.IMU_AngularVelocity.X
@@ -100,7 +100,7 @@ Public Class IMU_Stabilizer
 
         dst1(New cv.Rect(10, 95, 50, 50)).SetTo(0)
         Dim Text = "dx = " + Format(dx, "#0.00") + vbNewLine + "dy = " + Format(dy, "#0.00") + vbNewLine + "da = " + Format(da, "#0.00")
-        ocvb.trueText(Text)
+        task.trueText(Text)
     End Sub
 End Class
 
@@ -122,11 +122,11 @@ Public Class IMU_Magnetometer
         task.desc = "Get the IMU_Magnetometer values from the IMU (if available)"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.IMU_Magnetometer = New cv.Point3f Then
-            ocvb.trueText("The IMU for this camera does not have Magnetometer readings.")
+            task.trueText("The IMU for this camera does not have Magnetometer readings.")
         Else
-            ocvb.trueText("Uncalibrated IMU Magnetometer reading:  x = " + CStr(task.IMU_Magnetometer.X) + vbCrLf +
+            task.trueText("Uncalibrated IMU Magnetometer reading:  x = " + CStr(task.IMU_Magnetometer.X) + vbCrLf +
                                                   "Uncalibrated IMU Magnetometer reading:  y = " + CStr(task.IMU_Magnetometer.Y) + vbCrLf +
                                                   "Uncalibrated IMU Magnetometer reading:  z = " + CStr(task.IMU_Magnetometer.Z))
             plot.plotData = New cv.Scalar(task.IMU_Magnetometer.X, task.IMU_Magnetometer.Y, task.IMU_Magnetometer.Z)
@@ -147,11 +147,11 @@ Public Class IMU_Barometer
         task.desc = "Get the barometric pressure from the IMU (if available)"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.IMU_Barometer = 0 Then
-            ocvb.trueText("The IMU for this camera does not have barometric pressure.")
+            task.trueText("The IMU for this camera does not have barometric pressure.")
         Else
-            ocvb.trueText("Barometric pressure is " + CStr(task.IMU_Barometer) + " hectopascal." + vbCrLf +
+            task.trueText("Barometric pressure is " + CStr(task.IMU_Barometer) + " hectopascal." + vbCrLf +
                                                   "Barometric pressure is " + Format(task.IMU_Barometer * 0.02953, "#0.00") + " inches of mercury.")
         End If
     End Sub
@@ -167,8 +167,8 @@ Public Class IMU_Temperature
         task.desc = "Get the temperature of the IMU (if available)"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        ocvb.trueText("IMU Temperature is " + Format(task.IMU_Temperature, "#0.00") + " degrees Celsius." + vbCrLf +
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        task.trueText("IMU Temperature is " + Format(task.IMU_Temperature, "#0.00") + " degrees Celsius." + vbCrLf +
                       "IMU Temperature is " + Format(task.IMU_Temperature * 9 / 5 + 32, "#0.00") + " degrees Fahrenheit.")
     End Sub
 End Class
@@ -199,7 +199,7 @@ Public Class IMU_FrameTime
         task.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static IMUanchor As Integer = task.IMU_FrameTime
         Static histogramIMU(plot.maxScale) As Integer
 
@@ -213,7 +213,7 @@ Public Class IMU_FrameTime
             Static allZeroCount As Integer
             allZeroCount += 1
             If allZeroCount > 20 Then
-                ocvb.trueText("Is IMU present?  No IMU FrameTimes")
+                task.trueText("Is IMU present?  No IMU FrameTimes")
                 allZeroCount = Integer.MinValue ' don't show message again.
             End If
             Exit Sub ' if the IMU frametime was 0, then no new IMU data was generated (or it is unsupported!)
@@ -239,7 +239,7 @@ Public Class IMU_FrameTime
 
         histogramIMU(CInt(task.IMU_FrameTime)) += 1
 
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             Dim output = "IMU_TimeStamp (ms) " + Format(task.IMU_TimeStamp, "00") + vbCrLf +
                         "CPU TimeStamp (ms) " + Format(task.CPU_TimeStamp, "00") + vbCrLf +
                         "IMU Frametime (ms, sampled) " + Format(sampledIMUFrameTime, "000.00") +
@@ -266,7 +266,7 @@ Public Class IMU_FrameTime
                     output += vbCrLf
                 Next
             End If
-            ocvb.trueText(output)
+            task.trueText(output)
         End If
     End Sub
 End Class
@@ -298,7 +298,7 @@ Public Class IMU_HostFrameTimes
         task.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static CPUanchor As Integer = task.CPU_FrameTime
         Static hist(plot.maxScale) As Integer
 
@@ -326,7 +326,7 @@ Public Class IMU_HostFrameTimes
 
         hist(CInt(task.CPU_FrameTime)) += 1
 
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             Dim output = "IMU_TimeStamp (ms) " + Format(task.IMU_TimeStamp, "00") + vbCrLf +
                          "CPU TimeStamp (ms) " + Format(task.CPU_TimeStamp, "00") + vbCrLf +
                          "Host Frametime (ms, sampled) " + Format(sampledCPUFrameTime, "000.00") +
@@ -353,7 +353,7 @@ Public Class IMU_HostFrameTimes
                     output += vbCrLf
                 Next
             End If
-            ocvb.trueText(output)
+            task.trueText(output)
         End If
     End Sub
 End Class
@@ -385,7 +385,7 @@ Public Class IMU_TotalDelay
         task.desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         host.Run()
         imu.Run()
         Dim totaldelay = host.HostInterruptDelayEstimate + imu.IMUtoCaptureEstimate
@@ -427,7 +427,7 @@ Public Class IMU_TotalDelay
                 output += vbCrLf
             Next
         End If
-        ocvb.trueText(output)
+        task.trueText(output)
     End Sub
 End Class
 
@@ -457,29 +457,29 @@ Public Class IMU_GVector
         task.desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gx = task.IMU_Acceleration.X
         Dim gy = task.IMU_Acceleration.Y
         Dim gz = task.IMU_Acceleration.Z
 
-        ocvb.angleX = Math.Atan2(gy, gx) + cv.Cv2.PI / 2
-        ocvb.angleY = Math.Atan2(gx, gy)
-        ocvb.angleZ = Math.Atan2(gy, gz) + cv.Cv2.PI / 2
+        task.angleX = Math.Atan2(gy, gx) + cv.Cv2.PI / 2
+        task.angleY = Math.Atan2(gx, gy)
+        task.angleZ = Math.Atan2(gy, gz) + cv.Cv2.PI / 2
 
         Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
         Static manualCheckbox = findCheckBox("Initialize the X- and Z-axis sliders with gravity but allow manual after")
         If manualCheckbox.checked Then
-            If task.frameCount < 30 Then task.xRotateSlider.Value = CInt(ocvb.angleZ * 57.2958) Else ocvb.angleZ = task.xRotateSlider.Value / 57.2958
-            If task.frameCount < 30 Then task.zRotateSlider.Value = CInt(ocvb.angleX * 57.2958) Else ocvb.angleX = task.zRotateSlider.Value / 57.2958
+            If task.frameCount < 30 Then task.xRotateSlider.Value = CInt(task.angleZ * 57.2958) Else task.angleZ = task.xRotateSlider.Value / 57.2958
+            If task.frameCount < 30 Then task.zRotateSlider.Value = CInt(task.angleX * 57.2958) Else task.angleX = task.zRotateSlider.Value / 57.2958
         Else
-            If xCheckbox.checked = False Then ocvb.angleZ = 0
-            If zCheckbox.checked = False Then ocvb.angleX = 0
-            task.xRotateSlider.Value = CInt(ocvb.angleZ * 57.2958) Mod 90
-            task.zRotateSlider.Value = CInt(ocvb.angleX * 57.2958) Mod 90
+            If xCheckbox.checked = False Then task.angleZ = 0
+            If zCheckbox.checked = False Then task.angleX = 0
+            task.xRotateSlider.Value = CInt(task.angleZ * 57.2958) Mod 90
+            task.zRotateSlider.Value = CInt(task.angleX * 57.2958) Mod 90
         End If
 
-        kalman.kInput = {gx, gy, gz, ocvb.angleX, ocvb.angleY, ocvb.angleZ}
+        kalman.kInput = {gx, gy, gz, task.angleX, task.angleY, task.angleZ}
 
         Static kalmanCheck = findCheckBox("Turn Kalman filtering on")
         If kalmanCheck.Checked Then
@@ -488,19 +488,19 @@ Public Class IMU_GVector
             gy = kalman.kOutput(1)
             gz = kalman.kOutput(2)
 
-            ocvb.angleX = kalman.kOutput(3)
-            ocvb.angleY = kalman.kOutput(4)
-            ocvb.angleZ = kalman.kOutput(5)
+            task.angleX = kalman.kOutput(3)
+            task.angleY = kalman.kOutput(4)
+            task.angleZ = kalman.kOutput(5)
         End If
 
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             Dim outStr As String = "Acceleration and their angles are smoothed with a Kalman filters:" + vbCrLf + vbCrLf
             outStr = "IMU Acceleration in X-direction = " + vbTab + vbTab + Format(gx, "#0.0000") + vbCrLf
             outStr += "IMU Acceleration in Y-direction = " + vbTab + vbTab + Format(gy, "#0.0000") + vbCrLf
             outStr += "IMU Acceleration in Z-direction = " + vbTab + vbTab + Format(gz, "#0.0000") + vbCrLf + vbCrLf
-            outStr += "X-axis Angle from horizontal (in degrees) = " + vbTab + Format(ocvb.angleX * 57.2958, "#0.0000") + vbCrLf
-            outStr += "Y-axis Angle from horizontal (in degrees) = " + vbTab + Format(ocvb.angleY * 57.2958, "#0.0000") + vbCrLf
-            outStr += "Z-axis Angle from horizontal (in degrees) = " + vbTab + Format(ocvb.angleZ * 57.2958, "#0.0000") + vbCrLf + vbCrLf
+            outStr += "X-axis Angle from horizontal (in degrees) = " + vbTab + Format(task.angleX * 57.2958, "#0.0000") + vbCrLf
+            outStr += "Y-axis Angle from horizontal (in degrees) = " + vbTab + Format(task.angleY * 57.2958, "#0.0000") + vbCrLf
+            outStr += "Z-axis Angle from horizontal (in degrees) = " + vbTab + Format(task.angleZ * 57.2958, "#0.0000") + vbCrLf + vbCrLf
             ' if there is any significant acceleration other than gravity, it will be detected here.
             If Math.Abs(Math.Sqrt(gx * gx + gy * gy + gz * gz) - 9.807) > 0.05 Then
                 outStr += "Camera appears to be moving because the gravity vector is not 9.8.  Results may not be valid." + vbCrLf
@@ -515,7 +515,7 @@ Public Class IMU_GVector
                             vbTab + Format(Math.Sqrt(gx * gx + gy * gy + gz * gz), "#0.0000") + vbCrLf +
                             "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)"
 
-            ocvb.trueText(outStr)
+            task.trueText(outStr)
         End If
     End Sub
 End Class
@@ -545,7 +545,7 @@ Public Class IMU_IscameraLevel
         task.desc = "Answer the question: Is the camera level?"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gx = task.IMU_Acceleration.X
         Dim gy = task.IMU_Acceleration.Y
         Dim gz = task.IMU_Acceleration.Z
@@ -556,7 +556,7 @@ Public Class IMU_IscameraLevel
 
         Dim degreesThreshold = sliders.trackbar(0).Value / 10 ' 0-100 --> 0-10 degrees
         If Math.Abs(angleX) > degreesThreshold Or Math.Abs(angleZ) > degreesThreshold Then cameraLevel = False Else cameraLevel = True
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             flow.msgs.Add(" Angle X = " + Format(angleX, "0.00") + " degrees" +
                           " Angle Y = " + Format(angleY, "0.00") + " degrees" +
                           " Angle Z = " + Format(angleZ, "0.00") + " degrees" +
@@ -591,7 +591,7 @@ Public Class IMU_IscameraStable
         task.desc = "Answer the question: Is the camera stable?"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         pitch = task.IMU_AngularVelocity.X
         yaw = task.IMU_AngularVelocity.Y

@@ -27,7 +27,7 @@ Public Class Featureless_Basics
         task.desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run()
 
         edges.src = src
@@ -72,7 +72,7 @@ Public Class Featureless_DCT_MT
     End Sub
 
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         dct.src = src
         dct.Run()
         dst1 = dct.dst1
@@ -126,7 +126,7 @@ Public Class FeatureLess_Prediction
         task.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         fLess.src = src
         fLess.Run()
         dst1 = fLess.dst1
@@ -213,7 +213,7 @@ Public Class FeatureLess_PointTracker
         task.desc = "Track the featureless regions with point tracker"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         fLess.src = src
         fLess.Run()
         dst2 = fLess.dst1
@@ -245,7 +245,7 @@ Public Class FeatureLess_Highlights
         task.desc = "Highlight the featureless regions in an RGB image"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         fLessP.src = src
         fLessP.Run()
 

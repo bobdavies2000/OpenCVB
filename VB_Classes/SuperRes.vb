@@ -60,8 +60,8 @@ Public Class SuperRes_Video : Implements IDisposable
         sr = cv.SuperResolution.CreateBTVL1()
         sr.SetInput(fs)
         ocvb.desc = "Enhance resolution with SuperRes API in OpenCV"
-        ocvb.label1 = "Original Video"
-        ocvb.label2 = "SuperRes video"
+        task.label1 = "Original Video"
+        task.label2 = "SuperRes video"
     End Sub
     Public Sub Run(ocvb As AlgorithmData)
         ocvb.result1 = videoOptions.nextImage()

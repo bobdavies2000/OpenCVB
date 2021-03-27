@@ -13,7 +13,7 @@ Public Class Stitch_Basics
         task.desc = "Stitch together random parts of a color image."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim mats As New List(Of cv.Mat)
         Dim imageCount = sliders.trackbar(0).Value
         Dim width = sliders.trackbar(1).Value
@@ -29,7 +29,7 @@ Public Class Stitch_Basics
 
         'If task.parms.testAllRunning  Then
         ' It runs fine but after several runs, it will fail with an external exception.  Only happens on 'Test All' runs.
-        ocvb.trueText("Stitch_Basics only fails when running 'Test All'." + vbCrLf +
+        task.trueText("Stitch_Basics only fails when running 'Test All'." + vbCrLf +
                                      "Skipping it during a 'Test All' just so all the other tests can be exercised.")
         Exit Sub
         'End If

@@ -38,7 +38,7 @@ Public Class Palette_Basics
         Return 0
     End Function
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         colormap = checkRadios()
         label1 = "ColorMap = " + mapNames(colormap)
 
@@ -57,7 +57,7 @@ Public Class Palette_Basics
             If str.Contains("Ocean") Then str = str.Replace("Ocean", "Hsv") Else If str.Contains("Hsv") Then str = str.Replace("Hsv", "Ocean")
             Dim mapFile As New FileInfo(str)
             gradMap.gradientColorMap = cv.Cv2.ImRead(mapFile.FullName)
-            If standalone or task.intermediateReview = caller Then dst2 = gradMap.gradientColorMap.Resize(src.Size())
+            If standalone Or task.intermediateReview = caller Then dst2 = gradMap.gradientColorMap.Resize(src.Size())
             If whiteBack And gradMap.gradientColorMap.Cols <> 0 Then gradMap.gradientColorMap.Col(0).SetTo(cv.Scalar.White)
         End If
 
@@ -89,7 +89,7 @@ Public Class Palette_Color
         task.desc = "Define a color using sliders."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim b = sliders.trackbar(0).Value
         Dim g = sliders.trackbar(1).Value
         Dim r = sliders.trackbar(2).Value
@@ -117,7 +117,7 @@ Public Class Palette_LinearPolar
         End If
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1.SetTo(0)
         For i = 0 To dst1.Rows - 1
             Dim c = i * 255 / dst1.Rows
@@ -219,7 +219,7 @@ Public Class Palette_Reduction
         End Function
     End Class
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static reductionSlider = findSlider("Reduction factor")
         If reductionSlider.value < 32 Then
             reductionSlider.value = 32
@@ -294,7 +294,7 @@ Public Class Palette_DrawTest
         task.desc = "Experiment with palette using a drawn image"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         draw.Run()
         palette.src = draw.dst1
         palette.Run()
@@ -317,9 +317,9 @@ Public Class Palette_Gradient
         task.desc = "Create gradient image"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod frameModulo = 0 Then
-            If standalone or task.intermediateReview = caller Then
+            If standalone Or task.intermediateReview = caller Then
                 color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
                 color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
             End If
@@ -360,7 +360,7 @@ Public Class Palette_BuildGradientColorMap
         task.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static paletteSlider = findSlider("Number of color transitions (Used only with Random)")
         If standalone Or transitionCount <> paletteSlider.value Then
             transitionCount = paletteSlider.value
@@ -401,7 +401,7 @@ Public Class Palette_DepthColorMap
         task.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount = 0 Then
             Dim color1 = cv.Scalar.Yellow
             Dim color2 = cv.Scalar.Red
@@ -457,8 +457,8 @@ Public Class Palette_Consistency
         task.desc = "Using a histogram, assign the same colors to the same areas across frames"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone or task.intermediateReview = caller Then
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        If standalone Or task.intermediateReview = caller Then
             emax.Run()
             src = emax.dst2
         End If
@@ -469,7 +469,7 @@ Public Class Palette_Consistency
 
         hist.src = img
         hist.Run()
-        If standalone or task.intermediateReview = caller Then dst2 = hist.dst1.Resize(src.Size)
+        If standalone Or task.intermediateReview = caller Then dst2 = hist.dst1.Resize(src.Size)
 
         Dim histogram = hist.plotHist.hist
         Dim orderedByCount As New SortedList(Of Single, Integer)(New CompareHistCounts)
@@ -516,7 +516,7 @@ Public Class Palette_ObjectColors
         task.desc = "New class description"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         reduction.src = src
         reduction.src.SetTo(0, task.noDepthMask)
         reduction.Run()
@@ -557,7 +557,7 @@ Public Class Palette_ObjectColors
             Dim index = blobList.ElementAt(i).Value
             Dim blob = reduction.pTrack.drawRC.viewObjects.Values(index)
             dst1.Rectangle(New cv.Rect(blob.centroid.X, blob.centroid.Y, 60 * task.fontSize, 30 * task.fontSize), cv.Scalar.Black, -1)
-            ocvb.trueText(CStr(CInt(blobList.ElementAt(i).Key)), blob.centroid)
+            task.trueText(CStr(CInt(blobList.ElementAt(i).Key)), blob.centroid)
         Next
         dst1.SetTo(0, task.noDepthMask)
         label1 = CStr(blobList.Count) + " regions between " + Format(minDepth / 1000, "0.0") + " and " + Format(maxDepth / 1000, "0.0") + " meters"
@@ -583,7 +583,7 @@ Public Class Palette_Layout2D
         task.desc = "Layout the available colors in a 2D grid"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run()
         Dim index As Integer
         For Each r In grid.roiList

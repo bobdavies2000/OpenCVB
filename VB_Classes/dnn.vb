@@ -33,7 +33,7 @@ Public Class DNN_Test
         task.desc = "Download and use a Caffe database"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim image = cv.Cv2.ImRead(task.parms.homeDir + "Data/space_shuttle.jpg")
         dst2 = image.Resize(dst2.Size())
@@ -43,7 +43,7 @@ Public Class DNN_Test
         Dim minVal As Double, maxVal As Double
         Dim minLoc As cv.Point, maxLoc As cv.Point
         cv.Cv2.MinMaxLoc(prob.Reshape(1, 1), minVal, maxVal, minLoc, maxLoc)
-        ocvb.trueText("Best classification: index = " + CStr(maxLoc.X) + " which is for '" + classnames(maxLoc.X) + "' with Probability " + Format(maxVal, "#0.00%"), 40, 200)
+        task.trueText("Best classification: index = " + CStr(maxLoc.X) + " which is for '" + classnames(maxLoc.X) + "' with Probability " + Format(maxVal, "#0.00%"), 40, 200)
     End Sub
 End Class
 
@@ -65,11 +65,11 @@ Public Class DNN_Caffe_CS
         caffeCS.initialize(protoTxt, modelFile, synsetWords)
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim image = cv.Cv2.ImRead(task.parms.homeDir + "Data/space_shuttle.jpg")
         Dim str = caffeCS.Run(image)
         dst2 = image.Resize(dst2.Size())
-        ocvb.trueText(str, 10, 100)
+        task.trueText(str, 10, 100)
     End Sub
 End Class
 
@@ -83,7 +83,7 @@ Public Class DNN_Basics
     Dim net As Net
     Dim dnnPrepared As Boolean
     Dim crop As cv.Rect
-    Dim dnnWidth As integer, dnnHeight As integer
+    Dim dnnWidth As Integer, dnnHeight As Integer
     Dim testImage As cv.Mat
     Dim kalman(10) As Kalman_Basics
     Public rect As cv.Rect
@@ -116,13 +116,13 @@ Public Class DNN_Basics
             End If
         End If
         If dnnPrepared = False Then
-            ocvb.trueText("Caffe databases not found.  It should be in <OpenCVB_HomeDir>/Data.", 10, 100)
+            task.trueText("Caffe databases not found.  It should be in <OpenCVB_HomeDir>/Data.", 10, 100)
         End If
         task.desc = "Use OpenCV's dnn from Caffe file."
         label1 = "Cropped Input Image - must be square!"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If dnnPrepared Then
             Dim inScaleFactor = sliders.trackbar(0).Value / sliders.trackbar(0).Maximum ' should be 0.0078 by default...
             Dim meanVal = CSng(sliders.trackbar(1).Value)
@@ -183,7 +183,7 @@ Public Class DNN_Basics
                     rect.Width = src.Width / 12
                     rect.Height = src.Height / 16
                     dst2.Rectangle(rect, cv.Scalar.Black, -1)
-                    ocvb.trueText(nextName, CInt(rect.X), CInt(rect.Y), 3)
+                    task.trueText(nextName, CInt(rect.X), CInt(rect.Y), 3)
                 End If
             Next
 

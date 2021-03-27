@@ -28,7 +28,7 @@ Public Class Download_Databases
         task.desc = "Multi-threaded (responsive) download of the iBug 300W face database.  Not using iBug yet but planning to..."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static checkiBug = findRadio("Download the 1.7 Gb 300 Faces In-The-Wild database")
         Static checkTensor1 = findRadio("Download TensorFlow MobileNet-SSD v1")
@@ -63,15 +63,15 @@ Public Class Download_Databases
         Dim fileToDecompress = New FileInfo(task.parms.homeDir + "Data/" + filename)
         Dim downloadDir = New DirectoryInfo(task.parms.homeDir + "Data/" + Mid(fileToDecompress.Name, 1, Len(fileToDecompress.Name) - Len(".tar.gz")))
         If downloadActive And pythonActive = False Then
-            ocvb.trueText("Downloading active (takes a while).  Current download size = " + Format(zippedBuffer.Length / 1000, "###,##0") + "k bytes" + vbCrLf +
+            task.trueText("Downloading active (takes a while).  Current download size = " + Format(zippedBuffer.Length / 1000, "###,##0") + "k bytes" + vbCrLf +
                           "Download is " + Format(zippedBuffer.Length / 1797000000, "#0%") + " complete", 40, 200)
         Else
             If pythonActive Then
-                ocvb.trueText("Unzipping files to " + downloadDir.FullName, 40, 200)
+                task.trueText("Unzipping files to " + downloadDir.FullName, 40, 200)
             Else
                 If linkAddress <> "" Then
                     If downloadDir.Exists Then
-                        ocvb.trueText("The database " + downloadDir.Name + " has been downloaded and is ready for use.", 40, 100)
+                        task.trueText("The database " + downloadDir.Name + " has been downloaded and is ready for use.", 40, 100)
                         Exit Sub
                     End If
                     downloadActive = True
@@ -99,11 +99,11 @@ Public Class Download_Databases
                                 fs.WriteLine("tar.close")
                                 fs.Close()
 
-                                ocvb.pythonTaskName = pyScript
+                                task.pythonTaskName = pyScript
                                 Dim p As New Process
                                 p.StartInfo.FileName = task.parms.PythonExe
                                 p.StartInfo.WorkingDirectory = task.parms.homeDir + "Data"
-                                p.StartInfo.Arguments = """" + ocvb.pythonTaskName + """"
+                                p.StartInfo.Arguments = """" + task.pythonTaskName + """"
                                 p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
                                 p.Start()
                                 p.WaitForExit()
@@ -116,7 +116,7 @@ Public Class Download_Databases
                         End Sub)
                     downloadThread.Start()
                 Else
-                    ocvb.trueText("Check the database to be downloaded in the Options nearby.", 40, 200)
+                    task.trueText("Check the database to be downloaded in the Options nearby.", 40, 200)
                 End If
             End If
         End If

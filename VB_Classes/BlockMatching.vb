@@ -18,9 +18,9 @@ Public Class BlockMatching_Basics
         label2 = "Right Image (used with left image)"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
-            ocvb.trueText("For the Kinect 4 Azure camera, the left and right views are the same.")
+            task.trueText("For the Kinect 4 Azure camera, the left and right views are the same.")
         End If
 
         Dim numDisparity = sliders.trackbar(0).Value * 16 ' must be a multiple of 16

@@ -33,14 +33,14 @@ Public Class Quaterion_Basics
         task.desc = "Use the quaternion values to multiply and compute conjugate"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim q1 = New Quaternion(CSng(sliders.trackbar(0).Value / 100), CSng(sliders.trackbar(1).Value / 100),
                                     CSng(sliders.trackbar(2).Value / 100), CSng(sliders.trackbar(3).Value / 100))
         Dim q2 = New Quaternion(CSng(sliders.trackbar(4).Value / 100), CSng(sliders.trackbar(5).Value / 100),
                                     CSng(sliders.trackbar(6).Value / 100), CSng(sliders.trackbar(7).Value / 100))
 
         Dim quatmul = Quaternion.Multiply(q1, q2)
-        ocvb.trueText("q1 = " + q1.ToString() + vbCrLf + "q2 = " + q2.ToString() + vbCrLf + "Multiply q1 * q2" + quatmul.ToString())
+        task.trueText("q1 = " + q1.ToString() + vbCrLf + "q2 = " + q2.ToString() + vbCrLf + "Multiply q1 * q2" + quatmul.ToString())
     End Sub
 End Class
 
@@ -61,7 +61,7 @@ Public Class Quaterion_IMUPrediction
     End Sub
 
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         host.Run()
 
         Dim dt = host.HostInterruptDelayEstimate
@@ -80,7 +80,7 @@ Public Class Quaterion_IMUPrediction
 
         Dim diffq = Quaternion.Subtract(task.IMU_Rotation, predictedRotation)
 
-        ocvb.trueText("IMU_Acceleration = " + vbTab +
+        task.trueText("IMU_Acceleration = " + vbTab +
                                  Format(task.IMU_Acceleration.X, "0.0000") + ", " + vbTab +
                                  Format(task.IMU_Acceleration.Y, "0.0000") + ", " + vbTab +
                                  Format(task.IMU_Acceleration.Z, "0.0000") + ", " + vbTab + vbCrLf +

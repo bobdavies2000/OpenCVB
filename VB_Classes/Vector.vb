@@ -8,9 +8,9 @@ Public Class Vector_Magnitude
         label1 = "Vector Magnitude"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim cVector() As Single = {1, 4, 4, 8}
-        ocvb.trueText("p1 = (" + CStr(cVector(0)) + ", " + CStr(cVector(1)) + ")" + vbTab + " p2 = (" + CStr(cVector(2)) + ", " + CStr(cVector(3)) + ")", 10, 40)
+        task.trueText("p1 = (" + CStr(cVector(0)) + ", " + CStr(cVector(1)) + ")" + vbTab + " p2 = (" + CStr(cVector(2)) + ", " + CStr(cVector(3)) + ")", 10, 40)
         Dim coordinates As New cv.Mat(1, 4, cv.MatType.CV_32F, cVector)
         Dim diff_x = coordinates.Col(0) - coordinates.Col(2)
         Dim diff_y = coordinates.Col(1) - coordinates.Col(3)
@@ -18,10 +18,10 @@ Public Class Vector_Magnitude
         ' sqrt((x2 - x1)^2 + (y2 - y1)^2)
         Dim euclidean_distance As New cv.Mat
         cv.Cv2.Magnitude(diff_x, diff_y, euclidean_distance)
-        ocvb.trueText("euclidean_distance = " + CStr(euclidean_distance.Get(Of Single)(0, 0)), 10, 80)
+        task.trueText("euclidean_distance = " + CStr(euclidean_distance.Get(Of Single)(0, 0)), 10, 80)
 
         Dim manhattan_distance = cv.Cv2.Abs(diff_x) + cv.Cv2.Abs(diff_y)
-        ocvb.trueText("manhattan_distance = " + CStr(manhattan_distance.ToMat.Get(Of Single)(0, 0)), 10, 120)
+        task.trueText("manhattan_distance = " + CStr(manhattan_distance.ToMat.Get(Of Single)(0, 0)), 10, 120)
 
         ' Another way to compute L1 distance, with absdiff
         ' abs(x2 - x1) + abs(y2 - y1)
@@ -30,7 +30,7 @@ Public Class Vector_Magnitude
         Dim other_manhattan_distance As New cv.Mat
         cv.Cv2.Absdiff(points1, points2, other_manhattan_distance)
         other_manhattan_distance = other_manhattan_distance.Col(0) + other_manhattan_distance.Col(1)
-        ocvb.trueText("other_manhattan_distance = " + CStr(other_manhattan_distance.Get(Of Single)(0, 0)), 10, 160)
+        task.trueText("other_manhattan_distance = " + CStr(other_manhattan_distance.Get(Of Single)(0, 0)), 10, 160)
     End Sub
 End Class
 

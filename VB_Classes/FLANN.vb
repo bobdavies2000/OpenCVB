@@ -9,7 +9,7 @@ Public Class FLANN_Test
         label1 = "FLANN Basics"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         ' creates data set
         Using features As New cv.Mat(10000, 2, cv.MatType.CV_32FC1)
             cv.Cv2.Randu(features, 0, msRNG.Next(9900, 10000))
@@ -35,7 +35,7 @@ Public Class FLANN_Test
                     output += String.Format("distance:{0}", dist) + vbCrLf
                     output += String.Format("data:({0}, {1})", pt.X, pt.Y) + vbCrLf
                 Next i
-                ocvb.trueText(output)
+                task.trueText(output)
             End Using
         End Using
     End Sub
@@ -70,7 +70,7 @@ Public Class FLANN_Basics
         label1 = "Red is query, Nearest points blue"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim reuseData = check.Box(1).Checked
         If reuseData = False Or task.frameCount = 0 Then random.Run() ' fill result1 with random points in x and y range of the image.
         Dim features As New cv.Mat(random.Points2f.Length, 2, cv.MatType.CV_32F, random.Points2f)
@@ -120,7 +120,7 @@ Public Class FLANN_Basics
         output += "Play with the EPS and searchparams check count to see if that helps." + vbCrLf + vbCrLf
         output += "If the 'Search check' is set to 25 and the 'Match count' is set to 4, it does appear to return to the top 4." + vbCrLf
         output += "Perhaps FLANN is only good enough to find a group of neighbors.  Use with caution."
-        ocvb.trueText(output, 10, 50, 3)
+        task.trueText(output, 10, 50, 3)
     End Sub
 End Class
 

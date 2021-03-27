@@ -28,7 +28,7 @@ Public Class Surf_Basics
         task.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         srcLeft = task.leftView
         srcRight = task.rightView
         Dim doubleSize As New cv.Mat
@@ -60,7 +60,7 @@ Public Class Surf_BasicsVB
         task.desc = "Use left and right views to match points in horizontal slices."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         surf.src = src
         surf.Run()
         dst1 = surf.dst1
@@ -88,7 +88,7 @@ Public Class Surf_DrawMatchManual_CS
         task.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         surf.src = src
         surf.Run()
         dst1 = surf.srcLeft.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

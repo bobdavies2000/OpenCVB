@@ -18,7 +18,7 @@ Public Class Edges_Basics
         label2 = "Canny using L2 Norm"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim threshold1 As Integer = sliders.trackbar(0).Value
         Dim threshold2 As Integer = sliders.trackbar(1).Value
         Dim aperture = If(sliders.trackbar(2).Value Mod 2, sliders.trackbar(2).Value, sliders.trackbar(2).Value + 1)
@@ -57,7 +57,7 @@ Public Class Edges_DepthAndColor
         label2 = "Edges in color and depth no dilate"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         canny.src = src
         canny.Run()
         shadow.Run()
@@ -92,7 +92,7 @@ Public Class Edges_Laplacian
         task.desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gaussiankernelSize = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value - 1)
         Dim laplaciankernelSize = If(sliders.trackbar(1).Value Mod 2, sliders.trackbar(1).Value, sliders.trackbar(1).Value - 1)
 
@@ -121,7 +121,7 @@ Public Class Edges_Scharr
         task.desc = "Scharr is most accurate with 3x3 kernel."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim xField = gray.Scharr(cv.MatType.CV_32FC1, 1, 0)
         Dim yField = gray.Scharr(cv.MatType.CV_32FC1, 0, 1)
@@ -156,7 +156,7 @@ Public Class Edges_Preserving
         task.desc = "OpenCV's edge preserving filter."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         If radio.check(0).Checked Then
@@ -222,8 +222,8 @@ Public Class Edges_RandomForest_CPP
         label2 = "Thresholded Edge Mask (use slider to adjust)"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If task.frameCount < 100 Then ocvb.trueText("On the first call only, it takes a few seconds to load the randomForest model.", 10, 100)
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        If task.frameCount < 100 Then task.trueText("On the first call only, it takes a few seconds to load the randomForest model.", 10, 100)
 
         ' why not do this in the constructor?  Because the message is held up by the lengthy process of loading the model.
         If task.frameCount = 5 Then
@@ -264,7 +264,7 @@ Public Class Edges_ResizeAdd
         label2 = "Found edges added to grayscale image source."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim newFrame = gray(New cv.Range(sliders.trackbar(0).Value, gray.Rows - sliders.trackbar(0).Value),
                             New cv.Range(sliders.trackbar(1).Value, gray.Cols - sliders.trackbar(1).Value))
@@ -295,7 +295,7 @@ Public Class Edges_DCTfrequency
         task.desc = "Find edges by removing all the highest frequencies."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
@@ -334,7 +334,7 @@ Public Class Edges_Deriche_CPP
         task.desc = "Edge detection using the Deriche X and Y gradients - Painterly"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
@@ -380,7 +380,7 @@ Public Class Edges_Palette
         task.desc = "Use palette to help canny find more edges"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         edges.src = src
         edges.Run()
         dst1 = edges.dst1.Clone
@@ -413,7 +413,7 @@ Public Class Edges_DCTinput
         task.desc = "Use the featureless regions to enhance the edge detection"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         edges.src = src
         edges.Run()
@@ -448,7 +448,7 @@ Public Class Edges_BinarizedCanny
         task.desc = "Collect edges from binarized images"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         binarize.src = src
         binarize.Run()
@@ -499,7 +499,7 @@ Public Class Edges_BinarizedBrightness
         task.desc = "Visualize the impact of brightness on Edges_BinarizeSobel"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         bright.src = src
         bright.Run()
@@ -530,7 +530,7 @@ Public Class Edges_BinarizedReduction
         task.desc = "Visualize the impact of reduction on Edges_BinarizeSobel"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         reduction.src = src
         reduction.Run()
@@ -562,7 +562,7 @@ Public Class Edges_Depth
         task.desc = "Use Depth_SmoothMax to find edges in Depth"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         dMax.src = task.depth32f
         dMax.Run()
@@ -595,7 +595,7 @@ Public Class Edges_FeaturesOnly
         task.desc = "Removing the featureless regions after a binarized sobel"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         task.mouseClickFlag = False ' edges calls a mat_4clicks algorithm.
         edges.src = src
@@ -632,7 +632,7 @@ Public Class Edges_Consistent
         task.desc = "Edges that are consistent for x number of frames"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static nFrameSlider = findSlider("Edges present n frames")
         Dim nFrames = nFrameSlider.value
@@ -673,14 +673,14 @@ Public Class Edges_Stdev
         edges = New Edges_BinarizedSobel
         stdev = New Math_Stdev
         Dim kernelSlider = findSlider("Sobel kernel Size")
-        kernelSlider.value = 3
+        kernelSlider.Value = 3
 
         label1 = "Edges in High Stdev areas"
         label2 = "Mask of low stdev areas"
         task.desc = "Edges where stdev is above a threshold"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         stdev.src = src
         stdev.Run()
@@ -714,7 +714,7 @@ Public Class Edges_BlackSquare
         task.desc = "Visualize the impact of Sobel on a black square"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         std.src = src
         std.Run()
 
@@ -750,7 +750,7 @@ Public Class Edges_Combo
         task.desc = "Combine the results of binarized canny and sobel"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         edges1.src = src
         edges1.Run()
@@ -785,7 +785,7 @@ Public Class Edges_SobelLR
         label2 = "Edges in Right Image (except on Kinect)"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         red.Run()
         Dim leftView = red.dst1
         sobel.src = red.dst2
@@ -828,7 +828,7 @@ Public Class Edges_Sobel
         task.desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static ksizeSlider = findSlider("Sobel kernel Size")
         Dim kernelSize = If(ksizeSlider.Value Mod 2, ksizeSlider.Value, ksizeSlider.Value - 1)
         dst1 = New cv.Mat(src.Rows, src.Cols, src.Type)
@@ -868,7 +868,7 @@ Public Class Edges_SobelHorizontal
         task.desc = "Find edges with Sobel only in the horizontal direction"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         edges.src = src
         edges.Run()
 
@@ -904,7 +904,7 @@ Public Class Edges_SobelLRBinarized
         task.desc = "Isolate edges in the left and right views."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.mouseClickFlag Then task.mouseClickFlag = False ' preempt use of quadrants.
         red.Run()
@@ -953,7 +953,7 @@ Public Class Edges_BinarizedSobel
         task.desc = "Collect Sobel edges from binarized images"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
 
@@ -1026,7 +1026,7 @@ Public Class Edges_Matching
         task.desc = "Match edges in the left and right views to determine distance"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         grid.Run()
 
@@ -1054,7 +1054,7 @@ Public Class Edges_Matching
             Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
             match.correlationMat.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
             maxLocs(i) = maxLoc.X
-            If maxVal > threshold Or redrects.contains(i) Then
+            If maxVal > threshold Or redRects.Contains(i) Then
                 highlights.Add(i)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
                 dst2.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
@@ -1132,7 +1132,7 @@ Public Class Edges_MotionOverlay
         task.desc = "Find edges by displacing the current RGB image in any direction and diff it with the original."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static xSlider = findSlider("Displacement in the X direction (in pixels)")
         Static ySlider = findSlider("Displacement in the Y direction (in pixels)")
@@ -1174,7 +1174,7 @@ Public Class Edges_RGB
         task.desc = "Combine the edges from all 3 channels.  Painterly"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim img32f As New cv.Mat
         src.ConvertTo(img32f, cv.MatType.CV_32FC3)
@@ -1211,7 +1211,7 @@ Public Class Edges_HSV
         task.desc = "Combine the edges from all 3 HSV channels.  Painterly"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         edges.src = hsv
         edges.Run()

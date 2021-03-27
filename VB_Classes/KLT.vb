@@ -25,7 +25,7 @@ Public Class KLT_Basics
         task.desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static prevGray As New cv.Mat
 
         If check.Box(1).Checked Or task.frameCount Mod 25 = 0 Then
@@ -97,7 +97,7 @@ Public Class KLT_OpticalFlow
         task.desc = "KLT optical flow - needs more work"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         klt.src = src
         klt.Run()
         If task.frameCount > 0 And lastpoints IsNot Nothing And klt.inputPoints IsNot Nothing Then

@@ -17,7 +17,7 @@ Public Class ImageSeg_Basics
         task.desc = "Get the image segments and their associated features - centroids, masks, size, and enclosing rectangles"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         flood.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         flood.Run()
         dst1 = flood.dst2
@@ -56,7 +56,7 @@ Public Class ImageSeg_InRange
         task.desc = "Trim segments that are not in the range requested"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         iSeg.src = src
         iSeg.Run()
@@ -90,7 +90,7 @@ Public Class ImageSeg_MissingSegments
         task.desc = "Floodfill segments which were marked as missing and clear small unused segments"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static lenContourSlider = findSlider("Minimum length for missing contours")
         Dim maxLen = lenContourSlider.value
@@ -152,7 +152,7 @@ Public Class ImageSeg_Unstable
         task.desc = "Find the unstable segments and remove them"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static segSlider = findSlider("A segment is considered present after this many appearances")
         Dim refreshCount = segSlider.value
 
@@ -195,7 +195,7 @@ Public Class ImageSeg_CentroidTracker
         task.desc = "Track the centroids that are found consistently from frame to frame."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         iSeg.src = src
         iSeg.Run()

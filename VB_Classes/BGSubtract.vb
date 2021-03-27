@@ -23,7 +23,7 @@ Public Class BGSubtract_Basics_CPP
         task.desc = "Demonstrate all the different background subtraction algorithms in OpenCV - some only available in C++"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static frm = findfrm("BGSubtract_Basics_CPP Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
@@ -78,7 +78,7 @@ Public Class BGSubtract_MotionDetect_MT
         task.desc = "Detect Motion for use with background subtraction"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount = 0 Then src.CopyTo(dst2)
         Dim threadData As New cv.Vec3i
         Dim width = src.Width, height = src.Height
@@ -134,7 +134,7 @@ Public Class BGSubtract_Basics_MT
         task.desc = "Detect Motion in the color image"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run()
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -175,7 +175,7 @@ Public Class BGSubtract_Depth_MT
         label2 = "Accumulated depth image"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         bgsub.src = task.RGBDepth
         bgsub.Run()
         dst1 = bgsub.src
@@ -201,7 +201,7 @@ Public Class BGSubtract_MOG
         task.desc = "Subtract background using a mixture of Gaussians"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then
             gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
@@ -229,7 +229,7 @@ Public Class BGSubtract_MOG2
         task.desc = "Subtract background using a mixture of Gaussians"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static learnRateSlider = findSlider("MOG Learn Rate")
@@ -255,11 +255,11 @@ Public Class BGSubtract_GMG_KNN
         task.desc = "GMG and KNN API's to subtract background"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount < 120 Then
-            ocvb.trueText("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(task.frameCount))
+            task.trueText("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(task.frameCount))
         Else
-            ocvb.trueText("")
+            task.trueText("")
         End If
 
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -292,7 +292,7 @@ Public Class BGSubtract_MOG_RGBDepth
         task.desc = "Isolate motion in both depth and color data using a mixture of Gaussians"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static learnRateSlider = findSlider("Learn Rate")
         MOGDepth.Apply(gray, gray, learnRateSlider.Value / 1000)
@@ -323,7 +323,7 @@ Public Class BGSubtract_MOG_Retina
         task.desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         retina.src = task.RGBDepth
         retina.Run()
         bgSub.src = retina.dst2.Clone()
@@ -345,7 +345,7 @@ Public Class BGSubtract_DepthOrColorMotion
         task.desc = "Detect motion with both depth and color changes"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         motion.src = src.Clone()
         motion.Run()
         dst1 = motion.dst1
@@ -391,7 +391,7 @@ Public Class BGSubtract_Video
         task.desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         video.Run()
         dst2 = video.dst1
         bgfg.src = dst2
@@ -439,7 +439,7 @@ Public Class BGSubtract_Synthetic_CPP
         task.desc = "Generate a synthetic input to background subtraction method - Painterly"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount < 10 Then Exit Sub ' darker images at the start?
         If amplitude <> sliders.trackbar(0).Value Or magnitude <> sliders.trackbar(1).Value Or waveSpeed <> sliders.trackbar(2).Value Or
             objectSpeed <> sliders.trackbar(3).Value Then
@@ -485,7 +485,7 @@ Public Class BGSubtract_Synthetic
         task.desc = "Demonstrate background subtraction algorithms with synthetic images - Painterly"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         synth.src = src
         synth.Run()
         dst2 = synth.dst1

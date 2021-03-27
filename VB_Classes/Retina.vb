@@ -39,7 +39,7 @@ Public Class Retina_Basics_CPP
         task.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If check.Box(1).Checked Then
             check.Box(1).Checked = False
             Dim fileinfo = New FileInfo(CurDir() + "/RetinaDefaultParameters.xml")
@@ -52,7 +52,7 @@ Public Class Retina_Basics_CPP
                 MsgBox("RetinaDefaultParameters.xml should have been created but was not found.  OpenCV error?")
             End If
         End If
-        Static useLogSampling As integer = check.Box(0).Checked
+        Static useLogSampling As Integer = check.Box(0).Checked
         Static samplingFactor As Single = -1 ' force open
         If useLogSampling <> check.Box(0).Checked Or samplingFactor <> sliders.trackbar(0).Value Then
             If Retina <> 0 Then Retina_Basics_Close(Retina)
@@ -69,7 +69,7 @@ Public Class Retina_Basics_CPP
             Marshal.Copy(src.Data, srcData, 0, srcData.Length)
             magnoPtr = Retina_Basics_Run(Retina, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, handleMagno.AddrOfPinnedObject(), useLogSampling)
         Else
-            ocvb.trueText("Retina_Basics_CPP runs fine but during 'Test All' it is not run because it can oversubscribe OpenCL memory.")
+            task.trueText("Retina_Basics_CPP runs fine but during 'Test All' it is not run because it can oversubscribe OpenCL memory.")
             dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1, 0)
         End If
         handleSrc.Free()
@@ -104,7 +104,7 @@ Public Class Retina_Depth
         label2 = "Current depth motion result"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         retina.src = task.RGBDepth
         retina.Run()
         dst2 = retina.dst2

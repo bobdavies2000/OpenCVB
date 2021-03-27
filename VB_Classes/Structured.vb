@@ -15,7 +15,7 @@ Public Class Structured_Floor
         task.desc = "Find the floor plane"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         structD.Run()
 
@@ -63,7 +63,7 @@ Public Class Structured_Ceiling
         task.desc = "Find the ceiling plane"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         structD.Run()
 
@@ -104,7 +104,7 @@ Public Class Structured_MultiSliceH
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         side2D.Run()
         dst2 = side2D.dst2
         Dim Split = side2D.gCloud.dst1.Split()
@@ -156,7 +156,7 @@ Public Class Structured_MultiSliceV
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         top2D.Run()
         dst2 = top2D.dst2
 
@@ -213,7 +213,7 @@ Public Class Structured_MultiSlice
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         top2D.Run()
         side2D.Run()
 
@@ -277,7 +277,7 @@ Public Class Structured_MultiSliceLines
         task.desc = "Detect lines in the multiSlice output"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         multi.Run()
         cv.Cv2.BitwiseNot(multi.dst2, dst2)
         ldetect.src = multi.dst2
@@ -308,7 +308,7 @@ Public Class Structured_MultiSlicePolygon
         task.desc = "Detect polygons in the multiSlice output"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         multi.Run()
         cv.Cv2.BitwiseNot(multi.dst2, dst1)
 
@@ -349,7 +349,7 @@ Public Class Structured_SliceXPlot
         task.desc = "Find any plane around a peak value in the top-down histogram"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         structD.Run()
         dst2 = structD.dst2
         multi.Run()
@@ -380,7 +380,7 @@ Public Class Structured_SliceXPlot
         dst1 = task.color.Clone
         dst1.SetTo(cv.Scalar.White, maskZplane)
 
-        label2 = "Peak histogram count (" + Format(maxVal, "#0") + ") at " + Format(filterZ, "#0.00") + " meters +-" + Format(10 / ocvb.pixelsPerMeter, "#0.00") + " m"
+        label2 = "Peak histogram count (" + Format(maxVal, "#0") + ") at " + Format(filterZ, "#0.00") + " meters +-" + Format(10 / task.pixelsPerMeter, "#0.00") + " m"
     End Sub
 End Class
 
@@ -412,7 +412,7 @@ Public Class Structured_LinearizeFloor
         task.desc = "Using the mask for the floor create a better representation of the floor plane"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim minVal As Double, maxVal As Double
         Dim minLoc As cv.Point, maxLoc As cv.Point
         Static imuPC As cv.Mat
@@ -528,7 +528,7 @@ Public Class Structured_SliceH
         task.desc = "Find and isolate planes (floor and ceiling) in a side view histogram."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         side2D.Run()
 
         Dim depthShadow = task.noDepthMask
@@ -592,7 +592,7 @@ Public Class Structured_SliceV
         task.desc = "Find and isolate planes using the top view histogram data"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim xCoordinate = offsetSlider.Value
         top2D.Run()
 
@@ -662,7 +662,7 @@ Public Class Structured_SliceVStable
         task.desc = "Find and isolate planes using the top view histogram data"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim xCoordinate = offsetSlider.Value
         top2D.Run()
         dst2 = top2D.dst1
@@ -715,7 +715,7 @@ Public Class Structured_CenterSlice
         task.desc = "Find the vertical center line with accurate depth data.."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         vSlice.Run()
         dst1 = task.color
@@ -807,7 +807,7 @@ Public Class Structured_CloudFail
         task.desc = "Attempt to impose a structure on the point cloud data."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static xLineSlider = findSlider("Lines in X-Direction")
         Static yLineSlider = findSlider("Lines in Y-Direction")
         Static thresholdSlider = findSlider("Continuity threshold in mm")
@@ -888,7 +888,7 @@ Public Class Structured_Cloud
         task.desc = "Attempt to impose a linear structure on the pointcloud."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static sliceSlider = findSlider("Number of slices")
         Dim xLines = sliceSlider.value
         Dim yLines = CInt(xLines * dst1.Height / dst1.Width)
@@ -930,7 +930,7 @@ Public Class Structured_Crosshairs
         task.desc = "Connect vertical and horizontal dots that are in the same column and row."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static sliceSlider = findSlider("Number of slices")
         Static xSlider = findSlider("Slice index X")
         Static ySlider = findSlider("Slice index Y")
@@ -1019,7 +1019,7 @@ Public Class Structured_Lines
         task.desc = "Find the RGB lines and confirm they are present in the cloud data."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static thickSlider = findSlider("Line thickness")
         Dim thickness = thickSlider.value
         lines.src = src
@@ -1102,7 +1102,7 @@ Public Class Structured_LinesV
         task.desc = "Find all the vertical lines in the IMU rectified cloud"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static thickSlider = findSlider("Line thickness")
         Static errorSlider = findSlider("Error tolerance when measuring vertical lines in 3D (mm's)")
         toleranceInMMs = errorSlider.value / 1000
@@ -1140,7 +1140,7 @@ Public Class Structured_LinesH
         task.desc = "Find all the horizontal lines in the IMU rectified cloud"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.Clone
 
         vLines.src = src
@@ -1225,7 +1225,7 @@ Public Class Structured_LineIntercepts
         Next
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static thickSlider = findSlider("Line thickness")
         Static searchSlider = findSlider("x- and y-intercept search range in pixels")
         thickNess = thickSlider.value
@@ -1298,7 +1298,7 @@ Public Class Line_HighlightSlope
         task.desc = "An alternative way to highlight line segments with common slope"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         lines.src = src
         lines.Run()

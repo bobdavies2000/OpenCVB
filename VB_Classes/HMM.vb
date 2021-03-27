@@ -27,9 +27,9 @@ Public Class HMM_Example_CPP
         task.desc = "Simple test of Hidden Markov Model - text output"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.testAllRunning Then
-            ocvb.trueText("When HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.")
+            task.trueText("When HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.")
             Exit Sub
         End If
         Dim srcData(src.Total * src.ElemSize - 1) As Byte

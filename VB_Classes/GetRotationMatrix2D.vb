@@ -21,7 +21,7 @@ Public Class GetRotationMatrix2D_Options
         task.desc = "Run to get the warpflag based on the current options"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         For i = 0 To radio.check.Length - 1
             If radio.check(i).Checked Then
                 warpFlag = Choose(i + 1, cv.InterpolationFlags.Area, cv.InterpolationFlags.Cubic, cv.InterpolationFlags.Lanczos4, cv.InterpolationFlags.Linear,
@@ -56,7 +56,7 @@ Public Class GetRotationMatrix2D_Basics
         task.desc = "Rotate a rectangle of a specified angle"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static frm = findfrm("GetRotationMatrix2D_Basics Radio Options")
 
         rotateOptions.Run()
@@ -85,7 +85,7 @@ Public Class GetRotationMatrix2D_Box
         task.desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         rotation.src = src
         rotation.Run()
         dst2 = dst1.Clone()

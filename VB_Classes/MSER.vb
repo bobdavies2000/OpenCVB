@@ -14,7 +14,7 @@ Public Class MSER_Basics
         task.desc = "Run MSER (Maximally Stable Extremal Region) algorithm with all default options except for maximum area"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         options.src = src
         options.Run()
@@ -107,7 +107,7 @@ Public Class MSER_Options
         task.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image using all the available options."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim delta = sliders.trackbar(0).Value
         Dim minArea = sliders.trackbar(1).Value
         Dim maxArea = sliders.trackbar(2).Value
@@ -136,8 +136,8 @@ Public Class MSER_Options
         End If
 
         Dim input = src
-        If check.Box(1).Checked Then Input = Input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        mser.DetectRegions(Input, regions, boxes)
+        If check.Box(1).Checked Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        mser.DetectRegions(input, regions, boxes)
 
         If standalone Or task.intermediateReview = caller Then
             dst1 = src.Clone
@@ -173,7 +173,7 @@ Public Class MSER_SyntheticInput
         task.desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim img = New cv.Mat(800, 800, cv.MatType.CV_8U, 0)
         Dim width() = {390, 380, 300, 290, 280, 270, 260, 250, 210, 190, 150, 100, 80, 70}
         Dim color1() = {80, 180, 160, 140, 120, 100, 90, 110, 170, 150, 140, 100, 220}
@@ -200,13 +200,13 @@ Public Class MSER_TestSynthetic
     Inherits VBparent
     Dim mser As MSER_Options
     Dim synth As MSER_SyntheticInput
-    Private Function testSynthetic( img As cv.Mat, pass2Only As Boolean, delta As integer) As String
+    Private Function testSynthetic(img As cv.Mat, pass2Only As Boolean, delta As Integer) As String
         mser.check.Box(0).Checked = pass2Only
         mser.sliders.trackbar(0).Value = delta
         mser.src = img
         mser.Run()
 
-        Dim pixels As integer
+        Dim pixels As Integer
         Dim regionCount As Integer
         For i = 0 To mser.regions.Length - 1
             regionCount += 1
@@ -234,7 +234,7 @@ Public Class MSER_TestSynthetic
         task.desc = "Test MSER with the synthetic image."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         synth.Run()
         dst1 = synth.dst1.Clone()
         dst2 = synth.dst1
@@ -260,7 +260,7 @@ Public Class MSER_CPPStyle
         gray = image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim mser = cv.MSER.Create()
         Dim regions()() As cv.Point = Nothing
         Dim boxes() As cv.Rect = Nothing
@@ -298,7 +298,7 @@ Public Class MSER_Contours
         task.desc = "Use MSER but show the contours of each region."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         mser.src = src
         mser.Run()
 

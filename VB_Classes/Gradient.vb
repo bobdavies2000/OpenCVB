@@ -10,7 +10,7 @@ Public Class Gradient_Basics
         task.desc = "Use phase to compute gradient"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         sobel.src = src
         sobel.Run()
         Dim x32f As New cv.Mat, y32f As New cv.Mat
@@ -34,7 +34,7 @@ Public Class Gradient_Depth
         label2 = "Phase Output"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         sobel.src = task.depth32f
         sobel.Run()
         Dim x32f As New cv.Mat, y32f As New cv.Mat
@@ -73,7 +73,7 @@ Public Class Gradient_CartToPolar
         task.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         src.ConvertTo(basics.src, cv.MatType.CV_32FC3, 1 / 255)
         basics.Run()
 
@@ -112,7 +112,7 @@ Public Class Gradient_StableDepth
         task.desc = "Use the stable depth as input to get a map of the phase of the gradient in the depth data."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         motionSD.src = src
         motionSD.Run()

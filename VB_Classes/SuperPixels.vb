@@ -38,7 +38,7 @@ Public Class SuperPixel_Basics_CPP
         task.desc = "Sub-divide the image into super pixels."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static numSuperPixels As integer
         Static numIterations As integer
         Static prior As integer
@@ -98,7 +98,7 @@ Public Class SuperPixel_BinarizedImage
         task.desc = "Create SuperPixels from a binary image."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         binarize.src = src
         binarize.Run()
 
@@ -125,7 +125,7 @@ Public Class SuperPixel_Depth
         task.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         pixels.src = task.RGBDepth.Clone()
         pixels.Run()
         dst1 = pixels.dst1
@@ -151,7 +151,7 @@ Public Class SuperPixel_WithCanny
         task.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         edges.src = task.color.Clone()
         edges.Run()
         pixels.src = task.color.Clone()
@@ -183,7 +183,7 @@ Public Class SuperPixel_WithLineDetector
         task.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         lines.src = src
         lines.Run()
         dst2 = lines.dst1

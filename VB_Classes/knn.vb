@@ -16,7 +16,7 @@ Public Class KNN_Basics
         task.desc = "Test knn with random points in the image.  Find the nearest n points."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1.SetTo(cv.Scalar.Black)
 
         If standalone Then
@@ -72,7 +72,7 @@ Public Class KNN_BasicsQT
         task.desc = "Test knn with random points in the image.  Find the nearest n points."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1.SetTo(cv.Scalar.Black)
 
         If standalone Or knnQT.useRandomData Then
@@ -144,7 +144,7 @@ Public Class KNN_QueryTrain
         task.desc = "Source of query/train points - generate points if standalone.  Reuse points if requested."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             If check.Box(0).Checked = False Then useRandomData = True
         End If
@@ -200,7 +200,7 @@ Public Class KNN_1_to_1
         task.desc = "Use knn to find the nearest n points but use only the best and no duplicates - 1:1 mapping."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         basics.Run()
         dst1 = basics.dst1
 
@@ -296,7 +296,7 @@ Public Class KNN_Emax
         task.desc = "Emax centroids move but here KNN is used to matched the old and new locations and keep the colors the same."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             knn.basics.knnQT.trainingPoints = New List(Of cv.Point2f)(emax.flood.centroids)
             emax.Run()
@@ -343,7 +343,7 @@ Public Class KNN_Test
         task.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run()
 
         knn.knnQT.queryPoints.Clear()
@@ -388,7 +388,7 @@ Public Class KNN_Test_1_to_1
         task.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run()
 
         knn.basics.knnQT.queryPoints.Clear()
@@ -429,7 +429,7 @@ Public Class KNN_Point3d
         label2 = "Top Down View to confirm 3D KNN is correct"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim maxDepth As Integer = 4000 ' this is an arbitrary max depth
         Dim knn = cv.ML.KNearest.Create()
         If standalone or task.intermediateReview = caller Then
@@ -509,7 +509,7 @@ Public Class KNN_DepthClusters
         task.desc = "Use KNN to track and color the Blob results from clustering the depth data"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         blobs.Run()
         dst1 = blobs.dst2
 
@@ -549,7 +549,7 @@ Public Class KNN_SmoothAverage
         task.desc = "Smooth out the abrupt appearance/disappearance of floodfilled regions"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         knn.src = src
         knn.Run()
 
@@ -590,7 +590,7 @@ Public Class KNN_StabilizeRegions
         task.desc = "Identify major regions that are unstable - appearing and disappearing"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         knn.src = src
         knn.Run()
         dst1 = knn.dst2
@@ -623,7 +623,7 @@ Public Class KNN_Contours
         task.desc = "Use KNN to streamline the outline of a contour"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         outline.Run()
         dst1 = outline.dst2
 
@@ -720,7 +720,7 @@ Public Class KNN_Cluster2DCities
         Next
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         ' If they changed Then number of elements in the set
         Static demoModeCheck = findCheckBox("Demo Mode")
         Static cityCountSlider = findSlider("KNN - number of points")
@@ -752,7 +752,7 @@ Public Class KNN_Cluster2DCities
 
             dst1.SetTo(0)
             cluster(dst1)
-            ocvb.trueText("knn closed regions = " + CStr(closedRegions), 10, 40, 3)
+            task.trueText("knn closed regions = " + CStr(closedRegions), 10, 40, 3)
         End If
     End Sub
 End Class
@@ -786,7 +786,7 @@ Public Class KNN_Point2d
         findXnearest = nearestCountSlider.Value
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then prepareImage(dst1, task.dotSize)
 
         knn.Run()
@@ -826,11 +826,11 @@ Public Class KNN_Learn
         task.desc = "Learn from a set of training points.  The calling user can then use FindNearest on the knn"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1.SetTo(cv.Scalar.Black)
 
         If standalone Then
-            ocvb.trueText("Database is ready for queries.  Use it with code like this " + vbCrLf + vbCrLf +
+            task.trueText("Database is ready for queries.  Use it with code like this " + vbCrLf + vbCrLf +
                           "public learn as KNN_Learn" + vbCrLf + "learn = new KNN_Learn" + vbCrLf +
                           "Dim neighbors As New cv.Mat" + vbCrLf + "Dim queries = New cv.Mat(1, 2, cv.MatType.CV_32F, {pt.x, pt.y})" + vbCrLf +
                           "learn.knn.FindNearest(queries, 1, neighbors)" + vbCrLf + vbCrLf + "And neighbors will have nearest point." + vbCrLf +
@@ -916,7 +916,7 @@ Public Class KNN_PointTracker
         Next
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then
             If topView Is Nothing Then topView = New PointCloud_Kalman_TopView()
             topView.src = task.pointCloud
@@ -1047,7 +1047,7 @@ Public Class KNN_1_to_1FIFO
         task.desc = "Using the last set of points, find the nearest point for each the current set - first come, first served."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1.SetTo(cv.Scalar.Black)
 
         If standalone Then

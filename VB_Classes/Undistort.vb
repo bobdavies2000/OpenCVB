@@ -83,10 +83,10 @@ Public Class Undistort_Basics
         task.desc = "Use sliders to control the undistort OpenCV API - Painterly"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.parms.intrinsicsLeft.coeffs Is Nothing Then
-            ocvb.trueText("The intrinsics values are missing for this camera.")
+            task.trueText("The intrinsics values are missing for this camera.")
             Exit Sub
         End If
 

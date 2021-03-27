@@ -7,9 +7,9 @@ Public Class intrinsicsLeft_Basics
         label2 = "ppx/ppy location"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.intrinsicsLeft.coeffs Is Nothing Then
-            ocvb.trueText("This camera is missing the intrinsics.")
+            task.trueText("This camera is missing the intrinsics.")
             Exit Sub
         End If
         Dim ttStart = 40
@@ -21,16 +21,16 @@ Public Class intrinsicsLeft_Basics
         Next
         If task.parms.intrinsicsLeft.FOV IsNot Nothing Then
             If task.parms.intrinsicsLeft.FOV(0) = 0 Then
-                ttStr += "Approximate FOV in x = " + CStr(ocvb.hFov) + vbCrLf +
-                         "Approximate FOV in y = " + CStr(ocvb.vFov) + vbCrLf
+                ttStr += "Approximate FOV in x = " + CStr(task.hFov) + vbCrLf +
+                         "Approximate FOV in y = " + CStr(task.vFov) + vbCrLf
             Else
                 ttStr += "FOV in x = " + CStr(task.parms.intrinsicsLeft.FOV(0)) + vbCrLf + "FOV in y = " + CStr(task.parms.intrinsicsLeft.FOV(1)) + vbCrLf
             End If
         Else
-            ttStr += "Approximate FOV in x = " + CStr(ocvb.hFov) + vbCrLf +
-                     "Approximate FOV in y = " + CStr(ocvb.vFov) + vbCrLf
+            ttStr += "Approximate FOV in x = " + CStr(task.hFov) + vbCrLf +
+                     "Approximate FOV in y = " + CStr(task.vFov) + vbCrLf
         End If
-        ocvb.trueText(ttStr)
+        task.trueText(ttStr)
 
         dst2.SetTo(0)
         dst2.Line(New cv.Point(src.Width / 2, 0), New cv.Point(src.Width / 2, src.Height), cv.Scalar.White, 1)

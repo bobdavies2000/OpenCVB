@@ -15,7 +15,7 @@ Public Class Math_Subtract
         task.desc = "Subtract a Mat using a scalar.  Set scalar to zero to see pixels saturate to zero."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim bgr = New cv.Scalar(sliders.trackbar(2).Value, sliders.trackbar(1).Value, sliders.trackbar(0).Value)
         cv.Cv2.Subtract(bgr, src, dst1) ' or dst1 = bgr - src
         dst2 = src - bgr
@@ -67,7 +67,7 @@ Public Class Math_Median_CDF
         task.desc = "Compute the src image median"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If standalone or task.intermediateReview = caller Then bins = sliders.trackbar(0).Value
 
@@ -102,7 +102,7 @@ Public Class Math_DepthMeanStdev
         task.desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         minMax.src = src
         minMax.Run()
         Dim mean As Single = 0, stdev As Single = 0
@@ -134,7 +134,7 @@ Public Class Math_RGBCorrelation
         task.desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim split = src.Split()
         match.searchArea = split(0)
         match.template = split(1)
@@ -173,7 +173,7 @@ Public Class Math_ImageAverage
         task.desc = "Create an image that is the mean of x number of previous images."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static avgSlider = findSlider("Average - number of input images")
         Static saveImageCount = avgSlider.Value
@@ -239,7 +239,7 @@ Public Class Math_Stdev
         task.desc = "Compute the standard deviation in each segment"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim updateCount As Integer
         lowStdevMask.SetTo(0)
         highStdevMask.SetTo(0)
@@ -303,7 +303,7 @@ Public Class Math_StdevBoundary
         task.desc = "Explore how to get a better boundary on the low stdev mask"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         stdev.src = src
         stdev.Run()

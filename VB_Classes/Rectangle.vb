@@ -20,7 +20,7 @@ Public Class Rectangle_Basics
         task.desc = "Draw the requested number of rectangles."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static typeCheckBox = findCheckBox("Draw Rotated Rectangles (unchecked will draw rectangles)")
         Static countSlider = findSlider("Rectangle Count")
         Static saveType = typeCheckBox.Checked
@@ -67,7 +67,7 @@ Public Class Rectangle_Rotated
         task.desc = "Draw the requested number of rectangles."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         rect.src = src
         rect.Run()
         dst1 = rect.dst1
@@ -94,7 +94,7 @@ Public Class Rectangle_CComp
         task.desc = "Isolate rectanguler regions around connected components"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         ccomp.src = src
         ccomp.Run()
@@ -134,7 +134,7 @@ Public Class Rectangle_Overlap
         task.desc = "Test if 2 rectangles overlap"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Or task.intermediateReview = caller Then
             draw.Run()
@@ -187,7 +187,7 @@ Public Class Rectangle_Motion
     End Sub
 
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         motion.src = src
         motion.Run()
@@ -213,7 +213,7 @@ Public Class Rectangle_MotionDepth
         task.desc = "Motion rectangles often overlap.  This algorithm consolidates those rectangles in the depth image."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static lastDepth = task.depth32f
         cv.Cv2.Min(task.depth32f, lastDepth, motion.src)
 
@@ -271,7 +271,7 @@ Public Class Rectangle_Intersection
         Return enclosing
     End Function
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Or task.intermediateReview = caller Then
             If draw Is Nothing Then draw = New Rectangle_Basics
@@ -336,7 +336,7 @@ Public Class Rectangle_Union
         task.desc = "Create a rectangle that contains all the input rectangles"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Or task.intermediateReview = caller Then
             If draw Is Nothing Then draw = New Rectangle_Basics
@@ -394,7 +394,7 @@ Public Class Rectangle_MultiOverlap
         task.desc = "Given a group of rectangles, merge all the rectangles that overlap"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Then
             Static draw = New Rectangle_Basics

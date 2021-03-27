@@ -31,7 +31,7 @@ Public Class WarpModel_Basics
         task.desc = "Use FindTransformECC to align 2 images"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Then
             warpInput.src = src
             warpInput.Run()
@@ -93,7 +93,7 @@ Public Class WarpModel_Basics
         If radio.check(2).Checked Or radio.check(3).Checked Then
             outStr += vbCrLf + "NOTE: Gradients may give better results."
         End If
-        ocvb.trueText(outStr, aligned.Width + 10, 220)
+        task.trueText(outStr, aligned.Width + 10, 220)
     End Sub
     Public Sub Close()
         WarpModel_Close(cPtr)
@@ -140,7 +140,7 @@ Public Class WarpModel_Input
         task.desc = "Import the misaligned input."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim img As New cv.Mat
         Static frm = findfrm("WarpModel_Input Radio Options")
         For i = 0 To frm.check.length - 1
@@ -215,7 +215,7 @@ Public Class WarpModel_AlignImages
         task.desc = "Align the RGB inputs raw images from the Prokudin examples."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static gradientCheck = findCheckBox("Use Gradient in WarpInput")
         If standalone Then
             ecc.warpInput.src = src
@@ -239,7 +239,7 @@ Public Class WarpModel_AlignImages
         cv.Cv2.Merge(mergeInput, merged)
         dst1.SetTo(0)
         dst1(New cv.Rect(0, 0, merged.Width, merged.Height)) = merged
-        ocvb.trueText("Note small displacement of" + vbCrLf + "the image when gradient is used." + vbCrLf +
+        task.trueText("Note small displacement of" + vbCrLf + "the image when gradient is used." + vbCrLf +
                       "Other than that, images look the same." + vbCrLf +
                       "Displacement increases with Sobel" + vbCrLf + "kernel size", merged.Width + 10, 40)
     End Sub
@@ -279,7 +279,7 @@ End Class
 '        task.desc = "Find the Translation and Euclidean warp matrix for the current grayscale image to the previous - needs more work"
 '    End Sub
 '    Public Sub Run()
-'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        If task.intermediateReview = caller Then task.intermediateObject = Me
 
 '        sobel.src = src
 '        sobel.Run()
@@ -323,7 +323,7 @@ End Class
 '            thresholdError = "The stdev was only " + Format(stdev, "#0.00") + " which is below the threshold of " + Format(stdevThreshold, "#0.00")
 '        End If
 
-'        If thresholdError.Length > 0 Then ocvb.trueText(thresholdError)
+'        If thresholdError.Length > 0 Then task.trueText(thresholdError)
 '        lastFrame = dst1.Clone
 '    End Sub
 'End Class
@@ -345,7 +345,7 @@ End Class
 '        task.desc = "Find warp matrix for the whole image using just the segment with the highest entropy."
 '    End Sub
 '    Public Sub Run()
-'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        If task.intermediateReview = caller Then task.intermediateObject = Me
 
 '        ' we only need to compute the max entropy every once in a while.  
 '        If task.frameCount Mod 10 = 0 Then

@@ -30,12 +30,12 @@ Imports System.Runtime.InteropServices
 '        task.desc = "Track an object using cv.Tracking API's - tracker algorithm"
 '    End Sub
 '    Public Sub Run()
-'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        If task.intermediateReview = caller Then task.intermediateObject = Me
 
 '        Dim input = src
 '        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-'        ocvb.trueText("Draw a rectangle around object to be tracked.", 10, 140, 3)
+'        task.trueText("Draw a rectangle around object to be tracked.", 10, 140, 3)
 '        If check.Box(0).Checked Then
 '            check.Box(0).Checked = False
 '            If tracker IsNot Nothing Then tracker.Dispose()
@@ -91,7 +91,7 @@ Imports System.Runtime.InteropServices
 '        task.desc = "Track any number of objects simultaneously - tracker algorithm"
 '    End Sub
 '    Public Sub Run()
-'        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+'        If task.intermediateReview = caller Then task.intermediateObject = Me
 '        If task.drawRect.Width <> 0 Then
 '            Dim tr = New Tracker_Basics()
 '            tr.src = src
@@ -162,7 +162,7 @@ Public Class Tracker_Basics
         task.desc = "Use C++ to track objects"
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
 
         Dim input = src
@@ -201,7 +201,7 @@ Public Class Tracker_Basics
                 dst1 = New cv.Mat(input.Rows, input.Cols, If(input.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), dstData)
             End If
         Else
-            ocvb.trueText("Draw a rectangle around any object to be tracked in the RGB image above.", 10, 140)
+            task.trueText("Draw a rectangle around any object to be tracked in the RGB image above.", 10, 140)
         End If
     End Sub
     Public Sub Close()

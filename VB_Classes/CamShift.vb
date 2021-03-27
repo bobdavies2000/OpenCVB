@@ -24,7 +24,7 @@ Public Class CamShift_Basics
         task.desc = "CamShift Demo - draw on the images to define the object to track. Tracker Algorithm"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static roi As New cv.Rect
         Static vMinLast As integer
         Static vMaxLast As integer
@@ -92,7 +92,7 @@ Public Class CamShift_Foreground
         task.desc = "Use depth to find the head and start the camshift demo.  Tracker Algorithm"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim restartRequested As Boolean
         Static depthMin As integer
         Static depthMax As integer
@@ -133,7 +133,7 @@ Public Class Camshift_Object
         task.desc = "Use the blob depth cluster as input to initialize a camshift algorithm.  Tracker Algorithm"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         blob.Run()
         dst2 = blob.dst2.Clone()
 
@@ -180,7 +180,7 @@ Public Class Camshift_TopObjects
         task.desc = "Track - Tracker Algorithm"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         blob.Run()
         dst1 = blob.dst2
 

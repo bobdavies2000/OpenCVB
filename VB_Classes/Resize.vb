@@ -16,7 +16,7 @@ Public Class Resize_Basics
         label2 = "Difference from Cubic Resize (Best)"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static frm = findfrm("Resize_Basics Radio Options")
 
         rotateOptions.Run()
@@ -55,7 +55,7 @@ Public Class Resize_Percentage
         task.desc = "Resize by a percentage of the image."
     End Sub
     Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim percent As Double = CDbl(sliders.trackbar(0).Value / 100)
         Dim resizePercent = sliders.trackbar(0).Value / 100

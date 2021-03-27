@@ -6,7 +6,7 @@ Public Class Font_OpenCV
         task.desc = "Display different font options available in OpenCV"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod 30 Then Exit Sub
         Dim hersheyFont = Choose(task.frameCount Mod 7 + 1, cv.HersheyFonts.HersheyComplex, cv.HersheyFonts.HersheyComplexSmall, cv.HersheyFonts.HersheyDuplex,
                                  cv.HersheyFonts.HersheyPlain, cv.HersheyFonts.HersheyScriptComplex, cv.HersheyFonts.HersheyScriptSimplex, cv.HersheyFonts.HersheySimplex,
@@ -36,11 +36,11 @@ Public Class Font_TrueType
         task.desc = "Display different TrueType fonts"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gfontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
         Dim fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
         ' get the font on every iteration because it could have changed.  This should be done in any algorithm using OptionsFont.
-        ocvb.trueText("TrueType Font is currently set to " + fontName + " with size = " + CStr(gfontSize) + vbCrLf +
+        task.trueText("TrueType Font is currently set to " + fontName + " with size = " + CStr(gfontSize) + vbCrLf +
                       "Use the Settings button above to change the font name and size.")
     End Sub
 End Class
@@ -59,7 +59,7 @@ Public Class Font_FlowText
         task.desc = "Show TrueType text flowing through an image."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             msgs.Add("-------------------------------------------------------------------------------------------------------------------")
             msgs.Add("To get text to flow across an image in any algorithm, add 'flow = new Font_FlowText()' to the class constructor.")
@@ -76,7 +76,7 @@ Public Class Font_FlowText
         For i = firstLine To msgs.Count - 1
             fullText += msgs(i) + vbCrLf
         Next
-        ocvb.trueText(fullText, 10, 20, dst)
+        task.trueText(fullText, 10, 20, dst)
 
         If msgs.Count >= maxLines Then
             Try
