@@ -775,7 +775,7 @@ End Class
 '    Inherits VBparent
 '    Public topView As Histogram_TopView2D
 '    Public kTopView As PointCloud_Kalman_TopView
-'    Public lDetect As LineDetector_Basics
+'    Public lDetect As Line_Basics
 '    Dim angleSlider As System.Windows.Forms.TrackBar
 '    Dim cmat As PointCloud_Colorize
 '    Public Sub New()
@@ -787,7 +787,7 @@ End Class
 '        kTopView = New PointCloud_Kalman_TopView()
 '        cmat = New PointCloud_Colorize()
 
-'        lDetect = New LineDetector_Basics()
+'        lDetect = New Line_Basics()
 '        lDetect.drawLines = True
 
 '        label1 = "Top view aligned using the IMU gravity vector"
@@ -826,13 +826,13 @@ End Class
 '    Inherits VBparent
 '    Public sideView As Histogram_SideView2D
 '    Public kSideView As PointCloud_Kalman_SideView
-'    Public lDetect As LineDetector_Basics
+'    Public lDetect As Line_Basics
 '    Dim cmat As PointCloud_Colorize
 '    Public Sub New()
 '        initParent()
 
 '        cmat = New PointCloud_Colorize()
-'        lDetect = New LineDetector_Basics()
+'        lDetect = New Line_Basics()
 '        lDetect.drawLines = True
 
 '        kSideView = New PointCloud_Kalman_SideView()

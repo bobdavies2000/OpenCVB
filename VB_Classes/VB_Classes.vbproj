@@ -213,7 +213,7 @@
     <Compile Include="imShow.vb" />
     <Compile Include="Intrinsics.vb" />
     <Compile Include="Keyboard.vb" />
-    <Compile Include="LineDetector.vb" />
+    <Compile Include="Line.vb" />
     <Compile Include="Gradient.vb" />
     <Compile Include="Histogram.vb" />
     <Compile Include="HOG.vb" />

@@ -172,10 +172,10 @@ End Class
 Public Class SuperPixel_WithLineDetector
     Inherits VBparent
     Dim pixels As SuperPixel_Basics_CPP
-    Dim lines As LineDetector_Basics
+    Dim lines As Line_Basics
     Public Sub New()
         initParent()
-        lines = New LineDetector_Basics()
+        lines = New Line_Basics()
 
         pixels = New SuperPixel_Basics_CPP()
 

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class LineDetector_Basics
+Public Class Line_Basics
     Inherits VBparent
     Dim ld As cv.XImgProc.FastLineDetector
     Public drawLines = False
@@ -55,7 +55,7 @@ End Class
 
 
 
-Module fastLineDetector_Exports
+Module Line_Exports
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function lineDetectorFast_Run(image As IntPtr, rows As Integer, cols As Integer, length_threshold As Integer, distance_threshold As Single, canny_th1 As Integer, canny_th2 As Integer,
                                              canny_aperture_size As Integer, do_merge As Boolean) As Integer
@@ -219,7 +219,7 @@ End Module
 
 
 ' https://docs.opencv.org/3.4.3/d1/d9e/fld_lines_8cpp-example.html
-Public Class lineDetector_FLD_CPP
+Public Class line_FLD_CPP
     Inherits VBparent
     Public sortedLines As New SortedList(Of cv.Vec6f, Integer)
     Public lineMat As New cv.Mat
@@ -274,12 +274,12 @@ End Class
 
 
 
-Public Class LineDetector_3D_LongestLine
+Public Class Line_3D_LongestLine
     Inherits VBparent
-    Dim lines As lineDetector_FLD_CPP
+    Dim lines As line_FLD_CPP
     Public Sub New()
         initParent()
-        lines = New lineDetector_FLD_CPP()
+        lines = New line_FLD_CPP()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -309,12 +309,12 @@ End Class
 
 
 
-Public Class LineDetector_3D_FLD_MT
+Public Class Line_3D_FLD_MT
     Inherits VBparent
-    Dim lines As lineDetector_FLD_CPP
+    Dim lines As line_FLD_CPP
     Public Sub New()
         initParent()
-        lines = New lineDetector_FLD_CPP()
+        lines = New line_FLD_CPP()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -345,12 +345,12 @@ End Class
 
 
 
-'Public Class LineDetector_3D_FitLineZ
+'Public Class Line_3D_FitLineZ
 '    Inherits VBparent
-'    Dim linesFLD As lineDetector_FLD_CPP
+'    Dim linesFLD As line_FLD_CPP
 '    Public Sub New()
 '        initParent()
-'        linesFLD = New lineDetector_FLD_CPP()
+'        linesFLD = New line_FLD_CPP()
 
 '        If findfrm(caller + " Slider Options") Is Nothing Then
 '            sliders.Setup(caller)
@@ -453,7 +453,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4.3/d1/d9e/fld_lines_8cpp-example.html
-Public Class lineDetector_FLD
+Public Class line_FLD
     Inherits VBparent
     Public lines As New List(Of cv.Vec4f)
     Public Sub New()
@@ -525,13 +525,13 @@ End Class
 
 
 
-Public Class LineDetector_Reduction
+Public Class Line_Reduction
     Inherits VBparent
-    Dim lDetect As LineDetector_Basics
+    Dim lDetect As Line_Basics
     Dim reduction As Reduction_Basics
     Public Sub New()
         initParent()
-        lDetect = New LineDetector_Basics()
+        lDetect = New Line_Basics()
         reduction = New Reduction_Basics()
         reduction.radio.check(0).Checked = True
 
@@ -548,5 +548,84 @@ Public Class LineDetector_Reduction
         lDetect.src = reduction.dst1
         lDetect.Run()
         dst1 = lDetect.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_HighlightSlope
+    Inherits VBparent
+    Dim lines As Structured_LineIntercepts
+    Public Sub New()
+        initParent()
+        lines = New Structured_LineIntercepts
+        label1 = "Use mouse in right image to highlight lines"
+        task.desc = "An alternative way to highlight line segments with common slope"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+
+        lines.src = src
+        lines.Run()
+        Dim searchRange = lines.searchRange
+        dst2.SetTo(0)
+
+        Dim red = New cv.Scalar(0, 0, 255)
+        Dim green = New cv.Scalar(1, 128, 0)
+        Dim yellow = New cv.Scalar(2, 255, 255)
+        Dim blue = New cv.Scalar(254, 0, 0)
+
+        Dim center = New cv.Point(dst2.Width / 2, dst2.Height / 2)
+        dst2.Line(New cv.Point(0, 0), center, blue, 1, cv.LineTypes.Link4)
+        dst2.Line(New cv.Point(dst1.Width, 0), center, red, 1, cv.LineTypes.Link4)
+        dst2.Line(New cv.Point(0, dst1.Height), center, blue, 1, cv.LineTypes.Link4)
+        dst2.Line(New cv.Point(dst1.Width, dst1.Height), center, yellow, 1, cv.LineTypes.Link4)
+
+        Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
+        Dim pt = New cv.Point(center.X, center.Y - 30)
+        cv.Cv2.FloodFill(dst2, mask, pt, red, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
+
+        pt = New cv.Point(center.X, center.Y + 30)
+        cv.Cv2.FloodFill(dst2, mask, pt, green, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
+
+        pt = New cv.Point(center.X - 30, center.Y)
+        cv.Cv2.FloodFill(dst2, mask, pt, blue, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
+
+        pt = New cv.Point(center.X + 30, center.Y)
+        cv.Cv2.FloodFill(dst2, mask, pt, yellow, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
+        Dim color = dst2.Get(Of cv.Vec3b)(task.mousePoint.Y, task.mousePoint.X)
+
+        Dim p1 = task.mousePoint
+        Static p2 As cv.Point
+        If p1.X = center.X Then
+            If p1.Y <= center.Y Then p2 = New cv.Point(dst2.Width / 2, 0) Else p2 = New cv.Point(dst2.Width, dst2.Height)
+        Else
+            Dim m = (center.Y - p1.Y) / (center.X - p1.X)
+            Dim b = p1.Y - p1.X * m
+
+            If color.Item0 = 0 Then p2 = New cv.Point(-b / m, 0) ' red zone
+            If color.Item0 = 1 Then p2 = New cv.Point((dst2.Height - b) / m, dst2.Height) ' green
+            If color.Item0 = 2 Then p2 = New cv.Point(dst2.Width, dst2.Width * m + b) ' yellow
+            If color.Item0 = 254 Then p2 = New cv.Point(0, b) ' blue
+            dst2.Line(center, p2, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
+        End If
+        dst2.Circle(center, task.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+
+
+        Static redRadio = findRadio("Show Top intercepts")
+        Static greenRadio = findRadio("Show Bottom intercepts")
+        Static yellowRadio = findRadio("Show Right intercepts")
+        Static blueRadio = findRadio("Show Left intercepts")
+        If color.Item0 = 0 Then redRadio.checked = True
+        If color.Item0 = 1 Then greenRadio.checked = True
+        If color.Item0 = 2 Then yellowRadio.checked = True
+        If color.Item0 = 254 Then blueRadio.checked = True
+
+        lines.showIntercepts(p2, dst2)
+        dst1 = lines.dst1
     End Sub
 End Class

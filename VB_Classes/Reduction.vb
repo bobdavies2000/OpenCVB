@@ -155,7 +155,7 @@ Public Class Reduction_Lines
     Inherits VBparent
     Dim sideView As Histogram_SideView2D
     Dim topView As Histogram_TopView2D
-    Public lDetect As LineDetector_Basics
+    Public lDetect As Line_Basics
     Public cmatSide As PointCloud_ColorizeSide
     Public cmatTop As PointCloud_ColorizeTop
     Dim reduction As Reduction_PointCloud
@@ -169,7 +169,7 @@ Public Class Reduction_Lines
         reduction = New Reduction_PointCloud
 
         task.thresholdSlider.Value = 20
-        lDetect = New LineDetector_Basics()
+        lDetect = New Line_Basics()
 
         label1 = "Gravity rotated Side View with detected lines"
         label2 = "Gravity rotated Top View width detected lines"

@@ -267,10 +267,10 @@ End Class
 Public Class Structured_MultiSliceLines
     Inherits VBparent
     Dim multi As Structured_MultiSlice
-    Public ldetect As LineDetector_Basics
+    Public ldetect As Line_Basics
     Public Sub New()
         initParent()
-        ldetect = New LineDetector_Basics()
+        ldetect = New Line_Basics()
         Dim lenSlider = findSlider("Line length threshold in pixels")
         lenSlider.Value = lenSlider.Maximum ' don't need the yellow line...
         multi = New Structured_MultiSlice()
@@ -701,7 +701,7 @@ End Class
 Public Class Structured_CenterSlice
     Inherits VBparent
     Dim vSlice As Structured_SliceV
-    Dim line As LineDetector_Basics
+    Dim line As Line_Basics
     Public topPt As cv.Point2f, botPt As cv.Point2f
     Public slope As Single
     Public avgPt As cv.Point2f
@@ -709,7 +709,7 @@ Public Class Structured_CenterSlice
     Public Sub New()
         initParent()
         vSlice = New Structured_SliceV
-        line = New LineDetector_Basics
+        line = New Line_Basics
         label1 = "Center Slice in yellow"
         label2 = "White = SliceV output, Red Dot is avgPt"
         task.desc = "Find the vertical center line with accurate depth data.."
@@ -1005,7 +1005,7 @@ End Class
 
 Public Class Structured_Lines
     Inherits VBparent
-    Dim lines As LineDetector_Basics
+    Dim lines As Line_Basics
     Public pt1 As New List(Of cv.Point2f)
     Public pt2 As New List(Of cv.Point2f)
     Public z1 As New List(Of cv.Point3f) ' the point cloud values corresponding to pt1 and pt2
@@ -1013,7 +1013,7 @@ Public Class Structured_Lines
     Public cloudInput As cv.Mat
     Public Sub New()
         initParent()
-        lines = New LineDetector_Basics
+        lines = New Line_Basics
         label1 = "Lines defined in RGB"
         label2 = "Lines in RGB confirmed in the point cloud"
         task.desc = "Find the RGB lines and confirm they are present in the cloud data."
@@ -1164,7 +1164,7 @@ End Class
 
 Public Class Structured_LineIntercepts
     Inherits VBparent
-    Dim lines As LineDetector_Basics
+    Dim lines As Line_Basics
     Public pt1 As New List(Of cv.Point2f)
     Public pt2 As New List(Of cv.Point2f)
     Public topIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
@@ -1175,7 +1175,7 @@ Public Class Structured_LineIntercepts
     Public thickNess As Integer
     Public Sub New()
         initParent()
-        lines = New LineDetector_Basics
+        lines = New Line_Basics
         Dim lenSlider = findSlider("Line length threshold in pixels")
         lenSlider.Value = 1
 
@@ -1211,7 +1211,7 @@ Public Class Structured_LineIntercepts
             End Select
         Next
     End Sub
-    Public Sub highlight(showAll As Boolean, dst As cv.Mat)
+    Public Sub showIntercepts(mousePoint As cv.Point, dst As cv.Mat)
         Static topRadio = findRadio("Show Top intercepts")
         Static botRadio = findRadio("Show Bottom intercepts")
         Static leftRadio = findRadio("Show Left intercepts")
@@ -1220,8 +1220,8 @@ Public Class Structured_LineIntercepts
         For i = 0 To 3
             Dim radio = Choose(i + 1, topRadio, botRadio, leftRadio, rightRadio)
             Dim intercepts = Choose(i + 1, topIntercepts, botIntercepts, leftIntercepts, rightIntercepts)
-            Dim mousePoint = Choose(i + 1, task.mousePoint.X, task.mousePoint.X, task.mousePoint.Y, task.mousePoint.Y)
-            If radio.checked Or showAll Then hightLightIntercept(mousePoint, intercepts, i, dst)
+            Dim pt = Choose(i + 1, mousePoint.X, mousePoint.X, mousePoint.Y, mousePoint.Y)
+            If radio.checked Then hightLightIntercept(pt, intercepts, i, dst)
         Next
     End Sub
     Public Sub Run()
@@ -1279,74 +1279,6 @@ Public Class Structured_LineIntercepts
             End If
         Next
 
-        If standalone Then highlight(False, dst1)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Line_HighlightSlope
-    Inherits VBparent
-    Dim lines As Structured_LineIntercepts
-    Public Sub New()
-        initParent()
-        lines = New Structured_LineIntercepts
-        task.desc = "An alternative way to highlight line segments with common slope"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-
-        lines.src = src
-        lines.Run()
-        Dim searchRange = lines.searchRange
-        dst2.SetTo(0)
-
-        lines.highlight(True, dst2)
-        dst1 = lines.dst1
-
-        Dim red = New cv.Scalar(0, 0, 255)
-        Dim green = New cv.Scalar(1, 128, 0)
-        Dim yellow = New cv.Scalar(2, 255, 255)
-        Dim blue = New cv.Scalar(254, 0, 0)
-
-        Dim center = New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        dst2.Line(New cv.Point(0, 0), center, blue, 1, cv.LineTypes.Link4)
-        dst2.Line(New cv.Point(dst1.Width, 0), center, red, 1, cv.LineTypes.Link4)
-        dst2.Line(New cv.Point(0, dst1.Height), center, blue, 1, cv.LineTypes.Link4)
-        dst2.Line(New cv.Point(dst1.Width, dst1.Height), center, yellow, 1, cv.LineTypes.Link4)
-
-        Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
-        Dim pt = New cv.Point(center.X, center.Y - 30)
-        cv.Cv2.FloodFill(dst2, mask, pt, red, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
-
-        pt = New cv.Point(center.X, center.Y + 30)
-        cv.Cv2.FloodFill(dst2, mask, pt, green, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
-
-        pt = New cv.Point(center.X - 30, center.Y)
-        cv.Cv2.FloodFill(dst2, mask, pt, blue, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
-
-        pt = New cv.Point(center.X + 30, center.Y)
-        cv.Cv2.FloodFill(dst2, mask, pt, yellow, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
-
-        Dim p1 = task.mousePoint
-        Static p2 As cv.Point
-        If p1.X = center.X Then
-            If p1.Y <= center.Y Then p2 = New cv.Point(dst2.Width / 2, 0) Else p2 = New cv.Point(dst2.Width, dst2.Height)
-        Else
-            Dim color = dst2.Get(Of cv.Vec3b)(task.mousePoint.Y, task.mousePoint.X)
-            Dim m = (center.Y - p1.Y) / (center.X - p1.X)
-            Dim b = p1.Y - p1.X * m
-
-            If color.Item0 = 0 Then p2 = New cv.Point(-b / m, 0) ' red zone
-            If color.Item0 = 1 Then p2 = New cv.Point((dst2.Height - b) / m, dst2.Height) ' green
-            If color.Item0 = 2 Then p2 = New cv.Point(dst2.Width, dst2.Width * m + b) ' yellow
-            If color.Item0 = 254 Then p2 = New cv.Point(0, b) ' blue
-            dst2.Line(center, p2, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
-        End If
-        dst2.Circle(center, task.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+        If standalone Then showIntercepts(task.mousePoint, dst1)
     End Sub
 End Class
