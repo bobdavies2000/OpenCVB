@@ -586,7 +586,7 @@ Public Class IMU_IscameraStable
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 1)
-            sliders.setupTrackBar(0, "Threshold in camera motion in radians X100", 1, 100, 3) ' how much motion is reasonable?
+            sliders.setupTrackBar(0, "Threshold in camera motion in radians X100", 1, 15, 3) ' how much motion is reasonable?
         End If
         task.desc = "Answer the question: Is the camera stable?"
     End Sub

@@ -2,9 +2,55 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Line_Basics
     Inherits VBparent
+    Dim lines As Line_Stable
     Dim ld As cv.XImgProc.FastLineDetector
-    Public drawLines = False
     Public sortlines As New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
+    Public Sub New()
+        initParent()
+        lines = New Line_Stable
+        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
+        label1 = "Stable lines after IMU motion detection"
+        task.desc = "Use the line detector on the stable lines produced by Line_Stable"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        lines.src = src
+        lines.Run()
+        dst1 = lines.dst2
+
+        Dim ldLines = ld.Detect(lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        sortlines.Clear()
+
+        dst2.SetTo(0)
+        For Each v In ldLines
+            If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And
+               v(2) >= 0 And v(2) <= dst1.Cols And v(3) >= 0 And v(3) <= dst1.Rows Then
+                Dim pt1 = New cv.Point(CInt(v(0)), CInt(v(1)))
+                Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
+                Dim pixelLen = Math.Sqrt((pt1.X - pt2.X) * (pt1.X - pt2.X) + (pt1.Y - pt2.Y) * (pt1.Y - pt2.Y))
+                If pixelLen > lines.pixelThreshold Then
+                    dst2.Line(pt1, pt2, cv.Scalar.Yellow, lines.thickness, cv.LineTypes.AntiAlias)
+                    sortlines.Add(pixelLen, New cv.Vec4f(pt1.X, pt1.Y, pt2.X, pt2.Y))
+                End If
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Line_Stable
+    Inherits VBparent
+    Dim ld As cv.XImgProc.FastLineDetector
+    Dim stable As IMU_IscameraStable
+    Public sortlines As New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
+    Public thickness As Integer
+    Public pixelThreshold As Integer
     Public Sub New()
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -14,6 +60,7 @@ Public Class Line_Basics
             sliders.setupTrackBar(2, "Depth search radius in pixels", 1, 20, 2) ' not used in Run below but externally...
             sliders.setupTrackBar(3, "x- and y-intercept search range in pixels", 1, 50, 10) ' not used in Run below but externally...
         End If
+        stable = New IMU_IscameraStable
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
         label1 = "Yellow > length threshold"
         task.desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
@@ -23,11 +70,10 @@ Public Class Line_Basics
         dst1 = src.Clone
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim lines = ld.Detect(src)
-        src.CopyTo(dst2)
         Static thicknessSlider = findSlider("Line thickness")
-        Dim thickness = thicknessSlider.Value
+        thickness = thicknessSlider.Value
         Static pixelSlider = findSlider("Line length threshold in pixels")
-        Dim pixelThreshold = pixelSlider.value
+        pixelThreshold = pixelSlider.value
 
         sortlines.Clear()
 
@@ -43,12 +89,18 @@ Public Class Line_Basics
                 End If
             End If
         Next
-        If standalone Or drawLines Then
-            label2 = "Drawn with DrawSegment (thickness=1)"
-            ld.DrawSegments(dst2, lines, False)
-        End If
+
+        stable.Run()
+        If stable.cameraStable = False Then dst2.SetTo(0)
+
+        For Each line In sortlines
+            Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
+            Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
+            dst2.Line(p1, p2, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        Next
     End Sub
 End Class
+
 
 
 
@@ -274,7 +326,7 @@ End Class
 
 
 
-Public Class Line_3D_LongestLine
+Public Class Line_LongestLine
     Inherits VBparent
     Dim lines As line_FLD_CPP
     Public Sub New()
@@ -309,7 +361,7 @@ End Class
 
 
 
-Public Class Line_3D_FLD_MT
+Public Class Line_FLD_MT
     Inherits VBparent
     Dim lines As line_FLD_CPP
     Public Sub New()
@@ -529,11 +581,15 @@ Public Class Line_Reduction
     Inherits VBparent
     Dim lDetect As Line_Basics
     Dim reduction As Reduction_Basics
+    Dim stable As IMU_IscameraStable
     Public Sub New()
         initParent()
+        stable = New IMU_IscameraStable
         lDetect = New Line_Basics()
+
         reduction = New Reduction_Basics()
-        reduction.radio.check(0).Checked = True
+        Dim simpleRadio = findRadio("Use simple reduction")
+        simpleRadio.Checked = True
 
         label1 = "Yellow > length threshold, red < length threshold"
         label2 = "Input image after reduction"
@@ -543,11 +599,19 @@ Public Class Line_Reduction
         If task.intermediateReview = caller Then task.intermediateObject = Me
         reduction.src = src
         reduction.Run()
-        dst2 = reduction.dst1
 
         lDetect.src = reduction.dst1
         lDetect.Run()
         dst1 = lDetect.dst1
+
+        stable.Run()
+        If stable.cameraStable = False Then dst2.SetTo(0)
+
+        For Each line In lDetect.sortlines
+            Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
+            Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
+            dst2.Line(p1, p2, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        Next
     End Sub
 End Class
 
@@ -559,10 +623,10 @@ End Class
 
 Public Class Line_HighlightSlope
     Inherits VBparent
-    Dim lines As Structured_LineIntercepts
+    Dim lines As Line_Intercepts
     Public Sub New()
         initParent()
-        lines = New Structured_LineIntercepts
+        lines = New Line_Intercepts
         label1 = "Use mouse in right image to highlight lines"
         task.desc = "An alternative way to highlight line segments with common slope"
     End Sub
@@ -627,5 +691,291 @@ Public Class Line_HighlightSlope
 
         lines.showIntercepts(p2, dst2)
         dst1 = lines.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_ConfirmedDepth
+    Inherits VBparent
+    Dim lines As Line_Basics
+    Public pt1 As New List(Of cv.Point2f)
+    Public pt2 As New List(Of cv.Point2f)
+    Public z1 As New List(Of cv.Point3f) ' the point cloud values corresponding to pt1 and pt2
+    Public z2 As New List(Of cv.Point3f)
+    Public cloudInput As cv.Mat
+    Public Sub New()
+        initParent()
+        lines = New Line_Basics
+        label1 = "Lines defined in RGB"
+        label2 = "Lines in RGB confirmed in the point cloud"
+        task.desc = "Find the RGB lines and confirm they are present in the cloud data."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        Static thickSlider = findSlider("Line thickness")
+        Dim thickness = thickSlider.value
+        lines.src = src
+        lines.Run()
+        dst1 = lines.dst1
+
+        If lines.sortlines.Count = 0 Then Exit Sub
+        Dim lineList = New List(Of cv.Rect)
+        If cloudInput Is Nothing Then cloudInput = task.pointCloud
+        Dim split = cloudInput.Split()
+        dst2.SetTo(0)
+        pt1.Clear()
+        pt2.Clear()
+        z1.Clear()
+        z2.Clear()
+        For Each nl In lines.sortlines
+            Dim p1 = New cv.Point2f(nl.Value.Item0, nl.Value.Item1)
+            Dim p2 = New cv.Point2f(nl.Value.Item2, nl.Value.Item3)
+
+            Dim minXX = Math.Min(p1.X, p2.X)
+            Dim minYY = Math.Min(p1.Y, p2.Y)
+            Dim w = Math.Abs(p1.X - p2.X)
+            Dim h = Math.Abs(p1.Y - p2.Y)
+            Dim r = New cv.Rect(minXX, minYY, If(w > 0, w, 2), If(h > 0, h, 2))
+            Dim mask = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, 0)
+            mask.Line(New cv.Point(CInt(p1.X - r.X), CInt(p1.Y - r.Y)), New cv.Point(CInt(p2.X - r.X), CInt(p2.Y - r.Y)), 255, thickness, cv.LineTypes.Link4)
+            Dim mean = cloudInput(r).Mean(mask)
+
+            If mean <> New cv.Scalar Then
+                Dim min As Double, max As Double, Loc(4 - 1) As cv.Point
+                cv.Cv2.MinMaxLoc(split(0)(r), min, max, Loc(0), Loc(1), mask)
+
+                cv.Cv2.MinMaxLoc(split(1)(r), min, max, Loc(2), Loc(3), mask)
+                Dim len1 = Loc(0).DistanceTo(Loc(1))
+                Dim len2 = Loc(2).DistanceTo(Loc(3))
+                If len1 > len2 Then
+                    p1 = New cv.Point(Loc(0).X + r.X, Loc(0).Y + r.Y)
+                    p2 = New cv.Point(Loc(1).X + r.X, Loc(1).Y + r.Y)
+                Else
+                    p1 = New cv.Point(Loc(2).X + r.X, Loc(2).Y + r.Y)
+                    p2 = New cv.Point(Loc(3).X + r.X, Loc(3).Y + r.Y)
+                End If
+                If p1.DistanceTo(p2) > 1 Then
+                    dst2.Line(p1, p2, cv.Scalar.Yellow, thickness, cv.LineTypes.AntiAlias)
+                    pt1.Add(p1)
+                    pt2.Add(p2)
+                    z1.Add(cloudInput.Get(Of cv.Point3f)(p1.Y, p1.X))
+                    z2.Add(cloudInput.Get(Of cv.Point3f)(p2.Y, p2.X))
+                End If
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Line_Vertical
+    Inherits VBparent
+    Dim gCloud As Depth_PointCloud_IMU
+    Public lines As Line_ConfirmedDepth
+    Public thickness As Integer
+    Public toleranceInMMs As Single
+    Public Sub New()
+        initParent()
+        gCloud = New Depth_PointCloud_IMU
+        lines = New Line_ConfirmedDepth
+
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Error tolerance when measuring vertical lines in 3D (mm's)", 0, 300, 50)
+        End If
+
+        task.desc = "Find all the vertical lines in the IMU rectified cloud"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        Static thickSlider = findSlider("Line thickness")
+        Static errorSlider = findSlider("Error tolerance when measuring vertical lines in 3D (mm's)")
+        toleranceInMMs = errorSlider.value / 1000
+        thickness = thickSlider.value
+        dst1 = src.Clone
+
+        gCloud.Run()
+        lines.cloudInput = gCloud.dst1
+        lines.src = src
+        lines.Run()
+
+        For i = 0 To lines.z1.Count - 1
+            Dim p1 = lines.z1(i)
+            Dim p2 = lines.z2(i)
+            If Math.Abs(p1.X - p2.X) < toleranceInMMs And Math.Abs(p1.Z - p2.Z) < toleranceInMMs Then
+                dst1.Line(lines.pt1(i), lines.pt2(i), cv.Scalar.Yellow, thickness, cv.LineTypes.AntiAlias)
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Line_Horizontal
+    Inherits VBparent
+    Dim vLines As Line_Vertical
+    Public Sub New()
+        initParent()
+        vLines = New Line_Vertical
+        task.desc = "Find all the horizontal lines in the IMU rectified cloud"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        dst1 = src.Clone
+
+        vLines.src = src
+        vLines.Run()
+
+        For i = 0 To vLines.lines.z1.Count - 1
+            Dim p1 = vLines.lines.z1(i)
+            Dim p2 = vLines.lines.z2(i)
+            If Math.Abs(p1.Y - p2.Y) < vLines.toleranceInMMs And Math.Abs(p1.Z - p2.Z) < vLines.toleranceInMMs Then
+                dst1.Line(vLines.lines.pt1(i), vLines.lines.pt2(i), cv.Scalar.Yellow, vLines.thickness, cv.LineTypes.AntiAlias)
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_Intercepts
+    Inherits VBparent
+    Dim lines As Line_Basics
+    Public pt1 As New List(Of cv.Point2f)
+    Public pt2 As New List(Of cv.Point2f)
+    Public topIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+    Public botIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+    Public leftIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+    Public rightIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+    Public searchRange As Integer
+    Public thickNess As Integer
+    Public Sub New()
+        initParent()
+        lines = New Line_Basics
+        Dim lenSlider = findSlider("Line length threshold in pixels")
+        lenSlider.Value = 1
+
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 4)
+            radio.check(0).Text = "Show Top intercepts"
+            radio.check(1).Text = "Show Bottom intercepts"
+            radio.check(2).Text = "Show Left intercepts"
+            radio.check(3).Text = "Show Right intercepts"
+            radio.check(1).Checked = True
+        End If
+
+        label1 = "Mouse tracks top, bottom, left, or right intercepts."
+        task.desc = "Consolidate RGB lines using the x- and y-intercepts"
+    End Sub
+    Public Sub hightLightIntercept(mousePoint As Integer, intercepts As SortedList(Of Integer, Integer), axis As Integer, dst As cv.Mat)
+        For Each inter In intercepts
+            If Math.Abs(mousePoint - inter.Key) < searchRange Then
+                dst1.Line(pt1(inter.Value), pt2(inter.Value), cv.Scalar.White, thickNess + 4, cv.LineTypes.AntiAlias)
+                dst1.Line(pt1(inter.Value), pt2(inter.Value), cv.Scalar.Blue, thickNess, cv.LineTypes.AntiAlias)
+            End If
+        Next
+        For Each inter In intercepts
+            Select Case axis
+                Case 0
+                    dst.Line(New cv.Point(inter.Key, 0), New cv.Point(inter.Key, 10), cv.Scalar.White, task.lineSize)
+                Case 1
+                    dst.Line(New cv.Point(inter.Key, dst1.Height), New cv.Point(inter.Key, dst1.Height - 10), cv.Scalar.White, task.lineSize)
+                Case 2
+                    dst.Line(New cv.Point(0, inter.Key), New cv.Point(10, inter.Key), cv.Scalar.White, task.lineSize)
+                Case 3
+                    dst.Line(New cv.Point(dst1.Width, inter.Key), New cv.Point(dst1.Width - 10, inter.Key), cv.Scalar.White, task.lineSize)
+            End Select
+        Next
+    End Sub
+    Public Sub showIntercepts(mousePoint As cv.Point, dst As cv.Mat)
+        Static topRadio = findRadio("Show Top intercepts")
+        Static botRadio = findRadio("Show Bottom intercepts")
+        Static leftRadio = findRadio("Show Left intercepts")
+        Static rightRadio = findRadio("Show Right intercepts")
+
+        For i = 0 To 3
+            Dim radio = Choose(i + 1, topRadio, botRadio, leftRadio, rightRadio)
+            Dim intercepts = Choose(i + 1, topIntercepts, botIntercepts, leftIntercepts, rightIntercepts)
+            Dim pt = Choose(i + 1, mousePoint.X, mousePoint.X, mousePoint.Y, mousePoint.Y)
+            If radio.checked Then hightLightIntercept(pt, intercepts, i, dst)
+        Next
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        Static thickSlider = findSlider("Line thickness")
+        Static searchSlider = findSlider("x- and y-intercept search range in pixels")
+        thickNess = thickSlider.value
+        searchRange = searchSlider.value
+
+        lines.src = src
+        lines.Run()
+        If lines.sortlines.Count = 0 Then Exit Sub
+
+        dst1 = src
+        pt1.Clear()
+        pt2.Clear()
+        topIntercepts.Clear()
+        botIntercepts.Clear()
+        leftIntercepts.Clear()
+        rightIntercepts.Clear()
+        For i = 0 To lines.sortlines.Count - 1
+            Dim nl = lines.sortlines.ElementAt(i).Value
+            Dim p1 = New cv.Point2f(nl.Item0, nl.Item1)
+            Dim p2 = New cv.Point2f(nl.Item2, nl.Item3)
+
+            Dim minXX = Math.Min(p1.X, p2.X)
+            If p1.X <> minXX Then ' leftmost point is always in pt1
+                Dim tmp = p1
+                p1 = p2
+                p2 = tmp
+            End If
+
+            pt1.Add(p1)
+            pt2.Add(p2)
+            dst1.Line(p1, p2, cv.Scalar.Yellow, thickNess, cv.LineTypes.AntiAlias)
+            If p1.X = p2.X Then
+                topIntercepts.Add(p1.X, i)
+                botIntercepts.Add(p1.X, i)
+            Else
+                Dim m = (p1.Y - p2.Y) / (p1.X - p2.X)
+                Dim b = p1.Y - p1.X * m
+                If m = 0 Then
+                    leftIntercepts.Add(p1.Y, i)
+                    rightIntercepts.Add(p1.Y, i)
+                Else
+                    Dim xint1 = -b / m
+                    Dim xint2 = (dst1.Height - b) / m  ' x = (y - b) / m
+                    Dim yint1 = b
+                    Dim yint2 = m * dst1.Width + b
+                    If xint1 >= 0 And xint1 <= dst1.Width Then topIntercepts.Add(xint1, i)
+                    If xint2 >= 0 And xint2 <= dst1.Width Then botIntercepts.Add(xint2, i)
+                    If yint1 >= 0 And yint1 <= dst1.Height Then leftIntercepts.Add(yint1, i)
+                    If yint2 >= 0 And yint2 <= dst1.Height Then rightIntercepts.Add(yint2, i)
+                End If
+            End If
+        Next
+
+        If standalone Then showIntercepts(task.mousePoint, dst1)
     End Sub
 End Class
