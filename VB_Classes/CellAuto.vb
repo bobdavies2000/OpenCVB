@@ -65,7 +65,7 @@ Public Class CellAuto_Basics
         If standalone or task.intermediateReview = caller Then
             src = New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_8UC1, 0)
             src.Set(Of Byte)(0, src.Width / 2, 1)
-            If ocvb.frameCount Mod 2 Then dst2 = createCells(combo.Box.Text) Else dst1 = createCells(combo.Box.Text)
+            If task.frameCount Mod 2 Then dst2 = createCells(combo.Box.Text) Else dst1 = createCells(combo.Box.Text)
         Else
             dst1 = createCells(combo.Box.Text)
         End If

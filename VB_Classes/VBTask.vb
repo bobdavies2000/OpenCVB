@@ -100,6 +100,7 @@ End Module
 Public Class ActiveTask : Implements IDisposable
     Dim algoList As New algorithmList
     Public algorithmObject As Object
+    Public frameCount As Integer = 0
 
     Public color As cv.Mat
     Public RGBDepth As cv.Mat
@@ -128,6 +129,14 @@ Public Class ActiveTask : Implements IDisposable
     Public mousePicTag As Integer ' which image was the mouse in?
     Public mousePoint As cv.Point ' trace any mouse movements using this.
     Public mousePointUpdated As Boolean
+    Public parms As ActiveTask.algParms
+    Public defaultRect As cv.Rect
+
+    Public font As cv.HersheyFonts
+    Public fontSize As Single
+    Public dotSize As Integer
+    Public lineSize As Integer
+    Public resolutionIndex As Integer
 
     Public IMU_Barometer As Single
     Public IMU_Magnetometer As cv.Point3f
@@ -168,6 +177,17 @@ Public Class ActiveTask : Implements IDisposable
     Public pixelViewerOn As Boolean
 
     Public transformationMatrix() As Single
+
+    Public scalarColors(255) As cv.Scalar
+    Public vecColors(255) As cv.Vec3b
+
+    Public topCameraPoint As cv.Point
+    Public sideCameraPoint As cv.Point
+    Public topFrustrumAdjust As Single
+    Public sideFrustrumAdjust As Single
+
+    Public Const MAXZ_DEFAULT = 4
+    Public maxZ As Single = MAXZ_DEFAULT
 
     Public ttTextData As New List(Of TTtext)
     Public callTrace As New List(Of String)
@@ -215,7 +235,7 @@ Public Class ActiveTask : Implements IDisposable
     Private Sub buildColors()
         Dim vec As cv.Scalar, r As Integer = 120, b As Integer = 255, g As Integer = 0
         Dim scalarList As New List(Of cv.Scalar)
-        For i = 0 To ocvb.fixedColors.Length - 1
+        For i = 0 To 255
             Select Case i Mod 3
                 Case 0
                     vec = New cv.Scalar(b, g, r)
@@ -230,13 +250,13 @@ Public Class ActiveTask : Implements IDisposable
             If scalarList.Contains(New cv.Scalar(b, g, r)) Then b = (b + 100) Mod 255 ' try not to have duplicates.
             If r + g + b < 180 Then r = 120 ' need bright colors.
 
-            ocvb.scalarColors(i) = New cv.Scalar(b, g, r)
-            scalarList.Add(ocvb.scalarColors(i))
+            task.scalarColors(i) = New cv.Scalar(b, g, r)
+            scalarList.Add(task.scalarColors(i))
         Next
         Dim msrng As New System.Random
-        For i = 0 To ocvb.vecColors.Length - 1
-            ocvb.vecColors(i) = New cv.Vec3b(msrng.Next(100, 255), msrng.Next(100, 255), msrng.Next(100, 255)) ' note: cannot generate black!
-            ocvb.scalarColors(i) = New cv.Scalar(ocvb.vecColors(i).Item0, ocvb.vecColors(i).Item1, ocvb.vecColors(i).Item2)
+        For i = 0 To task.vecColors.Length - 1
+            task.vecColors(i) = New cv.Vec3b(msrng.Next(100, 255), msrng.Next(100, 255), msrng.Next(100, 255)) ' note: cannot generate black!
+            task.scalarColors(i) = New cv.Scalar(task.vecColors(i).Item0, task.vecColors(i).Item1, task.vecColors(i).Item2)
         Next
     End Sub
     Public Sub New(parms As algParms, resolution As cv.Size, algName As String, camWidth As Integer, camHeight As Integer, _defaultRect As cv.Rect)
@@ -248,12 +268,29 @@ Public Class ActiveTask : Implements IDisposable
 
         ocvb = New VBocvb(Me)
         task = Me
-        ocvb.parms = parms
-        ocvb.defaultRect = _defaultRect
+        task.parms = parms
+        task.defaultRect = _defaultRect
+        font = cv.HersheyFonts.HersheyComplex
+        Select Case task.color.Width
+            Case 320
+                fontSize = task.color.Width / task.pointCloud.Width
+                dotSize = 3
+                lineSize = 1
+                resolutionIndex = 1
+            Case 640
+                fontSize = task.color.Width / task.pointCloud.Width
+                dotSize = 7
+                lineSize = 2
+                resolutionIndex = 2
+            Case 1280
+                fontSize = 1
+                dotSize = 15
+                lineSize = 4
+                resolutionIndex = 3
+        End Select
 
         buildColors()
-        ocvb.algName = algName
-        ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes\" + algName
+        ocvb.pythonTaskName = task.parms.homeDir + "VB_Classes\" + algName
 
         aOptions = New OptionsContainer
         If algName.EndsWith(".py") = False Then aOptions.Show()
@@ -288,9 +325,9 @@ Public Class ActiveTask : Implements IDisposable
     End Sub
     Public Sub RunAlgorithm()
         Try
-            If ocvb.parms.useRecordedData Then
+            If task.parms.useRecordedData Then
                 Dim recordingFilename = New FileInfo(task.openFileDialogName)
-                If ocvb.parms.useRecordedData And recordingFilename.Exists = False Then
+                If task.parms.useRecordedData And recordingFilename.Exists = False Then
                     ocvb.trueText("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125)
                     Exit Sub
                 End If
@@ -301,10 +338,6 @@ Public Class ActiveTask : Implements IDisposable
             If inrange IsNot Nothing Then inrange.Run()
 
             algorithmObject.NextFrame()
-
-            If ocvb.parms.VTK_Present = False And ocvb.algName.StartsWith("VTK") Then
-                ocvb.trueText("VTK support is disabled. " + vbCrLf + "Instructions to enable VTK are in the Readme.md for OpenCVB")
-            End If
 
             label1 = ocvb.label1
             label2 = ocvb.label2

@@ -13,7 +13,7 @@ Public Class HOG_Basics
             sliders.setupTrackBar(2, "Scale", 0, 2000, 300)
         End If
         task.desc = "Find people with Histogram of Gradients (HOG) 2D feature"
-        staticImage = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/Asahiyama.jpg", cv.ImreadModes.Color)
+        staticImage = cv.Cv2.ImRead(task.parms.homeDir + "Data/Asahiyama.jpg", cv.ImreadModes.Color)
         dst2 = staticImage.Resize(dst2.Size)
     End Sub
     Private Sub drawFoundRectangles(dst1 As cv.Mat, found() As cv.Rect)

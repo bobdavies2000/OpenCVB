@@ -281,7 +281,7 @@ Public Class MFD_FloodFill
 
         dst2 = input.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each pt In floodPoints
-            dst2.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         Next
 
         For Each rect In sobel.mfd.motion.intersect.enclosingRects

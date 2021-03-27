@@ -85,7 +85,7 @@ Public Class Undistort_Basics
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If ocvb.parms.intrinsicsLeft.coeffs Is Nothing Then
+        If task.parms.intrinsicsLeft.coeffs Is Nothing Then
             ocvb.trueText("The intrinsics values are missing for this camera.")
             Exit Sub
         End If
@@ -102,10 +102,10 @@ Public Class Undistort_Basics
 
             maxDisp = sliders.trackbar(3).Value
             Dim stereo_height_px = sliders.trackbar(2).Value
-            undistortSetup(kMatLeft, dMatLeft, rMatLeft, pMatLeft, maxDisp, stereo_height_px, ocvb.parms.intrinsicsLeft)
+            undistortSetup(kMatLeft, dMatLeft, rMatLeft, pMatLeft, maxDisp, stereo_height_px, task.parms.intrinsicsLeft)
 
             ' the intrinsic coeff's on the Intel RS2 series are always zero.  Here we just make up some numbers so we can show the impact.
-            If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Then
+            If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Then
                 Dim d() As Double = {0.5, -2, 1.5, 0.5}
                 dMatLeft = New cv.Mat(1, 4, cv.MatType.CV_64F, d)
             End If

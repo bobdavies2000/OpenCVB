@@ -72,7 +72,7 @@ Public Class Random_LUTMask
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static lutMat As cv.Mat
-        If lutMat Is Nothing Or ocvb.frameCount Mod 10 = 0 Then
+        If lutMat Is Nothing Or task.frameCount Mod 10 = 0 Then
             random.Run()
             lutMat = cv.Mat.Zeros(New cv.Size(1, 256), cv.MatType.CV_8UC3)
             Dim lutIndex = 0
@@ -641,8 +641,8 @@ Public Class Random_KalmanPoints
 
         dst1.SetTo(0)
         For i = 0 To knn.currSet.Count - 1
-            dst1.Circle(knn.currSet(i), ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-            dst1.Circle(knn.lastSet(i), ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(knn.currSet(i), task.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(knn.lastSet(i), task.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
 
         Dim noChanges As Boolean = True

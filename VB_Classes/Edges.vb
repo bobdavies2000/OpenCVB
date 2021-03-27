@@ -223,14 +223,14 @@ Public Class Edges_RandomForest_CPP
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount < 100 Then ocvb.trueText("On the first call only, it takes a few seconds to load the randomForest model.", 10, 100)
+        If task.frameCount < 100 Then ocvb.trueText("On the first call only, it takes a few seconds to load the randomForest model.", 10, 100)
 
         ' why not do this in the constructor?  Because the message is held up by the lengthy process of loading the model.
-        If ocvb.frameCount = 5 Then
-            Dim modelInfo = New FileInfo(ocvb.parms.homeDir + "Data/model.yml.gz")
+        If task.frameCount = 5 Then
+            Dim modelInfo = New FileInfo(task.parms.homeDir + "Data/model.yml.gz")
             EdgesPtr = Edges_RandomForest_Open(modelInfo.FullName)
         End If
-        If ocvb.frameCount > 5 Then ' the first images are skipped so the message above can be displayed.
+        If task.frameCount > 5 Then ' the first images are skipped so the message above can be displayed.
             Marshal.Copy(src.Data, rgbData, 0, rgbData.Length)
             Dim handleRGB = GCHandle.Alloc(rgbData, GCHandleType.Pinned)
             Dim gray8u = Edges_RandomForest_Run(EdgesPtr, handleRGB.AddrOfPinnedObject(), src.Rows, src.Cols)
@@ -1041,7 +1041,7 @@ Public Class Edges_Matching
         Dim searchDepth = searchSlider.value
 
         Dim matchOption = match.checkRadio()
-        Dim fsize = ocvb.fontSize / 3
+        Dim fsize = task.fontSize / 3
         Dim maxLocs(grid.roiList.Count - 1) As Integer
         Dim highlights As New List(Of Integer)
         For i = 0 To grid.roiList.Count - 1
@@ -1058,7 +1058,7 @@ Public Class Edges_Matching
                 highlights.Add(i)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
                 dst2.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
-                cv.Cv2.PutText(dst2, Format(maxVal, "#0.00"), pt, ocvb.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                cv.Cv2.PutText(dst2, Format(maxVal, "#0.00"), pt, task.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             End If
         Next
 
@@ -1080,7 +1080,7 @@ Public Class Edges_Matching
                 dst1.Rectangle(roi, cv.Scalar.Red, 2)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
                 dst1.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
-                cv.Cv2.PutText(dst1, CStr(maxLocs(i)), pt, ocvb.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                cv.Cv2.PutText(dst1, CStr(maxLocs(i)), pt, task.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
             Next
         Else
             label1 = "Click in dst2 to highlight segment in dst1"
@@ -1099,7 +1099,7 @@ Public Class Edges_Matching
                     dst1.Rectangle(roi, cv.Scalar.Red, 2)
                     Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
                     dst1.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
-                    cv.Cv2.PutText(dst1, CStr(maxLocs(i)), pt, ocvb.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                    cv.Cv2.PutText(dst1, CStr(maxLocs(i)), pt, task.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                 Next
             End If
         End If

@@ -319,7 +319,7 @@ Public Class Benford_Primes
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount = 0 Then sieve.Run() ' only need to compute this once...
+        If task.frameCount = 0 Then sieve.Run() ' only need to compute this once...
         ocvb.trueText(CStr(sieve.primes.Count) + " primes were found")
 
         Dim tmp = New cv.Mat(sieve.primes.Count, 1, cv.MatType.CV_32S, sieve.primes.ToArray())

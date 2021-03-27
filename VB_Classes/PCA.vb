@@ -15,13 +15,13 @@ Public Class PCA_Basics
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static images(7) As cv.Mat
         Static images32f(images.Length) As cv.Mat
-        Dim index = ocvb.frameCount Mod images.Length
+        Dim index = task.frameCount Mod images.Length
         images(index) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         images(index).ConvertTo(gray32f, cv.MatType.CV_32F)
         gray32f = gray32f.Normalize(0, 255, cv.NormTypes.MinMax)
         images32f(index) = gray32f.Reshape(1, 1)
-        If ocvb.frameCount >= images.Length Then
+        If task.frameCount >= images.Length Then
             Dim data = New cv.Mat(images.Length, src.Rows * src.Cols, cv.MatType.CV_32F)
             For i = 0 To images.Length - 1
                 images32f(i).CopyTo(data.Row(i))
@@ -67,7 +67,7 @@ Public Class PCA_DrawImage
     Public Sub New()
         initParent()
         pca = New PCA_Basics()
-        image = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/pca_test1.jpg")
+        image = cv.Cv2.ImRead(task.parms.homeDir + "Data/pca_test1.jpg")
         task.desc = "Use PCA to find the principle direction of an object."
         label1 = "Original image"
         label2 = "PCA Output"

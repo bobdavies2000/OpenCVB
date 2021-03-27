@@ -1,30 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 
 Public Class VBocvb
-    Public frameCount As Integer = 0
-    Public parms As ActiveTask.algParms
-    Public defaultRect As cv.Rect
-
-    Public algorithmIndex As Integer
-    Public parentRoot As String
-    Public parentAlgorithm As String
-
-    Public fixedColors(255) As cv.Scalar
-
-    Public scalarColors(255) As cv.Scalar
-    Public vecColors(255) As cv.Vec3b
-    Public topCameraPoint As cv.Point
-    Public sideCameraPoint As cv.Point
-    Public topFrustrumAdjust As Single
-    Public sideFrustrumAdjust As Single
-    Public font As cv.HersheyFonts
-    Public fontSize As Single
-    Public dotSize As Integer
-    Public lineSize As Integer
-    Public resfactor As Single ' resolution is often a factor in sizing tasks.
-    Public resolutionIndex As Integer
-    Public Const MAXZ_DEFAULT = 4
-    Public maxZ As Single = MAXZ_DEFAULT
     Public pixelsPerMeter As Single
     Public hFov As Single
     Public vFov As Single
@@ -33,7 +9,6 @@ Public Class VBocvb
     Public angleZ As Single  ' rotation angle in radians around z-axis to align with gravity
     Public cz As Single
     Public sz As Single
-    Public algName As String
 
     Public intermediateObject As VBparent
 
@@ -42,27 +17,7 @@ Public Class VBocvb
 
     Public pythonTaskName As String
     Public Sub New(_task As ActiveTask)
-        font = cv.HersheyFonts.HersheyComplex
-        Select Case _task.color.Width
-            Case 320
-                fontSize = _task.color.Width / _task.pointCloud.Width
-                dotSize = 3
-                lineSize = 1
-                resfactor = 0.1
-                resolutionIndex = 1
-            Case 640
-                fontSize = _task.color.Width / _task.pointCloud.Width
-                dotSize = 7
-                lineSize = 2
-                resfactor = 0.3
-                resolutionIndex = 2
-            Case 1280
-                fontSize = 1
-                dotSize = 15
-                lineSize = 4
-                resfactor = 1
-                resolutionIndex = 3
-        End Select
+
     End Sub
     Public Sub trueText(text As String, Optional x As Integer = 10, Optional y As Integer = 40, Optional picTag As Integer = 2)
         Dim str As New TTtext(text, x, y, picTag)

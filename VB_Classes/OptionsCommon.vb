@@ -33,7 +33,7 @@ Public Class OptionsCommon_Depth
 
         minVal = task.minRangeSlider.Value
         maxVal = task.maxRangeSlider.Value
-        ocvb.maxZ = maxVal / 1000
+        task.maxZ = maxVal / 1000
         bins = task.thresholdSlider.Value
         If minVal >= maxVal Then maxVal = minVal + 1
 
@@ -87,22 +87,22 @@ Public Class OptionsCommon_Histogram
 
         ' The specification for each camera spells out the FOV angle
         ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.
-        Select Case ocvb.parms.cameraName
+        Select Case task.parms.cameraName
             Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
                 sideFrustrumSlider.Value = 58
                 topFrustrumSlider.Value = 180
                 cameraXSlider.Value = 0
-                cameraYSlider.Value = If(ocvb.resolutionIndex = 1, -1, -2)
+                cameraYSlider.Value = If(task.resolutionIndex = 1, -1, -2)
             Case VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2
                 sideFrustrumSlider.Value = 53
                 topFrustrumSlider.Value = 162
-                cameraXSlider.Value = If(ocvb.resolutionIndex = 3, 38, 13)
+                cameraXSlider.Value = If(task.resolutionIndex = 3, 38, 13)
                 cameraYSlider.Value = -3
             Case VB_Classes.ActiveTask.algParms.camNames.MyntD1000
                 sideFrustrumSlider.Value = 50
                 topFrustrumSlider.Value = 105
-                cameraXSlider.Value = If(ocvb.resolutionIndex = 1, 4, 8)
-                cameraYSlider.Value = If(ocvb.resolutionIndex = 3, -8, -3)
+                cameraXSlider.Value = If(task.resolutionIndex = 1, 4, 8)
+                cameraYSlider.Value = If(task.resolutionIndex = 3, -8, -3)
             Case VB_Classes.ActiveTask.algParms.camNames.D435i
                 If src.Width = 640 Then
                     sideFrustrumSlider.Value = 75
@@ -129,20 +129,20 @@ Public Class OptionsCommon_Histogram
                 End If
         End Select
 
-        ocvb.sideFrustrumAdjust = ocvb.maxZ * sideFrustrumSlider.Value / 100 / 2
-        ocvb.topFrustrumAdjust = ocvb.maxZ * topFrustrumSlider.Value / 100 / 2
-        ocvb.sideCameraPoint = New cv.Point(0, CInt(src.Height / 2 + cameraYSlider.Value))
-        ocvb.topCameraPoint = New cv.Point(CInt(src.Width / 2 + cameraXSlider.Value), CInt(src.Height))
+        task.sideFrustrumAdjust = task.maxZ * sideFrustrumSlider.Value / 100 / 2
+        task.topFrustrumAdjust = task.maxZ * topFrustrumSlider.Value / 100 / 2
+        task.sideCameraPoint = New cv.Point(0, CInt(src.Height / 2 + cameraYSlider.Value))
+        task.topCameraPoint = New cv.Point(CInt(src.Width / 2 + cameraXSlider.Value), CInt(src.Height))
         sliders.Hide()
         task.desc = "The options for the side view are shared with this algorithm"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        ocvb.sideFrustrumAdjust = ocvb.maxZ * sideFrustrumSlider.Value / 100 / 2
-        ocvb.topFrustrumAdjust = ocvb.maxZ * topFrustrumSlider.Value / 100 / 2
-        ocvb.sideCameraPoint = New cv.Point(0, CInt(src.Height / 2 + cameraYSlider.Value))
-        ocvb.topCameraPoint = New cv.Point(CInt(src.Width / 2 + cameraXSlider.Value), CInt(src.Height))
+        task.sideFrustrumAdjust = task.maxZ * sideFrustrumSlider.Value / 100 / 2
+        task.topFrustrumAdjust = task.maxZ * topFrustrumSlider.Value / 100 / 2
+        task.sideCameraPoint = New cv.Point(0, CInt(src.Height / 2 + cameraYSlider.Value))
+        task.topCameraPoint = New cv.Point(CInt(src.Width / 2 + cameraXSlider.Value), CInt(src.Height))
 
         If sliders.Visible = False Then
             ocvb.trueText("This algorithm was created to tune the frustrum and camera locations." + vbCrLf +

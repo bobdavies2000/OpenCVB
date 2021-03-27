@@ -88,7 +88,7 @@ Public Class EMax_Basics
 
                     Dim response = Math.Round(em_model.Predict2(sample).Item1)
 
-                    Dim c = ocvb.vecColors(response)
+                    Dim c = task.vecColors(response)
                     dst1.Circle(New cv.Point(j, i), 1, c, -1)
                 Next
             Next
@@ -97,7 +97,7 @@ Public Class EMax_Basics
         ' draw the clustered samples
         For i = 0 To samples.Rows - 1
             Dim pt = New cv.Point(Math.Round(samples.Get(Of Single)(i, 0)), Math.Round(samples.Get(Of Single)(i, 1)))
-            dst1.Circle(pt, 4, ocvb.vecColors(labels.Get(Of Integer)(i) + 1), -1, cv.LineTypes.AntiAlias) ' skip the first rColor - it might be used above.
+            dst1.Circle(pt, 4, task.vecColors(labels.Get(Of Integer)(i) + 1), -1, cv.LineTypes.AntiAlias) ' skip the first rColor - it might be used above.
         Next
     End Sub
 End Class

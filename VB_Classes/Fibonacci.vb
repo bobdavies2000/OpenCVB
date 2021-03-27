@@ -56,7 +56,7 @@ Public Class Fibonacci_Yield
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim fibs As System.Collections.Generic.IEnumerable(Of Double) = nextFib()
-        flow.msgs.Add(Format(ocvb.frameCount Mod 74, "00") + " fibonacci number " + Format(fibs.ElementAt(ocvb.frameCount), "###,##0"))
+        flow.msgs.Add(Format(task.frameCount Mod 74, "00") + " fibonacci number " + Format(fibs.ElementAt(task.frameCount), "###,##0"))
         flow.Run()
     End Sub
 End Class

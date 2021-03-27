@@ -272,7 +272,7 @@ Public Class Blur_TopoMap
         dst2 = addw.dst1
 
         label2 = "Blur = " + CStr(nextPercent) + "% Reduction Factor = " + CStr(reductionSlider.Value)
-        If ocvb.frameCount Mod frameSlider.Value = 0 Then nextPercent -= 1
+        If task.frameCount Mod frameSlider.Value = 0 Then nextPercent -= 1
         If nextPercent <= 0 Then nextPercent = savePercent
     End Sub
 End Class

@@ -60,8 +60,8 @@ Public Class Download_Databases
         If checkTensor7.checked Then filename = "faster_rcnn_resnet50_coco_2018_01_28.tar.gz"
         If checkTensor8.checked Then filename = "mask_rcnn_inception_v2_coco_2018_01_28.tar.gz"
 
-        Dim fileToDecompress = New FileInfo(ocvb.parms.homeDir + "Data/" + filename)
-        Dim downloadDir = New DirectoryInfo(ocvb.parms.homeDir + "Data/" + Mid(fileToDecompress.Name, 1, Len(fileToDecompress.Name) - Len(".tar.gz")))
+        Dim fileToDecompress = New FileInfo(task.parms.homeDir + "Data/" + filename)
+        Dim downloadDir = New DirectoryInfo(task.parms.homeDir + "Data/" + Mid(fileToDecompress.Name, 1, Len(fileToDecompress.Name) - Len(".tar.gz")))
         If downloadActive And pythonActive = False Then
             ocvb.trueText("Downloading active (takes a while).  Current download size = " + Format(zippedBuffer.Length / 1000, "###,##0") + "k bytes" + vbCrLf +
                           "Download is " + Format(zippedBuffer.Length / 1797000000, "#0%") + " complete", 40, 200)
@@ -87,13 +87,13 @@ Public Class Download_Databases
                             End If
 
                             If fileToDecompress.Name.EndsWith(".tar.gz") Then
-                                ocvb.parms.ShowConsoleLog = False
+                                task.parms.ShowConsoleLog = False
                                 pythonActive = True
-                                Dim pyScript = ocvb.parms.homeDir + "Data/extractTarFiles.py"
+                                Dim pyScript = task.parms.homeDir + "Data/extractTarFiles.py"
                                 Dim fs = New StreamWriter(pyScript)
                                 fs.WriteLine("import tarfile")
                                 fs.WriteLine("import os")
-                                fs.WriteLine("os.chdir(""" + ocvb.parms.homeDir + "Data/" + """)")
+                                fs.WriteLine("os.chdir(""" + task.parms.homeDir + "Data/" + """)")
                                 fs.WriteLine("tar = tarfile.open(""" + fileToDecompress.Name + """)")
                                 fs.WriteLine("tar.extractall()")
                                 fs.WriteLine("tar.close")
@@ -101,8 +101,8 @@ Public Class Download_Databases
 
                                 ocvb.pythonTaskName = pyScript
                                 Dim p As New Process
-                                p.StartInfo.FileName = ocvb.parms.PythonExe
-                                p.StartInfo.WorkingDirectory = ocvb.parms.homeDir + "Data"
+                                p.StartInfo.FileName = task.parms.PythonExe
+                                p.StartInfo.WorkingDirectory = task.parms.homeDir + "Data"
                                 p.StartInfo.Arguments = """" + ocvb.pythonTaskName + """"
                                 p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
                                 p.Start()

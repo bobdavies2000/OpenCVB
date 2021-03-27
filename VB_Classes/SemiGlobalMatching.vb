@@ -29,8 +29,8 @@ Public Class SemiGlobalMatching_CPP
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        'If ocvb.frameCount < 10 Then Exit Sub
-        'If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
+        'If task.frameCount < 10 Then Exit Sub
+        'If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
         '    ocvb.trueText("The left and right views are identical with the Microsoft Kinect 4 Azure camera.")
         '    Exit Sub
         'End If

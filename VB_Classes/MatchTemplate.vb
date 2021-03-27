@@ -99,7 +99,7 @@ Public Class MatchTemplate_RowCorrelation
         Static maxCorrelation As Single
 
         Static saveCorrType = match.matchOption
-        If ocvb.frameCount = 0 Or saveCorrType <> match.matchOption Then
+        If task.frameCount = 0 Or saveCorrType <> match.matchOption Then
             minCorrelation = Single.PositiveInfinity
             maxCorrelation = Single.NegativeInfinity
             saveCorrType = match.matchOption
@@ -161,7 +161,7 @@ Public Class MatchTemplate_DrawRect
         addw.Run()
         dst2 = addw.dst1
 
-        dst2.Circle(maxLoc.X, maxLoc.Y, ocvb.dotSize / 2, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst2.Circle(maxLoc.X, maxLoc.Y, task.dotSize / 2, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         label2 = "Red is best match, white has correlation > " + Format(thresholdSlider.value / 100, "#0%")
     End Sub
 End Class
@@ -192,7 +192,7 @@ Public Class MatchTemplate_BestEntropy_MT
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount Mod 30 = 0 Then
+        If task.frameCount Mod 30 = 0 Then
             entropy.src = src
             entropy.Run()
             task.drawRect = entropy.eMaxRect
@@ -238,7 +238,7 @@ Public Class MatchTemplate_Movement
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim fsize = ocvb.fontSize / 3
+        Dim fsize = task.fontSize / 3
 
         grid.Run()
         dst1 = src.Clone
@@ -267,7 +267,7 @@ Public Class MatchTemplate_Movement
                 If correlation.Get(Of Single)(0, 0) < CCthreshold Then
                     Interlocked.Increment(updateCount)
                     Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                    cv.Cv2.PutText(dst1, Format(correlation.Get(Of Single)(0, 0), "#0.00"), pt, ocvb.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                    cv.Cv2.PutText(dst1, Format(correlation.Get(Of Single)(0, 0), "#0.00"), pt, task.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                 Else
                     mask(roi).SetTo(255)
                     dst1(roi).SetTo(0)

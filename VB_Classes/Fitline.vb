@@ -134,8 +134,8 @@ Public Class Fitline_RawInput
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If check.Box(1).Checked Or ocvb.frameCount = 0 Then
-            If ocvb.parms.testAllRunning = False Then check.Box(1).Checked = False
+        If check.Box(1).Checked Or task.frameCount = 0 Then
+            If task.parms.testAllRunning = False Then check.Box(1).Checked = False
             dst1.SetTo(0)
             Dim rdotSize = 2
             Dim width = src.Width
@@ -170,7 +170,7 @@ Public Class Fitline_RawInput
             Dim highLight = cv.Scalar.White
             If check.Box(0).Checked Then
                 highLight = cv.Scalar.Gray
-                ocvb.dotSize = 5
+                task.dotSize = 5
             End If
             For i = 0 To sliders.trackbar(1).Value - 1
                 Dim noiseOffsetX = (Rnd() * 2 - 1) * sliders.trackbar(2).Value
@@ -181,7 +181,7 @@ Public Class Fitline_RawInput
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y > height Then pt.Y = height
                 points.Add(pt)
-                dst1.Circle(pt, ocvb.dotSize, highLight, -1, cv.LineTypes.AntiAlias)
+                dst1.Circle(pt, task.dotSize, highLight, -1, cv.LineTypes.AntiAlias)
             Next
         End If
     End Sub
@@ -209,7 +209,7 @@ Public Class Fitline_EigenFit
         Static theta As Single
         Static len As Single
         Static m2 As Single
-        If ocvb.frameCount Mod 30 = 0 Then
+        If task.frameCount Mod 30 = 0 Then
 
             Static noisePointCount As Integer
             Static linePointCount As Integer

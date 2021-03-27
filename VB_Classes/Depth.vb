@@ -76,7 +76,7 @@ Public Class Depth_HolesRect
             Dim minRect = cv.Cv2.MinAreaRect(contours(i))
             Dim size = minRect.Size.Width * minRect.Size.Height
             If size > minSize Then
-                Dim nextColor = New cv.Scalar(ocvb.vecColors(i Mod 255).Item0, ocvb.vecColors(i Mod 255).Item1, ocvb.vecColors(i Mod 255).Item2)
+                Dim nextColor = New cv.Scalar(task.vecColors(i Mod 255).Item0, task.vecColors(i Mod 255).Item1, task.vecColors(i Mod 255).Item2)
                 drawRotatedRectangle(minRect, dst1, nextColor)
                 If contours(i).Length >= 5 Then
                     minEllipse(i) = cv.Cv2.FitEllipse(contours(i))
@@ -190,7 +190,7 @@ Public Class Depth_MeanStdev_MT
         Dim minPt As cv.Point, maxPt As cv.Point
         cv.Cv2.MinMaxLoc(task.depth32f, minVal, maxVal, minPt, maxPt, mask)
 
-        Dim meanIndex = ocvb.frameCount Mod meanCount
+        Dim meanIndex = task.frameCount Mod meanCount
         Dim meanValues As New cv.Mat(grid.roiList.Count - 1, 1, cv.MatType.CV_32F)
         Dim stdValues As New cv.Mat(grid.roiList.Count - 1, 1, cv.MatType.CV_32F)
         Parallel.For(0, grid.roiList.Count,
@@ -199,14 +199,14 @@ Public Class Depth_MeanStdev_MT
             Dim mean As Single = 0, stdev As Single = 0
             cv.Cv2.MeanStdDev(task.depth32f(roi), mean, stdev, mask(roi))
             meanSeries.Set(Of Single)(i, meanIndex, mean)
-            If ocvb.frameCount >= meanCount - 1 Then
+            If task.frameCount >= meanCount - 1 Then
                 cv.Cv2.MeanStdDev(meanSeries.Row(i), mean, stdev)
                 meanValues.Set(Of Single)(i, 0, mean)
                 stdValues.Set(Of Single)(i, 0, stdev)
             End If
         End Sub)
 
-        If ocvb.frameCount >= meanCount Then
+        If task.frameCount >= meanCount Then
             Dim minStdVal As Double, maxStdVal As Double
             Dim meanmask = meanValues.Threshold(1, maxDepth, cv.ThresholdTypes.Binary).ConvertScaleAbs()
             cv.Cv2.MinMaxLoc(meanValues, minVal, maxVal, minPt, maxPt, meanmask)
@@ -715,7 +715,7 @@ Public Class Depth_LocalMinMax_Kalman_MT
             cv.Cv2.Circle(dst1, ptmin, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
             cv.Cv2.Circle(dst1, ptmax, radius, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
         Next
-        paint_voronoi(ocvb.scalarColors, dst2, subdiv)
+        paint_voronoi(task.scalarColors, dst2, subdiv)
     End Sub
 End Class
 
@@ -1480,7 +1480,7 @@ Public Class Depth_PointCloud_IMU
             label1 = "dst1 = pointcloud without rotation"
         End If
 
-        ocvb.pixelsPerMeter = dst1.Width / ocvb.maxZ
+        ocvb.pixelsPerMeter = dst1.Width / task.maxZ
     End Sub
 End Class
 

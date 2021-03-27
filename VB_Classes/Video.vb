@@ -10,8 +10,8 @@ Public Class Video_Basics
         initParent()
 
         task.openFileDialogRequested = True
-        task.openFileInitialDirectory = ocvb.parms.homeDir + "/Data/"
-        task.openFileDialogName = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", ocvb.parms.homeDir + "Data\CarsDrivingUnderBridge.mp4")
+        task.openFileInitialDirectory = task.parms.homeDir + "/Data/"
+        task.openFileDialogName = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", task.parms.homeDir + "Data\CarsDrivingUnderBridge.mp4")
         task.openFileFilter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"
         task.openFileFilterIndex = 1
         task.openFileDialogTitle = "Select a video file for input"
@@ -151,7 +151,7 @@ Public Class Video_MinRect
     Public Sub New()
         initParent()
         video = New Video_Basics()
-        video.srcVideo = ocvb.parms.homeDir + "Data/CarsDrivingUnderBridge.mp4"
+        video.srcVideo = task.parms.homeDir + "Data/CarsDrivingUnderBridge.mp4"
         video.Run()
 
         bgSub = New BGSubtract_MOG()

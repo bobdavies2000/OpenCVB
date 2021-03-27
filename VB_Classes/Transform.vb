@@ -49,8 +49,8 @@ Public Class Transform_Rotate
         imageCenter = New cv.Point2f(sliders.trackbar(2).Value, sliders.trackbar(3).Value)
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.trackbar(0).Value, sliders.trackbar(1).Value / 100)
         cv.Cv2.WarpAffine(src, dst1, rotationMat, New cv.Size())
-        dst1.Circle(imageCenter, ocvb.dotSize * 2, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-        dst1.Circle(imageCenter, ocvb.dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+        dst1.Circle(imageCenter, task.dotSize * 2, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        dst1.Circle(imageCenter, task.dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 
@@ -132,9 +132,9 @@ Public Class Transform_Affine3D
         Static pc2 As cv.Mat
         Static affineTransform As cv.Mat
 
-        If ocvb.parms.testAllRunning Then
-            If ocvb.frameCount = 30 Then check.Box(0).Checked = True
-            If ocvb.frameCount = 60 Then check.Box(1).Checked = True
+        If task.parms.testAllRunning Then
+            If task.frameCount = 30 Then check.Box(0).Checked = True
+            If task.frameCount = 60 Then check.Box(1).Checked = True
         End If
 
         If check.Box(0).Checked Then

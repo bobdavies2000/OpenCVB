@@ -86,7 +86,7 @@ Public Class VBparent : Implements IDisposable
 
             task.result(New cv.Rect(0, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst1)
             task.result(New cv.Rect(task.color.Width, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst2)
-            ocvb.frameCount += 1
+            task.frameCount += 1
         End If
     End Sub
     Public Function validateRect(r As cv.Rect) As cv.Rect

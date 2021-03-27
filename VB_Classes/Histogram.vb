@@ -33,7 +33,7 @@ Public Class Histogram_Basics
         Static colorName As String
         If standalone Or task.intermediateReview = caller Then
             Dim split() = src.Split()
-            If ocvb.frameCount Mod 100 = 0 Then
+            If task.frameCount Mod 100 = 0 Then
                 splitIndex += 1
                 If splitIndex > 2 Then splitIndex = 0
             End If
@@ -137,7 +137,7 @@ Public Class Histogram_Graph
 
         If standalone Or plotRequested Then
             maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000 ' smooth things out a little for the scale below
-            AddPlotScale(dst1, 0, maxVal, ocvb.fontSize * 2)
+            AddPlotScale(dst1, 0, maxVal, task.fontSize * 2)
             label1 = "Histogram for src image (default color) - " + CStr(bins) + " bins"
         End If
     End Sub
@@ -788,7 +788,7 @@ Public Class Histogram_TopData
 
         kalman = New Kalman_Basics()
         gCloud = New Depth_PointCloud_IMU()
-        If VB_Classes.ActiveTask.algParms.camNames.D455 = ocvb.parms.cameraName Then IntelBug = True
+        If VB_Classes.ActiveTask.algParms.camNames.D455 = task.parms.cameraName Then IntelBug = True
 
         task.desc = "Create a 2D top view for XZ histogram of depth in meters - NOTE: x and y scales differ!"
     End Sub
@@ -802,7 +802,7 @@ Public Class Histogram_TopData
         meterMin = minSlider.Value / 100
         meterMax = maxSlider.value / 100
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(meterMin, meterMax)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(meterMin, meterMax)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
@@ -850,7 +850,7 @@ Public Class Histogram_SideData
         meterMin = minSlider.value / 100
         meterMax = maxSlider.value / 100
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(meterMin, meterMax), New cv.Rangef(0, ocvb.maxZ)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(meterMin, meterMax), New cv.Rangef(0, task.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
@@ -890,7 +890,7 @@ Public Class Histogram_SmoothTopView2D
         stable.src = topView.gCloud.dst1
         stable.Run()
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-ocvb.topFrustrumAdjust, ocvb.topFrustrumAdjust)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(-task.topFrustrumAdjust, task.topFrustrumAdjust)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         cv.Cv2.CalcHist(New cv.Mat() {stable.dst2}, New Integer() {2, 0}, New cv.Mat, topView.histOutput, 2, histSize, ranges)
 
@@ -934,7 +934,7 @@ Public Class Histogram_SmoothSideView2D
         stable.src = sideView.gCloud.dst1
         stable.Run()
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.sideFrustrumAdjust, task.sideFrustrumAdjust), New cv.Rangef(0, task.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         cv.Cv2.CalcHist(New cv.Mat() {stable.dst2}, New Integer() {1, 2}, New cv.Mat, sideView.histOutput, 2, histSize, ranges)
 
@@ -1173,7 +1173,7 @@ Public Class Histogram_TopView2D
         If gCloud.src.Type <> cv.MatType.CV_32FC3 Then gCloud.src = task.pointCloud.Clone
         gCloud.Run() ' when displaying both top and side views, the gcloud run has already been done.
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-ocvb.topFrustrumAdjust, ocvb.topFrustrumAdjust)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(-task.topFrustrumAdjust, task.topFrustrumAdjust)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {2, 0}, New cv.Mat, originalHistOutput, 2, histSize, ranges)
@@ -1226,7 +1226,7 @@ Public Class Histogram_SideView2D
         If gCloud.src.Type <> cv.MatType.CV_32FC3 Then gCloud.src = task.pointCloud.Clone
         gCloud.Run()
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.sideFrustrumAdjust, task.sideFrustrumAdjust), New cv.Rangef(0, task.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {1, 2}, New cv.Mat, originalHistOutput, 2, histSize, ranges)
@@ -1317,9 +1317,9 @@ Public Class Histogram_ViewIntersections
         Dim rIntersect As New List(Of cv.Rect)
         Dim yRange As New List(Of cv.Vec2f)
         For Each r In histCO.side2D
-            minZ = ocvb.maxZ * r.X / dst1.Width
-            maxZ = ocvb.maxZ * (r.X + r.Width) / dst1.Width
-            Dim newRect = New cv.Rect(0, h - h * minZ / ocvb.maxZ - r.Width, w, r.Width)
+            minZ = task.maxZ * r.X / dst1.Width
+            maxZ = task.maxZ * (r.X + r.Width) / dst1.Width
+            Dim newRect = New cv.Rect(0, h - h * minZ / task.maxZ - r.Width, w, r.Width)
             For Each r2 In histCO.top2D
                 Dim rNext = r2.Intersect(newRect)
                 If rNext.Width > 0 And rNext.Height > 0 Then
@@ -1341,8 +1341,8 @@ Public Class Histogram_ViewIntersections
 
         If rIntersect.Count > 0 Then
             dst1.Rectangle(rIntersect(maxIndex), cv.Scalar.Yellow, 2)
-            minZ = ocvb.maxZ * (h - rIntersect(maxIndex).Y - rIntersect(maxIndex).Height) / h
-            maxZ = ocvb.maxZ * (h - rIntersect(maxIndex).Y) / h
+            minZ = task.maxZ * (h - rIntersect(maxIndex).Y - rIntersect(maxIndex).Height) / h
+            maxZ = task.maxZ * (h - rIntersect(maxIndex).Y) / h
             ocvb.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", rIntersect(maxIndex).X, rIntersect(maxIndex).Y - offset)
 
             Dim pc = histCO.histC.sideview.gCloud.dst1
@@ -1418,8 +1418,8 @@ Public Class Histogram_ViewObjects
         For Each r In flood.rects
             side2D.Add(r)
             dst1.Rectangle(r, cv.Scalar.White, 1)
-            minZ = ocvb.maxZ * r.X / w
-            maxZ = ocvb.maxZ * (r.X + r.Width) / w
+            minZ = task.maxZ * r.X / w
+            maxZ = task.maxZ * (r.X + r.Width) / w
             If standalone Or task.intermediateReview = caller Then ocvb.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset)
         Next
         label1 = CStr(flood.rects.Count) + " objects were identified in the side view"
@@ -1432,8 +1432,8 @@ Public Class Histogram_ViewObjects
         For Each r In flood.rects
             top2D.Add(r)
             dst2.Rectangle(r, cv.Scalar.White, 1)
-            minZ = ocvb.maxZ * (h - r.Y - r.Height) / h
-            maxZ = ocvb.maxZ * (h - r.Y) / h
+            minZ = task.maxZ * (h - r.Y - r.Height) / h
+            maxZ = task.maxZ * (h - r.Y) / h
             If standalone Or task.intermediateReview = caller Then ocvb.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset, 3)
         Next
 

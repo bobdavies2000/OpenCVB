@@ -41,14 +41,14 @@ Public Class OpenGL_Basics
     Private Sub memMapUpdate()
         Dim timeConversionUnits As Double = 1000
         Dim imuAlphaFactor As Double = 0.98 ' theta is a mix of acceleration data and gyro data.
-        If ocvb.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.D435i Then
+        If task.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.D435i Then
             timeConversionUnits = 1000 * 1000
             imuAlphaFactor = 0.99
         End If
         For i = 0 To memMapValues.Length - 1
             ' only change this if you are changing the data in the OpenGL C++ code at the same time...
-            memMapValues(i) = Choose(i + 1, ocvb.frameCount, ocvb.parms.intrinsicsLeft.fx, ocvb.parms.intrinsicsLeft.fy,
-                                     ocvb.parms.intrinsicsLeft.ppx, ocvb.parms.intrinsicsLeft.ppy, src.Width, src.Height, src.ElemSize * src.Total,
+            memMapValues(i) = Choose(i + 1, task.frameCount, task.parms.intrinsicsLeft.fx, task.parms.intrinsicsLeft.fy,
+                                     task.parms.intrinsicsLeft.ppx, task.parms.intrinsicsLeft.ppy, src.Width, src.Height, src.ElemSize * src.Total,
                                      dataInput.Total * dataInput.ElemSize, FOV, yaw, pitch, roll, zNear, zFar, pointSize, dataInput.Width, dataInput.Height,
                                      task.IMU_AngularVelocity.X, task.IMU_AngularVelocity.Y, task.IMU_AngularVelocity.Z,
                                      task.IMU_Acceleration.X, task.IMU_Acceleration.Y, task.IMU_Acceleration.Z, task.IMU_TimeStamp,
@@ -67,7 +67,7 @@ Public Class OpenGL_Basics
 
         startInfo.FileName = OpenGLTitle + ".exe"
         startInfo.Arguments = CStr(openGLWidth) + " " + CStr(openGLHeight) + " " + CStr(memMapbufferSize) + " " + pipeName
-        If ocvb.parms.ShowConsoleLog = False Then startInfo.WindowStyle = ProcessWindowStyle.Hidden
+        If task.parms.ShowConsoleLog = False Then startInfo.WindowStyle = ProcessWindowStyle.Hidden
         Process.Start(startInfo)
 
         memMapPtr = Marshal.AllocHGlobal(memMapbufferSize)
@@ -87,9 +87,9 @@ Public Class OpenGL_Basics
         If task.noDepthMask.width = pointCloudInput.Width Then pointCloudInput.SetTo(0, task.noDepthMask)
 
         Dim pcSize = pointCloudInput.Total * pointCloudInput.ElemSize
-        If ocvb.frameCount = 0 Then startOpenGLWindow()
+        If task.frameCount = 0 Then startOpenGLWindow()
         Dim readPipe(4) As Byte ' we read 4 bytes because that is the signal that the other end of the named pipe wrote 4 bytes to indicate iteration complete.
-        If ocvb.frameCount > 0 And pipe IsNot Nothing Then
+        If task.frameCount > 0 And pipe IsNot Nothing Then
             Dim bytesRead = pipe.Read(readPipe, 0, 4)
             If bytesRead = 0 Then ocvb.trueText("The OpenGL process appears to have stopped.", 20, 100)
         End If
@@ -135,7 +135,7 @@ Module OpenGL_Sliders_Module
     Public Sub setOpenGLsliders(caller As String, sliders As OptionsSliders)
         sliders.Setup(caller, 15)
         sliders.setupTrackBar(0, "OpenGL FOV", 1, 180, 150)
-        If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Then sliders.trackbar(0).Value = 135
+        If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Then sliders.trackbar(0).Value = 135
         sliders.setupTrackBar(1, "OpenGL yaw (degrees)", -180, 180, -3)
         sliders.setupTrackBar(2, "OpenGL pitch (degrees)", -180, 180, 3)
         sliders.setupTrackBar(3, "OpenGL roll (degrees)", -180, 180, 0)
@@ -241,7 +241,7 @@ Public Class OpenGL_IMU
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.parms.IMU_Present Then
+        If task.parms.IMU_Present Then
             imu.Run()
             ogl.OpenGL.dataInput = New cv.Mat(100, 100, cv.MatType.CV_32F, 0)
             ogl.src = src
@@ -334,7 +334,7 @@ Public Class OpenGL_Draw3D
         circle.Run()
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ogl.OpenGL.dataInput = dst2
-        ogl.OpenGL.src = New cv.Mat(1, ocvb.vecColors.Length - 1, cv.MatType.CV_8UC3, ocvb.vecColors.ToArray)
+        ogl.OpenGL.src = New cv.Mat(1, task.vecColors.Length - 1, cv.MatType.CV_8UC3, task.vecColors.ToArray)
         ogl.src = src
         ogl.Run()
     End Sub
@@ -395,7 +395,7 @@ Public Class OpenGL_GravityTransform
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.parms.IMU_Present Then
+        If task.parms.IMU_Present Then
             gCloud.src = task.pointCloud
             gCloud.Run()
 
@@ -429,7 +429,7 @@ Public Class OpenGL_Floor
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If ocvb.parms.IMU_Present Then
+        If task.parms.IMU_Present Then
             plane.Run()
             dst1 = plane.dst1
             dst2 = plane.dst2
@@ -464,7 +464,7 @@ Public Class OpenGL_FloorPlane
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If ocvb.parms.IMU_Present Then
+        If task.parms.IMU_Present Then
             plane.Run()
             dst1 = plane.dst1
             dst2 = plane.dst2
@@ -507,7 +507,7 @@ Public Class OpenGL_FloorTexture
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If ocvb.parms.IMU_Present Then
+        If task.parms.IMU_Present Then
             floor.plane.Run()
             dst1 = floor.plane.dst1
             dst2 = floor.plane.dst2
@@ -517,7 +517,7 @@ Public Class OpenGL_FloorTexture
             floor.ogl.textureInput = shuffle.rgbaTexture
 
             Dim data = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
-            data.Set(Of Single)(0, 0, ocvb.maxZ)
+            data.Set(Of Single)(0, 0, task.maxZ)
             data.Set(Of Single)(1, 0, 0)
             data.Set(Of Single)(2, 0, 0)
             data.Set(Of Single)(3, 0, floor.plane.floor.floorYplane)

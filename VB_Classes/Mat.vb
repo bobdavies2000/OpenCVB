@@ -308,7 +308,7 @@ Public Class Mat_Managed
         Static img(src.Total) As cv.Vec3b
         dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, img)
         Static nextColor As cv.Vec3b
-        If ocvb.frameCount Mod 30 = 0 Then
+        If task.frameCount Mod 30 = 0 Then
             If nextColor = New cv.Vec3b(0, 0, 255) Then nextColor = New cv.Vec3b(0, 255, 0) Else nextColor = New cv.Vec3b(0, 0, 255)
         End If
         For i = 0 To img.Length - 1

@@ -53,7 +53,7 @@ Public Class SuperRes_Video : Implements IDisposable
     Dim fs As cv.FrameSource
     Dim sr As cv.SuperResolution
     Public Sub New(ocvb As AlgorithmData)
-        videoOptions.fileinfo = New FileInfo(ocvb.parms.HomeDir + "Data/CarsDrivingUnderBridge.mp4")
+        videoOptions.fileinfo = New FileInfo(task.parms.HomeDir + "Data/CarsDrivingUnderBridge.mp4")
         videoOptions.Show()
         fs = cv.FrameSource.CreateFrameSource_Video(videoOptions.fileinfo.FullName)
         fs.NextFrame(ocvb.result2) ' skip the first frame.
@@ -67,7 +67,7 @@ Public Class SuperRes_Video : Implements IDisposable
         ocvb.result1 = videoOptions.nextImage()
         Dim normalFrame As New cv.Mat
         Dim srFrame As New cv.Mat
-        'Dim test = New FileStorage(ocvb.parms.HomeDir + "Data/test.txt", FileStorage.Mode.Write)
+        'Dim test = New FileStorage(task.parms.HomeDir + "Data/test.txt", FileStorage.Mode.Write)
         'sr.Write(test)
         'sr.NextFrame(ocvb.result2)
         'fs.NextFrame(normalFrame)

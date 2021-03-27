@@ -16,7 +16,7 @@ Imports cv = OpenCvSharp
 '    Public Sub Run()
 '		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        Dim data(src.Rows * src.Cols * src.ElemSize) As Byte
-'        If ocvb.parms.testAllRunning  Then
+'        If task.parms.testAllRunning  Then
 '            ocvb.trueText("During 'Test All', EMGU will occasionally fail with a missing cvextern.dll." + vbCrLf +
 '                                                  "The algorithm is working fine so it is turned off during testing.", 10, 125))
 '        Else
@@ -38,14 +38,14 @@ Imports cv = OpenCvSharp
 '    End Sub
 '    Public Sub Run()
 '		 If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-'        If ocvb.parms.testAllRunning  Then
+'        If task.parms.testAllRunning  Then
 '            ocvb.trueText("During 'Test All', EMGU will occasionally fail with a missing cvextern.dll." + vbCrLf +
 '                                                  "The algorithm is working fine so it is turned off during testing.", 10, 125))
 '        Else
-'            Dim lena = New cv.Mat(ocvb.parms.homeDir + "Data/Lena.jpg", cv.ImreadModes.Color)
+'            Dim lena = New cv.Mat(task.parms.homeDir + "Data/Lena.jpg", cv.ImreadModes.Color)
 '            Dim data(lena.Rows * lena.Cols * lena.ElemSize) As Byte
-'            Emgu_Classes.FaceDetection.Detect(ocvb.parms.homeDir + "Data\\Lena.jpg",
-'                                              ocvb.parms.homeDir + "Data\\haarcascade_frontalface_alt.xml", data)
+'            Emgu_Classes.FaceDetection.Detect(task.parms.homeDir + "Data\\Lena.jpg",
+'                                              task.parms.homeDir + "Data\\haarcascade_frontalface_alt.xml", data)
 '            Dim tmp = New cv.Mat(lena.Rows, lena.Cols, cv.MatType.CV_8UC3, data)
 '            tmp = tmp.Resize(New cv.Size(dst1.Rows, dst1.Rows))
 '            dst1(New cv.Rect(0, 0, tmp.Rows, tmp.Cols)) = tmp

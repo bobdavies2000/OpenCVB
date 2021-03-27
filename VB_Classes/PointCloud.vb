@@ -280,17 +280,17 @@ Public Class PointCloud_ColorizeSide
         If standalone Then src = dst1 Else dst1 = src
 
         Dim distanceRatio As Single = 1
-        Dim fsize = ocvb.fontSize * 1.5
+        Dim fsize = task.fontSize * 1.5
 
-        dst1.Circle(ocvb.sideCameraPoint, ocvb.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
-        For i = 1 To ocvb.maxZ
-            Dim xmeter = CInt(dst1.Width * i / ocvb.maxZ * distanceRatio)
+        dst1.Circle(task.sideCameraPoint, task.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
+        For i = 1 To task.maxZ
+            Dim xmeter = CInt(dst1.Width * i / task.maxZ * distanceRatio)
             dst1.Line(New cv.Point(xmeter, 0), New cv.Point(xmeter, dst1.Height), cv.Scalar.AliceBlue, 1)
             cv.Cv2.PutText(dst1, CStr(i) + "m", New cv.Point(xmeter - src.Width / 15, dst1.Height - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
 
-        Dim cam = ocvb.sideCameraPoint
-        Dim marker As New cv.Point2f(dst1.Width / (ocvb.maxZ * distanceRatio), 0)
+        Dim cam = task.sideCameraPoint
+        Dim marker As New cv.Point2f(dst1.Width / (task.maxZ * distanceRatio), 0)
         marker.Y = marker.X * Math.Tan((ocvb.vFov / 2) * cv.Cv2.PI / 180)
         Dim topLen = marker.X * Math.Tan((ocvb.hFov / 2) * cv.Cv2.PI / 180)
         Dim markerLeft = New cv.Point(marker.X, cam.Y - marker.Y)
@@ -319,8 +319,8 @@ Public Class PointCloud_ColorizeSide
         End If
 
         If standalone = False Then
-            dst1.Circle(markerLeft, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            dst1.Circle(markerRight, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(markerLeft, task.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(markerRight, task.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         End If
 
         ' draw the arc enclosing the camera FOV
@@ -380,16 +380,16 @@ Public Class PointCloud_ColorizeTop
         If standalone Then src = dst1 Else dst1 = src
 
         Dim distanceRatio As Single = 1
-        Dim fsize = ocvb.fontSize * 1.5
-        dst1.Circle(ocvb.topCameraPoint, ocvb.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
-        For i = 1 To ocvb.maxZ
-            Dim ymeter = CInt(dst1.Height - dst1.Height * i / (ocvb.maxZ * distanceRatio))
+        Dim fsize = task.fontSize * 1.5
+        dst1.Circle(task.topCameraPoint, task.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
+        For i = 1 To task.maxZ
+            Dim ymeter = CInt(dst1.Height - dst1.Height * i / (task.maxZ * distanceRatio))
             dst1.Line(New cv.Point(0, ymeter), New cv.Point(dst1.Width, ymeter), cv.Scalar.AliceBlue, 1)
             cv.Cv2.PutText(dst1, CStr(i) + "m", New cv.Point(10, ymeter - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
 
-        Dim cam = ocvb.topCameraPoint
-        Dim marker As New cv.Point2f(cam.X, dst1.Height / (ocvb.maxZ * distanceRatio))
+        Dim cam = task.topCameraPoint
+        Dim marker As New cv.Point2f(cam.X, dst1.Height / (task.maxZ * distanceRatio))
         Dim topLen = marker.Y * Math.Tan((ocvb.hFov / 2) * cv.Cv2.PI / 180)
         Dim sideLen = marker.Y * Math.Tan((ocvb.vFov / 2) * cv.Cv2.PI / 180)
         Dim markerLeft = New cv.Point(cam.X - topLen, dst1.Height - marker.Y)
@@ -410,23 +410,23 @@ Public Class PointCloud_ColorizeTop
         Dim startAngle = (180 - ocvb.hFov) / 2
         Dim x = dst1.Height / Math.Tan(startAngle * cv.Cv2.PI / 180)
 
-        Dim fovRight = New cv.Point(ocvb.topCameraPoint.X + x, 0)
-        Dim fovLeft = New cv.Point(ocvb.topCameraPoint.X - x, fovRight.Y)
+        Dim fovRight = New cv.Point(task.topCameraPoint.X + x, 0)
+        Dim fovLeft = New cv.Point(task.topCameraPoint.X - x, fovRight.Y)
 
         If standalone = False Then
-            dst1.Ellipse(ocvb.topCameraPoint, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-            dst1.Ellipse(ocvb.topCameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-            dst1.Line(ocvb.topCameraPoint, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            dst1.Ellipse(task.topCameraPoint, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+            dst1.Ellipse(task.topCameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+            dst1.Line(task.topCameraPoint, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
 
-            dst1.Circle(markerLeft, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            dst1.Circle(markerRight, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(markerLeft, task.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(markerRight, task.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
             dst1.Line(cam, markerLeft, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
             dst1.Line(cam, markerRight, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
 
             Dim shift = (src.Width - src.Height) / 2
             Dim labelLocation = New cv.Point(dst1.Width / 2 + shift, dst1.Height * 15 / 16)
             cv.Cv2.PutText(dst1, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-            dst1.Line(ocvb.topCameraPoint, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            dst1.Line(task.topCameraPoint, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         End If
     End Sub
 End Class
@@ -581,7 +581,7 @@ Public Class PointCloud_Kalman_TopView
             dst1 = topView.cmat.dst1
         End If
         Dim FOV = ocvb.hFov
-        label1 = Format(ocvb.pixelsPerMeter, "0") + " pixels per meter with maxZ at " + Format(ocvb.maxZ, "0.0") + " meters"
+        label1 = Format(ocvb.pixelsPerMeter, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
     End Sub
 End Class
 
@@ -631,7 +631,7 @@ Public Class PointCloud_Kalman_SideView
         End If
 
         Dim FOV = (180 - ocvb.vFov) / 2
-        label1 = Format(ocvb.pixelsPerMeter, "0") + " pixels per meter at " + Format(ocvb.maxZ, "0.0") + " meters"
+        label1 = Format(ocvb.pixelsPerMeter, "0") + " pixels per meter at " + Format(task.maxZ, "0.0") + " meters"
     End Sub
 End Class
 
@@ -893,10 +893,10 @@ End Class
 '        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        Static saveMaxZ As Single
 
-'        If ocvb.maxZ <> saveMaxZ Then
+'        If task.maxZ <> saveMaxZ Then
 '            clicks.Clear()
 '            points.Clear()
-'            saveMaxZ = ocvb.maxZ
+'            saveMaxZ = task.maxZ
 '        End If
 
 '        sideIMU.Run()
@@ -906,18 +906,18 @@ End Class
 '        If task.mouseClickFlag Then clicks.Add(task.mouseClickPoint)
 
 '        For Each pt In points
-'            dst2.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+'            dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
 '        Next
 '        For Each pt In clicks
-'            dst1.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-'            dst2.Circle(pt, ocvb.dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-'            Dim side1 = (pt.X - ocvb.sideCameraPoint.X)
-'            Dim side2 = (pt.Y - ocvb.sideCameraPoint.Y)
+'            dst1.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+'            dst2.Circle(pt, task.dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+'            Dim side1 = (pt.X - task.sideCameraPoint.X)
+'            Dim side2 = (pt.Y - task.sideCameraPoint.Y)
 '            Dim cameraDistance = Math.Sqrt(side1 * side1 + side2 * side2) / ocvb.pixelsPerMeter
 '            ocvb.trueText(Format(cameraDistance, "#0.00") + "m xdist = " + Format(side1 / ocvb.pixelsPerMeter, "#0.00") + "m", pt, 3)
 '        Next
 
-'        dst1.Line(New cv.Point(ocvb.sideCameraPoint.X, 0), New cv.Point(ocvb.sideCameraPoint.X, dst1.Height), cv.Scalar.White, 1)
+'        dst1.Line(New cv.Point(task.sideCameraPoint.X, 0), New cv.Point(task.sideCameraPoint.X, dst1.Height), cv.Scalar.White, 1)
 '    End Sub
 'End Class
 
@@ -1029,7 +1029,7 @@ End Class
 '        If leftPoints.Count > consistencySlider.value Then
 '            planeHeight = CInt(ocvb.pixelsPerMeter * cushion)
 '            If planeHeight = 0 Then planeHeight = 1
-'            Dim cam = ocvb.sideCameraPoint
+'            Dim cam = task.sideCameraPoint
 
 '            Static adjustmentSlider = findSlider("Y-coordinate up/down adjustment (mm)")
 '            Dim adjustPixels = ocvb.pixelsPerMeter * adjustmentSlider.value / 1000
@@ -1052,7 +1052,7 @@ End Class
 '            inrange.Run()
 '            maskplane = split(1).ConvertScaleAbs(255)
 
-'            Dim incr = ocvb.maxZ / split(2).Width
+'            Dim incr = task.maxZ / split(2).Width
 '            Dim tmp = New cv.Mat(split(2).Size, cv.MatType.CV_32F, 0)
 '            If floorRun Then
 '                For i = minRow To split(2).Rows - 1
@@ -1098,8 +1098,8 @@ End Class
 '    Public Sub Run()
 '        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 '        Static saveFrameCount = -1
-'        If saveFrameCount <> ocvb.frameCount Then
-'            saveFrameCount = ocvb.frameCount
+'        If saveFrameCount <> task.frameCount Then
+'            saveFrameCount = task.frameCount
 '            sideIMU.Run()
 '            dst1 = sideIMU.dst1
 '            dst2 = sideIMU.dst2
@@ -1211,7 +1211,7 @@ End Class
 '            kalman.Run()
 '            leftPoint.X = kalman.kOutput(0)
 '            rightPoint.X = kalman.kOutput(1)
-'            dst1.Line(leftPoint, rightPoint, cv.Scalar.Yellow, ocvb.lineSize, cv.LineTypes.AntiAlias)
+'            dst1.Line(leftPoint, rightPoint, cv.Scalar.Yellow, task.lineSize, cv.LineTypes.AntiAlias)
 '        End If
 '        label1 = "Side View with gravity "
 '    End Sub
@@ -1241,7 +1241,7 @@ Public Class PointCloud_Singletons
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount = 0 Then
+        If task.frameCount = 0 Then
             For i = 0 To singleFrames.Count - 1
                 singleFrames(i) = New cv.Mat(task.pointCloud.Size, cv.MatType.CV_8U, 0)
             Next
@@ -1256,7 +1256,7 @@ Public Class PointCloud_Singletons
         Dim mask = inrange.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
 
         Dim mask8uc3 = New cv.Mat(mask.Size, cv.MatType.CV_8UC3)
-        singleFrames(ocvb.frameCount Mod singleFrames.Count) = mask
+        singleFrames(task.frameCount Mod singleFrames.Count) = mask
         cv.Cv2.Merge(singleFrames, mask8uc3)
         dst2.SetTo(0)
         dst2.SetTo(cv.Scalar.White, mask8uc3.Resize(dst2.Size))
@@ -1295,7 +1295,7 @@ Public Class PointCloud_ReducedSideView
         split(2) *= 0.001
         cv.Cv2.Merge(split, dst2)
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-ocvb.sideFrustrumAdjust, ocvb.sideFrustrumAdjust), New cv.Rangef(0, ocvb.maxZ)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.sideFrustrumAdjust, task.sideFrustrumAdjust), New cv.Rangef(0, task.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         cv.Cv2.CalcHist(New cv.Mat() {dst2}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
@@ -1334,7 +1334,7 @@ Public Class PointCloud_ReducedTopView
         split(2) *= 0.001
         cv.Cv2.Merge(split, dst2)
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, ocvb.maxZ), New cv.Rangef(-ocvb.topFrustrumAdjust, ocvb.topFrustrumAdjust)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(-task.topFrustrumAdjust, task.topFrustrumAdjust)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         cv.Cv2.CalcHist(New cv.Mat() {dst2}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
@@ -1377,19 +1377,19 @@ Public Class PointCloud_ObjectsTop
         measureTop.Run()
         dst1 = measureTop.dst1
 
-        ocvb.pixelsPerMeter = dst1.Height / ocvb.maxZ
-        label1 = "Pixels/Meter horizontal: " + CStr(CInt(dst1.Width / ocvb.maxZ)) + " vertical: " + CStr(CInt(ocvb.pixelsPerMeter))
+        ocvb.pixelsPerMeter = dst1.Height / task.maxZ
+        label1 = "Pixels/Meter horizontal: " + CStr(CInt(dst1.Width / task.maxZ)) + " vertical: " + CStr(CInt(ocvb.pixelsPerMeter))
 
         Dim FOV = ocvb.hFov / 2
 
         Dim xpt1 As cv.Point2f, xpt2 As cv.Point2f
         If standalone Or task.intermediateReview = caller Then
             Static distanceSlider = findSlider("Test Bar Distance from camera in mm")
-            Dim pixeldistance = src.Height * (distanceSlider.Value / 1000) / ocvb.maxZ
+            Dim pixeldistance = src.Height * (distanceSlider.Value / 1000) / task.maxZ
             Dim lineHalf = CInt(Math.Tan(FOV * 0.0174533) * pixeldistance)
 
-            xpt1 = New cv.Point2f(ocvb.topCameraPoint.X - lineHalf, src.Height - pixeldistance)
-            xpt2 = New cv.Point2f(ocvb.topCameraPoint.X + lineHalf, src.Height - pixeldistance)
+            xpt1 = New cv.Point2f(task.topCameraPoint.X - lineHalf, src.Height - pixeldistance)
+            xpt2 = New cv.Point2f(task.topCameraPoint.X + lineHalf, src.Height - pixeldistance)
             If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Blue, 3)
             Dim lineWidth = xpt2.X - xpt1.X
             Dim blueLineMeters As Single
@@ -1413,10 +1413,10 @@ Public Class PointCloud_ObjectsTop
 
             Dim lineHalf = CInt(Math.Tan(FOV * 0.0174533) * (src.Height - (r.Y + r.Height)))
             Dim pixeldistance = src.Height - r.Y - r.Height
-            xpt1 = New cv.Point2f(ocvb.topCameraPoint.X - lineHalf, src.Height - pixeldistance)
-            xpt2 = New cv.Point2f(ocvb.topCameraPoint.X + lineHalf, src.Height - pixeldistance)
-            Dim coneleft = Math.Max(Math.Max(xpt1.X, r.X), ocvb.topCameraPoint.X - lineHalf)
-            Dim coneRight = Math.Min(Math.Min(xpt2.X, r.X + r.Width), ocvb.topCameraPoint.X + lineHalf)
+            xpt1 = New cv.Point2f(task.topCameraPoint.X - lineHalf, src.Height - pixeldistance)
+            xpt2 = New cv.Point2f(task.topCameraPoint.X + lineHalf, src.Height - pixeldistance)
+            Dim coneleft = Math.Max(Math.Max(xpt1.X, r.X), task.topCameraPoint.X - lineHalf)
+            Dim coneRight = Math.Min(Math.Min(xpt2.X, r.X + r.Width), task.topCameraPoint.X + lineHalf)
 
             Dim coneWidth = dst1.Width / (Math.Max(xpt2.X, dst1.Width) - Math.Max(xpt1.X, 0))
             Dim drawPt1 = New cv.Point2f(coneleft, r.Y + r.Height)
@@ -1428,13 +1428,13 @@ Public Class PointCloud_ObjectsTop
             Dim vo = measureTop.pTrack.drawRC.viewObjects.Values(i)
             Dim addlen As Single = 0
             ' need to add a small amount to the object width in pixels based on the angle to the camera of the back edge
-            If Not (ocvb.topCameraPoint.X > r.X And ocvb.topCameraPoint.X < r.X + r.Width) Then
-                If r.X > ocvb.topCameraPoint.X Then
-                    addlen = r.Height * Math.Abs(r.X - ocvb.topCameraPoint.X) / (src.Height - r.Y)
+            If Not (task.topCameraPoint.X > r.X And task.topCameraPoint.X < r.X + r.Width) Then
+                If r.X > task.topCameraPoint.X Then
+                    addlen = r.Height * Math.Abs(r.X - task.topCameraPoint.X) / (src.Height - r.Y)
                     If drawLines Then dst1.Line(New cv.Point2f(r.X, r.Y + r.Height), New cv.Point2f(r.X - addlen, r.Y + r.Height), cv.Scalar.Yellow, 3)
                     coneleft -= addlen
                 Else
-                    addlen = r.Height * (ocvb.topCameraPoint.X - (r.X + r.Width)) / (src.Height - r.Y)
+                    addlen = r.Height * (task.topCameraPoint.X - (r.X + r.Width)) / (src.Height - r.Y)
                     If drawLines Then dst1.Line(New cv.Point2f(r.X + r.Width, r.Y + r.Height), New cv.Point2f(r.X + r.Width + addlen, r.Y + r.Height), cv.Scalar.Yellow, 3)
                     If coneleft - addlen >= xpt1.X Then coneleft -= addlen
                 End If
@@ -1488,17 +1488,17 @@ Public Class PointCloud_ObjectsSide
         measureSide.Run()
         dst1 = measureSide.dst1
 
-        label1 = "Pixels/Meter horizontal: " + CStr(CInt(dst1.Width / ocvb.maxZ)) + " vertical: " + CStr(CInt(ocvb.pixelsPerMeter))
+        label1 = "Pixels/Meter horizontal: " + CStr(CInt(dst1.Width / task.maxZ)) + " vertical: " + CStr(CInt(ocvb.pixelsPerMeter))
         Dim FOV = ocvb.vFov / 2
 
         Dim xpt1 As cv.Point2f, xpt2 As cv.Point2f
         If standalone Or task.intermediateReview = caller Then
             Static distanceSlider = findSlider("Test Bar Distance from camera in mm")
-            Dim pixeldistance = src.Width * (distanceSlider.Value / 1000) / ocvb.maxZ
+            Dim pixeldistance = src.Width * (distanceSlider.Value / 1000) / task.maxZ
             Dim lineHalf = CInt(Math.Tan(FOV * 0.0174533) * pixeldistance)
 
-            xpt1 = New cv.Point2f(ocvb.sideCameraPoint.X + pixeldistance, ocvb.sideCameraPoint.Y - lineHalf)
-            xpt2 = New cv.Point2f(ocvb.sideCameraPoint.X + pixeldistance, ocvb.sideCameraPoint.Y + lineHalf)
+            xpt1 = New cv.Point2f(task.sideCameraPoint.X + pixeldistance, task.sideCameraPoint.Y - lineHalf)
+            xpt2 = New cv.Point2f(task.sideCameraPoint.X + pixeldistance, task.sideCameraPoint.Y + lineHalf)
             If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Blue, 3)
             Dim lineWidth = xpt2.Y - xpt1.Y
             Dim blueLineMeters As Single
@@ -1521,22 +1521,22 @@ Public Class PointCloud_ObjectsSide
             Dim r = measureSide.pTrack.drawRC.viewObjects.Values(i).rectInHist
             Dim lineHalf = CInt(Math.Tan(FOV * 0.0174533) * (src.Height - (r.Y + r.Height)))
             Dim pixeldistance = src.Height - r.Y - r.Height
-            xpt1 = New cv.Point2f(ocvb.topCameraPoint.X - lineHalf, src.Height - pixeldistance)
-            xpt2 = New cv.Point2f(ocvb.topCameraPoint.X + lineHalf, src.Height - pixeldistance)
-            Dim coneleft = Math.Max(Math.Max(xpt1.X, r.X), ocvb.topCameraPoint.X - lineHalf)
-            Dim coneRight = Math.Min(Math.Min(xpt2.X, r.X + r.Width), ocvb.topCameraPoint.X + lineHalf)
+            xpt1 = New cv.Point2f(task.topCameraPoint.X - lineHalf, src.Height - pixeldistance)
+            xpt2 = New cv.Point2f(task.topCameraPoint.X + lineHalf, src.Height - pixeldistance)
+            Dim coneleft = Math.Max(Math.Max(xpt1.X, r.X), task.topCameraPoint.X - lineHalf)
+            Dim coneRight = Math.Min(Math.Min(xpt2.X, r.X + r.Width), task.topCameraPoint.X + lineHalf)
 
             Dim coneWidth = dst1.Width / (Math.Max(xpt2.X, dst1.Width) - Math.Max(xpt1.X, 0))
             Dim drawPt1 = New cv.Point2f(coneleft, r.Y + r.Height)
             Dim drawpt2 = New cv.Point2f(coneRight, r.Y + r.Height)
 
-            lineHalf = CInt(Math.Tan(FOV * 0.0174533) * (r.X - ocvb.sideCameraPoint.X))
-            pixeldistance = r.X - ocvb.sideCameraPoint.X
-            xpt1 = New cv.Point2f(ocvb.sideCameraPoint.X + pixeldistance, ocvb.sideCameraPoint.Y - lineHalf)
-            xpt2 = New cv.Point2f(ocvb.sideCameraPoint.X + pixeldistance, ocvb.sideCameraPoint.Y + lineHalf)
+            lineHalf = CInt(Math.Tan(FOV * 0.0174533) * (r.X - task.sideCameraPoint.X))
+            pixeldistance = r.X - task.sideCameraPoint.X
+            xpt1 = New cv.Point2f(task.sideCameraPoint.X + pixeldistance, task.sideCameraPoint.Y - lineHalf)
+            xpt2 = New cv.Point2f(task.sideCameraPoint.X + pixeldistance, task.sideCameraPoint.Y + lineHalf)
 
-            coneleft = Math.Max(Math.Max(xpt1.Y, r.Y), ocvb.sideCameraPoint.Y - lineHalf)
-            coneRight = Math.Min(Math.Min(xpt2.Y, r.Y + r.Height), ocvb.sideCameraPoint.Y + lineHalf)
+            coneleft = Math.Max(Math.Max(xpt1.Y, r.Y), task.sideCameraPoint.Y - lineHalf)
+            coneRight = Math.Min(Math.Min(xpt2.Y, r.Y + r.Height), task.sideCameraPoint.Y + lineHalf)
             drawPt1 = New cv.Point2f(r.X, coneleft)
             drawpt2 = New cv.Point2f(r.X, coneRight)
 
@@ -1546,14 +1546,14 @@ Public Class PointCloud_ObjectsSide
             Dim vo = measureSide.pTrack.drawRC.viewObjects.Values(i)
             Dim addlen As Single = 0
             ' need to add a small amount to the object width in pixels based on the angle to the camera of the back edge
-            If Not (ocvb.sideCameraPoint.Y > r.Y And ocvb.sideCameraPoint.Y < r.Y + r.Height) Then
-                If r.Y > ocvb.sideCameraPoint.Y Then
-                    addlen = r.Width * (r.Y - ocvb.sideCameraPoint.Y) / (r.X + r.Width - ocvb.sideCameraPoint.X)
+            If Not (task.sideCameraPoint.Y > r.Y And task.sideCameraPoint.Y < r.Y + r.Height) Then
+                If r.Y > task.sideCameraPoint.Y Then
+                    addlen = r.Width * (r.Y - task.sideCameraPoint.Y) / (r.X + r.Width - task.sideCameraPoint.X)
                     If drawLines Then dst1.Line(New cv.Point2f(r.X, r.Y), New cv.Point2f(r.X, r.Y - addlen), cv.Scalar.Yellow, 3)
                     r = New cv.Rect(r.X, r.Y - addlen, r.Width, coneRight - coneleft - addlen)
                     If coneRight - addlen >= xpt2.Y Then coneRight -= addlen
                 Else
-                    addlen = r.Width * (ocvb.sideCameraPoint.Y - r.Y) / (r.X + r.Width - ocvb.sideCameraPoint.X)
+                    addlen = r.Width * (task.sideCameraPoint.Y - r.Y) / (r.X + r.Width - task.sideCameraPoint.X)
                     If drawLines Then dst1.Line(New cv.Point2f(r.X, r.Y + r.Height), New cv.Point2f(r.X, r.Y + r.Height + addlen), cv.Scalar.Yellow, 3)
                     r = New cv.Rect(r.X, r.Y + addlen, r.Width, coneRight - coneleft + addlen)
                     coneleft += addlen
@@ -1650,8 +1650,8 @@ Public Class PointCloud_BothViews
             detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y))
             Dim rFront = vwTop.Values(minIndex).rectFront
 
-            minDepth = ocvb.maxZ * (ocvb.topCameraPoint.Y - rView.Y - rView.Height) / src.Height
-            maxDepth = ocvb.maxZ * (ocvb.topCameraPoint.Y - rView.Y) / src.Height
+            minDepth = task.maxZ * (task.topCameraPoint.Y - rView.Y - rView.Height) / src.Height
+            maxDepth = task.maxZ * (task.topCameraPoint.Y - rView.Y) / src.Height
             widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Width / ocvb.pixelsPerMeter, "0.0") + "m"
             detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m" + widthInfo
 
@@ -1668,8 +1668,8 @@ Public Class PointCloud_BothViews
             Dim rView = vwSide.Values(minIndex).rectInHist
             detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y - 15))
             Dim rFront = vwSide.Values(minIndex).rectFront
-            minDepth = ocvb.maxZ * (rView.X - ocvb.sideCameraPoint.X) / src.Height
-            maxDepth = ocvb.maxZ * (rView.X + rView.Width - ocvb.sideCameraPoint.X) / src.Height
+            minDepth = task.maxZ * (rView.X - task.sideCameraPoint.X) / src.Height
+            maxDepth = task.maxZ * (rView.X + rView.Width - task.sideCameraPoint.X) / src.Height
 
             widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Height / ocvb.pixelsPerMeter, "0.0") + "m"
             detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m " + widthInfo
@@ -1738,7 +1738,7 @@ Public Class PointCloud_BackProjectTopView
             Dim colorBump = CInt(255 / rectList.Count)
 
             Static minSlider = findSlider("InRange Min Depth (mm)")
-            If ocvb.frameCount = 0 Then minSlider.Value = 1
+            If task.frameCount = 0 Then minSlider.Value = 1
             Dim minVal = minSlider.value
 
             Dim split = view.measureTop.topView.gCloud.dst1.Split()
@@ -1747,11 +1747,11 @@ Public Class PointCloud_BackProjectTopView
             For i = 0 To rectList.Count - 1
                 Dim r = rectList.ElementAt(i).Value
                 If r.Width > 0 And r.Height > 0 Then
-                    Dim minDepth = ocvb.maxZ - ocvb.maxZ * (r.Y + r.Height) / dst2.Height
-                    Dim maxDepth = ocvb.maxZ - ocvb.maxZ * r.Y / dst2.Height
+                    Dim minDepth = task.maxZ - task.maxZ * (r.Y + r.Height) / dst2.Height
+                    Dim maxDepth = task.maxZ - task.maxZ * r.Y / dst2.Height
 
-                    Dim minWidth = ocvb.maxZ * r.X / dst2.Width - ocvb.sideFrustrumAdjust
-                    Dim maxWidth = ocvb.maxZ * (r.X + r.Width) / dst2.Width - ocvb.sideFrustrumAdjust
+                    Dim minWidth = task.maxZ * r.X / dst2.Width - task.sideFrustrumAdjust
+                    Dim maxWidth = task.maxZ * (r.X + r.Width) / dst2.Width - task.sideFrustrumAdjust
 
                     Dim mask32f = New cv.Mat
 
@@ -1818,11 +1818,11 @@ Public Class PointCloud_BackProjectSideView
             For i = 0 To rectList.Count - 1
                 Dim r = rectList.ElementAt(i).Value
                 If r.Width > 0 And r.Height > 0 Then
-                    Dim minDepth = ocvb.maxZ * r.X / dst2.Width
-                    Dim maxDepth = ocvb.maxZ * (r.X + r.Width) / dst2.Width
+                    Dim minDepth = task.maxZ * r.X / dst2.Width
+                    Dim maxDepth = task.maxZ * (r.X + r.Width) / dst2.Width
 
-                    Dim minHeight = ocvb.maxZ - ocvb.maxZ * (r.Y + r.Height) / dst2.Height - ocvb.sideFrustrumAdjust
-                    Dim maxHeight = ocvb.maxZ - ocvb.maxZ * r.Y / dst2.Height - ocvb.sideFrustrumAdjust
+                    Dim minHeight = task.maxZ - task.maxZ * (r.Y + r.Height) / dst2.Height - task.sideFrustrumAdjust
+                    Dim maxHeight = task.maxZ - task.maxZ * r.Y / dst2.Height - task.sideFrustrumAdjust
 
                     Dim mask32f = New cv.Mat
 

@@ -135,10 +135,10 @@ Public Class TView_Centroids
         dst2 = tflood.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         For i = 0 To tflood.floodTop.centroids.Count - 1
-            dst1.Circle(tflood.floodTop.centroids(i), ocvb.dotSize, cv.Scalar.Yellow, -1)
+            dst1.Circle(tflood.floodTop.centroids(i), task.dotSize, cv.Scalar.Yellow, -1)
         Next
         For i = 0 To tflood.floodSide.centroids.Count - 1
-            dst2.Circle(tflood.floodSide.centroids(i), ocvb.dotSize, cv.Scalar.Yellow, -1)
+            dst2.Circle(tflood.floodSide.centroids(i), task.dotSize, cv.Scalar.Yellow, -1)
         Next
 
         Dim saveTopQueries = New List(Of cv.Point2f)(tflood.floodTop.centroids)
@@ -282,11 +282,11 @@ Public Class TView_BackProjectTop
             For i = 0 To rectlist.Count - 1
                 Dim r = rectlist(i)
                 If r.Width > 0 And r.Height > 0 Then
-                    Dim minDepth = ocvb.maxZ * r.X / dst2.Width
-                    Dim maxDepth = ocvb.maxZ * (r.X + r.Width) / dst2.Width
+                    Dim minDepth = task.maxZ * r.X / dst2.Width
+                    Dim maxDepth = task.maxZ * (r.X + r.Width) / dst2.Width
 
-                    Dim minHeight = ocvb.maxZ - ocvb.maxZ * (r.Y + r.Height) / dst2.Height - ocvb.sideFrustrumAdjust
-                    Dim maxHeight = ocvb.maxZ - ocvb.maxZ * r.Y / dst2.Height - ocvb.sideFrustrumAdjust
+                    Dim minHeight = task.maxZ - task.maxZ * (r.Y + r.Height) / dst2.Height - task.sideFrustrumAdjust
+                    Dim maxHeight = task.maxZ - task.maxZ * r.Y / dst2.Height - task.sideFrustrumAdjust
 
                     Dim mask32f = New cv.Mat
 

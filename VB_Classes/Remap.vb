@@ -33,7 +33,7 @@ Public Class Remap_Basics
 
         If direction <> 0 Then cv.Cv2.Remap(src, dst1, map_x, map_y) Else dst1 = src
 
-        If ocvb.frameCount Mod 30 = 0 Then
+        If task.frameCount Mod 30 = 0 Then
             direction += 1
             direction = direction Mod 4
         End If
@@ -64,7 +64,7 @@ Public Class Remap_Flip
             Case 3 ' flip horizontally and vertically
                 cv.Cv2.Flip(src, dst1, cv.FlipMode.XY)
         End Select
-        If ocvb.frameCount Mod 100 = 0 Then
+        If task.frameCount Mod 100 = 0 Then
             direction += 1
             direction = direction Mod 4
         End If

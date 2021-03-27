@@ -554,14 +554,14 @@ Public Class KNN_SmoothAverage
         knn.Run()
 
         Static accum As New cv.Mat
-        If ocvb.frameCount = 0 Then accum = knn.dst2.Clone
+        If task.frameCount = 0 Then accum = knn.dst2.Clone
 
         Dim alpha = sliders.trackbar(0).Value / 100
         cv.Cv2.AddWeighted(knn.dst2, alpha, accum, 1.0 - alpha, 0, accum)
         dst1 = accum
 
         Dim tmp = knn.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
-        If ocvb.frameCount = 0 Then lastinput = tmp.Clone
+        If task.frameCount = 0 Then lastinput = tmp.Clone
         cv.Cv2.BitwiseXor(tmp, lastinput, dst2)
         lastinput = tmp
     End Sub
@@ -596,7 +596,7 @@ Public Class KNN_StabilizeRegions
         dst1 = knn.dst2
 
         Dim tmp = knn.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
-        If ocvb.frameCount = 0 Then lastinput = tmp.Clone
+        If task.frameCount = 0 Then lastinput = tmp.Clone
         cv.Cv2.BitwiseXor(tmp, lastinput, dst2)
         lastinput = tmp
 
@@ -628,7 +628,7 @@ Public Class KNN_Contours
         dst1 = outline.dst2
 
         knn.knnQT.trainingPoints.Clear()
-        If ocvb.frameCount = 0 Then
+        If task.frameCount = 0 Then
             For i = 0 To outline.contours.Count - 1
                 knn.knnQT.trainingPoints.Add(New cv.Point2f(outline.contours(i).X, outline.contours(i).Y))
             Next
@@ -703,20 +703,20 @@ Public Class KNN_Cluster2DCities
             Next
         Next
         For i = 0 To cityOrder.Length - 1
-            result.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 4 * ocvb.fontSize)
+            result.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 4 * task.fontSize)
         Next
 
         closedRegions = 0
         For y = 0 To result.Rows - 1
             For x = 0 To result.Cols - 1
                 If result.Get(Of cv.Vec3b)(y, x) = cv.Scalar.Black Then
-                    Dim byteCount = cv.Cv2.FloodFill(result, New cv.Point(x, y), ocvb.vecColors(closedRegions Mod ocvb.vecColors.Length))
+                    Dim byteCount = cv.Cv2.FloodFill(result, New cv.Point(x, y), task.vecColors(closedRegions Mod task.vecColors.Length))
                     If byteCount > 10 Then closedRegions += 1 ' there are fake regions due to anti-alias like features that appear when drawing.
                 End If
             Next
         Next
         For i = 0 To cityOrder.Length - 1
-            result.Circle(cityPositions(i), 4 * ocvb.fontSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            result.Circle(cityPositions(i), 4 * task.fontSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
     Public Sub Run()
@@ -787,7 +787,7 @@ Public Class KNN_Point2d
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone or task.intermediateReview = caller Then prepareImage(dst1, ocvb.dotSize)
+        If standalone or task.intermediateReview = caller Then prepareImage(dst1, task.dotSize)
 
         knn.Run()
 
@@ -803,7 +803,7 @@ Public Class KNN_Point2d
             If standalone or task.intermediateReview = caller Then
                 For j = 0 To findXnearest - 1
                     dst1.Line(knn.knnQT.trainingPoints(responseSet(i * findXnearest + j)), knn.knnQT.queryPoints(i), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-                    cv.Cv2.Circle(dst1, knn.knnQT.queryPoints(i), ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
+                    cv.Cv2.Circle(dst1, knn.knnQT.queryPoints(i), task.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
                 Next
             End If
         Next
@@ -1070,9 +1070,9 @@ Public Class KNN_1_to_1FIFO
             lastSet.RemoveAt(index)
             Dim pt = trainData.Get(Of cv.Point2f)(index, 0)
             Dim qpoint = currSet(i)
-            cv.Cv2.Circle(dst1, qpoint, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
-            dst1.Line(pt, qpoint, cv.Scalar.Red, ocvb.lineSize, cv.LineTypes.AntiAlias)
-            cv.Cv2.Circle(dst1, pt, ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
+            cv.Cv2.Circle(dst1, qpoint, task.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
+            dst1.Line(pt, qpoint, cv.Scalar.Red, task.lineSize, cv.LineTypes.AntiAlias)
+            cv.Cv2.Circle(dst1, pt, task.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
         Next
     End Sub
 End Class

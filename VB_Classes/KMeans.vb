@@ -35,7 +35,7 @@ Public Class kMeans_Basics
             Dim mask = labels.InRange(i, i)
             Dim m = cv.Cv2.Moments(mask, True)
             centroids.Add(New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00))
-            dst1.SetTo(ocvb.scalarColors(i), mask)
+            dst1.SetTo(task.scalarColors(i), mask)
         Next
 
         For i = 0 To centroids.Count - 1
@@ -407,7 +407,7 @@ Public Class kMeans_Color_MT
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount = 0 Then
+        If task.frameCount = 0 Then
             Static gridWidthSlider = findSlider("ThreadGrid Width")
             Static gridHeightSlider = findSlider("ThreadGrid Height")
             gridWidthSlider.Value = 128
@@ -624,7 +624,7 @@ Public Class KMeans_Subdivision1
             Dim mask = gray1.InRange(i, i)
             Dim m = cv.Cv2.Moments(mask, True)
             centroids.Add(New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00))
-            dst1.SetTo(ocvb.scalarColors(i), mask)
+            dst1.SetTo(task.scalarColors(i), mask)
         Next
 
         For i = 0 To centroids.Count - 1

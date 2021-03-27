@@ -119,12 +119,12 @@ Public Class Dlib_iBug300WDownload
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim ibugDir = New DirectoryInfo(ocvb.parms.homeDir + "Data/ibug_300W_large_face_landmark_dataset")
+        Dim ibugDir = New DirectoryInfo(task.parms.homeDir + "Data/ibug_300W_large_face_landmark_dataset")
         If ibugDir.Exists And downloadActive = False And pythonActive = False Then
             ocvb.trueText("The iBug 300W face database was downloaded and is ready for use.", 40, 200)
             Exit Sub
         End If
-        Dim fileToDecompress As New FileInfo(ocvb.parms.homeDir + "Data/ibug_300W_large_face_landmark_dataset.tar.gz")
+        Dim fileToDecompress As New FileInfo(task.parms.homeDir + "Data/ibug_300W_large_face_landmark_dataset.tar.gz")
         If downloadActive And pythonActive = False Then
             ocvb.trueText("Downloading active (takes a while).  Current download size = " + Format(zippedBuffer.Length / 1000, "###,##0") + "k bytes" + vbCrLf +
                           "Download is " + Format(zippedBuffer.Length / 1797000000, "#0%") + " complete", 40, 200)
@@ -145,14 +145,14 @@ Public Class Dlib_iBug300WDownload
                                 File.WriteAllBytes(fileToDecompress.FullName, zippedBuffer.ToArray)
                             End If
 
-                            Dim saveConsoleSetting = ocvb.parms.ShowConsoleLog
-                            ocvb.parms.ShowConsoleLog = False
+                            Dim saveConsoleSetting = task.parms.ShowConsoleLog
+                            task.parms.ShowConsoleLog = False
                             pythonActive = True
-                            Dim pyScript = ocvb.parms.homeDir + "Data/extractiBug.py"
+                            Dim pyScript = task.parms.homeDir + "Data/extractiBug.py"
                             Dim fs = New StreamWriter(pyScript)
                             fs.WriteLine("import tarfile")
                             fs.WriteLine("import os")
-                            fs.WriteLine("os.chdir(""" + ocvb.parms.homeDir + "Data/" + """)")
+                            fs.WriteLine("os.chdir(""" + task.parms.homeDir + "Data/" + """)")
                             fs.WriteLine("tar = tarfile.open(""" + fileToDecompress.Name + """)")
                             fs.WriteLine("tar.extractall()")
                             fs.WriteLine("tar.close")
@@ -160,14 +160,14 @@ Public Class Dlib_iBug300WDownload
 
                             ocvb.pythonTaskName = pyScript
                             Dim p As New Process
-                            p.StartInfo.FileName = ocvb.parms.PythonExe
-                            p.StartInfo.WorkingDirectory = ocvb.parms.homeDir + "Data"
+                            p.StartInfo.FileName = task.parms.PythonExe
+                            p.StartInfo.WorkingDirectory = task.parms.homeDir + "Data"
                             p.StartInfo.Arguments = """" + ocvb.pythonTaskName + """"
-                            If ocvb.parms.ShowConsoleLog = False Then p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
+                            If task.parms.ShowConsoleLog = False Then p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
                             p.Start()
                             p.WaitForExit()
 
-                            ocvb.parms.ShowConsoleLog = saveConsoleSetting
+                            task.parms.ShowConsoleLog = saveConsoleSetting
                             My.Computer.FileSystem.DeleteFile(pyScript)
                             My.Computer.FileSystem.DeleteFile(fileToDecompress.FullName)
                             downloadActive = False

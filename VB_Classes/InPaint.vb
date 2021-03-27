@@ -24,7 +24,7 @@ Public Class InPaint_Basics
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
 
-        If ocvb.frameCount Mod 100 Then Exit Sub
+        If task.frameCount Mod 100 Then Exit Sub
         src.CopyTo(dst1)
         Dim p1 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
         Dim p2 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
@@ -58,7 +58,7 @@ Public Class InPaint_Noise
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount Mod 100 Then Exit Sub ' give them time to review the inpaint results
+        If task.frameCount Mod 100 Then Exit Sub ' give them time to review the inpaint results
         noise.src = src
         noise.Run() ' create some noise in the result1 image.
         dst1 = noise.dst1

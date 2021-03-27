@@ -136,7 +136,7 @@ Public Class Blob_RenderBlobs
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount Mod 100 = 0 Then
+        If task.frameCount Mod 100 = 0 Then
             blob.src = src
             blob.Run()
             dst1 = blob.dst1
@@ -248,7 +248,7 @@ Public Class Blob_Rectangles
             kalman(i).kInput = {rect.X, rect.Y, rect.Width, rect.Height}
             kalman(i).Run()
             rect = New cv.Rect(kalman(i).kOutput(0), kalman(i).kOutput(1), kalman(i).kOutput(2), kalman(i).kOutput(3))
-            dst1.Rectangle(rect, ocvb.scalarColors(i Mod 255), 2)
+            dst1.Rectangle(rect, task.scalarColors(i Mod 255), 2)
         Next
     End Sub
 End Class

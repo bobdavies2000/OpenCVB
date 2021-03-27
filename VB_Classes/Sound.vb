@@ -41,7 +41,7 @@ Public Class Sound_ToPCM
         initParent()
 
         task.openFileDialogRequested = True
-        task.openFileInitialDirectory = ocvb.parms.homeDir + "Data\"
+        task.openFileInitialDirectory = task.parms.homeDir + "Data\"
         task.openFileDialogName = GetSetting("OpenCVB", "AudioFileName", "AudioFileName", "")
         task.openFileFilter = "m4a (*.m4a)|*.m4a|mp3 (*.mp3)|*.mp3|mp4 (*.mp4)|*.mp4|wav (*.wav)|*.wav|aac (*.aac)|*.aac|All files (*.*)|*.*"
         task.openFileFilterIndex = 1

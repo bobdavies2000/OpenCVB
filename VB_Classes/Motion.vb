@@ -240,7 +240,7 @@ Public Class Motion_MinMaxPointCloud
         dst1 = stable.dst1
         dst2 = stable.dst2
         label2 = "Cumulative Motion = " + Format(stable.motion.changedPixels / 1000, "#0.0") + "k pixels "
-        If stable.motion.resetAll Or splitPC Is Nothing Or ocvb.frameCount < 30 Then
+        If stable.motion.resetAll Or splitPC Is Nothing Or task.frameCount < 30 Then
             splitPC = split
             dst2 = input
         Else
@@ -426,7 +426,7 @@ Public Class Motion_CCmerge
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount < 10 Then dst1 = src.Clone
+        If task.frameCount < 10 Then dst1 = src.Clone
 
         motionCC.src = src
         motionCC.Run()

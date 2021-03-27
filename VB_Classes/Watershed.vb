@@ -17,7 +17,7 @@ Public Class Watershed_Basics
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then rects.Add(task.drawRect)
 
-        If (standalone Or UseCorners) And ocvb.frameCount = 0 Then
+        If (standalone Or UseCorners) And task.frameCount = 0 Then
             For i = 0 To 4 - 1
                 Dim r As New cv.Rect(0, 0, src.Width / 10, src.Height / 10)
                 Select Case i

@@ -44,9 +44,9 @@ Public Class Retina_Basics_CPP
             check.Box(1).Checked = False
             Dim fileinfo = New FileInfo(CurDir() + "/RetinaDefaultParameters.xml")
             If fileinfo.Exists Then
-                FileCopy(CurDir() + "/RetinaDefaultParameters.xml", ocvb.parms.homeDir + "data/RetinaDefaultParameters.xml")
+                FileCopy(CurDir() + "/RetinaDefaultParameters.xml", task.parms.homeDir + "data/RetinaDefaultParameters.xml")
                 startInfo.FileName = "wordpad.exe"
-                startInfo.Arguments = ocvb.parms.homeDir + "Data/RetinaDefaultParameters.xml"
+                startInfo.Arguments = task.parms.homeDir + "Data/RetinaDefaultParameters.xml"
                 Process.Start(startInfo)
             Else
                 MsgBox("RetinaDefaultParameters.xml should have been created but was not found.  OpenCV error?")
@@ -60,12 +60,12 @@ Public Class Retina_Basics_CPP
             ReDim srcData(src.Total * src.ElemSize - 1)
             useLogSampling = check.Box(0).Checked
             samplingFactor = sliders.trackbar(0).Value
-            If ocvb.parms.testAllRunning = False Then Retina = Retina_Basics_Open(src.Rows, src.Cols, useLogSampling, samplingFactor)
+            If task.parms.testAllRunning = False Then Retina = Retina_Basics_Open(src.Rows, src.Cols, useLogSampling, samplingFactor)
         End If
         Dim handleMagno = GCHandle.Alloc(magnoData, GCHandleType.Pinned)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Dim magnoPtr As IntPtr = 0
-        If ocvb.parms.testAllRunning = False Then
+        If task.parms.testAllRunning = False Then
             Marshal.Copy(src.Data, srcData, 0, srcData.Length)
             magnoPtr = Retina_Basics_Run(Retina, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, handleMagno.AddrOfPinnedObject(), useLogSampling)
         Else

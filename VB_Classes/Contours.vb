@@ -106,10 +106,10 @@ Public Class Contours_Basics
                 Dim area = cv.Cv2.ContourArea(contours0(i))
                 If area > minArea Then
                     contourlist.Add(cv.Cv2.ApproxPolyDP(contours0(i), epsilon, True))
-                    dst2.Circle(pt, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-                    cv.Cv2.PutText(dst2, Format(area / 1000, "#0") + "k pixels", New cv.Point(pt.X + ocvb.dotSize, pt.Y), cv.HersheyFonts.HersheyComplexSmall, ocvb.fontSize, cv.Scalar.White)
+                    dst2.Circle(pt, task.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                    cv.Cv2.PutText(dst2, Format(area / 1000, "#0") + "k pixels", New cv.Point(pt.X + task.dotSize, pt.Y), cv.HersheyFonts.HersheyComplexSmall, task.fontSize, cv.Scalar.White)
                 Else
-                    cv.Cv2.PutText(dst2, "too small", New cv.Point(pt.X + ocvb.dotSize, pt.Y), cv.HersheyFonts.HersheyComplexSmall, ocvb.fontSize, cv.Scalar.White)
+                    cv.Cv2.PutText(dst2, "too small", New cv.Point(pt.X + task.dotSize, pt.Y), cv.HersheyFonts.HersheyComplexSmall, task.fontSize, cv.Scalar.White)
                 End If
             Next
         Else
@@ -200,7 +200,7 @@ Public Class Contours_RemoveLines
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim tmp = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/invoice.jpg")
+        Dim tmp = cv.Cv2.ImRead(task.parms.homeDir + "Data/invoice.jpg")
         Dim dstSize = New cv.Size(src.Height / tmp.Height * src.Width, src.Height)
         Dim dstRect = New cv.Rect(0, 0, dstSize.Width, src.Height)
         dst1(dstRect) = tmp.Resize(dstSize)
@@ -394,7 +394,7 @@ Public Class Contours_Binarized
         For i = 0 To cntList.Count - 1
             Dim lPoints = New List(Of List(Of cv.Point))
             lPoints.Add(cntList.ElementAt(i).Value.ToList)
-            cv.Cv2.DrawContours(CType(dst2, cv.InputOutputArray), lPoints, 0, ocvb.scalarColors(i Mod 255), -1)
+            cv.Cv2.DrawContours(CType(dst2, cv.InputOutputArray), lPoints, 0, task.scalarColors(i Mod 255), -1)
         Next
 
         lastFrame = dst2.Clone

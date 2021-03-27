@@ -247,7 +247,7 @@ Public Class Pixel_Measure
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Distance in mm", 50, ocvb.maxZ * 1000, 1500)
+            sliders.setupTrackBar(0, "Distance in mm", 50, task.maxZ * 1000, 1500)
         End If
 
         task.desc = "Compute how many pixels per meter at a requested distance"

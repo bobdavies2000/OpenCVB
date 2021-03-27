@@ -42,7 +42,7 @@ Public Class Palette_Basics
         colormap = checkRadios()
         label1 = "ColorMap = " + mapNames(colormap)
 
-        Static cMapDir As New DirectoryInfo(ocvb.parms.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
+        Static cMapDir As New DirectoryInfo(task.parms.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
         Static saveColorMap As Integer = -1
         If colormap = 20 Then
             saveColorMap = colormap
@@ -318,7 +318,7 @@ Public Class Palette_Gradient
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount Mod frameModulo = 0 Then
+        If task.frameCount Mod frameModulo = 0 Then
             If standalone or task.intermediateReview = caller Then
                 color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
                 color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
@@ -402,7 +402,7 @@ Public Class Palette_DepthColorMap
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount = 0 Then
+        If task.frameCount = 0 Then
             Dim color1 = cv.Scalar.Yellow
             Dim color2 = cv.Scalar.Red
             Dim color3 = cv.Scalar.Blue
@@ -556,7 +556,7 @@ Public Class Palette_ObjectColors
         For i = 0 To blobList.Count - 1
             Dim index = blobList.ElementAt(i).Value
             Dim blob = reduction.pTrack.drawRC.viewObjects.Values(index)
-            dst1.Rectangle(New cv.Rect(blob.centroid.X, blob.centroid.Y, 60 * ocvb.fontSize, 30 * ocvb.fontSize), cv.Scalar.Black, -1)
+            dst1.Rectangle(New cv.Rect(blob.centroid.X, blob.centroid.Y, 60 * task.fontSize, 30 * task.fontSize), cv.Scalar.Black, -1)
             ocvb.trueText(CStr(CInt(blobList.ElementAt(i).Key)), blob.centroid)
         Next
         dst1.SetTo(0, task.noDepthMask)
@@ -587,7 +587,7 @@ Public Class Palette_Layout2D
         grid.Run()
         Dim index As Integer
         For Each r In grid.roiList
-            dst1(r).SetTo(ocvb.scalarColors(index Mod 255))
+            dst1(r).SetTo(task.scalarColors(index Mod 255))
             index += 1
         Next
         label1 = "Palette_Layout2D - " + CStr(grid.roiList.Count) + " regions"

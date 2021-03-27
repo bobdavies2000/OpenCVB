@@ -166,7 +166,7 @@ Public Class Kalman_Compare
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount = 0 Then
+        If task.frameCount = 0 Then
             If kalman IsNot Nothing Then
                 If kalman.Count > 0 Then
                     For i = 0 To kalman.Count - 1
@@ -290,7 +290,7 @@ Public Class Kalman_MousePredict
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount Mod 100 = 0 Then dst1.SetTo(0)
+        If task.frameCount Mod 100 = 0 Then dst1.SetTo(0)
 
         Static lastRealMouse = task.mousePoint
         kalman.kInput(0) = task.mousePoint.X
@@ -648,7 +648,7 @@ Public Class Kalman_VB
         If noisyInput > sliders.trackbar(1).Maximum Then noisyInput = sliders.trackbar(1).Maximum
         sliders.trackbar(1).Value = noisyInput
 
-        matrix(ocvb.frameCount Mod MAX_INPUT) = input
+        matrix(task.frameCount Mod MAX_INPUT) = input
         Dim AverageOutput = (New cv.Mat(MAX_INPUT, 1, cv.MatType.CV_32F, matrix.ToArray)).Mean().Item(0)
 
         If AverageOutput < 0 Then AverageOutput = 0
@@ -775,7 +775,7 @@ Public Class Kalman_VB_Basics
             Next
         End If
 
-        matrix(ocvb.frameCount Mod saveAvgCount) = kInput
+        matrix(task.frameCount Mod saveAvgCount) = kInput
         kAverage = (New cv.Mat(saveAvgCount, 1, cv.MatType.CV_32F, matrix.ToArray)).Mean().Item(0)
 
         Static useKalmanCheck = findCheckBox("Turn Kalman filtering on")

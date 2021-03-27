@@ -28,7 +28,7 @@ Public Class KLT_Basics
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static prevGray As New cv.Mat
 
-        If check.Box(1).Checked Or ocvb.frameCount Mod 25 = 0 Then
+        If check.Box(1).Checked Or task.frameCount Mod 25 = 0 Then
             inputPoints = Nothing ' just delete all points and start again.
             check.Box(1).Checked = False
         End If
@@ -100,7 +100,7 @@ Public Class KLT_OpticalFlow
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         klt.src = src
         klt.Run()
-        If ocvb.frameCount > 0 And lastpoints IsNot Nothing And klt.inputPoints IsNot Nothing Then
+        If task.frameCount > 0 And lastpoints IsNot Nothing And klt.inputPoints IsNot Nothing Then
             dst1 = klt.dst1
             src.CopyTo(dst2)
             For i = 0 To klt.inputPoints.Length - 1
@@ -108,7 +108,7 @@ Public Class KLT_OpticalFlow
                     ' dst1.Line(lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
                     'Static lastFlowPoints() As cv.Point2f = klt.inputPoints
                     ' dst2.Line(lastFlowPoints(i), klt.inputPoints(i), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
-                    'If ocvb.frameCount Mod 10 = 0 Then lastFlowPoints = klt.inputPoints
+                    'If task.frameCount Mod 10 = 0 Then lastFlowPoints = klt.inputPoints
                 End If
             Next
         End If

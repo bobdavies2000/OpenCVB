@@ -212,7 +212,7 @@ Public Class MSER_TestSynthetic
             regionCount += 1
             Dim nextRegion = mser.regions(i)
             For Each pt In nextRegion
-                img.Set(Of cv.Vec3b)(pt.Y, pt.X, ocvb.vecColors(i Mod ocvb.vecColors.Length))
+                img.Set(Of cv.Vec3b)(pt.Y, pt.X, task.vecColors(i Mod task.vecColors.Length))
                 pixels += 1
             Next
         Next
@@ -256,7 +256,7 @@ Public Class MSER_CPPStyle
         label1 = "Contour regions from MSER"
         label2 = "Box regions from MSER"
         task.desc = "Maximally Stable Extremal Regions example - still image"
-        image = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
+        image = cv.Cv2.ImRead(task.parms.homeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
         gray = image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
     Public Sub Run()

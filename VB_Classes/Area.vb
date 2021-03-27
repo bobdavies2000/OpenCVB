@@ -40,7 +40,7 @@ Public Class Area_MinTriangle_CPP
         For i = 0 To srcPoints.Length - 1
             srcPoints(i).X = msRNG.Next(src.Width / 2 - squareWidth, src.Width / 2 + squareWidth)
             srcPoints(i).Y = msRNG.Next(src.Height / 2 - squareWidth, src.Height / 2 + squareWidth)
-            dst1.Circle(srcPoints(i), ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(srcPoints(i), task.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
         Dim input As New cv.Mat(numberOfPoints, 1, cv.MatType.CV_32FC2, srcPoints)
@@ -68,7 +68,7 @@ Public Class Area_MinRect
     Dim numberOfPoints As Integer
     Public srcPoints() As cv.Point2f
     Public minRect As cv.RotatedRect
-    Private Sub setup( _numberOfPoints As Integer)
+    Private Sub setup(_numberOfPoints As Integer)
         numberOfPoints = _numberOfPoints
         ReDim srcPoints(numberOfPoints)
     End Sub
@@ -86,7 +86,7 @@ Public Class Area_MinRect
         task.desc = "Find minimum containing rectangle for a set of points."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static pointCountSlider = findSlider("Area Number of Points")
         Static sizeSlider = findSlider("Area size")
         If numberOfPoints <> pointCountSlider.Value Then setup(pointCountSlider.value)
@@ -96,7 +96,7 @@ Public Class Area_MinRect
         For i = 0 To srcPoints.Length - 1
             srcPoints(i).X = msRNG.Next(src.Width / 2 - squareWidth, src.Width / 2 + squareWidth)
             srcPoints(i).Y = msRNG.Next(src.Height / 2 - squareWidth, src.Height / 2 + squareWidth)
-            dst1.Circle(srcPoints(i), ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(srcPoints(i), task.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
         minRect = cv.Cv2.MinAreaRect(srcPoints)
@@ -132,12 +132,12 @@ Public Class Area_MinMotionRect
         Return gray
     End Function
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         bgSub.src = src
         bgSub.Run()
         Dim gray As cv.Mat
         If bgSub.dst1.Channels = 1 Then gray = bgSub.dst1 Else gray = bgSub.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = motionRectangles(gray, ocvb.vecColors)
+        dst1 = motionRectangles(gray, task.vecColors)
         dst1.SetTo(cv.Scalar.All(255), gray)
     End Sub
 End Class
@@ -157,7 +157,7 @@ Public Class Area_FindNonZero
         task.desc = "Use FindNonZero API to get coordinates of non-zero points."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim gray = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         Dim srcPoints(10 - 1) As cv.Point ' doesn't really matter how many there are.
         For i = 0 To srcPoints.Length - 1
@@ -171,7 +171,7 @@ Public Class Area_FindNonZero
         dst2 = gray.EmptyClone().SetTo(0)
         ' mark the points so they are visible...
         For i = 0 To srcPoints.Length - 1
-            dst2.Circle(srcPoints(i), ocvb.dotSize + 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(srcPoints(i), task.dotSize + 2, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         Next
 
         Dim outstr As String = "Coordinates of the non-zero points (ordered by row - top to bottom): " + vbCrLf + vbCrLf

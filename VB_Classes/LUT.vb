@@ -41,7 +41,7 @@ Public Class LUT_Simple
     Public Sub New()
         initParent()
         reduction = New Reduction_Basics()
-        colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, ocvb.vecColors)
+        colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, task.vecColors)
         label2 = "Custom Color Lookup Table"
         task.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
@@ -115,7 +115,7 @@ Public Class LUT_Color
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Reduction for color image", 1, 256, 32)
         End If
-        colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, ocvb.vecColors) ' Create a new color palette here.
+        colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, task.vecColors) ' Create a new color palette here.
         task.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run()

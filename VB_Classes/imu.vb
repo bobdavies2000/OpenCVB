@@ -19,12 +19,12 @@ Public Class IMU_Basics
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim alpha As Double = sliders.trackbar(0).Value / 1000
-        If ocvb.frameCount = 0 Then
+        If task.frameCount = 0 Then
             lastTimeStamp = task.IMU_TimeStamp
         Else
             gyroAngle = task.IMU_AngularVelocity
             Dim dt_gyro = (task.IMU_TimeStamp - lastTimeStamp) / 1000
-            If ocvb.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.D435i Then dt_gyro /= 1000 ' different units in the timestamp?
+            If task.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.D435i Then dt_gyro /= 1000 ' different units in the timestamp?
             lastTimeStamp = task.IMU_TimeStamp
             gyroAngle = gyroAngle * dt_gyro
             theta += New cv.Point3f(-gyroAngle.Z, -gyroAngle.Y, gyroAngle.X)
@@ -33,7 +33,7 @@ Public Class IMU_Basics
         ' NOTE: Initialize the angle around the y-axis to zero.
         Dim accelAngle = New cv.Point3f(Math.Atan2(task.IMU_Acceleration.X, Math.Sqrt(task.IMU_Acceleration.Y * task.IMU_Acceleration.Y + task.IMU_Acceleration.Z * task.IMU_Acceleration.Z)), 0,
                                                     Math.Atan2(task.IMU_Acceleration.Y, task.IMU_Acceleration.Z))
-        If ocvb.frameCount = 0 Then
+        If task.frameCount = 0 Then
             theta = accelAngle
         Else
             ' Apply the Complementary Filter:
@@ -235,7 +235,7 @@ Public Class IMU_FrameTime
         If IMUtoCaptureEstimate < minDelay Then IMUtoCaptureEstimate = minDelay
 
         Static sampledIMUFrameTime = task.IMU_FrameTime
-        If ocvb.frameCount Mod 10 = 0 Then sampledIMUFrameTime = task.IMU_FrameTime
+        If task.frameCount Mod 10 = 0 Then sampledIMUFrameTime = task.IMU_FrameTime
 
         histogramIMU(CInt(task.IMU_FrameTime)) += 1
 
@@ -322,7 +322,7 @@ Public Class IMU_HostFrameTimes
         If HostInterruptDelayEstimate < 0 Then HostInterruptDelayEstimate = minDelay
 
         Static sampledCPUFrameTime = task.CPU_FrameTime
-        If ocvb.frameCount Mod 10 = 0 Then sampledCPUFrameTime = task.CPU_FrameTime
+        If task.frameCount Mod 10 = 0 Then sampledCPUFrameTime = task.CPU_FrameTime
 
         hist(CInt(task.CPU_FrameTime)) += 1
 
@@ -397,7 +397,7 @@ Public Class IMU_TotalDelay
         Static sampledIMUDelay = imu.IMUtoCaptureEstimate
         Static sampledTotalDelay = totaldelay
         Static sampledSmooth = kalman.stateResult
-        If ocvb.frameCount Mod 10 = 0 Then
+        If task.frameCount Mod 10 = 0 Then
             sampledCPUDelay = host.HostInterruptDelayEstimate
             sampledIMUDelay = imu.IMUtoCaptureEstimate
             sampledTotalDelay = totaldelay
@@ -470,8 +470,8 @@ Public Class IMU_GVector
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
         Static manualCheckbox = findCheckBox("Initialize the X- and Z-axis sliders with gravity but allow manual after")
         If manualCheckbox.checked Then
-            If ocvb.frameCount < 30 Then task.xRotateSlider.Value = CInt(ocvb.angleZ * 57.2958) Else ocvb.angleZ = task.xRotateSlider.Value / 57.2958
-            If ocvb.frameCount < 30 Then task.zRotateSlider.Value = CInt(ocvb.angleX * 57.2958) Else ocvb.angleX = task.zRotateSlider.Value / 57.2958
+            If task.frameCount < 30 Then task.xRotateSlider.Value = CInt(ocvb.angleZ * 57.2958) Else ocvb.angleZ = task.xRotateSlider.Value / 57.2958
+            If task.frameCount < 30 Then task.zRotateSlider.Value = CInt(ocvb.angleX * 57.2958) Else ocvb.angleX = task.zRotateSlider.Value / 57.2958
         Else
             If xCheckbox.checked = False Then ocvb.angleZ = 0
             If zCheckbox.checked = False Then ocvb.angleX = 0

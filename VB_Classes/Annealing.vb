@@ -33,11 +33,11 @@ Public Class Annealing_Basics_CPP
     Public Sub drawMap()
         dst1.SetTo(0)
         For i = 0 To cityOrder.Length - 1
-            dst1.Circle(cityPositions(i), ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(cityPositions(i), task.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
             dst1.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
         Next
-        cv.Cv2.PutText(dst1, "Energy", New cv.Point(10, 100), ocvb.font, ocvb.fontSize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-        cv.Cv2.PutText(dst1, Format(energy, "#0"), New cv.Point(10, 160), ocvb.font, ocvb.fontSize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst1, "Energy", New cv.Point(10, 100), task.font, task.fontSize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst1, Format(energy, "#0"), New cv.Point(10, 160), task.font, task.fontSize, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
     End Sub
     Public Sub setup()
         ReDim cityOrder(numberOfCities - 1)
@@ -75,7 +75,7 @@ Public Class Annealing_Basics_CPP
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If closed = True Then Exit Sub
         If standalone Or task.intermediateReview = caller Then
-            If ocvb.frameCount = 0 Then
+            If task.frameCount = 0 Then
                 setup()
                 Open()
             End If

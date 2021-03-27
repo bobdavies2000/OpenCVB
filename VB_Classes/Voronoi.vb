@@ -18,13 +18,13 @@ Public Class Voronoi_Basics
         dst = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         For Each pt In points
-            dst.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         Next
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If ocvb.frameCount = 0 Then
+        If task.frameCount = 0 Then
             Dim countSlider = findSlider("Random Pixel Count")
             countSlider.Maximum = 100
         End If
@@ -100,7 +100,7 @@ Public Class Voronoi_CPP
     Public Sub New()
         initParent()
         vDemo = New Voronoi_Basics()
-        vPtr = VoronoiDemo_Open(ocvb.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
+        vPtr = VoronoiDemo_Open(task.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
         task.desc = "Use the C++ version of the Voronoi code"
     End Sub
     Public Sub Run()

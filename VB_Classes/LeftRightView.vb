@@ -8,7 +8,7 @@ Public Class LeftRightView_Basics
             sliders.setupTrackBar(0, "brightness", 0, 255, 100)
         End If
         task.desc = "Show the left and right views from the 3D Camera"
-        Select Case ocvb.parms.cameraName
+        Select Case task.parms.cameraName
             Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
                 label1 = "Infrared Image"
                 label2 = "There is only one infrared image"
@@ -47,7 +47,7 @@ Public Class LeftRightView_CompareUndistorted
             sliders.setupTrackBar(2, "Slice Height", 1, (src.Rows - 100) / 2, 30)
         End If
 
-        Select Case ocvb.parms.cameraName
+        Select Case task.parms.cameraName
             Case VB_Classes.ActiveTask.algParms.camNames.D435i, VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2
                 label1 = "Left Image"
                 label2 = "Right Image"
@@ -92,7 +92,7 @@ Public Class LeftRightView_CompareRaw
             sliders.setupTrackBar(2, "Slice Height", 1, (src.Rows - 100) / 2, 30)
         End If
 
-        Select Case ocvb.parms.cameraName
+        Select Case task.parms.cameraName
             Case VB_Classes.ActiveTask.algParms.camNames.D435i, VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2,
                 label1 = "Left Image"
                 label2 = "Right Image"
@@ -233,7 +233,7 @@ Public Class LeftRightView_BrightnessContrast
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.OakDCamera Then
+            If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.OakDCamera Then
                 sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 10000, 1200)
                 sliders.setupTrackBar(1, "Brightness Beta (brightness)", -255, 255, -50)
             Else

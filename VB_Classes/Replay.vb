@@ -78,8 +78,8 @@ Public Class Replay_Record
         initParent()
 
         task.openFileDialogRequested = True
-        task.openFileInitialDirectory = ocvb.parms.homeDir + "/Data/"
-        task.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", ocvb.parms.homeDir + "Recording.ocvb")
+        task.openFileInitialDirectory = task.parms.homeDir + "/Data/"
+        task.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", task.parms.homeDir + "Recording.ocvb")
         task.openFileFilter = "ocvb (*.ocvb)|*.ocvb"
         task.openFileFilterIndex = 1
         task.openFileDialogTitle = "Select an OpenCVB bag file to create"
@@ -91,7 +91,7 @@ Public Class Replay_Record
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static bytesTotal As Int64
         recordingFilename = New FileInfo(task.openFileDialogName)
-        If ocvb.parms.useRecordedData And recordingFilename.Exists = False Then
+        If task.parms.useRecordedData And recordingFilename.Exists = False Then
             ocvb.trueText("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125)
             Exit Sub
         End If
@@ -167,8 +167,8 @@ Public Class Replay_Play
     Public Sub New()
         initParent()
         task.openFileDialogRequested = True
-        task.openFileInitialDirectory = ocvb.parms.homeDir + "/Data/"
-        task.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", ocvb.parms.homeDir + "Recording.ocvb")
+        task.openFileInitialDirectory = task.parms.homeDir + "/Data/"
+        task.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", task.parms.homeDir + "Recording.ocvb")
         task.openFileFilter = "ocvb (*.ocvb)|*.ocvb"
         task.openFileFilterIndex = 1
         task.openFileDialogTitle = "Select an OpenCVB bag file to create"

@@ -30,7 +30,7 @@ Public Class BGSubtract_Basics_CPP
                 If currMethod = i Then
                     Exit For
                 Else
-                    If ocvb.frameCount > 0 Then BGSubtract_BGFG_Close(bgfs)
+                    If task.frameCount > 0 Then BGSubtract_BGFG_Close(bgfs)
                     currMethod = i
                     label1 = "Method = " + frm.check(i).Text
                     bgfs = BGSubtract_BGFG_Open(currMethod)
@@ -79,7 +79,7 @@ Public Class BGSubtract_MotionDetect_MT
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount = 0 Then src.CopyTo(dst2)
+        If task.frameCount = 0 Then src.CopyTo(dst2)
         Dim threadData As New cv.Vec3i
         Dim width = src.Width, height = src.Height
         Static frm = findfrm("BGSubtract_MotionDetect_MT Radio Options")
@@ -139,7 +139,7 @@ Public Class BGSubtract_Basics_MT
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = input.EmptyClone.SetTo(0)
-        If ocvb.frameCount = 0 Then dst2 = input.Clone()
+        If task.frameCount = 0 Then dst2 = input.Clone()
         Static correlationSlider = findSlider("Correlation Threshold")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         dst1.SetTo(0)
@@ -256,8 +256,8 @@ Public Class BGSubtract_GMG_KNN
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount < 120 Then
-            ocvb.trueText("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(ocvb.frameCount))
+        If task.frameCount < 120 Then
+            ocvb.trueText("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(task.frameCount))
         Else
             ocvb.trueText("")
         End If
@@ -387,7 +387,7 @@ Public Class BGSubtract_Video
         bgfg = New BGSubtract_Basics_CPP()
 
         video = New Video_Basics()
-        video.srcVideo = ocvb.parms.homeDir + "Data/vtest.avi"
+        video.srcVideo = task.parms.homeDir + "Data/vtest.avi"
         task.desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
     End Sub
     Public Sub Run()
@@ -440,11 +440,11 @@ Public Class BGSubtract_Synthetic_CPP
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount < 10 Then Exit Sub ' darker images at the start?
+        If task.frameCount < 10 Then Exit Sub ' darker images at the start?
         If amplitude <> sliders.trackbar(0).Value Or magnitude <> sliders.trackbar(1).Value Or waveSpeed <> sliders.trackbar(2).Value Or
             objectSpeed <> sliders.trackbar(3).Value Then
 
-            If ocvb.frameCount <> 0 Then BGSubtract_Synthetic_Close(synthPtr)
+            If task.frameCount <> 0 Then BGSubtract_Synthetic_Close(synthPtr)
 
             amplitude = sliders.trackbar(0).Value
             magnitude = sliders.trackbar(1).Value
@@ -456,7 +456,7 @@ Public Class BGSubtract_Synthetic_CPP
             Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
 
             synthPtr = BGSubtract_Synthetic_Open(handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                                ocvb.parms.homeDir + "Data/baboon.jpg",
+                                                task.parms.homeDir + "Data/baboon.jpg",
                                                 amplitude / 100, magnitude, waveSpeed / 100, objectSpeed)
             handleSrc.Free()
         End If

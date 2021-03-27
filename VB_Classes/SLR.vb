@@ -72,7 +72,7 @@ Public Class SLR_Data
         initParent()
         plot = New Plot_Basics_CPP()
 
-        Dim sr = New StreamReader(ocvb.parms.homeDir + "/Data/real_data.txt")
+        Dim sr = New StreamReader(task.parms.homeDir + "/Data/real_data.txt")
         Dim code As String = sr.ReadToEnd
         sr.Close()
 

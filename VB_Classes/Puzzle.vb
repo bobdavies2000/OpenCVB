@@ -244,7 +244,7 @@ Public Class Puzzle_Basics
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static width As integer
         Static height As integer
-        If width <> gridWidthSlider.Value Or height <> gridHeightSlider.Value Or ocvb.frameCount = 0 Or restartRequested Then
+        If width <> gridWidthSlider.Value Or height <> gridHeightSlider.Value Or task.frameCount = 0 Or restartRequested Then
             restartRequested = False
             grid.Run()
             width = grid.roiList(0).Width
@@ -319,7 +319,7 @@ Public Class Puzzle_Solver
             ocvb.trueText("This algorithm was not setup to work at 640x480.  It works only at 1280x720")
             Exit Sub
         End If
-        If ocvb.frameCount = 0 Then
+        If task.frameCount = 0 Then
             If src.Width = 640 Then ' must be an even multiple
                 radio.check(0).Enabled = False
                 radio.check(1).Enabled = False
@@ -352,43 +352,43 @@ Public Class Puzzle_Solver
         Static xyOffset As Integer
         Static yxOffset As Integer
         Static yyOffset As Integer
-        If check.Box(0).Checked Or ocvb.parms.testAllRunning Or saveRadioIndex <> radioIndex Or saveResolutionWidth <> src.Width Then
+        If check.Box(0).Checked Or task.parms.testAllRunning Or saveRadioIndex <> radioIndex Or saveResolutionWidth <> src.Width Then
             Dim factor = 1
             saveRadioIndex = radioIndex
             saveResolutionWidth = src.Width
             Select Case src.Height
                 Case 180
                     factor = 4
-                    ocvb.fontSize = 0.4
+                    task.fontSize = 0.4
                 Case 360
                     factor = 2
-                    ocvb.fontSize = 0.7
+                    task.fontSize = 0.7
                 Case 720
                     factor = 1
-                    ocvb.fontSize = 1.8
+                    task.fontSize = 1.8
             End Select
             If radio.check(0).Checked Then
                 puzzle.grid.sliders.trackbar(0).Value = 256 / factor
                 puzzle.grid.sliders.trackbar(1).Value = 180 / factor
-                ocvb.fontSize /= 2
+                task.fontSize /= 2
                 xxOffset = puzzle.grid.sliders.trackbar(0).Value / 2
                 yxOffset = puzzle.grid.sliders.trackbar(0).Value * 3 / 4
             ElseIf radio.check(1).Checked Then
                 puzzle.grid.sliders.trackbar(0).Value = 128 / factor
                 puzzle.grid.sliders.trackbar(1).Value = 90 / factor
-                ocvb.fontSize /= 2
+                task.fontSize /= 2
                 xxOffset = puzzle.grid.sliders.trackbar(0).Value / 3
                 yxOffset = puzzle.grid.sliders.trackbar(0).Value * 3 / 4
             ElseIf radio.check(2).Checked Then
                 puzzle.grid.sliders.trackbar(0).Value = 64 / factor
                 puzzle.grid.sliders.trackbar(1).Value = 90 / factor
-                ocvb.fontSize /= 2
+                task.fontSize /= 2
                 xxOffset = puzzle.grid.sliders.trackbar(0).Value / 4
                 yxOffset = puzzle.grid.sliders.trackbar(0).Value / 2
             Else
                 puzzle.grid.sliders.trackbar(0).Value = 128 / factor
                 puzzle.grid.sliders.trackbar(1).Value = 80 / factor
-                ocvb.fontSize /= 2
+                task.fontSize /= 2
                 xxOffset = puzzle.grid.sliders.trackbar(0).Value / 4
                 yxOffset = puzzle.grid.sliders.trackbar(0).Value / 2
             End If
@@ -477,7 +477,7 @@ Public Class Puzzle_Solver
                         Dim correlationRight = tmp.Get(Of Single)(0, 0)
                         If check.Box(1).Checked And correlationRight < 0.9 Then
                             cv.Cv2.PutText(dst2, Format(correlationRight, "0.00"), New cv.Point(x + yxOffset, y + yyOffset),
-                                       cv.HersheyFonts.HersheySimplex, ocvb.fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                                       cv.HersheyFonts.HersheySimplex, task.fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                         End If
                     End If
 
@@ -490,7 +490,7 @@ Public Class Puzzle_Solver
 
                         If check.Box(1).Checked And correlationBottom < 0.9 Then
                             cv.Cv2.PutText(dst2, Format(correlationBottom, "0.00"), New cv.Point(x + xxOffset, y + xyOffset),
-                                       cv.HersheyFonts.HersheySimplex, ocvb.fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                                       cv.HersheyFonts.HersheySimplex, task.fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
                         End If
                     End If
                 Next

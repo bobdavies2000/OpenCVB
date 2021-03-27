@@ -41,7 +41,7 @@ Public Class CComp_Basics
             Dim m = cv.Cv2.Moments(nextMask, True)
             If m.M00 = 0 Then Continue For ' avoid divide by zero...
             centroids.Add(New cv.Point(CInt(m.M10 / m.M00 + rect.x), CInt(m.M01 / m.M00 + rect.y)))
-            If standalone Then dst1(blob.Rect).SetTo(ocvb.scalarColors(count), (dst2)(blob.Rect))
+            If standalone Then dst1(blob.Rect).SetTo(task.scalarColors(count), (dst2)(blob.Rect))
             count += 1
         Next
         Return count
@@ -232,9 +232,9 @@ Public Class CComp_MaxBlobs
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount < 10 Then Exit Sub
+        If task.frameCount < 10 Then Exit Sub
         Static thresholdSlider = findSlider("CComp threshold")
-        If ocvb.frameCount = 0 Then thresholdSlider.value = 0
+        If task.frameCount = 0 Then thresholdSlider.value = 0
 
         tracker.src = src
         tracker.Run()
@@ -285,7 +285,7 @@ Public Class CComp_MaxPixels
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount < 10 Then Exit Sub
+        If task.frameCount < 10 Then Exit Sub
         Static pixelValues(255) As Integer ' march through all 255 values and find the best...
         Static thresholdSlider = findSlider("CComp threshold")
 
@@ -525,7 +525,7 @@ Public Class CComp_Shapes
     Dim shapes As cv.Mat
     Public Sub New()
         initParent()
-        shapes = New cv.Mat(ocvb.parms.homeDir + "Data/Shapes.png", cv.ImreadModes.Color)
+        shapes = New cv.Mat(task.parms.homeDir + "Data/Shapes.png", cv.ImreadModes.Color)
         label1 = "Largest connected component"
         label2 = "RectView, LabelView, Binary, grayscale"
         task.desc = "Use connected components to isolate objects in image."

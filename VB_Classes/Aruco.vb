@@ -10,13 +10,13 @@ Public Class Aruco_Basics
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim tmp = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/aruco_markers_photo.jpg")
+        Dim tmp = cv.Cv2.ImRead(task.parms.homeDir + "Data/aruco_markers_photo.jpg")
         Static detectorParameters = cv.Aruco.DetectorParameters.Create()
         detectorParameters.CornerRefinementMethod = cv.Aruco.CornerRefineMethod.Subpix
         detectorParameters.CornerRefinementWinSize = 9
         Dim dictionary = cv.Aruco.CvAruco.GetPredefinedDictionary(cv.Aruco.PredefinedDictionaryName.Dict4X4_1000)
         Dim corners()() As cv.Point2f = Nothing
-        Dim ids() As integer = Nothing
+        Dim ids() As Integer = Nothing
         Dim rejectedPoints()() As cv.Point2f = Nothing
         ' this fails!  Cannot cast a Mat to an InputArray!  Bug?
         ' cv.Aruco.CvAruco.DetectMarkers(tmp, dictionary, corners, ids, detectorParameters, rejectedPoints)
@@ -40,7 +40,7 @@ Public Class Aruco_Test
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim tmp = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/aruco_markers_photo.jpg")
+        Dim tmp = cv.Cv2.ImRead(task.parms.homeDir + "Data/aruco_markers_photo.jpg")
         aruco.Run(tmp)
         dst1 = aruco.detectedMarkers.Resize(src.Size())
 

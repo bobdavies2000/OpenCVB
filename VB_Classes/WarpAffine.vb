@@ -69,7 +69,7 @@ Public Class WarpAffine_Captcha
         For i = 0 To captchaLength - 1
             Dim charImage = New cv.Mat(charHeight, charWidth, cv.MatType.CV_8UC3, cv.Scalar.White)
             Dim c = characters(rng.Next(0, characters.Length - 1))
-            cv.Cv2.PutText(charImage, c, New cv.Point(10, charHeight - 10), msRNG.Next(1, 6), msRNG.Next(3, 4), ocvb.vecColors(i), msRNG.Next(1, 5),
+            cv.Cv2.PutText(charImage, c, New cv.Point(10, charHeight - 10), msRNG.Next(1, 6), msRNG.Next(3, 4), task.vecColors(i), msRNG.Next(1, 5),
                            cv.LineTypes.AntiAlias)
             transformPerspective(charImage)
             rotateImg(charImage, charImage)
@@ -147,7 +147,7 @@ Public Class WarpAffine_3Points
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static M As New cv.Mat
-        If ocvb.frameCount Mod 60 = 0 Then
+        If task.frameCount Mod 60 = 0 Then
             Dim triangles(1) As cv.Mat
             triangle.src = src
             triangle.Run()
@@ -220,7 +220,7 @@ Public Class WarpAffine_4Points
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static M As New cv.Mat
-        If ocvb.frameCount Mod 60 = 0 Then
+        If task.frameCount Mod 60 = 0 Then
 
             Dim roi = New cv.Rect(50, src.Height / 2, src.Width / 6, src.Height / 6)
             Dim smallImage = src.Resize(New cv.Size(roi.Width, roi.Height))

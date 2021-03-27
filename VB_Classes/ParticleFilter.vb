@@ -11,7 +11,7 @@ Public Class ParticleFilter_Example
     Dim pfPtr As IntPtr
     Public Sub New()
         initParent()
-        pfPtr = ParticleFilterTest_Open(ocvb.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
+        pfPtr = ParticleFilterTest_Open(task.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
         task.desc = "Particle Filter example downloaded from github - hyperlink in the code shows URL."
     End Sub
     Public Sub Run()
@@ -21,9 +21,9 @@ Public Class ParticleFilter_Example
         If imageFrame Mod 45 = 0 Then
             imageFrame = 13
             ParticleFilterTest_Close(pfPtr)
-            pfPtr = ParticleFilterTest_Open(ocvb.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
+            pfPtr = ParticleFilterTest_Open(task.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
         End If
-        Dim nextFile As New FileInfo(ocvb.parms.homeDir + "Data/ballSequence/color_" + CStr(imageFrame) + ".png")
+        Dim nextFile As New FileInfo(task.parms.homeDir + "Data/ballSequence/color_" + CStr(imageFrame) + ".png")
         dst2 = cv.Cv2.ImRead(nextFile.FullName).Resize(dst1.Size)
         Dim imagePtr = ParticleFilterTest_Run(pfPtr)
         If imagePtr <> 0 Then

@@ -15,7 +15,7 @@ Public Class Rodrigues_ValidateKinect
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
+        If task.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
             dst2.SetTo(0)
             ocvb.trueText("Only the Kinect4Azure camera is currently supported for the Rodrigues calibration", 10, 140)
             Exit Sub
@@ -44,19 +44,19 @@ Public Class Rodrigues_ValidateVector
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2 Then
+        If task.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2 Then
             dst2.SetTo(0)
             ocvb.trueText("Only the StereoLabs Zed 2 and Intel T265 cameras are supported for this Rodrigues validation")
             Exit Sub
         End If
 
-        Dim rot = ocvb.parms.RotationMatrix
+        Dim rot = task.parms.RotationMatrix
         Dim output = "IMU Rotation Matrix for Zed 2 camera" + vbCrLf
         For i = 0 To 2
             output += vbTab + Format(rot(i * 3), "#0.000000") + vbTab + Format(rot(i * 3 + 1), "#0.0000000") + vbTab + Format(rot(i * 3 + 2), "#0.0000000") + vbCrLf
         Next
 
-        Dim src As New cv.Mat(3, 3, cv.MatType.CV_32F, ocvb.parms.RotationMatrix)
+        Dim src As New cv.Mat(3, 3, cv.MatType.CV_32F, task.parms.RotationMatrix)
         Dim dst1 As New cv.Mat(3, 1, src.Type)
         cv.Cv2.Rodrigues(src, dst1)
 
@@ -66,9 +66,9 @@ Public Class Rodrigues_ValidateVector
         Next
 
         output += vbCrLf + "Rotation Vector from IMU: " + vbCrLf
-        output += vbTab + Format(ocvb.parms.RotationVector.X, "#0.000000000") + vbTab
-        output += vbTab + Format(ocvb.parms.RotationVector.Y, "#0.000000000") + vbTab
-        output += vbTab + Format(ocvb.parms.RotationVector.Z, "#0.000000000") + vbTab
+        output += vbTab + Format(task.parms.RotationVector.X, "#0.000000000") + vbTab
+        output += vbTab + Format(task.parms.RotationVector.Y, "#0.000000000") + vbTab
+        output += vbTab + Format(task.parms.RotationVector.Z, "#0.000000000") + vbTab
         ocvb.trueText(output)
     End Sub
 End Class
@@ -85,13 +85,13 @@ Public Class Rodrigues_RotationMatrix
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim rot = ocvb.parms.RotationMatrix
+        Dim rot = task.parms.RotationMatrix
         Dim output = "IMU Rotation Matrix (rotate the camera to see if it is working)" + vbCrLf
         For i = 0 To 2
             output += vbTab + Format(rot(i * 3), "#0.000000") + vbTab + Format(rot(i * 3 + 1), "#0.0000000") + vbTab + Format(rot(i * 3 + 2), "#0.0000000") + vbCrLf
         Next
 
-        Dim src As New cv.Mat(3, 3, cv.MatType.CV_32F, ocvb.parms.RotationMatrix)
+        Dim src As New cv.Mat(3, 3, cv.MatType.CV_32F, task.parms.RotationMatrix)
         Dim dst1 As New cv.Mat(3, 1, src.Type, 3)
         cv.Cv2.Rodrigues(src, dst1)
 
@@ -117,13 +117,13 @@ Public Class Rodrigues_Extrinsics
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim rot = ocvb.parms.extrinsics.rotation
+        Dim rot = task.parms.extrinsics.rotation
         Dim output As String = "Extrinsics Rotation Matrix" + vbCrLf
         For i = 0 To 2
             output += vbTab + Format(rot(i * 3), "#0.00") + vbTab + Format(rot(i * 3 + 1), "#0.00") + vbTab + Format(rot(i * 3 + 2), "#0.00") + vbCrLf
         Next
 
-        Dim src32f As New cv.Mat(3, 3, cv.MatType.CV_32F, ocvb.parms.extrinsics.rotation)
+        Dim src32f As New cv.Mat(3, 3, cv.MatType.CV_32F, task.parms.extrinsics.rotation)
         Dim src As New cv.Mat
         src32f.ConvertTo(src, cv.MatType.CV_64F)
         Dim Jacobian As New cv.Mat(9, 3, src.Type, 0)

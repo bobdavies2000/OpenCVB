@@ -131,7 +131,7 @@ Public Class Plot_OverTime
         Dim pixelHeight = CInt(heightSlider.Value)
         Dim pixelWidth = CInt(widthSlider.Value)
 
-        If ocvb.frameCount = 0 Then dst1.SetTo(0)
+        If task.frameCount = 0 Then dst1.SetTo(0)
         If columnIndex + pixelWidth >= src.Width Then
             dst1.ColRange(columnIndex, src.Width).SetTo(backColor)
             columnIndex = 0
@@ -199,7 +199,7 @@ Public Class Plot_OverTime
         columnIndex += pixelWidth
         dst1.Col(columnIndex).SetTo(0)
         If standalone or task.intermediateReview = caller Then label1 = "RGB Means: blue = " + Format(plotData.Item(0), "#0.0") + " green = " + Format(plotData.Item(1), "#0.0") + " red = " + Format(plotData.Item(2), "#0.0")
-        AddPlotScale(dst1, minScale - topBottomPad, maxScale + topBottomPad, ocvb.fontSize * 2)
+        AddPlotScale(dst1, minScale - topBottomPad, maxScale + topBottomPad, task.fontSize * 2)
     End Sub
 End Class
 
@@ -251,7 +251,7 @@ Public Class Plot_Histogram
                 If hist.Rows <= 255 Then color = cv.Scalar.All((i Mod 255) * incr)
                 cv.Cv2.Rectangle(dst1, New cv.Rect(i * barWidth, dst1.Height - h, barWidth, h), color, -1)
             Next
-            AddPlotScale(dst1, 0, maxVal, ocvb.fontSize * 2)
+            AddPlotScale(dst1, 0, maxVal, task.fontSize * 2)
         End If
     End Sub
 End Class

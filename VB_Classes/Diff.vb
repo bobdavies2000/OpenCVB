@@ -17,7 +17,7 @@ Public Class Diff_Basics
         Dim gray = src
         If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If lastFrame Is Nothing Then lastFrame = src.Clone
-        If ocvb.frameCount > 0 Then
+        If task.frameCount > 0 Then
             dst1 = lastFrame
             cv.Cv2.Absdiff(gray, lastFrame, dst2)
             Static thresholdSlider = findSlider("Change threshold for each pixel")

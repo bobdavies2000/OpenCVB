@@ -24,7 +24,7 @@ Public Class Rectangle_Basics
         Static typeCheckBox = findCheckBox("Draw Rotated Rectangles (unchecked will draw rectangles)")
         Static countSlider = findSlider("Rectangle Count")
         Static saveType = typeCheckBox.Checked
-        If ocvb.frameCount Mod updateFrequency = 0 Or saveType <> typeCheckBox.checked Then
+        If task.frameCount Mod updateFrequency = 0 Or saveType <> typeCheckBox.checked Then
             saveType = typeCheckBox.checked
             dst1.SetTo(cv.Scalar.Black)
             rectangles.Clear()
@@ -38,7 +38,7 @@ Public Class Rectangle_Basics
                 Dim eSize = New cv.Size2f(CSng(msRNG.Next(0, src.Cols - nPoint.X - 1)), CSng(msRNG.Next(0, src.Rows - nPoint.Y - 1)))
                 Dim angle = 180.0F * CSng(msRNG.Next(0, 1000) / 1000.0F)
 
-                Dim nextColor = New cv.Scalar(ocvb.vecColors(i).Item0, ocvb.vecColors(i).Item1, ocvb.vecColors(i).Item2)
+                Dim nextColor = New cv.Scalar(task.vecColors(i).Item0, task.vecColors(i).Item1, task.vecColors(i).Item2)
                 If typeCheckBox.Checked Then
                     Dim r = New cv.RotatedRect(nPoint, eSize, angle)
                     drawRotatedRectangle(r, dst1, nextColor)
@@ -100,9 +100,9 @@ Public Class Rectangle_CComp
         ccomp.Run()
         dst1 = ccomp.dst1.Clone
 
-        If ocvb.frameCount Mod 2 = 0 Then rMotion.src = ccomp.dst1.Clone Else rMotion.src = New cv.Mat(ccomp.dst1.Size, cv.MatType.CV_8UC1, 0)
+        If task.frameCount Mod 2 = 0 Then rMotion.src = ccomp.dst1.Clone Else rMotion.src = New cv.Mat(ccomp.dst1.Size, cv.MatType.CV_8UC1, 0)
         rMotion.Run()
-        If ocvb.frameCount Mod 2 = 0 Then
+        If task.frameCount Mod 2 = 0 Then
             dst2 = task.color
             For Each r In rMotion.mOverlap.enclosingRects
                 dst2.Rectangle(r, cv.Scalar.Yellow, 2)

@@ -146,7 +146,7 @@ Public Class WarpModel_Input
         For i = 0 To frm.check.length - 1
             Dim nextRadio = frm.check(i)
             If nextRadio.Checked Then
-                Dim photo As New FileInfo(ocvb.parms.homeDir + "Data\Prokudin\" + nextRadio.Text)
+                Dim photo As New FileInfo(task.parms.homeDir + "Data\Prokudin\" + nextRadio.Text)
                 img = cv.Cv2.ImRead(photo.FullName, cv.ImreadModes.Grayscale)
                 label1 = photo.Name + " - red image"
                 label2 = photo.Name + " - Naively aligned merge"
@@ -348,7 +348,7 @@ End Class
 '        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
 '        ' we only need to compute the max entropy every once in a while.  
-'        If ocvb.frameCount Mod 10 = 0 Then
+'        If task.frameCount Mod 10 = 0 Then
 '            entropy.src = src
 '            entropy.Run()
 '        End If

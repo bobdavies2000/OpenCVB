@@ -312,7 +312,7 @@ Public Class DFT_Shapes
             lines.Run()
             dst1 = lines.dst1
         ElseIf pointRadio.checked Then
-            If ocvb.frameCount Mod 30 = 0 Then
+            If task.frameCount Mod 30 = 0 Then
                 dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
                 Dim pt1 = New cv.Point(msRNG.Next(0, dst1.Width / 10), msRNG.Next(0, dst1.Height / 10))
                 Dim pt2 = New cv.Point(msRNG.Next(0, dst1.Width / 10), msRNG.Next(0, dst1.Height / 10))

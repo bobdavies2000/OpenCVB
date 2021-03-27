@@ -71,7 +71,7 @@ Public Class GeneticDrawing_Basics
 
         gradient = New Gradient_CartToPolar()
         For i = 0 To brushes.Count - 1
-            brushes(i) = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg").CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            brushes(i) = cv.Cv2.ImRead(task.parms.homeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg").CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Next
 
         mats = New Mat_4to1()
@@ -173,7 +173,7 @@ Public Class GeneticDrawing_Basics
             stage = 0
 
             If standalone Or task.intermediateReview = caller Then
-                src = If(snapCheck.Checked, src.Clone, cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
+                src = If(snapCheck.Checked, src.Clone, cv.Cv2.ImRead(task.parms.homeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
             End If
             snapCheck.Checked = False
 
@@ -303,8 +303,8 @@ Public Class GeneticDrawing_Photo
         initParent()
 
         task.openFileDialogRequested = True
-        task.openFileInitialDirectory = ocvb.parms.homeDir + "Data/"
-        task.openFileDialogName = GetSetting("OpenCVB", "PhotoFileName", "PhotoFileName", ocvb.parms.homeDir + "Data/GeneticDrawingExample.jpg")
+        task.openFileInitialDirectory = task.parms.homeDir + "Data/"
+        task.openFileDialogName = GetSetting("OpenCVB", "PhotoFileName", "PhotoFileName", task.parms.homeDir + "Data/GeneticDrawingExample.jpg")
         task.openFileFilter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
         task.openFileFilterIndex = 1
         task.openFileDialogTitle = "Select an image file to create a paint version"
@@ -316,7 +316,7 @@ Public Class GeneticDrawing_Photo
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If inputFileName <> task.openFileDialogName Or ocvb.frameCount = 0 Then
+        If inputFileName <> task.openFileDialogName Or task.frameCount = 0 Then
             Dim fileinfo = New FileInfo(task.openFileDialogName)
             If fileinfo.Exists = False Then
                 label1 = "No input file.  Use dialogbox below..."

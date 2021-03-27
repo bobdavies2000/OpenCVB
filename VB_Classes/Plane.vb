@@ -26,13 +26,13 @@ Module Plane_Exports
     End Function
 
     Public Function getWorldCoordinates( p As cv.Point3f) As cv.Point3f
-        Dim x = (p.X - ocvb.parms.intrinsicsLeft.ppx) / ocvb.parms.intrinsicsLeft.fx
-        Dim y = (p.Y - ocvb.parms.intrinsicsLeft.ppy) / ocvb.parms.intrinsicsLeft.fy
+        Dim x = (p.X - task.parms.intrinsicsLeft.ppx) / task.parms.intrinsicsLeft.fx
+        Dim y = (p.Y - task.parms.intrinsicsLeft.ppy) / task.parms.intrinsicsLeft.fy
         Return New cv.Point3f(x * p.Z, y * p.Z, p.Z)
     End Function
     Public Function getWorldCoordinatesD6( p As cv.Point3f) As cv.Vec6f
-        Dim x = CSng((p.X - ocvb.parms.intrinsicsLeft.ppx) / ocvb.parms.intrinsicsLeft.fx)
-        Dim y = CSng((p.Y - ocvb.parms.intrinsicsLeft.ppy) / ocvb.parms.intrinsicsLeft.fy)
+        Dim x = CSng((p.X - task.parms.intrinsicsLeft.ppx) / task.parms.intrinsicsLeft.fx)
+        Dim y = CSng((p.Y - task.parms.intrinsicsLeft.ppy) / task.parms.intrinsicsLeft.fy)
         Return New cv.Vec6f(x * p.Z, y * p.Z, p.Z, p.X, p.Y, 0)
     End Function
     Public Function buildPlaneEquation(plane As cv.Vec4f, centroid As cv.Point3f) As cv.Vec4f

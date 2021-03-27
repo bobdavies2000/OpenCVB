@@ -10,7 +10,7 @@ Module Python_Module
         Dim pythonApp = New FileInfo(ocvb.pythonTaskName)
 
         If pythonApp.Name.StartsWith("LRS_") Then
-            If ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Or ocvb.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D455 Then
+            If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Or task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D455 Then
                 ocvb.trueText("The current OpenCVB camera is an Intel RealSense camera and it is also used by this Python script." + vbCrLf +
                               "The Python script will only run when using a non-RealSense camera in OpenCVB")
                 Return False
@@ -18,7 +18,7 @@ Module Python_Module
         End If
 
         ' when running the regression tests, some python processes are not completing before the next starts.  Then they build up.  What a mess.  This prevents it
-        If ocvb.parms.testAllRunning Then
+        If task.parms.testAllRunning Then
             For Each p In Process.GetProcesses
                 If p.ProcessName.ToUpper.Contains("PYTHON") And p.StartInfo.WorkingDirectory.EndsWith("VB_Classes") Then
                     Try
@@ -32,14 +32,14 @@ Module Python_Module
         End If
         If pythonApp.Exists Then
             Dim p As New Process
-            p.StartInfo.FileName = ocvb.parms.PythonExe
+            p.StartInfo.FileName = task.parms.PythonExe
             p.StartInfo.WorkingDirectory = pythonApp.DirectoryName
             If arguments = "" Then
                 p.StartInfo.Arguments = """" + pythonApp.Name + """"
             Else
                 p.StartInfo.Arguments = """" + pythonApp.Name + """" + " " + arguments
             End If
-            If ocvb.parms.ShowConsoleLog = False Then p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
+            If task.parms.ShowConsoleLog = False Then p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
             If p.Start() = False Then MsgBox("The Python script " + pythonApp.Name + " failed to start")
         Else
             If pythonApp.Name.EndsWith("Python_MemMap") Or pythonApp.Name.EndsWith("Python_Run") Then
@@ -61,7 +61,7 @@ Public Class Python_Run
     Inherits VBparent
     Public Sub New()
         initParent()
-        If ocvb.pythonTaskName = "" Then ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/PythonPackages.py"
+        If ocvb.pythonTaskName = "" Then ocvb.pythonTaskName = task.parms.homeDir + "VB_Classes/PythonPackages.py"
         Dim pythonApp = New FileInfo(ocvb.pythonTaskName)
         If pythonApp.Name.EndsWith("_PS.py") Then
             pyStream = New Python_Stream()
@@ -113,7 +113,7 @@ Public Class Python_MemMap
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
 
         If standalone Then
-            If ocvb.parms.externalPythonInvocation = False Then
+            If task.parms.externalPythonInvocation = False Then
                 StartPython("--MemMapLength=" + CStr(memMapbufferSize))
             End If
             Dim pythonApp = New FileInfo(ocvb.pythonTaskName)
@@ -123,7 +123,7 @@ Public Class Python_MemMap
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If standalone or task.intermediateReview = caller Then memMapValues(0) = ocvb.frameCount
+        If standalone or task.intermediateReview = caller Then memMapValues(0) = task.frameCount
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
     End Sub
@@ -146,10 +146,10 @@ Public Class Python_SurfaceBlit
         pipe = New NamedPipeServerStream(pipeName, PipeDirection.InOut)
         PipeTaskIndex += 1
 
-        ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/Python_SurfaceBlit.py"
+        ocvb.pythonTaskName = task.parms.homeDir + "VB_Classes/Python_SurfaceBlit.py"
         memMap = New Python_MemMap()
 
-        If ocvb.parms.externalPythonInvocation Then
+        If task.parms.externalPythonInvocation Then
             PythonReady = True ' python was already running and invoked OpenCVB.
         Else
             PythonReady = StartPython("--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
@@ -161,7 +161,7 @@ Public Class Python_SurfaceBlit
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If PythonReady Then
             For i = 0 To memMap.memMapValues.Length - 1
-                memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, src.Total * src.ElemSize, 0, src.Rows, src.Cols)
+                memMap.memMapValues(i) = Choose(i + 1, task.frameCount, src.Total * src.ElemSize, 0, src.Rows, src.Cols)
             Next
             memMap.Run()
 
@@ -209,12 +209,12 @@ Public Class Python_Stream
 
         ' Was this class invoked standalone?  Then just run something that works with RGB and depth...
         If ocvb.pythonTaskName.EndsWith("Python_Stream") Then
-            ocvb.pythonTaskName = ocvb.parms.homeDir + "VB_Classes/Python_Stream_PS.py"
+            ocvb.pythonTaskName = task.parms.homeDir + "VB_Classes/Python_Stream_PS.py"
         End If
 
         memMap = New Python_MemMap()
 
-        If ocvb.parms.externalPythonInvocation Then
+        If task.parms.externalPythonInvocation Then
             pythonReady = True ' python was already running and invoked OpenCVB.
         Else
             pythonReady = StartPython("--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
@@ -230,7 +230,7 @@ Public Class Python_Stream
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         If pythonReady Then
             For i = 0 To memMap.memMapValues.Length - 1
-                memMap.memMapValues(i) = Choose(i + 1, ocvb.frameCount, src.Total * src.ElemSize,
+                memMap.memMapValues(i) = Choose(i + 1, task.frameCount, src.Total * src.ElemSize,
                                                 task.depth32f.Total * task.depth32f.ElemSize, src.Rows, src.Cols,
                                                 task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height)
             Next

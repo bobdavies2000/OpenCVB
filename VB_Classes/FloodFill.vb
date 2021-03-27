@@ -130,7 +130,7 @@ Public Class FloodFill_Image
         dst2.SetTo(0)
         For i = 0 To basics.masks.Count - 1
             Dim maskIndex = basics.maskSizes.ElementAt(i).Value
-            dst2.SetTo(ocvb.scalarColors(i Mod 255), basics.masks(maskIndex))
+            dst2.SetTo(task.scalarColors(i Mod 255), basics.masks(maskIndex))
         Next
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
         label2 = CStr(basics.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
@@ -505,7 +505,7 @@ Public Class Floodfill_Identifiers
 
         For i = 0 To masks.Count - 1
             Dim rect = rects(i)
-            dst2(rect).SetTo(ocvb.scalarColors(i Mod 255), masks(i))
+            dst2(rect).SetTo(task.scalarColors(i Mod 255), masks(i))
         Next
     End Sub
 End Class
@@ -552,12 +552,12 @@ End Class
 Public Class FloodFill_PointTracker
     Inherits VBparent
     Dim pTrack As KNN_PointTracker
-    Dim flood As FloodFill_8bit
+    Dim flood As FloodFill_8Bit
     Public Sub New()
         initParent()
 
         pTrack = New KNN_PointTracker()
-        flood = New FloodFill_8bit()
+        flood = New FloodFill_8Bit()
 
         label1 = "Point tracker output"
         task.desc = "Test the FloodFill output as input into the point tracker"
@@ -618,7 +618,7 @@ Public Class FloodFill_Top16
         Dim allRect = New cv.Rect(0, 0, allSize.Width, allSize.Height)
         For i = 0 To flood.masks.Count - 1
             Dim maskIndex = flood.maskSizes.ElementAt(i).Value
-            Dim nextColor = ocvb.scalarColors(i Mod 255)
+            Dim nextColor = task.scalarColors(i Mod 255)
             dst1.SetTo(nextColor, flood.masks(maskIndex))
             If thumbCount < 16 Then
                 thumbNails(allRect) = flood.masks(maskIndex).Resize(allSize).Threshold(0, 255, cv.ThresholdTypes.Binary)
@@ -892,7 +892,7 @@ Public Class FloodFill_FullImage
 
         dst1 = edgeOutput.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each pt In floodPoints
-            dst1.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         Next
         mats.mat(2) = dst1
 
@@ -942,7 +942,7 @@ Public Class FloodFill_Step
         If standalone Then
             contours.src = src
             contours.Run()
-            contourInput = contours.basics.sortedcontours
+            contourInput = contours.basics.sortedContours
             dst1 = contours.dst1
             src = contours.dst2
         End If
@@ -995,7 +995,7 @@ Public Class FloodFill_Step
                     Dim c = lastFrame.Get(Of cv.Vec3b)(pt.Y, pt.X)
                     If c <> New cv.Vec3b Then
                         Dim nextColor = New cv.Scalar(c.Item0, c.Item1, c.Item2)
-                        If resetColors Or c = New cv.Vec3b Then nextColor = ocvb.scalarColors(x Mod 255)
+                        If resetColors Or c = New cv.Vec3b Then nextColor = task.scalarColors(x Mod 255)
                         Dim pixelCount = cv.Cv2.FloodFill(dst2, maskPlus, pt, nextColor, rect, zero, zero, floodFlag Or (255 << 8))
 
                         If rect.Width And rect.Height Then
@@ -1008,7 +1008,7 @@ Public Class FloodFill_Step
                             rects.Add(rect)
                             centroids.Add(centroid)
 
-                            dst2.Circle(pt, ocvb.dotSize, cv.Scalar.Yellow, -1)
+                            dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1)
                         End If
                     End If
                 End If

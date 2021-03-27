@@ -47,7 +47,7 @@ Public Class Polylines_Random
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount Mod 150 = 0 Then ' every x frames.
+        If task.frameCount Mod 150 = 0 Then ' every x frames.
             Dim h = src.Height, w = src.Width
             Dim autorand As New Random
             Dim points2f(10000) As cv.Point2f

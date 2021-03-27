@@ -130,7 +130,7 @@ Public Class Stabilizer_BasicsRandomInput
 
         Static lastShiftX = shiftX
         Static lastShiftY = shiftY
-        If ocvb.frameCount Mod 2 = 0 Then
+        If task.frameCount Mod 2 = 0 Then
             shiftX = lastShiftX
             shiftY = lastShiftY
         End If
@@ -212,7 +212,7 @@ Public Class Stabilizer_OpticalFlow
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Dim vert_Border = borderCrop * src.Rows / src.Cols
-        If ocvb.frameCount = 0 Then
+        If task.frameCount = 0 Then
             errScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 1)
             qScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 0.004)
             rScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 0.5)
@@ -231,7 +231,7 @@ Public Class Stabilizer_OpticalFlow
         features1 = New cv.Mat(inputFeat.Count, 1, cv.MatType.CV_32FC2, inputFeat.ToArray)
 
         Static lastFrame As cv.Mat = src.Clone()
-        If ocvb.frameCount > 0 Then
+        If task.frameCount > 0 Then
             Dim features2 = New cv.Mat
             Dim status As New cv.Mat
             Dim err As New cv.Mat

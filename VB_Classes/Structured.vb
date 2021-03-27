@@ -31,9 +31,9 @@ Public Class Structured_Floor
         kalman.Run()
 
         ' it settles down quicker...
-        If ocvb.frameCount > 30 Then yCoordinate = kalman.kAverage
+        If task.frameCount > 30 Then yCoordinate = kalman.kAverage
 
-        floorYplane = structD.side2D.meterMax * (yCoordinate - ocvb.sideCameraPoint.Y) / (dst2.Height - ocvb.sideCameraPoint.Y)
+        floorYplane = structD.side2D.meterMax * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
 
         structD.offsetSlider.Value = If(yCoordinate >= 0, yCoordinate, 0)
 
@@ -120,8 +120,8 @@ Public Class Structured_MultiSliceH
 
         sliceMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For yCoordinate = 0 To src.Height - 1 Step stepsize
-            Dim planeY = side2D.meterMin * (ocvb.sideCameraPoint.Y - yCoordinate) / ocvb.sideCameraPoint.Y
-            If yCoordinate > ocvb.sideCameraPoint.Y Then planeY = side2D.meterMax * (yCoordinate - ocvb.sideCameraPoint.Y) / (dst2.Height - ocvb.sideCameraPoint.Y)
+            Dim planeY = side2D.meterMin * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
+            If yCoordinate > task.sideCameraPoint.Y Then planeY = side2D.meterMax * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
             inrange.minVal = planeY - thicknessMeters
             inrange.maxVal = planeY + thicknessMeters
             inrange.src = Split(1).Clone
@@ -173,8 +173,8 @@ Public Class Structured_MultiSliceV
 
         Dim sliceMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For xCoordinate = 0 To src.Width - 1 Step stepsize
-            Dim planeX = top2D.meterMin * (ocvb.topCameraPoint.X - xCoordinate) / ocvb.topCameraPoint.X
-            If xCoordinate > ocvb.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - ocvb.topCameraPoint.X) / (dst2.Width - ocvb.topCameraPoint.X)
+            Dim planeX = top2D.meterMin * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+            If xCoordinate > task.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
             inrange.minVal = planeX - thicknessMeters
             inrange.maxVal = planeX + thicknessMeters
             inrange.src = split(0).Clone
@@ -230,8 +230,8 @@ Public Class Structured_MultiSlice
 
         dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For xCoordinate = 0 To src.Width - 1 Step stepsize
-            Dim planeX = top2D.meterMin * (ocvb.topCameraPoint.X - xCoordinate) / ocvb.topCameraPoint.X
-            If xCoordinate > ocvb.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - ocvb.topCameraPoint.X) / (dst2.Width - ocvb.topCameraPoint.X)
+            Dim planeX = top2D.meterMin * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+            If xCoordinate > task.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
             inrange.minVal = planeX - thicknessMeters
             inrange.maxVal = planeX + thicknessMeters
             inrange.src = split(0).Clone
@@ -242,8 +242,8 @@ Public Class Structured_MultiSlice
         Next
 
         For yCoordinate = 0 To src.Height - 1 Step stepsize
-            Dim planeY = side2D.meterMin * (ocvb.sideCameraPoint.Y - yCoordinate) / ocvb.sideCameraPoint.Y
-            If yCoordinate > ocvb.sideCameraPoint.Y Then planeY = side2D.meterMax * (yCoordinate - ocvb.sideCameraPoint.Y) / (dst2.Height - ocvb.sideCameraPoint.Y)
+            Dim planeY = side2D.meterMin * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
+            If yCoordinate > task.sideCameraPoint.Y Then planeY = side2D.meterMax * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
             inrange.minVal = planeY - thicknessMeters
             inrange.maxVal = planeY + thicknessMeters
             inrange.src = split(1).Clone
@@ -364,7 +364,7 @@ Public Class Structured_SliceXPlot
         multi.top2D.histOutput(rect).MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
 
         dst2.Circle(New cv.Point(col, dst2.Height - maxLoc.Y), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        Dim filterZ = maxLoc.Y / dst2.Height * ocvb.maxZ
+        Dim filterZ = maxLoc.Y / dst2.Height * task.maxZ
 
         Dim maskZplane As New cv.Mat(multi.split(0).Size, cv.MatType.CV_8U)
         If filterZ > 0 Then
@@ -536,8 +536,8 @@ Public Class Structured_SliceH
 
         Dim yCoordinate = CInt(offsetSlider.Value)
 
-        Dim planeY = side2D.meterMin * (ocvb.sideCameraPoint.Y - yCoordinate) / ocvb.sideCameraPoint.Y
-        If yCoordinate > ocvb.sideCameraPoint.Y Then planeY = side2D.meterMax * (yCoordinate - ocvb.sideCameraPoint.Y) / (dst2.Height - ocvb.sideCameraPoint.Y)
+        Dim planeY = side2D.meterMin * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
+        If yCoordinate > task.sideCameraPoint.Y Then planeY = side2D.meterMax * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
 
         Dim metersPerPixel = Math.Abs(side2D.meterMax - side2D.meterMin) / dst2.Height
         Dim cushion = cushionSlider.Value
@@ -559,7 +559,7 @@ Public Class Structured_SliceH
         dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         yPlaneOffset = If(offsetSlider.Value < dst2.Height - cushion, CInt(offsetSlider.Value), dst2.Height - cushion - 1)
-        dst2.Circle(New cv.Point(0, ocvb.sideCameraPoint.Y), ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        dst2.Circle(New cv.Point(0, task.sideCameraPoint.Y), task.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         dst2.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst2.Width, yPlaneOffset), cv.Scalar.Yellow, cushion)
     End Sub
 End Class
@@ -598,8 +598,8 @@ Public Class Structured_SliceV
 
         Dim split = top2D.gCloud.dst1.Split()
 
-        Dim planeX = top2D.meterMin * (ocvb.topCameraPoint.X - xCoordinate) / ocvb.topCameraPoint.X
-        If xCoordinate > ocvb.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - ocvb.topCameraPoint.X) / (dst2.Width - ocvb.topCameraPoint.X)
+        Dim planeX = top2D.meterMin * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+        If xCoordinate > task.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
 
         Dim metersPerPixel = Math.Abs(top2D.meterMax - top2D.meterMin) / dst2.Height
         Dim cushion = cushionSlider.Value
@@ -622,7 +622,7 @@ Public Class Structured_SliceV
         dst2 = top2D.dst1.Normalize(0, 255, cv.NormTypes.MinMax)
         dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2.Circle(New cv.Point(ocvb.topCameraPoint.X, dst2.Height), ocvb.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        dst2.Circle(New cv.Point(task.topCameraPoint.X, dst2.Height), task.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
         Dim offset = CInt(offsetSlider.Value)
         dst2.Line(New cv.Point(offset, 0), New cv.Point(offset, dst2.Height), cv.Scalar.Yellow, cushion)
     End Sub
@@ -668,8 +668,8 @@ Public Class Structured_SliceVStable
         dst2 = top2D.dst1
         Dim split = top2D.gCloud.dst1.Split()
 
-        Dim planeX = top2D.meterMin * (ocvb.topCameraPoint.X - xCoordinate) / ocvb.topCameraPoint.X
-        If xCoordinate > ocvb.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - ocvb.topCameraPoint.X) / (dst2.Width - ocvb.topCameraPoint.X)
+        Dim planeX = top2D.meterMin * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+        If xCoordinate > task.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
 
         Dim metersPerPixel = Math.Abs(top2D.meterMax - top2D.meterMin) / dst2.Height
         Dim cushion = cushionSlider.Value
@@ -769,7 +769,7 @@ Public Class Structured_CenterSlice
             topPt = New cv.Point2f(topPt.X, 0)
             botPt = New cv.Point2f(topPt.X, dst1.Height)
         End If
-        dst2.Circle(avgPt, ocvb.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst2.Circle(avgPt, task.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
         dst2.Line(topPt, botPt, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
         dst1.Line(topPt, botPt, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
     End Sub
@@ -1201,13 +1201,13 @@ Public Class Structured_LineIntercepts
         For Each inter In intercepts
             Select Case axis
                 Case 0
-                    dst.Line(New cv.Point(inter.Key, 0), New cv.Point(inter.Key, 10), cv.Scalar.White, ocvb.lineSize)
+                    dst.Line(New cv.Point(inter.Key, 0), New cv.Point(inter.Key, 10), cv.Scalar.White, task.lineSize)
                 Case 1
-                    dst.Line(New cv.Point(inter.Key, dst1.Height), New cv.Point(inter.Key, dst1.Height - 10), cv.Scalar.White, ocvb.lineSize)
+                    dst.Line(New cv.Point(inter.Key, dst1.Height), New cv.Point(inter.Key, dst1.Height - 10), cv.Scalar.White, task.lineSize)
                 Case 2
-                    dst.Line(New cv.Point(0, inter.Key), New cv.Point(10, inter.Key), cv.Scalar.White, ocvb.lineSize)
+                    dst.Line(New cv.Point(0, inter.Key), New cv.Point(10, inter.Key), cv.Scalar.White, task.lineSize)
                 Case 3
-                    dst.Line(New cv.Point(dst1.Width, inter.Key), New cv.Point(dst1.Width - 10, inter.Key), cv.Scalar.White, ocvb.lineSize)
+                    dst.Line(New cv.Point(dst1.Width, inter.Key), New cv.Point(dst1.Width - 10, inter.Key), cv.Scalar.White, task.lineSize)
             End Select
         Next
     End Sub
@@ -1347,6 +1347,6 @@ Public Class Line_HighlightSlope
             If color.Item0 = 254 Then p2 = New cv.Point(0, b) ' blue
             dst2.Line(center, p2, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
         End If
-        dst2.Circle(center, ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+        dst2.Circle(center, task.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
     End Sub
 End Class

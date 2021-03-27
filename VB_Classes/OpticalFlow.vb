@@ -136,7 +136,7 @@ Public Class OpticalFlow_DenseBasics
         Static oldGray As New cv.Mat
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        If ocvb.frameCount > 0 Then
+        If task.frameCount > 0 Then
             flow.Run()
 
             Dim hsv = opticalFlow_Dense(oldGray, src, flow.pyrScale, flow.levels, flow.winSize, flow.iterations, flow.polyN, flow.polySigma, flow.OpticalFlowFlags)
@@ -182,7 +182,7 @@ Public Class OpticalFlow_DenseBasics_MT
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
         Static oldGray As New cv.Mat
 
-        If ocvb.frameCount > 0 Then
+        If task.frameCount > 0 Then
             grid.Run()
             flow.Run()
 
@@ -279,7 +279,7 @@ Public Class OpticalFlow_Sparse
             End If
         Next
 
-        If ocvb.frameCount = 0 Then
+        If task.frameCount = 0 Then
             errScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 1)
             qScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 0.004)
             rScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 0.5)
@@ -316,7 +316,7 @@ Public Class OpticalFlow_Sparse
             Next
             label1 = "Matched " + CStr(features.Count) + " points "
 
-            If ocvb.frameCount Mod 10 = 0 Then lastFrame = src.Clone()
+            If task.frameCount Mod 10 = 0 Then lastFrame = src.Clone()
         Else
             lastFrame = src.Clone()
         End If

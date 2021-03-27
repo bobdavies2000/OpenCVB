@@ -11,7 +11,7 @@ Public Class Bitmap_ToMat
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim bitmap = New Bitmap(ocvb.parms.homeDir + "Data/lena.jpg")
+        Dim bitmap = New Bitmap(task.parms.homeDir + "Data/lena.jpg")
         dst1 = cv.Extensions.BitmapConverter.ToMat(bitmap).Resize(src.Size)
 
         bitmap = cv.Extensions.BitmapConverter.ToBitmap(src)

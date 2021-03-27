@@ -37,7 +37,7 @@ Public Class VTK_Basics
         ' setup the memory mapped area and initialize the intrinsicsLeft needed to convert imageXYZ to worldXYZ and for command/control of the interface.
         For i = 0 To memMapSysData.Length - 1
             ' only change this if you are changing the data in the VTK C++ code at the same time...
-            memMapValues(i) = Choose(i + 1, ocvb.frameCount, rgbInput.Width, rgbInput.Height, rgbInput.Total * rgbInput.ElemSize,
+            memMapValues(i) = Choose(i + 1, task.frameCount, rgbInput.Width, rgbInput.Height, rgbInput.Total * rgbInput.ElemSize,
                                          dataInput.Width, dataInput.Height, dataInput.Total * dataInput.ElemSize)
         Next
 
@@ -55,7 +55,7 @@ Public Class VTK_Basics
 
         startInfo.FileName = vtkTitle + ".exe"
         startInfo.Arguments = CStr(memMapbufferSize) + " " + pipeName
-        If ocvb.parms.ShowConsoleLog = False Then startInfo.WindowStyle = ProcessWindowStyle.Hidden
+        If task.parms.ShowConsoleLog = False Then startInfo.WindowStyle = ProcessWindowStyle.Hidden
         Process.Start(startInfo)
 
         hglobal = Marshal.AllocHGlobal(memMapbufferSize)
@@ -65,17 +65,17 @@ Public Class VTK_Basics
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.parms.VTK_Present = False Then Exit Sub
+        If task.parms.VTK_Present = False Then Exit Sub
 
         If standalone Then
             ocvb.trueText("VTK_Basics is used by any VTK algorithm but has no output by itself.")
             Exit Sub
         End If
 
-        If ocvb.frameCount = 0 Then startVTKWindow()
+        If task.frameCount = 0 Then startVTKWindow()
 
         Dim readPipe(4) As Byte ' we read 4 bytes because that is the signal that the other end of the named pipe wrote 4 bytes to indicate iteration complete.
-        If ocvb.frameCount <> 0 Then
+        If task.frameCount <> 0 Then
             Dim bytesRead = pipe.Read(readPipe, 0, 4)
             If bytesRead = 0 Then
                 ocvb.trueText("The VTK process appears to have stopped.", 20, 100)
@@ -132,7 +132,7 @@ Public Class VTK_Histogram3Drgb
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.parms.VTK_Present = False Then Exit Sub
+        If task.parms.VTK_Present = False Then Exit Sub
 
         Static binSlider = findSlider("Hist 3D bins")
         Static threshSlider = findSlider("Hist 3D bin Threshold X1m")
@@ -181,7 +181,7 @@ Public Class VTK_Histogram3DpointCloud
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.parms.VTK_Present = False Then Exit Sub
+        If task.parms.VTK_Present = False Then Exit Sub
 
         vtk.memMapUserData(2) = 0 ' assume no need to recompute 3D histogram.
         If vtk.memMapUserData(0) <> binSlider.value Or vtk.memMapUserData(1) <> threshSlider.value / 1000000 Then

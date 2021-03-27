@@ -292,7 +292,7 @@ Public Class LineDetector_3D_LongestLine
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
+        If task.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
         lines.src = src
         lines.Run()
         src.CopyTo(dst1)
@@ -325,8 +325,8 @@ Public Class LineDetector_3D_FLD_MT
         label2 = ""
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        If task.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
         lines.src = src
         lines.Run()
         src.CopyTo(dst1)
@@ -370,7 +370,7 @@ End Class
 '    End Sub
 '    Public Sub Run()
 '        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-'        If ocvb.frameCount Mod sliders.trackbar(2).Value Then Exit Sub
+'        If task.frameCount Mod sliders.trackbar(2).Value Then Exit Sub
 '        Dim useX As Boolean = check.Box(0).Checked
 '        linesFLD.src = src
 '        linesFLD.Run()

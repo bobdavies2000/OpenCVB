@@ -190,7 +190,7 @@ Public Class Camshift_TopObjects
         For i = 0 To cams.Length - 1
             If blob.flood.fBasics.maskSizes.Count > i Then
                 Dim camIndex = blob.flood.fBasics.maskSizes.ElementAt(i).Value
-                If ocvb.frameCount Mod updateFrequency = 0 Or cams(i).trackBox.Size.Width = 0 Then
+                If task.frameCount Mod updateFrequency = 0 Or cams(i).trackBox.Size.Width = 0 Then
                     task.drawRect = blob.flood.fBasics.rects(camIndex)
                 End If
 

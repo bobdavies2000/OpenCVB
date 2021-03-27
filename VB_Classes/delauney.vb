@@ -97,10 +97,10 @@ Public Class Delaunay_Basics
             Dim fp = New cv.Point2f(msRNG.Next(0, rect.Width), msRNG.Next(0, rect.Height))
             locate_point(dst1, subdiv, fp, active_facet_color)
             subdiv.Insert(fp)
-            draw_subdiv(dst1, subdiv, cv.Scalar.White, ocvb.frameCount Mod 2)
+            draw_subdiv(dst1, subdiv, cv.Scalar.White, task.frameCount Mod 2)
         Next
 
-        paint_voronoi(ocvb.scalarColors, dst1, subdiv)
+        paint_voronoi(task.scalarColors, dst1, subdiv)
     End Sub
 End Class
 
@@ -130,7 +130,7 @@ Public Class Delaunay_GoodFeatures
         Next
 
         Dim mixPercent = features.sliders.trackbar(3).Value / 100
-        paint_voronoi(ocvb.scalarColors, dst2, subdiv)
+        paint_voronoi(task.scalarColors, dst2, subdiv)
         cv.Cv2.AddWeighted(dst2, 1 - mixPercent, src, mixPercent, 0, dst2)
     End Sub
 End Class
@@ -149,7 +149,7 @@ Public Class Delauney_Subdiv2D
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount Mod updateFrequency <> 0 Then Exit Sub ' too fast otherwise...
+        If task.frameCount Mod updateFrequency <> 0 Then Exit Sub ' too fast otherwise...
         Dim rand As New Random()
         dst1.SetTo(0)
         Dim points = Enumerable.Range(0, 100).Select(Of cv.Point2f)(
@@ -209,7 +209,7 @@ Public Class Delauney_Coverage
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        If ocvb.frameCount Mod sliders.trackbar(0).Value = 0 Then dst1.SetTo(0)
+        If task.frameCount Mod sliders.trackbar(0).Value = 0 Then dst1.SetTo(0)
         delauney.src = src
         delauney.Run()
         cv.Cv2.BitwiseOr(delauney.dst1, dst1, dst1)

@@ -143,7 +143,7 @@ Public Class Hough_Lines_MT
     Public Sub Run()
         If task.intermediateReview = caller Then ocvb.intermediateObject = Me
 
-        If ocvb.frameCount = 0 Then
+        If task.frameCount = 0 Then
             Static gridWidthSlider = findSlider("ThreadGrid Width")
             Static gridHeightSlider = findSlider("ThreadGrid Height")
             gridWidthSlider.Value = 16

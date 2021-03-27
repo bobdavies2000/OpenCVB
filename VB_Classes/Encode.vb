@@ -24,7 +24,7 @@ Public Class Encode_Basics
         cv.Cv2.Absdiff(src, dst2, output)
 
         Static scaleSlider = findSlider("Encode Output Scaling")
-        If ocvb.frameCount = 0 Then scaleSlider.value = 10
+        If task.frameCount = 0 Then scaleSlider.value = 10
 
         output.ConvertTo(dst1, cv.MatType.CV_8UC3, scaleSlider.Value)
         Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)

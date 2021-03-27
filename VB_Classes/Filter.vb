@@ -79,7 +79,7 @@ Public Class Filter_Normalized2D
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Dim kernelSize = If(standalone, (ocvb.frameCount Mod 20) + 1, sliders.trackbar(0).Value)
+        Dim kernelSize = If(standalone, (task.frameCount Mod 20) + 1, sliders.trackbar(0).Value)
         Dim kernel = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
         dst1 = src.Filter2D(-1, kernel)
         label1 = "Normalized KernelSize = " + CStr(kernelSize)

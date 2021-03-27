@@ -24,7 +24,7 @@ Public Class Clone_Basics
         End If
         dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        If standalone And ocvb.frameCount Mod 10 = 0 Then cloneSpec += 1
+        If standalone And task.frameCount Mod 10 = 0 Then cloneSpec += 1
         Select Case cloneSpec Mod 3
             Case 0
                 cv.Cv2.ColorChange(src, mask, dst1, colorChangeValues(0), colorChangeValues(1), colorChangeValues(2))
@@ -149,11 +149,11 @@ Public Class Clone_Eagle
             radio.check(2).Text = "Seamless - Normal Clone"
             radio.check(2).Checked = True
         End If
-        sourceImage = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/CloneSource.png")
+        sourceImage = cv.Cv2.ImRead(task.parms.homeDir + "Data/CloneSource.png")
         sourceImage = sourceImage.Resize(New cv.Size(sourceImage.Width * src.Width / 1280, sourceImage.Height * src.Height / 720))
         srcROI = New cv.Rect(0, 40, sourceImage.Width, sourceImage.Height)
 
-        mask = cv.Cv2.ImRead(ocvb.parms.homeDir + "Data/Clonemask.png")
+        mask = cv.Cv2.ImRead(task.parms.homeDir + "Data/Clonemask.png")
         mask = mask.Resize(New cv.Size(mask.Width * src.Width / 1280, mask.Height * src.Height / 720))
         maskROI = New cv.Rect(srcROI.Width, 40, mask.Width, mask.Height)
 
