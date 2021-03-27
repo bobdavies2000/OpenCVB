@@ -1081,134 +1081,6 @@ End Class
 
 
 
-Public Class Structured_LineIntercepts
-    Inherits VBparent
-    Dim lines As LineDetector_Basics
-    Public pt1 As New List(Of cv.Point2f)
-    Public pt2 As New List(Of cv.Point2f)
-    Public topIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
-    Public botIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
-    Public leftIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
-    Public rightIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
-    Public searchRange As Integer
-    Public thickNess As Integer
-    Public Sub New()
-        initParent()
-        lines = New LineDetector_Basics
-        Dim lenSlider = findSlider("Line length threshold in pixels")
-        lenSlider.Value = 1
-
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 4)
-            radio.check(0).Text = "Show Top intercepts"
-            radio.check(1).Text = "Show Bottom intercepts"
-            radio.check(2).Text = "Show Left intercepts"
-            radio.check(3).Text = "Show Right intercepts"
-            radio.check(1).Checked = True
-        End If
-
-        label1 = "Mouse tracks top, bottom, left, or right intercepts."
-        task.desc = "Consolidate RGB lines using the x- and y-intercepts"
-    End Sub
-    Public Sub hightLightIntercept(mousePoint As Integer, intercepts As SortedList(Of Integer, Integer), axis As Integer)
-        For Each inter In intercepts
-            If Math.Abs(mousePoint - inter.Key) < searchRange Then
-                dst1.Line(pt1(inter.Value), pt2(inter.Value), cv.Scalar.White, thickNess + 4, cv.LineTypes.AntiAlias)
-                dst1.Line(pt1(inter.Value), pt2(inter.Value), cv.Scalar.Blue, thickNess, cv.LineTypes.AntiAlias)
-            End If
-        Next
-        For Each inter In intercepts
-            Select Case axis
-                Case 0
-                    dst1.Line(New cv.Point(inter.Key, 0), New cv.Point(inter.Key, 10), cv.Scalar.White, ocvb.lineSize)
-                Case 1
-                    dst1.Line(New cv.Point(inter.Key, dst1.Height), New cv.Point(inter.Key, dst1.Height - 10), cv.Scalar.White, ocvb.lineSize)
-                Case 2
-                    dst1.Line(New cv.Point(0, inter.Key), New cv.Point(10, inter.Key), cv.Scalar.White, ocvb.lineSize)
-                Case 3
-                    dst1.Line(New cv.Point(dst1.Width, inter.Key), New cv.Point(dst1.Width - 10, inter.Key), cv.Scalar.White, ocvb.lineSize)
-            End Select
-        Next
-    End Sub
-    Public Sub highlight()
-        Static topRadio = findRadio("Show Top intercepts")
-        Static botRadio = findRadio("Show Bottom intercepts")
-        Static leftRadio = findRadio("Show Left intercepts")
-        Static rightRadio = findRadio("Show Right intercepts")
-
-        For i = 0 To 3
-            Dim radio = Choose(i + 1, topRadio, botRadio, leftRadio, rightRadio)
-            Dim intercepts = Choose(i + 1, topIntercepts, botIntercepts, leftIntercepts, rightIntercepts)
-            Dim mousePoint = Choose(i + 1, task.mousePoint.X, task.mousePoint.X, task.mousePoint.Y, task.mousePoint.Y)
-            If radio.checked Then hightLightIntercept(mousePoint, intercepts, i)
-        Next
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
-        Static thickSlider = findSlider("Line thickness")
-        Static searchSlider = findSlider("x- and y-intercept search range in pixels")
-        thickNess = thickSlider.value
-        searchRange = searchSlider.value
-
-        lines.src = src
-        lines.Run()
-        If lines.sortlines.Count = 0 Then Exit Sub
-
-        dst1 = src
-        pt1.Clear()
-        pt2.Clear()
-        topIntercepts.Clear()
-        botIntercepts.Clear()
-        leftIntercepts.Clear()
-        rightIntercepts.Clear()
-        For i = 0 To lines.sortlines.Count - 1
-            Dim nl = lines.sortlines.ElementAt(i).Value
-            Dim p1 = New cv.Point2f(nl.Item0, nl.Item1)
-            Dim p2 = New cv.Point2f(nl.Item2, nl.Item3)
-
-            Dim minXX = Math.Min(p1.X, p2.X)
-            If p1.X <> minXX Then ' leftmost point is always in pt1
-                Dim tmp = p1
-                p1 = p2
-                p2 = tmp
-            End If
-
-            pt1.Add(p1)
-            pt2.Add(p2)
-            dst1.Line(p1, p2, cv.Scalar.Yellow, thickNess, cv.LineTypes.AntiAlias)
-            If p1.X = p2.X Then
-                topIntercepts.Add(p1.X, i)
-                botIntercepts.Add(p1.X, i)
-            Else
-                Dim m = (p1.Y - p2.Y) / (p1.X - p2.X)
-                Dim b = p1.Y - p1.X * m
-                If m = 0 Then
-                    leftIntercepts.Add(p1.Y, i)
-                    rightIntercepts.Add(p1.Y, i)
-                Else
-                    Dim xint1 = -b / m
-                    Dim xint2 = (dst1.Height - b) / m  ' x = (y - b) / m
-                    Dim yint1 = b
-                    Dim yint2 = m * dst1.Width + b
-                    If xint1 >= 0 And xint1 <= dst1.Width Then topIntercepts.Add(xint1, i)
-                    If xint2 >= 0 And xint2 <= dst1.Width Then botIntercepts.Add(xint2, i)
-                    If yint1 >= 0 And yint1 <= dst1.Height Then leftIntercepts.Add(yint1, i)
-                    If yint2 >= 0 And yint2 <= dst1.Height Then rightIntercepts.Add(yint2, i)
-                End If
-            End If
-        Next
-
-        If standalone Then highlight()
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 
 Public Class Structured_LinesV
     Inherits VBparent
@@ -1281,5 +1153,200 @@ Public Class Structured_LinesH
                 dst1.Line(vLines.lines.pt1(i), vLines.lines.pt2(i), cv.Scalar.Yellow, vLines.thickness, cv.LineTypes.AntiAlias)
             End If
         Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Structured_LineIntercepts
+    Inherits VBparent
+    Dim lines As LineDetector_Basics
+    Public pt1 As New List(Of cv.Point2f)
+    Public pt2 As New List(Of cv.Point2f)
+    Public topIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+    Public botIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+    Public leftIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+    Public rightIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+    Public searchRange As Integer
+    Public thickNess As Integer
+    Public Sub New()
+        initParent()
+        lines = New LineDetector_Basics
+        Dim lenSlider = findSlider("Line length threshold in pixels")
+        lenSlider.Value = 1
+
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 4)
+            radio.check(0).Text = "Show Top intercepts"
+            radio.check(1).Text = "Show Bottom intercepts"
+            radio.check(2).Text = "Show Left intercepts"
+            radio.check(3).Text = "Show Right intercepts"
+            radio.check(1).Checked = True
+        End If
+
+        label1 = "Mouse tracks top, bottom, left, or right intercepts."
+        task.desc = "Consolidate RGB lines using the x- and y-intercepts"
+    End Sub
+    Public Sub hightLightIntercept(mousePoint As Integer, intercepts As SortedList(Of Integer, Integer), axis As Integer, dst As cv.Mat)
+        For Each inter In intercepts
+            If Math.Abs(mousePoint - inter.Key) < searchRange Then
+                dst1.Line(pt1(inter.Value), pt2(inter.Value), cv.Scalar.White, thickNess + 4, cv.LineTypes.AntiAlias)
+                dst1.Line(pt1(inter.Value), pt2(inter.Value), cv.Scalar.Blue, thickNess, cv.LineTypes.AntiAlias)
+            End If
+        Next
+        For Each inter In intercepts
+            Select Case axis
+                Case 0
+                    dst.Line(New cv.Point(inter.Key, 0), New cv.Point(inter.Key, 10), cv.Scalar.White, ocvb.lineSize)
+                Case 1
+                    dst.Line(New cv.Point(inter.Key, dst1.Height), New cv.Point(inter.Key, dst1.Height - 10), cv.Scalar.White, ocvb.lineSize)
+                Case 2
+                    dst.Line(New cv.Point(0, inter.Key), New cv.Point(10, inter.Key), cv.Scalar.White, ocvb.lineSize)
+                Case 3
+                    dst.Line(New cv.Point(dst1.Width, inter.Key), New cv.Point(dst1.Width - 10, inter.Key), cv.Scalar.White, ocvb.lineSize)
+            End Select
+        Next
+    End Sub
+    Public Sub highlight(showAll As Boolean, dst As cv.Mat)
+        Static topRadio = findRadio("Show Top intercepts")
+        Static botRadio = findRadio("Show Bottom intercepts")
+        Static leftRadio = findRadio("Show Left intercepts")
+        Static rightRadio = findRadio("Show Right intercepts")
+
+        For i = 0 To 3
+            Dim radio = Choose(i + 1, topRadio, botRadio, leftRadio, rightRadio)
+            Dim intercepts = Choose(i + 1, topIntercepts, botIntercepts, leftIntercepts, rightIntercepts)
+            Dim mousePoint = Choose(i + 1, task.mousePoint.X, task.mousePoint.X, task.mousePoint.Y, task.mousePoint.Y)
+            If radio.checked Or showAll Then hightLightIntercept(mousePoint, intercepts, i, dst)
+        Next
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+        Static thickSlider = findSlider("Line thickness")
+        Static searchSlider = findSlider("x- and y-intercept search range in pixels")
+        thickNess = thickSlider.value
+        searchRange = searchSlider.value
+
+        lines.src = src
+        lines.Run()
+        If lines.sortlines.Count = 0 Then Exit Sub
+
+        dst1 = src
+        pt1.Clear()
+        pt2.Clear()
+        topIntercepts.Clear()
+        botIntercepts.Clear()
+        leftIntercepts.Clear()
+        rightIntercepts.Clear()
+        For i = 0 To lines.sortlines.Count - 1
+            Dim nl = lines.sortlines.ElementAt(i).Value
+            Dim p1 = New cv.Point2f(nl.Item0, nl.Item1)
+            Dim p2 = New cv.Point2f(nl.Item2, nl.Item3)
+
+            Dim minXX = Math.Min(p1.X, p2.X)
+            If p1.X <> minXX Then ' leftmost point is always in pt1
+                Dim tmp = p1
+                p1 = p2
+                p2 = tmp
+            End If
+
+            pt1.Add(p1)
+            pt2.Add(p2)
+            dst1.Line(p1, p2, cv.Scalar.Yellow, thickNess, cv.LineTypes.AntiAlias)
+            If p1.X = p2.X Then
+                topIntercepts.Add(p1.X, i)
+                botIntercepts.Add(p1.X, i)
+            Else
+                Dim m = (p1.Y - p2.Y) / (p1.X - p2.X)
+                Dim b = p1.Y - p1.X * m
+                If m = 0 Then
+                    leftIntercepts.Add(p1.Y, i)
+                    rightIntercepts.Add(p1.Y, i)
+                Else
+                    Dim xint1 = -b / m
+                    Dim xint2 = (dst1.Height - b) / m  ' x = (y - b) / m
+                    Dim yint1 = b
+                    Dim yint2 = m * dst1.Width + b
+                    If xint1 >= 0 And xint1 <= dst1.Width Then topIntercepts.Add(xint1, i)
+                    If xint2 >= 0 And xint2 <= dst1.Width Then botIntercepts.Add(xint2, i)
+                    If yint1 >= 0 And yint1 <= dst1.Height Then leftIntercepts.Add(yint1, i)
+                    If yint2 >= 0 And yint2 <= dst1.Height Then rightIntercepts.Add(yint2, i)
+                End If
+            End If
+        Next
+
+        If standalone Then highlight(False, dst1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_HighlightSlope
+    Inherits VBparent
+    Dim lines As Structured_LineIntercepts
+    Public Sub New()
+        initParent()
+        lines = New Structured_LineIntercepts
+        task.desc = "An alternative way to highlight line segments with common slope"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then ocvb.intermediateObject = Me
+
+        lines.src = src
+        lines.Run()
+        Dim searchRange = lines.searchRange
+        dst2.SetTo(0)
+
+        lines.highlight(True, dst2)
+        dst1 = lines.dst1
+
+        Dim red = New cv.Scalar(0, 0, 255)
+        Dim green = New cv.Scalar(1, 128, 0)
+        Dim yellow = New cv.Scalar(2, 255, 255)
+        Dim blue = New cv.Scalar(254, 0, 0)
+
+        Dim center = New cv.Point(dst2.Width / 2, dst2.Height / 2)
+        dst2.Line(New cv.Point(0, 0), center, blue, 1, cv.LineTypes.Link4)
+        dst2.Line(New cv.Point(dst1.Width, 0), center, red, 1, cv.LineTypes.Link4)
+        dst2.Line(New cv.Point(0, dst1.Height), center, blue, 1, cv.LineTypes.Link4)
+        dst2.Line(New cv.Point(dst1.Width, dst1.Height), center, yellow, 1, cv.LineTypes.Link4)
+
+        Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
+        Dim pt = New cv.Point(center.X, center.Y - 30)
+        cv.Cv2.FloodFill(dst2, mask, pt, red, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
+
+        pt = New cv.Point(center.X, center.Y + 30)
+        cv.Cv2.FloodFill(dst2, mask, pt, green, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
+
+        pt = New cv.Point(center.X - 30, center.Y)
+        cv.Cv2.FloodFill(dst2, mask, pt, blue, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
+
+        pt = New cv.Point(center.X + 30, center.Y)
+        cv.Cv2.FloodFill(dst2, mask, pt, yellow, New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8))
+
+        Dim p1 = task.mousePoint
+        Static p2 As cv.Point
+        If p1.X = center.X Then
+            If p1.Y <= center.Y Then p2 = New cv.Point(dst2.Width / 2, 0) Else p2 = New cv.Point(dst2.Width, dst2.Height)
+        Else
+            Dim color = dst2.Get(Of cv.Vec3b)(task.mousePoint.Y, task.mousePoint.X)
+            Dim m = (center.Y - p1.Y) / (center.X - p1.X)
+            Dim b = p1.Y - p1.X * m
+
+            If color.Item0 = 0 Then p2 = New cv.Point(-b / m, 0) ' red zone
+            If color.Item0 = 1 Then p2 = New cv.Point((dst2.Height - b) / m, dst2.Height) ' green
+            If color.Item0 = 2 Then p2 = New cv.Point(dst2.Width, dst2.Width * m + b) ' yellow
+            If color.Item0 = 254 Then p2 = New cv.Point(0, b) ' blue
+            dst2.Line(center, p2, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
+        End If
+        dst2.Circle(center, ocvb.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
     End Sub
 End Class
