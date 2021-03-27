@@ -110,7 +110,7 @@ Public Class ActiveTask : Implements IDisposable
     Public viewOptions As Object
     Public PixelViewer As Object
 
-    ' add any global option algorithms here
+    ' add any global option algorithms and structures here
     Public inrange As Object
     Public noDepthMask As New cv.Mat
     Public depthMask As New cv.Mat
@@ -122,7 +122,6 @@ Public Class ActiveTask : Implements IDisposable
     Public xRotateSlider As Windows.Forms.TrackBar
     Public yRotateSlider As Windows.Forms.TrackBar
     Public zRotateSlider As Windows.Forms.TrackBar
-    Public fuseSlider As Windows.Forms.TrackBar
 
     Public mouseClickFlag As Boolean
     Public mouseClickPoint As cv.Point
