@@ -154,7 +154,6 @@
     <Compile Include="Contrast.vb" />
     <Compile Include="Dither.vb" />
     <Compile Include="EMax.vb" />
-    <Compile Include="Emgu.vb" />
     <Compile Include="Entropy.vb" />
     <Compile Include="Etch.vb" />
     <Compile Include="FeatureLess.vb" />

@@ -533,7 +533,7 @@ End Class
 
 
 
-' This algorithm is different and does not inherit from ocvbClass.  It is the minimal work to implement kalman to allow large Kalman sets.
+' This algorithm is different and does not inherit from VBParent.  It is the minimal work to implement kalman to allow large Kalman sets.
 Public Class Kalman_Simple : Implements IDisposable
     Dim kf As New cv.KalmanFilter(2, 1, 0)
     Dim processNoise As New cv.Mat(2, 1, cv.MatType.CV_32F)

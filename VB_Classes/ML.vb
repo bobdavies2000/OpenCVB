@@ -448,7 +448,7 @@ End Class
 
 
 'Public Class ML_Simple
-'    Inherits ocvbClass
+'    Inherits VBParent
 '    Public trainData As cv.Mat
 '    Public response As cv.Mat
 '    Dim rtree = cv.ML.RTrees.Create()

@@ -20,7 +20,7 @@ Public Class OpenGL_MyOpenGLtest
         task.desc = "description"
     End Sub
     Public Sub Run()
- 		    If task.task.intermediateReview = caller Then ocvb.intermediateObject = Me
+ 		    If task.task.intermediateReview = caller Then task.intermediateObject = Me
         
         ogl.pointCloudInput = task.PointCloud
         ogl.src = task.color

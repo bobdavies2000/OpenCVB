@@ -979,3 +979,21 @@ Public Class Line_Intercepts
         If standalone Then showIntercepts(task.mousePoint, dst1)
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class Line_LeftRightImages
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+        task.desc = "description"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+    End Sub
+End Class

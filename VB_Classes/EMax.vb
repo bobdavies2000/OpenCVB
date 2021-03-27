@@ -43,7 +43,7 @@ Public Class EMax_Basics
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then
-            task.trueText("The EMax VBocvb class fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
+            task.trueText("The EMax algorithm fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
                           "The C++ version works fine (EMax_CPP) and the 2 are functionally identical.", 20, 100)
             Exit Sub ' comment this line to see the bug in the VB.Net version of this Predict2 below.
         End If

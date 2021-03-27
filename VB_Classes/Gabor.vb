@@ -87,7 +87,7 @@ Public Class Gabor_Basics_MT
         Next
 
         Dim accum = src.Clone()
-        Dim dst32f = New cv.Mat(src.Height, src.Width, cv.MatType.CV_32F, 0)
+        dst2 = New cv.Mat(src.Height, src.Width, cv.MatType.CV_32F, 0)
         Parallel.For(0, grid.roiList.Count,
         Sub(i)
             Dim roi = grid.roiList(i)
@@ -95,11 +95,10 @@ Public Class Gabor_Basics_MT
             gabor(i).Run()
             SyncLock accum
                 cv.Cv2.Max(accum, gabor(i).dst1, accum)
-                dst32f(roi) = gabor(i).gKernel.Normalize(0, 255, cv.NormTypes.MinMax).Resize(New cv.Size(roi.Width, roi.Height))
+                dst2(roi) = gabor(i).gKernel.Normalize(0, 255, cv.NormTypes.MinMax).Resize(New cv.Size(roi.Width, roi.Height))
             End SyncLock
         End Sub)
         dst1 = accum
-        dst2 = dst32f ' ocvbclass will convert this to 8uc3
     End Sub
 End Class
 

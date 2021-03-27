@@ -134,7 +134,7 @@ End Class
 
 
 
-' This algorithm is different and does not inherit from ocvbClass.  It is used to reduce the memory load when running MT algorithms above.
+' This algorithm is different and does not inherit from VBParent class.  It is used to reduce the memory load when running MT algorithms above.
 Public Class Entropy_Simple
     Public entropy As Single
     Public histRaw(3 - 1) As cv.Mat

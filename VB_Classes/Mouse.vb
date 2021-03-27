@@ -24,7 +24,7 @@ End Class
 
 
 
-Public Class Mouse_LeftClick
+Public Class Mouse_LeftClickZoom
     Inherits VBparent
     Public Sub New()
         initParent()
@@ -34,31 +34,13 @@ Public Class Mouse_LeftClick
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
         task.trueText("Left-click and drag to select a region in any of the images." + vbCrLf +
-                                 "The selected area is presented to ocvbClass in task.drawRect." + vbCrLf +
-                                 "In this example, the selected region from the RGB image will be resized to fit in the Result2 image to the right." + vbCrLf +
-                                 "Double-click an image to remove the selected region.")
+                      "The selected area is presented to ocvbClass in task.drawRect." + vbCrLf +
+                      "In this example, the selected region from the RGB image will be resized to fit in the Result2 image to the right." + vbCrLf +
+                      "Double-click an image to remove the selected region.")
 
         If task.drawRect.Width <> 0 And task.drawRect.Height <> 0 Then dst2 = src(task.drawRect).Resize(dst2.Size())
     End Sub
 End Class
 
-
-
-
-Public Class Mouse_RightClick
-    Inherits VBparent
-    Public Sub New()
-        initParent()
-        label1 = "Right click and drag to draw a rectangle"
-        task.desc = "Demonstrate what the right-click enables"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        task.trueText("Right-click and drag to select a region in one of the images." + vbCrLf +
-                                 "The selected image data will be opened in a spreadsheet.  Give it a try!" + vbCrLf +
-                                 "Double-click an image to remove the selected region.")
-        If task.drawRect.Width <> 0 And task.drawRect.Height <> 0 Then dst2 = src(task.drawRect).Resize(dst2.Size())
-    End Sub
-End Class
 
 
