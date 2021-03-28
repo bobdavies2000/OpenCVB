@@ -51,7 +51,7 @@ Public Class Sift_Basics_MT
     Dim numPointSlider As System.Windows.Forms.TrackBar
     Public Sub New()
         initParent()
-        lrView = New LeftRightView_BrightnessContrast()
+        lrView = New LeftRightView_BrightnessContrast
 
         grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
@@ -92,5 +92,3 @@ Public Class Sift_Basics_MT
         label1 = If(siftBasics.radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
     End Sub
 End Class
-
-

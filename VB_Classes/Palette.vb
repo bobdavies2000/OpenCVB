@@ -17,7 +17,7 @@ Public Class Palette_Basics
             radio.Setup(caller, 21)
             For i = 0 To radio.check.Length - 1
                 radio.check(i).Text = mapNames(i)
-                If mapNames(i) = "Hot" Then radio.check(i).Checked = True
+                If mapNames(i) = "Hsv" Then radio.check(i).Checked = True
             Next
             radioFrm = radio
         End If
@@ -591,5 +591,39 @@ Public Class Palette_Layout2D
             index += 1
         Next
         label1 = "Palette_Layout2D - " + CStr(grid.roiList.Count) + " regions"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Palette_LeftRightImages
+    Inherits VBparent
+    Dim lrViews As LeftRightView_Basics
+    Dim palette As Palette_Basics
+    Public Sub New()
+        initParent()
+        lrViews = New LeftRightView_Basics
+        Dim brightSlider = findSlider("brightness")
+        brightSlider.Value = 0
+        palette = New Palette_Basics
+        task.desc = "Use a palette with the left image."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+
+        lrViews.Run()
+
+        palette.src = lrViews.dst1
+        palette.Run()
+        dst1 = palette.dst1
+
+        palette.src = lrViews.dst2
+        palette.Run()
+        dst2 = palette.dst1
     End Sub
 End Class
