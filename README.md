@@ -34,7 +34,7 @@ Introduction
 There is no better documentation of an algorithm than a working example –
 especially if the output is visual and self-explanatory. Now imagine over 900
 OpenCV examples in a single app where each algorithm is less than a page of code
-and uses a familiar language. And each algorithm is *just the algorithm* without
+and in a familiar language. And each algorithm is *just the algorithm* without
 baggage from a user interface or environment. Each algorithm is designed to be
 reused in other algorithms so variations can be easily built.
 
@@ -53,10 +53,10 @@ algorithm’s intent.
 
 The basic layout of OpenCVB is shown below. Any of the algorithms can be
 selected from the first combo box at the top of the form. The second combo box
-is used to select algorithms grouped by OpenCV API or OpenCVB algorithm. The
-default grouping is to select the special grouping “\<All\>”. There are a
-variety of other special groupings that select, for example, all Python or all
-C++ algorithms or all multi-threaded algorithms.
+is used to select an algorithms group. The default grouping is to select the
+special grouping “\<All\>”. There are a variety of other special groupings that
+select, for example, all Python or all C++ algorithms or all multi-threaded
+algorithms.
 
 ![](media/0094dd80a047099af3fa5ecf92dee723.png)
 
