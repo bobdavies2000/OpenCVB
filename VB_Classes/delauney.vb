@@ -117,7 +117,7 @@ Public Class Delaunay_GoodFeatures
         task.desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then task.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         features.src = src
         features.Run()
 
@@ -129,9 +129,16 @@ Public Class Delaunay_GoodFeatures
             subdiv.Insert(features.goodFeatures(i))
         Next
 
-        Dim mixPercent = features.sliders.trackbar(3).Value / 100
         paint_voronoi(task.scalarColors, dst2, subdiv)
-        cv.Cv2.AddWeighted(dst2, 1 - mixPercent, src, mixPercent, 0, dst2)
+        Static lastFrame As cv.Mat = dst2
+        For i = 0 To features.goodFeatures.Count - 1
+            Dim pt = features.goodFeatures(i)
+            Dim color = lastFrame.Get(Of cv.Vec3b)(pt.Y, pt.X)
+            If color.Item0 < 100 Then color = task.vecColors(i)
+            dst2.FloodFill(pt, color)
+            dst1.FloodFill(pt, color)
+        Next
+        lastFrame = dst2.Clone
     End Sub
 End Class
 

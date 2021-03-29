@@ -547,13 +547,13 @@ End Class
 Public Class PointCloud_Kalman_TopView
     Inherits VBparent
     Public pTrack As KNN_PointTracker
-    Public flood As FloodFill_8bit
+    Public flood As FloodFill_Basics
     Public topView As Histogram_TopView2D
     Public Sub New()
         initParent()
 
         pTrack = New KNN_PointTracker
-        flood = New FloodFill_8bit
+        flood = New FloodFill_Basics
         Dim minFloodSlider = findSlider("FloodFill Minimum Size")
         minFloodSlider.Value = 100
         topView = New Histogram_TopView2D

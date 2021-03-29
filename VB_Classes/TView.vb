@@ -50,14 +50,14 @@ End Class
 
 Public Class TView_FloodFill
     Inherits VBparent
-    Public floodSide As FloodFill_Basics
-    Public floodTop As FloodFill_Basics
+    Public floodSide As FloodFill_Old
+    Public floodTop As FloodFill_Old
     Public tBasics As TView_Basics
     Public Sub New()
         initParent()
 
-        floodSide = New FloodFill_Basics
-        floodTop = New FloodFill_Basics
+        floodSide = New FloodFill_Old
+        floodTop = New FloodFill_Old
         Dim minFloodSlider = findSlider("FloodFill Minimum Size")
         minFloodSlider.Value = 100
         tBasics = New TView_Basics

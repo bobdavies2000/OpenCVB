@@ -3,7 +3,7 @@ Public Class Featureless_Basics
     Inherits VBparent
     Public edges As Edges_Basics
     Public grid As Thread_Grid
-    Public flood As FloodFill_8bit
+    Public flood As FloodFill_Basics
     Public Sub New()
         initParent()
 
@@ -21,7 +21,7 @@ Public Class Featureless_Basics
             sliders.setupTrackBar(1, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
             sliders.setupTrackBar(2, "FeatureLess threshold", 1, 100, 3)
         End If
-        flood = New FloodFill_8bit()
+        flood = New FloodFill_Basics()
 
         label1 = "Featureless mask"
         task.desc = "Multithread Houghlines to find featureless regions in an image."
