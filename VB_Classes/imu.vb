@@ -528,7 +528,7 @@ End Class
 
 
 
-Public Class IMU_IscameraLevel
+Public Class IMU_isCameraLevel
     Inherits VBparent
     Public angleX As Single ' in radians.
     Public angleY As Single ' in radians.
@@ -592,8 +592,7 @@ Public Class IMU_IscameraStable
         Dim roll = task.IMU_AngularVelocity.Z
 
         Dim totalRadians = Math.Abs(pitch) + Math.Abs(yaw) + Math.Abs(roll)
-        Static thresholdSlider = findSlider("Threshold in camera motion in radians X100")
-        Dim permissableRadians = thresholdSlider.value / 100
+        Dim permissableRadians = task.cameraStableSlider.Value / 100
         task.cameraStable = If(totalRadians > permissableRadians, False, True)
     End Sub
 End Class

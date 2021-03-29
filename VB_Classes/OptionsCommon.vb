@@ -24,6 +24,7 @@ Public Class OptionsCommon
         task.xRotateSlider = sliders.trackbar(3)
         task.yRotateSlider = sliders.trackbar(4)
         task.zRotateSlider = sliders.trackbar(5)
+        task.cameraStableSlider = sliders.trackbar(6)
 
         label1 = "Depth values that are in-range"
         label2 = "Depth values that are out of range (and < 8m)"

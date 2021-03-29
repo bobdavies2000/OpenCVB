@@ -20,8 +20,6 @@ Public Class Line_Basics
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
 
-        Dim radianSlider = findSlider("Threshold in camera motion in radians X100")
-        radianSlider.Value = 1
         lenSlider = findSlider("Line length threshold in pixels")
 
         label1 = "Lines detected in the current frame"
