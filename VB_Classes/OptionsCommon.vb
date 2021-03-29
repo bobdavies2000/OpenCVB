@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class OptionsCommon_Depth
+Public Class OptionsCommon
     Inherits VBparent
     Public minVal As Single
     Public maxVal As Single
@@ -9,13 +9,14 @@ Public Class OptionsCommon_Depth
         task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone.
         standalone = False
 
-        sliders.Setup(caller, 6)
+        sliders.Setup(caller, 7)
         sliders.setupTrackBar(0, "InRange Min Depth (mm)", 1, 2000, 200)
         sliders.setupTrackBar(1, "InRange Max Depth (mm)", 200, 15000, 4000)
         sliders.setupTrackBar(2, "Top and Side Views Histogram threshold", 0, 200, 2)
         sliders.setupTrackBar(3, "Amount to rotate pointcloud around X-axis (degrees)", -90, 90, 0)
         sliders.setupTrackBar(4, "Amount to rotate pointcloud around Y-axis (degrees)", -90, 90, 0)
         sliders.setupTrackBar(5, "Amount to rotate pointcloud around Z-axis (degrees)", -90, 90, 0)
+        sliders.setupTrackBar(6, "Threshold in camera motion in radians X100", 1, 15, 1) ' how much motion is reasonable?
 
         task.minRangeSlider = sliders.trackbar(0) ' one of the few places we can be certain there is only one...
         task.maxRangeSlider = sliders.trackbar(1)

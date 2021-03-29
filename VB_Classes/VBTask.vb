@@ -109,6 +109,7 @@ Public Class ActiveTask : Implements IDisposable
     Public rightView As cv.Mat
     Public viewOptions As Object
     Public PixelViewer As Object
+    Public IMUStable As Object
 
     ' add any global option algorithms and structures here
     Public inrange As Object
@@ -198,6 +199,7 @@ Public Class ActiveTask : Implements IDisposable
     Public intermediateObject As VBparent
 
     Public pythonTaskName As String
+    Public cameraStable As Boolean
 
     Public ttTextData As New List(Of TTtext)
     Public callTrace As New List(Of String)
@@ -303,8 +305,9 @@ Public Class ActiveTask : Implements IDisposable
 
         aOptions = New OptionsContainer
         If algName.EndsWith(".py") = False Then aOptions.Show()
-        inrange = algoList.createAlgorithm("OptionsCommon_Depth")
+        inrange = algoList.createAlgorithm("OptionsCommon")
         viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
+        IMUStable = algoList.createAlgorithm("IMU_IscameraStable")
         PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
 
         algorithmObject = algoList.createAlgorithm(algName)
@@ -345,6 +348,7 @@ Public Class ActiveTask : Implements IDisposable
 
             ' run any global options algorithms here.
             If inrange IsNot Nothing Then inrange.Run()
+            If IMUStable IsNot Nothing Then IMUStable.run() ' updates the flag that indicates stability according to the IMU.
 
             algorithmObject.NextFrame()
 

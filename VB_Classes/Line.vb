@@ -4,7 +4,6 @@ Imports CS_Classes
 Public Class Line_Basics
     Inherits VBparent
     Dim ld As cv.XImgProc.FastLineDetector
-    Public stable As IMU_IscameraStable
     Public sortlines As New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
     Public thickness As Integer
     Public pixelThreshold As Integer
@@ -19,7 +18,6 @@ Public Class Line_Basics
             sliders.setupTrackBar(3, "x- and y-intercept search range in pixels", 1, 50, 10) ' not used in Run below but externally...
         End If
 
-        stable = New IMU_IscameraStable
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
 
         Dim radianSlider = findSlider("Threshold in camera motion in radians X100")
@@ -54,8 +52,7 @@ Public Class Line_Basics
             End If
         Next
 
-        stable.Run()
-        If stable.cameraStable = False Then dst2.SetTo(0)
+        If task.cameraStable = False Then dst2.SetTo(0)
 
         For Each line In sortlines
             Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
@@ -105,7 +102,7 @@ Public Class Line_LeftRightOverlay
         lrLines.Run()
         dst1 = lrLines.dst1
         Static saveLRradio = lrRadio.checked
-        If lines.stable.cameraStable = False Or saveLRradio <> lrRadio.checked Then
+        If task.cameraStable = False Or saveLRradio <> lrRadio.checked Then
             dst2.SetTo(cv.Scalar.White)
             saveLRradio = lrRadio.checked
         End If
@@ -143,10 +140,8 @@ Public Class Line_Reduction
     Inherits VBparent
     Dim lDetect As Line_Basics
     Dim reduction As Reduction_Basics
-    Dim stable As IMU_IscameraStable
     Public Sub New()
         initParent()
-        stable = New IMU_IscameraStable
         lDetect = New Line_Basics()
 
         reduction = New Reduction_Basics()
@@ -166,8 +161,7 @@ Public Class Line_Reduction
         lDetect.Run()
         dst1 = lDetect.dst1
 
-        stable.Run()
-        If stable.cameraStable = False Then dst2.SetTo(0)
+        If task.cameraStable = False Then dst2.SetTo(0)
 
         For Each line In lDetect.sortlines
             Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
@@ -270,10 +264,8 @@ Public Class Line_ConfirmedDepth
     Public z1 As New List(Of cv.Point3f) ' the point cloud values corresponding to pt1 and pt2
     Public z2 As New List(Of cv.Point3f)
     Public cloudInput As cv.Mat
-    Public stable As IMU_IscameraStable
     Public Sub New()
         initParent()
-        stable = New IMU_IscameraStable
         lines = New Line_Basics
         label1 = "Lines defined in RGB"
         label2 = "Lines in RGB confirmed in the point cloud"
@@ -281,7 +273,6 @@ Public Class Line_ConfirmedDepth
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        stable.Run()
 
         Static thickSlider = findSlider("Line thickness")
         Dim thickness = thickSlider.value
@@ -293,7 +284,7 @@ Public Class Line_ConfirmedDepth
         Dim lineList = New List(Of cv.Rect)
         If cloudInput Is Nothing Then cloudInput = task.pointCloud
         Dim split = cloudInput.Split()
-        If stable.cameraStable = False Then dst2.SetTo(0)
+        If task.cameraStable = False Then dst2.SetTo(0)
         pt1.Clear()
         pt2.Clear()
         z1.Clear()

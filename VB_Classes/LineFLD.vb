@@ -11,11 +11,9 @@ Public Class lineFLD_Basics
     Public canny1Slider As Windows.Forms.TrackBar
     Public canny2Slider As Windows.Forms.TrackBar
     Public mergeCheckBox As Windows.Forms.CheckBox
-    Public stable As IMU_IscameraStable
     Public Sub New()
         initParent()
 
-        stable = New IMU_IscameraStable
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 6)
             sliders.setupTrackBar(0, "FLD - Min Length", 1, 200, 30)
@@ -66,8 +64,7 @@ Public Class lineFLD_Basics
         Dim lineCount = lineDetectorFast_Run(handle.AddrOfPinnedObject, rows, cols, length_threshold, distance_threshold, canny_th1, canny_th2, canny_aperture_size, do_merge)
         handle.Free()
 
-        stable.Run()
-        If stable.cameraStable = False Then dst2.SetTo(0)
+        If task.cameraStable = False Then dst2.SetTo(0)
 
         If lineCount > 0 Then
             Dim pts(4 * lineCount - 1) As Single

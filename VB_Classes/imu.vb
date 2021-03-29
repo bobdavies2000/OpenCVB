@@ -577,36 +577,23 @@ End Class
 
 Public Class IMU_IscameraStable
     Inherits VBparent
-    Public pitch As Single ' in radians.
-    Public yaw As Single ' in radians.
-    Public roll As Single ' in radians.
-    Public cameraStable As Boolean
     Dim flow As Font_FlowText
     Public Sub New()
         initParent()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 1)
-            sliders.setupTrackBar(0, "Threshold in camera motion in radians X100", 1, 15, 1) ' how much motion is reasonable?
-        End If
+        task.callTrace.Clear() ' special line to clear the tree view otherwise this common option is standalone.
+        standalone = False
         task.desc = "Answer the question: Is the camera stable?"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        pitch = task.IMU_AngularVelocity.X
-        yaw = task.IMU_AngularVelocity.Y
-        roll = task.IMU_AngularVelocity.Z
+        Dim pitch = task.IMU_AngularVelocity.X
+        Dim yaw = task.IMU_AngularVelocity.Y
+        Dim roll = task.IMU_AngularVelocity.Z
 
-        Static thresholdSlider = findSlider("Threshold in camera motion in radians X100")
         Dim totalRadians = Math.Abs(pitch) + Math.Abs(yaw) + Math.Abs(roll)
-        cameraStable = If(totalRadians > thresholdSlider.Value / 100, False, True)
-        If standalone Or task.intermediateReview = caller Then
-            If flow Is Nothing Then flow = New Font_FlowText()
-            flow.msgs.Add(" Pitch = " + Format(pitch, "0.00") + " radians" +
-                          " Yaw = " + Format(yaw, "0.00") + " radians" +
-                          " Roll = " + Format(roll, "0.00") + " radians" +
-                          If(cameraStable, " - Camera is stable", " - Camera is NOT stable"))
-            flow.Run()
-        End If
+        Static thresholdSlider = findSlider("Threshold in camera motion in radians X100")
+        Dim permissableRadians = thresholdSlider.value / 100
+        task.cameraStable = If(totalRadians > permissableRadians, False, True)
     End Sub
 End Class

@@ -5,11 +5,8 @@ Public Class Kalman_Basics
     Dim kalman() As Kalman_Simple
     Public kInput(4 - 1) As Single
     Public kOutput(4 - 1) As Single
-    Dim stable As IMU_IscameraStable
     Public Sub New()
         initParent()
-
-        stable = New IMU_IscameraStable()
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 2)
@@ -43,8 +40,7 @@ Public Class Kalman_Basics
         Dim useKalman = useKalmanCheck.checked
         Static stableCheck = findCheckBox("Only use Kalman filtering when camera is stable")
         If stableCheck.checked Then
-            stable.Run()
-            If stable.cameraStable = False Then useKalman = False
+            If task.cameraStable = False Then useKalman = False
         End If
         If useKalman Then
             For i = 0 To kalman.Length - 1
@@ -699,11 +695,9 @@ Public Class Kalman_VB_Basics
     Dim matrix As New List(Of Single)
     Dim plot As Plot_OverTime
     Dim basics As Kalman_Basics
-    Dim stable As IMU_IscameraStable
     Public Sub New()
         initParent()
 
-        stable = New IMU_IscameraStable()
         basics = New Kalman_Basics()
 
         plot = New Plot_OverTime()
@@ -782,8 +776,7 @@ Public Class Kalman_VB_Basics
         Dim useKalman = useKalmanCheck.checked
         Static stableCheck = findCheckBox("Only use Kalman filtering when camera is stable")
         If stableCheck.checked Then
-            stable.Run()
-            If stable.cameraStable = False Then useKalman = False
+            If task.cameraStable = False Then useKalman = False
         End If
         If useKalman Then
             'The Kalman Filter code comes from:

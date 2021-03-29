@@ -8,13 +8,11 @@ Public Class Motion_Basics
     Public changedPixels As Integer
     Public cumulativePixels As Integer
     Public resetAll As Boolean
-    Dim imu As IMU_IscameraStable
     Dim minSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
         intersect = New Rectangle_Intersection
         contours = New Contours_Basics()
-        imu = New IMU_IscameraStable
         diff = New Diff_Basics()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -35,8 +33,6 @@ Public Class Motion_Basics
         diff.src = src
         If diff.src.Channels = 3 Then diff.src = diff.src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else diff.src = diff.src.Clone
 
-        imu.Run()
-
         Static cumulativeThreshold = findSlider("Cumulative motion threshold")
         Static pixelThreshold = findSlider("Single frame motion threshold")
 
@@ -45,7 +41,7 @@ Public Class Motion_Basics
         changedPixels = dst2.CountNonZero()
         cumulativePixels += changedPixels
 
-        resetAll = imu.cameraStable = False Or cumulativePixels > cumulativeThreshold.value Or changedPixels > pixelThreshold.value Or task.depthOptionsChanged
+        resetAll = task.cameraStable = False Or cumulativePixels > cumulativeThreshold.value Or changedPixels > pixelThreshold.value Or task.depthOptionsChanged
         If resetAll Then
             cumulativePixels = 0
             task.depthOptionsChanged = False
