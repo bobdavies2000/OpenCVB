@@ -22,6 +22,7 @@ Public Class TView_Basics
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static countSlider = findSlider("Show counts > X")
 
+        sideView.src = src
         sideView.Run()
 
         split = sideView.gCloud.dst1.Split()
@@ -72,6 +73,7 @@ Public Class TView_FloodFill
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
+        tBasics.src = src
         tBasics.Run()
         dst1 = tBasics.dst1.Clone
         dst2 = tBasics.dst2.Clone

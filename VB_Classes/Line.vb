@@ -737,10 +737,10 @@ End Class
 Public Class Line_SideView
     Inherits VBparent
     Dim lines As Line_Basics
-    Dim sideView As Histogram_SideView2D
+    Dim tView As TView_FloodFill
     Public Sub New()
         initParent()
-        sideView = New Histogram_SideView2D
+        tView = New TView_FloodFill
         lines = New Line_Basics
         label1 = "Side view of the lines detected in the RGB image"
         label2 = "Lines found in the RGB image view"
@@ -754,9 +754,11 @@ Public Class Line_SideView
         dst2 = lines.dst2
 
         Dim mask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        sideView.src = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
-        task.pointCloud.CopyTo(sideView.src, mask)
-        sideView.Run()
-        dst1 = sideView.dst1
+        ' tView.src = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
+        'task.pointCloud.CopyTo(tView.src, mask)
+        tView.src = task.pointCloud
+        tView.Run()
+
+        dst1 = tView.dst2
     End Sub
 End Class
