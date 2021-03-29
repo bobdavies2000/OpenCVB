@@ -138,17 +138,17 @@ Public Class Camshift_Object
         dst2 = blob.dst2.Clone()
 
 
-        If blob.flood.fBasics.masks.Count > 0 Then
-            Dim largestMask = blob.flood.fBasics.maskSizes.ElementAt(0).Value
+        If blob.flood.masks.Count > 0 Then
+            Dim largestMask = blob.flood.maskSizes.ElementAt(0).Value
             If camshift.trackBox.Size.Width > src.Width Or camshift.trackBox.Size.Height > src.Height Then
-                task.drawRect = blob.flood.fBasics.rects(largestMask)
+                task.drawRect = blob.flood.rects(largestMask)
             End If
-            If camshift.trackBox.Size.Width < 50 Then task.drawRect = blob.flood.fBasics.rects(largestMask)
+            If camshift.trackBox.Size.Width < 50 Then task.drawRect = blob.flood.rects(largestMask)
             camshift.src = src
             camshift.Run()
             dst1 = camshift.dst1
-            Dim mask = camshift.dst1.ConvertScaleAbs(255)
-            cv.Cv2.BitwiseNot(mask, mask)
+            Dim mask = dst1.ConvertScaleAbs(255)
+            cv.Cv2.BitwiseNot(mask.CvtColor(cv.ColorConversionCodes.BGR2GRAY), mask)
             dst2.SetTo(0, mask)
             If camshift.trackBox.Size.Width > 0 Then dst2.Ellipse(camshift.trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
         End If
@@ -188,10 +188,10 @@ Public Class Camshift_TopObjects
         Dim updateFrequency = updateSlider.Value
         Dim trackBoxes As New List(Of cv.RotatedRect)
         For i = 0 To cams.Length - 1
-            If blob.flood.fBasics.maskSizes.Count > i Then
-                Dim camIndex = blob.flood.fBasics.maskSizes.ElementAt(i).Value
+            If blob.flood.maskSizes.Count > i Then
+                Dim camIndex = blob.flood.maskSizes.ElementAt(i).Value
                 If task.frameCount Mod updateFrequency = 0 Or cams(i).trackBox.Size.Width = 0 Then
-                    task.drawRect = blob.flood.fBasics.rects(camIndex)
+                    task.drawRect = blob.flood.rects(camIndex)
                 End If
 
                 cams(i).src = src

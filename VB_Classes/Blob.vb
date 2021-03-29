@@ -169,13 +169,13 @@ End Class
 Public Class Blob_DepthClusters
     Inherits VBparent
     Public histBlobs As Histogram_DepthClusters
-    Public flood As FloodFill_RelativeRange
+    Public flood As FloodFill_Basics
     Public Sub New()
         initParent()
 
         histBlobs = New Histogram_DepthClusters()
 
-        flood = New FloodFill_RelativeRange()
+        flood = New FloodFill_Basics()
         Dim loSlider = findSlider("FloodFill LoDiff")
         Dim hiSlider = findSlider("FloodFill HiDiff")
         loSlider.Value = 1 ' pixels are exact.
@@ -190,9 +190,9 @@ Public Class Blob_DepthClusters
         histBlobs.Run()
         dst1 = histBlobs.dst1
         flood.src = histBlobs.dst2
-        flood.fBasics.initialMask = task.noDepthMask
+        flood.initialMask = task.noDepthMask
         flood.Run()
-        dst2 = flood.fBasics.dst2
+        dst2 = flood.dst2
         label1 = CStr(histBlobs.valleys.rangeBoundaries.Count) + " Depth Clusters"
     End Sub
 End Class
@@ -279,12 +279,12 @@ Public Class Blob_Largest
         blobs.src = src
         blobs.Run()
         dst2 = blobs.dst2
-        rects = blobs.flood.fBasics.rects
-        masks = blobs.flood.fBasics.masks
+        rects = blobs.flood.rects
+        masks = blobs.flood.masks
 
         If masks.Count > 0 Then
             dst1.SetTo(0)
-            maskIndex = blobs.flood.fBasics.maskSizes.ElementAt(blobIndex).Value ' this is the largest boundary rectangle
+            maskIndex = blobs.flood.maskSizes.ElementAt(blobIndex).Value ' this is the largest boundary rectangle
             src.CopyTo(dst1, masks(maskIndex))
             kalman.kInput = {rects(maskIndex).X, rects(maskIndex).Y, rects(maskIndex).Width, rects(maskIndex).Height}
             kalman.Run()
