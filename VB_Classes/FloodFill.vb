@@ -2,100 +2,6 @@ Imports cv = OpenCvSharp
 Imports System.Threading
 Public Class FloodFill_Basics
     Inherits VBparent
-    Public basics As FloodFill_Old
-
-    Public maskSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
-    Public rects As New List(Of cv.Rect)
-    Public masks As New List(Of cv.Mat)
-    Public centroids As New List(Of cv.Point2f)
-    Public rejectedCentroids As New List(Of cv.Point2f)
-    Public rejectedRects As New List(Of cv.Rect)
-
-    Public initialMask As New cv.Mat
-    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
-    Public Sub New()
-        initParent()
-        basics = New FloodFill_Old
-        label1 = "Input image to floodfill"
-        task.desc = "Use floodfill to build image segments in a grayscale image."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        basics.src = src.Clone
-        basics.Run()
-        dst1 = src
-
-        maskSizes = New SortedList(Of Integer, Integer)(basics.maskSizes)
-        rects = New List(Of cv.Rect)(basics.rects)
-        masks = New List(Of cv.Mat)(basics.masks)
-        centroids = New List(Of cv.Point2f)(basics.centroids)
-        rejectedCentroids = New List(Of cv.Point2f)(basics.rejectedCentroids)
-        rejectedRects = New List(Of cv.Rect)(basics.rejectedRects)
-        initialMask = basics.initialMask.Clone
-        floodFlag = basics.floodFlag
-
-        dst2.SetTo(0)
-        For i = 0 To basics.masks.Count - 1
-            Dim maskIndex = basics.maskSizes.ElementAt(i).Value
-            dst2.SetTo(task.scalarColors(i Mod 255), basics.masks(maskIndex))
-        Next
-        Static minSizeSlider = findSlider("FloodFill Minimum Size")
-        label2 = CStr(basics.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class FloodFill_Palette
-    Inherits VBparent
-    Public basics As FloodFill_Basics
-    Public palette As Palette_Basics
-    Public allRegionMask As cv.Mat
-    Public Sub New()
-        initParent()
-        palette = New Palette_Basics()
-        palette.Run()
-
-        basics = New FloodFill_Basics()
-        task.desc = "Create a floodfill image that is only 8-bit for use with a palette"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        basics.src = src
-        basics.Run()
-
-        dst2.SetTo(0)
-        For i = 0 To basics.masks.Count - 1
-            Dim maskIndex = basics.maskSizes.ElementAt(i).Value
-            dst2.SetTo(cv.Scalar.All((i + 1) Mod 255), basics.masks(maskIndex))
-        Next
-
-        allRegionMask = If(dst2.Channels = 1, dst2, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255))
-
-        Dim incr = If(basics.masks.Count < 10, 25, 255 / basics.masks.Count)  'reduces flicker of slightly different colors
-        palette.src = dst2 * cv.Scalar.All(incr) ' spread the colors 
-        palette.Run()
-        dst1.SetTo(0)
-        palette.dst1.CopyTo(dst1, allRegionMask)
-
-        Static minSizeSlider = findSlider("FloodFill Minimum Size")
-        label2 = CStr(basics.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
-        If standalone Or task.intermediateReview = caller Then dst2 = palette.gradMap.gradientColorMap.Resize(src.Size())
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class FloodFill_Old
-    Inherits VBparent
     Public maskSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
@@ -186,6 +92,50 @@ Public Class FloodFill_Old
 
         lastFrame = dst1.Clone
         label2 = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FloodFill_Palette
+    Inherits VBparent
+    Public basics As FloodFill_Basics
+    Public palette As Palette_Basics
+    Public allRegionMask As cv.Mat
+    Public Sub New()
+        initParent()
+        palette = New Palette_Basics()
+        palette.Run()
+
+        basics = New FloodFill_Basics()
+        task.desc = "Create a floodfill image that is only 8-bit for use with a palette"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        basics.src = src
+        basics.Run()
+
+        dst2.SetTo(0)
+        For i = 0 To basics.masks.Count - 1
+            Dim maskIndex = basics.maskSizes.ElementAt(i).Value
+            dst2.SetTo(cv.Scalar.All((i + 1) Mod 255), basics.masks(maskIndex))
+        Next
+
+        allRegionMask = If(dst2.Channels = 1, dst2, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255))
+
+        Dim incr = If(basics.masks.Count < 10, 25, 255 / basics.masks.Count)  'reduces flicker of slightly different colors
+        palette.src = dst2 * cv.Scalar.All(incr) ' spread the colors 
+        palette.Run()
+        dst1.SetTo(0)
+        palette.dst1.CopyTo(dst1, allRegionMask)
+
+        Static minSizeSlider = findSlider("FloodFill Minimum Size")
+        label2 = CStr(basics.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
+        If standalone Or task.intermediateReview = caller Then dst2 = palette.gradMap.gradientColorMap.Resize(src.Size())
     End Sub
 End Class
 
@@ -369,7 +319,7 @@ Public Class FloodFill_RelativeRange
         fBasics.src = src
         fBasics.Run()
         dst1 = src
-        dst2 = fBasics.dst2
+        dst2 = fBasics.dst1
     End Sub
 End Class
 
@@ -400,7 +350,7 @@ Public Class Floodfill_Objects
         If task.intermediateReview = caller Then task.intermediateObject = Me
         basics.src = src
         basics.Run()
-        dst1 = basics.dst2
+        dst1 = basics.dst1
 
         Static loDiffSlider = findSlider("FloodFill LoDiff")
         Static hiDiffSlider = findSlider("FloodFill HiDiff")

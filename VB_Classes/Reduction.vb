@@ -65,7 +65,7 @@ Public Class Reduction_Floodfill
         flood.src = reduction.dst1
         flood.Run()
 
-        dst1 = flood.dst2
+        dst1 = flood.dst1
         label1 = flood.label2
     End Sub
 End Class

@@ -1407,7 +1407,7 @@ Public Class Histogram_ViewObjects
 
         flood.src = dst1
         flood.Run()
-        dst1 = flood.dst1.Clone.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = flood.dst1.Clone
 
         Dim offset = If(src.Width = 1280, 10, 16)
         Dim w = dst1.Width
@@ -1426,7 +1426,7 @@ Public Class Histogram_ViewObjects
 
         flood.src = dst2
         flood.Run()
-        dst2 = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = flood.dst1
 
         top2D.Clear()
         For Each r In flood.rects

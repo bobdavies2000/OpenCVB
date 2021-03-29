@@ -213,7 +213,7 @@ Public Class EMax_Centroids
 
         flood.src = emaxCPP.dst2.Clone
         flood.Run()
-        dst1 = flood.dst2
+        dst1 = flood.dst1
 
         Static lastCentroids As New List(Of cv.Point2f)
         For i = 0 To flood.centroids.Count - 1

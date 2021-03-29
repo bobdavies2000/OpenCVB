@@ -273,11 +273,6 @@ Public Class KNN_Emax
     Dim emax As EMax_Centroids
     Public Sub New()
         initParent()
-        If standalone Then
-            emax = New EMax_Centroids()
-            emax.Run() ' set the first generation of points.
-        End If
-
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 3)
             check.Box(0).Text = "Map queries to training data 1:1 (Off means many:1)"
@@ -297,7 +292,11 @@ Public Class KNN_Emax
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        If standalone or task.intermediateReview = caller Then
+        If standalone And task.frameCount = 0 Then
+            emax = New EMax_Centroids()
+            emax.Run() ' set the first generation of points.
+        End If
+        If standalone Or task.intermediateReview = caller Then
             knn.basics.knnQT.trainingPoints = New List(Of cv.Point2f)(emax.flood.centroids)
             emax.Run()
             knn.basics.knnQT.queryPoints = New List(Of cv.Point2f)(emax.flood.centroids)
