@@ -1,61 +1,14 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports CS_Classes
-Public Class Line_Test
-    Inherits VBparent
-    Dim lines As Line_Basics
-    Dim ld As cv.XImgProc.FastLineDetector
-    Public sortlines As New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
-    Public Sub New()
-        initParent()
-        lines = New Line_Basics
-        ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
-        label1 = "Latest stable lines determined by IMU"
-        label2 = "Lines found in the stable lines"
-        task.desc = "Use the line detector on the Line_Basics lines"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        lines.src = src
-        lines.Run()
-        dst1 = lines.dst2
-
-        Dim ldLines = ld.Detect(lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        sortlines.Clear()
-
-        dst2.SetTo(0)
-        For i = 0 To ldLines.Count - 1 Step 2
-            Dim v1 = ldLines.ElementAt(i)
-            Dim v2 = If(i = ldLines.Count - 1, v1, ldLines.ElementAt(i + 1))
-            Dim v = If(v1(0) < v2(0), v1, v2)
-            If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And
-                   v(2) >= 0 And v(2) <= dst1.Cols And v(3) >= 0 And v(3) <= dst1.Rows Then
-                Dim pt1 = New cv.Point(CInt(v(0)), CInt(v(1)))
-                Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
-                Dim pixelLen = pt1.DistanceTo(pt2)
-                If pixelLen > lines.pixelThreshold Then
-                    dst2.Line(pt1, pt2, cv.Scalar.Yellow, lines.thickness, cv.LineTypes.AntiAlias)
-                    sortlines.Add(pixelLen, New cv.Vec4f(pt1.X, pt1.Y, pt2.X, pt2.Y))
-                End If
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Line_Basics
     Inherits VBparent
     Dim ld As cv.XImgProc.FastLineDetector
-    Dim stable As IMU_IscameraStable
+    Public stable As IMU_IscameraStable
     Public sortlines As New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
     Public thickness As Integer
     Public pixelThreshold As Integer
+    Public lenSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -69,8 +22,9 @@ Public Class Line_Basics
         stable = New IMU_IscameraStable
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
 
-        Dim lenSlider = findSlider("Threshold in camera motion in radians X100")
-        lenSlider.Value = 1
+        Dim radianSlider = findSlider("Threshold in camera motion in radians X100")
+        radianSlider.Value = 1
+        lenSlider = findSlider("Line length threshold in pixels")
 
         label1 = "Lines detected in the current frame"
         label2 = "Lines detected since camera motion threshold"
@@ -83,8 +37,7 @@ Public Class Line_Basics
         Dim lines = ld.Detect(src)
         Static thicknessSlider = findSlider("Line thickness")
         thickness = thicknessSlider.Value
-        Static pixelSlider = findSlider("Line length threshold in pixels")
-        pixelThreshold = pixelSlider.value
+        pixelThreshold = lenSlider.Value
 
         sortlines.Clear()
 
@@ -107,11 +60,77 @@ Public Class Line_Basics
         For Each line In sortlines
             Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
             Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-            dst2.Line(p1, p2, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+            dst2.Line(p1, p2, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
         Next
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class Line_LeftRightOverlay
+    Inherits VBparent
+    Dim lrLines As Line_LeftRightImages
+    Dim lines As Line_Basics
+    Public Sub New()
+        initParent()
+        lrLines = New Line_LeftRightImages
+
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 2)
+            radio.check(0).Text = "Show Left image lines and right image lines"
+            radio.check(1).Text = "Show Left image lines and RGB lines"
+            radio.check(0).Checked = True
+        End If
+
+        lines = New Line_Basics
+        lines.lenSlider.Value = 50
+        dst2.SetTo(cv.Scalar.White)
+        label1 = "Left image of Line_LeftRightImages"
+        label2 = "Left image lines in red, right in blue"
+        task.desc = "Plot the points found for stable lines in the left and right images"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        Static lrRadio = findRadio("Show Left image lines and right image lines")
+        Dim showLeftRight = lrRadio.checked
+
+        lines.src = src
+        lines.Run()
+
+        lrLines.src = src
+        lrLines.Run()
+        dst1 = lrLines.dst1
+        Static saveLRradio = lrRadio.checked
+        If lines.stable.cameraStable = False Or saveLRradio <> lrRadio.checked Then
+            dst2.SetTo(cv.Scalar.White)
+            saveLRradio = lrRadio.checked
+        End If
+
+        For Each line In lrLines.leftLines.sortlines
+            Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
+            Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
+            dst2.Line(p1, p2, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+        Next
+
+        If showLeftRight Then
+            For Each line In lrLines.rightLines.sortlines
+                Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
+                Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
+                dst2.Line(p1, p2, cv.Scalar.Blue, 1, cv.LineTypes.AntiAlias)
+            Next
+        Else
+            For Each line In lines.sortlines
+                Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
+                Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
+                dst2.Line(p1, p2, cv.Scalar.Blue, 1, cv.LineTypes.AntiAlias)
+            Next
+        End If
+    End Sub
+End Class
 
 
 
@@ -632,7 +651,7 @@ End Class
 
 
 
-Public Class Line_HighlightSlope
+Public Class Line_InterceptsUI
     Inherits VBparent
     Dim lines As Line_Intercepts
     Public Sub New()
@@ -1026,7 +1045,7 @@ Public Class Line_LeftRightImages
 
         leftLines.src = lrPalette.dst1
         leftLines.Run()
-        If standalone Then dst1 = lrPalette.dst1 Else dst1.SetTo(0)
+        If standalone Then dst1 = lrPalette.dst2 Else dst1.SetTo(0)
 
         For Each line In leftLines.sortlines
             Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
@@ -1114,67 +1133,6 @@ End Class
 
 
 
-Public Class Line_Points
-    Inherits VBparent
-    Dim lines As Line_LeftRightImages
-    Dim linesStable As Line_Basics
-    Public Sub New()
-        initParent()
-        lines = New Line_LeftRightImages
-
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 2)
-            radio.check(0).Text = "Show Left image lines and right image lines"
-            radio.check(1).Text = "Show Left image lines and RGB lines"
-            radio.check(0).Checked = True
-        End If
-
-        linesStable = New Line_Basics
-        label1 = "Left image of Line_LeftRightImages"
-        label2 = "Left image lines in red, right in blue"
-        task.desc = "Plot the points found for stable lines in the left and right images"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        Static lrRadio = findRadio("Show Left image lines and right image lines")
-        Dim showLeftRight = lrRadio.checked
-
-
-        linesStable.src = src
-        linesStable.Run()
-
-        lines.src = src
-        lines.Run()
-        dst1 = lines.dst1
-        dst2.SetTo(cv.Scalar.White)
-
-        For Each line In lines.leftLines.sortlines
-            Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
-            Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-            dst2.Line(p1, p2, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
-        Next
-
-        If showLeftRight Then
-            For Each line In lines.rightLines.sortlines
-                Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
-                Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-                dst2.Line(p1, p2, cv.Scalar.Blue, 1, cv.LineTypes.AntiAlias)
-            Next
-        Else
-            For Each line In linesStable.sortlines
-                Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
-                Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-                dst2.Line(p1, p2, cv.Scalar.Blue, 1, cv.LineTypes.AntiAlias)
-            Next
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Line_NearestPoint
     Inherits VBparent
@@ -1249,95 +1207,31 @@ End Class
 
 
 
-'Public Class Line_Parallel
-'    Inherits VBparent
-'    Dim lines As Line_Basics
-'    Dim near As Line_NearestPoint
-'    Public pLines As New List(Of cv.Vec2s)
-'    Public slope As New SortedList(Of Single, cv.Vec4f)(New compareAllowIdenticalSingleInverted)
-'    Public Sub New()
-'        initParent()
-'        near = New Line_NearestPoint
-'        lines = New Line_Basics
-'        task.desc = "Identify parallel lines"
-'    End Sub
-'    Public Sub Run()
-'        If task.intermediateReview = caller Then task.intermediateObject = Me
 
-'        lines.src = src
-'        lines.Run()
-'        dst1 = lines.dst1.Clone
 
-'        Dim m As Single
-'        slope.Clear()
-'        pLines.Clear()
+Public Class Line_SideView
+    Inherits VBparent
+    Dim lines As Line_Basics
+    Dim sideView As Histogram_SideView2D
+    Public Sub New()
+        initParent()
+        sideView = New Histogram_SideView2D
+        lines = New Line_Basics
+        label1 = "Side view of the lines detected in the RGB image"
+        label2 = "Lines found in the RGB image view"
+        task.desc = "Line in image are projected into the depth image"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
 
-'        For Each line In lines.sortlines
-'            Dim p1 = New cv.Point2f(line.Value.Item0, line.Value.Item1)
-'            Dim p2 = New cv.Point2f(line.Value.Item2, line.Value.Item3)
-'            If p1.X = p2.X Then
-'                m = 10000 ' impossibly high for a standard camera image.
-'            Else
-'                m = (p1.Y - p2.Y) / (p1.X - p2.X)
-'            End If
-'            slope.Add(m, line.Value)
-'        Next
+        lines.src = src
+        lines.Run()
+        dst2 = lines.dst2
 
-'        dst2.SetTo(0)
-
-'        For i = 0 To slope.Count - 1
-'            Dim aline = slope.ElementAt(i)
-'            For j = i + 1 To slope.Count - 1
-'                Dim bline = slope.ElementAt(j)
-'                If CInt(aline.Key * 100) = CInt(bline.Key * 100) Then
-'                    Dim a1 = New cv.Point2f(aline.Value.Item0, aline.Value.Item1)
-'                    Dim a2 = New cv.Point2f(aline.Value.Item2, aline.Value.Item3)
-'                    Dim b1 = New cv.Point2f(bline.Value.Item0, bline.Value.Item1)
-'                    Dim b2 = New cv.Point2f(bline.Value.Item2, bline.Value.Item3)
-'                    Dim d1 = Math.Min(near.findDistance(a1, a2, b1), near.findDistance(a1, a2, b2))
-'                    Dim d2 = Math.Min(near.findDistance(b1, b2, a1), near.findDistance(b1, b2, a2))
-'                    Dim width = Math.Max(CInt(Math.Abs(d1 - d2)), 4)
-'                    If width < 10 Then
-'                        pLines.Add(New cv.Vec2s(i, j))
-'                        Dim minX = Math.Min(Math.Min(a1.X, a2.X), Math.Min(b1.X, b2.X))
-'                        Dim minY = Math.Min(Math.Min(a1.Y, a1.Y), Math.Min(b1.Y, b2.Y))
-'                        Dim maxX = Math.Max(Math.Max(a1.X, a2.X), Math.Max(b1.X, b2.X))
-'                        Dim maxY = Math.Max(Math.Max(a1.Y, a1.Y), Math.Max(b1.Y, b2.Y))
-
-'                        dst2.Line(New cv.Point2f(minX, minY), New cv.Point2f(maxX, maxY), cv.Scalar.White, width, cv.LineTypes.AntiAlias)
-'                    End If
-'                End If
-'            Next
-'        Next
-
-'        'For i = 0 To slope.Count - 1
-'        '    Dim aline = slope.ElementAt(i).Value
-'        '    Dim a1 = New cv.Point2f(aline.Item0, aline.Item1)
-'        '    Dim a2 = New cv.Point2f(aline.Item2, aline.Item3)
-'        '    For j = i + 1 To slope.Count - 1
-'        '        If pLines.Contains(New cv.Vec2s(j, i)) Then Continue For
-'        '        Dim bline = slope.ElementAt(j).Value
-'        '        Dim b1 = New cv.Point2f(bline.Item0, bline.Item1)
-'        '        Dim b2 = New cv.Point2f(bline.Item2, bline.Item3)
-'        '        Dim d1 =Math.Min(near.findDistance(a1, a2, b1), near.findDistance(a1, a2, b2))
-'        '        Dim d2 = Math.Min(near.findDistance(b1, b2, a1), near.findDistance(b1, b2, a2))
-
-'        '        If Math.Abs(d1 - d2) < 1 Then pLines.Add(New cv.Vec2s(i, j))
-'        '    Next
-'        '    Exit For
-'        'Next
-
-'        Console.WriteLine(CStr(pLines.Count))
-
-'        'For Each vec In pLines
-'        '    Dim v1 = slope.ElementAt(vec.Item0)
-'        '    Dim v2 = slope.ElementAt(vec.Item1)
-'        '    Dim p1 = New cv.Point2f(v1.Value.Item0, v1.Value.Item1)
-'        '    Dim p2 = New cv.Point2f(v1.Value.Item2, v1.Value.Item3)
-'        '    dst2.Line(p1, p2, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-'        '    p1 = New cv.Point2f(v2.Value.Item0, v2.Value.Item1)
-'        '    p2 = New cv.Point2f(v2.Value.Item2, v2.Value.Item3)
-'        '    dst2.Line(p1, p2, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-'        'Next
-'    End Sub
-'End Class
+        Dim mask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        sideView.src = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
+        task.pointCloud.CopyTo(sideView.src, mask)
+        sideView.Run()
+        dst1 = sideView.dst1
+    End Sub
+End Class
