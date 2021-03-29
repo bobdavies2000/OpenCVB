@@ -38,6 +38,8 @@ Public Class lineFLD_Basics
             check.Box(0).Checked = True
         End If
         mergeCheckBox = findCheckBox("FLD - incremental merge")
+        label1 = "Lines detected in the last frame"
+        label2 = "If camera motion, image is reset"
         task.desc = "A Fast Line Detector"
     End Sub
     Public Sub Run()

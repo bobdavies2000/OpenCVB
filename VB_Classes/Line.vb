@@ -270,8 +270,10 @@ Public Class Line_ConfirmedDepth
     Public z1 As New List(Of cv.Point3f) ' the point cloud values corresponding to pt1 and pt2
     Public z2 As New List(Of cv.Point3f)
     Public cloudInput As cv.Mat
+    Public stable As IMU_IscameraStable
     Public Sub New()
         initParent()
+        stable = New IMU_IscameraStable
         lines = New Line_Basics
         label1 = "Lines defined in RGB"
         label2 = "Lines in RGB confirmed in the point cloud"
@@ -279,6 +281,8 @@ Public Class Line_ConfirmedDepth
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
+        stable.Run()
+
         Static thickSlider = findSlider("Line thickness")
         Dim thickness = thickSlider.value
         lines.src = src
@@ -289,7 +293,7 @@ Public Class Line_ConfirmedDepth
         Dim lineList = New List(Of cv.Rect)
         If cloudInput Is Nothing Then cloudInput = task.pointCloud
         Dim split = cloudInput.Split()
-        dst2.SetTo(0)
+        If stable.cameraStable = False Then dst2.SetTo(0)
         pt1.Clear()
         pt2.Clear()
         z1.Clear()

@@ -598,9 +598,8 @@ Public Class IMU_IscameraStable
         roll = task.IMU_AngularVelocity.Z
 
         Static thresholdSlider = findSlider("Threshold in camera motion in radians X100")
-        Dim threshold = thresholdSlider.Value / 100
         Dim totalRadians = Math.Abs(pitch) + Math.Abs(yaw) + Math.Abs(roll)
-        cameraStable = If(totalRadians > threshold, False, True)
+        cameraStable = If(totalRadians > thresholdSlider.Value / 100, False, True)
         If standalone Or task.intermediateReview = caller Then
             If flow Is Nothing Then flow = New Font_FlowText()
             flow.msgs.Add(" Pitch = " + Format(pitch, "0.00") + " radians" +
