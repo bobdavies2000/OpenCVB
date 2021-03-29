@@ -1074,7 +1074,7 @@ Public Class Depth_Noise
         If task.intermediateReview = caller Then task.intermediateObject = Me
         noiseRemover.Run()
         dst1 = noiseRemover.dst1
-        dst2 = noiseRemover.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = noiseRemover.dst2
         dst1.SetTo(0, dst2)
     End Sub
 End Class
