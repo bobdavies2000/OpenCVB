@@ -49,11 +49,11 @@ End Class
 
 Public Class Reduction_Floodfill
     Inherits VBparent
-    Public flood As FloodFill_Image
+    Public flood As FloodFill_Basics
     Public reduction As Reduction_Basics
     Public Sub New()
         initParent()
-        flood = New FloodFill_Image()
+        flood = New FloodFill_Basics()
         reduction = New Reduction_Basics()
         task.desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
     End Sub

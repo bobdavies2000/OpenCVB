@@ -1371,7 +1371,7 @@ End Class
 Public Class Histogram_ViewObjects
     Inherits VBparent
     Public histC As Histogram_ViewConcentrationsTopX
-    Dim flood As FloodFill_Image
+    Dim flood As FloodFill_Basics
     Dim minSizeSlider As Windows.Forms.TrackBar
     Dim loDiffSlider As Windows.Forms.TrackBar
     Dim hiDiffSlider As Windows.Forms.TrackBar
@@ -1381,7 +1381,7 @@ Public Class Histogram_ViewObjects
     Public Sub New()
         initParent()
 
-        flood = New FloodFill_Image
+        flood = New FloodFill_Basics
         histC = New Histogram_ViewConcentrationsTopX
 
         minSizeSlider = findSlider("FloodFill Minimum Size")

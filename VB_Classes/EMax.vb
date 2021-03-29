@@ -189,11 +189,11 @@ End Class
 Public Class EMax_Centroids
     Inherits VBparent
     Public emaxCPP As EMax_CPP
-    Public flood As FloodFill_Image
+    Public flood As FloodFill_Basics
     Public Sub New()
         initParent()
 
-        flood = New FloodFill_Image()
+        flood = New FloodFill_Basics()
 
         emaxCPP = New EMax_CPP()
         Dim lowDiffslider = findSlider("FloodFill LoDiff")

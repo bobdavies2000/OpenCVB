@@ -296,11 +296,11 @@ Public Class Fuzzy_PointTracker
     Inherits VBparent
     Dim fuzzy As Fuzzy_Basics
     Dim pTrack As KNN_PointTracker
-    Dim flood As FloodFill_Basics
+    Dim flood As FloodFill_Palette
     Public Sub New()
         initParent()
         fuzzy = New Fuzzy_Basics()
-        flood = New FloodFill_Basics()
+        flood = New FloodFill_Palette()
         pTrack = New KNN_PointTracker()
         fuzzy.sliders.Visible = False
 

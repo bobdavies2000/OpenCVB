@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
-Public Class FloodFill_Image
+Public Class FloodFill_Basics
     Inherits VBparent
     Public basics As FloodFill_Old
 
@@ -50,9 +50,9 @@ End Class
 
 
 
-Public Class FloodFill_Basics
+Public Class FloodFill_Palette
     Inherits VBparent
-    Public basics As FloodFill_Image
+    Public basics As FloodFill_Basics
     Public palette As Palette_Basics
     Public allRegionMask As cv.Mat
     Public Sub New()
@@ -60,7 +60,7 @@ Public Class FloodFill_Basics
         palette = New Palette_Basics()
         palette.Run()
 
-        basics = New FloodFill_Image()
+        basics = New FloodFill_Basics()
         task.desc = "Create a floodfill image that is only 8-bit for use with a palette"
     End Sub
     Public Sub Run()
@@ -103,7 +103,6 @@ Public Class FloodFill_Old
     Public floodPoints As New List(Of cv.Point)
     Public rejectedCentroids As New List(Of cv.Point2f)
     Public rejectedRects As New List(Of cv.Rect)
-
     Public initialMask As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public Sub New()
@@ -115,7 +114,6 @@ Public Class FloodFill_Old
             sliders.setupTrackBar(2, "FloodFill HiDiff", 0, 255, 25)
             sliders.setupTrackBar(3, "Step Size", 1, src.Cols / 2, 10)
         End If
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         label1 = "Input image to floodfill"
         task.desc = "Use floodfill to build image segments in a grayscale image."
@@ -148,7 +146,6 @@ Public Class FloodFill_Old
         Dim ignoreMasks = initialMask.Clone()
 
         Dim gray = input.Clone()
-        dst1.SetTo(0)
         dst2.SetTo(0)
         For y = 0 To gray.Height - 1 Step stepSize
             For x = 0 To gray.Width - 1 Step stepSize
@@ -159,13 +156,14 @@ Public Class FloodFill_Old
                     If count > minFloodSize And count <> gray.Total Then
                         floodPoints.Add(pt)
                         masks.Add(maskPlus(maskRect).Clone().SetTo(0, ignoreMasks))
-                        masks(masks.Count - 1).SetTo(0, initialMask) ' The initial mask is what should not be part of any mask.
-                        maskSizes.Add(count, masks.Count - 1)
+                        Dim i = masks.Count - 1
+                        masks(i).SetTo(0, initialMask) ' The initial mask is what should not be part of any mask.
+                        maskSizes.Add(count, i)
                         rects.Add(rect)
                         Dim m = cv.Cv2.Moments(maskPlus(rect), True)
                         Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
                         centroids.Add(centroid)
-                        dst1.SetTo(255, masks(masks.Count - 1))
+                        dst2.SetTo(task.scalarColors(i Mod 255), masks(i))
                     Else
                         rejectedRects.Add(rect)
                         rejectedCentroids.Add(New cv.Point2f(rect.X + rect.Width / 2, rect.Y + rect.Height / 2))
@@ -176,6 +174,17 @@ Public Class FloodFill_Old
             Next
         Next
 
+        Static lastFrame = New cv.Mat(dst1.Size, cv.MatType.CV_8UC3, 0)
+        dst1.SetTo(0)
+        Dim black As New cv.Vec3b(0, 0, 0)
+        For i = 0 To masks.Count - 1
+            Dim minVal As Double, maxVal As Double, minLoc As cv.Point, maxLoc As cv.Point
+            task.depth32f.MinMaxLoc(minVal, maxVal, minLoc, maxLoc, masks(i))
+            Dim color = lastFrame.Get(Of cv.Vec3b)(maxLoc.Y, maxLoc.X)
+            If color = black Then dst1.SetTo(task.scalarColors(i Mod 255), masks(i)) Else dst1.SetTo(color, masks(i))
+        Next
+
+        lastFrame = dst1.Clone
         label2 = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
 End Class
@@ -335,10 +344,10 @@ End Class
 
 Public Class FloodFill_RelativeRange
     Inherits VBparent
-    Public fBasics As FloodFill_Image
+    Public fBasics As FloodFill_Basics
     Public Sub New()
         initParent()
-        fBasics = New FloodFill_Image()
+        fBasics = New FloodFill_Basics()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 3)
             check.Box(0).Text = "Use Fixed range - when off, it means use relative range "
@@ -372,7 +381,7 @@ End Class
 
 Public Class Floodfill_Objects
     Inherits VBparent
-    Dim basics As FloodFill_Image
+    Dim basics As FloodFill_Basics
     Dim minSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
@@ -381,7 +390,7 @@ Public Class Floodfill_Objects
             sliders.Setup(caller, 1)
             sliders.setupTrackBar(0, "Desired number of objects", 1, 100, 30)
         End If
-        basics = New FloodFill_Image()
+        basics = New FloodFill_Basics()
         minSlider = findSlider("FloodFill Minimum Size")
         minSlider.Value = (src.Width Mod 100) * 25
 
@@ -454,10 +463,10 @@ Public Class Floodfill_Identifiers
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
     Public minFloodSize As Integer
-    Public basics As FloodFill_Image
+    Public basics As FloodFill_Basics
     Public Sub New()
         initParent()
-        basics = New FloodFill_Image()
+        basics = New FloodFill_Basics()
         label1 = "Input image to floodfill"
         task.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
     End Sub
@@ -480,7 +489,6 @@ Public Class Floodfill_Identifiers
         rects.Clear()
         centroids.Clear()
         masks.Clear()
-        dst2.SetTo(0)
         cv.Cv2.BitwiseNot(src, src)
         For y = 0 To src.Height - 1 Step stepSize
             For x = 0 To src.Width - 1 Step stepSize
@@ -501,8 +509,10 @@ Public Class Floodfill_Identifiers
 
         label2 = CStr(rects.Count) + " regions > " + CStr(minFloodSize) + " pixels"
 
+        dst2.SetTo(0)
         For i = 0 To masks.Count - 1
             Dim rect = rects(i)
+            If rect.Width = dst2.Width And rect.Height = dst2.Height Then Continue For
             dst2(rect).SetTo(task.scalarColors(i Mod 255), masks(i))
         Next
     End Sub
@@ -550,12 +560,12 @@ End Class
 Public Class FloodFill_PointTracker
     Inherits VBparent
     Dim pTrack As KNN_PointTracker
-    Dim flood As FloodFill_Basics
+    Dim flood As FloodFill_Palette
     Public Sub New()
         initParent()
 
         pTrack = New KNN_PointTracker()
-        flood = New FloodFill_Basics()
+        flood = New FloodFill_Palette()
 
         label1 = "Point tracker output"
         task.desc = "Test the FloodFill output as input into the point tracker"
@@ -586,7 +596,7 @@ End Class
 
 Public Class FloodFill_Top16
     Inherits VBparent
-    Public flood As FloodFill_Image
+    Public flood As FloodFill_Basics
 
     Public thumbNails As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
@@ -597,7 +607,7 @@ Public Class FloodFill_Top16
             check.Box(0).Text = "Show (up to) the first 16 largest objects in view (in order of size)"
         End If
 
-        flood = New FloodFill_Image()
+        flood = New FloodFill_Basics()
 
         label1 = "Input image to floodfill"
         task.desc = "Use floodfill to build image segments in a grayscale image."

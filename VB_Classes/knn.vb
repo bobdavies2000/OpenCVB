@@ -495,12 +495,12 @@ End Class
 Public Class KNN_DepthClusters
     Inherits VBparent
     Public blobs As Blob_DepthClusters
-    Public flood As FloodFill_Basics
+    Public flood As FloodFill_Palette
     Public pTrack As KNN_PointTracker
     Public Sub New()
         initParent()
 
-        flood = New FloodFill_Basics()
+        flood = New FloodFill_Palette()
         blobs = New Blob_DepthClusters()
         pTrack = New KNN_PointTracker()
 
@@ -575,7 +575,7 @@ End Class
 Public Class KNN_StabilizeRegions
     Inherits VBparent
     Public knn As KNN_DepthClusters
-    Public flood As FloodFill_Basics
+    Public flood As FloodFill_Palette
     Dim lastinput As New cv.Mat
     Public Sub New()
         initParent()
@@ -583,7 +583,7 @@ Public Class KNN_StabilizeRegions
         Dim drawCheckbox = findCheckBox("Draw rectangle and centroid for each mask")
         drawCheckbox.Checked = False
 
-        flood = New FloodFill_Basics()
+        flood = New FloodFill_Palette()
 
         label1 = "Output of KNN_DepthClusters"
         label2 = "KNN_DepthClusters output plus unstable regions"

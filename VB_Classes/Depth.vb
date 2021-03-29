@@ -711,7 +711,7 @@ Public Class Depth_LocalMinMax_Kalman_MT
             Dim ptmax = New cv.Point2f(kalman.kOutput(i * 4 + 2) + roi.X, kalman.kOutput(i * 4 + 3) + roi.Y)
             ptmin = validatePoint2f(ptmin)
             ptmax = validatePoint2f(ptmax)
-            Dim test = subdiv.Insert(ptmin)
+            subdiv.Insert(ptmin)
             cv.Cv2.Circle(dst1, ptmin, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
             cv.Cv2.Circle(dst1, ptmax, radius, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
         Next
@@ -1033,10 +1033,10 @@ End Class
 Public Class Depth_NoiseRemovalMask
     Inherits VBparent
     Public noise As Depth_TooClose
-    Public flood As FloodFill_Basics
+    Public flood As FloodFill_Palette
     Public Sub New()
         initParent()
-        flood = New FloodFill_Basics()
+        flood = New FloodFill_Palette()
         noise = New Depth_TooClose()
 
         label1 = "Mask of all inrange depth"
