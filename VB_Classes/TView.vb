@@ -186,8 +186,8 @@ Public Class TView_Rectangles
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         tflood.Run()
-        dst1 = tflood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2 = tflood.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = tflood.dst1
+        dst2 = tflood.dst2
 
         mOverLap.inputRects = New List(Of cv.Rect)(tflood.floodTop.rects)
         mOverLap.Run()
