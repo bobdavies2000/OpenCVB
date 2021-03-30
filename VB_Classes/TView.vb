@@ -133,8 +133,8 @@ Public Class TView_Centroids
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         tflood.Run()
-        dst1 = tflood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2 = tflood.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = tflood.dst1
+        dst2 = tflood.dst2
 
         For i = 0 To tflood.floodTop.centroids.Count - 1
             dst1.Circle(tflood.floodTop.centroids(i), task.dotSize, cv.Scalar.Yellow, -1)
