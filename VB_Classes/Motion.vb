@@ -314,7 +314,7 @@ Public Class Motion_DepthShadow
         noiseRemover.Run()
 
         ' task.noDepthMask.convertto(dMin.src, cv.MatType.CV_32F)
-        dMin.src = noiseRemover.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dMin.src = noiseRemover.dst2
         dMin.Run()
         dst2 = dMin.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
