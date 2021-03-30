@@ -21,7 +21,7 @@ Public Class FloodFill_Basics
             sliders.setupTrackBar(3, "Step Size", 1, src.Cols / 2, 100)
         End If
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        label1 = "Input image to floodfill"
+        label2 = "Grayscale version"
         task.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
     Public Sub Run()
@@ -79,19 +79,8 @@ Public Class FloodFill_Basics
                 End If
             Next
         Next
-
-        Static lastFrame = New cv.Mat(dst1.Size, cv.MatType.CV_8UC3, 0)
-        dst1.SetTo(0)
-        Dim black As New cv.Vec3b(0, 0, 0)
-        For i = 0 To masks.Count - 1
-            Dim minVal As Double, maxVal As Double, minLoc As cv.Point, maxLoc As cv.Point
-            task.depth32f.MinMaxLoc(minVal, maxVal, minLoc, maxLoc, masks(i))
-            Dim color = lastFrame.Get(Of cv.Vec3b)(maxLoc.Y, maxLoc.X)
-            If color = black Then dst1.SetTo(task.scalarColors(i Mod 255), masks(i)) Else dst1.SetTo(color, masks(i))
-        Next
-
-        lastFrame = dst1.Clone
-        label2 = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
+        dst1 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        label1 = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
 End Class
 
