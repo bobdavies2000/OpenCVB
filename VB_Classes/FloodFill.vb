@@ -18,7 +18,7 @@ Public Class FloodFill_Basics
             sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2500)
             sliders.setupTrackBar(1, "FloodFill LoDiff", 0, 255, 25)
             sliders.setupTrackBar(2, "FloodFill HiDiff", 0, 255, 25)
-            sliders.setupTrackBar(3, "Step Size", 1, src.Cols / 2, 10)
+            sliders.setupTrackBar(3, "Step Size", 1, src.Cols / 2, 100)
         End If
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         label1 = "Input image to floodfill"
