@@ -1010,6 +1010,7 @@ Public Class OpenCVB
         picLabels(1) = "Depth:" + details
     End Sub
     Private Sub Exit_Click(sender As Object, e As EventArgs) Handles ExitCall.Click
+        fpsTimer.Enabled = False
         SaveSetting("OpenCVB", "TreeButton", "TreeButton", TreeButton.Checked)
         SaveSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", PixelViewerButton.Checked)
         stopCameraThread = True
@@ -1134,6 +1135,7 @@ Public Class OpenCVB
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algParms)
         SyncLock algorithmThreadLock ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
+            If fpsTimer.Enabled = False Then Exit Sub  ' if there was a task waiting and shutdown was requested, this will terminate the new task.
             AlgorithmTestCount += 1
             drawRect = New cv.Rect
             Dim algName = algorithmTaskHandle.Name

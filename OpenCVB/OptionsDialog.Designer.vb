@@ -143,7 +143,7 @@ Partial Class OptionsDialog
         'TestAllDuration
         '
         Me.TestAllDuration.Location = New System.Drawing.Point(16, 50)
-        Me.TestAllDuration.Minimum = New Decimal(New Integer() {2, 0, 0, 0})
+        Me.TestAllDuration.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.TestAllDuration.Name = "TestAllDuration"
         Me.TestAllDuration.ReadOnly = True
         Me.TestAllDuration.Size = New System.Drawing.Size(89, 26)
