@@ -327,7 +327,6 @@
     <Compile Include="Stabilizer.vb" />
     <Compile Include="Voronoi.vb" />
     <Compile Include="Voxels.vb" />
-    <Compile Include="VTK.vb" />
     <Compile Include="WarpModel.vb" />
     <Compile Include="WarpPerspective.vb" />
     <Compile Include="XFeatures.vb" />

@@ -315,9 +315,10 @@ Public Class OpenCVB
         Static myWhitePen As New Pen(Color.White)
         Static myBlackPen As New Pen(Color.Black)
 
-        If pic.Tag = 2 And firstTaskFramesReady <= 3 Then ' we want to see a few frames before starting the next in a test all run.
+        Static testAllPicMinimum = 10
+        If pic.Tag = 2 And firstTaskFramesReady <= testAllPicMinimum Then ' we want to see a few frames before starting the next in a test all run.
             firstTaskFramesReady += 1
-            If firstTaskFramesReady >= 3 Then
+            If firstTaskFramesReady >= testAllPicMinimum Then
                 If TestAllButton.Text <> "Test All" Then TestAllTimer.Enabled = True
             End If
         End If
@@ -1020,11 +1021,16 @@ Public Class OpenCVB
     End Sub
     Private Sub Exit_Click(sender As Object, e As EventArgs) Handles ExitCall.Click
         fpsTimer.Enabled = False
+        If logActive = False Then
+            TestAllTimer.Enabled = False
+        Else
+            If TestAllTimer.Enabled Then testAllButton_Click(sender, e) ' close the log file if needed.
+        End If
+
         SaveSetting("OpenCVB", "TreeButton", "TreeButton", TreeButton.Checked)
         SaveSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", PixelViewerButton.Checked)
         stopCameraThread = True
         saveAlgorithmName = ""
-        If TestAllTimer.Enabled Then testAllButton_Click(sender, e) ' close the log file if needed.
         textDesc = ""
         saveLayout()
         Application.DoEvents()
@@ -1102,10 +1108,12 @@ Public Class OpenCVB
 
         Dim currentAlgorithm = saveAlgorithmName
         saveAlgorithmName = AvailableAlgorithms.Text ' this tells the algorithmTask to terminate.
-        While frameCount > 0 ' AlgorithmTask sets it to 0 when terminated...
-            Thread.Sleep(100)
-            Console.WriteLine("waiting for the task thread...")
-        End While
+        If TestAllTimer.Enabled Then
+            While frameCount > 0 ' AlgorithmTask sets it to 0 when terminated...
+                Thread.Sleep(100)
+                Console.WriteLine("waiting for the task thread...")
+            End While
+        End If
         openFileForm.Hide()
         openFileForm.PlayButton.Text = "Start"
         openFileDialogName = ""
@@ -1144,51 +1152,50 @@ Public Class OpenCVB
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algParms)
         SyncLock algorithmThreadLock ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
-            If fpsTimer.Enabled = False Then Exit Sub  ' if there was a task waiting and shutdown was requested, this will terminate the new task.
             AlgorithmTestCount += 1
             drawRect = New cv.Rect
             Dim algName = algorithmTaskHandle.Name
-            If algName = "" Then Exit Sub
+            If algName <> "" Then
+                Dim myLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
+                Dim task = New VB_Classes.ActiveTask(parms, workingRes, algName, workingRes.Width, workingRes.Height, myLocation)
+                textDesc = task.desc
+                openFileInitialDirectory = task.openFileInitialDirectory
+                openFileDialogRequested = task.openFileDialogRequested
+                openFileinitialStartSetting = task.initialStartSetting
+                task.fileStarted = task.initialStartSetting
+                openFileStarted = task.initialStartSetting
+                openFileFilterIndex = task.openFileFilterIndex
+                openFileFilter = task.openFileFilter
+                openFileDialogName = task.openFileDialogName
+                openfileDialogTitle = task.openFileDialogTitle
+                intermediateReview = ""
 
-            Dim myLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
-            Dim task = New VB_Classes.ActiveTask(parms, workingRes, algName, workingRes.Width, workingRes.Height, myLocation)
-            textDesc = task.desc
-            openFileInitialDirectory = task.openFileInitialDirectory
-            openFileDialogRequested = task.openFileDialogRequested
-            openFileinitialStartSetting = task.initialStartSetting
-            task.fileStarted = task.initialStartSetting
-            openFileStarted = task.initialStartSetting
-            openFileFilterIndex = task.openFileFilterIndex
-            openFileFilter = task.openFileFilter
-            openFileDialogName = task.openFileDialogName
-            openfileDialogTitle = task.openFileDialogTitle
-            intermediateReview = ""
+                Console.WriteLine(vbCrLf + vbCrLf + vbTab + algName + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
+                Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + algName +
+                                  " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
+                Console.WriteLine(vbTab + "Active camera = " + camera.deviceName + " at resolution " + CStr(workingRes.Width) + "x" + CStr(workingRes.Height) + vbCrLf)
 
-            Console.WriteLine(vbCrLf + vbCrLf + vbTab + algName + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
-            Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + algName +
-                              " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
-            Console.WriteLine(vbTab + "Active camera = " + camera.deviceName + " at resolution " + CStr(workingRes.Width) + "x" + CStr(workingRes.Height) + vbCrLf)
+                If logActive And TestAllTimer.Enabled Then logAlgorithms.WriteLine(algName + "," + CStr(totalBytesOfMemoryUsed))
 
-            If logActive And TestAllTimer.Enabled Then logAlgorithms.WriteLine(algName + "," + CStr(totalBytesOfMemoryUsed))
+                ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.
+                If task.drawRect <> New cv.Rect Then
+                    drawRect = task.drawRect
+                    Dim ratio = task.color.Width / camPic(0).Width  ' relative size of algorithm size image to displayed image
+                    drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
+                End If
 
-            ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.
-            If task.drawRect <> New cv.Rect Then
-                drawRect = task.drawRect
-                Dim ratio = task.color.Width / camPic(0).Width  ' relative size of algorithm size image to displayed image
-                drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
+                ttTextData.Clear()
+
+                BothFirstAndLastReady = False
+                frameCount = 0 ' restart the count...
+
+                Run(task, algName)
+
+                task.Dispose()
+                If parms.testAllRunning Then Console.WriteLine(vbTab + "Ending " + algName)
             End If
-
-            ttTextData.Clear()
-
-            BothFirstAndLastReady = False
-            frameCount = 0 ' restart the count...
-
-            Run(task, algName)
-
-            task.Dispose()
-            frameCount = 0
-            If parms.testAllRunning Then Console.WriteLine(vbTab + "Ending " + algName)
         End SyncLock
+        frameCount = 0
     End Sub
     Private Sub Run(task As VB_Classes.ActiveTask, algName As String)
         While 1
@@ -1197,6 +1204,7 @@ Public Class OpenCVB
                 If saveAlgorithmName <> algName Or saveAlgorithmName = "" Then Exit Sub ' pause will stop the current algorithm as well.
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
                 SyncLock bufferLock
+                    If frameCount > 0 Then If stopCameraThread Then Exit Sub
                     If newImagesAvailable And pauseAlgorithmThread = False And camera.color.width > 0 Then
                         ' bring the data into the algorithm task.
                         task.color = camera.color.Resize(workingRes)
@@ -1223,7 +1231,7 @@ Public Class OpenCVB
                         task.CPU_FrameTime = camera.CPU_FrameTime
                         task.intermediateReview = intermediateReview
                         task.ratioImageToCampic = ratioImageToCampic
-                        task.pixelViewerOn = If(testallrunning, False, pixelViewerOn)
+                        task.pixelViewerOn = If(testAllRunning, False, pixelViewerOn)
 
                         If GrabRectangleData Then
                             GrabRectangleData = False
