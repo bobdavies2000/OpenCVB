@@ -21,7 +21,11 @@ Public Class OpenCVB
     Dim AlgorithmCount As Integer
     Dim AlgorithmTestCount As Integer
     Dim algorithmTaskHandle As Thread
+
     Dim saveAlgorithmName As String
+    Dim currentCameraName As String
+    Dim saveCameraName As String
+
     Dim border As Integer = 6
     Dim BothFirstAndLastReady As Boolean
     Dim camera As Object
@@ -67,8 +71,6 @@ Public Class OpenCVB
     Dim picLabels() = {"RGB", "Depth", "", ""}
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
     Public workingRes As cv.Size
-    Dim stopCameraThread As Boolean
-    Dim cameraThreadStopped As Boolean = True
     Dim textDesc As String = ""
     Dim totalBytesOfMemoryUsed As Integer
     Dim ttTextData As List(Of VB_Classes.TTtext)
@@ -520,24 +522,26 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub startCamera()
-        SyncLock bufferLock
-            stopCameraThread = True
-            SyncLock delegateLock
-                If camera IsNot Nothing Then camera.stopCamera()
-            End SyncLock
-        End SyncLock
-
         ' order is same as in optionsdialog enum
         camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraPyRS2, cameraOakD)
 
-        While cameraThreadStopped = False
+        ' Stop the current camera gracefully...
+        SyncLock bufferLock
+            saveCameraName = ""
+        End SyncLock
+
+        While currentCameraName <> ""
             Application.DoEvents()
         End While
+
+        camera.initialize(workingRes.Width, workingRes.Height, fps)
+        saveCameraName = camera.deviceName + " " + CStr(workingRes.Width)
+        If saveAlgorithmName IsNot Nothing Then StartAlgorithmTask() ' restart the algorithm...
         SyncLock cameraThreadLock
             cameraRefresh = False
             newImagesAvailable = False
             cameraTaskHandle = New Thread(AddressOf CameraTask)
-            cameraTaskHandle.Name = "CameraTask"
+            cameraTaskHandle.Name = camera.deviceName + " " + CStr(workingRes.Width)
             cameraTaskHandle.Priority = ThreadPriority.Highest
             cameraTaskHandle.Start()
         End SyncLock
@@ -547,12 +551,11 @@ Public Class OpenCVB
     Private Sub CameraTask()
         On Error Resume Next
         SyncLock cameraThreadLock
-            camera.initialize(workingRes.Width, workingRes.Height, fps)
-            stopCameraThread = False
-            cameraThreadStopped = False
-            While stopCameraThread = False
+            Dim currentCamera = camera
+            currentCameraName = currentCamera.deviceName + " " + CStr(workingRes.Width)
+            While currentCameraName = saveCameraName
                 SyncLock bufferLock
-                    camera.GetNextFrame()
+                    currentCamera.GetNextFrame()
                 End SyncLock
                 cameraRefresh = True ' trigger the paint 
                 newImagesAvailable = True ' trigger the algorithm task
@@ -565,7 +568,9 @@ Public Class OpenCVB
                 Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
                 totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
             End While
-            cameraThreadStopped = True
+            currentCamera.stopCamera()
+            currentCameraName = ""
+            saveAlgorithmName = "" ' restart algorithm when camera is ready...
         End SyncLock
     End Sub
     Private Sub TreeButton_Click(sender As Object, e As EventArgs) Handles TreeButton.Click
@@ -965,7 +970,10 @@ Public Class OpenCVB
         End SyncLock
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
-        If stopCameraThread = False And dropDownActive = False Then saveAlgorithmName = AvailableAlgorithms.Text
+        If saveCameraName = currentCameraName And dropDownActive = False Then
+            saveAlgorithmName = AvailableAlgorithms.Text
+            saveCameraName = camera.deviceName + " " + CStr(workingRes.Width)
+        End If
         Static lastAlgorithmFrame As Integer
         Static lastCameraFrame As Integer
         If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
@@ -1016,7 +1024,7 @@ Public Class OpenCVB
     Private Sub Exit_Click(sender As Object, e As EventArgs) Handles ExitCall.Click
         SaveSetting("OpenCVB", "TreeButton", "TreeButton", TreeButton.Checked)
         SaveSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", PixelViewerButton.Checked)
-        stopCameraThread = True
+        saveCameraName = ""
         saveAlgorithmName = ""
         textDesc = ""
         saveLayout()
@@ -1174,16 +1182,21 @@ Public Class OpenCVB
                 If saveAlgorithmName <> algName Then Exit Sub ' pause will stop the current algorithm as well.
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
                 SyncLock bufferLock
-                    If frameCount > 0 Then If stopCameraThread Then Exit Sub
+                    If frameCount > 0 And saveCameraName <> currentCameraName Then Exit Sub
                     If newImagesAvailable And pauseAlgorithmThread = False And camera.color.width > 0 Then
                         ' bring the data into the algorithm task.
                         task.color = camera.color.Resize(workingRes)
-
                         task.RGBDepth = camera.RGBDepth.Resize(workingRes)
                         task.leftView = camera.leftView.Resize(workingRes)
                         task.rightView = camera.rightView.Resize(workingRes)
-                        task.pointCloud = camera.PointCloud.clone.resize(workingRes)
-                        camera.depth16.convertto(task.depth32f, cv.MatType.CV_32F)
+
+                        If camera.depth16.width <> task.color.Width Then
+                            task.depth32f = New cv.Mat(task.color.Size, cv.MatType.CV_32F, 0)
+                            task.pointCloud = New cv.Mat(task.color.Size, cv.MatType.CV_32FC3, 0)
+                        Else
+                            camera.depth16.convertto(task.depth32f, cv.MatType.CV_32F)
+                            task.pointCloud = camera.PointCloud.clone.resize(workingRes)
+                        End If
 
                         task.transformationMatrix = camera.transformationMatrix
                         task.IMU_TimeStamp = camera.IMU_TimeStamp
@@ -1230,7 +1243,16 @@ Public Class OpenCVB
                 End SyncLock
             End While
 
-            task.RunAlgorithm()
+            Dim allInSync As Boolean = True
+            ' when transitioning between cameras, it can happen that all the images are not the same size...
+            For i = 0 To 5
+                Dim mat = Choose(i + 1, task.color, task.RGBDepth, task.leftView, task.rightView, task.depth32f, task.pointCloud)
+                If mat.width <> workingRes.Width Or mat.height <> workingRes.Height Then
+                    allInSync = False
+                    Exit For
+                End If
+            Next
+            If allInSync Then task.RunAlgorithm()
 
             If task.mousePointUpdated Then mousePoint = task.mousePoint ' in case the algorithm has changed the mouse location...
             If task.drawRectUpdated Then drawRect = task.drawRect
