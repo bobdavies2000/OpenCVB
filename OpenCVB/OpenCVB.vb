@@ -86,7 +86,6 @@ Public Class OpenCVB
     Dim pauseAlgorithmThread As Boolean
     Private Delegate Sub delegateEvent()
     Dim logAlgorithms As StreamWriter
-    Dim logActive As Boolean = False ' turn this on/off to collect data on algorithms and memory use.
     Public callTrace As New List(Of String)
     Const MAX_RECENT = 25
     Dim recentList As New List(Of String)
@@ -101,7 +100,7 @@ Public Class OpenCVB
     Dim stopTest As Bitmap
     Dim testAll As Bitmap
     Dim testAllRunning As Boolean
-    Dim firstTaskFramesReady As Integer
+    Dim dropDownActive As Boolean
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -315,14 +314,6 @@ Public Class OpenCVB
         Static myWhitePen As New Pen(Color.White)
         Static myBlackPen As New Pen(Color.Black)
 
-        Static testAllPicMinimum = 10
-        If pic.Tag = 2 And firstTaskFramesReady <= testAllPicMinimum Then ' we want to see a few frames before starting the next in a test all run.
-            firstTaskFramesReady += 1
-            If firstTaskFramesReady >= testAllPicMinimum Then
-                If TestAllButton.Text <> "Test All" Then TestAllTimer.Enabled = True
-            End If
-        End If
-
         If pixelViewerOn And (mousePicTag = pic.Tag Or (pixelViewTag = 3 And pic.Tag = 2)) Then
             Dim pic3Offset As Integer
             If pixelViewTag = 3 Then pic3Offset = imgResult.Width / 2
@@ -493,6 +484,7 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
+        If frameCount = 0 Then Exit Sub ' we have to see some output from the algorithm before moving on...
         If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Then
             ' Testing overnight with only 1280 resolution.  Switching between 640 and 1280 seems to cause camera interface to fail after a while.
             'If optionsForm.resolution640.Enabled And optionsForm.resolution1280.Checked Then
@@ -937,9 +929,14 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
-        saveAlgorithmName = ""
         Dim saveRes = optionsForm.resolution1280.Checked
         optionsForm.resolution1280.Checked = True
+        If TestAllButton.Text = "Test All" Then
+            TestAllButton.Image = stopTest
+        Else
+            TestAllButton.Image = testAll
+        End If
+
         If saveRes = False Then
             saveLayout()
             LineUpCamPics(False)
@@ -948,16 +945,12 @@ Public Class OpenCVB
 
         If TestAllButton.Text = "Test All" Then
             TestAllButton.Text = "Stop Test"
-            TestAllButton.Image = stopTest
-            If logActive Then logAlgorithms = New StreamWriter("C:\Temp\logAlgorithms.csv")
             TestAllTimer_Tick(sender, e)
             TestAllTimer.Enabled = True
             If TreeViewDialog IsNot Nothing Then TreeViewDialog.Timer1.Enabled = True
         Else
             TestAllTimer.Enabled = False
             TestAllButton.Text = "Test All"
-            If logActive Then logAlgorithms.Close()
-            TestAllButton.Image = testAll
             StartAlgorithmTask()
         End If
     End Sub
@@ -972,6 +965,7 @@ Public Class OpenCVB
         End SyncLock
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
+        If stopCameraThread = False And dropDownActive = False Then saveAlgorithmName = AvailableAlgorithms.Text
         Static lastAlgorithmFrame As Integer
         Static lastCameraFrame As Integer
         If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
@@ -1020,20 +1014,12 @@ Public Class OpenCVB
         picLabels(1) = "Depth:" + details
     End Sub
     Private Sub Exit_Click(sender As Object, e As EventArgs) Handles ExitCall.Click
-        fpsTimer.Enabled = False
-        If logActive = False Then
-            TestAllTimer.Enabled = False
-        Else
-            If TestAllTimer.Enabled Then testAllButton_Click(sender, e) ' close the log file if needed.
-        End If
-
         SaveSetting("OpenCVB", "TreeButton", "TreeButton", TreeButton.Checked)
         SaveSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", PixelViewerButton.Checked)
         stopCameraThread = True
         saveAlgorithmName = ""
         textDesc = ""
         saveLayout()
-        Application.DoEvents()
     End Sub
     Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
         MsgBox("The objective is to solve many small computer vision problems " + vbCrLf +
@@ -1100,20 +1086,8 @@ Public Class OpenCVB
         StartAlgorithmTask()
     End Sub
     Private Sub StartAlgorithmTask()
-        ' turn off test all timer until the first frame completes.  It can take a while for all the options to roll out...
-        If TestAllButton.Text <> "Test All" Then
-            firstTaskFramesReady = 0
-            TestAllTimer.Enabled = False
-        End If
-
-        Dim currentAlgorithm = saveAlgorithmName
-        saveAlgorithmName = AvailableAlgorithms.Text ' this tells the algorithmTask to terminate.
-        If TestAllTimer.Enabled Then
-            While frameCount > 0 ' AlgorithmTask sets it to 0 when terminated...
-                Thread.Sleep(100)
-                Console.WriteLine("waiting for the task thread...")
-            End While
-        End If
+        Console.WriteLine("Start Algorithm request for " + AvailableAlgorithms.Text)
+        saveAlgorithmName = AvailableAlgorithms.Text ' this tells the previous algorithmTask to terminate.
         openFileForm.Hide()
         openFileForm.PlayButton.Text = "Start"
         openFileDialogName = ""
@@ -1151,49 +1125,45 @@ Public Class OpenCVB
         algorithmTaskHandle.Start(parms)
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algParms)
+        Dim algName = algorithmTaskHandle.Name
         SyncLock algorithmThreadLock ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
             AlgorithmTestCount += 1
             drawRect = New cv.Rect
-            Dim algName = algorithmTaskHandle.Name
-            If algName <> "" Then
-                Dim myLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
-                Dim task = New VB_Classes.ActiveTask(parms, workingRes, algName, workingRes.Width, workingRes.Height, myLocation)
-                textDesc = task.desc
-                openFileInitialDirectory = task.openFileInitialDirectory
-                openFileDialogRequested = task.openFileDialogRequested
-                openFileinitialStartSetting = task.initialStartSetting
-                task.fileStarted = task.initialStartSetting
-                openFileStarted = task.initialStartSetting
-                openFileFilterIndex = task.openFileFilterIndex
-                openFileFilter = task.openFileFilter
-                openFileDialogName = task.openFileDialogName
-                openfileDialogTitle = task.openFileDialogTitle
-                intermediateReview = ""
+            Dim myLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
+            Dim task = New VB_Classes.ActiveTask(parms, workingRes, algName, workingRes.Width, workingRes.Height, myLocation)
+            textDesc = task.desc
+            openFileInitialDirectory = task.openFileInitialDirectory
+            openFileDialogRequested = task.openFileDialogRequested
+            openFileinitialStartSetting = task.initialStartSetting
+            task.fileStarted = task.initialStartSetting
+            openFileStarted = task.initialStartSetting
+            openFileFilterIndex = task.openFileFilterIndex
+            openFileFilter = task.openFileFilter
+            openFileDialogName = task.openFileDialogName
+            openfileDialogTitle = task.openFileDialogTitle
+            intermediateReview = ""
 
-                Console.WriteLine(vbCrLf + vbCrLf + vbTab + algName + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
-                Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + algName +
-                                  " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
-                Console.WriteLine(vbTab + "Active camera = " + camera.deviceName + " at resolution " + CStr(workingRes.Width) + "x" + CStr(workingRes.Height) + vbCrLf)
+            Console.WriteLine(vbCrLf + vbCrLf + vbTab + algName + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
+            Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + algName +
+                                      " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
+            Console.WriteLine(vbTab + "Active camera = " + camera.deviceName + " at resolution " + CStr(workingRes.Width) + "x" + CStr(workingRes.Height) + vbCrLf)
 
-                If logActive And TestAllTimer.Enabled Then logAlgorithms.WriteLine(algName + "," + CStr(totalBytesOfMemoryUsed))
-
-                ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.
-                If task.drawRect <> New cv.Rect Then
-                    drawRect = task.drawRect
-                    Dim ratio = task.color.Width / camPic(0).Width  ' relative size of algorithm size image to displayed image
-                    drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
-                End If
-
-                ttTextData.Clear()
-
-                BothFirstAndLastReady = False
-                frameCount = 0 ' restart the count...
-
-                Run(task, algName)
-
-                task.Dispose()
-                If parms.testAllRunning Then Console.WriteLine(vbTab + "Ending " + algName)
+            ' if the constructor for the algorithm sets the drawrect, adjust it for the ratio of the actual size and algorithm sized image.
+            If task.drawRect <> New cv.Rect Then
+                drawRect = task.drawRect
+                Dim ratio = task.color.Width / camPic(0).Width  ' relative size of algorithm size image to displayed image
+                drawRect = New cv.Rect(drawRect.X / ratio, drawRect.Y / ratio, drawRect.Width / ratio, drawRect.Height / ratio)
             End If
+
+            ttTextData.Clear()
+
+            BothFirstAndLastReady = False
+            frameCount = 0 ' restart the count...
+
+            Run(task, algName)
+
+            task.Dispose()
+            If parms.testAllRunning Then Console.WriteLine(vbTab + "Ending " + algName)
         End SyncLock
         frameCount = 0
     End Sub
@@ -1201,7 +1171,7 @@ Public Class OpenCVB
         While 1
             Dim ratioImageToCampic = task.color.Width / camPic(0).Width  ' relative size of displayed image and algorithm size image.
             While 1
-                If saveAlgorithmName <> algName Or saveAlgorithmName = "" Then Exit Sub ' pause will stop the current algorithm as well.
+                If saveAlgorithmName <> algName Then Exit Sub ' pause will stop the current algorithm as well.
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
                 SyncLock bufferLock
                     If frameCount > 0 Then If stopCameraThread Then Exit Sub
@@ -1324,6 +1294,14 @@ Public Class OpenCVB
             End If
             frameCount += 1
         End While
+    End Sub
+
+    Private Sub AvailableAlgorithms_DropDown(sender As Object, e As EventArgs) Handles AvailableAlgorithms.DropDown
+        dropDownActive = True
+    End Sub
+
+    Private Sub AvailableAlgorithms_DropDownClosed(sender As Object, e As EventArgs) Handles AvailableAlgorithms.DropDownClosed
+        dropDownActive = False
     End Sub
 End Class
 
