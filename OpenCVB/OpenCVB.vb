@@ -433,6 +433,14 @@ Public Class OpenCVB
         End If
         AlgorithmDesc.Text = textDesc
     End Sub
+    Private Sub recentList_Clicked(sender As Object, e As EventArgs)
+        Dim item = TryCast(sender, ToolStripMenuItem)
+        If AvailableAlgorithms.Items.Contains(item.Text) = False Then
+            AvailableAlgorithms.SelectedIndex = 0
+        Else
+            AvailableAlgorithms.SelectedItem = item.Name
+        End If
+    End Sub
     Private Sub setupRecentList()
         For i = 0 To MAX_RECENT - 1
             Dim nextA = GetSetting("OpenCVB", "RecentList" + CStr(i), "RecentList" + CStr(i), "recent algorithm " + CStr(i))
@@ -477,37 +485,51 @@ Public Class OpenCVB
             End If
         Next
     End Sub
-    Private Sub recentList_Clicked(sender As Object, e As EventArgs)
-        Dim item = TryCast(sender, ToolStripMenuItem)
-        If AvailableAlgorithms.Items.Contains(item.Text) = False Then
-            AvailableAlgorithms.SelectedIndex = 0
+    Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
+        TestAllButton.Image = If(TestAllButton.Text = "Test All", stopTest, testAll)
+        Me.Refresh()
+
+        Dim saveRes = optionsForm.resolution1280.Checked
+        optionsForm.resolution1280.Checked = True
+        If saveRes = False Then
+            saveLayout()
+            LineUpCamPics(False)
+            startCamera()
+        End If
+
+        If TestAllButton.Text = "Test All" Then
+            TestAllButton.Text = "Stop Test"
+            TestAllTimer_Tick(sender, e)
+            TestAllTimer.Enabled = True
+            If TreeViewDialog IsNot Nothing Then TreeViewDialog.Timer1.Enabled = True
         Else
-            AvailableAlgorithms.SelectedItem = item.Name
+            TestAllTimer.Enabled = False
+            TestAllButton.Text = "Test All"
+            StartAlgorithmTask()
         End If
     End Sub
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
-        If frameCount = 0 Then Exit Sub ' we have to see some output from the algorithm before moving on...
+        If frameCount = 0 And TestAllButton.Text = "Stop Test" Then Exit Sub ' we have to see some output from the algorithm before moving on...
         If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Then
-            ' Testing overnight with only 1280 resolution.  Switching between 640 and 1280 seems to cause camera interface to fail after a while.
             'If optionsForm.resolution640.Enabled And optionsForm.resolution1280.Checked Then
             '    optionsForm.resolution640.Checked = True
             '    LineUpCamPics(False)
             '    startCamera()
             'Else
             optionsForm.resolution1280.Checked = True ' start every camera at 1280x720
-            Dim cameraIndex = optionsForm.cameraIndex + 1
-            For i = 0 To optionsForm.cameraRadioButton.Count - 1
-                If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
-                If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
-                    optionsForm.cameraRadioButton(cameraIndex).Checked = True
-                    optionsForm.cameraIndex = cameraIndex
-                    LineUpCamPics(False)
-                    startCamera()
-                    Exit For
-                Else
-                    cameraIndex += 1
-                End If
-            Next
+                Dim cameraIndex = optionsForm.cameraIndex + 1
+                For i = 0 To optionsForm.cameraRadioButton.Count - 1
+                    If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
+                    If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
+                        optionsForm.cameraRadioButton(cameraIndex).Checked = True
+                        optionsForm.cameraIndex = cameraIndex
+                        LineUpCamPics(False)
+                        startCamera()
+                        Exit For
+                    Else
+                        cameraIndex += 1
+                    End If
+                Next
             'End If
         End If
 
@@ -536,7 +558,7 @@ Public Class OpenCVB
 
         camera.initialize(workingRes.Width, workingRes.Height, fps)
         saveCameraName = camera.deviceName + " " + CStr(workingRes.Width)
-        If saveAlgorithmName IsNot Nothing Then StartAlgorithmTask() ' restart the algorithm...
+        If saveAlgorithmName IsNot Nothing Then StartAlgorithmTask() ' restart the currealgorithm...
         SyncLock cameraThreadLock
             cameraRefresh = False
             newImagesAvailable = False
@@ -931,32 +953,6 @@ Public Class OpenCVB
             saveTestAllState = TestAllTimer.Enabled
             If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
             PausePlayButton.Image = PausePlay
-        End If
-    End Sub
-    Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
-        Dim saveRes = optionsForm.resolution1280.Checked
-        optionsForm.resolution1280.Checked = True
-        If TestAllButton.Text = "Test All" Then
-            TestAllButton.Image = stopTest
-        Else
-            TestAllButton.Image = testAll
-        End If
-
-        If saveRes = False Then
-            saveLayout()
-            LineUpCamPics(False)
-            startCamera()
-        End If
-
-        If TestAllButton.Text = "Test All" Then
-            TestAllButton.Text = "Stop Test"
-            TestAllTimer_Tick(sender, e)
-            TestAllTimer.Enabled = True
-            If TreeViewDialog IsNot Nothing Then TreeViewDialog.Timer1.Enabled = True
-        Else
-            TestAllTimer.Enabled = False
-            TestAllButton.Text = "Test All"
-            StartAlgorithmTask()
         End If
     End Sub
     Private Sub OpenCVB_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
