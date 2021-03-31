@@ -333,7 +333,6 @@ Public Class ActiveTask : Implements IDisposable
         task.vFov = vFOVangles(parms.cameraName)
 
         If aOptions IsNot Nothing Then aOptions.layoutOptions()
-
         Application.DoEvents()
     End Sub
     Public Sub RunAlgorithm()

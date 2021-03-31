@@ -101,6 +101,7 @@ Public Class OpenCVB
     Dim stopTest As Bitmap
     Dim testAll As Bitmap
     Dim testAllRunning As Boolean
+    Dim firstTaskFramesReady As Integer
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -276,6 +277,7 @@ Public Class OpenCVB
 
         If cameraPyRS2 Is Nothing Then optionsForm.cameraRadioButton(VB_Classes.ActiveTask.algParms.camNames.PythonRS2).Enabled = False
 
+        fpsTimer.Enabled = True
         setupCamPics()
         loadAlgorithmComboBoxes()
 
@@ -312,6 +314,13 @@ Public Class OpenCVB
 
         Static myWhitePen As New Pen(Color.White)
         Static myBlackPen As New Pen(Color.Black)
+
+        If pic.Tag = 2 And firstTaskFramesReady <= 3 Then ' we want to see a few frames before starting the next in a test all run.
+            firstTaskFramesReady += 1
+            If firstTaskFramesReady >= 3 Then
+                If TestAllButton.Text <> "Test All" Then TestAllTimer.Enabled = True
+            End If
+        End If
 
         If pixelViewerOn And (mousePicTag = pic.Tag Or (pixelViewTag = 3 And pic.Tag = 2)) Then
             Dim pic3Offset As Integer
@@ -1067,7 +1076,7 @@ Public Class OpenCVB
     End Sub
     Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
-        TestAllTimer.Enabled = False
+
         saveAlgorithmName = ""
 
         Dim saveCurrentCamera = optionsForm.cameraIndex
@@ -1085,15 +1094,18 @@ Public Class OpenCVB
         StartAlgorithmTask()
     End Sub
     Private Sub StartAlgorithmTask()
+        ' turn off test all timer until the first frame completes.  It can take a while for all the options to roll out...
+        If TestAllButton.Text <> "Test All" Then
+            firstTaskFramesReady = 0
+            TestAllTimer.Enabled = False
+        End If
+
         Dim currentAlgorithm = saveAlgorithmName
         saveAlgorithmName = AvailableAlgorithms.Text ' this tells the algorithmTask to terminate.
-        If algorithmTaskHandle IsNot Nothing Then
-            Dim loopCount As Integer = 0
-            While algorithmTaskHandle IsNot Nothing
-                Application.DoEvents()
-                If stopCameraThread Then Exit Sub  ' If the app is shutting down.
-            End While
-        End If
+        While frameCount > 0 ' AlgorithmTask sets it to 0 when terminated...
+            Thread.Sleep(100)
+            Console.WriteLine("waiting for the task thread...")
+        End While
         openFileForm.Hide()
         openFileForm.PlayButton.Text = "Start"
         openFileDialogName = ""
@@ -1126,12 +1138,9 @@ Public Class OpenCVB
         imgResult = New cv.Mat(imgSize, cv.MatType.CV_8UC3, 0)
 
         Thread.CurrentThread.Priority = ThreadPriority.Lowest
-
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
         algorithmTaskHandle.Name = AvailableAlgorithms.Text
         algorithmTaskHandle.Start(parms)
-        camera.frameCount = 0
-        fpsTimer.Enabled = True
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algParms)
         SyncLock algorithmThreadLock ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
@@ -1180,7 +1189,6 @@ Public Class OpenCVB
             frameCount = 0
             If parms.testAllRunning Then Console.WriteLine(vbTab + "Ending " + algName)
         End SyncLock
-        algorithmTaskHandle = Nothing
     End Sub
     Private Sub Run(task As VB_Classes.ActiveTask, algName As String)
         While 1
