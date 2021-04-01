@@ -1234,16 +1234,8 @@ Public Class OpenCVB
                 End SyncLock
             End While
 
-            Dim allInSync As Boolean = True
-            ' when transitioning between cameras, it can happen that all the images are not the same size...
-            For i = 0 To 5
-                Dim mat = Choose(i + 1, task.color, task.RGBDepth, task.leftView, task.rightView, task.depth32f, task.pointCloud)
-                If mat.width <> workingRes.Width Or mat.height <> workingRes.Height Then
-                    allInSync = False
-                    Exit For
-                End If
-            Next
-            If allInSync Then task.RunAlgorithm()
+
+            task.RunAlgorithm()
 
             If task.mousePointUpdated Then mousePoint = task.mousePoint ' in case the algorithm has changed the mouse location...
             If task.drawRectUpdated Then drawRect = task.drawRect

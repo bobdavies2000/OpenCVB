@@ -1113,6 +1113,9 @@ Addendum 2: Some Thoughts
     sync the presentation of the RGB and RGB Depth images like the dst1 and dst2
     images.
 
+21. Programming Tip: when you find that you can delete code and everything runs
+    better, you are getting closer to the solution.
+
 Addendum 3: Change Log
 ======================
 

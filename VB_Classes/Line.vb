@@ -737,10 +737,10 @@ End Class
 Public Class Line_SideView
     Inherits VBparent
     Dim lines As Line_Basics
-    Dim tView As TView_FloodFill
+    Dim tView As TimeView_FloodFill
     Public Sub New()
         initParent()
-        tView = New TView_FloodFill
+        tView = New TimeView_FloodFill
         lines = New Line_Basics
         label1 = "Side view of the lines detected in the RGB image"
         label2 = "Lines found in the RGB image view"

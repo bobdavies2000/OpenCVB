@@ -127,12 +127,15 @@ Public Class VBparent : Implements IDisposable
             End If
         Next
     End Sub
+    Public Function normalize32f(Input As cv.Mat) As cv.Mat
+        Dim outMat = Input.Normalize(0, 255, cv.NormTypes.MinMax)
+        outMat.ConvertTo(outMat, cv.MatType.CV_8UC1)
+        Return outMat.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+    End Function
     Private Function MakeSureImage8uC3(ByVal input As cv.Mat) As cv.Mat
         Dim outMat = input
         If input.Type = cv.MatType.CV_32F Then
-            outMat = input.Normalize(0, 255, cv.NormTypes.MinMax)
-            outMat.ConvertTo(outMat, cv.MatType.CV_8UC1)
-            outMat = outMat.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            outMat = normalize32f(input)
         ElseIf input.Type = cv.MatType.CV_32FC3 Then
             Dim split = input.Split()
             split(0) = split(0).ConvertScaleAbs(255)
