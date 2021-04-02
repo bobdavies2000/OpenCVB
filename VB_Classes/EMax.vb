@@ -1,8 +1,125 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Public Class EMax_Basics
+    Inherits VBparent
+    Public basics As EMax_VB_Failing
+    Dim inputDataMask As cv.Mat
+    Dim EMax_Basics As IntPtr
+    Public palette As Palette_Coherence
+    Dim edges As Edges_Sobel
+    Public Sub New()
+        initParent()
+        basics = New EMax_VB_Failing()
+        palette = New Palette_Coherence
+        EMax_Basics = EMax_Basics_Open()
+        edges = New Edges_Sobel
+
+        Dim lowDiffslider = findSlider("FloodFill LoDiff")
+        Dim highDiffslider = findSlider("FloodFill HiDiff")
+        lowDiffslider.Value = 1
+        highDiffslider.Value = 1
+        Dim kernelSlider = findSlider("Sobel kernel Size")
+        kernelSlider.Value = 7
+
+        label2 = "Emax regions around clusters"
+        task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        basics.Run()
+        dst1 = basics.dst1
+        Dim srcCount = basics.sliders.trackbar(0).Value
+        label1 = CStr(srcCount) + " Random samples in " + CStr(basics.regionCount) + " clusters"
+        If basics.regionCount <= 0 Then Exit Sub
+
+        Dim covarianceMatrixType As Integer = 0
+        For i = 0 To 3 - 1
+            If basics.radio.check(i).Checked = True Then
+                covarianceMatrixType = Choose(i + 1, cv.EM.Types.CovMatSpherical, cv.EM.Types.CovMatDiagonal, cv.EM.Types.CovMatGeneric)
+            End If
+        Next
+
+        Dim srcData((srcCount - 1) * 2) As Single
+        Dim handleSrc As GCHandle
+        handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
+        Marshal.Copy(basics.samples.Data, srcData, 0, srcData.Length)
+
+        Dim labelData(srcCount - 1) As Integer
+        Dim handleLabels As GCHandle
+        handleLabels = GCHandle.Alloc(labelData, GCHandleType.Pinned)
+        Marshal.Copy(basics.labels.Data, labelData, 0, labelData.Length)
+
+        Dim imagePtr = EMax_Basics_Run(EMax_Basics, handleSrc.AddrOfPinnedObject(), handleLabels.AddrOfPinnedObject(), srcCount, 2,
+                                       dst1.Rows, dst1.Cols, basics.regionCount, basics.sliders.trackbar(1).Value, covarianceMatrixType)
+        handleLabels.Free() ' free the pinned memory...
+        handleSrc.Free() ' free the pinned memory...
+
+        dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8U, imagePtr)
+
+        Dim minVal As Double, maxVal As Double
+        cv.Cv2.MinMaxLoc(dst2, minVal, maxVal)
+        dst2 = (dst2 * 128 / maxVal + 100).ToMat
+        edges.src = dst2
+        edges.Run()
+        dst2.SetTo(0, edges.dst1)
+
+        palette.src = dst2
+        palette.Run()
+        dst2 = palette.dst1
+        dst2.SetTo(0, edges.dst1)
+        If standalone Then
+            inputDataMask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+            dst1.CopyTo(dst2, inputDataMask)
+        End If
+    End Sub
+    Public Sub Close()
+        EMax_Basics_Close(EMax_Basics)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class EMax_CentroidsNew
+    Inherits VBparent
+    Public emaxCPP As EMax_Basics
+    Public Sub New()
+        initParent()
+
+        emaxCPP = New EMax_Basics()
+
+        Dim gridWidthSlider = findSlider("ThreadGrid Width")
+        gridWidthSlider.Value = src.Width * 170 / 640
+
+        task.desc = "Colorize the output of Emax"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+
+        emaxCPP.Run()
+        dst1 = emaxCPP.dst2
+        Static lastCentroids As New List(Of cv.Point2f)
+        Dim centroids = emaxCPP.palette.flood.flood.centroids
+        For i = 0 To centroids.Count - 1
+            dst1.Circle(centroids(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            If i < lastCentroids.Count Then
+                dst1.Circle(lastCentroids(i), 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            End If
+        Next
+        lastCentroids = New List(Of cv.Point2f)(centroids)
+    End Sub
+End Class
+
+
+
+
+
 ' https://docs.opencv.org/3.0-beta/modules/ml/doc/expectation_maximization.html
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/em.cpp
-Public Class EMax_Basics
+Public Class EMax_VB_Failing
     Inherits VBparent
     Public samples As cv.Mat
     Public labels As cv.Mat
@@ -12,10 +129,6 @@ Public Class EMax_Basics
     Public gridHeightSlider As System.Windows.Forms.TrackBar
     Public Sub New()
         initParent()
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
-            check.Box(0).Text = "Show EMax input in output"
-        End If
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -44,7 +157,7 @@ Public Class EMax_Basics
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then
             task.trueText("The EMax algorithm fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
-                          "The C++ version works fine (EMax_CPP) and the 2 are functionally identical.", 20, 100)
+                          "The C++ version works fine (EMax_Basics) and the 2 are functionally identical.", 20, 100)
             Exit Sub ' comment this line to see the bug in the VB.Net version of this Predict2 below.
         End If
 
@@ -123,79 +236,19 @@ End Module
 
 
 
-Public Class EMax_CPP
-    Inherits VBparent
-    Public basics As EMax_Basics
-    Dim inputDataMask As cv.Mat
-    Dim EMax_Basics As IntPtr
-    Public Sub New()
-        initParent()
-        basics = New EMax_Basics()
-
-        EMax_Basics = EMax_Basics_Open()
-
-        label2 = "Emax regions around clusters"
-        task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        basics.Run()
-        dst1 = basics.dst1
-        Dim srcCount = basics.sliders.trackbar(0).Value
-        label1 = CStr(srcCount) + " Random samples in " + CStr(basics.regionCount) + " clusters"
-        If basics.regionCount <= 0 Then Exit Sub
-
-        Dim covarianceMatrixType As Integer = 0
-        For i = 0 To 3 - 1
-            If basics.radio.check(i).Checked = True Then
-                covarianceMatrixType = Choose(i + 1, cv.EM.Types.CovMatSpherical, cv.EM.Types.CovMatDiagonal, cv.EM.Types.CovMatGeneric)
-            End If
-        Next
-
-        Dim srcData((srcCount - 1) * 2) As Single
-        Dim handleSrc As GCHandle
-        handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
-        Marshal.Copy(basics.samples.Data, srcData, 0, srcData.Length)
-
-        Dim labelData(srcCount - 1) As Integer
-        Dim handleLabels As GCHandle
-        handleLabels = GCHandle.Alloc(labelData, GCHandleType.Pinned)
-        Marshal.Copy(basics.labels.Data, labelData, 0, labelData.Length)
-
-        Dim imagePtr = EMax_Basics_Run(EMax_Basics, handleSrc.AddrOfPinnedObject(), handleLabels.AddrOfPinnedObject(), srcCount, 2,
-                                       dst1.Rows, dst1.Cols, basics.regionCount, basics.sliders.trackbar(1).Value, covarianceMatrixType)
-        handleLabels.Free() ' free the pinned memory...
-        handleSrc.Free() ' free the pinned memory...
-
-        If imagePtr <> 0 Then dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
-
-        Static showInputCheck = findCheckBox("Show EMax input in output")
-        If showInputCheck.Checked Then
-            inputDataMask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
-            dst1.CopyTo(dst2, inputDataMask)
-        End If
-    End Sub
-    Public Sub Close()
-        EMax_Basics_Close(EMax_Basics)
-    End Sub
-End Class
-
-
-
-
 
 
 
 Public Class EMax_Centroids
     Inherits VBparent
-    Public emaxCPP As EMax_CPP
+    Public emaxCPP As EMax_Basics
     Public flood As FloodFill_Basics
     Public Sub New()
         initParent()
 
         flood = New FloodFill_Basics()
 
-        emaxCPP = New EMax_CPP()
+        emaxCPP = New EMax_Basics()
         Dim lowDiffslider = findSlider("FloodFill LoDiff")
         Dim highDiffslider = findSlider("FloodFill HiDiff")
         lowDiffslider.Value = 1
@@ -210,7 +263,6 @@ Public Class EMax_Centroids
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         emaxCPP.Run()
-
         flood.src = emaxCPP.dst2.Clone
         flood.Run()
         dst1 = flood.dst1

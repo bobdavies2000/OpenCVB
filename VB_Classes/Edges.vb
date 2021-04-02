@@ -812,7 +812,7 @@ Public Class Edges_Sobel
     Dim addw As AddWeighted_Basics
     Public Sub New()
         initParent()
-        addw = New AddWeighted_Basics
+        If standalone Then addw = New AddWeighted_Basics
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Sobel kernel Size", 1, 32, 3)
@@ -820,9 +820,11 @@ Public Class Edges_Sobel
         End If
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+            check.Setup(caller, 2)
             check.Box(0).Text = "Threshold Sobel Results"
+            check.Box(1).Text = "Use Sobel Results"
             check.Box(0).Checked = True
+            check.Box(1).Checked = True
         End If
 
         task.desc = "Show Sobel edge detection with varying kernel sizes"
@@ -836,10 +838,14 @@ Public Class Edges_Sobel
         grayX = src.Sobel(cv.MatType.CV_32F, 1, 0, kernelSize)
         If horizontalOnly = False Then
             grayY = src.Sobel(cv.MatType.CV_32F, 0, 1, kernelSize)
-            addw.src = grayX
-            addw.src2 = grayY
-            addw.Run()
-            dst1 = addw.dst1.ConvertScaleAbs()
+            If standalone Then
+                addw.src = grayX
+                addw.src2 = grayY
+                addw.Run()
+                dst1 = addw.dst1.ConvertScaleAbs()
+            Else
+                dst1 = (grayY + grayX).ToMat.ConvertScaleAbs()
+            End If
         Else
             dst1 = grayX.ConvertScaleAbs()
         End If
@@ -891,12 +897,14 @@ Public Class Edges_SobelLRBinarized
     Dim addw As AddWeighted_Basics
     Public Sub New()
         initParent()
-        addw = New AddWeighted_Basics
-        Dim weightSlider = findSlider("Weight")
-        weightSlider.Value = 75
+        If standalone Then
+            addw = New AddWeighted_Basics
+            Dim weightSlider = findSlider("Weight")
+            weightSlider.Value = 75
+        End If
         edges = New Edges_BinarizedSobel
         red = New LeftRightView_Basics
-        Dim brightSlider = findSlider("brightness")
+        Dim brightSlider = findSlider("Infrared Brightness")
         brightSlider.Value = 1
 
         label1 = "Horizontal Sobel - Left View"
@@ -911,17 +919,25 @@ Public Class Edges_SobelLRBinarized
 
         edges.src = red.dst2
         edges.Run()
-        addw.src = red.dst2
-        addw.src2 = edges.dst2
-        addw.Run()
-        dst2 = addw.dst1.Clone
+        If standalone Then
+            addw.src = red.dst2
+            addw.src2 = edges.dst2
+            addw.Run()
+            dst2 = addw.dst1
+        Else
+            dst2 = edges.dst2
+        End If
 
         edges.src = red.dst1
         edges.Run()
-        addw.src = red.dst1
-        addw.src2 = edges.dst2.Clone
-        addw.Run()
-        dst1 = addw.dst1
+        If standalone Then
+            addw.src = red.dst1
+            addw.src2 = edges.dst2
+            addw.Run()
+            dst1 = addw.dst1
+        Else
+            dst1 = edges.dst2
+        End If
     End Sub
 End Class
 
@@ -1006,7 +1022,7 @@ Public Class Edges_Matching
         match = New MatchTemplate_Basics
         grid = New Thread_Grid
         red = New LeftRightView_Basics
-        Dim brightSlider = findSlider("brightness")
+        Dim brightSlider = findSlider("Infrared Brightness")
         brightSlider.Value = 1
 
         If findfrm(caller + " Slider Options") Is Nothing Then

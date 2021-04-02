@@ -90,49 +90,6 @@ End Class
 
 
 
-Public Class FloodFill_Palette
-    Inherits VBparent
-    Public basics As FloodFill_Basics
-    Public palette As Palette_Basics
-    Public allRegionMask As cv.Mat
-    Public Sub New()
-        initParent()
-        palette = New Palette_Basics()
-        palette.Run()
-
-        basics = New FloodFill_Basics()
-        task.desc = "Create a floodfill image that is only 8-bit for use with a palette"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        basics.src = src
-        basics.Run()
-
-        dst2.SetTo(0)
-        For i = 0 To basics.masks.Count - 1
-            Dim maskIndex = basics.maskSizes.ElementAt(i).Value
-            dst2.SetTo(cv.Scalar.All((i + 1) Mod 255), basics.masks(maskIndex))
-        Next
-
-        allRegionMask = If(dst2.Channels = 1, dst2, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255))
-
-        Dim incr = If(basics.masks.Count < 10, 25, 255 / basics.masks.Count)  'reduces flicker of slightly different colors
-        palette.src = dst2 * cv.Scalar.All(incr) ' spread the colors 
-        palette.Run()
-        dst1.SetTo(0)
-        palette.dst1.CopyTo(dst1, allRegionMask)
-
-        Static minSizeSlider = findSlider("FloodFill Minimum Size")
-        label2 = CStr(basics.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
-        If standalone Or task.intermediateReview = caller Then dst2 = palette.gradMap.gradientColorMap.Resize(src.Size())
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class FloodFill_Top16_MT
     Inherits VBparent
@@ -969,3 +926,86 @@ Public Class FloodFill_Step
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class FloodFill_Palette
+    Inherits VBparent
+    Public basics As FloodFill_Basics
+    Public palette As Palette_Basics
+    Public allRegionMask As cv.Mat
+    Public Sub New()
+        initParent()
+        palette = New Palette_Basics()
+        palette.Run()
+
+        basics = New FloodFill_Basics()
+        task.desc = "Create a floodfill image that is only 8-bit for use with a palette"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        basics.src = src
+        basics.Run()
+
+        dst2.SetTo(0)
+        For i = 0 To basics.masks.Count - 1
+            Dim maskIndex = basics.maskSizes.ElementAt(i).Value
+            dst2.SetTo(cv.Scalar.All((i + 1) Mod 255), basics.masks(maskIndex))
+        Next
+
+        allRegionMask = If(dst2.Channels = 1, dst2, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255))
+
+        Dim incr = If(basics.masks.Count < 10, 25, 255 / basics.masks.Count)  'reduces flicker of slightly different colors
+        palette.src = dst2 * cv.Scalar.All(incr) ' spread the colors 
+        palette.Run()
+        dst1.SetTo(0)
+        palette.dst1.CopyTo(dst1, allRegionMask)
+
+        Static minSizeSlider = findSlider("FloodFill Minimum Size")
+        label2 = CStr(basics.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
+        If standalone Or task.intermediateReview = caller Then dst2 = palette.gradMap.gradientColorMap.Resize(src.Size())
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FloodFill_Coherence
+    Inherits VBparent
+    Public flood As FloodFill_Basics
+    Dim pixel As Pixel_Sampler
+    Public Sub New()
+        initParent()
+        flood = New FloodFill_Basics
+        pixel = New Pixel_Sampler
+        task.desc = "Floodfill an image and make the colors consistent."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+
+        flood.src = src
+        flood.Run()
+
+        Static lastFrame As cv.Mat
+        If task.cameraStable = False Or task.frameCount = 0 Then
+            dst1 = New cv.Mat(src.Size, cv.MatType.CV_8UC1, 0)
+            lastFrame = flood.dst2.Clone
+        End If
+        For i = 0 To flood.rects.Count - 1
+            Dim rect = flood.rects(i)
+            Dim mask = flood.masks(i)(rect)
+            pixel.src = lastFrame(rect).Clone
+            Dim inverse = 255 - mask
+            pixel.src.SetTo(0, inverse)
+            pixel.Run()
+            dst1(rect).SetTo(pixel.dominantGray, mask)
+        Next
+        label1 = CStr(flood.rects.Count) + " regions identified in the last frame"
+        lastFrame = dst1.Clone
+    End Sub
+End Class

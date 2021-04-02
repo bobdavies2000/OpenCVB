@@ -19,17 +19,12 @@ public:
 	Mat labels;
 	Mat testInput;
 	Ptr<EM> em_model;
-	Scalar colors[256];
 	RNG rng;
 	int clusters;
 	int covarianceMatrixType;
 	int stepSize;
 	EMax_Basics()
 	{
-		for (int i = 0; i <= 255; ++i)
-		{
-			colors[i] = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-		}
 		em_model = EM::create();
 	}
     void Run()
@@ -41,6 +36,7 @@ public:
 
 		// classify every image pixel
 		Mat sample(1, 2, CV_32FC1);
+		output.setTo(0);
 		for (int i = 0; i < output.rows; i+=stepSize)
 		{
 //#pragma omp parallel for
@@ -49,8 +45,7 @@ public:
 				sample.at<float>(0) = (float)j;
 				sample.at<float>(1) = (float)i;
 				int response = cvRound(em_model->predict2(sample, noArray())[1]);
-				Scalar c = colors[response];
-				circle(output, Point(j, i), stepSize, c * 0.75, FILLED);
+				circle(output, Point(j, i), stepSize, response, FILLED);
 			}
 		}
 	}
@@ -78,7 +73,7 @@ int *EMax_Basics_Run(EMax_Basics *EMax_BasicsPtr, int *samplePtr, int *labelsPtr
 	EMax_BasicsPtr->clusters = clusters;
 	EMax_BasicsPtr->labels = Mat(rows, 1, CV_32S, labelsPtr);
 	EMax_BasicsPtr->samples = Mat(rows, cols, CV_32FC1, samplePtr);
-	EMax_BasicsPtr->output = Mat(imgRows, imgCols, CV_8UC3);
+	EMax_BasicsPtr->output = Mat(imgRows, imgCols, CV_8U);
 	EMax_BasicsPtr->Run();
     return (int *) EMax_BasicsPtr->output.data; // return this C++ allocated data to managed code where it will be used in the marshal.copy
 }

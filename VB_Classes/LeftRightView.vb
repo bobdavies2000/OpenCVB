@@ -5,7 +5,7 @@ Public Class LeftRightView_Basics
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "brightness", 0, 255, 100)
+            sliders.setupTrackBar(0, "Infrared Brightness", 0, 255, 100)
         End If
         task.desc = "Show the left and right views from the 3D Camera"
         Select Case task.parms.cameraName
@@ -40,7 +40,7 @@ Public Class LeftRightView_CompareRaw
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "brightness", 0, 255, 100)
+            sliders.setupTrackBar(0, "Infrared Brightness", 0, 255, 100)
             sliders.setupTrackBar(1, "Slice Starting Y", 0, 300, 100)
             sliders.setupTrackBar(2, "Slice Height", 1, (src.Rows - 100) / 2, 30)
         End If

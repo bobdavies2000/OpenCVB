@@ -432,71 +432,6 @@ End Class
 
 
 
-
-Public Class Palette_Consistency
-    Inherits VBparent
-    Dim emax As EMax_CPP
-    Public hist As Histogram_Simple
-    Dim lut As LUT_Rebuild
-    Private Class CompareHistCounts : Implements IComparer(Of Single)
-        Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
-            If a > b Then Return 1
-            Return -1 ' never returns equal because duplicates can happen.
-        End Function
-    End Class
-    Public Sub New()
-        initParent()
-        emax = New EMax_CPP()
-        emax.basics.sliders.trackbar(1).Value = 15
-
-        hist = New Histogram_Simple()
-        hist.sliders.trackbar(0).Value = 255
-
-        lut = New LUT_Rebuild()
-
-        task.desc = "Using a histogram, assign the same colors to the same areas across frames"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        If standalone Or task.intermediateReview = caller Then
-            emax.Run()
-            src = emax.dst2
-        End If
-        Dim size = New cv.Size(src.Width / 4, src.Height / 4)
-        Dim img = src.Resize(size, 0, 0, cv.InterpolationFlags.Cubic)
-        img = img.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        img = img.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-
-        hist.src = img
-        hist.Run()
-        If standalone Or task.intermediateReview = caller Then dst2 = hist.dst1.Resize(src.Size)
-
-        Dim histogram = hist.plotHist.hist
-        Dim orderedByCount As New SortedList(Of Single, Integer)(New CompareHistCounts)
-        For i = 0 To histogram.Rows - 1
-            Dim nextVal = histogram.Get(Of Single)(i)
-            If nextVal > 500 Then orderedByCount.Add(nextVal, i)
-        Next
-
-        Dim grayIndex As Integer
-        Dim grayIncr As Integer = CInt(255 / orderedByCount.Count)
-        For i = orderedByCount.Count - 1 To 0 Step -1
-            Dim paletteIndex = orderedByCount.ElementAt(i).Value
-            lut.paletteMap(paletteIndex) = grayIndex
-            grayIndex += grayIncr
-        Next
-
-        lut.src = img
-        lut.Run()
-        dst1 = lut.dst1.Resize(src.Size())
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class Palette_ObjectColors
     Inherits VBparent
     Dim reduction As Reduction_KNN_Color
@@ -608,7 +543,7 @@ Public Class Palette_LeftRightImages
     Public Sub New()
         initParent()
         lrViews = New LeftRightView_Basics
-        Dim brightSlider = findSlider("brightness")
+        Dim brightSlider = findSlider("Infrared Brightness")
         brightSlider.Value = 0
         palette = New Palette_Basics
         task.desc = "Use a palette with the left image."
@@ -625,5 +560,35 @@ Public Class Palette_LeftRightImages
         palette.src = lrViews.dst2
         palette.Run()
         dst2 = palette.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Palette_Coherence
+    Inherits VBparent
+    Public flood As FloodFill_Coherence
+    Public palette As Palette_Basics
+    Public Sub New()
+        initParent()
+        palette = New Palette_Basics()
+        palette.Run()
+
+        flood = New FloodFill_Coherence
+        task.desc = "Highlight a consistent 8-bit grayscale image regions with a palette"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        flood.src = src
+        flood.Run()
+
+        palette.src = flood.dst1
+        palette.Run()
+        dst1 = palette.dst1
+        label1 = flood.label1
     End Sub
 End Class
