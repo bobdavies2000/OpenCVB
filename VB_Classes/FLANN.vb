@@ -46,11 +46,11 @@ End Class
 ' https://docs.opencv.org/3.4/d5/d6f/tutorial_feature_flann_matcher.html
 Public Class FLANN_Basics
     Inherits VBparent
-    Dim random As Random_Points
+    Dim random As Random_Basics
     Dim qArray() As cv.Point2f
     Public Sub New()
         initParent()
-        random = New Random_Points()
+        random = New Random_Basics()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

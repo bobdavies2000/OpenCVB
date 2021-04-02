@@ -5,11 +5,11 @@ Imports System.Runtime.InteropServices
 Public Class Voronoi_Basics
     Inherits VBparent
     Public vDemo As New CS_Classes.VoronoiDemo
-    Public random As Random_Points
+    Public random As Random_Basics
     Public inputPoints As List(Of cv.Point)
     Public Sub New()
         initParent()
-        random = New Random_Points()
+        random = New Random_Basics()
         label1 = "Ordered list output for Voronoi algorithm"
         task.desc = "Use the ordered list method to find the Voronoi segments"
     End Sub
@@ -45,11 +45,11 @@ End Class
 Public Class Voronoi_Compare
     Inherits VBparent
     Dim basics As Voronoi_Basics
-    Public random As Random_Points
+    Public random As Random_Basics
     Public Sub New()
         initParent()
         basics = New Voronoi_Basics()
-        random = New Random_Points()
+        random = New Random_Basics()
 
         label1 = "Brute Force method"
         label2 = "Ordered List method"

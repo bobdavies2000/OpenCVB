@@ -6,11 +6,11 @@ Public Class KNN_Basics
     Public knn As cv.ML.KNearest
     Public lastSet As New List(Of cv.Point2f)
     Public currSet As New List(Of cv.Point2f)
-    Dim random As Random_Points
+    Dim random As Random_Basics
     Public Sub New()
         initParent()
 
-        random = New Random_Points
+        random = New Random_Basics
         label1 = "White=TrainingData, Red=queries"
         knn = cv.ML.KNearest.Create()
         task.desc = "Test knn with random points in the image.  Find the nearest n points."
@@ -116,8 +116,8 @@ Public Class KNN_QueryTrain
     Inherits VBparent
     Public trainingPoints As New List(Of cv.Point2f)
     Public queryPoints As New List(Of cv.Point2f)
-    Public randomTrain As Random_Points
-    Public randomQuery As Random_Points
+    Public randomTrain As Random_Basics
+    Public randomQuery As Random_Basics
     Public useRandomData As Boolean
     Public Sub New()
         initParent()
@@ -136,8 +136,8 @@ Public Class KNN_QueryTrain
             End If
         End If
 
-        randomTrain = New Random_Points()
-        randomQuery = New Random_Points()
+        randomTrain = New Random_Basics()
+        randomQuery = New Random_Basics()
 
         label1 = "Random training points"
         label2 = "Random query points"
@@ -1038,11 +1038,11 @@ Public Class KNN_1_to_1FIFO
     Public lastSet As New List(Of cv.Point2f)
     Public currSet As New List(Of cv.Point2f)
     Public knn As cv.ML.KNearest
-    Dim random As Random_Points
+    Dim random As Random_Basics
     Public Sub New()
         initParent()
 
-        random = New Random_Points
+        random = New Random_Basics
         random.rangeRect = New cv.Rect(0, 0, dst1.Width, dst1.Height)
         label1 = "White=TrainingData, Red=queries"
         knn = cv.ML.KNearest.Create()

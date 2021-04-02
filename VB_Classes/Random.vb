@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 
-Public Class Random_Points
+Public Class Random_Basics
     Inherits VBparent
     Public Points(0) As cv.Point
     Public Points2f(0) As cv.Point2f
@@ -60,12 +60,12 @@ End Class
 
 Public Class Random_LUTMask
     Inherits VBparent
-    Dim random As Random_Points
+    Dim random As Random_Basics
     Dim km As kMeans_Basics
     Public Sub New()
         initParent()
         km = New kMeans_Basics()
-        random = New Random_Points()
+        random = New Random_Basics()
         task.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image."
         label2 = "kmeans run To Get colors"
     End Sub
@@ -593,7 +593,7 @@ End Class
 
 Public Class Random_KalmanPoints
     Inherits VBparent
-    Dim random As Random_Points
+    Dim random As Random_Basics
     Dim knn As KNN_1_to_1FIFO
     Dim kalman As Kalman_Basics
     Dim countSlider As Windows.Forms.TrackBar
@@ -604,7 +604,7 @@ Public Class Random_KalmanPoints
         initParent()
         knn = New KNN_1_to_1FIFO
         kalman = New Kalman_Basics
-        random = New Random_Points
+        random = New Random_Basics
 
         Dim offset = 100
         random.rangeRect = New cv.Rect(offset, offset, dst1.Width - offset * 2, dst1.Height - offset * 2)

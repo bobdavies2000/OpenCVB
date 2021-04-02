@@ -259,3 +259,68 @@ Public Class Pixel_Measure
     End Sub
 End Class
 
+
+
+
+
+
+
+
+Public Class Pixel_Sampler
+    Inherits VBparent
+    Public random As Random_Basics
+    Public dominantGray As Byte
+    Dim width = 100
+    Dim height = 100
+    Public Sub New()
+        initParent()
+        If standalone Then random = New Random_Basics
+        task.desc = "Randomly sample the grayscale input to estimate the dominant gray. This can provide consistent colorizing."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+
+        If task.frameCount Mod 30 = 0 And standalone Then
+            If task.drawRect <> New cv.Rect Then
+                random.rangeRect = task.drawRect
+            Else
+                random.rangeRect = New cv.Rect(msRNG.Next(0, src.Width - width), msRNG.Next(0, src.Height - height), width, height)
+            End If
+            random.Run()
+        End If
+
+        Dim input = src
+        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Dim index As New List(Of cv.Point)
+        Dim pixels As New List(Of Byte)
+        Dim counts(random.Points2f.Count - 1) As Integer
+        For i = 0 To random.Points2f.Count - 1
+            Dim pt = random.Points2f(i)
+            Dim pixel = input.Get(Of Byte)(pt.Y, pt.X)
+            If pixels.Contains(pixel) Then
+                counts(pixels.IndexOf(pixel)) += 1
+            Else
+                pixels.Add(pixel)
+                counts(pixels.IndexOf(pixel)) = 1
+            End If
+        Next
+
+        Dim maxValue = counts.Max
+        For i = 0 To counts.Count - 1
+            If counts(i) = maxValue Then
+                dominantGray = pixels.ElementAt(i)
+                Exit For
+            End If
+        Next
+
+        If standalone Then
+            dst1 = input
+            dst1.Rectangle(random.rangeRect, cv.Scalar.White, 1)
+            For i = 0 To random.Points2f.Count - 1
+                dst1.Circle(random.Points2f(i), 1, cv.Scalar.White, -1)
+            Next
+            label1 = "Dominant gray value = " + CStr(dominantGray)
+        End If
+    End Sub
+End Class

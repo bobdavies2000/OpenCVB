@@ -85,7 +85,7 @@ End Class
 ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
 Public Class CellAuto_Life
     Inherits VBparent
-    Dim random As Random_Points
+    Dim random As Random_Basics
     Dim grid As cv.Mat
     Dim nextgrid As cv.Mat
     Dim factor = 8
@@ -117,7 +117,7 @@ Public Class CellAuto_Life
         grid = New cv.Mat(src.Height / factor, src.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
 
-        random = New Random_Points()
+        random = New Random_Basics()
         random.rangeRect = New cv.Rect(0, 0, grid.Width, grid.Height)
         Static randomSlider = findSlider("Random Pixel Count")
         randomSlider.Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.

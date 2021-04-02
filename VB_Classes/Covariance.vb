@@ -1,11 +1,11 @@
 Imports cv = OpenCvSharp
 Public Class Covariance_Basics
     Inherits VBparent
-    Dim random As Random_Points
+    Dim random As Random_Basics
     Public samples As cv.Mat
     Public Sub New()
         initParent()
-        random = New Random_Points()
+        random = New Random_Basics()
         task.desc = "Calculate the covariance of random depth data points."
     End Sub
     Public Sub Run()

@@ -25,13 +25,13 @@ End Class
 
 Public Class Mat_PointToMat
     Inherits VBparent
-    Dim mask As Random_Points
+    Dim mask As Random_Basics
     Public Sub New()
         initParent()
-        mask = New Random_Points()
+        mask = New Random_Basics()
         mask.plotPoints = True
-        label1 = "Random_Points points (original)"
-        label2 = "Random_Points points after format change"
+        label1 = "Random_Basics points (original)"
+        label2 = "Random_Basics points after format change"
         task.desc = "Convert pointf3 into a mat of points"
     End Sub
     Public Sub Run()
@@ -56,10 +56,10 @@ End Class
 
 Public Class Mat_MatToPoint
     Inherits VBparent
-    Dim mask As Random_Points
+    Dim mask As Random_Basics
     Public Sub New()
         initParent()
-        mask = New Random_Points()
+        mask = New Random_Basics()
         task.desc = "Convert a mat into a vector of points."
         label1 = "Reconstructed RGB Image"
     End Sub
