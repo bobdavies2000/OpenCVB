@@ -900,6 +900,9 @@ Public Class KNN_PointTracker
             sliders.setupTrackBar(0, "Minimum size of object in pixels", 1, 10000, 3000)
         End If
 
+        Dim hotRadio = findRadio("Hot")
+        hotRadio.Checked = True
+
         task.desc = "Use KNN to track points and Kalman to smooth the results"
     End Sub
     Private Sub allocateKalman(count As Integer)

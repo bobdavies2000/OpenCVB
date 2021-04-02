@@ -208,6 +208,10 @@ Public Class FeatureLess_PointTracker
         initParent()
         pTrack = New KNN_PointTracker()
         fLess = New Featureless_Basics()
+
+        Dim hotRadio = findRadio("Hot")
+        hotRadio.Checked = True
+
         label1 = "After point tracker"
         label2 = "Before point tracker"
         task.desc = "Track the featureless regions with point tracker"

@@ -506,6 +506,9 @@ Public Class FloodFill_PointTracker
         pTrack = New KNN_PointTracker()
         flood = New FloodFill_Palette()
 
+        Dim hotRadio = findRadio("Hot")
+        hotRadio.Checked = True
+
         label1 = "Point tracker output"
         task.desc = "Test the FloodFill output as input into the point tracker"
     End Sub

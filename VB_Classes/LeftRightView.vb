@@ -33,53 +33,6 @@ End Class
 
 
 
-Public Class LeftRightView_CompareUndistorted
-    Inherits VBparent
-    Public fisheye As FishEye_Rectified
-    Public Sub New()
-        initParent()
-        fisheye = New FishEye_Rectified()
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "brightness", 0, 255, 0)
-            sliders.setupTrackBar(1, "Slice Starting Y", 0, 300, 100)
-            sliders.setupTrackBar(2, "Slice Height", 1, (src.Rows - 100) / 2, 30)
-        End If
-
-        Select Case task.parms.cameraName
-            Case VB_Classes.ActiveTask.algParms.camNames.D435i, VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2
-                label1 = "Left Image"
-                label2 = "Right Image"
-        End Select
-        task.desc = "Show slices of the left and right view next to each other for visual comparison - right view needs more work"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        Dim sliceY = sliders.trackbar(1).Value
-        Dim slideHeight = sliders.trackbar(2).Value
-        Dim leftInput As cv.Mat, rightInput As cv.Mat
-
-        leftInput = task.leftView
-        rightInput = task.rightView
-
-        dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC1, 0)
-        dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8UC1, 0)
-
-        Dim rSrc = New cv.Rect(0, sliceY, leftInput.Width, slideHeight)
-        leftInput(rSrc).CopyTo(dst1(New cv.Rect(0, 100, leftInput.Width, slideHeight)))
-        rightInput(rSrc).CopyTo(dst1(New cv.Rect(0, 100 + slideHeight, leftInput.Width, slideHeight)))
-
-        dst2 = leftInput
-        dst1 += sliders.trackbar(0).Value
-        dst2 += sliders.trackbar(0).Value
-    End Sub
-End Class
-
-
-
-
-
 Public Class LeftRightView_CompareRaw
     Inherits VBparent
     Dim lrView As LeftRightView_Basics

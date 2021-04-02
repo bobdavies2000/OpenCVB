@@ -54,9 +54,7 @@ Public Class Surf_BasicsVB
     Public Sub New()
         initParent()
         fisheye = New FishEye_Rectified()
-
         surf = New Surf_Basics()
-
         task.desc = "Use left and right views to match points in horizontal slices."
     End Sub
     Public Sub Run()

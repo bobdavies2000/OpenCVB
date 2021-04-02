@@ -175,6 +175,9 @@ Public Class CComp_PointTracker
         pTrack = New KNN_PointTracker()
         basics = New CComp_Basics()
 
+        Dim hotRadio = findRadio("Hot")
+        hotRadio.Checked = True
+
         task.desc = "Track connected componenent centroids and use it to match coloring"
     End Sub
     Public Sub Run()
@@ -215,8 +218,8 @@ Public Class CComp_MaxBlobs
     Inherits VBparent
     Public tracker As CComp_PointTracker
     Public maxBlobs As Integer = -1
-    Public incr = 2
     Public maxValues(255) As Integer ' march through all 255 values and find the best...
+    Public incr = 2 ' some other algorithms change this...
     Public Sub New()
         initParent()
         tracker = New CComp_PointTracker()
@@ -227,19 +230,23 @@ Public Class CComp_MaxBlobs
             check.Setup(caller, 1)
             check.Box(0).Text = "Reassess the best CComp threshold"
         End If
+        Dim hotRadio = findRadio("Hot")
+        hotRadio.Checked = True
 
         task.desc = "Find the best CComp threshold to maximize the number of blobs"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        If task.frameCount < 10 Then Exit Sub
         Static thresholdSlider = findSlider("CComp threshold")
-        If task.frameCount = 0 Then thresholdSlider.value = 0
+        task.trueText("This algorithm will survey the different ccomp threshold options.", 10, 100, 3)
+        If task.frameCount < 10 Then
+            thresholdSlider.value = 0
+            Exit Sub
+        End If
 
         tracker.src = src
         tracker.Run()
         dst1 = tracker.dst1
-        dst2 = tracker.dst2
 
         If maxBlobs = -1 Then
             tracker.trackPoints = False ' not tracking yet...
@@ -257,7 +264,6 @@ Public Class CComp_MaxBlobs
                 End If
             Next
         End If
-        dst2 = tracker.dst2
 
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
@@ -285,14 +291,12 @@ Public Class CComp_MaxPixels
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        If task.frameCount < 10 Then Exit Sub
         Static pixelValues(255) As Integer ' march through all 255 values and find the best...
         Static thresholdSlider = findSlider("CComp threshold")
 
         maxBlob.src = src
         maxBlob.Run()
         dst1 = maxBlob.dst1
-        dst2 = maxBlob.dst2
 
         If maxPixels = -1 Then
             For i = Math.Max(thresholdSlider.value - 10, 0) To Math.Min(thresholdSlider.value + 10, 255)
@@ -334,6 +338,9 @@ Public Class CComp_DepthEdges
             check.Box(0).Text = "Use edge mask in connected components"
             check.Box(0).Checked = True
         End If
+
+        Dim hotRadio = findRadio("Hot")
+        hotRadio.Checked = True
 
         task.desc = "Use depth edges to isolate connected components in depth"
     End Sub

@@ -9,7 +9,11 @@ Public Class Highlight_Basics
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Public Sub New()
         initParent()
-        If standalone Then reduction = New Reduction_KNN_Color()
+        If standalone Then
+            reduction = New Reduction_KNN_Color()
+            Dim hotRadio = findRadio("Hot")
+            hotRadio.Checked = True
+        End If
         task.desc = "Pixels are grouped by reduction.  Highlight the rectangle and centroid nearest the mouse click"
     End Sub
     Public Sub Run()

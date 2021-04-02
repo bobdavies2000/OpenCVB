@@ -1460,6 +1460,9 @@ Public Class Histogram_SmoothConcentration
         topview = New Histogram_SmoothTopView2D
         concent = New Histogram_ViewConcentrationsTopX
 
+        Dim hotRadio = findRadio("Hot")
+        hotRadio.Checked = True
+
         task.desc = "Using stable depth data, highlight the histogram projections where concentrations are highest"
     End Sub
     Public Sub Run()
@@ -1504,6 +1507,10 @@ Public Class Histogram_ViewConcentrationsTopX
             sliders.setupTrackBar(2, "Concentration Threshold", 1, 100, 10)
             sliders.setupTrackBar(3, "Dot size", 1, 100, If(src.Width = 1280, 20, 10))
         End If
+
+        Dim hotRadio = findRadio("Hot")
+        hotRadio.Checked = True
+
         task.desc = "Highlight a fixed number of histogram projections where concentrations are highest"
     End Sub
     Public Function plotHighlights(histOutput As cv.Mat, dst As cv.Mat) As String

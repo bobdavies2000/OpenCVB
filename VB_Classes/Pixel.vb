@@ -2,8 +2,8 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Pixel_Viewer
     Inherits VBparent
-    Public pixels As PixelViewerForm
     Dim firstUpdate = True
+    Public viewerForm As New PixelViewerForm
     Public Sub New()
         initParent()
 
@@ -14,153 +14,143 @@ Public Class Pixel_Viewer
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        If task.pixelViewerOn Then
-            If pixels Is Nothing Then pixels = New PixelViewerForm
-            If pixels.Visible = False Then pixels = New PixelViewerForm
-            pixels.Show()
+        dst1 = Choose(task.mousePicTag + 1, task.color, task.RGBDepth, task.algorithmObject.dst1, task.algorithmObject.dst2)
 
-            dst1 = Choose(task.mousePicTag + 1, task.color, task.RGBDepth, task.algorithmObject.dst1, task.algorithmObject.dst2)
+        Dim displayType = -1 ' default is 8uc3
+        If dst1.Type = cv.MatType.CV_8UC3 Then displayType = 0
+        If dst1.Type = cv.MatType.CV_8U Then displayType = 1
+        If dst1.Type = cv.MatType.CV_32F Then displayType = 2
+        If dst1.Type = cv.MatType.CV_32FC3 Then displayType = 3
+        If displayType < 0 Or dst1.Channels > 4 Then
+            task.trueText("The pixel Viewer does not support this cv.Mat!  Please add support.")
+            Exit Sub
+        End If
+        If viewerForm.GrayScaleOnly.Checked And dst1.Channels <> 1 And displayType < 2 Then
+            dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        End If
 
-            Dim displayType = -1 ' default is 8uc3
-            If dst1.Type = cv.MatType.CV_8UC3 Then displayType = 0
-            If dst1.Type = cv.MatType.CV_8U Then displayType = 1
-            If dst1.Type = cv.MatType.CV_32F Then displayType = 2
-            If dst1.Type = cv.MatType.CV_32FC3 Then displayType = 3
-            If displayType < 0 Or dst1.Channels > 4 Then
-                task.trueText("The pixel Viewer does not support this cv.Mat!  Please add support.")
-                Exit Sub
-            End If
-            If pixels.GrayScaleOnly.Checked And dst1.Channels <> 1 And displayType < 2 Then
-                dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            End If
+        Dim formatType = Choose(displayType + 1, "8UC3", "8UC1", "32FC1", "32FC3")
+        viewerForm.Text = "Pixel Viewer for " + Choose(task.mousePicTag + 1, "Color", "RGB Depth", "dst1", "dst2") + " " + formatType
 
-            Dim formatType = Choose(displayType + 1, "8UC3", "8UC1", "32FC1", "32FC3")
-            pixels.Text = "Pixel Viewer for " + Choose(task.mousePicTag + 1, "Color", "RGB Depth", "dst1", "dst2") + " " + formatType
+        Dim drWidth = Choose(displayType + 1, 7, 22, 13, 4) * viewerForm.Width / 650 + 3
+        Dim drHeight = CInt(viewerForm.Height / 16) + If(viewerForm.Height < 400, -3, If(viewerForm.Height < 800, -1, 1))
+        If drHeight < 20 Then drHeight = 20
 
-            Dim drWidth = Choose(displayType + 1, 7, 22, 13, 4) * pixels.Width / 650 + 3
-            Dim drHeight = CInt(pixels.Height / 16) + If(pixels.Height < 400, -3, If(pixels.Height < 800, -1, 1))
-            If drHeight < 20 Then drHeight = 20
+        If viewerForm.mousePoint <> New cv.Point Then
+            task.mousePoint += viewerForm.mousePoint
+            task.mousePointUpdated = True
+            viewerForm.mousePoint = New cv.Point
+        End If
+        Static mouseLoc = New cv.Point(100, 100) ' assume 
+        If task.mousePoint.X Or task.mousePoint.Y Then
+            Dim x = If(task.mousePoint.X >= drWidth, CInt(task.mousePoint.X - drWidth), 0)
+            Dim y = If(task.mousePoint.Y >= drHeight, task.mousePoint.Y - drHeight, 0)
+            mouseLoc = New cv.Point(CInt(x), CInt(y))
+        End If
 
-            If pixels.mousePoint <> New cv.Point Then
-                task.mousePoint += pixels.mousePoint
-                task.mousePointUpdated = True
-                pixels.mousePoint = New cv.Point
-            End If
-            Static mouseLoc = New cv.Point(100, 100) ' assume 
-            If task.mousePoint.X Or task.mousePoint.Y Then
-                Dim x = If(task.mousePoint.X >= drWidth, CInt(task.mousePoint.X - drWidth), 0)
-                Dim y = If(task.mousePoint.Y >= drHeight, task.mousePoint.Y - drHeight, 0)
-                mouseLoc = New cv.Point(CInt(x), CInt(y))
-            End If
+        task.pixelViewerRect = New cv.Rect(0, 0, -1, -1)
+        task.pixelViewTag = task.mousePicTag
+        Dim dw = New cv.Rect(mouseLoc.x, mouseLoc.y, drWidth, drHeight)
+        If dw.X < 0 Then dw.X = 0
+        If dw.Y < 0 Then dw.Y = 0
+        If dw.X + dw.Width > dst1.Width Then
+            dw.X = dst1.Width - dw.Width
+            dw.Width = dw.Width
+        End If
+        If dw.Y + dw.Height > dst1.Height Then
+            dw.Y = dst1.Height - dw.Height
+            dw.Height = dw.Height
+        End If
 
-            task.pixelViewerRect = New cv.Rect(0, 0, -1, -1)
-            task.pixelViewTag = task.mousePicTag
-            Dim dw = New cv.Rect(mouseLoc.x, mouseLoc.y, drWidth, drHeight)
-            If dw.X < 0 Then dw.X = 0
-            If dw.Y < 0 Then dw.Y = 0
-            If dw.X + dw.Width > dst1.Width Then
-                dw.X = dst1.Width - dw.Width
-                dw.Width = dw.Width
-            End If
-            If dw.Y + dw.Height > dst1.Height Then
-                dw.Y = dst1.Height - dw.Height
-                dw.Height = dw.Height
-            End If
-
-            Dim testChange As cv.Mat = If(dst1.Channels = 1, dst1(dw).Clone, dst1(dw).CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            Dim diff As New cv.Mat
-            Static savePixels As cv.Mat = testChange
-            If savePixels.Size <> testChange.Size Or savePixels.Type <> testChange.Type Then
-                savePixels = testChange.Clone
-            Else
-                cv.Cv2.Absdiff(savePixels, testChange, diff)
-            End If
-
-            Dim img = dst1(dw)
-            Dim minVal As Single = 0, maxVal As Single = 255
-            Dim format32f = "0000.0"
-            If img.Type = cv.MatType.CV_32F Or img.Type = cv.MatType.CV_32FC3 Then
-                img.MinMaxLoc(minVal, maxVal)
-                If minVal >= 0 Then
-                    If maxVal < 1000 Then format32f = "000.00"
-                    If maxVal < 100 Then format32f = "00.000"
-                    If maxVal < 10 Then format32f = "0.0000"
-                Else
-                    maxVal = Math.Max(-minVal, maxVal)
-                    format32f = " 0.000;-0.000"
-                    If maxVal < 1000 Then format32f = " 000.0;-000.0"
-                    If maxVal < 100 Then format32f = " 00.00;-00.00"
-                    If maxVal < 10 Then format32f = " 0.000;-0.000"
-                End If
-            End If
-
-            savePixels = testChange.Clone
-
-            Dim imgText = ""
-            Select Case displayType
-
-                Case 0
-                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbLf
-                    For y = 0 To img.Height - 1
-                        imgText += "r" + Format(dw.Y + y, "000") + "   "
-                        For x = 0 To img.Width - 1
-                            Dim vec = img.Get(Of cv.Vec3b)(y, x)
-                            imgText += Format(vec.Item0, "000") + " " + Format(vec.Item1, "000") + " " + Format(vec.Item2, "000") + "   "
-                        Next
-                        imgText += vbLf
-                    Next
-
-                Case 1
-                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbLf
-                    For y = 0 To img.Height - 1
-                        imgText += "r" + Format(dw.Y + y, "000") + "   "
-                        For x = 0 To img.Width - 1
-                            imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "   ", " ")
-                        Next
-                        imgText += vbLf
-                    Next
-
-                Case 2
-                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbLf
-                    For y = 0 To img.Height - 1
-                        imgText += "r" + Format(dw.Y + y, "000") + "   "
-                        For x = 0 To img.Width - 1
-                            imgText += Format(img.Get(Of Single)(y, x), format32f) + If((dw.X + x) Mod 5 = 4, "   ", " ")
-                        Next
-                        imgText += vbLf
-                    Next
-
-                Case 3
-                    imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbLf
-                    For y = 0 To img.Height - 1
-                        imgText += "r" + Format(dw.Y + y, "000") + "   "
-                        For x = 0 To img.Width - 1
-                            Dim vec = img.Get(Of cv.Vec3f)(y, x)
-                            imgText += Format(vec.Item0, format32f) + " " + Format(vec.Item1, format32f) + " " + Format(vec.Item2, format32f) + "   "
-                        Next
-                        imgText += vbLf
-                    Next
-
-            End Select
-            task.pixelViewerRect = dw
-
-            If pixels.rtb.Text <> imgText Then
-                If pixels.UpdateFrequency.SelectedIndex = 0 Or firstUpdate Then pixels.rtb.Text = imgText Else pixels.saveText = imgText
-                firstUpdate = False
-            End If
+        Dim testChange As cv.Mat = If(dst1.Channels = 1, dst1(dw).Clone, dst1(dw).CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        Dim diff As New cv.Mat
+        Static saveviewerForm As cv.Mat = testChange
+        If saveviewerForm.Size <> testChange.Size Or saveviewerForm.Type <> testChange.Type Then
+            saveviewerForm = testChange.Clone
         Else
-            If pixels IsNot Nothing Then
-                pixels.Close()
-                pixels = Nothing
+            cv.Cv2.Absdiff(saveviewerForm, testChange, diff)
+        End If
+
+        Dim img = dst1(dw)
+        Dim minVal As Single = 0, maxVal As Single = 255
+        Dim format32f = "0000.0"
+        If img.Type = cv.MatType.CV_32F Or img.Type = cv.MatType.CV_32FC3 Then
+            img.MinMaxLoc(minVal, maxVal)
+            If minVal >= 0 Then
+                If maxVal < 1000 Then format32f = "000.00"
+                If maxVal < 100 Then format32f = "00.000"
+                If maxVal < 10 Then format32f = "0.0000"
+            Else
+                maxVal = Math.Max(-minVal, maxVal)
+                format32f = " 0.000;-0.000"
+                If maxVal < 1000 Then format32f = " 000.0;-000.0"
+                If maxVal < 100 Then format32f = " 00.00;-00.00"
+                If maxVal < 10 Then format32f = " 0.000;-0.000"
             End If
         End If
+
+        saveviewerForm = testChange.Clone
+
+        Dim imgText = ""
+        Select Case displayType
+
+            Case 0
+                imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbLf
+                For y = 0 To img.Height - 1
+                    imgText += "r" + Format(dw.Y + y, "000") + "   "
+                    For x = 0 To img.Width - 1
+                        Dim vec = img.Get(Of cv.Vec3b)(y, x)
+                        imgText += Format(vec.Item0, "000") + " " + Format(vec.Item1, "000") + " " + Format(vec.Item2, "000") + "   "
+                    Next
+                    imgText += vbLf
+                Next
+
+            Case 1
+                imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbLf
+                For y = 0 To img.Height - 1
+                    imgText += "r" + Format(dw.Y + y, "000") + "   "
+                    For x = 0 To img.Width - 1
+                        imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "   ", " ")
+                    Next
+                    imgText += vbLf
+                Next
+
+            Case 2
+                imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbLf
+                For y = 0 To img.Height - 1
+                    imgText += "r" + Format(dw.Y + y, "000") + "   "
+                    For x = 0 To img.Width - 1
+                        imgText += Format(img.Get(Of Single)(y, x), format32f) + If((dw.X + x) Mod 5 = 4, "   ", " ")
+                    Next
+                    imgText += vbLf
+                Next
+
+            Case 3
+                imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth)) + vbLf
+                For y = 0 To img.Height - 1
+                    imgText += "r" + Format(dw.Y + y, "000") + "   "
+                    For x = 0 To img.Width - 1
+                        Dim vec = img.Get(Of cv.Vec3f)(y, x)
+                        imgText += Format(vec.Item0, format32f) + " " + Format(vec.Item1, format32f) + " " + Format(vec.Item2, format32f) + "   "
+                    Next
+                    imgText += vbLf
+                Next
+
+        End Select
+        task.pixelViewerRect = dw
+
+        If viewerForm.rtb.Text <> imgText Then
+            If viewerForm.UpdateFrequency.SelectedIndex = 0 Or firstUpdate Then viewerForm.rtb.Text = imgText Else viewerForm.saveText = imgText
+            firstUpdate = False
+        End If
+
         If task.desc = "Display pixels under the cursor" Then
             task.trueText("Move the mouse to location that you want to inspect." + vbCrLf +
                           "Click and hold the right-mouse button to move away from that location")
         End If
     End Sub
     Public Sub closeViewer()
-        If pixels IsNot Nothing Then pixels.Close()
+        If viewerForm IsNot Nothing Then viewerForm.Close()
     End Sub
 End Class
 

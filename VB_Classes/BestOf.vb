@@ -157,6 +157,8 @@ Public Class BestOf_KNN
     Public Sub New()
         initParent()
         myTopView = New PointCloud_Kalman_TopView
+        Dim hotRadio = findRadio("Hot")
+        hotRadio.Checked = True
         task.desc = "Best example of using KNN to track objects"
     End Sub
     Public Sub Run()
