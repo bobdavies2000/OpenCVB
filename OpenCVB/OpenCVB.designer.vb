@@ -25,6 +25,8 @@ Partial Class OpenCVB
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(OpenCVB))
         Me.ToolStrip1 = New System.Windows.Forms.ToolStrip()
+        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
+        Me.ToolStripButton2 = New System.Windows.Forms.ToolStripButton()
         Me.PausePlayButton = New System.Windows.Forms.ToolStripButton()
         Me.OptionsButton = New System.Windows.Forms.ToolStripButton()
         Me.TestAllButton = New System.Windows.Forms.ToolStripButton()
@@ -42,8 +44,9 @@ Partial Class OpenCVB
         Me.ExitCall = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
-        Me.ToolStripButton2 = New System.Windows.Forms.ToolStripButton()
+        Me.SurveyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CreateSurveyImagesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SurveyTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ToolStrip1.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -59,6 +62,24 @@ Partial Class OpenCVB
         Me.ToolStrip1.Size = New System.Drawing.Size(1786, 58)
         Me.ToolStrip1.TabIndex = 0
         Me.ToolStrip1.Text = "ToolStrip1"
+        '
+        'ToolStripButton1
+        '
+        Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
+        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton1.Name = "ToolStripButton1"
+        Me.ToolStripButton1.Size = New System.Drawing.Size(34, 53)
+        Me.ToolStripButton1.Text = "ToolStripButton1"
+        '
+        'ToolStripButton2
+        '
+        Me.ToolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton2.Image = CType(resources.GetObject("ToolStripButton2.Image"), System.Drawing.Image)
+        Me.ToolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton2.Name = "ToolStripButton2"
+        Me.ToolStripButton2.Size = New System.Drawing.Size(34, 53)
+        Me.ToolStripButton2.Text = "ToolStripButton2"
         '
         'PausePlayButton
         '
@@ -162,7 +183,7 @@ Partial Class OpenCVB
         '
         Me.MenuStrip1.GripMargin = New System.Windows.Forms.Padding(2, 2, 0, 2)
         Me.MenuStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainMenu, Me.AboutToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainMenu, Me.SurveyToolStripMenuItem, Me.AboutToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(1786, 33)
@@ -179,13 +200,13 @@ Partial Class OpenCVB
         'ExitCall
         '
         Me.ExitCall.Name = "ExitCall"
-        Me.ExitCall.Size = New System.Drawing.Size(141, 34)
+        Me.ExitCall.Size = New System.Drawing.Size(270, 34)
         Me.ExitCall.Text = "E&xit"
         '
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(138, 6)
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(267, 6)
         '
         'AboutToolStripMenuItem
         '
@@ -193,23 +214,22 @@ Partial Class OpenCVB
         Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(78, 29)
         Me.AboutToolStripMenuItem.Text = "About"
         '
-        'ToolStripButton1
+        'SurveyToolStripMenuItem
         '
-        Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
-        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton1.Name = "ToolStripButton1"
-        Me.ToolStripButton1.Size = New System.Drawing.Size(34, 53)
-        Me.ToolStripButton1.Text = "ToolStripButton1"
+        Me.SurveyToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CreateSurveyImagesToolStripMenuItem})
+        Me.SurveyToolStripMenuItem.Name = "SurveyToolStripMenuItem"
+        Me.SurveyToolStripMenuItem.Size = New System.Drawing.Size(81, 29)
+        Me.SurveyToolStripMenuItem.Text = "Survey"
         '
-        'ToolStripButton2
+        'CreateSurveyImagesToolStripMenuItem
         '
-        Me.ToolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton2.Image = CType(resources.GetObject("ToolStripButton2.Image"), System.Drawing.Image)
-        Me.ToolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton2.Name = "ToolStripButton2"
-        Me.ToolStripButton2.Size = New System.Drawing.Size(34, 53)
-        Me.ToolStripButton2.Text = "ToolStripButton2"
+        Me.CreateSurveyImagesToolStripMenuItem.Name = "CreateSurveyImagesToolStripMenuItem"
+        Me.CreateSurveyImagesToolStripMenuItem.Size = New System.Drawing.Size(285, 34)
+        Me.CreateSurveyImagesToolStripMenuItem.Text = "Create Survey Images"
+        '
+        'SurveyTimer
+        '
+        Me.SurveyTimer.Interval = 1000
         '
         'OpenCVB
         '
@@ -254,4 +274,7 @@ Partial Class OpenCVB
     Friend WithEvents PixelViewerButton As ToolStripButton
     Friend WithEvents ToolStripButton1 As ToolStripButton
     Friend WithEvents ToolStripButton2 As ToolStripButton
+    Friend WithEvents SurveyToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents CreateSurveyImagesToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents SurveyTimer As Timer
 End Class

@@ -107,6 +107,11 @@ Public Class OpenCVB
     Dim testAll As Bitmap
     Dim testAllRunning As Boolean
     Dim dropDownActive As Boolean
+
+    Dim surveyActive As Boolean
+    Dim nextSurveyImageAvailable As Boolean
+    Dim surveyDir As DirectoryInfo
+    Dim lastSurveyImage As cv.Mat
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -320,6 +325,15 @@ Public Class OpenCVB
         Static myWhitePen As New Pen(Color.White)
         Static myBlackPen As New Pen(Color.Black)
 
+        If surveyActive And frameCount > 10 Then
+            If pic.Tag = 2 And nextSurveyImageAvailable = False Then
+                SyncLock imgResult
+                    lastSurveyImage = imgResult.Clone()
+                    SurveyTimer.Enabled = True
+                    nextSurveyImageAvailable = True
+                End SyncLock
+            End If
+        End If
         If pixelViewerOn And (mousePicTag = pic.Tag Or (pixelViewTag = 3 And pic.Tag = 2)) Then
             Dim pic3Offset As Integer
             If pixelViewTag = 3 Then pic3Offset = imgResult.Width / 2
@@ -1328,6 +1342,38 @@ Public Class OpenCVB
     End Sub
     Private Sub AvailableAlgorithms_DropDownClosed(sender As Object, e As EventArgs) Handles AvailableAlgorithms.DropDownClosed
         dropDownActive = False
+    End Sub
+    Private Sub CreateSurveyImagesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CreateSurveyImagesToolStripMenuItem.Click
+        surveyDir = New DirectoryInfo(HomeDir.FullName + "Survey/")
+        If surveyDir.Exists = False Then surveyDir.Create()
+        surveyActive = True
+        nextSurveyImageAvailable = False
+        AvailableAlgorithms.SelectedIndex = 0
+    End Sub
+    Private Sub SurveyTimer_Tick(sender As Object, e As EventArgs) Handles SurveyTimer.Tick
+        If nextSurveyImageAvailable Then
+            SurveyTimer.Enabled = False
+            Dim dst = lastSurveyImage
+            Dim dst1 = dst(New cv.Rect(0, 0, dst.Width / 2, dst.Height))
+            Dim dst2 = dst(New cv.Rect(dst.Width / 2, 0, dst.Width / 2, dst.Height))
+
+            Dim encodeParams() As Integer = {cv.ImwriteFlags.JpegQuality, 99}
+            Dim minVal As Double, maxVal As Double
+            cv.Cv2.MinMaxLoc(dst1, minVal, maxVal)
+            If maxVal > 0 Then cv.Cv2.ImWrite(surveyDir.FullName + "/" + AvailableAlgorithms.Text + "1.jpg", dst1, encodeParams)
+
+            cv.Cv2.MinMaxLoc(dst2, minVal, maxVal)
+            If maxVal > 0 Then cv.Cv2.ImWrite(surveyDir.FullName + "/" + AvailableAlgorithms.Text + "2.jpg", dst2, encodeParams)
+
+            If AvailableAlgorithms.SelectedIndex = AvailableAlgorithms.Items.Count - 1 Then
+                surveyActive = False
+                AvailableAlgorithms.SelectedIndex = 0
+            Else
+                AvailableAlgorithms.SelectedIndex += 1
+            End If
+            Thread.Sleep(2000)
+            nextSurveyImageAvailable = False
+        End If
     End Sub
 End Class
 
