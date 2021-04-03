@@ -26,7 +26,6 @@ End Class
 
 
 
-
 Public Class AddWeighted_Edges
     Inherits VBparent
     Dim edges As Edges_BinarizedSobel

@@ -10,6 +10,7 @@ Module IndexMain
     Dim nonPYnames As New SortedList(Of String, String)
     Dim PYStreamNames As New SortedList(Of String, String)
     Dim Painterly As New SortedList(Of String, String)
+    Dim Basics As New SortedList(Of String, String)
     Dim MoreWork As New SortedList(Of String, String)
     Dim Trackers As New SortedList(Of String, String)
     Private Function trimQuotes(line As String)
@@ -64,10 +65,10 @@ Module IndexMain
             If line.EndsWith(".py") Then
                 PYnames.Add(line, line)
                 If line.EndsWith("_PS.py") Then PYStreamNames.Add(line, line)
-                If line.EndsWith("_MT.py") Then MTnames.Add(line, line)
             Else
                 If line <> "" Then
                     If line.Contains("Python_Stream") = False And line.Contains("Python") = False Then
+                        If line.EndsWith("_Basics") Then Basics.Add(line, line)
                         nonPYnames.Add(line, line)
                         apiList.Add(line)
                         apiListLCase.Add(LCase(line))
@@ -161,6 +162,12 @@ Module IndexMain
         sw.WriteLine()
 
         sw.WriteLine("<All using recorded data>")
+
+        sw.Write("<Basics>")
+        For i = 0 To Basics.Count - 1
+            sw.Write("," + Basics.ElementAt(i).Key)
+        Next
+        sw.WriteLine()
 
         sw.Write("<C++>")
         For i = 0 To CPPnames.Count - 1
