@@ -89,9 +89,13 @@ Public Class OpenCVB
     Private Delegate Sub delegateEvent()
     Dim logAlgorithms As StreamWriter
     Public callTrace As New List(Of String)
+
     Const MAX_RECENT = 25
     Dim recentList As New List(Of String)
+    Dim arrowList As New List(Of String)
     Dim recentMenu(MAX_RECENT - 1) As ToolStripMenuItem
+    Dim arrowIndex As Integer
+
     Public intermediateReview As String
     Dim meActivateNeeded As Boolean
     Dim pixelViewerOn As Boolean
@@ -433,13 +437,32 @@ Public Class OpenCVB
         End If
         AlgorithmDesc.Text = textDesc
     End Sub
-    Private Sub recentList_Clicked(sender As Object, e As EventArgs)
-        Dim item = TryCast(sender, ToolStripMenuItem)
-        If AvailableAlgorithms.Items.Contains(item.Text) = False Then
+    Private Sub jumpToAlgorithm(algName As String)
+        If AvailableAlgorithms.Items.Contains(algName) = False Then
             AvailableAlgorithms.SelectedIndex = 0
         Else
-            AvailableAlgorithms.SelectedItem = item.Name
+            AvailableAlgorithms.SelectedItem = algName
         End If
+    End Sub
+    Private Sub recentList_Clicked(sender As Object, e As EventArgs)
+        arrowIndex = 0
+        Dim item = TryCast(sender, ToolStripMenuItem)
+        jumpToAlgorithm(item.Name)
+    End Sub
+    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+        If arrowIndex = 0 Then
+            arrowList.Clear()
+            For i = 0 To recentList.Count - 1
+                arrowList.Add(recentList.ElementAt(i))
+            Next
+        End If
+        arrowIndex = Math.Min(arrowList.Count - 1, arrowIndex + 1)
+        jumpToAlgorithm(arrowList.ElementAt(arrowIndex))
+    End Sub
+    Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
+        If arrowIndex = 0 Then Exit Sub ' nothing to go foreward to...
+        arrowIndex = Math.Max(0, arrowIndex - 1)
+        jumpToAlgorithm(arrowList.ElementAt(arrowIndex))
     End Sub
     Private Sub setupRecentList()
         For i = 0 To MAX_RECENT - 1
@@ -1300,11 +1323,9 @@ Public Class OpenCVB
             frameCount += 1
         End While
     End Sub
-
     Private Sub AvailableAlgorithms_DropDown(sender As Object, e As EventArgs) Handles AvailableAlgorithms.DropDown
         dropDownActive = True
     End Sub
-
     Private Sub AvailableAlgorithms_DropDownClosed(sender As Object, e As EventArgs) Handles AvailableAlgorithms.DropDownClosed
         dropDownActive = False
     End Sub
