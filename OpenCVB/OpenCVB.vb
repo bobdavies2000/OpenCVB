@@ -546,12 +546,12 @@ Public Class OpenCVB
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
         If frameCount = 0 And TestAllButton.Text = "Stop Test" Then Exit Sub ' we have to see some output from the algorithm before moving on...
         If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Then
-            If optionsForm.resolution640.Enabled And optionsForm.resolution1280.Checked Then
-                optionsForm.resolution640.Checked = True
-                LineUpCamPics(False)
-                startCamera()
-            Else
-                optionsForm.resolution1280.Checked = True ' start every camera at 1280x720
+            'If optionsForm.resolution640.Enabled And optionsForm.resolution1280.Checked Then
+            '    optionsForm.resolution640.Checked = True
+            '    LineUpCamPics(False)
+            '    startCamera()
+            'Else
+            optionsForm.resolution1280.Checked = True ' start every camera at 1280x720
                 Dim cameraIndex = optionsForm.cameraIndex + 1
                 For i = 0 To optionsForm.cameraRadioButton.Count - 1
                     If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
@@ -565,7 +565,7 @@ Public Class OpenCVB
                         cameraIndex += 1
                     End If
                 Next
-            End If
+            'End If
         End If
 
         If AvailableAlgorithms.SelectedIndex < AvailableAlgorithms.Items.Count - 1 Then
