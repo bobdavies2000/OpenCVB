@@ -44,7 +44,7 @@ Module Algorithm_Module
             Static retryCount As Integer
             retryCount += 1
             If retryCount >= 5 Then
-                MsgBox("A checkbox was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
+                Console.WriteLine("A checkbox was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
                 Exit While
             End If
         End While
@@ -67,7 +67,7 @@ Module Algorithm_Module
             Static retryCount As Integer
             retryCount += 1
             If retryCount >= 5 Then
-                MsgBox("A findRadio was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
+                Console.WriteLine("A findRadio was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
                 Exit While
             End If
         End While
@@ -85,7 +85,7 @@ Module Algorithm_Module
         Catch ex As Exception
             Console.WriteLine("findSlider failed.  The application list of forms changed while iterating.  Not critical.")
         End Try
-        MsgBox("A slider was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
+        Console.WriteLine("A slider was not found!" + vbCrLf + vbCrLf + "Review the " + vbCrLf + vbCrLf + "'" + opt + "' request '")
 
         Return Nothing
     End Function
