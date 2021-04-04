@@ -474,9 +474,12 @@ Public Class OpenCVB
         jumpToAlgorithm(arrowList.ElementAt(arrowIndex))
     End Sub
     Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
-        If arrowIndex = 0 Then Exit Sub ' nothing to go foreward to...
-        arrowIndex = Math.Max(0, arrowIndex - 1)
-        jumpToAlgorithm(arrowList.ElementAt(arrowIndex))
+        If arrowIndex = 0 Then
+            jumpToAlgorithm(AvailableAlgorithms.Items(Math.Min(AvailableAlgorithms.Items.Count - 1, AvailableAlgorithms.SelectedIndex + 1)))
+        Else
+            arrowIndex = Math.Max(0, arrowIndex - 1)
+            jumpToAlgorithm(arrowList.ElementAt(arrowIndex))
+        End If
     End Sub
     Private Sub setupRecentList()
         For i = 0 To MAX_RECENT - 1
