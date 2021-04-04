@@ -181,12 +181,12 @@ Public Class CameraMyntD
         Dim rightPtr = MyntDRightImage(cPtr)
         Dim pcPtr = MyntDPointCloud(cPtr)
         If imagePtr <> 0 And depthRGBPtr <> 0 And rightPtr <> 0 And depth16Ptr <> 0 And pcPtr <> 0 Then
-            color = New cv.Mat(height, width, cv.MatType.CV_8UC3, imagePtr).Clone()
+            color = New cv.Mat(height, width, cv.MatType.CV_8UC3, imagePtr)
             leftView = color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             rightView = New cv.Mat(height, width, cv.MatType.CV_8UC3, rightPtr).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, depthRGBPtr).Clone()
-            pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, pcPtr).Clone()
-            depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, depth16Ptr).Clone()
+            RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, depthRGBPtr)
+            pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, pcPtr)
+            depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, depth16Ptr)
             MyBase.GetNextFrameCounts(IMU_FrameTime)
         End If
     End Sub

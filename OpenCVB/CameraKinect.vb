@@ -146,11 +146,11 @@ Public Class CameraKinect
         If colorBuffer <> 0 Then ' it can be zero on startup...
             Dim colorRGBA = New cv.Mat(height, width, cv.MatType.CV_8UC4, colorBuffer)
             color = colorRGBA.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
-            depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, KinectRawDepth(cPtr)).Clone()
-            RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, KinectRGBdepth(cPtr)).Clone()
+            depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, KinectRawDepth(cPtr))
+            RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, KinectRGBdepth(cPtr))
             ' if you normalize here instead of just a fixed multiply, the image will pulse with different brightness values.  Not pretty.
             leftView = (New cv.Mat(height, width, cv.MatType.CV_16U, KinectLeftView(cPtr)) * 0.06).ToMat.ConvertScaleAbs() ' so depth data fits into 0-255 (approximately)
-            rightView = leftView.Clone()
+            rightView = leftView.Clone
 
             Dim pc = New cv.Mat(height, width, cv.MatType.CV_16SC3, KinectPointCloud(cPtr))
             ' This is less efficient than using 16-bit pixels but consistent with the other cameras
