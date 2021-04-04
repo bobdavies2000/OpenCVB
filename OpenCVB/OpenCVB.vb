@@ -11,10 +11,8 @@ Imports System.Runtime.InteropServices
 Imports System.Management
 Module opencv_module
     Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
-    Public delegateLock As New Mutex(True, "delegateLock")
     Public callTraceLock As New Mutex(True, "callTraceLock")
     Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
-    Public cameraThreadLock As New Mutex(True, "CameraThreadLock")
 End Module
 Public Class OpenCVB
 #Region "Globals"
@@ -23,11 +21,12 @@ Public Class OpenCVB
     Dim algorithmTaskHandle As Thread
 
     Dim saveAlgorithmName As String
-    Dim currentCameraName As String
     Dim saveCameraName As String
+    Dim saveCameraIndex As Integer
 
     Dim border As Integer = 6
     Dim BothFirstAndLastReady As Boolean
+
     Dim camera As Object
     Dim cameraRS2Generic As Object ' used only to initialize D435i
     Dim cameraD435i As Object
@@ -39,8 +38,10 @@ Public Class OpenCVB
     Dim cameraZed2 As Object
     Dim cameraTaskHandle As Thread
     Dim camPic(3 - 1) As PictureBox
-    Dim cameraRefresh As Boolean
-    Dim newImagesAvailable As Boolean
+
+    Dim paintNewImages As Boolean
+    Dim taskNewImages As Boolean
+
     Dim algorithmRefresh As Boolean
     Dim CodeLineCount As Integer
     Dim DrawingRectangle As Boolean
@@ -194,7 +195,7 @@ Public Class OpenCVB
 
         If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D435i) +
                 optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D455) > 0 Then
-            optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.PythonRS2) = 0 ' turned off for now...
+            optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.PythonRS2) = 0 ' Turn RealSense 2 Python interface on and off here...
         End If
 
         ' Some devices may be present but their opencvb camera interface needs to be present as well.
@@ -296,25 +297,6 @@ Public Class OpenCVB
         If GetSetting("OpenCVB", "TreeButton", "TreeButton", False) Then TreeButton_Click(sender, e)
         If GetSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", False) Then PixelViewerButton_Click(sender, e)
     End Sub
-    Private Sub checkCameraDefault()
-        ' if the default camera is not present, try to find another.
-        If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam) Then
-                optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
-            End If
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.MyntD1000) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.MyntD1000
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D435i) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.D435i
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D455) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.D455
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.OakDCamera
-            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.PythonRS2) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.PythonRS2
-            If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
-                MsgBox("There are no supported cameras present!" + vbCrLf + vbCrLf +
-                       "Connect any of these cameras: " + vbCrLf + vbCrLf + "Intel RealSense2 D455" + vbCrLf + "Intel RealSense2 D435i" + vbCrLf +
-                       "OpenCV Oak-D camera" + vbCrLf + "Microsoft Kinect 4 Azure" + vbCrLf + "MyntEyeD 1000" + vbCrLf + "StereoLabs Zed2")
-            End If
-        End If
-    End Sub
     Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
         Dim g As Graphics = e.Graphics
         Dim pic = DirectCast(sender, PictureBox)
@@ -362,8 +344,8 @@ Public Class OpenCVB
             End SyncLock
         End If
 
-        If cameraRefresh And (pic.Tag = 0 Or pic.Tag = 1) Then
-            cameraRefresh = False
+        If paintNewImages And (pic.Tag = 0 Or pic.Tag = 1) Then
+            paintNewImages = False
             If camera.color IsNot Nothing Then
                 If camera.color.width > 0 Then
                     Dim RGBDepth = camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
@@ -451,6 +433,25 @@ Public Class OpenCVB
         End If
         AlgorithmDesc.Text = textDesc
     End Sub
+    Private Sub checkCameraDefault()
+        ' if the default camera is not present, try to find another.
+        If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam) Then
+                optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
+            End If
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.MyntD1000) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.MyntD1000
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D435i) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.D435i
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D455) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.D455
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.OakDCamera
+            If optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.PythonRS2) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.PythonRS2
+            If optionsForm.cameraDeviceCount(optionsForm.cameraIndex) = 0 Then
+                MsgBox("There are no supported cameras present!" + vbCrLf + vbCrLf +
+                       "Connect any of these cameras: " + vbCrLf + vbCrLf + "Intel RealSense2 D455" + vbCrLf + "Intel RealSense2 D435i" + vbCrLf +
+                       "OpenCV Oak-D camera" + vbCrLf + "Microsoft Kinect 4 Azure" + vbCrLf + "MyntEyeD 1000" + vbCrLf + "StereoLabs Zed2")
+            End If
+        End If
+    End Sub
     Private Sub jumpToAlgorithm(algName As String)
         If AvailableAlgorithms.Items.Contains(algName) = False Then
             AvailableAlgorithms.SelectedIndex = 0
@@ -527,15 +528,6 @@ Public Class OpenCVB
     End Sub
     Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
         TestAllButton.Image = If(TestAllButton.Text = "Test All", stopTest, testAll)
-        Me.Refresh()
-
-        Dim saveRes = optionsForm.resolution1280.Checked
-        optionsForm.resolution1280.Checked = True
-        If saveRes = False Then
-            saveLayout()
-            LineUpCamPics(False)
-            startCamera()
-        End If
 
         If TestAllButton.Text = "Test All" Then
             TestAllButton.Text = "Stop Test"
@@ -585,55 +577,45 @@ Public Class OpenCVB
     End Sub
     Private Sub startCamera()
         ' order is same as in optionsdialog enum
-        camera = Choose(optionsForm.cameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraPyRS2, cameraOakD)
+        saveCameraIndex = optionsForm.cameraIndex
 
-        ' Stop the current camera gracefully...
-        SyncLock bufferLock
-            saveCameraName = ""
-        End SyncLock
-
-        While currentCameraName <> ""
-            Application.DoEvents()
-        End While
-
-        camera.initialize(workingRes.Width, workingRes.Height, fps)
-        saveCameraName = camera.deviceName + " " + CStr(workingRes.Width)
         If saveAlgorithmName IsNot Nothing Then StartAlgorithmTask() ' restart the currealgorithm...
-        SyncLock cameraThreadLock
-            cameraRefresh = False
-            newImagesAvailable = False
+        paintNewImages = False
+        taskNewImages = False
+        If cameraTaskHandle Is Nothing Then
             cameraTaskHandle = New Thread(AddressOf CameraTask)
-            cameraTaskHandle.Name = camera.deviceName + " " + CStr(workingRes.Width)
-            cameraTaskHandle.Priority = ThreadPriority.Highest
             cameraTaskHandle.Start()
-        End SyncLock
+        End If
 
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub
     Private Sub CameraTask()
         On Error Resume Next
-        SyncLock cameraThreadLock
-            Dim currentCamera = camera
-            currentCameraName = currentCamera.deviceName + " " + CStr(workingRes.Width)
-            While currentCameraName = saveCameraName
-                SyncLock bufferLock
-                    currentCamera.GetNextFrame()
-                End SyncLock
-                cameraRefresh = True ' trigger the paint 
-                newImagesAvailable = True ' trigger the algorithm task
+        Dim currentCameraIndex = -1
+        While (1)
+            If currentCameraIndex <> saveCameraIndex Then
+                If saveCameraIndex < 0 Then Exit While
+                If camera IsNot Nothing Then camera.stopCamera()
+                camera = Choose(saveCameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraPyRS2, cameraOakD)
+                currentCameraIndex = saveCameraIndex
+                camera.initialize(workingRes.Width, workingRes.Height, fps)
+                saveCameraName = camera.deviceName + " " + CStr(workingRes.Width)
+                cameraTaskHandle.Name = saveCameraName
+            End If
+            SyncLock bufferLock
+                camera.GetNextFrame()
+            End SyncLock
+            paintNewImages = True ' trigger the paint 
+            taskNewImages = True ' trigger the algorithm task
 
-                Static delegateX As New delegateEvent(AddressOf raiseEventCamera)
-                Me.Invoke(delegateX)
+            Static delegateX As New delegateEvent(AddressOf raiseEventCamera)
+            Me.Invoke(delegateX)
 
-                GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
+            GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
 
-                Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
-                totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
-            End While
-            currentCamera.stopCamera()
-            currentCameraName = ""
-            saveAlgorithmName = "" ' restart algorithm when camera is ready...
-        End SyncLock
+            Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
+            totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
+        End While
     End Sub
     Private Sub TreeButton_Click(sender As Object, e As EventArgs) Handles TreeButton.Click
         TreeButton.Checked = Not TreeButton.Checked
@@ -999,17 +981,11 @@ Public Class OpenCVB
         saveLayout()
     End Sub
     Public Sub raiseEventCamera()
-        SyncLock delegateLock
-            For i = 0 To camPic.Length - 1
-                camPic(i).Refresh()
-            Next
-        End SyncLock
+        For i = 0 To camPic.Length - 1
+            camPic(i).Refresh()
+        Next
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
-        If saveCameraName = currentCameraName And dropDownActive = False Then
-            saveAlgorithmName = AvailableAlgorithms.Text
-            saveCameraName = camera.deviceName + " " + CStr(workingRes.Width)
-        End If
         Static lastAlgorithmFrame As Integer
         Static lastCameraFrame As Integer
         If lastAlgorithmFrame > frameCount Then lastAlgorithmFrame = 0
@@ -1033,7 +1009,7 @@ Public Class OpenCVB
         Dim cameraFPS As Single = camFrames / (fpsTimer.Interval / 1000)
 
         Me.Text = "OpenCVB (" + Format(CodeLineCount, "###,##0") + " lines / " + CStr(AlgorithmCount) + " algorithms = " + CStr(CInt(CodeLineCount / AlgorithmCount)) +
-                  " lines per) - " + optionsForm.cameraRadioButton(optionsForm.cameraIndex).Text + " - " + Format(cameraFPS, "#0.0") +
+                  " lines per) - " + optionsForm.cameraRadioButton(saveCameraIndex).Text + " - " + Format(cameraFPS, "#0.0") +
                   "/" + Format(algorithmFPS, "#0.0") + " " + CStr(totalBytesOfMemoryUsed) + " Mb (working set) with " +
                   CStr(Process.GetCurrentProcess().Threads.Count) + " threads"
     End Sub
@@ -1060,9 +1036,8 @@ Public Class OpenCVB
     Private Sub Exit_Click(sender As Object, e As EventArgs) Handles ExitCall.Click
         SaveSetting("OpenCVB", "TreeButton", "TreeButton", TreeButton.Checked)
         SaveSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", PixelViewerButton.Checked)
-        saveCameraName = ""
-        saveAlgorithmName = ""
-        textDesc = ""
+        saveCameraIndex = -1 ' this will close the camera task
+        saveAlgorithmName = "" ' this will close the current algorithm.
         saveLayout()
     End Sub
     Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
@@ -1114,14 +1089,11 @@ Public Class OpenCVB
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
 
         saveAlgorithmName = ""
-
-        Dim saveCurrentCamera = optionsForm.cameraIndex
-
         Dim OKcancel = optionsForm.ShowDialog()
 
         If OKcancel = DialogResult.OK Then
             optionsForm.saveResolution()
-            If saveCurrentCamera <> optionsForm.cameraIndex Or camera.width <> workingRes.Width Then startCamera()
+            If saveCameraIndex <> optionsForm.cameraIndex Or camera.width <> workingRes.Width Then startCamera()
             TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
 
             LineUpCamPics(resizing:=False)
@@ -1214,12 +1186,13 @@ Public Class OpenCVB
     Private Sub Run(task As VB_Classes.ActiveTask, algName As String)
         While 1
             Dim ratioImageToCampic = task.color.Width / camPic(0).Width  ' relative size of displayed image and algorithm size image.
+            Dim currentCameraName = saveCameraName
             While 1
                 If saveAlgorithmName <> algName Then Exit Sub ' pause will stop the current algorithm as well.
                 Application.DoEvents() ' this will allow any options for the algorithm to be updated...
                 SyncLock bufferLock
                     If frameCount > 0 And saveCameraName <> currentCameraName Then Exit Sub
-                    If newImagesAvailable And pauseAlgorithmThread = False And camera.color.width > 0 Then
+                    If taskNewImages And pauseAlgorithmThread = False And camera.color.width > 0 Then
                         ' bring the data into the algorithm task.
                         task.color = camera.color.clone
                         task.RGBDepth = camera.RGBDepth.clone
@@ -1268,7 +1241,7 @@ Public Class OpenCVB
                             mouseClickFlag = False
                         End If
                         task.fileStarted = openFileStarted ' UI may have stopped play.
-                        newImagesAvailable = False
+                        taskNewImages = False
                         Exit While
                     End If
                 End SyncLock
