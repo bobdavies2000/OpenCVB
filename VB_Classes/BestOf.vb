@@ -265,29 +265,3 @@ Public Class BestOf_MSER
         label2 = mser.label2
     End Sub
 End Class
-
-
-
-
-
-
-
-Public Class BestOf_Stabilizer
-    Inherits VBparent
-    Dim stable As Stabilizer_BasicsTest
-    Public Sub New()
-        initParent()
-        stable = New Stabilizer_BasicsTest
-        task.desc = "Best example of how to stabilize the rgb image."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-
-        stable.src = src
-        stable.Run()
-        dst1 = stable.dst1
-        dst2 = stable.dst2
-        label1 = stable.label1
-        label2 = stable.label2
-    End Sub
-End Class
