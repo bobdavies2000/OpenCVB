@@ -552,20 +552,20 @@ Public Class OpenCVB
             '    startCamera()
             'Else
             optionsForm.resolution1280.Checked = True ' start every camera at 1280x720
-                Dim cameraIndex = optionsForm.cameraIndex + 1
-                For i = 0 To optionsForm.cameraRadioButton.Count - 1
-                    If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
-                    If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
-                        optionsForm.cameraRadioButton(cameraIndex).Checked = True
-                        optionsForm.cameraIndex = cameraIndex
-                        LineUpCamPics(False)
-                        startCamera()
-                        Exit For
-                    Else
-                        cameraIndex += 1
-                    End If
-                Next
-            'End If
+            Dim cameraIndex = optionsForm.cameraIndex + 1
+            For i = 0 To optionsForm.cameraRadioButton.Count - 1
+                If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
+                If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
+                    optionsForm.cameraRadioButton(cameraIndex).Checked = True
+                    optionsForm.cameraIndex = cameraIndex
+                    LineUpCamPics(False)
+                    startCamera()
+                    Exit For
+                Else
+                    cameraIndex += 1
+                End If
+            Next
+            ' End If
         End If
 
         If AvailableAlgorithms.SelectedIndex < AvailableAlgorithms.Items.Count - 1 Then

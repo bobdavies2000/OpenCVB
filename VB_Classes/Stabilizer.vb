@@ -56,21 +56,20 @@ Public Class Stabilizer_Basics
             Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
             match.correlationMat.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
 
-            Dim updateCount As Integer
             Static thresholdSlider = findSlider("Stabilizer Correlation Threshold X1000")
             If maxVal > thresholdSlider.value / thresholdSlider.maximum Then
-                updateCount += 1
-                shiftX = templateRect.X - maxLoc.X
-                shiftY = templateRect.Y - maxLoc.Y
+                shiftX = templateRect.X - maxLoc.X - searchRect.X
+                shiftY = templateRect.Y - maxLoc.Y - searchRect.Y
                 Dim x1 = If(shiftX < 0, Math.Abs(shiftX), 0)
                 Dim y1 = If(shiftY < 0, Math.Abs(shiftY), 0)
 
-                stableRect = New cv.Rect(x1, y1, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY))
                 dst2.SetTo(0)
 
                 Dim x2 = If(shiftX < 0, 0, shiftX)
                 Dim y2 = If(shiftY < 0, 0, shiftY)
+                stableRect = New cv.Rect(x1, y1, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY))
                 Dim srcRect = New cv.Rect(x2, y2, stableRect.Width, stableRect.Height)
+                stableRect = New cv.Rect(x1, y1, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY))
                 input(srcRect).CopyTo(dst2(stableRect))
                 Dim nonZero = dst2.CountNonZero() / (dst2.Width * dst2.Height)
                 If nonZero < (1 - lostMax) Then
