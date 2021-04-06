@@ -778,15 +778,15 @@ Public Class KNN_Point2d
     End Sub
     Public Sub prepareImage(dst As cv.Mat, dotSize As Integer)
         dst.SetTo(0)
-        For i = 0 To knn.knnQT.trainingPoints.Count - 1
-            cv.Cv2.Circle(dst, knn.knnQT.trainingPoints(i), dotSize + 2, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
-        Next
+        'For i = 0 To knn.knnQT.trainingPoints.Count - 1
+        '    cv.Cv2.Circle(dst, knn.knnQT.trainingPoints(i), dotSize + 2, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
+        'Next
         Static nearestCountSlider = findSlider("KNN k nearest points")
         findXnearest = nearestCountSlider.Value
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        If standalone or task.intermediateReview = caller Then prepareImage(dst1, task.dotSize)
+        If standalone Or task.intermediateReview = caller Then prepareImage(dst1, task.dotSize)
 
         knn.Run()
 
@@ -799,9 +799,10 @@ Public Class KNN_Point2d
                 Dim index = neighbors.Get(Of Single)(0, j)
                 responseSet(i * findXnearest + j) = CInt(index)
             Next
-            If standalone or task.intermediateReview = caller Then
+            If standalone Or task.intermediateReview = caller Then
                 For j = 0 To findXnearest - 1
                     dst1.Line(knn.knnQT.trainingPoints(responseSet(i * findXnearest + j)), knn.knnQT.queryPoints(i), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                    cv.Cv2.Circle(dst1, knn.knnQT.trainingPoints(responseSet(i * findXnearest + j)), task.dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
                     cv.Cv2.Circle(dst1, knn.knnQT.queryPoints(i), task.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias, 0)
                 Next
             End If

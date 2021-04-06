@@ -1,29 +1,34 @@
 Imports cv = OpenCvSharp
 Public Class LUT_Basics
     Inherits VBparent
-    Public reduction As Reduction_Basics
-    Dim gradMap As Palette_BuildGradientColorMap
-    Public colorMap As cv.Mat
     Public Sub New()
         initParent()
-        reduction = New Reduction_Basics()
-        gradMap = New Palette_BuildGradientColorMap
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "LUT zero through xxx", 1, 255, 65)
+            sliders.setupTrackBar(1, "LUT xxx through yyy", 1, 255, 110)
+            sliders.setupTrackBar(2, "LUT xxx through yyy", 1, 255, 160)
+            sliders.setupTrackBar(3, "LUT xxx through 255", 1, 255, 210)
+        End If
 
-        label2 = "Custom Color Lookup Table"
-        task.desc = "Use a palette to provide the lookup table for LUT - Painterly Effect"
+        task.desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-
-        If standalone or task.intermediateReview = caller Then
-            reduction.src = src
-            reduction.Run()
-        End If
-
-        gradMap.Run()
-        colorMap = gradMap.gradientColorMap.Flip(cv.FlipMode.X)
-        dst1 = reduction.dst1.LUT(colorMap)
-        dst2 = colorMap.Resize(src.Size())
+        sliders.sLabels(0).Text = "LUT zero through " + CStr(sliders.trackbar(0).Value)
+        sliders.sLabels(1).Text = "LUT " + CStr(sliders.trackbar(0).Value) + " through " + CStr(sliders.trackbar(1).Value)
+        sliders.sLabels(2).Text = "LUT " + CStr(sliders.trackbar(1).Value) + " through " + CStr(sliders.trackbar(2).Value)
+        sliders.sLabels(3).Text = "LUT " + CStr(sliders.trackbar(2).Value) + " through 255"
+        Dim splits = {sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value, sliders.trackbar(3).Value, 255}
+        Dim vals = {1, sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value, 255}
+        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim myLut As New cv.Mat(1, 256, cv.MatType.CV_8U)
+        Dim splitIndex As Integer
+        For i = 0 To 255
+            myLut.Set(Of Byte)(0, i, vals(splitIndex))
+            If i >= splits(splitIndex) Then splitIndex += 1
+        Next
+        dst1 = gray.LUT(myLut)
     End Sub
 End Class
 
@@ -33,8 +38,9 @@ End Class
 
 
 
+
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
-Public Class LUT_Simple
+Public Class LUT_Reduction
     Inherits VBparent
     Public reduction As Reduction_Basics
     Public colorMat As cv.Mat
@@ -50,7 +56,7 @@ Public Class LUT_Simple
         reduction.src = src
         reduction.Run()
         dst1 = reduction.dst1.LUT(colorMat)
-        If standalone or task.intermediateReview = caller Then dst2 = colorMat.Resize(src.Size())
+        If standalone Or task.intermediateReview = caller Then dst2 = colorMat.Resize(src.Size())
     End Sub
 End Class
 
@@ -60,43 +66,35 @@ End Class
 
 
 
-
-
-
-
-
-Public Class LUT_Gray
+Public Class LUT_CustomColor
     Inherits VBparent
+    Public reduction As Reduction_Basics
+    Dim gradMap As Palette_BuildGradientColorMap
+    Public colorMap As cv.Mat
     Public Sub New()
         initParent()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "LUT zero through xxx", 1, 255, 65)
-            sliders.setupTrackBar(1, "LUT xxx through yyy", 1, 255, 110)
-            sliders.setupTrackBar(2, "LUT xxx through yyy", 1, 255, 160)
-            sliders.setupTrackBar(3, "LUT xxx through 255", 1, 255, 210)
-        End If
+        reduction = New Reduction_Basics()
+        gradMap = New Palette_BuildGradientColorMap
 
-        task.desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
+        label2 = "Custom Color Lookup Table"
+        task.desc = "Use a palette to provide the lookup table for LUT - Painterly Effect"
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then task.intermediateObject = Me
-        sliders.sLabels(0).Text = "LUT zero through " + CStr(sliders.trackbar(0).Value)
-        sliders.sLabels(1).Text = "LUT " + CStr(sliders.trackbar(0).Value) + " through " + CStr(sliders.trackbar(1).Value)
-        sliders.sLabels(2).Text = "LUT " + CStr(sliders.trackbar(1).Value) + " through " + CStr(sliders.trackbar(2).Value)
-        sliders.sLabels(3).Text = "LUT " + CStr(sliders.trackbar(2).Value) + " through 255"
-        Dim splits = {sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value, sliders.trackbar(3).Value, 255}
-        Dim vals = {0, sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value, 255}
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim myLut As New cv.Mat(1, 256, cv.MatType.CV_8U)
-        Dim splitIndex As integer
-        For i = 0 To 255
-            myLut.Set(Of Byte)(0, i, vals(splitIndex))
-            If i >= splits(splitIndex) Then splitIndex += 1
-        Next
-        dst1 = gray.LUT(myLut)
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+
+        If standalone Or task.intermediateReview = caller Then
+            reduction.src = src
+            reduction.Run()
+        End If
+
+        gradMap.Run()
+        colorMap = gradMap.gradientColorMap.Flip(cv.FlipMode.X)
+        dst1 = reduction.dst1.LUT(colorMap)
+        dst2 = colorMap.Resize(src.Size())
     End Sub
 End Class
+
+
 
 
 

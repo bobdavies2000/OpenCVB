@@ -972,3 +972,49 @@ Public Class FloodFill_Palette
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class FloodFill_LUT
+    Inherits VBparent
+    Dim lut As LUT_Basics
+    Dim flood As FloodFill_Basics
+    Dim addw As AddWeighted_Basics
+    Public Sub New()
+        initParent()
+        addw = New AddWeighted_Basics
+        lut = New LUT_Basics
+        flood = New FloodFill_Basics
+        task.desc = "The input to a floodfill is the output of a LUT"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+
+        lut.src = src
+        lut.Run()
+
+        flood.src = lut.dst1
+        flood.Run()
+        dst1 = lut.dst1
+        dst2 = src
+        Dim mask As New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        Dim incr = 255 / (flood.masks.Count + 1)
+        For i = 0 To flood.masks.Count - 1
+            Dim rect = flood.rects(i)
+            Dim mat = flood.masks(i)
+            mask(rect).SetTo((i + 1) * incr, mat(rect))
+        Next
+
+        addw.src = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        addw.src2 = src
+        addw.Run()
+        dst2 = addw.dst1
+
+        For Each r In flood.rects
+            dst2.Rectangle(r, cv.Scalar.White, 1)
+        Next
+    End Sub
+End Class

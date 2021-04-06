@@ -166,41 +166,6 @@ End Class
 
 
 
-Public Class Blob_DepthClusters
-    Inherits VBparent
-    Public histBlobs As Histogram_DepthClusters
-    Public flood As FloodFill_Basics
-    Public Sub New()
-        initParent()
-
-        histBlobs = New Histogram_DepthClusters()
-
-        flood = New FloodFill_Basics()
-        Dim loSlider = findSlider("FloodFill LoDiff")
-        Dim hiSlider = findSlider("FloodFill HiDiff")
-        loSlider.Value = 1 ' pixels are exact.
-        hiSlider.Value = 1 ' pixels are exact.
-
-        label2 = "Backprojection of identified histogram depth clusters."
-        task.desc = "Highlight the distinct histogram blobs found with depth clustering."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        histBlobs.src = task.noDepthMask
-        histBlobs.Run()
-        dst1 = histBlobs.dst1
-        flood.src = histBlobs.dst2
-        flood.initialMask = task.noDepthMask
-        flood.Run()
-        dst2 = flood.dst2
-        label1 = CStr(histBlobs.valleys.rangeBoundaries.Count) + " Depth Clusters"
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class Blob_Rectangles
@@ -327,3 +292,95 @@ Public Class Blob_LargestDepthCluster
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class Blob_DepthClusters
+    Inherits VBparent
+    Public histBlobs As Histogram_DepthClusters
+    Public flood As FloodFill_Basics
+    Public Sub New()
+        initParent()
+
+        histBlobs = New Histogram_DepthClusters()
+
+        flood = New FloodFill_Basics()
+        Dim loSlider = findSlider("FloodFill LoDiff")
+        Dim hiSlider = findSlider("FloodFill HiDiff")
+        loSlider.Value = 1 ' pixels are exact.
+        hiSlider.Value = 1 ' pixels are exact.
+
+        label2 = "Backprojection of identified histogram depth clusters."
+        task.desc = "Highlight the distinct histogram blobs found with depth clustering."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        histBlobs.src = task.noDepthMask
+        histBlobs.Run()
+        dst1 = histBlobs.dst1
+        flood.src = histBlobs.dst2
+        flood.initialMask = task.noDepthMask
+        flood.Run()
+        dst2 = flood.dst2
+        label1 = CStr(histBlobs.valleys.rangeBoundaries.Count) + " Depth Clusters"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Blob_DepthClusters1
+    Inherits VBparent
+    Public histBlobs As Histogram_DepthClusters
+    Public flood As FloodFill_Basics
+    Dim pixel As Pixel_Sampler
+    Public Sub New()
+        initParent()
+        pixel = New Pixel_Sampler
+        histBlobs = New Histogram_DepthClusters()
+
+        flood = New FloodFill_Basics()
+        Dim loSlider = findSlider("FloodFill LoDiff")
+        Dim hiSlider = findSlider("FloodFill HiDiff")
+        loSlider.Value = 1 ' pixels are exact.
+        hiSlider.Value = 1 ' pixels are exact.
+
+        label2 = "Backprojection of identified histogram depth clusters."
+        task.desc = "Highlight the distinct histogram blobs found with depth clustering."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        histBlobs.src = task.noDepthMask
+        histBlobs.Run()
+        dst1 = histBlobs.dst1
+        flood.src = histBlobs.dst2
+        flood.initialMask = task.noDepthMask
+        flood.Run()
+
+        Static lastFrame = flood.dst2
+        Static lastCount = flood.rects.Count
+        If task.cameraStable = False Or task.frameCount = 0 Then
+            lastFrame = flood.dst2.Clone
+            dst2 = flood.dst2.Clone
+        Else
+            For i = 0 To flood.rects.Count - 1
+                Dim rect = flood.rects(i)
+                Dim mask = flood.masks(i)(rect)
+                pixel.src = lastFrame(rect).Clone
+                Dim inverse = 255 - mask
+                pixel.src.SetTo(0, inverse)
+                pixel.Run()
+                dst2(rect).SetTo(pixel.dominantGray, mask)
+            Next
+            lastFrame = dst2.Clone
+        End If
+        dst2.SetTo(0, task.noDepthMask)
+        label1 = CStr(histBlobs.valleys.rangeBoundaries.Count) + " Depth Clusters"
+    End Sub
+End Class

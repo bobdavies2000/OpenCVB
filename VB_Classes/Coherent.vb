@@ -21,19 +21,6 @@ Public Class Coherent_Basics
         flood.src = input
         flood.Run()
 
-        Dim sortedColor As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
-        For i = 0 To flood.lastPoints.Count - 1
-            sortedColor.Add(input.Mean(flood.lastMasks(i)).Item(0), i)
-        Next
-        dst1 = dst1.Clone
-        Dim incr = 255 / flood.lastPoints.Count
-        For i = sortedColor.Count - 1 To 0 Step -1
-            Dim index = sortedColor.ElementAt(i).Value
-            Dim rect = flood.lastRects(index)
-            Dim mask = flood.lastMasks(index)
-            dst1(rect).SetTo(255 - i * incr, mask(rect))
-        Next
-
         Static lastCount = flood.lastPoints.Count
         Static lastFrame = flood.dst1.Clone
         If flood.lastPoints.Count < lastCount Then
