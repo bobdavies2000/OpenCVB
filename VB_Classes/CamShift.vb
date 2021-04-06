@@ -139,7 +139,7 @@ Public Class Camshift_Object
 
 
         If blob.flood.masks.Count > 0 Then
-            Dim largestMask = blob.flood.maskSizes.ElementAt(0).Value
+            Dim largestMask = blob.flood.sortedSizes.ElementAt(0).Value
             If camshift.trackBox.Size.Width > src.Width Or camshift.trackBox.Size.Height > src.Height Then
                 task.drawRect = blob.flood.rects(largestMask)
             End If
@@ -189,7 +189,7 @@ Public Class Camshift_TopObjects
         Dim trackBoxes As New List(Of cv.RotatedRect)
         For i = 0 To cams.Length - 1
             If blob.flood.maskSizes.Count > i Then
-                Dim camIndex = blob.flood.maskSizes.ElementAt(i).Value
+                Dim camIndex = blob.flood.sortedSizes.ElementAt(i).Value
                 If task.frameCount Mod updateFrequency = 0 Or cams(i).trackBox.Size.Width = 0 Then
                     task.drawRect = blob.flood.rects(camIndex)
                 End If

@@ -1,8 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class OptionsCommon
     Inherits VBparent
-    Public minVal As Single
-    Public maxVal As Single
     Public bins As Integer
     Public Sub New()
         initParent()

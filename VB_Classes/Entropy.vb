@@ -88,7 +88,6 @@ Public Class Entropy_Highest
         addw.Run()
         dst2 = addw.dst1
 
-        Dim minval As Double, maxval As Double
         Dim tmp = entropyMap.ConvertScaleAbs(255 / (maxEntropy - minEntropy))
         cv.Cv2.MinMaxLoc(tmp, minval, maxval)
 

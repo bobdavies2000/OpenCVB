@@ -5,12 +5,12 @@ Public Class EMax_Basics
     Public basics As EMax_VB_Failing
     Dim inputDataMask As cv.Mat
     Dim EMax_Basics As IntPtr
-    Public palette As Palette_Coherence
+    Public palette As Coherent_Palette
     Dim edges As Edges_Sobel
     Public Sub New()
         initParent()
         basics = New EMax_VB_Failing()
-        palette = New Palette_Coherence
+        palette = New Coherent_Palette
         EMax_Basics = EMax_Basics_Open()
         edges = New Edges_Sobel
 
@@ -56,8 +56,7 @@ Public Class EMax_Basics
 
         dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8U, imagePtr)
 
-        Dim minVal As Double, maxVal As Double
-        cv.Cv2.MinMaxLoc(dst2, minVal, maxVal)
+        cv.Cv2.MinMaxLoc(dst2, minval, maxval)
         dst2 = (dst2 * 128 / maxVal + 100).ToMat
         edges.src = dst2
         edges.Run()

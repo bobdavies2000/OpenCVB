@@ -139,7 +139,6 @@ Public Class MiniPC_RotateAngle
         peak.angleY += 1
         If peak.angleY > 45 Then peak.angleY = -45
 
-        Dim minVal As Double, maxVal As Double
         Dim minLoc As cv.Point, maxLoc As cv.Point
         peak.histogram.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
 
@@ -190,7 +189,6 @@ Public Class MiniPC_RotateSinglePass
         Dim r = peak.mini.rect
         Dim sz = New cv.Size(r.Width, r.Height)
         Dim maxHist = Single.MinValue
-        Dim minVal As Double, maxVal As Double
         Dim minLoc As cv.Point, maxLoc As cv.Point
         Dim bestAngle As Integer
         Dim bestLoc As cv.Point

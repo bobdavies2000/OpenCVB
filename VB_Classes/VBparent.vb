@@ -37,6 +37,8 @@ Public Class VBparent : Implements IDisposable
     Public caller As String
     Public desc As String
     Public quadrantIndex As Integer = QUAD3
+    Public minVal As Double, maxVal As Double
+    Public minLoc As cv.Point, maxLoc As cv.Point
     Dim callStack = ""
     Public Sub initParent()
         If task.callTrace.Count = 0 Then

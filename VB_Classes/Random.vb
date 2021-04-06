@@ -96,10 +96,10 @@ End Class
 
 Public Class Random_UniformDist
     Inherits VBparent
-    Public minVal = 0
-    Public maxVal = 255
     Public Sub New()
         initParent()
+        minval = 0
+        maxval = 255
         task.desc = "Create a uniform distribution."
     End Sub
     Public Sub Run()

@@ -40,7 +40,6 @@ Public Class DNN_Test
         Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cv.Size(224, 224), New cv.Scalar(104, 117, 123))
         net.SetInput(inputBlob, "data")
         Dim prob = net.Forward("prob")
-        Dim minVal As Double, maxVal As Double
         Dim minLoc As cv.Point, maxLoc As cv.Point
         cv.Cv2.MinMaxLoc(prob.Reshape(1, 1), minVal, maxVal, minLoc, maxLoc)
         task.trueText("Best classification: index = " + CStr(maxLoc.X) + " which is for '" + classnames(maxLoc.X) + "' with Probability " + Format(maxVal, "#0.00%"), 40, 200)

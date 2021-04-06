@@ -284,7 +284,7 @@ Public Class Blob_Largest
 
         If masks.Count > 0 Then
             dst1.SetTo(0)
-            maskIndex = blobs.flood.maskSizes.ElementAt(blobIndex).Value ' this is the largest boundary rectangle
+            maskIndex = blobs.flood.sortedSizes.ElementAt(blobIndex).Value ' this is the largest boundary rectangle
             src.CopyTo(dst1, masks(maskIndex))
             kalman.kInput = {rects(maskIndex).X, rects(maskIndex).Y, rects(maskIndex).Width, rects(maskIndex).Height}
             kalman.Run()

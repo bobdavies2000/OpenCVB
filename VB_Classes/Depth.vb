@@ -32,15 +32,13 @@ Public Class Depth_FirstLastDistance
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim mask = task.depth32f.Threshold(1, 20000, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-        Dim minVal As Double, maxVal As Double
-        Dim minPt As cv.Point, maxPt As cv.Point
-        cv.Cv2.MinMaxLoc(task.depth32f, minVal, maxVal, minPt, maxPt, mask)
+        cv.Cv2.MinMaxLoc(task.depth32f, minVal, maxVal, minLoc, maxLoc, mask)
         task.RGBDepth.CopyTo(dst1)
         task.RGBDepth.CopyTo(dst2)
         label1 = "Min Depth " + CStr(minVal) + " mm"
-        dst1.Circle(minPt, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+        dst1.Circle(minLoc, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
         label2 = "Max Depth " + CStr(maxVal) + " mm"
-        dst2.Circle(maxPt, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+        dst2.Circle(maxLoc, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
     End Sub
 End Class
 
@@ -186,9 +184,7 @@ Public Class Depth_MeanStdev_MT
         Dim outOfRangeMask As New cv.Mat
         cv.Cv2.BitwiseNot(mask, outOfRangeMask)
 
-        Dim minVal As Double, maxVal As Double
-        Dim minPt As cv.Point, maxPt As cv.Point
-        cv.Cv2.MinMaxLoc(task.depth32f, minVal, maxVal, minPt, maxPt, mask)
+        cv.Cv2.MinMaxLoc(task.depth32f, minVal, maxVal, minLoc, maxLoc, mask)
 
         Dim meanIndex = task.frameCount Mod meanCount
         Dim meanValues As New cv.Mat(grid.roiList.Count - 1, 1, cv.MatType.CV_32F)
@@ -209,9 +205,9 @@ Public Class Depth_MeanStdev_MT
         If task.frameCount >= meanCount Then
             Dim minStdVal As Double, maxStdVal As Double
             Dim meanmask = meanValues.Threshold(1, maxDepth, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-            cv.Cv2.MinMaxLoc(meanValues, minVal, maxVal, minPt, maxPt, meanmask)
+            cv.Cv2.MinMaxLoc(meanValues, minVal, maxVal, minLoc, maxLoc, meanmask)
             Dim stdMask = stdValues.Threshold(0.001, maxDepth, cv.ThresholdTypes.Binary).ConvertScaleAbs() ' volatile region is x cm stdev.
-            cv.Cv2.MinMaxLoc(stdValues, minStdVal, maxStdVal, minPt, maxPt, stdMask)
+            cv.Cv2.MinMaxLoc(stdValues, minStdVal, maxStdVal, minLoc, maxLoc, stdMask)
 
             Parallel.For(0, grid.roiList.Count,
             Sub(i)
@@ -636,15 +632,13 @@ Public Class Depth_LocalMinMax_MT
         Parallel.For(0, grid.roiList.Count,
         Sub(i)
             Dim roi = grid.roiList(i)
-            Dim minVal As Double, maxVal As Double
-            Dim minPt As cv.Point, maxPt As cv.Point
-            cv.Cv2.MinMaxLoc(task.depth32f(roi), minVal, maxVal, minPt, maxPt, mask(roi))
-            If minPt.X < 0 Or minPt.Y < 0 Then minPt = New cv.Point2f(0, 0)
-            minPoint(i) = New cv.Point(minPt.X + roi.X, minPt.Y + roi.Y)
-            maxPoint(i) = New cv.Point(maxPt.X + roi.X, maxPt.Y + roi.Y)
+            cv.Cv2.MinMaxLoc(task.depth32f(roi), minVal, maxVal, minLoc, maxLoc, mask(roi))
+            If minLoc.X < 0 Or minLoc.Y < 0 Then minLoc = New cv.Point2f(0, 0)
+            minPoint(i) = New cv.Point(minLoc.X + roi.X, minLoc.Y + roi.Y)
+            maxPoint(i) = New cv.Point(maxLoc.X + roi.X, maxLoc.Y + roi.Y)
 
-            cv.Cv2.Circle(dst1(roi), minPt, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            cv.Cv2.Circle(dst1(roi), maxPt, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+            cv.Cv2.Circle(dst1(roi), minLoc, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            cv.Cv2.Circle(dst1(roi), maxLoc, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
         End Sub)
     End Sub
 End Class
@@ -691,14 +685,13 @@ Public Class Depth_LocalMinMax_Kalman_MT
         Parallel.For(0, grid.roiList.Count,
         Sub(i)
             Dim roi = grid.roiList(i)
-            Dim minVal As Double, maxVal As Double
-            Dim minPt As cv.Point, maxPt As cv.Point
-            cv.Cv2.MinMaxLoc(depth32f(roi), minVal, maxVal, minPt, maxPt, depthmask(roi))
-            If minPt.X < 0 Or minPt.Y < 0 Then minPt = New cv.Point2f(0, 0)
-            kalman.kInput(i * 4) = minPt.X
-            kalman.kInput(i * 4 + 1) = minPt.Y
-            kalman.kInput(i * 4 + 2) = maxPt.X
-            kalman.kInput(i * 4 + 3) = maxPt.Y
+            Dim minLoc As cv.Point, maxLoc As cv.Point
+            cv.Cv2.MinMaxLoc(depth32f(roi), minVal, maxVal, minLoc, maxLoc, depthmask(roi))
+            If minLoc.X < 0 Or minLoc.Y < 0 Then minLoc = New cv.Point2f(0, 0)
+            kalman.kInput(i * 4) = minLoc.X
+            kalman.kInput(i * 4 + 1) = minLoc.Y
+            kalman.kInput(i * 4 + 2) = maxLoc.X
+            kalman.kInput(i * 4 + 3) = maxLoc.Y
         End Sub)
 
         kalman.Run()
@@ -1009,30 +1002,6 @@ End Class
 
 
 
-Public Class Depth_TooClose
-    Inherits VBparent
-    Public minVal As Double
-    Public depth32f As cv.Mat
-    Public Sub New()
-        initParent()
-        label2 = "Non-Zero depth mask"
-        task.desc = "Tests to determine if the camera is too close"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        depth32f = task.depth32f
-        Dim maxval As Double
-        Dim minLoc As cv.Point, maxLoc As cv.Point
-        dst1 = task.depthMask
-        depth32f.MinMaxLoc(minVal, maxval, minLoc, maxLoc, dst1)
-        label1 = "Min Z = " + Format(minVal, "#0") + " Max Z = " + Format(maxval, "#0")
-    End Sub
-End Class
-
-
-
-
-
 
 
 
@@ -1120,8 +1089,6 @@ Public Class Depth_InRange
     Inherits VBparent
     Public depthMask As New cv.Mat
     Public noDepthMask As New cv.Mat
-    Public minVal As Single
-    Public maxVal As Single
     Public depth32f As New cv.Mat
     Public depth32fAfterMasking As Boolean
     Public Sub New()
@@ -1901,69 +1868,14 @@ End Class
 
 
 
-Public Class Depth_NoiseRemovalMask
-    Inherits VBparent
-    Public noise As Depth_TooClose
-    Public flood As FloodFill_Palette
-    Public Sub New()
-        initParent()
-        flood = New FloodFill_Palette()
-        noise = New Depth_TooClose()
-
-        label1 = "Mask of all inrange depth"
-        label1 = "Solid inrange depth - noise removed"
-        task.desc = "Use the 'Too Close' test to remove (some) noisy depth"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        noise.Run()
-        dst1 = noise.dst1
-
-        flood.src = dst1
-        flood.Run()
-        dst2 = flood.basics.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Depth_Noise
-    Inherits VBparent
-    Dim noiseRemover As Depth_NoiseRemovalMask
-    Public Sub New()
-        initParent()
-        noiseRemover = New Depth_NoiseRemovalMask
-        label1 = "Just the noise in the depth"
-        label2 = "Solid depth with noise removed"
-        task.desc = "Show depth with and without the depth noise from being too close."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        noiseRemover.Run()
-        dst1 = noiseRemover.dst1
-        dst2 = noiseRemover.dst2
-        dst1.SetTo(0, dst2)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Depth_Solid
     Inherits VBparent
-    Dim noiseRemover As Depth_NoiseRemovalMask
-    Public palette As Palette_Coherence
+    Dim noiseRemover As Depth_NoiseMask
+    Public palette As Coherent_Palette
     Public Sub New()
         initParent()
-        noiseRemover = New Depth_NoiseRemovalMask
-        palette = New Palette_Coherence
+        noiseRemover = New Depth_NoiseMask
+        palette = New Coherent_Palette
         label1 = "Solid depth with noise removed"
         task.desc = "Remove noise from depth and consistently identify solid depth."
     End Sub
@@ -1989,12 +1901,10 @@ End Class
 
 Public Class Depth_Basics
     Inherits VBparent
-    Dim noiseRemover As Depth_NoiseRemovalMask
-    Dim sobel As Edges_Sobel
+    Dim noiseRemover As Depth_NoiseMask
     Public Sub New()
         initParent()
-        sobel = New Edges_Sobel
-        noiseRemover = New Depth_NoiseRemovalMask
+        noiseRemover = New Depth_NoiseMask
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Max depth difference X100 in mm's", 0, 1000, 50)
@@ -2016,10 +1926,65 @@ Public Class Depth_Basics
         dst1.SetTo(0, (255 - noiseRemover.dst1).ToMat)
         cv.Cv2.Absdiff(dst1(rect2), dst1(rect1), dst1(rect2))
         dst1 = dst1.Threshold(maxDiff, 255, cv.ThresholdTypes.BinaryInv)
+    End Sub
+End Class
 
-        sobel.src = dst1.Clone
-        sobel.Run()
-        dst2 = sobel.dst1
-        dst2.SetTo(0, (255 - noiseRemover.dst2).ToMat)
+
+
+
+
+
+
+
+
+
+Public Class Depth_NoiseMask
+    Inherits VBparent
+    Public flood As Coherent_Palette
+    Public Sub New()
+        initParent()
+        flood = New Coherent_Palette()
+        Dim stepSizeSlider = findSlider("Step Size")
+        stepSizeSlider.Value = 50
+        label1 = "Mask of all inrange depth"
+        label1 = "Solid inrange depth - noise removed"
+        task.desc = "Use the 'Too Close' test to remove (some) noisy depth"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        dst1 = task.depthMask
+
+        flood.src = dst1
+        flood.Run()
+        dst2 = flood.dst1
+        ' dst1.SetTo(0, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Depth_Noise
+    Inherits VBparent
+    Dim noiseRemover As Depth_NoiseMask
+    Dim fore As Depth_Foreground
+    Public Sub New()
+        initParent()
+        noiseRemover = New Depth_NoiseMask
+        label1 = "Solid depth with noise removed"
+        label2 = "Just the noise in the depth"
+        task.desc = "Show depth with and without the depth noise from being too close."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+
+
+        noiseRemover.Run()
+        dst2 = noiseRemover.dst1
+        dst1 = noiseRemover.flood.dst1
+        ' dst2.SetTo(0, noiseRemover.flood.palette.)
     End Sub
 End Class

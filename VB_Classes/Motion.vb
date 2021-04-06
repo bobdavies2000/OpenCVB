@@ -292,11 +292,11 @@ End Class
 Public Class Motion_DepthShadow
     Inherits VBparent
     Dim motion As Motion_Basics
-    Dim noiseRemover As Depth_NoiseRemovalMask
+    Dim noiseRemover As Depth_NoiseMask
     Dim dMin As Depth_SmoothMin
     Public Sub New()
         initParent()
-        noiseRemover = New Depth_NoiseRemovalMask
+        noiseRemover = New Depth_NoiseMask
         motion = New Motion_Basics
         dMin = New Depth_SmoothMin
 

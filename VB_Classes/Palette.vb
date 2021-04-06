@@ -562,33 +562,3 @@ Public Class Palette_LeftRightImages
         dst2 = palette.dst1
     End Sub
 End Class
-
-
-
-
-
-
-
-Public Class Palette_Coherence
-    Inherits VBparent
-    Public flood As FloodFill_Coherence
-    Public palette As Palette_Basics
-    Public Sub New()
-        initParent()
-        palette = New Palette_Basics()
-        palette.Run()
-
-        flood = New FloodFill_Coherence
-        task.desc = "Highlight a consistent 8-bit grayscale image regions with a palette"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        flood.src = src
-        flood.Run()
-
-        palette.src = flood.dst1
-        palette.Run()
-        dst1 = palette.dst1
-        label1 = flood.label1
-    End Sub
-End Class

@@ -359,7 +359,6 @@ Public Class Structured_SliceXPlot
 
         Dim cushion = cushionSlider.Value
         Dim rect = New cv.Rect(col, 0, If(col + cushion >= dst2.Width, dst2.Width - col, cushion), dst2.Height - 1)
-        Dim minVal As Double, maxVal As Double
         Dim minLoc As cv.Point, maxLoc As cv.Point
         multi.top2D.histOutput(rect).MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
 
@@ -413,7 +412,6 @@ Public Class Structured_LinearizeFloor
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        Dim minVal As Double, maxVal As Double
         Dim minLoc As cv.Point, maxLoc As cv.Point
         Static imuPC As cv.Mat
         floor.Run()

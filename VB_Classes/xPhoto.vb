@@ -17,8 +17,7 @@ Public Class xPhoto_Bm3dDenoise
         cv.Cv2.EqualizeHist(src, src)
         CvXPhoto.Bm3dDenoising(src, dst1)
         cv.Cv2.Subtract(dst1, src, dst2)
-        Dim minVal As Double, maxVal As Double
-        dst2.MinMaxLoc(minVal, maxVal)
+        dst2.MinMaxLoc(minval, maxval)
         label2 = "Diff from input - max change=" + CStr(maxVal)
         dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
@@ -41,8 +40,7 @@ Public Class xPhoto_Bm3dDenoiseDepthImage
         cv.Cv2.EqualizeHist(gray, gray)
         CvXPhoto.Bm3dDenoising(gray, dst1)
         cv.Cv2.Subtract(dst1, gray, dst2)
-        Dim minVal As Double, maxVal As Double
-        dst2.MinMaxLoc(minVal, maxVal)
+        dst2.MinMaxLoc(minval, maxval)
         label2 = "Diff from input - max change=" + CStr(maxVal)
         dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub

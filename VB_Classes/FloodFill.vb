@@ -2,7 +2,8 @@ Imports cv = OpenCvSharp
 Imports System.Threading
 Public Class FloodFill_Basics
     Inherits VBparent
-    Public maskSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
+    Public sortedSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
+    Public maskSizes As New List(Of Integer)
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
@@ -42,7 +43,7 @@ Public Class FloodFill_Basics
         initialMask = input.EmptyClone().SetTo(0)
 
         masks.Clear()
-        maskSizes.Clear()
+        sortedSizes.Clear()
         rects.Clear()
         centroids.Clear()
         rejectedCentroids.Clear()
@@ -64,7 +65,8 @@ Public Class FloodFill_Basics
                         masks.Add(maskPlus(maskRect).Clone().SetTo(0, ignoreMasks))
                         Dim i = masks.Count - 1
                         masks(i).SetTo(0, initialMask) ' The initial mask is what should not be part of any mask.
-                        maskSizes.Add(count, i)
+                        sortedSizes.Add(count, i)
+                        maskSizes.Add(count)
                         rects.Add(rect)
                         Dim m = cv.Cv2.Moments(maskPlus(rect), True)
                         Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
@@ -524,7 +526,7 @@ Public Class FloodFill_Top16
         Dim thumbCount As Integer
         Dim allRect = New cv.Rect(0, 0, allSize.Width, allSize.Height)
         For i = 0 To flood.masks.Count - 1
-            Dim maskIndex = flood.maskSizes.ElementAt(i).Value
+            Dim maskIndex = flood.sortedSizes.ElementAt(i).Value
             Dim nextColor = task.scalarColors(i Mod 255)
             dst1.SetTo(nextColor, flood.masks(maskIndex))
             If thumbCount < 16 Then
@@ -952,7 +954,7 @@ Public Class FloodFill_Palette
 
         dst2.SetTo(0)
         For i = 0 To basics.masks.Count - 1
-            Dim maskIndex = basics.maskSizes.ElementAt(i).Value
+            Dim maskIndex = basics.sortedSizes.ElementAt(i).Value
             dst2.SetTo(cv.Scalar.All((i + 1) Mod 255), basics.masks(maskIndex))
         Next
 
@@ -970,42 +972,3 @@ Public Class FloodFill_Palette
     End Sub
 End Class
 
-
-
-
-
-
-Public Class FloodFill_Coherence
-    Inherits VBparent
-    Public flood As FloodFill_Basics
-    Dim pixel As Pixel_Sampler
-    Public Sub New()
-        initParent()
-        flood = New FloodFill_Basics
-        pixel = New Pixel_Sampler
-        task.desc = "Floodfill an image and make the colors consistent."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-
-        flood.src = src
-        flood.Run()
-
-        Static lastFrame As cv.Mat
-        If task.cameraStable = False Or task.frameCount = 0 Then
-            dst1 = New cv.Mat(src.Size, cv.MatType.CV_8UC1, 0)
-            lastFrame = flood.dst2.Clone
-        End If
-        For i = 0 To flood.rects.Count - 1
-            Dim rect = flood.rects(i)
-            Dim mask = flood.masks(i)(rect)
-            pixel.src = lastFrame(rect).Clone
-            Dim inverse = 255 - mask
-            pixel.src.SetTo(0, inverse)
-            pixel.Run()
-            dst1(rect).SetTo(pixel.dominantGray, mask)
-        Next
-        label1 = CStr(flood.rects.Count) + " regions identified in the last frame"
-        lastFrame = dst1.Clone
-    End Sub
-End Class

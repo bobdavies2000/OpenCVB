@@ -320,8 +320,7 @@ Public Class Pixel_Sampler
                 End If
             Next
         Else
-            Dim minVal As Double, maxVal As Double
-            cv.Cv2.MinMaxLoc(src, minVal, maxVal)
+            cv.Cv2.MinMaxLoc(src, minval, maxval)
             dominantGray = maxVal
         End If
 
