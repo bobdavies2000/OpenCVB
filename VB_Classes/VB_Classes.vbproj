@@ -107,7 +107,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddWeighted.vb" />
-    <Compile Include="BestOf.vb" />
     <Compile Include="BGSubtract.vb" />
     <Compile Include="Coherence.vb" />
     <Compile Include="DLib.vb" />

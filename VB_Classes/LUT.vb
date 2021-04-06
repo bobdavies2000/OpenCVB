@@ -21,7 +21,7 @@ Public Class LUT_Basics
         sliders.sLabels(3).Text = "LUT " + CStr(sliders.trackbar(2).Value) + " through 255"
         Dim splits = {sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value, sliders.trackbar(3).Value, 255}
         Dim vals = {1, sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value, 255}
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray = If(src.Channels = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         Dim myLut As New cv.Mat(1, 256, cv.MatType.CV_8U)
         Dim splitIndex As Integer
         For i = 0 To 255
@@ -151,3 +151,27 @@ Public Class LUT_Rebuild
     End Sub
 End Class
 
+
+
+
+
+
+
+
+
+Public Class LUT_RGBDepth
+    Inherits VBparent
+    Dim lut As LUT_Basics
+    Public Sub New()
+        initParent()
+        lut = New LUT_Basics
+        label1 = "Depth data in 5 LUT entries"
+        task.desc = "Use a LUT on the RGBDepth to segregate depth data."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        lut.src = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        lut.Run()
+        dst1 = lut.dst1
+    End Sub
+End Class

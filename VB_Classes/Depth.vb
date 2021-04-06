@@ -1868,36 +1868,6 @@ End Class
 
 
 
-Public Class Depth_Solid
-    Inherits VBparent
-    Dim noiseRemover As Depth_NoiseMask
-    Public palette As Coherent_Palette
-    Public Sub New()
-        initParent()
-        noiseRemover = New Depth_NoiseMask
-        palette = New Coherent_Palette
-        label1 = "Solid depth with noise removed"
-        task.desc = "Remove noise from depth and consistently identify solid depth."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        noiseRemover.Run()
-        dst1 = noiseRemover.dst2
-
-        Dim mask = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        palette.src = dst1
-        palette.Run()
-        dst2 = palette.dst1
-        dst2.SetTo(0, mask)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class Depth_Basics
     Inherits VBparent
@@ -1986,5 +1956,36 @@ Public Class Depth_Noise
         dst2 = noiseRemover.dst1
         dst1 = noiseRemover.flood.dst1
         ' dst2.SetTo(0, noiseRemover.flood.palette.)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Depth_Solid
+    Inherits VBparent
+    Dim noiseRemover As Depth_NoiseMask
+    Public palette As Coherent_Palette
+    Public Sub New()
+        initParent()
+        noiseRemover = New Depth_NoiseMask
+        palette = New Coherent_Palette
+        label1 = "Solid depth with noise removed"
+        task.desc = "Remove noise from depth and consistently identify solid depth."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        noiseRemover.Run()
+        dst1 = noiseRemover.dst2
+
+        Dim mask = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        palette.src = dst1
+        palette.Run()
+        dst2 = palette.dst1
+        dst2.SetTo(0, mask)
     End Sub
 End Class
