@@ -734,8 +734,10 @@ Public Class Depth_ColorMap
         Dim alpha = sliders.trackbar(0).Value / 100
         Dim beta = sliders.trackbar(1).Value
         cv.Cv2.ConvertScaleAbs(task.depth32f, Palette.src, alpha, beta)
+        Palette.src += 1
         Palette.Run()
         dst1 = Palette.dst1
+        dst1.SetTo(0, task.noDepthMask)
         dst2 = Palette.dst2
     End Sub
 End Class

@@ -57,9 +57,12 @@ Public Class Palette_Basics
             If str.Contains("Ocean") Then str = str.Replace("Ocean", "Hsv") Else If str.Contains("Hsv") Then str = str.Replace("Hsv", "Ocean")
             Dim mapFile As New FileInfo(str)
             gradMap.gradientColorMap = cv.Cv2.ImRead(mapFile.FullName)
-            gradMap.gradientColorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b(0, 0, 0)) ' the first color is black in all gradient maps.
             If standalone Or task.intermediateReview = caller Then dst2 = gradMap.gradientColorMap.Resize(src.Size())
-            If whiteBack And gradMap.gradientColorMap.Cols <> 0 Then gradMap.gradientColorMap.Col(0).SetTo(cv.Scalar.White)
+            If whiteBack And gradMap.gradientColorMap.Cols <> 0 Then
+                gradMap.gradientColorMap.Col(0).SetTo(cv.Scalar.White)
+            Else
+                gradMap.gradientColorMap.Col(0).SetTo(cv.Scalar.Black)
+            End If
         End If
 
         ' Uncomment this to test if the .NET interface for ApplyColorMap for custom color maps is working

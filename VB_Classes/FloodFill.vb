@@ -654,7 +654,6 @@ Public Class FloodFill_FullImage
     Public floodPoints As New List(Of cv.Point)
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public edges As Edges_BinarizedSobel
-    Public edgeStd As Edges_Stdev
     Dim initialMask As New cv.Mat
     Dim palette As Palette_Basics
     Public motion As Motion_Basics
@@ -667,7 +666,6 @@ Public Class FloodFill_FullImage
         mats = New Mat_4Click
         palette = New Palette_Basics
         edges = New Edges_BinarizedSobel
-        edgeStd = New Edges_Stdev
 
         Dim paletteRadio = findRadio("Random - use slider to adjust")
         paletteRadio.Checked = True
@@ -706,7 +704,6 @@ Public Class FloodFill_FullImage
 
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
 
-
         motion.src = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         motion.Run()
         mats.mat(0) = motion.dst1
@@ -721,18 +718,10 @@ Public Class FloodFill_FullImage
         Static zero As New cv.Scalar(0)
         Static maskRect = New cv.Rect(1, 1, dst1.Width, dst1.Height)
 
-        Static stdCheck = findCheckBox("Use filter to remove low stdev areas")
-        Dim edgeOutput As cv.Mat
-        If stdCheck.checked Then
-            edgeStd.src = input
-            edgeStd.Run()
-            edgeOutput = edgeStd.dst1.Clone
-        Else
-            edges.src = input
-            edges.Run()
-            edgeOutput = edges.dst2.Clone
-        End If
-        dst1 = edgeOutput.Clone
+        edges.src = input
+        edges.Run()
+        dst1 = edges.dst2.Clone
+        mats.mat(1).SetTo(255, dst1.Clone)
 
         Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1, 0)
         Dim rect As cv.Rect
@@ -754,20 +743,22 @@ Public Class FloodFill_FullImage
                 dst2.Rectangle(rect, cv.Scalar.Red, 2)
             Next
         End If
+        Dim index As Integer
         For y = fill To dst1.Height - fill - 1 Step stepSize
             For x = fill To dst1.Width - fill - 1 Step stepSize
                 testCount += 1
                 inputRect.X = x
                 inputRect.Y = y
-                Dim edgeCount = dst1(inputRect).CountNonZero
-                Dim depthCount = task.depth32f(inputRect).CountNonZero
-                If edgeCount = 0 And depthCount > depthThreshold Then
-                    floodCount += 1
+                'Dim edgeCount = dst1(inputRect).CountNonZero
+                'Dim depthCount = task.depth32f(inputRect).CountNonZero
+                'If edgeCount = 0 And depthCount > depthThreshold Then
+                floodCount += 1
                     pt.X = x + fill / 2
                     pt.Y = y + fill / 2
-                    Dim colorIndex = lastFrame.Get(Of Byte)(pt.Y, pt.X)
-                    If resetColors Or motion.resetAll Or colorIndex = 0 Then colorIndex = (255 - masks.Count - 1) Mod 255
-                    Dim pixelCount = cv.Cv2.FloodFill(dst1, maskPlus, pt, cv.Scalar.All(colorIndex), rect, zero, zero, floodFlag Or (255 << 8))
+                    'Dim colorIndex = lastFrame.Get(Of Byte)(pt.Y, pt.X)
+                    'If resetColors Or motion.resetAll Or colorIndex = 0 Then colorIndex = (255 - masks.Count - 1) Mod 255
+                    index += 1
+                    Dim pixelCount = cv.Cv2.FloodFill(dst1, maskPlus, pt, cv.Scalar.All(index), rect, zero, zero, floodFlag Or (255 << 8))
 
                     If rect.Width And rect.Height Then
                         floodPoints.Add(pt)
@@ -779,7 +770,7 @@ Public Class FloodFill_FullImage
                         rects.Add(rect)
                         centroids.Add(centroid)
                     End If
-                End If
+                ' End If
             Next
         Next
 
@@ -791,19 +782,16 @@ Public Class FloodFill_FullImage
         mats.mat(3).SetTo(0, mats.mat(1)) ' show the pixels that are not assigned (missing)
         label2 = "Checked " + CStr(testCount) + " locations and used floodfill on " + CStr(floodCount)
 
-        mats.mat(1) = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        missingSegments = mats.mat(1).Clone
-        Dim missed = mats.mat(1).CountNonZero()
-        mats.mat(1).SetTo(255, edgeOutput)
+        missingSegments = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        Dim missed = mats.mat(1).CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
         Dim segmentedCount = src.Width * src.Height - missed
         Dim percentRGB = Format(segmentedCount / (src.Width * src.Height), "#0%")
         label1 = "Segmented pixels = " + Format(segmentedCount, "###,###") + " or " + percentRGB + " of total pixels"
 
-        dst1 = edgeOutput.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        mats.mat(2) = mats.mat(1).Clone
         For Each pt In floodPoints
-            dst1.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+            mats.mat(2).Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
-        mats.mat(2) = dst1
 
         mats.Run()
         dst1 = mats.dst1

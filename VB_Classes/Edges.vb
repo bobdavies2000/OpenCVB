@@ -362,43 +362,6 @@ End Class
 
 
 
-Public Class Edges_Palette
-    Inherits VBparent
-    Dim edges As Edges_Basics
-    Dim palette As Palette_Basics
-    Public Sub New()
-        initParent()
-        edges = New Edges_Basics
-        palette = New Palette_Basics
-        Dim randomRadio = findRadio("Random - use slider to adjust")
-        randomRadio.Checked = True
-        Dim paletteSlider = findSlider("Number of color transitions (Used only with Random)")
-        paletteSlider.Value = 2
-
-        label1 = "Edges found using grayscale image"
-        label2 = "Edges found after palettizing grayscale image"
-        task.desc = "Use palette to help canny find more edges"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        edges.src = src
-        edges.Run()
-        dst1 = edges.dst1.Clone
-
-        palette.src = src
-        palette.Run()
-        edges.src = palette.dst1
-        edges.Run()
-        dst2 = edges.dst1.Clone
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class Edges_DCTinput
     Inherits VBparent
