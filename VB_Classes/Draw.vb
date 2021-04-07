@@ -231,7 +231,7 @@ Public Class Draw_Shapes
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim offsetX = 50, offsetY = 25, lineLength = 50, thickness = 2
 
-        dst1.SetTo(cv.Scalar.White)
+        dst1.SetTo(0)
         For i = 1 To 256
             dst1.Line(New cv.Point(thickness * i + offsetX, offsetY), New cv.Point(thickness * i + offsetX, offsetY + lineLength), New cv.Scalar(i, i, i), thickness)
         Next
@@ -241,19 +241,19 @@ Public Class Draw_Shapes
                 Case 0 ' circle
                     Dim center = New cv.Point(msRNG.Next(offsetX, dst1.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst1.Rows - offsetY))
                     Dim radius = msRNG.Next(1, Math.Min(offsetX, offsetY))
-                    dst1.Circle(center, radius, color, -1, task.lineType)
+                    dst1.Circle(center, radius, color, -1, cv.LineTypes.Link8)
                 Case 1 ' Rectangle
                     Dim center = New cv.Point(msRNG.Next(offsetX, dst1.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst1.Rows - offsetY))
                     Dim width = msRNG.Next(1, Math.Min(offsetX, offsetY))
                     Dim height = msRNG.Next(1, Math.Min(offsetX, offsetY))
                     Dim rc = New cv.Rect(center.X - width, center.Y - height / 2, width, height)
-                    dst1.Rectangle(rc, color, -1, task.lineType)
+                    dst1.Rectangle(rc, color, -1, cv.LineTypes.Link8)
                 Case 2 ' Ellipse
                     Dim center = New cv.Point(msRNG.Next(offsetX, dst1.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst1.Rows - offsetY))
                     Dim width = msRNG.Next(1, Math.Min(offsetX, offsetY))
                     Dim height = msRNG.Next(1, Math.Min(offsetX, offsetY))
                     Dim angle = msRNG.Next(0, 180)
-                    dst1.Ellipse(center, New cv.Size(width / 2, height / 2), angle, 0, 360, color, -1, task.lineType)
+                    dst1.Ellipse(center, New cv.Size(width / 2, height / 2), angle, 0, 360, color, -1, cv.LineTypes.Link8)
             End Select
         Next
     End Sub

@@ -69,12 +69,12 @@ End Class
 Public Class LUT_CustomColor
     Inherits VBparent
     Public reduction As Reduction_Basics
-    Dim gradMap As Palette_BuildGradientColorMap
+    Dim gradMap As Palette_RandomColorMap
     Public colorMap As cv.Mat
     Public Sub New()
         initParent()
         reduction = New Reduction_Basics()
-        gradMap = New Palette_BuildGradientColorMap
+        gradMap = New Palette_RandomColorMap
 
         label2 = "Custom Color Lookup Table"
         task.desc = "Use a palette to provide the lookup table for LUT - Painterly Effect"

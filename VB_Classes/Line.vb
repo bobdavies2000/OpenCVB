@@ -198,10 +198,10 @@ Public Class Line_InterceptsUI
         Dim blue = New cv.Scalar(254, 0, 0)
 
         Dim center = New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        dst2.Line(New cv.Point(0, 0), center, blue, 1, task.lineType)
-        dst2.Line(New cv.Point(dst1.Width, 0), center, red, 1, task.lineType)
-        dst2.Line(New cv.Point(0, dst1.Height), center, blue, 1, task.lineType)
-        dst2.Line(New cv.Point(dst1.Width, dst1.Height), center, yellow, 1, task.lineType)
+        dst2.Line(New cv.Point(0, 0), center, blue, 1, cv.LineTypes.Link4)
+        dst2.Line(New cv.Point(dst1.Width, 0), center, red, 1, cv.LineTypes.Link4)
+        dst2.Line(New cv.Point(0, dst1.Height), center, blue, 1, cv.LineTypes.Link4)
+        dst2.Line(New cv.Point(dst1.Width, dst1.Height), center, yellow, 1, cv.LineTypes.Link4)
 
         Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
         Dim pt = New cv.Point(center.X, center.Y - 30)
@@ -297,7 +297,7 @@ Public Class Line_ConfirmedDepth
             Dim h = Math.Abs(p1.Y - p2.Y)
             Dim r = New cv.Rect(minXX, minYY, If(w > 0, w, 2), If(h > 0, h, 2))
             Dim mask = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, 0)
-            mask.Line(New cv.Point(CInt(p1.X - r.X), CInt(p1.Y - r.Y)), New cv.Point(CInt(p2.X - r.X), CInt(p2.Y - r.Y)), 255, thickness, task.lineType)
+            mask.Line(New cv.Point(CInt(p1.X - r.X), CInt(p1.Y - r.Y)), New cv.Point(CInt(p2.X - r.X), CInt(p2.Y - r.Y)), 255, thickness, cv.LineTypes.Link4)
             Dim mean = cloudInput(r).Mean(mask)
 
             If mean <> New cv.Scalar Then

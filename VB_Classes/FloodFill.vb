@@ -655,7 +655,7 @@ Public Class FloodFill_FullImage
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public edges As Edges_BinarizedSobel
     Dim initialMask As New cv.Mat
-    Dim palette As Palette_Basics
+    Dim palette As Palette_RandomColorMap
     Public motion As Motion_Basics
     Public mats As Mat_4Click
     Public missingSegments As cv.Mat
@@ -664,11 +664,8 @@ Public Class FloodFill_FullImage
 
         motion = New Motion_Basics
         mats = New Mat_4Click
-        palette = New Palette_Basics
+        palette = New Palette_RandomColorMap
         edges = New Edges_BinarizedSobel
-
-        Dim paletteRadio = findRadio("Random - use slider to adjust")
-        paletteRadio.Checked = True
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -682,8 +679,6 @@ Public Class FloodFill_FullImage
             check.Box(0).Text = "Use filter to remove low stdev areas"
         End If
 
-        Dim paletteSlider = findSlider("Number of color transitions (Used only with Random)")
-        paletteSlider.Value = 180 ' insures every region will be a significantly different color
         task.desc = "Floodfill each of the segments outlined by the Edges_BinarizedSobel algorithm"
     End Sub
     Public Sub Run()
@@ -749,28 +744,22 @@ Public Class FloodFill_FullImage
                 testCount += 1
                 inputRect.X = x
                 inputRect.Y = y
-                'Dim edgeCount = dst1(inputRect).CountNonZero
-                'Dim depthCount = task.depth32f(inputRect).CountNonZero
-                'If edgeCount = 0 And depthCount > depthThreshold Then
                 floodCount += 1
-                    pt.X = x + fill / 2
-                    pt.Y = y + fill / 2
-                    'Dim colorIndex = lastFrame.Get(Of Byte)(pt.Y, pt.X)
-                    'If resetColors Or motion.resetAll Or colorIndex = 0 Then colorIndex = (255 - masks.Count - 1) Mod 255
-                    index += 1
-                    Dim pixelCount = cv.Cv2.FloodFill(dst1, maskPlus, pt, cv.Scalar.All(index), rect, zero, zero, floodFlag Or (255 << 8))
+                pt.X = x + fill / 2
+                pt.Y = y + fill / 2
+                index += 1
+                Dim pixelCount = cv.Cv2.FloodFill(dst1, maskPlus, pt, cv.Scalar.All(index), rect, zero, zero, floodFlag Or (255 << 8))
 
-                    If rect.Width And rect.Height Then
-                        floodPoints.Add(pt)
-                        Dim m = cv.Cv2.Moments(maskPlus(rect), True)
-                        Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
+                If rect.Width And rect.Height Then
+                    floodPoints.Add(pt)
+                    Dim m = cv.Cv2.Moments(maskPlus(rect), True)
+                    Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
 
-                        maskSizes.Add(pixelCount, masks.Count)
-                        masks.Add(maskPlus(maskRect)(rect))
-                        rects.Add(rect)
-                        centroids.Add(centroid)
-                    End If
-                ' End If
+                    maskSizes.Add(pixelCount, masks.Count)
+                    masks.Add(maskPlus(maskRect)(rect))
+                    rects.Add(rect)
+                    centroids.Add(centroid)
+                End If
             Next
         Next
 
@@ -956,7 +945,7 @@ Public Class FloodFill_Palette
 
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
         label2 = CStr(basics.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
-        If standalone Or task.intermediateReview = caller Then dst2 = palette.gradMap.gradientColorMap.Resize(src.Size())
+        If standalone Or task.intermediateReview = caller Then dst2 = palette.gradientColorMap.Resize(src.Size())
     End Sub
 End Class
 

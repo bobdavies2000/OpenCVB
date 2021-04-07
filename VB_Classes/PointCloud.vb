@@ -188,7 +188,7 @@ Public Class PointCloud_Inspector
         For i = 0 To yLines - 1
             Dim pt1 = New cv.Point2f(dst1.Width, i * stepY)
             Dim pt2 = New cv.Point2f(0, i * stepY)
-            dst1.Line(pt1, pt2, 255, 1, task.lineType)
+            dst1.Line(pt1, pt2, 255, 1, cv.LineTypes.Link4)
 
             Dim pt = New cv.Point2f(cLine, i * stepY)
             Dim xyz = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)

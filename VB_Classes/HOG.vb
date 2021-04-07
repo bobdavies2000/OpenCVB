@@ -27,7 +27,7 @@ Public Class HOG_Basics
                 .Width = CInt(Math.Truncate(Math.Round(rect.Width * 0.8))),
                 .Height = CInt(Math.Truncate(Math.Round(rect.Height * 0.8)))
             }
-            dst1.Rectangle(r.TopLeft, r.BottomRight, cv.Scalar.Red, 3, task.lineType, 0)
+            dst1.Rectangle(r.TopLeft, r.BottomRight, cv.Scalar.Red, 3, cv.LineTypes.Link8, 0)
         Next rect
     End Sub
     Public Sub Run()

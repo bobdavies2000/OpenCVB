@@ -1,17 +1,14 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
-
 Public Class Palette_Basics
     Inherits VBparent
-    Public gradMap As Palette_BuildGradientColorMap
     Public colormap As cv.ColormapTypes
     Dim radioFrm As OptionsRadioButtons
-    Public whiteBack As Boolean
+    Public whitebackground As Boolean
+    Public gradientColorMap As New cv.Mat
     Public Sub New()
         initParent()
-        gradMap = New Palette_BuildGradientColorMap()
-
         radioFrm = findfrm(caller + " Radio Options")
         If radioFrm Is Nothing Then
             radio.Setup(caller, 21)
@@ -24,18 +21,19 @@ Public Class Palette_Basics
         task.desc = "Apply the different color maps in OpenCV - Painterly Effect"
     End Sub
     Public Function checkRadios() As cv.ColormapTypes
+        Dim scheme As cv.ColormapTypes = 0
         For i = 0 To radioFrm.check.Length - 1
             If radioFrm.check(i).Checked Then
-                Dim scheme = Choose(i + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone, cv.ColormapTypes.Cividis, cv.ColormapTypes.Cool,
+                scheme = Choose(i + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone, cv.ColormapTypes.Cividis, cv.ColormapTypes.Cool,
                                            cv.ColormapTypes.Hot, cv.ColormapTypes.Hsv, cv.ColormapTypes.Inferno, cv.ColormapTypes.Jet,
                                            cv.ColormapTypes.Magma, cv.ColormapTypes.Ocean, cv.ColormapTypes.Parula, cv.ColormapTypes.Pink,
                                            cv.ColormapTypes.Plasma, cv.ColormapTypes.Rainbow, cv.ColormapTypes.Spring, cv.ColormapTypes.Summer,
                                            cv.ColormapTypes.Twilight, cv.ColormapTypes.TwilightShifted, cv.ColormapTypes.Viridis,
-                                           cv.ColormapTypes.Winter, 20) ' The last = placeholder for Random...
-                Return scheme
+                                           cv.ColormapTypes.Winter)
+                Exit For
             End If
         Next
-        Return 0
+        Return scheme
     End Function
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -44,37 +42,23 @@ Public Class Palette_Basics
 
         Static cMapDir As New DirectoryInfo(task.parms.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
         Static saveColorMap As Integer = -1
-        If colormap = 20 Then
-            saveColorMap = colormap
-            gradMap.Run()
-        Else
-            gradMap.transitionCount = -1
-        End If
         If saveColorMap <> colormap Then
             saveColorMap = colormap
             Dim str = cMapDir.FullName + "/colorscale_" + mapNames(colormap) + ".jpg"
             ' Something is flipped - Ocean is actually HSV and vice versa.  This addresses it but check in future OpenCVSharp releases...
             If str.Contains("Ocean") Then str = str.Replace("Ocean", "Hsv") Else If str.Contains("Hsv") Then str = str.Replace("Hsv", "Ocean")
             Dim mapFile As New FileInfo(str)
-            gradMap.gradientColorMap = cv.Cv2.ImRead(mapFile.FullName)
-            If standalone Or task.intermediateReview = caller Then dst2 = gradMap.gradientColorMap.Resize(src.Size())
-            If whiteBack And gradMap.gradientColorMap.Cols <> 0 Then
-                gradMap.gradientColorMap.Col(0).SetTo(cv.Scalar.White)
-            Else
-                gradMap.gradientColorMap.Col(0).SetTo(cv.Scalar.Black)
-            End If
+            gradientColorMap = cv.Cv2.ImRead(mapFile.FullName)
+            gradientColorMap.Col(0).SetTo(If(whitebackground, cv.Scalar.White, cv.Scalar.Black))
         End If
 
-        ' Uncomment this to test if the .NET interface for ApplyColorMap for custom color maps is working
-        ' cv.Cv2.ApplyColorMap(src, dst2, gradMap.gradientColorMap) 
-
-        ' In the meantime, this will work!
-        If gradMap.gradientColorMap.Cols > 0 Then
-            dst1 = Palette_Custom_Apply(src, gradMap.gradientColorMap)
-            dst2 = gradMap.gradientColorMap.Resize(dst2.Size)
-        End If
+        dst1 = Palette_Custom_Apply(src, gradientColorMap)
+        dst2 = gradientColorMap.Resize(dst2.Size)
     End Sub
 End Class
+
+
+
 
 
 
@@ -103,6 +87,9 @@ Public Class Palette_Color
         label2 = "Color (255 - RGB) = " + CStr(255 - b) + " " + CStr(255 - g) + " " + CStr(255 - r)
     End Sub
 End Class
+
+
+
 
 
 
@@ -291,7 +278,7 @@ Public Class Palette_DrawTest
     Public Sub New()
         initParent()
         palette = New Palette_Basics()
-
+        palette.whitebackground = True
         draw = New Draw_Shapes()
         palette.src = dst1
 
@@ -349,7 +336,7 @@ End Class
 
 
 
-Public Class Palette_BuildGradientColorMap
+Public Class Palette_RandomColorMap
     Inherits VBparent
     Public gradientColorMap As New cv.Mat
     Public transitionCount As Integer = -1
@@ -357,7 +344,7 @@ Public Class Palette_BuildGradientColorMap
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Number of color transitions (Used only with Random)", 1, 255, 150)
+            sliders.setupTrackBar(0, "Number of color transitions (Used only with Random)", 1, 255, 180)
         End If
 
         label2 = "Generated colormap"

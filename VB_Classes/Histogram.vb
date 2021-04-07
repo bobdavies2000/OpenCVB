@@ -1442,7 +1442,7 @@ Public Class Histogram_DepthValleys
     Public Sub New()
         initParent()
         palette = New Palette_Basics
-        palette.whiteBack = True
+        palette.whitebackground = True
         Dim radioJet = findRadio("Hsv")
         radioJet.Checked = True
         hist = New Histogram_Depth()

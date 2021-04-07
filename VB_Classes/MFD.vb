@@ -180,16 +180,13 @@ Public Class MFD_FloodFill
     Public floodPoints As New List(Of cv.Point)
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Dim initialMask As New cv.Mat
-    Dim palette As Palette_Basics
+    Dim palette As Palette_RandomColorMap
     Dim sobel As MFD_BinarizedSobel
     Public Sub New()
         initParent()
 
-        palette = New Palette_Basics
+        palette = New Palette_RandomColorMap
         sobel = New MFD_BinarizedSobel
-
-        Dim paletteRadio = findRadio("Random - use slider to adjust")
-        paletteRadio.Checked = True
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -197,8 +194,6 @@ Public Class MFD_FloodFill
             sliders.setupTrackBar(1, "FloodFill point distance from edge", 1, 25, 10)
         End If
 
-        Dim paletteSlider = findSlider("Number of color transitions (Used only with Random)")
-        paletteSlider.Value = 180 ' insures every region will be a significantly different color
         task.desc = "Floodfill the image of MFD edges (binarized Sobel output)"
     End Sub
     Public Sub Run()
