@@ -1,5 +1,4 @@
-﻿Imports System.Windows.Controls
-Imports rs = Intel.RealSense
+﻿Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 
