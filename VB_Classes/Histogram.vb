@@ -1555,11 +1555,11 @@ Public Class Histogram_DepthClusters
             Dim startEndDepth = valleys.rangeBoundaries.ElementAt(i)
             cv.Cv2.InRange(src, startEndDepth.X, startEndDepth.Y, tmp)
             cv.Cv2.ConvertScaleAbs(tmp, mask)
-            palette.src.SetTo(i * colorIncr Mod 255, mask)
+            palette.src.SetTo(i * colorIncr + 1, mask)
         Next
         palette.Run()
         dst2 = palette.dst1
-        dst2.SetTo(0, task.noDepthMask)
+        ' dst2.SetTo(0, task.noDepthMask)
         If standalone Or task.intermediateReview = caller Then
             label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"
             label2 = "Backprojection of " + CStr(valleys.rangeBoundaries.Count) + " histogram clusters"
