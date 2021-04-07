@@ -1,5 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Threading
 Public Class OptionsCommon
     Inherits VBparent
     Public bins As Integer
@@ -79,7 +78,6 @@ Public Class OptionsCommon_LineType
             radio.check(2).Text = "Link8"
             radio.check(0).Checked = True
         End If
-        Thread.Sleep(10)
         task.desc = "Control the line type in use by all algorithms."
     End Sub
     Public Sub Run()

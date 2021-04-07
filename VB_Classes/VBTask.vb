@@ -350,9 +350,11 @@ Public Class ActiveTask : Implements IDisposable
             End If
 
             ' run any global options algorithms here.
-            inrange.Run() ' updates all the depth info.
-            IMUStable.run() ' updates the flag that indicates stability according to the IMU.
-            lineTypeTask.run() ' sets the global for the line type
+            If task.pythonTaskName.EndsWith(".py") = False Then
+                inrange.Run() ' updates all the depth info.
+                IMUStable.run() ' updates the flag that indicates stability according to the IMU.
+                lineTypeTask.run() ' sets the global for the line type
+            End If
 
             algorithmObject.NextFrame()
 
