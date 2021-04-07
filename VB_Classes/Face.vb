@@ -4,7 +4,7 @@ Module FaceDetection_Exports
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim faces() = cascade.DetectMultiScale(gray, 1.08, 3, cv.HaarDetectionTypes.ScaleImage, New cv.Size(30, 30))
         For Each face In faces
-            src.Rectangle(face, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+            src.Rectangle(face, cv.Scalar.Red, 1, task.lineType)
         Next
     End Sub
 End Module

@@ -35,7 +35,7 @@ Public Class QRcode_Basics
 
         src.CopyTo(dst1)
         For i = 0 To box.Length - 1
-            dst1.Line(box(i), box((i + 1) Mod 4), cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
+            dst1.Line(box(i), box((i + 1) Mod 4), cv.Scalar.Red, 3, task.lineType)
         Next
         If refersTo <> "" Then label1 = refersTo
     End Sub

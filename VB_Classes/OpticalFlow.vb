@@ -308,9 +308,9 @@ Public Class OpticalFlow_Sparse
                     If length < 30 Then
                         features.Add(pt1)
                         lastFeatures.Add(pt2)
-                        dst1.Line(pt1, pt2, cv.Scalar.Red, 5, cv.LineTypes.AntiAlias)
-                        dst2.Circle(pt1, 5, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-                        dst2.Circle(pt2, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                        dst1.Line(pt1, pt2, cv.Scalar.Red, 5, task.lineType)
+                        dst2.Circle(pt1, 5, cv.Scalar.White, -1, task.lineType)
+                        dst2.Circle(pt2, 3, cv.Scalar.Red, -1, task.lineType)
                     End If
                 End If
             Next

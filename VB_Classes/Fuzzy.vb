@@ -72,7 +72,7 @@ Public Class Fuzzy_Basics
 
             Dim len = contours(i).Length
             For j = 0 To len
-                dst2.Line(contours(i)(j Mod len), contours(i)((j + 1) Mod len), cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+                dst2.Line(contours(i)(j Mod len), contours(i)((j + 1) Mod len), cv.Scalar.White, 2, task.lineType)
             Next
             sortContours.Add(len, New cv.Point(i, maskID))
         Next
@@ -233,8 +233,8 @@ Public Class Fuzzy_TrackerDepth
                 rects.Add(rect)
                 layoutColor.Add(c.Value.Item1)
                 If displayRect Then
-                    dst1.Circle(centroid, 6, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-                    dst1.Circle(centroid, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                    dst1.Circle(centroid, 6, cv.Scalar.Yellow, -1, task.lineType)
+                    dst1.Circle(centroid, 3, cv.Scalar.Red, -1, task.lineType)
                     dst1.Rectangle(rect, cv.Scalar.Yellow, 2)
                 End If
             End If

@@ -215,7 +215,7 @@ Public Class Clone_Seamless
         Dim radius = 100
         If task.drawRect = New cv.Rect Then
             dst2.SetTo(0)
-            dst2.Circle(center.X, center.Y, radius, cv.Scalar.White, -1)
+            dst2.Circle(center.X, center.Y, radius, cv.Scalar.White, -1, task.lineType)
         Else
             cv.Cv2.Rectangle(dst2, task.drawRect, cv.Scalar.White, -1)
         End If
@@ -230,7 +230,7 @@ Public Class Clone_Seamless
         Next
         dst1 = src.Clone()
         cv.Cv2.SeamlessClone(task.RGBDepth, src, dst2, center, dst1, style)
-        dst1.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        dst1.Circle(center, radius, cv.Scalar.White, 1, task.lineType)
     End Sub
 End Class
 

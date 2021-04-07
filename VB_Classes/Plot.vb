@@ -178,7 +178,7 @@ Public Class Plot_OverTime
             Dim rect = New cv.Rect(c.X, c.Y, pixelWidth * 2, pixelHeight * 2)
             Select Case i
                 Case 0
-                    dst1.Circle(c, pixelWidth, plotColors(i), -1, cv.LineTypes.AntiAlias)
+                    dst1.Circle(c, pixelWidth, plotColors(i), -1, task.lineType)
                 Case 1
                     dst1.Rectangle(rect, plotColors(i), -1)
                 Case 2

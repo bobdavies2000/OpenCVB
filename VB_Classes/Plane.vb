@@ -146,7 +146,7 @@ Public Class Plane_Detect
                 Dim p2 = contours(maxIndex)(k + stepj)
                 worldDepth.Add(getWorldCoordinates(New cv.Point3f(roi.X + p1.X, roi.Y + p1.Y, depthROI.Get(Of Single)(p1.Y, p1.X))))
                 worldDepth.Add(getWorldCoordinates(New cv.Point3f(roi.X + p2.X, roi.Y + p2.Y, depthROI.Get(Of Single)(p2.Y, p2.X))))
-                dst1(roi).Line(p1, p2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias) ' show the line connecting the 2 points used to create the normal
+                dst1(roi).Line(p1, p2, cv.Scalar.White, 1, task.lineType) ' show the line connecting the 2 points used to create the normal
             Next
 
             ' compute plane equation from the worlddepth points.
@@ -219,7 +219,7 @@ Public Class Plane_DetectDebug
                 Dim p2 = contours(maxIndex)(k + stepj)
                 worldDepth.Add(getWorldCoordinates(New cv.Point3f(roi.X + p1.X, roi.Y + p1.Y, depthROI.Get(Of Single)(p1.Y, p1.X))))
                 worldDepth.Add(getWorldCoordinates(New cv.Point3f(roi.X + p2.X, roi.Y + p2.Y, depthROI.Get(Of Single)(p2.Y, p2.X))))
-                dst1(roi).Line(p1, p2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias) ' show the line connecting the 2 points used to create the normal
+                dst1(roi).Line(p1, p2, cv.Scalar.White, 1, task.lineType) ' show the line connecting the 2 points used to create the normal
             Next
 
             ' compute plane equation from the worlddepth points.

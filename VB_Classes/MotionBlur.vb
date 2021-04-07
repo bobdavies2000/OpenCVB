@@ -30,7 +30,7 @@ Public Class MotionBlur_Basics
         dst1 = src.Filter2D(-1, kernel)
         pt1 += New cv.Point(src.Width / 2, src.Height / 2)
         pt2 += New cv.Point(src.Width / 2, src.Height / 2)
-        If showDirection Then dst1.Line(pt1, pt2, cv.Scalar.Yellow, 5, cv.LineTypes.AntiAlias)
+        If showDirection Then dst1.Line(pt1, pt2, cv.Scalar.Yellow, 5, task.lineType)
     End Sub
 End Class
 

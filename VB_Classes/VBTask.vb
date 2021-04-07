@@ -109,6 +109,7 @@ Public Class ActiveTask : Implements IDisposable
     Public rightView As cv.Mat
     Public viewOptions As Object
     Public PixelViewer As Object
+    Public lineTypeTask As Object
     Public IMUStable As Object
 
     ' add any global option algorithms and structures here
@@ -201,6 +202,7 @@ Public Class ActiveTask : Implements IDisposable
 
     Public pythonTaskName As String
     Public cameraStable As Boolean
+    Public lineType As cv.LineTypes
 
     Public ttTextData As New List(Of TTtext)
     Public callTrace As New List(Of String)
@@ -310,6 +312,7 @@ Public Class ActiveTask : Implements IDisposable
         viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
         IMUStable = algoList.createAlgorithm("IMU_IscameraStable")
         PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
+        lineTypeTask = algoList.createAlgorithm("OptionsCommon_LineType")
 
         algorithmObject = algoList.createAlgorithm(algName)
 
@@ -347,8 +350,9 @@ Public Class ActiveTask : Implements IDisposable
             End If
 
             ' run any global options algorithms here.
-            If inrange IsNot Nothing Then inrange.Run()
-            If IMUStable IsNot Nothing Then IMUStable.run() ' updates the flag that indicates stability according to the IMU.
+            inrange.Run() ' updates all the depth info.
+            IMUStable.run() ' updates the flag that indicates stability according to the IMU.
+            lineTypeTask.run() ' sets the global for the line type
 
             algorithmObject.NextFrame()
 

@@ -20,7 +20,7 @@ Public Class ORB_Basics
         If standalone or task.intermediateReview = caller Then
             dst1 = src.Clone()
             For Each kpt In keypoints
-                dst1.Circle(kpt.Pt, 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                dst1.Circle(kpt.Pt, 3, cv.Scalar.Yellow, -1, task.lineType)
             Next
             label1 = CStr(keypoints.Count) + " key points were identified"
         End If

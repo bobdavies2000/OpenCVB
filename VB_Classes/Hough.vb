@@ -13,7 +13,7 @@ Module Hough_Exports
 
             Dim pt1 As cv.Point = New cv.Point(Math.Round(x + 1000 * -b), Math.Round(y + 1000 * a))
             Dim pt2 As cv.Point = New cv.Point(Math.Round(x - 1000 * -b), Math.Round(y - 1000 * a))
-            dst1.Line(pt1, pt2, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias, 0)
+            dst1.Line(pt1, pt2, cv.Scalar.Red, 2, task.lineType, 0)
         Next
     End Sub
 
@@ -30,7 +30,7 @@ Module Hough_Exports
         Dim pt1 As cv.Point = New cv.Point(x, y)
         Dim pt2 As cv.Point
         If m = 0 Then pt2 = New cv.Point(x, dst1.Rows) Else pt2 = New cv.Point((dst1.Rows - b) / m, dst1.Rows)
-        dst1.Line(pt1, pt2, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias, 0)
+        dst1.Line(pt1, pt2, cv.Scalar.Red, 3, task.lineType, 0)
     End Sub
 End Module
 
@@ -60,7 +60,7 @@ Public Class Hough_Circles
         Dim foundColor = New cv.Scalar(0, 0, 255)
         dst1.CopyTo(dst2)
         For i = 0 To cFound.Length - 1
-            cv.Cv2.Circle(dst2, New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y)), cFound(i).Radius, foundColor, 5, cv.LineTypes.AntiAlias)
+            cv.Cv2.Circle(dst2, New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y)), cFound(i).Radius, foundColor, 5, task.lineType)
         Next
         label2 = CStr(cFound.Length) + " circles were identified"
     End Sub
@@ -108,7 +108,7 @@ Public Class Hough_Lines
             Dim probSegments = cv.Cv2.HoughLinesP(edges.dst1, rhoIn, thetaIn, threshold)
             For i = 0 To Math.Min(probSegments.Length, sliders.trackbar(3).Value) - 1
                 Dim line = probSegments(i)
-                dst2.Line(line.P1, line.P2, cv.Scalar.Red, 3, cv.LineTypes.AntiAlias)
+                dst2.Line(line.P1, line.P2, cv.Scalar.Red, 3, task.lineType)
             Next
             label2 = "Probablistic lines = " + CStr(probSegments.Length)
         End If

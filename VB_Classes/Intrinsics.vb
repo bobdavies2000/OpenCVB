@@ -38,10 +38,10 @@ Public Class intrinsicsLeft_Basics
 
         Dim nextline = "(" + CStr(task.parms.intrinsicsLeft.ppx) + ", " + CStr(task.parms.intrinsicsLeft.ppy) + ")"
         Dim ttLocation = New cv.Point(CInt(src.Width / 2) + 20, CInt(src.Height / 2) + 40)
-        cv.Cv2.PutText(dst2, nextline, ttLocation, task.font, task.fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+        cv.Cv2.PutText(dst2, nextline, ttLocation, task.font, task.fontSize, cv.Scalar.White, 1, task.lineType)
 
         Dim ptLoc = New cv.Point(src.Width / 2 + 4, src.Height / 2 + 4)
-        dst2.Line(ptLoc, ttLocation, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
+        dst2.Line(ptLoc, ttLocation, cv.Scalar.Red, 2, task.lineType)
     End Sub
 End Class
 

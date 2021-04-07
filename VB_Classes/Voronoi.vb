@@ -18,7 +18,7 @@ Public Class Voronoi_Basics
         dst = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         For Each pt In points
-            dst.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
     End Sub
     Public Sub Run()

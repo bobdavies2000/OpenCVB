@@ -33,7 +33,7 @@ Public Class Random_Basics
             Dim y = msRNG.Next(rangeRect.Y, rangeRect.Y + rangeRect.Height)
             Points(i) = New cv.Point2f(x, y)
             Points2f(i) = New cv.Point2f(x, y)
-            If standalone Or plotPoints = True Then cv.Cv2.Circle(dst1, Points(i), 3, cv.Scalar.Gray, -1, cv.LineTypes.AntiAlias, 0)
+            If standalone Or plotPoints = True Then cv.Cv2.Circle(dst1, Points(i), 3, cv.Scalar.Gray, -1, task.lineType, 0)
         Next
     End Sub
 End Class
@@ -641,8 +641,8 @@ Public Class Random_KalmanPoints
 
         dst1.SetTo(0)
         For i = 0 To knn.currSet.Count - 1
-            dst1.Circle(knn.currSet(i), task.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-            dst1.Circle(knn.lastSet(i), task.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(knn.currSet(i), task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+            dst1.Circle(knn.lastSet(i), task.dotSize, cv.Scalar.Red, -1, task.lineType)
         Next
 
         Dim noChanges As Boolean = True

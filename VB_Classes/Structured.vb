@@ -324,7 +324,7 @@ Public Class Structured_MultiSlicePolygon
         For i = 0 To contours.Length - 1
             If contours(i).Length = 2 Then Continue For
             If contours(i).Length <= maxSides Then
-                cv.Cv2.DrawContours(dst2, contours, i, New cv.Scalar(0, 255, 255), 2, cv.LineTypes.AntiAlias)
+                cv.Cv2.DrawContours(dst2, contours, i, New cv.Scalar(0, 255, 255), 2, task.lineType)
             End If
         Next
     End Sub
@@ -362,7 +362,7 @@ Public Class Structured_SliceXPlot
         Dim minLoc As cv.Point, maxLoc As cv.Point
         multi.top2D.histOutput(rect).MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
 
-        dst2.Circle(New cv.Point(col, dst2.Height - maxLoc.Y), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst2.Circle(New cv.Point(col, dst2.Height - maxLoc.Y), 10, cv.Scalar.Red, -1, task.lineType)
         Dim filterZ = maxLoc.Y / dst2.Height * task.maxZ
 
         Dim maskZplane As New cv.Mat(multi.split(0).Size, cv.MatType.CV_8U)
@@ -557,7 +557,7 @@ Public Class Structured_SliceH
         dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         yPlaneOffset = If(offsetSlider.Value < dst2.Height - cushion, CInt(offsetSlider.Value), dst2.Height - cushion - 1)
-        dst2.Circle(New cv.Point(0, task.sideCameraPoint.Y), task.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        dst2.Circle(New cv.Point(0, task.sideCameraPoint.Y), task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         dst2.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst2.Width, yPlaneOffset), cv.Scalar.Yellow, cushion)
     End Sub
 End Class
@@ -620,7 +620,7 @@ Public Class Structured_SliceV
         dst2 = top2D.dst1.Normalize(0, 255, cv.NormTypes.MinMax)
         dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2.Circle(New cv.Point(task.topCameraPoint.X, dst2.Height), task.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+        dst2.Circle(New cv.Point(task.topCameraPoint.X, dst2.Height), task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         Dim offset = CInt(offsetSlider.Value)
         dst2.Line(New cv.Point(offset, 0), New cv.Point(offset, dst2.Height), cv.Scalar.Yellow, cushion)
     End Sub
@@ -767,9 +767,9 @@ Public Class Structured_CenterSlice
             topPt = New cv.Point2f(topPt.X, 0)
             botPt = New cv.Point2f(topPt.X, dst1.Height)
         End If
-        dst2.Circle(avgPt, task.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-        dst2.Line(topPt, botPt, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
-        dst1.Line(topPt, botPt, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+        dst2.Circle(avgPt, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+        dst2.Line(topPt, botPt, cv.Scalar.Red, 1, task.lineType)
+        dst1.Line(topPt, botPt, cv.Scalar.Yellow, 1, task.lineType)
     End Sub
 End Class
 
@@ -979,14 +979,14 @@ Public Class Structured_Crosshairs
                         Dim p1 = New cv.Point(pointX.Get(Of Integer)(y - 1, x), pointY.Get(Of Integer)(y - 1, x))
                         If p1.X > 0 Then
                             Dim p2 = New cv.Point(xx, yy)
-                            dst1.Line(p1, p2, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+                            dst1.Line(p1, p2, cv.Scalar.White, 2, task.lineType)
                         End If
                     End If
                     If y = indexY Then
                         Dim p1 = New cv.Point(pointX.Get(Of Integer)(y, x - 1), pointY.Get(Of Integer)(y, x - 1))
                         If p1.X > 0 Then
                             Dim p2 = New cv.Point(xx, yy)
-                            dst1.Line(p1, p2, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+                            dst1.Line(p1, p2, cv.Scalar.White, 2, task.lineType)
                         End If
                     End If
                 End If

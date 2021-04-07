@@ -29,10 +29,10 @@ Public Class InPaint_Basics
         Dim p1 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
         Dim p2 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
         Dim thickness = sliders.trackbar(0).Value
-        dst1.Line(p1, p2, New cv.Scalar(0, 0, 0), thickness, cv.LineTypes.AntiAlias)
+        dst1.Line(p1, p2, New cv.Scalar(0, 0, 0), thickness, task.lineType)
         Dim mask = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
         mask.SetTo(0)
-        mask.Line(p1, p2, cv.Scalar.All(255), thickness, cv.LineTypes.AntiAlias)
+        mask.Line(p1, p2, cv.Scalar.All(255), thickness, task.lineType)
         cv.Cv2.Inpaint(dst1, mask, dst2, thickness, inPaintFlag)
     End Sub
 End Class

@@ -114,7 +114,7 @@ Public Class Harris_Detector_CPP
             FeaturePoints.Clear()
             For i = 0 To ptMat.Rows - 1
                 FeaturePoints.Add(New cv.Point2f(ptMat.Get(of integer)(i, 0), ptMat.Get(of integer)(i, 1)))
-                If standalone or task.intermediateReview = caller Then dst1.Circle(FeaturePoints(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                If standalone or task.intermediateReview = caller Then dst1.Circle(FeaturePoints(i), 3, cv.Scalar.Yellow, -1, task.lineType)
             Next
         End If
     End Sub

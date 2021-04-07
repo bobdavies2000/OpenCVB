@@ -34,7 +34,7 @@ Public Class ImageSeg_Basics
         dst2 = addw.dst1
 
         For Each pt In floodPoints
-            dst1.Circle(pt, task.dotSize - 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(pt, task.dotSize - 3, cv.Scalar.Yellow, -1, task.lineType)
         Next
 
         label2 = addw.label1.Replace("depth", "ImageSeg")
@@ -122,7 +122,7 @@ Public Class ImageSeg_MissingSegments
 
             If nextContour.Length >= maxLen Then contours.Add(nextContour)
         Next
-        cv.Cv2.DrawContours(dst2, contours.ToArray, -1, 128, -1, cv.LineTypes.AntiAlias)
+        cv.Cv2.DrawContours(dst2, contours.ToArray, -1, 128, -1, task.lineType)
         label2 = CStr(contours.Count) + " contours were found "
     End Sub
 End Class
@@ -209,13 +209,13 @@ Public Class ImageSeg_CentroidTracker
         pTrack.Run()
         dst2 = dst1.Clone
         For Each vo In pTrack.drawRC.viewObjects
-            dst2.Circle(vo.Value.centroid, task.dotSize + 1, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-            dst2.Circle(vo.Value.centroid, task.dotSize - 2, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-            dst2.Line(vo.Value.floodPoint, vo.Value.centroid, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            dst2.Circle(vo.Value.centroid, task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
+            dst2.Circle(vo.Value.centroid, task.dotSize - 2, cv.Scalar.Blue, -1, task.lineType)
+            dst2.Line(vo.Value.floodPoint, vo.Value.centroid, cv.Scalar.White, 1, task.lineType)
         Next
 
         For Each pt In pTrack.floodPoints
-            dst2.Circle(pt, task.dotSize - 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(pt, task.dotSize - 3, cv.Scalar.Yellow, -1, task.lineType)
         Next
         label2 = "Centroid " + CStr(pTrack.drawRC.viewObjects.Count) + " blue, floodPoint " + CStr(pTrack.floodPoints.Count) + " yellow"
     End Sub

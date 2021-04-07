@@ -102,14 +102,14 @@ Public Class LeftRightView_Features
         features.Run()
         lrView.dst2.CopyTo(dst2)
         For i = 0 To features.goodFeatures.Count - 1
-            cv.Cv2.Circle(dst2, features.goodFeatures(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            cv.Cv2.Circle(dst2, features.goodFeatures(i), 3, cv.Scalar.White, -1, task.lineType)
         Next
 
         features.src = lrView.dst1
         features.Run()
         lrView.dst1.CopyTo(dst1)
         For i = 0 To features.goodFeatures.Count - 1
-            cv.Cv2.Circle(dst1, features.goodFeatures(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            cv.Cv2.Circle(dst1, features.goodFeatures(i), 3, cv.Scalar.White, -1, task.lineType)
         Next
     End Sub
 End Class

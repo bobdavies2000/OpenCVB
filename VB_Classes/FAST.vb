@@ -23,7 +23,7 @@ Public Class FAST_Basics
         keypoints = cv.Cv2.FAST(src, sliders.trackbar(0).Value, If(check.Box(0).Checked, True, False))
 
         For Each kp As cv.KeyPoint In keypoints
-            dst1.Circle(kp.Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
+            dst1.Circle(kp.Pt, 3, cv.Scalar.Red, -1, task.lineType, 0)
         Next kp
         label1 = "FAST_Basics nonMax = " + If(check.Box(0).Checked, "True", "False")
     End Sub
@@ -52,7 +52,7 @@ Public Class FAST_Centroid
         dst1 = fast.dst1
         dst2.SetTo(0)
         For Each kp As cv.KeyPoint In fast.keypoints
-            dst2.Circle(kp.Pt, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
+            dst2.Circle(kp.Pt, 10, cv.Scalar.White, -1, task.lineType, 0)
         Next kp
         Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim m = cv.Cv2.Moments(gray, True)
@@ -60,7 +60,7 @@ Public Class FAST_Centroid
             kalman.kInput(0) = m.M10 / m.M00
             kalman.kInput(1) = m.M01 / m.M00
             kalman.Run()
-            dst2.Circle(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, cv.Scalar.Red, -1, task.lineType)
         End If
     End Sub
 End Class

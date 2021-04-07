@@ -178,7 +178,7 @@ Public Class DNN_Basics
                         kalman(minIndex).Run()
                         rect = New cv.Rect(kalman(minIndex).kOutput(0), kalman(minIndex).kOutput(1), kalman(minIndex).kOutput(2), kalman(minIndex).kOutput(3))
                     End If
-                    dst2.Rectangle(rect, cv.Scalar.Yellow, 3, cv.LineTypes.AntiAlias)
+                    dst2.Rectangle(rect, cv.Scalar.Yellow, 3, task.lineType)
                     rect.Width = src.Width / 12
                     rect.Height = src.Height / 16
                     dst2.Rectangle(rect, cv.Scalar.Black, -1)

@@ -191,10 +191,10 @@ Public Class TimeView_Centroids
         dst2 = tflood.dst1
 
         For i = 0 To tflood.floodTop.centroids.Count - 1
-            dst1.Circle(tflood.floodTop.centroids(i), task.dotSize, cv.Scalar.Yellow, -1)
+            dst1.Circle(tflood.floodTop.centroids(i), task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
         For i = 0 To tflood.floodSide.centroids.Count - 1
-            dst2.Circle(tflood.floodSide.centroids(i), task.dotSize, cv.Scalar.Yellow, -1)
+            dst2.Circle(tflood.floodSide.centroids(i), task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
 
         Dim saveTopQueries = New List(Of cv.Point2f)(tflood.floodTop.centroids)
@@ -204,10 +204,10 @@ Public Class TimeView_Centroids
             knn.Run()
             For i = 0 To knn.neighbors.Rows - 1
                 Dim qPoint = tflood.floodTop.centroids(i)
-                cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias, 0)
+                cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, task.lineType, 0)
                 Dim pt = saveTopQueries(knn.neighbors.Get(Of Single)(i, 0))
                 Dim cpt = New cv.Point(CInt(pt.X), CInt(pt.Y))
-                dst1.Line(cpt, qPoint, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+                dst1.Line(cpt, qPoint, cv.Scalar.Red, 1, task.lineType)
             Next
 
             saveTopQueries = New List(Of cv.Point2f)(tflood.floodTop.centroids)

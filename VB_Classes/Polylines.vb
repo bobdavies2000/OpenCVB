@@ -27,7 +27,7 @@ Public Class Polylines_IEnumerableExample
 
         dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         ' NOTE: when there are 2 points, there will be 1 line.
-        dst1.Polylines(pts, check.Box(0).Checked, cv.Scalar.White, sliders.trackbar(1).Value, cv.LineTypes.AntiAlias)
+        dst1.Polylines(pts, check.Box(0).Checked, cv.Scalar.White, sliders.trackbar(1).Value, task.lineType)
     End Sub
 End Class
 
@@ -61,7 +61,7 @@ Public Class Polylines_Random
             pts.Add(points)
 
             dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
-            dst1.Polylines(pts, False, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            dst1.Polylines(pts, False, cv.Scalar.White, 1, task.lineType)
             dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
 

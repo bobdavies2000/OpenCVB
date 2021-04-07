@@ -38,7 +38,7 @@ Public Class Highlight_Basics
             highlightMask = viewObjects.ElementAt(index).Value.mask
             preKalmanRect = viewObjects.ElementAt(index).Value.preKalmanRect
 
-            dst1.Circle(highlightPoint, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(highlightPoint, 5, cv.Scalar.Red, -1, task.lineType)
             dst1.Rectangle(highlightRect, cv.Scalar.Red, 2)
             Dim rect = New cv.Rect(0, 0, highlightMask.Width, highlightMask.Height)
             task.color.CopyTo(dst2)

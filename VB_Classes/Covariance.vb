@@ -16,7 +16,7 @@ Public Class Covariance_Basics
             random.Run()
             samples = New cv.Mat(random.Points.Length, 2, cv.MatType.CV_32F, random.Points2f)
             For i = 0 To random.Points.Length - 1
-                dst2.Circle(random.Points(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                dst2.Circle(random.Points(i), 3, cv.Scalar.White, -1, task.lineType)
             Next
         End If
         Dim samples2 = samples.Reshape(2)
@@ -31,9 +31,9 @@ Public Class Covariance_Basics
         If standalone Or task.intermediateReview = caller Then
             Dim newCenter = New cv.Point(overallMean(0), overallMean(1))
             Static lastCenter = newCenter
-            dst2.Circle(newCenter, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            dst2.Circle(lastCenter, 5, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
-            dst2.Line(newCenter, lastCenter, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
+            dst2.Circle(newCenter, 5, cv.Scalar.Red, -1, task.lineType)
+            dst2.Circle(lastCenter, 5, cv.Scalar.Yellow, 2, task.lineType)
+            dst2.Line(newCenter, lastCenter, cv.Scalar.Red, 2, task.lineType)
             lastCenter = newCenter
             output += "Yellow is last center, red is the current center"
         End If

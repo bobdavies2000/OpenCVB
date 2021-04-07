@@ -22,7 +22,7 @@ Public Class FREAK_Basics
 
         For Each kpt In orb.keypoints
             Dim r = kpt.Size / 2
-            dst1.Circle(kpt.Pt, r, cv.Scalar.Green)
+            dst1.Circle(kpt.Pt, r, cv.Scalar.Green, -1, task.lineType)
             dst1.Line(New cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), cv.Scalar.Green)
             dst1.Line(New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), cv.Scalar.Green)
         Next

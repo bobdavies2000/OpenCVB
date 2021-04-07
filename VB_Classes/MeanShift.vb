@@ -34,7 +34,7 @@ Public Class MeanShift_Basics
             cv.Cv2.CalcBackProject(New cv.Mat() {hsv}, ch, roi_hist, backProj, ranges)
             cv.Cv2.MeanShift(backProj, trackbox, cv.TermCriteria.Both(10, 1))
             dst1 = backProj.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst1.Rectangle(trackbox, cv.Scalar.Red, rectangleEdgeWidth, cv.LineTypes.AntiAlias)
+            dst1.Rectangle(trackbox, cv.Scalar.Red, rectangleEdgeWidth, task.lineType)
             Show_HSV_Hist(dst2, roi_hist)
             dst2 = dst2.CvtColor(cv.ColorConversionCodes.HSV2BGR)
         Else

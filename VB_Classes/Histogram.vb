@@ -131,7 +131,7 @@ Public Class Histogram_Graph
                     points.Add(New cv.Point(CInt(j * lineWidth), dst1.Rows - dst1.Rows * histRaw(i).Get(Of Single)(j, 0) / maxVal))
                 Next
                 listOfPoints.Add(points)
-                dst1.Polylines(listOfPoints, False, plotColors(i), thickness, cv.LineTypes.AntiAlias)
+                dst1.Polylines(listOfPoints, False, plotColors(i), thickness, task.lineType)
             End If
         Next
 
@@ -171,7 +171,7 @@ Module histogram_Functions
                     Dim value = cv.Scalar.All(255 - intensity)
                     'value = New cv.Scalar(pt1.X * 255 / dst1.Cols, pt1.Y * 255 / dst1.Rows, 255 - intensity)
                     value = New cv.Scalar(intensity, intensity, intensity)
-                    dst1.Rectangle(pt1, pt2, value, -1, cv.LineTypes.AntiAlias)
+                    dst1.Rectangle(pt1, pt2, value, -1, task.lineType)
                 End If
             Next
         Next

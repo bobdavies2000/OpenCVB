@@ -103,9 +103,9 @@ Public Class EMax_CentroidsNew
         Static lastCentroids As New List(Of cv.Point2f)
         Dim centroids = emaxCPP.palette.flood.flood.centroids
         For i = 0 To centroids.Count - 1
-            dst1.Circle(centroids(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(centroids(i), 3, cv.Scalar.White, -1, task.lineType)
             If i < lastCentroids.Count Then
-                dst1.Circle(lastCentroids(i), 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                dst1.Circle(lastCentroids(i), 3, cv.Scalar.Red, -1, task.lineType)
             End If
         Next
         lastCentroids = New List(Of cv.Point2f)(centroids)
@@ -209,7 +209,7 @@ Public Class EMax_VB_Failing
         ' draw the clustered samples
         For i = 0 To samples.Rows - 1
             Dim pt = New cv.Point(Math.Round(samples.Get(Of Single)(i, 0)), Math.Round(samples.Get(Of Single)(i, 1)))
-            dst1.Circle(pt, 4, task.vecColors(labels.Get(Of Integer)(i) + 1), -1, cv.LineTypes.AntiAlias) ' skip the first rColor - it might be used above.
+            dst1.Circle(pt, 4, task.vecColors(labels.Get(Of Integer)(i) + 1), -1, task.lineType) ' skip the first rColor - it might be used above.
         Next
     End Sub
 End Class
@@ -268,9 +268,9 @@ Public Class EMax_Centroids
 
         Static lastCentroids As New List(Of cv.Point2f)
         For i = 0 To flood.centroids.Count - 1
-            dst1.Circle(flood.centroids(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(flood.centroids(i), 3, cv.Scalar.White, -1, task.lineType)
             If i < lastCentroids.Count Then
-                dst1.Circle(lastCentroids(i), 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+                dst1.Circle(lastCentroids(i), 3, cv.Scalar.Red, -1, task.lineType)
             End If
         Next
         lastCentroids = New List(Of cv.Point2f)(flood.centroids)

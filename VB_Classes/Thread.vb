@@ -147,7 +147,7 @@ Public Class Thread_GridTest
          Sub(i)
              Dim roi = grid.roiList(i)
              cv.Cv2.Subtract(mean, src(roi), dst2(roi))
-             dst2(roi).Line(New cv.Point(0, 0), New cv.Point(roi.Width, roi.Height), cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+             dst2(roi).Line(New cv.Point(0, 0), New cv.Point(roi.Width, roi.Height), cv.Scalar.White, 1, task.lineType)
          End Sub)
     End Sub
 End Class

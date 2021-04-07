@@ -16,7 +16,7 @@ Public Class Mouse_Basics
         Static colorIndex As Integer
         Dim nextColor = task.scalarColors(colorIndex)
         Dim nextPt = task.mousePoint
-        dst1.Circle(nextPt, radius, nextColor, -1, cv.LineTypes.AntiAlias)
+        dst1.Circle(nextPt, radius, nextColor, -1, task.lineType)
         colorIndex += 1
         If colorIndex >= task.scalarColors.Count Then colorIndex = 0
     End Sub

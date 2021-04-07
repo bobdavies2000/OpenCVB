@@ -98,7 +98,7 @@ Public Class SVM_Options
             Dim res = responses(i)
             Dim color As cv.Scalar = If(res = 1, cv.Scalar.Red, cv.Scalar.GreenYellow)
             Dim cSize = If(res = 1, 2, 4)
-            dst1.Circle(x, y, cSize, color, -1)
+            dst1.Circle(x, y, cSize, color, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -148,8 +148,8 @@ Public Class SVM_Basics
         For x = 1 To src.Height - 1
             Dim y1 = CInt(src.Height - svmOptions.f(x - 1))
             Dim y2 = CInt(src.Height - svmOptions.f(x))
-            dst1.Line(x - 1, y1, x, y2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-            dst2.Line(x - 1, y1, x, y2, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            dst1.Line(x - 1, y1, x, y2, cv.Scalar.White, 1, task.lineType)
+            dst2.Line(x - 1, y1, x, y2, cv.Scalar.White, 1, task.lineType)
         Next
     End Sub
 End Class
@@ -204,7 +204,7 @@ Public Class SVM_Random
                 If pt.X > rect.X And pt.X < rect.X + rect.Width And pt.Y > rect.Y And pt.Y < rect.Y + rect.Height Then resp = 1 Else resp = -1
             End If
             response.Set(Of integer)(i, 0, resp)
-            dst1.Circle(pt, 5, If(resp = 1, cv.Scalar.Blue, cv.Scalar.Green), -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(pt, 5, If(resp = 1, cv.Scalar.Blue, cv.Scalar.Green), -1, task.lineType)
             trainData.Set(Of Single)(i, 0, pt.X)
             trainData.Set(Of Single)(i, 1, pt.Y)
         Next
@@ -223,10 +223,10 @@ Public Class SVM_Random
                     Dim ret = svmx.Predict(sampleMat)
                     output.Add(ret)
                     If ret >= 0 Then
-                        dst2.Circle(New cv.Point(x, y), 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+                        dst2.Circle(New cv.Point(x, y), 5, cv.Scalar.Blue, -1, task.lineType)
                         blueCount += 1
                     Else
-                        dst2.Circle(New cv.Point(x, y), 5, cv.Scalar.Green, -1, cv.LineTypes.AntiAlias)
+                        dst2.Circle(New cv.Point(x, y), 5, cv.Scalar.Green, -1, task.lineType)
                     End If
                 Next
             Next
@@ -281,15 +281,15 @@ Public Class SVM_TestCase
                 sampleMat.Set(Of Single)(0, 1, y)
                 Dim response = svmx.Predict(sampleMat)
                 Dim color = If(response >= 0, cv.Scalar.Blue, cv.Scalar.Green)
-                dst2.Circle(New cv.Point(x, y), 5, color, -1, cv.LineTypes.AntiAlias)
+                dst2.Circle(New cv.Point(x, y), 5, color, -1, task.lineType)
             Next
         Next
 
         For i = 0 To trainMat.Rows - 1
             Dim color = If(labelsMat.Get(Of integer)(i) = 1, cv.Scalar.Yellow, cv.Scalar.Red)
             Dim pt = New cv.Point(trainMat.Get(Of Single)(i, 0), trainMat.Get(Of Single)(i, 1))
-            dst1.Circle(pt, 5, color, -1, cv.LineTypes.AntiAlias)
-            dst2.Circle(pt, 5, color, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(pt, 5, color, -1, task.lineType)
+            dst2.Circle(pt, 5, color, -1, task.lineType)
         Next
     End Sub
 End Class

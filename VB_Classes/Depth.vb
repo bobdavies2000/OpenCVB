@@ -36,9 +36,9 @@ Public Class Depth_FirstLastDistance
         task.RGBDepth.CopyTo(dst1)
         task.RGBDepth.CopyTo(dst2)
         label1 = "Min Depth " + CStr(minVal) + " mm"
-        dst1.Circle(minLoc, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+        dst1.Circle(minLoc, 10, cv.Scalar.White, -1, task.lineType)
         label2 = "Max Depth " + CStr(maxVal) + " mm"
-        dst2.Circle(maxLoc, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+        dst2.Circle(maxLoc, 10, cv.Scalar.White, -1, task.lineType)
     End Sub
 End Class
 
@@ -637,8 +637,8 @@ Public Class Depth_LocalMinMax_MT
             minPoint(i) = New cv.Point(minLoc.X + roi.X, minLoc.Y + roi.Y)
             maxPoint(i) = New cv.Point(maxLoc.X + roi.X, maxLoc.Y + roi.Y)
 
-            cv.Cv2.Circle(dst1(roi), minLoc, 5, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            cv.Cv2.Circle(dst1(roi), maxLoc, 5, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+            cv.Cv2.Circle(dst1(roi), minLoc, 5, cv.Scalar.Red, -1, task.lineType)
+            cv.Cv2.Circle(dst1(roi), maxLoc, 5, cv.Scalar.Blue, -1, task.lineType)
         End Sub)
     End Sub
 End Class
@@ -705,8 +705,8 @@ Public Class Depth_LocalMinMax_Kalman_MT
             ptmin = validatePoint2f(ptmin)
             ptmax = validatePoint2f(ptmax)
             subdiv.Insert(ptmin)
-            cv.Cv2.Circle(dst1, ptmin, radius, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            cv.Cv2.Circle(dst1, ptmax, radius, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+            cv.Cv2.Circle(dst1, ptmin, radius, cv.Scalar.Red, -1, task.lineType)
+            cv.Cv2.Circle(dst1, ptmax, radius, cv.Scalar.Blue, -1, task.lineType)
         Next
         paint_voronoi(task.scalarColors, dst2, subdiv)
     End Sub
@@ -1906,7 +1906,7 @@ End Class
 
 
 
-Public Class Depth_Noise
+Public Class Depth_Solid
     Inherits VBparent
     Public flood As Coherent_Palette
     Public Sub New()

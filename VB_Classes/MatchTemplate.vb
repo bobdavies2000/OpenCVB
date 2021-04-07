@@ -161,7 +161,7 @@ Public Class MatchTemplate_DrawRect
         addw.Run()
         dst2 = addw.dst1
 
-        dst2.Circle(maxLoc.X, maxLoc.Y, task.dotSize / 2, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+        dst2.Circle(maxLoc.X, maxLoc.Y, task.dotSize / 2, cv.Scalar.Red, -1, task.lineType)
         label2 = "Red is best match, white has correlation > " + Format(thresholdSlider.value / 100, "#0%")
     End Sub
 End Class
@@ -267,7 +267,7 @@ Public Class MatchTemplate_Movement
                 If correlation.Get(Of Single)(0, 0) < CCthreshold Then
                     Interlocked.Increment(updateCount)
                     Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                    cv.Cv2.PutText(dst1, Format(correlation.Get(Of Single)(0, 0), "#0.00"), pt, task.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                    cv.Cv2.PutText(dst1, Format(correlation.Get(Of Single)(0, 0), "#0.00"), pt, task.font, fsize, cv.Scalar.White, 1, task.lineType)
                 Else
                     mask(roi).SetTo(255)
                     dst1(roi).SetTo(0)

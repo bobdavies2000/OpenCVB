@@ -6,7 +6,7 @@ Module Delaunay_Exports
             If org.Y >= 0 And org.Y <= img.Height Then
                 If output.X >= 0 And output.X <= img.Width Then
                     If output.Y >= 0 And output.Y <= img.Height Then
-                        cv.Cv2.Line(img, org, output, active_color, 1, cv.LineTypes.AntiAlias, 0)
+                        cv.Cv2.Line(img, org, output, active_color, 1, task.lineType, 0)
                     End If
                 End If
             End If
@@ -54,7 +54,7 @@ Module Delaunay_Exports
             Loop
         End If
 
-        cv.Cv2.Circle(img, fp, 10, active_color, -1, cv.LineTypes.AntiAlias, 0)
+        cv.Cv2.Circle(img, fp, 10, active_color, -1, task.lineType, 0)
     End Sub
     Public Sub paint_voronoi(colors() As cv.Scalar, img As cv.Mat, subdiv As cv.Subdiv2D)
         Dim facets = New cv.Point2f()() {Nothing}
@@ -71,8 +71,8 @@ Module Delaunay_Exports
             Next
             Dim nextColor = colors(i Mod colors.Length)
             ifacets(0) = ifacet
-            cv.Cv2.FillConvexPoly(img, ifacet, nextColor, cv.LineTypes.AntiAlias)
-            cv.Cv2.Polylines(img, ifacets, True, New cv.Scalar(0), 1, cv.LineTypes.AntiAlias, 0)
+            cv.Cv2.FillConvexPoly(img, ifacet, nextColor, task.lineType)
+            cv.Cv2.Polylines(img, ifacets, True, New cv.Scalar(0), 1, task.lineType, 0)
         Next
     End Sub
 End Module
@@ -164,7 +164,7 @@ Public Class Delauney_Subdiv2D
                 Return New cv.Point2f(rand.Next(0, src.Width), rand.Next(0, src.Height))
             End Function).ToArray()
         For Each p In points
-            dst1.Circle(p, 4, cv.Scalar.Red, -1)
+            dst1.Circle(p, 4, cv.Scalar.Red, -1, task.lineType)
         Next
         dst2 = dst1.Clone()
 

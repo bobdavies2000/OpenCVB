@@ -71,7 +71,7 @@ Public Class CamShift_Basics
         dst1.SetTo(0)
         src.CopyTo(dst1, mask)
         If trackBox.Size.Width > 0 Then
-            dst1.Ellipse(trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+            dst1.Ellipse(trackBox, cv.Scalar.White, 2, task.lineType)
         End If
     End Sub
 End Class
@@ -150,7 +150,7 @@ Public Class Camshift_Object
             Dim mask = dst1.ConvertScaleAbs(255)
             cv.Cv2.BitwiseNot(mask.CvtColor(cv.ColorConversionCodes.BGR2GRAY), mask)
             dst2.SetTo(0, mask)
-            If camshift.trackBox.Size.Width > 0 Then dst2.Ellipse(camshift.trackBox, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+            If camshift.trackBox.Size.Width > 0 Then dst2.Ellipse(camshift.trackBox, cv.Scalar.White, 2, task.lineType)
         End If
     End Sub
 End Class
@@ -201,7 +201,7 @@ Public Class Camshift_TopObjects
             End If
         Next
         For i = 0 To trackBoxes.Count - 1
-            dst1.Ellipse(trackBoxes(i), cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+            dst1.Ellipse(trackBoxes(i), cv.Scalar.White, 2, task.lineType)
         Next
         mats.Run()
         dst2 = mats.dst1

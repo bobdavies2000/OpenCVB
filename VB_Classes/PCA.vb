@@ -77,13 +77,13 @@ Public Class PCA_DrawImage
         Dim hypotenuse = Math.Sqrt((p.Y - q.Y) * (p.Y - q.Y) + (p.X - q.X) * (p.X - q.X))
         q.X = p.X - scale * hypotenuse * Math.Cos(angle)
         q.Y = p.Y - scale * hypotenuse * Math.Sin(angle)
-        img.Line(p, q, color, 1, cv.LineTypes.AntiAlias)
+        img.Line(p, q, color, 1, task.lineType)
         p.X = q.X + 9 * Math.Cos(angle + Math.PI / 4)
         p.Y = q.Y + 9 * Math.Sin(angle + Math.PI / 4)
-        img.Line(p, q, color, 1, cv.LineTypes.AntiAlias)
+        img.Line(p, q, color, 1, task.lineType)
         p.X = q.X + 9 * Math.Cos(angle - Math.PI / 4)
         p.Y = q.Y + 9 * Math.Sin(angle - Math.PI / 4)
-        img.Line(p, q, color, 1, cv.LineTypes.AntiAlias)
+        img.Line(p, q, color, 1, task.lineType)
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -97,7 +97,7 @@ Public Class PCA_DrawImage
         For i = 0 To contours.Length - 1
             Dim area = cv.Cv2.ContourArea(contours(i))
             If area < 100 Or area > 100000 Then Continue For
-            cv.Cv2.DrawContours(dst2, contours, i, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+            cv.Cv2.DrawContours(dst2, contours, i, cv.Scalar.Red, 1, task.lineType)
             Dim sz = contours(i).Length
             Dim data_pts = New cv.Mat(sz, 2, cv.MatType.CV_64FC1)
             For j = 0 To data_pts.Rows - 1
@@ -114,7 +114,7 @@ Public Class PCA_DrawImage
                 eigen_val(j) = pca_analysis.Eigenvalues.Get(Of Double)(0, j)
             Next
 
-            dst2.Circle(cntr, 3, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
+            dst2.Circle(cntr, 3, cv.Scalar.BlueViolet, -1, task.lineType)
             Dim factor As Single = 0.02 ' scaling factor for the lines depicting the principle components.
             Dim ept1 = New cv.Point(cntr.X + factor * eigen_vecs(0).X * eigen_val(0), cntr.Y + factor * eigen_vecs(0).Y * eigen_val(0))
             Dim ept2 = New cv.Point(cntr.X - factor * eigen_vecs(1).X * eigen_val(1), cntr.Y - factor * eigen_vecs(1).Y * eigen_val(1))

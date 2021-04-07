@@ -200,7 +200,7 @@ Public Class Video_MinCircle
         If video.contours IsNot Nothing Then
             For i = 0 To video.contours.Length - 1
                 cv.Cv2.MinEnclosingCircle(video.contours(i), center, radius)
-                dst1.Circle(center, radius, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                dst1.Circle(center, radius, cv.Scalar.White, 1, task.lineType)
             Next
         End If
     End Sub

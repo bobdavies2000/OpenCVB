@@ -164,7 +164,7 @@ Public Class MSER_SyntheticInput
     End Sub
     Private Sub addNestedCircles(img As cv.Mat, p0 As cv.Point, width() As Integer, color() As Integer, n As Integer)
         For i = 0 To n - 1
-            img.Circle(p0, width(i) / 2, color(i), 1)
+            img.Circle(p0, width(i) / 2, color(i), 1, task.lineType)
             img.FloodFill(p0, color(i))
         Next
     End Sub
@@ -269,7 +269,7 @@ Public Class MSER_CPPStyle
         For Each pts In regions
             Dim color = cv.Scalar.RandomColor
             For Each pt In pts
-                mat.Circle(pt, 1, color)
+                mat.Circle(pt, 1, color, -1, task.lineType)
             Next
         Next
         dst1 = mat.Resize(dst1.Size())
@@ -277,7 +277,7 @@ Public Class MSER_CPPStyle
         mat = image.Clone()
         For Each box In boxes
             Dim color = cv.Scalar.RandomColor
-            mat.Rectangle(box, color, -1, cv.LineTypes.AntiAlias)
+            mat.Rectangle(box, color, -1, task.lineType)
         Next
         dst2 = mat.Resize(dst2.Size())
     End Sub

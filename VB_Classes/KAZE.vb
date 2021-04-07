@@ -14,7 +14,7 @@ Public Class KAZE_KeypointsKAZE_CS
         CS_Kaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         src.CopyTo(dst1)
         For i = 0 To CS_Kaze.kazeKeyPoints.Count - 1
-            dst1.Circle(CS_Kaze.kazeKeyPoints.ElementAt(i).Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(CS_Kaze.kazeKeyPoints.ElementAt(i).Pt, 3, cv.Scalar.Red, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -35,7 +35,7 @@ Public Class KAZE_KeypointsAKAZE_CS
         CS_AKaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         src.CopyTo(dst1)
         For i = 0 To CS_AKaze.akazeKeyPoints.Count - 1
-            dst1.Circle(CS_AKaze.akazeKeyPoints.ElementAt(i).Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(CS_AKaze.akazeKeyPoints.ElementAt(i).Pt, 3, cv.Scalar.Red, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -128,10 +128,10 @@ Public Class KAZE_LeftAligned_CS
                 End If
             Next
             If minDistance < Single.MaxValue Then
-                dst2.Circle(pt1.Pt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-                dst1.Circle(pt1.Pt, 3, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
-                dst2.Circle(CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, 3, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-                dst2.Line(pt1.Pt, CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+                dst2.Circle(pt1.Pt, 3, cv.Scalar.Blue, -1, task.lineType)
+                dst1.Circle(pt1.Pt, 3, cv.Scalar.Blue, -1, task.lineType)
+                dst2.Circle(CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, 3, cv.Scalar.Red, -1, task.lineType)
+                dst2.Line(pt1.Pt, CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, cv.Scalar.Yellow, 1, task.lineType)
             End If
         Next
         label1 = "Right image has " + CStr(CS_KazeRight.kazeKeyPoints.Count) + " key points"

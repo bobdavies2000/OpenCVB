@@ -801,7 +801,7 @@ Public Class FloodFill_FullImage
 
         dst1 = edgeOutput.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each pt In floodPoints
-            dst1.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
         mats.mat(2) = dst1
 
@@ -917,7 +917,7 @@ Public Class FloodFill_Step
                             rects.Add(rect)
                             centroids.Add(centroid)
 
-                            dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1)
+                            dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
                         End If
                     End If
                 End If

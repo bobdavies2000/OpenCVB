@@ -11,7 +11,7 @@ Module Hull_module
         cv.Cv2.DrawContours(result, listOfPoints, 0, color, 2)
 
         For i = 0 To polyPoints.Count - 1
-            result.Circle(polyPoints(i), 5, color, -1, cv.LineTypes.AntiAlias)
+            result.Circle(polyPoints(i), 5, color, -1, task.lineType)
         Next
 
         Return points
@@ -61,11 +61,11 @@ Public Class Hull_Basics
             Dim sum = pMat.Sum()
             Dim center = New cv.Point(CInt(sum.Val0 / hull.Count), CInt(sum.Val1 / hull.Count))
             Dim pixels = dst1.FloodFill(center, cv.Scalar.Yellow) ' because the shape is convex, we know the center is in the intere
-            dst1.Circle(center, 10, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(center, 10, cv.Scalar.Red, -1, task.lineType)
 
             For i = 0 To Count - 1
-                dst1.Circle(points(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-                dst2.Circle(points(i), 3, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                dst1.Circle(points(i), 3, cv.Scalar.Yellow, -1, task.lineType)
+                dst2.Circle(points(i), 3, cv.Scalar.Yellow, -1, task.lineType)
             Next
         End If
     End Sub

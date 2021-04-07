@@ -39,7 +39,7 @@ Public Class kMeans_Basics
         Next
 
         For i = 0 To centroids.Count - 1
-            dst1.Circle(centroids(i), 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(centroids(i), 10, cv.Scalar.Yellow, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -628,7 +628,7 @@ Public Class KMeans_Subdivision1
         Next
 
         For i = 0 To centroids.Count - 1
-            dst1.Circle(centroids(i), 10, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(centroids(i), 10, cv.Scalar.Yellow, -1, task.lineType)
         Next
     End Sub
 End Class

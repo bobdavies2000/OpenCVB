@@ -1074,7 +1074,7 @@ Public Class Edges_Matching
                 highlights.Add(i)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
                 dst2.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
-                cv.Cv2.PutText(dst2, Format(maxVal, "#0.00"), pt, task.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                cv.Cv2.PutText(dst2, Format(maxVal, "#0.00"), pt, task.font, fsize, cv.Scalar.White, 1, task.lineType)
             End If
         Next
 
@@ -1096,7 +1096,7 @@ Public Class Edges_Matching
                 dst1.Rectangle(roi, cv.Scalar.Red, 2)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
                 dst1.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
-                cv.Cv2.PutText(dst1, CStr(maxLocs(i)), pt, task.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                cv.Cv2.PutText(dst1, CStr(maxLocs(i)), pt, task.font, fsize, cv.Scalar.White, 1, task.lineType)
             Next
         Else
             label1 = "Click in dst2 to highlight segment in dst1"
@@ -1115,7 +1115,7 @@ Public Class Edges_Matching
                     dst1.Rectangle(roi, cv.Scalar.Red, 2)
                     Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
                     dst1.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
-                    cv.Cv2.PutText(dst1, CStr(maxLocs(i)), pt, task.font, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                    cv.Cv2.PutText(dst1, CStr(maxLocs(i)), pt, task.font, fsize, cv.Scalar.White, 1, task.lineType)
                 Next
             End If
         End If

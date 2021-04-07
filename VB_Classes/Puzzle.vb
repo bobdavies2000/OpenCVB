@@ -477,7 +477,7 @@ Public Class Puzzle_Solver
                         Dim correlationRight = tmp.Get(Of Single)(0, 0)
                         If check.Box(1).Checked And correlationRight < 0.9 Then
                             cv.Cv2.PutText(dst2, Format(correlationRight, "0.00"), New cv.Point(x + yxOffset, y + yyOffset),
-                                       cv.HersheyFonts.HersheySimplex, task.fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                                       cv.HersheyFonts.HersheySimplex, task.fontSize, cv.Scalar.White, 1, task.lineType)
                         End If
                     End If
 
@@ -490,7 +490,7 @@ Public Class Puzzle_Solver
 
                         If check.Box(1).Checked And correlationBottom < 0.9 Then
                             cv.Cv2.PutText(dst2, Format(correlationBottom, "0.00"), New cv.Point(x + xxOffset, y + xyOffset),
-                                       cv.HersheyFonts.HersheySimplex, task.fontSize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                                       cv.HersheyFonts.HersheySimplex, task.fontSize, cv.Scalar.White, 1, task.lineType)
                         End If
                     End If
                 Next

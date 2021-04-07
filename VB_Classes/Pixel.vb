@@ -328,7 +328,7 @@ Public Class Pixel_Sampler
             dst1 = src
             dst1.Rectangle(random.rangeRect, cv.Scalar.White, 1)
             For i = 0 To random.Points2f.Count - 1
-                dst1.Circle(random.Points2f(i), 1, cv.Scalar.White, -1)
+                dst1.Circle(random.Points2f(i), 1, cv.Scalar.White, -1, task.lineType)
             Next
             label1 = "Dominant gray value = " + CStr(dominantGray)
             task.trueText("Draw in the image to select a region for testing.", 10, 200, 3)

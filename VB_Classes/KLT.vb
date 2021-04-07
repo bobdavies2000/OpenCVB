@@ -72,7 +72,7 @@ Public Class KLT_Basics
             Dim pt = outputMat.Get(Of cv.Point2f)(i)
             If pt.X >= 0 And pt.X <= src.Cols And pt.Y >= 0 And pt.Y <= src.Rows Then
                 If status.Get(Of Byte)(i) Then
-                    dst1.Circle(pt, 3, circleColor, -1, cv.LineTypes.AntiAlias)
+                    dst1.Circle(pt, 3, circleColor, -1, task.lineType)
                 End If
             Else
                 status.Set(Of Byte)(i, 0) ' this point is not visible!
@@ -105,9 +105,9 @@ Public Class KLT_OpticalFlow
             src.CopyTo(dst2)
             For i = 0 To klt.inputPoints.Length - 1
                 If klt.status.Get(Of Byte)(i) And i < lastpoints.Length And i < klt.inputPoints.Length Then
-                    ' dst1.Line(lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+                    ' dst1.Line(lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, 2, task.lineType)
                     'Static lastFlowPoints() As cv.Point2f = klt.inputPoints
-                    ' dst2.Line(lastFlowPoints(i), klt.inputPoints(i), cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+                    ' dst2.Line(lastFlowPoints(i), klt.inputPoints(i), cv.Scalar.Yellow, 2, task.lineType)
                     'If task.frameCount Mod 10 = 0 Then lastFlowPoints = klt.inputPoints
                 End If
             Next

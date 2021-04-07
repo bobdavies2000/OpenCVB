@@ -153,7 +153,7 @@ Public Class CellAuto_Life
                 End If
                 If nextgrid.Get(Of Byte)(y, x) Then
                     Dim pt = New cv.Point(x, y) * factor
-                    dst1.Circle(pt, factor / 2, nodeColor, -1, cv.LineTypes.AntiAlias)
+                    dst1.Circle(pt, factor / 2, nodeColor, -1, task.lineType)
                     population += 1
                 End If
             Next

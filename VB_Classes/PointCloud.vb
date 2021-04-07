@@ -182,13 +182,13 @@ Public Class PointCloud_Inspector
         Dim topPt = New cv.Point2f(cLine, 0)
         Dim botPt = New cv.Point2f(cLine, dst1.Height)
         dst1 = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1.Line(topPt, botPt, 255, 3, cv.LineTypes.AntiAlias)
+        dst1.Line(topPt, botPt, 255, 3, task.lineType)
 
         Dim stepY = dst1.Height / yLines
         For i = 0 To yLines - 1
             Dim pt1 = New cv.Point2f(dst1.Width, i * stepY)
             Dim pt2 = New cv.Point2f(0, i * stepY)
-            dst1.Line(pt1, pt2, 255, 1, cv.LineTypes.Link4)
+            dst1.Line(pt1, pt2, 255, 1, task.lineType)
 
             Dim pt = New cv.Point2f(cLine, i * stepY)
             Dim xyz = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
@@ -282,11 +282,11 @@ Public Class PointCloud_ColorizeSide
         Dim distanceRatio As Single = 1
         Dim fsize = task.fontSize * 1.5
 
-        dst1.Circle(task.sideCameraPoint, task.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
+        dst1.Circle(task.sideCameraPoint, task.dotSize, cv.Scalar.BlueViolet, -1, task.lineType)
         For i = 1 To task.maxZ
             Dim xmeter = CInt(dst1.Width * i / task.maxZ * distanceRatio)
             dst1.Line(New cv.Point(xmeter, 0), New cv.Point(xmeter, dst1.Height), cv.Scalar.AliceBlue, 1)
-            cv.Cv2.PutText(dst1, CStr(i) + "m", New cv.Point(xmeter - src.Width / 15, dst1.Height - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            cv.Cv2.PutText(dst1, CStr(i) + "m", New cv.Point(xmeter - src.Width / 15, dst1.Height - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, task.lineType)
         Next
 
         Dim cam = task.sideCameraPoint
@@ -319,8 +319,8 @@ Public Class PointCloud_ColorizeSide
         End If
 
         If standalone = False Then
-            dst1.Circle(markerLeft, task.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            dst1.Circle(markerRight, task.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(markerLeft, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+            dst1.Circle(markerRight, task.dotSize, cv.Scalar.Red, -1, task.lineType)
         End If
 
         ' draw the arc enclosing the camera FOV
@@ -331,17 +331,17 @@ Public Class PointCloud_ColorizeSide
         Dim fovBot = New cv.Point(dst1.Width, cam.Y + y)
 
         If standalone = False Then
-            dst1.Ellipse(cam, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-            dst1.Ellipse(cam, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-            dst1.Line(cam, fovTop, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-            dst1.Line(cam, fovBot, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            dst1.Ellipse(cam, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, 2, task.lineType)
+            dst1.Ellipse(cam, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, task.lineType)
+            dst1.Line(cam, fovTop, cv.Scalar.White, 1, task.lineType)
+            dst1.Line(cam, fovBot, cv.Scalar.White, 1, task.lineType)
 
-            dst1.Line(cam, markerLeft, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-            dst1.Line(cam, markerRight, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+            dst1.Line(cam, markerLeft, cv.Scalar.Yellow, 1, task.lineType)
+            dst1.Line(cam, markerRight, cv.Scalar.Yellow, 1, task.lineType)
 
             Dim labelLocation = New cv.Point(src.Width * 0.02, src.Height * 7 / 8)
             cv.Cv2.PutText(dst1, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize,
-                       cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+                       cv.Scalar.White, 1, task.lineType)
         End If
     End Sub
 End Class
@@ -381,11 +381,11 @@ Public Class PointCloud_ColorizeTop
 
         Dim distanceRatio As Single = 1
         Dim fsize = task.fontSize * 1.5
-        dst1.Circle(task.topCameraPoint, task.dotSize, cv.Scalar.BlueViolet, -1, cv.LineTypes.AntiAlias)
+        dst1.Circle(task.topCameraPoint, task.dotSize, cv.Scalar.BlueViolet, -1, task.lineType)
         For i = 1 To task.maxZ
             Dim ymeter = CInt(dst1.Height - dst1.Height * i / (task.maxZ * distanceRatio))
             dst1.Line(New cv.Point(0, ymeter), New cv.Point(dst1.Width, ymeter), cv.Scalar.AliceBlue, 1)
-            cv.Cv2.PutText(dst1, CStr(i) + "m", New cv.Point(10, ymeter - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            cv.Cv2.PutText(dst1, CStr(i) + "m", New cv.Point(10, ymeter - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, task.lineType)
         Next
 
         Dim cam = task.topCameraPoint
@@ -414,19 +414,19 @@ Public Class PointCloud_ColorizeTop
         Dim fovLeft = New cv.Point(task.topCameraPoint.X - x, fovRight.Y)
 
         If standalone = False Then
-            dst1.Ellipse(task.topCameraPoint, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-            dst1.Ellipse(task.topCameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
-            dst1.Line(task.topCameraPoint, fovLeft, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            dst1.Ellipse(task.topCameraPoint, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, 2, task.lineType)
+            dst1.Ellipse(task.topCameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, task.lineType)
+            dst1.Line(task.topCameraPoint, fovLeft, cv.Scalar.White, 1, task.lineType)
 
-            dst1.Circle(markerLeft, task.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            dst1.Circle(markerRight, task.dotSize, cv.Scalar.Red, -1, cv.LineTypes.AntiAlias)
-            dst1.Line(cam, markerLeft, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-            dst1.Line(cam, markerRight, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+            dst1.Circle(markerLeft, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+            dst1.Circle(markerRight, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+            dst1.Line(cam, markerLeft, cv.Scalar.Yellow, 1, task.lineType)
+            dst1.Line(cam, markerRight, cv.Scalar.Yellow, 1, task.lineType)
 
             Dim shift = (src.Width - src.Height) / 2
             Dim labelLocation = New cv.Point(dst1.Width / 2 + shift, dst1.Height * 15 / 16)
-            cv.Cv2.PutText(dst1, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
-            dst1.Line(task.topCameraPoint, fovRight, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            cv.Cv2.PutText(dst1, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, task.lineType)
+            dst1.Line(task.topCameraPoint, fovRight, cv.Scalar.White, 1, task.lineType)
         End If
     End Sub
 End Class
@@ -906,11 +906,11 @@ End Class
 '        If task.mouseClickFlag Then clicks.Add(task.mouseClickPoint)
 
 '        For Each pt In points
-'            dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+'            dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
 '        Next
 '        For Each pt In clicks
-'            dst1.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
-'            dst2.Circle(pt, task.dotSize, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias)
+'            dst1.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+'            dst2.Circle(pt, task.dotSize, cv.Scalar.Blue, -1, task.lineType)
 '            Dim side1 = (pt.X - task.sideCameraPoint.X)
 '            Dim side2 = (pt.Y - task.sideCameraPoint.Y)
 '            Dim cameraDistance = Math.Sqrt(side1 * side1 + side2 * side2) / task.pixelsPerMeter
@@ -1211,7 +1211,7 @@ End Class
 '            kalman.Run()
 '            leftPoint.X = kalman.kOutput(0)
 '            rightPoint.X = kalman.kOutput(1)
-'            dst1.Line(leftPoint, rightPoint, cv.Scalar.Yellow, task.lineSize, cv.LineTypes.AntiAlias)
+'            dst1.Line(leftPoint, rightPoint, cv.Scalar.Yellow, task.lineSize, task.lineType)
 '        End If
 '        label1 = "Side View with gravity "
 '    End Sub

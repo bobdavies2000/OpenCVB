@@ -26,7 +26,7 @@ Public Class Features_GoodFeatures
         goodFeatures.Clear()
         For i = 0 To features.Length - 1
             goodFeatures.Add(features.ElementAt(i))
-            cv.Cv2.Circle(dst1, features(i), 3, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            cv.Cv2.Circle(dst1, features(i), 3, cv.Scalar.White, -1, task.lineType)
         Next
     End Sub
 End Class

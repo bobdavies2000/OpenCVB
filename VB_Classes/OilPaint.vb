@@ -71,9 +71,9 @@ Public Class OilPaint_Pointilism
 
                 Dim rotatedRect = New cv.RotatedRect(nPoint, eSize, angle)
                 If radio.check(0).Checked Then
-                    dst1(saveDrawRect).Ellipse(rotatedRect, nextColor, -1, cv.LineTypes.AntiAlias)
+                    dst1(saveDrawRect).Ellipse(rotatedRect, nextColor, -1, task.lineType)
                 Else
-                    dst1(saveDrawRect).Circle(nPoint, slen / 4, nextColor, -1, cv.LineTypes.AntiAlias)
+                    dst1(saveDrawRect).Circle(nPoint, slen / 4, nextColor, -1, task.lineType)
                 End If
             Next
         Next

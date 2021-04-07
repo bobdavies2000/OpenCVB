@@ -8,15 +8,15 @@ Module Draw_Exports
         For j = 0 To vertices2f.Length - 1
             vertices(j) = New cv.Point(CInt(vertices2f(j).X), CInt(vertices2f(j).Y))
         Next
-        cv.Cv2.FillConvexPoly(dst1, vertices, color, cv.LineTypes.AntiAlias)
+        cv.Cv2.FillConvexPoly(dst1, vertices, color, task.lineType)
     End Sub
     Public Sub drawRotatedOutline(rr As cv.RotatedRect, dst As cv.Mat, color As cv.Scalar)
         Dim vertices = rr.Points()
         For i = 0 To 4 - 1
             dst.Line(New cv.Point(vertices(i).X, vertices(i).Y), New cv.Point(vertices((i + 1) Mod 4).X, vertices((i + 1) Mod 4).Y),
-                     color, 1, cv.LineTypes.AntiAlias)
+                     color, 1, task.lineType)
         Next
-        dst.Rectangle(rr.BoundingRect, color, 1, cv.LineTypes.AntiAlias)
+        dst.Rectangle(rr.BoundingRect, color, 1, task.lineType)
     End Sub
     Public Function initRandomRect(width As Integer, height As Integer, margin As Integer) As cv.Rect
         Dim x As Integer, y As Integer, w As Integer, h As Integer
@@ -67,8 +67,8 @@ Public Class Draw_Noise
             Dim c = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
             If addRandomColor = False Then c = cv.Scalar.Black
             Dim noiseWidth = msRNG.Next(1, maxNoiseWidth)
-            dst1.Circle(center, noiseWidth, c, -1, cv.LineTypes.AntiAlias)
-            noiseMask.Circle(center, noiseWidth, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+            dst1.Circle(center, noiseWidth, c, -1, task.lineType)
+            noiseMask.Circle(center, noiseWidth, cv.Scalar.White, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -125,7 +125,7 @@ Public Class Draw_Circles
                 Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
                 Dim radius = msRNG.Next(10, 10 + msRNG.Next(src.Cols / 4))
                 Dim nextColor = New cv.Scalar(task.vecColors(i).Item0, task.vecColors(i).Item1, task.vecColors(i).Item2)
-                dst1.Circle(nPoint, radius, nextColor, -1,)
+                dst1.Circle(nPoint, radius, nextColor, -1, task.lineType)
             Next
         End If
     End Sub
@@ -153,7 +153,7 @@ Public Class Draw_Line
             Dim nPoint2 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
             Dim thickness = msRNG.Next(1, 10)
             Dim nextColor = New cv.Scalar(task.vecColors(i).Item0, task.vecColors(i).Item1, task.vecColors(i).Item2)
-            dst1.Line(nPoint1, nPoint2, nextColor, thickness, cv.LineTypes.AntiAlias)
+            dst1.Line(nPoint1, nPoint2, nextColor, thickness, task.lineType)
         Next
     End Sub
 End Class
@@ -193,7 +193,7 @@ Public Class Draw_Polygon
             Next
             listOfPoints.Add(points)
             If radio.check(0).Checked Then
-                cv.Cv2.Polylines(dst1, listOfPoints, True, polyColor, 2, cv.LineTypes.AntiAlias)
+                cv.Cv2.Polylines(dst1, listOfPoints, True, polyColor, 2, task.lineType)
             Else
                 dst1.FillPoly(listOfPoints, New cv.Scalar(0, 0, 255))
             End If
@@ -241,19 +241,19 @@ Public Class Draw_Shapes
                 Case 0 ' circle
                     Dim center = New cv.Point(msRNG.Next(offsetX, dst1.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst1.Rows - offsetY))
                     Dim radius = msRNG.Next(1, Math.Min(offsetX, offsetY))
-                    dst1.Circle(center, radius, color, -1, cv.LineTypes.Link8)
+                    dst1.Circle(center, radius, color, -1, task.lineType)
                 Case 1 ' Rectangle
                     Dim center = New cv.Point(msRNG.Next(offsetX, dst1.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst1.Rows - offsetY))
                     Dim width = msRNG.Next(1, Math.Min(offsetX, offsetY))
                     Dim height = msRNG.Next(1, Math.Min(offsetX, offsetY))
                     Dim rc = New cv.Rect(center.X - width, center.Y - height / 2, width, height)
-                    dst1.Rectangle(rc, color, -1, cv.LineTypes.Link8)
+                    dst1.Rectangle(rc, color, -1, task.lineType)
                 Case 2 ' Ellipse
                     Dim center = New cv.Point(msRNG.Next(offsetX, dst1.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst1.Rows - offsetY))
                     Dim width = msRNG.Next(1, Math.Min(offsetX, offsetY))
                     Dim height = msRNG.Next(1, Math.Min(offsetX, offsetY))
                     Dim angle = msRNG.Next(0, 180)
-                    dst1.Ellipse(center, New cv.Size(width / 2, height / 2), angle, 0, 360, color, -1, cv.LineTypes.Link8)
+                    dst1.Ellipse(center, New cv.Size(width / 2, height / 2), angle, 0, 360, color, -1, task.lineType)
             End Select
         Next
     End Sub
@@ -329,7 +329,7 @@ Public Class Draw_SymmetricalShapes
         Next
 
         For i = 0 To numPoints - 1
-            dst1.Line(points.ElementAt(i), points.ElementAt((i + 1) Mod numPoints), task.scalarColors(i Mod task.scalarColors.Count), 2, cv.LineTypes.AntiAlias)
+            dst1.Line(points.ElementAt(i), points.ElementAt((i + 1) Mod numPoints), task.scalarColors(i Mod task.scalarColors.Count), 2, task.lineType)
         Next
 
         If check.Box(2).Checked Then dst1.FloodFill(center, fillColor)
@@ -404,7 +404,7 @@ Public Class Draw_Arc
 
         dst1.SetTo(cv.Scalar.White)
         If radio.check(0).Checked Then
-            dst1.Ellipse(rr, color, thickness, cv.LineTypes.AntiAlias)
+            dst1.Ellipse(rr, color, thickness, task.lineType)
             drawRotatedOutline(rr, dst1, task.scalarColors(colorIndex))
         Else
             Dim angle = kalman.kOutput(4)
@@ -412,7 +412,7 @@ Public Class Draw_Arc
             Dim endAngle = kalman.kOutput(6)
             If radio.check(1).Checked Then thickness = -1
             dst1.Ellipse(New cv.Point(rr.Center.X, rr.Center.Y), New cv.Size(rr.BoundingRect.Size.Width, rr.BoundingRect.Size.Height),
-                         angle, startAngle, endAngle, color, thickness, cv.LineTypes.AntiAlias)
+                         angle, startAngle, endAngle, color, thickness, task.lineType)
         End If
         If r = rect Or sliders.trackbar(0).Value <> saveMargin Then setup()
     End Sub
@@ -465,8 +465,8 @@ Public Class Draw_ViewObjects
                 For i = 0 To viewObjects.Count - 1
                     Dim vw = viewObjects.ElementAt(i).Value
                     Dim pt = vw.centroid
-                    cv.Cv2.Circle(dst1, pt, task.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias, 0)
-                    cv.Cv2.Circle(dst1, pt, task.dotSize - 2, cv.Scalar.Blue, -1, cv.LineTypes.AntiAlias, 0)
+                    cv.Cv2.Circle(dst1, pt, task.dotSize, cv.Scalar.White, -1, task.lineType, 0)
+                    cv.Cv2.Circle(dst1, pt, task.dotSize - 2, cv.Scalar.Blue, -1, task.lineType, 0)
                     dst1.Rectangle(vw.rectInHist, cv.Scalar.White, 1)
                 Next
             End If
@@ -547,8 +547,8 @@ Public Class Draw_ClipLine
         Dim r = New cv.Rect(kalman.kOutput(4), kalman.kOutput(5), kalman.kOutput(6), kalman.kOutput(7))
 
         Dim clipped = cv.Cv2.ClipLine(r, p1, p2) ' Returns false when the line and the rectangle don't intersect.
-        dst2.Line(p1, p2, If(clipped, cv.Scalar.White, cv.Scalar.Black), 2, cv.LineTypes.AntiAlias)
-        dst2.Rectangle(r, If(clipped, cv.Scalar.Yellow, cv.Scalar.Red), 2, cv.LineTypes.AntiAlias)
+        dst2.Line(p1, p2, If(clipped, cv.Scalar.White, cv.Scalar.Black), 2, task.lineType)
+        dst2.Rectangle(r, If(clipped, cv.Scalar.Yellow, cv.Scalar.Red), 2, task.lineType)
 
         Static linenum = 0
         flow.msgs.Add("(" + CStr(linenum) + ") line " + If(clipped, "interects rectangle", "does not intersect rectangle"))
@@ -605,9 +605,9 @@ Public Class Draw_Intersection
         End If
 
         dst1.SetTo(0)
-        dst1.Line(p1, p2, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
-        dst1.Line(p3, p4, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
-        If intersectionPoint <> New cv.Point2f Then dst1.Circle(intersectionPoint, 10, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+        dst1.Line(p1, p2, cv.Scalar.Yellow, 2, task.lineType)
+        dst1.Line(p3, p4, cv.Scalar.Yellow, 2, task.lineType)
+        If intersectionPoint <> New cv.Point2f Then dst1.Circle(intersectionPoint, 10, cv.Scalar.White, -1, task.lineType)
         If intersect Then label1 = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y)) Else label1 = "Parallel!!!"
         If intersectionPoint.X < 0 Or intersectionPoint.X > dst1.Width Or intersectionPoint.Y < 0 Or intersectionPoint.Y > dst1.Height Then
             label1 += " (off screen)"

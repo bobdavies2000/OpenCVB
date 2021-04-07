@@ -85,7 +85,7 @@ Public Class Texture_Flow
                 Dim delta = New cv.Point2f(split(4).Get(Of Single)(y, x), split(5).Get(Of Single)(y, x)) * TFdelta
                 Dim p1 = New cv.Point(x - delta.X, y - delta.Y)
                 Dim p2 = New cv.Point(x + delta.X, y + delta.Y)
-                dst1.Line(p1, p2, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
+                dst1.Line(p1, p2, cv.Scalar.Black, 1, task.lineType)
             Next
         Next
     End Sub

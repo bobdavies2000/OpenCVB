@@ -155,7 +155,7 @@ Public Class Blob_RenderBlobs
             cc.FilterByBlob(dst1, dst2, maxBlob)
 
             For Each b In cc.Blobs.Skip(1)
-                dst1.Rectangle(b.Rect, cv.Scalar.Red, 2, cv.LineTypes.AntiAlias)
+                dst1.Rectangle(b.Rect, cv.Scalar.Red, 2, task.lineType)
             Next
         End If
     End Sub

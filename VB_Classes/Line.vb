@@ -44,7 +44,7 @@ Public Class Line_Basics
                 Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
                 Dim pixelLen = pt1.DistanceTo(pt2)
                 If pixelLen > pixelThreshold Then
-                    dst1.Line(pt1, pt2, cv.Scalar.Yellow, thickness, cv.LineTypes.AntiAlias)
+                    dst1.Line(pt1, pt2, cv.Scalar.Yellow, thickness, task.lineType)
                     sortlines.Add(pixelLen, New cv.Vec4f(pt1.X, pt1.Y, pt2.X, pt2.Y))
                 End If
             End If
@@ -55,7 +55,7 @@ Public Class Line_Basics
         For Each line In sortlines
             Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
             Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-            dst2.Line(p1, p2, cv.Scalar.Yellow, 2, cv.LineTypes.AntiAlias)
+            dst2.Line(p1, p2, cv.Scalar.Yellow, 2, task.lineType)
         Next
     End Sub
 End Class
@@ -108,20 +108,20 @@ Public Class Line_LeftRightOverlay
         For Each line In lrLines.leftLines.sortlines
             Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
             Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-            dst2.Line(p1, p2, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+            dst2.Line(p1, p2, cv.Scalar.Red, 1, task.lineType)
         Next
 
         If showLeftRight Then
             For Each line In lrLines.rightLines.sortlines
                 Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
                 Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-                dst2.Line(p1, p2, cv.Scalar.Blue, 1, cv.LineTypes.AntiAlias)
+                dst2.Line(p1, p2, cv.Scalar.Blue, 1, task.lineType)
             Next
         Else
             For Each line In lines.sortlines
                 Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
                 Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-                dst2.Line(p1, p2, cv.Scalar.Blue, 1, cv.LineTypes.AntiAlias)
+                dst2.Line(p1, p2, cv.Scalar.Blue, 1, task.lineType)
             Next
         End If
     End Sub
@@ -164,7 +164,7 @@ Public Class Line_Reduction
         For Each line In lDetect.sortlines
             Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
             Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-            dst2.Line(p1, p2, cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
+            dst2.Line(p1, p2, cv.Scalar.Yellow, 1, task.lineType)
         Next
     End Sub
 End Class
@@ -198,10 +198,10 @@ Public Class Line_InterceptsUI
         Dim blue = New cv.Scalar(254, 0, 0)
 
         Dim center = New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        dst2.Line(New cv.Point(0, 0), center, blue, 1, cv.LineTypes.Link4)
-        dst2.Line(New cv.Point(dst1.Width, 0), center, red, 1, cv.LineTypes.Link4)
-        dst2.Line(New cv.Point(0, dst1.Height), center, blue, 1, cv.LineTypes.Link4)
-        dst2.Line(New cv.Point(dst1.Width, dst1.Height), center, yellow, 1, cv.LineTypes.Link4)
+        dst2.Line(New cv.Point(0, 0), center, blue, 1, task.lineType)
+        dst2.Line(New cv.Point(dst1.Width, 0), center, red, 1, task.lineType)
+        dst2.Line(New cv.Point(0, dst1.Height), center, blue, 1, task.lineType)
+        dst2.Line(New cv.Point(dst1.Width, dst1.Height), center, yellow, 1, task.lineType)
 
         Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
         Dim pt = New cv.Point(center.X, center.Y - 30)
@@ -229,9 +229,9 @@ Public Class Line_InterceptsUI
             If color.Item0 = 1 Then p2 = New cv.Point((dst2.Height - b) / m, dst2.Height) ' green
             If color.Item0 = 2 Then p2 = New cv.Point(dst2.Width, dst2.Width * m + b) ' yellow
             If color.Item0 = 254 Then p2 = New cv.Point(0, b) ' blue
-            dst2.Line(center, p2, cv.Scalar.Black, 1, cv.LineTypes.AntiAlias)
+            dst2.Line(center, p2, cv.Scalar.Black, 1, task.lineType)
         End If
-        dst2.Circle(center, task.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+        dst2.Circle(center, task.dotSize, cv.Scalar.White, -1, task.lineType)
 
 
         Static redRadio = findRadio("Show Top intercepts")
@@ -297,7 +297,7 @@ Public Class Line_ConfirmedDepth
             Dim h = Math.Abs(p1.Y - p2.Y)
             Dim r = New cv.Rect(minXX, minYY, If(w > 0, w, 2), If(h > 0, h, 2))
             Dim mask = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, 0)
-            mask.Line(New cv.Point(CInt(p1.X - r.X), CInt(p1.Y - r.Y)), New cv.Point(CInt(p2.X - r.X), CInt(p2.Y - r.Y)), 255, thickness, cv.LineTypes.Link4)
+            mask.Line(New cv.Point(CInt(p1.X - r.X), CInt(p1.Y - r.Y)), New cv.Point(CInt(p2.X - r.X), CInt(p2.Y - r.Y)), 255, thickness, task.lineType)
             Dim mean = cloudInput(r).Mean(mask)
 
             If mean <> New cv.Scalar Then
@@ -315,7 +315,7 @@ Public Class Line_ConfirmedDepth
                     p2 = New cv.Point(Loc(3).X + r.X, Loc(3).Y + r.Y)
                 End If
                 If p1.DistanceTo(p2) > 1 Then
-                    dst2.Line(p1, p2, cv.Scalar.Yellow, thickness, cv.LineTypes.AntiAlias)
+                    dst2.Line(p1, p2, cv.Scalar.Yellow, thickness, task.lineType)
                     pt1.Add(p1)
                     pt2.Add(p2)
                     z1.Add(cloudInput.Get(Of cv.Point3f)(p1.Y, p1.X))
@@ -370,7 +370,7 @@ Public Class Line_Vertical
             Dim p1 = lines.z1(i)
             Dim p2 = lines.z2(i)
             If Math.Abs(p1.X - p2.X) < toleranceInMMs And Math.Abs(p1.Z - p2.Z) < toleranceInMMs Then
-                dst1.Line(lines.pt1(i), lines.pt2(i), cv.Scalar.Yellow, thickness, cv.LineTypes.AntiAlias)
+                dst1.Line(lines.pt1(i), lines.pt2(i), cv.Scalar.Yellow, thickness, task.lineType)
             End If
         Next
     End Sub
@@ -402,7 +402,7 @@ Public Class Line_Horizontal
             Dim p1 = vLines.lines.z1(i)
             Dim p2 = vLines.lines.z2(i)
             If Math.Abs(p1.Y - p2.Y) < vLines.toleranceInMMs And Math.Abs(p1.Z - p2.Z) < vLines.toleranceInMMs Then
-                dst1.Line(vLines.lines.pt1(i), vLines.lines.pt2(i), cv.Scalar.Yellow, vLines.thickness, cv.LineTypes.AntiAlias)
+                dst1.Line(vLines.lines.pt1(i), vLines.lines.pt2(i), cv.Scalar.Yellow, vLines.thickness, task.lineType)
             End If
         Next
     End Sub
@@ -446,8 +446,8 @@ Public Class Line_Intercepts
     Public Sub hightLightIntercept(mousePoint As Integer, intercepts As SortedList(Of Integer, Integer), axis As Integer, dst As cv.Mat)
         For Each inter In intercepts
             If Math.Abs(mousePoint - inter.Key) < searchRange Then
-                dst1.Line(pt1(inter.Value), pt2(inter.Value), cv.Scalar.White, thickNess + 4, cv.LineTypes.AntiAlias)
-                dst1.Line(pt1(inter.Value), pt2(inter.Value), cv.Scalar.Blue, thickNess, cv.LineTypes.AntiAlias)
+                dst1.Line(pt1(inter.Value), pt2(inter.Value), cv.Scalar.White, thickNess + 4, task.lineType)
+                dst1.Line(pt1(inter.Value), pt2(inter.Value), cv.Scalar.Blue, thickNess, task.lineType)
             End If
         Next
         For Each inter In intercepts
@@ -508,7 +508,7 @@ Public Class Line_Intercepts
 
             pt1.Add(p1)
             pt2.Add(p2)
-            dst1.Line(p1, p2, cv.Scalar.Yellow, thickNess, cv.LineTypes.AntiAlias)
+            dst1.Line(p1, p2, cv.Scalar.Yellow, thickNess, task.lineType)
             If p1.X = p2.X Then
                 topIntercepts.Add(p1.X, i)
                 botIntercepts.Add(p1.X, i)
@@ -575,7 +575,7 @@ Public Class Line_LeftRightImages
         For Each line In leftLines.sortlines
             Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
             Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-            dst1.Line(p1, p2, color, 1, cv.LineTypes.AntiAlias)
+            dst1.Line(p1, p2, color, 1, task.lineType)
         Next
 
         rightLines.src = lrPalette.dst2
@@ -585,7 +585,7 @@ Public Class Line_LeftRightImages
         For Each line In rightLines.sortlines
             Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
             Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-            dst2.Line(p1, p2, color, 1, cv.LineTypes.AntiAlias)
+            dst2.Line(p1, p2, color, 1, task.lineType)
         Next
     End Sub
 End Class
@@ -719,9 +719,9 @@ Public Class Line_NearestPoint
             Dim p2 = getPoint()
             Dim nearest = findNearest(p1, p2, pt)
             dst1.SetTo(0)
-            dst1.Circle(New cv.Point2f(pt.X, pt.Y), task.dotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
-            dst1.Line(New cv.Point2f(p1.X, p1.Y), New cv.Point2f(p2.X, p2.Y), cv.Scalar.Yellow, 1, cv.LineTypes.AntiAlias)
-            dst1.Line(pt, nearest, cv.Scalar.White, 1, cv.LineTypes.AntiAlias)
+            dst1.Circle(New cv.Point2f(pt.X, pt.Y), task.dotSize, cv.Scalar.White, -1, task.lineType)
+            dst1.Line(New cv.Point2f(p1.X, p1.Y), New cv.Point2f(p2.X, p2.Y), cv.Scalar.Yellow, 1, task.lineType)
+            dst1.Line(pt, nearest, cv.Scalar.White, 1, task.lineType)
             label1 = "nearest point = (" + CStr(nearest.X) + "," + CStr(nearest.Y) + ")"
         End If
     End Sub

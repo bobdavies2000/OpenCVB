@@ -44,7 +44,7 @@ Public Class Fitline_Basics
                 lines.Add(p1)
                 lines.Add(p2)
             End If
-            dst1.Line(p1, p2, cv.Scalar.Red, 1, cv.LineTypes.AntiAlias)
+            dst1.Line(p1, p2, cv.Scalar.Red, 1, task.lineType)
         Next
     End Sub
 End Class
@@ -92,7 +92,7 @@ Public Class Fitline_3DBasics_MT
                 ' save the average color for this roi
                 Dim mean = task.RGBDepth(roi).Mean()
                 mean(0) = 255 - mean(0)
-                dst2.Rectangle(roi, mean, -1, cv.LineTypes.AntiAlias)
+                dst2.Rectangle(roi, mean, -1, task.lineType)
             Else
                 line = cv.Cv2.FitLine(points.ToArray, cv.DistanceTypes.L2, 0, 0, 0.01)
             End If
@@ -149,7 +149,7 @@ Public Class Fitline_RawInput
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y > height Then pt.Y = height
                 points.Add(pt)
-                dst1.Circle(points(i), rdotSize, cv.Scalar.White, -1, cv.LineTypes.AntiAlias)
+                dst1.Circle(points(i), rdotSize, cv.Scalar.White, -1, task.lineType)
             Next
 
             Dim p1 As cv.Point2f, p2 As cv.Point2f
@@ -181,7 +181,7 @@ Public Class Fitline_RawInput
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y > height Then pt.Y = height
                 points.Add(pt)
-                dst1.Circle(pt, task.dotSize, highLight, -1, cv.LineTypes.AntiAlias)
+                dst1.Circle(pt, task.dotSize, highLight, -1, task.lineType)
             Next
         End If
     End Sub
@@ -236,7 +236,7 @@ Public Class Fitline_EigenFit
             Dim bb = line.Y1 - m * line.X1
             Dim p1 = New cv.Point(0, bb)
             Dim p2 = New cv.Point(width, m * width + bb)
-            dst1.Line(p1, p2, cv.Scalar.Red, 20, cv.LineTypes.AntiAlias)
+            dst1.Line(p1, p2, cv.Scalar.Red, 20, task.lineType)
 
             Dim pointMat = New cv.Mat(noisyLine.points.Count, 1, cv.MatType.CV_32FC2, noisyLine.points.ToArray)
             Dim mean = pointMat.Mean()
@@ -272,16 +272,16 @@ Public Class Fitline_EigenFit
             m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
 
             If Math.Abs(m2) > 1.0 Then
-                dst1.Line(p1, p2, cv.Scalar.Yellow, 10, cv.LineTypes.AntiAlias)
+                dst1.Line(p1, p2, cv.Scalar.Yellow, 10, task.lineType)
             Else
                 p1 = New cv.Point2f(mean.Val0 - Math.Cos(-theta) * len / 2, mean.Val1 - Math.Sin(-theta) * len / 2)
                 p2 = New cv.Point2f(mean.Val0 + Math.Cos(-theta) * len / 2, mean.Val1 + Math.Sin(-theta) * len / 2)
                 m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
-                dst1.Line(p1, p2, cv.Scalar.Yellow, 10, cv.LineTypes.AntiAlias)
+                dst1.Line(p1, p2, cv.Scalar.Yellow, 10, task.lineType)
             End If
             p1 = New cv.Point(0, noisyLine.bb)
             p2 = New cv.Point(width, noisyLine.m * width + noisyLine.bb)
-            dst1.Line(p1, p2, cv.Scalar.Blue, 3, cv.LineTypes.AntiAlias)
+            dst1.Line(p1, p2, cv.Scalar.Blue, 3, task.lineType)
         End If
         task.trueText("GT m = " + Format(noisyLine.m, "#0.00") + " eigen m = " + Format(m2, "#0.00") + "    len = " + CStr(CInt(len)) + vbCrLf +
                                               "Confidence = " + Format(eigenVal.Get(Of Single)(0, 0) / eigenVal.Get(Of Single)(1, 0), "#0.0") + vbCrLf +

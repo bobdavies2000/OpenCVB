@@ -108,7 +108,7 @@ Public Class GetRotationMatrix2D_Box
         For i = 0 To dstpoints.Width - 1
             Dim p1 = dstpoints.Get(Of cv.Point2f)(0, i)
             Dim p2 = dstpoints.Get(Of cv.Point2f)(0, (i + 1) Mod 4)
-            dst2.Line(p1, p2, cv.Scalar.White, 2, cv.LineTypes.AntiAlias)
+            dst2.Line(p1, p2, cv.Scalar.White, 2, task.lineType)
         Next
     End Sub
 End Class

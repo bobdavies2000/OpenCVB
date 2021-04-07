@@ -78,7 +78,7 @@ Public Class CComp_Basics
         count += renderBlobs(minSize, mats.mat(1), maxSize)
         If standalone Then
             For i = 0 To centroids.Count - 1
-                dst1.Circle(centroids.ElementAt(i), 5, cv.Scalar.Yellow, -1, cv.LineTypes.AntiAlias)
+                dst1.Circle(centroids.ElementAt(i), 5, cv.Scalar.Yellow, -1, task.lineType)
                 dst1.Rectangle(rects.ElementAt(i), cv.Scalar.White, 2)
             Next
         End If

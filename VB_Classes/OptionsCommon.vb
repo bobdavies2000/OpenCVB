@@ -64,6 +64,40 @@ End Class
 
 
 
+Public Class OptionsCommon_LineType
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+        task.callTrace.Clear() ' special line to clear the tree view otherwise OptionsCommon_LineType is standalone.
+        standalone = False
+
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "AntiAlias"
+            radio.check(1).Text = "Link4"
+            radio.check(2).Text = "Link8"
+            radio.check(0).Checked = True
+        End If
+
+        task.desc = "Control the line type in use by all algorithms."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        Static AntiAliasRadio = findRadio("AntiAlias")
+        Static Link4Radio = findRadio("Link4")
+        Static Link8Radio = findRadio("Link8")
+        If AntiAliasRadio.checked Then task.lineType = cv.LineTypes.AntiAlias
+        If Link4Radio.checked Then task.lineType = cv.LineTypes.Link4
+        If Link8Radio.checked Then task.lineType = cv.LineTypes.Link8
+    End Sub
+End Class
+
+
+
+
+
+
+
 Public Class OptionsCommon_Histogram
     Inherits VBparent
     Dim sideFrustrumSlider As Windows.Forms.TrackBar
