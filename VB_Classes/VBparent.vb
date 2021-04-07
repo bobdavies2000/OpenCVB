@@ -84,11 +84,13 @@ Public Class VBparent : Implements IDisposable
                 task.result = New cv.Mat(New cv.Size(dst1.Width * 2, dst1.Height), cv.MatType.CV_8UC3)
             End If
 
-            If task.pixelViewerOn Then
-                task.PixelViewer.viewerForm.Show()
-                task.PixelViewer.Run()
-            Else
-                If task.PixelViewer.viewerForm.Visible Then task.PixelViewer.viewerForm.Hide()
+            If task.pythonTaskName.EndsWith(".py") = False Then
+                If task.pixelViewerOn Then
+                    task.PixelViewer.viewerForm.Show()
+                    task.PixelViewer.Run()
+                Else
+                    If task.PixelViewer.viewerForm.Visible Then task.PixelViewer.viewerForm.Hide()
+                End If
             End If
 
             task.result(New cv.Rect(0, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst1)

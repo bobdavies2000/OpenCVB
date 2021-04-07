@@ -307,12 +307,14 @@ Public Class ActiveTask : Implements IDisposable
         task.pythonTaskName = task.parms.homeDir + "VB_Classes\" + algName
 
         aOptions = New OptionsContainer
-        If algName.EndsWith(".py") = False Then aOptions.Show()
-        inrange = algoList.createAlgorithm("OptionsCommon")
-        viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
-        IMUStable = algoList.createAlgorithm("IMU_IscameraStable")
-        PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
-        lineTypeTask = algoList.createAlgorithm("OptionsCommon_LineType")
+        If algName.EndsWith(".py") = False Then
+            aOptions.Show()
+            inrange = algoList.createAlgorithm("OptionsCommon")
+            viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
+            IMUStable = algoList.createAlgorithm("IMU_IscameraStable")
+            PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
+            lineTypeTask = algoList.createAlgorithm("OptionsCommon_LineType")
+        End If
 
         algorithmObject = algoList.createAlgorithm(algName)
 
