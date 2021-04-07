@@ -1531,8 +1531,10 @@ End Class
 Public Class Histogram_DepthClusters
     Inherits VBparent
     Public valleys As Histogram_DepthValleys
+    Dim palette As Palette_Basics
     Public Sub New()
         initParent()
+        palette = New Palette_Basics
         valleys = New Histogram_DepthValleys()
         task.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
     End Sub
@@ -1547,16 +1549,17 @@ Public Class Histogram_DepthClusters
 
         Dim mask As New cv.Mat
         Dim tmp As New cv.Mat
-        Dim colorIncr = 25 ' (255 / valleys.rangeBoundaries.Count)
-        valleys.palette.src = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim colorIncr = 255 / valleys.rangeBoundaries.Count
+        palette.src = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         For i = 0 To valleys.rangeBoundaries.Count - 1
             Dim startEndDepth = valleys.rangeBoundaries.ElementAt(i)
             cv.Cv2.InRange(src, startEndDepth.X, startEndDepth.Y, tmp)
             cv.Cv2.ConvertScaleAbs(tmp, mask)
-            valleys.palette.src.SetTo(i * colorIncr Mod 255, mask)
+            palette.src.SetTo(i * colorIncr Mod 255, mask)
         Next
-        valleys.palette.Run()
-        dst2 = valleys.palette.dst1
+        palette.Run()
+        dst2 = palette.dst1
+        dst2.SetTo(0, task.noDepthMask)
         If standalone Or task.intermediateReview = caller Then
             label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"
             label2 = "Backprojection of " + CStr(valleys.rangeBoundaries.Count) + " histogram clusters"
