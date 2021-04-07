@@ -288,50 +288,6 @@ End Class
 
 
 
-
-Public Class Motion_DepthShadow
-    Inherits VBparent
-    Dim motion As Motion_Basics
-    Dim noiseRemover As Depth_NoiseMask
-    Dim dMin As Depth_SmoothMin
-    Public Sub New()
-        initParent()
-        noiseRemover = New Depth_NoiseMask
-        motion = New Motion_Basics
-        dMin = New Depth_SmoothMin
-
-        Dim minSlider = findSlider("Contour minimum area")
-        minSlider.Value = 100
-        Dim cumSlider = findSlider("Cumulative motion threshold")
-        cumSlider.Value = 2000
-
-        label1 = "Motion of the depth shadow"
-        task.desc = "Use the motion in the depth shadow to enhance Motion_Basics use of RGB"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        noiseRemover.src = src
-        noiseRemover.Run()
-
-        ' task.noDepthMask.convertto(dMin.src, cv.MatType.CV_32F)
-        dMin.src = noiseRemover.dst2
-        dMin.Run()
-        dst2 = dMin.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        motion.src = dst2
-        motion.Run()
-        dst1 = motion.dst2
-
-        label2 = "Shadow that is consistently present. " + Format(dst2.CountNonZero / 1000, "#,##0") + "k pixels"
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Motion_ThruCorrelation
     Inherits VBparent
     Dim grid As Thread_Grid

@@ -1869,67 +1869,36 @@ End Class
 
 
 
-Public Class Depth_Basics
-    Inherits VBparent
-    Dim noiseRemover As Depth_NoiseMask
-    Public Sub New()
-        initParent()
-        noiseRemover = New Depth_NoiseMask
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Max depth difference X100 in mm's", 0, 1000, 50)
-        End If
+'Public Class Depth_Basics
+'    Inherits VBparent
+'    Dim noiseRemover As Depth_NoiseMask
+'    Public Sub New()
+'        initParent()
+'        noiseRemover = New Depth_NoiseMask
+'        If findfrm(caller + " Slider Options") Is Nothing Then
+'            sliders.Setup(caller)
+'            sliders.setupTrackBar(0, "Max depth difference X100 in mm's", 0, 1000, 50)
+'        End If
 
-        task.desc = "Separate neighboring depth pixels that have are not close"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        noiseRemover.Run()
+'        task.desc = "Separate neighboring depth pixels that have are not close"
+'    End Sub
+'    Public Sub Run()
+'        If task.intermediateReview = caller Then task.intermediateObject = Me
+'        noiseRemover.Run()
 
-        Static diffSlider = findSlider("Max depth difference X100 in mm's")
-        Dim maxDiff = diffSlider.value / 100
+'        Static diffSlider = findSlider("Max depth difference X100 in mm's")
+'        Dim maxDiff = diffSlider.value / 100
 
-        Dim rect1 = New cv.Rect(1, 1, src.Width - 1, src.Height - 1)
-        Dim rect2 = New cv.Rect(0, 0, src.Width - 1, src.Height - 1)
+'        Dim rect1 = New cv.Rect(1, 1, src.Width - 1, src.Height - 1)
+'        Dim rect2 = New cv.Rect(0, 0, src.Width - 1, src.Height - 1)
 
-        dst1 = task.depth32f
-        dst1.SetTo(0, (255 - noiseRemover.dst1).ToMat)
-        cv.Cv2.Absdiff(dst1(rect2), dst1(rect1), dst1(rect2))
-        dst1 = dst1.Threshold(maxDiff, 255, cv.ThresholdTypes.BinaryInv)
-    End Sub
-End Class
+'        dst1 = task.depth32f
+'        dst1.SetTo(0, (255 - noiseRemover.dst1).ToMat)
+'        cv.Cv2.Absdiff(dst1(rect2), dst1(rect1), dst1(rect2))
+'        dst1 = dst1.Threshold(maxDiff, 255, cv.ThresholdTypes.BinaryInv)
+'    End Sub
+'End Class
 
-
-
-
-
-
-
-
-
-
-Public Class Depth_NoiseMask
-    Inherits VBparent
-    Public flood As Coherent_Palette
-    Public Sub New()
-        initParent()
-        flood = New Coherent_Palette()
-        Dim stepSizeSlider = findSlider("Step Size")
-        stepSizeSlider.Value = 50
-        label1 = "Mask of all inrange depth"
-        label1 = "Solid inrange depth - noise removed"
-        task.desc = "Use the 'Too Close' test to remove (some) noisy depth"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        dst1 = task.depthMask
-
-        flood.src = dst1
-        flood.Run()
-        dst2 = flood.dst1
-        ' dst1.SetTo(0, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-    End Sub
-End Class
 
 
 
@@ -1939,53 +1908,21 @@ End Class
 
 Public Class Depth_Noise
     Inherits VBparent
-    Dim noiseRemover As Depth_NoiseMask
-    Dim fore As Depth_Foreground
+    Public flood As Coherent_Palette
     Public Sub New()
         initParent()
-        noiseRemover = New Depth_NoiseMask
+        flood = New Coherent_Palette()
         label1 = "Solid depth with noise removed"
-        label2 = "Just the noise in the depth"
         task.desc = "Show depth with and without the depth noise from being too close."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-
-        noiseRemover.Run()
-        dst2 = noiseRemover.dst1
-        dst1 = noiseRemover.flood.dst1
-        ' dst2.SetTo(0, noiseRemover.flood.palette.)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Depth_Solid
-    Inherits VBparent
-    Dim noiseRemover As Depth_NoiseMask
-    Public palette As Coherent_Palette
-    Public Sub New()
-        initParent()
-        noiseRemover = New Depth_NoiseMask
-        palette = New Coherent_Palette
-        label1 = "Solid depth with noise removed"
-        task.desc = "Remove noise from depth and consistently identify solid depth."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        noiseRemover.Run()
-        dst1 = noiseRemover.dst2
-
-        Dim mask = dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        palette.src = dst1
-        palette.Run()
-        dst2 = palette.dst1
-        dst2.SetTo(0, mask)
+        flood.src = task.depthMask
+        flood.Run()
+        dst1 = flood.dst1
+        dst1.SetTo(0, task.noDepthMask)
+        dst2 = task.depth32f
+        dst2.SetTo(0, task.noDepthMask)
     End Sub
 End Class
