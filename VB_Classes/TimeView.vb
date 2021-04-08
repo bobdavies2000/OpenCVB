@@ -87,9 +87,6 @@ Public Class TimeView_TopBackProjection
         If rectlist.Count > 0 Then
             Dim colorBump = CInt(255 / rectlist.Count)
 
-            Static minSlider = findSlider("InRange Min Depth (mm)")
-            Dim minVal = minSlider.value
-
             Dim colorMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             dst1 = src
             For i = 0 To rectlist.Count - 1
