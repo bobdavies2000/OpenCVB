@@ -1235,18 +1235,25 @@ End Class
 Public Class Depth_PunchDecreasing
     Inherits VBparent
     Public Increasing As Boolean
+    Dim fore As Depth_Foreground
     Public Sub New()
         initParent()
+        fore = New Depth_Foreground
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Threshold in millimeters", 0, 1000, 8)
         End If
+
         task.desc = "Identify where depth is decreasing - coming toward the camera."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        Dim depth32f = If(src.Type = cv.MatType.CV_32F, src, task.depth32f)
-        Static lastDepth As cv.Mat = depth32f
+
+        fore.Run()
+        Dim depth32f As New cv.Mat
+        task.depth32f.CopyTo(depth32f, fore.dst1)
+
+        Static lastDepth = depth32f
 
         Dim mmThreshold = sliders.trackbar(0).Value
         If Increasing Then
@@ -1295,9 +1302,6 @@ Public Class Depth_PunchBlob
         contours = New Contours_Basics
         Dim areaSlider = findSlider("Contour minimum area")
         areaSlider.Value = 5000
-
-        Dim maxSlider = findSlider("InRange Max Depth (mm)")
-        maxSlider.Value = 2000 ' must be close to the camera.
 
         depthInc = New Depth_PunchDecreasing
         task.desc = "Identify the punch with a rectangle around the largest blob"
