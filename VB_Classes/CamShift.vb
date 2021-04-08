@@ -187,7 +187,7 @@ Public Class Camshift_TopObjects
         Static updateSlider = findSlider("Reinitialize camshift after x frames")
         Dim updateFrequency = updateSlider.Value
         Dim trackBoxes As New List(Of cv.RotatedRect)
-        For i = 0 To cams.Length - 1
+        For i = 0 To Math.Min(cams.Length, blob.flood.sortedSizes.Count) - 1
             If blob.flood.maskSizes.Count > i Then
                 Dim camIndex = blob.flood.sortedSizes.ElementAt(i).Value
                 If task.frameCount Mod updateFrequency = 0 Or cams(i).trackBox.Size.Width = 0 Then
