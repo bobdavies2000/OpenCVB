@@ -465,6 +465,7 @@ Public Class OpenGL_FloorPlane
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.parms.IMU_Present Then
+            plane.src = src
             plane.Run()
             dst1 = plane.dst1
             dst2 = plane.dst2

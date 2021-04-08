@@ -17,6 +17,7 @@ Public Class Structured_Floor
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
+        structD.src = src
         structD.Run()
 
         Dim yCoordinate = dst2.Height
@@ -94,11 +95,9 @@ Public Class Structured_MultiSliceH
     Public side2D As Histogram_SideData
     Public structD As Structured_SliceH
     Public sliceMask As cv.Mat
-    Dim inrange As Depth_InRange
     Public Sub New()
         initParent()
         side2D = New Histogram_SideData()
-        inrange = New Depth_InRange()
         structD = New Structured_SliceH()
 
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
@@ -122,11 +121,11 @@ Public Class Structured_MultiSliceH
         For yCoordinate = 0 To src.Height - 1 Step stepsize
             Dim planeY = side2D.meterMin * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
             If yCoordinate > task.sideCameraPoint.Y Then planeY = side2D.meterMax * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
-            inrange.minVal = planeY - thicknessMeters
-            inrange.maxVal = planeY + thicknessMeters
-            inrange.src = Split(1).Clone
-            inrange.Run()
-            sliceMask.SetTo(255, inrange.depthMask)
+            Dim depthMask As New cv.Mat
+            minVal = planeY - thicknessMeters
+            maxVal = planeY + thicknessMeters
+            cv.Cv2.InRange(Split(1).Clone, minVal, maxVal, depthMask)
+            sliceMask.SetTo(255, depthMask)
             sliceMask.SetTo(0, task.noDepthMask)
         Next
 
@@ -145,12 +144,10 @@ Public Class Structured_MultiSliceV
     Inherits VBparent
     Public top2D As Histogram_TopData
     Public structD As Structured_SliceH
-    Dim inrange As Depth_InRange
     Public Sub New()
         initParent()
 
         top2D = New Histogram_TopData()
-        inrange = New Depth_InRange()
         structD = New Structured_SliceH()
 
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
@@ -175,11 +172,11 @@ Public Class Structured_MultiSliceV
         For xCoordinate = 0 To src.Width - 1 Step stepsize
             Dim planeX = top2D.meterMin * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
             If xCoordinate > task.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
-            inrange.minVal = planeX - thicknessMeters
-            inrange.maxVal = planeX + thicknessMeters
-            inrange.src = split(0).Clone
-            inrange.Run()
-            sliceMask.SetTo(255, inrange.depthMask)
+            Dim depthMask As New cv.Mat
+            minVal = planeX - thicknessMeters
+            maxVal = planeX + thicknessMeters
+            cv.Cv2.InRange(split(0).Clone, minVal, maxVal, depthMask)
+            sliceMask.SetTo(255, depthMask)
             sliceMask.SetTo(0, task.noDepthMask)
         Next
 
@@ -199,7 +196,6 @@ Public Class Structured_MultiSlice
     Public top2D As Histogram_TopData
     Public side2D As Histogram_SideData
     Dim struct As Structured_SliceV
-    Public inrange As Depth_InRange
     Public sliceMask As cv.Mat
     Public split() As cv.Mat
     Public Sub New()
@@ -207,7 +203,6 @@ Public Class Structured_MultiSlice
 
         side2D = New Histogram_SideData()
         top2D = New Histogram_TopData()
-        inrange = New Depth_InRange()
         struct = New Structured_SliceV()
 
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
@@ -232,11 +227,11 @@ Public Class Structured_MultiSlice
         For xCoordinate = 0 To src.Width - 1 Step stepsize
             Dim planeX = top2D.meterMin * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
             If xCoordinate > task.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
-            inrange.minVal = planeX - thicknessMeters
-            inrange.maxVal = planeX + thicknessMeters
-            inrange.src = split(0).Clone
-            inrange.Run()
-            sliceMask = inrange.depthMask
+            Dim depthMask As New cv.Mat
+            minVal = planeX - thicknessMeters
+            maxVal = planeX + thicknessMeters
+            cv.Cv2.InRange(split(0).Clone, minVal, maxVal, depthMask)
+            sliceMask = depthMask
             sliceMask.SetTo(0, task.noDepthMask)
             dst2.SetTo(255, sliceMask)
         Next
@@ -244,11 +239,11 @@ Public Class Structured_MultiSlice
         For yCoordinate = 0 To src.Height - 1 Step stepsize
             Dim planeY = side2D.meterMin * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
             If yCoordinate > task.sideCameraPoint.Y Then planeY = side2D.meterMax * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
-            inrange.minVal = planeY - thicknessMeters
-            inrange.maxVal = planeY + thicknessMeters
-            inrange.src = split(1).Clone
-            inrange.Run()
-            Dim tmp = inrange.depthMask
+            Dim depthMask As New cv.Mat
+            minVal = planeY - thicknessMeters
+            maxVal = planeY + thicknessMeters
+            cv.Cv2.InRange(split(1).Clone, minVal, maxVal, depthMask)
+            Dim tmp = depthMask
             cv.Cv2.BitwiseOr(tmp, sliceMask, sliceMask)
             dst2.SetTo(255, sliceMask)
         Next
@@ -367,11 +362,11 @@ Public Class Structured_SliceXPlot
 
         Dim maskZplane As New cv.Mat(multi.split(0).Size, cv.MatType.CV_8U)
         If filterZ > 0 Then
-            multi.inrange.minVal = filterZ - 0.05 ' a 10 cm buffer surrounding the z value
-            multi.inrange.maxVal = filterZ + 0.05
-            multi.inrange.src = multi.split(2)
-            multi.inrange.Run()
-            maskZplane = multi.inrange.depthMask
+            Dim depthMask As New cv.Mat
+            minVal = filterZ - 0.05 ' a 10 cm buffer surrounding the z value
+            maxVal = filterZ + 0.05
+            cv.Cv2.InRange(multi.split(2), minVal, maxVal, depthMask)
+            maskZplane = depthMask
         End If
 
         If filterZ > 0 Then cv.Cv2.BitwiseAnd(multi.sliceMask, maskZplane, maskZplane)
@@ -414,6 +409,7 @@ Public Class Structured_LinearizeFloor
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim minLoc As cv.Point, maxLoc As cv.Point
         Static imuPC As cv.Mat
+        floor.src = src
         floor.Run()
         dst1 = floor.dst1
         dst2 = floor.dst2
@@ -501,7 +497,6 @@ End Class
 Public Class Structured_SliceH
     Inherits VBparent
     Public side2D As Histogram_SideData
-    Dim inrange As Depth_InRange
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
     Public sliceMask As cv.Mat
@@ -509,7 +504,6 @@ Public Class Structured_SliceH
     Public Sub New()
         initParent()
         side2D = New Histogram_SideData()
-        inrange = New Depth_InRange()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -541,15 +535,15 @@ Public Class Structured_SliceH
         Dim cushion = cushionSlider.Value
         Dim thicknessMeters = cushion * metersPerPixel
         dst1 = task.color.Clone
-        inrange.minVal = planeY - thicknessMeters
-        inrange.maxVal = planeY + thicknessMeters
-        inrange.src = Split(1).Clone
-        inrange.Run()
-        sliceMask = inrange.depthMask
+        Dim depthMask As New cv.Mat
+        minVal = planeY - thicknessMeters
+        maxVal = planeY + thicknessMeters
+        cv.Cv2.InRange(Split(1).Clone, minVal, maxVal, depthMask)
+        sliceMask = depthMask
         sliceMask.SetTo(0, task.noDepthMask)
 
-        label1 = "At offset " + CStr(yCoordinate) + " y = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
-                 Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
+        label1 = "At offset " + CStr(yCoordinate) + " y = " + Format((maxVal + minVal) / 2, "#0.00") + " with " +
+                 Format(Math.Abs(maxVal - minVal) * 100, "0.00") + " cm width"
         dst1.SetTo(cv.Scalar.White, sliceMask)
         label2 = side2D.label2
 
@@ -571,7 +565,6 @@ End Class
 Public Class Structured_SliceV
     Inherits VBparent
     Public top2D As Histogram_TopData
-    Public inrange As Depth_InRange
     Dim sideStruct As Structured_SliceH
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
@@ -579,7 +572,6 @@ Public Class Structured_SliceV
     Public Sub New()
         initParent()
         top2D = New Histogram_TopData()
-        inrange = New Depth_InRange()
         sideStruct = New Structured_SliceH()
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
@@ -603,15 +595,15 @@ Public Class Structured_SliceV
         Dim cushion = cushionSlider.Value
         Dim thicknessMeters = cushion * metersPerPixel
 
-        inrange.minVal = planeX - thicknessMeters
-        inrange.maxVal = planeX + thicknessMeters
-        inrange.src = split(0).Clone
-        inrange.Run()
-        sliceMask = inrange.depthMask
+        Dim depthMask As New cv.Mat
+        minVal = planeX - thicknessMeters
+        maxVal = planeX + thicknessMeters
+        cv.Cv2.InRange(split(0).Clone, minVal, maxVal, depthMask)
+        sliceMask = depthMask
         sliceMask.SetTo(0, task.noDepthMask)
 
-        label1 = "At offset " + CStr(xCoordinate) + " x = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
-                 Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
+        label1 = "At offset " + CStr(xCoordinate) + " x = " + Format((maxVal + minVal) / 2, "#0.00") + " with " +
+                 Format(Math.Abs(maxVal - minVal) * 100, "0.00") + " cm width"
 
         dst1 = task.color.Clone
         dst1.SetTo(cv.Scalar.White, sliceMask)
@@ -642,7 +634,6 @@ End Class
 Public Class Structured_SliceVStable
     Inherits VBparent
     Public top2D As Histogram_TopData
-    Public inrange As Depth_InRange
     Dim sideStruct As Structured_SliceH
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
@@ -650,7 +641,6 @@ Public Class Structured_SliceVStable
     Public Sub New()
         initParent()
         top2D = New Histogram_TopData()
-        inrange = New Depth_InRange()
         sideStruct = New Structured_SliceH()
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
@@ -673,15 +663,15 @@ Public Class Structured_SliceVStable
         Dim cushion = cushionSlider.Value
         Dim thicknessMeters = cushion * metersPerPixel
 
-        inrange.minVal = planeX - thicknessMeters
-        inrange.maxVal = planeX + thicknessMeters
-        inrange.src = split(0).Clone
-        inrange.Run()
-        sliceMask = inrange.depthMask
+        Dim depthMask As New cv.Mat
+        minVal = planeX - thicknessMeters
+        maxVal = planeX + thicknessMeters
+        cv.Cv2.InRange(split(0).Clone, minVal, maxVal, depthMask)
+        sliceMask = depthMask
         sliceMask.SetTo(0, task.noDepthMask)
 
-        label1 = "At offset " + CStr(xCoordinate) + " x = " + Format((inrange.maxVal + inrange.minVal) / 2, "#0.00") + " with " +
-                 Format(Math.Abs(inrange.maxVal - inrange.minVal) * 100, "0.00") + " cm width"
+        label1 = "At offset " + CStr(xCoordinate) + " x = " + Format((maxVal + minVal) / 2, "#0.00") + " with " +
+                 Format(Math.Abs(maxVal - minVal) * 100, "0.00") + " cm width"
 
         dst1 = task.color.Clone
         dst1.SetTo(cv.Scalar.White, sliceMask)

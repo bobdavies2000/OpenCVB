@@ -411,7 +411,7 @@ Public Class Depth_ColorizerFastFade_CPP
     Public Sub New()
         initParent()
         dcPtr = Depth_Colorizer2_Open()
-        label2 = "Mask from Depth_InRange"
+        label2 = "No depth mask from Depth_InRange"
         task.desc = "Display depth data with InRange.  Higher contrast than others - yellow to blue always present."
     End Sub
     Public Sub Run()
