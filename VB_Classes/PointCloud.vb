@@ -459,7 +459,7 @@ Public Class PointCloud_Raw_CPP
 
         Dim h = src.Height
         Dim w = src.Width
-        Dim range = CSng(task.inrange.maxval - task.inrange.minval)
+        Dim range = CSng(task.maxDepth - task.minDepth)
         If depthBytes Is Nothing Then
             ReDim depthBytes(task.depth32f.Total * task.depth32f.ElemSize - 1)
         End If
@@ -467,7 +467,7 @@ Public Class PointCloud_Raw_CPP
         Marshal.Copy(task.depth32f.Data, depthBytes, 0, depthBytes.Length)
         Dim handleDepth = GCHandle.Alloc(depthBytes, GCHandleType.Pinned)
 
-        Dim imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject, task.inrange.minval, task.inrange.maxval, task.depth32f.Height, task.depth32f.Width)
+        Dim imagePtr = SimpleProjectionRun(cPtr, handleDepth.AddrOfPinnedObject, task.minDepth, task.maxDepth, task.depth32f.Height, task.depth32f.Width)
 
         dst1 = New cv.Mat(task.depth32f.Rows, task.depth32f.Cols, cv.MatType.CV_8U, imagePtr).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2 = New cv.Mat(task.depth32f.Rows, task.depth32f.Cols, cv.MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -510,7 +510,7 @@ Public Class PointCloud_Raw
 
         Dim h = src.Height
         Dim w = src.Width
-        Dim range = CSng(task.inrange.maxval - task.inrange.minval)
+        Dim range = CSng(task.maxDepth - task.minDepth)
 
         ' this VB.Net version is much slower than the optimized C++ version below.
         dst1 = src.EmptyClone.SetTo(cv.Scalar.White)
@@ -523,9 +523,9 @@ Public Class PointCloud_Raw
                          Dim m = task.depthmask.Get(Of Byte)(y, x)
                          If m > 0 Then
                              Dim depth = task.depth32f.Get(Of Single)(y, x)
-                             Dim dy = CInt(h * (depth - task.inrange.minval) / range)
+                             Dim dy = CInt(h * (depth - task.minDepth) / range)
                              If dy < h And dy > 0 Then dst1.Set(Of cv.Vec3b)(h - dy, x, black)
-                             Dim dx = CInt(w * (depth - task.inrange.minval) / range)
+                             Dim dx = CInt(w * (depth - task.minDepth) / range)
                              If dx < w And dx > 0 Then dst2.Set(Of cv.Vec3b)(y, dx, black)
                          End If
                      Next
