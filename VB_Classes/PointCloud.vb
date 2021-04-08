@@ -1270,10 +1270,6 @@ Public Class PointCloud_BackProjectTopView
         If rectList.Count > 0 Then
             Dim colorBump = CInt(255 / rectList.Count)
 
-            Static minSlider = findSlider("InRange Min Depth (mm)")
-            If task.frameCount = 0 Then minSlider.Value = 1
-            Dim minVal = minSlider.value
-
             Dim split = view.measureTop.topView.gCloud.dst1.Split()
             Dim colorMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             dst1 = src
@@ -1329,6 +1325,7 @@ Public Class PointCloud_BackProjectSideView
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
+        view.src = src
         view.Run()
         cmatSide.src = view.dst1
         cmatSide.Run()
@@ -1341,9 +1338,6 @@ Public Class PointCloud_BackProjectSideView
 
         If rectList.Count > 0 Then
             Dim colorBump = CInt(255 / rectList.Count)
-
-            Static minSlider = findSlider("InRange Min Depth (mm)")
-            Dim minVal = minSlider.value
 
             Dim split = view.measureSide.sideView.gCloud.dst1.Split()
             Dim colorMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
