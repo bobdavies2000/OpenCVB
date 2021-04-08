@@ -144,7 +144,7 @@ Public Class Meanshift_TopObjects
 
         Dim updateFrequency = sliders.trackbar(0).Value
         Dim trackBoxes As New List(Of cv.Rect)
-        For i = 0 To cams.Length - 1
+        For i = 0 To Math.Min(cams.Length, blob.flood.sortedSizes.Count) - 1
             If blob.flood.maskSizes.Count > i Then
                 Dim camIndex = blob.flood.sortedSizes.ElementAt(i).Value
                 If task.frameCount Mod updateFrequency = 0 Or cams(i).trackbox.Size.Width = 0 Or task.frameCount < 3 Then
