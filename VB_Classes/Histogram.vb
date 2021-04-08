@@ -291,13 +291,11 @@ End Class
 
 Public Class Histogram_Depth
     Inherits VBparent
-    Public inrange As Depth_InRange
     Public plotHist As Plot_Histogram
     Public Sub New()
         initParent()
         plotHist = New Plot_Histogram()
 
-        inrange = New Depth_InRange
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Histogram Depth Bins", 2, src.Cols, 50)
@@ -308,21 +306,14 @@ Public Class Histogram_Depth
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        inrange.src = src
-        If inrange.src.Type = cv.MatType.CV_32F Then
-            inrange.Run()
-        Else
-            inrange.depth32f = task.depth32f
-        End If
-
-        plotHist.minRange = task.inrange.minval
-        plotHist.maxRange = task.inrange.maxval
+        plotHist.minRange = task.minDepth
+        plotHist.maxRange = task.maxDepth
         Static binSlider = findSlider("Histogram Depth Bins")
         plotHist.bins = binSlider.value
 
         Dim histSize() = {plotHist.bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
-        cv.Cv2.CalcHist(New cv.Mat() {inrange.depth32f}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {task.depth32f}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 
         If standalone Or task.intermediateReview = caller Then
             plotHist.Run()
