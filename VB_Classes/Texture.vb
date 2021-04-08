@@ -23,7 +23,7 @@ Public Class Texture_Basics
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        If standalone Or src.Channels <> 1 Then
+        If standalone Or src.Channels <> 1 Or src.Width = 0 Then
             ellipse.Run()
             dst1 = ellipse.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst1 = dst1.ConvertScaleAbs(255)
