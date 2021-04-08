@@ -466,7 +466,7 @@ Public Class CComp_InRange_MT
                 Dim bin = binary(roiList(j)).Clone()
                 Dim depth = task.depth32f(roiList(j))
                 Dim meanDepth = depth.Mean(mask(roiList(j)))
-                If meanDepth.Item(0) < task.inrange.maxVal Then
+                If meanDepth.Item(0) < task.maxDepth Then
                     Dim avg = task.RGBDepth(roiList(j)).Mean(mask(roiList(j)))
                     dst1(roiList(j)).SetTo(avg, bin)
                     dst2(roiList(j)).SetTo(avg)
@@ -476,6 +476,10 @@ Public Class CComp_InRange_MT
         label1 = "# of blobs = " + CStr(totalBlobs) + " in " + CStr(rangeCount) + " regions"
     End Sub
 End Class
+
+
+
+
 
 
 
