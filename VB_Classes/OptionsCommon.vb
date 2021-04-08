@@ -1,28 +1,28 @@
 ﻿Imports cv = OpenCvSharp
-Public Class OptionsCommon
+Public Class OptionsCommon_Depth
     Inherits VBparent
     Public bins As Integer
+    Public gOptions As New OptionsGlobal
     Public Sub New()
         initParent()
         task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone.
         standalone = False
 
-        sliders.Setup(caller, 7)
-        sliders.setupTrackBar(0, "InRange Min Depth (mm)", 1, 2000, 200)
-        sliders.setupTrackBar(1, "InRange Max Depth (mm)", 200, 15000, 4000)
-        sliders.setupTrackBar(2, "Top and Side Views Histogram threshold", 0, 200, 2)
-        sliders.setupTrackBar(3, "Amount to rotate pointcloud around X-axis (degrees)", -90, 90, 0)
-        sliders.setupTrackBar(4, "Amount to rotate pointcloud around Y-axis (degrees)", -90, 90, 0)
-        sliders.setupTrackBar(5, "Amount to rotate pointcloud around Z-axis (degrees)", -90, 90, 0)
-        sliders.setupTrackBar(6, "Threshold in camera motion in radians X100", 1, 15, 1) ' how much motion is reasonable?
+        gOptions = New OptionsGlobal
+        gOptions.Show()
 
-        task.minRangeSlider = sliders.trackbar(0) ' one of the few places we can be certain there is only one...
-        task.maxRangeSlider = sliders.trackbar(1)
-        task.thresholdSlider = sliders.trackbar(2)
-        task.xRotateSlider = sliders.trackbar(3)
-        task.yRotateSlider = sliders.trackbar(4)
-        task.zRotateSlider = sliders.trackbar(5)
-        task.cameraStableSlider = sliders.trackbar(6)
+        sliders.Setup(caller, 7)
+        sliders.setupTrackBar(0, "Top and Side Views Histogram threshold", 0, 200, 2)
+        sliders.setupTrackBar(1, "Amount to rotate pointcloud around X-axis (degrees)", -90, 90, 0)
+        sliders.setupTrackBar(2, "Amount to rotate pointcloud around Y-axis (degrees)", -90, 90, 0)
+        sliders.setupTrackBar(3, "Amount to rotate pointcloud around Z-axis (degrees)", -90, 90, 0)
+        sliders.setupTrackBar(4, "Threshold in camera motion in radians X100", 1, 15, 1) ' how much motion is reasonable?
+
+        task.thresholdSlider = sliders.trackbar(0)
+        task.xRotateSlider = sliders.trackbar(1)
+        task.yRotateSlider = sliders.trackbar(2)
+        task.zRotateSlider = sliders.trackbar(3)
+        task.cameraStableSlider = sliders.trackbar(4)
 
         label1 = "Depth values that are in-range"
         label2 = "Depth values that are out of range (and < 8m)"
@@ -31,19 +31,20 @@ Public Class OptionsCommon
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        minVal = task.minRangeSlider.Value
-        maxVal = task.maxRangeSlider.Value
-        task.maxZ = maxVal / 1000
+        task.minDepth = gOptions.MinRange.Value
+        task.maxDepth = gOptions.MaxRange.Value
+        If task.minDepth >= task.maxDepth Then task.maxDepth = task.minDepth + 1
+
+        task.maxZ = task.maxDepth / 1000
         bins = task.thresholdSlider.Value
-        If minVal >= maxVal Then maxVal = minVal + 1
 
         Static saveMaxVal As Integer
         Static saveMinVal As Integer
         Static saveYRotate As Integer
-        If saveMaxVal <> maxVal Or saveMinVal <> minVal Or saveYRotate <> task.yRotateSlider.Value Then
+        If saveMaxVal <> task.maxDepth Or saveMinVal <> task.minDepth Or saveYRotate <> task.yRotateSlider.Value Then
             task.depthOptionsChanged = True
-            saveMaxVal = maxVal
-            saveMinVal = minVal
+            saveMaxVal = task.maxDepth
+            saveMinVal = task.minDepth
             saveYRotate = task.yRotateSlider.Value
         Else
             task.depthOptionsChanged = False
@@ -51,7 +52,7 @@ Public Class OptionsCommon
 
         If task.depth32f.Size <> src.Size Then task.depth32f = task.depth32f.Resize(src.Size, 0, 0, cv.InterpolationFlags.Nearest)
         If task.pointCloud.Size <> src.Size Then task.pointCloud = task.pointCloud.Resize(src.Size, 0, 0, cv.InterpolationFlags.Nearest)
-        cv.Cv2.InRange(task.depth32f, minVal, maxVal, task.depthMask)
+        cv.Cv2.InRange(task.depth32f, task.minDepth, task.maxDepth, task.depthMask)
         cv.Cv2.BitwiseNot(task.depthMask, task.noDepthMask)
         dst1 = task.depth32f.SetTo(0, task.noDepthMask)
         If task.pointCloud.Width = task.noDepthMask.Width Then task.pointCloud.SetTo(0, task.noDepthMask) ' reflect the range bounds into the task.pointcloud as well.

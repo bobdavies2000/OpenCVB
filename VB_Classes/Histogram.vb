@@ -346,8 +346,6 @@ Public Class Histogram_2D_XZ_YZ
         initParent()
         xyz = New Mat_ImageXYZ_MT
 
-        task.maxRangeSlider.Value = 1500 ' up to x meters away
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Histogram X bins", 1, src.Cols, 30)
@@ -362,13 +360,11 @@ Public Class Histogram_2D_XZ_YZ
         Dim xbins = sliders.trackbar(0).Value
         Dim ybins = sliders.trackbar(1).Value
         Dim zbins = sliders.trackbar(2).Value
-        Dim minRange = task.minRangeSlider.Value
-        Dim maxRange = task.maxRangeSlider.Value
 
         Dim histogram As New cv.Mat
 
-        Dim rangesX() = New cv.Rangef() {New cv.Rangef(0, src.Width - 1), New cv.Rangef(minRange, maxRange)}
-        Dim rangesY() = New cv.Rangef() {New cv.Rangef(0, src.Width - 1), New cv.Rangef(minRange, maxRange)}
+        Dim rangesX() = New cv.Rangef() {New cv.Rangef(0, src.Width - 1), New cv.Rangef(task.minDepth, task.maxDepth)}
+        Dim rangesY() = New cv.Rangef() {New cv.Rangef(0, src.Width - 1), New cv.Rangef(task.minDepth, task.maxDepth)}
 
         xyz.Run()
         Dim sizesX() = {xbins, zbins}
@@ -1360,7 +1356,7 @@ Public Class Histogram_ViewConcentrationsTopX
         Static cThresholdSlider = findSlider("Concentration Threshold")
         Dim concentrationThreshold = cThresholdSlider.Value
 
-        Dim minPixel = CInt(resizeFactor * task.minRangeSlider.Value * task.pixelsPerMeter / 1000)
+        Dim minPixel = CInt(resizeFactor * task.minDepth * task.pixelsPerMeter / 1000)
 
         Dim tmp = histOutput.Resize(New cv.Size(CInt(histOutput.Width * resizeFactor), CInt(histOutput.Height * resizeFactor)))
         Dim pts As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
@@ -1469,7 +1465,7 @@ Public Class Histogram_DepthValleys
             hist.plotHist.hist.Set(Of Single)(i, 0, kalman.kOutput(i))
         Next
 
-        Dim depthIncr = CInt(task.maxRangeSlider.Value / histSlider.Value) ' each bar represents this number of millimeters
+        Dim depthIncr = CInt(task.maxDepth / histSlider.Value) ' each bar represents this number of millimeters
         Dim pointCount = kalman.kOutput(0) + kalman.kOutput(1)
         Dim startDepth = 1
         Dim startEndDepth As cv.Point
@@ -1491,7 +1487,7 @@ Public Class Histogram_DepthValleys
             End If
         Next
 
-        startEndDepth = New cv.Point(startDepth, CInt(task.maxRangeSlider.Value))
+        startEndDepth = New cv.Point(startDepth, CInt(task.maxDepth))
         depthBoundaries.Add(pointCount, startEndDepth) ' capped at the max depth we are observing
 
         rangeBoundaries.Clear()

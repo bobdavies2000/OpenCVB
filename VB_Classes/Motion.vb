@@ -270,9 +270,9 @@ Public Class Motion_MinMaxDepthColorized
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        Static saveMin = task.minRangeSlider.Value
-        Static saveMax = task.maxRangeSlider.Value
-        If saveMin <> task.minRangeSlider.Value Or saveMax <> task.maxRangeSlider.Value Then stable.externalReset = True
+        Static saveMin = task.minDepth
+        Static saveMax = task.maxDepth
+        If saveMin <> task.minDepth Or saveMax <> task.maxDepth Then stable.externalReset = True
         stable.Run()
         dst1 = stable.dst1
 

@@ -5,8 +5,6 @@ Public Class Voxels_Basics_MT
     Public grid As Thread_Grid
     Public voxels(1) As Single
     Public voxelMat As cv.Mat
-    Public minDepth As Single
-    Public maxDepth As Single
     Public Sub New()
         initParent()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -36,11 +34,6 @@ Public Class Voxels_Basics_MT
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
         Dim split() = src.Split()
 
-        minDepth = task.minRangeSlider.Value
-        maxDepth = task.maxRangeSlider.Value
-
-        inrange.minVal = minDepth
-        inrange.maxVal = maxDepth
         inrange.src = split(2) * 1000
         inrange.Run()
 
@@ -70,9 +63,9 @@ Public Class Voxels_Basics_MT
             Parallel.For(0, grid.roiList.Count,
                 Sub(i)
                     Dim roi = grid.roiList(i)
-                    If voxels(i) >= minDepth And voxels(i) <= maxDepth Then
+                    If voxels(i) >= task.minDepth And voxels(i) <= task.maxDepth Then
                         voxelMat.Set(Of Single)(i, 0, voxels(i))
-                        Dim v = 255 * (voxels(i) - minDepth) / (maxDepth - minDepth)
+                        Dim v = 255 * (voxels(i) - task.minDepth) / (task.maxDepth - task.minDepth)
                         Dim color = New cv.Scalar(((256 - v) * nearColor(0) + v * farColor(0)) >> 8,
                                                   ((256 - v) * nearColor(1) + v * farColor(1)) >> 8,
                                                   ((256 - v) * nearColor(2) + v * farColor(2)) >> 8)
@@ -81,7 +74,7 @@ Public Class Voxels_Basics_MT
                 End Sub)
             dst2 = img.Resize(dst1.Size)
         End If
-        voxelMat *= 255 / (maxDepth - minDepth) ' do the normalize manually to use the min and max Depth (more stable image)
+        voxelMat *= 255 / (task.maxDepth - task.minDepth) ' do the normalize manually to use the min and max Depth (more stable image)
     End Sub
 End Class
 

@@ -47,7 +47,7 @@ Partial Class OptionsCombo
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(851, 265)
+        Me.ClientSize = New System.Drawing.Size(829, 265)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.Box)
         Me.Name = "OptionsCombo"

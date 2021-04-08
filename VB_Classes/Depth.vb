@@ -425,7 +425,7 @@ Public Class Depth_ColorizerFastFade_CPP
         Dim depthData(input.Total * input.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
         Marshal.Copy(input.Data, depthData, 0, depthData.Length)
-        Dim imagePtr = Depth_Colorizer2_Run(dcPtr, handleSrc.AddrOfPinnedObject(), input.Rows, input.Cols, task.maxRangeSlider.Value)
+        Dim imagePtr = Depth_Colorizer2_Run(dcPtr, handleSrc.AddrOfPinnedObject(), input.Rows, input.Cols, task.maxDepth)
         handleSrc.Free()
 
         If imagePtr <> 0 Then
@@ -819,11 +819,8 @@ End Class
 
 Public Class Depth_SmoothingMat
     Inherits VBparent
-    Public inrange As Depth_InRange
     Public Sub New()
         initParent()
-        inrange = New Depth_InRange()
-        inrange.depth32fAfterMasking = True
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -836,18 +833,15 @@ Public Class Depth_SmoothingMat
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then src = task.depth32f
         Dim rect = If(task.drawRect.Width <> 0, task.drawRect, New cv.Rect(0, 0, src.Width, src.Height))
-        inrange.src = src(rect)
-        inrange.Run()
-        Static lastDepth = inrange.dst2 ' the far depth needs to be smoothed
-        If lastDepth.Size <> inrange.dst1.Size Then lastDepth = inrange.dst1
+        Static lastDepth = task.depth32f
 
-        cv.Cv2.Subtract(lastDepth, inrange.dst1, dst1)
+        cv.Cv2.Subtract(lastDepth, task.depth32f, dst1)
 
         Static thresholdSlider = findSlider("Threshold in millimeters")
         Dim mmThreshold = CSng(thresholdSlider.Value)
         dst1 = dst1.Threshold(mmThreshold, 0, cv.ThresholdTypes.TozeroInv).Threshold(-mmThreshold, 0, cv.ThresholdTypes.Tozero)
-        cv.Cv2.Add(inrange.dst1, dst1, dst2)
-        lastDepth = inrange.dst1
+        cv.Cv2.Add(task.depth32f, dst1, dst2)
+        lastDepth = task.depth32f
 
         label1 = "Smoothing Mat: range from " + CStr(task.inrange.minval) + " to +" + CStr(task.inrange.maxval)
     End Sub
@@ -1086,30 +1080,120 @@ End Class
 
 
 
+Public Class Depth_Foreground
+    Inherits VBparent
+    Public blobLocation As New List(Of cv.Point)
+    Public maxIndex As Integer
+    Public Sub New()
+        initParent()
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Max Range for foreground depth in mm's", 200, 2000, 1200)
+            sliders.setupTrackBar(1, "Number of frames to fuse", 1, 20, 10)
+        End If
+
+        label1 = "Mask for the largest foreground blob"
+        task.desc = "Use InRange to define foreground and find the largest blob in the foreground"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        Static depthSlider = findSlider("Max Range for foreground depth in mm's")
+
+        cv.Cv2.InRange(task.depth32f, 0, depthSlider.value, dst1)
+        dst2 = dst1.Clone
+
+        ' find the largest blob and use that define that to be the foreground object.
+        Dim blobSize As New List(Of Integer)
+        blobLocation.Clear()
+
+        For y = 0 To dst1.Height - 1
+            For x = 0 To dst1.Width - 1
+                Dim nextByte = dst1.Get(Of Byte)(y, x)
+                If nextByte <> 0 Then
+                    Dim count = dst1.FloodFill(New cv.Point(x, y), 0)
+                    If count > 10 Then
+                        blobSize.Add(count)
+                        blobLocation.Add(New cv.Point(x, y))
+                    End If
+                End If
+            Next
+        Next
+        Dim maxBlob As Integer
+        maxIndex = -1
+        For i = 0 To blobSize.Count - 1
+            If maxBlob < blobSize.Item(i) Then
+                maxBlob = blobSize.Item(i)
+                maxIndex = i
+            End If
+        Next
+        dst2.FloodFill(blobLocation(maxIndex), 250)
+        cv.Cv2.InRange(dst2, 250, 250, dst1)
+        dst1.SetTo(0, task.noDepthMask)
+        label2 = "Mask of all depth pixels < " + Format(depthSlider.value / 1000, "0.0") + "m"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_ForegroundOverTime
+    Inherits VBparent
+    Dim fore As Depth_Foreground
+    Public Sub New()
+        initParent()
+        fore = New Depth_Foreground
+        label1 = "Pixels that are consistently present"
+        label2 = "Latest foreground frame"
+        task.desc = "Create a fused foreground mask over x number of frames"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+
+        Static lastFrames As New List(Of cv.Mat)
+        Static countSlider = findSlider("Number of frames to fuse")
+        Static saveCount As Integer
+        Static sumFrame As New cv.Mat
+        If saveCount <> countSlider.value Then
+            lastFrames.Clear()
+            saveCount = countSlider.value
+            sumFrame = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
+        End If
+
+        fore.Run()
+        lastFrames.Add((fore.dst1 * 1 / 255).ToMat)
+        cv.Cv2.Add(sumFrame, lastFrames(lastFrames.Count - 1), sumFrame)
+        If lastFrames.Count >= saveCount Then
+            sumFrame = sumFrame.Subtract(lastFrames(0)).ToMat
+            lastFrames.RemoveAt(0)
+        End If
+        dst1 = sumFrame.Threshold(saveCount - 2, 255, cv.ThresholdTypes.Binary)
+        dst2 = fore.dst1
+    End Sub
+End Class
+
+
+
+
+
 
 Public Class Depth_InRange
     Inherits VBparent
     Public depthMask As New cv.Mat
     Public noDepthMask As New cv.Mat
     Public depth32f As New cv.Mat
-    Public depth32fAfterMasking As Boolean
     Public Sub New()
         initParent()
         label1 = "Depth values that are in-range"
-        label2 = "Depth values that are out of range (and < 8m)"
         task.desc = "Show depth with OpenCV using varying min and max depths."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        Dim min = If(minVal <> 0, minVal, task.minRangeSlider.Value)
-        Dim max = If(minVal <> 0, maxVal, task.maxRangeSlider.Value)
-        If min >= max Then max = min + 1
-        depth32f = src
-        If depth32f.Type <> cv.MatType.CV_32FC1 Then depth32f = task.depth32f
-        cv.Cv2.InRange(depth32f, min, max, depthMask)
-        cv.Cv2.BitwiseNot(depthMask, noDepthMask)
-        dst1 = depth32f.Clone.SetTo(0, noDepthMask)
-        If standalone Or depth32fAfterMasking Then dst2 = depth32f.Clone.SetTo(0, depthMask)
+
+        dst1 = task.depth32f
+        dst1.SetTo(0, task.noDepthMask)
     End Sub
 End Class
 
@@ -1765,52 +1849,6 @@ Public Class Depth_Dilate
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Depth_Foreground
-    Inherits VBparent
-    Public blobLocation As New List(Of cv.Point)
-    Public maxIndex As Integer
-    Public Sub New()
-        initParent()
-        task.maxRangeSlider.Value = 1500
-
-        task.desc = "Use depth to find an object in the foreground.  Use InRange Min Depth to define foreground"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-
-        Dim tmp As cv.Mat = task.depthMask.Clone
-        ' find the largest blob and use that define that to be the foreground object.
-        Dim blobSize As New List(Of Integer)
-        blobLocation.Clear()
-
-        For y = 0 To tmp.Height - 1
-            For x = 0 To tmp.Width - 1
-                Dim nextByte = tmp.Get(Of Byte)(y, x)
-                If nextByte <> 0 Then
-                    Dim count = tmp.FloodFill(New cv.Point(x, y), 0)
-                    If count > 10 Then
-                        blobSize.Add(count)
-                        blobLocation.Add(New cv.Point(x, y))
-                    End If
-                End If
-            Next
-        Next
-        Dim maxBlob As Integer
-        maxIndex = -1
-        For i = 0 To blobSize.Count - 1
-            If maxBlob < blobSize.Item(i) Then
-                maxBlob = blobSize.Item(i)
-                maxIndex = i
-            End If
-        Next
-        dst1 = task.depthMask.Clone
-    End Sub
-End Class
 
 
 

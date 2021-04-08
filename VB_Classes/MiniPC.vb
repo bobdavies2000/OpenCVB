@@ -81,7 +81,7 @@ Public Class MiniPC_Rotate
         input = gOutput.Reshape(3, input.Rows)
 
         Dim split = input.Split()
-        Dim mask = split(2).Threshold(task.minRangeSlider.Value / 1000, 255, cv.ThresholdTypes.BinaryInv)
+        Dim mask = split(2).Threshold(task.minDepth / 1000, 255, cv.ThresholdTypes.BinaryInv)
         input.SetTo(0, mask.ConvertScaleAbs(255)) ' remove zero depth pixels with non-zero x and y.
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.sideFrustrumAdjust, task.sideFrustrumAdjust), New cv.Rangef(0, task.maxZ)}

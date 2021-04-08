@@ -118,8 +118,8 @@ Public Class ActiveTask : Implements IDisposable
     Public depthMask As New cv.Mat
     Public depth32f As New cv.Mat
     Public depthOptionsChanged As Boolean
-    Public minRangeSlider As Windows.Forms.TrackBar
-    Public maxRangeSlider As Windows.Forms.TrackBar
+    Public minDepth As Integer
+    Public maxDepth As Integer
     Public thresholdSlider As Windows.Forms.TrackBar
     Public xRotateSlider As Windows.Forms.TrackBar
     Public yRotateSlider As Windows.Forms.TrackBar
@@ -309,7 +309,7 @@ Public Class ActiveTask : Implements IDisposable
         aOptions = New OptionsContainer
         If algName.EndsWith(".py") = False Then
             aOptions.Show()
-            inrange = algoList.createAlgorithm("OptionsCommon")
+            inrange = algoList.createAlgorithm("OptionsCommon_Depth")
             viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
             IMUStable = algoList.createAlgorithm("IMU_IscameraStable")
             PixelViewer = algoList.createAlgorithm("Pixel_Viewer")

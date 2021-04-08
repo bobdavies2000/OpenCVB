@@ -1156,6 +1156,7 @@ Public Class OpenCVB
         Thread.CurrentThread.Priority = ThreadPriority.Lowest
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
         algorithmTaskHandle.Name = AvailableAlgorithms.Text
+        algorithmTaskHandle.SetApartmentState(ApartmentState.STA)
         algorithmTaskHandle.Start(parms)
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algParms)

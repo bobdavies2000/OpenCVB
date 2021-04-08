@@ -434,9 +434,6 @@ Public Class Palette_ObjectColors
         palette = New Palette_Basics()
         reduction = New Reduction_KNN_Color()
 
-        task.maxRangeSlider.Value = task.maxRangeSlider.Maximum
-        task.inrange.maxval = task.maxRangeSlider.Value
-
         label1 = "Consistent colors"
         label2 = "Original colors"
         task.desc = "New class description"
@@ -447,9 +444,6 @@ Public Class Palette_ObjectColors
         reduction.src.SetTo(0, task.noDepthMask)
         reduction.Run()
         dst2 = reduction.dst2
-
-        Dim minDepth = task.inrange.minval
-        Dim maxDepth = task.inrange.maxval
 
         Dim blobList As New SortedList(Of Single, Integer)
         For i = 0 To reduction.pTrack.drawRC.viewObjects.Count - 1
@@ -462,7 +456,7 @@ Public Class Palette_ObjectColors
                 If countDepthPixels > 30 Then
                     Dim depth = task.depth32f(r).Mean(mask)
                     If blobList.ContainsKey(depth.Item(0)) = False Then
-                        If depth.Item(0) > minDepth And depth.Item(0) < maxDepth Then blobList.Add(depth.Item(0), i)
+                        If depth.Item(0) > task.minDepth And depth.Item(0) < task.maxDepth Then blobList.Add(depth.Item(0), i)
                     End If
                 End If
             End If
@@ -486,7 +480,7 @@ Public Class Palette_ObjectColors
             task.trueText(CStr(CInt(blobList.ElementAt(i).Key)), blob.centroid)
         Next
         dst1.SetTo(0, task.noDepthMask)
-        label1 = CStr(blobList.Count) + " regions between " + Format(minDepth / 1000, "0.0") + " and " + Format(maxDepth / 1000, "0.0") + " meters"
+        label1 = CStr(blobList.Count) + " regions between " + Format(task.minDepth / 1000, "0.0") + " and " + Format(task.maxDepth / 1000, "0.0") + " meters"
     End Sub
 End Class
 
