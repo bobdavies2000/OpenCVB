@@ -66,8 +66,8 @@ Public Class ImageSeg_InRange
             Dim mask = iSeg.masks(i)
             Dim r = iSeg.rects(i)
             Dim meanDepth = task.depth32f(r).Mean(mask)
-            If meanDepth.Val0 >= task.inrange.maxval Then dst1(r).SetTo(0, mask)
-            If meanDepth.Val0 <= task.inrange.minval Then dst1(r).SetTo(0, mask)
+            If meanDepth.Val0 >= task.maxDepth Then dst1(r).SetTo(0, mask)
+            If meanDepth.Val0 <= task.minDepth Then dst1(r).SetTo(0, mask)
         Next
     End Sub
 End Class

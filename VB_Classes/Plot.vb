@@ -313,7 +313,7 @@ Public Class Plot_Depth
         ReDim plot.srcX(hist.plotHist.hist.Rows - 1)
         ReDim plot.srcY(hist.plotHist.hist.Rows - 1)
         For i = 0 To plot.srcX.Length - 1
-            plot.srcX(i) = task.inrange.minval + i * (task.inrange.maxval - task.inrange.minval) / plot.srcX.Length
+            plot.srcX(i) = task.maxDepth + i * (task.maxDepth - task.minDepth) / plot.srcX.Length
             plot.srcY(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
         Next
         plot.Run()

@@ -315,10 +315,7 @@ Public Class Depth_Palette
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        Dim minDepth = task.inrange.minVal
-        Dim maxDepth = task.inrange.maxVal
-
-        Dim depthNorm = (task.depth32f * 255 / (maxDepth - minDepth)).ToMat ' do the normalize manually to use the min and max Depth (more stable)
+        Dim depthNorm = (task.depth32f * 255 / (task.maxDepth - task.minDepth)).ToMat ' do the normalize manually to use the min and max Depth (more stable)
         depthNorm.ConvertTo(depthNorm, cv.MatType.CV_8U)
         dst1 = Palette_Custom_Apply(depthNorm.CvtColor(cv.ColorConversionCodes.GRAY2BGR), customColorMap).SetTo(0, task.noDepthMask)
     End Sub
@@ -574,7 +571,7 @@ Public Class Depth_Colorizer_MT
         Dim nearColor = New Single() {0, 1, 1}
         Dim farColor = New Single() {1, 0, 0}
 
-        Dim range = task.inrange.maxval - task.inrange.minval
+        Dim range = task.maxDepth - task.minDepth
         Parallel.ForEach(grid.roiList,
          Sub(roi)
              Dim depth = src(roi)
@@ -583,8 +580,8 @@ Public Class Depth_Colorizer_MT
              For y = 0 To depth.Rows - 1
                  For x = 0 To depth.Cols - 1
                      Dim pixel = depth.Get(Of Single)(y, x)
-                     If pixel > task.inrange.minval And pixel <= task.inrange.maxval Then
-                         Dim t = (pixel - task.inrange.minval) / range
+                     If pixel > task.minDepth And pixel <= task.maxDepth Then
+                         Dim t = (pixel - task.minDepth) / range
                          rgbdata(x * 3 + 0 + y * stride) = ((1 - t) * nearColor(0) + t * farColor(0)) * 255
                          rgbdata(x * 3 + 1 + y * stride) = ((1 - t) * nearColor(1) + t * farColor(1)) * 255
                          rgbdata(x * 3 + 2 + y * stride) = ((1 - t) * nearColor(2) + t * farColor(2)) * 255
@@ -843,7 +840,7 @@ Public Class Depth_SmoothingMat
         cv.Cv2.Add(task.depth32f, dst1, dst2)
         lastDepth = task.depth32f
 
-        label1 = "Smoothing Mat: range from " + CStr(task.inrange.minval) + " to +" + CStr(task.inrange.maxval)
+        label1 = "Smoothing Mat: range from " + CStr(task.minDepth) + " to +" + CStr(task.maxDepth)
     End Sub
 End Class
 

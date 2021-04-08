@@ -97,12 +97,12 @@ Public Class CamShift_Foreground
         Static depthMin As integer
         Static depthMax As integer
         If camshift.trackBox.Size.Width < 50 Then restartRequested = True
-        If task.inrange.minval <> depthMin Then
-            depthMin = task.inrange.minval
+        If task.minDepth <> depthMin Then
+            depthMin = task.minDepth
             restartRequested = True
         End If
-        If task.inrange.maxval <> depthMax Then
-            depthMax = task.inrange.maxval
+        If task.maxDepth <> depthMax Then
+            depthMax = task.maxDepth
             restartRequested = True
         End If
         If restartRequested Then fore.Run()
