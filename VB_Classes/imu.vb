@@ -237,7 +237,7 @@ Public Class IMU_FrameTime
         Static sampledIMUFrameTime = task.IMU_FrameTime
         If task.frameCount Mod 10 = 0 Then sampledIMUFrameTime = task.IMU_FrameTime
 
-        histogramIMU(CInt(task.IMU_FrameTime)) += 1
+        histogramIMU(Math.Min(CInt(task.IMU_FrameTime), histogramIMU.Length - 1)) += 1
 
         If standalone Or task.intermediateReview = caller Then
             Dim output = "IMU_TimeStamp (ms) " + Format(task.IMU_TimeStamp, "00") + vbCrLf +
@@ -324,7 +324,7 @@ Public Class IMU_HostFrameTimes
         Static sampledCPUFrameTime = task.CPU_FrameTime
         If task.frameCount Mod 10 = 0 Then sampledCPUFrameTime = task.CPU_FrameTime
 
-        hist(CInt(task.CPU_FrameTime)) += 1
+        hist(Math.Min(CInt(task.CPU_FrameTime), hist.Length - 1)) += 1
 
         If standalone Or task.intermediateReview = caller Then
             Dim output = "IMU_TimeStamp (ms) " + Format(task.IMU_TimeStamp, "00") + vbCrLf +
