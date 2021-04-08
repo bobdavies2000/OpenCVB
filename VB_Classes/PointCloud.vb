@@ -774,7 +774,6 @@ End Class
 Public Class PointCloud_Singletons
     Inherits VBparent
     Public topView As Histogram_TopView2D
-    Dim singleFrames(3 - 1) As cv.Mat
     Public Sub New()
         initParent()
         topView = New Histogram_TopView2D()

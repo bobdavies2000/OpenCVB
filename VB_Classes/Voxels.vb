@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class Voxels_Basics_MT
     Inherits VBparent
-    Public inrange As Depth_InRange
     Public grid As Thread_Grid
     Public voxels(1) As Single
     Public voxelMat As cv.Mat
@@ -12,8 +11,6 @@ Public Class Voxels_Basics_MT
             check.Box(0).Text = "Display intermediate results"
             check.Box(0).Checked = True
         End If
-
-        inrange = New Depth_InRange()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -34,8 +31,9 @@ Public Class Voxels_Basics_MT
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
         Dim split() = src.Split()
 
-        inrange.src = split(2) * 1000
-        inrange.Run()
+        Dim depthMask As New cv.Mat
+        Dim input = (split(2) * 1000).ToMat
+        cv.Cv2.InRange(input, task.minDepth, task.maxDepth, depthMask)
 
         grid.src = split(2)
         grid.Run()
@@ -46,9 +44,9 @@ Public Class Voxels_Basics_MT
         Parallel.For(0, grid.roiList.Count,
         Sub(i)
             Dim roi = grid.roiList(i)
-            Dim count = inrange.depthMask(roi).CountNonZero()
+            Dim count = depthMask(roi).CountNonZero()
             If count > 0 Then
-                voxels(i) = inrange.src(roi).Mean(inrange.depthMask(roi)).Item(0)
+                voxels(i) = input(roi).Mean(depthMask(roi)).Item(0)
             Else
                 voxels(i) = 0
             End If
@@ -69,7 +67,7 @@ Public Class Voxels_Basics_MT
                         Dim color = New cv.Scalar(((256 - v) * nearColor(0) + v * farColor(0)) >> 8,
                                                   ((256 - v) * nearColor(1) + v * farColor(1)) >> 8,
                                                   ((256 - v) * nearColor(2) + v * farColor(2)) >> 8)
-                        img(roi).SetTo(color, inrange.depthMask(roi))
+                        img(roi).SetTo(color, depthMask(roi))
                     End If
                 End Sub)
             dst2 = img.Resize(dst1.Size)
