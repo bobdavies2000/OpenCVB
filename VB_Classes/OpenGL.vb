@@ -508,6 +508,7 @@ Public Class OpenGL_FloorTexture
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.parms.IMU_Present Then
+            floor.plane.src = src
             floor.plane.Run()
             dst1 = floor.plane.dst1
             dst2 = floor.plane.dst2

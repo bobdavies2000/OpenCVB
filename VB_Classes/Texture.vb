@@ -23,7 +23,7 @@ Public Class Texture_Basics
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        If standalone Or src.Channels <> 1 Or src.Width = 0 Then
+        If standalone Or src.Channels <> 1 Then
             ellipse.Run()
             dst1 = ellipse.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst1 = dst1.ConvertScaleAbs(255)
@@ -160,7 +160,8 @@ Public Class Texture_Shuffle
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
+            floor.plane.src = src
             floor.plane.Run()
             dst2.SetTo(0)
             src.CopyTo(dst2, floor.plane.sliceMask)
@@ -170,6 +171,7 @@ Public Class Texture_Shuffle
             texture.src = src
         End If
 
+        texture.src = src
         texture.Run()
         dst1 = texture.dst2
         dst2.Rectangle(texture.tRect, cv.Scalar.White, 2)
