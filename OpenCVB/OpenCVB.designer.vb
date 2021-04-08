@@ -43,9 +43,9 @@ Partial Class OpenCVB
         Me.MainMenu = New System.Windows.Forms.ToolStripMenuItem()
         Me.ExitCall = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
-        Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SurveyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CreateSurveyImagesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SurveyTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ToolStrip1.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
@@ -56,7 +56,7 @@ Partial Class OpenCVB
         Me.ToolStrip1.AutoSize = False
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.SnapShotButton, Me.TreeButton, Me.PixelViewerButton})
-        Me.ToolStrip1.Location = New System.Drawing.Point(0, 33)
+        Me.ToolStrip1.Location = New System.Drawing.Point(0, 36)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
         Me.ToolStrip1.Size = New System.Drawing.Size(1786, 58)
@@ -164,19 +164,21 @@ Partial Class OpenCVB
         'OpenCVkeyword
         '
         Me.OpenCVkeyword.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.OpenCVkeyword.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.OpenCVkeyword.FormattingEnabled = True
         Me.OpenCVkeyword.Location = New System.Drawing.Point(716, 47)
         Me.OpenCVkeyword.Name = "OpenCVkeyword"
-        Me.OpenCVkeyword.Size = New System.Drawing.Size(363, 28)
+        Me.OpenCVkeyword.Size = New System.Drawing.Size(363, 33)
         Me.OpenCVkeyword.TabIndex = 1
         '
         'AvailableAlgorithms
         '
         Me.AvailableAlgorithms.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.AvailableAlgorithms.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.AvailableAlgorithms.FormattingEnabled = True
         Me.AvailableAlgorithms.Location = New System.Drawing.Point(347, 47)
         Me.AvailableAlgorithms.Name = "AvailableAlgorithms"
-        Me.AvailableAlgorithms.Size = New System.Drawing.Size(363, 28)
+        Me.AvailableAlgorithms.Size = New System.Drawing.Size(363, 33)
         Me.AvailableAlgorithms.TabIndex = 0
         '
         'MenuStrip1
@@ -186,7 +188,7 @@ Partial Class OpenCVB
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainMenu, Me.SurveyToolStripMenuItem, Me.AboutToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(1786, 33)
+        Me.MenuStrip1.Size = New System.Drawing.Size(1786, 36)
         Me.MenuStrip1.TabIndex = 2
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -194,31 +196,25 @@ Partial Class OpenCVB
         '
         Me.MainMenu.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ExitCall, Me.ToolStripSeparator1})
         Me.MainMenu.Name = "MainMenu"
-        Me.MainMenu.Size = New System.Drawing.Size(54, 29)
+        Me.MainMenu.Size = New System.Drawing.Size(54, 32)
         Me.MainMenu.Text = "&File"
         '
         'ExitCall
         '
         Me.ExitCall.Name = "ExitCall"
-        Me.ExitCall.Size = New System.Drawing.Size(270, 34)
+        Me.ExitCall.Size = New System.Drawing.Size(141, 34)
         Me.ExitCall.Text = "E&xit"
         '
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(267, 6)
-        '
-        'AboutToolStripMenuItem
-        '
-        Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
-        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(78, 29)
-        Me.AboutToolStripMenuItem.Text = "About"
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(138, 6)
         '
         'SurveyToolStripMenuItem
         '
         Me.SurveyToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CreateSurveyImagesToolStripMenuItem})
         Me.SurveyToolStripMenuItem.Name = "SurveyToolStripMenuItem"
-        Me.SurveyToolStripMenuItem.Size = New System.Drawing.Size(81, 29)
+        Me.SurveyToolStripMenuItem.Size = New System.Drawing.Size(81, 32)
         Me.SurveyToolStripMenuItem.Text = "Survey"
         '
         'CreateSurveyImagesToolStripMenuItem
@@ -226,6 +222,12 @@ Partial Class OpenCVB
         Me.CreateSurveyImagesToolStripMenuItem.Name = "CreateSurveyImagesToolStripMenuItem"
         Me.CreateSurveyImagesToolStripMenuItem.Size = New System.Drawing.Size(285, 34)
         Me.CreateSurveyImagesToolStripMenuItem.Text = "Create Survey Images"
+        '
+        'AboutToolStripMenuItem
+        '
+        Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
+        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(78, 32)
+        Me.AboutToolStripMenuItem.Text = "About"
         '
         'SurveyTimer
         '

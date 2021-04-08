@@ -1325,7 +1325,7 @@ Public Class Depth_PunchBlob
         lastContoursCount = contours.contourlist.Count
         label2 = CStr(punchCount) + " Punches Thrown"
 
-        If showMessage Then
+        If showMessage > 0 Then
             task.trueText("Punched!!!", 10, 100, 3)
             showMessage -= 1
         End If
