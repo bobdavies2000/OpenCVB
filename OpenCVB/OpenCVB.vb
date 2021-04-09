@@ -69,7 +69,6 @@ Public Class OpenCVB
     Dim openCVKeywords As New List(Of String)
     Public optionsForm As OptionsDialog
     Dim TreeViewDialog As TreeviewForm
-    Dim openFileForm As OpenFilename
     Dim picLabels() = {"RGB", "Depth", "", ""}
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
     Public workingRes As cv.Size
@@ -77,16 +76,6 @@ Public Class OpenCVB
     Dim totalBytesOfMemoryUsed As Integer
     Dim ttTextData As List(Of VB_Classes.TTtext)
 
-    Dim openFileDialogRequested As Boolean
-    Dim openFileinitialStartSetting As Boolean
-    Dim openFileInitialDirectory As String
-    Dim openFileFilter As String
-    Dim openFileFilterIndex As Integer
-    Dim openFileDialogName As String
-    Dim openFileStarted As Boolean
-    Dim openfileDialogTitle As String
-    Dim openfileSliderPercent As Single
-    Dim openFileFormLocated As Boolean
     Dim pauseAlgorithmThread As Boolean
     Private Delegate Sub delegateEvent()
     Dim logAlgorithms As StreamWriter
@@ -183,8 +172,6 @@ Public Class OpenCVB
             End If
         End While
         sr.Close()
-
-        openFileForm = New OpenFilename
 
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
@@ -401,40 +388,6 @@ Public Class OpenCVB
             End If
         End SyncLock
 
-        ' only the main task can have an openfiledialog box!  Move results to the algorithm task from specified locations in this form.
-        If openFileInitialDirectory <> "" Then
-            If openFileDialogRequested Then
-                openFileDialogRequested = False
-                openFileForm.OpenFileDialog1.InitialDirectory = openFileInitialDirectory
-                openFileForm.OpenFileDialog1.FileName = "*.*"
-                openFileForm.OpenFileDialog1.CheckFileExists = False
-                openFileForm.OpenFileDialog1.Filter = openFileFilter
-                openFileForm.OpenFileDialog1.FilterIndex = openFileFilterIndex
-                openFileForm.filename.Text = openFileDialogName
-                openFileForm.Text = openfileDialogTitle
-                openFileForm.Label1.Text = "Select a file for use with the " + AvailableAlgorithms.Text + " algorithm."
-                openFileForm.Show()
-                openFileStarted = openFileinitialStartSetting
-                If openFileinitialStartSetting And openFileForm.PlayButton.Text = "Start" Then
-                    openFileForm.PlayButton.PerformClick()
-                Else
-                    If openFileinitialStartSetting = False Then
-                        openFileForm.fileStarted = False
-                        openFileForm.PlayButton.Text = "Start"
-                    End If
-                End If
-            Else
-                If (openFileForm.Location.X <> Me.Left Or openFileForm.Location.Y <> Me.Top + Me.Height) And openFileFormLocated = False Then
-                    openFileFormLocated = True
-                    openFileForm.Location = New Point(Me.Left, Me.Top + Me.Height)
-                End If
-                If openFileDialogName <> openFileForm.filename.Text Then openFileDialogName = openFileForm.filename.Text
-                If openfileSliderPercent >= 0 And openfileSliderPercent <= 1 Then openFileForm.TrackBar1.Value = openfileSliderPercent * 10000
-                openFileForm.PlayButton.Visible = openfileSliderPercent >= 0 ' negative indicates it should not be shown.
-                openFileForm.TrackBar1.Visible = openFileForm.PlayButton.Visible
-            End If
-            openFileStarted = openFileForm.fileStarted
-        End If
         AlgorithmDesc.Text = textDesc
     End Sub
     Private Sub checkCameraDefault()
@@ -1123,12 +1076,6 @@ Public Class OpenCVB
     Private Sub StartAlgorithmTask()
         Console.WriteLine("Queuing up: " + AvailableAlgorithms.Text)
         saveAlgorithmName = AvailableAlgorithms.Text ' this tells the previous algorithmTask to terminate.
-        openFileForm.Hide()
-        openFileForm.PlayButton.Text = "Start"
-        openFileDialogName = ""
-        openFileInitialDirectory = ""
-        openFileForm.fileStarted = False
-        openFileFormLocated = False
 
         Dim parms As New VB_Classes.ActiveTask.algParms
         ReDim parms.RotationMatrix(9 - 1)
@@ -1168,15 +1115,6 @@ Public Class OpenCVB
             Dim myLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
             Dim task = New VB_Classes.ActiveTask(parms, workingRes, algName, workingRes.Width, workingRes.Height, myLocation)
             textDesc = task.desc
-            openFileInitialDirectory = task.openFileInitialDirectory
-            openFileDialogRequested = task.openFileDialogRequested
-            openFileinitialStartSetting = task.initialStartSetting
-            task.fileStarted = task.initialStartSetting
-            openFileStarted = task.initialStartSetting
-            openFileFilterIndex = task.openFileFilterIndex
-            openFileFilter = task.openFileFilter
-            openFileDialogName = task.openFileDialogName
-            openfileDialogTitle = task.openFileDialogTitle
             intermediateReview = ""
 
             Console.WriteLine(vbCrLf + vbCrLf + vbTab + algName + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
@@ -1260,7 +1198,6 @@ Public Class OpenCVB
                             If mouseClickFlag Then task.mouseClickPoint = mousePoint
                             mouseClickFlag = False
                         End If
-                        task.fileStarted = openFileStarted ' UI may have stopped play.
                         taskNewImages = False
                         Exit While
                     End If
@@ -1279,26 +1216,6 @@ Public Class OpenCVB
 
             pixelViewerRect = task.pixelViewerRect
             pixelViewTag = task.pixelViewTag
-
-            If openFileDialogName <> "" Then
-                If openFileDialogName <> task.openFileDialogName Or openFileStarted <> task.fileStarted Then
-                    task.fileStarted = openFileStarted
-                    task.openFileDialogName = openFileDialogName
-                End If
-                openfileSliderPercent = task.openFileSliderPercent
-            End If
-
-            Static inputFile As String = "" ' task.openFileDialogName
-            If inputFile <> task.openFileDialogName Then
-                inputFile = task.openFileDialogName
-                openFileInitialDirectory = task.openFileInitialDirectory
-                openFileDialogRequested = task.openFileDialogRequested
-                openFileinitialStartSetting = True ' if the file playing changes while the algorithm is running, automatically start playing the new file.
-                openFileFilterIndex = task.openFileFilterIndex
-                openFileFilter = task.openFileFilter
-                openFileDialogName = task.openFileDialogName
-                openfileDialogTitle = task.openFileDialogTitle
-            End If
 
             If frameCount = 0 Then meActivateNeeded = True
 

@@ -154,16 +154,6 @@ Public Class ActiveTask : Implements IDisposable
     Public CPU_TimeStamp As Double
     Public CPU_FrameTime As Double
 
-    Public openFileDialogRequested As Boolean
-    Public openFileInitialDirectory As String
-    Public openFileFilter As String
-    Public openFileFilterIndex As Integer
-    Public openFileDialogName As String
-    Public openFileDialogTitle As String
-    Public openFileSliderPercent As Single
-    Public fileStarted As Boolean
-    Public initialStartSetting As Boolean
-
     Public drawRect As cv.Rect ' filled in if the user draws on any of the images.
     Public drawRectClear As Boolean ' used to remove the drawing rectangle when it has been used to initialize a camshift or mean shift.
     Public drawRectUpdated As Boolean
@@ -342,14 +332,7 @@ Public Class ActiveTask : Implements IDisposable
     End Sub
     Public Sub RunAlgorithm()
         Try
-            If task.parms.useRecordedData Then
-                Dim recordingFilename = New FileInfo(task.openFileDialogName)
-                If task.parms.useRecordedData And recordingFilename.Exists = False Then
-                    task.trueText("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125)
-                    Exit Sub
-                End If
-                recordedData.Run()
-            End If
+            If task.parms.useRecordedData Then recordedData.Run()
 
             ' run any global options algorithms here.
             If task.pythonTaskName.EndsWith(".py") = False Then

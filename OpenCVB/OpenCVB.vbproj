@@ -124,12 +124,6 @@
     <Compile Include="CameraPyRS2.vb" />
     <Compile Include="CameraRS2.vb" />
     <Compile Include="CameraMyntD.vb" />
-    <Compile Include="OpenFilename.Designer.vb">
-      <DependentUpon>OpenFilename.vb</DependentUpon>
-    </Compile>
-    <Compile Include="OpenFilename.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="OptionsDialog.Designer.vb">
       <DependentUpon>OptionsDialog.vb</DependentUpon>
     </Compile>
@@ -174,9 +168,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="OpenFilename.resx">
-      <DependentUpon>OpenFilename.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="OptionsDialog.resx">
       <DependentUpon>OptionsDialog.vb</DependentUpon>
     </EmbeddedResource>
