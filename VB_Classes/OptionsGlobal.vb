@@ -15,6 +15,9 @@ Public Class OptionsGlobal
 
         thresholdSlider.Value = GetSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", 2)
         threshold.Text = CStr(thresholdSlider.Value)
+
+        IMUmotionSlider.Value = GetSetting("OpenCVB", "IMUmotionSlider", "IMUmotionSlider", 1)
+        IMUmotion.Text = CStr(IMUmotionSlider.Value)
     End Sub
     Private Sub OptionsGlobal_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         SaveSetting("OpenCVB", "MinRangeDepth", "MinRangeDepth", MinRange.Value)
@@ -24,5 +27,8 @@ Public Class OptionsGlobal
     End Sub
     Private Sub thresholdSlider_Scroll(sender As Object, e As EventArgs) Handles thresholdSlider.Scroll
         threshold.Text = CStr(thresholdSlider.Value)
+    End Sub
+    Private Sub IMUmotionSlider_Scroll(sender As Object, e As EventArgs) Handles IMUmotionSlider.Scroll
+        IMUmotion.Text = CStr(IMUmotionSlider.Value)
     End Sub
 End Class

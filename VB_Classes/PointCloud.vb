@@ -297,27 +297,32 @@ Public Class PointCloud_ColorizeSide
         Dim markerLeft = New cv.Point(marker.X, cam.Y - marker.Y)
         Dim markerRight = New cv.Point(marker.X, cam.Y + marker.Y)
 
+        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
         Static xRotateSlider = findSlider("Amount to rotate pointcloud around X-axis (degrees)")
         If standalone Then imu.Run()
         Dim offset = Math.Sin(task.angleX) * marker.Y
-        If task.angleX > 0 Then
-            markerLeft.Y = markerLeft.Y - offset
-            markerRight.Y = markerRight.Y + offset
-        Else
-            markerLeft.Y = markerLeft.Y + offset
-            markerRight.Y = markerRight.Y - offset
+        If xCheckbox.checked Then
+            If task.angleX > 0 Then
+                markerLeft.Y = markerLeft.Y - offset
+                markerRight.Y = markerRight.Y + offset
+            Else
+                markerLeft.Y = markerLeft.Y + offset
+                markerRight.Y = markerRight.Y - offset
+            End If
         End If
 
         Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
-        markerLeft = New cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y) ' Change the origin
-        markerLeft = New cv.Point(markerLeft.X * Math.Cos(task.angleZ) - markerLeft.Y * Math.Sin(task.angleZ), ' rotate around x-axis using angleZ
-                                          markerLeft.Y * Math.Cos(task.angleZ) + markerLeft.X * Math.Sin(task.angleZ))
-        markerLeft = New cv.Point(markerLeft.X + cam.X, markerLeft.Y + cam.Y) ' Move the origin to the side camera location.
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
+        If zCheckbox.checked Then
+            markerLeft = New cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y) ' Change the origin
+            markerLeft = New cv.Point(markerLeft.X * Math.Cos(task.angleZ) - markerLeft.Y * Math.Sin(task.angleZ), ' rotate around x-axis using angleZ
+                                              markerLeft.Y * Math.Cos(task.angleZ) + markerLeft.X * Math.Sin(task.angleZ))
+            markerLeft = New cv.Point(markerLeft.X + cam.X, markerLeft.Y + cam.Y) ' Move the origin to the side camera location.
 
-        ' Same as above for markerLeft but consolidated algebraically.
-        markerRight = New cv.Point((markerRight.X - cam.X) * Math.Cos(task.angleZ) - (markerRight.Y - cam.Y) * Math.Sin(task.angleZ) + cam.X,
-                                           (markerRight.Y - cam.Y) * Math.Cos(task.angleZ) + (markerRight.X - cam.X) * Math.Sin(task.angleZ) + cam.Y)
-
+            ' Same as above for markerLeft but consolidated algebraically.
+            markerRight = New cv.Point((markerRight.X - cam.X) * Math.Cos(task.angleZ) - (markerRight.Y - cam.Y) * Math.Sin(task.angleZ) + cam.X,
+                                               (markerRight.Y - cam.Y) * Math.Cos(task.angleZ) + (markerRight.X - cam.X) * Math.Sin(task.angleZ) + cam.Y)
+        End If
         If standalone = False Then
             dst1.Circle(markerLeft, task.dotSize, cv.Scalar.Red, -1, task.lineType)
             dst1.Circle(markerRight, task.dotSize, cv.Scalar.Red, -1, task.lineType)
@@ -397,15 +402,18 @@ Public Class PointCloud_ColorizeTop
         Dim markerLeft = New cv.Point(cam.X - topLen, dst1.Height - marker.Y)
         Dim markerRight = New cv.Point(cam.X + topLen, dst1.Height - marker.Y)
 
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
         Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
         If standalone Then imu.Run()
         Dim offset = Math.Sin(task.angleZ) * topLen
-        If task.angleZ > 0 Then
-            markerLeft.X = markerLeft.X - offset
-            markerRight.X = markerRight.X + offset
-        Else
-            markerLeft.X = markerLeft.X + offset
-            markerRight.X = markerRight.X - offset
+        If zCheckbox.checked Then
+            If task.angleZ > 0 Then
+                markerLeft.X = markerLeft.X - offset
+                markerRight.X = markerRight.X + offset
+            Else
+                markerLeft.X = markerLeft.X + offset
+                markerRight.X = markerRight.X - offset
+            End If
         End If
 
         ' draw the arc enclosing the camera FOV

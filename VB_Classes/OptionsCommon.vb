@@ -10,10 +10,7 @@ Public Class OptionsCommon_Depth
         gOptions = New OptionsGlobal
         gOptions.Show()
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Threshold in camera motion in radians X100", 1, 15, 1) ' how much motion is reasonable?
-
-        task.cameraStableSlider = sliders.trackbar(0)
+        task.cameraStableSlider = gOptions.IMUmotionSlider
 
         label1 = "Depth values that are in-range"
         label2 = "Depth values that are out of range (and < 8m)"
