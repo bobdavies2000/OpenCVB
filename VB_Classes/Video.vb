@@ -6,18 +6,25 @@ Public Class Video_Basics
     Public srcVideo As String
     Public image As New cv.Mat
     Public captureVideo As New cv.VideoCapture
+    Dim fileNameForm As OptionsFileName
+    Dim fileInfo As FileInfo
     Public Sub New()
         initParent()
 
-        task.openFileDialogRequested = True
-        task.openFileInitialDirectory = task.parms.homeDir + "/Data/"
-        task.openFileDialogName = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", task.parms.homeDir + "Data\CarsDrivingUnderBridge.mp4")
-        task.openFileFilter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"
-        task.openFileFilterIndex = 1
-        task.openFileDialogTitle = "Select a video file for input"
-        task.initialStartSetting = False
+        fileNameForm = New OptionsFileName
+        fileNameForm.OpenFileDialog1.InitialDirectory = task.parms.homeDir + "Data\"
+        fileNameForm.OpenFileDialog1.FileName = "*.*"
+        fileNameForm.OpenFileDialog1.CheckFileExists = False
+        fileNameForm.OpenFileDialog1.Filter = "video files (*.mp4)|*.mp4|All files (*.*)|*.*"
+        fileNameForm.OpenFileDialog1.FilterIndex = 1
+        fileNameForm.filename.Text = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", task.parms.homeDir + "Data\CarsDrivingUnderBridge.mp4")
+        fileNameForm.Text = "Select a video file for input"
+        fileNameForm.Label1.Text = "Select a video file for input"
+        fileNameForm.PlayButton.Hide()
+        fileNameForm.Setup(caller)
+        fileNameForm.Show()
 
-        Dim fileInfo = New FileInfo(task.openFileDialogName)
+        fileInfo = New FileInfo(fileNameForm.filename.Text)
         srcVideo = fileInfo.FullName
 
         captureVideo = New cv.VideoCapture(fileInfo.FullName)
@@ -26,14 +33,13 @@ Public Class Video_Basics
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        Dim fileInfo = New FileInfo(task.openFileDialogName)
-        If srcVideo <> task.openFileDialogName Then
+        If srcVideo <> fileNameForm.filename.Text Then
             If fileInfo.Exists = False Then
                 task.trueText("File not found: " + fileInfo.FullName, 10, 125)
                 Exit Sub
             End If
-            srcVideo = task.openFileDialogName
-            captureVideo = New cv.VideoCapture(task.openFileDialogName)
+            srcVideo = fileNameForm.filename.Text
+            captureVideo = New cv.VideoCapture(fileNameForm.filename.Text)
         End If
         captureVideo.Read(image)
         If image.Empty() Then
@@ -42,7 +48,7 @@ Public Class Video_Basics
             captureVideo.Read(image)
         End If
 
-        task.openFileSliderPercent = captureVideo.PosFrames / captureVideo.FrameCount
+        fileNameForm.TrackBar1.Value = 10000 * captureVideo.PosFrames / captureVideo.FrameCount
         If image.Empty() = False Then dst1 = image.Resize(src.Size())
     End Sub
 End Class

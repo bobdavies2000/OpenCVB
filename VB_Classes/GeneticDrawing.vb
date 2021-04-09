@@ -299,37 +299,41 @@ Public Class GeneticDrawing_Photo
     Inherits VBparent
     Dim gDraw As GeneticDrawing_Color
     Dim inputFileName As String
+    Dim fileNameForm As OptionsFileName
     Public Sub New()
         initParent()
 
-        task.openFileDialogRequested = True
-        task.openFileInitialDirectory = task.parms.homeDir + "Data/"
-        task.openFileDialogName = GetSetting("OpenCVB", "PhotoFileName", "PhotoFileName", task.parms.homeDir + "Data/GeneticDrawingExample.jpg")
-        task.openFileFilter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
-        task.openFileFilterIndex = 1
-        task.openFileDialogTitle = "Select an image file to create a paint version"
-        task.initialStartSetting = True
-        task.openFileSliderPercent = -1
+        fileNameForm = New OptionsFileName
+        fileNameForm.OpenFileDialog1.InitialDirectory = task.parms.homeDir + "Data/"
+        fileNameForm.OpenFileDialog1.FileName = "*.*"
+        fileNameForm.OpenFileDialog1.CheckFileExists = False
+        fileNameForm.OpenFileDialog1.Filter = "jpg (*.jpg)|*.jpg|png (*.png)|*.png|bmp (*.bmp)|*.bmp|All files (*.*)|*.*"
+        fileNameForm.OpenFileDialog1.FilterIndex = 1
+        fileNameForm.filename.Text = GetSetting("OpenCVB", "PhotoFileName", "PhotoFileName", task.parms.homeDir + "Data/GeneticDrawingExample.jpg")
+        fileNameForm.Text = "Select an image file to create a paint version"
+        fileNameForm.Label1.Text = "Select a file for use with the Sound_Basics algorithm."
+        fileNameForm.PlayButton.Hide()
+        fileNameForm.Setup(caller)
+        fileNameForm.Show()
 
         task.desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes. Painterly"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        If inputFileName <> task.openFileDialogName Or task.frameCount = 0 Then
-            Dim fileinfo = New FileInfo(task.openFileDialogName)
-            If fileinfo.Exists = False Then
-                label1 = "No input file.  Use dialogbox below..."
+        Static fileInputName = New FileInfo(fileNameForm.filename.Text)
+        If inputFileName <> fileInputName.FullName Or task.frameCount = 0 Then
+            inputFileName = fileInputName.FullName
+            If fileInputName.Exists = False Then
+                label1 = "No input file specified or file not found."
                 Exit Sub
             End If
 
-            Dim fullsizeImage = cv.Cv2.ImRead(fileinfo.FullName)
+            Dim fullsizeImage = cv.Cv2.ImRead(fileInputName.FullName)
             If fullsizeImage.Channels <> 3 Then
                 label1 = "Input file must be RGB 3-channel image!"
                 Exit Sub
             End If
-            inputFileName = task.openFileDialogName
-
             If gDraw IsNot Nothing Then gDraw.Dispose()
             gDraw = New GeneticDrawing_Color()
 
@@ -343,7 +347,7 @@ Public Class GeneticDrawing_Photo
             Else
                 src = fullsizeImage
             End If
-            SaveSetting("OpenCVB", "PhotoFileName", "PhotoFileName", fileinfo.FullName)
+            SaveSetting("OpenCVB", "PhotoFileName", "PhotoFileName", fileInputName.FullName)
             gDraw.src = src
         End If
 

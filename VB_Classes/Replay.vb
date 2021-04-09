@@ -74,29 +74,33 @@ Public Class Replay_Record
     Dim cloudBytes() As Byte
     Dim maxBytes As Single = 20000000000
     Dim recordingFilename As FileInfo
+    Dim fileNameForm As OptionsFileName
     Public Sub New()
         initParent()
-
-        task.openFileDialogRequested = True
-        task.openFileInitialDirectory = task.parms.homeDir + "/Data/"
-        task.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", task.parms.homeDir + "Recording.ocvb")
-        task.openFileFilter = "ocvb (*.ocvb)|*.ocvb"
-        task.openFileFilterIndex = 1
-        task.openFileDialogTitle = "Select an OpenCVB bag file to create"
-        task.initialStartSetting = False
+        fileNameForm = New OptionsFileName
+        fileNameForm.OpenFileDialog1.InitialDirectory = task.parms.homeDir + "Data/"
+        fileNameForm.OpenFileDialog1.FileName = "*.*"
+        fileNameForm.OpenFileDialog1.CheckFileExists = False
+        fileNameForm.OpenFileDialog1.Filter = "ocvb (*.ocvb)|*.ocvb"
+        fileNameForm.OpenFileDialog1.FilterIndex = 1
+        fileNameForm.filename.Text = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", task.parms.homeDir + "Recording.ocvb")
+        fileNameForm.Text = "Select an OpenCVB bag file to create"
+        fileNameForm.Label1.Text = "Select a file to record all the image data."
+        fileNameForm.Setup(caller)
+        fileNameForm.Show()
 
         task.desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static bytesTotal As Int64
-        recordingFilename = New FileInfo(task.openFileDialogName)
+        recordingFilename = New FileInfo(fileNameForm.filename.Text)
         If task.parms.useRecordedData And recordingFilename.Exists = False Then
             task.trueText("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125)
             Exit Sub
         End If
 
-        If task.fileStarted Then
+        If fileNameForm.FileStarted Then
             If recordingActive = False Then
                 bytesPerColor = task.color.Total * task.color.ElemSize
                 bytesPerRGBDepth = task.RGBDepth.Total * task.RGBDepth.ElemSize
@@ -129,10 +133,9 @@ Public Class Replay_Record
                 bytesTotal += cloudBytes.Length
 
                 If bytesTotal >= maxBytes Then
-                    task.fileStarted = False
                     recordingActive = False
                 Else
-                    task.openFileSliderPercent = bytesTotal / maxBytes
+                    fileNameForm.TrackBar1.Value = 10000 * bytesTotal / maxBytes
                 End If
             End If
         Else
@@ -164,24 +167,30 @@ Public Class Replay_Play
     Dim fh As New fileHeader
     Dim fs As FileStream
     Dim recordingFilename As FileInfo
+    Dim fileNameForm As OptionsFileName
     Public Sub New()
         initParent()
-        task.openFileDialogRequested = True
-        task.openFileInitialDirectory = task.parms.homeDir + "/Data/"
-        task.openFileDialogName = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", task.parms.homeDir + "Recording.ocvb")
-        task.openFileFilter = "ocvb (*.ocvb)|*.ocvb"
-        task.openFileFilterIndex = 1
-        task.openFileDialogTitle = "Select an OpenCVB bag file to create"
-        task.initialStartSetting = True
+
+        fileNameForm = New OptionsFileName
+        fileNameForm.OpenFileDialog1.InitialDirectory = task.parms.homeDir + "Data/"
+        fileNameForm.OpenFileDialog1.FileName = "*.*"
+        fileNameForm.OpenFileDialog1.CheckFileExists = False
+        fileNameForm.OpenFileDialog1.Filter = "ocvb (*.ocvb)|*.ocvb"
+        fileNameForm.OpenFileDialog1.FilterIndex = 1
+        fileNameForm.filename.Text = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", task.parms.homeDir + "Recording.ocvb")
+        fileNameForm.Text = "Select an OpenCVB bag file to create"
+        fileNameForm.Label1.Text = "Select an OpenCVB bag file to read"
+        fileNameForm.Setup(caller)
+        fileNameForm.Show()
 
         task.desc = "Playback a file recorded by OpenCVB"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static bytesTotal As Int64
-        recordingFilename = New FileInfo(task.openFileDialogName)
+        recordingFilename = New FileInfo(fileNameForm.filename.Text)
         If recordingFilename.Exists = False Then task.trueText("File not found: " + recordingFilename.FullName, 10, 125)
-        If task.fileStarted And recordingFilename.Exists Then
+        If fileNameForm.fileStarted And recordingFilename.Exists Then
             Dim maxBytes = recordingFilename.Length
             If playbackActive Then
                 colorBytes = binRead.ReadBytes(bytesPerColor)
@@ -208,7 +217,7 @@ Public Class Replay_Play
                     playbackActive = False
                     bytesTotal = 0
                 End If
-                task.openFileSliderPercent = bytesTotal / recordingFilename.Length
+                fileNameForm.TrackBar1.Value = 10000 * bytesTotal / recordingFilename.Length
                 dst1 = task.color.Clone()
                 dst2 = task.RGBDepth.Clone()
             Else
