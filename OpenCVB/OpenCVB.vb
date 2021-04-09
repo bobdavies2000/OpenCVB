@@ -686,6 +686,7 @@ Public Class OpenCVB
         LineUpCamPics(resizing:=True)
     End Sub
     Private Sub LineUpCamPics(resizing As Boolean)
+        AlgorithmDesc.Width = Me.Width - AlgorithmDesc.Left - 50
         If resizing = False Then
             If optionsForm.SnapToGrid.Checked Then
                 Select Case workingRes.Height

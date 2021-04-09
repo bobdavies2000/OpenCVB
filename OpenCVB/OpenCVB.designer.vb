@@ -153,11 +153,10 @@ Partial Class OpenCVB
         '
         'AlgorithmDesc
         '
-        Me.AlgorithmDesc.AutoSize = True
         Me.AlgorithmDesc.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.AlgorithmDesc.Location = New System.Drawing.Point(1099, 50)
+        Me.AlgorithmDesc.Location = New System.Drawing.Point(1099, 36)
         Me.AlgorithmDesc.Name = "AlgorithmDesc"
-        Me.AlgorithmDesc.Size = New System.Drawing.Size(119, 22)
+        Me.AlgorithmDesc.Size = New System.Drawing.Size(675, 51)
         Me.AlgorithmDesc.TabIndex = 0
         Me.AlgorithmDesc.Text = "Algorithm Desc"
         '
@@ -183,6 +182,7 @@ Partial Class OpenCVB
         '
         'MenuStrip1
         '
+        Me.MenuStrip1.GripMargin = New System.Windows.Forms.Padding(2, 2, 0, 2)
         Me.MenuStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainMenu, Me.SurveyToolStripMenuItem, Me.AboutToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
