@@ -126,13 +126,12 @@ Public Class Sound_SignalGenerator
         initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 6)
+            sliders.Setup(caller, 5)
             sliders.setupTrackBar(0, "Sine Wave Frequency", 10, 4000, 1000)
             sliders.setupTrackBar(1, "Decibels", -100, 0, -20)
             sliders.setupTrackBar(2, "Sweep Only - End Frequency", 20, 4000, 1000)
             sliders.setupTrackBar(3, "Sweep Only - duration secs", 0, 10, 1)
             sliders.setupTrackBar(4, "Retain Data for x seconds", 1, 100, 2)
-            sliders.setupTrackBar(5, "Cycle progress", 0, 100, 0)
         End If
 
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -162,7 +161,6 @@ Public Class Sound_SignalGenerator
         Static endSweepSlider = findSlider("Sweep Only - End Frequency")
         Static sweepDurationSlider = findSlider("Sweep Only - duration secs")
         Static retainSlider = findSlider("Retain Data for x seconds")
-        Static cycleSlider = findSlider("Cycle progress")
         Static saveRadioIndex = -1
 
         Static frm = findfrm("Sound_SignalGenerator Radio Options")
@@ -174,13 +172,12 @@ Public Class Sound_SignalGenerator
             End If
         Next
 
-        If cycleSlider.value = 0 Or wgenSlider.Value <> wGen.Frequency Or retainSlider.Value <> pcmDuration Or saveRadioIndex = radioIndex Then
+        If wgenSlider.Value <> wGen.Frequency Or retainSlider.Value <> pcmDuration Or saveRadioIndex = radioIndex Then
             If pcmDuration <> retainSlider.Value Then
                 pcmDuration = retainSlider.Value
                 ReDim pcmData(pcmDuration * generatedSamplesPerSecond - 1) ' enough for about 10 seconds of audio.
                 startTime = Now
             End If
-
 
             Static reverse0Check = findCheckBox("PhaseReverse Left")
             Static reverse1Check = findCheckBox("PhaseReverse Right")
@@ -200,9 +197,6 @@ Public Class Sound_SignalGenerator
             player.Play()
         End If
         If standalone Or task.intermediateReview = caller Then task.trueText("Requested sound data is in the pcm32f cv.Mat")
-
-        cycleSlider.value = Math.Min(100, CInt(100 * (Now - startTime).TotalSeconds / pcmDuration))
-        If cycleSlider.value >= 100 Then cycleSlider.value = 1
     End Sub
     Public Sub Close()
         player?.Stop()
@@ -253,14 +247,14 @@ Public Class Sound_Display
 
             Dim totalSamples = soundSource.pcm32f.Rows
             samplesperLine = If(soundSource.stereo, totalSamples / 2 / dst1.Width, totalSamples / dst1.Width)
-            Static frm = findfrm("Sound_Display Radio Options")
-            For i = 0 To frm.check.length - 1
-                If frm.check(i).Checked Then formatIndex = i
-            Next
         End If
+        Static frm = findfrm("Sound_Display Radio Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then formatIndex = i
+        Next
 
-        Dim absMinVal As Double, absMaxVal As Double
         Dim pcm = soundSource.pcm32f
+        Dim absMinVal As Double, absMaxVal As Double
         pcm.MinMaxLoc(absMinVal, absMaxVal)
         If Double.IsNaN(absMaxVal) Or Double.IsNaN(absMinVal) Then Exit Sub ' bad input data...
         If Double.IsNegativeInfinity(absMinVal) Or Double.IsInfinity(absMaxVal) Then Exit Sub ' bad input data...
