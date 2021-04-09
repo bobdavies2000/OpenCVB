@@ -168,7 +168,6 @@ Public Class Reduction_Lines
         topView = New Histogram_TopView2D()
         reduction = New Reduction_PointCloud
 
-        task.thresholdSlider.Value = 20
         lDetect = New Line_Basics()
 
         label1 = "Gravity rotated Side View with detected lines"

@@ -9,7 +9,6 @@ Public Class Structured_Floor
         kalman = New Kalman_VB_Basics()
 
         structD = New Structured_SliceH()
-        task.thresholdSlider.Value = 10 ' some cameras can show data below ground level...
         structD.cushionSlider.Value = 5 ' floor runs can use a thinner slice that ceilings...
 
         task.desc = "Find the floor plane"

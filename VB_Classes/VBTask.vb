@@ -118,9 +118,11 @@ Public Class ActiveTask : Implements IDisposable
     Public depthMask As New cv.Mat
     Public depth32f As New cv.Mat
     Public depthOptionsChanged As Boolean
+
+    Public histogramBins As Integer
+
     Public minDepth As Integer
     Public maxDepth As Integer
-    Public thresholdSlider As Windows.Forms.TrackBar
     Public xRotateSlider As Windows.Forms.TrackBar
     Public yRotateSlider As Windows.Forms.TrackBar
     Public zRotateSlider As Windows.Forms.TrackBar

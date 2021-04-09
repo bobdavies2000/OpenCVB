@@ -45,7 +45,6 @@ Public Class MiniPC_Rotate
     Public Sub New()
         initParent()
         mini = New MiniPC_Basics
-        task.thresholdSlider.Value = 1
 
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         label2 = "Side view after resize percentage"
@@ -88,7 +87,7 @@ Public Class MiniPC_Rotate
         Dim histSize() = {input.Height, input.Width}
         cv.Cv2.CalcHist(New cv.Mat() {input}, New Integer() {1, 2}, New cv.Mat, histogram, 2, histSize, ranges)
 
-        dst1(mini.rect) = histogram.Threshold(task.thresholdSlider.Value, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        dst1(mini.rect) = histogram.Threshold(task.histogramBins, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         dst2(mini.rect) = input.ConvertScaleAbs(255)
     End Sub
 End Class

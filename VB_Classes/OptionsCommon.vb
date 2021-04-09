@@ -1,7 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class OptionsCommon_Depth
     Inherits VBparent
-    Public bins As Integer
     Public gOptions As New OptionsGlobal
     Public Sub New()
         initParent()
@@ -11,18 +10,16 @@ Public Class OptionsCommon_Depth
         gOptions = New OptionsGlobal
         gOptions.Show()
 
-        sliders.Setup(caller, 7)
-        sliders.setupTrackBar(0, "Top and Side Views Histogram threshold", 0, 200, 2)
-        sliders.setupTrackBar(1, "Amount to rotate pointcloud around X-axis (degrees)", -90, 90, 0)
-        sliders.setupTrackBar(2, "Amount to rotate pointcloud around Y-axis (degrees)", -90, 90, 0)
-        sliders.setupTrackBar(3, "Amount to rotate pointcloud around Z-axis (degrees)", -90, 90, 0)
-        sliders.setupTrackBar(4, "Threshold in camera motion in radians X100", 1, 15, 1) ' how much motion is reasonable?
+        sliders.Setup(caller)
+        sliders.setupTrackBar(0, "Amount to rotate pointcloud around X-axis (degrees)", -90, 90, 0)
+        sliders.setupTrackBar(1, "Amount to rotate pointcloud around Y-axis (degrees)", -90, 90, 0)
+        sliders.setupTrackBar(2, "Amount to rotate pointcloud around Z-axis (degrees)", -90, 90, 0)
+        sliders.setupTrackBar(3, "Threshold in camera motion in radians X100", 1, 15, 1) ' how much motion is reasonable?
 
-        task.thresholdSlider = sliders.trackbar(0)
-        task.xRotateSlider = sliders.trackbar(1)
-        task.yRotateSlider = sliders.trackbar(2)
-        task.zRotateSlider = sliders.trackbar(3)
-        task.cameraStableSlider = sliders.trackbar(4)
+        task.xRotateSlider = sliders.trackbar(0)
+        task.yRotateSlider = sliders.trackbar(1)
+        task.zRotateSlider = sliders.trackbar(2)
+        task.cameraStableSlider = sliders.trackbar(3)
 
         label1 = "Depth values that are in-range"
         label2 = "Depth values that are out of range (and < 8m)"
@@ -31,12 +28,13 @@ Public Class OptionsCommon_Depth
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
+        task.histogramBins = gOptions.thresholdSlider.Value
+
         task.minDepth = gOptions.MinRange.Value
         task.maxDepth = gOptions.MaxRange.Value
         If task.minDepth >= task.maxDepth Then task.maxDepth = task.minDepth + 1
 
         task.maxZ = task.maxDepth / 1000
-        bins = task.thresholdSlider.Value
 
         Static saveMaxVal As Integer
         Static saveMinVal As Integer

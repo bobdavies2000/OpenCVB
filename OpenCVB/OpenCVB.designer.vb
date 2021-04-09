@@ -56,7 +56,7 @@ Partial Class OpenCVB
         Me.ToolStrip1.AutoSize = False
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.SnapShotButton, Me.TreeButton, Me.PixelViewerButton})
-        Me.ToolStrip1.Location = New System.Drawing.Point(0, 36)
+        Me.ToolStrip1.Location = New System.Drawing.Point(0, 33)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
         Me.ToolStrip1.Size = New System.Drawing.Size(1786, 58)
@@ -155,7 +155,7 @@ Partial Class OpenCVB
         '
         Me.AlgorithmDesc.AutoSize = True
         Me.AlgorithmDesc.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.AlgorithmDesc.Location = New System.Drawing.Point(1085, 50)
+        Me.AlgorithmDesc.Location = New System.Drawing.Point(1099, 50)
         Me.AlgorithmDesc.Name = "AlgorithmDesc"
         Me.AlgorithmDesc.Size = New System.Drawing.Size(119, 22)
         Me.AlgorithmDesc.TabIndex = 0
@@ -164,31 +164,30 @@ Partial Class OpenCVB
         'OpenCVkeyword
         '
         Me.OpenCVkeyword.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.OpenCVkeyword.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.OpenCVkeyword.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.OpenCVkeyword.FormattingEnabled = True
-        Me.OpenCVkeyword.Location = New System.Drawing.Point(716, 47)
+        Me.OpenCVkeyword.Location = New System.Drawing.Point(730, 39)
         Me.OpenCVkeyword.Name = "OpenCVkeyword"
-        Me.OpenCVkeyword.Size = New System.Drawing.Size(363, 33)
+        Me.OpenCVkeyword.Size = New System.Drawing.Size(363, 37)
         Me.OpenCVkeyword.TabIndex = 1
         '
         'AvailableAlgorithms
         '
         Me.AvailableAlgorithms.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.AvailableAlgorithms.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AvailableAlgorithms.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.AvailableAlgorithms.FormattingEnabled = True
-        Me.AvailableAlgorithms.Location = New System.Drawing.Point(347, 47)
+        Me.AvailableAlgorithms.Location = New System.Drawing.Point(361, 39)
         Me.AvailableAlgorithms.Name = "AvailableAlgorithms"
-        Me.AvailableAlgorithms.Size = New System.Drawing.Size(363, 33)
+        Me.AvailableAlgorithms.Size = New System.Drawing.Size(363, 37)
         Me.AvailableAlgorithms.TabIndex = 0
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.GripMargin = New System.Windows.Forms.Padding(2, 2, 0, 2)
         Me.MenuStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainMenu, Me.SurveyToolStripMenuItem, Me.AboutToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(1786, 36)
+        Me.MenuStrip1.Size = New System.Drawing.Size(1786, 33)
         Me.MenuStrip1.TabIndex = 2
         Me.MenuStrip1.Text = "MenuStrip1"
         '
