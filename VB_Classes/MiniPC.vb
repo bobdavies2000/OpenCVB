@@ -87,7 +87,7 @@ Public Class MiniPC_Rotate
         Dim histSize() = {input.Height, input.Width}
         cv.Cv2.CalcHist(New cv.Mat() {input}, New Integer() {1, 2}, New cv.Mat, histogram, 2, histSize, ranges)
 
-        dst1(mini.rect) = histogram.Threshold(task.histThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        dst1(mini.rect) = histogram.Threshold(task.task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         dst2(mini.rect) = input.ConvertScaleAbs(255)
     End Sub
 End Class

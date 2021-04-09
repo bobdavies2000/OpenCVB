@@ -22,7 +22,7 @@ Public Class OptionsCommon_Depth
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        task.histThreshold = gOptions.thresholdSlider.Value
+        task.task.hist3DThreshold = gOptions.thresholdSlider.Value
 
         task.minDepth = gOptions.MinRange.Value
         task.maxDepth = gOptions.MaxRange.Value
