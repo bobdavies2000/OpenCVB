@@ -119,7 +119,7 @@ Public Class ActiveTask : Implements IDisposable
     Public depth32f As New cv.Mat
     Public depthOptionsChanged As Boolean
 
-    Public task.hist3DThreshold As Integer
+    Public hist3DThreshold As Integer
 
     Public minDepth As Integer
     Public maxDepth As Integer
