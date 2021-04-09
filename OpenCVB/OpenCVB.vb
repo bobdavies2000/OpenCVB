@@ -370,7 +370,7 @@ Public Class OpenCVB
                             If maxline <= 0 Then Exit For
                         End If
                     Next
-                    ttTextData.Clear()
+                    ' ttTextData.Clear()
                 End If
             Catch ex As Exception
                 Console.WriteLine("Error in ttextData update: " + ex.Message)

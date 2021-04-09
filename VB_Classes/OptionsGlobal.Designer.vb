@@ -37,12 +37,20 @@ Partial Class OptionsGlobal
         Me.threshold = New System.Windows.Forms.Label()
         Me.thresholdSlider = New System.Windows.Forms.TrackBar()
         Me.Label6 = New System.Windows.Forms.Label()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.TrackBar2 = New System.Windows.Forms.TrackBar()
+        Me.Label7 = New System.Windows.Forms.Label()
+        Me.Label8 = New System.Windows.Forms.Label()
+        Me.TrackBar3 = New System.Windows.Forms.TrackBar()
+        Me.Label9 = New System.Windows.Forms.Label()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.MaxRange, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MinRange, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox1.SuspendLayout()
         CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.thresholdSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TrackBar2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.TrackBar3, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'MinMaxDepth
@@ -55,7 +63,7 @@ Partial Class OptionsGlobal
         Me.MinMaxDepth.Controls.Add(Me.Label1)
         Me.MinMaxDepth.Location = New System.Drawing.Point(12, 13)
         Me.MinMaxDepth.Name = "MinMaxDepth"
-        Me.MinMaxDepth.Size = New System.Drawing.Size(829, 195)
+        Me.MinMaxDepth.Size = New System.Drawing.Size(829, 169)
         Me.MinMaxDepth.TabIndex = 0
         Me.MinMaxDepth.TabStop = False
         Me.MinMaxDepth.Text = "Global Depth Min/Max"
@@ -124,15 +132,21 @@ Partial Class OptionsGlobal
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.Label8)
+        Me.GroupBox1.Controls.Add(Me.TrackBar3)
+        Me.GroupBox1.Controls.Add(Me.Label9)
+        Me.GroupBox1.Controls.Add(Me.Label5)
+        Me.GroupBox1.Controls.Add(Me.TrackBar2)
+        Me.GroupBox1.Controls.Add(Me.Label7)
         Me.GroupBox1.Controls.Add(Me.Label2)
         Me.GroupBox1.Controls.Add(Me.TrackBar1)
         Me.GroupBox1.Controls.Add(Me.Label3)
         Me.GroupBox1.Controls.Add(Me.threshold)
         Me.GroupBox1.Controls.Add(Me.thresholdSlider)
         Me.GroupBox1.Controls.Add(Me.Label6)
-        Me.GroupBox1.Location = New System.Drawing.Point(12, 214)
+        Me.GroupBox1.Location = New System.Drawing.Point(12, 193)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(829, 195)
+        Me.GroupBox1.Size = New System.Drawing.Size(829, 347)
         Me.GroupBox1.TabIndex = 1
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Histogram Projection Options"
@@ -178,7 +192,7 @@ Partial Class OptionsGlobal
         'thresholdSlider
         '
         Me.thresholdSlider.Location = New System.Drawing.Point(213, 29)
-        Me.thresholdSlider.Maximum = 2000
+        Me.thresholdSlider.Maximum = 100
         Me.thresholdSlider.Minimum = 1
         Me.thresholdSlider.Name = "thresholdSlider"
         Me.thresholdSlider.Size = New System.Drawing.Size(505, 69)
@@ -193,6 +207,64 @@ Partial Class OptionsGlobal
         Me.Label6.Size = New System.Drawing.Size(173, 47)
         Me.Label6.TabIndex = 0
         Me.Label6.Text = "Top and Side Views Histogram threshold"
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(737, 189)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(57, 20)
+        Me.Label5.TabIndex = 8
+        Me.Label5.Text = "Label5"
+        '
+        'TrackBar2
+        '
+        Me.TrackBar2.Location = New System.Drawing.Point(213, 182)
+        Me.TrackBar2.Maximum = 15000
+        Me.TrackBar2.Minimum = 200
+        Me.TrackBar2.Name = "TrackBar2"
+        Me.TrackBar2.Size = New System.Drawing.Size(505, 69)
+        Me.TrackBar2.TabIndex = 7
+        Me.TrackBar2.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.TrackBar2.Value = 200
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Location = New System.Drawing.Point(19, 189)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(188, 20)
+        Me.Label7.TabIndex = 6
+        Me.Label7.Text = "InRange Min Depth (mm)"
+        '
+        'Label8
+        '
+        Me.Label8.AutoSize = True
+        Me.Label8.Location = New System.Drawing.Point(737, 261)
+        Me.Label8.Name = "Label8"
+        Me.Label8.Size = New System.Drawing.Size(57, 20)
+        Me.Label8.TabIndex = 11
+        Me.Label8.Text = "Label8"
+        '
+        'TrackBar3
+        '
+        Me.TrackBar3.Location = New System.Drawing.Point(213, 254)
+        Me.TrackBar3.Maximum = 15000
+        Me.TrackBar3.Minimum = 200
+        Me.TrackBar3.Name = "TrackBar3"
+        Me.TrackBar3.Size = New System.Drawing.Size(505, 69)
+        Me.TrackBar3.TabIndex = 10
+        Me.TrackBar3.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.TrackBar3.Value = 200
+        '
+        'Label9
+        '
+        Me.Label9.AutoSize = True
+        Me.Label9.Location = New System.Drawing.Point(19, 261)
+        Me.Label9.Name = "Label9"
+        Me.Label9.Size = New System.Drawing.Size(188, 20)
+        Me.Label9.TabIndex = 9
+        Me.Label9.Text = "InRange Min Depth (mm)"
         '
         'OptionsGlobal
         '
@@ -211,6 +283,8 @@ Partial Class OptionsGlobal
         Me.GroupBox1.PerformLayout()
         CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.thresholdSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TrackBar2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.TrackBar3, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -230,4 +304,10 @@ Partial Class OptionsGlobal
     Friend WithEvents threshold As Windows.Forms.Label
     Friend WithEvents thresholdSlider As Windows.Forms.TrackBar
     Friend WithEvents Label6 As Windows.Forms.Label
+    Friend WithEvents Label8 As Windows.Forms.Label
+    Friend WithEvents TrackBar3 As Windows.Forms.TrackBar
+    Friend WithEvents Label9 As Windows.Forms.Label
+    Friend WithEvents Label5 As Windows.Forms.Label
+    Friend WithEvents TrackBar2 As Windows.Forms.TrackBar
+    Friend WithEvents Label7 As Windows.Forms.Label
 End Class

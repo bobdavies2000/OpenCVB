@@ -257,6 +257,7 @@ Public Class PointCloud_ColorizeSide
     Inherits VBparent
     Dim palette As Palette_Gradient
     Dim arcSize As Integer
+    Dim imu As IMU_GVector
     Public xCheckbox As Windows.Forms.CheckBox
     Public zCheckbox As Windows.Forms.CheckBox
     Public Sub New()
@@ -270,7 +271,7 @@ Public Class PointCloud_ColorizeSide
 
         palette.Run()
         dst1 = palette.dst1
-
+        If standalone Then imu = New IMU_GVector
         label1 = "Colorize mask for side view"
         task.desc = "Create the colorized mat used for side projections"
     End Sub
@@ -296,7 +297,9 @@ Public Class PointCloud_ColorizeSide
         Dim markerLeft = New cv.Point(marker.X, cam.Y - marker.Y)
         Dim markerRight = New cv.Point(marker.X, cam.Y + marker.Y)
 
-        If task.xRotateSlider.Value <> 0 Then
+        Static xRotateSlider = findSlider("Amount to rotate pointcloud around X-axis (degrees)")
+        If standalone Then imu.Run()
+        If xRotateSlider.Value <> 0 Then
             Dim offset = Math.Sin(task.angleX) * marker.Y
             If task.angleX > 0 Then
                 markerLeft.Y = markerLeft.Y - offset
@@ -307,7 +310,8 @@ Public Class PointCloud_ColorizeSide
             End If
         End If
 
-        If task.zRotateSlider.Value <> 0 Then
+        Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
+        If zRotateSlider.Value <> 0 Then
             markerLeft = New cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y) ' Change the origin
             markerLeft = New cv.Point(markerLeft.X * Math.Cos(task.angleZ) - markerLeft.Y * Math.Sin(task.angleZ), ' rotate around x-axis using angleZ
                                       markerLeft.Y * Math.Cos(task.angleZ) + markerLeft.X * Math.Sin(task.angleZ))
@@ -358,10 +362,12 @@ Public Class PointCloud_ColorizeTop
     Inherits VBparent
     Dim palette As Palette_Gradient
     Dim arcSize As Integer
+    Dim imu As IMU_GVector
     Public xCheckbox As Windows.Forms.CheckBox
     Public Sub New()
         initParent()
 
+        If standalone Then imu = New IMU_GVector
         palette = New Palette_Gradient()
         palette.color1 = cv.Scalar.Yellow
         palette.color2 = cv.Scalar.Blue
@@ -395,7 +401,9 @@ Public Class PointCloud_ColorizeTop
         Dim markerLeft = New cv.Point(cam.X - topLen, dst1.Height - marker.Y)
         Dim markerRight = New cv.Point(cam.X + topLen, dst1.Height - marker.Y)
 
-        If task.zRotateSlider.Value <> 0 Then
+        Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
+        If standalone Then imu.Run()
+        If zRotateSlider.Value <> 0 Then
             Dim offset = Math.Sin(task.angleZ) * topLen
             If task.angleZ > 0 Then
                 markerLeft.X = markerLeft.X - offset
@@ -565,7 +573,7 @@ Public Class PointCloud_Kalman_TopView
 
         topView.Run()
 
-        flood.src = topView.histOutput.Threshold(task.histogramBins, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        flood.src = topView.histOutput.Threshold(task.histThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         flood.Run()
 
         If flood.dst1.Channels = 3 Then pTrack.src = flood.dst1 Else pTrack.src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -699,7 +707,7 @@ Public Class PointCloud_FrustrumTop
         frustrum = New Draw_Frustrum
         topView = New Histogram_TopView2D
 
-        task.histogramBins = 0
+        task.histThreshold = 0
 
         Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
         Dim zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
@@ -741,7 +749,7 @@ Public Class PointCloud_FrustrumSide
         frustrum = New Draw_Frustrum
         sideView = New Histogram_SideView2D
 
-        task.histogramBins = 0
+        task.histThreshold = 0
 
         Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
         Dim zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
@@ -778,7 +786,7 @@ Public Class PointCloud_Singletons
         initParent()
         topView = New Histogram_TopView2D()
         topView.resizeHistOutput = False
-        task.histogramBins = 1
+        task.histThreshold = 1
 
         label1 = "Top down view before inrange sampling"
         label2 = "Histogram after filtering for single-only histogram bins"
@@ -832,7 +840,7 @@ Public Class PointCloud_ReducedSideView
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         cv.Cv2.CalcHist(New cv.Mat() {dst2}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
-        histOutput = histOutput.Threshold(task.histogramBins, 255, cv.ThresholdTypes.Binary)
+        histOutput = histOutput.Threshold(task.histThreshold, 255, cv.ThresholdTypes.Binary)
         histOutput.ConvertTo(dst1, cv.MatType.CV_8UC1)
     End Sub
 End Class
@@ -872,7 +880,7 @@ Public Class PointCloud_ReducedTopView
         cv.Cv2.CalcHist(New cv.Mat() {dst2}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         histOutput = histOutput.Flip(cv.FlipMode.X)
-        dst1 = histOutput.Threshold(task.histogramBins, 255, cv.ThresholdTypes.Binary)
+        dst1 = histOutput.Threshold(task.histThreshold, 255, cv.ThresholdTypes.Binary)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
     End Sub
 End Class
@@ -1150,7 +1158,9 @@ Public Class PointCloud_BothViews
             Dim instructions = "Click any centroid to get details"
             Dim accMsg1 = "TopView - distances are accurate"
             Dim accMsg2 = "SideView - distances are accurate"
-            If task.xRotateSlider.Value <> 0 Or task.zRotateSlider.Value <> 0 Then
+            Static xRotateSlider = findSlider("Amount to rotate pointcloud around X-axis (degrees)")
+            Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
+            If xRotateSlider.Value <> 0 Or zRotateSlider.Value <> 0 Then
                 levelCheck.Run()
                 If levelCheck.cameraLevel Then
                     accMsg1 = "Distances are good - camera is level"

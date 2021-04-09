@@ -11,15 +11,9 @@ Public Class OptionsCommon_Depth
         gOptions.Show()
 
         sliders.Setup(caller)
-        sliders.setupTrackBar(0, "Amount to rotate pointcloud around X-axis (degrees)", -90, 90, 0)
-        sliders.setupTrackBar(1, "Amount to rotate pointcloud around Y-axis (degrees)", -90, 90, 0)
-        sliders.setupTrackBar(2, "Amount to rotate pointcloud around Z-axis (degrees)", -90, 90, 0)
-        sliders.setupTrackBar(3, "Threshold in camera motion in radians X100", 1, 15, 1) ' how much motion is reasonable?
+        sliders.setupTrackBar(0, "Threshold in camera motion in radians X100", 1, 15, 1) ' how much motion is reasonable?
 
-        task.xRotateSlider = sliders.trackbar(0)
-        task.yRotateSlider = sliders.trackbar(1)
-        task.zRotateSlider = sliders.trackbar(2)
-        task.cameraStableSlider = sliders.trackbar(3)
+        task.cameraStableSlider = sliders.trackbar(0)
 
         label1 = "Depth values that are in-range"
         label2 = "Depth values that are out of range (and < 8m)"
@@ -28,7 +22,7 @@ Public Class OptionsCommon_Depth
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        task.histogramBins = gOptions.thresholdSlider.Value
+        task.histThreshold = gOptions.thresholdSlider.Value
 
         task.minDepth = gOptions.MinRange.Value
         task.maxDepth = gOptions.MaxRange.Value
@@ -38,12 +32,10 @@ Public Class OptionsCommon_Depth
 
         Static saveMaxVal As Integer
         Static saveMinVal As Integer
-        Static saveYRotate As Integer
-        If saveMaxVal <> task.maxDepth Or saveMinVal <> task.minDepth Or saveYRotate <> task.yRotateSlider.Value Then
+        If saveMaxVal <> task.maxDepth Or saveMinVal <> task.minDepth Then
             task.depthOptionsChanged = True
             saveMaxVal = task.maxDepth
             saveMinVal = task.minDepth
-            saveYRotate = task.yRotateSlider.Value
         Else
             task.depthOptionsChanged = False
         End If

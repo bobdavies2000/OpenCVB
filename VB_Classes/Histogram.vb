@@ -794,7 +794,7 @@ Public Class Histogram_TopData
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
-        dst1 = histOutput.Flip(cv.FlipMode.X).Threshold(task.histogramBins, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        dst1 = histOutput.Flip(cv.FlipMode.X).Threshold(task.histThreshold, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         label1 = "Left x = " + Format(meterMin, "#0.00") + " Right X = " + Format(meterMax, "#0.00") + " x and y scales differ!"
     End Sub
 End Class
@@ -842,7 +842,7 @@ Public Class Histogram_SideData
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
-        dst1 = histOutput.Threshold(task.histogramBins, 255, cv.ThresholdTypes.Binary)
+        dst1 = histOutput.Threshold(task.histThreshold, 255, cv.ThresholdTypes.Binary)
         label1 = "Top y = " + Format(meterMin, "#0.00") + " Bottom Y = " + Format(meterMax, "#0.00") + " x and y scales differ!"
     End Sub
 End Class
@@ -882,7 +882,7 @@ Public Class Histogram_SmoothTopView2D
         cv.Cv2.CalcHist(New cv.Mat() {stable.dst2}, New Integer() {2, 0}, New cv.Mat, topView.histOutput, 2, histSize, ranges)
 
         topView.histOutput = topView.histOutput.Flip(cv.FlipMode.X)
-        dst1 = topView.histOutput.Threshold(task.histogramBins, 255, cv.ThresholdTypes.Binary)
+        dst1 = topView.histOutput.Threshold(task.histThreshold, 255, cv.ThresholdTypes.Binary)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -925,7 +925,7 @@ Public Class Histogram_SmoothSideView2D
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         cv.Cv2.CalcHist(New cv.Mat() {stable.dst2}, New Integer() {1, 2}, New cv.Mat, sideView.histOutput, 2, histSize, ranges)
 
-        dst1 = sideView.histOutput.Threshold(task.histogramBins, 255, cv.ThresholdTypes.Binary)
+        dst1 = sideView.histOutput.Threshold(task.histThreshold, 255, cv.ThresholdTypes.Binary)
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -1006,7 +1006,7 @@ Public Class Histogram_TopView2D
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {2, 0}, New cv.Mat, originalHistOutput, 2, histSize, ranges)
 
         originalHistOutput = originalHistOutput.Flip(cv.FlipMode.X)
-        histOutput = originalHistOutput.Threshold(task.histogramBins, 255, cv.ThresholdTypes.Binary)
+        histOutput = originalHistOutput.Threshold(task.histThreshold, 255, cv.ThresholdTypes.Binary)
         dst1 = histOutput.Clone
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         If standalone Or task.intermediateReview = caller Then
@@ -1039,7 +1039,7 @@ Public Class Histogram_SideView2D
 
         cmat = New PointCloud_ColorizeSide
         gCloud = New Depth_PointCloud_IMU
-        If standalone Or task.intermediateReview = caller Then task.yRotateSlider.Value = 1
+        ' If standalone Or task.intermediateReview = caller Then task.yRotateSlider.Value = 1
         If standalone Then task.viewOptions.sliders.show()
 
         label1 = "ZY (Side View)"
@@ -1050,7 +1050,6 @@ Public Class Histogram_SideView2D
         If standalone Then task.viewOptions.run()
 
         gCloud.src = src
-        If gCloud.src.Type <> cv.MatType.CV_32FC3 Then gCloud.src = task.pointCloud.Clone
         gCloud.Run()
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.sideFrustrumAdjust, task.sideFrustrumAdjust), New cv.Rangef(0, task.maxZ)}
@@ -1058,7 +1057,7 @@ Public Class Histogram_SideView2D
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {1, 2}, New cv.Mat, originalHistOutput, 2, histSize, ranges)
 
-        histOutput = originalHistOutput.Threshold(task.histogramBins, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        histOutput = originalHistOutput.Threshold(task.histThreshold, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         histOutput.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         If standalone Or task.intermediateReview = caller Then

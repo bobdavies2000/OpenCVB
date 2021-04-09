@@ -445,6 +445,13 @@ Public Class IMU_GVector
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(6 - 1)
 
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Amount to rotate pointcloud around X-axis (degrees)", -90, 90, 0)
+            sliders.setupTrackBar(1, "Amount to rotate pointcloud around Y-axis (degrees)", -90, 90, 0)
+            sliders.setupTrackBar(2, "Amount to rotate pointcloud around Z-axis (degrees)", -90, 90, 0)
+        End If
+
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 3)
             check.Box(0).Text = "Rotate pointcloud around X-axis using gravity vector angleZ"
@@ -466,17 +473,19 @@ Public Class IMU_GVector
         task.angleY = Math.Atan2(gx, gy)
         task.angleZ = Math.Atan2(gy, gz) + cv.Cv2.PI / 2
 
+        Static xRotateSlider = findSlider("Amount to rotate pointcloud around X-axis (degrees)")
+        Static yRotateSlider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
+        Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
+
         Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
         Static manualCheckbox = findCheckBox("Initialize the X- and Z-axis sliders with gravity but allow manual after")
         If manualCheckbox.checked Then
-            If task.frameCount < 30 Then task.xRotateSlider.Value = CInt(task.angleZ * 57.2958) Else task.angleZ = task.xRotateSlider.Value / 57.2958
-            If task.frameCount < 30 Then task.zRotateSlider.Value = CInt(task.angleX * 57.2958) Else task.angleX = task.zRotateSlider.Value / 57.2958
+            task.angleZ = xRotateSlider.Value / 57.2958
+            task.angleX = zRotateSlider.Value / 57.2958
         Else
-            If xCheckbox.checked = False Then task.angleZ = 0
-            If zCheckbox.checked = False Then task.angleX = 0
-            task.xRotateSlider.Value = CInt(task.angleZ * 57.2958) Mod 90
-            task.zRotateSlider.Value = CInt(task.angleX * 57.2958) Mod 90
+            xRotateSlider.Value = CInt(task.angleZ * 57.2958) Mod 90
+            zRotateSlider.Value = CInt(task.angleX * 57.2958) Mod 90
         End If
 
         kalman.kInput = {gx, gy, gz, task.angleX, task.angleY, task.angleZ}
