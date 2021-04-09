@@ -299,28 +299,24 @@ Public Class PointCloud_ColorizeSide
 
         Static xRotateSlider = findSlider("Amount to rotate pointcloud around X-axis (degrees)")
         If standalone Then imu.Run()
-        If xRotateSlider.Value <> 0 Then
-            Dim offset = Math.Sin(task.angleX) * marker.Y
-            If task.angleX > 0 Then
-                markerLeft.Y = markerLeft.Y - offset
-                markerRight.Y = markerRight.Y + offset
-            Else
-                markerLeft.Y = markerLeft.Y + offset
-                markerRight.Y = markerRight.Y - offset
-            End If
+        Dim offset = Math.Sin(task.angleX) * marker.Y
+        If task.angleX > 0 Then
+            markerLeft.Y = markerLeft.Y - offset
+            markerRight.Y = markerRight.Y + offset
+        Else
+            markerLeft.Y = markerLeft.Y + offset
+            markerRight.Y = markerRight.Y - offset
         End If
 
         Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
-        If zRotateSlider.Value <> 0 Then
-            markerLeft = New cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y) ' Change the origin
-            markerLeft = New cv.Point(markerLeft.X * Math.Cos(task.angleZ) - markerLeft.Y * Math.Sin(task.angleZ), ' rotate around x-axis using angleZ
-                                      markerLeft.Y * Math.Cos(task.angleZ) + markerLeft.X * Math.Sin(task.angleZ))
-            markerLeft = New cv.Point(markerLeft.X + cam.X, markerLeft.Y + cam.Y) ' Move the origin to the side camera location.
+        markerLeft = New cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y) ' Change the origin
+        markerLeft = New cv.Point(markerLeft.X * Math.Cos(task.angleZ) - markerLeft.Y * Math.Sin(task.angleZ), ' rotate around x-axis using angleZ
+                                          markerLeft.Y * Math.Cos(task.angleZ) + markerLeft.X * Math.Sin(task.angleZ))
+        markerLeft = New cv.Point(markerLeft.X + cam.X, markerLeft.Y + cam.Y) ' Move the origin to the side camera location.
 
-            ' Same as above for markerLeft but consolidated algebraically.
-            markerRight = New cv.Point((markerRight.X - cam.X) * Math.Cos(task.angleZ) - (markerRight.Y - cam.Y) * Math.Sin(task.angleZ) + cam.X,
-                                       (markerRight.Y - cam.Y) * Math.Cos(task.angleZ) + (markerRight.X - cam.X) * Math.Sin(task.angleZ) + cam.Y)
-        End If
+        ' Same as above for markerLeft but consolidated algebraically.
+        markerRight = New cv.Point((markerRight.X - cam.X) * Math.Cos(task.angleZ) - (markerRight.Y - cam.Y) * Math.Sin(task.angleZ) + cam.X,
+                                           (markerRight.Y - cam.Y) * Math.Cos(task.angleZ) + (markerRight.X - cam.X) * Math.Sin(task.angleZ) + cam.Y)
 
         If standalone = False Then
             dst1.Circle(markerLeft, task.dotSize, cv.Scalar.Red, -1, task.lineType)
@@ -403,15 +399,13 @@ Public Class PointCloud_ColorizeTop
 
         Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
         If standalone Then imu.Run()
-        If zRotateSlider.Value <> 0 Then
-            Dim offset = Math.Sin(task.angleZ) * topLen
-            If task.angleZ > 0 Then
-                markerLeft.X = markerLeft.X - offset
-                markerRight.X = markerRight.X + offset
-            Else
-                markerLeft.X = markerLeft.X + offset
-                markerRight.X = markerRight.X - offset
-            End If
+        Dim offset = Math.Sin(task.angleZ) * topLen
+        If task.angleZ > 0 Then
+            markerLeft.X = markerLeft.X - offset
+            markerRight.X = markerRight.X + offset
+        Else
+            markerLeft.X = markerLeft.X + offset
+            markerRight.X = markerRight.X - offset
         End If
 
         ' draw the arc enclosing the camera FOV
