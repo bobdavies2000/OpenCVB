@@ -24,7 +24,6 @@ Public Class Salience_Basics_CPP
     Public Sub New()
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders = New OptionsSliders
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Salience numScales", 1, 6, 6)
         End If

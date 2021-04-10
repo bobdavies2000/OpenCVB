@@ -297,11 +297,11 @@ Public Class PointCloud_ColorizeSide
         Dim markerLeft = New cv.Point(marker.X, cam.Y - marker.Y)
         Dim markerRight = New cv.Point(marker.X, cam.Y + marker.Y)
 
-        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
-        Static xRotateSlider = findSlider("Amount to rotate pointcloud around X-axis (degrees)")
+        Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
         If standalone Then imu.Run()
         Dim offset = Math.Sin(task.angleX) * marker.Y
-        If xCheckbox.checked Then
+        If zCheckbox.checked Then
             If task.angleX > 0 Then
                 markerLeft.Y = markerLeft.Y - offset
                 markerRight.Y = markerRight.Y + offset
@@ -311,9 +311,9 @@ Public Class PointCloud_ColorizeSide
             End If
         End If
 
-        Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
-        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
-        If zCheckbox.checked Then
+        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
+        Static xRotateSlider = findSlider("Amount to rotate pointcloud around X-axis (degrees)")
+        If xCheckbox.Checked Then
             markerLeft = New cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y) ' Change the origin
             markerLeft = New cv.Point(markerLeft.X * Math.Cos(task.angleZ) - markerLeft.Y * Math.Sin(task.angleZ), ' rotate around x-axis using angleZ
                                               markerLeft.Y * Math.Cos(task.angleZ) + markerLeft.X * Math.Sin(task.angleZ))

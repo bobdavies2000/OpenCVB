@@ -987,14 +987,12 @@ Public Class Histogram_TopView2D
 
         cmat = New PointCloud_ColorizeTop
         gCloud = New Depth_PointCloud_IMU
-        If standalone Then task.viewOptions.sliders.show()
 
         label1 = "XZ (Top View)"
         task.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        If standalone Then task.viewOptions.run()
 
         gCloud.src = src
         If gCloud.src.Type <> cv.MatType.CV_32FC3 Then gCloud.src = task.pointCloud.Clone
@@ -1037,15 +1035,12 @@ Public Class Histogram_SideView2D
 
         cmat = New PointCloud_ColorizeSide
         gCloud = New Depth_PointCloud_IMU
-        ' If standalone Or task.intermediateReview = caller Then task.yRotateSlider.Value = 1
-        If standalone Then task.viewOptions.sliders.show()
 
         label1 = "ZY (Side View)"
         task.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        If standalone Then task.viewOptions.run()
 
         gCloud.src = src
         gCloud.Run()
