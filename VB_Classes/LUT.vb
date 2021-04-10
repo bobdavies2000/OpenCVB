@@ -1,6 +1,51 @@
 Imports cv = OpenCvSharp
 Public Class LUT_Basics
     Inherits VBparent
+    Public nSeg As Integer
+    Public Sub New()
+        initParent()
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Number of LUT Segments", 2, 100, 10)
+        End If
+
+        task.desc = "Divide the image into n-segments controlled with a slider."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+
+        Static segment() As Integer
+        Static nSegSlider = findSlider("Number of LUT Segments")
+        Static myLut As New cv.Mat(1, 256, cv.MatType.CV_8U)
+        Dim segments = nSegSlider.value
+        If segments <> nSeg Then
+            nSeg = segments
+            Dim incr = 255 / nSeg
+            ReDim segment(nSeg)
+            For i = 1 To nSeg - 1
+                segment(i) = i * incr
+            Next
+            segment(segment.Count - 1) = 255
+            Dim splitIndex As Integer
+            For i = 0 To 255
+                myLut.Set(Of Byte)(0, i, segment(splitIndex))
+                If i >= segment(splitIndex) Then splitIndex += 1
+            Next
+        End If
+        Dim gray = src
+        If gray.Channels <> 1 Then gray = gray.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = gray.LUT(myLut)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class LUT_Sliders
+    Inherits VBparent
     Public Sub New()
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -165,7 +210,6 @@ Public Class LUT_RGBDepth
     Public Sub New()
         initParent()
         lut = New LUT_Basics
-        label1 = "Depth data in 5 LUT entries"
         task.desc = "Use a LUT on the RGBDepth to segregate depth data."
     End Sub
     Public Sub Run()
@@ -173,5 +217,30 @@ Public Class LUT_RGBDepth
         lut.src = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         lut.Run()
         dst1 = lut.dst1
+        label1 = "Depth data in " + CStr(lut.nSeg) + " LUT entries"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class LUT_Depth32f
+    Inherits VBparent
+    Dim lut As LUT_Basics
+    Public Sub New()
+        initParent()
+        lut = New LUT_Basics
+        task.desc = "Use a LUT on the 32-bit depth to segregate depth data."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        lut.src = task.depth32f.Normalize(255).ConvertScaleAbs(255)
+        lut.Run()
+        dst1 = lut.dst1
+        label1 = "Depth data in " + CStr(lut.nSeg) + " LUT entries"
     End Sub
 End Class

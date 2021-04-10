@@ -243,8 +243,6 @@ Public Class FeatureLess_Highlights
     Public Sub New()
         initParent()
         fLessP = New FeatureLess_PointTracker()
-        Dim randomRadio = findRadio("Random - use slider to adjust")
-        randomRadio.Checked = True
         addW = New AddWeighted_Basics()
         task.desc = "Highlight the featureless regions in an RGB image"
     End Sub

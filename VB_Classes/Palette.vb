@@ -11,8 +11,8 @@ Public Class Palette_Basics
         initParent()
         radioFrm = findfrm(caller + " Radio Options")
         If radioFrm Is Nothing Then
-            radio.Setup(caller, 21)
-            For i = 0 To radio.check.Length - 1
+            radio.Setup(caller, mapNames.Count)
+            For i = 0 To mapNames.Count - 1
                 radio.check(i).Text = mapNames(i)
                 If mapNames(i) = "Hsv" Then radio.check(i).Checked = True
             Next
@@ -22,7 +22,7 @@ Public Class Palette_Basics
     End Sub
     Public Function checkRadios() As cv.ColormapTypes
         Dim scheme As cv.ColormapTypes = 0
-        For i = 0 To radioFrm.check.Length - 1
+        For i = 0 To mapNames.Count - 1
             If radioFrm.check(i).Checked Then
                 scheme = Choose(i + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone, cv.ColormapTypes.Cividis, cv.ColormapTypes.Cool,
                                            cv.ColormapTypes.Hot, cv.ColormapTypes.Hsv, cv.ColormapTypes.Inferno, cv.ColormapTypes.Jet,
@@ -136,7 +136,7 @@ Module Palette_Custom_Module
     Public Sub Palette_Custom(img As IntPtr, map As IntPtr, dst1 As IntPtr, rows As Integer, cols As Integer, channels As Integer)
     End Sub
     Public mapNames() As String = {"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
-                                   "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "TwilightShifted", "Viridis", "Winter", "Random - use slider to adjust"}
+                                   "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "TwilightShifted", "Viridis", "Winter"}
     Public Function Palette_Custom_Apply(src As cv.Mat, customColorMap As cv.Mat) As cv.Mat
         ' the VB.Net interface to OpenCV doesn't support adding a random lookup table to ApplyColorMap API.  It is available in C++ though.
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
