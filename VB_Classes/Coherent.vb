@@ -68,8 +68,6 @@ Public Class Coherent_FloodFill
         initParent()
         knn = New KNN_1_to_1
         basics = New FloodFill_Basics
-        Dim thresholdSlider = findSlider("Threshold in camera motion in radians X100")
-        thresholdSlider.Value = 2
         task.desc = "Floodfill an image and make the colors consistent."
     End Sub
     Public Sub Run()
