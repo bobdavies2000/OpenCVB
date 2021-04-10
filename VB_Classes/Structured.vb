@@ -96,8 +96,8 @@ Public Class Structured_MultiSliceH
     Public sliceMask As cv.Mat
     Public Sub New()
         initParent()
-        side2D = New Histogram_SideData()
-        structD = New Structured_SliceH()
+        side2D = New Histogram_SideData
+        structD = New Structured_SliceH
 
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
@@ -142,12 +142,12 @@ End Class
 Public Class Structured_MultiSliceV
     Inherits VBparent
     Public top2D As Histogram_TopData
-    Public structD As Structured_SliceH
+    Public structD As Structured_SliceV
     Public Sub New()
         initParent()
 
-        top2D = New Histogram_TopData()
-        structD = New Structured_SliceH()
+        top2D = New Histogram_TopData
+        structD = New Structured_SliceV
 
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
@@ -348,8 +348,7 @@ Public Class Structured_SliceXPlot
         dst2 = structD.dst2
         multi.Run()
 
-        Static offsetSlider = findSlider("Offset for the vertical slice")
-        Dim col = CInt(offsetSlider.value)
+        Dim col = CInt(structD.offsetSlider.Value)
 
         Dim cushion = cushionSlider.Value
         Dim rect = New cv.Rect(col, 0, If(col + cushion >= dst2.Width, dst2.Width - col, cushion), dst2.Height - 1)
@@ -488,6 +487,26 @@ Public Class Structured_LinearizeFloor
 End Class
 
 
+Public Class Structured_SliceOptions
+    Inherits VBparent
+    Public Sub New()
+        initParent()
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 10, 1)
+            sliders.setupTrackBar(1, "Slice step size in pixels (multi-slice option only)", 1, 100, 20)
+            sliders.setupTrackBar(2, "Standalone only horizontal slice offset", 0, src.Width - 1, src.Width / 2)
+            sliders.setupTrackBar(3, "Standalone only vertical slice offset", 0, src.Width - 1, src.Width / 2)
+        End If
+
+        task.desc = "Structured Slice options"
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        task.trueText("This algorithm is used to share the horizontal and vertical slice options.")
+    End Sub
+End Class
 
 
 
@@ -499,21 +518,16 @@ Public Class Structured_SliceH
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
     Public sliceMask As cv.Mat
+    Dim sliceOptions As Structured_SliceOptions
     Public yPlaneOffset As Integer
     Public Sub New()
         initParent()
         side2D = New Histogram_SideData()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 100, 1)
-            sliders.setupTrackBar(1, "Offset for the horizontal slice", 0, src.Height - 1, src.Height / 2)
-            sliders.setupTrackBar(2, "Offset for the vertical slice", 0, src.Width - 1, src.Width / 2)
-            sliders.setupTrackBar(3, "Slice step size in pixels (multi-slice option only)", 1, 100, 20)
-        End If
+        sliceOptions = New Structured_SliceOptions
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
-        offsetSlider = findSlider("Offset for the horizontal slice")
+        offsetSlider = findSlider("Standalone only horizontal slice offset")
 
         label2 = "Yellow bar is ceiling.  Yellow line is camera level."
         task.desc = "Find and isolate planes (floor and ceiling) in a side view histogram."
@@ -568,13 +582,15 @@ Public Class Structured_SliceV
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
     Public sliceMask As cv.Mat
+    Dim sliceOptions As Structured_SliceOptions
     Public Sub New()
         initParent()
         top2D = New Histogram_TopData()
-        sideStruct = New Structured_SliceH()
+
+        sliceOptions = New Structured_SliceOptions
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
-        offsetSlider = findSlider("Offset for the vertical slice")
+        offsetSlider = findSlider("Standalone only vertical slice offset")
         offsetSlider.Maximum = src.Width - 1
         offsetSlider.Value = src.Width / 2
 
@@ -624,27 +640,20 @@ End Class
 
 
 
-
-
-
-
-
-
 Public Class Structured_SliceVStable
     Inherits VBparent
     Public top2D As Histogram_TopData
-    Dim sideStruct As Structured_SliceH
+    Dim structD As Structured_SliceV
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
     Public sliceMask As cv.Mat
     Public Sub New()
         initParent()
-        top2D = New Histogram_TopData()
-        sideStruct = New Structured_SliceH()
+        top2D = New Histogram_TopData
+        structD = New Structured_SliceV
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
-        offsetSlider = findSlider("Offset for the vertical slice")
-        offsetSlider.Value = src.Width / 2
+        structD.offsetSlider.Value = src.Width / 2
 
         task.desc = "Find and isolate planes using the top view histogram data"
     End Sub
