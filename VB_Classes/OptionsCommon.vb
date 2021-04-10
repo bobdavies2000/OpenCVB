@@ -37,45 +37,16 @@ Public Class OptionsCommon_Depth
             task.depthOptionsChanged = False
         End If
 
+        If gOptions.AntiAlias.Checked Then task.lineType = cv.LineTypes.AntiAlias
+        If gOptions.Link4.Checked Then task.lineType = cv.LineTypes.Link4
+        If gOptions.Link8.Checked Then task.lineType = cv.LineTypes.Link8
+
         If task.depth32f.Size <> src.Size Then task.depth32f = task.depth32f.Resize(src.Size, 0, 0, cv.InterpolationFlags.Nearest)
         If task.pointCloud.Size <> src.Size Then task.pointCloud = task.pointCloud.Resize(src.Size, 0, 0, cv.InterpolationFlags.Nearest)
         cv.Cv2.InRange(task.depth32f, task.minDepth, task.maxDepth, task.depthMask)
         cv.Cv2.BitwiseNot(task.depthMask, task.noDepthMask)
         dst1 = task.depth32f.SetTo(0, task.noDepthMask)
         If task.pointCloud.Width = task.noDepthMask.Width Then task.pointCloud.SetTo(0, task.noDepthMask) ' reflect the range bounds into the task.pointcloud as well.
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class OptionsCommon_LineType
-    Inherits VBparent
-    Public Sub New()
-        initParent()
-        task.callTrace.Clear() ' special line to clear the tree view otherwise OptionsCommon_LineType is standalone.
-        standalone = False
-
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
-            radio.check(0).Text = "AntiAlias"
-            radio.check(1).Text = "Link4"
-            radio.check(2).Text = "Link8"
-            radio.check(0).Checked = True
-        End If
-        task.desc = "Control the line type in use by all algorithms."
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
-        Static AntiAliasRadio = findRadio("AntiAlias")
-        Static Link4Radio = findRadio("Link4")
-        Static Link8Radio = findRadio("Link8")
-        If AntiAliasRadio.checked Then task.lineType = cv.LineTypes.AntiAlias
-        If Link4Radio.checked Then task.lineType = cv.LineTypes.Link4
-        If Link8Radio.checked Then task.lineType = cv.LineTypes.Link8
     End Sub
 End Class
 

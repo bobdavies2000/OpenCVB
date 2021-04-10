@@ -38,12 +38,16 @@ Partial Class OptionsGlobal
         Me.thresholdSlider = New System.Windows.Forms.TrackBar()
         Me.Label6 = New System.Windows.Forms.Label()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.Link8 = New System.Windows.Forms.RadioButton()
+        Me.Link4 = New System.Windows.Forms.RadioButton()
+        Me.AntiAlias = New System.Windows.Forms.RadioButton()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.MaxRange, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MinRange, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox1.SuspendLayout()
         CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.thresholdSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox2.SuspendLayout()
         Me.SuspendLayout()
         '
         'MinMaxDepth
@@ -195,12 +199,48 @@ Partial Class OptionsGlobal
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.Link8)
+        Me.GroupBox2.Controls.Add(Me.Link4)
+        Me.GroupBox2.Controls.Add(Me.AntiAlias)
         Me.GroupBox2.Location = New System.Drawing.Point(858, 22)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(738, 171)
+        Me.GroupBox2.Size = New System.Drawing.Size(176, 171)
         Me.GroupBox2.TabIndex = 2
         Me.GroupBox2.TabStop = False
-        Me.GroupBox2.Text = "GroupBox2"
+        Me.GroupBox2.Text = "Line Types"
+        '
+        'Link8
+        '
+        Me.Link8.AutoSize = True
+        Me.Link8.Location = New System.Drawing.Point(23, 115)
+        Me.Link8.Name = "Link8"
+        Me.Link8.Size = New System.Drawing.Size(72, 24)
+        Me.Link8.TabIndex = 2
+        Me.Link8.TabStop = True
+        Me.Link8.Text = "Link8"
+        Me.Link8.UseVisualStyleBackColor = True
+        '
+        'Link4
+        '
+        Me.Link4.AutoSize = True
+        Me.Link4.Location = New System.Drawing.Point(23, 76)
+        Me.Link4.Name = "Link4"
+        Me.Link4.Size = New System.Drawing.Size(72, 24)
+        Me.Link4.TabIndex = 1
+        Me.Link4.TabStop = True
+        Me.Link4.Text = "Link4"
+        Me.Link4.UseVisualStyleBackColor = True
+        '
+        'AntiAlias
+        '
+        Me.AntiAlias.AutoSize = True
+        Me.AntiAlias.Location = New System.Drawing.Point(23, 40)
+        Me.AntiAlias.Name = "AntiAlias"
+        Me.AntiAlias.Size = New System.Drawing.Size(96, 24)
+        Me.AntiAlias.TabIndex = 0
+        Me.AntiAlias.TabStop = True
+        Me.AntiAlias.Text = "AntiAlias"
+        Me.AntiAlias.UseVisualStyleBackColor = True
         '
         'OptionsGlobal
         '
@@ -220,6 +260,8 @@ Partial Class OptionsGlobal
         Me.GroupBox1.PerformLayout()
         CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.thresholdSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox2.ResumeLayout(False)
+        Me.GroupBox2.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -240,4 +282,7 @@ Partial Class OptionsGlobal
     Friend WithEvents thresholdSlider As Windows.Forms.TrackBar
     Friend WithEvents Label6 As Windows.Forms.Label
     Friend WithEvents GroupBox2 As Windows.Forms.GroupBox
+    Friend WithEvents Link8 As Windows.Forms.RadioButton
+    Friend WithEvents Link4 As Windows.Forms.RadioButton
+    Friend WithEvents AntiAlias As Windows.Forms.RadioButton
 End Class

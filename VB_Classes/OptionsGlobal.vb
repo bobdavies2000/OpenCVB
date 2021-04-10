@@ -18,12 +18,19 @@ Public Class OptionsGlobal
 
         IMUmotionSlider.Value = GetSetting("OpenCVB", "IMUmotionSlider", "IMUmotionSlider", 1)
         IMUmotion.Text = CStr(IMUmotionSlider.Value)
+
+        AntiAlias.Checked = GetSetting("OpenCVB", "AntiAlias", "AntiAlias", True)
+        Link4.Checked = GetSetting("OpenCVB", "Link4", "Link4", False)
+        Link8.Checked = GetSetting("OpenCVB", "Link8", "Link8", False)
     End Sub
     Private Sub OptionsGlobal_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         SaveSetting("OpenCVB", "MinRangeDepth", "MinRangeDepth", MinRange.Value)
         SaveSetting("OpenCVB", "MaxRangeDepth", "MaxRangeDepth", MaxRange.Value)
         SaveSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", thresholdSlider.Value)
         SaveSetting("OpenCVB", "MaxRangeDepth", "MaxRangeDepth", MaxRange.Value)
+        SaveSetting("OpenCVB", "AntiAlias", "AntiAlias", AntiAlias.Checked)
+        SaveSetting("OpenCVB", "Link4", "Link4", Link4.Checked)
+        SaveSetting("OpenCVB", "Link8", "Link8", Link8.Checked)
     End Sub
     Private Sub thresholdSlider_Scroll(sender As Object, e As EventArgs) Handles thresholdSlider.Scroll
         threshold.Text = CStr(thresholdSlider.Value)
