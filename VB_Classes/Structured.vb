@@ -339,7 +339,7 @@ Public Class Structured_SliceXPlot
         multi = New Structured_MultiSlice()
         structD = New Structured_SliceV()
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
-        cushionSlider.Value = 25
+        cushionSlider.Value = cushionSlider.Maximum
         task.desc = "Find any plane around a peak value in the top-down histogram"
     End Sub
     Public Sub Run()
