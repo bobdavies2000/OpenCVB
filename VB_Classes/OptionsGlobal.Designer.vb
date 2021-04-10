@@ -37,6 +37,7 @@ Partial Class OptionsGlobal
         Me.threshold = New System.Windows.Forms.Label()
         Me.thresholdSlider = New System.Windows.Forms.TrackBar()
         Me.Label6 = New System.Windows.Forms.Label()
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.MaxRange, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MinRange, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -192,11 +193,21 @@ Partial Class OptionsGlobal
         Me.Label6.TabIndex = 0
         Me.Label6.Text = "Top and Side Views Histogram threshold"
         '
+        'GroupBox2
+        '
+        Me.GroupBox2.Location = New System.Drawing.Point(858, 22)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(738, 171)
+        Me.GroupBox2.TabIndex = 2
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "GroupBox2"
+        '
         'OptionsGlobal
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1700, 822)
+        Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.MinMaxDepth)
         Me.Name = "OptionsGlobal"
@@ -228,4 +239,5 @@ Partial Class OptionsGlobal
     Friend WithEvents threshold As Windows.Forms.Label
     Friend WithEvents thresholdSlider As Windows.Forms.TrackBar
     Friend WithEvents Label6 As Windows.Forms.Label
+    Friend WithEvents GroupBox2 As Windows.Forms.GroupBox
 End Class
