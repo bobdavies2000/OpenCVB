@@ -14,11 +14,11 @@ Public Class Encode_Basics
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        Dim buf(src.Width * src.Height * src.ElemSize) As Byte
-        Dim encodeParams() As integer = {options.getEncodeParameter(), options.qualityLevel}
+        Dim encodeParams() As Integer = {options.getEncodeParameter(), options.qualityLevel}
 
-        cv.Cv2.ImEncode(".jpg", src, buf, encodeParams)
-        dst2 = cv.Cv2.ImDecode(buf, cv.ImreadModes.AnyColor)
+        Dim buf() = src.ImEncode(".jpg", encodeParams)
+        Dim image = New cv.Mat(buf.Count, 1, cv.MatType.CV_8U, buf)
+        dst2 = cv.Cv2.ImDecode(image, cv.ImreadModes.AnyColor)
 
         Dim output As New cv.Mat
         cv.Cv2.Absdiff(src, dst2, output)
@@ -28,7 +28,7 @@ Public Class Encode_Basics
 
         output.ConvertTo(dst1, cv.MatType.CV_8UC3, scaleSlider.Value)
         Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)
-        label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.1%") + ")"
+        label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.0%") + ")"
     End Sub
 End Class
 
@@ -76,13 +76,13 @@ Public Class Encode_Options
     End Function
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        Dim buf(src.Width * src.Height * src.ElemSize) As Byte
 
         Dim fileExtension = ".jpg"
         Dim encodeParams() As integer = {getEncodeParameter(), qualityLevel}
 
-        cv.Cv2.ImEncode(fileExtension, src, buf, encodeParams)
-        dst2 = cv.Cv2.ImDecode(buf, cv.ImreadModes.AnyColor)
+        Dim buf() = src.ImEncode(".jpg", encodeParams)
+        Dim image = New cv.Mat(buf.Count, 1, cv.MatType.CV_8U, buf)
+        dst2 = cv.Cv2.ImDecode(image, cv.ImreadModes.AnyColor)
 
         Dim output As New cv.Mat
         cv.Cv2.Absdiff(src, dst2, output)
