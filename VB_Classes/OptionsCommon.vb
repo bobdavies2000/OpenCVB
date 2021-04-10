@@ -37,9 +37,7 @@ Public Class OptionsCommon_Depth
             task.depthOptionsChanged = False
         End If
 
-        If gOptions.AntiAlias.Checked Then task.lineType = cv.LineTypes.AntiAlias
-        If gOptions.Link4.Checked Then task.lineType = cv.LineTypes.Link4
-        If gOptions.Link8.Checked Then task.lineType = cv.LineTypes.Link8
+        task.lineType = cv.LineTypes.AntiAlias ' cv.LineTypes.Link4 or cv.LineTypes.Link8
 
         If task.depth32f.Size <> src.Size Then task.depth32f = task.depth32f.Resize(src.Size, 0, 0, cv.InterpolationFlags.Nearest)
         If task.pointCloud.Size <> src.Size Then task.pointCloud = task.pointCloud.Resize(src.Size, 0, 0, cv.InterpolationFlags.Nearest)
