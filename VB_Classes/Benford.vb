@@ -179,9 +179,9 @@ Public Class Benford_JPEG
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        Dim jpeg = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, sliders.trackbar(0).Value})
+        Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, sliders.trackbar(0).Value})
         benford.src = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
-        dst1 = cv.Cv2.ImDecode(jpeg, cv.ImreadModes.Color)
+        dst1 = src
         benford.Run()
         dst2 = benford.dst1
         label2 = benford.label2
