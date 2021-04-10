@@ -412,13 +412,14 @@ Public Class Structured_LinearizeFloor
         dst1 = floor.dst1
         dst2 = floor.dst2
         sliceMask = floor.structD.sliceMask
-        If sliceMask.CountNonZero() > 0 Then
-            Dim nonFloorMask As New cv.Mat
-            cv.Cv2.BitwiseNot(sliceMask, nonFloorMask)
-            imuPC = task.pointCloud.Clone
-            imuPointCloud = imuPC.Clone
-            imuPC.SetTo(0, nonFloorMask)
 
+        Dim nonFloorMask As New cv.Mat
+        cv.Cv2.BitwiseNot(sliceMask, nonFloorMask)
+        imuPC = task.pointCloud.Clone
+        imuPointCloud = imuPC.Clone
+        imuPC.SetTo(0, nonFloorMask)
+
+        If sliceMask.CountNonZero() > 0 Then
             Dim split = imuPC.Split()
             Static xCheck = findCheckBox("Smooth in X-direction")
             If xCheck.Checked Then

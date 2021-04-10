@@ -495,44 +495,44 @@ End Class
 
 
 
-Public Class OpenGL_FloorTexture
-    Inherits VBparent
-    Dim floor As OpenGL_FloorPlane
-    Dim shuffle As Texture_Shuffle
-    Public Sub New()
-        initParent()
-        shuffle = New Texture_Shuffle()
-        floor = New OpenGL_FloorPlane()
-        task.desc = "Texture the plane of the floor with a good sample of the texture from the mask"
-    End Sub
-    Public Sub Run()
-        If task.intermediateReview = caller Then task.intermediateObject = Me
+'Public Class OpenGL_FloorTexture
+'    Inherits VBparent
+'    Dim floor As OpenGL_FloorPlane
+'    Dim shuffle As Texture_Shuffle
+'    Public Sub New()
+'        initParent()
+'        shuffle = New Texture_Shuffle()
+'        floor = New OpenGL_FloorPlane()
+'        task.desc = "Texture the plane of the floor with a good sample of the texture from the mask"
+'    End Sub
+'    Public Sub Run()
+'        If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        If task.parms.IMU_Present Then
-            floor.plane.src = src
-            floor.plane.Run()
-            dst1 = floor.plane.dst1
-            dst2 = floor.plane.dst2
+'        If task.parms.IMU_Present Then
+'            floor.plane.src = src
+'            floor.plane.Run()
+'            dst1 = floor.plane.dst1
+'            dst2 = floor.plane.dst2
 
-            shuffle.src = floor.plane.sliceMask
-            shuffle.Run()
-            floor.ogl.textureInput = shuffle.rgbaTexture
+'            shuffle.src = floor.plane.sliceMask
+'            shuffle.Run()
+'            floor.ogl.textureInput = shuffle.rgbaTexture
 
-            Dim data = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
-            data.Set(Of Single)(0, 0, task.maxZ)
-            data.Set(Of Single)(1, 0, 0)
-            data.Set(Of Single)(2, 0, 0)
-            data.Set(Of Single)(3, 0, floor.plane.floor.floorYplane)
-            floor.ogl.dataInput = data
-            floor.ogl.pointCloudInput = floor.plane.imuPointCloud
-            floor.ogl.pointCloudInput.SetTo(0, floor.plane.sliceMask)
-            floor.ogl.src = src
-            floor.ogl.Run()
-        Else
-            task.trueText("The IMU is not working or not available.")
-        End If
-    End Sub
-End Class
+'            Dim data = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
+'            data.Set(Of Single)(0, 0, task.maxZ)
+'            data.Set(Of Single)(1, 0, 0)
+'            data.Set(Of Single)(2, 0, 0)
+'            data.Set(Of Single)(3, 0, floor.plane.floor.floorYplane)
+'            floor.ogl.dataInput = data
+'            floor.ogl.pointCloudInput = floor.plane.imuPointCloud
+'            floor.ogl.pointCloudInput.SetTo(0, floor.plane.sliceMask)
+'            floor.ogl.src = src
+'            floor.ogl.Run()
+'        Else
+'            task.trueText("The IMU is not working or not available.")
+'        End If
+'    End Sub
+'End Class
 
 
 
