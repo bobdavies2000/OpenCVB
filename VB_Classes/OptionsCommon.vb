@@ -56,91 +56,66 @@ End Class
 
 Public Class OptionsCommon_Histogram
     Inherits VBparent
-    Dim sideFrustrumSlider As Windows.Forms.TrackBar
-    Dim topFrustrumSlider As Windows.Forms.TrackBar
-    Dim cameraYSlider As Windows.Forms.TrackBar
-    Dim cameraXSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
         task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone.
 
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 200, 57)
-        sliders.setupTrackBar(1, "TopView Frustrum adjustment", 1, 200, 57)
-        sliders.setupTrackBar(2, "SideCameraPoint adjustment", -100, 100, 0)
-        sliders.setupTrackBar(3, "TopCameraPoint adjustment", -10, 10, 0)
-
-        sideFrustrumSlider = sliders.trackbar(0) ' findSlider("SideView Frustrum adjustment")
-        topFrustrumSlider = sliders.trackbar(1) 'findSlider("TopView Frustrum adjustment")
-        cameraYSlider = sliders.trackbar(2) ' findSlider("SideCameraPoint adjustment")
-        cameraXSlider = sliders.trackbar(3) 'findSlider("TopCameraPoint adjustment")
+        Dim sideFrustrumSetting = 57
+        Dim topFrustrumSetting = 57
+        Dim cameraYSetting = 0
+        Dim cameraXSetting = 0
 
         ' The specification for each camera spells out the FOV angle
         ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.
         Select Case task.parms.cameraName
             Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
-                sideFrustrumSlider.Value = 58
-                topFrustrumSlider.Value = 180
-                cameraXSlider.Value = 0
-                cameraYSlider.Value = If(task.resolutionIndex = 1, -1, -2)
+                sideFrustrumSetting = 58
+                topFrustrumSetting = 180
+                cameraXSetting = 0
+                cameraYSetting = If(task.resolutionIndex = 1, -1, -2)
             Case VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2
-                sideFrustrumSlider.Value = 53
-                topFrustrumSlider.Value = 162
-                cameraXSlider.Value = If(task.resolutionIndex = 3, 38, 13)
-                cameraYSlider.Value = -3
+                sideFrustrumSetting = 53
+                topFrustrumSetting = 162
+                cameraXSetting = If(task.resolutionIndex = 3, 38, 13)
+                cameraYSetting = -3
             Case VB_Classes.ActiveTask.algParms.camNames.MyntD1000
-                sideFrustrumSlider.Value = 50
-                topFrustrumSlider.Value = 105
-                cameraXSlider.Value = If(task.resolutionIndex = 1, 4, 8)
-                cameraYSlider.Value = If(task.resolutionIndex = 3, -8, -3)
+                sideFrustrumSetting = 50
+                topFrustrumSetting = 105
+                cameraXSetting = If(task.resolutionIndex = 1, 4, 8)
+                cameraYSetting = If(task.resolutionIndex = 3, -8, -3)
             Case VB_Classes.ActiveTask.algParms.camNames.D435i
                 If src.Width = 640 Then
-                    sideFrustrumSlider.Value = 75
-                    topFrustrumSlider.Value = 101
-                    cameraXSlider.Value = 0
-                    cameraYSlider.Value = 0
+                    sideFrustrumSetting = 75
+                    topFrustrumSetting = 101
+                    cameraXSetting = 0
+                    cameraYSetting = 0
                 Else
-                    sideFrustrumSlider.Value = 57
-                    topFrustrumSlider.Value = 175
-                    cameraXSlider.Value = 0
-                    cameraYSlider.Value = 0
+                    sideFrustrumSetting = 57
+                    topFrustrumSetting = 175
+                    cameraXSetting = 0
+                    cameraYSetting = 0
                 End If
             Case VB_Classes.ActiveTask.algParms.camNames.D455
                 If src.Width = 640 Then
-                    sideFrustrumSlider.Value = 86
-                    topFrustrumSlider.Value = 113
-                    cameraXSlider.Value = 1
-                    cameraYSlider.Value = -1
+                    sideFrustrumSetting = 86
+                    topFrustrumSetting = 113
+                    cameraXSetting = 1
+                    cameraYSetting = -1
                 Else
-                    sideFrustrumSlider.Value = 58
-                    topFrustrumSlider.Value = 184
-                    cameraXSlider.Value = 0
-                    cameraYSlider.Value = -3
+                    sideFrustrumSetting = 58
+                    topFrustrumSetting = 184
+                    cameraXSetting = 0
+                    cameraYSetting = -3
                 End If
         End Select
 
-        task.sideFrustrumAdjust = task.maxZ * sideFrustrumSlider.Value / 100 / 2
-        task.topFrustrumAdjust = task.maxZ * topFrustrumSlider.Value / 100 / 2
-        task.sideCameraPoint = New cv.Point(0, CInt(src.Height / 2 + cameraYSlider.Value))
-        task.topCameraPoint = New cv.Point(CInt(src.Width / 2 + cameraXSlider.Value), CInt(src.Height))
-        sliders.Hide()
+        task.sideFrustrumAdjust = task.maxZ * sideFrustrumSetting / 100 / 2
+        task.topFrustrumAdjust = task.maxZ * topFrustrumSetting / 100 / 2
+        task.sideCameraPoint = New cv.Point(0, CInt(src.Height / 2 + cameraYSetting))
+        task.topCameraPoint = New cv.Point(CInt(src.Width / 2 + cameraXSetting), CInt(src.Height))
         task.desc = "The options for the side view are shared with this algorithm"
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-
-        task.sideFrustrumAdjust = task.maxZ * sideFrustrumSlider.Value / 100 / 2
-        task.topFrustrumAdjust = task.maxZ * topFrustrumSlider.Value / 100 / 2
-        task.sideCameraPoint = New cv.Point(0, CInt(src.Height / 2 + cameraYSlider.Value))
-        task.topCameraPoint = New cv.Point(CInt(src.Width / 2 + cameraXSlider.Value), CInt(src.Height))
-
-        If sliders.Visible = False Then
-            task.trueText("This algorithm was created to tune the frustrum and camera locations." + vbCrLf +
-                          "Without these tuning parameters the side and top views would not be correct." + vbCrLf +
-                          "To see how these adjustments work and to add a new camera, " + vbCrLf +
-                          "use the Histogram_TopView2D or Histogram_SideView2D algorithms." + vbCrLf +
-                          "For new cameras, make the adjustments needed, note the value, and update " + vbCrLf +
-                          "the Select statement in the constructor for OptionsCommon_Histogram.")
-        End If
     End Sub
 End Class

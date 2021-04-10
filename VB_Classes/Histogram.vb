@@ -1009,12 +1009,10 @@ Public Class Histogram_TopView2D
         histOutput = originalHistOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary)
         dst1 = histOutput.Clone
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
-        If standalone Or task.intermediateReview = caller Then
-            dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            cmat.src = dst2
-            cmat.Run()
-            dst2 = cmat.dst1
-        End If
+        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cmat.src = dst2
+        cmat.Run()
+        dst2 = cmat.dst1
     End Sub
 End Class
 
@@ -1060,12 +1058,10 @@ Public Class Histogram_SideView2D
         histOutput = originalHistOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         histOutput.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
-        If standalone Or task.intermediateReview = caller Then
-            dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            cmat.src = dst2
-            cmat.Run()
-            dst2 = cmat.dst1
-        End If
+        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cmat.src = dst2
+        cmat.Run()
+        dst2 = cmat.dst1
     End Sub
 End Class
 
@@ -1549,6 +1545,68 @@ Public Class Histogram_DepthClusters
         If standalone Or task.intermediateReview = caller Then
             label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"
             label2 = "Backprojection of " + CStr(valleys.rangeBoundaries.Count) + " histogram clusters"
+        End If
+    End Sub
+End Class
+
+
+
+
+
+Public Class Histogram_Frustrum
+    Inherits VBparent
+    Dim sideFrustrumSlider As Windows.Forms.TrackBar
+    Dim topFrustrumSlider As Windows.Forms.TrackBar
+    Dim cameraXSlider As Windows.Forms.TrackBar
+    Dim cameraYSlider As Windows.Forms.TrackBar
+    Dim top2d As Histogram_TopView2D
+    Dim side2d As Histogram_SideView2D
+    Public Sub New()
+        initParent()
+
+        top2d = New Histogram_TopView2D
+        side2d = New Histogram_SideView2D
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 200, 57)
+            sliders.setupTrackBar(1, "TopView Frustrum adjustment", 1, 200, 57)
+            sliders.setupTrackBar(2, "TopCameraPoint adjustment", -10, 10, 0)
+            sliders.setupTrackBar(3, "SideCameraPoint adjustment", -100, 100, 0)
+        End If
+
+        sideFrustrumSlider = findSlider("SideView Frustrum adjustment")
+        topFrustrumSlider = findSlider("TopView Frustrum adjustment")
+        cameraXSlider = findSlider("TopCameraPoint adjustment")
+        cameraYSlider = findSlider("SideCameraPoint adjustment")
+
+        sideFrustrumSlider.Value = 100 * 2 * task.sideFrustrumAdjust / task.maxZ
+        topFrustrumSlider.Value = 100 * 2 * task.topFrustrumAdjust / task.maxZ
+        cameraXSlider.Value = task.topCameraPoint.X - src.Width / 2
+        cameraYSlider.Value = task.sideCameraPoint.Y - src.Height / 2
+        task.desc = "The global options for the side and top view.  See OptionCommon_Histogram to make settings permanent."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+
+        top2d.Run()
+        dst1 = top2d.dst2
+
+        side2d.Run()
+        dst2 = side2d.dst2
+
+        task.sideFrustrumAdjust = task.maxZ * sideFrustrumSlider.Value / 100 / 2
+        task.topFrustrumAdjust = task.maxZ * topFrustrumSlider.Value / 100 / 2
+        task.sideCameraPoint = New cv.Point(0, CInt(src.Height / 2 + cameraYSlider.Value))
+        task.topCameraPoint = New cv.Point(CInt(src.Width / 2 + cameraXSlider.Value), CInt(src.Height))
+
+        If standalone Then
+            task.trueText("This algorithm was created to tune the frustrum and camera locations." + vbCrLf +
+                          "Without these tuning parameters the side and top views would not be correct." + vbCrLf +
+                          "To see how these adjustments work or to add a new camera, " + vbCrLf +
+                          "use the Histogram_TopView2D or Histogram_SideView2D algorithms." + vbCrLf +
+                          "For new cameras, make the adjustments needed, note the value, and update " + vbCrLf +
+                          "the Select statement in the constructor for OptionsCommon_Histogram.")
         End If
     End Sub
 End Class
