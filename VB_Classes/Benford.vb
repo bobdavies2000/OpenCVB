@@ -181,7 +181,7 @@ Public Class Benford_JPEG
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, sliders.trackbar(0).Value})
         benford.src = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
-        dst1 = src
+        dst1 = cv.Cv2.ImDecode(benford.src, cv.ImreadModes.Color)
         benford.Run()
         dst2 = benford.dst1
         label2 = benford.label2
@@ -212,9 +212,9 @@ Public Class Benford_JPEG99
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static qualitySlider = findSlider("JPEG Quality")
-        Dim jpeg = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, qualitySlider.Value})
+        Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, qualitySlider.Value})
         benford.src = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
-        dst1 = cv.Cv2.ImDecode(jpeg, cv.ImreadModes.Color)
+        dst1 = cv.Cv2.ImDecode(benford.src, cv.ImreadModes.Color)
         benford.Run()
         dst2 = benford.dst1
         label2 = benford.label2
