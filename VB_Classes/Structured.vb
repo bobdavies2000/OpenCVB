@@ -518,7 +518,7 @@ Public Class Structured_SliceH
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
     Public sliceMask As cv.Mat
-    Dim sliceOptions As Structured_SliceOptions
+    Public sliceOptions As Structured_SliceOptions
     Public yPlaneOffset As Integer
     Public Sub New()
         initParent()
@@ -582,7 +582,7 @@ Public Class Structured_SliceV
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
     Public sliceMask As cv.Mat
-    Dim sliceOptions As Structured_SliceOptions
+    Public sliceOptions As Structured_SliceOptions
     Public Sub New()
         initParent()
         top2D = New Histogram_TopData()
@@ -653,7 +653,8 @@ Public Class Structured_SliceVStable
         structD = New Structured_SliceV
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
-        structD.offsetSlider.Value = src.Width / 2
+        offsetSlider = structD.offsetSlider
+        offsetSlider.Value = src.Width / 2
 
         task.desc = "Find and isolate planes using the top view histogram data"
     End Sub
