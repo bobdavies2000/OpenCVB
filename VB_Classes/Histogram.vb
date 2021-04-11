@@ -1388,6 +1388,8 @@ Public Class Histogram_DepthValleys
     Dim kalman As Kalman_Basics
     Dim hist As Histogram_Depth
     Public rangeBoundaries As New List(Of cv.Point)
+    Public orderedRange As New List(Of cv.Point)
+    Public orderedColors As New List(Of Integer)
     Public sortedSizes As New List(Of Integer)
     Public palette As Palette_Basics
     Dim histSlider As Windows.Forms.TrackBar
@@ -1451,22 +1453,28 @@ Public Class Histogram_DepthValleys
         Dim startDepth = 1
         Dim startEndDepth As cv.Point
         Dim depthBoundaries As New SortedList(Of Single, cv.Point)(New CompareCounts)
+        orderedRange.Clear()
         For i = 2 To kalman.kOutput.Length - 3
             Dim prev2 = kalman.kOutput(i - 2)
             Dim prev = kalman.kOutput(i - 1)
             Dim curr = kalman.kOutput(i)
             Dim post = kalman.kOutput(i + 1)
             Dim post2 = kalman.kOutput(i + 2)
-            pointCount += kalman.kOutput(i)
-            If prev2 > 1 And prev > 1 And curr > 1 And post > 1 And post2 > 1 Then
-                If curr < (prev + prev2) / 2 And curr < (post + post2) / 2 And i * depthIncr > startDepth + depthIncr Then
-                    startEndDepth = New cv.Point(startDepth, i * depthIncr)
-                    depthBoundaries.Add(pointCount, startEndDepth)
-                    pointCount = 0
-                    startDepth = i * depthIncr + 0.1
+            pointCount += curr
+            If curr < 100 Then curr = 0 ' too small to worry about...
+            If (prev2 > 1 And prev > 1 And curr > 1 And post > 1 And post2 > 1) Or curr = 0 Then
+                If (curr < (prev + prev2) / 2 And curr < (post + post2) / 2 And i * depthIncr > startDepth + depthIncr) Or curr = 0 Then
+                    If i * depthIncr > task.minDepth Then
+                        startEndDepth = New cv.Point(startDepth, i * depthIncr)
+                        depthBoundaries.Add(pointCount, startEndDepth)
+                        orderedRange.Add(startEndDepth)
+                        pointCount = 0
+                        startDepth = i * depthIncr + 0.1
+                    End If
                 End If
             End If
         Next
+        orderedRange.Add(New cv.Point(orderedRange(orderedRange.Count - 1).Y, CInt(task.maxZ * 1000)))
 
         startEndDepth = New cv.Point(startDepth, CInt(task.maxDepth))
         depthBoundaries.Add(pointCount, startEndDepth) ' capped at the max depth we are observing
@@ -1479,17 +1487,20 @@ Public Class Histogram_DepthValleys
         Next
 
         Dim paletteColors(hist.plotHist.hist.Rows - 1) As Integer
-        Dim colorIncr = (255 / rangeBoundaries.Count)
+        Dim colorIncr = 255 / orderedRange.Count
+        Dim splitIndex As Integer
+        orderedColors.Clear()
         For i = 0 To hist.plotHist.hist.Rows - 1
             Dim depth = i * depthIncr + 1
-            For j = 0 To rangeBoundaries.Count - 1
-                Dim startEnd = rangeBoundaries.ElementAt(j)
-                If depth >= startEnd.X And depth < startEnd.Y Then
-                    paletteColors(i) = j * colorIncr + 1
-                    Exit For
+            If depth >= orderedRange(splitIndex).Y Then
+                If splitIndex <= orderedRange.Count - 1 Then
+                    orderedColors.Add(splitIndex * colorIncr)
+                    splitIndex += 1
                 End If
-            Next
+            End If
+            paletteColors(i) = (splitIndex + 1) * colorIncr
         Next
+        orderedColors.Add(splitIndex * colorIncr)
 
         dst1 = histogramBarsValleys(hist.plotHist.hist, paletteColors)
         palette.src = dst1
@@ -1536,7 +1547,6 @@ Public Class Histogram_DepthClusters
         Next
         palette.Run()
         dst2 = palette.dst1
-        ' dst2.SetTo(0, task.noDepthMask)
         If standalone Or task.intermediateReview = caller Then
             label1 = "Histogram of " + CStr(valleys.rangeBoundaries.Count) + " Depth Clusters"
             label2 = "Backprojection of " + CStr(valleys.rangeBoundaries.Count) + " histogram clusters"

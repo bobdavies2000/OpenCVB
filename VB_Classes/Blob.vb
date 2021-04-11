@@ -335,7 +335,7 @@ End Class
 
 
 
-Public Class Blob_DepthClusters1
+Public Class Blob_DepthPixelSampler
     Inherits VBparent
     Public histBlobs As Histogram_DepthClusters
     Public flood As FloodFill_Basics
@@ -381,6 +381,49 @@ Public Class Blob_DepthClusters1
             lastFrame = dst2.Clone
         End If
         dst2.SetTo(0, task.noDepthMask)
+        label1 = CStr(histBlobs.valleys.rangeBoundaries.Count) + " Depth Clusters"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Blob_DepthLUT
+    Inherits VBparent
+    Public histBlobs As Histogram_DepthClusters
+    Dim palette As Palette_Basics
+    Public Sub New()
+        initParent()
+        palette = New Palette_Basics
+        histBlobs = New Histogram_DepthClusters()
+
+        label2 = "Identified histogram depth clusters."
+        task.desc = "Highlight the distinct histogram blobs found with depth clustering."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        histBlobs.src = task.noDepthMask
+        histBlobs.Run()
+        dst1 = histBlobs.dst1
+        Static myLut As New cv.Mat(1, 256, cv.MatType.CV_8U)
+
+        Dim ranges = New List(Of cv.Point)(histBlobs.valleys.orderedRange)
+        Dim colorIncr = task.maxZ * 1000 / 255
+        Dim splitIndex = 0
+        For i = 0 To 255
+            myLut.Set(Of Byte)(0, i, histBlobs.valleys.orderedColors(splitIndex))
+            If i * colorIncr >= ranges(splitIndex).X Then splitIndex += If(splitIndex = ranges.Count - 1, 0, 1)
+        Next
+        Dim gray = task.depth32f.Normalize(255).ConvertScaleAbs(255)
+        dst2 = gray.LUT(myLut)
+        palette.src = dst2
+        palette.Run()
+        dst2 = palette.dst1
+        dst2.SetTo(0, task.noDepthMask)
+
         label1 = CStr(histBlobs.valleys.rangeBoundaries.Count) + " Depth Clusters"
     End Sub
 End Class
