@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Imports System.IO
 Public Class Palette_Basics
     Inherits VBparent
-    Public colormap As cv.ColormapTypes
+    Dim colormap As cv.ColormapTypes
     Dim radioFrm As OptionsRadioButtons
     Public whitebackground As Boolean
     Public gradientColorMap As New cv.Mat
