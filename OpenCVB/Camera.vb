@@ -2,9 +2,13 @@
 Imports System.Numerics
 Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
-
-
-
+Imports System.Threading
+Module opencv_module
+    Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
+    Public delegateLock As New Mutex(True, "delegateLock") ' this is a lock to coordinate paint and the camera task
+    Public callTraceLock As New Mutex(True, "callTraceLock")
+    Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
+End Module
 
 Module Palette_Custom_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>

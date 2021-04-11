@@ -1502,6 +1502,7 @@ Public Class Histogram_DepthValleys
     Dim kalman As Kalman_Basics
     Dim hist As Histogram_Depth
     Public ranges As New List(Of cv.Point)
+    Public rangeColors As New List(Of Integer)
     Public palette As Palette_Basics
     Dim histSlider As Windows.Forms.TrackBar
     Public Sub New()
@@ -1533,8 +1534,11 @@ Public Class Histogram_DepthValleys
         Next
 
         Dim depthIncr = CInt(task.maxDepth / histSlider.Value) ' each bar represents this number of millimeters
-        Dim startDepth = 1
+        Dim startDepth = 0
         ranges.Clear()
+        rangeColors.Clear()
+
+        Dim pointcount As Integer
         For i = 2 To kalman.kOutput.Length - 3
             Dim prev2 = kalman.kOutput(i - 2)
             Dim prev = kalman.kOutput(i - 1)
@@ -1542,9 +1546,10 @@ Public Class Histogram_DepthValleys
             Dim post = kalman.kOutput(i + 1)
             Dim post2 = kalman.kOutput(i + 2)
             If curr < 100 Then curr = 0 ' too small to worry about plotting...
+            pointcount += curr
             If (prev2 > 1 And prev > 1 And curr > 1 And post > 1 And post2 > 1) Or curr = 0 Then
                 If (curr < (prev + prev2) / 2 And curr < (post + post2) / 2 And i * depthIncr > startDepth + depthIncr) Or curr = 0 Then
-                    ranges.Add(New cv.Point(startDepth, i * depthIncr))
+                    If pointcount > 1000 Then ranges.Add(New cv.Point(startDepth, i * depthIncr))
                     startDepth = i * depthIncr
                 End If
             End If
@@ -1564,12 +1569,24 @@ Public Class Histogram_DepthValleys
             For i = 0 To histogram.Rows - 1
                 Dim depth = i * depthIncr + 1
                 If splitIndex >= ranges.Count - 1 Then splitIndex = ranges.Count - 1
-                If depth >= ranges(splitIndex).Y Then splitIndex += 1
-                Dim h = CInt(dst1.Height * kalman.kOutput(i) / maxVal)
+
                 Dim nextColor = (splitIndex + 1) * colorIncr
                 If nextColor > 255 Then nextColor = 255
+
+                If depth > ranges(0).Y Then
+                    If depth >= ranges(splitIndex).X And rangeColors.Count < ranges.Count Then
+                        rangeColors.Add(nextColor)
+                        splitIndex += 1
+                    End If
+                End If
+                Dim h = CInt(dst1.Height * kalman.kOutput(i) / maxVal)
+
                 If h > 0 Then cv.Cv2.Rectangle(dst1, New cv.Rect(i * binWidth, dst1.Height - h, binWidth, h), nextColor, -1)
             Next
+        End If
+        ' boundary condition when all one color...
+        If rangeColors.Count = 0 And ranges.Count = 1 Then
+            rangeColors.Add(255)
         End If
 
         palette.src = dst1

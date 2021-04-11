@@ -1,20 +1,13 @@
 ﻿Imports System.ComponentModel
 Imports System.Environment
 Imports System.Globalization
-Imports System.Drawing
 Imports System.IO
 Imports System.Text.RegularExpressions
 Imports System.Threading
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
-Imports System.Runtime.InteropServices
 Imports System.Management
-Module opencv_module
-    Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
-    Public delegateLock As New Mutex(True, "delegateLock") ' this is a lock to coordinate paint and the camera task
-    Public callTraceLock As New Mutex(True, "callTraceLock")
-    Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
-End Module
+
 Public Class OpenCVB
 #Region "Globals"
     Dim AlgorithmCount As Integer

@@ -398,7 +398,7 @@ End Class
 
 
 
-Public Class Blob_DepthLUT
+Public Class Blob_DepthRanges
     Inherits VBparent
     Public histBlobs As Histogram_DepthClusters
     Public Sub New()
@@ -412,21 +412,16 @@ Public Class Blob_DepthLUT
         If task.intermediateReview = caller Then task.intermediateObject = Me
         histBlobs.Run()
         dst1 = histBlobs.dst1
-        Static myLut As New cv.Mat(1, 256, cv.MatType.CV_8UC3)
 
         Dim ranges = New List(Of cv.Point)(histBlobs.valleys.ranges)
-        Dim colorIncr = task.maxZ * 1000 / 255
-        Dim mapIncr = 255 / histBlobs.valleys.ranges.Count
+        Dim rangeColors = New List(Of Integer)(histBlobs.valleys.rangeColors)
         Dim map = histBlobs.valleys.palette.gradientColorMap
-        Dim splitIndex = 0
-        For i = 0 To 255
-            myLut.Set(Of cv.Vec3b)(0, i, map.Get(Of cv.Vec3b)(0, CInt((splitIndex + 1) * mapIncr)))
-            If i * colorIncr >= ranges(splitIndex).Y Then splitIndex += 1
-        Next
-        Dim tmp = task.depth32f.Normalize(255).ConvertScaleAbs(255)
-        tmp += 1
-        dst2 = tmp.CvtColor(cv.ColorConversionCodes.GRAY2BGR).LUT(myLut)
 
+        Dim tmp As New cv.Mat
+        For i = 0 To ranges.Count - 1
+            cv.Cv2.InRange(task.depth32f, ranges(i).X, ranges(i).Y, tmp)
+            dst2.SetTo(map.Get(Of cv.Vec3b)(0, rangeColors(i)), tmp)
+        Next
         dst2.SetTo(0, task.noDepthMask)
 
         label1 = CStr(histBlobs.valleys.ranges.Count) + " Depth Clusters"
