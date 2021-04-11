@@ -124,15 +124,17 @@
     <Compile Include="CameraPyRS2.vb" />
     <Compile Include="CameraRS2.vb" />
     <Compile Include="CameraMyntD.vb" />
+    <Compile Include="OpenCVB.designer.vb">
+      <DependentUpon>OpenCVB.vb</DependentUpon>
+    </Compile>
+    <Compile Include="OpenCVB.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="OptionsDialog.Designer.vb">
       <DependentUpon>OptionsDialog.vb</DependentUpon>
     </Compile>
     <Compile Include="OptionsDialog.vb" />
     <Compile Include="CameraKinect.vb" />
-    <Compile Include="OpenCVB.designer.vb">
-      <DependentUpon>OpenCVB.vb</DependentUpon>
-    </Compile>
-    <Compile Include="OpenCVB.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -160,12 +162,12 @@
     <Compile Include="TreeviewForm.vb" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="OptionsDialog.resx">
-      <DependentUpon>OptionsDialog.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="OpenCVB.resx">
       <DependentUpon>OpenCVB.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OptionsDialog.resx">
+      <DependentUpon>OptionsDialog.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
