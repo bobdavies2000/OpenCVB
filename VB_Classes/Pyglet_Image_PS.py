@@ -5,7 +5,6 @@ import cv2 as cv
 import io
 import numpy as np
 from PIL import Image as im
-
 window = pyglet.window.Window()
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
