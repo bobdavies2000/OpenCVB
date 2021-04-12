@@ -201,6 +201,9 @@ float RS2DepthScale(RealSense2Camera * tp)
 extern "C" __declspec(dllexport)
 void RS2Stop(RealSense2Camera * tp)
 {
-	tp->pipeline.stop();
-	delete tp;
+	if (tp != 0)
+	{
+		tp->pipeline.stop();
+		delete tp;
+	}
 }

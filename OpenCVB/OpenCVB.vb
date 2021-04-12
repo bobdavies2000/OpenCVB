@@ -529,7 +529,9 @@ Public Class OpenCVB
         SyncLock bufferLock
             saveCameraIndex = optionsForm.cameraIndex
         End SyncLock
-        If saveAlgorithmName IsNot Nothing Then StartAlgorithmTask() ' restart the currealgorithm...
+        If saveAlgorithmName IsNot Nothing Then
+            If saveAlgorithmName <> "" Then StartAlgorithmTask() ' restart the currealgorithm...
+        End If
         paintNewImages = False
         taskNewImages = False
         If cameraTaskHandle Is Nothing Then
@@ -547,7 +549,11 @@ Public Class OpenCVB
         Dim currentCameraIndex = -1
         While (1)
             SyncLock bufferLock
-                If currentCameraIndex <> saveCameraIndex Then
+                Dim changeResolution As Boolean
+                If camera IsNot Nothing Then
+                    If camera.width <> workingRes.Width Then changeResolution = True
+                End If
+                If currentCameraIndex <> saveCameraIndex Or changeResolution Then
                     saveAlgorithmName = "" ' this will restart the current algorithm
                     If saveCameraIndex < 0 Then Exit While
                     If camera IsNot Nothing Then camera.stopCamera()
@@ -1061,10 +1067,10 @@ Public Class OpenCVB
             optionsForm.saveResolution()
             If saveCameraIndex <> optionsForm.cameraIndex Or camera.width <> workingRes.Width Then startCamera()
             TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
-
-            LineUpCamPics(resizing:=False)
-            saveLayout()
         End If
+
+        LineUpCamPics(resizing:=False)
+        saveLayout()
         StartAlgorithmTask()
     End Sub
     Private Sub StartAlgorithmTask()
@@ -1094,6 +1100,11 @@ Public Class OpenCVB
 
         Dim imgSize = New cv.Size(CInt(workingRes.Width * 2), CInt(workingRes.Height))
         imgResult = New cv.Mat(imgSize, cv.MatType.CV_8UC3, 0)
+
+        While 1
+            If camera.width = workingRes.Width Then Exit While
+            Application.DoEvents()
+        End While
 
         Thread.CurrentThread.Priority = ThreadPriority.Lowest
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
@@ -1199,7 +1210,7 @@ Public Class OpenCVB
             End While
 
             task.RunAlgorithm()
-            If task.WarningCount >= 4 Then Exit While ' algorithm is hung...
+            ' If task.WarningCount >= 4 Then Exit While ' algorithm is hung...
 
             If task.mousePointUpdated Then mousePoint = task.mousePoint ' in case the algorithm has changed the mouse location...
             If task.drawRectUpdated Then drawRect = task.drawRect

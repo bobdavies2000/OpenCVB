@@ -268,10 +268,9 @@ Public Class ActiveTask : Implements IDisposable
 #End Region
     Private Sub VBTaskTimerPop(sender As Object, e As EventArgs)
         Static saveFrameCount = -1
-        If saveFrameCount = frameCount Then
+        If saveFrameCount = frameCount And frameCount > 0 Then
             Console.WriteLine("Warning: " + task.pythonTaskName + " has not completed work on a frame in a second. Warning " + CStr(WarningCount))
             WarningCount += 1
-            If WarningCount > 5 Then Me.Dispose()
         Else
             WarningCount = 0
             saveFrameCount = frameCount
@@ -366,6 +365,7 @@ Public Class ActiveTask : Implements IDisposable
         End Try
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
+        TaskTimer.Enabled = False
         If recordedData IsNot Nothing Then recordedData.Dispose()
         If algorithmObject IsNot Nothing Then algorithmObject.Dispose()
     End Sub
