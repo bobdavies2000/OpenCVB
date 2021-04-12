@@ -1582,15 +1582,19 @@ Public Class Histogram_DepthValleys
                 If nextColor > 255 Then nextColor = 255
 
                 If depth >= ranges(splitIndex).Y And rangeColors.Count < ranges.Count Then
-                    rangeColors.Add(CInt(nextColor))
+                    If grayOnly = False Then rangeColors.Add(CInt(nextColor)) Else rangeColors.Add(splitIndex + 1)
                     splitIndex += 1
                 End If
                 Dim h = CInt(dst1.Height * kalman.kOutput(i) / maxVal)
 
-                If h > 0 Then cv.Cv2.Rectangle(dst1, New cv.Rect(i * binWidth, dst1.Height - h, binWidth, h), CInt(nextColor), -1)
+                If grayOnly = False Then
+                    If h > 0 Then cv.Cv2.Rectangle(dst1, New cv.Rect(i * binWidth, dst1.Height - h, binWidth, h), CInt(nextColor), -1)
+                Else
+                    If h > 0 Then cv.Cv2.Rectangle(dst1, New cv.Rect(i * binWidth, dst1.Height - h, binWidth, h), splitIndex + 1, -1)
+                End If
             Next
         End If
-        rangeColors.Add(255)
+        rangeColors.Add(If(grayOnly = False, 255, ranges.Count))
 
         If grayOnly = False Then
             palette.src = dst1

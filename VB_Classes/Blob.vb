@@ -25,6 +25,7 @@ Public Class Blob_Basics
             sliders.setupTrackBar(2, "Threshold Step", 1, 50, 5)
         End If
         task.desc = "Test C# Blob Detector."
+        task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -94,6 +95,7 @@ Public Class Blob_Input
         label1 = "Click any quadrant below to view it on the right"
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Generate data to test Blob Detector."
+        task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -133,6 +135,7 @@ Public Class Blob_RenderBlobs
         task.desc = "Use connected components to find blobs."
         label1 = "Input blobs"
         label2 = "Showing only the largest blob in test data"
+        task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -458,11 +461,13 @@ End Class
 
 Public Class Blob_DepthRangesGray
     Inherits VBparent
-    Dim blobs As Blob_DepthRanges
+    Public blobs As Blob_DepthRanges
+    Public palette As Palette_Basics
     Public Sub New()
         initParent()
         blobs = New Blob_DepthRanges
         blobs.grayOnly = True
+        If standalone Then palette = New Palette_Basics
         task.desc = "Find the depth ranges but only in grayscale."
     End Sub
     Public Sub Run()
@@ -470,5 +475,58 @@ Public Class Blob_DepthRangesGray
         blobs.Run()
         dst1 = blobs.dst1
         dst2 = blobs.dst2
+        If standalone Then
+            Dim spread = 255 / blobs.histBlobs.valleys.ranges.Count
+            palette.src = dst1 * spread
+            palette.Run()
+            dst1 = palette.dst1
+
+            palette.src = dst2 * spread
+            palette.Run()
+            dst2 = palette.dst1
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Blob_DepthFloodfill
+    Inherits VBparent
+    Dim flood As FloodFill_Basics
+    Dim blobs As Blob_DepthRangesGray
+    Public Sub New()
+        initParent()
+        flood = New FloodFill_Basics
+        Dim loSlider = findSlider("FloodFill LoDiff")
+        Dim hiSlider = findSlider("FloodFill HiDiff")
+        loSlider.Value = 1
+        hiSlider.Value = 1
+        blobs = New Blob_DepthRangesGray
+        If standalone Then blobs.palette = New Palette_Basics
+        label1 = "Slices in depth merged to connected slices"
+        label2 = "Before slices were merged"
+        task.desc = "Use the grayscale blobs to connect depth neighbors that are 1-pixel value different"
+        task.rank = 5
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+
+        blobs.Run()
+
+        If standalone Then
+            Dim spread = 255 / blobs.blobs.histBlobs.valleys.ranges.Count
+            blobs.palette.src = blobs.dst2.Clone * spread
+            blobs.palette.Run()
+            dst2 = blobs.palette.dst1
+        End If
+
+        flood.src = blobs.dst2
+        flood.Run()
+        dst1 = flood.dst1
     End Sub
 End Class
