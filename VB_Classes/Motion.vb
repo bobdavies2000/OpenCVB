@@ -18,7 +18,6 @@ Public Class Motion_Basics
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Single frame motion threshold", 1, 100000, If(task.color.Width = 1280, 20000, 1000)) ' used only externally...
             sliders.setupTrackBar(1, "Cumulative motion threshold", 1, src.Total, If(task.color.Width = 1280, 200000, 100000)) ' used only externally...
-            sliders.setupTrackBar(2, "Camera Motion threshold in radians X100", 1, 100, 3) ' how much camera motion is reasonable?
         End If
 
         minSlider = findSlider("Contour minimum area")
