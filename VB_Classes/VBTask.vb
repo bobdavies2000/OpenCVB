@@ -97,6 +97,9 @@ End Module
 
 
 Public Class ActiveTask : Implements IDisposable
+#Region "VBTask variables"
+    Dim TaskTimer As New System.Timers.Timer(1000)
+    Public WarningCount As Integer
     Dim algoList As New algorithmList
     Public algorithmObject As Object
     Public frameCount As Integer = 0
@@ -262,7 +265,23 @@ Public Class ActiveTask : Implements IDisposable
             task.scalarColors(i) = New cv.Scalar(task.vecColors(i).Item0, task.vecColors(i).Item1, task.vecColors(i).Item2)
         Next
     End Sub
+#End Region
+    Private Sub VBTaskTimerPop(sender As Object, e As EventArgs)
+        Static saveFrameCount = -1
+        If saveFrameCount = frameCount Then
+            Console.WriteLine("Warning: " + task.pythonTaskName + " has not completed work on a frame in a second. Warning " + CStr(WarningCount))
+            WarningCount += 1
+            If WarningCount > 5 Then Me.Dispose()
+        Else
+            WarningCount = 0
+            saveFrameCount = frameCount
+        End If
+        saveFrameCount = frameCount
+    End Sub
     Public Sub New(parms As algParms, resolution As cv.Size, algName As String, camWidth As Integer, camHeight As Integer, _defaultRect As cv.Rect)
+        AddHandler TaskTimer.Elapsed, New Timers.ElapsedEventHandler(AddressOf VBTaskTimerPop)
+        TaskTimer.AutoReset = True
+        TaskTimer.Enabled = True
         Randomize() ' just in case anyone uses VB.Net's Rnd
         color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(color.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))

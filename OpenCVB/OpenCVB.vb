@@ -1199,6 +1199,7 @@ Public Class OpenCVB
             End While
 
             task.RunAlgorithm()
+            If task.WarningCount >= 4 Then Exit While ' algorithm is hung...
 
             If task.mousePointUpdated Then mousePoint = task.mousePoint ' in case the algorithm has changed the mouse location...
             If task.drawRectUpdated Then drawRect = task.drawRect
