@@ -284,14 +284,14 @@ Public Class Binarize_Simple
     Inherits VBparent
     Public meanScalar As cv.Scalar
     Public mask As New cv.Mat
-    Dim blur As Blur_Basics
-    Dim blurSlider As Windows.Forms.TrackBar
+    'Dim blur As Blur_Basics
+    'Dim blurSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
         mask = New cv.Mat(src.Size, cv.MatType.CV_8U, 255)
-        blur = New Blur_Basics()
-        blurSlider = findSlider("Blur Kernel Size")
-        blurSlider.Value = 20
+        'blur = New Blur_Basics()
+        'blurSlider = findSlider("Blur Kernel Size")
+        'blurSlider.Value = 20
 
         task.desc = "Binarize an image using Threshold with OTSU."
     End Sub
@@ -309,13 +309,14 @@ Public Class Binarize_Simple
             meanScalar = cv.Cv2.Mean(input)
         End If
 
-        If blurSlider.Value Then
-            blur.src = input
-            blur.Run()
-            dst1 = blur.dst1.Threshold(meanScalar(0), 255, cv.ThresholdTypes.Binary)
-        Else
-            dst1 = input.Threshold(meanScalar(0), 255, cv.ThresholdTypes.Binary)
-        End If
+        'If blurSlider.Value Then
+        '    blur.src = input
+        '    blur.Run()
+        '    dst1 = blur.dst1.Threshold(meanScalar(0), 255, cv.ThresholdTypes.Binary)
+        'Else
+        '    dst1 = input.Threshold(meanScalar(0), 255, cv.ThresholdTypes.Binary)
+        'End If
+        dst1 = input.Threshold(meanScalar(0), 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
