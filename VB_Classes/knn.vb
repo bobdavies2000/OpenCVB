@@ -61,17 +61,17 @@ Public Class KNN_BasicsQT
     Public testMode As Boolean
     Public desiredMatches = 1
     Public knn As cv.ML.KNearest
-    Public knnQT As KNN_QueryTrain
+    Public knnQT As KNN_Options
     Public Sub New()
         initParent()
 
-        knnQT = New KNN_QueryTrain()
+        knnQT = New KNN_Options()
         If standalone Then knnQT.useRandomData = True
 
         label1 = "White=TrainingData, Red=queries"
         knn = cv.ML.KNearest.Create()
         task.desc = "Test knn with random points in the image.  Find the nearest n points."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -114,7 +114,7 @@ End Class
 
 
 
-Public Class KNN_QueryTrain
+Public Class KNN_Options
     Inherits VBparent
     Public trainingPoints As New List(Of cv.Point2f)
     Public queryPoints As New List(Of cv.Point2f)
@@ -128,7 +128,7 @@ Public Class KNN_QueryTrain
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "KNN Query count", 1, 100, 10)
             sliders.setupTrackBar(1, "KNN Train count", 1, 100, 20)
-            sliders.setupTrackBar(2, "KNN k nearest points", 1, 5, 1)
+            sliders.setupTrackBar(2, "KNN k nearest points", 1, 100, 1)
         End If
 
         If standalone Then
@@ -138,13 +138,10 @@ Public Class KNN_QueryTrain
             End If
         End If
 
-        randomTrain = New Random_Basics()
-        randomQuery = New Random_Basics()
-
         label1 = "Random training points"
         label2 = "Random query points"
         task.desc = "Source of query/train points - generate points if standalone.  Reuse points if requested."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -153,6 +150,10 @@ Public Class KNN_QueryTrain
         End If
 
         If useRandomData Then
+            If randomTrain Is Nothing Then
+                randomTrain = New Random_Basics()
+                randomQuery = New Random_Basics()
+            End If
             Static trainSlider = findSlider("KNN Train count")
             randomTrain.countSlider.Value = trainSlider.Value
             randomTrain.Run()
@@ -201,7 +202,7 @@ Public Class KNN_1_to_1
 
         label1 = "White=TrainingData, Red=queries, yellow=unmatched"
         task.desc = "Use knn to find the nearest n points but use only the best and no duplicates - 1:1 mapping."
-		' task.rank = 1
+        ' task.rank = 2
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -420,18 +421,14 @@ End Class
 Public Class KNN_Point3d
     Inherits VBparent
     Public querySet() As cv.Point3f
+    Public kOptions As KNN_Options
     Public responseSet() As Integer
     Public lastSet() As cv.Point3f ' default usage: find and connect points in 2D for this number of points.
-    Public findXnearest As Integer
     Public Sub New()
         initParent()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "knn Query Points", 1, 500, 10)
-            sliders.setupTrackBar(1, "knn k nearest points", 0, 500, 1)
-        End If
+        kOptions = New KNN_Options
         task.desc = "Use KNN to connect 3D points.  Results shown are a 2D projection of the 3D results."
-		' task.rank = 1
+        ' task.rank = 1
         label1 = "Yellow=Query (in 3D) Blue=Best Response (in 3D)"
         label2 = "Top Down View to confirm 3D KNN is correct"
     End Sub
@@ -440,7 +437,8 @@ Public Class KNN_Point3d
         Dim maxDepth As Integer = 4000 ' this is an arbitrary max depth
         Dim knn = cv.ML.KNearest.Create()
         If standalone Or task.intermediateReview = caller Then
-            ReDim lastSet(sliders.trackbar(0).Value - 1)
+            Static countSlider = findSlider("KNN Query count")
+            ReDim lastSet(countSlider.Value - 1)
             ReDim querySet(lastSet.Count - 1)
             For i = 0 To lastSet.Count - 1
                 lastSet(i) = New cv.Point3f(msRNG.Next(0, dst1.Cols), msRNG.Next(0, dst1.Rows), msRNG.Next(0, maxDepth))
@@ -468,7 +466,9 @@ Public Class KNN_Point3d
             dst2.Circle(p, 9, cv.Scalar.Blue, -1, task.lineType)
         Next
 
-        If standalone Or task.intermediateReview = caller Then findXnearest = sliders.trackbar(1).Value
+        Static nearestCountSlider = findSlider("KNN k nearest points")
+        Dim findXnearest = nearestCountSlider.value
+
         ReDim responseSet(querySet.Length * findXnearest - 1)
         For i = 0 To querySet.Count - 1
             query.Set(Of cv.Point3f)(0, 0, querySet(i))
@@ -683,25 +683,15 @@ Public Class KNN_Cluster2DCities
         initParent()
         knn = New KNN_Point2d()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "KNN - number of points", 10, 1000, 100)
-        End If
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
-            check.Box(0).Text = "Demo Mode (continuous update)"
-            check.Box(0).Checked = True
-        End If
-
         label1 = ""
         task.desc = "Use knn to cluster cities - a primitive attempt at traveling salesman problem."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub cluster(result As cv.Mat)
+    Public Sub cluster(result As cv.Mat, findXnearest As Integer)
         Dim alreadyTaken As New List(Of Integer)
         For i = 0 To numberOfCities - 1
             For j = 1 To numberOfCities - 1
-                Dim nearestCity = knn.responseSet(i * knn.findXnearest + j)
+                Dim nearestCity = knn.responseSet(i * findXnearest + j)
                 ' the last entry will never have a city to connect to so just connect with the nearest.
                 If i = numberOfCities - 1 Then
                     cityOrder(i) = nearestCity
@@ -734,40 +724,37 @@ Public Class KNN_Cluster2DCities
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
         ' If they changed Then number of elements in the set
-        Static demoModeCheck = findCheckBox("Demo Mode")
-        Static cityCountSlider = findSlider("KNN - number of points")
+        Static cityCountSlider = findSlider("KNN Query count")
 
-        If cityCountSlider.Value <> numberOfCities Or demoModeCheck.Checked Then
-            numberOfCities = cityCountSlider.Value
-            knn.findXnearest = numberOfCities
+        numberOfCities = cityCountSlider.Value
+        Static nearestCountSlider = findSlider("KNN k nearest points")
+        nearestCountSlider.Value = numberOfCities
 
-            ReDim cityPositions(numberOfCities - 1)
-            ReDim cityOrder(numberOfCities - 1)
+        ReDim cityPositions(numberOfCities - 1)
+        ReDim cityOrder(numberOfCities - 1)
 
-            Dim gen As New System.Random()
-            Dim r As New cv.RNG(gen.Next(0, 1000000))
-            For i = 0 To numberOfCities - 1
-                cityPositions(i).X = r.Uniform(0, src.Width)
-                cityPositions(i).Y = r.Uniform(0, src.Height)
-            Next
+        Dim gen As New System.Random()
+        Dim r As New cv.RNG(gen.Next(0, 1000000))
+        For i = 0 To numberOfCities - 1
+            cityPositions(i).X = r.Uniform(0, src.Width)
+            cityPositions(i).Y = r.Uniform(0, src.Height)
+        Next
 
-            ' find the nearest neighbor for each city - first will be the current city, next will be nearest real neighbors in order
-            Dim trainingSlider = findSlider("KNN Train count")
-            Dim querySlider = findSlider("KNN Query count")
-            knn.knn.knnQT.trainingPoints.Clear()
-            knn.knn.knnQT.queryPoints.Clear()
-            For i = 0 To numberOfCities - 1
-                knn.knn.knnQT.trainingPoints.Add(New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y)))
-                knn.knn.knnQT.queryPoints.Add(New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y)))
-            Next
-            knn.Run()
+        ' find the nearest neighbor for each city - first will be the current city, next will be nearest real neighbors in order
+        knn.knn.knnQT.trainingPoints.Clear()
+        knn.knn.knnQT.queryPoints.Clear()
+        For i = 0 To numberOfCities - 1
+            knn.knn.knnQT.trainingPoints.Add(New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y)))
+            knn.knn.knnQT.queryPoints.Add(New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y)))
+        Next
+        knn.Run()
 
-            dst1.SetTo(0)
-            cluster(dst1)
-            task.trueText("knn closed regions = " + CStr(closedRegions), 10, 40, 3)
-        End If
+        dst1.SetTo(0)
+        cluster(dst1, nearestCountSlider.Value)
+        task.trueText("knn closed regions = " + CStr(closedRegions), 10, 40, 3)
     End Sub
 End Class
+
 
 
 
@@ -778,7 +765,6 @@ End Class
 Public Class KNN_Point2d
     Inherits VBparent
     Public knn As KNN_BasicsQT
-    Public findXnearest As Integer = 1
     Public responseSet() As Integer
     Public Sub New()
         initParent()
@@ -795,14 +781,15 @@ Public Class KNN_Point2d
         'For i = 0 To knn.knnQT.trainingPoints.Count - 1
         '    cv.Cv2.Circle(dst, knn.knnQT.trainingPoints(i), dotSize + 2, cv.Scalar.Blue, -1, task.lineType, 0)
         'Next
-        Static nearestCountSlider = findSlider("KNN k nearest points")
-        findXnearest = nearestCountSlider.Value
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then prepareImage(dst1, task.dotSize)
 
         knn.Run()
+
+        Static nearestCountSlider = findSlider("KNN k nearest points")
+        Dim findXnearest = nearestCountSlider.Value
 
         ReDim responseSet(knn.knnQT.queryPoints.Count * findXnearest - 1)
         Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)

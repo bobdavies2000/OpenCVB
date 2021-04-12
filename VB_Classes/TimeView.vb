@@ -16,7 +16,7 @@ Public Class TimeView_Basics
         dst1 = New cv.Mat(src.Size, cv.MatType.CV_32F, 0)
         dst2 = New cv.Mat(src.Size, cv.MatType.CV_32F, 0)
         task.desc = "TimeView that highlights concentrations of depth pixels"
-		' task.rank = 1
+        ' task.rank = 3
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
