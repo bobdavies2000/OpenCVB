@@ -445,7 +445,6 @@
     <Content Include="MSER_PS.py" />
     <Content Include="ICP_SyntheticExample.py" />
     <Content Include="ICP_Models.py" />
-    <Content Include="Pyglet_Image_PS.py" />
     <Content Include="Pyglet_Image.py" />
     <Content Include="PyStream.py" />
     <Content Include="PythonDebug.py" />
