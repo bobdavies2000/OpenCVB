@@ -10,7 +10,7 @@ Public Class DilateErode_Basics
             sliders.setupTrackBar(1, "Erode (-) to Dilate (+)", -32, 32, 1)
         End If
         task.desc = "Dilate and Erode the RGB and Depth image."
-		task.rank = 1
+		' task.rank = 1
 
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 4)
@@ -81,7 +81,7 @@ Public Class DilateErode_DepthSeed
             sliders.setupTrackBar(1, "DepthSeed max Depth", 1, 5000, 3000)
         End If
         task.desc = "Erode depth to build a depth mask for inrange data."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -125,7 +125,7 @@ Public Class DilateErode_OpenClose
             sliders.setupTrackBar(0, "Dilate Open/Close Iterations", -10, 10, 10)
         End If
         task.desc = "Erode and dilate with MorphologyEx on the RGB and Depth image."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

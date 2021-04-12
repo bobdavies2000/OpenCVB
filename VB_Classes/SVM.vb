@@ -46,7 +46,7 @@ Public Class SVM_Options
         radio1.Show()
         label1 = "SVM_Options - only options, no output"
         task.desc = "SVM has many options - enough to make a class for it."
-        task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Function createSVM() As cv.ML.SVM
         Static frm = findfrm(caller + " Radio Options")
@@ -113,7 +113,7 @@ Public Class SVM_Basics
         initParent()
         svmOptions = New SVM_Options()
         task.desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
-        task.rank = 1
+        ' task.rank = 1
         label1 = "SVM_Basics input data"
         label2 = "Results - white line is ground truth"
     End Sub
@@ -176,7 +176,7 @@ Public Class SVM_Random
 
         label1 = "SVM Training data"
         task.desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
-        task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -266,7 +266,7 @@ Public Class SVM_TestCase
         svmOptions.radio.check(3).Enabled = False
 
         task.desc = "Text book example on SVM"
-        task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

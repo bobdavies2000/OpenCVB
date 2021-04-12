@@ -23,7 +23,7 @@ Public Class KLT_Basics
             check.Box(1).Text = "KLT - delete all Points"
         End If
         task.desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -96,7 +96,7 @@ Public Class KLT_OpticalFlow
         initParent()
         klt = New KLT_Basics()
         task.desc = "KLT optical flow - needs more work"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

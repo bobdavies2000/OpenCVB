@@ -5,7 +5,7 @@ Public Class EigenVecVals_Basics
     Public Sub New()
         initParent()
         task.desc = "Solve system of equations using OpenCV's EigenVV"
-		task.rank = 1
+		' task.rank = 1
         label1 = "EigenVec (solution)"
         label2 = "Relationship between Eigen Vec and Vals"
     End Sub

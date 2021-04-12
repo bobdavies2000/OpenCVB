@@ -10,7 +10,7 @@ Public Class Dlib_Sobel_CS
         initParent()
         d2Mat = New Mat_Dlib2Mat
         task.desc = "Testing the DLib interface with a simple Sobel example"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -41,7 +41,7 @@ Public Class Dlib_GaussianBlur_CS
         label1 = "Gaussian Blur of grayscale image"
         label2 = "Gaussian Blur of BGR image"
         task.desc = "Use DlibDotNet to blur an image"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -77,7 +77,7 @@ Public Class Dlib_FaceDetectHOG_CS
         faces.initialize()
         d2Mat = New Mat_Dlib2Mat
         task.desc = "Use DlibDotNet to detect faces using the HOG detector"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -119,7 +119,7 @@ Public Class Dlib_iBug300WDownload
         End If
 
         task.desc = "Multi-threaded (responsive) download of the iBug 300W face database.  Not using iBug yet but planning to..."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

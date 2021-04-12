@@ -103,7 +103,7 @@ Public Class Dither_Basics
         label1 = "Dither applied to the RGB image"
         label2 = "Dither applied to the Depth image"
         task.desc = "Explore all the varieties of dithering"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

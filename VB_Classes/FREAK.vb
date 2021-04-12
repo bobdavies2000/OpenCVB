@@ -8,7 +8,7 @@ Public Class FREAK_Basics
         initParent()
         orb = New ORB_Basics()
         task.desc = "Find keypoints using ORB and FREAK algorithm"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

@@ -9,7 +9,7 @@ Public Class Blur_Basics
             sliders.setupTrackBar(0, "Blur Kernel Size", 0, 32, 5)
         End If
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -38,7 +38,7 @@ Public Class Blur_Gaussian
         initParent()
         blur = New Blur_Basics()
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -67,7 +67,7 @@ Public Class Blur_Median_CS
         initParent()
         blur = New Blur_Basics()
         task.desc = "Replace each pixel with the median of neighborhood of varying sizes."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -95,7 +95,7 @@ Public Class Blur_Homogeneous
         initParent()
         blur = New Blur_Basics()
         task.desc = "Smooth each pixel with a kernel of 1's of different sizes."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -125,7 +125,7 @@ Public Class Blur_Median
         initParent()
         blur = New Blur_Basics()
         task.desc = "Replace each pixel with the median of neighborhood of varying sizes."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -155,7 +155,7 @@ Public Class Blur_Bilateral
         initParent()
         blur = New Blur_Basics()
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -190,7 +190,7 @@ Public Class Blur_PlusHistogram
         label1 = "Use Blur slider to see impact on histogram peak values"
         label2 = "Top is before equalize, Bottom is after Equalize"
         task.desc = "Compound algorithms Blur and Histogram"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -243,7 +243,7 @@ Public Class Blur_TopoMap
         End If
         label1 = "Image Gradient"
         task.desc = "Create a topo map from the blurred image"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

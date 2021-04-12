@@ -8,7 +8,7 @@ Public Class xPhoto_Bm3dDenoise
     Public Sub New()
         initParent()
         task.desc = "Denoise image with block matching and filtering."
-		task.rank = 1
+		' task.rank = 1
         label1 = "Bm3dDenoising"
         label2 = "Difference from Input"
     End Sub
@@ -33,7 +33,7 @@ Public Class xPhoto_Bm3dDenoiseDepthImage
     Public Sub New()
         initParent()
         task.desc = "Denoise the depth image with block matching and filtering."
-		task.rank = 1
+		' task.rank = 1
         label2 = "Difference from Input"
     End Sub
     Public Sub Run()
@@ -90,7 +90,7 @@ Public Class xPhoto_OilPaint_CPP
         Application.DoEvents() ' because the rest of initialization takes so long, let the show() above take effect.
         xPhoto_OilPaint = xPhoto_OilPaint_Open()
         task.desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

@@ -48,7 +48,7 @@ Public Class FishEye_Rectified
         '                                       cv.MatType.CV_32FC1, rightViewMap1, rightViewMap2)
 
         task.desc = "Use OpenCV's FishEye API to undistort a fisheye lens input - needs more work"
-		task.rank = 1
+		' task.rank = 1
         label1 = "Left View"
         label2 = "Right View"
     End Sub
@@ -77,7 +77,7 @@ Public Class FishEye_Raw
     Public Sub New()
         initParent()
         task.desc = "Display the Raw FishEye images for the T265 (only)"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

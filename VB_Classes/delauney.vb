@@ -85,7 +85,7 @@ Public Class Delaunay_Basics
     Public Sub New()
         initParent()
         task.desc = "Use Delaunay to subdivide an image into triangles."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -116,7 +116,7 @@ Public Class Delaunay_GoodFeatures
         features = New Features_GoodFeatures()
         label2 = "Voronoi facets of delauney good features"
         task.desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -155,7 +155,7 @@ Public Class Delauney_Subdiv2D
         initParent()
         label2 = "Voronoi facets for the same subdiv2D"
         task.desc = "Generate random points and divide the image around those points."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -216,7 +216,7 @@ Public Class Delauney_Coverage
         End If
         label1 = "Coverage of space"
         task.desc = "Combine random points with linear connections to neighbors to cover space. Note that space fills rapidly."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

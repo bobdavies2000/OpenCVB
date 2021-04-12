@@ -18,7 +18,7 @@ Public Class Moments_Basics
 
         label1 = "Red dot = Kalman smoothed centroid"
         task.desc = "Compute the centroid of the provided mask file."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -60,7 +60,7 @@ Public Class Moments_CentroidKalman
 
         label1 = "Red dot = Kalman smoothed centroid"
         task.desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

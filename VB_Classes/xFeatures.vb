@@ -5,7 +5,7 @@ Public Class XFeatures2D_StarDetector
     Public Sub New()
         initParent()
         task.desc = "Basics of the StarDetector - a 2D feature detector.  FAILS IN COMPUTE.  Uncomment to investigate further."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

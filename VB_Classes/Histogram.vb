@@ -26,7 +26,7 @@ Public Class Histogram_Basics
 
         label2 = "Histogram - x=bins/y=count"
         task.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -104,7 +104,7 @@ Public Class Histogram_Graph
             sliders.setupTrackBar(1, "Histogram line thickness", 1, 20, 3)
         End If
         task.desc = "Plot histograms for up to 3 channels."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -241,7 +241,7 @@ Public Class Histogram_NormalizeGray
         End If
 
         task.desc = "Create a histogram of a normalized image"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -273,7 +273,7 @@ Public Class Histogram_2D_HueSaturation
             sliders.setupTrackBar(1, "Saturation bins", 1, 256, 32) ' quantize sat to 32 levels
         End If
         task.desc = "Create a histogram for hue and saturation."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -311,7 +311,7 @@ Public Class Histogram_2D_XZ_YZ
             sliders.setupTrackBar(2, "Histogram Z bins", 1, 200, 100)
         End If
         task.desc = "Create a 2D histogram for depth in XZ and YZ."
-		task.rank = 1
+		' task.rank = 1
         label2 = "Left is XZ (Top View) and Right is YZ (Side View)"
     End Sub
     Public Sub Run()
@@ -362,7 +362,7 @@ Public Class Histogram_EqualizeColor
         mats = New Mat_2to1()
 
         task.desc = "Create an equalized histogram of the color image. Image is noticeably enhanced."
-		task.rank = 1
+		' task.rank = 1
         label1 = "Image Enhanced with Equalized Histogram"
     End Sub
     Public Sub Run()
@@ -415,7 +415,7 @@ Public Class Histogram_EqualizeGray
         label1 = "Before EqualizeHist"
         label2 = "After EqualizeHist"
         task.desc = "Create an equalized histogram of the grayscale image."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -462,7 +462,7 @@ Public Class Histogram_Equalize255
         label1 = "Resulting equalized image"
         label2 = "Upper plot is before equalization.  Bottom is after."
         task.desc = "Reproduce the results of the hist.py example with existing algorithms"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -493,7 +493,7 @@ Public Class Histogram_Simple
         End If
 
         task.desc = "Build a simple and reusable histogram for grayscale images."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -546,7 +546,7 @@ Public Class Histogram_ColorsAndGray
 
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Create a histogram of a normalized image"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -586,7 +586,7 @@ Public Class Histogram_BackProjectionPeak
         hist.kalman.check.Box(0).Checked = False
 
         task.desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
-		task.rank = 1
+		' task.rank = 1
         label2 = "Grayscale Histogram"
     End Sub
     Public Sub Run()
@@ -634,7 +634,7 @@ Public Class Histogram_BackProjection2D
         hist = New Histogram_2D_HueSaturation()
 
         task.desc = "Backproject from a hue and saturation histogram."
-		task.rank = 1
+		' task.rank = 1
         label1 = "X-axis is Hue, Y-axis is Sat.  Draw rectangle to isolate ranges"
         label2 = "Backprojection of detected hue and saturation."
     End Sub
@@ -700,7 +700,7 @@ Public Class Histogram_HueSaturation2DPlot
         mats = New Mat_4to1()
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -754,7 +754,7 @@ Public Class Histogram_TopData
         If VB_Classes.ActiveTask.algParms.camNames.D455 = task.parms.cameraName Then IntelBug = True
 
         task.desc = "Create a 2D top view for XZ histogram of depth in meters - NOTE: x and y scales differ!"
-		task.rank = 1
+		' task.rank = 1
     End Sub
 
     Public Sub Run()
@@ -804,7 +804,7 @@ Public Class Histogram_SideData
         gCloud = New Depth_PointCloud_IMU()
 
         task.desc = "Create a 2D side view for ZY histogram of depth in meters - NOTE: x and y scales differ!"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -847,7 +847,7 @@ Public Class Histogram_SmoothTopView2D
 
         label1 = "XZ (Top View)"
         task.desc = "Create a 2D top view with stable depth data."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -892,7 +892,7 @@ Public Class Histogram_SmoothSideView2D
 
         label1 = "ZY (Side View)"
         task.desc = "Create a 2D side view of stable depth data"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -933,7 +933,7 @@ Public Class Histogram_StableDepthClusters
         label1 = "Histogram of stable depth"
         label2 = "Backprojection of stable depth"
         task.desc = "Use the stable depth to identify the depth_clusters using histogram valleys"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -971,7 +971,7 @@ Public Class Histogram_TopView2D
 
         label1 = "XZ (Top View)"
         task.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1020,7 +1020,7 @@ Public Class Histogram_SideView2D
 
         label1 = "ZY (Side View)"
         task.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1065,7 +1065,7 @@ Public Class Histogram_BackProjectionGrayscale
 
         label1 = "Move mouse to backproject each histogram column"
         task.desc = "Explore Backprojection of each element of a grayscale histogram."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1104,7 +1104,7 @@ Public Class Histogram_ViewIntersections
         histCO = New Histogram_ViewObjects
         label1 = "Yellow is largest intersection.  dst2 = point cloud"
         task.desc = "Find the intersections of the rectangles found in the Histogram_ConcentrationObjects"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1198,7 +1198,7 @@ Public Class Histogram_ViewObjects
         minSizeSlider.Value = dotSlider.Value * dotSlider.Value
 
         task.desc = "Use the histogram concentrations to identify objects in the field of view"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1267,7 +1267,7 @@ Public Class Histogram_SmoothConcentration
         hotRadio.Checked = True
 
         task.desc = "Using stable depth data, highlight the histogram projections where concentrations are highest"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1316,7 +1316,7 @@ Public Class Histogram_ViewConcentrationsTopX
         hotRadio.Checked = True
 
         task.desc = "Highlight a fixed number of histogram projections where concentrations are highest"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Function plotHighlights(histOutput As cv.Mat, dst As cv.Mat) As String
         Static ResizeSlider = findSlider("Resize Factor x100")
@@ -1387,7 +1387,7 @@ Public Class Histogram_DepthClusters
         palette = New Palette_Basics
         valleys = New Histogram_DepthValleys()
         task.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1453,7 +1453,7 @@ Public Class Histogram_Frustrum
         cameraXSlider.Value = task.topCameraPoint.X - src.Width / 2
         cameraYSlider.Value = task.sideCameraPoint.Y - src.Height / 2
         task.desc = "The global options for the side and top view.  See OptionCommon_Histogram to make settings permanent."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1498,7 +1498,7 @@ Public Class Histogram_Depth
         End If
 
         task.desc = "Show depth data as a histogram."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1547,7 +1547,7 @@ Public Class Histogram_DepthValleys
 
         label1 = "Histogram clustered by valleys and smoothed"
         task.desc = "Identify valleys in the Depth histogram."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

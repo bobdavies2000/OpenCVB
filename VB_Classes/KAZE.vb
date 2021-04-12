@@ -7,7 +7,7 @@ Public Class KAZE_KeypointsKAZE_CS
     Public Sub New()
         initParent()
         task.desc = "Find keypoints using KAZE algorithm."
-		task.rank = 1
+		' task.rank = 1
         label1 = "KAZE key points"
     End Sub
     Public Sub Run()
@@ -29,7 +29,7 @@ Public Class KAZE_KeypointsAKAZE_CS
     Public Sub New()
         initParent()
         task.desc = "Find keypoints using AKAZE algorithm."
-		task.rank = 1
+		' task.rank = 1
         label1 = "AKAZE key points"
     End Sub
     Public Sub Run()
@@ -54,7 +54,7 @@ Public Class KAZE_Sample_CS
         box = cv.Cv2.ImRead(task.parms.homeDir + "Data/box.png", cv.ImreadModes.Color)
         box_in_scene = cv.Cv2.ImRead(task.parms.homeDir + "Data/box_in_scene.png", cv.ImreadModes.Color)
         task.desc = "Match keypoints in 2 photos."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -74,7 +74,7 @@ Public Class KAZE_Match_CS
         red = New LeftRightView_Basics()
         red.sliders.trackbar(0).Value = 45
         task.desc = "Match keypoints in the left and right images."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -103,7 +103,7 @@ Public Class KAZE_LeftAligned_CS
         End If
 
         task.desc = "Match keypoints in the left and right images but display it as movement in the right image."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

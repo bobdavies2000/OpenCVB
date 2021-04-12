@@ -19,7 +19,7 @@ Public Class Palette_Basics
             radioFrm = radio
         End If
         task.desc = "Apply the different color maps in OpenCV - Painterly Effect"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Function checkRadios() As cv.ColormapTypes
         Dim scheme As cv.ColormapTypes = 0
@@ -76,7 +76,7 @@ Public Class Palette_Color
             sliders.setupTrackBar(2, "red", 0, 255, msRNG.Next(0, 255))
         End If
         task.desc = "Define a color using sliders."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -102,7 +102,7 @@ Public Class Palette_LinearPolar
     Public Sub New()
         initParent()
         task.desc = "Use LinearPolar to create gradient image"
-		task.rank = 1
+		' task.rank = 1
         rotateOptions = New GetRotationMatrix2D_Options
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -199,7 +199,7 @@ Public Class Palette_Reduction
             sliders.setupTrackBar(0, "InRange offset from specific color", 1, 100, 10)
         End If
         task.desc = "Map colors to different palette - Painterly Effect."
-		task.rank = 1
+		' task.rank = 1
         label1 = "Reduced Colors"
     End Sub
     Private Class CompareVec3b : Implements IComparer(Of cv.Vec3b)
@@ -287,7 +287,7 @@ Public Class Palette_DrawTest
         palette.src = dst1
 
         task.desc = "Experiment with palette using a drawn image"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -311,7 +311,7 @@ Public Class Palette_Gradient
         initParent()
         label2 = "From and To colors"
         task.desc = "Create gradient image"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -355,7 +355,7 @@ Public Class Palette_RandomColorMap
 
         label2 = "Generated colormap"
         task.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -397,7 +397,7 @@ Public Class Palette_DepthColorMap
 
         label2 = "Palette used to color left image"
         task.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -445,7 +445,7 @@ Public Class Palette_ObjectColors
         label1 = "Consistent colors"
         label2 = "Original colors"
         task.desc = "New class description"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -510,7 +510,7 @@ Public Class Palette_Layout2D
         heightslider.Value = 24
         grid.Run()
         task.desc = "Layout the available colors in a 2D grid"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -542,7 +542,7 @@ Public Class Palette_LeftRightImages
         brightSlider.Value = 0
         palette = New Palette_Basics
         task.desc = "Use a palette with the left image."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

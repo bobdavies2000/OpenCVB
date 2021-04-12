@@ -12,7 +12,7 @@ Public Class WarpPerspective_Basics
             sliders.setupTrackBar(2, "Warped Angle", 0, 360, 0)
         End If
         task.desc = "Use WarpPerspective to transform input images."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

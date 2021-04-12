@@ -14,7 +14,7 @@ Public Class CartoonifyImage_Basics
         label1 = "Mask for Cartoon"
         label2 = "Cartoonify Result"
         task.desc = "Create a cartoon from a color image - Painterly Effect"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

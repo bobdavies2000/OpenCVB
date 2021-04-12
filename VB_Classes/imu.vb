@@ -15,7 +15,7 @@ Public Class IMU_Basics
         flow = New Font_FlowText()
 
         task.desc = "Read and display the IMU coordinates"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -67,7 +67,7 @@ Public Class IMU_Stabilizer
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(3 - 1)
         task.desc = "Stabilize the image with the IMU data."
-		task.rank = 1
+		' task.rank = 1
         label1 = "IMU Stabilize (Move Camera + Select Kalman)"
         label2 = "Difference from Color Image"
     End Sub
@@ -122,7 +122,7 @@ Public Class IMU_Magnetometer
         plot.minScale = -10
 
         task.desc = "Get the IMU_Magnetometer values from the IMU (if available)"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -148,7 +148,7 @@ Public Class IMU_Barometer
     Public Sub New()
         initParent()
         task.desc = "Get the barometric pressure from the IMU (if available)"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -169,7 +169,7 @@ Public Class IMU_Temperature
     Public Sub New()
         initParent()
         task.desc = "Get the temperature of the IMU (if available)"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -202,7 +202,7 @@ Public Class IMU_FrameTime
         End If
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         task.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -302,7 +302,7 @@ Public Class IMU_HostFrameTimes
         End If
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         task.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -390,7 +390,7 @@ Public Class IMU_TotalDelay
         label1 = "Timing data - total (white) right image"
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         task.desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -470,7 +470,7 @@ Public Class IMU_GVector
         End If
 
         task.desc = "Find the angle of tilt for the camera with respect to gravity."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -561,7 +561,7 @@ Public Class IMU_isCameraLevel
             sliders.setupTrackBar(0, "Threshold in degrees X10", 1, 100, 20) ' default is 20 which is 2 degrees from 0...
         End If
         task.desc = "Answer the question: Is the camera level?"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -602,7 +602,7 @@ Public Class IMU_IscameraStable
         task.callTrace.Clear() ' special line to clear the tree view otherwise this common option is standalone.
         standalone = False
         task.desc = "Answer the question: Is the camera stable?"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

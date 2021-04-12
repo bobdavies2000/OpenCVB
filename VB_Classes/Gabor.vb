@@ -24,7 +24,7 @@ Public Class Gabor_Basics
             sliders.setupTrackBar(5, "Gabor Phase offset X100", 0, 100, 0)
         End If
         task.desc = "Explore Gabor kernel - Painterly Effect"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -68,7 +68,7 @@ Public Class Gabor_Basics_MT
         Next
 
         task.desc = "Apply multiple Gabor filters sweeping through different values of theta - Painterly Effect."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

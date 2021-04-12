@@ -30,7 +30,7 @@ Public Class Video_Basics
         captureVideo = New cv.VideoCapture(fileInfo.FullName)
         label1 = fileInfo.Name
         task.desc = "Show a video file"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -74,7 +74,7 @@ Public Class Video_CarCounting
         flow = New Font_FlowText()
 
         task.desc = "Count cars in a video file"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -132,7 +132,7 @@ Public Class Video_CarCComp
         video = New Video_Basics()
 
         task.desc = "Outline cars with a rectangle"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -165,7 +165,7 @@ Public Class Video_MinRect
 
         bgSub = New BGSubtract_MOG()
         task.desc = "Find area of car outline - example of using minAreaRect"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -198,7 +198,7 @@ Public Class Video_MinCircle
         initParent()
         video = New Video_MinRect()
         task.desc = "Find area of car outline - example of using MinEnclosingCircle"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

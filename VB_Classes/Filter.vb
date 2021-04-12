@@ -5,7 +5,7 @@ Public Class Filter_Laplacian
     Public Sub New()
         initParent()
         task.desc = "Use a filter to approximate the Laplacian derivative."
-		task.rank = 1
+		' task.rank = 1
         label1 = "Sharpened image using Filter2D output"
         label2 = "Output of Filter2D (approximated Laplacian)"
     End Sub
@@ -40,7 +40,7 @@ Public Class Filter_NormalizedKernel
             sliders.setupTrackBar(0, "Normalize alpha X10", 1, 100, 10)
         End If
         task.desc = "Create a normalized kernel and use it."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -78,7 +78,7 @@ Public Class Filter_Normalized2D
             sliders.setupTrackBar(0, "Filter Normalized 2D kernel size", 1, 21, 3)
         End If
         task.desc = "Create and apply a normalized kernel."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -111,7 +111,7 @@ Public Class Filter_SepFilter2D
         End If
         label1 = "Gaussian Blur result"
         task.desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

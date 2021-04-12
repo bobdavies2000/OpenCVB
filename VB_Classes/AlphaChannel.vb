@@ -12,7 +12,7 @@ Public Class AlphaChannel_Basics
         alpha.Size = New System.Drawing.Size(src.Width + 10, src.Height + 10)
 
         task.desc = "Use the the Windows 10 alpha channel to separate foreground and background"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -41,7 +41,7 @@ Public Class AlphaChannel_Blend
         End If
 
         task.desc = "Use alpha blending to smoothly separate background from foreground"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

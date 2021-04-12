@@ -12,7 +12,7 @@ Public Class Clone_Basics
         label1 = "Clone result - draw anywhere to clone a region"
         label2 = "Clone Region Mask"
         task.desc = "Clone a portion of one image into another.  Draw on any image to change selected area."
-		task.rank = 1
+		' task.rank = 1
         task.drawRect = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
     End Sub
     Public Sub Run()
@@ -56,7 +56,7 @@ Public Class Clone_ColorChange
         label1 = "Draw anywhere to select different clone region"
         label2 = "Mask used for clone"
         task.desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -86,7 +86,7 @@ Public Class Clone_IlluminationChange
         label1 = "Draw anywhere to select different clone region"
         label2 = "Mask used for clone"
         task.desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -117,7 +117,7 @@ Public Class Clone_TextureFlattening
         label1 = "Draw anywhere to select different clone region"
         label2 = "mask used for clone"
         task.desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -169,7 +169,7 @@ Public Class Clone_Eagle
         label1 = "Move Eagle by clicking in any location."
         label2 = "Source image and source mask."
         task.desc = "Clone an eagle into the video stream."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -213,7 +213,7 @@ Public Class Clone_Seamless
         label1 = "Results for SeamlessClone"
         label2 = "Mask for Clone"
         task.desc = "Use the seamlessclone API to merge color and depth..."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

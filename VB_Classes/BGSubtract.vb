@@ -21,7 +21,7 @@ Public Class BGSubtract_Basics_CPP
             radio.check(4).Checked = True ' mog2 appears to be the best...
         End If
         task.desc = "Demonstrate all the different background subtraction algorithms in OpenCV - some only available in C++"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -77,7 +77,7 @@ Public Class BGSubtract_MotionDetect_MT
         End If
         label2 = "Only Motion Added"
         task.desc = "Detect Motion for use with background subtraction"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -134,7 +134,7 @@ Public Class BGSubtract_Basics_MT
         End If
 
         task.desc = "Detect Motion in the color image"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -174,7 +174,7 @@ Public Class BGSubtract_Depth_MT
         initParent()
         bgsub = New BGSubtract_Basics_MT()
         task.desc = "Detect Motion in the depth image - needs more work"
-		task.rank = 1
+		' task.rank = 1
         label1 = "Depth data src"
         label2 = "Accumulated depth image"
     End Sub
@@ -203,7 +203,7 @@ Public Class BGSubtract_MOG
 
         MOG = cv.BackgroundSubtractorMOG.Create()
         task.desc = "Subtract background using a mixture of Gaussians"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -232,7 +232,7 @@ Public Class BGSubtract_MOG2
         End If
         MOG2 = cv.BackgroundSubtractorMOG2.Create()
         task.desc = "Subtract background using a mixture of Gaussians"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -259,7 +259,7 @@ Public Class BGSubtract_GMG_KNN
         gmg = cv.BackgroundSubtractorGMG.Create()
         knn = cv.BackgroundSubtractorKNN.Create()
         task.desc = "GMG and KNN API's to subtract background"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -297,7 +297,7 @@ Public Class BGSubtract_MOG_RGBDepth
         label1 = "Unstable depth"
         label2 = "Unstable color"
         task.desc = "Isolate motion in both depth and color data using a mixture of Gaussians"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -329,7 +329,7 @@ Public Class BGSubtract_MOG_Retina
         label1 = "MOG results of depth motion"
         label2 = "Difference from retina depth motion."
         task.desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -352,7 +352,7 @@ Public Class BGSubtract_DepthOrColorMotion
         initParent()
         motion = New Diff_UnstableDepthAndColor()
         task.desc = "Detect motion with both depth and color changes"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -399,7 +399,7 @@ Public Class BGSubtract_Video
         video = New Video_Basics()
         video.srcVideo = task.parms.homeDir + "Data/vtest.avi"
         task.desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -448,7 +448,7 @@ Public Class BGSubtract_Synthetic_CPP
         End If
         label1 = "Synthetic background/foreground image."
         task.desc = "Generate a synthetic input to background subtraction method - Painterly"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -495,7 +495,7 @@ Public Class BGSubtract_Synthetic
 
         synth = New BGSubtract_Synthetic_CPP()
         task.desc = "Demonstrate background subtraction algorithms with synthetic images - Painterly"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

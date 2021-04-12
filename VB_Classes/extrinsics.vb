@@ -4,7 +4,7 @@ Public Class Extrinsics_Basics
     Public Sub New()
         initParent()
         task.desc = "Show the depth camera extrinsics."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

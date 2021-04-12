@@ -14,7 +14,7 @@ Public Class Distance_Basics
         label1 = "Distance results"
         label2 = "Input mask to distance transformm"
         task.desc = "Distance algorithm basics."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -55,7 +55,7 @@ Public Class Distance_Foreground
         label1 = "Distance results"
         label2 = "Input mask to distance transformm"
         task.desc = "Distance algorithm basics."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

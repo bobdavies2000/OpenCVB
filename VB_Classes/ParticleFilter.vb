@@ -13,7 +13,7 @@ Public Class ParticleFilter_Example
         initParent()
         pfPtr = ParticleFilterTest_Open(task.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
         task.desc = "Particle Filter example downloaded from github - hyperlink in the code shows URL."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

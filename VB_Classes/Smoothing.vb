@@ -53,7 +53,7 @@ Public Class Smoothing_Exterior
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
 		task.desc = "Smoothing the line connecting a series of points."
-		task.rank = 1
+		' task.rank = 1
 	End Sub
 	Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -139,7 +139,7 @@ Public Class Smoothing_Interior
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
 		task.desc = "Smoothing the line connecting a series of points staying inside the outline."
-		task.rank = 1
+		' task.rank = 1
 	End Sub
 	Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -192,7 +192,7 @@ Public Class Smoothing_Contours
 		End If
 
 		task.desc = "Use Smoothing exterior or interior to get a smoother representation of a contour"
-		task.rank = 1
+		' task.rank = 1
 	End Sub
 	Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

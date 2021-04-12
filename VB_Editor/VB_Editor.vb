@@ -79,7 +79,7 @@ Module VB_EditorMain
                 For i = 0 To lines.Count - 1
                     sw.WriteLine(lines(i))
                     If insertLine(lines(i)) Then
-                        sw.WriteLine(vbTab + vbTab + "task.rank = 1")
+                        sw.WriteLine(vbTab + vbTab + "' task.rank = 1")
                     End If
                     'If deleteLine(lines(i)) Then
                     '    Console.WriteLine("Deleting: " + lines(i))

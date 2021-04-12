@@ -74,7 +74,7 @@ Public Class ML_FillRGBDepth_MT
         label1 = "ML filled shadow"
         label2 = ""
         task.desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -112,7 +112,7 @@ Public Class ML_FillRGBDepth
 
         label2 = "ML filled shadow"
         task.desc = "Predict depth based on color and display colorized depth to confirm correctness of model."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -152,7 +152,7 @@ Public Class ML_DepthFromColor_MT
         label1 = "Predicted Depth"
         label2 = "Mask of color and depth input"
         task.desc = "Use RGB, X, and Y to predict depth across the entire image, maxDepth = slider value."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -220,7 +220,7 @@ Public Class ML_DepthFromColor
 
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -303,7 +303,7 @@ Public Class ML_DepthFromXYColor
 
         label1 = "Predicted Depth"
         task.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -404,7 +404,7 @@ Public Class ML_EdgeDepth_MT
         label1 = "Depth Shadow (inverse of color and depth)"
         label2 = "Predicted Depth"
         task.desc = "Use RGB to predict depth near edges."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

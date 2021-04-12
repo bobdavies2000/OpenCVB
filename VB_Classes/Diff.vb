@@ -11,7 +11,7 @@ Public Class Diff_Basics
         label1 = "Stable Color"
         label2 = "Unstable Color mask"
         task.desc = "Capture an image and compare it to previous frame using absDiff and threshold"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -52,7 +52,7 @@ Public Class Diff_UnstableDepthAndColor
 
         label1 = "Stable depth and color"
         task.desc = "Build a mask for any pixels that have either unstable depth or color"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

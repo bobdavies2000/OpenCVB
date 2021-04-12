@@ -29,7 +29,7 @@ Public Class WarpModel_Basics
         label1 = "Src image (align to this image)"
         label2 = "Src2 image aligned to src image"
         task.desc = "Use FindTransformECC to align 2 images"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -139,7 +139,7 @@ Public Class WarpModel_Input
 
         sobel = New Edges_Sobel()
         task.desc = "Import the misaligned input."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -215,7 +215,7 @@ Public Class WarpModel_AlignImages
 
         label1 = "Aligned image"
         task.desc = "Align the RGB inputs raw images from the Prokudin examples."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

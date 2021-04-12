@@ -7,7 +7,7 @@ Public Class Fourier_MathNet
     Public Sub New()
         initParent()
         task.desc = "Use the 1D Fourier support in MathNet to do a 2D Fourier transform"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

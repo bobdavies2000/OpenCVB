@@ -46,7 +46,7 @@ Public Class Hough_Circles
         circles = New Draw_Circles()
         circles.sliders.trackbar(0).Value = 3
         task.desc = "Find circles using HoughCircles."
-		task.rank = 1
+		' task.rank = 1
         label1 = "Input circles to Hough"
         label2 = "Hough Circles found"
     End Sub
@@ -87,7 +87,7 @@ Public Class Hough_Lines
             sliders.setupTrackBar(3, "Lines to Plot", 1, 1000, 25)
         End If
         task.desc = "Use Houghlines to find lines in the image."
-		task.rank = 1
+		' task.rank = 1
     End Sub
 
     Public Sub Run()
@@ -138,7 +138,7 @@ Public Class Hough_Lines_MT
         grid = New Thread_Grid
 
         task.desc = "Multithread Houghlines to find lines in image fragments."
-		task.rank = 1
+		' task.rank = 1
         label1 = "Hough_Lines_MT"
         label2 = "Hough_Lines_MT"
     End Sub

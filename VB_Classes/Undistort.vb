@@ -81,7 +81,7 @@ Public Class Undistort_Basics
         End If
         label1 = "Left Image with sliders applied"
         task.desc = "Use sliders to control the undistort OpenCV API - Painterly"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

@@ -22,7 +22,7 @@ Public Class CamShift_Basics
         label1 = "Draw anywhere to create histogram and start camshift"
         label2 = "Histogram of targeted region (hue only)"
         task.desc = "CamShift Demo - draw on the images to define the object to track. Tracker Algorithm"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -91,7 +91,7 @@ Public Class CamShift_Foreground
         fore = New Depth_Foreground()
         label1 = "Automatically finding the head - top of nearest object"
         task.desc = "Use depth to find the head and start the camshift demo.  Tracker Algorithm"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -133,7 +133,7 @@ Public Class Camshift_Object
         label1 = "Largest blob with hue tracked.  Draw enabled."
         label2 = "Backprojection of depth clusters masked with hue"
         task.desc = "Use the blob depth cluster as input to initialize a camshift algorithm.  Tracker Algorithm"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -181,7 +181,7 @@ Public Class Camshift_TopObjects
             sliders.setupTrackBar(0, "Reinitialize camshift after x frames", 1, 500, 100)
         End If
         task.desc = "Track - Tracker Algorithm"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

@@ -13,7 +13,7 @@ Public Class HOG_Basics
             sliders.setupTrackBar(2, "Scale", 0, 2000, 300)
         End If
         task.desc = "Find people with Histogram of Gradients (HOG) 2D feature"
-		task.rank = 1
+		' task.rank = 1
         staticImage = cv.Cv2.ImRead(task.parms.homeDir + "Data/Asahiyama.jpg", cv.ImreadModes.Color)
         dst2 = staticImage.Resize(dst2.Size)
     End Sub

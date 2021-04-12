@@ -26,7 +26,7 @@ Public Class SemiGlobalMatching_CPP
     Public Sub New()
         initParent()
         task.desc = "Find depth using the semi-global matching algorithm."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

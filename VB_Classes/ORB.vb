@@ -11,7 +11,7 @@ Public Class ORB_Basics
             sliders.setupTrackBar(0, "ORB - desired point count", 10, 2000, 100)
         End If
         task.desc = "Find keypoints using ORB - Oriented Fast and Rotated BRIEF"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

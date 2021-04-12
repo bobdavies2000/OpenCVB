@@ -11,7 +11,7 @@ Public Class MotionBlur_Basics
             sliders.setupTrackBar(1, "Motion Blur Angle", -90, 90, 0)
         End If
         task.desc = "Use Filter2D to create a motion blur"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -137,7 +137,7 @@ Public Class MotionBlur_Deblur
         End If
 
         task.desc = "Deblur a motion blurred image"
-		task.rank = 1
+		' task.rank = 1
         label1 = "Blurred Image Input"
         label2 = "Deblurred Image Output"
     End Sub

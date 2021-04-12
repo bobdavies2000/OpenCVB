@@ -24,7 +24,7 @@ Public Class FloodFill_Basics
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         label2 = "Grayscale version"
         task.desc = "Use floodfill to build image segments in a grayscale image."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -107,7 +107,7 @@ Public Class FloodFill_Top16_MT
             sliders.setupTrackBar(2, "FloodFill HiDiff", 1, 255, 5)
         End If
         task.desc = "Use floodfill to build image segments with a grayscale image."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -148,7 +148,7 @@ Public Class FloodFill_Color_MT
         flood = New FloodFill_Top16_MT()
 
         task.desc = "Use floodfill to build image segments in an RGB image."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -193,7 +193,7 @@ Public Class FloodFill_DCT
 
         dct = New DCT_FeatureLess()
         task.desc = "Find surfaces that lack any texture with DCT (highest frequency removed) and use floodfill to isolate those surfaces."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -223,7 +223,7 @@ Public Class FloodFill_CComp
 
         label1 = "Input to Floodfill "
         task.desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -262,7 +262,7 @@ Public Class FloodFill_RelativeRange
         label1 = "Input to floodfill basics"
         label2 = "Output of floodfill basics"
         task.desc = "Experiment with 'relative' range option to floodfill.  Compare to fixed range option."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -299,7 +299,7 @@ Public Class Floodfill_Objects
         minSlider.Value = (src.Width Mod 100) * 25
 
         task.desc = "Use floodfill to identify the desired number of objects"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -345,7 +345,7 @@ Public Class FloodFill_WithDepth
         label1 = "Floodfill results after removing unknown depth"
         label2 = "Mask showing where depth data is missing"
         task.desc = "Floodfill only the areas where there is depth"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -375,7 +375,7 @@ Public Class Floodfill_Identifiers
         basics = New FloodFill_Basics()
         label1 = "Input image to floodfill"
         task.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -441,7 +441,7 @@ Public Class Floodfill_ColorObjects
         pFlood = New Floodfill_Identifiers()
 
         task.desc = "Use floodfill to identify each of the region candidates using only color."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -480,7 +480,7 @@ Public Class FloodFill_PointTracker
 
         label1 = "Point tracker output"
         task.desc = "Test the FloodFill output as input into the point tracker"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -523,7 +523,7 @@ Public Class FloodFill_Top16
 
         label1 = "Input image to floodfill"
         task.desc = "Use floodfill to build image segments in a grayscale image."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -578,7 +578,7 @@ Public Class FloodFill_Click
         flood.pt = New cv.Point(msRNG.Next(0, dst1.Width - 1), msRNG.Next(0, dst1.Height - 1))
         label2 = "Click anywhere to floodfill that area"
         task.desc = "FloodFill where the mouse clicks"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -625,7 +625,7 @@ Public Class FloodFill_Point
         End If
         label1 = "Input image to floodfill"
         task.desc = "Use floodfill at a single location in a grayscale image."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -694,7 +694,7 @@ Public Class FloodFill_FullImage
         End If
 
         task.desc = "Floodfill each of the segments outlined by the Edges_BinarizedSobel algorithm"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -836,7 +836,7 @@ Public Class FloodFill_Step
         End If
 
         task.desc = "Step through the current image to floodfill using colors from the previous image"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -939,7 +939,7 @@ Public Class FloodFill_Palette
 
         basics = New FloodFill_Basics()
         task.desc = "Create a floodfill image that is only 8-bit for use with a palette"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -983,7 +983,7 @@ Public Class FloodFill_LUT
         lut = New LUT_Basics
         flood = New FloodFill_Basics
         task.desc = "The input to a floodfill is the output of a LUT"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

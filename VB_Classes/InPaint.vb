@@ -18,7 +18,7 @@ Public Class InPaint_Basics
         End If
 
         task.desc = "Create a flaw in an image and then use inPaint to mask it."
-		task.rank = 1
+		' task.rank = 1
         label2 = "Repaired Image"
     End Sub
     Public Sub Run()
@@ -55,7 +55,7 @@ Public Class InPaint_Noise
         End If
 
         task.desc = "Create noise in an image and then use inPaint to remove it."
-		task.rank = 1
+		' task.rank = 1
         label2 = "Repaired Image"
     End Sub
     Public Sub Run()

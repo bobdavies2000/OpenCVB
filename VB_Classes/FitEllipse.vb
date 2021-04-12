@@ -22,7 +22,7 @@ Public Class FitEllipse_Basics_CPP
 
         label1 = "Green FitEllipse, Yellow=AMS, Red=Direct"
         task.desc = "Use FitEllipse to draw around a set of points"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

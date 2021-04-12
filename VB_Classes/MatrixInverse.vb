@@ -35,7 +35,7 @@ Public Class MatrixInverse_Basics_CS
         initParent()
         input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
         task.desc = "Manually invert a matrix"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -66,7 +66,7 @@ Public Class MatrixInverse_OpenCV
         initParent()
         input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
         task.desc = "Use OpenCV to invert a matrix"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

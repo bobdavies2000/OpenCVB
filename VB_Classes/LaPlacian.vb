@@ -11,7 +11,7 @@ Public Class Laplacian_Basics
             sliders.setupTrackBar(2, "Laplacian Delta", 0, 1000, 0)
         End If
         task.desc = "Laplacian filter - the second derivative."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -52,7 +52,7 @@ Public Class Laplacian_Blur
             radio.check(0).Checked = True
         End If
         task.desc = "Laplacian filter - the second derivative - with different bluring techniques"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -99,7 +99,7 @@ Public Class Laplacian_PyramidFilter
             sliders.setupTrackBar(5, "Saturate", 0, 10, 1)
         End If
         task.desc = "VB.Net version of the Laplacian Pyramid Filter - see reference."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

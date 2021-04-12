@@ -93,12 +93,13 @@ Module IndexMain
                 line = Trim(nextFile.ReadLine())
                 Dim lcaseLine = " " + LCase(line)
                 If lcaseLine.Contains("painterly") And Painterly.ContainsKey(classname) = False Then Painterly.Add(classname, classname)
-                If line = "" Or Trim(line).StartsWith("'") Or Trim(line).StartsWith("#") Then Continue While
                 If line.Contains("task.rank = ") Then
-                    Dim rankVal = CInt(line.Substring(line.IndexOf("=") + 2))
-                    If rankVal <> 1 Then Dim k = 0
+                    Dim rankVal = CInt(line.Substring(Len(line) - 1, 1))
                     If rankings(rankVal - 1).ContainsKey(classname) = False Then rankings(rankVal - 1).Add(classname, classname)
                 End If
+
+                If line = "" Or Trim(line).StartsWith("'") Or Trim(line).StartsWith("#") Then Continue While
+
                 If lcaseLine.Contains("needs more work") And MoreWork.ContainsKey(classname) = False Then MoreWork.Add(classname, classname)
                 If lcaseLine.Contains("tracker algorithm") And Trackers.ContainsKey(classname) = False Then Trackers.Add(classname, classname)
                 If (lcaseLine.Contains("np.") Or LCase(classname).Contains("numpy")) And numpy.ContainsKey(classname) = False Then numpy.Add(classname, classname)

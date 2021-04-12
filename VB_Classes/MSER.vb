@@ -12,7 +12,7 @@ Public Class MSER_Basics
         maxSlider = findSlider("MSER Max Area")
         maxSlider.Value = If(src.Width = 1280, 50000, 20000)
         task.desc = "Run MSER (Maximally Stable Extremal Region) algorithm with all default options except for maximum area"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -106,7 +106,7 @@ Public Class MSER_Options
         End If
         ReDim saveParms(sliders.trackbar.Count + check.Box.Count - 1)
         task.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image using all the available options."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -173,7 +173,7 @@ Public Class MSER_SyntheticInput
     Public Sub New()
         initParent()
         task.desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -235,7 +235,7 @@ Public Class MSER_TestSynthetic
         label1 = "Input image to MSER"
         label1 = "Output image from MSER"
         task.desc = "Test MSER with the synthetic image."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -260,7 +260,7 @@ Public Class MSER_CPPStyle
         label1 = "Contour regions from MSER"
         label2 = "Box regions from MSER"
         task.desc = "Maximally Stable Extremal Regions example - still image"
-		task.rank = 1
+		' task.rank = 1
         image = cv.Cv2.ImRead(task.parms.homeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
         gray = image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
@@ -301,7 +301,7 @@ Public Class MSER_Contours
         mser = New MSER_Options()
         mser.sliders.trackbar(1).Value = 4000
         task.desc = "Use MSER but show the contours of each region."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

@@ -11,7 +11,7 @@ Public Class Coherent_Basics
         flood = New Coherent_FloodFill
         dst1 = New cv.Mat(src.Size, cv.MatType.CV_8UC1, 0)
         task.desc = "Segment image with same values at the same locations"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -70,7 +70,7 @@ Public Class Coherent_FloodFill
         knn = New KNN_1_to_1
         basics = New FloodFill_Basics
         task.desc = "Floodfill an image and make the colors consistent."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -167,7 +167,7 @@ Public Class Coherent_Palette
 
         flood = New Coherent_Pixel
         task.desc = "Highlight a consistent 8-bit grayscale image regions with a palette"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -197,7 +197,7 @@ Public Class Coherent_Pixel
         flood = New FloodFill_Basics
         pixel = New Pixel_Sampler
         task.desc = "Floodfill an image and sample masks to make the colors consistent."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

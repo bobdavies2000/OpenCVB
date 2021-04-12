@@ -13,7 +13,7 @@ Public Class Features_GoodFeatures
             sliders.setupTrackBar(2, "Distance", 1, 100, 30)
         End If
         task.desc = "Find good features to track in an RGB image."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -53,7 +53,7 @@ Public Class Features_PointTracker
         label1 = "Good features without Kalman"
         label2 = "Good features with Kalman"
         task.desc = "Find good features and track them"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

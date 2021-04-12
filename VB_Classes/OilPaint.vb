@@ -22,7 +22,7 @@ Public Class OilPaint_Pointilism
 
         task.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
         task.desc = "Alter the image to effect the pointilism style - Painterly Effect"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -95,7 +95,7 @@ Public Class OilPaint_ColorProbability
         km.sliders.trackbar(0).Value = 12 ' we would like a dozen colors or so in the color image.
         ReDim color_probability(km.sliders.trackbar(0).Value - 1)
         task.desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -136,7 +136,7 @@ Public Class OilPaint_ManualVB
             sliders.setupTrackBar(1, "Intensity", 5, 150, 25)
         End If
         task.desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
-		task.rank = 1
+		' task.rank = 1
         task.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
     End Sub
     Public Sub Run()
@@ -199,7 +199,7 @@ Public Class OilPaint_Manual
             sliders.setupTrackBar(2, "Threshold", 0, 200, 25) ' add the third slider for the threshold.
         End If
         task.desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
-		task.rank = 1
+		' task.rank = 1
         label2 = "Selected area only"
 
         task.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
@@ -234,7 +234,7 @@ Public Class OilPaint_Cartoon
         task.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
 
         task.desc = "Alter an image so it appears more like a cartoon - Painterly Effect"
-		task.rank = 1
+		' task.rank = 1
         label1 = "OilPaint_Cartoon"
         label2 = "Laplacian Edges"
     End Sub

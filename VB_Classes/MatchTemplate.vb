@@ -30,7 +30,7 @@ Public Class MatchTemplate_Basics
             sliders.setupTrackBar(1, "Correlation Threshold X100", 1, 100, 90)
         End If
         task.desc = "Find correlation coefficient for 2 random series.  Should be near zero except for small sample size."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Function checkRadio() As cv.TemplateMatchModes
         matchOption = cv.TemplateMatchModes.CCoeffNormed
@@ -83,7 +83,7 @@ Public Class MatchTemplate_RowCorrelation
         match = New MatchTemplate_Basics()
 
         task.desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -132,7 +132,7 @@ Public Class MatchTemplate_DrawRect
 
         label1 = "Probabilities (draw rectangle to test again)"
         task.desc = "Find the requested template in an image.  Tracker Algorithm"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -192,7 +192,7 @@ Public Class MatchTemplate_BestEntropy_MT
         label1 = "Probabilities that the template matches image"
         label2 = "Red is the best template to match (highest entropy)"
         task.desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate.  Tracker Algorithm"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -239,7 +239,7 @@ Public Class MatchTemplate_Movement
         mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
         dst2 = mask.Clone
         task.desc = "Assign each segment a correlation coefficient and stdev to the previous frame"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

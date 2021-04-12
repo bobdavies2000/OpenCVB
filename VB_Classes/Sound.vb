@@ -59,7 +59,7 @@ Public Class Sound_Basics
         fileNameForm.Show()
 
         task.desc = "Load an audio file, play it, and convert to PCM"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -153,7 +153,7 @@ Public Class Sound_SignalGenerator
         player.Init(wGen)
 
         task.desc = "Generate sound with a sine waveform."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -229,7 +229,7 @@ Public Class Sound_Display
         If standalone Then soundSource = New Sound_SignalGenerator
 
         task.desc = "Display a sound buffer in several styles"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -337,7 +337,7 @@ Public Class Sound_GenWaveDisplay
         plotSound = New Sound_Display
         plotSound.soundSource = New Sound_SignalGenerator
         task.desc = "Display the generated sound waves"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -365,7 +365,7 @@ Public Class Sound_WaveDisplay
         plotSound = New Sound_Display
         plotSound.soundSource = New Sound_Basics
         task.desc = "Display the generated sound waves"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

@@ -24,7 +24,7 @@ Public Class Voxels_Basics_MT
 
         label2 = "Voxels labeled with their median distance"
         task.desc = "Use multi-threading to get median depth values as voxels."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

@@ -21,7 +21,7 @@ Public Class SLR_Basics
             sliders.setupTrackBar(1, "Simple moving average window size", 1, 100, 20)
         End If
         task.desc = "Segmented Linear Regression example"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -86,7 +86,7 @@ Public Class SLR_Data
             End If
         Next
         task.desc = "Plot the data used in SLR_Basics"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -114,7 +114,7 @@ Public Class SLR_Image
         slr = New SLR_Basics()
         label1 = "Original data"
         task.desc = "Run Segmented Linear Regression on grayscale image data - just an experiment"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

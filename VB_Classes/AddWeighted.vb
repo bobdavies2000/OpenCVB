@@ -11,7 +11,7 @@ Public Class AddWeighted_Basics
         End If
         weightSlider = findSlider("Weight")
         task.desc = "Add 2 images with specified weights."
-		task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -38,7 +38,7 @@ Public Class AddWeighted_Edges
         Dim weightSlider = findSlider("Weight")
         weightSlider.Value = 75
         task.desc = "Add in the edges separating light and dark to the color image"
-		task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -71,7 +71,7 @@ Public Class AddWeighted_ImageAccumulate
         End If
 
         task.desc = "Update a running average of the image"
-		task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -106,7 +106,7 @@ Public Class AddWeighted_InfraRed
         End If
 
         task.desc = "Align the depth data with the left or right view.  Oak-D is aligned with the right image."
-		task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

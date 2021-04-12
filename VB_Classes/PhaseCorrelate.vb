@@ -21,7 +21,7 @@ Public Class PhaseCorrelate_Basics
 
         cv.Cv2.CreateHanningWindow(hanning, src.Size, cv.MatType.CV_64F)
         task.desc = "Look for a shift between the current frame and the previous"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -92,7 +92,7 @@ Public Class PhaseCorrelate_BasicsTest
         label1 = "Unstable input to PhaseCorrelate_Basics"
         label2 = "Stabilized output from Phase_Correlate_Basics"
         task.desc = "Test the PhaseCorrelate_Basics with random movement"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -124,7 +124,7 @@ Public Class PhaseCorrelate_Depth
         initParent()
         phaseC = New PhaseCorrelate_Basics
         task.desc = "Use phase correlation on the depth data"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -161,7 +161,7 @@ Public Class PhaseCorrelate_HanningWindow
         initParent()
         label1 = "Looking down on a bell curve in 2 dimensions"
         task.desc = "Show what a Hanning window looks like"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

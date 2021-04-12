@@ -12,7 +12,7 @@ Public Class Rodrigues_ValidateKinect
     Public Sub New()
         initParent()
         task.desc = "Validate the Rodrigues calibration for Kinect camera (only)"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -42,7 +42,7 @@ Public Class Rodrigues_ValidateVector
     Public Sub New()
         initParent()
         task.desc = "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -84,7 +84,7 @@ Public Class Rodrigues_RotationMatrix
     Public Sub New()
         initParent()
         task.desc = "Display the contents of the IMU Rotation Matrix"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -117,7 +117,7 @@ Public Class Rodrigues_Extrinsics
     Public Sub New()
         initParent()
         task.desc = "Convert Camera extrinsics array to a Vector with Rodrigues"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

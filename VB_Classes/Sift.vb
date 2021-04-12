@@ -22,7 +22,7 @@ Public Class Sift_Basics
             sliders.setupTrackBar(0, "Points to Match", 1, 1000, 200)
         End If
         task.desc = "Compare 2 images to get a homography.  We will use left and right images."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -68,7 +68,7 @@ Public Class Sift_Basics_MT
         numPointSlider.Value = 1
 
         task.desc = "Compare 2 images to get a homography.  We will use left and right images - needs more work"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

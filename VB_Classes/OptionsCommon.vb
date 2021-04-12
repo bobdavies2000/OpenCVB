@@ -15,7 +15,7 @@ Public Class OptionsCommon_Depth
         label1 = "Depth values that are in-range"
         label2 = "Depth values that are out of range (and < 8m)"
         task.desc = "Show depth with OpenCV using varying min and max depths."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -115,7 +115,7 @@ Public Class OptionsCommon_Histogram
         task.sideCameraPoint = New cv.Point(0, CInt(src.Height / 2 + cameraYSetting))
         task.topCameraPoint = New cv.Point(CInt(src.Width / 2 + cameraXSetting), CInt(src.Height))
         task.desc = "The options for the side view are shared with this algorithm"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

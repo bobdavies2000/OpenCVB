@@ -37,7 +37,7 @@ Public Class CellAuto_Basics
         End If
 
         task.desc = "Visualize the 30 interesting examples from the first 256 in 'New Kind of Science'"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Function createCells(outStr As String) As cv.Mat
         Dim outcomes(8 - 1) As Byte
@@ -123,7 +123,7 @@ Public Class CellAuto_Life
         Static randomSlider = findSlider("Random Pixel Count")
         randomSlider.Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
         task.desc = "Use OpenCV to implement the Game of Life"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -198,7 +198,7 @@ Public Class CellAuto_LifeColor
 
         label1 = "Births are blue, deaths are red"
         task.desc = "Game of Life but with color added"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -238,7 +238,7 @@ Public Class CellAuto_LifePopulation
         plot.plotCount = 1
 
         task.desc = "Show Game of Life display with plot of population"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -269,7 +269,7 @@ Public Class CellAuto_Basics_MP
         i18 = cell.i18
 
         task.desc = "Multi-threaded version of CellAuto_Basics"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -316,7 +316,7 @@ Public Class CellAuto_All256
             sliders.setupTrackBar(0, "Current Rule", 0, 255, 0)
         End If
         task.desc = "Run through all 256 combinations of outcomes"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Private Function createOutcome(val As Integer) As String
         Dim outstr As String = ""
@@ -365,7 +365,7 @@ Public Class CellAuto_MultiPoint
         cell.combo.Box.SelectedIndex = 4 ' this one is nice...
         cell.check.Box(0).Checked = False ' just the one pattern.
         task.desc = "All256 above starts with just one point.  Here we start with multiple points."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

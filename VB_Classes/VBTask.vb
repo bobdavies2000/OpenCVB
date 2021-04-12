@@ -165,7 +165,7 @@ Public Class ActiveTask : Implements IDisposable
     Public label1 As String
     Public label2 As String
     Public desc As String
-    Public rank As Integer ' an estimate of the value of the algorithm.  Used to create the <Rank x> grouping in the user interface.
+    Public rank As Integer
     Public intermediateReview As String
     Public ratioImageToCampic As Single
     Public pixelViewerOn As Boolean

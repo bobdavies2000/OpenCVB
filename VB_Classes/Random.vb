@@ -20,7 +20,7 @@ Public Class Random_Basics
 
         rangeRect = New cv.Rect(0, 0, src.Cols, src.Rows)
         task.desc = "Create a uniform random mask with a specificied number of pixels."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -48,7 +48,7 @@ Public Class Random_Shuffle
     Public Sub New()
         initParent()
         task.desc = "Use randomShuffle to reorder an image."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -69,7 +69,7 @@ Public Class Random_LUTMask
         km = New kMeans_Basics()
         random = New Random_Basics()
         task.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image."
-		task.rank = 1
+		' task.rank = 1
         label2 = "kmeans run To Get colors"
     End Sub
     Public Sub Run()
@@ -104,7 +104,7 @@ Public Class Random_UniformDist
         minval = 0
         maxval = 255
         task.desc = "Create a uniform distribution."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -133,7 +133,7 @@ Public Class Random_NormalDist
         End If
 
         task.desc = "Create a normal distribution in all 3 colors with a variable standard deviation."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -157,7 +157,7 @@ Public Class Random_CheckUniformSmoothed
         rUniform = New Random_UniformDist()
 
         task.desc = "Display the smoothed histogram for a uniform distribution."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -188,7 +188,7 @@ Public Class Random_CheckUniformDist
         rUniform = New Random_UniformDist()
 
         task.desc = "Display the histogram for a uniform distribution."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -217,7 +217,7 @@ Public Class Random_CheckNormalDist
         histogram.sliders.trackbar(0).Value = 255
         normalDist = New Random_NormalDist()
         task.desc = "Display the histogram for a Normal distribution."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -246,7 +246,7 @@ Public Class Random_CheckNormalDistSmoothed
         histogram.plotHist.minRange = 1
         normalDist = New Random_NormalDist()
         task.desc = "Display the histogram for a Normal distribution."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -299,7 +299,7 @@ Public Class Random_PatternGenerator_CPP
         initParent()
         Random_PatternGenerator = Random_PatternGenerator_Open()
         task.desc = "Generate random patterns for use with 'Random Pattern Calibration'"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -339,7 +339,7 @@ Public Class Random_CustomDistribution
         If standalone Then plotHist = New Plot_Histogram()
 
         task.desc = "Create a custom random number distribution from any histogram"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -391,7 +391,7 @@ Public Class Random_MonteCarlo
             sliders.setupTrackBar(0, "Number of bins", 1, 255, 91)
         End If
         task.desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -441,7 +441,7 @@ Public Class Random_CustomHistogram
         label2 = "Histogram of the resulting random numbers"
 
         task.desc = "Create a random number distribution that reflects histogram of a grayscale image"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -487,7 +487,7 @@ Public Class Random_60sTV
             sliders.setupTrackBar(1, "Percentage of pixels to include noise", 0, 100, 20)
         End If
         task.desc = "Imitate an old TV appearance using randomness."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -527,7 +527,7 @@ Public Class Random_60sTVFaster
         options = New Random_60sTV
         label2 = "Changed pixels, add/sub mask, plusMask, minusMask"
         task.desc = "A faster way to apply noise to imitate an old TV appearance using randomness and thresholding."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -575,7 +575,7 @@ Public Class Random_60sTVFastSimple
         random = New Random_UniformDist
         options = New Random_60sTV
         task.desc = "Remove diagnostics from the faster algorithm to simplify code."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -627,7 +627,7 @@ Public Class Random_KalmanPoints
         countSlider = findSlider("Random Pixel Count")
         countSlider.Value = 5
         task.desc = "Smoothly transition a random point from location to location."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

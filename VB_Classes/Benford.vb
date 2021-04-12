@@ -32,7 +32,7 @@ Public Class Benford_Basics
         Next
 
         task.desc = "Build the capability to perform a Benford analysis."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub setup99()
         ReDim expectedDistribution(100 - 1)
@@ -113,7 +113,7 @@ Public Class Benford_NormalizedImage
         benford = New Benford_Basics()
 
         task.desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -144,7 +144,7 @@ Public Class Benford_NormalizedImage99
         benford.setup99()
 
         task.desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -179,7 +179,7 @@ Public Class Benford_JPEG
         End If
 
         task.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -212,7 +212,7 @@ Public Class Benford_JPEG99
             sliders.setupTrackBar(0, "JPEG Quality", 1, 100, 90)
         End If
         task.desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -246,7 +246,7 @@ Public Class Benford_PNG
             sliders.setupTrackBar(0, "PNG Compression", 1, 100, 90)
         End If
         task.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -272,7 +272,7 @@ Public Class Benford_Depth
         initParent()
         benford = New Benford_Basics()
         task.desc = "Apply Benford to the depth data"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -295,7 +295,7 @@ Public Class Benford_DepthRGB
         initParent()
         benford = New Benford_JPEG()
         task.desc = "Apply Benford to the depth RGB image that is compressed with JPEG"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -324,7 +324,7 @@ Public Class Benford_Primes
         Dim countSlider = findSlider("Count of desired primes")
         countSlider.Value = countSlider.Maximum
         task.desc = "Apply Benford to a list of primes"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

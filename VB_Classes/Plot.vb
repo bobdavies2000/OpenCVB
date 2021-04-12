@@ -16,7 +16,7 @@ Public Class Plot_Basics
         label1 = "Plot of grayscale histogram"
         label2 = "Same Data but using OpenCV C++ plot"
         task.desc = "Plot data provided in src Mat"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -48,7 +48,7 @@ Public Class Plot_Basics_CPP
     Public Sub New()
         initParent()
         task.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -121,7 +121,7 @@ Public Class Plot_OverTime
             sliders.setupTrackBar(1, "Plot Pixel Width", 1, 40, 4)
         End If
         task.desc = "Plot an input variable over time"
-		task.rank = 1
+		' task.rank = 1
         myStopWatch = Stopwatch.StartNew()
     End Sub
     Public Sub Run()
@@ -221,7 +221,7 @@ Public Class Plot_Histogram
     Public Sub New()
         initParent()
         task.desc = "Plot histogram data with a stable scale at the left of the image."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -310,7 +310,7 @@ Public Class Plot_Depth
         plot = New Plot_Basics_CPP()
 
         task.desc = "Show depth using OpenCV's plot format with variable bins."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

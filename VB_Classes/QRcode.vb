@@ -16,7 +16,7 @@ Public Class QRcode_Basics
             qrInput2 = qrInput2.Resize(New cv.Size(120, 160))
         End If
         task.desc = "Read a QR code"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

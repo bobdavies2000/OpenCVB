@@ -9,7 +9,7 @@ Public Class Transform_Resize
             sliders.setupTrackBar(0, "Resize Percent", 50, 1000, 50)
         End If
         task.desc = "Resize an image based on the slider value."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -44,7 +44,7 @@ Public Class Transform_Rotate
             sliders.setupTrackBar(3, "Rotation center Y", 1, src.Height, src.Height / 2)
         End If
         task.desc = "Rotate and scale and image based on the slider values."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -71,7 +71,7 @@ Public Class Transform_Sort
             radio.check(3).Text = "EveryRow"
         End If
         task.desc = "Sort the pixels of a grayscale image."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -101,7 +101,7 @@ Public Class Transform_SortReshape
             radio.check(1).Text = "Descending"
         End If
         task.desc = "Sort the pixels of a grayscale image."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -128,7 +128,7 @@ Public Class Transform_Affine3D
             check.Box(1).Text = "Check to snap the second point cloud"
         End If
         task.desc = "Using 2 point clouds compute the 3D affine transform between them"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

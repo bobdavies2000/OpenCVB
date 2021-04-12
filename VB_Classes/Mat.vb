@@ -6,7 +6,7 @@ Public Class Mat_Repeat
     Public Sub New()
         initParent()
         task.desc = "Use the repeat method to replicate data."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -34,7 +34,7 @@ Public Class Mat_PointToMat
         label1 = "Random_Basics points (original)"
         label2 = "Random_Basics points after format change"
         task.desc = "Convert pointf3 into a mat of points"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -63,7 +63,7 @@ Public Class Mat_MatToPoint
         initParent()
         mask = New Random_Basics()
         task.desc = "Convert a mat into a vector of points."
-		task.rank = 1
+		' task.rank = 1
         label1 = "Reconstructed RGB Image"
     End Sub
     Public Sub Run()
@@ -95,7 +95,7 @@ Public Class Mat_Transpose
     Public Sub New()
         initParent()
         task.desc = "Transpose a Mat and show results."
-		task.rank = 1
+		' task.rank = 1
         label1 = "Color Image Transposed"
         label2 = "Color Image Transposed back (artifacts)"
     End Sub
@@ -121,7 +121,7 @@ Public Class Mat_Tricks
         label1 = "Image squeezed into square Mat"
         label2 = "Mat transposed around the diagonal"
         task.desc = "Show some Mat tricks."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -154,7 +154,7 @@ Public Class Mat_4to1
         label1 = "Combining 4 images into one"
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Use one Mat for up to 4 images"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub defaultMats()
         mat1 = task.color
@@ -206,7 +206,7 @@ Public Class Mat_2to1
 
         label1 = ""
         task.desc = "Fill a Mat with 2 images"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -261,7 +261,7 @@ Public Class Mat_ImageXYZ_MT
         xyzPlanes = xyDepth.Split()
 
         task.desc = "Create a cv.Point3f vector with x, y, and z."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -288,7 +288,7 @@ Public Class Mat_RowColRange
         initParent()
         label1 = "BitwiseNot of RowRange and ColRange"
         task.desc = "Perform operation on a range of cols and/or Rows."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -310,7 +310,7 @@ Public Class Mat_Managed
         initParent()
         label1 = "Color change is in the managed cv.vec3b array"
         task.desc = "There is a limited ability to use Mat data in Managed code directly."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -341,7 +341,7 @@ Public Class Mat_MultiplyReview
         initParent()
         flow = New Font_FlowText()
         task.desc = "Review matrix multiplication"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -420,7 +420,7 @@ Public Class Mat_Inverse
             radio.check(4).Enabled = False ' not accepted!
         End If
         task.desc = "Given a 3x3 matrix, invert it and present results."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -493,7 +493,7 @@ Public Class Mat_4Click
 
         label2 = "Click a quadrant in dst1 to snapshot it in dst2"
         task.desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst2"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -522,7 +522,7 @@ Public Class Mat_2Click
         mats = New Mat_2to1
         mat = mats.mat
         task.desc = "Split an image into 2 segments and allow clicking on each half to open it in dst2"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -555,7 +555,7 @@ Public Class Mat_2Dlib
     Public Sub New()
         initParent()
         task.desc = "Convert a Mat to the expected Array2D for a DLib API"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -591,7 +591,7 @@ Public Class Mat_Dlib2Mat
     Public Sub New()
         initParent()
         task.desc = "Convert a Dlib Array2D to an OpenCV Mat"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

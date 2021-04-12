@@ -4,7 +4,7 @@ Public Class intrinsicsLeft_Basics
     Public Sub New()
         initParent()
         task.desc = "Show the depth camera intrinsicsLeft."
-		task.rank = 1
+		' task.rank = 1
         label2 = "ppx/ppy location"
     End Sub
     Public Sub Run()

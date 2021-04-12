@@ -30,7 +30,7 @@ Public Class Fuzzy_Basics
         label1 = "Solid regions"
         label2 = "Fuzzy pixels - not solid"
         task.desc = "That which is not solid is fuzzy"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -122,7 +122,7 @@ Public Class Fuzzy_ContoursDepth
         fuzzyD = New Fuzzy_Basics()
 
         task.desc = "Use contours to outline solids in the depth data"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -146,7 +146,7 @@ Public Class Fuzzy_NeighborProof
         initParent()
         fuzzy = New Fuzzy_Basics()
         task.desc = "Prove that every contour point has at least one and only one neighbor with the mask ID and that the rest are zero"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -205,7 +205,7 @@ Public Class Fuzzy_TrackerDepth
             check.Box(0).Checked = True
         End If
         task.desc = "Create centroids and rect's for solid regions and track them - tracker"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -265,7 +265,7 @@ Public Class Fuzzy_TrackerDepthClick
         initParent()
         tracker = New Fuzzy_TrackerDepth()
         task.desc = "Create centroids and rect's for solid regions and track them - tracker"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -313,7 +313,7 @@ Public Class Fuzzy_PointTracker
         hotRadio.Checked = True
 
         task.desc = "FloodFill the regions defined as solid"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

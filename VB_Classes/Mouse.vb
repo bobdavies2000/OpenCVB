@@ -5,7 +5,7 @@ Public Class Mouse_Basics
         initParent()
         label1 = "Move the mouse below to show mouse tracking."
         task.desc = "Test the mousePoint interface"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -31,7 +31,7 @@ Public Class Mouse_LeftClickZoom
         initParent()
         label1 = "Left click and drag to draw a rectangle"
         task.desc = "Demonstrate what the left-click enables"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

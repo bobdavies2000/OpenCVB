@@ -12,7 +12,7 @@ Public Class Voronoi_Basics
         random = New Random_Basics()
         label1 = "Ordered list output for Voronoi algorithm"
         task.desc = "Use the ordered list method to find the Voronoi segments"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub vDisplay( ByRef dst As cv.Mat, points As List(Of cv.Point))
         dst = dst.Normalize(255).ConvertScaleAbs(255)
@@ -55,7 +55,7 @@ Public Class Voronoi_Compare
         label1 = "Brute Force method"
         label2 = "Ordered List method"
         task.desc = "C# implementations of the BruteForce and OrderedList Voronoi algorithms"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -104,7 +104,7 @@ Public Class Voronoi_CPP
         vDemo = New Voronoi_Basics()
         vPtr = VoronoiDemo_Open(task.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
         task.desc = "Use the C++ version of the Voronoi code"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

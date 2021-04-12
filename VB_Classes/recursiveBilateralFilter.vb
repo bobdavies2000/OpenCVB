@@ -27,7 +27,7 @@ Public Class RecursiveBilateralFilter_CPP
         End If
         rbf = RecursiveBilateralFilter_Open()
         task.desc = "Apply the recursive bilateral filter"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

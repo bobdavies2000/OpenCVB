@@ -6,7 +6,7 @@ Public Class FLANN_Test
     Public Sub New()
         initParent()
         task.desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. "
-		task.rank = 1
+		' task.rank = 1
         label1 = "FLANN Basics"
     End Sub
     Public Sub Run()
@@ -68,7 +68,7 @@ Public Class FLANN_Basics
         End If
 
         task.desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
-		task.rank = 1
+		' task.rank = 1
         label1 = "Red is query, Nearest points blue"
     End Sub
     Public Sub Run()

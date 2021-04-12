@@ -19,7 +19,7 @@ Public Class Texture_Basics
 
         ellipse = New Draw_Ellipses()
         task.desc = "Use multi-threading to find the best sample 256x256 texture of a mask"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -70,7 +70,7 @@ Public Class Texture_Flow
         End If
 
         task.desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -104,7 +104,7 @@ Public Class Texture_Flow_Depth
         initParent()
         texture = New Texture_Flow()
         task.desc = "Display texture flow in the depth data"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -128,7 +128,7 @@ Public Class Texture_Flow_Reduction
         texture = New Texture_Flow
         reduction = New Reduction_Basics
         task.desc = "Display texture flow in the reduced color image"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -161,7 +161,7 @@ Public Class Texture_Shuffle
         texture = New Texture_Basics()
         shuffle = New Random_Shuffle()
         task.desc = "Use random shuffling to homogenize a texture sample of what the floor looks like."
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

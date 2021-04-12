@@ -8,7 +8,7 @@ Public Class Bitmap_ToMat
         label1 = "Convert color bitmap to Mat"
         label2 = "Convert Mat to bitmap and then back to Mat"
         task.desc = "Convert a color and grayscale bitmap to a cv.Mat"
-		task.rank = 1
+		' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
