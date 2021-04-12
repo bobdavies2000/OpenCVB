@@ -1534,7 +1534,7 @@ Public Class Histogram_DepthValleys
         Next
 
         Dim depthIncr = CInt(task.maxDepth / histSlider.Value) ' each bar represents this number of millimeters
-        Dim startDepth = 0
+        Dim startDepth = 1
         ranges.Clear()
         rangeColors.Clear()
 
@@ -1550,7 +1550,8 @@ Public Class Histogram_DepthValleys
             If (prev2 > 1 And prev > 1 And curr > 1 And post > 1 And post2 > 1) Or curr = 0 Then
                 If (curr < (prev + prev2) / 2 And curr < (post + post2) / 2 And i * depthIncr > startDepth + depthIncr) Or curr = 0 Then
                     If pointcount > 1000 Then ranges.Add(New cv.Point(startDepth, i * depthIncr))
-                    startDepth = i * depthIncr
+                    startDepth = i * depthIncr + 1
+                    pointcount = 0
                 End If
             End If
         Next
@@ -1573,21 +1574,16 @@ Public Class Histogram_DepthValleys
                 Dim nextColor = (splitIndex + 1) * colorIncr
                 If nextColor > 255 Then nextColor = 255
 
-                If depth > ranges(0).Y Then
-                    If depth >= ranges(splitIndex).X And rangeColors.Count < ranges.Count Then
-                        rangeColors.Add(nextColor)
-                        splitIndex += 1
-                    End If
+                If depth >= ranges(splitIndex).Y And rangeColors.Count < ranges.Count Then
+                    rangeColors.Add(nextColor)
+                    splitIndex += 1
                 End If
                 Dim h = CInt(dst1.Height * kalman.kOutput(i) / maxVal)
 
                 If h > 0 Then cv.Cv2.Rectangle(dst1, New cv.Rect(i * binWidth, dst1.Height - h, binWidth, h), nextColor, -1)
             Next
         End If
-        ' boundary condition when all one color...
-        If rangeColors.Count = 0 And ranges.Count = 1 Then
-            rangeColors.Add(255)
-        End If
+        rangeColors.Add(255)
 
         palette.src = dst1
         palette.Run()

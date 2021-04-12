@@ -7,7 +7,12 @@ Imports System.Threading
 Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 Imports System.Management
-
+Module opencv_module
+    Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
+    Public delegateLock As New Mutex(True, "delegateLock") ' this is a lock to coordinate paint and the camera task
+    Public callTraceLock As New Mutex(True, "callTraceLock")
+    Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
+End Module
 Public Class OpenCVB
 #Region "Globals"
     Dim AlgorithmCount As Integer
@@ -863,7 +868,7 @@ Public Class OpenCVB
                 DrawingRectangle = False
                 GrabRectangleData = True
             End If
-            ignoremousemove = False
+            ignoreMouseMove = False
         Catch ex As Exception
             Console.WriteLine("Error in camPic_MouseUp: " + ex.Message)
         End Try
