@@ -944,7 +944,7 @@ Public Class OpenCVB
             pauseAlgorithmThread = True
             saveTestAllState = TestAllTimer.Enabled
             If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
-            PausePlayButton.Image = PausePlay
+            PausePlayButton.Image = runPlay
         End If
     End Sub
     Private Sub OpenCVB_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
