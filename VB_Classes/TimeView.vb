@@ -11,8 +11,7 @@ Public Class TimeView_Basics
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Histogram Threshold Count", 0, 100, 4)
-            sliders.setupTrackBar(1, "Number of frames to include", 2, 30, 10)
+            sliders.setupTrackBar(0, "Number of frames to include", 2, 30, 10)
         End If
         dst1 = New cv.Mat(src.Size, cv.MatType.CV_32F, 0)
         dst2 = New cv.Mat(src.Size, cv.MatType.CV_32F, 0)
@@ -21,7 +20,6 @@ Public Class TimeView_Basics
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        Static countSlider = findSlider("Histogram Threshold Count")
 
         Static sideFrames As New List(Of cv.Mat)
         Static topFrames As New List(Of cv.Mat)
@@ -38,16 +36,16 @@ Public Class TimeView_Basics
         sideView.src = src
         sideView.Run()
 
-        sideFrames.Add(sideView.originalHistOutput.Threshold(countSlider.value, 255, cv.ThresholdTypes.Binary))
+        sideFrames.Add(sideView.originalHistOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary))
 
         topView.Run()
-        topFrames.Add(topView.originalHistOutput.Threshold(countSlider.value, 255, cv.ThresholdTypes.Binary))
+        topFrames.Add(topView.originalHistOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary))
 
         dst1 = dst1.Add(sideFrames.ElementAt(sideFrames.Count - 1))
         dst2 = dst2.Add(topFrames.ElementAt(sideFrames.Count - 1))
 
-        label1 = "Accum " + CStr(topFrames.Count) + " side frames with hist threshold > " + CStr(countSlider.value)
-        label2 = "Accum " + CStr(topFrames.Count) + " top frames with hist threshold > " + CStr(countSlider.value)
+        label1 = "Accum " + CStr(topFrames.Count) + " side frames with hist threshold > " + CStr(task.hist3DThreshold)
+        label2 = "Accum " + CStr(topFrames.Count) + " top frames with hist threshold > " + CStr(task.hist3DThreshold)
 
         If sideFrames.Count >= saveFrameCount Then
             dst1 = dst1.Subtract(sideFrames.ElementAt(0))
