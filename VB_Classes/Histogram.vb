@@ -1475,7 +1475,7 @@ Public Class Histogram_Depth
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        plotHist.minRange = task.minDepth
+        plotHist.minRange = 1 ' task.minDepth
         plotHist.maxRange = task.maxDepth
         Static binSlider = findSlider("Histogram Depth Bins")
         plotHist.bins = binSlider.value
@@ -1503,7 +1503,9 @@ Public Class Histogram_DepthValleys
     Dim hist As Histogram_Depth
     Public ranges As New List(Of cv.Point)
     Public rangeColors As New List(Of Integer)
+    Public rangeCounts As New List(Of Integer)
     Public palette As Palette_Basics
+    Public grayOnly As Boolean
     Dim histSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
@@ -1533,10 +1535,11 @@ Public Class Histogram_DepthValleys
             histogram.Set(Of Single)(i, 0, kalman.kOutput(i))
         Next
 
-        Dim depthIncr = CInt(task.maxDepth / histSlider.Value) ' each bar represents this number of millimeters
+        Dim depthIncr = task.maxDepth / histSlider.Value ' each bar represents this number of millimeters
         Dim startDepth = 1
         ranges.Clear()
         rangeColors.Clear()
+        rangeCounts.Clear()
 
         Dim pointcount As Integer
         For i = 2 To kalman.kOutput.Length - 3
@@ -1549,9 +1552,12 @@ Public Class Histogram_DepthValleys
             pointcount += curr
             If (prev2 > 1 And prev > 1 And curr > 1 And post > 1 And post2 > 1) Or curr = 0 Then
                 If (curr < (prev + prev2) / 2 And curr < (post + post2) / 2 And i * depthIncr > startDepth + depthIncr) Or curr = 0 Then
-                    If pointcount > 1000 Then ranges.Add(New cv.Point(startDepth, i * depthIncr))
+                    If pointcount > 1000 Then
+                        ranges.Add(New cv.Point(startDepth, i * depthIncr))
+                        rangeCounts.Add(pointcount)
+                        pointcount = 0
+                    End If
                     startDepth = i * depthIncr + 1
-                    pointcount = 0
                 End If
             End If
         Next
@@ -1560,6 +1566,7 @@ Public Class Histogram_DepthValleys
         Else
             ranges.Add(New cv.Point(0, CInt(task.maxZ * 1000)))
         End If
+        rangeCounts.Add(pointcount)
 
         dst1 = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
         Dim binWidth = CInt(dst1.Width / histogram.Rows)
@@ -1575,18 +1582,20 @@ Public Class Histogram_DepthValleys
                 If nextColor > 255 Then nextColor = 255
 
                 If depth >= ranges(splitIndex).Y And rangeColors.Count < ranges.Count Then
-                    rangeColors.Add(nextColor)
+                    rangeColors.Add(CInt(nextColor))
                     splitIndex += 1
                 End If
                 Dim h = CInt(dst1.Height * kalman.kOutput(i) / maxVal)
 
-                If h > 0 Then cv.Cv2.Rectangle(dst1, New cv.Rect(i * binWidth, dst1.Height - h, binWidth, h), nextColor, -1)
+                If h > 0 Then cv.Cv2.Rectangle(dst1, New cv.Rect(i * binWidth, dst1.Height - h, binWidth, h), CInt(nextColor), -1)
             Next
         End If
         rangeColors.Add(255)
 
-        palette.src = dst1
-        palette.Run()
-        dst1 = palette.dst1
+        If grayOnly = False Then
+            palette.src = dst1
+            palette.Run()
+            dst1 = palette.dst1
+        End If
     End Sub
 End Class

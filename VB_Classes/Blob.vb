@@ -401,6 +401,7 @@ End Class
 Public Class Blob_DepthRanges
     Inherits VBparent
     Public histBlobs As Histogram_DepthClusters
+    Public grayOnly As Boolean
     Public Sub New()
         initParent()
         histBlobs = New Histogram_DepthClusters
@@ -410,6 +411,7 @@ Public Class Blob_DepthRanges
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
+        histBlobs.valleys.grayOnly = grayOnly
         histBlobs.Run()
         dst1 = histBlobs.dst1
 
@@ -417,13 +419,56 @@ Public Class Blob_DepthRanges
         Dim rangeColors = New List(Of Integer)(histBlobs.valleys.rangeColors)
         Dim map = histBlobs.valleys.palette.gradientColorMap
 
-        Dim tmp As New cv.Mat
-        For i = 0 To ranges.Count - 1
-            cv.Cv2.InRange(task.depth32f, ranges(i).X, ranges(i).Y, tmp)
-            dst2.SetTo(map.Get(Of cv.Vec3b)(0, rangeColors(i)), tmp)
-        Next
+        ' this is close and more efficient but not precise!
+        'Dim depth = task.depth32f.Normalize(255).ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        'Dim myLUT = New cv.Mat(1, 256, cv.MatType.CV_8UC3)
+        'Dim index As Integer
+        'For i = 0 To 255
+        '    If rangeColors(index) = i And rangeColors(index) < 255 Then index += 1
+        '    myLUT.Set(Of cv.Vec3b)(0, i, map.Get(Of cv.Vec3b)(0, rangeColors(index)))
+        'Next
+        'dst2 = depth.LUT(myLUT)
+
+        Dim mask As New cv.Mat
+        If grayOnly = False Then
+            For i = 0 To ranges.Count - 1
+                cv.Cv2.InRange(task.depth32f, ranges(i).X, ranges(i).Y, mask)
+                dst2.SetTo(map.Get(Of cv.Vec3b)(0, rangeColors(i)), mask)
+            Next
+        Else
+            dst2 = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
+            For i = 0 To ranges.Count - 1
+                cv.Cv2.InRange(task.depth32f, ranges(i).X, ranges(i).Y, mask)
+                dst2.SetTo(rangeColors(i), mask)
+            Next
+        End If
+
         dst2.SetTo(0, task.noDepthMask)
 
         label1 = CStr(histBlobs.valleys.ranges.Count) + " Depth Clusters"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Blob_DepthRangesGray
+    Inherits VBparent
+    Dim blobs As Blob_DepthRanges
+    Public Sub New()
+        initParent()
+        blobs = New Blob_DepthRanges
+        blobs.grayOnly = True
+        task.desc = "Find the depth ranges but only in grayscale."
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        blobs.Run()
+        dst1 = blobs.dst1
+        dst2 = blobs.dst2
     End Sub
 End Class
