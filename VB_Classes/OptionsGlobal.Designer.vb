@@ -37,6 +37,7 @@ Partial Class OptionsGlobal
         Me.threshold = New System.Windows.Forms.Label()
         Me.thresholdSlider = New System.Windows.Forms.TrackBar()
         Me.Label6 = New System.Windows.Forms.Label()
+        Me.resetToDefaults = New System.Windows.Forms.CheckBox()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.MaxRange, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MinRange, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -53,7 +54,7 @@ Partial Class OptionsGlobal
         Me.MinMaxDepth.Controls.Add(Me.minCount)
         Me.MinMaxDepth.Controls.Add(Me.MinRange)
         Me.MinMaxDepth.Controls.Add(Me.Label1)
-        Me.MinMaxDepth.Location = New System.Drawing.Point(12, 13)
+        Me.MinMaxDepth.Location = New System.Drawing.Point(12, 63)
         Me.MinMaxDepth.Name = "MinMaxDepth"
         Me.MinMaxDepth.Size = New System.Drawing.Size(829, 169)
         Me.MinMaxDepth.TabIndex = 0
@@ -130,7 +131,7 @@ Partial Class OptionsGlobal
         Me.GroupBox1.Controls.Add(Me.threshold)
         Me.GroupBox1.Controls.Add(Me.thresholdSlider)
         Me.GroupBox1.Controls.Add(Me.Label6)
-        Me.GroupBox1.Location = New System.Drawing.Point(12, 193)
+        Me.GroupBox1.Location = New System.Drawing.Point(12, 243)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(829, 168)
         Me.GroupBox1.TabIndex = 1
@@ -192,11 +193,23 @@ Partial Class OptionsGlobal
         Me.Label6.TabIndex = 0
         Me.Label6.Text = "Top and Side Views Histogram threshold"
         '
+        'resetToDefaults
+        '
+        Me.resetToDefaults.AutoSize = True
+        Me.resetToDefaults.Location = New System.Drawing.Point(12, 8)
+        Me.resetToDefaults.Name = "resetToDefaults"
+        Me.resetToDefaults.Size = New System.Drawing.Size(837, 24)
+        Me.resetToDefaults.TabIndex = 2
+        Me.resetToDefaults.Text = "All options on this form are remembered from the previous session.  To reset to t" &
+    "heir default values, check this box."
+        Me.resetToDefaults.UseVisualStyleBackColor = True
+        '
         'OptionsGlobal
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1700, 822)
+        Me.Controls.Add(Me.resetToDefaults)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.MinMaxDepth)
         Me.Name = "OptionsGlobal"
@@ -210,6 +223,7 @@ Partial Class OptionsGlobal
         CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.thresholdSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
@@ -228,4 +242,5 @@ Partial Class OptionsGlobal
     Friend WithEvents threshold As Windows.Forms.Label
     Friend WithEvents thresholdSlider As Windows.Forms.TrackBar
     Friend WithEvents Label6 As Windows.Forms.Label
+    Friend WithEvents resetToDefaults As Windows.Forms.CheckBox
 End Class

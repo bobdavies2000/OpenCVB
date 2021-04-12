@@ -23,12 +23,20 @@ Public Class OptionsGlobal
         SaveSetting("OpenCVB", "MinRangeDepth", "MinRangeDepth", MinRange.Value)
         SaveSetting("OpenCVB", "MaxRangeDepth", "MaxRangeDepth", MaxRange.Value)
         SaveSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", thresholdSlider.Value)
-        SaveSetting("OpenCVB", "MaxRangeDepth", "MaxRangeDepth", MaxRange.Value)
+        SaveSetting("OpenCVB", "IMUmotionSlider", "IMUmotionSlider", IMUmotionSlider.Value)
     End Sub
     Private Sub thresholdSlider_Scroll(sender As Object, e As EventArgs) Handles thresholdSlider.Scroll
         threshold.Text = CStr(thresholdSlider.Value)
     End Sub
     Private Sub IMUmotionSlider_Scroll(sender As Object, e As EventArgs) Handles IMUmotionSlider.Scroll
         IMUmotion.Text = CStr(IMUmotionSlider.Value)
+    End Sub
+    Private Sub resetToDefaults_CheckedChanged(sender As Object, e As EventArgs) Handles resetToDefaults.CheckedChanged
+        SaveSetting("OpenCVB", "MinRangeDepth", "MinRangeDepth", 200)
+        SaveSetting("OpenCVB", "MaxRangeDepth", "MaxRangeDepth", 4000)
+        SaveSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", 2)
+        SaveSetting("OpenCVB", "IMUmotionSlider", "IMUmotionSlider", 1)
+        OptionsGlobal_Load(sender, e)
+        resetToDefaults.Checked = False
     End Sub
 End Class

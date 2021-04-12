@@ -468,7 +468,7 @@ Public Class Blob_Rectangles
         initParent()
         blobs = New Blob_Largest()
         task.desc = "Get the blobs and their masks and outline them with a rectangle."
-        ' task.rank = 1
+        ' task.rank = 2
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

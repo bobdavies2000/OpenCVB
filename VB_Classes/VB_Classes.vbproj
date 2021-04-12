@@ -118,6 +118,12 @@
     <Compile Include="MFD.vb" />
     <Compile Include="MiniPC.vb" />
     <Compile Include="OptionsCommon.vb" />
+    <Compile Include="OptionsContainer.Designer.vb">
+      <DependentUpon>OptionsContainer.vb</DependentUpon>
+    </Compile>
+    <Compile Include="OptionsContainer.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="OptionsFileName.Designer.vb">
       <DependentUpon>OptionsFileName.vb</DependentUpon>
     </Compile>
@@ -125,7 +131,9 @@
     <Compile Include="OptionsGlobal.Designer.vb">
       <DependentUpon>OptionsGlobal.vb</DependentUpon>
     </Compile>
-    <Compile Include="OptionsGlobal.vb" />
+    <Compile Include="OptionsGlobal.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="PhaseCorrelate.vb" />
     <Compile Include="PhotoShop.vb" />
     <Compile Include="PixelViewerForm.Designer.vb">
@@ -137,10 +145,6 @@
     <Compile Include="Fuzzy.vb" />
     <Compile Include="Highlight.vb" />
     <Compile Include="Motion.vb" />
-    <Compile Include="OptionsContainer.Designer.vb">
-      <DependentUpon>OptionsContainer.vb</DependentUpon>
-    </Compile>
-    <Compile Include="OptionsContainer.vb" />
     <Compile Include="ParticleFilter.vb" />
     <Compile Include="ProCon.vb" />
     <Compile Include="Sieve.vb" />
