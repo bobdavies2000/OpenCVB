@@ -10,6 +10,7 @@ Public Class Object_Basics
         label1 = "Connected components for objects in the foreground - tracker algorithm"
         label2 = "Mask for background"
         task.desc = "Identify objects in the foreground."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -24,4 +25,5 @@ Public Class Object_Basics
         dst1 = ccomp.dst1
     End Sub
 End Class
+
 

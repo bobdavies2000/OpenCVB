@@ -33,6 +33,7 @@ Public Class Contours_Basics
 
         label2 = "Contours_Basics with centroid in red"
         task.desc = "Demo options on FindContours."
+		task.rank = 1
     End Sub
     Public Sub setOptions()
         Static frm = findfrm("Contours_Basics Retrieval Mode Radio Options")
@@ -143,6 +144,7 @@ Public Class Contours_RGB
     Public Sub New()
         initParent()
         task.desc = "Find and draw the contour of the largest foreground RGB contour."
+		task.rank = 1
         label2 = "Background"
     End Sub
     Public Sub Run()
@@ -197,6 +199,7 @@ Public Class Contours_RemoveLines
         label1 = "Original image"
         label2 = "Original with horizontal/vertical lines removed"
         task.desc = "Remove the lines from an invoice image"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -239,6 +242,7 @@ Public Class Contours_Depth
     Public Sub New()
         initParent()
         task.desc = "Find and draw the contour of the depth foreground."
+		task.rank = 1
         label1 = "DepthContour input"
         label2 = "DepthContour output"
     End Sub
@@ -289,6 +293,7 @@ Public Class Contours_Prediction
         label1 = "Original contour image"
         label2 = "Image after smoothing with Kalman_Basics"
         task.desc = "Predict the next contour point with Kalman to smooth the outline"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -331,6 +336,7 @@ Public Class Contours_FindandDraw
         label1 = "FindandDraw input"
         label2 = "FindandDraw output"
         task.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -376,6 +382,7 @@ Public Class Contours_Binarized
         label1 = "Sobel output of grayscale input"
         label2 = "DrawContours output after FindContours"
         task.desc = "Find contours using Edges after image is binarized"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

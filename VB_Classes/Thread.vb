@@ -40,6 +40,7 @@ Public Class Thread_Grid
         gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8U)
         gridToRoi = New cv.Mat(src.Size(), cv.MatType.CV_32S)
         task.desc = "Create a grid for use with parallel.ForEach."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -128,6 +129,7 @@ Public Class Thread_GridTest
         gridHeightSlider.Value = 40
         label1 = ""
         task.desc = "Validation test for thread_grid algorithm"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -151,3 +153,4 @@ Public Class Thread_GridTest
          End Sub)
     End Sub
 End Class
+

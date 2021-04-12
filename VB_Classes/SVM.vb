@@ -46,6 +46,7 @@ Public Class SVM_Options
         radio1.Show()
         label1 = "SVM_Options - only options, no output"
         task.desc = "SVM has many options - enough to make a class for it."
+        task.rank = 1
     End Sub
     Public Function createSVM() As cv.ML.SVM
         Static frm = findfrm(caller + " Radio Options")
@@ -81,7 +82,7 @@ Public Class SVM_Options
         Return x + 50 * Math.Sin(x / 15.0)
     End Function
     Public Sub Run()
-		If task.intermediateReview = caller Then task.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         ReDim points(sliders.trackbar(0).Value)
         ReDim responses(points.Length - 1)
         For i = 0 To points.Length - 1
@@ -112,12 +113,13 @@ Public Class SVM_Basics
         initParent()
         svmOptions = New SVM_Options()
         task.desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
+        task.rank = 1
         label1 = "SVM_Basics input data"
         label2 = "Results - white line is ground truth"
     End Sub
 
     Public Sub Run()
-		If task.intermediateReview = caller Then task.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         svmOptions.Run() ' update any options specified in the interface.
         dst1 = svmOptions.dst1
 
@@ -174,9 +176,10 @@ Public Class SVM_Random
 
         label1 = "SVM Training data"
         task.desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
+        task.rank = 1
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then task.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         svmOptions.Run()
         dst1.SetTo(cv.Scalar.White)
         dst2.SetTo(cv.Scalar.White)
@@ -197,13 +200,13 @@ Public Class SVM_Random
 
         For i = 0 To dataSize
             Dim pt = New cv.Point2f(msRNG.Next(0, width - 1), msRNG.Next(0, src.Height - 1))
-            Dim resp As integer
+            Dim resp As Integer
             If setLinear Then
                 If pt.X >= pt.Y Then resp = 1 Else resp = -1
             Else
                 If pt.X > rect.X And pt.X < rect.X + rect.Width And pt.Y > rect.Y And pt.Y < rect.Y + rect.Height Then resp = 1 Else resp = -1
             End If
-            response.Set(Of integer)(i, 0, resp)
+            response.Set(Of Integer)(i, 0, resp)
             dst1.Circle(pt, 5, If(resp = 1, cv.Scalar.Blue, cv.Scalar.Green), -1, task.lineType)
             trainData.Set(Of Single)(i, 0, pt.X)
             trainData.Set(Of Single)(i, 1, pt.Y)
@@ -247,7 +250,7 @@ End Class
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
 Public Class SVM_TestCase
     Inherits VBparent
-    Dim labels() As integer = {1, -1, -1, -1}
+    Dim labels() As Integer = {1, -1, -1, -1}
     Dim trainData(,) As Single = {{501, 50}, {255, 50}, {501, 255}, {50, 200}}
     Dim trainMat As cv.Mat
     Dim labelsMat As cv.Mat
@@ -263,9 +266,10 @@ Public Class SVM_TestCase
         svmOptions.radio.check(3).Enabled = False
 
         task.desc = "Text book example on SVM"
+        task.rank = 1
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then task.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1.SetTo(cv.Scalar.White)
         dst2.SetTo(0)
         svmOptions.Run()
@@ -286,10 +290,11 @@ Public Class SVM_TestCase
         Next
 
         For i = 0 To trainMat.Rows - 1
-            Dim color = If(labelsMat.Get(Of integer)(i) = 1, cv.Scalar.Yellow, cv.Scalar.Red)
+            Dim color = If(labelsMat.Get(Of Integer)(i) = 1, cv.Scalar.Yellow, cv.Scalar.Red)
             Dim pt = New cv.Point(trainMat.Get(Of Single)(i, 0), trainMat.Get(Of Single)(i, 1))
             dst1.Circle(pt, 5, color, -1, task.lineType)
             dst2.Circle(pt, 5, color, -1, task.lineType)
         Next
     End Sub
 End Class
+

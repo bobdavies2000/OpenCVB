@@ -8,6 +8,7 @@ Public Class Gradient_Basics
         sobel = New Edges_Sobel()
         label2 = "Phase Output"
         task.desc = "Use phase to compute gradient"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -31,6 +32,7 @@ Public Class Gradient_Depth
         initParent()
         sobel = New Edges_Sobel()
         task.desc = "Use phase to compute gradient on depth image"
+		task.rank = 1
         label2 = "Phase Output"
     End Sub
     Public Sub Run()
@@ -71,6 +73,7 @@ Public Class Gradient_CartToPolar
         label1 = "CartToPolar Magnitude Output Normalized"
         label2 = "CartToPolar Angle Output"
         task.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -110,6 +113,7 @@ Public Class Gradient_StableDepth
         label1 = "Stable depth input to Gradient"
         label2 = "Phase component of the gradient output"
         task.desc = "Use the stable depth as input to get a map of the phase of the gradient in the depth data."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

@@ -1,4 +1,4 @@
-﻿'  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
+'  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
 Imports cv = OpenCvSharp
 Public Class Motion_Basics
     Inherits VBparent
@@ -26,6 +26,7 @@ Public Class Motion_Basics
 
         label1 = "Enclosing rectangles are yellow in dst1 and dst2"
         task.desc = "Detect contours in the motion data and the resulting rectangles"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -108,6 +109,7 @@ Public Class Motion_WithBlurDilate
 
         label2 = "Mask of pixel differences "
         task.desc = "Detect contours in the motion data using blur and dilate"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -178,6 +180,7 @@ Public Class Motion_MinMaxDepth
         label1 = "32-bit format of the stable depth"
         label2 = "Motion mask"
         task.desc = "While minimizing options and dependencies, use RGB motion to figure out what depth values should change."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -223,6 +226,7 @@ Public Class Motion_MinMaxPointCloud
         label1 = stable.label1
         label2 = stable.label2
         task.desc = "Use the stable depth values to create a stable point cloud"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -266,6 +270,7 @@ Public Class Motion_MinMaxDepthColorized
         label1 = "32-bit format stable depth data"
         label2 = "Colorized version of image at left"
         task.desc = "Colorize the stable depth (keeps Motion_MinMaxDepth at a minimum complexity)"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -303,6 +308,7 @@ Public Class Motion_ThruCorrelation
 
         dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         task.desc = "Detect motion through the correlation coefficient"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -366,6 +372,7 @@ Public Class Motion_CCmerge
         motionCC = New Motion_ThruCorrelation
 
         task.desc = "Use the correlation coefficient to maintain an up-to-date image"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

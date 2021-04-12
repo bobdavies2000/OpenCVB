@@ -15,6 +15,7 @@ Public Class Highlight_Basics
             hotRadio.Checked = True
         End If
         task.desc = "Pixels are grouped by reduction.  Highlight the rectangle and centroid nearest the mouse click"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -47,4 +48,5 @@ Public Class Highlight_Basics
         End If
     End Sub
 End Class
+
 

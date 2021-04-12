@@ -11,6 +11,7 @@ Public Class LUT_Basics
         End If
 
         task.desc = "Divide the image into n-segments controlled with a slider."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -57,6 +58,7 @@ Public Class LUT_Sliders
         End If
 
         task.desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -95,6 +97,7 @@ Public Class LUT_Reduction
         colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, task.vecColors)
         label2 = "Custom Color Lookup Table"
         task.desc = "Build and use a custom color palette - Painterly Effect"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -123,6 +126,7 @@ Public Class LUT_CustomColor
 
         label2 = "Custom Color Lookup Table"
         task.desc = "Use a palette to provide the lookup table for LUT - Painterly Effect"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -160,6 +164,7 @@ Public Class LUT_Color
         End If
         colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, task.vecColors) ' Create a new color palette here.
         task.desc = "Build and use a custom color palette - Painterly Effect"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -187,6 +192,7 @@ Public Class LUT_Rebuild
             paletteMap(i) = i
         Next
         task.desc = "Rebuild any grayscale image with a 256 element Look-Up Table"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -211,6 +217,7 @@ Public Class LUT_RGBDepth
         initParent()
         lut = New LUT_Basics
         task.desc = "Use a LUT on the RGBDepth to segregate depth data."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -235,6 +242,7 @@ Public Class LUT_Depth32f
         initParent()
         lut = New LUT_Basics
         task.desc = "Use a LUT on the 32-bit depth to segregate depth data."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

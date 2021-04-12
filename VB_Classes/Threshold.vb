@@ -12,6 +12,7 @@ Public Class Threshold_LaplacianFilter
         label1 = "Foreground Input"
         label2 = "Edges of foreground input"
         task.desc = "Threshold the output of a Laplacian derivative, mask with depth foreground.  needs more work"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -25,5 +26,6 @@ Public Class Threshold_LaplacianFilter
         dst2.SetTo(0, mask)
     End Sub
 End Class
+
 
 

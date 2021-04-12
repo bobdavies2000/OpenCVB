@@ -15,6 +15,7 @@ Public Class Fitline_Basics
             sliders.setupTrackBar(1, "Accuracy for the angle X100", 0, 100, 10)
         End If
         task.desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -58,6 +59,7 @@ Public Class Fitline_3DBasics_MT
         initParent()
         hlines = New Hough_Lines_MT()
         task.desc = "Use visual lines to find 3D lines."
+		task.rank = 1
         label2 = "White is featureless RGB, blue depth shadow"
     End Sub
     Public Sub Run()
@@ -131,6 +133,7 @@ Public Class Fitline_RawInput
             check.Box(1).Checked = True
         End If
         task.desc = "Generate a noisy line in a field of random data."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -202,6 +205,7 @@ Public Class Fitline_EigenFit
         label1 = "blue=GT, red=fitline, yellow=EigenFit"
         label2 = "Raw input (use sliders below to explore)"
         task.desc = "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -289,6 +293,7 @@ Public Class Fitline_EigenFit
                                               Format(theta, "#0.0000"))
     End Sub
 End Class
+
 
 
 

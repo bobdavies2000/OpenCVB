@@ -19,6 +19,7 @@ Public Class Binarize_Basics
         blur = New Blur_Basics()
         mask = New cv.Mat(src.Size, cv.MatType.CV_8U, 255)
         task.desc = "Binarize an image using Threshold with OTSU."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -63,6 +64,7 @@ Public Class Binarize_OTSU
         label1 = "Threshold 1) binary 2) Binary+OTSU 3) OTSU 4) OTSU+Blur"
         label2 = "Histograms correspond to images on the left"
         task.desc = "Binarize an image using Threshold with OTSU."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -110,6 +112,7 @@ Public Class Binarize_Niblack_Sauvola
             sliders.setupTrackBar(3, "Sauvola r", 1, 100, 64)
         End If
         task.desc = "Binarize an image using Niblack and Sauvola"
+		task.rank = 1
         label1 = "Binarize Niblack"
         label2 = "Binarize Sauvola"
     End Sub
@@ -143,6 +146,7 @@ Public Class Binarize_Niblack_Nick
             sliders.setupTrackBar(2, "Nick k", -1000, 1000, 100)
         End If
         task.desc = "Binarize an image using Niblack and Nick"
+		task.rank = 1
         label1 = "Binarize Niblack"
         label2 = "Binarize Nick"
     End Sub
@@ -179,6 +183,7 @@ Public Class Binarize_Bernson
 
         task.drawRect = New cv.Rect(100, 100, 100, 100)
         task.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -217,6 +222,7 @@ Public Class Binarize_Bernson_MT
             sliders.setupTrackBar(2, "bg Threshold", 0, 255, 100)
         End If
         task.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
+		task.rank = 1
         label1 = "Binarize Bernson"
     End Sub
     Public Sub Run()
@@ -262,6 +268,7 @@ Public Class Binarize_Reduction
         label1 = "Binarize output from reduction"
         label2 = "Binarize Basics Output"
         task.desc = "Binarize an image using reduction"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -294,6 +301,7 @@ Public Class Binarize_Simple
         'blurSlider.Value = 20
 
         task.desc = "Binarize an image using Threshold with OTSU."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -335,6 +343,7 @@ Public Class Binarize_Recurse
         mats = New Mat_4Click
         label1 = "Lighter half, lightest, darker half, darkest"
         task.desc = "Binarize an image twice using masks"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -365,3 +374,4 @@ Public Class Binarize_Recurse
         label2 = mats.label2
     End Sub
 End Class
+

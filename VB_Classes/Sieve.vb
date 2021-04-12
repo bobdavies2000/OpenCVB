@@ -12,6 +12,7 @@ Public Class Sieve_BasicsVB
         End If
 
         task.desc = "Implement the Sieve of Eratothenes"
+		task.rank = 1
     End Sub
     Public Function shareResults(sieveList As List(Of Integer)) As String
         Dim completeList As String = ""
@@ -58,6 +59,7 @@ Public Class Sieve_Basics
         initParent()
         printer = New Sieve_BasicsVB
         task.desc = "Implement the Sieve of Eratothenes in C#"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -65,6 +67,7 @@ Public Class Sieve_Basics
         task.trueText(printer.shareResults(sieve.GetPrimeNumbers(countSlider.value)))
     End Sub
 End Class
+
 
 
 

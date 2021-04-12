@@ -10,6 +10,7 @@ Public Class Keyboard_Basics
         checkKeys.Setup(caller)
         label1 = "Use the Options form to send in keystrokes"
         task.desc = "Test the keyboard interface available to all algorithms"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -26,4 +27,5 @@ Public Class Keyboard_Basics
         End If
     End Sub
 End Class
+
 

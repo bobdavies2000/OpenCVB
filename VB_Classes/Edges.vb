@@ -14,6 +14,7 @@ Public Class Edges_Basics
         End If
 
         task.desc = "Show canny edge detection with varying thresholds"
+		task.rank = 1
         label1 = "Canny using L1 Norm"
         label2 = "Canny using L2 Norm"
     End Sub
@@ -53,6 +54,7 @@ Public Class Edges_DepthAndColor
         shadow = New Depth_Holes()
 
         task.desc = "Find all the edges in an image include Canny from the grayscale image and edges of depth shadow."
+		task.rank = 1
         label1 = "Edges in color and depth after dilate"
         label2 = "Edges in color and depth no dilate"
     End Sub
@@ -90,6 +92,7 @@ Public Class Edges_Laplacian
         End If
         label2 = "Laplacian of Depth Image"
         task.desc = "Show Laplacian edge detection with varying kernel sizes"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -119,6 +122,7 @@ Public Class Edges_Scharr
         End If
         label2 = "x field + y field in CV_32F format"
         task.desc = "Scharr is most accurate with 3x3 kernel."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -154,6 +158,7 @@ Public Class Edges_Preserving
         End If
         label2 = "Edge preserving blur for RGB depth image above"
         task.desc = "OpenCV's edge preserving filter."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -218,6 +223,7 @@ Public Class Edges_RandomForest_CPP
         End If
 
         task.desc = "Detect edges using structured forests - Opencv Contrib"
+		task.rank = 1
         ReDim rgbData(src.Total * src.ElemSize - 1)
         label2 = "Thresholded Edge Mask (use slider to adjust)"
     End Sub
@@ -260,6 +266,7 @@ Public Class Edges_ResizeAdd
             sliders.setupTrackBar(2, "Threshold for Pixel Difference", 1, 50, 16)
         End If
         task.desc = "Find edges using a resize, subtract, and threshold."
+		task.rank = 1
         label1 = "Edges found with just resizing"
         label2 = "Found edges added to grayscale image source."
     End Sub
@@ -293,6 +300,7 @@ Public Class Edges_DCTfrequency
 
         label2 = "Mask for the isolated frequencies"
         task.desc = "Find edges by removing all the highest frequencies."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -332,6 +340,7 @@ Public Class Edges_Deriche_CPP
         Edges_Deriche = Edges_Deriche_Open()
         label2 = "Image enhanced with Deriche results"
         task.desc = "Edge detection using the Deriche X and Y gradients - Painterly"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -374,6 +383,7 @@ Public Class Edges_DCTinput
         label1 = "Canny edges produced from original grayscale image"
         label2 = "Edges produced with featureless regions cleared"
         task.desc = "Use the featureless regions to enhance the edge detection"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -409,6 +419,7 @@ Public Class Edges_BinarizedCanny
         edges = New Edges_Basics
         label1 = "Edges between halves, lightest, darkest, and the combo"
         task.desc = "Collect edges from binarized images"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -460,6 +471,7 @@ Public Class Edges_BinarizedBrightness
         bright = New PhotoShop_Brightness
 
         task.desc = "Visualize the impact of brightness on Edges_BinarizeSobel"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -491,6 +503,7 @@ Public Class Edges_BinarizedReduction
         reduction = New Reduction_Basics
 
         task.desc = "Visualize the impact of reduction on Edges_BinarizeSobel"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -523,6 +536,7 @@ Public Class Edges_Depth
         Dim kernelSlider = findSlider("Sobel kernel Size")
         kernelSlider.Value = 14
         task.desc = "Use Depth_SmoothMax to find edges in Depth"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -556,6 +570,7 @@ Public Class Edges_FeaturesOnly
         label1 = "Output of Edges_BinarizedSobel"
         label2 = "dst1 with featureless areas removed."
         task.desc = "Removing the featureless regions after a binarized sobel"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -593,6 +608,7 @@ Public Class Edges_Consistent
         End If
 
         task.desc = "Edges that are consistent for x number of frames"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -641,6 +657,7 @@ Public Class Edges_Stdev
         label1 = "Edges in High Stdev areas"
         label2 = "Mask of low stdev areas"
         task.desc = "Edges where stdev is above a threshold"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -675,6 +692,7 @@ Public Class Edges_BlackSquare
         edges = New Edges_BinarizedSobel
         std = New Math_Stdev
         task.desc = "Visualize the impact of Sobel on a black square"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -711,6 +729,7 @@ Public Class Edges_Combo
 
         label1 = "Sobel = red, Canny = yellow - they are identical"
         task.desc = "Combine the results of binarized canny and sobel"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -744,6 +763,7 @@ Public Class Edges_SobelLR
         sobel.sliders.trackbar(0).Value = 5
 
         task.desc = "Find the edges in the LeftViewimages."
+		task.rank = 1
         label1 = "Edges in Left Image"
         label2 = "Edges in Right Image (except on Kinect)"
     End Sub
@@ -791,6 +811,7 @@ Public Class Edges_Sobel
         End If
 
         task.desc = "Show Sobel edge detection with varying kernel sizes"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -835,6 +856,7 @@ Public Class Edges_SobelHorizontal
         edges = New Edges_Sobel
         edges.horizontalOnly = True
         task.desc = "Find edges with Sobel only in the horizontal direction"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -873,6 +895,7 @@ Public Class Edges_SobelLRBinarized
         label1 = "Horizontal Sobel - Left View"
         label2 = "Horizontal Sobel - Right View"
         task.desc = "Isolate edges in the left and right views."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -930,6 +953,7 @@ Public Class Edges_BinarizedSobel
         label1 = "Edges between halves, lightest, darkest, and the combo"
         label2 = "Click any quadrant in dst1 to enlarge it in dst2"
         task.desc = "Collect Sobel edges from binarized images"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1003,6 +1027,7 @@ Public Class Edges_Matching
         End If
 
         task.desc = "Match edges in the left and right views to determine distance"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1109,6 +1134,7 @@ Public Class Edges_MotionOverlay
 
         label2 = "AbsDiff output of offset with original"
         task.desc = "Find edges by displacing the current RGB image in any direction and diff it with the original."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1151,6 +1177,7 @@ Public Class Edges_RGB
         Dim thresholdCheck = findCheckBox("Threshold Sobel Results")
         thresholdCheck.Checked = False
         task.desc = "Combine the edges from all 3 channels.  Painterly"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1188,6 +1215,7 @@ Public Class Edges_HSV
         Dim thresholdSlider = findSlider("Threshold to zero pixels below this value")
         thresholdSlider.Value = 25
         task.desc = "Combine the edges from all 3 HSV channels.  Painterly"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

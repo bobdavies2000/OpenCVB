@@ -37,6 +37,7 @@ Public Class OpenGL_Basics
     Public Sub New()
         initParent()
         task.desc = "Create an OpenGL window and update it with images"
+		task.rank = 1
     End Sub
     Private Sub memMapUpdate()
         Dim timeConversionUnits As Double = 1000
@@ -167,6 +168,7 @@ Public Class OpenGL_Options
         OpenGL = New OpenGL_Basics()
         setOpenGLsliders(caller, sliders)
         task.desc = "Adjust point size and FOV in OpenGL"
+		task.rank = 1
         label1 = ""
     End Sub
     Public Sub Run()
@@ -209,6 +211,7 @@ Public Class OpenGL_Callbacks
         ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         task.desc = "Show the point cloud of 3D data and use callbacks to modify view."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -238,6 +241,7 @@ Public Class OpenGL_IMU
         ogl.sliders.trackbar(2).Value = 0 ' yaw
         ogl.sliders.trackbar(3).Value = 0 ' roll
         task.desc = "Show how to use IMU coordinates in OpenGL"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -284,6 +288,7 @@ Public Class OpenGL_3Ddata
 
         label1 = "Input to Histogram 3D"
         task.desc = "Plot the results of a 3D histogram in OpenGL."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -328,6 +333,7 @@ Public Class OpenGL_Draw3D
         ogl.pointCloudInput = New cv.Mat ' we are not using the point cloud when displaying data.
         label2 = "Grayscale image sent to OpenGL"
         task.desc = "Draw in an image show it in 3D in OpenGL without any explicit math"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -355,6 +361,7 @@ Public Class OpenGL_Voxels
         ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Voxels"
         task.desc = "Show the voxel representation in OpenGL"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -392,6 +399,7 @@ Public Class OpenGL_GravityTransform
         ogl.OpenGLTitle = "OpenGL_Callbacks"
 
         task.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -425,6 +433,7 @@ Public Class OpenGL_Floor
 
         plane = New Structured_LinearizeFloor()
         task.desc = "Convert depth cloud floor to a plane and visualize it with OpenGL"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -460,6 +469,7 @@ Public Class OpenGL_FloorPlane
         ogl.OpenGLTitle = "OpenGL_FloorPlane"
         plane = New Structured_LinearizeFloor()
         task.desc = "Show the floor in the pointcloud as a plane"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -552,6 +562,7 @@ Public Class OpenGL_DepthSliceH
         ogl.OpenGLTitle = "OpenGL_Callbacks"
 
         task.desc = "View depth slices in 3D with OpenGL"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -585,6 +596,7 @@ Public Class OpenGL_StableDepth
         ogl = New OpenGL_Options
 
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -615,6 +627,7 @@ Public Class OpenGL_AverageDepth
 
         label2 = "32-bit format stabilized depth data"
         task.desc = "Use the depth_stabilizer output as input the an OpenGL display"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -654,6 +667,7 @@ Public Class OpenGL_StableDepthMouse
 
         label2 = "dst2 is a pointcloud"
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -685,6 +699,7 @@ Public Class OpenGL_SmoothSurfaces
         ogl = New OpenGL_Callbacks
 
         task.desc = "Filter the 3D image to show only smooth surfaces."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -714,6 +729,7 @@ Public Class OpenGL_Stable
         stable = New Motion_MinMaxPointCloud
         ogl = New OpenGL_Callbacks
         task.desc = "Use the Motion_MinMaxPointCloud in 3D"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -745,6 +761,7 @@ Public Class OpenGL_ReducedXYZ
         ogl = New OpenGL_Basics
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         task.desc = "Display the pointCloud after reduction in X, Y, or Z dimensions."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -773,6 +790,7 @@ Public Class OpenGL_Reduced
         ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         task.desc = "Use the reduced depth pointcloud in OpenGL"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -801,6 +819,7 @@ Public Class OpenGL_ReducedSideView
         reduced = New PointCloud_ReducedSideView
         ogl = New OpenGL_Callbacks
         task.desc = "Use the reduced depth pointcloud in 3D but allow it to be rotated in Options_Common"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -831,6 +850,7 @@ Public Class OpenGL_MFD_PointCloud
         mfd = New MFD_PointCloud
         ogl = New OpenGL_Callbacks
         task.desc = "Use the MFD_PointCloud in 3D"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -864,6 +884,7 @@ Public Class OpenGL_Structured_PointCloud
 
         label1 = "Structured cloud 32fC3 data"
         task.desc = "Visualize the Structured_Cloud"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -876,6 +897,7 @@ Public Class OpenGL_Structured_PointCloud
         ogl.Run()
     End Sub
 End Class
+
 
 
 

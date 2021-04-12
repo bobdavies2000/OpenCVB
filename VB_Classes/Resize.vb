@@ -12,6 +12,7 @@ Public Class Resize_Basics
         rotateOptions.radio.check(6).Enabled = False
 
         task.desc = "Resize with different options and compare them"
+		task.rank = 1
         label1 = "Rectangle highlight above resized"
         label2 = "Difference from Cubic Resize (Best)"
     End Sub
@@ -53,6 +54,7 @@ Public Class Resize_Percentage
         End If
 
         task.desc = "Resize by a percentage of the image."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -74,5 +76,6 @@ Public Class Resize_Percentage
         End If
     End Sub
 End Class
+
 
 

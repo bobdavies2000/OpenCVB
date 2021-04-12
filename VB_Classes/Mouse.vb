@@ -5,6 +5,7 @@ Public Class Mouse_Basics
         initParent()
         label1 = "Move the mouse below to show mouse tracking."
         task.desc = "Test the mousePoint interface"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -30,6 +31,7 @@ Public Class Mouse_LeftClickZoom
         initParent()
         label1 = "Left click and drag to draw a rectangle"
         task.desc = "Demonstrate what the left-click enables"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -41,6 +43,7 @@ Public Class Mouse_LeftClickZoom
         If task.drawRect.Width <> 0 And task.drawRect.Height <> 0 Then dst2 = src(task.drawRect).Resize(dst2.Size())
     End Sub
 End Class
+
 
 
 

@@ -15,6 +15,7 @@ Public Class Polylines_IEnumerableExample
             sliders.setupTrackBar(1, "Polyline Thickness", 0, 10, 1)
         End If
         task.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -44,6 +45,7 @@ Public Class Polylines_Random
         initParent()
         label1 = CStr(zoomFactor) + "X zoom around mouse movement on image"
         task.desc = "Create a random procedural image - Painterly Effect"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -72,4 +74,5 @@ Public Class Polylines_Random
         dst2 = dst1.GetRectSubPix(New cv.Size(width, height), New cv.Point2f(x, y)).Resize(dst2.Size)
     End Sub
 End Class
+
 

@@ -54,6 +54,7 @@ Public Class Draw_Noise
             sliders.setupTrackBar(1, "Noise Width", 1, 10, 3)
         End If
         task.desc = "Add Noise to the color image"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -88,6 +89,7 @@ Public Class Draw_Ellipses
             sliders.setupTrackBar(0, "Ellipse Count", 1, 255, 3)
         End If
         task.desc = "Draw the requested number of ellipses."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -116,6 +118,7 @@ Public Class Draw_Circles
             sliders.setupTrackBar(0, "Circle Count", 1, 255, 3)
         End If
         task.desc = "Draw the requested number of circles."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -143,6 +146,7 @@ Public Class Draw_Line
             sliders.setupTrackBar(0, "Line Count", 1, 255, 1)
         End If
         task.desc = "Draw the requested number of Lines."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -169,6 +173,7 @@ Public Class Draw_Polygon
             sliders.setupTrackBar(0, "Polygon Count", 1, 255, 1)
         End If
         task.desc = "Draw Polygon figures"
+		task.rank = 1
         label2 = "Convex Hull for the same polygon"
 
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -226,6 +231,7 @@ Public Class Draw_Shapes
     Public Sub New()
         initParent()
         task.desc = "Use RNG to draw the same set of shapes every time"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -284,6 +290,7 @@ Public Class Draw_SymmetricalShapes
             check.Box(4).Checked = True
         End If
         task.desc = "Generate shapes programmatically"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -375,6 +382,7 @@ Public Class Draw_Arc
         setup()
 
         task.desc = "Use OpenCV's ellipse function to draw an arc"
+		task.rank = 1
     End Sub
     Private Sub setup()
         saveMargin = sliders.trackbar(0).Value ' work in the middle of the image.
@@ -439,6 +447,7 @@ Public Class Draw_ViewObjects
             check.Box(0).Checked = True
         End If
         task.desc = "Draw rectangles and centroids"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -489,6 +498,7 @@ Public Class Draw_Frustrum
 
         label2 = "Frustrum data prepared for 3D display - 32FC3"
         task.desc = "Draw a frustrum for a camera viewport"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -533,6 +543,7 @@ Public Class Draw_ClipLine
         setup()
 
         task.desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -580,6 +591,7 @@ Public Class Draw_Intersection
     Public Sub New()
         initParent()
         task.desc = "Determine if 2 lines intersect"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -632,6 +644,7 @@ Public Class Draw_Hexagon
         alpha.Size = New System.Drawing.Size(src.Width + 10, src.Height + 10)
         alpha.Text = "Perception is the key"
         task.desc = "What it means to recognize a cube.  Zygmunt Pizlo UC Irvine"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

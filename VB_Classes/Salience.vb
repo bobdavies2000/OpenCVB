@@ -30,6 +30,7 @@ Public Class Salience_Basics_CPP
 
         salience = Salience_Open()
         task.desc = "Show results of Salience algorithm when using C++"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -58,6 +59,7 @@ Public Class Salience_Basics_MT
         salience.sliders.trackbar(1).Value = 2
 
         task.desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -85,5 +87,6 @@ Public Class Salience_Basics_MT
             End Sub)
     End Sub
 End Class
+
 
 

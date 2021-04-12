@@ -9,6 +9,7 @@ Public Class Pyramid_Basics
             sliders.setupTrackBar(0, "Zoom in and out", -1, 1, 0)
         End If
         task.desc = "Use pyrup and pyrdown to zoom in and out of an image."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -42,6 +43,7 @@ Public Class Pyramid_Filter
         laplace = New Laplacian_PyramidFilter()
 
         task.desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -50,5 +52,6 @@ Public Class Pyramid_Filter
         dst1 = laplace.dst1
     End Sub
 End Class
+
 
 

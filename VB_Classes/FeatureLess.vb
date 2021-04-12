@@ -25,6 +25,7 @@ Public Class Featureless_Basics
 
         label1 = "Featureless mask"
         task.desc = "Multithread Houghlines to find featureless regions in an image."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -69,6 +70,7 @@ Public Class Featureless_DCT_MT
 
         label2 = "Largest FeatureLess Region"
         task.desc = "Use DCT to find featureless regions."
+		task.rank = 1
     End Sub
 
     Public Sub Run()
@@ -124,6 +126,7 @@ Public Class FeatureLess_Prediction
         fLess = New Featureless_Basics()
 
         task.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -215,6 +218,7 @@ Public Class FeatureLess_PointTracker
         label1 = "After point tracker"
         label2 = "Before point tracker"
         task.desc = "Track the featureless regions with point tracker"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -245,6 +249,7 @@ Public Class FeatureLess_Highlights
         fLessP = New FeatureLess_PointTracker()
         addW = New AddWeighted_Basics()
         task.desc = "Highlight the featureless regions in an RGB image"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -257,3 +262,4 @@ Public Class FeatureLess_Highlights
         dst1 = addW.dst1
     End Sub
 End Class
+

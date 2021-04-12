@@ -12,6 +12,7 @@ Public Class Watershed_Basics
         label1 = "Draw rectangle to add another marker"
         label2 = "Mask for watershed (selected regions)."
         task.desc = "Watershed API experiment.  Draw on the image to test."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -75,6 +76,7 @@ Public Class Watershed_DepthReduction
         watershed.UseCorners = True
         label2 = "Reduction input to WaterShed"
         task.desc = "Watershed the depth image using shadow, close, and far points."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -104,6 +106,7 @@ Public Class Watershed_DepthAuto
         watershed = New Watershed_Basics()
         watershed.UseCorners = True
         task.desc = "Watershed the four corners of the depth image."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -113,4 +116,5 @@ Public Class Watershed_DepthAuto
         label1 = watershed.label1
     End Sub
 End Class
+
 

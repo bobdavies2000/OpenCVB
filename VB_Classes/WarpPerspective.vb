@@ -12,6 +12,7 @@ Public Class WarpPerspective_Basics
             sliders.setupTrackBar(2, "Warped Angle", 0, 360, 0)
         End If
         task.desc = "Use WarpPerspective to transform input images."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -27,5 +28,6 @@ Public Class WarpPerspective_Basics
         cv.Cv2.WarpAffine(dst1, dst2, rotationMatrix, src.Size(), cv.InterpolationFlags.Nearest)
     End Sub
 End Class
+
 
 

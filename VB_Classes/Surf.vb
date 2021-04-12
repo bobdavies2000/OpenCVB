@@ -26,6 +26,7 @@ Public Class Surf_Basics
         End If
 
         task.desc = "Compare 2 images to get a homography.  We will use left and right images."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -56,6 +57,7 @@ Public Class Surf_BasicsVB
         fisheye = New FishEye_Rectified()
         surf = New Surf_Basics()
         task.desc = "Use left and right views to match points in horizontal slices."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -84,6 +86,7 @@ Public Class Surf_DrawMatchManual_CS
             sliders.setupTrackBar(0, "Surf Vertical Range to Search", 0, 50, 10)
         End If
         task.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -117,4 +120,5 @@ Public Class Surf_DrawMatchManual_CS
         label2 = "Yellow matched left to right = " + CStr(matchCount) + ". Red is unmatched."
     End Sub
 End Class
+
 

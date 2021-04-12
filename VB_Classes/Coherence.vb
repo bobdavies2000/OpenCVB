@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 ' http://www.mia.uni-saarland.de/Publications/weickert-dagm03.pdf
 Public Class Coherence_Basics
     Inherits VBparent
@@ -13,6 +13,7 @@ Public Class Coherence_Basics
         End If
         label1 = "Coherence - draw rectangle to apply"
         task.desc = "Find lines that are artistically coherent in the image - Painterly"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -92,6 +93,7 @@ Public Class Coherent_Depth
         initParent()
         coherent = New Coherence_Basics
         task.desc = "Find coherent lines in the depth image - Painterly"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

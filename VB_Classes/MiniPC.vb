@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class MiniPC_Basics
     Inherits VBparent
     Dim resize As Resize_Percentage
@@ -9,6 +9,7 @@ Public Class MiniPC_Basics
         gCloud = New Depth_PointCloud_IMU()
         resize = New Resize_Percentage
         task.desc = "Create a mini point cloud for use with histograms"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -49,6 +50,7 @@ Public Class MiniPC_Rotate
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         label2 = "Side view after resize percentage"
         task.desc = "Create a histogram for the mini point cloud"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -121,6 +123,7 @@ Public Class MiniPC_RotateAngle
         label1 = "peak dst1, peak dst2, changed mask, maxvalues history"
         label2 = "Blue is mean*100, red is maxVal/100, green mask count"
         task.desc = "Find a peak value in the side view histograms"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -178,6 +181,7 @@ Public Class MiniPC_RotateSinglePass
         peak = New MiniPC_Rotate
         peak.angleY = -90
         task.desc = "Same operation as MiniPC_RotateAngle but in a single pass."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

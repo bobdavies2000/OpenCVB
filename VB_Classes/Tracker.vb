@@ -160,6 +160,7 @@ Public Class Tracker_Basics
         End If
 
         task.desc = "Use C++ to track objects"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -208,3 +209,4 @@ Public Class Tracker_Basics
         Tracker_Basics_Close(cPtr)
     End Sub
 End Class
+

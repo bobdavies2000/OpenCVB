@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports mnum = MathNet.Numerics
 Imports System.Runtime.InteropServices
 ' https://www.codeproject.com/Tips/5296095/Perform-a-2D-Fourier-Transform-with-the-Package-ma?msg=5791718#xx5791718xx
@@ -7,6 +7,7 @@ Public Class Fourier_MathNet
     Public Sub New()
         initParent()
         task.desc = "Use the 1D Fourier support in MathNet to do a 2D Fourier transform"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -43,6 +44,7 @@ Public Class Fourier_MathNet
         label1 = "Magnitude=" + Format(magnitude, "###,##0") + " phase=" + Format(phase, "#.000")
     End Sub
 End Class
+
 
 
 

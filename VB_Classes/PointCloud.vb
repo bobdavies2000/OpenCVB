@@ -105,6 +105,7 @@ Public Class PointCloud_Basics
     Public Sub New()
         initParent()
         task.desc = "Display the point cloud in a 2D image for use with the PixelViewer"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -128,6 +129,7 @@ Public Class PointCloud_Continuous
         End If
 
         task.desc = "Show where the pointcloud is continuous"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -168,6 +170,7 @@ Public Class PointCloud_Inspector
         dst1 = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
 
         task.desc = "Inspect x, y, and z values in a row or column"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -219,6 +222,7 @@ Public Class PointCloud_Continuous_VB
         dst1 = New cv.Mat(src.Size, cv.MatType.CV_8U)
         dst2 = New cv.Mat(src.Size, cv.MatType.CV_8U)
         task.desc = "Show where the pointcloud is continuous"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -274,6 +278,7 @@ Public Class PointCloud_ColorizeSide
         If standalone Then imu = New IMU_GVector
         label1 = "Colorize mask for side view"
         task.desc = "Create the colorized mat used for side projections"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -380,6 +385,7 @@ Public Class PointCloud_ColorizeTop
 
         label1 = "Colorize mask for top down view"
         task.desc = "Create the colorize the mat for a topdown projections"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -460,6 +466,7 @@ Public Class PointCloud_Raw_CPP
         label1 = "Top View"
         label2 = "Side View"
         task.desc = "Project the depth data onto a top view and side view."
+		task.rank = 1
 
         cPtr = SimpleProjectionOpen()
     End Sub
@@ -511,6 +518,7 @@ Public Class PointCloud_Raw
         label1 = "Top View"
         label2 = "Side View"
         task.desc = "Project the depth data onto a top view and side view - using only VB code (too slow.)"
+		task.rank = 1
 
         cPtr = SimpleProjectionOpen()
     End Sub
@@ -569,6 +577,7 @@ Public Class PointCloud_Kalman_TopView
         topView = New Histogram_TopView2D
 
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -619,6 +628,7 @@ Public Class PointCloud_Kalman_SideView
         sideView = New Histogram_SideView2D()
 
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -666,6 +676,7 @@ Public Class PointCloud_BackProject
         label1 = "Click any quadrant below to enlarge it"
         label2 = "Click any centroid to display details"
         task.desc = "Backproject the selected object"
+		task.rank = 1
     End Sub
 
     Public Sub Run()
@@ -718,6 +729,7 @@ Public Class PointCloud_FrustrumTop
 
         label2 = "Draw_Frustrum output"
         task.desc = "Translate only the frustrum with gravity"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -760,6 +772,7 @@ Public Class PointCloud_FrustrumSide
 
         label2 = "Draw_Frustrum output"
         task.desc = "Translate only the frustrum with gravity"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -793,6 +806,7 @@ Public Class PointCloud_Singletons
         label1 = "Top down view before inrange sampling"
         label2 = "Histogram after filtering for single-only histogram bins"
         task.desc = "Find floor and ceiling using gravity aligned top-down view and selecting bins with exactly 1 sample"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -824,6 +838,7 @@ Public Class PointCloud_ReducedSideView
         gCloud = New Depth_PointCloud_IMU
         reduction = New Reduction_Basics
         task.desc = "Create a stable side view of the point cloud"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -863,6 +878,7 @@ Public Class PointCloud_ReducedTopView
         gCloud = New Depth_PointCloud_IMU
         reduction = New Reduction_Basics
         task.desc = "Create a stable side view of the point cloud"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -912,6 +928,7 @@ Public Class PointCloud_ObjectsTop
             End If
         End If
         task.desc = "Validate the formula for pixel height as a function of distance"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1023,6 +1040,7 @@ Public Class PointCloud_ObjectsSide
             sliders.setupTrackBar(0, "Test Bar Distance from camera in mm", 1, 4000, 1500)
         End If
         task.desc = "Validate the formula for pixel height as a function of distance"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1147,6 +1165,7 @@ Public Class PointCloud_BothViews
         backMatMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1)
 
         task.desc = "Find the actual width in pixels for the objects detected in the top view"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1269,6 +1288,7 @@ Public Class PointCloud_BackProjectTopView
         label1 = "Back projection of objects identified in the top view"
         label2 = "Objects identified in the top view"
         task.desc = "Display only the top view of the depth data and backproject the histogram onto the RGB image."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1334,6 +1354,7 @@ Public Class PointCloud_BackProjectSideView
         view = New PointCloud_ObjectsSide
         cmatSide = New PointCloud_ColorizeSide
         task.desc = "Display only the side view of the depth data - with and without the IMU active"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1383,3 +1404,4 @@ Public Class PointCloud_BackProjectSideView
         End If
     End Sub
 End Class
+

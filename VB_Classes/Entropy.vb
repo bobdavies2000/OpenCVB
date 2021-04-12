@@ -15,6 +15,7 @@ Public Class Entropy_Basics
         End If
 
         task.desc = "Compute the entropy in an image - a measure of contrast(iness)"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -61,6 +62,7 @@ Public Class Entropy_Highest
 
         label1 = "Highest entropy marked with red rectangle"
         task.desc = "Find the highest entropy section of the color image."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -115,6 +117,7 @@ Public Class Entropy_FAST
         label1 = "Output of Fast_Basics, input to entropy calculation"
         label2 = "Lighter color is higher entropy, Red marks highest"
         task.desc = "Use FAST markings to add to entropy"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -167,3 +170,4 @@ Public Class Entropy_Simple
         Next
     End Sub
 End Class
+

@@ -24,6 +24,7 @@ Public Class Trace_OpenCV_CPP
         initParent()
         Trace_OpenCV = Trace_OpenCV_Open()
         task.desc = "Use OpenCV's Trace facility - applicable to C++ code - and requires Intel's VTune (see link in code.)"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -39,6 +40,7 @@ Public Class Trace_OpenCV_CPP
         Trace_OpenCV_Close(Trace_OpenCV)
     End Sub
 End Class
+
 
 
 

@@ -5,6 +5,7 @@ Public Class Solve_ByMat
     Public Sub New()
         initParent()
         task.desc = "Solve a set of equations with OpenCV's Solve API."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -31,6 +32,7 @@ Public Class Solve_ByArray
     Public Sub New()
         initParent()
         task.desc = "Solve a set of equations with OpenCV's Solve API with a normal array as input  "
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -45,4 +47,5 @@ Public Class Solve_ByArray
         task.trueText("Solution ByArray: X1 = " + CStr(x.Get(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(Of Double)(0, 1)), 10, 125)
     End Sub
 End Class
+
 

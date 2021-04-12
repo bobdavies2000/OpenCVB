@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class MFD_Basics
     Inherits VBparent
     Public motion As Motion_Basics
@@ -16,6 +16,7 @@ Public Class MFD_Basics
         End If
         label1 = "Motion-filtered image"
         task.desc = "Motion-Filtered basics - update only the changed regions"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -59,6 +60,7 @@ Public Class MFD_Depth
         mfd = New MFD_Basics
         label1 = "Motion-filtered depth data"
         task.desc = "Stabilize the depth image but update any areas with motion"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -84,6 +86,7 @@ Public Class MFD_PointCloud
         mfd = New MFD_Basics
         label1 = "Motion-filtered PointCloud"
         task.desc = "Stabilize the PointCloud but update any areas with motion"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -119,6 +122,7 @@ Public Class MFD_Sobel
 
         label1 = "Sobel edges of Motion-Filtered RGB"
         task.desc = "Stabilize the Sobel output with MFD"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -151,6 +155,7 @@ Public Class MFD_BinarizedSobel
         sobel = New Edges_BinarizedSobel
         label1 = "Binarized Sobel edges of Motion-Filtered RGB"
         task.desc = "Stabilize the binarized Sobel output with MFD"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -195,6 +200,7 @@ Public Class MFD_FloodFill
         End If
 
         task.desc = "Floodfill the image of MFD edges (binarized Sobel output)"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -286,4 +292,5 @@ Public Class MFD_FloodFill
 
     End Sub
 End Class
+
 

@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class ImageSeg_Basics
     Inherits VBparent
     Dim addw As AddWeighted_Basics
@@ -15,6 +15,7 @@ Public Class ImageSeg_Basics
         addw = New AddWeighted_Basics
         flood = New FloodFill_FullImage
         task.desc = "Get the image segments and their associated features - centroids, masks, size, and enclosing rectangles"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -54,6 +55,7 @@ Public Class ImageSeg_InRange
         initParent()
         iSeg = New ImageSeg_Basics
         task.desc = "Trim segments that are not in the range requested"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -88,6 +90,7 @@ Public Class ImageSeg_MissingSegments
         flood = New FloodFill_FullImage
 
         task.desc = "Floodfill segments which were marked as missing and clear small unused segments"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -150,6 +153,7 @@ Public Class ImageSeg_Unstable
         End If
 
         task.desc = "Find the unstable segments and remove them"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -193,6 +197,7 @@ Public Class ImageSeg_CentroidTracker
 
         label1 = "Output of ImageSeg_Basics"
         task.desc = "Track the centroids that are found consistently from frame to frame."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

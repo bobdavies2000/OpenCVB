@@ -34,6 +34,7 @@ Public Class Hull_Basics
         End If
 
         task.desc = "Surround a set of random points with a convex hull"
+		task.rank = 1
         label1 = "Convex Hull Output"
         label2 = "Convex Hull Input"
     End Sub
@@ -70,5 +71,6 @@ Public Class Hull_Basics
         End If
     End Sub
 End Class
+
 
 

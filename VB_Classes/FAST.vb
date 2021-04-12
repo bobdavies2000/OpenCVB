@@ -15,6 +15,7 @@ Public Class FAST_Basics
             check.Box(0).Checked = True
         End If
         task.desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -44,6 +45,7 @@ Public Class FAST_Centroid
 
         fast = New FAST_Basics()
         task.desc = "Find interesting points with the FAST and smooth the centroid with kalman"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -64,6 +66,7 @@ Public Class FAST_Centroid
         End If
     End Sub
 End Class
+
 
 
 

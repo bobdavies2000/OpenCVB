@@ -14,6 +14,7 @@ Public Class Distance_Basics
         label1 = "Distance results"
         label2 = "Input mask to distance transformm"
         task.desc = "Distance algorithm basics."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -54,6 +55,7 @@ Public Class Distance_Foreground
         label1 = "Distance results"
         label2 = "Input mask to distance transformm"
         task.desc = "Distance algorithm basics."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -76,5 +78,6 @@ Public Class Distance_Foreground
         dst1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
+
 
 

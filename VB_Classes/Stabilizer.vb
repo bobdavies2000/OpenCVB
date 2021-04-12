@@ -24,6 +24,7 @@ Public Class Stabilizer_Basics
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         label1 = "Current frame - rectangle input to matchTemplate"
         task.desc = "if reasonable stdev and no motion in correlation rectangle, stabilize image across frames"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -115,6 +116,7 @@ Public Class Stabilizer_BasicsRandomInput
         label1 = "Current frame (before)"
         label2 = "Image after shift"
         task.desc = "Generate images that have been arbitrarily shifted"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -171,6 +173,7 @@ Public Class Stabilizer_BasicsTest
 
         label1 = "Unstable input to Stabilizer_Basics"
         task.desc = "Test the Stabilizer_Basics with random movement"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -206,6 +209,7 @@ Public Class Stabilizer_OpticalFlow
         good = New Features_GoodFeatures()
 
         task.desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
+		task.rank = 1
         label1 = "Stabilized Image"
     End Sub
     Public Sub Run()
@@ -326,6 +330,7 @@ Public Class Stabilizer_MotionDetect
         End If
 
         task.desc = "Detect motiion in the stabilizer output"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

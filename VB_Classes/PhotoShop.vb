@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class PhotoShop_Clahe ' Contrast Limited Adaptive Histogram Equalization (CLAHE)
     Inherits VBparent
@@ -12,6 +12,7 @@ Public Class PhotoShop_Clahe ' Contrast Limited Adaptive Histogram Equalization 
         label1 = "GrayScale"
         label2 = "CLAHE Result"
         task.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -34,6 +35,7 @@ Public Class PhotoShop_Hue
         label1 = "Hue"
         label2 = "Saturation"
         task.desc = "Show hue (Result1) and Saturation (Result2)."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -56,6 +58,7 @@ Public Class PhotoShop_AlphaBeta
     Public Sub New()
         initParent()
         task.desc = "Use alpha and beta with ConvertScaleAbs."
+		task.rank = 1
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 500, 300)
@@ -81,6 +84,7 @@ Public Class PhotoShop_Gamma
     Public Sub New()
         initParent()
         task.desc = "Use gamma with ConvertScaleAbs."
+		task.rank = 1
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Brightness Gamma correction", 0, 200, 100)
@@ -132,6 +136,7 @@ Public Class PhotoShop_WhiteBalance_CPP
         label1 = "Image with auto white balance"
         label2 = "White pixels were altered from the original"
         task.desc = "Automate getting the right white balance"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -175,6 +180,7 @@ Public Class PhotoShop_WhiteBalance
 
         label1 = "Image with auto white balance"
         task.desc = "Automate getting the right white balance"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -234,6 +240,7 @@ Public Class PhotoShop_ChangeMask
         whiteCPP = New PhotoShop_WhiteBalance_CPP()
 
         task.desc = "Create a mask for the changed pixels after white balance"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -283,6 +290,7 @@ Public Class PhotoShop_PlotHist
         mat2to1 = New Mat_2to1()
 
         task.desc = "Plot the histogram of the before and after white balancing"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -318,6 +326,7 @@ Public Class PhotoShop_Sepia
     Public Sub New()
         initParent()
         task.desc = "Create a sepia image"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -357,6 +366,7 @@ Public Class PhotoShop_Emboss
         gray128 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 128)
         label2 = "Embossed output"
         task.desc = "Use the video stream to make it appear like an embossed paper image."
+		task.rank = 1
     End Sub
     Public Function kernelGenerator(size As Integer) As cv.Mat
         Dim kernel As New cv.Mat(size, size, cv.MatType.CV_8S, 0)
@@ -420,6 +430,7 @@ Public Class PhotoShop_EmbossAll
         label1 = "The combination of all angles"
         label2 = "bottom left, bottom right, top left, top right"
         task.desc = "Emboss using all the directions provided"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -495,6 +506,7 @@ Public Class PhotoShop_DuoTone
         End If
 
         task.desc = "Create a DuoTone image"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -552,6 +564,7 @@ Public Class PhotoShop_Brightness
 
         label1 = "RGB straight to HSV"
         task.desc = "Implement the traditional brightness effect"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -591,6 +604,7 @@ Public Class PhotoShop_UnsharpMask
             sliders.setupTrackBar(2, "Shift Amount", 0, 5000, 1000)
         End If
         task.desc = "Sharpen an image - Painterly Effect"
+		task.rank = 1
         label2 = "Unsharp mask (difference from Blur)"
     End Sub
     Public Sub Run()
@@ -625,6 +639,7 @@ Public Class PhotoShop_SharpenDetail
             sliders.setupTrackBar(1, "DetailEnhance Sigma_r X100", 1, 100, 7)
         End If
         task.desc = "Enhance detail on an image - Painterly Effect"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -651,6 +666,7 @@ Public Class PhotoShop_SharpenStylize
             sliders.setupTrackBar(1, "Stylize Sigma_r X100", 1, 100, 7)
         End If
         task.desc = "Stylize an image - Painterly Effect"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -679,6 +695,7 @@ Public Class PhotoShop_Pencil_Basics
         End If
 
         task.desc = "Convert image to a pencil sketch - Painterly Effect"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -712,6 +729,7 @@ Public Class PhotoShop_Pencil_Manual
             radio.check(0).Checked = True
         End If
         task.desc = "Break down the process of converting an image to a sketch - Painterly Effect"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -731,3 +749,4 @@ Public Class PhotoShop_Pencil_Manual
         dst2 = Choose(index + 1, src, grayinv, blur)
     End Sub
 End Class
+

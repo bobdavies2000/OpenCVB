@@ -12,6 +12,7 @@ Public Class GrabCut_Basics
         label1 = "Foreground from depth data"
         label2 = "Foreground after GrabCut using mask in dst1"
         task.desc = "Use grabcut with just a foreground and background definition."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -66,6 +67,7 @@ Public Class GrabCut_FineTune
         label1 = "Foreground Mask, fg fine tuning, bg fine tuning, blank"
         label2 = "Grabcut results after adding fine tuning selections"
         task.desc = "There are probably mistakes in the initial Grabcut_Basics.  Use the checkbox to fine tune what is background and foreground"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -104,5 +106,6 @@ Public Class GrabCut_FineTune
         dst2 = basics.dst2
     End Sub
 End Class
+
 
 

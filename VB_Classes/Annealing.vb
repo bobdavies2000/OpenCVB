@@ -70,6 +70,7 @@ Public Class Annealing_Basics_CPP
         initParent()
         setup()
         task.desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -171,6 +172,7 @@ Public Class Annealing_CPP_MT
         label2 = "Top 2 are best solutions, bottom 2 are worst."
 
         task.desc = "Setup and control finding the optimal route for a traveling salesman"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -269,6 +271,7 @@ Public Class Annealing_Options
         anneal.setup()
         anneal.Open()
         task.desc = "Setup and control finding the optimal route for a traveling salesman"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -304,4 +307,5 @@ Public Class Annealing_Options
 
     End Sub
 End Class
+
 

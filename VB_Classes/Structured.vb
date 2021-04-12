@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Public Class Structured_Floor
     Inherits VBparent
     Public structD As Structured_SliceH
@@ -12,6 +12,7 @@ Public Class Structured_Floor
         structD.cushionSlider.Value = 5 ' floor runs can use a thinner slice that ceilings...
 
         task.desc = "Find the floor plane"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -61,6 +62,7 @@ Public Class Structured_Ceiling
         structD = New Structured_SliceH()
         structD.cushionSlider.Value = 10
         task.desc = "Find the ceiling plane"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -100,6 +102,7 @@ Public Class Structured_MultiSliceH
         structD = New Structured_SliceH
 
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -150,6 +153,7 @@ Public Class Structured_MultiSliceV
         structD = New Structured_SliceV
 
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -205,6 +209,7 @@ Public Class Structured_MultiSlice
         struct = New Structured_SliceV()
 
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -269,6 +274,7 @@ Public Class Structured_MultiSliceLines
         lenSlider.Value = lenSlider.Maximum ' don't need the yellow line...
         multi = New Structured_MultiSlice()
         task.desc = "Detect lines in the multiSlice output"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -300,6 +306,7 @@ Public Class Structured_MultiSlicePolygon
             sliders.setupTrackBar(0, "Max number of sides in the identified polygons", 3, 100, 4)
         End If
         task.desc = "Detect polygons in the multiSlice output"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -341,6 +348,7 @@ Public Class Structured_SliceXPlot
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         cushionSlider.Value = cushionSlider.Maximum
         task.desc = "Find any plane around a peak value in the top-down histogram"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -402,6 +410,7 @@ Public Class Structured_LinearizeFloor
             check.Box(1).Checked = True
         End If
         task.desc = "Using the mask for the floor create a better representation of the floor plane"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -502,6 +511,7 @@ Public Class Structured_SliceOptions
         End If
 
         task.desc = "Structured Slice options"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -532,6 +542,7 @@ Public Class Structured_SliceH
 
         label2 = "Yellow bar is ceiling.  Yellow line is camera level."
         task.desc = "Find and isolate planes (floor and ceiling) in a side view histogram."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -596,6 +607,7 @@ Public Class Structured_SliceV
         offsetSlider.Value = src.Width / 2
 
         task.desc = "Find and isolate planes using the top view histogram data"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -658,6 +670,7 @@ Public Class Structured_SliceVStable
         offsetSlider.Value = src.Width / 2
 
         task.desc = "Find and isolate planes using the top view histogram data"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -711,6 +724,7 @@ Public Class Structured_CenterSlice
         label1 = "Center Slice in yellow"
         label2 = "White = SliceV output, Red Dot is avgPt"
         task.desc = "Find the vertical center line with accurate depth data.."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -803,6 +817,7 @@ Public Class Structured_CloudFail
         End If
 
         task.desc = "Attempt to impose a structure on the point cloud data."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -884,6 +899,7 @@ Public Class Structured_Cloud
         End If
 
         task.desc = "Attempt to impose a linear structure on the pointcloud."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -926,6 +942,7 @@ Public Class Structured_Crosshairs
         initParent()
         sCloud = New Structured_Cloud
         task.desc = "Connect vertical and horizontal dots that are in the same column and row."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

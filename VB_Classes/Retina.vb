@@ -37,6 +37,7 @@ Public Class Retina_Basics_CPP
         label1 = "Retina Parvo"
         label2 = "Retina Magno"
         task.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -100,6 +101,7 @@ Public Class Retina_Depth
         retina = New Retina_Basics_CPP()
 
         task.desc = "Use the bio-inspired retina algorithm with the depth data."
+		task.rank = 1
         label1 = "Last result || current result"
         label2 = "Current depth motion result"
     End Sub
@@ -114,4 +116,5 @@ Public Class Retina_Depth
         lastMotion = retina.dst2
     End Sub
 End Class
+
 

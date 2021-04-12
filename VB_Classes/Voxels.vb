@@ -24,6 +24,7 @@ Public Class Voxels_Basics_MT
 
         label2 = "Voxels labeled with their median distance"
         task.desc = "Use multi-threading to get median depth values as voxels."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -75,4 +76,5 @@ Public Class Voxels_Basics_MT
         voxelMat *= 255 / (task.maxDepth - task.minDepth) ' do the normalize manually to use the min and max Depth (more stable image)
     End Sub
 End Class
+
 

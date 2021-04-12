@@ -9,6 +9,7 @@ Public Class MeanSubtraction_Basics
             sliders.setupTrackBar(0, "Scaling Factor = mean/scaling factor X100", 1, 500, 100)
         End If
         task.desc = "Subtract the mean from the image with a scaling factor"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -18,4 +19,5 @@ Public Class MeanSubtraction_Basics
         dst1 *= 1 / scalingFactor
     End Sub
 End Class
+
 

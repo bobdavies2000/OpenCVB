@@ -25,6 +25,7 @@ Public Class Blob_Basics
             sliders.setupTrackBar(2, "Threshold Step", 1, 50, 5)
         End If
         task.desc = "Test C# Blob Detector."
+		task.rank = 1
         task.rank = 1
     End Sub
     Public Sub Run()
@@ -95,6 +96,7 @@ Public Class Blob_Input
         label1 = "Click any quadrant below to view it on the right"
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Generate data to test Blob Detector."
+		task.rank = 1
         task.rank = 1
     End Sub
     Public Sub Run()
@@ -133,6 +135,7 @@ Public Class Blob_RenderBlobs
         blob.updateFrequency = 1
 
         task.desc = "Use connected components to find blobs."
+		task.rank = 1
         label1 = "Input blobs"
         label2 = "Showing only the largest blob in test data"
         task.rank = 1
@@ -187,6 +190,7 @@ Public Class Blob_Rectangles
         initParent()
         blobs = New Blob_Largest()
         task.desc = "Get the blobs and their masks and outline them with a rectangle."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -241,6 +245,7 @@ Public Class Blob_Largest
 
         blobs = New Blob_DepthClusters()
         task.desc = "Gather all the blob data and display the largest."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -325,6 +330,7 @@ Public Class Blob_DepthClusters
 
         label2 = "Backprojection of identified histogram depth clusters."
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
+        task.rank = 3
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -363,6 +369,7 @@ Public Class Blob_DepthPixelSampler
 
         label2 = "Backprojection of identified histogram depth clusters."
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
+        task.rank = 2
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -411,6 +418,7 @@ Public Class Blob_DepthRanges
 
         label2 = "Identified histogram depth clusters."
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
+        task.rank = 4
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -469,6 +477,7 @@ Public Class Blob_DepthRangesGray
         blobs.grayOnly = True
         If standalone Then palette = New Palette_Basics
         task.desc = "Find the depth ranges but only in grayscale."
+        task.rank = 5
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -511,6 +520,7 @@ Public Class Blob_DepthFloodfill
         label1 = "Slices in depth merged to connected slices"
         label2 = "Before slices were merged"
         task.desc = "Use the grayscale blobs to connect depth neighbors that are 1-pixel value different"
+		task.rank = 1
         task.rank = 5
     End Sub
     Public Sub Run()

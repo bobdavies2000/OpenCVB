@@ -26,6 +26,7 @@ Public Class CComp_Basics
         End If
 
         task.desc = "Draw bounding boxes around RGB binarized connected Components"
+		task.rank = 1
     End Sub
     Private Function renderBlobs(minSize As Integer, mask As cv.Mat, maxSize As Integer) As Integer
         Dim count As Integer = 0
@@ -119,6 +120,7 @@ Public Class CComp_Basics_FullImage
         basics = New CComp_Basics()
 
         task.desc = "Connect components in the light half of OTSU threshold output, then use the dark half, then combine results."
+		task.rank = 1
         label2 = "Masks binary+otsu used to compute mean depth"
     End Sub
     Private Function colorWithDepth(matIndex As Integer) As Integer
@@ -179,6 +181,7 @@ Public Class CComp_PointTracker
         hotRadio.Checked = True
 
         task.desc = "Track connected componenent centroids and use it to match coloring"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -234,6 +237,7 @@ Public Class CComp_MaxBlobs
         hotRadio.Checked = True
 
         task.desc = "Find the best CComp threshold to maximize the number of blobs"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -288,6 +292,7 @@ Public Class CComp_MaxPixels
         maxBlob = New CComp_MaxBlobs()
         maxBlob.incr = 5
         task.desc = "Find the best CComp threshold to maximize pixels"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -343,6 +348,7 @@ Public Class CComp_DepthEdges
         hotRadio.Checked = True
 
         task.desc = "Use depth edges to isolate connected components in depth"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -373,6 +379,7 @@ Public Class CComp_EdgeMask
         ccomp = New CComp_ColorDepth()
 
         task.desc = "Isolate Color connected components after applying the Edge Mask"
+		task.rank = 1
         label1 = "Edges_DepthAndColor (input to ccomp)"
         label2 = "Blob Rectangles with centroids (white)"
     End Sub
@@ -401,6 +408,7 @@ Public Class CComp_ColorDepth
         label1 = "Color by Mean Depth"
         label2 = "Binary image using threshold binary+Otsu"
         task.desc = "Color connected components based on their depth"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -437,6 +445,7 @@ Public Class CComp_InRange_MT
         sliders.setupTrackBar(1, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
 
         task.desc = "Connected components in specific ranges"
+		task.rank = 1
         label2 = "Blob rectangles - largest to smallest"
     End Sub
     Public Sub Run()
@@ -494,6 +503,7 @@ Public Class CComp_InRange
             sliders.setupTrackBar(1, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
         End If
         task.desc = "Connect components in specific ranges"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -540,6 +550,7 @@ Public Class CComp_Shapes
         label1 = "Largest connected component"
         label2 = "RectView, LabelView, Binary, grayscale"
         task.desc = "Use connected components to isolate objects in image."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -591,6 +602,7 @@ Public Class CComp_Simple
 
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         task.desc = "Draw bounding boxes around RGB binarized connected Components"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -642,6 +654,7 @@ Public Class CComp_Binarized
         ccomp = New CComp_Simple
         edges = New Edges_BinarizedSobel
         task.desc = "Find connected components using an image with binarized edges"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -654,6 +667,7 @@ Public Class CComp_Binarized
         dst2 = ccomp.dst2
     End Sub
 End Class
+
 
 
 

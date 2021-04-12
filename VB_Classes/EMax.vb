@@ -23,6 +23,7 @@ Public Class EMax_Basics
 
         label2 = "Emax regions around clusters"
         task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -94,6 +95,7 @@ Public Class EMax_CentroidsNew
         gridWidthSlider.Value = src.Width * 170 / 640
 
         task.desc = "Colorize the output of Emax"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -151,6 +153,7 @@ Public Class EMax_VB_Failing
         End If
 
         task.desc = "OpenCV expectation maximization example."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -257,6 +260,7 @@ Public Class EMax_Centroids
         gridWidthSlider.Value = src.Width * 170 / 640
 
         task.desc = "Get the Emax cluster centroids using floodfill "
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -298,6 +302,7 @@ Public Class EMax_PointTracker
 
         label1 = "Original before KNN/Kalman tracking (red=previous)"
         task.desc = "Use KNN and Kalman to track the EMax Centroids and map consisten colors"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -332,3 +337,4 @@ Public Class EMax_PointTracker
         label2 = "After: there were " + Format(totalErrors / generationCount, "0.0") + " average errors matching centroids"
     End Sub
 End Class
+

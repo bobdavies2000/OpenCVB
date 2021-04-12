@@ -19,6 +19,7 @@ Public Class GetRotationMatrix2D_Options
         End If
 
         task.desc = "Run to get the warpflag based on the current options"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -54,6 +55,7 @@ Public Class GetRotationMatrix2D_Basics
         End If
 
         task.desc = "Rotate a rectangle of a specified angle"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -83,6 +85,7 @@ Public Class GetRotationMatrix2D_Box
         label1 = "Original Rectangle in the original perspective"
         label2 = "Same Rectangle in the new warped perspective"
         task.desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -112,4 +115,5 @@ Public Class GetRotationMatrix2D_Box
         Next
     End Sub
 End Class
+
 

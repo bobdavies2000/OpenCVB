@@ -26,6 +26,7 @@ Public Class Etch_ASketch
         cursor = randomCursor()
         dst1.SetTo(slateColor)
         task.desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -72,4 +73,5 @@ Public Class Etch_ASketch
         End If
     End Sub
 End Class
+
 

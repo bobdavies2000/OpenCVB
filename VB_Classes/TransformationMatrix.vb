@@ -13,6 +13,7 @@ Public Class TransformationMatrix_Basics
         label1 = "View from above the camera"
         label2 = "View from side of the camera"
         task.desc = "Show the contents of the transformation matrix"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -40,4 +41,5 @@ Public Class TransformationMatrix_Basics
         End If
     End Sub
 End Class
+
 

@@ -6,6 +6,7 @@ Public Class Bitwise_Not
         label1 = "Color BitwiseNot"
         label2 = "Gray BitwiseNot"
         task.desc = "Gray and color bitwise_not"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -14,4 +15,5 @@ Public Class Bitwise_Not
         cv.Cv2.BitwiseNot(gray, dst2)
     End Sub
 End Class
+
 

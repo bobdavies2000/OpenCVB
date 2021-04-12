@@ -5,6 +5,7 @@ Public Class Remap_Basics
     Public Sub New()
         initParent()
         task.desc = "Use remap to reflect an image in 4 directions."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -49,6 +50,7 @@ Public Class Remap_Flip
     Public Sub New()
         initParent()
         task.desc = "Use flip to remap an image."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -70,6 +72,7 @@ Public Class Remap_Flip
         End If
     End Sub
 End Class
+
 
 
 

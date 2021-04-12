@@ -43,6 +43,7 @@ Public Class Harris_Features_CPP
             sliders.setupTrackBar(4, "Weight for dst1 X100", 1, 100, 50)
         End If
         task.desc = "Use Harris feature detectors to identify interesting points."
+		task.rank = 1
 
         ReDim srcData(src.Total - 1)
         Harris_Features = Harris_Features_Open()
@@ -91,6 +92,7 @@ Public Class Harris_Detector_CPP
             sliders.setupTrackBar(0, "Harris qualityLevel", 1, 100, 2)
         End If
         task.desc = "Use Harris detector to identify interesting points."
+		task.rank = 1
 
         ReDim srcData(src.Total - 1)
         Harris_Detector = Harris_Detector_Open()
@@ -122,5 +124,6 @@ Public Class Harris_Detector_CPP
         Harris_Detector_Close(Harris_Detector)
     End Sub
 End Class
+
 
 

@@ -21,18 +21,12 @@ Module VB_EditorMain
     End Function
 
     Private Function insertLine(line As String) As Boolean
-        Static insideRunFunction As Boolean
-        'If Trim(line) = "End Sub" And insideRunFunction Then
-        If insideRunFunction Then
-            Console.WriteLine(vbTab + vbTab + "If task.intermediateReview = caller Then task.intermediateObject = Me")
+        If line Is Nothing Then Return False
+        If line.Trim.StartsWith("task.desc = ") Then
             changeLines += 1
-            insideRunFunction = False
+            Console.WriteLine(line)
             Return True
         End If
-        If InStr(line, "Public Sub Run()") Then
-            insideRunFunction = True
-        End If
-        'Console.WriteLine(line)
         Return False
     End Function
     Sub Main()
@@ -83,10 +77,10 @@ Module VB_EditorMain
 
                 Dim sw = New StreamWriter(filename)
                 For i = 0 To lines.Count - 1
-                    If insertLine(lines(i)) Then
-                        sw.WriteLine(vbTab + vbTab + "If task.intermediateReview = caller Then task.intermediateObject = Me")
-                    End If
                     sw.WriteLine(lines(i))
+                    If insertLine(lines(i)) Then
+                        sw.WriteLine(vbTab + vbTab + "task.rank = 1")
+                    End If
                     'If deleteLine(lines(i)) Then
                     '    Console.WriteLine("Deleting: " + lines(i))
                     'Else

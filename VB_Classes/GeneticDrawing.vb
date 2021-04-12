@@ -27,6 +27,7 @@ Public Class GeneticDrawing_Options
             sliders.setupTrackBar(3, "Brush size Percentage", 5, 100, 100)
         End If
         task.desc = "Display all the options available to genetic drawing algorithms."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -79,6 +80,7 @@ Public Class GeneticDrawing_Basics
         label1 = "(clkwise) original, imgStage, imgGeneration, magnitude"
         label2 = "Current result"
         task.desc = "Create a painting from the current video input using a genetic algorithm. Draw anywhere to focus brushes. Painterly"
+		task.rank = 1
     End Sub
     Private Function runDNAseq(dna() As DNAentry) As cv.Mat
         Dim nextImage = imgGeneration.Clone()
@@ -264,6 +266,7 @@ Public Class GeneticDrawing_Color
 
         label1 = "Intermediate results - original+2 partial+Mag"
         task.desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes. Painterly"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -317,6 +320,7 @@ Public Class GeneticDrawing_Photo
         fileNameForm.Show()
 
         task.desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes. Painterly"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -359,3 +363,4 @@ Public Class GeneticDrawing_Photo
         label2 = gDraw.label2
     End Sub
 End Class
+

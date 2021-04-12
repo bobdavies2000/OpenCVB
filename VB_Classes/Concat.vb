@@ -6,6 +6,7 @@ Public Class Concat_Basics
         label1 = "Horizontal concatenation"
         label2 = "Vertical concatenation"
         task.desc = "Concatenate 2 images - horizontally and vertically"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -30,6 +31,7 @@ Public Class Concat_4way
         Next
         label1 = "Color/RGBDepth/Left/Right views"
         task.desc = "Concatenate 4 images - horizontally and vertically"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -46,4 +48,5 @@ Public Class Concat_4way
         dst1 = tmp3.Resize(src.Size())
     End Sub
 End Class
+
 

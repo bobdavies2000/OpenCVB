@@ -8,6 +8,7 @@ Public Class FREAK_Basics
         initParent()
         orb = New ORB_Basics()
         task.desc = "Find keypoints using ORB and FREAK algorithm"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -31,4 +32,5 @@ Public Class FREAK_Basics
         If fDesc.Width > 0 And fDesc.Height > 0 Then dst2 = fDesc.Resize(dst2.Size())
     End Sub
 End Class
+
 

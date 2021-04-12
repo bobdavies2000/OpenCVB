@@ -4,6 +4,7 @@ Public Class Font_OpenCV
     Public Sub New()
         initParent()
         task.desc = "Display different font options available in OpenCV"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -34,6 +35,7 @@ Public Class Font_TrueType
     Public Sub New()
         initParent()
         task.desc = "Display different TrueType fonts"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -57,6 +59,7 @@ Public Class Font_FlowText
         initParent()
         If src.Height = 480 Then maxLineCount = 26
         task.desc = "Show TrueType text flowing through an image."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -92,4 +95,5 @@ Public Class Font_FlowText
         lastCount = msgs.Count
     End Sub
 End Class
+
 

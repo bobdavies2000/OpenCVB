@@ -1,4 +1,4 @@
-﻿Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://docs.opencv.org/3.4.3/d1/d9e/fld_lines_8cpp-example.html
 Public Class lineFLD_Basics
@@ -39,6 +39,7 @@ Public Class lineFLD_Basics
         label1 = "Lines detected in the last frame"
         label2 = "If camera motion, image is reset"
         task.desc = "A Fast Line Detector"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -266,6 +267,7 @@ Public Class lineFLD_CPP
         initParent()
         lineFLD = New lineFLD_Basics
         task.desc = "Basics for a Fast Line Detector"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -313,6 +315,7 @@ Public Class LineFLD_LongestLine
         End If
 
         task.desc = "Identify planes using the lines present in the rgb image."
+		task.rank = 1
         label2 = ""
     End Sub
     Public Sub Run()
@@ -351,6 +354,7 @@ Public Class LineFLD_MT
             sliders.setupTrackBar(1, "Update frequency (in frames)", 1, 100, 1)
         End If
         task.desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
+		task.rank = 1
         label2 = ""
     End Sub
     Public Sub Run()
@@ -477,3 +481,4 @@ End Class
 '        End If
 '    End Sub
 'End Class
+

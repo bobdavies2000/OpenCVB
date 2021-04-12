@@ -10,6 +10,7 @@ Public Class PCA_Basics
         End If
 
         task.desc = "Reconstruct a video stream as a composite of X images."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -47,6 +48,7 @@ Public Class PCA_Depth
         initParent()
         pca = New PCA_Basics()
         task.desc = "Reconstruct a depth stream as a composite of X images."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -69,6 +71,7 @@ Public Class PCA_DrawImage
         pca = New PCA_Basics()
         image = cv.Cv2.ImRead(task.parms.homeDir + "Data/pca_test1.jpg")
         task.desc = "Use PCA to find the principle direction of an object."
+		task.rank = 1
         label1 = "Original image"
         label2 = "PCA Output"
     End Sub
@@ -124,5 +127,6 @@ Public Class PCA_DrawImage
         Next
     End Sub
 End Class
+
 
 

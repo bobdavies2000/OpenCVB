@@ -19,6 +19,7 @@ Public Class Reduction_Basics
         End If
 
         task.desc = "Reduction: a simpler way to KMeans by reducing color resolution"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -56,6 +57,7 @@ Public Class Reduction_Floodfill
         flood = New FloodFill_Basics()
         reduction = New Reduction_Basics()
         task.desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -89,6 +91,7 @@ Public Class Reduction_KNN_Color
 
         label2 = "Original floodfill color selections"
         task.desc = "Use KNN with color reduction to consistently identify regions and color them."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -131,6 +134,7 @@ Public Class Reduction_KNN_ColorAndDepth
         label1 = "Detecting objects using only color coherence"
         label2 = "Detecting objects with color and depth coherence"
         task.desc = "Reduction_KNN finds objects with depth.  This algorithm uses only color on the remaining objects."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -173,6 +177,7 @@ Public Class Reduction_Lines
         label1 = "Gravity rotated Side View with detected lines"
         label2 = "Gravity rotated Top View width detected lines"
         task.desc = "Present both the top and side view to minimize pixel counts."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -215,6 +220,7 @@ Public Class Reduction_Histogram
 
         label2 = "Backprojection of highlighted histogram bin"
         task.desc = "Use the histogram of a reduced RGB image to isolate featureless portions of an image."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -246,6 +252,7 @@ Public Class Reduction_PointCloud
         label1 = "Reduced depth"
         label2 = "Pointcloud with reduced z-Depth"
         task.desc = "Use reduction to smooth depth data"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -284,6 +291,7 @@ Public Class Reduction_XYZ
         End If
 
         task.desc = "Use reduction to slice the point cloud in 3 dimensions"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -329,6 +337,7 @@ Public Class Reduction_Edges
         reduction.radio.check(0).Checked = True
 
         task.desc = "Get the edges after reducing the image."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -364,6 +373,7 @@ Public Class Reduction_Depth
         reduction.radio.check(0).Checked = True
         colorizer = New Depth_Colorizer_CPP()
         task.desc = "Use reduction to smooth depth data"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -403,6 +413,7 @@ Public Class Reduction_DepthMax
         colorizer = New Depth_Colorizer_CPP()
         dMax = New Depth_SmoothMax
         task.desc = "Use reduction to isolate depth in 1 meter increments"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

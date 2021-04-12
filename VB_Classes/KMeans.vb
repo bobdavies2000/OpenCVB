@@ -11,6 +11,7 @@ Public Class kMeans_Basics
         End If
 
         task.desc = "Cluster the rgb image pixels using kMeans."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -62,6 +63,7 @@ Public Class kMeans_BasicsDepthColor
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
         End If
         task.desc = "Cluster the rgb image pixels using kMeans."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -114,6 +116,7 @@ Public Class kMeans_Clusters
         label1 = "kmeans - k=2,4,6,8"
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Show clustering with various settings for cluster count.  Draw to select region of interest."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -148,6 +151,7 @@ Public Class kMeans_RGBFast
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
         End If
         task.desc = "Cluster a small rgb image using kMeans.  Specify clusterCount value."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -190,6 +194,7 @@ Public Class kMeans_RGB_Plus_XYDepth
         km = New kMeans_BasicsDepthColor()
         label1 = "kmeans - RGB, XY, and Depth Raw"
         task.desc = "Cluster with kMeans RGB, x, y, and depth."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -253,6 +258,7 @@ Public Class kMeans_XYDepth
         label1 = "Draw rectangle anywhere..."
         label2 = "Currently selected region"
         task.desc = "Cluster with x, y, and depth using kMeans.  Draw on the image to select a region."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -287,6 +293,7 @@ Public Class kMeans_Depth_FG_BG
         label1 = "Foreground Mask"
         label2 = "Background Mask"
         task.desc = "Separate foreground and background using Kmeans (with k=2) using the depth value of center point."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -327,6 +334,7 @@ Public Class kMeans_LAB
         Dim h = src.Rows / 4
         task.drawRect = New cv.Rect(w, h, w * 2, h * 2)
         task.desc = "Cluster the LAB image using kMeans.  Is it better?  Optionally draw on the image and select k."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -366,6 +374,7 @@ Public Class kMeans_Color
             sliders.setupTrackBar(0, "kMeans cluster count (k)", 2, 32, 3)
         End If
         task.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -404,6 +413,7 @@ Public Class kMeans_Color_MT
         grid = New Thread_Grid
 
         task.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -454,6 +464,7 @@ Public Class kMeans_ColorDepth
         End If
 
         task.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -504,6 +515,7 @@ Public Class kMeans_ColorDepth_MT
         grid.sliders.trackbar(1).Value = 32
 
         task.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -553,6 +565,7 @@ Public Class KMeans_Subdivision
         kmeans = New kMeans_BasicsDepthColor()
         kmeans.resizeRequest = False
         task.desc = "Use KMeans to subdivide an image and then subdivide it again."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -595,6 +608,7 @@ Public Class KMeans_Subdivision1
         kmeans.resizeRequest = False
         kmeans.useDepthColor = False
         task.desc = "Use KMeans to subdivide an image and then subdivide it again."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me

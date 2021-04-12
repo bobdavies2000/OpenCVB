@@ -4,6 +4,7 @@ Public Class intrinsicsLeft_Basics
     Public Sub New()
         initParent()
         task.desc = "Show the depth camera intrinsicsLeft."
+		task.rank = 1
         label2 = "ppx/ppy location"
     End Sub
     Public Sub Run()
@@ -44,5 +45,6 @@ Public Class intrinsicsLeft_Basics
         dst2.Line(ptLoc, ttLocation, cv.Scalar.Red, 2, task.lineType)
     End Sub
 End Class
+
 
 

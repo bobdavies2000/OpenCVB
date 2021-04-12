@@ -5,6 +5,7 @@ Module IndexMain
     Dim MTnames As New SortedList(Of String, String)
     Dim CSnames As New SortedList(Of String, String)
     Dim OpenGLnames As New SortedList(Of String, String)
+    Dim rankings(5 - 1) As SortedList(Of String, String)
     Dim numpy As New SortedList(Of String, String)
     Dim PYnames As New SortedList(Of String, String)
     Dim nonPYnames As New SortedList(Of String, String)
@@ -25,6 +26,9 @@ Module IndexMain
         Return Regex.IsMatch(letterChar, "^[A-Za-z]{1}$")
     End Function
     Sub Main()
+        For i = 0 To rankings.Length - 1
+            rankings(i) = New SortedList(Of String, String)
+        Next
         Dim apiList As New List(Of String)
         Dim apiListLCase As New List(Of String)
         Dim classNames As New List(Of String) ' the list of all the classnames - including python names 
@@ -90,6 +94,11 @@ Module IndexMain
                 Dim lcaseLine = " " + LCase(line)
                 If lcaseLine.Contains("painterly") And Painterly.ContainsKey(classname) = False Then Painterly.Add(classname, classname)
                 If line = "" Or Trim(line).StartsWith("'") Or Trim(line).StartsWith("#") Then Continue While
+                If line.Contains("task.rank = ") Then
+                    Dim rankVal = CInt(line.Substring(line.IndexOf("=") + 2))
+                    If rankVal <> 1 Then Dim k = 0
+                    If rankings(rankVal - 1).ContainsKey(classname) = False Then rankings(rankVal - 1).Add(classname, classname)
+                End If
                 If lcaseLine.Contains("needs more work") And MoreWork.ContainsKey(classname) = False Then MoreWork.Add(classname, classname)
                 If lcaseLine.Contains("tracker algorithm") And Trackers.ContainsKey(classname) = False Then Trackers.Add(classname, classname)
                 If (lcaseLine.Contains("np.") Or LCase(classname).Contains("numpy")) And numpy.ContainsKey(classname) = False Then numpy.Add(classname, classname)
@@ -230,6 +239,16 @@ Module IndexMain
             sw.Write("," + PYStreamNames.ElementAt(i).Key)
         Next
         sw.WriteLine()
+
+        For i = 0 To rankings.Length - 1
+            If rankings(i).Count > 0 Then
+                sw.Write("<Rank " + CStr(i + 1) + ">")
+                For j = 0 To rankings(i).Count - 1
+                    If rankings(i).ElementAt(j).Key <> "" Then sw.Write("," + rankings(i).ElementAt(j).Key)
+                Next
+                sw.WriteLine()
+            End If
+        Next
 
         sw.Write("<Trackers>")
         For i = 0 To Trackers.Count - 1

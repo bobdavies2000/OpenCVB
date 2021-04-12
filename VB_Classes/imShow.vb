@@ -4,6 +4,7 @@ Public Class imShow_Basics
     Public Sub New()
         initParent()
         task.desc = "This is just a reminder that all HighGUI methods are available in OpenCVB"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -25,6 +26,7 @@ Public Class imShow_WaitKey
         vDemo = New Voronoi_Basics()
 
         task.desc = "You can use the HighGUI WaitKey call to pause an algorithm and review output one frame at a time."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -34,3 +36,4 @@ Public Class imShow_WaitKey
         dst1 = vDemo.dst1
     End Sub
 End Class
+

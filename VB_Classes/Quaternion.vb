@@ -31,6 +31,7 @@ Public Class Quaterion_Basics
         End If
 
         task.desc = "Use the quaternion values to multiply and compute conjugate"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -58,6 +59,7 @@ Public Class Quaterion_IMUPrediction
         label1 = "Quaternion_IMUPrediction"
         label2 = ""
         task.desc = "IMU data arrives at the CPU after a delay.  Predict changes to the image based on delay and motion data."
+		task.rank = 1
     End Sub
 
     Public Sub Run()
@@ -111,5 +113,6 @@ Public Class Quaterion_IMUPrediction
                                  Format(diffq.Z, "0.0000") + ", " + vbTab)
     End Sub
 End Class
+
 
 

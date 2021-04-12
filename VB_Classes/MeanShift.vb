@@ -10,6 +10,7 @@ Public Class MeanShift_Basics
         initParent()
         label1 = "Draw anywhere to start mean shift tracking."
         task.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track.  Tracker Algorithm"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -56,6 +57,7 @@ Public Class MeanShift_Depth
         blob = New Depth_ForegroundHead()
         label1 = "Draw anywhere to start mean shift tracking."
         task.desc = "Use depth to start mean shift algorithm.  Tracker Algorithm"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -99,6 +101,7 @@ Public Class MeanShift_PyrFilter
             sliders.setupTrackBar(2, "MeanShift Max Pyramid level", 1, 8, 3)
         End If
         task.desc = "Use PyrMeanShiftFiltering to segment an image."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -136,6 +139,7 @@ Public Class Meanshift_TopObjects
             cams(i).rectangleEdgeWidth = 8
         Next
         task.desc = "Track - tracking algorithm"
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -164,5 +168,6 @@ Public Class Meanshift_TopObjects
         dst2 = mats2.dst1
     End Sub
 End Class
+
 
 

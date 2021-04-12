@@ -81,6 +81,7 @@ Public Class Undistort_Basics
         End If
         label1 = "Left Image with sliders applied"
         task.desc = "Use sliders to control the undistort OpenCV API - Painterly"
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -137,4 +138,5 @@ Public Class Undistort_Basics
         dst2 = src.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(src.Size())
     End Sub
 End Class
+
 

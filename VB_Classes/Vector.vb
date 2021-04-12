@@ -5,6 +5,7 @@ Public Class Vector_Magnitude
     Public Sub New()
         initParent()
         task.desc = "Compute Euclidian and Manhattan Distance on a single vector."
+		task.rank = 1
         label1 = "Vector Magnitude"
     End Sub
     Public Sub Run()
@@ -33,5 +34,6 @@ Public Class Vector_Magnitude
         task.trueText("other_manhattan_distance = " + CStr(other_manhattan_distance.Get(Of Single)(0, 0)), 10, 160)
     End Sub
 End Class
+
 
 

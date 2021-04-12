@@ -12,6 +12,7 @@ Public Class Corners_Harris
             sliders.setupTrackBar(2, "Corner quality level", 1, 100, 50)
         End If
         task.desc = "Find corners using Eigen values and vectors"
+		task.rank = 1
         label2 = "Corner Eigen values"
     End Sub
     Public Sub Run()
@@ -71,6 +72,7 @@ Public Class Corners_SubPix
         End If
         label1 = "Output of GoodFeatures"
         task.desc = "Use PreCornerDetect to find features in the image."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -105,6 +107,7 @@ Public Class Corners_PreCornerDetect
             sliders.setupTrackBar(0, "kernel Size", 1, 20, 19)
         End If
         task.desc = "Use PreCornerDetect to find features in the image."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -147,6 +150,7 @@ Public Class Corners_ShiTomasi_CPP
             sliders.setupTrackBar(3, "Corner normalize alpha", 1, 255, 127)
         End If
         task.desc = "Find corners using Eigen values and vectors"
+		task.rank = 1
         label2 = "Corner Eigen values"
     End Sub
     Public Sub Run()
@@ -170,3 +174,4 @@ Public Class Corners_ShiTomasi_CPP
         stNormal.ConvertTo(dst2, cv.MatType.CV_8U)
     End Sub
 End Class
+

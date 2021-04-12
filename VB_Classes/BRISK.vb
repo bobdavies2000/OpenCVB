@@ -10,6 +10,7 @@ Public Class BRISK_Basics
             sliders.setupTrackBar(0, "BRISK Radius Threshold", 1, 100, 50)
         End If
         task.desc = "Detect features with BRISK"
+		task.rank = 1
         Brisk = cv.BRISK.Create()
     End Sub
     Public Sub Run()
@@ -28,5 +29,6 @@ Public Class BRISK_Basics
         If standalone or task.intermediateReview = caller Then cv.Cv2.AddWeighted(src, 0.5, dst1, 0.5, 0, dst1)
     End Sub
 End Class
+
 
 

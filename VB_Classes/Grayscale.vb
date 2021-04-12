@@ -9,6 +9,7 @@ Public Class Grayscale_Basics
             check.Box(0).Checked = True
         End If
         task.desc = "Manually create a grayscale image.  The only reason for this example is to show how slow it can be to do the work manually in VB.Net"
+		task.rank = 1
         label1 = "Grayscale_Basics"
         label2 = ""
     End Sub
@@ -28,4 +29,5 @@ Public Class Grayscale_Basics
         End If
     End Sub
 End Class
+
 

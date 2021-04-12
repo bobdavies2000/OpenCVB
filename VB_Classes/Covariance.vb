@@ -7,6 +7,7 @@ Public Class Covariance_Basics
         initParent()
         random = New Random_Basics()
         task.desc = "Calculate the covariance of random depth data points."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -52,6 +53,7 @@ Public Class Covariance_Test
 
         covar = New Covariance_Basics()
         task.desc = "Test the covariance basics algorithm."
+		task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -61,5 +63,6 @@ Public Class Covariance_Test
         task.trueText("Results should be a symmetric array with 2.1 and -2.1", 20, 150)
     End Sub
 End Class
+
 
 

@@ -36,6 +36,7 @@ Public Class SuperPixel_Basics_CPP
 
         label2 = "Superpixel label data (0-255)"
         task.desc = "Sub-divide the image into super pixels."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -96,6 +97,7 @@ Public Class SuperPixel_BinarizedImage
         pixelCountSlider.value = 20 ' find the top 20 super pixels.
 
         task.desc = "Create SuperPixels from a binary image."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -123,6 +125,7 @@ Public Class SuperPixel_Depth
         pixels = New SuperPixel_Basics_CPP()
 
         task.desc = "Create SuperPixels using RGBDepth image."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -149,6 +152,7 @@ Public Class SuperPixel_WithCanny
         pixels = New SuperPixel_Basics_CPP()
 
         task.desc = "Create SuperPixels using RGBDepth image."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -181,6 +185,7 @@ Public Class SuperPixel_WithLineDetector
 
         label2 = "Input to superpixel basics."
         task.desc = "Create SuperPixels using RGBDepth image."
+		task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -192,5 +197,6 @@ Public Class SuperPixel_WithLineDetector
         dst1 = pixels.dst1
     End Sub
 End Class
+
 
 
