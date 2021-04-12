@@ -14,7 +14,7 @@ Public Class KNN_Basics
         label1 = "White=TrainingData, Red=queries"
         knn = cv.ML.KNearest.Create()
         task.desc = "Test knn with random points in the image.  Find the nearest n points."
-		' task.rank = 1
+        ' task.rank = 2
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -131,11 +131,9 @@ Public Class KNN_Options
             sliders.setupTrackBar(2, "KNN k nearest points", 1, 100, 1)
         End If
 
-        If standalone Then
-            If findfrm(caller + " CheckBox Options") Is Nothing Then
-                check.Setup(caller, 1)
-                check.Box(0).Text = "Reuse the training and query data"
-            End If
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Reuse the training and query data"
         End If
 
         label1 = "Random training points"
@@ -723,35 +721,38 @@ Public Class KNN_Cluster2DCities
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
+        Static reuseCheck = findCheckBox("Reuse the training and query data")
         ' If they changed Then number of elements in the set
         Static cityCountSlider = findSlider("KNN Query count")
 
-        numberOfCities = cityCountSlider.Value
-        Static nearestCountSlider = findSlider("KNN k nearest points")
-        nearestCountSlider.Value = numberOfCities
+        If cityCountSlider.Value <> numberOfCities Or reuseCheck.Checked = False Then
+            numberOfCities = cityCountSlider.Value
+            Static nearestCountSlider = findSlider("KNN k nearest points")
+            nearestCountSlider.Value = numberOfCities
 
-        ReDim cityPositions(numberOfCities - 1)
-        ReDim cityOrder(numberOfCities - 1)
+            ReDim cityPositions(numberOfCities - 1)
+            ReDim cityOrder(numberOfCities - 1)
 
-        Dim gen As New System.Random()
-        Dim r As New cv.RNG(gen.Next(0, 1000000))
-        For i = 0 To numberOfCities - 1
-            cityPositions(i).X = r.Uniform(0, src.Width)
-            cityPositions(i).Y = r.Uniform(0, src.Height)
-        Next
+            Dim gen As New System.Random()
+            Dim r As New cv.RNG(gen.Next(0, 1000000))
+            For i = 0 To numberOfCities - 1
+                cityPositions(i).X = r.Uniform(0, src.Width)
+                cityPositions(i).Y = r.Uniform(0, src.Height)
+            Next
 
-        ' find the nearest neighbor for each city - first will be the current city, next will be nearest real neighbors in order
-        knn.knn.knnQT.trainingPoints.Clear()
-        knn.knn.knnQT.queryPoints.Clear()
-        For i = 0 To numberOfCities - 1
-            knn.knn.knnQT.trainingPoints.Add(New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y)))
-            knn.knn.knnQT.queryPoints.Add(New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y)))
-        Next
-        knn.Run()
+            ' find the nearest neighbor for each city - first will be the current city, next will be nearest real neighbors in order
+            knn.knn.knnQT.trainingPoints.Clear()
+            knn.knn.knnQT.queryPoints.Clear()
+            For i = 0 To numberOfCities - 1
+                knn.knn.knnQT.trainingPoints.Add(New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y)))
+                knn.knn.knnQT.queryPoints.Add(New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y)))
+            Next
+            knn.Run()
 
-        dst1.SetTo(0)
-        cluster(dst1, nearestCountSlider.Value)
-        task.trueText("knn closed regions = " + CStr(closedRegions), 10, 40, 3)
+            dst1.SetTo(0)
+            cluster(dst1, nearestCountSlider.Value)
+            task.trueText("knn closed regions = " + CStr(closedRegions), 10, 40, 3)
+        End If
     End Sub
 End Class
 
