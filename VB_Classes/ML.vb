@@ -67,8 +67,8 @@ Public Class ML_FillRGBDepth_MT
         grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = src.Cols / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
-        gridHeightSlider.Value = src.Rows / 4
+        gridWidthSlider.Value = dst1.Cols / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
+        gridHeightSlider.Value = dst1.Rows / 4
 
         shadow = New Depth_Holes()
         label1 = "ML filled shadow"
@@ -76,18 +76,17 @@ Public Class ML_FillRGBDepth_MT
         task.desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        shadow.Run()
-        grid.Run()
+        shadow.Run(src)
+        grid.run(src)
         Dim minLearnCount = 5
         Parallel.ForEach(grid.roiList,
             Sub(roi)
                 task.depth32f(roi) = detectAndFillShadow(shadow.holeMask(roi), shadow.dst2(roi), task.depth32f(roi), src(roi), minLearnCount)
             End Sub)
 
-        colorizer.src = task.depth32f
-        colorizer.Run()
+        colorizer.Run(task.depth32f)
         dst1 = colorizer.dst1.Clone()
         dst1.SetTo(cv.Scalar.White, grid.gridMask)
     End Sub
@@ -114,14 +113,13 @@ Public Class ML_FillRGBDepth
         task.desc = "Predict depth based on color and display colorized depth to confirm correctness of model."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        shadow.Run()
+        shadow.Run(src)
         Dim minLearnCount = sliders.trackbar(0).Value
         task.RGBDepth.CopyTo(dst1)
         task.depth32f = detectAndFillShadow(shadow.holeMask, shadow.dst2, task.depth32f, src, minLearnCount)
-        colorizer.src = task.depth32f
-        colorizer.Run()
+        colorizer.Run(task.depth32f)
         dst2 = colorizer.dst1
     End Sub
 End Class
@@ -154,9 +152,9 @@ Public Class ML_DepthFromColor_MT
         task.desc = "Use RGB, X, and Y to predict depth across the entire image, maxDepth = slider value."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        grid.Run()
+        grid.run(src)
 
         Dim mask = task.depth32f.Threshold(sliders.trackbar(0).Value, sliders.trackbar(0).Value, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         task.depth32f.SetTo(sliders.trackbar(0).Value, mask)
@@ -164,8 +162,7 @@ Public Class ML_DepthFromColor_MT
         Dim predictedDepth As New cv.Mat(task.depth32f.Size(), cv.MatType.CV_32F, 0)
 
         mask = task.depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
-        dilate.src = mask
-        dilate.Run()
+        dilate.Run(mask)
         mask = dilate.dst1
         dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -189,8 +186,7 @@ Public Class ML_DepthFromColor_MT
                 End If
             End Sub)
         label2 = "Input region count = " + CStr(predictedRegions) + " of " + CStr(grid.roiList.Count)
-        colorizer.src = predictedDepth
-        colorizer.Run()
+        colorizer.Run(predictedDepth)
         dst1 = colorizer.dst1
     End Sub
 End Class
@@ -222,15 +218,14 @@ Public Class ML_DepthFromColor
         task.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        shadow.Run()
+        shadow.Run(src)
         mats.mat(1) = shadow.holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim color32f As New cv.Mat
 
-        resized.src = src
-        resized.Run()
+        resized.Run(src)
 
         Dim colorROI As New cv.Rect(0, 0, resized.resizeOptions.newSize.Width, resized.resizeOptions.newSize.Height)
         resized.dst1.ConvertTo(color32f, cv.MatType.CV_32FC3)
@@ -245,8 +240,7 @@ Public Class ML_DepthFromColor
         cv.Cv2.BitwiseNot(mask, mask)
         depth32f.SetTo(sliders.trackbar(0).Value, mask)
 
-        colorizer.src = depth32f
-        colorizer.Run()
+        colorizer.Run(depth32f)
         mats.mat(3) = colorizer.dst1.Clone()
 
         mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
@@ -266,11 +260,10 @@ Public Class ML_DepthFromColor
         rtree.Predict(input, output)
         Dim predictedDepth = output.Reshape(1, src.Height)
 
-        colorizer.src = predictedDepth
-        colorizer.Run()
+        colorizer.Run(predictedDepth)
         mats.mat(0) = colorizer.dst1.Clone()
 
-        mats.Run()
+        mats.Run(src)
         dst1 = mats.dst1
         label1 = "prediction, shadow, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
@@ -305,15 +298,14 @@ Public Class ML_DepthFromXYColor
         task.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        shadow.Run()
+        shadow.Run(src)
         mats.mat(0) = shadow.holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim color32f As New cv.Mat
 
-        resized.src = src.Clone()
-        resized.Run()
+        resized.Run(src)
 
         Dim colorROI As New cv.Rect(0, 0, resized.resizeOptions.newSize.Width, resized.resizeOptions.newSize.Height)
         resized.dst1.ConvertTo(color32f, cv.MatType.CV_32FC3)
@@ -329,8 +321,7 @@ Public Class ML_DepthFromXYColor
         cv.Cv2.BitwiseNot(mask, mask)
         depth32f.SetTo(sliders.trackbar(0).Value, mask)
 
-        colorizer.src = depth32f
-        colorizer.Run()
+        colorizer.Run(depth32f)
         mats.mat(3) = colorizer.dst1.Clone()
 
         mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
@@ -366,11 +357,10 @@ Public Class ML_DepthFromXYColor
         rtree.Predict(input, output)
         Dim predictedDepth = output.Reshape(1, src.Height)
 
-        colorizer.src = predictedDepth
-        colorizer.Run()
+        colorizer.Run(predictedDepth)
         dst1 = colorizer.dst1.Clone()
 
-        mats.Run()
+        mats.Run(src)
         dst2 = mats.dst1
         label2 = "shadow, empty, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
     End Sub
@@ -406,9 +396,9 @@ Public Class ML_EdgeDepth_MT
         task.desc = "Use RGB to predict depth near edges."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        grid.Run()
+        grid.run(src)
 
         Dim mask = task.depth32f.Threshold(sliders.trackbar(0).Value, sliders.trackbar(0).Value, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         task.depth32f.SetTo(sliders.trackbar(0).Value, mask)
@@ -416,9 +406,8 @@ Public Class ML_EdgeDepth_MT
         Dim predictedDepth As New cv.Mat(task.depth32f.Size(), cv.MatType.CV_32F, 0)
 
         mask = task.depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
-        dilate.src = mask
-        dilate.Run()
-        dst1 = dilate.src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dilate.Run(mask)
+        dst1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim color32f As New cv.Mat
         src.ConvertTo(color32f, cv.MatType.CV_32FC3)
@@ -441,8 +430,7 @@ Public Class ML_EdgeDepth_MT
                 End If
             End Sub)
         label2 = "Input region count = " + CStr(predictedRegions) + " of " + CStr(grid.roiList.Count)
-        colorizer.src = predictedDepth
-        colorizer.Run()
+        colorizer.Run(predictedDepth)
         dst2 = colorizer.dst1
     End Sub
 End Class
@@ -479,7 +467,7 @@ End Class
 '        tmp.ConvertTo(vec, cv.MatType.CV_8UC3)
 '        Return New cv.Vec3b(vec.Get(Of Byte)(0, 0), vec.Get(Of Byte)(0, 1), vec.Get(Of Byte)(0, 2))
 '    End Function
-'    Public Sub Run()
+'    Public Sub Run(src as cv.Mat)
 '		If task.intermediateReview = caller Then task.intermediateObject = Me
 '        Static lastColors As New cv.Mat
 '        If standalone or task.intermediateReview = caller Then

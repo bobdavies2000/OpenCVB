@@ -8,7 +8,7 @@ Public Class Concat_Basics
         task.desc = "Concatenate 2 images - horizontally and vertically"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim tmp As New cv.Mat
         cv.Cv2.HConcat(src, task.RGBDepth, tmp)
@@ -33,7 +33,7 @@ Public Class Concat_4way
         task.desc = "Concatenate 4 images - horizontally and vertically"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             img(0) = src

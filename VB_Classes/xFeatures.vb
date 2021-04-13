@@ -7,7 +7,7 @@ Public Class XFeatures2D_StarDetector
         task.desc = "Basics of the StarDetector - a 2D feature detector.  FAILS IN COMPUTE.  Uncomment to investigate further."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.Clone()
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

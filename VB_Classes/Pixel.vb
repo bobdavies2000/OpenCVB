@@ -12,7 +12,7 @@ Public Class Pixel_Viewer
         task.desc = "Display pixels under the cursor"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         dst1 = Choose(task.mousePicTag + 1, task.color, task.RGBDepth, task.algorithmObject.dst1, task.algorithmObject.dst2)
@@ -175,7 +175,7 @@ Public Class Pixel_GetSet
         task.desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim rows = src.Height
         Dim cols = src.Width
@@ -218,7 +218,7 @@ Public Class Pixel_GetSet
 
         task.trueText(output, src.Width / 2 + 10, src.Height / 2 + 20)
 
-        mats.Run()
+        mats.Run(src)
         dst1 = mats.dst1
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
         dst2 = mats.mat(quadrantIndex)
@@ -247,9 +247,9 @@ Public Class Pixel_Measure
     End Sub
     Public Function Compute(mmDist As Single) As Single
         Dim halfLineInMeters = Math.Tan(0.0174533 * task.hFov / 2) * mmDist
-        Return halfLineInMeters * 2 / src.Width
+        Return halfLineInMeters * 2 / dst1.Width
     End Function
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static distanceSlider = findSlider("Distance in mm")
         Dim mmPP = Compute(distanceSlider.value)
@@ -281,7 +281,7 @@ Public Class Pixel_Sampler
         task.desc = "Find the dominanant pixel color - not an average! This can provide consistent colorizing."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Then
@@ -293,10 +293,9 @@ Public Class Pixel_Sampler
                 End If
             End If
         Else
-            random.src = src
             random.rangeRect = New cv.Rect(0, 0, src.Width, src.Height)
         End If
-        random.Run()
+        random.Run(src)
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim index As New List(Of cv.Point)

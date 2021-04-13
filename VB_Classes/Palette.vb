@@ -10,7 +10,7 @@ Public Class Palette_Basics
         task.desc = "Apply the different color maps in OpenCV - Painterly Effect"
         ' task.rank = 3
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         label1 = "ColorMap = " + task.paletteSchemeName
 
@@ -49,7 +49,7 @@ Public Class Palette_Color
         task.desc = "Define a color using sliders."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim b = sliders.trackbar(0).Value
         Dim g = sliders.trackbar(1).Value
@@ -78,10 +78,10 @@ Public Class Palette_LinearPolar
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "LinearPolar radius", 0, src.Cols, src.Cols / 2)
+            sliders.setupTrackBar(0, "LinearPolar radius", 0, dst1.Cols, dst1.Cols / 2)
         End If
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1.SetTo(0)
         For i = 0 To dst1.Rows - 1
@@ -89,7 +89,7 @@ Public Class Palette_LinearPolar
             dst1.Row(i).SetTo(New cv.Scalar(c, c, c))
         Next
 
-        rotateOptions.Run()
+        rotateOptions.Run(src)
 
         Static frm = findfrm("Palette_LinearPolar Radio Options")
         Static pt = New cv.Point2f(msRNG.Next(0, dst1.Cols - 1), msRNG.Next(0, dst1.Rows - 1))
@@ -182,15 +182,14 @@ Public Class Palette_Reduction
             Return If(a(2) < b(2), -1, 1)
         End Function
     End Class
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static reductionSlider = findSlider("Reduction factor")
         If reductionSlider.value < 32 Then
             reductionSlider.value = 32
             Console.WriteLine("This algorithm gets very slow unless there is lots of reduction.  Resetting reduction slider value to 2^^5")
         End If
-        reduction.src = src
-        reduction.Run()
+        reduction.Run(src)
         dst1 = reduction.dst1
 
         Dim palette As New SortedList(Of cv.Vec3b, Integer)(New CompareVec3b)
@@ -251,16 +250,14 @@ Public Class Palette_DrawTest
         initParent()
         task.palette.whitebackground = True
         draw = New Draw_Shapes()
-        task.palette.src = dst1
 
         task.desc = "Experiment with palette using a drawn image"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        draw.Run()
-        task.palette.src = draw.dst1
-        task.palette.Run()
+        draw.Run(src)
+        task.palette.Run(draw.dst1)
         dst1 = task.palette.dst1
     End Sub
 End Class
@@ -280,7 +277,7 @@ Public Class Palette_Gradient
         task.desc = "Create gradient image"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod frameModulo = 0 Then
             If standalone Or task.intermediateReview = caller Then
@@ -324,7 +321,7 @@ Public Class Palette_RandomColorMap
         task.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static paletteSlider = findSlider("Number of color transitions (Used only with Random)")
         If standalone Or transitionCount <> paletteSlider.value Then
@@ -366,7 +363,7 @@ Public Class Palette_DepthColorMap
         task.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount = 0 Then
             Dim color1 = cv.Scalar.Yellow
@@ -412,11 +409,10 @@ Public Class Palette_ObjectColors
         task.desc = "New class description"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        reduction.src = src
-        reduction.src.SetTo(0, task.noDepthMask)
-        reduction.Run()
+        src.SetTo(0, task.noDepthMask)
+        reduction.Run(src)
         dst2 = reduction.dst2
 
         Dim blobList As New SortedList(Of Single, Integer)
@@ -472,13 +468,13 @@ Public Class Palette_Layout2D
         Dim heightslider = findSlider("ThreadGrid Height")
         widthSlider.Value = 40
         heightslider.Value = 24
-        grid.Run()
+        grid.Run(dst1)
         task.desc = "Layout the available colors in a 2D grid"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        grid.Run()
+        grid.Run(src)
         Dim index As Integer
         For Each r In grid.roiList
             dst1(r).SetTo(task.scalarColors(index Mod 255))
@@ -506,17 +502,15 @@ Public Class Palette_LeftRightImages
         task.desc = "Use a palette with the left image."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        lrViews.Run()
+        lrViews.Run(src)
 
-        task.palette.src = lrViews.dst1
-        task.palette.Run()
+        task.palette.Run(lrViews.dst1)
         dst1 = task.palette.dst1
 
-        task.palette.src = lrViews.dst2
-        task.palette.Run()
+        task.palette.Run(lrViews.dst2)
         dst2 = task.palette.dst1
     End Sub
 End Class

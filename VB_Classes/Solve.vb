@@ -7,7 +7,7 @@ Public Class Solve_ByMat
         task.desc = "Solve a set of equations with OpenCV's Solve API."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         ' x + y = 10
         ' 2x + 3y = 26
@@ -34,7 +34,7 @@ Public Class Solve_ByArray
         task.desc = "Solve a set of equations with OpenCV's Solve API with a normal array as input  "
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         ' x + y = 10
         ' 2x + 3y = 26

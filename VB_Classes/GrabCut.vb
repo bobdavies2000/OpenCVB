@@ -14,10 +14,9 @@ Public Class GrabCut_Basics
         task.desc = "Use grabcut with just a foreground and background definition."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        fgnd.src = src
-        fgnd.Run()
+        fgnd.Run(src)
         dst1 = fgnd.dst1
 
         Dim fg = dst1.Threshold(1, cv.GrabCutClasses.FGD, cv.ThresholdTypes.Binary)
@@ -69,7 +68,7 @@ Public Class GrabCut_FineTune
         task.desc = "There are probably mistakes in the initial Grabcut_Basics.  Use the checkbox to fine tune what is background and foreground"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static clearCheck = findRadio("Clear all foreground and background fine tuning")
@@ -94,13 +93,12 @@ Public Class GrabCut_FineTune
             End If
         End If
 
-        basics.src = src
-        basics.Run()
+        basics.Run(src)
 
         mats.mat(0) = basics.dst1
         mats.mat(1) = basics.fgFineTune
         mats.mat(2) = basics.bgFineTune
-        mats.Run()
+        mats.Run(src)
         dst1 = mats.dst1
 
         dst2 = basics.dst2

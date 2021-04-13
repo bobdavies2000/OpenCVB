@@ -31,18 +31,16 @@ Public Class WarpModel_Basics
         task.desc = "Use FindTransformECC to align 2 images"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        Dim input = src.Clone
         If standalone Then
-            warpInput.src = input
-            warpInput.Run()
+            warpInput.Run(src)
 
             If warpInput.check.Box(0).Checked Then
-                input = warpInput.gradient(0)
+                src = warpInput.gradient(0)
                 src2 = warpInput.gradient(1)
             Else
-                input = warpInput.rgb(0)
+                src = warpInput.rgb(0)
                 src2 = warpInput.rgb(1)
             End If
         End If
@@ -52,14 +50,14 @@ Public Class WarpModel_Basics
             If frm.check(i).Checked Then warpMode = i
         Next
 
-        Dim srcData(input.Total * input.ElemSize - 1) As Byte
+        Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Dim src2Data(src2.Total * src2.ElemSize - 1) As Byte
-        Marshal.Copy(input.Data, srcData, 0, srcData.Length - 1)
+        Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
         Marshal.Copy(src2.Data, src2Data, 0, src2Data.Length - 1)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Dim handleSrc2 = GCHandle.Alloc(src2Data, GCHandleType.Pinned)
 
-        Dim matPtr = WarpModel_Run(cPtr, handleSrc.AddrOfPinnedObject(), handleSrc2.AddrOfPinnedObject(), input.Rows, input.Cols, 1, warpMode)
+        Dim matPtr = WarpModel_Run(cPtr, handleSrc.AddrOfPinnedObject(), handleSrc2.AddrOfPinnedObject(), src.Rows, src.Cols, 1, warpMode)
 
         handleSrc.Free()
         handleSrc2.Free()
@@ -73,17 +71,17 @@ Public Class WarpModel_Basics
 
         If warpMode <> 3 Then
             Dim warpMat = New cv.Mat(2, 3, cv.MatType.CV_32F, warpMatrix)
-            cv.Cv2.WarpAffine(src2, aligned, warpMat, input.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
+            cv.Cv2.WarpAffine(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
         Else
             Dim warpMat = New cv.Mat(3, 3, cv.MatType.CV_32F, warpMatrix)
-            cv.Cv2.WarpPerspective(src2, aligned, warpMat, input.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
+            cv.Cv2.WarpPerspective(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
         End If
 
         dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
         dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
 
-        outputRect = New cv.Rect(0, 0, input.Width, input.Height)
-        dst1(outputRect) = input
+        outputRect = New cv.Rect(0, 0, src.Width, src.Height)
+        dst1(outputRect) = src
         dst2(outputRect) = src2
 
         Dim outStr = "The warp matrix is:" + vbCrLf
@@ -140,9 +138,9 @@ Public Class WarpModel_Input
 
         sobel = New Edges_Sobel()
         task.desc = "Import the misaligned input."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim img As New cv.Mat
         Static frm = findfrm("WarpModel_Input Radio Options")
@@ -162,8 +160,7 @@ Public Class WarpModel_Input
         Static gradientCheck = findCheckBox("Use Gradient in WarpInput")
         For i = 0 To r.Count - 1
             If gradientCheck.checked Then
-                sobel.src = img(r(i))
-                sobel.Run()
+                sobel.Run(img(r(i)))
                 gradient(i) = sobel.dst1.Clone()
             End If
             rgb(i) = img(r(i))
@@ -216,29 +213,26 @@ Public Class WarpModel_AlignImages
 
         label1 = "Aligned image"
         task.desc = "Align the RGB inputs raw images from the Prokudin examples."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static gradientCheck = findCheckBox("Use Gradient in WarpInput")
-        If standalone Then
-            ecc.warpInput.src = src
-            ecc.warpInput.Run()
-        End If
+        If standalone Then ecc.warpInput.Run(src)
         Dim aligned() = {New cv.Mat, New cv.Mat}
         For i = 0 To 1
             If gradientCheck.Checked Then
-                ecc.src = ecc.warpInput.gradient(0)
+                src = ecc.warpInput.gradient(0)
                 ecc.src2 = Choose(i + 1, ecc.warpInput.gradient(1), ecc.warpInput.gradient(2))
             Else
-                ecc.src = ecc.warpInput.rgb(0)
+                src = ecc.warpInput.rgb(0)
                 ecc.src2 = Choose(i + 1, ecc.warpInput.rgb(1), ecc.warpInput.rgb(2))
             End If
-            ecc.Run()
+            ecc.Run(src)
             aligned(i) = ecc.aligned.Clone()
         Next
 
-        Dim mergeInput() = {ecc.src, aligned(0), aligned(1)}
+        Dim mergeInput() = {src, aligned(0), aligned(1)}
         Dim merged As New cv.Mat
         cv.Cv2.Merge(mergeInput, merged)
         dst1.SetTo(0)
@@ -282,7 +276,7 @@ End Class
 '        label2 = "Current ROI aligned to previous frame (dst1)"
 '        task.desc = "Find the Translation and Euclidean warp matrix for the current grayscale image to the previous - needs more work"
 '    End Sub
-'    Public Sub Run()
+'    Public Sub Run(src as cv.Mat)
 '        If task.intermediateReview = caller Then task.intermediateObject = Me
 
 '        sobel.src = src
@@ -348,7 +342,7 @@ End Class
 '        entropy = New Entropy_Highest
 '        task.desc = "Find warp matrix for the whole image using just the segment with the highest entropy."
 '    End Sub
-'    Public Sub Run()
+'    Public Sub Run(src as cv.Mat)
 '        If task.intermediateReview = caller Then task.intermediateObject = Me
 
 '        ' we only need to compute the max entropy every once in a while.  

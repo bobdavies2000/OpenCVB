@@ -13,7 +13,7 @@ Public Class Line_Basics
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Line thickness", 1, 20, 2)
-            sliders.setupTrackBar(1, "Line length threshold in pixels", 1, src.Width + src.Height, 50)
+            sliders.setupTrackBar(1, "Line length threshold in pixels", 1, dst1.Width + dst1.Height, 50)
             sliders.setupTrackBar(2, "Depth search radius in pixels", 1, 20, 2) ' not used in Run below but externally...
             sliders.setupTrackBar(3, "x- and y-intercept search range in pixels", 1, 50, 10) ' not used in Run below but externally...
         End If
@@ -27,7 +27,7 @@ Public Class Line_Basics
         task.desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.Clone
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -90,16 +90,14 @@ Public Class Line_LeftRightOverlay
         task.desc = "Plot the points found for stable lines in the left and right images"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static lrRadio = findRadio("Show Left image lines and right image lines")
         Dim showLeftRight = lrRadio.checked
 
-        lines.src = src
-        lines.Run()
+        lines.Run(src)
 
-        lrLines.src = src
-        lrLines.Run()
+        lrLines.Run(src)
         dst1 = lrLines.dst1
         Static saveLRradio = lrRadio.checked
         If task.cameraStable = False Or saveLRradio <> lrRadio.checked Then
@@ -153,13 +151,11 @@ Public Class Line_Reduction
         task.desc = "Use the reduced rgb image as input to the line detector"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        reduction.src = src
-        reduction.Run()
+        reduction.Run(src)
 
-        lDetect.src = reduction.dst1
-        lDetect.Run()
+        lDetect.Run(reduction.dst1)
         dst1 = lDetect.dst1
 
         If task.cameraStable = False Then dst2.SetTo(0)
@@ -188,11 +184,10 @@ Public Class Line_InterceptsUI
         task.desc = "An alternative way to highlight line segments with common slope"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        lines.src = src
-        lines.Run()
+        lines.Run(src)
         Dim searchRange = lines.searchRange
         dst2.SetTo(0)
 
@@ -274,13 +269,12 @@ Public Class Line_ConfirmedDepth
         task.desc = "Find the RGB lines and confirm they are present in the cloud data."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static thickSlider = findSlider("Line thickness")
         Dim thickness = thickSlider.value
-        lines.src = src
-        lines.Run()
+        lines.Run(src)
         dst1 = lines.dst1
 
         If lines.sortlines.Count = 0 Then Exit Sub
@@ -359,7 +353,7 @@ Public Class Line_Vertical
         task.desc = "Find all the vertical lines in the IMU rectified cloud"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static thickSlider = findSlider("Line thickness")
         Static errorSlider = findSlider("Error tolerance when measuring vertical lines in 3D (mm's)")
@@ -367,10 +361,9 @@ Public Class Line_Vertical
         thickness = thickSlider.value
         dst1 = src.Clone
 
-        gCloud.Run()
+        gCloud.Run(src)
         lines.cloudInput = gCloud.dst1
-        lines.src = src
-        lines.Run()
+        lines.Run(src)
 
         For i = 0 To lines.z1.Count - 1
             Dim p1 = lines.z1(i)
@@ -398,12 +391,11 @@ Public Class Line_Horizontal
         task.desc = "Find all the horizontal lines in the IMU rectified cloud"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.Clone
 
-        vLines.src = src
-        vLines.Run()
+        vLines.Run(src)
 
         For i = 0 To vLines.lines.z1.Count - 1
             Dim p1 = vLines.lines.z1(i)
@@ -484,15 +476,14 @@ Public Class Line_Intercepts
             If radio.checked Then hightLightIntercept(pt, intercepts, i, dst)
         Next
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static thickSlider = findSlider("Line thickness")
         Static searchSlider = findSlider("x- and y-intercept search range in pixels")
         thickNess = thickSlider.value
         searchRange = searchSlider.value
 
-        lines.src = src
-        lines.Run()
+        lines.Run(src)
         If lines.sortlines.Count = 0 Then Exit Sub
 
         dst1 = src
@@ -570,15 +561,14 @@ Public Class Line_LeftRightImages
         task.desc = "Find lines in the infrared images"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim color = cv.Scalar.Yellow
         If standalone Then color = cv.Scalar.Black
 
-        lrPalette.Run()
+        lrPalette.Run(src)
 
-        leftLines.src = lrPalette.dst1
-        leftLines.Run()
+        leftLines.Run(lrPalette.dst1)
         If standalone Then dst1 = lrPalette.dst2 Else dst1.SetTo(0)
 
         For Each line In leftLines.sortlines
@@ -587,8 +577,7 @@ Public Class Line_LeftRightImages
             dst1.Line(p1, p2, color, 1, task.lineType)
         Next
 
-        rightLines.src = lrPalette.dst2
-        rightLines.Run()
+        rightLines.Run(lrPalette.dst2)
         If standalone Then dst2 = lrPalette.dst2 Else dst2.SetTo(0)
 
         For Each line In rightLines.sortlines
@@ -623,7 +612,7 @@ Public Class Line_Sift_MT
         gridWidthSlider.Value = task.color.Cols * 2 ' we are just taking horizontal slices of the image.
         gridHeightSlider.Value = 10
 
-        grid.Run()
+        grid.Run(dst1)
 
         siftBasics = New Sift_Basics
         Dim flannRadio = findRadio("Use Flann Matcher") ' not reliable
@@ -637,11 +626,11 @@ Public Class Line_Sift_MT
         task.desc = "Using the lines highlighted in left/right infrared images, find corresponding lines."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        grid.Run()
+        grid.run(src)
 
-        lrView.Run()
+        lrView.Run(src)
         dst1 = lrView.dst1
         dst2 = lrView.dst2
 
@@ -721,7 +710,7 @@ Public Class Line_NearestPoint
         Dim nearest = findNearest(p1, p2, pt)
         Return nearest.DistanceTo(pt)
     End Function
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.frameCount Mod 30 = 0 And standalone Then
@@ -758,18 +747,16 @@ Public Class Line_SideView
         task.desc = "Line in image are projected into the depth image"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        lines.src = src
-        lines.Run()
+        lines.Run(src)
         dst2 = lines.dst2
 
         Dim mask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ' tView.src = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
         'task.pointCloud.CopyTo(tView.src, mask)
-        tView.src = task.pointCloud
-        tView.Run()
+        tView.Run(task.pointCloud)
 
         dst1 = tView.dst2
     End Sub

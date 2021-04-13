@@ -15,7 +15,7 @@ Public Class Coherence_Basics
         task.desc = "Find lines that are artistically coherent in the image - Painterly"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim sigma = sliders.trackbar(0).Value * 2 + 1
         Dim blend = sliders.trackbar(1).Value / 10
@@ -93,12 +93,11 @@ Public Class Coherent_Depth
         initParent()
         coherent = New Coherence_Basics
         task.desc = "Find coherent lines in the depth image - Painterly"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        coherent.src = task.RGBDepth
-        coherent.Run()
+        coherent.Run(task.RGBDepth)
         dst1 = coherent.dst1
     End Sub
 End Class

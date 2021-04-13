@@ -27,12 +27,11 @@ Public Class Featureless_Basics
         task.desc = "Multithread Houghlines to find featureless regions in an image."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        grid.Run()
+        grid.Run(src)
 
-        edges.src = src
-        edges.Run()
+        edges.Run(src)
 
         Dim rhoIn = sliders.trackbar(0).Value
         Dim thetaIn = sliders.trackbar(1).Value / 1000
@@ -46,8 +45,7 @@ Public Class Featureless_Basics
             If segments.Count = 0 Then mask(roi).SetTo(255)
         End Sub)
 
-        flood.src = mask
-        flood.Run()
+        flood.Run(mask)
         dst1 = flood.dst1
 
         dst2.SetTo(0)
@@ -73,10 +71,9 @@ Public Class Featureless_DCT_MT
         ' task.rank = 1
     End Sub
 
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        dct.src = src
-        dct.Run()
+        dct.Run(src)
         dst1 = dct.dst1
         dst2 = dct.dst2
 
@@ -128,10 +125,9 @@ Public Class FeatureLess_Prediction
         task.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        fLess.src = src
-        fLess.Run()
+        fLess.Run(src)
         dst1 = fLess.dst1
         dst2 = fLess.dst2
         Dim labels = fLess.dst2.Clone()
@@ -217,16 +213,15 @@ Public Class FeatureLess_PointTracker
         task.desc = "Track the featureless regions with point tracker"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        fLess.src = src
-        fLess.Run()
+        fLess.Run(src)
         dst2 = fLess.dst1
 
         pTrack.queryPoints = fLess.flood.basics.centroids
         pTrack.queryRects = fLess.flood.basics.rects
         pTrack.queryMasks = fLess.flood.basics.masks
-        pTrack.Run()
+        pTrack.Run(src)
         dst1 = pTrack.dst1
     End Sub
 End Class
@@ -248,14 +243,12 @@ Public Class FeatureLess_Highlights
         task.desc = "Highlight the featureless regions in an RGB image"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        fLessP.src = src
-        fLessP.Run()
+        fLessP.Run(src)
 
-        addW.src = src
         addW.src2 = fLessP.dst1
-        addW.Run()
+        addW.Run(src)
         dst1 = addW.dst1
     End Sub
 End Class

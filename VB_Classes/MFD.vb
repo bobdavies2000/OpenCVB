@@ -18,14 +18,12 @@ Public Class MFD_Basics
         task.desc = "Motion-Filtered basics - update only the changed regions"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        dMax.src = src
-        dMax.Run()
+        dMax.Run(src)
 
-        motion.src = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        motion.Run()
+        motion.Run(task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         label2 = motion.label2
         dst2 = If(motion.dst2.Channels = 1, motion.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR), motion.dst2.Clone)
 
@@ -62,11 +60,10 @@ Public Class MFD_Depth
         task.desc = "Stabilize the depth image but update any areas with motion"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        mfd.src = task.depth32f
-        mfd.Run()
+        mfd.Run(task.depth32f)
         dst1 = mfd.dst1
         dst2 = mfd.dst2
         label2 = mfd.label2
@@ -88,11 +85,10 @@ Public Class MFD_PointCloud
         task.desc = "Stabilize the PointCloud but update any areas with motion"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        mfd.src = task.pointCloud
-        mfd.Run()
+        mfd.Run(task.pointCloud)
         dst1 = mfd.dst1
         dst2 = mfd.dst2
         label2 = mfd.label2
@@ -124,17 +120,15 @@ Public Class MFD_Sobel
         task.desc = "Stabilize the Sobel output with MFD"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        mfd.src = src
-        mfd.Run()
+        mfd.Run(src)
         dst2 = mfd.dst2
         label2 = mfd.label2
 
         Static thresholdSlider = findSlider("Pixel threshold to zero")
-        sobel.src = mfd.dst1
-        sobel.Run()
+        sobel.Run(mfd.dst1)
         dst1 = sobel.dst1.Threshold(thresholdSlider.value, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
@@ -157,14 +151,12 @@ Public Class MFD_BinarizedSobel
         task.desc = "Stabilize the binarized Sobel output with MFD"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        mfd.src = src
-        mfd.Run()
+        mfd.Run(src)
 
-        sobel.src = mfd.dst1.Clone
-        sobel.Run()
+        sobel.Run(mfd.dst1.Clone)
 
         dst1 = sobel.dst1
         dst2 = sobel.dst2
@@ -195,14 +187,14 @@ Public Class MFD_FloodFill
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "FloodFill Step Size", 1, src.Cols / 2, 15)
+            sliders.setupTrackBar(0, "FloodFill Step Size", 1, dst1.Cols / 2, 15)
             sliders.setupTrackBar(1, "FloodFill point distance from edge", 1, 25, 10)
         End If
 
         task.desc = "Floodfill the image of MFD edges (binarized Sobel output)"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static stepSlider = findSlider("FloodFill Step Size")
         Static fillSlider = findSlider("FloodFill point distance from edge")
@@ -211,8 +203,7 @@ Public Class MFD_FloodFill
 
         Dim input = src.Clone
         If input.Type <> cv.MatType.CV_8UC1 Then
-            sobel.src = src
-            sobel.Run()
+            sobel.Run(src)
             input = sobel.dst2.Clone
         End If
 
@@ -276,8 +267,7 @@ Public Class MFD_FloodFill
         Next
 
         lastFrame = dst1.Clone
-        palette.src = dst1
-        palette.Run()
+        palette.Run(dst1)
         dst1 = palette.dst1
 
         dst2 = input.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -289,7 +279,6 @@ Public Class MFD_FloodFill
             dst2.Rectangle(rect, cv.Scalar.Yellow, 1)
         Next
         label2 = sobel.mfd.label2
-
     End Sub
 End Class
 

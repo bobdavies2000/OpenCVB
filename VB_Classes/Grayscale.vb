@@ -13,7 +13,7 @@ Public Class Grayscale_Basics
         label1 = "Grayscale_Basics"
         label2 = ""
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If check.Box(0).Checked Then
             dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

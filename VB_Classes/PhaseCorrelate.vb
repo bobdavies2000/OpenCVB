@@ -19,11 +19,11 @@ Public Class PhaseCorrelate_Basics
             sliders.setupTrackBar(0, "Threshold shift to cause reset of lastFrame", 0, 100, 30)
         End If
 
-        cv.Cv2.CreateHanningWindow(hanning, src.Size, cv.MatType.CV_64F)
+        cv.Cv2.CreateHanningWindow(hanning, dst1.Size, cv.MatType.CV_64F)
         task.desc = "Look for a shift between the current frame and the previous"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim input = src
@@ -94,14 +94,12 @@ Public Class PhaseCorrelate_BasicsTest
         task.desc = "Test the PhaseCorrelate_Basics with random movement"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        random.src = src
-        random.Run()
+        random.Run(src)
 
-        stable.src = random.dst2.Clone
-        stable.Run()
+        stable.Run(random.dst2.Clone)
 
         dst1 = stable.dst1
         dst2 = stable.dst2
@@ -126,12 +124,11 @@ Public Class PhaseCorrelate_Depth
         task.desc = "Use phase correlation on the depth data"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static lastFrame = task.depth32f.Clone
-        phaseC.src = task.depth32f
-        phaseC.Run()
+        phaseC.Run(task.depth32f)
         dst1 = task.depth32f
         Dim tmp = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         If phaseC.resetLastFrame Then task.depth32f.CopyTo(lastFrame)
@@ -163,7 +160,7 @@ Public Class PhaseCorrelate_HanningWindow
         task.desc = "Show what a Hanning window looks like"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         cv.Cv2.CreateHanningWindow(dst1, src.Size, cv.MatType.CV_32F)
     End Sub

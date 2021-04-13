@@ -17,10 +17,9 @@ Public Class ImageSeg_Basics
         task.desc = "Get the image segments and their associated features - centroids, masks, size, and enclosing rectangles"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        flood.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        flood.Run()
+        flood.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst1 = flood.dst2
 
         maskSizes = New SortedList(Of Integer, Integer)(flood.maskSizes)
@@ -29,9 +28,8 @@ Public Class ImageSeg_Basics
         centroids = New List(Of cv.Point2f)(flood.centroids)
         floodPoints = New List(Of cv.Point)(flood.floodPoints)
 
-        addw.src = dst1
         addw.src2 = src
-        addw.Run()
+        addw.Run(dst1)
         dst2 = addw.dst1
 
         For Each pt In floodPoints
@@ -57,11 +55,10 @@ Public Class ImageSeg_InRange
         task.desc = "Trim segments that are not in the range requested"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        iSeg.src = src
-        iSeg.Run()
+        iSeg.Run(src)
         dst1 = iSeg.dst2
 
         For i = 0 To iSeg.maskSizes.Count - 1
@@ -92,7 +89,7 @@ Public Class ImageSeg_MissingSegments
         task.desc = "Floodfill segments which were marked as missing and clear small unused segments"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static lenContourSlider = findSlider("Minimum length for missing contours")
@@ -111,8 +108,7 @@ Public Class ImageSeg_MissingSegments
             saveFillDistance = fill
         End If
 
-        flood.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        flood.Run()
+        flood.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst1 = flood.dst2
 
         dst2 = flood.missingSegments
@@ -152,13 +148,12 @@ Public Class ImageSeg_Unstable
         task.desc = "Find the unstable segments and remove them"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static segSlider = findSlider("A segment is considered present after this many appearances")
         Dim refreshCount = segSlider.value
 
-        iSeg.src = src
-        iSeg.Run()
+        iSeg.Run(src)
         dst1 = iSeg.dst1
 
         Dim tmp = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -168,8 +163,7 @@ Public Class ImageSeg_Unstable
         cv.Cv2.Min(tmp, previousFrame, dst2)
         previousFrame = dst2
 
-        task.palette.src = dst2
-        task.palette.Run()
+        task.palette.Run(dst2)
         dst2 = task.palette.dst1
         dst2.SetTo(0, iSeg.flood.mats.mat(1))
     End Sub
@@ -196,19 +190,18 @@ Public Class ImageSeg_CentroidTracker
         task.desc = "Track the centroids that are found consistently from frame to frame."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        iSeg.src = src
-        iSeg.Run()
+        iSeg.Run(src)
         dst1 = iSeg.dst1
 
-        If iSeg.flood.dst1.Channels = 3 Then pTrack.src = iSeg.flood.dst1 Else pTrack.src = iSeg.flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Dim tmp = If(iSeg.flood.dst1.Channels = 3, iSeg.flood.dst1, iSeg.flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
         pTrack.queryPoints = New List(Of cv.Point2f)(iSeg.centroids)
         pTrack.queryRects = New List(Of cv.Rect)(iSeg.rects)
         pTrack.queryMasks = New List(Of cv.Mat)(iSeg.masks)
         pTrack.floodPoints = New List(Of cv.Point)(iSeg.floodPoints)
-        pTrack.Run()
+        pTrack.Run(tmp)
         dst2 = dst1.Clone
         For Each vo In pTrack.drawRC.viewObjects
             dst2.Circle(vo.Value.centroid, task.dotSize + 1, cv.Scalar.White, -1, task.lineType)

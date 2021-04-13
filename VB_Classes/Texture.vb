@@ -15,17 +15,17 @@ Public Class Texture_Basics
         Dim gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 64
         gridHeightSlider.Value = 64
-        grid.Run()
+        grid.Run(dst1)
 
         ellipse = New Draw_Ellipses()
         task.desc = "Use multi-threading to find the best sample 256x256 texture of a mask"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Or src.Channels <> 1 Then
-            ellipse.Run()
+            ellipse.Run(src)
             dst1 = ellipse.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst1 = dst1.ConvertScaleAbs(255)
             dst2 = ellipse.dst1.Clone
@@ -72,7 +72,7 @@ Public Class Texture_Flow
         task.desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim TFdelta = sliders.trackbar(0).Value
         Dim TFblockSize = sliders.trackbar(1).Value * 2 + 1
@@ -106,10 +106,9 @@ Public Class Texture_Flow_Depth
         task.desc = "Display texture flow in the depth data"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        texture.src = task.RGBDepth
-        texture.Run()
+        texture.Run(task.RGBDepth)
         dst1 = texture.dst1
     End Sub
 End Class
@@ -130,14 +129,12 @@ Public Class Texture_Flow_Reduction
         task.desc = "Display texture flow in the reduced color image"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        reduction.src = task.color
-        reduction.Run()
+        reduction.Run(task.color)
         dst1 = reduction.dst1
 
-        texture.src = reduction.dst1
-        texture.Run()
+        texture.Run(reduction.dst1)
         dst2 = texture.dst1
     End Sub
 End Class
@@ -163,25 +160,20 @@ Public Class Texture_Shuffle
         task.desc = "Use random shuffling to homogenize a texture sample of what the floor looks like."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then
-            floor.plane.src = src
-            floor.plane.Run()
+            floor.plane.Run(src)
             dst2.SetTo(0)
             src.CopyTo(dst2, floor.plane.sliceMask)
             dst1 = floor.plane.dst1
-            texture.src = floor.plane.sliceMask
-        Else
-            texture.src = src
+            src = floor.plane.sliceMask
         End If
 
-        texture.src = src
-        texture.Run()
+        texture.Run(src)
         dst1 = texture.dst2
         dst2.Rectangle(texture.tRect, cv.Scalar.White, 2)
-        shuffle.src = texture.texture
-        shuffle.Run()
+        shuffle.Run(texture.texture)
         tRect = New cv.Rect(0, 0, texture.tRect.Width * 4, texture.tRect.Height * 4)
         dst1(tRect) = shuffle.dst1.Repeat(4, 4)
         Dim split = dst1(tRect).Split()

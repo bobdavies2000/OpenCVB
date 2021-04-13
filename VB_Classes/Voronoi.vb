@@ -22,14 +22,14 @@ Public Class Voronoi_Basics
             dst.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.frameCount = 0 Then
             Dim countSlider = findSlider("Random Pixel Count")
             countSlider.Maximum = 100
         End If
-        random.Run()
+        random.Run(src)
         inputPoints = New List(Of cv.Point)(random.Points)
 
         vDemo.Run(dst1, inputPoints)
@@ -57,10 +57,10 @@ Public Class Voronoi_Compare
         task.desc = "C# implementations of the BruteForce and OrderedList Voronoi algorithms"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        random.Run()
+        random.Run(src)
         Dim points = New List(Of cv.Point)(random.Points)
         basics.vDemo.Run(dst1, points, True)
         basics.vDisplay(dst1, points)
@@ -106,11 +106,11 @@ Public Class Voronoi_CPP
         task.desc = "Use the C++ version of the Voronoi code"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim countSlider = findSlider("Random Pixel Count")
-        vDemo.random.Run()
+        vDemo.random.Run(src)
         Dim handleSrc = GCHandle.Alloc(vDemo.random.Points, GCHandleType.Pinned)
         Dim imagePtr = VoronoiDemo_Run(vPtr, handleSrc.AddrOfPinnedObject(), countSlider.Value, dst1.Width, dst1.Height)
         handleSrc.Free()

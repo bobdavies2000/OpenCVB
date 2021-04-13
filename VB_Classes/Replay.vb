@@ -92,7 +92,7 @@ Public Class Replay_Record
         task.desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static bytesTotal As Int64
         recordingFilename = New FileInfo(fileNameForm.filename.Text)
@@ -187,7 +187,7 @@ Public Class Replay_Play
         task.desc = "Playback a file recorded by OpenCVB"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static bytesTotal As Int64
         recordingFilename = New FileInfo(fileNameForm.filename.Text)
@@ -272,12 +272,11 @@ Public Class Replay_OpenGL
         task.desc = "Replay a recorded session with OpenGL"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        replay.Run()
+        replay.Run(src)
         ogl.pointCloudInput = task.pointCloud
-        ogl.src = task.color
-        ogl.Run()
+        ogl.Run(task.color)
     End Sub
 End Class
 

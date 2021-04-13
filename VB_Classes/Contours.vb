@@ -52,7 +52,7 @@ Public Class Contours_Basics
             End If
         Next
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         setOptions()
         Static dontchange As Boolean
@@ -65,8 +65,7 @@ Public Class Contours_Basics
             If standalone Or task.intermediateReview = caller Then
                 If rotatedRect Is Nothing Then rotatedRect = New Rectangle_Rotated
                 Dim imageInput As New cv.Mat
-                rotatedRect.src = src
-                rotatedRect.Run()
+                rotatedRect.Run(src)
                 imageInput = rotatedRect.dst1
                 If imageInput.Channels = 3 Then
                     dst1 = imageInput.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
@@ -147,7 +146,7 @@ Public Class Contours_RGB
 		' task.rank = 1
         label2 = "Background"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim img = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         img.SetTo(0, task.noDepthMask)
@@ -201,7 +200,7 @@ Public Class Contours_RemoveLines
         task.desc = "Remove the lines from an invoice image"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim tmp = cv.Cv2.ImRead(task.parms.homeDir + "Data/invoice.jpg")
         Dim dstSize = New cv.Size(src.Height / tmp.Height * src.Width, src.Height)
@@ -246,7 +245,7 @@ Public Class Contours_Depth
         label1 = "DepthContour input"
         label2 = "DepthContour output"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = task.noDepthMask
         dst2.SetTo(0)
@@ -295,21 +294,21 @@ Public Class Contours_Prediction
         task.desc = "Predict the next contour point with Kalman to smooth the outline"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        outline.Run()
+        outline.Run(src)
         dst1 = outline.dst2
         dst2.SetTo(0)
         Dim stepSize = sliders.trackbar(0).Value
         Dim len = outline.contours.Count
         If len > 0 Then
             kalman.kInput = {outline.contours(0).X, outline.contours(0).Y}
-            kalman.Run()
+            kalman.Run(src)
             Dim origin = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
             For i = 0 To outline.contours.Count - 1 Step stepSize
                 Dim pt1 = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
                 kalman.kInput = {outline.contours(i Mod len).X, outline.contours(i Mod len).Y}
-                kalman.Run()
+                kalman.Run(src)
                 Dim pt2 = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
                 dst2.Line(pt1, pt2, cv.Scalar.Yellow, 1, task.lineType)
             Next
@@ -338,10 +337,9 @@ Public Class Contours_FindandDraw
         task.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        rotatedRect.src = src
-        rotatedRect.Run()
+        rotatedRect.Run(src)
         dst1 = rotatedRect.dst1
         Dim img = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
         Dim tmp As New cv.Mat
@@ -384,14 +382,12 @@ Public Class Contours_Binarized
         task.desc = "Find contours using Edges after image is binarized"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        sobel.src = src
-        sobel.Run()
+        sobel.Run(src)
         dst1 = sobel.dst1
 
-        basics.src = dst1.Clone
-        basics.Run()
+        basics.Run(dst1.Clone)
 
         Dim cntList = basics.sortedContours
         If cntList.Count = 0 Then Exit Sub ' there were no lines?

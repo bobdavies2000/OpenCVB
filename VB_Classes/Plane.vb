@@ -107,9 +107,9 @@ Public Class Plane_Detect
 		' task.rank = 1
         label2 = "Blue, green, and red show different planes"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        grid.Run()
+        grid.Run(src)
 
         dst2.SetTo(0)
         task.RGBDepth.CopyTo(dst1)
@@ -181,9 +181,9 @@ Public Class Plane_DetectDebug
 		' task.rank = 1
         label2 = "Blue, green, and red show different planes"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        grid.Run()
+        grid.Run(src)
 
         dst2.SetTo(0)
         task.RGBDepth.CopyTo(dst1)

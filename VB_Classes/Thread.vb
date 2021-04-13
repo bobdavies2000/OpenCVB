@@ -31,18 +31,18 @@ Public Class Thread_Grid
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "ThreadGrid Width", 2, src.Width, 32)
-            sliders.setupTrackBar(1, "ThreadGrid Height", 2, src.Height, 32)
+            sliders.setupTrackBar(0, "ThreadGrid Width", 2, dst1.Width, 32)
+            sliders.setupTrackBar(1, "ThreadGrid Height", 2, dst1.Height, 32)
             sliders.setupTrackBar(2, "ThreadGrid Border", 0, 20, 0)
         End If
         roiList = New List(Of cv.Rect)
         borderList = New List(Of cv.Rect)
-        gridMask = New cv.Mat(src.Size(), cv.MatType.CV_8U)
-        gridToRoi = New cv.Mat(src.Size(), cv.MatType.CV_32S)
+        gridMask = New cv.Mat(dst1.Size(), cv.MatType.CV_8U)
+        gridToRoi = New cv.Mat(dst1.Size(), cv.MatType.CV_32S)
         task.desc = "Create a grid for use with parallel.ForEach."
-		' task.rank = 1
+        ' task.rank = 3
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static lastWidth As Integer
         Static lastHeight As Integer
@@ -131,9 +131,9 @@ Public Class Thread_GridTest
         task.desc = "Validation test for thread_grid algorithm"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        grid.Run()
+        grid.Run(src)
         Dim mean = cv.Cv2.Mean(src)
 
         Parallel.For(0, grid.roiList.Count,

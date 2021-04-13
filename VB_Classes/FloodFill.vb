@@ -19,14 +19,14 @@ Public Class FloodFill_Basics
             sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2500)
             sliders.setupTrackBar(1, "FloodFill LoDiff", 0, 255, 25)
             sliders.setupTrackBar(2, "FloodFill HiDiff", 0, 255, 25)
-            sliders.setupTrackBar(3, "Step Size", 1, src.Cols / 2, 100)
+            sliders.setupTrackBar(3, "Step Size", 1, dst1.Cols / 2, 100)
         End If
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         label2 = "Grayscale version"
         task.desc = "Use floodfill to build image segments in a grayscale image."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
         Static loDiffSlider = findSlider("FloodFill LoDiff")
@@ -109,7 +109,7 @@ Public Class FloodFill_Top16_MT
         task.desc = "Use floodfill to build image segments with a grayscale image."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim minFloodSize = sliders.trackbar(0).Value
         Dim loDiff = cv.Scalar.All(sliders.trackbar(1).Value)
@@ -117,7 +117,7 @@ Public Class FloodFill_Top16_MT
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Clone()
-        grid.Run()
+        grid.run(src)
         Parallel.ForEach(grid.roiList,
         Sub(roi)
             For y = roi.Y To roi.Y + roi.Height - 1
@@ -150,14 +150,14 @@ Public Class FloodFill_Color_MT
         task.desc = "Use floodfill to build image segments in an RGB image."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim minFloodSize = flood.sliders.trackbar(0).Value
         Dim loDiff = cv.Scalar.All(flood.sliders.trackbar(1).Value)
         Dim hiDiff = cv.Scalar.All(flood.sliders.trackbar(2).Value)
 
         dst1 = src.Clone()
-        grid.Run()
+        grid.run(src)
         Dim vec255 = New cv.Vec3b(255, 255, 255)
         Dim vec0 = New cv.Vec3b(0, 0, 0)
         Dim regionCount As Integer = 0
@@ -195,13 +195,11 @@ Public Class FloodFill_DCT
         task.desc = "Find surfaces that lack any texture with DCT (highest frequency removed) and use floodfill to isolate those surfaces."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        dct.src = src
-        dct.Run()
+        dct.Run(src)
 
-        flood.src = dct.dst2.Clone()
-        flood.Run()
+        flood.Run(dct.dst2.Clone())
         dst1 = flood.dst1
     End Sub
 End Class
@@ -225,14 +223,11 @@ Public Class FloodFill_CComp
         task.desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        ccomp.src = src
-        ccomp.Run()
-
-        range.src = ccomp.dst1
-        range.Run()
+        ccomp.Run(src)
+        range.Run(ccomp.dst1)
         dst1 = range.dst1
         dst2 = range.dst2
         Static minSlider = findSlider("FloodFill Minimum Size")
@@ -264,14 +259,13 @@ Public Class FloodFill_RelativeRange
         task.desc = "Experiment with 'relative' range option to floodfill.  Compare to fixed range option."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         fBasics.floodFlag = 0
         If check.Box(0).Checked Then fBasics.floodFlag += cv.FloodFillFlags.FixedRange
         If check.Box(1).Checked Then fBasics.floodFlag += cv.FloodFillFlags.Link4 Else fBasics.floodFlag += cv.FloodFillFlags.Link8
         If check.Box(2).Checked Then fBasics.floodFlag += cv.FloodFillFlags.MaskOnly
-        fBasics.src = src
-        fBasics.Run()
+        fBasics.Run(src)
         dst1 = src
         dst2 = fBasics.dst1
     End Sub
@@ -296,15 +290,14 @@ Public Class Floodfill_Objects
         End If
         basics = New FloodFill_Basics()
         minSlider = findSlider("FloodFill Minimum Size")
-        minSlider.Value = (src.Width Mod 100) * 25
+        minSlider.Value = (dst1.Width Mod 100) * 25
 
         task.desc = "Use floodfill to identify the desired number of objects"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        basics.src = src
-        basics.Run()
+        basics.Run(src)
         dst1 = basics.dst1
 
         Static loDiffSlider = findSlider("FloodFill LoDiff")
@@ -313,7 +306,7 @@ Public Class Floodfill_Objects
 
         label1 = CStr(basics.masks.Count) + " objects with more than " + CStr(minSlider.Value) + " bytes"
         Static lastSetting As Integer = loDiffSlider.Value
-        If dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero() < 0.9 * basics.src.Total And minSlider.Value > 500 Then
+        If dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero() < 0.9 * src.Total And minSlider.Value > 500 Then
             minSlider.Value -= 10
         Else
             If basics.masks.Count >= sliders.trackbar(0).Value Then
@@ -347,10 +340,9 @@ Public Class FloodFill_WithDepth
         task.desc = "Floodfill only the areas where there is depth"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        range.src = src
-        range.Run()
+        range.Run(src)
         dst2 = task.noDepthMask
         dst1 = range.dst2
         dst1.SetTo(0, dst2)
@@ -377,7 +369,7 @@ Public Class Floodfill_Identifiers
         task.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
         Static loDiffSlider = findSlider("FloodFill LoDiff")
@@ -443,10 +435,9 @@ Public Class Floodfill_ColorObjects
         task.desc = "Use floodfill to identify each of the region candidates using only color."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        pFlood.src = src
-        pFlood.Run()
+        pFlood.Run(src)
         dst1 = pFlood.dst2.Clone
 
         masks = New List(Of cv.Mat)(pFlood.masks)
@@ -479,16 +470,15 @@ Public Class FloodFill_PointTracker
         task.desc = "Test the FloodFill output as input into the point tracker"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        flood.src = src
-        flood.Run()
+        flood.Run(src)
         dst2 = flood.dst1
 
         pTrack.queryPoints = flood.basics.centroids
         pTrack.queryRects = flood.basics.rects
         pTrack.queryMasks = flood.basics.masks
-        pTrack.Run()
+        pTrack.Run(src)
 
         label2 = CStr(pTrack.drawRC.viewObjects.Count) + " regions were found"
         dst1 = pTrack.dst1
@@ -522,14 +512,13 @@ Public Class FloodFill_Top16
         task.desc = "Use floodfill to build image segments in a grayscale image."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        flood.src = src
         thumbNails = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         Dim allSize = New cv.Size(thumbNails.Width / 4, thumbNails.Height / 4) ' show the first 16 masks
-        flood.Run()
+        flood.Run(src)
 
         dst1.SetTo(0)
         Dim thumbCount As Integer
@@ -577,7 +566,7 @@ Public Class FloodFill_Click
         task.desc = "FloodFill where the mouse clicks"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.mouseClickFlag Then
@@ -585,13 +574,11 @@ Public Class FloodFill_Click
             task.mouseClickFlag = False ' preempt any other uses
         End If
 
-        edges.src = src
-        edges.Run()
+        edges.Run(src)
         dst1 = edges.dst2
 
         If flood.pt.X Or flood.pt.Y Then
-            flood.src = dst1.Clone
-            flood.Run()
+            flood.Run(dst1.Clone)
             dst1.CopyTo(dst2)
             If flood.pixelCount > 0 Then dst2.SetTo(255, flood.dst2)
         End If
@@ -624,14 +611,13 @@ Public Class FloodFill_Point
         task.desc = "Use floodfill at a single location in a grayscale image."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         dst1 = src.Clone()
         If standalone Then
             pt = New cv.Point(msRNG.Next(0, dst1.Width - 1), msRNG.Next(0, dst1.Height - 1))
-            edges.src = src
-            edges.Run()
+            edges.Run(src)
             dst1 = edges.mats.dst1
             dst2 = edges.mats.mat(quadrantIndex)
         Else
@@ -680,7 +666,7 @@ Public Class FloodFill_FullImage
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "FloodFill Step Size", 1, src.Cols / 2, 15)
+            sliders.setupTrackBar(0, "FloodFill Step Size", 1, dst1.Cols / 2, 15)
             sliders.setupTrackBar(1, "FloodFill point distance from edge", 1, 25, 10)
             sliders.setupTrackBar(2, "Minimum length for missing contours", 3, 25, 4)
         End If
@@ -693,7 +679,7 @@ Public Class FloodFill_FullImage
         task.desc = "Floodfill each of the segments outlined by the Edges_BinarizedSobel algorithm"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static stepSlider = findSlider("FloodFill Step Size")
         Static fillSlider = findSlider("FloodFill point distance from edge")
@@ -711,8 +697,7 @@ Public Class FloodFill_FullImage
 
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
 
-        motion.src = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        motion.Run()
+        motion.Run(task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         mats.mat(0) = motion.dst1
 
         masks.Clear()
@@ -720,13 +705,11 @@ Public Class FloodFill_FullImage
         rects.Clear()
         centroids.Clear()
 
-        Dim input = src
-        If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static zero As New cv.Scalar(0)
         Static maskRect = New cv.Rect(1, 1, dst1.Width, dst1.Height)
 
-        edges.src = input
-        edges.Run()
+        edges.Run(src)
         dst1 = edges.dst2.Clone
         mats.mat(1).SetTo(255, dst1.Clone)
 
@@ -777,8 +760,7 @@ Public Class FloodFill_FullImage
 
         motion.resetAll = False
         lastFrame = dst1.Clone
-        task.palette.src = dst1
-        task.palette.Run()
+        task.palette.Run(dst1)
         mats.mat(3) = task.palette.dst1
         mats.mat(3).SetTo(0, mats.mat(1)) ' show the pixels that are not assigned (missing)
         label2 = "Checked " + CStr(testCount) + " locations and used floodfill on " + CStr(floodCount)
@@ -794,7 +776,7 @@ Public Class FloodFill_FullImage
             mats.mat(2).Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
 
-        mats.Run()
+        mats.Run(src)
         dst1 = mats.dst1
         dst2 = mats.mat(quadrantIndex)
     End Sub
@@ -827,7 +809,7 @@ Public Class FloodFill_Step
         contours = New Contours_Binarized
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "FloodFill Step Size", 1, src.Cols / 2, 15)
+            sliders.setupTrackBar(0, "FloodFill Step Size", 1, dst1.Width / 2, 15)
             sliders.setupTrackBar(1, "FloodFill point distance from edge", 1, 25, 10)
             sliders.setupTrackBar(2, "Minimum length for missing contours", 3, 25, 4)
         End If
@@ -835,12 +817,11 @@ Public Class FloodFill_Step
         task.desc = "Step through the current image to floodfill using colors from the previous image"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Then
-            contours.src = src
-            contours.Run()
+            contours.Run(src)
             contourInput = contours.basics.sortedContours
             dst1 = contours.dst1
             src = contours.dst2
@@ -935,10 +916,9 @@ Public Class FloodFill_Palette
         task.desc = "Create a floodfill image that is only 8-bit for use with a palette"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        basics.src = src
-        basics.Run()
+        basics.Run(src)
 
         dst2.SetTo(0)
         For i = 0 To basics.masks.Count - 1
@@ -949,8 +929,7 @@ Public Class FloodFill_Palette
         allRegionMask = If(dst2.Channels = 1, dst2, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255))
 
         Dim incr = If(basics.masks.Count < 10, 25, 255 / basics.masks.Count)  'reduces flicker of slightly different colors
-        task.palette.src = dst2 * cv.Scalar.All(incr) ' spread the colors 
-        task.palette.Run()
+        task.palette.Run(dst2 * cv.Scalar.All(incr)) ' spread the colors 
         dst1.SetTo(0)
         task.palette.dst1.CopyTo(dst1, allRegionMask)
 
@@ -979,14 +958,12 @@ Public Class FloodFill_LUT
         task.desc = "The input to a floodfill is the output of a LUT"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        lut.src = src
-        lut.Run()
+        lut.Run(src)
 
-        flood.src = lut.dst1
-        flood.Run()
+        flood.Run(lut.dst1)
         dst1 = lut.dst1
         dst2 = src
         Dim mask As New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -997,9 +974,8 @@ Public Class FloodFill_LUT
             mask(rect).SetTo((i + 1) * incr, mat(rect))
         Next
 
-        addw.src = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         addw.src2 = src
-        addw.Run()
+        addw.Run(mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
         dst2 = addw.dst1
 
         For Each r In flood.rects
@@ -1037,7 +1013,7 @@ Public Class FloodFill_Neighbors
         task.desc = "Use floodfill to combine neighboring labels - regions that differ by only 1"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
         Static stepSlider = findSlider("Step Size")
@@ -1086,8 +1062,7 @@ Public Class FloodFill_Neighbors
             Next
         Next
         Dim spread = CInt(255 / rangeColors.Count)
-        task.palette.src = dst2 * spread
-        task.palette.Run()
+        task.palette.Run(dst2 * spread)
         dst2 = task.palette.dst1
         label2 = CStr(basics.masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub

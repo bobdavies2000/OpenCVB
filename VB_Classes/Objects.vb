@@ -12,16 +12,16 @@ Public Class Object_Basics
         task.desc = "Identify objects in the foreground."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             dst1 = task.depthmask
             dst2 = task.noDepthMask
         End If
 
-        ccomp.src.SetTo(0)
-        src.CopyTo(ccomp.src, task.depthmask)
-        ccomp.Run()
+        src.SetTo(0)
+        src.SetTo(0, task.noDepthMask)
+        ccomp.Run(src)
         dst1 = ccomp.dst1
     End Sub
 End Class

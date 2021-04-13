@@ -52,7 +52,7 @@ Public Class FishEye_Rectified
         label1 = "Left View"
         label2 = "Right View"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         dst1.SetTo(0)
@@ -79,7 +79,7 @@ Public Class FishEye_Raw
         task.desc = "Display the Raw FishEye images for the T265 (only)"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         label1 = "Left Fisheye Image"
         label2 = "Right Fisheye Image"

@@ -16,7 +16,7 @@ Public Class Distance_Basics
         task.desc = "Distance algorithm basics."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then src = task.RGBDepth ' to get some zeros in the image...
         Dim gray = src
@@ -57,9 +57,9 @@ Public Class Distance_Foreground
         task.desc = "Distance algorithm basics."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        foreground.Run()
+        foreground.Run(src)
         dst2 = foreground.dst1
         Dim fg = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
 

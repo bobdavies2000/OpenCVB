@@ -10,7 +10,7 @@ Public Class Bitmap_ToMat
         task.desc = "Convert a color and grayscale bitmap to a cv.Mat"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim bitmap = New Bitmap(task.parms.homeDir + "Data/lena.jpg")
         dst1 = cv.Extensions.BitmapConverter.ToMat(bitmap).Resize(src.Size)

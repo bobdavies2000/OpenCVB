@@ -13,7 +13,7 @@ Public Class MotionBlur_Basics
         task.desc = "Use Filter2D to create a motion blur"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             If sliders.trackbar(1).Value < sliders.trackbar(1).Maximum Then
@@ -141,17 +141,16 @@ Public Class MotionBlur_Deblur
         label1 = "Blurred Image Input"
         label2 = "Deblurred Image Output"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        mblur.src = src
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
             mblur.sliders.trackbar(0).Value = msRNG.Next(mblur.sliders.trackbar(0).Minimum, mblur.sliders.trackbar(0).Maximum)
             mblur.sliders.trackbar(1).Value = msRNG.Next(mblur.sliders.trackbar(1).Minimum, mblur.sliders.trackbar(1).Maximum)
-            mblur.Run()
+            mblur.Run(src)
             mblur.showDirection = False
         Else
-            mblur.Run() ' the motion blurred image is in result1
+            mblur.Run(src) ' the motion blurred image is in result1
         End If
         dst1 = mblur.dst1
 

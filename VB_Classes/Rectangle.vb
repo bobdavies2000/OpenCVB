@@ -20,7 +20,7 @@ Public Class Rectangle_Basics
         task.desc = "Draw the requested number of rectangles."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static typeCheckBox = findCheckBox("Draw Rotated Rectangles (unchecked will draw rectangles)")
         Static countSlider = findSlider("Rectangle Count")
@@ -68,10 +68,9 @@ Public Class Rectangle_Rotated
         task.desc = "Draw the requested number of rectangles."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        rect.src = src
-        rect.Run()
+        rect.Run(src)
         dst1 = rect.dst1
     End Sub
 End Class
@@ -96,15 +95,14 @@ Public Class Rectangle_CComp
         task.desc = "Isolate rectanguler regions around connected components"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        ccomp.src = src
-        ccomp.Run()
+        ccomp.Run(src)
         dst1 = ccomp.dst1.Clone
 
-        If task.frameCount Mod 2 = 0 Then rMotion.src = ccomp.dst1.Clone Else rMotion.src = New cv.Mat(ccomp.dst1.Size, cv.MatType.CV_8UC1, 0)
-        rMotion.Run()
+        src = If(task.frameCount Mod 2 = 0, ccomp.dst1.Clone, New cv.Mat(ccomp.dst1.Size, cv.MatType.CV_8UC1, 0))
+        rMotion.Run(src)
         If task.frameCount Mod 2 = 0 Then
             dst2 = task.color
             For Each r In rMotion.mOverlap.enclosingRects
@@ -137,11 +135,11 @@ Public Class Rectangle_Overlap
         task.desc = "Test if 2 rectangles overlap"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Or task.intermediateReview = caller Then
-            draw.Run()
+            draw.Run(src)
             dst1 = draw.dst1
         End If
 
@@ -191,11 +189,10 @@ Public Class Rectangle_Motion
 		' task.rank = 1
     End Sub
 
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        motion.src = src
-        motion.Run()
+        motion.Run(src)
         dst1 = motion.dst1.Clone
     End Sub
 End Class
@@ -218,21 +215,20 @@ Public Class Rectangle_MotionDepth
         task.desc = "Motion rectangles often overlap.  This algorithm consolidates those rectangles in the depth image."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static lastDepth = task.depth32f
-        cv.Cv2.Min(task.depth32f, lastDepth, motion.src)
+        cv.Cv2.Min(task.depth32f, lastDepth, src)
 
-        motion.Run()
+        motion.Run(src)
         dst2 = motion.dst2
         If motion.resetAll Then
             lastDepth = task.depth32f
-            colorize.src = task.depth32f
+            src = task.depth32f
         Else
-            colorize.src = motion.src.Clone
-            lastDepth = motion.src
+            lastDepth = src
         End If
-        colorize.Run()
+        colorize.Run(src)
         dst1 = colorize.dst1
     End Sub
 End Class
@@ -257,7 +253,7 @@ Public Class Rectangle_Intersection
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Merge rectangles within X pixels", 0, src.Width, If(src.Width = 1280, 500, 250))
+            sliders.setupTrackBar(0, "Merge rectangles within X pixels", 0, dst1.Width, If(dst1.Width = 1280, 500, 250))
         End If
 
         task.desc = "Test if any number of rectangles overlap."
@@ -277,7 +273,7 @@ Public Class Rectangle_Intersection
         otherRects = New List(Of cv.Rect)(newOther)
         Return enclosing
     End Function
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Or task.intermediateReview = caller Then
@@ -291,7 +287,7 @@ Public Class Rectangle_Intersection
 
             label1 = "Input rectangles = " + CStr(countSlider.value)
 
-            draw.Run()
+            draw.Run(src)
             dst1 = draw.dst1
             inputRects = New List(Of cv.Rect)(draw.rectangles)
         Else
@@ -343,7 +339,7 @@ Public Class Rectangle_Union
         task.desc = "Create a rectangle that contains all the input rectangles"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Or task.intermediateReview = caller Then
@@ -357,7 +353,7 @@ Public Class Rectangle_Union
 
             label1 = "Input rectangles = " + CStr(draw.rectangles.Count)
 
-            draw.Run()
+            draw.Run(src)
             dst1 = draw.dst1
             inputRects = New List(Of cv.Rect)(draw.rectangles)
         Else
@@ -402,7 +398,7 @@ Public Class Rectangle_MultiOverlap
         task.desc = "Given a group of rectangles, merge all the rectangles that overlap"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Then
@@ -415,7 +411,7 @@ Public Class Rectangle_MultiOverlap
 
             label1 = "Input rectangles = " + CStr(draw.rectangles.Count)
 
-            draw.Run()
+            draw.Run(src)
             dst1 = draw.dst1
             inputRects = draw.rectangles
         End If

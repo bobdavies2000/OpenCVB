@@ -26,7 +26,7 @@ Public Class Gabor_Basics
         task.desc = "Explore Gabor kernel - Painterly Effect"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             ksize = sliders.trackbar(0).Value * 2 + 1
@@ -57,10 +57,10 @@ Public Class Gabor_Basics_MT
         grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = src.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.
-        gridHeightSlider.Value = src.Height / 4
+        gridWidthSlider.Value = dst1.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.
+        gridHeightSlider.Value = dst1.Height / 4
 
-        grid.Run() ' we only run this one time!  It needs to be 32 Gabor filters only.
+        grid.Run(dst1) ' we only run this one time!  It needs to be 32 Gabor filters only.
 
         For i = 0 To gabor.Length - 1
             gabor(i) = New Gabor_Basics()
@@ -70,7 +70,7 @@ Public Class Gabor_Basics_MT
         task.desc = "Apply multiple Gabor filters sweeping through different values of theta - Painterly Effect."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static ksizeSlider = findSlider("Gabor Kernel Size")
@@ -93,8 +93,7 @@ Public Class Gabor_Basics_MT
         Parallel.For(0, grid.roiList.Count,
         Sub(i)
             Dim roi = grid.roiList(i)
-            gabor(i).src = src
-            gabor(i).Run()
+            gabor(i).Run(src)
             SyncLock accum
                 cv.Cv2.Max(accum, gabor(i).dst1, accum)
                 dst2(roi) = gabor(i).gKernel.Normalize(0, 255, cv.NormTypes.MinMax).Resize(New cv.Size(roi.Width, roi.Height))

@@ -41,7 +41,7 @@ Public Class lineFLD_Basics
         task.desc = "A Fast Line Detector"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         lines.Clear()
 
@@ -269,7 +269,7 @@ Public Class lineFLD_CPP
         task.desc = "Basics for a Fast Line Detector"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         sortedLines.Clear()
 
@@ -318,11 +318,10 @@ Public Class LineFLD_LongestLine
 		' task.rank = 1
         label2 = ""
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
-        lines.src = src
-        lines.Run()
+        lines.Run(src)
         src.CopyTo(dst1)
 
         If lines.sortedLines.Count > 0 Then
@@ -357,11 +356,10 @@ Public Class LineFLD_MT
 		' task.rank = 1
         label2 = ""
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
-        lines.src = src
-        lines.Run()
+        lines.Run(src)
         src.CopyTo(dst1)
 
         ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
@@ -401,7 +399,7 @@ End Class
 '        task.desc = "Use Fitline with the sparse Z data and X or Y (in RGB pixels)."
 '        label2 = ""
 '    End Sub
-'    Public Sub Run()
+'    Public Sub Run(src as cv.Mat)
 '        If task.intermediateReview = caller Then task.intermediateObject = Me
 '        If task.frameCount Mod sliders.trackbar(2).Value Then Exit Sub
 '        Dim useX As Boolean = check.Box(0).Checked

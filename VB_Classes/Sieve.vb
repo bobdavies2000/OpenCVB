@@ -26,7 +26,7 @@ Public Class Sieve_BasicsVB
         Next
         Return completeList + Mid(nextList, 1, If(nextList.Length > 2, Len(nextList) - 2, ""))
     End Function
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim count = sliders.trackbar(0).Value
         Dim nextEntry As Integer = 2
@@ -61,7 +61,7 @@ Public Class Sieve_Basics
         task.desc = "Implement the Sieve of Eratothenes in C#"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static countSlider = findSlider("Count of desired primes")
         task.trueText(printer.shareResults(sieve.GetPrimeNumbers(countSlider.value)))

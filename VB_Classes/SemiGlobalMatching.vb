@@ -28,7 +28,7 @@ Public Class SemiGlobalMatching_CPP
         task.desc = "Find depth using the semi-global matching algorithm."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         'If task.frameCount < 10 Then Exit Sub
         'If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then

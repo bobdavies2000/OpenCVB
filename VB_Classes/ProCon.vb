@@ -70,7 +70,7 @@ Public Class ProCon_Basics
             If terminateProducer Then Exit While Else Thread.Sleep(pduration)
         End While
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If sliders.trackbar(0).Value <> buffer.Length Then
             SyncLock mutex
@@ -85,7 +85,7 @@ Public Class ProCon_Basics
         pduration = sliders.trackbar(1).Value
         cduration = sliders.trackbar(2).Value
         SyncLock mutex
-            flow.Run()
+            flow.Run(src)
         End SyncLock
     End Sub
     Public Sub Close()
@@ -111,7 +111,7 @@ Public Class ProCon_Variation
         task.desc = "DijKstra's Producer/Consumer - similar to Basics above but producer is the algorithm thread."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         SyncLock procon.mutex
             procon.tail = procon.success(procon.tail)
@@ -120,7 +120,7 @@ Public Class ProCon_Variation
                 frameCount += 1
             End If
         End SyncLock
-        procon.Run()
+        procon.Run(src)
     End Sub
     Public Sub Close()
         procon.terminateConsumer = True

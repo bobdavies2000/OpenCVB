@@ -105,7 +105,7 @@ Public Class Dither_Basics
         task.desc = "Explore all the varieties of dithering"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim radioIndex As Integer
         Static frm = findfrm("Dither_Basics Radio Options")

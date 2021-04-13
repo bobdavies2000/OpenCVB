@@ -17,7 +17,7 @@ Public Class Entropy_Basics
         task.desc = "Compute the entropy in an image - a measure of contrast(iness)"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static binSlider = findSlider("Number of Bins")
         simple.bins = binSlider.Value
@@ -31,7 +31,7 @@ Public Class Entropy_Basics
         Next
         If standalone or task.intermediateReview = caller Then
             flow.msgs.Add("Entropy total = " + Format(entropy, "0.00") + " - " + entropyChannels)
-            flow.Run()
+            flow.Run(src)
         End If
     End Sub
 End Class
@@ -64,9 +64,9 @@ Public Class Entropy_Highest
         task.desc = "Find the highest entropy section of the color image."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        grid.Run()
+        grid.Run(src)
 
         Dim entropyMap = New cv.Mat(src.Size(), cv.MatType.CV_32F)
         Dim entropyList(grid.roiList.Count - 1) As Single
@@ -85,9 +85,8 @@ Public Class Entropy_Highest
 
         dst2 = entropyMap.ConvertScaleAbs(255 / (maxEntropy - minEntropy), minEntropy)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        addw.src = dst2
         addw.src2 = src
-        addw.Run()
+        addw.Run(dst2)
         dst2 = addw.dst1
 
         Dim tmp = entropyMap.ConvertScaleAbs(255 / (maxEntropy - minEntropy))
@@ -119,13 +118,11 @@ Public Class Entropy_FAST
         task.desc = "Use FAST markings to add to entropy"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        fast.src = src
-        fast.Run()
+        fast.Run(src)
 
-        entropy.src = fast.dst1
-        entropy.Run()
+        entropy.Run(fast.dst1)
         dst1 = entropy.dst1
         dst2 = entropy.dst2
         dst2.Rectangle(entropy.eMaxRect, cv.Scalar.Red, 4)

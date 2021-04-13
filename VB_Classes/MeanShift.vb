@@ -12,7 +12,7 @@ Public Class MeanShift_Basics
         task.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track.  Tracker Algorithm"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then usingDrawRect = True
         If usingDrawRect Then inputRect = task.drawRect
@@ -59,25 +59,23 @@ Public Class MeanShift_Depth
         task.desc = "Use depth to start mean shift algorithm.  Tracker Algorithm"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.drawRect.Width > 0 Then
             ms.usingDrawRect = True
             ms.inputRect = New cv.Rect
         End If
         If ms.usingDrawRect Then
-            ms.src = src
-            ms.Run()
+            ms.Run(src)
             dst1 = ms.dst1
             dst2 = ms.dst2
         Else
-            blob.Run()
+            blob.Run(src)
             dst1 = blob.dst1
 
             If blob.trustworthy Then
-                ms.src = src
                 ms.inputRect = blob.trustedRect
-                ms.Run()
+                ms.Run(src)
                 dst2 = ms.dst2
                 dst1 = ms.dst1
             Else
@@ -103,7 +101,7 @@ Public Class MeanShift_PyrFilter
         task.desc = "Use PyrMeanShiftFiltering to segment an image."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim spatialRadius = sliders.trackbar(0).Value
         Dim colorRadius = sliders.trackbar(1).Value
@@ -141,10 +139,9 @@ Public Class Meanshift_TopObjects
         task.desc = "Track - tracking algorithm"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        blob.src = src
-        blob.Run()
+        blob.Run(src)
 
         Dim updateFrequency = sliders.trackbar(0).Value
         Dim trackBoxes As New List(Of cv.Rect)
@@ -155,16 +152,15 @@ Public Class Meanshift_TopObjects
                     cams(i).inputRect = blob.flood.rects(camIndex)
                 End If
 
-                cams(i).src = src
-                cams(i).Run()
+                cams(i).Run(src)
                 mats1.mat(i) = cams(i).dst1.Clone()
                 mats2.mat(i) = cams(i).dst2.Clone()
                 trackBoxes.Add(cams(i).trackbox)
             End If
         Next
-        mats1.Run()
+        mats1.Run(src)
         dst1 = mats1.dst1
-        mats2.Run()
+        mats2.Run(src)
         dst2 = mats2.dst1
     End Sub
 End Class

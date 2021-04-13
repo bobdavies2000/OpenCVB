@@ -9,7 +9,7 @@ Public Class Aruco_Basics
         task.desc = "Show how to use the Aruco markers and rotate the image accordingly."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim tmp = cv.Cv2.ImRead(task.parms.homeDir + "Data/aruco_markers_photo.jpg")
         Static detectorParameters = cv.Aruco.DetectorParameters.Create()
@@ -40,7 +40,7 @@ Public Class Aruco_Test
         task.desc = "Testing the Aruco marker detection in C#"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim tmp = cv.Cv2.ImRead(task.parms.homeDir + "Data/aruco_markers_photo.jpg")
         aruco.Run(tmp)

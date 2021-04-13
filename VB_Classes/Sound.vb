@@ -61,7 +61,7 @@ Public Class Sound_Basics
         task.desc = "Load an audio file, play it, and convert to PCM"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim sender As New Object, e As New EventArgs
         Static fileinfo = New FileInfo(fileNameForm.filename.Text)
@@ -155,7 +155,7 @@ Public Class Sound_SignalGenerator
         task.desc = "Generate sound with a sine waveform."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static radioIndex As Integer
         Static wgenSlider = findSlider("Sine Wave Frequency")
@@ -231,7 +231,7 @@ Public Class Sound_Display
         task.desc = "Display a sound buffer in several styles"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static sliderPercent As Single
         Static fileStarted As Boolean
@@ -339,10 +339,10 @@ Public Class Sound_GenWaveDisplay
         task.desc = "Display the generated sound waves"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         plotSound.soundSource.run()
-        plotSound.Run()
+        plotSound.Run(src)
         Dim r1 = New cv.Rect(0, 0, src.Width, src.Height)
         Dim r2 = New cv.Rect(src.Width, 0, src.Width, src.Height)
         dst1 = plotSound.dst1(r1)
@@ -367,10 +367,10 @@ Public Class Sound_WaveDisplay
         task.desc = "Display the generated sound waves"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         plotSound.soundSource.run()
-        plotSound.Run()
+        plotSound.Run(src)
         Dim r1 = New cv.Rect(0, 0, src.Width, src.Height)
         Dim r2 = New cv.Rect(src.Width, 0, src.Width, src.Height)
         dst1 = plotSound.dst1(r1)

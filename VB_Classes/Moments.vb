@@ -19,10 +19,10 @@ Public Class Moments_Basics
         task.desc = "Compute the centroid of the provided mask file."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
-            foreground.Run()
+            foreground.Run(src)
             dst1 = foreground.dst1
             inputMask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
@@ -32,7 +32,7 @@ Public Class Moments_Basics
         If task.useKalman Then
             kalman.kInput(0) = m.M10 / m.M00
             kalman.kInput(1) = m.M01 / m.M00
-            kalman.Run()
+            kalman.Run(src)
             center = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
         Else
             center = New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00)
@@ -61,16 +61,16 @@ Public Class Moments_CentroidKalman
         task.desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        foreground.Run()
+        foreground.Run(src)
         dst1 = foreground.dst1
         Dim mask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim m = cv.Cv2.Moments(mask, True)
         If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
             kalman.kInput(0) = m.M10 / m.M00
             kalman.kInput(1) = m.M01 / m.M00
-            kalman.Run()
+            kalman.Run(src)
             dst1.Circle(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, cv.Scalar.Red, -1, task.lineType)
         End If
     End Sub

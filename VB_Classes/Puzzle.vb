@@ -230,24 +230,24 @@ Public Class Puzzle_Basics
         grid = New Thread_Grid
         gridWidthSlider = findSlider("ThreadGrid Width")
         gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = src.Cols / 10
-        gridHeightSlider.Value = src.Rows / 8
+        gridWidthSlider.Value = dst1.Cols / 10
+        gridHeightSlider.Value = dst1.Rows / 8
 
-        grid.Run()
+        grid.Run(dst1)
         task.desc = "Create the puzzle pieces for toy genetic or annealing algorithm."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Function Shuffle(Of T)(collection As IEnumerable(Of T)) As List(Of T)
         Dim r As Random = New Random()
         Shuffle = collection.OrderBy(Function(a) r.Next()).ToList()
     End Function
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static width As Integer
         Static height As Integer
         If width <> gridWidthSlider.Value Or height <> gridHeightSlider.Value Or task.frameCount = 0 Or restartRequested Then
             restartRequested = False
-            grid.Run()
+            grid.Run(src)
             width = grid.roiList(0).Width
             height = grid.roiList(0).Height
 
@@ -314,7 +314,7 @@ Public Class Puzzle_Solver
         Next
         Return bfit
     End Function
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If src.Width = 640 Then
@@ -394,13 +394,11 @@ Public Class Puzzle_Solver
                 xxOffset = puzzle.grid.sliders.trackbar(0).Value / 4
                 yxOffset = puzzle.grid.sliders.trackbar(0).Value / 2
             End If
-            puzzle.grid.src = src
-            puzzle.grid.Run()
+            puzzle.grid.Run(src)
             xyOffset = puzzle.grid.sliders.trackbar(1).Value * 9 / 10
             yyOffset = puzzle.grid.sliders.trackbar(1).Value / 2
             puzzle.restartRequested = True
-            puzzle.src = src
-            puzzle.Run()
+            puzzle.Run(src)
             roilist = puzzle.grid.roiList.ToArray
         End If
 

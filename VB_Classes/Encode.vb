@@ -13,7 +13,7 @@ Public Class Encode_Basics
         label1 = "absDiff with original"
         label2 = "Original decompressed"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim encodeParams() As Integer = {options.getEncodeParameter(), options.qualityLevel}
 
@@ -76,7 +76,7 @@ Public Class Encode_Options
         If encodeOption = cv.ImwriteFlags.JpegOptimize Then qualityLevel = 1 ' just on or off
         Return encodeOption
     End Function
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim fileExtension = ".jpg"

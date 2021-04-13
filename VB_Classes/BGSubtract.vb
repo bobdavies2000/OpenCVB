@@ -23,7 +23,7 @@ Public Class BGSubtract_Basics_CPP
         task.desc = "Demonstrate all the different background subtraction algorithms in OpenCV - some only available in C++"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static frm = findfrm("BGSubtract_Basics_CPP Radio Options")
         For i = 0 To frm.check.length - 1
@@ -77,9 +77,9 @@ Public Class BGSubtract_MotionDetect_MT
         End If
         label2 = "Only Motion Added"
         task.desc = "Detect Motion for use with background subtraction"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount = 0 Then src.CopyTo(dst2)
         Dim threadData As New cv.Vec3i
@@ -134,11 +134,11 @@ Public Class BGSubtract_Basics_MT
         End If
 
         task.desc = "Detect Motion in the color image"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        grid.Run()
+        grid.Run(src)
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = input.EmptyClone.SetTo(0)
@@ -174,15 +174,14 @@ Public Class BGSubtract_Depth_MT
         initParent()
         bgsub = New BGSubtract_Basics_MT()
         task.desc = "Detect Motion in the depth image - needs more work"
-		' task.rank = 1
+        ' task.rank = 1
         label1 = "Depth data src"
         label2 = "Accumulated depth image"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        bgsub.src = task.RGBDepth
-        bgsub.Run()
-        dst1 = bgsub.src
+        bgsub.Run(task.RGBDepth)
+        dst1 = task.RGBDepth
         dst2 = bgsub.dst2
         dst2.SetTo(0, task.noDepthMask)
     End Sub
@@ -203,9 +202,9 @@ Public Class BGSubtract_MOG
 
         MOG = cv.BackgroundSubtractorMOG.Create()
         task.desc = "Subtract background using a mixture of Gaussians"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then
             gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -232,9 +231,9 @@ Public Class BGSubtract_MOG2
         End If
         MOG2 = cv.BackgroundSubtractorMOG2.Create()
         task.desc = "Subtract background using a mixture of Gaussians"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -259,9 +258,9 @@ Public Class BGSubtract_GMG_KNN
         gmg = cv.BackgroundSubtractorGMG.Create()
         knn = cv.BackgroundSubtractorKNN.Create()
         task.desc = "GMG and KNN API's to subtract background"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount < 120 Then
             task.trueText("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(task.frameCount))
@@ -297,9 +296,9 @@ Public Class BGSubtract_MOG_RGBDepth
         label1 = "Unstable depth"
         label2 = "Unstable color"
         task.desc = "Isolate motion in both depth and color data using a mixture of Gaussians"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static learnRateSlider = findSlider("Learn Rate")
@@ -329,14 +328,12 @@ Public Class BGSubtract_MOG_Retina
         label1 = "MOG results of depth motion"
         label2 = "Difference from retina depth motion."
         task.desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        retina.src = task.RGBDepth
-        retina.Run()
-        bgSub.src = retina.dst2.Clone()
-        bgSub.Run()
+        retina.Run(task.RGBDepth)
+        bgSub.Run(retina.dst2.Clone())
         dst1 = bgSub.dst1
         cv.Cv2.Subtract(bgSub.dst1, retina.dst2, dst2)
     End Sub
@@ -352,12 +349,11 @@ Public Class BGSubtract_DepthOrColorMotion
         initParent()
         motion = New Diff_UnstableDepthAndColor()
         task.desc = "Detect motion with both depth and color changes"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        motion.src = src.Clone()
-        motion.Run()
+        motion.Run(src)
         dst1 = motion.dst1
         dst2 = motion.dst2
         Dim mask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs()
@@ -382,6 +378,16 @@ Module BGSubtract_BGFG_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function BGSubtract_BGFG_Run(bgfs As IntPtr, rgbPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
     End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function BGSubtract_Synthetic_Open(rgbPtr As IntPtr, rows As Integer, cols As Integer, fgFilename As String, amplitude As Double,
+                                          magnitude As Double, wavespeed As Double, objectspeed As Double) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub BGSubtract_Synthetic_Close(synthPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function BGSubtract_Synthetic_Run(synthPtr As IntPtr) As IntPtr
+    End Function
 End Module
 
 
@@ -399,14 +405,13 @@ Public Class BGSubtract_Video
         video = New Video_Basics()
         video.srcVideo = task.parms.homeDir + "Data/vtest.avi"
         task.desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        video.Run()
+        video.Run(src)
         dst2 = video.dst1
-        bgfg.src = dst2
-        bgfg.Run()
+        bgfg.Run(dst2)
         dst1 = bgfg.dst1
     End Sub
 End Class
@@ -414,20 +419,6 @@ End Class
 
 
 
-
-
-Module BGSubtract_Synthetic_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_Synthetic_Open(rgbPtr As IntPtr, rows As Integer, cols As Integer, fgFilename As String, amplitude As Double,
-                                              magnitude As Double, wavespeed As Double, objectspeed As Double) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub BGSubtract_Synthetic_Close(synthPtr As IntPtr)
-    End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_Synthetic_Run(synthPtr As IntPtr) As IntPtr
-    End Function
-End Module
 
 
 
@@ -448,9 +439,9 @@ Public Class BGSubtract_Synthetic_CPP
         End If
         label1 = "Synthetic background/foreground image."
         task.desc = "Generate a synthetic input to background subtraction method - Painterly"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount < 10 Then Exit Sub ' darker images at the start?
         If amplitude <> sliders.trackbar(0).Value Or magnitude <> sliders.trackbar(1).Value Or waveSpeed <> sliders.trackbar(2).Value Or
@@ -495,15 +486,13 @@ Public Class BGSubtract_Synthetic
 
         synth = New BGSubtract_Synthetic_CPP()
         task.desc = "Demonstrate background subtraction algorithms with synthetic images - Painterly"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        synth.src = src
-        synth.Run()
+        synth.Run(src)
         dst2 = synth.dst1
-        bgfg.src = dst2
-        bgfg.Run()
+        bgfg.Run(dst2)
         dst1 = bgfg.dst1
     End Sub
 End Class

@@ -55,13 +55,12 @@ Public Class Smoothing_Exterior
 		task.desc = "Smoothing the line connecting a series of points."
 		' task.rank = 1
 	End Sub
-	Public Sub Run()
+	Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
 		If standalone Or task.intermediateReview = caller Then
 			If task.frameCount Mod 30 Then Exit Sub
 
-			hull.src = src
-			hull.Run()
+			hull.Run(src)
 			Dim nextHull = hull.hull
 
 			dst1.SetTo(0)
@@ -141,13 +140,12 @@ Public Class Smoothing_Interior
 		task.desc = "Smoothing the line connecting a series of points staying inside the outline."
 		' task.rank = 1
 	End Sub
-	Public Sub Run()
+	Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
 		If standalone or task.intermediateReview = caller Then
 			If task.frameCount Mod 30 Then Exit Sub
 
-			hull.src = src
-			hull.Run()
+			hull.Run(src)
 			Dim nextHull = hull.hull
 
 			dst1.SetTo(0)
@@ -194,9 +192,9 @@ Public Class Smoothing_Contours
 		task.desc = "Use Smoothing exterior or interior to get a smoother representation of a contour"
 		' task.rank = 1
 	End Sub
-	Public Sub Run()
+	Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-		outline.Run()
+		outline.Run(src)
 
 		Dim stepsize = sliders.trackbar(0).Value
 		Dim smooth As Object

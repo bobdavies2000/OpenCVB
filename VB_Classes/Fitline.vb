@@ -17,10 +17,10 @@ Public Class Fitline_Basics
         task.desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then
-            draw.Run()
+            draw.Run(src)
             dst2 = draw.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
             dst1 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Else
@@ -62,10 +62,9 @@ Public Class Fitline_3DBasics_MT
 		' task.rank = 1
         label2 = "White is featureless RGB, blue depth shadow"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        hlines.src = src
-        hlines.Run()
+        hlines.Run(src)
         dst2 = hlines.dst2
         Dim mask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
         dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -135,7 +134,7 @@ Public Class Fitline_RawInput
         task.desc = "Generate a noisy line in a field of random data."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If check.Box(1).Checked Or task.frameCount = 0 Then
             If task.parms.testAllRunning = False Then check.Box(1).Checked = False
@@ -207,7 +206,7 @@ Public Class Fitline_EigenFit
         task.desc = "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static eigenVec As New cv.Mat(2, 2, cv.MatType.CV_32F, 0), eigenVal As New cv.Mat(2, 2, cv.MatType.CV_32F, 0)
         Static theta As Single
@@ -222,7 +221,7 @@ Public Class Fitline_EigenFit
             'If noisyLine.sliders.trackbar(0).Value <> noisePointCount Or noisyLine.sliders.trackbar(1).Value <> linePointCount Or
             '    noisyLine.sliders.trackbar(2).Value <> lineNoise Or noisyLine.check.Box(0).Checked <> highlight Or noisyLine.check.Box(1).Checked Then
             noisyLine.check.Box(1).Checked = True
-            noisyLine.Run()
+            noisyLine.Run(src)
             dst2 = noisyLine.dst1
             dst1.SetTo(0)
             noisyLine.check.Box(1).Checked = False

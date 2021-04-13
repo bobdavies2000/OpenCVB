@@ -37,7 +37,7 @@ Public Class MultiDimensionScaling_Cities
     Private Function CenteringMatrix(n As integer) As cv.Mat
         Return cv.Mat.Eye(n, n, cv.MatType.CV_64F) - 1.0 / n
     End Function
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim size = 10 ' we are working with 10 cities.
         Dim cityMat = New cv.Mat(size, size, cv.MatType.CV_64FC1, CityDistance)

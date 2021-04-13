@@ -60,7 +60,7 @@ Public Class WarpAffine_Captcha
         cv.Cv2.WarpPerspective(charImage, charImage, perpectiveTranx, New cv.Size(charImage.Cols, charImage.Rows), cv.InterpolationFlags.Cubic,
                                cv.BorderTypes.Constant, cv.Scalar.White)
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim characters() As String = {"a", "A", "b", "B", "c", "C", "D", "d", "e", "E", "f", "F", "g", "G", "h", "H", "j", "J", "k", "K", "m", "M", "n", "N", "q", "Q", "R", "t", "T", "w", "W", "x", "X", "y", "Y", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
         Dim charactersSize = characters.Length / characters(0).Length
@@ -107,11 +107,11 @@ Public Class WarpAffine_Basics
         task.desc = "Use WarpAffine to transform input images."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static frm = findfrm("WarpAffine_Basics Radio Options")
 
-        rotateOptions.Run()
+        rotateOptions.Run(src)
 
         Dim pt = New cv.Point2f(src.Cols / 2, src.Rows / 2)
         Dim angle = sliders.trackbar(0).Value
@@ -147,16 +147,15 @@ Public Class WarpAffine_3Points
         label1 = "Triangles define the affine transform"
         label2 = "Image with affine transform applied"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static M As New cv.Mat
         If task.frameCount Mod 60 = 0 Then
             Dim triangles(1) As cv.Mat
-            triangle.src = src
-            triangle.Run()
+            triangle.Run(src)
             triangles(0) = triangle.triangle.Clone()
             Dim srcPoints1 = triangle.srcPoints.Clone()
-            triangle.Run()
+            triangle.Run(src)
             triangles(1) = triangle.triangle.Clone()
             Dim srcPoints2 = triangle.srcPoints.Clone()
 
@@ -221,7 +220,7 @@ Public Class WarpAffine_4Points
 		' task.rank = 1
         label1 = "Color image with perspective transform applied"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static M As New cv.Mat
         If task.frameCount Mod 60 = 0 Then
@@ -229,8 +228,7 @@ Public Class WarpAffine_4Points
             Dim roi = New cv.Rect(50, src.Height / 2, src.Width / 6, src.Height / 6)
             Dim smallImage = src.Resize(New cv.Size(roi.Width, roi.Height))
             Dim rectangles(1) As cv.RotatedRect
-            rect.src = src
-            rect.Run()
+            rect.Run(src)
             rectangles(1) = rect.minRect
             rectangles(1).Center.X = src.Width - rectangles(0).Center.X - roi.Width
 

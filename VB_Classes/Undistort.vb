@@ -71,7 +71,7 @@ Public Class Undistort_Basics
             sliders.setupTrackBar(0, "undistort intrinsics Left", 1, 200, 100)
         End If
         sliders.setupTrackBar(1, "undistort intrinsics coeff's", -1000, 1000, 100)
-        sliders.setupTrackBar(2, "undistort stereo height", 1, src.Rows, src.Rows)
+        sliders.setupTrackBar(2, "undistort stereo height", 1, dst1.Rows, dst1.Rows)
         sliders.setupTrackBar(3, "undistort Offset left/right", 1, 200, 112)
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -83,7 +83,7 @@ Public Class Undistort_Basics
         task.desc = "Use sliders to control the undistort OpenCV API - Painterly"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.parms.intrinsicsLeft.coeffs Is Nothing Then

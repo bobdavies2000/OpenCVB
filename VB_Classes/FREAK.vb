@@ -10,10 +10,9 @@ Public Class FREAK_Basics
         task.desc = "Find keypoints using ORB and FREAK algorithm"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        orb.src = src
-        orb.Run()
+        orb.Run(src)
 
         Dim freak = cv.XFeatures2D.FREAK.Create()
         Dim fdesc = New cv.Mat

@@ -15,7 +15,7 @@ Public Class Features_GoodFeatures
         task.desc = "Find good features to track in an RGB image."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim numPoints = sliders.trackbar(0).Value
@@ -55,11 +55,10 @@ Public Class Features_PointTracker
         task.desc = "Find good features and track them"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        features.src = src
-        features.Run()
+        features.Run(src)
         dst1 = features.dst1
 
         pTrack.queryPoints.Clear()
@@ -74,8 +73,7 @@ Public Class Features_PointTracker
             pTrack.queryMasks.Add(New cv.Mat)
         Next
 
-        pTrack.src = src
-        pTrack.Run()
+        pTrack.Run(src)
 
         dst2.SetTo(0)
         For Each obj In pTrack.drawRC.viewObjects

@@ -13,7 +13,7 @@ Public Class Diff_Basics
         task.desc = "Capture an image and compare it to previous frame using absDiff and threshold"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gray = src
         If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -54,13 +54,11 @@ Public Class Diff_UnstableDepthAndColor
         task.desc = "Build a mask for any pixels that have either unstable depth or color"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        diff.src = src
-        diff.Run()
+        diff.Run(src)
         Dim unstableColor = diff.dst2.Clone()
-        depth.src = task.RGBDepth
-        depth.Run()
+        depth.Run(task.RGBDepth)
         Dim unstableDepth As New cv.Mat
         Dim mask As New cv.Mat
         cv.Cv2.BitwiseNot(depth.dst2, unstableDepth)

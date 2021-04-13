@@ -21,7 +21,7 @@ Public Class Reduction_Basics
         task.desc = "Reduction: a simpler way to KMeans by reducing color resolution"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static reductionSlider = findSlider("Reduction factor")
         Dim reductionVal = CInt(reductionSlider.Value)
@@ -57,15 +57,12 @@ Public Class Reduction_Floodfill
         flood = New FloodFill_Basics()
         reduction = New Reduction_Basics()
         task.desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        reduction.src = src
-        reduction.Run()
-
-        flood.src = reduction.dst1
-        flood.Run()
+        reduction.Run(src)
+        flood.Run(reduction.dst1)
 
         dst1 = flood.dst1
         label1 = flood.label2
@@ -91,24 +88,22 @@ Public Class Reduction_KNN_Color
 
         label2 = "Original floodfill color selections"
         task.desc = "Use KNN with color reduction to consistently identify regions and color them."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        reduction.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        reduction.Run()
+        reduction.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = reduction.dst1
 
         pTrack.queryPoints = New List(Of cv.Point2f)(reduction.flood.centroids)
         pTrack.queryRects = New List(Of cv.Rect)(reduction.flood.rects)
         pTrack.queryMasks = New List(Of cv.Mat)(reduction.flood.masks)
-        pTrack.Run()
+        pTrack.Run(src)
         dst1 = pTrack.dst1
 
         If standalone Or task.intermediateReview = caller Then
             highlight.viewObjects = pTrack.drawRC.viewObjects
-            highlight.src = dst1
-            highlight.Run()
+            highlight.Run(dst1)
             dst1 = highlight.dst1
         End If
 
@@ -134,15 +129,14 @@ Public Class Reduction_KNN_ColorAndDepth
         label1 = "Detecting objects using only color coherence"
         label2 = "Detecting objects with color and depth coherence"
         task.desc = "Reduction_KNN finds objects with depth.  This algorithm uses only color on the remaining objects."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        reduction.src = src
-        reduction.Run()
+        reduction.Run(src)
         dst1 = reduction.dst1
 
-        depth.Run()
+        depth.Run(src)
         dst2 = depth.dst1
     End Sub
 End Class
@@ -177,27 +171,23 @@ Public Class Reduction_Lines
         label1 = "Gravity rotated Side View with detected lines"
         label2 = "Gravity rotated Top View width detected lines"
         task.desc = "Present both the top and side view to minimize pixel counts."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        reduction.Run()
+        reduction.Run(src)
 
-        sideView.Run()
-        lDetect.src = sideView.dst1
-        lDetect.Run()
+        sideView.Run(src)
+        lDetect.Run(sideView.dst1)
 
-        cmatSide.src = lDetect.dst1
-        cmatSide.Run()
+        cmatSide.Run(lDetect.dst1)
         dst1 = cmatSide.dst1
 
-        topView.Run()
-        lDetect.src = topView.dst1
-        lDetect.Run()
+        topView.Run(src)
+        lDetect.Run(topView.dst1)
 
-        cmatTop.src = lDetect.dst1
-        cmatTop.Run()
+        cmatTop.Run(lDetect.dst1)
         dst2 = cmatTop.dst1
     End Sub
 End Class
@@ -220,18 +210,16 @@ Public Class Reduction_Histogram
 
         label2 = "Backprojection of highlighted histogram bin"
         task.desc = "Use the histogram of a reduced RGB image to isolate featureless portions of an image."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        basics.src = src.Clone
-        basics.Run()
+        basics.Run(src)
         Static reductionSlider = findSlider("Reduction factor")
         reductionSlider.value = 112
 
-        hist.src = basics.dst1
-        hist.Run()
+        hist.Run(basics.dst1)
         dst1 = hist.dst1
         dst2 = hist.dst2
         label1 = "Reduction = " + CStr(reductionSlider.value) + " and bins = " + CStr(hist.binSlider.Value)
@@ -252,18 +240,17 @@ Public Class Reduction_PointCloud
         label1 = "Reduced depth"
         label2 = "Pointcloud with reduced z-Depth"
         task.desc = "Use reduction to smooth depth data"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        Dim input = src.Clone
-        If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud
-        Dim split() = input.Split()
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        Dim split() = src.Split()
 
         split(2) *= 1000
-        split(2).ConvertTo(reduction.src, cv.MatType.CV_32S)
-        reduction.Run()
+        split(2).ConvertTo(src, cv.MatType.CV_32S)
+        reduction.Run(src)
         reduction.dst1.ConvertTo(dst1, cv.MatType.CV_32F)
         split(2) = dst1 * 0.001
         cv.Cv2.Merge(split, dst2)
@@ -291,21 +278,20 @@ Public Class Reduction_XYZ
         End If
 
         task.desc = "Use reduction to slice the point cloud in 3 dimensions"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        Dim input = src.Clone
-        If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud
-        Dim split() = input.Split()
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        Dim split() = src.Split()
 
         For i = 0 To 3 - 1
             If check.Box(i).Checked Then
                 split(i) += 10
                 split(i) *= 1000
-                split(i).ConvertTo(reduction.src, cv.MatType.CV_32S)
-                reduction.Run()
+                split(i).ConvertTo(src, cv.MatType.CV_32S)
+                reduction.Run(src)
                 reduction.dst1.ConvertTo(split(i), cv.MatType.CV_32F)
                 split(i) *= 0.001
                 split(i) -= 10
@@ -337,20 +323,18 @@ Public Class Reduction_Edges
         reduction.radio.check(0).Checked = True
 
         task.desc = "Get the edges after reducing the image."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        reduction.src = src
-        reduction.Run()
+        reduction.Run(src)
         dst1 = reduction.dst1.Clone
 
         Dim reductionRequested = False
         If reduction.radio.check(0).Checked Or reduction.radio.check(1).Checked Then reductionRequested = True
         label1 = If(reductionRequested, "Reduced image", "Original image")
         label2 = If(reductionRequested, "Laplacian edges of reduced image", "Laplacian edges of original image")
-        edges.src = dst1
-        edges.Run()
+        edges.Run(dst1)
         dst2 = edges.dst1
     End Sub
 End Class
@@ -373,20 +357,17 @@ Public Class Reduction_Depth
         reduction.radio.check(0).Checked = True
         colorizer = New Depth_Colorizer_CPP()
         task.desc = "Use reduction to smooth depth data"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        If src.Type = cv.MatType.CV_32S Then
-            reduction.src = src
-        Else
+        If src.Type <> cv.MatType.CV_32S Then
             src = task.depth32f
-            src.ConvertTo(reduction.src, cv.MatType.CV_32S)
+            src.ConvertTo(src, cv.MatType.CV_32S)
         End If
-        reduction.Run()
+        reduction.Run(src)
         reduction.dst1.ConvertTo(reducedDepth32F, cv.MatType.CV_32F)
-        colorizer.src = reducedDepth32F
-        colorizer.Run()
+        colorizer.Run(reducedDepth32F)
         dst1 = colorizer.dst1
         label1 = reduction.label1
     End Sub
@@ -413,22 +394,20 @@ Public Class Reduction_DepthMax
         colorizer = New Depth_Colorizer_CPP()
         dMax = New Depth_SmoothMax
         task.desc = "Use reduction to isolate depth in 1 meter increments"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        dMax.src = src
-        If dMax.src.Type <> cv.MatType.CV_32F Then dMax.src = task.depth32f
-        dMax.Run()
+        If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
+        dMax.Run(src)
         dst1 = dMax.dst2
 
-        dst1.ConvertTo(reduction.src, cv.MatType.CV_32S)
-        reduction.Run()
+        dst1.ConvertTo(src, cv.MatType.CV_32S)
+        reduction.Run(src)
         reduction.dst1.ConvertTo(reducedDepth32F, cv.MatType.CV_32F)
 
-        colorizer.src = reducedDepth32F
-        colorizer.Run()
+        colorizer.Run(reducedDepth32F)
         dst2 = colorizer.dst1
     End Sub
 End Class

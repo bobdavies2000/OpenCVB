@@ -12,7 +12,7 @@ Public Class Watershed_Basics
         task.desc = "Watershed API experiment.  Draw on the image to test."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then rects.Add(task.drawRect)
 
@@ -41,13 +41,13 @@ Public Class Watershed_Basics
             cv.Cv2.Watershed(src, markers)
 
             markers *= Math.Truncate(255 / rects.Count)
-            markers.ConvertTo(task.palette.src, cv.MatType.CV_8U)
-            task.palette.Run()
+            Dim tmp As New cv.Mat
+            markers.ConvertTo(tmp, cv.MatType.CV_8U)
+            task.palette.Run(tmp)
             dst2 = task.palette.dst1
 
-            addW.src = src
             addW.src2 = task.palette.dst1
-            addW.Run()
+            addW.Run(src)
             dst1 = addW.dst1
         Else
             dst1 = src
@@ -76,14 +76,12 @@ Public Class Watershed_DepthReduction
         task.desc = "Watershed the depth image using shadow, close, and far points."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        reduction.src = task.RGBDepth
-        reduction.Run()
+        reduction.Run(task.RGBDepth)
         dst2 = reduction.dst1
 
-        watershed.src = reduction.dst1
-        watershed.Run()
+        watershed.Run(reduction.dst1)
         dst1 = watershed.dst1
         label1 = watershed.label1
     End Sub
@@ -106,10 +104,9 @@ Public Class Watershed_DepthAuto
         task.desc = "Watershed the four corners of the depth image."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        watershed.src = task.RGBDepth
-        watershed.Run()
+        watershed.Run(task.RGBDepth)
         dst1 = watershed.dst1
         label1 = watershed.label1
     End Sub

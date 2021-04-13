@@ -43,12 +43,12 @@ Public Class Harris_Features_CPP
             sliders.setupTrackBar(4, "Weight for dst1 X100", 1, 100, 50)
         End If
         task.desc = "Use Harris feature detectors to identify interesting points."
-		' task.rank = 1
+        ' task.rank = 1
 
-        ReDim srcData(src.Total - 1)
+        ReDim srcData(dst1.Total - 1)
         Harris_Features = Harris_Features_Open()
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
@@ -92,12 +92,12 @@ Public Class Harris_Detector_CPP
             sliders.setupTrackBar(0, "Harris qualityLevel", 1, 100, 2)
         End If
         task.desc = "Use Harris detector to identify interesting points."
-		' task.rank = 1
+        ' task.rank = 1
 
-        ReDim srcData(src.Total - 1)
+        ReDim srcData(dst1.Total - 1)
         Harris_Detector = Harris_Detector_Open()
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)

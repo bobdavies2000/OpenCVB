@@ -11,7 +11,7 @@ Public Class SLR_Basics
         plot = New Plot_Basics_CPP()
         input = New SLR_Data()
         If standalone Then
-            input.Run()
+            input.Run(dst1)
             label1 = "Sample data input"
         End If
 
@@ -23,7 +23,7 @@ Public Class SLR_Basics
         task.desc = "Segmented Linear Regression example"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim resultX As New List(Of Double)
@@ -39,12 +39,12 @@ Public Class SLR_Basics
         If resultX.Count > 0 Then
             plot.srcX = input.dataX.ToArray
             plot.srcY = input.dataY.ToArray
-            plot.Run()
+            plot.Run(src)
             dst1 = plot.dst1.Clone
 
             plot.srcX = resultX.ToArray
             plot.srcY = resultY.ToArray
-            plot.Run()
+            plot.Run(src)
             dst2 = plot.dst1
         Else
             dst1.SetTo(0)
@@ -88,11 +88,11 @@ Public Class SLR_Data
         task.desc = "Plot the data used in SLR_Basics"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         plot.srcX = dataX.ToArray
         plot.srcY = dataY.ToArray
-        plot.Run()
+        plot.Run(src)
         dst1 = plot.dst1
     End Sub
 End Class
@@ -116,13 +116,12 @@ Public Class SLR_Image
         task.desc = "Run Segmented Linear Regression on grayscale image data - just an experiment"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        hist.src = src
         hist.plotColors(0) = cv.Scalar.White
-        hist.Run()
+        hist.Run(src)
         dst1 = hist.dst1
         For i = 0 To hist.histRaw(0).Rows - 1
             For j = 0 To 3 - 1
@@ -130,7 +129,7 @@ Public Class SLR_Image
                 slr.input.dataY.Add(hist.histRaw(j).Get(Of Single)(i, 0))
             Next
         Next
-        slr.Run()
+        slr.Run(src)
         dst2 = slr.dst2
     End Sub
 End Class 

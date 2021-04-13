@@ -11,7 +11,7 @@ Public Class Blur_Basics
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static kernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize As Integer = kernelSlider.Value
@@ -40,7 +40,7 @@ Public Class Blur_Gaussian
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = blurKernelSlider.Value
@@ -69,7 +69,7 @@ Public Class Blur_Median_CS
         task.desc = "Replace each pixel with the median of neighborhood of varying sizes."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = blurKernelSlider.Value
@@ -97,7 +97,7 @@ Public Class Blur_Homogeneous
         task.desc = "Smooth each pixel with a kernel of 1's of different sizes."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = CDbl(blurKernelSlider.Value)
@@ -127,7 +127,7 @@ Public Class Blur_Median
         task.desc = "Replace each pixel with the median of neighborhood of varying sizes."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = CDbl(blurKernelSlider.Value)
@@ -157,7 +157,7 @@ Public Class Blur_Bilateral
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = CDbl(blurKernelSlider.Value)
@@ -192,21 +192,18 @@ Public Class Blur_PlusHistogram
         task.desc = "Compound algorithms Blur and Histogram"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        myhist.src = src
-        myhist.Run()
+        myhist.Run(src)
 
         mat2to1.mat(0) = myhist.dst1.Clone()
 
-        blur.src = myhist.src
-        blur.Run()
+        blur.Run(src)
 
-        myhist.src = blur.dst1.Clone
-        myhist.Run()
+        myhist.Run(blur.dst1.Clone)
 
         mat2to1.mat(1) = myhist.dst2.Clone()
-        mat2to1.Run()
+        mat2to1.Run(src)
         dst2 = mat2to1.dst1
         dst1 = blur.dst1
     End Sub
@@ -240,7 +237,7 @@ Public Class Blur_TopoMap
         task.desc = "Create a topo map from the blurred image"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static savePercent As Single
         Static nextPercent As Single
@@ -255,8 +252,7 @@ Public Class Blur_TopoMap
         Dim kernelSize = CInt(nextPercent / 100 * src.Width)
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
-        gradient.src = src
-        gradient.Run()
+        gradient.Run(src)
         dst1 = gradient.magnitude
 
         If kernelSize > 1 Then cv.Cv2.GaussianBlur(dst1, dst2, New cv.Size(kernelSize, kernelSize), 0, 0)
@@ -266,12 +262,10 @@ Public Class Blur_TopoMap
         dst2 = (dst2 * 1 / reductionSlider.Value).tomat
         dst2 = (dst2 * reductionSlider.Value).toMat
 
-        task.palette.src = dst2
-        task.palette.Run()
+        task.palette.Run(dst2)
 
-        addw.src = task.color
         addw.src2 = task.palette.dst1
-        addw.Run()
+        addw.Run(task.color)
         dst2 = addw.dst1
 
         label2 = "Blur = " + CStr(nextPercent) + "% Reduction Factor = " + CStr(reductionSlider.Value)

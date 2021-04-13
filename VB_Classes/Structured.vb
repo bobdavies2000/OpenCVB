@@ -14,11 +14,10 @@ Public Class Structured_Floor
         task.desc = "Find the floor plane"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        structD.src = src
-        structD.Run()
+        structD.Run(src)
 
         Dim yCoordinate = dst2.Height
         Dim lastSum = dst2.Row(dst2.Height - 1).Sum()
@@ -29,7 +28,7 @@ Public Class Structured_Floor
         Next
 
         kalman.kInput = yCoordinate
-        kalman.Run()
+        kalman.Run(src)
 
         ' it settles down quicker...
         If task.frameCount > 30 Then yCoordinate = kalman.kAverage
@@ -64,10 +63,10 @@ Public Class Structured_Ceiling
         task.desc = "Find the ceiling plane"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        structD.Run()
+        structD.Run(src)
 
         Dim yCoordinate As Integer
         Dim lastSum = dst2.Row(yCoordinate).Sum()
@@ -78,7 +77,7 @@ Public Class Structured_Ceiling
         Next
 
         kalman.kInput(0) = yCoordinate
-        kalman.Run()
+        kalman.Run(src)
         structD.offsetSlider.Value = If(kalman.kOutput(0) >= 0, kalman.kOutput(0), 0)
 
         dst1 = structD.dst1
@@ -104,9 +103,9 @@ Public Class Structured_MultiSliceH
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        side2D.Run()
+        side2D.Run(src)
         dst2 = side2D.dst2
         Dim Split = side2D.gCloud.dst1.Split()
 
@@ -155,9 +154,9 @@ Public Class Structured_MultiSliceV
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        top2D.Run()
+        top2D.Run(src)
         dst2 = top2D.dst2
 
         Dim split = top2D.gCloud.dst1.Split()
@@ -211,10 +210,10 @@ Public Class Structured_MultiSlice
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        top2D.Run()
-        side2D.Run()
+        top2D.Run(src)
+        side2D.Run(src)
 
         Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         Dim cushion = cushionSlider.Value
@@ -276,12 +275,11 @@ Public Class Structured_MultiSliceLines
         task.desc = "Detect lines in the multiSlice output"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        multi.Run()
+        multi.Run(src)
         cv.Cv2.BitwiseNot(multi.dst2, dst2)
-        ldetect.src = multi.dst2
-        ldetect.Run()
+        ldetect.Run(multi.dst2)
         dst1 = ldetect.dst1
     End Sub
 End Class
@@ -308,9 +306,9 @@ Public Class Structured_MultiSlicePolygon
         task.desc = "Detect polygons in the multiSlice output"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        multi.Run()
+        multi.Run(src)
         cv.Cv2.BitwiseNot(multi.dst2, dst1)
 
         Dim rawContours = cv.Cv2.FindContoursAsArray(dst1, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
@@ -350,11 +348,11 @@ Public Class Structured_SliceXPlot
         task.desc = "Find any plane around a peak value in the top-down histogram"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        structD.Run()
+        structD.Run(src)
         dst2 = structD.dst2
-        multi.Run()
+        multi.Run(src)
 
         Dim col = CInt(structD.offsetSlider.Value)
 
@@ -412,12 +410,11 @@ Public Class Structured_LinearizeFloor
         task.desc = "Using the mask for the floor create a better representation of the floor plane"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim minLoc As cv.Point, maxLoc As cv.Point
         Static imuPC As cv.Mat
-        floor.src = src
-        floor.Run()
+        floor.Run(src)
         dst1 = floor.dst1
         dst2 = floor.dst2
         sliceMask = floor.structD.sliceMask
@@ -453,7 +450,7 @@ Public Class Structured_LinearizeFloor
             If yCheck.Checked Then
                 split(1).MinMaxLoc(minVal, maxVal, minLoc, maxLoc, sliceMask)
                 kalman.kInput = (minVal + maxVal) / 2
-                kalman.Run()
+                kalman.Run(src)
                 floorYPlane = kalman.kAverage
                 split(1).SetTo(floorYPlane, sliceMask)
             End If
@@ -506,14 +503,14 @@ Public Class Structured_SliceOptions
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 10, 1)
             sliders.setupTrackBar(1, "Slice step size in pixels (multi-slice option only)", 1, 100, 20)
-            sliders.setupTrackBar(2, "Standalone only horizontal slice offset", 0, src.Width - 1, src.Width / 2)
-            sliders.setupTrackBar(3, "Standalone only vertical slice offset", 0, src.Width - 1, src.Width / 2)
+            sliders.setupTrackBar(2, "Standalone only horizontal slice offset", 0, dst1.Width - 1, dst1.Width / 2)
+            sliders.setupTrackBar(3, "Standalone only vertical slice offset", 0, dst1.Width - 1, dst1.Width / 2)
         End If
 
         task.desc = "Structured Slice options"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         task.trueText("This algorithm is used to share the horizontal and vertical slice options.")
     End Sub
@@ -544,9 +541,9 @@ Public Class Structured_SliceH
         task.desc = "Find and isolate planes (floor and ceiling) in a side view histogram."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        side2D.Run()
+        side2D.Run(src)
 
         Dim depthShadow = task.noDepthMask
         Dim Split = side2D.gCloud.dst1.Split()
@@ -603,16 +600,16 @@ Public Class Structured_SliceV
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         offsetSlider = findSlider("Standalone only vertical slice offset")
-        offsetSlider.Maximum = src.Width - 1
-        offsetSlider.Value = src.Width / 2
+        offsetSlider.Maximum = dst1.Width - 1
+        offsetSlider.Value = dst1.Width / 2
 
         task.desc = "Find and isolate planes using the top view histogram data"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim xCoordinate = offsetSlider.Value
-        top2D.Run()
+        top2D.Run(src)
 
         Dim split = top2D.gCloud.dst1.Split()
 
@@ -667,15 +664,15 @@ Public Class Structured_SliceVStable
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         offsetSlider = structD.offsetSlider
-        offsetSlider.Value = src.Width / 2
+        offsetSlider.Value = dst1.Width / 2
 
         task.desc = "Find and isolate planes using the top view histogram data"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim xCoordinate = offsetSlider.Value
-        top2D.Run()
+        top2D.Run(src)
         dst2 = top2D.dst1
         Dim split = top2D.gCloud.dst1.Split()
 
@@ -726,14 +723,13 @@ Public Class Structured_CenterSlice
         task.desc = "Find the vertical center line with accurate depth data.."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        vSlice.Run()
+        vSlice.Run(src)
         dst1 = task.color
 
-        line.src = vSlice.sliceMask
-        line.Run()
+        line.Run(vSlice.sliceMask)
         dst2 = line.dst1
 
         If line.sortlines.Count > 0 Then
@@ -819,7 +815,7 @@ Public Class Structured_CloudFail
         task.desc = "Attempt to impose a structure on the point cloud data."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static xLineSlider = findSlider("Lines in X-Direction")
         Static yLineSlider = findSlider("Lines in Y-Direction")
@@ -901,7 +897,7 @@ Public Class Structured_Cloud
         task.desc = "Attempt to impose a linear structure on the pointcloud."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static sliceSlider = findSlider("Number of slices")
         Dim xLines = sliceSlider.value
@@ -944,7 +940,7 @@ Public Class Structured_Crosshairs
         task.desc = "Connect vertical and horizontal dots that are in the same column and row."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static sliceSlider = findSlider("Number of slices")
         Static xSlider = findSlider("Slice index X")
@@ -956,7 +952,7 @@ Public Class Structured_Crosshairs
         If indexX > xLines Then indexX = xLines - 1
         If indexY > yLines Then indexY = yLines - 1
 
-        sCloud.Run()
+        sCloud.Run(src)
         Dim data = sCloud.data
         Dim split = cv.Cv2.Split(data)
         Dim minX As Double, maxX As Double

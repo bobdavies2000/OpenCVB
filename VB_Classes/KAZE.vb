@@ -10,7 +10,7 @@ Public Class KAZE_KeypointsKAZE_CS
 		' task.rank = 1
         label1 = "KAZE key points"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         CS_Kaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         src.CopyTo(dst1)
@@ -32,7 +32,7 @@ Public Class KAZE_KeypointsAKAZE_CS
 		' task.rank = 1
         label1 = "AKAZE key points"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         CS_AKaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         src.CopyTo(dst1)
@@ -56,7 +56,7 @@ Public Class KAZE_Sample_CS
         task.desc = "Match keypoints in 2 photos."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim result = CS_Kaze.Run(box, box_in_scene)
         dst1 = result.Resize(src.Size())
@@ -76,9 +76,9 @@ Public Class KAZE_Match_CS
         task.desc = "Match keypoints in the left and right images."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        red.Run()
+        red.Run(src)
         dst1 = red.dst1
         dst2 = red.dst2
         Dim result = CS_Kaze.Run(dst1, dst2)
@@ -105,7 +105,7 @@ Public Class KAZE_LeftAligned_CS
         task.desc = "Match keypoints in the left and right images but display it as movement in the right image."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         CS_KazeLeft.GetKeypoints(task.leftView)
         CS_KazeRight.GetKeypoints(task.rightView)

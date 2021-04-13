@@ -27,7 +27,6 @@ Public Class VBparent : Implements IDisposable
     Public sliders As New OptionsSliders
     Public pyStream As Object
     Public standalone As Boolean
-    Public src As New cv.Mat
     Public dst1 As cv.Mat
     Public dst2 As cv.Mat
     Public label1 As String
@@ -50,14 +49,12 @@ Public Class VBparent : Implements IDisposable
             If task.callTrace.Contains(callStack) = False Then task.callTrace.Add(callStack)
         End If
 
-        src = task.color.Clone
-        dst1 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
-        dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
+        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
+        dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
     End Sub
-    Public Sub NextFrame()
-        If standalone Or task.intermediateReview = caller Then src = task.color.Clone
+    Public Sub NextFrame(src As cv.Mat)
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
-        algorithm.Run()
+        algorithm.Run(src)
         If standalone Then
             task.label1 = label1
             task.label2 = label2
@@ -82,7 +79,7 @@ Public Class VBparent : Implements IDisposable
             If task.pythonTaskName.EndsWith(".py") = False Then
                 If task.pixelViewerOn Then
                     task.PixelViewer.viewerForm.Show()
-                    task.PixelViewer.Run()
+                    task.PixelViewer.Run(src)
                 Else
                     If task.PixelViewer.viewerForm.Visible Then task.PixelViewer.viewerForm.Hide()
                 End If

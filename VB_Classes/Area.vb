@@ -30,7 +30,7 @@ Public Class Area_MinTriangle_CPP
         task.desc = "Find minimum containing triangle for a set of points."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static pointCountSlider = findSlider("Area Number of Points")
         Static sizeSlider = findSlider("Area size")
@@ -87,7 +87,7 @@ Public Class Area_MinRect
         task.desc = "Find minimum containing rectangle for a set of points."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static pointCountSlider = findSlider("Area Number of Points")
         Static sizeSlider = findSlider("Area size")
@@ -134,10 +134,9 @@ Public Class Area_MinMotionRect
         Next
         Return gray
     End Function
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        bgSub.src = src
-        bgSub.Run()
+        bgSub.Run(src)
         Dim gray As cv.Mat
         If bgSub.dst1.Channels = 1 Then gray = bgSub.dst1 Else gray = bgSub.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = motionRectangles(gray, task.vecColors)
@@ -160,7 +159,7 @@ Public Class Area_FindNonZero
         task.desc = "Use FindNonZero API to get coordinates of non-zero points."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gray = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         Dim srcPoints(10 - 1) As cv.Point ' doesn't really matter how many there are.

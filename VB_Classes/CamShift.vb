@@ -24,7 +24,7 @@ Public Class CamShift_Basics
         task.desc = "CamShift Demo - draw on the images to define the object to track. Tracker Algorithm"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static roi As New cv.Rect
         Static vMinLast As integer
@@ -93,7 +93,7 @@ Public Class CamShift_Foreground
         task.desc = "Use depth to find the head and start the camshift demo.  Tracker Algorithm"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim restartRequested As Boolean
         Static depthMin As integer
@@ -107,9 +107,8 @@ Public Class CamShift_Foreground
             depthMax = task.maxDepth
             restartRequested = True
         End If
-        If restartRequested Then fore.Run()
-        camshift.src = src
-        camshift.Run()
+        If restartRequested Then fore.Run(src)
+        camshift.Run(src)
         dst1 = camshift.dst1
     End Sub
 End Class
@@ -135,9 +134,9 @@ Public Class Camshift_Object
         task.desc = "Use the blob depth cluster as input to initialize a camshift algorithm.  Tracker Algorithm"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        blob.Run()
+        blob.Run(src)
         dst2 = blob.dst2.Clone()
 
 
@@ -147,8 +146,7 @@ Public Class Camshift_Object
                 task.drawRect = blob.flood.rects(largestMask)
             End If
             If camshift.trackBox.Size.Width < 50 Then task.drawRect = blob.flood.rects(largestMask)
-            camshift.src = src
-            camshift.Run()
+            camshift.Run(src)
             dst1 = camshift.dst1
             Dim mask = dst1.ConvertScaleAbs(255)
             cv.Cv2.BitwiseNot(mask.CvtColor(cv.ColorConversionCodes.BGR2GRAY), mask)
@@ -183,9 +181,9 @@ Public Class Camshift_TopObjects
         task.desc = "Track - Tracker Algorithm"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        blob.Run()
+        blob.Run(src)
         dst1 = blob.dst2
 
         Static updateSlider = findSlider("Reinitialize camshift after x frames")
@@ -198,8 +196,7 @@ Public Class Camshift_TopObjects
                     task.drawRect = blob.flood.rects(camIndex)
                 End If
 
-                cams(i).src = src
-                cams(i).Run()
+                cams(i).Run(src)
                 mats.mat(i) = cams(i).dst1.Clone()
                 trackBoxes.Add(cams(i).trackBox)
             End If
@@ -207,7 +204,7 @@ Public Class Camshift_TopObjects
         For i = 0 To trackBoxes.Count - 1
             dst1.Ellipse(trackBoxes(i), cv.Scalar.White, 2, task.lineType)
         Next
-        mats.Run()
+        mats.Run(src)
         dst2 = mats.dst1
     End Sub
 End Class

@@ -21,7 +21,7 @@ Public Class InPaint_Basics
 		' task.rank = 1
         label2 = "Repaired Image"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
 
@@ -58,11 +58,10 @@ Public Class InPaint_Noise
 		' task.rank = 1
         label2 = "Repaired Image"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod 100 Then Exit Sub ' give them time to review the inpaint results
-        noise.src = src
-        noise.Run() ' create some noise in the result1 image.
+        noise.Run(src) ' create some noise in the result1 image.
         dst1 = noise.dst1
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
         cv.Cv2.Inpaint(dst1, noise.noiseMask, dst2, noise.maxNoiseWidth, inPaintFlag)

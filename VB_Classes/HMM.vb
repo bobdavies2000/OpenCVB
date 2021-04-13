@@ -27,7 +27,7 @@ Public Class HMM_Example_CPP
         task.desc = "Simple test of Hidden Markov Model - text output"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.testAllRunning Then
             task.trueText("When HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.")

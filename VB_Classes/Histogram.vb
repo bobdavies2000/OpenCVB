@@ -28,7 +28,7 @@ Public Class Histogram_Basics
         task.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static splitIndex = -1
         Static colorName As String
@@ -42,8 +42,7 @@ Public Class Histogram_Basics
             colorName = Choose(splitIndex + 1, "Blue", "Green", "Red")
         End If
 
-        Dim input = src
-        If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Static histBinSlider = findSlider("Histogram Bins")
         plotHist.bins = histBinSlider.Value
@@ -51,7 +50,7 @@ Public Class Histogram_Basics
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
 
         Dim dimensions() = New Integer() {plotHist.bins}
-        cv.Cv2.CalcHist(New cv.Mat() {input}, New Integer() {0}, New cv.Mat, histogram, 1, dimensions, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, New cv.Mat, histogram, 1, dimensions, ranges)
 
         Static zeroCheck = findCheckBox("Remove the zero histogram value")
         If zeroCheck.checked Then histogram.Set(Of Single)(0, 0, 0)
@@ -63,7 +62,7 @@ Public Class Histogram_Basics
             For i = 0 To plotHist.bins - 1
                 kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
             Next
-            kalman.Run()
+            kalman.Run(src)
             For i = 0 To plotHist.bins - 1
                 histogram.Set(Of Single)(i, 0, kalman.kOutput(i))
             Next
@@ -71,8 +70,7 @@ Public Class Histogram_Basics
 
         plotHist.hist = histogram
         If standalone Or task.intermediateReview = caller Then plotHist.backColor = splitColors(splitIndex)
-        plotHist.src = input
-        plotHist.Run()
+        plotHist.Run(src)
         dst1 = plotHist.dst1
         label1 = colorName + " input to histogram"
     End Sub
@@ -105,7 +103,7 @@ Public Class Histogram_Graph
         task.desc = "Plot histograms for up to 3 channels."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static histBinSlider = findSlider("Histogram Bins")
         bins = histBinSlider.Value
@@ -242,13 +240,12 @@ Public Class Histogram_NormalizeGray
         task.desc = "Create a histogram of a normalized image"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        histogram.src = src
         If check.Box(0).Checked Then
-            cv.Cv2.Normalize(histogram.src, histogram.src, sliders.trackbar(0).Value, sliders.trackbar(1).Value, cv.NormTypes.MinMax) ' only minMax is working...
+            cv.Cv2.Normalize(src, src, sliders.trackbar(0).Value, sliders.trackbar(1).Value, cv.NormTypes.MinMax) ' only minMax is working...
         End If
-        histogram.Run()
+        histogram.Run(src)
         dst1 = histogram.dst1
     End Sub
 End Class
@@ -274,7 +271,7 @@ Public Class Histogram_2D_HueSaturation
         task.desc = "Create a histogram for hue and saturation."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         hsv = src.CvtColor(cv.ColorConversionCodes.RGB2HSV)
         Dim hbins = sliders.trackbar(0).Value
@@ -305,15 +302,15 @@ Public Class Histogram_2D_XZ_YZ
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Histogram X bins", 1, src.Cols, 30)
-            sliders.setupTrackBar(1, "Histogram Y bins", 1, src.Rows, 30)
+            sliders.setupTrackBar(0, "Histogram X bins", 1, dst1.Cols, 30)
+            sliders.setupTrackBar(1, "Histogram Y bins", 1, dst1.Rows, 30)
             sliders.setupTrackBar(2, "Histogram Z bins", 1, 200, 100)
         End If
         task.desc = "Create a 2D histogram for depth in XZ and YZ."
         ' task.rank = 1
         label2 = "Left is XZ (Top View) and Right is YZ (Side View)"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim xbins = sliders.trackbar(0).Value
         Dim ybins = sliders.trackbar(1).Value
@@ -324,7 +321,7 @@ Public Class Histogram_2D_XZ_YZ
         Dim rangesX() = New cv.Rangef() {New cv.Rangef(0, src.Width - 1), New cv.Rangef(task.minDepth, task.maxDepth)}
         Dim rangesY() = New cv.Rangef() {New cv.Rangef(0, src.Width - 1), New cv.Rangef(task.minDepth, task.maxDepth)}
 
-        xyz.Run()
+        xyz.Run(src)
         Dim sizesX() = {xbins, zbins}
         cv.Cv2.CalcHist(New cv.Mat() {xyz.xyDepth}, New Integer() {0, 2}, New cv.Mat(), histogram, 2, sizesX, rangesX)
         histogram2DPlot(histogram, dst1, zbins, xbins)
@@ -364,7 +361,7 @@ Public Class Histogram_EqualizeColor
         ' task.rank = 1
         label1 = "Image Enhanced with Equalized Histogram"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim rgb(2) As cv.Mat
@@ -377,16 +374,14 @@ Public Class Histogram_EqualizeColor
 
         If standalone Or displayHist Then
             cv.Cv2.Split(src, rgb) ' equalizehist alters the input...
-            kalman.src = rgb(channel).Clone()
             kalman.plotHist.backColor = cv.Scalar.Red
-            kalman.Run()
+            kalman.Run(rgb(channel).Clone())
             mats.mat(0) = kalman.dst1.Clone()
 
-            kalmanEq.src = rgbEq(channel).Clone()
-            kalmanEq.Run()
+            kalmanEq.Run(rgbEq(channel).Clone())
             mats.mat(1) = kalmanEq.dst1.Clone()
 
-            mats.Run()
+            mats.Run(src)
             dst2 = mats.dst1
             label2 = "Before (top) and After Red Histogram"
 
@@ -416,18 +411,17 @@ Public Class Histogram_EqualizeGray
         task.desc = "Create an equalized histogram of the grayscale image."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static binSlider = findSlider("Histogram Bins")
         binSlider.Value = histogramEq.sliders.trackbar(0).Value
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        histogram.src = src.Clone
-        histogram.Run()
+        histogram.Run(src)
         dst1 = histogram.dst1.Clone
-        cv.Cv2.EqualizeHist(histogram.src, histogramEq.src)
-        histogramEq.Run()
+        cv.Cv2.EqualizeHist(src, src)
+        histogramEq.Run(src)
         dst2 = histogramEq.dst1
     End Sub
 End Class
@@ -460,13 +454,12 @@ Public Class Histogram_Equalize255
         task.desc = "Reproduce the results of the hist.py example with existing algorithms"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         For i = 0 To 3 - 1
             If radio.check(i).Checked Then eqHist.channel = i
         Next
-        eqHist.src = src
-        eqHist.Run()
+        eqHist.Run(src)
         dst1 = eqHist.dst1.Clone
         dst2 = eqHist.dst2.Clone
     End Sub
@@ -485,13 +478,13 @@ Public Class Histogram_Simple
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Histogram Bins", 2, src.Cols, 50)
+            sliders.setupTrackBar(0, "Histogram Bins", 2, dst1.Cols, 50)
         End If
 
         task.desc = "Build a simple and reusable histogram for grayscale images."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         plotHist.bins = sliders.trackbar(0).Value
@@ -500,7 +493,7 @@ Public Class Histogram_Simple
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
         cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 
-        plotHist.Run()
+        plotHist.Run(src)
         dst1 = plotHist.dst1
     End Sub
 End Class
@@ -542,25 +535,23 @@ Public Class Histogram_ColorsAndGray
         task.desc = "Create a histogram of a normalized image"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         task.useKalman = False
         Dim split = src.Split()
         ReDim Preserve split(4 - 1)
         split(4 - 1) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) ' add a 4th image - the grayscale image to the R G and B images.
-        histogram.src = New cv.Mat
         For i = 0 To split.Length - 1
+            Dim histSrc = split(i).Clone()
             If check.Box(0).Checked Then
-                cv.Cv2.Normalize(split(i), histogram.src, sliders.trackbar(0).Value, sliders.trackbar(1).Value, cv.NormTypes.MinMax) ' only minMax is working...
-            Else
-                histogram.src = split(i).Clone()
+                cv.Cv2.Normalize(split(i), histSrc, sliders.trackbar(0).Value, sliders.trackbar(1).Value, cv.NormTypes.MinMax) ' only minMax is working...
             End If
             histogram.plotHist.backColor = Choose(i + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.PowderBlue)
-            histogram.Run()
+            histogram.Run(histSrc)
             mats.mat(i) = histogram.dst1.Clone()
         Next
 
-        mats.Run()
+        mats.Run(src)
         dst1 = mats.dst1
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
         dst2 = mats.mat(quadrantIndex)
@@ -583,13 +574,11 @@ Public Class Histogram_BackProjectionPeak
         ' task.rank = 1
         label2 = "Grayscale Histogram"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         task.useKalman = False
-        Dim input = src
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        hist.src = input
-        hist.Run()
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        hist.Run(src)
         dst2 = hist.dst1
 
         Dim minVal As Single, maxVal As Single
@@ -601,7 +590,7 @@ Public Class Histogram_BackProjectionPeak
         Dim pixelMin = CInt((histindex) * barRange)
         Dim pixelMax = CInt((histindex + 1) * barRange)
 
-        Dim mask = input.InRange(pixelMin, pixelMax).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        Dim mask = src.InRange(pixelMin, pixelMax).Threshold(1, 255, cv.ThresholdTypes.Binary)
         dst1.SetTo(0)
         src.CopyTo(dst1, mask)
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
@@ -633,10 +622,9 @@ Public Class Histogram_BackProjection2D
         label1 = "X-axis is Hue, Y-axis is Sat.  Draw rectangle to isolate ranges"
         label2 = "Backprojection of detected hue and saturation."
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        hist.src = src
-        hist.Run()
+        hist.Run(src)
         dst1 = hist.dst1
         Static hueBins = hist.sliders.trackbar(0).Value
         Static satBins = hist.sliders.trackbar(1).Value
@@ -697,19 +685,17 @@ Public Class Histogram_HueSaturation2DPlot
         task.desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        hueSat.src = src
-        hueSat.Run()
+        hueSat.Run(src)
         mats.mat(0) = hueSat.dst1
         mats.mat(1) = hueSat.dst2
 
-        hist2d.src = src
-        hist2d.Run()
+        hist2d.Run(src)
         mats.mat(2) = hist2d.dst2
         mats.mat(3) = hist2d.dst1
 
-        mats.Run()
+        mats.Run(src)
         dst1 = mats.dst1
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
         dst2 = mats.mat(quadrantIndex)
@@ -752,9 +738,9 @@ Public Class Histogram_TopData
         ' task.rank = 1
     End Sub
 
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        gCloud.Run()
+        gCloud.Run(src)
 
         Static minSlider = findSlider("X scale negative value in meters (meterMin) X100")
         Static maxSlider = findSlider("X scale positive value in meters (meterMax) X100")
@@ -801,9 +787,9 @@ Public Class Histogram_SideData
         task.desc = "Create a 2D side view for ZY histogram of depth in meters - NOTE: x and y scales differ!"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        gCloud.Run()
+        gCloud.Run(src)
 
         Static minSlider = findSlider("Y scale negative value in meters (meterMin) X100")
         Static maxSlider = findSlider("Y scale positive value in meters (meterMax) X100")
@@ -844,12 +830,11 @@ Public Class Histogram_SmoothTopView2D
         task.desc = "Create a 2D top view with stable depth data."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        topView.gCloud.Run()
+        topView.gCloud.Run(src)
 
-        stable.src = topView.gCloud.dst1
-        stable.Run()
+        stable.Run(topView.gCloud.dst1)
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(-task.topFrustrumAdjust, task.topFrustrumAdjust)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
@@ -860,8 +845,7 @@ Public Class Histogram_SmoothTopView2D
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cmat.src = dst2
-        cmat.Run()
+        cmat.Run(dst2)
         dst2 = cmat.dst1
     End Sub
 End Class
@@ -889,12 +873,11 @@ Public Class Histogram_SmoothSideView2D
         task.desc = "Create a 2D side view of stable depth data"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        sideView.gCloud.Run()
+        sideView.gCloud.Run(src)
 
-        stable.src = sideView.gCloud.dst1
-        stable.Run()
+        stable.Run(sideView.gCloud.dst1)
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.sideFrustrumAdjust, task.sideFrustrumAdjust), New cv.Rangef(0, task.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
@@ -904,8 +887,7 @@ Public Class Histogram_SmoothSideView2D
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cmat.src = dst2
-        cmat.Run()
+        cmat.Run(dst2)
         dst2 = cmat.dst1
     End Sub
 End Class
@@ -930,11 +912,10 @@ Public Class Histogram_StableDepthClusters
         task.desc = "Use the stable depth to identify the depth_clusters using histogram valleys"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        motionSD.Run()
-        clusters.src = motionSD.dst1
-        clusters.Run()
+        motionSD.Run(src)
+        clusters.Run(motionSD.dst1)
         dst1 = clusters.dst1
         dst2 = clusters.dst2
     End Sub
@@ -968,12 +949,11 @@ Public Class Histogram_TopView2D
         task.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        gCloud.src = src
-        If gCloud.src.Type <> cv.MatType.CV_32FC3 Then gCloud.src = task.pointCloud.Clone
-        gCloud.Run() ' when displaying both top and side views, the gcloud run has already been done.
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
+        gCloud.Run(src) ' when displaying both top and side views, the gcloud run has already been done.
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(-task.topFrustrumAdjust, task.topFrustrumAdjust)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
@@ -985,8 +965,7 @@ Public Class Histogram_TopView2D
         dst1 = histOutput.Clone
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cmat.src = dst2
-        cmat.Run()
+        cmat.Run(dst2)
         dst2 = cmat.dst1
     End Sub
 End Class
@@ -1017,11 +996,10 @@ Public Class Histogram_SideView2D
         task.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        gCloud.src = src
-        gCloud.Run()
+        gCloud.Run(src)
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.sideFrustrumAdjust, task.sideFrustrumAdjust), New cv.Rangef(0, task.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
@@ -1032,8 +1010,7 @@ Public Class Histogram_SideView2D
         histOutput.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cmat.src = dst2
-        cmat.Run()
+        cmat.Run(dst2)
         dst2 = cmat.dst1
     End Sub
 End Class
@@ -1062,10 +1039,9 @@ Public Class Histogram_BackProjectionGrayscale
         task.desc = "Explore Backprojection of each element of a grayscale histogram."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        hist.src = src
-        hist.Run()
+        hist.Run(src)
         dst1 = hist.dst1
 
         histIndex = CInt(hist.histogram.Rows * task.mousePoint.X / src.Width)
@@ -1101,10 +1077,10 @@ Public Class Histogram_ViewIntersections
         task.desc = "Find the intersections of the rectangles found in the Histogram_ConcentrationObjects"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        histCO.Run()
+        histCO.Run(src)
         dst1 = histCO.dst2
 
         Dim offset = If(src.Width = 1280, 10, 16)
@@ -1195,16 +1171,15 @@ Public Class Histogram_ViewObjects
         task.desc = "Use the histogram concentrations to identify objects in the field of view"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        histC.Run()
+        histC.Run(src)
 
         dst1 = histC.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         dst2 = histC.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        flood.src = dst1
-        flood.Run()
+        flood.Run(dst1)
         dst1 = flood.dst1.Clone
 
         Dim offset = If(src.Width = 1280, 10, 16)
@@ -1222,8 +1197,7 @@ Public Class Histogram_ViewObjects
         Next
         label1 = CStr(flood.rects.Count) + " objects were identified in the side view"
 
-        flood.src = dst2
-        flood.Run()
+        flood.Run(dst2)
         dst2 = flood.dst1
 
         top2D.Clear()
@@ -1261,15 +1235,15 @@ Public Class Histogram_SmoothConcentration
         task.desc = "Using stable depth data, highlight the histogram projections where concentrations are highest"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        sideview.Run()
+        sideview.Run(src)
         dst1 = sideview.dst1
         Dim noDepth = sideview.sideView.histOutput.Get(Of Single)(sideview.sideView.histOutput.Height / 2, 0)
         label1 = "SideView " + concent.plotHighlights(sideview.sideView.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
         dst1 = task.palette.dst1.Clone
 
-        topview.Run()
+        topview.Run(src)
         dst2 = topview.dst1
         label2 = "TopView " + concent.plotHighlights(topview.topView.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
         dst2 = task.palette.dst1.Clone
@@ -1298,7 +1272,7 @@ Public Class Histogram_ViewConcentrationsTopX
             sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 50)
             sliders.setupTrackBar(1, "Resize Factor x100", 1, 100, 10)
             sliders.setupTrackBar(2, "Concentration Threshold", 1, 100, 10)
-            sliders.setupTrackBar(3, "Dot size", 1, 100, If(src.Width = 1280, 20, 10))
+            sliders.setupTrackBar(3, "Dot size", 1, 100, If(dst1.Width = 1280, 20, 10))
         End If
 
         task.desc = "Highlight a fixed number of histogram projections where concentrations are highest"
@@ -1330,20 +1304,19 @@ Public Class Histogram_ViewConcentrationsTopX
             Dim pt = pts.ElementAt(i).Value
             dst.Rectangle(New cv.Rect(pt.X - dotsize, pt.Y - dotsize, dotsize * 2, dotsize * 2), 128, -1)
         Next
-        task.palette.src = dst
-        task.palette.Run()
+        task.palette.Run(dst)
         Dim maxConcentration = If(pts.Count > 0, pts.ElementAt(0).Key, 0)
         Return CStr(pts.Count) + " highlights. Max=" + CStr(maxConcentration)
     End Function
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        sideview.Run()
+        sideview.Run(src)
         dst1 = sideview.dst1
         Dim noDepth = sideview.histOutput.Get(Of Single)(sideview.histOutput.Height / 2, 0)
         label1 = "SideView " + plotHighlights(sideview.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
         If standalone Or task.intermediateReview = caller Then dst1 = task.palette.dst1.Clone
 
-        topview.Run()
+        topview.Run(src)
         dst2 = topview.dst1
         label2 = "TopView " + plotHighlights(topview.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
         If standalone Or task.intermediateReview = caller Then dst2 = task.palette.dst1.Clone
@@ -1373,26 +1346,25 @@ Public Class Histogram_DepthClusters
         task.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If src.Type <> cv.MatType.CV_32F Then src = task.depth32f.Clone
 
-        valleys.src = src
-        valleys.Run()
+        valleys.Run(src)
         dst1 = valleys.dst1
 
         Dim mask As New cv.Mat
         Dim tmp As New cv.Mat
         Dim colorIncr = 255 / valleys.ranges.Count
-        task.palette.src = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim paletteSrc = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         For i = 0 To valleys.ranges.Count - 1
             Dim startEndDepth = valleys.ranges.ElementAt(i)
             cv.Cv2.InRange(src, startEndDepth.X, startEndDepth.Y, tmp)
             cv.Cv2.ConvertScaleAbs(tmp, mask)
-            task.palette.src.SetTo(i * colorIncr + 1, mask)
+            paletteSrc.SetTo(i * colorIncr + 1, mask)
         Next
-        task.palette.Run()
+        task.palette.Run(paletteSrc)
         dst2 = task.palette.dst1
         If standalone Or task.intermediateReview = caller Then
             label1 = "Histogram of " + CStr(valleys.ranges.Count) + " Depth Clusters"
@@ -1434,18 +1406,18 @@ Public Class Histogram_Frustrum
 
         sideFrustrumSlider.Value = 100 * 2 * task.sideFrustrumAdjust / task.maxZ
         topFrustrumSlider.Value = 100 * 2 * task.topFrustrumAdjust / task.maxZ
-        cameraXSlider.Value = task.topCameraPoint.X - src.Width / 2
-        cameraYSlider.Value = task.sideCameraPoint.Y - src.Height / 2
+        cameraXSlider.Value = task.topCameraPoint.X - dst1.Width / 2
+        cameraYSlider.Value = task.sideCameraPoint.Y - dst1.Height / 2
         task.desc = "The global options for the side and top view.  See OptionCommon_Histogram to make settings permanent."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        top2d.Run()
+        top2d.Run(src)
         dst1 = top2d.dst2
 
-        side2d.Run()
+        side2d.Run(src)
         dst2 = side2d.dst2
 
         task.sideFrustrumAdjust = task.maxZ * sideFrustrumSlider.Value / 100 / 2
@@ -1478,13 +1450,13 @@ Public Class Histogram_Depth
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Histogram Depth Bins", 2, src.Cols, 50)
+            sliders.setupTrackBar(0, "Histogram Depth Bins", 2, dst1.Cols, 50)
         End If
 
         task.desc = "Show depth data as a histogram."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         plotHist.minRange = 1 ' task.minDepth
@@ -1497,7 +1469,7 @@ Public Class Histogram_Depth
         cv.Cv2.CalcHist(New cv.Mat() {task.depth32f}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 
         If standalone Or task.intermediateReview = caller Then
-            plotHist.Run()
+            plotHist.Run(src)
             dst1 = plotHist.dst1
         End If
         label1 = "Histogram Depth: " + Format(plotHist.minRange / 1000, "0.0") + "m to " + Format(plotHist.maxRange / 1000, "0.0") + " m"
@@ -1531,16 +1503,15 @@ Public Class Histogram_DepthValleys
         task.desc = "Identify valleys in the Depth histogram."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        hist.src = src
-        If hist.src.Type <> cv.MatType.CV_32F Then hist.src = task.depth32f
-        hist.Run()
+        If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
+        hist.Run(src)
         If kalman.kInput.Length <> hist.plotHist.hist.Rows Then ReDim kalman.kInput(hist.plotHist.hist.Rows - 1)
         For i = 0 To hist.plotHist.hist.Rows - 1
             kalman.kInput(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
         Next
-        kalman.Run()
+        kalman.Run(src)
         Dim histogram = hist.plotHist.hist
         For i = 0 To histogram.Rows - 1
             histogram.Set(Of Single)(i, 0, kalman.kOutput(i))
@@ -1608,8 +1579,7 @@ Public Class Histogram_DepthValleys
         rangeColors.Add(If(grayOnly = False, 255, ranges.Count))
 
         If grayOnly = False Then
-            task.palette.src = dst1
-            task.palette.Run()
+            task.palette.Run(dst1)
             dst1 = task.palette.dst1
         End If
     End Sub

@@ -12,7 +12,7 @@ Public Class PCA_Basics
         task.desc = "Reconstruct a video stream as a composite of X images."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static images(7) As cv.Mat
         Static images32f(images.Length) As cv.Mat
@@ -50,10 +50,9 @@ Public Class PCA_Depth
         task.desc = "Reconstruct a depth stream as a composite of X images."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        pca.src = task.RGBDepth
-        pca.Run()
+        pca.Run(task.RGBDepth)
         dst1 = pca.dst1
     End Sub
 End Class
@@ -88,7 +87,7 @@ Public Class PCA_DrawImage
         p.Y = q.Y + 9 * Math.Sin(angle - Math.PI / 4)
         img.Line(p, q, color, 1, task.lineType)
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = image.Resize(dst1.Size())
         Dim gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, cv.ThresholdTypes.Binary Or cv.ThresholdTypes.Otsu)

@@ -28,7 +28,7 @@ Public Class Download_Databases
         task.desc = "Multi-threaded (responsive) download of the iBug 300W face database.  Not using iBug yet but planning to..."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static checkiBug = findRadio("Download the 1.7 Gb 300 Faces In-The-Wild database")

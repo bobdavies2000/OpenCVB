@@ -7,14 +7,14 @@ Public Class WarpPerspective_Basics
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Warped Width", 0, src.Cols, src.Cols - 50)
-            sliders.setupTrackBar(1, "Warped Height", 0, src.Rows, src.Rows - 50)
+            sliders.setupTrackBar(0, "Warped Width", 0, dst1.Cols, dst1.Cols - 50)
+            sliders.setupTrackBar(1, "Warped Height", 0, dst1.Rows, dst1.Rows - 50)
             sliders.setupTrackBar(2, "Warped Angle", 0, 360, 0)
         End If
         task.desc = "Use WarpPerspective to transform input images."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim srcPt() = {New cv.Point2f(0, 0), New cv.Point2f(0, src.Height), New cv.Point2f(src.Width, 0), New cv.Point2f(src.Width, src.Height)}
         Dim pts() = {New cv.Point2f(0, 0), New cv.Point2f(0, src.Height), New cv.Point2f(src.Width, 0), New cv.Point2f(sliders.trackbar(0).Value, sliders.trackbar(1).Value)}

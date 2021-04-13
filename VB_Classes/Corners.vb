@@ -15,7 +15,7 @@ Public Class Corners_Harris
 		' task.rank = 1
         label2 = "Corner Eigen values"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static color As New cv.Mat
         Static gray As New cv.Mat
@@ -74,10 +74,9 @@ Public Class Corners_SubPix
         task.desc = "Use PreCornerDetect to find features in the image."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        good.src = src
-        good.Run()
+        good.Run(src)
         If good.goodFeatures.Count = 0 Then Exit Sub ' no good features right now...
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim winSize = New cv.Size(sliders.trackbar(0).Value, sliders.trackbar(0).Value)
@@ -109,7 +108,7 @@ Public Class Corners_PreCornerDetect
         task.desc = "Use PreCornerDetect to find features in the image."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim ksize = sliders.trackbar(0).Value
@@ -119,8 +118,7 @@ Public Class Corners_PreCornerDetect
 
         cv.Cv2.Normalize(prob, prob, 0, 255, cv.NormTypes.MinMax)
         prob.ConvertTo(gray, cv.MatType.CV_8U)
-        median.src = gray.Clone()
-        median.Run()
+        median.Run(gray.Clone())
         dst1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2 = gray.Threshold(160, 255, cv.ThresholdTypes.BinaryInv).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         label2 = "median = " + CStr(median.medianVal)
@@ -153,7 +151,7 @@ Public Class Corners_ShiTomasi_CPP
 		' task.rank = 1
         label2 = "Corner Eigen values"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim data(src.Total - 1) As Byte
 

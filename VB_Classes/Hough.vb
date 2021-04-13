@@ -50,10 +50,9 @@ Public Class Hough_Circles
         label1 = "Input circles to Hough"
         label2 = "Hough Circles found"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        circles.src = src
-        circles.Run()
+        circles.Run(src)
         dst1 = circles.dst1
         Static Dim method As integer = 3
         cv.Cv2.CvtColor(dst1, dst2, cv.ColorConversionCodes.BGR2GRAY)
@@ -90,10 +89,9 @@ Public Class Hough_Lines
 		' task.rank = 1
     End Sub
 
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        edges.src = src.Clone()
-        edges.Run()
+        edges.Run(src)
 
         Dim rhoIn = sliders.trackbar(0).Value
         Dim thetaIn = sliders.trackbar(1).Value / 1000
@@ -143,7 +141,7 @@ Public Class Hough_Lines_MT
         label2 = "Hough_Lines_MT"
     End Sub
 
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.frameCount = 0 Then
@@ -152,10 +150,9 @@ Public Class Hough_Lines_MT
             gridWidthSlider.Value = 16
             gridHeightSlider.Value = 16
         End If
-        grid.Run()
+        grid.run(src)
 
-        edges.src = src
-        edges.Run()
+        edges.Run(src)
         dst1 = edges.dst1
 
         Dim rhoIn = sliders.trackbar(0).Value

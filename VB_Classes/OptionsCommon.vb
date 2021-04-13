@@ -18,7 +18,7 @@ Public Class OptionsCommon_Depth
         task.desc = "Show depth with OpenCV using varying min and max depths."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         task.hist3DThreshold = gOptions.thresholdSlider.Value
@@ -90,7 +90,7 @@ Public Class OptionsCommon_Histogram
                 cameraXSetting = If(task.resolutionIndex = 1, 4, 8)
                 cameraYSetting = If(task.resolutionIndex = 3, -8, -3)
             Case VB_Classes.ActiveTask.algParms.camNames.D435i
-                If src.Width = 640 Then
+                If dst1.Width = 640 Then
                     sideFrustrumSetting = 75
                     topFrustrumSetting = 101
                     cameraXSetting = 0
@@ -102,7 +102,7 @@ Public Class OptionsCommon_Histogram
                     cameraYSetting = 0
                 End If
             Case VB_Classes.ActiveTask.algParms.camNames.D455
-                If src.Width = 640 Then
+                If dst1.Width = 640 Then
                     sideFrustrumSetting = 86
                     topFrustrumSetting = 113
                     cameraXSetting = 1
@@ -117,12 +117,12 @@ Public Class OptionsCommon_Histogram
 
         task.sideFrustrumAdjust = task.maxZ * sideFrustrumSetting / 100 / 2
         task.topFrustrumAdjust = task.maxZ * topFrustrumSetting / 100 / 2
-        task.sideCameraPoint = New cv.Point(0, CInt(src.Height / 2 + cameraYSetting))
-        task.topCameraPoint = New cv.Point(CInt(src.Width / 2 + cameraXSetting), CInt(src.Height))
+        task.sideCameraPoint = New cv.Point(0, CInt(dst1.Height / 2 + cameraYSetting))
+        task.topCameraPoint = New cv.Point(CInt(dst1.Width / 2 + cameraXSetting), CInt(dst1.Height))
         task.desc = "The options for the side view are shared with this algorithm"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
     End Sub
 End Class

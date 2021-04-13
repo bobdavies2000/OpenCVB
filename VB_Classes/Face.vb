@@ -23,7 +23,7 @@ Public Class Face_Haar_LBP
         label1 = "Faces detected with Haar"
         label2 = "Faces detected with LBP"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.Clone()
         detectFace(dst1, haarCascade)
@@ -44,7 +44,7 @@ Public Class Face_Haar_Alt
 		' task.rank = 1
         label1 = "Faces detected with Haar_Alt"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.Clone()
         detectFace(dst1, haarCascade)

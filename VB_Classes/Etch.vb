@@ -8,7 +8,7 @@ Public Class Etch_ASketch
     Dim cursor As cv.Point
     Dim ms_rng As New System.Random
     Private Function randomCursor()
-        Return New cv.Point(ms_rng.Next(0, src.Width), ms_rng.Next(0, src.Height))
+        Return New cv.Point(ms_rng.Next(0, dst1.Width), ms_rng.Next(0, dst1.Height))
     End Function
     Public Sub New()
         initParent()
@@ -28,9 +28,9 @@ Public Class Etch_ASketch
         task.desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        keys.Run()
+        keys.Run(src)
         Dim Input = New List(Of String)(keys.keyInput)
 
         If check.Box(1).Checked Then

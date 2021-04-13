@@ -14,7 +14,7 @@ Public Class PhotoShop_Clahe ' Contrast Limited Adaptive Histogram Equalization 
         task.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src
@@ -37,7 +37,7 @@ Public Class PhotoShop_Hue
         task.desc = "Show hue (Result1) and Saturation (Result2)."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim imghsv = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         cv.Cv2.CvtColor(src, imghsv, cv.ColorConversionCodes.RGB2HSV)
@@ -65,7 +65,7 @@ Public Class PhotoShop_AlphaBeta
             sliders.setupTrackBar(1, "Brightness Beta (brightness)", -100, 100, 0)
         End If
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.ConvertScaleAbs(sliders.trackbar(0).Value / 500, sliders.trackbar(1).Value)
     End Sub
@@ -90,7 +90,7 @@ Public Class PhotoShop_Gamma
             sliders.setupTrackBar(0, "Brightness Gamma correction", 0, 200, 100)
         End If
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static lastGamma As Integer = -1
         If lastGamma <> sliders.trackbar(0).Value Then
@@ -138,7 +138,7 @@ Public Class PhotoShop_WhiteBalance_CPP
         task.desc = "Automate getting the right white balance"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim rgbData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(rgbData, GCHandleType.Pinned) ' pin it for the duration...
@@ -182,7 +182,7 @@ Public Class PhotoShop_WhiteBalance
         task.desc = "Automate getting the right white balance"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim rgb32f As New cv.Mat
         src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
@@ -192,8 +192,8 @@ Public Class PhotoShop_WhiteBalance
         Dim planes() = rgb32f.Split()
         Dim sum32f = New cv.Mat(src.Size(), cv.MatType.CV_32F)
         sum32f = planes(0) + planes(1) + planes(2)
-        hist.src = sum32f
-        hist.Run()
+        src = sum32f
+        hist.Run(src)
         dst2 = hist.dst1
 
         Static thresholdSlider = findSlider("White balance threshold X100")
@@ -202,7 +202,7 @@ Public Class PhotoShop_WhiteBalance
         Dim threshold As Integer
         For i = hist.histRaw(0).Rows - 1 To 0 Step -1
             sum += hist.histRaw(0).Get(Of Single)(i, 0)
-            If sum > hist.src.Rows * hist.src.Cols * thresholdVal Then
+            If sum > src.Rows * src.Cols * thresholdVal Then
                 threshold = i
                 Exit For
             End If
@@ -242,7 +242,7 @@ Public Class PhotoShop_ChangeMask
         task.desc = "Create a mask for the changed pixels after white balance"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static countdown = 120
         Static whiteFlag As Boolean
@@ -253,14 +253,12 @@ Public Class PhotoShop_ChangeMask
         countdown -= 1
 
         If whiteFlag Then
-            white.src = src
-            white.Run()
+            white.Run(src)
             dst1 = white.dst1
             label1 = "White balanced image - VB version"
             label2 = "Mask of changed pixels - VB version"
         Else
-            whiteCPP.src = src
-            whiteCPP.Run()
+            whiteCPP.Run(src)
             dst1 = whiteCPP.dst1
             label1 = "White balanced image - C++ version"
             label2 = "Mask of changed pixels - C++ version"
@@ -292,22 +290,19 @@ Public Class PhotoShop_PlotHist
         task.desc = "Plot the histogram of the before and after white balancing"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        hist1.src = src
-        hist1.Run()
+        hist1.Run(src)
         mat2to1.mat(0) = hist1.dst1
 
-        white.src = src
-        white.Run()
+        white.Run(src)
         dst1 = white.dst1
         label1 = white.label1
 
-        hist2.src = dst1
-        hist2.Run()
+        hist2.Run(dst1)
         mat2to1.mat(1) = hist2.dst1
 
-        mat2to1.Run()
+        mat2to1.Run(src)
         dst2 = mat2to1.dst1
         label2 = "The top is before white balance"
     End Sub
@@ -328,7 +323,7 @@ Public Class PhotoShop_Sepia
         task.desc = "Create a sepia image"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2RGB)
         Dim tMatrix = New cv.Mat(3, 3, cv.MatType.CV_64F, {{0.393, 0.769, 0.189}, {0.349, 0.686, 0.168}, {0.272, 0.534, 0.131}})
@@ -377,7 +372,7 @@ Public Class PhotoShop_Emboss
         Next
         Return kernel
     End Function
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static sizeSlider = findSlider("Emboss Kernel Size")
         Dim kernel = kernelGenerator(sizeSlider.value)
@@ -432,7 +427,7 @@ Public Class PhotoShop_EmbossAll
         task.desc = "Emboss using all the directions provided"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim kernel = emboss.kernelGenerator(sizeSlider.Value)
 
@@ -463,7 +458,7 @@ Public Class PhotoShop_EmbossAll
             cv.Cv2.BitwiseOr(mats.mat(i), dst1, dst1)
         Next
 
-        mats.Run()
+        mats.Run(src)
         dst2 = mats.dst1
     End Sub
 End Class
@@ -508,7 +503,7 @@ Public Class PhotoShop_DuoTone
         task.desc = "Create a DuoTone image"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static expSlider = findSlider("DuoTone Exponent")
@@ -566,7 +561,7 @@ Public Class PhotoShop_Brightness
         task.desc = "Implement the traditional brightness effect"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static brightnessSlider = findSlider("Brightness Value")
         Dim brightness As Single = brightnessSlider.value / 100
@@ -607,7 +602,7 @@ Public Class PhotoShop_UnsharpMask
 		' task.rank = 1
         label2 = "Unsharp mask (difference from Blur)"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim blurred As New cv.Mat
         Dim sigma As Double = sliders.trackbar(0).Value / 100
@@ -641,7 +636,7 @@ Public Class PhotoShop_SharpenDetail
         task.desc = "Enhance detail on an image - Painterly Effect"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
@@ -668,7 +663,7 @@ Public Class PhotoShop_SharpenStylize
         task.desc = "Stylize an image - Painterly Effect"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
@@ -697,7 +692,7 @@ Public Class PhotoShop_Pencil_Basics
         task.desc = "Convert image to a pencil sketch - Painterly Effect"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
@@ -731,7 +726,7 @@ Public Class PhotoShop_Pencil_Manual
         task.desc = "Break down the process of converting an image to a sketch - Painterly Effect"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayinv As New cv.Mat

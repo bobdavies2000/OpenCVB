@@ -355,15 +355,15 @@ Public Class ActiveTask : Implements IDisposable
     End Sub
     Public Sub RunAlgorithm()
         Try
-            If task.parms.useRecordedData Then recordedData.Run()
+            If task.parms.useRecordedData Then recordedData.Run(task.color)
 
             ' run any global options algorithms here.
             If task.pythonTaskName.EndsWith(".py") = False Then
-                inrange.Run() ' updates all the depth info.
-                IMUStable.run() ' updates the flag that indicates stability according to the IMU.
+                inrange.Run(task.color) ' updates all the depth info.
+                IMUStable.run(task.color) ' updates the flag that indicates stability according to the IMU.
             End If
 
-            algorithmObject.NextFrame()
+            algorithmObject.NextFrame(task.color)
 
             label1 = task.label1
             label2 = task.label2

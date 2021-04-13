@@ -12,7 +12,7 @@ Public Class Keyboard_Basics
         task.desc = "Test the keyboard interface available to all algorithms"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         keyInput = New List(Of String)(checkKeys.inputText)
         checkKeys.inputText.Clear()
@@ -23,7 +23,7 @@ Public Class Keyboard_Basics
                 inputText += keyInput(i).ToString()
             Next
             If inputText <> "" Then flow.msgs.Add(inputText)
-            flow.Run()
+            flow.Run(src)
         End If
     End Sub
 End Class

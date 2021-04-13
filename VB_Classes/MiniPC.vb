@@ -11,13 +11,11 @@ Public Class MiniPC_Basics
         task.desc = "Create a mini point cloud for use with histograms"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        gCloud.Run()
-
-        resize.src = gCloud.dst1
-        resize.Run()
+        gCloud.Run(src)
+        resize.Run(gCloud.dst1)
 
         Dim split = resize.dst1.Split()
         split(2).SetTo(0, task.noDepthMask.Resize(split(2).Size))
@@ -52,12 +50,12 @@ Public Class MiniPC_Rotate
         task.desc = "Create a histogram for the mini point cloud"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim input = src
         If standalone Then
-            mini.Run()
+            mini.Run(input)
             input = mini.dst2 ' the task.pointcloud
             Static angleYslider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
             angleY = angleYslider.value
@@ -125,19 +123,19 @@ Public Class MiniPC_RotateAngle
         task.desc = "Find a peak value in the side view histograms"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If src.Type <> cv.MatType.CV_32FC3 Then
-            peak.mini.Run()
-            peak.src = peak.mini.dst2
+            peak.mini.Run(src)
+            src = peak.mini.dst2
         Else
-            peak.src = src
+            src = src
         End If
 
         Dim r = peak.mini.rect
         Dim sz = New cv.Size(r.Width, r.Height)
-        peak.Run()
+        peak.Run(src)
         peak.angleY += 1
         If peak.angleY > 45 Then peak.angleY = -45
 
@@ -154,13 +152,13 @@ Public Class MiniPC_RotateAngle
             resetCheck.Checked = True
         End If
         plot.plotData = New cv.Scalar(metric)
-        plot.Run()
+        plot.Run(src)
         dst2 = plot.dst1
         mats.mat(3) = peak.histogram.ConvertScaleAbs(255)
 
         mats.mat(0) = peak.dst1(peak.mini.rect)
         mats.mat(1) = peak.dst2(peak.mini.rect)
-        mats.Run()
+        mats.Run(src)
         dst1 = mats.dst1
     End Sub
 End Class
@@ -183,11 +181,10 @@ Public Class MiniPC_RotateSinglePass
         task.desc = "Same operation as MiniPC_RotateAngle but in a single pass."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        peak.mini.Run()
-        peak.src = peak.mini.dst2
+        peak.mini.Run(src)
 
         Dim r = peak.mini.rect
         Dim sz = New cv.Size(r.Width, r.Height)
@@ -196,7 +193,7 @@ Public Class MiniPC_RotateSinglePass
         Dim bestAngle As Integer
         Dim bestLoc As cv.Point
         For i = -90 To 90
-            peak.Run()
+            peak.Run(peak.mini.dst2)
             peak.angleY = i
             peak.histogram.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
             If maxVal > maxHist Then
@@ -205,7 +202,7 @@ Public Class MiniPC_RotateSinglePass
                 bestLoc = maxLoc
             End If
         Next
-        peak.Run()
+        peak.Run(peak.mini.dst2)
         peak.angleY = bestAngle
         dst1 = peak.dst1
         dst2 = peak.dst2

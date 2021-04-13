@@ -8,7 +8,7 @@ Public Class Bitwise_Not
         task.desc = "Gray and color bitwise_not"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         cv.Cv2.BitwiseNot(src, dst1)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

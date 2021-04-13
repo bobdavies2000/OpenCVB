@@ -13,7 +13,7 @@ Public Class LUT_Basics
         task.desc = "Divide the image into n-segments controlled with a slider."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static segment() As Integer
@@ -60,7 +60,7 @@ Public Class LUT_Sliders
         task.desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         sliders.sLabels(0).Text = "LUT zero through " + CStr(sliders.trackbar(0).Value)
         sliders.sLabels(1).Text = "LUT " + CStr(sliders.trackbar(0).Value) + " through " + CStr(sliders.trackbar(1).Value)
@@ -99,10 +99,9 @@ Public Class LUT_Reduction
         task.desc = "Build and use a custom color palette - Painterly Effect"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        reduction.src = src
-        reduction.Run()
+        reduction.Run(src)
         dst1 = reduction.dst1.LUT(colorMat)
         If standalone Or task.intermediateReview = caller Then dst2 = colorMat.Resize(src.Size())
     End Sub
@@ -128,15 +127,14 @@ Public Class LUT_CustomColor
         task.desc = "Use a palette to provide the lookup table for LUT - Painterly Effect"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Or task.intermediateReview = caller Then
-            reduction.src = src
-            reduction.Run()
+            reduction.Run(src)
         End If
 
-        gradMap.Run()
+        gradMap.Run(src)
         colorMap = gradMap.gradientColorMap.Flip(cv.FlipMode.X)
         dst1 = reduction.dst1.LUT(colorMap)
         dst2 = colorMap.Resize(src.Size())
@@ -166,7 +164,7 @@ Public Class LUT_Color
         task.desc = "Build and use a custom color palette - Painterly Effect"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim reduction = sliders.trackbar(0).Value
         If standalone or task.intermediateReview = caller Then
@@ -194,7 +192,7 @@ Public Class LUT_Rebuild
         task.desc = "Rebuild any grayscale image with a 256 element Look-Up Table"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim lut = New cv.Mat(1, 256, cv.MatType.CV_8U, paletteMap)
         dst1 = src.LUT(lut)
@@ -219,10 +217,9 @@ Public Class LUT_RGBDepth
         task.desc = "Use a LUT on the RGBDepth to segregate depth data."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        lut.src = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        lut.Run()
+        lut.Run(task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst1 = lut.dst1
         label1 = "Depth data in " + CStr(lut.nSeg) + " LUT entries"
     End Sub
@@ -244,10 +241,9 @@ Public Class LUT_Depth32f
         task.desc = "Use a LUT on the 32-bit depth to segregate depth data."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        lut.src = task.depth32f.Normalize(255).ConvertScaleAbs(255)
-        lut.Run()
+        lut.Run(task.depth32f.Normalize(255).ConvertScaleAbs(255))
         dst1 = lut.dst1
         label1 = "Depth data in " + CStr(lut.nSeg) + " LUT entries"
     End Sub

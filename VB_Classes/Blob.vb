@@ -28,7 +28,7 @@ Public Class Blob_Basics
 		' task.rank = 1
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim blobParams = New cv.SimpleBlobDetector.Params
         blobParams.FilterByArea = check.Box(0).Checked
@@ -47,8 +47,7 @@ Public Class Blob_Basics
         blobParams.MinDistBetweenBlobs = 10
         blobParams.MinRepeatability = 1
 
-        blob.src = src
-        blob.Run()
+        blob.Run(src)
         dst1 = blob.dst1
         dst2 = dst1.EmptyClone
 
@@ -99,24 +98,20 @@ Public Class Blob_Input
 		' task.rank = 1
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        rectangles.src = src
-        rectangles.Run()
+        rectangles.Run(src)
         Mats.mat(0) = rectangles.dst1
 
-        circles.src = src
-        circles.Run()
+        circles.Run(src)
         Mats.mat(1) = circles.dst1
 
-        ellipses.src = src
-        ellipses.Run()
+        ellipses.Run(src)
         Mats.mat(2) = ellipses.dst1
 
-        poly.src = src
-        poly.Run()
+        poly.Run(src)
         Mats.mat(3) = poly.dst2
-        Mats.Run()
+        Mats.Run(src)
         Mats.dst1.CopyTo(dst1)
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
         dst2 = Mats.mat(quadrantIndex)
@@ -140,11 +135,10 @@ Public Class Blob_RenderBlobs
         label2 = "Showing only the largest blob in test data"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod 100 = 0 Then
-            blob.src = src
-            blob.Run()
+            blob.Run(src)
             dst1 = blob.dst1
             Dim gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.BinaryInv)
@@ -192,14 +186,12 @@ Public Class Blob_DepthClusters
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
         task.rank = 3
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        histBlobs.src = task.noDepthMask
-        histBlobs.Run()
+        histBlobs.Run(task.noDepthMask)
         dst1 = histBlobs.dst1
-        flood.src = histBlobs.dst2
         flood.initialMask = task.noDepthMask
-        flood.Run()
+        flood.Run(histBlobs.dst2)
         dst2 = flood.dst2
         label1 = CStr(histBlobs.ranges.Count) + " Depth Clusters"
     End Sub
@@ -231,14 +223,12 @@ Public Class Blob_DepthPixelSampler
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
         task.rank = 2
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        histBlobs.src = task.noDepthMask
-        histBlobs.Run()
+        histBlobs.Run(task.noDepthMask)
         dst1 = histBlobs.dst1
-        flood.src = histBlobs.dst2
         flood.initialMask = task.noDepthMask
-        flood.Run()
+        flood.Run(histBlobs.dst2)
 
         Static lastFrame = flood.dst2
         Static lastCount = flood.rects.Count
@@ -249,10 +239,7 @@ Public Class Blob_DepthPixelSampler
             For i = 0 To flood.rects.Count - 1
                 Dim rect = flood.rects(i)
                 Dim mask = flood.masks(i)(rect)
-                pixel.src = lastFrame(rect).Clone
-                Dim inverse = 255 - mask
-                pixel.src.SetTo(0, inverse)
-                pixel.Run()
+                pixel.Run(lastFrame(rect).Clone.setTo(0, 255 - mask))
                 dst2(rect).SetTo(pixel.dominantGray, mask)
             Next
             lastFrame = dst2.Clone
@@ -280,10 +267,10 @@ Public Class Blob_DepthRanges
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
         task.rank = 4
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         histBlobs.valleys.grayOnly = grayOnly
-        histBlobs.Run()
+        histBlobs.Run(src)
         dst1 = histBlobs.dst1
 
         Dim ranges = New List(Of cv.Point)(histBlobs.valleys.ranges)
@@ -337,19 +324,17 @@ Public Class Blob_DepthRangesGray
         task.desc = "Find the depth ranges but only in grayscale."
         task.rank = 5
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        blobs.Run()
+        blobs.Run(src)
         dst1 = blobs.dst1
         dst2 = blobs.dst2
         If standalone Then
             Dim spread = 255 / blobs.histBlobs.valleys.ranges.Count
-            task.palette.src = dst1 * spread
-            task.palette.Run()
+            task.palette.Run(dst1 * spread)
             dst1 = task.palette.dst1
 
-            task.palette.src = dst2 * spread
-            task.palette.Run()
+            task.palette.Run(dst2 * spread)
             dst2 = task.palette.dst1
         End If
     End Sub
@@ -378,19 +363,17 @@ Public Class Blob_DepthFloodfill
         task.desc = "Use the grayscale blobs to connect depth neighbors that are 1-pixel value different"
         task.rank = 5
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        blobs.Run()
+        blobs.Run(src)
 
         Dim spread = 255 / blobs.blobs.histBlobs.valleys.ranges.Count
-        task.palette.src = blobs.dst2.Clone * spread
-        task.palette.Run()
+        task.palette.Run(blobs.dst2.Clone * spread)
         dst2 = task.palette.dst1
 
-        flood.src = blobs.dst2
         flood.rangeColors = New List(Of Integer)(blobs.blobs.histBlobs.valleys.rangeColors)
-        flood.Run()
+        flood.Run(blobs.dst2)
         dst1 = flood.dst2
         dst1.SetTo(0, task.noDepthMask)
     End Sub
@@ -418,10 +401,9 @@ Public Class Blob_Largest
         task.desc = "Gather all the blob data and display the largest."
         ' task.rank = 3
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        blobs.src = src
-        blobs.Run()
+        blobs.Run(src)
         dst2 = blobs.dst2
         rects = blobs.flood.basics.rects
         masks = blobs.flood.basics.masks
@@ -431,7 +413,7 @@ Public Class Blob_Largest
             maskIndex = blobs.flood.basics.sortedSizes.ElementAt(blobIndex).Value ' this is the largest boundary rectangle
             src.CopyTo(dst1, masks(maskIndex))
             kalman.kInput = {rects(maskIndex).X, rects(maskIndex).Y, rects(maskIndex).Width, rects(maskIndex).Height}
-            kalman.Run()
+            kalman.Run(src)
             Dim res = kalman.kOutput
             Dim rect = New cv.Rect(CInt(res(0)), CInt(res(1)), CInt(res(2)), CInt(res(3)))
             dst1.Rectangle(rect, cv.Scalar.Red, 2)
@@ -467,9 +449,9 @@ Public Class Blob_Rectangles
         task.desc = "Get the blobs and their masks and outline them with a rectangle."
         ' task.rank = 2
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        blobs.Run()
+        blobs.Run(src)
         dst1 = src
         dst2 = blobs.blobs.dst2
 
@@ -493,7 +475,7 @@ Public Class Blob_Rectangles
         For i = 0 To blobsToShow - 1
             Dim rect = sortedBlobs.ElementAt(i).Key
             kalman(i).kInput = {rect.X, rect.Y, rect.Width, rect.Height}
-            kalman(i).Run()
+            kalman(i).Run(src)
             rect = New cv.Rect(kalman(i).kOutput(0), kalman(i).kOutput(1), kalman(i).kOutput(2), kalman(i).kOutput(3))
             dst1.Rectangle(rect, task.scalarColors(i Mod 255), 2)
         Next

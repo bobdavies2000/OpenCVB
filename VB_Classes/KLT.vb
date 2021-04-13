@@ -25,7 +25,7 @@ Public Class KLT_Basics
         task.desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static prevGray As New cv.Mat
 
@@ -98,10 +98,9 @@ Public Class KLT_OpticalFlow
         task.desc = "KLT optical flow - needs more work"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        klt.src = src
-        klt.Run()
+        klt.Run(src)
         If task.frameCount > 0 And lastpoints IsNot Nothing And klt.inputPoints IsNot Nothing Then
             dst1 = klt.dst1
             src.CopyTo(dst2)

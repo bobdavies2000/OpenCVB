@@ -39,7 +39,7 @@ Public Class Retina_Basics_CPP
         task.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If check.Box(1).Checked Then
             check.Box(1).Checked = False
@@ -105,10 +105,9 @@ Public Class Retina_Depth
         label1 = "Last result || current result"
         label2 = "Current depth motion result"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        retina.src = task.RGBDepth
-        retina.Run()
+        retina.Run(task.RGBDepth)
         dst2 = retina.dst2
         Static lastMotion As New cv.Mat
         If lastMotion.Width = 0 Then lastMotion = retina.dst2

@@ -25,9 +25,9 @@ Public Class EMax_Basics
         task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        basics.Run()
+        basics.Run(src)
         dst1 = basics.dst1
         Dim srcCount = basics.sliders.trackbar(0).Value
         label1 = CStr(srcCount) + " Random samples in " + CStr(basics.regionCount) + " clusters"
@@ -59,12 +59,10 @@ Public Class EMax_Basics
 
         cv.Cv2.MinMaxLoc(dst2, minval, maxval)
         dst2 = (dst2 * 128 / maxVal + 100).ToMat
-        edges.src = dst2
-        edges.Run()
+        edges.Run(dst2)
         dst2.SetTo(0, edges.dst1)
 
-        task.palette.src = dst2
-        task.palette.Run()
+        task.palette.Run(dst2)
         dst2 = task.palette.dst1
         dst2.SetTo(0, edges.dst1)
         If standalone Then
@@ -92,15 +90,15 @@ Public Class EMax_CentroidsNew
         emaxCPP = New EMax_Basics()
 
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
-        gridWidthSlider.Value = src.Width * 170 / 640
+        gridWidthSlider.Value = dst1.Width * 170 / 640
 
         task.desc = "Colorize the output of Emax"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        emaxCPP.Run()
+        emaxCPP.Run(src)
         dst1 = emaxCPP.dst2
         Static lastCentroids As New List(Of cv.Point2f)
         Dim centroids = emaxCPP.palette.flood.flood.centroids
@@ -141,8 +139,8 @@ Public Class EMax_VB_Failing
         grid = New Thread_Grid
         gridWidthSlider = findSlider("ThreadGrid Width")
         gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = src.Width / 2
-        gridHeightSlider.Value = src.Height / 2
+        gridWidthSlider.Value = dst1.Width / 2
+        gridHeightSlider.Value = dst1.Height / 2
 
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)
@@ -155,7 +153,7 @@ Public Class EMax_VB_Failing
         task.desc = "OpenCV expectation maximization example."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then
             task.trueText("The EMax algorithm fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
@@ -163,7 +161,7 @@ Public Class EMax_VB_Failing
             Exit Sub ' comment this line to see the bug in the VB.Net version of this Predict2 below.
         End If
 
-        grid.Run()
+        grid.Run(src)
         regionCount = grid.roiList.Count - 1
 
         samples = New cv.Mat(sliders.trackbar(0).Value, 2, cv.MatType.CV_32FC1, 0)
@@ -257,17 +255,16 @@ Public Class EMax_Centroids
         highDiffslider.Value = 1
 
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
-        gridWidthSlider.Value = src.Width * 170 / 640
+        gridWidthSlider.Value = dst1.Width * 170 / 640
 
         task.desc = "Get the Emax cluster centroids using floodfill "
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        emaxCPP.Run()
-        flood.src = emaxCPP.dst2.Clone
-        flood.Run()
+        emaxCPP.Run(src)
+        flood.Run(emaxCPP.dst2.Clone)
         dst1 = flood.dst1
 
         Static lastCentroids As New List(Of cv.Point2f)
@@ -304,15 +301,15 @@ Public Class EMax_PointTracker
         task.desc = "Use KNN and Kalman to track the EMax Centroids and map consisten colors"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        emax.Run()
+        emax.Run(src)
         dst1 = emax.dst1
 
         pTrack.queryPoints = emax.flood.centroids
         pTrack.queryMasks = emax.flood.masks
         pTrack.queryRects = emax.flood.rects
-        pTrack.Run()
+        pTrack.Run(src)
         dst2 = pTrack.dst1
 
         ' this is to verify that the colors are remaining largely consistent (they may change if more centroids appear.)

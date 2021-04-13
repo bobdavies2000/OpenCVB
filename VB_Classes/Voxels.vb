@@ -26,7 +26,7 @@ Public Class Voxels_Basics_MT
         task.desc = "Use multi-threading to get median depth values as voxels."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
@@ -36,8 +36,7 @@ Public Class Voxels_Basics_MT
         Dim input = (split(2) * 1000).ToMat
         cv.Cv2.InRange(input, task.minDepth, task.maxDepth, depthMask)
 
-        grid.src = split(2)
-        grid.Run()
+        grid.Run(split(2))
 
         If voxels.Length <> grid.roiList.Count Then ReDim voxels(grid.roiList.Count - 1)
 

@@ -7,18 +7,16 @@ Public Class Coherent_Basics
         initParent()
         pixel = New Pixel_Sampler
         flood = New Coherent_FloodFill
-        dst1 = New cv.Mat(src.Size, cv.MatType.CV_8UC1, 0)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8UC1, 0)
         task.desc = "Segment image with same values at the same locations"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        Dim input = src
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        flood.src = input
-        flood.Run()
+        flood.Run(src)
 
         Static lastCount = flood.lastPoints.Count
         Static lastFrame = flood.dst1.Clone
@@ -29,10 +27,7 @@ Public Class Coherent_Basics
             For i = 0 To flood.lastRects.Count - 1
                 Dim rect = flood.lastRects(i)
                 Dim mask = flood.lastMasks(i)(rect)
-                pixel.src = lastFrame(rect).Clone
-                Dim inverse = 255 - mask
-                pixel.src.SetTo(0, inverse)
-                pixel.Run()
+                pixel.Run(lastFrame(rect).Clone.setto(0, 255 - mask))
                 dst1(rect).SetTo(pixel.dominantGray, mask)
             Next
             lastFrame = dst1.Clone
@@ -40,8 +35,7 @@ Public Class Coherent_Basics
         lastCount = flood.lastPoints.Count
 
         If standalone Then
-            task.palette.src = dst1
-            task.palette.Run()
+            task.palette.Run(dst1)
             dst2 = task.palette.dst1
         End If
         label1 = CStr(flood.lastRects.Count) + " regions identified in the last frame"
@@ -70,13 +64,12 @@ Public Class Coherent_FloodFill
         task.desc = "Floodfill an image and make the colors consistent."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static minSlider = findSlider("FloodFill Minimum Size")
         Dim threshold = minSlider.value
 
-        basics.src = src
-        basics.Run()
+        basics.Run(src)
 
         Dim queryPoints = New List(Of cv.Point2f)
         For Each r In basics.rects
@@ -85,7 +78,7 @@ Public Class Coherent_FloodFill
 
         knn.basics.knnQT.queryPoints = New List(Of cv.Point2f)(queryPoints)
         knn.basics.knnQT.trainingPoints = New List(Of cv.Point2f)(lastPoints)
-        knn.Run()
+        knn.Run(src)
 
         If task.cameraStable = False Or task.frameCount = 0 Then
             dst1 = New cv.Mat(src.Size, cv.MatType.CV_8UC1, 0)
@@ -163,13 +156,11 @@ Public Class Coherent_Palette
         task.desc = "Highlight a consistent 8-bit grayscale image regions with a palette"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        flood.src = src
-        flood.Run()
+        flood.Run(src)
 
-        task.palette.src = flood.dst1
-        task.palette.Run()
+        task.palette.Run(flood.dst1)
         dst1 = task.palette.dst1
         label1 = flood.label1
     End Sub
@@ -193,11 +184,10 @@ Public Class Coherent_Pixel
         task.desc = "Floodfill an image and sample masks to make the colors consistent."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        flood.src = src
-        flood.Run()
+        flood.Run(src)
 
         Static lastFrame As cv.Mat
         If task.cameraStable = False Or task.frameCount = 0 Then
@@ -207,10 +197,7 @@ Public Class Coherent_Pixel
         For i = 0 To flood.rects.Count - 1
             Dim rect = flood.rects(i)
             Dim mask = flood.masks(i)(rect)
-            pixel.src = lastFrame(rect).Clone
-            Dim inverse = 255 - mask
-            pixel.src.SetTo(0, inverse)
-            pixel.Run()
+            pixel.Run(lastFrame(rect).Clone.SetTo(0, 255 - mask))
             dst1(rect).SetTo(pixel.dominantGray, mask)
         Next
         label1 = CStr(flood.rects.Count) + " regions identified in the last frame"

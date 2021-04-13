@@ -32,7 +32,7 @@ Public Class Video_Basics
         task.desc = "Show a video file"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If srcVideo <> fileNameForm.filename.Text Then
             If fileInfo.Exists = False Then
@@ -76,13 +76,12 @@ Public Class Video_CarCounting
         task.desc = "Count cars in a video file"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        video.Run()
+        video.Run(src)
         If video.dst1.Empty() = False And video.image.Empty() = False Then
             dst1.SetTo(0)
-            bgSub.src = video.image
-            bgSub.Run()
+            bgSub.Run(video.image)
             Dim videoImage = bgSub.dst1
             dst2 = video.dst1
 
@@ -109,7 +108,7 @@ Public Class Video_CarCounting
 
             Dim tmp = videoImage.Resize(src.Size())
             flow.msgs.Add("  Cars " + CStr(carCount))
-            flow.Run()
+            flow.Run(src)
             cv.Cv2.BitwiseOr(dst1, tmp.CvtColor(cv.ColorConversionCodes.GRAY2BGR), dst1)
         End If
     End Sub
@@ -134,14 +133,12 @@ Public Class Video_CarCComp
         task.desc = "Outline cars with a rectangle"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        video.Run()
+        video.Run(src)
         If video.dst1.Empty() = False Then
-            bgSub.src = video.dst1
-            bgSub.Run()
-            cc.src = bgSub.dst1
-            cc.Run()
+            bgSub.Run(video.dst1)
+            cc.Run(bgSub.dst1)
             dst1 = cc.dst1
             dst2 = cc.dst2
         End If
@@ -161,18 +158,17 @@ Public Class Video_MinRect
         initParent()
         video = New Video_Basics()
         video.srcVideo = task.parms.homeDir + "Data/CarsDrivingUnderBridge.mp4"
-        video.Run()
+        video.Run(dst1)
 
         bgSub = New BGSubtract_MOG()
         task.desc = "Find area of car outline - example of using minAreaRect"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        video.Run()
+        video.Run(src)
         If video.dst1.Empty() = False Then
-            bgSub.src = video.dst1
-            bgSub.Run()
+            bgSub.Run(video.dst1)
 
             contours = cv.Cv2.FindContoursAsArray(bgSub.dst1, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
             dst1 = bgSub.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -200,9 +196,9 @@ Public Class Video_MinCircle
         task.desc = "Find area of car outline - example of using MinEnclosingCircle"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        video.Run()
+        video.Run(src)
         dst1 = video.dst1
         dst2 = video.dst2
 

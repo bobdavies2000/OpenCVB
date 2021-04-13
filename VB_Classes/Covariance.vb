@@ -9,12 +9,12 @@ Public Class Covariance_Basics
         task.desc = "Calculate the covariance of random depth data points."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim covariance As New cv.Mat, mean = New cv.Mat
         dst2.SetTo(0)
         If standalone Or task.intermediateReview = caller Then
-            random.Run()
+            random.Run(src)
             samples = New cv.Mat(random.Points.Length, 2, cv.MatType.CV_32F, random.Points2f)
             For i = 0 To random.Points.Length - 1
                 dst2.Circle(random.Points(i), 3, cv.Scalar.White, -1, task.lineType)
@@ -55,11 +55,11 @@ Public Class Covariance_Test
         task.desc = "Test the covariance basics algorithm."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim testInput() As Double = {1.5, 2.3, 3.0, 1.7, 1.2, 2.9, 2.1, 2.2, 3.1, 3.1, 1.3, 2.7, 2.0, 1.7, 1.0, 2.0, 0.5, 0.6, 1.0, 0.9}
         covar.samples = New cv.Mat(10, 2, cv.MatType.CV_64F, testInput)
-        covar.Run()
+        covar.Run(src)
         task.trueText("Results should be a symmetric array with 2.1 and -2.1", 20, 150)
     End Sub
 End Class

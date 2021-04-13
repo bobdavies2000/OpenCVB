@@ -81,7 +81,7 @@ Public Class SVM_Options
     Public Function f(x As Double) As Double
         Return x + 50 * Math.Sin(x / 15.0)
     End Function
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         ReDim points(sliders.trackbar(0).Value)
         ReDim responses(points.Length - 1)
@@ -118,9 +118,9 @@ Public Class SVM_Basics
         label2 = "Results - white line is ground truth"
     End Sub
 
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        svmOptions.Run() ' update any options specified in the interface.
+        svmOptions.Run(src) ' update any options specified in the interface.
         dst1 = svmOptions.dst1
 
         Dim dataMat = New cv.Mat(svmOptions.points.Length - 1, 2, cv.MatType.CV_32FC1, svmOptions.points)
@@ -178,9 +178,9 @@ Public Class SVM_Random
         task.desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        svmOptions.Run()
+        svmOptions.Run(src)
         dst1.SetTo(cv.Scalar.White)
         dst2.SetTo(cv.Scalar.White)
 
@@ -268,11 +268,11 @@ Public Class SVM_TestCase
         task.desc = "Text book example on SVM"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1.SetTo(cv.Scalar.White)
         dst2.SetTo(0)
-        svmOptions.Run()
+        svmOptions.Run(src)
 
         Dim svmx = svmOptions.createSVM()
         svmx.Train(trainMat, cv.ML.SampleTypes.RowSample, labelsMat)

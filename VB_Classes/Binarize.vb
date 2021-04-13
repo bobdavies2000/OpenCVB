@@ -17,11 +17,11 @@ Public Class Binarize_Basics
     Public Sub New()
         initParent()
         blur = New Blur_Basics()
-        mask = New cv.Mat(src.Size, cv.MatType.CV_8U, 255)
+        mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 255)
         task.desc = "Binarize an image using Threshold with OTSU."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         meanScalar = cv.Cv2.Mean(src, mask)
 
@@ -29,8 +29,7 @@ Public Class Binarize_Basics
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If useBlur Then
-            blur.src = input
-            blur.Run()
+            blur.Run(input)
             dst1 = blur.dst1.Threshold(meanScalar(0), 255, thresholdType)
         Else
             dst1 = input.Threshold(meanScalar(0), 255, thresholdType)
@@ -66,14 +65,13 @@ Public Class Binarize_OTSU
         task.desc = "Binarize an image using Threshold with OTSU."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         binarize.meanScalar = cv.Cv2.Mean(input)
-        binarize.src = input
 
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked Then label1 = radio.check(i).Text
@@ -91,7 +89,7 @@ Public Class Binarize_OTSU
                 binarize.useBlur = True
                 binarize.thresholdType = cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu
         End Select
-        binarize.Run()
+        binarize.Run(input)
         dst1 = binarize.dst1
     End Sub
 End Class
@@ -116,7 +114,7 @@ Public Class Binarize_Niblack_Sauvola
         label1 = "Binarize Niblack"
         label2 = "Binarize Sauvola"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
@@ -150,7 +148,7 @@ Public Class Binarize_Niblack_Nick
         label1 = "Binarize Niblack"
         label2 = "Binarize Nick"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
@@ -185,7 +183,7 @@ Public Class Binarize_Bernson
         task.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
@@ -225,12 +223,12 @@ Public Class Binarize_Bernson_MT
         ' task.rank = 1
         label1 = "Binarize Bernson"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
-        grid.Run()
+        grid.Run(src)
         Dim contrastMin = sliders.trackbar(1).Value
         Dim bgThreshold = sliders.trackbar(2).Value
 
@@ -270,14 +268,13 @@ Public Class Binarize_Reduction
         task.desc = "Binarize an image using reduction"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        reduction.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        reduction.Run()
+        Dim tmp = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        reduction.Run(tmp)
         dst1 = reduction.dst1.Threshold(reduction.maskVal / 2, 255, cv.ThresholdTypes.Binary)
 
-        basics.src = reduction.src
-        basics.Run()
+        basics.Run(tmp)
         dst2 = basics.dst1
     End Sub
 End Class
@@ -293,12 +290,12 @@ Public Class Binarize_Simple
     Public mask As New cv.Mat
     Public Sub New()
         initParent()
-        mask = New cv.Mat(src.Size, cv.MatType.CV_8U, 255)
+        mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 255)
 
         task.desc = "Binarize an image using Threshold with OTSU."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim input = src.Clone
@@ -333,30 +330,27 @@ Public Class Binarize_Recurse
         task.desc = "Binarize an image twice using masks"
         ' task.rank = 2
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
 
-        binarize.src = gray
         binarize.mask = New cv.Mat
-        binarize.Run()
+        binarize.Run(gray)
         mats.mat(0) = binarize.dst1.Clone
 
-        binarize.src = gray
         binarize.mask = mats.mat(0)
-        binarize.Run()
+        binarize.Run(gray)
         mats.mat(1) = binarize.dst1.Clone
 
         cv.Cv2.BitwiseNot(mats.mat(0), mats.mat(2))
-        binarize.src = gray
         binarize.mask = mats.mat(0).Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        binarize.Run()
+        binarize.Run(gray)
         mats.mat(3) = binarize.dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
 
-        mats.Run()
+        mats.Run(src)
         dst1 = mats.dst1
         dst2 = mats.mat(quadrantIndex)
         label2 = mats.label2

@@ -6,7 +6,7 @@ Public Class Font_OpenCV
         task.desc = "Display different font options available in OpenCV"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod 30 Then Exit Sub
         Dim hersheyFont = Choose(task.frameCount Mod 7 + 1, cv.HersheyFonts.HersheyComplex, cv.HersheyFonts.HersheyComplexSmall, cv.HersheyFonts.HersheyDuplex,
@@ -37,7 +37,7 @@ Public Class Font_TrueType
         task.desc = "Display different TrueType fonts"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gfontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
         Dim fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
@@ -57,18 +57,18 @@ Public Class Font_FlowText
     Public maxLineCount = 22
     Public Sub New()
         initParent()
-        If src.Height = 480 Then maxLineCount = 26
+        If dst1.Height = 480 Then maxLineCount = 26
         task.desc = "Show TrueType text flowing through an image."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             msgs.Add("-------------------------------------------------------------------------------------------------------------------")
             msgs.Add("To get text to flow across an image in any algorithm, add 'flow = new Font_FlowText()' to the class constructor.")
             msgs.Add("Also optionally indicate if you want result1 or result2 for text (the default is result1.)")
             msgs.Add("Then in your Run method, add a line 'flow.msgs.add('your next line of text')' - for as many msgs as you need on each pass.")
-            msgs.Add("Then at the end of your Run method, invoke flow.Run()")
+            msgs.Add("Then at the end of your Run method, invoke flow.Run(src)")
         End If
         Static lastCount As Integer
 

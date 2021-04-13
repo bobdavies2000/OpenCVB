@@ -34,7 +34,7 @@ Public Class DFT_Basics
         label1 = "Image after inverse DFT"
         label2 = "DFT_Basics Spectrum Magnitude"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         gray = src
         If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -70,7 +70,7 @@ Public Class DFT_Basics
         mats.mat(2) = padded(New cv.Rect(cx, 0, cx, cy)).Clone()
         mats.mat(1) = padded(New cv.Rect(0, cy, cx, cy)).Clone()
         mats.mat(0) = padded(New cv.Rect(cx, cy, cx, cy)).Clone()
-        mats.Run()
+        mats.Run(src)
         dst2 = mats.dst1
 
         dst1 = inverseDFT(complexImage)
@@ -92,7 +92,7 @@ Public Class DFT_Inverse
 		' task.rank = 1
         label1 = "Image after Inverse DFT"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
@@ -108,7 +108,7 @@ Public Class DFT_Inverse
         cv.Cv2.Absdiff(src, dst1, diff)
         mats.mat(0) = diff.Threshold(0, 255, cv.ThresholdTypes.Binary)
         mats.mat(1) = (diff * 50).ToMat
-        mats.Run()
+        mats.Run(src)
         If mats.mat(0).countnonzero() > 0 Then
             dst2 = mats.dst1
             label2 = "Mask of difference (top) and relative diff (bot)"
@@ -132,8 +132,8 @@ Public Class DFT_ButterworthFilter_MT
         initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "DFT B Filter - Radius", 1, src.Rows, src.Rows)
-            sliders.setupTrackBar(1, "DFT B Filter - Order", 1, src.Rows, 2)
+            sliders.setupTrackBar(0, "DFT B Filter - Radius", 1, dst1.Rows, dst1.Rows)
+            sliders.setupTrackBar(1, "DFT B Filter - Order", 1, dst1.Rows, 2)
         End If
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 6)
@@ -152,10 +152,9 @@ Public Class DFT_ButterworthFilter_MT
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        dft.src = src
-        dft.Run()
+        dft.Run(src)
 
         Static radius As Integer
         Static order As Integer
@@ -219,10 +218,9 @@ Public Class DFT_ButterworthDepth
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        bfilter.src = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        bfilter.Run()
+        bfilter.Run(task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst1 = bfilter.dst1
         dst2 = bfilter.dst2
     End Sub
@@ -287,7 +285,7 @@ Public Class DFT_Shapes
         task.desc = "Show the spectrum magnitude for some standard shapes. Painterly"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static circleRadio = findRadio("Draw Circle")
@@ -299,22 +297,22 @@ Public Class DFT_Shapes
         Static pointRadio = findRadio("Draw Point")
 
         If circleRadio.checked Then
-            circle.Run()
+            circle.Run(src)
             dst1 = circle.dst1
         ElseIf ellipseRadio.checked Then
-            ellipse.Run()
+            ellipse.Run(src)
             dst1 = ellipse.dst1
         ElseIf rectangleRadio.checked Then
-            rectangle.Run()
+            rectangle.Run(src)
             dst1 = rectangle.dst1
         ElseIf polygonRadio.checked Then
-            polygon.Run()
+            polygon.Run(src)
             dst1 = polygon.dst1
         ElseIf symShapeRadio.checked Then
-            symShapes.Run()
+            symShapes.Run(src)
             dst1 = symShapes.dst1
         ElseIf lineRadio.checked Then
-            lines.Run()
+            lines.Run(src)
             dst1 = lines.dst1
         ElseIf pointRadio.checked Then
             If task.frameCount Mod 30 = 0 Then
@@ -327,8 +325,7 @@ Public Class DFT_Shapes
             End If
         End If
 
-        dft.src = dst1
-        dft.Run()
+        dft.Run(dst1)
         dst2 = dft.dst2
 
         ' uncomment the following line to view the inverse of the DFT transform.  It is the grayscale image of the input - no surprise.  It works!

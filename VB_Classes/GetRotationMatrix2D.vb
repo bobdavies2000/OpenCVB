@@ -21,7 +21,7 @@ Public Class GetRotationMatrix2D_Options
         task.desc = "Run to get the warpflag based on the current options"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         For i = 0 To radio.check.Length - 1
             If radio.check(i).Checked Then
@@ -57,11 +57,11 @@ Public Class GetRotationMatrix2D_Basics
         task.desc = "Rotate a rectangle of a specified angle"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static frm = findfrm("GetRotationMatrix2D_Basics Radio Options")
 
-        rotateOptions.Run()
+        rotateOptions.Run(src)
         Dim angle = sliders.trackbar(0).Value
         M = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), angle, 1)
         dst1 = src.WarpAffine(M, src.Size(), rotateOptions.warpFlag)
@@ -87,10 +87,9 @@ Public Class GetRotationMatrix2D_Box
         task.desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        rotation.src = src
-        rotation.Run()
+        rotation.Run(src)
         dst2 = dst1.Clone()
 
         Dim r = task.drawRect

@@ -15,7 +15,7 @@ Public Class TransformationMatrix_Basics
         task.desc = "Show the contents of the transformation matrix"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.transformationMatrix IsNot Nothing Then
             Dim t = task.transformationMatrix

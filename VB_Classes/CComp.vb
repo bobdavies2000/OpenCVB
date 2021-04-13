@@ -15,7 +15,7 @@ Public Class CComp_Basics
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
-            sliders.setupTrackBar(1, "CComp Max Area", 0, src.Width * src.Height / 2, src.Width * src.Height / 4)
+            sliders.setupTrackBar(1, "CComp Max Area", 0, dst1.Width * dst1.Height / 2, dst1.Width * dst1.Height / 4)
             sliders.setupTrackBar(2, "CComp threshold", 0, 255, 128)
         End If
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -32,8 +32,8 @@ Public Class CComp_Basics
         Dim count As Integer = 0
         For Each blob In connectedComponents.Blobs
             If blob.Area < minSize Or blob.Area > maxSize Then Continue For ' skip it if too small or too big ...
-            If blob.rect.width * blob.rect.height >= src.Width * src.Height Then Continue For
-            If blob.rect.width = src.Width Or blob.rect.height = src.Height Then Continue For
+            If blob.rect.width * blob.rect.height >= dst1.Width * dst1.Height Then Continue For
+            If blob.rect.width = dst1.Width Or blob.rect.height = dst1.Height Then Continue For
             Dim rect = blob.Rect
             rects.Add(rect)
             Dim nextMask = mask(rect)
@@ -47,7 +47,7 @@ Public Class CComp_Basics
         Next
         Return count
     End Function
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         rects.Clear()
         centroids.Clear()
@@ -86,7 +86,7 @@ Public Class CComp_Basics
         label1 = CStr(count) + " items found > " + CStr(minSize) + " and < " + CStr(maxSize)
         connectedComponents.renderblobs(dst1)
 
-        mats.Run()
+        mats.Run(src)
         If check.Box(0).Checked Then
             If check.Box(1).Checked Then
                 label2 = "OTSU light, OTSU dark, rendered light, rendered dark"
@@ -146,7 +146,7 @@ Public Class CComp_Basics_FullImage
         Next
         Return count
     End Function
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1.SetTo(0)
@@ -157,7 +157,7 @@ Public Class CComp_Basics_FullImage
         count += colorWithDepth(1)
         label1 = CStr(count) + " items found and colored mean depth"
 
-        mats.Run()
+        mats.Run(src)
         dst2 = mats.dst1
     End Sub
 End Class
@@ -180,22 +180,20 @@ Public Class CComp_PointTracker
         task.desc = "Track connected componenent centroids and use it to match coloring"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        basics.src = src
-        basics.Run()
+        basics.Run(src)
 
         If trackPoints Then
             dst2 = basics.dst1
             pTrack.queryPoints = basics.centroids
             pTrack.queryRects = basics.rects
             pTrack.queryMasks = basics.masks
-            pTrack.Run()
+            pTrack.Run(src)
             dst1 = pTrack.dst1
 
             highlight.viewObjects = pTrack.drawRC.viewObjects
-            highlight.src = dst1
-            highlight.Run()
+            highlight.Run(dst1)
             dst1 = highlight.dst1
             If highlight.highlightPoint <> New cv.Point Then
                 dst2 = highlight.dst2
@@ -234,7 +232,7 @@ Public Class CComp_MaxBlobs
         task.desc = "Find the best CComp threshold to maximize the number of blobs"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static thresholdSlider = findSlider("CComp threshold")
         task.trueText("This algorithm will survey the different ccomp threshold options.", 10, 100, 3)
@@ -243,8 +241,7 @@ Public Class CComp_MaxBlobs
             Exit Sub
         End If
 
-        tracker.src = src
-        tracker.Run()
+        tracker.Run(src)
         dst1 = tracker.dst1
 
         If maxBlobs = -1 Then
@@ -252,7 +249,7 @@ Public Class CComp_MaxBlobs
             For i = 10 To 160 Step incr
                 maxValues(thresholdSlider.value) = tracker.basics.centroids.Count
                 If thresholdSlider.value + incr < 255 Then thresholdSlider.value = i
-                tracker.Run()
+                tracker.Run(src)
             Next
             tracker.trackPoints = True
 
@@ -289,19 +286,18 @@ Public Class CComp_MaxPixels
         task.desc = "Find the best CComp threshold to maximize pixels"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static pixelValues(255) As Integer ' march through all 255 values and find the best...
         Static thresholdSlider = findSlider("CComp threshold")
 
-        maxBlob.src = src
-        maxBlob.Run()
+        maxBlob.Run(src)
         dst1 = maxBlob.dst1
 
         If maxPixels = -1 Then
             For i = Math.Max(thresholdSlider.value - 10, 0) To Math.Min(thresholdSlider.value + 10, 255)
                 thresholdSlider.value = i
-                maxBlob.Run()
+                maxBlob.Run(src)
                 Dim pixelCount = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
                 pixelValues(thresholdSlider.value) = pixelCount
             Next
@@ -311,7 +307,7 @@ Public Class CComp_MaxPixels
                     thresholdSlider.value = i
                 End If
             Next
-            maxBlob.Run()
+            maxBlob.Run(src)
             dst1 = maxBlob.dst1
         Else
             Dim pixelCount = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
@@ -342,15 +338,14 @@ Public Class CComp_DepthEdges
         task.desc = "Use depth edges to isolate connected components in depth"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        depth.Run()
+        depth.Run(src)
         If standalone Or task.intermediateReview = caller Then dst2 = depth.dst2
 
         'If check.Box(0).Checked Then ccomp.basics.edgeMask = depth.dst2 Else ccomp.basics.edgeMask = Nothing
         If check.Box(0).Checked Then src.SetTo(0, depth.dst2)
-        ccomp.src = src
-        ccomp.Run()
+        ccomp.Run(src)
         dst1 = ccomp.dst1
         If ccomp.highlight.highlightPoint <> New cv.Point Then dst2 = ccomp.highlight.dst2
     End Sub
@@ -375,17 +370,20 @@ Public Class CComp_EdgeMask
         label1 = "Edges_DepthAndColor (input to ccomp)"
         label2 = "Blob Rectangles with centroids (white)"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        edges.src = src
-        edges.Run()
+        edges.Run(src)
         dst1 = edges.dst1
 
-        ccomp.src = If(standalone, edges.src, src)
-        ccomp.Run()
+        ccomp.Run(src)
         dst2 = ccomp.dst1
     End Sub
 End Class
+
+
+
+
+
 
 
 
@@ -402,7 +400,7 @@ Public Class CComp_ColorDepth
         task.desc = "Color connected components based on their depth"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
@@ -440,7 +438,7 @@ Public Class CComp_InRange_MT
         ' task.rank = 1
         label2 = "Blob rectangles - largest to smallest"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -497,7 +495,7 @@ Public Class CComp_InRange
         task.desc = "Connect components in specific ranges"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -544,7 +542,7 @@ Public Class CComp_Shapes
         task.desc = "Use connected components to isolate objects in image."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gray = shapes.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu + cv.ThresholdTypes.Binary)
@@ -588,7 +586,7 @@ Public Class CComp_Simple
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
-            sliders.setupTrackBar(1, "CComp Max Area", 0, src.Width * src.Height / 2, src.Width * src.Height / 4)
+            sliders.setupTrackBar(1, "CComp Max Area", 0, dst1.Width * dst1.Height / 2, dst1.Width * dst1.Height / 4)
             sliders.setupTrackBar(2, "CComp threshold", 0, 255, 50)
         End If
 
@@ -596,7 +594,7 @@ Public Class CComp_Simple
         task.desc = "Draw bounding boxes around RGB binarized connected Components"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         rects.Clear()
         centroids.Clear()
@@ -648,14 +646,11 @@ Public Class CComp_Binarized
         task.desc = "Find connected components using an image with binarized edges"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        edges.src = src
-        edges.Run()
+        edges.Run(src)
         dst1 = edges.dst2
-
-        ccomp.src = dst1
-        ccomp.Run()
+        ccomp.Run(dst1)
         dst2 = ccomp.dst2
     End Sub
 End Class

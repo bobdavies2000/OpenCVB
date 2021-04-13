@@ -17,14 +17,14 @@ Public Class Fractal_Mandelbrot
             sliders.setupTrackBar(0, "Mandelbrot iterations", 1, 50, 34)
         End If
         task.desc = "Run the classic Mandalbrot algorithm"
-		' task.rank = 1
-        dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+        ' task.rank = 1
+        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
         saveIterations = 0
     End Sub
     Public Sub mandelbrotLoop(y As Integer, iterations As Integer)
-        incrX = (endX - startX) / src.Width
-        incrY = (endY - startY) / src.Height
-        For x = 0 To src.Width - 1
+        incrX = (endX - startX) / dst1.Width
+        incrY = (endY - startY) / dst1.Height
+        For x = 0 To dst1.Width - 1
             Dim c = New Complex(startX + x * incrX, startY + y * incrY)
             Dim z = New Complex(0, 0)
             Dim iter = 0
@@ -35,7 +35,7 @@ Public Class Fractal_Mandelbrot
             dst1.Set(Of Byte)(y, x, If(iter < iterations, 255 * iter / (iterations - 1), 0))
         Next
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim iterations = sliders.trackbar(0).Value
         If saveIterations <> iterations Then
@@ -61,7 +61,7 @@ Public Class Fractal_Mandelbrot_MT
         task.desc = "Run a multi-threaded version of the Mandalbrot algorithm"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim iterations = mandel.sliders.trackbar(0).Value
         Parallel.For(0, src.Height,
@@ -91,7 +91,7 @@ Public Class Fractal_MandelbrotZoom
         task.desc = "Run the classic Mandalbrot algorithm and allow zooming in"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim iterations = mandel.sliders.trackbar(0).Value
 
@@ -140,11 +140,10 @@ Public Class Fractal_MandelbrotZoomColor
         task.desc = "Classic Mandelbrot in color"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        mandel.Run()
-        task.palette.src = mandel.dst1
-        task.palette.Run()
+        mandel.Run(src)
+        task.palette.Run(mandel.dst1)
         dst1 = task.palette.dst1
         label1 = mandel.label1
     End Sub
@@ -177,16 +176,16 @@ Public Class Fractal_Julia
             dst1.Set(Of Byte)(y, x, 255 - mt)
             depth = 0
         End If
-        If Math.Sqrt(Math.Pow(x - src.Width / 2, 2) + Math.Pow(y - src.Height / 2, 2)) > src.Height / 2 Then dst1.Set(Of Byte)(y, x, 0)
+        If Math.Sqrt(Math.Pow(x - dst1.Width / 2, 2) + Math.Pow(y - dst1.Height / 2, 2)) > dst1.Height / 2 Then dst1.Set(Of Byte)(y, x, 0)
         If depth < max / 4 Then Return 0
         Return julia_point(x, y, r, depth - 1, max, c, Complex.Pow(z, 2) + c)
     End Function
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static savedMouse = New cv.Point(-1, -1)
         If savedMouse <> task.mousePoint Or mandel.mandel.check.Box(0).Checked Then
             savedMouse = task.mousePoint
-            mandel.Run()
+            mandel.Run(src)
             dst2 = mandel.dst1.Clone
 
             Dim detail = 1
@@ -204,8 +203,7 @@ Public Class Fractal_Julia
                         julia_point(x, y, r, depth, depth, c, z)
                     Next
                 End Sub)
-            task.palette.src = dst1
-            task.palette.Run()
+            task.palette.Run(dst1)
             dst1 = task.palette.dst1
         End If
     End Sub

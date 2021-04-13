@@ -13,12 +13,12 @@ Public Class TimeView_Basics
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Number of frames to include", 2, 30, 10)
         End If
-        dst1 = New cv.Mat(src.Size, cv.MatType.CV_32F, 0)
-        dst2 = New cv.Mat(src.Size, cv.MatType.CV_32F, 0)
+        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_32F, 0)
+        dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_32F, 0)
         task.desc = "TimeView that highlights concentrations of depth pixels"
         ' task.rank = 3
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static sideFrames As New List(Of cv.Mat)
@@ -33,12 +33,11 @@ Public Class TimeView_Basics
             dst2.SetTo(0)
         End If
 
-        sideView.src = src
-        sideView.Run()
+        sideView.Run(src)
 
         sideFrames.Add(sideView.originalHistOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary))
 
-        topView.Run()
+        topView.Run(src)
         topFrames.Add(topView.originalHistOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary))
 
         dst1 = dst1.Add(sideFrames.ElementAt(sideFrames.Count - 1))
@@ -72,10 +71,10 @@ Public Class TimeView_TopBackProjection
         task.desc = "Backproject the side and top views into the image view"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        tFlood.Run()
+        tFlood.Run(src)
         dst2 = tFlood.dst2
 
         Dim rectlist = tFlood.floodTop.rects
@@ -106,8 +105,7 @@ Public Class TimeView_TopBackProjection
                     colorMask.SetTo((i * colorBump) Mod 255, mask)
                 End If
             Next
-            task.palette.src = colorMask
-            task.palette.Run()
+            task.palette.Run(colorMask)
             dst1 = task.palette.dst1
         Else
             task.trueText("No objects found")
@@ -137,19 +135,16 @@ Public Class TimeView_FloodFill
         task.desc = "FloodFill the histograms of side and top views - TimeView_Basics"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        tBasics.src = src
-        tBasics.Run()
+        tBasics.Run(src)
 
-        floodSide.src = tBasics.dst1.ConvertScaleAbs(255)
-        floodSide.Run()
+        floodSide.Run(tBasics.dst1.ConvertScaleAbs(255))
         dst1 = floodSide.dst1
         label1 = "SideView " + floodSide.label1
 
-        floodTop.src = tBasics.dst2.ConvertScaleAbs(255)
-        floodTop.Run()
+        floodTop.Run(tBasics.dst2.ConvertScaleAbs(255))
         dst2 = floodTop.dst1
         label2 = "TopView " + floodTop.label1
     End Sub
@@ -178,10 +173,10 @@ Public Class TimeView_Centroids
         task.desc = "Use KNN to track the query points"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        tflood.Run()
+        tflood.Run(src)
         dst1 = tflood.dst2
         dst2 = tflood.dst1
 
@@ -196,7 +191,7 @@ Public Class TimeView_Centroids
         If saveTopQueries.Count > 0 Then
             knn.knnQT.trainingPoints = saveTopQueries
             knn.knnQT.queryPoints = New List(Of cv.Point2f)(tflood.floodTop.centroids)
-            knn.Run()
+            knn.Run(src)
             For i = 0 To knn.neighbors.Rows - 1
                 Dim qPoint = tflood.floodTop.centroids(i)
                 cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, task.lineType, 0)
@@ -232,21 +227,21 @@ Public Class TimeView_Rectangles
         task.desc = "Use KNN to track the query points"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        tflood.Run()
+        tflood.Run(src)
         dst1 = tflood.dst2
         dst2 = tflood.dst1
 
         mOverLap.inputRects = New List(Of cv.Rect)(tflood.floodTop.rects)
-        mOverLap.Run()
+        mOverLap.Run(src)
         For i = 0 To mOverLap.outputRects.Count - 1
             dst1.Rectangle(mOverLap.outputRects(i), cv.Scalar.Yellow, 1)
         Next
 
         mOverLap.inputRects = New List(Of cv.Rect)(tflood.floodSide.rects)
-        mOverLap.Run()
+        mOverLap.Run(src)
         For i = 0 To mOverLap.outputRects.Count - 1
             dst2.Rectangle(mOverLap.outputRects(i), cv.Scalar.Yellow, 1)
         Next
@@ -278,22 +273,20 @@ Public Class TimeView_Frustrum
         task.desc = "Colorize the back and side views"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        tView.Run()
+        tView.Run(src)
         mats.mat(0) = tView.dst1.Clone
         mats.mat(1) = tView.dst2.Clone
 
-        cmatTop.src = tView.dst1
-        cmatTop.Run()
+        cmatTop.Run(tView.dst1)
         mats.mat(2) = cmatTop.dst1
 
-        cmatSide.src = tView.dst2
-        cmatSide.Run()
+        cmatSide.Run(tView.dst2)
         mats.mat(3) = cmatSide.dst1
 
-        mats.Run()
+        mats.Run(src)
         dst1 = mats.dst1
         dst2 = mats.dst2
     End Sub

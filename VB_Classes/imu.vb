@@ -17,7 +17,7 @@ Public Class IMU_Basics
         task.desc = "Read and display the IMU coordinates"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim alpha As Double = sliders.trackbar(0).Value / 1000
         If task.frameCount = 0 Then
@@ -50,7 +50,7 @@ Public Class IMU_Basics
                                   " Yaw = " + Format(task.IMU_AngularVelocity.Y, "#0.00") + " Roll = " + Format(task.IMU_AngularVelocity.Z, "#0.00"))
         End If
         label1 = "theta.x " + Format(theta.X, "#0.000") + " y " + Format(theta.Y, "#0.000") + " z " + Format(theta.Z, "#0.000")
-        flow.Run()
+        flow.Run(src)
     End Sub
 End Class
 
@@ -71,7 +71,7 @@ Public Class IMU_Stabilizer
         label1 = "IMU Stabilize (Move Camera + Select Kalman)"
         label2 = "Difference from Color Image"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim borderCrop = 5
         Dim vert_Border = borderCrop * src.Rows / src.Cols
@@ -82,7 +82,7 @@ Public Class IMU_Stabilizer
         Dim sy = 1 ' assume no scaling is taking place.
 
         kalman.kInput = {dx, dy, da}
-        kalman.Run()
+        kalman.Run(src)
         dx = kalman.kOutput(0)
         dy = kalman.kOutput(1)
         da = kalman.kOutput(2)
@@ -124,7 +124,7 @@ Public Class IMU_Magnetometer
         task.desc = "Get the IMU_Magnetometer values from the IMU (if available)"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.IMU_Magnetometer = New cv.Point3f Then
             task.trueText("The IMU for this camera does not have Magnetometer readings.")
@@ -133,7 +133,7 @@ Public Class IMU_Magnetometer
                                                   "Uncalibrated IMU Magnetometer reading:  y = " + CStr(task.IMU_Magnetometer.Y) + vbCrLf +
                                                   "Uncalibrated IMU Magnetometer reading:  z = " + CStr(task.IMU_Magnetometer.Z))
             plot.plotData = New cv.Scalar(task.IMU_Magnetometer.X, task.IMU_Magnetometer.Y, task.IMU_Magnetometer.Z)
-            plot.Run()
+            plot.Run(src)
             label2 = "x (blue) = " + Format(plot.plotData.Item(0), "#0.00") + " y (green) = " + Format(plot.plotData.Item(1), "#0.00") +
                           " z (red) = " + Format(plot.plotData.Item(2), "#0.00")
         End If
@@ -150,7 +150,7 @@ Public Class IMU_Barometer
         task.desc = "Get the barometric pressure from the IMU (if available)"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.IMU_Barometer = 0 Then
             task.trueText("The IMU for this camera does not have barometric pressure.")
@@ -171,7 +171,7 @@ Public Class IMU_Temperature
         task.desc = "Get the temperature of the IMU (if available)"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         task.trueText("IMU Temperature is " + Format(task.IMU_Temperature, "#0.00") + " degrees Celsius." + vbCrLf +
                       "IMU Temperature is " + Format(task.IMU_Temperature * 9 / 5 + 32, "#0.00") + " degrees Fahrenheit.")
@@ -204,7 +204,7 @@ Public Class IMU_FrameTime
         task.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static IMUanchor As Integer = task.IMU_FrameTime
         Static histogramIMU(plot.maxScale) As Integer
@@ -258,7 +258,7 @@ Public Class IMU_FrameTime
                         "IMU Anchor Frame Time = White (IMU Frame Time that occurs most often" + vbCrLf + vbCrLf + vbCrLf
 
             plot.plotData = New cv.Scalar(task.IMU_FrameTime, task.CPU_FrameTime, IMUtoCaptureEstimate, IMUanchor)
-            plot.Run()
+            plot.Run(src)
 
             If plot.maxScale - plot.minScale > histogramIMU.Count Then ReDim histogramIMU(plot.maxScale - plot.minScale)
 
@@ -302,9 +302,9 @@ Public Class IMU_HostFrameTimes
         End If
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         task.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static CPUanchor As Integer = task.CPU_FrameTime
         Static hist(plot.maxScale) As Integer
@@ -346,7 +346,7 @@ Public Class IMU_HostFrameTimes
                          "White" + vbTab + "Host Anchor Frame Time (Host Frame Time that occurs most often" + vbCrLf + vbCrLf + vbCrLf
 
             plot.plotData = New cv.Scalar(task.IMU_FrameTime, task.CPU_FrameTime, HostInterruptDelayEstimate, CPUanchor)
-            plot.Run()
+            plot.Run(src)
 
             If plot.maxScale - plot.minScale > hist.Count Then ReDim hist(plot.maxScale - plot.minScale)
 
@@ -390,16 +390,16 @@ Public Class IMU_TotalDelay
         label1 = "Timing data - total (white) right image"
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         task.desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        host.Run()
-        imu.Run()
+        host.Run(src)
+        imu.Run(src)
         Dim totaldelay = host.HostInterruptDelayEstimate + imu.IMUtoCaptureEstimate
 
         kalman.inputReal = totaldelay
-        kalman.Run()
+        kalman.Run(src)
 
         Static sampledCPUDelay = host.HostInterruptDelayEstimate
         Static sampledIMUDelay = imu.IMUtoCaptureEstimate
@@ -422,7 +422,7 @@ Public Class IMU_TotalDelay
                      "White" + vbTab + "Host+IMU Anchor Frame Time (Host Frame Time that occurs most often)" + vbCrLf + vbCrLf + vbCrLf
 
         plot.plotData = New cv.Scalar(imu.IMUtoCaptureEstimate, host.HostInterruptDelayEstimate, totaldelay, kalman.stateResult)
-        plot.Run()
+        plot.Run(src)
 
         Static countSlider = findSlider("Number of Plot Values")
         Dim plotLastX = countSlider.value
@@ -472,7 +472,7 @@ Public Class IMU_GVector
         task.desc = "Find the angle of tilt for the camera with respect to gravity."
         ' task.rank = 5
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gx = task.IMU_Acceleration.X
         Dim gy = task.IMU_Acceleration.Y
@@ -500,7 +500,7 @@ Public Class IMU_GVector
         kalman.kInput = {gx, gy, gz, task.angleX, task.angleY, task.angleZ}
 
         If task.useKalman Then
-            kalman.Run()
+            kalman.Run(src)
             gx = kalman.kOutput(0)
             gy = kalman.kOutput(1)
             gz = kalman.kOutput(2)
@@ -562,7 +562,7 @@ Public Class IMU_isCameraLevel
         task.desc = "Answer the question: Is the camera level?"
         ' task.rank = 3
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gx = task.IMU_Acceleration.X
         Dim gy = task.IMU_Acceleration.Y
@@ -579,7 +579,7 @@ Public Class IMU_isCameraLevel
                           " Angle Y = " + Format(angleY, "0.00") + " degrees" +
                           " Angle Z = " + Format(angleZ, "0.00") + " degrees" +
                           If(cameraLevel, " - Camera is level", " - Camera is NOT level"))
-            flow.Run()
+            flow.Run(src)
         End If
     End Sub
 End Class
@@ -603,7 +603,7 @@ Public Class IMU_IscameraStable
         task.desc = "Answer the question: Is the camera stable?"
         ' task.rank = 3
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim pitch = task.IMU_AngularVelocity.X

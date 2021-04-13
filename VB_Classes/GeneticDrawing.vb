@@ -29,7 +29,7 @@ Public Class GeneticDrawing_Options
         task.desc = "Display all the options available to genetic drawing algorithms."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         task.trueText("There is no output for this algorithm - just controls showing the genetic drawing options")
     End Sub
@@ -152,7 +152,7 @@ Public Class GeneticDrawing_Basics
         mats.mat(3) = runDNAseq(DNAseq)
         totalError = calculateError(mats.mat(3))
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static genSlider = findSlider("Number of Generations")
@@ -181,8 +181,7 @@ Public Class GeneticDrawing_Basics
 
             src = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
             mats.mat(0) = src
-            gradient.src = mats.mat(0)
-            gradient.Run()
+            gradient.Run(mats.mat(0))
             mats.mat(2) = gradient.magnitude.ConvertScaleAbs(255)
 
             startNewStage(r)
@@ -239,7 +238,7 @@ Public Class GeneticDrawing_Basics
             startNewStage(r)
         End If
 
-        mats.Run()
+        mats.Run(src)
         dst1 = mats.dst1
         label2 = " stage " + CStr(stage) + "/" + CStr(stageTotal) + " Gen " + Format(generation, "00") + " chgs = " + CStr(changes) + " err/1000 = " + CStr(CInt(totalError / 1000))
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
@@ -268,7 +267,7 @@ Public Class GeneticDrawing_Color
         task.desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes. Painterly"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim split() As cv.Mat
         split = src.Split()
@@ -278,8 +277,7 @@ Public Class GeneticDrawing_Color
         restartCheck.checked = False
         For i = 0 To split.Count - 1
             gDraw(i).restartRequested = restartRequested
-            gDraw(i).src = split(i)
-            gDraw(i).Run()
+            gDraw(i).Run(split(i))
             split(i) = gDraw(i).dst2
         Next
 
@@ -322,7 +320,7 @@ Public Class GeneticDrawing_Photo
         task.desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes. Painterly"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static fileInputName = New FileInfo(fileNameForm.filename.Text)
@@ -352,10 +350,9 @@ Public Class GeneticDrawing_Photo
                 src = fullsizeImage
             End If
             SaveSetting("OpenCVB", "PhotoFileName", "PhotoFileName", fileInputName.FullName)
-            gDraw.src = src
         End If
 
-        gDraw.Run()
+        gDraw.Run(src)
 
         dst1 = gDraw.dst1
         dst2 = gDraw.dst2

@@ -19,7 +19,7 @@ Public Class LeftRightView_Basics
                 label2 = "Right Image"
         End Select
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = task.leftView
         dst2 = task.rightView
@@ -43,7 +43,7 @@ Public Class LeftRightView_CompareRaw
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Infrared Brightness", 0, 255, 100)
             sliders.setupTrackBar(1, "Slice Starting Y", 0, 300, 100)
-            sliders.setupTrackBar(2, "Slice Height", 1, (src.Rows - 100) / 2, 30)
+            sliders.setupTrackBar(2, "Slice Height", 1, (dst1.Rows - 100) / 2, 30)
         End If
 
         Select Case task.parms.cameraName
@@ -60,9 +60,9 @@ Public Class LeftRightView_CompareRaw
         task.desc = "Show slices of the left and right view next to each other for visual comparison"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        lrView.Run()
+        lrView.Run(src)
 
         dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, 0)
 
@@ -97,19 +97,17 @@ Public Class LeftRightView_Features
         label1 = "Left Image"
         label2 = "Right Image"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        lrView.Run()
+        lrView.Run(src)
 
-        features.src = lrView.dst2
-        features.Run()
+        features.Run(lrView.dst2)
         lrView.dst2.CopyTo(dst2)
         For i = 0 To features.goodFeatures.Count - 1
             cv.Cv2.Circle(dst2, features.goodFeatures(i), 3, cv.Scalar.White, -1, task.lineType)
         Next
 
-        features.src = lrView.dst1
-        features.Run()
+        features.Run(lrView.dst1)
         lrView.dst1.CopyTo(dst1)
         For i = 0 To features.goodFeatures.Count - 1
             cv.Cv2.Circle(dst1, features.goodFeatures(i), 3, cv.Scalar.White, -1, task.lineType)
@@ -132,16 +130,14 @@ Public Class LeftRightView_Palettized
         label1 = "Left Image"
         label2 = "Right Image"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        lrView.Run()
+        lrView.Run(src)
 
-        task.palette.src = lrView.dst1
-        task.palette.Run()
+        task.palette.Run(lrView.dst1)
         dst1 = task.palette.dst1
 
-        task.palette.src = lrView.dst2
-        task.palette.Run()
+        task.palette.Run(lrView.dst2)
         dst2 = task.palette.dst1
     End Sub
 End Class
@@ -165,15 +161,13 @@ Public Class LeftRightView_BRISK
 
         lrView = New LeftRightView_Basics()
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        lrView.Run()
-        brisk.src = lrView.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        brisk.Run()
+        lrView.Run(src)
+        brisk.Run(lrView.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
         dst2 = brisk.dst1
 
-        brisk.src = lrView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        brisk.Run()
+        brisk.Run(lrView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
         dst1 = brisk.dst1
     End Sub
 End Class
@@ -203,7 +197,7 @@ Public Class LeftRightView_BrightnessContrast
         task.desc = "Enhance the left/right views with brightness and contrast."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = task.leftView.ConvertScaleAbs(sliders.trackbar(0).Value / 500, sliders.trackbar(1).Value)
         dst2 = task.rightView.ConvertScaleAbs(sliders.trackbar(0).Value / 500, sliders.trackbar(1).Value)

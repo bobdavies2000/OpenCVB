@@ -33,7 +33,7 @@ Public Class DNN_Test
         task.desc = "Download and use a Caffe database"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim image = cv.Cv2.ImRead(task.parms.homeDir + "Data/space_shuttle.jpg")
@@ -65,7 +65,7 @@ Public Class DNN_Caffe_CS
         Dim synsetWords = task.parms.homeDir + "Data/synset_words.txt"
         caffeCS.initialize(protoTxt, modelFile, synsetWords)
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim image = cv.Cv2.ImRead(task.parms.homeDir + "Data/space_shuttle.jpg")
         Dim str = caffeCS.Run(image)
@@ -104,9 +104,9 @@ Public Class DNN_Basics
             ReDim kalman(i).kOutput(4 - 1)
         Next
 
-        dnnWidth = src.Height ' height is always smaller than width...
-        dnnHeight = src.Height
-        crop = New cv.Rect(src.Width / 2 - dnnWidth / 2, src.Height / 2 - dnnHeight / 2, dnnWidth, dnnHeight)
+        dnnWidth = dst1.Height ' height is always smaller than width...
+        dnnHeight = dst1.Height
+        crop = New cv.Rect(dst1.Width / 2 - dnnWidth / 2, dst1.Height / 2 - dnnHeight / 2, dnnWidth, dnnHeight)
 
         Dim infoText As New FileInfo(task.parms.homeDir + "Data/MobileNetSSD_deploy.prototxt")
         If infoText.Exists Then
@@ -123,7 +123,7 @@ Public Class DNN_Basics
 		' task.rank = 1
         label1 = "Cropped Input Image - must be square!"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If dnnPrepared Then
             Dim inScaleFactor = sliders.trackbar(0).Value / sliders.trackbar(0).Maximum ' should be 0.0078 by default...
@@ -178,7 +178,7 @@ Public Class DNN_Basics
 
                     If minIndex < kalman.Count Then
                         kalman(minIndex).kInput = {rect.X, rect.Y, rect.Width, rect.Height}
-                        kalman(minIndex).Run()
+                        kalman(minIndex).Run(src)
                         rect = New cv.Rect(kalman(minIndex).kOutput(0), kalman(minIndex).kOutput(1), kalman(minIndex).kOutput(2), kalman(minIndex).kOutput(3))
                     End If
                     dst2.Rectangle(rect, cv.Scalar.Yellow, 3, task.lineType)

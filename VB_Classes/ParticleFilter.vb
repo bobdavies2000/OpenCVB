@@ -15,7 +15,7 @@ Public Class ParticleFilter_Example
         task.desc = "Particle Filter example downloaded from github - hyperlink in the code shows URL."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static imageFrame = 12
         imageFrame += 1

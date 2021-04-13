@@ -18,7 +18,7 @@ Public Class BlockMatching_Basics
         label1 = "Block matching disparity colorized like depth"
         label2 = "Right Image (used with left image)"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
             task.trueText("For the Kinect 4 Azure camera, the left and right views are the same.")
@@ -43,19 +43,16 @@ Public Class BlockMatching_Basics
 
         Dim disparity As New cv.Mat
         blockMatch.compute(task.leftView, task.rightView, disparity)
-        disparity.ConvertTo(colorizer.src, cv.MatType.CV_32F, 1 / 16)
-        colorizer.src = colorizer.src.Threshold(0, 0, cv.ThresholdTypes.Tozero)
+        Dim ctmp As New cv.Mat
+        disparity.ConvertTo(ctmp, cv.MatType.CV_32F, 1 / 16)
+        ctmp = ctmp.Threshold(0, 0, cv.ThresholdTypes.Tozero)
         Dim topMargin = 10, sideMargin = 8
         Dim rect = New cv.Rect(numDisparity + sideMargin, topMargin, src.Width - numDisparity - sideMargin * 2, src.Height - topMargin * 2)
-        Dim tmp = New cv.Mat(src.Size(), cv.MatType.CV_32F, 0)
         Dim distance = sliders.trackbar(2).Value * 1000
-        cv.Cv2.Divide(distance, colorizer.src(rect), colorizer.src(rect)) ' this needs much more refinement.  The trackbar3 value is just an approximation.
-        colorizer.src(rect) = colorizer.src(rect).Threshold(10000, 10000, cv.ThresholdTypes.Trunc)
-        colorizer.Run()
+        cv.Cv2.Divide(distance, ctmp(rect), ctmp(rect)) ' this needs much more refinement.  The trackbar3 value is just an approximation.
+        ctmp(rect) = ctmp(rect).Threshold(10000, 10000, cv.ThresholdTypes.Trunc)
+        colorizer.Run(ctmp)
         dst1(rect) = colorizer.dst1(rect)
         dst2 = task.rightView.Resize(src.Size())
     End Sub
 End Class
-
-
-

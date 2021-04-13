@@ -49,7 +49,7 @@ Public Class OpenGL_Basics
         For i = 0 To memMapValues.Length - 1
             ' only change this if you are changing the data in the OpenGL C++ code at the same time...
             memMapValues(i) = Choose(i + 1, task.frameCount, task.parms.intrinsicsLeft.fx, task.parms.intrinsicsLeft.fy,
-                                     task.parms.intrinsicsLeft.ppx, task.parms.intrinsicsLeft.ppy, src.Width, src.Height, src.ElemSize * src.Total,
+                                     task.parms.intrinsicsLeft.ppx, task.parms.intrinsicsLeft.ppy, dst1.Width, dst1.Height, dst1.ElemSize * dst1.Total,
                                      dataInput.Total * dataInput.ElemSize, FOV, yaw, pitch, roll, zNear, zFar, pointSize, dataInput.Width, dataInput.Height,
                                      task.IMU_AngularVelocity.X, task.IMU_AngularVelocity.Y, task.IMU_AngularVelocity.Z,
                                      task.IMU_Acceleration.X, task.IMU_Acceleration.Y, task.IMU_Acceleration.Z, task.IMU_TimeStamp,
@@ -78,7 +78,7 @@ Public Class OpenGL_Basics
         imageLabel = OpenGLTitle ' default title - can be overridden with each image.
         pipe.WaitForConnection()
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Or pointCloudInput Is Nothing Then pointCloudInput = task.pointCloud
 
@@ -165,10 +165,10 @@ Public Class OpenGL_Options
         OpenGL = New OpenGL_Basics()
         setOpenGLsliders(caller, sliders)
         task.desc = "Adjust point size and FOV in OpenGL"
-		' task.rank = 1
+        ' task.rank = 1
         label1 = ""
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         OpenGL.FOV = sliders.trackbar(0).Value
@@ -189,10 +189,9 @@ Public Class OpenGL_Options
         OpenGL.scaleXYZ.Item1 = sliders.trackbar(12).Value
         OpenGL.scaleXYZ.Item2 = sliders.trackbar(13).Value
 
-        OpenGL.src = src
         OpenGL.pointCloudInput = pointCloudInput
         If OpenGL.pointCloudInput Is Nothing Then OpenGL.pointCloudInput = task.pointCloud
-        OpenGL.Run()
+        OpenGL.Run(src)
     End Sub
 End Class
 
@@ -208,14 +207,13 @@ Public Class OpenGL_Callbacks
         ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         task.desc = "Show the point cloud of 3D data and use callbacks to modify view."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        ogl.src = src
         If standalone Then pointCloudInput = task.pointCloud
         ogl.pointCloudInput = pointCloudInput
-        ogl.Run()
+        ogl.Run(src)
     End Sub
 End Class
 
@@ -238,15 +236,14 @@ Public Class OpenGL_IMU
         ogl.sliders.trackbar(2).Value = 0 ' yaw
         ogl.sliders.trackbar(3).Value = 0 ' roll
         task.desc = "Show how to use IMU coordinates in OpenGL"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.IMU_Present Then
-            imu.Run()
+            imu.Run(src)
             ogl.OpenGL.dataInput = New cv.Mat(100, 100, cv.MatType.CV_32F, 0)
-            ogl.src = src
-            ogl.Run() ' we are not moving any images to OpenGL - just the IMU value which are already in the memory mapped file.
+            ogl.Run(src) ' we are not moving any images to OpenGL - just the IMU value which are already in the memory mapped file.
         Else
             task.trueText("The IMU is not working or is unavailable")
         End If
@@ -280,14 +277,14 @@ Public Class OpenGL_3Ddata
         colors = New Palette_Gradient()
         colors.color1 = cv.Scalar.Yellow
         colors.color2 = cv.Scalar.Blue
-        colors.Run()
-        ogl.OpenGL.src = dst1.Clone() ' only need to set this once.
+        colors.Run(dst1)
+        ' ogl.OpenGL.src = dst1.Clone() ' only need to set this once.
 
         label1 = "Input to Histogram 3D"
         task.desc = "Plot the results of a 3D histogram in OpenGL."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim bins = sliders.trackbar(0).Value
 
@@ -303,8 +300,7 @@ Public Class OpenGL_3Ddata
         histogram = histogram.Normalize(255)
 
         ogl.OpenGL.dataInput = histogram.Clone()
-        ogl.src = src
-        ogl.Run()
+        ogl.Run(src)
     End Sub
 End Class
 
@@ -330,16 +326,15 @@ Public Class OpenGL_Draw3D
         ogl.pointCloudInput = New cv.Mat ' we are not using the point cloud when displaying data.
         label2 = "Grayscale image sent to OpenGL"
         task.desc = "Draw in an image show it in 3D in OpenGL without any explicit math"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        circle.Run()
+        circle.Run(src)
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ogl.OpenGL.dataInput = dst2
-        ogl.OpenGL.src = New cv.Mat(1, task.vecColors.Length - 1, cv.MatType.CV_8UC3, task.vecColors.ToArray)
-        ogl.src = src
-        ogl.Run()
+        ' ogl.OpenGL.src = New cv.Mat(1, task.vecColors.Length - 1, cv.MatType.CV_8UC3, task.vecColors.ToArray)
+        ogl.Run(src)
     End Sub
 End Class
 
@@ -358,12 +353,11 @@ Public Class OpenGL_Voxels
         ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Voxels"
         task.desc = "Show the voxel representation in OpenGL"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        voxels.src = src
-        voxels.Run()
+        voxels.Run(src)
         Static intermediateResults = findCheckBox("Display intermediate results")
         If intermediateResults.checked Then
             dst1 = voxels.dst1
@@ -371,8 +365,7 @@ Public Class OpenGL_Voxels
         End If
 
         ogl.dataInput = New cv.Mat(voxels.grid.tilesPerCol, voxels.grid.tilesPerRow, cv.MatType.CV_32F, voxels.voxels)
-        ogl.src = src
-        ogl.Run()
+        ogl.Run(src)
     End Sub
 End Class
 
@@ -396,17 +389,15 @@ Public Class OpenGL_GravityTransform
         ogl.OpenGLTitle = "OpenGL_Callbacks"
 
         task.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.IMU_Present Then
-            gCloud.src = task.pointCloud
-            gCloud.Run()
+            gCloud.Run(task.pointCloud)
 
             ogl.pointCloudInput = gCloud.dst1
-            ogl.src = src
-            ogl.Run()
+            ogl.Run(src)
         Else
             task.trueText("The IMU is not working or is unavailable")
         End If
@@ -430,19 +421,18 @@ Public Class OpenGL_Floor
 
         plane = New Structured_LinearizeFloor()
         task.desc = "Convert depth cloud floor to a plane and visualize it with OpenGL"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.parms.IMU_Present Then
-            plane.Run()
+            plane.Run(src)
             dst1 = plane.dst1
             dst2 = plane.dst2
 
             ogl.pointCloudInput = plane.imuPointCloud
-            ogl.src = src
-            ogl.Run()
+            ogl.Run(src)
         Else
             task.trueText("The IMU is not working or is unavailable")
         End If
@@ -466,14 +456,13 @@ Public Class OpenGL_FloorPlane
         ogl.OpenGLTitle = "OpenGL_FloorPlane"
         plane = New Structured_LinearizeFloor()
         task.desc = "Show the floor in the pointcloud as a plane"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.parms.IMU_Present Then
-            plane.src = src
-            plane.Run()
+            plane.Run(src)
             dst1 = plane.dst1
             dst2 = plane.dst2
 
@@ -485,8 +474,7 @@ Public Class OpenGL_FloorPlane
             data.Set(Of Single)(3, 0, plane.floor.floorYplane)
             ogl.dataInput = data
             ogl.pointCloudInput = plane.imuPointCloud
-            ogl.src = src
-            ogl.Run()
+            ogl.Run(src)
         Else
             task.trueText("The IMU is not working or is unavailable")
         End If
@@ -512,7 +500,7 @@ End Class
 '        floor = New OpenGL_FloorPlane()
 '        task.desc = "Texture the plane of the floor with a good sample of the texture from the mask"
 '    End Sub
-'    Public Sub Run()
+'    Public Sub Run(src as cv.Mat)
 '        If task.intermediateReview = caller Then task.intermediateObject = Me
 
 '        If task.parms.IMU_Present Then
@@ -559,19 +547,18 @@ Public Class OpenGL_DepthSliceH
         ogl.OpenGLTitle = "OpenGL_Callbacks"
 
         task.desc = "View depth slices in 3D with OpenGL"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        slices.Run()
+        slices.Run(src)
         dst1 = slices.dst1
         Dim mask As New cv.Mat
         cv.Cv2.BitwiseNot(slices.sliceMask, mask)
 
         ogl.pointCloudInput = slices.side2D.gCloud.dst1.Clone
         ogl.pointCloudInput.SetTo(0, mask)
-        ogl.src = New cv.Mat(mask.Size, cv.MatType.CV_8UC3, cv.Scalar.White)
-        ogl.Run()
+        ogl.Run(New cv.Mat(mask.Size, cv.MatType.CV_8UC3, cv.Scalar.White))
     End Sub
 End Class
 
@@ -593,17 +580,16 @@ Public Class OpenGL_StableDepth
         ogl = New OpenGL_Options
 
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        pcValid.Run()
+        pcValid.Run(src)
         dst1 = pcValid.dst1
         dst2 = pcValid.dst2
         ogl.pointCloudInput = pcValid.dst2
-        ogl.src = task.color
-        ogl.Run()
+        ogl.Run(task.color)
     End Sub
 End Class
 
@@ -624,24 +610,22 @@ Public Class OpenGL_AverageDepth
 
         label2 = "32-bit format stabilized depth data"
         task.desc = "Use the depth_stabilizer output as input the an OpenGL display"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim split = task.pointCloud.Split()
 
-        stable.src = src
-        If stable.src.Type <> cv.MatType.CV_32F Then stable.src = split(2) * 1000
+        If src.Type <> cv.MatType.CV_32F Then src = split(2) * 1000
 
-        stable.Run()
+        stable.Run(src)
         dst1 = stable.dst2
 
         split(2) = stable.dst2 * 0.001
         cv.Cv2.Merge(split, dst2)
         ogl.pointCloudInput = dst2
-        ogl.src = task.color
-        ogl.Run()
+        ogl.Run(task.color)
     End Sub
 End Class
 
@@ -664,18 +648,17 @@ Public Class OpenGL_StableDepthMouse
 
         label2 = "dst2 is a pointcloud"
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        pcValid.Run()
+        pcValid.Run(src)
         dst1 = pcValid.dst1
         dst2 = pcValid.dst2
 
         ogl.pointCloudInput = pcValid.dst2
-        ogl.src = task.color
-        ogl.Run()
+        ogl.Run(task.color)
     End Sub
 End Class
 
@@ -696,18 +679,17 @@ Public Class OpenGL_SmoothSurfaces
         ogl = New OpenGL_Callbacks
 
         task.desc = "Filter the 3D image to show only smooth surfaces."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        smooth.Run()
+        smooth.Run(src)
         dst1 = smooth.dst2
 
         smooth.pcValid.dst2.CopyTo(dst2, smooth.dst2)
         ogl.pointCloudInput = dst2
-        ogl.src = task.color
-        ogl.Run()
+        ogl.Run(task.color)
     End Sub
 End Class
 
@@ -726,17 +708,16 @@ Public Class OpenGL_Stable
         stable = New Motion_MinMaxPointCloud
         ogl = New OpenGL_Callbacks
         task.desc = "Use the Motion_MinMaxPointCloud in 3D"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        stable.Run()
+        stable.Run(src)
         dst1 = stable.dst1
 
         ogl.pointCloudInput = stable.dst2
-        ogl.src = task.color
-        ogl.Run()
+        ogl.Run(task.color)
 
         label2 = stable.label2
     End Sub
@@ -758,16 +739,15 @@ Public Class OpenGL_ReducedXYZ
         ogl = New OpenGL_Basics
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         task.desc = "Display the pointCloud after reduction in X, Y, or Z dimensions."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        reduction.Run()
+        reduction.Run(src)
         dst2 = reduction.dst2
 
         ogl.pointCloudInput = reduction.dst2
-        ogl.src = src
-        ogl.Run()
+        ogl.Run(src)
     End Sub
 End Class
 
@@ -789,15 +769,14 @@ Public Class OpenGL_Reduction
         task.desc = "Use the reduced depth pointcloud in OpenGL"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        reduction.Run()
+        reduction.Run(src)
         dst1 = reduction.dst1
         dst2 = reduction.dst2
 
         ogl.pointCloudInput = reduction.dst2
-        ogl.src = src
-        ogl.Run()
+        ogl.Run(src)
     End Sub
 End Class
 
@@ -816,17 +795,16 @@ Public Class OpenGL_ReducedSideView
         reduced = New PointCloud_ReducedSideView
         ogl = New OpenGL_Callbacks
         task.desc = "Use the reduced depth pointcloud in 3D but allow it to be rotated in Options_Common"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        reduced.Run()
+        reduced.Run(src)
         dst1 = reduced.dst1
 
         ogl.pointCloudInput = reduced.dst2
-        ogl.src = task.color
-        ogl.Run()
+        ogl.Run(task.color)
 
         label1 = reduced.label1
     End Sub
@@ -847,18 +825,17 @@ Public Class OpenGL_MFD_PointCloud
         mfd = New MFD_PointCloud
         ogl = New OpenGL_Callbacks
         task.desc = "Use the MFD_PointCloud in 3D"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        mfd.Run()
+        mfd.Run(src)
         dst1 = mfd.dst1
         dst2 = mfd.dst2
 
         ogl.pointCloudInput = dst1
-        ogl.src = task.color
-        ogl.Run()
+        ogl.Run(task.color)
 
         label2 = mfd.label2
     End Sub
@@ -881,17 +858,16 @@ Public Class OpenGL_Structured_PointCloud
 
         label1 = "Structured cloud 32fC3 data"
         task.desc = "Visualize the Structured_Cloud"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        sCloud.Run()
+        sCloud.Run(src)
         dst1 = sCloud.dst1
 
         ogl.pointCloudInput = dst1
-        ogl.src = New cv.Mat(src.Size, cv.MatType.CV_8UC3, cv.Scalar.White)
-        ogl.Run()
+        ogl.Run(New cv.Mat(src.Size, cv.MatType.CV_8UC3, cv.Scalar.White))
     End Sub
 End Class
 

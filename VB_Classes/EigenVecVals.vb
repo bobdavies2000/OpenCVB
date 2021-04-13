@@ -9,7 +9,7 @@ Public Class EigenVecVals_Basics
         label1 = "EigenVec (solution)"
         label2 = "Relationship between Eigen Vec and Vals"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim a() As Double = {1.96, -6.49, -0.47, -7.2, -0.65,
                              -6.49, 3.8, -6.39, 1.5, -6.34,

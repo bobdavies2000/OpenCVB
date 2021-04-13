@@ -15,7 +15,7 @@ Public Class Math_Subtract
         task.desc = "Subtract a Mat using a scalar.  Set scalar to zero to see pixels saturate to zero."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim bgr = New cv.Scalar(sliders.trackbar(2).Value, sliders.trackbar(1).Value, sliders.trackbar(0).Value)
         cv.Cv2.Subtract(bgr, src, dst1) ' or dst1 = bgr - src
@@ -68,7 +68,7 @@ Public Class Math_Median_CDF
         task.desc = "Compute the src image median"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If standalone or task.intermediateReview = caller Then bins = sliders.trackbar(0).Value
@@ -104,10 +104,9 @@ Public Class Math_DepthMeanStdev
         task.desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        minMax.src = src
-        minMax.Run()
+        minMax.Run(src)
         Dim mean As Single = 0, stdev As Single = 0
         Dim mask = minMax.dst2 ' the mask for stable depth.
         dst2.SetTo(0)
@@ -137,26 +136,26 @@ Public Class Math_RGBCorrelation
         task.desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim split = src.Split()
         match.searchArea = split(0)
         match.template = split(1)
-        match.Run()
+        match.Run(src)
         Dim blueGreenCorrelation = "Blue-Green " + match.label1
 
         match.searchArea = split(2)
         match.template = split(1)
-        match.Run()
+        match.Run(src)
         Dim redGreenCorrelation = "Red-Green " + match.label1
 
         match.searchArea = split(2)
         match.template = split(0)
-        match.Run()
+        match.Run(src)
         Dim redBlueCorrelation = "Red-Blue " + match.label1
 
         flow.msgs.Add(blueGreenCorrelation + " " + redGreenCorrelation + " " + redBlueCorrelation)
-        flow.Run()
+        flow.Run(src)
         label1 = "Log of " + match.matchText
     End Sub
 End Class
@@ -177,7 +176,7 @@ Public Class Math_ImageAverage
         task.desc = "Create an image that is the mean of x number of previous images."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static avgSlider = findSlider("Average - number of input images")
@@ -244,14 +243,14 @@ Public Class Math_Stdev
         task.desc = "Compute the standard deviation in each segment"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim updateCount As Integer
         lowStdevMask.SetTo(0)
         highStdevMask.SetTo(0)
         Dim fsize = task.fontSize / 3
 
-        grid.Run()
+        grid.run(src)
 
         dst1 = src.Clone
         If dst1.Channels = 3 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -309,11 +308,10 @@ Public Class Math_StdevBoundary
         task.desc = "Explore how to get a better boundary on the low stdev mask"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        stdev.src = src
-        stdev.Run()
+        stdev.Run(src)
         dst1 = stdev.dst1
         stdev.saveFrame.CopyTo(dst2)
 

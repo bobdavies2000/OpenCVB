@@ -12,7 +12,7 @@ Public Class Dlib_Sobel_CS
         task.desc = "Testing the DLib interface with a simple Sobel example"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -20,7 +20,7 @@ Public Class Dlib_Sobel_CS
         sobel.Run(input)
 
         d2Mat.dGray = sobel.edgeImage
-        d2Mat.Run()
+        d2Mat.Run(src)
         dst1 = d2Mat.dst1
     End Sub
 End Class
@@ -43,7 +43,7 @@ Public Class Dlib_GaussianBlur_CS
         task.desc = "Use DlibDotNet to blur an image"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim input = src
@@ -52,7 +52,7 @@ Public Class Dlib_GaussianBlur_CS
         blur.Run(input)
 
         d2Mat.dGray = blur.blurredGray
-        d2Mat.Run()
+        d2Mat.Run(src)
         dst1 = d2Mat.dst1
 
         blur.Run(src) ' now blur the 8uc3 image
@@ -79,7 +79,7 @@ Public Class Dlib_FaceDetectHOG_CS
         task.desc = "Use DlibDotNet to detect faces using the HOG detector"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim input = src
@@ -121,7 +121,7 @@ Public Class Dlib_iBug300WDownload
         task.desc = "Multi-threaded (responsive) download of the iBug 300W face database.  Not using iBug yet but planning to..."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim ibugDir = New DirectoryInfo(task.parms.homeDir + "Data/ibug_300W_large_face_landmark_dataset")
         If ibugDir.Exists And downloadActive = False And pythonActive = False Then

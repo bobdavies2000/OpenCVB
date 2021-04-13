@@ -45,7 +45,7 @@ Public Class MatchTemplate_Basics
         Next
         Return matchOption
     End Function
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static sampleSlider = findSlider("Sample Size")
         If standalone Or task.intermediateReview = caller Then
@@ -64,7 +64,7 @@ Public Class MatchTemplate_Basics
             dst1.SetTo(0)
             label1 = matchText + " for " + CStr(searchArea.Cols) + " samples = " + Format(correlation, "#,##0.00")
             flow.msgs.Add(matchText + " = " + Format(correlation, "#,##0.00"))
-            flow.Run()
+            flow.Run(src)
         End If
     End Sub
 End Class
@@ -85,17 +85,17 @@ Public Class MatchTemplate_RowCorrelation
         task.desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim line1 = msRNG.Next(0, src.Height - 1)
         Dim line2 = msRNG.Next(0, src.Height - 1)
 
         match.searchArea = src.Row(line1)
         match.template = src.Row(line2 + 1)
-        match.Run()
+        match.Run(src)
         Dim correlation = match.correlationMat.Get(Of Single)(0, 0)
         flow.msgs.Add(match.matchText + " between lines " + CStr(line1) + " and line " + CStr(line2) + " = " + Format(correlation, "#,##0.00"))
-        flow.Run()
+        flow.Run(src)
 
         Static minCorrelation As Single
         Static maxCorrelation As Single
@@ -134,7 +134,7 @@ Public Class MatchTemplate_DrawRect
         task.desc = "Find the requested template in an image.  Tracker Algorithm"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then Exit Sub
         If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
@@ -146,7 +146,7 @@ Public Class MatchTemplate_DrawRect
 
         match.searchArea = saveTemplate
         match.template = src
-        match.Run()
+        match.Run(src)
 
         dst1 = New cv.Mat(src.Size, cv.MatType.CV_32F, 0)
         Dim rect = New cv.Rect(task.drawRect.Width / 2, task.drawRect.Height / 2, src.Width - task.drawRect.Width + 1, src.Height - task.drawRect.Height + 1)
@@ -160,8 +160,7 @@ Public Class MatchTemplate_DrawRect
         Dim mask = dst1.Threshold(thresholdSlider.value / 100, 255, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
         addw.src2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        addw.src = src
-        addw.Run()
+        addw.Run(src)
         dst2 = addw.dst1
 
         dst2.Circle(maxLoc.X, maxLoc.Y, task.dotSize / 2, cv.Scalar.Red, -1, task.lineType)
@@ -194,16 +193,13 @@ Public Class MatchTemplate_BestEntropy_MT
         task.desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate.  Tracker Algorithm"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod 30 = 0 Then
-            entropy.src = src
-            entropy.Run()
+            entropy.Run(src)
             task.drawRect = entropy.eMaxRect
         End If
-
-        match.src = src
-        match.Run()
+        match.Run(src)
         dst1 = match.dst1
         dst2 = match.dst2
     End Sub
@@ -241,11 +237,11 @@ Public Class MatchTemplate_Movement
         task.desc = "Assign each segment a correlation coefficient and stdev to the previous frame"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim fsize = task.fontSize / 3
 
-        grid.Run()
+        grid.run(src)
         dst1 = src.Clone
         If dst1.Channels = 3 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 

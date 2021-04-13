@@ -30,11 +30,10 @@ Public Class Fuzzy_Basics
         task.desc = "That which is not solid is fuzzy"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         options.setOptions()
-        reduction.src = src
-        reduction.Run()
+        reduction.Run(src)
         dst1 = reduction.dst1
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -76,8 +75,7 @@ Public Class Fuzzy_Basics
             sortContours.Add(len, New cv.Point(i, maskID))
         Next
 
-        task.palette.src = gray
-        task.palette.Run()
+        task.palette.Run(gray)
         dst1 = task.palette.dst1
         dst1.SetTo(0, dst2)
     End Sub
@@ -122,10 +120,9 @@ Public Class Fuzzy_ContoursDepth
         task.desc = "Use contours to outline solids in the depth data"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        fuzzyD.src = task.RGBDepth
-        fuzzyD.Run()
+        fuzzyD.Run(task.RGBDepth)
         dst1 = fuzzyD.dst1
     End Sub
 End Class
@@ -146,12 +143,11 @@ Public Class Fuzzy_NeighborProof
         task.desc = "Prove that every contour point has at least one and only one neighbor with the mask ID and that the rest are zero"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static proofFailed As Boolean = False
         If proofFailed Then Exit Sub
-        fuzzy.src = src
-        fuzzy.Run()
+        fuzzy.Run(src)
         dst1 = fuzzy.gray
         For i = 0 To fuzzy.contours.Length - 1
             Dim len = fuzzy.contours(i).Length
@@ -205,10 +201,9 @@ Public Class Fuzzy_TrackerDepth
         task.desc = "Create centroids and rect's for solid regions and track them - tracker"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        fuzzy.src = task.RGBDepth
-        fuzzy.Run()
+        fuzzy.Run(task.RGBDepth)
         dst1 = fuzzy.dst1
 
         centroids.Clear()
@@ -265,10 +260,9 @@ Public Class Fuzzy_TrackerDepthClick
         task.desc = "Create centroids and rect's for solid regions and track them - tracker"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        tracker.src = src
-        tracker.Run()
+        tracker.Run(src)
         dst1 = tracker.dst1
 
         If standalone And highlightRegion < 0 Then task.trueText("Click any color region to get more details and track it", 10, 50, 3)
@@ -310,19 +304,17 @@ Public Class Fuzzy_PointTracker
         task.desc = "FloodFill the regions defined as solid"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        fuzzy.src = src
-        fuzzy.Run()
+        fuzzy.Run(src)
         dst2 = fuzzy.dst1
 
-        flood.src = fuzzy.dst1
-        flood.Run()
+        flood.Run(fuzzy.dst1)
 
         pTrack.queryPoints = flood.basics.centroids
         pTrack.queryRects = flood.basics.rects
         pTrack.queryMasks = flood.basics.masks
-        pTrack.Run()
+        pTrack.Run(src)
 
         label2 = CStr(pTrack.drawRC.viewObjects.Count) + " regions were found"
         dst1 = pTrack.dst1

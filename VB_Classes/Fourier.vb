@@ -9,7 +9,7 @@ Public Class Fourier_MathNet
         task.desc = "Use the 1D Fourier support in MathNet to do a 2D Fourier transform"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim input = src

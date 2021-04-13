@@ -18,7 +18,7 @@ Public Class Edges_Basics
         label1 = "Canny using L1 Norm"
         label2 = "Canny using L2 Norm"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim threshold1 As Integer = sliders.trackbar(0).Value
         Dim threshold2 As Integer = sliders.trackbar(1).Value
@@ -58,17 +58,15 @@ Public Class Edges_DepthAndColor
         label1 = "Edges in color and depth after dilate"
         label2 = "Edges in color and depth no dilate"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        canny.src = src
-        canny.Run()
-        shadow.Run()
+        canny.Run(src)
+        shadow.Run(src)
 
         dst2 = shadow.dst2
         dst2 += canny.dst1.Threshold(1, 255, cv.ThresholdTypes.Binary)
 
-        dilate.src = dst2
-        dilate.Run()
+        dilate.Run(dst2)
         dilate.dst1.SetTo(0, shadow.holeMask)
         dst1 = dilate.dst1
     End Sub
@@ -94,7 +92,7 @@ Public Class Edges_Laplacian
         task.desc = "Show Laplacian edge detection with varying kernel sizes"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gaussiankernelSize = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value - 1)
         Dim laplaciankernelSize = If(sliders.trackbar(1).Value Mod 2, sliders.trackbar(1).Value, sliders.trackbar(1).Value - 1)
@@ -124,7 +122,7 @@ Public Class Edges_Scharr
         task.desc = "Scharr is most accurate with 3x3 kernel."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim xField = gray.Scharr(cv.MatType.CV_32FC1, 1, 0)
@@ -160,7 +158,7 @@ Public Class Edges_Preserving
         task.desc = "OpenCV's edge preserving filter."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
@@ -223,11 +221,11 @@ Public Class Edges_RandomForest_CPP
         End If
 
         task.desc = "Detect edges using structured forests - Opencv Contrib"
-		' task.rank = 1
-        ReDim rgbData(src.Total * src.ElemSize - 1)
+        ' task.rank = 1
+        ReDim rgbData(dst1.Total * dst1.ElemSize - 1)
         label2 = "Thresholded Edge Mask (use slider to adjust)"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount < 100 Then task.trueText("On the first call only, it takes a few seconds to load the randomForest model.", 10, 100)
 
@@ -270,7 +268,7 @@ Public Class Edges_ResizeAdd
         label1 = "Edges found with just resizing"
         label2 = "Found edges added to grayscale image source."
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim newFrame = gray(New cv.Range(sliders.trackbar(0).Value, gray.Rows - sliders.trackbar(0).Value),
@@ -302,7 +300,7 @@ Public Class Edges_DCTfrequency
         task.desc = "Find edges by removing all the highest frequencies."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
@@ -342,7 +340,7 @@ Public Class Edges_Deriche_CPP
         task.desc = "Edge detection using the Deriche X and Y gradients - Painterly"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
@@ -385,17 +383,15 @@ Public Class Edges_DCTinput
         task.desc = "Use the featureless regions to enhance the edge detection"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        edges.src = src
-        edges.Run()
+        edges.Run(src)
         dst1 = edges.dst1.Clone
 
-        dct.src = src
-        dct.Run()
-        edges.src = src.SetTo(cv.Scalar.White, dct.dst1)
-        edges.Run()
+        dct.Run(src)
+        Dim tmp = src.SetTo(cv.Scalar.White, dct.dst1)
+        edges.Run(tmp)
         dst2 = edges.dst1
     End Sub
 End Class
@@ -421,28 +417,24 @@ Public Class Edges_BinarizedCanny
         task.desc = "Collect edges from binarized images"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        binarize.src = src
-        binarize.Run()
+        binarize.Run(src)
 
-        edges.src = binarize.mats.mat(0) ' the light and dark halves
-        edges.Run()
+        edges.Run(binarize.mats.mat(0))  ' the light and dark halves
         mats.mat(0) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         mats.mat(3) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        edges.src = binarize.mats.mat(1) ' the lightest of the light half
-        edges.Run()
+        edges.Run(binarize.mats.mat(1))  ' the lightest of the light half
         mats.mat(1) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.BitwiseOr(mats.mat(1), mats.mat(3), mats.mat(3))
 
-        edges.src = binarize.mats.mat(3) ' the darkest of the dark half
-        edges.Run()
+        edges.Run(binarize.mats.mat(3))  ' the darkest of the dark half
         mats.mat(2) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), mats.mat(3))
 
-        mats.Run()
+        mats.Run(src)
         dst1 = mats.dst1
         If mats.dst2.Channels = 3 Then
             label2 = "Combo of first 3 below.  Click quadrants in dst1."
@@ -473,15 +465,13 @@ Public Class Edges_BinarizedBrightness
         task.desc = "Visualize the impact of brightness on Edges_BinarizeSobel"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        bright.src = src
-        bright.Run()
+        bright.Run(src)
         dst1 = bright.dst2
 
-        edges.src = bright.dst2
-        edges.Run()
+        edges.Run(bright.dst2)
         dst2 = edges.dst2
     End Sub
 End Class
@@ -505,15 +495,13 @@ Public Class Edges_BinarizedReduction
         task.desc = "Visualize the impact of reduction on Edges_BinarizeSobel"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        reduction.src = src
-        reduction.Run()
+        reduction.Run(src)
         dst1 = reduction.dst1
 
-        edges.src = dst1
-        edges.Run()
+        edges.Run(dst1)
         dst2 = edges.dst2
     End Sub
 End Class
@@ -538,15 +526,13 @@ Public Class Edges_Depth
         task.desc = "Use Depth_SmoothMax to find edges in Depth"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        dMax.src = task.depth32f
-        dMax.Run()
+        dMax.Run(task.depth32f)
         dst1 = dMax.dst1
 
-        sobel.src = dMax.dst2
-        sobel.Run()
+        sobel.Run(dMax.dst2)
         dst2 = sobel.dst1
     End Sub
 End Class
@@ -572,16 +558,14 @@ Public Class Edges_FeaturesOnly
         task.desc = "Removing the featureless regions after a binarized sobel"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         task.mouseClickFlag = False ' edges calls a mat_4clicks algorithm.
-        edges.src = src
-        edges.Run()
+        edges.Run(src)
         dst1 = edges.dst2
 
-        featLess.src = src
-        featLess.Run()
+        featLess.Run(src)
         dst2 = dst1.Clone
         dst2.SetTo(0, featLess.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
     End Sub
@@ -610,7 +594,7 @@ Public Class Edges_Consistent
         task.desc = "Edges that are consistent for x number of frames"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static nFrameSlider = findSlider("Edges present n frames")
@@ -623,8 +607,7 @@ Public Class Edges_Consistent
             saveFrameCount = nFrames
         End If
 
-        edges.src = src
-        edges.Run()
+        edges.Run(src)
 
         saveFrames.Add(edges.dst2.Clone)
         If saveFrames.Count > nFrames Then saveFrames.RemoveAt(0)
@@ -659,16 +642,12 @@ Public Class Edges_Stdev
         task.desc = "Edges where stdev is above a threshold"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        stdev.src = src
-        stdev.Run()
-
-        edges.src = src
-        edges.Run()
+        stdev.Run(src)
+        edges.Run(src)
         dst1 = edges.dst2
-
         dst1.SetTo(0, stdev.lowStdevMask)
         dst2 = stdev.lowStdevMask
     End Sub
@@ -694,18 +673,15 @@ Public Class Edges_BlackSquare
         task.desc = "Visualize the impact of Sobel on a black square"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        std.src = src
-        std.Run()
+        std.Run(src)
 
-        edges.src = std.dst2
-        edges.Run()
+        edges.Run(std.dst2)
         dst1 = edges.dst2
 
-        addW.src = dst1
         addW.src2 = std.dst2
-        addW.Run()
+        addW.Run(dst1)
         dst2 = addW.dst1
 
         'Dim mask = std.dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
@@ -731,14 +707,11 @@ Public Class Edges_Combo
         task.desc = "Combine the results of binarized canny and sobel"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        edges1.src = src
-        edges1.Run()
-
-        edges2.src = src
-        edges2.Run()
+        edges1.Run(src)
+        edges2.Run(src)
 
         dst1 = task.color
         dst1.SetTo(cv.Scalar.Red, edges2.dst2)
@@ -767,16 +740,14 @@ Public Class Edges_SobelLR
         label1 = "Edges in Left Image"
         label2 = "Edges in Right Image (except on Kinect)"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        red.Run()
+        red.Run(src)
         Dim leftView = red.dst1
-        sobel.src = red.dst2
-        sobel.Run()
+        sobel.Run(red.dst2)
         dst2 = sobel.dst1.Clone()
 
-        sobel.src = leftView
-        sobel.Run()
+        sobel.Run(leftView)
         dst1 = sobel.dst1
     End Sub
 End Class
@@ -813,7 +784,7 @@ Public Class Edges_Sobel
         task.desc = "Show Sobel edge detection with varying kernel sizes"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static ksizeSlider = findSlider("Sobel kernel Size")
         Dim kernelSize = If(ksizeSlider.Value Mod 2, ksizeSlider.Value, ksizeSlider.Value - 1)
@@ -823,9 +794,8 @@ Public Class Edges_Sobel
         If horizontalOnly = False Then
             grayY = src.Sobel(cv.MatType.CV_32F, 0, 1, kernelSize)
             If standalone Then
-                addw.src = grayX
                 addw.src2 = grayY
-                addw.Run()
+                addw.Run(grayX)
                 dst1 = addw.dst1.ConvertScaleAbs()
             Else
                 dst1 = (grayY + grayX).ToMat.ConvertScaleAbs()
@@ -858,10 +828,9 @@ Public Class Edges_SobelHorizontal
         task.desc = "Find edges with Sobel only in the horizontal direction"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        edges.src = src
-        edges.Run()
+        edges.Run(src)
 
         Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
         dst1 = edges.dst1.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
@@ -897,29 +866,25 @@ Public Class Edges_SobelLRBinarized
         task.desc = "Isolate edges in the left and right views."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.mouseClickFlag Then task.mouseClickFlag = False ' preempt use of quadrants.
-        red.Run()
+        red.Run(src)
 
-        edges.src = red.dst2
-        edges.Run()
+        edges.Run(red.dst2)
         If standalone Then
-            addw.src = red.dst2
             addw.src2 = edges.dst2
-            addw.Run()
+            addw.Run(red.dst2)
             dst2 = addw.dst1
         Else
             dst2 = edges.dst2
         End If
 
-        edges.src = red.dst1
-        edges.Run()
+        edges.Run(red.dst1)
         If standalone Then
-            addw.src = red.dst1
             addw.src2 = edges.dst2
-            addw.Run()
+            addw.Run(red.dst1)
             dst1 = addw.dst1
         Else
             dst1 = edges.dst2
@@ -955,30 +920,26 @@ Public Class Edges_BinarizedSobel
         task.desc = "Collect Sobel edges from binarized images"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
 
-        binarize.src = src
-        binarize.Run()
+        binarize.Run(src)
 
-        edges.src = binarize.mats.mat(0) ' the light and dark halves
-        edges.Run()
+        edges.Run(binarize.mats.mat(0)) ' the light and dark halves
         mats.mat(0) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         mats.mat(3) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        edges.src = binarize.mats.mat(1) ' the lightest of the light half
-        edges.Run()
+        edges.Run(binarize.mats.mat(1)) ' the lightest of the light half
         mats.mat(1) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.BitwiseOr(mats.mat(1), mats.mat(3), mats.mat(3))
 
-        edges.src = binarize.mats.mat(3) ' the darkest of the dark half
-        edges.Run()
+        edges.Run(binarize.mats.mat(3))  ' the darkest of the dark half
         mats.mat(2) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), mats.mat(3))
 
-        mats.Run()
+        mats.Run(src)
         dst1 = mats.dst1
         If mats.dst2.Channels = 3 Then
             label2 = "Bitwise or of images 1-3 at left.  Click dst1."
@@ -1029,12 +990,12 @@ Public Class Edges_Matching
         task.desc = "Match edges in the left and right views to determine distance"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        grid.Run()
+        grid.Run(src)
 
-        red.Run()
+        red.Run(src)
         dst1 = red.dst1
         dst2 = red.dst2
 
@@ -1054,7 +1015,7 @@ Public Class Edges_Matching
             Dim searchROI = New cv.Rect(roi.X, roi.Y, width, roi.Height)
             match.searchArea = dst2(roi)
             match.template = dst1(searchROI)
-            match.Run()
+            match.Run(src)
             Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
             match.correlationMat.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
             maxLocs(i) = maxLoc.X
@@ -1136,7 +1097,7 @@ Public Class Edges_MotionOverlay
         task.desc = "Find edges by displacing the current RGB image in any direction and diff it with the original."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static xSlider = findSlider("Displacement in the X direction (in pixels)")
@@ -1144,16 +1105,14 @@ Public Class Edges_MotionOverlay
         Dim xDisp = xSlider.value
         Dim yDisp = ySlider.value
 
-        Dim input As cv.Mat = src.Clone
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        diff.lastFrame = input.Clone
+        diff.lastFrame = src.Clone
         Dim rect1 = New cv.Rect(xDisp, yDisp, dst1.Width - xDisp - 1, dst1.Height - yDisp - 1)
         Dim rect2 = New cv.Rect(0, 0, dst1.Width - xDisp - 1, dst1.Height - yDisp - 1)
-        diff.lastFrame(rect2) = input(rect1).Clone
+        diff.lastFrame(rect2) = src(rect1).Clone
 
-        diff.src = input
-        diff.Run()
+        diff.Run(src)
         dst1 = diff.dst1
         dst2 = diff.dst2
         dst2.SetTo(0, task.noDepthMask)
@@ -1179,7 +1138,7 @@ Public Class Edges_RGB
         task.desc = "Combine the edges from all 3 channels.  Painterly"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim img32f As New cv.Mat
@@ -1191,8 +1150,7 @@ Public Class Edges_RGB
         cv.Cv2.Merge(split, img32f)
         img32f.ConvertTo(dst1, cv.MatType.CV_8UC3)
         For i = 0 To 3 - 1
-            sobel.src = split(i)
-            sobel.Run()
+            sobel.Run(split(i))
             split(i) = 255 - sobel.dst1
         Next
         cv.Cv2.Merge(split, dst1)
@@ -1217,11 +1175,10 @@ Public Class Edges_HSV
         task.desc = "Combine the edges from all 3 HSV channels.  Painterly"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-        edges.src = hsv
-        edges.Run()
+        edges.Run(hsv)
         dst1 = edges.dst1
     End Sub
 End Class

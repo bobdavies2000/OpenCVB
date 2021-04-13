@@ -97,7 +97,7 @@ Public Class OpticalFlow_DenseOptions
         task.desc = "Use dense optical flow algorithm options"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         pyrScale = sliders.trackbar(0).Value / sliders.trackbar(0).Maximum
         levels = sliders.trackbar(1).Value
@@ -133,13 +133,13 @@ Public Class OpticalFlow_DenseBasics
         task.desc = "Use dense optical flow algorithm  "
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static oldGray As New cv.Mat
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If task.frameCount > 0 Then
-            flow.Run()
+            flow.Run(src)
 
             Dim hsv = opticalFlow_Dense(oldGray, src, flow.pyrScale, flow.levels, flow.winSize, flow.iterations, flow.polyN, flow.polySigma, flow.OpticalFlowFlags)
 
@@ -166,8 +166,8 @@ Public Class OpticalFlow_DenseBasics_MT
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         Static gridBorderSlider = findSlider("ThreadGrid Border")
-        gridWidthSlider.Value = src.Cols / 4
-        gridHeightSlider.Value = src.Rows / 4
+        gridWidthSlider.Value = dst1.Cols / 4
+        gridHeightSlider.Value = dst1.Rows / 4
         gridHeightSlider.Value = 5
 
         flow = New OpticalFlow_DenseOptions()
@@ -181,13 +181,13 @@ Public Class OpticalFlow_DenseBasics_MT
         task.desc = "MultiThread dense optical flow algorithm  "
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static oldGray As New cv.Mat
 
         If task.frameCount > 0 Then
-            grid.Run()
-            flow.Run()
+            grid.run(src)
+            flow.Run(src)
 
             Static thresholdSlider = findSlider("OpticalFlow Correlation Threshold")
             Dim CCthreshold = CSng(thresholdSlider.Value / thresholdSlider.Maximum)
@@ -268,7 +268,7 @@ Public Class OpticalFlow_Sparse
             errScale.Set(Of Double)(i, 0, (1 - gainScale) * f1err.Get(Of Double)(i, 0))
         Next
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.Clone()
         dst2 = src.Clone()
@@ -292,8 +292,7 @@ Public Class OpticalFlow_Sparse
         End If
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        good.src = src
-        good.Run()
+        good.Run(src)
         features = good.goodFeatures
         Dim features1 = New cv.Mat(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)
         Dim features2 = New cv.Mat

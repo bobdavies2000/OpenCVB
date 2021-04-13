@@ -7,7 +7,7 @@ Public Class Remap_Basics
         task.desc = "Use remap to reflect an image in 4 directions."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim map_x = New cv.Mat(src.Size(), cv.MatType.CV_32F)
         Dim map_y = New cv.Mat(src.Size(), cv.MatType.CV_32F)
@@ -52,7 +52,7 @@ Public Class Remap_Flip
         task.desc = "Use flip to remap an image."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         label1 = Choose(direction + 1, "Remap_Flip - original", "Remap_Flip - flip horizontal", "Remap_Flip - flip veritical",
                                             "Remap_Flip - flip horizontal and vertical")

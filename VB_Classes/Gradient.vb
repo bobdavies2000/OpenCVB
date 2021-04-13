@@ -10,10 +10,9 @@ Public Class Gradient_Basics
         task.desc = "Use phase to compute gradient"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        sobel.src = src
-        sobel.Run()
+        sobel.Run(src)
         Dim x32f As New cv.Mat, y32f As New cv.Mat
         sobel.grayX.ConvertTo(x32f, cv.MatType.CV_32F)
         sobel.grayY.ConvertTo(y32f, cv.MatType.CV_32F)
@@ -35,10 +34,9 @@ Public Class Gradient_Depth
 		' task.rank = 1
         label2 = "Phase Output"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        sobel.src = task.depth32f
-        sobel.Run()
+        sobel.Run(task.depth32f)
         Dim x32f As New cv.Mat, y32f As New cv.Mat
         sobel.grayX.ConvertTo(x32f, cv.MatType.CV_32F)
         sobel.grayY.ConvertTo(y32f, cv.MatType.CV_32F)
@@ -75,10 +73,11 @@ Public Class Gradient_CartToPolar
         task.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
-		If task.intermediateReview = caller Then task.intermediateObject = Me
-        src.ConvertTo(basics.src, cv.MatType.CV_32FC3, 1 / 255)
-        basics.Run()
+    Public Sub Run(src as cv.Mat)
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        Dim tmp As New cv.Mat
+        src.ConvertTo(tmp, cv.MatType.CV_32FC3, 1 / 255)
+        basics.Run(tmp)
 
         basics.sobel.grayX.ConvertTo(dst1, cv.MatType.CV_32F)
         basics.sobel.grayX.ConvertTo(dst2, cv.MatType.CV_32F)
@@ -115,15 +114,13 @@ Public Class Gradient_StableDepth
         task.desc = "Use the stable depth as input to get a map of the phase of the gradient in the depth data."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        motionSD.src = src
-        motionSD.Run()
+        motionSD.Run(src)
         dst1 = motionSD.dst1.Clone
 
-        basics.src = dst1.Clone
-        basics.Run()
+        basics.Run(dst1.Clone)
         dst2 = basics.dst2
     End Sub
 End Class

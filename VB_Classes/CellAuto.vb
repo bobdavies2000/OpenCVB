@@ -5,6 +5,7 @@ Public Class CellAuto_Basics
     Public i18 As New List(Of String)
     Dim inputCombo = "111,110,101,100,011,010,001,000"
     Dim cellInput(,) = {{1, 1, 1}, {1, 1, 0}, {1, 0, 1}, {1, 0, 0}, {0, 1, 1}, {0, 1, 0}, {0, 0, 1}, {0, 0, 0}}
+    Public input As New cv.Mat
     Public Sub New()
         initParent()
         i18.Add("00011110 Rule 30 (chaotic)")
@@ -45,7 +46,7 @@ Public Class CellAuto_Basics
             outcomes(i) = Integer.Parse(outStr.Substring(i, 1))
         Next
 
-        Dim dst = src.Clone()
+        Dim dst = input.Clone()
         For y = 0 To dst.Height - 2
             For x = 0 To dst.Width - 2
                 Dim x1 = dst.Get(Of Byte)(y, x - 1)
@@ -61,7 +62,7 @@ Public Class CellAuto_Basics
         Next
         Return dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Function
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             src = New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_8UC1, 0)
@@ -115,7 +116,7 @@ Public Class CellAuto_Life
     End Function
     Public Sub New()
         initParent()
-        grid = New cv.Mat(src.Height / factor, src.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
+        grid = New cv.Mat(dst1.Height / factor, dst1.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
 
         random = New Random_Basics()
@@ -125,12 +126,12 @@ Public Class CellAuto_Life
         task.desc = "Use OpenCV to implement the Game of Life"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static savePointCount As Integer
         Static randomSlider = findSlider("Random Pixel Count")
         If randomSlider.Value <> savePointCount Or generation = 0 Then
-            random.Run()
+            random.Run(src)
             generation = 0
             savePointCount = randomSlider.Value
             For i = 0 To random.Points.Count - 1
@@ -200,9 +201,9 @@ Public Class CellAuto_LifeColor
         task.desc = "Game of Life but with color added"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        game.Run()
+        game.Run(src)
         dst1 = game.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static lastBoard = dst1.Clone
 
@@ -240,13 +241,13 @@ Public Class CellAuto_LifePopulation
         task.desc = "Show Game of Life display with plot of population"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        game.Run()
+        game.Run(src)
         dst1 = game.dst1
 
         plot.plotData = New cv.Scalar(game.population, 0, 0)
-        plot.Run()
+        plot.Run(src)
         dst2 = plot.dst1
     End Sub
 End Class
@@ -271,11 +272,11 @@ Public Class CellAuto_Basics_MP
         task.desc = "Multi-threaded version of CellAuto_Basics"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then
-            cell.src = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
-            cell.src.Set(Of Byte)(0, cell.src.Width / 2, 1)
+            cell.input = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
+            cell.input.Set(Of Byte)(0, cell.input.Width / 2, 1)
         End If
         Parallel.For(0, 2,
           Sub(i)
@@ -308,7 +309,7 @@ Public Class CellAuto_All256
     Dim cell As CellAuto_Basics
     Public Sub New()
         initParent()
-        cell = New CellAuto_Basics()
+        cell = New CellAuto_Basics
         cell.combo.Visible = False ' won't need this...
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -326,13 +327,13 @@ Public Class CellAuto_All256
         Next
         Return outstr
     End Function
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim index = sliders.trackbar(0).Value
         Dim mtOn = cell.check.Box(0).Checked
 
-        cell.src = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
-        cell.src.Set(Of Byte)(0, cell.src.Width / 2, 1)
+        cell.input = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
+        cell.input.Set(Of Byte)(0, cell.input.Width / 2, 1)
 
         Parallel.For(0, 2,
           Sub(i)
@@ -367,18 +368,18 @@ Public Class CellAuto_MultiPoint
         task.desc = "All256 above starts with just one point.  Here we start with multiple points."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        cell.src = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
+        Dim tmp = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
         Static pt1 = 0
-        Static pt2 = cell.src.Width / 2
-        cell.src.Set(0, pt1, 1)
-        cell.src.Set(0, pt2, 1)
-        cell.Run()
+        Static pt2 = tmp.Width / 2
+        tmp.Set(0, pt1, 1)
+        tmp.Set(0, pt2, 1)
+        cell.Run(tmp)
 
         dst1 = cell.dst1
         pt1 += 1
-        If pt1 > cell.src.Width Then pt1 = 0
+        If pt1 > tmp.Width Then pt1 = 0
         If pt1 >= src.Width Then pt1 = 0
     End Sub
 End Class

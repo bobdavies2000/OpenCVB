@@ -20,11 +20,11 @@ Public Class OilPaint_Pointilism
             radio.check(1).Checked = True
         End If
 
-        task.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
+        task.drawRect = New cv.Rect(dst1.Cols * 3 / 8, dst1.Rows * 3 / 8, dst1.Cols * 2 / 8, dst1.Rows * 2 / 8)
         task.desc = "Alter the image to effect the pointilism style - Painterly Effect"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src
         Dim img = src(task.drawRect)
@@ -97,10 +97,9 @@ Public Class OilPaint_ColorProbability
         task.desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        km.src = src
-        km.Run()
+        km.Run(src)
         dst1 = km.dst1
         Dim c() = km.clusterColors
         If c Is Nothing Then Exit Sub
@@ -136,10 +135,10 @@ Public Class OilPaint_ManualVB
             sliders.setupTrackBar(1, "Intensity", 5, 150, 25)
         End If
         task.desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
-		' task.rank = 1
-        task.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
+        ' task.rank = 1
+        task.drawRect = New cv.Rect(dst1.Cols * 3 / 8, dst1.Rows * 3 / 8, dst1.Cols * 2 / 8, dst1.Rows * 2 / 8)
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim filtersize = sliders.trackbar(0).Value
         Dim levels = sliders.trackbar(1).Value
@@ -202,9 +201,9 @@ Public Class OilPaint_Manual
 		' task.rank = 1
         label2 = "Selected area only"
 
-        task.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
+        task.drawRect = New cv.Rect(dst1.Cols * 3 / 8, dst1.Rows * 3 / 8, dst1.Cols * 2 / 8, dst1.Rows * 2 / 8)
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
@@ -231,22 +230,20 @@ Public Class OilPaint_Cartoon
         laplacian = New Edges_Laplacian()
 
         oil = New OilPaint_Manual
-        task.drawRect = New cv.Rect(src.Cols * 3 / 8, src.Rows * 3 / 8, src.Cols * 2 / 8, src.Rows * 2 / 8)
+        task.drawRect = New cv.Rect(dst1.Cols * 3 / 8, dst1.Rows * 3 / 8, dst1.Cols * 2 / 8, dst1.Rows * 2 / 8)
 
         task.desc = "Alter an image so it appears more like a cartoon - Painterly Effect"
 		' task.rank = 1
         label1 = "OilPaint_Cartoon"
         label2 = "Laplacian Edges"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim roi = task.drawRect
-        laplacian.src = src
-        laplacian.Run()
+        laplacian.Run(src)
         dst2 = laplacian.dst1
 
-        oil.src = src
-        oil.Run()
+        oil.Run(src)
         dst1 = oil.dst1
 
         Dim threshold = oil.sliders.trackbar(2).Value

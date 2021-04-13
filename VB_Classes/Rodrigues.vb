@@ -14,7 +14,7 @@ Public Class Rodrigues_ValidateKinect
         task.desc = "Validate the Rodrigues calibration for Kinect camera (only)"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
             dst2.SetTo(0)
@@ -44,7 +44,7 @@ Public Class Rodrigues_ValidateVector
         task.desc = "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2 Then
             dst2.SetTo(0)
@@ -58,7 +58,7 @@ Public Class Rodrigues_ValidateVector
             output += vbTab + Format(rot(i * 3), "#0.000000") + vbTab + Format(rot(i * 3 + 1), "#0.0000000") + vbTab + Format(rot(i * 3 + 2), "#0.0000000") + vbCrLf
         Next
 
-        Dim src As New cv.Mat(3, 3, cv.MatType.CV_32F, task.parms.RotationMatrix)
+        src = New cv.Mat(3, 3, cv.MatType.CV_32F, task.parms.RotationMatrix)
         Dim dst1 As New cv.Mat(3, 1, src.Type)
         cv.Cv2.Rodrigues(src, dst1)
 
@@ -86,7 +86,7 @@ Public Class Rodrigues_RotationMatrix
         task.desc = "Display the contents of the IMU Rotation Matrix"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim rot = task.parms.RotationMatrix
         Dim output = "IMU Rotation Matrix (rotate the camera to see if it is working)" + vbCrLf
@@ -94,7 +94,7 @@ Public Class Rodrigues_RotationMatrix
             output += vbTab + Format(rot(i * 3), "#0.000000") + vbTab + Format(rot(i * 3 + 1), "#0.0000000") + vbTab + Format(rot(i * 3 + 2), "#0.0000000") + vbCrLf
         Next
 
-        Dim src As New cv.Mat(3, 3, cv.MatType.CV_32F, task.parms.RotationMatrix)
+        src = New cv.Mat(3, 3, cv.MatType.CV_32F, task.parms.RotationMatrix)
         Dim dst1 As New cv.Mat(3, 1, src.Type, 3)
         cv.Cv2.Rodrigues(src, dst1)
 
@@ -119,7 +119,7 @@ Public Class Rodrigues_Extrinsics
         task.desc = "Convert Camera extrinsics array to a Vector with Rodrigues"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim rot = task.parms.extrinsics.rotation
         Dim output As String = "Extrinsics Rotation Matrix" + vbCrLf
@@ -128,7 +128,6 @@ Public Class Rodrigues_Extrinsics
         Next
 
         Dim src32f As New cv.Mat(3, 3, cv.MatType.CV_32F, task.parms.extrinsics.rotation)
-        Dim src As New cv.Mat
         src32f.ConvertTo(src, cv.MatType.CV_64F)
         Dim Jacobian As New cv.Mat(9, 3, src.Type, 0)
         Dim dst1 As New cv.Mat(3, 1, src.Type, 3)

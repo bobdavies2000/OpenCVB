@@ -16,11 +16,11 @@ Public Class Resize_Basics
         label1 = "Rectangle highlight above resized"
         label2 = "Difference from Cubic Resize (Best)"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static frm = findfrm("Resize_Basics Radio Options")
 
-        rotateOptions.Run()
+        rotateOptions.Run(src)
 
         If standalone Or task.intermediateReview = caller Then
             Dim roi = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
@@ -56,15 +56,14 @@ Public Class Resize_Percentage
         task.desc = "Resize by a percentage of the image."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim percent As Double = CDbl(sliders.trackbar(0).Value / 100)
         Dim resizePercent = sliders.trackbar(0).Value / 100
         resizePercent = Math.Sqrt(resizePercent)
         resizeOptions.newSize = New cv.Size(Math.Ceiling(src.Width * resizePercent), Math.Ceiling(src.Height * resizePercent))
-        resizeOptions.src = src
-        resizeOptions.Run()
+        resizeOptions.Run(src)
 
         If standalone or task.intermediateReview = caller Then
             Dim roi As New cv.Rect(0, 0, resizeOptions.dst1.Width, resizeOptions.dst1.Height)

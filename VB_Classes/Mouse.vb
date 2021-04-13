@@ -7,7 +7,7 @@ Public Class Mouse_Basics
         task.desc = "Test the mousePoint interface"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static lastPoint = New cv.Point
         ' only display mouse movement in the lower left image (pic.tag = 2)
@@ -33,7 +33,7 @@ Public Class Mouse_LeftClickZoom
         task.desc = "Demonstrate what the left-click enables"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         task.trueText("Left-click and drag to select a region in any of the images." + vbCrLf +
                       "The selected area is presented to ocvbClass in task.drawRect." + vbCrLf +

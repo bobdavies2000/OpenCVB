@@ -18,11 +18,10 @@ Public Class Plot_Basics
         task.desc = "Plot data provided in src Mat"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        hist.src = src
         hist.plotColors(0) = cv.Scalar.White
-        hist.Run()
+        hist.Run(src)
         dst1 = hist.dst1
 
         ReDim plot.srcX(hist.histRaw(0).Rows - 1)
@@ -31,7 +30,7 @@ Public Class Plot_Basics
             plot.srcX(i) = i
             plot.srcY(i) = hist.histRaw(0).Get(Of Single)(i, 0)
         Next
-        plot.Run()
+        plot.Run(src)
         dst2 = plot.dst1
         label1 = hist.label1
     End Sub
@@ -50,7 +49,7 @@ Public Class Plot_Basics_CPP
         task.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone or task.intermediateReview = caller Then
@@ -124,7 +123,7 @@ Public Class Plot_OverTime
 		' task.rank = 1
         myStopWatch = Stopwatch.StartNew()
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
@@ -223,7 +222,7 @@ Public Class Plot_Histogram
         task.desc = "Plot histogram data with a stable scale at the left of the image."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -312,16 +311,16 @@ Public Class Plot_Depth
         task.desc = "Show depth using OpenCV's plot format with variable bins."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        hist.Run()
+        hist.Run(src)
         ReDim plot.srcX(hist.plotHist.hist.Rows - 1)
         ReDim plot.srcY(hist.plotHist.hist.Rows - 1)
         For i = 0 To plot.srcX.Length - 1
             plot.srcX(i) = task.maxDepth + i * (task.maxDepth - task.minDepth) / plot.srcX.Length
             plot.srcY(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
         Next
-        plot.Run()
+        plot.Run(src)
         dst1 = plot.dst1
 
         label1 = plot.label1

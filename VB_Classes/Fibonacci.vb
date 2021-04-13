@@ -9,7 +9,7 @@ Public Class Fibonacci_Basics
         task.desc = "Generate the fibonacci sequence using conventional code"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static a As Double = 0, b As Double = 1
         If a = 1134903170 Then
@@ -20,7 +20,7 @@ Public Class Fibonacci_Basics
         a = b
         b = t
         flow.msgs.Add(t.ToString)
-        flow.Run()
+        flow.Run(src)
     End Sub
 End Class
 
@@ -55,11 +55,11 @@ Public Class Fibonacci_Yield
             b = t
         End While
     End Function
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim fibs As System.Collections.Generic.IEnumerable(Of Double) = nextFib()
         flow.msgs.Add(Format(task.frameCount Mod 74, "00") + " fibonacci number " + Format(fibs.ElementAt(task.frameCount), "###,##0"))
-        flow.Run()
+        flow.Run(src)
     End Sub
 End Class
 

@@ -13,7 +13,7 @@ Public Class AddWeighted_Basics
         task.desc = "Add 2 images with specified weights."
         ' task.rank = 3
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then src2 = task.RGBDepth ' external use must provide src2!
         Dim alpha = weightSlider.Value / 100
@@ -40,16 +40,14 @@ Public Class AddWeighted_Edges
         task.desc = "Add in the edges separating light and dark to the color image"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        edges.src = src
-        edges.Run()
+        edges.Run(src)
         dst1 = edges.dst2
 
-        addw.src = src
         addw.src2 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        addw.Run()
+        addw.Run(src)
         dst2 = addw.dst1
     End Sub
 End Class
@@ -73,7 +71,7 @@ Public Class AddWeighted_ImageAccumulate
         task.desc = "Update a running average of the image"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         dst1 = New cv.Mat(task.depth32f.Size, cv.MatType.CV_32F)
@@ -108,10 +106,10 @@ Public Class AddWeighted_InfraRed
         task.desc = "Align the depth data with the left or right view.  Oak-D is aligned with the right image."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        infra.Run()
+        infra.Run(src)
 
         Static rightRadio = findRadio("Use RightView")
         Dim leftOrRight As String = "Right"
@@ -121,12 +119,10 @@ Public Class AddWeighted_InfraRed
             addw.src2 = infra.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             leftOrRight = "Left"
         End If
-        addw.src = task.RGBDepth
-        addw.Run()
+        addw.Run(task.RGBDepth)
         dst1 = addw.dst1.Clone
 
-        addw.src = src
-        addw.Run()
+        addw.Run(src)
         dst2 = addw.dst1
         label1 = "InfraRed " + leftOrRight + " " + Format(1 - addw.weightSlider.Value / 100, "#0%") + " Depth " + Format(addw.weightSlider.Value / 100, "#0%")
         label2 = "InfraRed " + leftOrRight + " " + Format(1 - addw.weightSlider.Value / 100, "#0%") + " RGB " + Format(addw.weightSlider.Value / 100, "#0%")

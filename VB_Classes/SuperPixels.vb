@@ -38,7 +38,7 @@ Public Class SuperPixel_Basics_CPP
         task.desc = "Sub-divide the image into super pixels."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static numSuperPixels As integer
         Static numIterations As integer
@@ -99,13 +99,11 @@ Public Class SuperPixel_BinarizedImage
         task.desc = "Create SuperPixels from a binary image."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        binarize.src = src
-        binarize.Run()
+        binarize.Run(src)
 
-        pixels.src = binarize.dst1
-        pixels.Run()
+        pixels.Run(binarize.dst1)
         dst1 = pixels.dst1
         dst2 = pixels.dst2
         dst2.SetTo(cv.Scalar.White, pixels.wireGrid)
@@ -127,10 +125,9 @@ Public Class SuperPixel_Depth
         task.desc = "Create SuperPixels using RGBDepth image."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        pixels.src = task.RGBDepth.Clone()
-        pixels.Run()
+        pixels.Run(task.RGBDepth)
         dst1 = pixels.dst1
         dst2 = pixels.dst2
     End Sub
@@ -154,13 +151,12 @@ Public Class SuperPixel_WithCanny
         task.desc = "Create SuperPixels using RGBDepth image."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        edges.src = task.color.Clone()
-        edges.Run()
-        pixels.src = task.color.Clone()
-        pixels.src.SetTo(cv.Scalar.White, edges.dst1)
-        pixels.Run()
+        edges.Run(src)
+        src = task.color.Clone()
+        src.SetTo(cv.Scalar.White, edges.dst1)
+        pixels.Run(src)
         dst1 = pixels.dst1
         dst2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2.SetTo(cv.Scalar.Red, edges.dst1)
@@ -187,13 +183,11 @@ Public Class SuperPixel_WithLineDetector
         task.desc = "Create SuperPixels using RGBDepth image."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        lines.src = src
-        lines.Run()
+        lines.Run(src)
         dst2 = lines.dst1
-        pixels.src = dst2
-        pixels.Run()
+        pixels.Run(dst2)
         dst1 = pixels.dst1
     End Sub
 End Class

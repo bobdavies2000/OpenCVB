@@ -12,10 +12,10 @@ Public Class Clone_Basics
         label1 = "Clone result - draw anywhere to clone a region"
         label2 = "Clone Region Mask"
         task.desc = "Clone a portion of one image into another.  Draw on any image to change selected area."
-		' task.rank = 1
-        task.drawRect = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
+        ' task.rank = 1
+        task.drawRect = New cv.Rect(dst1.Width / 4, dst1.Height / 4, dst1.Width / 2, dst1.Height / 2)
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim mask As New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         If task.drawRect = New cv.Rect Then
@@ -58,11 +58,11 @@ Public Class Clone_ColorChange
         task.desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         clone.cloneSpec = 0
         clone.colorChangeValues = New cv.Point3f(sliders.trackbar(0).Value / 10, sliders.trackbar(1).Value / 10, sliders.trackbar(0).Value / 10)
-        clone.Run()
+        clone.Run(src)
         dst1 = clone.dst1
         dst2 = clone.dst2
     End Sub
@@ -88,11 +88,11 @@ Public Class Clone_IlluminationChange
         task.desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         clone.cloneSpec = 1
         clone.illuminationChangeValues = New cv.Vec2f(sliders.trackbar(0).Value / 10, sliders.trackbar(1).Value / 10)
-        clone.Run()
+        clone.Run(src)
         dst1 = clone.dst1
         dst2 = clone.dst2
     End Sub
@@ -119,11 +119,11 @@ Public Class Clone_TextureFlattening
         task.desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         clone.cloneSpec = 2
         clone.textureFlatteningValues = New cv.Vec2f(sliders.trackbar(0).Value, sliders.trackbar(1).Value)
-        clone.Run()
+        clone.Run(src)
         dst1 = clone.dst1
         dst2 = clone.dst2
     End Sub
@@ -154,24 +154,24 @@ Public Class Clone_Eagle
             radio.check(2).Checked = True
         End If
         sourceImage = cv.Cv2.ImRead(task.parms.homeDir + "Data/CloneSource.png")
-        sourceImage = sourceImage.Resize(New cv.Size(sourceImage.Width * src.Width / 1280, sourceImage.Height * src.Height / 720))
+        sourceImage = sourceImage.Resize(New cv.Size(sourceImage.Width * dst1.Width / 1280, sourceImage.Height * dst1.Height / 720))
         srcROI = New cv.Rect(0, 40, sourceImage.Width, sourceImage.Height)
 
         mask = cv.Cv2.ImRead(task.parms.homeDir + "Data/Clonemask.png")
-        mask = mask.Resize(New cv.Size(mask.Width * src.Width / 1280, mask.Height * src.Height / 720))
+        mask = mask.Resize(New cv.Size(mask.Width * dst1.Width / 1280, mask.Height * dst1.Height / 720))
         maskROI = New cv.Rect(srcROI.Width, 40, mask.Width, mask.Height)
 
         dst2.SetTo(0)
         dst2(srcROI) = sourceImage
         dst2(maskROI) = mask
 
-        pt = New cv.Point(src.Width / 2, src.Height / 2)
+        pt = New cv.Point(dst1.Width / 2, dst1.Height / 2)
         label1 = "Move Eagle by clicking in any location."
         label2 = "Source image and source mask."
         task.desc = "Clone an eagle into the video stream."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.Clone()
         If task.mouseClickFlag Then
@@ -215,7 +215,7 @@ Public Class Clone_Seamless
         task.desc = "Use the seamlessclone API to merge color and depth..."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim center As New cv.Point(src.Width / 2, src.Height / 2)
         Dim radius = 100

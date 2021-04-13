@@ -17,7 +17,7 @@ Public Class Motion_Basics
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Single frame motion threshold", 1, 100000, If(task.color.Width = 1280, 20000, 1000)) ' used only externally...
-            sliders.setupTrackBar(1, "Cumulative motion threshold", 1, src.Total, If(task.color.Width = 1280, 200000, 100000)) ' used only externally...
+            sliders.setupTrackBar(1, "Cumulative motion threshold", 1, dst1.Total, If(task.color.Width = 1280, 200000, 100000)) ' used only externally...
         End If
 
         minSlider = findSlider("Contour minimum area")
@@ -27,16 +27,15 @@ Public Class Motion_Basics
         task.desc = "Detect contours in the motion data and the resulting rectangles"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        diff.src = src
-        If diff.src.Channels = 3 Then diff.src = diff.src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else diff.src = diff.src.Clone
+        src = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
 
         Static cumulativeThreshold = findSlider("Cumulative motion threshold")
         Static pixelThreshold = findSlider("Single frame motion threshold")
 
-        diff.Run()
+        diff.Run(src)
         dst2 = diff.dst2
         changedPixels = dst2.CountNonZero()
         cumulativePixels += changedPixels
@@ -47,10 +46,9 @@ Public Class Motion_Basics
             task.depthOptionsChanged = False
         End If
 
-        contours.src = dst2
-        contours.Run()
+        contours.Run(dst2)
 
-        dst1 = diff.src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If contours.contourlist.Count Then
             intersect.inputRects.Clear()
             For Each c In contours.contourlist
@@ -61,7 +59,7 @@ Public Class Motion_Basics
                 If r.Y + r.Height > dst2.Height Then r.Height = dst2.Height - r.Y
                 intersect.inputRects.Add(r)
             Next
-            intersect.Run()
+            intersect.Run(src)
 
             If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             For Each r In intersect.enclosingRects
@@ -110,12 +108,11 @@ Public Class Motion_WithBlurDilate
         task.desc = "Detect contours in the motion data using blur and dilate"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        If src.Channels = 3 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = src.Clone
-        blur.src = dst1
-        blur.Run()
+        dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
+        blur.Run(dst1)
         dst1 = blur.dst1
 
         Static delayCounter = 0
@@ -127,17 +124,14 @@ Public Class Motion_WithBlurDilate
             rectList.Clear()
         End If
 
-        diff.src = dst1
-        diff.Run()
+        diff.Run(dst1)
         dst2 = diff.dst2
         changedPixels = dst2.CountNonZero()
         cumulativePixels += changedPixels
 
-        dilate.src = dst2
-        dilate.Run()
+        dilate.Run(dst2)
 
-        contours.src = dilate.dst1
-        contours.Run()
+        contours.Run(dilate.dst1)
 
         For Each c In contours.contourlist
             Dim r = cv.Cv2.BoundingRect(c)
@@ -181,13 +175,12 @@ Public Class Motion_MinMaxDepth
         task.desc = "While minimizing options and dependencies, use RGB motion to figure out what depth values should change."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim input = src
         If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f.Clone
 
-        motion.src = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        motion.Run()
+        motion.Run(task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = motion.dst2.Clone
 
         If motion.resetAll Or externalReset Then
@@ -227,14 +220,13 @@ Public Class Motion_MinMaxPointCloud
         task.desc = "Use the stable depth values to create a stable point cloud"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim input = src.Clone
         If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud
         Dim split = input.Split()
-        stable.src = split(2) * 1000
-        stable.Run()
+        stable.Run(split(2) * 1000)
 
         dst1 = stable.dst1
         dst2 = stable.dst2
@@ -271,17 +263,16 @@ Public Class Motion_MinMaxDepthColorized
         task.desc = "Colorize the stable depth (keeps Motion_MinMaxDepth at a minimum complexity)"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static saveMin = task.minDepth
         Static saveMax = task.maxDepth
         If saveMin <> task.minDepth Or saveMax <> task.maxDepth Then stable.externalReset = True
-        stable.Run()
+        stable.Run(src)
         dst1 = stable.dst1
 
-        colorize.src = dst1
-        colorize.Run()
+        colorize.Run(dst1)
         dst2 = colorize.dst1
     End Sub
 End Class
@@ -309,9 +300,9 @@ Public Class Motion_ThruCorrelation
         task.desc = "Detect motion through the correlation coefficient"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        grid.Run()
+        grid.Run(src)
 
         Dim input = src.Clone
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -373,12 +364,11 @@ Public Class Motion_CCmerge
         task.desc = "Use the correlation coefficient to maintain an up-to-date image"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount < 10 Then dst1 = src.Clone
 
-        motionCC.src = src
-        motionCC.Run()
+        motionCC.Run(src)
 
         Static lastFrame = src.Clone
         If motionCC.dst2.CountNonZero() > src.Total / 2 Then

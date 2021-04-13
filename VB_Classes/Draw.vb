@@ -56,7 +56,7 @@ Public Class Draw_Noise
         task.desc = "Add Noise to the color image"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         maxNoiseWidth = sliders.trackbar(1).Value
         src.CopyTo(dst1)
@@ -91,7 +91,7 @@ Public Class Draw_Ellipses
         task.desc = "Draw the requested number of ellipses."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.Black)
@@ -120,7 +120,7 @@ Public Class Draw_Circles
         task.desc = "Draw the requested number of circles."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.Black)
@@ -148,7 +148,7 @@ Public Class Draw_Line
         task.desc = "Draw the requested number of Lines."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod updateFrequency Then Exit Sub
         dst1.SetTo(cv.Scalar.Black)
@@ -183,7 +183,7 @@ Public Class Draw_Polygon
             radio.check(0).Checked = True
         End If
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim height = src.Height / 8
         Dim width = src.Width / 8
@@ -233,7 +233,7 @@ Public Class Draw_Shapes
         task.desc = "Use RNG to draw the same set of shapes every time"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim offsetX = 50, offsetY = 25, lineLength = 50, thickness = 2
 
@@ -276,8 +276,8 @@ Public Class Draw_SymmetricalShapes
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Number of points", 200, 1000, 500)
-            sliders.setupTrackBar(1, "Radius 1", 1, src.Rows / 2, src.Rows / 4)
-            sliders.setupTrackBar(2, "Radius 2", 1, src.Rows / 2, src.Rows / 8)
+            sliders.setupTrackBar(1, "Radius 1", 1, dst1.Rows / 2, dst1.Rows / 4)
+            sliders.setupTrackBar(2, "Radius 2", 1, dst1.Rows / 2, dst1.Rows / 8)
             sliders.setupTrackBar(3, "nGenPer", 1, 500, 100)
         End If
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -292,7 +292,7 @@ Public Class Draw_SymmetricalShapes
         task.desc = "Generate shapes programmatically"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static rotateAngle As Single = 0
         Static fillColor = cv.Scalar.Red
@@ -369,7 +369,7 @@ Public Class Draw_Arc
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Clearance from image edge (margin size)", 5, src.Width / 8, src.Width / 16)
+            sliders.setupTrackBar(0, "Clearance from image edge (margin size)", 5, dst1.Width / 8, dst1.Width / 16)
         End If
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)
@@ -396,11 +396,11 @@ Public Class Draw_Arc
 
         kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.useKalman Then
             kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
-            kalman.Run()
+            kalman.Run(src)
         Else
             kalman.kOutput = kalman.kInput ' do nothing...
         End If
@@ -447,7 +447,7 @@ Public Class Draw_ViewObjects
         task.desc = "Draw rectangles and centroids"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then
             task.trueText("Draw_ViewObjects has no standalone version." + vbCrLf + "It just draws rectangles and centroids for other algorithms.")
@@ -463,8 +463,7 @@ Public Class Draw_ViewObjects
                 End If
             Next
 
-            task.palette.src = dst1 * cv.Scalar.All(incr) ' spread the colors 
-            task.palette.Run()
+            task.palette.Run(dst1 * cv.Scalar.All(incr))
             dst1 = task.palette.dst1
 
             Static drawRectangleCheck = findCheckBox("Draw rectangle and centroid for each mask")
@@ -498,7 +497,7 @@ Public Class Draw_Frustrum
         task.desc = "Draw a frustrum for a camera viewport"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = New cv.Mat(task.pointCloud.Height, task.pointCloud.Height, cv.MatType.CV_32F, 0)
         Dim mid = task.pointCloud.Height / 2
@@ -506,8 +505,7 @@ Public Class Draw_Frustrum
         For i = 0 To task.pointCloud.Height / 2
             dst1.Rectangle(New cv.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), cv.Scalar.All(i * zIncr), 1)
         Next
-        xyzDepth.src = dst1
-        xyzDepth.Run()
+        xyzDepth.Run(dst1)
         dst2 = xyzDepth.dst2
     End Sub
 End Class
@@ -543,11 +541,11 @@ Public Class Draw_ClipLine
         task.desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         dst2 = src
         kalman.kInput = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
-        kalman.Run()
+        kalman.Run(src)
         Dim p1 = New cv.Point(CInt(kalman.kOutput(0)), CInt(kalman.kOutput(1)))
         Dim p2 = New cv.Point(CInt(kalman.kOutput(2)), CInt(kalman.kOutput(3)))
 
@@ -568,7 +566,7 @@ Public Class Draw_ClipLine
         task.trueText("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
                      CInt(src.Width / 2), 200)
         If r = rect Then setup()
-        flow.Run()
+        flow.Run(src)
     End Sub
 End Class
 
@@ -591,7 +589,7 @@ Public Class Draw_Intersection
         task.desc = "Determine if 2 lines intersect"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then
             If task.frameCount Mod 100 <> 0 Then Exit Sub
@@ -639,12 +637,12 @@ Public Class Draw_Hexagon
         initParent()
         alpha.imagePic.Image = Image.FromFile(task.parms.homeDir + "Data/GestaltCube.gif")
         alpha.Show()
-        alpha.Size = New System.Drawing.Size(src.Width + 10, src.Height + 10)
+        alpha.Size = New System.Drawing.Size(dst1.Width + 10, dst1.Height + 10)
         alpha.Text = "Perception is the key"
         task.desc = "What it means to recognize a cube.  Zygmunt Pizlo UC Irvine"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
     End Sub
 End Class

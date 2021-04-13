@@ -13,11 +13,10 @@ Public Class Highlight_Basics
         task.desc = "Pixels are grouped by reduction.  Highlight the rectangle and centroid nearest the mouse click"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then
-            reduction.src = src
-            reduction.Run()
+            reduction.Run(src)
             viewObjects = reduction.pTrack.drawRC.viewObjects
             src = reduction.dst1
         End If

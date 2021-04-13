@@ -17,7 +17,7 @@ Public Class FAST_Basics
         task.desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         src.CopyTo(dst1)
@@ -47,10 +47,9 @@ Public Class FAST_Centroid
         task.desc = "Find interesting points with the FAST and smooth the centroid with kalman"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        fast.src = src
-        fast.Run()
+        fast.Run(src)
         dst1 = fast.dst1
         dst2.SetTo(0)
         For Each kp As cv.KeyPoint In fast.keypoints
@@ -61,7 +60,7 @@ Public Class FAST_Centroid
         If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
             kalman.kInput(0) = m.M10 / m.M00
             kalman.kInput(1) = m.M01 / m.M00
-            kalman.Run()
+            kalman.Run(src)
             dst2.Circle(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, cv.Scalar.Red, -1, task.lineType)
         End If
     End Sub

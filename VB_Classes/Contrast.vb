@@ -12,7 +12,7 @@ Public Class Contrast_POW
         task.desc = "Reduce contrast with POW function"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1.ConvertTo(dst2, cv.MatType.CV_32FC3)
@@ -40,7 +40,7 @@ Public Class Contrast_Basics
         task.desc = "Show image with varying contrast and brightness."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         src.ConvertTo(dst1, -1, sliders.trackbar(1).Value / 50, sliders.trackbar(0).Value)
         label1 = "Brightness/Contrast"

@@ -16,8 +16,8 @@ Public Class Stabilizer_Basics
             sliders.Setup(caller, 5)
             sliders.setupTrackBar(0, "Maximum percentage of lost pixels before image is reset", 0, 100, 10)
             sliders.setupTrackBar(1, "Stabilizer Correlation Threshold X1000", 0, 1000, 950)
-            sliders.setupTrackBar(2, "Width of input to matchtemplate", 10, src.Width - pad, 128)
-            sliders.setupTrackBar(3, "Height of input to matchtemplate", 10, src.Height - pad, 96)
+            sliders.setupTrackBar(2, "Width of input to matchtemplate", 10, dst1.Width - pad, 128)
+            sliders.setupTrackBar(3, "Height of input to matchtemplate", 10, dst1.Height - pad, 96)
             sliders.setupTrackBar(4, "Min stdev in correlation rect", 1, 50, 10)
         End If
 
@@ -26,7 +26,7 @@ Public Class Stabilizer_Basics
         task.desc = "if reasonable stdev and no motion in correlation rectangle, stabilize image across frames"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim resetImage As Boolean
 
@@ -52,7 +52,7 @@ Public Class Stabilizer_Basics
             searchRect = New cv.Rect(t.X - pad, t.Y - pad, t.Width + pad * 2, t.Height + pad * 2)
             match.searchArea = lastFrame(searchRect)
             match.template = input(templateRect)
-            match.Run()
+            match.Run(src)
 
             Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
             match.correlationMat.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
@@ -118,7 +118,7 @@ Public Class Stabilizer_BasicsRandomInput
         task.desc = "Generate images that have been arbitrarily shifted"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim input = src
@@ -175,14 +175,11 @@ Public Class Stabilizer_BasicsTest
         task.desc = "Test the Stabilizer_Basics with random movement"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        random.src = src
-        random.Run()
-
-        stable.src = random.dst2.Clone
-        stable.Run()
+        random.Run(src)
+        stable.Run(random.dst2.Clone)
 
         dst1 = stable.dst1
         dst2 = stable.dst2
@@ -212,7 +209,7 @@ Public Class Stabilizer_OpticalFlow
 		' task.rank = 1
         label1 = "Stabilized Image"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim vert_Border = borderCrop * src.Rows / src.Cols
         If task.frameCount = 0 Then
@@ -227,8 +224,7 @@ Public Class Stabilizer_OpticalFlow
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If inputFeat Is Nothing Then
-            good.src = src
-            good.Run()
+            good.Run(src)
             inputFeat = good.goodFeatures
         End If
         features1 = New cv.Mat(inputFeat.Count, 1, cv.MatType.CV_32FC2, inputFeat.ToArray)
@@ -332,16 +328,14 @@ Public Class Stabilizer_MotionDetect
         task.desc = "Detect motiion in the stabilizer output"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        stable.src = src
-        stable.Run()
+        stable.Run(src)
 
         Static offsetSlider = findSlider("Offset of stable rectangle from each side in pixels")
         Dim offset = offsetSlider.value
-        motion.src = stable.dst2(stable.templateRect)
-        motion.Run()
+        motion.Run(stable.dst2(stable.templateRect))
         dst1 = stable.dst2
         dst1.Rectangle(stable.templateRect, cv.Scalar.White, 1)
         dst2 = motion.dst2

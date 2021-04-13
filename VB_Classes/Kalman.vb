@@ -10,7 +10,7 @@ Public Class Kalman_Basics
         task.desc = "Use Kalman to stabilize values (such as a cv.rect.)"
         ' task.rank = 4
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static saveDimension = -1
         If saveDimension <> kInput.Length Then
@@ -32,7 +32,7 @@ Public Class Kalman_Basics
         If task.useKalman Then
             For i = 0 To kalman.Length - 1
                 kalman(i).inputReal = kInput(i)
-                kalman(i).Run()
+                kalman(i).Run(src)
                 If Double.IsNaN(kalman(i).stateResult) Then kalman(i).stateResult = kalman(i).inputReal ' kalman failure...
                 kOutput(i) = kalman(i).stateResult
             Next
@@ -72,7 +72,7 @@ Public Class Kalman_Stripped
         task.desc = "High volume usage only.  Same as Kalman_basics but no check boxes."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static saveDimension = -1
         If saveDimension <> kInput.Length Then
@@ -94,7 +94,7 @@ Public Class Kalman_Stripped
         If task.useKalman Then
             For i = 0 To kalman.Length - 1
                 kalman(i).inputReal = kInput(i)
-                kalman(i).Run()
+                kalman(i).Run(src)
                 If Double.IsNaN(kalman(i).stateResult) Then kalman(i).stateResult = kalman(i).inputReal ' kalman failure...
                 kOutput(i) = kalman(i).stateResult
             Next
@@ -144,7 +144,7 @@ Public Class Kalman_Compare
         task.desc = "Use this kalman filter to predict the next value."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount = 0 Then
             If kalman IsNot Nothing Then
@@ -167,18 +167,18 @@ Public Class Kalman_Compare
         End If
 
         plot.plotData = src.Mean()
-        plot.Run()
+        plot.Run(src)
         dst1 = plot.dst1
 
         For i = 0 To kalman.Count - 1
             kalman(i).inputReal = plot.plotData.Item(i)
-            kalman(i).Run()
+            kalman(i).Run(src)
         Next
 
         kPlot.maxScale = plot.maxScale ' keep the scale the same for the side-by-side plots.
         kPlot.minScale = plot.minScale
         kPlot.plotData = New cv.Scalar(kalman(0).stateResult, kalman(1).stateResult, kalman(2).stateResult)
-        kPlot.Run()
+        kPlot.Run(src)
         dst2 = kPlot.dst1
     End Sub
 End Class
@@ -214,12 +214,12 @@ Public Class Kalman_RotatingPoint
         cv.Cv2.SetIdentity(kf.MeasurementNoiseCov, cv.Scalar.All(0.1))
         cv.Cv2.SetIdentity(kf.ErrorCovPost, cv.Scalar.All(1))
         cv.Cv2.Randn(kf.StatePost, New cv.Scalar(0), cv.Scalar.All(1))
-        radius = src.Rows / 2.4 ' so we see the entire circle...
-        center = New cv.Point2f(src.Cols / 2, src.Rows / 2)
+        radius = dst1.Rows / 2.4 ' so we see the entire circle...
+        center = New cv.Point2f(dst1.Cols / 2, dst1.Rows / 2)
         task.desc = "Track a rotating point using a Kalman filter. Yellow line (estimate) should be shorter than red (real)."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim stateAngle = kState.Get(Of Single)(0)
 
@@ -265,12 +265,12 @@ Public Class Kalman_MousePredict
         ReDim kalman.kInput(2 - 1)
         ReDim kalman.kOutput(2 - 1)
 
-        lineWidth = src.Width / 300
+        lineWidth = dst1.Width / 300
         label1 = "Red is real mouse, white is prediction"
         task.desc = "Use kalman filter to predict the next mouse location."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod 100 = 0 Then dst1.SetTo(0)
 
@@ -278,7 +278,7 @@ Public Class Kalman_MousePredict
         kalman.kInput(0) = task.mousePoint.X
         kalman.kInput(1) = task.mousePoint.Y
         Dim lastStateResult = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
-        kalman.Run()
+        kalman.Run(src)
         cv.Cv2.Line(dst1, New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), lastStateResult, cv.Scalar.All(255), lineWidth, task.lineType)
         cv.Cv2.Line(dst1, task.mousePoint, lastRealMouse, New cv.Scalar(0, 0, 255), lineWidth, task.lineType)
         lastRealMouse = task.mousePoint
@@ -304,9 +304,9 @@ Public Class Kalman_CVMat
         input = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
         If standalone Then label1 = "Rectangle moves smoothly to random locations"
         task.desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static saveDimension = -1
         If saveDimension <> input.Rows Then
@@ -328,7 +328,7 @@ Public Class Kalman_CVMat
         If task.useKalman Then
             For i = 0 To kalman.Length - 1
                 kalman(i).inputReal = input.Get(Of Single)(i, 0)
-                kalman(i).Run()
+                kalman(i).Run(src)
                 output.Set(Of Single)(i, 0, kalman(i).stateResult)
             Next
         Else
@@ -336,7 +336,7 @@ Public Class Kalman_CVMat
         End If
 
 
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             Dim rx(input.Rows - 1) As Single
             Dim testrect As New cv.Rect
             For i = 0 To input.Rows - 1
@@ -377,19 +377,18 @@ Public Class Kalman_ImageSmall
         label1 = "The small image is processed by the Kalman filter"
         label2 = "Mask of the smoothed image minus original"
         task.desc = "Resize the image to allow the Kalman filter to process the whole image."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        resize.src = src
-        resize.Run()
+        resize.Run(src)
 
         Dim saveOriginal = resize.dst1.Clone()
         Dim gray32f As New cv.Mat
         resize.dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
         kalman.input = gray32f.Reshape(1, gray32f.Width * gray32f.Height)
-        kalman.Run()
+        kalman.Run(src)
         Dim tmp As New cv.Mat
         kalman.output.ConvertTo(tmp, cv.MatType.CV_8U)
         tmp = tmp.Reshape(1, gray32f.Height)
@@ -414,12 +413,11 @@ Public Class Kalman_DepthSmall
         label1 = "Mask of non-zero depth after Kalman smoothing"
         label2 = "Mask of the smoothed image minus original"
         task.desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        kalman.src = task.RGBDepth
-        kalman.Run()
+        kalman.Run(task.RGBDepth)
         dst1 = kalman.dst1
         dst2 = kalman.dst2
     End Sub
@@ -445,15 +443,14 @@ Public Class Kalman_Depth32f
         label1 = "Mask of non-zero depth after Kalman smoothing"
         label2 = "Difference from original depth"
         task.desc = "Use a resized depth Mat to find where depth is decreasing (getting closer.)"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        resize.src = task.depth32f
-        resize.Run()
+        resize.Run(task.depth32f)
 
         kalman.input = resize.dst1.Reshape(1, resize.dst1.Width * resize.dst1.Height)
-        kalman.Run()
+        kalman.Run(src)
         dst1 = kalman.output.Reshape(1, resize.dst1.Height)
         dst1 = dst1.Resize(src.Size())
         cv.Cv2.Subtract(dst1, task.depth32f, dst2)
@@ -495,7 +492,7 @@ Public Class Kalman_Single
         task.desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -507,7 +504,7 @@ Public Class Kalman_Single
         stateResult = kf.Correct(measurement).Get(Of Single)(0, 0)
         If standalone or task.intermediateReview = caller Then
             plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
-            plot.Run()
+            plot.Run(src)
             dst2 = plot.dst1
             label1 = "Mean of the grayscale image is predicted"
             label2 = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
@@ -540,7 +537,7 @@ Public Class Kalman_Simple : Implements IDisposable
         kf.MeasurementNoiseCov.SetIdentity(0.1)
         kf.ErrorCovPost.SetIdentity(1)
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         Dim prediction = kf.Predict()
         measurement.Set(Of Single)(0, 0, inputReal)
         stateResult = kf.Correct(measurement).Get(Of Single)(0, 0)
@@ -589,7 +586,7 @@ Public Class Kalman_VB
         End If
         label1 = "Use first slider in the options to test the algorithm.  The other sliders in the options visualize the impact."
         task.desc = "A native VB Kalman filter"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub State_Update(ByVal q_m As Single)
         Dim dt As Single = 1 / 20
@@ -623,7 +620,7 @@ Public Class Kalman_VB
         angle += K_0 * angle_err 'Update our state estimate
         q_bias += K_1 * angle_err
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         input = sliders.trackbar(0).Value
         Dim noiselevel = sliders.trackbar(6).Value
@@ -706,7 +703,7 @@ Public Class Kalman_VB_Basics
         End If
         label1 = "Blue = gray mean, green = kalman, red = kalman avg"
         task.desc = "Build a generic kalman filter based on Kalman_VB"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub State_Update(ByVal q_m As Single)
         Static deltaSlider = findSlider("Delta Time X100")
@@ -744,10 +741,10 @@ Public Class Kalman_VB_Basics
         kOutput += K_0 * kError 'Update our state estimate
         q_bias += K_1 * kError
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             Dim gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             kInput = gray.Mean().Item(0)
         End If
@@ -774,9 +771,9 @@ Public Class Kalman_VB_Basics
             kOutput = kInput
         End If
 
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             plot.plotData = New cv.Scalar(kOutput, kInput, kAverage)
-            plot.Run()
+            plot.Run(src)
         End If
     End Sub
 End Class

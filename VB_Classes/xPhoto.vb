@@ -12,7 +12,7 @@ Public Class xPhoto_Bm3dDenoise
         label1 = "Bm3dDenoising"
         label2 = "Difference from Input"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.EqualizeHist(src, src)
@@ -36,7 +36,7 @@ Public Class xPhoto_Bm3dDenoiseDepthImage
 		' task.rank = 1
         label2 = "Difference from Input"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.EqualizeHist(gray, gray)
@@ -92,7 +92,7 @@ Public Class xPhoto_OilPaint_CPP
         task.desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim colorCode As integer = cv.ColorConversionCodes.BGR2GRAY
         Static frm = findfrm("xPhoto_OilPaint_CPP Radio Options")

@@ -58,7 +58,7 @@ Public Class Python_Run
         task.desc = "Run Python app: " + pythonApp.Name
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If pyStream IsNot Nothing Then
             pyStream.src = src
@@ -110,7 +110,7 @@ Public Class Python_MemMap
 		' task.rank = 1
         End If
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then memMapValues(0) = task.frameCount
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
@@ -147,13 +147,13 @@ Public Class Python_SurfaceBlit
         task.desc = "Stream data to Python_SurfaceBlit Python script."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If PythonReady Then
             For i = 0 To memMap.memMapValues.Length - 1
                 memMap.memMapValues(i) = Choose(i + 1, task.frameCount, src.Total * src.ElemSize, 0, src.Rows, src.Cols)
             Next
-            memMap.Run()
+            memMap.Run(src)
 
             Dim rgb = src.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2RGB)
             If rgbBuffer.Length <> rgb.Total * rgb.ElemSize Then ReDim rgbBuffer(rgb.Total * rgb.ElemSize - 1)
@@ -217,7 +217,7 @@ Public Class Python_Stream
         task.desc = "General purpose class to pipe RGB and Depth to Python scripts."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If pythonReady Then
             For i = 0 To memMap.memMapValues.Length - 1
@@ -225,7 +225,7 @@ Public Class Python_Stream
                                                 task.depth32f.Total * task.depth32f.ElemSize, src.Rows, src.Cols,
                                                 task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height)
             Next
-            memMap.Run()
+            memMap.Run(src)
 
             If rgbBuffer.Length <> src.Total * src.ElemSize Then ReDim rgbBuffer(src.Total * src.ElemSize - 1)
             If depthBuffer.Length <> task.depth32f.Total * task.depth32f.ElemSize Then ReDim depthBuffer(task.depth32f.Total * task.depth32f.ElemSize - 1)

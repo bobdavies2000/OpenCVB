@@ -13,7 +13,7 @@ Public Class kMeans_Basics
         task.desc = "Cluster the rgb image pixels using kMeans."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim kInput = src.Resize(New cv.Size(CInt(src.Width / resizeFactor), CInt(src.Height / resizeFactor)))
         Dim columnVector = kInput.Reshape(src.Channels, kInput.Height * kInput.Width)
@@ -65,7 +65,7 @@ Public Class kMeans_BasicsDepthColor
         task.desc = "Cluster the rgb image pixels using kMeans."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim resizeVal = If(resizeRequest, 4, 1)
         Dim small = src.Resize(New cv.Size(src.Width / resizeVal, src.Height / resizeVal))
@@ -118,17 +118,16 @@ Public Class kMeans_Clusters
         task.desc = "Show clustering with various settings for cluster count.  Draw to select region of interest."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static saveRect = task.drawRect
         task.drawRect = saveRect
-        km.src = src
         For i = 0 To 3
             km.kmeansK = Choose(i + 1, 2, 4, 6, 8)
-            km.Run()
+            km.Run(src)
             Mats.mat(i) = km.dst1.Clone
         Next
-        Mats.Run()
+        Mats.Run(src)
         dst1 = Mats.dst1
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
         dst2 = Mats.mat(quadrantIndex)
@@ -153,7 +152,7 @@ Public Class kMeans_RGBFast
         task.desc = "Cluster a small rgb image using kMeans.  Specify clusterCount value."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim small8uC3 = src.Resize(New cv.Size(CInt(src.Rows / resizeFactor), CInt(src.Cols / resizeFactor)))
         Dim columnVector As New cv.Mat
@@ -196,10 +195,9 @@ Public Class kMeans_RGB_Plus_XYDepth
         task.desc = "Cluster with kMeans RGB, x, y, and depth."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
-        km.src = src
-        km.Run() ' cluster the rgb image - output is in dst2
+        km.Run(src) ' cluster the rgb image - output is in dst2
         Dim rgb32f As New cv.Mat
         km.dst1.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
         Dim xyDepth32f As New cv.Mat(rgb32f.Size(), cv.MatType.CV_32FC3, 0)
@@ -252,15 +250,15 @@ Public Class kMeans_XYDepth
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
         End If
-        Dim w = src.Cols / 4
-        Dim h = src.Rows / 4
+        Dim w = dst1.Cols / 4
+        Dim h = dst1.Rows / 4
         task.drawRect = New cv.Rect(w, h, w * 2, h * 2)
         label1 = "Draw rectangle anywhere..."
         label2 = "Currently selected region"
         task.desc = "Cluster with x, y, and depth using kMeans.  Draw on the image to select a region."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim roi = task.drawRect
         Dim xyDepth32f As New cv.Mat(task.depth32f(roi).Size(), cv.MatType.CV_32FC3, 0)
@@ -295,7 +293,7 @@ Public Class kMeans_Depth_FG_BG
         task.desc = "Separate foreground and background using Kmeans (with k=2) using the depth value of center point."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim columnVector As New cv.Mat
         columnVector = task.depth32f.Reshape(1, task.depth32f.Rows * task.depth32f.Cols)
@@ -330,13 +328,13 @@ Public Class kMeans_LAB
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
         End If
         label1 = "kMeans_LAB - draw to select region"
-        Dim w = src.Cols / 4
-        Dim h = src.Rows / 4
+        Dim w = dst1.Cols / 4
+        Dim h = dst1.Rows / 4
         task.drawRect = New cv.Rect(w, h, w * 2, h * 2)
         task.desc = "Cluster the LAB image using kMeans.  Is it better?  Optionally draw on the image and select k."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim roi = task.drawRect
         Dim labMat = src(roi).CvtColor(cv.ColorConversionCodes.RGB2Lab)
@@ -376,7 +374,7 @@ Public Class kMeans_Color
         task.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim columnVector = src.Reshape(src.Channels, src.Height * src.Width)
         Dim rgb32f As New cv.Mat
@@ -415,7 +413,7 @@ Public Class kMeans_Color_MT
         task.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount = 0 Then
             Static gridWidthSlider = findSlider("ThreadGrid Width")
@@ -424,7 +422,7 @@ Public Class kMeans_Color_MT
             gridHeightSlider.Value = 160
 
         End If
-        grid.Run()
+        grid.run(src)
         Dim clusterCount = sliders.trackbar(0).Value
         Parallel.ForEach(grid.roiList,
         Sub(roi)
@@ -466,7 +464,7 @@ Public Class kMeans_ColorDepth
         task.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim rgb32f As New cv.Mat
         src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
@@ -517,9 +515,9 @@ Public Class kMeans_ColorDepth_MT
         task.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        grid.Run()
+        grid.run(src)
 
         Dim clusterCount = sliders.trackbar(0).Value
         Parallel.ForEach(grid.roiList,
@@ -567,28 +565,27 @@ Public Class KMeans_Subdivision
         task.desc = "Use KMeans to subdivide an image and then subdivide it again."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static kmeansKslider = findSlider("kMeans k")
         kmeansKslider.value = 2
 
-        kmeans.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        kmeans.Run()
+        kmeans.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst1 = kmeans.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim mean = dst1.Mean()
         Dim maskDark = dst1.Threshold(mean.Item(0), 255, cv.ThresholdTypes.BinaryInv)
-        kmeans.src.SetTo(0)
-        src.CopyTo(kmeans.src, maskDark)
+        src.SetTo(0)
+        src.CopyTo(src, maskDark)
         kmeansKslider.value = 3
-        kmeans.Run()
+        kmeans.Run(src)
         dst2 = kmeans.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim maskLite = dst1.Threshold(mean.Item(0), 255, cv.ThresholdTypes.Binary)
-        kmeans.src.SetTo(0)
-        src.CopyTo(kmeans.src, maskLite)
+        src.SetTo(0)
+        src.CopyTo(src, maskLite)
         kmeansKslider.value = 3
-        kmeans.Run()
+        kmeans.Run(src)
         kmeans.dst1.CopyTo(dst2, maskLite)
     End Sub
 End Class
@@ -610,27 +607,26 @@ Public Class KMeans_Subdivision1
         task.desc = "Use KMeans to subdivide an image and then subdivide it again."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static kmeansKslider = findSlider("kMeans k")
         kmeansKslider.value = 2
 
-        kmeans.src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        kmeans.Run()
+        kmeans.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         Dim gray1 = kmeans.dst1.Clone
 
         Dim maskDark = gray1.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
-        kmeans.src.SetTo(0)
-        src.CopyTo(kmeans.src, maskDark)
+        src.SetTo(0)
+        src.CopyTo(src, maskDark)
         kmeansKslider.value = 3
-        kmeans.Run()
+        kmeans.Run(src)
         Dim gray2 = kmeans.dst1.Clone
 
         Dim maskLite = gray1.Threshold(1, 255, cv.ThresholdTypes.Binary)
-        kmeans.src.SetTo(0)
-        src.CopyTo(kmeans.src, maskLite)
+        src.SetTo(0)
+        src.CopyTo(src, maskLite)
         kmeansKslider.value = 3
-        kmeans.Run()
+        kmeans.Run(src)
         kmeans.dst1.CopyTo(gray2, maskLite)
 
         Dim centroids As New List(Of cv.Point)

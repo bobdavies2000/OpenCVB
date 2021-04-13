@@ -16,14 +16,14 @@ Public Class KNN_Basics
         task.desc = "Test knn with random points in the image.  Find the nearest n points."
         ' task.rank = 2
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1.SetTo(cv.Scalar.Black)
 
         If standalone Then
-            random.Run()
+            random.Run(src)
             lastSet = New List(Of cv.Point2f)(random.Points2f)
-            random.Run()
+            random.Run(src)
             currSet = New List(Of cv.Point2f)(random.Points2f)
         End If
 
@@ -73,12 +73,12 @@ Public Class KNN_BasicsQT
         task.desc = "Test knn with random points in the image.  Find the nearest n points."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1.SetTo(cv.Scalar.Black)
 
         If standalone Or knnQT.useRandomData Then
-            knnQT.Run()
+            knnQT.Run(src)
             knnQT.trainingPoints = New List(Of cv.Point2f)(knnQT.randomTrain.Points2f)
             knnQT.queryPoints = New List(Of cv.Point2f)(knnQT.randomQuery.Points2f)
         Else
@@ -141,7 +141,7 @@ Public Class KNN_Options
         task.desc = "Source of query/train points - generate points if standalone.  Reuse points if requested."
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then
             If check.Box(0).Checked = False Then useRandomData = True
@@ -154,11 +154,11 @@ Public Class KNN_Options
             End If
             Static trainSlider = findSlider("KNN Train count")
             randomTrain.countSlider.Value = trainSlider.Value
-            randomTrain.Run()
+            randomTrain.Run(src)
 
             Static querySlider = findSlider("KNN Query count")
             randomQuery.countSlider.Value = querySlider.Value
-            randomQuery.Run()
+            randomQuery.Run(src)
         End If
 
         ' algorithm does nothing but provide a location for query/train points when not running standalone.
@@ -202,9 +202,9 @@ Public Class KNN_1_to_1
         task.desc = "Use knn to find the nearest n points but use only the best and no duplicates - 1:1 mapping."
         ' task.rank = 2
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        basics.Run()
+        basics.Run(src)
         dst1 = basics.dst1
 
         ReDim matchedPoints(basics.knnQT.queryPoints.Count - 1)
@@ -294,19 +294,19 @@ Public Class KNN_Emax
         task.desc = "Emax centroids move but here KNN is used to matched the old and new locations and keep the colors the same."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone And task.frameCount = 0 Then
             emax = New EMax_Centroids()
-            emax.Run() ' set the first generation of points.
+            emax.Run(src) ' set the first generation of points.
         End If
         If standalone Or task.intermediateReview = caller Then
             knn.basics.knnQT.trainingPoints = New List(Of cv.Point2f)(emax.flood.centroids)
-            emax.Run()
+            emax.Run(src)
             knn.basics.knnQT.queryPoints = New List(Of cv.Point2f)(emax.flood.centroids)
         End If
 
-        knn.Run()
+        knn.Run(src)
         If standalone Or task.intermediateReview = caller Then
             dst1 = emax.dst1 + knn.dst1
             dst2 = knn.dst1
@@ -346,9 +346,9 @@ Public Class KNN_Test
         task.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        grid.Run()
+        grid.run(src)
 
         knn.knnQT.queryPoints.Clear()
         For i = 0 To grid.roiList.Count - 1
@@ -357,7 +357,7 @@ Public Class KNN_Test
             knn.knnQT.queryPoints.Add(pt)
         Next
 
-        knn.Run()
+        knn.Run(src)
         dst1 = knn.dst1
         knn.knnQT.trainingPoints = New List(Of cv.Point2f)(knn.knnQT.queryPoints)
         label1 = knn.label1
@@ -392,9 +392,9 @@ Public Class KNN_Test_1_to_1
         task.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        grid.Run()
+        grid.run(src)
 
         knn.basics.knnQT.queryPoints.Clear()
         For i = 0 To grid.roiList.Count - 1
@@ -403,7 +403,7 @@ Public Class KNN_Test_1_to_1
             knn.basics.knnQT.queryPoints.Add(pt)
         Next
 
-        knn.Run()
+        knn.Run(src)
         dst1 = knn.dst1
         knn.basics.knnQT.trainingPoints = New List(Of cv.Point2f)(knn.basics.knnQT.queryPoints)
         label1 = knn.label1
@@ -430,7 +430,7 @@ Public Class KNN_Point3d
         label1 = "Yellow=Query (in 3D) Blue=Best Response (in 3D)"
         label2 = "Top Down View to confirm 3D KNN is correct"
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim maxDepth As Integer = 4000 ' this is an arbitrary max depth
         Dim knn = cv.ML.KNearest.Create()
@@ -514,18 +514,17 @@ Public Class KNN_DepthClusters
         task.desc = "Use KNN to track and color the Blob results from clustering the depth data"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        blobs.Run()
+        blobs.Run(src)
         dst1 = blobs.dst2
 
-        flood.src = dst1
-        flood.Run()
+        flood.Run(dst1)
 
         pTrack.queryPoints = flood.basics.centroids
         pTrack.queryMasks = flood.basics.masks
         pTrack.queryRects = flood.basics.rects
-        pTrack.Run()
+        pTrack.Run(src)
         dst2 = pTrack.dst1
     End Sub
 End Class
@@ -555,10 +554,9 @@ Public Class KNN_SmoothAverage
         task.desc = "Smooth out the abrupt appearance/disappearance of floodfilled regions"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        knn.src = src
-        knn.Run()
+        knn.Run(src)
 
         Static accum As New cv.Mat
         If task.frameCount = 0 Then accum = knn.dst2.Clone
@@ -597,10 +595,9 @@ Public Class KNN_StabilizeRegions
         task.desc = "Identify major regions that are unstable - appearing and disappearing"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        knn.src = src
-        knn.Run()
+        knn.Run(src)
         dst1 = knn.dst2
 
         Dim tmp = knn.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
@@ -608,8 +605,7 @@ Public Class KNN_StabilizeRegions
         cv.Cv2.BitwiseXor(tmp, lastinput, dst2)
         lastinput = tmp
 
-        flood.src = dst2
-        flood.Run()
+        flood.Run(dst2)
         dst2 = flood.dst2
 
     End Sub
@@ -631,9 +627,9 @@ Public Class KNN_Contours
         task.desc = "Use KNN to streamline the outline of a contour"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        outline.Run()
+        outline.Run(src)
         dst1 = outline.dst2
 
         knn.knnQT.trainingPoints.Clear()
@@ -648,7 +644,7 @@ Public Class KNN_Contours
             Next
         End If
 
-        knn.Run()
+        knn.Run(src)
 
         Dim queries = New cv.Mat(knn.knnQT.queryPoints.Count, 2, cv.MatType.CV_32F, knn.knnQT.queryPoints.ToArray)
         Dim trainData = New cv.Mat(knn.knnQT.trainingPoints.Count, 2, cv.MatType.CV_32F, knn.knnQT.trainingPoints.ToArray)
@@ -719,7 +715,7 @@ Public Class KNN_Cluster2DCities
             result.Circle(cityPositions(i), 4 * task.fontSize, cv.Scalar.Red, -1, task.lineType)
         Next
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Static reuseCheck = findCheckBox("Reuse the training and query data")
         ' If they changed Then number of elements in the set
@@ -747,7 +743,7 @@ Public Class KNN_Cluster2DCities
                 knn.knn.knnQT.trainingPoints.Add(New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y)))
                 knn.knn.knnQT.queryPoints.Add(New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y)))
             Next
-            knn.Run()
+            knn.Run(src)
 
             dst1.SetTo(0)
             cluster(dst1, nearestCountSlider.Value)
@@ -783,11 +779,11 @@ Public Class KNN_Point2d
         '    cv.Cv2.Circle(dst, knn.knnQT.trainingPoints(i), dotSize + 2, cv.Scalar.Blue, -1, task.lineType, 0)
         'Next
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then prepareImage(dst1, task.dotSize)
 
-        knn.Run()
+        knn.Run(src)
 
         Static nearestCountSlider = findSlider("KNN k nearest points")
         Dim findXnearest = nearestCountSlider.Value
@@ -828,7 +824,7 @@ Public Class KNN_Learn
         task.desc = "Learn from a set of training points.  The calling user can then use FindNearest on the knn"
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1.SetTo(cv.Scalar.Black)
 
@@ -919,12 +915,11 @@ Public Class KNN_PointTracker
             End If
         Next
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then
             If topView Is Nothing Then topView = New PointCloud_Kalman_TopView()
-            topView.src = task.pointCloud
-            topView.Run()
+            topView.Run(task.pointCloud)
             dst1 = topView.dst1
             Exit Sub
         End If
@@ -952,7 +947,7 @@ Public Class KNN_PointTracker
         newCentroids.Clear()
 
         knn.basics.knnQT.queryPoints = New List(Of cv.Point2f)(queryPoints)
-        knn.Run()
+        knn.Run(src)
 
         Dim matches As New List(Of cv.Point2f)(knn.matchedPoints)
         If matches IsNot Nothing Then ' first pass condition.
@@ -981,7 +976,7 @@ Public Class KNN_PointTracker
                     inputRect = queryRects(matchIndex)
                     kalman(i).kInput = {queryPoints(matchIndex).X, queryPoints(matchIndex).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}
                     If task.useKalman Then
-                        kalman(i).Run()
+                        kalman(i).Run(src)
                     Else
                         kalman(i).kOutput = {queryPoints(matchIndex).X, queryPoints(matchIndex).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}
                     End If
@@ -1021,7 +1016,7 @@ Public Class KNN_PointTracker
             Next
 
             If useDrawRC Then
-                drawRC.Run()
+                drawRC.Run(src)
                 dst1 = drawRC.dst1
             End If
         End If
@@ -1050,14 +1045,14 @@ Public Class KNN_1_to_1FIFO
         task.desc = "Using the last set of points, find the nearest point for each the current set - first come, first served."
 		' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1.SetTo(cv.Scalar.Black)
 
         If standalone Then
-            random.Run()
+            random.Run(src)
             lastSet = New List(Of cv.Point2f)(random.Points2f)
-            random.Run()
+            random.Run(src)
             currSet = New List(Of cv.Point2f)(random.Points2f)
         End If
 
