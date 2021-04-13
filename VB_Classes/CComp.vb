@@ -177,11 +177,8 @@ Public Class CComp_PointTracker
         pTrack = New KNN_PointTracker()
         basics = New CComp_Basics()
 
-        Dim hotRadio = findRadio("Hot")
-        hotRadio.Checked = True
-
         task.desc = "Track connected componenent centroids and use it to match coloring"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -233,8 +230,6 @@ Public Class CComp_MaxBlobs
             check.Setup(caller, 1)
             check.Box(0).Text = "Reassess the best CComp threshold"
         End If
-        Dim hotRadio = findRadio("Hot")
-        hotRadio.Checked = True
 
         task.desc = "Find the best CComp threshold to maximize the number of blobs"
 		' task.rank = 1
@@ -344,11 +339,8 @@ Public Class CComp_DepthEdges
             check.Box(0).Checked = True
         End If
 
-        Dim hotRadio = findRadio("Hot")
-        hotRadio.Checked = True
-
         task.desc = "Use depth edges to isolate connected components in depth"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

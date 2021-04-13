@@ -307,11 +307,8 @@ Public Class Fuzzy_PointTracker
         pTrack = New KNN_PointTracker()
         fuzzy.sliders.Visible = False
 
-        Dim hotRadio = findRadio("Hot")
-        hotRadio.Checked = True
-
         task.desc = "FloodFill the regions defined as solid"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

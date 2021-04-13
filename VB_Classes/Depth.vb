@@ -882,9 +882,6 @@ Public Class Depth_Smoothing
         reductionRadio.Checked = True
         smooth = New Depth_SmoothingMat()
 
-        Dim hotRadio = findRadio("Hot")
-        hotRadio.Checked = True
-
         label2 = "Mask of depth that is smooth"
         task.desc = "This attempt to get the depth data to 'calm' down is not working well enough to be useful - needs more work"
 		' task.rank = 1

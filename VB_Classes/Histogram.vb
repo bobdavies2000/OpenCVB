@@ -1258,11 +1258,8 @@ Public Class Histogram_SmoothConcentration
         topview = New Histogram_SmoothTopView2D
         concent = New Histogram_ViewConcentrationsTopX
 
-        Dim hotRadio = findRadio("Hot")
-        hotRadio.Checked = True
-
         task.desc = "Using stable depth data, highlight the histogram projections where concentrations are highest"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
