@@ -51,8 +51,8 @@ Public Class VBparent : Implements IDisposable
         End If
 
         src = task.color
-        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
-        dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
+        dst1 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
+        dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
     End Sub
     Public Sub NextFrame()
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
@@ -72,10 +72,10 @@ Public Class VBparent : Implements IDisposable
                     task.label2 = task.intermediateObject.label2
                 End If
             End If
-            If dst1.Width <> task.color.Width Then dst1 = dst1.Resize(New cv.Size(task.color.Width, task.color.Height))
-            If dst2.Width <> task.color.Width Then dst2 = dst2.Resize(New cv.Size(task.color.Width, task.color.Height))
-            If task.result.Width <> dst1.Width * 2 Or task.result.Height <> dst1.Height Then
-                task.result = New cv.Mat(New cv.Size(dst1.Width * 2, dst1.Height), cv.MatType.CV_8UC3)
+            If dst1.Width <> src.Width Then dst1 = dst1.Resize(New cv.Size(src.Width, src.Height))
+            If dst2.Width <> src.Width Then dst2 = dst2.Resize(New cv.Size(src.Width, src.Height))
+            If task.imgResult.Width <> dst1.Width * 2 Or task.imgResult.Height <> dst1.Height Then
+                task.imgResult = New cv.Mat(New cv.Size(dst1.Width * 2, dst1.Height), cv.MatType.CV_8UC3)
             End If
 
             If task.pythonTaskName.EndsWith(".py") = False Then
@@ -87,8 +87,8 @@ Public Class VBparent : Implements IDisposable
                 End If
             End If
 
-            task.result(New cv.Rect(0, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst1)
-            task.result(New cv.Rect(task.color.Width, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst2)
+            task.imgResult(New cv.Rect(0, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst1)
+            task.imgResult(New cv.Rect(task.color.Width, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst2)
             task.frameCount += 1
         End If
     End Sub

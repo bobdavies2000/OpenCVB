@@ -1241,7 +1241,7 @@ Public Class OpenCVB
             End SyncLock
 
             SyncLock imgResult
-                imgResult = task.result.Clone()
+                imgResult = task.imgResult.Clone()
                 algorithmRefresh = True
             End SyncLock
 

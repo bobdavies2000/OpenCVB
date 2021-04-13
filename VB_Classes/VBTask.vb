@@ -106,7 +106,7 @@ Public Class ActiveTask : Implements IDisposable
 
     Public color As cv.Mat
     Public RGBDepth As cv.Mat
-    Public result As New cv.Mat
+    Public imgResult As New cv.Mat
     Public pointCloud As cv.Mat
     Public leftView As cv.Mat
     Public rightView As cv.Mat
@@ -292,7 +292,7 @@ Public Class ActiveTask : Implements IDisposable
         color = New cv.Mat(resolution.Height, resolution.Width, cv.MatType.CV_8UC3, cv.Scalar.All(0))
         RGBDepth = New cv.Mat(color.Size(), cv.MatType.CV_8UC3, cv.Scalar.All(0))
         pointCloud = New cv.Mat(camHeight, camWidth, cv.MatType.CV_32FC3, cv.Scalar.All(0))
-        result = New cv.Mat(color.Height, color.Width * 2, cv.MatType.CV_8UC3, cv.Scalar.All(0))
+        imgResult = New cv.Mat(color.Height, color.Width * 2, cv.MatType.CV_8UC3, cv.Scalar.All(0))
 
         task = Me
         task.algName = _algName
