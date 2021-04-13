@@ -3,39 +3,13 @@ Imports System.Runtime.InteropServices
 Imports System.IO
 Public Class Palette_Basics
     Inherits VBparent
-    ' Dim colormap As cv.ColormapTypes
-    ' Dim radioFrm As OptionsRadioButtons
     Public whitebackground As Boolean
     Public gradientColorMap As New cv.Mat
     Public Sub New()
         initParent()
-        'radioFrm = findfrm(caller + " Radio Options")
-        'If radioFrm Is Nothing Then
-        '    radio.Setup(caller, mapNames.Count)
-        '    For i = 0 To mapNames.Count - 1
-        '        radio.check(i).Text = mapNames(i)
-        '        If mapNames(i) = "Hsv" Then radio.check(i).Checked = True
-        '    Next
-        '    radioFrm = radio
-        'End If
         task.desc = "Apply the different color maps in OpenCV - Painterly Effect"
-		' task.rank = 1
+        ' task.rank = 3
     End Sub
-    'Public Function checkRadios() As cv.ColormapTypes
-    '    Dim scheme As cv.ColormapTypes = 0
-    '    For i = 0 To mapNames.Count - 1
-    '        If radioFrm.check(i).Checked Then
-    '            scheme = Choose(i + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone, cv.ColormapTypes.Cividis, cv.ColormapTypes.Cool,
-    '                                       cv.ColormapTypes.Hot, cv.ColormapTypes.Hsv, cv.ColormapTypes.Inferno, cv.ColormapTypes.Jet,
-    '                                       cv.ColormapTypes.Magma, cv.ColormapTypes.Ocean, cv.ColormapTypes.Parula, cv.ColormapTypes.Pink,
-    '                                       cv.ColormapTypes.Plasma, cv.ColormapTypes.Rainbow, cv.ColormapTypes.Spring, cv.ColormapTypes.Summer,
-    '                                       cv.ColormapTypes.Twilight, cv.ColormapTypes.TwilightShifted, cv.ColormapTypes.Viridis,
-    '                                       cv.ColormapTypes.Winter)
-    '            Exit For
-    '        End If
-    '    Next
-    '    Return scheme
-    'End Function
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
         label1 = "ColorMap = " + task.paletteSchemeName
@@ -45,8 +19,6 @@ Public Class Palette_Basics
         If saveColorMap <> task.paletteScheme Then
             saveColorMap = task.paletteScheme
             Dim str = cMapDir.FullName + "/colorscale_" + task.paletteSchemeName + ".jpg"
-            ' Something is flipped - Ocean is actually HSV and vice versa.  This addresses it but check in future OpenCVSharp releases...
-            If str.Contains("Ocean") Then str = str.Replace("Ocean", "Hsv") Else If str.Contains("Hsv") Then str = str.Replace("Hsv", "Ocean")
             Dim mapFile As New FileInfo(str)
             gradientColorMap = cv.Cv2.ImRead(mapFile.FullName)
             gradientColorMap.Col(0).SetTo(If(whitebackground, cv.Scalar.White, cv.Scalar.Black))

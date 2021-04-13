@@ -26,7 +26,7 @@ Public Class OptionsGlobal
         UseKalman.Checked = GetSetting("OpenCVB", "useKalman", "useKalman", True)
         UseKalmanWhenStable.Checked = GetSetting("OpenCVB", "UseKalmanWhenStable", "UseKalmanWhenStable", False)
 
-        schemeName = GetSetting("OpenCVB", "DefaultPalette", "DefaultPalette", "Hsv")
+        schemeName = GetSetting("OpenCVB", "DefaultPalette", "DefaultPalette", "Jet")
         If check Is Nothing Then
             ReDim check(mapNames.Count - 1)
             For i = 0 To mapNames.Count - 1
@@ -82,7 +82,7 @@ Public Class OptionsGlobal
         SaveSetting("OpenCVB", "IMUmotionSlider", "IMUmotionSlider", 1)
         SaveSetting("OpenCVB", "useKalman", "useKalman", True)
         SaveSetting("OpenCVB", "UseKalmanWhenStable", "UseKalmanWhenStable", False)
-        SaveSetting("OpenCVB", "DefaultPalette", "DefaultPalette", "Hsv")
+        SaveSetting("OpenCVB", "DefaultPalette", "DefaultPalette", "Jet")
         OptionsGlobal_Load(sender, e)
         resetToDefaults.Checked = False
     End Sub
