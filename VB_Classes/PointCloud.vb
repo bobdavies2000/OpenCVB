@@ -259,7 +259,7 @@ End Class
 ' https://www.mynteye.com/pages/mynt-eye-d
 Public Class PointCloud_ColorizeSide
     Inherits VBparent
-    Dim palette As Palette_Gradient
+    Dim gpalette As Palette_Gradient
     Dim arcSize As Integer
     Dim imu As IMU_GVector
     Public xCheckbox As Windows.Forms.CheckBox
@@ -267,14 +267,14 @@ Public Class PointCloud_ColorizeSide
     Public Sub New()
         initParent()
 
-        palette = New Palette_Gradient()
-        palette.color1 = cv.Scalar.Yellow
-        palette.color2 = cv.Scalar.Blue
-        palette.frameModulo = 1
+        gpalette = New Palette_Gradient()
+        gpalette.color1 = cv.Scalar.Yellow
+        gpalette.color2 = cv.Scalar.Blue
+        gpalette.frameModulo = 1
         arcSize = src.Width / 15
 
-        palette.Run()
-        dst1 = palette.dst1
+        gpalette.Run()
+        dst1 = gpalette.dst1
         If standalone Then imu = New IMU_GVector
         label1 = "Colorize mask for side view"
         task.desc = "Create the colorized mat used for side projections"
@@ -366,7 +366,7 @@ End Class
 ' https://www.mynteye.com/pages/mynt-eye-d
 Public Class PointCloud_ColorizeTop
     Inherits VBparent
-    Dim palette As Palette_Gradient
+    Dim gpalette As Palette_Gradient
     Dim arcSize As Integer
     Dim imu As IMU_GVector
     Public xCheckbox As Windows.Forms.CheckBox
@@ -374,14 +374,14 @@ Public Class PointCloud_ColorizeTop
         initParent()
 
         If standalone Then imu = New IMU_GVector
-        palette = New Palette_Gradient()
-        palette.color1 = cv.Scalar.Yellow
-        palette.color2 = cv.Scalar.Blue
-        palette.frameModulo = 1
+        gpalette = New Palette_Gradient()
+        gpalette.color1 = cv.Scalar.Yellow
+        gpalette.color2 = cv.Scalar.Blue
+        gpalette.frameModulo = 1
         arcSize = src.Width / 15
 
-        palette.Run()
-        dst1 = palette.dst1
+        gpalette.Run()
+        dst1 = gpalette.dst1
 
         label1 = "Colorize mask for top down view"
         task.desc = "Create the colorize the mat for a topdown projections"
@@ -1278,17 +1278,15 @@ End Class
 Public Class PointCloud_BackProjectTopView
     Inherits VBparent
     Dim view As PointCloud_ObjectsTop
-    Dim palette As Palette_Basics
     Public Sub New()
         initParent()
         view = New PointCloud_ObjectsTop
         view.colorizeNeeded = True
 
-        palette = New Palette_Basics
         label1 = "Back projection of objects identified in the top view"
         label2 = "Objects identified in the top view"
         task.desc = "Display only the top view of the depth data and backproject the histogram onto the RGB image."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1326,9 +1324,9 @@ Public Class PointCloud_BackProjectTopView
                     colorMask.SetTo((i * colorBump) Mod 255, mask)
                 End If
             Next
-            palette.src = colorMask
-            palette.Run()
-            dst1 = palette.dst1
+            task.palette.src = colorMask
+            task.palette.Run()
+            dst1 = task.palette.dst1
         Else
             task.trueText("No objects found")
         End If
@@ -1346,15 +1344,13 @@ Public Class PointCloud_BackProjectSideView
     Inherits VBparent
     Dim view As PointCloud_ObjectsSide
     Dim cmatSide As PointCloud_ColorizeSide
-    Dim palette As Palette_Basics
     Public Sub New()
         initParent()
-        palette = New Palette_Basics
 
         view = New PointCloud_ObjectsSide
         cmatSide = New PointCloud_ColorizeSide
         task.desc = "Display only the side view of the depth data - with and without the IMU active"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1396,9 +1392,9 @@ Public Class PointCloud_BackProjectSideView
                     colorMask.SetTo((i * colorBump) Mod 255, mask)
                 End If
             Next
-            palette.src = colorMask
-            palette.Run()
-            dst1 = palette.dst1
+            task.palette.src = colorMask
+            task.palette.Run()
+            dst1 = task.palette.dst1
         Else
             task.trueText("No objects found")
         End If

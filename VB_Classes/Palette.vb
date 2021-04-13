@@ -3,49 +3,48 @@ Imports System.Runtime.InteropServices
 Imports System.IO
 Public Class Palette_Basics
     Inherits VBparent
-    Dim colormap As cv.ColormapTypes
-    Dim radioFrm As OptionsRadioButtons
+    ' Dim colormap As cv.ColormapTypes
+    ' Dim radioFrm As OptionsRadioButtons
     Public whitebackground As Boolean
     Public gradientColorMap As New cv.Mat
     Public Sub New()
         initParent()
-        radioFrm = findfrm(caller + " Radio Options")
-        If radioFrm Is Nothing Then
-            radio.Setup(caller, mapNames.Count)
-            For i = 0 To mapNames.Count - 1
-                radio.check(i).Text = mapNames(i)
-                If mapNames(i) = "Hsv" Then radio.check(i).Checked = True
-            Next
-            radioFrm = radio
-        End If
+        'radioFrm = findfrm(caller + " Radio Options")
+        'If radioFrm Is Nothing Then
+        '    radio.Setup(caller, mapNames.Count)
+        '    For i = 0 To mapNames.Count - 1
+        '        radio.check(i).Text = mapNames(i)
+        '        If mapNames(i) = "Hsv" Then radio.check(i).Checked = True
+        '    Next
+        '    radioFrm = radio
+        'End If
         task.desc = "Apply the different color maps in OpenCV - Painterly Effect"
 		' task.rank = 1
     End Sub
-    Public Function checkRadios() As cv.ColormapTypes
-        Dim scheme As cv.ColormapTypes = 0
-        For i = 0 To mapNames.Count - 1
-            If radioFrm.check(i).Checked Then
-                scheme = Choose(i + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone, cv.ColormapTypes.Cividis, cv.ColormapTypes.Cool,
-                                           cv.ColormapTypes.Hot, cv.ColormapTypes.Hsv, cv.ColormapTypes.Inferno, cv.ColormapTypes.Jet,
-                                           cv.ColormapTypes.Magma, cv.ColormapTypes.Ocean, cv.ColormapTypes.Parula, cv.ColormapTypes.Pink,
-                                           cv.ColormapTypes.Plasma, cv.ColormapTypes.Rainbow, cv.ColormapTypes.Spring, cv.ColormapTypes.Summer,
-                                           cv.ColormapTypes.Twilight, cv.ColormapTypes.TwilightShifted, cv.ColormapTypes.Viridis,
-                                           cv.ColormapTypes.Winter)
-                Exit For
-            End If
-        Next
-        Return scheme
-    End Function
+    'Public Function checkRadios() As cv.ColormapTypes
+    '    Dim scheme As cv.ColormapTypes = 0
+    '    For i = 0 To mapNames.Count - 1
+    '        If radioFrm.check(i).Checked Then
+    '            scheme = Choose(i + 1, cv.ColormapTypes.Autumn, cv.ColormapTypes.Bone, cv.ColormapTypes.Cividis, cv.ColormapTypes.Cool,
+    '                                       cv.ColormapTypes.Hot, cv.ColormapTypes.Hsv, cv.ColormapTypes.Inferno, cv.ColormapTypes.Jet,
+    '                                       cv.ColormapTypes.Magma, cv.ColormapTypes.Ocean, cv.ColormapTypes.Parula, cv.ColormapTypes.Pink,
+    '                                       cv.ColormapTypes.Plasma, cv.ColormapTypes.Rainbow, cv.ColormapTypes.Spring, cv.ColormapTypes.Summer,
+    '                                       cv.ColormapTypes.Twilight, cv.ColormapTypes.TwilightShifted, cv.ColormapTypes.Viridis,
+    '                                       cv.ColormapTypes.Winter)
+    '            Exit For
+    '        End If
+    '    Next
+    '    Return scheme
+    'End Function
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        colormap = checkRadios()
-        label1 = "ColorMap = " + mapNames(colormap)
+        label1 = "ColorMap = " + task.paletteSchemeName
 
         Static cMapDir As New DirectoryInfo(task.parms.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
         Static saveColorMap As Integer = -1
-        If saveColorMap <> colormap Then
-            saveColorMap = colormap
-            Dim str = cMapDir.FullName + "/colorscale_" + mapNames(colormap) + ".jpg"
+        If saveColorMap <> task.paletteScheme Then
+            saveColorMap = task.paletteScheme
+            Dim str = cMapDir.FullName + "/colorscale_" + task.paletteSchemeName + ".jpg"
             ' Something is flipped - Ocean is actually HSV and vice versa.  This addresses it but check in future OpenCVSharp releases...
             If str.Contains("Ocean") Then str = str.Replace("Ocean", "Hsv") Else If str.Contains("Hsv") Then str = str.Replace("Hsv", "Ocean")
             Dim mapFile As New FileInfo(str)
@@ -277,14 +276,12 @@ End Class
 
 Public Class Palette_DrawTest
     Inherits VBparent
-    Dim palette As Palette_Basics
     Dim draw As Draw_Shapes
     Public Sub New()
         initParent()
-        palette = New Palette_Basics()
-        palette.whitebackground = True
+        task.palette.whitebackground = True
         draw = New Draw_Shapes()
-        palette.src = dst1
+        task.palette.src = dst1
 
         task.desc = "Experiment with palette using a drawn image"
 		' task.rank = 1
@@ -292,9 +289,9 @@ Public Class Palette_DrawTest
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
         draw.Run()
-        palette.src = draw.dst1
-        palette.Run()
-        dst1 = palette.dst1
+        task.palette.src = draw.dst1
+        task.palette.Run()
+        dst1 = task.palette.dst1
     End Sub
 End Class
 
@@ -434,12 +431,10 @@ End Class
 Public Class Palette_ObjectColors
     Inherits VBparent
     Dim reduction As Reduction_KNN_Color
-    Dim palette As Palette_Basics
     Public gray As cv.Mat
     Public Sub New()
         initParent()
 
-        palette = New Palette_Basics()
         reduction = New Reduction_KNN_Color()
 
         label1 = "Consistent colors"
@@ -478,8 +473,7 @@ Public Class Palette_ObjectColors
             gray(blob.preKalmanRect).SetTo(i + 1, blob.mask)
         Next
         dst1 = gray * Math.Floor(255 / blobList.Count) ' map to 0-255
-        Dim colormap = palette.checkRadios()
-        cv.Cv2.ApplyColorMap(src, dst1, colormap)
+        cv.Cv2.ApplyColorMap(src, dst1, task.paletteScheme)
 
         dst1.SetTo(0, gray.ConvertScaleAbs(255))
         For i = 0 To blobList.Count - 1
@@ -534,28 +528,26 @@ End Class
 Public Class Palette_LeftRightImages
     Inherits VBparent
     Dim lrViews As LeftRightView_Basics
-    Dim palette As Palette_Basics
     Public Sub New()
         initParent()
         lrViews = New LeftRightView_Basics
         Dim brightSlider = findSlider("Infrared Brightness")
         brightSlider.Value = 0
-        palette = New Palette_Basics
         task.desc = "Use a palette with the left image."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         lrViews.Run()
 
-        palette.src = lrViews.dst1
-        palette.Run()
-        dst1 = palette.dst1
+        task.palette.src = lrViews.dst1
+        task.palette.Run()
+        dst1 = task.palette.dst1
 
-        palette.src = lrViews.dst2
-        palette.Run()
-        dst2 = palette.dst1
+        task.palette.src = lrViews.dst2
+        task.palette.Run()
+        dst2 = task.palette.dst1
     End Sub
 End Class
 

@@ -63,9 +63,9 @@ Public Class EMax_Basics
         edges.Run()
         dst2.SetTo(0, edges.dst1)
 
-        palette.src = dst2
-        palette.Run()
-        dst2 = palette.dst1
+        task.palette.src = dst2
+        task.palette.Run()
+        dst2 = task.palette.dst1
         dst2.SetTo(0, edges.dst1)
         If standalone Then
             inputDataMask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)

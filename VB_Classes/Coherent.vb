@@ -3,15 +3,13 @@ Public Class Coherent_Basics
     Inherits VBparent
     Dim flood As Coherent_FloodFill
     Dim pixel As Pixel_Sampler
-    Dim palette As Palette_Basics
     Public Sub New()
         initParent()
         pixel = New Pixel_Sampler
-        palette = New Palette_Basics
         flood = New Coherent_FloodFill
         dst1 = New cv.Mat(src.Size, cv.MatType.CV_8UC1, 0)
         task.desc = "Segment image with same values at the same locations"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -42,9 +40,9 @@ Public Class Coherent_Basics
         lastCount = flood.lastPoints.Count
 
         If standalone Then
-            palette.src = dst1
-            palette.Run()
-            dst2 = palette.dst1
+            task.palette.src = dst1
+            task.palette.Run()
+            dst2 = task.palette.dst1
         End If
         label1 = CStr(flood.lastRects.Count) + " regions identified in the last frame"
     End Sub
@@ -159,24 +157,20 @@ End Class
 Public Class Coherent_Palette
     Inherits VBparent
     Public flood As Coherent_Pixel
-    Public palette As Palette_Basics
     Public Sub New()
         initParent()
-        palette = New Palette_Basics()
-        palette.Run()
-
         flood = New Coherent_Pixel
         task.desc = "Highlight a consistent 8-bit grayscale image regions with a palette"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
         flood.src = src
         flood.Run()
 
-        palette.src = flood.dst1
-        palette.Run()
-        dst1 = palette.dst1
+        task.palette.src = flood.dst1
+        task.palette.Run()
+        dst1 = task.palette.dst1
         label1 = flood.label1
     End Sub
 End Class

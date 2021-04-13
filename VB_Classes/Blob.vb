@@ -288,7 +288,7 @@ Public Class Blob_DepthRanges
 
         Dim ranges = New List(Of cv.Point)(histBlobs.valleys.ranges)
         Dim rangeColors = New List(Of Integer)(histBlobs.valleys.rangeColors)
-        Dim map = histBlobs.valleys.palette.gradientColorMap
+        Dim map = task.palette.gradientColorMap
 
         ' this is close and more efficient but not precise!
         'Dim depth = task.depth32f.Normalize(255).ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -330,12 +330,10 @@ End Class
 Public Class Blob_DepthRangesGray
     Inherits VBparent
     Public blobs As Blob_DepthRanges
-    Public palette As Palette_Basics
     Public Sub New()
         initParent()
         blobs = New Blob_DepthRanges
         blobs.grayOnly = True
-        If standalone Then palette = New Palette_Basics
         task.desc = "Find the depth ranges but only in grayscale."
         task.rank = 5
     End Sub
@@ -346,13 +344,13 @@ Public Class Blob_DepthRangesGray
         dst2 = blobs.dst2
         If standalone Then
             Dim spread = 255 / blobs.histBlobs.valleys.ranges.Count
-            palette.src = dst1 * spread
-            palette.Run()
-            dst1 = palette.dst1
+            task.palette.src = dst1 * spread
+            task.palette.Run()
+            dst1 = task.palette.dst1
 
-            palette.src = dst2 * spread
-            palette.Run()
-            dst2 = palette.dst1
+            task.palette.src = dst2 * spread
+            task.palette.Run()
+            dst2 = task.palette.dst1
         End If
     End Sub
 End Class
@@ -374,7 +372,6 @@ Public Class Blob_DepthFloodfill
         flood = New FloodFill_Neighbors
 
         blobs = New Blob_DepthRangesGray
-        blobs.palette = New Palette_Basics
 
         label1 = "Slices in depth merged to connected slices"
         label2 = "Before slices were merged"
@@ -387,9 +384,9 @@ Public Class Blob_DepthFloodfill
         blobs.Run()
 
         Dim spread = 255 / blobs.blobs.histBlobs.valleys.ranges.Count
-        blobs.palette.src = blobs.dst2.Clone * spread
-        blobs.palette.Run()
-        dst2 = blobs.palette.dst1
+        task.palette.src = blobs.dst2.Clone * spread
+        task.palette.Run()
+        dst2 = task.palette.dst1
 
         flood.src = blobs.dst2
         flood.rangeColors = New List(Of Integer)(blobs.blobs.histBlobs.valleys.rangeColors)

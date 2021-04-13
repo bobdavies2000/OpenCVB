@@ -730,28 +730,26 @@ End Class
 
 Public Class Depth_ColorMap
     Inherits VBparent
-    Dim Palette As Palette_Basics
     Public Sub New()
         initParent()
-        Palette = New Palette_Basics()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Depth ColorMap Alpha X100", 1, 100, 5)
             sliders.setupTrackBar(1, "Depth ColorMap Beta", 1, 100, 3)
         End If
         task.desc = "Display the depth as a color map"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim alpha = sliders.trackbar(0).Value / 100
         Dim beta = sliders.trackbar(1).Value
-        cv.Cv2.ConvertScaleAbs(task.depth32f, Palette.src, alpha, beta)
-        Palette.src += 1
-        Palette.Run()
-        dst1 = Palette.dst1
+        cv.Cv2.ConvertScaleAbs(task.depth32f, task.palette.src, alpha, beta)
+        task.palette.src += 1
+        task.palette.Run()
+        dst1 = task.palette.dst1
         dst1.SetTo(0, task.noDepthMask)
-        dst2 = Palette.dst2
+        dst2 = task.palette.dst2
     End Sub
 End Class
 

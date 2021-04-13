@@ -125,6 +125,8 @@ Public Class ActiveTask : Implements IDisposable
     Public useKalman As Boolean
     Public useKalmanWhenStable As Boolean
     Public palette As Palette_Basics
+    Public paletteScheme As cv.ColormapTypes
+    Public paletteSchemeName As String
 
     Public minDepth As Integer
     Public maxDepth As Integer

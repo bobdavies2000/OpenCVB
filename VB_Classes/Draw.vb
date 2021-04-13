@@ -435,11 +435,9 @@ End Class
 Public Class Draw_ViewObjects
     Inherits VBparent
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Public palette As Palette_Basics
     Public Sub New()
         initParent()
 
-        palette = New Palette_Basics()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 2)
             check.Box(0).Text = "Draw rectangle and centroid for each mask"
@@ -447,7 +445,7 @@ Public Class Draw_ViewObjects
             check.Box(0).Checked = True
         End If
         task.desc = "Draw rectangles and centroids"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -465,9 +463,9 @@ Public Class Draw_ViewObjects
                 End If
             Next
 
-            palette.src = dst1 * cv.Scalar.All(incr) ' spread the colors 
-            palette.Run()
-            dst1 = palette.dst1
+            task.palette.src = dst1 * cv.Scalar.All(incr) ' spread the colors 
+            task.palette.Run()
+            dst1 = task.palette.dst1
 
             Static drawRectangleCheck = findCheckBox("Draw rectangle and centroid for each mask")
             If drawRectangleCheck.checked Then

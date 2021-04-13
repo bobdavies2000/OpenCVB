@@ -66,15 +66,11 @@ End Class
 Public Class TimeView_TopBackProjection
     Inherits VBparent
     Dim tFlood As TimeView_FloodFill
-    Dim palette As Palette_Basics
     Public Sub New()
         initParent()
         tFlood = New TimeView_FloodFill
-        palette = New Palette_Basics
-        Dim hotRadio = findRadio("Hot")
-        hotRadio.Checked = True
         task.desc = "Backproject the side and top views into the image view"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -110,9 +106,9 @@ Public Class TimeView_TopBackProjection
                     colorMask.SetTo((i * colorBump) Mod 255, mask)
                 End If
             Next
-            palette.src = colorMask
-            palette.Run()
-            dst1 = palette.dst1
+            task.palette.src = colorMask
+            task.palette.Run()
+            dst1 = task.palette.dst1
         Else
             task.trueText("No objects found")
         End If

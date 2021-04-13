@@ -1270,12 +1270,12 @@ Public Class Histogram_SmoothConcentration
         dst1 = sideview.dst1
         Dim noDepth = sideview.sideView.histOutput.Get(Of Single)(sideview.sideView.histOutput.Height / 2, 0)
         label1 = "SideView " + concent.plotHighlights(sideview.sideView.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        dst1 = concent.palette.dst1.Clone
+        dst1 = task.palette.dst1.Clone
 
         topview.Run()
         dst2 = topview.dst1
         label2 = "TopView " + concent.plotHighlights(topview.topView.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        dst2 = concent.palette.dst1.Clone
+        dst2 = task.palette.dst1.Clone
     End Sub
 End Class
 
@@ -1290,11 +1290,8 @@ Public Class Histogram_ViewConcentrationsTopX
     Inherits VBparent
     Public sideview As Histogram_SideView2D
     Public topview As Histogram_TopView2D
-    Public palette As Palette_Basics
     Public Sub New()
         initParent()
-
-        palette = New Palette_Basics
 
         sideview = New Histogram_SideView2D
         topview = New Histogram_TopView2D
@@ -1307,11 +1304,8 @@ Public Class Histogram_ViewConcentrationsTopX
             sliders.setupTrackBar(3, "Dot size", 1, 100, If(src.Width = 1280, 20, 10))
         End If
 
-        Dim hotRadio = findRadio("Hot")
-        hotRadio.Checked = True
-
         task.desc = "Highlight a fixed number of histogram projections where concentrations are highest"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Function plotHighlights(histOutput As cv.Mat, dst As cv.Mat) As String
         Static ResizeSlider = findSlider("Resize Factor x100")
@@ -1339,8 +1333,8 @@ Public Class Histogram_ViewConcentrationsTopX
             Dim pt = pts.ElementAt(i).Value
             dst.Rectangle(New cv.Rect(pt.X - dotsize, pt.Y - dotsize, dotsize * 2, dotsize * 2), 128, -1)
         Next
-        palette.src = dst
-        palette.Run()
+        task.palette.src = dst
+        task.palette.Run()
         Dim maxConcentration = If(pts.Count > 0, pts.ElementAt(0).Key, 0)
         Return CStr(pts.Count) + " highlights. Max=" + CStr(maxConcentration)
     End Function
@@ -1350,12 +1344,12 @@ Public Class Histogram_ViewConcentrationsTopX
         dst1 = sideview.dst1
         Dim noDepth = sideview.histOutput.Get(Of Single)(sideview.histOutput.Height / 2, 0)
         label1 = "SideView " + plotHighlights(sideview.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        If standalone Or task.intermediateReview = caller Then dst1 = palette.dst1.Clone
+        If standalone Or task.intermediateReview = caller Then dst1 = task.palette.dst1.Clone
 
         topview.Run()
         dst2 = topview.dst1
         label2 = "TopView " + plotHighlights(topview.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        If standalone Or task.intermediateReview = caller Then dst2 = palette.dst1.Clone
+        If standalone Or task.intermediateReview = caller Then dst2 = task.palette.dst1.Clone
     End Sub
 End Class
 
@@ -1376,13 +1370,11 @@ End Class
 Public Class Histogram_DepthClusters
     Inherits VBparent
     Public valleys As Histogram_DepthValleys
-    Dim palette As Palette_Basics
     Public Sub New()
         initParent()
-        palette = New Palette_Basics
         valleys = New Histogram_DepthValleys()
         task.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1396,15 +1388,15 @@ Public Class Histogram_DepthClusters
         Dim mask As New cv.Mat
         Dim tmp As New cv.Mat
         Dim colorIncr = 255 / valleys.ranges.Count
-        palette.src = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        task.palette.src = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         For i = 0 To valleys.ranges.Count - 1
             Dim startEndDepth = valleys.ranges.ElementAt(i)
             cv.Cv2.InRange(src, startEndDepth.X, startEndDepth.Y, tmp)
             cv.Cv2.ConvertScaleAbs(tmp, mask)
-            palette.src.SetTo(i * colorIncr + 1, mask)
+            task.palette.src.SetTo(i * colorIncr + 1, mask)
         Next
-        palette.Run()
-        dst2 = palette.dst1
+        task.palette.Run()
+        dst2 = task.palette.dst1
         If standalone Or task.intermediateReview = caller Then
             label1 = "Histogram of " + CStr(valleys.ranges.Count) + " Depth Clusters"
             label2 = "Backprojection of " + CStr(valleys.ranges.Count) + " histogram clusters"
@@ -1527,12 +1519,10 @@ Public Class Histogram_DepthValleys
     Public ranges As New List(Of cv.Point)
     Public rangeColors As New List(Of Integer)
     Public rangeCounts As New List(Of Integer)
-    Public palette As Palette_Basics
     Public grayOnly As Boolean
     Dim histSlider As Windows.Forms.TrackBar
     Public Sub New()
         initParent()
-        palette = New Palette_Basics
         hist = New Histogram_Depth()
 
         histSlider = findSlider("Histogram Depth Bins")
@@ -1621,9 +1611,9 @@ Public Class Histogram_DepthValleys
         rangeColors.Add(If(grayOnly = False, 255, ranges.Count))
 
         If grayOnly = False Then
-            palette.src = dst1
-            palette.Run()
-            dst1 = palette.dst1
+            task.palette.src = dst1
+            task.palette.Run()
+            dst1 = task.palette.dst1
         End If
     End Sub
 End Class

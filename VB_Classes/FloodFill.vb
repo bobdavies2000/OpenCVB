@@ -780,9 +780,9 @@ Public Class FloodFill_FullImage
 
         motion.resetAll = False
         lastFrame = dst1.Clone
-        palette.src = dst1
-        palette.Run()
-        mats.mat(3) = palette.dst1
+        task.palette.src = dst1
+        task.palette.Run()
+        mats.mat(3) = task.palette.dst1
         mats.mat(3).SetTo(0, mats.mat(1)) ' show the pixels that are not assigned (missing)
         label2 = "Checked " + CStr(testCount) + " locations and used floodfill on " + CStr(floodCount)
 
@@ -930,12 +930,9 @@ End Class
 Public Class FloodFill_Palette
     Inherits VBparent
     Public basics As FloodFill_Basics
-    Public palette As Palette_Basics
     Public allRegionMask As cv.Mat
     Public Sub New()
         initParent()
-        palette = New Palette_Basics()
-        palette.Run()
 
         basics = New FloodFill_Basics()
         task.desc = "Create a floodfill image that is only 8-bit for use with a palette"
@@ -955,14 +952,14 @@ Public Class FloodFill_Palette
         allRegionMask = If(dst2.Channels = 1, dst2, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255))
 
         Dim incr = If(basics.masks.Count < 10, 25, 255 / basics.masks.Count)  'reduces flicker of slightly different colors
-        palette.src = dst2 * cv.Scalar.All(incr) ' spread the colors 
-        palette.Run()
+        task.palette.src = dst2 * cv.Scalar.All(incr) ' spread the colors 
+        task.palette.Run()
         dst1.SetTo(0)
-        palette.dst1.CopyTo(dst1, allRegionMask)
+        task.palette.dst1.CopyTo(dst1, allRegionMask)
 
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
         label2 = CStr(basics.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
-        If standalone Or task.intermediateReview = caller Then dst2 = palette.gradientColorMap.Resize(src.Size())
+        If standalone Or task.intermediateReview = caller Then dst2 = task.palette.gradientColorMap.Resize(src.Size())
     End Sub
 End Class
 

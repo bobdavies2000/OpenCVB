@@ -3,11 +3,9 @@ Public Class Watershed_Basics
     Inherits VBparent
     Dim addW As AddWeighted_Basics
     Dim rects As New List(Of cv.Rect)
-    Dim palette As Palette_Basics
     Public UseCorners As Boolean
     Public Sub New()
         initParent()
-        palette = New Palette_Basics
         addW = New AddWeighted_Basics
         label1 = "Draw rectangle to add another marker"
         label2 = "Mask for watershed (selected regions)."
@@ -43,12 +41,12 @@ Public Class Watershed_Basics
             cv.Cv2.Watershed(src, markers)
 
             markers *= Math.Truncate(255 / rects.Count)
-            markers.ConvertTo(palette.src, cv.MatType.CV_8U)
-            palette.Run()
-            dst2 = palette.dst1
+            markers.ConvertTo(task.palette.src, cv.MatType.CV_8U)
+            task.palette.Run()
+            dst2 = task.palette.dst1
 
             addW.src = src
-            addW.src2 = palette.dst1
+            addW.src2 = task.palette.dst1
             addW.Run()
             dst1 = addW.dst1
         Else

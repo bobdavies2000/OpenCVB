@@ -24,6 +24,8 @@ Public Class OptionsCommon_Depth
         task.hist3DThreshold = gOptions.thresholdSlider.Value
         task.useKalman = gOptions.UseKalman.Checked
         task.useKalmanWhenStable = gOptions.UseKalmanWhenStable.Checked
+        task.paletteScheme = gOptions.scheme
+        task.paletteSchemeName = gOptions.schemeName
 
         task.minDepth = gOptions.MinRange.Value
         task.maxDepth = gOptions.MaxRange.Value

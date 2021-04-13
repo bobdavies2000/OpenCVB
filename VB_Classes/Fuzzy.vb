@@ -5,7 +5,6 @@ Public Class Fuzzy_Basics
     Dim Fuzzy As IntPtr
     Dim reduction As Reduction_Basics
     Dim options As Contours_Basics
-    Public palette As Palette_Basics
     Public gray As cv.Mat
     Public contours As cv.Point()()
     Public sortContours As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
@@ -17,7 +16,6 @@ Public Class Fuzzy_Basics
         Dim floodRadio = findRadio("FloodFill")
         If floodRadio.Enabled Then floodRadio.Enabled = False ' too much special handling - cv_32SC1 image 
 
-        palette = New Palette_Basics()
         reduction = New Reduction_Basics()
         Fuzzy = Fuzzy_Open()
 
@@ -78,9 +76,9 @@ Public Class Fuzzy_Basics
             sortContours.Add(len, New cv.Point(i, maskID))
         Next
 
-        palette.src = gray
-        palette.Run()
-        dst1 = palette.dst1
+        task.palette.src = gray
+        task.palette.Run()
+        dst1 = task.palette.dst1
         dst1.SetTo(0, dst2)
     End Sub
     Public Sub Close()

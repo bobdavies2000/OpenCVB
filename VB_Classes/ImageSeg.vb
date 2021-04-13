@@ -140,12 +140,9 @@ End Class
 Public Class ImageSeg_Unstable
     Inherits VBparent
     Dim iSeg As ImageSeg_Basics
-    Dim palette As Palette_Basics
     Public Sub New()
         initParent()
         iSeg = New ImageSeg_Basics
-        palette = New Palette_Basics
-
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -153,7 +150,7 @@ Public Class ImageSeg_Unstable
         End If
 
         task.desc = "Find the unstable segments and remove them"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -171,9 +168,9 @@ Public Class ImageSeg_Unstable
         cv.Cv2.Min(tmp, previousFrame, dst2)
         previousFrame = dst2
 
-        palette.src = dst2
-        palette.Run()
-        dst2 = palette.dst1
+        task.palette.src = dst2
+        task.palette.Run()
+        dst2 = task.palette.dst1
         dst2.SetTo(0, iSeg.flood.mats.mat(1))
     End Sub
 End Class

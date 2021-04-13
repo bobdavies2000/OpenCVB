@@ -123,14 +123,12 @@ End Class
 Public Class LeftRightView_Palettized
     Inherits VBparent
     Dim lrView As LeftRightView_Basics
-    Dim palette As Palette_Basics
     Public Sub New()
         initParent()
         lrView = New LeftRightView_Basics()
-        palette = New Palette_Basics()
 
         task.desc = "Add color to the 8-bit infrared images."
-		' task.rank = 1
+        ' task.rank = 1
         label1 = "Left Image"
         label2 = "Right Image"
     End Sub
@@ -138,13 +136,13 @@ Public Class LeftRightView_Palettized
         If task.intermediateReview = caller Then task.intermediateObject = Me
         lrView.Run()
 
-        palette.src = lrView.dst1
-        palette.Run()
-        dst1 = palette.dst1
+        task.palette.src = lrView.dst1
+        task.palette.Run()
+        dst1 = task.palette.dst1
 
-        palette.src = lrView.dst2
-        palette.Run()
-        dst2 = palette.dst1
+        task.palette.src = lrView.dst2
+        task.palette.Run()
+        dst2 = task.palette.dst1
     End Sub
 End Class
 

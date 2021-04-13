@@ -221,13 +221,8 @@ Public Class Blur_TopoMap
     Inherits VBparent
     Dim gradient As Gradient_CartToPolar
     Dim addw As AddWeighted_Basics
-    Dim palette As Palette_Basics
     Public Sub New()
         initParent()
-
-        palette = New Palette_Basics
-        Dim magma = findRadio("Magma")
-        magma.Checked = True
 
         addw = New AddWeighted_Basics
         Dim weightSlider = findSlider("Weight")
@@ -243,7 +238,7 @@ Public Class Blur_TopoMap
         End If
         label1 = "Image Gradient"
         task.desc = "Create a topo map from the blurred image"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -271,11 +266,11 @@ Public Class Blur_TopoMap
         dst2 = (dst2 * 1 / reductionSlider.Value).tomat
         dst2 = (dst2 * reductionSlider.Value).toMat
 
-        palette.src = dst2
-        palette.Run()
+        task.palette.src = dst2
+        task.palette.Run()
 
         addw.src = task.color
-        addw.src2 = palette.dst1
+        addw.src2 = task.palette.dst1
         addw.Run()
         dst2 = addw.dst1
 

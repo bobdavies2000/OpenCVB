@@ -134,22 +134,18 @@ End Class
 Public Class Fractal_MandelbrotZoomColor
     Inherits VBparent
     Public mandel As Fractal_MandelbrotZoom
-    Public palette As Palette_Basics
     Public Sub New()
         initParent()
         mandel = New Fractal_MandelbrotZoom()
-        palette = New Palette_Basics()
-        Dim hsvRadio = findRadio("Hsv")
-        hsvRadio.Checked = True
         task.desc = "Classic Mandelbrot in color"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         mandel.Run()
-        palette.src = mandel.dst1
-        palette.Run()
-        dst1 = palette.dst1
+        task.palette.src = mandel.dst1
+        task.palette.Run()
+        dst1 = task.palette.dst1
         label1 = mandel.label1
     End Sub
 End Class
@@ -208,9 +204,9 @@ Public Class Fractal_Julia
                         julia_point(x, y, r, depth, depth, c, z)
                     Next
                 End Sub)
-            mandel.palette.src = dst1
-            mandel.palette.Run()
-            dst1 = mandel.palette.dst1
+            task.palette.src = dst1
+            task.palette.Run()
+            dst1 = task.palette.dst1
         End If
     End Sub
 End Class
