@@ -499,8 +499,7 @@ Public Class IMU_GVector
 
         kalman.kInput = {gx, gy, gz, task.angleX, task.angleY, task.angleZ}
 
-        Static kalmanCheck = findCheckBox("Turn Kalman filtering on")
-        If kalmanCheck.Checked Then
+        If task.useKalman Then
             kalman.Run()
             gx = kalman.kOutput(0)
             gy = kalman.kOutput(1)

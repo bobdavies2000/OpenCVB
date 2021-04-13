@@ -58,8 +58,7 @@ Public Class Histogram_Basics
 
         label2 = "Plot Histogram bins = " + CStr(plotHist.bins)
 
-        Static kalmanCheck = findCheckBox("Turn Kalman filtering on")
-        If kalmanCheck.checked Then
+        If task.useKalman Then
             ReDim kalman.kInput(plotHist.bins - 1)
             For i = 0 To plotHist.bins - 1
                 kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
@@ -421,10 +420,7 @@ Public Class Histogram_EqualizeGray
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static binSlider = findSlider("Histogram Bins")
-        Static eqCheckBox = findCheckBox("Turn Kalman filtering on")
-
         binSlider.Value = histogramEq.sliders.trackbar(0).Value
-        eqCheckBox.Checked = histogramEq.kalman.check.Box(0).Checked
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         histogram.src = src.Clone

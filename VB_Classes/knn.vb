@@ -983,8 +983,7 @@ Public Class KNN_PointTracker
                     matchIndex = matches.IndexOf(pt1)
                     inputRect = queryRects(matchIndex)
                     kalman(i).kInput = {queryPoints(matchIndex).X, queryPoints(matchIndex).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}
-                    Static useKalmanCheck = findCheckBox("Turn Kalman filtering on")
-                    If useKalmanCheck.Checked Then
+                    If task.useKalman Then
                         kalman(i).Run()
                     Else
                         kalman(i).kOutput = {queryPoints(matchIndex).X, queryPoints(matchIndex).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}
