@@ -50,7 +50,7 @@ Public Class VBparent : Implements IDisposable
             If task.callTrace.Contains(callStack) = False Then task.callTrace.Add(callStack)
         End If
 
-        src = task.color
+        src = task.color.Clone
         dst1 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
         dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
     End Sub
