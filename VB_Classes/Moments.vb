@@ -7,7 +7,6 @@ Public Class Moments_Basics
     Public scaleFactor As Integer = 1
     Public offsetPt As cv.Point
     Public kalman As Kalman_Basics
-    Public useKalman As Boolean = True
     Public Sub New()
         initParent()
 
@@ -18,7 +17,7 @@ Public Class Moments_Basics
 
         label1 = "Red dot = Kalman smoothed centroid"
         task.desc = "Compute the centroid of the provided mask file."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
 		If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -30,7 +29,7 @@ Public Class Moments_Basics
         Dim m = cv.Cv2.Moments(inputMask, True)
 
         Dim center As cv.Point2f
-        If kalman.check.Box(0).Checked Or useKalman Then
+        If task.useKalman Then
             kalman.kInput(0) = m.M10 / m.M00
             kalman.kInput(1) = m.M01 / m.M00
             kalman.Run()

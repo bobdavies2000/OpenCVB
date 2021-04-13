@@ -398,7 +398,7 @@ Public Class Draw_Arc
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        If kalman.check.Box(0).Checked Then
+        If task.useKalman Then
             kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
             kalman.Run()
         Else
@@ -532,7 +532,7 @@ Public Class Draw_ClipLine
         pt1 = New cv.Point(r.X, r.Y)
         pt2 = New cv.Point(r.X + r.Width, r.Y + r.Height)
         rect = initRandomRect(dst2.Width, dst2.Height, 25)
-        If kalman.check.Box(0).Checked Then flow.msgs.Add("--------------------------- setup ---------------------------")
+        If task.useKalman Then flow.msgs.Add("--------------------------- setup ---------------------------")
     End Sub
     Public Sub New()
         initParent()

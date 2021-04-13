@@ -530,8 +530,6 @@ Public Class Histogram_ColorsAndGray
             sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
         End If
         histogram = New Histogram_Basics
-        histogram.kalman.check.Box(0).Checked = False
-        histogram.kalman.check.Box(0).Enabled = False
         histogram.sliders.trackbar(0).Value = 40
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -546,6 +544,7 @@ Public Class Histogram_ColorsAndGray
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
+        task.useKalman = False
         Dim split = src.Split()
         ReDim Preserve split(4 - 1)
         split(4 - 1) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) ' add a 4th image - the grayscale image to the R G and B images.
@@ -579,7 +578,6 @@ Public Class Histogram_BackProjectionPeak
         initParent()
 
         hist = New Histogram_Basics
-        hist.kalman.check.Box(0).Checked = False
 
         task.desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
 		' task.rank = 1
@@ -587,6 +585,7 @@ Public Class Histogram_BackProjectionPeak
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
+        task.useKalman = False
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.src = input
