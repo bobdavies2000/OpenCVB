@@ -486,8 +486,12 @@ Public Class Random_60sTV
             sliders.setupTrackBar(0, "Range of noise to apply (from 0 to this value)", 0, 255, 50)
             sliders.setupTrackBar(1, "Percentage of pixels to include noise", 0, 100, 20)
         End If
+
+        task.drawRect = New cv.Rect(100, 100, 100, 100)
+        label1 = "Draw anywhere to select a test region"
+        label2 = "Resized selection rectangle in dst1"
         task.desc = "Imitate an old TV appearance using randomness."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -497,11 +501,12 @@ Public Class Random_60sTV
         Dim thresh = threshSlider.value
 
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        For y = 0 To dst1.Height - 1
-            For x = 0 To dst1.Width - 1
+        dst2 = dst1(task.drawRect)
+        For y = 0 To dst2.Height - 1
+            For x = 0 To dst2.Width - 1
                 If 255 * Rnd() <= thresh Then
-                    Dim v = dst1.Get(Of Byte)(y, x)
-                    dst1.Set(Of Byte)(y, x, If(2 * Rnd() = 0, Math.Min(v + (val + 1) * Rnd(), 255), Math.Max(v - (val + 1) * Rnd(), 0)))
+                    Dim v = dst2.Get(Of Byte)(y, x)
+                    dst2.Set(Of Byte)(y, x, If(2 * Rnd() = 0, Math.Min(v + (val + 1) * Rnd(), 255), Math.Max(v - (val + 1) * Rnd(), 0)))
                 End If
             Next
         Next

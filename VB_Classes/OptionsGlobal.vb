@@ -35,7 +35,6 @@ Public Class OptionsGlobal
                 AddHandler check(i).CheckedChanged, AddressOf palette_CheckedChanged
                 FlowLayoutPanel1.Controls.Add(check(i))
                 check(i).Text = mapNames(i)
-                If mapNames(i) = schemeName Then check(i).Checked = True
             Next
         End If
         For i = 0 To mapNames.Count - 1
