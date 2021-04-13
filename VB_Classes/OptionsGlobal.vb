@@ -4,7 +4,7 @@ Public Class OptionsGlobal
     Dim check() As RadioButton
     Public scheme As cv.ColormapTypes = 0
     Public schemeName As String
-    Public mapNames() As String = {"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
+    Dim mapNames() As String = {"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
                                    "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "TwilightShifted", "Viridis", "Winter"}
     Private Sub MaxRange_Scroll(sender As Object, e As EventArgs) Handles MaxRange.Scroll
         maxCount.Text = CStr(MaxRange.Value)
