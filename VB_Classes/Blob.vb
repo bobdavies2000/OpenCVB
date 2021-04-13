@@ -366,17 +366,16 @@ End Class
 
 Public Class Blob_DepthFloodfill
     Inherits VBparent
-    Public flood As FloodFill_Basics
+    Public flood As FloodFill_Neighbors
     Public blobs As Blob_DepthRangesGray
     Public Sub New()
         initParent()
-        flood = New FloodFill_Basics
-        Dim loSlider = findSlider("FloodFill LoDiff")
-        Dim hiSlider = findSlider("FloodFill HiDiff")
-        loSlider.Value = 1
-        hiSlider.Value = 1
+
+        flood = New FloodFill_Neighbors
+
         blobs = New Blob_DepthRangesGray
         blobs.palette = New Palette_Basics
+
         label1 = "Slices in depth merged to connected slices"
         label2 = "Before slices were merged"
         task.desc = "Use the grayscale blobs to connect depth neighbors that are 1-pixel value different"
@@ -393,8 +392,9 @@ Public Class Blob_DepthFloodfill
         dst2 = blobs.palette.dst1
 
         flood.src = blobs.dst2
+        flood.rangeColors = New List(Of Integer)(blobs.blobs.histBlobs.valleys.rangeColors)
         flood.Run()
-        dst1 = flood.dst1
+        dst1 = flood.dst2
         dst1.SetTo(0, task.noDepthMask)
     End Sub
 End Class
@@ -426,12 +426,12 @@ Public Class Blob_Largest
         blobs.src = src
         blobs.Run()
         dst2 = blobs.dst2
-        rects = blobs.flood.rects
-        masks = blobs.flood.masks
+        rects = blobs.flood.basics.rects
+        masks = blobs.flood.basics.masks
 
         If masks.Count > 0 Then
             dst1.SetTo(0)
-            maskIndex = blobs.flood.sortedSizes.ElementAt(blobIndex).Value ' this is the largest boundary rectangle
+            maskIndex = blobs.flood.basics.sortedSizes.ElementAt(blobIndex).Value ' this is the largest boundary rectangle
             src.CopyTo(dst1, masks(maskIndex))
             kalman.kInput = {rects(maskIndex).X, rects(maskIndex).Y, rects(maskIndex).Width, rects(maskIndex).Height}
             kalman.Run()

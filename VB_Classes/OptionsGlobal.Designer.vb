@@ -38,12 +38,19 @@ Partial Class OptionsGlobal
         Me.thresholdSlider = New System.Windows.Forms.TrackBar()
         Me.Label6 = New System.Windows.Forms.Label()
         Me.resetToDefaults = New System.Windows.Forms.CheckBox()
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.UseKalman = New System.Windows.Forms.CheckBox()
+        Me.UseKalmanWhenStable = New System.Windows.Forms.CheckBox()
+        Me.PaletteGroup = New System.Windows.Forms.GroupBox()
+        Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.MaxRange, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MinRange, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox1.SuspendLayout()
         CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.thresholdSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox2.SuspendLayout()
+        Me.PaletteGroup.SuspendLayout()
         Me.SuspendLayout()
         '
         'MinMaxDepth
@@ -204,11 +211,62 @@ Partial Class OptionsGlobal
     "heir default values, check this box."
         Me.resetToDefaults.UseVisualStyleBackColor = True
         '
+        'GroupBox2
+        '
+        Me.GroupBox2.Controls.Add(Me.UseKalmanWhenStable)
+        Me.GroupBox2.Controls.Add(Me.UseKalman)
+        Me.GroupBox2.Location = New System.Drawing.Point(854, 17)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(839, 281)
+        Me.GroupBox2.TabIndex = 3
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "Miscelaneous Globals"
+        '
+        'UseKalman
+        '
+        Me.UseKalman.AutoSize = True
+        Me.UseKalman.Location = New System.Drawing.Point(23, 30)
+        Me.UseKalman.Name = "UseKalman"
+        Me.UseKalman.Size = New System.Drawing.Size(201, 24)
+        Me.UseKalman.TabIndex = 0
+        Me.UseKalman.Text = "Turn Kalman filtering on"
+        Me.UseKalman.UseVisualStyleBackColor = True
+        '
+        'UseKalmanWhenStable
+        '
+        Me.UseKalmanWhenStable.AutoSize = True
+        Me.UseKalmanWhenStable.Location = New System.Drawing.Point(23, 60)
+        Me.UseKalmanWhenStable.Name = "UseKalmanWhenStable"
+        Me.UseKalmanWhenStable.Size = New System.Drawing.Size(341, 24)
+        Me.UseKalmanWhenStable.TabIndex = 1
+        Me.UseKalmanWhenStable.Text = "Only use Kalman when the camera is stable"
+        Me.UseKalmanWhenStable.UseVisualStyleBackColor = True
+        '
+        'PaletteGroup
+        '
+        Me.PaletteGroup.Controls.Add(Me.FlowLayoutPanel1)
+        Me.PaletteGroup.Location = New System.Drawing.Point(854, 300)
+        Me.PaletteGroup.Name = "PaletteGroup"
+        Me.PaletteGroup.Size = New System.Drawing.Size(838, 153)
+        Me.PaletteGroup.TabIndex = 5
+        Me.PaletteGroup.TabStop = False
+        Me.PaletteGroup.Text = "Palette Setting"
+        '
+        'FlowLayoutPanel1
+        '
+        Me.FlowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown
+        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(6, 25)
+        Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(826, 113)
+        Me.FlowLayoutPanel1.TabIndex = 5
+        '
         'OptionsGlobal
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1700, 822)
+        Me.Controls.Add(Me.PaletteGroup)
+        Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.resetToDefaults)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.MinMaxDepth)
@@ -222,6 +280,9 @@ Partial Class OptionsGlobal
         Me.GroupBox1.PerformLayout()
         CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.thresholdSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox2.ResumeLayout(False)
+        Me.GroupBox2.PerformLayout()
+        Me.PaletteGroup.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -243,4 +304,9 @@ Partial Class OptionsGlobal
     Friend WithEvents thresholdSlider As Windows.Forms.TrackBar
     Friend WithEvents Label6 As Windows.Forms.Label
     Friend WithEvents resetToDefaults As Windows.Forms.CheckBox
+    Friend WithEvents GroupBox2 As Windows.Forms.GroupBox
+    Friend WithEvents UseKalman As Windows.Forms.CheckBox
+    Friend WithEvents UseKalmanWhenStable As Windows.Forms.CheckBox
+    Friend WithEvents PaletteGroup As Windows.Forms.GroupBox
+    Friend WithEvents FlowLayoutPanel1 As Windows.Forms.FlowLayoutPanel
 End Class

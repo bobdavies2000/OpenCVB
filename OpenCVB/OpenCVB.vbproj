@@ -130,10 +130,6 @@
     <Compile Include="OpenCVB.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OptionsDialog.Designer.vb">
-      <DependentUpon>OptionsDialog.vb</DependentUpon>
-    </Compile>
-    <Compile Include="OptionsDialog.vb" />
     <Compile Include="CameraKinect.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -151,6 +147,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="OptionsDialog.Designer.vb">
+      <DependentUpon>OptionsDialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="OptionsDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="SnapshotRequest.Designer.vb">
       <DependentUpon>SnapshotRequest.vb</DependentUpon>
     </Compile>
@@ -166,14 +168,14 @@
       <DependentUpon>OpenCVB.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="OptionsDialog.resx">
-      <DependentUpon>OptionsDialog.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OptionsDialog.resx">
+      <DependentUpon>OptionsDialog.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SnapshotRequest.resx">
       <DependentUpon>SnapshotRequest.vb</DependentUpon>

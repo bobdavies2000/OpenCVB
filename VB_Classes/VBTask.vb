@@ -122,6 +122,9 @@ Public Class ActiveTask : Implements IDisposable
     Public depthOptionsChanged As Boolean
 
     Public hist3DThreshold As Integer
+    Public useKalman As Boolean
+    Public useKalmanWhenStable As Boolean
+    Public palette As Palette_Basics
 
     Public minDepth As Integer
     Public maxDepth As Integer

@@ -11,7 +11,7 @@ Public Class AddWeighted_Basics
         End If
         weightSlider = findSlider("Weight")
         task.desc = "Add 2 images with specified weights."
-        ' task.rank = 1
+        ' task.rank = 3
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

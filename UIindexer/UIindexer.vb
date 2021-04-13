@@ -5,7 +5,7 @@ Module IndexMain
     Dim MTnames As New SortedList(Of String, String)
     Dim CSnames As New SortedList(Of String, String)
     Dim OpenGLnames As New SortedList(Of String, String)
-    Dim rankings(5 - 1) As SortedList(Of String, String)
+    Dim rankings(10 - 1) As SortedList(Of String, String)
     Dim numpy As New SortedList(Of String, String)
     Dim PYnames As New SortedList(Of String, String)
     Dim nonPYnames As New SortedList(Of String, String)

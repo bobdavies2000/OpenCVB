@@ -491,9 +491,9 @@ Public Class Mat_4Click
         mats = New Mat_4to1
         mat = mats.mat
 
-        label2 = "Click a quadrant in dst1 to snapshot it in dst2"
+        label2 = "Click a quadrant in dst1 to view it in dst2"
         task.desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst2"
-		' task.rank = 1
+        ' task.rank = 2
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

@@ -10,6 +10,7 @@ Public Class OptionsCommon_Depth
         gOptions = New OptionsGlobal
         gOptions.Show()
 
+        task.palette = New Palette_Basics
         task.cameraStableSlider = gOptions.IMUmotionSlider
 
         label1 = "Depth values that are in-range"
@@ -21,6 +22,8 @@ Public Class OptionsCommon_Depth
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
         task.hist3DThreshold = gOptions.thresholdSlider.Value
+        task.useKalman = gOptions.UseKalman.Checked
+        task.useKalmanWhenStable = gOptions.UseKalmanWhenStable.Checked
 
         task.minDepth = gOptions.MinRange.Value
         task.maxDepth = gOptions.MaxRange.Value

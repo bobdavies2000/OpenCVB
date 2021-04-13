@@ -7,16 +7,8 @@ Public Class Kalman_Basics
     Public kOutput(4 - 1) As Single
     Public Sub New()
         initParent()
-
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
-            check.Box(0).Text = "Turn Kalman filtering on"
-            check.Box(1).Text = "Only use Kalman filtering when camera is stable"
-            check.Box(0).Checked = True
-        End If
-
         task.desc = "Use Kalman to stabilize values (such as a cv.rect.)"
-		' task.rank = 1
+        ' task.rank = 4
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -37,13 +29,7 @@ Public Class Kalman_Basics
             ReDim kOutput(kInput.Count - 1)
         End If
 
-        Static useKalmanCheck = findCheckBox("Turn Kalman filtering on")
-        Dim useKalman = useKalmanCheck.checked
-        Static stableCheck = findCheckBox("Only use Kalman filtering when camera is stable")
-        If stableCheck.checked Then
-            If task.cameraStable = False Then useKalman = False
-        End If
-        If useKalman Then
+        If task.useKalman Then
             For i = 0 To kalman.Length - 1
                 kalman(i).inputReal = kInput(i)
                 kalman(i).Run()
@@ -105,12 +91,7 @@ Public Class Kalman_Stripped
             ReDim kOutput(kInput.Count - 1)
         End If
 
-        Dim useKalman = True
-        If standalone = False Then
-            Static useKalmanCheck = findCheckBox("Turn Kalman filtering on")
-            useKalman = useKalmanCheck.checked
-        End If
-        If useKalman Then
+        If task.useKalman Then
             For i = 0 To kalman.Length - 1
                 kalman(i).inputReal = kInput(i)
                 kalman(i).Run()
@@ -784,13 +765,7 @@ Public Class Kalman_VB_Basics
         matrix(task.frameCount Mod saveAvgCount) = kInput
         kAverage = (New cv.Mat(saveAvgCount, 1, cv.MatType.CV_32F, matrix.ToArray)).Mean().Item(0)
 
-        Static useKalmanCheck = findCheckBox("Turn Kalman filtering on")
-        Dim useKalman = useKalmanCheck.checked
-        Static stableCheck = findCheckBox("Only use Kalman filtering when camera is stable")
-        If stableCheck.checked Then
-            If task.cameraStable = False Then useKalman = False
-        End If
-        If useKalman Then
+        If task.useKalman Then
             'The Kalman Filter code comes from:
             'http://www.rotomotion.com/downloads/tilt.c
             State_Update(kInput)

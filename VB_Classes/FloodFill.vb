@@ -24,7 +24,7 @@ Public Class FloodFill_Basics
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         label2 = "Grayscale version"
         task.desc = "Use floodfill to build image segments in a grayscale image."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1011,5 +1011,90 @@ Public Class FloodFill_LUT
         For Each r In flood.rects
             dst2.Rectangle(r, cv.Scalar.White, 1)
         Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class FloodFill_Neighbors
+    Inherits VBparent
+    Public basics As FloodFill_Basics
+    Public initialMask As New cv.Mat
+    Public rangeColors As New List(Of Integer)
+    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
+    Dim loDiff = cv.Scalar.All(1)
+    Dim hiDiff = cv.Scalar.All(1)
+    Public Sub New()
+        initParent()
+
+        basics = New FloodFill_Basics
+
+        For i = 0 To 10
+            rangeColors.Add(i)
+        Next
+
+        If standalone Then
+            loDiff = cv.Scalar.All(10)
+            hiDiff = cv.Scalar.All(10)
+        End If
+        label1 = "Grayscale version"
+        task.desc = "Use floodfill to combine neighboring labels - regions that differ by only 1"
+        ' task.rank = 1
+    End Sub
+    Public Sub Run()
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        Static minSizeSlider = findSlider("FloodFill Minimum Size")
+        Static stepSlider = findSlider("Step Size")
+        Dim minFloodSize = minSizeSlider.Value
+        Dim stepSize = stepSlider.Value
+
+        dst1 = src
+        If dst1.Channels <> 1 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim maskPlus = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8UC1)
+        Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
+        initialMask = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
+
+        basics.masks.Clear()
+        basics.sortedSizes.Clear()
+        basics.rects.Clear()
+        basics.centroids.Clear()
+
+        maskPlus.SetTo(0)
+        Dim ignoreMasks = initialMask.Clone()
+
+        dst2.SetTo(0)
+        For y = 0 To dst1.Height - 1 Step stepSize
+            For x = 0 To dst1.Width - 1 Step stepSize
+                If ignoreMasks.Get(Of Byte)(y, x) = 0 Then
+                    Dim rect As New cv.Rect
+                    Dim pt = New cv.Point(CInt(x), CInt(y))
+                    Dim labelID = dst1.Get(Of Byte)(pt.Y, pt.X)
+                    If labelID = 0 Then Continue For ' skip where depth is absent.
+                    Dim count = cv.Cv2.FloodFill(dst1, maskPlus, pt, labelID, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
+                    If count > minFloodSize And count <> dst1.Total Then
+                        basics.floodPoints.Add(pt)
+                        basics.masks.Add(maskPlus(maskRect).Clone().SetTo(0, ignoreMasks))
+                        Dim i = basics.masks.Count - 1
+                        basics.masks(i).SetTo(0, initialMask) ' The initial mask is what should not be part of any mask.
+                        basics.sortedSizes.Add(count, i)
+                        basics.maskSizes.Add(count)
+                        basics.rects.Add(rect)
+                        Dim m = cv.Cv2.Moments(maskPlus(rect), True)
+                        Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
+                        basics.centroids.Add(centroid)
+                        dst2.SetTo(labelID, basics.masks(i))
+                    End If
+                    ' Mask off any object that is too small or previously identified
+                    cv.Cv2.BitwiseOr(ignoreMasks, maskPlus(maskRect), ignoreMasks)
+                End If
+            Next
+        Next
+        Dim spread = CInt(255 / rangeColors.Count)
+        task.palette.src = dst2 * spread
+        task.palette.Run()
+        dst2 = task.palette.dst1
+        label2 = CStr(basics.masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
 End Class

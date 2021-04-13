@@ -179,7 +179,7 @@ Public Class Benford_JPEG
         End If
 
         task.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
-		' task.rank = 1
+        ' task.rank = 2
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -246,7 +246,7 @@ Public Class Benford_PNG
             sliders.setupTrackBar(0, "PNG Compression", 1, 100, 90)
         End If
         task.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
-		' task.rank = 1
+        ' task.rank = 2
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

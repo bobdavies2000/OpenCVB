@@ -134,6 +134,12 @@
     <Compile Include="OptionsGlobal.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="OptionsRadioButtons.Designer.vb">
+      <DependentUpon>OptionsRadioButtons.vb</DependentUpon>
+    </Compile>
+    <Compile Include="OptionsRadioButtons.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="PhaseCorrelate.vb" />
     <Compile Include="PhotoShop.vb" />
     <Compile Include="PixelViewerForm.Designer.vb">
@@ -314,10 +320,6 @@
       <DependentUpon>OptionsCheckbox.vb</DependentUpon>
     </Compile>
     <Compile Include="OptionsCheckbox.vb" />
-    <Compile Include="OptionsRadioButtons.Designer.vb">
-      <DependentUpon>OptionsRadioButtons.vb</DependentUpon>
-    </Compile>
-    <Compile Include="OptionsRadioButtons.vb" />
     <Compile Include="Palette.vb" />
     <Compile Include="PCA.vb" />
     <Compile Include="Random.vb" />
@@ -367,11 +369,11 @@
     <EmbeddedResource Include="OptionsCombo.resx">
       <DependentUpon>OptionsCombo.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="OptionsSliders.resx">
-      <DependentUpon>OptionsSliders.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="OptionsRadioButtons.resx">
       <DependentUpon>OptionsRadioButtons.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OptionsSliders.resx">
+      <DependentUpon>OptionsSliders.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PixelViewerForm.resx">
       <DependentUpon>PixelViewerForm.vb</DependentUpon>

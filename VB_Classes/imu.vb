@@ -470,7 +470,7 @@ Public Class IMU_GVector
         End If
 
         task.desc = "Find the angle of tilt for the camera with respect to gravity."
-		' task.rank = 1
+        ' task.rank = 5
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -561,7 +561,7 @@ Public Class IMU_isCameraLevel
             sliders.setupTrackBar(0, "Threshold in degrees X10", 1, 100, 20) ' default is 20 which is 2 degrees from 0...
         End If
         task.desc = "Answer the question: Is the camera level?"
-		' task.rank = 1
+        ' task.rank = 3
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -602,7 +602,7 @@ Public Class IMU_IscameraStable
         task.callTrace.Clear() ' special line to clear the tree view otherwise this common option is standalone.
         standalone = False
         task.desc = "Answer the question: Is the camera stable?"
-		' task.rank = 1
+        ' task.rank = 3
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -614,5 +614,8 @@ Public Class IMU_IscameraStable
         Dim totalRadians = Math.Abs(pitch) + Math.Abs(yaw) + Math.Abs(roll)
         Dim permissableRadians = task.cameraStableSlider.Value / 100
         task.cameraStable = If(totalRadians > permissableRadians, False, True)
+        If task.useKalmanWhenStable Then
+            task.useKalman = If(task.cameraStable, task.useKalman, False)
+        End If
     End Sub
 End Class
