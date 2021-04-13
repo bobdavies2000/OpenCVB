@@ -109,8 +109,6 @@ Module Palette_Custom_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub Palette_Custom(img As IntPtr, map As IntPtr, dst1 As IntPtr, rows As Integer, cols As Integer, channels As Integer)
     End Sub
-    Public mapNames() As String = {"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
-                                   "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "TwilightShifted", "Viridis", "Winter"}
     Public Function Palette_Custom_Apply(src As cv.Mat, customColorMap As cv.Mat) As cv.Mat
         ' the VB.Net interface to OpenCV doesn't support adding a random lookup table to ApplyColorMap API.  It is available in C++ though.
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
@@ -139,7 +137,7 @@ Module Palette_Custom_Module
         Dim gradientColors As New cv.Mat(1, width, cv.MatType.CV_64FC3)
         For i = 0 To width - 1
             gradientColors.Set(Of cv.Scalar)(0, i, New cv.Scalar(f * color2(0) + (1 - f) * color1(0), f * color2(1) + (1 - f) * color1(1),
-                                                                     f * color2(2) + (1 - f) * color1(2)))
+                                                                 f * color2(2) + (1 - f) * color1(2)))
             f -= 1 / width
         Next
         Dim result = New cv.Mat(1, width, cv.MatType.CV_8UC3)
