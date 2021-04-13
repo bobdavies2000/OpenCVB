@@ -325,7 +325,7 @@ Public Class Kalman_CVMat
             output = New cv.Mat(input.Rows, 1, cv.MatType.CV_32F, 0)
         End If
 
-        If basics.check.Box(0).Checked Then
+        If task.useKalman Then
             For i = 0 To kalman.Length - 1
                 kalman(i).inputReal = input.Get(Of Single)(i, 0)
                 kalman(i).Run()
