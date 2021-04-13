@@ -31,7 +31,7 @@ Partial Class SnapshotRequest
         Me.Result1 = New System.Windows.Forms.RadioButton()
         Me.Result2 = New System.Windows.Forms.RadioButton()
         Me.AllImages = New System.Windows.Forms.RadioButton()
-        Me.Label1 = New System.Windows.Forms.Label()
+        Me.ClickOKlabel = New System.Windows.Forms.Label()
         Me.TableLayoutPanel1.SuspendLayout()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -137,14 +137,14 @@ Partial Class SnapshotRequest
         Me.AllImages.Text = "All Images"
         Me.AllImages.UseVisualStyleBackColor = True
         '
-        'Label1
+        'ClickOKlabel
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(7, 422)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(310, 20)
-        Me.Label1.TabIndex = 12
-        Me.Label1.Text = "After clicking OK, image will be in clipboard."
+        Me.ClickOKlabel.AutoSize = True
+        Me.ClickOKlabel.Location = New System.Drawing.Point(7, 422)
+        Me.ClickOKlabel.Name = "ClickOKlabel"
+        Me.ClickOKlabel.Size = New System.Drawing.Size(310, 20)
+        Me.ClickOKlabel.TabIndex = 12
+        Me.ClickOKlabel.Text = "After clicking OK, image will be in clipboard."
         '
         'SnapshotRequest
         '
@@ -153,7 +153,7 @@ Partial Class SnapshotRequest
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.Cancel_Button
         Me.ClientSize = New System.Drawing.Size(652, 485)
-        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.ClickOKlabel)
         Me.Controls.Add(Me.AllImages)
         Me.Controls.Add(Me.Result1)
         Me.Controls.Add(Me.Result2)
@@ -184,5 +184,5 @@ Partial Class SnapshotRequest
     Friend WithEvents Result1 As RadioButton
     Friend WithEvents Result2 As RadioButton
     Friend WithEvents AllImages As RadioButton
-    Friend WithEvents Label1 As Label
+    Friend WithEvents ClickOKlabel As Label
 End Class

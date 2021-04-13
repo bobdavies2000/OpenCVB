@@ -117,6 +117,12 @@
     <Compile Include="LineFLD.vb" />
     <Compile Include="MFD.vb" />
     <Compile Include="MiniPC.vb" />
+    <Compile Include="OptionsCombo.Designer.vb">
+      <DependentUpon>OptionsCombo.vb</DependentUpon>
+    </Compile>
+    <Compile Include="OptionsCombo.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="OptionsCommon.vb" />
     <Compile Include="OptionsContainer.Designer.vb">
       <DependentUpon>OptionsContainer.vb</DependentUpon>
@@ -127,11 +133,19 @@
     <Compile Include="OptionsFileName.Designer.vb">
       <DependentUpon>OptionsFileName.vb</DependentUpon>
     </Compile>
-    <Compile Include="OptionsFileName.vb" />
+    <Compile Include="OptionsFileName.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="OptionsGlobal.Designer.vb">
       <DependentUpon>OptionsGlobal.vb</DependentUpon>
     </Compile>
     <Compile Include="OptionsGlobal.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OptionsKeyboardInput.Designer.vb">
+      <DependentUpon>OptionsKeyboardInput.vb</DependentUpon>
+    </Compile>
+    <Compile Include="OptionsKeyboardInput.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="OptionsRadioButtons.Designer.vb">
@@ -173,10 +187,6 @@
     <Compile Include="Entropy.vb" />
     <Compile Include="Etch.vb" />
     <Compile Include="FeatureLess.vb" />
-    <Compile Include="OptionsKeyboardInput.Designer.vb">
-      <DependentUpon>OptionsKeyboardInput.vb</DependentUpon>
-    </Compile>
-    <Compile Include="OptionsKeyboardInput.vb" />
     <Compile Include="Fractal.vb" />
     <Compile Include="FREAK.vb" />
     <Compile Include="Gabor.vb" />
@@ -276,10 +286,6 @@
       <DependentUpon>imageForm.vb</DependentUpon>
     </Compile>
     <Compile Include="imageForm.vb" />
-    <Compile Include="OptionsCombo.Designer.vb">
-      <DependentUpon>OptionsCombo.vb</DependentUpon>
-    </Compile>
-    <Compile Include="OptionsCombo.vb" />
     <Compile Include="OptionsSliders.Designer.vb">
       <DependentUpon>OptionsSliders.vb</DependentUpon>
     </Compile>
@@ -342,6 +348,9 @@
     <Compile Include="XPhoto.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="OptionsCombo.resx">
+      <DependentUpon>OptionsCombo.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="OptionsContainer.resx">
       <DependentUpon>OptionsContainer.vb</DependentUpon>
     </EmbeddedResource>
@@ -350,9 +359,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsGlobal.resx">
       <DependentUpon>OptionsGlobal.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OptionsKeyboardInput.resx">
-      <DependentUpon>OptionsKeyboardInput.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
@@ -366,8 +372,8 @@
     <EmbeddedResource Include="OptionsCheckbox.resx">
       <DependentUpon>OptionsCheckbox.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="OptionsCombo.resx">
-      <DependentUpon>OptionsCombo.vb</DependentUpon>
+    <EmbeddedResource Include="OptionsKeyboardInput.resx">
+      <DependentUpon>OptionsKeyboardInput.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsRadioButtons.resx">
       <DependentUpon>OptionsRadioButtons.vb</DependentUpon>

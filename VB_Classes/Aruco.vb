@@ -38,7 +38,7 @@ Public Class Aruco_Test
         label1 = "Original Image with marker ID's"
         label2 = "Normalized image after WarpPerspective."
         task.desc = "Testing the Aruco marker detection in C#"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

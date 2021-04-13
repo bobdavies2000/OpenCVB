@@ -85,7 +85,7 @@ Public Class Replay_Record
         fileNameForm.OpenFileDialog1.FilterIndex = 1
         fileNameForm.filename.Text = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", task.parms.homeDir + "Recording.ocvb")
         fileNameForm.Text = "Select an OpenCVB bag file to create"
-        fileNameForm.Label1.Text = "Select a file to record all the image data."
+        fileNameForm.FileNameLabel.Text = "Select a file to record all the image data."
         fileNameForm.Setup(caller)
         fileNameForm.Show()
 
@@ -180,7 +180,7 @@ Public Class Replay_Play
         fileNameForm.OpenFileDialog1.FilterIndex = 1
         fileNameForm.filename.Text = GetSetting("OpenCVB", "ReplayFileName", "ReplayFileName", task.parms.homeDir + "Recording.ocvb")
         fileNameForm.Text = "Select an OpenCVB bag file to create"
-        fileNameForm.Label1.Text = "Select an OpenCVB bag file to read"
+        fileNameForm.FileNameLabel.Text = "Select an OpenCVB bag file to read"
         fileNameForm.Setup(caller)
         fileNameForm.Show()
 

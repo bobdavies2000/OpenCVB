@@ -1033,7 +1033,6 @@ Public Class OpenCVB
         Me.DrawToBitmap(img, New Rectangle(0, 0, Me.Width, Me.Height))
 
         Dim snapForm = New SnapshotRequest
-        snapForm.SnapshotRequest_Load(sender, e)
         snapForm.PictureBox1.Image = img
         snapForm.AllImages.Checked = True
         If snapForm.ShowDialog() <> DialogResult.OK Then Exit Sub

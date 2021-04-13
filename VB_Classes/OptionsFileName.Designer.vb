@@ -24,7 +24,7 @@ Partial Class OptionsFileName
     Private Sub InitializeComponent()
         Me.TrackBar1 = New System.Windows.Forms.TrackBar()
         Me.PlayButton = New System.Windows.Forms.Button()
-        Me.Label1 = New System.Windows.Forms.Label()
+        Me.FileNameLabel = New System.Windows.Forms.Label()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.filename = New System.Windows.Forms.TextBox()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
@@ -50,14 +50,14 @@ Partial Class OptionsFileName
         Me.PlayButton.Text = "Start"
         Me.PlayButton.UseVisualStyleBackColor = True
         '
-        'Label1
+        'FileNameLabel
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(17, 9)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(51, 20)
-        Me.Label1.TabIndex = 8
-        Me.Label1.Text = "label1"
+        Me.FileNameLabel.AutoSize = True
+        Me.FileNameLabel.Location = New System.Drawing.Point(17, 9)
+        Me.FileNameLabel.Name = "FileNameLabel"
+        Me.FileNameLabel.Size = New System.Drawing.Size(51, 20)
+        Me.FileNameLabel.TabIndex = 8
+        Me.FileNameLabel.Text = "label1"
         '
         'Button1
         '
@@ -91,7 +91,7 @@ Partial Class OptionsFileName
         Me.ClientSize = New System.Drawing.Size(982, 177)
         Me.Controls.Add(Me.TrackBar1)
         Me.Controls.Add(Me.PlayButton)
-        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.FileNameLabel)
         Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.filename)
         Me.Name = "OptionsFileName"
@@ -104,7 +104,7 @@ Partial Class OptionsFileName
 
     Friend WithEvents TrackBar1 As Windows.Forms.TrackBar
     Friend WithEvents PlayButton As Windows.Forms.Button
-    Friend WithEvents Label1 As Windows.Forms.Label
+    Friend WithEvents FileNameLabel As Windows.Forms.Label
     Friend WithEvents Button1 As Windows.Forms.Button
     Friend WithEvents filename As Windows.Forms.TextBox
     Friend WithEvents OpenFileDialog1 As Windows.Forms.OpenFileDialog

@@ -10,7 +10,7 @@ Public Class Depth_Flatland
         End If
         label2 = "Grayscale version"
         task.desc = "Attempt to stabilize the depth image."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -29,7 +29,7 @@ Public Class Depth_FirstLastDistance
     Public Sub New()
         initParent()
         task.desc = "Monitor the first and last depth distances"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -60,7 +60,7 @@ Public Class Depth_HolesRect
         shadow = New Depth_Holes()
 
         task.desc = "Identify the minimum rectangles of contours of the depth shadow"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
 
     Public Sub Run()
@@ -104,7 +104,7 @@ Public Class Depth_FlatData
         End If
         label1 = "Reduced resolution RGBDepth"
         task.desc = "Attempt to stabilize the depth image."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -166,7 +166,7 @@ Public Class Depth_MeanStdev_MT
             sliders.setupTrackBar(1, "MeanStdev Frame Series", 1, 100, 5)
         End If
         task.desc = "Collect a time series of depth and measure where the stdev is unstable.  Plan is to avoid depth where unstable."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -254,7 +254,7 @@ Public Class Depth_MeanStdevPlot
         plot2.plotCount = 1
 
         task.desc = "Plot the mean and stdev of the depth image"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -295,7 +295,7 @@ Public Class Depth_Uncertainty
         End If
         label2 = "Mask of areas with unstable depth"
         task.desc = "Use the bio-inspired retina algorithm to determine depth uncertainty."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -319,7 +319,7 @@ Public Class Depth_Palette
 
         customColorMap = colorTransition(cv.Scalar.Blue, cv.Scalar.Yellow, 256)
         task.desc = "Use a palette to display depth from the raw depth data."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -385,7 +385,7 @@ Public Class Depth_Colorizer_CPP
         initParent()
         dcPtr = Depth_Colorizer_Open()
         task.desc = "Display Depth image using C++ instead of VB.Net"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -419,7 +419,7 @@ Public Class Depth_ColorizerFastFade_CPP
         dcPtr = Depth_Colorizer2_Open()
         label2 = "No depth mask from Depth_InRange"
         task.desc = "Display depth data with InRange.  Higher contrast than others - yellow to blue always present."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -454,7 +454,7 @@ Public Class Depth_ColorizerVB
     Public Sub New()
         initParent()
         task.desc = "Colorize depth manually."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -510,7 +510,7 @@ Public Class Depth_ColorizerVB_MT
         grid = New Thread_Grid
 
         task.desc = "Colorize depth manually with multi-threading."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -574,7 +574,7 @@ Public Class Depth_Colorizer_MT
         initParent()
         grid = New Thread_Grid
         task.desc = "Colorize normally uses CDF to stabilize the colors.  Just using sliders here - stabilized but not optimal range."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -622,7 +622,7 @@ Public Class Depth_LocalMinMax_MT
 
         label1 = "Red is min distance, blue is max distance"
         task.desc = "Find min and max depth in each segment."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -676,7 +676,7 @@ Public Class Depth_LocalMinMax_Kalman_MT
 
         label1 = "Red is min distance, blue is max distance"
         task.desc = "Find minimum depth in each segment."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -768,7 +768,7 @@ Public Class Depth_NotMissing
 
         label2 = "Stable (non-zero) Depth"
         task.desc = "Collect X frames, compute stable depth using the RGB and Depth image."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -800,7 +800,7 @@ Public Class Depth_Median
         median.rangeMax = 10000
         median.rangeMin = 1 ' ignore depth of zero as it is not known.
         task.desc = "Divide the depth image ahead and behind the median."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -841,7 +841,7 @@ Public Class Depth_SmoothingMat
         End If
         label2 = "Depth pixels after smoothing"
         task.desc = "Use depth rate of change to smooth the depth values beyond close range"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -884,7 +884,7 @@ Public Class Depth_Smoothing
 
         label2 = "Mask of depth that is smooth"
         task.desc = "This attempt to get the depth data to 'calm' down is not working well enough to be useful - needs more work"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -929,7 +929,7 @@ Public Class Depth_Edges
             sliders.setupTrackBar(0, "Threshold for depth disparity", 0, 255, 200)
         End If
         task.desc = "Find edges in depth data"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -957,7 +957,7 @@ Public Class Depth_HolesOverTime
         End If
         label2 = "Latest hole mask"
         task.desc = "Integrate memory holes over time to identify unstable depth"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -994,7 +994,7 @@ Public Class Depth_Holes
         label2 = "Shadow Edges (use sliders to expand)"
         element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(5, 5))
         task.desc = "Identify holes in the depth image."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1024,7 +1024,7 @@ Public Class Depth_WorldXYZ
         initParent()
         label2 = "dst2 = pointcloud"
         task.desc = "Create 32-bit XYZ format from depth data (to slow to be useful.)"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1060,7 +1060,7 @@ Public Class Depth_WorldXYZ_MT
         grid = New Thread_Grid
         label2 = "dst2 = pointcloud"
         task.desc = "Create OpenGL point cloud from depth data (slow)"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1112,7 +1112,7 @@ Public Class Depth_Foreground
 
         label1 = "Mask for the largest foreground blob"
         task.desc = "Use InRange to define foreground and find the largest blob in the foreground"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1166,7 +1166,7 @@ Public Class Depth_ForegroundOverTime
         label1 = "Pixels that are consistently present"
         label2 = "Latest foreground frame"
         task.desc = "Create a fused foreground mask over x number of frames"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1207,7 +1207,7 @@ Public Class Depth_InRange
         initParent()
         label1 = "Depth values that are in-range"
         task.desc = "Show depth with OpenCV using varying min and max depths."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1235,7 +1235,7 @@ Public Class Depth_LowQualityMask
 
         label2 = "Dilated zero depth - reduces flyout particles"
         task.desc = "Monitor motion in the mask where depth is zero"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1269,7 +1269,7 @@ Public Class Depth_PunchDecreasing
         End If
 
         task.desc = "Identify where depth is decreasing - coming toward the camera."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1303,7 +1303,7 @@ Public Class Depth_PunchIncreasing
         depth = New Depth_PunchDecreasing
         depth.Increasing = True
         task.desc = "Identify where depth is increasing - retreating from the camera."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1331,7 +1331,7 @@ Public Class Depth_PunchBlob
 
         depthInc = New Depth_PunchDecreasing
         task.desc = "Identify the punch with a rectangle around the largest blob"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1391,7 +1391,7 @@ Public Class Depth_SmoothSurfaces
         label1 = "1)HistX 2)HistY 3)backProject histX 4)backP histY"
         label2 = "Likely smooth surfaces"
         task.desc = "Find planes using the pointcloud X and Y differences"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1455,7 +1455,7 @@ Public Class Depth_PointCloud_IMU
         imu = New IMU_GVector
 
         task.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1538,7 +1538,7 @@ Public Class Depth_SmoothAverage
         label1 = "InRange average depth (low quality depth removed)"
         label2 = "32-bit format average stable depth"
         task.desc = "To reduce z-Jitter, use the average depth value at each pixel as long as the camera is stable"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1571,7 +1571,7 @@ Public Class Depth_SmoothMin
         label1 = "InRange depth with low quality depth removed."
         label2 = "Motion in the RGB image. Depth updated in rectangle."
         task.desc = "To reduce z-Jitter, use the closest depth value at each pixel as long as the camera is stable"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1632,7 +1632,7 @@ Public Class Depth_SmoothMax
         label1 = "InRange depth with low quality depth removed."
         label2 = "32-bit format StableMax"
         task.desc = "To reduce z-Jitter, use the farthest depth value at each pixel as long as the camera is stable"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1685,7 +1685,7 @@ Public Class Depth_Averaging
 
         label2 = "32-bit format depth data"
         task.desc = "Take the average depth at each pixel but eliminate any pixels that had zero depth."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1729,7 +1729,7 @@ Public Class Depth_SmoothMinMax
         label1 = "Depth map colorized"
         label2 = "32-bit StableDepth"
         task.desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1791,7 +1791,7 @@ Public Class Depth_AveragingStable
         Dim minMaxRadio = findRadio("Use farthest distance")
         minMaxRadio.Checked = True
         task.desc = "Use Depth_SmoothMax to remove the artifacts from the Depth_Averaging"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1833,7 +1833,7 @@ Public Class Depth_Fusion
         End If
 
         task.desc = "Fuse the depth from the previous x frames."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1876,7 +1876,7 @@ Public Class Depth_Dilate
         initParent()
         dilate = New DilateErode_Basics
         task.desc = "Dilate the depth data to fill holes."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1907,7 +1907,7 @@ Public Class Depth_ForegroundHead
 
         label1 = "Blue is current, red is kalman, green is trusted"
         task.desc = "Use Depth_ForeGround to find the foreground blob.  Then find the probable head of the person in front of the camera."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -1993,7 +1993,7 @@ Public Class Depth_Solid
         flood = New Coherent_Palette()
         label1 = "Solid depth with noise removed"
         task.desc = "Show depth with and without the depth noise from being too close."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

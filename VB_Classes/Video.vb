@@ -19,7 +19,7 @@ Public Class Video_Basics
         fileNameForm.OpenFileDialog1.FilterIndex = 1
         fileNameForm.filename.Text = GetSetting("OpenCVB", "VideoFileName", "VideoFileName", task.parms.homeDir + "Data\CarsDrivingUnderBridge.mp4")
         fileNameForm.Text = "Select a video file for input"
-        fileNameForm.Label1.Text = "Select a video file for input"
+        fileNameForm.FileNameLabel.Text = "Select a video file for input"
         fileNameForm.PlayButton.Hide()
         fileNameForm.Setup(caller)
         fileNameForm.Show()

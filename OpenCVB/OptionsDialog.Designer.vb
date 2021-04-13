@@ -31,11 +31,11 @@ Partial Class OptionsDialog
         Me.ShowLabels = New System.Windows.Forms.CheckBox()
         Me.GroupBox4 = New System.Windows.Forms.GroupBox()
         Me.TestAllDuration = New System.Windows.Forms.NumericUpDown()
-        Me.Label1 = New System.Windows.Forms.Label()
+        Me.DurationLabel = New System.Windows.Forms.Label()
         Me.GroupBox6 = New System.Windows.Forms.GroupBox()
         Me.PythonExeName = New System.Windows.Forms.TextBox()
         Me.SelectPythonFile = New System.Windows.Forms.Button()
-        Me.Label2 = New System.Windows.Forms.Label()
+        Me.PythonLabel = New System.Windows.Forms.Label()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.OKButton = New System.Windows.Forms.Button()
         Me.Cancel_Button = New System.Windows.Forms.Button()
@@ -132,7 +132,7 @@ Partial Class OptionsDialog
         'GroupBox4
         '
         Me.GroupBox4.Controls.Add(Me.TestAllDuration)
-        Me.GroupBox4.Controls.Add(Me.Label1)
+        Me.GroupBox4.Controls.Add(Me.DurationLabel)
         Me.GroupBox4.Location = New System.Drawing.Point(21, 513)
         Me.GroupBox4.Name = "GroupBox4"
         Me.GroupBox4.Size = New System.Drawing.Size(935, 99)
@@ -150,21 +150,21 @@ Partial Class OptionsDialog
         Me.TestAllDuration.TabIndex = 2
         Me.TestAllDuration.Value = New Decimal(New Integer() {10, 0, 0, 0})
         '
-        'Label1
+        'DurationLabel
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(111, 52)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(620, 20)
-        Me.Label1.TabIndex = 1
-        Me.Label1.Text = "Duration in seconds of each test when running ""Test All"" (there is a 5 second min" &
+        Me.DurationLabel.AutoSize = True
+        Me.DurationLabel.Location = New System.Drawing.Point(111, 52)
+        Me.DurationLabel.Name = "DurationLabel"
+        Me.DurationLabel.Size = New System.Drawing.Size(620, 20)
+        Me.DurationLabel.TabIndex = 1
+        Me.DurationLabel.Text = "Duration in seconds of each test when running ""Test All"" (there is a 5 second min" &
     "imum)"
         '
         'GroupBox6
         '
         Me.GroupBox6.Controls.Add(Me.PythonExeName)
         Me.GroupBox6.Controls.Add(Me.SelectPythonFile)
-        Me.GroupBox6.Controls.Add(Me.Label2)
+        Me.GroupBox6.Controls.Add(Me.PythonLabel)
         Me.GroupBox6.Location = New System.Drawing.Point(21, 623)
         Me.GroupBox6.Name = "GroupBox6"
         Me.GroupBox6.Size = New System.Drawing.Size(936, 123)
@@ -188,14 +188,14 @@ Partial Class OptionsDialog
         Me.SelectPythonFile.Text = "..."
         Me.SelectPythonFile.UseVisualStyleBackColor = True
         '
-        'Label2
+        'PythonLabel
         '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(12, 37)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(552, 20)
-        Me.Label2.TabIndex = 1
-        Me.Label2.Text = "Select the version of Python that should be used when running Python scripts"
+        Me.PythonLabel.AutoSize = True
+        Me.PythonLabel.Location = New System.Drawing.Point(12, 37)
+        Me.PythonLabel.Name = "PythonLabel"
+        Me.PythonLabel.Size = New System.Drawing.Size(552, 20)
+        Me.PythonLabel.TabIndex = 1
+        Me.PythonLabel.Text = "Select the version of Python that should be used when running Python scripts"
         '
         'OpenFileDialog1
         '
@@ -309,11 +309,11 @@ Partial Class OptionsDialog
     Friend WithEvents ShowLabels As CheckBox
     Friend WithEvents GroupBox4 As GroupBox
     Friend WithEvents TestAllDuration As NumericUpDown
-    Friend WithEvents Label1 As Label
+    Friend WithEvents DurationLabel As Label
     Friend WithEvents GroupBox6 As GroupBox
     Friend WithEvents PythonExeName As TextBox
     Friend WithEvents SelectPythonFile As Button
-    Friend WithEvents Label2 As Label
+    Friend WithEvents PythonLabel As Label
     Friend WithEvents OpenFileDialog1 As OpenFileDialog
     Friend WithEvents ShowConsoleLog As CheckBox
     Friend WithEvents OKButton As Button

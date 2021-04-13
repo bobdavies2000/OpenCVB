@@ -24,7 +24,7 @@ Partial Class TreeviewForm
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.TreeView1 = New System.Windows.Forms.TreeView()
-        Me.Label1 = New System.Windows.Forms.Label()
+        Me.ClickTreeLabel = New System.Windows.Forms.Label()
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.OK_Button = New System.Windows.Forms.Button()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
@@ -41,14 +41,14 @@ Partial Class TreeviewForm
         Me.TreeView1.Size = New System.Drawing.Size(943, 75)
         Me.TreeView1.TabIndex = 1
         '
-        'Label1
+        'ClickTreeLabel
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(12, 96)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(199, 20)
-        Me.Label1.TabIndex = 2
-        Me.Label1.Text = "Click any tree entry to run it"
+        Me.ClickTreeLabel.AutoSize = True
+        Me.ClickTreeLabel.Location = New System.Drawing.Point(12, 96)
+        Me.ClickTreeLabel.Name = "ClickTreeLabel"
+        Me.ClickTreeLabel.Size = New System.Drawing.Size(199, 20)
+        Me.ClickTreeLabel.TabIndex = 2
+        Me.ClickTreeLabel.Text = "Click any tree entry to run it"
         '
         'Timer1
         '
@@ -109,7 +109,7 @@ Partial Class TreeviewForm
         Me.ClientSize = New System.Drawing.Size(943, 194)
         Me.Controls.Add(Me.ReviewDST)
         Me.Controls.Add(Me.ReviewStandalone)
-        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.ClickTreeLabel)
         Me.Controls.Add(Me.TreeView1)
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
@@ -123,7 +123,7 @@ Partial Class TreeviewForm
 
     End Sub
     Friend WithEvents TreeView1 As TreeView
-    Friend WithEvents Label1 As Label
+    Friend WithEvents ClickTreeLabel As Label
     Friend WithEvents Timer1 As Timer
     Friend WithEvents OK_Button As Button
     Friend WithEvents TableLayoutPanel1 As TableLayoutPanel

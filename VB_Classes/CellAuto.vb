@@ -123,10 +123,10 @@ Public Class CellAuto_Life
         Static randomSlider = findSlider("Random Pixel Count")
         randomSlider.Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
         task.desc = "Use OpenCV to implement the Game of Life"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then task.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static savePointCount As Integer
         Static randomSlider = findSlider("Random Pixel Count")
         If randomSlider.Value <> savePointCount Or generation = 0 Then
@@ -198,10 +198,10 @@ Public Class CellAuto_LifeColor
 
         label1 = "Births are blue, deaths are red"
         task.desc = "Game of Life but with color added"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then task.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         game.Run()
         dst1 = game.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static lastBoard = dst1.Clone
@@ -238,10 +238,10 @@ Public Class CellAuto_LifePopulation
         plot.plotCount = 1
 
         task.desc = "Show Game of Life display with plot of population"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then task.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         game.Run()
         dst1 = game.dst1
 
@@ -269,11 +269,11 @@ Public Class CellAuto_Basics_MP
         i18 = cell.i18
 
         task.desc = "Multi-threaded version of CellAuto_Basics"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
-		If task.intermediateReview = caller Then task.intermediateObject = Me
-        If standalone or task.intermediateReview = caller Then
+        If task.intermediateReview = caller Then task.intermediateObject = Me
+        If standalone Or task.intermediateReview = caller Then
             cell.src = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
             cell.src.Set(Of Byte)(0, cell.src.Width / 2, 1)
         End If
@@ -316,7 +316,7 @@ Public Class CellAuto_All256
             sliders.setupTrackBar(0, "Current Rule", 0, 255, 0)
         End If
         task.desc = "Run through all 256 combinations of outcomes"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Private Function createOutcome(val As Integer) As String
         Dim outstr As String = ""
@@ -327,7 +327,7 @@ Public Class CellAuto_All256
         Return outstr
     End Function
     Public Sub Run()
-		If task.intermediateReview = caller Then task.intermediateObject = Me
+        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim index = sliders.trackbar(0).Value
         Dim mtOn = cell.check.Box(0).Checked
 

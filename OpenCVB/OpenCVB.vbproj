@@ -153,15 +153,19 @@
     <Compile Include="OptionsDialog.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="CameraZED2.vb" />
     <Compile Include="SnapshotRequest.Designer.vb">
       <DependentUpon>SnapshotRequest.vb</DependentUpon>
     </Compile>
-    <Compile Include="SnapshotRequest.vb" />
-    <Compile Include="CameraZED2.vb" />
+    <Compile Include="SnapshotRequest.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="TreeviewForm.Designer.vb">
       <DependentUpon>TreeviewForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="TreeviewForm.vb" />
+    <Compile Include="TreeviewForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="OpenCVB.resx">

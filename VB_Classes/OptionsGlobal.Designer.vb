@@ -25,22 +25,22 @@ Partial Class OptionsGlobal
         Me.MinMaxDepth = New System.Windows.Forms.GroupBox()
         Me.maxCount = New System.Windows.Forms.Label()
         Me.MaxRange = New System.Windows.Forms.TrackBar()
-        Me.Label4 = New System.Windows.Forms.Label()
+        Me.InrangeMaxLabel = New System.Windows.Forms.Label()
         Me.minCount = New System.Windows.Forms.Label()
         Me.MinRange = New System.Windows.Forms.TrackBar()
-        Me.Label1 = New System.Windows.Forms.Label()
+        Me.InrangeMinLabel = New System.Windows.Forms.Label()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.IMUmotion = New System.Windows.Forms.Label()
         Me.IMUmotionSlider = New System.Windows.Forms.TrackBar()
-        Me.Label3 = New System.Windows.Forms.Label()
+        Me.ThresholdLabel = New System.Windows.Forms.Label()
         Me.threshold = New System.Windows.Forms.Label()
         Me.thresholdSlider = New System.Windows.Forms.TrackBar()
-        Me.Label6 = New System.Windows.Forms.Label()
+        Me.TopSideThresholdLabel = New System.Windows.Forms.Label()
         Me.resetToDefaults = New System.Windows.Forms.CheckBox()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
-        Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.UseKalmanWhenStable = New System.Windows.Forms.CheckBox()
+        Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.PaletteGroup = New System.Windows.Forms.GroupBox()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.MinMaxDepth.SuspendLayout()
@@ -57,10 +57,10 @@ Partial Class OptionsGlobal
         '
         Me.MinMaxDepth.Controls.Add(Me.maxCount)
         Me.MinMaxDepth.Controls.Add(Me.MaxRange)
-        Me.MinMaxDepth.Controls.Add(Me.Label4)
+        Me.MinMaxDepth.Controls.Add(Me.InrangeMaxLabel)
         Me.MinMaxDepth.Controls.Add(Me.minCount)
         Me.MinMaxDepth.Controls.Add(Me.MinRange)
-        Me.MinMaxDepth.Controls.Add(Me.Label1)
+        Me.MinMaxDepth.Controls.Add(Me.InrangeMinLabel)
         Me.MinMaxDepth.Location = New System.Drawing.Point(12, 63)
         Me.MinMaxDepth.Name = "MinMaxDepth"
         Me.MinMaxDepth.Size = New System.Drawing.Size(829, 169)
@@ -88,14 +88,14 @@ Partial Class OptionsGlobal
         Me.MaxRange.TickStyle = System.Windows.Forms.TickStyle.None
         Me.MaxRange.Value = 200
         '
-        'Label4
+        'InrangeMaxLabel
         '
-        Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(18, 112)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(188, 20)
-        Me.Label4.TabIndex = 3
-        Me.Label4.Text = "InRange Min Depth (mm)"
+        Me.InrangeMaxLabel.AutoSize = True
+        Me.InrangeMaxLabel.Location = New System.Drawing.Point(18, 112)
+        Me.InrangeMaxLabel.Name = "InrangeMaxLabel"
+        Me.InrangeMaxLabel.Size = New System.Drawing.Size(188, 20)
+        Me.InrangeMaxLabel.TabIndex = 3
+        Me.InrangeMaxLabel.Text = "InRange Min Depth (mm)"
         '
         'minCount
         '
@@ -117,14 +117,14 @@ Partial Class OptionsGlobal
         Me.MinRange.TickStyle = System.Windows.Forms.TickStyle.None
         Me.MinRange.Value = 1
         '
-        'Label1
+        'InrangeMinLabel
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(19, 40)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(188, 20)
-        Me.Label1.TabIndex = 0
-        Me.Label1.Text = "InRange Min Depth (mm)"
+        Me.InrangeMinLabel.AutoSize = True
+        Me.InrangeMinLabel.Location = New System.Drawing.Point(19, 40)
+        Me.InrangeMinLabel.Name = "InrangeMinLabel"
+        Me.InrangeMinLabel.Size = New System.Drawing.Size(188, 20)
+        Me.InrangeMinLabel.TabIndex = 0
+        Me.InrangeMinLabel.Text = "InRange Min Depth (mm)"
         '
         'OpenFileDialog1
         '
@@ -134,10 +134,10 @@ Partial Class OptionsGlobal
         '
         Me.GroupBox1.Controls.Add(Me.IMUmotion)
         Me.GroupBox1.Controls.Add(Me.IMUmotionSlider)
-        Me.GroupBox1.Controls.Add(Me.Label3)
+        Me.GroupBox1.Controls.Add(Me.ThresholdLabel)
         Me.GroupBox1.Controls.Add(Me.threshold)
         Me.GroupBox1.Controls.Add(Me.thresholdSlider)
-        Me.GroupBox1.Controls.Add(Me.Label6)
+        Me.GroupBox1.Controls.Add(Me.TopSideThresholdLabel)
         Me.GroupBox1.Location = New System.Drawing.Point(12, 243)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(829, 168)
@@ -164,13 +164,13 @@ Partial Class OptionsGlobal
         Me.IMUmotionSlider.TickStyle = System.Windows.Forms.TickStyle.None
         Me.IMUmotionSlider.Value = 1
         '
-        'Label3
+        'ThresholdLabel
         '
-        Me.Label3.Location = New System.Drawing.Point(19, 107)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(196, 44)
-        Me.Label3.TabIndex = 3
-        Me.Label3.Text = "Threshold in IMU motion in radians X100"
+        Me.ThresholdLabel.Location = New System.Drawing.Point(19, 107)
+        Me.ThresholdLabel.Name = "ThresholdLabel"
+        Me.ThresholdLabel.Size = New System.Drawing.Size(196, 44)
+        Me.ThresholdLabel.TabIndex = 3
+        Me.ThresholdLabel.Text = "Threshold in IMU motion in radians X100"
         '
         'threshold
         '
@@ -192,13 +192,13 @@ Partial Class OptionsGlobal
         Me.thresholdSlider.TickStyle = System.Windows.Forms.TickStyle.None
         Me.thresholdSlider.Value = 1
         '
-        'Label6
+        'TopSideThresholdLabel
         '
-        Me.Label6.Location = New System.Drawing.Point(42, 29)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(173, 47)
-        Me.Label6.TabIndex = 0
-        Me.Label6.Text = "Top and Side Views Histogram threshold"
+        Me.TopSideThresholdLabel.Location = New System.Drawing.Point(42, 29)
+        Me.TopSideThresholdLabel.Name = "TopSideThresholdLabel"
+        Me.TopSideThresholdLabel.Size = New System.Drawing.Size(173, 47)
+        Me.TopSideThresholdLabel.TabIndex = 0
+        Me.TopSideThresholdLabel.Text = "Top and Side Views Histogram threshold"
         '
         'resetToDefaults
         '
@@ -222,16 +222,6 @@ Partial Class OptionsGlobal
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
         '
-        'UseKalman
-        '
-        Me.UseKalman.AutoSize = True
-        Me.UseKalman.Location = New System.Drawing.Point(23, 30)
-        Me.UseKalman.Name = "UseKalman"
-        Me.UseKalman.Size = New System.Drawing.Size(201, 24)
-        Me.UseKalman.TabIndex = 0
-        Me.UseKalman.Text = "Turn Kalman filtering on"
-        Me.UseKalman.UseVisualStyleBackColor = True
-        '
         'UseKalmanWhenStable
         '
         Me.UseKalmanWhenStable.AutoSize = True
@@ -241,6 +231,16 @@ Partial Class OptionsGlobal
         Me.UseKalmanWhenStable.TabIndex = 1
         Me.UseKalmanWhenStable.Text = "Only use Kalman when the camera is stable"
         Me.UseKalmanWhenStable.UseVisualStyleBackColor = True
+        '
+        'UseKalman
+        '
+        Me.UseKalman.AutoSize = True
+        Me.UseKalman.Location = New System.Drawing.Point(23, 30)
+        Me.UseKalman.Name = "UseKalman"
+        Me.UseKalman.Size = New System.Drawing.Size(201, 24)
+        Me.UseKalman.TabIndex = 0
+        Me.UseKalman.Text = "Turn Kalman filtering on"
+        Me.UseKalman.UseVisualStyleBackColor = True
         '
         'PaletteGroup
         '
@@ -289,20 +289,20 @@ Partial Class OptionsGlobal
     End Sub
 
     Friend WithEvents MinMaxDepth As Windows.Forms.GroupBox
-    Friend WithEvents Label1 As Windows.Forms.Label
+    Friend WithEvents InrangeMinLabel As Windows.Forms.Label
     Friend WithEvents MinRange As Windows.Forms.TrackBar
     Friend WithEvents maxCount As Windows.Forms.Label
     Friend WithEvents MaxRange As Windows.Forms.TrackBar
-    Friend WithEvents Label4 As Windows.Forms.Label
+    Friend WithEvents InrangeMaxLabel As Windows.Forms.Label
     Friend WithEvents minCount As Windows.Forms.Label
     Friend WithEvents OpenFileDialog1 As Windows.Forms.OpenFileDialog
     Friend WithEvents GroupBox1 As Windows.Forms.GroupBox
     Friend WithEvents IMUmotion As Windows.Forms.Label
     Friend WithEvents IMUmotionSlider As Windows.Forms.TrackBar
-    Friend WithEvents Label3 As Windows.Forms.Label
+    Friend WithEvents ThresholdLabel As Windows.Forms.Label
     Friend WithEvents threshold As Windows.Forms.Label
     Friend WithEvents thresholdSlider As Windows.Forms.TrackBar
-    Friend WithEvents Label6 As Windows.Forms.Label
+    Friend WithEvents TopSideThresholdLabel As Windows.Forms.Label
     Friend WithEvents resetToDefaults As Windows.Forms.CheckBox
     Friend WithEvents GroupBox2 As Windows.Forms.GroupBox
     Friend WithEvents UseKalman As Windows.Forms.CheckBox

@@ -53,7 +53,7 @@ Public Class Sound_Basics
         fileNameForm.OpenFileDialog1.FilterIndex = 1
         fileNameForm.filename.Text = GetSetting("OpenCVB", "AudioFileName", "AudioFileName", "")
         fileNameForm.Text = "Select an audio file to analyze"
-        fileNameForm.Label1.Text = "Select a file for use with the Sound_Basics algorithm."
+        fileNameForm.FileNameLabel.Text = "Select a file for use with the Sound_Basics algorithm."
         fileNameForm.PlayButton.Hide()
         fileNameForm.Setup(caller)
         fileNameForm.Show()

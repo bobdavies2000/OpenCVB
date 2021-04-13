@@ -27,7 +27,7 @@ Public Class VBparent : Implements IDisposable
     Public sliders As New OptionsSliders
     Public pyStream As Object
     Public standalone As Boolean
-    Public src As cv.Mat
+    Public src As New cv.Mat
     Public dst1 As cv.Mat
     Public dst2 As cv.Mat
     Public label1 As String
@@ -50,20 +50,14 @@ Public Class VBparent : Implements IDisposable
             If task.callTrace.Contains(callStack) = False Then task.callTrace.Add(callStack)
         End If
 
-        src = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
-        dst1 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
-        dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
+        src = task.color
+        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
+        dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
     End Sub
     Public Sub NextFrame()
-        If standalone Or task.intermediateReview = caller Then src = task.color
-        If task.depth32f.Size <> dst1.Size Or task.depth32f.Size <> src.Size Then
-            src = src.Resize(task.depth32f.Size)
-            dst1 = New cv.Mat(task.depth32f.Size(), cv.MatType.CV_8UC3)
-            dst2 = New cv.Mat(task.depth32f.Size(), cv.MatType.CV_8UC3)
-        End If
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
         algorithm.Run()
-        If standalone And src.Width > 0 Then
+        If standalone Then
             task.label1 = label1
             task.label2 = label2
             If task.intermediateReview <> "" And task.intermediateReview <> caller Then
@@ -103,10 +97,10 @@ Public Class VBparent : Implements IDisposable
         If r.Height < 0 Then r.Height = 1
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
-        If r.X > src.Width Then r.X = src.Width
-        If r.Y > src.Height Then r.Y = src.Height
-        If r.X + r.Width > src.Width Then r.Width = src.Width - r.X
-        If r.Y + r.Height > src.Height Then r.Height = src.Height - r.Y
+        If r.X > dst1.Width Then r.X = dst1.Width
+        If r.Y > dst1.Height Then r.Y = dst1.Height
+        If r.X + r.Width > dst1.Width Then r.Width = dst1.Width - r.X
+        If r.Y + r.Height > dst1.Height Then r.Height = dst1.Height - r.Y
         Return r
     End Function
     Public Function validatePoint2f(p As cv.Point2f) As cv.Point2f
@@ -173,7 +167,6 @@ Public Class VBparent : Implements IDisposable
         radio.Dispose()
         radio1.Dispose()
         combo.Dispose()
-        src.Dispose()
         dst1.Dispose()
         dst2.Dispose()
     End Sub

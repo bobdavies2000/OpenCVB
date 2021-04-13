@@ -32,11 +32,11 @@ Public Class TreeviewForm
         OpenCVB.TreeButton.Checked = False
     End Sub
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
-        If botDistance = 0 Then botDistance = Me.Height - Label1.Top
-        Label1.Top = Me.Height - botDistance
-        ReviewStandalone.Top = Label1.Top + Label1.Height + 25
+        If botDistance = 0 Then botDistance = Me.Height - ClickTreeLabel.Top
+        ClickTreeLabel.Top = Me.Height - botDistance
+        ReviewStandalone.Top = ClickTreeLabel.Top + ClickTreeLabel.Height + 25
         ReviewDST.Top = ReviewStandalone.Top + ReviewStandalone.Height + 5
-        TreeView1.Height = Label1.Top - 5
+        TreeView1.Height = ClickTreeLabel.Top - 5
     End Sub
     Private Sub TreeviewForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.Left = GetSetting("OpenCVB", "TreeViewLeft", "TreeViewLeft", Me.Left)

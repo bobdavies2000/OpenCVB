@@ -25,7 +25,7 @@ Public Class Line_Basics
         label1 = "Lines detected in the current frame"
         label2 = "Lines detected since camera motion threshold"
         task.desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -88,7 +88,7 @@ Public Class Line_LeftRightOverlay
         label1 = "Left image of Line_LeftRightImages"
         label2 = "Left image lines in red, right in blue"
         task.desc = "Plot the points found for stable lines in the left and right images"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -151,7 +151,7 @@ Public Class Line_Reduction
         label1 = "Yellow > length threshold, red < length threshold"
         label2 = "Input image after reduction"
         task.desc = "Use the reduced rgb image as input to the line detector"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -186,7 +186,7 @@ Public Class Line_InterceptsUI
         lines = New Line_Intercepts
         label1 = "Use mouse in right image to highlight lines"
         task.desc = "An alternative way to highlight line segments with common slope"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -272,7 +272,7 @@ Public Class Line_ConfirmedDepth
         label1 = "Lines defined in RGB"
         label2 = "Lines in RGB confirmed in the point cloud"
         task.desc = "Find the RGB lines and confirm they are present in the cloud data."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -357,7 +357,7 @@ Public Class Line_Vertical
         End If
 
         task.desc = "Find all the vertical lines in the IMU rectified cloud"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -396,7 +396,7 @@ Public Class Line_Horizontal
         initParent()
         vLines = New Line_Vertical
         task.desc = "Find all the horizontal lines in the IMU rectified cloud"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -449,7 +449,7 @@ Public Class Line_Intercepts
 
         label1 = "Mouse tracks top, bottom, left, or right intercepts."
         task.desc = "Consolidate RGB lines using the x- and y-intercepts"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub hightLightIntercept(mousePoint As Integer, intercepts As SortedList(Of Integer, Integer), axis As Integer, dst As cv.Mat)
         For Each inter In intercepts
@@ -568,7 +568,7 @@ Public Class Line_LeftRightImages
         label1 = "Left infrared image with lines detected"
         label2 = "Right infrared image with lines detected"
         task.desc = "Find lines in the infrared images"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -635,7 +635,7 @@ Public Class Line_Sift_MT
         label1 = "Left image - lines connect SIFT dots"
         label2 = "Right image - note inaccurate results"
         task.desc = "Using the lines highlighted in left/right infrared images, find corresponding lines."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
@@ -677,7 +677,7 @@ Public Class Line_NearestPoint
         Dim offset = 20
         rangeRect = New cv.Rect(offset, offset, dst1.Width - offset * 2, dst1.Height - offset * 2)
         task.desc = "Demonstrate computing the distance from a point to a line"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Private Function getPoint() As cv.Point2f
         Dim x = msRNG.Next(rangeRect.X, rangeRect.X + rangeRect.Width)
@@ -756,7 +756,7 @@ Public Class Line_SideView
         label1 = "Side view of the lines detected in the RGB image"
         label2 = "Lines found in the RGB image view"
         task.desc = "Line in image are projected into the depth image"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me

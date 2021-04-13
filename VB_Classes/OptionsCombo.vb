@@ -4,7 +4,7 @@ Public Class OptionsCombo
         Me.MdiParent = aOptions
         Me.Text = caller + " ComboBox Options"
         aOptions.addTitle(Me)
-        Label1.Text = label
+        ComboLabel.Text = label
         For i = 0 To comboList.Count - 1
             Box.Items.Add(comboList.ElementAt(i))
         Next

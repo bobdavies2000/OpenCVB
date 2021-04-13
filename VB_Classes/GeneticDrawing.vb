@@ -314,7 +314,7 @@ Public Class GeneticDrawing_Photo
         fileNameForm.OpenFileDialog1.FilterIndex = 1
         fileNameForm.filename.Text = GetSetting("OpenCVB", "PhotoFileName", "PhotoFileName", task.parms.homeDir + "Data/GeneticDrawingExample.jpg")
         fileNameForm.Text = "Select an image file to create a paint version"
-        fileNameForm.Label1.Text = "Select a file for use with the Sound_Basics algorithm."
+        fileNameForm.FileNameLabel.Text = "Select a file for use with the Sound_Basics algorithm."
         fileNameForm.PlayButton.Hide()
         fileNameForm.Setup(caller)
         fileNameForm.Show()
