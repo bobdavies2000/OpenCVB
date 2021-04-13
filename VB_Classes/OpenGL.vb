@@ -80,10 +80,7 @@ Public Class OpenGL_Basics
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
-        If standalone Or task.intermediateReview = caller Or pointCloudInput Is Nothing Then
-            src = src
-            pointCloudInput = task.pointCloud
-        End If
+        If standalone Or task.intermediateReview = caller Or pointCloudInput Is Nothing Then pointCloudInput = task.pointCloud
 
         If task.noDepthMask.Width = pointCloudInput.Width Then pointCloudInput.SetTo(0, task.noDepthMask)
 
@@ -95,7 +92,7 @@ Public Class OpenGL_Basics
             If bytesRead = 0 Then task.trueText("The OpenGL process appears to have stopped.", 20, 100)
         End If
 
-        Dim rgb = src.CvtColor(cv.ColorConversionCodes.BGR2RGB) ' OpenGL needs RGB, not BGR
+        Dim rgb = task.color.CvtColor(cv.ColorConversionCodes.BGR2RGB) ' OpenGL needs RGB, not BGR
         If rgb.Width Then ReDim rgbBuffer(rgb.Total * rgb.ElemSize - 1)
         If dataInput.Width Then ReDim dataBuffer(dataInput.Total * dataInput.ElemSize - 1)
         If textureInput.Width Then ReDim textureBuffer(textureInput.Total * textureInput.ElemSize - 1)

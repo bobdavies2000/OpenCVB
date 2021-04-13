@@ -225,7 +225,7 @@ Public Class Reduction_Histogram
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        basics.src = src
+        basics.src = src.Clone
         basics.Run()
         Static reductionSlider = findSlider("Reduction factor")
         reductionSlider.value = 112
@@ -257,7 +257,7 @@ Public Class Reduction_PointCloud
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        Dim input = src
+        Dim input = src.Clone
         If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud
         Dim split() = input.Split()
 
@@ -296,7 +296,7 @@ Public Class Reduction_XYZ
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
 
-        Dim input = src
+        Dim input = src.Clone
         If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud
         Dim split() = input.Split()
 
