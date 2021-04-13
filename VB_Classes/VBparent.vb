@@ -55,6 +55,7 @@ Public Class VBparent : Implements IDisposable
         dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
     End Sub
     Public Sub NextFrame()
+        If standalone Or task.intermediateReview = caller Then src = task.color.Clone
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
         algorithm.Run()
         If standalone Then
