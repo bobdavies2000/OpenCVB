@@ -37,13 +37,13 @@ Public Class Coherence_Basics
         If task.drawRect.Width <> 0 Then srcRect = task.drawRect
 
         dst1 = src.Clone()
-        src = src(srcRect)
+        Dim input = src(srcRect)
 
         Dim gray As New cv.Mat
         Dim eigen As New cv.Mat
         Dim split() As cv.Mat
         For i = 0 To 3
-            gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            gray = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             eigen = gray.CornerEigenValsAndVecs(str_sigma, eigenKernelSize)
             split = eigen.Split()
             Dim x = split(2), y = split(3)
@@ -67,14 +67,14 @@ Public Class Coherence_Basics
 
             Dim mask = gvv.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
 
-            Dim erode = src.Erode(New cv.Mat)
-            Dim dilate = src.Dilate(New cv.Mat)
+            Dim erode = input.Erode(New cv.Mat)
+            Dim dilate = input.Dilate(New cv.Mat)
 
             Dim imgl = erode
             dilate.CopyTo(imgl, mask)
-            src = src * (1 - blend) + imgl * blend
+            input = input * (1 - blend) + imgl * blend
         Next
-        dst1(srcRect) = src
+        dst1(srcRect) = input
         dst1.Rectangle(srcRect, cv.Scalar.Yellow, 2)
         dst2.SetTo(0)
     End Sub
