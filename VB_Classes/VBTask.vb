@@ -198,6 +198,7 @@ Public Class ActiveTask : Implements IDisposable
     Public intermediateObject As VBparent
 
     Public pythonTaskName As String
+    Public algName As String
     Public cameraStable As Boolean
     Public lineType As cv.LineTypes
 
@@ -275,7 +276,7 @@ Public Class ActiveTask : Implements IDisposable
     Private Sub VBTaskTimerPop(sender As Object, e As EventArgs)
         Static saveFrameCount = -1
         If saveFrameCount = frameCount And frameCount > 0 Then
-            Console.WriteLine("Warning: " + task.pythonTaskName + " has not completed work on a frame in a second. Warning " + CStr(WarningCount))
+            Console.WriteLine("Warning: " + task.algName + " has not completed work on a frame in a second. Warning " + CStr(WarningCount))
             WarningCount += 1
         Else
             WarningCount = 0
@@ -283,7 +284,7 @@ Public Class ActiveTask : Implements IDisposable
         End If
         saveFrameCount = frameCount
     End Sub
-    Public Sub New(parms As algParms, resolution As cv.Size, algName As String, camWidth As Integer, camHeight As Integer, _defaultRect As cv.Rect)
+    Public Sub New(parms As algParms, resolution As cv.Size, _algName As String, camWidth As Integer, camHeight As Integer, _defaultRect As cv.Rect)
         AddHandler TaskTimer.Elapsed, New Timers.ElapsedEventHandler(AddressOf VBTaskTimerPop)
         TaskTimer.AutoReset = True
         TaskTimer.Enabled = True
@@ -294,6 +295,7 @@ Public Class ActiveTask : Implements IDisposable
         result = New cv.Mat(color.Height, color.Width * 2, cv.MatType.CV_8UC3, cv.Scalar.All(0))
 
         task = Me
+        task.algName = _algName
         task.parms = parms
         task.defaultRect = _defaultRect
         font = cv.HersheyFonts.HersheyComplex
@@ -316,10 +318,10 @@ Public Class ActiveTask : Implements IDisposable
         End Select
 
         buildColors()
-        task.pythonTaskName = task.parms.homeDir + "VB_Classes\" + algName
+        task.pythonTaskName = task.parms.homeDir + "VB_Classes\" + task.algName
 
         aOptions = New OptionsContainer
-        If algName.EndsWith(".py") = False Then
+        If task.algName.EndsWith(".py") = False Then
             aOptions.Show()
             inrange = algoList.createAlgorithm("OptionsCommon_Depth")
             viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
@@ -327,10 +329,10 @@ Public Class ActiveTask : Implements IDisposable
             PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
         End If
 
-        algorithmObject = algoList.createAlgorithm(algName)
+        algorithmObject = algoList.createAlgorithm(task.algName)
 
         If algorithmObject Is Nothing Then
-            MsgBox("The algorithm: " + algName + " was not found in the algorithmList.vb code." + vbCrLf +
+            MsgBox("The algorithm: " + task.algName + " was not found in the algorithmList.vb code." + vbCrLf +
                    "Problem likely originated with the UIindexer.")
         End If
         If parms.useRecordedData Then recordedData = New Replay_Play()
