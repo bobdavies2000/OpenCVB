@@ -33,15 +33,16 @@ Public Class WarpModel_Basics
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
+        Dim input = src.Clone
         If standalone Then
-            warpInput.src = src
+            warpInput.src = input
             warpInput.Run()
 
             If warpInput.check.Box(0).Checked Then
-                src = warpInput.gradient(0)
+                input = warpInput.gradient(0)
                 src2 = warpInput.gradient(1)
             Else
-                src = warpInput.rgb(0)
+                input = warpInput.rgb(0)
                 src2 = warpInput.rgb(1)
             End If
         End If
@@ -51,14 +52,14 @@ Public Class WarpModel_Basics
             If frm.check(i).Checked Then warpMode = i
         Next
 
-        Dim srcData(src.Total * src.ElemSize - 1) As Byte
+        Dim srcData(input.Total * input.ElemSize - 1) As Byte
         Dim src2Data(src2.Total * src2.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, srcData, 0, srcData.Length - 1)
+        Marshal.Copy(input.Data, srcData, 0, srcData.Length - 1)
         Marshal.Copy(src2.Data, src2Data, 0, src2Data.Length - 1)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
         Dim handleSrc2 = GCHandle.Alloc(src2Data, GCHandleType.Pinned)
 
-        Dim matPtr = WarpModel_Run(cPtr, handleSrc.AddrOfPinnedObject(), handleSrc2.AddrOfPinnedObject(), src.Rows, src.Cols, 1, warpMode)
+        Dim matPtr = WarpModel_Run(cPtr, handleSrc.AddrOfPinnedObject(), handleSrc2.AddrOfPinnedObject(), input.Rows, input.Cols, 1, warpMode)
 
         handleSrc.Free()
         handleSrc2.Free()
@@ -72,17 +73,17 @@ Public Class WarpModel_Basics
 
         If warpMode <> 3 Then
             Dim warpMat = New cv.Mat(2, 3, cv.MatType.CV_32F, warpMatrix)
-            cv.Cv2.WarpAffine(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
+            cv.Cv2.WarpAffine(src2, aligned, warpMat, input.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
         Else
             Dim warpMat = New cv.Mat(3, 3, cv.MatType.CV_32F, warpMatrix)
-            cv.Cv2.WarpPerspective(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
+            cv.Cv2.WarpPerspective(src2, aligned, warpMat, input.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
         End If
 
         dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
         dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
 
-        outputRect = New cv.Rect(0, 0, src.Width, src.Height)
-        dst1(outputRect) = src
+        outputRect = New cv.Rect(0, 0, input.Width, input.Height)
+        dst1(outputRect) = input
         dst2(outputRect) = src2
 
         Dim outStr = "The warp matrix is:" + vbCrLf

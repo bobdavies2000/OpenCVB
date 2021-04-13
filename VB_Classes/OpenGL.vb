@@ -776,7 +776,7 @@ End Class
 
 
 
-Public Class OpenGL_Reduced
+Public Class OpenGL_Reduction
     Inherits VBparent
     Dim reduction As Reduction_PointCloud
     Public ogl As OpenGL_Basics
@@ -787,7 +787,7 @@ Public Class OpenGL_Reduced
         ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         task.desc = "Use the reduced depth pointcloud in OpenGL"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run()
         If task.intermediateReview = caller Then task.intermediateObject = Me
