@@ -106,7 +106,6 @@ Public Class Dither_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim radioIndex As Integer
         Static frm = findfrm("Dither_Basics Radio Options")
         For i = 0 To frm.check.length - 1

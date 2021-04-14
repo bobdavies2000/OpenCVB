@@ -19,7 +19,6 @@ Public Class QRcode_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim x = msRNG.Next(0, src.Width - Math.Max(qrInput1.Width, qrInput2.Width))
         Dim y = msRNG.Next(0, src.Height - Math.Max(qrInput1.Height, qrInput2.Height))
         If CInt(task.frameCount / 50) Mod 2 = 0 Then

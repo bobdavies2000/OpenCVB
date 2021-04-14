@@ -19,7 +19,6 @@ Public Class MFD_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         dMax.Run(src)
 
@@ -61,7 +60,6 @@ Public Class MFD_Depth
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         mfd.Run(task.depth32f)
         dst1 = mfd.dst1
@@ -86,7 +84,6 @@ Public Class MFD_PointCloud
         ' task.rank = 4
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         mfd.Run(task.pointCloud)
         dst1 = mfd.dst1
@@ -121,7 +118,6 @@ Public Class MFD_Sobel
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         mfd.Run(src)
         dst2 = mfd.dst2
@@ -152,7 +148,6 @@ Public Class MFD_BinarizedSobel
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         mfd.Run(src)
 
@@ -195,7 +190,6 @@ Public Class MFD_FloodFill
 		' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static stepSlider = findSlider("FloodFill Step Size")
         Static fillSlider = findSlider("FloodFill point distance from edge")
         Dim fill = fillSlider.value

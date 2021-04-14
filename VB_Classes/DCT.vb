@@ -21,7 +21,6 @@ Public Class DCT_Basics
         label2 = "Difference from original"
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
@@ -63,7 +62,6 @@ Public Class DCT_RGB
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim srcPlanes = src.Split()
 
         Dim dctFlag As cv.DctFlags
@@ -109,7 +107,6 @@ Public Class DCT_Depth
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
@@ -144,7 +141,6 @@ Public Class DCT_FeatureLess
         label2 = "FeatureLess RGB regions"
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         dct.Run(src)
         Dim runLenMin = dct.sliders.trackbar(1).Value
         dst1 = dct.dst1
@@ -208,7 +204,6 @@ Public Class DCT_Surfaces_debug
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run(src)
 
         Mats.mat(0) = src.Clone
@@ -283,7 +278,6 @@ Public Class DCT_CComponents
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         dct.Run(src)
         cc.Run(dct.dst1.Clone())
         dst1 = cc.dst1

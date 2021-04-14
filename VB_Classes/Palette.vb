@@ -11,7 +11,6 @@ Public Class Palette_Basics
         ' task.rank = 3
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         label1 = "ColorMap = " + task.paletteSchemeName
 
         Static cMapDir As New DirectoryInfo(task.parms.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
@@ -50,7 +49,6 @@ Public Class Palette_Color
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim b = sliders.trackbar(0).Value
         Dim g = sliders.trackbar(1).Value
         Dim r = sliders.trackbar(2).Value
@@ -82,7 +80,6 @@ Public Class Palette_LinearPolar
         End If
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1.SetTo(0)
         For i = 0 To dst1.Rows - 1
             Dim c = i * 255 / dst1.Rows
@@ -183,7 +180,6 @@ Public Class Palette_Reduction
         End Function
     End Class
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static reductionSlider = findSlider("Reduction factor")
         If reductionSlider.value < 32 Then
             reductionSlider.value = 32
@@ -255,7 +251,6 @@ Public Class Palette_DrawTest
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         draw.Run(src)
         task.palette.Run(draw.dst1)
         dst1 = task.palette.dst1
@@ -278,7 +273,6 @@ Public Class Palette_Gradient
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod frameModulo = 0 Then
             If standalone Or task.intermediateReview = caller Then
                 color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
@@ -322,7 +316,6 @@ Public Class Palette_RandomColorMap
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static paletteSlider = findSlider("Number of color transitions (Used only with Random)")
         If standalone Or transitionCount <> paletteSlider.value Then
             transitionCount = paletteSlider.value
@@ -364,7 +357,6 @@ Public Class Palette_DepthColorMap
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount = 0 Then
             Dim color1 = cv.Scalar.Yellow
             Dim color2 = cv.Scalar.Red
@@ -410,7 +402,6 @@ Public Class Palette_ObjectColors
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         src.SetTo(0, task.noDepthMask)
         reduction.Run(src)
         dst2 = reduction.dst2
@@ -473,7 +464,6 @@ Public Class Palette_Layout2D
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run(src)
         Dim index As Integer
         For Each r In grid.roiList
@@ -503,7 +493,6 @@ Public Class Palette_LeftRightImages
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         lrViews.Run(src)
 

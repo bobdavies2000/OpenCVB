@@ -27,7 +27,6 @@ Public Class Stabilizer_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim resetImage As Boolean
 
         Static widthSlider = findSlider("Width of input to matchtemplate")
@@ -119,7 +118,6 @@ Public Class Stabilizer_BasicsRandomInput
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -176,7 +174,6 @@ Public Class Stabilizer_BasicsTest
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         random.Run(src)
         stable.Run(random.dst2.Clone)
@@ -210,7 +207,6 @@ Public Class Stabilizer_OpticalFlow
         label1 = "Stabilized Image"
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim vert_Border = borderCrop * src.Rows / src.Cols
         If task.frameCount = 0 Then
             errScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 1)
@@ -329,7 +325,6 @@ Public Class Stabilizer_MotionDetect
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         stable.Run(src)
 

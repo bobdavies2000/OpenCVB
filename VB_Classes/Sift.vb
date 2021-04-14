@@ -25,7 +25,6 @@ Public Class Sift_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         lrView.Run(src)
 
@@ -71,7 +70,6 @@ Public Class Sift_Basics_MT
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.run(src)
 
         lrView.Run(src)

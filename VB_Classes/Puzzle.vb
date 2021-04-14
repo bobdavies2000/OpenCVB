@@ -242,7 +242,6 @@ Public Class Puzzle_Basics
         Shuffle = collection.OrderBy(Function(a) r.Next()).ToList()
     End Function
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static width As Integer
         Static height As Integer
         If width <> gridWidthSlider.Value Or height <> gridHeightSlider.Value Or task.frameCount = 0 Or restartRequested Then
@@ -315,7 +314,6 @@ Public Class Puzzle_Solver
         Return bfit
     End Function
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If src.Width = 640 Then
             task.trueText("This algorithm was not setup to work at 640x480.  It works only at 1280x720")

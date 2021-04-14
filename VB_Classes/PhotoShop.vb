@@ -15,7 +15,6 @@ Public Class PhotoShop_Clahe ' Contrast Limited Adaptive Histogram Equalization 
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src
         Dim claheObj = cv.Cv2.CreateCLAHE()
@@ -38,7 +37,6 @@ Public Class PhotoShop_Hue
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim imghsv = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         cv.Cv2.CvtColor(src, imghsv, cv.ColorConversionCodes.RGB2HSV)
         Dim hsv_planes = imghsv.Split()
@@ -66,7 +64,6 @@ Public Class PhotoShop_AlphaBeta
         End If
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.ConvertScaleAbs(sliders.trackbar(0).Value / 500, sliders.trackbar(1).Value)
     End Sub
 End Class
@@ -91,7 +88,6 @@ Public Class PhotoShop_Gamma
         End If
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static lastGamma As Integer = -1
         If lastGamma <> sliders.trackbar(0).Value Then
             lastGamma = sliders.trackbar(0).Value
@@ -139,7 +135,6 @@ Public Class PhotoShop_WhiteBalance_CPP
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim rgbData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(rgbData, GCHandleType.Pinned) ' pin it for the duration...
         Marshal.Copy(src.Data, rgbData, 0, rgbData.Length)
@@ -183,7 +178,6 @@ Public Class PhotoShop_WhiteBalance
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim rgb32f As New cv.Mat
         src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
         Dim maxVal As Double, minVal As Double
@@ -243,7 +237,6 @@ Public Class PhotoShop_ChangeMask
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static countdown = 120
         Static whiteFlag As Boolean
         If countdown = 0 Then
@@ -291,7 +284,6 @@ Public Class PhotoShop_PlotHist
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         hist1.Run(src)
         mat2to1.mat(0) = hist1.dst1
 
@@ -324,7 +316,6 @@ Public Class PhotoShop_Sepia
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2RGB)
         Dim tMatrix = New cv.Mat(3, 3, cv.MatType.CV_64F, {{0.393, 0.769, 0.189}, {0.349, 0.686, 0.168}, {0.272, 0.534, 0.131}})
         dst1 = dst1.Transform(tMatrix).Threshold(255, 255, cv.ThresholdTypes.Trunc)
@@ -373,7 +364,6 @@ Public Class PhotoShop_Emboss
         Return kernel
     End Function
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static sizeSlider = findSlider("Emboss Kernel Size")
         Dim kernel = kernelGenerator(sizeSlider.value)
 
@@ -428,7 +418,6 @@ Public Class PhotoShop_EmbossAll
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim kernel = emboss.kernelGenerator(sizeSlider.Value)
 
         Static threshSlider = findSlider("Emboss threshold")
@@ -504,7 +493,6 @@ Public Class PhotoShop_DuoTone
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static expSlider = findSlider("DuoTone Exponent")
         Dim exp = 1 + expSlider.value / 100
@@ -562,7 +550,6 @@ Public Class PhotoShop_Brightness
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static brightnessSlider = findSlider("Brightness Value")
         Dim brightness As Single = brightnessSlider.value / 100
 
@@ -603,7 +590,6 @@ Public Class PhotoShop_UnsharpMask
         label2 = "Unsharp mask (difference from Blur)"
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim blurred As New cv.Mat
         Dim sigma As Double = sliders.trackbar(0).Value / 100
         Dim threshold As Double = sliders.trackbar(1).Value
@@ -637,7 +623,6 @@ Public Class PhotoShop_SharpenDetail
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         cv.Cv2.DetailEnhance(src, dst1, sigma_s, sigma_r)
@@ -664,7 +649,6 @@ Public Class PhotoShop_SharpenStylize
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         cv.Cv2.Stylization(src, dst1, sigma_s, sigma_r)
@@ -693,7 +677,6 @@ Public Class PhotoShop_Pencil_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         Dim shadowFactor = sliders.trackbar(2).Value / 1000
@@ -727,7 +710,6 @@ Public Class PhotoShop_Pencil_Manual
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayinv As New cv.Mat
         cv.Cv2.BitwiseNot(src, grayinv)

@@ -43,7 +43,6 @@ Public Class Thread_Grid
         ' task.rank = 3
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static lastWidth As Integer
         Static lastHeight As Integer
         Static lastBorder As Integer
@@ -132,7 +131,6 @@ Public Class Thread_GridTest
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run(src)
         Dim mean = cv.Cv2.Mean(src)
 

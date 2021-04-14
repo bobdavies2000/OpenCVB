@@ -88,7 +88,6 @@ Public Class Delaunay_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim active_facet_color = New cv.Scalar(0, 0, 255)
         Dim rect = New cv.Rect(0, 0, src.Width, src.Height)
 
@@ -119,7 +118,6 @@ Public Class Delaunay_GoodFeatures
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         features.Run(src)
 
         dst1 = src
@@ -157,7 +155,6 @@ Public Class Delauney_Subdiv2D
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod updateFrequency <> 0 Then Exit Sub ' too fast otherwise...
         Dim rand As New Random()
         dst1.SetTo(0)
@@ -218,7 +215,6 @@ Public Class Delauney_Coverage
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod sliders.trackbar(0).Value = 0 Then dst1.SetTo(0)
         delauney.Run(src)
         cv.Cv2.BitwiseOr(delauney.dst1, dst1, dst1)

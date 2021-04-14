@@ -15,7 +15,6 @@ Public Class Threshold_LaplacianFilter
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         edges.Run(src)
         dst2 = edges.dst2
         dst1 = task.depth32f

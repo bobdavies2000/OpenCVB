@@ -48,7 +48,6 @@ Public Class CComp_Basics
         Return count
     End Function
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         rects.Clear()
         centroids.Clear()
         masks.Clear()
@@ -147,7 +146,6 @@ Public Class CComp_Basics_FullImage
         Return count
     End Function
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1.SetTo(0)
 
@@ -181,7 +179,6 @@ Public Class CComp_PointTracker
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         basics.Run(src)
 
         If trackPoints Then
@@ -233,7 +230,6 @@ Public Class CComp_MaxBlobs
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static thresholdSlider = findSlider("CComp threshold")
         task.trueText("This algorithm will survey the different ccomp threshold options.", 10, 100, 3)
         If task.frameCount < 10 Then
@@ -287,7 +283,6 @@ Public Class CComp_MaxPixels
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static pixelValues(255) As Integer ' march through all 255 values and find the best...
         Static thresholdSlider = findSlider("CComp threshold")
 
@@ -339,7 +334,6 @@ Public Class CComp_DepthEdges
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         depth.Run(src)
         If standalone Or task.intermediateReview = caller Then dst2 = depth.dst2
 
@@ -371,7 +365,6 @@ Public Class CComp_EdgeMask
         label2 = "Blob Rectangles with centroids (white)"
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         edges.Run(src)
         dst1 = edges.dst1
 
@@ -401,7 +394,6 @@ Public Class CComp_ColorDepth
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
         dst1 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -439,7 +431,6 @@ Public Class CComp_InRange_MT
         label2 = "Blob rectangles - largest to smallest"
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Integer = sliders.trackbar(0).Value
@@ -496,7 +487,6 @@ Public Class CComp_InRange
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Integer = sliders.trackbar(0).Value
@@ -543,7 +533,6 @@ Public Class CComp_Shapes
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gray = shapes.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu + cv.ThresholdTypes.Binary)
         Dim labelview = shapes.EmptyClone()
@@ -595,7 +584,6 @@ Public Class CComp_Simple
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         rects.Clear()
         centroids.Clear()
 
@@ -647,7 +635,6 @@ Public Class CComp_Binarized
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         edges.Run(src)
         dst1 = edges.dst2
         ccomp.Run(dst1)

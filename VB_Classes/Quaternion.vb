@@ -34,7 +34,6 @@ Public Class Quaterion_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim q1 = New Quaternion(CSng(sliders.trackbar(0).Value / 100), CSng(sliders.trackbar(1).Value / 100),
                                     CSng(sliders.trackbar(2).Value / 100), CSng(sliders.trackbar(3).Value / 100))
         Dim q2 = New Quaternion(CSng(sliders.trackbar(4).Value / 100), CSng(sliders.trackbar(5).Value / 100),
@@ -63,7 +62,6 @@ Public Class Quaterion_IMUPrediction
     End Sub
 
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         host.Run(src)
 
         Dim dt = host.HostInterruptDelayEstimate

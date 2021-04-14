@@ -77,7 +77,6 @@ Public Class ML_FillRGBDepth_MT
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         shadow.Run(src)
         grid.run(src)
         Dim minLearnCount = 5
@@ -114,7 +113,6 @@ Public Class ML_FillRGBDepth
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         shadow.Run(src)
         Dim minLearnCount = sliders.trackbar(0).Value
         task.RGBDepth.CopyTo(dst1)
@@ -153,7 +151,6 @@ Public Class ML_DepthFromColor_MT
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.run(src)
 
         Dim mask = task.depth32f.Threshold(sliders.trackbar(0).Value, sliders.trackbar(0).Value, cv.ThresholdTypes.Binary).ConvertScaleAbs()
@@ -219,7 +216,6 @@ Public Class ML_DepthFromColor
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         shadow.Run(src)
         mats.mat(1) = shadow.holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -299,7 +295,6 @@ Public Class ML_DepthFromXYColor
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         shadow.Run(src)
         mats.mat(0) = shadow.holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -397,7 +392,6 @@ Public Class ML_EdgeDepth_MT
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.run(src)
 
         Dim mask = task.depth32f.Threshold(sliders.trackbar(0).Value, sliders.trackbar(0).Value, cv.ThresholdTypes.Binary).ConvertScaleAbs()
@@ -468,7 +462,6 @@ End Class
 '        Return New cv.Vec3b(vec.Get(Of Byte)(0, 0), vec.Get(Of Byte)(0, 1), vec.Get(Of Byte)(0, 2))
 '    End Function
 '    Public Sub Run(src as cv.Mat)
-'		If task.intermediateReview = caller Then task.intermediateObject = Me
 '        Static lastColors As New cv.Mat
 '        If standalone or task.intermediateReview = caller Then
 '            emax.Run()

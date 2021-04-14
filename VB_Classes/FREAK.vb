@@ -11,7 +11,6 @@ Public Class FREAK_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         orb.Run(src)
 
         Dim freak = cv.XFeatures2D.FREAK.Create()

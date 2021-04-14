@@ -14,7 +14,6 @@ Public Class kMeans_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim kInput = src.Resize(New cv.Size(CInt(src.Width / resizeFactor), CInt(src.Height / resizeFactor)))
         Dim columnVector = kInput.Reshape(src.Channels, kInput.Height * kInput.Width)
         Dim src32f As New cv.Mat
@@ -66,7 +65,6 @@ Public Class kMeans_BasicsDepthColor
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim resizeVal = If(resizeRequest, 4, 1)
         Dim small = src.Resize(New cv.Size(src.Width / resizeVal, src.Height / resizeVal))
         Dim rectMat = small.Clone
@@ -119,7 +117,6 @@ Public Class kMeans_Clusters
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static saveRect = task.drawRect
         task.drawRect = saveRect
         For i = 0 To 3
@@ -153,7 +150,6 @@ Public Class kMeans_RGBFast
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim small8uC3 = src.Resize(New cv.Size(CInt(src.Rows / resizeFactor), CInt(src.Cols / resizeFactor)))
         Dim columnVector As New cv.Mat
         columnVector = small8uC3.Reshape(small8uC3.Channels, small8uC3.Rows * small8uC3.Cols)
@@ -196,7 +192,6 @@ Public Class kMeans_RGB_Plus_XYDepth
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         km.Run(src) ' cluster the rgb image - output is in dst2
         Dim rgb32f As New cv.Mat
         km.dst1.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
@@ -259,7 +254,6 @@ Public Class kMeans_XYDepth
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim roi = task.drawRect
         Dim xyDepth32f As New cv.Mat(task.depth32f(roi).Size(), cv.MatType.CV_32FC3, 0)
         For y = 0 To xyDepth32f.Rows - 1
@@ -294,7 +288,6 @@ Public Class kMeans_Depth_FG_BG
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim columnVector As New cv.Mat
         columnVector = task.depth32f.Reshape(1, task.depth32f.Rows * task.depth32f.Cols)
         columnVector.ConvertTo(columnVector, cv.MatType.CV_32FC1)
@@ -335,7 +328,6 @@ Public Class kMeans_LAB
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim roi = task.drawRect
         Dim labMat = src(roi).CvtColor(cv.ColorConversionCodes.RGB2Lab)
         Dim columnVector As New cv.Mat
@@ -375,7 +367,6 @@ Public Class kMeans_Color
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim columnVector = src.Reshape(src.Channels, src.Height * src.Width)
         Dim rgb32f As New cv.Mat
         columnVector.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
@@ -414,7 +405,6 @@ Public Class kMeans_Color_MT
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount = 0 Then
             Static gridWidthSlider = findSlider("ThreadGrid Width")
             Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -465,7 +455,6 @@ Public Class kMeans_ColorDepth
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim rgb32f As New cv.Mat
         src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
         Dim srcPlanes() As cv.Mat = Nothing
@@ -516,7 +505,6 @@ Public Class kMeans_ColorDepth_MT
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.run(src)
 
         Dim clusterCount = sliders.trackbar(0).Value
@@ -566,7 +554,6 @@ Public Class KMeans_Subdivision
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static kmeansKslider = findSlider("kMeans k")
         kmeansKslider.value = 2
 
@@ -608,7 +595,6 @@ Public Class KMeans_Subdivision1
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static kmeansKslider = findSlider("kMeans k")
         kmeansKslider.value = 2
 

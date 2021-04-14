@@ -26,7 +26,6 @@ Public Class KLT_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static prevGray As New cv.Mat
 
         If check.Box(1).Checked Or task.frameCount Mod 25 = 0 Then
@@ -99,7 +98,6 @@ Public Class KLT_OpticalFlow
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         klt.Run(src)
         If task.frameCount > 0 And lastpoints IsNot Nothing And klt.inputPoints IsNot Nothing Then
             dst1 = klt.dst1

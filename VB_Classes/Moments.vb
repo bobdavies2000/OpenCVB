@@ -20,7 +20,6 @@ Public Class Moments_Basics
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             foreground.Run(src)
             dst1 = foreground.dst1
@@ -62,7 +61,6 @@ Public Class Moments_CentroidKalman
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         foreground.Run(src)
         dst1 = foreground.dst1
         Dim mask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

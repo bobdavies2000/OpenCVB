@@ -23,7 +23,6 @@ Public Class Voronoi_Basics
         Next
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.frameCount = 0 Then
             Dim countSlider = findSlider("Random Pixel Count")
@@ -58,7 +57,6 @@ Public Class Voronoi_Compare
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         random.Run(src)
         Dim points = New List(Of cv.Point)(random.Points)
@@ -107,7 +105,6 @@ Public Class Voronoi_CPP
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim countSlider = findSlider("Random Pixel Count")
         vDemo.random.Run(src)

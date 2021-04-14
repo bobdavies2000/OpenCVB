@@ -8,7 +8,6 @@ Public Class Mouse_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static lastPoint = New cv.Point
         ' only display mouse movement in the lower left image (pic.tag = 2)
         If lastPoint = task.mousePoint Or task.mousePicTag <> 2 Then Exit Sub
@@ -34,7 +33,6 @@ Public Class Mouse_LeftClickZoom
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         task.trueText("Left-click and drag to select a region in any of the images." + vbCrLf +
                       "The selected area is presented to ocvbClass in task.drawRect." + vbCrLf +
                       "In this example, the selected region from the RGB image will be resized to fit in the Result2 image to the right." + vbCrLf +

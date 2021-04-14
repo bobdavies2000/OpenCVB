@@ -22,7 +22,6 @@ Public Class Reduction_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static reductionSlider = findSlider("Reduction factor")
         Dim reductionVal = CInt(reductionSlider.Value)
         Static bitwiseCheck = findRadio("Use bitwise reduction")
@@ -60,7 +59,6 @@ Public Class Reduction_Floodfill
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         reduction.Run(src)
         flood.Run(reduction.dst1)
 
@@ -91,7 +89,6 @@ Public Class Reduction_KNN_Color
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         reduction.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = reduction.dst1
 
@@ -132,7 +129,6 @@ Public Class Reduction_KNN_ColorAndDepth
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         reduction.Run(src)
         dst1 = reduction.dst1
 
@@ -174,7 +170,6 @@ Public Class Reduction_Lines
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         reduction.Run(src)
 
@@ -213,7 +208,6 @@ Public Class Reduction_Histogram
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         basics.Run(src)
         Static reductionSlider = findSlider("Reduction factor")
@@ -243,7 +237,6 @@ Public Class Reduction_PointCloud
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
         Dim split() = src.Split()
@@ -281,7 +274,6 @@ Public Class Reduction_XYZ
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
         Dim split() = src.Split()
@@ -326,7 +318,6 @@ Public Class Reduction_Edges
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         reduction.Run(src)
         dst1 = reduction.dst1.Clone
 
@@ -360,7 +351,6 @@ Public Class Reduction_Depth
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Type <> cv.MatType.CV_32S Then
             src = task.depth32f
             src.ConvertTo(src, cv.MatType.CV_32S)
@@ -397,7 +387,6 @@ Public Class Reduction_DepthMax
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
         dMax.Run(src)

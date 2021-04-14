@@ -18,7 +18,6 @@ Public Class IMU_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim alpha As Double = sliders.trackbar(0).Value / 1000
         If task.frameCount = 0 Then
             lastTimeStamp = task.IMU_TimeStamp
@@ -72,7 +71,6 @@ Public Class IMU_Stabilizer
         label2 = "Difference from Color Image"
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim borderCrop = 5
         Dim vert_Border = borderCrop * src.Rows / src.Cols
         Dim dx = task.IMU_AngularVelocity.X
@@ -125,7 +123,6 @@ Public Class IMU_Magnetometer
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.IMU_Magnetometer = New cv.Point3f Then
             task.trueText("The IMU for this camera does not have Magnetometer readings.")
         Else
@@ -151,7 +148,6 @@ Public Class IMU_Barometer
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.IMU_Barometer = 0 Then
             task.trueText("The IMU for this camera does not have barometric pressure.")
         Else
@@ -172,7 +168,6 @@ Public Class IMU_Temperature
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         task.trueText("IMU Temperature is " + Format(task.IMU_Temperature, "#0.00") + " degrees Celsius." + vbCrLf +
                       "IMU Temperature is " + Format(task.IMU_Temperature * 9 / 5 + 32, "#0.00") + " degrees Fahrenheit.")
     End Sub
@@ -205,7 +200,6 @@ Public Class IMU_FrameTime
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static IMUanchor As Integer = task.IMU_FrameTime
         Static histogramIMU(plot.maxScale) As Integer
 
@@ -305,7 +299,6 @@ Public Class IMU_HostFrameTimes
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static CPUanchor As Integer = task.CPU_FrameTime
         Static hist(plot.maxScale) As Integer
 
@@ -393,7 +386,6 @@ Public Class IMU_TotalDelay
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         host.Run(src)
         imu.Run(src)
         Dim totaldelay = host.HostInterruptDelayEstimate + imu.IMUtoCaptureEstimate
@@ -473,7 +465,6 @@ Public Class IMU_GVector
         ' task.rank = 5
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gx = task.IMU_Acceleration.X
         Dim gy = task.IMU_Acceleration.Y
         Dim gz = task.IMU_Acceleration.Z
@@ -563,7 +554,6 @@ Public Class IMU_isCameraLevel
         ' task.rank = 3
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gx = task.IMU_Acceleration.X
         Dim gy = task.IMU_Acceleration.Y
         Dim gz = task.IMU_Acceleration.Z
@@ -604,7 +594,6 @@ Public Class IMU_IscameraStable
         ' task.rank = 3
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim pitch = task.IMU_AngularVelocity.X
         Dim yaw = task.IMU_AngularVelocity.Y

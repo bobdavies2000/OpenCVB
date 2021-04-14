@@ -31,7 +31,6 @@ Public Class Area_MinTriangle_CPP
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static pointCountSlider = findSlider("Area Number of Points")
         Static sizeSlider = findSlider("Area size")
         If numberOfPoints <> pointCountSlider.Value Then setup()
@@ -88,7 +87,6 @@ Public Class Area_MinRect
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static pointCountSlider = findSlider("Area Number of Points")
         Static sizeSlider = findSlider("Area size")
         If numberOfPoints <> pointCountSlider.Value Then setup(pointCountSlider.value)
@@ -135,7 +133,6 @@ Public Class Area_MinMotionRect
         Return gray
     End Function
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         bgSub.Run(src)
         Dim gray As cv.Mat
         If bgSub.dst1.Channels = 1 Then gray = bgSub.dst1 Else gray = bgSub.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -160,7 +157,6 @@ Public Class Area_FindNonZero
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gray = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         Dim srcPoints(10 - 1) As cv.Point ' doesn't really matter how many there are.
         For i = 0 To srcPoints.Length - 1

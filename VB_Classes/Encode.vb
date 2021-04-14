@@ -14,7 +14,6 @@ Public Class Encode_Basics
         label2 = "Original decompressed"
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim encodeParams() As Integer = {options.getEncodeParameter(), options.qualityLevel}
 
         Dim buf() = src.ImEncode(".jpg", encodeParams)
@@ -77,7 +76,6 @@ Public Class Encode_Options
         Return encodeOption
     End Function
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim fileExtension = ".jpg"
         Dim encodeParams() As integer = {getEncodeParameter(), qualityLevel}

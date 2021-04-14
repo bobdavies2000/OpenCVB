@@ -93,7 +93,6 @@ Public Class Replay_Record
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static bytesTotal As Int64
         recordingFilename = New FileInfo(fileNameForm.filename.Text)
         If task.parms.useRecordedData And recordingFilename.Exists = False Then
@@ -188,7 +187,6 @@ Public Class Replay_Play
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static bytesTotal As Int64
         recordingFilename = New FileInfo(fileNameForm.filename.Text)
         If recordingFilename.Exists = False Then task.trueText("File not found: " + recordingFilename.FullName, 10, 125)
@@ -273,7 +271,6 @@ Public Class Replay_OpenGL
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         replay.Run(src)
         ogl.pointCloudInput = task.pointCloud
         ogl.Run(task.color)

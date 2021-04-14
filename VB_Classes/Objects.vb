@@ -13,7 +13,6 @@ Public Class Object_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             dst1 = task.depthmask
             dst2 = task.noDepthMask

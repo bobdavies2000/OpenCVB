@@ -14,7 +14,6 @@ Public Class AddWeighted_Basics
         ' task.rank = 3
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then src2 = task.RGBDepth ' external use must provide src2!
         Dim alpha = weightSlider.Value / 100
         cv.Cv2.AddWeighted(src, alpha, src2, 1.0 - alpha, 0, dst1)
@@ -41,7 +40,6 @@ Public Class AddWeighted_Edges
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         edges.Run(src)
         dst1 = edges.dst2
@@ -72,7 +70,6 @@ Public Class AddWeighted_ImageAccumulate
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         dst1 = New cv.Mat(task.depth32f.Size, cv.MatType.CV_32F)
         Static weightSlider = findSlider("Accumulation weight of each image X100")
@@ -107,7 +104,6 @@ Public Class AddWeighted_InfraRed
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         infra.Run(src)
 
@@ -128,3 +124,4 @@ Public Class AddWeighted_InfraRed
         label2 = "InfraRed " + leftOrRight + " " + Format(1 - addw.weightSlider.Value / 100, "#0%") + " RGB " + Format(addw.weightSlider.Value / 100, "#0%")
     End Sub
 End Class
+

@@ -43,7 +43,6 @@ Public Class Benford_Basics
         use99 = True
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then
             benford.Run(src)
             dst1 = benford.dst1
@@ -114,7 +113,6 @@ Public Class Benford_NormalizedImage
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
@@ -144,7 +142,6 @@ Public Class Benford_NormalizedImage99
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
@@ -178,7 +175,6 @@ Public Class Benford_JPEG
         ' task.rank = 2
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, sliders.trackbar(0).Value})
         Dim tmp = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
         dst1 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
@@ -211,7 +207,6 @@ Public Class Benford_JPEG99
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static qualitySlider = findSlider("JPEG Quality")
         Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, qualitySlider.Value})
         Dim tmp = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
@@ -245,7 +240,6 @@ Public Class Benford_PNG
         ' task.rank = 2
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static compressionSlider = findSlider("PNG Compression")
         Dim png = src.ImEncode(".png", New Integer() {cv.ImwriteFlags.PngCompression, compressionSlider.Value})
         Dim tmp = New cv.Mat(png.Count, 1, cv.MatType.CV_8U, png)
@@ -271,7 +265,6 @@ Public Class Benford_Depth
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         benford.Run(task.depth32f)
         dst1 = benford.dst1
         label1 = benford.label2
@@ -293,7 +286,6 @@ Public Class Benford_DepthRGB
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         benford.Run(task.RGBDepth)
         dst1 = benford.dst2
         label1 = benford.label2
@@ -321,7 +313,6 @@ Public Class Benford_Primes
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount = 0 Then sieve.Run(src) ' only need to compute this once...
         task.trueText(CStr(sieve.primes.Count) + " primes were found")
 

@@ -17,7 +17,6 @@ Public Class KNN_Basics
         ' task.rank = 2
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1.SetTo(cv.Scalar.Black)
 
         If standalone Then
@@ -74,7 +73,6 @@ Public Class KNN_BasicsQT
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1.SetTo(cv.Scalar.Black)
 
         If standalone Or knnQT.useRandomData Then
@@ -142,7 +140,6 @@ Public Class KNN_Options
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then
             If check.Box(0).Checked = False Then useRandomData = True
         End If
@@ -203,7 +200,6 @@ Public Class KNN_1_to_1
         ' task.rank = 2
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         basics.Run(src)
         dst1 = basics.dst1
 
@@ -295,7 +291,6 @@ Public Class KNN_Emax
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone And task.frameCount = 0 Then
             emax = New EMax_Centroids()
             emax.Run(src) ' set the first generation of points.
@@ -347,7 +342,6 @@ Public Class KNN_Test
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.run(src)
 
         knn.knnQT.queryPoints.Clear()
@@ -393,7 +387,6 @@ Public Class KNN_Test_1_to_1
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.run(src)
 
         knn.basics.knnQT.queryPoints.Clear()
@@ -431,7 +424,6 @@ Public Class KNN_Point3d
         label2 = "Top Down View to confirm 3D KNN is correct"
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim maxDepth As Integer = 4000 ' this is an arbitrary max depth
         Dim knn = cv.ML.KNearest.Create()
         If standalone Or task.intermediateReview = caller Then
@@ -515,7 +507,6 @@ Public Class KNN_DepthClusters
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         blobs.Run(src)
         dst1 = blobs.dst2
 
@@ -555,7 +546,6 @@ Public Class KNN_SmoothAverage
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         knn.Run(src)
 
         Static accum As New cv.Mat
@@ -596,7 +586,6 @@ Public Class KNN_StabilizeRegions
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         knn.Run(src)
         dst1 = knn.dst2
 
@@ -628,7 +617,6 @@ Public Class KNN_Contours
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         outline.Run(src)
         dst1 = outline.dst2
 
@@ -716,7 +704,6 @@ Public Class KNN_Cluster2DCities
         Next
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static reuseCheck = findCheckBox("Reuse the training and query data")
         ' If they changed Then number of elements in the set
         Static cityCountSlider = findSlider("KNN Query count")
@@ -780,7 +767,6 @@ Public Class KNN_Point2d
         'Next
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then prepareImage(dst1, task.dotSize)
 
         knn.Run(src)
@@ -825,7 +811,6 @@ Public Class KNN_Learn
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1.SetTo(cv.Scalar.Black)
 
         If standalone Then
@@ -916,7 +901,6 @@ Public Class KNN_PointTracker
         Next
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then
             If topView Is Nothing Then topView = New PointCloud_Kalman_TopView()
             topView.Run(task.pointCloud)
@@ -1046,7 +1030,6 @@ Public Class KNN_1_to_1FIFO
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1.SetTo(cv.Scalar.Black)
 
         If standalone Then

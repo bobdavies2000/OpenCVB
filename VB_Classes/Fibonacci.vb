@@ -10,7 +10,6 @@ Public Class Fibonacci_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static a As Double = 0, b As Double = 1
         If a = 1134903170 Then
             a = 0
@@ -56,7 +55,6 @@ Public Class Fibonacci_Yield
         End While
     End Function
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim fibs As System.Collections.Generic.IEnumerable(Of Double) = nextFib()
         flow.msgs.Add(Format(task.frameCount Mod 74, "00") + " fibonacci number " + Format(fibs.ElementAt(task.frameCount), "###,##0"))
         flow.Run(src)

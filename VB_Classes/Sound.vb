@@ -62,7 +62,6 @@ Public Class Sound_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim sender As New Object, e As New EventArgs
         Static fileinfo = New FileInfo(fileNameForm.filename.Text)
         If fileinfo.Exists And fileNameForm.PlayButton.Text = "Start" Then
@@ -156,7 +155,6 @@ Public Class Sound_SignalGenerator
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static radioIndex As Integer
         Static wgenSlider = findSlider("Sine Wave Frequency")
         Static DecibelSlider = findSlider("Decibels")
@@ -232,7 +230,6 @@ Public Class Sound_Display
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static sliderPercent As Single
         Static fileStarted As Boolean
         Static formatIndex As Integer
@@ -340,7 +337,6 @@ Public Class Sound_GenWaveDisplay
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         plotSound.soundSource.run()
         plotSound.Run(src)
         Dim r1 = New cv.Rect(0, 0, src.Width, src.Height)
@@ -368,7 +364,6 @@ Public Class Sound_WaveDisplay
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         plotSound.soundSource.run()
         plotSound.Run(src)
         Dim r1 = New cv.Rect(0, 0, src.Width, src.Height)

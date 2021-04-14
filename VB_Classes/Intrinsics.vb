@@ -8,7 +8,6 @@ Public Class intrinsicsLeft_Basics
         label2 = "ppx/ppy location"
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.intrinsicsLeft.coeffs Is Nothing Then
             task.trueText("This camera is missing the intrinsics.")
             Exit Sub

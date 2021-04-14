@@ -51,7 +51,6 @@ Public Class Hough_Circles
         label2 = "Hough Circles found"
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         circles.Run(src)
         dst1 = circles.dst1
         Static Dim method As integer = 3
@@ -90,7 +89,6 @@ Public Class Hough_Lines
     End Sub
 
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         edges.Run(src)
 
         Dim rhoIn = sliders.trackbar(0).Value
@@ -142,7 +140,6 @@ Public Class Hough_Lines_MT
     End Sub
 
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.frameCount = 0 Then
             Static gridWidthSlider = findSlider("ThreadGrid Width")

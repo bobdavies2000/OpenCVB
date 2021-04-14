@@ -14,7 +14,6 @@ Public Class LUT_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static segment() As Integer
         Static nSegSlider = findSlider("Number of LUT Segments")
@@ -61,7 +60,6 @@ Public Class LUT_Sliders
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         sliders.sLabels(0).Text = "LUT zero through " + CStr(sliders.trackbar(0).Value)
         sliders.sLabels(1).Text = "LUT " + CStr(sliders.trackbar(0).Value) + " through " + CStr(sliders.trackbar(1).Value)
         sliders.sLabels(2).Text = "LUT " + CStr(sliders.trackbar(1).Value) + " through " + CStr(sliders.trackbar(2).Value)
@@ -100,7 +98,6 @@ Public Class LUT_Reduction
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         reduction.Run(src)
         dst1 = reduction.dst1.LUT(colorMat)
         If standalone Or task.intermediateReview = caller Then dst2 = colorMat.Resize(src.Size())
@@ -128,7 +125,6 @@ Public Class LUT_CustomColor
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Or task.intermediateReview = caller Then
             reduction.Run(src)
@@ -165,7 +161,6 @@ Public Class LUT_Color
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim reduction = sliders.trackbar(0).Value
         If standalone or task.intermediateReview = caller Then
             src /= reduction
@@ -193,7 +188,6 @@ Public Class LUT_Rebuild
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim lut = New cv.Mat(1, 256, cv.MatType.CV_8U, paletteMap)
         dst1 = src.LUT(lut)
         If standalone or task.intermediateReview = caller Then dst2 = lut.Resize(src.Size())
@@ -218,7 +212,6 @@ Public Class LUT_RGBDepth
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         lut.Run(task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst1 = lut.dst1
         label1 = "Depth data in " + CStr(lut.nSeg) + " LUT entries"
@@ -242,7 +235,6 @@ Public Class LUT_Depth32f
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         lut.Run(task.depth32f.Normalize(255).ConvertScaleAbs(255))
         dst1 = lut.dst1
         label1 = "Depth data in " + CStr(lut.nSeg) + " LUT entries"

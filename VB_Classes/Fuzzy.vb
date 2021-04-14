@@ -31,7 +31,6 @@ Public Class Fuzzy_Basics
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         options.setOptions()
         reduction.Run(src)
         dst1 = reduction.dst1
@@ -121,7 +120,6 @@ Public Class Fuzzy_ContoursDepth
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         fuzzyD.Run(task.RGBDepth)
         dst1 = fuzzyD.dst1
     End Sub
@@ -144,7 +142,6 @@ Public Class Fuzzy_NeighborProof
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static proofFailed As Boolean = False
         If proofFailed Then Exit Sub
         fuzzy.Run(src)
@@ -202,7 +199,6 @@ Public Class Fuzzy_TrackerDepth
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         fuzzy.Run(task.RGBDepth)
         dst1 = fuzzy.dst1
 
@@ -261,7 +257,6 @@ Public Class Fuzzy_TrackerDepthClick
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         tracker.Run(src)
         dst1 = tracker.dst1
 
@@ -305,7 +300,6 @@ Public Class Fuzzy_PointTracker
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         fuzzy.Run(src)
         dst2 = fuzzy.dst1
 

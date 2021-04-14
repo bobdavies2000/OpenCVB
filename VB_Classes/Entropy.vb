@@ -18,7 +18,6 @@ Public Class Entropy_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static binSlider = findSlider("Number of Bins")
         simple.bins = binSlider.Value
         simple.run(src)
@@ -65,7 +64,6 @@ Public Class Entropy_Highest
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run(src)
 
         Dim entropyMap = New cv.Mat(src.Size(), cv.MatType.CV_32F)
@@ -119,7 +117,6 @@ Public Class Entropy_FAST
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         fast.Run(src)
 
         entropy.Run(fast.dst1)

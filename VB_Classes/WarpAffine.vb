@@ -61,7 +61,6 @@ Public Class WarpAffine_Captcha
                                cv.BorderTypes.Constant, cv.Scalar.White)
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim characters() As String = {"a", "A", "b", "B", "c", "C", "D", "d", "e", "E", "f", "F", "g", "G", "h", "H", "j", "J", "k", "K", "m", "M", "n", "N", "q", "Q", "R", "t", "T", "w", "W", "x", "X", "y", "Y", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
         Dim charactersSize = characters.Length / characters(0).Length
 
@@ -108,7 +107,6 @@ Public Class WarpAffine_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static frm = findfrm("WarpAffine_Basics Radio Options")
 
         rotateOptions.Run(src)
@@ -148,7 +146,6 @@ Public Class WarpAffine_3Points
         label2 = "Image with affine transform applied"
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static M As New cv.Mat
         If task.frameCount Mod 60 = 0 Then
             Dim triangles(1) As cv.Mat
@@ -221,7 +218,6 @@ Public Class WarpAffine_4Points
         label1 = "Color image with perspective transform applied"
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static M As New cv.Mat
         If task.frameCount Mod 60 = 0 Then
 

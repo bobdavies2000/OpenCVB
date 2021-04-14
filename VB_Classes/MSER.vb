@@ -15,7 +15,6 @@ Public Class MSER_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         options.Run(src)
 
@@ -108,7 +107,6 @@ Public Class MSER_Options
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim delta = sliders.trackbar(0).Value
         Dim minArea = sliders.trackbar(1).Value
         Dim maxArea = sliders.trackbar(2).Value
@@ -175,7 +173,6 @@ Public Class MSER_SyntheticInput
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim img = New cv.Mat(800, 800, cv.MatType.CV_8U, 0)
         Dim width() = {390, 380, 300, 290, 280, 270, 260, 250, 210, 190, 150, 100, 80, 70}
         Dim color1() = {80, 180, 160, 140, 120, 100, 90, 110, 170, 150, 140, 100, 220}
@@ -236,7 +233,6 @@ Public Class MSER_TestSynthetic
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         synth.Run(src)
         dst1 = synth.dst1.Clone()
         dst2 = synth.dst1
@@ -263,7 +259,6 @@ Public Class MSER_CPPStyle
         gray = image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim mser = cv.MSER.Create()
         Dim regions()() As cv.Point = Nothing
         Dim boxes() As cv.Rect = Nothing
@@ -302,7 +297,6 @@ Public Class MSER_Contours
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         mser.Run(src)
 
         Dim pixels As integer

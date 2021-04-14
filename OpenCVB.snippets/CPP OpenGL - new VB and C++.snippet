@@ -20,9 +20,7 @@ Public Class OpenGL_MyOpenGLtest
         task.desc = "description"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
- 		    If task.task.intermediateReview = caller Then task.intermediateObject = Me
-        
+    Public Sub Run(src as cv.Mat)
         ogl.pointCloudInput = task.PointCloud
         ogl.src = task.color
         ogl.Run()

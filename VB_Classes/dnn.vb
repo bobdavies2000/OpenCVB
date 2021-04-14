@@ -34,7 +34,6 @@ Public Class DNN_Test
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim image = cv.Cv2.ImRead(task.parms.homeDir + "Data/space_shuttle.jpg")
         dst2 = image.Resize(dst2.Size())
@@ -66,7 +65,6 @@ Public Class DNN_Caffe_CS
         caffeCS.initialize(protoTxt, modelFile, synsetWords)
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim image = cv.Cv2.ImRead(task.parms.homeDir + "Data/space_shuttle.jpg")
         Dim str = caffeCS.Run(image)
         dst2 = image.Resize(dst2.Size())
@@ -124,7 +122,6 @@ Public Class DNN_Basics
         label1 = "Cropped Input Image - must be square!"
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If dnnPrepared Then
             Dim inScaleFactor = sliders.trackbar(0).Value / sliders.trackbar(0).Maximum ' should be 0.0078 by default...
             Dim meanVal = CSng(sliders.trackbar(1).Value)

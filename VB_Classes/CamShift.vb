@@ -25,7 +25,6 @@ Public Class CamShift_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static roi As New cv.Rect
         Static vMinLast As integer
         Static vMaxLast As integer
@@ -94,7 +93,6 @@ Public Class CamShift_Foreground
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim restartRequested As Boolean
         Static depthMin As integer
         Static depthMax As integer
@@ -135,7 +133,6 @@ Public Class Camshift_Object
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         blob.Run(src)
         dst2 = blob.dst2.Clone()
 
@@ -181,7 +178,6 @@ Public Class Camshift_TopObjects
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         blob.Run(src)
         dst1 = blob.dst2
 

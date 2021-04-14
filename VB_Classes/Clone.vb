@@ -16,7 +16,6 @@ Public Class Clone_Basics
         task.drawRect = New cv.Rect(dst1.Width / 4, dst1.Height / 4, dst1.Width / 2, dst1.Height / 2)
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim mask As New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         If task.drawRect = New cv.Rect Then
             mask.SetTo(255)
@@ -59,7 +58,6 @@ Public Class Clone_ColorChange
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         clone.cloneSpec = 0
         clone.colorChangeValues = New cv.Point3f(sliders.trackbar(0).Value / 10, sliders.trackbar(1).Value / 10, sliders.trackbar(0).Value / 10)
         clone.Run(src)
@@ -89,7 +87,6 @@ Public Class Clone_IlluminationChange
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         clone.cloneSpec = 1
         clone.illuminationChangeValues = New cv.Vec2f(sliders.trackbar(0).Value / 10, sliders.trackbar(1).Value / 10)
         clone.Run(src)
@@ -120,7 +117,6 @@ Public Class Clone_TextureFlattening
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         clone.cloneSpec = 2
         clone.textureFlatteningValues = New cv.Vec2f(sliders.trackbar(0).Value, sliders.trackbar(1).Value)
         clone.Run(src)
@@ -172,7 +168,6 @@ Public Class Clone_Eagle
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.Clone()
         If task.mouseClickFlag Then
             pt = task.mouseClickPoint  ' pt corresponds To the center Of the source image.  Roi can't be outside image boundary.
@@ -216,7 +211,6 @@ Public Class Clone_Seamless
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim center As New cv.Point(src.Width / 2, src.Height / 2)
         Dim radius = 100
         If task.drawRect = New cv.Rect Then

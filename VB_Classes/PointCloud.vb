@@ -108,7 +108,6 @@ Public Class PointCloud_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = task.pointCloud
     End Sub
 End Class
@@ -132,7 +131,6 @@ Public Class PointCloud_Continuous
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static thresholdSlider = findSlider("Threshold of continuity in mm")
         Dim threshold = thresholdSlider.value
 
@@ -173,7 +171,6 @@ Public Class PointCloud_Inspector
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static yLineSlider = findSlider("Y-Direction intervals")
         Static cLineSlider = findSlider("Inspection Line")
         Dim yLines = yLineSlider.value
@@ -225,7 +222,6 @@ Public Class PointCloud_Continuous_VB
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static thresholdSlider = findSlider("Threshold of continuity in mm")
         Dim threshold = thresholdSlider.value
 
@@ -281,7 +277,6 @@ Public Class PointCloud_ColorizeSide
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Then src = dst1 Else dst1 = src
 
@@ -388,7 +383,6 @@ Public Class PointCloud_ColorizeTop
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Then src = dst1 Else dst1 = src
 
@@ -471,7 +465,6 @@ Public Class PointCloud_Raw_CPP
         cPtr = SimpleProjectionOpen()
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.run(src)
 
         Dim h = src.Height
@@ -523,7 +516,6 @@ Public Class PointCloud_Raw
         cPtr = SimpleProjectionOpen()
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.run(src)
 
         Dim h = src.Height
@@ -580,7 +572,6 @@ Public Class PointCloud_Kalman_TopView
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         topView.Run(src)
 
@@ -629,7 +620,6 @@ Public Class PointCloud_Kalman_SideView
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         sideView.Run(src)
 
         flood.Run(sideView.histOutput.ConvertScaleAbs(255))
@@ -675,7 +665,6 @@ Public Class PointCloud_BackProject
     End Sub
 
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.mouseClickFlag Then
             ' lower left image is the mat_4to1
             If task.mousePicTag = 2 Then
@@ -727,7 +716,6 @@ Public Class PointCloud_FrustrumTop
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         frustrum.Run(src)
         topView.Run(frustrum.dst2)
@@ -768,7 +756,6 @@ Public Class PointCloud_FrustrumSide
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         frustrum.Run(src)
         sideView.Run(frustrum.dst2)
@@ -800,7 +787,6 @@ Public Class PointCloud_Singletons
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         topView.Run(src)
         dst1 = topView.dst1
 
@@ -832,7 +818,6 @@ Public Class PointCloud_ReducedSideView
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         gCloud.Run(src)
 
@@ -872,7 +857,6 @@ Public Class PointCloud_ReducedTopView
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         gCloud.Run(src)
 
@@ -922,7 +906,6 @@ Public Class PointCloud_ObjectsTop
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim drawLines = showRectanglesCheck.checked
         measureTop.Run(src)
@@ -1033,7 +1016,6 @@ Public Class PointCloud_ObjectsSide
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim drawLines = showRectanglesCheck.checked
         measureSide.Run(src)
@@ -1157,7 +1139,6 @@ Public Class PointCloud_BothViews
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim showDetails = showRectanglesCheck.checked
 
@@ -1276,7 +1257,6 @@ Public Class PointCloud_BackProjectTopView
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         view.Run(src)
         dst2 = view.dst1
 
@@ -1339,7 +1319,6 @@ Public Class PointCloud_BackProjectSideView
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         view.Run(src)
         cmatSide.Run(view.dst1)
         dst2 = cmatSide.dst1

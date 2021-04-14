@@ -12,7 +12,6 @@ Public Class Coherent_Basics
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -65,7 +64,6 @@ Public Class Coherent_FloodFill
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static minSlider = findSlider("FloodFill Minimum Size")
         Dim threshold = minSlider.value
 
@@ -157,7 +155,6 @@ Public Class Coherent_Palette
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         flood.Run(src)
 
         task.palette.Run(flood.dst1)
@@ -185,7 +182,6 @@ Public Class Coherent_Pixel
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         flood.Run(src)
 

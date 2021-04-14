@@ -28,7 +28,6 @@ Public Class Line_Basics
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.Clone
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim lines = ld.Detect(src)
@@ -91,7 +90,6 @@ Public Class Line_LeftRightOverlay
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static lrRadio = findRadio("Show Left image lines and right image lines")
         Dim showLeftRight = lrRadio.checked
 
@@ -152,7 +150,6 @@ Public Class Line_Reduction
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         reduction.Run(src)
 
         lDetect.Run(reduction.dst1)
@@ -185,7 +182,6 @@ Public Class Line_InterceptsUI
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         lines.Run(src)
         Dim searchRange = lines.searchRange
@@ -270,7 +266,6 @@ Public Class Line_ConfirmedDepth
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static thickSlider = findSlider("Line thickness")
         Dim thickness = thickSlider.value
@@ -354,7 +349,6 @@ Public Class Line_Vertical
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static thickSlider = findSlider("Line thickness")
         Static errorSlider = findSlider("Error tolerance when measuring vertical lines in 3D (mm's)")
         toleranceInMMs = errorSlider.value / 1000
@@ -392,7 +386,6 @@ Public Class Line_Horizontal
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.Clone
 
         vLines.Run(src)
@@ -477,7 +470,6 @@ Public Class Line_Intercepts
         Next
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static thickSlider = findSlider("Line thickness")
         Static searchSlider = findSlider("x- and y-intercept search range in pixels")
         thickNess = thickSlider.value
@@ -562,7 +554,6 @@ Public Class Line_LeftRightImages
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim color = cv.Scalar.Yellow
         If standalone Then color = cv.Scalar.Black
 
@@ -627,7 +618,6 @@ Public Class Line_Sift_MT
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.run(src)
 
         lrView.Run(src)
@@ -711,7 +701,6 @@ Public Class Line_NearestPoint
         Return nearest.DistanceTo(pt)
     End Function
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.frameCount Mod 30 = 0 And standalone Then
             Dim pt = getPoint()
@@ -748,7 +737,6 @@ Public Class Line_SideView
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         lines.Run(src)
         dst2 = lines.dst2

@@ -14,7 +14,6 @@ Public Class MotionBlur_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             If sliders.trackbar(1).Value < sliders.trackbar(1).Maximum Then
                 sliders.trackbar(1).Value += 1
@@ -142,7 +141,6 @@ Public Class MotionBlur_Deblur
         label2 = "Deblurred Image Output"
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
             mblur.sliders.trackbar(0).Value = msRNG.Next(mblur.sliders.trackbar(0).Minimum, mblur.sliders.trackbar(0).Maximum)

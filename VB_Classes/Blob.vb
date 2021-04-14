@@ -29,7 +29,6 @@ Public Class Blob_Basics
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim blobParams = New cv.SimpleBlobDetector.Params
         blobParams.FilterByArea = check.Box(0).Checked
         blobParams.FilterByCircularity = check.Box(1).Checked
@@ -99,7 +98,6 @@ Public Class Blob_Input
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         rectangles.Run(src)
         Mats.mat(0) = rectangles.dst1
 
@@ -136,7 +134,6 @@ Public Class Blob_RenderBlobs
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod 100 = 0 Then
             blob.Run(src)
             dst1 = blob.dst1
@@ -186,7 +183,6 @@ Public Class Blob_DepthClusters
         task.rank = 3
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         histBlobs.Run(task.noDepthMask)
         dst1 = histBlobs.dst1
         label1 = CStr(histBlobs.ranges.Count) + " Depth Clusters"
@@ -220,7 +216,6 @@ Public Class Blob_DepthPixelSampler
         task.rank = 2
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         histBlobs.Run(task.noDepthMask)
         dst1 = histBlobs.dst1
         flood.initialMask = task.noDepthMask
@@ -264,7 +259,6 @@ Public Class Blob_DepthRanges
         task.rank = 4
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         histBlobs.valleys.grayOnly = grayOnly
         histBlobs.Run(src)
         dst1 = histBlobs.dst1
@@ -321,7 +315,6 @@ Public Class Blob_DepthRangesGray
         task.rank = 5
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         blobs.Run(src)
         dst1 = blobs.dst1
         dst2 = blobs.dst2
@@ -360,7 +353,6 @@ Public Class Blob_DepthFloodfill
         task.rank = 5
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         blobs.Run(src)
 
@@ -398,7 +390,6 @@ Public Class Blob_Largest
         ' task.rank = 3
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         blobs.Run(src)
         dst2 = blobs.dst2
         rects = blobs.flood.basics.rects
@@ -446,7 +437,6 @@ Public Class Blob_Rectangles
         ' task.rank = 2
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         blobs.Run(src)
         dst1 = src
         dst2 = blobs.blobs.dst2

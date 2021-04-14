@@ -19,7 +19,6 @@ Public Class BlockMatching_Basics
         label2 = "Right Image (used with left image)"
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
             task.trueText("For the Kinect 4 Azure camera, the left and right views are the same.")
         End If

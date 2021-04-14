@@ -28,7 +28,6 @@ Public Class Motion_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         src = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
 
@@ -109,7 +108,6 @@ Public Class Motion_WithBlurDilate
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
         blur.Run(dst1)
@@ -176,7 +174,6 @@ Public Class Motion_MinMaxDepth
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim input = src
         If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f.Clone
 
@@ -221,7 +218,6 @@ Public Class Motion_MinMaxPointCloud
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim input = src.Clone
         If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud
@@ -264,7 +260,6 @@ Public Class Motion_MinMaxDepthColorized
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static saveMin = task.minDepth
         Static saveMax = task.maxDepth
@@ -301,7 +296,6 @@ Public Class Motion_ThruCorrelation
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run(src)
 
         Dim input = src.Clone
@@ -365,7 +359,6 @@ Public Class Motion_CCmerge
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount < 10 Then dst1 = src.Clone
 
         motionCC.Run(src)

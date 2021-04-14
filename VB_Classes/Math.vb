@@ -16,7 +16,6 @@ Public Class Math_Subtract
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim bgr = New cv.Scalar(sliders.trackbar(2).Value, sliders.trackbar(1).Value, sliders.trackbar(0).Value)
         cv.Cv2.Subtract(bgr, src, dst1) ' or dst1 = bgr - src
         dst2 = src - bgr
@@ -69,7 +68,6 @@ Public Class Math_Median_CDF
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If standalone or task.intermediateReview = caller Then bins = sliders.trackbar(0).Value
 
@@ -105,7 +103,6 @@ Public Class Math_DepthMeanStdev
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         minMax.Run(src)
         Dim mean As Single = 0, stdev As Single = 0
         Dim mask = minMax.dst2 ' the mask for stable depth.
@@ -137,7 +134,6 @@ Public Class Math_RGBCorrelation
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim split = src.Split()
         match.searchArea = split(0)
         match.template = split(1)
@@ -177,7 +173,6 @@ Public Class Math_ImageAverage
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static avgSlider = findSlider("Average - number of input images")
         Static saveImageCount = avgSlider.Value
@@ -244,7 +239,6 @@ Public Class Math_Stdev
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim updateCount As Integer
         lowStdevMask.SetTo(0)
         highStdevMask.SetTo(0)
@@ -309,7 +303,6 @@ Public Class Math_StdevBoundary
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         stdev.Run(src)
         dst1 = stdev.dst1

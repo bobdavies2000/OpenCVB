@@ -13,7 +13,6 @@ Public Class Pixel_Viewer
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         dst1 = Choose(task.mousePicTag + 1, task.color, task.RGBDepth, task.algorithmObject.dst1, task.algorithmObject.dst2)
 
@@ -176,7 +175,6 @@ Public Class Pixel_GetSet
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim rows = src.Height
         Dim cols = src.Width
         Dim output As String = ""
@@ -250,7 +248,6 @@ Public Class Pixel_Measure
         Return halfLineInMeters * 2 / dst1.Width
     End Function
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static distanceSlider = findSlider("Distance in mm")
         Dim mmPP = Compute(distanceSlider.value)
         If standalone Then
@@ -282,7 +279,6 @@ Public Class Pixel_Sampler
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Then
             If task.frameCount Mod 30 = 0 Then

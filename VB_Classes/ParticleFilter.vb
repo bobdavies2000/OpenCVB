@@ -16,7 +16,6 @@ Public Class ParticleFilter_Example
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static imageFrame = 12
         imageFrame += 1
         If imageFrame Mod 45 = 0 Then

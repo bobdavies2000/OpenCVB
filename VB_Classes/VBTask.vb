@@ -172,6 +172,7 @@ Public Class ActiveTask : Implements IDisposable
     Public desc As String
     Public rank As Integer
     Public intermediateReview As String
+    Public activeObjects As New List(Of Object)
     Public ratioImageToCampic As Single
     Public pixelViewerOn As Boolean
 

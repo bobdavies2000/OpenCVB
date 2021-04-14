@@ -11,7 +11,6 @@ Public Class Gradient_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         sobel.Run(src)
         Dim x32f As New cv.Mat, y32f As New cv.Mat
         sobel.grayX.ConvertTo(x32f, cv.MatType.CV_32F)
@@ -35,7 +34,6 @@ Public Class Gradient_Depth
         label2 = "Phase Output"
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         sobel.Run(task.depth32f)
         Dim x32f As New cv.Mat, y32f As New cv.Mat
         sobel.grayX.ConvertTo(x32f, cv.MatType.CV_32F)
@@ -74,7 +72,6 @@ Public Class Gradient_CartToPolar
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim tmp As New cv.Mat
         src.ConvertTo(tmp, cv.MatType.CV_32FC3, 1 / 255)
         basics.Run(tmp)
@@ -115,7 +112,6 @@ Public Class Gradient_StableDepth
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         motionSD.Run(src)
         dst1 = motionSD.dst1.Clone

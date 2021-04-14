@@ -23,7 +23,6 @@ Public Class Random_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If Points.Length <> countSlider.Value Then
             ReDim Points(countSlider.Value - 1)
             ReDim Points2f(countSlider.Value - 1)
@@ -51,7 +50,6 @@ Public Class Random_Shuffle
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         src.CopyTo(dst1)
         cv.Cv2.RandShuffle(dst1, 1.0, myRNG) ' don't remove that myRNG!  It will fail in RandShuffle.
         label1 = "Random_shuffle - wave at camera"
@@ -73,7 +71,6 @@ Public Class Random_LUTMask
         label2 = "kmeans run To Get colors"
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static lutMat As cv.Mat
         If lutMat Is Nothing Or task.frameCount Mod 10 = 0 Then
             random.Run(src)
@@ -106,7 +103,6 @@ Public Class Random_UniformDist
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U)
         cv.Cv2.Randu(dst1, minVal, maxVal)
     End Sub
@@ -135,7 +131,6 @@ Public Class Random_NormalDist
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static grayCheck = findCheckBox("Use Grayscale image")
         If grayCheck.checked And dst1.Channels <> 1 Then dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
         cv.Cv2.Randn(dst1, New cv.Scalar(sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value), cv.Scalar.All(sliders.trackbar(3).Value))
@@ -159,7 +154,6 @@ Public Class Random_CheckUniformSmoothed
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         rUniform.Run(src)
         dst1 = rUniform.dst1
         histogram.plotHist.maxRange = 255
@@ -188,7 +182,6 @@ Public Class Random_CheckUniformDist
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         rUniform.Run(src)
         dst1 = rUniform.dst1
         histogram.plotRequested = True
@@ -215,7 +208,6 @@ Public Class Random_CheckNormalDist
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         normalDist.Run(src)
         dst1 = normalDist.dst1
         histogram.plotRequested = True
@@ -242,7 +234,6 @@ Public Class Random_CheckNormalDistSmoothed
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         normalDist.Run(src)
         dst1 = normalDist.dst1
         histogram.Run(dst1)
@@ -293,7 +284,6 @@ Public Class Random_PatternGenerator_CPP
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim imagePtr = Random_PatternGenerator_Run(Random_PatternGenerator, src.Rows, src.Cols)
@@ -333,7 +323,6 @@ Public Class Random_CustomDistribution
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim lastValue = inputCDF.Get(Of Single)(inputCDF.Rows - 1, 0)
         If Not (lastValue > 0.99 And lastValue <= 1.0) Then ' convert the input histogram to a cdf.
             inputCDF *= 1 / (inputCDF.Sum().Item(0))
@@ -385,7 +374,6 @@ Public Class Random_MonteCarlo
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim dimension = sliders.trackbar(0).Value
         Dim histogram = New cv.Mat(dimension, 1, cv.MatType.CV_32F, 0)
         For i = 0 To outputRandom.rows - 1
@@ -435,7 +423,6 @@ Public Class Random_CustomHistogram
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Static saveBins As Integer
@@ -484,7 +471,6 @@ Public Class Random_60sTV
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static valSlider = findSlider("Range of noise to apply (from 0 to this value)")
         Static threshSlider = findSlider("Percentage of pixels to include noise")
         Dim val = valSlider.value
@@ -525,7 +511,6 @@ Public Class Random_60sTVFaster
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static valSlider = findSlider("Range of noise to apply (from 0 to this value)")
         Static percentSlider = findSlider("Percentage of pixels to include noise")
 
@@ -573,7 +558,6 @@ Public Class Random_60sTVFastSimple
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static valSlider = findSlider("Range of noise to apply (from 0 to this value)")
         Static percentSlider = findSlider("Percentage of pixels to include noise")
 
@@ -625,7 +609,6 @@ Public Class Random_KalmanPoints
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If refreshPoints Then
             random.Run(src)

@@ -39,7 +39,6 @@ Public Class Hull_Basics
         label2 = "Convex Hull Input"
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim Count = sliders.trackbar(0).Value
         Dim points(Count - 1) As cv.Point
         Dim pad = 4

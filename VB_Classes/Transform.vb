@@ -12,7 +12,6 @@ Public Class Transform_Resize
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim resizeFactor = sliders.trackbar(0).Value / 100
         Dim w = CInt(resizeFactor * src.Width)
         Dim h = CInt(resizeFactor * src.Height)
@@ -47,7 +46,6 @@ Public Class Transform_Rotate
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         imageCenter = New cv.Point2f(sliders.trackbar(2).Value, sliders.trackbar(3).Value)
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.trackbar(0).Value, sliders.trackbar(1).Value / 100)
         cv.Cv2.WarpAffine(src, dst1, rotationMat, New cv.Size())
@@ -74,7 +72,6 @@ Public Class Transform_Sort
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim sortOption = cv.SortFlags.Ascending
         If radio.check(1).Checked Then sortOption = cv.SortFlags.Descending
@@ -104,7 +101,6 @@ Public Class Transform_SortReshape
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim sortOption = cv.SortFlags.Ascending
         If radio.check(1).Checked Then sortOption = cv.SortFlags.Descending
@@ -131,7 +127,6 @@ Public Class Transform_Affine3D
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim output = "Use the check boxes to snapshot the different point clouds" + vbCrLf
         Static pc1 As cv.Mat
         Static pc2 As cv.Mat

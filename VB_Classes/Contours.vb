@@ -53,7 +53,6 @@ Public Class Contours_Basics
         Next
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         setOptions()
         Static dontchange As Boolean
         If task.mouseClickFlag And dontchange Then
@@ -147,7 +146,6 @@ Public Class Contours_RGB
         label2 = "Background"
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim img = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         img.SetTo(0, task.noDepthMask)
 
@@ -201,7 +199,6 @@ Public Class Contours_RemoveLines
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim tmp = cv.Cv2.ImRead(task.parms.homeDir + "Data/invoice.jpg")
         Dim dstSize = New cv.Size(src.Height / tmp.Height * src.Width, src.Height)
         Dim dstRect = New cv.Rect(0, 0, dstSize.Width, src.Height)
@@ -246,7 +243,6 @@ Public Class Contours_Depth
         label2 = "DepthContour output"
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = task.noDepthMask
         dst2.SetTo(0)
         Dim input As cv.Mat = task.depthMask
@@ -295,7 +291,6 @@ Public Class Contours_Prediction
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         outline.Run(src)
         dst1 = outline.dst2
         dst2.SetTo(0)
@@ -338,7 +333,6 @@ Public Class Contours_FindandDraw
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         rotatedRect.Run(src)
         dst1 = rotatedRect.dst1
         Dim img = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
@@ -383,7 +377,6 @@ Public Class Contours_Binarized
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         sobel.Run(src)
         dst1 = sobel.dst1
 

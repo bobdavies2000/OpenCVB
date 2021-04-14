@@ -12,7 +12,6 @@ Public Class MeanSubtraction_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim mean = cv.Cv2.Mean(src)
         cv.Cv2.Subtract(mean, src, dst1)
         Dim scalingFactor = sliders.trackbar(0).Value / 100

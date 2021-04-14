@@ -29,7 +29,6 @@ Public Class Etch_ASketch
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         keys.Run(src)
         Dim Input = New List(Of String)(keys.keyInput)
 

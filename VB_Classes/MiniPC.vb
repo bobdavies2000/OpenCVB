@@ -12,7 +12,6 @@ Public Class MiniPC_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         gCloud.Run(src)
         resize.Run(gCloud.dst1)
@@ -51,7 +50,6 @@ Public Class MiniPC_Rotate
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim input = src
         If standalone Then
@@ -124,7 +122,6 @@ Public Class MiniPC_RotateAngle
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If src.Type <> cv.MatType.CV_32FC3 Then
             peak.mini.Run(src)
@@ -182,7 +179,6 @@ Public Class MiniPC_RotateSinglePass
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         peak.mini.Run(src)
 

@@ -20,7 +20,6 @@ Public Class LeftRightView_Basics
         End Select
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = task.leftView
         dst2 = task.rightView
 
@@ -61,7 +60,6 @@ Public Class LeftRightView_CompareRaw
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         lrView.Run(src)
 
         dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, 0)
@@ -98,7 +96,6 @@ Public Class LeftRightView_Features
         label2 = "Right Image"
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         lrView.Run(src)
 
         features.Run(lrView.dst2)
@@ -131,7 +128,6 @@ Public Class LeftRightView_Palettized
         label2 = "Right Image"
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         lrView.Run(src)
 
         task.palette.Run(lrView.dst1)
@@ -162,7 +158,6 @@ Public Class LeftRightView_BRISK
         lrView = New LeftRightView_Basics()
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         lrView.Run(src)
         brisk.Run(lrView.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
         dst2 = brisk.dst1
@@ -198,7 +193,6 @@ Public Class LeftRightView_BrightnessContrast
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = task.leftView.ConvertScaleAbs(sliders.trackbar(0).Value / 500, sliders.trackbar(1).Value)
         dst2 = task.rightView.ConvertScaleAbs(sliders.trackbar(0).Value / 500, sliders.trackbar(1).Value)
     End Sub

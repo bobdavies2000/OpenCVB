@@ -30,7 +30,6 @@ Imports System.Runtime.InteropServices
 '        task.desc = "Track an object using cv.Tracking API's - tracker algorithm"
 '    End Sub
 '    Public Sub Run(src as cv.Mat)
-'        If task.intermediateReview = caller Then task.intermediateObject = Me
 
 '        Dim input = src
 '        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -91,7 +90,6 @@ Imports System.Runtime.InteropServices
 '        task.desc = "Track any number of objects simultaneously - tracker algorithm"
 '    End Sub
 '    Public Sub Run(src as cv.Mat)
-'        If task.intermediateReview = caller Then task.intermediateObject = Me
 '        If task.drawRect.Width <> 0 Then
 '            Dim tr = New Tracker_Basics()
 '            tr.src = src
@@ -163,7 +161,6 @@ Public Class Tracker_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
 
         Dim input = src

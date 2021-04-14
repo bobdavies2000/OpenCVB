@@ -84,7 +84,6 @@ Public Class Undistort_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.parms.intrinsicsLeft.coeffs Is Nothing Then
             task.trueText("The intrinsics values are missing for this camera.")

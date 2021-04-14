@@ -7,7 +7,6 @@ Public Class Extrinsics_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim nextline = "Rotation MatrixTranslation" + vbCrLf
         Dim fmt = "#0.0000"
         If task.parms.extrinsics.rotation Is Nothing Then

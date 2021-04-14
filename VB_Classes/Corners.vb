@@ -16,7 +16,6 @@ Public Class Corners_Harris
         label2 = "Corner Eigen values"
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static color As New cv.Mat
         Static gray As New cv.Mat
         Static mc As New cv.Mat
@@ -75,7 +74,6 @@ Public Class Corners_SubPix
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         good.Run(src)
         If good.goodFeatures.Count = 0 Then Exit Sub ' no good features right now...
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -109,7 +107,6 @@ Public Class Corners_PreCornerDetect
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim ksize = sliders.trackbar(0).Value
         If ksize Mod 2 = 0 Then ksize += 1
@@ -152,7 +149,6 @@ Public Class Corners_ShiTomasi_CPP
         label2 = "Corner Eigen values"
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim data(src.Total - 1) As Byte
 
         Dim blocksize = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value + 1)

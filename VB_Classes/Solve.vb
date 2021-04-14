@@ -8,7 +8,6 @@ Public Class Solve_ByMat
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         ' x + y = 10
         ' 2x + 3y = 26
         ' (x=4, y=6)
@@ -35,7 +34,6 @@ Public Class Solve_ByArray
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         ' x + y = 10
         ' 2x + 3y = 26
         ' (x=4, y=6)

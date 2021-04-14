@@ -12,7 +12,7 @@ Module VB_EditorMain
         Return line
     End Function
     Private Function deleteLine(line As String) As Boolean
-        If line.Contains("MyBase.Finish()") Then
+        If line.Contains("If task.intermediateReview = caller Then task.intermediateObject = Me") Then
             Console.WriteLine("Deleting line: " + line)
             changeLines += 1
             Return True
@@ -46,9 +46,9 @@ Module VB_EditorMain
             While nextFile.Peek() <> -1
                 Dim line As String
                 line = nextFile.ReadLine()
-                ' deleteLine(line)
+                deleteLine(line)
                 'makeChange(line)
-                insertLine(line)
+                'insertLine(line)
             End While
             nextFile.Close()
             If saveChangeLines <> changeLines Then changeFiles.Add(fileName)
@@ -77,15 +77,16 @@ Module VB_EditorMain
 
                 Dim sw = New StreamWriter(filename)
                 For i = 0 To lines.Count - 1
-                    sw.WriteLine(lines(i))
-                    If insertLine(lines(i)) Then
-                        sw.WriteLine(vbTab + vbTab + "' task.rank = 1")
-                    End If
-                    'If deleteLine(lines(i)) Then
-                    '    Console.WriteLine("Deleting: " + lines(i))
-                    'Else
-                    '    sw.Write(lines(i))
+                    If lines(i) Is Nothing Then Continue For
+                    'sw.WriteLine(lines(i))
+                    'If insertLine(lines(i)) Then
+                    '    sw.WriteLine(vbTab + vbTab + "' task.rank = 1")
                     'End If
+                    If deleteLine(lines(i)) Then
+                        Console.WriteLine("Deleting: " + lines(i))
+                    Else
+                        sw.WriteLine(lines(i))
+                    End If
                 Next
                 sw.Close()
             Next

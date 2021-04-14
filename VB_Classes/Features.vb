@@ -16,7 +16,6 @@ Public Class Features_GoodFeatures
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim numPoints = sliders.trackbar(0).Value
         Dim quality = sliders.trackbar(1).Value / 100
@@ -56,7 +55,6 @@ Public Class Features_PointTracker
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
 
         features.Run(src)
         dst1 = features.dst1

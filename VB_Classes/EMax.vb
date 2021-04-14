@@ -26,7 +26,6 @@ Public Class EMax_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         basics.Run(src)
         dst1 = basics.dst1
         Dim srcCount = basics.sliders.trackbar(0).Value
@@ -96,7 +95,6 @@ Public Class EMax_CentroidsNew
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         emaxCPP.Run(src)
         dst1 = emaxCPP.dst2
@@ -154,7 +152,6 @@ Public Class EMax_VB_Failing
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Then
             task.trueText("The EMax algorithm fails as a result of a bug in OpenCVSharp.  See code for details." + vbCrLf +
                           "The C++ version works fine (EMax_Basics) and the 2 are functionally identical.", 20, 100)
@@ -261,7 +258,6 @@ Public Class EMax_Centroids
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         emaxCPP.Run(src)
         flood.Run(emaxCPP.dst2.Clone)
@@ -302,7 +298,6 @@ Public Class EMax_PointTracker
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         emax.Run(src)
         dst1 = emax.dst1
 

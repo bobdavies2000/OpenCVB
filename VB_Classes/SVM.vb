@@ -82,7 +82,6 @@ Public Class SVM_Options
         Return x + 50 * Math.Sin(x / 15.0)
     End Function
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         ReDim points(sliders.trackbar(0).Value)
         ReDim responses(points.Length - 1)
         For i = 0 To points.Length - 1
@@ -119,7 +118,6 @@ Public Class SVM_Basics
     End Sub
 
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         svmOptions.Run(src) ' update any options specified in the interface.
         dst1 = svmOptions.dst1
 
@@ -179,7 +177,6 @@ Public Class SVM_Random
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         svmOptions.Run(src)
         dst1.SetTo(cv.Scalar.White)
         dst2.SetTo(cv.Scalar.White)
@@ -269,7 +266,6 @@ Public Class SVM_TestCase
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1.SetTo(cv.Scalar.White)
         dst2.SetTo(0)
         svmOptions.Run(src)

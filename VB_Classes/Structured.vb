@@ -15,7 +15,6 @@ Public Class Structured_Floor
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         structD.Run(src)
 
@@ -64,7 +63,6 @@ Public Class Structured_Ceiling
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         structD.Run(src)
 
@@ -104,7 +102,6 @@ Public Class Structured_MultiSliceH
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         side2D.Run(src)
         dst2 = side2D.dst2
         Dim Split = side2D.gCloud.dst1.Split()
@@ -155,7 +152,6 @@ Public Class Structured_MultiSliceV
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         top2D.Run(src)
         dst2 = top2D.dst2
 
@@ -211,7 +207,6 @@ Public Class Structured_MultiSlice
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         top2D.Run(src)
         side2D.Run(src)
 
@@ -276,7 +271,6 @@ Public Class Structured_MultiSliceLines
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         multi.Run(src)
         cv.Cv2.BitwiseNot(multi.dst2, dst2)
         ldetect.Run(multi.dst2)
@@ -307,7 +301,6 @@ Public Class Structured_MultiSlicePolygon
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         multi.Run(src)
         cv.Cv2.BitwiseNot(multi.dst2, dst1)
 
@@ -349,7 +342,6 @@ Public Class Structured_SliceXPlot
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         structD.Run(src)
         dst2 = structD.dst2
         multi.Run(src)
@@ -411,7 +403,6 @@ Public Class Structured_LinearizeFloor
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim minLoc As cv.Point, maxLoc As cv.Point
         Static imuPC As cv.Mat
         floor.Run(src)
@@ -511,7 +502,6 @@ Public Class Structured_SliceOptions
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         task.trueText("This algorithm is used to share the horizontal and vertical slice options.")
     End Sub
 End Class
@@ -542,7 +532,6 @@ Public Class Structured_SliceH
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         side2D.Run(src)
 
         Dim depthShadow = task.noDepthMask
@@ -607,7 +596,6 @@ Public Class Structured_SliceV
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim xCoordinate = offsetSlider.Value
         top2D.Run(src)
 
@@ -670,7 +658,6 @@ Public Class Structured_SliceVStable
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim xCoordinate = offsetSlider.Value
         top2D.Run(src)
         dst2 = top2D.dst1
@@ -724,7 +711,6 @@ Public Class Structured_CenterSlice
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         vSlice.Run(src)
         dst1 = task.color
@@ -816,7 +802,6 @@ Public Class Structured_CloudFail
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static xLineSlider = findSlider("Lines in X-Direction")
         Static yLineSlider = findSlider("Lines in Y-Direction")
         Static thresholdSlider = findSlider("Continuity threshold in mm")
@@ -898,7 +883,6 @@ Public Class Structured_Cloud
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static sliceSlider = findSlider("Number of slices")
         Dim xLines = sliceSlider.value
         Dim yLines = CInt(xLines * dst1.Height / dst1.Width)
@@ -941,7 +925,6 @@ Public Class Structured_Crosshairs
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static sliceSlider = findSlider("Number of slices")
         Static xSlider = findSlider("Slice index X")
         Static ySlider = findSlider("Slice index Y")

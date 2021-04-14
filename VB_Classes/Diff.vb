@@ -14,7 +14,6 @@ Public Class Diff_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim gray = src
         If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If lastFrame Is Nothing Then lastFrame = src.Clone
@@ -55,7 +54,6 @@ Public Class Diff_UnstableDepthAndColor
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         diff.Run(src)
         Dim unstableColor = diff.dst2.Clone()
         depth.Run(task.RGBDepth)

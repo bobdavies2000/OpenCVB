@@ -98,7 +98,6 @@ Public Class OpticalFlow_DenseOptions
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         pyrScale = sliders.trackbar(0).Value / sliders.trackbar(0).Maximum
         levels = sliders.trackbar(1).Value
         winSize = sliders.trackbar(2).Value
@@ -134,7 +133,6 @@ Public Class OpticalFlow_DenseBasics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static oldGray As New cv.Mat
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -182,7 +180,6 @@ Public Class OpticalFlow_DenseBasics_MT
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static oldGray As New cv.Mat
 
         If task.frameCount > 0 Then
@@ -269,7 +266,6 @@ Public Class OpticalFlow_Sparse
         Next
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src.Clone()
         dst2 = src.Clone()
 

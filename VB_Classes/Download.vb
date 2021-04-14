@@ -29,7 +29,6 @@ Public Class Download_Databases
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static checkiBug = findRadio("Download the 1.7 Gb 300 Faces In-The-Wild database")
         Static checkTensor1 = findRadio("Download TensorFlow MobileNet-SSD v1")

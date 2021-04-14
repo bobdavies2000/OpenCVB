@@ -11,7 +11,6 @@ Public Class Kalman_Basics
         ' task.rank = 4
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static saveDimension = -1
         If saveDimension <> kInput.Length Then
             If kalman IsNot Nothing Then
@@ -73,7 +72,6 @@ Public Class Kalman_Stripped
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static saveDimension = -1
         If saveDimension <> kInput.Length Then
             If kalman IsNot Nothing Then
@@ -145,7 +143,6 @@ Public Class Kalman_Compare
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount = 0 Then
             If kalman IsNot Nothing Then
                 If kalman.Count > 0 Then
@@ -220,7 +217,6 @@ Public Class Kalman_RotatingPoint
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim stateAngle = kState.Get(Of Single)(0)
 
         Dim prediction = kf.Predict()
@@ -271,7 +267,6 @@ Public Class Kalman_MousePredict
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod 100 = 0 Then dst1.SetTo(0)
 
         Static lastRealMouse = task.mousePoint
@@ -307,7 +302,6 @@ Public Class Kalman_CVMat
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static saveDimension = -1
         If saveDimension <> input.Rows Then
             If kalman IsNot Nothing Then
@@ -380,7 +374,6 @@ Public Class Kalman_ImageSmall
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         resize.Run(src)
 
@@ -416,7 +409,6 @@ Public Class Kalman_DepthSmall
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         kalman.Run(task.RGBDepth)
         dst1 = kalman.dst1
         dst2 = kalman.dst2
@@ -446,7 +438,6 @@ Public Class Kalman_Depth32f
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         resize.Run(task.depth32f)
 
         kalman.input = resize.dst1.Reshape(1, resize.dst1.Width * resize.dst1.Height)
@@ -493,7 +484,6 @@ Public Class Kalman_Single
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             inputReal = dst1.Mean().Item(0)
@@ -621,7 +611,6 @@ Public Class Kalman_VB
         q_bias += K_1 * angle_err
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         input = sliders.trackbar(0).Value
         Dim noiselevel = sliders.trackbar(6).Value
         Dim additionalbias = sliders.trackbar(7).Value
@@ -742,7 +731,6 @@ Public Class Kalman_VB_Basics
         q_bias += K_1 * kError
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Or task.intermediateReview = caller Then
             Dim gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

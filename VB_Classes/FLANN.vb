@@ -10,7 +10,6 @@ Public Class FLANN_Test
         label1 = "FLANN Basics"
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         ' creates data set
         Using features As New cv.Mat(10000, 2, cv.MatType.CV_32FC1)
             cv.Cv2.Randu(features, 0, msRNG.Next(9900, 10000))
@@ -72,7 +71,6 @@ Public Class FLANN_Basics
         label1 = "Red is query, Nearest points blue"
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim reuseData = check.Box(1).Checked
         If reuseData = False Or task.frameCount = 0 Then random.Run(src) ' fill result1 with random points in x and y range of the image.
         Dim features As New cv.Mat(random.Points2f.Length, 2, cv.MatType.CV_32F, random.Points2f)

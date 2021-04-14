@@ -79,7 +79,6 @@ Public Class OpenGL_Basics
         pipe.WaitForConnection()
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Or task.intermediateReview = caller Or pointCloudInput Is Nothing Then pointCloudInput = task.pointCloud
 
         If task.noDepthMask.Width = pointCloudInput.Width Then pointCloudInput.SetTo(0, task.noDepthMask)
@@ -169,7 +168,6 @@ Public Class OpenGL_Options
         label1 = ""
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         OpenGL.FOV = sliders.trackbar(0).Value
         OpenGL.yaw = sliders.trackbar(1).Value
@@ -210,7 +208,6 @@ Public Class OpenGL_Callbacks
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Then pointCloudInput = task.pointCloud
         ogl.pointCloudInput = pointCloudInput
         ogl.Run(src)
@@ -239,7 +236,6 @@ Public Class OpenGL_IMU
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.IMU_Present Then
             imu.Run(src)
             ogl.OpenGL.dataInput = New cv.Mat(100, 100, cv.MatType.CV_32F, 0)
@@ -285,7 +281,6 @@ Public Class OpenGL_3Ddata
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim bins = sliders.trackbar(0).Value
 
         If histInput Is Nothing Then ReDim histInput(src.Total * src.ElemSize - 1)
@@ -329,7 +324,6 @@ Public Class OpenGL_Draw3D
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         circle.Run(src)
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ogl.OpenGL.dataInput = dst2
@@ -356,7 +350,6 @@ Public Class OpenGL_Voxels
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         voxels.Run(src)
         Static intermediateResults = findCheckBox("Display intermediate results")
         If intermediateResults.checked Then
@@ -392,7 +385,6 @@ Public Class OpenGL_GravityTransform
         ' task.rank = 5
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.parms.IMU_Present Then
             gCloud.Run(task.pointCloud)
 
@@ -424,7 +416,6 @@ Public Class OpenGL_Floor
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.parms.IMU_Present Then
             plane.Run(src)
@@ -459,7 +450,6 @@ Public Class OpenGL_FloorPlane
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.parms.IMU_Present Then
             plane.Run(src)
@@ -501,7 +491,6 @@ End Class
 '        task.desc = "Texture the plane of the floor with a good sample of the texture from the mask"
 '    End Sub
 '    Public Sub Run(src as cv.Mat)
-'        If task.intermediateReview = caller Then task.intermediateObject = Me
 
 '        If task.parms.IMU_Present Then
 '            floor.plane.src = src
@@ -550,7 +539,6 @@ Public Class OpenGL_DepthSliceH
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         slices.Run(src)
         dst1 = slices.dst1
         Dim mask As New cv.Mat
@@ -583,7 +571,6 @@ Public Class OpenGL_StableDepth
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         pcValid.Run(src)
         dst1 = pcValid.dst1
@@ -613,7 +600,6 @@ Public Class OpenGL_AverageDepth
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim split = task.pointCloud.Split()
 
@@ -651,7 +637,6 @@ Public Class OpenGL_StableDepthMouse
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         pcValid.Run(src)
         dst1 = pcValid.dst1
@@ -682,7 +667,6 @@ Public Class OpenGL_SmoothSurfaces
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         smooth.Run(src)
         dst1 = smooth.dst2
@@ -711,7 +695,6 @@ Public Class OpenGL_Stable
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         stable.Run(src)
         dst1 = stable.dst1
@@ -742,7 +725,6 @@ Public Class OpenGL_ReducedXYZ
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         reduction.Run(src)
         dst2 = reduction.dst2
 
@@ -770,7 +752,6 @@ Public Class OpenGL_Reduction
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         reduction.Run(src)
         dst1 = reduction.dst1
         dst2 = reduction.dst2
@@ -798,7 +779,6 @@ Public Class OpenGL_ReducedSideView
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         reduced.Run(src)
         dst1 = reduced.dst1
@@ -828,7 +808,6 @@ Public Class OpenGL_MFD_PointCloud
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         mfd.Run(src)
         dst1 = mfd.dst1
@@ -861,7 +840,6 @@ Public Class OpenGL_Structured_PointCloud
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         sCloud.Run(src)
         dst1 = sCloud.dst1

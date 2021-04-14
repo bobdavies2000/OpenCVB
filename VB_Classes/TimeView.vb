@@ -19,7 +19,6 @@ Public Class TimeView_Basics
         ' task.rank = 3
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static sideFrames As New List(Of cv.Mat)
         Static topFrames As New List(Of cv.Mat)
@@ -72,7 +71,6 @@ Public Class TimeView_TopBackProjection
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         tFlood.Run(src)
         dst2 = tFlood.dst2
@@ -136,7 +134,6 @@ Public Class TimeView_FloodFill
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         tBasics.Run(src)
 
@@ -174,7 +171,6 @@ Public Class TimeView_Centroids
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         tflood.Run(src)
         dst1 = tflood.dst2
@@ -228,7 +224,6 @@ Public Class TimeView_Rectangles
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         tflood.Run(src)
         dst1 = tflood.dst2
@@ -274,7 +269,6 @@ Public Class TimeView_Frustrum
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         tView.Run(src)
         mats.mat(0) = tView.dst1.Clone

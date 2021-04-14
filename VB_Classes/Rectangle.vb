@@ -21,7 +21,6 @@ Public Class Rectangle_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static typeCheckBox = findCheckBox("Draw Rotated Rectangles (unchecked will draw rectangles)")
         Static countSlider = findSlider("Rectangle Count")
         Static saveType = typeCheckBox.Checked
@@ -69,7 +68,6 @@ Public Class Rectangle_Rotated
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         rect.Run(src)
         dst1 = rect.dst1
     End Sub
@@ -96,7 +94,6 @@ Public Class Rectangle_CComp
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         ccomp.Run(src)
         dst1 = ccomp.dst1.Clone
@@ -136,7 +133,6 @@ Public Class Rectangle_Overlap
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Or task.intermediateReview = caller Then
             draw.Run(src)
@@ -190,7 +186,6 @@ Public Class Rectangle_Motion
     End Sub
 
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         motion.Run(src)
         dst1 = motion.dst1.Clone
@@ -216,7 +211,6 @@ Public Class Rectangle_MotionDepth
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static lastDepth = task.depth32f
         cv.Cv2.Min(task.depth32f, lastDepth, src)
 
@@ -274,7 +268,6 @@ Public Class Rectangle_Intersection
         Return enclosing
     End Function
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Or task.intermediateReview = caller Then
             If draw Is Nothing Then draw = New Rectangle_Basics
@@ -340,7 +333,6 @@ Public Class Rectangle_Union
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Or task.intermediateReview = caller Then
             If draw Is Nothing Then draw = New Rectangle_Basics
@@ -399,7 +391,6 @@ Public Class Rectangle_MultiOverlap
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Then
             Static draw = New Rectangle_Basics

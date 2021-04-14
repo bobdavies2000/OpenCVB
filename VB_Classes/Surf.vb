@@ -29,7 +29,6 @@ Public Class Surf_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         srcLeft = task.leftView
         srcRight = task.rightView
         Dim doubleSize As New cv.Mat
@@ -60,7 +59,6 @@ Public Class Surf_BasicsVB
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         surf.Run(src)
         dst1 = surf.dst1
         dst2 = surf.dst2
@@ -88,7 +86,6 @@ Public Class Surf_DrawMatchManual_CS
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         surf.Run(src)
         dst1 = surf.srcLeft.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2 = surf.srcRight.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

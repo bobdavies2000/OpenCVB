@@ -16,7 +16,6 @@ Public Class TransformationMatrix_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.transformationMatrix IsNot Nothing Then
             Dim t = task.transformationMatrix
             Dim mul = sliders.trackbar(0).Value

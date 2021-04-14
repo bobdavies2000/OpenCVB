@@ -30,7 +30,6 @@ Public Class GeneticDrawing_Options
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         task.trueText("There is no output for this algorithm - just controls showing the genetic drawing options")
     End Sub
 End Class
@@ -153,7 +152,6 @@ Public Class GeneticDrawing_Basics
         totalError = calculateError(mats.mat(3))
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static genSlider = findSlider("Number of Generations")
         Static stageSlider = findSlider("Number of Stages")
@@ -268,7 +266,6 @@ Public Class GeneticDrawing_Color
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim split() As cv.Mat
         split = src.Split()
 
@@ -321,7 +318,6 @@ Public Class GeneticDrawing_Photo
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static fileInputName = New FileInfo(fileNameForm.filename.Text)
         If inputFileName <> fileInputName.FullName Or task.frameCount = 0 Then

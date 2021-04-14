@@ -39,7 +39,6 @@ Public Class SuperPixel_Basics_CPP
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static numSuperPixels As integer
         Static numIterations As integer
         Static prior As integer
@@ -100,7 +99,6 @@ Public Class SuperPixel_BinarizedImage
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         binarize.Run(src)
 
         pixels.Run(binarize.dst1)
@@ -126,7 +124,6 @@ Public Class SuperPixel_Depth
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         pixels.Run(task.RGBDepth)
         dst1 = pixels.dst1
         dst2 = pixels.dst2
@@ -152,7 +149,6 @@ Public Class SuperPixel_WithCanny
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         edges.Run(src)
         src = task.color.Clone()
         src.SetTo(cv.Scalar.White, edges.dst1)
@@ -184,7 +180,6 @@ Public Class SuperPixel_WithLineDetector
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         lines.Run(src)
         dst2 = lines.dst1
         pixels.Run(dst2)

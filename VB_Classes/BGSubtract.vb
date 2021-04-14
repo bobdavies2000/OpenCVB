@@ -24,7 +24,6 @@ Public Class BGSubtract_Basics_CPP
 		' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static frm = findfrm("BGSubtract_Basics_CPP Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
@@ -80,7 +79,6 @@ Public Class BGSubtract_MotionDetect_MT
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount = 0 Then src.CopyTo(dst2)
         Dim threadData As New cv.Vec3i
         Dim width = src.Width, height = src.Height
@@ -137,7 +135,6 @@ Public Class BGSubtract_Basics_MT
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run(src)
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -179,7 +176,6 @@ Public Class BGSubtract_Depth_MT
         label2 = "Accumulated depth image"
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         bgsub.Run(task.RGBDepth)
         dst1 = task.RGBDepth
         dst2 = bgsub.dst2
@@ -205,7 +201,6 @@ Public Class BGSubtract_MOG
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then
             gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
@@ -234,7 +229,6 @@ Public Class BGSubtract_MOG2
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static learnRateSlider = findSlider("MOG Learn Rate")
@@ -261,7 +255,6 @@ Public Class BGSubtract_GMG_KNN
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount < 120 Then
             task.trueText("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(task.frameCount))
         Else
@@ -299,7 +292,6 @@ Public Class BGSubtract_MOG_RGBDepth
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static learnRateSlider = findSlider("Learn Rate")
         MOGDepth.Apply(gray, gray, learnRateSlider.Value / 1000)
@@ -331,7 +323,6 @@ Public Class BGSubtract_MOG_Retina
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         retina.Run(task.RGBDepth)
         bgSub.Run(retina.dst2.Clone())
         dst1 = bgSub.dst1
@@ -352,7 +343,6 @@ Public Class BGSubtract_DepthOrColorMotion
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         motion.Run(src)
         dst1 = motion.dst1
         dst2 = motion.dst2
@@ -408,7 +398,6 @@ Public Class BGSubtract_Video
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         video.Run(src)
         dst2 = video.dst1
         bgfg.Run(dst2)
@@ -442,7 +431,6 @@ Public Class BGSubtract_Synthetic_CPP
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount < 10 Then Exit Sub ' darker images at the start?
         If amplitude <> sliders.trackbar(0).Value Or magnitude <> sliders.trackbar(1).Value Or waveSpeed <> sliders.trackbar(2).Value Or
             objectSpeed <> sliders.trackbar(3).Value Then
@@ -489,7 +477,6 @@ Public Class BGSubtract_Synthetic
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         synth.Run(src)
         dst2 = synth.dst1
         bgfg.Run(dst2)

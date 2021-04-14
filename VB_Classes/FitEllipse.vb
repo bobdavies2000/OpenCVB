@@ -25,7 +25,6 @@ Public Class FitEllipse_Basics_CPP
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         area.Run(src)  ' get some random clusters of points
         dst1.SetTo(0)
         If area.srcPoints.Count >= 5 Then

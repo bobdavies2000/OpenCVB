@@ -27,7 +27,6 @@ Public Class FloodFill_Basics
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
         Static loDiffSlider = findSlider("FloodFill LoDiff")
         Static hiDiffSlider = findSlider("FloodFill HiDiff")
@@ -110,7 +109,6 @@ Public Class FloodFill_Top16_MT
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim minFloodSize = sliders.trackbar(0).Value
         Dim loDiff = cv.Scalar.All(sliders.trackbar(1).Value)
         Dim hiDiff = cv.Scalar.All(sliders.trackbar(2).Value)
@@ -151,7 +149,6 @@ Public Class FloodFill_Color_MT
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim minFloodSize = flood.sliders.trackbar(0).Value
         Dim loDiff = cv.Scalar.All(flood.sliders.trackbar(1).Value)
         Dim hiDiff = cv.Scalar.All(flood.sliders.trackbar(2).Value)
@@ -196,7 +193,6 @@ Public Class FloodFill_DCT
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dct.Run(src)
 
         flood.Run(dct.dst2.Clone())
@@ -224,7 +220,6 @@ Public Class FloodFill_CComp
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         ccomp.Run(src)
         range.Run(ccomp.dst1)
@@ -260,7 +255,6 @@ Public Class FloodFill_RelativeRange
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         fBasics.floodFlag = 0
         If check.Box(0).Checked Then fBasics.floodFlag += cv.FloodFillFlags.FixedRange
         If check.Box(1).Checked Then fBasics.floodFlag += cv.FloodFillFlags.Link4 Else fBasics.floodFlag += cv.FloodFillFlags.Link8
@@ -296,7 +290,6 @@ Public Class Floodfill_Objects
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         basics.Run(src)
         dst1 = basics.dst1
 
@@ -341,7 +334,6 @@ Public Class FloodFill_WithDepth
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         range.Run(src)
         dst2 = task.noDepthMask
         dst1 = range.dst2
@@ -370,7 +362,6 @@ Public Class Floodfill_Identifiers
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
         Static loDiffSlider = findSlider("FloodFill LoDiff")
         Static hiDiffSlider = findSlider("FloodFill HiDiff")
@@ -436,7 +427,6 @@ Public Class Floodfill_ColorObjects
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         pFlood.Run(src)
         dst1 = pFlood.dst2.Clone
 
@@ -471,7 +461,6 @@ Public Class FloodFill_PointTracker
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         flood.Run(src)
         dst2 = flood.dst1
 
@@ -513,7 +502,6 @@ Public Class FloodFill_Top16
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         thumbNails = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
@@ -567,7 +555,6 @@ Public Class FloodFill_Click
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If task.mouseClickFlag Then
             flood.pt = task.mouseClickPoint
@@ -612,7 +599,6 @@ Public Class FloodFill_Point
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         dst1 = src.Clone()
         If standalone Then
@@ -680,7 +666,6 @@ Public Class FloodFill_FullImage
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static stepSlider = findSlider("FloodFill Step Size")
         Static fillSlider = findSlider("FloodFill point distance from edge")
         Dim fill = fillSlider.value
@@ -818,7 +803,6 @@ Public Class FloodFill_Step
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone Then
             contours.Run(src)
@@ -917,7 +901,6 @@ Public Class FloodFill_Palette
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         basics.Run(src)
 
         dst2.SetTo(0)
@@ -959,7 +942,6 @@ Public Class FloodFill_LUT
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         lut.Run(src)
 
@@ -1014,7 +996,6 @@ Public Class FloodFill_Neighbors
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
         Static stepSlider = findSlider("Step Size")
         Dim minFloodSize = minSizeSlider.Value

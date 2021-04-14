@@ -19,7 +19,6 @@ Public Class OptionsCommon_Depth
         ' task.rank = 3
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         task.hist3DThreshold = gOptions.thresholdSlider.Value
         task.useKalman = gOptions.UseKalman.Checked
@@ -123,6 +122,5 @@ Public Class OptionsCommon_Histogram
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
     End Sub
 End Class

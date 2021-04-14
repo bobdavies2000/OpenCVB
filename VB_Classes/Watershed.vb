@@ -13,7 +13,6 @@ Public Class Watershed_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then rects.Add(task.drawRect)
 
         If (standalone Or UseCorners) And task.frameCount = 0 Then
@@ -77,7 +76,6 @@ Public Class Watershed_DepthReduction
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         reduction.Run(task.RGBDepth)
         dst2 = reduction.dst1
 
@@ -105,7 +103,6 @@ Public Class Watershed_DepthAuto
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         watershed.Run(task.RGBDepth)
         dst1 = watershed.dst1
         label1 = watershed.label1

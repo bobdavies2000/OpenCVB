@@ -24,7 +24,6 @@ Public Class SLR_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Dim resultX As New List(Of Double)
         Dim resultY As New List(Of Double)
@@ -89,7 +88,6 @@ Public Class SLR_Data
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         plot.srcX = dataX.ToArray
         plot.srcY = dataY.ToArray
         plot.Run(src)
@@ -117,7 +115,6 @@ Public Class SLR_Image
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.plotColors(0) = cv.Scalar.White

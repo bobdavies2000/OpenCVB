@@ -33,7 +33,6 @@ Public Class Video_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If srcVideo <> fileNameForm.filename.Text Then
             If fileInfo.Exists = False Then
                 task.trueText("File not found: " + fileInfo.FullName, 10, 125)
@@ -77,7 +76,6 @@ Public Class Video_CarCounting
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         video.Run(src)
         If video.dst1.Empty() = False And video.image.Empty() = False Then
             dst1.SetTo(0)
@@ -134,7 +132,6 @@ Public Class Video_CarCComp
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         video.Run(src)
         If video.dst1.Empty() = False Then
             bgSub.Run(video.dst1)
@@ -165,7 +162,6 @@ Public Class Video_MinRect
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         video.Run(src)
         If video.dst1.Empty() = False Then
             bgSub.Run(video.dst1)
@@ -197,7 +193,6 @@ Public Class Video_MinCircle
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         video.Run(src)
         dst1 = video.dst1
         dst2 = video.dst2

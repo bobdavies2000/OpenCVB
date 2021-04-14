@@ -15,7 +15,6 @@ Public Class GrabCut_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         fgnd.Run(src)
         dst1 = fgnd.dst1
 
@@ -69,7 +68,6 @@ Public Class GrabCut_FineTune
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static clearCheck = findRadio("Clear all foreground and background fine tuning")
         If clearCheck.checked Then

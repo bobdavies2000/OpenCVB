@@ -25,7 +25,6 @@ Public Class OilPaint_Pointilism
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         dst1 = src
         Dim img = src(task.drawRect)
         Static saveDrawRect As New cv.Rect
@@ -98,7 +97,6 @@ Public Class OilPaint_ColorProbability
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         km.Run(src)
         dst1 = km.dst1
         Dim c() = km.clusterColors
@@ -139,7 +137,6 @@ Public Class OilPaint_ManualVB
         task.drawRect = New cv.Rect(dst1.Cols * 3 / 8, dst1.Rows * 3 / 8, dst1.Cols * 2 / 8, dst1.Rows * 2 / 8)
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim filtersize = sliders.trackbar(0).Value
         Dim levels = sliders.trackbar(1).Value
 
@@ -204,7 +201,6 @@ Public Class OilPaint_Manual
         task.drawRect = New cv.Rect(dst1.Cols * 3 / 8, dst1.Rows * 3 / 8, dst1.Cols * 2 / 8, dst1.Rows * 2 / 8)
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         Dim roi = task.drawRect
@@ -238,7 +234,6 @@ Public Class OilPaint_Cartoon
         label2 = "Laplacian Edges"
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim roi = task.drawRect
         laplacian.Run(src)
         dst2 = laplacian.dst1

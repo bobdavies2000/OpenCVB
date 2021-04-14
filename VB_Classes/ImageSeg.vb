@@ -18,7 +18,6 @@ Public Class ImageSeg_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         flood.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst1 = flood.dst2
 
@@ -56,7 +55,6 @@ Public Class ImageSeg_InRange
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         iSeg.Run(src)
         dst1 = iSeg.dst2
@@ -90,7 +88,6 @@ Public Class ImageSeg_MissingSegments
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         Static lenContourSlider = findSlider("Minimum length for missing contours")
         Dim maxLen = lenContourSlider.value
@@ -149,7 +146,6 @@ Public Class ImageSeg_Unstable
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static segSlider = findSlider("A segment is considered present after this many appearances")
         Dim refreshCount = segSlider.value
 
@@ -191,7 +187,6 @@ Public Class ImageSeg_CentroidTracker
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         iSeg.Run(src)
         dst1 = iSeg.dst1

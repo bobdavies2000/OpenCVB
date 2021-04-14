@@ -28,7 +28,6 @@ Public Class Featureless_Basics
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         grid.Run(src)
 
         edges.Run(src)
@@ -72,7 +71,6 @@ Public Class Featureless_DCT_MT
     End Sub
 
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         dct.Run(src)
         dst1 = dct.dst1
         dst2 = dct.dst2
@@ -126,7 +124,6 @@ Public Class FeatureLess_Prediction
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         fLess.Run(src)
         dst1 = fLess.dst1
         dst2 = fLess.dst2
@@ -214,7 +211,6 @@ Public Class FeatureLess_PointTracker
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         fLess.Run(src)
         dst2 = fLess.dst1
 
@@ -244,7 +240,6 @@ Public Class FeatureLess_Highlights
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         fLessP.Run(src)
 
         addW.src2 = fLessP.dst1

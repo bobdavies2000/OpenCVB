@@ -16,7 +16,6 @@ Public Class Coherence_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim sigma = sliders.trackbar(0).Value * 2 + 1
         Dim blend = sliders.trackbar(1).Value / 10
         Dim str_sigma = sliders.trackbar(2).Value * 2 + 1
@@ -96,7 +95,6 @@ Public Class Coherent_Depth
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         coherent.Run(task.RGBDepth)
         dst1 = coherent.dst1
     End Sub

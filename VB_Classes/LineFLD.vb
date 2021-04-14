@@ -42,7 +42,6 @@ Public Class lineFLD_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         lines.Clear()
 
         Dim length_threshold = minLenSlider.Value
@@ -270,7 +269,6 @@ Public Class lineFLD_CPP
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         sortedLines.Clear()
 
         Dim length_threshold = lineFLD.minLenSlider.Value
@@ -319,7 +317,6 @@ Public Class LineFLD_LongestLine
         label2 = ""
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
         lines.Run(src)
         src.CopyTo(dst1)
@@ -357,7 +354,6 @@ Public Class LineFLD_MT
         label2 = ""
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If task.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
         lines.Run(src)
         src.CopyTo(dst1)
@@ -400,7 +396,6 @@ End Class
 '        label2 = ""
 '    End Sub
 '    Public Sub Run(src as cv.Mat)
-'        If task.intermediateReview = caller Then task.intermediateObject = Me
 '        If task.frameCount Mod sliders.trackbar(2).Value Then Exit Sub
 '        Dim useX As Boolean = check.Box(0).Checked
 '        linesFLD.src = src

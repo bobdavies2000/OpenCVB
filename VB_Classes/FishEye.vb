@@ -53,7 +53,6 @@ Public Class FishEye_Rectified
         label2 = "Right View"
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
 
         dst1.SetTo(0)
         dst2.SetTo(0)
@@ -80,7 +79,6 @@ Public Class FishEye_Raw
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         label1 = "Left Fisheye Image"
         label2 = "Right Fisheye Image"
         dst1 = task.leftView

@@ -9,7 +9,6 @@ Public Class Concat_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim tmp As New cv.Mat
         cv.Cv2.HConcat(src, task.RGBDepth, tmp)
         dst1 = tmp.Resize(src.Size())
@@ -34,7 +33,6 @@ Public Class Concat_4way
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             img(0) = src
             img(1) = task.RGBDepth

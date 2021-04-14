@@ -43,16 +43,25 @@ Public Class VBparent : Implements IDisposable
         If task.callTrace.Count = 0 Then
             standalone = True
             task.callTrace.Clear()
+            task.activeObjects.Clear()
             task.callTrace.Add(callStack)
         Else
             standalone = False
             If task.callTrace.Contains(callStack) = False Then task.callTrace.Add(callStack)
         End If
-
+        task.activeObjects.Add(Me)
         dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
         dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
     End Sub
     Public Sub NextFrame(src As cv.Mat)
+        If task.intermediateReview <> "" Then
+            For Each obj In task.activeObjects
+                If obj.caller = task.intermediateReview Then
+                    task.intermediateObject = obj
+                    Exit For
+                End If
+            Next
+        End If
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
         algorithm.Run(src)
         If standalone Then
@@ -165,8 +174,6 @@ Public Class VBparent : Implements IDisposable
         radio.Dispose()
         radio1.Dispose()
         combo.Dispose()
-        dst1.Dispose()
-        dst2.Dispose()
     End Sub
 
     Public Const QUAD0 = 0 ' there are 4 images to the user interface when using Mat_4to1.

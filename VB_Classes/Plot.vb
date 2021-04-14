@@ -19,7 +19,6 @@ Public Class Plot_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         hist.plotColors(0) = cv.Scalar.White
         hist.Run(src)
         dst1 = hist.dst1
@@ -50,7 +49,6 @@ Public Class Plot_Basics_CPP
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
 
         If standalone or task.intermediateReview = caller Then
             ReDim srcX(50 - 1)
@@ -124,7 +122,6 @@ Public Class Plot_OverTime
         myStopWatch = Stopwatch.StartNew()
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
 
@@ -223,7 +220,6 @@ Public Class Plot_Histogram
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim dimensions() = New Integer() {bins}
@@ -312,7 +308,6 @@ Public Class Plot_Depth
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         hist.Run(src)
         ReDim plot.srcX(hist.plotHist.hist.Rows - 1)
         ReDim plot.srcY(hist.plotHist.hist.Rows - 1)

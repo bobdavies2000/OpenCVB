@@ -56,7 +56,6 @@ Public Class Smoothing_Exterior
 		' task.rank = 1
 	End Sub
 	Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
 		If standalone Or task.intermediateReview = caller Then
 			If task.frameCount Mod 30 Then Exit Sub
 
@@ -141,7 +140,6 @@ Public Class Smoothing_Interior
 		' task.rank = 1
 	End Sub
 	Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
 		If standalone or task.intermediateReview = caller Then
 			If task.frameCount Mod 30 Then Exit Sub
 
@@ -193,7 +191,6 @@ Public Class Smoothing_Contours
 		' task.rank = 1
 	End Sub
 	Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
 		outline.Run(src)
 
 		Dim stepsize = sliders.trackbar(0).Value

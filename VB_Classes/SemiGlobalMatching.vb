@@ -29,7 +29,6 @@ Public Class SemiGlobalMatching_CPP
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         'If task.frameCount < 10 Then Exit Sub
         'If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
         '    task.trueText("The left and right views are identical with the Microsoft Kinect 4 Azure camera.")

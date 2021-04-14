@@ -10,7 +10,6 @@ Public Class Filter_Laplacian
         label2 = "Output of Filter2D (approximated Laplacian)"
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim kernel = New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {1, 1, 1, 1, -8, 1, 1, 1, 1})
         Dim imgLaplacian = src.Filter2D(cv.MatType.CV_32F, kernel)
         Dim sharp As New cv.Mat
@@ -43,7 +42,6 @@ Public Class Filter_NormalizedKernel
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim kernel = New cv.Mat(1, 21, cv.MatType.CV_32FC1, New Single() {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1})
         Dim normType = cv.NormTypes.L1
         Static frm = findfrm("Filter_NormalizedKernel Radio Options")
@@ -81,7 +79,6 @@ Public Class Filter_Normalized2D
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim kernelSize = If(standalone, (task.frameCount Mod 20) + 1, sliders.trackbar(0).Value)
         Dim kernel = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
         dst1 = src.Filter2D(-1, kernel)
@@ -114,7 +111,6 @@ Public Class Filter_SepFilter2D
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim xDim = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value + 1)
         Dim yDim = If(sliders.trackbar(1).Value Mod 2, sliders.trackbar(1).Value, sliders.trackbar(1).Value + 1)
         Dim sigma = sliders.trackbar(2).Value / 10

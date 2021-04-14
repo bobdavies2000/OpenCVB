@@ -32,7 +32,6 @@ Public Class WarpModel_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone Then
             warpInput.Run(src)
 
@@ -141,7 +140,6 @@ Public Class WarpModel_Input
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Dim img As New cv.Mat
         Static frm = findfrm("WarpModel_Input Radio Options")
         For i = 0 To frm.check.length - 1
@@ -216,7 +214,6 @@ Public Class WarpModel_AlignImages
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         Static gradientCheck = findCheckBox("Use Gradient in WarpInput")
         If standalone Then ecc.warpInput.Run(src)
         Dim aligned() = {New cv.Mat, New cv.Mat}
@@ -277,7 +274,6 @@ End Class
 '        task.desc = "Find the Translation and Euclidean warp matrix for the current grayscale image to the previous - needs more work"
 '    End Sub
 '    Public Sub Run(src as cv.Mat)
-'        If task.intermediateReview = caller Then task.intermediateObject = Me
 
 '        sobel.src = src
 '        sobel.Run()
@@ -343,7 +339,6 @@ End Class
 '        task.desc = "Find warp matrix for the whole image using just the segment with the highest entropy."
 '    End Sub
 '    Public Sub Run(src as cv.Mat)
-'        If task.intermediateReview = caller Then task.intermediateObject = Me
 
 '        ' we only need to compute the max entropy every once in a while.  
 '        If task.frameCount Mod 10 = 0 Then

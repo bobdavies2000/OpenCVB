@@ -22,7 +22,6 @@ Public Class GetRotationMatrix2D_Options
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         For i = 0 To radio.check.Length - 1
             If radio.check(i).Checked Then
                 warpFlag = Choose(i + 1, cv.InterpolationFlags.Area, cv.InterpolationFlags.Cubic, cv.InterpolationFlags.Lanczos4, cv.InterpolationFlags.Linear,
@@ -58,7 +57,6 @@ Public Class GetRotationMatrix2D_Basics
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         Static frm = findfrm("GetRotationMatrix2D_Basics Radio Options")
 
         rotateOptions.Run(src)
@@ -88,7 +86,6 @@ Public Class GetRotationMatrix2D_Box
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         rotation.Run(src)
         dst2 = dst1.Clone()
 

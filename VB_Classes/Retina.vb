@@ -40,7 +40,6 @@ Public Class Retina_Basics_CPP
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         If check.Box(1).Checked Then
             check.Box(1).Checked = False
             Dim fileinfo = New FileInfo(CurDir() + "/RetinaDefaultParameters.xml")
@@ -106,7 +105,6 @@ Public Class Retina_Depth
         label2 = "Current depth motion result"
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.intermediateReview = caller Then task.intermediateObject = Me
         retina.Run(task.RGBDepth)
         dst2 = retina.dst2
         Static lastMotion As New cv.Mat

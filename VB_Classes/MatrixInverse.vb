@@ -38,7 +38,6 @@ Public Class MatrixInverse_Basics_CS
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         If input.Width <> input.Height Then
             task.trueText("The src matrix must be square!")
             Exit Sub
@@ -69,7 +68,6 @@ Public Class MatrixInverse_OpenCV
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-		If task.intermediateReview = caller Then task.intermediateObject = Me
         If input.Width <> input.Height Then
             task.trueText("The input matrix must be square!")
             Exit Sub
