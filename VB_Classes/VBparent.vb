@@ -29,6 +29,7 @@ Public Class VBparent : Implements IDisposable
     Public standalone As Boolean
     Public dst1 As cv.Mat
     Public dst2 As cv.Mat
+    Public dst3 As cv.Mat
     Public label1 As String
     Public label2 As String
     Public msRNG As New System.Random
@@ -52,6 +53,7 @@ Public Class VBparent : Implements IDisposable
         task.activeObjects.Add(Me)
         dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
         dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
+        dst3 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
     End Sub
     Public Sub NextFrame(src As cv.Mat)
         If task.intermediateReview <> "" Then

@@ -1,20 +1,59 @@
 Imports cv = OpenCvSharp
+' https://stackoverflow.com/questions/14770756/opencv-simpleblobdetector-filterbyinertia-meaning
 Public Class Blob_Basics
+    Inherits VBparent
+    Dim options As Blob_Options
+    Dim input As Blob_Input
+    Dim blobDetector As New CS_Classes.Blob_Basics
+    Public Sub New()
+        options = New Blob_Options
+        blobDetector = New CS_Classes.Blob_Basics
+        If standalone Then input = New Blob_Input()
+
+        task.desc = "Isolate and list blobs with specified options"
+        ' task.rank = 1
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        options.Run(src)
+
+        If standalone Then
+            input.Run(src)
+            dst1 = input.dst1
+        Else
+            dst1 = src
+        End If
+        blobDetector.Run(dst1, dst2, options.blobParams)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Blob_Options
     Inherits VBparent
     Dim blob As Blob_Input
     Dim blobDetector As New CS_Classes.Blob_Basics
+    Public blobParams = New cv.SimpleBlobDetector.Params
     Public Sub New()
         blobDetector = New CS_Classes.Blob_Basics
-        blob = New Blob_Input()
-        blob.updateFrequency = 1 ' it is pretty fast but sloppy...
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 5)
-            check.Box(0).Text = "FilterByArea"
-            check.Box(1).Text = "FilterByCircularity"
-            check.Box(2).Text = "FilterByConvexity"
-            check.Box(3).Text = "FilterByInertia"
-            check.Box(4).Text = "FilterByColor"
-            check.Box(4).Checked = True ' filter by color...
+        If standalone Then
+            blob = New Blob_Input()
+            blob.updateFrequency = 30
+        End If
+
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 5)
+            radio.check(0).Text = "FilterByArea"
+            radio.check(1).Text = "FilterByCircularity"
+            radio.check(2).Text = "FilterByConvexity"
+            radio.check(3).Text = "FilterByInertia"
+            radio.check(4).Text = "FilterByColor"
+            radio.check(1).Checked = True
         End If
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -23,16 +62,16 @@ Public Class Blob_Basics
             sliders.setupTrackBar(1, "max Threshold", 0, 255, 255)
             sliders.setupTrackBar(2, "Threshold Step", 1, 50, 5)
         End If
-        task.desc = "Test C# Blob Detector."
+        task.desc = "Prepare options for a blob detection run."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
-        Dim blobParams = New cv.SimpleBlobDetector.Params
-        blobParams.FilterByArea = check.Box(0).Checked
-        blobParams.FilterByCircularity = check.Box(1).Checked
-        blobParams.FilterByConvexity = check.Box(2).Checked
-        blobParams.FilterByInertia = check.Box(3).Checked
-        blobParams.FilterByColor = check.Box(4).Checked
+    Public Sub Run(src As cv.Mat)
+        blobParams = New cv.SimpleBlobDetector.Params
+        If radio.check(0).Checked Then blobParams.FilterByArea = radio.check(0).Checked
+        If radio.check(1).Checked Then blobParams.FilterByCircularity = radio.check(1).Checked
+        If radio.check(2).Checked Then blobParams.FilterByConvexity = radio.check(2).Checked
+        If radio.check(3).Checked Then blobParams.FilterByInertia = radio.check(3).Checked
+        If radio.check(4).Checked Then blobParams.FilterByColor = radio.check(4).Checked
 
         blobParams.MaxArea = 100
         blobParams.MinArea = 0.001
@@ -44,12 +83,13 @@ Public Class Blob_Basics
         blobParams.MinDistBetweenBlobs = 10
         blobParams.MinRepeatability = 1
 
-        blob.Run(src)
-        dst1 = blob.dst1
-        dst2 = dst1.EmptyClone
+        If standalone Then
+            blob.Run(src)
+            dst1 = blob.dst1
 
-        ' The create method in SimpleBlobDetector is not available in VB.Net.  Not sure why.  To get around this, just use C# where create method works fine.
-        blobDetector.Run(dst1, dst2, blobParams)
+            ' The create method in SimpleBlobDetector is not available in VB.Net.  Not sure why.  To get around this, just use C# where create method works fine.
+            blobDetector.Run(dst1, dst2, blobParams)
+        End If
     End Sub
 End Class
 
@@ -94,22 +134,24 @@ Public Class Blob_Input
         task.desc = "Generate data to test Blob Detector."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
-        rectangles.Run(src)
-        Mats.mat(0) = rectangles.dst1
+    Public Sub Run(src As cv.Mat)
+        If task.frameCount Mod updateFrequency = 0 Then
+            rectangles.Run(src)
+            Mats.mat(0) = rectangles.dst1
 
-        circles.Run(src)
-        Mats.mat(1) = circles.dst1
+            circles.Run(src)
+            Mats.mat(1) = circles.dst1
 
-        ellipses.Run(src)
-        Mats.mat(2) = ellipses.dst1
+            ellipses.Run(src)
+            Mats.mat(2) = ellipses.dst1
 
-        poly.Run(src)
-        Mats.mat(3) = poly.dst2
-        Mats.Run(src)
-        Mats.dst1.CopyTo(dst1)
-        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
-        dst2 = Mats.mat(quadrantIndex)
+            poly.Run(src)
+            Mats.mat(3) = poly.dst2
+            Mats.Run(src)
+            Mats.dst1.CopyTo(dst1)
+            If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
+            dst2 = Mats.mat(quadrantIndex)
+        End If
     End Sub
 End Class
 
@@ -123,9 +165,9 @@ Public Class Blob_RenderBlobs
         blob = New Blob_Input()
         blob.updateFrequency = 1
 
-        task.desc = "Use connected components to find blobs."
         label1 = "Input blobs"
         label2 = "Largest blob, centroid in yellow"
+        task.desc = "Use connected components to find blobs."
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -134,7 +176,6 @@ Public Class Blob_RenderBlobs
             dst1 = blob.dst1
             Dim gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.Binary)
-            cv.Cv2.ImShow("binary", binary)
             Dim labelView = dst1.EmptyClone
             Dim stats As New cv.Mat
             Dim centroids As New cv.Mat
