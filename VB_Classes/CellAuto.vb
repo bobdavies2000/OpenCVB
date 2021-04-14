@@ -65,8 +65,8 @@ Public Class CellAuto_Basics
     Public Sub Run(src as cv.Mat)
 		If task.intermediateReview = caller Then task.intermediateObject = Me
         If standalone or task.intermediateReview = caller Then
-            src = New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_8UC1, 0)
-            src.Set(Of Byte)(0, src.Width / 2, 1)
+            input = New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_8UC1, 0)
+            input.Set(Of Byte)(0, src.Width / 2, 1)
             If task.frameCount Mod 2 Then dst2 = createCells(combo.Box.Text) Else dst1 = createCells(combo.Box.Text)
         Else
             dst1 = createCells(combo.Box.Text)
