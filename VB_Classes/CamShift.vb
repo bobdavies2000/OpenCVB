@@ -139,7 +139,6 @@ Public Class Camshift_Object
         blob.Run(src)
         dst2 = blob.dst2.Clone()
 
-
         If blob.flood.masks.Count > 0 Then
             Dim largestMask = blob.flood.sortedSizes.ElementAt(0).Value
             If camshift.trackBox.Size.Width > src.Width Or camshift.trackBox.Size.Height > src.Height Then

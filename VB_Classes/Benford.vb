@@ -80,6 +80,7 @@ Public Class Benford_Basics
 
         plot.hist = New cv.Mat(counts.Length, 1, cv.MatType.CV_32F, counts)
         plot.Run(src)
+        dst2 = plot.dst1.Clone
         For i = 0 To counts.Count - 1
             counts(i) = src.Rows * expectedDistribution(i)
         Next
@@ -88,7 +89,7 @@ Public Class Benford_Basics
         plot.Run(src)
 
         cv.Cv2.BitwiseNot(plot.dst1, addW.src2)
-        addW.Run(plot.dst1.Clone)
+        addW.Run(dst2)
         dst1 = addW.dst1
 
         label2 = "AddWeighted: " + CStr(addW.weightSlider.Value) + "% actual vs. " + CStr(100 - addW.weightSlider.Value) + "% Benford distribution"

@@ -27,7 +27,7 @@ Key 's' - To save the results
 '''
 import numpy as np
 import cv2 as cv
-titleWindow = 'grabcut.py'
+titleWindow = 'Grabcut.py'
 
 import sys
 import ctypes

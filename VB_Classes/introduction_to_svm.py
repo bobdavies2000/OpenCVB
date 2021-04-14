@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np
-titleWindow = 'Introduction_to_SVM.py'
+titleWindow = 'Introduction_to_svm.py'
 print("Takes a moment to compute resulting image...")
 # Set up training data
 ## [setup1]

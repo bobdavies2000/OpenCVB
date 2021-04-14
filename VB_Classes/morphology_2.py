@@ -10,7 +10,6 @@ max_kernel_size = 21
 title_trackbar_operator_type = 'Operator:\n 0: Opening - 1: Closing  \n 2: Gradient - 3: Top Hat \n 4: Black Hat'
 title_trackbar_element_type = 'Element:\n 0: Rect - 1: Cross - 2: Ellipse'
 title_trackbar_kernel_size = 'Kernel size:\n 2n + 1'
-titleWindow = 'Morphology Transformations Demo'
 morph_op_dic = {0: cv.MORPH_OPEN, 1: cv.MORPH_CLOSE, 2: cv.MORPH_GRADIENT, 3: cv.MORPH_TOPHAT, 4: cv.MORPH_BLACKHAT}
 
 def morphology_operations(val):

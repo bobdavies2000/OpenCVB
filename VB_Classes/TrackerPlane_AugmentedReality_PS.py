@@ -25,7 +25,7 @@ import common
 from TrackerPlane_PS import PlaneTracker
 from PyStream import PyStreamRun
 import sys
-titleWindow = "TrackerPlane_Reality_PS.py"
+titleWindow = "TrackerPlane_AugmentedReality_PS.py"
 
 # Simple model of a house - cube with a triangular prism "roof"
 ar_verts = np.float32([[0, 0, 0], [0, 1, 0], [1, 1, 0], [1, 0, 0],

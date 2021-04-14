@@ -182,7 +182,6 @@ Public Class Blob_DepthClusters
         loSlider.Value = 1 ' pixels are exact.
         hiSlider.Value = 1 ' pixels are exact.
 
-        label2 = "Backprojection of identified histogram depth clusters."
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
         task.rank = 3
     End Sub
@@ -190,9 +189,6 @@ Public Class Blob_DepthClusters
         If task.intermediateReview = caller Then task.intermediateObject = Me
         histBlobs.Run(task.noDepthMask)
         dst1 = histBlobs.dst1
-        flood.initialMask = task.noDepthMask
-        flood.Run(histBlobs.dst2)
-        dst2 = flood.dst2
         label1 = CStr(histBlobs.ranges.Count) + " Depth Clusters"
     End Sub
 End Class
