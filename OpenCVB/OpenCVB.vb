@@ -116,12 +116,15 @@ Public Class OpenCVB
             Else
                 algorithm = args(1)
             End If
+            ' this app erroneously invokes OpenCVB.exe because the parameters are not properly passed to the PyStream thread
+            ' this only occurs during a "test all" session.  The algorithm works whenever tested individually.  Bug in Python?
+            If algorithm = "Pyglet_Image_PS.py" Then End
             Console.WriteLine("'" + algorithm + "' was provided in the command line arguments to OpenCVB")
-            SaveSetting("OpenCVB", "<All>", "<All>", algorithm)
-            externalPythonInvocation = True ' we don't need to start python because it started OpenCVB.
-            HomeDir = New DirectoryInfo(CurDir() + "\..\")
-        Else
-            HomeDir = New DirectoryInfo(CurDir() + "\..\..\")
+                SaveSetting("OpenCVB", "<All>", "<All>", algorithm)
+                externalPythonInvocation = True ' we don't need to start python because it started OpenCVB.
+                HomeDir = New DirectoryInfo(CurDir() + "\..\")
+            Else
+                HomeDir = New DirectoryInfo(CurDir() + "\..\..\")
         End If
 
         PausePlay = New Bitmap(HomeDir.FullName + "OpenCVB/Data/PauseButton.png")
