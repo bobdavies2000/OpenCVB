@@ -83,7 +83,7 @@ Public Class MFD_PointCloud
         mfd = New MFD_Basics
         label1 = "Motion-filtered PointCloud"
         task.desc = "Stabilize the PointCloud but update any areas with motion"
-		' task.rank = 1
+        ' task.rank = 4
     End Sub
     Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me

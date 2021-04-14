@@ -61,8 +61,7 @@ Public Class Python_Run
     Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
         If pyStream IsNot Nothing Then
-            pyStream.src = src
-            pyStream.Run()
+            pyStream.Run(src)
             dst1 = pyStream.dst1
             dst2 = pyStream.dst2
             label1 = "Output of Python Backend"

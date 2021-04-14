@@ -16,7 +16,7 @@ Public Class OptionsCommon_Depth
         label1 = "Depth values that are in-range"
         label2 = "Depth values that are out of range (and < 8m)"
         task.desc = "Show depth with OpenCV using varying min and max depths."
-		' task.rank = 1
+        ' task.rank = 3
     End Sub
     Public Sub Run(src as cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me

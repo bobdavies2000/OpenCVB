@@ -6,6 +6,7 @@ import io
 import numpy as np
 from PIL import Image as im
 window = pyglet.window.Window()
+titleWindow = 'Pyglet_Image_PS.py'
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
     global image, imageReady
@@ -21,7 +22,6 @@ class PyStreamThread(object):
         thread.start()                                  
 
     def run(self):
-        titleWindow = 'Pyglet_Image_PS.py'
         PyStreamRun(OpenCVCode, titleWindow)        
 
 @window.event

@@ -19,7 +19,7 @@ Public Class ORB_Basics
         orb = cv.ORB.Create(sliders.trackbar(0).Value)
         keypoints = orb.Detect(src)
         If standalone or task.intermediateReview = caller Then
-            dst1 = src.Clone()
+            dst1 = src.Clone().CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             For Each kpt In keypoints
                 dst1.Circle(kpt.Pt, 3, cv.Scalar.Yellow, -1, task.lineType)
             Next

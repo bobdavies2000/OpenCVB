@@ -389,7 +389,7 @@ Public Class OpenGL_GravityTransform
         ogl.OpenGLTitle = "OpenGL_Callbacks"
 
         task.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
-        ' task.rank = 1
+        ' task.rank = 5
     End Sub
     Public Sub Run(src As cv.Mat)
         If task.intermediateReview = caller Then task.intermediateObject = Me
