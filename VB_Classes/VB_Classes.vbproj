@@ -177,7 +177,6 @@
     <Compile Include="Aruco.vb" />
     <Compile Include="Benford.vb" />
     <Compile Include="Bitmap.vb" />
-    <Compile Include="Bitwise.vb" />
     <Compile Include="Cartoonify.vb" />
     <Compile Include="Coherent.vb" />
     <Compile Include="Concat.vb" />
