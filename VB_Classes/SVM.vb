@@ -7,7 +7,6 @@ Public Class SVM_Options
     Public points() As cv.Point2f
     Public responses() As Integer
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 8)
@@ -109,7 +108,6 @@ Public Class SVM_Basics
     Inherits VBparent
     Dim svmOptions As SVM_Options
     Public Sub New()
-        initParent()
         svmOptions = New SVM_Options()
         task.desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
         ' task.rank = 1
@@ -161,7 +159,6 @@ Public Class SVM_Random
     Inherits VBparent
     Dim svmOptions As SVM_Options
     Public Sub New()
-        initParent()
         svmOptions = New SVM_Options()
         svmOptions.sliders.trackbar(1).Value = 15
 
@@ -253,7 +250,6 @@ Public Class SVM_TestCase
     Dim labelsMat As cv.Mat
     Dim svmOptions As SVM_Options
     Public Sub New()
-        initParent()
 
         trainMat = New cv.Mat(4, 2, cv.MatType.CV_32F, trainData)
         labelsMat = New cv.Mat(4, 1, cv.MatType.CV_32SC1, labels)

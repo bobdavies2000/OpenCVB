@@ -5,7 +5,6 @@ Public Class Featureless_Basics
     Public grid As Thread_Grid
     Public flood As FloodFill_Palette
     Public Sub New()
-        initParent()
 
         edges = New Edges_Basics()
 
@@ -62,7 +61,6 @@ Public Class Featureless_DCT_MT
     Inherits VBparent
     Dim dct As DCT_FeatureLess
     Public Sub New()
-        initParent()
         dct = New DCT_FeatureLess()
 
         label2 = "Largest FeatureLess Region"
@@ -113,7 +111,6 @@ Public Class FeatureLess_Prediction
     Inherits VBparent
     Dim fLess As Featureless_Basics
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "FeatureLess Resize Percent", 1, 100, 1)
@@ -201,7 +198,6 @@ Public Class FeatureLess_PointTracker
     Public fLess As Featureless_Basics
     Public pTrack As KNN_PointTracker
     Public Sub New()
-        initParent()
         pTrack = New KNN_PointTracker()
         fLess = New Featureless_Basics()
 
@@ -233,7 +229,6 @@ Public Class FeatureLess_Highlights
     Public fLessP As FeatureLess_PointTracker
     Public addW As AddWeighted_Basics
     Public Sub New()
-        initParent()
         fLessP = New FeatureLess_PointTracker()
         addW = New AddWeighted_Basics()
         task.desc = "Highlight the featureless regions in an RGB image"

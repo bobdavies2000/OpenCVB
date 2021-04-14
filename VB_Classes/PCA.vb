@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 Public Class PCA_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Retained Variance", 1, 100, 95)
@@ -44,7 +43,6 @@ Public Class PCA_Depth
     Inherits VBparent
     Dim pca As PCA_Basics
     Public Sub New()
-        initParent()
         pca = New PCA_Basics()
         task.desc = "Reconstruct a depth stream as a composite of X images."
 		' task.rank = 1
@@ -64,7 +62,6 @@ Public Class PCA_DrawImage
     Dim pca As PCA_Basics
     Dim image As New cv.Mat
     Public Sub New()
-        initParent()
         pca = New PCA_Basics()
         image = cv.Cv2.ImRead(task.parms.homeDir + "Data/pca_test1.jpg")
         task.desc = "Use PCA to find the principle direction of an object."

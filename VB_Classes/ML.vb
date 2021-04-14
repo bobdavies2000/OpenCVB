@@ -62,7 +62,6 @@ Public Class ML_FillRGBDepth_MT
     Dim grid As Thread_Grid
     Dim colorizer As Depth_Colorizer_CPP
     Public Sub New()
-        initParent()
         colorizer = New Depth_Colorizer_CPP()
         grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
@@ -97,7 +96,6 @@ Public Class ML_FillRGBDepth
     Dim shadow As Depth_Holes
     Dim colorizer As Depth_Colorizer_CPP
     Public Sub New()
-        initParent()
         colorizer = New Depth_Colorizer_CPP()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -129,7 +127,6 @@ Public Class ML_DepthFromColor_MT
     Dim grid As Thread_Grid
     Dim dilate As DilateErode_Basics
     Public Sub New()
-        initParent()
         colorizer = New Depth_Colorizer_CPP()
 
         dilate = New DilateErode_Basics()
@@ -197,7 +194,6 @@ Public Class ML_DepthFromColor
     Dim shadow As Depth_Holes
     Dim resized As Resize_Percentage
     Public Sub New()
-        initParent()
         colorizer = New Depth_Colorizer_CPP()
 
         mats = New Mat_4to1()
@@ -276,7 +272,6 @@ Public Class ML_DepthFromXYColor
     Dim resized As Resize_Percentage
     Dim colorizer As Depth_Colorizer_CPP
     Public Sub New()
-        initParent()
         colorizer = New Depth_Colorizer_CPP()
 
         mats = New Mat_4to1()
@@ -370,7 +365,6 @@ Public Class ML_EdgeDepth_MT
     Dim grid As Thread_Grid
     Dim dilate As DilateErode_Basics
     Public Sub New()
-        initParent()
         colorizer = New Depth_Colorizer_CPP()
 
         dilate = New DilateErode_Basics()
@@ -443,7 +437,6 @@ End Class
 '    Public predictions As New cv.Mat
 '    Dim emax As EMax_Centroids
 '    Public Sub New()
-'        initParent()
 
 '        If standalone or task.intermediateReview = caller Then
 '            emax = New EMax_Centroids()

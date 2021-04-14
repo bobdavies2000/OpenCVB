@@ -7,7 +7,6 @@ Public Class GeneticDrawing_Options
     Inherits VBparent
     Public stageTotal = 100
     Public Sub New()
-        initParent()
         Windows.Forms.Application.DoEvents()
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -65,7 +64,6 @@ Public Class GeneticDrawing_Basics
     Public gradient As Gradient_CartToPolar
     Public restartRequested As Boolean = True
     Public Sub New()
-        initParent()
 
         options = New GeneticDrawing_Options()
 
@@ -255,7 +253,6 @@ Public Class GeneticDrawing_Color
     Inherits VBparent
     Dim gDraw(3 - 1) As GeneticDrawing_Basics
     Public Sub New()
-        initParent()
 
         gDraw(0) = New GeneticDrawing_Basics()
         gDraw(1) = New GeneticDrawing_Basics()
@@ -299,7 +296,6 @@ Public Class GeneticDrawing_Photo
     Dim inputFileName As String
     Dim fileNameForm As OptionsFileName
     Public Sub New()
-        initParent()
 
         fileNameForm = New OptionsFileName
         fileNameForm.OpenFileDialog1.InitialDirectory = task.parms.homeDir + "Data/"

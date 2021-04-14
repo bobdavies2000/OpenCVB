@@ -6,7 +6,6 @@ Public Class Entropy_Basics
     Dim simple = New Entropy_Simple
     Public entropy As Single
     Public Sub New()
-        initParent()
         flow = New Font_FlowText()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -47,7 +46,6 @@ Public Class Entropy_Highest
     Public eMaxRect As cv.Rect
     Dim addw As AddWeighted_Basics
     Public Sub New()
-        initParent()
 
         addw = New AddWeighted_Basics
 
@@ -107,7 +105,6 @@ Public Class Entropy_FAST
     Dim fast As FAST_Basics
     Dim entropy As Entropy_Highest
     Public Sub New()
-        initParent()
         fast = New FAST_Basics()
         entropy = New Entropy_Highest()
 

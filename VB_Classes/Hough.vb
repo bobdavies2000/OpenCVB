@@ -42,7 +42,6 @@ Public Class Hough_Circles
     Inherits VBparent
     Dim circles As Draw_Circles
     Public Sub New()
-        initParent()
         circles = New Draw_Circles()
         circles.sliders.trackbar(0).Value = 3
         task.desc = "Find circles using HoughCircles."
@@ -74,7 +73,6 @@ Public Class Hough_Lines
     Dim edges As Edges_Basics
     Public segments() As cv.LineSegmentPolar
     Public Sub New()
-        initParent()
         edges = New Edges_Basics()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -122,7 +120,6 @@ Public Class Hough_Lines_MT
     Dim edges As Edges_Basics
     Public grid As Thread_Grid
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "rho", 1, 100, 1)

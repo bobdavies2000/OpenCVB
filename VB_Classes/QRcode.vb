@@ -6,7 +6,6 @@ Public Class QRcode_Basics
     Dim qrInput1 As New cv.Mat
     Dim qrInput2 As New cv.Mat
     Public Sub New()
-        initParent()
         Dim fileInfo = New FileInfo(task.parms.homeDir + "data/QRcode1.png")
         If fileInfo.Exists Then qrInput1 = cv.Cv2.ImRead(fileInfo.FullName)
         fileInfo = New FileInfo(task.parms.homeDir + "Data/QRCode2.png")

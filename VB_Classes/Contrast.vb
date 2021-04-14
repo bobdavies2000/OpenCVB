@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Public Class Contrast_POW
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
@@ -30,7 +29,6 @@ End Class
 Public Class Contrast_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Brightness", 1, 100, 50)

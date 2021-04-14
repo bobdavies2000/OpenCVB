@@ -32,7 +32,6 @@ Public Class MatrixInverse_Basics_CS
     Dim defaultBVector() As Double = {12, 7, 7, 13}
     Dim input As cv.Mat
     Public Sub New()
-        initParent()
         input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
         task.desc = "Manually invert a matrix"
 		' task.rank = 1
@@ -62,7 +61,6 @@ Public Class MatrixInverse_OpenCV
     Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
     Public input As cv.Mat
     Public Sub New()
-        initParent()
         input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
         task.desc = "Use OpenCV to invert a matrix"
 		' task.rank = 1

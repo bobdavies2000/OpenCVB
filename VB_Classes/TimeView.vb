@@ -4,7 +4,6 @@ Public Class TimeView_Basics
     Public sideView As Histogram_SideView2D
     Public topView As Histogram_TopView2D
     Public Sub New()
-        initParent()
 
         sideView = New Histogram_SideView2D
         topView = New Histogram_TopView2D
@@ -65,7 +64,6 @@ Public Class TimeView_TopBackProjection
     Inherits VBparent
     Dim tFlood As TimeView_FloodFill
     Public Sub New()
-        initParent()
         tFlood = New TimeView_FloodFill
         task.desc = "Backproject the side and top views into the image view"
         ' task.rank = 1
@@ -123,7 +121,6 @@ Public Class TimeView_FloodFill
     Public floodTop As FloodFill_Basics
     Public tBasics As TimeView_Basics
     Public Sub New()
-        initParent()
 
         floodSide = New FloodFill_Basics
         floodTop = New FloodFill_Basics
@@ -161,7 +158,6 @@ Public Class TimeView_Centroids
     Public queryPoints As New List(Of cv.Point2f)
     Public responses As New List(Of cv.Point2f)
     Public Sub New()
-        initParent()
         tflood = New TimeView_FloodFill
         knn = New KNN_BasicsQT
 
@@ -213,7 +209,6 @@ Public Class TimeView_Rectangles
     Dim mOverLap As Rectangle_MultiOverlap
     Public tflood As TimeView_FloodFill
     Public Sub New()
-        initParent()
 
         mOverLap = New Rectangle_MultiOverlap
         tflood = New TimeView_FloodFill
@@ -259,7 +254,6 @@ Public Class TimeView_Frustrum
     Dim cmatTop As PointCloud_ColorizeTop
     Dim mats As Mat_4Click
     Public Sub New()
-        initParent()
         mats = New Mat_4Click
         cmatSide = New PointCloud_ColorizeSide
         cmatTop = New PointCloud_ColorizeTop

@@ -16,7 +16,6 @@ Public Class ProCon_Basics
     Public pduration As Integer
     Public cduration As Integer
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -103,7 +102,6 @@ Public Class ProCon_Variation
     Dim procon As ProCon_Basics
     Dim frameCount As Integer
     Public Sub New()
-        initParent()
         procon = New ProCon_Basics()
         procon.sliders.trackbar(1).Enabled = False ' no duration for the producer because algorithm task is the producer.
         procon.terminateProducer = True ' we don't want 2 producer tasks...

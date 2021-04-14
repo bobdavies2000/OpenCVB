@@ -13,7 +13,6 @@ Public Class FloodFill_Basics
     Public initialMask As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 4)
             sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2500)
@@ -97,7 +96,6 @@ Public Class FloodFill_Top16_MT
     Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -141,7 +139,6 @@ Public Class FloodFill_Color_MT
     Dim flood As FloodFill_Top16_MT
     Dim grid As Thread_Grid
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
         flood = New FloodFill_Top16_MT()
 
@@ -185,7 +182,6 @@ Public Class FloodFill_DCT
     Dim flood As FloodFill_Color_MT
     Dim dct As DCT_FeatureLess
     Public Sub New()
-        initParent()
         flood = New FloodFill_Color_MT()
 
         dct = New DCT_FeatureLess()
@@ -210,7 +206,6 @@ Public Class FloodFill_CComp
     Dim ccomp As CComp_Basics
     Dim range As FloodFill_RelativeRange
     Public Sub New()
-        initParent()
 
         ccomp = New CComp_Basics
         range = New FloodFill_RelativeRange
@@ -239,7 +234,6 @@ Public Class FloodFill_RelativeRange
     Inherits VBparent
     Public fBasics As FloodFill_Basics
     Public Sub New()
-        initParent()
         fBasics = New FloodFill_Basics()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 3)
@@ -276,7 +270,6 @@ Public Class Floodfill_Objects
     Dim basics As FloodFill_Basics
     Dim minSlider As Windows.Forms.TrackBar
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 1)
@@ -324,7 +317,6 @@ Public Class FloodFill_WithDepth
     Inherits VBparent
     Dim range As FloodFill_RelativeRange
     Public Sub New()
-        initParent()
 
         range = New FloodFill_RelativeRange()
 
@@ -355,7 +347,6 @@ Public Class Floodfill_Identifiers
     Public minFloodSize As Integer
     Public basics As FloodFill_Basics
     Public Sub New()
-        initParent()
         basics = New FloodFill_Basics()
         label1 = "Input image to floodfill"
         task.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
@@ -420,7 +411,6 @@ Public Class Floodfill_ColorObjects
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
     Public Sub New()
-        initParent()
         pFlood = New Floodfill_Identifiers()
 
         task.desc = "Use floodfill to identify each of the region candidates using only color."
@@ -451,7 +441,6 @@ Public Class FloodFill_PointTracker
     Dim pTrack As KNN_PointTracker
     Dim flood As FloodFill_Palette
     Public Sub New()
-        initParent()
 
         pTrack = New KNN_PointTracker()
         flood = New FloodFill_Palette()
@@ -489,7 +478,6 @@ Public Class FloodFill_Top16
     Public thumbNails As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public Sub New()
-        initParent()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
             check.Box(0).Text = "Show (up to) the first 16 largest objects in view (in order of size)"
@@ -546,7 +534,6 @@ Public Class FloodFill_Click
     Dim edges As Edges_BinarizedSobel
     Dim flood As FloodFill_Point
     Public Sub New()
-        initParent()
         edges = New Edges_BinarizedSobel
         flood = New FloodFill_Point
         flood.pt = New cv.Point(msRNG.Next(0, dst1.Width - 1), msRNG.Next(0, dst1.Height - 1))
@@ -587,7 +574,6 @@ Public Class FloodFill_Point
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public pt As cv.Point ' this is the floodfill point
     Public Sub New()
-        initParent()
         If standalone Then
             edges = New Edges_BinarizedSobel
             label2 = "FloodFill_Point standalone just shows the edges"
@@ -643,7 +629,6 @@ Public Class FloodFill_FullImage
     Public mats As Mat_4Click
     Public missingSegments As cv.Mat
     Public Sub New()
-        initParent()
 
         motion = New Motion_Basics
         mats = New Mat_4Click
@@ -789,7 +774,6 @@ Public Class FloodFill_Step
     Dim edgesInput As cv.Mat
     Dim contourInput As New SortedList(Of Integer, cv.Point())(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
-        initParent()
 
         contours = New Contours_Binarized
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -894,7 +878,6 @@ Public Class FloodFill_Palette
     Public basics As FloodFill_Basics
     Public allRegionMask As cv.Mat
     Public Sub New()
-        initParent()
 
         basics = New FloodFill_Basics()
         task.desc = "Create a floodfill image that is only 8-bit for use with a palette"
@@ -934,7 +917,6 @@ Public Class FloodFill_LUT
     Dim flood As FloodFill_Basics
     Dim addw As AddWeighted_Basics
     Public Sub New()
-        initParent()
         addw = New AddWeighted_Basics
         lut = New LUT_Basics
         flood = New FloodFill_Basics
@@ -979,7 +961,6 @@ Public Class FloodFill_Neighbors
     Dim loDiff = cv.Scalar.All(1)
     Dim hiDiff = cv.Scalar.All(1)
     Public Sub New()
-        initParent()
 
         basics = New FloodFill_Basics
 

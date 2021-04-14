@@ -5,7 +5,6 @@ Public Class KAZE_KeypointsKAZE_CS
     Inherits VBparent
     Dim CS_Kaze As New CS_Classes.Kaze_Basics
     Public Sub New()
-        initParent()
         task.desc = "Find keypoints using KAZE algorithm."
 		' task.rank = 1
         label1 = "KAZE key points"
@@ -26,7 +25,6 @@ Public Class KAZE_KeypointsAKAZE_CS
     Inherits VBparent
     Dim CS_AKaze As New CS_Classes.AKaze_Basics
     Public Sub New()
-        initParent()
         task.desc = "Find keypoints using AKAZE algorithm."
 		' task.rank = 1
         label1 = "AKAZE key points"
@@ -48,7 +46,6 @@ Public Class KAZE_Sample_CS
     Dim box_in_scene As New cv.Mat
     Dim CS_Kaze As New CS_Classes.Kaze_Sample
     Public Sub New()
-        initParent()
         box = cv.Cv2.ImRead(task.parms.homeDir + "Data/box.png", cv.ImreadModes.Color)
         box_in_scene = cv.Cv2.ImRead(task.parms.homeDir + "Data/box_in_scene.png", cv.ImreadModes.Color)
         task.desc = "Match keypoints in 2 photos."
@@ -67,7 +64,6 @@ Public Class KAZE_Match_CS
     Dim red As LeftRightView_Basics
     Dim CS_Kaze As New CS_Classes.Kaze_Sample
     Public Sub New()
-        initParent()
         red = New LeftRightView_Basics()
         red.sliders.trackbar(0).Value = 45
         task.desc = "Match keypoints in the left and right images."
@@ -91,7 +87,6 @@ Public Class KAZE_LeftAligned_CS
     Dim CS_KazeLeft As New CS_Classes.Kaze_Basics
     Dim CS_KazeRight As New CS_Classes.Kaze_Basics
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Max number of points to match", 1, 300, 100)

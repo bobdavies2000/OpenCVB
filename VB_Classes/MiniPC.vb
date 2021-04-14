@@ -5,7 +5,6 @@ Public Class MiniPC_Basics
     Public rect As cv.Rect
     Dim gCloud As Depth_PointCloud_IMU
     Public Sub New()
-        initParent()
         gCloud = New Depth_PointCloud_IMU()
         resize = New Resize_Percentage
         task.desc = "Create a mini point cloud for use with histograms"
@@ -41,7 +40,6 @@ Public Class MiniPC_Rotate
     Public histogram As New cv.Mat
     Public angleY As Integer
     Public Sub New()
-        initParent()
         mini = New MiniPC_Basics
 
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -103,7 +101,6 @@ Public Class MiniPC_RotateAngle
     Public plot As Plot_OverTime
     Dim resetCheck As Windows.Forms.CheckBox
     Public Sub New()
-        initParent()
 
         plot = New Plot_OverTime()
         plot.controlScale = True ' we are controlling the scale...
@@ -172,7 +169,6 @@ Public Class MiniPC_RotateSinglePass
     Inherits VBparent
     Dim peak As MiniPC_Rotate
     Public Sub New()
-        initParent()
         peak = New MiniPC_Rotate
         peak.angleY = -90
         task.desc = "Same operation as MiniPC_RotateAngle but in a single pass."

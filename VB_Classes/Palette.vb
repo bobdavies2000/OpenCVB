@@ -6,7 +6,6 @@ Public Class Palette_Basics
     Public whitebackground As Boolean
     Public gradientColorMap As New cv.Mat
     Public Sub New()
-        initParent()
         task.desc = "Apply the different color maps in OpenCV - Painterly Effect"
         ' task.rank = 3
     End Sub
@@ -38,7 +37,6 @@ End Class
 Public Class Palette_Color
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "blue", 0, 255, msRNG.Next(0, 255))
@@ -69,7 +67,6 @@ Public Class Palette_LinearPolar
     Inherits VBparent
     Public rotateOptions As GetRotationMatrix2D_Options
     Public Sub New()
-        initParent()
         task.desc = "Use LinearPolar to create gradient image"
 		' task.rank = 1
         rotateOptions = New GetRotationMatrix2D_Options
@@ -155,7 +152,6 @@ Public Class Palette_Reduction
     Inherits VBparent
     Dim reduction As Reduction_Basics
     Public Sub New()
-        initParent()
         reduction = New Reduction_Basics()
         reduction.radio.check(0).Checked = True
         reduction.radio.check(2).Enabled = False ' must have some reduction for this to work...
@@ -243,7 +239,6 @@ Public Class Palette_DrawTest
     Inherits VBparent
     Dim draw As Draw_Shapes
     Public Sub New()
-        initParent()
         task.palette.whitebackground = True
         draw = New Draw_Shapes()
 
@@ -267,7 +262,6 @@ Public Class Palette_Gradient
     Public color1 As cv.Scalar
     Public color2 As cv.Scalar
     Public Sub New()
-        initParent()
         label2 = "From and To colors"
         task.desc = "Create gradient image"
 		' task.rank = 1
@@ -305,7 +299,6 @@ Public Class Palette_RandomColorMap
     Public gradientColorMap As New cv.Mat
     Public transitionCount As Integer = -1
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Number of color transitions (Used only with Random)", 1, 255, 180)
@@ -345,7 +338,6 @@ Public Class Palette_DepthColorMap
     Inherits VBparent
     Dim gradientColorMap As New cv.Mat
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -392,7 +384,6 @@ Public Class Palette_ObjectColors
     Dim reduction As Reduction_KNN_Color
     Public gray As cv.Mat
     Public Sub New()
-        initParent()
 
         reduction = New Reduction_KNN_Color()
 
@@ -453,7 +444,6 @@ Public Class Palette_Layout2D
     Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
         Dim widthSlider = findSlider("ThreadGrid Width")
         Dim heightslider = findSlider("ThreadGrid Height")
@@ -485,7 +475,6 @@ Public Class Palette_LeftRightImages
     Inherits VBparent
     Dim lrViews As LeftRightView_Basics
     Public Sub New()
-        initParent()
         lrViews = New LeftRightView_Basics
         Dim brightSlider = findSlider("Infrared Brightness")
         brightSlider.Value = 0

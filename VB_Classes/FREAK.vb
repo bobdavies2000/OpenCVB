@@ -5,7 +5,6 @@ Public Class FREAK_Basics
     Inherits VBparent
     Dim orb As ORB_Basics
     Public Sub New()
-        initParent()
         orb = New ORB_Basics()
         task.desc = "Find keypoints using ORB and FREAK algorithm"
 		' task.rank = 1

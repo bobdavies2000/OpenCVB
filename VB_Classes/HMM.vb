@@ -21,7 +21,6 @@ Public Class HMM_Example_CPP
     Inherits VBparent
     Dim HMM As IntPtr = 0
     Public Sub New()
-        initParent()
         If task.parms.testAllRunning = False Then HMM = HMM_Open()
         label1 = "Text output with explanation will appear in the Visual Studio output."
         task.desc = "Simple test of Hidden Markov Model - text output"

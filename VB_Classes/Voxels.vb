@@ -5,7 +5,6 @@ Public Class Voxels_Basics_MT
     Public voxels(1) As Single
     Public voxelMat As cv.Mat
     Public Sub New()
-        initParent()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
             check.Box(0).Text = "Display intermediate results"

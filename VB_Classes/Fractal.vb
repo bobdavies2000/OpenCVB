@@ -11,7 +11,6 @@ Public Class Fractal_Mandelbrot
     Public incrX As Single
     Public incrY As Single
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Mandelbrot iterations", 1, 50, 34)
@@ -55,7 +54,6 @@ Public Class Fractal_Mandelbrot_MT
     Inherits VBparent
     Dim mandel As Fractal_Mandelbrot
     Public Sub New()
-        initParent()
         mandel = New Fractal_Mandelbrot()
         task.desc = "Run a multi-threaded version of the Mandalbrot algorithm"
 		' task.rank = 1
@@ -80,7 +78,6 @@ Public Class Fractal_MandelbrotZoom
     Inherits VBparent
     Public mandel As Fractal_Mandelbrot
     Public Sub New()
-        initParent()
         mandel = New Fractal_Mandelbrot()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
@@ -132,7 +129,6 @@ Public Class Fractal_MandelbrotZoomColor
     Inherits VBparent
     Public mandel As Fractal_MandelbrotZoom
     Public Sub New()
-        initParent()
         mandel = New Fractal_MandelbrotZoom()
         task.desc = "Classic Mandelbrot in color"
         ' task.rank = 1
@@ -160,7 +156,6 @@ Public Class Fractal_Julia
     Dim rt As Double = 0.282
     Dim mt As Double = -0.58
     Public Sub New()
-        initParent()
         mandel = New Fractal_MandelbrotZoomColor()
         label2 = "Mouse selects different Julia Sets - zoom for detail"
         task.desc = "Build Julia set from any point in the Mandelbrot fractal"

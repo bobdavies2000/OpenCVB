@@ -7,7 +7,6 @@ Public Class IMU_Basics
     Public theta As cv.Point3f ' this is the description - x, y, and z - of the axes centered in the camera.
     Public gyroAngle As cv.Point3f ' this is the orientation of the gyro.
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
@@ -62,7 +61,6 @@ Public Class IMU_Stabilizer
     Inherits VBparent
     Dim kalman As Kalman_Basics
     Public Sub New()
-        initParent()
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(3 - 1)
         task.desc = "Stabilize the image with the IMU data."
@@ -113,7 +111,6 @@ Public Class IMU_Magnetometer
     Inherits VBparent
     Public plot As Plot_OverTime
     Public Sub New()
-        initParent()
         plot = New Plot_OverTime()
         plot.dst1 = dst2
         plot.maxScale = 10
@@ -143,7 +140,6 @@ End Class
 Public Class IMU_Barometer
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Get the barometric pressure from the IMU (if available)"
 		' task.rank = 1
     End Sub
@@ -163,7 +159,6 @@ End Class
 Public Class IMU_Temperature
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Get the temperature of the IMU (if available)"
 		' task.rank = 1
     End Sub
@@ -182,7 +177,6 @@ Public Class IMU_FrameTime
     Public CPUInterval As Double
     Public IMUtoCaptureEstimate As Double
     Public Sub New()
-        initParent()
         plot = New Plot_OverTime()
         plot.dst1 = dst2
         plot.maxScale = 150
@@ -281,7 +275,6 @@ Public Class IMU_HostFrameTimes
     Public CPUInterval As Double
     Public HostInterruptDelayEstimate As Double
     Public Sub New()
-        initParent()
         plot = New Plot_OverTime()
         plot.dst1 = dst2
         plot.maxScale = 150
@@ -368,7 +361,6 @@ Public Class IMU_TotalDelay
     Dim plot As Plot_OverTime
     Dim kalman As Kalman_Single
     Public Sub New()
-        initParent()
 
         host = New IMU_HostFrameTimes()
         imu = New IMU_FrameTime()
@@ -441,7 +433,6 @@ Public Class IMU_GVector
     Inherits VBparent
     Public kalman As Kalman_Basics
     Public Sub New()
-        initParent()
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(6 - 1)
 
@@ -544,7 +535,6 @@ Public Class IMU_isCameraLevel
     Public cameraLevel As Boolean
     Dim flow As Font_FlowText
     Public Sub New()
-        initParent()
         If standalone Then flow = New Font_FlowText()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 1)
@@ -587,7 +577,6 @@ Public Class IMU_IscameraStable
     Inherits VBparent
     Dim flow As Font_FlowText
     Public Sub New()
-        initParent()
         task.callTrace.Clear() ' special line to clear the tree view otherwise this common option is standalone.
         standalone = False
         task.desc = "Answer the question: Is the camera stable?"

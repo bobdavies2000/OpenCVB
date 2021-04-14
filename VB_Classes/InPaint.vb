@@ -5,7 +5,6 @@ Imports cv = OpenCvSharp
 Public Class InPaint_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Thickness", 1, 25, 2)
@@ -43,7 +42,6 @@ Public Class InPaint_Noise
     Inherits VBparent
     Dim noise As Draw_Noise
     Public Sub New()
-        initParent()
         noise = New Draw_Noise()
 
         If findfrm(caller + " Radio Options") Is Nothing Then

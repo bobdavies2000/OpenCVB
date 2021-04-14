@@ -12,7 +12,6 @@ Public Class Gabor_Basics
     Public gamma As Double
     Public phaseOffset As Double
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 6)
@@ -51,7 +50,6 @@ Public Class Gabor_Basics_MT
     Dim grid As Thread_Grid
     Dim gabor(31) As Gabor_Basics
     Public Sub New()
-        initParent()
         label2 = "The 32 kernels used"
         grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")

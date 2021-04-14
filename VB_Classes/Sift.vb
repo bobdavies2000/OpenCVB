@@ -7,7 +7,6 @@ Public Class Sift_Basics
     Dim siftCS As New CS_SiftBasics
     Dim lrView As LeftRightView_BrightnessContrast
     Public Sub New()
-        initParent()
         lrView = New LeftRightView_BrightnessContrast
 
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -50,7 +49,6 @@ Public Class Sift_Basics_MT
     Dim lrView As LeftRightView_BrightnessContrast
     Dim numPointSlider As System.Windows.Forms.TrackBar
     Public Sub New()
-        initParent()
         lrView = New LeftRightView_BrightnessContrast
 
         grid = New Thread_Grid

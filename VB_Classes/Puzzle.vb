@@ -226,7 +226,6 @@ Public Class Puzzle_Basics
     Dim gridWidthSlider As System.Windows.Forms.TrackBar
     Dim gridHeightSlider As System.Windows.Forms.TrackBar
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
         gridWidthSlider = findSlider("ThreadGrid Width")
         gridHeightSlider = findSlider("ThreadGrid Height")
@@ -283,7 +282,6 @@ Public Class Puzzle_Solver
     Dim usedList As New List(Of Integer)
     Dim fitlist As New List(Of bestFit)
     Public Sub New()
-        initParent()
         puzzle = New Puzzle_Basics()
 
         If findfrm(caller + " Radio Options") Is Nothing Then

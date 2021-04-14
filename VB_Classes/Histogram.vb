@@ -7,7 +7,6 @@ Public Class Histogram_Basics
     Public plotHist As Plot_Histogram
     Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
     Public Sub New()
-        initParent()
         plotHist = New Plot_Histogram()
         plotHist.minRange = 0
 
@@ -28,7 +27,7 @@ Public Class Histogram_Basics
         task.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static splitIndex = -1
         Static colorName As String
         If standalone Or task.intermediateReview = caller Then
@@ -93,7 +92,6 @@ Public Class Histogram_Graph
     Public plotRequested As Boolean
     Public plotColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Histogram Bins", 2, 256, 50)
@@ -102,7 +100,7 @@ Public Class Histogram_Graph
         task.desc = "Plot histograms for up to 3 channels."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static histBinSlider = findSlider("Histogram Bins")
         bins = histBinSlider.Value
 
@@ -221,7 +219,6 @@ Public Class Histogram_NormalizeGray
     Inherits VBparent
     Public histogram As Histogram_Basics
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
@@ -238,7 +235,7 @@ Public Class Histogram_NormalizeGray
         task.desc = "Create a histogram of a normalized image"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If check.Box(0).Checked Then
             cv.Cv2.Normalize(src, src, sliders.trackbar(0).Value, sliders.trackbar(1).Value, cv.NormTypes.MinMax) ' only minMax is working...
         End If
@@ -259,7 +256,6 @@ Public Class Histogram_2D_HueSaturation
     Public hsv As cv.Mat
 
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Hue bins", 1, 180, 30) ' quantize hue to 30 levels
@@ -268,7 +264,7 @@ Public Class Histogram_2D_HueSaturation
         task.desc = "Create a histogram for hue and saturation."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         hsv = src.CvtColor(cv.ColorConversionCodes.RGB2HSV)
         Dim hbins = sliders.trackbar(0).Value
         Dim sbins = sliders.trackbar(1).Value
@@ -293,7 +289,6 @@ Public Class Histogram_2D_XZ_YZ
     Dim minSlider As Windows.Forms.TrackBar
     Dim maxSlider As Windows.Forms.TrackBar
     Public Sub New()
-        initParent()
         xyz = New Mat_ImageXYZ_MT
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -306,7 +301,7 @@ Public Class Histogram_2D_XZ_YZ
         ' task.rank = 1
         label2 = "Left is XZ (Top View) and Right is YZ (Side View)"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim xbins = sliders.trackbar(0).Value
         Dim ybins = sliders.trackbar(1).Value
         Dim zbins = sliders.trackbar(2).Value
@@ -343,7 +338,6 @@ Public Class Histogram_EqualizeColor
     Public displayHist As Boolean = False
     Public channel = 2
     Public Sub New()
-        initParent()
         kalmanEq = New Histogram_Basics
         kalman = New Histogram_Basics
 
@@ -356,7 +350,7 @@ Public Class Histogram_EqualizeColor
         ' task.rank = 1
         label1 = "Image Enhanced with Equalized Histogram"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         Dim rgb(2) As cv.Mat
         Dim rgbEq(2) As cv.Mat
@@ -395,7 +389,6 @@ Public Class Histogram_EqualizeGray
     Public histogramEq As Histogram_Basics
     Public histogram As Histogram_Basics
     Public Sub New()
-        initParent()
         histogramEq = New Histogram_Basics
 
         histogram = New Histogram_Basics
@@ -405,7 +398,7 @@ Public Class Histogram_EqualizeGray
         task.desc = "Create an equalized histogram of the grayscale image."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         Static binSlider = findSlider("Histogram Bins")
         binSlider.Value = histogramEq.sliders.trackbar(0).Value
@@ -428,7 +421,6 @@ Public Class Histogram_Equalize255
     Inherits VBparent
     Dim eqHist As Histogram_EqualizeColor
     Public Sub New()
-        initParent()
 
         eqHist = New Histogram_EqualizeColor()
         Static binSlider = findSlider("Histogram Bins")
@@ -447,7 +439,7 @@ Public Class Histogram_Equalize255
         task.desc = "Reproduce the results of the hist.py example with existing algorithms"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         For i = 0 To 3 - 1
             If radio.check(i).Checked Then eqHist.channel = i
         Next
@@ -465,7 +457,6 @@ Public Class Histogram_Simple
     Inherits VBparent
     Public plotHist As Plot_Histogram
     Public Sub New()
-        initParent()
         plotHist = New Plot_Histogram()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -476,7 +467,7 @@ Public Class Histogram_Simple
         task.desc = "Build a simple and reusable histogram for grayscale images."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         plotHist.bins = sliders.trackbar(0).Value
 
@@ -505,7 +496,6 @@ Public Class Histogram_ColorsAndGray
     Dim histogram As Histogram_Basics
     Dim mats As Mat_4to1
     Public Sub New()
-        initParent()
         mats = New Mat_4to1()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -526,7 +516,7 @@ Public Class Histogram_ColorsAndGray
         task.desc = "Create a histogram of a normalized image"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         task.useKalman = False
         Dim split = src.Split()
         ReDim Preserve split(4 - 1)
@@ -556,7 +546,6 @@ Public Class Histogram_BackProjectionPeak
     Inherits VBparent
     Dim hist As Histogram_Basics
     Public Sub New()
-        initParent()
 
         hist = New Histogram_Basics
 
@@ -564,7 +553,7 @@ Public Class Histogram_BackProjectionPeak
         ' task.rank = 1
         label2 = "Grayscale Histogram"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         task.useKalman = False
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.Run(src)
@@ -602,7 +591,6 @@ Public Class Histogram_BackProjection2D
     Inherits VBparent
     Dim hist As Histogram_2D_HueSaturation
     Public Sub New()
-        initParent()
 
         hist = New Histogram_2D_HueSaturation()
 
@@ -611,7 +599,7 @@ Public Class Histogram_BackProjection2D
         label1 = "X-axis is Hue, Y-axis is Sat.  Draw rectangle to isolate ranges"
         label2 = "Backprojection of detected hue and saturation."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         hist.Run(src)
         dst1 = hist.dst1
         Static hueBins = hist.sliders.trackbar(0).Value
@@ -664,7 +652,6 @@ Public Class Histogram_HueSaturation2DPlot
     Dim hist2d As Histogram_BackProjection2D
     Dim mats As Mat_4to1
     Public Sub New()
-        initParent()
 
         hueSat = New PhotoShop_Hue()
         hist2d = New Histogram_BackProjection2D()
@@ -673,7 +660,7 @@ Public Class Histogram_HueSaturation2DPlot
         task.desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         hueSat.Run(src)
         mats.mat(0) = hueSat.dst1
         mats.mat(1) = hueSat.dst2
@@ -709,7 +696,6 @@ Public Class Histogram_TopData
     Dim IntelBug As Boolean
     Public resizeHistOutput As Boolean = True
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -725,7 +711,7 @@ Public Class Histogram_TopData
         ' task.rank = 1
     End Sub
 
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         gCloud.Run(src)
 
         Static minSlider = findSlider("X scale negative value in meters (meterMin) X100")
@@ -760,7 +746,6 @@ Public Class Histogram_SideData
     Dim kalman As Kalman_Basics
     Public resizeHistOutput As Boolean = True
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -773,7 +758,7 @@ Public Class Histogram_SideData
         task.desc = "Create a 2D side view for ZY histogram of depth in meters - NOTE: x and y scales differ!"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         gCloud.Run(src)
 
         Static minSlider = findSlider("Y scale negative value in meters (meterMin) X100")
@@ -804,7 +789,6 @@ Public Class Histogram_SmoothTopView2D
     Dim cmat As PointCloud_ColorizeTop
     Dim stable As Motion_MinMaxPointCloud
     Public Sub New()
-        initParent()
 
         cmat = New PointCloud_ColorizeTop
         topView = New Histogram_TopView2D
@@ -815,7 +799,7 @@ Public Class Histogram_SmoothTopView2D
         task.desc = "Create a 2D top view with stable depth data."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         topView.gCloud.Run(src)
 
         stable.Run(topView.gCloud.dst1)
@@ -846,7 +830,6 @@ Public Class Histogram_SmoothSideView2D
     Dim cmat As PointCloud_ColorizeSide
     Dim stable As Motion_MinMaxPointCloud
     Public Sub New()
-        initParent()
 
         cmat = New PointCloud_ColorizeSide
         sideView = New Histogram_SideView2D
@@ -857,7 +840,7 @@ Public Class Histogram_SmoothSideView2D
         task.desc = "Create a 2D side view of stable depth data"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         sideView.gCloud.Run(src)
 
         stable.Run(sideView.gCloud.dst1)
@@ -886,7 +869,6 @@ Public Class Histogram_StableDepthClusters
     Dim clusters As Histogram_DepthClusters
     Dim motionSD As Motion_MinMaxDepth
     Public Sub New()
-        initParent()
 
         clusters = New Histogram_DepthClusters
         motionSD = New Motion_MinMaxDepth
@@ -895,7 +877,7 @@ Public Class Histogram_StableDepthClusters
         task.desc = "Use the stable depth to identify the depth_clusters using histogram valleys"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         motionSD.Run(src)
         clusters.Run(motionSD.dst1)
         dst1 = clusters.dst1
@@ -922,7 +904,6 @@ Public Class Histogram_TopView2D
     Public cmat As PointCloud_ColorizeTop
     Public resizeHistOutput As Boolean = True
     Public Sub New()
-        initParent()
 
         cmat = New PointCloud_ColorizeTop
         gCloud = New Depth_PointCloud_IMU
@@ -931,7 +912,7 @@ Public Class Histogram_TopView2D
         task.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
         gCloud.Run(src) ' when displaying both top and side views, the gcloud run has already been done.
@@ -968,7 +949,6 @@ Public Class Histogram_SideView2D
     Public frustrumAdjust As Single
     Public resizeHistOutput As Boolean = True
     Public Sub New()
-        initParent()
 
         cmat = New PointCloud_ColorizeSide
         gCloud = New Depth_PointCloud_IMU
@@ -977,7 +957,7 @@ Public Class Histogram_SideView2D
         task.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         gCloud.Run(src)
 
@@ -1010,7 +990,6 @@ Public Class Histogram_BackProjectionGrayscale
     Public histIndex As Integer
     Public binSlider As Windows.Forms.TrackBar
     Public Sub New()
-        initParent()
         hist = New Histogram_Basics
         binSlider = findSlider("Histogram Bins")
         binSlider.Value = 10
@@ -1019,7 +998,7 @@ Public Class Histogram_BackProjectionGrayscale
         task.desc = "Explore Backprojection of each element of a grayscale histogram."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         hist.Run(src)
         dst1 = hist.dst1
 
@@ -1050,13 +1029,12 @@ Public Class Histogram_ViewIntersections
     Inherits VBparent
     Dim histCO As Histogram_ViewObjects
     Public Sub New()
-        initParent()
         histCO = New Histogram_ViewObjects
         label1 = "Yellow is largest intersection.  dst2 = point cloud"
         task.desc = "Find the intersections of the rectangles found in the Histogram_ConcentrationObjects"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         histCO.Run(src)
         dst1 = histCO.dst2
@@ -1130,7 +1108,6 @@ Public Class Histogram_ViewObjects
     Public side2D As New List(Of cv.Rect)
     Public top2D As New List(Of cv.Rect)
     Public Sub New()
-        initParent()
 
         flood = New FloodFill_Basics
         histC = New Histogram_ViewConcentrationsTopX
@@ -1149,7 +1126,7 @@ Public Class Histogram_ViewObjects
         task.desc = "Use the histogram concentrations to identify objects in the field of view"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         histC.Run(src)
 
@@ -1203,7 +1180,6 @@ Public Class Histogram_SmoothConcentration
     Public topview As Histogram_SmoothTopView2D
     Dim concent As Histogram_ViewConcentrationsTopX
     Public Sub New()
-        initParent()
 
         sideview = New Histogram_SmoothSideView2D
         topview = New Histogram_SmoothTopView2D
@@ -1212,7 +1188,7 @@ Public Class Histogram_SmoothConcentration
         task.desc = "Using stable depth data, highlight the histogram projections where concentrations are highest"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         sideview.Run(src)
         dst1 = sideview.dst1
         Dim noDepth = sideview.sideView.histOutput.Get(Of Single)(sideview.sideView.histOutput.Height / 2, 0)
@@ -1238,7 +1214,6 @@ Public Class Histogram_ViewConcentrationsTopX
     Public sideview As Histogram_SideView2D
     Public topview As Histogram_TopView2D
     Public Sub New()
-        initParent()
 
         sideview = New Histogram_SideView2D
         topview = New Histogram_TopView2D
@@ -1284,7 +1259,7 @@ Public Class Histogram_ViewConcentrationsTopX
         Dim maxConcentration = If(pts.Count > 0, pts.ElementAt(0).Key, 0)
         Return CStr(pts.Count) + " highlights. Max=" + CStr(maxConcentration)
     End Function
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         sideview.Run(src)
         dst1 = sideview.dst1
         Dim noDepth = sideview.histOutput.Get(Of Single)(sideview.histOutput.Height / 2, 0)
@@ -1316,12 +1291,11 @@ Public Class Histogram_DepthClusters
     Inherits VBparent
     Public valleys As Histogram_DepthValleys
     Public Sub New()
-        initParent()
         valleys = New Histogram_DepthValleys()
         task.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         If src.Type <> cv.MatType.CV_32F Then src = task.depth32f.Clone
 
@@ -1360,7 +1334,6 @@ Public Class Histogram_Frustrum
     Dim top2d As Histogram_TopView2D
     Dim side2d As Histogram_SideView2D
     Public Sub New()
-        initParent()
 
         top2d = New Histogram_TopView2D
         side2d = New Histogram_SideView2D
@@ -1385,7 +1358,7 @@ Public Class Histogram_Frustrum
         task.desc = "The global options for the side and top view.  See OptionCommon_Histogram to make settings permanent."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         top2d.Run(src)
         dst1 = top2d.dst2
@@ -1418,7 +1391,6 @@ Public Class Histogram_Depth
     Inherits VBparent
     Public plotHist As Plot_Histogram
     Public Sub New()
-        initParent()
         plotHist = New Plot_Histogram()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -1429,7 +1401,7 @@ Public Class Histogram_Depth
         task.desc = "Show depth data as a histogram."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         plotHist.minRange = 1 ' task.minDepth
         plotHist.maxRange = task.maxDepth
@@ -1463,7 +1435,6 @@ Public Class Histogram_DepthValleys
     Public grayOnly As Boolean
     Dim histSlider As Windows.Forms.TrackBar
     Public Sub New()
-        initParent()
         hist = New Histogram_Depth()
 
         histSlider = findSlider("Histogram Depth Bins")

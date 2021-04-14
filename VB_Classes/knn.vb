@@ -8,7 +8,6 @@ Public Class KNN_Basics
     Public currSet As New List(Of cv.Point2f)
     Dim random As Random_Basics
     Public Sub New()
-        initParent()
 
         random = New Random_Basics
         label1 = "White=TrainingData, Red=queries"
@@ -62,7 +61,6 @@ Public Class KNN_BasicsQT
     Public knn As cv.ML.KNearest
     Public knnQT As KNN_Options
     Public Sub New()
-        initParent()
 
         knnQT = New KNN_Options()
         If standalone Then knnQT.useRandomData = True
@@ -120,7 +118,6 @@ Public Class KNN_Options
     Public randomQuery As Random_Basics
     Public useRandomData As Boolean
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -189,7 +186,6 @@ Public Class KNN_1_to_1
     Public unmatchedPoints As New List(Of cv.Point2f)
     Public basics As KNN_BasicsQT
     Public Sub New()
-        initParent()
 
         basics = New KNN_BasicsQT()
         If standalone Then basics.knnQT.useRandomData = True
@@ -271,7 +267,6 @@ Public Class KNN_Emax
     Public knn As KNN_1_to_1
     Dim emax As EMax_Centroids
     Public Sub New()
-        initParent()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 3)
             check.Box(0).Text = "Map queries to training data 1:1 (Off means many:1)"
@@ -321,7 +316,6 @@ Public Class KNN_Test
     Public grid As Thread_Grid
     Dim knn As KNN_BasicsQT
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -368,7 +362,6 @@ Public Class KNN_Test_1_to_1
     Public grid As Thread_Grid
     Dim knn As KNN_1_to_1
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -416,7 +409,6 @@ Public Class KNN_Point3d
     Public responseSet() As Integer
     Public lastSet() As cv.Point3f ' default usage: find and connect points in 2D for this number of points.
     Public Sub New()
-        initParent()
         kOptions = New KNN_Options
         task.desc = "Use KNN to connect 3D points.  Results shown are a 2D projection of the 3D results."
         ' task.rank = 1
@@ -495,7 +487,6 @@ Public Class KNN_DepthClusters
     Public flood As FloodFill_Palette
     Public pTrack As KNN_PointTracker
     Public Sub New()
-        initParent()
 
         flood = New FloodFill_Palette()
         blobs = New Blob_DepthClusters()
@@ -530,7 +521,6 @@ Public Class KNN_SmoothAverage
     Dim knn As KNN_DepthClusters
     Dim lastinput As New cv.Mat
     Public Sub New()
-        initParent()
         knn = New KNN_DepthClusters()
         Dim drawCheckbox = findCheckBox("Draw rectangle and centroid for each mask")
         drawCheckbox.Checked = False
@@ -573,7 +563,6 @@ Public Class KNN_StabilizeRegions
     Public flood As FloodFill_Palette
     Dim lastinput As New cv.Mat
     Public Sub New()
-        initParent()
         knn = New KNN_DepthClusters()
         Dim drawCheckbox = findCheckBox("Draw rectangle and centroid for each mask")
         drawCheckbox.Checked = False
@@ -610,7 +599,6 @@ Public Class KNN_Contours
     Dim outline As Contours_Depth
     Dim knn As KNN_BasicsQT
     Public Sub New()
-        initParent()
         outline = New Contours_Depth()
         knn = New KNN_BasicsQT()
         task.desc = "Use KNN to streamline the outline of a contour"
@@ -662,7 +650,6 @@ Public Class KNN_Cluster2DCities
     Dim numberOfCities As Integer
     Dim closedRegions As Integer
     Public Sub New()
-        initParent()
         knn = New KNN_Point2d()
 
         label1 = ""
@@ -751,7 +738,6 @@ Public Class KNN_Point2d
     Public knn As KNN_BasicsQT
     Public responseSet() As Integer
     Public Sub New()
-        initParent()
 
         knn = New KNN_BasicsQT()
         If standalone Then knn.knnQT.useRandomData = True
@@ -805,7 +791,6 @@ Public Class KNN_Learn
     Public trainingPoints As New List(Of cv.Point2f)
     Public knn As cv.ML.KNearest
     Public Sub New()
-        initParent()
         knn = cv.ML.KNearest.Create()
         task.desc = "Learn from a set of training points.  The calling user can then use FindNearest on the knn"
 		' task.rank = 1
@@ -871,7 +856,6 @@ Public Class KNN_PointTracker
     Public floodPoints As New List(Of cv.Point)
     Public drawRC As Draw_ViewObjects
     Public Sub New()
-        initParent()
         If standalone Then topView = New PointCloud_Kalman_TopView()
 
         drawRC = New Draw_ViewObjects
@@ -1020,7 +1004,6 @@ Public Class KNN_1_to_1FIFO
     Public knn As cv.ML.KNearest
     Dim random As Random_Basics
     Public Sub New()
-        initParent()
 
         random = New Random_Basics
         random.rangeRect = New cv.Rect(0, 0, dst1.Width, dst1.Height)

@@ -7,7 +7,6 @@ Public Class Clone_Basics
     Public textureFlatteningValues As cv.Vec2f
     Public cloneSpec As Integer ' 0 is colorchange, 1 is illuminationchange, 2 is textureflattening
     Public Sub New()
-        initParent()
 
         label1 = "Clone result - draw anywhere to clone a region"
         label2 = "Clone Region Mask"
@@ -43,7 +42,6 @@ Public Class Clone_ColorChange
     Inherits VBparent
     Dim clone As Clone_Basics
     Public Sub New()
-        initParent()
         clone = New Clone_Basics()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -73,7 +71,6 @@ Public Class Clone_IlluminationChange
     Inherits VBparent
     Dim clone As Clone_Basics
     Public Sub New()
-        initParent()
         clone = New Clone_Basics()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -103,7 +100,6 @@ Public Class Clone_TextureFlattening
     Inherits VBparent
     Dim clone As Clone_Basics
     Public Sub New()
-        initParent()
         clone = New Clone_Basics()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -141,7 +137,6 @@ Public Class Clone_Eagle
     Dim maskROI As cv.Rect
     Dim pt As cv.Point
     Public Sub New()
-        initParent()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)
             radio.check(0).Text = "Seamless - Mixed Clone"
@@ -196,7 +191,6 @@ End Class
 Public Class Clone_Seamless
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)
             radio.check(0).Text = "Seamless Normal Clone"

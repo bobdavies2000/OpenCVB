@@ -3,7 +3,6 @@ Imports System.Runtime.InteropServices
 Public Class Depth_Flatland
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Region Count", 1, 250, 10)
@@ -26,7 +25,6 @@ End Class
 Public Class Depth_FirstLastDistance
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Monitor the first and last depth distances"
         ' task.rank = 1
     End Sub
@@ -50,7 +48,6 @@ Public Class Depth_HolesRect
     Inherits VBparent
     Dim shadow As Depth_Holes
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "shadowRect Min Size", 1, 20000, 2000)
@@ -94,7 +91,6 @@ End Class
 Public Class Depth_FlatData
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "FlatData Region Count", 1, 250, 200)
@@ -149,7 +145,6 @@ Public Class Depth_MeanStdev_MT
     Dim grid As Thread_Grid
     Dim meanSeries As New cv.Mat
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -236,7 +231,6 @@ Public Class Depth_MeanStdevPlot
     Dim plot1 As Plot_OverTime
     Dim plot2 As Plot_OverTime
     Public Sub New()
-        initParent()
 
         plot1 = New Plot_OverTime()
         plot1.dst1 = dst1
@@ -280,7 +274,6 @@ Public Class Depth_Uncertainty
     Inherits VBparent
     Dim retina As Retina_Basics_CPP
     Public Sub New()
-        initParent()
         retina = New Retina_Basics_CPP()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -307,7 +300,6 @@ Public Class Depth_Palette
     Inherits VBparent
     Dim customColorMap As New cv.Mat
     Public Sub New()
-        initParent()
 
         customColorMap = colorTransition(cv.Scalar.Blue, cv.Scalar.Yellow, 256)
         task.desc = "Use a palette to display depth from the raw depth data."
@@ -373,7 +365,6 @@ Public Class Depth_Colorizer_CPP
     Inherits VBparent
     Dim dcPtr As IntPtr
     Public Sub New()
-        initParent()
         dcPtr = Depth_Colorizer_Open()
         task.desc = "Display Depth image using C++ instead of VB.Net"
         ' task.rank = 1
@@ -405,7 +396,6 @@ Public Class Depth_ColorizerFastFade_CPP
     Inherits VBparent
     Dim dcPtr As IntPtr
     Public Sub New()
-        initParent()
         dcPtr = Depth_Colorizer2_Open()
         label2 = "No depth mask from Depth_InRange"
         task.desc = "Display depth data with InRange.  Higher contrast than others - yellow to blue always present."
@@ -441,7 +431,6 @@ End Class
 Public Class Depth_ColorizerVB
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Colorize depth manually."
         ' task.rank = 1
     End Sub
@@ -489,7 +478,6 @@ Public Class Depth_ColorizerVB_MT
     Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Min Depth", 0, 1000, 0)
@@ -558,7 +546,6 @@ Public Class Depth_Colorizer_MT
     Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
         task.desc = "Colorize normally uses CDF to stabilize the colors.  Just using sliders here - stabilized but not optimal range."
         ' task.rank = 1
@@ -603,7 +590,6 @@ Public Class Depth_LocalMinMax_MT
     Public minPoint(0) As cv.Point2f
     Public maxPoint(0) As cv.Point2f
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
 
         label1 = "Red is min distance, blue is max distance"
@@ -648,7 +634,6 @@ Public Class Depth_LocalMinMax_Kalman_MT
     Dim kalman As Kalman_Basics
     Public grid As Thread_Grid
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -715,7 +700,6 @@ End Class
 Public Class Depth_ColorMap
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Depth ColorMap Alpha X100", 1, 100, 5)
@@ -745,7 +729,6 @@ Public Class Depth_NotMissing
     Inherits VBparent
     Public mog As BGSubtract_Basics_CPP
     Public Sub New()
-        initParent()
 
         mog = New BGSubtract_Basics_CPP()
 
@@ -775,7 +758,6 @@ Public Class Depth_Median
     Inherits VBparent
     Dim median As Math_Median_CDF
     Public Sub New()
-        initParent()
         median = New Math_Median_CDF()
         median.rangeMax = 10000
         median.rangeMin = 1 ' ignore depth of zero as it is not known.
@@ -809,7 +791,6 @@ End Class
 Public Class Depth_SmoothingMat
     Inherits VBparent
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -848,7 +829,6 @@ Public Class Depth_Smoothing
     Public mats As Mat_4to1
     Public colorize As Depth_ColorMap
     Public Sub New()
-        initParent()
 
         colorize = New Depth_ColorMap()
         mats = New Mat_4to1()
@@ -892,7 +872,6 @@ Public Class Depth_Edges
     Inherits VBparent
     Dim edges As Edges_Laplacian
     Public Sub New()
-        initParent()
         edges = New Edges_Laplacian()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -918,7 +897,6 @@ Public Class Depth_HolesOverTime
     Inherits VBparent
     Dim recentImages As New List(Of cv.Mat)
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -953,7 +931,6 @@ Public Class Depth_Holes
     Public holeMask As New cv.Mat
     Dim element As New cv.Mat
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Amount of dilation of borderMask", 1, 10, 1)
@@ -988,7 +965,6 @@ Public Class Depth_WorldXYZ
     Inherits VBparent
     Public depthUnitsMeters = False
     Public Sub New()
-        initParent()
         label2 = "dst2 = pointcloud"
         task.desc = "Create 32-bit XYZ format from depth data (to slow to be useful.)"
         ' task.rank = 1
@@ -1022,7 +998,6 @@ Public Class Depth_WorldXYZ_MT
     Dim grid As Thread_Grid
     Public depthUnitsMeters = False
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
         label2 = "dst2 = pointcloud"
         task.desc = "Create OpenGL point cloud from depth data (slow)"
@@ -1065,7 +1040,6 @@ Public Class Depth_Foreground
     Public blobLocation As New List(Of cv.Point)
     Public maxIndex As Integer
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -1123,7 +1097,6 @@ Public Class Depth_ForegroundOverTime
     Inherits VBparent
     Dim fore As Depth_Foreground
     Public Sub New()
-        initParent()
         fore = New Depth_Foreground
         label1 = "Pixels that are consistently present"
         label2 = "Latest foreground frame"
@@ -1165,7 +1138,6 @@ Public Class Depth_InRange
     Public noDepthMask As New cv.Mat
     Public depth32f As New cv.Mat
     Public Sub New()
-        initParent()
         label1 = "Depth values that are in-range"
         task.desc = "Show depth with OpenCV using varying min and max depths."
         ' task.rank = 1
@@ -1187,7 +1159,6 @@ Public Class Depth_LowQualityMask
     Inherits VBparent
     Dim dilate As DilateErode_Basics
     Public Sub New()
-        initParent()
 
         dilate = New DilateErode_Basics
         Dim ellipseRadio = findRadio("Dilate/Erode shape: Ellipse")
@@ -1218,7 +1189,6 @@ Public Class Depth_PunchDecreasing
     Public Increasing As Boolean
     Dim fore As Depth_Foreground
     Public Sub New()
-        initParent()
         fore = New Depth_Foreground
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -1255,7 +1225,6 @@ Public Class Depth_PunchIncreasing
     Inherits VBparent
     Public depth As Depth_PunchDecreasing
     Public Sub New()
-        initParent()
         depth = New Depth_PunchDecreasing
         depth.Increasing = True
         task.desc = "Identify where depth is increasing - retreating from the camera."
@@ -1278,7 +1247,6 @@ Public Class Depth_PunchBlob
     Dim depthInc As Depth_PunchDecreasing
     Dim contours As Contours_Basics
     Public Sub New()
-        initParent()
         contours = New Contours_Basics
         Dim areaSlider = findSlider("Contour minimum area")
         areaSlider.Value = 5000
@@ -1332,7 +1300,6 @@ Public Class Depth_SmoothSurfaces
     Dim histY As Histogram_Basics
     Dim mats As Mat_4to1
     Public Sub New()
-        initParent()
 
         mats = New Mat_4to1
         histX = New Histogram_Basics
@@ -1400,7 +1367,6 @@ Public Class Depth_PointCloud_IMU
     Public imu As IMU_GVector
     Public gMatrix(,) As Single
     Public Sub New()
-        initParent()
 
         imu = New IMU_GVector
 
@@ -1478,7 +1444,6 @@ Public Class Depth_SmoothAverage
     Dim dMax As Depth_SmoothMax
     Dim colorize As Depth_ColorizerFastFade_CPP
     Public Sub New()
-        initParent()
 
         colorize = New Depth_ColorizerFastFade_CPP
         dMin = New Depth_SmoothMin
@@ -1510,7 +1475,6 @@ Public Class Depth_SmoothMin
     Public motion As Motion_Basics
     Dim colorize As Depth_ColorizerFastFade_CPP
     Public Sub New()
-        initParent()
 
         colorize = New Depth_ColorizerFastFade_CPP
         motion = New Motion_Basics
@@ -1562,7 +1526,6 @@ Public Class Depth_SmoothMax
     Dim colorize As Depth_ColorizerFastFade_CPP
     Public stableMax As cv.Mat
     Public Sub New()
-        initParent()
 
         colorize = New Depth_ColorizerFastFade_CPP
         dMin = New Depth_SmoothMin
@@ -1618,7 +1581,6 @@ Public Class Depth_Averaging
     Public avg As Math_ImageAverage
     Public colorize As Depth_Colorizer_CPP
     Public Sub New()
-        initParent()
 
         avg = New Math_ImageAverage()
         colorize = New Depth_Colorizer_CPP()
@@ -1651,7 +1613,6 @@ Public Class Depth_SmoothMinMax
     Public dMax As Depth_SmoothMax
     Public resetAll As Boolean
     Public Sub New()
-        initParent()
         colorize = New Depth_ColorizerFastFade_CPP
         dMin = New Depth_SmoothMin
         dMax = New Depth_SmoothMax
@@ -1717,7 +1678,6 @@ Public Class Depth_AveragingStable
     Dim dAvg As Depth_Averaging
     Dim extrema As Depth_SmoothMinMax
     Public Sub New()
-        initParent()
         dAvg = New Depth_Averaging
         extrema = New Depth_SmoothMinMax
         Dim minMaxRadio = findRadio("Use farthest distance")
@@ -1753,7 +1713,6 @@ Public Class Depth_Fusion
     Inherits VBparent
     Dim dMax As Depth_SmoothMax
     Public Sub New()
-        initParent()
         dMax = New Depth_SmoothMax
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -1801,7 +1760,6 @@ Public Class Depth_Dilate
     Inherits VBparent
     Dim dilate As DilateErode_Basics
     Public Sub New()
-        initParent()
         dilate = New DilateErode_Basics
         task.desc = "Dilate the depth data to fill holes."
         ' task.rank = 1
@@ -1827,7 +1785,6 @@ Public Class Depth_ForegroundHead
     Public trustedRect As cv.Rect
     Public trustworthy As Boolean
     Public Sub New()
-        initParent()
         fgnd = New Depth_Foreground
         kalman = New Kalman_Basics()
 
@@ -1876,7 +1833,6 @@ End Class
 '    Inherits VBparent
 '    Dim noiseRemover As Depth_NoiseMask
 '    Public Sub New()
-'        initParent()
 '        noiseRemover = New Depth_NoiseMask
 '        If findfrm(caller + " Slider Options") Is Nothing Then
 '            sliders.Setup(caller)
@@ -1912,7 +1868,6 @@ Public Class Depth_Solid
     Inherits VBparent
     Public flood As Coherent_Palette
     Public Sub New()
-        initParent()
         flood = New Coherent_Palette()
         label1 = "Solid depth with noise removed"
         task.desc = "Show depth with and without the depth noise from being too close."

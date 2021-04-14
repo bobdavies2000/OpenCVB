@@ -12,7 +12,7 @@ Module VB_EditorMain
         Return line
     End Function
     Private Function deleteLine(line As String) As Boolean
-        If line.Contains("If task.intermediateReview = caller Then task.intermediateObject = Me") Then
+        If line.Contains("initParent()") Then
             Console.WriteLine("Deleting line: " + line)
             changeLines += 1
             Return True

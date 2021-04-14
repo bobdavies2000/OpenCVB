@@ -3,7 +3,6 @@ Public Class Threshold_LaplacianFilter
     Inherits VBparent
     Dim edges As Filter_Laplacian
     Public Sub New()
-        initParent()
         edges = New Filter_Laplacian()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

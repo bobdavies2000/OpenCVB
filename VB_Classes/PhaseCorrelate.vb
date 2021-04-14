@@ -12,7 +12,6 @@ Public Class PhaseCorrelate_Basics
     Public lastFrame As cv.Mat
     Public resetLastFrame As Boolean
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -84,7 +83,6 @@ Public Class PhaseCorrelate_BasicsTest
     Dim random As Stabilizer_BasicsRandomInput
     Dim stable As PhaseCorrelate_Basics
     Public Sub New()
-        initParent()
         stable = New PhaseCorrelate_Basics
         random = New Stabilizer_BasicsRandomInput
 
@@ -117,7 +115,6 @@ Public Class PhaseCorrelate_Depth
     Inherits VBparent
     Dim phaseC As PhaseCorrelate_Basics
     Public Sub New()
-        initParent()
         phaseC = New PhaseCorrelate_Basics
         task.desc = "Use phase correlation on the depth data"
 		' task.rank = 1
@@ -152,7 +149,6 @@ End Class
 Public Class PhaseCorrelate_HanningWindow
     Inherits VBparent
     Public Sub New()
-        initParent()
         label1 = "Looking down on a bell curve in 2 dimensions"
         task.desc = "Show what a Hanning window looks like"
 		' task.rank = 1

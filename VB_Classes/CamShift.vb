@@ -10,7 +10,6 @@ Public Class CamShift_Basics
     Inherits VBparent
     Public trackBox As New cv.RotatedRect
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -85,7 +84,6 @@ Public Class CamShift_Foreground
     Dim camshift As CamShift_Basics
     Dim fore As Depth_Foreground
     Public Sub New()
-        initParent()
         camshift = New CamShift_Basics()
         fore = New Depth_Foreground()
         label1 = "Automatically finding the head - top of nearest object"
@@ -122,7 +120,6 @@ Public Class Camshift_Object
     Dim blob As Blob_DepthClusters
     Dim camshift As CamShift_Basics
     Public Sub New()
-        initParent()
         blob = New Blob_DepthClusters()
 
         camshift = New CamShift_Basics()
@@ -162,7 +159,6 @@ Public Class Camshift_TopObjects
     Dim cams(4 - 1) As CamShift_Basics
     Dim mats As Mat_4to1
     Public Sub New()
-        initParent()
         mats = New Mat_4to1()
 
         blob = New Blob_DepthClusters()

@@ -3,7 +3,6 @@ Public Class Remap_Basics
     Inherits VBparent
     Public direction = 3 ' default to remap horizontally and vertically
     Public Sub New()
-        initParent()
         task.desc = "Use remap to reflect an image in 4 directions."
 		' task.rank = 1
     End Sub
@@ -47,7 +46,6 @@ Public Class Remap_Flip
     Inherits VBparent
     Public direction = 0
     Public Sub New()
-        initParent()
         task.desc = "Use flip to remap an image."
 		' task.rank = 1
     End Sub

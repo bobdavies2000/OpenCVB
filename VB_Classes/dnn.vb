@@ -9,7 +9,6 @@ Public Class DNN_Test
     Dim net As Net
     Dim classnames() As String
     Public Sub New()
-        initParent()
 
         Dim modelFile As New FileInfo(task.parms.homeDir + "Data/bvlc_googlenet.caffemodel")
         If File.Exists(modelFile.FullName) = False Then
@@ -54,7 +53,6 @@ Public Class DNN_Caffe_CS
     Inherits VBparent
     Dim caffeCS As New CS_Classes.DNN
     Public Sub New()
-        initParent()
         label2 = "Input Image"
         task.desc = "Download and use a Caffe database"
 		' task.rank = 1
@@ -89,7 +87,6 @@ Public Class DNN_Basics
     Dim classNames() = {"background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse",
                         "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"}
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "DNN Scale Factor", 1, 10000, 78)

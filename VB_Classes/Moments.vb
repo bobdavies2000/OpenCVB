@@ -8,7 +8,6 @@ Public Class Moments_Basics
     Public offsetPt As cv.Point
     Public kalman As Kalman_Basics
     Public Sub New()
-        initParent()
 
         If standalone Then foreground = New kMeans_Depth_FG_BG()
 
@@ -50,7 +49,6 @@ Public Class Moments_CentroidKalman
     Dim foreground As kMeans_Depth_FG_BG
     Dim kalman As Kalman_Basics
     Public Sub New()
-        initParent()
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(2 - 1) ' 2 elements - cv.point
 

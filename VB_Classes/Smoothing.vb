@@ -42,7 +42,6 @@ Public Class Smoothing_Exterior
 		Return spline
 	End Function
 	Public Sub New()
-		initParent()
 		hull = New Hull_Basics()
 		hull.sliders.trackbar(0).Minimum = 4 ' required minimum number of points for the algorithm.
 
@@ -122,7 +121,6 @@ Public Class Smoothing_Interior
 	End Function
 
 	Public Sub New()
-		initParent()
 		hull = New Hull_Basics()
 
 		Dim hullSlider = findSlider("Hull random points")
@@ -169,7 +167,6 @@ Public Class Smoothing_Contours
 	Dim smoothE As Smoothing_Exterior
 	Dim smoothI As Smoothing_Interior
 	Public Sub New()
-		initParent()
 		outline = New Contours_Depth()
 		smoothE = New Smoothing_Exterior()
 		smoothI = New Smoothing_Interior()

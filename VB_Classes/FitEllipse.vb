@@ -17,7 +17,6 @@ Public Class FitEllipse_Basics_CPP
     Dim area As Area_MinTriangle_CPP
     Public dstData(5 * 4 - 1) As Byte ' enough space for a float describing angle, center, and width/height - this will be filled in on the C++ side.
     Public Sub New()
-        initParent()
         area = New Area_MinTriangle_CPP()
 
         label1 = "Green FitEllipse, Yellow=AMS, Red=Direct"

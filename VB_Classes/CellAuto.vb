@@ -7,7 +7,6 @@ Public Class CellAuto_Basics
     Dim cellInput(,) = {{1, 1, 1}, {1, 1, 0}, {1, 0, 1}, {1, 0, 0}, {0, 1, 1}, {0, 1, 0}, {0, 0, 1}, {0, 0, 0}}
     Public input As New cv.Mat
     Public Sub New()
-        initParent()
         i18.Add("00011110 Rule 30 (chaotic)")
         i18.Add("00110110 Rule 54")
         i18.Add("00111100 Rule 60")
@@ -114,7 +113,6 @@ Public Class CellAuto_Life
         Return CountNeighbors
     End Function
     Public Sub New()
-        initParent()
         grid = New cv.Mat(dst1.Height / factor, dst1.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
 
@@ -190,7 +188,6 @@ Public Class CellAuto_LifeColor
     Inherits VBparent
     Dim game As CellAuto_Life
     Public Sub New()
-        initParent()
         game = New CellAuto_Life()
         game.backColor = cv.Scalar.White
         game.nodeColor = cv.Scalar.Black
@@ -227,7 +224,6 @@ Public Class CellAuto_LifePopulation
     Dim plot As Plot_OverTime
     Dim game As CellAuto_Life
     Public Sub New()
-        initParent()
         game = New CellAuto_Life()
 
         plot = New Plot_OverTime()
@@ -260,7 +256,6 @@ Public Class CellAuto_Basics_MP
     Dim i18 As New List(Of String)
     Dim i18Index As Integer
     Public Sub New()
-        initParent()
 
         cell = New CellAuto_Basics()
         i18 = cell.i18
@@ -303,7 +298,6 @@ Public Class CellAuto_All256
     Inherits VBparent
     Dim cell As CellAuto_Basics
     Public Sub New()
-        initParent()
         cell = New CellAuto_Basics
         cell.combo.Visible = False ' won't need this...
 
@@ -354,7 +348,6 @@ Public Class CellAuto_MultiPoint
     Inherits VBparent
     Dim cell As CellAuto_Basics
     Public Sub New()
-        initParent()
 
         cell = New CellAuto_Basics()
         cell.combo.Box.SelectedIndex = 4 ' this one is nice...

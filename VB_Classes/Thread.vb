@@ -28,7 +28,6 @@ Public Class Thread_Grid
         Next
     End Sub
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "ThreadGrid Width", 2, dst1.Width, 32)
@@ -120,7 +119,6 @@ Public Class Thread_GridTest
     Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")

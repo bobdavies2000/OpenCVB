@@ -4,7 +4,6 @@ Public Class Coherent_Basics
     Dim flood As Coherent_FloodFill
     Dim pixel As Pixel_Sampler
     Public Sub New()
-        initParent()
         pixel = New Pixel_Sampler
         flood = New Coherent_FloodFill
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8UC1, 0)
@@ -57,7 +56,6 @@ Public Class Coherent_FloodFill
     Public lastRects As New List(Of cv.Rect)
     Public lastSizes As New List(Of Integer)
     Public Sub New()
-        initParent()
         knn = New KNN_1_to_1
         basics = New FloodFill_Basics
         task.desc = "Floodfill an image and make the colors consistent."
@@ -149,7 +147,6 @@ Public Class Coherent_Palette
     Inherits VBparent
     Public flood As Coherent_Pixel
     Public Sub New()
-        initParent()
         flood = New Coherent_Pixel
         task.desc = "Highlight a consistent 8-bit grayscale image regions with a palette"
         ' task.rank = 1
@@ -175,7 +172,6 @@ Public Class Coherent_Pixel
     Public flood As FloodFill_Basics
     Dim pixel As Pixel_Sampler
     Public Sub New()
-        initParent()
         flood = New FloodFill_Basics
         pixel = New Pixel_Sampler
         task.desc = "Floodfill an image and sample masks to make the colors consistent."

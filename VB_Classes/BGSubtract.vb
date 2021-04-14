@@ -8,7 +8,6 @@ Public Class BGSubtract_Basics_CPP
     Dim bgfs As IntPtr
     Public currMethod As integer = -1
     Public Sub New()
-        initParent()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 7)
             radio.check(0).Text = "GMG"
@@ -61,7 +60,6 @@ End Class
 Public Class BGSubtract_MotionDetect_MT
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
@@ -123,7 +121,6 @@ Public Class BGSubtract_Basics_MT
     Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -168,7 +165,6 @@ Public Class BGSubtract_Depth_MT
     Inherits VBparent
     Dim bgsub As BGSubtract_Basics_MT
     Public Sub New()
-        initParent()
         bgsub = New BGSubtract_Basics_MT()
         task.desc = "Detect Motion in the depth image - needs more work"
         ' task.rank = 1
@@ -190,7 +186,6 @@ Public Class BGSubtract_MOG
     Dim MOG As cv.BackgroundSubtractorMOG
     Public gray As New cv.Mat
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "MOG Learn Rate", 0, 1000, 10)
@@ -219,7 +214,6 @@ Public Class BGSubtract_MOG2
     Public gray As New cv.Mat
     Dim MOG2 As cv.BackgroundSubtractorMOG2
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "MOG Learn Rate", 0, 1000, 10)
@@ -243,7 +237,6 @@ Public Class BGSubtract_GMG_KNN
     Dim gmg As cv.BackgroundSubtractorGMG
     Dim knn As cv.BackgroundSubtractorKNN
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Learn Rate", 1, 1000, 1)
@@ -278,7 +271,6 @@ Public Class BGSubtract_MOG_RGBDepth
     Dim MOGDepth As cv.BackgroundSubtractorMOG
     Dim MOGRGB As cv.BackgroundSubtractorMOG
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "MOG Learn Rate x1000", 0, 1000, 10)
@@ -310,7 +302,6 @@ Public Class BGSubtract_MOG_Retina
     Dim bgSub As BGSubtract_MOG
     Dim retina As Retina_Basics_CPP
     Public Sub New()
-        initParent()
         bgSub = New BGSubtract_MOG()
         Static bgSubLearnRate = findSlider("MOG Learn Rate")
         bgSubLearnRate.Value = 100
@@ -337,7 +328,6 @@ Public Class BGSubtract_DepthOrColorMotion
     Inherits VBparent
     Public motion As Diff_UnstableDepthAndColor
     Public Sub New()
-        initParent()
         motion = New Diff_UnstableDepthAndColor()
         task.desc = "Detect motion with both depth and color changes"
         ' task.rank = 1
@@ -389,7 +379,6 @@ Public Class BGSubtract_Video
     Dim bgfg As BGSubtract_Basics_CPP
     Dim video As Video_Basics
     Public Sub New()
-        initParent()
         bgfg = New BGSubtract_Basics_CPP()
 
         video = New Video_Basics()
@@ -418,7 +407,6 @@ Public Class BGSubtract_Synthetic_CPP
     Dim synthPtr As IntPtr
     Dim amplitude As Double, magnitude As Double, waveSpeed As Double, objectSpeed As Double
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Synthetic Amplitude x100", 1, 400, 200)
@@ -469,7 +457,6 @@ Public Class BGSubtract_Synthetic
     Dim bgfg As BGSubtract_Basics_CPP
     Dim synth As BGSubtract_Synthetic_CPP
     Public Sub New()
-        initParent()
         bgfg = New BGSubtract_Basics_CPP()
 
         synth = New BGSubtract_Synthetic_CPP()

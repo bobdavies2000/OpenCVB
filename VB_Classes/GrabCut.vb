@@ -6,7 +6,6 @@ Public Class GrabCut_Basics
     Public fgFineTune As cv.Mat
     Public bgFineTune As cv.Mat
     Public Sub New()
-        initParent()
         fgnd = New Depth_Foreground
 
         label1 = "Foreground from depth data"
@@ -50,7 +49,6 @@ Public Class GrabCut_FineTune
     Dim basics As GrabCut_Basics
     Dim mats As Mat_4to1
     Public Sub New()
-        initParent()
         mats = New Mat_4to1
         basics = New GrabCut_Basics
 

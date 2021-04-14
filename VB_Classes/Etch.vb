@@ -11,7 +11,6 @@ Public Class Etch_ASketch
         Return New cv.Point(ms_rng.Next(0, dst1.Width), ms_rng.Next(0, dst1.Height))
     End Function
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 2)

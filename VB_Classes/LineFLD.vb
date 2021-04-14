@@ -12,7 +12,6 @@ Public Class lineFLD_Basics
     Public canny2Slider As Windows.Forms.TrackBar
     Public mergeCheckBox As Windows.Forms.CheckBox
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 6)
@@ -263,7 +262,6 @@ Public Class lineFLD_CPP
     Dim lineFLD As lineFLD_Basics
     Public lineMat As New cv.Mat
     Public Sub New()
-        initParent()
         lineFLD = New lineFLD_Basics
         task.desc = "Basics for a Fast Line Detector"
 		' task.rank = 1
@@ -303,7 +301,6 @@ Public Class LineFLD_LongestLine
     Inherits VBparent
     Dim lines As lineFLD_CPP
     Public Sub New()
-        initParent()
         lines = New lineFLD_CPP()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -341,7 +338,6 @@ Public Class LineFLD_MT
     Inherits VBparent
     Dim lines As lineFLD_CPP
     Public Sub New()
-        initParent()
         lines = New lineFLD_CPP()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -376,7 +372,6 @@ End Class
 '    Inherits VBparent
 '    Dim linesFLD As lineFLD_CPP
 '    Public Sub New()
-'        initParent()
 '        linesFLD = New line_FLD_CPP()
 
 '        If findfrm(caller + " Slider Options") Is Nothing Then

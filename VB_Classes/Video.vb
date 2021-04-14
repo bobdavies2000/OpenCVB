@@ -9,7 +9,6 @@ Public Class Video_Basics
     Dim fileNameForm As OptionsFileName
     Dim fileInfo As FileInfo
     Public Sub New()
-        initParent()
 
         fileNameForm = New OptionsFileName
         fileNameForm.OpenFileDialog1.InitialDirectory = task.parms.homeDir + "Data\"
@@ -65,7 +64,6 @@ Public Class Video_CarCounting
     Dim video As Video_Basics
     Dim bgSub As BGSubtract_MOG
     Public Sub New()
-        initParent()
         bgSub = New BGSubtract_MOG()
 
         video = New Video_Basics()
@@ -122,7 +120,6 @@ Public Class Video_CarCComp
     Dim video As Video_Basics
     Dim bgSub As BGSubtract_MOG
     Public Sub New()
-        initParent()
 
         bgSub = New BGSubtract_MOG()
         cc = New CComp_Basics()
@@ -152,7 +149,6 @@ Public Class Video_MinRect
     Public bgSub As BGSubtract_MOG
     Public contours As cv.Point()()
     Public Sub New()
-        initParent()
         video = New Video_Basics()
         video.srcVideo = task.parms.homeDir + "Data/CarsDrivingUnderBridge.mp4"
         video.Run(dst1)
@@ -187,7 +183,6 @@ Public Class Video_MinCircle
     Inherits VBparent
     Dim video As Video_MinRect
     Public Sub New()
-        initParent()
         video = New Video_MinRect()
         task.desc = "Find area of car outline - example of using MinEnclosingCircle"
 		' task.rank = 1

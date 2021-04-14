@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 Public Class Stitch_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Number of random images", 10, 50, 10)

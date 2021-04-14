@@ -10,7 +10,6 @@ Public Class ParticleFilter_Example
     Inherits VBparent
     Dim pfPtr As IntPtr
     Public Sub New()
-        initParent()
         pfPtr = ParticleFilterTest_Open(task.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
         task.desc = "Particle Filter example downloaded from github - hyperlink in the code shows URL."
 		' task.rank = 1

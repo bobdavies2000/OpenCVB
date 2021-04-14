@@ -5,7 +5,6 @@ Imports System.IO
 Public Class Edges_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Canny threshold1", 1, 255, 50)
@@ -42,7 +41,6 @@ Public Class Edges_DepthAndColor
     Dim canny As Edges_Basics
     Dim dilate As DilateErode_Basics
     Public Sub New()
-        initParent()
         dilate = New DilateErode_Basics()
         dilate.radio.check(2).Checked = True
 
@@ -80,7 +78,6 @@ End Class
 Public Class Edges_Laplacian
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Gaussian Kernel", 1, 32, 7)
@@ -110,7 +107,6 @@ End Class
 Public Class Edges_Scharr
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Scharr multiplier X100", 1, 500, 50)
@@ -137,7 +133,6 @@ End Class
 Public Class Edges_Preserving
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 2)
             radio.check(0).Text = "Edge RecurseFilter"
@@ -209,7 +204,6 @@ Public Class Edges_RandomForest_CPP
     Dim rgbData() As Byte
     Dim EdgesPtr As IntPtr
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Edges RF Threshold", 1, 255, 35)
@@ -250,7 +244,6 @@ End Class
 Public Class Edges_ResizeAdd
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Border Vertical in Pixels", 1, 20, 5)
@@ -282,7 +275,6 @@ End Class
 Public Class Edges_DCTfrequency
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Remove Frequencies < x", 0, 100, 32)
@@ -321,7 +313,6 @@ Public Class Edges_Deriche_CPP
     Inherits VBparent
     Dim Edges_Deriche As IntPtr
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Deriche Alpha", 1, 400, 100)
@@ -366,7 +357,6 @@ Public Class Edges_DCTinput
     Dim edges As Edges_Basics
     Dim dct As DCT_FeatureLess
     Public Sub New()
-        initParent()
         edges = New Edges_Basics
         dct = New DCT_FeatureLess
         label1 = "Canny edges produced from original grayscale image"
@@ -399,7 +389,6 @@ Public Class Edges_BinarizedCanny
     Dim binarize As Binarize_Recurse
     Dim mats As Mat_4Click
     Public Sub New()
-        initParent()
         mats = New Mat_4Click
         binarize = New Binarize_Recurse
         edges = New Edges_Basics
@@ -446,7 +435,6 @@ Public Class Edges_BinarizedBrightness
     Dim edges As Edges_BinarizedSobel
     Dim bright As PhotoShop_Brightness
     Public Sub New()
-        initParent()
 
         edges = New Edges_BinarizedSobel
         bright = New PhotoShop_Brightness
@@ -475,7 +463,6 @@ Public Class Edges_BinarizedReduction
     Dim edges As Edges_BinarizedSobel
     Dim reduction As Reduction_Basics
     Public Sub New()
-        initParent()
 
         edges = New Edges_BinarizedSobel
         reduction = New Reduction_Basics
@@ -505,7 +492,6 @@ Public Class Edges_Depth
     Dim dMax As Depth_SmoothMax
     Dim sobel As Edges_Sobel
     Public Sub New()
-        initParent()
         dMax = New Depth_SmoothMax
         sobel = New Edges_Sobel
         Dim kernelSlider = findSlider("Sobel kernel Size")
@@ -536,7 +522,6 @@ Public Class Edges_FeaturesOnly
     Dim edges As Edges_BinarizedSobel
     Dim featLess As Featureless_Basics
     Public Sub New()
-        initParent()
         edges = New Edges_BinarizedSobel
         featLess = New Featureless_Basics
         label1 = "Output of Edges_BinarizedSobel"
@@ -568,7 +553,6 @@ Public Class Edges_Consistent
     Inherits VBparent
     Dim edges As Edges_FeaturesOnly
     Public Sub New()
-        initParent()
         edges = New Edges_FeaturesOnly
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -615,7 +599,6 @@ Public Class Edges_Stdev
     Dim stdev As Math_Stdev
     Dim edges As Edges_BinarizedSobel
     Public Sub New()
-        initParent()
         edges = New Edges_BinarizedSobel
         stdev = New Math_Stdev
         Dim kernelSlider = findSlider("Sobel kernel Size")
@@ -649,7 +632,6 @@ Public Class Edges_BlackSquare
     Dim edges As Edges_BinarizedSobel
     Dim addW As AddWeighted_Basics
     Public Sub New()
-        initParent()
         addW = New AddWeighted_Basics
         edges = New Edges_BinarizedSobel
         std = New Math_Stdev
@@ -681,7 +663,6 @@ Public Class Edges_Combo
     Dim edges1 As Edges_BinarizedCanny
     Dim edges2 As Edges_BinarizedSobel
     Public Sub New()
-        initParent()
         edges1 = New Edges_BinarizedCanny
         edges2 = New Edges_BinarizedSobel
 
@@ -711,7 +692,6 @@ Public Class Edges_SobelLR
     Dim red As LeftRightView_Basics
     Dim sobel As Edges_Sobel
     Public Sub New()
-        initParent()
         red = New LeftRightView_Basics()
         sobel = New Edges_Sobel()
         sobel.sliders.trackbar(0).Value = 5
@@ -745,7 +725,6 @@ Public Class Edges_Sobel
     Public horizontalOnly As Boolean
     Dim addw As AddWeighted_Basics
     Public Sub New()
-        initParent()
         If standalone Then addw = New AddWeighted_Basics
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -801,7 +780,6 @@ Public Class Edges_SobelHorizontal
     Inherits VBparent
     Dim edges As Edges_Sobel
     Public Sub New()
-        initParent()
         edges = New Edges_Sobel
         edges.horizontalOnly = True
         task.desc = "Find edges with Sobel only in the horizontal direction"
@@ -828,7 +806,6 @@ Public Class Edges_SobelLRBinarized
     Dim edges As Edges_BinarizedSobel
     Dim addw As AddWeighted_Basics
     Public Sub New()
-        initParent()
         If standalone Then
             addw = New AddWeighted_Basics
             Dim weightSlider = findSlider("Weight")
@@ -882,7 +859,6 @@ Public Class Edges_BinarizedSobel
     Dim binarize As Binarize_Recurse
     Public mats As Mat_4Click
     Public Sub New()
-        initParent()
         mats = New Mat_4Click
 
         binarize = New Binarize_Recurse
@@ -941,7 +917,6 @@ Public Class Edges_Matching
     Dim red As LeftRightView_Basics
     Dim grid As Thread_Grid
     Public Sub New()
-        initParent()
 
         match = New MatchTemplate_Basics
         grid = New Thread_Grid
@@ -1059,7 +1034,6 @@ Public Class Edges_MotionOverlay
     Inherits VBparent
     Dim diff As Diff_Basics
     Public Sub New()
-        initParent()
 
         diff = New Diff_Basics
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -1105,7 +1079,6 @@ Public Class Edges_RGB
     Inherits VBparent
     Dim sobel As Edges_Sobel
     Public Sub New()
-        initParent()
         sobel = New Edges_Sobel
         Dim thresholdCheck = findCheckBox("Threshold Sobel Results")
         thresholdCheck.Checked = False
@@ -1141,7 +1114,6 @@ Public Class Edges_HSV
     Inherits VBparent
     Dim edges As Edges_RGB
     Public Sub New()
-        initParent()
         edges = New Edges_RGB
         Dim thresholdSlider = findSlider("Threshold to zero pixels below this value")
         thresholdSlider.Value = 25

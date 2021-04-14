@@ -5,7 +5,6 @@ Public Class Sieve_BasicsVB
     Inherits VBparent
     Public primes As New List(Of Integer)
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Count of desired primes", 1, 10000, 400)
@@ -55,7 +54,6 @@ Public Class Sieve_Basics
     Dim printer As Sieve_BasicsVB
     Dim sieve As New CS_Classes.Sieve
     Public Sub New()
-        initParent()
         printer = New Sieve_BasicsVB
         task.desc = "Implement the Sieve of Eratothenes in C#"
 		' task.rank = 1

@@ -1,4 +1,4 @@
-﻿Imports System.Windows.Forms
+Imports System.Windows.Forms
 Imports cv = OpenCvSharp
 Imports System.IO
 Public Class TTtext
@@ -136,6 +136,7 @@ Public Class VBparent : Implements IDisposable
                 End If
             End If
         Next
+        initParent()
     End Sub
     Public Function normalize32f(Input As cv.Mat) As cv.Mat
         Dim outMat = Input.Normalize(0, 255, cv.NormTypes.MinMax)

@@ -5,7 +5,6 @@ Public Class Watershed_Basics
     Dim rects As New List(Of cv.Rect)
     Public UseCorners As Boolean
     Public Sub New()
-        initParent()
         addW = New AddWeighted_Basics
         label1 = "Draw rectangle to add another marker"
         label2 = "Mask for watershed (selected regions)."
@@ -67,7 +66,6 @@ Public Class Watershed_DepthReduction
     Dim watershed As Watershed_Basics
     Dim reduction As Reduction_Basics
     Public Sub New()
-        initParent()
         reduction = New Reduction_Basics()
         watershed = New Watershed_Basics()
         watershed.UseCorners = True
@@ -96,7 +94,6 @@ Public Class Watershed_DepthAuto
     Inherits VBparent
     Dim watershed As Watershed_Basics
     Public Sub New()
-        initParent()
         watershed = New Watershed_Basics()
         watershed.UseCorners = True
         task.desc = "Watershed the four corners of the depth image."

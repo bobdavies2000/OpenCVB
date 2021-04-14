@@ -5,7 +5,6 @@ Public Class HOG_Basics
     Dim staticImage As cv.Mat
     Dim staticImageProcessed As Boolean
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Threshold", 0, 100, 0)

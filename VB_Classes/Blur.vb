@@ -3,7 +3,6 @@ Imports CS_Classes
 Public Class Blur_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Blur Kernel Size", 0, 32, 5)
@@ -34,7 +33,6 @@ Public Class Blur_Gaussian
     Dim CS_BlurGaussian As New CS_BlurGaussian
     Dim blur As Blur_Basics
     Public Sub New()
-        initParent()
         blur = New Blur_Basics()
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
 		' task.rank = 1
@@ -62,7 +60,6 @@ Public Class Blur_Median_CS
     Dim CS_BlurMedian As New CS_BlurMedian
     Dim blur As Blur_Basics
     Public Sub New()
-        initParent()
         blur = New Blur_Basics()
         task.desc = "Replace each pixel with the median of neighborhood of varying sizes."
 		' task.rank = 1
@@ -89,7 +86,6 @@ Public Class Blur_Homogeneous
     Inherits VBparent
     Dim blur As Blur_Basics
     Public Sub New()
-        initParent()
         blur = New Blur_Basics()
         task.desc = "Smooth each pixel with a kernel of 1's of different sizes."
 		' task.rank = 1
@@ -118,7 +114,6 @@ Public Class Blur_Median
     Inherits VBparent
     Dim blur As Blur_Basics
     Public Sub New()
-        initParent()
         blur = New Blur_Basics()
         task.desc = "Replace each pixel with the median of neighborhood of varying sizes."
 		' task.rank = 1
@@ -147,7 +142,6 @@ Public Class Blur_Bilateral
     Inherits VBparent
     Dim blur As Blur_Basics
     Public Sub New()
-        initParent()
         blur = New Blur_Basics()
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
 		' task.rank = 1
@@ -175,7 +169,6 @@ Public Class Blur_PlusHistogram
     Dim blur As Blur_Bilateral
     Dim myhist As Histogram_EqualizeGray
     Public Sub New()
-        initParent()
         mat2to1 = New Mat_2to1()
 
         blur = New Blur_Bilateral()
@@ -212,7 +205,6 @@ Public Class Blur_TopoMap
     Dim gradient As Gradient_CartToPolar
     Dim addw As AddWeighted_Basics
     Public Sub New()
-        initParent()
 
         addw = New AddWeighted_Basics
         Dim weightSlider = findSlider("Weight")

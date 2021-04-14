@@ -4,7 +4,6 @@ Imports System.Runtime.InteropServices
 Public Class Corners_Harris
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Corner block size", 1, 21, 3)
@@ -63,7 +62,6 @@ Public Class Corners_SubPix
     Inherits VBparent
     Public good As Features_GoodFeatures
     Public Sub New()
-        initParent()
         good = New Features_GoodFeatures()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -97,7 +95,6 @@ Public Class Corners_PreCornerDetect
     Inherits VBparent
     Dim median As Math_Median_CDF
     Public Sub New()
-        initParent()
         median = New Math_Median_CDF()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -136,7 +133,6 @@ End Module
 Public Class Corners_ShiTomasi_CPP
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Corner block size", 1, 21, 3)

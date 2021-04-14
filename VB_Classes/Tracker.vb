@@ -11,7 +11,6 @@ Imports System.Runtime.InteropServices
 '    Public boxObject() As cv.Rect2d
 '    Public trackerIndex As Integer
 '    Public Sub New()
-'        initParent()
 
 '        If findfrm(caller + " Radio Options") Is Nothing Then
 '            radio.Setup(caller, 8)
@@ -86,7 +85,6 @@ Imports System.Runtime.InteropServices
 '    Inherits VBparent
 '    Dim trackers As New List(Of Tracker_Basics)
 '    Public Sub New()
-'        initParent()
 '        task.desc = "Track any number of objects simultaneously - tracker algorithm"
 '    End Sub
 '    Public Sub Run(src as cv.Mat)
@@ -142,7 +140,6 @@ Public Class Tracker_Basics
     Dim cPtr As IntPtr
     Dim trackType As Integer
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 8)

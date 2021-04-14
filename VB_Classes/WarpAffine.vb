@@ -7,7 +7,6 @@ Public Class WarpAffine_Captcha
     Const captchaLength = 8
     Dim rng As New System.Random
     Public Sub New()
-        initParent()
         task.desc = "Use OpenCV to build a captcha Turing test."
 		' task.rank = 1
     End Sub
@@ -96,7 +95,6 @@ Public Class WarpAffine_Basics
     Inherits VBparent
     Public rotateOptions As GetRotationMatrix2D_Options
     Public Sub New()
-        initParent()
         rotateOptions = New GetRotationMatrix2D_Options
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -135,7 +133,6 @@ Public Class WarpAffine_3Points
     Inherits VBparent
     Dim triangle As Area_MinTriangle_CPP
     Public Sub New()
-        initParent()
         triangle = New Area_MinTriangle_CPP()
         triangle.sliders.trackbar(0).Value = 20
         triangle.sliders.trackbar(1).Value = 150
@@ -210,7 +207,6 @@ Public Class WarpAffine_4Points
     Inherits VBparent
     Dim rect As Area_MinRect
     Public Sub New()
-        initParent()
         rect = New Area_MinRect()
 
         task.desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."

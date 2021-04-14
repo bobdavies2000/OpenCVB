@@ -25,7 +25,6 @@ Public Class DFT_Basics
     Public rows As integer
     Public cols As integer
     Public Sub New()
-        initParent()
         mats = New Mat_4to1()
         mats.noLines = True
 
@@ -85,7 +84,6 @@ Public Class DFT_Inverse
     Inherits VBparent
     Dim mats As Mat_2to1
     Public Sub New()
-        initParent()
         mats = New Mat_2to1()
         task.desc = "Take the inverse of the Discrete Fourier Transform."
 		' task.rank = 1
@@ -127,7 +125,6 @@ Public Class DFT_ButterworthFilter_MT
     Inherits VBparent
     Public dft As DFT_Basics
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "DFT B Filter - Radius", 1, dst1.Rows, dst1.Rows)
@@ -207,7 +204,6 @@ Public Class DFT_ButterworthDepth
     Inherits VBparent
     Dim bfilter As DFT_ButterworthFilter_MT
     Public Sub New()
-        initParent()
         bfilter = New DFT_ButterworthFilter_MT()
 
         task.desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
@@ -243,7 +239,6 @@ Public Class DFT_Shapes
     Dim lines As Draw_Line
     Dim symShapes As Draw_SymmetricalShapes
     Public Sub New()
-        initParent()
         dft = New DFT_Basics
 
         circle = New Draw_Circles

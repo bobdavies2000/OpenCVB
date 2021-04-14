@@ -4,7 +4,6 @@ Imports cv = OpenCvSharp
 Public Class Mat_Repeat
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Use the repeat method to replicate data."
 		' task.rank = 1
     End Sub
@@ -27,7 +26,6 @@ Public Class Mat_PointToMat
     Inherits VBparent
     Dim mask As Random_Basics
     Public Sub New()
-        initParent()
         mask = New Random_Basics()
         mask.plotPoints = True
         label1 = "Random_Basics points (original)"
@@ -58,7 +56,6 @@ Public Class Mat_MatToPoint
     Inherits VBparent
     Dim mask As Random_Basics
     Public Sub New()
-        initParent()
         mask = New Random_Basics()
         task.desc = "Convert a mat into a vector of points."
 		' task.rank = 1
@@ -90,7 +87,6 @@ End Class
 Public Class Mat_Transpose
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Transpose a Mat and show results."
 		' task.rank = 1
         label1 = "Color Image Transposed"
@@ -113,7 +109,6 @@ End Class
 Public Class Mat_Tricks
     Inherits VBparent
     Public Sub New()
-        initParent()
         label1 = "Image squeezed into square Mat"
         label2 = "Mat transposed around the diagonal"
         task.desc = "Show some Mat tricks."
@@ -139,7 +134,6 @@ Public Class Mat_4to1
     Public mat() As cv.Mat = {mat1, mat2, mat3, mat4}
     Public noLines As Boolean ' if they want lines or not...
     Public Sub New()
-        initParent()
         mat1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat3 = mat1.Clone()
@@ -193,7 +187,6 @@ Public Class Mat_2to1
     Public mat() As cv.Mat = {mat1, mat2}
     Public noLines As Boolean ' if they want lines or not...
     Public Sub New()
-        initParent()
         mat1 = New cv.Mat(New cv.Size(dst1.Rows, dst1.Cols), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat = {mat1, mat2}
@@ -237,7 +230,6 @@ Public Class Mat_ImageXYZ_MT
     Public xyDepth As cv.Mat
     Public xyzPlanes() As cv.Mat
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         Dim gridHeightSlider = findSlider("ThreadGrid Height")
@@ -277,7 +269,6 @@ End Class
 Public Class Mat_RowColRange
     Inherits VBparent
     Public Sub New()
-        initParent()
         label1 = "BitwiseNot of RowRange and ColRange"
         task.desc = "Perform operation on a range of cols and/or Rows."
 		' task.rank = 1
@@ -298,7 +289,6 @@ End Class
 Public Class Mat_Managed
     Inherits VBparent
     Public Sub New()
-        initParent()
         label1 = "Color change is in the managed cv.vec3b array"
         task.desc = "There is a limited ability to use Mat data in Managed code directly."
 		' task.rank = 1
@@ -328,7 +318,6 @@ Public Class Mat_MultiplyReview
     Inherits VBparent
     Dim flow As Font_FlowText
     Public Sub New()
-        initParent()
         flow = New Font_FlowText()
         task.desc = "Review matrix multiplication"
 		' task.rank = 1
@@ -394,7 +383,6 @@ Public Class Mat_Inverse
     Public validateInverse As Boolean
     Public inverse As New cv.Mat
     Public Sub New()
-        initParent()
         flow = New Font_FlowText()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 6)
@@ -475,7 +463,6 @@ Public Class Mat_4Click
     Dim mats As Mat_4to1
     Public mat() As cv.Mat
     Public Sub New()
-        initParent()
         mats = New Mat_4to1
         mat = mats.mat
 
@@ -505,7 +492,6 @@ Public Class Mat_2Click
     Dim mats As Mat_2to1
     Public mat() As cv.Mat
     Public Sub New()
-        initParent()
         mats = New Mat_2to1
         mat = mats.mat
         task.desc = "Split an image into 2 segments and allow clicking on each half to open it in dst2"
@@ -539,7 +525,6 @@ Public Class Mat_2Dlib
     Public dRGB As Array2D(Of BgrPixel)
     Public dGray As Array2D(Of Byte)
     Public Sub New()
-        initParent()
         task.desc = "Convert a Mat to the expected Array2D for a DLib API"
 		' task.rank = 1
     End Sub
@@ -574,7 +559,6 @@ Public Class Mat_Dlib2Mat
     Public dRGB As Array2D(Of BgrPixel)
     Public d32f As Array2D(Of Single)
     Public Sub New()
-        initParent()
         task.desc = "Convert a Dlib Array2D to an OpenCV Mat"
 		' task.rank = 1
     End Sub

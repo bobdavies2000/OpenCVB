@@ -3,7 +3,6 @@ Imports System.Runtime.InteropServices
 Public Class Transform_Resize
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Resize Percent", 50, 1000, 50)
@@ -34,7 +33,6 @@ Public Class Transform_Rotate
     Inherits VBparent
     Public imageCenter As cv.Point2f
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Angle", -180, 180, 30)
@@ -59,7 +57,6 @@ End Class
 Public Class Transform_Sort
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 4)
             radio.check(0).Text = "Ascending"
@@ -90,7 +87,6 @@ Public Class Transform_SortReshape
     Inherits VBparent
     Public sortVector As cv.Mat
     Public Sub New()
-        initParent()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 2)
             radio.check(0).Text = "Ascending"
@@ -117,7 +113,6 @@ End Class
 Public Class Transform_Affine3D
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 2)
             check.Box(0).Text = "Check to snap the first point cloud"

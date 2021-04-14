@@ -4,7 +4,6 @@ Public Class Resize_Basics
     Public newSize As cv.Size
     Public rotateOptions As GetRotationMatrix2D_Options
     Public Sub New()
-        initParent()
         rotateOptions = New GetRotationMatrix2D_Options
 
         ' warp is not allowed in resize
@@ -44,7 +43,6 @@ Public Class Resize_Percentage
     Inherits VBparent
     Public resizeOptions As Resize_Basics
     Public Sub New()
-        initParent()
         resizeOptions = New Resize_Basics()
 
         If findfrm(caller + " Slider Options") Is Nothing Then

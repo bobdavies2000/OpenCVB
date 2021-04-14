@@ -83,7 +83,6 @@ End Module
 Public Class Delaunay_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Use Delaunay to subdivide an image into triangles."
 		' task.rank = 1
     End Sub
@@ -111,7 +110,6 @@ Public Class Delaunay_GoodFeatures
     Inherits VBparent
     Dim features As Features_GoodFeatures
     Public Sub New()
-        initParent()
         features = New Features_GoodFeatures()
         label2 = "Voronoi facets of delauney good features"
         task.desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
@@ -149,7 +147,6 @@ Public Class Delauney_Subdiv2D
     Inherits VBparent
     Public updateFrequency As Integer = 30
     Public Sub New()
-        initParent()
         label2 = "Voronoi facets for the same subdiv2D"
         task.desc = "Generate random points and divide the image around those points."
 		' task.rank = 1
@@ -203,7 +200,6 @@ Public Class Delauney_Coverage
     Inherits VBparent
     Dim delauney As Delauney_Subdiv2D
     Public Sub New()
-        initParent()
         delauney = New Delauney_Subdiv2D()
         delauney.updateFrequency = 1
         If findfrm(caller + " Slider Options") Is Nothing Then

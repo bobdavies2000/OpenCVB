@@ -3,7 +3,6 @@ Public Class LUT_Basics
     Inherits VBparent
     Public nSeg As Integer
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -47,7 +46,6 @@ End Class
 Public Class LUT_Sliders
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "LUT zero through xxx", 1, 255, 65)
@@ -90,7 +88,6 @@ Public Class LUT_Reduction
     Public reduction As Reduction_Basics
     Public colorMat As cv.Mat
     Public Sub New()
-        initParent()
         reduction = New Reduction_Basics()
         colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, task.vecColors)
         label2 = "Custom Color Lookup Table"
@@ -116,7 +113,6 @@ Public Class LUT_CustomColor
     Dim gradMap As Palette_RandomColorMap
     Public colorMap As cv.Mat
     Public Sub New()
-        initParent()
         reduction = New Reduction_Basics()
         gradMap = New Palette_RandomColorMap
 
@@ -151,7 +147,6 @@ Public Class LUT_Color
     Public paletteMap(256) As cv.Vec3b
     Dim colorMat As cv.Mat
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Reduction for color image", 1, 256, 32)
@@ -180,7 +175,6 @@ Public Class LUT_Rebuild
     Inherits VBparent
     Public paletteMap(256 - 1) As Byte
     Public Sub New()
-        initParent()
         For i = 0 To paletteMap.Count - 1
             paletteMap(i) = i
         Next
@@ -206,7 +200,6 @@ Public Class LUT_RGBDepth
     Inherits VBparent
     Dim lut As LUT_Basics
     Public Sub New()
-        initParent()
         lut = New LUT_Basics
         task.desc = "Use a LUT on the RGBDepth to segregate depth data."
 		' task.rank = 1
@@ -229,7 +222,6 @@ Public Class LUT_Depth32f
     Inherits VBparent
     Dim lut As LUT_Basics
     Public Sub New()
-        initParent()
         lut = New LUT_Basics
         task.desc = "Use a LUT on the 32-bit depth to segregate depth data."
 		' task.rank = 1

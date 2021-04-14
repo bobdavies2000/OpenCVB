@@ -8,7 +8,6 @@ Public Class KLT_Basics
     Public circleColor = cv.Scalar.Red
     Dim term As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "KLT - MaxCorners", 1, 200, 100)
@@ -92,7 +91,6 @@ Public Class KLT_OpticalFlow
     Dim klt As KLT_Basics
     Dim lastpoints() As cv.Point2f
     Public Sub New()
-        initParent()
         klt = New KLT_Basics()
         task.desc = "KLT optical flow - needs more work"
 		' task.rank = 1

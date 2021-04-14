@@ -4,7 +4,6 @@ Public Class Blob_Basics
     Dim blob As Blob_Input
     Dim blobDetector As New CS_Classes.Blob_Basics
     Public Sub New()
-        initParent()
         blobDetector = New CS_Classes.Blob_Basics
         blob = New Blob_Input()
         blob.updateFrequency = 1 ' it is pretty fast but sloppy...
@@ -70,7 +69,6 @@ Public Class Blob_Input
     Public Mats As Mat_4to1
     Public updateFrequency = 30
     Public Sub New()
-        initParent()
         rectangles = New Rectangle_Rotated()
         circles = New Draw_Circles()
         ellipses = New Draw_Ellipses()
@@ -123,7 +121,6 @@ Public Class Blob_RenderBlobs
     Inherits VBparent
     Dim blob As Blob_Input
     Public Sub New()
-        initParent()
         blob = New Blob_Input()
         blob.updateFrequency = 1
 
@@ -169,7 +166,6 @@ Public Class Blob_DepthClusters
     Public histBlobs As Histogram_DepthValleys
     Public flood As FloodFill_Basics
     Public Sub New()
-        initParent()
 
         histBlobs = New Histogram_DepthValleys
 
@@ -201,7 +197,6 @@ Public Class Blob_DepthPixelSampler
     Public flood As FloodFill_Basics
     Dim pixel As Pixel_Sampler
     Public Sub New()
-        initParent()
         pixel = New Pixel_Sampler
         histBlobs = New Histogram_DepthClusters
 
@@ -251,7 +246,6 @@ Public Class Blob_DepthRanges
     Public histBlobs As Histogram_DepthClusters
     Public grayOnly As Boolean
     Public Sub New()
-        initParent()
         histBlobs = New Histogram_DepthClusters
 
         label2 = "Identified histogram depth clusters."
@@ -308,7 +302,6 @@ Public Class Blob_DepthRangesGray
     Inherits VBparent
     Public blobs As Blob_DepthRanges
     Public Sub New()
-        initParent()
         blobs = New Blob_DepthRanges
         blobs.grayOnly = True
         task.desc = "Find the depth ranges but only in grayscale."
@@ -341,7 +334,6 @@ Public Class Blob_DepthFloodfill
     Public flood As FloodFill_Neighbors
     Public blobs As Blob_DepthRangesGray
     Public Sub New()
-        initParent()
 
         flood = New FloodFill_Neighbors
 
@@ -381,7 +373,6 @@ Public Class Blob_Largest
     Public blobIndex As Integer
     Public maskIndex As Integer
     Public Sub New()
-        initParent()
         kalman = New Kalman_Basics
         ReDim kalman.kInput(4 - 1)
 
@@ -431,7 +422,6 @@ Public Class Blob_Rectangles
         End Function
     End Class
     Public Sub New()
-        initParent()
         blobs = New Blob_Largest()
         task.desc = "Get the blobs and their masks and outline them with a rectangle."
         ' task.rank = 2

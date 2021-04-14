@@ -20,7 +20,6 @@ Public Class RecursiveBilateralFilter_CPP
     Dim srcData(0) As Byte
     Dim rbf As IntPtr
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "RBF Recursion count", 1, 20, 2)

@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 Public Class Pyramid_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Zoom in and out", -1, 1, 0)
@@ -38,7 +37,6 @@ Public Class Pyramid_Filter
     Inherits VBparent
     Dim laplace As Laplacian_PyramidFilter
     Public Sub New()
-        initParent()
         laplace = New Laplacian_PyramidFilter()
 
         task.desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively"

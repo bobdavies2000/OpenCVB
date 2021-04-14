@@ -12,7 +12,6 @@ Public Class WarpModel_Basics
     Public aligned As New cv.Mat
     Public outputRect As cv.Rect
     Public Sub New()
-        initParent()
         cPtr = WarpModel_Open()
 
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -112,7 +111,6 @@ Public Class WarpModel_Input
     Public gradient(3 - 1) As cv.Mat
     Dim sobel As Edges_Sobel
     Public Sub New()
-        initParent()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 12)
             radio.check(0).Text = "building.jpg"
@@ -206,7 +204,6 @@ Public Class WarpModel_AlignImages
     Inherits VBparent
     Dim ecc As WarpModel_Basics
     Public Sub New()
-        initParent()
         ecc = New WarpModel_Basics()
 
         label1 = "Aligned image"
@@ -253,7 +250,6 @@ End Class
 '    Public lastFrame As cv.Mat
 '    Dim match As MatchTemplate_DrawRect
 '    Public Sub New()
-'        initParent()
 '        match = New MatchTemplate_DrawRect
 
 '        sobel = New Edges_Sobel
@@ -333,7 +329,6 @@ End Class
 '    Dim warp As WarpModel_Image
 '    Dim entropy As Entropy_Highest
 '    Public Sub New()
-'        initParent()
 '        warp = New WarpModel_Image
 '        entropy = New Entropy_Highest
 '        task.desc = "Find warp matrix for the whole image using just the segment with the highest entropy."

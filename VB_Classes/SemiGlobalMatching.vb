@@ -24,7 +24,6 @@ Public Class SemiGlobalMatching_CPP
     Dim rightData(1 - 1) As Byte
     Dim cPtr As IntPtr
     Public Sub New()
-        initParent()
         task.desc = "Find depth using the semi-global matching algorithm."
 		' task.rank = 1
     End Sub

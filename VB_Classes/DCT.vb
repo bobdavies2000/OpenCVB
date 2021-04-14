@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Public Class DCT_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Remove Frequencies < x", 0, 100, 1)
@@ -17,10 +16,10 @@ Public Class DCT_Basics
         End If
 
         task.desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies."
-		' task.rank = 1
+        ' task.rank = 1
         label2 = "Difference from original"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
@@ -52,7 +51,6 @@ Public Class DCT_RGB
     Inherits VBparent
     Public dct As DCT_Basics
     Public Sub New()
-        initParent()
         dct = New DCT_Basics()
         dct.sliders.trackbar(0).Value = 1
 
@@ -99,7 +97,6 @@ Public Class DCT_Depth
     Inherits VBparent
     Public dct As DCT_Basics
     Public Sub New()
-        initParent()
         dct = New DCT_Basics()
         dct.sliders.trackbar(0).Value = 1
         label2 = "Subtract DCT inverse from Grayscale depth"
@@ -132,7 +129,6 @@ Public Class DCT_FeatureLess
     Inherits VBparent
     Public dct As DCT_Basics
     Public Sub New()
-        initParent()
 
         dct = New DCT_Basics()
         dct.sliders.trackbar(0).Value = 1
@@ -186,7 +182,6 @@ Public Class DCT_Surfaces_debug
     Dim dct As DCT_FeatureLess
     Dim flow As Font_FlowText
     Public Sub New()
-        initParent()
         flow = New Font_FlowText()
 
         grid = New Thread_Grid
@@ -268,7 +263,6 @@ Public Class DCT_CComponents
     Dim dct As DCT_FeatureLess
     Dim cc As CComp_ColorDepth
     Public Sub New()
-        initParent()
         dct = New DCT_FeatureLess()
         cc = New CComp_ColorDepth()
 

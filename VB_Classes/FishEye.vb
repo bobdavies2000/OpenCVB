@@ -9,7 +9,6 @@ Public Class FishEye_Rectified
     Dim t265Rect As cv.Rect
     Dim t265Original As cv.Rect
     Public Sub New()
-        initParent()
         ' the support the T265 was dropped - no point cloud or real depth.  This code is kept around because it shows how to use the intrinsics.
 
         'Dim minDisp = 0
@@ -74,7 +73,6 @@ End Class
 Public Class FishEye_Raw
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Display the Raw FishEye images for the T265 (only)"
 		' task.rank = 1
     End Sub

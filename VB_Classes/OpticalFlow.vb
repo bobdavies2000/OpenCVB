@@ -73,7 +73,6 @@ Public Class OpticalFlow_DenseOptions
     Public OpticalFlowFlags As cv.OpticalFlowFlags
     Public outputScaling As Integer
     Public Sub New()
-        initParent()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 5)
             radio.check(0).Text = "FarnebackGaussian"
@@ -127,7 +126,6 @@ Public Class OpticalFlow_DenseBasics
     Inherits VBparent
     Dim flow As OpticalFlow_DenseOptions
     Public Sub New()
-        initParent()
         flow = New OpticalFlow_DenseOptions()
         task.desc = "Use dense optical flow algorithm  "
 		' task.rank = 1
@@ -159,7 +157,6 @@ Public Class OpticalFlow_DenseBasics_MT
     Dim accum As New cv.Mat
     Dim flow As OpticalFlow_DenseOptions
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -230,7 +227,6 @@ Public Class OpticalFlow_Sparse
     Dim sumScale As cv.Mat, sScale As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
     Public Sub New()
-        initParent()
         good = New Features_GoodFeatures()
 
         If findfrm(caller + " Slider Options") Is Nothing Then

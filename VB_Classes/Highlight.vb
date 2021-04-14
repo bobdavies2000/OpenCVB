@@ -8,7 +8,6 @@ Public Class Highlight_Basics
     Dim highlightMask As New cv.Mat
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Public Sub New()
-        initParent()
         If standalone Then reduction = New Reduction_KNN_Color()
         task.desc = "Pixels are grouped by reduction.  Highlight the rectangle and centroid nearest the mouse click"
         ' task.rank = 1

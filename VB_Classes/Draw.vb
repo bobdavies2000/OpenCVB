@@ -47,7 +47,6 @@ Public Class Draw_Noise
     Public addRandomColor As Boolean
     Public noiseMask As cv.Mat
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Noise Count", 1, 1000, 100)
@@ -82,7 +81,6 @@ Public Class Draw_Ellipses
     Inherits VBparent
     Public updateFrequency = 30
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Ellipse Count", 1, 255, 3)
@@ -110,7 +108,6 @@ Public Class Draw_Circles
     Inherits VBparent
     Public updateFrequency = 30
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Circle Count", 1, 255, 3)
@@ -137,7 +134,6 @@ Public Class Draw_Line
     Inherits VBparent
     Public updateFrequency = 30
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Line Count", 1, 255, 1)
@@ -163,7 +159,6 @@ End Class
 Public Class Draw_Polygon
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Polygon Count", 1, 255, 1)
@@ -224,7 +219,6 @@ End Class
 Public Class Draw_Shapes
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Use RNG to draw the same set of shapes every time"
 		' task.rank = 1
     End Sub
@@ -266,7 +260,6 @@ End Class
 Public Class Draw_SymmetricalShapes
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Number of points", 200, 1000, 500)
@@ -355,7 +348,6 @@ Public Class Draw_Arc
     Dim colorIndex As Integer
     Dim thickness As Integer
     Public Sub New()
-        initParent()
 
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(7 - 1)
@@ -428,7 +420,6 @@ Public Class Draw_ViewObjects
     Inherits VBparent
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 2)
@@ -480,7 +471,6 @@ Public Class Draw_Frustrum
     Inherits VBparent
     Public xyzDepth As Depth_WorldXYZ_MT
     Public Sub New()
-        initParent()
         xyzDepth = New Depth_WorldXYZ_MT()
         xyzDepth.depthUnitsMeters = True
 
@@ -521,7 +511,6 @@ Public Class Draw_ClipLine
         If task.useKalman Then flow.msgs.Add("--------------------------- setup ---------------------------")
     End Sub
     Public Sub New()
-        initParent()
 
         flow = New Font_FlowText()
 
@@ -574,7 +563,6 @@ Public Class Draw_Intersection
     Public intersect As Boolean
     Public intersectionPoint As cv.Point2f
     Public Sub New()
-        initParent()
         task.desc = "Determine if 2 lines intersect"
 		' task.rank = 1
     End Sub
@@ -622,7 +610,6 @@ Public Class Draw_Hexagon
     Inherits VBparent
     Dim alpha As New imageForm
     Public Sub New()
-        initParent()
         alpha.imagePic.Image = Image.FromFile(task.parms.homeDir + "Data/GestaltCube.gif")
         alpha.Show()
         alpha.Size = New System.Drawing.Size(dst1.Width + 10, dst1.Height + 10)

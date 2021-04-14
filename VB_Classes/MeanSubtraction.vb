@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 Public Class MeanSubtraction_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Scaling Factor = mean/scaling factor X100", 1, 500, 100)

@@ -6,7 +6,6 @@ Imports System.Windows.Forms
 Public Class xPhoto_Bm3dDenoise
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Denoise image with block matching and filtering."
 		' task.rank = 1
         label1 = "Bm3dDenoising"
@@ -30,7 +29,6 @@ End Class
 Public Class xPhoto_Bm3dDenoiseDepthImage
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Denoise the depth image with block matching and filtering."
 		' task.rank = 1
         label2 = "Difference from Input"
@@ -69,7 +67,6 @@ Public Class xPhoto_OilPaint_CPP
     Inherits VBparent
     Dim xPhoto_OilPaint As IntPtr
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "xPhoto Dynamic Ratio", 1, 127, 7)

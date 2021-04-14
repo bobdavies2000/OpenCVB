@@ -4,7 +4,6 @@ Public Class GetRotationMatrix2D_Options
     Inherits VBparent
     Public warpFlag As cv.InterpolationFlags
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 7)
@@ -46,7 +45,6 @@ Public Class GetRotationMatrix2D_Basics
     Public Mflip As cv.Mat
     Public rotateOptions As GetRotationMatrix2D_Options
     Public Sub New()
-        initParent()
         rotateOptions = New GetRotationMatrix2D_Options
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -76,7 +74,6 @@ Public Class GetRotationMatrix2D_Box
     Inherits VBparent
     Dim rotation As GetRotationMatrix2D_Basics
     Public Sub New()
-        initParent()
         rotation = New GetRotationMatrix2D_Basics()
         task.drawRect = New cv.Rect(100, 100, 100, 100)
 

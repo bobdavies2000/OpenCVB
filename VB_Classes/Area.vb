@@ -20,7 +20,6 @@ Public Class Area_MinTriangle_CPP
         ReDim dstData(3 * Marshal.SizeOf(numberOfPoints) * 2 - 1) ' minTriangle returns 3 points
     End Sub
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Area Number of Points", 1, 30, 5)
@@ -73,7 +72,6 @@ Public Class Area_MinRect
         ReDim srcPoints(numberOfPoints)
     End Sub
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -112,7 +110,6 @@ Public Class Area_MinMotionRect
     Inherits VBparent
     Dim bgSub As BGSubtract_MOG
     Public Sub New()
-        initParent()
         bgSub = New BGSubtract_MOG()
         Static bgSubLearnRate = findSlider("MOG Learn Rate")
         bgSubLearnRate.Value = 100 ' low threshold to maximize motion
@@ -150,7 +147,6 @@ End Class
 Public Class Area_FindNonZero
     Inherits VBparent
     Public Sub New()
-        initParent()
         label1 = "Coordinates of non-zero points"
         label2 = "Non-zero original points"
         task.desc = "Use FindNonZero API to get coordinates of non-zero points."

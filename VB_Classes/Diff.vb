@@ -3,7 +3,6 @@ Public Class Diff_Basics
     Inherits VBparent
     Public lastFrame As cv.Mat
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Change threshold for each pixel", 1, 255, 25)
@@ -43,7 +42,6 @@ Public Class Diff_UnstableDepthAndColor
     Public depth As Depth_NotMissing
     Dim lastFrames() As cv.Mat
     Public Sub New()
-        initParent()
         diff = New Diff_Basics()
         diff.sliders.trackbar(0).Value = 20 ' this is color threshold - low means detecting more motion.
 

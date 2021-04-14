@@ -7,7 +7,6 @@ Public Class SLR_Basics
     Dim slr As New CS_Classes.SLR
     Dim plot As Plot_Basics_CPP
     Public Sub New()
-        initParent()
         plot = New Plot_Basics_CPP()
         input = New SLR_Data()
         If standalone Then
@@ -69,7 +68,6 @@ Public Class SLR_Data
     Public dataX As New List(Of Double)
     Public dataY As New List(Of Double)
     Public Sub New()
-        initParent()
         plot = New Plot_Basics_CPP()
 
         Dim sr = New StreamReader(task.parms.homeDir + "/Data/real_data.txt")
@@ -106,7 +104,6 @@ Public Class SLR_Image
     Dim slr As SLR_Basics
     Dim hist As Histogram_Graph
     Public Sub New()
-        initParent()
         hist = New Histogram_Graph()
         hist.plotRequested = True
         slr = New SLR_Basics()

@@ -15,7 +15,6 @@ Public Class Face_Haar_LBP
     Dim haarCascade As cv.CascadeClassifier
     Dim lbpCascade As cv.CascadeClassifier
     Public Sub New()
-        initParent()
         haarCascade = New cv.CascadeClassifier(task.parms.homeDir + "Data/haarcascade_frontalface_default.xml")
         lbpCascade = New cv.CascadeClassifier(task.parms.homeDir + "Data/lbpcascade_frontalface.xml")
         task.desc = "Detect faces in the video stream."
@@ -37,7 +36,6 @@ Public Class Face_Haar_Alt
     Inherits VBparent
     Dim haarCascade As cv.CascadeClassifier
     Public Sub New()
-        initParent()
         haarCascade = New cv.CascadeClassifier(task.parms.homeDir + "Data/haarcascade_frontalface_alt.xml")
         task.desc = "Detect faces Haar_alt database."
 		' task.rank = 1

@@ -7,7 +7,6 @@ Public Class MeanShift_Basics
     Public trackbox As New cv.Rect
     Public usingDrawRect As Boolean
     Public Sub New()
-        initParent()
         label1 = "Draw anywhere to start mean shift tracking."
         task.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track.  Tracker Algorithm"
 		' task.rank = 1
@@ -51,7 +50,6 @@ Public Class MeanShift_Depth
     Dim ms As MeanShift_Basics
     Dim blob As Depth_ForegroundHead
     Public Sub New()
-        initParent()
         ms = New MeanShift_Basics()
         blob = New Depth_ForegroundHead()
         label1 = "Draw anywhere to start mean shift tracking."
@@ -89,7 +87,6 @@ End Class
 Public Class MeanShift_PyrFilter
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "MeanShift Spatial Radius", 1, 100, 10)
@@ -119,7 +116,6 @@ Public Class Meanshift_TopObjects
     Dim mats1 As Mat_4to1
     Dim mats2 As Mat_4to1
     Public Sub New()
-        initParent()
         mats1 = New Mat_4to1()
 
         mats2 = New Mat_4to1()

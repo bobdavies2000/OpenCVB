@@ -26,7 +26,6 @@ Public Class SuperPixel_Basics_CPP
     Public wireGrid As cv.Mat
     Public gridColor = cv.Scalar.White
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Number of SuperPixels", 1, 1000, 400)
@@ -86,7 +85,6 @@ Public Class SuperPixel_BinarizedImage
     Dim pixels As SuperPixel_Basics_CPP
     Dim binarize As Binarize_Basics
     Public Sub New()
-        initParent()
 
         binarize = New Binarize_Basics()
 
@@ -117,7 +115,6 @@ Public Class SuperPixel_Depth
     Inherits VBparent
     Dim pixels As SuperPixel_Basics_CPP
     Public Sub New()
-        initParent()
         pixels = New SuperPixel_Basics_CPP()
 
         task.desc = "Create SuperPixels using RGBDepth image."
@@ -140,7 +137,6 @@ Public Class SuperPixel_WithCanny
     Dim pixels As SuperPixel_Basics_CPP
     Dim edges As Edges_Basics
     Public Sub New()
-        initParent()
         edges = New Edges_Basics()
 
         pixels = New SuperPixel_Basics_CPP()
@@ -170,7 +166,6 @@ Public Class SuperPixel_WithLineDetector
     Dim pixels As SuperPixel_Basics_CPP
     Dim lines As Line_Basics
     Public Sub New()
-        initParent()
         lines = New Line_Basics()
 
         pixels = New SuperPixel_Basics_CPP()

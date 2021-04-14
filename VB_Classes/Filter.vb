@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 Public Class Filter_Laplacian
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Use a filter to approximate the Laplacian derivative."
 		' task.rank = 1
         label1 = "Sharpened image using Filter2D output"
@@ -25,7 +24,6 @@ End Class
 Public Class Filter_NormalizedKernel
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 4)
             radio.check(0).Text = "INF"
@@ -70,7 +68,6 @@ End Class
 Public Class Filter_Normalized2D
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Filter Normalized 2D kernel size", 1, 21, 3)
@@ -93,7 +90,6 @@ End Class
 Public Class Filter_SepFilter2D
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
             check.Box(0).Text = "Show Difference SepFilter2D and Gaussian"

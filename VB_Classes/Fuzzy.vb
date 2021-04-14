@@ -9,7 +9,6 @@ Public Class Fuzzy_Basics
     Public contours As cv.Point()()
     Public sortContours As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
-        initParent()
 
         options = New Contours_Basics()
 
@@ -113,7 +112,6 @@ Public Class Fuzzy_ContoursDepth
     Inherits VBparent
     Public fuzzyD As Fuzzy_Basics
     Public Sub New()
-        initParent()
         fuzzyD = New Fuzzy_Basics()
 
         task.desc = "Use contours to outline solids in the depth data"
@@ -136,7 +134,6 @@ Public Class Fuzzy_NeighborProof
     Inherits VBparent
     Dim fuzzy As Fuzzy_Basics
     Public Sub New()
-        initParent()
         fuzzy = New Fuzzy_Basics()
         task.desc = "Prove that every contour point has at least one and only one neighbor with the mask ID and that the rest are zero"
         ' task.rank = 1
@@ -187,7 +184,6 @@ Public Class Fuzzy_TrackerDepth
     Public highlightRect As cv.Rect
     Public highlightRegion = -1
     Public Sub New()
-        initParent()
         fuzzy = New Fuzzy_Basics()
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -251,7 +247,6 @@ Public Class Fuzzy_TrackerDepthClick
     Public highlightRegion = -1
     Public regionMask As cv.Mat
     Public Sub New()
-        initParent()
         tracker = New Fuzzy_TrackerDepth()
         task.desc = "Create centroids and rect's for solid regions and track them - tracker"
         ' task.rank = 1
@@ -290,7 +285,6 @@ Public Class Fuzzy_PointTracker
     Dim pTrack As KNN_PointTracker
     Dim flood As FloodFill_Palette
     Public Sub New()
-        initParent()
         fuzzy = New Fuzzy_Basics()
         flood = New FloodFill_Palette()
         pTrack = New KNN_PointTracker()

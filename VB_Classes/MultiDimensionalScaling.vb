@@ -14,7 +14,6 @@ Public Class MultiDimensionScaling_Cities
         2182, 1737, 1021, 1891, 959, 2734, 2408, 678, 0, 2329,    ' Seattle
         543, 597, 1494, 1220, 2300, 923, 205, 2442, 2329, 0}      ' Washington D.C.
     Public Sub New()
-        initParent()
         label1 = "Resulting solution using cv.Eigen"
         task.desc = "Use OpenCV's Eigen function to solve a system of equations"
 		' task.rank = 1

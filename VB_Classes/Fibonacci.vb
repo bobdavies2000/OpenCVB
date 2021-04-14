@@ -4,7 +4,6 @@ Public Class Fibonacci_Basics
     Inherits VBparent
     Dim flow As Font_FlowText
     Public Sub New()
-        initParent()
         flow = New Font_FlowText()
         task.desc = "Generate the fibonacci sequence using conventional code"
 		' task.rank = 1
@@ -33,7 +32,6 @@ Public Class Fibonacci_Yield
     Inherits VBparent
     Dim flow As Font_FlowText
     Public Sub New()
-        initParent()
         flow = New Font_FlowText()
         task.desc = "Generate the fibonacci sequence using ienumerable's"
 		' task.rank = 1

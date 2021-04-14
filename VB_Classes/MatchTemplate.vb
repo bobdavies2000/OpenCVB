@@ -10,7 +10,6 @@ Public Class MatchTemplate_Basics
     Public correlation As Single
     Public matchOption As cv.TemplateMatchModes
     Public Sub New()
-        initParent()
         flow = New Font_FlowText()
 
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -76,7 +75,6 @@ Public Class MatchTemplate_RowCorrelation
     Dim match As MatchTemplate_Basics
     Dim flow As Font_FlowText
     Public Sub New()
-        initParent()
         flow = New Font_FlowText()
 
         match = New MatchTemplate_Basics()
@@ -122,7 +120,6 @@ Public Class MatchTemplate_DrawRect
     Dim match As MatchTemplate_Basics
     Dim addw As AddWeighted_Basics
     Public Sub New()
-        initParent()
         If standalone Then task.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
 
         addw = New AddWeighted_Basics
@@ -179,7 +176,6 @@ Public Class MatchTemplate_BestEntropy_MT
     Dim entropy As Entropy_Highest
     Dim match As MatchTemplate_DrawRect
     Public Sub New()
-        initParent()
 
         match = New MatchTemplate_DrawRect()
 
@@ -218,7 +214,6 @@ Public Class MatchTemplate_Movement
     Dim match As MatchTemplate_Basics
     Public mask As cv.Mat
     Public Sub New()
-        initParent()
         match = New MatchTemplate_Basics
         grid = New Thread_Grid
 

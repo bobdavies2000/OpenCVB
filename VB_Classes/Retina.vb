@@ -22,7 +22,6 @@ Public Class Retina_Basics_CPP
     Dim magnoData(0) As Byte
     Dim srcData(0) As Byte
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Retina Sample Factor", 1, 10, 2)
@@ -96,7 +95,6 @@ Public Class Retina_Depth
     Inherits VBparent
     Dim retina As Retina_Basics_CPP
     Public Sub New()
-        initParent()
         retina = New Retina_Basics_CPP()
 
         task.desc = "Use the bio-inspired retina algorithm with the depth data."

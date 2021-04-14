@@ -10,7 +10,6 @@ Public Class Surf_Basics
     Public srcLeft As New cv.Mat
     Public srcRight As New cv.Mat
     Public Sub New()
-        initParent()
         fisheye = New FishEye_Rectified()
 
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -52,7 +51,6 @@ Public Class Surf_BasicsVB
     Dim surf As Surf_Basics
     Dim fisheye As FishEye_Rectified
     Public Sub New()
-        initParent()
         fisheye = New FishEye_Rectified()
         surf = New Surf_Basics()
         task.desc = "Use left and right views to match points in horizontal slices."
@@ -74,7 +72,6 @@ Public Class Surf_DrawMatchManual_CS
     Inherits VBparent
     Dim surf As Surf_Basics
     Public Sub New()
-        initParent()
         surf = New Surf_Basics()
         surf.CS_SurfBasics.drawPoints = False
 

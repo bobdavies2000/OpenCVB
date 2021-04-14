@@ -4,7 +4,6 @@ Public Class kMeans_Basics
     Public kmeansK As Integer
     Public resizeFactor = 1 ' update this to 2 or 4 to speed up the kmeans performance.
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
@@ -56,7 +55,6 @@ Public Class kMeans_BasicsDepthColor
     Public resizeRequest As Boolean = True
     Public useDepthColor As Boolean = True
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
@@ -106,7 +104,6 @@ Public Class kMeans_Clusters
     Dim Mats As Mat_4to1
     Dim km As kMeans_BasicsDepthColor
     Public Sub New()
-        initParent()
         Mats = New Mat_4to1()
 
         km = New kMeans_BasicsDepthColor()
@@ -141,7 +138,6 @@ Public Class kMeans_RGBFast
     Public resizeFactor = 2
     Public clusterCount = 6
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
@@ -185,7 +181,6 @@ Public Class kMeans_RGB_Plus_XYDepth
     Dim km As kMeans_BasicsDepthColor
     Dim clusterColors() As cv.Vec6i
     Public Sub New()
-        initParent()
         km = New kMeans_BasicsDepthColor()
         label1 = "kmeans - RGB, XY, and Depth Raw"
         task.desc = "Cluster with kMeans RGB, x, y, and depth."
@@ -240,7 +235,6 @@ End Class
 Public Class kMeans_XYDepth
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
@@ -281,7 +275,6 @@ End Class
 Public Class kMeans_Depth_FG_BG
     Inherits VBparent
     Public Sub New()
-        initParent()
         label1 = "Foreground Mask"
         label2 = "Background Mask"
         task.desc = "Separate foreground and background using Kmeans (with k=2) using the depth value of center point."
@@ -315,7 +308,6 @@ End Class
 Public Class kMeans_LAB
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
@@ -358,7 +350,6 @@ End Class
 Public Class kMeans_Color
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "kMeans cluster count (k)", 2, 32, 3)
@@ -393,7 +384,6 @@ Public Class kMeans_Color_MT
     Inherits VBparent
     Public grid As Thread_Grid
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 2)
@@ -445,7 +435,6 @@ End Class
 Public Class kMeans_ColorDepth
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 3)
@@ -491,7 +480,6 @@ Public Class kMeans_ColorDepth_MT
     Inherits VBparent
     Public grid As Thread_Grid
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 3)
@@ -547,7 +535,6 @@ Public Class KMeans_Subdivision
     Inherits VBparent
     Dim kmeans As kMeans_BasicsDepthColor
     Public Sub New()
-        initParent()
         kmeans = New kMeans_BasicsDepthColor()
         kmeans.resizeRequest = False
         task.desc = "Use KMeans to subdivide an image and then subdivide it again."
@@ -587,7 +574,6 @@ Public Class KMeans_Subdivision1
     Inherits VBparent
     Dim kmeans As kMeans_BasicsDepthColor
     Public Sub New()
-        initParent()
         kmeans = New kMeans_BasicsDepthColor()
         kmeans.resizeRequest = False
         kmeans.useDepthColor = False

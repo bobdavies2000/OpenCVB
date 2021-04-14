@@ -5,7 +5,6 @@ Public Class Structured_Floor
     Dim kalman As Kalman_VB_Basics
     Public floorYplane As Single
     Public Sub New()
-        initParent()
         kalman = New Kalman_VB_Basics()
 
         structD = New Structured_SliceH()
@@ -53,7 +52,6 @@ Public Class Structured_Ceiling
     Public structD As Structured_SliceH
     Dim kalman As Kalman_Basics
     Public Sub New()
-        initParent()
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(0)
 
@@ -94,7 +92,6 @@ Public Class Structured_MultiSliceH
     Public structD As Structured_SliceH
     Public sliceMask As cv.Mat
     Public Sub New()
-        initParent()
         side2D = New Histogram_SideData
         structD = New Structured_SliceH
 
@@ -143,7 +140,6 @@ Public Class Structured_MultiSliceV
     Public top2D As Histogram_TopData
     Public structD As Structured_SliceV
     Public Sub New()
-        initParent()
 
         top2D = New Histogram_TopData
         structD = New Structured_SliceV
@@ -197,7 +193,6 @@ Public Class Structured_MultiSlice
     Public sliceMask As cv.Mat
     Public split() As cv.Mat
     Public Sub New()
-        initParent()
 
         side2D = New Histogram_SideData()
         top2D = New Histogram_TopData()
@@ -262,7 +257,6 @@ Public Class Structured_MultiSliceLines
     Dim multi As Structured_MultiSlice
     Public ldetect As Line_Basics
     Public Sub New()
-        initParent()
         ldetect = New Line_Basics()
         Dim lenSlider = findSlider("Line length threshold in pixels")
         lenSlider.Value = lenSlider.Maximum ' don't need the yellow line...
@@ -288,7 +282,6 @@ Public Class Structured_MultiSlicePolygon
     Inherits VBparent
     Dim multi As Structured_MultiSlice
     Public Sub New()
-        initParent()
         multi = New Structured_MultiSlice()
         label1 = "Input to FindContours"
         label2 = "ApproxPolyDP 4-corner object from FindContours input"
@@ -333,7 +326,6 @@ Public Class Structured_SliceXPlot
     Dim structD As Structured_SliceV
     Dim cushionSlider As Windows.Forms.TrackBar
     Public Sub New()
-        initParent()
         multi = New Structured_MultiSlice()
         structD = New Structured_SliceV()
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
@@ -388,7 +380,6 @@ Public Class Structured_LinearizeFloor
     Public sliceMask As cv.Mat
     Public floorYPlane As Single
     Public Sub New()
-        initParent()
         kalman = New Kalman_VB_Basics()
         floor = New Structured_Floor()
 
@@ -488,7 +479,6 @@ End Class
 Public Class Structured_SliceOptions
     Inherits VBparent
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -519,7 +509,6 @@ Public Class Structured_SliceH
     Public sliceOptions As Structured_SliceOptions
     Public yPlaneOffset As Integer
     Public Sub New()
-        initParent()
         side2D = New Histogram_SideData()
 
         sliceOptions = New Structured_SliceOptions
@@ -582,7 +571,6 @@ Public Class Structured_SliceV
     Public sliceMask As cv.Mat
     Public sliceOptions As Structured_SliceOptions
     Public Sub New()
-        initParent()
         top2D = New Histogram_TopData()
 
         sliceOptions = New Structured_SliceOptions
@@ -646,7 +634,6 @@ Public Class Structured_SliceVStable
     Public offsetSlider As Windows.Forms.TrackBar
     Public sliceMask As cv.Mat
     Public Sub New()
-        initParent()
         top2D = New Histogram_TopData
         structD = New Structured_SliceV
 
@@ -702,7 +689,6 @@ Public Class Structured_CenterSlice
     Public avgPt As cv.Point2f
     Public b As Integer
     Public Sub New()
-        initParent()
         vSlice = New Structured_SliceV
         line = New Line_Basics
         label1 = "Center Slice in yellow"
@@ -780,7 +766,6 @@ Public Class Structured_CloudFail
     Inherits VBparent
     Dim mmPixel As Pixel_Measure
     Public Sub New()
-        initParent()
         mmPixel = New Pixel_Measure
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -871,7 +856,6 @@ Public Class Structured_Cloud
     Inherits VBparent
     Public data As New cv.Mat
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Number of slices", 0, 200, 100)
@@ -919,7 +903,6 @@ Public Class Structured_Crosshairs
     Inherits VBparent
     Dim sCloud As Structured_Cloud
     Public Sub New()
-        initParent()
         sCloud = New Structured_Cloud
         task.desc = "Connect vertical and horizontal dots that are in the same column and row."
 		' task.rank = 1

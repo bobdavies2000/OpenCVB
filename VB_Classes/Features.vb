@@ -5,7 +5,6 @@ Public Class Features_GoodFeatures
     Inherits VBparent
     Public goodFeatures As New List(Of cv.Point2f)
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Number of Points", 10, 1000, 200)
@@ -41,7 +40,6 @@ Public Class Features_PointTracker
     Dim pTrack As KNN_PointTracker
     Dim rRadius = 10
     Public Sub New()
-        initParent()
         features = New Features_GoodFeatures()
         pTrack = New KNN_PointTracker()
         Dim drawRectCheck = findCheckBox("Draw rectangle and centroid for each mask")

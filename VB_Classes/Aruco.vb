@@ -5,7 +5,6 @@ Imports OpenCvSharp.Aruco.CvAruco
 Public Class Aruco_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Show how to use the Aruco markers and rotate the image accordingly."
 		' task.rank = 1
     End Sub
@@ -33,7 +32,6 @@ Public Class Aruco_Test
     Inherits VBparent
     Dim aruco As New CS_Classes.Aruco_Detect
     Public Sub New()
-        initParent()
         label1 = "Original Image with marker ID's"
         label2 = "Normalized image after WarpPerspective."
         task.desc = "Testing the Aruco marker detection in C#"

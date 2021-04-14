@@ -103,7 +103,6 @@ End Module
 Public Class PointCloud_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Display the point cloud in a 2D image for use with the PixelViewer"
 		' task.rank = 1
     End Sub
@@ -120,7 +119,6 @@ End Class
 Public Class PointCloud_Continuous
     Inherits VBparent
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -158,7 +156,6 @@ End Class
 Public Class PointCloud_Inspector
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Inspection Line", 0, dst1.Width, dst1.Width / 2)
@@ -209,7 +206,6 @@ End Class
 Public Class PointCloud_Continuous_VB
     Inherits VBparent
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -261,7 +257,6 @@ Public Class PointCloud_ColorizeSide
     Public xCheckbox As Windows.Forms.CheckBox
     Public zCheckbox As Windows.Forms.CheckBox
     Public Sub New()
-        initParent()
 
         gpalette = New Palette_Gradient()
         gpalette.color1 = cv.Scalar.Yellow
@@ -366,7 +361,6 @@ Public Class PointCloud_ColorizeTop
     Dim imu As IMU_GVector
     Public xCheckbox As Windows.Forms.CheckBox
     Public Sub New()
-        initParent()
 
         If standalone Then imu = New IMU_GVector
         gpalette = New Palette_Gradient()
@@ -450,7 +444,6 @@ Public Class PointCloud_Raw_CPP
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -501,7 +494,6 @@ Public Class PointCloud_Raw
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -560,7 +552,6 @@ Public Class PointCloud_Kalman_TopView
     Public flood As FloodFill_Palette
     Public topView As Histogram_TopView2D
     Public Sub New()
-        initParent()
 
         pTrack = New KNN_PointTracker
         flood = New FloodFill_Palette
@@ -605,7 +596,6 @@ Public Class PointCloud_Kalman_SideView
     Public pTrack As KNN_PointTracker
     Public cmat As PointCloud_ColorizeSide
     Public Sub New()
-        initParent()
 
 
         pTrack = New KNN_PointTracker
@@ -654,7 +644,6 @@ Public Class PointCloud_BackProject
     Dim both As PointCloud_BothViews
     Dim mats As Mat_4to1
     Public Sub New()
-        initParent()
 
         both = New PointCloud_BothViews()
         mats = New Mat_4to1()
@@ -698,7 +687,6 @@ Public Class PointCloud_FrustrumTop
     Dim topView As Histogram_TopView2D
     Dim cmat As PointCloud_ColorizeTop
     Public Sub New()
-        initParent()
 
         cmat = New PointCloud_ColorizeTop
         frustrum = New Draw_Frustrum
@@ -738,7 +726,6 @@ Public Class PointCloud_FrustrumSide
     Dim sideView As Histogram_SideView2D
     Dim cmat As PointCloud_ColorizeSide
     Public Sub New()
-        initParent()
 
         cmat = New PointCloud_ColorizeSide
         frustrum = New Draw_Frustrum
@@ -776,7 +763,6 @@ Public Class PointCloud_Singletons
     Inherits VBparent
     Public topView As Histogram_TopView2D
     Public Sub New()
-        initParent()
         topView = New Histogram_TopView2D()
         topView.resizeHistOutput = False
         task.hist3DThreshold = 1
@@ -811,7 +797,6 @@ Public Class PointCloud_ReducedSideView
     Dim reduction As Reduction_Basics
     Dim histOutput As New cv.Mat
     Public Sub New()
-        initParent()
         gCloud = New Depth_PointCloud_IMU
         reduction = New Reduction_Basics
         task.desc = "Create a stable side view of the point cloud"
@@ -850,7 +835,6 @@ Public Class PointCloud_ReducedTopView
     Dim reduction As Reduction_Basics
     Dim histOutput As New cv.Mat
     Public Sub New()
-        initParent()
         gCloud = New Depth_PointCloud_IMU
         reduction = New Reduction_Basics
         task.desc = "Create a stable side view of the point cloud"
@@ -891,7 +875,6 @@ Public Class PointCloud_ObjectsTop
     Dim cmat As PointCloud_ColorizeTop
     Public colorizeNeeded As Boolean
     Public Sub New()
-        initParent()
 
         cmat = New PointCloud_ColorizeTop
         measureTop = New PointCloud_Kalman_TopView
@@ -1003,7 +986,6 @@ Public Class PointCloud_ObjectsSide
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Dim cmat As PointCloud_ColorizeSide
     Public Sub New()
-        initParent()
 
         cmat = New PointCloud_ColorizeSide
         measureSide = New PointCloud_Kalman_SideView
@@ -1124,7 +1106,6 @@ Public Class PointCloud_BothViews
     Dim cmatSide As PointCloud_ColorizeSide
     Dim cmatTop As PointCloud_ColorizeTop
     Public Sub New()
-        initParent()
 
         levelCheck = New IMU_isCameraLevel
         topPixel = New PointCloud_ObjectsTop
@@ -1247,7 +1228,6 @@ Public Class PointCloud_BackProjectTopView
     Inherits VBparent
     Dim view As PointCloud_ObjectsTop
     Public Sub New()
-        initParent()
         view = New PointCloud_ObjectsTop
         view.colorizeNeeded = True
 
@@ -1311,7 +1291,6 @@ Public Class PointCloud_BackProjectSideView
     Dim view As PointCloud_ObjectsSide
     Dim cmatSide As PointCloud_ColorizeSide
     Public Sub New()
-        initParent()
 
         view = New PointCloud_ObjectsSide
         cmatSide = New PointCloud_ColorizeSide

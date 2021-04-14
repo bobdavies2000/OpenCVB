@@ -20,7 +20,6 @@ Public Class Benford_Basics
     Dim addW As AddWeighted_Basics
     Dim use99 As Boolean
     Public Sub New()
-        initParent()
         addW = New AddWeighted_Basics
         addW.weightSlider.Value = 75
 
@@ -42,7 +41,7 @@ Public Class Benford_Basics
         ReDim counts(expectedDistribution.Count - 1)
         use99 = True
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If standalone Or task.intermediateReview = caller Then
             benford.Run(src)
             dst1 = benford.dst1
@@ -105,12 +104,9 @@ Public Class Benford_NormalizedImage
     Inherits VBparent
     Public benford As Benford_Basics
     Public Sub New()
-        initParent()
-
         benford = New Benford_Basics()
-
         task.desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -133,8 +129,6 @@ Public Class Benford_NormalizedImage99
     Inherits VBparent
     Public benford As Benford_Basics
     Public Sub New()
-        initParent()
-
         benford = New Benford_Basics()
         benford.setup99()
 
@@ -162,8 +156,6 @@ Public Class Benford_JPEG
     Inherits VBparent
     Public benford As Benford_Basics
     Public Sub New()
-        initParent()
-
         benford = New Benford_Basics()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -194,8 +186,6 @@ Public Class Benford_JPEG99
     Inherits VBparent
     Public benford As Benford_Basics
     Public Sub New()
-        initParent()
-
         benford = New Benford_Basics()
         benford.setup99()
 
@@ -228,8 +218,6 @@ Public Class Benford_PNG
     Inherits VBparent
     Public benford As Benford_Basics
     Public Sub New()
-        initParent()
-
         benford = New Benford_Basics()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -259,7 +247,6 @@ Public Class Benford_Depth
     Inherits VBparent
     Public benford As Benford_Basics
     Public Sub New()
-        initParent()
         benford = New Benford_Basics()
         task.desc = "Apply Benford to the depth data"
 		' task.rank = 1
@@ -280,7 +267,6 @@ Public Class Benford_DepthRGB
     Inherits VBparent
     Public benford As Benford_JPEG
     Public Sub New()
-        initParent()
         benford = New Benford_JPEG()
         task.desc = "Apply Benford to the depth RGB image that is compressed with JPEG"
 		' task.rank = 1
@@ -304,7 +290,6 @@ Public Class Benford_Primes
     Dim sieve As Sieve_BasicsVB
     Dim benford As Benford_Basics
     Public Sub New()
-        initParent()
         benford = New Benford_Basics
         sieve = New Sieve_BasicsVB
         Dim countSlider = findSlider("Count of desired primes")

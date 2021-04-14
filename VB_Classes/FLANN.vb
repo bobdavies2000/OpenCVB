@@ -4,7 +4,6 @@ Imports cv = OpenCvSharp
 Public Class FLANN_Test
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. "
 		' task.rank = 1
         label1 = "FLANN Basics"
@@ -49,7 +48,6 @@ Public Class FLANN_Basics
     Dim random As Random_Basics
     Dim qArray() As cv.Point2f
     Public Sub New()
-        initParent()
         random = New Random_Basics()
 
         If findfrm(caller + " Slider Options") Is Nothing Then

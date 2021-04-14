@@ -3,7 +3,6 @@ Public Class TransformationMatrix_Basics
     Inherits VBparent
     Dim topLocations As New List(Of cv.Point3d)
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "TMatrix Top View multiplier", 1, 1000, 500)

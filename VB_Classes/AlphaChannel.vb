@@ -6,16 +6,13 @@ Public Class AlphaChannel_Basics
     Inherits VBparent
     Dim alpha As New imageForm
     Public Sub New()
-        initParent()
-
         alpha.Show()
         alpha.Size = New System.Drawing.Size(dst1.Width + 10, dst1.Height + 10)
 
         task.desc = "Use the the Windows 10 alpha channel to separate foreground and background"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src As cv.Mat)
-
+    Public Sub Run(ByVal src As cv.Mat)
         src = src.CvtColor(cv.ColorConversionCodes.BGR2BGRA)
         Dim split = src.Split()
         split(3) = task.depthMask
@@ -32,8 +29,6 @@ End Class
 Public Class AlphaChannel_Blend
     Inherits VBparent
     Public Sub New()
-        initParent()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Transparency amount", 0, 255, 100)

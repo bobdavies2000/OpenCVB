@@ -5,7 +5,6 @@ Public Class MFD_Basics
     Public stableImg As cv.Mat
     Dim dMax As Depth_SmoothMax
     Public Sub New()
-        initParent()
         dMax = New Depth_SmoothMax
         motion = New Motion_Basics
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -53,7 +52,6 @@ Public Class MFD_Depth
     Inherits VBparent
     Dim mfd As MFD_Basics
     Public Sub New()
-        initParent()
         mfd = New MFD_Basics
         label1 = "Motion-filtered depth data"
         task.desc = "Stabilize the depth image but update any areas with motion"
@@ -77,7 +75,6 @@ Public Class MFD_PointCloud
     Inherits VBparent
     Dim mfd As MFD_Basics
     Public Sub New()
-        initParent()
         mfd = New MFD_Basics
         label1 = "Motion-filtered PointCloud"
         task.desc = "Stabilize the PointCloud but update any areas with motion"
@@ -104,7 +101,6 @@ Public Class MFD_Sobel
     Dim mfd As MFD_Basics
     Dim sobel As Edges_Sobel
     Public Sub New()
-        initParent()
         mfd = New MFD_Basics
         sobel = New Edges_Sobel
 
@@ -140,7 +136,6 @@ Public Class MFD_BinarizedSobel
     Public mfd As MFD_Basics
     Dim sobel As Edges_BinarizedSobel
     Public Sub New()
-        initParent()
         mfd = New MFD_Basics
         sobel = New Edges_BinarizedSobel
         label1 = "Binarized Sobel edges of Motion-Filtered RGB"
@@ -175,7 +170,6 @@ Public Class MFD_FloodFill
     Dim palette As Palette_RandomColorMap
     Dim sobel As MFD_BinarizedSobel
     Public Sub New()
-        initParent()
 
         palette = New Palette_RandomColorMap
         sobel = New MFD_BinarizedSobel

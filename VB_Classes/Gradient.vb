@@ -4,7 +4,6 @@ Public Class Gradient_Basics
     Inherits VBparent
     Public sobel As Edges_Sobel
     Public Sub New()
-        initParent()
         sobel = New Edges_Sobel()
         label2 = "Phase Output"
         task.desc = "Use phase to compute gradient"
@@ -27,7 +26,6 @@ Public Class Gradient_Depth
     Inherits VBparent
     Dim sobel As Edges_Sobel
     Public Sub New()
-        initParent()
         sobel = New Edges_Sobel()
         task.desc = "Use phase to compute gradient on depth image"
 		' task.rank = 1
@@ -56,7 +54,6 @@ Public Class Gradient_CartToPolar
     Public magnitude As New cv.Mat
     Public angle As New cv.Mat
     Public Sub New()
-        initParent()
         basics = New Gradient_Basics()
 
         Static ksizeSlider = findSlider("Sobel kernel Size")
@@ -103,7 +100,6 @@ Public Class Gradient_StableDepth
     Dim motionSD As Motion_MinMaxDepth
     Dim basics As Gradient_Basics
     Public Sub New()
-        initParent()
         motionSD = New Motion_MinMaxDepth
         basics = New Gradient_Basics
         label1 = "Stable depth input to Gradient"

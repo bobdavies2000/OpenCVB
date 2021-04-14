@@ -15,7 +15,6 @@ End Module
 Public Class Quaterion_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 8)
@@ -52,7 +51,6 @@ Public Class Quaterion_IMUPrediction
     Inherits VBparent
     Dim host As IMU_HostFrameTimes
     Public Sub New()
-        initParent()
         host = New IMU_HostFrameTimes()
 
         label1 = "Quaternion_IMUPrediction"

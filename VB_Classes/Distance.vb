@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 Public Class Distance_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)
             radio.check(0).Text = "C"
@@ -42,7 +41,6 @@ Public Class Distance_Foreground
     Inherits VBparent
     Dim foreground As kMeans_Depth_FG_BG
     Public Sub New()
-        initParent()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)
             radio.check(0).Text = "C"

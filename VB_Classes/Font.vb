@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Public Class Font_OpenCV
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Display different font options available in OpenCV"
 		' task.rank = 1
     End Sub
@@ -32,7 +31,6 @@ End Class
 Public Class Font_TrueType
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Display different TrueType fonts"
 		' task.rank = 1
     End Sub
@@ -54,7 +52,6 @@ Public Class Font_FlowText
     Public dst As Integer = RESULT1 ' set to result2 to appear in dst2
     Public maxLineCount = 22
     Public Sub New()
-        initParent()
         If dst1.Height = 480 Then maxLineCount = 26
         task.desc = "Show TrueType text flowing through an image."
 		' task.rank = 1

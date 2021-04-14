@@ -4,7 +4,6 @@ Public Class FAST_Basics
     Inherits VBparent
     Public keypoints() As cv.KeyPoint
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Threshold", 0, 200, 15)
@@ -38,7 +37,6 @@ Public Class FAST_Centroid
     Dim fast As FAST_Basics
     Dim kalman As Kalman_Basics
     Public Sub New()
-        initParent()
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(1) ' 2 elements - cv.point
 

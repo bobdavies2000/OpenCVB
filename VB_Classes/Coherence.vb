@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 Public Class Coherence_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Coherence Sigma", 1, 15, 9)
@@ -89,7 +88,6 @@ Public Class Coherent_Depth
     Inherits VBparent
     Dim coherent As Coherence_Basics
     Public Sub New()
-        initParent()
         coherent = New Coherence_Basics
         task.desc = "Find coherent lines in the depth image - Painterly"
         ' task.rank = 1

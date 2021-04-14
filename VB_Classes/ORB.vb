@@ -5,7 +5,6 @@ Public Class ORB_Basics
     Public keypoints() As cv.KeyPoint
     Dim orb As cv.ORB
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "ORB - desired point count", 10, 2000, 100)

@@ -10,7 +10,6 @@ Public Class Motion_Basics
     Public resetAll As Boolean
     Dim minSlider As Windows.Forms.TrackBar
     Public Sub New()
-        initParent()
         intersect = New Rectangle_Intersection
         contours = New Contours_Basics()
         diff = New Diff_Basics()
@@ -90,7 +89,6 @@ Public Class Motion_WithBlurDilate
     Public changedPixels As Integer
     Public cumulativePixels As Integer
     Public Sub New()
-        initParent()
         contours = New Contours_Basics()
         dilate = New DilateErode_Basics()
         diff = New Diff_Basics()
@@ -157,7 +155,6 @@ Public Class Motion_MinMaxDepth
     Public motion As Motion_Basics
     Public externalReset As Boolean
     Public Sub New()
-        initParent()
         motion = New Motion_Basics
 
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -210,7 +207,6 @@ Public Class Motion_MinMaxPointCloud
     Public stable As Motion_MinMaxDepth
     Public splitPC() As cv.Mat
     Public Sub New()
-        initParent()
         stable = New Motion_MinMaxDepth
         label1 = stable.label1
         label2 = stable.label2
@@ -251,7 +247,6 @@ Public Class Motion_MinMaxDepthColorized
     Dim stable As Motion_MinMaxDepth
     Dim colorize As Depth_ColorizerFastFade_CPP
     Public Sub New()
-        initParent()
         colorize = New Depth_ColorizerFastFade_CPP
         stable = New Motion_MinMaxDepth
         label1 = "32-bit format stable depth data"
@@ -282,7 +277,6 @@ Public Class Motion_ThruCorrelation
     Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -352,7 +346,6 @@ Public Class Motion_CCmerge
     Inherits VBparent
     Dim motionCC As Motion_ThruCorrelation
     Public Sub New()
-        initParent()
         motionCC = New Motion_ThruCorrelation
 
         task.desc = "Use the correlation coefficient to maintain an up-to-date image"

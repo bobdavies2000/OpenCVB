@@ -47,7 +47,6 @@ End Module
 Public Class Python_Run
     Inherits VBparent
     Public Sub New()
-        initParent()
         If task.pythonTaskName = "" Then task.pythonTaskName = task.parms.homeDir + "VB_Classes/PythonPackages.py"
         Dim pythonApp = New FileInfo(task.pythonTaskName)
         If pythonApp.Name.EndsWith("_PS.py") Then
@@ -90,7 +89,6 @@ Public Class Python_MemMap
     Public memMapValues(50 - 1) As Double ' more than we need - buffer for growth.  PyStream assumes 400 bytes length!  Do not change...
     Public memMapbufferSize As Integer
     Public Sub New()
-        initParent()
         memMapbufferSize = System.Runtime.InteropServices.Marshal.SizeOf(GetType(Double)) * memMapValues.Length
         memMapPtr = Marshal.AllocHGlobal(memMapbufferSize)
         memMapFile = MemoryMappedFile.CreateOrOpen("Python_MemMap", memMapbufferSize)
@@ -127,7 +125,6 @@ Public Class Python_SurfaceBlit
     Dim rgbBuffer(1) As Byte
     Dim PythonReady As Boolean
     Public Sub New()
-        initParent()
         pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
         pipe = New NamedPipeServerStream(pipeName, PipeDirection.InOut)
         PipeTaskIndex += 1
@@ -187,7 +184,6 @@ Public Class Python_Stream
     Dim pythonReady As Boolean
     Dim memMap As Python_MemMap
     Public Sub New()
-        initParent()
         pipeName = "PyStream2Way" + CStr(PipeTaskIndex)
         pipeOut = New NamedPipeServerStream(pipeName, PipeDirection.Out)
         pipeIn = New NamedPipeServerStream(pipeName + "Results", PipeDirection.In)

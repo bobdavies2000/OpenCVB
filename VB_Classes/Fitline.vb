@@ -5,7 +5,6 @@ Public Class Fitline_Basics
     Public draw As Draw_Line
     Public lines As New List(Of cv.Point) ' there are always an even number - 2 points define the line.
     Public Sub New()
-        initParent()
         draw = New Draw_Line()
         draw.sliders.trackbar(0).Value = 2
 
@@ -55,7 +54,6 @@ Public Class Fitline_3DBasics_MT
     Inherits VBparent
     Dim hlines As Hough_Lines_MT
     Public Sub New()
-        initParent()
         hlines = New Hough_Lines_MT()
         task.desc = "Use visual lines to find 3D lines."
 		' task.rank = 1
@@ -115,7 +113,6 @@ Public Class Fitline_RawInput
     Public m As Single
     Public bb As Single
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Random point count", 0, 500, 100)
@@ -194,7 +191,6 @@ Public Class Fitline_EigenFit
     Inherits VBparent
     Dim noisyLine As Fitline_RawInput
     Public Sub New()
-        initParent()
         noisyLine = New Fitline_RawInput()
         noisyLine.sliders.trackbar(0).Value = 30
         noisyLine.sliders.trackbar(1).Value = 400

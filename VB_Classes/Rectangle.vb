@@ -5,7 +5,6 @@ Public Class Rectangle_Basics
     Public rectangles As New List(Of cv.Rect)
     Public rotatedRectangles As New List(Of cv.RotatedRect)
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
@@ -60,7 +59,6 @@ Public Class Rectangle_Rotated
     Inherits VBparent
     Public rect As Rectangle_Basics
     Public Sub New()
-        initParent()
         rect = New Rectangle_Basics
         Dim rotatedCheck = findCheckBox("Draw Rotated Rectangles (unchecked will draw rectangles)")
         rotatedCheck.Checked = True
@@ -85,7 +83,6 @@ Public Class Rectangle_CComp
     Dim ccomp As CComp_Basics_FullImage
     Dim rMotion As Rectangle_Motion
     Public Sub New()
-        initParent()
         rMotion = New Rectangle_Motion
         ccomp = New CComp_Basics_FullImage
 
@@ -123,7 +120,6 @@ Public Class Rectangle_Overlap
     Public enclosingRect As cv.Rect
     Dim draw As Rectangle_Basics
     Public Sub New()
-        initParent()
 
         draw = New Rectangle_Basics
         Dim countSlider = findSlider("Rectangle Count")
@@ -177,7 +173,6 @@ Public Class Rectangle_Motion
     Public motion As Motion_Basics
     Public mOverlap As Rectangle_Intersection
     Public Sub New()
-        initParent()
         motion = New Motion_Basics
         mOverlap = New Rectangle_Intersection
         label1 = "Yellow is pixel motion.  Red is all pixel motion"
@@ -202,7 +197,6 @@ Public Class Rectangle_MotionDepth
     Public motion As Motion_Basics
     Dim colorize As Depth_ColorizerFastFade_CPP
     Public Sub New()
-        initParent()
         colorize = New Depth_ColorizerFastFade_CPP
         motion = New Motion_Basics
         label1 = "Rectangles from contours of motion (unconsolidated)"
@@ -243,7 +237,6 @@ Public Class Rectangle_Intersection
     Public enclosingRects As New List(Of cv.Rect)
     Dim otherRects As New List(Of cv.Rect)
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -328,7 +321,6 @@ Public Class Rectangle_Union
     Public inputRects As New List(Of cv.Rect)
     Public allRect As cv.Rect ' a rectangle covering all the input
     Public Sub New()
-        initParent()
         task.desc = "Create a rectangle that contains all the input rectangles"
 		' task.rank = 1
     End Sub
@@ -386,7 +378,6 @@ Public Class Rectangle_MultiOverlap
     Public inputRects As New List(Of cv.Rect)
     Public outputRects As New List(Of cv.Rect)
     Public Sub New()
-        initParent()
         task.desc = "Given a group of rectangles, merge all the rectangles that overlap"
 		' task.rank = 1
     End Sub

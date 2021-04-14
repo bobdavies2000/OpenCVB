@@ -7,7 +7,6 @@ Public Class Plot_Basics
     Dim hist As Histogram_Graph
     Public plotCount As Integer = 3
     Public Sub New()
-        initParent()
         hist = New Histogram_Graph()
         hist.plotRequested = True
 
@@ -44,7 +43,6 @@ Public Class Plot_Basics_CPP
     Public srcX() As Double
     Public srcY() As Double
     Public Sub New()
-        initParent()
         task.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
 		' task.rank = 1
     End Sub
@@ -105,7 +103,6 @@ Public Class Plot_OverTime
     Public controlScale As Boolean ' Use this to programmatically control the scale (rather than let the automated way below keep the scale.)
     Dim myStopWatch As Stopwatch
     Public Sub New()
-        initParent()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
             check.Box(0).Text = "Reset the plot scale"
@@ -215,7 +212,6 @@ Public Class Plot_Histogram
     Public backColor As cv.Scalar = cv.Scalar.Red
     Public fixedMaxVal As Integer
     Public Sub New()
-        initParent()
         task.desc = "Plot histogram data with a stable scale at the left of the image."
 		' task.rank = 1
     End Sub
@@ -296,7 +292,6 @@ Public Class Plot_Depth
     Dim plot As Plot_Basics_CPP
     Dim hist As Histogram_Depth
     Public Sub New()
-        initParent()
         hist = New Histogram_Depth()
         Dim binSlider = findSlider("Histogram Depth Bins")
         binSlider.Minimum = 3  ' but in the opencv plot contrib code - OBO.  This prevents encountering it.  Should be ok!

@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 Public Class Laplacian_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Laplacian Kernel size", 1, 21, 3)
@@ -35,7 +34,6 @@ End Class
 Public Class Laplacian_Blur
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Laplacian Kernel size", 1, 21, 3)
@@ -86,7 +84,6 @@ End Class
 Public Class Laplacian_PyramidFilter
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 6)
             sliders.setupTrackBar(0, "Sharpest", 0, 10, 1)

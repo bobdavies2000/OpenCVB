@@ -5,7 +5,6 @@ Public Class Pixel_Viewer
     Dim firstUpdate = True
     Public viewerForm As New PixelViewerForm
     Public Sub New()
-        initParent()
 
         task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone (it is always present, not standalone)
         standalone = False
@@ -166,7 +165,6 @@ Public Class Pixel_GetSet
     Inherits VBparent
     Dim mats As Mat_4to1
     Public Sub New()
-        initParent()
         mats = New Mat_4to1()
 
         label1 = "Time to copy using get/set,Generic Index, Marshal Copy"
@@ -233,7 +231,6 @@ End Class
 Public Class Pixel_Measure
     Inherits VBparent
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -273,7 +270,6 @@ Public Class Pixel_Sampler
     Dim width = 100
     Dim height = 100
     Public Sub New()
-        initParent()
         random = New Random_Basics
         task.desc = "Find the dominanant pixel color - not an average! This can provide consistent colorizing."
 		' task.rank = 1

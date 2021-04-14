@@ -76,7 +76,6 @@ Public Class Replay_Record
     Dim recordingFilename As FileInfo
     Dim fileNameForm As OptionsFileName
     Public Sub New()
-        initParent()
         fileNameForm = New OptionsFileName
         fileNameForm.OpenFileDialog1.InitialDirectory = task.parms.homeDir + "Data/"
         fileNameForm.OpenFileDialog1.FileName = "*.*"
@@ -169,7 +168,6 @@ Public Class Replay_Play
     Dim recordingFilename As FileInfo
     Dim fileNameForm As OptionsFileName
     Public Sub New()
-        initParent()
 
         fileNameForm = New OptionsFileName
         fileNameForm.OpenFileDialog1.InitialDirectory = task.parms.homeDir + "Data/"
@@ -264,7 +262,6 @@ Public Class Replay_OpenGL
     Dim ogl As OpenGL_Callbacks
     Dim replay As Replay_Play
     Public Sub New()
-        initParent()
         ogl = New OpenGL_Callbacks()
         replay = New Replay_Play()
         task.desc = "Replay a recorded session with OpenGL"

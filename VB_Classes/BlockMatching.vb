@@ -4,7 +4,6 @@ Public Class BlockMatching_Basics
     Inherits VBparent
     Dim colorizer As Depth_Colorizer_CPP
     Public Sub New()
-        initParent()
         colorizer = New Depth_Colorizer_CPP()
 
         If findfrm(caller + " Slider Options") Is Nothing Then

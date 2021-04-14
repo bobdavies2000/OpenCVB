@@ -4,7 +4,6 @@ Imports System.Threading
 Public Class Math_Subtract
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Red", 0, 255, 255)
@@ -59,7 +58,6 @@ Public Class Math_Median_CDF
     Public rangeMax As Integer = 255
     Public bins As integer = 10
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Histogram Bins", 4, 1000, 100)
@@ -97,7 +95,6 @@ Public Class Math_DepthMeanStdev
     Inherits VBparent
     Dim minMax As Depth_NotMissing
     Public Sub New()
-        initParent()
         minMax = New Depth_NotMissing()
         task.desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
 		' task.rank = 1
@@ -126,7 +123,6 @@ Public Class Math_RGBCorrelation
     Dim flow As Font_FlowText
     Dim match As MatchTemplate_Basics
     Public Sub New()
-        initParent()
         flow = New Font_FlowText()
 
         match = New MatchTemplate_Basics()
@@ -164,7 +160,6 @@ Public Class Math_ImageAverage
     Inherits VBparent
     Dim images As New List(Of cv.Mat)
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Average - number of input images", 1, 100, 10)
@@ -214,7 +209,6 @@ Public Class Math_Stdev
     Public lowStdevMask As cv.Mat
     Public saveFrame As cv.Mat
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -295,7 +289,6 @@ Public Class Math_StdevBoundary
     Inherits VBparent
     Dim stdev As Math_Stdev
     Public Sub New()
-        initParent()
         stdev = New Math_Stdev
         label1 = "Low stdev regions.  Gaps filled with OTSU results"
         label2 = "High stdev segments after the first pass"

@@ -4,7 +4,6 @@ Imports cv = OpenCvSharp
 Public Class Bitmap_ToMat
     Inherits VBparent
     Public Sub New()
-        initParent()
         label1 = "Convert color bitmap to Mat"
         label2 = "Convert Mat to bitmap and then back to Mat"
         task.desc = "Convert a color and grayscale bitmap to a cv.Mat"

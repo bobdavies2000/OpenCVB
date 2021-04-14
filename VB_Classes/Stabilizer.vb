@@ -9,7 +9,6 @@ Public Class Stabilizer_Basics
     Public stableRect As cv.Rect
     Dim pad = 20
     Public Sub New()
-        initParent()
         match = New MatchTemplate_Basics
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -105,7 +104,6 @@ End Class
 Public Class Stabilizer_BasicsRandomInput
     Inherits VBparent
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -165,7 +163,6 @@ Public Class Stabilizer_BasicsTest
     Dim random As Stabilizer_BasicsRandomInput
     Dim stable As Stabilizer_Basics
     Public Sub New()
-        initParent()
         stable = New Stabilizer_Basics
         random = New Stabilizer_BasicsRandomInput
 
@@ -199,7 +196,6 @@ Public Class Stabilizer_OpticalFlow
     Dim sumScale As cv.Mat, sScale As cv.Mat, features1 As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
     Public Sub New()
-        initParent()
         good = New Features_GoodFeatures()
 
         task.desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
@@ -311,7 +307,6 @@ Public Class Stabilizer_MotionDetect
     Dim motion As Motion_Basics
     Dim stable As Stabilizer_Basics
     Public Sub New()
-        initParent()
         motion = New Motion_Basics
         stable = New Stabilizer_Basics
 

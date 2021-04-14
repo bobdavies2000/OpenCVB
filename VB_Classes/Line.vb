@@ -9,7 +9,6 @@ Public Class Line_Basics
     Public pixelThreshold As Integer
     Public lenSlider As Windows.Forms.TrackBar
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Line thickness", 1, 20, 2)
@@ -71,7 +70,6 @@ Public Class Line_LeftRightOverlay
     Dim lrLines As Line_LeftRightImages
     Dim lines As Line_Basics
     Public Sub New()
-        initParent()
         lrLines = New Line_LeftRightImages
 
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -137,7 +135,6 @@ Public Class Line_Reduction
     Dim lDetect As Line_Basics
     Dim reduction As Reduction_Basics
     Public Sub New()
-        initParent()
         lDetect = New Line_Basics()
 
         reduction = New Reduction_Basics()
@@ -175,7 +172,6 @@ Public Class Line_InterceptsUI
     Inherits VBparent
     Dim lines As Line_Intercepts
     Public Sub New()
-        initParent()
         lines = New Line_Intercepts
         label1 = "Use mouse in right image to highlight lines"
         task.desc = "An alternative way to highlight line segments with common slope"
@@ -258,7 +254,6 @@ Public Class Line_ConfirmedDepth
     Public z2 As New List(Of cv.Point3f)
     Public cloudInput As cv.Mat
     Public Sub New()
-        initParent()
         lines = New Line_Basics
         label1 = "Lines defined in RGB"
         label2 = "Lines in RGB confirmed in the point cloud"
@@ -335,7 +330,6 @@ Public Class Line_Vertical
     Public thickness As Integer
     Public toleranceInMMs As Single
     Public Sub New()
-        initParent()
         gCloud = New Depth_PointCloud_IMU
         lines = New Line_ConfirmedDepth
 
@@ -380,7 +374,6 @@ Public Class Line_Horizontal
     Inherits VBparent
     Dim vLines As Line_Vertical
     Public Sub New()
-        initParent()
         vLines = New Line_Vertical
         task.desc = "Find all the horizontal lines in the IMU rectified cloud"
         ' task.rank = 1
@@ -418,7 +411,6 @@ Public Class Line_Intercepts
     Public searchRange As Integer
     Public thickNess As Integer
     Public Sub New()
-        initParent()
         lines = New Line_Basics
         Dim lenSlider = findSlider("Line length threshold in pixels")
         lenSlider.Value = 1
@@ -540,7 +532,6 @@ Public Class Line_LeftRightImages
     Public leftLines As Line_Basics
     Public rightLines As Line_Basics
     Public Sub New()
-        initParent()
         lrPalette = New Palette_LeftRightImages
 
         leftLines = New Line_Basics
@@ -593,7 +584,6 @@ Public Class Line_Sift_MT
     Dim lrView As Line_LeftRightImages
     Dim numPointSlider As System.Windows.Forms.TrackBar
     Public Sub New()
-        initParent()
         lrView = New Line_LeftRightImages
 
         grid = New Thread_Grid
@@ -652,7 +642,6 @@ Public Class Line_NearestPoint
     Inherits VBparent
     Dim rangeRect As cv.Rect
     Public Sub New()
-        initParent()
         Dim offset = 20
         rangeRect = New cv.Rect(offset, offset, dst1.Width - offset * 2, dst1.Height - offset * 2)
         task.desc = "Demonstrate computing the distance from a point to a line"
@@ -728,7 +717,6 @@ Public Class Line_SideView
     Dim lines As Line_Basics
     Dim tView As TimeView_FloodFill
     Public Sub New()
-        initParent()
         tView = New TimeView_FloodFill
         lines = New Line_Basics
         label1 = "Side view of the lines detected in the RGB image"

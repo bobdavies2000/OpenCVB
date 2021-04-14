@@ -7,7 +7,6 @@ Public Class MSER_Basics
     Dim options As MSER_Options
     Dim maxSlider As Windows.Forms.TrackBar
     Public Sub New()
-        initParent()
         options = New MSER_Options
         maxSlider = findSlider("MSER Max Area")
         maxSlider.Value = If(dst1.Width = 1280, 50000, 20000)
@@ -81,7 +80,6 @@ Public Class MSER_Options
     Dim saveParms() As Integer
     Public mser = cv.MSER.Create
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 9)
             sliders.setupTrackBar(0, "MSER Delta", 1, 100, 9)
@@ -168,7 +166,6 @@ Public Class MSER_SyntheticInput
         Next
     End Sub
     Public Sub New()
-        initParent()
         task.desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
 		' task.rank = 1
     End Sub
@@ -217,7 +214,6 @@ Public Class MSER_TestSynthetic
         Return CStr(regionCount) + " Regions had " + CStr(pixels) + " pixels"
     End Function
     Public Sub New()
-        initParent()
         mser = New MSER_Options()
         mser.sliders.trackbar(0).Value = 10
         mser.sliders.trackbar(1).Value = 100
@@ -250,7 +246,6 @@ Public Class MSER_CPPStyle
     Dim gray As cv.Mat
     Dim image As cv.Mat
     Public Sub New()
-        initParent()
         label1 = "Contour regions from MSER"
         label2 = "Box regions from MSER"
         task.desc = "Maximally Stable Extremal Regions example - still image"
@@ -290,7 +285,6 @@ Public Class MSER_Contours
     Inherits VBparent
     Dim mser As MSER_Options
     Public Sub New()
-        initParent()
         mser = New MSER_Options()
         mser.sliders.trackbar(1).Value = 4000
         task.desc = "Use MSER but show the contours of each region."

@@ -4,7 +4,6 @@ Public Class Encode_Basics
     Inherits VBparent
     Dim options As Encode_Options
     Public Sub New()
-        initParent()
 
         options = New Encode_Options()
 
@@ -39,7 +38,6 @@ Public Class Encode_Options
     Inherits VBparent
     Public qualityLevel As Integer
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.

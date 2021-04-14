@@ -35,7 +35,6 @@ Public Class OpenGL_Basics
     Dim openGLHeight = 1200
     Dim openGLWidth = 1500
     Public Sub New()
-        initParent()
         task.desc = "Create an OpenGL window and update it with images"
 		' task.rank = 1
     End Sub
@@ -160,7 +159,6 @@ Public Class OpenGL_Options
     Public OpenGL As OpenGL_Basics
     Public pointCloudInput As cv.Mat
     Public Sub New()
-        initParent()
         OpenGL = New OpenGL_Basics()
         setOpenGLsliders(caller, sliders)
         task.desc = "Adjust point size and FOV in OpenGL"
@@ -201,7 +199,6 @@ Public Class OpenGL_Callbacks
     Public ogl As OpenGL_Basics
     Public pointCloudInput As cv.Mat
     Public Sub New()
-        initParent()
         ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         task.desc = "Show the point cloud of 3D data and use callbacks to modify view."
@@ -224,7 +221,6 @@ Public Class OpenGL_IMU
     Public imu As IMU_GVector
 
     Public Sub New()
-        initParent()
         imu = New IMU_GVector()
 
         ogl = New OpenGL_Options()
@@ -258,7 +254,6 @@ Public Class OpenGL_3Ddata
     Public ogl As OpenGL_Options
     Dim histInput() As Byte
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
@@ -307,7 +302,6 @@ Public Class OpenGL_Draw3D
     Dim circle As Draw_Circles
     Public ogl As OpenGL_Options
     Public Sub New()
-        initParent()
         circle = New Draw_Circles()
         circle.sliders.trackbar(0).Value = 5
 
@@ -341,7 +335,6 @@ Public Class OpenGL_Voxels
     Public voxels As Voxels_Basics_MT
     Public ogl As OpenGL_Basics
     Public Sub New()
-        initParent()
         voxels = New Voxels_Basics_MT()
 
         ogl = New OpenGL_Basics()
@@ -374,7 +367,6 @@ Public Class OpenGL_GravityTransform
     Public ogl As OpenGL_Basics
     Public gCloud As Depth_PointCloud_IMU
     Public Sub New()
-        initParent()
 
         gCloud = New Depth_PointCloud_IMU()
 
@@ -407,7 +399,6 @@ Public Class OpenGL_Floor
     Dim plane As Structured_LinearizeFloor
     Dim ogl As OpenGL_Basics
     Public Sub New()
-        initParent()
         ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Callbacks"
 
@@ -442,7 +433,6 @@ Public Class OpenGL_FloorPlane
     Public ogl As OpenGL_Basics
     Public plane As Structured_LinearizeFloor
     Public Sub New()
-        initParent()
         ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_FloorPlane"
         plane = New Structured_LinearizeFloor()
@@ -485,7 +475,6 @@ End Class
 '    Dim floor As OpenGL_FloorPlane
 '    Dim shuffle As Texture_Shuffle
 '    Public Sub New()
-'        initParent()
 '        shuffle = New Texture_Shuffle()
 '        floor = New OpenGL_FloorPlane()
 '        task.desc = "Texture the plane of the floor with a good sample of the texture from the mask"
@@ -529,7 +518,6 @@ Public Class OpenGL_DepthSliceH
     Public ogl As OpenGL_Basics
     Dim slices As Structured_MultiSliceH
     Public Sub New()
-        initParent()
 
         slices = New Structured_MultiSliceH()
         ogl = New OpenGL_Basics()
@@ -562,7 +550,6 @@ Public Class OpenGL_StableDepth
     Dim pcValid As Motion_MinMaxPointCloud
     Public ogl As OpenGL_Options
     Public Sub New()
-        initParent()
 
         pcValid = New Motion_MinMaxPointCloud
         ogl = New OpenGL_Options
@@ -590,7 +577,6 @@ Public Class OpenGL_AverageDepth
     Dim stable As Depth_AveragingStable
     Public ogl As OpenGL_Callbacks
     Public Sub New()
-        initParent()
 
         stable = New Depth_AveragingStable
         ogl = New OpenGL_Callbacks
@@ -627,7 +613,6 @@ Public Class OpenGL_StableDepthMouse
     Dim pcValid As Motion_MinMaxPointCloud
     Public ogl As OpenGL_Callbacks
     Public Sub New()
-        initParent()
 
         pcValid = New Motion_MinMaxPointCloud
         ogl = New OpenGL_Callbacks
@@ -658,7 +643,6 @@ Public Class OpenGL_SmoothSurfaces
     Dim smooth As Depth_SmoothSurfaces
     Public ogl As OpenGL_Callbacks
     Public Sub New()
-        initParent()
 
         smooth = New Depth_SmoothSurfaces
         ogl = New OpenGL_Callbacks
@@ -688,7 +672,6 @@ Public Class OpenGL_Stable
     Dim stable As Motion_MinMaxPointCloud
     Dim ogl As OpenGL_Callbacks
     Public Sub New()
-        initParent()
         stable = New Motion_MinMaxPointCloud
         ogl = New OpenGL_Callbacks
         task.desc = "Use the Motion_MinMaxPointCloud in 3D"
@@ -716,7 +699,6 @@ Public Class OpenGL_ReducedXYZ
     Dim reduction As Reduction_XYZ
     Public ogl As OpenGL_Basics
     Public Sub New()
-        initParent()
         reduction = New Reduction_XYZ
 
         ogl = New OpenGL_Basics
@@ -743,7 +725,6 @@ Public Class OpenGL_Reduction
     Dim reduction As Reduction_PointCloud
     Public ogl As OpenGL_Basics
     Public Sub New()
-        initParent()
         reduction = New Reduction_PointCloud
 
         ogl = New OpenGL_Basics()
@@ -772,7 +753,6 @@ Public Class OpenGL_ReducedSideView
     Dim reduced As PointCloud_ReducedSideView
     Dim ogl As OpenGL_Callbacks
     Public Sub New()
-        initParent()
         reduced = New PointCloud_ReducedSideView
         ogl = New OpenGL_Callbacks
         task.desc = "Use the reduced depth pointcloud in 3D but allow it to be rotated in Options_Common"
@@ -801,7 +781,6 @@ Public Class OpenGL_MFD_PointCloud
     Dim mfd As MFD_PointCloud
     Dim ogl As OpenGL_Callbacks
     Public Sub New()
-        initParent()
         mfd = New MFD_PointCloud
         ogl = New OpenGL_Callbacks
         task.desc = "Use the MFD_PointCloud in 3D"
@@ -831,7 +810,6 @@ Public Class OpenGL_Structured_PointCloud
     Dim sCloud As Structured_Cloud
     Dim ogl As OpenGL_Callbacks
     Public Sub New()
-        initParent()
         sCloud = New Structured_Cloud
         ogl = New OpenGL_Callbacks
 

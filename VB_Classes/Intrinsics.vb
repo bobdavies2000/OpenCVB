@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Public Class intrinsicsLeft_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Show the depth camera intrinsicsLeft."
 		' task.rank = 1
         label2 = "ppx/ppy location"

@@ -83,7 +83,6 @@ End Module
 Public Class Dither_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Bits per color plane (Nbpp only)", 1, 5, 1)

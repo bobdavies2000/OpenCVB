@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Public Class Polylines_IEnumerableExample
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
             check.Box(0).Text = "Polyline closed if checked"
@@ -41,7 +40,6 @@ Public Class Polylines_Random
     Inherits VBparent
     Dim zoomFactor = 4
     Public Sub New()
-        initParent()
         label1 = CStr(zoomFactor) + "X zoom around mouse movement on image"
         task.desc = "Create a random procedural image - Painterly Effect"
 		' task.rank = 1

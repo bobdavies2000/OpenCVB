@@ -9,7 +9,6 @@ Public Class Random_Basics
     Public plotPoints As Boolean = False
     Public countSlider As Windows.Forms.TrackBar
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Random Pixel Count", 1, dst1.Cols * dst1.Rows, 20)
@@ -45,7 +44,6 @@ Public Class Random_Shuffle
     Inherits VBparent
     Dim myRNG As New cv.RNG
     Public Sub New()
-        initParent()
         task.desc = "Use randomShuffle to reorder an image."
 		' task.rank = 1
     End Sub
@@ -63,7 +61,6 @@ Public Class Random_LUTMask
     Dim random As Random_Basics
     Dim km As kMeans_Basics
     Public Sub New()
-        initParent()
         km = New kMeans_Basics()
         random = New Random_Basics()
         task.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image."
@@ -96,7 +93,6 @@ End Class
 Public Class Random_UniformDist
     Inherits VBparent
     Public Sub New()
-        initParent()
         minval = 0
         maxval = 255
         task.desc = "Create a uniform distribution."
@@ -113,7 +109,6 @@ End Class
 Public Class Random_NormalDist
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Random_NormalDist Blue Mean", 0, 255, 125)
@@ -144,7 +139,6 @@ Public Class Random_CheckUniformSmoothed
     Dim histogram As Histogram_Basics
     Dim rUniform As Random_UniformDist
     Public Sub New()
-        initParent()
         histogram = New Histogram_Basics
         histogram.sliders.trackbar(0).Value = 255
 
@@ -172,7 +166,6 @@ Public Class Random_CheckUniformDist
     Dim histogram As Histogram_Graph
     Dim rUniform As Random_UniformDist
     Public Sub New()
-        initParent()
         histogram = New Histogram_Graph()
         histogram.sliders.trackbar(0).Value = 255
 
@@ -200,7 +193,6 @@ Public Class Random_CheckNormalDist
     Dim histogram As Histogram_Graph
     Dim normalDist As Random_NormalDist
     Public Sub New()
-        initParent()
         histogram = New Histogram_Graph()
         histogram.sliders.trackbar(0).Value = 255
         normalDist = New Random_NormalDist()
@@ -225,7 +217,6 @@ Public Class Random_CheckNormalDistSmoothed
     Dim histogram As Histogram_Basics
     Dim normalDist As Random_NormalDist
     Public Sub New()
-        initParent()
         histogram = New Histogram_Basics
         histogram.sliders.trackbar(0).Value = 255
         histogram.plotHist.minRange = 1
@@ -278,7 +269,6 @@ Public Class Random_PatternGenerator_CPP
     Inherits VBparent
     Dim Random_PatternGenerator As IntPtr
     Public Sub New()
-        initParent()
         Random_PatternGenerator = Random_PatternGenerator_Open()
         task.desc = "Generate random patterns for use with 'Random Pattern Calibration'"
 		' task.rank = 1
@@ -313,7 +303,6 @@ Public Class Random_CustomDistribution
     Public outputHistogram As cv.Mat
     Public plotHist As Plot_Histogram
     Public Sub New()
-        initParent()
         Dim loadedDice() As Single = {1, 3, 0.5, 0.5, 0.75, 0.25}
         inputCDF = New cv.Mat(loadedDice.Length, 1, cv.MatType.CV_32F, loadedDice)
 
@@ -362,7 +351,6 @@ Public Class Random_MonteCarlo
     Public plotHist As Plot_Histogram
     Public outputRandom = New cv.Mat(4000, 1, cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
     Public Sub New()
-        initParent()
         plotHist = New Plot_Histogram()
         plotHist.fixedMaxVal = 100
 
@@ -408,7 +396,6 @@ Public Class Random_CustomHistogram
     Public hist As Histogram_Simple
     Public saveHist As cv.Mat
     Public Sub New()
-        initParent()
 
         random = New Random_CustomDistribution()
         random.outputRandom = New cv.Mat(1000, 1, cv.MatType.CV_32S, 0)
@@ -456,7 +443,6 @@ End Class
 Public Class Random_60sTV
     Inherits VBparent
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -501,7 +487,6 @@ Public Class Random_60sTVFaster
     Dim mats As Mat_4to1
     Dim options As Random_60sTV
     Public Sub New()
-        initParent()
 
         mats = New Mat_4to1
         random = New Random_UniformDist
@@ -551,7 +536,6 @@ Public Class Random_60sTVFastSimple
     Dim random As Random_UniformDist
     Dim options As Random_60sTV
     Public Sub New()
-        initParent()
         random = New Random_UniformDist
         options = New Random_60sTV
         task.desc = "Remove diagnostics from the faster algorithm to simplify code."
@@ -596,7 +580,6 @@ Public Class Random_KalmanPoints
     Dim refreshPoints As Boolean = True
     Dim savePoints(0) As cv.Point
     Public Sub New()
-        initParent()
         knn = New KNN_1_to_1FIFO
         kalman = New Kalman_Basics
         random = New Random_Basics

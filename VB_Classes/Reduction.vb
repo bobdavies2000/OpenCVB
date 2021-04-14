@@ -3,7 +3,6 @@ Public Class Reduction_Basics
     Inherits VBparent
     Public maskVal As Integer
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Reduction factor", 0, 4096, 64)
@@ -52,7 +51,6 @@ Public Class Reduction_Floodfill
     Public flood As FloodFill_Basics
     Public reduction As Reduction_Basics
     Public Sub New()
-        initParent()
         flood = New FloodFill_Basics()
         reduction = New Reduction_Basics()
         task.desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
@@ -78,7 +76,6 @@ Public Class Reduction_KNN_Color
     Public pTrack As KNN_PointTracker
     Dim highlight As Highlight_Basics
     Public Sub New()
-        initParent()
 
         pTrack = New KNN_PointTracker()
         reduction = New Reduction_Floodfill()
@@ -120,7 +117,6 @@ Public Class Reduction_KNN_ColorAndDepth
     Dim reduction As Reduction_KNN_Color
     Dim depth As Depth_Edges
     Public Sub New()
-        initParent()
         depth = New Depth_Edges()
         reduction = New Reduction_KNN_Color()
         label1 = "Detecting objects using only color coherence"
@@ -154,7 +150,6 @@ Public Class Reduction_Lines
     Public cmatTop As PointCloud_ColorizeTop
     Dim reduction As Reduction_PointCloud
     Public Sub New()
-        initParent()
 
         cmatSide = New PointCloud_ColorizeSide
         cmatTop = New PointCloud_ColorizeTop
@@ -198,7 +193,6 @@ Public Class Reduction_Histogram
     Dim basics As Reduction_Basics
     Dim hist As Histogram_BackProjectionGrayscale
     Public Sub New()
-        initParent()
 
         basics = New Reduction_Basics()
         hist = New Histogram_BackProjectionGrayscale()
@@ -228,7 +222,6 @@ Public Class Reduction_PointCloud
     Inherits VBparent
     Dim reduction As Reduction_Basics
     Public Sub New()
-        initParent()
         reduction = New Reduction_Basics()
         reduction.radio.check(0).Checked = True
         label1 = "Reduced depth"
@@ -259,7 +252,6 @@ Public Class Reduction_XYZ
     Inherits VBparent
     Dim reduction As Reduction_Basics
     Public Sub New()
-        initParent()
         reduction = New Reduction_Basics()
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -308,7 +300,6 @@ Public Class Reduction_Edges
     Dim edges As Edges_Laplacian
     Dim reduction As Reduction_Basics
     Public Sub New()
-        initParent()
 
         edges = New Edges_Laplacian()
         reduction = New Reduction_Basics()
@@ -343,7 +334,6 @@ Public Class Reduction_Depth
     Dim colorizer As Depth_Colorizer_CPP
     Public reducedDepth32F As New cv.Mat
     Public Sub New()
-        initParent()
         reduction = New Reduction_Basics()
         reduction.radio.check(0).Checked = True
         colorizer = New Depth_Colorizer_CPP()
@@ -378,7 +368,6 @@ Public Class Reduction_DepthMax
     Dim dMax As Depth_SmoothMax
     Public reducedDepth32F As New cv.Mat
     Public Sub New()
-        initParent()
         reduction = New Reduction_Basics()
         reduction.radio.check(0).Checked = True
         colorizer = New Depth_Colorizer_CPP()

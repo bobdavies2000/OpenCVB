@@ -68,8 +68,6 @@ Public Class AnyName_CPP
     Inherits VBparent
     Dim cPtr As IntPtr
     Public Sub New()
-        initParent()
-        
         cPtr = Anyname_Open()
         task.desc = "description"
         ' task.rank = 1

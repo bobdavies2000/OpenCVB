@@ -7,7 +7,6 @@ Public Class Dlib_Sobel_CS
     Dim d2Mat As Mat_Dlib2Mat
     Dim sobel As New CS_Classes.Dlib_EdgesSobel
     Public Sub New()
-        initParent()
         d2Mat = New Mat_Dlib2Mat
         task.desc = "Testing the DLib interface with a simple Sobel example"
 		' task.rank = 1
@@ -35,7 +34,6 @@ Public Class Dlib_GaussianBlur_CS
     Dim blur As New CS_Classes.Dlib_GaussianBlur
     Dim d2Mat As Mat_Dlib2Mat
     Public Sub New()
-        initParent()
         d2Mat = New Mat_Dlib2Mat
         label1 = "Gaussian Blur of grayscale image"
         label2 = "Gaussian Blur of BGR image"
@@ -70,7 +68,6 @@ Public Class Dlib_FaceDetectHOG_CS
     Dim faces As New CS_Classes.Dlib_FaceDetectHOG
     Dim d2Mat As Mat_Dlib2Mat
     Public Sub New()
-        initParent()
 
         faces.initialize()
         d2Mat = New Mat_Dlib2Mat
@@ -108,7 +105,6 @@ Public Class Dlib_iBug300WDownload
     Dim downloadActive As Boolean
     Dim pythonActive As Boolean
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)

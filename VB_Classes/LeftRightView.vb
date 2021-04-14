@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Public Class LeftRightView_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Infrared Brightness", 0, 255, 100)
@@ -37,7 +36,6 @@ Public Class LeftRightView_CompareRaw
     Inherits VBparent
     Dim lrView As LeftRightView_Basics
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Infrared Brightness", 0, 255, 100)
@@ -85,7 +83,6 @@ Public Class LeftRightView_Features
     Dim lrView As LeftRightView_Basics
     Dim features As Features_GoodFeatures
     Public Sub New()
-        initParent()
         features = New Features_GoodFeatures()
 
         lrView = New LeftRightView_Basics()
@@ -119,7 +116,6 @@ Public Class LeftRightView_Palettized
     Inherits VBparent
     Dim lrView As LeftRightView_Basics
     Public Sub New()
-        initParent()
         lrView = New LeftRightView_Basics()
 
         task.desc = "Add color to the 8-bit infrared images."
@@ -146,7 +142,6 @@ Public Class LeftRightView_BRISK
     Dim lrView As LeftRightView_Basics
     Dim brisk As BRISK_Basics
     Public Sub New()
-        initParent()
         task.desc = "Add color to the 8-bit infrared images."
 		' task.rank = 1
         label1 = "Infrared Left Image"
@@ -175,7 +170,6 @@ End Class
 Public Class LeftRightView_BrightnessContrast
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.OakDCamera Then

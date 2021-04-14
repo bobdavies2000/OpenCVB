@@ -7,7 +7,6 @@ Public Class OilPaint_Pointilism
     Dim randomMask As cv.Mat
     Dim myRNG As New cv.RNG
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Stroke Scale", 1, 5, 3)
@@ -89,7 +88,6 @@ Public Class OilPaint_ColorProbability
     Public color_probability() As Single
     Public km As kMeans_RGBFast
     Public Sub New()
-        initParent()
         km = New kMeans_RGBFast()
         km.sliders.trackbar(0).Value = 12 ' we would like a dozen colors or so in the color image.
         ReDim color_probability(km.sliders.trackbar(0).Value - 1)
@@ -126,7 +124,6 @@ End Class
 Public Class OilPaint_ManualVB
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Filter Size", 3, 15, 3)
@@ -187,7 +184,6 @@ Public Class OilPaint_Manual
     Inherits VBparent
     Dim oilPaint As New CS_Classes.OilPaintManual
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Kernel Size", 2, 10, 4)
@@ -222,7 +218,6 @@ Public Class OilPaint_Cartoon
     Dim oil As OilPaint_Manual
     Dim laplacian As Edges_Laplacian
     Public Sub New()
-        initParent()
         laplacian = New Edges_Laplacian()
 
         oil = New OilPaint_Manual

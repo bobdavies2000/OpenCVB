@@ -9,7 +9,6 @@ Public Class Texture_Basics
     Dim texturePop As Integer
     Public tChange As Boolean ' if the texture hasn't changed this will be false.
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         Dim gridHeightSlider = findSlider("ThreadGrid Height")
@@ -60,7 +59,6 @@ End Class
 Public Class Texture_Flow
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Texture Flow Delta", 2, 100, 12)
@@ -99,7 +97,6 @@ Public Class Texture_Flow_Depth
     Inherits VBparent
     Dim texture As Texture_Flow
     Public Sub New()
-        initParent()
         texture = New Texture_Flow()
         task.desc = "Display texture flow in the depth data"
 		' task.rank = 1
@@ -120,7 +117,6 @@ Public Class Texture_Flow_Reduction
     Dim texture As Texture_Flow
     Dim reduction As Reduction_Basics
     Public Sub New()
-        initParent()
         texture = New Texture_Flow
         reduction = New Reduction_Basics
         task.desc = "Display texture flow in the reduced color image"
@@ -149,7 +145,6 @@ Public Class Texture_Shuffle
     Public tRect As cv.Rect
     Public rgbaTexture As New cv.Mat
     Public Sub New()
-        initParent()
         floor = New OpenGL_FloorPlane()
         texture = New Texture_Basics()
         shuffle = New Random_Shuffle()

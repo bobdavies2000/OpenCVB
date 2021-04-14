@@ -3,7 +3,6 @@ Imports System.Runtime.InteropServices
 Public Class PhotoShop_Clahe ' Contrast Limited Adaptive Histogram Equalization (CLAHE)
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Clip Limit", 1, 100, 10)
@@ -30,7 +29,6 @@ Public Class PhotoShop_Hue
     Inherits VBparent
     Public hsv_planes(2) As cv.Mat
     Public Sub New()
-        initParent()
         label1 = "Hue"
         label2 = "Saturation"
         task.desc = "Show hue (Result1) and Saturation (Result2)."
@@ -54,7 +52,6 @@ End Class
 Public Class PhotoShop_AlphaBeta
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Use alpha and beta with ConvertScaleAbs."
 		' task.rank = 1
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -79,7 +76,6 @@ Public Class PhotoShop_Gamma
     Inherits VBparent
     Dim lookupTable(255) As Byte
     Public Sub New()
-        initParent()
         task.desc = "Use gamma with ConvertScaleAbs."
 		' task.rank = 1
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -123,7 +119,6 @@ Public Class PhotoShop_WhiteBalance_CPP
     Inherits VBparent
     Dim wPtr As IntPtr
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "White balance threshold X100", 1, 100, 10)
@@ -165,7 +160,6 @@ Public Class PhotoShop_WhiteBalance
     Dim whiteCPP As PhotoShop_WhiteBalance_CPP
     Dim wPtr As IntPtr
     Public Sub New()
-        initParent()
         hist = New Histogram_Graph()
         hist.plotRequested = True
         hist.bins = 256 * 3
@@ -229,7 +223,6 @@ Public Class PhotoShop_ChangeMask
     Dim white As PhotoShop_WhiteBalance
     Dim whiteCPP As PhotoShop_WhiteBalance_CPP
     Public Sub New()
-        initParent()
         white = New PhotoShop_WhiteBalance()
         whiteCPP = New PhotoShop_WhiteBalance_CPP()
 
@@ -273,7 +266,6 @@ Public Class PhotoShop_PlotHist
     Public hist2 As Histogram_Basics
     Dim mat2to1 As Mat_2to1
     Public Sub New()
-        initParent()
         white = New PhotoShop_ChangeMask()
 
         hist1 = New Histogram_Basics
@@ -311,7 +303,6 @@ End Class
 Public Class PhotoShop_Sepia
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Create a sepia image"
 		' task.rank = 1
     End Sub
@@ -333,7 +324,6 @@ Public Class PhotoShop_Emboss
     Inherits VBparent
     Public gray128 As cv.Mat
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -401,7 +391,6 @@ Public Class PhotoShop_EmbossAll
     Dim mats As Mat_4to1
     Dim sizeSlider As Windows.Forms.TrackBar
     Public Sub New()
-        initParent()
         mats = New Mat_4to1
         emboss = New PhotoShop_Emboss
 
@@ -462,7 +451,6 @@ End Class
 Public Class PhotoShop_DuoTone
     Inherits VBparent
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)
@@ -538,7 +526,6 @@ End Class
 Public Class PhotoShop_Brightness
     Inherits VBparent
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -578,7 +565,6 @@ End Class
 Public Class PhotoShop_UnsharpMask
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "sigma", 1, 2000, 100)
@@ -613,7 +599,6 @@ End Class
 Public Class PhotoShop_SharpenDetail
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "DetailEnhance Sigma_s", 0, 200, 60)
@@ -639,7 +624,6 @@ End Class
 Public Class PhotoShop_SharpenStylize
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Stylize Sigma_s", 0, 200, 60)
@@ -665,7 +649,6 @@ End Class
 Public Class PhotoShop_Pencil_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Pencil Sigma_s", 0, 200, 60)
@@ -693,7 +676,6 @@ End Class
 Public Class PhotoShop_Pencil_Manual
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Blur kernel size", 2, 100, 10)

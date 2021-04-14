@@ -6,7 +6,6 @@ Public Class Keyboard_Basics
     Dim flow As Font_FlowText
     Public checkKeys As New OptionsKeyboardInput
     Public Sub New()
-        initParent()
         checkKeys.Setup(caller)
         label1 = "Use the Options form to send in keystrokes"
         task.desc = "Test the keyboard interface available to all algorithms"

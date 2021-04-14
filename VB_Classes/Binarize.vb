@@ -15,7 +15,6 @@ Public Class Binarize_Basics
     Dim blur As Blur_Basics
     Public useBlur As Boolean
     Public Sub New()
-        initParent()
         blur = New Blur_Basics()
         mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 255)
         task.desc = "Binarize an image using Threshold with OTSU."
@@ -46,7 +45,6 @@ Public Class Binarize_OTSU
     Dim plotHist As Plot_Histogram
     Dim binarize As Binarize_Basics
     Public Sub New()
-        initParent()
         binarize = New Binarize_Basics()
         plotHist = New Plot_Histogram()
 
@@ -99,7 +97,6 @@ End Class
 Public Class Binarize_Niblack_Sauvola
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
@@ -133,7 +130,6 @@ End Class
 Public Class Binarize_Niblack_Nick
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
@@ -166,7 +162,6 @@ End Class
 Public Class Binarize_Bernson
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
@@ -201,7 +196,6 @@ Public Class Binarize_Bernson_MT
     Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
-        initParent()
         grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
         Static gridHeightSlider = findSlider("ThreadGrid Height")
@@ -250,7 +244,6 @@ Public Class Binarize_Reduction
     Dim reduction As Reduction_Basics
     Dim basics As Binarize_Basics
     Public Sub New()
-        initParent()
         basics = New Binarize_Basics
         reduction = New Reduction_Basics
         Dim reductionRadio = findRadio("Use bitwise reduction")
@@ -282,7 +275,6 @@ Public Class Binarize_Simple
     Public meanScalar As cv.Scalar
     Public mask As New cv.Mat
     Public Sub New()
-        initParent()
         mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 255)
 
         task.desc = "Binarize an image using Threshold with OTSU."
@@ -315,7 +307,6 @@ Public Class Binarize_Recurse
     Dim binarize As Binarize_Simple
     Public mats As Mat_4Click
     Public Sub New()
-        initParent()
         binarize = New Binarize_Simple
         mats = New Mat_4Click
         label1 = "Lighter half, lightest, darker half, darkest"

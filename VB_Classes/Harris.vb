@@ -32,7 +32,6 @@ Public Class Harris_Features_CPP
     Dim srcData() As Byte
     Dim Harris_Features As IntPtr
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 5)
@@ -85,7 +84,6 @@ Public Class Harris_Detector_CPP
     Dim Harris_Detector As IntPtr
     Public FeaturePoints As New List(Of cv.Point2f)
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Harris qualityLevel", 1, 100, 2)

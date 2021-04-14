@@ -3,7 +3,6 @@ Public Class OptionsCommon_Depth
     Inherits VBparent
     Public gOptions As New OptionsGlobal
     Public Sub New()
-        initParent()
         task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone.
         standalone = False
 
@@ -62,7 +61,6 @@ End Class
 Public Class OptionsCommon_Histogram
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone.
 
         Dim sideFrustrumSetting = 57

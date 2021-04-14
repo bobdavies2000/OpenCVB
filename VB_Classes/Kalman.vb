@@ -6,7 +6,6 @@ Public Class Kalman_Basics
     Public kInput(4 - 1) As Single
     Public kOutput(4 - 1) As Single
     Public Sub New()
-        initParent()
         task.desc = "Use Kalman to stabilize values (such as a cv.rect.)"
         ' task.rank = 4
     End Sub
@@ -67,7 +66,6 @@ Public Class Kalman_Stripped
     Public kInput(4 - 1) As Single
     Public kOutput(4 - 1) As Single
     Public Sub New()
-        initParent()
         task.desc = "High volume usage only.  Same as Kalman_basics but no check boxes."
 		' task.rank = 1
     End Sub
@@ -128,7 +126,6 @@ Public Class Kalman_Compare
     Public plot As Plot_OverTime
     Public kPlot As Plot_OverTime
     Public Sub New()
-        initParent()
         plot = New Plot_OverTime()
         plot.plotCount = 3
         plot.topBottomPad = 20
@@ -200,7 +197,6 @@ Public Class Kalman_RotatingPoint
         cv.Cv2.Line(dst1, New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, 1, task.lineType)
     End Sub
     Public Sub New()
-        initParent()
         label1 = "Estimate Yellow < Real Red (if working)"
 
         cv.Cv2.Randn(kState, New cv.Scalar(0), cv.Scalar.All(0.1))
@@ -256,7 +252,6 @@ Public Class Kalman_MousePredict
     Dim kalman As Kalman_Basics
     Dim lineWidth As Integer
     Public Sub New()
-        initParent()
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(2 - 1)
         ReDim kalman.kOutput(2 - 1)
@@ -293,7 +288,6 @@ Public Class Kalman_CVMat
     Dim basics As Kalman_Basics
     Public input As cv.Mat
     Public Sub New()
-        initParent()
         basics = New Kalman_Basics()
         ReDim basics.kInput(4 - 1)
         input = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
@@ -363,7 +357,6 @@ Public Class Kalman_ImageSmall
     Dim kalman As Kalman_CVMat
     Dim resize As Resize_Percentage
     Public Sub New()
-        initParent()
         kalman = New Kalman_CVMat()
 
         resize = New Resize_Percentage()
@@ -400,7 +393,6 @@ Public Class Kalman_DepthSmall
     Inherits VBparent
     Dim kalman As Kalman_ImageSmall
     Public Sub New()
-        initParent()
         kalman = New Kalman_ImageSmall()
 
         label1 = "Mask of non-zero depth after Kalman smoothing"
@@ -426,7 +418,6 @@ Public Class Kalman_Depth32f
     Dim kalman As Kalman_CVMat
     Dim resize As Resize_Percentage
     Public Sub New()
-        initParent()
         kalman = New Kalman_CVMat()
 
         resize = New Resize_Percentage()
@@ -469,7 +460,6 @@ Public Class Kalman_Single
     Public transitionMatrix() As Single = {1, 1, 0, 1} ' Change the transition matrix externally and set newTransmissionMatrix.
     Public newTransmissionMatrix As Boolean = True
     Public Sub New()
-        initParent()
         Dim tMatrix() As Single = {1, 1, 0, 1}
         kf.TransitionMatrix = New cv.Mat(2, 2, cv.MatType.CV_32F, tMatrix)
         kf.MeasurementMatrix.SetIdentity(1)
@@ -557,7 +547,6 @@ Public Class Kalman_VB
     Dim Q_gyro As Single = 0.3
     Public input As Single
     Public Sub New()
-        initParent()
         oRand = New Random(DateTime.Now.Millisecond)
         For i = 0 To MAX_INPUT - 1
             matrix.Add(0)
@@ -674,7 +663,6 @@ Public Class Kalman_VB_Basics
     Dim plot As Plot_OverTime
     Dim basics As Kalman_Basics
     Public Sub New()
-        initParent()
 
         basics = New Kalman_Basics()
 

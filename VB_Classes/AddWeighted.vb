@@ -4,7 +4,6 @@ Public Class AddWeighted_Basics
     Public src2 As New cv.Mat
     Public weightSlider As System.Windows.Forms.TrackBar
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Weight", 0, 100, 50)
@@ -31,7 +30,6 @@ Public Class AddWeighted_Edges
     Dim edges As Edges_BinarizedSobel
     Dim addw As AddWeighted_Basics
     Public Sub New()
-        initParent()
         edges = New Edges_BinarizedSobel
         addw = New AddWeighted_Basics
         Dim weightSlider = findSlider("Weight")
@@ -59,7 +57,6 @@ End Class
 Public Class AddWeighted_ImageAccumulate
     Inherits VBparent
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -89,7 +86,6 @@ Public Class AddWeighted_InfraRed
     Dim infra As LeftRightView_BrightnessContrast
     Dim src2 As New cv.Mat
     Public Sub New()
-        initParent()
         infra = New LeftRightView_BrightnessContrast
         addw = New AddWeighted_Basics
 

@@ -10,7 +10,6 @@ Public Class CComp_Basics
     Public edgeMask As cv.Mat
     Dim mats As Mat_4to1
     Public Sub New()
-        initParent()
         mats = New Mat_4to1()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -114,7 +113,6 @@ Public Class CComp_Basics_FullImage
     Dim mats As Mat_4to1
     Dim basics As CComp_Basics
     Public Sub New()
-        initParent()
         mats = New Mat_4to1()
         basics = New CComp_Basics()
 
@@ -169,7 +167,6 @@ Public Class CComp_PointTracker
     Public highlight As Highlight_Basics
     Public trackPoints As Boolean = True
     Public Sub New()
-        initParent()
 
         highlight = New Highlight_Basics()
         pTrack = New KNN_PointTracker()
@@ -216,7 +213,6 @@ Public Class CComp_MaxBlobs
     Public maxValues(255) As Integer ' march through all 255 values and find the best...
     Public incr = 2 ' some other algorithms change this...
     Public Sub New()
-        initParent()
         tracker = New CComp_PointTracker()
         Dim checkOTSU = findCheckBox("Use OTSU to binarize the image")
         checkOTSU.Checked = False ' turn off OTSU so the slider works...
@@ -276,7 +272,6 @@ Public Class CComp_MaxPixels
     Dim maxBlob As CComp_MaxBlobs
     Public maxPixels As Integer = -1
     Public Sub New()
-        initParent()
         maxBlob = New CComp_MaxBlobs()
         maxBlob.incr = 5
         task.desc = "Find the best CComp threshold to maximize pixels"
@@ -319,7 +314,6 @@ Public Class CComp_DepthEdges
     Dim ccomp As CComp_PointTracker
     Dim depth As Depth_Edges
     Public Sub New()
-        initParent()
 
         ccomp = New CComp_PointTracker()
         depth = New Depth_Edges()
@@ -354,7 +348,6 @@ Public Class CComp_EdgeMask
     Dim ccomp As CComp_ColorDepth
     Dim edges As Edges_DepthAndColor
     Public Sub New()
-        initParent()
         edges = New Edges_DepthAndColor()
 
         ccomp = New CComp_ColorDepth()
@@ -383,7 +376,6 @@ End Class
 Public Class CComp_ColorDepth
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 1)
             sliders.setupTrackBar(0, "Min Blob size", 0, 10000, 100)
@@ -421,7 +413,6 @@ End Class
 Public Class CComp_InRange_MT
     Inherits VBparent
     Public Sub New()
-        initParent()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "InRange # of ranges", 2, 255, 15)
         sliders.setupTrackBar(1, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
@@ -477,7 +468,6 @@ End Class
 Public Class CComp_InRange
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "InRange # of ranges", 1, 20, 15)
@@ -525,7 +515,6 @@ Public Class CComp_Shapes
     Inherits VBparent
     Dim shapes As cv.Mat
     Public Sub New()
-        initParent()
         shapes = New cv.Mat(task.parms.homeDir + "Data/Shapes.png", cv.ImreadModes.Color)
         label1 = "Largest connected component"
         label2 = "RectView, LabelView, Binary, grayscale"
@@ -571,7 +560,6 @@ Public Class CComp_Simple
     Public rects As New List(Of cv.Rect)
     Public centroids As New List(Of cv.Point2f)
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
@@ -628,7 +616,6 @@ Public Class CComp_Binarized
     Dim edges As Edges_BinarizedSobel
     Dim ccomp As CComp_Simple
     Public Sub New()
-        initParent()
         ccomp = New CComp_Simple
         edges = New Edges_BinarizedSobel
         task.desc = "Find connected components using an image with binarized edges"

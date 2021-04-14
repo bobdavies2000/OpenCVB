@@ -4,7 +4,6 @@ Public Class MotionBlur_Basics
     Public kernel As cv.Mat
     Public showDirection As Boolean = True
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Motion Blur Length", 1, 101, 51)
@@ -118,7 +117,6 @@ Public Class MotionBlur_Deblur
         Return planes(0)
     End Function
     Public Sub New()
-        initParent()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
             check.Box(0).Text = "Redo motion blurred image"

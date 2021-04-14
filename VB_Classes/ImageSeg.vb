@@ -11,7 +11,6 @@ Public Class ImageSeg_Basics
 
     Public flood As FloodFill_FullImage
     Public Sub New()
-        initParent()
         addw = New AddWeighted_Basics
         flood = New FloodFill_FullImage
         task.desc = "Get the image segments and their associated features - centroids, masks, size, and enclosing rectangles"
@@ -49,7 +48,6 @@ Public Class ImageSeg_InRange
     Inherits VBparent
     Dim iSeg As ImageSeg_Basics
     Public Sub New()
-        initParent()
         iSeg = New ImageSeg_Basics
         task.desc = "Trim segments that are not in the range requested"
 		' task.rank = 1
@@ -80,7 +78,6 @@ Public Class ImageSeg_MissingSegments
     Inherits VBparent
     Public flood As FloodFill_FullImage
     Public Sub New()
-        initParent()
 
         flood = New FloodFill_FullImage
 
@@ -134,7 +131,6 @@ Public Class ImageSeg_Unstable
     Inherits VBparent
     Dim iSeg As ImageSeg_Basics
     Public Sub New()
-        initParent()
         iSeg = New ImageSeg_Basics
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -176,7 +172,6 @@ Public Class ImageSeg_CentroidTracker
     Public iSeg As ImageSeg_Basics
     Public pTrack As KNN_PointTracker
     Public Sub New()
-        initParent()
         iSeg = New ImageSeg_Basics
         pTrack = New KNN_PointTracker
         Dim drawCheckbox = findCheckBox("Caller will handle any drawing required")

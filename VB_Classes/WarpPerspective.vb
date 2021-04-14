@@ -4,7 +4,6 @@ Imports cv = OpenCvSharp
 Public Class WarpPerspective_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Warped Width", 0, dst1.Cols, dst1.Cols - 50)

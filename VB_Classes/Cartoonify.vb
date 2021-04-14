@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 Public Class CartoonifyImage_Basics
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Cartoon Median Blur kernel", 1, 21, 7)

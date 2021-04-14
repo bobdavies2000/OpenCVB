@@ -8,7 +8,6 @@ Public Class Voronoi_Basics
     Public random As Random_Basics
     Public inputPoints As List(Of cv.Point)
     Public Sub New()
-        initParent()
         random = New Random_Basics()
         label1 = "Ordered list output for Voronoi algorithm"
         task.desc = "Use the ordered list method to find the Voronoi segments"
@@ -47,7 +46,6 @@ Public Class Voronoi_Compare
     Dim basics As Voronoi_Basics
     Public random As Random_Basics
     Public Sub New()
-        initParent()
         basics = New Voronoi_Basics()
         random = New Random_Basics()
 
@@ -98,7 +96,6 @@ Public Class Voronoi_CPP
     Dim vPtr As IntPtr
     Dim vDemo As Voronoi_Basics
     Public Sub New()
-        initParent()
         vDemo = New Voronoi_Basics()
         vPtr = VoronoiDemo_Open(task.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
         task.desc = "Use the C++ version of the Voronoi code"

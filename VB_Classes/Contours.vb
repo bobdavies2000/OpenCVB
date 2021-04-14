@@ -9,7 +9,6 @@ Public Class Contours_Basics
     Public sortedContours As New SortedList(Of Integer, cv.Point())(New compareAllowIdenticalIntegerInverted)
     Public contours0 As cv.Point()()
     Public Sub New()
-        initParent()
         radio.Setup(caller + " Retrieval Mode", 5)
         radio.check(0).Text = "CComp"
         radio.check(1).Text = "External"
@@ -140,7 +139,6 @@ End Class
 Public Class Contours_RGB
     Inherits VBparent
     Public Sub New()
-        initParent()
         task.desc = "Find and draw the contour of the largest foreground RGB contour."
 		' task.rank = 1
         label2 = "Background"
@@ -186,7 +184,6 @@ End Class
 Public Class Contours_RemoveLines
     Inherits VBparent
     Public Sub New()
-        initParent()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 3)
             sliders.setupTrackBar(0, "Morphology width/height", 1, 100, 20)
@@ -236,7 +233,6 @@ Public Class Contours_Depth
     Inherits VBparent
     Public contours As New List(Of cv.Point)
     Public Sub New()
-        initParent()
         task.desc = "Find and draw the contour of the depth foreground."
 		' task.rank = 1
         label1 = "DepthContour input"
@@ -276,7 +272,6 @@ Public Class Contours_Prediction
     Dim outline As Contours_Depth
     Dim kalman As Kalman_Basics
     Public Sub New()
-        initParent()
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(2 - 1)
         outline = New Contours_Depth()
@@ -324,7 +319,6 @@ Public Class Contours_FindandDraw
     Inherits VBparent
     Dim rotatedRect As Rectangle_Rotated
     Public Sub New()
-        initParent()
         rotatedRect = New Rectangle_Rotated()
         rotatedRect.rect.sliders.trackbar(0).Value = 5
         label1 = "FindandDraw input"
@@ -364,7 +358,6 @@ Public Class Contours_Binarized
     Dim sobel As Edges_Sobel
     Public basics As Contours_Basics
     Public Sub New()
-        initParent()
 
         basics = New Contours_Basics
         sobel = New Edges_Sobel

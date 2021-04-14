@@ -8,7 +8,6 @@ Public Class EMax_Basics
     Public palette As Coherent_Palette
     Dim edges As Edges_Sobel
     Public Sub New()
-        initParent()
         basics = New EMax_VB_Failing()
         palette = New Coherent_Palette
         EMax_Basics = EMax_Basics_Open()
@@ -84,7 +83,6 @@ Public Class EMax_CentroidsNew
     Inherits VBparent
     Public emaxCPP As EMax_Basics
     Public Sub New()
-        initParent()
 
         emaxCPP = New EMax_Basics()
 
@@ -125,7 +123,6 @@ Public Class EMax_VB_Failing
     Public gridWidthSlider As System.Windows.Forms.TrackBar
     Public gridHeightSlider As System.Windows.Forms.TrackBar
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -241,7 +238,6 @@ Public Class EMax_Centroids
     Public emaxCPP As EMax_Basics
     Public flood As FloodFill_Basics
     Public Sub New()
-        initParent()
 
         flood = New FloodFill_Basics()
 
@@ -283,7 +279,6 @@ Public Class EMax_PointTracker
     Dim pTrack As KNN_PointTracker
     Dim emax As EMax_Centroids
     Public Sub New()
-        initParent()
 
         emax = New EMax_Centroids()
 

@@ -9,7 +9,6 @@ Public Class Download_Databases
     Dim linkAddress As String = ""
     Dim zippedBuffer As New MemoryStream
     Public Sub New()
-        initParent()
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             radio.Setup(caller, 9)
