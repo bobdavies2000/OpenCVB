@@ -488,9 +488,9 @@ Public Class KNN_DepthClusters
     Public pTrack As KNN_PointTracker
     Public Sub New()
 
-        flood = New FloodFill_Palette()
-        blobs = New Blob_DepthClusters()
-        pTrack = New KNN_PointTracker()
+        flood = New FloodFill_Palette
+        blobs = New Blob_DepthClusters
+        pTrack = New KNN_PointTracker
 
         label1 = "Output of Blob_DepthClusters"
         label2 = "Same output after KNN_PointTracker"

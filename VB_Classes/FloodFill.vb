@@ -964,10 +964,6 @@ Public Class FloodFill_Neighbors
 
         basics = New FloodFill_Basics
 
-        For i = 0 To 10
-            rangeColors.Add(i)
-        Next
-
         If standalone Then
             loDiff = cv.Scalar.All(10)
             hiDiff = cv.Scalar.All(10)
@@ -992,6 +988,7 @@ Public Class FloodFill_Neighbors
         basics.sortedSizes.Clear()
         basics.rects.Clear()
         basics.centroids.Clear()
+        rangeColors.Clear()
 
         maskPlus.SetTo(0)
         Dim ignoreMasks = initialMask.Clone()
@@ -1017,15 +1014,17 @@ Public Class FloodFill_Neighbors
                         Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
                         basics.centroids.Add(centroid)
                         dst2.SetTo(labelID, basics.masks(i))
+                        If rangeColors.Contains(labelID) = False Then rangeColors.Add(labelID)
                     End If
                     ' Mask off any object that is too small or previously identified
                     cv.Cv2.BitwiseOr(ignoreMasks, maskPlus(maskRect), ignoreMasks)
                 End If
             Next
         Next
-        Dim spread = CInt(255 / rangeColors.Count)
+
+        Dim spread = If(rangeColors.Count > 0, CInt(255 / rangeColors.Count), 255)
         task.palette.Run(dst2 * spread)
-        dst2 = task.palette.dst1
+        dst1 = task.palette.dst1
         label2 = CStr(basics.masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
 End Class

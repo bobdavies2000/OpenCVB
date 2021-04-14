@@ -120,9 +120,9 @@ Public Class Camshift_Object
     Dim blob As Blob_DepthClusters
     Dim camshift As CamShift_Basics
     Public Sub New()
-        blob = New Blob_DepthClusters()
+        blob = New Blob_DepthClusters
 
-        camshift = New CamShift_Basics()
+        camshift = New CamShift_Basics
 
         label1 = "Largest blob with hue tracked.  Draw enabled."
         label2 = "Backprojection of depth clusters masked with hue"
@@ -159,11 +159,11 @@ Public Class Camshift_TopObjects
     Dim cams(4 - 1) As CamShift_Basics
     Dim mats As Mat_4to1
     Public Sub New()
-        mats = New Mat_4to1()
+        mats = New Mat_4to1
 
-        blob = New Blob_DepthClusters()
+        blob = New Blob_DepthClusters
         For i = 0 To cams.Length - 1
-            cams(i) = New CamShift_Basics()
+            cams(i) = New CamShift_Basics
         Next
 
         If findfrm(caller + " Slider Options") Is Nothing Then

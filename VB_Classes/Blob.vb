@@ -24,7 +24,6 @@ Public Class Blob_Basics
             sliders.setupTrackBar(2, "Threshold Step", 1, 50, 5)
         End If
         task.desc = "Test C# Blob Detector."
-		' task.rank = 1
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -88,11 +87,11 @@ Public Class Blob_Input
         poly.radio.check(1).Checked = True ' we want the convex polygon filled.
 
         Mats = New Mat_4to1()
+        Mats.noLines = True
 
         label1 = "Click any quadrant below to view it on the right"
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Generate data to test Blob Detector."
-		' task.rank = 1
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -125,9 +124,8 @@ Public Class Blob_RenderBlobs
         blob.updateFrequency = 1
 
         task.desc = "Use connected components to find blobs."
-		' task.rank = 1
         label1 = "Input blobs"
-        label2 = "Showing only the largest blob in test data"
+        label2 = "Largest blob, centroid in yellow"
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -135,13 +133,13 @@ Public Class Blob_RenderBlobs
             blob.Run(src)
             dst1 = blob.dst1
             Dim gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.BinaryInv)
+            Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.Binary)
+            cv.Cv2.ImShow("binary", binary)
             Dim labelView = dst1.EmptyClone
             Dim stats As New cv.Mat
             Dim centroids As New cv.Mat
             Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
             Dim labelCount = cv.Cv2.ConnectedComponentsWithStats(binary, labelView, stats, centroids)
-            If cc.LabelCount <= 1 Then Exit Sub
             cc.RenderBlobs(labelView)
 
             Dim maxBlob = cc.GetLargestBlob()
@@ -151,6 +149,9 @@ Public Class Blob_RenderBlobs
             For Each b In cc.Blobs.Skip(1)
                 dst1.Rectangle(b.Rect, cv.Scalar.Red, 2, task.lineType)
             Next
+
+            dst2.Circle(maxBlob.Centroid, task.dotSize + 3, cv.Scalar.Blue, -1, task.lineType)
+            dst2.Circle(maxBlob.Centroid, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         End If
     End Sub
 End Class
@@ -176,7 +177,7 @@ Public Class Blob_DepthClusters
         hiSlider.Value = 1 ' pixels are exact.
 
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
-        task.rank = 3
+        'task.rank = 3
     End Sub
     Public Sub Run(src as cv.Mat)
         histBlobs.Run(task.noDepthMask)
@@ -208,7 +209,7 @@ Public Class Blob_DepthPixelSampler
 
         label2 = "Backprojection of identified histogram depth clusters."
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
-        task.rank = 2
+        'task.rank = 2
     End Sub
     Public Sub Run(src as cv.Mat)
         histBlobs.Run(task.noDepthMask)
@@ -245,23 +246,25 @@ Public Class Blob_DepthRanges
     Inherits VBparent
     Public histBlobs As Histogram_DepthClusters
     Public grayOnly As Boolean
+    Public masks As New List(Of cv.Mat)
+    Public maskSizes As New SortedList(Of Integer, Integer)
+    Public ranges As New List(Of cv.Point)
     Public Sub New()
         histBlobs = New Histogram_DepthClusters
 
         label2 = "Identified histogram depth clusters."
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
-        task.rank = 4
+        'task.rank = 4
     End Sub
-    Public Sub Run(src as cv.Mat)
-        histBlobs.valleys.grayOnly = grayOnly
+    Public Sub Run(src As cv.Mat)
         histBlobs.Run(src)
         dst1 = histBlobs.dst1
 
-        Dim ranges = New List(Of cv.Point)(histBlobs.valleys.ranges)
-        Dim rangeColors = New List(Of Integer)(histBlobs.valleys.rangeColors)
+        ranges = New List(Of cv.Point)(histBlobs.valleys.ranges)
         Dim map = task.palette.gradientColorMap
 
         ' this is close and more efficient but not precise!
+        'Dim rangeColors = New List(Of Integer)(histBlobs.valleys.rangeColors)
         'Dim depth = task.depth32f.Normalize(255).ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         'Dim myLUT = New cv.Mat(1, 256, cv.MatType.CV_8UC3)
         'Dim index As Integer
@@ -272,19 +275,17 @@ Public Class Blob_DepthRanges
         'dst2 = depth.LUT(myLUT)
 
         Dim mask As New cv.Mat
-        If grayOnly = False Then
-            For i = 0 To ranges.Count - 1
-                cv.Cv2.InRange(task.depth32f, ranges(i).X, ranges(i).Y, mask)
-                dst2.SetTo(map.Get(Of cv.Vec3b)(0, rangeColors(i)), mask)
-            Next
-        Else
-            dst2 = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
-            For i = 0 To ranges.Count - 1
-                cv.Cv2.InRange(task.depth32f, ranges(i).X, ranges(i).Y, mask)
-                dst2.SetTo(rangeColors(i), mask)
-            Next
-        End If
-
+        masks.Clear()
+        maskSizes.Clear()
+        Dim spread = 255 / ranges.Count
+        If grayOnly Then dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        For i = 0 To ranges.Count - 1
+            cv.Cv2.InRange(task.depth32f, ranges(i).X, ranges(i).Y, mask)
+            Dim nextColor = If(grayOnly, i + 1, map.Get(Of cv.Vec3b)(0, (i + 1) * spread))
+            masks.Add(mask.Clone)
+            maskSizes.Add(mask.CountNonZero(), i)
+            dst2.SetTo(nextColor, mask)
+        Next
         dst2.SetTo(0, task.noDepthMask)
 
         label1 = CStr(histBlobs.valleys.ranges.Count) + " Depth Clusters"
@@ -297,163 +298,24 @@ End Class
 
 
 
-
-Public Class Blob_DepthRangesGray
+Public Class Blob_Largest
     Inherits VBparent
     Public blobs As Blob_DepthRanges
     Public Sub New()
-        blobs = New Blob_DepthRanges
-        blobs.grayOnly = True
-        task.desc = "Find the depth ranges but only in grayscale."
-        task.rank = 5
-    End Sub
-    Public Sub Run(src as cv.Mat)
-        blobs.Run(src)
-        dst1 = blobs.dst1
-        dst2 = blobs.dst2
-        If standalone Then
-            Dim spread = 255 / blobs.histBlobs.valleys.ranges.Count
-            task.palette.Run(dst1 * spread)
-            dst1 = task.palette.dst1
-
-            task.palette.Run(dst2 * spread)
-            dst2 = task.palette.dst1
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Blob_DepthFloodfill
-    Inherits VBparent
-    Public flood As FloodFill_Neighbors
-    Public blobs As Blob_DepthRangesGray
-    Public Sub New()
-
-        flood = New FloodFill_Neighbors
-
-        blobs = New Blob_DepthRangesGray
-
-        label1 = "Slices in depth merged to connected slices"
-        label2 = "Before slices were merged"
-        task.desc = "Use the grayscale blobs to connect depth neighbors that are 1-pixel value different"
-        task.rank = 5
-    End Sub
-    Public Sub Run(src as cv.Mat)
-
-        blobs.Run(src)
-
-        Dim spread = 255 / blobs.blobs.histBlobs.valleys.ranges.Count
-        task.palette.Run(blobs.dst2.Clone * spread)
-        dst2 = task.palette.dst1
-
-        flood.rangeColors = New List(Of Integer)(blobs.blobs.histBlobs.valleys.rangeColors)
-        flood.Run(blobs.dst2)
-        dst1 = flood.dst2
-        dst1.SetTo(0, task.noDepthMask)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Blob_Largest
-    Inherits VBparent
-    Public blobs As Blob_DepthFloodfill
-    Public rects As List(Of cv.Rect)
-    Public masks As List(Of cv.Mat)
-    Public kalman As Kalman_Basics
-    Public blobIndex As Integer
-    Public maskIndex As Integer
-    Public Sub New()
-        kalman = New Kalman_Basics
-        ReDim kalman.kInput(4 - 1)
-
-        blobs = New Blob_DepthFloodfill()
+        blobs = New Blob_DepthRanges()
         task.desc = "Gather all the blob data and display the largest."
         ' task.rank = 3
     End Sub
     Public Sub Run(src as cv.Mat)
         blobs.Run(src)
         dst2 = blobs.dst2
-        rects = blobs.flood.basics.rects
-        masks = blobs.flood.basics.masks
 
-        If masks.Count > 0 Then
+        If blobs.masks.Count > 0 Then
             dst1.SetTo(0)
-            maskIndex = blobs.flood.basics.sortedSizes.ElementAt(blobIndex).Value ' this is the largest boundary rectangle
-            src.CopyTo(dst1, masks(maskIndex))
-            kalman.kInput = {rects(maskIndex).X, rects(maskIndex).Y, rects(maskIndex).Width, rects(maskIndex).Height}
-            kalman.Run(src)
-            Dim res = kalman.kOutput
-            Dim rect = New cv.Rect(CInt(res(0)), CInt(res(1)), CInt(res(2)), CInt(res(3)))
-            dst1.Rectangle(rect, cv.Scalar.Red, 2)
+            Dim maskIndex = blobs.maskSizes.ElementAt(blobs.masks.Count - 1).Value
+            src.CopyTo(dst1, blobs.masks(maskIndex))
         End If
-        label1 = "Show the largest blob of the " + CStr(rects.Count) + " blobs"
+        label1 = "Show the largest blob of the " + CStr(blobs.masks.Count) + " blobs"
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-
-Public Class Blob_Rectangles
-    Inherits VBparent
-    Dim blobs As Blob_Largest
-    Dim kalman() As Kalman_Basics
-    Private Class CompareRect : Implements IComparer(Of cv.Rect)
-        Public Function Compare(ByVal a As cv.Rect, ByVal b As cv.Rect) As Integer Implements IComparer(Of cv.Rect).Compare
-            Dim aSize = a.Width * a.Height
-            Dim bSize = b.Width * b.Height
-            If aSize > bSize Then Return -1
-            Return 1
-        End Function
-    End Class
-    Public Sub New()
-        blobs = New Blob_Largest()
-        task.desc = "Get the blobs and their masks and outline them with a rectangle."
-        ' task.rank = 2
-    End Sub
-    Public Sub Run(src as cv.Mat)
-        blobs.Run(src)
-        dst1 = src
-        dst2 = blobs.blobs.dst2
-
-        ' sort the blobs by size before delivery to kalman
-        Dim sortedBlobs As New SortedList(Of cv.Rect, Integer)(New CompareRect)
-        For i = 0 To blobs.rects.Count - 1
-            sortedBlobs.Add(blobs.rects(i), i)
-        Next
-        Static blobCount As Integer
-        Dim blobsToShow = Math.Min(3, blobs.rects.Count - 1)
-        If blobCount <> blobsToShow And blobsToShow > 0 Then
-            blobCount = blobsToShow
-            ReDim kalman(blobsToShow - 1)
-            For i = 0 To blobsToShow - 1
-                kalman(i) = New Kalman_Basics()
-                ReDim kalman(i).kInput(4 - 1)
-            Next
-        End If
-
-        label1 = "Showing top " + CStr(blobsToShow) + " of the " + CStr(blobs.rects.Count) + " blobs found "
-        For i = 0 To blobsToShow - 1
-            Dim rect = sortedBlobs.ElementAt(i).Key
-            kalman(i).kInput = {rect.X, rect.Y, rect.Width, rect.Height}
-            kalman(i).Run(src)
-            rect = New cv.Rect(kalman(i).kOutput(0), kalman(i).kOutput(1), kalman(i).kOutput(2), kalman(i).kOutput(3))
-            dst1.Rectangle(rect, task.scalarColors(i Mod 255), 2)
-        Next
-    End Sub
-End Class

@@ -1432,7 +1432,6 @@ Public Class Histogram_DepthValleys
     Public ranges As New List(Of cv.Point)
     Public rangeColors As New List(Of Integer)
     Public rangeCounts As New List(Of Integer)
-    Public grayOnly As Boolean
     Dim histSlider As Windows.Forms.TrackBar
     Public Sub New()
         hist = New Histogram_Depth()
@@ -1446,7 +1445,7 @@ Public Class Histogram_DepthValleys
         task.desc = "Identify valleys in the Depth histogram."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
         hist.Run(src)
         If kalman.kInput.Length <> hist.plotHist.hist.Rows Then ReDim kalman.kInput(hist.plotHist.hist.Rows - 1)
@@ -1496,33 +1495,24 @@ Public Class Histogram_DepthValleys
         Dim binWidth = CInt(dst1.Width / histogram.Rows)
         histogram.MinMaxLoc(minVal, maxVal)
         Dim splitIndex As Integer
-        Dim colorIncr = 255 / ranges.Count
         If maxVal > 0 Then
             For i = 0 To histogram.Rows - 1
                 Dim depth = i * depthIncr + 1
                 If splitIndex >= ranges.Count - 1 Then splitIndex = ranges.Count - 1
 
-                Dim nextColor = (splitIndex + 1) * colorIncr
-                If nextColor > 255 Then nextColor = 255
-
                 If depth >= ranges(splitIndex).Y And rangeColors.Count < ranges.Count Then
-                    If grayOnly = False Then rangeColors.Add(CInt(nextColor)) Else rangeColors.Add(splitIndex + 1)
+                    rangeColors.Add(splitIndex + 1)
                     splitIndex += 1
                 End If
                 Dim h = CInt(dst1.Height * kalman.kOutput(i) / maxVal)
 
-                If grayOnly = False Then
-                    If h > 0 Then cv.Cv2.Rectangle(dst1, New cv.Rect(i * binWidth, dst1.Height - h, binWidth, h), CInt(nextColor), -1)
-                Else
-                    If h > 0 Then cv.Cv2.Rectangle(dst1, New cv.Rect(i * binWidth, dst1.Height - h, binWidth, h), splitIndex + 1, -1)
-                End If
+                If h > 0 Then cv.Cv2.Rectangle(dst1, New cv.Rect(i * binWidth, dst1.Height - h, binWidth, h), splitIndex + 1, -1)
             Next
         End If
-        rangeColors.Add(If(grayOnly = False, 255, ranges.Count))
+        rangeColors.Add(ranges.Count + 1)
 
-        If grayOnly = False Then
-            task.palette.Run(dst1)
-            dst1 = task.palette.dst1
-        End If
+        Dim spread = 255 / ranges.Count
+        task.palette.Run(dst1 * spread)
+        dst1 = task.palette.dst1
     End Sub
 End Class

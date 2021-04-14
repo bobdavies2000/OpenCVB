@@ -116,11 +116,10 @@ Public Class Meanshift_TopObjects
     Dim mats1 As Mat_4to1
     Dim mats2 As Mat_4to1
     Public Sub New()
-        mats1 = New Mat_4to1()
+        mats1 = New Mat_4to1
+        mats2 = New Mat_4to1
 
-        mats2 = New Mat_4to1()
-
-        blob = New Blob_DepthClusters()
+        blob = New Blob_DepthClusters
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "How often should meanshift be reinitialized", 1, 500, 100)
