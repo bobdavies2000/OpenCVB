@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 
 
 ' https://docs.opencv.org/master/df/d3d/tutorial_py_inpainting.html#gsc.tab=0
-Public Class InPaint_Basics
-    Inherits VBparent
+Public Class InPaint_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -38,8 +37,7 @@ End Class
 
 
 
-Public Class InPaint_Noise
-    Inherits VBparent
+Public Class InPaint_Noise : Inherits VBparent
     Dim noise As Draw_Noise
     Public Sub New()
         noise = New Draw_Noise()

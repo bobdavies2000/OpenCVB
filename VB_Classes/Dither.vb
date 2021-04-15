@@ -80,8 +80,7 @@ End Module
 
 
 ' https://www.codeproject.com/Articles/5259216/Dither-Ordered-and-Floyd-Steinberg-Monochrome-Colo
-Public Class Dither_Basics
-    Inherits VBparent
+Public Class Dither_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

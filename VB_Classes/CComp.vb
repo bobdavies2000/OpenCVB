@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
-Public Class CComp_Basics
-    Inherits VBparent
+Public Class CComp_Basics : Inherits VBparent
     Public connectedComponents As Object
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
@@ -108,8 +107,7 @@ End Class
 
 
 
-Public Class CComp_Basics_FullImage
-    Inherits VBparent
+Public Class CComp_Basics_FullImage : Inherits VBparent
     Dim mats As Mat_4to1
     Dim basics As CComp_Basics
     Public Sub New()
@@ -160,8 +158,7 @@ End Class
 
 
 
-Public Class CComp_PointTracker
-    Inherits VBparent
+Public Class CComp_PointTracker : Inherits VBparent
     Public basics As CComp_Basics
     Public pTrack As KNN_PointTracker
     Public highlight As Highlight_Basics
@@ -206,8 +203,7 @@ End Class
 
 
 
-Public Class CComp_MaxBlobs
-    Inherits VBparent
+Public Class CComp_MaxBlobs : Inherits VBparent
     Public tracker As CComp_PointTracker
     Public maxBlobs As Integer = -1
     Public maxValues(255) As Integer ' march through all 255 values and find the best...
@@ -267,8 +263,7 @@ End Class
 
 
 
-Public Class CComp_MaxPixels
-    Inherits VBparent
+Public Class CComp_MaxPixels : Inherits VBparent
     Dim maxBlob As CComp_MaxBlobs
     Public maxPixels As Integer = -1
     Public Sub New()
@@ -309,8 +304,7 @@ End Class
 
 
 
-Public Class CComp_DepthEdges
-    Inherits VBparent
+Public Class CComp_DepthEdges : Inherits VBparent
     Dim ccomp As CComp_PointTracker
     Dim depth As Depth_Edges
     Public Sub New()
@@ -343,8 +337,7 @@ End Class
 
 
 
-Public Class CComp_EdgeMask
-    Inherits VBparent
+Public Class CComp_EdgeMask : Inherits VBparent
     Dim ccomp As CComp_ColorDepth
     Dim edges As Edges_DepthAndColor
     Public Sub New()
@@ -373,8 +366,7 @@ End Class
 
 
 
-Public Class CComp_ColorDepth
-    Inherits VBparent
+Public Class CComp_ColorDepth : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 1)
@@ -410,8 +402,7 @@ End Class
 
 
 
-Public Class CComp_InRange_MT
-    Inherits VBparent
+Public Class CComp_InRange_MT : Inherits VBparent
     Public Sub New()
         sliders.Setup(caller)
         sliders.setupTrackBar(0, "InRange # of ranges", 2, 255, 15)
@@ -465,8 +456,7 @@ End Class
 
 
 
-Public Class CComp_InRange
-    Inherits VBparent
+Public Class CComp_InRange : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -511,8 +501,7 @@ End Class
 
 
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.ConnectedComponents.RenderBlobs(OpenCvSharp.Mat)/
-Public Class CComp_Shapes
-    Inherits VBparent
+Public Class CComp_Shapes : Inherits VBparent
     Dim shapes As cv.Mat
     Public Sub New()
         shapes = New cv.Mat(task.parms.homeDir + "Data/Shapes.png", cv.ImreadModes.Color)
@@ -554,8 +543,7 @@ End Class
 
 
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
-Public Class CComp_Simple
-    Inherits VBparent
+Public Class CComp_Simple : Inherits VBparent
     Public connectedComponents As Object
     Public rects As New List(Of cv.Rect)
     Public centroids As New List(Of cv.Point2f)
@@ -611,8 +599,7 @@ End Class
 
 
 
-Public Class CComp_Binarized
-    Inherits VBparent
+Public Class CComp_Binarized : Inherits VBparent
     Dim edges As Edges_BinarizedSobel
     Dim ccomp As CComp_Simple
     Public Sub New()

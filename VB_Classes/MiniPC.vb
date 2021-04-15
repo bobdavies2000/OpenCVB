@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class MiniPC_Basics
-    Inherits VBparent
+Public Class MiniPC_Basics : Inherits VBparent
     Dim resize As Resize_Percentage
     Public rect As cv.Rect
     Dim gCloud As Depth_PointCloud_IMU
@@ -34,8 +33,7 @@ End Class
 
 
 
-Public Class MiniPC_Rotate
-    Inherits VBparent
+Public Class MiniPC_Rotate : Inherits VBparent
     Public mini As MiniPC_Basics
     Public histogram As New cv.Mat
     Public angleY As Integer
@@ -94,8 +92,7 @@ End Class
 
 
 
-Public Class MiniPC_RotateAngle
-    Inherits VBparent
+Public Class MiniPC_RotateAngle : Inherits VBparent
     Dim peak As MiniPC_Rotate
     Dim mats As Mat_4to1
     Public plot As Plot_OverTime
@@ -165,8 +162,7 @@ End Class
 
 
 
-Public Class MiniPC_RotateSinglePass
-    Inherits VBparent
+Public Class MiniPC_RotateSinglePass : Inherits VBparent
     Dim peak As MiniPC_Rotate
     Public Sub New()
         peak = New MiniPC_Rotate

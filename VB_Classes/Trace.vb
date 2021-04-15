@@ -17,8 +17,7 @@ End Module
 
 
 ' https://github.com/opencv/opencv/wiki/Profiling-OpenCV-Applications
-Public Class Trace_OpenCV_CPP
-    Inherits VBparent
+Public Class Trace_OpenCV_CPP : Inherits VBparent
     Dim Trace_OpenCV As IntPtr
     Public Sub New()
         Trace_OpenCV = Trace_OpenCV_Open()

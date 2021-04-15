@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class ImageSeg_Basics
-    Inherits VBparent
+Public Class ImageSeg_Basics : Inherits VBparent
     Dim addw As AddWeighted_Basics
 
     Public maskSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
@@ -44,8 +43,7 @@ End Class
 
 
 
-Public Class ImageSeg_InRange
-    Inherits VBparent
+Public Class ImageSeg_InRange : Inherits VBparent
     Dim iSeg As ImageSeg_Basics
     Public Sub New()
         iSeg = New ImageSeg_Basics
@@ -74,8 +72,7 @@ End Class
 
 
 
-Public Class ImageSeg_MissingSegments
-    Inherits VBparent
+Public Class ImageSeg_MissingSegments : Inherits VBparent
     Public flood As FloodFill_FullImage
     Public Sub New()
 
@@ -127,8 +124,7 @@ End Class
 
 
 
-Public Class ImageSeg_Unstable
-    Inherits VBparent
+Public Class ImageSeg_Unstable : Inherits VBparent
     Dim iSeg As ImageSeg_Basics
     Public Sub New()
         iSeg = New ImageSeg_Basics
@@ -167,8 +163,7 @@ End Class
 
 
 
-Public Class ImageSeg_CentroidTracker
-    Inherits VBparent
+Public Class ImageSeg_CentroidTracker : Inherits VBparent
     Public iSeg As ImageSeg_Basics
     Public pTrack As KNN_PointTracker
     Public Sub New()

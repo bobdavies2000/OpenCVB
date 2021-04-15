@@ -12,8 +12,7 @@ End Module
 
 
 ' https://docs.opencv.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
-Public Class FitEllipse_Basics_CPP
-    Inherits VBparent
+Public Class FitEllipse_Basics_CPP : Inherits VBparent
     Dim area As Area_MinTriangle_CPP
     Public dstData(5 * 4 - 1) As Byte ' enough space for a float describing angle, center, and width/height - this will be filled in on the C++ side.
     Public Sub New()

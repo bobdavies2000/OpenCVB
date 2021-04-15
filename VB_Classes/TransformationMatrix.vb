@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class TransformationMatrix_Basics
-    Inherits VBparent
+Public Class TransformationMatrix_Basics : Inherits VBparent
     Dim topLocations As New List(Of cv.Point3d)
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then

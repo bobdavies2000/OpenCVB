@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://bytefish.de/blog/eigenvalues_in_opencv/
-Public Class EigenVecVals_Basics
-    Inherits VBparent
+Public Class EigenVecVals_Basics : Inherits VBparent
     Public Sub New()
         task.desc = "Solve system of equations using OpenCV's EigenVV"
 		' task.rank = 1

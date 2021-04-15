@@ -3,8 +3,7 @@ Imports System.IO
 
 
 
-Public Class GeneticDrawing_Options
-    Inherits VBparent
+Public Class GeneticDrawing_Options : Inherits VBparent
     Public stageTotal = 100
     Public Sub New()
         Windows.Forms.Application.DoEvents()
@@ -44,8 +43,7 @@ Public Structure DNAentry
     Dim brushNumber As Integer
 End Structure
 ' https://github.com/anopara/genetic-drawing
-Public Class GeneticDrawing_Basics
-    Inherits VBparent
+Public Class GeneticDrawing_Basics : Inherits VBparent
     Public minBrushRange = New cv.Rangef(0.1, 0.3)
     Public maxBrushRange = New cv.Rangef(0.3, 0.7)
     Dim minSize As Single
@@ -249,8 +247,7 @@ End Class
 
 
 ' https://github.com/anopara/genetic-drawing
-Public Class GeneticDrawing_Color
-    Inherits VBparent
+Public Class GeneticDrawing_Color : Inherits VBparent
     Dim gDraw(3 - 1) As GeneticDrawing_Basics
     Public Sub New()
 
@@ -290,8 +287,7 @@ End Class
 
 
 
-Public Class GeneticDrawing_Photo
-    Inherits VBparent
+Public Class GeneticDrawing_Photo : Inherits VBparent
     Dim gDraw As GeneticDrawing_Color
     Dim inputFileName As String
     Dim fileNameForm As OptionsFileName

@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Reduction_Basics
-    Inherits VBparent
+Public Class Reduction_Basics : Inherits VBparent
     Public maskVal As Integer
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -46,8 +45,7 @@ End Class
 
 
 
-Public Class Reduction_Floodfill
-    Inherits VBparent
+Public Class Reduction_Floodfill : Inherits VBparent
     Public flood As FloodFill_Basics
     Public reduction As Reduction_Basics
     Public Sub New()
@@ -70,8 +68,7 @@ End Class
 
 
 
-Public Class Reduction_KNN_Color
-    Inherits VBparent
+Public Class Reduction_KNN_Color : Inherits VBparent
     Public reduction As Reduction_Floodfill
     Public pTrack As KNN_PointTracker
     Dim highlight As Highlight_Basics
@@ -112,8 +109,7 @@ End Class
 
 
 
-Public Class Reduction_KNN_ColorAndDepth
-    Inherits VBparent
+Public Class Reduction_KNN_ColorAndDepth : Inherits VBparent
     Dim reduction As Reduction_KNN_Color
     Dim depth As Depth_Edges
     Public Sub New()
@@ -141,8 +137,7 @@ End Class
 
 
 
-Public Class Reduction_Lines
-    Inherits VBparent
+Public Class Reduction_Lines : Inherits VBparent
     Dim sideView As Histogram_SideView2D
     Dim topView As Histogram_TopView2D
     Public lDetect As Line_Basics
@@ -188,8 +183,7 @@ End Class
 
 
 
-Public Class Reduction_Histogram
-    Inherits VBparent
+Public Class Reduction_Histogram : Inherits VBparent
     Dim basics As Reduction_Basics
     Dim hist As Histogram_BackProjectionGrayscale
     Public Sub New()
@@ -218,8 +212,7 @@ End Class
 
 
 
-Public Class Reduction_PointCloud
-    Inherits VBparent
+Public Class Reduction_PointCloud : Inherits VBparent
     Dim reduction As Reduction_Basics
     Public Sub New()
         reduction = New Reduction_Basics()
@@ -248,8 +241,7 @@ End Class
 
 
 
-Public Class Reduction_XYZ
-    Inherits VBparent
+Public Class Reduction_XYZ : Inherits VBparent
     Dim reduction As Reduction_Basics
     Public Sub New()
         reduction = New Reduction_Basics()
@@ -295,8 +287,7 @@ End Class
 
 
 
-Public Class Reduction_Edges
-    Inherits VBparent
+Public Class Reduction_Edges : Inherits VBparent
     Dim edges As Edges_Laplacian
     Dim reduction As Reduction_Basics
     Public Sub New()
@@ -328,8 +319,7 @@ End Class
 
 
 
-Public Class Reduction_Depth
-    Inherits VBparent
+Public Class Reduction_Depth : Inherits VBparent
     Dim reduction As Reduction_Basics
     Dim colorizer As Depth_Colorizer_CPP
     Public reducedDepth32F As New cv.Mat
@@ -361,8 +351,7 @@ End Class
 
 
 
-Public Class Reduction_DepthMax
-    Inherits VBparent
+Public Class Reduction_DepthMax : Inherits VBparent
     Dim reduction As Reduction_Basics
     Dim colorizer As Depth_Colorizer_CPP
     Dim dMax As Depth_SmoothMax

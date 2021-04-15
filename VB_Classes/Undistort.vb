@@ -56,8 +56,7 @@ End Module
 
 
 ' https://stackoverflow.com/questions/26602981/correct-barrel-distortion-in-opencv-manually-without-chessboard-image
-Public Class Undistort_Basics
-    Inherits VBparent
+Public Class Undistort_Basics : Inherits VBparent
     Dim leftViewMap1 As New cv.Mat
     Dim leftViewMap2 As New cv.Mat
     Dim saveK As integer, saveD As integer, saveR As integer, saveP As integer

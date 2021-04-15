@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class MFD_Basics
-    Inherits VBparent
+Public Class MFD_Basics : Inherits VBparent
     Public motion As Motion_Basics
     Public stableImg As cv.Mat
     Dim dMax As Depth_SmoothMax
@@ -48,8 +47,7 @@ End Class
 
 
 
-Public Class MFD_Depth
-    Inherits VBparent
+Public Class MFD_Depth : Inherits VBparent
     Dim mfd As MFD_Basics
     Public Sub New()
         mfd = New MFD_Basics
@@ -71,8 +69,7 @@ End Class
 
 
 
-Public Class MFD_PointCloud
-    Inherits VBparent
+Public Class MFD_PointCloud : Inherits VBparent
     Dim mfd As MFD_Basics
     Public Sub New()
         mfd = New MFD_Basics
@@ -96,8 +93,7 @@ End Class
 
 
 
-Public Class MFD_Sobel
-    Inherits VBparent
+Public Class MFD_Sobel : Inherits VBparent
     Dim mfd As MFD_Basics
     Dim sobel As Edges_Sobel
     Public Sub New()
@@ -131,8 +127,7 @@ End Class
 
 
 
-Public Class MFD_BinarizedSobel
-    Inherits VBparent
+Public Class MFD_BinarizedSobel : Inherits VBparent
     Public mfd As MFD_Basics
     Dim sobel As Edges_BinarizedSobel
     Public Sub New()
@@ -158,8 +153,7 @@ End Class
 
 
 
-Public Class MFD_FloodFill
-    Inherits VBparent
+Public Class MFD_FloodFill : Inherits VBparent
     Public maskSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)

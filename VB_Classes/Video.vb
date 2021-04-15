@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.IO
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
-Public Class Video_Basics
-    Inherits VBparent
+Public Class Video_Basics : Inherits VBparent
     Public srcVideo As String
     Public image As New cv.Mat
     Public captureVideo As New cv.VideoCapture
@@ -58,8 +57,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
-Public Class Video_CarCounting
-    Inherits VBparent
+Public Class Video_CarCounting : Inherits VBparent
     Dim flow As Font_FlowText
     Dim video As Video_Basics
     Dim bgSub As BGSubtract_MOG
@@ -114,8 +112,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
-Public Class Video_CarCComp
-    Inherits VBparent
+Public Class Video_CarCComp : Inherits VBparent
     Dim cc As CComp_Basics
     Dim video As Video_Basics
     Dim bgSub As BGSubtract_MOG
@@ -143,8 +140,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
-Public Class Video_MinRect
-    Inherits VBparent
+Public Class Video_MinRect : Inherits VBparent
     Public video As Video_Basics
     Public bgSub As BGSubtract_MOG
     Public contours As cv.Point()()
@@ -179,8 +175,7 @@ End Class
 
 
 
-Public Class Video_MinCircle
-    Inherits VBparent
+Public Class Video_MinCircle : Inherits VBparent
     Dim video As Video_MinRect
     Public Sub New()
         video = New Video_MinRect()

@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class KNN_Basics
-    Inherits VBparent
+Public Class KNN_Basics : Inherits VBparent
     Public neighbors As New cv.Mat
     Public desiredMatches = 1
     Public knn As cv.ML.KNearest
@@ -53,8 +52,7 @@ End Class
 
 
 
-Public Class KNN_BasicsQT
-    Inherits VBparent
+Public Class KNN_BasicsQT : Inherits VBparent
     Public neighbors As New cv.Mat
     Public testMode As Boolean
     Public desiredMatches = 1
@@ -110,8 +108,7 @@ End Class
 
 
 
-Public Class KNN_Options
-    Inherits VBparent
+Public Class KNN_Options : Inherits VBparent
     Public trainingPoints As New List(Of cv.Point2f)
     Public queryPoints As New List(Of cv.Point2f)
     Public randomTrain As Random_Basics
@@ -180,8 +177,7 @@ End Class
 
 
 
-Public Class KNN_1_to_1
-    Inherits VBparent
+Public Class KNN_1_to_1 : Inherits VBparent
     Public matchedPoints() As cv.Point2f
     Public unmatchedPoints As New List(Of cv.Point2f)
     Public basics As KNN_BasicsQT
@@ -262,8 +258,7 @@ End Class
 
 
 
-Public Class KNN_Emax
-    Inherits VBparent
+Public Class KNN_Emax : Inherits VBparent
     Public knn As KNN_1_to_1
     Dim emax As EMax_Centroids
     Public Sub New()
@@ -311,8 +306,7 @@ End Class
 
 
 
-Public Class KNN_Test
-    Inherits VBparent
+Public Class KNN_Test : Inherits VBparent
     Public grid As Thread_Grid
     Dim knn As KNN_BasicsQT
     Public Sub New()
@@ -357,8 +351,7 @@ End Class
 
 
 
-Public Class KNN_Test_1_to_1
-    Inherits VBparent
+Public Class KNN_Test_1_to_1 : Inherits VBparent
     Public grid As Thread_Grid
     Dim knn As KNN_1_to_1
     Public Sub New()
@@ -402,8 +395,7 @@ End Class
 
 
 
-Public Class KNN_Point3d
-    Inherits VBparent
+Public Class KNN_Point3d : Inherits VBparent
     Public querySet() As cv.Point3f
     Public kOptions As KNN_Options
     Public responseSet() As Integer
@@ -481,8 +473,7 @@ End Class
 
 
 
-Public Class KNN_DepthClusters
-    Inherits VBparent
+Public Class KNN_DepthClusters : Inherits VBparent
     Public blobs As Blob_DepthClusters
     Public flood As FloodFill_Palette
     Public pTrack As KNN_PointTracker
@@ -516,8 +507,7 @@ End Class
 
 
 
-Public Class KNN_SmoothAverage
-    Inherits VBparent
+Public Class KNN_SmoothAverage : Inherits VBparent
     Dim knn As KNN_DepthClusters
     Dim lastinput As New cv.Mat
     Public Sub New()
@@ -557,8 +547,7 @@ End Class
 
 
 
-Public Class KNN_StabilizeRegions
-    Inherits VBparent
+Public Class KNN_StabilizeRegions : Inherits VBparent
     Public knn As KNN_DepthClusters
     Public flood As FloodFill_Palette
     Dim lastinput As New cv.Mat
@@ -594,8 +583,7 @@ End Class
 
 
 
-Public Class KNN_Contours
-    Inherits VBparent
+Public Class KNN_Contours : Inherits VBparent
     Dim outline As Contours_Depth
     Dim knn As KNN_BasicsQT
     Public Sub New()
@@ -641,8 +629,7 @@ End Class
 
 
 
-Public Class KNN_Cluster2DCities
-    Inherits VBparent
+Public Class KNN_Cluster2DCities : Inherits VBparent
     Dim knn As KNN_Point2d
     Public cityPositions() As cv.Point
     Public cityOrder() As Integer
@@ -733,8 +720,7 @@ End Class
 
 
 
-Public Class KNN_Point2d
-    Inherits VBparent
+Public Class KNN_Point2d : Inherits VBparent
     Public knn As KNN_BasicsQT
     Public responseSet() As Integer
     Public Sub New()
@@ -786,8 +772,7 @@ End Class
 
 
 
-Public Class KNN_Learn
-    Inherits VBparent
+Public Class KNN_Learn : Inherits VBparent
     Public trainingPoints As New List(Of cv.Point2f)
     Public knn As cv.ML.KNearest
     Public Sub New()
@@ -843,8 +828,7 @@ End Structure
 
 
 
-Public Class KNN_PointTracker
-    Inherits VBparent
+Public Class KNN_PointTracker : Inherits VBparent
     Public knn As KNN_1_to_1
     Dim newCentroids As New List(Of cv.Point2f)
     Dim topView As PointCloud_Kalman_TopView
@@ -996,8 +980,7 @@ End Class
 
 
 
-Public Class KNN_1_to_1FIFO
-    Inherits VBparent
+Public Class KNN_1_to_1FIFO : Inherits VBparent
     Public neighbors As New cv.Mat
     Public lastSet As New List(Of cv.Point2f)
     Public currSet As New List(Of cv.Point2f)

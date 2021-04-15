@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 
 'https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
-Public Class Voronoi_Basics
-    Inherits VBparent
+Public Class Voronoi_Basics : Inherits VBparent
     Public vDemo As New CS_Classes.VoronoiDemo
     Public random As Random_Basics
     Public inputPoints As List(Of cv.Point)
@@ -40,8 +39,7 @@ End Class
 
 
 'https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
-Public Class Voronoi_Compare
-    Inherits VBparent
+Public Class Voronoi_Compare : Inherits VBparent
     Dim basics As Voronoi_Basics
     Public random As Random_Basics
     Public Sub New()
@@ -90,8 +88,7 @@ End Module
 
 
 'https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
-Public Class Voronoi_CPP
-    Inherits VBparent
+Public Class Voronoi_CPP : Inherits VBparent
     Dim vPtr As IntPtr
     Dim vDemo As Voronoi_Basics
     Public Sub New()

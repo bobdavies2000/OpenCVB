@@ -1,7 +1,6 @@
 
 Imports cv = OpenCvSharp
-Public Class FishEye_Rectified
-    Inherits VBparent
+Public Class FishEye_Rectified : Inherits VBparent
     Public leftView As cv.Mat
     Public rightView As cv.Mat
     Dim kMatRight As New cv.Mat, dMatRight As New cv.Mat, rMatRight As New cv.Mat, pMatRight As New cv.Mat
@@ -70,8 +69,7 @@ End Class
 
 
 
-Public Class FishEye_Raw
-    Inherits VBparent
+Public Class FishEye_Raw : Inherits VBparent
     Public Sub New()
         task.desc = "Display the Raw FishEye images for the T265 (only)"
 		' task.rank = 1

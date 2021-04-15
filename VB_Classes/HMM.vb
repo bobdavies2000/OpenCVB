@@ -17,8 +17,7 @@ End Module
 
 
 'https://github.com/omidsakhi/cv-hmm
-Public Class HMM_Example_CPP
-    Inherits VBparent
+Public Class HMM_Example_CPP : Inherits VBparent
     Dim HMM As IntPtr = 0
     Public Sub New()
         If task.parms.testAllRunning = False Then HMM = HMM_Open()

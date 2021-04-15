@@ -3,8 +3,7 @@ Imports OpenCvSharp.XPhoto
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
 
-Public Class xPhoto_Bm3dDenoise
-    Inherits VBparent
+Public Class xPhoto_Bm3dDenoise : Inherits VBparent
     Public Sub New()
         task.desc = "Denoise image with block matching and filtering."
 		' task.rank = 1
@@ -26,8 +25,7 @@ End Class
 
 
 
-Public Class xPhoto_Bm3dDenoiseDepthImage
-    Inherits VBparent
+Public Class xPhoto_Bm3dDenoiseDepthImage : Inherits VBparent
     Public Sub New()
         task.desc = "Denoise the depth image with block matching and filtering."
 		' task.rank = 1
@@ -63,8 +61,7 @@ End Module
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/xphoto/samples/oil.cpp
-Public Class xPhoto_OilPaint_CPP
-    Inherits VBparent
+Public Class xPhoto_OilPaint_CPP : Inherits VBparent
     Dim xPhoto_OilPaint As IntPtr
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then

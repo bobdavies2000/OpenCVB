@@ -2,15 +2,9 @@ Imports cv = OpenCvSharp
 Imports System.IO
 Imports NAudio.Wave
 Imports NAudio.Wave.SampleProviders.SignalGeneratorType
-
-
-
-
-
 ' https://archive.codeplex.com/?p=naudio
 ' http://ismir2002.ismir.net/proceedings/02-FP04-2.pdf
-Public Class Sound_Basics
-    Inherits VBparent
+Public Class Sound_Basics : Inherits VBparent
     Dim memData As WaveBuffer
     Dim pcmData8() As Short
     Dim pcmData16() As Short
@@ -58,9 +52,9 @@ Public Class Sound_Basics
         fileNameForm.Show()
 
         task.desc = "Load an audio file, play it, and convert to PCM"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim sender As New Object, e As New EventArgs
         Static fileinfo = New FileInfo(fileNameForm.filename.Text)
         If fileinfo.Exists And fileNameForm.PlayButton.Text = "Start" Then
@@ -110,8 +104,7 @@ End Class
 
 
 ' https://github.com/naudio/sinegenerator-sample
-Public Class Sound_SignalGenerator
-    Inherits VBparent
+Public Class Sound_SignalGenerator : Inherits VBparent
     Dim player As NAudio.Wave.IWavePlayer
     Dim wGen As New NAudio.Wave.SampleProviders.SignalGenerator
     Public pcm32f As New cv.Mat
@@ -150,9 +143,9 @@ Public Class Sound_SignalGenerator
         player.Init(wGen)
 
         task.desc = "Generate sound with a sine waveform."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static radioIndex As Integer
         Static wgenSlider = findSlider("Sine Wave Frequency")
         Static DecibelSlider = findSlider("Decibels")
@@ -207,8 +200,7 @@ End Class
 
 
 
-Public Class Sound_Display
-    Inherits VBparent
+Public Class Sound_Display : Inherits VBparent
     Public soundSource As Object
     Public Sub New()
 
@@ -224,9 +216,9 @@ Public Class Sound_Display
         If standalone Then soundSource = New Sound_SignalGenerator
 
         task.desc = "Display a sound buffer in several styles"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static sliderPercent As Single
         Static fileStarted As Boolean
         Static formatIndex As Integer
@@ -323,16 +315,15 @@ End Class
 
 
 
-Public Class Sound_GenWaveDisplay
-    Inherits VBparent
+Public Class Sound_GenWaveDisplay : Inherits VBparent
     Dim plotSound As Sound_Display
     Public Sub New()
         plotSound = New Sound_Display
         plotSound.soundSource = New Sound_SignalGenerator
         task.desc = "Display the generated sound waves"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         plotSound.soundSource.run(src)
         plotSound.Run(src)
         Dim r1 = New cv.Rect(0, 0, src.Width, src.Height)
@@ -349,8 +340,7 @@ End Class
 
 
 
-Public Class Sound_WaveDisplay
-    Inherits VBparent
+Public Class Sound_WaveDisplay : Inherits VBparent
     Dim plotSound As Sound_Display
     Public Sub New()
         plotSound = New Sound_Display

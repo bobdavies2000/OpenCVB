@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 'http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
-Public Class Kalman_Basics
-    Inherits VBparent
+Public Class Kalman_Basics : Inherits VBparent
     Dim kalman() As Kalman_Simple
     Public kInput(4 - 1) As Single
     Public kOutput(4 - 1) As Single
@@ -60,8 +59,7 @@ End Class
 
 
 
-Public Class Kalman_Stripped
-    Inherits VBparent
+Public Class Kalman_Stripped : Inherits VBparent
     Dim kalman() As Kalman_Simple
     Public kInput(4 - 1) As Single
     Public kOutput(4 - 1) As Single
@@ -120,8 +118,7 @@ End Class
 
 
 ' http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
-Public Class Kalman_Compare
-    Inherits VBparent
+Public Class Kalman_Compare : Inherits VBparent
     Dim kalman() As Kalman_Single
     Public plot As Plot_OverTime
     Public kPlot As Plot_OverTime
@@ -180,8 +177,7 @@ End Class
 
 
 'https://github.com/opencv/opencv/blob/master/samples/cpp/kalman.cpp
-Public Class Kalman_RotatingPoint
-    Inherits VBparent
+Public Class Kalman_RotatingPoint : Inherits VBparent
     Dim kf As New cv.KalmanFilter(2, 1, 0)
     Dim kState As New cv.Mat(2, 1, cv.MatType.CV_32F)
     Dim processNoise As New cv.Mat(2, 1, cv.MatType.CV_32F)
@@ -247,8 +243,7 @@ End Class
 
 ' http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
 ' https://www.codeproject.com/Articles/865935/Object-Tracking-Kalman-Filter-with-Ease
-Public Class Kalman_MousePredict
-    Inherits VBparent
+Public Class Kalman_MousePredict : Inherits VBparent
     Dim kalman As Kalman_Basics
     Dim lineWidth As Integer
     Public Sub New()
@@ -281,8 +276,7 @@ End Class
 
 
 
-Public Class Kalman_CVMat
-    Inherits VBparent
+Public Class Kalman_CVMat : Inherits VBparent
     Dim kalman() As Kalman_Simple
     Public output As cv.Mat
     Dim basics As Kalman_Basics
@@ -352,8 +346,7 @@ End Class
 
 
 
-Public Class Kalman_ImageSmall
-    Inherits VBparent
+Public Class Kalman_ImageSmall : Inherits VBparent
     Dim kalman As Kalman_CVMat
     Dim resize As Resize_Percentage
     Public Sub New()
@@ -389,8 +382,7 @@ End Class
 
 
 
-Public Class Kalman_DepthSmall
-    Inherits VBparent
+Public Class Kalman_DepthSmall : Inherits VBparent
     Dim kalman As Kalman_ImageSmall
     Public Sub New()
         kalman = New Kalman_ImageSmall()
@@ -413,8 +405,7 @@ End Class
 
 
 
-Public Class Kalman_Depth32f
-    Inherits VBparent
+Public Class Kalman_Depth32f : Inherits VBparent
     Dim kalman As Kalman_CVMat
     Dim resize As Resize_Percentage
     Public Sub New()
@@ -446,8 +437,7 @@ End Class
 
 
 
-Public Class Kalman_Single
-    Inherits VBparent
+Public Class Kalman_Single : Inherits VBparent
     Dim plot As Plot_OverTime
     Dim kf As New cv.KalmanFilter(2, 1, 0)
     Dim processNoise As New cv.Mat(2, 1, cv.MatType.CV_32F)
@@ -533,8 +523,7 @@ End Class
 
 ' https://www.codeproject.com/Articles/865935/Object-Tracking-Kalman-Filter-with-Ease
 ' https://www.codeproject.com/Articles/326657/KalmanDemo
-Public Class Kalman_VB
-    Inherits VBparent
+Public Class Kalman_VB : Inherits VBparent
     Const MAX_INPUT = 20
     Dim matrix As New List(Of Single)
     Dim oRand As Random
@@ -650,8 +639,7 @@ End Class
 ' https://towardsdatascience.com/kalman-filter-interview-bdc39f3e6cf3
 ' https://towardsdatascience.com/extended-kalman-filter-43e52b16757d
 ' https://towardsdatascience.com/the-unscented-kalman-filter-anything-ekf-can-do-i-can-do-it-better-ce7c773cf88d
-Public Class Kalman_VB_Basics
-    Inherits VBparent
+Public Class Kalman_VB_Basics : Inherits VBparent
     Public kInput As Single
     Public kOutput As Single
     Public kAverage As Single

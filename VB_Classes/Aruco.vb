@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 Imports OpenCvSharp.Aruco.CvAruco
 
 ' https://github.com/shimat/opencvsharp_samples/blob/master/SamplesCS/Samples/ArucoSample.cs
-Public Class Aruco_Basics
-    Inherits VBparent
+Public Class Aruco_Basics : Inherits VBparent
     Public Sub New()
         task.desc = "Show how to use the Aruco markers and rotate the image accordingly."
 		' task.rank = 1
@@ -28,8 +27,7 @@ End Class
 
 
 
-Public Class Aruco_Test
-    Inherits VBparent
+Public Class Aruco_Test : Inherits VBparent
     Dim aruco As New CS_Classes.Aruco_Detect
     Public Sub New()
         label1 = "Original Image with marker ID's"

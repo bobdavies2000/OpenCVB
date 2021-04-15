@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Diff_Basics
-    Inherits VBparent
+Public Class Diff_Basics : Inherits VBparent
     Public lastFrame As cv.Mat
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -36,8 +35,7 @@ End Class
 
 
 
-Public Class Diff_UnstableDepthAndColor
-    Inherits VBparent
+Public Class Diff_UnstableDepthAndColor : Inherits VBparent
     Public diff As Diff_Basics
     Public depth As Depth_NotMissing
     Dim lastFrames() As cv.Mat

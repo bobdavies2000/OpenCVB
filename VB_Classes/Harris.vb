@@ -27,8 +27,7 @@ End Module
 
 
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
-Public Class Harris_Features_CPP
-    Inherits VBparent
+Public Class Harris_Features_CPP : Inherits VBparent
     Dim srcData() As Byte
     Dim Harris_Features As IntPtr
     Public Sub New()
@@ -77,8 +76,7 @@ End Class
 
 
 ' https://github.com/PacktPublishing/OpenCV3-Computer-Vision-Application-Programming-Cookbook-Third-Edition/blob/master/Chapter08/harrisDetector.h
-Public Class Harris_Detector_CPP
-    Inherits VBparent
+Public Class Harris_Detector_CPP : Inherits VBparent
     Dim srcData() As Byte
     Dim ptCount(1) As integer
     Dim Harris_Detector As IntPtr

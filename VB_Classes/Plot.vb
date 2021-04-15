@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
-Public Class Plot_Basics
-    Inherits VBparent
+Public Class Plot_Basics : Inherits VBparent
     Dim plot As Plot_Basics_CPP
     Dim hist As Histogram_Graph
     Public plotCount As Integer = 3
@@ -38,8 +37,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/plot/samples/plot_demo.cpp
-Public Class Plot_Basics_CPP
-    Inherits VBparent
+Public Class Plot_Basics_CPP : Inherits VBparent
     Public srcX() As Double
     Public srcY() As Double
     Public Sub New()
@@ -87,8 +85,7 @@ End Class
 
 
 
-Public Class Plot_OverTime
-    Inherits VBparent
+Public Class Plot_OverTime : Inherits VBparent
     Public plotData As cv.Scalar
     Public plotCount As integer = 3
     Public plotColors() As cv.Scalar = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.White}
@@ -203,8 +200,7 @@ End Class
 
 
 
-Public Class Plot_Histogram
-    Inherits VBparent
+Public Class Plot_Histogram : Inherits VBparent
     Public hist As New cv.Mat
     Public bins As integer = 50
     Public minRange As integer = 0
@@ -287,8 +283,7 @@ End Module
 
 
 
-Public Class Plot_Depth
-    Inherits VBparent
+Public Class Plot_Depth : Inherits VBparent
     Dim plot As Plot_Basics_CPP
     Dim hist As Histogram_Depth
     Public Sub New()

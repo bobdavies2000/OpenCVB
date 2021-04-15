@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 
-Public Class DilateErode_Basics
-    Inherits VBparent
+Public Class DilateErode_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -66,8 +65,7 @@ End Class
 
 
 
-Public Class DilateErode_DepthSeed
-    Inherits VBparent
+Public Class DilateErode_DepthSeed : Inherits VBparent
     Dim dilate As DilateErode_Basics
     Public Sub New()
         dilate = New DilateErode_Basics()
@@ -105,8 +103,7 @@ End Class
 
 
 
-Public Class DilateErode_OpenClose
-    Inherits VBparent
+Public Class DilateErode_OpenClose : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)

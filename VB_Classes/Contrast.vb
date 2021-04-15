@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Contrast_POW
-    Inherits VBparent
+Public Class Contrast_POW : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -26,8 +25,7 @@ End Class
 
 
 
-Public Class Contrast_Basics
-    Inherits VBparent
+Public Class Contrast_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

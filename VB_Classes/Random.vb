@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 
-Public Class Random_Basics
-    Inherits VBparent
+Public Class Random_Basics : Inherits VBparent
     Public Points(0) As cv.Point
     Public Points2f(0) As cv.Point2f
     Public rangeRect As cv.Rect
@@ -40,8 +39,7 @@ End Class
 
 
 
-Public Class Random_Shuffle
-    Inherits VBparent
+Public Class Random_Shuffle : Inherits VBparent
     Dim myRNG As New cv.RNG
     Public Sub New()
         task.desc = "Use randomShuffle to reorder an image."
@@ -56,8 +54,7 @@ End Class
 
 
 
-Public Class Random_LUTMask
-    Inherits VBparent
+Public Class Random_LUTMask : Inherits VBparent
     Dim random As Random_Basics
     Dim km As kMeans_Basics
     Public Sub New()
@@ -90,8 +87,7 @@ End Class
 
 
 
-Public Class Random_UniformDist
-    Inherits VBparent
+Public Class Random_UniformDist : Inherits VBparent
     Public Sub New()
         minVal = 0
         maxVal = 255
@@ -106,8 +102,7 @@ End Class
 
 
 
-Public Class Random_NormalDist
-    Inherits VBparent
+Public Class Random_NormalDist : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -134,8 +129,7 @@ End Class
 
 
 
-Public Class Random_CheckUniformSmoothed
-    Inherits VBparent
+Public Class Random_CheckUniformSmoothed : Inherits VBparent
     Dim histogram As Histogram_Basics
     Dim rUniform As Random_UniformDist
     Public Sub New()
@@ -161,8 +155,7 @@ End Class
 
 
 
-Public Class Random_CheckUniformDist
-    Inherits VBparent
+Public Class Random_CheckUniformDist : Inherits VBparent
     Dim histogram As Histogram_Graph
     Dim rUniform As Random_UniformDist
     Public Sub New()
@@ -188,8 +181,7 @@ End Class
 
 
 
-Public Class Random_CheckNormalDist
-    Inherits VBparent
+Public Class Random_CheckNormalDist : Inherits VBparent
     Dim histogram As Histogram_Graph
     Dim normalDist As Random_NormalDist
     Public Sub New()
@@ -212,8 +204,7 @@ End Class
 
 
 
-Public Class Random_CheckNormalDistSmoothed
-    Inherits VBparent
+Public Class Random_CheckNormalDistSmoothed : Inherits VBparent
     Dim histogram As Histogram_Basics
     Dim normalDist As Random_NormalDist
     Public Sub New()
@@ -265,8 +256,7 @@ End Module
 
 
 
-Public Class Random_PatternGenerator_CPP
-    Inherits VBparent
+Public Class Random_PatternGenerator_CPP : Inherits VBparent
     Dim Random_PatternGenerator As IntPtr
     Public Sub New()
         Random_PatternGenerator = Random_PatternGenerator_Open()
@@ -296,8 +286,7 @@ End Class
 
 
 
-Public Class Random_CustomDistribution
-    Inherits VBparent
+Public Class Random_CustomDistribution : Inherits VBparent
     Public inputCDF As cv.Mat ' place a cumulative distribution function here (or just put the histogram that reflects the desired random number distribution)
     Public outputRandom = New cv.Mat(10000, 1, cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
     Public outputHistogram As cv.Mat
@@ -346,8 +335,7 @@ End Class
 
 
 ' https://www.khanacademy.org/computing/computer-programming/programming-natural-simulations/programming-randomness/a/custom-distribution-of-random-numbers
-Public Class Random_MonteCarlo
-    Inherits VBparent
+Public Class Random_MonteCarlo : Inherits VBparent
     Public plotHist As Plot_Histogram
     Public outputRandom = New cv.Mat(4000, 1, cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
     Public Sub New()
@@ -390,8 +378,7 @@ End Class
 
 
 
-Public Class Random_CustomHistogram
-    Inherits VBparent
+Public Class Random_CustomHistogram : Inherits VBparent
     Public random As Random_CustomDistribution
     Public hist As Histogram_Simple
     Public saveHist As cv.Mat
@@ -440,8 +427,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class Random_60sTV
-    Inherits VBparent
+Public Class Random_60sTV : Inherits VBparent
     Public Sub New()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -481,8 +467,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class Random_60sTVFaster
-    Inherits VBparent
+Public Class Random_60sTVFaster : Inherits VBparent
     Dim random As Random_UniformDist
     Dim mats As Mat_4to1
     Dim options As Random_60sTV
@@ -531,8 +516,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class Random_60sTVFastSimple
-    Inherits VBparent
+Public Class Random_60sTVFastSimple : Inherits VBparent
     Dim random As Random_UniformDist
     Dim options As Random_60sTV
     Public Sub New()
@@ -570,8 +554,7 @@ End Class
 
 
 
-Public Class Random_KalmanPoints
-    Inherits VBparent
+Public Class Random_KalmanPoints : Inherits VBparent
     Dim random As Random_Basics
     Dim knn As KNN_1_to_1FIFO
     Dim kalman As Kalman_Basics

@@ -217,8 +217,7 @@ End Module
 
 
 ' https://github.com/nemanja-m/gaps
-Public Class Puzzle_Basics
-    Inherits VBparent
+Public Class Puzzle_Basics : Inherits VBparent
     Public grid As Thread_Grid
     Public scrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
     Public unscrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
@@ -275,8 +274,7 @@ End Class
 
 
 
-Public Class Puzzle_Solver
-    Inherits VBparent
+Public Class Puzzle_Solver : Inherits VBparent
     Dim puzzle As Puzzle_Basics
     Public roilist() As cv.Rect
     Dim usedList As New List(Of Integer)

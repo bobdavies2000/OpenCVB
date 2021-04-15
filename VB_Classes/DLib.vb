@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.IO
 Imports System.Net
 Imports System.Threading
-Public Class Dlib_Sobel_CS
-    Inherits VBparent
+Public Class Dlib_Sobel_CS : Inherits VBparent
     Dim d2Mat As Mat_Dlib2Mat
     Dim sobel As New CS_Classes.Dlib_EdgesSobel
     Public Sub New()
@@ -29,8 +28,7 @@ End Class
 
 
 
-Public Class Dlib_GaussianBlur_CS
-    Inherits VBparent
+Public Class Dlib_GaussianBlur_CS : Inherits VBparent
     Dim blur As New CS_Classes.Dlib_GaussianBlur
     Dim d2Mat As Mat_Dlib2Mat
     Public Sub New()
@@ -63,8 +61,7 @@ End Class
 
 
 
-Public Class Dlib_FaceDetectHOG_CS
-    Inherits VBparent
+Public Class Dlib_FaceDetectHOG_CS : Inherits VBparent
     Dim faces As New CS_Classes.Dlib_FaceDetectHOG
     Dim d2Mat As Mat_Dlib2Mat
     Public Sub New()
@@ -99,8 +96,7 @@ End Class
 
 ' https://ibug.doc.ic.ac.uk/resources/300-W/
 ' https://stackoverflow.com/questions/30887979/i-want-to-create-a-script-for-unzip-tar-gz-file-via-python
-Public Class Dlib_iBug300WDownload
-    Inherits VBparent
+Public Class Dlib_iBug300WDownload : Inherits VBparent
     Dim zippedBuffer As New MemoryStream()
     Dim downloadActive As Boolean
     Dim pythonActive As Boolean

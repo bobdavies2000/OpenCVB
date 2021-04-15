@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/2.4/modules/flann/doc/flann_fast_approximate_nearest_neighbor_search.html#
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FlannSample.vb
-Public Class FLANN_Test
-    Inherits VBparent
+Public Class FLANN_Test : Inherits VBparent
     Public Sub New()
         task.desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. "
 		' task.rank = 1
@@ -43,8 +42,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d5/d6f/tutorial_feature_flann_matcher.html
-Public Class FLANN_Basics
-    Inherits VBparent
+Public Class FLANN_Basics : Inherits VBparent
     Dim random As Random_Basics
     Dim qArray() As cv.Point2f
     Public Sub New()

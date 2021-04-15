@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
-Public Class FloodFill_Basics
-    Inherits VBparent
+Public Class FloodFill_Basics : Inherits VBparent
     Public sortedSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
     Public maskSizes As New List(Of Integer)
     Public rects As New List(Of cv.Rect)
@@ -92,8 +91,7 @@ End Class
 
 
 
-Public Class FloodFill_Top16_MT
-    Inherits VBparent
+Public Class FloodFill_Top16_MT : Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
         grid = New Thread_Grid
@@ -134,8 +132,7 @@ End Class
 
 
 
-Public Class FloodFill_Color_MT
-    Inherits VBparent
+Public Class FloodFill_Color_MT : Inherits VBparent
     Dim flood As FloodFill_Top16_MT
     Dim grid As Thread_Grid
     Public Sub New()
@@ -177,8 +174,7 @@ End Class
 
 
 
-Public Class FloodFill_DCT
-    Inherits VBparent
+Public Class FloodFill_DCT : Inherits VBparent
     Dim flood As FloodFill_Color_MT
     Dim dct As DCT_FeatureLess
     Public Sub New()
@@ -201,8 +197,7 @@ End Class
 
 
 
-Public Class FloodFill_CComp
-    Inherits VBparent
+Public Class FloodFill_CComp : Inherits VBparent
     Dim ccomp As CComp_Basics
     Dim range As FloodFill_RelativeRange
     Public Sub New()
@@ -230,8 +225,7 @@ End Class
 
 
 
-Public Class FloodFill_RelativeRange
-    Inherits VBparent
+Public Class FloodFill_RelativeRange : Inherits VBparent
     Public fBasics As FloodFill_Basics
     Public Sub New()
         fBasics = New FloodFill_Basics()
@@ -265,8 +259,7 @@ End Class
 
 
 
-Public Class Floodfill_Objects
-    Inherits VBparent
+Public Class Floodfill_Objects : Inherits VBparent
     Dim basics As FloodFill_Basics
     Dim minSlider As Windows.Forms.TrackBar
     Public Sub New()
@@ -313,8 +306,7 @@ End Class
 
 
 
-Public Class FloodFill_WithDepth
-    Inherits VBparent
+Public Class FloodFill_WithDepth : Inherits VBparent
     Dim range As FloodFill_RelativeRange
     Public Sub New()
 
@@ -338,8 +330,7 @@ End Class
 
 
 
-Public Class Floodfill_Identifiers
-    Inherits VBparent
+Public Class Floodfill_Identifiers : Inherits VBparent
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
@@ -404,8 +395,7 @@ End Class
 
 
 
-Public Class Floodfill_ColorObjects
-    Inherits VBparent
+Public Class Floodfill_ColorObjects : Inherits VBparent
     Public pFlood As Floodfill_Identifiers
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
@@ -436,8 +426,7 @@ End Class
 
 
 
-Public Class FloodFill_PointTracker
-    Inherits VBparent
+Public Class FloodFill_PointTracker : Inherits VBparent
     Dim pTrack As KNN_PointTracker
     Dim flood As FloodFill_Palette
     Public Sub New()
@@ -471,8 +460,7 @@ End Class
 
 
 
-Public Class FloodFill_Top16
-    Inherits VBparent
+Public Class FloodFill_Top16 : Inherits VBparent
     Public flood As FloodFill_Basics
 
     Public thumbNails As New cv.Mat
@@ -529,8 +517,7 @@ End Class
 
 
 
-Public Class FloodFill_Click
-    Inherits VBparent
+Public Class FloodFill_Click : Inherits VBparent
     Dim edges As Edges_BinarizedSobel
     Dim flood As FloodFill_Point
     Public Sub New()
@@ -564,8 +551,7 @@ End Class
 
 
 
-Public Class FloodFill_Point
-    Inherits VBparent
+Public Class FloodFill_Point : Inherits VBparent
     Public pixelCount As Integer
     Public rect As cv.Rect
     Dim edges As Edges_BinarizedSobel
@@ -614,8 +600,7 @@ End Class
 
 
 
-Public Class FloodFill_FullImage
-    Inherits VBparent
+Public Class FloodFill_FullImage : Inherits VBparent
     Public maskSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
@@ -761,8 +746,7 @@ End Class
 
 
 
-Public Class FloodFill_Step
-    Inherits VBparent
+Public Class FloodFill_Step : Inherits VBparent
     Public maskSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
@@ -873,8 +857,7 @@ End Class
 
 
 
-Public Class FloodFill_Palette
-    Inherits VBparent
+Public Class FloodFill_Palette : Inherits VBparent
     Public basics As FloodFill_Basics
     Public allRegionMask As cv.Mat
     Public Sub New()
@@ -911,8 +894,7 @@ End Class
 
 
 
-Public Class FloodFill_LUT
-    Inherits VBparent
+Public Class FloodFill_LUT : Inherits VBparent
     Dim lut As LUT_Basics
     Dim flood As FloodFill_Basics
     Dim addw As AddWeighted_Basics
@@ -952,8 +934,7 @@ End Class
 
 
 
-Public Class FloodFill_Neighbors
-    Inherits VBparent
+Public Class FloodFill_Neighbors : Inherits VBparent
     Public basics As FloodFill_Basics
     Public initialMask As New cv.Mat
     Public rangeColors As New List(Of Integer)

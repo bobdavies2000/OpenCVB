@@ -100,8 +100,7 @@ End Module
 
 
 
-Public Class PointCloud_Basics
-    Inherits VBparent
+Public Class PointCloud_Basics : Inherits VBparent
     Public Sub New()
         task.desc = "Display the point cloud in a 2D image for use with the PixelViewer"
 		' task.rank = 1
@@ -116,8 +115,7 @@ End Class
 
 
 
-Public Class PointCloud_Continuous
-    Inherits VBparent
+Public Class PointCloud_Continuous : Inherits VBparent
     Public Sub New()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -153,8 +151,7 @@ End Class
 
 
 
-Public Class PointCloud_Inspector
-    Inherits VBparent
+Public Class PointCloud_Inspector : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -203,8 +200,7 @@ End Class
 
 
 
-Public Class PointCloud_Continuous_VB
-    Inherits VBparent
+Public Class PointCloud_Continuous_VB : Inherits VBparent
     Public Sub New()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -249,8 +245,7 @@ End Class
 ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
 ' https://www.stereolabs.com/zed/
 ' https://www.mynteye.com/pages/mynt-eye-d
-Public Class PointCloud_ColorizeSide
-    Inherits VBparent
+Public Class PointCloud_ColorizeSide : Inherits VBparent
     Dim gpalette As Palette_Gradient
     Dim arcSize As Integer
     Dim imu As IMU_GVector
@@ -354,8 +349,7 @@ End Class
 ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
 ' https://www.stereolabs.com/zed/
 ' https://www.mynteye.com/pages/mynt-eye-d
-Public Class PointCloud_ColorizeTop
-    Inherits VBparent
+Public Class PointCloud_ColorizeTop : Inherits VBparent
     Dim gpalette As Palette_Gradient
     Dim arcSize As Integer
     Dim imu As IMU_GVector
@@ -438,8 +432,7 @@ End Class
 
 
 
-Public Class PointCloud_Raw_CPP
-    Inherits VBparent
+Public Class PointCloud_Raw_CPP : Inherits VBparent
     Dim grid As Thread_Grid
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
@@ -488,8 +481,7 @@ End Class
 
 
 
-Public Class PointCloud_Raw
-    Inherits VBparent
+Public Class PointCloud_Raw : Inherits VBparent
     Dim grid As Thread_Grid
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
@@ -546,8 +538,7 @@ End Class
 
 
 
-Public Class PointCloud_Kalman_TopView
-    Inherits VBparent
+Public Class PointCloud_Kalman_TopView : Inherits VBparent
     Public pTrack As KNN_PointTracker
     Public flood As FloodFill_Palette
     Public topView As Histogram_TopView2D
@@ -588,8 +579,7 @@ End Class
 
 
 
-Public Class PointCloud_Kalman_SideView
-    Inherits VBparent
+Public Class PointCloud_Kalman_SideView : Inherits VBparent
     Public flood As Floodfill_Identifiers
     Public sideView As Histogram_SideView2D
     Public pTrack As KNN_PointTracker
@@ -637,8 +627,7 @@ End Class
 
 
 
-Public Class PointCloud_BackProject
-    Inherits VBparent
+Public Class PointCloud_BackProject : Inherits VBparent
     Dim both As PointCloud_BothViews
     Dim mats As Mat_4to1
     Public Sub New()
@@ -679,8 +668,7 @@ End Class
 
 
 
-Public Class PointCloud_FrustrumTop
-    Inherits VBparent
+Public Class PointCloud_FrustrumTop : Inherits VBparent
     Dim frustrum As Draw_Frustrum
     Dim topView As Histogram_TopView2D
     Dim cmat As PointCloud_ColorizeTop
@@ -718,8 +706,7 @@ End Class
 
 
 
-Public Class PointCloud_FrustrumSide
-    Inherits VBparent
+Public Class PointCloud_FrustrumSide : Inherits VBparent
     Dim frustrum As Draw_Frustrum
     Dim sideView As Histogram_SideView2D
     Dim cmat As PointCloud_ColorizeSide
@@ -757,8 +744,7 @@ End Class
 
 
 
-Public Class PointCloud_Singletons
-    Inherits VBparent
+Public Class PointCloud_Singletons : Inherits VBparent
     Public topView As Histogram_TopView2D
     Public Sub New()
         topView = New Histogram_TopView2D()
@@ -789,8 +775,7 @@ End Class
 
 
 
-Public Class PointCloud_ReducedSideView
-    Inherits VBparent
+Public Class PointCloud_ReducedSideView : Inherits VBparent
     Dim gCloud As Depth_PointCloud_IMU
     Dim reduction As Reduction_Basics
     Dim histOutput As New cv.Mat
@@ -827,8 +812,7 @@ End Class
 
 
 
-Public Class PointCloud_ReducedTopView
-    Inherits VBparent
+Public Class PointCloud_ReducedTopView : Inherits VBparent
     Dim gCloud As Depth_PointCloud_IMU
     Dim reduction As Reduction_Basics
     Dim histOutput As New cv.Mat
@@ -866,8 +850,7 @@ End Class
 
 
 
-Public Class PointCloud_ObjectsTop
-    Inherits VBparent
+Public Class PointCloud_ObjectsTop : Inherits VBparent
     Public measureTop As PointCloud_Kalman_TopView
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Dim cmat As PointCloud_ColorizeTop
@@ -978,8 +961,7 @@ End Class
 
 
 
-Public Class PointCloud_ObjectsSide
-    Inherits VBparent
+Public Class PointCloud_ObjectsSide : Inherits VBparent
     Public measureSide As PointCloud_Kalman_SideView
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Dim cmat As PointCloud_ColorizeSide
@@ -1091,8 +1073,7 @@ End Class
 
 
 
-Public Class PointCloud_BothViews
-    Inherits VBparent
+Public Class PointCloud_BothViews : Inherits VBparent
     Public topPixel As PointCloud_ObjectsTop
     Public sidePixel As PointCloud_ObjectsSide
     Dim levelCheck As IMU_isCameraLevel
@@ -1222,8 +1203,7 @@ End Class
 
 
 
-Public Class PointCloud_BackProjectTopView
-    Inherits VBparent
+Public Class PointCloud_BackProjectTopView : Inherits VBparent
     Dim view As PointCloud_ObjectsTop
     Public Sub New()
         view = New PointCloud_ObjectsTop
@@ -1284,8 +1264,7 @@ End Class
 
 
 
-Public Class PointCloud_BackProjectSideView
-    Inherits VBparent
+Public Class PointCloud_BackProjectSideView : Inherits VBparent
     Dim view As PointCloud_ObjectsSide
     Dim cmatSide As PointCloud_ColorizeSide
     Public Sub New()

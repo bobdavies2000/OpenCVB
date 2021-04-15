@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.3.1/d6/d73/Pyramids_8cpp-example.html
-Public Class Pyramid_Basics
-    Inherits VBparent
+Public Class Pyramid_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -33,8 +32,7 @@ End Class
 
 
 
-Public Class Pyramid_Filter
-    Inherits VBparent
+Public Class Pyramid_Filter : Inherits VBparent
     Dim laplace As Laplacian_PyramidFilter
     Public Sub New()
         laplace = New Laplacian_PyramidFilter()

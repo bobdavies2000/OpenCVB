@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class intrinsicsLeft_Basics
-    Inherits VBparent
+Public Class intrinsicsLeft_Basics : Inherits VBparent
     Public Sub New()
         task.desc = "Show the depth camera intrinsicsLeft."
 		' task.rank = 1

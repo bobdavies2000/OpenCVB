@@ -3,8 +3,7 @@ Imports System.Runtime.InteropServices
 Imports System.Threading
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
-Public Class BGSubtract_Basics_CPP
-    Inherits VBparent
+Public Class BGSubtract_Basics_CPP : Inherits VBparent
     Dim bgfs As IntPtr
     Public currMethod As integer = -1
     Public Sub New()
@@ -57,8 +56,7 @@ End Class
 
 
 
-Public Class BGSubtract_MotionDetect_MT
-    Inherits VBparent
+Public Class BGSubtract_MotionDetect_MT : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -117,8 +115,7 @@ End Class
 
 
 
-Public Class BGSubtract_Basics_MT
-    Inherits VBparent
+Public Class BGSubtract_Basics_MT : Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
         grid = New Thread_Grid
@@ -161,8 +158,7 @@ End Class
 
 
 
-Public Class BGSubtract_Depth_MT
-    Inherits VBparent
+Public Class BGSubtract_Depth_MT : Inherits VBparent
     Dim bgsub As BGSubtract_Basics_MT
     Public Sub New()
         bgsub = New BGSubtract_Basics_MT()
@@ -181,8 +177,7 @@ End Class
 
 
 
-Public Class BGSubtract_MOG
-    Inherits VBparent
+Public Class BGSubtract_MOG : Inherits VBparent
     Dim MOG As cv.BackgroundSubtractorMOG
     Public gray As New cv.Mat
     Public Sub New()
@@ -209,8 +204,7 @@ End Class
 
 
 
-Public Class BGSubtract_MOG2
-    Inherits VBparent
+Public Class BGSubtract_MOG2 : Inherits VBparent
     Public gray As New cv.Mat
     Dim MOG2 As cv.BackgroundSubtractorMOG2
     Public Sub New()
@@ -232,8 +226,7 @@ End Class
 
 
 
-Public Class BGSubtract_GMG_KNN
-    Inherits VBparent
+Public Class BGSubtract_GMG_KNN : Inherits VBparent
     Dim gmg As cv.BackgroundSubtractorGMG
     Dim knn As cv.BackgroundSubtractorKNN
     Public Sub New()
@@ -265,8 +258,7 @@ End Class
 
 
 
-Public Class BGSubtract_MOG_RGBDepth
-    Inherits VBparent
+Public Class BGSubtract_MOG_RGBDepth : Inherits VBparent
     Public gray As New cv.Mat
     Dim MOGDepth As cv.BackgroundSubtractorMOG
     Dim MOGRGB As cv.BackgroundSubtractorMOG
@@ -297,8 +289,7 @@ End Class
 
 
 
-Public Class BGSubtract_MOG_Retina
-    Inherits VBparent
+Public Class BGSubtract_MOG_Retina : Inherits VBparent
     Dim bgSub As BGSubtract_MOG
     Dim retina As Retina_Basics_CPP
     Public Sub New()
@@ -324,8 +315,7 @@ End Class
 
 
 
-Public Class BGSubtract_DepthOrColorMotion
-    Inherits VBparent
+Public Class BGSubtract_DepthOrColorMotion : Inherits VBparent
     Public motion As Diff_UnstableDepthAndColor
     Public Sub New()
         motion = New Diff_UnstableDepthAndColor()
@@ -374,8 +364,7 @@ End Module
 
 
 
-Public Class BGSubtract_Video
-    Inherits VBparent
+Public Class BGSubtract_Video : Inherits VBparent
     Dim bgfg As BGSubtract_Basics_CPP
     Dim video As Video_Basics
     Public Sub New()
@@ -402,8 +391,7 @@ End Class
 
 
 
-Public Class BGSubtract_Synthetic_CPP
-    Inherits VBparent
+Public Class BGSubtract_Synthetic_CPP : Inherits VBparent
     Dim synthPtr As IntPtr
     Dim amplitude As Double, magnitude As Double, waveSpeed As Double, objectSpeed As Double
     Public Sub New()
@@ -452,8 +440,7 @@ End Class
 
 
 
-Public Class BGSubtract_Synthetic
-    Inherits VBparent
+Public Class BGSubtract_Synthetic : Inherits VBparent
     Dim bgfg As BGSubtract_Basics_CPP
     Dim synth As BGSubtract_Synthetic_CPP
     Public Sub New()

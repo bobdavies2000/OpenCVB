@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Remap_Basics
-    Inherits VBparent
+Public Class Remap_Basics : Inherits VBparent
     Public direction = 3 ' default to remap horizontally and vertically
     Public Sub New()
         task.desc = "Use remap to reflect an image in 4 directions."
@@ -42,8 +41,7 @@ End Class
 
 
 
-Public Class Remap_Flip
-    Inherits VBparent
+Public Class Remap_Flip : Inherits VBparent
     Public direction = 0
     Public Sub New()
         task.desc = "Use flip to remap an image."

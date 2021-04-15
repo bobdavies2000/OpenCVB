@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
-Public Class IMU_Basics
-    Inherits VBparent
+Public Class IMU_Basics : Inherits VBparent
     Dim lastTimeStamp As Double
     Dim flow As Font_FlowText
     Public theta As cv.Point3f ' this is the description - x, y, and z - of the axes centered in the camera.
@@ -57,8 +56,7 @@ End Class
 
 
 
-Public Class IMU_Stabilizer
-    Inherits VBparent
+Public Class IMU_Stabilizer : Inherits VBparent
     Dim kalman As Kalman_Basics
     Public Sub New()
         kalman = New Kalman_Basics()
@@ -107,8 +105,7 @@ End Class
 
 
 
-Public Class IMU_Magnetometer
-    Inherits VBparent
+Public Class IMU_Magnetometer : Inherits VBparent
     Public plot As Plot_OverTime
     Public Sub New()
         plot = New Plot_OverTime()
@@ -137,8 +134,7 @@ End Class
 
 
 
-Public Class IMU_Barometer
-    Inherits VBparent
+Public Class IMU_Barometer : Inherits VBparent
     Public Sub New()
         task.desc = "Get the barometric pressure from the IMU (if available)"
 		' task.rank = 1
@@ -156,8 +152,7 @@ End Class
 
 
 
-Public Class IMU_Temperature
-    Inherits VBparent
+Public Class IMU_Temperature : Inherits VBparent
     Public Sub New()
         task.desc = "Get the temperature of the IMU (if available)"
 		' task.rank = 1
@@ -171,8 +166,7 @@ End Class
 
 
 
-Public Class IMU_FrameTime
-    Inherits VBparent
+Public Class IMU_FrameTime : Inherits VBparent
     Public plot As Plot_OverTime
     Public CPUInterval As Double
     Public IMUtoCaptureEstimate As Double
@@ -269,8 +263,7 @@ End Class
 
 
 
-Public Class IMU_HostFrameTimes
-    Inherits VBparent
+Public Class IMU_HostFrameTimes : Inherits VBparent
     Public plot As Plot_OverTime
     Public CPUInterval As Double
     Public HostInterruptDelayEstimate As Double
@@ -354,8 +347,7 @@ End Class
 
 
 
-Public Class IMU_TotalDelay
-    Inherits VBparent
+Public Class IMU_TotalDelay : Inherits VBparent
     Dim host As IMU_HostFrameTimes
     Dim imu As IMU_FrameTime
     Dim plot As Plot_OverTime
@@ -429,8 +421,7 @@ End Class
 
 
 
-Public Class IMU_GVector
-    Inherits VBparent
+Public Class IMU_GVector : Inherits VBparent
     Public kalman As Kalman_Basics
     Public Sub New()
         kalman = New Kalman_Basics()
@@ -527,8 +518,7 @@ End Class
 
 
 
-Public Class IMU_isCameraLevel
-    Inherits VBparent
+Public Class IMU_isCameraLevel : Inherits VBparent
     Public angleX As Single ' in radians.
     Public angleY As Single ' in radians.
     Public angleZ As Single ' in radians.
@@ -573,8 +563,7 @@ End Class
 
 
 
-Public Class IMU_IscameraStable
-    Inherits VBparent
+Public Class IMU_IscameraStable : Inherits VBparent
     Dim flow As Font_FlowText
     Public Sub New()
         task.callTrace.Clear() ' special line to clear the tree view otherwise this common option is standalone.

@@ -7,8 +7,7 @@ Module Rodrigues_Basics_Exports
 End Module
 
 
-Public Class Rodrigues_ValidateKinect
-    Inherits VBparent
+Public Class Rodrigues_ValidateKinect : Inherits VBparent
     Public Sub New()
         task.desc = "Validate the Rodrigues calibration for Kinect camera (only)"
 		' task.rank = 1
@@ -35,8 +34,7 @@ End Class
 
 
 
-Public Class Rodrigues_ValidateVector
-    Inherits VBparent
+Public Class Rodrigues_ValidateVector : Inherits VBparent
     Public Sub New()
         task.desc = "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)"
 		' task.rank = 1
@@ -75,8 +73,7 @@ End Class
 
 
 
-Public Class Rodrigues_RotationMatrix
-    Inherits VBparent
+Public Class Rodrigues_RotationMatrix : Inherits VBparent
     Public Sub New()
         task.desc = "Display the contents of the IMU Rotation Matrix"
 		' task.rank = 1
@@ -106,8 +103,7 @@ End Class
 
 
 
-Public Class Rodrigues_Extrinsics
-    Inherits VBparent
+Public Class Rodrigues_Extrinsics : Inherits VBparent
     Public Sub New()
         task.desc = "Convert Camera extrinsics array to a Vector with Rodrigues"
 		' task.rank = 1

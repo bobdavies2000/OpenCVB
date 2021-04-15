@@ -1,7 +1,6 @@
 
 Imports cv = OpenCvSharp
-Public Class Etch_ASketch
-    Inherits VBparent
+Public Class Etch_ASketch : Inherits VBparent
     Dim keys As Keyboard_Basics
     Dim slateColor = New cv.Scalar(122, 122, 122)
     Dim black As New cv.Vec3b(0, 0, 0)

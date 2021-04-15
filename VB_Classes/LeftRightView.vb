@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class LeftRightView_Basics
-    Inherits VBparent
+Public Class LeftRightView_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -32,8 +31,7 @@ End Class
 
 
 
-Public Class LeftRightView_CompareRaw
-    Inherits VBparent
+Public Class LeftRightView_CompareRaw : Inherits VBparent
     Dim lrView As LeftRightView_Basics
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -78,8 +76,7 @@ End Class
 
 
 
-Public Class LeftRightView_Features
-    Inherits VBparent
+Public Class LeftRightView_Features : Inherits VBparent
     Dim lrView As LeftRightView_Basics
     Dim features As Features_GoodFeatures
     Public Sub New()
@@ -112,8 +109,7 @@ End Class
 
 
 
-Public Class LeftRightView_Palettized
-    Inherits VBparent
+Public Class LeftRightView_Palettized : Inherits VBparent
     Dim lrView As LeftRightView_Basics
     Public Sub New()
         lrView = New LeftRightView_Basics()
@@ -137,8 +133,7 @@ End Class
 
 
 
-Public Class LeftRightView_BRISK
-    Inherits VBparent
+Public Class LeftRightView_BRISK : Inherits VBparent
     Dim lrView As LeftRightView_Basics
     Dim brisk As BRISK_Basics
     Public Sub New()
@@ -167,8 +162,7 @@ End Class
 
 
 
-Public Class LeftRightView_BrightnessContrast
-    Inherits VBparent
+Public Class LeftRightView_BrightnessContrast : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

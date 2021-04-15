@@ -6,8 +6,7 @@ Imports System.IO.Pipes
 
 ' https://docs.opencv.org/3.4.1/d2/dc1/camshiftdemo_8cpp-example.html
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
-Public Class CamShift_Basics
-    Inherits VBparent
+Public Class CamShift_Basics : Inherits VBparent
     Public trackBox As New cv.RotatedRect
     Public Sub New()
 
@@ -79,8 +78,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
-Public Class CamShift_Foreground
-    Inherits VBparent
+Public Class CamShift_Foreground : Inherits VBparent
     Dim camshift As CamShift_Basics
     Dim fore As Depth_Foreground
     Public Sub New()
@@ -115,8 +113,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
-Public Class Camshift_Object
-    Inherits VBparent
+Public Class Camshift_Object : Inherits VBparent
     Dim blob As Blob_DepthClusters
     Dim camshift As CamShift_Basics
     Public Sub New()
@@ -153,8 +150,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
-Public Class Camshift_TopObjects
-    Inherits VBparent
+Public Class Camshift_TopObjects : Inherits VBparent
     Dim blob As Blob_DepthClusters
     Dim cams(4 - 1) As CamShift_Basics
     Dim mats As Mat_4to1

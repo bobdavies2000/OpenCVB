@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 
 ' https://docs.opencv.org/3.4/d7/d8b/tutorial_py_lucas_kanade.html
-Public Class Features_GoodFeatures
-    Inherits VBparent
+Public Class Features_GoodFeatures : Inherits VBparent
     Public goodFeatures As New List(Of cv.Point2f)
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -34,8 +33,7 @@ End Class
 
 
 
-Public Class Features_PointTracker
-    Inherits VBparent
+Public Class Features_PointTracker : Inherits VBparent
     Dim features As Features_GoodFeatures
     Dim pTrack As KNN_PointTracker
     Dim rRadius = 10

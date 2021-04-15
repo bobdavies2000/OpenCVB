@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Voxels_Basics_MT
-    Inherits VBparent
+Public Class Voxels_Basics_MT : Inherits VBparent
     Public grid As Thread_Grid
     Public voxels(1) As Single
     Public voxelMat As cv.Mat

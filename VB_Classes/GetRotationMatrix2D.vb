@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Windows.Forms
-Public Class GetRotationMatrix2D_Options
-    Inherits VBparent
+Public Class GetRotationMatrix2D_Options : Inherits VBparent
     Public warpFlag As cv.InterpolationFlags
     Public Sub New()
 
@@ -39,8 +38,7 @@ End Class
 
 
 ' https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
-Public Class GetRotationMatrix2D_Basics
-    Inherits VBparent
+Public Class GetRotationMatrix2D_Basics : Inherits VBparent
     Public M As cv.Mat
     Public Mflip As cv.Mat
     Public rotateOptions As GetRotationMatrix2D_Options
@@ -70,8 +68,7 @@ End Class
 
 
 
-Public Class GetRotationMatrix2D_Box
-    Inherits VBparent
+Public Class GetRotationMatrix2D_Box : Inherits VBparent
     Dim rotation As GetRotationMatrix2D_Basics
     Public Sub New()
         rotation = New GetRotationMatrix2D_Basics()

@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/lkdemo.cpp
-Public Class KLT_Basics
-    Inherits VBparent
+Public Class KLT_Basics : Inherits VBparent
     Public inputPoints() As cv.Point2f
     Public status As New cv.Mat
     Public outputMat As New cv.Mat
@@ -86,8 +85,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/python/lk_track.py
-Public Class KLT_OpticalFlow
-    Inherits VBparent
+Public Class KLT_OpticalFlow : Inherits VBparent
     Dim klt As KLT_Basics
     Dim lastpoints() As cv.Point2f
     Public Sub New()

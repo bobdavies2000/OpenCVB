@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 'https://www.pyimagesearch.com/2017/11/06/deep-learning-opencvs-blobfromimage-works/
-Public Class MeanSubtraction_Basics
-    Inherits VBparent
+Public Class MeanSubtraction_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

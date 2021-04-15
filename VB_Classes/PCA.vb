@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/pca.cpp
-Public Class PCA_Basics
-    Inherits VBparent
+Public Class PCA_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -39,8 +38,7 @@ End Class
 
 
 
-Public Class PCA_Depth
-    Inherits VBparent
+Public Class PCA_Depth : Inherits VBparent
     Dim pca As PCA_Basics
     Public Sub New()
         pca = New PCA_Basics()
@@ -57,8 +55,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.1.0/d1/dee/tutorial_introduction_to_pca.html
-Public Class PCA_DrawImage
-    Inherits VBparent
+Public Class PCA_DrawImage : Inherits VBparent
     Dim pca As PCA_Basics
     Dim image As New cv.Mat
     Public Sub New()

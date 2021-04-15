@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class PhotoShop_Clahe ' Contrast Limited Adaptive Histogram Equalization (CLAHE)
-    Inherits VBparent
+Public Class PhotoShop_Clahe : Inherits VBparent
+    ' Contrast Limited Adaptive Histogram Equalization (CLAHE) : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -25,8 +25,7 @@ End Class
 
 
 
-Public Class PhotoShop_Hue
-    Inherits VBparent
+Public Class PhotoShop_Hue : Inherits VBparent
     Public hsv_planes(2) As cv.Mat
     Public Sub New()
         label1 = "Hue"
@@ -49,8 +48,7 @@ End Class
 
 
 
-Public Class PhotoShop_AlphaBeta
-    Inherits VBparent
+Public Class PhotoShop_AlphaBeta : Inherits VBparent
     Public Sub New()
         task.desc = "Use alpha and beta with ConvertScaleAbs."
 		' task.rank = 1
@@ -72,8 +70,7 @@ End Class
 
 
 
-Public Class PhotoShop_Gamma
-    Inherits VBparent
+Public Class PhotoShop_Gamma : Inherits VBparent
     Dim lookupTable(255) As Byte
     Public Sub New()
         task.desc = "Use gamma with ConvertScaleAbs."
@@ -115,8 +112,7 @@ End Module
 
 
 ' https://blog.csdn.net/just_sort/article/details/85982871
-Public Class PhotoShop_WhiteBalance_CPP
-    Inherits VBparent
+Public Class PhotoShop_WhiteBalance_CPP : Inherits VBparent
     Dim wPtr As IntPtr
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -154,8 +150,7 @@ End Class
 
 
 ' https://blog.csdn.net/just_sort/article/details/85982871
-Public Class PhotoShop_WhiteBalance
-    Inherits VBparent
+Public Class PhotoShop_WhiteBalance : Inherits VBparent
     Dim hist As Histogram_Graph
     Dim whiteCPP As PhotoShop_WhiteBalance_CPP
     Dim wPtr As IntPtr
@@ -218,8 +213,7 @@ End Class
 
 
 ' https://blog.csdn.net/just_sort/article/details/85982871
-Public Class PhotoShop_ChangeMask
-    Inherits VBparent
+Public Class PhotoShop_ChangeMask : Inherits VBparent
     Dim white As PhotoShop_WhiteBalance
     Dim whiteCPP As PhotoShop_WhiteBalance_CPP
     Public Sub New()
@@ -259,8 +253,7 @@ End Class
 
 
 ' https://blog.csdn.net/just_sort/article/details/85982871
-Public Class PhotoShop_PlotHist
-    Inherits VBparent
+Public Class PhotoShop_PlotHist : Inherits VBparent
     Dim white As PhotoShop_ChangeMask
     Public hist1 As Histogram_Basics
     Public hist2 As Histogram_Basics
@@ -300,8 +293,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class PhotoShop_Sepia
-    Inherits VBparent
+Public Class PhotoShop_Sepia : Inherits VBparent
     Public Sub New()
         task.desc = "Create a sepia image"
 		' task.rank = 1
@@ -320,8 +312,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class PhotoShop_Emboss
-    Inherits VBparent
+Public Class PhotoShop_Emboss : Inherits VBparent
     Public gray128 As cv.Mat
     Public Sub New()
 
@@ -385,8 +376,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class PhotoShop_EmbossAll
-    Inherits VBparent
+Public Class PhotoShop_EmbossAll : Inherits VBparent
     Dim emboss As PhotoShop_Emboss
     Dim mats As Mat_4to1
     Dim sizeSlider As Windows.Forms.TrackBar
@@ -448,8 +438,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class PhotoShop_DuoTone
-    Inherits VBparent
+Public Class PhotoShop_DuoTone : Inherits VBparent
     Public Sub New()
 
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -523,8 +512,7 @@ End Class
 
 
 ' https://github.com/spmallick/learnopencv/tree/master/
-Public Class PhotoShop_Brightness
-    Inherits VBparent
+Public Class PhotoShop_Brightness : Inherits VBparent
     Public Sub New()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -562,8 +550,7 @@ End Class
 
 
 
-Public Class PhotoShop_UnsharpMask
-    Inherits VBparent
+Public Class PhotoShop_UnsharpMask : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -596,8 +583,7 @@ End Class
 
 
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
-Public Class PhotoShop_SharpenDetail
-    Inherits VBparent
+Public Class PhotoShop_SharpenDetail : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -621,8 +607,7 @@ End Class
 
 
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
-Public Class PhotoShop_SharpenStylize
-    Inherits VBparent
+Public Class PhotoShop_SharpenStylize : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -646,8 +631,7 @@ End Class
 
 
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
-Public Class PhotoShop_Pencil_Basics
-    Inherits VBparent
+Public Class PhotoShop_Pencil_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -673,8 +657,7 @@ End Class
 
 
 ' https://cppsecrets.com/users/2582658986657266505064717765737646677977/Convert-photo-to-sketch-using-python.php?fbclid=IwAR3pOtiqxeOPiqouii7tmN9Q7yA5vG4dFdXGqA0XgZqcMB87w5a1PEMzGOw
-Public Class PhotoShop_Pencil_Manual
-    Inherits VBparent
+Public Class PhotoShop_Pencil_Manual : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

@@ -64,8 +64,7 @@ End Module
 
 
 
-Public Class Replay_Record
-    Inherits VBparent
+Public Class Replay_Record : Inherits VBparent
     Dim binWrite As BinaryWriter
     Dim recordingActive As Boolean
     Dim colorBytes() As Byte
@@ -155,8 +154,7 @@ End Class
 
 
 
-Public Class Replay_Play
-    Inherits VBparent
+Public Class Replay_Play : Inherits VBparent
     Dim binRead As BinaryReader
     Dim playbackActive As Boolean
     Dim colorBytes() As Byte
@@ -257,8 +255,7 @@ End Class
 
 
 
-Public Class Replay_OpenGL
-    Inherits VBparent
+Public Class Replay_OpenGL : Inherits VBparent
     Dim ogl As OpenGL_Callbacks
     Dim replay As Replay_Play
     Public Sub New()

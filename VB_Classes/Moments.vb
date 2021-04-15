@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Moments_Basics
-    Inherits VBparent
+Public Class Moments_Basics : Inherits VBparent
     Public inputMask As cv.Mat
     Public centroid As cv.Point2f
     Dim foreground As kMeans_Depth_FG_BG
@@ -44,8 +43,7 @@ End Class
 
 
 
-Public Class Moments_CentroidKalman
-    Inherits VBparent
+Public Class Moments_CentroidKalman : Inherits VBparent
     Dim foreground As kMeans_Depth_FG_BG
     Dim kalman As Kalman_Basics
     Public Sub New()

@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class BRISK_Basics
-    Inherits VBparent
+Public Class BRISK_Basics : Inherits VBparent
     Public Brisk As cv.BRISK
     Public features As New List(Of cv.Point2f)
     Public Sub New()

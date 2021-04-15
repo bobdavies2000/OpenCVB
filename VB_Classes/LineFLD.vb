@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://docs.opencv.org/3.4.3/d1/d9e/fld_lines_8cpp-example.html
-Public Class lineFLD_Basics
-    Inherits VBparent
+Public Class lineFLD_Basics : Inherits VBparent
     Public lines As New List(Of cv.Vec4f)
     Public minLenSlider As Windows.Forms.TrackBar
     Public maxDistanceSlider As Windows.Forms.TrackBar
@@ -256,8 +255,7 @@ End Module
 
 
 ' https://docs.opencv.org/3.4.3/d1/d9e/fld_lines_8cpp-example.html
-Public Class lineFLD_CPP
-    Inherits VBparent
+Public Class lineFLD_CPP : Inherits VBparent
     Public sortedLines As New SortedList(Of cv.Vec6f, Integer)
     Dim lineFLD As lineFLD_Basics
     Public lineMat As New cv.Mat
@@ -297,8 +295,7 @@ End Class
 
 
 
-Public Class LineFLD_LongestLine
-    Inherits VBparent
+Public Class LineFLD_LongestLine : Inherits VBparent
     Dim lines As lineFLD_CPP
     Public Sub New()
         lines = New lineFLD_CPP()
@@ -334,8 +331,7 @@ End Class
 
 
 
-Public Class LineFLD_MT
-    Inherits VBparent
+Public Class LineFLD_MT : Inherits VBparent
     Dim lines As lineFLD_CPP
     Public Sub New()
         lines = New lineFLD_CPP()
@@ -368,8 +364,7 @@ End Class
 
 
 
-'Public Class Line_3D_FitLineZ
-'    Inherits VBparent
+'Public Class Line_3D_FitLineZ : Inherits VBparent
 '    Dim linesFLD As lineFLD_CPP
 '    Public Sub New()
 '        linesFLD = New line_FLD_CPP()

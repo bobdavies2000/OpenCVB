@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class DCT_Basics
-    Inherits VBparent
+Public Class DCT_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -47,8 +46,7 @@ End Class
 
 
 
-Public Class DCT_RGB
-    Inherits VBparent
+Public Class DCT_RGB : Inherits VBparent
     Public dct As DCT_Basics
     Public Sub New()
         dct = New DCT_Basics()
@@ -93,8 +91,7 @@ End Class
 
 
 
-Public Class DCT_Depth
-    Inherits VBparent
+Public Class DCT_Depth : Inherits VBparent
     Public dct As DCT_Basics
     Public Sub New()
         dct = New DCT_Basics()
@@ -125,8 +122,7 @@ End Class
 
 
 
-Public Class DCT_FeatureLess
-    Inherits VBparent
+Public Class DCT_FeatureLess : Inherits VBparent
     Public dct As DCT_Basics
     Public Sub New()
 
@@ -175,8 +171,7 @@ End Class
 
 
 
-Public Class DCT_Surfaces_debug
-    Inherits VBparent
+Public Class DCT_Surfaces_debug : Inherits VBparent
     Dim Mats As Mat_4to1
     Dim grid As Thread_Grid
     Dim dct As DCT_FeatureLess
@@ -256,8 +251,7 @@ End Class
 
 
 
-Public Class DCT_CComponents
-    Inherits VBparent
+Public Class DCT_CComponents : Inherits VBparent
     Dim dct As DCT_FeatureLess
     Dim cc As CComp_ColorDepth
     Public Sub New()

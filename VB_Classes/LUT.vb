@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class LUT_Basics
-    Inherits VBparent
+Public Class LUT_Basics : Inherits VBparent
     Public nSeg As Integer
     Public Sub New()
 
@@ -43,8 +42,7 @@ End Class
 
 
 
-Public Class LUT_Sliders
-    Inherits VBparent
+Public Class LUT_Sliders : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -83,8 +81,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
-Public Class LUT_Reduction
-    Inherits VBparent
+Public Class LUT_Reduction : Inherits VBparent
     Public reduction As Reduction_Basics
     Public colorMat As cv.Mat
     Public Sub New()
@@ -107,8 +104,7 @@ End Class
 
 
 
-Public Class LUT_CustomColor
-    Inherits VBparent
+Public Class LUT_CustomColor : Inherits VBparent
     Public reduction As Reduction_Basics
     Dim gradMap As Palette_RandomColorMap
     Public colorMap As cv.Mat
@@ -142,8 +138,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
-Public Class LUT_Color
-    Inherits VBparent
+Public Class LUT_Color : Inherits VBparent
     Public paletteMap(256) As cv.Vec3b
     Dim colorMat As cv.Mat
     Public Sub New()
@@ -171,8 +166,7 @@ End Class
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
 ' https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
-Public Class LUT_Rebuild
-    Inherits VBparent
+Public Class LUT_Rebuild : Inherits VBparent
     Public paletteMap(256 - 1) As Byte
     Public Sub New()
         For i = 0 To paletteMap.Count - 1
@@ -196,8 +190,7 @@ End Class
 
 
 
-Public Class LUT_RGBDepth
-    Inherits VBparent
+Public Class LUT_RGBDepth : Inherits VBparent
     Dim lut As LUT_Basics
     Public Sub New()
         lut = New LUT_Basics
@@ -218,8 +211,7 @@ End Class
 
 
 
-Public Class LUT_Depth32f
-    Inherits VBparent
+Public Class LUT_Depth32f : Inherits VBparent
     Dim lut As LUT_Basics
     Public Sub New()
         lut = New LUT_Basics

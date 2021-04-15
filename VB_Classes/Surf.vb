@@ -3,8 +3,7 @@ Imports System.Runtime.InteropServices
 Imports CS_Classes
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Surf_Basics
-    Inherits VBparent
+Public Class Surf_Basics : Inherits VBparent
     Public CS_SurfBasics As New CS_SurfBasics
     Dim fisheye As FishEye_Rectified
     Public srcLeft As New cv.Mat
@@ -46,8 +45,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Surf_BasicsVB
-    Inherits VBparent
+Public Class Surf_BasicsVB : Inherits VBparent
     Dim surf As Surf_Basics
     Dim fisheye As FishEye_Rectified
     Public Sub New()
@@ -68,8 +66,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Surf_DrawMatchManual_CS
-    Inherits VBparent
+Public Class Surf_DrawMatchManual_CS : Inherits VBparent
     Dim surf As Surf_Basics
     Public Sub New()
         surf = New Surf_Basics()

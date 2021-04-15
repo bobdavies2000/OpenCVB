@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Structured_Floor
-    Inherits VBparent
+Public Class Structured_Floor : Inherits VBparent
     Public structD As Structured_SliceH
     Dim kalman As Kalman_VB_Basics
     Public floorYplane As Single
@@ -47,8 +46,7 @@ End Class
 
 
 
-Public Class Structured_Ceiling
-    Inherits VBparent
+Public Class Structured_Ceiling : Inherits VBparent
     Public structD As Structured_SliceH
     Dim kalman As Kalman_Basics
     Public Sub New()
@@ -86,8 +84,7 @@ End Class
 
 
 
-Public Class Structured_MultiSliceH
-    Inherits VBparent
+Public Class Structured_MultiSliceH : Inherits VBparent
     Public side2D As Histogram_SideData
     Public structD As Structured_SliceH
     Public sliceMask As cv.Mat
@@ -135,8 +132,7 @@ End Class
 
 
 
-Public Class Structured_MultiSliceV
-    Inherits VBparent
+Public Class Structured_MultiSliceV : Inherits VBparent
     Public top2D As Histogram_TopData
     Public structD As Structured_SliceV
     Public Sub New()
@@ -185,8 +181,7 @@ End Class
 
 
 
-Public Class Structured_MultiSlice
-    Inherits VBparent
+Public Class Structured_MultiSlice : Inherits VBparent
     Public top2D As Histogram_TopData
     Public side2D As Histogram_SideData
     Dim struct As Structured_SliceV
@@ -252,8 +247,7 @@ End Class
 
 
 
-Public Class Structured_MultiSliceLines
-    Inherits VBparent
+Public Class Structured_MultiSliceLines : Inherits VBparent
     Dim multi As Structured_MultiSlice
     Public ldetect As Line_Basics
     Public Sub New()
@@ -278,8 +272,7 @@ End Class
 
 
 
-Public Class Structured_MultiSlicePolygon
-    Inherits VBparent
+Public Class Structured_MultiSlicePolygon : Inherits VBparent
     Dim multi As Structured_MultiSlice
     Public Sub New()
         multi = New Structured_MultiSlice()
@@ -320,8 +313,7 @@ End Class
 
 
 
-Public Class Structured_SliceXPlot
-    Inherits VBparent
+Public Class Structured_SliceXPlot : Inherits VBparent
     Dim multi As Structured_MultiSlice
     Dim structD As Structured_SliceV
     Dim cushionSlider As Windows.Forms.TrackBar
@@ -372,8 +364,7 @@ End Class
 
 
 
-Public Class Structured_LinearizeFloor
-    Inherits VBparent
+Public Class Structured_LinearizeFloor : Inherits VBparent
     Public floor As Structured_Floor
     Dim kalman As Kalman_VB_Basics
     Public imuPointCloud As cv.Mat
@@ -476,8 +467,7 @@ Public Class Structured_LinearizeFloor
 End Class
 
 
-Public Class Structured_SliceOptions
-    Inherits VBparent
+Public Class Structured_SliceOptions : Inherits VBparent
     Public Sub New()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -500,8 +490,7 @@ End Class
 
 
 
-Public Class Structured_SliceH
-    Inherits VBparent
+Public Class Structured_SliceH : Inherits VBparent
     Public side2D As Histogram_SideData
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
@@ -562,8 +551,7 @@ End Class
 
 
 
-Public Class Structured_SliceV
-    Inherits VBparent
+Public Class Structured_SliceV : Inherits VBparent
     Public top2D As Histogram_TopData
     Dim sideStruct As Structured_SliceH
     Public cushionSlider As Windows.Forms.TrackBar
@@ -626,8 +614,7 @@ End Class
 
 
 
-Public Class Structured_SliceVStable
-    Inherits VBparent
+Public Class Structured_SliceVStable : Inherits VBparent
     Public top2D As Histogram_TopData
     Dim structD As Structured_SliceV
     Public cushionSlider As Windows.Forms.TrackBar
@@ -680,8 +667,7 @@ End Class
 
 
 
-Public Class Structured_CenterSlice
-    Inherits VBparent
+Public Class Structured_CenterSlice : Inherits VBparent
     Dim vSlice As Structured_SliceV
     Dim line As Line_Basics
     Public topPt As cv.Point2f, botPt As cv.Point2f
@@ -762,8 +748,7 @@ End Class
 
 
 
-Public Class Structured_CloudFail
-    Inherits VBparent
+Public Class Structured_CloudFail : Inherits VBparent
     Dim mmPixel As Pixel_Measure
     Public Sub New()
         mmPixel = New Pixel_Measure
@@ -852,8 +837,7 @@ End Class
 
 
 
-Public Class Structured_Cloud
-    Inherits VBparent
+Public Class Structured_Cloud : Inherits VBparent
     Public data As New cv.Mat
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -899,8 +883,7 @@ End Class
 
 
 
-Public Class Structured_Crosshairs
-    Inherits VBparent
+Public Class Structured_Crosshairs : Inherits VBparent
     Dim sCloud As Structured_Cloud
     Public Sub New()
         sCloud = New Structured_Cloud

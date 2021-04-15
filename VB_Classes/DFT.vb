@@ -15,8 +15,7 @@ End Module
 
 
 ' http://stackoverflow.com/questions/19761526/how-to-do-inverse-dft-in-opencv
-Public Class DFT_Basics
-    Inherits VBparent
+Public Class DFT_Basics : Inherits VBparent
     Dim mats As Mat_4to1
     Public magnitude As New cv.Mat
     Public spectrum As New cv.Mat
@@ -80,8 +79,7 @@ End Class
 
 
 ' http://opencvexamples.blogspot.com/
-Public Class DFT_Inverse
-    Inherits VBparent
+Public Class DFT_Inverse : Inherits VBparent
     Dim mats As Mat_2to1
     Public Sub New()
         mats = New Mat_2to1()
@@ -121,8 +119,7 @@ End Class
 
 ' http://breckon.eu/toby/teaching/dip/opencv/lecture_demos/c++/butterworth_lowpass.cpp
 ' https://github.com/ruohoruotsi/Butterworth-Filter-Design
-Public Class DFT_ButterworthFilter_MT
-    Inherits VBparent
+Public Class DFT_ButterworthFilter_MT : Inherits VBparent
     Public dft As DFT_Basics
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -200,8 +197,7 @@ End Class
 
 ' http://breckon.eu/toby/teaching/dip/opencv/lecture_demos/c++/butterworth_lowpass.cpp
 ' https://github.com/ruohoruotsi/Butterworth-Filter-Design
-Public Class DFT_ButterworthDepth
-    Inherits VBparent
+Public Class DFT_ButterworthDepth : Inherits VBparent
     Dim bfilter As DFT_ButterworthFilter_MT
     Public Sub New()
         bfilter = New DFT_ButterworthFilter_MT()
@@ -229,8 +225,7 @@ End Class
 
 
 
-Public Class DFT_Shapes
-    Inherits VBparent
+Public Class DFT_Shapes : Inherits VBparent
     Dim dft As DFT_Basics
     Dim circle As Draw_Circles
     Dim ellipse As Draw_Ellipses

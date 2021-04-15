@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Object_Basics
-    Inherits VBparent
+Public Class Object_Basics : Inherits VBparent
     Dim ccomp As CComp_ColorDepth
     Public Sub New()
 

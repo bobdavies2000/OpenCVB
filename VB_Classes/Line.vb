@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports CS_Classes
-Public Class Line_Basics
-    Inherits VBparent
+Public Class Line_Basics : Inherits VBparent
     Dim ld As cv.XImgProc.FastLineDetector
     Public sortlines As New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
     Public thickness As Integer
@@ -65,8 +64,7 @@ End Class
 
 
 
-Public Class Line_LeftRightOverlay
-    Inherits VBparent
+Public Class Line_LeftRightOverlay : Inherits VBparent
     Dim lrLines As Line_LeftRightImages
     Dim lines As Line_Basics
     Public Sub New()
@@ -130,8 +128,7 @@ End Class
 
 
 
-Public Class Line_Reduction
-    Inherits VBparent
+Public Class Line_Reduction : Inherits VBparent
     Dim lDetect As Line_Basics
     Dim reduction As Reduction_Basics
     Public Sub New()
@@ -168,8 +165,7 @@ End Class
 
 
 
-Public Class Line_InterceptsUI
-    Inherits VBparent
+Public Class Line_InterceptsUI : Inherits VBparent
     Dim lines As Line_Intercepts
     Public Sub New()
         lines = New Line_Intercepts
@@ -245,8 +241,7 @@ End Class
 
 
 
-Public Class Line_ConfirmedDepth
-    Inherits VBparent
+Public Class Line_ConfirmedDepth : Inherits VBparent
     Dim lines As Line_Basics
     Public pt1 As New List(Of cv.Point2f)
     Public pt2 As New List(Of cv.Point2f)
@@ -323,8 +318,7 @@ End Class
 
 
 
-Public Class Line_Vertical
-    Inherits VBparent
+Public Class Line_Vertical : Inherits VBparent
     Dim gCloud As Depth_PointCloud_IMU
     Public lines As Line_ConfirmedDepth
     Public thickness As Integer
@@ -370,8 +364,7 @@ End Class
 
 
 
-Public Class Line_Horizontal
-    Inherits VBparent
+Public Class Line_Horizontal : Inherits VBparent
     Dim vLines As Line_Vertical
     Public Sub New()
         vLines = New Line_Vertical
@@ -399,8 +392,7 @@ End Class
 
 
 
-Public Class Line_Intercepts
-    Inherits VBparent
+Public Class Line_Intercepts : Inherits VBparent
     Dim lines As Line_Basics
     Public pt1 As New List(Of cv.Point2f)
     Public pt2 As New List(Of cv.Point2f)
@@ -525,8 +517,7 @@ End Class
 
 
 
-Public Class Line_LeftRightImages
-    Inherits VBparent
+Public Class Line_LeftRightImages : Inherits VBparent
     Dim lrPalette As Palette_LeftRightImages
     Public leftLines As Line_Basics
     Public rightLines As Line_Basics
@@ -574,8 +565,7 @@ End Class
 
 
 
-Public Class Line_Sift_MT
-    Inherits VBparent
+Public Class Line_Sift_MT : Inherits VBparent
     Dim grid As Thread_Grid
     Dim siftCS As New CS_SiftBasics
     Dim siftBasics As Sift_Basics
@@ -636,8 +626,7 @@ End Class
 
 
 
-Public Class Line_NearestPoint
-    Inherits VBparent
+Public Class Line_NearestPoint : Inherits VBparent
     Dim rangeRect As cv.Rect
     Public Sub New()
         Dim offset = 20
@@ -710,8 +699,7 @@ End Class
 
 
 
-Public Class Line_SideView
-    Inherits VBparent
+Public Class Line_SideView : Inherits VBparent
     Dim lines As Line_Basics
     Dim tView As TimeView_FloodFill
     Public Sub New()

@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' http://areshopencv.blogspot.com/2011/12/computing-entropy-of-image.html
-Public Class Entropy_Basics
-    Inherits VBparent
+Public Class Entropy_Basics : Inherits VBparent
     Dim flow As Font_FlowText
     Dim simple = New Entropy_Simple
     Public entropy As Single
@@ -39,8 +38,7 @@ End Class
 
 
 
-Public Class Entropy_Highest
-    Inherits VBparent
+Public Class Entropy_Highest : Inherits VBparent
     Dim entropyCalc As Entropy_Simple
     Public grid As Thread_Grid
     Public eMaxRect As cv.Rect
@@ -100,8 +98,7 @@ End Class
 
 
 
-Public Class Entropy_FAST
-    Inherits VBparent
+Public Class Entropy_FAST : Inherits VBparent
     Dim fast As FAST_Basics
     Dim entropy As Entropy_Highest
     Public Sub New()

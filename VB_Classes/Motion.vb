@@ -1,7 +1,6 @@
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
 Imports cv = OpenCvSharp
-Public Class Motion_Basics
-    Inherits VBparent
+Public Class Motion_Basics : Inherits VBparent
     Dim diff As Diff_Basics
     Dim contours As Contours_Basics
     Public intersect As Rectangle_Intersection
@@ -79,8 +78,7 @@ End Class
 
 
 
-Public Class Motion_WithBlurDilate
-    Inherits VBparent
+Public Class Motion_WithBlurDilate : Inherits VBparent
     Dim blur As Blur_Basics
     Dim diff As Diff_Basics
     Dim dilate As DilateErode_Basics
@@ -149,8 +147,7 @@ End Class
 
 
 
-Public Class Motion_MinMaxDepth
-    Inherits VBparent
+Public Class Motion_MinMaxDepth : Inherits VBparent
     Public motion As Motion_Basics
     Public externalReset As Boolean
     Public Sub New()
@@ -201,8 +198,7 @@ End Class
 
 
 
-Public Class Motion_MinMaxPointCloud
-    Inherits VBparent
+Public Class Motion_MinMaxPointCloud : Inherits VBparent
     Public stable As Motion_MinMaxDepth
     Public splitPC() As cv.Mat
     Public Sub New()
@@ -241,8 +237,7 @@ End Class
 
 
 
-Public Class Motion_MinMaxDepthColorized
-    Inherits VBparent
+Public Class Motion_MinMaxDepthColorized : Inherits VBparent
     Dim stable As Motion_MinMaxDepth
     Dim colorize As Depth_ColorizerFastFade_CPP
     Public Sub New()
@@ -272,8 +267,7 @@ End Class
 
 
 
-Public Class Motion_ThruCorrelation
-    Inherits VBparent
+Public Class Motion_ThruCorrelation : Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
         grid = New Thread_Grid
@@ -341,8 +335,7 @@ End Class
 
 
 
-Public Class Motion_CCmerge
-    Inherits VBparent
+Public Class Motion_CCmerge : Inherits VBparent
     Dim motionCC As Motion_ThruCorrelation
     Public Sub New()
         motionCC = New Motion_ThruCorrelation

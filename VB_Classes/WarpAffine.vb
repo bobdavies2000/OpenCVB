@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' http://opencvexamples.blogspot.com/
-Public Class WarpAffine_Captcha
-    Inherits VBparent
+Public Class WarpAffine_Captcha : Inherits VBparent
     Const charHeight = 100
     Const charWidth = 80
     Const captchaLength = 8
@@ -91,8 +90,7 @@ End Class
 
 
 ' http://opencvexamples.blogspot.com/
-Public Class WarpAffine_Basics
-    Inherits VBparent
+Public Class WarpAffine_Basics : Inherits VBparent
     Public rotateOptions As GetRotationMatrix2D_Options
     Public Sub New()
         rotateOptions = New GetRotationMatrix2D_Options
@@ -129,8 +127,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
-Public Class WarpAffine_3Points
-    Inherits VBparent
+Public Class WarpAffine_3Points : Inherits VBparent
     Dim triangle As Area_MinTriangle_CPP
     Public Sub New()
         triangle = New Area_MinTriangle_CPP()
@@ -203,8 +200,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_imgproc/py_geometric_transformations/py_geometric_transformations.html
-Public Class WarpAffine_4Points
-    Inherits VBparent
+Public Class WarpAffine_4Points : Inherits VBparent
     Dim rect As Area_MinRect
     Public Sub New()
         rect = New Area_MinRect()

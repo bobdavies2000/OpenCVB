@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/shimat/opencvsharp/wiki/Solve-Equation
-Public Class Solve_ByMat
-    Inherits VBparent
+Public Class Solve_ByMat : Inherits VBparent
     Public Sub New()
         task.desc = "Solve a set of equations with OpenCV's Solve API."
 		' task.rank = 1
@@ -25,8 +24,7 @@ End Class
 
 
 ' https://github.com/shimat/opencvsharp/wiki/Solve-Equation
-Public Class Solve_ByArray
-    Inherits VBparent
+Public Class Solve_ByArray : Inherits VBparent
     Public Sub New()
         task.desc = "Solve a set of equations with OpenCV's Solve API with a normal array as input  "
 		' task.rank = 1

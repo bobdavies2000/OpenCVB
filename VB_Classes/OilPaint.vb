@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Windows.Forms
 
 ' Source: https://hackernoon.com/https-medium-com-matteoronchetti-pointillism-with-python-and-opencv-f4274e6bbb7b
-Public Class OilPaint_Pointilism
-    Inherits VBparent
+Public Class OilPaint_Pointilism : Inherits VBparent
     Dim randomMask As cv.Mat
     Dim myRNG As New cv.RNG
     Public Sub New()
@@ -83,8 +82,7 @@ End Class
 
 
 
-Public Class OilPaint_ColorProbability
-    Inherits VBparent
+Public Class OilPaint_ColorProbability : Inherits VBparent
     Public color_probability() As Single
     Public km As kMeans_RGBFast
     Public Sub New()
@@ -121,8 +119,7 @@ End Class
 
 
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
-Public Class OilPaint_ManualVB
-    Inherits VBparent
+Public Class OilPaint_ManualVB : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -180,8 +177,7 @@ End Class
 
 
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
-Public Class OilPaint_Manual
-    Inherits VBparent
+Public Class OilPaint_Manual : Inherits VBparent
     Dim oilPaint As New CS_Classes.OilPaintManual
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -213,8 +209,7 @@ End Class
 
 
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
-Public Class OilPaint_Cartoon
-    Inherits VBparent
+Public Class OilPaint_Cartoon : Inherits VBparent
     Dim oil As OilPaint_Manual
     Dim laplacian As Edges_Laplacian
     Public Sub New()

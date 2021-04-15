@@ -38,8 +38,7 @@ End Module
 
 
 ' https://docs.opencv.org/3.1.0/d6/d10/tutorial_py_houghlines.html
-Public Class Hough_Circles
-    Inherits VBparent
+Public Class Hough_Circles : Inherits VBparent
     Dim circles As Draw_Circles
     Public Sub New()
         circles = New Draw_Circles()
@@ -68,8 +67,7 @@ End Class
 
 ' https://docs.opencv.org/3.1.0/d6/d10/tutorial_py_houghlines.html
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HoughLinesSample.vb
-Public Class Hough_Lines
-    Inherits VBparent
+Public Class Hough_Lines : Inherits VBparent
     Dim edges As Edges_Basics
     Public segments() As cv.LineSegmentPolar
     Public Sub New()
@@ -115,8 +113,7 @@ End Class
 
 
 
-Public Class Hough_Lines_MT
-    Inherits VBparent
+Public Class Hough_Lines_MT : Inherits VBparent
     Dim edges As Edges_Basics
     Public grid As Thread_Grid
     Public Sub New()

@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://stackoverflow.com/questions/37492663/how-to-use-magnitude-and-absdiff-opencv-functions-to-compute-distances
-Public Class Vector_Magnitude
-    Inherits VBparent
+Public Class Vector_Magnitude : Inherits VBparent
     Public Sub New()
         task.desc = "Compute Euclidian and Manhattan Distance on a single vector."
 		' task.rank = 1

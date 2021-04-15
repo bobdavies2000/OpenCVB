@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Contours_Basics
-    Inherits VBparent
+Public Class Contours_Basics : Inherits VBparent
     Public rotatedRect As Rectangle_Rotated
     Public retrievalMode As cv.RetrievalModes
     Public ApproximationMode As cv.ContourApproximationModes
@@ -136,8 +135,7 @@ End Class
 
 
 
-Public Class Contours_RGB
-    Inherits VBparent
+Public Class Contours_RGB : Inherits VBparent
     Public Sub New()
         task.desc = "Find and draw the contour of the largest foreground RGB contour."
 		' task.rank = 1
@@ -181,8 +179,7 @@ End Class
 
 
 ' https://github.com/SciSharp/SharpCV/blob/master/src/SharpCV.Examples/Program.cs
-Public Class Contours_RemoveLines
-    Inherits VBparent
+Public Class Contours_RemoveLines : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 3)
@@ -229,8 +226,7 @@ End Class
 
 
 
-Public Class Contours_Depth
-    Inherits VBparent
+Public Class Contours_Depth : Inherits VBparent
     Public contours As New List(Of cv.Point)
     Public Sub New()
         task.desc = "Find and draw the contour of the depth foreground."
@@ -267,8 +263,7 @@ End Class
 
 
 
-Public Class Contours_Prediction
-    Inherits VBparent
+Public Class Contours_Prediction : Inherits VBparent
     Dim outline As Contours_Depth
     Dim kalman As Kalman_Basics
     Public Sub New()
@@ -315,8 +310,7 @@ End Class
 
 
 
-Public Class Contours_FindandDraw
-    Inherits VBparent
+Public Class Contours_FindandDraw : Inherits VBparent
     Dim rotatedRect As Rectangle_Rotated
     Public Sub New()
         rotatedRect = New Rectangle_Rotated()
@@ -353,8 +347,7 @@ End Class
 
 
 
-Public Class Contours_Binarized
-    Inherits VBparent
+Public Class Contours_Binarized : Inherits VBparent
     Dim sobel As Edges_Sobel
     Public basics As Contours_Basics
     Public Sub New()

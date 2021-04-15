@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.IO
 ' https://www.codeproject.com/Articles/5282014/Segmented-Linear-Regression
-Public Class SLR_Basics
-    Inherits VBparent
+Public Class SLR_Basics : Inherits VBparent
     Public input As SLR_Data
     Dim slr As New CS_Classes.SLR
     Dim plot As Plot_Basics_CPP
@@ -62,8 +61,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/5282014/Segmented-Linear-Regression
-Public Class SLR_Data
-    Inherits VBparent
+Public Class SLR_Data : Inherits VBparent
     Dim plot As Plot_Basics_CPP
     Public dataX As New List(Of Double)
     Public dataY As New List(Of Double)
@@ -99,8 +97,7 @@ End Class
 
 
 
-Public Class SLR_Image
-    Inherits VBparent
+Public Class SLR_Image : Inherits VBparent
     Dim slr As SLR_Basics
     Dim hist As Histogram_Graph
     Public Sub New()

@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-'Public Class Tracker_Basics
-'    Inherits VBparent
+'Public Class Tracker_Basics : Inherits VBparent
 '    Dim tracker As Object
 '    Public trackerCSRT As cv.Tracking.TrackerCSRT
 '    Public trackerGOTURN As cv.TrackerGOTURN
@@ -81,8 +80,7 @@ Imports System.Runtime.InteropServices
 
 
 
-'Public Class Tracker_MultiObject
-'    Inherits VBparent
+'Public Class Tracker_MultiObject : Inherits VBparent
 '    Dim trackers As New List(Of Tracker_Basics)
 '    Public Sub New()
 '        task.desc = "Track any number of objects simultaneously - tracker algorithm"
@@ -135,8 +133,7 @@ End Module
 
 
 ' https://learnopencv.com/object-tracking-using-opencv-cpp-python/
-Public Class Tracker_Basics
-    Inherits VBparent
+Public Class Tracker_Basics : Inherits VBparent
     Dim cPtr As IntPtr
     Dim trackType As Integer
     Public Sub New()

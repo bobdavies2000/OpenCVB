@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class kMeans_Basics
-    Inherits VBparent
+Public Class kMeans_Basics : Inherits VBparent
     Public kmeansK As Integer
     Public resizeFactor = 1 ' update this to 2 or 4 to speed up the kmeans performance.
     Public Sub New()
@@ -49,8 +48,7 @@ End Class
 
 
 
-Public Class kMeans_BasicsDepthColor
-    Inherits VBparent
+Public Class kMeans_BasicsDepthColor : Inherits VBparent
     Public kmeansK As Integer
     Public resizeRequest As Boolean = True
     Public useDepthColor As Boolean = True
@@ -99,8 +97,7 @@ End Class
 
 
 
-Public Class kMeans_Clusters
-    Inherits VBparent
+Public Class kMeans_Clusters : Inherits VBparent
     Dim Mats As Mat_4to1
     Dim km As kMeans_BasicsDepthColor
     Public Sub New()
@@ -132,8 +129,7 @@ End Class
 
 
 
-Public Class kMeans_RGBFast
-    Inherits VBparent
+Public Class kMeans_RGBFast : Inherits VBparent
     Public clusterColors() As cv.Vec3b
     Public resizeFactor = 2
     Public clusterCount = 6
@@ -176,8 +172,7 @@ End Class
 
 
 
-Public Class kMeans_RGB_Plus_XYDepth
-    Inherits VBparent
+Public Class kMeans_RGB_Plus_XYDepth : Inherits VBparent
     Dim km As kMeans_BasicsDepthColor
     Dim clusterColors() As cv.Vec6i
     Public Sub New()
@@ -232,8 +227,7 @@ End Class
 
 
 
-Public Class kMeans_XYDepth
-    Inherits VBparent
+Public Class kMeans_XYDepth : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -272,8 +266,7 @@ End Class
 
 
 
-Public Class kMeans_Depth_FG_BG
-    Inherits VBparent
+Public Class kMeans_Depth_FG_BG : Inherits VBparent
     Public Sub New()
         label1 = "Foreground Mask"
         label2 = "Background Mask"
@@ -305,8 +298,7 @@ End Class
 
 
 
-Public Class kMeans_LAB
-    Inherits VBparent
+Public Class kMeans_LAB : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -347,8 +339,7 @@ End Class
 
 
 
-Public Class kMeans_Color
-    Inherits VBparent
+Public Class kMeans_Color : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -380,8 +371,7 @@ End Class
 
 
 
-Public Class kMeans_Color_MT
-    Inherits VBparent
+Public Class kMeans_Color_MT : Inherits VBparent
     Public grid As Thread_Grid
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -432,8 +422,7 @@ End Class
 
 
 
-Public Class kMeans_ColorDepth
-    Inherits VBparent
+Public Class kMeans_ColorDepth : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -476,8 +465,7 @@ End Class
 
 
 
-Public Class kMeans_ColorDepth_MT
-    Inherits VBparent
+Public Class kMeans_ColorDepth_MT : Inherits VBparent
     Public grid As Thread_Grid
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -531,8 +519,7 @@ End Class
 
 
 
-Public Class KMeans_Subdivision
-    Inherits VBparent
+Public Class KMeans_Subdivision : Inherits VBparent
     Dim kmeans As kMeans_BasicsDepthColor
     Public Sub New()
         kmeans = New kMeans_BasicsDepthColor()
@@ -570,8 +557,7 @@ End Class
 
 
 
-Public Class KMeans_Subdivision1
-    Inherits VBparent
+Public Class KMeans_Subdivision1 : Inherits VBparent
     Dim kmeans As kMeans_BasicsDepthColor
     Public Sub New()
         kmeans = New kMeans_BasicsDepthColor()

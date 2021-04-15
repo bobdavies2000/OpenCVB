@@ -80,6 +80,7 @@ Module VB_EditorMain
                     If lines(i) Is Nothing Then Continue For
                     If deleteLine(lines(i)) Then
                         Console.WriteLine("Deleting: " + lines(i))
+                        lines(i) = Nothing
                         lines(i - 1) += " : Inherits VBparent"
                     End If
                 Next

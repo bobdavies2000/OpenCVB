@@ -25,8 +25,7 @@ End Module
 
 
 ' https://visualstudiomagazine.com/articles/2020/04/06/invert-matrix.aspx
-Public Class MatrixInverse_Basics_CS
-    Inherits VBparent
+Public Class MatrixInverse_Basics_CS : Inherits VBparent
     Public matrix As New MatrixInverse ' NOTE: C# class
     Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
     Dim defaultBVector() As Double = {12, 7, 7, 13}
@@ -56,8 +55,7 @@ End Class
 
 
 
-Public Class MatrixInverse_OpenCV
-    Inherits VBparent
+Public Class MatrixInverse_OpenCV : Inherits VBparent
     Dim defaultInput(,) As Double = {{3, 7, 2, 5}, {4, 0, 1, 1}, {1, 6, 3, 0}, {2, 8, 4, 3}}
     Public input As cv.Mat
     Public Sub New()

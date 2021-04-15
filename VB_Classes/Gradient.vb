@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Gradient_Basics
-    Inherits VBparent
+Public Class Gradient_Basics : Inherits VBparent
     Public sobel As Edges_Sobel
     Public Sub New()
         sobel = New Edges_Sobel()
@@ -22,8 +21,7 @@ End Class
 
 
 
-Public Class Gradient_Depth
-    Inherits VBparent
+Public Class Gradient_Depth : Inherits VBparent
     Dim sobel As Edges_Sobel
     Public Sub New()
         sobel = New Edges_Sobel()
@@ -48,8 +46,7 @@ End Class
 
 
 ' https://github.com/anopara/genetic-drawing
-Public Class Gradient_CartToPolar
-    Inherits VBparent
+Public Class Gradient_CartToPolar : Inherits VBparent
     Public basics As Gradient_Basics
     Public magnitude As New cv.Mat
     Public angle As New cv.Mat
@@ -95,8 +92,7 @@ End Class
 
 
 
-Public Class Gradient_StableDepth
-    Inherits VBparent
+Public Class Gradient_StableDepth : Inherits VBparent
     Dim motionSD As Motion_MinMaxDepth
     Dim basics As Gradient_Basics
     Public Sub New()

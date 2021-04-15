@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://www.programcreek.com/python/example/70396/cv2.imencode
-Public Class Encode_Basics
-    Inherits VBparent
+Public Class Encode_Basics : Inherits VBparent
     Dim options As Encode_Options
     Public Sub New()
 
@@ -34,8 +33,7 @@ End Class
 
 
 ' https://answers.opencv.org/question/31519/encode-image-in-jpg-with-opencv-avoiding-the-artifacts-effect/
-Public Class Encode_Options
-    Inherits VBparent
+Public Class Encode_Options : Inherits VBparent
     Public qualityLevel As Integer
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then

@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Depth_Flatland
-    Inherits VBparent
+Public Class Depth_Flatland : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -22,8 +21,7 @@ End Class
 
 
 
-Public Class Depth_FirstLastDistance
-    Inherits VBparent
+Public Class Depth_FirstLastDistance : Inherits VBparent
     Public Sub New()
         task.desc = "Monitor the first and last depth distances"
         ' task.rank = 1
@@ -44,8 +42,7 @@ End Class
 
 
 
-Public Class Depth_HolesRect
-    Inherits VBparent
+Public Class Depth_HolesRect : Inherits VBparent
     Dim shadow As Depth_Holes
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -88,8 +85,7 @@ End Class
 
 
 
-Public Class Depth_FlatData
-    Inherits VBparent
+Public Class Depth_FlatData : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -140,8 +136,7 @@ End Module
 
 
 
-Public Class Depth_MeanStdev_MT
-    Inherits VBparent
+Public Class Depth_MeanStdev_MT : Inherits VBparent
     Dim grid As Thread_Grid
     Dim meanSeries As New cv.Mat
     Public Sub New()
@@ -226,8 +221,7 @@ End Class
 
 
 
-Public Class Depth_MeanStdevPlot
-    Inherits VBparent
+Public Class Depth_MeanStdevPlot : Inherits VBparent
     Dim plot1 As Plot_OverTime
     Dim plot2 As Plot_OverTime
     Public Sub New()
@@ -270,8 +264,7 @@ End Class
 
 
 
-Public Class Depth_Uncertainty
-    Inherits VBparent
+Public Class Depth_Uncertainty : Inherits VBparent
     Dim retina As Retina_Basics_CPP
     Public Sub New()
         retina = New Retina_Basics_CPP()
@@ -296,8 +289,7 @@ End Class
 
 
 
-Public Class Depth_Palette
-    Inherits VBparent
+Public Class Depth_Palette : Inherits VBparent
     Dim customColorMap As New cv.Mat
     Public Sub New()
 
@@ -361,8 +353,7 @@ End Module
 
 
 
-Public Class Depth_Colorizer_CPP
-    Inherits VBparent
+Public Class Depth_Colorizer_CPP : Inherits VBparent
     Dim dcPtr As IntPtr
     Public Sub New()
         dcPtr = Depth_Colorizer_Open()
@@ -392,8 +383,7 @@ End Class
 
 
 
-Public Class Depth_ColorizerFastFade_CPP
-    Inherits VBparent
+Public Class Depth_ColorizerFastFade_CPP : Inherits VBparent
     Dim dcPtr As IntPtr
     Public Sub New()
         dcPtr = Depth_Colorizer2_Open()
@@ -428,8 +418,7 @@ End Class
 
 
 ' this algorithm is only intended to show how the depth can be colorized.  It is very slow.  Use the C++ version of this code nearby.
-Public Class Depth_ColorizerVB
-    Inherits VBparent
+Public Class Depth_ColorizerVB : Inherits VBparent
     Public Sub New()
         task.desc = "Colorize depth manually."
         ' task.rank = 1
@@ -474,8 +463,7 @@ End Class
 
 
 
-Public Class Depth_ColorizerVB_MT
-    Inherits VBparent
+Public Class Depth_ColorizerVB_MT : Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -542,8 +530,7 @@ End Class
 
 
 
-Public Class Depth_Colorizer_MT
-    Inherits VBparent
+Public Class Depth_Colorizer_MT : Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
         grid = New Thread_Grid
@@ -584,8 +571,7 @@ End Class
 
 
 
-Public Class Depth_LocalMinMax_MT
-    Inherits VBparent
+Public Class Depth_LocalMinMax_MT : Inherits VBparent
     Public grid As Thread_Grid
     Public minPoint(0) As cv.Point2f
     Public maxPoint(0) As cv.Point2f
@@ -629,8 +615,7 @@ End Class
 
 
 
-Public Class Depth_LocalMinMax_Kalman_MT
-    Inherits VBparent
+Public Class Depth_LocalMinMax_Kalman_MT : Inherits VBparent
     Dim kalman As Kalman_Basics
     Public grid As Thread_Grid
     Public Sub New()
@@ -697,8 +682,7 @@ End Class
 
 
 
-Public Class Depth_ColorMap
-    Inherits VBparent
+Public Class Depth_ColorMap : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -725,8 +709,7 @@ End Class
 
 
 
-Public Class Depth_NotMissing
-    Inherits VBparent
+Public Class Depth_NotMissing : Inherits VBparent
     Public mog As BGSubtract_Basics_CPP
     Public Sub New()
 
@@ -754,8 +737,7 @@ End Class
 
 
 
-Public Class Depth_Median
-    Inherits VBparent
+Public Class Depth_Median : Inherits VBparent
     Dim median As Math_Median_CDF
     Public Sub New()
         median = New Math_Median_CDF()
@@ -788,8 +770,7 @@ End Class
 
 
 
-Public Class Depth_SmoothingMat
-    Inherits VBparent
+Public Class Depth_SmoothingMat : Inherits VBparent
     Public Sub New()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -821,8 +802,7 @@ End Class
 
 
 
-Public Class Depth_Smoothing
-    Inherits VBparent
+Public Class Depth_Smoothing : Inherits VBparent
     Dim smooth As Depth_SmoothingMat
     Dim reduction As Reduction_Basics
     Public reducedDepth As New cv.Mat
@@ -868,8 +848,7 @@ End Class
 
 
 
-Public Class Depth_Edges
-    Inherits VBparent
+Public Class Depth_Edges : Inherits VBparent
     Dim edges As Edges_Laplacian
     Public Sub New()
         edges = New Edges_Laplacian()
@@ -893,8 +872,7 @@ End Class
 
 
 
-Public Class Depth_HolesOverTime
-    Inherits VBparent
+Public Class Depth_HolesOverTime : Inherits VBparent
     Dim recentImages As New List(Of cv.Mat)
     Public Sub New()
 
@@ -926,8 +904,7 @@ End Class
 
 
 
-Public Class Depth_Holes
-    Inherits VBparent
+Public Class Depth_Holes : Inherits VBparent
     Public holeMask As New cv.Mat
     Dim element As New cv.Mat
     Public Sub New()
@@ -961,8 +938,7 @@ End Class
 
 
 
-Public Class Depth_WorldXYZ
-    Inherits VBparent
+Public Class Depth_WorldXYZ : Inherits VBparent
     Public depthUnitsMeters = False
     Public Sub New()
         label2 = "dst2 = pointcloud"
@@ -993,8 +969,7 @@ End Class
 
 
 
-Public Class Depth_WorldXYZ_MT
-    Inherits VBparent
+Public Class Depth_WorldXYZ_MT : Inherits VBparent
     Dim grid As Thread_Grid
     Public depthUnitsMeters = False
     Public Sub New()
@@ -1035,8 +1010,7 @@ End Class
 
 
 
-Public Class Depth_Foreground
-    Inherits VBparent
+Public Class Depth_Foreground : Inherits VBparent
     Public blobLocation As New List(Of cv.Point)
     Public maxIndex As Integer
     Public Sub New()
@@ -1093,8 +1067,7 @@ End Class
 
 
 
-Public Class Depth_ForegroundOverTime
-    Inherits VBparent
+Public Class Depth_ForegroundOverTime : Inherits VBparent
     Dim fore As Depth_Foreground
     Public Sub New()
         fore = New Depth_Foreground
@@ -1132,8 +1105,7 @@ End Class
 
 
 
-Public Class Depth_InRange
-    Inherits VBparent
+Public Class Depth_InRange : Inherits VBparent
     Public depthMask As New cv.Mat
     Public noDepthMask As New cv.Mat
     Public depth32f As New cv.Mat
@@ -1155,8 +1127,7 @@ End Class
 
 
 
-Public Class Depth_LowQualityMask
-    Inherits VBparent
+Public Class Depth_LowQualityMask : Inherits VBparent
     Dim dilate As DilateErode_Basics
     Public Sub New()
 
@@ -1184,8 +1155,7 @@ End Class
 
 
 
-Public Class Depth_PunchDecreasing
-    Inherits VBparent
+Public Class Depth_PunchDecreasing : Inherits VBparent
     Public Increasing As Boolean
     Dim fore As Depth_Foreground
     Public Sub New()
@@ -1221,8 +1191,7 @@ End Class
 
 
 
-Public Class Depth_PunchIncreasing
-    Inherits VBparent
+Public Class Depth_PunchIncreasing : Inherits VBparent
     Public depth As Depth_PunchDecreasing
     Public Sub New()
         depth = New Depth_PunchDecreasing
@@ -1241,8 +1210,7 @@ End Class
 
 
 
-Public Class Depth_PunchBlob
-    Inherits VBparent
+Public Class Depth_PunchBlob : Inherits VBparent
     Dim depthDec As Depth_PunchDecreasing
     Dim depthInc As Depth_PunchDecreasing
     Dim contours As Contours_Basics
@@ -1292,8 +1260,7 @@ End Class
 
 
 
-Public Class Depth_SmoothSurfaces
-    Inherits VBparent
+Public Class Depth_SmoothSurfaces : Inherits VBparent
     Public pcValid As Motion_MinMaxPointCloud
     Dim histX As Histogram_Basics
     Dim histY As Histogram_Basics
@@ -1360,8 +1327,7 @@ End Class
 
 ' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
 ' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
-Public Class Depth_PointCloud_IMU
-    Inherits VBparent
+Public Class Depth_PointCloud_IMU : Inherits VBparent
     Public Mask As New cv.Mat
     Public imu As IMU_GVector
     Public gMatrix(,) As Single
@@ -1437,8 +1403,7 @@ End Class
 
 
 
-Public Class Depth_SmoothAverage
-    Inherits VBparent
+Public Class Depth_SmoothAverage : Inherits VBparent
     Dim dMin As Depth_SmoothMin
     Dim dMax As Depth_SmoothMax
     Dim colorize As Depth_ColorizerFastFade_CPP
@@ -1468,8 +1433,7 @@ End Class
 
 
 
-Public Class Depth_SmoothMin
-    Inherits VBparent
+Public Class Depth_SmoothMin : Inherits VBparent
     Public stableMin As cv.Mat
     Public motion As Motion_Basics
     Dim colorize As Depth_ColorizerFastFade_CPP
@@ -1519,8 +1483,7 @@ End Class
 
 
 
-Public Class Depth_SmoothMax
-    Inherits VBparent
+Public Class Depth_SmoothMax : Inherits VBparent
     Public dMin As Depth_SmoothMin
     Dim colorize As Depth_ColorizerFastFade_CPP
     Public stableMax As cv.Mat
@@ -1575,8 +1538,7 @@ End Class
 
 
 
-Public Class Depth_Averaging
-    Inherits VBparent
+Public Class Depth_Averaging : Inherits VBparent
     Public avg As Math_ImageAverage
     Public colorize As Depth_Colorizer_CPP
     Public Sub New()
@@ -1605,8 +1567,7 @@ End Class
 
 
 
-Public Class Depth_SmoothMinMax
-    Inherits VBparent
+Public Class Depth_SmoothMinMax : Inherits VBparent
     Dim colorize As Depth_ColorizerFastFade_CPP
     Public dMin As Depth_SmoothMin
     Public dMax As Depth_SmoothMax
@@ -1672,8 +1633,7 @@ End Class
 
 
 
-Public Class Depth_AveragingStable
-    Inherits VBparent
+Public Class Depth_AveragingStable : Inherits VBparent
     Dim dAvg As Depth_Averaging
     Dim extrema As Depth_SmoothMinMax
     Public Sub New()
@@ -1708,8 +1668,7 @@ End Class
 
 
 
-Public Class Depth_Fusion
-    Inherits VBparent
+Public Class Depth_Fusion : Inherits VBparent
     Dim dMax As Depth_SmoothMax
     Public Sub New()
         dMax = New Depth_SmoothMax
@@ -1755,8 +1714,7 @@ End Class
 
 
 
-Public Class Depth_Dilate
-    Inherits VBparent
+Public Class Depth_Dilate : Inherits VBparent
     Dim dilate As DilateErode_Basics
     Public Sub New()
         dilate = New DilateErode_Basics
@@ -1777,8 +1735,7 @@ End Class
 
 
 
-Public Class Depth_ForegroundHead
-    Inherits VBparent
+Public Class Depth_ForegroundHead : Inherits VBparent
     Dim fgnd As Depth_Foreground
     Public kalman As Kalman_Basics
     Public trustedRect As cv.Rect
@@ -1828,8 +1785,7 @@ End Class
 
 
 
-'Public Class Depth_Basics
-'    Inherits VBparent
+'Public Class Depth_Basics : Inherits VBparent
 '    Dim noiseRemover As Depth_NoiseMask
 '    Public Sub New()
 '        noiseRemover = New Depth_NoiseMask
@@ -1863,8 +1819,7 @@ End Class
 
 
 
-Public Class Depth_Solid
-    Inherits VBparent
+Public Class Depth_Solid : Inherits VBparent
     Public flood As Coherent_Palette
     Public Sub New()
         flood = New Coherent_Palette()

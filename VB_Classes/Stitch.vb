@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/shimat/opencvsharp/blob/master/test/OpenCvSharp.Tests/stitching/StitchingTest.cs
-Public Class Stitch_Basics
-    Inherits VBparent
+Public Class Stitch_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

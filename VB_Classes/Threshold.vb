@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Threshold_LaplacianFilter
-    Inherits VBparent
+Public Class Threshold_LaplacianFilter : Inherits VBparent
     Dim edges As Filter_Laplacian
     Public Sub New()
         edges = New Filter_Laplacian()

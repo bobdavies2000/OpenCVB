@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Mouse_Basics
-    Inherits VBparent
+Public Class Mouse_Basics : Inherits VBparent
     Public Sub New()
         label1 = "Move the mouse below to show mouse tracking."
         task.desc = "Test the mousePoint interface"
@@ -23,8 +22,7 @@ End Class
 
 
 
-Public Class Mouse_LeftClickZoom
-    Inherits VBparent
+Public Class Mouse_LeftClickZoom : Inherits VBparent
     Public Sub New()
         label1 = "Left click and drag to draw a rectangle"
         task.desc = "Demonstrate what the left-click enables"

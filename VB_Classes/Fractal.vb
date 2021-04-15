@@ -1,8 +1,7 @@
 Imports System.Numerics
 Imports cv = OpenCvSharp
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
-Public Class Fractal_Mandelbrot
-    Inherits VBparent
+Public Class Fractal_Mandelbrot : Inherits VBparent
     Public startX As Single = -2
     Public endX As Single = 2
     Public startY As Single = -1.5
@@ -50,8 +49,7 @@ End Class
 
 
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
-Public Class Fractal_Mandelbrot_MT
-    Inherits VBparent
+Public Class Fractal_Mandelbrot_MT : Inherits VBparent
     Dim mandel As Fractal_Mandelbrot
     Public Sub New()
         mandel = New Fractal_Mandelbrot()
@@ -74,8 +72,7 @@ End Class
 
 
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
-Public Class Fractal_MandelbrotZoom
-    Inherits VBparent
+Public Class Fractal_MandelbrotZoom : Inherits VBparent
     Public mandel As Fractal_Mandelbrot
     Public Sub New()
         mandel = New Fractal_Mandelbrot()
@@ -125,8 +122,7 @@ End Class
 
 
 
-Public Class Fractal_MandelbrotZoomColor
-    Inherits VBparent
+Public Class Fractal_MandelbrotZoomColor : Inherits VBparent
     Public mandel As Fractal_MandelbrotZoom
     Public Sub New()
         mandel = New Fractal_MandelbrotZoom()
@@ -150,8 +146,7 @@ End Class
 
 ' http://www.malinc.se/m/JuliaSets.php
 ' https://www.geeksforgeeks.org/julia-fractal-set-in-c-c-using-graphics/
-Public Class Fractal_Julia
-    Inherits VBparent
+Public Class Fractal_Julia : Inherits VBparent
     Dim mandel As Fractal_MandelbrotZoomColor
     Dim rt As Double = 0.282
     Dim mt As Double = -0.58

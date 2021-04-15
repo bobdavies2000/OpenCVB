@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Watershed_Basics
-    Inherits VBparent
+Public Class Watershed_Basics : Inherits VBparent
     Dim addW As AddWeighted_Basics
     Dim rects As New List(Of cv.Rect)
     Public UseCorners As Boolean
@@ -61,8 +60,7 @@ End Class
 
 
 
-Public Class Watershed_DepthReduction
-    Inherits VBparent
+Public Class Watershed_DepthReduction : Inherits VBparent
     Dim watershed As Watershed_Basics
     Dim reduction As Reduction_Basics
     Public Sub New()
@@ -90,8 +88,7 @@ End Class
 
 
 
-Public Class Watershed_DepthAuto
-    Inherits VBparent
+Public Class Watershed_DepthAuto : Inherits VBparent
     Dim watershed As Watershed_Basics
     Public Sub New()
         watershed = New Watershed_Basics()

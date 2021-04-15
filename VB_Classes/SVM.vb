@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
-Public Class SVM_Options
-    Inherits VBparent
+Public Class SVM_Options : Inherits VBparent
     Public kernelType = cv.ML.SVM.KernelTypes.Rbf
     Public SVMType = cv.ML.SVM.Types.CSvc
     Public points() As cv.Point2f
@@ -104,8 +103,7 @@ End Class
 
 
 
-Public Class SVM_Basics
-    Inherits VBparent
+Public Class SVM_Basics : Inherits VBparent
     Dim svmOptions As SVM_Options
     Public Sub New()
         svmOptions = New SVM_Options()
@@ -155,8 +153,7 @@ End Class
 
 
 
-Public Class SVM_Random
-    Inherits VBparent
+Public Class SVM_Random : Inherits VBparent
     Dim svmOptions As SVM_Options
     Public Sub New()
         svmOptions = New SVM_Options()
@@ -242,8 +239,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
-Public Class SVM_TestCase
-    Inherits VBparent
+Public Class SVM_TestCase : Inherits VBparent
     Dim labels() As Integer = {1, -1, -1, -1}
     Dim trainData(,) As Single = {{501, 50}, {255, 50}, {501, 255}, {50, 200}}
     Dim trainMat As cv.Mat

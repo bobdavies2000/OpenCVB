@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' http://www.mia.uni-saarland.de/Publications/weickert-dagm03.pdf
-Public Class Coherence_Basics
-    Inherits VBparent
+Public Class Coherence_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -84,8 +83,7 @@ End Class
 
 
 
-Public Class Coherent_Depth
-    Inherits VBparent
+Public Class Coherent_Depth : Inherits VBparent
     Dim coherent As Coherence_Basics
     Public Sub New()
         coherent = New Coherence_Basics

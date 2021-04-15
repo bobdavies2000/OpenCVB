@@ -4,8 +4,7 @@ Imports OpenCvSharp.XImgProc
 ' https://docs.opencv.org/3.4/d7/d4d/tutorial_py_thresholding.html
 ' https://www.learnopencv.com/otsu-thresholding-with-opencv/?ck_subscriber_id=785741175
 ' https://github.com/spmallick/learnopencv/tree/master/otsu-method?ck_subscriber_id=785741175
-Public Class Binarize_Basics
-    Inherits VBparent
+Public Class Binarize_Basics : Inherits VBparent
     Public thresholdType = cv.ThresholdTypes.Otsu
     Dim minRange = 0
     Dim maxRange = 255
@@ -40,8 +39,7 @@ End Class
 
 
 'https://docs.opencv.org/3.4/d7/d4d/tutorial_py_thresholding.html
-Public Class Binarize_OTSU
-    Inherits VBparent
+Public Class Binarize_OTSU : Inherits VBparent
     Dim plotHist As Plot_Histogram
     Dim binarize As Binarize_Basics
     Public Sub New()
@@ -94,8 +92,7 @@ End Class
 
 
 
-Public Class Binarize_Niblack_Sauvola
-    Inherits VBparent
+Public Class Binarize_Niblack_Sauvola : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -127,8 +124,7 @@ End Class
 
 
 
-Public Class Binarize_Niblack_Nick
-    Inherits VBparent
+Public Class Binarize_Niblack_Nick : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -159,8 +155,7 @@ End Class
 
 
 
-Public Class Binarize_Bernson
-    Inherits VBparent
+Public Class Binarize_Bernson : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -192,8 +187,7 @@ End Class
 
 
 
-Public Class Binarize_Bernson_MT
-    Inherits VBparent
+Public Class Binarize_Bernson_MT : Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
         grid = New Thread_Grid
@@ -239,8 +233,7 @@ End Class
 
 
 
-Public Class Binarize_Reduction
-    Inherits VBparent
+Public Class Binarize_Reduction : Inherits VBparent
     Dim reduction As Reduction_Basics
     Dim basics As Binarize_Basics
     Public Sub New()
@@ -269,8 +262,7 @@ End Class
 
 
 
-Public Class Binarize_Simple
-    Inherits VBparent
+Public Class Binarize_Simple : Inherits VBparent
     Public meanScalar As cv.Scalar
     Public mask As New cv.Mat
     Public Sub New()
@@ -301,8 +293,7 @@ End Class
 
 
 
-Public Class Binarize_Recurse
-    Inherits VBparent
+Public Class Binarize_Recurse : Inherits VBparent
     Dim binarize As Binarize_Simple
     Public mats As Mat_4Click
     Public Sub New()

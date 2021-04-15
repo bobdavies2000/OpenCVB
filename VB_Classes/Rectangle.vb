@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Rectangle_Basics
-    Inherits VBparent
+Public Class Rectangle_Basics : Inherits VBparent
     Public rectangles As New List(Of cv.Rect)
     Public rotatedRectangles As New List(Of cv.RotatedRect)
     Dim optDraw As Draw_Options
@@ -43,8 +42,7 @@ End Class
 
 
 
-Public Class Rectangle_Rotated
-    Inherits VBparent
+Public Class Rectangle_Rotated : Inherits VBparent
     Public rect As Rectangle_Basics
     Public Sub New()
         rect = New Rectangle_Basics
@@ -66,8 +64,7 @@ End Class
 
 
 
-Public Class Rectangle_CComp
-    Inherits VBparent
+Public Class Rectangle_CComp : Inherits VBparent
     Dim ccomp As CComp_Basics_FullImage
     Dim rMotion As Rectangle_Motion
     Public Sub New()
@@ -100,8 +97,7 @@ End Class
 
 
 
-Public Class Rectangle_Overlap
-    Inherits VBparent
+Public Class Rectangle_Overlap : Inherits VBparent
     Public rect1 As cv.Rect
     Public rect2 As cv.Rect
     Public enclosingRect As cv.Rect
@@ -152,8 +148,7 @@ End Class
 
 
 
-Public Class Rectangle_Motion
-    Inherits VBparent
+Public Class Rectangle_Motion : Inherits VBparent
     Public motion As Motion_Basics
     Public mOverlap As Rectangle_Intersection
     Public Sub New()
@@ -174,8 +169,7 @@ End Class
 
 
 
-Public Class Rectangle_MotionDepth
-    Inherits VBparent
+Public Class Rectangle_MotionDepth : Inherits VBparent
     Public motion As Motion_Basics
     Dim colorize As Depth_ColorizerFastFade_CPP
     Public Sub New()
@@ -210,8 +204,7 @@ End Class
 
 
 
-Public Class Rectangle_Intersection
-    Inherits VBparent
+Public Class Rectangle_Intersection : Inherits VBparent
     Public rect1 As cv.Rect
     Public rect2 As cv.Rect
     Public inputRects As New List(Of cv.Rect)
@@ -295,8 +288,7 @@ End Class
 
 
 
-Public Class Rectangle_Union
-    Inherits VBparent
+Public Class Rectangle_Union : Inherits VBparent
     Dim draw As Rectangle_Basics
     Public inputRects As New List(Of cv.Rect)
     Public allRect As cv.Rect ' a rectangle covering all the input
@@ -353,8 +345,7 @@ End Class
 
 
 
-Public Class Rectangle_MultiOverlap
-    Inherits VBparent
+Public Class Rectangle_MultiOverlap : Inherits VBparent
     Public inputRects As New List(Of cv.Rect)
     Public outputRects As New List(Of cv.Rect)
     Public Sub New()

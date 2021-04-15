@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 'https://github.com/shimat/opencvsharp/wiki/ORB-and-FREAK
-Public Class ORB_Basics
-    Inherits VBparent
+Public Class ORB_Basics : Inherits VBparent
     Public keypoints() As cv.KeyPoint
     Dim orb As cv.ORB
     Public Sub New()

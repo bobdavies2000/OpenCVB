@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
-Public Class MatchTemplate_Basics
-    Inherits VBparent
+Public Class MatchTemplate_Basics : Inherits VBparent
     Dim flow As Font_FlowText
     Public searchArea As cv.Mat
     Public template As cv.Mat
@@ -70,8 +69,7 @@ End Class
 
 
 
-Public Class MatchTemplate_RowCorrelation
-    Inherits VBparent
+Public Class MatchTemplate_RowCorrelation : Inherits VBparent
     Dim match As MatchTemplate_Basics
     Dim flow As Font_FlowText
     Public Sub New()
@@ -113,8 +111,7 @@ End Class
 
 
 
-Public Class MatchTemplate_DrawRect
-    Inherits VBparent
+Public Class MatchTemplate_DrawRect : Inherits VBparent
     Public saveTemplate As cv.Mat
     Public saveRect As cv.Rect
     Dim match As MatchTemplate_Basics
@@ -171,8 +168,7 @@ End Class
 
 
 
-Public Class MatchTemplate_BestEntropy_MT
-    Inherits VBparent
+Public Class MatchTemplate_BestEntropy_MT : Inherits VBparent
     Dim entropy As Entropy_Highest
     Dim match As MatchTemplate_DrawRect
     Public Sub New()
@@ -208,8 +204,7 @@ End Class
 
 
 
-Public Class MatchTemplate_Movement
-    Inherits VBparent
+Public Class MatchTemplate_Movement : Inherits VBparent
     Dim grid As Thread_Grid
     Dim match As MatchTemplate_Basics
     Public mask As cv.Mat

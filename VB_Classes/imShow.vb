@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class imShow_Basics
-    Inherits VBparent
+Public Class imShow_Basics : Inherits VBparent
     Public Sub New()
         task.desc = "This is just a reminder that all HighGUI methods are available in OpenCVB"
 		' task.rank = 1
@@ -16,8 +15,7 @@ End Class
 
 
 
-Public Class imShow_WaitKey
-    Inherits VBparent
+Public Class imShow_WaitKey : Inherits VBparent
     Dim vDemo As Voronoi_Basics
     Public Sub New()
         vDemo = New Voronoi_Basics()

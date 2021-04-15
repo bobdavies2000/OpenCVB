@@ -23,8 +23,7 @@ End Module
 
 
 
-Public Class Hull_Basics
-    Inherits VBparent
+Public Class Hull_Basics : Inherits VBparent
     Public hull() As cv.Point
         Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then

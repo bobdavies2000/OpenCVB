@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Imports OpenCvSharp.XFeatures2D
 'https://github.com/shimat/opencvsharp/wiki/ORB-and-FREAK
-Public Class FREAK_Basics
-    Inherits VBparent
+Public Class FREAK_Basics : Inherits VBparent
     Dim orb As ORB_Basics
     Public Sub New()
         orb = New ORB_Basics()

@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/FASTSample.vb
-Public Class FAST_Basics
-    Inherits VBparent
+Public Class FAST_Basics : Inherits VBparent
     Public keypoints() As cv.KeyPoint
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -32,8 +31,7 @@ End Class
 
 
 
-Public Class FAST_Centroid
-    Inherits VBparent
+Public Class FAST_Centroid : Inherits VBparent
     Dim fast As FAST_Basics
     Dim kalman As Kalman_Basics
     Public Sub New()

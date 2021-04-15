@@ -41,8 +41,7 @@ End Module
 
 
 
-Public Class Draw_Noise
-    Inherits VBparent
+Public Class Draw_Noise : Inherits VBparent
     Public maxNoiseWidth As Integer = 3
     Public addRandomColor As Boolean
     Public noiseMask As cv.Mat
@@ -77,8 +76,7 @@ End Class
 
 
 
-Public Class Draw_Options
-    Inherits VBparent
+Public Class Draw_Options : Inherits VBparent
     Dim circles As Draw_Circles
     Public drawCount As Integer
     Public updateFrequency As Integer
@@ -123,8 +121,7 @@ End Class
 
 
 
-Public Class Draw_Ellipses
-    Inherits VBparent
+Public Class Draw_Ellipses : Inherits VBparent
     Dim optDraw As Draw_Options
     Public Sub New()
         optDraw = New Draw_Options
@@ -148,8 +145,7 @@ End Class
 
 
 
-Public Class Draw_Circles
-    Inherits VBparent
+Public Class Draw_Circles : Inherits VBparent
     Dim optDraw As Draw_Options
     Public Sub New()
         optDraw = New Draw_Options
@@ -172,8 +168,7 @@ End Class
 
 
 
-Public Class Draw_Line
-    Inherits VBparent
+Public Class Draw_Line : Inherits VBparent
     Dim optDraw As Draw_Options
     Public Sub New()
         optDraw = New Draw_Options
@@ -195,8 +190,7 @@ End Class
 
 
 
-Public Class Draw_Polygon
-    Inherits VBparent
+Public Class Draw_Polygon : Inherits VBparent
     Dim optDraw As Draw_Options
     Public Sub New()
         optDraw = New Draw_Options
@@ -245,8 +239,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
-Public Class Draw_Shapes
-    Inherits VBparent
+Public Class Draw_Shapes : Inherits VBparent
     Public Sub New()
         task.desc = "Use RNG to draw the same set of shapes every time"
 		' task.rank = 1
@@ -286,8 +279,7 @@ End Class
 
 
 
-Public Class Draw_SymmetricalShapes
-    Inherits VBparent
+Public Class Draw_SymmetricalShapes : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -363,8 +355,7 @@ End Class
 
 
 
-Public Class Draw_Arc
-    Inherits VBparent
+Public Class Draw_Arc : Inherits VBparent
     Dim kalman As Kalman_Basics
     Dim saveArcAngle As Integer
     Dim saveMargin As Integer
@@ -445,8 +436,7 @@ End Class
 
 
 
-Public Class Draw_ViewObjects
-    Inherits VBparent
+Public Class Draw_ViewObjects : Inherits VBparent
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Public Sub New()
 
@@ -496,8 +486,7 @@ End Class
 
 
 
-Public Class Draw_Frustrum
-    Inherits VBparent
+Public Class Draw_Frustrum : Inherits VBparent
     Public xyzDepth As Depth_WorldXYZ_MT
     Public Sub New()
         xyzDepth = New Depth_WorldXYZ_MT()
@@ -523,8 +512,7 @@ End Class
 
 
 
-Public Class Draw_ClipLine
-    Inherits VBparent
+Public Class Draw_ClipLine : Inherits VBparent
     Dim flow As Font_FlowText
     Dim kalman As Kalman_Basics
     Dim lastRect As cv.Rect
@@ -583,8 +571,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/7446126/opencv-2d-line-intersection-helper-function
-Public Class Draw_Intersection
-    Inherits VBparent
+Public Class Draw_Intersection : Inherits VBparent
     Public p1 As cv.Point2f
     Public p2 As cv.Point2f
     Public p3 As cv.Point2f
@@ -635,8 +622,7 @@ End Class
 
 
 ' http://www3.psych.purdue.edu/~zpizlo/GestaltCube
-Public Class Draw_Hexagon
-    Inherits VBparent
+Public Class Draw_Hexagon : Inherits VBparent
     Dim alpha As New imageForm
     Public Sub New()
         alpha.imagePic.Image = Image.FromFile(task.parms.homeDir + "Data/GestaltCube.gif")

@@ -6,8 +6,7 @@ Imports System.IO
 
 
 ' https://github.com/masaddev/OpenCVParticleFilter/tree/master/OpenCVParticleFilter
-Public Class ParticleFilter_Example
-    Inherits VBparent
+Public Class ParticleFilter_Example : Inherits VBparent
     Dim pfPtr As IntPtr
     Public Sub New()
         pfPtr = ParticleFilterTest_Open(task.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)

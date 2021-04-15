@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Resize_Basics
-    Inherits VBparent
+Public Class Resize_Basics : Inherits VBparent
     Public newSize As cv.Size
     Public rotateOptions As GetRotationMatrix2D_Options
     Public Sub New()
@@ -39,8 +38,7 @@ End Class
 
 
 
-Public Class Resize_Percentage
-    Inherits VBparent
+Public Class Resize_Percentage : Inherits VBparent
     Public resizeOptions As Resize_Basics
     Public Sub New()
         resizeOptions = New Resize_Basics()

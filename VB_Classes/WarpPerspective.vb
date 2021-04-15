@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 
 ' http://opencvexamples.blogspot.com/
-Public Class WarpPerspective_Basics
-    Inherits VBparent
+Public Class WarpPerspective_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
 ' https://answers.opencv.org/question/122331/how-to-subtract-a-constant-from-a-3-channel-mat/
-Public Class Math_Subtract
-    Inherits VBparent
+Public Class Math_Subtract : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -51,8 +50,7 @@ End Module
 
 
 
-Public Class Math_Median_CDF
-    Inherits VBparent
+Public Class Math_Median_CDF : Inherits VBparent
     Public medianVal As Double
     Public rangeMin As Integer = 0
     Public rangeMax As Integer = 255
@@ -91,8 +89,7 @@ End Class
 
 
 
-Public Class Math_DepthMeanStdev
-    Inherits VBparent
+Public Class Math_DepthMeanStdev : Inherits VBparent
     Dim minMax As Depth_NotMissing
     Public Sub New()
         minMax = New Depth_NotMissing()
@@ -118,8 +115,7 @@ End Class
 
 
 
-Public Class Math_RGBCorrelation
-    Inherits VBparent
+Public Class Math_RGBCorrelation : Inherits VBparent
     Dim flow As Font_FlowText
     Dim match As MatchTemplate_Basics
     Public Sub New()
@@ -156,8 +152,7 @@ End Class
 
 
 
-Public Class Math_ImageAverage
-    Inherits VBparent
+Public Class Math_ImageAverage : Inherits VBparent
     Dim images As New List(Of cv.Mat)
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -202,8 +197,7 @@ End Class
 
 
 
-Public Class Math_Stdev
-    Inherits VBparent
+Public Class Math_Stdev : Inherits VBparent
     Public grid As Thread_Grid
     Public highStdevMask As cv.Mat
     Public lowStdevMask As cv.Mat
@@ -283,8 +277,7 @@ End Class
 
 
 
-Public Class Math_StdevBoundary
-    Inherits VBparent
+Public Class Math_StdevBoundary : Inherits VBparent
     Dim stdev As Math_Stdev
     Public Sub New()
         stdev = New Math_Stdev

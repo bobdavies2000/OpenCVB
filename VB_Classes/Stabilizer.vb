@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Stabilizer_Basics
-    Inherits VBparent
+Public Class Stabilizer_Basics : Inherits VBparent
     Dim match As MatchTemplate_Basics
     Public shiftX As Integer
     Public shiftY As Integer
@@ -101,8 +100,7 @@ End Class
 
 
 
-Public Class Stabilizer_BasicsRandomInput
-    Inherits VBparent
+Public Class Stabilizer_BasicsRandomInput : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -156,8 +154,7 @@ End Class
 
 
 
-Public Class Stabilizer_BasicsTest
-    Inherits VBparent
+Public Class Stabilizer_BasicsTest : Inherits VBparent
     Dim random As Stabilizer_BasicsRandomInput
     Dim stable As Stabilizer_Basics
     Public Sub New()
@@ -186,8 +183,7 @@ End Class
 
 
 ' https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
-Public Class Stabilizer_OpticalFlow
-    Inherits VBparent
+Public Class Stabilizer_OpticalFlow : Inherits VBparent
     Public good As Features_GoodFeatures
     Public inputFeat As New List(Of cv.Point2f)
     Public borderCrop = 30
@@ -300,8 +296,7 @@ End Class
 
 
 
-Public Class Stabilizer_MotionDetect
-    Inherits VBparent
+Public Class Stabilizer_MotionDetect : Inherits VBparent
     Dim motion As Motion_Basics
     Dim stable As Stabilizer_Basics
     Public Sub New()

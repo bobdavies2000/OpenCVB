@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports CS_Classes
-Public Class Blur_Basics
-    Inherits VBparent
+Public Class Blur_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -28,8 +27,7 @@ End Class
 
 
 
-Public Class Blur_Gaussian
-    Inherits VBparent
+Public Class Blur_Gaussian : Inherits VBparent
     Dim CS_BlurGaussian As New CS_BlurGaussian
     Dim blur As Blur_Basics
     Public Sub New()
@@ -55,8 +53,7 @@ End Class
 
 
 
-Public Class Blur_Median_CS
-    Inherits VBparent
+Public Class Blur_Median_CS : Inherits VBparent
     Dim CS_BlurMedian As New CS_BlurMedian
     Dim blur As Blur_Basics
     Public Sub New()
@@ -82,8 +79,7 @@ End Class
 
 
 
-Public Class Blur_Homogeneous
-    Inherits VBparent
+Public Class Blur_Homogeneous : Inherits VBparent
     Dim blur As Blur_Basics
     Public Sub New()
         blur = New Blur_Basics()
@@ -110,8 +106,7 @@ End Class
 
 
 
-Public Class Blur_Median
-    Inherits VBparent
+Public Class Blur_Median : Inherits VBparent
     Dim blur As Blur_Basics
     Public Sub New()
         blur = New Blur_Basics()
@@ -138,8 +133,7 @@ End Class
 
 ' https://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html?highlight=bilateralfilter
 ' https://www.tutorialspoint.com/opencv/opencv_bilateral_filter.htm
-Public Class Blur_Bilateral
-    Inherits VBparent
+Public Class Blur_Bilateral : Inherits VBparent
     Dim blur As Blur_Basics
     Public Sub New()
         blur = New Blur_Basics()
@@ -163,8 +157,7 @@ End Class
 
 
 
-Public Class Blur_PlusHistogram
-    Inherits VBparent
+Public Class Blur_PlusHistogram : Inherits VBparent
     Dim mat2to1 As Mat_2to1
     Dim blur As Blur_Bilateral
     Dim myhist As Histogram_EqualizeGray
@@ -200,8 +193,7 @@ End Class
 
 
 
-Public Class Blur_TopoMap
-    Inherits VBparent
+Public Class Blur_TopoMap : Inherits VBparent
     Dim gradient As Gradient_CartToPolar
     Dim addw As AddWeighted_Basics
     Public Sub New()

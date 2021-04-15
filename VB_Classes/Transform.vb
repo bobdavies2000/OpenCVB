@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Transform_Resize
-    Inherits VBparent
+Public Class Transform_Resize : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -29,8 +28,7 @@ End Class
 
 
 
-Public Class Transform_Rotate
-    Inherits VBparent
+Public Class Transform_Rotate : Inherits VBparent
     Public imageCenter As cv.Point2f
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -54,8 +52,7 @@ End Class
 
 
 
-Public Class Transform_Sort
-    Inherits VBparent
+Public Class Transform_Sort : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 4)
@@ -83,8 +80,7 @@ End Class
 
 
 
-Public Class Transform_SortReshape
-    Inherits VBparent
+Public Class Transform_SortReshape : Inherits VBparent
     Public sortVector As cv.Mat
     Public Sub New()
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -110,8 +106,7 @@ End Class
 
 
 
-Public Class Transform_Affine3D
-    Inherits VBparent
+Public Class Transform_Affine3D : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 2)

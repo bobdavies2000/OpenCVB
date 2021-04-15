@@ -56,8 +56,7 @@ Module ML__Exports
 End Module
 
 
-Public Class ML_FillRGBDepth_MT
-    Inherits VBparent
+Public Class ML_FillRGBDepth_MT : Inherits VBparent
     Dim shadow As Depth_Holes
     Dim grid As Thread_Grid
     Dim colorizer As Depth_Colorizer_CPP
@@ -91,8 +90,7 @@ Public Class ML_FillRGBDepth_MT
 End Class
 
 
-Public Class ML_FillRGBDepth
-    Inherits VBparent
+Public Class ML_FillRGBDepth : Inherits VBparent
     Dim shadow As Depth_Holes
     Dim colorizer As Depth_Colorizer_CPP
     Public Sub New()
@@ -121,8 +119,7 @@ Public Class ML_FillRGBDepth
 End Class
 
 
-Public Class ML_DepthFromColor_MT
-    Inherits VBparent
+Public Class ML_DepthFromColor_MT : Inherits VBparent
     Dim colorizer As Depth_Colorizer_CPP
     Dim grid As Thread_Grid
     Dim dilate As DilateErode_Basics
@@ -187,8 +184,7 @@ End Class
 
 
 
-Public Class ML_DepthFromColor
-    Inherits VBparent
+Public Class ML_DepthFromColor : Inherits VBparent
     Dim colorizer As Depth_Colorizer_CPP
     Dim mats As Mat_4to1
     Dim shadow As Depth_Holes
@@ -265,8 +261,7 @@ End Class
 
 
 
-Public Class ML_DepthFromXYColor
-    Inherits VBparent
+Public Class ML_DepthFromXYColor : Inherits VBparent
     Dim mats As Mat_4to1
     Dim shadow As Depth_Holes
     Dim resized As Resize_Percentage
@@ -359,8 +354,7 @@ End Class
 
 
 
-Public Class ML_EdgeDepth_MT
-    Inherits VBparent
+Public Class ML_EdgeDepth_MT : Inherits VBparent
     Dim colorizer As Depth_Colorizer_CPP
     Dim grid As Thread_Grid
     Dim dilate As DilateErode_Basics

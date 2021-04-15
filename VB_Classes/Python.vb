@@ -44,8 +44,7 @@ End Module
 
 
 
-Public Class Python_Run
-    Inherits VBparent
+Public Class Python_Run : Inherits VBparent
     Public Sub New()
         If task.pythonTaskName = "" Then task.pythonTaskName = task.parms.homeDir + "VB_Classes/PythonPackages.py"
         Dim pythonApp = New FileInfo(task.pythonTaskName)
@@ -81,8 +80,7 @@ End Class
 
 
 
-Public Class Python_MemMap
-    Inherits VBparent
+Public Class Python_MemMap : Inherits VBparent
     Dim memMapWriter As MemoryMappedViewAccessor
     Dim memMapFile As MemoryMappedFile
     Dim memMapPtr As IntPtr
@@ -117,8 +115,7 @@ End Class
 
 
 
-Public Class Python_SurfaceBlit
-    Inherits VBparent
+Public Class Python_SurfaceBlit : Inherits VBparent
     Dim memMap As Python_MemMap
     Dim pipeName As String
     Dim pipe As NamedPipeServerStream
@@ -172,8 +169,7 @@ End Class
 
 
 
-Public Class Python_Stream
-    Inherits VBparent
+Public Class Python_Stream : Inherits VBparent
     Dim pipeName As String
     Dim pipeIn As NamedPipeServerStream
     Dim pipeOut As NamedPipeServerStream

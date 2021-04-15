@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Featureless_Basics
-    Inherits VBparent
+Public Class Featureless_Basics : Inherits VBparent
     Public edges As Edges_Basics
     Public grid As Thread_Grid
     Public flood As FloodFill_Palette
@@ -57,8 +56,7 @@ End Class
 
 
 
-Public Class Featureless_DCT_MT
-    Inherits VBparent
+Public Class Featureless_DCT_MT : Inherits VBparent
     Dim dct As DCT_FeatureLess
     Public Sub New()
         dct = New DCT_FeatureLess()
@@ -107,8 +105,7 @@ End Class
 
 
 
-Public Class FeatureLess_Prediction
-    Inherits VBparent
+Public Class FeatureLess_Prediction : Inherits VBparent
     Dim fLess As Featureless_Basics
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -193,8 +190,7 @@ End Class
 
 
 
-Public Class FeatureLess_PointTracker
-    Inherits VBparent
+Public Class FeatureLess_PointTracker : Inherits VBparent
     Public fLess As Featureless_Basics
     Public pTrack As KNN_PointTracker
     Public Sub New()
@@ -224,8 +220,7 @@ End Class
 
 
 
-Public Class FeatureLess_Highlights
-    Inherits VBparent
+Public Class FeatureLess_Highlights : Inherits VBparent
     Public fLessP As FeatureLess_PointTracker
     Public addW As AddWeighted_Basics
     Public Sub New()

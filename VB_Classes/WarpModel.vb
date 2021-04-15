@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.IO
 Imports System.Runtime.InteropServices
 ' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
-Public Class WarpModel_Basics
-    Inherits VBparent
+Public Class WarpModel_Basics : Inherits VBparent
     Public warpInput As WarpModel_Input
     Dim cPtr As IntPtr
     Public warpMatrix() As Single
@@ -105,8 +104,7 @@ End Class
 
 ' https://github.com/ycui11/-Colorizing-Prokudin-Gorskii-images-of-the-Russian-Empire
 ' https://github.com/petraohlin/Colorizing-the-Prokudin-Gorskii-Collection
-Public Class WarpModel_Input
-    Inherits VBparent
+Public Class WarpModel_Input : Inherits VBparent
     Public rgb(3 - 1) As cv.Mat
     Public gradient(3 - 1) As cv.Mat
     Dim sobel As Edges_Sobel
@@ -200,8 +198,7 @@ End Module
 
 
 ' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
-Public Class WarpModel_AlignImages
-    Inherits VBparent
+Public Class WarpModel_AlignImages : Inherits VBparent
     Dim ecc As WarpModel_Basics
     Public Sub New()
         ecc = New WarpModel_Basics()
@@ -243,8 +240,7 @@ End Class
 
 
 
-'Public Class WarpModel_Image
-'    Inherits VBparent
+'Public Class WarpModel_Image : Inherits VBparent
 '    Public wbasics As WarpModel_Basics
 '    Dim sobel As Edges_Sobel
 '    Public lastFrame As cv.Mat
@@ -324,8 +320,7 @@ End Class
 
 
 
-'Public Class WarpModel_Entropy
-'    Inherits VBparent
+'Public Class WarpModel_Entropy : Inherits VBparent
 '    Dim warp As WarpModel_Image
 '    Dim entropy As Entropy_Highest
 '    Public Sub New()

@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class MSER_Basics
-    Inherits VBparent
+Public Class MSER_Basics : Inherits VBparent
     Dim sortedBoxes As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
     Public containers As New List(Of cv.Rect)
     Dim options As MSER_Options
@@ -73,8 +72,7 @@ End Class
 
 
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class MSER_Options
-    Inherits VBparent
+Public Class MSER_Options : Inherits VBparent
     Public boxes() As cv.Rect = Nothing
     Public regions()() As cv.Point = Nothing
     Dim saveParms() As Integer
@@ -150,8 +148,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class MSER_SyntheticInput
-    Inherits VBparent
+Public Class MSER_SyntheticInput : Inherits VBparent
     Private Sub addNestedRectangles(img As cv.Mat, p0 As cv.Point, width() As Integer, color() As Integer, n As Integer)
         For i = 0 To n - 1
             img.Rectangle(New cv.Rect(p0.X, p0.Y, width(i), width(i)), color(i), 1)
@@ -192,8 +189,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class MSER_TestSynthetic
-    Inherits VBparent
+Public Class MSER_TestSynthetic : Inherits VBparent
     Dim mser As MSER_Options
     Dim synth As MSER_SyntheticInput
     Private Function testSynthetic(img As cv.Mat, pass2Only As Boolean, delta As Integer) As String
@@ -241,8 +237,7 @@ End Class
 
 
 ' https://github.com/shimat/opencvsharp/wiki/MSER
-Public Class MSER_CPPStyle
-    Inherits VBparent
+Public Class MSER_CPPStyle : Inherits VBparent
     Dim gray As cv.Mat
     Dim image As cv.Mat
     Public Sub New()
@@ -281,8 +276,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/python/mser.py
-Public Class MSER_Contours
-    Inherits VBparent
+Public Class MSER_Contours : Inherits VBparent
     Dim mser As MSER_Options
     Public Sub New()
         mser = New MSER_Options()

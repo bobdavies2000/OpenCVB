@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
-Public Class Texture_Basics
-    Inherits VBparent
+Public Class Texture_Basics : Inherits VBparent
     Dim grid As Thread_Grid
     Dim ellipse As Draw_Ellipses
     Public texture As New cv.Mat
@@ -54,8 +53,7 @@ End Class
 
 
 
-Public Class Texture_Flow
-    Inherits VBparent
+Public Class Texture_Flow : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -91,8 +89,7 @@ End Class
 
 
 
-Public Class Texture_Flow_Depth
-    Inherits VBparent
+Public Class Texture_Flow_Depth : Inherits VBparent
     Dim texture As Texture_Flow
     Public Sub New()
         texture = New Texture_Flow()
@@ -110,8 +107,7 @@ End Class
 
 
 
-Public Class Texture_Flow_Reduction
-    Inherits VBparent
+Public Class Texture_Flow_Reduction : Inherits VBparent
     Dim texture As Texture_Flow
     Dim reduction As Reduction_Basics
     Public Sub New()
@@ -135,8 +131,7 @@ End Class
 
 
 
-Public Class Texture_Shuffle
-    Inherits VBparent
+Public Class Texture_Shuffle : Inherits VBparent
     Dim shuffle As Random_Shuffle
     Dim floor As OpenGL_FloorPlane
     Dim texture As Texture_Basics

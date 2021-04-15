@@ -18,8 +18,7 @@ End Module
 
 
 ' https://github.com/epiception/SGM-Census
-Public Class SemiGlobalMatching_CPP
-    Inherits VBparent
+Public Class SemiGlobalMatching_CPP : Inherits VBparent
     Dim leftData(1 - 1) As Byte
     Dim rightData(1 - 1) As Byte
     Dim cPtr As IntPtr

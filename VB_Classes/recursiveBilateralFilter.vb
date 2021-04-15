@@ -15,8 +15,7 @@ End Module
 
 
 ' https://github.com/ufoym
-Public Class RecursiveBilateralFilter_CPP
-    Inherits VBparent
+Public Class RecursiveBilateralFilter_CPP : Inherits VBparent
     Dim srcData(0) As Byte
     Dim rbf As IntPtr
     Public Sub New()

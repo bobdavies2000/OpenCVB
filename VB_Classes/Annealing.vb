@@ -17,8 +17,7 @@ End Module
 
 
 
-Public Class Annealing_Basics_CPP
-    Inherits VBparent
+Public Class Annealing_Basics_CPP : Inherits VBparent
     Public numberOfCities As integer = 25
     Public restartComputation As Boolean
     Public msg As String
@@ -108,8 +107,7 @@ End Class
 
 
 
-Public Class Annealing_CPP_MT
-    Inherits VBparent
+Public Class Annealing_CPP_MT : Inherits VBparent
     Dim random As Random_Basics
     Dim anneal() As Annealing_Basics_CPP
     Dim mats As Mat_4to1
@@ -236,8 +234,7 @@ End Class
 
 
 
-Public Class Annealing_Options
-    Inherits VBparent
+Public Class Annealing_Options : Inherits VBparent
     Dim random As Random_Basics
     Public anneal As Annealing_Basics_CPP
     Dim flow As Font_FlowText

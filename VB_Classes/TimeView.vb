@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class TimeView_Basics
-    Inherits VBparent
+Public Class TimeView_Basics : Inherits VBparent
     Public sideView As Histogram_SideView2D
     Public topView As Histogram_TopView2D
     Public Sub New()
@@ -60,8 +59,7 @@ End Class
 
 
 
-Public Class TimeView_TopBackProjection
-    Inherits VBparent
+Public Class TimeView_TopBackProjection : Inherits VBparent
     Dim tFlood As TimeView_FloodFill
     Public Sub New()
         tFlood = New TimeView_FloodFill
@@ -115,8 +113,7 @@ End Class
 
 
 
-Public Class TimeView_FloodFill
-    Inherits VBparent
+Public Class TimeView_FloodFill : Inherits VBparent
     Public floodSide As FloodFill_Basics
     Public floodTop As FloodFill_Basics
     Public tBasics As TimeView_Basics
@@ -150,8 +147,7 @@ End Class
 
 
 
-Public Class TimeView_Centroids
-    Inherits VBparent
+Public Class TimeView_Centroids : Inherits VBparent
     Public knn As KNN_BasicsQT
     Dim tflood As TimeView_FloodFill
     Public queryPoints As New List(Of cv.Point2f)
@@ -203,8 +199,7 @@ End Class
 
 
 
-Public Class TimeView_Rectangles
-    Inherits VBparent
+Public Class TimeView_Rectangles : Inherits VBparent
     Dim mOverLap As Rectangle_MultiOverlap
     Public tflood As TimeView_FloodFill
     Public Sub New()
@@ -246,8 +241,7 @@ End Class
 
 
 
-Public Class TimeView_Frustrum
-    Inherits VBparent
+Public Class TimeView_Frustrum : Inherits VBparent
     Dim tView As TimeView_Rectangles
     Dim cmatSide As PointCloud_ColorizeSide
     Dim cmatTop As PointCloud_ColorizeTop

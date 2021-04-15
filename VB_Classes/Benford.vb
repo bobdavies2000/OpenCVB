@@ -11,8 +11,7 @@ Imports System.Text.RegularExpressions
 ' This impact is likely the result of how JPEG compression truncates values as insignificant - a definite manipulation of the data.
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-Public Class Benford_Basics
-    Inherits VBparent
+Public Class Benford_Basics : Inherits VBparent
     Public expectedDistribution(10 - 1) As Single
     Public counts(expectedDistribution.Count - 1) As Single
     Dim plot As Plot_Histogram
@@ -100,8 +99,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-Public Class Benford_NormalizedImage
-    Inherits VBparent
+Public Class Benford_NormalizedImage : Inherits VBparent
     Public benford As Benford_Basics
     Public Sub New()
         benford = New Benford_Basics()
@@ -125,8 +123,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-Public Class Benford_NormalizedImage99
-    Inherits VBparent
+Public Class Benford_NormalizedImage99 : Inherits VBparent
     Public benford As Benford_Basics
     Public Sub New()
         benford = New Benford_Basics()
@@ -152,8 +149,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-Public Class Benford_JPEG
-    Inherits VBparent
+Public Class Benford_JPEG : Inherits VBparent
     Public benford As Benford_Basics
     Public Sub New()
         benford = New Benford_Basics()
@@ -182,8 +178,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-Public Class Benford_JPEG99
-    Inherits VBparent
+Public Class Benford_JPEG99 : Inherits VBparent
     Public benford As Benford_Basics
     Public Sub New()
         benford = New Benford_Basics()
@@ -214,8 +209,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
-Public Class Benford_PNG
-    Inherits VBparent
+Public Class Benford_PNG : Inherits VBparent
     Public benford As Benford_Basics
     Public Sub New()
         benford = New Benford_Basics()
@@ -243,8 +237,7 @@ End Class
 
 
 
-Public Class Benford_Depth
-    Inherits VBparent
+Public Class Benford_Depth : Inherits VBparent
     Public benford As Benford_Basics
     Public Sub New()
         benford = New Benford_Basics()
@@ -263,8 +256,7 @@ End Class
 
 
 
-Public Class Benford_DepthRGB
-    Inherits VBparent
+Public Class Benford_DepthRGB : Inherits VBparent
     Public benford As Benford_JPEG
     Public Sub New()
         benford = New Benford_JPEG()
@@ -285,8 +277,7 @@ End Class
 
 
 
-Public Class Benford_Primes
-    Inherits VBparent
+Public Class Benford_Primes : Inherits VBparent
     Dim sieve As Sieve_BasicsVB
     Dim benford As Benford_Basics
     Public Sub New()

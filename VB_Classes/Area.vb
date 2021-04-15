@@ -6,8 +6,7 @@ Module MinTriangle_Exports
     End Sub
 End Module
 
-Public Class Area_MinTriangle_CPP
-    Inherits VBparent
+Public Class Area_MinTriangle_CPP : Inherits VBparent
     Dim numberOfPoints As integer
     Public srcPoints() As cv.Point2f
     Public srcData() As Byte
@@ -62,8 +61,7 @@ End Class
 
 
 
-Public Class Area_MinRect
-    Inherits VBparent
+Public Class Area_MinRect : Inherits VBparent
     Dim numberOfPoints As Integer
     Public srcPoints() As cv.Point2f
     Public minRect As cv.RotatedRect
@@ -106,8 +104,7 @@ End Class
 
 
 
-Public Class Area_MinMotionRect
-    Inherits VBparent
+Public Class Area_MinMotionRect : Inherits VBparent
     Dim bgSub As BGSubtract_MOG
     Public Sub New()
         bgSub = New BGSubtract_MOG()
@@ -144,8 +141,7 @@ End Class
 
 
 
-Public Class Area_FindNonZero
-    Inherits VBparent
+Public Class Area_FindNonZero : Inherits VBparent
     Public Sub New()
         label1 = "Coordinates of non-zero points"
         label2 = "Non-zero original points"

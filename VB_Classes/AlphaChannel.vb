@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 ' https://www.learnopencv.com/alpha-blending-using-opencv-cpp-python/
 ' https://docs.microsoft.com/en-us/dotnet/api/system.drawing.bitmap.maketransparent?view=dotnet-plat-ext-3.1
-Public Class AlphaChannel_Basics
-    Inherits VBparent
+Public Class AlphaChannel_Basics : Inherits VBparent
     Dim alpha As New imageForm
     Public Sub New()
         alpha.Show()
@@ -26,8 +25,7 @@ End Class
 
 
 ' https://www.learnopencv.com/alpha-blending-using-opencv-cpp-python/
-Public Class AlphaChannel_Blend
-    Inherits VBparent
+Public Class AlphaChannel_Blend : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

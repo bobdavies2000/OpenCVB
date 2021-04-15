@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
-Public Class CellAuto_Basics
-    Inherits VBparent
+Public Class CellAuto_Basics : Inherits VBparent
     Public i18 As New List(Of String)
     Dim inputCombo = "111,110,101,100,011,010,001,000"
     Dim cellInput(,) = {{1, 1, 1}, {1, 1, 0}, {1, 0, 1}, {1, 0, 0}, {0, 1, 1}, {0, 1, 0}, {0, 0, 1}, {0, 0, 0}}
@@ -85,8 +84,7 @@ End Class
 
 
 ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
-Public Class CellAuto_Life
-    Inherits VBparent
+Public Class CellAuto_Life : Inherits VBparent
     Dim random As Random_Basics
     Dim grid As cv.Mat
     Dim nextgrid As cv.Mat
@@ -186,8 +184,7 @@ End Class
 
 
 ' https://natureofcode.com/book/chapter-7-cellular-automata/
-Public Class CellAuto_LifeColor
-    Inherits VBparent
+Public Class CellAuto_LifeColor : Inherits VBparent
     Dim game As CellAuto_Life
     Public Sub New()
         game = New CellAuto_Life()
@@ -221,8 +218,7 @@ End Class
 
 
 ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
-Public Class CellAuto_LifePopulation
-    Inherits VBparent
+Public Class CellAuto_LifePopulation : Inherits VBparent
     Dim plot As Plot_OverTime
     Dim game As CellAuto_Life
     Public Sub New()
@@ -252,8 +248,7 @@ End Class
 
 
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
-Public Class CellAuto_Basics_MP
-    Inherits VBparent
+Public Class CellAuto_Basics_MP : Inherits VBparent
     Dim cell As CellAuto_Basics
     Dim i18 As New List(Of String)
     Dim i18Index As Integer
@@ -296,8 +291,7 @@ End Class
 
 
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
-Public Class CellAuto_All256
-    Inherits VBparent
+Public Class CellAuto_All256 : Inherits VBparent
     Dim cell As CellAuto_Basics
     Public Sub New()
         cell = New CellAuto_Basics
@@ -346,8 +340,7 @@ End Class
 
 
 
-Public Class CellAuto_MultiPoint
-    Inherits VBparent
+Public Class CellAuto_MultiPoint : Inherits VBparent
     Dim cell As CellAuto_Basics
     Public Sub New()
 

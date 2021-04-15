@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Histogram_Basics
-    Inherits VBparent
+Public Class Histogram_Basics : Inherits VBparent
     Public histogram As New cv.Mat
     Public kalman As Kalman_Basics
     Public plotHist As Plot_Histogram
@@ -81,8 +80,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv/blob/master/samples/python/hist.py
-Public Class Histogram_Graph
-    Inherits VBparent
+Public Class Histogram_Graph : Inherits VBparent
     Public histRaw(3 - 1) As cv.Mat
     Public histNormalized(3 - 1) As cv.Mat
     Public bins = 50
@@ -215,8 +213,7 @@ End Module
 
 
 
-Public Class Histogram_NormalizeGray
-    Inherits VBparent
+Public Class Histogram_NormalizeGray : Inherits VBparent
     Public histogram As Histogram_Basics
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -250,8 +247,7 @@ End Class
 
 
 ' https://docs.opencv.org/2.4/modules/imgproc/doc/histograms.html
-Public Class Histogram_2D_HueSaturation
-    Inherits VBparent
+Public Class Histogram_2D_HueSaturation : Inherits VBparent
     Public histogram As New cv.Mat
     Public hsv As cv.Mat
 
@@ -283,8 +279,7 @@ End Class
 
 
 
-Public Class Histogram_2D_XZ_YZ
-    Inherits VBparent
+Public Class Histogram_2D_XZ_YZ : Inherits VBparent
     Dim xyz As Mat_ImageXYZ_MT
     Dim minSlider As Windows.Forms.TrackBar
     Dim maxSlider As Windows.Forms.TrackBar
@@ -330,8 +325,7 @@ End Class
 
 
 ' https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
-Public Class Histogram_EqualizeColor
-    Inherits VBparent
+Public Class Histogram_EqualizeColor : Inherits VBparent
     Public kalmanEq As Histogram_Basics
     Public kalman As Histogram_Basics
     Dim mats As Mat_2to1
@@ -383,8 +377,7 @@ End Class
 
 
 'https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
-Public Class Histogram_EqualizeGray
-    Inherits VBparent
+Public Class Histogram_EqualizeGray : Inherits VBparent
     Public histogramEq As Histogram_Basics
     Public histogram As Histogram_Basics
     Public Sub New()
@@ -416,8 +409,7 @@ End Class
 
 
 ' https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
-Public Class Histogram_Equalize255
-    Inherits VBparent
+Public Class Histogram_Equalize255 : Inherits VBparent
     Dim eqHist As Histogram_EqualizeColor
     Public Sub New()
 
@@ -452,8 +444,7 @@ End Class
 
 
 
-Public Class Histogram_Simple
-    Inherits VBparent
+Public Class Histogram_Simple : Inherits VBparent
     Public plotHist As Plot_Histogram
     Public Sub New()
         plotHist = New Plot_Histogram()
@@ -490,8 +481,7 @@ End Class
 
 
 
-Public Class Histogram_ColorsAndGray
-    Inherits VBparent
+Public Class Histogram_ColorsAndGray : Inherits VBparent
     Dim histogram As Histogram_Basics
     Dim mats As Mat_4to1
     Public Sub New()
@@ -541,8 +531,7 @@ End Class
 
 
 
-Public Class Histogram_BackProjectionPeak
-    Inherits VBparent
+Public Class Histogram_BackProjectionPeak : Inherits VBparent
     Dim hist As Histogram_Basics
     Public Sub New()
         hist = New Histogram_Basics
@@ -585,8 +574,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
-Public Class Histogram_BackProjection2D
-    Inherits VBparent
+Public Class Histogram_BackProjection2D : Inherits VBparent
     Dim hist As Histogram_2D_HueSaturation
     Public Sub New()
 
@@ -644,8 +632,7 @@ End Class
 
 
 
-Public Class Histogram_HueSaturation2DPlot
-    Inherits VBparent
+Public Class Histogram_HueSaturation2DPlot : Inherits VBparent
     Dim hueSat As PhotoShop_Hue
     Dim hist2d As Histogram_BackProjection2D
     Dim mats As Mat_4to1
@@ -684,8 +671,7 @@ End Class
 
 
 
-Public Class Histogram_TopData
-    Inherits VBparent
+Public Class Histogram_TopData : Inherits VBparent
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Public meterMin As Single
@@ -735,8 +721,7 @@ End Class
 
 
 
-Public Class Histogram_SideData
-    Inherits VBparent
+Public Class Histogram_SideData : Inherits VBparent
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Public meterMin As Single
@@ -781,8 +766,7 @@ End Class
 
 
 
-Public Class Histogram_SmoothTopView2D
-    Inherits VBparent
+Public Class Histogram_SmoothTopView2D : Inherits VBparent
     Public topView As Histogram_TopView2D
     Dim cmat As PointCloud_ColorizeTop
     Dim stable As Motion_MinMaxPointCloud
@@ -822,8 +806,7 @@ End Class
 
 
 
-Public Class Histogram_SmoothSideView2D
-    Inherits VBparent
+Public Class Histogram_SmoothSideView2D : Inherits VBparent
     Public sideView As Histogram_SideView2D
     Dim cmat As PointCloud_ColorizeSide
     Dim stable As Motion_MinMaxPointCloud
@@ -862,8 +845,7 @@ End Class
 
 
 
-Public Class Histogram_StableDepthClusters
-    Inherits VBparent
+Public Class Histogram_StableDepthClusters : Inherits VBparent
     Dim clusters As Histogram_DepthClusters
     Dim motionSD As Motion_MinMaxDepth
     Public Sub New()
@@ -893,8 +875,7 @@ End Class
 
 
 
-Public Class Histogram_TopView2D
-    Inherits VBparent
+Public Class Histogram_TopView2D : Inherits VBparent
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Public originalHistOutput As New cv.Mat
@@ -938,8 +919,7 @@ End Class
 
 
 
-Public Class Histogram_SideView2D
-    Inherits VBparent
+Public Class Histogram_SideView2D : Inherits VBparent
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Public originalHistOutput As New cv.Mat
@@ -982,8 +962,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
-Public Class Histogram_BackProjectionGrayscale
-    Inherits VBparent
+Public Class Histogram_BackProjectionGrayscale : Inherits VBparent
     Dim hist As Histogram_Basics
     Public histIndex As Integer
     Public binSlider As Windows.Forms.TrackBar
@@ -1023,8 +1002,7 @@ End Class
 
 
 
-Public Class Histogram_ViewIntersections
-    Inherits VBparent
+Public Class Histogram_ViewIntersections : Inherits VBparent
     Dim histCO As Histogram_ViewObjects
     Public Sub New()
         histCO = New Histogram_ViewObjects
@@ -1095,8 +1073,7 @@ End Class
 
 
 
-Public Class Histogram_ViewObjects
-    Inherits VBparent
+Public Class Histogram_ViewObjects : Inherits VBparent
     Public histC As Histogram_ViewConcentrationsTopX
     Dim flood As FloodFill_Basics
     Dim minSizeSlider As Windows.Forms.TrackBar
@@ -1172,8 +1149,7 @@ End Class
 
 
 
-Public Class Histogram_SmoothConcentration
-    Inherits VBparent
+Public Class Histogram_SmoothConcentration : Inherits VBparent
     Public sideview As Histogram_SmoothSideView2D
     Public topview As Histogram_SmoothTopView2D
     Dim concent As Histogram_ViewConcentrationsTopX
@@ -1207,8 +1183,7 @@ End Class
 
 
 
-Public Class Histogram_ViewConcentrationsTopX
-    Inherits VBparent
+Public Class Histogram_ViewConcentrationsTopX : Inherits VBparent
     Public sideview As Histogram_SideView2D
     Public topview As Histogram_TopView2D
     Public Sub New()
@@ -1285,8 +1260,7 @@ End Class
 
 
 
-Public Class Histogram_DepthClusters
-    Inherits VBparent
+Public Class Histogram_DepthClusters : Inherits VBparent
     Public valleys As Histogram_DepthValleys
     Public Sub New()
         valleys = New Histogram_DepthValleys()
@@ -1323,8 +1297,7 @@ End Class
 
 
 
-Public Class Histogram_Frustrum
-    Inherits VBparent
+Public Class Histogram_Frustrum : Inherits VBparent
     Dim sideFrustrumSlider As Windows.Forms.TrackBar
     Dim topFrustrumSlider As Windows.Forms.TrackBar
     Dim cameraXSlider As Windows.Forms.TrackBar
@@ -1385,8 +1358,7 @@ End Class
 
 
 
-Public Class Histogram_Depth
-    Inherits VBparent
+Public Class Histogram_Depth : Inherits VBparent
     Public plotHist As Plot_Histogram
     Public Sub New()
         plotHist = New Plot_Histogram()
@@ -1423,8 +1395,7 @@ End Class
 
 
 
-Public Class Histogram_DepthValleys
-    Inherits VBparent
+Public Class Histogram_DepthValleys : Inherits VBparent
     Dim kalman As Kalman_Basics
     Dim hist As Histogram_Depth
     Public ranges As New List(Of cv.Point)

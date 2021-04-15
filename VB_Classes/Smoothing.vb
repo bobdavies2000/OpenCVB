@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
-Public Class Smoothing_Exterior
-	Inherits VBparent
+Public Class Smoothing_Exterior : Inherits VBparent
 	Dim hull As Hull_Basics
 	Public inputPoints As List(Of cv.Point)
 	Public smoothPoints As List(Of cv.Point)
@@ -76,8 +75,7 @@ End Class
 
 
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
-Public Class Smoothing_Interior
-	Inherits VBparent
+Public Class Smoothing_Interior : Inherits VBparent
 	Dim hull As Hull_Basics
 	Public inputPoints As List(Of cv.Point)
 	Public smoothPoints As List(Of cv.Point)
@@ -158,8 +156,7 @@ End Class
 
 
 
-Public Class Smoothing_Options
-	Inherits VBparent
+Public Class Smoothing_Options : Inherits VBparent
 	Public iterations As Integer
 	Public interiorTension As Single
 	Public stepSize As Integer
@@ -189,8 +186,7 @@ End Class
 
 
 
-Public Class Smoothing_Contours
-	Inherits VBparent
+Public Class Smoothing_Contours : Inherits VBparent
 	Dim outline As Blob_Largest
 	Dim smoothE As Smoothing_Exterior
 	Dim smoothI As Smoothing_Interior

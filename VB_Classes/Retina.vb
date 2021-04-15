@@ -15,8 +15,7 @@ Module Retina_CPP_Module
 End Module
 
 'https://docs.opencv.org/3.4/d3/d86/tutorial_bioinspired_retina_model.html
-Public Class Retina_Basics_CPP
-    Inherits VBparent
+Public Class Retina_Basics_CPP : Inherits VBparent
     Dim Retina As IntPtr = 0
     Dim startInfo As New ProcessStartInfo
     Dim magnoData(0) As Byte
@@ -91,8 +90,7 @@ End Class
 
 
 
-Public Class Retina_Depth
-    Inherits VBparent
+Public Class Retina_Depth : Inherits VBparent
     Dim retina As Retina_Basics_CPP
     Public Sub New()
         retina = New Retina_Basics_CPP()

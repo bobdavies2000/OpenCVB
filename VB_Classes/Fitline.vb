@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.4/js_contour_features_fitLine.html
-Public Class Fitline_Basics
-    Inherits VBparent
+Public Class Fitline_Basics : Inherits VBparent
     Public draw As Draw_Line
     Public lines As New List(Of cv.Point) ' there are always an even number - 2 points define the line.
     Public Sub New()
@@ -50,8 +49,7 @@ End Class
 
 
 
-Public Class Fitline_3DBasics_MT
-    Inherits VBparent
+Public Class Fitline_3DBasics_MT : Inherits VBparent
     Dim hlines As Hough_Lines_MT
     Public Sub New()
         hlines = New Hough_Lines_MT
@@ -107,8 +105,7 @@ End Class
 
 
 
-Public Class Fitline_RawInput
-    Inherits VBparent
+Public Class Fitline_RawInput : Inherits VBparent
     Public points As New List(Of cv.Point2f)
     Public m As Single
     Public bb As Single
@@ -187,8 +184,7 @@ End Class
 
 
 ' http://www.cs.cmu.edu/~youngwoo/doc/lineFittingTest.cpp
-Public Class Fitline_EigenFit
-    Inherits VBparent
+Public Class Fitline_EigenFit : Inherits VBparent
     Dim noisyLine As Fitline_RawInput
     Public Sub New()
         noisyLine = New Fitline_RawInput()

@@ -46,7 +46,7 @@ Module UI_GeneratorMain
                 sIndex += 1
                 fileName = fileinfo.FullName
             Else
-                If fileName.EndsWith("VBparent.vb") = False And fileName.EndsWith("VBocvb.vb") = False Then
+                If fileName.EndsWith("VBparent.vb") = False Then
                     Dim nextFile As New System.IO.StreamReader(fileName)
                     While nextFile.Peek() <> -1
                         Dim line = Trim(nextFile.ReadLine())
@@ -57,10 +57,10 @@ Module UI_GeneratorMain
                                 If LCase(line).StartsWith("public class") Then
                                     Dim split As String() = Regex.Split(line, "\W+")
                                     If line.EndsWith(" : Inherits VBparent") Then className = split(2)
-                                    If LCase(line).StartsWith("public sub new(") And sortedNames.ContainsKey(className) = False Then
-                                        sortedNames.Add(className, sIndex)
-                                        sIndex += 1
-                                    End If
+                                End If
+                                If LCase(line).StartsWith("public sub new(") And sortedNames.ContainsKey(className) = False Then
+                                    sortedNames.Add(className, sIndex)
+                                    sIndex += 1
                                 End If
                             End If
                         End If
@@ -83,17 +83,14 @@ Module UI_GeneratorMain
         sw.WriteLine("Public Class algorithmList")
 
         sw.WriteLine("Public Function createAlgorithm( algorithmName as string) As Object")
-        sw.WriteLine("Select Case ucase(algorithmName)")
         For i = 0 To cleanNames.Count - 1
             Dim nextName = cleanNames.Item(i)
-            sw.WriteLine(vbTab + "case """ + UCase(nextName) + """")
             If nextName.EndsWith(".py") Then
-                sw.WriteLine(vbTab + vbTab + "return new Python_Run()")
+                sw.WriteLine("if algorithmName = """ + nextName + """ Then return new Python_Run()")
             Else
-                sw.WriteLine(vbTab + vbTab + "return new " + nextName)
+                sw.WriteLine("if algorithmName = """ + nextName + """ Then return new " + nextName)
             End If
         Next
-        sw.WriteLine("End Select")
         sw.WriteLine("return nothing")
         sw.WriteLine("End Function")
 

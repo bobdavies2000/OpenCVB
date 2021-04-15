@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class AddWeighted_Basics
-    Inherits VBparent
+Public Class AddWeighted_Basics : Inherits VBparent
     Public src2 As New cv.Mat
     Public weightSlider As System.Windows.Forms.TrackBar
     Public Sub New()
@@ -25,8 +24,7 @@ End Class
 
 
 
-Public Class AddWeighted_Edges
-    Inherits VBparent
+Public Class AddWeighted_Edges : Inherits VBparent
     Dim edges As Edges_BinarizedSobel
     Dim addw As AddWeighted_Basics
     Public Sub New()
@@ -53,8 +51,7 @@ End Class
 
 
 
-Public Class AddWeighted_ImageAccumulate
-    Inherits VBparent
+Public Class AddWeighted_ImageAccumulate : Inherits VBparent
     Public Sub New()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -79,8 +76,7 @@ End Class
 
 
 
-Public Class AddWeighted_InfraRed
-    Inherits VBparent
+Public Class AddWeighted_InfraRed : Inherits VBparent
     Dim addw As AddWeighted_Basics
     Dim infra As LeftRightView_BrightnessContrast
     Dim src2 As New cv.Mat

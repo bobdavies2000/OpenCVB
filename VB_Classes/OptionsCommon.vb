@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class OptionsCommon_Depth
-    Inherits VBparent
+Public Class OptionsCommon_Depth : Inherits VBparent
     Public gOptions As New OptionsGlobal
     Public Sub New()
         task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone.
@@ -58,8 +57,7 @@ End Class
 
 
 
-Public Class OptionsCommon_Histogram
-    Inherits VBparent
+Public Class OptionsCommon_Histogram : Inherits VBparent
     Public Sub New()
         task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone.
 

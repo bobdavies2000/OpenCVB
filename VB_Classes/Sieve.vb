@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Numerics
 ' https://github.com/TheAlgorithms/C-Sharp/blob/master/Algorithms/Other/SieveOfEratosthenes.cs'
-Public Class Sieve_BasicsVB
-    Inherits VBparent
+Public Class Sieve_BasicsVB : Inherits VBparent
     Public primes As New List(Of Integer)
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -49,8 +48,7 @@ End Class
 
 
 
-Public Class Sieve_Basics
-    Inherits VBparent
+Public Class Sieve_Basics : Inherits VBparent
     Dim printer As Sieve_BasicsVB
     Dim sieve As New CS_Classes.Sieve
     Public Sub New()

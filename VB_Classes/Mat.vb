@@ -1,8 +1,7 @@
 Imports System.Runtime.InteropServices
 Imports DlibDotNet
 Imports cv = OpenCvSharp
-Public Class Mat_Repeat
-    Inherits VBparent
+Public Class Mat_Repeat : Inherits VBparent
     Public Sub New()
         task.desc = "Use the repeat method to replicate data."
 		' task.rank = 1
@@ -22,8 +21,7 @@ End Class
 
 
 
-Public Class Mat_PointToMat
-    Inherits VBparent
+Public Class Mat_PointToMat : Inherits VBparent
     Dim random As Random_Basics
     Public Sub New()
         random = New Random_Basics()
@@ -52,8 +50,7 @@ End Class
 
 
 
-Public Class Mat_MatToPoint
-    Inherits VBparent
+Public Class Mat_MatToPoint : Inherits VBparent
     Dim mask As Random_Basics
     Public Sub New()
         mask = New Random_Basics()
@@ -84,8 +81,7 @@ End Class
 
 
 
-Public Class Mat_Transpose
-    Inherits VBparent
+Public Class Mat_Transpose : Inherits VBparent
     Public Sub New()
         task.desc = "Transpose a Mat and show results."
 		' task.rank = 1
@@ -106,8 +102,7 @@ End Class
 
 
 ' https://csharp.hotexamples.com/examples/OpenCvSharp/Mat/-/php-mat-class-examples.html#0x95f170f4714e3258c220a78eacceeee99591440b9885a2997bbbc6b3aebdcf1c-19,,37,
-Public Class Mat_Tricks
-    Inherits VBparent
+Public Class Mat_Tricks : Inherits VBparent
     Public Sub New()
         label1 = "Image squeezed into square Mat"
         label2 = "Mat transposed around the diagonal"
@@ -125,8 +120,7 @@ End Class
 
 
 
-Public Class Mat_4to1
-    Inherits VBparent
+Public Class Mat_4to1 : Inherits VBparent
     Dim mat1 As cv.Mat
     Dim mat2 As cv.Mat
     Dim mat3 As cv.Mat
@@ -180,8 +174,7 @@ End Class
 
 
 
-Public Class Mat_2to1
-    Inherits VBparent
+Public Class Mat_2to1 : Inherits VBparent
     Dim mat1 As cv.Mat
     Dim mat2 As cv.Mat
     Public mat() As cv.Mat = {mat1, mat2}
@@ -224,8 +217,7 @@ End Class
 
 
 
-Public Class Mat_ImageXYZ_MT
-    Inherits VBparent
+Public Class Mat_ImageXYZ_MT : Inherits VBparent
     Dim grid As Thread_Grid
     Public xyDepth As cv.Mat
     Public xyzPlanes() As cv.Mat
@@ -264,8 +256,7 @@ End Class
 
 ' https://csharp.hotexamples.com/examples/OpenCvSharp/MatExpr/-/php-matexpr-class-examples.html
 ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/MatOperations.cs
-Public Class Mat_RowColRange
-    Inherits VBparent
+Public Class Mat_RowColRange : Inherits VBparent
     Public Sub New()
         label1 = "BitwiseNot of RowRange and ColRange"
         task.desc = "Perform operation on a range of cols and/or Rows."
@@ -284,8 +275,7 @@ End Class
 
 
 
-Public Class Mat_Managed
-    Inherits VBparent
+Public Class Mat_Managed : Inherits VBparent
     Public Sub New()
         label1 = "Color change is in the managed cv.vec3b array"
         task.desc = "There is a limited ability to use Mat data in Managed code directly."
@@ -312,8 +302,7 @@ End Class
 
 
 
-Public Class Mat_MultiplyReview
-    Inherits VBparent
+Public Class Mat_MultiplyReview : Inherits VBparent
     Dim flow As Font_FlowText
     Public Sub New()
         flow = New Font_FlowText()
@@ -374,8 +363,7 @@ End Class
 
 
 ' https://stackoverflow.com/questions/11015119/inverse-matrix-opencv-matrix-inv-not-working-properly
-Public Class Mat_Inverse
-    Inherits VBparent
+Public Class Mat_Inverse : Inherits VBparent
     Dim flow As Font_FlowText
     Public matrix(,) As Single = {{1.1688, 0.23, 62.2}, {-0.013, 1.225, -6.29}, {0, 0, 1}}
     Public validateInverse As Boolean
@@ -456,8 +444,7 @@ End Class
 
 
 
-Public Class Mat_4Click
-    Inherits VBparent
+Public Class Mat_4Click : Inherits VBparent
     Dim mats As Mat_4to1
     Public mat() As cv.Mat
     Public Sub New()
@@ -485,8 +472,7 @@ End Class
 
 
 
-Public Class Mat_2Click
-    Inherits VBparent
+Public Class Mat_2Click : Inherits VBparent
     Dim mats As Mat_2to1
     Public mat() As cv.Mat
     Public Sub New()
@@ -517,8 +503,7 @@ End Class
 
 
 ' https://github.com/takuya-takeuchi/DlibDotNet/tree/master/examples/3rdparty/OpenCVSharp/MatToArray2D
-Public Class Mat_2Dlib
-    Inherits VBparent
+Public Class Mat_2Dlib : Inherits VBparent
     Public dRGB As Array2D(Of BgrPixel)
     Public dGray As Array2D(Of Byte)
     Public Sub New()
@@ -550,8 +535,7 @@ End Class
 
 
 ' https://github.com/takuya-takeuchi/DlibDotNet/tree/master/examples/3rdparty/OpenCVSharp/MatToArray2D
-Public Class Mat_Dlib2Mat
-    Inherits VBparent
+Public Class Mat_Dlib2Mat : Inherits VBparent
     Public dGray As Array2D(Of Byte)
     Public dRGB As Array2D(Of BgrPixel)
     Public d32f As Array2D(Of Single)

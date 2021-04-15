@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class EMax_Basics
-    Inherits VBparent
+Public Class EMax_Basics : Inherits VBparent
     Public basics As EMax_VB_Failing
     Dim inputDataMask As cv.Mat
     Dim EMax_Basics As IntPtr
@@ -76,8 +75,7 @@ End Class
 
 
 
-Public Class EMax_CentroidsNew
-    Inherits VBparent
+Public Class EMax_CentroidsNew : Inherits VBparent
     Public emaxCPP As EMax_Basics
     Public Sub New()
 
@@ -110,8 +108,7 @@ End Class
 
 ' https://docs.opencv.org/3.0-beta/modules/ml/doc/expectation_maximization.html
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/em.cpp
-Public Class EMax_VB_Failing
-    Inherits VBparent
+Public Class EMax_VB_Failing : Inherits VBparent
     Public samples As cv.Mat
     Public labels As cv.Mat
     Public grid As Thread_Grid
@@ -229,8 +226,7 @@ End Module
 
 
 
-Public Class EMax_Centroids
-    Inherits VBparent
+Public Class EMax_Centroids : Inherits VBparent
     Public emaxCPP As EMax_Basics
     Public flood As FloodFill_Basics
     Public Sub New()
@@ -268,8 +264,7 @@ End Class
 
 
 
-Public Class EMax_PointTracker
-    Inherits VBparent
+Public Class EMax_PointTracker : Inherits VBparent
     Dim pTrack As KNN_PointTracker
     Dim emax As EMax_Centroids
     Public Sub New()

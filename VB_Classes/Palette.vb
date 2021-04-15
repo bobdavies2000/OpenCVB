@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
-Public Class Palette_Basics
-    Inherits VBparent
+Public Class Palette_Basics : Inherits VBparent
     Public whitebackground As Boolean
     Public gradientColorMap As New cv.Mat
     Public Sub New()
@@ -34,8 +33,7 @@ End Class
 
 
 
-Public Class Palette_Color
-    Inherits VBparent
+Public Class Palette_Color : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -63,8 +61,7 @@ End Class
 
 
 
-Public Class Palette_LinearPolar
-    Inherits VBparent
+Public Class Palette_LinearPolar : Inherits VBparent
     Public rotateOptions As GetRotationMatrix2D_Options
     Public Sub New()
         task.desc = "Use LinearPolar to create gradient image"
@@ -148,8 +145,7 @@ End Module
 
 
 
-Public Class Palette_Reduction
-    Inherits VBparent
+Public Class Palette_Reduction : Inherits VBparent
     Dim reduction As Reduction_Basics
     Public Sub New()
         reduction = New Reduction_Basics()
@@ -235,8 +231,7 @@ End Class
 
 
 
-Public Class Palette_DrawTest
-    Inherits VBparent
+Public Class Palette_DrawTest : Inherits VBparent
     Dim draw As Draw_Shapes
     Public Sub New()
         task.palette.whitebackground = True
@@ -256,8 +251,7 @@ End Class
 
 
 
-Public Class Palette_Gradient
-    Inherits VBparent
+Public Class Palette_Gradient : Inherits VBparent
     Public frameModulo As Integer = 30 ' every 30 frames try a different pair of random colors.
     Public color1 As cv.Scalar
     Public color2 As cv.Scalar
@@ -294,8 +288,7 @@ End Class
 
 
 
-Public Class Palette_RandomColorMap
-    Inherits VBparent
+Public Class Palette_RandomColorMap : Inherits VBparent
     Public gradientColorMap As New cv.Mat
     Public transitionCount As Integer = -1
     Public Sub New()
@@ -334,8 +327,7 @@ End Class
 
 
 
-Public Class Palette_DepthColorMap
-    Inherits VBparent
+Public Class Palette_DepthColorMap : Inherits VBparent
     Dim gradientColorMap As New cv.Mat
     Public Sub New()
 
@@ -379,8 +371,7 @@ End Class
 
 
 
-Public Class Palette_ObjectColors
-    Inherits VBparent
+Public Class Palette_ObjectColors : Inherits VBparent
     Dim reduction As Reduction_KNN_Color
     Public gray As cv.Mat
     Public Sub New()
@@ -440,8 +431,7 @@ End Class
 
 
 
-Public Class Palette_Layout2D
-    Inherits VBparent
+Public Class Palette_Layout2D : Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
         grid = New Thread_Grid
@@ -469,8 +459,7 @@ End Class
 
 
 
-Public Class Palette_LeftRightImages
-    Inherits VBparent
+Public Class Palette_LeftRightImages : Inherits VBparent
     Dim lrViews As LeftRightView_Basics
     Public Sub New()
         lrViews = New LeftRightView_Basics

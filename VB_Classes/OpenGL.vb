@@ -3,8 +3,7 @@ Imports System.Runtime.InteropServices
 Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
 
-Public Class OpenGL_Basics
-    Inherits VBparent
+Public Class OpenGL_Basics : Inherits VBparent
     Dim memMapWriter As MemoryMappedViewAccessor
     Dim pipeName As String ' this is name of pipe to the OpenGL task.  It is dynamic and increments.
     Dim pipe As NamedPipeServerStream
@@ -154,8 +153,7 @@ End Module
 
 
 
-Public Class OpenGL_Options
-    Inherits VBparent
+Public Class OpenGL_Options : Inherits VBparent
     Public OpenGL As OpenGL_Basics
     Public pointCloudInput As cv.Mat
     Public Sub New()
@@ -194,8 +192,7 @@ End Class
 
 
 
-Public Class OpenGL_Callbacks
-    Inherits VBparent
+Public Class OpenGL_Callbacks : Inherits VBparent
     Public ogl As OpenGL_Basics
     Public pointCloudInput As cv.Mat
     Public Sub New()
@@ -215,8 +212,7 @@ End Class
 
 
 'https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
-Public Class OpenGL_IMU
-    Inherits VBparent
+Public Class OpenGL_IMU : Inherits VBparent
     Public ogl As OpenGL_Options
     Public imu As IMU_GVector
 
@@ -248,8 +244,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d1/d1d/tutorial_histo3D.html
-Public Class OpenGL_3Ddata
-    Inherits VBparent
+Public Class OpenGL_3Ddata : Inherits VBparent
     Dim colors As Palette_Gradient
     Public ogl As OpenGL_Options
     Dim histInput() As Byte
@@ -297,8 +292,7 @@ End Class
 
 
 
-Public Class OpenGL_Draw3D
-    Inherits VBparent
+Public Class OpenGL_Draw3D : Inherits VBparent
     Dim circle As Draw_Circles
     Public ogl As OpenGL_Options
     Public Sub New()
@@ -330,8 +324,7 @@ End Class
 
 
 
-Public Class OpenGL_Voxels
-    Inherits VBparent
+Public Class OpenGL_Voxels : Inherits VBparent
     Public voxels As Voxels_Basics_MT
     Public ogl As OpenGL_Basics
     Public Sub New()
@@ -362,8 +355,7 @@ End Class
 
 ' https://open.gl/transformations
 ' https://www.codeproject.com/Articles/1247960/Learning-Basic-Math-Used-In-3D-Graphics-Engines
-Public Class OpenGL_GravityTransform
-    Inherits VBparent
+Public Class OpenGL_GravityTransform : Inherits VBparent
     Public ogl As OpenGL_Basics
     Public gCloud As Depth_PointCloud_IMU
     Public Sub New()
@@ -394,8 +386,7 @@ End Class
 
 
 
-Public Class OpenGL_Floor
-    Inherits VBparent
+Public Class OpenGL_Floor : Inherits VBparent
     Dim plane As Structured_LinearizeFloor
     Dim ogl As OpenGL_Basics
     Public Sub New()
@@ -428,8 +419,7 @@ End Class
 
 
 
-Public Class OpenGL_FloorPlane
-    Inherits VBparent
+Public Class OpenGL_FloorPlane : Inherits VBparent
     Public ogl As OpenGL_Basics
     Public plane As Structured_LinearizeFloor
     Public Sub New()
@@ -470,8 +460,7 @@ End Class
 
 
 
-'Public Class OpenGL_FloorTexture
-'    Inherits VBparent
+'Public Class OpenGL_FloorTexture : Inherits VBparent
 '    Dim floor As OpenGL_FloorPlane
 '    Dim shuffle As Texture_Shuffle
 '    Public Sub New()
@@ -513,8 +502,7 @@ End Class
 
 
 
-Public Class OpenGL_DepthSliceH
-    Inherits VBparent
+Public Class OpenGL_DepthSliceH : Inherits VBparent
     Public ogl As OpenGL_Basics
     Dim slices As Structured_MultiSliceH
     Public Sub New()
@@ -545,8 +533,7 @@ End Class
 
 
 
-Public Class OpenGL_StableDepth
-    Inherits VBparent
+Public Class OpenGL_StableDepth : Inherits VBparent
     Dim pcValid As Motion_MinMaxPointCloud
     Public ogl As OpenGL_Options
     Public Sub New()
@@ -572,8 +559,7 @@ End Class
 
 
 
-Public Class OpenGL_AverageDepth
-    Inherits VBparent
+Public Class OpenGL_AverageDepth : Inherits VBparent
     Dim stable As Depth_AveragingStable
     Public ogl As OpenGL_Callbacks
     Public Sub New()
@@ -608,8 +594,7 @@ End Class
 
 
 
-Public Class OpenGL_StableDepthMouse
-    Inherits VBparent
+Public Class OpenGL_StableDepthMouse : Inherits VBparent
     Dim pcValid As Motion_MinMaxPointCloud
     Public ogl As OpenGL_Callbacks
     Public Sub New()
@@ -638,8 +623,7 @@ End Class
 
 
 
-Public Class OpenGL_SmoothSurfaces
-    Inherits VBparent
+Public Class OpenGL_SmoothSurfaces : Inherits VBparent
     Dim smooth As Depth_SmoothSurfaces
     Public ogl As OpenGL_Callbacks
     Public Sub New()
@@ -667,8 +651,7 @@ End Class
 
 
 
-Public Class OpenGL_Stable
-    Inherits VBparent
+Public Class OpenGL_Stable : Inherits VBparent
     Dim stable As Motion_MinMaxPointCloud
     Dim ogl As OpenGL_Callbacks
     Public Sub New()
@@ -694,8 +677,7 @@ End Class
 
 
 
-Public Class OpenGL_ReducedXYZ
-    Inherits VBparent
+Public Class OpenGL_ReducedXYZ : Inherits VBparent
     Dim reduction As Reduction_XYZ
     Public ogl As OpenGL_Basics
     Public Sub New()
@@ -720,8 +702,7 @@ End Class
 
 
 
-Public Class OpenGL_Reduction
-    Inherits VBparent
+Public Class OpenGL_Reduction : Inherits VBparent
     Dim reduction As Reduction_PointCloud
     Public ogl As OpenGL_Basics
     Public Sub New()
@@ -748,8 +729,7 @@ End Class
 
 
 
-Public Class OpenGL_ReducedSideView
-    Inherits VBparent
+Public Class OpenGL_ReducedSideView : Inherits VBparent
     Dim reduced As PointCloud_ReducedSideView
     Dim ogl As OpenGL_Callbacks
     Public Sub New()
@@ -776,8 +756,7 @@ End Class
 
 
 
-Public Class OpenGL_MFD_PointCloud
-    Inherits VBparent
+Public Class OpenGL_MFD_PointCloud : Inherits VBparent
     Dim mfd As MFD_PointCloud
     Dim ogl As OpenGL_Callbacks
     Public Sub New()
@@ -805,8 +784,7 @@ End Class
 
 
 
-Public Class OpenGL_Structured_PointCloud
-    Inherits VBparent
+Public Class OpenGL_Structured_PointCloud : Inherits VBparent
     Dim sCloud As Structured_Cloud
     Dim ogl As OpenGL_Callbacks
     Public Sub New()

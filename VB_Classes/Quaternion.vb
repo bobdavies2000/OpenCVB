@@ -12,8 +12,7 @@ Module Quaternion_module
     End Function
 End Module
 
-Public Class Quaterion_Basics
-    Inherits VBparent
+Public Class Quaterion_Basics : Inherits VBparent
     Public Sub New()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -47,8 +46,7 @@ End Class
 
 
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/pose-predict
-Public Class Quaterion_IMUPrediction
-    Inherits VBparent
+Public Class Quaterion_IMUPrediction : Inherits VBparent
     Dim host As IMU_HostFrameTimes
     Public Sub New()
         host = New IMU_HostFrameTimes()

@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 Imports CS_Classes
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
-Public Class Sift_Basics
-    Inherits VBparent
+Public Class Sift_Basics : Inherits VBparent
     Dim siftCS As New CS_SiftBasics
     Dim lrView As LeftRightView_BrightnessContrast
     Public Sub New()
@@ -41,8 +40,7 @@ End Class
 
 
 
-Public Class Sift_Basics_MT
-    Inherits VBparent
+Public Class Sift_Basics_MT : Inherits VBparent
     Dim grid As Thread_Grid
     Dim siftCS As New CS_SiftBasics
     Dim siftBasics As Sift_Basics

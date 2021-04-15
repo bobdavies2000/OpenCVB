@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Polylines_IEnumerableExample
-    Inherits VBparent
+Public Class Polylines_IEnumerableExample : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
@@ -36,8 +35,7 @@ End Class
 
 ' VB.Net implementation of the browse example in OpenCV.
 ' https://github.com/opencv/opencv/blob/master/samples/python/browse.py
-Public Class Polylines_Random
-    Inherits VBparent
+Public Class Polylines_Random : Inherits VBparent
     Dim zoomFactor = 4
     Public Sub New()
         label1 = CStr(zoomFactor) + "X zoom around mouse movement on image"

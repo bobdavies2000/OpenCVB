@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
-Public Class Laplacian_Basics
-    Inherits VBparent
+Public Class Laplacian_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -31,8 +30,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.2.0/de/db2/laplace_8cpp-example.html
-Public Class Laplacian_Blur
-    Inherits VBparent
+Public Class Laplacian_Blur : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -81,8 +79,7 @@ End Class
 
 
 ' http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.54.299
-Public Class Laplacian_PyramidFilter
-    Inherits VBparent
+Public Class Laplacian_PyramidFilter : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 6)

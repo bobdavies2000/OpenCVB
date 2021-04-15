@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://github.com/davemk99/Cartoonify-Image/blob/master/main.cpp
-Public Class CartoonifyImage_Basics
-    Inherits VBparent
+Public Class CartoonifyImage_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

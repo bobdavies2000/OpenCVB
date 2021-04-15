@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Covariance_Basics
-    Inherits VBparent
+Public Class Covariance_Basics : Inherits VBparent
     Dim random As Random_Basics
     Public samples As cv.Mat
     Public Sub New()
@@ -43,8 +42,7 @@ End Class
 
 
 ' http://answers.opencv.org/question/31228/how-to-use-function-calccovarmatrix/
-Public Class Covariance_Test
-    Inherits VBparent
+Public Class Covariance_Test : Inherits VBparent
     Dim covar As Covariance_Basics
     Public Sub New()
 

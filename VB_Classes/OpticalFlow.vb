@@ -61,8 +61,7 @@ End Module
 
 
 ' https://www.learnopencv.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
-Public Class OpticalFlow_DenseOptions
-    Inherits VBparent
+Public Class OpticalFlow_DenseOptions : Inherits VBparent
 
     Public pyrScale As Single
     Public levels As Integer
@@ -122,8 +121,7 @@ End Class
 
 
 'https://www.learnopencv.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
-Public Class OpticalFlow_DenseBasics
-    Inherits VBparent
+Public Class OpticalFlow_DenseBasics : Inherits VBparent
     Dim optFlow As OpticalFlow_DenseOptions
     Public Sub New()
         optFlow = New OpticalFlow_DenseOptions()
@@ -151,8 +149,7 @@ End Class
 
 
 
-Public Class OpticalFlow_DenseBasics_MT
-    Inherits VBparent
+Public Class OpticalFlow_DenseBasics_MT : Inherits VBparent
 
     Public grid As Thread_Grid
     Dim accum As New cv.Mat
@@ -219,8 +216,7 @@ End Class
 
 
 ' https://www.learnopencv.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
-Public Class OpticalFlow_Sparse
-    Inherits VBparent
+Public Class OpticalFlow_Sparse : Inherits VBparent
 
     Public features As New List(Of cv.Point2f)
 

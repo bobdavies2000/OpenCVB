@@ -20,8 +20,7 @@ End Module
 
 
 
-Public Class SuperPixel_Basics_CPP
-    Inherits VBparent
+Public Class SuperPixel_Basics_CPP : Inherits VBparent
     Dim spPtr As IntPtr = 0
     Public wireGrid As cv.Mat
     Public gridColor = cv.Scalar.White
@@ -80,8 +79,7 @@ End Class
 
 
 
-Public Class SuperPixel_BinarizedImage
-    Inherits VBparent
+Public Class SuperPixel_BinarizedImage : Inherits VBparent
     Dim pixels As SuperPixel_Basics_CPP
     Dim binarize As Binarize_Basics
     Public Sub New()
@@ -111,8 +109,7 @@ End Class
 
 
 
-Public Class SuperPixel_Depth
-    Inherits VBparent
+Public Class SuperPixel_Depth : Inherits VBparent
     Dim pixels As SuperPixel_Basics_CPP
     Public Sub New()
         pixels = New SuperPixel_Basics_CPP()
@@ -132,8 +129,7 @@ End Class
 
 
 
-Public Class SuperPixel_WithCanny
-    Inherits VBparent
+Public Class SuperPixel_WithCanny : Inherits VBparent
     Dim pixels As SuperPixel_Basics_CPP
     Dim edges As Edges_Basics
     Public Sub New()
@@ -161,8 +157,7 @@ End Class
 
 
 
-Public Class SuperPixel_WithLineDetector
-    Inherits VBparent
+Public Class SuperPixel_WithLineDetector : Inherits VBparent
     Dim pixels As SuperPixel_Basics_CPP
     Dim lines As Line_Basics
     Public Sub New()

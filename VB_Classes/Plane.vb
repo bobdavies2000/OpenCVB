@@ -92,8 +92,7 @@ End Module
 
 
 
-Public Class Plane_Detect
-    Inherits VBparent
+Public Class Plane_Detect : Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
         grid = New Thread_Grid
@@ -164,8 +163,7 @@ End Class
 
 
 
-Public Class Plane_DetectDebug
-    Inherits VBparent
+Public Class Plane_DetectDebug : Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
         grid = New Thread_Grid

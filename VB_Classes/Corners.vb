@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
-Public Class Corners_Harris
-    Inherits VBparent
+Public Class Corners_Harris : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -58,8 +57,7 @@ End Class
 
 
 
-Public Class Corners_SubPix
-    Inherits VBparent
+Public Class Corners_SubPix : Inherits VBparent
     Public good As Features_GoodFeatures
     Public Sub New()
         good = New Features_GoodFeatures()
@@ -91,8 +89,7 @@ End Class
 
 
 
-Public Class Corners_PreCornerDetect
-    Inherits VBparent
+Public Class Corners_PreCornerDetect : Inherits VBparent
     Dim median As Math_Median_CDF
     Public Sub New()
         median = New Math_Median_CDF()
@@ -130,8 +127,7 @@ End Module
 
 
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
-Public Class Corners_ShiTomasi_CPP
-    Inherits VBparent
+Public Class Corners_ShiTomasi_CPP : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

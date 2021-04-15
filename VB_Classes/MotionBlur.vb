@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class MotionBlur_Basics
-    Inherits VBparent
+Public Class MotionBlur_Basics : Inherits VBparent
     Public kernel As cv.Mat
     Public showDirection As Boolean = True
     Public Sub New()
@@ -37,8 +36,7 @@ End Class
 
 
 ' https://docs.opencv.org/trunk/d1/dfd/tutorial_motion_deblur_filter.html
-Public Class MotionBlur_Deblur
-    Inherits VBparent
+Public Class MotionBlur_Deblur : Inherits VBparent
     Dim mblur As MotionBlur_Basics
     Private Function calcPSF(filterSize As cv.Size, len As integer, theta As Double) As cv.Mat
         Dim h As New cv.Mat(filterSize, cv.MatType.CV_32F, 0)

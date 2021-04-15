@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
-Public Class Filter_Laplacian
-    Inherits VBparent
+Public Class Filter_Laplacian : Inherits VBparent
     Public Sub New()
         task.desc = "Use a filter to approximate the Laplacian derivative."
 		' task.rank = 1
@@ -21,8 +20,7 @@ Public Class Filter_Laplacian
 End Class
 
 
-Public Class Filter_NormalizedKernel
-    Inherits VBparent
+Public Class Filter_NormalizedKernel : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 4)
@@ -65,8 +63,7 @@ End Class
 
 
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/filter_2d/filter_2d.html
-Public Class Filter_Normalized2D
-    Inherits VBparent
+Public Class Filter_Normalized2D : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -87,8 +84,7 @@ End Class
 
 
 'https://www.cc.gatech.edu/classes/AY2015/cs4475_summer/documents/smoothing_separable.py
-Public Class Filter_SepFilter2D
-    Inherits VBparent
+Public Class Filter_SepFilter2D : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)

@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' http://answers.opencv.org/question/175486/meanshift-sample-code-in-c/
-Public Class MeanShift_Basics
-    Inherits VBparent
+Public Class MeanShift_Basics : Inherits VBparent
     Public rectangleEdgeWidth As integer = 2
     Public inputRect As cv.Rect
     Public trackbox As New cv.Rect
@@ -45,8 +44,7 @@ End Class
 
 
 
-Public Class MeanShift_Depth
-    Inherits VBparent
+Public Class MeanShift_Depth : Inherits VBparent
     Dim ms As MeanShift_Basics
     Dim blob As Depth_ForegroundHead
     Public Sub New()
@@ -84,8 +82,7 @@ End Class
 
 
 'http://study.marearts.com/2014/12/opencv-meanshiftfiltering-example.html
-Public Class MeanShift_PyrFilter
-    Inherits VBparent
+Public Class MeanShift_PyrFilter : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -109,8 +106,7 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
-Public Class Meanshift_TopObjects
-    Inherits VBparent
+Public Class Meanshift_TopObjects : Inherits VBparent
     Dim blob As Blob_DepthClusters
     Dim cams(4 - 1) As MeanShift_Basics
     Dim mats1 As Mat_4to1

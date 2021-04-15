@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 Imports mnum = MathNet.Numerics
 Imports System.Runtime.InteropServices
 ' https://www.codeproject.com/Tips/5296095/Perform-a-2D-Fourier-Transform-with-the-Package-ma?msg=5791718#xx5791718xx
-Public Class Fourier_MathNet
-    Inherits VBparent
+Public Class Fourier_MathNet : Inherits VBparent
     Public Sub New()
         task.desc = "Use the 1D Fourier support in MathNet to do a 2D Fourier transform"
 		' task.rank = 1

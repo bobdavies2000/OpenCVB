@@ -80,8 +80,7 @@ End Module
 
 
 
-Public Class Delaunay_Basics
-    Inherits VBparent
+Public Class Delaunay_Basics : Inherits VBparent
     Public Sub New()
         task.desc = "Use Delaunay to subdivide an image into triangles."
 		' task.rank = 1
@@ -106,8 +105,7 @@ End Class
 
 
 
-Public Class Delaunay_GoodFeatures
-    Inherits VBparent
+Public Class Delaunay_GoodFeatures : Inherits VBparent
     Dim features As Features_GoodFeatures
     Public Sub New()
         features = New Features_GoodFeatures()
@@ -143,8 +141,7 @@ End Class
 
 
 ' https://github.com/shimat/opencvsharp/wiki/Subdiv2D
-Public Class Delauney_Subdiv2D
-    Inherits VBparent
+Public Class Delauney_Subdiv2D : Inherits VBparent
     Public updateFrequency As Integer = 30
     Public Sub New()
         label2 = "Voronoi facets for the same subdiv2D"
@@ -196,8 +193,7 @@ End Class
 
 
 
-Public Class Delauney_Coverage
-    Inherits VBparent
+Public Class Delauney_Coverage : Inherits VBparent
     Dim delauney As Delauney_Subdiv2D
     Public Sub New()
         delauney = New Delauney_Subdiv2D()

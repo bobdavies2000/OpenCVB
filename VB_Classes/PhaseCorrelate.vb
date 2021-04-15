@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/phase_corr.cpp
 ' https://docs.opencv.org/master/d7/df3/group__imgproc__motion.html
-Public Class PhaseCorrelate_Basics
-    Inherits VBparent
+Public Class PhaseCorrelate_Basics : Inherits VBparent
     Dim hanning As New cv.Mat
     Public stableRect As cv.Rect
     Public srcRect As cv.Rect
@@ -78,8 +77,7 @@ End Class
 
 
 
-Public Class PhaseCorrelate_BasicsTest
-    Inherits VBparent
+Public Class PhaseCorrelate_BasicsTest : Inherits VBparent
     Dim random As Stabilizer_BasicsRandomInput
     Dim stable As PhaseCorrelate_Basics
     Public Sub New()
@@ -111,8 +109,7 @@ End Class
 
 
 
-Public Class PhaseCorrelate_Depth
-    Inherits VBparent
+Public Class PhaseCorrelate_Depth : Inherits VBparent
     Dim phaseC As PhaseCorrelate_Basics
     Public Sub New()
         phaseC = New PhaseCorrelate_Basics
@@ -146,8 +143,7 @@ End Class
 
 
 ' https://docs.opencv.org/master/d7/df3/group__imgproc__motion.html
-Public Class PhaseCorrelate_HanningWindow
-    Inherits VBparent
+Public Class PhaseCorrelate_HanningWindow : Inherits VBparent
     Public Sub New()
         label1 = "Looking down on a bell curve in 2 dimensions"
         task.desc = "Show what a Hanning window looks like"

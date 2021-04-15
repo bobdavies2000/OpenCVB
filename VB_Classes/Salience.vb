@@ -16,8 +16,7 @@ End Module
 
 
 
-Public Class Salience_Basics_CPP
-    Inherits VBparent
+Public Class Salience_Basics_CPP : Inherits VBparent
     Dim grayData(0) As Byte
     Dim numScales As integer
     Dim salience As IntPtr
@@ -48,8 +47,7 @@ End Class
 
 
 
-Public Class Salience_Basics_MT
-    Inherits VBparent
+Public Class Salience_Basics_MT : Inherits VBparent
     Dim salience As Salience_Basics_CPP
     Public Sub New()
         salience = New Salience_Basics_CPP()

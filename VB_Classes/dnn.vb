@@ -4,8 +4,7 @@ Imports System.Net
 Imports System.Linq
 Imports System.IO
 
-Public Class DNN_Test
-    Inherits VBparent
+Public Class DNN_Test : Inherits VBparent
     Dim net As Net
     Dim classnames() As String
     Public Sub New()
@@ -49,8 +48,7 @@ End Class
 
 
 
-Public Class DNN_Caffe_CS
-    Inherits VBparent
+Public Class DNN_Caffe_CS : Inherits VBparent
     Dim caffeCS As New CS_Classes.DNN
     Public Sub New()
         label2 = "Input Image"
@@ -75,8 +73,7 @@ End Class
 
 
 ' https://github.com/twMr7/rscvdnn
-Public Class DNN_Basics
-    Inherits VBparent
+Public Class DNN_Basics : Inherits VBparent
     Dim net As Net
     Dim dnnPrepared As Boolean
     Dim crop As cv.Rect

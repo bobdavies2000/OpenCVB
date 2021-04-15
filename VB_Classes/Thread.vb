@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Collections.Concurrent
 
-Public Class Thread_Grid
-    Inherits VBparent
+Public Class Thread_Grid : Inherits VBparent
     Public roiList As List(Of cv.Rect)
     Public borderList As List(Of cv.Rect)
     Public gridMask As cv.Mat
@@ -115,8 +114,7 @@ End Class
 
 
 
-Public Class Thread_GridTest
-    Inherits VBparent
+Public Class Thread_GridTest : Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
         grid = New Thread_Grid

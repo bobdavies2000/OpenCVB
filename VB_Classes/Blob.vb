@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://stackoverflow.com/questions/14770756/opencv-simpleblobdetector-filterbyinertia-meaning
-Public Class Blob_Basics
-    Inherits VBparent
+Public Class Blob_Basics : Inherits VBparent
     Dim options As Blob_Options
     Dim input As Blob_Input
     Dim blobDetector As New CS_Classes.Blob_Basics
@@ -34,8 +33,7 @@ End Class
 
 
 
-Public Class Blob_Options
-    Inherits VBparent
+Public Class Blob_Options : Inherits VBparent
     Dim blob As Blob_Input
     Dim blobDetector As New CS_Classes.Blob_Basics
     Public blobParams = New cv.SimpleBlobDetector.Params
@@ -99,8 +97,7 @@ End Class
 
 
 
-Public Class Blob_Input
-    Inherits VBparent
+Public Class Blob_Input : Inherits VBparent
     Dim rectangles As Rectangle_Rotated
     Dim circles As Draw_Circles
     Dim ellipses As Draw_Ellipses
@@ -149,8 +146,7 @@ End Class
 
 
 
-Public Class Blob_RenderBlobs
-    Inherits VBparent
+Public Class Blob_RenderBlobs : Inherits VBparent
     Dim input As Blob_Input
     Public Sub New()
         input = New Blob_Input()
@@ -193,8 +189,7 @@ End Class
 
 
 
-Public Class Blob_DepthClusters
-    Inherits VBparent
+Public Class Blob_DepthClusters : Inherits VBparent
     Public histBlobs As Histogram_DepthValleys
     Public flood As FloodFill_Basics
     Public Sub New()
@@ -220,8 +215,7 @@ End Class
 
 
 
-Public Class Blob_DepthPixelSampler
-    Inherits VBparent
+Public Class Blob_DepthPixelSampler : Inherits VBparent
     Public histBlobs As Histogram_DepthClusters
     Public flood As FloodFill_Basics
     Dim pixel As Pixel_Sampler
@@ -268,8 +262,7 @@ End Class
 
 
 
-Public Class Blob_DepthRanges
-    Inherits VBparent
+Public Class Blob_DepthRanges : Inherits VBparent
     Public histBlobs As Histogram_DepthClusters
     Public grayOnly As Boolean
     Public masks As New List(Of cv.Mat)
@@ -324,8 +317,7 @@ End Class
 
 
 
-Public Class Blob_Largest
-    Inherits VBparent
+Public Class Blob_Largest : Inherits VBparent
     Public blobs As Blob_DepthRanges
     Public Sub New()
         blobs = New Blob_DepthRanges()

@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
 'https://docs.opencv.org/3.1.0/da/d22/tutorial_py_canny.html
-Public Class Edges_Basics
-    Inherits VBparent
+Public Class Edges_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -35,8 +34,7 @@ End Class
 
 
 
-Public Class Edges_DepthAndColor
-    Inherits VBparent
+Public Class Edges_DepthAndColor : Inherits VBparent
     Dim shadow As Depth_Holes
     Dim canny As Edges_Basics
     Dim dilate As DilateErode_Basics
@@ -75,8 +73,7 @@ End Class
 
 
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
-Public Class Edges_Laplacian
-    Inherits VBparent
+Public Class Edges_Laplacian : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -104,8 +101,7 @@ End Class
 
 
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edges_Scharr
-    Inherits VBparent
+Public Class Edges_Scharr : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -130,8 +126,7 @@ End Class
 
 
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
-Public Class Edges_Preserving
-    Inherits VBparent
+Public Class Edges_Preserving : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 2)
@@ -199,8 +194,7 @@ End Module
 
 
 '  https://docs.opencv.org/3.1.0/d0/da5/tutorial_ximgproc_prediction.html
-Public Class Edges_RandomForest_CPP
-    Inherits VBparent
+Public Class Edges_RandomForest_CPP : Inherits VBparent
     Dim rgbData() As Byte
     Dim EdgesPtr As IntPtr
     Public Sub New()
@@ -241,8 +235,7 @@ End Class
 
 
 
-Public Class Edges_ResizeAdd
-    Inherits VBparent
+Public Class Edges_ResizeAdd : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -272,8 +265,7 @@ End Class
 
 
 
-Public Class Edges_DCTfrequency
-    Inherits VBparent
+Public Class Edges_DCTfrequency : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -309,8 +301,7 @@ End Class
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/ximgproc/samples/dericheSample.py
-Public Class Edges_Deriche_CPP
-    Inherits VBparent
+Public Class Edges_Deriche_CPP : Inherits VBparent
     Dim Edges_Deriche As IntPtr
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -352,8 +343,7 @@ End Class
 
 
 
-Public Class Edges_DCTinput
-    Inherits VBparent
+Public Class Edges_DCTinput : Inherits VBparent
     Dim edges As Edges_Basics
     Dim dct As DCT_FeatureLess
     Public Sub New()
@@ -383,8 +373,7 @@ End Class
 
 
 
-Public Class Edges_BinarizedCanny
-    Inherits VBparent
+Public Class Edges_BinarizedCanny : Inherits VBparent
     Dim edges As Edges_Basics
     Dim binarize As Binarize_Recurse
     Dim mats As Mat_4Click
@@ -430,8 +419,7 @@ End Class
 
 
 
-Public Class Edges_BinarizedBrightness
-    Inherits VBparent
+Public Class Edges_BinarizedBrightness : Inherits VBparent
     Dim edges As Edges_BinarizedSobel
     Dim bright As PhotoShop_Brightness
     Public Sub New()
@@ -458,8 +446,7 @@ End Class
 
 
 
-Public Class Edges_BinarizedReduction
-    Inherits VBparent
+Public Class Edges_BinarizedReduction : Inherits VBparent
     Dim edges As Edges_BinarizedSobel
     Dim reduction As Reduction_Basics
     Public Sub New()
@@ -487,8 +474,7 @@ End Class
 
 
 
-Public Class Edges_Depth
-    Inherits VBparent
+Public Class Edges_Depth : Inherits VBparent
     Dim dMax As Depth_SmoothMax
     Dim sobel As Edges_Sobel
     Public Sub New()
@@ -516,8 +502,7 @@ End Class
 
 
 
-Public Class Edges_FeaturesOnly
-    Inherits VBparent
+Public Class Edges_FeaturesOnly : Inherits VBparent
     Dim edges As Edges_BinarizedSobel
     Dim featLess As Featureless_Basics
     Public Sub New()
@@ -548,8 +533,7 @@ End Class
 
 
 
-Public Class Edges_Consistent
-    Inherits VBparent
+Public Class Edges_Consistent : Inherits VBparent
     Dim edges As Edges_FeaturesOnly
     Public Sub New()
         edges = New Edges_FeaturesOnly
@@ -593,8 +577,7 @@ End Class
 
 
 
-Public Class Edges_Stdev
-    Inherits VBparent
+Public Class Edges_Stdev : Inherits VBparent
     Dim stdev As Math_Stdev
     Dim edges As Edges_BinarizedSobel
     Public Sub New()
@@ -624,8 +607,7 @@ End Class
 
 
 
-Public Class Edges_BlackSquare
-    Inherits VBparent
+Public Class Edges_BlackSquare : Inherits VBparent
     Dim std As Math_Stdev
     Dim edges As Edges_BinarizedSobel
     Dim addW As AddWeighted_Basics
@@ -656,8 +638,7 @@ End Class
 
 
 
-Public Class Edges_Combo
-    Inherits VBparent
+Public Class Edges_Combo : Inherits VBparent
     Dim edges1 As Edges_BinarizedCanny
     Dim edges2 As Edges_BinarizedSobel
     Public Sub New()
@@ -685,8 +666,7 @@ End Class
 
 
 
-Public Class Edges_SobelLR
-    Inherits VBparent
+Public Class Edges_SobelLR : Inherits VBparent
     Dim red As LeftRightView_Basics
     Dim sobel As Edges_Sobel
     Public Sub New()
@@ -716,8 +696,7 @@ End Class
 
 
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edges_Sobel
-    Inherits VBparent
+Public Class Edges_Sobel : Inherits VBparent
     Public grayX As cv.Mat
     Public grayY As cv.Mat
     Public horizontalOnly As Boolean
@@ -774,8 +753,7 @@ End Class
 
 
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edges_SobelHorizontal
-    Inherits VBparent
+Public Class Edges_SobelHorizontal : Inherits VBparent
     Dim edges As Edges_Sobel
     Public Sub New()
         edges = New Edges_Sobel
@@ -798,8 +776,7 @@ End Class
 
 
 
-Public Class Edges_SobelLRBinarized
-    Inherits VBparent
+Public Class Edges_SobelLRBinarized : Inherits VBparent
     Dim red As LeftRightView_Basics
     Dim edges As Edges_BinarizedSobel
     Dim addw As AddWeighted_Basics
@@ -849,8 +826,7 @@ End Class
 
 
 
-Public Class Edges_BinarizedSobel
-    Inherits VBparent
+Public Class Edges_BinarizedSobel : Inherits VBparent
     Dim edges As Edges_Sobel
     Dim binarize As Binarize_Recurse
     Public mats As Mat_4Click
@@ -906,8 +882,7 @@ End Class
 
 
 
-Public Class Edges_Matching
-    Inherits VBparent
+Public Class Edges_Matching : Inherits VBparent
     Dim match As MatchTemplate_Basics
     Dim red As LeftRightView_Basics
     Dim grid As Thread_Grid
@@ -1024,8 +999,7 @@ End Class
 
 
 
-Public Class Edges_MotionOverlay
-    Inherits VBparent
+Public Class Edges_MotionOverlay : Inherits VBparent
     Dim diff As Diff_Basics
     Public Sub New()
 
@@ -1069,8 +1043,7 @@ End Class
 
 
 ' https://scikit-image.org/docs/dev/auto_examples/color_exposure/plot_adapt_rgb.html#sphx-glr-auto-examples-color-exposure-plot-adapt-rgb-py
-Public Class Edges_RGB
-    Inherits VBparent
+Public Class Edges_RGB : Inherits VBparent
     Dim sobel As Edges_Sobel
     Public Sub New()
         sobel = New Edges_Sobel
@@ -1104,8 +1077,7 @@ End Class
 
 
 ' https://scikit-image.org/docs/dev/auto_examples/color_exposure/plot_adapt_rgb.html#sphx-glr-auto-examples-color-exposure-plot-adapt-rgb-py
-Public Class Edges_HSV
-    Inherits VBparent
+Public Class Edges_HSV : Inherits VBparent
     Dim edges As Edges_RGB
     Public Sub New()
         edges = New Edges_RGB

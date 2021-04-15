@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Pixel_Viewer
-    Inherits VBparent
+Public Class Pixel_Viewer : Inherits VBparent
     Dim firstUpdate = True
     Public viewerForm As New PixelViewerForm
     Public Sub New()
@@ -161,8 +160,7 @@ End Class
 
 
 ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/PixelAccess.cs
-Public Class Pixel_GetSet
-    Inherits VBparent
+Public Class Pixel_GetSet : Inherits VBparent
     Dim mats As Mat_4to1
     Public Sub New()
         mats = New Mat_4to1()
@@ -228,8 +226,7 @@ End Class
 
 
 
-Public Class Pixel_Measure
-    Inherits VBparent
+Public Class Pixel_Measure : Inherits VBparent
     Public Sub New()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -263,8 +260,7 @@ End Class
 
 
 
-Public Class Pixel_Sampler
-    Inherits VBparent
+Public Class Pixel_Sampler : Inherits VBparent
     Public random As Random_Basics
     Public dominantGray As Byte
     Dim width = 100

@@ -106,10 +106,7 @@ Module IndexMain
                 If LCase(line).StartsWith("public class") Then
                     Dim split As String() = Regex.Split(line, "\W+")
                     ' next line must be "Inherits VBparent"
-                    Dim line2 = Trim(nextFile.ReadLine())
-                    If line2 = "Inherits VBparent" Then
-                        classname = split(2) ' public class <classname>
-                    End If
+                    If line.EndsWith(" : Inherits VBparent") Then classname = split(2) ' public class <classname>
                     If classname.StartsWith("Python_") Then PYnames.Add(classname, classname)
                     If classname.EndsWith("_PS.py") Then PYStreamNames.Add(classname, classname)
                     If classname.EndsWith("_MT") Then MTnames.Add(classname, classname)

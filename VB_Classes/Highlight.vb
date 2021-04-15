@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Highlight_Basics
-    Inherits VBparent
+Public Class Highlight_Basics : Inherits VBparent
     Dim reduction As Reduction_KNN_Color
     Public highlightPoint As New cv.Point
     Dim highlightRect As New cv.Rect

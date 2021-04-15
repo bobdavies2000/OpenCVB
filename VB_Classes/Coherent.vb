@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class Coherent_Basics
-    Inherits VBparent
+Public Class Coherent_Basics : Inherits VBparent
     Dim flood As Coherent_FloodFill
     Dim pixel As Pixel_Sampler
     Public Sub New()
@@ -47,8 +46,7 @@ End Class
 
 
 
-Public Class Coherent_FloodFill
-    Inherits VBparent
+Public Class Coherent_FloodFill : Inherits VBparent
     Public basics As FloodFill_Basics
     Dim knn As KNN_1_to_1
     Public lastPoints As New List(Of cv.Point2f)
@@ -143,8 +141,7 @@ End Class
 
 
 
-Public Class Coherent_Palette
-    Inherits VBparent
+Public Class Coherent_Palette : Inherits VBparent
     Public flood As Coherent_Pixel
     Public Sub New()
         flood = New Coherent_Pixel
@@ -167,8 +164,7 @@ End Class
 
 
 
-Public Class Coherent_Pixel
-    Inherits VBparent
+Public Class Coherent_Pixel : Inherits VBparent
     Public flood As FloodFill_Basics
     Dim pixel As Pixel_Sampler
     Public Sub New()

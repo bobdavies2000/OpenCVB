@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.3.1/de/dd0/grabcut_8cpp-example.html
-Public Class GrabCut_Basics
-    Inherits VBparent
+Public Class GrabCut_Basics : Inherits VBparent
     Dim fgnd As Depth_Foreground
     Public fgFineTune As cv.Mat
     Public bgFineTune As cv.Mat
@@ -44,8 +43,7 @@ End Class
 
 
 
-Public Class GrabCut_FineTune
-    Inherits VBparent
+Public Class GrabCut_FineTune : Inherits VBparent
     Dim basics As GrabCut_Basics
     Dim mats As Mat_4to1
     Public Sub New()
