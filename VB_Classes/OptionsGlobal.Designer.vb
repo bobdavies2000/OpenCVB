@@ -147,7 +147,7 @@ Partial Class OptionsGlobal
         Me.HistogramSettings.Controls.Add(Me.HistBins)
         Me.HistogramSettings.Location = New System.Drawing.Point(12, 243)
         Me.HistogramSettings.Name = "HistogramSettings"
-        Me.HistogramSettings.Size = New System.Drawing.Size(829, 285)
+        Me.HistogramSettings.Size = New System.Drawing.Size(829, 266)
         Me.HistogramSettings.TabIndex = 1
         Me.HistogramSettings.TabStop = False
         Me.HistogramSettings.Text = "Histogram Options"

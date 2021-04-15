@@ -8,14 +8,7 @@ Public Class Histogram_Basics : Inherits VBparent
     Public Sub New()
         plotHist = New Plot_Histogram()
         plotHist.minRange = 0
-
         kalman = New Kalman_Basics()
-
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
-            check.Box(0).Text = "Remove the zero histogram value"
-            check.Box(0).Checked = False
-        End If
 
         label2 = "Histogram - x=bins/y=count"
         task.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
@@ -41,9 +34,6 @@ Public Class Histogram_Basics : Inherits VBparent
 
         Dim dimensions() = New Integer() {task.histogramBins}
         cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, New cv.Mat, histogram, 1, dimensions, ranges)
-
-        Static zeroCheck = findCheckBox("Remove the zero histogram value")
-        If zeroCheck.checked Then histogram.Set(Of Single)(0, 0, 0)
 
         label2 = "Plot Histogram bins = " + CStr(task.histogramBins)
 
