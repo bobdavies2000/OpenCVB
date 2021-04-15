@@ -287,21 +287,16 @@ Public Class Plot_Depth : Inherits VBparent
     Dim hist As Histogram_Depth
     Public Sub New()
         hist = New Histogram_Depth()
-        Dim binSlider = findSlider("Histogram Depth Bins")
-        binSlider.Minimum = 3  ' but in the opencv plot contrib code - OBO.  This prevents encountering it.  Should be ok!
-        binSlider.Value = 200 ' a lot more bins in a plot than a bar chart.
-
         plot = New Plot_Basics_CPP()
-
         task.desc = "Show depth using OpenCV's plot format with variable bins."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         hist.Run(src)
         ReDim plot.srcX(hist.plotHist.hist.Rows - 1)
         ReDim plot.srcY(hist.plotHist.hist.Rows - 1)
         For i = 0 To plot.srcX.Length - 1
-            plot.srcX(i) = task.maxDepth + i * (task.maxDepth - task.minDepth) / plot.srcX.Length
+            plot.srcX(i) = i * (task.maxDepth - task.minDepth) / plot.srcX.Length
             plot.srcY(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
         Next
         plot.Run(src)

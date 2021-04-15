@@ -222,12 +222,12 @@ Partial Class OptionsGlobal
         '
         Me.HistBinSlider.Location = New System.Drawing.Point(213, 29)
         Me.HistBinSlider.Maximum = 300
-        Me.HistBinSlider.Minimum = 1
+        Me.HistBinSlider.Minimum = 3
         Me.HistBinSlider.Name = "HistBinSlider"
         Me.HistBinSlider.Size = New System.Drawing.Size(505, 69)
         Me.HistBinSlider.TabIndex = 1
         Me.HistBinSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.HistBinSlider.Value = 1
+        Me.HistBinSlider.Value = 3
         '
         'HistBins
         '
