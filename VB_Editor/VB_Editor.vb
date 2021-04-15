@@ -12,7 +12,7 @@ Module VB_EditorMain
         Return line
     End Function
     Private Function deleteLine(line As String) As Boolean
-        If line.Contains("initParent()") Then
+        If line.Contains("Inherits VBparent") Then
             Console.WriteLine("Deleting line: " + line)
             changeLines += 1
             Return True
@@ -78,15 +78,22 @@ Module VB_EditorMain
                 Dim sw = New StreamWriter(filename)
                 For i = 0 To lines.Count - 1
                     If lines(i) Is Nothing Then Continue For
+                    If deleteLine(lines(i)) Then
+                        Console.WriteLine("Deleting: " + lines(i))
+                        lines(i - 1) += " : Inherits VBparent"
+                    End If
+                Next
+                For i = 0 To lines.Count - 1
+                    If lines(i) Is Nothing Then Continue For
                     'sw.WriteLine(lines(i))
                     'If insertLine(lines(i)) Then
                     '    sw.WriteLine(vbTab + vbTab + "' task.rank = 1")
                     'End If
-                    If deleteLine(lines(i)) Then
-                        Console.WriteLine("Deleting: " + lines(i))
-                    Else
-                        sw.WriteLine(lines(i))
-                    End If
+                    'If deleteLine(lines(i)) Then
+                    '    Console.WriteLine("Deleting: " + lines(i))
+                    'Else
+                    sw.WriteLine(lines(i))
+                    'End If
                 Next
                 sw.Close()
             Next

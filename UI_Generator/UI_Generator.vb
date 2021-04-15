@@ -56,18 +56,11 @@ Module UI_GeneratorMain
                                 If Len(line) > 0 Then CodeLineCount += 1
                                 If LCase(line).StartsWith("public class") Then
                                     Dim split As String() = Regex.Split(line, "\W+")
-                                    ' next line must be "Inherits VBparent"
-                                    Dim line2 = Trim(nextFile.ReadLine())
-                                    CodeLineCount += 1
-                                    If line2.StartsWith(vbTab) Then line2 = Mid(line2, 2)
-                                    If LCase(line2) = "inherits vbparent" Then className = split(2) ' public class <classname>
-                                End If
-
-                                If className = "Kalman_Single" Then Dim k = 0
-
-                                If LCase(line).StartsWith("public sub new(") And sortedNames.ContainsKey(className) = False Then
-                                    sortedNames.Add(className, sIndex)
-                                    sIndex += 1
+                                    If line.EndsWith(" : Inherits VBparent") Then className = split(2)
+                                    If LCase(line).StartsWith("public sub new(") And sortedNames.ContainsKey(className) = False Then
+                                        sortedNames.Add(className, sIndex)
+                                        sIndex += 1
+                                    End If
                                 End If
                             End If
                         End If
