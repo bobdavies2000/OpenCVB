@@ -43,11 +43,12 @@ Public Class Hough_Circles
     Dim circles As Draw_Circles
     Public Sub New()
         circles = New Draw_Circles()
-        circles.sliders.trackbar(0).Value = 3
-        task.desc = "Find circles using HoughCircles."
-		' task.rank = 1
+        Dim drawSlider = findSlider("DrawCount")
+        drawSlider.Value = 3
         label1 = "Input circles to Hough"
         label2 = "Hough Circles found"
+        task.desc = "Find circles using HoughCircles."
+        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         circles.Run(src)

@@ -108,23 +108,19 @@ Public Class Blob_Input
     Public Mats As Mat_4to1
     Public updateFrequency = 30
     Public Sub New()
-        rectangles = New Rectangle_Rotated()
-        circles = New Draw_Circles()
-        ellipses = New Draw_Ellipses()
-        poly = New Draw_Polygon()
+        rectangles = New Rectangle_Rotated
+        circles = New Draw_Circles
+        ellipses = New Draw_Ellipses
+        poly = New Draw_Polygon
 
-        Dim countSlider = findSlider("Rectangle Count")
-        countSlider.Value = 5
+        Dim drawSlider = findSlider("DrawCount")
+        drawSlider.Value = 5
 
-        circles.sliders.trackbar(0).Value = 5
-        ellipses.sliders.trackbar(0).Value = 5
-        poly.sliders.trackbar(0).Value = 5
+        Dim freqSlider = findSlider("Update Frequency")
+        freqSlider.Value = 1
 
-        rectangles.rect.updateFrequency = 1
-        circles.updateFrequency = 1
-        ellipses.updateFrequency = 1
-
-        poly.radio.check(1).Checked = True ' we want the convex polygon filled.
+        Dim fillCheck = findCheckBox("Draw filled (unchecked draw an outline)")
+        fillCheck.Checked = True
 
         Mats = New Mat_4to1()
         Mats.noLines = True
@@ -160,10 +156,9 @@ End Class
 
 Public Class Blob_RenderBlobs
     Inherits VBparent
-    Dim blob As Blob_Input
+    Dim input As Blob_Input
     Public Sub New()
-        blob = New Blob_Input()
-        blob.updateFrequency = 1
+        input = New Blob_Input()
 
         label1 = "Input blobs"
         label2 = "Largest blob, centroid in yellow"
@@ -171,9 +166,9 @@ Public Class Blob_RenderBlobs
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        If task.frameCount Mod 100 = 0 Then
-            blob.Run(src)
-            dst1 = blob.dst1
+        If task.frameCount Mod input.updateFrequency = 0 Then
+            input.Run(src)
+            dst1 = input.dst1
             Dim gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.Binary)
             Dim labelView = dst1.EmptyClone
@@ -183,13 +178,13 @@ Public Class Blob_RenderBlobs
             Dim labelCount = cv.Cv2.ConnectedComponentsWithStats(binary, labelView, stats, centroids)
             cc.RenderBlobs(labelView)
 
-            Dim maxBlob = cc.GetLargestBlob()
-            dst2.SetTo(0)
-            cc.FilterByBlob(dst1, dst2, maxBlob)
-
             For Each b In cc.Blobs.Skip(1)
                 dst1.Rectangle(b.Rect, cv.Scalar.Red, 2, task.lineType)
             Next
+
+            Dim maxBlob = cc.GetLargestBlob()
+            dst2.SetTo(0)
+            cc.FilterByBlob(dst1, dst2, maxBlob)
 
             dst2.Circle(maxBlob.Centroid, task.dotSize + 3, cv.Scalar.Blue, -1, task.lineType)
             dst2.Circle(maxBlob.Centroid, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)

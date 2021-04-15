@@ -1,35 +1,23 @@
 Imports cv = OpenCvSharp
 Public Class Rectangle_Basics
     Inherits VBparent
-    Public updateFrequency = 30
     Public rectangles As New List(Of cv.Rect)
     Public rotatedRectangles As New List(Of cv.RotatedRect)
+    Dim optDraw As Draw_Options
     Public Sub New()
-
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
-            check.Box(0).Text = "Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)"
-        End If
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Rectangle Count", 1, 255, 3)
-        End If
-
+        optDraw = New Draw_Options
         task.desc = "Draw the requested number of rectangles."
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        Static typeCheckBox = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
-        Static countSlider = findSlider("Rectangle Count")
-        Static saveType = typeCheckBox.Checked
-        If task.frameCount Mod updateFrequency = 0 Or saveType <> typeCheckBox.checked Then
-            saveType = typeCheckBox.checked
+        optDraw.Run()
+        Static saveType = optDraw.drawRotated
+        If task.frameCount Mod optDraw.updateFrequency = 0 Or saveType <> optDraw.drawRotated Then
+            saveType = optDraw.drawRotated
             dst1.SetTo(cv.Scalar.Black)
             rectangles.Clear()
             rotatedRectangles.Clear()
-            Dim rCount = countSlider.Value
-            For i = 0 To rCount - 1
+            For i = 0 To optDraw.drawCount - 1
                 ' Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
                 Dim nPoint = New cv.Point2f(msRNG.Next(0, src.Width), msRNG.Next(0, src.Height))
                 Dim width = msRNG.Next(0, src.Cols - nPoint.X - 1)
@@ -38,13 +26,13 @@ Public Class Rectangle_Basics
                 Dim angle = 180.0F * CSng(msRNG.Next(0, 1000) / 1000.0F)
 
                 Dim nextColor = New cv.Scalar(task.vecColors(i).Item0, task.vecColors(i).Item1, task.vecColors(i).Item2)
-                If typeCheckBox.Checked Then
+                If optDraw.drawRotated Then
                     Dim r = New cv.RotatedRect(nPoint, eSize, angle)
                     drawRotatedRectangle(r, dst1, nextColor)
                     rotatedRectangles.Add(r)
                 Else
                     Dim r = New cv.Rect(nPoint.X, nPoint.Y, width, height)
-                    cv.Cv2.Rectangle(dst1, r, nextColor, -1)
+                    cv.Cv2.Rectangle(dst1, r, nextColor, optDraw.drawFilled)
                     rectangles.Add(r)
                 End If
             Next
@@ -91,7 +79,6 @@ Public Class Rectangle_CComp
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-
         ccomp.Run(src)
         dst1 = ccomp.dst1.Clone
 
@@ -120,16 +107,14 @@ Public Class Rectangle_Overlap
     Public enclosingRect As cv.Rect
     Dim draw As Rectangle_Basics
     Public Sub New()
-
         draw = New Rectangle_Basics
-        Dim countSlider = findSlider("Rectangle Count")
+        Dim countSlider = findSlider("DrawCount")
         countSlider.Value = 2
 
         task.desc = "Test if 2 rectangles overlap"
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-
         If standalone Or task.intermediateReview = caller Then
             draw.Run(src)
             dst1 = draw.dst1
@@ -179,9 +164,7 @@ Public Class Rectangle_Motion
         task.desc = "Motion rectangles often overlap.  This algorithm consolidates those rectangles in the RGB image."
         ' task.rank = 1
     End Sub
-
     Public Sub Run(src As cv.Mat)
-
         motion.Run(src)
         dst1 = motion.dst1.Clone
     End Sub
@@ -237,7 +220,6 @@ Public Class Rectangle_Intersection
     Public enclosingRects As New List(Of cv.Rect)
     Dim otherRects As New List(Of cv.Rect)
     Public Sub New()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Merge rectangles within X pixels", 0, dst1.Width, If(dst1.Width = 1280, 500, 250))
@@ -261,14 +243,13 @@ Public Class Rectangle_Intersection
         Return enclosing
     End Function
     Public Sub Run(src As cv.Mat)
-
         If standalone Or task.intermediateReview = caller Then
             If draw Is Nothing Then draw = New Rectangle_Basics
 
             Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             rotatedCheck.Enabled = False
 
-            Static countSlider = findSlider("Rectangle Count")
+            Static countSlider = findSlider("DrawCount")
             countSlider.Value = msRNG.Next(2, 10)
 
             label1 = "Input rectangles = " + CStr(countSlider.value)
@@ -332,7 +313,7 @@ Public Class Rectangle_Union
             Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             rotatedCheck.Enabled = False
 
-            Static countSlider = findSlider("Rectangle Count")
+            Static countSlider = findSlider("DrawCount")
             countSlider.Value = msRNG.Next(2, 10)
 
             label1 = "Input rectangles = " + CStr(draw.rectangles.Count)
@@ -388,7 +369,7 @@ Public Class Rectangle_MultiOverlap
             Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             rotatedCheck.Enabled = False
 
-            Static countSlider = findSlider("Rectangle Count")
+            Static countSlider = findSlider("DrawCount")
             countSlider.Value = msRNG.Next(2, 10)
 
             label1 = "Input rectangles = " + CStr(draw.rectangles.Count)

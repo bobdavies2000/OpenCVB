@@ -238,8 +238,11 @@ Public Class DFT_Shapes
     Dim rectangle As Rectangle_Basics
     Dim lines As Draw_Line
     Dim symShapes As Draw_SymmetricalShapes
+    Dim optDraw As Draw_Options
     Public Sub New()
         dft = New DFT_Basics
+
+        optDraw = New Draw_Options
 
         circle = New Draw_Circles
         ellipse = New Draw_Ellipses
@@ -248,16 +251,8 @@ Public Class DFT_Shapes
         lines = New Draw_Line
         symShapes = New Draw_SymmetricalShapes
 
-        Dim circleSlider = findSlider("Circle Count")
-        circleSlider.Value = 1
-        Dim ellipseSlider = findSlider("Ellipse Count")
-        ellipseSlider.Value = 1
-        Dim polySlider = findSlider("Polygon Count")
-        polySlider.Value = 1
-        Dim rectangleSlider = findSlider("Rectangle Count")
-        rectangleSlider.Value = 1
-        Dim lineslider = findSlider("Line Count")
-        lineslider.Value = 1
+        Dim drawSlider = findSlider("DrawCount")
+        drawSlider.Value = 1
 
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 7)
@@ -276,7 +271,8 @@ Public Class DFT_Shapes
         task.desc = "Show the spectrum magnitude for some standard shapes. Painterly"
 		' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
+        optDraw.Run()
 
         Static circleRadio = findRadio("Draw Circle")
         Static ellipseRadio = findRadio("Draw Ellipse")
@@ -305,7 +301,7 @@ Public Class DFT_Shapes
             lines.Run(src)
             dst1 = lines.dst1
         ElseIf pointRadio.checked Then
-            If task.frameCount Mod 30 = 0 Then
+            If task.frameCount Mod optDraw.updateFrequency = 0 Then
                 dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
                 Dim pt1 = New cv.Point(msRNG.Next(0, dst1.Width / 10), msRNG.Next(0, dst1.Height / 10))
                 Dim pt2 = New cv.Point(msRNG.Next(0, dst1.Width / 10), msRNG.Next(0, dst1.Height / 10))

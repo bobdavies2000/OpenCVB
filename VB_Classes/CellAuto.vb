@@ -62,14 +62,16 @@ Public Class CellAuto_Basics
         Return dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Function
     Public Sub Run(src as cv.Mat)
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             input = New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_8UC1, 0)
             input.Set(Of Byte)(0, src.Width / 2, 1)
             If task.frameCount Mod 2 Then dst2 = createCells(combo.Box.Text) Else dst1 = createCells(combo.Box.Text)
         Else
+            input = src.Clone
             dst1 = createCells(combo.Box.Text)
         End If
-        If check.Box(0).Checked Then
+        Static rotateCheckBox = findCheckBox("Rotate through the different rules")
+        If rotateCheckBox.Checked Then
             Dim index = combo.Box.SelectedIndex
             If index + 1 < i18.Count - 1 Then combo.Box.SelectedIndex += 1 Else combo.Box.SelectedIndex = 0
         End If

@@ -77,26 +77,70 @@ End Class
 
 
 
-Public Class Draw_Ellipses
+Public Class Draw_Options
     Inherits VBparent
-    Public updateFrequency = 30
+    Dim circles As Draw_Circles
+    Public drawCount As Integer
+    Public updateFrequency As Integer
+    Public drawFilled As Integer
+    Public drawRotated As Boolean
     Public Sub New()
+        If standalone Then circles = New Draw_Circles
+
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Ellipse Count", 1, 255, 3)
+            sliders.setupTrackBar(0, "DrawCount", 0, 20, 3)
+            sliders.setupTrackBar(1, "Update Frequency", 1, 50, 1)
         End If
-        task.desc = "Draw the requested number of ellipses."
-		' task.rank = 1
+
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 2)
+            check.Box(0).Text = "Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)"
+            check.Box(1).Text = "Draw filled (unchecked draw an outline)"
+        End If
+
+        task.desc = "Show the options for the draw algorithms"
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
-        If task.frameCount Mod updateFrequency = 0 Then
+    Public Sub Run()
+        Static countSlider = findSlider("DrawCount")
+        Static freqSlider = findSlider("Update Frequency")
+        Static fillCheck = findCheckBox("Draw filled (unchecked draw an outline)")
+        Static rotateCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
+        drawCount = countSlider.value
+        updateFrequency = freqSlider.value
+        drawFilled = If(fillCheck.checked, -1, 2)
+        drawRotated = rotateCheck.checked
+        If standalone Then
+            circles.Run(task.color)
+            dst1 = circles.dst1
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Draw_Ellipses
+    Inherits VBparent
+    Dim optDraw As Draw_Options
+    Public Sub New()
+        optDraw = New Draw_Options
+        task.desc = "Draw the requested number of ellipses."
+        ' task.rank = 1
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        optDraw.Run()
+        If task.frameCount Mod optDraw.updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.Black)
-            For i = 0 To sliders.trackbar(0).Value - 1
+            For i = 0 To optDraw.drawCount - 1
                 Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
                 Dim eSize = New cv.Size2f(CSng(msRNG.Next(0, src.Cols - nPoint.X - 1)), CSng(msRNG.Next(0, src.Rows - nPoint.Y - 1)))
                 Dim angle = 180.0F * CSng(msRNG.Next(0, 1000) / 1000.0F)
                 Dim nextColor = New cv.Scalar(task.vecColors(i).Item0, task.vecColors(i).Item1, task.vecColors(i).Item2)
-                dst1.Ellipse(New cv.RotatedRect(nPoint, eSize, angle), nextColor, -1,)
+                dst1.Ellipse(New cv.RotatedRect(nPoint, eSize, angle), nextColor, optDraw.drawFilled)
             Next
         End If
     End Sub
@@ -106,23 +150,21 @@ End Class
 
 Public Class Draw_Circles
     Inherits VBparent
-    Public updateFrequency = 30
+    Dim optDraw As Draw_Options
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Circle Count", 1, 255, 3)
-        End If
+        optDraw = New Draw_Options
         task.desc = "Draw the requested number of circles."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
-        If task.frameCount Mod updateFrequency = 0 Then
+    Public Sub Run(src As cv.Mat)
+        optDraw.Run()
+        If task.frameCount Mod optDraw.updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.Black)
-            For i = 0 To sliders.trackbar(0).Value - 1
+            For i = 0 To optDraw.drawCount - 1
                 Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
                 Dim radius = msRNG.Next(10, 10 + msRNG.Next(src.Cols / 4))
                 Dim nextColor = New cv.Scalar(task.vecColors(i).Item0, task.vecColors(i).Item1, task.vecColors(i).Item2)
-                dst1.Circle(nPoint, radius, nextColor, -1, task.lineType)
+                dst1.Circle(nPoint, radius, nextColor, optDraw.drawFilled, task.lineType)
             Next
         End If
     End Sub
@@ -132,24 +174,21 @@ End Class
 
 Public Class Draw_Line
     Inherits VBparent
-    Public updateFrequency = 30
+    Dim optDraw As Draw_Options
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Line Count", 1, 255, 1)
-        End If
+        optDraw = New Draw_Options
         task.desc = "Draw the requested number of Lines."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
-        If task.frameCount Mod updateFrequency Then Exit Sub
+    Public Sub Run(src As cv.Mat)
+        optDraw.Run()
+        If task.frameCount Mod optDraw.updateFrequency Then Exit Sub
         dst1.SetTo(cv.Scalar.Black)
-        For i = 0 To sliders.trackbar(0).Value - 1
+        For i = 0 To optDraw.drawCount - 1
             Dim nPoint1 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
             Dim nPoint2 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
-            Dim thickness = msRNG.Next(1, 10)
             Dim nextColor = New cv.Scalar(task.vecColors(i).Item0, task.vecColors(i).Item1, task.vecColors(i).Item2)
-            dst1.Line(nPoint1, nPoint2, nextColor, thickness, task.lineType)
+            dst1.Line(nPoint1, nPoint2, nextColor, optDraw.drawFilled, task.lineType)
         Next
     End Sub
 End Class
@@ -158,36 +197,30 @@ End Class
 
 Public Class Draw_Polygon
     Inherits VBparent
+    Dim optDraw As Draw_Options
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Polygon Count", 1, 255, 1)
-        End If
+        optDraw = New Draw_Options
         task.desc = "Draw Polygon figures"
-		' task.rank = 1
+        ' task.rank = 1
         label2 = "Convex Hull for the same polygon"
-
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 2)
-            radio.check(0).Text = "Polygon Outline"
-            radio.check(1).Text = "Polygon Filled"
-            radio.check(0).Checked = True
-        End If
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
+        optDraw.Run()
+
+        If task.frameCount Mod optDraw.updateFrequency Then Exit Sub
         Dim height = src.Height / 8
         Dim width = src.Width / 8
         Dim polyColor = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
         dst1.SetTo(cv.Scalar.Black)
         dst2 = dst1.Clone()
-        For i = 0 To sliders.trackbar(0).Value - 1
+        For i = 0 To optDraw.drawCount - 1
             Dim points = New List(Of cv.Point)
             Dim listOfPoints = New List(Of List(Of cv.Point))
             For j = 0 To 10
                 points.Add(New cv.Point(CInt(msRNG.Next(width, width * 7)), CInt(msRNG.Next(height, height * 7))))
             Next
             listOfPoints.Add(points)
-            If radio.check(0).Checked Then
+            If optDraw.drawFilled <> -1 Then
                 cv.Cv2.Polylines(dst1, listOfPoints, True, polyColor, 2, task.lineType)
             Else
                 dst1.FillPoly(listOfPoints, New cv.Scalar(0, 0, 255))
@@ -202,11 +235,7 @@ Public Class Draw_Polygon
             Next
             listOfPoints.Add(points)
             dst2.SetTo(cv.Scalar.Black)
-            If radio.check(0).Checked Then
-                cv.Cv2.DrawContours(dst2, listOfPoints, 0, polyColor, 2)
-            Else
-                cv.Cv2.DrawContours(dst2, listOfPoints, 0, polyColor, -1)
-            End If
+            cv.Cv2.DrawContours(dst2, listOfPoints, 0, polyColor, optDraw.drawFilled)
         Next
     End Sub
 End Class
@@ -614,8 +643,8 @@ Public Class Draw_Hexagon
         alpha.Show()
         alpha.Size = New System.Drawing.Size(dst1.Width + 10, dst1.Height + 10)
         alpha.Text = "Perception is the key"
-        task.desc = "What it means to recognize a cube.  Zygmunt Pizlo UC Irvine"
-		' task.rank = 1
+        task.desc = "What it means to recognize a cube.  Zygmunt Pizlo - UC Irvine"
+        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
     End Sub
