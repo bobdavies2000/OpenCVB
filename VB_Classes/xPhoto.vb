@@ -66,8 +66,8 @@ Public Class XPhoto_OilPaint_CPP : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "xPhoto Dynamic Ratio", 1, 127, 7)
-            sliders.setupTrackBar(1, "xPhoto Block Size", 1, 100, 3)
+            sliders.setupTrackBar(0, "XPhoto Dynamic Ratio", 1, 127, 7)
+            sliders.setupTrackBar(1, "XPhoto Block Size", 1, 100, 3)
         End If
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 5)
@@ -86,7 +86,7 @@ Public Class XPhoto_OilPaint_CPP : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat)
         Dim colorCode As Integer = cv.ColorConversionCodes.BGR2GRAY
-        Static frm = findfrm("xPhoto_OilPaint_CPP Radio Options")
+        Static frm = findfrm("XPhoto_OilPaint_CPP Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 colorCode = Choose(i + 1, cv.ColorConversionCodes.BGR2GRAY, cv.ColorConversionCodes.BGR2HSV, cv.ColorConversionCodes.BGR2YUV,
