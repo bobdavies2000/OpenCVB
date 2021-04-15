@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class OptionsCommon_Depth : Inherits VBparent
+Public Class OptionsCommon : Inherits VBparent
     Public gOptions As New OptionsGlobal
     Public Sub New()
         task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone.
@@ -16,7 +16,7 @@ Public Class OptionsCommon_Depth : Inherits VBparent
         task.desc = "Show depth with OpenCV using varying min and max depths."
         ' task.rank = 3
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         task.hist3DThreshold = gOptions.thresholdSlider.Value
         task.useKalman = gOptions.UseKalman.Checked
