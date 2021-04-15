@@ -6,6 +6,7 @@ Public Class Smoothing_Exterior
 	Public inputPoints As List(Of cv.Point)
 	Public smoothPoints As List(Of cv.Point)
 	Public plotColor = cv.Scalar.Yellow
+	Dim smOptions As Smoothing_Options
 	Private Function getSplineInterpolationCatmullRom(points As List(Of cv.Point), nrOfInterpolatedPoints As Integer) As List(Of cv.Point)
 		Dim spline As New List(Of cv.Point)
 		' Create a new pointlist to spline.  If you don't do this, the original pointlist is included with the extrapolated points
@@ -42,30 +43,29 @@ Public Class Smoothing_Exterior
 		Return spline
 	End Function
 	Public Sub New()
-		hull = New Hull_Basics()
-		hull.sliders.trackbar(0).Minimum = 4 ' required minimum number of points for the algorithm.
-
-		If findfrm(caller + " Slider Options") Is Nothing Then
-			sliders.Setup(caller)
-			sliders.setupTrackBar(0, "Smoothing iterations", 1, 20, 10)
+		smOptions = New Smoothing_Options
+		If standalone Then
+			hull = New Hull_Basics
 		End If
+
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
 		task.desc = "Smoothing the line connecting a series of points."
 		' task.rank = 1
 	End Sub
 	Public Sub Run(src as cv.Mat)
+		smOptions.Run(Nothing)
 		If standalone Or task.intermediateReview = caller Then
 			If task.frameCount Mod 30 Then Exit Sub
-
+			dst1.SetTo(0)
 			hull.Run(src)
 			Dim nextHull = hull.hull
-
-			dst1.SetTo(0)
 			inputPoints = drawPoly(dst1, nextHull, cv.Scalar.White)
+		Else
+			dst1.SetTo(0)
 		End If
 		If inputPoints.Count > 1 Then
-			smoothPoints = getSplineInterpolationCatmullRom(inputPoints, sliders.trackbar(0).Value)
+			smoothPoints = getSplineInterpolationCatmullRom(inputPoints, smOptions.iterations)
 			drawPoly(dst1, smoothPoints.ToArray, plotColor)
 		End If
 	End Sub
@@ -82,6 +82,7 @@ Public Class Smoothing_Interior
 	Public inputPoints As List(Of cv.Point)
 	Public smoothPoints As List(Of cv.Point)
 	Public plotColor = cv.Scalar.Yellow
+	Dim smOptions As Smoothing_Options
 	Private Function getCurveSmoothingChaikin(points As List(Of cv.Point), tension As Double, nrOfIterations As Integer) As List(Of cv.Point2d)
 		'the tension factor defines a scale between corner cutting distance in segment half length, i.e. between 0.05 and 0.45
 		'the opposite corner will be cut by the inverse (i.e. 1-cutting distance) to keep symmetry
@@ -119,37 +120,32 @@ Public Class Smoothing_Interior
 		nl.Add(points(points.Count - 1))
 		Return nl
 	End Function
-
 	Public Sub New()
-		hull = New Hull_Basics()
-
-		Dim hullSlider = findSlider("Hull random points")
-		hullSlider.Minimum = 4 ' required minimum number of points for the algorithm.
-		hullSlider.Value = 16
-
-		If findfrm(caller + " Slider Options") Is Nothing Then
-			sliders.Setup(caller)
-			sliders.setupTrackBar(0, "Smoothing iterations", 1, 20, 1)
-			sliders.setupTrackBar(1, "Smoothing tension X100", 1, 100, 50)
+		smOptions = New Smoothing_Options
+		If standalone Then
+			hull = New Hull_Basics()
+			findSlider("Hull random points").Value = 16
 		End If
+
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
 		task.desc = "Smoothing the line connecting a series of points staying inside the outline."
 		' task.rank = 1
 	End Sub
-	Public Sub Run(src as cv.Mat)
-		If standalone or task.intermediateReview = caller Then
+	Public Sub Run(src As cv.Mat)
+		smOptions.Run(Nothing)
+		If standalone Or task.intermediateReview = caller Then
 			If task.frameCount Mod 30 Then Exit Sub
-
+			dst1.SetTo(0)
 			hull.Run(src)
 			Dim nextHull = hull.hull
-
-			dst1.SetTo(0)
 			inputPoints = drawPoly(dst1, nextHull, cv.Scalar.White)
+		Else
+			dst1.SetTo(0)
 		End If
-		Dim smoothPoints2d = getCurveSmoothingChaikin(inputPoints, sliders.trackbar(1).Value / 100, sliders.trackbar(0).Value)
+		Dim smoothPoints2d = getCurveSmoothingChaikin(inputPoints, smOptions.interiorTension, smOptions.iterations)
 		Dim smoothPoints As New List(Of cv.Point)
-		For i = 0 To smoothPoints2d.Count - 1
+		For i = 0 To smoothPoints2d.Count - 1 Step smOptions.stepSize
 			smoothPoints.Add(New cv.Point(CInt(smoothPoints2d.ElementAt(i).X), CInt(smoothPoints2d.ElementAt(i).Y)))
 		Next
 		If smoothPoints.Count > 0 Then drawPoly(dst1, smoothPoints.ToArray, plotColor)
@@ -161,22 +157,52 @@ End Class
 
 
 
-Public Class Smoothing_Contours
-	Inherits VBparent
-	Dim outline As Contours_Depth
-	Dim smoothE As Smoothing_Exterior
-	Dim smoothI As Smoothing_Interior
-	Public Sub New()
-		outline = New Contours_Depth()
-		smoothE = New Smoothing_Exterior()
-		smoothI = New Smoothing_Interior()
-		smoothE.plotColor = cv.Scalar.Blue
-		smoothI.plotColor = cv.Scalar.Blue
 
+Public Class Smoothing_Options
+	Inherits VBparent
+	Public iterations As Integer
+	Public interiorTension As Single
+	Public stepSize As Integer
+	Public Sub New()
 		If findfrm(caller + " Slider Options") Is Nothing Then
 			sliders.Setup(caller)
-			sliders.setupTrackBar(0, "Step size when adding points (1 is identity)", 1, 500, 30)
+			sliders.setupTrackBar(0, "Smoothing iterations", 1, 20, 8)
+			sliders.setupTrackBar(1, "Smoothing tension X100 (Interior Only)", 1, 100, 50)
+			sliders.setupTrackBar(2, "Step size when adding points (1 is identity)", 1, 500, 30)
 		End If
+
+		label1 = "No output - just options for smoothing..."
+		task.desc = "Options for smoothing operations."
+		' task.rank = 1
+	End Sub
+	Public Sub Run(src As cv.Mat)
+		Static iterSlider = findSlider("Smoothing iterations")
+		Static tensionSlider = findSlider("Smoothing tension X100 (Interior Only)")
+		Static stepSlider = findSlider("Step size when adding points (1 is identity)")
+		iterations = iterSlider.value
+		interiorTension = tensionSlider.value / 100
+		stepSize = stepSlider.value
+	End Sub
+End Class
+
+
+
+
+
+Public Class Smoothing_Contours
+	Inherits VBparent
+	Dim outline As Blob_Largest
+	Dim smoothE As Smoothing_Exterior
+	Dim smoothI As Smoothing_Interior
+	Dim smOptions As Smoothing_Options
+	Public Sub New()
+		outline = New Blob_Largest
+		smoothE = New Smoothing_Exterior
+		smoothI = New Smoothing_Interior
+		smoothE.plotColor = cv.Scalar.Blue
+		smoothI.plotColor = cv.Scalar.Blue
+		smOptions = New Smoothing_Options
+
 		If findfrm(caller + " Radio Options") Is Nothing Then
 			radio.Setup(caller, 2)
 			radio.check(0).Text = "Interior smoothing"
@@ -185,23 +211,37 @@ Public Class Smoothing_Contours
 		End If
 
 		task.desc = "Use Smoothing exterior or interior to get a smoother representation of a contour"
-		' task.rank = 1
+		' task.rank = 3
 	End Sub
-	Public Sub Run(src as cv.Mat)
-		outline.Run(src)
+	Public Sub Run(src As cv.Mat)
+		smOptions.Run(Nothing)
 
-		Dim stepsize = sliders.trackbar(0).Value
-		Dim smooth As Object
-		If radio.check(0).Checked Then smooth = smoothI Else smooth = smoothE
-		smooth.inputPoints = New List(Of cv.Point)
-		For i = 0 To outline.contours.Count - 1 Step stepsize
-			smooth.inputPoints.Add(New cv.Point2f(outline.contours(i).X, outline.contours(i).Y))
+		outline.Run(src)
+		dst2 = outline.dst1
+
+		Dim smooth = If(radio.check(0).Checked, smoothI, smoothE)
+		Dim contours0 = cv.Cv2.FindContoursAsArray(outline.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY), cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+		Dim maxIndex As Integer
+		Dim maxNodes As Integer
+		For i = 0 To contours0.Length - 1
+			Dim c = cv.Cv2.ApproxPolyDP(contours0(i), 3, True)
+			If maxNodes < c.Length Then
+				maxIndex = i
+				maxNodes = c.Length
+			End If
 		Next
-		smooth.dst1 = outline.dst2
-		smooth.Run()
+		cv.Cv2.DrawContours(dst2, contours0, maxIndex, New cv.Scalar(0, 255, 255), task.lineSize)
+
+		smooth.inputPoints = New List(Of cv.Point)
+		For i = 0 To contours0(maxIndex).Count - 1 Step smOptions.stepSize
+			smooth.inputPoints.Add(contours0(maxIndex)(i))
+		Next
+
+		smooth.Run(Nothing)
 		dst1 = smooth.dst1
-		If standalone Then dst2.SetTo(0)
+
 		label1 = "Smoothing with " + If(radio.check(0).Checked, "Interior", "Exterior") + " lines"
+		label2 = "Found " + CStr(contours0.Count) + " countours in the largest blob"
 	End Sub
 End Class
 
