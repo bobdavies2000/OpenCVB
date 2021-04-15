@@ -567,9 +567,9 @@ Public Class Histogram_BackProjectionPeak
         Dim pixelMax = CInt((histindex + 1) * barRange)
 
         Dim mask = src.InRange(pixelMin, pixelMax).Threshold(1, 255, cv.ThresholdTypes.Binary)
-        dst1.SetTo(0)
-        src.CopyTo(dst1, mask)
-        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        Dim tmp = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        src.CopyTo(tmp, mask)
+        dst1 = tmp.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         label1 = "BackProjection of most frequent gray pixel"
         dst2.Rectangle(New cv.Rect(barWidth * histindex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 1)
