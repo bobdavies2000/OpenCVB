@@ -1,11 +1,11 @@
 Imports cv = OpenCvSharp
-Public Class intrinsicsLeft_Basics : Inherits VBparent
+Public Class IntrinsicsLeft_Basics : Inherits VBparent
     Public Sub New()
         task.desc = "Show the depth camera intrinsicsLeft."
-		' task.rank = 1
+        ' task.rank = 1
         label2 = "ppx/ppy location"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If task.parms.intrinsicsLeft.coeffs Is Nothing Then
             task.trueText("This camera is missing the intrinsics.")
             Exit Sub

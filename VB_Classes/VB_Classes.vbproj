@@ -114,6 +114,7 @@
     <Compile Include="FishEye.vb" />
     <Compile Include="Fourier.vb" />
     <Compile Include="ImageSeg.vb" />
+    <Compile Include="imShow.vb" />
     <Compile Include="LineFLD.vb" />
     <Compile Include="MFD.vb" />
     <Compile Include="MiniPC.vb" />
@@ -231,7 +232,6 @@
     <Compile Include="Font.vb" />
     <Compile Include="GrabCut.vb" />
     <Compile Include="HMM.vb" />
-    <Compile Include="imShow.vb" />
     <Compile Include="Intrinsics.vb" />
     <Compile Include="Keyboard.vb" />
     <Compile Include="Line.vb" />
