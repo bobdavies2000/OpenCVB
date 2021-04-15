@@ -134,7 +134,6 @@ Public Class Random_CheckUniformSmoothed : Inherits VBparent
     Dim rUniform As Random_UniformDist
     Public Sub New()
         histogram = New Histogram_Basics
-        histogram.sliders.trackbar(0).Value = 255
 
         rUniform = New Random_UniformDist()
 
@@ -160,7 +159,6 @@ Public Class Random_CheckUniformDist : Inherits VBparent
     Dim rUniform As Random_UniformDist
     Public Sub New()
         histogram = New Histogram_Graph()
-        histogram.sliders.trackbar(0).Value = 255
 
         rUniform = New Random_UniformDist()
 
@@ -186,7 +184,6 @@ Public Class Random_CheckNormalDist : Inherits VBparent
     Dim normalDist As Random_NormalDist
     Public Sub New()
         histogram = New Histogram_Graph()
-        histogram.sliders.trackbar(0).Value = 255
         normalDist = New Random_NormalDist()
         task.desc = "Display the histogram for a Normal distribution."
         ' task.rank = 1
@@ -209,7 +206,6 @@ Public Class Random_CheckNormalDistSmoothed : Inherits VBparent
     Dim normalDist As Random_NormalDist
     Public Sub New()
         histogram = New Histogram_Basics
-        histogram.sliders.trackbar(0).Value = 255
         histogram.plotHist.minRange = 1
         normalDist = New Random_NormalDist()
         task.desc = "Display the histogram for a Normal distribution."

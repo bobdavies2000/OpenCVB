@@ -966,7 +966,6 @@ Public Class PointCloud_ObjectsSide : Inherits VBparent
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Dim cmat As PointCloud_ColorizeSide
     Public Sub New()
-
         cmat = New PointCloud_ColorizeSide
         measureSide = New PointCloud_Kalman_SideView
 

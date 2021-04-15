@@ -420,7 +420,6 @@ Public Class Histogram_ColorsAndGray : Inherits VBparent
             sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
         End If
         histogram = New Histogram_Basics
-        histogram.sliders.trackbar(0).Value = 40
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
