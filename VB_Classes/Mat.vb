@@ -189,8 +189,7 @@ Public Class Mat_2to1 : Inherits VBparent
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-
-        Static nSize = New cv.Size(src.Width, src.Height / 2)
+        Static nSize = New cv.Size(task.color.Width, task.color.Height / 2)
         Static roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         If standalone or task.intermediateReview = caller Then

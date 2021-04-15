@@ -2,13 +2,13 @@ Imports cv = OpenCvSharp
 Public Class Moments_Basics : Inherits VBparent
     Public inputMask As cv.Mat
     Public centroid As cv.Point2f
-    Dim foreground As kMeans_Depth_FG_BG
+    Dim foreground As KMeans_Depth_FG_BG
     Public scaleFactor As Integer = 1
     Public offsetPt As cv.Point
     Public kalman As Kalman_Basics
     Public Sub New()
 
-        If standalone Then foreground = New kMeans_Depth_FG_BG()
+        If standalone Then foreground = New KMeans_Depth_FG_BG()
 
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(2 - 1) ' 2 elements - cv.point
@@ -44,13 +44,13 @@ End Class
 
 
 Public Class Moments_CentroidKalman : Inherits VBparent
-    Dim foreground As kMeans_Depth_FG_BG
+    Dim foreground As KMeans_Depth_FG_BG
     Dim kalman As Kalman_Basics
     Public Sub New()
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(2 - 1) ' 2 elements - cv.point
 
-        foreground = New kMeans_Depth_FG_BG()
+        foreground = New KMeans_Depth_FG_BG()
 
         label1 = "Red dot = Kalman smoothed centroid"
         task.desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."

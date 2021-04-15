@@ -15,7 +15,6 @@ Public Class CamShift_Basics : Inherits VBparent
             sliders.setupTrackBar(0, "CamShift vMin", 0, 255, 32)
             sliders.setupTrackBar(1, "CamShift vMax", 0, 255, 255)
             sliders.setupTrackBar(2, "CamShift Smin", 0, 255, 60)
-            sliders.setupTrackBar(3, "CamShift Histogram bins", 16, 255, 32)
         End If
         label1 = "Draw anywhere to create histogram and start camshift"
         label2 = "Histogram of targeted region (hue only)"
@@ -34,10 +33,8 @@ Public Class CamShift_Basics : Inherits VBparent
         Static vMinSlider = findSlider("CamShift vMin")
         Static vMaxSlider = findSlider("CamShift vMax")
         Static sMinSlider = findSlider("CamShift Smin")
-        Static histBinsSlider = findSlider("CamShift Histogram bins")
 
-        Dim bins = histBinsSlider.Value
-        Dim hsize() As integer = {bins, bins, bins}
+        Dim hsize() As Integer = {task.histogramBins, task.histogramBins, task.histogramBins}
         Dim ranges() = {New cv.Rangef(0, 180)}
         Dim min = Math.Min(vMinSlider.value, vMaxSlider.Value)
         Dim max = Math.Max(vMinSlider.value, vMaxSlider.Value)

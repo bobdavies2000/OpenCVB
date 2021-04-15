@@ -202,8 +202,7 @@ End Class
 
 Public Class Plot_Histogram : Inherits VBparent
     Public hist As New cv.Mat
-    Public bins As integer = 50
-    Public minRange As integer = 0
+    Public minRange As Integer = 0
     Public maxRange As integer = 255
     Public backColor As cv.Scalar = cv.Scalar.Red
     Public fixedMaxVal As Integer
@@ -214,7 +213,7 @@ Public Class Plot_Histogram : Inherits VBparent
     Public Sub Run(src as cv.Mat)
         If standalone or task.intermediateReview = caller Then
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            Dim dimensions() = New Integer() {bins}
+            Dim dimensions() = New Integer() {task.histogramBins}
             Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
             cv.Cv2.CalcHist(New cv.Mat() {gray}, New Integer() {0}, New cv.Mat(), hist, 1, dimensions, ranges)
         End If

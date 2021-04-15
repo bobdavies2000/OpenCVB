@@ -30,13 +30,16 @@ Partial Class OptionsGlobal
         Me.MinRange = New System.Windows.Forms.TrackBar()
         Me.InrangeMinLabel = New System.Windows.Forms.Label()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.HistogramSettings = New System.Windows.Forms.GroupBox()
+        Me.ProjectionThreshold = New System.Windows.Forms.Label()
+        Me.ProjectionSlider = New System.Windows.Forms.TrackBar()
+        Me.ProjectionThresh = New System.Windows.Forms.Label()
         Me.IMUmotion = New System.Windows.Forms.Label()
         Me.IMUmotionSlider = New System.Windows.Forms.TrackBar()
         Me.ThresholdLabel = New System.Windows.Forms.Label()
-        Me.threshold = New System.Windows.Forms.Label()
-        Me.thresholdSlider = New System.Windows.Forms.TrackBar()
-        Me.TopSideThresholdLabel = New System.Windows.Forms.Label()
+        Me.HistBinsCount = New System.Windows.Forms.Label()
+        Me.HistBinSlider = New System.Windows.Forms.TrackBar()
+        Me.HistBins = New System.Windows.Forms.Label()
         Me.resetToDefaults = New System.Windows.Forms.CheckBox()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.UseKalmanWhenStable = New System.Windows.Forms.CheckBox()
@@ -46,9 +49,10 @@ Partial Class OptionsGlobal
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.MaxRange, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MinRange, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.GroupBox1.SuspendLayout()
+        Me.HistogramSettings.SuspendLayout()
+        CType(Me.ProjectionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.thresholdSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox2.SuspendLayout()
         Me.PaletteGroup.SuspendLayout()
         Me.SuspendLayout()
@@ -130,25 +134,57 @@ Partial Class OptionsGlobal
         '
         Me.OpenFileDialog1.FileName = "OpenFileDialog1"
         '
-        'GroupBox1
+        'HistogramSettings
         '
-        Me.GroupBox1.Controls.Add(Me.IMUmotion)
-        Me.GroupBox1.Controls.Add(Me.IMUmotionSlider)
-        Me.GroupBox1.Controls.Add(Me.ThresholdLabel)
-        Me.GroupBox1.Controls.Add(Me.threshold)
-        Me.GroupBox1.Controls.Add(Me.thresholdSlider)
-        Me.GroupBox1.Controls.Add(Me.TopSideThresholdLabel)
-        Me.GroupBox1.Location = New System.Drawing.Point(12, 243)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(829, 168)
-        Me.GroupBox1.TabIndex = 1
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Histogram Projection Options"
+        Me.HistogramSettings.Controls.Add(Me.ProjectionThreshold)
+        Me.HistogramSettings.Controls.Add(Me.ProjectionSlider)
+        Me.HistogramSettings.Controls.Add(Me.ProjectionThresh)
+        Me.HistogramSettings.Controls.Add(Me.IMUmotion)
+        Me.HistogramSettings.Controls.Add(Me.IMUmotionSlider)
+        Me.HistogramSettings.Controls.Add(Me.ThresholdLabel)
+        Me.HistogramSettings.Controls.Add(Me.HistBinsCount)
+        Me.HistogramSettings.Controls.Add(Me.HistBinSlider)
+        Me.HistogramSettings.Controls.Add(Me.HistBins)
+        Me.HistogramSettings.Location = New System.Drawing.Point(12, 243)
+        Me.HistogramSettings.Name = "HistogramSettings"
+        Me.HistogramSettings.Size = New System.Drawing.Size(829, 285)
+        Me.HistogramSettings.TabIndex = 1
+        Me.HistogramSettings.TabStop = False
+        Me.HistogramSettings.Text = "Histogram Options"
+        '
+        'ProjectionThreshold
+        '
+        Me.ProjectionThreshold.AutoSize = True
+        Me.ProjectionThreshold.Location = New System.Drawing.Point(737, 112)
+        Me.ProjectionThreshold.Name = "ProjectionThreshold"
+        Me.ProjectionThreshold.Size = New System.Drawing.Size(57, 20)
+        Me.ProjectionThreshold.TabIndex = 8
+        Me.ProjectionThreshold.Text = "Label1"
+        '
+        'ProjectionSlider
+        '
+        Me.ProjectionSlider.Location = New System.Drawing.Point(213, 105)
+        Me.ProjectionSlider.Maximum = 20
+        Me.ProjectionSlider.Minimum = 1
+        Me.ProjectionSlider.Name = "ProjectionSlider"
+        Me.ProjectionSlider.Size = New System.Drawing.Size(505, 69)
+        Me.ProjectionSlider.TabIndex = 7
+        Me.ProjectionSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.ProjectionSlider.Value = 1
+        '
+        'ProjectionThresh
+        '
+        Me.ProjectionThresh.Location = New System.Drawing.Point(42, 105)
+        Me.ProjectionThresh.Name = "ProjectionThresh"
+        Me.ProjectionThresh.Size = New System.Drawing.Size(173, 47)
+        Me.ProjectionThresh.TabIndex = 6
+        Me.ProjectionThresh.Text = "Projection threshold"
+        Me.ProjectionThresh.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'IMUmotion
         '
         Me.IMUmotion.AutoSize = True
-        Me.IMUmotion.Location = New System.Drawing.Point(737, 114)
+        Me.IMUmotion.Location = New System.Drawing.Point(737, 175)
         Me.IMUmotion.Name = "IMUmotion"
         Me.IMUmotion.Size = New System.Drawing.Size(87, 20)
         Me.IMUmotion.TabIndex = 5
@@ -156,7 +192,7 @@ Partial Class OptionsGlobal
         '
         'IMUmotionSlider
         '
-        Me.IMUmotionSlider.Location = New System.Drawing.Point(213, 107)
+        Me.IMUmotionSlider.Location = New System.Drawing.Point(213, 168)
         Me.IMUmotionSlider.Maximum = 20
         Me.IMUmotionSlider.Name = "IMUmotionSlider"
         Me.IMUmotionSlider.Size = New System.Drawing.Size(505, 69)
@@ -166,39 +202,41 @@ Partial Class OptionsGlobal
         '
         'ThresholdLabel
         '
-        Me.ThresholdLabel.Location = New System.Drawing.Point(19, 107)
+        Me.ThresholdLabel.Location = New System.Drawing.Point(19, 168)
         Me.ThresholdLabel.Name = "ThresholdLabel"
         Me.ThresholdLabel.Size = New System.Drawing.Size(196, 44)
         Me.ThresholdLabel.TabIndex = 3
         Me.ThresholdLabel.Text = "Threshold in IMU motion in radians X100"
+        Me.ThresholdLabel.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
-        'threshold
+        'HistBinsCount
         '
-        Me.threshold.AutoSize = True
-        Me.threshold.Location = New System.Drawing.Point(737, 36)
-        Me.threshold.Name = "threshold"
-        Me.threshold.Size = New System.Drawing.Size(75, 20)
-        Me.threshold.TabIndex = 2
-        Me.threshold.Text = "threshold"
+        Me.HistBinsCount.AutoSize = True
+        Me.HistBinsCount.Location = New System.Drawing.Point(737, 36)
+        Me.HistBinsCount.Name = "HistBinsCount"
+        Me.HistBinsCount.Size = New System.Drawing.Size(68, 20)
+        Me.HistBinsCount.TabIndex = 2
+        Me.HistBinsCount.Text = "HistBins"
         '
-        'thresholdSlider
+        'HistBinSlider
         '
-        Me.thresholdSlider.Location = New System.Drawing.Point(213, 29)
-        Me.thresholdSlider.Maximum = 100
-        Me.thresholdSlider.Minimum = 1
-        Me.thresholdSlider.Name = "thresholdSlider"
-        Me.thresholdSlider.Size = New System.Drawing.Size(505, 69)
-        Me.thresholdSlider.TabIndex = 1
-        Me.thresholdSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.thresholdSlider.Value = 1
+        Me.HistBinSlider.Location = New System.Drawing.Point(213, 29)
+        Me.HistBinSlider.Maximum = 300
+        Me.HistBinSlider.Minimum = 1
+        Me.HistBinSlider.Name = "HistBinSlider"
+        Me.HistBinSlider.Size = New System.Drawing.Size(505, 69)
+        Me.HistBinSlider.TabIndex = 1
+        Me.HistBinSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.HistBinSlider.Value = 1
         '
-        'TopSideThresholdLabel
+        'HistBins
         '
-        Me.TopSideThresholdLabel.Location = New System.Drawing.Point(42, 29)
-        Me.TopSideThresholdLabel.Name = "TopSideThresholdLabel"
-        Me.TopSideThresholdLabel.Size = New System.Drawing.Size(173, 47)
-        Me.TopSideThresholdLabel.TabIndex = 0
-        Me.TopSideThresholdLabel.Text = "Top and Side Views Histogram threshold"
+        Me.HistBins.Location = New System.Drawing.Point(42, 29)
+        Me.HistBins.Name = "HistBins"
+        Me.HistBins.Size = New System.Drawing.Size(173, 47)
+        Me.HistBins.TabIndex = 0
+        Me.HistBins.Text = "Bins"
+        Me.HistBins.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'resetToDefaults
         '
@@ -268,7 +306,7 @@ Partial Class OptionsGlobal
         Me.Controls.Add(Me.PaletteGroup)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.resetToDefaults)
-        Me.Controls.Add(Me.GroupBox1)
+        Me.Controls.Add(Me.HistogramSettings)
         Me.Controls.Add(Me.MinMaxDepth)
         Me.Name = "OptionsGlobal"
         Me.Text = "Options Available to all Algorithms"
@@ -276,10 +314,11 @@ Partial Class OptionsGlobal
         Me.MinMaxDepth.PerformLayout()
         CType(Me.MaxRange, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.MinRange, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
+        Me.HistogramSettings.ResumeLayout(False)
+        Me.HistogramSettings.PerformLayout()
+        CType(Me.ProjectionSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.thresholdSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         Me.PaletteGroup.ResumeLayout(False)
@@ -296,17 +335,20 @@ Partial Class OptionsGlobal
     Friend WithEvents InrangeMaxLabel As Windows.Forms.Label
     Friend WithEvents minCount As Windows.Forms.Label
     Friend WithEvents OpenFileDialog1 As Windows.Forms.OpenFileDialog
-    Friend WithEvents GroupBox1 As Windows.Forms.GroupBox
+    Friend WithEvents HistogramSettings As Windows.Forms.GroupBox
     Friend WithEvents IMUmotion As Windows.Forms.Label
     Friend WithEvents IMUmotionSlider As Windows.Forms.TrackBar
     Friend WithEvents ThresholdLabel As Windows.Forms.Label
-    Friend WithEvents threshold As Windows.Forms.Label
-    Friend WithEvents thresholdSlider As Windows.Forms.TrackBar
-    Friend WithEvents TopSideThresholdLabel As Windows.Forms.Label
+    Friend WithEvents HistBinsCount As Windows.Forms.Label
+    Friend WithEvents HistBinSlider As Windows.Forms.TrackBar
+    Friend WithEvents HistBins As Windows.Forms.Label
     Friend WithEvents resetToDefaults As Windows.Forms.CheckBox
     Friend WithEvents GroupBox2 As Windows.Forms.GroupBox
     Friend WithEvents UseKalman As Windows.Forms.CheckBox
     Friend WithEvents UseKalmanWhenStable As Windows.Forms.CheckBox
     Friend WithEvents PaletteGroup As Windows.Forms.GroupBox
     Friend WithEvents FlowLayoutPanel1 As Windows.Forms.FlowLayoutPanel
+    Friend WithEvents ProjectionThreshold As Windows.Forms.Label
+    Friend WithEvents ProjectionSlider As Windows.Forms.TrackBar
+    Friend WithEvents ProjectionThresh As Windows.Forms.Label
 End Class

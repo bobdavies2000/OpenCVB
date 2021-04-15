@@ -10,6 +10,7 @@ Public Class OptionsCommon : Inherits VBparent
 
         task.palette = New Palette_Basics
         task.cameraStableSlider = gOptions.IMUmotionSlider
+        task.histogramBins = gOptions.HistBinSlider.Value
 
         label1 = "Depth values that are in-range"
         label2 = "Depth values that are out of range (and < 8m)"
@@ -18,11 +19,13 @@ Public Class OptionsCommon : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat)
 
-        task.hist3DThreshold = gOptions.thresholdSlider.Value
+        task.hist3DThreshold = gOptions.HistBinSlider.Value
         task.useKalman = gOptions.UseKalman.Checked
         task.useKalmanWhenStable = gOptions.UseKalmanWhenStable.Checked
         task.paletteScheme = gOptions.scheme
         task.paletteSchemeName = gOptions.schemeName
+
+        task.histogramBins = gOptions.HistBinSlider.Value
 
         task.minDepth = gOptions.MinRange.Value
         task.maxDepth = gOptions.MaxRange.Value

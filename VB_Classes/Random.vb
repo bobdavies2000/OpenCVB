@@ -56,9 +56,9 @@ End Class
 
 Public Class Random_LUTMask : Inherits VBparent
     Dim random As Random_Basics
-    Dim km As kMeans_Basics
+    Dim km As KMeans_Basics
     Public Sub New()
-        km = New kMeans_Basics()
+        km = New KMeans_Basics()
         random = New Random_Basics()
         task.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image."
 		' task.rank = 1

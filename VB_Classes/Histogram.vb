@@ -11,11 +11,6 @@ Public Class Histogram_Basics : Inherits VBparent
 
         kalman = New Kalman_Basics()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Histogram Bins", 1, 1000, 50)
-        End If
-
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
             check.Box(0).Text = "Remove the zero histogram value"
@@ -41,26 +36,24 @@ Public Class Histogram_Basics : Inherits VBparent
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Static histBinSlider = findSlider("Histogram Bins")
-        plotHist.bins = histBinSlider.Value
-        Dim histSize() = {plotHist.bins}
+        Dim histSize() = {task.histogramBins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
 
-        Dim dimensions() = New Integer() {plotHist.bins}
+        Dim dimensions() = New Integer() {task.histogramBins}
         cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, New cv.Mat, histogram, 1, dimensions, ranges)
 
         Static zeroCheck = findCheckBox("Remove the zero histogram value")
         If zeroCheck.checked Then histogram.Set(Of Single)(0, 0, 0)
 
-        label2 = "Plot Histogram bins = " + CStr(plotHist.bins)
+        label2 = "Plot Histogram bins = " + CStr(task.histogramBins)
 
         If task.useKalman Then
-            ReDim kalman.kInput(plotHist.bins - 1)
-            For i = 0 To plotHist.bins - 1
+            ReDim kalman.kInput(task.histogramBins - 1)
+            For i = 0 To task.histogramBins - 1
                 kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
             Next
             kalman.Run(src)
-            For i = 0 To plotHist.bins - 1
+            For i = 0 To task.histogramBins - 1
                 histogram.Set(Of Single)(i, 0, kalman.kOutput(i))
             Next
         End If
@@ -90,24 +83,15 @@ Public Class Histogram_Graph : Inherits VBparent
     Public plotRequested As Boolean
     Public plotColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Histogram Bins", 2, 256, 50)
-            sliders.setupTrackBar(1, "Histogram line thickness", 1, 20, 3)
-        End If
         task.desc = "Plot histograms for up to 3 channels."
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        Static histBinSlider = findSlider("Histogram Bins")
-        bins = histBinSlider.Value
-
-        Static thicknessSlider = findSlider("Histogram line thickness")
-        Dim thickness = thicknessSlider.Value
+        If standalone Then bins = task.histogramBins
         Dim dimensions() = New Integer() {bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
 
-        Dim lineWidth = dst1.Cols / bins
+        Dim plotWidth = dst1.Width / bins
 
         dst1.SetTo(backColor)
         Dim maxVal As Double
@@ -121,10 +105,10 @@ Public Class Histogram_Graph : Inherits VBparent
                 Dim points = New List(Of cv.Point)
                 Dim listOfPoints = New List(Of List(Of cv.Point))
                 For j = 0 To bins - 1
-                    points.Add(New cv.Point(CInt(j * lineWidth), dst1.Rows - dst1.Rows * histRaw(i).Get(Of Single)(j, 0) / maxVal))
+                    points.Add(New cv.Point(CInt(j * plotWidth), dst1.Rows - dst1.Rows * histRaw(i).Get(Of Single)(j, 0) / maxVal))
                 Next
                 listOfPoints.Add(points)
-                dst1.Polylines(listOfPoints, False, plotColors(i), thickness, task.lineType)
+                dst1.Polylines(listOfPoints, False, plotColors(i), task.lineSize, task.lineType)
             End If
         Next
 
@@ -335,12 +319,9 @@ Public Class Histogram_EqualizeColor : Inherits VBparent
         kalmanEq = New Histogram_Basics
         kalman = New Histogram_Basics
 
-        Static binSlider = findSlider("Histogram Bins")
-        binSlider.Value = 40
+        mats = New Mat_2to1
 
-        mats = New Mat_2to1()
-
-        task.desc = "Create an equalized histogram of the color image. Image is noticeably enhanced."
+        task.desc = "Create an equalized histogram of the color image."
         ' task.rank = 1
         label1 = "Image Enhanced with Equalized Histogram"
     End Sub
@@ -380,10 +361,12 @@ End Class
 Public Class Histogram_EqualizeGray : Inherits VBparent
     Public histogramEq As Histogram_Basics
     Public histogram As Histogram_Basics
+    Dim mats As Mat_2to1
     Public Sub New()
         histogramEq = New Histogram_Basics
 
         histogram = New Histogram_Basics
+        mats = New Mat_2to1
 
         label1 = "Before EqualizeHist"
         label2 = "After EqualizeHist"
@@ -391,54 +374,17 @@ Public Class Histogram_EqualizeGray : Inherits VBparent
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-
-        Static binSlider = findSlider("Histogram Bins")
-        binSlider.Value = histogramEq.sliders.trackbar(0).Value
-
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         histogram.Run(src)
-        dst1 = histogram.dst1.Clone
-        cv.Cv2.EqualizeHist(src, src)
-        histogramEq.Run(src)
-        dst2 = histogramEq.dst1
+        mats.mat(0) = histogram.dst1.Clone
+        cv.Cv2.EqualizeHist(src, dst1)
+        histogramEq.Run(dst1)
+        mats.mat(1) = histogramEq.dst1
+        mats.Run(Nothing)
+        dst2 = mats.dst1
     End Sub
 End Class
 
-
-
-
-
-' https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
-Public Class Histogram_Equalize255 : Inherits VBparent
-    Dim eqHist As Histogram_EqualizeColor
-    Public Sub New()
-
-        eqHist = New Histogram_EqualizeColor()
-        Static binSlider = findSlider("Histogram Bins")
-        binSlider.Value = 255
-        eqHist.displayHist = True
-
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
-            radio.check(0).Text = "Equalize the Blue channel"
-            radio.check(1).Text = "Equalize the Green channel"
-            radio.check(2).Text = "Equalize the Red channel"
-            radio.check(2).Checked = True
-        End If
-        label1 = "Resulting equalized image"
-        label2 = "Upper plot is before equalization.  Bottom is after."
-        task.desc = "Reproduce the results of the hist.py example with existing algorithms"
-        ' task.rank = 1
-    End Sub
-    Public Sub Run(src As cv.Mat)
-        For i = 0 To 3 - 1
-            If radio.check(i).Checked Then eqHist.channel = i
-        Next
-        eqHist.Run(src)
-        dst1 = eqHist.dst1.Clone
-        dst2 = eqHist.dst2.Clone
-    End Sub
-End Class
 
 
 
@@ -449,19 +395,13 @@ Public Class Histogram_Simple : Inherits VBparent
     Public Sub New()
         plotHist = New Plot_Histogram()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Histogram Bins", 2, dst1.Cols, 50)
-        End If
-
         task.desc = "Build a simple and reusable histogram for grayscale images."
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        plotHist.bins = sliders.trackbar(0).Value
 
-        Dim histSize() = {sliders.trackbar(0).Value}
+        Dim histSize() = {task.histogramBins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
         cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 
@@ -469,9 +409,6 @@ Public Class Histogram_Simple : Inherits VBparent
         dst1 = plotHist.dst1
     End Sub
 End Class
-
-
-
 
 
 
@@ -964,13 +901,10 @@ End Class
 ' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
 Public Class Histogram_BackProjectionGrayscale : Inherits VBparent
     Dim hist As Histogram_Basics
-    Public histIndex As Integer
+    Public histIndex As Single
     Public binSlider As Windows.Forms.TrackBar
     Public Sub New()
         hist = New Histogram_Basics
-        binSlider = findSlider("Histogram Bins")
-        binSlider.Value = 10
-
         label1 = "Move mouse to backproject each histogram column"
         task.desc = "Explore Backprojection of each element of a grayscale histogram."
         ' task.rank = 1
@@ -979,17 +913,21 @@ Public Class Histogram_BackProjectionGrayscale : Inherits VBparent
         hist.Run(src)
         dst1 = hist.dst1
 
-        histIndex = CInt(hist.histogram.Rows * task.mousePoint.X / src.Width)
-        Dim barWidth = dst1.Width / binSlider.Value
-        Dim barRange = Math.Round(255 / binSlider.Value)
+        histIndex = hist.histogram.Rows * task.mousePoint.X / src.Width
+        Dim barWidth = dst1.Width / task.histogramBins
+        Dim barRange = 255 / task.histogramBins
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(histIndex * barRange, (histIndex + 1) * barRange)}
+        Dim maxRange = (histIndex + 1) * barRange
+        If CInt(histIndex) = task.histogramBins Then maxRange = 255
+        If maxRange > 255 Then maxRange = 255
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(histIndex * barRange, maxRange)}
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim mat() As cv.Mat = {gray}
         Dim bins() = {0}
         cv.Cv2.CalcBackProject(mat, bins, hist.histogram, dst2, ranges)
 
-        label2 = "Backprojecting " + CStr(histIndex * barRange) + " to " + CStr((histIndex + 1) * barRange) + " with " + Format(hist.histogram.Get(Of Single)(histIndex, 0), "#0") + " samples"
+        label2 = "Backprojecting " + CStr(CInt(histIndex * barRange)) + " to " + CStr(CInt(maxRange)) + " with " +
+                 Format(hist.histogram.Get(Of Single)(histIndex, 0), "#0") + " samples"
         dst1.Rectangle(New cv.Rect(barWidth * histIndex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 5)
     End Sub
 End Class
@@ -1363,11 +1301,6 @@ Public Class Histogram_Depth : Inherits VBparent
     Public Sub New()
         plotHist = New Plot_Histogram()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Histogram Depth Bins", 2, dst1.Cols, 50)
-        End If
-
         task.desc = "Show depth data as a histogram."
         ' task.rank = 1
     End Sub
@@ -1376,9 +1309,8 @@ Public Class Histogram_Depth : Inherits VBparent
         plotHist.minRange = 1 ' task.minDepth
         plotHist.maxRange = task.maxDepth
         Static binSlider = findSlider("Histogram Depth Bins")
-        plotHist.bins = binSlider.value
 
-        Dim histSize() = {plotHist.bins}
+        Dim histSize() = {task.histogramBins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
         cv.Cv2.CalcHist(New cv.Mat() {task.depth32f}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 

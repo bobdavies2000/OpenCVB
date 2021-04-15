@@ -37,7 +37,7 @@ End Class
 
 
 Public Class Distance_Foreground : Inherits VBparent
-    Dim foreground As kMeans_Depth_FG_BG
+    Dim foreground As KMeans_Depth_FG_BG
     Public Sub New()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)
@@ -46,7 +46,7 @@ Public Class Distance_Foreground : Inherits VBparent
             radio.check(2).Text = "L2"
             radio.check(2).Checked = True
         End If
-        foreground = New kMeans_Depth_FG_BG()
+        foreground = New KMeans_Depth_FG_BG()
         label1 = "Distance results"
         label2 = "Input mask to distance transformm"
         task.desc = "Distance algorithm basics."

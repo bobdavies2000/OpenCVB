@@ -19,8 +19,11 @@ Public Class OptionsGlobal
         maxCount.Text = CStr(MaxRange.Value)
         minCount.Text = CStr(MinRange.Value)
 
-        thresholdSlider.Value = GetSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", 2)
-        threshold.Text = CStr(thresholdSlider.Value)
+        HistBinSlider.Value = GetSetting("OpenCVB", "HistogramBins", "HistogramBins", 40)
+        HistBinsCount.Text = CStr(HistBinSlider.Value)
+
+        ProjectionSlider.Value = 2 '  GetSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", 2)
+        ProjectionThreshold.Text = CStr(ProjectionSlider.Value)
 
         IMUmotionSlider.Value = GetSetting("OpenCVB", "IMUmotionSlider", "IMUmotionSlider", 1)
         IMUmotion.Text = CStr(IMUmotionSlider.Value)
@@ -61,15 +64,16 @@ Public Class OptionsGlobal
     Private Sub OptionsGlobal_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         SaveSetting("OpenCVB", "MinRangeDepth", "MinRangeDepth", MinRange.Value)
         SaveSetting("OpenCVB", "MaxRangeDepth", "MaxRangeDepth", MaxRange.Value)
-        SaveSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", thresholdSlider.Value)
+        SaveSetting("OpenCVB", "HistogramBins", "HistogramBins", HistBinSlider.Value)
+        SaveSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", ProjectionSlider.Value)
         SaveSetting("OpenCVB", "IMUmotionSlider", "IMUmotionSlider", IMUmotionSlider.Value)
 
         SaveSetting("OpenCVB", "useKalman", "useKalman", UseKalman.Checked)
         SaveSetting("OpenCVB", "UseKalmanWhenStable", "UseKalmanWhenStable", UseKalmanWhenStable.Checked)
         SaveSetting("OpenCVB", "DefaultPalette", "DefaultPalette", schemeName)
     End Sub
-    Private Sub thresholdSlider_Scroll(sender As Object, e As EventArgs) Handles thresholdSlider.Scroll
-        threshold.Text = CStr(thresholdSlider.Value)
+    Private Sub thresholdSlider_Scroll(sender As Object, e As EventArgs) Handles HistBinSlider.Scroll
+        HistBinsCount.Text = CStr(HistBinSlider.Value)
     End Sub
     Private Sub IMUmotionSlider_Scroll(sender As Object, e As EventArgs) Handles IMUmotionSlider.Scroll
         IMUmotion.Text = CStr(IMUmotionSlider.Value)
@@ -80,6 +84,7 @@ Public Class OptionsGlobal
     Private Sub resetToDefaults_CheckedChanged(sender As Object, e As EventArgs) Handles resetToDefaults.CheckedChanged
         SaveSetting("OpenCVB", "MinRangeDepth", "MinRangeDepth", 200)
         SaveSetting("OpenCVB", "MaxRangeDepth", "MaxRangeDepth", 4000)
+        SaveSetting("OpenCVB", "HistogramBins", "HistogramBins", 40)
         SaveSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", 2)
         SaveSetting("OpenCVB", "IMUmotionSlider", "IMUmotionSlider", 1)
         SaveSetting("OpenCVB", "useKalman", "useKalman", True)
