@@ -3,19 +3,19 @@ Imports OpenCvSharp.XPhoto
 Imports System.Runtime.InteropServices
 Imports System.Windows.Forms
 
-Public Class xPhoto_Bm3dDenoise : Inherits VBparent
+Public Class XPhoto_Bm3dDenoise : Inherits VBparent
     Public Sub New()
         task.desc = "Denoise image with block matching and filtering."
-		' task.rank = 1
+        ' task.rank = 1
         label1 = "Bm3dDenoising"
         label2 = "Difference from Input"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.EqualizeHist(src, src)
         CvXPhoto.Bm3dDenoising(src, dst1)
         cv.Cv2.Subtract(dst1, src, dst2)
-        dst2.MinMaxLoc(minval, maxval)
+        dst2.MinMaxLoc(minVal, maxVal)
         label2 = "Diff from input - max change=" + CStr(maxVal)
         dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
@@ -25,18 +25,18 @@ End Class
 
 
 
-Public Class xPhoto_Bm3dDenoiseDepthImage : Inherits VBparent
+Public Class XPhoto_Bm3dDenoiseDepthImage : Inherits VBparent
     Public Sub New()
         task.desc = "Denoise the depth image with block matching and filtering."
-		' task.rank = 1
+        ' task.rank = 1
         label2 = "Difference from Input"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.EqualizeHist(gray, gray)
         CvXPhoto.Bm3dDenoising(gray, dst1)
         cv.Cv2.Subtract(dst1, gray, dst2)
-        dst2.MinMaxLoc(minval, maxval)
+        dst2.MinMaxLoc(minVal, maxVal)
         label2 = "Diff from input - max change=" + CStr(maxVal)
         dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
@@ -61,7 +61,7 @@ End Module
 
 
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/xphoto/samples/oil.cpp
-Public Class xPhoto_OilPaint_CPP : Inherits VBparent
+Public Class XPhoto_OilPaint_CPP : Inherits VBparent
     Dim xPhoto_OilPaint As IntPtr
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -82,10 +82,10 @@ Public Class xPhoto_OilPaint_CPP : Inherits VBparent
         Application.DoEvents() ' because the rest of initialization takes so long, let the show() above take effect.
         xPhoto_OilPaint = xPhoto_OilPaint_Open()
         task.desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
-        Dim colorCode As integer = cv.ColorConversionCodes.BGR2GRAY
+    Public Sub Run(src As cv.Mat)
+        Dim colorCode As Integer = cv.ColorConversionCodes.BGR2GRAY
         Static frm = findfrm("xPhoto_OilPaint_CPP Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
