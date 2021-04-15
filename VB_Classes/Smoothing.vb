@@ -144,7 +144,7 @@ Public Class Smoothing_Interior
 			dst1.SetTo(0)
 		End If
 		Dim smoothPoints2d = getCurveSmoothingChaikin(inputPoints, smOptions.interiorTension, smOptions.iterations)
-		Dim smoothPoints As New List(Of cv.Point)
+		smoothPoints = New List(Of cv.Point)
 		For i = 0 To smoothPoints2d.Count - 1 Step smOptions.stepSize
 			smoothPoints.Add(New cv.Point(CInt(smoothPoints2d.ElementAt(i).X), CInt(smoothPoints2d.ElementAt(i).Y)))
 		Next
@@ -217,6 +217,7 @@ Public Class Smoothing_Contours
 		smOptions.Run(Nothing)
 
 		outline.Run(src)
+		dst1 = outline.dst1.Clone
 		dst2 = outline.dst1
 
 		Dim smooth = If(radio.check(0).Checked, smoothI, smoothE)
@@ -238,7 +239,7 @@ Public Class Smoothing_Contours
 		Next
 
 		smooth.Run(Nothing)
-		dst1 = smooth.dst1
+		If smooth.smoothPoints.Count > 0 Then drawPoly(dst1, smooth.smoothPoints.ToArray, smooth.plotColor)
 
 		label1 = "Smoothing with " + If(radio.check(0).Checked, "Interior", "Exterior") + " lines"
 		label2 = "Found " + CStr(contours0.Count) + " countours in the largest blob"
