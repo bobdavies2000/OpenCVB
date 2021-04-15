@@ -54,20 +54,13 @@ Public Class Math_Median_CDF : Inherits VBparent
     Public medianVal As Double
     Public rangeMin As Integer = 0
     Public rangeMax As Integer = 255
-    Public bins As integer = 10
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Histogram Bins", 4, 1000, 100)
-        End If
         task.desc = "Compute the src image median"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If standalone or task.intermediateReview = caller Then bins = sliders.trackbar(0).Value
-
-        medianVal = computeMedian(src, New cv.Mat, src.Total, bins, rangeMin, rangeMax)
+        medianVal = computeMedian(src, New cv.Mat, src.Total, task.histogramBins, rangeMin, rangeMax)
 
         If standalone or task.intermediateReview = caller Then
             Dim mask = New cv.Mat

@@ -10,15 +10,9 @@ Public Class Voxels_Basics_MT : Inherits VBparent
             check.Box(0).Checked = True
         End If
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Histogram Bins", 2, 200, 100)
-        End If
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 16
-        gridHeightSlider.Value = 16
+        findSlider("ThreadGrid Width").Value = 16
+        findSlider("ThreadGrid Height").Value = 16
 
         label2 = "Voxels labeled with their median distance"
         task.desc = "Use multi-threading to get median depth values as voxels."
@@ -37,7 +31,6 @@ Public Class Voxels_Basics_MT : Inherits VBparent
 
         If voxels.Length <> grid.roiList.Count Then ReDim voxels(grid.roiList.Count - 1)
 
-        Dim bins = sliders.trackbar(0).Value
         Parallel.For(0, grid.roiList.Count,
         Sub(i)
             Dim roi = grid.roiList(i)

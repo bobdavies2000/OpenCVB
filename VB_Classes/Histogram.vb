@@ -1308,7 +1308,6 @@ Public Class Histogram_Depth : Inherits VBparent
 
         plotHist.minRange = 1 ' task.minDepth
         plotHist.maxRange = task.maxDepth
-        Static binSlider = findSlider("Histogram Depth Bins")
 
         Dim histSize() = {task.histogramBins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
@@ -1333,12 +1332,8 @@ Public Class Histogram_DepthValleys : Inherits VBparent
     Public ranges As New List(Of cv.Point)
     Public rangeColors As New List(Of Integer)
     Public rangeCounts As New List(Of Integer)
-    Dim histSlider As Windows.Forms.TrackBar
     Public Sub New()
         hist = New Histogram_Depth()
-
-        histSlider = findSlider("Histogram Depth Bins")
-        histSlider.Value = 40 ' number of bins.
 
         kalman = New Kalman_Basics()
 
@@ -1359,7 +1354,7 @@ Public Class Histogram_DepthValleys : Inherits VBparent
             histogram.Set(Of Single)(i, 0, kalman.kOutput(i))
         Next
 
-        Dim depthIncr = task.maxDepth / histSlider.Value ' each bar represents this number of millimeters
+        Dim depthIncr = task.maxDepth / task.histogramBins ' each bar represents this number of millimeters
         Dim startDepth = 1
         ranges.Clear()
         rangeColors.Clear()
