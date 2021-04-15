@@ -384,7 +384,6 @@ Public Class Random_CustomHistogram : Inherits VBparent
         random.outputRandom = New cv.Mat(1000, 1, cv.MatType.CV_32S, 0)
 
         hist = New Histogram_Simple()
-        hist.sliders.trackbar(0).Value = 255
 
         label1 = "Histogram of the grayscale image"
         label2 = "Histogram of the resulting random numbers"
@@ -396,8 +395,8 @@ Public Class Random_CustomHistogram : Inherits VBparent
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Static saveBins As Integer
-        If hist.sliders.trackbar(0).Value <> saveBins Then
-            saveBins = hist.sliders.trackbar(0).Value
+        If task.histogramBins <> saveBins Then
+            saveBins = task.histogramBins
             hist.plotHist.fixedMaxVal = 0 ' we are sharing the plothist with the code below...
             hist.Run(src)
             dst1 = hist.dst1.Clone()

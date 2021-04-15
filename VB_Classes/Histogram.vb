@@ -475,8 +475,8 @@ Public Class Histogram_BackProjectionPeak : Inherits VBparent
         Dim minVal As Single, maxVal As Single
         Dim minIdx As cv.Point, maxIdx As cv.Point
         hist.histogram.MinMaxLoc(minVal, maxVal, minIdx, maxIdx)
-        Dim barWidth = dst1.Width / hist.sliders.trackbar(0).Value
-        Dim barRange = 255 / hist.sliders.trackbar(0).Value
+        Dim barWidth = dst1.Width / task.histogramBins
+        Dim barRange = 255 / task.histogramBins
         Dim histindex = maxIdx.Y
         Dim pixelMin = CInt((histindex) * barRange)
         Dim pixelMax = CInt((histindex + 1) * barRange)
@@ -514,12 +514,14 @@ Public Class Histogram_BackProjection2D : Inherits VBparent
     Public Sub Run(src As cv.Mat)
         hist.Run(src)
         dst1 = hist.dst1
-        Static hueBins = hist.sliders.trackbar(0).Value
-        Static satBins = hist.sliders.trackbar(1).Value
-        If hueBins <> hist.sliders.trackbar(0).Value Or satBins <> hist.sliders.trackbar(1).Value Then
+        Static hueBinSlider = findSlider("Hue bins")
+        Static hueBins = hueBinSlider.Value
+        Static satBinSlider = findSlider("Saturation bins")
+        Static satBins = satBinSlider.Value
+        If hueBins <> hueBinSlider.Value Or satBins <> satBinSlider.Value Then
             task.drawRectClear = True
-            hueBins = hist.sliders.trackbar(0).Value
-            satBins = hist.sliders.trackbar(1).Value
+            hueBins = hueBinSlider.Value
+            satBins = satBinSlider.Value
         End If
 
         Dim unitsPerHueBin = 180 / hueBins
