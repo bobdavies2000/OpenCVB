@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://docs.opencv.org/3.4.3/d1/d9e/fld_lines_8cpp-example.html
-Public Class lineFLD_Basics : Inherits VBparent
+Public Class LineFLD_Basics : Inherits VBparent
     Public lines As New List(Of cv.Vec4f)
     Public minLenSlider As Windows.Forms.TrackBar
     Public maxDistanceSlider As Windows.Forms.TrackBar
@@ -37,9 +37,9 @@ Public Class lineFLD_Basics : Inherits VBparent
         label1 = "Lines detected in the last frame"
         label2 = "If camera motion, image is reset"
         task.desc = "A Fast Line Detector"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         lines.Clear()
 
         Dim length_threshold = minLenSlider.Value
@@ -255,16 +255,16 @@ End Module
 
 
 ' https://docs.opencv.org/3.4.3/d1/d9e/fld_lines_8cpp-example.html
-Public Class lineFLD_CPP : Inherits VBparent
+Public Class LineFLD_CPP : Inherits VBparent
     Public sortedLines As New SortedList(Of cv.Vec6f, Integer)
-    Dim lineFLD As lineFLD_Basics
+    Dim lineFLD As LineFLD_Basics
     Public lineMat As New cv.Mat
     Public Sub New()
-        lineFLD = New lineFLD_Basics
+        lineFLD = New LineFLD_Basics
         task.desc = "Basics for a Fast Line Detector"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         sortedLines.Clear()
 
         Dim length_threshold = lineFLD.minLenSlider.Value
