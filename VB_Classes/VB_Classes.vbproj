@@ -460,7 +460,7 @@
     <Content Include="RotateImage.py" />
     <Content Include="SelectiveSearchSegmentation_Demo.py" />
     <Content Include="PhotoShop_sepia.py" />
-    <Content Include="stereo_match.py" />
+    <Content Include="Stereo_match.py" />
     <Content Include="Superpixels_PS.py" />
     <Content Include="TensorFlow_Example1_PS.py" />
     <Content Include="Tetris.py" />
