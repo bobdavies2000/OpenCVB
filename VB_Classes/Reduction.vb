@@ -204,7 +204,7 @@ Public Class Reduction_Histogram : Inherits VBparent
         hist.Run(basics.dst1)
         dst1 = hist.dst1
         dst2 = hist.dst2
-        label1 = "Reduction = " + CStr(reductionSlider.value) + " and bins = " + CStr(hist.binSlider.Value)
+        label1 = "Reduction = " + CStr(reductionSlider.value) + " and bins = " + CStr(task.histogramBins)
     End Sub
 End Class
 
