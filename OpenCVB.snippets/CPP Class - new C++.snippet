@@ -64,8 +64,7 @@ End Module
 '//		return (int *) cPtr->dst.data; // return this C++ allocated data to managed code
 '//}
 
-Public Class AnyName_CPP
-    Inherits VBparent
+Public Class AnyName_CPP : Inherits VBparent
     Dim cPtr As IntPtr
     Public Sub New()
         cPtr = Anyname_Open()
