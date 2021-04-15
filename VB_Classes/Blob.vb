@@ -273,7 +273,7 @@ Public Class Blob_DepthRanges
     Public histBlobs As Histogram_DepthClusters
     Public grayOnly As Boolean
     Public masks As New List(Of cv.Mat)
-    Public maskSizes As New SortedList(Of Integer, Integer)
+    Public maskSizes As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public ranges As New List(Of cv.Point)
     Public Sub New()
         histBlobs = New Histogram_DepthClusters

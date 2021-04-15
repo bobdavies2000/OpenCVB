@@ -231,7 +231,7 @@ Public Class Reduction_PointCloud
     End Sub
     Public Sub Run(src As cv.Mat)
 
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
         Dim split() = src.Split()
 
         split(2) *= 1000
