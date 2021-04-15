@@ -121,7 +121,7 @@ Public Class kMeans_Clusters
             km.Run(src)
             Mats.mat(i) = km.dst1.Clone
         Next
-        Mats.Run(src)
+        mats.Run(Nothing)
         dst1 = Mats.dst1
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
         dst2 = Mats.mat(quadrantIndex)
@@ -402,7 +402,7 @@ Public Class kMeans_Color_MT
             gridHeightSlider.Value = 160
 
         End If
-        grid.run(src)
+        grid.Run(Nothing)
         Dim clusterCount = sliders.trackbar(0).Value
         Parallel.ForEach(grid.roiList,
         Sub(roi)
@@ -493,7 +493,7 @@ Public Class kMeans_ColorDepth_MT
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        grid.run(src)
+        grid.Run(Nothing)
 
         Dim clusterCount = sliders.trackbar(0).Value
         Parallel.ForEach(grid.roiList,

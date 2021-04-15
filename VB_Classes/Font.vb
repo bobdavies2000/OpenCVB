@@ -56,18 +56,18 @@ Public Class Font_FlowText
         task.desc = "Show TrueType text flowing through an image."
 		' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
-        If standalone or task.intermediateReview = caller Then
+    Public Sub Run(src As cv.Mat)
+        If standalone Or task.intermediateReview = caller Then
             msgs.Add("-------------------------------------------------------------------------------------------------------------------")
             msgs.Add("To get text to flow across an image in any algorithm, add 'flow = new Font_FlowText()' to the class constructor.")
             msgs.Add("Also optionally indicate if you want result1 or result2 for text (the default is result1.)")
             msgs.Add("Then in your Run method, add a line 'flow.msgs.add('your next line of text')' - for as many msgs as you need on each pass.")
-            msgs.Add("Then at the end of your Run method, invoke flow.Run(src)")
+            msgs.Add("Then at the end of your Run method, invoke flow.Run(Nothing)")
         End If
         Static lastCount As Integer
 
         Dim maxlines = 22
-        If src.Height = 480 Then maxlines = 28
+        If dst1.Height = 480 Then maxlines = 28
         Dim firstLine = If(msgs.Count - maxlines < 0, 0, msgs.Count - maxlines)
         Dim fullText As String = ""
         For i = firstLine To msgs.Count - 1
@@ -75,7 +75,7 @@ Public Class Font_FlowText
         Next
         task.trueText(fullText, 10, 20, dst)
 
-        If msgs.Count >= maxLines Then
+        If msgs.Count >= maxlines Then
             Try
                 Dim index As Integer
                 For i = 0 To lastCount - maxlines - 1

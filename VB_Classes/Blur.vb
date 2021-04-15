@@ -207,8 +207,7 @@ Public Class Blur_TopoMap
     Public Sub New()
 
         addw = New AddWeighted_Basics
-        Dim weightSlider = findSlider("Weight")
-        weightSlider.Value = 15
+        findSlider("Weight").Value = 15
 
         gradient = New Gradient_CartToPolar
 

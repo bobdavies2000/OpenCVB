@@ -83,7 +83,7 @@ Public Class ProCon_Basics
         pduration = sliders.trackbar(1).Value
         cduration = sliders.trackbar(2).Value
         SyncLock mutex
-            flow.Run(src)
+            flow.Run(Nothing)
         End SyncLock
     End Sub
     Public Sub Close()

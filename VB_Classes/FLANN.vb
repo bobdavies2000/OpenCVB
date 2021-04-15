@@ -70,7 +70,7 @@ Public Class FLANN_Basics
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim reuseData = check.Box(1).Checked
-        If reuseData = False Or task.frameCount = 0 Then random.Run(src) ' fill result1 with random points in x and y range of the image.
+        If reuseData = False Or task.frameCount = 0 Then random.Run(Nothing) ' fill result1 with random points in x and y range of the image.
         Dim features As New cv.Mat(random.Points2f.Length, 2, cv.MatType.CV_32F, random.Points2f)
 
         Dim matchCount = Math.Min(sliders.trackbar(1).Value, random.Points2f.Length - 1)

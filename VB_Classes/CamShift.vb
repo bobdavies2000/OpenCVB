@@ -195,7 +195,7 @@ Public Class Camshift_TopObjects
         For i = 0 To trackBoxes.Count - 1
             dst1.Ellipse(trackBoxes(i), cv.Scalar.White, 2, task.lineType)
         Next
-        mats.Run(src)
+        mats.Run(Nothing)
         dst2 = mats.dst1
     End Sub
 End Class

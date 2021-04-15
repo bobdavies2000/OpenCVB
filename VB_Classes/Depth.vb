@@ -160,7 +160,7 @@ Public Class Depth_MeanStdev_MT
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        grid.Run(src)
+        grid.Run(Nothing)
         dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U)
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U)
 
@@ -489,7 +489,7 @@ Public Class Depth_ColorizerVB_MT
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        grid.Run(src)
+        grid.Run(Nothing)
 
         If standalone Or task.intermediateReview = caller Then src = task.depth32f
         Dim nearColor = New Single() {0, 1, 1}
@@ -551,7 +551,7 @@ Public Class Depth_Colorizer_MT
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        grid.Run(src)
+        grid.Run(Nothing)
 
         If standalone Or task.intermediateReview = caller Then src = task.depth32f
         Dim nearColor = New Single() {0, 1, 1}
@@ -597,7 +597,7 @@ Public Class Depth_LocalMinMax_MT
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        grid.Run(src)
+        grid.Run(Nothing)
 
         Dim mask = task.depth32f.Threshold(1, 5000, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8UC1)
@@ -639,7 +639,7 @@ Public Class Depth_LocalMinMax_Kalman_MT
         Static gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = 128
         gridHeightSlider.Value = 90
-        grid.Run(dst1)
+        grid.Run(Nothing)
 
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(grid.roiList.Count * 4 - 1)
@@ -649,7 +649,7 @@ Public Class Depth_LocalMinMax_Kalman_MT
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        grid.Run(src)
+        grid.Run(Nothing)
 
         If grid.roiList.Count * 4 <> kalman.kInput.Length Then
             If kalman IsNot Nothing Then kalman.Dispose()
@@ -708,7 +708,7 @@ Public Class Depth_ColorMap
         task.desc = "Display the depth as a color map"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim alpha = sliders.trackbar(0).Value / 100
         Dim beta = sliders.trackbar(1).Value
         cv.Cv2.ConvertScaleAbs(task.depth32f, src, alpha, beta)
@@ -736,7 +736,7 @@ Public Class Depth_NotMissing
         task.desc = "Collect X frames, compute stable depth using the RGB and Depth image."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If standalone Or task.intermediateReview = caller Then src = task.RGBDepth
         mog.Run(src)
         dst1 = mog.dst1
@@ -764,7 +764,7 @@ Public Class Depth_Median
         task.desc = "Divide the depth image ahead and behind the median."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         median.Run(task.depth32f)
 
         Dim mask As cv.Mat
@@ -800,7 +800,7 @@ Public Class Depth_SmoothingMat
         task.desc = "Use depth rate of change to smooth the depth values beyond close range"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If standalone Or task.intermediateReview = caller Then src = task.depth32f
         Dim rect = If(task.drawRect.Width <> 0, task.drawRect, New cv.Rect(0, 0, src.Width, src.Height))
         Static lastDepth = task.depth32f
@@ -841,7 +841,7 @@ Public Class Depth_Smoothing
         task.desc = "This attempt to get the depth data to 'calm' down is not working well enough to be useful - needs more work"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         smooth.Run(task.depth32f)
         Dim input = smooth.dst1.Normalize(0, 255, cv.NormTypes.MinMax)
         input.ConvertTo(mats.mat(0), cv.MatType.CV_8UC1)
@@ -853,7 +853,7 @@ Public Class Depth_Smoothing
         reduction.dst1.ConvertTo(reducedDepth, cv.MatType.CV_32F)
         colorize.Run(reducedDepth)
         dst1 = colorize.dst1
-        mats.Run(src)
+        mats.Run(Nothing)
         dst2 = mats.dst1
         label1 = smooth.label1
     End Sub
@@ -881,7 +881,7 @@ Public Class Depth_Edges
         task.desc = "Find edges in depth data"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         edges.Run(src)
         dst1 = edges.dst2
         dst2 = edges.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
@@ -906,7 +906,7 @@ Public Class Depth_HolesOverTime
         task.desc = "Integrate memory holes over time to identify unstable depth"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         recentImages.Add(task.noDepthMask.Clone) ' To see the value of clone, remove it temporarily.  Only the most recent depth holes are added in.
 
         dst2 = task.noDepthMask
@@ -941,7 +941,7 @@ Public Class Depth_Holes
         task.desc = "Identify holes in the depth image."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         holeMask = task.depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
         holeMask = holeMask.Dilate(element, Nothing, sliders.trackbar(1).Value)
         dst1 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -969,7 +969,7 @@ Public Class Depth_WorldXYZ
         task.desc = "Create 32-bit XYZ format from depth data (to slow to be useful.)"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim input = src
         If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f
         If depthUnitsMeters = False Then input = (input * 0.001).ToMat
@@ -1003,9 +1003,9 @@ Public Class Depth_WorldXYZ_MT
         task.desc = "Create OpenGL point cloud from depth data (slow)"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.depth32f
-        grid.Run(src)
+        grid.Run(Nothing)
 
         dst2 = New cv.Mat(task.pointCloud.Size(), cv.MatType.CV_32FC3, 0)
         If depthUnitsMeters = False Then src = (src * 0.001).ToMat
@@ -1051,7 +1051,7 @@ Public Class Depth_Foreground
         task.desc = "Use InRange to define foreground and find the largest blob in the foreground"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static depthSlider = findSlider("Max Range for foreground depth in mm's")
 
         cv.Cv2.InRange(task.depth32f, 0, depthSlider.value, dst1)
@@ -1103,7 +1103,7 @@ Public Class Depth_ForegroundOverTime
         task.desc = "Create a fused foreground mask over x number of frames"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         Static lastFrames As New List(Of cv.Mat)
         Static countSlider = findSlider("Number of frames to fuse")
@@ -1142,7 +1142,7 @@ Public Class Depth_InRange
         task.desc = "Show depth with OpenCV using varying min and max depths."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         dst1 = task.depth32f
         dst1.SetTo(0, task.noDepthMask)
@@ -1168,7 +1168,7 @@ Public Class Depth_LowQualityMask
         task.desc = "Monitor motion in the mask where depth is zero"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         dst1 = task.noDepthMask
         dilate.Run(dst1)
@@ -1198,7 +1198,7 @@ Public Class Depth_PunchDecreasing
         task.desc = "Identify where depth is decreasing - coming toward the camera."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         fore.Run(src)
         Dim depth32f As New cv.Mat
@@ -1230,7 +1230,7 @@ Public Class Depth_PunchIncreasing
         task.desc = "Identify where depth is increasing - retreating from the camera."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         depth.Run(src)
         dst1 = depth.dst1
     End Sub
@@ -1248,14 +1248,13 @@ Public Class Depth_PunchBlob
     Dim contours As Contours_Basics
     Public Sub New()
         contours = New Contours_Basics
-        Dim areaSlider = findSlider("Contour minimum area")
-        areaSlider.Value = 5000
+        findSlider("Contour minimum area").Value = 5000
 
         depthInc = New Depth_PunchDecreasing
         task.desc = "Identify the punch with a rectangle around the largest blob"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         depthInc.Run(src)
         dst1 = depthInc.dst1
 
@@ -1311,7 +1310,7 @@ Public Class Depth_SmoothSurfaces
         task.desc = "Find planes using the pointcloud X and Y differences"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         pcValid.Run(src)
         Dim mask = pcValid.dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
@@ -1345,7 +1344,7 @@ Public Class Depth_SmoothSurfaces
         mat(0) = yMat
         cv.Cv2.CalcBackProject(mat, bins, histX.histogram, mats.mat(3), ranges)
 
-        mats.Run(src)
+        mats.Run(Nothing)
         dst1 = mats.dst1
 
         cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), dst2)

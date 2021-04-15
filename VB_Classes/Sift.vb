@@ -58,7 +58,7 @@ Public Class Sift_Basics_MT
         gridWidthSlider.Value = task.color.Cols * 2 ' we are just taking horizontal slices of the image.
         gridHeightSlider.Value = 10
 
-        grid.Run(dst1)
+        grid.Run(Nothing)
 
         siftBasics = New Sift_Basics
         numPointSlider = findSlider("Points to Match")
@@ -68,7 +68,7 @@ Public Class Sift_Basics_MT
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        grid.run(src)
+        grid.Run(Nothing)
 
         lrView.Run(src)
 

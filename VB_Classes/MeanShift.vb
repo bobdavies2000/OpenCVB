@@ -149,9 +149,9 @@ Public Class Meanshift_TopObjects
                 trackBoxes.Add(cams(i).trackbox)
             End If
         Next
-        mats1.Run(src)
+        mats1.Run(Nothing)
         dst1 = mats1.dst1
-        mats2.Run(src)
+        mats2.Run(Nothing)
         dst2 = mats2.dst1
     End Sub
 End Class

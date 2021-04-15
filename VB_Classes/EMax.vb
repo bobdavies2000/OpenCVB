@@ -13,12 +13,9 @@ Public Class EMax_Basics
         EMax_Basics = EMax_Basics_Open()
         edges = New Edges_Sobel
 
-        Dim lowDiffslider = findSlider("FloodFill LoDiff")
-        Dim highDiffslider = findSlider("FloodFill HiDiff")
-        lowDiffslider.Value = 1
-        highDiffslider.Value = 1
-        Dim kernelSlider = findSlider("Sobel kernel Size")
-        kernelSlider.Value = 7
+        findSlider("FloodFill LoDiff").Value = 1
+        findSlider("FloodFill HiDiff").Value = 1
+        findSlider("Sobel kernel Size").Value = 7
 
         label2 = "Emax regions around clusters"
         task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
@@ -86,8 +83,7 @@ Public Class EMax_CentroidsNew
 
         emaxCPP = New EMax_Basics()
 
-        Dim gridWidthSlider = findSlider("ThreadGrid Width")
-        gridWidthSlider.Value = dst1.Width * 170 / 640
+        findSlider("ThreadGrid Width").Value = dst1.Width * 170 / 640
 
         task.desc = "Colorize the output of Emax"
 		' task.rank = 1
@@ -155,7 +151,7 @@ Public Class EMax_VB_Failing
             Exit Sub ' comment this line to see the bug in the VB.Net version of this Predict2 below.
         End If
 
-        grid.Run(src)
+        grid.Run(Nothing)
         regionCount = grid.roiList.Count - 1
 
         samples = New cv.Mat(sliders.trackbar(0).Value, 2, cv.MatType.CV_32FC1, 0)
@@ -242,10 +238,8 @@ Public Class EMax_Centroids
         flood = New FloodFill_Basics()
 
         emaxCPP = New EMax_Basics()
-        Dim lowDiffslider = findSlider("FloodFill LoDiff")
-        Dim highDiffslider = findSlider("FloodFill HiDiff")
-        lowDiffslider.Value = 1
-        highDiffslider.Value = 1
+        findSlider("FloodFill LoDiff").Value = 1
+        findSlider("FloodFill HiDiff").Value = 1
 
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         gridWidthSlider.Value = dst1.Width * 170 / 640

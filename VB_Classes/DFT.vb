@@ -68,7 +68,7 @@ Public Class DFT_Basics
         mats.mat(2) = padded(New cv.Rect(cx, 0, cx, cy)).Clone()
         mats.mat(1) = padded(New cv.Rect(0, cy, cx, cy)).Clone()
         mats.mat(0) = padded(New cv.Rect(cx, cy, cx, cy)).Clone()
-        mats.Run(src)
+        mats.Run(Nothing)
         dst2 = mats.dst1
 
         dst1 = inverseDFT(complexImage)
@@ -86,10 +86,10 @@ Public Class DFT_Inverse
     Public Sub New()
         mats = New Mat_2to1()
         task.desc = "Take the inverse of the Discrete Fourier Transform."
-		' task.rank = 1
+        ' task.rank = 1
         label1 = "Image after Inverse DFT"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         src.ConvertTo(gray32f, cv.MatType.CV_32F)
@@ -251,8 +251,7 @@ Public Class DFT_Shapes
         lines = New Draw_Line
         symShapes = New Draw_SymmetricalShapes
 
-        Dim drawSlider = findSlider("DrawCount")
-        drawSlider.Value = 1
+        findSlider("DrawCount").Value = 1
 
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 7)
@@ -272,7 +271,7 @@ Public Class DFT_Shapes
 		' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        optDraw.Run()
+        optDraw.Run(Nothing)
 
         Static circleRadio = findRadio("Draw Circle")
         Static ellipseRadio = findRadio("Draw Ellipse")

@@ -147,7 +147,7 @@ Public Class Math_RGBCorrelation
         Dim redBlueCorrelation = "Red-Blue " + match.label1
 
         flow.msgs.Add(blueGreenCorrelation + " " + redGreenCorrelation + " " + redBlueCorrelation)
-        flow.Run(src)
+        flow.Run(Nothing)
         label1 = "Log of " + match.matchText
     End Sub
 End Class
@@ -215,10 +215,8 @@ Public Class Math_Stdev
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Stdev Threshold", 0, 100, 10)
         End If
-        Dim widthSlider = findSlider("ThreadGrid Width")
-        Dim heightSlider = findSlider("ThreadGrid Height")
-        widthSlider.Value = 16
-        heightSlider.Value = 16
+        findSlider("ThreadGrid Width").Value = 16
+        findSlider("ThreadGrid Height").Value = 16
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 3)
@@ -238,7 +236,7 @@ Public Class Math_Stdev
         highStdevMask.SetTo(0)
         Dim fsize = task.fontSize / 3
 
-        grid.run(src)
+        grid.Run(Nothing)
 
         dst1 = src.Clone
         If dst1.Channels = 3 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

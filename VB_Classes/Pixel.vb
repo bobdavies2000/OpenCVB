@@ -214,7 +214,7 @@ Public Class Pixel_GetSet
 
         task.trueText(output, src.Width / 2 + 10, src.Height / 2 + 20)
 
-        mats.Run(src)
+        mats.Run(Nothing)
         dst1 = mats.dst1
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
         dst2 = mats.mat(quadrantIndex)
@@ -287,7 +287,7 @@ Public Class Pixel_Sampler
         Else
             random.rangeRect = New cv.Rect(0, 0, src.Width, src.Height)
         End If
-        random.Run(src)
+        random.Run(Nothing)
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim index As New List(Of cv.Point)

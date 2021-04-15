@@ -107,7 +107,7 @@ Public Class Plane_Detect
         label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run(src as cv.Mat)
-        grid.Run(src)
+        grid.Run(Nothing)
 
         dst2.SetTo(0)
         task.RGBDepth.CopyTo(dst1)
@@ -179,7 +179,7 @@ Public Class Plane_DetectDebug
         label2 = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run(src as cv.Mat)
-        grid.Run(src)
+        grid.Run(Nothing)
 
         dst2.SetTo(0)
         task.RGBDepth.CopyTo(dst1)

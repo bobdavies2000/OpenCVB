@@ -77,7 +77,7 @@ Public Class ML_FillRGBDepth_MT
     End Sub
     Public Sub Run(src as cv.Mat)
         shadow.Run(src)
-        grid.run(src)
+        grid.Run(Nothing)
         Dim minLearnCount = 5
         Parallel.ForEach(grid.roiList,
             Sub(roi)
@@ -148,7 +148,7 @@ Public Class ML_DepthFromColor_MT
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        grid.run(src)
+        grid.Run(Nothing)
 
         Dim mask = task.depth32f.Threshold(sliders.trackbar(0).Value, sliders.trackbar(0).Value, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         task.depth32f.SetTo(sliders.trackbar(0).Value, mask)
@@ -255,7 +255,7 @@ Public Class ML_DepthFromColor
         colorizer.Run(predictedDepth)
         mats.mat(0) = colorizer.dst1.Clone()
 
-        mats.Run(src)
+        mats.Run(Nothing)
         dst1 = mats.dst1
         label1 = "prediction, shadow, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
@@ -350,7 +350,7 @@ Public Class ML_DepthFromXYColor
         colorizer.Run(predictedDepth)
         dst1 = colorizer.dst1.Clone()
 
-        mats.Run(src)
+        mats.Run(Nothing)
         dst2 = mats.dst1
         label2 = "shadow, empty, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
     End Sub
@@ -386,7 +386,7 @@ Public Class ML_EdgeDepth_MT
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        grid.run(src)
+        grid.Run(Nothing)
 
         Dim mask = task.depth32f.Threshold(sliders.trackbar(0).Value, sliders.trackbar(0).Value, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         task.depth32f.SetTo(sliders.trackbar(0).Value, mask)

@@ -113,7 +113,7 @@ Public Class FloodFill_Top16_MT
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Clone()
-        grid.run(src)
+        grid.Run(Nothing)
         Parallel.ForEach(grid.roiList,
         Sub(roi)
             For y = roi.Y To roi.Y + roi.Height - 1
@@ -151,7 +151,7 @@ Public Class FloodFill_Color_MT
         Dim hiDiff = cv.Scalar.All(flood.sliders.trackbar(2).Value)
 
         dst1 = src.Clone()
-        grid.run(src)
+        grid.Run(Nothing)
         Dim vec255 = New cv.Vec3b(255, 255, 255)
         Dim vec0 = New cv.Vec3b(0, 0, 0)
         Dim regionCount As Integer = 0
@@ -746,7 +746,7 @@ Public Class FloodFill_FullImage
             mats.mat(2).Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
 
-        mats.Run(src)
+        mats.Run(Nothing)
         dst1 = mats.dst1
         dst2 = mats.mat(quadrantIndex)
     End Sub

@@ -104,7 +104,7 @@ Public Class Video_CarCounting
 
             Dim tmp = videoImage.Resize(src.Size())
             flow.msgs.Add("  Cars " + CStr(carCount))
-            flow.Run(src)
+            flow.Run(Nothing)
             cv.Cv2.BitwiseOr(dst1, tmp.CvtColor(cv.ColorConversionCodes.GRAY2BGR), dst1)
         End If
     End Sub

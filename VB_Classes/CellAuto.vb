@@ -118,7 +118,7 @@ Public Class CellAuto_Life
         grid = New cv.Mat(dst1.Height / factor, dst1.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
 
-        random = New Random_Basics()
+        random = New Random_Basics
         random.rangeRect = New cv.Rect(0, 0, grid.Width, grid.Height)
         Static randomSlider = findSlider("Random Pixel Count")
         randomSlider.Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
@@ -129,7 +129,7 @@ Public Class CellAuto_Life
         Static savePointCount As Integer
         Static randomSlider = findSlider("Random Pixel Count")
         If randomSlider.Value <> savePointCount Or generation = 0 Then
-            random.Run(src)
+            random.Run(Nothing)
             generation = 0
             savePointCount = randomSlider.Value
             For i = 0 To random.Points.Count - 1

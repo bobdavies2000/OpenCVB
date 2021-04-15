@@ -458,7 +458,7 @@ Public Class PointCloud_Raw_CPP
         cPtr = SimpleProjectionOpen()
     End Sub
     Public Sub Run(src as cv.Mat)
-        grid.run(src)
+        grid.Run(Nothing)
 
         Dim h = src.Height
         Dim w = src.Width
@@ -508,7 +508,7 @@ Public Class PointCloud_Raw
         cPtr = SimpleProjectionOpen()
     End Sub
     Public Sub Run(src as cv.Mat)
-        grid.run(src)
+        grid.Run(Nothing)
 
         Dim h = src.Height
         Dim w = src.Width
@@ -555,8 +555,7 @@ Public Class PointCloud_Kalman_TopView
 
         pTrack = New KNN_PointTracker
         flood = New FloodFill_Palette
-        Dim minFloodSlider = findSlider("FloodFill Minimum Size")
-        minFloodSlider.Value = 100
+        findSlider("FloodFill Minimum Size").Value = 100
         topView = New Histogram_TopView2D
 
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
@@ -602,8 +601,7 @@ Public Class PointCloud_Kalman_SideView
         cmat = New PointCloud_ColorizeSide
         flood = New Floodfill_Identifiers
 
-        Dim minFloodSlider = findSlider("FloodFill Minimum Size")
-        minFloodSlider.Value = 100
+        findSlider("FloodFill Minimum Size").Value = 100
         sideView = New Histogram_SideView2D()
 
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
@@ -667,7 +665,7 @@ Public Class PointCloud_BackProject
         mats.mat(1) = both.dst2
         mats.mat(2) = both.backMat
         mats.mat(3) = both.backMatMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        mats.Run(src)
+        mats.Run(Nothing)
         dst1 = mats.dst1
         dst2 = mats.mat(quadrantIndex)
         label2 = both.detailText

@@ -320,7 +320,7 @@ Public Class Contours_FindandDraw
     Dim rotatedRect As Rectangle_Rotated
     Public Sub New()
         rotatedRect = New Rectangle_Rotated()
-        rotatedRect.rect.sliders.trackbar(0).Value = 5
+        findSlider("DrawCount").Value = 5
         label1 = "FindandDraw input"
         label2 = "FindandDraw output"
         task.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
@@ -358,11 +358,9 @@ Public Class Contours_Binarized
     Dim sobel As Edges_Sobel
     Public basics As Contours_Basics
     Public Sub New()
-
         basics = New Contours_Basics
         sobel = New Edges_Sobel
-        Dim kernelSlider = findSlider("Sobel kernel Size")
-        kernelSlider.Value = 3
+        findSlider("Sobel kernel Size").Value = 3
 
         label1 = "Sobel output of grayscale input"
         label2 = "DrawContours output after FindContours"

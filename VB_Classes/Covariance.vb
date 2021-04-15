@@ -12,7 +12,7 @@ Public Class Covariance_Basics
         Dim covariance As New cv.Mat, mean = New cv.Mat
         dst2.SetTo(0)
         If standalone Or task.intermediateReview = caller Then
-            random.Run(src)
+            random.Run(Nothing)
             samples = New cv.Mat(random.Points.Length, 2, cv.MatType.CV_32F, random.Points2f)
             For i = 0 To random.Points.Length - 1
                 dst2.Circle(random.Points(i), 3, cv.Scalar.White, -1, task.lineType)

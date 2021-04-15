@@ -48,7 +48,7 @@ Public Class IMU_Basics
                                   " Yaw = " + Format(task.IMU_AngularVelocity.Y, "#0.00") + " Roll = " + Format(task.IMU_AngularVelocity.Z, "#0.00"))
         End If
         label1 = "theta.x " + Format(theta.X, "#0.000") + " y " + Format(theta.Y, "#0.000") + " z " + Format(theta.Z, "#0.000")
-        flow.Run(src)
+        flow.Run(Nothing)
     End Sub
 End Class
 
@@ -559,7 +559,7 @@ Public Class IMU_isCameraLevel
                           " Angle Y = " + Format(angleY, "0.00") + " degrees" +
                           " Angle Z = " + Format(angleZ, "0.00") + " degrees" +
                           If(cameraLevel, " - Camera is level", " - Camera is NOT level"))
-            flow.Run(src)
+            flow.Run(Nothing)
         End If
     End Sub
 End Class

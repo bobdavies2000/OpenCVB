@@ -185,10 +185,8 @@ Public Class DCT_Surfaces_debug
         flow = New Font_FlowText()
 
         grid = New Thread_Grid
-        Dim gridWidthSlider = findSlider("ThreadGrid Width")
-        Dim gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 100
-        gridHeightSlider.Value = 150
+        findSlider("ThreadGrid Width").Value = 100
+        findSlider("ThreadGrid Height").Value = 150
         dct = New DCT_FeatureLess()
         dct.dct.sliders.trackbar(0).Value = 1
         Mats = New Mat_4to1()
@@ -199,7 +197,7 @@ Public Class DCT_Surfaces_debug
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        grid.Run(src)
+        grid.Run(Nothing)
 
         Mats.mat(0) = src.Clone
         Mats.mat(0).SetTo(cv.Scalar.White, grid.gridMask)
@@ -214,7 +212,7 @@ Public Class DCT_Surfaces_debug
         task.depth32f.SetTo(0, notMask) ' remove non-featureless surface depth data.
 
         ' find the most featureless roi
-        Dim maxIndex As integer
+        Dim maxIndex As Integer
         Dim roiCounts(grid.roiList.Count - 1)
         For i = 0 To grid.roiList.Count - 1
             roiCounts(i) = mask(grid.roiList(i)).CountNonZero()
@@ -223,7 +221,7 @@ Public Class DCT_Surfaces_debug
 
         Mats.mat(3) = New cv.Mat(src.Size(), cv.MatType.CV_8UC3, 0)
         src(grid.roiList(maxIndex)).CopyTo(Mats.mat(3)(grid.roiList(maxIndex)), mask(grid.roiList(maxIndex)))
-        Mats.Run(src)
+        Mats.Run(Nothing)
         dst2 = Mats.dst1
 
         Dim world As New cv.Mat(src.Size(), cv.MatType.CV_32FC3, 0)
@@ -251,7 +249,7 @@ Public Class DCT_Surfaces_debug
                 End If
             End If
         End If
-        flow.Run(src)
+        flow.Run(Nothing)
     End Sub
 End Class
 

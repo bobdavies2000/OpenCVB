@@ -303,7 +303,7 @@ Public Class OpenGL_Draw3D
     Public ogl As OpenGL_Options
     Public Sub New()
         circle = New Draw_Circles()
-        circle.sliders.trackbar(0).Value = 5
+        findSlider("DrawCount").Value = 5
 
         ogl = New OpenGL_Options()
         ogl.OpenGL.OpenGLTitle = "OpenGL_3DShapes"

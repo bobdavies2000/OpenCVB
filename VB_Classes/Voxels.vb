@@ -34,7 +34,7 @@ Public Class Voxels_Basics_MT
         Dim input = (split(2) * 1000).ToMat
         cv.Cv2.InRange(input, task.minDepth, task.maxDepth, depthMask)
 
-        grid.Run(split(2))
+        grid.Run(Nothing)
 
         If voxels.Length <> grid.roiList.Count Then ReDim voxels(grid.roiList.Count - 1)
 
@@ -73,5 +73,3 @@ Public Class Voxels_Basics_MT
         voxelMat *= 255 / (task.maxDepth - task.minDepth) ' do the normalize manually to use the min and max Depth (more stable image)
     End Sub
 End Class
-
-

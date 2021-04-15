@@ -57,7 +57,7 @@ Public Class Gabor_Basics_MT
         gridWidthSlider.Value = dst1.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.
         gridHeightSlider.Value = dst1.Height / 4
 
-        grid.Run(dst1) ' we only run this one time!  It needs to be 32 Gabor filters only.
+        grid.Run(Nothing) ' we only run this one time!  It needs to be 32 Gabor filters only.
 
         For i = 0 To gabor.Length - 1
             gabor(i) = New Gabor_Basics()

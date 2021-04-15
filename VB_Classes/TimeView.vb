@@ -124,8 +124,7 @@ Public Class TimeView_FloodFill
 
         floodSide = New FloodFill_Basics
         floodTop = New FloodFill_Basics
-        Dim minFloodSlider = findSlider("FloodFill Minimum Size")
-        minFloodSlider.Value = 10
+        findSlider("FloodFill Minimum Size").Value = 10
         tBasics = New TimeView_Basics
         task.desc = "FloodFill the histograms of side and top views - TimeView_Basics"
 		' task.rank = 1
@@ -274,7 +273,7 @@ Public Class TimeView_Frustrum
         cmatSide.Run(tView.dst2)
         mats.mat(3) = cmatSide.dst1
 
-        mats.Run(src)
+        mats.Run(Nothing)
         dst1 = mats.dst1
         dst2 = mats.dst2
     End Sub

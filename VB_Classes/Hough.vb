@@ -43,8 +43,7 @@ Public Class Hough_Circles
     Dim circles As Draw_Circles
     Public Sub New()
         circles = New Draw_Circles()
-        Dim drawSlider = findSlider("DrawCount")
-        drawSlider.Value = 3
+        findSlider("DrawCount").Value = 3
         label1 = "Input circles to Hough"
         label2 = "Hough Circles found"
         task.desc = "Find circles using HoughCircles."
@@ -145,7 +144,7 @@ Public Class Hough_Lines_MT
             gridWidthSlider.Value = 16
             gridHeightSlider.Value = 16
         End If
-        grid.run(src)
+        grid.Run(Nothing)
 
         edges.Run(src)
         dst1 = edges.dst1

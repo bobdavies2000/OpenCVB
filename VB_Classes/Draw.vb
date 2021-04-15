@@ -102,7 +102,7 @@ Public Class Draw_Options
         task.desc = "Show the options for the draw algorithms"
         ' task.rank = 1
     End Sub
-    Public Sub Run()
+    Public Sub Run(src As cv.Mat)
         Static countSlider = findSlider("DrawCount")
         Static freqSlider = findSlider("Update Frequency")
         Static fillCheck = findCheckBox("Draw filled (unchecked draw an outline)")
@@ -132,7 +132,7 @@ Public Class Draw_Ellipses
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        optDraw.Run()
+        optDraw.Run(Nothing)
         If task.frameCount Mod optDraw.updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.Black)
             For i = 0 To optDraw.drawCount - 1
@@ -157,7 +157,7 @@ Public Class Draw_Circles
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        optDraw.Run()
+        optDraw.Run(Nothing)
         If task.frameCount Mod optDraw.updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.Black)
             For i = 0 To optDraw.drawCount - 1
@@ -181,7 +181,7 @@ Public Class Draw_Line
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        optDraw.Run()
+        optDraw.Run(Nothing)
         If task.frameCount Mod optDraw.updateFrequency Then Exit Sub
         dst1.SetTo(cv.Scalar.Black)
         For i = 0 To optDraw.drawCount - 1
@@ -205,7 +205,7 @@ Public Class Draw_Polygon
         label2 = "Convex Hull for the same polygon"
     End Sub
     Public Sub Run(src As cv.Mat)
-        optDraw.Run()
+        optDraw.Run(Nothing)
 
         If task.frameCount Mod optDraw.updateFrequency Then Exit Sub
         Dim height = src.Height / 8
@@ -573,7 +573,7 @@ Public Class Draw_ClipLine
         task.trueText("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
                      CInt(src.Width / 2), 200)
         If r = rect Then setup()
-        flow.Run(src)
+        flow.Run(Nothing)
     End Sub
 End Class
 

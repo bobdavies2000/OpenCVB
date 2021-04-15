@@ -104,7 +104,6 @@ End Class
 Public Class Stabilizer_BasicsRandomInput
     Inherits VBparent
     Public Sub New()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Range of random motion introduced (absolute value in pixels)", 0, 30, 8)
@@ -116,7 +115,6 @@ Public Class Stabilizer_BasicsRandomInput
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 

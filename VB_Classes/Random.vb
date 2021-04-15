@@ -21,7 +21,7 @@ Public Class Random_Basics
         task.desc = "Create a uniform random mask with a specificied number of pixels."
 		' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If Points.Length <> countSlider.Value Then
             ReDim Points(countSlider.Value - 1)
             ReDim Points2f(countSlider.Value - 1)
@@ -70,7 +70,7 @@ Public Class Random_LUTMask
     Public Sub Run(src as cv.Mat)
         Static lutMat As cv.Mat
         If lutMat Is Nothing Or task.frameCount Mod 10 = 0 Then
-            random.Run(src)
+            random.Run(Nothing)
             lutMat = cv.Mat.Zeros(New cv.Size(1, 256), cv.MatType.CV_8UC3)
             Dim lutIndex = 0
             km.Run(src)
@@ -93,12 +93,12 @@ End Class
 Public Class Random_UniformDist
     Inherits VBparent
     Public Sub New()
-        minval = 0
-        maxval = 255
+        minVal = 0
+        maxVal = 255
         task.desc = "Create a uniform distribution."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U)
         cv.Cv2.Randu(dst1, minVal, maxVal)
     End Sub
@@ -123,9 +123,9 @@ Public Class Random_NormalDist
         End If
 
         task.desc = "Create a normal distribution in all 3 colors with a variable standard deviation."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static grayCheck = findCheckBox("Use Grayscale image")
         If grayCheck.checked And dst1.Channels <> 1 Then dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
         cv.Cv2.Randn(dst1, New cv.Scalar(sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value), cv.Scalar.All(sliders.trackbar(3).Value))
@@ -145,9 +145,9 @@ Public Class Random_CheckUniformSmoothed
         rUniform = New Random_UniformDist()
 
         task.desc = "Display the smoothed histogram for a uniform distribution."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         rUniform.Run(src)
         dst1 = rUniform.dst1
         histogram.plotHist.maxRange = 255
@@ -172,9 +172,9 @@ Public Class Random_CheckUniformDist
         rUniform = New Random_UniformDist()
 
         task.desc = "Display the histogram for a uniform distribution."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         rUniform.Run(src)
         dst1 = rUniform.dst1
         histogram.plotRequested = True
@@ -197,9 +197,9 @@ Public Class Random_CheckNormalDist
         histogram.sliders.trackbar(0).Value = 255
         normalDist = New Random_NormalDist()
         task.desc = "Display the histogram for a Normal distribution."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         normalDist.Run(src)
         dst1 = normalDist.dst1
         histogram.plotRequested = True
@@ -222,9 +222,9 @@ Public Class Random_CheckNormalDistSmoothed
         histogram.plotHist.minRange = 1
         normalDist = New Random_NormalDist()
         task.desc = "Display the histogram for a Normal distribution."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         normalDist.Run(src)
         dst1 = normalDist.dst1
         histogram.Run(dst1)
@@ -271,9 +271,9 @@ Public Class Random_PatternGenerator_CPP
     Public Sub New()
         Random_PatternGenerator = Random_PatternGenerator_Open()
         task.desc = "Generate random patterns for use with 'Random Pattern Calibration'"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim imagePtr = Random_PatternGenerator_Run(Random_PatternGenerator, src.Rows, src.Cols)
@@ -309,9 +309,9 @@ Public Class Random_CustomDistribution
         If standalone Then plotHist = New Plot_Histogram()
 
         task.desc = "Create a custom random number distribution from any histogram"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim lastValue = inputCDF.Get(Of Single)(inputCDF.Rows - 1, 0)
         If Not (lastValue > 0.99 And lastValue <= 1.0) Then ' convert the input histogram to a cdf.
             inputCDF *= 1 / (inputCDF.Sum().Item(0))
@@ -359,9 +359,9 @@ Public Class Random_MonteCarlo
             sliders.setupTrackBar(0, "Number of bins", 1, 255, 91)
         End If
         task.desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim dimension = sliders.trackbar(0).Value
         Dim histogram = New cv.Mat(dimension, 1, cv.MatType.CV_32F, 0)
         For i = 0 To outputRandom.rows - 1
@@ -407,9 +407,9 @@ Public Class Random_CustomHistogram
         label2 = "Histogram of the resulting random numbers"
 
         task.desc = "Create a random number distribution that reflects histogram of a grayscale image"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Static saveBins As Integer
@@ -456,7 +456,7 @@ Public Class Random_60sTV
         task.desc = "Imitate an old TV appearance using randomness."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static valSlider = findSlider("Range of noise to apply (from 0 to this value)")
         Static threshSlider = findSlider("Percentage of pixels to include noise")
         Dim val = valSlider.value
@@ -493,9 +493,9 @@ Public Class Random_60sTVFaster
         options = New Random_60sTV
         label2 = "Changed pixels, add/sub mask, plusMask, minusMask"
         task.desc = "A faster way to apply noise to imitate an old TV appearance using randomness and thresholding."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static valSlider = findSlider("Range of noise to apply (from 0 to this value)")
         Static percentSlider = findSlider("Percentage of pixels to include noise")
 
@@ -519,7 +519,7 @@ Public Class Random_60sTVFaster
 
         cv.Cv2.Add(dst1, valMat, dst1, plusMask)
         cv.Cv2.Subtract(dst1, valMat, dst1, minusMask)
-        mats.Run(src)
+        mats.Run(Nothing)
         dst2 = mats.dst1
     End Sub
 End Class
@@ -539,9 +539,9 @@ Public Class Random_60sTVFastSimple
         random = New Random_UniformDist
         options = New Random_60sTV
         task.desc = "Remove diagnostics from the faster algorithm to simplify code."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static valSlider = findSlider("Range of noise to apply (from 0 to this value)")
         Static percentSlider = findSlider("Percentage of pixels to include noise")
 
@@ -589,14 +589,14 @@ Public Class Random_KalmanPoints
         countSlider = findSlider("Random Pixel Count")
         countSlider.Value = 5
         task.desc = "Smoothly transition a random point from location to location."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         If refreshPoints Then
-            random.Run(src)
+            random.Run(Nothing)
             knn.lastSet = New List(Of cv.Point2f)(random.Points2f)
-            random.Run(src) ' now find the new locations.
+            random.Run(Nothing) ' now find the new locations.
             knn.currSet = New List(Of cv.Point2f)(random.Points2f)
             refreshPoints = False
 

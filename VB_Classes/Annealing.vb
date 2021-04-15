@@ -124,7 +124,7 @@ Public Class Annealing_CPP_MT
     Private Sub setup()
         Static citySlider = findSlider("Anneal Number of Cities")
         random.countSlider.Value = citySlider.value
-        random.Run(dst1) ' get the city positions (may or may not be used below.)
+        random.Run(Nothing) ' get the city positions (may or may not be used below.)
 
         Dim numberofCities = sliders.trackbar(0).Value
         Dim circles = check.Box(2).Checked
@@ -171,7 +171,7 @@ Public Class Annealing_CPP_MT
         task.desc = "Setup and control finding the optimal route for a traveling salesman"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If anneal(0) Is Nothing Then setup() ' setup here rather than in algorithm so all threads work on the same problem.
         Static CityCountSlider = findSlider("Anneal Number of Cities")
         If anneal(0).numberOfCities <> CityCountSlider.Value Or check.Box(0).Checked Or check.Box(2).Checked <> anneal(0).circularPattern Then setup()
@@ -194,7 +194,7 @@ Public Class Annealing_CPP_MT
             bestList.Add(anneal(i).energy, i)
             flow.msgs.Add("CPU=" + Format(i, "00") + " " + anneal(i).msg)
         Next
-        flow.Run(src)
+        flow.Run(Nothing)
 
         ' if the top 4 are all the same energy, then we are done.
         If bestList.Count > 1 Then
@@ -219,7 +219,7 @@ Public Class Annealing_CPP_MT
             mats.mat(2) = anneal(CInt(bestList.ElementAt(bestList.Count - 2).Value)).dst1
             mats.mat(3) = anneal(CInt(bestList.ElementAt(bestList.Count - 1).Value)).dst1
         End If
-        mats.Run(src)
+        mats.Run(Nothing)
         dst2 = mats.dst1
 
         ' copy the top half of the solutions to the bottom half (worst solutions)
@@ -245,7 +245,7 @@ Public Class Annealing_Options
         random = New Random_Basics()
         Static randomSlider = findSlider("Random Pixel Count")
         randomSlider.Value = 25 ' change the default number of cities here.
-        random.Run(dst1) ' get the city positions (may or may not be used below.)
+        random.Run(Nothing) ' get the city positions (may or may not be used below.)
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 2)
@@ -268,7 +268,7 @@ Public Class Annealing_Options
         task.desc = "Setup and control finding the optimal route for a traveling salesman"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static randomSlider = findSlider("Random Pixel Count")
         Dim numberOfCities = randomSlider.Value
         Dim circularPattern = check.Box(1).Checked ' do they want a circular pattern?
@@ -286,7 +286,7 @@ Public Class Annealing_Options
 
         If anneal.restartComputation Then
             anneal.restartComputation = False
-            random.Run(src) ' get the city positions (may or may not be used below.)
+            random.Run(Nothing) ' get the city positions (may or may not be used below.)
             If check.Box(1).Checked = False Then anneal.cityPositions = random.Points2f.Clone()
             anneal.setup()
             anneal.Open()
@@ -297,7 +297,7 @@ Public Class Annealing_Options
         End If
 
         flow.msgs.Add(anneal.msg)
-        flow.Run(src)
+        flow.Run(Nothing)
 
     End Sub
 End Class

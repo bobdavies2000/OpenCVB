@@ -234,7 +234,7 @@ Public Class GeneticDrawing_Basics
             startNewStage(r)
         End If
 
-        mats.Run(src)
+        mats.Run(Nothing)
         dst1 = mats.dst1
         label2 = " stage " + CStr(stage) + "/" + CStr(stageTotal) + " Gen " + Format(generation, "00") + " chgs = " + CStr(changes) + " err/1000 = " + CStr(CInt(totalError / 1000))
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()

@@ -24,25 +24,25 @@ End Class
 
 Public Class Mat_PointToMat
     Inherits VBparent
-    Dim mask As Random_Basics
+    Dim random As Random_Basics
     Public Sub New()
-        mask = New Random_Basics()
-        mask.plotPoints = True
+        random = New Random_Basics()
+        random.plotPoints = True
         label1 = "Random_Basics points (original)"
         label2 = "Random_Basics points after format change"
         task.desc = "Convert pointf3 into a mat of points"
 		' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
-        mask.Run(src) ' generates a set of points
-        dst1 = mask.dst1
-        Dim rows = mask.Points.Length
-        Dim pMat = New cv.Mat(rows, 1, cv.MatType.CV_32SC2, mask.Points)
+    Public Sub Run(src As cv.Mat)
+        random.Run(Nothing)
+        dst1 = random.dst1
+        Dim rows = random.Points.Length
+        Dim pMat = New cv.Mat(rows, 1, cv.MatType.CV_32SC2, random.Points)
         Dim indexer = pMat.GetGenericIndexer(Of cv.Vec2i)()
         dst2.SetTo(0)
         Dim white = New cv.Vec3b(255, 255, 255)
         For i = 0 To rows - 1
-            dst2.Set(Of cv.Vec3b)(indexer(i).Item1, indexer(i).Item0, White)
+            dst2.Set(Of cv.Vec3b)(indexer(i).Item1, indexer(i).Item0, white)
         Next
     End Sub
 End Class
@@ -152,8 +152,8 @@ Public Class Mat_4to1
         mat4 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         mat = {mat1, mat2, mat3, mat4}
     End Sub
-    Public Sub Run(src as cv.Mat)
-        Static nSize = New cv.Size(src.Width / 2, src.Height / 2)
+    Public Sub Run(src As cv.Mat)
+        Static nSize = New cv.Size(dst1.Width / 2, dst1.Height / 2)
         Static roiTopLeft = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
         Static roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
@@ -231,10 +231,8 @@ Public Class Mat_ImageXYZ_MT
     Public xyzPlanes() As cv.Mat
     Public Sub New()
         grid = New Thread_Grid
-        Dim gridWidthSlider = findSlider("ThreadGrid Width")
-        Dim gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 32
-        gridHeightSlider.Value = 32
+        findSlider("ThreadGrid Width").Value = 32
+        findSlider("ThreadGrid Height").Value = 32
 
         xyDepth = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC3, 0)
         Dim xyz As New cv.Point3f
@@ -249,14 +247,14 @@ Public Class Mat_ImageXYZ_MT
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        grid.run(src)
+        grid.Run(Nothing)
         Parallel.ForEach(grid.roiList,
           Sub(roi)
               xyzPlanes(2)(roi) = task.depth32f(roi)
           End Sub)
 
         cv.Cv2.Merge(xyzPlanes, xyDepth)
-        If standalone or task.intermediateReview = caller Then task.trueText("Mat built with X, Y, and Z (Depth)", 10, 125)
+        If standalone Or task.intermediateReview = caller Then task.trueText("Mat built with X, Y, and Z (Depth)", 10, 125)
     End Sub
 End Class
 
@@ -271,9 +269,9 @@ Public Class Mat_RowColRange
     Public Sub New()
         label1 = "BitwiseNot of RowRange and ColRange"
         task.desc = "Perform operation on a range of cols and/or Rows."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim midX = src.Width / 2
         Dim midY = src.Height / 2
         dst1 = src
@@ -291,9 +289,9 @@ Public Class Mat_Managed
     Public Sub New()
         label1 = "Color change is in the managed cv.vec3b array"
         task.desc = "There is a limited ability to use Mat data in Managed code directly."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static autoRand As New Random()
         Static img(src.Total) As cv.Vec3b
         dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, img)
@@ -320,9 +318,9 @@ Public Class Mat_MultiplyReview
     Public Sub New()
         flow = New Font_FlowText()
         task.desc = "Review matrix multiplication"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim a(,) = {{1, 4, 2}, {2, 5, 1}}
         Dim b(,) = {{3, 4, 2}, {3, 5, 7}, {1, 2, 1}}
         Dim nextLine = ""
@@ -366,7 +364,7 @@ Public Class Mat_MultiplyReview
             flow.msgs.Add(nextLine)
         Next
 
-        flow.Run(src)
+        flow.Run(Nothing)
     End Sub
 End Class
 
@@ -397,9 +395,9 @@ Public Class Mat_Inverse
             radio.check(4).Enabled = False ' not accepted!
         End If
         task.desc = "Given a 3x3 matrix, invert it and present results."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim nextline = ""
 
         Dim decompType = cv.DecompTypes.Cholesky
@@ -447,7 +445,7 @@ Public Class Mat_Inverse
             Next
         End If
 
-        flow.Run(src)
+        flow.Run(Nothing)
     End Sub
 End Class
 
@@ -470,10 +468,10 @@ Public Class Mat_4Click
         task.desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst2"
         ' task.rank = 2
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
-        If standalone Or task.intermediateReview = caller Then mats.defaultMats
-        mats.Run(src)
+        If standalone Or task.intermediateReview = caller Then mats.defaultMats()
+        mats.Run(Nothing)
         dst1 = mats.dst1
 
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
@@ -495,10 +493,9 @@ Public Class Mat_2Click
         mats = New Mat_2to1
         mat = mats.mat
         task.desc = "Split an image into 2 segments and allow clicking on each half to open it in dst2"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
-
+    Public Sub Run(src As cv.Mat)
         If standalone Then
             mats.mat(0) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             cv.Cv2.BitwiseNot(mats.mat(0), mats.mat(1))

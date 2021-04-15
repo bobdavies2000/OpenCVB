@@ -10,11 +10,9 @@ Public Class Texture_Basics
     Public tChange As Boolean ' if the texture hasn't changed this will be false.
     Public Sub New()
         grid = New Thread_Grid
-        Dim gridWidthSlider = findSlider("ThreadGrid Width")
-        Dim gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 64
-        gridHeightSlider.Value = 64
-        grid.Run(dst1)
+        findSlider("ThreadGrid Width").Value = 64
+        findSlider("ThreadGrid Height").Value = 64
+        grid.Run(Nothing)
 
         ellipse = New Draw_Ellipses()
         task.desc = "Use multi-threading to find the best sample 256x256 texture of a mask"

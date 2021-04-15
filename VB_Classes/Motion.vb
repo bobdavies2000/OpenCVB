@@ -98,8 +98,7 @@ Public Class Motion_WithBlurDilate
             sliders.setupTrackBar(0, "Frames to persist", 1, 100, 10)
         End If
 
-        Dim iterSlider = findSlider("Dilate/Erode Kernel Size")
-        iterSlider.Value = 2
+        findSlider("Dilate/Erode Kernel Size").Value = 2
 
         label2 = "Mask of pixel differences "
         task.desc = "Detect contours in the motion data using blur and dilate"
@@ -290,7 +289,7 @@ Public Class Motion_ThruCorrelation
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        grid.Run(src)
+        grid.Run(Nothing)
 
         Dim input = src.Clone
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

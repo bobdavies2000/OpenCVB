@@ -445,16 +445,14 @@ Public Class Palette_Layout2D
     Dim grid As Thread_Grid
     Public Sub New()
         grid = New Thread_Grid
-        Dim widthSlider = findSlider("ThreadGrid Width")
-        Dim heightslider = findSlider("ThreadGrid Height")
-        widthSlider.Value = 40
-        heightslider.Value = 24
-        grid.Run(dst1)
+        findSlider("ThreadGrid Width").Value = 40
+        Dim heightslider = findSlider("ThreadGrid Height").Value = 24
+        grid.Run(Nothing)
         task.desc = "Layout the available colors in a 2D grid"
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        grid.Run(src)
+        grid.Run(Nothing)
         Dim index As Integer
         For Each r In grid.roiList
             dst1(r).SetTo(task.scalarColors(index Mod 255))
@@ -476,8 +474,7 @@ Public Class Palette_LeftRightImages
     Dim lrViews As LeftRightView_Basics
     Public Sub New()
         lrViews = New LeftRightView_Basics
-        Dim brightSlider = findSlider("Infrared Brightness")
-        brightSlider.Value = 0
+        findSlider("Infrared Brightness").Value = 0
         task.desc = "Use a palette with the left image."
         ' task.rank = 1
     End Sub

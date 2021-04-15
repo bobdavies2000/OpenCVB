@@ -18,7 +18,7 @@ Public Class Fibonacci_Basics
         a = b
         b = t
         flow.msgs.Add(t.ToString)
-        flow.Run(src)
+        flow.Run(Nothing)
     End Sub
 End Class
 
@@ -55,7 +55,7 @@ Public Class Fibonacci_Yield
     Public Sub Run(src as cv.Mat)
         Dim fibs As System.Collections.Generic.IEnumerable(Of Double) = nextFib()
         flow.msgs.Add(Format(task.frameCount Mod 74, "00") + " fibonacci number " + Format(fibs.ElementAt(task.frameCount), "###,##0"))
-        flow.Run(src)
+        flow.Run(Nothing)
     End Sub
 End Class
 

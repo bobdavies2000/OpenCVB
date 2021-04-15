@@ -27,7 +27,7 @@ Public Class Featureless_Basics
         ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        grid.Run(src)
+        grid.Run(Nothing)
 
         edges.Run(src)
 

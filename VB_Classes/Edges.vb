@@ -412,7 +412,7 @@ Public Class Edges_BinarizedCanny
         mats.mat(2) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), mats.mat(3))
 
-        mats.Run(src)
+        mats.Run(Nothing)
         dst1 = mats.dst1
         If mats.dst2.Channels = 3 Then
             label2 = "Combo of first 3 below.  Click quadrants in dst1."
@@ -494,8 +494,7 @@ Public Class Edges_Depth
     Public Sub New()
         dMax = New Depth_SmoothMax
         sobel = New Edges_Sobel
-        Dim kernelSlider = findSlider("Sobel kernel Size")
-        kernelSlider.Value = 14
+        findSlider("Sobel kernel Size").Value = 14
         task.desc = "Use Depth_SmoothMax to find edges in Depth"
 		' task.rank = 1
     End Sub
@@ -601,8 +600,7 @@ Public Class Edges_Stdev
     Public Sub New()
         edges = New Edges_BinarizedSobel
         stdev = New Math_Stdev
-        Dim kernelSlider = findSlider("Sobel kernel Size")
-        kernelSlider.Value = 3
+        findSlider("Sobel kernel Size").Value = 14
 
         label1 = "Edges in High Stdev areas"
         label2 = "Mask of low stdev areas"
@@ -808,13 +806,11 @@ Public Class Edges_SobelLRBinarized
     Public Sub New()
         If standalone Then
             addw = New AddWeighted_Basics
-            Dim weightSlider = findSlider("Weight")
-            weightSlider.Value = 75
+            findSlider("Weight").Value = 75
         End If
         edges = New Edges_BinarizedSobel
         red = New LeftRightView_Basics
-        Dim brightSlider = findSlider("Infrared Brightness")
-        brightSlider.Value = 1
+        findSlider("Infrared Brightness").Value = 1
 
         label1 = "Horizontal Sobel - Left View"
         label2 = "Horizontal Sobel - Right View"
@@ -865,8 +861,7 @@ Public Class Edges_BinarizedSobel
 
         edges = New Edges_Sobel
 
-        Dim kernelSlider = findSlider("Sobel kernel Size")
-        kernelSlider.Value = 5
+        findSlider("Sobel kernel Size").Value = 5
 
         label1 = "Edges between halves, lightest, darkest, and the combo"
         label2 = "Click any quadrant in dst1 to enlarge it in dst2"
@@ -891,7 +886,7 @@ Public Class Edges_BinarizedSobel
         mats.mat(2) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), mats.mat(3))
 
-        mats.Run(src)
+        mats.Run(Nothing)
         dst1 = mats.dst1
         If mats.dst2.Channels = 3 Then
             label2 = "Bitwise or of images 1-3 at left.  Click dst1."
@@ -921,8 +916,7 @@ Public Class Edges_Matching
         match = New MatchTemplate_Basics
         grid = New Thread_Grid
         red = New LeftRightView_Basics
-        Dim brightSlider = findSlider("Infrared Brightness")
-        brightSlider.Value = 1
+        findSlider("Infrared Brightness").Value = 1
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -943,7 +937,7 @@ Public Class Edges_Matching
     End Sub
     Public Sub Run(src as cv.Mat)
 
-        grid.Run(src)
+        grid.Run(Nothing)
 
         red.Run(src)
         dst1 = red.dst1
@@ -1115,8 +1109,7 @@ Public Class Edges_HSV
     Dim edges As Edges_RGB
     Public Sub New()
         edges = New Edges_RGB
-        Dim thresholdSlider = findSlider("Threshold to zero pixels below this value")
-        thresholdSlider.Value = 25
+        findSlider("Threshold to zero pixels below this value").Value = 25
         task.desc = "Combine the edges from all 3 HSV channels.  Painterly"
 		' task.rank = 1
     End Sub

@@ -113,14 +113,9 @@ Public Class Blob_Input
         ellipses = New Draw_Ellipses
         poly = New Draw_Polygon
 
-        Dim drawSlider = findSlider("DrawCount")
-        drawSlider.Value = 5
-
-        Dim freqSlider = findSlider("Update Frequency")
-        freqSlider.Value = 1
-
-        Dim fillCheck = findCheckBox("Draw filled (unchecked draw an outline)")
-        fillCheck.Checked = True
+        findSlider("DrawCount").Value = 5
+        findSlider("Update Frequency").Value = 1
+        findCheckBox("Draw filled (unchecked draw an outline)").Checked = True
 
         Mats = New Mat_4to1()
         Mats.noLines = True
@@ -143,7 +138,7 @@ Public Class Blob_Input
 
             poly.Run(src)
             Mats.mat(3) = poly.dst2
-            Mats.Run(src)
+            Mats.Run(Nothing)
             Mats.dst1.CopyTo(dst1)
             If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
             dst2 = Mats.mat(quadrantIndex)
@@ -203,14 +198,11 @@ Public Class Blob_DepthClusters
     Public histBlobs As Histogram_DepthValleys
     Public flood As FloodFill_Basics
     Public Sub New()
-
         histBlobs = New Histogram_DepthValleys
 
         flood = New FloodFill_Basics()
-        Dim loSlider = findSlider("FloodFill LoDiff")
-        Dim hiSlider = findSlider("FloodFill HiDiff")
-        loSlider.Value = 1 ' pixels are exact.
-        hiSlider.Value = 1 ' pixels are exact.
+        findSlider("FloodFill LoDiff").Value = 1
+        findSlider("FloodFill HiDiff").Value = 1
 
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
         'task.rank = 3
@@ -238,10 +230,8 @@ Public Class Blob_DepthPixelSampler
         histBlobs = New Histogram_DepthClusters
 
         flood = New FloodFill_Basics()
-        Dim loSlider = findSlider("FloodFill LoDiff")
-        Dim hiSlider = findSlider("FloodFill HiDiff")
-        loSlider.Value = 1 ' pixels are exact.
-        hiSlider.Value = 1 ' pixels are exact.
+        findSlider("FloodFill LoDiff").Value = 1
+        findSlider("FloodFill HiDiff").Value = 1
 
         label2 = "Backprojection of identified histogram depth clusters."
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."

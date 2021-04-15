@@ -24,10 +24,9 @@ Public Class Voronoi_Basics
     Public Sub Run(src as cv.Mat)
 
         If task.frameCount = 0 Then
-            Dim countSlider = findSlider("Random Pixel Count")
-            countSlider.Maximum = 100
+            findSlider("Random Pixel Count").Maximum = 100
         End If
-        random.Run(src)
+        random.Run(Nothing)
         inputPoints = New List(Of cv.Point)(random.Points)
 
         vDemo.Run(dst1, inputPoints)
@@ -56,7 +55,7 @@ Public Class Voronoi_Compare
     End Sub
     Public Sub Run(src as cv.Mat)
 
-        random.Run(src)
+        random.Run(Nothing)
         Dim points = New List(Of cv.Point)(random.Points)
         basics.vDemo.Run(dst1, points, True)
         basics.vDisplay(dst1, points)
@@ -103,8 +102,8 @@ Public Class Voronoi_CPP
     End Sub
     Public Sub Run(src as cv.Mat)
 
-        Dim countSlider = findSlider("Random Pixel Count")
-        vDemo.random.Run(src)
+        Static countSlider = findSlider("Random Pixel Count")
+        vDemo.random.Run(Nothing)
         Dim handleSrc = GCHandle.Alloc(vDemo.random.Points, GCHandleType.Pinned)
         Dim imagePtr = VoronoiDemo_Run(vPtr, handleSrc.AddrOfPinnedObject(), countSlider.Value, dst1.Width, dst1.Height)
         handleSrc.Free()

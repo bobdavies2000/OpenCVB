@@ -351,7 +351,6 @@ Public Class Histogram_EqualizeColor
         label1 = "Image Enhanced with Equalized Histogram"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         Dim rgb(2) As cv.Mat
         Dim rgbEq(2) As cv.Mat
         rgbEq = src.Split()
@@ -531,7 +530,7 @@ Public Class Histogram_ColorsAndGray
             mats.mat(i) = histogram.dst1.Clone()
         Next
 
-        mats.Run(src)
+        mats.Run(Nothing)
         dst1 = mats.dst1
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
         dst2 = mats.mat(quadrantIndex)
@@ -546,7 +545,6 @@ Public Class Histogram_BackProjectionPeak
     Inherits VBparent
     Dim hist As Histogram_Basics
     Public Sub New()
-
         hist = New Histogram_Basics
 
         task.desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
@@ -571,7 +569,7 @@ Public Class Histogram_BackProjectionPeak
         Dim mask = src.InRange(pixelMin, pixelMax).Threshold(1, 255, cv.ThresholdTypes.Binary)
         dst1.SetTo(0)
         src.CopyTo(dst1, mask)
-        dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         label1 = "BackProjection of most frequent gray pixel"
         dst2.Rectangle(New cv.Rect(barWidth * histindex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 1)
@@ -669,7 +667,7 @@ Public Class Histogram_HueSaturation2DPlot
         mats.mat(2) = hist2d.dst2
         mats.mat(3) = hist2d.dst1
 
-        mats.Run(src)
+        mats.Run(Nothing)
         dst1 = mats.dst1
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
         dst2 = mats.mat(quadrantIndex)

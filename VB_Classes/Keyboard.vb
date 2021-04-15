@@ -21,7 +21,7 @@ Public Class Keyboard_Basics
                 inputText += keyInput(i).ToString()
             Next
             If inputText <> "" Then flow.msgs.Add(inputText)
-            flow.Run(src)
+            flow.Run(Nothing)
         End If
     End Sub
 End Class

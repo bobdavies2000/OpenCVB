@@ -152,7 +152,7 @@ Public Class MiniPC_RotateAngle
 
         mats.mat(0) = peak.dst1(peak.mini.rect)
         mats.mat(1) = peak.dst2(peak.mini.rect)
-        mats.Run(src)
+        mats.Run(Nothing)
         dst1 = mats.dst1
     End Sub
 End Class

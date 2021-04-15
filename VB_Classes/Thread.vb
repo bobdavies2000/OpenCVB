@@ -41,7 +41,7 @@ Public Class Thread_Grid
         task.desc = "Create a grid for use with parallel.ForEach."
         ' task.rank = 3
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static lastWidth As Integer
         Static lastHeight As Integer
         Static lastBorder As Integer
@@ -60,11 +60,11 @@ Public Class Thread_Grid
 
             gridMask.SetTo(0)
             incompleteRegions = 0
-            For y = 0 To src.Height - 1 Step gHeight
-                For x = 0 To src.Width - 1 Step gWidth
+            For y = 0 To dst1.Height - 1 Step gHeight
+                For x = 0 To dst1.Width - 1 Step gWidth
                     Dim roi = New cv.Rect(x, y, gWidth, gHeight)
-                    If x + roi.Width >= src.Width Then roi.Width = src.Width - x
-                    If y + roi.Height >= src.Height Then roi.Height = src.Height - y
+                    If x + roi.Width >= dst1.Width Then roi.Width = dst1.Width - x
+                    If y + roi.Height >= dst1.Height Then roi.Height = dst1.Height - y
                     If roi.Width > 0 And roi.Height > 0 Then
                         If y = 0 Then tilesPerRow += 1
                         If x = 0 Then tilesPerCol += 1
@@ -85,11 +85,11 @@ Public Class Thread_Grid
                     broi.Height += broi.Y
                     broi.Y = 0
                 End If
-                If broi.Width + broi.X > src.Width Then
-                    broi.Width = src.Width - broi.X
+                If broi.Width + broi.X > dst1.Width Then
+                    broi.Width = dst1.Width - broi.X
                 End If
-                If broi.Height + broi.Y > src.Height Then
-                    broi.Height = src.Height - broi.Y
+                If broi.Height + broi.Y > dst1.Height Then
+                    broi.Height = dst1.Height - broi.Y
                 End If
                 borderList.Add(broi)
             Next
@@ -102,7 +102,7 @@ Public Class Thread_Grid
         End If
 
         If standalone Or task.intermediateReview = caller Then
-            src.CopyTo(dst1)
+            task.color.CopyTo(dst1)
             dst1.SetTo(cv.Scalar.All(255), gridMask)
             label1 = "Thread_Grid " + CStr(roiList.Count - incompleteRegions) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +
                           CStr(roiList(0).Width) + "X" + CStr(roiList(0).Height) + " regions"
@@ -129,7 +129,7 @@ Public Class Thread_GridTest
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        grid.Run(src)
+        grid.Run(Nothing)
         Dim mean = cv.Cv2.Mean(src)
 
         Parallel.For(0, grid.roiList.Count,

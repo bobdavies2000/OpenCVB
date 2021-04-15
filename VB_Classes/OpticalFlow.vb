@@ -124,9 +124,9 @@ End Class
 'https://www.learnopencv.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
 Public Class OpticalFlow_DenseBasics
     Inherits VBparent
-    Dim flow As OpticalFlow_DenseOptions
+    Dim optFlow As OpticalFlow_DenseOptions
     Public Sub New()
-        flow = New OpticalFlow_DenseOptions()
+        optFlow = New OpticalFlow_DenseOptions()
         task.desc = "Use dense optical flow algorithm  "
 		' task.rank = 1
     End Sub
@@ -135,12 +135,13 @@ Public Class OpticalFlow_DenseBasics
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If task.frameCount > 0 Then
-            flow.Run(src)
+            optFlow.Run(src)
 
-            Dim hsv = opticalFlow_Dense(oldGray, src, flow.pyrScale, flow.levels, flow.winSize, flow.iterations, flow.polyN, flow.polySigma, flow.OpticalFlowFlags)
+            Dim hsv = opticalFlow_Dense(oldGray, src, optFlow.pyrScale, optFlow.levels, optFlow.winSize, optFlow.iterations, optFlow.polyN,
+                                        optFlow.polySigma, optFlow.OpticalFlowFlags)
 
             dst1 = hsv.CvtColor(cv.ColorConversionCodes.HSV2RGB)
-            dst1 = dst1.ConvertScaleAbs(flow.outputScaling)
+            dst1 = dst1.ConvertScaleAbs(optFlow.outputScaling)
             dst2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
         oldGray = src.Clone()
@@ -155,7 +156,7 @@ Public Class OpticalFlow_DenseBasics_MT
 
     Public grid As Thread_Grid
     Dim accum As New cv.Mat
-    Dim flow As OpticalFlow_DenseOptions
+    Dim optFlow As OpticalFlow_DenseOptions
     Public Sub New()
         grid = New Thread_Grid
         Static gridWidthSlider = findSlider("ThreadGrid Width")
@@ -165,8 +166,8 @@ Public Class OpticalFlow_DenseBasics_MT
         gridHeightSlider.Value = dst1.Rows / 4
         gridHeightSlider.Value = 5
 
-        flow = New OpticalFlow_DenseOptions()
-        flow.sliders.trackbar(0).Value = 75
+        optFlow = New OpticalFlow_DenseOptions()
+        optFlow.sliders.trackbar(0).Value = 75
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -180,8 +181,8 @@ Public Class OpticalFlow_DenseBasics_MT
         Static oldGray As New cv.Mat
 
         If task.frameCount > 0 Then
-            grid.run(src)
-            flow.Run(src)
+            grid.Run(Nothing)
+            optFlow.Run(src)
 
             Static thresholdSlider = findSlider("OpticalFlow Correlation Threshold")
             Dim CCthreshold = CSng(thresholdSlider.Value / thresholdSlider.Maximum)
@@ -195,10 +196,11 @@ Public Class OpticalFlow_DenseBasics_MT
                 If CCthreshold > correlation.Get(Of Single)(0, 0) Then
                     img.CopyTo(accum(roi))
                     Dim gray = accum(broi).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                    Dim hsv = opticalFlow_Dense(oldGray(broi), gray, flow.pyrScale, flow.levels, flow.winSize, flow.iterations, flow.polyN, flow.polySigma, flow.OpticalFlowFlags)
+                    Dim hsv = opticalFlow_Dense(oldGray(broi), gray, optFlow.pyrScale, optFlow.levels, optFlow.winSize, optFlow.iterations,
+                                                optFlow.polyN, optFlow.polySigma, optFlow.OpticalFlowFlags)
                     Dim tROI = New cv.Rect(roi.X - broi.X, roi.Y - broi.Y, roi.Width, roi.Height)
                     dst1(roi) = hsv(tROI).CvtColor(cv.ColorConversionCodes.HSV2RGB)
-                    dst1(roi) = dst1(roi).ConvertScaleAbs(flow.outputScaling)
+                    dst1(roi) = dst1(roi).ConvertScaleAbs(optFlow.outputScaling)
                 Else
                     dst1(roi).SetTo(0)
                 End If

@@ -216,7 +216,7 @@ Public Class Binarize_Bernson_MT
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
-        grid.Run(src)
+        grid.Run(Nothing)
         Dim contrastMin = sliders.trackbar(1).Value
         Dim bgThreshold = sliders.trackbar(2).Value
 
@@ -248,14 +248,13 @@ Public Class Binarize_Reduction
         reduction = New Reduction_Basics
         Dim reductionRadio = findRadio("Use bitwise reduction")
         reductionRadio.Checked = True
-        Dim reductionSlider = findSlider("Reduction factor")
-        reductionSlider.Value = 256
+        findSlider("Reduction factor").Value = 256
         label1 = "Binarize output from reduction"
         label2 = "Binarize Basics Output"
         task.desc = "Binarize an image using reduction"
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim tmp = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         reduction.Run(tmp)
         dst1 = reduction.dst1.Threshold(reduction.maskVal / 2, 255, cv.ThresholdTypes.Binary)
@@ -280,7 +279,7 @@ Public Class Binarize_Simple
         task.desc = "Binarize an image using Threshold with OTSU."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         Dim input = src.Clone
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -313,7 +312,7 @@ Public Class Binarize_Recurse
         task.desc = "Binarize an image twice using masks"
         ' task.rank = 2
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
@@ -332,7 +331,7 @@ Public Class Binarize_Recurse
         binarize.Run(gray)
         mats.mat(3) = binarize.dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
 
-        mats.Run(src)
+        mats.Run(Nothing)
         dst1 = mats.dst1
         dst2 = mats.mat(quadrantIndex)
         label2 = mats.label2

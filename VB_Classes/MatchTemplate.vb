@@ -62,7 +62,7 @@ Public Class MatchTemplate_Basics
             dst1.SetTo(0)
             label1 = matchText + " for " + CStr(searchArea.Cols) + " samples = " + Format(correlation, "#,##0.00")
             flow.msgs.Add(matchText + " = " + Format(correlation, "#,##0.00"))
-            flow.Run(src)
+            flow.Run(Nothing)
         End If
     End Sub
 End Class
@@ -91,7 +91,7 @@ Public Class MatchTemplate_RowCorrelation
         match.Run(src)
         Dim correlation = match.correlationMat.Get(Of Single)(0, 0)
         flow.msgs.Add(match.matchText + " between lines " + CStr(line1) + " and line " + CStr(line2) + " = " + Format(correlation, "#,##0.00"))
-        flow.Run(src)
+        flow.Run(Nothing)
 
         Static minCorrelation As Single
         Static maxCorrelation As Single
@@ -231,7 +231,7 @@ Public Class MatchTemplate_Movement
     Public Sub Run(src as cv.Mat)
         Dim fsize = task.fontSize / 3
 
-        grid.run(src)
+        grid.Run(Nothing)
         dst1 = src.Clone
         If dst1.Channels = 3 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 

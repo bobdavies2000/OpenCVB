@@ -32,8 +32,7 @@ Public Class AddWeighted_Edges
     Public Sub New()
         edges = New Edges_BinarizedSobel
         addw = New AddWeighted_Basics
-        Dim weightSlider = findSlider("Weight")
-        weightSlider.Value = 75
+        findSlider("Weight").Value = 75
         task.desc = "Add in the edges separating light and dark to the color image"
         ' task.rank = 1
     End Sub

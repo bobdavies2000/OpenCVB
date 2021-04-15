@@ -412,8 +412,7 @@ Public Class Line_Intercepts
     Public thickNess As Integer
     Public Sub New()
         lines = New Line_Basics
-        Dim lenSlider = findSlider("Line length threshold in pixels")
-        lenSlider.Value = 1
+        findSlider("Line length threshold in pixels").Value = 1
 
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 4)
@@ -536,8 +535,7 @@ Public Class Line_LeftRightImages
 
         leftLines = New Line_Basics
         rightLines = New Line_Basics
-        Dim lenSlider = findSlider("Line length threshold in pixels")
-        lenSlider.Value = 1
+        findSlider("Line length threshold in pixels").Value = 1
 
         label1 = "Left infrared image with lines detected"
         label2 = "Right infrared image with lines detected"
@@ -593,7 +591,7 @@ Public Class Line_Sift_MT
         gridWidthSlider.Value = task.color.Cols * 2 ' we are just taking horizontal slices of the image.
         gridHeightSlider.Value = 10
 
-        grid.Run(dst1)
+        grid.Run(Nothing)
 
         siftBasics = New Sift_Basics
         Dim flannRadio = findRadio("Use Flann Matcher") ' not reliable
@@ -607,8 +605,8 @@ Public Class Line_Sift_MT
         task.desc = "Using the lines highlighted in left/right infrared images, find corresponding lines."
         ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
-        grid.run(src)
+    Public Sub Run(src As cv.Mat)
+        grid.Run(Nothing)
 
         lrView.Run(src)
         dst1 = lrView.dst1

@@ -232,7 +232,7 @@ Public Class Puzzle_Basics
         gridWidthSlider.Value = dst1.Cols / 10
         gridHeightSlider.Value = dst1.Rows / 8
 
-        grid.Run(dst1)
+        grid.Run(Nothing)
         task.desc = "Create the puzzle pieces for toy genetic or annealing algorithm."
         ' task.rank = 1
     End Sub
@@ -245,7 +245,7 @@ Public Class Puzzle_Basics
         Static height As Integer
         If width <> gridWidthSlider.Value Or height <> gridHeightSlider.Value Or task.frameCount = 0 Or restartRequested Then
             restartRequested = False
-            grid.Run(src)
+            grid.Run(Nothing)
             width = grid.roiList(0).Width
             height = grid.roiList(0).Height
 
@@ -390,7 +390,7 @@ Public Class Puzzle_Solver
                 xxOffset = puzzle.grid.sliders.trackbar(0).Value / 4
                 yxOffset = puzzle.grid.sliders.trackbar(0).Value / 2
             End If
-            puzzle.grid.Run(src)
+            puzzle.grid.Run(Nothing)
             xyOffset = puzzle.grid.sliders.trackbar(1).Value * 9 / 10
             yyOffset = puzzle.grid.sliders.trackbar(1).Value / 2
             puzzle.restartRequested = True

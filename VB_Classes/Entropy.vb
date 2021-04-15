@@ -29,7 +29,7 @@ Public Class Entropy_Basics
         Next
         If standalone or task.intermediateReview = caller Then
             flow.msgs.Add("Entropy total = " + Format(entropy, "0.00") + " - " + entropyChannels)
-            flow.Run(src)
+            flow.Run(Nothing)
         End If
     End Sub
 End Class
@@ -62,7 +62,7 @@ Public Class Entropy_Highest
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        grid.Run(src)
+        grid.Run(Nothing)
 
         Dim entropyMap = New cv.Mat(src.Size(), cv.MatType.CV_32F)
         Dim entropyList(grid.roiList.Count - 1) As Single

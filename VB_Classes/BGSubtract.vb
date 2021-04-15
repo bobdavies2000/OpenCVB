@@ -132,7 +132,7 @@ Public Class BGSubtract_Basics_MT
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        grid.Run(src)
+        grid.Run(Nothing)
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = input.EmptyClone.SetTo(0)

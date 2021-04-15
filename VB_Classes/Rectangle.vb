@@ -10,7 +10,7 @@ Public Class Rectangle_Basics
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        optDraw.Run()
+        optDraw.Run(Nothing)
         Static saveType = optDraw.drawRotated
         If task.frameCount Mod optDraw.updateFrequency = 0 Or saveType <> optDraw.drawRotated Then
             saveType = optDraw.drawRotated
@@ -108,8 +108,7 @@ Public Class Rectangle_Overlap
     Dim draw As Rectangle_Basics
     Public Sub New()
         draw = New Rectangle_Basics
-        Dim countSlider = findSlider("DrawCount")
-        countSlider.Value = 2
+        findSlider("DrawCount").Value = 2
 
         task.desc = "Test if 2 rectangles overlap"
         ' task.rank = 1

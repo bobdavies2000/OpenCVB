@@ -436,7 +436,7 @@ Public Class PhotoShop_EmbossAll
             cv.Cv2.BitwiseOr(mats.mat(i), dst1, dst1)
         Next
 
-        mats.Run(src)
+        mats.Run(Nothing)
         dst2 = mats.dst1
     End Sub
 End Class

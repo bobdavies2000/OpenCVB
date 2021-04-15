@@ -5,8 +5,8 @@ Public Class Fitline_Basics
     Public draw As Draw_Line
     Public lines As New List(Of cv.Point) ' there are always an even number - 2 points define the line.
     Public Sub New()
-        draw = New Draw_Line()
-        draw.sliders.trackbar(0).Value = 2
+        draw = New Draw_Line
+        findSlider("DrawCount").Value = 2
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -54,7 +54,7 @@ Public Class Fitline_3DBasics_MT
     Inherits VBparent
     Dim hlines As Hough_Lines_MT
     Public Sub New()
-        hlines = New Hough_Lines_MT()
+        hlines = New Hough_Lines_MT
         task.desc = "Use visual lines to find 3D lines."
 		' task.rank = 1
         label2 = "White is featureless RGB, blue depth shadow"
