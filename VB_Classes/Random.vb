@@ -379,29 +379,23 @@ Public Class Random_CustomHistogram : Inherits VBparent
     Public hist As Histogram_Simple
     Public saveHist As cv.Mat
     Public Sub New()
-
         random = New Random_CustomDistribution()
         random.outputRandom = New cv.Mat(1000, 1, cv.MatType.CV_32S, 0)
 
         hist = New Histogram_Simple()
 
         label1 = "Histogram of the grayscale image"
-        label2 = "Histogram of the resulting random numbers"
-
+        label2 = "Custom random distribution that reflects dst1 image"
         task.desc = "Create a random number distribution that reflects histogram of a grayscale image"
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Static saveBins As Integer
-        If task.histogramBins <> saveBins Then
-            saveBins = task.histogramBins
-            hist.plotHist.fixedMaxVal = 0 ' we are sharing the plothist with the code below...
-            hist.Run(src)
-            dst1 = hist.dst1.Clone()
-            saveHist = hist.plotHist.hist.Clone()
-        End If
+        hist.plotHist.fixedMaxVal = 0 ' we are sharing the plothist with the code below...
+        hist.Run(src)
+        dst1 = hist.dst1.Clone()
+        saveHist = hist.plotHist.hist.Clone()
 
         random.inputCDF = saveHist ' it will convert the histogram into a cdf where the last value must be near one.
         random.Run(src)
