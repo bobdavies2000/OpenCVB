@@ -232,11 +232,11 @@ Public Class Sound_Display
         Static formatIndex As Integer
         Static samplesperLine As Single
         Static starttime As Date
-        If standalone Then soundSource.run()
+        If standalone Then soundSource.Run(src)
         dst1 = New cv.Mat(New cv.Size(src.Width * 2, src.Height), cv.MatType.CV_8UC3, cv.Scalar.Beige)
         If fileStarted = False Then
             fileStarted = True
-            soundSource.Run()
+            soundSource.Run(src)
             sliderPercent = 0
             starttime = Now
 
@@ -333,7 +333,7 @@ Public Class Sound_GenWaveDisplay
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        plotSound.soundSource.run()
+        plotSound.soundSource.run(src)
         plotSound.Run(src)
         Dim r1 = New cv.Rect(0, 0, src.Width, src.Height)
         Dim r2 = New cv.Rect(src.Width, 0, src.Width, src.Height)
@@ -359,7 +359,7 @@ Public Class Sound_WaveDisplay
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-        plotSound.soundSource.run()
+        plotSound.soundSource.run(src)
         plotSound.Run(src)
         Dim r1 = New cv.Rect(0, 0, src.Width, src.Height)
         Dim r2 = New cv.Rect(src.Width, 0, src.Width, src.Height)
