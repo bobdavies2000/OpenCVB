@@ -19,7 +19,8 @@ Public Class OptionsCommon : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat)
 
-        task.hist3DThreshold = gOptions.HistBinSlider.Value
+        task.hist3DThreshold = gOptions.ProjectionSlider.Value
+        gOptions.ProjectionThreshold.Text = CStr(task.hist3DThreshold)
         task.useKalman = gOptions.UseKalman.Checked
         task.useKalmanWhenStable = gOptions.UseKalmanWhenStable.Checked
         task.paletteScheme = gOptions.scheme

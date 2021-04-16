@@ -22,7 +22,7 @@ Public Class OptionsGlobal
         HistBinSlider.Value = GetSetting("OpenCVB", "HistogramBins", "HistogramBins", 40)
         HistBinsCount.Text = CStr(HistBinSlider.Value)
 
-        ProjectionSlider.Value = 2 '  GetSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", 2)
+        ProjectionSlider.Value = GetSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", 2)
         ProjectionThreshold.Text = CStr(ProjectionSlider.Value)
 
         IMUmotionSlider.Value = GetSetting("OpenCVB", "IMUmotionSlider", "IMUmotionSlider", 1)

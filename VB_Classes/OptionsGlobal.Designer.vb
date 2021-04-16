@@ -33,7 +33,7 @@ Partial Class OptionsGlobal
         Me.HistogramSettings = New System.Windows.Forms.GroupBox()
         Me.ProjectionThreshold = New System.Windows.Forms.Label()
         Me.ProjectionSlider = New System.Windows.Forms.TrackBar()
-        Me.ProjectionThresh = New System.Windows.Forms.Label()
+        Me.LabelProjection = New System.Windows.Forms.Label()
         Me.IMUmotion = New System.Windows.Forms.Label()
         Me.IMUmotionSlider = New System.Windows.Forms.TrackBar()
         Me.ThresholdLabel = New System.Windows.Forms.Label()
@@ -138,7 +138,7 @@ Partial Class OptionsGlobal
         '
         Me.HistogramSettings.Controls.Add(Me.ProjectionThreshold)
         Me.HistogramSettings.Controls.Add(Me.ProjectionSlider)
-        Me.HistogramSettings.Controls.Add(Me.ProjectionThresh)
+        Me.HistogramSettings.Controls.Add(Me.LabelProjection)
         Me.HistogramSettings.Controls.Add(Me.IMUmotion)
         Me.HistogramSettings.Controls.Add(Me.IMUmotionSlider)
         Me.HistogramSettings.Controls.Add(Me.ThresholdLabel)
@@ -157,9 +157,9 @@ Partial Class OptionsGlobal
         Me.ProjectionThreshold.AutoSize = True
         Me.ProjectionThreshold.Location = New System.Drawing.Point(737, 112)
         Me.ProjectionThreshold.Name = "ProjectionThreshold"
-        Me.ProjectionThreshold.Size = New System.Drawing.Size(57, 20)
+        Me.ProjectionThreshold.Size = New System.Drawing.Size(149, 20)
         Me.ProjectionThreshold.TabIndex = 8
-        Me.ProjectionThreshold.Text = "Label1"
+        Me.ProjectionThreshold.Text = "ProjectionThreshold"
         '
         'ProjectionSlider
         '
@@ -172,14 +172,14 @@ Partial Class OptionsGlobal
         Me.ProjectionSlider.TickStyle = System.Windows.Forms.TickStyle.None
         Me.ProjectionSlider.Value = 1
         '
-        'ProjectionThresh
+        'LabelProjection
         '
-        Me.ProjectionThresh.Location = New System.Drawing.Point(42, 105)
-        Me.ProjectionThresh.Name = "ProjectionThresh"
-        Me.ProjectionThresh.Size = New System.Drawing.Size(173, 47)
-        Me.ProjectionThresh.TabIndex = 6
-        Me.ProjectionThresh.Text = "Projection threshold"
-        Me.ProjectionThresh.TextAlign = System.Drawing.ContentAlignment.TopRight
+        Me.LabelProjection.Location = New System.Drawing.Point(42, 105)
+        Me.LabelProjection.Name = "LabelProjection"
+        Me.LabelProjection.Size = New System.Drawing.Size(173, 47)
+        Me.LabelProjection.TabIndex = 6
+        Me.LabelProjection.Text = "Projection threshold"
+        Me.LabelProjection.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'IMUmotion
         '
@@ -350,5 +350,5 @@ Partial Class OptionsGlobal
     Friend WithEvents FlowLayoutPanel1 As Windows.Forms.FlowLayoutPanel
     Friend WithEvents ProjectionThreshold As Windows.Forms.Label
     Friend WithEvents ProjectionSlider As Windows.Forms.TrackBar
-    Friend WithEvents ProjectionThresh As Windows.Forms.Label
+    Friend WithEvents LabelProjection As Windows.Forms.Label
 End Class
