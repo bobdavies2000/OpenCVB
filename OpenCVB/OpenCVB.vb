@@ -527,6 +527,10 @@ Public Class OpenCVB
             End If
         End If
 
+        ' when switching resolution, best to reset these as the move from higher to lower res could mean the point is no longer valid.
+        mouseClickPoint = New cv.Point
+        mousePoint = New cv.Point
+
         If AvailableAlgorithms.SelectedIndex < AvailableAlgorithms.Items.Count - 1 Then
             AvailableAlgorithms.SelectedIndex += 1
         Else
