@@ -1106,11 +1106,6 @@ Public Class OpenCVB
         Dim imgSize = New cv.Size(CInt(workingRes.Width * 2), CInt(workingRes.Height))
         imgResult = New cv.Mat(imgSize, cv.MatType.CV_8UC3, 0)
 
-        While 1
-            If camera.width = workingRes.Width Then Exit While
-            Application.DoEvents()
-        End While
-
         Thread.CurrentThread.Priority = ThreadPriority.Lowest
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
         algorithmTaskHandle.Name = AvailableAlgorithms.Text

@@ -30,7 +30,7 @@ Public Class Structured_Floor : Inherits VBparent
         ' it settles down quicker...
         If task.frameCount > 30 Then yCoordinate = kalman.kAverage
 
-        floorYplane = structD.side2D.meterMax * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
+        floorYplane = (task.maxZ / 2) * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
 
         structD.offsetSlider.Value = If(yCoordinate >= 0, yCoordinate, 0)
 
@@ -103,7 +103,7 @@ Public Class Structured_MultiSliceH : Inherits VBparent
         Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         Dim cushion = cushionSlider.Value
 
-        Dim metersPerPixel = Math.Abs(side2D.meterMax - side2D.meterMin) / dst2.Height
+        Dim metersPerPixel = task.maxZ / dst2.Height
         Dim thicknessMeters = cushion * metersPerPixel
 
         Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
@@ -111,8 +111,8 @@ Public Class Structured_MultiSliceH : Inherits VBparent
 
         sliceMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For yCoordinate = 0 To src.Height - 1 Step stepsize
-            Dim planeY = side2D.meterMin * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
-            If yCoordinate > task.sideCameraPoint.Y Then planeY = side2D.meterMax * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
+            Dim planeY = -task.maxZ / 2 * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
+            If yCoordinate > task.sideCameraPoint.Y Then planeY = task.maxZ / 2 * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
             Dim depthMask As New cv.Mat
             minVal = planeY - thicknessMeters
             maxVal = planeY + thicknessMeters
@@ -152,7 +152,7 @@ Public Class Structured_MultiSliceV : Inherits VBparent
         Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         Dim cushion = cushionSlider.Value
 
-        Dim metersPerPixel = Math.Abs(top2D.meterMax - top2D.meterMin) / dst2.Height
+        Dim metersPerPixel = task.maxZ / dst2.Height
         Dim thicknessMeters = cushion * metersPerPixel
 
         Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
@@ -160,8 +160,8 @@ Public Class Structured_MultiSliceV : Inherits VBparent
 
         Dim sliceMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For xCoordinate = 0 To src.Width - 1 Step stepsize
-            Dim planeX = top2D.meterMin * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
-            If xCoordinate > task.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
+            Dim planeX = -task.maxZ / 2 * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+            If xCoordinate > task.topCameraPoint.X Then planeX = task.maxZ / 2 * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
             Dim depthMask As New cv.Mat
             minVal = planeX - thicknessMeters
             maxVal = planeX + thicknessMeters
@@ -203,7 +203,7 @@ Public Class Structured_MultiSlice : Inherits VBparent
         Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         Dim cushion = cushionSlider.Value
 
-        Dim metersPerPixel = Math.Abs(top2D.meterMax - top2D.meterMin) / dst2.Height
+        Dim metersPerPixel = task.maxZ / dst2.Height
         Dim thicknessMeters = cushion * metersPerPixel
 
         Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
@@ -213,8 +213,8 @@ Public Class Structured_MultiSlice : Inherits VBparent
 
         dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For xCoordinate = 0 To src.Width - 1 Step stepsize
-            Dim planeX = top2D.meterMin * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
-            If xCoordinate > task.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
+            Dim planeX = -task.maxZ / 2 * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+            If xCoordinate > task.topCameraPoint.X Then planeX = task.maxZ / 2 * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
             Dim depthMask As New cv.Mat
             minVal = planeX - thicknessMeters
             maxVal = planeX + thicknessMeters
@@ -225,8 +225,8 @@ Public Class Structured_MultiSlice : Inherits VBparent
         Next
 
         For yCoordinate = 0 To src.Height - 1 Step stepsize
-            Dim planeY = side2D.meterMin * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
-            If yCoordinate > task.sideCameraPoint.Y Then planeY = side2D.meterMax * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
+            Dim planeY = -task.maxZ / 2 * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
+            If yCoordinate > task.sideCameraPoint.Y Then planeY = task.maxZ / 2 * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
             Dim depthMask As New cv.Mat
             minVal = planeY - thicknessMeters
             maxVal = planeY + thicknessMeters
@@ -517,10 +517,10 @@ Public Class Structured_SliceH : Inherits VBparent
 
         Dim yCoordinate = CInt(offsetSlider.Value)
 
-        Dim planeY = side2D.meterMin * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
-        If yCoordinate > task.sideCameraPoint.Y Then planeY = side2D.meterMax * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
+        Dim planeY = -task.maxZ / 2 * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
+        If yCoordinate > task.sideCameraPoint.Y Then planeY = task.maxZ / 2 * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
 
-        Dim metersPerPixel = Math.Abs(side2D.meterMax - side2D.meterMin) / dst2.Height
+        Dim metersPerPixel = task.maxZ / dst2.Height
         Dim cushion = cushionSlider.Value
         Dim thicknessMeters = cushion * metersPerPixel
         dst1 = task.color.Clone
@@ -577,10 +577,10 @@ Public Class Structured_SliceV : Inherits VBparent
 
         Dim split = top2D.gCloud.dst1.Split()
 
-        Dim planeX = top2D.meterMin * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
-        If xCoordinate > task.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
+        Dim planeX = -task.maxZ / 2 * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+        If xCoordinate > task.topCameraPoint.X Then planeX = task.maxZ / 2 * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
 
-        Dim metersPerPixel = Math.Abs(top2D.meterMax - top2D.meterMin) / dst2.Height
+        Dim metersPerPixel = task.maxZ / dst2.Height
         Dim cushion = cushionSlider.Value
         Dim thicknessMeters = cushion * metersPerPixel
 
@@ -637,10 +637,10 @@ Public Class Structured_SliceVStable : Inherits VBparent
         dst2 = top2D.dst1
         Dim split = top2D.gCloud.dst1.Split()
 
-        Dim planeX = top2D.meterMin * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
-        If xCoordinate > task.topCameraPoint.X Then planeX = top2D.meterMax * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
+        Dim planeX = -task.maxZ / 2 * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+        If xCoordinate > task.topCameraPoint.X Then planeX = task.maxZ / 2 * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
 
-        Dim metersPerPixel = Math.Abs(top2D.meterMax - top2D.meterMin) / dst2.Height
+        Dim metersPerPixel = task.maxZ / dst2.Height
         Dim cushion = cushionSlider.Value
         Dim thicknessMeters = cushion * metersPerPixel
 

@@ -596,104 +596,6 @@ End Class
 
 
 
-
-
-
-Public Class Histogram_TopData : Inherits VBparent
-    Public gCloud As Depth_PointCloud_IMU
-    Public histOutput As New cv.Mat
-    Public meterMin As Single
-    Public meterMax As Single
-    Dim kalman As Kalman_Basics
-    Dim IntelBug As Boolean
-    Public resizeHistOutput As Boolean = True
-    Public Sub New()
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "X scale negative value in meters (meterMin) X100", -400, -5, -200)
-            sliders.setupTrackBar(1, "X scale positive value in meters (meterMax) X100", 5, 400, 200)
-        End If
-
-        kalman = New Kalman_Basics()
-        gCloud = New Depth_PointCloud_IMU()
-        If VB_Classes.ActiveTask.algParms.camNames.D455 = task.parms.cameraName Then IntelBug = True
-
-        task.desc = "Create a 2D top view for XZ histogram of depth in meters - NOTE: x and y scales differ!"
-        ' task.rank = 1
-    End Sub
-
-    Public Sub Run(src As cv.Mat)
-        gCloud.Run(src)
-
-        Static minSlider = findSlider("X scale negative value in meters (meterMin) X100")
-        Static maxSlider = findSlider("X scale positive value in meters (meterMax) X100")
-        meterMin = minSlider.Value / 100
-        meterMax = maxSlider.value / 100
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(meterMin, meterMax)}
-        Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
-        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
-
-        dst1 = histOutput.Flip(cv.FlipMode.X).Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
-        label1 = "Left x = " + Format(meterMin, "#0.00") + " Right X = " + Format(meterMax, "#0.00") + " x and y scales differ!"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class Histogram_SideData : Inherits VBparent
-    Public gCloud As Depth_PointCloud_IMU
-    Public histOutput As New cv.Mat
-    Public meterMin As Single
-    Public meterMax As Single
-    Dim kalman As Kalman_Basics
-    Public resizeHistOutput As Boolean = True
-    Public Sub New()
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Y scale negative value in meters (meterMin) X100", -400, -5, -200)
-            sliders.setupTrackBar(1, "Y scale positive value in meters (meterMax) X100", 5, 400, 200)
-        End If
-        kalman = New Kalman_Basics()
-        gCloud = New Depth_PointCloud_IMU()
-
-        task.desc = "Create a 2D side view for ZY histogram of depth in meters - NOTE: x and y scales differ!"
-        ' task.rank = 1
-    End Sub
-    Public Sub Run(src As cv.Mat)
-        gCloud.Run(src)
-
-        Static minSlider = findSlider("Y scale negative value in meters (meterMin) X100")
-        Static maxSlider = findSlider("Y scale positive value in meters (meterMax) X100")
-        meterMin = minSlider.value / 100
-        meterMax = maxSlider.value / 100
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(meterMin, meterMax), New cv.Rangef(0, task.maxZ)}
-        Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
-        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
-
-        dst1 = histOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary)
-        label1 = "Top y = " + Format(meterMin, "#0.00") + " Bottom Y = " + Format(meterMax, "#0.00") + " x and y scales differ!"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Histogram_SmoothTopView2D : Inherits VBparent
     Public topView As Histogram_TopView2D
     Dim cmat As PointCloud_ColorizeTop
@@ -1401,5 +1303,100 @@ Public Class Histogram_DepthValleys : Inherits VBparent
         Dim spread = 255 / ranges.Count
         task.palette.Run(dst1 * spread)
         dst1 = task.palette.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Histogram_TopData : Inherits VBparent
+    Public gCloud As Depth_PointCloud_IMU
+    Public histOutput As New cv.Mat
+    Dim kalman As Kalman_Basics
+    Dim IntelBug As Boolean
+    Public resizeHistOutput As Boolean = True
+    Public Sub New()
+        kalman = New Kalman_Basics()
+        gCloud = New Depth_PointCloud_IMU()
+        If VB_Classes.ActiveTask.algParms.camNames.D455 = task.parms.cameraName Then IntelBug = True
+
+        task.desc = "Create a 2D top view for XZ histogram of depth in meters - NOTE: x and y scales differ!"
+        ' task.rank = 1
+    End Sub
+
+    Public Sub Run(src As cv.Mat)
+        gCloud.Run(src)
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(-task.maxZ / 2, task.maxZ / 2)}
+        Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
+        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
+
+        dst1 = histOutput.Flip(cv.FlipMode.X).Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        label1 = "Left x = " + Format(-task.maxZ / 2, "#0.00") + " Right X = " + Format(task.maxZ / 2, "#0.00") + " x and y scales differ!"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Histogram_SideData : Inherits VBparent
+    Public gCloud As Depth_PointCloud_IMU
+    Public histOutput As New cv.Mat
+    Dim kalman As Kalman_Basics
+    Public resizeHistOutput As Boolean = True
+    Public Sub New()
+        kalman = New Kalman_Basics()
+        gCloud = New Depth_PointCloud_IMU()
+
+        task.desc = "Create a 2D side view for ZY histogram of depth in meters - NOTE: x and y scales differ!"
+        ' task.rank = 1
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        gCloud.Run(src)
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.maxZ / 2, task.maxZ / 2), New cv.Rangef(0, task.maxZ)}
+        Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
+        If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
+
+        dst1 = histOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary)
+        label1 = "Top y = " + Format(-task.maxZ / 2, "#0.00") + " Bottom Y = " + Format(task.maxZ / 2, "#0.00") + " x and y scales differ!"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Histogram_BothViews : Inherits VBparent
+    Dim sideview As Histogram_SideData
+    Dim topview As Histogram_TopData
+    Public Sub New()
+        sideview = New Histogram_SideData
+        topview = New Histogram_TopData
+        label1 = "Side View Histogram"
+        label2 = "Top View Histogram"
+        task.desc = "Show both the side and top histograms."
+        ' task.rank = 1
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        sideview.Run(src)
+        dst1 = sideview.dst1
+
+        topview.Run(src)
+        dst2 = topview.dst1
     End Sub
 End Class
