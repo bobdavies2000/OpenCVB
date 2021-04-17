@@ -27,13 +27,14 @@ Public Class OptionsDialog
         SaveSetting("OpenCVB", "ShowConsoleLog", "ShowConsoleLog", ShowConsoleLog.Checked)
         SaveSetting("OpenCVB", "FontName", "FontName", fontInfo.Font.Name)
         SaveSetting("OpenCVB", "FontSize", "FontSize", fontInfo.Font.Size)
+        SaveSetting("OpenCVB", "resolution640", "resolution640", resolution640.Checked)
+        SaveSetting("OpenCVB", "resolution1280", "resolution1280", resolution1280.Checked)
 
         Me.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.Close()
     End Sub
     Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)
         cameraIndex = sender.tag
-        ' resolution640.Enabled = False
         If cameraIndex = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Or
             cameraIndex = VB_Classes.ActiveTask.algParms.camNames.MyntD1000 Or
             cameraIndex = VB_Classes.ActiveTask.algParms.camNames.OakDCamera Or
@@ -48,18 +49,6 @@ Public Class OptionsDialog
         For i = 0 To cameraRadioButton.Count - 1
             If cameraDeviceCount(i) > 0 Then cameraRadioButton(i).Enabled = True
         Next
-    End Sub
-    Public Sub saveResolution()
-        Select Case OpenCVB.workingRes.Width
-            Case 640
-                resolution640.Checked = True
-                OpenCVB.workingRes = New cv.Size(640, 480)
-                resolutionName = "Medium"
-            Case 1280
-                resolution1280.Checked = True
-                OpenCVB.workingRes = New cv.Size(1280, 720)
-                resolutionName = "High"
-        End Select
     End Sub
     Public Sub OptionsDialog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Static radioButtonsPresent = False
@@ -79,9 +68,8 @@ Public Class OptionsDialog
             Next
         End If
 
-        OpenCVB.workingRes.Width = GetSetting("OpenCVB", "resolutionWidth", "resolutionWidth", 640)
-        OpenCVB.workingRes.Height = GetSetting("OpenCVB", "resolutionHeight", "resolutionHeight", 480)
-        saveResolution()
+        resolution640.Checked = GetSetting("OpenCVB", "resolution640", "resolution640", False)
+        resolution1280.Checked = GetSetting("OpenCVB", "resolution1280", "resolution1280", True)
 
         cameraIndex = GetSetting("OpenCVB", "CameraIndex", "CameraIndex", VB_Classes.ActiveTask.algParms.camNames.D435i)
         cameraRadioButton(cameraIndex).Checked = True
@@ -146,9 +134,9 @@ Public Class OptionsDialog
         End If
     End Sub
     Private Sub HighResolution_CheckedChanged(sender As Object, e As EventArgs) Handles resolution1280.CheckedChanged
-        OpenCVB.workingRes = New cv.Size(1280, 720)
+        resolutionName = "High"
     End Sub
     Private Sub mediumResolution_CheckedChanged(sender As Object, e As EventArgs) Handles resolution640.CheckedChanged
-        OpenCVB.workingRes = New cv.Size(640, 480)
+        resolutionName = "Medium"
     End Sub
 End Class

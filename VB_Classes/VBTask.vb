@@ -366,7 +366,9 @@ Public Class ActiveTask : Implements IDisposable
                 IMUStable.run(task.color.Clone) ' updates the flag that indicates stability according to the IMU.
             End If
 
+            TaskTimer.Enabled = True
             algorithmObject.NextFrame(task.color.Clone)
+            TaskTimer.Enabled = False
 
             label1 = task.label1
             label2 = task.label2

@@ -176,6 +176,7 @@ Public Class OpenCVB
 
         optionsForm = New OptionsDialog
         optionsForm.OptionsDialog_Load(sender, e)
+        workingRes = If(optionsForm.resolution1280.Checked, New cv.Size(1280, 720), New cv.Size(640, 480))
 
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam) = USBenumeration("Azure Kinect 4K Camera")
         optionsForm.cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.D435i) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth")
@@ -486,11 +487,11 @@ Public Class OpenCVB
     End Sub
     Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
         TestAllButton.Image = If(TestAllButton.Text = "Test All", stopTest, testAll)
-
         If TestAllButton.Text = "Test All" Then
             TestAllButton.Text = "Stop Test"
             TestAllTimer_Tick(sender, e)
             TestAllTimer.Enabled = True
+            AlgorithmTestCount = 0
             If TreeViewDialog IsNot Nothing Then TreeViewDialog.Timer1.Enabled = True
         Else
             TestAllTimer.Enabled = False
@@ -500,27 +501,30 @@ Public Class OpenCVB
     End Sub
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
         If frameCount = 0 And TestAllButton.Text = "Stop Test" Then Exit Sub ' we have to see some output from the algorithm before moving on...
+        TestAllTimer.Enabled = False ' it can take a while to restart the camera so stop watching until the timer event is complete.
         If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Then
-            'If optionsForm.resolution640.Enabled And optionsForm.resolution1280.Checked Then
-            '    optionsForm.resolution640.Checked = True
-            '    LineUpCamPics(False)
-            '    startCamera()
-            'Else
-            optionsForm.resolution1280.Checked = True ' start every camera at 1280x720
-            Dim cameraIndex = optionsForm.cameraIndex + 1
-            For i = 0 To optionsForm.cameraRadioButton.Count - 1
-                If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
-                If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
-                    optionsForm.cameraRadioButton(cameraIndex).Checked = True
-                    optionsForm.cameraIndex = cameraIndex
-                    LineUpCamPics(False)
-                    startCamera()
-                    Exit For
-                Else
-                    cameraIndex += 1
-                End If
-            Next
-            ' End If
+            If optionsForm.resolution640.Enabled And optionsForm.resolution1280.Checked Then
+                optionsForm.resolution640.Checked = True
+                workingRes = New cv.Size(640, 480)
+                LineUpCamPics(False)
+                startCamera()
+            Else
+                optionsForm.resolution1280.Checked = True ' start every camera at 1280x720
+                Dim cameraIndex = optionsForm.cameraIndex + 1
+                For i = 0 To optionsForm.cameraRadioButton.Count - 1
+                    If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
+                    If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
+                        optionsForm.cameraRadioButton(cameraIndex).Checked = True
+                        optionsForm.cameraIndex = cameraIndex
+                        workingRes = New cv.Size(1280, 720)
+                        LineUpCamPics(False)
+                        startCamera()
+                        Exit For
+                    Else
+                        cameraIndex += 1
+                    End If
+                Next
+            End If
         End If
 
         If AvailableAlgorithms.SelectedIndex < AvailableAlgorithms.Items.Count - 1 Then
@@ -532,6 +536,7 @@ Public Class OpenCVB
                 AvailableAlgorithms.SelectedIndex = 0
             End If
         End If
+        TestAllTimer.Enabled = True
     End Sub
     Private Sub startCamera()
         SyncLock bufferLock
@@ -555,14 +560,14 @@ Public Class OpenCVB
     Private Sub CameraTask()
         On Error Resume Next
         Dim currentCameraIndex = -1
+        Dim changeResolution As Boolean
         While (1)
             SyncLock bufferLock
-                Dim changeResolution As Boolean
+                changeResolution = False
                 If camera IsNot Nothing Then
                     If camera.width <> workingRes.Width Then changeResolution = True
                 End If
                 If currentCameraIndex <> saveCameraIndex Or changeResolution Then
-                    saveAlgorithmName = "" ' this will restart the current algorithm
                     If saveCameraIndex < 0 Then Exit While
                     If camera IsNot Nothing Then camera.stopCamera()
                     ' order is same as in optionsdialog enum
@@ -570,6 +575,7 @@ Public Class OpenCVB
                     currentCameraIndex = saveCameraIndex
                     camera.initialize(workingRes.Width, workingRes.Height, fps)
                     saveCameraName = camera.deviceName + " " + CStr(workingRes.Width)
+                    saveCameraIndex = currentCameraIndex
                 End If
                 camera.GetNextFrame()
             End SyncLock
@@ -828,6 +834,8 @@ Public Class OpenCVB
     End Sub
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
         If AvailableAlgorithms.Enabled Then
+            imgResult.SetTo(0)
+            Me.Refresh()
             If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e) ' if paused, then restart.
             If OpenCVkeyword.Text = "" Then Exit Sub ' we are terminating...
             SaveSetting("OpenCVB", OpenCVkeyword.Text, OpenCVkeyword.Text, AvailableAlgorithms.Text)
@@ -994,22 +1002,12 @@ Public Class OpenCVB
                   CStr(Process.GetCurrentProcess().Threads.Count) + " threads"
     End Sub
     Private Sub saveLayout()
-        optionsForm.saveResolution()
         SaveSetting("OpenCVB", "OpenCVBLeft", "OpenCVBLeft", Me.Left)
         SaveSetting("OpenCVB", "OpenCVBTop", "OpenCVBTop", Me.Top)
         SaveSetting("OpenCVB", "OpenCVBWidth", "OpenCVBWidth", Me.Width)
         SaveSetting("OpenCVB", "OpenCVBHeight", "OpenCVBHeight", Me.Height)
 
-        Dim resolutionDesc As String = ""
-        Select Case optionsForm.resolutionName
-            Case "Low"
-                resolutionDesc = "320x240"
-            Case "Medium"
-                resolutionDesc = "640x480"
-            Case "High"
-                resolutionDesc = "1280x720"
-        End Select
-        Dim details = " Display at " + CStr(camPic(0).Width) + "x" + CStr(camPic(0).Height) + ", Working Res. = " + resolutionDesc
+        Dim details = " Display at " + CStr(camPic(0).Width) + "x" + CStr(camPic(0).Height) + ", Working Res. = " + If(optionsForm.resolution640.Checked, "640x480", "1280x720")
         picLabels(0) = "RGB:" + details
         picLabels(1) = "Depth:" + details
     End Sub
@@ -1071,7 +1069,7 @@ Public Class OpenCVB
         Dim OKcancel = optionsForm.ShowDialog()
 
         If OKcancel = DialogResult.OK Then
-            optionsForm.saveResolution()
+            workingRes = If(optionsForm.resolution1280.Checked, New cv.Size(1280, 720), New cv.Size(640, 480))
             If saveCameraIndex <> optionsForm.cameraIndex Or camera.width <> workingRes.Width Then startCamera()
             TestAllTimer.Interval = optionsForm.TestAllDuration.Value * 1000
         End If
