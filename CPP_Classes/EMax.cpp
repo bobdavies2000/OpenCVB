@@ -11,7 +11,7 @@ using namespace std;
 using namespace cv;
 using namespace cv::ml;
 // Why did we need a C++ version of the EM OpenCV API's?  Because the OpenCVSharp Predict2 interface is broken.
-class EMax_Basics
+class EMax_Raw
 {
 private:
 public:
@@ -23,7 +23,7 @@ public:
 	int clusters;
 	int covarianceMatrixType;
 	int stepSize;
-	EMax_Basics()
+	EMax_Raw()
 	{
 		em_model = EM::create();
 	}
@@ -52,28 +52,28 @@ public:
 };
 
 extern "C" __declspec(dllexport)
-EMax_Basics *EMax_Basics_Open()
+EMax_Raw *EMax_Raw_Open()
 {
-    EMax_Basics *EMax_BasicsPtr = new EMax_Basics();
-    return EMax_BasicsPtr;
+    EMax_Raw *EMax_RawPtr = new EMax_Raw();
+    return EMax_RawPtr;
 }
 
 extern "C" __declspec(dllexport)
-void EMax_Basics_Close(EMax_Basics *EMax_BasicsPtr)
+void EMax_Raw_Close(EMax_Raw *EMax_RawPtr)
 {
-    delete EMax_BasicsPtr;
+    delete EMax_RawPtr;
 }
 
 extern "C" __declspec(dllexport)
-int *EMax_Basics_Run(EMax_Basics *EMax_BasicsPtr, int *samplePtr, int *labelsPtr, int rows, int cols, int imgRows, int imgCols, int clusters,
+int *EMax_Raw_Run(EMax_Raw *EMax_RawPtr, int *samplePtr, int *labelsPtr, int rows, int cols, int imgRows, int imgCols, int clusters,
 					 int stepSize, int covarianceMatrixType)
 {
-	EMax_BasicsPtr->covarianceMatrixType = covarianceMatrixType;
-	EMax_BasicsPtr->stepSize = stepSize;
-	EMax_BasicsPtr->clusters = clusters;
-	EMax_BasicsPtr->labels = Mat(rows, 1, CV_32S, labelsPtr);
-	EMax_BasicsPtr->samples = Mat(rows, cols, CV_32FC1, samplePtr);
-	EMax_BasicsPtr->output = Mat(imgRows, imgCols, CV_8U);
-	EMax_BasicsPtr->Run();
-    return (int *) EMax_BasicsPtr->output.data; // return this C++ allocated data to managed code where it will be used in the marshal.copy
+	EMax_RawPtr->covarianceMatrixType = covarianceMatrixType;
+	EMax_RawPtr->stepSize = stepSize;
+	EMax_RawPtr->clusters = clusters;
+	EMax_RawPtr->labels = Mat(rows, 1, CV_32S, labelsPtr);
+	EMax_RawPtr->samples = Mat(rows, cols, CV_32FC1, samplePtr);
+	EMax_RawPtr->output = Mat(imgRows, imgCols, CV_8U);
+	EMax_RawPtr->Run();
+    return (int *) EMax_RawPtr->output.data; // return this C++ allocated data to managed code where it will be used in the marshal.copy
 }

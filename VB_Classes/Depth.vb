@@ -1785,55 +1785,12 @@ End Class
 
 
 
-'Public Class Depth_Basics : Inherits VBparent
-'    Dim noiseRemover As Depth_NoiseMask
-'    Public Sub New()
-'        noiseRemover = New Depth_NoiseMask
-'        If findfrm(caller + " Slider Options") Is Nothing Then
-'            sliders.Setup(caller)
-'            sliders.setupTrackBar(0, "Max depth difference X100 in mm's", 0, 1000, 50)
-'        End If
-
-'        task.desc = "Separate neighboring depth pixels that have are not close"
-'    End Sub
-'    Public Sub Run(src as cv.Mat)
-'        noiseRemover.Run()
-
-'        Static diffSlider = findSlider("Max depth difference X100 in mm's")
-'        Dim maxDiff = diffSlider.value / 100
-
-'        Dim rect1 = New cv.Rect(1, 1, src.Width - 1, src.Height - 1)
-'        Dim rect2 = New cv.Rect(0, 0, src.Width - 1, src.Height - 1)
-
-'        dst1 = task.depth32f
-'        dst1.SetTo(0, (255 - noiseRemover.dst1).ToMat)
-'        cv.Cv2.Absdiff(dst1(rect2), dst1(rect1), dst1(rect2))
-'        dst1 = dst1.Threshold(maxDiff, 255, cv.ThresholdTypes.BinaryInv)
-'    End Sub
-'End Class
-
-
-
-
-
-
-
-
-Public Class Depth_Solid : Inherits VBparent
-    Public flood As Coherent_Palette
+Public Class Depth_RGBShadow : Inherits VBparent
     Public Sub New()
-        flood = New Coherent_Palette()
-        label1 = "Solid depth with noise removed"
-        task.desc = "Show depth with and without the depth noise from being too close."
-        ' task.rank = 1
+        task.desc = "Merge the RGB and Depth Shadow"
     End Sub
-    Public Sub Run(src as cv.Mat)
-
-        flood.Run(task.depthMask)
-        dst1 = flood.dst1
+    Public Sub Run(src As cv.Mat)
+        dst1 = src
         dst1.SetTo(0, task.noDepthMask)
-        dst2 = task.depth32f
-        dst2.SetTo(0, task.noDepthMask)
     End Sub
 End Class
-

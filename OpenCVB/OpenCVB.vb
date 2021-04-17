@@ -1283,12 +1283,11 @@ Public Class OpenCVB
             Dim dst2 = dst(New cv.Rect(dst.Width / 2, 0, dst.Width / 2, dst.Height))
 
             Dim encodeParams() As Integer = {cv.ImwriteFlags.JpegQuality, 99}
-            Dim minVal As Double, maxVal As Double
-            cv.Cv2.MinMaxLoc(dst1, minVal, maxVal)
-            If maxVal > 0 Then cv.Cv2.ImWrite(surveyDir.FullName + "/" + AvailableAlgorithms.Text + "1.jpg", dst1, encodeParams)
+            Dim count = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
+            If count > 0 Then cv.Cv2.ImWrite(surveyDir.FullName + "/" + AvailableAlgorithms.Text + "1.jpg", dst1, encodeParams)
 
-            cv.Cv2.MinMaxLoc(dst2, minVal, maxVal)
-            If maxVal > 0 Then cv.Cv2.ImWrite(surveyDir.FullName + "/" + AvailableAlgorithms.Text + "2.jpg", dst2, encodeParams)
+            count = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
+            If count > 0 Then cv.Cv2.ImWrite(surveyDir.FullName + "/" + AvailableAlgorithms.Text + "2.jpg", dst2, encodeParams)
 
             If AvailableAlgorithms.SelectedIndex = AvailableAlgorithms.Items.Count - 1 Then
                 surveyActive = False

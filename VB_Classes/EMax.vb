@@ -2,13 +2,13 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 ' https://docs.opencv.org/3.0-beta/modules/ml/doc/expectation_maximization.html
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/em.cpp
-Public Class EMax_Basics : Inherits VBparent
+Public Class EMax_Raw : Inherits VBparent
     Dim inputDataMask As cv.Mat
-    Dim EMax_Basics As IntPtr
-    Public options As EMax_Options
+    Dim EMax_Raw As IntPtr
+    Public options As EMax_Setup
     Public Sub New()
-        options = New EMax_Options()
-        EMax_Basics = EMax_Basics_Open()
+        options = New EMax_Setup()
+        EMax_Raw = EMax_Raw_Open()
 
         label2 = "Emax regions as integers"
         task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
@@ -30,7 +30,7 @@ Public Class EMax_Basics : Inherits VBparent
         handleLabels = GCHandle.Alloc(labelData, GCHandleType.Pinned)
         Marshal.Copy(options.labels.Data, labelData, 0, labelData.Length)
 
-        Dim imagePtr = EMax_Basics_Run(EMax_Basics, handleSrc.AddrOfPinnedObject(), handleLabels.AddrOfPinnedObject(), inCount, 2,
+        Dim imagePtr = EMax_Raw_Run(EMax_Raw, handleSrc.AddrOfPinnedObject(), handleLabels.AddrOfPinnedObject(), inCount, 2,
                                        dst1.Rows, dst1.Cols, options.regionCount, options.predictionStepSize, options.covarianceMatrixType)
         handleLabels.Free() ' free the pinned memory...
         handleSrc.Free() ' free the pinned memory...
@@ -45,7 +45,7 @@ Public Class EMax_Basics : Inherits VBparent
         End If
     End Sub
     Public Sub Close()
-        EMax_Basics_Close(EMax_Basics)
+        EMax_Raw_Close(EMax_Raw)
     End Sub
 End Class
 
@@ -55,29 +55,29 @@ End Class
 
 
 
-Public Class EMax_Coherent : Inherits VBparent
+Public Class EMax_Basics : Inherits VBparent
     Dim inputDataMask As cv.Mat
-    Dim emax As EMax_Basics
+    Public basics As EMax_Raw
     Dim lut As LUT_Color
     Public Sub New()
         lut = New LUT_Color
-        emax = New EMax_Basics
+        basics = New EMax_Raw
         label1 = "Emax regions around clusters"
         task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-        emax.Run(Nothing)
-        label1 = emax.label1
+        basics.Run(Nothing)
+        label1 = basics.label1
 
-        Dim regions = emax.options.regionCount
+        Dim regions = basics.options.regionCount
         Dim regionCount(regions - 1, regions - 1)
-        For i = 0 To emax.options.samples.Rows - 1
-            Dim p = emax.options.samples.Get(Of cv.Point2f)(i, 0)
+        For i = 0 To basics.options.samples.Rows - 1
+            Dim p = basics.options.samples.Get(Of cv.Point2f)(i, 0)
             Dim pt = New cv.Point(CInt(p.X), CInt(p.Y))
             If pt.X >= 0 And pt.Y >= 0 And pt.X < dst2.Width And pt.Y < dst2.Height Then
-                Dim label = emax.options.labels.Get(Of Integer)(i, 0)
-                Dim eGrp = emax.dst2.Get(Of Byte)(CInt(pt.Y), CInt(pt.X))
+                Dim label = basics.options.labels.Get(Of Integer)(i, 0)
+                Dim eGrp = basics.dst2.Get(Of Byte)(CInt(pt.Y), CInt(pt.X))
                 If eGrp < regions Then regionCount(label, eGrp) += 1
             End If
         Next
@@ -90,11 +90,11 @@ Public Class EMax_Coherent : Inherits VBparent
                 If index Is Nothing Then Continue For
                 If maxCount < index Then
                     maxCount = index
-                    task.palette.gradientColorMap.Set(Of cv.Vec3b)(0, j, emax.options.regionColors(i))
+                    task.palette.gradientColorMap.Set(Of cv.Vec3b)(0, j, basics.options.regionColors(i))
                 End If
             Next
         Next
-        task.palette.Run(emax.dst2)
+        task.palette.Run(basics.dst2)
         dst1 = task.palette.dst1
     End Sub
 End Class
@@ -104,7 +104,7 @@ End Class
 
 
 
-Public Class EMax_Options : Inherits VBparent
+Public Class EMax_Setup : Inherits VBparent
     Public grid As Thread_Grid
     Public regionCount As Integer
     Public regionColors() As cv.Vec3b
@@ -121,8 +121,8 @@ Public Class EMax_Options : Inherits VBparent
         End If
 
         grid = New Thread_Grid
-        findSlider("ThreadGrid Width").Value = dst1.Width / 2
-        findSlider("ThreadGrid Height").Value = dst1.Height / 2
+        findSlider("ThreadGrid Width").Value = dst1.Width / 3
+        findSlider("ThreadGrid Height").Value = dst1.Height / 3
 
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)
@@ -142,12 +142,12 @@ Public Class EMax_Options : Inherits VBparent
         If regionCount <> grid.roiList.Count - 1 Then
             regionCount = grid.roiList.Count - 1
             ReDim regionColors(regionCount - 1)
-            Dim colorMap As cv.Mat = task.palette.gradientColorMap.Row(0)
-            Dim spread = 255 / regionCount
-            For i = 0 To regionCount - 1
-                regionColors(i) = colorMap.Get(Of cv.Vec3b)(0, i * spread)
-            Next
         End If
+        Dim colorMap As cv.Mat = task.palette.gradientColorMap.Row(0)
+        Dim spread = 255 / regionCount
+        For i = 0 To regionCount - 1
+            regionColors(i) = colorMap.Get(Of cv.Vec3b)(0, i * spread)
+        Next
         For i = 0 To radio.check.Count - 1
             If radio.check(i).Checked = True Then
                 covarianceMatrixType = Choose(i + 1, cv.EM.Types.CovMatSpherical, cv.EM.Types.CovMatDiagonal, cv.EM.Types.CovMatGeneric)
@@ -195,27 +195,23 @@ End Class
 ' https://docs.opencv.org/3.0-beta/modules/ml/doc/expectation_maximization.html
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/em.cpp
 Public Class EMax_VB_Failing : Inherits VBparent
-    Dim options As EMax_Options
+    Dim options As EMax_Setup
     Public Sub New()
-        options = New EMax_Options
+        options = New EMax_Setup
         task.desc = "OpenCV expectation maximization example."
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         If standalone Or task.intermediateReview = caller Then
             task.trueText("The EMax algorithm fails as a result of a bug in em_model.Predict2.  See code for details." + vbCrLf +
-                          "The C++ version works fine (EMax_Basics) and the 2 are functionally identical.", 20, 100)
+                          "The C++ version works fine (EMax_Raw) and the 2 are functionally identical.", 20, 100)
 
             Exit Sub ' comment this line to see the bug in the VB.Net version of this Predict2 below.
 
+            options.Run(Nothing)
             Dim em_model = cv.EM.Create()
             em_model.ClustersNumber = options.regionCount
-            Static frm = findfrm("EMax_Basics Radio Options")
-            For i = 0 To frm.check.length - 1
-                If frm.check(i).Checked Then
-                    em_model.CovarianceMatrixType = Choose(i + 1, cv.EM.Types.CovMatSpherical, cv.EM.Types.CovMatDiagonal, cv.EM.Types.CovMatGeneric)
-                End If
-            Next
+            em_model.CovarianceMatrixType = options.covarianceMatrixType
             em_model.TermCriteria = New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 300, 1.0)
             em_model.TrainEM(options.samples, Nothing, options.labels, Nothing)
 
@@ -242,13 +238,13 @@ End Class
 
 Module EMax_Exports
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function EMax_Basics_Open() As IntPtr
+    Public Function EMax_Raw_Open() As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub EMax_Basics_Close(EMax_BasicsPtr As IntPtr)
+    Public Sub EMax_Raw_Close(EMax_RawPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function EMax_Basics_Run(EMax_BasicsPtr As IntPtr, samplesPtr As IntPtr, labelsPtr As IntPtr, rows As Integer, cols As Integer, imgRows As Integer,
+    Public Function EMax_Raw_Run(EMax_RawPtr As IntPtr, samplesPtr As IntPtr, labelsPtr As IntPtr, rows As Integer, cols As Integer, imgRows As Integer,
                                     imgCols As Integer, clusters As Integer, stepSize As Integer, covarianceMatrixType As Integer) As IntPtr
     End Function
 End Module
@@ -265,6 +261,8 @@ Public Class EMax_Centroids : Inherits VBparent
     Public flood As FloodFill_Basics
     Public Sub New()
         flood = New FloodFill_Basics
+        findSlider("FloodFill LoDiff").Value = 0
+        findSlider("FloodFill HiDiff").Value = 1
         emaxCPP = New EMax_Basics
         findSlider("ThreadGrid Width").Value = dst1.Width * 170 / 640
         task.desc = "Get the Emax cluster centroids using floodfill "
@@ -272,7 +270,7 @@ Public Class EMax_Centroids : Inherits VBparent
     End Sub
     Public Sub Run(src as cv.Mat)
         emaxCPP.Run(src)
-        flood.Run(emaxCPP.dst2.Clone)
+        flood.Run(emaxCPP.dst1.Clone)
         dst1 = flood.dst1
 
         Static lastCentroids As New List(Of cv.Point2f)
@@ -328,8 +326,8 @@ Public Class EMax_PointTracker : Inherits VBparent
         Static totalErrors = 0
         Static generationCount = 0
         Static saveCount = 0
-        If emax.emaxCPP.options.grid.roiList.Count <> saveCount Then
-            saveCount = emax.emaxCPP.options.grid.roiList.Count
+        If emax.emaxCPP.basics.options.grid.roiList.Count <> saveCount Then
+            saveCount = emax.emaxCPP.basics.options.grid.roiList.Count
             totalErrors = 0
             generationCount = 0
         End If
