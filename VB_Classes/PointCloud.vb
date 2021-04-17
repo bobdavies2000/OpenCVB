@@ -744,35 +744,6 @@ End Class
 
 
 
-Public Class PointCloud_Singletons : Inherits VBparent
-    Public topView As Histogram_TopView2D
-    Public Sub New()
-        topView = New Histogram_TopView2D()
-        topView.resizeHistOutput = False
-        task.hist3DThreshold = 1
-
-        label1 = "Top down view before inrange sampling"
-        label2 = "Histogram after filtering for single-only histogram bins"
-        task.desc = "Find floor and ceiling using gravity aligned top-down view and selecting bins with exactly 1 sample"
-		' task.rank = 1
-    End Sub
-    Public Sub Run(src as cv.Mat)
-        topView.Run(src)
-        dst1 = topView.dst1
-
-        minVal = 1
-        maxVal = 2
-        cv.Cv2.InRange(topView.originalHistOutput, minVal, maxVal, dst2)
-        Dim mask = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 Public Class PointCloud_ReducedSideView : Inherits VBparent
@@ -1318,3 +1289,64 @@ Public Class PointCloud_BackProjectSideView : Inherits VBparent
     End Sub
 End Class
 
+
+
+
+
+
+
+
+
+
+Public Class PointCloud_Singletons : Inherits VBparent
+    Public topView As Histogram_TopView2D
+    Public Sub New()
+        topView = New Histogram_TopView2D
+        topView.resizeHistOutput = False
+        task.hist3DThreshold = 1
+
+        label1 = "Top down view before inrange sampling"
+        label2 = "Histogram after filtering for single-only histogram bins"
+        task.desc = "Find floor and ceiling using gravity aligned top-down view and selecting bins with exactly 1 sample"
+        ' task.rank = 1
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        topView.Run(src)
+        dst1 = topView.dst1
+
+        cv.Cv2.InRange(topView.originalHistOutput, 1, 1, dst2)
+        Dim mask = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class PointCloud_SingletonRegions : Inherits VBparent
+    Public topView As Histogram_TopView2D
+    Dim dilate As DilateErode_Basics
+    Public Sub New()
+        dilate = New DilateErode_Basics
+        topView = New Histogram_TopView2D
+        topView.resizeHistOutput = False
+        task.hist3DThreshold = 1
+
+        label1 = "Top down view before inrange sampling"
+        label2 = "Histogram after filtering for single-only histogram bins"
+        task.desc = "Find floor and ceiling using gravity aligned top-down view and selecting bins with exactly 1 sample"
+        ' task.rank = 1
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        topView.Run(src)
+        cv.Cv2.InRange(topView.originalHistOutput, 1, 1, dst2)
+        Dim mask = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
+        dilate.Run(dst2.Clone)
+        dst1 = dilate.dst1
+    End Sub
+End Class

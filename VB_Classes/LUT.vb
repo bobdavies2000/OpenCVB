@@ -1,22 +1,22 @@
 Imports cv = OpenCvSharp
+' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
+' https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
 Public Class LUT_Basics : Inherits VBparent
-    Public nSeg As Integer
     Public Sub New()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Number of LUT Segments", 2, 100, 10)
         End If
 
         task.desc = "Divide the image into n-segments controlled with a slider."
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
-
+    Public Sub Run(src As cv.Mat)
         Static segment() As Integer
         Static nSegSlider = findSlider("Number of LUT Segments")
-        Static myLut As New cv.Mat(1, 256, cv.MatType.CV_8U)
         Dim segments = nSegSlider.value
+        Static myLut As New cv.Mat(1, 256, cv.MatType.CV_8U)
+        Static nSeg = segments
         If segments <> nSeg Then
             nSeg = segments
             Dim incr = 255 / nSeg
@@ -34,8 +34,11 @@ Public Class LUT_Basics : Inherits VBparent
         Dim gray = src
         If gray.Channels <> 1 Then gray = gray.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = gray.LUT(myLut)
+        label1 = "Image segmented into " + CStr(segments + 1) + " divisions (0-" + CStr(segments) + ")"
     End Sub
 End Class
+
+
 
 
 
@@ -80,30 +83,6 @@ End Class
 
 
 
-' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
-Public Class LUT_Reduction : Inherits VBparent
-    Public reduction As Reduction_Basics
-    Public colorMat As cv.Mat
-    Public Sub New()
-        reduction = New Reduction_Basics()
-        colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, task.vecColors)
-        label2 = "Custom Color Lookup Table"
-        task.desc = "Build and use a custom color palette - Painterly Effect"
-		' task.rank = 1
-    End Sub
-    Public Sub Run(src as cv.Mat)
-        reduction.Run(src)
-        dst1 = reduction.dst1.LUT(colorMat)
-        If standalone Or task.intermediateReview = caller Then dst2 = colorMat.Resize(src.Size())
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class LUT_CustomColor : Inherits VBparent
     Public reduction As Reduction_Basics
     Dim gradMap As Palette_RandomColorMap
@@ -117,11 +96,7 @@ Public Class LUT_CustomColor : Inherits VBparent
 		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
-
-        If standalone Or task.intermediateReview = caller Then
-            reduction.Run(src)
-        End If
-
+        If standalone Or task.intermediateReview = caller Then reduction.Run(src)
         gradMap.Run(src)
         colorMap = gradMap.gradientColorMap.Flip(cv.FlipMode.X)
         dst1 = reduction.dst1.LUT(colorMap)
@@ -136,51 +111,23 @@ End Class
 
 
 
-
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
-Public Class LUT_Color : Inherits VBparent
-    Public paletteMap(256) As cv.Vec3b
-    Dim colorMat As cv.Mat
+Public Class LUT_Reduction : Inherits VBparent
+    Public reduction As Reduction_Basics
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Reduction for color image", 1, 256, 32)
-        End If
-        colorMat = New cv.Mat(1, 256, cv.MatType.CV_8UC3, task.vecColors) ' Create a new color palette here.
+        reduction = New Reduction_Basics()
+        label2 = "Custom Color Lookup Table"
         task.desc = "Build and use a custom color palette - Painterly Effect"
-		' task.rank = 1
+        ' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
-        Dim reduction = sliders.trackbar(0).Value
-        If standalone or task.intermediateReview = caller Then
-            src /= reduction
-            src *= reduction
-        End If
-        dst1 = src.LUT(colorMat)
-        If standalone or task.intermediateReview = caller Then dst2 = colorMat.Resize(src.Size())
+    Public Sub Run(src As cv.Mat)
+        task.palette.Run(Nothing)
+        reduction.Run(src)
+        dst1 = reduction.dst1.LUT(task.palette.gradientColorMap.Row(0))
+        If standalone Or task.intermediateReview = caller Then dst2 = task.palette.gradientColorMap.Resize(src.Size())
     End Sub
 End Class
 
-
-
-
-' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
-' https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
-Public Class LUT_Rebuild : Inherits VBparent
-    Public paletteMap(256 - 1) As Byte
-    Public Sub New()
-        For i = 0 To paletteMap.Count - 1
-            paletteMap(i) = i
-        Next
-        task.desc = "Rebuild any grayscale image with a 256 element Look-Up Table"
-		' task.rank = 1
-    End Sub
-    Public Sub Run(src as cv.Mat)
-        Dim lut = New cv.Mat(1, 256, cv.MatType.CV_8U, paletteMap)
-        dst1 = src.LUT(lut)
-        If standalone or task.intermediateReview = caller Then dst2 = lut.Resize(src.Size())
-    End Sub
-End Class
 
 
 
@@ -197,10 +144,10 @@ Public Class LUT_RGBDepth : Inherits VBparent
         task.desc = "Use a LUT on the RGBDepth to segregate depth data."
 		' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         lut.Run(task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst1 = lut.dst1
-        label1 = "Depth data in " + CStr(lut.nSeg) + " LUT entries"
+        label1 = lut.label1
     End Sub
 End Class
 
@@ -218,9 +165,29 @@ Public Class LUT_Depth32f : Inherits VBparent
         task.desc = "Use a LUT on the 32-bit depth to segregate depth data."
 		' task.rank = 1
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         lut.Run(task.depth32f.Normalize(255).ConvertScaleAbs(255))
         dst1 = lut.dst1
-        label1 = "Depth data in " + CStr(lut.nSeg) + " LUT entries"
+        dst1.SetTo(0, task.noDepthMask)
+        label1 = lut.label1
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
+Public Class LUT_Color : Inherits VBparent
+    Public Sub New()
+        task.desc = "Apply the current LUT to the input image"
+        ' task.rank = 1
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        task.palette.Run(Nothing)
+
     End Sub
 End Class

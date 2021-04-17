@@ -21,8 +21,10 @@ Public Class Palette_Basics : Inherits VBparent
             gradientColorMap.Col(0).SetTo(If(whitebackground, cv.Scalar.White, cv.Scalar.Black))
         End If
 
-        dst1 = Palette_Custom_Apply(src, gradientColorMap)
-        dst2 = gradientColorMap.Resize(dst2.Size)
+        If src IsNot Nothing Then
+            dst1 = Palette_Custom_Apply(src, gradientColorMap)
+            dst2 = gradientColorMap.Resize(dst2.Size)
+        End If
     End Sub
 End Class
 
