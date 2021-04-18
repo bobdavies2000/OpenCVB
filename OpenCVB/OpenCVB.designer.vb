@@ -46,7 +46,6 @@ Partial Class OpenCVB
         Me.SurveyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CreateSurveyImagesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.SurveyTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ToolStrip1.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -56,7 +55,7 @@ Partial Class OpenCVB
         Me.ToolStrip1.AutoSize = False
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.SnapShotButton, Me.TreeButton, Me.PixelViewerButton})
-        Me.ToolStrip1.Location = New System.Drawing.Point(0, 36)
+        Me.ToolStrip1.Location = New System.Drawing.Point(0, 33)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
         Me.ToolStrip1.Size = New System.Drawing.Size(1786, 58)
@@ -187,7 +186,7 @@ Partial Class OpenCVB
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MainMenu, Me.SurveyToolStripMenuItem, Me.AboutToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(1786, 36)
+        Me.MenuStrip1.Size = New System.Drawing.Size(1786, 33)
         Me.MenuStrip1.TabIndex = 2
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -195,7 +194,7 @@ Partial Class OpenCVB
         '
         Me.MainMenu.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ExitCall, Me.ToolStripSeparator1})
         Me.MainMenu.Name = "MainMenu"
-        Me.MainMenu.Size = New System.Drawing.Size(54, 32)
+        Me.MainMenu.Size = New System.Drawing.Size(54, 29)
         Me.MainMenu.Text = "&File"
         '
         'ExitCall
@@ -213,24 +212,20 @@ Partial Class OpenCVB
         '
         Me.SurveyToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CreateSurveyImagesToolStripMenuItem})
         Me.SurveyToolStripMenuItem.Name = "SurveyToolStripMenuItem"
-        Me.SurveyToolStripMenuItem.Size = New System.Drawing.Size(81, 32)
+        Me.SurveyToolStripMenuItem.Size = New System.Drawing.Size(81, 29)
         Me.SurveyToolStripMenuItem.Text = "Survey"
         '
         'CreateSurveyImagesToolStripMenuItem
         '
         Me.CreateSurveyImagesToolStripMenuItem.Name = "CreateSurveyImagesToolStripMenuItem"
-        Me.CreateSurveyImagesToolStripMenuItem.Size = New System.Drawing.Size(285, 34)
-        Me.CreateSurveyImagesToolStripMenuItem.Text = "Create Survey Images"
+        Me.CreateSurveyImagesToolStripMenuItem.Size = New System.Drawing.Size(397, 34)
+        Me.CreateSurveyImagesToolStripMenuItem.Text = "Create Survey Images and Rankings"
         '
         'AboutToolStripMenuItem
         '
         Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
-        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(78, 32)
+        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(78, 29)
         Me.AboutToolStripMenuItem.Text = "About"
-        '
-        'SurveyTimer
-        '
-        Me.SurveyTimer.Interval = 1000
         '
         'OpenCVB
         '
@@ -277,5 +272,4 @@ Partial Class OpenCVB
     Friend WithEvents ToolStripButton2 As ToolStripButton
     Friend WithEvents SurveyToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents CreateSurveyImagesToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents SurveyTimer As Timer
 End Class

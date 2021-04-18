@@ -98,9 +98,8 @@ Public Class OpenCVB
     Dim dropDownActive As Boolean
 
     Dim surveyActive As Boolean
-    Dim nextSurveyImageAvailable As Boolean
     Dim surveyDir As DirectoryInfo
-    Dim lastSurveyImage As cv.Mat
+    Dim surveyFileWriter As StreamWriter
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -120,11 +119,11 @@ Public Class OpenCVB
             ' this only occurs during a "test all" session.  The algorithm works whenever tested individually.  Bug in Python?
             If algorithm = "Pyglet_Image_PS.py" Then End
             Console.WriteLine("'" + algorithm + "' was provided in the command line arguments to OpenCVB")
-                SaveSetting("OpenCVB", "<All>", "<All>", algorithm)
-                externalPythonInvocation = True ' we don't need to start python because it started OpenCVB.
-                HomeDir = New DirectoryInfo(CurDir() + "\..\")
-            Else
-                HomeDir = New DirectoryInfo(CurDir() + "\..\..\")
+            SaveSetting("OpenCVB", "<All>", "<All>", algorithm)
+            externalPythonInvocation = True ' we don't need to start python because it started OpenCVB.
+            HomeDir = New DirectoryInfo(CurDir() + "\..\")
+        Else
+            HomeDir = New DirectoryInfo(CurDir() + "\..\..\")
         End If
 
         PausePlay = New Bitmap(HomeDir.FullName + "OpenCVB/Data/PauseButton.png")
@@ -298,14 +297,37 @@ Public Class OpenCVB
         Static myBlackPen As New Pen(Color.Black)
 
         If surveyActive And frameCount > 10 Then
-            If pic.Tag = 2 And nextSurveyImageAvailable = False Then
+            ' This code is only active during a survey. 
+            If pic.Tag = 2 Then
                 SyncLock imgResult
-                    lastSurveyImage = imgResult.Clone()
-                    SurveyTimer.Enabled = True
-                    nextSurveyImageAvailable = True
+                    Dim dst1 = imgResult(New cv.Rect(0, 0, imgResult.Width / 2, imgResult.Height))
+                    Dim dst2 = imgResult(New cv.Rect(imgResult.Width / 2, 0, imgResult.Width / 2, imgResult.Height))
+
+                    Dim encodeParams() As Integer = {cv.ImwriteFlags.JpegQuality, 99}
+                    Dim count = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
+                    If count > 0 Then cv.Cv2.ImWrite(surveyDir.FullName + "/" + AvailableAlgorithms.Text + "1.jpg", dst1, encodeParams)
+
+                    count = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
+                    If count > 0 Then cv.Cv2.ImWrite(surveyDir.FullName + "/" + AvailableAlgorithms.Text + "2.jpg", dst2, encodeParams)
+
+                    Dim callEntry As String = ""
+                    For i = 0 To callTrace.Count - 1
+                        Dim split() = callTrace(i).Split("\")
+                        callEntry += split(split.Length - 2) + If(i = callTrace.Count - 1, "", ",")
+                    Next
+                    surveyFileWriter.WriteLine(callEntry)
+                    frameCount = 0
+                    If AvailableAlgorithms.SelectedIndex = AvailableAlgorithms.Items.Count - 1 Then
+                        surveyFileWriter.Close()
+                        surveyActive = False
+                        AvailableAlgorithms.SelectedIndex = 0
+                    Else
+                        AvailableAlgorithms.SelectedIndex += 1
+                    End If
                 End SyncLock
             End If
         End If
+
         If pixelViewerOn And (mousePicTag = pic.Tag Or (pixelViewTag = 3 And pic.Tag = 2)) Then
             Dim pic3Offset As Integer
             If pixelViewTag = 3 Then pic3Offset = imgResult.Width / 2
@@ -1185,7 +1207,7 @@ Public Class OpenCVB
                         task.CPU_FrameTime = camera.CPU_FrameTime
                         task.intermediateReview = intermediateReview
                         task.ratioImageToCampic = ratioImageToCampic
-                        task.pixelViewerOn = If(testAllRunning, False, pixelViewerOn)
+                        task.pixelViewerOn = If(testAllRunning Or surveyActive, False, pixelViewerOn)
 
                         If GrabRectangleData Then
                             GrabRectangleData = False
@@ -1214,7 +1236,6 @@ Public Class OpenCVB
             End While
 
             task.RunAlgorithm()
-            ' If task.WarningCount >= 4 Then Exit While ' algorithm is hung...
 
             If task.mousePointUpdated Then mousePoint = task.mousePoint ' in case the algorithm has changed the mouse location...
             If task.drawRectUpdated Then drawRect = task.drawRect
@@ -1266,35 +1287,18 @@ Public Class OpenCVB
         dropDownActive = False
     End Sub
     Private Sub CreateSurveyImagesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CreateSurveyImagesToolStripMenuItem.Click
-        surveyDir = New DirectoryInfo(HomeDir.FullName + "Survey/")
-        If surveyDir.Exists = False Then surveyDir.Create()
-        surveyActive = True
-        nextSurveyImageAvailable = False
-        AvailableAlgorithms.SelectedIndex = 0
-    End Sub
-    Private Sub SurveyTimer_Tick(sender As Object, e As EventArgs) Handles SurveyTimer.Tick
-        If nextSurveyImageAvailable Then
-            SurveyTimer.Enabled = False
-            Dim dst = lastSurveyImage
-            Dim dst1 = dst(New cv.Rect(0, 0, dst.Width / 2, dst.Height))
-            Dim dst2 = dst(New cv.Rect(dst.Width / 2, 0, dst.Width / 2, dst.Height))
-
-            Dim encodeParams() As Integer = {cv.ImwriteFlags.JpegQuality, 99}
-            Dim count = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
-            If count > 0 Then cv.Cv2.ImWrite(surveyDir.FullName + "/" + AvailableAlgorithms.Text + "1.jpg", dst1, encodeParams)
-
-            count = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
-            If count > 0 Then cv.Cv2.ImWrite(surveyDir.FullName + "/" + AvailableAlgorithms.Text + "2.jpg", dst2, encodeParams)
-
-            If AvailableAlgorithms.SelectedIndex = AvailableAlgorithms.Items.Count - 1 Then
-                surveyActive = False
-                AvailableAlgorithms.SelectedIndex = 0
-            Else
-                AvailableAlgorithms.SelectedIndex += 1
-            End If
-            Thread.Sleep(2000)
-            nextSurveyImageAvailable = False
+        If CreateSurveyImagesToolStripMenuItem.Text = "Stop Survey" Then
+            surveyActive = False
+            CreateSurveyImagesToolStripMenuItem.Text = "Create Survey Images and Rankings"
+            surveyFileWriter.Close()
+        Else
+            CreateSurveyImagesToolStripMenuItem.Text = "Stop Survey"
+            surveyDir = New DirectoryInfo(HomeDir.FullName + "Survey/")
+            If surveyDir.Exists = False Then surveyDir.Create()
+            surveyFileWriter = New StreamWriter(HomeDir.FullName + "Data/Rankings.txt")
+            surveyActive = True
         End If
+        AvailableAlgorithms.SelectedIndex = 0
     End Sub
 End Class
 
