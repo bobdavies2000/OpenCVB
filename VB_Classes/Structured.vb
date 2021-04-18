@@ -11,7 +11,7 @@ Public Class Structured_Floor : Inherits VBparent
 
         task.desc = "Find the floor plane"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         structD.Run(src)
 
@@ -29,7 +29,7 @@ Public Class Structured_Floor : Inherits VBparent
         ' it settles down quicker...
         If task.frameCount > 30 Then yCoordinate = kalman.kAverage
 
-        floorYplane = (task.maxXY) * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
+        floorYplane = (task.maxY) * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
 
         structD.offsetSlider.Value = If(yCoordinate >= 0, yCoordinate, 0)
 
@@ -56,7 +56,7 @@ Public Class Structured_Ceiling : Inherits VBparent
         structD.cushionSlider.Value = 10
         task.desc = "Find the ceiling plane"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         structD.Run(src)
 
@@ -92,7 +92,7 @@ Public Class Structured_MultiSliceH : Inherits VBparent
 
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         side2D.Run(src)
         dst2 = side2D.dst2
         Dim Split = side2D.gCloud.dst1.Split()
@@ -108,8 +108,8 @@ Public Class Structured_MultiSliceH : Inherits VBparent
 
         sliceMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For yCoordinate = 0 To src.Height - 1 Step stepsize
-            Dim planeY = -task.maxXY * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
-            If yCoordinate > task.sideCameraPoint.Y Then planeY = task.maxXY * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
+            Dim planeY = -task.maxY * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
+            If yCoordinate > task.sideCameraPoint.Y Then planeY = task.maxY * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
             Dim depthMask As New cv.Mat
             minVal = planeY - thicknessMeters
             maxVal = planeY + thicknessMeters
@@ -139,7 +139,7 @@ Public Class Structured_MultiSliceV : Inherits VBparent
 
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         top2D.Run(src)
         dst2 = top2D.dst2
 
@@ -156,8 +156,8 @@ Public Class Structured_MultiSliceV : Inherits VBparent
 
         Dim sliceMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For xCoordinate = 0 To src.Width - 1 Step stepsize
-            Dim planeX = -task.maxXY * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
-            If xCoordinate > task.topCameraPoint.X Then planeX = task.maxXY * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
+            Dim planeX = -task.maxX * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+            If xCoordinate > task.topCameraPoint.X Then planeX = task.maxX * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
             Dim depthMask As New cv.Mat
             minVal = planeX - thicknessMeters
             maxVal = planeX + thicknessMeters
@@ -191,7 +191,7 @@ Public Class Structured_MultiSlice : Inherits VBparent
 
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         top2D.Run(src)
         side2D.Run(src)
 
@@ -208,8 +208,8 @@ Public Class Structured_MultiSlice : Inherits VBparent
 
         dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For xCoordinate = 0 To src.Width - 1 Step stepsize
-            Dim planeX = -task.maxXY * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
-            If xCoordinate > task.topCameraPoint.X Then planeX = task.maxXY * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
+            Dim planeX = -task.maxX * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+            If xCoordinate > task.topCameraPoint.X Then planeX = task.maxX * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
             Dim depthMask As New cv.Mat
             minVal = planeX - thicknessMeters
             maxVal = planeX + thicknessMeters
@@ -220,8 +220,8 @@ Public Class Structured_MultiSlice : Inherits VBparent
         Next
 
         For yCoordinate = 0 To src.Height - 1 Step stepsize
-            Dim planeY = -task.maxXY * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
-            If yCoordinate > task.sideCameraPoint.Y Then planeY = task.maxXY * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
+            Dim planeY = -task.maxY * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
+            If yCoordinate > task.sideCameraPoint.Y Then planeY = task.maxY * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
             Dim depthMask As New cv.Mat
             minVal = planeY - thicknessMeters
             maxVal = planeY + thicknessMeters
@@ -252,7 +252,7 @@ Public Class Structured_MultiSliceLines : Inherits VBparent
         multi = New Structured_MultiSlice()
         task.desc = "Detect lines in the multiSlice output"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         multi.Run(src)
         cv.Cv2.BitwiseNot(multi.dst2, dst2)
         ldetect.Run(multi.dst2)
@@ -279,7 +279,7 @@ Public Class Structured_MultiSlicePolygon : Inherits VBparent
         End If
         task.desc = "Detect polygons in the multiSlice output"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         multi.Run(src)
         cv.Cv2.BitwiseNot(multi.dst2, dst1)
 
@@ -317,7 +317,7 @@ Public Class Structured_SliceXPlot : Inherits VBparent
         cushionSlider.Value = cushionSlider.Maximum
         task.desc = "Find any plane around a peak value in the top-down histogram"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         structD.Run(src)
         dst2 = structD.dst2
         multi.Run(src)
@@ -375,7 +375,7 @@ Public Class Structured_LinearizeFloor : Inherits VBparent
         End If
         task.desc = "Using the mask for the floor create a better representation of the floor plane"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim minLoc As cv.Point, maxLoc As cv.Point
         Static imuPC As cv.Mat
         floor.Run(src)
@@ -471,7 +471,7 @@ Public Class Structured_SliceOptions : Inherits VBparent
 
         task.desc = "Structured Slice options"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         task.trueText("This algorithm is used to share the horizontal and vertical slice options.")
     End Sub
 End Class
@@ -498,7 +498,7 @@ Public Class Structured_SliceH : Inherits VBparent
         label2 = "Yellow bar is ceiling.  Yellow line is camera level."
         task.desc = "Find and isolate planes (floor and ceiling) in a side view histogram."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         side2D.Run(src)
 
         Dim depthShadow = task.noDepthMask
@@ -506,8 +506,8 @@ Public Class Structured_SliceH : Inherits VBparent
 
         Dim yCoordinate = CInt(offsetSlider.Value)
 
-        Dim planeY = -task.maxXY * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
-        If yCoordinate > task.sideCameraPoint.Y Then planeY = task.maxXY * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
+        Dim planeY = -task.maxY * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
+        If yCoordinate > task.sideCameraPoint.Y Then planeY = task.maxY * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
 
         Dim metersPerPixel = task.maxZ / dst2.Height
         Dim cushion = cushionSlider.Value
@@ -559,14 +559,14 @@ Public Class Structured_SliceV : Inherits VBparent
 
         task.desc = "Find and isolate planes using the top view histogram data"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim xCoordinate = offsetSlider.Value
         top2D.Run(src)
 
         Dim split = top2D.gCloud.dst1.Split()
 
-        Dim planeX = -task.maxXY * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
-        If xCoordinate > task.topCameraPoint.X Then planeX = task.maxXY * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
+        Dim planeX = -task.maxX * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+        If xCoordinate > task.topCameraPoint.X Then planeX = task.maxX * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
 
         Dim metersPerPixel = task.maxZ / dst2.Height
         Dim cushion = cushionSlider.Value
@@ -618,14 +618,14 @@ Public Class Structured_SliceVStable : Inherits VBparent
 
         task.desc = "Find and isolate planes using the top view histogram data"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim xCoordinate = offsetSlider.Value
         top2D.Run(src)
         dst2 = top2D.dst1
         Dim split = top2D.gCloud.dst1.Split()
 
-        Dim planeX = -task.maxXY * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
-        If xCoordinate > task.topCameraPoint.X Then planeX = task.maxXY * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
+        Dim planeX = -task.maxX * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
+        If xCoordinate > task.topCameraPoint.X Then planeX = task.maxX * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
 
         Dim metersPerPixel = task.maxZ / dst2.Height
         Dim cushion = cushionSlider.Value
@@ -668,7 +668,7 @@ Public Class Structured_CenterSlice : Inherits VBparent
         label2 = "White = SliceV output, Red Dot is avgPt"
         task.desc = "Find the vertical center line with accurate depth data.."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         vSlice.Run(src)
         dst1 = task.color
@@ -756,7 +756,7 @@ Public Class Structured_CloudFail : Inherits VBparent
 
         task.desc = "Attempt to impose a structure on the point cloud data."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static xLineSlider = findSlider("Lines in X-Direction")
         Static yLineSlider = findSlider("Lines in Y-Direction")
         Static thresholdSlider = findSlider("Continuity threshold in mm")
@@ -834,7 +834,7 @@ Public Class Structured_Cloud : Inherits VBparent
 
         task.desc = "Attempt to impose a linear structure on the pointcloud."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static sliceSlider = findSlider("Number of slices")
         Dim xLines = sliceSlider.value
         Dim yLines = CInt(xLines * dst1.Height / dst1.Width)

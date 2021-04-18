@@ -31,7 +31,8 @@ Public Class OptionsCommon : Inherits VBparent
         If task.minDepth >= task.maxDepth Then task.maxDepth = task.minDepth + 1
 
         task.maxZ = task.maxDepth / 1000
-        task.maxXY = task.maxZ * dst1.Height / dst1.Width / 2
+        task.maxX = task.maxZ * dst1.Width / dst1.Height / 2
+        task.maxY = task.maxZ * dst1.Height / dst1.Width / 2
     End Sub
     Public Sub Run(src As cv.Mat)
         updateSettings()

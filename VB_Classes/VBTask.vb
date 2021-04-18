@@ -188,7 +188,8 @@ Public Class ActiveTask : Implements IDisposable
     Public sideFrustrumAdjust As Single
 
     Public maxZ As Single
-    Public maxXY As Single
+    Public maxX As Single
+    Public maxY As Single
 
     Public pixelsPerMeter As Single
     Public hFov As Single

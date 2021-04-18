@@ -1287,13 +1287,13 @@ Public Class Histogram_TopData : Inherits VBparent
     Public Sub Run(src As cv.Mat)
         gCloud.Run(src)
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(-task.maxXY, task.maxXY)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(-task.maxX, task.maxX)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         dst1 = histOutput.Flip(cv.FlipMode.X).Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
-        label1 = "Left x = " + Format(-task.maxXY, "#0.00") + " Right X = " + Format(task.maxXY, "#0.00") + " x and y scales differ!"
+        label1 = "Left x = " + Format(-task.maxX, "#0.00") + " Right X = " + Format(task.maxX, "#0.00") + " x and y scales differ!"
     End Sub
 End Class
 
@@ -1319,13 +1319,13 @@ Public Class Histogram_SideData : Inherits VBparent
     Public Sub Run(src As cv.Mat)
         gCloud.Run(src)
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.maxXY, task.maxXY), New cv.Rangef(0, task.maxZ)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.maxY, task.maxY), New cv.Rangef(0, task.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         dst1 = histOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary)
-        label1 = "Top y = " + Format(-task.maxXY, "#0.00") + " Bottom Y = " + Format(task.maxXY, "#0.00") + " x and y scales differ!"
+        label1 = "Top y = " + Format(-task.maxY, "#0.00") + " Bottom Y = " + Format(task.maxY, "#0.00") + " x and y scales differ!"
     End Sub
 End Class
 
