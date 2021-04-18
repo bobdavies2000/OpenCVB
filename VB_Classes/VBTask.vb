@@ -188,8 +188,8 @@ Public Class ActiveTask : Implements IDisposable
     Public topFrustrumAdjust As Single
     Public sideFrustrumAdjust As Single
 
-    Public Const MAXZ_DEFAULT = 4
-    Public maxZ As Single = MAXZ_DEFAULT
+    Public maxZ As Single
+    Public maxXY As Single
 
     Public pixelsPerMeter As Single
     Public hFov As Single

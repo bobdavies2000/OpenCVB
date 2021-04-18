@@ -11,14 +11,13 @@ Public Class OptionsCommon : Inherits VBparent
         task.palette = New Palette_Basics
         task.cameraStableSlider = gOptions.IMUmotionSlider
         task.histogramBins = gOptions.HistBinSlider.Value
-
+        updateSettings()
         label1 = "Depth values that are in-range"
         label2 = "Depth values that are out of range (and < 8m)"
         task.desc = "Show depth with OpenCV using varying min and max depths."
         ' task.rank = 3
     End Sub
-    Public Sub Run(src As cv.Mat)
-
+    Private Sub updateSettings()
         task.hist3DThreshold = gOptions.ProjectionSlider.Value
         gOptions.ProjectionThreshold.Text = CStr(task.hist3DThreshold)
         task.useKalman = gOptions.UseKalman.Checked
@@ -33,7 +32,10 @@ Public Class OptionsCommon : Inherits VBparent
         If task.minDepth >= task.maxDepth Then task.maxDepth = task.minDepth + 1
 
         task.maxZ = task.maxDepth / 1000
-
+        task.maxXY = task.maxZ * dst1.Height / dst1.Width / 2
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        updateSettings()
         Static saveMaxVal As Integer
         Static saveMinVal As Integer
         If saveMaxVal <> task.maxDepth Or saveMinVal <> task.minDepth Then

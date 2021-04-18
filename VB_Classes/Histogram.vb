@@ -766,7 +766,6 @@ Public Class Histogram_SideView2D : Inherits VBparent
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-
         gCloud.Run(src)
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.sideFrustrumAdjust, task.sideFrustrumAdjust), New cv.Rangef(0, task.maxZ)}
@@ -905,35 +904,22 @@ End Class
 
 
 Public Class Histogram_ViewObjects : Inherits VBparent
-    Public histC As Histogram_ViewConcentrationsTopX
+    Public histC As Histogram_ConcentrationsTop
     Dim flood As FloodFill_Basics
-    Dim minSizeSlider As Windows.Forms.TrackBar
-    Dim loDiffSlider As Windows.Forms.TrackBar
-    Dim hiDiffSlider As Windows.Forms.TrackBar
-    Dim stepSlider As Windows.Forms.TrackBar
     Public side2D As New List(Of cv.Rect)
     Public top2D As New List(Of cv.Rect)
     Public Sub New()
-
         flood = New FloodFill_Basics
-        histC = New Histogram_ViewConcentrationsTopX
+        histC = New Histogram_ConcentrationsTop
 
-        minSizeSlider = findSlider("FloodFill Minimum Size")
-        loDiffSlider = findSlider("FloodFill LoDiff")
-        hiDiffSlider = findSlider("FloodFill HiDiff")
-        stepSlider = findSlider("Step Size")
-        loDiffSlider.Value = 250
-        hiDiffSlider.Value = 255
-
-        Dim dotSlider = findSlider("Dot size")
-        stepSlider.Value = dotSlider.Value
-        minSizeSlider.Value = dotSlider.Value * dotSlider.Value
+        findSlider("FloodFill Minimum Size").Value = task.dotSize * task.dotSize
+        findSlider("FloodFill LoDiff").Value = 250
+        findSlider("FloodFill HiDiff").Value = 255
 
         task.desc = "Use the histogram concentrations to identify objects in the field of view"
         ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-
         histC.Run(src)
 
         dst1 = histC.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
@@ -983,12 +969,12 @@ End Class
 Public Class Histogram_SmoothConcentration : Inherits VBparent
     Public sideview As Histogram_SmoothSideView2D
     Public topview As Histogram_SmoothTopView2D
-    Dim concent As Histogram_ViewConcentrationsTopX
+    Dim concent As Histogram_ConcentrationsTop
     Public Sub New()
 
         sideview = New Histogram_SmoothSideView2D
         topview = New Histogram_SmoothTopView2D
-        concent = New Histogram_ViewConcentrationsTopX
+        concent = New Histogram_ConcentrationsTop
 
         task.desc = "Using stable depth data, highlight the histogram projections where concentrations are highest"
         ' task.rank = 1
@@ -1014,7 +1000,7 @@ End Class
 
 
 
-Public Class Histogram_ViewConcentrationsTopX : Inherits VBparent
+Public Class Histogram_ConcentrationsTop : Inherits VBparent
     Public sideview As Histogram_SideView2D
     Public topview As Histogram_TopView2D
     Public Sub New()
@@ -1027,7 +1013,6 @@ Public Class Histogram_ViewConcentrationsTopX : Inherits VBparent
             sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 50)
             sliders.setupTrackBar(1, "Resize Factor x100", 1, 100, 10)
             sliders.setupTrackBar(2, "Concentration Threshold", 1, 100, 10)
-            sliders.setupTrackBar(3, "Dot size", 1, 100, If(dst1.Width = 1280, 20, 10))
         End If
 
         task.desc = "Highlight a fixed number of histogram projections where concentrations are highest"
@@ -1052,12 +1037,10 @@ Public Class Histogram_ViewConcentrationsTopX : Inherits VBparent
         Next
 
         Static topXslider = findSlider("Display the top x highlights")
-        Static dotSlider = findSlider("Dot size")
         Dim topX = topXslider.value
-        Dim dotsize = dotSlider.value
         For i = 0 To Math.Min(pts.Count - 1, topX - 1)
             Dim pt = pts.ElementAt(i).Value
-            dst.Rectangle(New cv.Rect(pt.X - dotsize, pt.Y - dotsize, dotsize * 2, dotsize * 2), 128, -1)
+            dst.Rectangle(New cv.Rect(pt.X - task.dotSize, pt.Y - task.dotSize, task.dotSize * 2, task.dotSize * 2), 128, -1)
         Next
         task.palette.Run(dst)
         Dim maxConcentration = If(pts.Count > 0, pts.ElementAt(0).Key, 0)
@@ -1331,13 +1314,13 @@ Public Class Histogram_TopData : Inherits VBparent
     Public Sub Run(src As cv.Mat)
         gCloud.Run(src)
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(-task.maxZ / 2, task.maxZ / 2)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(-task.maxXY, task.maxXY)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         dst1 = histOutput.Flip(cv.FlipMode.X).Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
-        label1 = "Left x = " + Format(-task.maxZ / 2, "#0.00") + " Right X = " + Format(task.maxZ / 2, "#0.00") + " x and y scales differ!"
+        label1 = "Left x = " + Format(-task.maxXY, "#0.00") + " Right X = " + Format(task.maxXY, "#0.00") + " x and y scales differ!"
     End Sub
 End Class
 
@@ -1364,13 +1347,13 @@ Public Class Histogram_SideData : Inherits VBparent
     Public Sub Run(src As cv.Mat)
         gCloud.Run(src)
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.maxZ / 2, task.maxZ / 2), New cv.Rangef(0, task.maxZ)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.maxXY, task.maxXY), New cv.Rangef(0, task.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
         dst1 = histOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary)
-        label1 = "Top y = " + Format(-task.maxZ / 2, "#0.00") + " Bottom Y = " + Format(task.maxZ / 2, "#0.00") + " x and y scales differ!"
+        label1 = "Top y = " + Format(-task.maxXY, "#0.00") + " Bottom Y = " + Format(task.maxXY, "#0.00") + " x and y scales differ!"
     End Sub
 End Class
 
