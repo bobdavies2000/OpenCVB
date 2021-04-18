@@ -79,7 +79,6 @@ Public Class Undistort_Basics : Inherits VBparent
         End If
         label1 = "Left Image with sliders applied"
         task.desc = "Use sliders to control the undistort OpenCV API - Painterly"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 

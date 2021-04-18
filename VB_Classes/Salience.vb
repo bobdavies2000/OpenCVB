@@ -28,7 +28,6 @@ Public Class Salience_Basics_CPP : Inherits VBparent
 
         salience = Salience_Open()
         task.desc = "Show results of Salience algorithm when using C++"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -54,7 +53,6 @@ Public Class Salience_Basics_MT : Inherits VBparent
         salience.sliders.trackbar(1).Value = 2
 
         task.desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

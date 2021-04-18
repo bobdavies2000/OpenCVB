@@ -13,7 +13,6 @@ Public Class ImageSeg_Basics : Inherits VBparent
         addw = New AddWeighted_Basics
         flood = New FloodFill_FullImage
         task.desc = "Get the image segments and their associated features - centroids, masks, size, and enclosing rectangles"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         flood.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -48,7 +47,6 @@ Public Class ImageSeg_InRange : Inherits VBparent
     Public Sub New()
         iSeg = New ImageSeg_Basics
         task.desc = "Trim segments that are not in the range requested"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -79,7 +77,6 @@ Public Class ImageSeg_MissingSegments : Inherits VBparent
         flood = New FloodFill_FullImage
 
         task.desc = "Floodfill segments which were marked as missing and clear small unused segments"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -135,7 +132,6 @@ Public Class ImageSeg_Unstable : Inherits VBparent
         End If
 
         task.desc = "Find the unstable segments and remove them"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static segSlider = findSlider("A segment is considered present after this many appearances")
@@ -174,7 +170,6 @@ Public Class ImageSeg_CentroidTracker : Inherits VBparent
 
         label1 = "Output of ImageSeg_Basics"
         task.desc = "Track the centroids that are found consistently from frame to frame."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 

@@ -7,7 +7,6 @@ Public Class Blur_Basics : Inherits VBparent
             sliders.setupTrackBar(0, "Blur Kernel Size", 0, 32, 5)
         End If
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static kernelSlider = findSlider("Blur Kernel Size")
@@ -33,7 +32,6 @@ Public Class Blur_Gaussian : Inherits VBparent
     Public Sub New()
         blur = New Blur_Basics()
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
@@ -59,7 +57,6 @@ Public Class Blur_Median_CS : Inherits VBparent
     Public Sub New()
         blur = New Blur_Basics()
         task.desc = "Replace each pixel with the median of neighborhood of varying sizes."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
@@ -84,7 +81,6 @@ Public Class Blur_Homogeneous : Inherits VBparent
     Public Sub New()
         blur = New Blur_Basics()
         task.desc = "Smooth each pixel with a kernel of 1's of different sizes."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
@@ -111,7 +107,6 @@ Public Class Blur_Median : Inherits VBparent
     Public Sub New()
         blur = New Blur_Basics()
         task.desc = "Replace each pixel with the median of neighborhood of varying sizes."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
@@ -138,7 +133,6 @@ Public Class Blur_Bilateral : Inherits VBparent
     Public Sub New()
         blur = New Blur_Basics()
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
@@ -170,7 +164,6 @@ Public Class Blur_PlusHistogram : Inherits VBparent
         label1 = "Use Blur slider to see impact on histogram peak values"
         label2 = "Top is before equalize, Bottom is after Equalize"
         task.desc = "Compound algorithms Blur and Histogram"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         myhist.Run(src)
@@ -211,7 +204,6 @@ Public Class Blur_TopoMap : Inherits VBparent
         End If
         label1 = "Image Gradient"
         task.desc = "Create a topo map from the blurred image"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static savePercent As Single

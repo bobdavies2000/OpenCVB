@@ -38,7 +38,6 @@ Public Class Thread_Grid : Inherits VBparent
         gridMask = New cv.Mat(dst1.Size(), cv.MatType.CV_8U)
         gridToRoi = New cv.Mat(dst1.Size(), cv.MatType.CV_32S)
         task.desc = "Create a grid for use with parallel.ForEach."
-        ' task.rank = 3
     End Sub
     Public Sub Run(src As cv.Mat)
         Static lastWidth As Integer
@@ -124,7 +123,6 @@ Public Class Thread_GridTest : Inherits VBparent
         gridHeightSlider.Value = 40
         label1 = ""
         task.desc = "Validation test for thread_grid algorithm"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         grid.Run(Nothing)

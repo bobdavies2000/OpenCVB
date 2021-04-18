@@ -5,7 +5,6 @@ Imports System.Runtime.InteropServices
 Public Class Fourier_MathNet : Inherits VBparent
     Public Sub New()
         task.desc = "Use the 1D Fourier support in MathNet to do a 2D Fourier transform"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 

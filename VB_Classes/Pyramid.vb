@@ -7,7 +7,6 @@ Public Class Pyramid_Basics : Inherits VBparent
             sliders.setupTrackBar(0, "Zoom in and out", -1, 1, 0)
         End If
         task.desc = "Use pyrup and pyrdown to zoom in and out of an image."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim zoom = sliders.trackbar(0).Value
@@ -38,7 +37,6 @@ Public Class Pyramid_Filter : Inherits VBparent
         laplace = New Laplacian_PyramidFilter()
 
         task.desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         laplace.Run(src)

@@ -24,7 +24,6 @@ Public Class SemiGlobalMatching_CPP : Inherits VBparent
     Dim cPtr As IntPtr
     Public Sub New()
         task.desc = "Find depth using the semi-global matching algorithm."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         'If task.frameCount < 10 Then Exit Sub

@@ -9,7 +9,6 @@ Public Class Highlight_Basics : Inherits VBparent
     Public Sub New()
         If standalone Then reduction = New Reduction_KNN_Color()
         task.desc = "Pixels are grouped by reduction.  Highlight the rectangle and centroid nearest the mouse click"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If standalone Or task.intermediateReview = caller Then

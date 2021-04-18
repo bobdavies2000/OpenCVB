@@ -6,7 +6,6 @@ Public Class Bitmap_ToMat : Inherits VBparent
         label1 = "Convert color bitmap to Mat"
         label2 = "Convert Mat to bitmap and then back to Mat"
         task.desc = "Convert a color and grayscale bitmap to a cv.Mat"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim bitmap = New Bitmap(task.parms.homeDir + "Data/lena.jpg")

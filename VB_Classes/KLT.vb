@@ -21,7 +21,6 @@ Public Class KLT_Basics : Inherits VBparent
             check.Box(1).Text = "KLT - delete all Points"
         End If
         task.desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static prevGray As New cv.Mat
@@ -91,7 +90,6 @@ Public Class KLT_OpticalFlow : Inherits VBparent
     Public Sub New()
         klt = New KLT_Basics()
         task.desc = "KLT optical flow - needs more work"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         klt.Run(src)

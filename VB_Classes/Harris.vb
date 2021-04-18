@@ -41,7 +41,6 @@ Public Class Harris_Features_CPP : Inherits VBparent
             sliders.setupTrackBar(4, "Weight for dst1 X100", 1, 100, 50)
         End If
         task.desc = "Use Harris feature detectors to identify interesting points."
-        ' task.rank = 1
 
         ReDim srcData(dst1.Total - 1)
         Harris_Features = Harris_Features_Open()
@@ -87,7 +86,6 @@ Public Class Harris_Detector_CPP : Inherits VBparent
             sliders.setupTrackBar(0, "Harris qualityLevel", 1, 100, 2)
         End If
         task.desc = "Use Harris detector to identify interesting points."
-        ' task.rank = 1
 
         ReDim srcData(dst1.Total - 1)
         Harris_Detector = Harris_Detector_Open()

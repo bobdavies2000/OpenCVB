@@ -15,7 +15,6 @@ Public Class OptionsCommon : Inherits VBparent
         label1 = "Depth values that are in-range"
         label2 = "Depth values that are out of range (and < 8m)"
         task.desc = "Show depth with OpenCV using varying min and max depths."
-        ' task.rank = 3
     End Sub
     Private Sub updateSettings()
         task.hist3DThreshold = gOptions.ProjectionSlider.Value
@@ -121,7 +120,6 @@ Public Class OptionsCommon_Histogram : Inherits VBparent
         task.sideCameraPoint = New cv.Point(0, CInt(dst1.Height / 2 + cameraYSetting))
         task.topCameraPoint = New cv.Point(CInt(dst1.Width / 2 + cameraXSetting), CInt(dst1.Height))
         task.desc = "The options for the side view are shared with this algorithm"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
     End Sub

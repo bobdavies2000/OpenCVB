@@ -13,7 +13,6 @@ Public Class Entropy_Basics : Inherits VBparent
         End If
 
         task.desc = "Compute the entropy in an image - a measure of contrast(iness)"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static binSlider = findSlider("Number of Bins")
@@ -57,7 +56,6 @@ Public Class Entropy_Highest : Inherits VBparent
 
         label1 = "Highest entropy marked with red rectangle"
         task.desc = "Find the highest entropy section of the color image."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         grid.Run(Nothing)
@@ -108,7 +106,6 @@ Public Class Entropy_FAST : Inherits VBparent
         label1 = "Output of Fast_Basics, input to entropy calculation"
         label2 = "Lighter color is higher entropy, Red marks highest"
         task.desc = "Use FAST markings to add to entropy"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         fast.Run(src)

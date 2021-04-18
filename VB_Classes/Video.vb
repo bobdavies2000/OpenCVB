@@ -28,7 +28,6 @@ Public Class Video_Basics : Inherits VBparent
         captureVideo = New cv.VideoCapture(fileInfo.FullName)
         label1 = fileInfo.Name
         task.desc = "Show a video file"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If srcVideo <> fileNameForm.filename.Text Then
@@ -69,7 +68,6 @@ Public Class Video_CarCounting : Inherits VBparent
         flow = New Font_FlowText()
 
         task.desc = "Count cars in a video file"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         video.Run(src)
@@ -123,7 +121,6 @@ Public Class Video_CarCComp : Inherits VBparent
         video = New Video_Basics()
 
         task.desc = "Outline cars with a rectangle"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         video.Run(src)
@@ -151,7 +148,6 @@ Public Class Video_MinRect : Inherits VBparent
 
         bgSub = New BGSubtract_MOG()
         task.desc = "Find area of car outline - example of using minAreaRect"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         video.Run(src)
@@ -180,7 +176,6 @@ Public Class Video_MinCircle : Inherits VBparent
     Public Sub New()
         video = New Video_MinRect()
         task.desc = "Find area of car outline - example of using MinEnclosingCircle"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         video.Run(src)

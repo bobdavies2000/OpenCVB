@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 Public Class Filter_Laplacian : Inherits VBparent
     Public Sub New()
         task.desc = "Use a filter to approximate the Laplacian derivative."
-		' task.rank = 1
         label1 = "Sharpened image using Filter2D output"
         label2 = "Output of Filter2D (approximated Laplacian)"
     End Sub
@@ -35,7 +34,6 @@ Public Class Filter_NormalizedKernel : Inherits VBparent
             sliders.setupTrackBar(0, "Normalize alpha X10", 1, 100, 10)
         End If
         task.desc = "Create a normalized kernel and use it."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim kernel = New cv.Mat(1, 21, cv.MatType.CV_32FC1, New Single() {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1})
@@ -70,7 +68,6 @@ Public Class Filter_Normalized2D : Inherits VBparent
             sliders.setupTrackBar(0, "Filter Normalized 2D kernel size", 1, 21, 3)
         End If
         task.desc = "Create and apply a normalized kernel."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim kernelSize = If(standalone, (task.frameCount Mod 20) + 1, sliders.trackbar(0).Value)
@@ -100,7 +97,6 @@ Public Class Filter_SepFilter2D : Inherits VBparent
         End If
         label1 = "Gaussian Blur result"
         task.desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim xDim = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value + 1)

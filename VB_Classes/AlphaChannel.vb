@@ -9,7 +9,6 @@ Public Class AlphaChannel_Basics : Inherits VBparent
         alpha.Size = New System.Drawing.Size(dst1.Width + 10, dst1.Height + 10)
 
         task.desc = "Use the the Windows 10 alpha channel to separate foreground and background"
-        ' task.rank = 1
     End Sub
     Public Sub Run(ByVal src As cv.Mat)
         src = src.CvtColor(cv.ColorConversionCodes.BGR2BGRA)
@@ -33,7 +32,6 @@ Public Class AlphaChannel_Blend : Inherits VBparent
         End If
 
         task.desc = "Use alpha blending to smoothly separate background from foreground"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         dst2.SetTo(0)

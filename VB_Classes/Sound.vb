@@ -52,7 +52,6 @@ Public Class Sound_Basics : Inherits VBparent
         fileNameForm.Show()
 
         task.desc = "Load an audio file, play it, and convert to PCM"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         Dim sender As New Object, e As New EventArgs
@@ -143,7 +142,6 @@ Public Class Sound_SignalGenerator : Inherits VBparent
         player.Init(wGen)
 
         task.desc = "Generate sound with a sine waveform."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         Static radioIndex As Integer
@@ -216,7 +214,6 @@ Public Class Sound_Display : Inherits VBparent
         If standalone Then soundSource = New Sound_SignalGenerator
 
         task.desc = "Display a sound buffer in several styles"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         Static sliderPercent As Single
@@ -321,7 +318,6 @@ Public Class Sound_GenWaveDisplay : Inherits VBparent
         plotSound = New Sound_Display
         plotSound.soundSource = New Sound_SignalGenerator
         task.desc = "Display the generated sound waves"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         plotSound.soundSource.run(src)
@@ -346,7 +342,6 @@ Public Class Sound_WaveDisplay : Inherits VBparent
         plotSound = New Sound_Display
         plotSound.soundSource = New Sound_Basics
         task.desc = "Display the generated sound waves"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         plotSound.soundSource.run(src)

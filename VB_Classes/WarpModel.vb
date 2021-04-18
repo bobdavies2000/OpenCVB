@@ -27,7 +27,6 @@ Public Class WarpModel_Basics : Inherits VBparent
         label1 = "Src image (align to this image)"
         label2 = "Src2 image aligned to src image"
         task.desc = "Use FindTransformECC to align 2 images"
-		' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         If standalone Then
@@ -133,7 +132,6 @@ Public Class WarpModel_Input : Inherits VBparent
 
         sobel = New Edges_Sobel()
         task.desc = "Import the misaligned input."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         Dim img As New cv.Mat
@@ -205,7 +203,6 @@ Public Class WarpModel_AlignImages : Inherits VBparent
 
         label1 = "Aligned image"
         task.desc = "Align the RGB inputs raw images from the Prokudin examples."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         Static gradientCheck = findCheckBox("Use Gradient in WarpInput")

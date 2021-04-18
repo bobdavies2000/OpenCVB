@@ -13,7 +13,6 @@ Public Class Fitline_Basics : Inherits VBparent
             sliders.setupTrackBar(1, "Accuracy for the angle X100", 0, 100, 10)
         End If
         task.desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If standalone Or task.intermediateReview = caller Then
@@ -54,7 +53,6 @@ Public Class Fitline_3DBasics_MT : Inherits VBparent
     Public Sub New()
         hlines = New Hough_Lines_MT
         task.desc = "Use visual lines to find 3D lines."
-		' task.rank = 1
         label2 = "White is featureless RGB, blue depth shadow"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -124,7 +122,6 @@ Public Class Fitline_RawInput : Inherits VBparent
             check.Box(1).Checked = True
         End If
         task.desc = "Generate a noisy line in a field of random data."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If check.Box(1).Checked Or task.frameCount = 0 Then
@@ -193,7 +190,6 @@ Public Class Fitline_EigenFit : Inherits VBparent
         label1 = "blue=GT, red=fitline, yellow=EigenFit"
         label2 = "Raw input (use sliders below to explore)"
         task.desc = "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static eigenVec As New cv.Mat(2, 2, cv.MatType.CV_32F, 0), eigenVal As New cv.Mat(2, 2, cv.MatType.CV_32F, 0)

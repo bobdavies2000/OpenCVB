@@ -12,7 +12,6 @@ Public Class CartoonifyImage_Basics : Inherits VBparent
         label1 = "Mask for Cartoon"
         label2 = "Cartoonify Result"
         task.desc = "Create a cartoon from a color image - Painterly Effect"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim medianBlur = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value + 1)

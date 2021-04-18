@@ -3,7 +3,6 @@ Public Class Remap_Basics : Inherits VBparent
     Public direction = 3 ' default to remap horizontally and vertically
     Public Sub New()
         task.desc = "Use remap to reflect an image in 4 directions."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim map_x = New cv.Mat(src.Size(), cv.MatType.CV_32F)
@@ -45,7 +44,6 @@ Public Class Remap_Flip : Inherits VBparent
     Public direction = 0
     Public Sub New()
         task.desc = "Use flip to remap an image."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         label1 = Choose(direction + 1, "Remap_Flip - original", "Remap_Flip - flip horizontal", "Remap_Flip - flip veritical",

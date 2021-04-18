@@ -13,7 +13,6 @@ Public Class Polylines_IEnumerableExample : Inherits VBparent
             sliders.setupTrackBar(1, "Polyline Thickness", 0, 10, 1)
         End If
         task.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim points = Enumerable.Range(0, sliders.trackbar(0).Value).Select(Of cv.Point)(
@@ -40,7 +39,6 @@ Public Class Polylines_Random : Inherits VBparent
     Public Sub New()
         label1 = CStr(zoomFactor) + "X zoom around mouse movement on image"
         task.desc = "Create a random procedural image - Painterly Effect"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If task.frameCount Mod 150 = 0 Then ' every x frames.

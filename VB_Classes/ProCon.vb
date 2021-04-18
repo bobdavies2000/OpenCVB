@@ -37,7 +37,6 @@ Public Class ProCon_Basics : Inherits VBparent
         c.Start()
 
         task.desc = "DijKstra's Producer/Consumer 'Cooperating Sequential Process'.  Consumer must see every item produced."
-		' task.rank = 1
     End Sub
     Public Function success(index As Integer) As Integer
         Return (index + 1) Mod buffer.Length
@@ -104,7 +103,6 @@ Public Class ProCon_Variation : Inherits VBparent
         procon.sliders.trackbar(1).Enabled = False ' no duration for the producer because algorithm task is the producer.
         procon.terminateProducer = True ' we don't want 2 producer tasks...
         task.desc = "DijKstra's Producer/Consumer - similar to Basics above but producer is the algorithm thread."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         SyncLock procon.mutex

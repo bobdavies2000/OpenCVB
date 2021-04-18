@@ -4,7 +4,6 @@ Public Class Concat_Basics : Inherits VBparent
         label1 = "Horizontal concatenation"
         label2 = "Vertical concatenation"
         task.desc = "Concatenate 2 images - horizontally and vertically"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim tmp As New cv.Mat
@@ -26,7 +25,6 @@ Public Class Concat_4way : Inherits VBparent
         Next
         label1 = "Color/RGBDepth/Left/Right views"
         task.desc = "Concatenate 4 images - horizontally and vertically"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If standalone or task.intermediateReview = caller Then

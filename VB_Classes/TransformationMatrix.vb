@@ -11,7 +11,6 @@ Public Class TransformationMatrix_Basics : Inherits VBparent
         label1 = "View from above the camera"
         label2 = "View from side of the camera"
         task.desc = "Show the contents of the transformation matrix"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If task.transformationMatrix IsNot Nothing Then

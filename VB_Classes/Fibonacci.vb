@@ -5,7 +5,6 @@ Public Class Fibonacci_Basics : Inherits VBparent
     Public Sub New()
         flow = New Font_FlowText()
         task.desc = "Generate the fibonacci sequence using conventional code"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static a As Double = 0, b As Double = 1
@@ -32,7 +31,6 @@ Public Class Fibonacci_Yield : Inherits VBparent
     Public Sub New()
         flow = New Font_FlowText()
         task.desc = "Generate the fibonacci sequence using ienumerable's"
-		' task.rank = 1
     End Sub
     Private Iterator Function nextFib() As System.Collections.Generic.IEnumerable(Of Double)
         Dim a As Double = 0

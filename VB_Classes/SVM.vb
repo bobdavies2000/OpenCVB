@@ -44,7 +44,6 @@ Public Class SVM_Options : Inherits VBparent
         radio1.Show()
         label1 = "SVM_Options - only options, no output"
         task.desc = "SVM has many options - enough to make a class for it."
-        ' task.rank = 1
     End Sub
     Public Function createSVM() As cv.ML.SVM
         Static frm = findfrm(caller + " Radio Options")
@@ -108,7 +107,6 @@ Public Class SVM_Basics : Inherits VBparent
     Public Sub New()
         svmOptions = New SVM_Options()
         task.desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
-        ' task.rank = 1
         label1 = "SVM_Basics input data"
         label2 = "Results - white line is ground truth"
     End Sub
@@ -168,7 +166,6 @@ Public Class SVM_Random : Inherits VBparent
 
         label1 = "SVM Training data"
         task.desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         svmOptions.Run(src)
@@ -255,7 +252,6 @@ Public Class SVM_TestCase : Inherits VBparent
         svmOptions.radio.check(3).Enabled = False
 
         task.desc = "Text book example on SVM"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         dst1.SetTo(cv.Scalar.White)

@@ -7,7 +7,6 @@ Public Class Coherent_Basics : Inherits VBparent
         flood = New Coherent_FloodFill
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8UC1, 0)
         task.desc = "Segment image with same values at the same locations"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -57,7 +56,6 @@ Public Class Coherent_FloodFill : Inherits VBparent
         knn = New KNN_1_to_1
         basics = New FloodFill_Basics
         task.desc = "Floodfill an image and make the colors consistent."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static minSlider = findSlider("FloodFill Minimum Size")
@@ -146,7 +144,6 @@ Public Class Coherent_Palette : Inherits VBparent
     Public Sub New()
         flood = New Coherent_Pixel
         task.desc = "Highlight a consistent 8-bit grayscale image regions with a palette"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         flood.Run(src)
@@ -171,7 +168,6 @@ Public Class Coherent_Pixel : Inherits VBparent
         flood = New FloodFill_Basics
         pixel = New Pixel_Sampler
         task.desc = "Floodfill an image and sample masks to make the colors consistent."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 

@@ -54,7 +54,6 @@ Public Class Python_Run : Inherits VBparent
             StartPython("")
         End If
         task.desc = "Run Python app: " + pythonApp.Name
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If pyStream IsNot Nothing Then
@@ -101,7 +100,6 @@ Public Class Python_MemMap : Inherits VBparent
             Dim pythonApp = New FileInfo(task.pythonTaskName)
             label1 = "No output for Python_MemMap - see Python console"
             task.desc = "Run Python app: " + pythonApp.Name + " to share memory with OpenCVB and Python."
-		' task.rank = 1
         End If
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -136,7 +134,6 @@ Public Class Python_SurfaceBlit : Inherits VBparent
         End If
         If PythonReady Then pipe.WaitForConnection()
         task.desc = "Stream data to Python_SurfaceBlit Python script."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If PythonReady Then
@@ -203,7 +200,6 @@ Public Class Python_Stream : Inherits VBparent
         End If
         label1 = "Output of Python Backend"
         task.desc = "General purpose class to pipe RGB and Depth to Python scripts."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If pythonReady Then

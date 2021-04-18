@@ -9,7 +9,6 @@ Public Class AddWeighted_Basics : Inherits VBparent
         End If
         weightSlider = findSlider("Weight")
         task.desc = "Add 2 images with specified weights."
-        ' task.rank = 3
     End Sub
     Public Sub Run(src As cv.Mat)
         If standalone Or task.intermediateReview = caller Then src2 = task.RGBDepth ' external use must provide src2!
@@ -32,10 +31,8 @@ Public Class AddWeighted_Edges : Inherits VBparent
         addw = New AddWeighted_Basics
         findSlider("Weight").Value = 75
         task.desc = "Add in the edges separating light and dark to the color image"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-
         edges.Run(src)
         dst1 = edges.dst2
 
@@ -53,14 +50,12 @@ End Class
 
 Public Class AddWeighted_ImageAccumulate : Inherits VBparent
     Public Sub New()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Accumulation weight of each image X100", 1, 100, 10)
         End If
 
         task.desc = "Update a running average of the image"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
 
@@ -92,10 +87,8 @@ Public Class AddWeighted_InfraRed : Inherits VBparent
         End If
 
         task.desc = "Align the depth data with the left or right view.  Oak-D is aligned with the right image."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
-
         infra.Run(src)
 
         Static rightRadio = findRadio("Use RightView")

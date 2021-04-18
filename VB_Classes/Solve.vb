@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 Public Class Solve_ByMat : Inherits VBparent
     Public Sub New()
         task.desc = "Solve a set of equations with OpenCV's Solve API."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         ' x + y = 10
@@ -27,7 +26,6 @@ End Class
 Public Class Solve_ByArray : Inherits VBparent
     Public Sub New()
         task.desc = "Solve a set of equations with OpenCV's Solve API with a normal array as input  "
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         ' x + y = 10

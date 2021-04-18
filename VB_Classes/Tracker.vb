@@ -152,7 +152,6 @@ Public Class Tracker_Basics : Inherits VBparent
         End If
 
         task.desc = "Use C++ to track objects"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 

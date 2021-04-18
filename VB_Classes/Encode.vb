@@ -7,7 +7,6 @@ Public Class Encode_Basics : Inherits VBparent
         options = New Encode_Options()
 
         task.desc = "Error Level Analysis - to verify a jpg image has not been modified."
-		' task.rank = 1
         label1 = "absDiff with original"
         label2 = "Original decompressed"
     End Sub
@@ -53,7 +52,6 @@ Public Class Encode_Options : Inherits VBparent
         End If
 
         task.desc = "Encode options that affect quality."
-		' task.rank = 1
         label1 = "absDiff with original image"
     End Sub
     Public Function getEncodeParameter() As Integer

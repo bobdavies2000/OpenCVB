@@ -14,7 +14,6 @@ Public Class TimeView_Basics : Inherits VBparent
         dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_32F, 0)
         dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_32F, 0)
         task.desc = "TimeView that highlights concentrations of depth pixels"
-        ' task.rank = 3
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -64,7 +63,6 @@ Public Class TimeView_TopBackProjection : Inherits VBparent
     Public Sub New()
         tFlood = New TimeView_FloodFill
         task.desc = "Backproject the side and top views into the image view"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -124,7 +122,6 @@ Public Class TimeView_FloodFill : Inherits VBparent
         findSlider("FloodFill Minimum Size").Value = 10
         tBasics = New TimeView_Basics
         task.desc = "FloodFill the histograms of side and top views - TimeView_Basics"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -159,7 +156,6 @@ Public Class TimeView_Centroids : Inherits VBparent
         label1 = "Top view with centroids in yellow"
         label2 = "Side view with centroids in yellow"
         task.desc = "Use KNN to track the query points"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -210,7 +206,6 @@ Public Class TimeView_Rectangles : Inherits VBparent
         label1 = "Top view with rectangles in yellow"
         label2 = "Side view with rectangles in yellow"
         task.desc = "Use KNN to track the query points"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -253,7 +248,6 @@ Public Class TimeView_Frustrum : Inherits VBparent
         tView = New TimeView_Rectangles
         label2 = "Click a quadrant in dst1 to show it in dst2 "
         task.desc = "Colorize the back and side views"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 

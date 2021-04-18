@@ -8,7 +8,6 @@ Public Class PCA_Basics : Inherits VBparent
         End If
 
         task.desc = "Reconstruct a video stream as a composite of X images."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static images(7) As cv.Mat
@@ -43,7 +42,6 @@ Public Class PCA_Depth : Inherits VBparent
     Public Sub New()
         pca = New PCA_Basics()
         task.desc = "Reconstruct a depth stream as a composite of X images."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         pca.Run(task.RGBDepth)
@@ -62,7 +60,6 @@ Public Class PCA_DrawImage : Inherits VBparent
         pca = New PCA_Basics()
         image = cv.Cv2.ImRead(task.parms.homeDir + "Data/pca_test1.jpg")
         task.desc = "Use PCA to find the principle direction of an object."
-		' task.rank = 1
         label1 = "Original image"
         label2 = "PCA Output"
     End Sub

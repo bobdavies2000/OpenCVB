@@ -25,7 +25,6 @@ Public Class RecursiveBilateralFilter_CPP : Inherits VBparent
         End If
         rbf = RecursiveBilateralFilter_Open()
         task.desc = "Apply the recursive bilateral filter"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If srcData.Length <> src.Total * src.ElemSize Then ReDim srcData(src.Total * src.ElemSize - 1)

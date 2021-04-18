@@ -37,7 +37,6 @@ Public Class LineFLD_Basics : Inherits VBparent
         label1 = "Lines detected in the last frame"
         label2 = "If camera motion, image is reset"
         task.desc = "A Fast Line Detector"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         lines.Clear()
@@ -262,7 +261,6 @@ Public Class LineFLD_CPP : Inherits VBparent
     Public Sub New()
         lineFLD = New LineFLD_Basics
         task.desc = "Basics for a Fast Line Detector"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         sortedLines.Clear()
@@ -307,7 +305,6 @@ Public Class LineFLD_LongestLine : Inherits VBparent
         End If
 
         task.desc = "Identify planes using the lines present in the rgb image."
-		' task.rank = 1
         label2 = ""
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -342,7 +339,6 @@ Public Class LineFLD_MT : Inherits VBparent
             sliders.setupTrackBar(1, "Update frequency (in frames)", 1, 100, 1)
         End If
         task.desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
-		' task.rank = 1
         label2 = ""
     End Sub
     Public Sub Run(src as cv.Mat)

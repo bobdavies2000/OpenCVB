@@ -4,7 +4,6 @@ Imports cv = OpenCvSharp
 Public Class Mat_Repeat : Inherits VBparent
     Public Sub New()
         task.desc = "Use the repeat method to replicate data."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim small = src.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
@@ -29,7 +28,6 @@ Public Class Mat_PointToMat : Inherits VBparent
         label1 = "Random_Basics points (original)"
         label2 = "Random_Basics points after format change"
         task.desc = "Convert pointf3 into a mat of points"
-		' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         random.Run(Nothing)
@@ -55,7 +53,6 @@ Public Class Mat_MatToPoint : Inherits VBparent
     Public Sub New()
         mask = New Random_Basics()
         task.desc = "Convert a mat into a vector of points."
-		' task.rank = 1
         label1 = "Reconstructed RGB Image"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -84,7 +81,6 @@ End Class
 Public Class Mat_Transpose : Inherits VBparent
     Public Sub New()
         task.desc = "Transpose a Mat and show results."
-		' task.rank = 1
         label1 = "Color Image Transposed"
         label2 = "Color Image Transposed back (artifacts)"
     End Sub
@@ -107,7 +103,6 @@ Public Class Mat_Tricks : Inherits VBparent
         label1 = "Image squeezed into square Mat"
         label2 = "Mat transposed around the diagonal"
         task.desc = "Show some Mat tricks."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim mat = src.Resize(New cv.Size(src.Height, src.Height))
@@ -137,7 +132,6 @@ Public Class Mat_4to1 : Inherits VBparent
         label1 = "Combining 4 images into one"
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Use one Mat for up to 4 images"
-		' task.rank = 1
     End Sub
     Public Sub defaultMats()
         mat1 = task.color
@@ -186,7 +180,6 @@ Public Class Mat_2to1 : Inherits VBparent
 
         label1 = ""
         task.desc = "Fill a Mat with 2 images"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static nSize = New cv.Size(task.color.Width, task.color.Height / 2)
@@ -235,7 +228,6 @@ Public Class Mat_ImageXYZ_MT : Inherits VBparent
         xyzPlanes = xyDepth.Split()
 
         task.desc = "Create a cv.Point3f vector with x, y, and z."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         grid.Run(Nothing)
@@ -259,7 +251,6 @@ Public Class Mat_RowColRange : Inherits VBparent
     Public Sub New()
         label1 = "BitwiseNot of RowRange and ColRange"
         task.desc = "Perform operation on a range of cols and/or Rows."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         Dim midX = src.Width / 2
@@ -278,7 +269,6 @@ Public Class Mat_Managed : Inherits VBparent
     Public Sub New()
         label1 = "Color change is in the managed cv.vec3b array"
         task.desc = "There is a limited ability to use Mat data in Managed code directly."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         Static autoRand As New Random()
@@ -306,7 +296,6 @@ Public Class Mat_MultiplyReview : Inherits VBparent
     Public Sub New()
         flow = New Font_FlowText()
         task.desc = "Review matrix multiplication"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         Dim a(,) = {{1, 4, 2}, {2, 5, 1}}
@@ -382,7 +371,6 @@ Public Class Mat_Inverse : Inherits VBparent
             radio.check(4).Enabled = False ' not accepted!
         End If
         task.desc = "Given a 3x3 matrix, invert it and present results."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         Dim nextline = ""
@@ -452,7 +440,6 @@ Public Class Mat_4Click : Inherits VBparent
 
         label2 = "Click a quadrant in dst1 to view it in dst2"
         task.desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst2"
-        ' task.rank = 2
     End Sub
     Public Sub Run(src As cv.Mat)
 
@@ -478,7 +465,6 @@ Public Class Mat_2Click : Inherits VBparent
         mats = New Mat_2to1
         mat = mats.mat
         task.desc = "Split an image into 2 segments and allow clicking on each half to open it in dst2"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         If standalone Then
@@ -507,7 +493,6 @@ Public Class Mat_2Dlib : Inherits VBparent
     Public dGray As Array2D(Of Byte)
     Public Sub New()
         task.desc = "Convert a Mat to the expected Array2D for a DLib API"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -540,7 +525,6 @@ Public Class Mat_Dlib2Mat : Inherits VBparent
     Public d32f As Array2D(Of Single)
     Public Sub New()
         task.desc = "Convert a Dlib Array2D to an OpenCV Mat"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 

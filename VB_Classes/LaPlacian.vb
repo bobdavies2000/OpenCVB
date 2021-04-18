@@ -9,7 +9,6 @@ Public Class Laplacian_Basics : Inherits VBparent
             sliders.setupTrackBar(2, "Laplacian Delta", 0, 1000, 0)
         End If
         task.desc = "Laplacian filter - the second derivative."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim kernelSize = sliders.trackbar(0).Value()
@@ -47,7 +46,6 @@ Public Class Laplacian_Blur : Inherits VBparent
             radio.check(0).Checked = True
         End If
         task.desc = "Laplacian filter - the second derivative - with different bluring techniques"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim kernelSize = sliders.trackbar(0).Value()
@@ -91,7 +89,6 @@ Public Class Laplacian_PyramidFilter : Inherits VBparent
             sliders.setupTrackBar(5, "Saturate", 0, 10, 1)
         End If
         task.desc = "VB.Net version of the Laplacian Pyramid Filter - see reference."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim levelMat(sliders.trackbar.Length - 1) As cv.Mat

@@ -8,7 +8,6 @@ Public Class Object_Basics : Inherits VBparent
         label1 = "Connected components for objects in the foreground - tracker algorithm"
         label2 = "Mask for background"
         task.desc = "Identify objects in the foreground."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If standalone or task.intermediateReview = caller Then

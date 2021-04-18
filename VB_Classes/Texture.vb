@@ -15,7 +15,6 @@ Public Class Texture_Basics : Inherits VBparent
 
         ellipse = New Draw_Ellipses()
         task.desc = "Use multi-threading to find the best sample 256x256 texture of a mask"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -63,7 +62,6 @@ Public Class Texture_Flow : Inherits VBparent
         End If
 
         task.desc = "Find and mark the texture flow in an image - see texture_flow.py.  Painterly Effect"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim TFdelta = sliders.trackbar(0).Value
@@ -94,7 +92,6 @@ Public Class Texture_Flow_Depth : Inherits VBparent
     Public Sub New()
         texture = New Texture_Flow()
         task.desc = "Display texture flow in the depth data"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         texture.Run(task.RGBDepth)
@@ -114,7 +111,6 @@ Public Class Texture_Flow_Reduction : Inherits VBparent
         texture = New Texture_Flow
         reduction = New Reduction_Basics
         task.desc = "Display texture flow in the reduced color image"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         reduction.Run(task.color)
@@ -142,7 +138,6 @@ Public Class Texture_Shuffle : Inherits VBparent
         texture = New Texture_Basics()
         shuffle = New Random_Shuffle()
         task.desc = "Use random shuffling to homogenize a texture sample of what the floor looks like."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If standalone Or task.intermediateReview = caller Then

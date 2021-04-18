@@ -28,7 +28,6 @@ Public Class DFT_Basics : Inherits VBparent
         mats.noLines = True
 
         task.desc = "Explore the Discrete Fourier Transform."
-		' task.rank = 1
         label1 = "Image after inverse DFT"
         label2 = "DFT_Basics Spectrum Magnitude"
     End Sub
@@ -84,7 +83,6 @@ Public Class DFT_Inverse : Inherits VBparent
     Public Sub New()
         mats = New Mat_2to1()
         task.desc = "Take the inverse of the Discrete Fourier Transform."
-        ' task.rank = 1
         label1 = "Image after Inverse DFT"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -140,7 +138,6 @@ Public Class DFT_ButterworthFilter_MT : Inherits VBparent
 
         dft = New DFT_Basics()
         task.desc = "Use the Butterworth filter on a DFT image - color image input."
-		' task.rank = 1
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
     End Sub
@@ -203,7 +200,6 @@ Public Class DFT_ButterworthDepth : Inherits VBparent
         bfilter = New DFT_ButterworthFilter_MT()
 
         task.desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
-		' task.rank = 1
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
     End Sub
@@ -263,7 +259,6 @@ Public Class DFT_Shapes : Inherits VBparent
         label1 = "Input to the DFT"
         label2 = "Discrete Fourier Transform Output"
         task.desc = "Show the spectrum magnitude for some standard shapes. Painterly"
-		' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         optDraw.Run(Nothing)

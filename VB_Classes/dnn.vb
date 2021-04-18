@@ -29,7 +29,6 @@ Public Class DNN_Test : Inherits VBparent
 
         label2 = "Input Image"
         task.desc = "Download and use a Caffe database"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -53,7 +52,6 @@ Public Class DNN_Caffe_CS : Inherits VBparent
     Public Sub New()
         label2 = "Input Image"
         task.desc = "Download and use a Caffe database"
-		' task.rank = 1
 
         Dim protoTxt = task.parms.homeDir + "Data/bvlc_googlenet.prototxt"
         Dim modelFile = task.parms.homeDir + "Data/bvlc_googlenet.caffemodel"
@@ -112,7 +110,6 @@ Public Class DNN_Basics : Inherits VBparent
             task.trueText("Caffe databases not found.  It should be in <OpenCVB_HomeDir>/Data.", 10, 100)
         End If
         task.desc = "Use OpenCV's dnn from Caffe file."
-		' task.rank = 1
         label1 = "Cropped Input Image - must be square!"
     End Sub
     Public Sub Run(src as cv.Mat)

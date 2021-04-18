@@ -101,7 +101,6 @@ Public Class Dither_Basics : Inherits VBparent
         label1 = "Dither applied to the RGB image"
         label2 = "Dither applied to the Depth image"
         task.desc = "Explore all the varieties of dithering"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim radioIndex As Integer

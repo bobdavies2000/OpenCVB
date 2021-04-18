@@ -15,7 +15,6 @@ Public Class Fractal_Mandelbrot : Inherits VBparent
             sliders.setupTrackBar(0, "Mandelbrot iterations", 1, 50, 34)
         End If
         task.desc = "Run the classic Mandalbrot algorithm"
-        ' task.rank = 1
         dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
         saveIterations = 0
     End Sub
@@ -54,7 +53,6 @@ Public Class Fractal_Mandelbrot_MT : Inherits VBparent
     Public Sub New()
         mandel = New Fractal_Mandelbrot()
         task.desc = "Run a multi-threaded version of the Mandalbrot algorithm"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim iterations = mandel.sliders.trackbar(0).Value
@@ -81,7 +79,6 @@ Public Class Fractal_MandelbrotZoom : Inherits VBparent
             check.Box(0).Text = "Reset to original Mandelbrot"
         End If
         task.desc = "Run the classic Mandalbrot algorithm and allow zooming in"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim iterations = mandel.sliders.trackbar(0).Value
@@ -127,7 +124,6 @@ Public Class Fractal_MandelbrotZoomColor : Inherits VBparent
     Public Sub New()
         mandel = New Fractal_MandelbrotZoom()
         task.desc = "Classic Mandelbrot in color"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         mandel.Run(src)
@@ -154,7 +150,6 @@ Public Class Fractal_Julia : Inherits VBparent
         mandel = New Fractal_MandelbrotZoomColor()
         label2 = "Mouse selects different Julia Sets - zoom for detail"
         task.desc = "Build Julia set from any point in the Mandelbrot fractal"
-		' task.rank = 1
     End Sub
     Private Function julia_point(x As Single, y As Single, r As Integer, depth As Integer, max As Integer, c As Complex, z As Complex)
         If Complex.Abs(z) > r Then

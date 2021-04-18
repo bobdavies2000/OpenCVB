@@ -22,7 +22,6 @@ Public Class Stabilizer_Basics : Inherits VBparent
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         label1 = "Current frame - rectangle input to matchTemplate"
         task.desc = "if reasonable stdev and no motion in correlation rectangle, stabilize image across frames"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim resetImage As Boolean
@@ -110,7 +109,6 @@ Public Class Stabilizer_BasicsRandomInput : Inherits VBparent
         label1 = "Current frame (before)"
         label2 = "Image after shift"
         task.desc = "Generate images that have been arbitrarily shifted"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim input = src
@@ -163,7 +161,6 @@ Public Class Stabilizer_BasicsTest : Inherits VBparent
 
         label1 = "Unstable input to Stabilizer_Basics"
         task.desc = "Test the Stabilizer_Basics with random movement"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -193,7 +190,6 @@ Public Class Stabilizer_OpticalFlow : Inherits VBparent
         good = New Features_GoodFeatures()
 
         task.desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
-		' task.rank = 1
         label1 = "Stabilized Image"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -310,7 +306,6 @@ Public Class Stabilizer_MotionDetect : Inherits VBparent
         End If
 
         task.desc = "Detect motiion in the stabilizer output"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 

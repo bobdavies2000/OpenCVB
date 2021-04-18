@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Public Class Font_OpenCV : Inherits VBparent
     Public Sub New()
         task.desc = "Display different font options available in OpenCV"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If task.frameCount Mod 30 Then Exit Sub
@@ -30,7 +29,6 @@ End Class
 Public Class Font_TrueType : Inherits VBparent
     Public Sub New()
         task.desc = "Display different TrueType fonts"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim gfontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
@@ -51,7 +49,6 @@ Public Class Font_FlowText : Inherits VBparent
     Public Sub New()
         If dst1.Height = 480 Then maxLineCount = 26
         task.desc = "Show TrueType text flowing through an image."
-		' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         If standalone Or task.intermediateReview = caller Then

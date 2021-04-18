@@ -23,7 +23,6 @@ Public Class Motion_Basics : Inherits VBparent
 
         label1 = "Enclosing rectangles are yellow in dst1 and dst2"
         task.desc = "Detect contours in the motion data and the resulting rectangles"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -100,7 +99,6 @@ Public Class Motion_WithBlurDilate : Inherits VBparent
 
         label2 = "Mask of pixel differences "
         task.desc = "Detect contours in the motion data using blur and dilate"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -164,7 +162,6 @@ Public Class Motion_MinMaxDepth : Inherits VBparent
         label1 = "32-bit format of the stable depth"
         label2 = "Motion mask"
         task.desc = "While minimizing options and dependencies, use RGB motion to figure out what depth values should change."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim input = src
@@ -206,7 +203,6 @@ Public Class Motion_MinMaxPointCloud : Inherits VBparent
         label1 = stable.label1
         label2 = stable.label2
         task.desc = "Use the stable depth values to create a stable point cloud"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -246,7 +242,6 @@ Public Class Motion_MinMaxDepthColorized : Inherits VBparent
         label1 = "32-bit format stable depth data"
         label2 = "Colorized version of image at left"
         task.desc = "Colorize the stable depth (keeps Motion_MinMaxDepth at a minimum complexity)"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -280,7 +275,6 @@ Public Class Motion_ThruCorrelation : Inherits VBparent
 
         dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         task.desc = "Detect motion through the correlation coefficient"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         grid.Run(Nothing)
@@ -341,7 +335,6 @@ Public Class Motion_CCmerge : Inherits VBparent
         motionCC = New Motion_ThruCorrelation
 
         task.desc = "Use the correlation coefficient to maintain an up-to-date image"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If task.frameCount < 10 Then dst1 = src.Clone

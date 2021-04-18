@@ -7,7 +7,6 @@ Public Class Transform_Resize : Inherits VBparent
             sliders.setupTrackBar(0, "Resize Percent", 50, 1000, 50)
         End If
         task.desc = "Resize an image based on the slider value."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim resizeFactor = sliders.trackbar(0).Value / 100
@@ -39,7 +38,6 @@ Public Class Transform_Rotate : Inherits VBparent
             sliders.setupTrackBar(3, "Rotation center Y", 1, dst1.Height, dst1.Height / 2)
         End If
         task.desc = "Rotate and scale and image based on the slider values."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         imageCenter = New cv.Point2f(sliders.trackbar(2).Value, sliders.trackbar(3).Value)
@@ -63,7 +61,6 @@ Public Class Transform_Sort : Inherits VBparent
             radio.check(3).Text = "EveryRow"
         End If
         task.desc = "Sort the pixels of a grayscale image."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -90,7 +87,6 @@ Public Class Transform_SortReshape : Inherits VBparent
             radio.check(1).Text = "Descending"
         End If
         task.desc = "Sort the pixels of a grayscale image."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -114,7 +110,6 @@ Public Class Transform_Affine3D : Inherits VBparent
             check.Box(1).Text = "Check to snap the second point cloud"
         End If
         task.desc = "Using 2 point clouds compute the 3D affine transform between them"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim output = "Use the check boxes to snapshot the different point clouds" + vbCrLf

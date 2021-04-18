@@ -8,7 +8,6 @@ Public Class Watershed_Basics : Inherits VBparent
         label1 = "Draw rectangle to add another marker"
         label2 = "Mask for watershed (selected regions)."
         task.desc = "Watershed API experiment.  Draw on the image to test."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then rects.Add(task.drawRect)
@@ -69,7 +68,6 @@ Public Class Watershed_DepthReduction : Inherits VBparent
         watershed.UseCorners = True
         label2 = "Reduction input to WaterShed"
         task.desc = "Watershed the depth image using shadow, close, and far points."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         reduction.Run(task.RGBDepth)
@@ -94,7 +92,6 @@ Public Class Watershed_DepthAuto : Inherits VBparent
         watershed = New Watershed_Basics()
         watershed.UseCorners = True
         task.desc = "Watershed the four corners of the depth image."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         watershed.Run(task.RGBDepth)

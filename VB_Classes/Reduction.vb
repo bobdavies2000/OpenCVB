@@ -17,7 +17,6 @@ Public Class Reduction_Basics : Inherits VBparent
         End If
 
         task.desc = "Reduction: a simpler way to KMeans by reducing color resolution"
-		' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         Static reductionSlider = findSlider("Reduction factor")
@@ -52,7 +51,6 @@ Public Class Reduction_Floodfill : Inherits VBparent
         flood = New FloodFill_Basics()
         reduction = New Reduction_Basics()
         task.desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         reduction.Run(src)
@@ -80,7 +78,6 @@ Public Class Reduction_KNN_Color : Inherits VBparent
 
         label2 = "Original floodfill color selections"
         task.desc = "Use KNN with color reduction to consistently identify regions and color them."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         reduction.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -118,7 +115,6 @@ Public Class Reduction_KNN_ColorAndDepth : Inherits VBparent
         label1 = "Detecting objects using only color coherence"
         label2 = "Detecting objects with color and depth coherence"
         task.desc = "Reduction_KNN finds objects with depth.  This algorithm uses only color on the remaining objects."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         reduction.Run(src)
@@ -157,7 +153,6 @@ Public Class Reduction_Lines : Inherits VBparent
         label1 = "Gravity rotated Side View with detected lines"
         label2 = "Gravity rotated Top View width detected lines"
         task.desc = "Present both the top and side view to minimize pixel counts."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
 
@@ -193,7 +188,6 @@ Public Class Reduction_Histogram : Inherits VBparent
 
         label2 = "Backprojection of highlighted histogram bin"
         task.desc = "Use the histogram of a reduced RGB image to isolate featureless portions of an image."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
 
@@ -220,7 +214,6 @@ Public Class Reduction_PointCloud : Inherits VBparent
         label1 = "Reduced depth"
         label2 = "Pointcloud with reduced z-Depth"
         task.desc = "Use reduction to smooth depth data"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
 
@@ -255,7 +248,6 @@ Public Class Reduction_XYZ : Inherits VBparent
         End If
 
         task.desc = "Use reduction to slice the point cloud in 3 dimensions"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
 
@@ -297,7 +289,6 @@ Public Class Reduction_Edges : Inherits VBparent
         reduction.radio.check(0).Checked = True
 
         task.desc = "Get the edges after reducing the image."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         reduction.Run(src)
@@ -328,7 +319,6 @@ Public Class Reduction_Depth : Inherits VBparent
         reduction.radio.check(0).Checked = True
         colorizer = New Depth_Colorizer_CPP()
         task.desc = "Use reduction to smooth depth data"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32S Then
@@ -362,7 +352,6 @@ Public Class Reduction_DepthMax : Inherits VBparent
         colorizer = New Depth_Colorizer_CPP()
         dMax = New Depth_SmoothMax
         task.desc = "Use reduction to isolate depth in 1 meter increments"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
 

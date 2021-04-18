@@ -93,7 +93,6 @@ Public Class OpticalFlow_DenseOptions : Inherits VBparent
         End If
         label1 = "No output - just option settings..."
         task.desc = "Use dense optical flow algorithm options"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         pyrScale = sliders.trackbar(0).Value / sliders.trackbar(0).Maximum
@@ -126,7 +125,6 @@ Public Class OpticalFlow_DenseBasics : Inherits VBparent
     Public Sub New()
         optFlow = New OpticalFlow_DenseOptions()
         task.desc = "Use dense optical flow algorithm  "
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static oldGray As New cv.Mat
@@ -172,7 +170,6 @@ Public Class OpticalFlow_DenseBasics_MT : Inherits VBparent
         End If
 
         task.desc = "MultiThread dense optical flow algorithm  "
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static oldGray As New cv.Mat
@@ -246,7 +243,6 @@ Public Class OpticalFlow_Sparse : Inherits VBparent
         End If
 
         task.desc = "Show the optical flow of a sparse matrix."
-		' task.rank = 1
         label1 = ""
         label2 = ""
     End Sub

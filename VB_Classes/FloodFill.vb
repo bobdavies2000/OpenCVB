@@ -22,7 +22,6 @@ Public Class FloodFill_Basics : Inherits VBparent
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         label2 = "Grayscale version"
         task.desc = "Use floodfill to build image segments in a grayscale image."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
@@ -102,7 +101,6 @@ Public Class FloodFill_Top16_MT : Inherits VBparent
             sliders.setupTrackBar(2, "FloodFill HiDiff", 1, 255, 5)
         End If
         task.desc = "Use floodfill to build image segments with a grayscale image."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim minFloodSize = sliders.trackbar(0).Value
@@ -140,7 +138,6 @@ Public Class FloodFill_Color_MT : Inherits VBparent
         flood = New FloodFill_Top16_MT()
 
         task.desc = "Use floodfill to build image segments in an RGB image."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim minFloodSize = flood.sliders.trackbar(0).Value
@@ -182,7 +179,6 @@ Public Class FloodFill_DCT : Inherits VBparent
 
         dct = New DCT_FeatureLess()
         task.desc = "Find surfaces that lack any texture with DCT (highest frequency removed) and use floodfill to isolate those surfaces."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         dct.Run(src)
@@ -207,7 +203,6 @@ Public Class FloodFill_CComp : Inherits VBparent
 
         label1 = "Input to Floodfill "
         task.desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -240,7 +235,6 @@ Public Class FloodFill_RelativeRange : Inherits VBparent
         label1 = "Input to floodfill basics"
         label2 = "Output of floodfill basics"
         task.desc = "Experiment with 'relative' range option to floodfill.  Compare to fixed range option."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         fBasics.floodFlag = 0
@@ -273,7 +267,6 @@ Public Class Floodfill_Objects : Inherits VBparent
         minSlider.Value = (dst1.Width Mod 100) * 25
 
         task.desc = "Use floodfill to identify the desired number of objects"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         basics.Run(src)
@@ -315,7 +308,6 @@ Public Class FloodFill_WithDepth : Inherits VBparent
         label1 = "Floodfill results after removing unknown depth"
         label2 = "Mask showing where depth data is missing"
         task.desc = "Floodfill only the areas where there is depth"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         range.Run(src)
@@ -341,7 +333,6 @@ Public Class Floodfill_Identifiers : Inherits VBparent
         basics = New FloodFill_Basics()
         label1 = "Input image to floodfill"
         task.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
@@ -404,7 +395,6 @@ Public Class Floodfill_ColorObjects : Inherits VBparent
         pFlood = New Floodfill_Identifiers()
 
         task.desc = "Use floodfill to identify each of the region candidates using only color."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         pFlood.Run(src)
@@ -436,7 +426,6 @@ Public Class FloodFill_PointTracker : Inherits VBparent
 
         label1 = "Point tracker output"
         task.desc = "Test the FloodFill output as input into the point tracker"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         flood.Run(src)
@@ -475,7 +464,6 @@ Public Class FloodFill_Top16 : Inherits VBparent
 
         label1 = "Input image to floodfill"
         task.desc = "Use floodfill to build image segments in a grayscale image."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -526,7 +514,6 @@ Public Class FloodFill_Click : Inherits VBparent
         flood.pt = New cv.Point(msRNG.Next(0, dst1.Width - 1), msRNG.Next(0, dst1.Height - 1))
         label2 = "Click anywhere to floodfill that area"
         task.desc = "FloodFill where the mouse clicks"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -568,7 +555,6 @@ Public Class FloodFill_Point : Inherits VBparent
         End If
         label1 = "Input image to floodfill"
         task.desc = "Use floodfill at a single location in a grayscale image."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -633,7 +619,6 @@ Public Class FloodFill_FullImage : Inherits VBparent
         End If
 
         task.desc = "Floodfill each of the segments outlined by the Edges_BinarizedSobel algorithm"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static stepSlider = findSlider("FloodFill Step Size")
@@ -768,7 +753,6 @@ Public Class FloodFill_Step : Inherits VBparent
         End If
 
         task.desc = "Step through the current image to floodfill using colors from the previous image"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -864,7 +848,6 @@ Public Class FloodFill_Palette : Inherits VBparent
 
         basics = New FloodFill_Basics()
         task.desc = "Create a floodfill image that is only 8-bit for use with a palette"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         basics.Run(src)
@@ -903,7 +886,6 @@ Public Class FloodFill_LUT : Inherits VBparent
         lut = New LUT_Basics
         flood = New FloodFill_Basics
         task.desc = "The input to a floodfill is the output of a LUT"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -951,7 +933,6 @@ Public Class FloodFill_Neighbors : Inherits VBparent
         End If
         label1 = "Grayscale version"
         task.desc = "Use floodfill to combine neighboring labels - regions that differ by only 1"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static minSizeSlider = findSlider("FloodFill Minimum Size")

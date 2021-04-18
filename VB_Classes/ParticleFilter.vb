@@ -11,7 +11,6 @@ Public Class ParticleFilter_Example : Inherits VBparent
     Public Sub New()
         pfPtr = ParticleFilterTest_Open(task.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
         task.desc = "Particle Filter example downloaded from github - hyperlink in the code shows URL."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static imageFrame = 12

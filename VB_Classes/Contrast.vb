@@ -8,7 +8,6 @@ Public Class Contrast_POW : Inherits VBparent
         label1 = "Original Image"
         label2 = "Contrast reduced"
         task.desc = "Reduce contrast with POW function"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -33,7 +32,6 @@ Public Class Contrast_Basics : Inherits VBparent
             sliders.setupTrackBar(1, "Contrast", 1, 100, 50)
         End If
         task.desc = "Show image with varying contrast and brightness."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         src.ConvertTo(dst1, -1, sliders.trackbar(1).Value / 50, sliders.trackbar(0).Value)

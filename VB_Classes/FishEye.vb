@@ -46,7 +46,6 @@ Public Class FishEye_Rectified : Inherits VBparent
         '                                       cv.MatType.CV_32FC1, rightViewMap1, rightViewMap2)
 
         task.desc = "Use OpenCV's FishEye API to undistort a fisheye lens input - needs more work"
-		' task.rank = 1
         label1 = "Left View"
         label2 = "Right View"
     End Sub
@@ -72,7 +71,6 @@ End Class
 Public Class FishEye_Raw : Inherits VBparent
     Public Sub New()
         task.desc = "Display the Raw FishEye images for the T265 (only)"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         label1 = "Left Fisheye Image"

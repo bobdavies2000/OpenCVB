@@ -8,7 +8,6 @@ Public Class Pixel_Viewer : Inherits VBparent
         task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone (it is always present, not standalone)
         standalone = False
         task.desc = "Display pixels under the cursor"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -168,7 +167,6 @@ Public Class Pixel_GetSet : Inherits VBparent
         label1 = "Time to copy using get/set,Generic Index, Marshal Copy"
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim rows = src.Height
@@ -235,7 +233,6 @@ Public Class Pixel_Measure : Inherits VBparent
         End If
 
         task.desc = "Compute how many pixels per meter at a requested distance"
-		' task.rank = 1
     End Sub
     Public Function Compute(mmDist As Single) As Single
         Dim halfLineInMeters = Math.Tan(0.0174533 * task.hFov / 2) * mmDist
@@ -268,7 +265,6 @@ Public Class Pixel_Sampler : Inherits VBparent
     Public Sub New()
         random = New Random_Basics
         task.desc = "Find the dominanant pixel color - not an average! This can provide consistent colorizing."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 

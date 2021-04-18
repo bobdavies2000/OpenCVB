@@ -10,7 +10,6 @@ Public Class Structured_Floor : Inherits VBparent
         structD.cushionSlider.Value = 5 ' floor runs can use a thinner slice that ceilings...
 
         task.desc = "Find the floor plane"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -56,7 +55,6 @@ Public Class Structured_Ceiling : Inherits VBparent
         structD = New Structured_SliceH()
         structD.cushionSlider.Value = 10
         task.desc = "Find the ceiling plane"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -93,7 +91,6 @@ Public Class Structured_MultiSliceH : Inherits VBparent
         structD = New Structured_SliceH
 
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         side2D.Run(src)
@@ -141,7 +138,6 @@ Public Class Structured_MultiSliceV : Inherits VBparent
         structD = New Structured_SliceV
 
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         top2D.Run(src)
@@ -194,7 +190,6 @@ Public Class Structured_MultiSlice : Inherits VBparent
         struct = New Structured_SliceV()
 
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         top2D.Run(src)
@@ -256,7 +251,6 @@ Public Class Structured_MultiSliceLines : Inherits VBparent
         lenSlider.Value = lenSlider.Maximum ' don't need the yellow line...
         multi = New Structured_MultiSlice()
         task.desc = "Detect lines in the multiSlice output"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         multi.Run(src)
@@ -284,7 +278,6 @@ Public Class Structured_MultiSlicePolygon : Inherits VBparent
             sliders.setupTrackBar(0, "Max number of sides in the identified polygons", 3, 100, 4)
         End If
         task.desc = "Detect polygons in the multiSlice output"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         multi.Run(src)
@@ -323,7 +316,6 @@ Public Class Structured_SliceXPlot : Inherits VBparent
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         cushionSlider.Value = cushionSlider.Maximum
         task.desc = "Find any plane around a peak value in the top-down histogram"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         structD.Run(src)
@@ -382,7 +374,6 @@ Public Class Structured_LinearizeFloor : Inherits VBparent
             check.Box(1).Checked = True
         End If
         task.desc = "Using the mask for the floor create a better representation of the floor plane"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim minLoc As cv.Point, maxLoc As cv.Point
@@ -479,7 +470,6 @@ Public Class Structured_SliceOptions : Inherits VBparent
         End If
 
         task.desc = "Structured Slice options"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         task.trueText("This algorithm is used to share the horizontal and vertical slice options.")
@@ -507,7 +497,6 @@ Public Class Structured_SliceH : Inherits VBparent
 
         label2 = "Yellow bar is ceiling.  Yellow line is camera level."
         task.desc = "Find and isolate planes (floor and ceiling) in a side view histogram."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         side2D.Run(src)
@@ -569,7 +558,6 @@ Public Class Structured_SliceV : Inherits VBparent
         offsetSlider.Value = dst1.Width / 2
 
         task.desc = "Find and isolate planes using the top view histogram data"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim xCoordinate = offsetSlider.Value
@@ -629,7 +617,6 @@ Public Class Structured_SliceVStable : Inherits VBparent
         offsetSlider.Value = dst1.Width / 2
 
         task.desc = "Find and isolate planes using the top view histogram data"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim xCoordinate = offsetSlider.Value
@@ -680,7 +667,6 @@ Public Class Structured_CenterSlice : Inherits VBparent
         label1 = "Center Slice in yellow"
         label2 = "White = SliceV output, Red Dot is avgPt"
         task.desc = "Find the vertical center line with accurate depth data.."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -769,7 +755,6 @@ Public Class Structured_CloudFail : Inherits VBparent
         End If
 
         task.desc = "Attempt to impose a structure on the point cloud data."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static xLineSlider = findSlider("Lines in X-Direction")
@@ -848,7 +833,6 @@ Public Class Structured_Cloud : Inherits VBparent
         End If
 
         task.desc = "Attempt to impose a linear structure on the pointcloud."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static sliceSlider = findSlider("Number of slices")
@@ -888,7 +872,6 @@ Public Class Structured_Crosshairs : Inherits VBparent
     Public Sub New()
         sCloud = New Structured_Cloud
         task.desc = "Connect vertical and horizontal dots that are in the same column and row."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static sliceSlider = findSlider("Number of slices")

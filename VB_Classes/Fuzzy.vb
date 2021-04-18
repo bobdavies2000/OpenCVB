@@ -26,7 +26,6 @@ Public Class Fuzzy_Basics : Inherits VBparent
         label1 = "Solid regions"
         label2 = "Fuzzy pixels - not solid"
         task.desc = "That which is not solid is fuzzy"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         options.setOptions()
@@ -113,7 +112,6 @@ Public Class Fuzzy_ContoursDepth : Inherits VBparent
         fuzzyD = New Fuzzy_Basics()
 
         task.desc = "Use contours to outline solids in the depth data"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         fuzzyD.Run(task.RGBDepth)
@@ -133,7 +131,6 @@ Public Class Fuzzy_NeighborProof : Inherits VBparent
     Public Sub New()
         fuzzy = New Fuzzy_Basics()
         task.desc = "Prove that every contour point has at least one and only one neighbor with the mask ID and that the rest are zero"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static proofFailed As Boolean = False
@@ -188,7 +185,6 @@ Public Class Fuzzy_TrackerDepth : Inherits VBparent
             check.Box(0).Checked = True
         End If
         task.desc = "Create centroids and rect's for solid regions and track them - tracker"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         fuzzy.Run(task.RGBDepth)
@@ -244,7 +240,6 @@ Public Class Fuzzy_TrackerDepthClick : Inherits VBparent
     Public Sub New()
         tracker = New Fuzzy_TrackerDepth()
         task.desc = "Create centroids and rect's for solid regions and track them - tracker"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         tracker.Run(src)
@@ -285,7 +280,6 @@ Public Class Fuzzy_PointTracker : Inherits VBparent
         fuzzy.sliders.Visible = False
 
         task.desc = "FloodFill the regions defined as solid"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         fuzzy.Run(src)

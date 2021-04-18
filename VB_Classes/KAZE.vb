@@ -5,7 +5,6 @@ Public Class KAZE_KeypointsKAZE_CS : Inherits VBparent
     Dim CS_Kaze As New CS_Classes.Kaze_Basics
     Public Sub New()
         task.desc = "Find keypoints using KAZE algorithm."
-		' task.rank = 1
         label1 = "KAZE key points"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -24,7 +23,6 @@ Public Class KAZE_KeypointsAKAZE_CS : Inherits VBparent
     Dim CS_AKaze As New CS_Classes.AKaze_Basics
     Public Sub New()
         task.desc = "Find keypoints using AKAZE algorithm."
-		' task.rank = 1
         label1 = "AKAZE key points"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -46,7 +44,6 @@ Public Class KAZE_Sample_CS : Inherits VBparent
         box = cv.Cv2.ImRead(task.parms.homeDir + "Data/box.png", cv.ImreadModes.Color)
         box_in_scene = cv.Cv2.ImRead(task.parms.homeDir + "Data/box_in_scene.png", cv.ImreadModes.Color)
         task.desc = "Match keypoints in 2 photos."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim result = CS_Kaze.Run(box, box_in_scene)
@@ -63,7 +60,6 @@ Public Class KAZE_Match_CS : Inherits VBparent
         red = New LeftRightView_Basics()
         red.sliders.trackbar(0).Value = 45
         task.desc = "Match keypoints in the left and right images."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         red.Run(src)
@@ -89,7 +85,6 @@ Public Class KAZE_LeftAligned_CS : Inherits VBparent
         End If
 
         task.desc = "Match keypoints in the left and right images but display it as movement in the right image."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         CS_KazeLeft.GetKeypoints(task.leftView)

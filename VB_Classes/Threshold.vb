@@ -10,7 +10,6 @@ Public Class Threshold_LaplacianFilter : Inherits VBparent
         label1 = "Foreground Input"
         label2 = "Edges of foreground input"
         task.desc = "Threshold the output of a Laplacian derivative, mask with depth foreground.  needs more work"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         edges.Run(src)

@@ -22,7 +22,6 @@ Public Class Trace_OpenCV_CPP : Inherits VBparent
     Public Sub New()
         Trace_OpenCV = Trace_OpenCV_Open()
         task.desc = "Use OpenCV's Trace facility - applicable to C++ code - and requires Intel's VTune (see link in code.)"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim srcData(src.Total * src.ElemSize - 1) As Byte

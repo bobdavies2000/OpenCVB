@@ -10,7 +10,6 @@ Public Class WarpPerspective_Basics : Inherits VBparent
             sliders.setupTrackBar(2, "Warped Angle", 0, 360, 0)
         End If
         task.desc = "Use WarpPerspective to transform input images."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim srcPt() = {New cv.Point2f(0, 0), New cv.Point2f(0, src.Height), New cv.Point2f(src.Width, 0), New cv.Point2f(src.Width, src.Height)}

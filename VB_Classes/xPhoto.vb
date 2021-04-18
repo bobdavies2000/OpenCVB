@@ -6,7 +6,6 @@ Imports System.Windows.Forms
 Public Class XPhoto_Bm3dDenoise : Inherits VBparent
     Public Sub New()
         task.desc = "Denoise image with block matching and filtering."
-        ' task.rank = 1
         label1 = "Bm3dDenoising"
         label2 = "Difference from Input"
     End Sub
@@ -28,7 +27,6 @@ End Class
 Public Class XPhoto_Bm3dDenoiseDepthImage : Inherits VBparent
     Public Sub New()
         task.desc = "Denoise the depth image with block matching and filtering."
-        ' task.rank = 1
         label2 = "Difference from Input"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -82,7 +80,6 @@ Public Class XPhoto_OilPaint_CPP : Inherits VBparent
         Application.DoEvents() ' because the rest of initialization takes so long, let the show() above take effect.
         xPhoto_OilPaint = xPhoto_OilPaint_Open()
         task.desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         Dim colorCode As Integer = cv.ColorConversionCodes.BGR2GRAY

@@ -9,7 +9,6 @@ Public Class Stitch_Basics : Inherits VBparent
             sliders.setupTrackBar(2, "Rectangle height", task.color.Height / 4, task.color.Height - 1, task.color.Height / 2)
         End If
         task.desc = "Stitch together random parts of a color image."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim mats As New List(Of cv.Mat)

@@ -10,7 +10,6 @@ Public Class Clone_Basics : Inherits VBparent
         label1 = "Clone result - draw anywhere to clone a region"
         label2 = "Clone Region Mask"
         task.desc = "Clone a portion of one image into another.  Draw on any image to change selected area."
-        ' task.rank = 1
         task.drawRect = New cv.Rect(dst1.Width / 4, dst1.Height / 4, dst1.Width / 2, dst1.Height / 2)
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -51,7 +50,6 @@ Public Class Clone_ColorChange : Inherits VBparent
         label1 = "Draw anywhere to select different clone region"
         label2 = "Mask used for clone"
         task.desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         clone.cloneSpec = 0
@@ -78,7 +76,6 @@ Public Class Clone_IlluminationChange : Inherits VBparent
         label1 = "Draw anywhere to select different clone region"
         label2 = "Mask used for clone"
         task.desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         clone.cloneSpec = 1
@@ -106,7 +103,6 @@ Public Class Clone_TextureFlattening : Inherits VBparent
         label1 = "Draw anywhere to select different clone region"
         label2 = "mask used for clone"
         task.desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         clone.cloneSpec = 2
@@ -155,7 +151,6 @@ Public Class Clone_Eagle : Inherits VBparent
         label1 = "Move Eagle by clicking in any location."
         label2 = "Source image and source mask."
         task.desc = "Clone an eagle into the video stream."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         dst1 = src.Clone()
@@ -196,7 +191,6 @@ Public Class Clone_Seamless : Inherits VBparent
         label1 = "Results for SeamlessClone"
         label2 = "Mask for Clone"
         task.desc = "Use the seamlessclone API to merge color and depth..."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim center As New cv.Point(src.Width / 2, src.Height / 2)

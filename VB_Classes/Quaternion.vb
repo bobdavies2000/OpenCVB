@@ -29,7 +29,6 @@ Public Class Quaterion_Basics : Inherits VBparent
         End If
 
         task.desc = "Use the quaternion values to multiply and compute conjugate"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim q1 = New Quaternion(CSng(sliders.trackbar(0).Value / 100), CSng(sliders.trackbar(1).Value / 100),
@@ -54,7 +53,6 @@ Public Class Quaterion_IMUPrediction : Inherits VBparent
         label1 = "Quaternion_IMUPrediction"
         label2 = ""
         task.desc = "IMU data arrives at the CPU after a delay.  Predict changes to the image based on delay and motion data."
-		' task.rank = 1
     End Sub
 
     Public Sub Run(src as cv.Mat)

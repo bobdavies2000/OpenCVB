@@ -12,7 +12,6 @@ Public Class Distance_Basics : Inherits VBparent
         label1 = "Distance results"
         label2 = "Input mask to distance transformm"
         task.desc = "Distance algorithm basics."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If standalone or task.intermediateReview = caller Then src = task.RGBDepth ' to get some zeros in the image...
@@ -50,7 +49,6 @@ Public Class Distance_Foreground : Inherits VBparent
         label1 = "Distance results"
         label2 = "Input mask to distance transformm"
         task.desc = "Distance algorithm basics."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         foreground.Run(src)

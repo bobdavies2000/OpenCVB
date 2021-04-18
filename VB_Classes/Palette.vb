@@ -6,7 +6,6 @@ Public Class Palette_Basics : Inherits VBparent
     Public gradientColorMap As New cv.Mat
     Public Sub New()
         task.desc = "Apply the different color maps in OpenCV - Painterly Effect"
-        ' task.rank = 3
     End Sub
     Public Sub Run(src as cv.Mat)
         label1 = "ColorMap = " + task.paletteSchemeName
@@ -44,7 +43,6 @@ Public Class Palette_Color : Inherits VBparent
             sliders.setupTrackBar(2, "red", 0, 255, msRNG.Next(0, 255))
         End If
         task.desc = "Define a color using sliders."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim b = sliders.trackbar(0).Value
@@ -67,7 +65,6 @@ Public Class Palette_LinearPolar : Inherits VBparent
     Public rotateOptions As GetRotationMatrix2D_Options
     Public Sub New()
         task.desc = "Use LinearPolar to create gradient image"
-		' task.rank = 1
         rotateOptions = New GetRotationMatrix2D_Options
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -159,7 +156,6 @@ Public Class Palette_Reduction : Inherits VBparent
             sliders.setupTrackBar(0, "InRange offset from specific color", 1, 100, 10)
         End If
         task.desc = "Map colors to different palette - Painterly Effect."
-		' task.rank = 1
         label1 = "Reduced Colors"
     End Sub
     Private Class CompareVec3b : Implements IComparer(Of cv.Vec3b)
@@ -240,7 +236,6 @@ Public Class Palette_DrawTest : Inherits VBparent
         draw = New Draw_Shapes()
 
         task.desc = "Experiment with palette using a drawn image"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         draw.Run(src)
@@ -260,7 +255,6 @@ Public Class Palette_Gradient : Inherits VBparent
     Public Sub New()
         label2 = "From and To colors"
         task.desc = "Create gradient image"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If task.frameCount Mod frameModulo = 0 Then
@@ -301,7 +295,6 @@ Public Class Palette_RandomColorMap : Inherits VBparent
 
         label2 = "Generated colormap"
         task.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static paletteSlider = findSlider("Number of color transitions (Used only with Random)")
@@ -340,7 +333,6 @@ Public Class Palette_DepthColorMap : Inherits VBparent
 
         label2 = "Palette used to color left image"
         task.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If task.frameCount = 0 Then
@@ -383,7 +375,6 @@ Public Class Palette_ObjectColors : Inherits VBparent
         label1 = "Consistent colors"
         label2 = "Original colors"
         task.desc = "New class description"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         src.SetTo(0, task.noDepthMask)
@@ -441,7 +432,6 @@ Public Class Palette_Layout2D : Inherits VBparent
         Dim heightslider = findSlider("ThreadGrid Height").Value = 24
         grid.Run(Nothing)
         task.desc = "Layout the available colors in a 2D grid"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         grid.Run(Nothing)
@@ -467,7 +457,6 @@ Public Class Palette_LeftRightImages : Inherits VBparent
         lrViews = New LeftRightView_Basics
         findSlider("Infrared Brightness").Value = 0
         task.desc = "Use a palette with the left image."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 

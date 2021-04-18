@@ -15,7 +15,6 @@ Public Class DCT_Basics : Inherits VBparent
         End If
 
         task.desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies."
-        ' task.rank = 1
         label2 = "Difference from original"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -55,7 +54,6 @@ Public Class DCT_RGB : Inherits VBparent
         label1 = "Reconstituted RGB image"
         label2 = "Difference from original"
         task.desc = "Apply OpenCV's Discrete Cosine Transform to an RGB image and use slider to remove the highest frequencies."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim srcPlanes = src.Split()
@@ -98,7 +96,6 @@ Public Class DCT_Depth : Inherits VBparent
         dct.sliders.trackbar(0).Value = 1
         label2 = "Subtract DCT inverse from Grayscale depth"
         task.desc = "Find featureless surfaces in the depth data - expected to be useful only on the Kinect for Azure camera."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -129,7 +126,6 @@ Public Class DCT_FeatureLess : Inherits VBparent
         dct = New DCT_Basics()
         dct.sliders.trackbar(0).Value = 1
         task.desc = "Find surfaces that lack any texture.  Remove just the highest frequency from the DCT to get horizontal lines through the image."
-		' task.rank = 1
         label2 = "FeatureLess RGB regions"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -189,7 +185,6 @@ Public Class DCT_Surfaces_debug : Inherits VBparent
         label1 = "Largest flat surface segment stats"
         label2 = "Lower right image identifies potential flat surface"
         task.desc = "Find plane equation for a featureless surface - debugging one region for now."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         grid.Run(Nothing)
@@ -261,7 +256,6 @@ Public Class DCT_CComponents : Inherits VBparent
         label1 = "DCT masks colorized with average depth."
         label2 = "DCT mask"
         task.desc = "Find surfaces that lack texture with DCT (Discrete Cosine Transform) and use connected components to isolate those surfaces."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         dct.Run(src)

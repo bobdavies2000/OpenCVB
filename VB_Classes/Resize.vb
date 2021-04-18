@@ -10,7 +10,6 @@ Public Class Resize_Basics : Inherits VBparent
         rotateOptions.radio.check(6).Enabled = False
 
         task.desc = "Resize with different options and compare them"
-		' task.rank = 1
         label1 = "Rectangle highlight above resized"
         label2 = "Difference from Cubic Resize (Best)"
     End Sub
@@ -49,7 +48,6 @@ Public Class Resize_Percentage : Inherits VBparent
         End If
 
         task.desc = "Resize by a percentage of the image."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 

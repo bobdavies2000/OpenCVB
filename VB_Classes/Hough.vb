@@ -46,7 +46,6 @@ Public Class Hough_Circles : Inherits VBparent
         label1 = "Input circles to Hough"
         label2 = "Hough Circles found"
         task.desc = "Find circles using HoughCircles."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         circles.Run(src)
@@ -81,7 +80,6 @@ Public Class Hough_Lines : Inherits VBparent
             sliders.setupTrackBar(3, "Lines to Plot", 1, 1000, 25)
         End If
         task.desc = "Use Houghlines to find lines in the image."
-		' task.rank = 1
     End Sub
 
     Public Sub Run(src as cv.Mat)
@@ -128,7 +126,6 @@ Public Class Hough_Lines_MT : Inherits VBparent
         grid = New Thread_Grid
 
         task.desc = "Multithread Houghlines to find lines in image fragments."
-		' task.rank = 1
         label1 = "Hough_Lines_MT"
         label2 = "Hough_Lines_MT"
     End Sub

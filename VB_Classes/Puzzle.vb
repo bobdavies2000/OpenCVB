@@ -233,7 +233,6 @@ Public Class Puzzle_Basics : Inherits VBparent
 
         grid.Run(Nothing)
         task.desc = "Create the puzzle pieces for toy genetic or annealing algorithm."
-        ' task.rank = 1
     End Sub
     Function Shuffle(Of T)(collection As IEnumerable(Of T)) As List(Of T)
         Dim r As Random = New Random()
@@ -299,7 +298,6 @@ Public Class Puzzle_Solver : Inherits VBparent
             check.Box(1).Checked = False
         End If
         task.desc = "Put the puzzle back together using the absDiff of the up, down, left and right sides of each ROI."
-		' task.rank = 1
     End Sub
     Private Function checkUsedList(best As List(Of Integer)) As bestFit
         Dim bfit As New bestFit

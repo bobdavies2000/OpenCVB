@@ -12,7 +12,6 @@ Public Class EMax_Raw : Inherits VBparent
 
         label2 = "Emax regions as integers"
         task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         options.Run(Nothing)
@@ -64,7 +63,6 @@ Public Class EMax_Basics : Inherits VBparent
         basics = New EMax_Raw
         label1 = "Emax regions around clusters"
         task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         basics.Run(Nothing)
@@ -134,7 +132,6 @@ Public Class EMax_Setup : Inherits VBparent
 
         label1 = "EMax algorithms input samples"
         task.desc = "Options for EMax algorithms."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         task.palette.Run(Nothing)
@@ -199,7 +196,6 @@ Public Class EMax_VB_Failing : Inherits VBparent
     Public Sub New()
         options = New EMax_Setup
         task.desc = "OpenCV expectation maximization example."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         If standalone Or task.intermediateReview = caller Then
@@ -266,7 +262,6 @@ Public Class EMax_Centroids : Inherits VBparent
         emaxCPP = New EMax_Basics
         findSlider("ThreadGrid Width").Value = dst1.Width * 170 / 640
         task.desc = "Get the Emax cluster centroids using floodfill "
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         emaxCPP.Run(src)
@@ -302,7 +297,6 @@ Public Class EMax_PointTracker : Inherits VBparent
 
         label1 = "Original before KNN/Kalman tracking (red=previous)"
         task.desc = "Use KNN and Kalman to track the EMax Centroids and map consisten colors"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         emax.Run(src)

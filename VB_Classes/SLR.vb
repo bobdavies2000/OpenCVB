@@ -19,7 +19,6 @@ Public Class SLR_Basics : Inherits VBparent
             sliders.setupTrackBar(1, "Simple moving average window size", 1, 100, 20)
         End If
         task.desc = "Segmented Linear Regression example"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -81,7 +80,6 @@ Public Class SLR_Data : Inherits VBparent
             End If
         Next
         task.desc = "Plot the data used in SLR_Basics"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         plot.srcX = dataX.ToArray
@@ -106,7 +104,6 @@ Public Class SLR_Image : Inherits VBparent
         slr = New SLR_Basics()
         label1 = "Original data"
         task.desc = "Run Segmented Linear Regression on grayscale image data - just an experiment"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 

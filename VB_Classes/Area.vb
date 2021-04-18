@@ -26,7 +26,6 @@ Public Class Area_MinTriangle_CPP : Inherits VBparent
         End If
         setup()
         task.desc = "Find minimum containing triangle for a set of points."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static pointCountSlider = findSlider("Area Number of Points")
@@ -80,7 +79,6 @@ Public Class Area_MinRect : Inherits VBparent
         setup(sliders.trackbar(0).Value)
 
         task.desc = "Find minimum containing rectangle for a set of points."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static pointCountSlider = findSlider("Area Number of Points")
@@ -111,7 +109,6 @@ Public Class Area_MinMotionRect : Inherits VBparent
         Static bgSubLearnRate = findSlider("MOG Learn Rate")
         bgSubLearnRate.Value = 100 ' low threshold to maximize motion
         task.desc = "Use minRectArea to encompass detected motion"
-		' task.rank = 1
         label1 = "MinRectArea of MOG motion"
     End Sub
 
@@ -146,7 +143,6 @@ Public Class Area_FindNonZero : Inherits VBparent
         label1 = "Coordinates of non-zero points"
         label2 = "Non-zero original points"
         task.desc = "Use FindNonZero API to get coordinates of non-zero points."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim gray = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)

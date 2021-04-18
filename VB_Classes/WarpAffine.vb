@@ -7,7 +7,6 @@ Public Class WarpAffine_Captcha : Inherits VBparent
     Dim rng As New System.Random
     Public Sub New()
         task.desc = "Use OpenCV to build a captcha Turing test."
-		' task.rank = 1
     End Sub
     Private Sub addNoise(image As cv.Mat)
         For n = 0 To 100
@@ -100,7 +99,6 @@ Public Class WarpAffine_Basics : Inherits VBparent
         End If
 
         task.desc = "Use WarpAffine to transform input images."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static frm = findfrm("WarpAffine_Basics Radio Options")
@@ -135,7 +133,6 @@ Public Class WarpAffine_3Points : Inherits VBparent
         triangle.sliders.trackbar(1).Value = 150
 
         task.desc = "Use 3 non-colinear points to build an affine transform and apply it to the color image."
-		' task.rank = 1
         label1 = "Triangles define the affine transform"
         label2 = "Image with affine transform applied"
     End Sub
@@ -206,7 +203,6 @@ Public Class WarpAffine_4Points : Inherits VBparent
         rect = New Area_MinRect()
 
         task.desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."
-		' task.rank = 1
         label1 = "Color image with perspective transform applied"
     End Sub
     Public Sub Run(src as cv.Mat)

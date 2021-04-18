@@ -6,7 +6,6 @@ Public Class Kalman_Basics : Inherits VBparent
     Public kOutput(4 - 1) As Single
     Public Sub New()
         task.desc = "Use Kalman to stabilize values (such as a cv.rect.)"
-        ' task.rank = 4
     End Sub
     Public Sub Run(src as cv.Mat)
         Static saveDimension = -1
@@ -65,7 +64,6 @@ Public Class Kalman_Stripped : Inherits VBparent
     Public kOutput(4 - 1) As Single
     Public Sub New()
         task.desc = "High volume usage only.  Same as Kalman_basics but no check boxes."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static saveDimension = -1
@@ -134,7 +132,6 @@ Public Class Kalman_Compare : Inherits VBparent
         label1 = "Kalman input: mean values for RGB"
         label2 = "Kalman output: smoothed mean values for RGB"
         task.desc = "Use this kalman filter to predict the next value."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If task.frameCount = 0 Then
@@ -206,7 +203,6 @@ Public Class Kalman_RotatingPoint : Inherits VBparent
         radius = dst1.Rows / 2.4 ' so we see the entire circle...
         center = New cv.Point2f(dst1.Cols / 2, dst1.Rows / 2)
         task.desc = "Track a rotating point using a Kalman filter. Yellow line (estimate) should be shorter than red (real)."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim stateAngle = kState.Get(Of Single)(0)
@@ -254,7 +250,6 @@ Public Class Kalman_MousePredict : Inherits VBparent
         lineWidth = dst1.Width / 300
         label1 = "Red is real mouse, white is prediction"
         task.desc = "Use kalman filter to predict the next mouse location."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If task.frameCount Mod 100 = 0 Then dst1.SetTo(0)
@@ -287,7 +282,6 @@ Public Class Kalman_CVMat : Inherits VBparent
         input = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
         If standalone Then label1 = "Rectangle moves smoothly to random locations"
         task.desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         Static saveDimension = -1
@@ -357,7 +351,6 @@ Public Class Kalman_ImageSmall : Inherits VBparent
         label1 = "The small image is processed by the Kalman filter"
         label2 = "Mask of the smoothed image minus original"
         task.desc = "Resize the image to allow the Kalman filter to process the whole image."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -390,7 +383,6 @@ Public Class Kalman_DepthSmall : Inherits VBparent
         label1 = "Mask of non-zero depth after Kalman smoothing"
         label2 = "Mask of the smoothed image minus original"
         task.desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         kalman.Run(task.RGBDepth)
@@ -417,7 +409,6 @@ Public Class Kalman_Depth32f : Inherits VBparent
         label1 = "Mask of non-zero depth after Kalman smoothing"
         label2 = "Difference from original depth"
         task.desc = "Use a resized depth Mat to find where depth is decreasing (getting closer.)"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         resize.Run(task.depth32f)
@@ -461,7 +452,6 @@ Public Class Kalman_Single : Inherits VBparent
             plot.plotCount = 2 ' 2 items to plot
         End If
         task.desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If standalone or task.intermediateReview = caller Then
@@ -554,7 +544,6 @@ Public Class Kalman_VB : Inherits VBparent
         End If
         label1 = "Use first slider in the options to test the algorithm.  The other sliders in the options visualize the impact."
         task.desc = "A native VB Kalman filter"
-        ' task.rank = 1
     End Sub
     Public Sub State_Update(ByVal q_m As Single)
         Dim dt As Single = 1 / 20
@@ -668,7 +657,6 @@ Public Class Kalman_VB_Basics : Inherits VBparent
         End If
         label1 = "Blue = gray mean, green = kalman, red = kalman avg"
         task.desc = "Build a generic kalman filter based on Kalman_VB"
-        ' task.rank = 1
     End Sub
     Public Sub State_Update(ByVal q_m As Single)
         Static deltaSlider = findSlider("Delta Time X100")

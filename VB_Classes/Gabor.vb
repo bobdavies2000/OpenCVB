@@ -22,7 +22,6 @@ Public Class Gabor_Basics : Inherits VBparent
             sliders.setupTrackBar(5, "Gabor Phase offset X100", 0, 100, 0)
         End If
         task.desc = "Explore Gabor kernel - Painterly Effect"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If standalone or task.intermediateReview = caller Then
@@ -63,7 +62,6 @@ Public Class Gabor_Basics_MT : Inherits VBparent
         Next
 
         task.desc = "Apply multiple Gabor filters sweeping through different values of theta - Painterly Effect."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 

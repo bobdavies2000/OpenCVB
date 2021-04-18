@@ -9,7 +9,6 @@ Public Class Diff_Basics : Inherits VBparent
         label1 = "Stable Color"
         label2 = "Unstable Color mask"
         task.desc = "Capture an image and compare it to previous frame using absDiff and threshold"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim gray = src
@@ -47,7 +46,6 @@ Public Class Diff_UnstableDepthAndColor : Inherits VBparent
 
         label1 = "Stable depth and color"
         task.desc = "Build a mask for any pixels that have either unstable depth or color"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         diff.Run(src)

@@ -9,7 +9,6 @@ Public Class LUT_Basics : Inherits VBparent
         End If
 
         task.desc = "Divide the image into n-segments controlled with a slider."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         Static segment() As Integer
@@ -56,7 +55,6 @@ Public Class LUT_Sliders : Inherits VBparent
         End If
 
         task.desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         sliders.sLabels(0).Text = "LUT zero through " + CStr(sliders.trackbar(0).Value)
@@ -93,7 +91,6 @@ Public Class LUT_CustomColor : Inherits VBparent
 
         label2 = "Custom Color Lookup Table"
         task.desc = "Use a palette to provide the lookup table for LUT - Painterly Effect"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If standalone Or task.intermediateReview = caller Then reduction.Run(src)
@@ -118,7 +115,6 @@ Public Class LUT_Reduction : Inherits VBparent
         reduction = New Reduction_Basics()
         label2 = "Custom Color Lookup Table"
         task.desc = "Build and use a custom color palette - Painterly Effect"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         task.palette.Run(Nothing)
@@ -142,7 +138,6 @@ Public Class LUT_RGBDepth : Inherits VBparent
     Public Sub New()
         lut = New LUT_Basics
         task.desc = "Use a LUT on the RGBDepth to segregate depth data."
-		' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         lut.Run(task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -163,7 +158,6 @@ Public Class LUT_Depth32f : Inherits VBparent
     Public Sub New()
         lut = New LUT_Basics
         task.desc = "Use a LUT on the 32-bit depth to segregate depth data."
-		' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         lut.Run(task.depth32f.Normalize(255).ConvertScaleAbs(255))
@@ -184,7 +178,6 @@ End Class
 Public Class LUT_Color : Inherits VBparent
     Public Sub New()
         task.desc = "Apply the current LUT to the input image"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         task.palette.Run(Nothing)

@@ -6,7 +6,6 @@ Public Class FREAK_Basics : Inherits VBparent
     Public Sub New()
         orb = New ORB_Basics()
         task.desc = "Find keypoints using ORB and FREAK algorithm"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         orb.Run(src)

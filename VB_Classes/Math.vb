@@ -11,7 +11,6 @@ Public Class Math_Subtract : Inherits VBparent
         End If
 
         task.desc = "Subtract a Mat using a scalar.  Set scalar to zero to see pixels saturate to zero."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim bgr = New cv.Scalar(sliders.trackbar(2).Value, sliders.trackbar(1).Value, sliders.trackbar(0).Value)
@@ -56,7 +55,6 @@ Public Class Math_Median_CDF : Inherits VBparent
     Public rangeMax As Integer = 255
     Public Sub New()
         task.desc = "Compute the src image median"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -87,7 +85,6 @@ Public Class Math_DepthMeanStdev : Inherits VBparent
     Public Sub New()
         minMax = New Depth_NotMissing()
         task.desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         minMax.Run(src)
@@ -116,7 +113,6 @@ Public Class Math_RGBCorrelation : Inherits VBparent
 
         match = New MatchTemplate_Basics()
         task.desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim split = src.Split()
@@ -153,7 +149,6 @@ Public Class Math_ImageAverage : Inherits VBparent
             sliders.setupTrackBar(0, "Average - number of input images", 1, 100, 10)
         End If
         task.desc = "Create an image that is the mean of x number of previous images."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -215,7 +210,6 @@ Public Class Math_Stdev : Inherits VBparent
         highStdevMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
         lowStdevMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
         task.desc = "Compute the standard deviation in each segment"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim updateCount As Integer
@@ -277,7 +271,6 @@ Public Class Math_StdevBoundary : Inherits VBparent
         label1 = "Low stdev regions.  Gaps filled with OTSU results"
         label2 = "High stdev segments after the first pass"
         task.desc = "Explore how to get a better boundary on the low stdev mask"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 

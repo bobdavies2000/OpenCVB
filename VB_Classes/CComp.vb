@@ -24,7 +24,6 @@ Public Class CComp_Basics : Inherits VBparent
         End If
 
         task.desc = "Draw bounding boxes around RGB binarized connected Components"
-		' task.rank = 1
     End Sub
     Private Function renderBlobs(minSize As Integer, mask As cv.Mat, maxSize As Integer) As Integer
         Dim count As Integer = 0
@@ -115,7 +114,6 @@ Public Class CComp_Basics_FullImage : Inherits VBparent
         basics = New CComp_Basics()
 
         task.desc = "Connect components in the light half of OTSU threshold output, then use the dark half, then combine results."
-        ' task.rank = 1
         label2 = "Masks binary+otsu used to compute mean depth"
     End Sub
     Private Function colorWithDepth(matIndex As Integer) As Integer
@@ -170,7 +168,6 @@ Public Class CComp_PointTracker : Inherits VBparent
         basics = New CComp_Basics()
 
         task.desc = "Track connected componenent centroids and use it to match coloring"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         basics.Run(src)
@@ -219,7 +216,6 @@ Public Class CComp_MaxBlobs : Inherits VBparent
         End If
 
         task.desc = "Find the best CComp threshold to maximize the number of blobs"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static thresholdSlider = findSlider("CComp threshold")
@@ -270,7 +266,6 @@ Public Class CComp_MaxPixels : Inherits VBparent
         maxBlob = New CComp_MaxBlobs()
         maxBlob.incr = 5
         task.desc = "Find the best CComp threshold to maximize pixels"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static pixelValues(255) As Integer ' march through all 255 values and find the best...
@@ -319,7 +314,6 @@ Public Class CComp_DepthEdges : Inherits VBparent
         End If
 
         task.desc = "Use depth edges to isolate connected components in depth"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         depth.Run(src)
@@ -346,7 +340,6 @@ Public Class CComp_EdgeMask : Inherits VBparent
         ccomp = New CComp_ColorDepth()
 
         task.desc = "Isolate Color connected components after applying the Edge Mask"
-        ' task.rank = 1
         label1 = "Edges_DepthAndColor (input to ccomp)"
         label2 = "Blob Rectangles with centroids (white)"
     End Sub
@@ -375,7 +368,6 @@ Public Class CComp_ColorDepth : Inherits VBparent
         label1 = "Color by Mean Depth"
         label2 = "Binary image using threshold binary+Otsu"
         task.desc = "Color connected components based on their depth"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -409,7 +401,6 @@ Public Class CComp_InRange_MT : Inherits VBparent
         sliders.setupTrackBar(1, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
 
         task.desc = "Connected components in specific ranges"
-        ' task.rank = 1
         label2 = "Blob rectangles - largest to smallest"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -464,7 +455,6 @@ Public Class CComp_InRange : Inherits VBparent
             sliders.setupTrackBar(1, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
         End If
         task.desc = "Connect components in specific ranges"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -508,7 +498,6 @@ Public Class CComp_Shapes : Inherits VBparent
         label1 = "Largest connected component"
         label2 = "RectView, LabelView, Binary, grayscale"
         task.desc = "Use connected components to isolate objects in image."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim gray = shapes.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -557,7 +546,6 @@ Public Class CComp_Simple : Inherits VBparent
 
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         task.desc = "Draw bounding boxes around RGB binarized connected Components"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         rects.Clear()
@@ -606,7 +594,6 @@ Public Class CComp_Binarized : Inherits VBparent
         ccomp = New CComp_Simple
         edges = New Edges_BinarizedSobel
         task.desc = "Find connected components using an image with binarized edges"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         edges.Run(src)

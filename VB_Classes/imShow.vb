@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Public Class ImShow_Basics : Inherits VBparent
     Public Sub New()
         task.desc = "This is just a reminder that all HighGUI methods are available in OpenCVB"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         cv.Cv2.ImShow("color", src)
@@ -21,7 +20,6 @@ Public Class ImShow_WaitKey : Inherits VBparent
         vDemo = New Voronoi_Basics()
 
         task.desc = "You can use the HighGUI WaitKey call to pause an algorithm and review output one frame at a time."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         vDemo.Run(src)

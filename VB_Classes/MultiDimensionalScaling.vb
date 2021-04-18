@@ -15,7 +15,6 @@ Public Class MultiDimensionScaling_Cities : Inherits VBparent
     Public Sub New()
         label1 = "Resulting solution using cv.Eigen"
         task.desc = "Use OpenCV's Eigen function to solve a system of equations"
-		' task.rank = 1
     End Sub
     Private Function Torgerson(src As cv.Mat) As Double
         Dim rows = src.Rows

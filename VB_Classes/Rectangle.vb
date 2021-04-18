@@ -6,7 +6,6 @@ Public Class Rectangle_Basics : Inherits VBparent
     Public Sub New()
         optDraw = New Draw_Options
         task.desc = "Draw the requested number of rectangles."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         optDraw.Run(Nothing)
@@ -49,7 +48,6 @@ Public Class Rectangle_Rotated : Inherits VBparent
         Dim rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
         rotatedCheck.Checked = True
         task.desc = "Draw the requested number of rectangles."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         rect.Run(src)
@@ -73,7 +71,6 @@ Public Class Rectangle_CComp : Inherits VBparent
 
         label2 = "Connected component features isolated by rect's"
         task.desc = "Isolate rectanguler regions around connected components"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         ccomp.Run(src)
@@ -107,7 +104,6 @@ Public Class Rectangle_Overlap : Inherits VBparent
         findSlider("DrawCount").Value = 2
 
         task.desc = "Test if 2 rectangles overlap"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         If standalone Or task.intermediateReview = caller Then
@@ -156,7 +152,6 @@ Public Class Rectangle_Motion : Inherits VBparent
         mOverlap = New Rectangle_Intersection
         label1 = "Yellow is pixel motion.  Red is all pixel motion"
         task.desc = "Motion rectangles often overlap.  This algorithm consolidates those rectangles in the RGB image."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         motion.Run(src)
@@ -178,7 +173,6 @@ Public Class Rectangle_MotionDepth : Inherits VBparent
         label1 = "Rectangles from contours of motion (unconsolidated)"
         label2 = "Pixel differences from motion (everything!)"
         task.desc = "Motion rectangles often overlap.  This algorithm consolidates those rectangles in the depth image."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         Static lastDepth = task.depth32f
@@ -218,7 +212,6 @@ Public Class Rectangle_Intersection : Inherits VBparent
         End If
 
         task.desc = "Test if any number of rectangles overlap."
-        ' task.rank = 1
     End Sub
     Private Function findEnclosingRect(rects As List(Of cv.Rect), proximity As Integer) As cv.Rect
         Dim enclosing = rects(0)
@@ -294,7 +287,6 @@ Public Class Rectangle_Union : Inherits VBparent
     Public allRect As cv.Rect ' a rectangle covering all the input
     Public Sub New()
         task.desc = "Create a rectangle that contains all the input rectangles"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
 
@@ -350,7 +342,6 @@ Public Class Rectangle_MultiOverlap : Inherits VBparent
     Public outputRects As New List(Of cv.Rect)
     Public Sub New()
         task.desc = "Given a group of rectangles, merge all the rectangles that overlap"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
 

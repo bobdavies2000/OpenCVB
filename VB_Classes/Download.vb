@@ -24,7 +24,6 @@ Public Class Download_Databases : Inherits VBparent
         End If
 
         task.desc = "Multi-threaded (responsive) download of the iBug 300W face database.  Not using iBug yet but planning to..."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 

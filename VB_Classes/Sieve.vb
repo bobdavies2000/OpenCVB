@@ -10,7 +10,6 @@ Public Class Sieve_BasicsVB : Inherits VBparent
         End If
 
         task.desc = "Implement the Sieve of Eratothenes"
-		' task.rank = 1
     End Sub
     Public Function shareResults(sieveList As List(Of Integer)) As String
         Dim completeList As String = ""
@@ -54,7 +53,6 @@ Public Class Sieve_Basics : Inherits VBparent
     Public Sub New()
         printer = New Sieve_BasicsVB
         task.desc = "Implement the Sieve of Eratothenes in C#"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static countSlider = findSlider("Count of desired primes")

@@ -12,7 +12,6 @@ Public Class KNN_Basics : Inherits VBparent
         label1 = "White=TrainingData, Red=queries"
         knn = cv.ML.KNearest.Create()
         task.desc = "Test knn with random points in the image.  Find the nearest n points."
-        ' task.rank = 2
     End Sub
     Public Sub Run(src as cv.Mat)
         dst1.SetTo(cv.Scalar.Black)
@@ -66,7 +65,6 @@ Public Class KNN_BasicsQT : Inherits VBparent
         label1 = "White=TrainingData, Red=queries"
         knn = cv.ML.KNearest.Create()
         task.desc = "Test knn with random points in the image.  Find the nearest n points."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         dst1.SetTo(cv.Scalar.Black)
@@ -131,7 +129,6 @@ Public Class KNN_Options : Inherits VBparent
         label1 = "Random training points"
         label2 = "Random query points"
         task.desc = "Source of query/train points - generate points if standalone.  Reuse points if requested."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         If standalone Or task.intermediateReview = caller Then
@@ -189,7 +186,6 @@ Public Class KNN_1_to_1 : Inherits VBparent
 
         label1 = "White=TrainingData, Red=queries, yellow=unmatched"
         task.desc = "Use knn to find the nearest n points but use only the best and no duplicates - 1:1 mapping."
-        ' task.rank = 2
     End Sub
     Public Sub Run(src As cv.Mat)
         basics.Run(src)
@@ -278,7 +274,6 @@ Public Class KNN_Emax : Inherits VBparent
         label1 = "Output from Emax"
         label2 = "White=TrainingData, Red=queries yellow=unmatched"
         task.desc = "Emax centroids move but here KNN is used to matched the old and new locations and keep the colors the same."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         If standalone And task.frameCount = 0 Then
@@ -327,7 +322,6 @@ Public Class KNN_Test : Inherits VBparent
         End If
 
         task.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         grid.Run(Nothing)
@@ -370,7 +364,6 @@ Public Class KNN_Test_1_to_1 : Inherits VBparent
             check.Box(0).Text = "Show grid mask"
         End If
         task.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         grid.Run(Nothing)
@@ -403,7 +396,6 @@ Public Class KNN_Point3d : Inherits VBparent
     Public Sub New()
         kOptions = New KNN_Options
         task.desc = "Use KNN to connect 3D points.  Results shown are a 2D projection of the 3D results."
-        ' task.rank = 1
         label1 = "Yellow=Query (in 3D) Blue=Best Response (in 3D)"
         label2 = "Top Down View to confirm 3D KNN is correct"
     End Sub
@@ -486,7 +478,6 @@ Public Class KNN_DepthClusters : Inherits VBparent
         label1 = "Output of Blob_DepthClusters"
         label2 = "Same output after KNN_PointTracker"
         task.desc = "Use KNN to track and color the Blob results from clustering the depth data"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         blobs.Run(src)
@@ -523,7 +514,6 @@ Public Class KNN_SmoothAverage : Inherits VBparent
         label1 = "AddWeight result of current and previous frame"
         label2 = "Mask for difference between current and last frame"
         task.desc = "Smooth out the abrupt appearance/disappearance of floodfilled regions"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         knn.Run(src)
@@ -561,7 +551,6 @@ Public Class KNN_StabilizeRegions : Inherits VBparent
         label1 = "Output of KNN_DepthClusters"
         label2 = "KNN_DepthClusters output plus unstable regions"
         task.desc = "Identify major regions that are unstable - appearing and disappearing"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         knn.Run(src)
@@ -590,7 +579,6 @@ Public Class KNN_Contours : Inherits VBparent
         outline = New Contours_Depth()
         knn = New KNN_BasicsQT()
         task.desc = "Use KNN to streamline the outline of a contour"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         outline.Run(src)
@@ -641,7 +629,6 @@ Public Class KNN_Cluster2DCities : Inherits VBparent
 
         label1 = ""
         task.desc = "Use knn to cluster cities - a primitive attempt at traveling salesman problem."
-        ' task.rank = 1
     End Sub
     Public Sub cluster(result As cv.Mat, findXnearest As Integer)
         Dim alreadyTaken As New List(Of Integer)
@@ -729,7 +716,6 @@ Public Class KNN_Point2d : Inherits VBparent
         If standalone Then knn.knnQT.useRandomData = True
 
         task.desc = "Use KNN to find n matching points for each query."
-        ' task.rank = 1
         label1 = "Yellow=Queries, Blue=Best Responses"
     End Sub
     Public Sub prepareImage(dst As cv.Mat, dotSize As Integer)
@@ -778,7 +764,6 @@ Public Class KNN_Learn : Inherits VBparent
     Public Sub New()
         knn = cv.ML.KNearest.Create()
         task.desc = "Learn from a set of training points.  The calling user can then use FindNearest on the knn"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         dst1.SetTo(cv.Scalar.Black)
@@ -854,7 +839,6 @@ Public Class KNN_PointTracker : Inherits VBparent
         End If
 
         task.desc = "Use KNN to track points and Kalman to smooth the results"
-        ' task.rank = 1
     End Sub
     Private Sub allocateKalman(count As Integer)
         For i = kalman.Count To count - 1
@@ -993,7 +977,6 @@ Public Class KNN_1_to_1FIFO : Inherits VBparent
         label1 = "White=TrainingData, Red=queries"
         knn = cv.ML.KNearest.Create()
         task.desc = "Using the last set of points, find the nearest point for each the current set - first come, first served."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         dst1.SetTo(cv.Scalar.Black)

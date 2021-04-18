@@ -34,7 +34,6 @@ Public Class SuperPixel_Basics_CPP : Inherits VBparent
 
         label2 = "Superpixel label data (0-255)"
         task.desc = "Sub-divide the image into super pixels."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static numSuperPixels As integer
@@ -92,7 +91,6 @@ Public Class SuperPixel_BinarizedImage : Inherits VBparent
         pixelCountSlider.value = 20 ' find the top 20 super pixels.
 
         task.desc = "Create SuperPixels from a binary image."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         binarize.Run(src)
@@ -115,7 +113,6 @@ Public Class SuperPixel_Depth : Inherits VBparent
         pixels = New SuperPixel_Basics_CPP()
 
         task.desc = "Create SuperPixels using RGBDepth image."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         pixels.Run(task.RGBDepth)
@@ -138,7 +135,6 @@ Public Class SuperPixel_WithCanny : Inherits VBparent
         pixels = New SuperPixel_Basics_CPP()
 
         task.desc = "Create SuperPixels using RGBDepth image."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         edges.Run(src)
@@ -167,7 +163,6 @@ Public Class SuperPixel_WithLineDetector : Inherits VBparent
 
         label2 = "Input to superpixel basics."
         task.desc = "Create SuperPixels using RGBDepth image."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         lines.Run(src)

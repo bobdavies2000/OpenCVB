@@ -19,7 +19,6 @@ Public Class CamShift_Basics : Inherits VBparent
         label1 = "Draw anywhere to create histogram and start camshift"
         label2 = "Histogram of targeted region (hue only)"
         task.desc = "CamShift Demo - draw on the images to define the object to track. Tracker Algorithm"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static roi As New cv.Rect
@@ -83,7 +82,6 @@ Public Class CamShift_Foreground : Inherits VBparent
         fore = New Depth_Foreground()
         label1 = "Automatically finding the head - top of nearest object"
         task.desc = "Use depth to find the head and start the camshift demo.  Tracker Algorithm"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim restartRequested As Boolean
@@ -121,7 +119,6 @@ Public Class Camshift_Object : Inherits VBparent
         label1 = "Largest blob with hue tracked.  Draw enabled."
         label2 = "Backprojection of depth clusters masked with hue"
         task.desc = "Use the blob depth cluster as input to initialize a camshift algorithm.  Tracker Algorithm"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         blob.Run(src)
@@ -164,7 +161,6 @@ Public Class Camshift_TopObjects : Inherits VBparent
             sliders.setupTrackBar(0, "Reinitialize camshift after x frames", 1, 500, 100)
         End If
         task.desc = "Track - Tracker Algorithm"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         blob.Run(src)

@@ -83,7 +83,6 @@ End Module
 Public Class Delaunay_Basics : Inherits VBparent
     Public Sub New()
         task.desc = "Use Delaunay to subdivide an image into triangles."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim active_facet_color = New cv.Scalar(0, 0, 255)
@@ -111,7 +110,6 @@ Public Class Delaunay_GoodFeatures : Inherits VBparent
         features = New Features_GoodFeatures()
         label2 = "Voronoi facets of delauney good features"
         task.desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         features.Run(src)
@@ -146,7 +144,6 @@ Public Class Delauney_Subdiv2D : Inherits VBparent
     Public Sub New()
         label2 = "Voronoi facets for the same subdiv2D"
         task.desc = "Generate random points and divide the image around those points."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If task.frameCount Mod updateFrequency <> 0 Then Exit Sub ' too fast otherwise...
@@ -204,7 +201,6 @@ Public Class Delauney_Coverage : Inherits VBparent
         End If
         label1 = "Coverage of space"
         task.desc = "Combine random points with linear connections to neighbors to cover space. Note that space fills rapidly."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If task.frameCount Mod sliders.trackbar(0).Value = 0 Then dst1.SetTo(0)

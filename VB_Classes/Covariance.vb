@@ -5,7 +5,6 @@ Public Class Covariance_Basics : Inherits VBparent
     Public Sub New()
         random = New Random_Basics()
         task.desc = "Calculate the covariance of random depth data points."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim covariance As New cv.Mat, mean = New cv.Mat
@@ -48,7 +47,6 @@ Public Class Covariance_Test : Inherits VBparent
 
         covar = New Covariance_Basics()
         task.desc = "Test the covariance basics algorithm."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim testInput() As Double = {1.5, 2.3, 3.0, 1.7, 1.2, 2.9, 2.1, 2.2, 3.1, 3.1, 1.3, 2.7, 2.0, 1.7, 1.0, 2.0, 0.5, 0.6, 1.0, 0.9}

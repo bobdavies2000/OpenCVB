@@ -68,7 +68,6 @@ Public Class Annealing_Basics_CPP : Inherits VBparent
     Public Sub New()
         setup()
         task.desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If closed = True Then Exit Sub
@@ -167,7 +166,6 @@ Public Class Annealing_CPP_MT : Inherits VBparent
         label2 = "Top 2 are best solutions, bottom 2 are worst."
 
         task.desc = "Setup and control finding the optimal route for a traveling salesman"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         If anneal(0) Is Nothing Then setup() ' setup here rather than in algorithm so all threads work on the same problem.
@@ -263,7 +261,6 @@ Public Class Annealing_Options : Inherits VBparent
         anneal.setup()
         anneal.Open()
         task.desc = "Setup and control finding the optimal route for a traveling salesman"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         Static randomSlider = findSlider("Random Pixel Count")

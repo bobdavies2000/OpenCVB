@@ -8,7 +8,6 @@ Public Class MeanShift_Basics : Inherits VBparent
     Public Sub New()
         label1 = "Draw anywhere to start mean shift tracking."
         task.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track.  Tracker Algorithm"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If standalone or task.intermediateReview = caller Then usingDrawRect = True
@@ -52,7 +51,6 @@ Public Class MeanShift_Depth : Inherits VBparent
         blob = New Depth_ForegroundHead()
         label1 = "Draw anywhere to start mean shift tracking."
         task.desc = "Use depth to start mean shift algorithm.  Tracker Algorithm"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If task.drawRect.Width > 0 Then
@@ -91,7 +89,6 @@ Public Class MeanShift_PyrFilter : Inherits VBparent
             sliders.setupTrackBar(2, "MeanShift Max Pyramid level", 1, 8, 3)
         End If
         task.desc = "Use PyrMeanShiftFiltering to segment an image."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim spatialRadius = sliders.trackbar(0).Value
@@ -125,7 +122,6 @@ Public Class Meanshift_TopObjects : Inherits VBparent
             cams(i).rectangleEdgeWidth = 8
         Next
         task.desc = "Track - tracking algorithm"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         blob.Run(src)

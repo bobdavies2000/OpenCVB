@@ -8,7 +8,6 @@ Public Class Dlib_Sobel_CS : Inherits VBparent
     Public Sub New()
         d2Mat = New Mat_Dlib2Mat
         task.desc = "Testing the DLib interface with a simple Sobel example"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim input = src
@@ -36,7 +35,6 @@ Public Class Dlib_GaussianBlur_CS : Inherits VBparent
         label1 = "Gaussian Blur of grayscale image"
         label2 = "Gaussian Blur of BGR image"
         task.desc = "Use DlibDotNet to blur an image"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -69,7 +67,6 @@ Public Class Dlib_FaceDetectHOG_CS : Inherits VBparent
         faces.initialize()
         d2Mat = New Mat_Dlib2Mat
         task.desc = "Use DlibDotNet to detect faces using the HOG detector"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -108,7 +105,6 @@ Public Class Dlib_iBug300WDownload : Inherits VBparent
         End If
 
         task.desc = "Multi-threaded (responsive) download of the iBug 300W face database.  Not using iBug yet but planning to..."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim ibugDir = New DirectoryInfo(task.parms.homeDir + "Data/ibug_300W_large_face_landmark_dataset")

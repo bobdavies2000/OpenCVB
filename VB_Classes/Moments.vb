@@ -15,7 +15,6 @@ Public Class Moments_Basics : Inherits VBparent
 
         label1 = "Red dot = Kalman smoothed centroid"
         task.desc = "Compute the centroid of the provided mask file."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If standalone or task.intermediateReview = caller Then
@@ -54,7 +53,6 @@ Public Class Moments_CentroidKalman : Inherits VBparent
 
         label1 = "Red dot = Kalman smoothed centroid"
         task.desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         foreground.Run(src)

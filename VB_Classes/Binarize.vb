@@ -17,7 +17,6 @@ Public Class Binarize_Basics : Inherits VBparent
         blur = New Blur_Basics()
         mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 255)
         task.desc = "Binarize an image using Threshold with OTSU."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         meanScalar = cv.Cv2.Mean(src, mask)
@@ -58,7 +57,6 @@ Public Class Binarize_OTSU : Inherits VBparent
         label1 = "Threshold 1) binary 2) Binary+OTSU 3) OTSU 4) OTSU+Blur"
         label2 = "Histograms correspond to images on the left"
         task.desc = "Binarize an image using Threshold with OTSU."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -102,7 +100,6 @@ Public Class Binarize_Niblack_Sauvola : Inherits VBparent
             sliders.setupTrackBar(3, "Sauvola r", 1, 100, 64)
         End If
         task.desc = "Binarize an image using Niblack and Sauvola"
-        ' task.rank = 1
         label1 = "Binarize Niblack"
         label2 = "Binarize Sauvola"
     End Sub
@@ -133,7 +130,6 @@ Public Class Binarize_Niblack_Nick : Inherits VBparent
             sliders.setupTrackBar(2, "Nick k", -1000, 1000, 100)
         End If
         task.desc = "Binarize an image using Niblack and Nick"
-        ' task.rank = 1
         label1 = "Binarize Niblack"
         label2 = "Binarize Nick"
     End Sub
@@ -167,7 +163,6 @@ Public Class Binarize_Bernson : Inherits VBparent
 
         task.drawRect = New cv.Rect(100, 100, 100, 100)
         task.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim kernelSize = sliders.trackbar(0).Value
@@ -203,7 +198,6 @@ Public Class Binarize_Bernson_MT : Inherits VBparent
             sliders.setupTrackBar(2, "bg Threshold", 0, 255, 100)
         End If
         task.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
-        ' task.rank = 1
         label1 = "Binarize Bernson"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -245,7 +239,6 @@ Public Class Binarize_Reduction : Inherits VBparent
         label1 = "Binarize output from reduction"
         label2 = "Binarize Basics Output"
         task.desc = "Binarize an image using reduction"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         Dim tmp = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -269,7 +262,6 @@ Public Class Binarize_Simple : Inherits VBparent
         mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 255)
 
         task.desc = "Binarize an image using Threshold with OTSU."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
 
@@ -301,7 +293,6 @@ Public Class Binarize_Recurse : Inherits VBparent
         mats = New Mat_4Click
         label1 = "Lighter half, lightest, darker half, darkest"
         task.desc = "Binarize an image twice using masks"
-        ' task.rank = 2
     End Sub
     Public Sub Run(src As cv.Mat)
 

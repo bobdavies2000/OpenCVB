@@ -6,7 +6,6 @@ Public Class LeftRightView_Basics : Inherits VBparent
             sliders.setupTrackBar(0, "Infrared Brightness", 0, 255, 100)
         End If
         task.desc = "Show the left and right views from the 3D Camera"
-		' task.rank = 1
         Select Case task.parms.cameraName
             Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
                 label1 = "Infrared Image"
@@ -53,7 +52,6 @@ Public Class LeftRightView_CompareRaw : Inherits VBparent
         lrView = New LeftRightView_Basics()
         lrView.sliders.Hide()
         task.desc = "Show slices of the left and right view next to each other for visual comparison"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         lrView.Run(src)
@@ -85,7 +83,6 @@ Public Class LeftRightView_Features : Inherits VBparent
         lrView = New LeftRightView_Basics()
 
         task.desc = "Find GoodFeatures in the left and right depalettized infrared images"
-		' task.rank = 1
         label1 = "Left Image"
         label2 = "Right Image"
     End Sub
@@ -115,7 +112,6 @@ Public Class LeftRightView_Palettized : Inherits VBparent
         lrView = New LeftRightView_Basics()
 
         task.desc = "Add color to the 8-bit infrared images."
-        ' task.rank = 1
         label1 = "Left Image"
         label2 = "Right Image"
     End Sub
@@ -138,7 +134,6 @@ Public Class LeftRightView_BRISK : Inherits VBparent
     Dim brisk As BRISK_Basics
     Public Sub New()
         task.desc = "Add color to the 8-bit infrared images."
-		' task.rank = 1
         label1 = "Infrared Left Image"
         label2 = "Infrared Right Image"
 
@@ -178,7 +173,6 @@ Public Class LeftRightView_BrightnessContrast : Inherits VBparent
         label1 = "Left View"
         label2 = "Right View"
         task.desc = "Enhance the left/right views with brightness and contrast."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         dst1 = task.leftView.ConvertScaleAbs(sliders.trackbar(0).Value / 500, sliders.trackbar(1).Value)

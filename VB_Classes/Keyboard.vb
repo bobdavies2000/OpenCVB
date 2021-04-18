@@ -8,7 +8,6 @@ Public Class Keyboard_Basics : Inherits VBparent
         checkKeys.Setup(caller)
         label1 = "Use the Options form to send in keystrokes"
         task.desc = "Test the keyboard interface available to all algorithms"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         keyInput = New List(Of String)(checkKeys.inputText)

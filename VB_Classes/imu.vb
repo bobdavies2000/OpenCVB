@@ -13,7 +13,6 @@ Public Class IMU_Basics : Inherits VBparent
         flow = New Font_FlowText()
 
         task.desc = "Read and display the IMU coordinates"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim alpha As Double = sliders.trackbar(0).Value / 1000
@@ -62,7 +61,6 @@ Public Class IMU_Stabilizer : Inherits VBparent
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(3 - 1)
         task.desc = "Stabilize the image with the IMU data."
-		' task.rank = 1
         label1 = "IMU Stabilize (Move Camera + Select Kalman)"
         label2 = "Difference from Color Image"
     End Sub
@@ -114,7 +112,6 @@ Public Class IMU_Magnetometer : Inherits VBparent
         plot.minScale = -10
 
         task.desc = "Get the IMU_Magnetometer values from the IMU (if available)"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If task.IMU_Magnetometer = New cv.Point3f Then
@@ -137,7 +134,6 @@ End Class
 Public Class IMU_Barometer : Inherits VBparent
     Public Sub New()
         task.desc = "Get the barometric pressure from the IMU (if available)"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If task.IMU_Barometer = 0 Then
@@ -155,7 +151,6 @@ End Class
 Public Class IMU_Temperature : Inherits VBparent
     Public Sub New()
         task.desc = "Get the temperature of the IMU (if available)"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         task.trueText("IMU Temperature is " + Format(task.IMU_Temperature, "#0.00") + " degrees Celsius." + vbCrLf +
@@ -185,7 +180,6 @@ Public Class IMU_FrameTime : Inherits VBparent
         End If
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         task.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static IMUanchor As Integer = task.IMU_FrameTime
@@ -282,7 +276,6 @@ Public Class IMU_HostFrameTimes : Inherits VBparent
         End If
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         task.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         Static CPUanchor As Integer = task.CPU_FrameTime
@@ -367,7 +360,6 @@ Public Class IMU_TotalDelay : Inherits VBparent
         label1 = "Timing data - total (white) right image"
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         task.desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         host.Run(src)
@@ -444,7 +436,6 @@ Public Class IMU_GVector : Inherits VBparent
         End If
 
         task.desc = "Find the angle of tilt for the camera with respect to gravity."
-        ' task.rank = 5
     End Sub
     Public Sub Run(src As cv.Mat)
         Dim gx = task.IMU_Acceleration.X
@@ -531,7 +522,6 @@ Public Class IMU_isCameraLevel : Inherits VBparent
             sliders.setupTrackBar(0, "Threshold in degrees X10", 1, 100, 20) ' default is 20 which is 2 degrees from 0...
         End If
         task.desc = "Answer the question: Is the camera level?"
-        ' task.rank = 3
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim gx = task.IMU_Acceleration.X
@@ -569,7 +559,6 @@ Public Class IMU_IscameraStable : Inherits VBparent
         task.callTrace.Clear() ' special line to clear the tree view otherwise this common option is standalone.
         standalone = False
         task.desc = "Answer the question: Is the camera stable?"
-        ' task.rank = 3
     End Sub
     Public Sub Run(src as cv.Mat)
 

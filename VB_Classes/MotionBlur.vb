@@ -9,7 +9,6 @@ Public Class MotionBlur_Basics : Inherits VBparent
             sliders.setupTrackBar(1, "Motion Blur Angle", -90, 90, 0)
         End If
         task.desc = "Use Filter2D to create a motion blur"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If standalone or task.intermediateReview = caller Then
@@ -132,7 +131,6 @@ Public Class MotionBlur_Deblur : Inherits VBparent
         End If
 
         task.desc = "Deblur a motion blurred image"
-		' task.rank = 1
         label1 = "Blurred Image Input"
         label2 = "Deblurred Image Output"
     End Sub

@@ -52,7 +52,6 @@ Public Class Draw_Noise : Inherits VBparent
             sliders.setupTrackBar(1, "Noise Width", 1, 10, 3)
         End If
         task.desc = "Add Noise to the color image"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         maxNoiseWidth = sliders.trackbar(1).Value
@@ -98,7 +97,6 @@ Public Class Draw_Options : Inherits VBparent
         End If
 
         task.desc = "Show the options for the draw algorithms"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         Static countSlider = findSlider("DrawCount")
@@ -126,7 +124,6 @@ Public Class Draw_Ellipses : Inherits VBparent
     Public Sub New()
         optDraw = New Draw_Options
         task.desc = "Draw the requested number of ellipses."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         optDraw.Run(Nothing)
@@ -150,7 +147,6 @@ Public Class Draw_Circles : Inherits VBparent
     Public Sub New()
         optDraw = New Draw_Options
         task.desc = "Draw the requested number of circles."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         optDraw.Run(Nothing)
@@ -173,7 +169,6 @@ Public Class Draw_Line : Inherits VBparent
     Public Sub New()
         optDraw = New Draw_Options
         task.desc = "Draw the requested number of Lines."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         optDraw.Run(Nothing)
@@ -195,7 +190,6 @@ Public Class Draw_Polygon : Inherits VBparent
     Public Sub New()
         optDraw = New Draw_Options
         task.desc = "Draw Polygon figures"
-        ' task.rank = 1
         label2 = "Convex Hull for the same polygon"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -242,7 +236,6 @@ End Class
 Public Class Draw_Shapes : Inherits VBparent
     Public Sub New()
         task.desc = "Use RNG to draw the same set of shapes every time"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim offsetX = 50, offsetY = 25, lineLength = 50, thickness = 2
@@ -298,7 +291,6 @@ Public Class Draw_SymmetricalShapes : Inherits VBparent
             check.Box(4).Checked = True
         End If
         task.desc = "Generate shapes programmatically"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static rotateAngle As Single = 0
@@ -387,7 +379,6 @@ Public Class Draw_Arc : Inherits VBparent
         setup()
 
         task.desc = "Use OpenCV's ellipse function to draw an arc"
-		' task.rank = 1
     End Sub
     Private Sub setup()
         saveMargin = sliders.trackbar(0).Value ' work in the middle of the image.
@@ -447,7 +438,6 @@ Public Class Draw_ViewObjects : Inherits VBparent
             check.Box(0).Checked = True
         End If
         task.desc = "Draw rectangles and centroids"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If standalone Or task.intermediateReview = caller Then
@@ -494,7 +484,6 @@ Public Class Draw_Frustrum : Inherits VBparent
 
         label2 = "Frustrum data prepared for 3D display - 32FC3"
         task.desc = "Draw a frustrum for a camera viewport"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         dst1 = New cv.Mat(task.pointCloud.Height, task.pointCloud.Height, cv.MatType.CV_32F, 0)
@@ -535,7 +524,6 @@ Public Class Draw_ClipLine : Inherits VBparent
         setup()
 
         task.desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         dst2 = src
@@ -580,7 +568,6 @@ Public Class Draw_Intersection : Inherits VBparent
     Public intersectionPoint As cv.Point2f
     Public Sub New()
         task.desc = "Determine if 2 lines intersect"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If standalone Or task.intermediateReview = caller Then
@@ -630,7 +617,6 @@ Public Class Draw_Hexagon : Inherits VBparent
         alpha.Size = New System.Drawing.Size(dst1.Width + 10, dst1.Height + 10)
         alpha.Text = "Perception is the key"
         task.desc = "What it means to recognize a cube.  Zygmunt Pizlo - UC Irvine"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
     End Sub

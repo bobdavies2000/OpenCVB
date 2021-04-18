@@ -6,7 +6,6 @@ Public Class Gradient_Basics : Inherits VBparent
         sobel = New Edges_Sobel()
         label2 = "Phase Output"
         task.desc = "Use phase to compute gradient"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         sobel.Run(src)
@@ -26,7 +25,6 @@ Public Class Gradient_Depth : Inherits VBparent
     Public Sub New()
         sobel = New Edges_Sobel()
         task.desc = "Use phase to compute gradient on depth image"
-		' task.rank = 1
         label2 = "Phase Output"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -63,7 +61,6 @@ Public Class Gradient_CartToPolar : Inherits VBparent
         label1 = "CartToPolar Magnitude Output Normalized"
         label2 = "CartToPolar Angle Output"
         task.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim tmp As New cv.Mat
@@ -101,7 +98,6 @@ Public Class Gradient_StableDepth : Inherits VBparent
         label1 = "Stable depth input to Gradient"
         label2 = "Phase component of the gradient output"
         task.desc = "Use the stable depth as input to get a map of the phase of the gradient in the depth data."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 

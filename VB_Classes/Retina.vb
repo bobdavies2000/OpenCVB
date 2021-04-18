@@ -35,7 +35,6 @@ Public Class Retina_Basics_CPP : Inherits VBparent
         label1 = "Retina Parvo"
         label2 = "Retina Magno"
         task.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If check.Box(1).Checked Then
@@ -96,7 +95,6 @@ Public Class Retina_Depth : Inherits VBparent
         retina = New Retina_Basics_CPP()
 
         task.desc = "Use the bio-inspired retina algorithm with the depth data."
-		' task.rank = 1
         label1 = "Last result || current result"
         label2 = "Current depth motion result"
     End Sub

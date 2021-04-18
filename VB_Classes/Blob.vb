@@ -10,7 +10,6 @@ Public Class Blob_Basics : Inherits VBparent
         If standalone Then input = New Blob_Input()
 
         task.desc = "Isolate and list blobs with specified options"
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         options.Run(src)
@@ -61,7 +60,6 @@ Public Class Blob_Options : Inherits VBparent
             sliders.setupTrackBar(2, "Threshold Step", 1, 50, 5)
         End If
         task.desc = "Prepare options for a blob detection run."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         blobParams = New cv.SimpleBlobDetector.Params
@@ -120,7 +118,6 @@ Public Class Blob_Input : Inherits VBparent
         label1 = "Click any quadrant below to view it on the right"
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Generate data to test Blob Detector."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src As cv.Mat)
         If task.frameCount Mod updateFrequency = 0 Then
@@ -154,7 +151,6 @@ Public Class Blob_RenderBlobs : Inherits VBparent
         label1 = "Input blobs"
         label2 = "Largest blob, centroid in yellow"
         task.desc = "Use connected components to find blobs."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If task.frameCount Mod input.updateFrequency = 0 Then
@@ -322,7 +318,6 @@ Public Class Blob_Largest : Inherits VBparent
     Public Sub New()
         blobs = New Blob_DepthRanges()
         task.desc = "Gather all the blob data and display the largest."
-        ' task.rank = 3
     End Sub
     Public Sub Run(src as cv.Mat)
         blobs.Run(src)

@@ -20,7 +20,6 @@ Public Class FitEllipse_Basics_CPP : Inherits VBparent
 
         label1 = "Green FitEllipse, Yellow=AMS, Red=Direct"
         task.desc = "Use FitEllipse to draw around a set of points"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         area.Run(src)  ' get some random clusters of points

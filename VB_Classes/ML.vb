@@ -72,7 +72,6 @@ Public Class ML_FillRGBDepth_MT : Inherits VBparent
         label1 = "ML filled shadow"
         label2 = ""
         task.desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         shadow.Run(src)
@@ -106,7 +105,6 @@ Public Class ML_FillRGBDepth : Inherits VBparent
 
         label2 = "ML filled shadow"
         task.desc = "Predict depth based on color and display colorized depth to confirm correctness of model."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         shadow.Run(src)
@@ -142,7 +140,6 @@ Public Class ML_DepthFromColor_MT : Inherits VBparent
         label1 = "Predicted Depth"
         label2 = "Mask of color and depth input"
         task.desc = "Use RGB, X, and Y to predict depth across the entire image, maxDepth = slider value."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         grid.Run(Nothing)
@@ -205,7 +202,6 @@ Public Class ML_DepthFromColor : Inherits VBparent
 
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         shadow.Run(src)
@@ -282,7 +278,6 @@ Public Class ML_DepthFromXYColor : Inherits VBparent
 
         label1 = "Predicted Depth"
         task.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         shadow.Run(src)
@@ -377,7 +372,6 @@ Public Class ML_EdgeDepth_MT : Inherits VBparent
         label1 = "Depth Shadow (inverse of color and depth)"
         label2 = "Predicted Depth"
         task.desc = "Use RGB to predict depth near edges."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         grid.Run(Nothing)

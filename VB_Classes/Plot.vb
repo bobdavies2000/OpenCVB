@@ -14,7 +14,6 @@ Public Class Plot_Basics : Inherits VBparent
         label1 = "Plot of grayscale histogram"
         label2 = "Same Data but using OpenCV C++ plot"
         task.desc = "Plot data provided in src Mat"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         hist.plotColors(0) = cv.Scalar.White
@@ -42,7 +41,6 @@ Public Class Plot_Basics_CPP : Inherits VBparent
     Public srcY() As Double
     Public Sub New()
         task.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -112,7 +110,6 @@ Public Class Plot_OverTime : Inherits VBparent
             sliders.setupTrackBar(1, "Plot Pixel Width", 1, 40, 4)
         End If
         task.desc = "Plot an input variable over time"
-		' task.rank = 1
         myStopWatch = Stopwatch.StartNew()
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -208,7 +205,6 @@ Public Class Plot_Histogram : Inherits VBparent
     Public fixedMaxVal As Integer
     Public Sub New()
         task.desc = "Plot histogram data with a stable scale at the left of the image."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         If standalone or task.intermediateReview = caller Then
@@ -289,7 +285,6 @@ Public Class Plot_Depth : Inherits VBparent
         hist = New Histogram_Depth()
         plot = New Plot_Basics_CPP()
         task.desc = "Show depth using OpenCV's plot format with variable bins."
-        ' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         hist.Run(src)

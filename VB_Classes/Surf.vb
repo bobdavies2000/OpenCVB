@@ -24,7 +24,6 @@ Public Class Surf_Basics : Inherits VBparent
         End If
 
         task.desc = "Compare 2 images to get a homography.  We will use left and right images."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         srcLeft = task.leftView
@@ -52,7 +51,6 @@ Public Class Surf_BasicsVB : Inherits VBparent
         fisheye = New FishEye_Rectified()
         surf = New Surf_Basics()
         task.desc = "Use left and right views to match points in horizontal slices."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         surf.Run(src)
@@ -77,7 +75,6 @@ Public Class Surf_DrawMatchManual_CS : Inherits VBparent
             sliders.setupTrackBar(0, "Surf Vertical Range to Search", 0, 50, 10)
         End If
         task.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         surf.Run(src)

@@ -88,7 +88,6 @@ Public Class Replay_Record : Inherits VBparent
         fileNameForm.Show()
 
         task.desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static bytesTotal As Int64
@@ -180,7 +179,6 @@ Public Class Replay_Play : Inherits VBparent
         fileNameForm.Show()
 
         task.desc = "Playback a file recorded by OpenCVB"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         Static bytesTotal As Int64
@@ -262,7 +260,6 @@ Public Class Replay_OpenGL : Inherits VBparent
         ogl = New OpenGL_Callbacks()
         replay = New Replay_Play()
         task.desc = "Replay a recorded session with OpenGL"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         replay.Run(src)

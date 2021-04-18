@@ -16,7 +16,6 @@ Public Class Voxels_Basics_MT : Inherits VBparent
 
         label2 = "Voxels labeled with their median distance"
         task.desc = "Use multi-threading to get median depth values as voxels."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 

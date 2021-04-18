@@ -20,7 +20,6 @@ Public Class Sift_Basics : Inherits VBparent
             sliders.setupTrackBar(0, "Points to Match", 1, 1000, 200)
         End If
         task.desc = "Compare 2 images to get a homography.  We will use left and right images."
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
 
@@ -63,7 +62,6 @@ Public Class Sift_Basics_MT : Inherits VBparent
         numPointSlider.Value = 1
 
         task.desc = "Compare 2 images to get a homography.  We will use left and right images - needs more work"
-		' task.rank = 1
     End Sub
     Public Sub Run(src as cv.Mat)
         grid.Run(Nothing)

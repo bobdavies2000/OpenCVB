@@ -50,7 +50,6 @@ Public Class Smoothing_Exterior : Inherits VBparent
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
 		task.desc = "Smoothing the line connecting a series of points."
-		' task.rank = 1
 	End Sub
 	Public Sub Run(src as cv.Mat)
 		smOptions.Run(Nothing)
@@ -128,7 +127,6 @@ Public Class Smoothing_Interior : Inherits VBparent
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
 		task.desc = "Smoothing the line connecting a series of points staying inside the outline."
-		' task.rank = 1
 	End Sub
 	Public Sub Run(src As cv.Mat)
 		smOptions.Run(Nothing)
@@ -170,7 +168,6 @@ Public Class Smoothing_Options : Inherits VBparent
 
 		label1 = "No output - just options for smoothing..."
 		task.desc = "Options for smoothing operations."
-		' task.rank = 1
 	End Sub
 	Public Sub Run(src As cv.Mat)
 		Static iterSlider = findSlider("Smoothing iterations")
@@ -207,7 +204,6 @@ Public Class Smoothing_Contours : Inherits VBparent
 		End If
 
 		task.desc = "Use Smoothing exterior or interior to get a smoother representation of a contour"
-		' task.rank = 3
 	End Sub
 	Public Sub Run(src As cv.Mat)
 		smOptions.Run(Nothing)

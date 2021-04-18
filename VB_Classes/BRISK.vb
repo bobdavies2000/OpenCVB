@@ -8,7 +8,6 @@ Public Class BRISK_Basics : Inherits VBparent
             sliders.setupTrackBar(0, "BRISK Radius Threshold", 1, 100, 50)
         End If
         task.desc = "Detect features with BRISK"
-		' task.rank = 1
         Brisk = cv.BRISK.Create()
     End Sub
     Public Sub Run(src as cv.Mat)
