@@ -2,10 +2,13 @@ Imports cv = OpenCvSharp
 Public Class TimeView_Basics : Inherits VBparent
     Public sideView As Histogram_SideView2D
     Public topView As Histogram_TopView2D
+    Dim sideSetup As PointCloud_SetupSide
+    Dim topSetup As PointCloud_SetupTop
     Public Sub New()
-
         sideView = New Histogram_SideView2D
+        sideSetup = New PointCloud_SetupSide
         topView = New Histogram_TopView2D
+        topSetup = New PointCloud_SetupTop
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -16,17 +19,18 @@ Public Class TimeView_Basics : Inherits VBparent
         task.desc = "TimeView that highlights concentrations of depth pixels"
     End Sub
     Public Sub Run(src as cv.Mat)
-
         Static sideFrames As New List(Of cv.Mat)
         Static topFrames As New List(Of cv.Mat)
         Static saveFrameCount As Integer
         Static frameSlider = findSlider("Number of frames to include")
+        Static sideAccum As New cv.Mat(src.Size, cv.MatType.CV_32FC1)
+        Static topAccum As New cv.Mat(src.Size, cv.MatType.CV_32FC1)
         If saveFrameCount <> frameSlider.value Then
             saveFrameCount = frameSlider.value
             sideFrames.Clear()
             topFrames.Clear()
-            dst1.SetTo(0)
-            dst2.SetTo(0)
+            sideAccum.SetTo(0)
+            topAccum.SetTo(0)
         End If
 
         sideView.Run(src)
@@ -36,15 +40,19 @@ Public Class TimeView_Basics : Inherits VBparent
         topView.Run(src)
         topFrames.Add(topView.originalHistOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary))
 
-        dst1 = dst1.Add(sideFrames.ElementAt(sideFrames.Count - 1))
-        dst2 = dst2.Add(topFrames.ElementAt(sideFrames.Count - 1))
+        sideAccum = sideAccum.Add(sideFrames.ElementAt(sideFrames.Count - 1))
+        sideSetup.Run(sideAccum.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+        dst1 = sideSetup.dst1
+        topAccum = topAccum.Add(topFrames.ElementAt(sideFrames.Count - 1))
+        topSetup.Run(topAccum.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+        dst2 = topSetup.dst1
 
         label1 = "Accum " + CStr(topFrames.Count) + " side frames with hist threshold > " + CStr(task.hist3DThreshold)
         label2 = "Accum " + CStr(topFrames.Count) + " top frames with hist threshold > " + CStr(task.hist3DThreshold)
 
         If sideFrames.Count >= saveFrameCount Then
-            dst1 = dst1.Subtract(sideFrames.ElementAt(0))
-            dst2 = dst2.Subtract(topFrames.ElementAt(0))
+            sideAccum = sideAccum.Subtract(sideFrames.ElementAt(0))
+            topAccum = topAccum.Subtract(topFrames.ElementAt(0))
             sideFrames.RemoveAt(0)
             topFrames.RemoveAt(0)
         End If
@@ -65,7 +73,6 @@ Public Class TimeView_TopBackProjection : Inherits VBparent
         task.desc = "Backproject the side and top views into the image view"
     End Sub
     Public Sub Run(src as cv.Mat)
-
         tFlood.Run(src)
         dst2 = tFlood.dst2
 
@@ -82,8 +89,8 @@ Public Class TimeView_TopBackProjection : Inherits VBparent
                     Dim minDepth = task.maxZ * r.X / dst2.Width
                     Dim maxDepth = task.maxZ * (r.X + r.Width) / dst2.Width
 
-                    Dim minHeight = task.maxZ - task.maxZ * (r.Y + r.Height) / dst2.Height - task.sideFrustrumAdjust
-                    Dim maxHeight = task.maxZ - task.maxZ * r.Y / dst2.Height - task.sideFrustrumAdjust
+                    Dim minHeight = task.maxZ - task.maxZ * (r.Y + r.Height) / dst2.Height - task.maxY
+                    Dim maxHeight = task.maxZ - task.maxZ * r.Y / dst2.Height - task.maxY
 
                     Dim mask32f = New cv.Mat
 
@@ -116,7 +123,6 @@ Public Class TimeView_FloodFill : Inherits VBparent
     Public floodTop As FloodFill_Basics
     Public tBasics As TimeView_Basics
     Public Sub New()
-
         floodSide = New FloodFill_Basics
         floodTop = New FloodFill_Basics
         findSlider("FloodFill Minimum Size").Value = 10
@@ -158,7 +164,6 @@ Public Class TimeView_Centroids : Inherits VBparent
         task.desc = "Use KNN to track the query points"
     End Sub
     Public Sub Run(src as cv.Mat)
-
         tflood.Run(src)
         dst1 = tflood.dst2
         dst2 = tflood.dst1
@@ -199,7 +204,6 @@ Public Class TimeView_Rectangles : Inherits VBparent
     Dim mOverLap As Rectangle_MultiOverlap
     Public tflood As TimeView_FloodFill
     Public Sub New()
-
         mOverLap = New Rectangle_MultiOverlap
         tflood = New TimeView_FloodFill
 
@@ -208,7 +212,6 @@ Public Class TimeView_Rectangles : Inherits VBparent
         task.desc = "Use KNN to track the query points"
     End Sub
     Public Sub Run(src as cv.Mat)
-
         tflood.Run(src)
         dst1 = tflood.dst2
         dst2 = tflood.dst1
@@ -250,7 +253,6 @@ Public Class TimeView_Frustrum : Inherits VBparent
         task.desc = "Colorize the back and side views"
     End Sub
     Public Sub Run(src as cv.Mat)
-
         tView.Run(src)
         mats.mat(0) = tView.dst1.Clone
         mats.mat(1) = tView.dst2.Clone

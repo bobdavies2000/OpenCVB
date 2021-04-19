@@ -185,12 +185,9 @@ Public Class ActiveTask : Implements IDisposable
 
     Public topCameraPoint As cv.Point
     Public sideCameraPoint As cv.Point
-    Public topFrustrumAdjust As Single
-    Public sideFrustrumAdjust As Single
-
-    Public maxZ As Single
     Public maxX As Single
     Public maxY As Single
+    Public maxZ As Single
 
     Public pixelsPerMeter As Single
     Public hFov As Single

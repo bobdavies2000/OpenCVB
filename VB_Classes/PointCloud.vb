@@ -255,7 +255,7 @@ Public Class PointCloud_SetupSide : Inherits VBparent
         Dim distanceRatio As Single = 1
         Dim fsize = task.fontSize * 1.5
 
-        dst1.SetTo(0)
+        If standalone Then dst1.SetTo(0) Else src.CopyTo(dst1)
         dst1.Circle(task.sideCameraPoint, task.dotSize, cv.Scalar.BlueViolet, -1, task.lineType)
         For i = 1 To task.maxZ
             Dim xmeter = CInt(dst1.Width * i / task.maxZ * distanceRatio)
@@ -344,7 +344,7 @@ Public Class PointCloud_SetupTop : Inherits VBparent
     Public Sub Run(src As cv.Mat)
         Dim distanceRatio As Single = 1
         Dim fsize = task.fontSize * 1.5
-        dst1.SetTo(0)
+        If standalone Then dst1.SetTo(0) Else src.CopyTo(dst1)
         dst1.Circle(task.topCameraPoint, task.dotSize, cv.Scalar.BlueViolet, -1, task.lineType)
         For i = 1 To task.maxZ
             Dim ymeter = CInt(dst1.Height - dst1.Height * i / (task.maxZ * distanceRatio))
@@ -395,6 +395,9 @@ Public Class PointCloud_SetupTop : Inherits VBparent
         dst1.Line(task.topCameraPoint, fovRight, cv.Scalar.White, 1, task.lineType)
     End Sub
 End Class
+
+
+
 
 
 
@@ -635,7 +638,6 @@ Public Class PointCloud_FrustrumTop : Inherits VBparent
     Dim topView As Histogram_TopView2D
     Dim cmat As PointCloud_SetupTop
     Public Sub New()
-
         cmat = New PointCloud_SetupTop
         frustrum = New Draw_Frustrum
         topView = New Histogram_TopView2D
@@ -651,11 +653,10 @@ Public Class PointCloud_FrustrumTop : Inherits VBparent
         task.desc = "Translate only the frustrum with gravity"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         frustrum.Run(src)
         topView.Run(frustrum.dst2)
 
-        cmat.Run(topView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+        cmat.Run(topView.dst1)
         dst1 = cmat.dst1
     End Sub
 End Class
@@ -672,7 +673,6 @@ Public Class PointCloud_FrustrumSide : Inherits VBparent
     Dim sideView As Histogram_SideView2D
     Dim cmat As PointCloud_SetupSide
     Public Sub New()
-
         cmat = New PointCloud_SetupSide
         frustrum = New Draw_Frustrum
         sideView = New Histogram_SideView2D
@@ -688,11 +688,10 @@ Public Class PointCloud_FrustrumSide : Inherits VBparent
         task.desc = "Translate only the frustrum with gravity"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         frustrum.Run(src)
         sideView.Run(frustrum.dst2)
 
-        cmat.Run(sideView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+        cmat.Run(sideView.dst1)
         dst1 = cmat.dst1
     End Sub
 End Class
@@ -727,7 +726,7 @@ Public Class PointCloud_ReducedSideView : Inherits VBparent
         split(2) *= 0.001
         cv.Cv2.Merge(split, dst2)
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.sideFrustrumAdjust, task.sideFrustrumAdjust), New cv.Rangef(0, task.maxZ)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.maxY, task.maxY), New cv.Rangef(0, task.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         cv.Cv2.CalcHist(New cv.Mat() {dst2}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
 
@@ -763,7 +762,7 @@ Public Class PointCloud_ReducedTopView : Inherits VBparent
         split(2) *= 0.001
         cv.Cv2.Merge(split, dst2)
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(-task.topFrustrumAdjust, task.topFrustrumAdjust)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(-task.maxX, task.maxX)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         cv.Cv2.CalcHist(New cv.Mat() {dst2}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
 
@@ -1158,8 +1157,8 @@ Public Class PointCloud_BackProjectTopView : Inherits VBparent
                     Dim minDepth = task.maxZ - task.maxZ * (r.Y + r.Height) / dst2.Height
                     Dim maxDepth = task.maxZ - task.maxZ * r.Y / dst2.Height
 
-                    Dim minWidth = task.maxZ * r.X / dst2.Width - task.sideFrustrumAdjust
-                    Dim maxWidth = task.maxZ * (r.X + r.Width) / dst2.Width - task.sideFrustrumAdjust
+                    Dim minWidth = task.maxZ * r.X / dst2.Width - task.maxY
+                    Dim maxWidth = task.maxZ * (r.X + r.Width) / dst2.Width - task.maxY
 
                     Dim mask32f = New cv.Mat
 
@@ -1219,8 +1218,8 @@ Public Class PointCloud_BackProjectSideView : Inherits VBparent
                     Dim minDepth = task.maxZ * r.X / dst2.Width
                     Dim maxDepth = task.maxZ * (r.X + r.Width) / dst2.Width
 
-                    Dim minHeight = task.maxZ - task.maxZ * (r.Y + r.Height) / dst2.Height - task.sideFrustrumAdjust
-                    Dim maxHeight = task.maxZ - task.maxZ * r.Y / dst2.Height - task.sideFrustrumAdjust
+                    Dim minHeight = task.maxZ - task.maxZ * (r.Y + r.Height) / dst2.Height - task.maxY
+                    Dim maxHeight = task.maxZ - task.maxZ * r.Y / dst2.Height - task.maxY
 
                     Dim mask32f = New cv.Mat
 

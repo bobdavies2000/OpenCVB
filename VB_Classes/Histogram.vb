@@ -603,7 +603,7 @@ Public Class Histogram_SmoothTopView2D : Inherits VBparent
 
         stable.Run(topView.gCloud.dst1)
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(-task.topFrustrumAdjust, task.topFrustrumAdjust)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(-task.maxX, task.maxX)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         cv.Cv2.CalcHist(New cv.Mat() {stable.dst2}, New Integer() {2, 0}, New cv.Mat, topView.histOutput, 2, histSize, ranges)
 
@@ -642,7 +642,7 @@ Public Class Histogram_SmoothSideView2D : Inherits VBparent
 
         stable.Run(sideView.gCloud.dst1)
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.sideFrustrumAdjust, task.sideFrustrumAdjust), New cv.Rangef(0, task.maxZ)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.maxY, task.maxY), New cv.Rangef(0, task.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         cv.Cv2.CalcHist(New cv.Mat() {stable.dst2}, New Integer() {1, 2}, New cv.Mat, sideView.histOutput, 2, histSize, ranges)
 
@@ -710,7 +710,7 @@ Public Class Histogram_TopView2D : Inherits VBparent
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
         gCloud.Run(src) ' when displaying both top and side views, the gcloud run has already been done.
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(-task.topFrustrumAdjust, task.topFrustrumAdjust)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(-task.maxX, task.maxX)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {2, 0}, New cv.Mat, originalHistOutput, 2, histSize, ranges)
@@ -751,7 +751,7 @@ Public Class Histogram_SideView2D : Inherits VBparent
     Public Sub Run(src As cv.Mat)
         gCloud.Run(src)
 
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.sideFrustrumAdjust, task.sideFrustrumAdjust), New cv.Rangef(0, task.maxZ)}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.maxY, task.maxY), New cv.Rangef(0, task.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
         If resizeHistOutput Then histSize = {dst2.Height, dst2.Width}
         cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {1, 2}, New cv.Mat, originalHistOutput, 2, histSize, ranges)
@@ -1081,44 +1081,40 @@ Public Class Histogram_Frustrum : Inherits VBparent
     Dim topFrustrumSlider As Windows.Forms.TrackBar
     Dim cameraXSlider As Windows.Forms.TrackBar
     Dim cameraYSlider As Windows.Forms.TrackBar
-    Dim top2d As Histogram_TopView2D
-    Dim side2d As Histogram_SideView2D
+    Dim tView As TimeView_Basics
     Public Sub New()
-
-        top2d = New Histogram_TopView2D
-        side2d = New Histogram_SideView2D
+        tView = New TimeView_Basics
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 200, 57)
-            sliders.setupTrackBar(1, "TopView Frustrum adjustment", 1, 200, 57)
-            sliders.setupTrackBar(2, "TopCameraPoint adjustment", -10, 10, 0)
-            sliders.setupTrackBar(3, "SideCameraPoint adjustment", -100, 100, 0)
+            sliders.setupTrackBar(1, "SideCameraPoint adjustment", -100, 100, 0)
+            sliders.setupTrackBar(2, "TopView Frustrum adjustment", 1, 200, 57)
+            sliders.setupTrackBar(3, "TopCameraPoint adjustment", -10, 10, 0)
         End If
 
+        findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ").Checked = False
+        findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX").Checked = False
         sideFrustrumSlider = findSlider("SideView Frustrum adjustment")
         topFrustrumSlider = findSlider("TopView Frustrum adjustment")
         cameraXSlider = findSlider("TopCameraPoint adjustment")
         cameraYSlider = findSlider("SideCameraPoint adjustment")
 
-        sideFrustrumSlider.Value = 100 * 2 * task.sideFrustrumAdjust / task.maxZ
-        topFrustrumSlider.Value = 100 * 2 * task.topFrustrumAdjust / task.maxZ
+        sideFrustrumSlider.Value = 100 * 2 * task.maxY / task.maxZ
+        topFrustrumSlider.Value = 100 * 2 * task.maxX / task.maxZ
         cameraXSlider.Value = task.topCameraPoint.X - dst1.Width / 2
         cameraYSlider.Value = task.sideCameraPoint.Y - dst1.Height / 2
         task.desc = "The global options for the side and top view.  See OptionCommon_Histogram to make settings permanent."
     End Sub
     Public Sub Run(src As cv.Mat)
-
-        top2d.Run(src)
-        dst1 = top2d.dst2
-
-        side2d.Run(src)
-        dst2 = side2d.dst2
-
-        task.sideFrustrumAdjust = task.maxZ * sideFrustrumSlider.Value / 100 / 2
-        task.topFrustrumAdjust = task.maxZ * topFrustrumSlider.Value / 100 / 2
+        task.maxX = task.maxZ * topFrustrumSlider.Value / 100 / 2
+        task.maxY = task.maxZ * sideFrustrumSlider.Value / 100 / 2
         task.sideCameraPoint = New cv.Point(0, CInt(src.Height / 2 + cameraYSlider.Value))
         task.topCameraPoint = New cv.Point(CInt(src.Width / 2 + cameraXSlider.Value), CInt(src.Height))
+
+        tView.Run(src)
+        dst1 = tView.dst1
+        dst2 = tView.dst2
 
         If standalone Then
             task.trueText("This algorithm was created to tune the frustrum and camera locations." + vbCrLf +

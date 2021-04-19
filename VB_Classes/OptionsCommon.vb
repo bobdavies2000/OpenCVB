@@ -8,22 +8,6 @@ Public Class OptionsCommon : Inherits VBparent
         gOptions = New OptionsGlobal
         gOptions.Show()
 
-        ' create a palette gradient
-        'Dim color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-        'Dim color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-        'task.paletteGradient = New cv.Mat()
-        'Dim gradientColors As New cv.Mat(task.paletteGradient.Rows, 1, cv.MatType.CV_64FC3)
-        'Dim f As Double = 1.0
-        'For i = 0 To task.paletteGradient.Rows - 1
-        '    gradientColors.Set(Of cv.Scalar)(i, 0, New cv.Scalar(f * color2(0) + (1 - f) * color1(0), f * color2(1) + (1 - f) * color1(1),
-        '                                                         f * color2(2) + (1 - f) * color1(2)))
-        '    f -= 1 / dst1.Rows
-        'Next
-
-        'For i = 0 To dst1.Rows - 1
-        '    dst1.Row(i).SetTo(gradientColors.Get(Of cv.Scalar)(i))
-        'Next
-
         task.palette = New Palette_Basics
         task.cameraStableSlider = gOptions.IMUmotionSlider
         task.histogramBins = gOptions.HistBinSlider.Value
@@ -47,8 +31,6 @@ Public Class OptionsCommon : Inherits VBparent
         If task.minDepth >= task.maxDepth Then task.maxDepth = task.minDepth + 1
 
         task.maxZ = task.maxDepth / 1000
-        task.maxX = task.maxZ * dst1.Width / dst1.Height / 2
-        task.maxY = task.maxZ * dst1.Height / dst1.Width / 2
     End Sub
     Public Sub Run(src As cv.Mat)
         updateSettings()
@@ -108,10 +90,10 @@ Public Class OptionsCommon_Histogram : Inherits VBparent
                 cameraYSetting = If(task.resolutionIndex = 3, -8, -3)
             Case VB_Classes.ActiveTask.algParms.camNames.D435i
                 If dst1.Width = 640 Then
-                    sideFrustrumSetting = 75
+                    sideFrustrumSetting = 76
                     topFrustrumSetting = 101
-                    cameraXSetting = 0
-                    cameraYSetting = 0
+                    cameraXSetting = -3
+                    cameraYSetting = 2
                 Else
                     sideFrustrumSetting = 57
                     topFrustrumSetting = 175
@@ -120,22 +102,23 @@ Public Class OptionsCommon_Histogram : Inherits VBparent
                 End If
             Case VB_Classes.ActiveTask.algParms.camNames.D455
                 If dst1.Width = 640 Then
-                    sideFrustrumSetting = 86
-                    topFrustrumSetting = 113
-                    cameraXSetting = 1
+                    sideFrustrumSetting = 84
+                    topFrustrumSetting = 108
+                    cameraXSetting = 3
                     cameraYSetting = -1
                 Else
                     sideFrustrumSetting = 58
-                    topFrustrumSetting = 184
+                    topFrustrumSetting = 174
                     cameraXSetting = 0
                     cameraYSetting = -3
                 End If
         End Select
 
-        task.sideFrustrumAdjust = task.maxZ * sideFrustrumSetting / 100 / 2
-        task.topFrustrumAdjust = task.maxZ * topFrustrumSetting / 100 / 2
+        task.maxY = task.maxZ * sideFrustrumSetting / 100 / 2
+        task.maxX = task.maxZ * topFrustrumSetting / 100 / 2
         task.sideCameraPoint = New cv.Point(0, CInt(dst1.Height / 2 + cameraYSetting))
         task.topCameraPoint = New cv.Point(CInt(dst1.Width / 2 + cameraXSetting), CInt(dst1.Height))
+
         task.desc = "The options for the side view are shared with this algorithm"
     End Sub
     Public Sub Run(src as cv.Mat)
