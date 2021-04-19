@@ -21,7 +21,7 @@ Public Class InPaint_Basics : Inherits VBparent
     Public Sub Run(src as cv.Mat)
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
 
-        If task.frameCount Mod 100 Then Exit Sub
+        If task.frameCount Mod 30 Then Exit Sub
         src.CopyTo(dst1)
         Dim p1 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
         Dim p2 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
@@ -33,6 +33,9 @@ Public Class InPaint_Basics : Inherits VBparent
         cv.Cv2.Inpaint(dst1, mask, dst2, thickness, inPaintFlag)
     End Sub
 End Class
+
+
+
 
 
 
@@ -62,3 +65,19 @@ End Class
 
 
 
+
+
+
+
+Public Class InPaint_Depth : Inherits VBparent
+    Public Sub New()
+        label1 = "32-bit representation of original depth"
+        label2 = "32-bit depth repaired with inpainting"
+        task.desc = "Use Navier-Stokes to fill in the holes in the depth"
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
+        dst1 = src.Clone
+        cv.Cv2.Inpaint(src, task.noDepthMask, dst2, 20, cv.InpaintMethod.NS)
+    End Sub
+End Class
