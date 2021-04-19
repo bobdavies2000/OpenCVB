@@ -37,7 +37,7 @@ Module UIranking
         For i = 0 To apiRank.Count - 1
             apiRank(i) = CInt(apiRank(i) * 10 / maxRank)
         Next
-        ' Console.WriteLine("Max rank OpenCVB algorithm is: " + apiList(apiRank.IndexOf(maxRank))
+
         Dim rankList As String
         Dim sw = New StreamWriter("../../Data/RankList.txt")
         For i = 1 To 9
@@ -49,6 +49,13 @@ Module UIranking
             Next
             If rankList.Contains("IMU_GVector") Then rankList += ",Kalman_Basics" ' kalman_basics is so far ahead of the others.  This clips it.
             If rankList <> "" Then sw.WriteLine("<Rank " + CStr(i) + ">," + rankList)
+        Next
+        sw.Close()
+
+        sw = New StreamWriter("../../Data/OpenCVBKeywords.txt")
+        For i = 0 To apiKeywords.Count - 1
+            Dim split = apiKeywords(i).Split(",")
+            If split.Length > 1 Then sw.WriteLine(apiKeywords(i))
         Next
         sw.Close()
         Console.WriteLine("Read in " + CStr(lines.Count))

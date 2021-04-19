@@ -32,7 +32,6 @@ Module IndexMain
         Dim ExecDir As New DirectoryInfo(My.Application.Info.DirectoryPath)
         ChDir(ExecDir.FullName)
         Dim directoryInfo As New DirectoryInfo(CurDir() + "/../../vb_classes")
-        Dim fileEntries As String() = Directory.GetFiles(directoryInfo.FullName)
         ' Process the list of files found in the directory. 
         Dim sr = New System.IO.StreamReader(directoryInfo.FullName + "\..\Data\FileNames.txt")
         Dim codeFileNames As New List(Of String)
@@ -129,6 +128,11 @@ Module IndexMain
         Dim sortedNames As New SortedList(Of String, String)
         For i = 0 To tokens.Count - 1
             If tokens(i) IsNot Nothing Then
+
+                ' once we hit the first OpenCVB name, we are done because we are going to use the output of the UIranking.exe instead.
+                ' The ranking includes the indirect references while the apilist created above only has the direct references.
+                If apiList(i).StartsWith(nonPYnames.ElementAt(0).Key) Then Exit For
+
                 If apiList(i).EndsWith("(") Then apiList(i) = apiList(i).Substring(0, Len(apiList(i)) - 1)
                 ' sort the tokens before creating the final entry
                 Dim split As String() = Regex.Split(tokens(i), ",")
@@ -143,6 +147,15 @@ Module IndexMain
                 sortedNames.Add(apiList(i), finalEntry)
             End If
         Next
+
+        ' this is where we add the direct and indirect references to the OpenCVKeywords.
+        sr = New StreamReader(directoryInfo.FullName + "\..\Data\OpenCVBKeywords.txt")
+        While sr.EndOfStream = False
+            Dim nextKey = sr.ReadLine()
+            Dim split = nextKey.Split(",")
+            sortedNames.Add(split(0), nextKey)
+        End While
+        sr.Close()
 
         Dim sw As New StreamWriter(directoryInfo.FullName + "/../Data/AlgorithmMapToOpenCV.txt")
         sw.WriteLine("<All>")
@@ -216,6 +229,12 @@ Module IndexMain
             sw.Write("," + PYStreamNames.ElementAt(i).Key)
         Next
         sw.WriteLine()
+
+        sr = New StreamReader(directoryInfo.FullName + "\..\Data\ranklist.txt")
+        While sr.EndOfStream = False
+            sw.WriteLine(sr.ReadLine)
+        End While
+        sr.Close()
 
         'sw.Write("<Trackers>")
         'For i = 0 To Trackers.Count - 1
