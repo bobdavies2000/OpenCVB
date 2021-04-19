@@ -59,7 +59,7 @@
     <ClCompile Include="Voronoi.cpp" />
     <ClCompile Include="WarpModel.cpp" />
     <ClCompile Include="WhiteBalance.cpp" />
-    <ClCompile Include="xPhoto_OilPaint.cpp" />
+    <ClCompile Include="xPhoto.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

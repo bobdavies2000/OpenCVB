@@ -41,3 +41,44 @@ int *xPhoto_OilPaint_Run(xPhoto_OilPaint *xPhoto_OilPaint_Ptr, int *imagePtr, in
 	xPhoto_OilPaint_Ptr->Run(size, dynRatio, colorCode);
     return (int *) xPhoto_OilPaint_Ptr->dst.data; // return this C++ allocated data to managed code where it will be used in the marshal.copy
 }
+
+
+
+
+
+
+class xPhoto_Inpaint
+{
+private:
+public:
+    Mat src, dst;
+    xPhoto_Inpaint() {}
+    void Run(Mat mask, int iType)
+    {
+        dst.setTo(0);
+        //xphoto::inpaint(src, mask, dst, iType);
+    }
+};
+
+extern "C" __declspec(dllexport)
+xPhoto_Inpaint * xPhoto_Inpaint_Open()
+{
+    xPhoto_Inpaint* xPhoto_Inpaint_Ptr = new xPhoto_Inpaint();
+    return xPhoto_Inpaint_Ptr;
+}
+
+extern "C" __declspec(dllexport)
+void xPhoto_Inpaint_Close(xPhoto_Inpaint * xPhoto_Inpaint_Ptr)
+{
+    delete xPhoto_Inpaint_Ptr;
+}
+
+extern "C" __declspec(dllexport)
+int* xPhoto_Inpaint_Run(xPhoto_Inpaint *xPhoto_Inpaint_Ptr, int* imagePtr, int* maskPtr, int rows, int cols, int iType)
+{
+    xPhoto_Inpaint_Ptr->src = Mat(rows, cols, CV_8UC3, imagePtr);
+    xPhoto_Inpaint_Ptr->dst = Mat(rows, cols, CV_8UC3);
+    Mat mask = Mat(rows, cols, CV_8UC1, maskPtr);
+    xPhoto_Inpaint_Ptr->Run(mask, iType);
+    return (int*)xPhoto_Inpaint_Ptr->dst.data; // return this C++ allocated data to managed code where it will be used in the marshal.copy
+}

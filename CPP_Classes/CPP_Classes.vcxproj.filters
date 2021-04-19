@@ -86,7 +86,7 @@
     <ClCompile Include="Retina.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="xPhoto_OilPaint.cpp">
+    <ClCompile Include="xPhoto.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="HMM.cpp">

@@ -3,6 +3,7 @@ Imports cv = OpenCvSharp
 
 ' https://docs.opencv.org/master/df/d3d/tutorial_py_inpainting.html#gsc.tab=0
 Public Class InPaint_Basics : Inherits VBparent
+    Public thickness As Integer
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -18,18 +19,23 @@ Public Class InPaint_Basics : Inherits VBparent
         task.desc = "Create a flaw in an image and then use inPaint to mask it."
         label2 = "Repaired Image"
     End Sub
+    Public Function drawRandomLine(dst As cv.Mat)
+        Static thickSlider = findSlider("Thickness")
+        thickness = thickSlider.value
+        Dim p1 = New cv.Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
+        Dim p2 = New cv.Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
+        dst1.Line(p1, p2, New cv.Scalar(0, 0, 0), thickness, task.lineType)
+        Dim mask = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
+        mask.SetTo(0)
+        mask.Line(p1, p2, cv.Scalar.All(255), thickness, task.lineType)
+        Return mask
+    End Function
     Public Sub Run(src as cv.Mat)
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
 
         If task.frameCount Mod 30 Then Exit Sub
         src.CopyTo(dst1)
-        Dim p1 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
-        Dim p2 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
-        Dim thickness = sliders.trackbar(0).Value
-        dst1.Line(p1, p2, New cv.Scalar(0, 0, 0), thickness, task.lineType)
-        Dim mask = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
-        mask.SetTo(0)
-        mask.Line(p1, p2, cv.Scalar.All(255), thickness, task.lineType)
+        Dim mask = drawRandomLine(dst1)
         cv.Cv2.Inpaint(dst1, mask, dst2, thickness, inPaintFlag)
     End Sub
 End Class

@@ -51,10 +51,25 @@ Module xPhoto_OilPaint_CPP_Module
     Public Sub xPhoto_OilPaint_Close(xPhoto_OilPaint_Ptr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function xPhoto_OilPaint_Run(xPhoto_OilPaint_Ptr As IntPtr, rgbPtr As IntPtr, rows As integer, cols As integer,
-                                       size As integer, dynRatio As integer, colorCode As integer) As IntPtr
+    Public Function xPhoto_OilPaint_Run(xPhoto_OilPaint_Ptr As IntPtr, rgbPtr As IntPtr, rows As Integer, cols As Integer,
+                                       size As Integer, dynRatio As Integer, colorCode As Integer) As IntPtr
+    End Function
+
+
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function xPhoto_Inpaint_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub xPhoto_Inpaint_Close(xPhoto_Inpaint_Ptr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function xPhoto_Inpaint_Run(xPhoto_Inpaint_Ptr As IntPtr, rgbPtr As IntPtr, maskPtr As IntPtr, rows As Integer, cols As Integer, iType As Integer) As IntPtr
     End Function
 End Module
+
+
+
+
 
 
 
@@ -108,3 +123,78 @@ End Class
 
 
 
+
+
+
+
+Public Class xPhoto_Inpaint : Inherits VBparent
+    Public basics As InPaint_Basics
+    Public Sub New()
+        basics = New InPaint_Basics
+
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "FSR_Best"
+            radio.check(1).Text = "FSR_Fast"
+            radio.check(2).Text = "ShiftMap"
+            radio.check(0).Checked = True
+        End If
+
+        label1 = "RGB input to xPhoto Inpaint"
+        label2 = "Repaired result..."
+        task.desc = "Use the xPhoto inpaint to fill in the depth holes"
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        dst1 = src
+        Dim mask = basics.drawRandomLine(dst1)
+        Dim iType = InpaintTypes.FSR_BEST
+        Static radioFast = findRadio("FSR_Fast")
+        Static radioSMap = findRadio("ShiftMap")
+        If radioFast.checked Then iType = InpaintTypes.FSR_FAST
+        If radioSMap.checked Then iType = InpaintTypes.SHIFTMAP
+        ' CvXPhoto.Inpaint(dst1, mask, dst2, InpaintTypes.FSR_BEST)
+        task.trueText("This VB interface for xPhoto Inpaint does not work...  Uncomment the line above this msg to test.", 10, 200, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class XPhoto_Inpaint_CPP : Inherits VBparent
+    Dim xPhoto_Inpaint As IntPtr
+    Dim inpVB As xPhoto_Inpaint
+    Public Sub New()
+        inpVB = New xPhoto_Inpaint
+        xPhoto_Inpaint = xPhoto_Inpaint_Open()
+        task.desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        Static radioFast = findRadio("FSR_Fast")
+        Static radioSMap = findRadio("ShiftMap")
+        Dim iType = InpaintTypes.FSR_BEST
+        If radioFast.checked Then iType = InpaintTypes.FSR_FAST
+        If radioSMap.checked Then iType = InpaintTypes.SHIFTMAP
+
+        Dim mask = inpVB.basics.drawRandomLine(src)
+        dst1 = src
+
+        Dim srcData(src.Total * src.ElemSize - 1) As Byte
+        Dim maskData(mask.Total * mask.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, srcData, 0, srcData.Length)
+        Marshal.Copy(mask.Data, maskData, 0, maskData.Length)
+        Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
+        Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
+        Dim imagePtr = xPhoto_Inpaint_Run(xPhoto_Inpaint, handleSrc.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols, iType)
+        handleSrc.Free()
+        handleMask.Free()
+
+        If imagePtr <> 0 Then dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
+
+        task.trueText("The infrastructure is all in place but the xPhoto Inpaint call hangs.  Uncomment the C++ line in Run to test", 10, 200, 3)
+    End Sub
+    Public Sub Close()
+        xPhoto_Inpaint_Close(xPhoto_Inpaint)
+    End Sub
+End Class

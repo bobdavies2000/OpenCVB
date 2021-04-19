@@ -378,6 +378,7 @@ Public Class Histogram_Simple : Inherits VBparent
     Public Sub New()
         plotHist = New Plot_Histogram()
 
+        label1 = "Histogram of the grayscale video stream"
         task.desc = "Build a simple and reusable histogram for grayscale images."
     End Sub
     Public Sub Run(src As cv.Mat)
