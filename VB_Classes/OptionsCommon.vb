@@ -108,7 +108,7 @@ Public Class OptionsCommon_Histogram : Inherits VBparent
                     cameraYSetting = -1
                 Else
                     sideFrustrumSetting = 58
-                    topFrustrumSetting = 174
+                    topFrustrumSetting = 180
                     cameraXSetting = 0
                     cameraYSetting = -3
                 End If
