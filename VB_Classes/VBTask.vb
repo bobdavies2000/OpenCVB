@@ -324,8 +324,8 @@ Public Class ActiveTask : Implements IDisposable
         aOptions = New OptionsContainer
         If task.algName.EndsWith(".py") = False Then
             aOptions.Show()
-            inrange = algoList.createAlgorithm("OptionsCommon")
             viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
+            inrange = algoList.createAlgorithm("OptionsCommon")
             IMUStable = algoList.createAlgorithm("IMU_IscameraStable")
             PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
         End If

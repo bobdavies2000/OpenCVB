@@ -29,11 +29,13 @@ Public Class OptionsCommon : Inherits VBparent
         task.minDepth = gOptions.MinRange.Value
         task.maxDepth = gOptions.MaxRange.Value
         If task.minDepth >= task.maxDepth Then task.maxDepth = task.minDepth + 1
-
         task.maxZ = task.maxDepth / 1000
+        task.maxY = task.maxZ * task.viewOptions.sideFrustrumSetting / 100 / 2
+        task.maxX = task.maxZ * task.viewOptions.topFrustrumSetting / 100 / 2
     End Sub
     Public Sub Run(src As cv.Mat)
         updateSettings()
+
         Static saveMaxVal As Integer
         Static saveMinVal As Integer
         If saveMaxVal <> task.maxDepth Or saveMinVal <> task.minDepth Then
@@ -62,11 +64,11 @@ End Class
 
 
 Public Class OptionsCommon_Histogram : Inherits VBparent
+    Public sideFrustrumSetting = 57
+    Public topFrustrumSetting = 57
     Public Sub New()
         task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone.
 
-        Dim sideFrustrumSetting = 57
-        Dim topFrustrumSetting = 57
         Dim cameraYSetting = 0
         Dim cameraXSetting = 0
 
@@ -114,13 +116,11 @@ Public Class OptionsCommon_Histogram : Inherits VBparent
                 End If
         End Select
 
-        task.maxY = task.maxZ * sideFrustrumSetting / 100 / 2
-        task.maxX = task.maxZ * topFrustrumSetting / 100 / 2
         task.sideCameraPoint = New cv.Point(0, CInt(dst1.Height / 2 + cameraYSetting))
         task.topCameraPoint = New cv.Point(CInt(dst1.Width / 2 + cameraXSetting), CInt(dst1.Height))
 
         task.desc = "The options for the side view are shared with this algorithm"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
     End Sub
 End Class
