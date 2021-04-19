@@ -48,8 +48,8 @@ Public Class OptionsCommon : Inherits VBparent
 
         task.lineType = cv.LineTypes.AntiAlias ' cv.LineTypes.Link4 or cv.LineTypes.Link8
 
-        If task.depth32f.Size <> src.Size Then task.depth32f = task.depth32f.Resize(src.Size, 0, 0, cv.InterpolationFlags.Nearest)
-        If task.pointCloud.Size <> src.Size Then task.pointCloud = task.pointCloud.Resize(src.Size, 0, 0, cv.InterpolationFlags.Nearest)
+        If task.depth32f.Size <> task.color.Size Then task.depth32f = task.depth32f.Resize(task.color.Size, 0, 0, cv.InterpolationFlags.Nearest)
+        If task.pointCloud.Size <> task.color.Size Then task.pointCloud = task.pointCloud.Resize(task.color.Size, 0, 0, cv.InterpolationFlags.Nearest)
         cv.Cv2.InRange(task.depth32f, task.minDepth, task.maxDepth, task.depthMask)
         cv.Cv2.BitwiseNot(task.depthMask, task.noDepthMask)
         dst1 = task.depth32f.SetTo(0, task.noDepthMask)

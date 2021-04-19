@@ -560,8 +560,7 @@ Public Class IMU_IscameraStable : Inherits VBparent
         standalone = False
         task.desc = "Answer the question: Is the camera stable?"
     End Sub
-    Public Sub Run(src as cv.Mat)
-
+    Public Sub Run(src As cv.Mat)
         Dim pitch = task.IMU_AngularVelocity.X
         Dim yaw = task.IMU_AngularVelocity.Y
         Dim roll = task.IMU_AngularVelocity.Z
@@ -569,8 +568,6 @@ Public Class IMU_IscameraStable : Inherits VBparent
         Dim totalRadians = Math.Abs(pitch) + Math.Abs(yaw) + Math.Abs(roll)
         Dim permissableRadians = task.cameraStableSlider.Value / 100
         task.cameraStable = If(totalRadians > permissableRadians, False, True)
-        If task.useKalmanWhenStable Then
-            task.useKalman = If(task.cameraStable, task.useKalman, False)
-        End If
+        If task.useKalmanWhenStable Then task.useKalman = If(task.cameraStable, task.useKalman, False)
     End Sub
 End Class

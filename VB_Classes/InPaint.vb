@@ -33,9 +33,8 @@ Public Class InPaint_Basics : Inherits VBparent
     Public Sub Run(src as cv.Mat)
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
 
-        If task.frameCount Mod 30 Then Exit Sub
         src.CopyTo(dst1)
-        Dim mask = drawRandomLine(dst1)
+        Dim mask As cv.Mat = drawRandomLine(dst1)
         cv.Cv2.Inpaint(dst1, mask, dst2, thickness, inPaintFlag)
     End Sub
 End Class

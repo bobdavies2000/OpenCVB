@@ -808,7 +808,7 @@ Public Class PointCloud_ObjectsTop : Inherits VBparent
         Dim FOV = task.hFov / 2
 
         Dim xpt1 As cv.Point2f, xpt2 As cv.Point2f
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Then
             Static distanceSlider = findSlider("Test Bar Distance from camera in mm")
             Dim pixeldistance = src.Height * (distanceSlider.Value / 1000) / task.maxZ
             Dim lineHalf = CInt(Math.Tan(FOV * 0.0174533) * pixeldistance)
@@ -896,9 +896,11 @@ Public Class PointCloud_ObjectsSide : Inherits VBparent
         cmat = New PointCloud_SetupSide
         measureSide = New PointCloud_Kalman_SideView
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Test Bar Distance from camera in mm", 1, 4000, 1500)
+        If standalone Then
+            If findfrm(caller + " Slider Options") Is Nothing Then
+                sliders.Setup(caller)
+                sliders.setupTrackBar(0, "Test Bar Distance from camera in mm", 1, 4000, 1500)
+            End If
         End If
         task.desc = "Validate the formula for pixel height as a function of distance"
     End Sub
@@ -912,7 +914,7 @@ Public Class PointCloud_ObjectsSide : Inherits VBparent
         Dim FOV = task.vFov / 2
 
         Dim xpt1 As cv.Point2f, xpt2 As cv.Point2f
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Then
             Static distanceSlider = findSlider("Test Bar Distance from camera in mm")
             Dim pixeldistance = src.Width * (distanceSlider.Value / 1000) / task.maxZ
             Dim lineHalf = CInt(Math.Tan(FOV * 0.0174533) * pixeldistance)

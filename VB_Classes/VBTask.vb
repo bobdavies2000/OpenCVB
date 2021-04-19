@@ -113,6 +113,7 @@ Public Class ActiveTask : Implements IDisposable
     Public viewOptions As Object
     Public PixelViewer As Object
     Public IMUStable As Object
+    Public IMULevel As Object
 
     ' add any global option algorithms and structures here
     Public inrange As Object
@@ -327,6 +328,7 @@ Public Class ActiveTask : Implements IDisposable
             viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
             inrange = algoList.createAlgorithm("OptionsCommon")
             IMUStable = algoList.createAlgorithm("IMU_IscameraStable")
+            IMULevel = algoList.createAlgorithm("IMU_IscameraStable")
             PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
         End If
 
@@ -360,8 +362,9 @@ Public Class ActiveTask : Implements IDisposable
 
             ' run any global options algorithms here.
             If task.pythonTaskName.EndsWith(".py") = False Then
-                inrange.Run(task.color.Clone) ' updates all the depth info.
-                IMUStable.run(task.color.Clone) ' updates the flag that indicates stability according to the IMU.
+                inrange.Run(Nothing) ' updates all the depth info.
+                IMUStable.run(Nothing) ' updates the flag that indicates stability according to the IMU.
+                IMULevel.run(Nothing)
             End If
 
             TaskTimer.Enabled = True

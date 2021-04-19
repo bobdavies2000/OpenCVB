@@ -1087,7 +1087,6 @@ Public Class Depth_InRange : Inherits VBparent
         task.desc = "Show depth with OpenCV using varying min and max depths."
     End Sub
     Public Sub Run(src As cv.Mat)
-
         dst1 = task.depth32f
         dst1.SetTo(0, task.noDepthMask)
     End Sub
@@ -1102,7 +1101,6 @@ End Class
 Public Class Depth_LowQualityMask : Inherits VBparent
     Dim dilate As DilateErode_Basics
     Public Sub New()
-
         dilate = New DilateErode_Basics
         Dim ellipseRadio = findRadio("Dilate/Erode shape: Ellipse")
         ellipseRadio.Checked = True
@@ -1111,7 +1109,6 @@ Public Class Depth_LowQualityMask : Inherits VBparent
         task.desc = "Monitor motion in the mask where depth is zero"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         dst1 = task.noDepthMask
         dilate.Run(dst1)
         dst2 = dilate.dst1
@@ -1139,7 +1136,6 @@ Public Class Depth_PunchDecreasing : Inherits VBparent
         task.desc = "Identify where depth is decreasing - coming toward the camera."
     End Sub
     Public Sub Run(src As cv.Mat)
-
         fore.Run(src)
         Dim depth32f As New cv.Mat
         task.depth32f.CopyTo(depth32f, fore.dst1)
@@ -1234,7 +1230,6 @@ Public Class Depth_SmoothSurfaces : Inherits VBparent
     Dim histY As Histogram_Basics
     Dim mats As Mat_4to1
     Public Sub New()
-
         mats = New Mat_4to1
         histX = New Histogram_Basics
         histY = New Histogram_Basics
@@ -1245,7 +1240,6 @@ Public Class Depth_SmoothSurfaces : Inherits VBparent
         task.desc = "Find planes using the pointcloud X and Y differences"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         pcValid.Run(src)
         Dim mask = pcValid.dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
 
@@ -1299,7 +1293,6 @@ Public Class Depth_PointCloud_IMU : Inherits VBparent
     Public imu As IMU_GVector
     Public gMatrix(,) As Single
     Public Sub New()
-
         imu = New IMU_GVector
 
         task.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
@@ -1374,7 +1367,6 @@ Public Class Depth_SmoothAverage : Inherits VBparent
     Dim dMax As Depth_SmoothMax
     Dim colorize As Depth_ColorizerFastFade_CPP
     Public Sub New()
-
         colorize = New Depth_ColorizerFastFade_CPP
         dMin = New Depth_SmoothMin
         dMax = New Depth_SmoothMax
@@ -1384,7 +1376,6 @@ Public Class Depth_SmoothAverage : Inherits VBparent
         task.desc = "To reduce z-Jitter, use the average depth value at each pixel as long as the camera is stable"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         dMax.Run(task.depth32f)
         dst1 = dMax.dMin.dst1
 
@@ -1403,7 +1394,6 @@ Public Class Depth_SmoothMin : Inherits VBparent
     Public motion As Motion_Basics
     Dim colorize As Depth_ColorizerFastFade_CPP
     Public Sub New()
-
         colorize = New Depth_ColorizerFastFade_CPP
         motion = New Motion_Basics
 
@@ -1412,7 +1402,6 @@ Public Class Depth_SmoothMin : Inherits VBparent
         task.desc = "To reduce z-Jitter, use the closest depth value at each pixel as long as the camera is stable"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.depth32f
 
         motion.Run(task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -1452,7 +1441,6 @@ Public Class Depth_SmoothMax : Inherits VBparent
     Dim colorize As Depth_ColorizerFastFade_CPP
     Public stableMax As cv.Mat
     Public Sub New()
-
         colorize = New Depth_ColorizerFastFade_CPP
         dMin = New Depth_SmoothMin
 
@@ -1466,7 +1454,6 @@ Public Class Depth_SmoothMax : Inherits VBparent
         task.desc = "To reduce z-Jitter, use the farthest depth value at each pixel as long as the camera is stable"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.depth32f
 
         dMin.Run(src)
@@ -1505,7 +1492,6 @@ Public Class Depth_Averaging : Inherits VBparent
     Public avg As Math_ImageAverage
     Public colorize As Depth_Colorizer_CPP
     Public Sub New()
-
         avg = New Math_ImageAverage()
         colorize = New Depth_Colorizer_CPP()
 
@@ -1513,7 +1499,6 @@ Public Class Depth_Averaging : Inherits VBparent
         task.desc = "Take the average depth at each pixel but eliminate any pixels that had zero depth."
     End Sub
     Public Sub Run(src As cv.Mat)
-
         If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
         avg.Run(src)
 
@@ -1551,7 +1536,6 @@ Public Class Depth_SmoothMinMax : Inherits VBparent
         task.desc = "To reduce z-Jitter, use the closest or farthest point as long as the camera is stable"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.depth32f
 
         Dim radioVal As Integer
@@ -1605,7 +1589,6 @@ Public Class Depth_AveragingStable : Inherits VBparent
         task.desc = "Use Depth_SmoothMax to remove the artifacts from the Depth_Averaging"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
         extrema.Run(src)
 
@@ -1641,7 +1624,6 @@ Public Class Depth_Fusion : Inherits VBparent
         task.desc = "Fuse the depth from the previous x frames."
     End Sub
     Public Sub Run(src As cv.Mat)
-
         Dim input = src
         If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f
 
@@ -1680,7 +1662,6 @@ Public Class Depth_Dilate : Inherits VBparent
         task.desc = "Dilate the depth data to fill holes."
     End Sub
     Public Sub Run(src As cv.Mat)
-
         dilate.Run(task.depth32f)
         dst1 = dilate.dst1
     End Sub
@@ -1706,7 +1687,6 @@ Public Class Depth_ForegroundHead : Inherits VBparent
         task.desc = "Use Depth_ForeGround to find the foreground blob.  Then find the probable head of the person in front of the camera."
     End Sub
     Public Sub Run(src As cv.Mat)
-
         fgnd.Run(src)
 
         trustworthy = False
