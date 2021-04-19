@@ -1,6 +1,5 @@
 ﻿Imports System.IO
 Module UIranking
-
     Sub Main()
         Dim rankingInput As New FileInfo("../../Data/rankings.txt")
         Dim sr = New StreamReader(rankingInput.FullName)
@@ -26,8 +25,10 @@ Module UIranking
                 For j = 0 To split.Length - 1
                     If apiList.Contains(split(j)) Then
                         Dim index = apiList.IndexOf(split(j))
-                        apiKeywords(index) += "," + apiList(i)
-                        apiRank(index) += 1
+                        If apiKeywords(index).Contains(apiList(i)) = False Then
+                            apiKeywords(index) += "," + apiList(i)
+                            apiRank(index) += 1
+                        End If
                     End If
                 Next
             End If
