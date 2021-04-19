@@ -2,10 +2,9 @@
 Imports System.Text.RegularExpressions
 Module IndexMain
     Dim CPPnames As New SortedList(Of String, String)
-    Dim MTnames As New SortedList(Of String, String)
+    ' Dim MTnames As New SortedList(Of String, String)
     Dim CSnames As New SortedList(Of String, String)
     Dim OpenGLnames As New SortedList(Of String, String)
-    Dim rankings(10 - 1) As SortedList(Of String, String)
     Dim numpy As New SortedList(Of String, String)
     Dim PYnames As New SortedList(Of String, String)
     Dim nonPYnames As New SortedList(Of String, String)
@@ -13,7 +12,7 @@ Module IndexMain
     Dim Painterly As New SortedList(Of String, String)
     Dim Basics As New SortedList(Of String, String)
     Dim MoreWork As New SortedList(Of String, String)
-    Dim Trackers As New SortedList(Of String, String)
+    ' Dim Trackers As New SortedList(Of String, String)
     Private Function trimQuotes(line As String)
         While InStr(line, """")
             Dim startq = InStr(line, """")
@@ -26,9 +25,6 @@ Module IndexMain
         Return Regex.IsMatch(letterChar, "^[A-Za-z]{1}$")
     End Function
     Sub Main()
-        For i = 0 To rankings.Length - 1
-            rankings(i) = New SortedList(Of String, String)
-        Next
         Dim apiList As New List(Of String)
         Dim apiListLCase As New List(Of String)
         Dim classNames As New List(Of String) ' the list of all the classnames - including python names 
@@ -54,13 +50,6 @@ Module IndexMain
             End If
         End While
         srAPI.Close()
-
-        ' add any custom keywords here.  These are OpenCVB terms not OpenCV API's (so no right parenthesis) - case sensitive and sorted!
-        Dim ocvbKeywords() As String = {"mouseClickPoint", "mouseClickFlag", "mousePicTag", "mousePoint", "testAllRunning"}
-        For i = 0 To ocvbKeywords.Length - 1
-            apiListLCase.Add(LCase(ocvbKeywords(i))) ' no "(" in the lower case edition - these are not function calls.
-            apiList.Add(ocvbKeywords(i) + "(")
-        Next
 
         Dim apiOCVB = New System.IO.StreamReader(directoryInfo.FullName + "\..\Data\AlgorithmList.txt")
         line = apiOCVB.ReadLine() ' toss the codeline count...
@@ -93,15 +82,11 @@ Module IndexMain
                 line = Trim(nextFile.ReadLine())
                 Dim lcaseLine = " " + LCase(line)
                 If lcaseLine.Contains("painterly") And Painterly.ContainsKey(classname) = False Then Painterly.Add(classname, classname)
-                If line.Contains("task.rank = ") Then
-                    Dim rankVal = CInt(line.Substring(Len(line) - 1, 1))
-                    If rankings(rankVal - 1).ContainsKey(classname) = False Then rankings(rankVal - 1).Add(classname, classname)
-                End If
 
                 If line = "" Or Trim(line).StartsWith("'") Or Trim(line).StartsWith("#") Then Continue While
 
                 If lcaseLine.Contains("needs more work") And MoreWork.ContainsKey(classname) = False Then MoreWork.Add(classname, classname)
-                If lcaseLine.Contains("tracker algorithm") And Trackers.ContainsKey(classname) = False Then Trackers.Add(classname, classname)
+                ' If lcaseLine.Contains("tracker algorithm") And Trackers.ContainsKey(classname) = False Then Trackers.Add(classname, classname)
                 If (lcaseLine.Contains("np.") Or LCase(classname).Contains("numpy")) And numpy.ContainsKey(classname) = False Then numpy.Add(classname, classname)
                 If LCase(line).StartsWith("public class") Then
                     Dim split As String() = Regex.Split(line, "\W+")
@@ -109,7 +94,7 @@ Module IndexMain
                     If line.EndsWith(" : Inherits VBparent") Then classname = split(2) ' public class <classname>
                     If classname.StartsWith("Python_") Then PYnames.Add(classname, classname)
                     If classname.EndsWith("_PS.py") Then PYStreamNames.Add(classname, classname)
-                    If classname.EndsWith("_MT") Then MTnames.Add(classname, classname)
+                    ' If classname.EndsWith("_MT") Then MTnames.Add(classname, classname)
                     If classname.EndsWith("_CPP") Then CPPnames.Add(classname, classname)
                     If classname.StartsWith("OpenGL") Then OpenGLnames.Add(classname, classname)
                     If classname.StartsWith("OpenCVGL") Then OpenGLnames.Add(classname, classname)
@@ -196,11 +181,11 @@ Module IndexMain
             sw.WriteLine()
         End If
 
-        sw.Write("<Multi-Threaded Algorithms>")
-        For i = 0 To MTnames.Count - 1
-            sw.Write("," + MTnames.ElementAt(i).Key)
-        Next
-        sw.WriteLine()
+        'sw.Write("<Multi-Threaded Algorithms>")
+        'For i = 0 To MTnames.Count - 1
+        '    sw.Write("," + MTnames.ElementAt(i).Key)
+        'Next
+        'sw.WriteLine()
 
         sw.Write("<NumPy>")
         For i = 0 To numpy.Count - 1
@@ -213,12 +198,6 @@ Module IndexMain
             sw.Write("," + OpenGLnames.ElementAt(i).Key)
         Next
         sw.WriteLine()
-
-        For i = 0 To ocvbKeywords.Count - 1
-            sw.Write("<OpenCVB - " + ocvbKeywords(i) + ">,")
-            Dim j = sortedNames.IndexOfKey(ocvbKeywords(i))
-            sw.WriteLine(sortedNames.ElementAt(j).Value)
-        Next
 
         sw.Write("<Painterly>")
         For i = 0 To Painterly.Count - 1
@@ -238,21 +217,11 @@ Module IndexMain
         Next
         sw.WriteLine()
 
-        For i = 0 To rankings.Length - 1
-            If rankings(i).Count > 0 Then
-                sw.Write("<Rank " + CStr(i + 1) + ">")
-                For j = 0 To rankings(i).Count - 1
-                    If rankings(i).ElementAt(j).Key <> "" Then sw.Write("," + rankings(i).ElementAt(j).Key)
-                Next
-                sw.WriteLine()
-            End If
-        Next
-
-        sw.Write("<Trackers>")
-        For i = 0 To Trackers.Count - 1
-            sw.Write("," + Trackers.ElementAt(i).Key)
-        Next
-        sw.WriteLine()
+        'sw.Write("<Trackers>")
+        'For i = 0 To Trackers.Count - 1
+        '    sw.Write("," + Trackers.ElementAt(i).Key)
+        'Next
+        'sw.WriteLine()
 
         For i = 0 To sortedNames.Count - 1
             Dim token = sortedNames.ElementAt(i)

@@ -99,6 +99,7 @@ Public Class OpenCVB
 
     Dim surveyActive As Boolean
     Dim surveyDir As DirectoryInfo
+    Dim surveyIndex As Integer
     Dim surveyFileWriter As StreamWriter
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -310,19 +311,21 @@ Public Class OpenCVB
                     count = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
                     If count > 0 Then cv.Cv2.ImWrite(surveyDir.FullName + "/" + AvailableAlgorithms.Text + "2.jpg", dst2, encodeParams)
 
-                    Dim callEntry As String = ""
-                    For i = 0 To callTrace.Count - 1
-                        Dim split() = callTrace(i).Split("\")
-                        callEntry += split(split.Length - 2) + If(i = callTrace.Count - 1, "", ",")
-                    Next
-                    surveyFileWriter.WriteLine(callEntry)
                     frameCount = 0
-                    If AvailableAlgorithms.SelectedIndex = AvailableAlgorithms.Items.Count - 1 Then
+                    If surveyIndex >= 0 Then
+                        Dim callEntry As String = ""
+                        For i = 0 To callTrace.Count - 1
+                            Dim split() = callTrace(i).Split("\")
+                            callEntry += split(split.Length - 2) + If(i = callTrace.Count - 1, "", ",")
+                        Next
+                        surveyFileWriter.WriteLine(callEntry)
+                    End If
+                    If surveyIndex = AvailableAlgorithms.Items.Count - 1 Then
                         surveyFileWriter.Close()
                         surveyActive = False
-                        AvailableAlgorithms.SelectedIndex = 0
                     Else
-                        AvailableAlgorithms.SelectedIndex += 1
+                        surveyIndex += 1
+                        AvailableAlgorithms.SelectedIndex = surveyIndex
                     End If
                 End SyncLock
             End If
@@ -1292,6 +1295,7 @@ Public Class OpenCVB
             CreateSurveyImagesToolStripMenuItem.Text = "Create Survey Images and Rankings"
             surveyFileWriter.Close()
         Else
+            surveyIndex = -1
             CreateSurveyImagesToolStripMenuItem.Text = "Stop Survey"
             surveyDir = New DirectoryInfo(HomeDir.FullName + "Survey/")
             If surveyDir.Exists = False Then surveyDir.Create()
@@ -1299,6 +1303,8 @@ Public Class OpenCVB
             surveyActive = True
         End If
         AvailableAlgorithms.SelectedIndex = 0
+        Application.DoEvents()
+        Thread.Sleep(1000)
     End Sub
 End Class
 

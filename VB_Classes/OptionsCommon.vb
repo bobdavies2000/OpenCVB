@@ -8,6 +8,22 @@ Public Class OptionsCommon : Inherits VBparent
         gOptions = New OptionsGlobal
         gOptions.Show()
 
+        ' create a palette gradient
+        'Dim color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+        'Dim color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+        'task.paletteGradient = New cv.Mat()
+        'Dim gradientColors As New cv.Mat(task.paletteGradient.Rows, 1, cv.MatType.CV_64FC3)
+        'Dim f As Double = 1.0
+        'For i = 0 To task.paletteGradient.Rows - 1
+        '    gradientColors.Set(Of cv.Scalar)(i, 0, New cv.Scalar(f * color2(0) + (1 - f) * color1(0), f * color2(1) + (1 - f) * color1(1),
+        '                                                         f * color2(2) + (1 - f) * color1(2)))
+        '    f -= 1 / dst1.Rows
+        'Next
+
+        'For i = 0 To dst1.Rows - 1
+        '    dst1.Row(i).SetTo(gradientColors.Get(Of cv.Scalar)(i))
+        'Next
+
         task.palette = New Palette_Basics
         task.cameraStableSlider = gOptions.IMUmotionSlider
         task.histogramBins = gOptions.HistBinSlider.Value

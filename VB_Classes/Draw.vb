@@ -482,15 +482,16 @@ Public Class Draw_Frustrum : Inherits VBparent
         xyzDepth = New Depth_WorldXYZ_MT()
         xyzDepth.depthUnitsMeters = True
 
-        label2 = "Frustrum data prepared for 3D display - 32FC3"
+        label2 = "Frustrum's shape prepared."
         task.desc = "Draw a frustrum for a camera viewport"
     End Sub
     Public Sub Run(src as cv.Mat)
-        dst1 = New cv.Mat(task.pointCloud.Height, task.pointCloud.Height, cv.MatType.CV_32F, 0)
+        dst1 = New cv.Mat(task.pointCloud.Height, task.pointCloud.Width, cv.MatType.CV_32F, 0)
+        Dim fRect = New cv.Rect((dst2.Width - dst2.Height) / 2, 0, dst2.Height, dst2.Height)
         Dim mid = task.pointCloud.Height / 2
         Dim zIncr = task.maxZ / mid
         For i = 0 To task.pointCloud.Height / 2
-            dst1.Rectangle(New cv.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), cv.Scalar.All(i * zIncr), 1)
+            dst1(fRect).Rectangle(New cv.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), cv.Scalar.All(i * zIncr), 1)
         Next
         xyzDepth.Run(dst1)
         dst2 = xyzDepth.dst2

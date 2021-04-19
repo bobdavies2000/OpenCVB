@@ -127,6 +127,7 @@ Public Class ActiveTask : Implements IDisposable
     Public useKalman As Boolean
     Public useKalmanWhenStable As Boolean
     Public palette As Palette_Basics
+    Public paletteGradient As cv.Mat
     Public paletteScheme As cv.ColormapTypes
     Public paletteSchemeName As String
 
