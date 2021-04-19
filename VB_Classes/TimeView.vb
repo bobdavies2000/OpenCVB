@@ -238,13 +238,13 @@ End Class
 
 Public Class TimeView_Frustrum : Inherits VBparent
     Dim tView As TimeView_Rectangles
-    Dim cmatSide As PointCloud_ColorizeSide
-    Dim cmatTop As PointCloud_ColorizeTop
+    Dim cmatSide As PointCloud_SetupSide
+    Dim cmatTop As PointCloud_SetupTop
     Dim mats As Mat_4Click
     Public Sub New()
         mats = New Mat_4Click
-        cmatSide = New PointCloud_ColorizeSide
-        cmatTop = New PointCloud_ColorizeTop
+        cmatSide = New PointCloud_SetupSide
+        cmatTop = New PointCloud_SetupTop
         tView = New TimeView_Rectangles
         label2 = "Click a quadrant in dst1 to show it in dst2 "
         task.desc = "Colorize the back and side views"

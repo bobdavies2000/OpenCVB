@@ -586,11 +586,11 @@ End Class
 
 Public Class Histogram_SmoothTopView2D : Inherits VBparent
     Public topView As Histogram_TopView2D
-    Dim cmat As PointCloud_ColorizeTop
+    Dim cmat As PointCloud_SetupTop
     Dim stable As Motion_MinMaxPointCloud
     Public Sub New()
 
-        cmat = New PointCloud_ColorizeTop
+        cmat = New PointCloud_SetupTop
         topView = New Histogram_TopView2D
 
         stable = New Motion_MinMaxPointCloud
@@ -625,11 +625,11 @@ End Class
 
 Public Class Histogram_SmoothSideView2D : Inherits VBparent
     Public sideView As Histogram_SideView2D
-    Dim cmat As PointCloud_ColorizeSide
+    Dim cmat As PointCloud_SetupSide
     Dim stable As Motion_MinMaxPointCloud
     Public Sub New()
 
-        cmat = New PointCloud_ColorizeSide
+        cmat = New PointCloud_SetupSide
         sideView = New Histogram_SideView2D
 
         stable = New Motion_MinMaxPointCloud
@@ -695,11 +695,11 @@ Public Class Histogram_TopView2D : Inherits VBparent
     Public histOutput As New cv.Mat
     Public originalHistOutput As New cv.Mat
     Public markers(2 - 1) As cv.Point2f
-    Public cmat As PointCloud_ColorizeTop
+    Public cmat As PointCloud_SetupTop
     Public resizeHistOutput As Boolean = True
     Public Sub New()
 
-        cmat = New PointCloud_ColorizeTop
+        cmat = New PointCloud_SetupTop
         gCloud = New Depth_PointCloud_IMU
 
         label1 = "XZ (Top View)"
@@ -737,12 +737,12 @@ Public Class Histogram_SideView2D : Inherits VBparent
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Public originalHistOutput As New cv.Mat
-    Public cmat As PointCloud_ColorizeSide
+    Public cmat As PointCloud_SetupSide
     Public frustrumAdjust As Single
     Public resizeHistOutput As Boolean = True
     Public Sub New()
 
-        cmat = New PointCloud_ColorizeSide
+        cmat = New PointCloud_SetupSide
         gCloud = New Depth_PointCloud_IMU
 
         label1 = "ZY (Side View)"

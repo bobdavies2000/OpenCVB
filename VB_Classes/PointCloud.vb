@@ -240,31 +240,22 @@ End Class
 ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
 ' https://www.stereolabs.com/zed/
 ' https://www.mynteye.com/pages/mynt-eye-d
-Public Class PointCloud_ColorizeSide : Inherits VBparent
-    ' Dim gpalette As Palette_Gradient
+Public Class PointCloud_SetupSide : Inherits VBparent
     Dim arcSize As Integer
     Dim imu As IMU_GVector
     Public xCheckbox As Windows.Forms.CheckBox
     Public zCheckbox As Windows.Forms.CheckBox
     Public Sub New()
-        'gpalette = New Palette_Gradient()
-        'gpalette.color1 = cv.Scalar.Yellow
-        'gpalette.color2 = cv.Scalar.Blue
-        'gpalette.frameModulo = 1
-        'gpalette.Run(dst1)
-        'dst1 = gpalette.dst1
-
         arcSize = dst1.Width / 15
         If standalone Then imu = New IMU_GVector
         label1 = "Colorize mask for side view"
         task.desc = "Create the colorized mat used for side projections"
     End Sub
     Public Sub Run(src As cv.Mat)
-        If standalone Then src = dst1 Else dst1 = src
-
         Dim distanceRatio As Single = 1
         Dim fsize = task.fontSize * 1.5
 
+        dst1.SetTo(0)
         dst1.Circle(task.sideCameraPoint, task.dotSize, cv.Scalar.BlueViolet, -1, task.lineType)
         For i = 1 To task.maxZ
             Dim xmeter = CInt(dst1.Width * i / task.maxZ * distanceRatio)
@@ -317,19 +308,17 @@ Public Class PointCloud_ColorizeSide : Inherits VBparent
         Dim fovTop = New cv.Point(dst1.Width, cam.Y - y)
         Dim fovBot = New cv.Point(dst1.Width, cam.Y + y)
 
-        If standalone = False Then
-            dst1.Ellipse(cam, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, 2, task.lineType)
-            dst1.Ellipse(cam, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, task.lineType)
-            dst1.Line(cam, fovTop, cv.Scalar.White, 1, task.lineType)
-            dst1.Line(cam, fovBot, cv.Scalar.White, 1, task.lineType)
+        dst1.Ellipse(cam, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, 2, task.lineType)
+        dst1.Ellipse(cam, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, task.lineType)
+        dst1.Line(cam, fovTop, cv.Scalar.White, 1, task.lineType)
+        dst1.Line(cam, fovBot, cv.Scalar.White, 1, task.lineType)
 
-            dst1.Line(cam, markerLeft, cv.Scalar.Yellow, 1, task.lineType)
-            dst1.Line(cam, markerRight, cv.Scalar.Yellow, 1, task.lineType)
+        dst1.Line(cam, markerLeft, cv.Scalar.Red, 1, task.lineType)
+        dst1.Line(cam, markerRight, cv.Scalar.Red, 1, task.lineType)
 
-            Dim labelLocation = New cv.Point(src.Width * 0.02, src.Height * 7 / 8)
-            cv.Cv2.PutText(dst1, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize,
+        Dim labelLocation = New cv.Point(src.Width * 0.02, src.Height * 7 / 8)
+        cv.Cv2.PutText(dst1, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize,
                        cv.Scalar.White, 1, task.lineType)
-        End If
     End Sub
 End Class
 
@@ -341,30 +330,21 @@ End Class
 ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
 ' https://www.stereolabs.com/zed/
 ' https://www.mynteye.com/pages/mynt-eye-d
-Public Class PointCloud_ColorizeTop : Inherits VBparent
-    ' Dim gpalette As Palette_Gradient
+Public Class PointCloud_SetupTop : Inherits VBparent
     Dim arcSize As Integer
     Dim imu As IMU_GVector
     Public xCheckbox As Windows.Forms.CheckBox
     Public Sub New()
         If standalone Then imu = New IMU_GVector
-        'gpalette = New Palette_Gradient()
-        'gpalette.color1 = cv.Scalar.Yellow
-        'gpalette.color2 = cv.Scalar.Blue
-        'gpalette.frameModulo = 1
-        'gpalette.Run(dst1)
-        'dst1 = gpalette.dst1
-
         arcSize = dst1.Width / 15
 
         label1 = "Colorize mask for top down view"
         task.desc = "Create the colorize the mat for a topdown projections"
     End Sub
     Public Sub Run(src As cv.Mat)
-        If standalone Then src = dst1 Else dst1 = src
-
         Dim distanceRatio As Single = 1
         Dim fsize = task.fontSize * 1.5
+        dst1.SetTo(0)
         dst1.Circle(task.topCameraPoint, task.dotSize, cv.Scalar.BlueViolet, -1, task.lineType)
         For i = 1 To task.maxZ
             Dim ymeter = CInt(dst1.Height - dst1.Height * i / (task.maxZ * distanceRatio))
@@ -400,21 +380,19 @@ Public Class PointCloud_ColorizeTop : Inherits VBparent
         Dim fovRight = New cv.Point(task.topCameraPoint.X + x, 0)
         Dim fovLeft = New cv.Point(task.topCameraPoint.X - x, fovRight.Y)
 
-        If standalone = False Then
-            dst1.Ellipse(task.topCameraPoint, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, 2, task.lineType)
-            dst1.Ellipse(task.topCameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, task.lineType)
-            dst1.Line(task.topCameraPoint, fovLeft, cv.Scalar.White, 1, task.lineType)
+        dst1.Ellipse(task.topCameraPoint, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, 2, task.lineType)
+        dst1.Ellipse(task.topCameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, task.lineType)
+        dst1.Line(task.topCameraPoint, fovLeft, cv.Scalar.White, 1, task.lineType)
 
-            dst1.Circle(markerLeft, task.dotSize, cv.Scalar.Red, -1, task.lineType)
-            dst1.Circle(markerRight, task.dotSize, cv.Scalar.Red, -1, task.lineType)
-            dst1.Line(cam, markerLeft, cv.Scalar.Yellow, 1, task.lineType)
-            dst1.Line(cam, markerRight, cv.Scalar.Yellow, 1, task.lineType)
+        dst1.Circle(markerLeft, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+        dst1.Circle(markerRight, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+        dst1.Line(cam, markerLeft, cv.Scalar.Red, 1, task.lineType)
+        dst1.Line(cam, markerRight, cv.Scalar.Red, 1, task.lineType)
 
-            Dim shift = (src.Width - src.Height) / 2
-            Dim labelLocation = New cv.Point(dst1.Width / 2 + shift, dst1.Height * 15 / 16)
-            cv.Cv2.PutText(dst1, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, task.lineType)
-            dst1.Line(task.topCameraPoint, fovRight, cv.Scalar.White, 1, task.lineType)
-        End If
+        Dim shift = (src.Width - src.Height) / 2
+        Dim labelLocation = New cv.Point(dst1.Width / 2 + shift, dst1.Height * 15 / 16)
+        cv.Cv2.PutText(dst1, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, task.lineType)
+        dst1.Line(task.topCameraPoint, fovRight, cv.Scalar.White, 1, task.lineType)
     End Sub
 End Class
 
@@ -569,12 +547,12 @@ Public Class PointCloud_Kalman_SideView : Inherits VBparent
     Public flood As Floodfill_Identifiers
     Public sideView As Histogram_SideView2D
     Public pTrack As KNN_PointTracker
-    Public cmat As PointCloud_ColorizeSide
+    Public cmat As PointCloud_SetupSide
     Public Sub New()
 
 
         pTrack = New KNN_PointTracker
-        cmat = New PointCloud_ColorizeSide
+        cmat = New PointCloud_SetupSide
         flood = New Floodfill_Identifiers
 
         findSlider("FloodFill Minimum Size").Value = 100
@@ -655,10 +633,10 @@ End Class
 Public Class PointCloud_FrustrumTop : Inherits VBparent
     Dim frustrum As Draw_Frustrum
     Dim topView As Histogram_TopView2D
-    Dim cmat As PointCloud_ColorizeTop
+    Dim cmat As PointCloud_SetupTop
     Public Sub New()
 
-        cmat = New PointCloud_ColorizeTop
+        cmat = New PointCloud_SetupTop
         frustrum = New Draw_Frustrum
         topView = New Histogram_TopView2D
 
@@ -692,10 +670,10 @@ End Class
 Public Class PointCloud_FrustrumSide : Inherits VBparent
     Dim frustrum As Draw_Frustrum
     Dim sideView As Histogram_SideView2D
-    Dim cmat As PointCloud_ColorizeSide
+    Dim cmat As PointCloud_SetupSide
     Public Sub New()
 
-        cmat = New PointCloud_ColorizeSide
+        cmat = New PointCloud_SetupSide
         frustrum = New Draw_Frustrum
         sideView = New Histogram_SideView2D
 
@@ -804,11 +782,11 @@ End Class
 Public Class PointCloud_ObjectsTop : Inherits VBparent
     Public measureTop As PointCloud_Kalman_TopView
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Dim cmat As PointCloud_ColorizeTop
+    Dim cmat As PointCloud_SetupTop
     Public colorizeNeeded As Boolean
     Public Sub New()
 
-        cmat = New PointCloud_ColorizeTop
+        cmat = New PointCloud_SetupTop
         measureTop = New PointCloud_Kalman_TopView
 
         If standalone Then
@@ -914,9 +892,9 @@ End Class
 Public Class PointCloud_ObjectsSide : Inherits VBparent
     Public measureSide As PointCloud_Kalman_SideView
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Dim cmat As PointCloud_ColorizeSide
+    Dim cmat As PointCloud_SetupSide
     Public Sub New()
-        cmat = New PointCloud_ColorizeSide
+        cmat = New PointCloud_SetupSide
         measureSide = New PointCloud_Kalman_SideView
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -1030,15 +1008,15 @@ Public Class PointCloud_BothViews : Inherits VBparent
     Public backMatMask As New cv.Mat
     Public vwTop As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Public vwSide As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Dim cmatSide As PointCloud_ColorizeSide
-    Dim cmatTop As PointCloud_ColorizeTop
+    Dim cmatSide As PointCloud_SetupSide
+    Dim cmatTop As PointCloud_SetupTop
     Public Sub New()
 
         levelCheck = New IMU_isCameraLevel
         topPixel = New PointCloud_ObjectsTop
         sidePixel = New PointCloud_ObjectsSide
-        cmatSide = New PointCloud_ColorizeSide
-        cmatTop = New PointCloud_ColorizeTop
+        cmatSide = New PointCloud_SetupSide
+        cmatTop = New PointCloud_SetupTop
 
         backMat = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC3)
         backMatMask = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
@@ -1212,11 +1190,11 @@ End Class
 
 Public Class PointCloud_BackProjectSideView : Inherits VBparent
     Dim view As PointCloud_ObjectsSide
-    Dim cmatSide As PointCloud_ColorizeSide
+    Dim cmatSide As PointCloud_SetupSide
     Public Sub New()
 
         view = New PointCloud_ObjectsSide
-        cmatSide = New PointCloud_ColorizeSide
+        cmatSide = New PointCloud_SetupSide
         task.desc = "Display only the side view of the depth data - with and without the IMU active"
     End Sub
     Public Sub Run(src As cv.Mat)
