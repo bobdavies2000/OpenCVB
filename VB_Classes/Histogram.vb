@@ -885,13 +885,13 @@ End Class
 
 
 Public Class Histogram_ViewObjects : Inherits VBparent
-    Public histC As Histogram_ConcentrationsTop
+    Public histC As Histogram_ConcentrationPoints
     Dim flood As FloodFill_Basics
     Public side2D As New List(Of cv.Rect)
     Public top2D As New List(Of cv.Rect)
     Public Sub New()
         flood = New FloodFill_Basics
-        histC = New Histogram_ConcentrationsTop
+        histC = New Histogram_ConcentrationPoints
 
         findSlider("FloodFill Minimum Size").Value = task.dotSize * task.dotSize
         findSlider("FloodFill LoDiff").Value = 250
@@ -949,12 +949,12 @@ End Class
 Public Class Histogram_SmoothConcentration : Inherits VBparent
     Public sideview As Histogram_SmoothSideView2D
     Public topview As Histogram_SmoothTopView2D
-    Dim concent As Histogram_ConcentrationsTop
+    Dim concent As Histogram_ConcentrationPoints
     Public Sub New()
 
         sideview = New Histogram_SmoothSideView2D
         topview = New Histogram_SmoothTopView2D
-        concent = New Histogram_ConcentrationsTop
+        concent = New Histogram_ConcentrationPoints
 
         task.desc = "Using stable depth data, highlight the histogram projections where concentrations are highest"
     End Sub
@@ -979,17 +979,16 @@ End Class
 
 
 
-Public Class Histogram_ConcentrationsTop : Inherits VBparent
+Public Class Histogram_ConcentrationPoints : Inherits VBparent
     Public sideview As Histogram_SideView2D
     Public topview As Histogram_TopView2D
     Public Sub New()
-
         sideview = New Histogram_SideView2D
         topview = New Histogram_TopView2D
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 50)
+            sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 10)
             sliders.setupTrackBar(1, "Resize Factor x100", 1, 100, 10)
             sliders.setupTrackBar(2, "Concentration Threshold", 1, 100, 10)
         End If
@@ -1015,34 +1014,24 @@ Public Class Histogram_ConcentrationsTop : Inherits VBparent
         Next
 
         Static topXslider = findSlider("Display the top x highlights")
-        Dim topX = topXslider.value
-        For i = 0 To Math.Min(pts.Count - 1, topX - 1)
+        Dim topX = Math.Min(pts.Count, topXslider.value)
+        For i = 0 To topX - 1
             Dim pt = pts.ElementAt(i).Value
-            dst.Rectangle(New cv.Rect(pt.X - task.dotSize, pt.Y - task.dotSize, task.dotSize * 2, task.dotSize * 2), 128, -1)
+            dst.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
-        task.palette.Run(dst)
         Dim maxConcentration = If(pts.Count > 0, pts.ElementAt(0).Key, 0)
-        Return CStr(pts.Count) + " highlights. Max=" + CStr(maxConcentration)
+        Return CStr(topX) + " highlights. Max=" + CStr(maxConcentration)
     End Function
     Public Sub Run(src As cv.Mat)
         sideview.Run(src)
-        dst1 = sideview.dst1
-        Dim noDepth = sideview.histOutput.Get(Of Single)(sideview.histOutput.Height / 2, 0)
-        label1 = "SideView " + plotHighlights(sideview.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        If standalone Or task.intermediateReview = caller Then dst1 = task.palette.dst1.Clone
+        dst1 = sideview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        label1 = "SideView " + plotHighlights(sideview.originalHistOutput, dst1)
 
         topview.Run(src)
-        dst2 = topview.dst1
-        label2 = "TopView " + plotHighlights(topview.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        If standalone Or task.intermediateReview = caller Then dst2 = task.palette.dst1.Clone
+        dst2 = topview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        label2 = "TopView " + plotHighlights(topview.originalHistOutput, dst2)
     End Sub
 End Class
-
-
-
-
-
-
 
 
 
@@ -1059,7 +1048,6 @@ Public Class Histogram_DepthClusters : Inherits VBparent
         task.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
     End Sub
     Public Sub Run(src As cv.Mat)
-
         If src.Type <> cv.MatType.CV_32F Then src = task.depth32f.Clone
 
         valleys.Run(src)

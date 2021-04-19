@@ -61,5 +61,4 @@ Module UIranking
         sw.Close()
         Console.WriteLine("Read in " + CStr(lines.Count))
     End Sub
-
 End Module
