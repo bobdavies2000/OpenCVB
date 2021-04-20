@@ -290,7 +290,7 @@ Public Class Structured_MultiSlicePolygon : Inherits VBparent
         Next
 
         dst2.SetTo(0)
-        Dim sidesSlider = findSlider("Max number of sides in the identified polygons")
+        Static sidesSlider = findSlider("Max number of sides in the identified polygons")
         Dim maxSides = sidesSlider.Value
         For i = 0 To contours.Length - 1
             If contours(i).Length = 2 Then Continue For

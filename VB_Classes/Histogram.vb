@@ -1334,11 +1334,31 @@ Public Class Histogram_Peaks : Inherits VBparent
             End If
         Next
 
+        Dim valleys As New List(Of Integer)
+        Dim vCount As New List(Of Single)
+        For i = 0 To peaks.Count - 2
+            Dim minCount = hCount(i)
+            Dim minIndex As Integer
+            For j = peaks(i) To peaks(i + 1)
+                Dim nextCount = histogram.Get(Of Single)(j, 0)
+                If nextCount < minCount Then
+                    minCount = nextCount
+                    minIndex = j
+                End If
+            Next
+            valleys.Add(minIndex)
+            vCount.Add(minCount)
+        Next
+
         histogram.MinMaxLoc(minVal, maxVal)
         Dim barWidth = dst1.Width / histogram.Rows
         For i = 0 To peaks.Count - 1
             Dim h = CInt(hCount(i) * dst1.Height / maxVal)
             cv.Cv2.Rectangle(dst1, New cv.Rect(peaks(i) * barWidth, dst1.Height - h, barWidth, h), cv.Scalar.Yellow, 2)
+        Next
+        For i = 0 To valleys.Count - 1
+            Dim h = CInt(vCount(i) * dst1.Height / maxVal)
+            cv.Cv2.Rectangle(dst1, New cv.Rect(valleys(i) * barWidth, dst1.Height - h, barWidth, h), cv.Scalar.Blue, 2)
         Next
         label1 = "There were " + CStr(peaks.Count) + " in the grayscale image"
     End Sub
