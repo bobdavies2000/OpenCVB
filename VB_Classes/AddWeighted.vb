@@ -58,7 +58,6 @@ Public Class AddWeighted_ImageAccumulate : Inherits VBparent
         task.desc = "Update a running average of the image"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         dst1 = New cv.Mat(task.depth32f.Size, cv.MatType.CV_32F)
         Static weightSlider = findSlider("Accumulation weight of each image X100")
         cv.Cv2.AccumulateWeighted(task.depth32f, dst1, weightSlider.value / 100, New cv.Mat)

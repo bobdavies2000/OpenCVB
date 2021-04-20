@@ -101,6 +101,7 @@ Public Class OpenCVB
     Dim surveyDir As DirectoryInfo
     Dim surveyIndex As Integer
     Dim surveyFileWriter As StreamWriter
+
 #End Region
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture
@@ -511,6 +512,10 @@ Public Class OpenCVB
         Next
     End Sub
     Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
+        If AvailableAlgorithms.Items.Count = 1 Then
+            MsgBox("There is only algorithm to test!  Only groups with 2 or more algorithms can run 'Test All'.")
+            Exit Sub
+        End If
         TestAllButton.Image = If(TestAllButton.Text = "Test All", stopTest, testAll)
         If TestAllButton.Text = "Test All" Then
             TestAllButton.Text = "Stop Test"
@@ -559,11 +564,7 @@ Public Class OpenCVB
         If AvailableAlgorithms.SelectedIndex < AvailableAlgorithms.Items.Count - 1 Then
             AvailableAlgorithms.SelectedIndex += 1
         Else
-            If AvailableAlgorithms.Items.Count = 1 Then ' selection index won't change if there is only one algorithm in the list.
-                StartAlgorithmTask()
-            Else
-                AvailableAlgorithms.SelectedIndex = 0
-            End If
+            AvailableAlgorithms.SelectedIndex = 0
         End If
         TestAllTimer.Enabled = True
     End Sub
@@ -1108,7 +1109,16 @@ Public Class OpenCVB
         StartAlgorithmTask()
     End Sub
     Private Sub StartAlgorithmTask()
-        Console.WriteLine("Queuing up: " + AvailableAlgorithms.Text)
+        testAllRunning = TestAllButton.Text = "Stop Test"
+        saveAlgorithmName = "" ' this should terminate the current running algorithm - unless it is hung!
+        If algorithmTaskHandle IsNot Nothing Then
+            While algorithmTaskHandle.IsAlive
+                If testAllRunning Then TestAllTimer.Enabled = False ' no more tasks please...
+                Thread.Sleep(1000)
+            End While
+            If testAllRunning Then TestAllTimer.Enabled = True
+        End If
+
         saveAlgorithmName = AvailableAlgorithms.Text ' this tells the previous algorithmTask to terminate.
 
         Dim parms As New VB_Classes.ActiveTask.algParms
@@ -1120,7 +1130,6 @@ Public Class OpenCVB
         parms.PythonExe = optionsForm.PythonExeName.Text
 
         parms.useRecordedData = OpenCVkeyword.Text = "<All using recorded data>"
-        testAllRunning = TestAllButton.Text = "Stop Test"
         parms.testAllRunning = testAllRunning
         parms.externalPythonInvocation = externalPythonInvocation
         parms.ShowConsoleLog = optionsForm.ShowConsoleLog.Checked
@@ -1171,11 +1180,11 @@ Public Class OpenCVB
             Run(task, algName)
 
             task.Dispose()
-            If parms.testAllRunning Then Console.WriteLine(vbTab + "Ending " + algName)
         End SyncLock
         frameCount = 0
     End Sub
     Private Sub Run(task As VB_Classes.ActiveTask, algName As String)
+        Dim saveWorkingRes = workingRes
         While 1
             Dim ratioImageToCampic = task.color.Width / camPic(0).Width  ' relative size of displayed image and algorithm size image.
             Dim currentCameraIndex = saveCameraIndex
@@ -1184,6 +1193,7 @@ Public Class OpenCVB
                 If saveAlgorithmName <> algName Then Exit Sub ' pause will stop the current algorithm as well.
                 SyncLock bufferLock
                     If frameCount > 0 And (saveCameraIndex <> currentCameraIndex Or camera.width <> workingRes.Width) Then Exit Sub
+                    If saveWorkingRes <> workingRes Then Exit Sub ' switching camera resolution means stopping the current algorithm
                     If taskNewImages And pauseAlgorithmThread = False Then
                         ' bring the data into the algorithm task.
                         task.color = camera.color.clone
