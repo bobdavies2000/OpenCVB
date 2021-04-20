@@ -6,7 +6,7 @@ Public Class Histogram_Basics : Inherits VBparent
     Public plotHist As Plot_Histogram
     Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
     Public Sub New()
-        plotHist = New Plot_Histogram()
+        plotHist = New Plot_Histogram
         plotHist.minRange = 0
         kalman = New Kalman_Basics()
 
@@ -18,10 +18,7 @@ Public Class Histogram_Basics : Inherits VBparent
         Static colorName As String
         If standalone Or task.intermediateReview = caller Then
             Dim split() = src.Split()
-            If task.frameCount Mod 100 = 0 Then
-                splitIndex += 1
-                If splitIndex > 2 Then splitIndex = 0
-            End If
+            If task.frameCount Mod 100 = 0 Then splitIndex = If(splitIndex < 2, splitIndex + 1, 0)
             src = split(splitIndex)
             colorName = Choose(splitIndex + 1, "Blue", "Green", "Red")
         End If
@@ -445,42 +442,6 @@ Public Class Histogram_ColorsAndGray : Inherits VBparent
     End Sub
 End Class
 
-
-
-
-
-Public Class Histogram_BackProjectionPeak : Inherits VBparent
-    Dim hist As Histogram_Basics
-    Public Sub New()
-        hist = New Histogram_Basics
-
-        task.desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
-        label2 = "Grayscale Histogram"
-    End Sub
-    Public Sub Run(src As cv.Mat)
-        task.useKalman = False
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        hist.Run(src)
-        dst2 = hist.dst1
-
-        Dim minVal As Single, maxVal As Single
-        Dim minIdx As cv.Point, maxIdx As cv.Point
-        hist.histogram.MinMaxLoc(minVal, maxVal, minIdx, maxIdx)
-        Dim barWidth = dst1.Width / task.histogramBins
-        Dim barRange = 255 / task.histogramBins
-        Dim histindex = maxIdx.Y
-        Dim pixelMin = CInt((histindex) * barRange)
-        Dim pixelMax = CInt((histindex + 1) * barRange)
-
-        Dim mask = src.InRange(pixelMin, pixelMax).Threshold(1, 255, cv.ThresholdTypes.Binary)
-        Dim tmp = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        src.CopyTo(tmp, mask)
-        dst1 = tmp.Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-        label1 = "BackProjection of most frequent gray pixel"
-        dst2.Rectangle(New cv.Rect(barWidth * histindex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 1)
-    End Sub
-End Class
 
 
 
@@ -1337,5 +1298,90 @@ Public Class Histogram_BothViews : Inherits VBparent
 
         topview.Run(src)
         dst2 = topview.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Histogram_Peaks : Inherits VBparent
+    Dim hist As Histogram_Basics
+    Public Sub New()
+        hist = New Histogram_Basics
+        task.desc = "Find the peaks - columns taller that both neighbors - in the histogram"
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        hist.Run(src)
+        dst1 = hist.dst1
+
+        Dim histogram = hist.histogram
+        Dim peaks As New List(Of Integer)
+        Dim hCount As New List(Of Single)
+        For i = 0 To histogram.Rows - 1
+            Dim prev = histogram.Get(Of Single)(Math.Max(i - 1, 0), 0)
+            Dim curr = histogram.Get(Of Single)(i, 0)
+            Dim nextVal = histogram.Get(Of Single)(Math.Min(i + 1, histogram.Rows - 1), 0)
+            If i = 0 Then
+                If prev > nextVal Then
+                    peaks.Add(i)
+                    hCount.Add(prev)
+                End If
+            Else
+                If prev < curr And curr >= nextVal Then
+                    peaks.Add(i)
+                    hCount.Add(curr)
+                End If
+            End If
+        Next
+
+        histogram.MinMaxLoc(minVal, maxVal)
+        Dim barWidth = dst1.Width / histogram.Rows
+        For i = 0 To peaks.Count - 1
+            Dim h = CInt(hCount(i) * dst1.Height / maxVal)
+            cv.Cv2.Rectangle(dst1, New cv.Rect(peaks(i) * barWidth, dst1.Height - h, barWidth, h), cv.Scalar.Yellow, 2)
+        Next
+        label1 = "There were " + CStr(peaks.Count) + " in the grayscale image"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Histogram_PeakMax : Inherits VBparent
+    Dim hist As Histogram_Basics
+    Public Sub New()
+        hist = New Histogram_Basics
+
+        task.desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
+        label2 = "Grayscale Histogram"
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        task.useKalman = False
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        hist.Run(src)
+        dst2 = hist.dst1
+
+        Dim minVal As Single, maxVal As Single
+        Dim minIdx As cv.Point, maxIdx As cv.Point
+        hist.histogram.MinMaxLoc(minVal, maxVal, minIdx, maxIdx)
+        Dim barWidth = dst1.Width / task.histogramBins
+        Dim barRange = 255 / task.histogramBins
+        Dim histindex = maxIdx.Y
+        Dim pixelMin = CInt((histindex) * barRange)
+        Dim pixelMax = CInt((histindex + 1) * barRange)
+
+        Dim mask = src.InRange(pixelMin, pixelMax).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        Dim tmp = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        src.CopyTo(tmp, mask)
+        dst1 = tmp.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        label1 = "BackProjection of most frequent gray pixel"
+        dst2.Rectangle(New cv.Rect(barWidth * histindex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 1)
     End Sub
 End Class

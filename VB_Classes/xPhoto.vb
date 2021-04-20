@@ -43,7 +43,7 @@ End Class
 
 
 
-Module xPhoto_OilPaint_CPP_Module
+Module XPhoto_OilPaint_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function xPhoto_OilPaint_Open() As IntPtr
     End Function
@@ -127,7 +127,7 @@ End Class
 
 
 
-Public Class xPhoto_Inpaint : Inherits VBparent
+Public Class XPhoto_Inpaint : Inherits VBparent
     Public basics As InPaint_Basics
     Public Sub New()
         basics = New InPaint_Basics

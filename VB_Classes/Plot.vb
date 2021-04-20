@@ -215,7 +215,6 @@ Public Class Plot_Histogram : Inherits VBparent
         End If
         dst1.SetTo(backColor)
         Dim barWidth = dst1.Width / hist.Rows
-        Dim minVal As Single, maxVal As Single
         hist.MinMaxLoc(minVal, maxVal)
 
         If fixedMaxVal = 0 Then

@@ -367,3 +367,17 @@ Public Class Reduction_DepthMax : Inherits VBparent
         dst2 = colorizer.dst1
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Reduction_ToPeaks : Inherits VBparent
+    Public Sub New()
+        task.desc = "Reduce an image to the histogram peaks"
+    End Sub
+    Public Sub Run(src As cv.Mat)
+    End Sub
+End Class

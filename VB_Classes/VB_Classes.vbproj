@@ -422,7 +422,6 @@
     <Content Include="MPL_Histogram_PS.py" />
     <Content Include="MPL_PlotContours_PS.py" />
     <Content Include="Plane.py" />
-    <Content Include="Pyglet_Image_PS.py" />
     <Content Include="Python_Stream_PS.py" />
     <Content Include="AddWeighted_PS.py" />
     <Content Include="BGSubtract.py" />
