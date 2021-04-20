@@ -530,7 +530,7 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
-        If frameCount = 0 And TestAllButton.Text = "Stop Test" Then Exit Sub ' we have to see some output from the algorithm before moving on...
+        If frameCount < 5 And TestAllButton.Text = "Stop Test" Then Exit Sub ' we have to see some output from the algorithm before moving on...
         TestAllTimer.Enabled = False ' it can take a while to restart the camera so stop watching until the timer event is complete.
         If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Then
             If optionsForm.resolution640.Enabled And optionsForm.resolution1280.Checked Then
@@ -561,11 +561,9 @@ Public Class OpenCVB
         mouseClickPoint = New cv.Point
         mousePoint = New cv.Point
 
-        If AvailableAlgorithms.SelectedIndex < AvailableAlgorithms.Items.Count - 1 Then
-            AvailableAlgorithms.SelectedIndex += 1
-        Else
-            AvailableAlgorithms.SelectedIndex = 0
-        End If
+        With AvailableAlgorithms
+            .SelectedIndex = If(.SelectedIndex < .Items.Count - 1, .SelectedIndex + 1, 0)
+        End With
         TestAllTimer.Enabled = True
     End Sub
     Private Sub startCamera()
