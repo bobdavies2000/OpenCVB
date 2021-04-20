@@ -16,6 +16,7 @@ End Module
 Public Class OpenCVB
 #Region "Globals"
     Dim AlgorithmCount As Integer
+    Dim saveSelectedAlgorithmIndex As Integer
     Dim AlgorithmTestCount As Integer
     Dim algorithmTaskHandle As Thread
 
@@ -522,6 +523,7 @@ Public Class OpenCVB
             TestAllTimer_Tick(sender, e)
             TestAllTimer.Enabled = True
             AlgorithmTestCount = 0
+            saveSelectedAlgorithmIndex = AvailableAlgorithms.SelectedIndex
             If TreeViewDialog IsNot Nothing Then TreeViewDialog.Timer1.Enabled = True
         Else
             TestAllTimer.Enabled = False
@@ -532,7 +534,7 @@ Public Class OpenCVB
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
         If frameCount < 5 And TestAllButton.Text = "Stop Test" Then Exit Sub ' we have to see some output from the algorithm before moving on...
         TestAllTimer.Enabled = False ' it can take a while to restart the camera so stop watching until the timer event is complete.
-        If AlgorithmTestCount Mod AvailableAlgorithms.Items.Count = 0 And AlgorithmTestCount > 0 Then
+        If AvailableAlgorithms.SelectedIndex = saveSelectedAlgorithmIndex And AlgorithmTestCount > 0 Then
             If optionsForm.resolution640.Enabled And optionsForm.resolution1280.Checked Then
                 optionsForm.resolution640.Checked = True
                 workingRes = New cv.Size(640, 480)
