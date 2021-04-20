@@ -10,7 +10,6 @@ Public Class Histogram_Basics : Inherits VBparent
         plotHist.minRange = 0
         kalman = New Kalman_Basics()
 
-        label2 = "Histogram - x=bins/y=count"
         task.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -31,8 +30,6 @@ Public Class Histogram_Basics : Inherits VBparent
         Dim dimensions() = New Integer() {task.histogramBins}
         cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, New cv.Mat, histogram, 1, dimensions, ranges)
 
-        label2 = "Plot Histogram bins = " + CStr(task.histogramBins)
-
         If task.useKalman Then
             ReDim kalman.kInput(task.histogramBins - 1)
             For i = 0 To task.histogramBins - 1
@@ -48,7 +45,7 @@ Public Class Histogram_Basics : Inherits VBparent
         If standalone Or task.intermediateReview = caller Then plotHist.backColor = splitColors(splitIndex)
         plotHist.Run(src)
         dst1 = plotHist.dst1
-        label1 = colorName + " input to histogram"
+        label1 = colorName + " histogram, bins = " + CStr(task.histogramBins)
     End Sub
 End Class
 
