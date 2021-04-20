@@ -9,7 +9,6 @@ Public Class OptionsCommon : Inherits VBparent
         gOptions.Show()
 
         task.palette = New Palette_Basics
-        task.cameraStableSlider = gOptions.IMUmotionSlider
         task.histogramBins = gOptions.HistBinSlider.Value
         updateSettings()
         label1 = "Depth values that are in-range"
@@ -25,6 +24,8 @@ Public Class OptionsCommon : Inherits VBparent
         task.paletteSchemeName = gOptions.schemeName
 
         task.histogramBins = gOptions.HistBinSlider.Value
+        task.cameraMotionLimit = gOptions.IMUmotionSlider.Value / 100
+        task.cameraLevelLimit = gOptions.IMUlevelSlider.Value / 10
 
         task.minDepth = gOptions.MinRange.Value
         task.maxDepth = gOptions.MaxRange.Value

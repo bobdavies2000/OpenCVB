@@ -533,8 +533,8 @@ Public Class PointCloud_Kalman_TopView : Inherits VBparent
         dst1 = pTrack.dst1
 
         If standalone Or task.intermediateReview = caller Then
-            topView.cmat.Run(dst1)
-            dst1 = topView.cmat.dst1
+            topView.setupTop.Run(dst1)
+            dst1 = topView.setupTop.dst1
         End If
         Dim FOV = task.hFov
         label1 = Format(task.pixelsPerMeter, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
@@ -550,12 +550,10 @@ Public Class PointCloud_Kalman_SideView : Inherits VBparent
     Public flood As Floodfill_Identifiers
     Public sideView As Histogram_SideView2D
     Public pTrack As KNN_PointTracker
-    Public cmat As PointCloud_SetupSide
+    Public setupSide As PointCloud_SetupSide
     Public Sub New()
-
-
         pTrack = New KNN_PointTracker
-        cmat = New PointCloud_SetupSide
+        setupSide = New PointCloud_SetupSide
         flood = New Floodfill_Identifiers
 
         findSlider("FloodFill Minimum Size").Value = 100
@@ -575,8 +573,8 @@ Public Class PointCloud_Kalman_SideView : Inherits VBparent
         dst1 = pTrack.dst1
 
         If standalone Or task.intermediateReview = caller Then
-            cmat.Run(dst1)
-            dst1 = cmat.dst1
+            setupSide.Run(dst1)
+            dst1 = setupSide.dst1
         End If
 
         Dim FOV = (180 - task.vFov) / 2
@@ -597,14 +595,12 @@ Public Class PointCloud_BackProject : Inherits VBparent
     Dim both As PointCloud_BothViews
     Dim mats As Mat_4to1
     Public Sub New()
-
         both = New PointCloud_BothViews()
         mats = New Mat_4to1()
         label1 = "Click any quadrant below to enlarge it"
         label2 = "Click any centroid to display details"
         task.desc = "Backproject the selected object"
     End Sub
-
     Public Sub Run(src As cv.Mat)
         If task.mouseClickFlag Then
             ' lower left image is the mat_4to1
@@ -636,9 +632,9 @@ End Class
 Public Class PointCloud_FrustrumTop : Inherits VBparent
     Dim frustrum As Draw_Frustrum
     Dim topView As Histogram_TopView2D
-    Dim cmat As PointCloud_SetupTop
+    Dim setupTop As PointCloud_SetupTop
     Public Sub New()
-        cmat = New PointCloud_SetupTop
+        setupTop = New PointCloud_SetupTop
         frustrum = New Draw_Frustrum
         topView = New Histogram_TopView2D
 
@@ -656,8 +652,8 @@ Public Class PointCloud_FrustrumTop : Inherits VBparent
         frustrum.Run(src)
         topView.Run(frustrum.dst2)
 
-        cmat.Run(topView.dst1)
-        dst1 = cmat.dst1
+        setupTop.Run(topView.dst1)
+        dst1 = setupTop.dst1
     End Sub
 End Class
 
@@ -671,9 +667,9 @@ End Class
 Public Class PointCloud_FrustrumSide : Inherits VBparent
     Dim frustrum As Draw_Frustrum
     Dim sideView As Histogram_SideView2D
-    Dim cmat As PointCloud_SetupSide
+    Dim setupSide As PointCloud_SetupSide
     Public Sub New()
-        cmat = New PointCloud_SetupSide
+        setupSide = New PointCloud_SetupSide
         frustrum = New Draw_Frustrum
         sideView = New Histogram_SideView2D
 
@@ -691,8 +687,8 @@ Public Class PointCloud_FrustrumSide : Inherits VBparent
         frustrum.Run(src)
         sideView.Run(frustrum.dst2)
 
-        cmat.Run(sideView.dst1)
-        dst1 = cmat.dst1
+        setupSide.Run(sideView.dst1)
+        dst1 = setupSide.dst1
     End Sub
 End Class
 
@@ -715,7 +711,6 @@ Public Class PointCloud_ReducedSideView : Inherits VBparent
         task.desc = "Create a stable side view of the point cloud"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         gCloud.Run(src)
 
         Dim split = gCloud.dst1.Split()
@@ -751,7 +746,6 @@ Public Class PointCloud_ReducedTopView : Inherits VBparent
         task.desc = "Create a stable side view of the point cloud"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         gCloud.Run(src)
 
         Dim split = gCloud.dst1.Split()
@@ -781,11 +775,10 @@ End Class
 Public Class PointCloud_ObjectsTop : Inherits VBparent
     Public measureTop As PointCloud_Kalman_TopView
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Dim cmat As PointCloud_SetupTop
+    Dim setupTop As PointCloud_SetupTop
     Public colorizeNeeded As Boolean
     Public Sub New()
-
-        cmat = New PointCloud_SetupTop
+        setupTop = New PointCloud_SetupTop
         measureTop = New PointCloud_Kalman_TopView
 
         If standalone Then
@@ -870,8 +863,8 @@ Public Class PointCloud_ObjectsTop : Inherits VBparent
             viewObjects.Add(vo.rectFront.Width * vo.rectFront.Height, vo)
         Next
         If standalone Or task.intermediateReview = caller Or colorizeNeeded Then
-            cmat.Run(dst1)
-            dst1 = cmat.dst1
+            setupTop.Run(dst1)
+            dst1 = setupTop.dst1
         End If
     End Sub
 End Class
@@ -891,9 +884,9 @@ End Class
 Public Class PointCloud_ObjectsSide : Inherits VBparent
     Public measureSide As PointCloud_Kalman_SideView
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Dim cmat As PointCloud_SetupSide
+    Dim setupSide As PointCloud_SetupSide
     Public Sub New()
-        cmat = New PointCloud_SetupSide
+        setupSide = New PointCloud_SetupSide
         measureSide = New PointCloud_Kalman_SideView
 
         If standalone Then
@@ -987,8 +980,8 @@ Public Class PointCloud_ObjectsSide : Inherits VBparent
             viewObjects.Add(vo.rectFront.Width * vo.rectFront.Height, vo)
         Next
         If standalone Or task.intermediateReview = caller Then
-            cmat.Run(dst1)
-            dst1 = cmat.dst1
+            setupSide.Run(dst1)
+            dst1 = setupSide.dst1
         End If
     End Sub
 End Class
@@ -1003,21 +996,18 @@ End Class
 Public Class PointCloud_BothViews : Inherits VBparent
     Public topPixel As PointCloud_ObjectsTop
     Public sidePixel As PointCloud_ObjectsSide
-    Dim levelCheck As IMU_isCameraLevel
     Public detailText As String
     Public backMat As New cv.Mat
     Public backMatMask As New cv.Mat
     Public vwTop As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Public vwSide As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Dim cmatSide As PointCloud_SetupSide
-    Dim cmatTop As PointCloud_SetupTop
+    Dim setupSide As PointCloud_SetupSide
+    Dim setupTop As PointCloud_SetupTop
     Public Sub New()
-
-        levelCheck = New IMU_isCameraLevel
         topPixel = New PointCloud_ObjectsTop
         sidePixel = New PointCloud_ObjectsSide
-        cmatSide = New PointCloud_SetupSide
-        cmatTop = New PointCloud_SetupTop
+        setupSide = New PointCloud_SetupSide
+        setupTop = New PointCloud_SetupTop
 
         backMat = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC3)
         backMatMask = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
@@ -1038,8 +1028,7 @@ Public Class PointCloud_BothViews : Inherits VBparent
             Static xRotateSlider = findSlider("Amount to rotate pointcloud around X-axis (degrees)")
             Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
             If xRotateSlider.Value <> 0 Or zRotateSlider.Value <> 0 Then
-                levelCheck.Run(src)
-                If levelCheck.cameraLevel Then
+                If task.cameraLevel Then
                     accMsg1 = "Distances are good - camera is level"
                     accMsg2 = "Distances are good - camera is level"
                 Else
@@ -1114,11 +1103,11 @@ Public Class PointCloud_BothViews : Inherits VBparent
             End If
         End If
 
-        cmatSide.Run(sidePixel.dst1)
-        dst1 = cmatSide.dst1
+        setupSide.Run(sidePixel.dst1)
+        dst1 = setupSide.dst1
 
-        cmatTop.Run(topPixel.dst1)
-        dst2 = cmatTop.dst1
+        setupTop.Run(topPixel.dst1)
+        dst2 = setupTop.dst1
     End Sub
 End Class
 
@@ -1191,17 +1180,16 @@ End Class
 
 Public Class PointCloud_BackProjectSideView : Inherits VBparent
     Dim view As PointCloud_ObjectsSide
-    Dim cmatSide As PointCloud_SetupSide
+    Dim setupSide As PointCloud_SetupSide
     Public Sub New()
-
         view = New PointCloud_ObjectsSide
-        cmatSide = New PointCloud_SetupSide
+        setupSide = New PointCloud_SetupSide
         task.desc = "Display only the side view of the depth data - with and without the IMU active"
     End Sub
     Public Sub Run(src As cv.Mat)
         view.Run(src)
-        cmatSide.Run(view.dst1)
-        dst2 = cmatSide.dst1
+        setupSide.Run(view.dst1)
+        dst2 = setupSide.dst1
 
         Dim rectList = New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
         For Each obj In view.viewObjects

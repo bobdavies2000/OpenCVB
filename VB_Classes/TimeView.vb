@@ -2,13 +2,13 @@ Imports cv = OpenCvSharp
 Public Class TimeView_Basics : Inherits VBparent
     Public sideView As Histogram_SideView2D
     Public topView As Histogram_TopView2D
-    Dim sideSetup As PointCloud_SetupSide
-    Dim topSetup As PointCloud_SetupTop
+    Dim setupSide As PointCloud_SetupSide
+    Dim setupTop As PointCloud_SetupTop
     Public Sub New()
         sideView = New Histogram_SideView2D
-        sideSetup = New PointCloud_SetupSide
+        setupSide = New PointCloud_SetupSide
         topView = New Histogram_TopView2D
-        topSetup = New PointCloud_SetupTop
+        setupTop = New PointCloud_SetupTop
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -41,11 +41,11 @@ Public Class TimeView_Basics : Inherits VBparent
         topFrames.Add(topView.originalHistOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary))
 
         sideAccum = sideAccum.Add(sideFrames.ElementAt(sideFrames.Count - 1))
-        sideSetup.Run(sideAccum.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR))
-        dst1 = sideSetup.dst1
+        setupSide.Run(sideAccum.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+        dst1 = setupSide.dst1
         topAccum = topAccum.Add(topFrames.ElementAt(sideFrames.Count - 1))
-        topSetup.Run(topAccum.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR))
-        dst2 = topSetup.dst1
+        setupTop.Run(topAccum.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+        dst2 = setupTop.dst1
 
         label1 = "Accum " + CStr(topFrames.Count) + " side frames with hist threshold > " + CStr(task.hist3DThreshold)
         label2 = "Accum " + CStr(topFrames.Count) + " top frames with hist threshold > " + CStr(task.hist3DThreshold)
@@ -241,13 +241,13 @@ End Class
 
 Public Class TimeView_Frustrum : Inherits VBparent
     Dim tView As TimeView_Rectangles
-    Dim cmatSide As PointCloud_SetupSide
-    Dim cmatTop As PointCloud_SetupTop
+    Dim setupSide As PointCloud_SetupSide
+    Dim setupTop As PointCloud_SetupTop
     Dim mats As Mat_4Click
     Public Sub New()
         mats = New Mat_4Click
-        cmatSide = New PointCloud_SetupSide
-        cmatTop = New PointCloud_SetupTop
+        setupSide = New PointCloud_SetupSide
+        setupTop = New PointCloud_SetupTop
         tView = New TimeView_Rectangles
         label2 = "Click a quadrant in dst1 to show it in dst2 "
         task.desc = "Colorize the back and side views"
@@ -257,11 +257,11 @@ Public Class TimeView_Frustrum : Inherits VBparent
         mats.mat(0) = tView.dst1.Clone
         mats.mat(1) = tView.dst2.Clone
 
-        cmatTop.Run(tView.dst1)
-        mats.mat(2) = cmatTop.dst1
+        setupTop.Run(tView.dst1)
+        mats.mat(2) = setupTop.dst1
 
-        cmatSide.Run(tView.dst2)
-        mats.mat(3) = cmatSide.dst1
+        setupSide.Run(tView.dst2)
+        mats.mat(3) = setupSide.dst1
 
         mats.Run(Nothing)
         dst1 = mats.dst1

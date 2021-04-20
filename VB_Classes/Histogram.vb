@@ -545,11 +545,11 @@ End Class
 
 Public Class Histogram_SmoothTopView2D : Inherits VBparent
     Public topView As Histogram_TopView2D
-    Dim cmat As PointCloud_SetupTop
+    Dim setupTop As PointCloud_SetupTop
     Dim stable As Motion_MinMaxPointCloud
     Public Sub New()
 
-        cmat = New PointCloud_SetupTop
+        setupTop = New PointCloud_SetupTop
         topView = New Histogram_TopView2D
 
         stable = New Motion_MinMaxPointCloud
@@ -571,8 +571,8 @@ Public Class Histogram_SmoothTopView2D : Inherits VBparent
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cmat.Run(dst2)
-        dst2 = cmat.dst1
+        setupTop.Run(dst2)
+        dst2 = setupTop.dst1
     End Sub
 End Class
 
@@ -584,11 +584,11 @@ End Class
 
 Public Class Histogram_SmoothSideView2D : Inherits VBparent
     Public sideView As Histogram_SideView2D
-    Dim cmat As PointCloud_SetupSide
+    Dim setupSide As PointCloud_SetupSide
     Dim stable As Motion_MinMaxPointCloud
     Public Sub New()
 
-        cmat = New PointCloud_SetupSide
+        setupSide = New PointCloud_SetupSide
         sideView = New Histogram_SideView2D
 
         stable = New Motion_MinMaxPointCloud
@@ -609,8 +609,8 @@ Public Class Histogram_SmoothSideView2D : Inherits VBparent
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cmat.Run(dst2)
-        dst2 = cmat.dst1
+        setupSide.Run(dst2)
+        dst2 = setupSide.dst1
     End Sub
 End Class
 
@@ -624,7 +624,6 @@ Public Class Histogram_StableDepthClusters : Inherits VBparent
     Dim clusters As Histogram_DepthClusters
     Dim motionSD As Motion_MinMaxDepth
     Public Sub New()
-
         clusters = New Histogram_DepthClusters
         motionSD = New Motion_MinMaxDepth
         label1 = "Histogram of stable depth"
@@ -654,18 +653,16 @@ Public Class Histogram_TopView2D : Inherits VBparent
     Public histOutput As New cv.Mat
     Public originalHistOutput As New cv.Mat
     Public markers(2 - 1) As cv.Point2f
-    Public cmat As PointCloud_SetupTop
+    Public setupTop As PointCloud_SetupTop
     Public resizeHistOutput As Boolean = True
     Public Sub New()
-
-        cmat = New PointCloud_SetupTop
+        setupTop = New PointCloud_SetupTop
         gCloud = New Depth_PointCloud_IMU
 
         label1 = "XZ (Top View)"
         task.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
         gCloud.Run(src) ' when displaying both top and side views, the gcloud run has already been done.
 
@@ -679,8 +676,8 @@ Public Class Histogram_TopView2D : Inherits VBparent
         dst1 = histOutput.Clone
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cmat.Run(dst2)
-        dst2 = cmat.dst1
+        setupTop.Run(dst2)
+        dst2 = setupTop.dst1
     End Sub
 End Class
 
@@ -696,12 +693,11 @@ Public Class Histogram_SideView2D : Inherits VBparent
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Public originalHistOutput As New cv.Mat
-    Public cmat As PointCloud_SetupSide
+    Public setupSide As PointCloud_SetupSide
     Public frustrumAdjust As Single
     Public resizeHistOutput As Boolean = True
     Public Sub New()
-
-        cmat = New PointCloud_SetupSide
+        setupSide = New PointCloud_SetupSide
         gCloud = New Depth_PointCloud_IMU
 
         label1 = "ZY (Side View)"
@@ -719,8 +715,8 @@ Public Class Histogram_SideView2D : Inherits VBparent
         histOutput.ConvertTo(dst1, cv.MatType.CV_8UC1)
 
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cmat.Run(dst2)
-        dst2 = cmat.dst1
+        setupSide.Run(dst2)
+        dst2 = setupSide.dst1
     End Sub
 End Class
 
@@ -1360,7 +1356,7 @@ Public Class Histogram_Peaks : Inherits VBparent
             Dim h = CInt(vCount(i) * dst1.Height / maxVal)
             cv.Cv2.Rectangle(dst1, New cv.Rect(valleys(i) * barWidth, dst1.Height - h, barWidth, h), cv.Scalar.Blue, 2)
         Next
-        label1 = "There were " + CStr(peaks.Count) + " in the grayscale image"
+        label1 = "Grayscale image: " + CStr(peaks.Count) + " peaks (yellow), valley=blue"
     End Sub
 End Class
 

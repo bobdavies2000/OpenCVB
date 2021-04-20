@@ -509,38 +509,22 @@ End Class
 
 
 
-Public Class IMU_isCameraLevel : Inherits VBparent
-    Public angleX As Single ' in radians.
-    Public angleY As Single ' in radians.
-    Public angleZ As Single ' in radians.
-    Public cameraLevel As Boolean
-    Dim flow As Font_FlowText
+Public Class IMU_IsCameraLevel : Inherits VBparent
     Public Sub New()
-        If standalone Then flow = New Font_FlowText()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 1)
-            sliders.setupTrackBar(0, "Threshold in degrees X10", 1, 100, 20) ' default is 20 which is 2 degrees from 0...
-        End If
+        task.callTrace.Clear() ' special line to clear the tree view otherwise this common option is standalone.
+        standalone = False
         task.desc = "Answer the question: Is the camera level?"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim gx = task.IMU_Acceleration.X
         Dim gy = task.IMU_Acceleration.Y
         Dim gz = task.IMU_Acceleration.Z
 
-        angleX = (Math.Atan2(gy, gx) + cv.Cv2.PI / 2) * 57.2958
-        angleY = (Math.Atan2(gx, gy) - cv.Cv2.PI / 2) * 57.2958
-        angleZ = (Math.Atan2(gy, gz) + cv.Cv2.PI / 2) * 57.2958
+        task.angleX = (Math.Atan2(gy, gx) + cv.Cv2.PI / 2) * 57.2958
+        task.angleY = (Math.Atan2(gx, gy) - cv.Cv2.PI / 2) * 57.2958
+        task.angleZ = (Math.Atan2(gy, gz) + cv.Cv2.PI / 2) * 57.2958
 
-        Dim degreesThreshold = sliders.trackbar(0).Value / 10 ' 0-100 --> 0-10 degrees
-        If Math.Abs(angleX) > degreesThreshold Or Math.Abs(angleZ) > degreesThreshold Then cameraLevel = False Else cameraLevel = True
-        If standalone Or task.intermediateReview = caller Then
-            flow.msgs.Add(" Angle X = " + Format(angleX, "0.00") + " degrees" +
-                          " Angle Y = " + Format(angleY, "0.00") + " degrees" +
-                          " Angle Z = " + Format(angleZ, "0.00") + " degrees" +
-                          If(cameraLevel, " - Camera is level", " - Camera is NOT level"))
-            flow.Run(Nothing)
-        End If
+        task.cameraLevel = If(Math.Abs(task.angleX) > task.cameraLevelLimit Or Math.Abs(task.angleZ) > task.cameraLevelLimit, False, True)
     End Sub
 End Class
 
@@ -554,7 +538,6 @@ End Class
 
 
 Public Class IMU_IscameraStable : Inherits VBparent
-    Dim flow As Font_FlowText
     Public Sub New()
         task.callTrace.Clear() ' special line to clear the tree view otherwise this common option is standalone.
         standalone = False
@@ -566,8 +549,7 @@ Public Class IMU_IscameraStable : Inherits VBparent
         Dim roll = task.IMU_AngularVelocity.Z
 
         Dim totalRadians = Math.Abs(pitch) + Math.Abs(yaw) + Math.Abs(roll)
-        Dim permissableRadians = task.cameraStableSlider.Value / 100
-        task.cameraStable = If(totalRadians > permissableRadians, False, True)
+        task.cameraStable = If(totalRadians > task.cameraMotionLimit, False, True)
         If task.useKalmanWhenStable Then task.useKalman = If(task.cameraStable, task.useKalman, False)
     End Sub
 End Class

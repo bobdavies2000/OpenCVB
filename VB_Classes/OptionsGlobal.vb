@@ -26,7 +26,10 @@ Public Class OptionsGlobal
         ProjectionThreshold.Text = CStr(ProjectionSlider.Value)
 
         IMUmotionSlider.Value = GetSetting("OpenCVB", "IMUmotionSlider", "IMUmotionSlider", 1)
-        IMUmotion.Text = CStr(IMUmotionSlider.Value)
+        MotionThresholdValue.Text = CStr(IMUmotionSlider.Value)
+
+        IMUlevelSlider.Value = GetSetting("OpenCVB", "IMUlevelSlider", "IMUlevelSlider", 20)
+        LevelThresholdValue.Text = CStr(IMUlevelSlider.Value)
 
         UseKalman.Checked = GetSetting("OpenCVB", "useKalman", "useKalman", True)
         UseKalmanWhenStable.Checked = GetSetting("OpenCVB", "UseKalmanWhenStable", "UseKalmanWhenStable", False)
@@ -66,7 +69,9 @@ Public Class OptionsGlobal
         SaveSetting("OpenCVB", "MaxRangeDepth", "MaxRangeDepth", MaxRange.Value)
         SaveSetting("OpenCVB", "HistogramBins", "HistogramBins", HistBinSlider.Value)
         SaveSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", ProjectionSlider.Value)
+
         SaveSetting("OpenCVB", "IMUmotionSlider", "IMUmotionSlider", IMUmotionSlider.Value)
+        SaveSetting("OpenCVB", "IMUlevelSlider", "IMUlevelSlider", IMUlevelSlider.Value)
 
         SaveSetting("OpenCVB", "useKalman", "useKalman", UseKalman.Checked)
         SaveSetting("OpenCVB", "UseKalmanWhenStable", "UseKalmanWhenStable", UseKalmanWhenStable.Checked)
@@ -74,9 +79,6 @@ Public Class OptionsGlobal
     End Sub
     Private Sub thresholdSlider_Scroll(sender As Object, e As EventArgs) Handles HistBinSlider.Scroll
         HistBinsCount.Text = CStr(HistBinSlider.Value)
-    End Sub
-    Private Sub IMUmotionSlider_Scroll(sender As Object, e As EventArgs) Handles IMUmotionSlider.Scroll
-        IMUmotion.Text = CStr(IMUmotionSlider.Value)
     End Sub
     Private Sub palette_CheckedChanged(sender As Object, e As EventArgs)
         checkRadios()
@@ -86,11 +88,20 @@ Public Class OptionsGlobal
         SaveSetting("OpenCVB", "MaxRangeDepth", "MaxRangeDepth", 4000)
         SaveSetting("OpenCVB", "HistogramBins", "HistogramBins", 40)
         SaveSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", 2)
+
         SaveSetting("OpenCVB", "IMUmotionSlider", "IMUmotionSlider", 1)
+        SaveSetting("OpenCVB", "IMUlevelSlider", "IMUlevelSlider", 20)
+
         SaveSetting("OpenCVB", "useKalman", "useKalman", True)
         SaveSetting("OpenCVB", "UseKalmanWhenStable", "UseKalmanWhenStable", False)
         SaveSetting("OpenCVB", "DefaultPalette", "DefaultPalette", "Jet")
         OptionsGlobal_Load(sender, e)
         resetToDefaults.Checked = False
+    End Sub
+    Private Sub TrackBar1_Scroll(sender As Object, e As EventArgs) Handles IMUlevelSlider.Scroll
+        LevelThresholdValue.Text = CStr(IMUlevelSlider.Value)
+    End Sub
+    Private Sub IMUmotionSlider_Scroll(sender As Object, e As EventArgs) Handles IMUmotionSlider.Scroll
+        MotionThresholdValue.Text = CStr(IMUmotionSlider.Value)
     End Sub
 End Class

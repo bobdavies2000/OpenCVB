@@ -127,6 +127,12 @@ Public Class ActiveTask : Implements IDisposable
 
     Public useKalman As Boolean
     Public useKalmanWhenStable As Boolean
+
+    Public cameraStable As Boolean
+    Public cameraLevel As Boolean
+    Public cameraMotionLimit As Single
+    Public cameraLevelLimit As Single
+
     Public palette As Palette_Basics
     Public paletteGradient As cv.Mat
     Public paletteScheme As cv.ColormapTypes
@@ -134,7 +140,6 @@ Public Class ActiveTask : Implements IDisposable
 
     Public minDepth As Integer
     Public maxDepth As Integer
-    Public cameraStableSlider As Windows.Forms.TrackBar
 
     Public mouseClickFlag As Boolean
     Public mouseClickPoint As cv.Point
@@ -201,7 +206,6 @@ Public Class ActiveTask : Implements IDisposable
 
     Public pythonTaskName As String
     Public algName As String
-    Public cameraStable As Boolean
     Public lineType As cv.LineTypes
 
     Public ttTextData As New List(Of TTtext)
@@ -328,7 +332,7 @@ Public Class ActiveTask : Implements IDisposable
             viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
             inrange = algoList.createAlgorithm("OptionsCommon")
             IMUStable = algoList.createAlgorithm("IMU_IscameraStable")
-            IMULevel = algoList.createAlgorithm("IMU_IscameraStable")
+            IMULevel = algoList.createAlgorithm("IMU_IsCameraLevel")
             PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
         End If
 
@@ -364,7 +368,7 @@ Public Class ActiveTask : Implements IDisposable
             If task.pythonTaskName.EndsWith(".py") = False Then
                 inrange.Run(Nothing) ' updates all the depth info.
                 IMUStable.run(Nothing) ' updates the flag that indicates stability according to the IMU.
-                IMULevel.run(Nothing)
+                IMULevel.run(Nothing)  ' updates the flag that indicate the camera is level according to the IMU
             End If
 
             TaskTimer.Enabled = True

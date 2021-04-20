@@ -34,9 +34,6 @@ Partial Class OptionsGlobal
         Me.ProjectionThreshold = New System.Windows.Forms.Label()
         Me.ProjectionSlider = New System.Windows.Forms.TrackBar()
         Me.LabelProjection = New System.Windows.Forms.Label()
-        Me.IMUmotion = New System.Windows.Forms.Label()
-        Me.IMUmotionSlider = New System.Windows.Forms.TrackBar()
-        Me.ThresholdLabel = New System.Windows.Forms.Label()
         Me.HistBinsCount = New System.Windows.Forms.Label()
         Me.HistBinSlider = New System.Windows.Forms.TrackBar()
         Me.HistBins = New System.Windows.Forms.Label()
@@ -46,15 +43,24 @@ Partial Class OptionsGlobal
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.PaletteGroup = New System.Windows.Forms.GroupBox()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
+        Me.CameraOptions = New System.Windows.Forms.GroupBox()
+        Me.MotionThresholdValue = New System.Windows.Forms.Label()
+        Me.IMUmotionSlider = New System.Windows.Forms.TrackBar()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.LevelThresholdValue = New System.Windows.Forms.Label()
+        Me.IMUlevelSlider = New System.Windows.Forms.TrackBar()
+        Me.Label2 = New System.Windows.Forms.Label()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.MaxRange, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MinRange, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.HistogramSettings.SuspendLayout()
         CType(Me.ProjectionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox2.SuspendLayout()
         Me.PaletteGroup.SuspendLayout()
+        Me.CameraOptions.SuspendLayout()
+        CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.IMUlevelSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'MinMaxDepth
@@ -139,15 +145,12 @@ Partial Class OptionsGlobal
         Me.HistogramSettings.Controls.Add(Me.ProjectionThreshold)
         Me.HistogramSettings.Controls.Add(Me.ProjectionSlider)
         Me.HistogramSettings.Controls.Add(Me.LabelProjection)
-        Me.HistogramSettings.Controls.Add(Me.IMUmotion)
-        Me.HistogramSettings.Controls.Add(Me.IMUmotionSlider)
-        Me.HistogramSettings.Controls.Add(Me.ThresholdLabel)
         Me.HistogramSettings.Controls.Add(Me.HistBinsCount)
         Me.HistogramSettings.Controls.Add(Me.HistBinSlider)
         Me.HistogramSettings.Controls.Add(Me.HistBins)
         Me.HistogramSettings.Location = New System.Drawing.Point(12, 243)
         Me.HistogramSettings.Name = "HistogramSettings"
-        Me.HistogramSettings.Size = New System.Drawing.Size(829, 266)
+        Me.HistogramSettings.Size = New System.Drawing.Size(829, 195)
         Me.HistogramSettings.TabIndex = 1
         Me.HistogramSettings.TabStop = False
         Me.HistogramSettings.Text = "Histogram Options"
@@ -180,34 +183,6 @@ Partial Class OptionsGlobal
         Me.LabelProjection.TabIndex = 6
         Me.LabelProjection.Text = "Projection threshold"
         Me.LabelProjection.TextAlign = System.Drawing.ContentAlignment.TopRight
-        '
-        'IMUmotion
-        '
-        Me.IMUmotion.AutoSize = True
-        Me.IMUmotion.Location = New System.Drawing.Point(737, 175)
-        Me.IMUmotion.Name = "IMUmotion"
-        Me.IMUmotion.Size = New System.Drawing.Size(87, 20)
-        Me.IMUmotion.TabIndex = 5
-        Me.IMUmotion.Text = "IMUmotion"
-        '
-        'IMUmotionSlider
-        '
-        Me.IMUmotionSlider.Location = New System.Drawing.Point(213, 168)
-        Me.IMUmotionSlider.Maximum = 20
-        Me.IMUmotionSlider.Name = "IMUmotionSlider"
-        Me.IMUmotionSlider.Size = New System.Drawing.Size(505, 69)
-        Me.IMUmotionSlider.TabIndex = 4
-        Me.IMUmotionSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.IMUmotionSlider.Value = 1
-        '
-        'ThresholdLabel
-        '
-        Me.ThresholdLabel.Location = New System.Drawing.Point(19, 168)
-        Me.ThresholdLabel.Name = "ThresholdLabel"
-        Me.ThresholdLabel.Size = New System.Drawing.Size(196, 44)
-        Me.ThresholdLabel.TabIndex = 3
-        Me.ThresholdLabel.Text = "Threshold in IMU motion in radians X100"
-        Me.ThresholdLabel.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'HistBinsCount
         '
@@ -298,11 +273,83 @@ Partial Class OptionsGlobal
         Me.FlowLayoutPanel1.Size = New System.Drawing.Size(826, 113)
         Me.FlowLayoutPanel1.TabIndex = 5
         '
+        'CameraOptions
+        '
+        Me.CameraOptions.Controls.Add(Me.LevelThresholdValue)
+        Me.CameraOptions.Controls.Add(Me.IMUlevelSlider)
+        Me.CameraOptions.Controls.Add(Me.Label2)
+        Me.CameraOptions.Controls.Add(Me.MotionThresholdValue)
+        Me.CameraOptions.Controls.Add(Me.IMUmotionSlider)
+        Me.CameraOptions.Controls.Add(Me.Label4)
+        Me.CameraOptions.Location = New System.Drawing.Point(857, 459)
+        Me.CameraOptions.Name = "CameraOptions"
+        Me.CameraOptions.Size = New System.Drawing.Size(829, 188)
+        Me.CameraOptions.TabIndex = 6
+        Me.CameraOptions.TabStop = False
+        Me.CameraOptions.Text = "Camera Settings"
+        '
+        'MotionThresholdValue
+        '
+        Me.MotionThresholdValue.AutoSize = True
+        Me.MotionThresholdValue.Location = New System.Drawing.Point(722, 32)
+        Me.MotionThresholdValue.Name = "MotionThresholdValue"
+        Me.MotionThresholdValue.Size = New System.Drawing.Size(127, 20)
+        Me.MotionThresholdValue.TabIndex = 5
+        Me.MotionThresholdValue.Text = "MotionThreshold"
+        '
+        'IMUmotionSlider
+        '
+        Me.IMUmotionSlider.Location = New System.Drawing.Point(198, 25)
+        Me.IMUmotionSlider.Maximum = 20
+        Me.IMUmotionSlider.Name = "IMUmotionSlider"
+        Me.IMUmotionSlider.Size = New System.Drawing.Size(505, 69)
+        Me.IMUmotionSlider.TabIndex = 4
+        Me.IMUmotionSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.IMUmotionSlider.Value = 1
+        '
+        'Label4
+        '
+        Me.Label4.Location = New System.Drawing.Point(4, 25)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(196, 44)
+        Me.Label4.TabIndex = 3
+        Me.Label4.Text = "Motion Threshold in IMU (radians X100)"
+        Me.Label4.TextAlign = System.Drawing.ContentAlignment.TopRight
+        '
+        'LevelThresholdValue
+        '
+        Me.LevelThresholdValue.AutoSize = True
+        Me.LevelThresholdValue.Location = New System.Drawing.Point(722, 107)
+        Me.LevelThresholdValue.Name = "LevelThresholdValue"
+        Me.LevelThresholdValue.Size = New System.Drawing.Size(116, 20)
+        Me.LevelThresholdValue.TabIndex = 8
+        Me.LevelThresholdValue.Text = "LevelThreshold"
+        '
+        'IMUlevelSlider
+        '
+        Me.IMUlevelSlider.Location = New System.Drawing.Point(198, 100)
+        Me.IMUlevelSlider.Maximum = 100
+        Me.IMUlevelSlider.Name = "IMUlevelSlider"
+        Me.IMUlevelSlider.Size = New System.Drawing.Size(505, 69)
+        Me.IMUlevelSlider.TabIndex = 7
+        Me.IMUlevelSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.IMUlevelSlider.Value = 20
+        '
+        'Label2
+        '
+        Me.Label2.Location = New System.Drawing.Point(4, 100)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(196, 44)
+        Me.Label2.TabIndex = 6
+        Me.Label2.Text = "Level Threshold in IMU (degrees X10)"
+        Me.Label2.TextAlign = System.Drawing.ContentAlignment.TopRight
+        '
         'OptionsGlobal
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1700, 822)
+        Me.Controls.Add(Me.CameraOptions)
         Me.Controls.Add(Me.PaletteGroup)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.resetToDefaults)
@@ -317,11 +364,14 @@ Partial Class OptionsGlobal
         Me.HistogramSettings.ResumeLayout(False)
         Me.HistogramSettings.PerformLayout()
         CType(Me.ProjectionSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         Me.PaletteGroup.ResumeLayout(False)
+        Me.CameraOptions.ResumeLayout(False)
+        Me.CameraOptions.PerformLayout()
+        CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.IMUlevelSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -336,9 +386,6 @@ Partial Class OptionsGlobal
     Friend WithEvents minCount As Windows.Forms.Label
     Friend WithEvents OpenFileDialog1 As Windows.Forms.OpenFileDialog
     Friend WithEvents HistogramSettings As Windows.Forms.GroupBox
-    Friend WithEvents IMUmotion As Windows.Forms.Label
-    Friend WithEvents IMUmotionSlider As Windows.Forms.TrackBar
-    Friend WithEvents ThresholdLabel As Windows.Forms.Label
     Friend WithEvents HistBinsCount As Windows.Forms.Label
     Friend WithEvents HistBinSlider As Windows.Forms.TrackBar
     Friend WithEvents HistBins As Windows.Forms.Label
@@ -351,4 +398,11 @@ Partial Class OptionsGlobal
     Friend WithEvents ProjectionThreshold As Windows.Forms.Label
     Friend WithEvents ProjectionSlider As Windows.Forms.TrackBar
     Friend WithEvents LabelProjection As Windows.Forms.Label
+    Friend WithEvents CameraOptions As Windows.Forms.GroupBox
+    Friend WithEvents LevelThresholdValue As Windows.Forms.Label
+    Friend WithEvents IMUlevelSlider As Windows.Forms.TrackBar
+    Friend WithEvents Label2 As Windows.Forms.Label
+    Friend WithEvents MotionThresholdValue As Windows.Forms.Label
+    Friend WithEvents IMUmotionSlider As Windows.Forms.TrackBar
+    Friend WithEvents Label4 As Windows.Forms.Label
 End Class
