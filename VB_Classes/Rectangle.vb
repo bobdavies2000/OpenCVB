@@ -286,12 +286,11 @@ Public Class Rectangle_Union : Inherits VBparent
         task.desc = "Create a rectangle that contains all the input rectangles"
     End Sub
     Public Sub Run(src As cv.Mat)
-        Static countSlider = findSlider("DrawCount")
-        Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
-
         If standalone Or task.intermediateReview = caller Then
             If draw Is Nothing Then draw = New Rectangle_Basics
 
+            Static countSlider = findSlider("DrawCount")
+            Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             rotatedCheck.Enabled = False
             countSlider.Value = msRNG.Next(2, 10)
             label1 = "Input rectangles = " + CStr(draw.rectangles.Count)
