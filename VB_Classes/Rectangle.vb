@@ -339,11 +339,10 @@ Public Class Rectangle_MultiOverlap : Inherits VBparent
         task.desc = "Given a group of rectangles, merge all the rectangles that overlap"
     End Sub
     Public Sub Run(src As cv.Mat)
-        Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
-        Static countSlider = findSlider("DrawCount")
-
         If standalone Then
             Static draw = New Rectangle_Basics
+            Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
+            Static countSlider = findSlider("DrawCount")
             rotatedCheck.Enabled = False
             countSlider.Value = msRNG.Next(2, 10)
 
