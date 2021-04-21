@@ -615,8 +615,10 @@ Public Class OpenCVB
             paintNewImages = True ' trigger the paint 
             taskNewImages = True ' trigger the algorithm task
 
-            Static delegateX As New delegateEvent(AddressOf raiseEventCamera)
-            Me.Invoke(delegateX)
+            If saveAlgorithmName <> "" Then ' if the main thread is trying to queue up another algorithm, we don't need to raise this event.
+                Static delegateX As New delegateEvent(AddressOf raiseEventCamera)
+                Me.Invoke(delegateX)
+            End If
 
             GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
 
@@ -1108,6 +1110,7 @@ Public Class OpenCVB
             While algorithmTaskHandle.IsAlive
                 If testAllRunning Then TestAllTimer.Enabled = False ' no more tasks please...
                 Thread.Sleep(1000)
+                Application.DoEvents()
             End While
             Console.WriteLine(AvailableAlgorithms.Text + " now starting since the previous algorithm thread has ended.")
             If testAllRunning Then TestAllTimer.Enabled = True

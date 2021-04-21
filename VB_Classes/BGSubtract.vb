@@ -286,9 +286,8 @@ Public Class BGSubtract_MOG_Retina : Inherits VBparent
     Dim bgSub As BGSubtract_MOG
     Dim retina As Retina_Basics_CPP
     Public Sub New()
-        Static bgSubLearnRate = findSlider("MOG Learn Rate")
         bgSub = New BGSubtract_MOG()
-        bgSubLearnRate.Value = 100
+        findSlider("MOG Learn Rate").Value = 100
 
         retina = New Retina_Basics_CPP()
 
