@@ -622,8 +622,14 @@ Public Class KNN_Cluster2DCities : Inherits VBparent
     Public distances() As Integer
     Dim numberOfCities As Integer
     Dim closedRegions As Integer
+    Dim nearestCountSlider As Windows.Forms.TrackBar
+    Dim cityCountSlider As Windows.Forms.TrackBar
     Public Sub New()
         knn = New KNN_Point2d()
+        ' If they changed Then number of elements in the set
+        cityCountSlider = findSlider("KNN Query count")
+        nearestCountSlider = findSlider("KNN k nearest points")
+        nearestCountSlider.Value = cityCountSlider.Value
 
         label1 = ""
         task.desc = "Use knn to cluster cities - a primitive attempt at traveling salesman problem."
@@ -664,10 +670,6 @@ Public Class KNN_Cluster2DCities : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat)
         Static reuseCheck = findCheckBox("Reuse the training and query data")
-        ' If they changed Then number of elements in the set
-        Static cityCountSlider = findSlider("KNN Query count")
-        Static nearestCountSlider = findSlider("KNN k nearest points")
-        nearestCountSlider.Value = numberOfCities
 
         If cityCountSlider.Value <> numberOfCities Or reuseCheck.Checked = False Then
             numberOfCities = cityCountSlider.Value
@@ -697,6 +699,7 @@ Public Class KNN_Cluster2DCities : Inherits VBparent
         End If
     End Sub
 End Class
+
 
 
 
