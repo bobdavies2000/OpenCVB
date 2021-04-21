@@ -227,11 +227,11 @@ Public Class Rectangle_Intersection : Inherits VBparent
         Return enclosing
     End Function
     Public Sub Run(src As cv.Mat)
-        Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
-        Static countSlider = findSlider("DrawCount")
         Static mergeSlider = findSlider("Merge rectangles within X pixels")
         If standalone Or task.intermediateReview = caller Then
             If draw Is Nothing Then draw = New Rectangle_Basics
+            Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
+            Static countSlider = findSlider("DrawCount")
 
             rotatedCheck.Enabled = False
             countSlider.Value = msRNG.Next(2, 10)

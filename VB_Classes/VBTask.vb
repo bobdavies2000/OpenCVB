@@ -335,9 +335,9 @@ Public Class ActiveTask : Implements IDisposable
             IMULevel = algoList.createAlgorithm("IMU_IsCameraLevel")
             PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
         End If
-        Thread.Sleep(1000)
 
         algorithmObject = algoList.createAlgorithm(task.algName)
+        Thread.Sleep(1000)
 
         If algorithmObject Is Nothing Then
             MsgBox("The algorithm: " + task.algName + " was not found in the algorithmList.vb code." + vbCrLf +
