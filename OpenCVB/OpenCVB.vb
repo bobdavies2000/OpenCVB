@@ -16,13 +16,13 @@ End Module
 Public Class OpenCVB
 #Region "Globals"
     Dim AlgorithmCount As Integer
-    Dim saveSelectedAlgorithmIndex As Integer
-    Dim AlgorithmTestCount As Integer
+    Dim saveSelectedAlgorithm As String
+    Dim AlgorithmTestAllCount As Integer
     Dim algorithmTaskHandle As Thread
 
     Dim saveAlgorithmName As String
     Dim saveCameraName As String
-    Dim saveCameraIndex As Integer
+    Dim activeCameraIndex As Integer
 
     Dim border As Integer = 6
     Dim BothFirstAndLastReady As Boolean
@@ -514,77 +514,80 @@ Public Class OpenCVB
     End Sub
     Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
         If AvailableAlgorithms.Items.Count = 1 Then
-            MsgBox("There is only algorithm to test!  Only groups with 2 or more algorithms can run 'Test All'.")
+            MsgBox("There is only algorithm to test!  Only groups with 2 or more algorithms need to run 'Test All'.")
             Exit Sub
         End If
         TestAllButton.Image = If(TestAllButton.Text = "Test All", stopTest, testAll)
         If TestAllButton.Text = "Test All" Then
+            AlgorithmTestAllCount = 0
+            saveSelectedAlgorithm = AvailableAlgorithms.Text
             TestAllButton.Text = "Stop Test"
-            TestAllTimer_Tick(sender, e)
             TestAllTimer.Enabled = True
-            AlgorithmTestCount = 0
-            saveSelectedAlgorithmIndex = AvailableAlgorithms.SelectedIndex
+            AvailableAlgorithms.Enabled = False  ' the algorithm will be started in the testAllTimer event.
             If TreeViewDialog IsNot Nothing Then TreeViewDialog.Timer1.Enabled = True
         Else
+            AvailableAlgorithms.Enabled = True
             TestAllTimer.Enabled = False
             TestAllButton.Text = "Test All"
-            StartAlgorithmTask()
         End If
     End Sub
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
         If frameCount < 5 And TestAllButton.Text = "Stop Test" Then Exit Sub ' we have to see some output from the algorithm before moving on...
         TestAllTimer.Enabled = False ' it can take a while to restart the camera so stop watching until the timer event is complete.
-        If AvailableAlgorithms.SelectedIndex = saveSelectedAlgorithmIndex And AlgorithmTestCount > 0 Then
+        Me.Refresh()
+
+        ' switching cameras automatically restarts the algorithm.
+        With AvailableAlgorithms
+            .SelectedIndex = If(.SelectedIndex < .Items.Count - 1, .SelectedIndex + 1, 0)
+        End With
+
+        If AvailableAlgorithms.Text = saveSelectedAlgorithm And AlgorithmTestAllCount > 0 Then
             If optionsForm.resolution640.Enabled And optionsForm.resolution1280.Checked Then
                 optionsForm.resolution640.Checked = True
                 workingRes = New cv.Size(640, 480)
                 LineUpCamPics(False)
                 startCamera()
             Else
-                optionsForm.resolution1280.Checked = True ' start every camera at 1280x720
-                Dim cameraIndex = optionsForm.cameraIndex + 1
-                For i = 0 To optionsForm.cameraRadioButton.Count - 1
-                    If cameraIndex >= optionsForm.cameraRadioButton.Count Then cameraIndex = 0
-                    If optionsForm.cameraRadioButton(cameraIndex).Enabled Then
-                        optionsForm.cameraRadioButton(cameraIndex).Checked = True
-                        optionsForm.cameraIndex = cameraIndex
-                        workingRes = New cv.Size(1280, 720)
-                        LineUpCamPics(False)
-                        startCamera()
-                        Exit For
-                    Else
-                        cameraIndex += 1
+                With optionsForm
+                    Dim nextCameraIndex = activeCameraIndex
+                    workingRes = New cv.Size(1280, 720)
+                    If .cameraRadioButton.Count > 1 Then
+                        While 1
+                            nextCameraIndex = If(nextCameraIndex = .cameraRadioButton.Count - 1, 0, nextCameraIndex + 1)
+                            If .cameraRadioButton(nextCameraIndex).Enabled Then
+                                .cameraRadioButton(nextCameraIndex).Checked = True
+                                .resolution1280.Checked = True ' start every camera at 1280x720
+                                activeCameraIndex = nextCameraIndex
+                                LineUpCamPics(False)
+                                startCamera()
+                                Exit While
+                            Else
+                                nextCameraIndex += 1
+                            End If
+                        End While
                     End If
-                Next
+                End With
             End If
+
+            ' when switching resolution, best to reset these as the move from higher to lower res could mean the point is no longer valid.
+            mouseClickPoint = New cv.Point
+            mousePoint = New cv.Point
         End If
 
-        ' when switching resolution, best to reset these as the move from higher to lower res could mean the point is no longer valid.
-        mouseClickPoint = New cv.Point
-        mousePoint = New cv.Point
+        StartAlgorithmTask()
 
-        With AvailableAlgorithms
-            .SelectedIndex = If(.SelectedIndex < .Items.Count - 1, .SelectedIndex + 1, 0)
-        End With
         TestAllTimer.Enabled = True
     End Sub
     Private Sub startCamera()
-        SyncLock bufferLock
-            saveCameraIndex = optionsForm.cameraIndex
-        End SyncLock
-        If saveAlgorithmName IsNot Nothing Then
-            If saveAlgorithmName <> "" Then StartAlgorithmTask() ' restart the currealgorithm...
-        End If
+        activeCameraIndex = optionsForm.cameraIndex
         paintNewImages = False
         taskNewImages = False
         If cameraTaskHandle Is Nothing Then
             cameraTaskHandle = New Thread(AddressOf CameraTask)
+            cameraTaskHandle.Name = "Camera Task"
             cameraTaskHandle.Start()
         End If
 
-        While paintNewImages = False
-            Application.DoEvents() ' wait for the first images from the camera.
-        End While
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub
     Private Sub CameraTask()
@@ -593,30 +596,21 @@ Public Class OpenCVB
         Dim changeResolution As Boolean
         While (1)
             SyncLock bufferLock
-                changeResolution = False
                 If camera IsNot Nothing Then
                     If camera.width <> workingRes.Width Then changeResolution = True
                 End If
-                If currentCameraIndex <> saveCameraIndex Or changeResolution Then
-                    If saveCameraIndex < 0 Then Exit While
+                If currentCameraIndex <> activeCameraIndex Or changeResolution Then
+                    changeResolution = False
+                    If activeCameraIndex < 0 Then Exit While ' shutting down...
                     If camera IsNot Nothing Then camera.stopCamera()
                     ' order is same as in optionsdialog enum
-                    camera = Choose(saveCameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraPyRS2, cameraOakD)
-                    currentCameraIndex = saveCameraIndex
+                    currentCameraIndex = activeCameraIndex
+                    camera = Choose(currentCameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraPyRS2, cameraOakD)
                     camera.initialize(workingRes.Width, workingRes.Height, fps)
                     saveCameraName = camera.deviceName + " " + CStr(workingRes.Width)
-                    saveCameraIndex = currentCameraIndex
                 End If
                 camera.GetNextFrame()
             End SyncLock
-
-            ' make sure that all the images have something...
-            If frameCount = 0 Then
-                For i = 0 To 5
-                    Dim mat = Choose(i + 1, camera.color, camera.rgbdepth, camera.depth16, camera.leftview, camera.rightview, camera.pointcloud)
-                    If mat.size <> workingRes Then Continue For ' try again...
-                Next
-            End If
 
             paintNewImages = True ' trigger the paint 
             taskNewImages = True ' trigger the algorithm task
@@ -864,8 +858,6 @@ Public Class OpenCVB
     End Sub
     Private Sub AvailableAlgorithms_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AvailableAlgorithms.SelectedIndexChanged
         If AvailableAlgorithms.Enabled Then
-            imgResult.SetTo(0)
-            Me.Refresh()
             If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e) ' if paused, then restart.
             If OpenCVkeyword.Text = "" Then Exit Sub ' we are terminating...
             SaveSetting("OpenCVB", OpenCVkeyword.Text, OpenCVkeyword.Text, AvailableAlgorithms.Text)
@@ -1027,7 +1019,7 @@ Public Class OpenCVB
         Dim cameraFPS As Single = camFrames / (fpsTimer.Interval / 1000)
 
         Me.Text = "OpenCVB (" + Format(CodeLineCount, "###,##0") + " lines / " + CStr(AlgorithmCount) + " algorithms = " + CStr(CInt(CodeLineCount / AlgorithmCount)) +
-                  " lines per) - " + optionsForm.cameraRadioButton(saveCameraIndex).Text + " - " + Format(cameraFPS, "#0.0") +
+                  " lines per) - " + optionsForm.cameraRadioButton(activeCameraIndex).Text + " - " + Format(cameraFPS, "#0.0") +
                   "/" + Format(algorithmFPS, "#0.0") + " " + CStr(totalBytesOfMemoryUsed) + " Mb (working set) with " +
                   CStr(Process.GetCurrentProcess().Threads.Count) + " threads"
     End Sub
@@ -1044,7 +1036,7 @@ Public Class OpenCVB
     Private Sub Exit_Click(sender As Object, e As EventArgs) Handles ExitCall.Click
         SaveSetting("OpenCVB", "TreeButton", "TreeButton", TreeButton.Checked)
         SaveSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", PixelViewerButton.Checked)
-        saveCameraIndex = -1 ' this will close the camera task
+        activeCameraIndex = -1 ' this will close the camera task
         saveAlgorithmName = "" ' this will close the current algorithm.
         saveLayout()
     End Sub
@@ -1096,6 +1088,7 @@ Public Class OpenCVB
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
 
         saveAlgorithmName = ""
+        Dim saveCameraIndex As Integer = activeCameraIndex
         Dim OKcancel = optionsForm.ShowDialog()
 
         If OKcancel = DialogResult.OK Then
@@ -1116,6 +1109,7 @@ Public Class OpenCVB
                 If testAllRunning Then TestAllTimer.Enabled = False ' no more tasks please...
                 Thread.Sleep(1000)
             End While
+            Console.WriteLine(AvailableAlgorithms.Text + " now starting since the previous algorithm thread has ended.")
             If testAllRunning Then TestAllTimer.Enabled = True
         End If
 
@@ -1153,14 +1147,14 @@ Public Class OpenCVB
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algParms)
         Dim algName = algorithmTaskHandle.Name
         SyncLock algorithmThreadLock ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
-            AlgorithmTestCount += 1
+            AlgorithmTestAllCount += 1
             drawRect = New cv.Rect
             Dim myLocation = New cv.Rect(Me.Left, Me.Top, Me.Width, Me.Height)
             Dim task = New VB_Classes.ActiveTask(parms, workingRes, algName, workingRes.Width, workingRes.Height, myLocation)
             textDesc = task.desc
             intermediateReview = ""
 
-            Console.WriteLine(vbCrLf + vbCrLf + vbTab + algName + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestCount) + vbTab + "Algorithms tested")
+            Console.WriteLine(vbCrLf + vbCrLf + vbTab + algName + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestAllCount) + vbTab + "Algorithms tested")
             Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + algName +
                                       " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
             Console.WriteLine(vbTab + "Active camera = " + camera.deviceName + " at resolution " + CStr(workingRes.Width) + "x" + CStr(workingRes.Height) + vbCrLf)
@@ -1180,20 +1174,21 @@ Public Class OpenCVB
             Run(task, algName)
 
             task.Dispose()
+            Console.WriteLine(algName + " ending.  Thread closing...")
         End SyncLock
         frameCount = 0
     End Sub
     Private Sub Run(task As VB_Classes.ActiveTask, algName As String)
         Dim saveWorkingRes = workingRes
+        Const minFrames = 5
         While 1
             Dim ratioImageToCampic = task.color.Width / camPic(0).Width  ' relative size of displayed image and algorithm size image.
-            Dim currentCameraIndex = saveCameraIndex
+            Dim currentCameraIndex = activeCameraIndex
             While 1
                 Application.DoEvents()
-                If saveAlgorithmName <> algName Then Exit Sub ' pause will stop the current algorithm as well.
+                If saveAlgorithmName <> algName And frameCount > minFrames Then Exit Sub ' 
                 SyncLock bufferLock
-                    If frameCount > 0 And (saveCameraIndex <> currentCameraIndex Or camera.width <> workingRes.Width) Then Exit Sub
-                    If saveWorkingRes <> workingRes Then Exit Sub ' switching camera resolution means stopping the current algorithm
+                    If saveWorkingRes <> workingRes And frameCount > minFrames Then Exit Sub ' switching camera resolution means stopping the current algorithm
                     If taskNewImages And pauseAlgorithmThread = False Then
                         ' bring the data into the algorithm task.
                         task.color = camera.color.clone
