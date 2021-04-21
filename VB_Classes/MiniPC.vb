@@ -101,7 +101,8 @@ Public Class MiniPC_RotateAngle : Inherits VBparent
         plot.controlScale = True ' we are controlling the scale...
         plot.maxScale = 1
         plot.minScale = 0
-        findCheckBox("Reset the plot scale").Checked = False
+        resetCheck = findCheckBox("Reset the plot scale")
+        resetCheck.Checked = False
 
         mats = New Mat_4to1
         peak = New MiniPC_Rotate
