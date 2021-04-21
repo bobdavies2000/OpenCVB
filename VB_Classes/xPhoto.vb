@@ -145,11 +145,11 @@ Public Class XPhoto_Inpaint : Inherits VBparent
         task.desc = "Use the xPhoto inpaint to fill in the depth holes"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static radioFast = findRadio("FSR_Fast")
+        Static radioSMap = findRadio("ShiftMap")
         dst1 = src
         Dim mask = basics.drawRandomLine(dst1)
         Dim iType = InpaintTypes.FSR_BEST
-        Static radioFast = findRadio("FSR_Fast")
-        Static radioSMap = findRadio("ShiftMap")
         If radioFast.checked Then iType = InpaintTypes.FSR_FAST
         If radioSMap.checked Then iType = InpaintTypes.SHIFTMAP
         ' CvXPhoto.Inpaint(dst1, mask, dst2, InpaintTypes.FSR_BEST)

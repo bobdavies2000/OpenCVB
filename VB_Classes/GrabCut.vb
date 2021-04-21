@@ -62,15 +62,15 @@ Public Class GrabCut_FineTune : Inherits VBparent
         task.desc = "There are probably mistakes in the initial Grabcut_Basics.  Use the checkbox to fine tune what is background and foreground"
     End Sub
     Public Sub Run(src as cv.Mat)
-
+        Static fgFineTuning = findRadio("Selected rectangle is added to the foreground")
         Static clearCheck = findRadio("Clear all foreground and background fine tuning")
+        Static saveRadio = fgFineTuning.checked
+
         If clearCheck.checked Then
             basics.fgFineTune = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
             basics.bgFineTune = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
         End If
 
-        Static fgFineTuning = findRadio("Selected rectangle is added to the foreground")
-        Static saveRadio = fgFineTuning.checked
         If saveRadio <> fgFineTuning.checked Then
             saveRadio = fgFineTuning.checked
             task.drawRectClear = True

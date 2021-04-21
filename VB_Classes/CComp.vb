@@ -45,19 +45,20 @@ Public Class CComp_Basics : Inherits VBparent
         Return count
     End Function
     Public Sub Run(src as cv.Mat)
+        Static minSizeSlider = findSlider("CComp Min Area")
+        Static maxSizeSlider = findSlider("CComp Max Area")
+        Static thresholdSlider = findSlider("CComp threshold")
+        Dim minSize = minSizeSlider.value
+        Dim maxSize = maxSizeSlider.value
+        Dim threshold = thresholdSlider.value
+
         rects.Clear()
         centroids.Clear()
         masks.Clear()
         dst1.SetTo(0)
-        Static minSizeSlider = findSlider("CComp Min Area")
-        Static maxSizeSlider = findSlider("CComp Max Area")
-        Dim minSize = minSizeSlider.value
-        Dim maxSize = maxSizeSlider.value
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Static thresholdSlider = findSlider("CComp threshold")
-        Dim threshold = thresholdSlider.value
         Dim tFlag = If(check.Box(1).Checked, OpenCvSharp.ThresholdTypes.Binary, OpenCvSharp.ThresholdTypes.BinaryInv)
         tFlag += If(check.Box(0).Checked, OpenCvSharp.ThresholdTypes.Otsu, 0)
         mats.mat(0) = src.Threshold(threshold, 255, tFlag)
@@ -117,6 +118,11 @@ Public Class CComp_Basics_FullImage : Inherits VBparent
         label2 = "Masks binary+otsu used to compute mean depth"
     End Sub
     Private Function colorWithDepth(matIndex As Integer) As Integer
+        Static minSizeSlider = findSlider("CComp Min Area")
+        Static maxSizeSlider = findSlider("CComp Max Area")
+        Dim minSize = minSizeSlider.value
+        Dim maxSize = maxSizeSlider.value
+
         Dim cc = cv.Cv2.ConnectedComponentsEx(mats.mat(matIndex))
 
         Dim blobList As New List(Of cv.Rect)
@@ -127,10 +133,6 @@ Public Class CComp_Basics_FullImage : Inherits VBparent
         blobList.Sort(Function(a, b) (a.Width * a.Height).CompareTo(b.Width * b.Height))
 
         Dim count As Integer = 0
-        Static minSizeSlider = findSlider("CComp Min Area")
-        Static maxSizeSlider = findSlider("CComp Max Area")
-        Dim minSize = minSizeSlider.value
-        Dim maxSize = maxSizeSlider.value
         For Each blob In cc.Blobs
             If blob.Area < minSize Or blob.Area > maxSize Then Continue For ' skip it if too small or too big ...
             count += 1
@@ -548,22 +550,22 @@ Public Class CComp_Simple : Inherits VBparent
         task.desc = "Draw bounding boxes around RGB binarized connected Components"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static thresholdSlider = findSlider("CComp threshold")
+        Static minSizeSlider = findSlider("CComp Min Area")
+        Static maxSizeSlider = findSlider("CComp Max Area")
+        Dim minSize = minSizeSlider.value
+        Dim maxSize = maxSizeSlider.value
+
         rects.Clear()
         centroids.Clear()
 
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Static thresholdSlider = findSlider("CComp threshold")
         dst1 = input.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.BinaryInv) '  + cv.ThresholdTypes.Otsu
 
         connectedComponents = cv.Cv2.ConnectedComponentsEx(dst1)
         connectedComponents.renderblobs(dst2)
-
-        Static minSizeSlider = findSlider("CComp Min Area")
-        Static maxSizeSlider = findSlider("CComp Max Area")
-        Dim minSize = minSizeSlider.value
-        Dim maxSize = maxSizeSlider.value
 
         Dim count As Integer = 0
         For Each blob In connectedComponents.Blobs

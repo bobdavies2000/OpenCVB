@@ -93,18 +93,17 @@ Public Class Structured_MultiSliceH : Inherits VBparent
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
+        Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
+        Dim cushion = cushionSlider.Value
+        Dim stepsize = stepSlider.value
+
         side2D.Run(src)
         dst2 = side2D.dst2
         Dim Split = side2D.gCloud.dst1.Split()
 
-        Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
-        Dim cushion = cushionSlider.Value
-
         Dim metersPerPixel = task.maxZ / dst2.Height
         Dim thicknessMeters = cushion * metersPerPixel
-
-        Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
-        Dim stepsize = stepSlider.value
 
         sliceMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For yCoordinate = 0 To src.Height - 1 Step stepsize
@@ -140,19 +139,18 @@ Public Class Structured_MultiSliceV : Inherits VBparent
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
+        Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
+        Dim cushion = cushionSlider.Value
+        Dim stepsize = stepSlider.value
+
         top2D.Run(src)
         dst2 = top2D.dst2
 
         Dim split = top2D.gCloud.dst1.Split()
 
-        Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
-        Dim cushion = cushionSlider.Value
-
         Dim metersPerPixel = task.maxZ / dst2.Height
         Dim thicknessMeters = cushion * metersPerPixel
-
-        Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
-        Dim stepsize = stepSlider.value
 
         Dim sliceMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For xCoordinate = 0 To src.Width - 1 Step stepsize
@@ -192,17 +190,16 @@ Public Class Structured_MultiSlice : Inherits VBparent
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
+        Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
+        Dim stepsize = stepSlider.value
+        Dim cushion = cushionSlider.Value
+
         top2D.Run(src)
         side2D.Run(src)
 
-        Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
-        Dim cushion = cushionSlider.Value
-
         Dim metersPerPixel = task.maxZ / dst2.Height
         Dim thicknessMeters = cushion * metersPerPixel
-
-        Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
-        Dim stepsize = stepSlider.value
 
         split = side2D.gCloud.dst1.Split()
 
@@ -280,6 +277,9 @@ Public Class Structured_MultiSlicePolygon : Inherits VBparent
         task.desc = "Detect polygons in the multiSlice output"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static sidesSlider = findSlider("Max number of sides in the identified polygons")
+        Dim maxSides = sidesSlider.Value
+
         multi.Run(src)
         cv.Cv2.BitwiseNot(multi.dst2, dst1)
 
@@ -290,8 +290,6 @@ Public Class Structured_MultiSlicePolygon : Inherits VBparent
         Next
 
         dst2.SetTo(0)
-        Static sidesSlider = findSlider("Max number of sides in the identified polygons")
-        Dim maxSides = sidesSlider.Value
         For i = 0 To contours.Length - 1
             If contours(i).Length = 2 Then Continue For
             If contours(i).Length <= maxSides Then
@@ -376,6 +374,9 @@ Public Class Structured_LinearizeFloor : Inherits VBparent
         task.desc = "Using the mask for the floor create a better representation of the floor plane"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static xCheck = findCheckBox("Smooth in X-direction")
+        Static yCheck = findCheckBox("Smooth in Y-direction")
+        Static zCheck = findCheckBox("Smooth in Z-direction")
         Dim minLoc As cv.Point, maxLoc As cv.Point
         Static imuPC As cv.Mat
         floor.Run(src)
@@ -391,7 +392,6 @@ Public Class Structured_LinearizeFloor : Inherits VBparent
 
         If sliceMask.CountNonZero() > 0 Then
             Dim split = imuPC.Split()
-            Static xCheck = findCheckBox("Smooth in X-direction")
             If xCheck.Checked Then
                 split(0).MinMaxLoc(minVal, maxVal, minLoc, maxLoc, sliceMask)
 
@@ -410,7 +410,6 @@ Public Class Structured_LinearizeFloor : Inherits VBparent
                 Next
             End If
 
-            Static yCheck = findCheckBox("Smooth in Y-direction")
             If yCheck.Checked Then
                 split(1).MinMaxLoc(minVal, maxVal, minLoc, maxLoc, sliceMask)
                 kalman.kInput = (minVal + maxVal) / 2
@@ -419,7 +418,6 @@ Public Class Structured_LinearizeFloor : Inherits VBparent
                 split(1).SetTo(floorYPlane, sliceMask)
             End If
 
-            Static zCheck = findCheckBox("Smooth in Z-direction")
             If zCheck.Checked Then
                 Dim firstRow As Integer, lastRow As Integer
                 For firstRow = 0 To sliceMask.Height - 1
@@ -760,13 +758,15 @@ Public Class Structured_CloudFail : Inherits VBparent
         Static xLineSlider = findSlider("Lines in X-Direction")
         Static yLineSlider = findSlider("Lines in Y-Direction")
         Static thresholdSlider = findSlider("Continuity threshold in mm")
-        Dim xLines = xLineSlider.value
-        Dim yLines = yLineSlider.value
-        Dim threshold = thresholdSlider.value
 
         Static xCheck = findCheckBox("Impose constraints on X")
         Static yCheck = findCheckBox("Impose constraints on Y")
         Static noCheck = findCheckBox("Impose constraints on neither")
+
+        Dim xLines = xLineSlider.value
+        Dim yLines = yLineSlider.value
+        Dim threshold = thresholdSlider.value
+
         Dim xconstraint = xCheck.checked
         Dim yconstraint = yCheck.checked
         Dim noconstraint = noCheck.checked

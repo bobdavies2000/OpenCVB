@@ -39,8 +39,7 @@ Public Class Features_PointTracker : Inherits VBparent
     Public Sub New()
         features = New Features_GoodFeatures()
         pTrack = New KNN_PointTracker()
-        Dim drawRectCheck = findCheckBox("Draw rectangle and centroid for each mask")
-        drawRectCheck.Checked = False
+        findCheckBox("Draw rectangle and centroid for each mask").Checked = False
         findSlider("Minimum size of object in pixels").Value = 1
 
         label1 = "Good features without Kalman"

@@ -73,10 +73,10 @@ Public Class BGSubtract_MotionDetect_MT : Inherits VBparent
         task.desc = "Detect Motion for use with background subtraction"
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.frameCount = 0 Then src.CopyTo(dst2)
+        Static correlationSlider = findSlider("Correlation Threshold")
+        Static frm = findfrm("BGSubtract_MotionDetect_MT Radio Options")
         Dim threadData As New cv.Vec3i
         Dim width = src.Width, height = src.Height
-        Static frm = findfrm("BGSubtract_MotionDetect_MT Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 threadData = Choose(i + 1, New cv.Vec3i(1, width, height), New cv.Vec3i(2, width / 2, height), New cv.Vec3i(4, width / 2, height / 2),
@@ -84,13 +84,14 @@ Public Class BGSubtract_MotionDetect_MT : Inherits VBparent
                 Exit For
             End If
         Next
+
+        If task.frameCount = 0 Then src.CopyTo(dst2)
         Dim threadCount = threadData(0)
         width = threadData(1)
         height = threadData(2)
         Dim taskArray(threadCount - 1) As System.Threading.Tasks.Task
         Dim xfactor = CInt(src.Width / width)
         Dim yfactor = Math.Max(CInt(src.Height / height), CInt(src.Width / width))
-        Static correlationSlider = findSlider("Correlation Threshold")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         dst1.SetTo(0)
         For i = 0 To threadCount - 1
@@ -186,12 +187,12 @@ Public Class BGSubtract_MOG : Inherits VBparent
         task.desc = "Subtract background using a mixture of Gaussians"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static learnRateSlider = findSlider("MOG Learn Rate")
         If src.Channels = 3 Then
             gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
             gray = src
         End If
-        Static learnRateSlider = findSlider("MOG Learn Rate")
         MOG.Apply(gray, gray, learnRateSlider.Value / 1000)
         dst1 = gray
     End Sub
@@ -211,9 +212,9 @@ Public Class BGSubtract_MOG2 : Inherits VBparent
         task.desc = "Subtract background using a mixture of Gaussians"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static learnRateSlider = findSlider("MOG Learn Rate")
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Static learnRateSlider = findSlider("MOG Learn Rate")
         MOG2.Apply(input, dst1, learnRateSlider.Value / 1000)
     End Sub
 End Class
@@ -234,6 +235,7 @@ Public Class BGSubtract_GMG_KNN : Inherits VBparent
         task.desc = "GMG and KNN API's to subtract background"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static learnRateSlider = findSlider("Learn Rate")
         If task.frameCount < 120 Then
             task.trueText("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(task.frameCount))
         Else
@@ -241,7 +243,6 @@ Public Class BGSubtract_GMG_KNN : Inherits VBparent
         End If
 
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Static learnRateSlider = findSlider("Learn Rate")
         gmg.Apply(dst1, dst1, learnRateSlider.Value / 1000)
         knn.Apply(dst1, dst1, learnRateSlider.Value / 1000)
     End Sub
@@ -268,8 +269,8 @@ Public Class BGSubtract_MOG_RGBDepth : Inherits VBparent
         task.desc = "Isolate motion in both depth and color data using a mixture of Gaussians"
     End Sub
     Public Sub Run(src As cv.Mat)
-        gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static learnRateSlider = findSlider("Learn Rate")
+        gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOGDepth.Apply(gray, gray, learnRateSlider.Value / 1000)
         dst1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -285,8 +286,8 @@ Public Class BGSubtract_MOG_Retina : Inherits VBparent
     Dim bgSub As BGSubtract_MOG
     Dim retina As Retina_Basics_CPP
     Public Sub New()
-        bgSub = New BGSubtract_MOG()
         Static bgSubLearnRate = findSlider("MOG Learn Rate")
+        bgSub = New BGSubtract_MOG()
         bgSubLearnRate.Value = 100
 
         retina = New Retina_Basics_CPP()

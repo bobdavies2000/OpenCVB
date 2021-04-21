@@ -11,13 +11,13 @@ Public Class Diff_Basics : Inherits VBparent
         task.desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static thresholdSlider = findSlider("Change threshold for each pixel")
         Dim gray = src
         If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If lastFrame Is Nothing Then lastFrame = src.Clone
         If task.frameCount > 0 Then
             dst1 = lastFrame
             cv.Cv2.Absdiff(gray, lastFrame, dst2)
-            Static thresholdSlider = findSlider("Change threshold for each pixel")
             If dst2.Type = cv.MatType.CV_8U Then
                 dst2 = dst2.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
             Else

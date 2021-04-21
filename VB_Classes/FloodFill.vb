@@ -205,12 +205,12 @@ Public Class FloodFill_CComp : Inherits VBparent
         task.desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static minSlider = findSlider("FloodFill Minimum Size")
 
         ccomp.Run(src)
         range.Run(ccomp.dst1)
         dst1 = range.dst1
         dst2 = range.dst2
-        Static minSlider = findSlider("FloodFill Minimum Size")
         label2 = CStr(ccomp.connectedComponents.blobs.length) + " blobs found. " + CStr(range.fBasics.rects.Count) + " were more than " +
                  CStr(minSlider.Value) + " pixels"
     End Sub
@@ -269,12 +269,12 @@ Public Class Floodfill_Objects : Inherits VBparent
         task.desc = "Use floodfill to identify the desired number of objects"
     End Sub
     Public Sub Run(src as cv.Mat)
-        basics.Run(src)
-        dst1 = basics.dst1
-
         Static loDiffSlider = findSlider("FloodFill LoDiff")
         Static hiDiffSlider = findSlider("FloodFill HiDiff")
         Static stepSlider = findSlider("Step Size")
+
+        basics.Run(src)
+        dst1 = basics.dst1
 
         label1 = CStr(basics.masks.Count) + " objects with more than " + CStr(minSlider.Value) + " bytes"
         Static lastSetting As Integer = loDiffSlider.Value
@@ -466,6 +466,7 @@ Public Class FloodFill_Top16 : Inherits VBparent
         task.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static minSizeSlider = findSlider("FloodFill Minimum Size")
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         thumbNails = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
@@ -491,7 +492,6 @@ Public Class FloodFill_Top16 : Inherits VBparent
             End If
         Next
         If check.Box(0).Checked Then dst1 = thumbNails.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        Static minSizeSlider = findSlider("FloodFill Minimum Size")
         label1 = CStr(flood.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
     End Sub
 End Class
@@ -755,6 +755,10 @@ Public Class FloodFill_Step : Inherits VBparent
         task.desc = "Step through the current image to floodfill using colors from the previous image"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static stepSlider = findSlider("FloodFill Step Size")
+        Static fillSlider = findSlider("FloodFill point distance from edge")
+        Dim fill = fillSlider.value
+        Dim stepSize = stepSlider.Value
 
         If standalone Then
             contours.Run(src)
@@ -762,11 +766,6 @@ Public Class FloodFill_Step : Inherits VBparent
             dst1 = contours.dst1
             src = contours.dst2
         End If
-
-        Static stepSlider = findSlider("FloodFill Step Size")
-        Static fillSlider = findSlider("FloodFill point distance from edge")
-        Dim fill = fillSlider.value
-        Dim stepSize = stepSlider.Value
 
         Static saveStepSize As Integer
         Static saveFillDistance As Integer
@@ -850,6 +849,7 @@ Public Class FloodFill_Palette : Inherits VBparent
         task.desc = "Create a floodfill image that is only 8-bit for use with a palette"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static minSizeSlider = findSlider("FloodFill Minimum Size")
         basics.Run(src)
 
         dst2.SetTo(0)
@@ -865,7 +865,6 @@ Public Class FloodFill_Palette : Inherits VBparent
         dst1.SetTo(0)
         task.palette.dst1.CopyTo(dst1, allRegionMask)
 
-        Static minSizeSlider = findSlider("FloodFill Minimum Size")
         label2 = CStr(basics.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
         If standalone Or task.intermediateReview = caller Then dst2 = task.palette.gradientColorMap.Resize(src.Size())
     End Sub

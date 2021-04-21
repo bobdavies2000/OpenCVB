@@ -151,7 +151,6 @@ Public Class Math_ImageAverage : Inherits VBparent
         task.desc = "Create an image that is the mean of x number of previous images."
     End Sub
     Public Sub Run(src as cv.Mat)
-
         Static avgSlider = findSlider("Average - number of input images")
         Static saveImageCount = avgSlider.Value
         If avgSlider.Value <> saveImageCount Then
@@ -212,6 +211,12 @@ Public Class Math_Stdev : Inherits VBparent
         task.desc = "Compute the standard deviation in each segment"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static stdevSlider = findSlider("Stdev Threshold")
+        Static meanCheck = findCheckBox("Show mean")
+        Static stdevCheck = findCheckBox("Show Stdev")
+        Static gridCheck = findCheckBox("Show Grid Mask")
+        Dim stdevThreshold = CSng(stdevSlider.Value)
+
         Dim updateCount As Integer
         lowStdevMask.SetTo(0)
         highStdevMask.SetTo(0)
@@ -222,11 +227,6 @@ Public Class Math_Stdev : Inherits VBparent
         dst1 = src.Clone
         If dst1.Channels = 3 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Static stdevSlider = findSlider("Stdev Threshold")
-        Dim stdevThreshold = CSng(stdevSlider.Value)
-
-        Static meanCheck = findCheckBox("Show mean")
-        Static stdevCheck = findCheckBox("Show Stdev")
         Dim showMean = meanCheck.checked
         Dim showStdev = stdevCheck.checked
         Static lastFrame As cv.Mat = dst1.Clone()
@@ -246,7 +246,6 @@ Public Class Math_Stdev : Inherits VBparent
                 dst1(roi).SetTo(0)
             End If
         End Sub)
-        Static gridCheck = findCheckBox("Show Grid Mask")
         If gridCheck.checked Then dst1.SetTo(255, grid.gridMask)
         dst2.SetTo(0)
         saveFrame.CopyTo(dst2, highStdevMask)

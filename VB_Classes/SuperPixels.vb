@@ -87,8 +87,7 @@ Public Class SuperPixel_BinarizedImage : Inherits VBparent
 
         pixels = New SuperPixel_Basics_CPP()
         pixels.gridColor = cv.Scalar.Red
-        Static pixelCountSlider = findSlider("Number of SuperPixels")
-        pixelCountSlider.value = 20 ' find the top 20 super pixels.
+        findSlider("Number of SuperPixels").Value = 20 ' find the top 20 super pixels.
 
         task.desc = "Create SuperPixels from a binary image."
     End Sub

@@ -55,9 +55,9 @@ Public Class Encode_Options : Inherits VBparent
         label1 = "absDiff with original image"
     End Sub
     Public Function getEncodeParameter() As Integer
-        Dim encodeOption As Integer
-        qualityLevel = sliders.trackbar(0).Value
+        Static qualitySlider = findSlider("Encode Quality Level")
         Static frm = findfrm("Encode_Options Radio Options")
+        Dim encodeOption As Integer
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 encodeOption = Choose(i + 1, cv.ImwriteFlags.JpegChromaQuality, cv.ImwriteFlags.JpegLumaQuality, cv.ImwriteFlags.JpegOptimize, cv.ImwriteFlags.JpegProgressive,
@@ -65,6 +65,7 @@ Public Class Encode_Options : Inherits VBparent
                 Exit For
             End If
         Next
+        qualityLevel = qualitySlider.Value
         If encodeOption = cv.ImwriteFlags.JpegProgressive Then qualityLevel = 1 ' just on or off
         If encodeOption = cv.ImwriteFlags.JpegOptimize Then qualityLevel = 1 ' just on or off
         Return encodeOption

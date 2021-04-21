@@ -155,8 +155,8 @@ Public Class Annealing_CPP_MT : Inherits VBparent
             check.Setup(caller, 3)
             check.Box(0).Text = "Restart TravelingSalesman"
             check.Box(1).Text = "Copy Best Intermediate solutions (top half) to Bottom Half"
-            check.Box(1).Checked = True
             check.Box(2).Text = "Circular pattern of cities (allows you to visually check if successful.)"
+            check.Box(1).Checked = True
             check.Box(2).Checked = True
         End If
 
@@ -168,10 +168,13 @@ Public Class Annealing_CPP_MT : Inherits VBparent
         task.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Sub Run(src As cv.Mat)
-        If anneal(0) Is Nothing Then setup() ' setup here rather than in algorithm so all threads work on the same problem.
         Static CityCountSlider = findSlider("Anneal Number of Cities")
-        If anneal(0).numberOfCities <> CityCountSlider.Value Or check.Box(0).Checked Or check.Box(2).Checked <> anneal(0).circularPattern Then setup()
-        check.Box(0).Checked = False
+        Static restartCheck = findCheckBox("Restart TravelingSalesman")
+        Static copyBestCheck = findCheckBox("Copy Best Intermediate solutions (top half) to Bottom Half")
+        Static circularCheck = findCheckBox("Circular pattern of cities (allows you to visually check if successful.)")
+        If anneal(0) Is Nothing Then setup() ' setup here rather than in algorithm so all threads work on the same problem.
+        If anneal(0).numberOfCities <> CityCountSlider.Value Or restartCheck.Checked Or circularCheck.Checked <> anneal(0).circularPattern Then setup()
+        restartCheck.Checked = False
         Dim allClosed As Boolean = True
         Parallel.For(0, anneal.Length,
             Sub(i)
@@ -219,7 +222,7 @@ Public Class Annealing_CPP_MT : Inherits VBparent
         dst2 = mats.dst1
 
         ' copy the top half of the solutions to the bottom half (worst solutions)
-        If check.Box(1).Checked Then
+        If copyBestCheck.Checked Then
             For i = 0 To anneal.Length / 2 - 1
                 anneal(bestList.ElementAt(bestList.Count - 1 - i).Value).cityOrder = anneal(bestList.ElementAt(i).Value).cityOrder
             Next
@@ -237,8 +240,8 @@ Public Class Annealing_Options : Inherits VBparent
     Public anneal As Annealing_Basics_CPP
     Dim flow As Font_FlowText
     Public Sub New()
-        random = New Random_Basics()
         Static randomSlider = findSlider("Random Pixel Count")
+        random = New Random_Basics()
         randomSlider.Value = 25 ' change the default number of cities here.
         random.Run(Nothing) ' get the city positions (may or may not be used below.)
 

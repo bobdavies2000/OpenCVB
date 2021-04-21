@@ -19,12 +19,14 @@ Public Class TimeView_Basics : Inherits VBparent
         task.desc = "TimeView that highlights concentrations of depth pixels"
     End Sub
     Public Sub Run(src as cv.Mat)
-        Static sideFrames As New List(Of cv.Mat)
-        Static topFrames As New List(Of cv.Mat)
-        Static saveFrameCount As Integer
         Static frameSlider = findSlider("Number of frames to include")
         Static sideAccum As New cv.Mat(src.Size, cv.MatType.CV_32FC1)
         Static topAccum As New cv.Mat(src.Size, cv.MatType.CV_32FC1)
+
+        Static sideFrames As New List(Of cv.Mat)
+        Static topFrames As New List(Of cv.Mat)
+        Static saveFrameCount As Integer
+
         If saveFrameCount <> frameSlider.value Then
             saveFrameCount = frameSlider.value
             sideFrames.Clear()

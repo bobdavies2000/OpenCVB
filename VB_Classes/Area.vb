@@ -106,8 +106,7 @@ Public Class Area_MinMotionRect : Inherits VBparent
     Dim bgSub As BGSubtract_MOG
     Public Sub New()
         bgSub = New BGSubtract_MOG()
-        Static bgSubLearnRate = findSlider("MOG Learn Rate")
-        bgSubLearnRate.Value = 100 ' low threshold to maximize motion
+        findSlider("MOG Learn Rate").Value = 100 ' low threshold to maximize motion
         task.desc = "Use minRectArea to encompass detected motion"
         label1 = "MinRectArea of MOG motion"
     End Sub

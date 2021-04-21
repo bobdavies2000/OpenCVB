@@ -95,7 +95,6 @@ Public Class Voronoi_CPP : Inherits VBparent
         task.desc = "Use the C++ version of the Voronoi code"
     End Sub
     Public Sub Run(src as cv.Mat)
-
         Static countSlider = findSlider("Random Pixel Count")
         vDemo.random.Run(Nothing)
         Dim handleSrc = GCHandle.Alloc(vDemo.random.Points, GCHandleType.Pinned)

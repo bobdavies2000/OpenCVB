@@ -47,10 +47,8 @@ Public Class Entropy_Highest : Inherits VBparent
         addw = New AddWeighted_Basics
 
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 64
-        gridHeightSlider.Value = 80
+        findSlider("ThreadGrid Width").Value = 64
+        findSlider("ThreadGrid Height").Value = 80
 
         entropyCalc = New Entropy_Simple
 

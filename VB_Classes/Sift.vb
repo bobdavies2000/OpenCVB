@@ -49,8 +49,8 @@ Public Class Sift_Basics_MT : Inherits VBparent
         lrView = New LeftRightView_BrightnessContrast
 
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        Dim gridWidthSlider = findSlider("ThreadGrid Width")
+        Dim gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Maximum = task.color.Cols * 2
         gridWidthSlider.Value = task.color.Cols * 2 ' we are just taking horizontal slices of the image.
         gridHeightSlider.Value = 10

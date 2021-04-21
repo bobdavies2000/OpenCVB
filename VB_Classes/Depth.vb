@@ -53,13 +53,13 @@ Public Class Depth_HolesRect : Inherits VBparent
     End Sub
 
     Public Sub Run(src As cv.Mat)
+        Static sizeSlider = findSlider("shadowRect Min Size")
         shadow.Run(src)
 
         Dim contours As cv.Point()()
         contours = cv.Cv2.FindContoursAsArray(shadow.dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
 
         Dim minEllipse(contours.Length - 1) As cv.RotatedRect
-        Static sizeSlider = findSlider("shadowRect Min Size")
         Dim minSize = sizeSlider.value
         For i = 0 To contours.Length - 1
             Dim minRect = cv.Cv2.MinAreaRect(contours(i))
@@ -137,10 +137,8 @@ Public Class Depth_MeanStdev_MT : Inherits VBparent
     Dim meanSeries As New cv.Mat
     Public Sub New()
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 64
-        gridHeightSlider.Value = 40
+        findSlider("ThreadGrid Width").Value = 64
+        findSlider("ThreadGrid Height").Value = 40
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -606,10 +604,8 @@ Public Class Depth_LocalMinMax_Kalman_MT : Inherits VBparent
     Public grid As Thread_Grid
     Public Sub New()
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 128
-        gridHeightSlider.Value = 90
+        findSlider("ThreadGrid Width").Value = 128
+        findSlider("ThreadGrid Height").Value = 90
         grid.Run(Nothing)
 
         kalman = New Kalman_Basics()
@@ -763,13 +759,14 @@ Public Class Depth_SmoothingMat : Inherits VBparent
         task.desc = "Use depth rate of change to smooth the depth values beyond close range"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static thresholdSlider = findSlider("Threshold in millimeters")
+        Static lastDepth = task.depth32f
+
         If standalone Or task.intermediateReview = caller Then src = task.depth32f
         Dim rect = If(task.drawRect.Width <> 0, task.drawRect, New cv.Rect(0, 0, src.Width, src.Height))
-        Static lastDepth = task.depth32f
 
         cv.Cv2.Subtract(lastDepth, task.depth32f, dst1)
 
-        Static thresholdSlider = findSlider("Threshold in millimeters")
         Dim mmThreshold = CSng(thresholdSlider.Value)
         dst1 = dst1.Threshold(mmThreshold, 0, cv.ThresholdTypes.TozeroInv).Threshold(-mmThreshold, 0, cv.ThresholdTypes.Tozero)
         cv.Cv2.Add(task.depth32f, dst1, dst2)
@@ -790,12 +787,10 @@ Public Class Depth_Smoothing : Inherits VBparent
     Public mats As Mat_4to1
     Public colorize As Depth_ColorMap
     Public Sub New()
-
         colorize = New Depth_ColorMap()
         mats = New Mat_4to1()
         reduction = New Reduction_Basics()
-        Dim reductionRadio = findRadio("Use bitwise reduction")
-        reductionRadio.Checked = True
+        findRadio("Use bitwise reduction").Checked = True
         smooth = New Depth_SmoothingMat()
 
         label2 = "Mask of depth that is smooth"
@@ -1050,11 +1045,11 @@ Public Class Depth_ForegroundOverTime : Inherits VBparent
         task.desc = "Create a fused foreground mask over x number of frames"
     End Sub
     Public Sub Run(src As cv.Mat)
-
-        Static lastFrames As New List(Of cv.Mat)
         Static countSlider = findSlider("Number of frames to fuse")
+        Static lastFrames As New List(Of cv.Mat)
         Static saveCount As Integer
         Static sumFrame As New cv.Mat
+
         If saveCount <> countSlider.value Then
             lastFrames.Clear()
             saveCount = countSlider.value
@@ -1102,8 +1097,7 @@ Public Class Depth_LowQualityMask : Inherits VBparent
     Dim dilate As DilateErode_Basics
     Public Sub New()
         dilate = New DilateErode_Basics
-        Dim ellipseRadio = findRadio("Dilate/Erode shape: Ellipse")
-        ellipseRadio.Checked = True
+        findRadio("Dilate/Erode shape: Ellipse").Checked = True
 
         label2 = "Dilated zero depth - reduces flyout particles"
         task.desc = "Monitor motion in the mask where depth is zero"
@@ -1300,6 +1294,7 @@ Public Class Depth_PointCloud_IMU : Inherits VBparent
     Public Sub Run(src As cv.Mat)
         Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
+        Static angleYslider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
 
         Dim input = src
         If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud.Clone
@@ -1330,7 +1325,6 @@ Public Class Depth_PointCloud_IMU : Inherits VBparent
                                {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz},
                                {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz}}
 
-        Static angleYslider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
         Dim angleY = angleYslider.value
         '[cos(a) 0 -sin(a)]
         '[0      1       0]
@@ -1454,6 +1448,7 @@ Public Class Depth_SmoothMax : Inherits VBparent
         task.desc = "To reduce z-Jitter, use the farthest depth value at each pixel as long as the camera is stable"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static dMinCheck = findCheckBox("Use SmoothMin to find zero depth pixels")
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.depth32f
 
         dMin.Run(src)
@@ -1466,7 +1461,6 @@ Public Class Depth_SmoothMax : Inherits VBparent
                 cv.Cv2.Max(src, stableMax, stableMax)
             Next
 
-            Static dMinCheck = findCheckBox("Use SmoothMin to find zero depth pixels")
             If dMinCheck.checked Then
                 Dim zeroMask As New cv.Mat
                 dMin.stableMin.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertTo(zeroMask, cv.MatType.CV_8U)
@@ -1584,15 +1578,14 @@ Public Class Depth_AveragingStable : Inherits VBparent
     Public Sub New()
         dAvg = New Depth_Averaging
         extrema = New Depth_SmoothMinMax
-        Dim minMaxRadio = findRadio("Use farthest distance")
-        minMaxRadio.Checked = True
+        findRadio("Use farthest distance").Checked = True
         task.desc = "Use Depth_SmoothMax to remove the artifacts from the Depth_Averaging"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static noAvgRadio = findRadio("Use unchanged depth input")
         If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
         extrema.Run(src)
 
-        Static noAvgRadio = findRadio("Use unchanged depth input")
         If noAvgRadio.checked = False Then
             dAvg.Run(extrema.dst2)
             dst1 = dAvg.dst1
@@ -1624,14 +1617,14 @@ Public Class Depth_Fusion : Inherits VBparent
         task.desc = "Fuse the depth from the previous x frames."
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static fuseSlider = findSlider("Number of frames to fuse")
+        Dim fuseCount = fuseSlider.value
+        Static saveFuseCount = fuseCount
+        Static fuseFrames As New List(Of cv.Mat)
+
         Dim input = src
         If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f
 
-        Static fuseSlider = findSlider("Number of frames to fuse")
-        Dim fuseCount = fuseSlider.value
-
-        Static saveFuseCount = fuseCount
-        Static fuseFrames As New List(Of cv.Mat)
         If saveFuseCount <> fuseCount Then
             fuseFrames = New List(Of cv.Mat)
             saveFuseCount = fuseCount

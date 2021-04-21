@@ -154,12 +154,9 @@ Public Class OpticalFlow_DenseBasics_MT : Inherits VBparent
     Dim optFlow As OpticalFlow_DenseOptions
     Public Sub New()
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        Static gridBorderSlider = findSlider("ThreadGrid Border")
-        gridWidthSlider.Value = dst1.Cols / 4
-        gridHeightSlider.Value = dst1.Rows / 4
-        gridHeightSlider.Value = 5
+        findSlider("ThreadGrid Width").Value = dst1.Cols / 4
+        findSlider("ThreadGrid Height").Value = dst1.Rows / 4
+        findSlider("ThreadGrid Border").Value = 5
 
         optFlow = New OpticalFlow_DenseOptions()
         optFlow.sliders.trackbar(0).Value = 75
@@ -172,13 +169,13 @@ Public Class OpticalFlow_DenseBasics_MT : Inherits VBparent
         task.desc = "MultiThread dense optical flow algorithm  "
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static thresholdSlider = findSlider("OpticalFlow Correlation Threshold")
         Static oldGray As New cv.Mat
 
         If task.frameCount > 0 Then
             grid.Run(Nothing)
             optFlow.Run(src)
 
-            Static thresholdSlider = findSlider("OpticalFlow Correlation Threshold")
             Dim CCthreshold = CSng(thresholdSlider.Value / thresholdSlider.Maximum)
             Parallel.For(0, grid.borderList.Count,
             Sub(i)

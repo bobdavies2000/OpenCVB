@@ -124,6 +124,8 @@ Public Class Hough_Lines_MT : Inherits VBparent
         edges = New Edges_Basics()
 
         grid = New Thread_Grid
+        findSlider("ThreadGrid Width").Value = 16
+        findSlider("ThreadGrid Height").Value = 16
 
         task.desc = "Multithread Houghlines to find lines in image fragments."
         label1 = "Hough_Lines_MT"
@@ -131,13 +133,6 @@ Public Class Hough_Lines_MT : Inherits VBparent
     End Sub
 
     Public Sub Run(src as cv.Mat)
-
-        If task.frameCount = 0 Then
-            Static gridWidthSlider = findSlider("ThreadGrid Width")
-            Static gridHeightSlider = findSlider("ThreadGrid Height")
-            gridWidthSlider.Value = 16
-            gridHeightSlider.Value = 16
-        End If
         grid.Run(Nothing)
 
         edges.Run(src)

@@ -8,10 +8,8 @@ Public Class Featureless_Basics : Inherits VBparent
         edges = New Edges_Basics()
 
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 10
-        gridHeightSlider.Value = gridWidthSlider.Value
+        findSlider("ThreadGrid Width").Value = 10
+        findSlider("ThreadGrid Height").Value = 10
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

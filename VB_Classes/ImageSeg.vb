@@ -79,11 +79,10 @@ Public Class ImageSeg_MissingSegments : Inherits VBparent
         task.desc = "Floodfill segments which were marked as missing and clear small unused segments"
     End Sub
     Public Sub Run(src as cv.Mat)
-
         Static lenContourSlider = findSlider("Minimum length for missing contours")
-        Dim maxLen = lenContourSlider.value
         Static stepSlider = findSlider("FloodFill Step Size")
         Static fillSlider = findSlider("FloodFill point distance from edge")
+        Dim maxLen = lenContourSlider.value
         Dim fill = fillSlider.value
         Dim stepSize = stepSlider.Value
 
@@ -165,8 +164,7 @@ Public Class ImageSeg_CentroidTracker : Inherits VBparent
     Public Sub New()
         iSeg = New ImageSeg_Basics
         pTrack = New KNN_PointTracker
-        Dim drawCheckbox = findCheckBox("Caller will handle any drawing required")
-        drawCheckbox.Checked = True
+        findCheckBox("Caller will handle any drawing required").Checked = True
 
         label1 = "Output of ImageSeg_Basics"
         task.desc = "Track the centroids that are found consistently from frame to frame."

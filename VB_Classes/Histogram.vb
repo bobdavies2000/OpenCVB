@@ -460,12 +460,13 @@ Public Class Histogram_BackProjection2D : Inherits VBparent
         label2 = "Backprojection of detected hue and saturation."
     End Sub
     Public Sub Run(src As cv.Mat)
-        hist.Run(src)
-        dst1 = hist.dst1
         Static hueBinSlider = findSlider("Hue bins")
         Static hueBins = hueBinSlider.Value
         Static satBinSlider = findSlider("Saturation bins")
         Static satBins = satBinSlider.Value
+
+        hist.Run(src)
+        dst1 = hist.dst1
         If hueBins <> hueBinSlider.Value Or satBins <> satBinSlider.Value Then
             task.drawRectClear = True
             hueBins = hueBinSlider.Value
@@ -952,9 +953,8 @@ Public Class Histogram_ConcentrationPoints : Inherits VBparent
     End Sub
     Public Function plotHighlights(histOutput As cv.Mat, dst As cv.Mat) As String
         Static ResizeSlider = findSlider("Resize Factor x100")
-        Dim resizeFactor = ResizeSlider.Value / 100
-
         Static cThresholdSlider = findSlider("Concentration Threshold")
+        Dim resizeFactor = ResizeSlider.Value / 100
         Dim concentrationThreshold = cThresholdSlider.Value
 
         Dim minPixel = CInt(resizeFactor * task.minDepth * task.pixelsPerMeter / 1000)

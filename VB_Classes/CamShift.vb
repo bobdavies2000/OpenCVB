@@ -21,6 +21,10 @@ Public Class CamShift_Basics : Inherits VBparent
         task.desc = "CamShift Demo - draw on the images to define the object to track. Tracker Algorithm"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static vMinSlider = findSlider("CamShift vMin")
+        Static vMaxSlider = findSlider("CamShift vMax")
+        Static sMinSlider = findSlider("CamShift Smin")
+
         Static roi As New cv.Rect
         Static vMinLast As integer
         Static vMaxLast As integer
@@ -28,10 +32,6 @@ Public Class CamShift_Basics : Inherits VBparent
         Static roi_hist As New cv.Mat
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim hue = hsv.EmptyClone()
-
-        Static vMinSlider = findSlider("CamShift vMin")
-        Static vMaxSlider = findSlider("CamShift vMax")
-        Static sMinSlider = findSlider("CamShift Smin")
 
         Dim hsize() As Integer = {task.histogramBins, task.histogramBins, task.histogramBins}
         Dim ranges() = {New cv.Rangef(0, 180)}
@@ -163,10 +163,10 @@ Public Class Camshift_TopObjects : Inherits VBparent
         task.desc = "Track - Tracker Algorithm"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static updateSlider = findSlider("Reinitialize camshift after x frames")
         blob.Run(src)
         dst1 = blob.dst2
 
-        Static updateSlider = findSlider("Reinitialize camshift after x frames")
         Dim updateFrequency = updateSlider.Value
         Dim trackBoxes As New List(Of cv.RotatedRect)
         For i = 0 To Math.Min(cams.Length, blob.flood.sortedSizes.Count) - 1

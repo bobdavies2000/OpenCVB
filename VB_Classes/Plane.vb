@@ -96,10 +96,8 @@ Public Class Plane_Detect : Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 64
-        gridHeightSlider.Value = 64
+        findSlider("ThreadGrid Width").Value = 64
+        findSlider("ThreadGrid Height").Value = 64
 
         task.desc = "Identify planes in each segment."
         label2 = "Blue, green, and red show different planes"
@@ -166,10 +164,8 @@ Public Class Plane_DetectDebug : Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 32
-        gridHeightSlider.Value = 32
+        findSlider("ThreadGrid Width").Value = 32
+        findSlider("ThreadGrid Height").Value = 32
 
         task.desc = "Debug code to identify planes in just one segment."
         label2 = "Blue, green, and red show different planes"

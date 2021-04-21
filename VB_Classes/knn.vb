@@ -131,6 +131,8 @@ Public Class KNN_Options : Inherits VBparent
         task.desc = "Source of query/train points - generate points if standalone.  Reuse points if requested."
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static trainSlider = findSlider("KNN Train count")
+        Static querySlider = findSlider("KNN Query count")
         If standalone Or task.intermediateReview = caller Then
             If check.Box(0).Checked = False Then useRandomData = True
         End If
@@ -140,11 +142,9 @@ Public Class KNN_Options : Inherits VBparent
                 randomTrain = New Random_Basics()
                 randomQuery = New Random_Basics()
             End If
-            Static trainSlider = findSlider("KNN Train count")
             randomTrain.countSlider.Value = trainSlider.Value
             randomTrain.Run(Nothing)
 
-            Static querySlider = findSlider("KNN Query count")
             randomQuery.countSlider.Value = querySlider.Value
             randomQuery.Run(Nothing)
         End If
@@ -306,8 +306,8 @@ Public Class KNN_Test : Inherits VBparent
     Dim knn As KNN_BasicsQT
     Public Sub New()
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        Dim gridWidthSlider = findSlider("ThreadGrid Width")
+        Dim gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Minimum = 50 ' limit the number of centroids - KNN can't handle more than a few thousand without rework.
         gridHeightSlider.Minimum = 50
         gridWidthSlider.Value = 100
@@ -350,8 +350,8 @@ Public Class KNN_Test_1_to_1 : Inherits VBparent
     Dim knn As KNN_1_to_1
     Public Sub New()
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        Dim gridWidthSlider = findSlider("ThreadGrid Width")
+        Dim gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Minimum = 50 ' limit the number of centroids - KNN can't handle more than a few thousand without rework.
         gridHeightSlider.Minimum = 50
         gridWidthSlider.Value = 100
@@ -400,10 +400,13 @@ Public Class KNN_Point3d : Inherits VBparent
         label2 = "Top Down View to confirm 3D KNN is correct"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static countSlider = findSlider("KNN Query count")
+        Static nearestCountSlider = findSlider("KNN k nearest points")
+        Dim findXnearest = nearestCountSlider.value
+
         Dim maxDepth As Integer = 4000 ' this is an arbitrary max depth
         Dim knn = cv.ML.KNearest.Create()
         If standalone Or task.intermediateReview = caller Then
-            Static countSlider = findSlider("KNN Query count")
             ReDim lastSet(countSlider.Value - 1)
             ReDim querySet(lastSet.Count - 1)
             For i = 0 To lastSet.Count - 1
@@ -431,9 +434,6 @@ Public Class KNN_Point3d : Inherits VBparent
             p = New cv.Point2f(lastSet(i).X, lastSet(i).Z * src.Rows / maxDepth)
             dst2.Circle(p, 9, cv.Scalar.Blue, -1, task.lineType)
         Next
-
-        Static nearestCountSlider = findSlider("KNN k nearest points")
-        Dim findXnearest = nearestCountSlider.value
 
         ReDim responseSet(querySet.Length * findXnearest - 1)
         For i = 0 To querySet.Count - 1
@@ -503,8 +503,7 @@ Public Class KNN_SmoothAverage : Inherits VBparent
     Dim lastinput As New cv.Mat
     Public Sub New()
         knn = New KNN_DepthClusters()
-        Dim drawCheckbox = findCheckBox("Draw rectangle and centroid for each mask")
-        drawCheckbox.Checked = False
+        findCheckBox("Draw rectangle and centroid for each mask").Checked = False
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -543,8 +542,7 @@ Public Class KNN_StabilizeRegions : Inherits VBparent
     Dim lastinput As New cv.Mat
     Public Sub New()
         knn = New KNN_DepthClusters()
-        Dim drawCheckbox = findCheckBox("Draw rectangle and centroid for each mask")
-        drawCheckbox.Checked = False
+        findCheckBox("Draw rectangle and centroid for each mask").Checked = False
 
         flood = New FloodFill_Palette()
 
@@ -668,11 +666,11 @@ Public Class KNN_Cluster2DCities : Inherits VBparent
         Static reuseCheck = findCheckBox("Reuse the training and query data")
         ' If they changed Then number of elements in the set
         Static cityCountSlider = findSlider("KNN Query count")
+        Static nearestCountSlider = findSlider("KNN k nearest points")
+        nearestCountSlider.Value = numberOfCities
 
         If cityCountSlider.Value <> numberOfCities Or reuseCheck.Checked = False Then
             numberOfCities = cityCountSlider.Value
-            Static nearestCountSlider = findSlider("KNN k nearest points")
-            nearestCountSlider.Value = numberOfCities
 
             ReDim cityPositions(numberOfCities - 1)
             ReDim cityOrder(numberOfCities - 1)
@@ -725,12 +723,12 @@ Public Class KNN_Point2d : Inherits VBparent
         'Next
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static nearestCountSlider = findSlider("KNN k nearest points")
+        Dim findXnearest = nearestCountSlider.Value
+
         If standalone Or task.intermediateReview = caller Then prepareImage(dst1, task.dotSize)
 
         knn.Run(src)
-
-        Static nearestCountSlider = findSlider("KNN k nearest points")
-        Dim findXnearest = nearestCountSlider.Value
 
         ReDim responseSet(knn.knnQT.queryPoints.Count * findXnearest - 1)
         Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
@@ -853,6 +851,8 @@ Public Class KNN_PointTracker : Inherits VBparent
         Next
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static pixelSlider = findSlider("Minimum size of object in pixels")
+        Static drawRCCheck = findCheckBox("Caller will handle any drawing required")
         If standalone Or task.intermediateReview = caller Then
             If topView Is Nothing Then topView = New PointCloud_Kalman_TopView()
             topView.Run(task.pointCloud)
@@ -901,7 +901,6 @@ Public Class KNN_PointTracker : Inherits VBparent
             If queryMasks.Count > 0 Then dst1.SetTo(0)
             Dim inputRect = New cv.Rect
             drawRC.viewObjects.Clear()
-            Static drawRCCheck = findCheckBox("Caller will handle any drawing required")
             Dim useDrawRC = drawRCCheck.checked = False
             For i = 0 To knn.basics.knnQT.trainingPoints.Count - 1
                 inputRect = New cv.Rect(kalman(i).kInput(2), kalman(i).kInput(3), kalman(i).kInput(4), kalman(i).kInput(5))
@@ -929,7 +928,6 @@ Public Class KNN_PointTracker : Inherits VBparent
                     If outRect.Height < 0 Then outRect.Height = 1
                     vo.rectInHist = outRect
 
-                    Static pixelSlider = findSlider("Minimum size of object in pixels")
                     Dim minPixels = pixelSlider.value
 
                     If vo.rectInHist.Width * vo.rectInHist.Height >= minPixels Then

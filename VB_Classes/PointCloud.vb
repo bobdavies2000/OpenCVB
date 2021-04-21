@@ -252,6 +252,11 @@ Public Class PointCloud_SetupSide : Inherits VBparent
         task.desc = "Create the colorized mat used for side projections"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
+        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
+        Static xRotateSlider = findSlider("Amount to rotate pointcloud around X-axis (degrees)")
+
         Dim distanceRatio As Single = 1
         Dim fsize = task.fontSize * 1.5
 
@@ -270,8 +275,6 @@ Public Class PointCloud_SetupSide : Inherits VBparent
         Dim markerLeft = New cv.Point(marker.X, cam.Y - marker.Y)
         Dim markerRight = New cv.Point(marker.X, cam.Y + marker.Y)
 
-        Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
-        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
         If standalone Then imu.Run(src)
         Dim offset = Math.Sin(task.angleX) * marker.Y
         If zCheckbox.checked Then
@@ -284,8 +287,6 @@ Public Class PointCloud_SetupSide : Inherits VBparent
             End If
         End If
 
-        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
-        Static xRotateSlider = findSlider("Amount to rotate pointcloud around X-axis (degrees)")
         If xCheckbox.Checked Then
             markerLeft = New cv.Point(markerLeft.X - cam.X, markerLeft.Y - cam.Y) ' Change the origin
             markerLeft = New cv.Point(markerLeft.X * Math.Cos(task.angleZ) - markerLeft.Y * Math.Sin(task.angleZ), ' rotate around x-axis using angleZ
@@ -408,10 +409,8 @@ Public Class PointCloud_Raw_CPP : Inherits VBparent
     Dim depthBytes() As Byte
     Public Sub New()
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 64
-        gridHeightSlider.Value = 32
+        findSlider("ThreadGrid Width").Value = 64
+        findSlider("ThreadGrid Height").Value = 32
 
         label1 = "Top View"
         label2 = "Side View"
@@ -456,10 +455,8 @@ Public Class PointCloud_Raw : Inherits VBparent
     Dim depthBytes() As Byte
     Public Sub New()
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 64
-        gridHeightSlider.Value = 32
+        findSlider("ThreadGrid Width").Value = 64
+        findSlider("ThreadGrid Height").Value = 32
 
         label1 = "Top View"
         label2 = "Side View"
@@ -640,10 +637,8 @@ Public Class PointCloud_FrustrumTop : Inherits VBparent
 
         task.hist3DThreshold = 0
 
-        Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
-        Dim zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
-        xCheckbox.Checked = False
-        zCheckbox.Checked = False
+        findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ").Checked = False
+        findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX").Checked = False
 
         label2 = "Draw_Frustrum output"
         task.desc = "Translate only the frustrum with gravity"
@@ -675,10 +670,8 @@ Public Class PointCloud_FrustrumSide : Inherits VBparent
 
         task.hist3DThreshold = 0
 
-        Dim xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
-        Dim zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
-        xCheckbox.Checked = False
-        zCheckbox.Checked = False
+        findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ").Checked = False
+        findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX").Checked = False
 
         label2 = "Draw_Frustrum output"
         task.desc = "Translate only the frustrum with gravity"
@@ -790,6 +783,7 @@ Public Class PointCloud_ObjectsTop : Inherits VBparent
         task.desc = "Validate the formula for pixel height as a function of distance"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static distanceSlider = findSlider("Test Bar Distance from camera in mm")
         Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim drawLines = showRectanglesCheck.checked
         measureTop.Run(src)
@@ -802,7 +796,6 @@ Public Class PointCloud_ObjectsTop : Inherits VBparent
 
         Dim xpt1 As cv.Point2f, xpt2 As cv.Point2f
         If standalone Then
-            Static distanceSlider = findSlider("Test Bar Distance from camera in mm")
             Dim pixeldistance = src.Height * (distanceSlider.Value / 1000) / task.maxZ
             Dim lineHalf = CInt(Math.Tan(FOV * 0.0174533) * pixeldistance)
 
@@ -898,6 +891,7 @@ Public Class PointCloud_ObjectsSide : Inherits VBparent
         task.desc = "Validate the formula for pixel height as a function of distance"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static distanceSlider = findSlider("Test Bar Distance from camera in mm")
         Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim drawLines = showRectanglesCheck.checked
         measureSide.Run(src)
@@ -908,7 +902,6 @@ Public Class PointCloud_ObjectsSide : Inherits VBparent
 
         Dim xpt1 As cv.Point2f, xpt2 As cv.Point2f
         If standalone Then
-            Static distanceSlider = findSlider("Test Bar Distance from camera in mm")
             Dim pixeldistance = src.Width * (distanceSlider.Value / 1000) / task.maxZ
             Dim lineHalf = CInt(Math.Tan(FOV * 0.0174533) * pixeldistance)
 
@@ -1015,6 +1008,8 @@ Public Class PointCloud_BothViews : Inherits VBparent
         task.desc = "Find the actual width in pixels for the objects detected in the top view"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static xRotateSlider = findSlider("Amount to rotate pointcloud around X-axis (degrees)")
+        Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
         Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim showDetails = showRectanglesCheck.checked
 
@@ -1025,8 +1020,6 @@ Public Class PointCloud_BothViews : Inherits VBparent
             Dim instructions = "Click any centroid to get details"
             Dim accMsg1 = "TopView - distances are accurate"
             Dim accMsg2 = "SideView - distances are accurate"
-            Static xRotateSlider = findSlider("Amount to rotate pointcloud around X-axis (degrees)")
-            Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
             If xRotateSlider.Value <> 0 Or zRotateSlider.Value <> 0 Then
                 If task.cameraLevel Then
                     accMsg1 = "Distances are good - camera is level"

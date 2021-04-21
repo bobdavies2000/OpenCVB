@@ -63,10 +63,8 @@ Public Class ML_FillRGBDepth_MT : Inherits VBparent
     Public Sub New()
         colorizer = New Depth_Colorizer_CPP()
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = dst1.Cols / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
-        gridHeightSlider.Value = dst1.Rows / 4
+        findSlider("ThreadGrid Width").Value = dst1.Cols / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
+        findSlider("ThreadGrid Height").Value = dst1.Rows / 4
 
         shadow = New Depth_Holes()
         label1 = "ML filled shadow"
@@ -132,10 +130,8 @@ Public Class ML_DepthFromColor_MT : Inherits VBparent
             sliders.setupTrackBar(0, "Prediction Max Depth", 500, 5000, 1000)
         End If
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 16
-        gridHeightSlider.Value = 16
+        findSlider("ThreadGrid Width").Value = 16
+        findSlider("ThreadGrid Height").Value = 16
 
         label1 = "Predicted Depth"
         label2 = "Mask of color and depth input"
@@ -364,10 +360,8 @@ Public Class ML_EdgeDepth_MT : Inherits VBparent
             sliders.setupTrackBar(0, "Prediction Max Depth", 500, 5000, 1000)
         End If
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 16
-        gridHeightSlider.Value = 16
+        findSlider("ThreadGrid Width").Value = 16
+        findSlider("ThreadGrid Height").Value = 16
 
         label1 = "Depth Shadow (inverse of color and depth)"
         label2 = "Predicted Depth"

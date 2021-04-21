@@ -660,10 +660,11 @@ Public Class Kalman_VB_Basics : Inherits VBparent
     End Sub
     Public Sub State_Update(ByVal q_m As Single)
         Static deltaSlider = findSlider("Delta Time X100")
-        Dim dt As Single = deltaSlider.value / 100
-        Dim unbias As Single = q_m - q_bias 'Unbias our gyro
         Static covarSlider = findSlider("Process Covariance X10000")
         Static pDotSlider = findSlider("pDot entry X1000")
+
+        Dim dt As Single = deltaSlider.value / 100
+        Dim unbias As Single = q_m - q_bias 'Unbias our gyro
         Dim pdotEntry = pDotSlider.value / 1000
         processCovar = covarSlider.value / 10000
         Dim Pdot() As Single = {processCovar - P(0, 1) - P(1, 0), -P(1, 1), -P(1, 1), pdotEntry}

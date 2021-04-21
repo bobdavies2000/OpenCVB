@@ -371,17 +371,12 @@ Public Class KMeans_Color_MT : Inherits VBparent
         End If
 
         grid = New Thread_Grid
+        findSlider("ThreadGrid Width").Value = 128
+        findSlider("ThreadGrid Height").Value = 160
 
         task.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
     End Sub
     Public Sub Run(src As cv.Mat)
-        If task.frameCount = 0 Then
-            Static gridWidthSlider = findSlider("ThreadGrid Width")
-            Static gridHeightSlider = findSlider("ThreadGrid Height")
-            gridWidthSlider.Value = 128
-            gridHeightSlider.Value = 160
-
-        End If
         grid.Run(Nothing)
         Dim clusterCount = sliders.trackbar(0).Value
         Parallel.ForEach(grid.roiList,

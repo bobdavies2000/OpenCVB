@@ -12,11 +12,11 @@ Public Class Threshold_LaplacianFilter : Inherits VBparent
         task.desc = "Threshold the output of a Laplacian derivative, mask with depth foreground.  needs more work"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static distSlider = findSlider("z-Distance")
         edges.Run(src)
         dst2 = edges.dst2
         dst1 = task.depth32f
 
-        Static distSlider = findSlider("z-Distance")
         Dim mask = dst1.Threshold(distSlider.value, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
         dst2.SetTo(0, mask)
     End Sub

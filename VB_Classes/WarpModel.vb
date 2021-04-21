@@ -134,8 +134,9 @@ Public Class WarpModel_Input : Inherits VBparent
         task.desc = "Import the misaligned input."
     End Sub
     Public Sub Run(src As cv.Mat)
-        Dim img As New cv.Mat
+        Static gradientCheck = findCheckBox("Use Gradient in WarpInput")
         Static frm = findfrm("WarpModel_Input Radio Options")
+        Dim img As New cv.Mat
         For i = 0 To frm.check.length - 1
             Dim nextRadio = frm.check(i)
             If nextRadio.Checked Then
@@ -149,7 +150,6 @@ Public Class WarpModel_Input : Inherits VBparent
         Dim r() = {New cv.Rect(0, 0, img.Width, img.Height / 3), New cv.Rect(0, img.Height / 3, img.Width, img.Height / 3),
                    New cv.Rect(0, 2 * img.Height / 3, img.Width, img.Height / 3)}
 
-        Static gradientCheck = findCheckBox("Use Gradient in WarpInput")
         For i = 0 To r.Count - 1
             If gradientCheck.checked Then
                 sobel.Run(img(r(i)))
@@ -263,6 +263,10 @@ End Class
 '        task.desc = "Find the Translation and Euclidean warp matrix for the current grayscale image to the previous - needs more work"
 '    End Sub
 '    Public Sub Run(src as cv.Mat)
+'        Static stdevSlider = findSlider("Stdev Threshold")
+'        Dim stdevThreshold = CSng(stdevSlider.Value)
+'        Static correlationSlider = findSlider("Correlation Threshold X1000")
+'        Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
 
 '        sobel.src = src
 '        sobel.Run()
@@ -275,11 +279,6 @@ End Class
 '        wbasics.src = dst1(task.drawRect)
 '        wbasics.src2 = lastFrame(task.drawRect)
 
-'        Static stdevSlider = findSlider("Stdev Threshold")
-'        Dim stdevThreshold = CSng(stdevSlider.Value)
-
-'        Static correlationSlider = findSlider("Correlation Threshold X1000")
-'        Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
 
 '        Dim mean As Single, stdev As Single
 '        cv.Cv2.MeanStdDev(dst1(task.drawRect), mean, stdev)

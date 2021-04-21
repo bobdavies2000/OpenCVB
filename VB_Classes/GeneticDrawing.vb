@@ -146,7 +146,6 @@ Public Class GeneticDrawing_Basics : Inherits VBparent
         totalError = calculateError(mats.mat(3))
     End Sub
     Public Sub Run(src as cv.Mat)
-
         Static genSlider = findSlider("Number of Generations")
         Static stageSlider = findSlider("Number of Stages")
         Static brushSlider = findSlider("Brush size Percentage")
@@ -257,10 +256,10 @@ Public Class GeneticDrawing_Color : Inherits VBparent
         task.desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes. Painterly"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static restartCheck = findCheckBox("Restart the algorithm with the current settings")
         Dim split() As cv.Mat
         split = src.Split()
 
-        Static restartCheck = findCheckBox("Restart the algorithm with the current settings")
         Dim restartRequested = restartCheck.checked
         restartCheck.checked = False
         For i = 0 To split.Count - 1

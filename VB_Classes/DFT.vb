@@ -261,8 +261,6 @@ Public Class DFT_Shapes : Inherits VBparent
         task.desc = "Show the spectrum magnitude for some standard shapes. Painterly"
     End Sub
     Public Sub Run(src As cv.Mat)
-        optDraw.Run(Nothing)
-
         Static circleRadio = findRadio("Draw Circle")
         Static ellipseRadio = findRadio("Draw Ellipse")
         Static lineRadio = findRadio("Draw Line")
@@ -270,6 +268,8 @@ Public Class DFT_Shapes : Inherits VBparent
         Static polygonRadio = findRadio("Draw Polygon")
         Static symShapeRadio = findRadio("Draw Symmetrical Shapes")
         Static pointRadio = findRadio("Draw Point")
+
+        optDraw.Run(Nothing)
 
         If circleRadio.checked Then
             circle.Run(src)

@@ -531,7 +531,6 @@ Public Class Edges_Consistent : Inherits VBparent
         task.desc = "Edges that are consistent for x number of frames"
     End Sub
     Public Sub Run(src as cv.Mat)
-
         Static nFrameSlider = findSlider("Edges present n frames")
         Dim nFrames = nFrameSlider.value
 
@@ -700,6 +699,8 @@ Public Class Edges_Sobel : Inherits VBparent
         task.desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
+        Static thresholdCheck = findCheckBox("Threshold Sobel Results")
         Static ksizeSlider = findSlider("Sobel kernel Size")
         Dim kernelSize = If(ksizeSlider.Value Mod 2, ksizeSlider.Value, ksizeSlider.Value - 1)
         dst1 = New cv.Mat(src.Rows, src.Cols, src.Type)
@@ -717,9 +718,7 @@ Public Class Edges_Sobel : Inherits VBparent
         Else
             dst1 = grayX.ConvertScaleAbs()
         End If
-        Static thresholdCheck = findCheckBox("Threshold Sobel Results")
         If thresholdCheck.checked Then
-            Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
             dst1 = dst1.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Tozero).Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
         End If
     End Sub
@@ -740,9 +739,9 @@ Public Class Edges_SobelHorizontal : Inherits VBparent
         task.desc = "Find edges with Sobel only in the horizontal direction"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
         edges.Run(src)
 
-        Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
         dst1 = edges.dst1.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
@@ -886,18 +885,20 @@ Public Class Edges_Matching : Inherits VBparent
         task.desc = "Match edges in the left and right views to determine distance"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static overlayCheck = findCheckBox("Overlay thread grid")
+        Static highlightCheck = findCheckBox("Highlight all grid entries above threshold")
+        Static clearCheck = findCheckBox("Clear selected highlights (if Highlight all grid entries is unchecked)")
+        Static redRects As New List(Of Integer)
+        Static thresholdSlider = findSlider("Correlation threshold for display X100")
+        Static searchSlider = findSlider("Search depth in pixels")
+        Dim threshold = thresholdSlider.value / 100
+        Dim searchDepth = searchSlider.value
 
         grid.Run(Nothing)
 
         red.Run(src)
         dst1 = red.dst1
         dst2 = red.dst2
-
-        Static redRects As New List(Of Integer)
-        Static thresholdSlider = findSlider("Correlation threshold for display X100")
-        Static searchSlider = findSlider("Search depth in pixels")
-        Dim threshold = thresholdSlider.value / 100
-        Dim searchDepth = searchSlider.value
 
         Dim matchOption = match.checkRadio()
         Dim fsize = task.fontSize / 3
@@ -921,13 +922,11 @@ Public Class Edges_Matching : Inherits VBparent
             End If
         Next
 
-        Static overlayCheck = findCheckBox("Overlay thread grid")
         If overlayCheck.checked Then
             dst1.SetTo(255, grid.gridMask)
             dst2.SetTo(255, grid.gridMask)
         End If
 
-        Static highlightCheck = findCheckBox("Highlight all grid entries above threshold")
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If highlightCheck.checked Then
@@ -943,7 +942,6 @@ Public Class Edges_Matching : Inherits VBparent
             Next
         Else
             label1 = "Click in dst2 to highlight segment in dst1"
-            Static clearCheck = findCheckBox("Clear selected highlights (if Highlight all grid entries is unchecked)")
             If clearCheck.checked Then
                 redRects.Clear()
                 grid.mouseClickROI = 0
@@ -989,7 +987,6 @@ Public Class Edges_MotionOverlay : Inherits VBparent
         task.desc = "Find edges by displacing the current RGB image in any direction and diff it with the original."
     End Sub
     Public Sub Run(src as cv.Mat)
-
         Static xSlider = findSlider("Displacement in the X direction (in pixels)")
         Static ySlider = findSlider("Displacement in the Y direction (in pixels)")
         Dim xDisp = xSlider.value
@@ -1021,12 +1018,10 @@ Public Class Edges_RGB : Inherits VBparent
     Dim sobel As Edges_Sobel
     Public Sub New()
         sobel = New Edges_Sobel
-        Dim thresholdCheck = findCheckBox("Threshold Sobel Results")
-        thresholdCheck.Checked = False
+        findCheckBox("Threshold Sobel Results").Checked = False
         task.desc = "Combine the edges from all 3 channels.  Painterly"
     End Sub
     Public Sub Run(src as cv.Mat)
-
         Dim img32f As New cv.Mat
         src.ConvertTo(img32f, cv.MatType.CV_32FC3)
         Dim split = img32f.Split()

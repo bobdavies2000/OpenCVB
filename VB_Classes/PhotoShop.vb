@@ -121,12 +121,13 @@ Public Class PhotoShop_WhiteBalance_CPP : Inherits VBparent
         task.desc = "Automate getting the right white balance"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static thresholdSlider = findSlider("White balance threshold X100")
+        Dim thresholdVal As Single = thresholdSlider.Value / 100
+
         Dim rgbData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(rgbData, GCHandleType.Pinned) ' pin it for the duration...
         Marshal.Copy(src.Data, rgbData, 0, rgbData.Length)
 
-        Static thresholdSlider = findSlider("White balance threshold X100")
-        Dim thresholdVal As Single = thresholdSlider.Value / 100
         Dim rgbPtr = WhiteBalance_Run(wPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, thresholdVal)
         handleSrc.Free()
 
@@ -161,6 +162,9 @@ Public Class PhotoShop_WhiteBalance : Inherits VBparent
         task.desc = "Automate getting the right white balance"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static thresholdSlider = findSlider("White balance threshold X100")
+        Dim thresholdVal = thresholdSlider.Value / 100
+
         Dim rgb32f As New cv.Mat
         src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
         Dim maxVal As Double, minVal As Double
@@ -173,8 +177,6 @@ Public Class PhotoShop_WhiteBalance : Inherits VBparent
         hist.Run(src)
         dst2 = hist.dst1
 
-        Static thresholdSlider = findSlider("White balance threshold X100")
-        Dim thresholdVal = thresholdSlider.Value / 100
         Dim sum As Single
         Dim threshold As Integer
         For i = hist.histRaw(0).Rows - 1 To 0 Step -1
@@ -386,9 +388,8 @@ Public Class PhotoShop_EmbossAll : Inherits VBparent
         task.desc = "Emboss using all the directions provided"
     End Sub
     Public Sub Run(src as cv.Mat)
-        Dim kernel = emboss.kernelGenerator(sizeSlider.Value)
-
         Static threshSlider = findSlider("Emboss threshold")
+        Dim kernel = emboss.kernelGenerator(sizeSlider.Value)
 
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = dst1.Filter2D(-1, kernel)
@@ -458,7 +459,6 @@ Public Class PhotoShop_DuoTone : Inherits VBparent
         task.desc = "Create a DuoTone image"
     End Sub
     Public Sub Run(src as cv.Mat)
-
         Static expSlider = findSlider("DuoTone Exponent")
         Dim exp = 1 + expSlider.value / 100
         Dim expMat As New cv.Mat(256, 1, cv.MatType.CV_8U)

@@ -12,7 +12,7 @@ Public Class MSER_Basics : Inherits VBparent
         task.desc = "Run MSER (Maximally Stable Extremal Region) algorithm with all default options except for maximum area"
     End Sub
     Public Sub Run(src as cv.Mat)
-
+        Static minSlider = findSlider("MSER Min Area")
         options.Run(src)
 
         dst1 = src.Clone
@@ -51,7 +51,6 @@ Public Class MSER_Basics : Inherits VBparent
             Next
         End While
 
-        Static minSlider = findSlider("MSER Min Area")
         Dim minArea = minSlider.value
         For Each rect In containers
             If rect.Width * rect.Height > minArea Then dst1.Rectangle(rect, cv.Scalar.Yellow, If(src.Width = 1280, 2, 1))

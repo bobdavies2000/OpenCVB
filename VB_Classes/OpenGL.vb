@@ -329,8 +329,8 @@ Public Class OpenGL_Voxels : Inherits VBparent
         task.desc = "Show the voxel representation in OpenGL"
     End Sub
     Public Sub Run(src As cv.Mat)
-        voxels.Run(src)
         Static intermediateResults = findCheckBox("Display intermediate results")
+        voxels.Run(src)
         If intermediateResults.checked Then
             dst1 = voxels.dst1
             dst2 = voxels.dst2

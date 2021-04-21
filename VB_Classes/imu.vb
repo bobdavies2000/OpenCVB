@@ -362,6 +362,8 @@ Public Class IMU_TotalDelay : Inherits VBparent
         task.desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion."
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static countSlider = findSlider("Number of Plot Values")
+        Dim plotLastX = countSlider.value
         host.Run(src)
         imu.Run(src)
         Dim totaldelay = host.HostInterruptDelayEstimate + imu.IMUtoCaptureEstimate
@@ -392,8 +394,6 @@ Public Class IMU_TotalDelay : Inherits VBparent
         plot.plotData = New cv.Scalar(imu.IMUtoCaptureEstimate, host.HostInterruptDelayEstimate, totaldelay, kalman.stateResult)
         plot.Run(src)
 
-        Static countSlider = findSlider("Number of Plot Values")
-        Dim plotLastX = countSlider.value
         If plot.lastXdelta.Count > plotLastX Then
             For i = 0 To plot.plotCount - 1
                 output += "Last " + CStr(plotLastX) + Choose(i + 1, " IMU Delay ", " Host Delay", " Total Delay ms", " Smoothed Total") + vbTab
@@ -438,6 +438,14 @@ Public Class IMU_GVector : Inherits VBparent
         task.desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static xRotateSlider = findSlider("Amount to rotate pointcloud around X-axis (degrees)")
+        Static yRotateSlider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
+        Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
+
+        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
+        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
+        Static manualCheckbox = findCheckBox("Initialize the X- and Z-axis sliders with gravity but allow manual after")
+
         Dim gx = task.IMU_Acceleration.X
         Dim gy = task.IMU_Acceleration.Y
         Dim gz = task.IMU_Acceleration.Z
@@ -446,13 +454,6 @@ Public Class IMU_GVector : Inherits VBparent
         task.angleY = Math.Atan2(gx, gy)
         task.angleZ = Math.Atan2(gy, gz) + cv.Cv2.PI / 2
 
-        Static xRotateSlider = findSlider("Amount to rotate pointcloud around X-axis (degrees)")
-        Static yRotateSlider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
-        Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
-
-        Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
-        Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
-        Static manualCheckbox = findCheckBox("Initialize the X- and Z-axis sliders with gravity but allow manual after")
         If manualCheckbox.checked Then
             task.angleZ = xRotateSlider.Value / 57.2958
             task.angleX = zRotateSlider.Value / 57.2958

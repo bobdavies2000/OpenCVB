@@ -15,6 +15,9 @@ Public Class Fitline_Basics : Inherits VBparent
         task.desc = "Show how Fitline API works.  When the lines overlap the image has a single contour and the lines are occasionally not found."
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static radiusSlider = findSlider("Accuracy for the radius X100")
+        Static angleSlider = findSlider("Accuracy for the angle X100")
+
         If standalone Or task.intermediateReview = caller Then
             draw.Run(src)
             dst2 = draw.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
@@ -25,8 +28,6 @@ Public Class Fitline_Basics : Inherits VBparent
 
         Dim contours As cv.Point()()
         contours = cv.Cv2.FindContoursAsArray(dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
-        Static radiusSlider = findSlider("Accuracy for the radius X100")
-        Static angleSlider = findSlider("Accuracy for the angle X100")
         Dim radiusAccuracy = radiusSlider.Value / 100
         Dim angleAccuracy = angleSlider.Value / 100
         For i = 0 To contours.Length - 1

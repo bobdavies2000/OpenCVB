@@ -19,16 +19,14 @@ Public Class DilateErode_Basics : Inherits VBparent
         End If
     End Sub
     Public Sub Run(src as cv.Mat)
-
+        Static ellipseRadio = findRadio("Dilate/Erode shape: Ellipse")
+        Static rectRadio = findRadio("Dilate/Erode shape: Rect")
         Static iterSlider = findSlider("Erode (-) to Dilate (+)")
-        Dim iterations = iterSlider.Value
-
         Static kernelSlider = findSlider("Dilate/Erode Kernel Size")
+        Dim iterations = iterSlider.Value
         Dim kernelsize As Integer = kernelSlider.Value
         If kernelsize Mod 2 = 0 Then kernelsize += 1
 
-        Static ellipseRadio = findRadio("Dilate/Erode shape: Ellipse")
-        Static rectRadio = findRadio("Dilate/Erode shape: Rect")
         Dim morphShape = cv.MorphShapes.Cross
         If ellipseRadio.Checked Then morphShape = cv.MorphShapes.Ellipse
         If rectRadio.Checked Then morphShape = cv.MorphShapes.Rect

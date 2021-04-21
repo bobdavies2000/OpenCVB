@@ -40,13 +40,13 @@ Public Class Thread_Grid : Inherits VBparent
         task.desc = "Create a grid for use with parallel.ForEach."
     End Sub
     Public Sub Run(src As cv.Mat)
-        Static lastWidth As Integer
-        Static lastHeight As Integer
-        Static lastBorder As Integer
-
         Static widthSlider = findSlider("ThreadGrid Width")
         Static heightSlider = findSlider("ThreadGrid Height")
         Static borderSlider = findSlider("ThreadGrid Border")
+
+        Static lastWidth As Integer
+        Static lastHeight As Integer
+        Static lastBorder As Integer
 
         If task.mouseClickFlag Then mouseClickROI = gridToRoi.Get(Of Integer)(task.mouseClickPoint.Y, task.mouseClickPoint.X)
         Dim borderSize = borderSlider.Value
@@ -117,10 +117,8 @@ Public Class Thread_GridTest : Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 64
-        gridHeightSlider.Value = 40
+        findSlider("ThreadGrid Width").Value = 64
+        findSlider("ThreadGrid Height").Value = 40
         label1 = ""
         task.desc = "Validation test for thread_grid algorithm"
     End Sub

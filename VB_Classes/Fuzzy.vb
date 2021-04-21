@@ -187,6 +187,9 @@ Public Class Fuzzy_TrackerDepth : Inherits VBparent
         task.desc = "Create centroids and rect's for solid regions and track them - tracker"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static displayCheck = findCheckBox("Display centroid and rectangle for each region")
+        Static minRectSizeSlider = findSlider("Threshold for rectangle size")
+
         fuzzy.Run(task.RGBDepth)
         dst1 = fuzzy.dst1
 
@@ -195,8 +198,6 @@ Public Class Fuzzy_TrackerDepth : Inherits VBparent
         layoutColor.Clear()
         Dim minX As Double, maxX As Double
         Dim minY As Double, maxY As Double
-        Static displayCheck = findCheckBox("Display centroid and rectangle for each region")
-        Static minRectSizeSlider = findSlider("Threshold for rectangle size")
         Dim minRectSize = minRectSizeSlider.value
         Dim displayRect = displayCheck.checked
         For Each c In fuzzy.sortContours

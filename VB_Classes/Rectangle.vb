@@ -45,8 +45,7 @@ Public Class Rectangle_Rotated : Inherits VBparent
     Public rect As Rectangle_Basics
     Public Sub New()
         rect = New Rectangle_Basics
-        Dim rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
-        rotatedCheck.Checked = True
+        findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)").Checked = True
         task.desc = "Draw the requested number of rectangles."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -106,13 +105,13 @@ Public Class Rectangle_Overlap : Inherits VBparent
         task.desc = "Test if 2 rectangles overlap"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static typeCheckBox = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
         If standalone Or task.intermediateReview = caller Then
             draw.Run(src)
             dst1 = draw.dst1
         End If
 
         dst2.SetTo(0)
-        Static typeCheckBox = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
         If typeCheckBox.Checked Then
             Dim r1 As cv.RotatedRect = draw.rotatedRectangles(0)
             Dim r2 As cv.RotatedRect = draw.rotatedRectangles(1)
@@ -228,15 +227,14 @@ Public Class Rectangle_Intersection : Inherits VBparent
         Return enclosing
     End Function
     Public Sub Run(src As cv.Mat)
+        Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
+        Static countSlider = findSlider("DrawCount")
+        Static mergeSlider = findSlider("Merge rectangles within X pixels")
         If standalone Or task.intermediateReview = caller Then
             If draw Is Nothing Then draw = New Rectangle_Basics
 
-            Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             rotatedCheck.Enabled = False
-
-            Static countSlider = findSlider("DrawCount")
             countSlider.Value = msRNG.Next(2, 10)
-
             label1 = "Input rectangles = " + CStr(countSlider.value)
 
             draw.Run(src)
@@ -258,7 +256,6 @@ Public Class Rectangle_Intersection : Inherits VBparent
             otherRects.Add(r.Value)
         Next
 
-        Static mergeSlider = findSlider("Merge rectangles within X pixels")
         Dim proximity = mergeSlider.value
         enclosingRects.Clear()
         While otherRects.Count
@@ -289,16 +286,14 @@ Public Class Rectangle_Union : Inherits VBparent
         task.desc = "Create a rectangle that contains all the input rectangles"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static countSlider = findSlider("DrawCount")
+        Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
 
         If standalone Or task.intermediateReview = caller Then
             If draw Is Nothing Then draw = New Rectangle_Basics
 
-            Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             rotatedCheck.Enabled = False
-
-            Static countSlider = findSlider("DrawCount")
             countSlider.Value = msRNG.Next(2, 10)
-
             label1 = "Input rectangles = " + CStr(draw.rectangles.Count)
 
             draw.Run(src)
@@ -344,13 +339,12 @@ Public Class Rectangle_MultiOverlap : Inherits VBparent
         task.desc = "Given a group of rectangles, merge all the rectangles that overlap"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
+        Static countSlider = findSlider("DrawCount")
 
         If standalone Then
             Static draw = New Rectangle_Basics
-            Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             rotatedCheck.Enabled = False
-
-            Static countSlider = findSlider("DrawCount")
             countSlider.Value = msRNG.Next(2, 10)
 
             label1 = "Input rectangles = " + CStr(draw.rectangles.Count)

@@ -107,6 +107,7 @@ Public Class Dlib_iBug300WDownload : Inherits VBparent
         task.desc = "Multi-threaded (responsive) download of the iBug 300W face database.  Not using iBug yet but planning to..."
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static checkDownload = findCheckBox("Download the 1.7 Gb 300 Faces In-The-Wild database")
         Dim ibugDir = New DirectoryInfo(task.parms.homeDir + "Data/ibug_300W_large_face_landmark_dataset")
         If ibugDir.Exists And downloadActive = False And pythonActive = False Then
             task.trueText("The iBug 300W face database was downloaded and is ready for use.", 40, 200)
@@ -120,7 +121,6 @@ Public Class Dlib_iBug300WDownload : Inherits VBparent
             If pythonActive Then
                 task.trueText("iBug files are being unzipped to " + ibugDir.FullName, 40, 200)
             Else
-                Static checkDownload = findCheckBox("Download the 1.7 Gb 300 Faces In-The-Wild database")
                 If checkDownload.checked Then
                     Static client = HttpWebRequest.CreateHttp("http://dlib.net/files/data/ibug_300W_large_face_landmark_dataset.tar.gz")
                     Static response = client.GetResponse()

@@ -263,6 +263,7 @@ Public Class LineFLD_CPP : Inherits VBparent
         task.desc = "Basics for a Fast Line Detector"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static sizeSlider = findSlider("FLD - Line Thickness")
         sortedLines.Clear()
 
         Dim length_threshold = lineFLD.minLenSlider.Value
@@ -283,7 +284,6 @@ Public Class LineFLD_CPP : Inherits VBparent
         Dim lineCount = lineDetectorFast_Run(handle.AddrOfPinnedObject, src.Height, src.Width, length_threshold, distance_threshold, canny_th1, canny_th2, canny_aperture_size, do_merge)
         handle.Free()
 
-        Static sizeSlider = findSlider("FLD - Line Thickness")
         If lineCount > 0 Then sortedLines = drawSegments(dst1, lineCount, sizeSlider.Value, lineMat)
     End Sub
 End Class

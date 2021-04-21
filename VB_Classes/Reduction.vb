@@ -19,12 +19,12 @@ Public Class Reduction_Basics : Inherits VBparent
         task.desc = "Reduction: a simpler way to KMeans by reducing color resolution"
     End Sub
     Public Sub Run(src As cv.Mat)
-        Static reductionSlider = findSlider("Reduction factor")
-        Dim reductionVal = CInt(reductionSlider.Value)
         Static bitwiseCheck = findRadio("Use bitwise reduction")
         Static simpleCheck = findRadio("Use simple reduction")
+        Static reductionSlider = findSlider("Reduction factor")
+        Static bitSlider = findSlider("Bits to remove in bitwise reduction")
+        Dim reductionVal = CInt(reductionSlider.Value)
         If bitwiseCheck.Checked Then
-            Static bitSlider = findSlider("Bits to remove in bitwise reduction")
             Dim zeroBits = Math.Pow(2, bitSlider.value) - 1
             Dim tmp = New cv.Mat(src.Size, src.Type, cv.Scalar.All(255 - zeroBits))
             cv.Cv2.BitwiseAnd(src, tmp, dst1)
@@ -80,6 +80,7 @@ Public Class Reduction_KNN_Color : Inherits VBparent
         task.desc = "Use KNN with color reduction to consistently identify regions and color them."
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static minSizeSlider = findSlider("FloodFill Minimum Size")
         reduction.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = reduction.dst1
 
@@ -95,7 +96,6 @@ Public Class Reduction_KNN_Color : Inherits VBparent
             dst1 = highlight.dst1
         End If
 
-        Static minSizeSlider = findSlider("FloodFill Minimum Size")
         label1 = "There were " + CStr(pTrack.drawRC.viewObjects.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
     End Sub
 End Class
@@ -181,7 +181,6 @@ Public Class Reduction_Histogram : Inherits VBparent
     Dim basics As Reduction_Basics
     Dim hist As Histogram_BackProjectionGrayscale
     Public Sub New()
-
         basics = New Reduction_Basics()
         hist = New Histogram_BackProjectionGrayscale()
 
@@ -189,9 +188,9 @@ Public Class Reduction_Histogram : Inherits VBparent
         task.desc = "Use the histogram of a reduced RGB image to isolate featureless portions of an image."
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static reductionSlider = findSlider("Reduction factor")
 
         basics.Run(src)
-        Static reductionSlider = findSlider("Reduction factor")
         reductionSlider.value = 112
 
         hist.Run(basics.dst1)

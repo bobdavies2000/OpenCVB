@@ -186,10 +186,8 @@ Public Class Binarize_Bernson_MT : Inherits VBparent
     Dim grid As Thread_Grid
     Public Sub New()
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = 32
-        gridHeightSlider.Value = 32
+        findSlider("ThreadGrid Width").Value = 32
+        findSlider("ThreadGrid Height").Value = 32
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -200,17 +198,19 @@ Public Class Binarize_Bernson_MT : Inherits VBparent
         task.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
         label1 = "Binarize Bernson"
     End Sub
-    Public Sub Run(src as cv.Mat)
-        Dim kernelSize = sliders.trackbar(0).Value
-        If kernelSize Mod 2 = 0 Then kernelSize += 1
+    Public Sub Run(src As cv.Mat)
+        Static kernelSlider = findSlider("Kernel Size")
+        Static contrastSlider = findSlider("Contrast min")
+        Static bgSlider = findSlider("bg Threshold")
+        Dim kernelSize = kernelSlider.Value
+        Dim contrastMin = contrastSlider.Value
+        Dim bgThreshold = bgSlider.Value
 
+        If kernelSize Mod 2 = 0 Then kernelSize += 1
         grid.Run(Nothing)
-        Dim contrastMin = sliders.trackbar(1).Value
-        Dim bgThreshold = sliders.trackbar(2).Value
 
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
         Parallel.ForEach(grid.roiList,
             Sub(roi)
                 Dim grayBin = input(roi).Clone()
@@ -233,8 +233,7 @@ Public Class Binarize_Reduction : Inherits VBparent
     Public Sub New()
         basics = New Binarize_Basics
         reduction = New Reduction_Basics
-        Dim reductionRadio = findRadio("Use bitwise reduction")
-        reductionRadio.Checked = True
+        findRadio("Use bitwise reduction").Checked = True
         findSlider("Reduction factor").Value = 256
         label1 = "Binarize output from reduction"
         label2 = "Binarize Basics Output"

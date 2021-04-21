@@ -73,6 +73,9 @@ Public Class Palette_LinearPolar : Inherits VBparent
         End If
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static radiusSlider = findSlider("LinearPolar radius")
+        Dim radius = radiusSlider.Value ' msRNG.next(0, dst1.Cols)
+
         dst1.SetTo(0)
         For i = 0 To dst1.Rows - 1
             Dim c = i * 255 / dst1.Rows
@@ -81,10 +84,7 @@ Public Class Palette_LinearPolar : Inherits VBparent
 
         rotateOptions.Run(src)
 
-        Static frm = findfrm("Palette_LinearPolar Radio Options")
         Static pt = New cv.Point2f(msRNG.Next(0, dst1.Cols - 1), msRNG.Next(0, dst1.Rows - 1))
-        Static radiusSlider = findSlider("LinearPolar radius")
-        Dim radius = radiusSlider.Value ' msRNG.next(0, dst1.Cols)
         dst2.SetTo(0)
         If rotateOptions.warpFlag = cv.InterpolationFlags.WarpInverseMap Then radiusSlider.Value = radiusSlider.Maximum
         cv.Cv2.LinearPolar(dst1, dst1, pt, radius, rotateOptions.warpFlag)
@@ -335,6 +335,7 @@ Public Class Palette_DepthColorMap : Inherits VBparent
         task.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static cvtScaleSlider = findSlider("Convert and Scale value X100")
         If task.frameCount = 0 Then
             Dim color1 = cv.Scalar.Yellow
             Dim color2 = cv.Scalar.Red
@@ -352,7 +353,6 @@ Public Class Palette_DepthColorMap : Inherits VBparent
                 dst2(r) = gradientColorMap
             Next
         End If
-        Static cvtScaleSlider = findSlider("Convert and Scale value X100")
         Dim depth8u = task.depth32f.ConvertScaleAbs(cvtScaleSlider.Value / 100)
         dst1 = Palette_Custom_Apply(depth8u, gradientColorMap)
 

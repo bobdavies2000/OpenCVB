@@ -49,10 +49,8 @@ Public Class Gabor_Basics_MT : Inherits VBparent
     Public Sub New()
         label2 = "The 32 kernels used"
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = dst1.Width / 8 ' we want 4 rows of 8 or 32 regions for this example.
-        gridHeightSlider.Value = dst1.Height / 4
+        findSlider("ThreadGrid Width").Value = dst1.Width / 8
+        findSlider("ThreadGrid Height").Value = dst1.Height / 4
 
         grid.Run(Nothing) ' we only run this one time!  It needs to be 32 Gabor filters only.
 
@@ -64,7 +62,6 @@ Public Class Gabor_Basics_MT : Inherits VBparent
         task.desc = "Apply multiple Gabor filters sweeping through different values of theta - Painterly Effect."
     End Sub
     Public Sub Run(src as cv.Mat)
-
         Static ksizeSlider = findSlider("Gabor Kernel Size")
         Static sigmaSlider = findSlider("Gabor Sigma")
         Static lambdaSlider = findSlider("Gabor lambda")

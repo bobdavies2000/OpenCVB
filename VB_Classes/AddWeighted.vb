@@ -58,8 +58,8 @@ Public Class AddWeighted_ImageAccumulate : Inherits VBparent
         task.desc = "Update a running average of the image"
     End Sub
     Public Sub Run(src As cv.Mat)
-        dst1 = New cv.Mat(task.depth32f.Size, cv.MatType.CV_32F)
         Static weightSlider = findSlider("Accumulation weight of each image X100")
+        dst1 = New cv.Mat(task.depth32f.Size, cv.MatType.CV_32F)
         cv.Cv2.AccumulateWeighted(task.depth32f, dst1, weightSlider.value / 100, New cv.Mat)
     End Sub
 End Class
@@ -88,9 +88,9 @@ Public Class AddWeighted_InfraRed : Inherits VBparent
         task.desc = "Align the depth data with the left or right view.  Oak-D is aligned with the right image."
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static rightRadio = findRadio("Use RightView")
         infra.Run(src)
 
-        Static rightRadio = findRadio("Use RightView")
         Dim leftOrRight As String = "Right"
         If rightRadio.checked Then
             addw.src2 = infra.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

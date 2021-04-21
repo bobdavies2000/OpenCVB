@@ -60,6 +60,7 @@ Public Class CellAuto_Basics : Inherits VBparent
         Return dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Function
     Public Sub Run(src as cv.Mat)
+        Static rotateCheckBox = findCheckBox("Rotate through the different rules")
         If standalone Or task.intermediateReview = caller Then
             input = New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_8UC1, 0)
             input.Set(Of Byte)(0, src.Width / 2, 1)
@@ -68,7 +69,6 @@ Public Class CellAuto_Basics : Inherits VBparent
             input = src.Clone
             dst1 = createCells(combo.Box.Text)
         End If
-        Static rotateCheckBox = findCheckBox("Rotate through the different rules")
         If rotateCheckBox.Checked Then
             Dim index = combo.Box.SelectedIndex
             If index + 1 < i18.Count - 1 Then combo.Box.SelectedIndex += 1 Else combo.Box.SelectedIndex = 0
@@ -117,13 +117,12 @@ Public Class CellAuto_Life : Inherits VBparent
 
         random = New Random_Basics
         random.rangeRect = New cv.Rect(0, 0, grid.Width, grid.Height)
-        Static randomSlider = findSlider("Random Pixel Count")
-        randomSlider.Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
+        findSlider("Random Pixel Count").Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
         task.desc = "Use OpenCV to implement the Game of Life"
     End Sub
     Public Sub Run(src as cv.Mat)
-        Static savePointCount As Integer
         Static randomSlider = findSlider("Random Pixel Count")
+        Static savePointCount As Integer
         If randomSlider.Value <> savePointCount Or generation = 0 Then
             random.Run(Nothing)
             generation = 0

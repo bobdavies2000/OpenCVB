@@ -206,11 +206,12 @@ Public Class Blur_TopoMap : Inherits VBparent
         task.desc = "Create a topo map from the blurred image"
     End Sub
     Public Sub Run(src as cv.Mat)
-        Static savePercent As Single
-        Static nextPercent As Single
         Static reductionSlider = findSlider("Reduction Factor")
         Static frameSlider = findSlider("Frame Count Cycle")
         Static percentSlider = findSlider("Percent of Blurring")
+
+        Static savePercent As Single
+        Static nextPercent As Single
         If savePercent <> percentSlider.Value Then
             savePercent = percentSlider.Value
             nextPercent = savePercent

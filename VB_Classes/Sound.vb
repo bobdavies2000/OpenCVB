@@ -151,6 +151,8 @@ Public Class Sound_SignalGenerator : Inherits VBparent
         Static sweepDurationSlider = findSlider("Sweep Only - duration secs")
         Static retainSlider = findSlider("Retain Data for x seconds")
         Static saveRadioIndex = -1
+        Static reverse0Check = findCheckBox("PhaseReverse Left")
+        Static reverse1Check = findCheckBox("PhaseReverse Right")
 
         Static frm = findfrm("Sound_SignalGenerator Radio Options")
         For i = 0 To frm.check.length - 1
@@ -168,8 +170,6 @@ Public Class Sound_SignalGenerator : Inherits VBparent
                 startTime = Now
             End If
 
-            Static reverse0Check = findCheckBox("PhaseReverse Left")
-            Static reverse1Check = findCheckBox("PhaseReverse Right")
             wGen.PhaseReverse(0) = reverse0Check.Checked
             wGen.PhaseReverse(1) = reverse1Check.Checked
 

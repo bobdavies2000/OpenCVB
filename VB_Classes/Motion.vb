@@ -25,11 +25,10 @@ Public Class Motion_Basics : Inherits VBparent
         task.desc = "Detect contours in the motion data and the resulting rectangles"
     End Sub
     Public Sub Run(src as cv.Mat)
-
-        src = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
-
         Static cumulativeThreshold = findSlider("Cumulative motion threshold")
         Static pixelThreshold = findSlider("Single frame motion threshold")
+
+        src = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
 
         diff.Run(src)
         dst2 = diff.dst2
@@ -101,6 +100,7 @@ Public Class Motion_WithBlurDilate : Inherits VBparent
         task.desc = "Detect contours in the motion data using blur and dilate"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static persistSlider = findSlider("Frames to persist")
 
         dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
         blur.Run(dst1)
@@ -109,7 +109,6 @@ Public Class Motion_WithBlurDilate : Inherits VBparent
         Static delayCounter = 0
         delayCounter += 1
 
-        Static persistSlider = findSlider("Frames to persist")
         If delayCounter > persistSlider.value Then
             delayCounter = 0
             rectList.Clear()
@@ -164,6 +163,8 @@ Public Class Motion_MinMaxDepth : Inherits VBparent
         task.desc = "While minimizing options and dependencies, use RGB motion to figure out what depth values should change."
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static useNone = findRadio("Use unchanged depth input")
+        Static useMax = findRadio("Use farthest distance")
         Dim input = src
         If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f.Clone
 
@@ -177,8 +178,6 @@ Public Class Motion_MinMaxDepth : Inherits VBparent
             If dst2.Channels <> 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             input.CopyTo(dst1, dst2)
 
-            Static useNone = findRadio("Use unchanged depth input")
-            Static useMax = findRadio("Use farthest distance")
             If useNone.checked = False Then
                 If useMax.checked Then cv.Cv2.Max(input, dst1, dst1) Else cv.Cv2.Min(input, dst1, dst1)
             Else
@@ -277,12 +276,6 @@ Public Class Motion_ThruCorrelation : Inherits VBparent
         task.desc = "Detect motion through the correlation coefficient"
     End Sub
     Public Sub Run(src as cv.Mat)
-        grid.Run(Nothing)
-
-        Dim input = src.Clone
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        Static lastFrame As cv.Mat = input.Clone
         Static ccSlider = findSlider("Correlation coefficient threshold for motion X1000")
         Static padSlider = findSlider("Pad size in pixels for the search area")
         Static stdevSlider = findSlider("Stdev threshold for using correlation")
@@ -290,6 +283,12 @@ Public Class Motion_ThruCorrelation : Inherits VBparent
         Dim ccThreshold = ccSlider.value
         Dim stdevThreshold = stdevSlider.value
 
+        grid.Run(Nothing)
+
+        Dim input = src.Clone
+        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Static lastFrame As cv.Mat = input.Clone
         dst2.SetTo(0)
         Parallel.For(0, grid.roiList.Count,
         Sub(i)

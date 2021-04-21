@@ -134,6 +134,10 @@ Public Class EMax_Setup : Inherits VBparent
         task.desc = "Options for EMax algorithms."
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static sampleSlider = findSlider("EMax Number of Samples")
+        Static stepSlider = findSlider("EMax Prediction Step Size")
+        Static sigmaSlider = findSlider("EMax Sigma (spread)")
+
         task.palette.Run(Nothing)
         grid.Run(Nothing)
         If regionCount <> grid.roiList.Count - 1 Then
@@ -150,10 +154,6 @@ Public Class EMax_Setup : Inherits VBparent
                 covarianceMatrixType = Choose(i + 1, cv.EM.Types.CovMatSpherical, cv.EM.Types.CovMatDiagonal, cv.EM.Types.CovMatGeneric)
             End If
         Next
-
-        Static sampleSlider = findSlider("EMax Number of Samples")
-        Static stepSlider = findSlider("EMax Prediction Step Size")
-        Static sigmaSlider = findSlider("EMax Sigma (spread)")
 
         samples = New cv.Mat(sampleSlider.Value, 2, cv.MatType.CV_32FC1, 0).Reshape(2, 0)
         If regionCount > sampleSlider.Value / 2 Then regionCount = sampleSlider.Value / 2

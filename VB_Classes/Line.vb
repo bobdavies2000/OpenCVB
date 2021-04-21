@@ -25,10 +25,10 @@ Public Class Line_Basics : Inherits VBparent
         task.desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static thicknessSlider = findSlider("Line thickness")
         dst1 = src.Clone
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim lines = ld.Detect(src)
-        Static thicknessSlider = findSlider("Line thickness")
         thickness = thicknessSlider.Value
         pixelThreshold = lenSlider.Value
 
@@ -133,8 +133,7 @@ Public Class Line_Reduction : Inherits VBparent
         lDetect = New Line_Basics()
 
         reduction = New Reduction_Basics()
-        Dim simpleRadio = findRadio("Use simple reduction")
-        simpleRadio.Checked = True
+        findRadio("Use simple reduction").Checked = True
 
         label1 = "Yellow > length threshold, red < length threshold"
         label2 = "Input image after reduction"
@@ -170,6 +169,10 @@ Public Class Line_InterceptsUI : Inherits VBparent
         task.desc = "An alternative way to highlight line segments with common slope"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static redRadio = findRadio("Show Top intercepts")
+        Static greenRadio = findRadio("Show Bottom intercepts")
+        Static yellowRadio = findRadio("Show Right intercepts")
+        Static blueRadio = findRadio("Show Left intercepts")
 
         lines.Run(src)
         Dim searchRange = lines.searchRange
@@ -216,11 +219,6 @@ Public Class Line_InterceptsUI : Inherits VBparent
         End If
         dst2.Circle(center, task.dotSize, cv.Scalar.White, -1, task.lineType)
 
-
-        Static redRadio = findRadio("Show Top intercepts")
-        Static greenRadio = findRadio("Show Bottom intercepts")
-        Static yellowRadio = findRadio("Show Right intercepts")
-        Static blueRadio = findRadio("Show Left intercepts")
         If color.Item0 = 0 Then redRadio.checked = True
         If color.Item0 = 1 Then greenRadio.checked = True
         If color.Item0 = 2 Then yellowRadio.checked = True
@@ -251,9 +249,9 @@ Public Class Line_ConfirmedDepth : Inherits VBparent
         task.desc = "Find the RGB lines and confirm they are present in the cloud data."
     End Sub
     Public Sub Run(src as cv.Mat)
-
         Static thickSlider = findSlider("Line thickness")
         Dim thickness = thickSlider.value
+
         lines.Run(src)
         dst1 = lines.dst1
 
@@ -566,8 +564,8 @@ Public Class Line_Sift_MT : Inherits VBparent
         lrView = New Line_LeftRightImages
 
         grid = New Thread_Grid
-        Static gridWidthSlider = findSlider("ThreadGrid Width")
-        Static gridHeightSlider = findSlider("ThreadGrid Height")
+        Dim gridWidthSlider = findSlider("ThreadGrid Width")
+        Dim gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Maximum = task.color.Cols * 2
         gridWidthSlider.Value = task.color.Cols * 2 ' we are just taking horizontal slices of the image.
         gridHeightSlider.Value = 10
@@ -575,8 +573,7 @@ Public Class Line_Sift_MT : Inherits VBparent
         grid.Run(Nothing)
 
         siftBasics = New Sift_Basics
-        Dim flannRadio = findRadio("Use Flann Matcher") ' not reliable
-        flannRadio.Enabled = False
+        findRadio("Use Flann Matcher").Enabled = False
 
         numPointSlider = findSlider("Points to Match")
         numPointSlider.Value = 1

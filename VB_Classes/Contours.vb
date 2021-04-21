@@ -50,8 +50,11 @@ Public Class Contours_Basics : Inherits VBparent
         Next
     End Sub
     Public Sub Run(src as cv.Mat)
-        setOptions()
+        Static areaSlider = findSlider("Contour minimum area")
+        Static epsilonSlider = findSlider("Contour epsilon (arc length percent)")
         Static dontchange As Boolean
+
+        setOptions()
         If task.mouseClickFlag And dontchange Then
             dontchange = False
         Else
@@ -82,8 +85,6 @@ Public Class Contours_Basics : Inherits VBparent
             contours0 = cv.Cv2.FindContoursAsArray(dst1, retrievalMode, ApproximationMode)
         End If
 
-        Static areaSlider = findSlider("Contour minimum area")
-        Static epsilonSlider = findSlider("Contour epsilon (arc length percent)")
         Dim minArea = areaSlider.value
         Dim epsilon = epsilonSlider.value
         If standalone Then

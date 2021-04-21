@@ -106,12 +106,11 @@ Public Class MFD_Sobel : Inherits VBparent
         task.desc = "Stabilize the Sobel output with MFD"
     End Sub
     Public Sub Run(src as cv.Mat)
-
+        Static thresholdSlider = findSlider("Pixel threshold to zero")
         mfd.Run(src)
         dst2 = mfd.dst2
         label2 = mfd.label2
 
-        Static thresholdSlider = findSlider("Pixel threshold to zero")
         sobel.Run(mfd.dst1)
         dst1 = sobel.dst1.Threshold(thresholdSlider.value, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub
@@ -172,6 +171,7 @@ Public Class MFD_FloodFill : Inherits VBparent
         task.desc = "Floodfill the image of MFD edges (binarized Sobel output)"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static MFD_OnOffRadio = findRadio("Use motion-filtered pixel values")
         Static stepSlider = findSlider("FloodFill Step Size")
         Static fillSlider = findSlider("FloodFill point distance from edge")
         Dim fill = fillSlider.value
@@ -183,7 +183,6 @@ Public Class MFD_FloodFill : Inherits VBparent
             input = sobel.dst2.Clone
         End If
 
-        Static MFD_OnOffRadio = findRadio("Use motion-filtered pixel values")
         Static saveStepSize As Integer
         Static saveFillDistance As Integer
         Static saveMFD_OnOff = MFD_OnOffRadio.checked

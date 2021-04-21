@@ -113,11 +113,12 @@ Public Class Plot_OverTime : Inherits VBparent
         myStopWatch = Stopwatch.StartNew()
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static widthSlider = findSlider("Plot Pixel Width")
+        Static heightSlider = findSlider("Plot Pixel Height")
+        Static resetCheck = findCheckBox("Reset the plot scale")
         Const plotSeriesCount = 100
         lastXdelta.Add(plotData)
 
-        Static widthSlider = findSlider("Plot Pixel Width")
-        Static heightSlider = findSlider("Plot Pixel Height")
         Dim pixelHeight = CInt(heightSlider.Value)
         Dim pixelWidth = CInt(widthSlider.Value)
 
@@ -137,7 +138,6 @@ Public Class Plot_OverTime : Inherits VBparent
         Next
 
         ' if enough points are off the charted area or if manually requested, then redo the scale.
-        Static resetCheck = findCheckBox("Reset the plot scale")
         If (offChartCount > plotTriggerRescale And lastXdelta.Count >= plotSeriesCount And controlScale = False) Or resetCheck.Checked Then
             resetCheck.Checked = False
             dst1.SetTo(0)

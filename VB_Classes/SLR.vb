@@ -21,14 +21,14 @@ Public Class SLR_Basics : Inherits VBparent
         task.desc = "Segmented Linear Regression example"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static toleranceSlider = findSlider("Approximate accuracy (tolerance) X100")
+        Static movingAvgSlider = findSlider("Simple moving average window size")
+        Dim tolerance = toleranceSlider.value / 100
+        Dim halfLength = movingAvgSlider.value
 
         Dim resultX As New List(Of Double)
         Dim resultY As New List(Of Double)
 
-        Static toleranceSlider = findSlider("Approximate accuracy (tolerance) X100")
-        Dim tolerance = toleranceSlider.value / 100
-        Static movingAvgSlider = findSlider("Simple moving average window size")
-        Dim halfLength = movingAvgSlider.value
         slr.SegmentedRegressionFast(input.dataX, input.dataY, tolerance, halfLength, resultX, resultY)
 
         label1 = "Tolerance = " + CStr(tolerance) + " and moving average window = " + CStr(halfLength)

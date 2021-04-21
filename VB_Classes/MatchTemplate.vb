@@ -124,6 +124,7 @@ Public Class MatchTemplate_DrawRect : Inherits VBparent
         task.desc = "Find the requested template in an image.  Tracker Algorithm"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static thresholdSlider = findSlider("Correlation Threshold X100")
         If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then Exit Sub
         If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
             If task.drawRect.X + task.drawRect.Width >= src.Width Then task.drawRect.Width = src.Width - task.drawRect.X
@@ -144,7 +145,6 @@ Public Class MatchTemplate_DrawRect : Inherits VBparent
         Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
         dst1.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
 
-        Static thresholdSlider = findSlider("Correlation Threshold X100")
         Dim mask = dst1.Threshold(thresholdSlider.value / 100, 255, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
         addw.src2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -219,17 +219,16 @@ Public Class MatchTemplate_Movement : Inherits VBparent
         task.desc = "Assign each segment a correlation coefficient and stdev to the previous frame"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static stdevSlider = findSlider("Stdev Threshold")
+        Static correlationSlider = findSlider("Correlation Threshold X1000")
+        Dim stdevThreshold = CSng(stdevSlider.Value)
+        Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
+
         Dim fsize = task.fontSize / 3
 
         grid.Run(Nothing)
         dst1 = src.Clone
         If dst1.Channels = 3 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        Static stdevSlider = findSlider("Stdev Threshold")
-        Dim stdevThreshold = CSng(stdevSlider.Value)
-
-        Static correlationSlider = findSlider("Correlation Threshold X1000")
-        Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
 
         Static lastFrame As cv.Mat = dst1.Clone()
         Dim saveFrame As cv.Mat = dst1.Clone

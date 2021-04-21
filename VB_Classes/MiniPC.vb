@@ -44,12 +44,12 @@ Public Class MiniPC_Rotate : Inherits VBparent
         task.desc = "Create a histogram for the mini point cloud"
     End Sub
     Public Sub Run(src as cv.Mat)
+        Static angleYslider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
 
         Dim input = src
         If standalone Then
             mini.Run(input)
             input = mini.dst2 ' the task.pointcloud
-            Static angleYslider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
             angleY = angleYslider.value
         End If
 
@@ -101,8 +101,7 @@ Public Class MiniPC_RotateAngle : Inherits VBparent
         plot.controlScale = True ' we are controlling the scale...
         plot.maxScale = 1
         plot.minScale = 0
-        resetCheck = findCheckBox("Reset the plot scale")
-        resetCheck.Checked = False
+        findCheckBox("Reset the plot scale").Checked = False
 
         mats = New Mat_4to1
         peak = New MiniPC_Rotate
@@ -113,7 +112,6 @@ Public Class MiniPC_RotateAngle : Inherits VBparent
         task.desc = "Find a peak value in the side view histograms"
     End Sub
     Public Sub Run(src as cv.Mat)
-
         If src.Type <> cv.MatType.CV_32FC3 Then
             peak.mini.Run(src)
             src = peak.mini.dst2
