@@ -987,6 +987,29 @@ Public Class OpenCVB
             PausePlayButton.Image = runPlay
         End If
     End Sub
+    Private Sub AvailableAlgorithms_DropDown(sender As Object, e As EventArgs) Handles AvailableAlgorithms.DropDown
+        dropDownActive = True
+    End Sub
+    Private Sub AvailableAlgorithms_DropDownClosed(sender As Object, e As EventArgs) Handles AvailableAlgorithms.DropDownClosed
+        dropDownActive = False
+    End Sub
+    Private Sub CreateSurveyImagesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CreateSurveyImagesToolStripMenuItem.Click
+        If CreateSurveyImagesToolStripMenuItem.Text = "Stop Survey" Then
+            surveyActive = False
+            CreateSurveyImagesToolStripMenuItem.Text = "Create Survey Images and Rankings"
+            surveyFileWriter.Close()
+        Else
+            surveyIndex = -1
+            CreateSurveyImagesToolStripMenuItem.Text = "Stop Survey"
+            surveyDir = New DirectoryInfo(HomeDir.FullName + "Survey/")
+            If surveyDir.Exists = False Then surveyDir.Create()
+            surveyFileWriter = New StreamWriter(HomeDir.FullName + "Data/Rankings.txt")
+            surveyActive = True
+        End If
+        AvailableAlgorithms.SelectedIndex = 0
+        Application.DoEvents()
+        Thread.Sleep(1000)
+    End Sub
     Private Sub OpenCVB_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         saveLayout()
     End Sub
@@ -1245,16 +1268,6 @@ Public Class OpenCVB
                 End SyncLock
             End While
 
-            Dim saveFrameCount As Integer
-            If frameCount = 0 Then
-                saveFrameCount = Application.OpenForms.Count
-            Else
-                Dim frmCount = Application.OpenForms.Count
-                If saveFrameCount < frmCount Then saveFrameCount = Application.OpenForms.Count
-                If saveFrameCount > frmCount Then Exit Sub
-                If frameCount Mod 50 = 0 Then Console.WriteLine("")
-            End If
-            Console.Write(CStr(Application.OpenForms.Count))
             task.RunAlgorithm()
 
             If task.mousePointUpdated Then mousePoint = task.mousePoint ' in case the algorithm has changed the mouse location...
@@ -1300,28 +1313,4 @@ Public Class OpenCVB
             frameCount += 1
         End While
     End Sub
-    Private Sub AvailableAlgorithms_DropDown(sender As Object, e As EventArgs) Handles AvailableAlgorithms.DropDown
-        dropDownActive = True
-    End Sub
-    Private Sub AvailableAlgorithms_DropDownClosed(sender As Object, e As EventArgs) Handles AvailableAlgorithms.DropDownClosed
-        dropDownActive = False
-    End Sub
-    Private Sub CreateSurveyImagesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CreateSurveyImagesToolStripMenuItem.Click
-        If CreateSurveyImagesToolStripMenuItem.Text = "Stop Survey" Then
-            surveyActive = False
-            CreateSurveyImagesToolStripMenuItem.Text = "Create Survey Images and Rankings"
-            surveyFileWriter.Close()
-        Else
-            surveyIndex = -1
-            CreateSurveyImagesToolStripMenuItem.Text = "Stop Survey"
-            surveyDir = New DirectoryInfo(HomeDir.FullName + "Survey/")
-            If surveyDir.Exists = False Then surveyDir.Create()
-            surveyFileWriter = New StreamWriter(HomeDir.FullName + "Data/Rankings.txt")
-            surveyActive = True
-        End If
-        AvailableAlgorithms.SelectedIndex = 0
-        Application.DoEvents()
-        Thread.Sleep(1000)
-    End Sub
 End Class
-
