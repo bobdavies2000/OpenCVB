@@ -171,12 +171,12 @@ Public Class VBparent : Implements IDisposable
         If pyStream IsNot Nothing Then pyStream.Dispose()
         Dim type As Type = algorithm.GetType()
         If type.GetMethod("Close") IsNot Nothing Then algorithm.Close()  ' Close any unmanaged classes...
-        If aOptions IsNot Nothing Then aOptions.Close()
         sliders.Dispose()
         check.Dispose()
         radio.Dispose()
         radio1.Dispose()
         combo.Dispose()
+        If aOptions IsNot Nothing Then aOptions.Close()
     End Sub
 
     Public Const QUAD0 = 0 ' there are 4 images to the user interface when using Mat_4to1.

@@ -1154,7 +1154,7 @@ Public Class OpenCVB
             textDesc = task.desc
             intermediateReview = ""
 
-            Console.WriteLine(vbCrLf + vbCrLf + vbTab + algName + " " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestAllCount) + vbTab + "Algorithms tested")
+            Console.WriteLine(vbCrLf + vbCrLf + vbTab + algName + " - " + textDesc + vbCrLf + vbTab + CStr(AlgorithmTestAllCount) + vbTab + "Algorithms tested")
             Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " + algName +
                                       " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
             Console.WriteLine(vbTab + "Active camera = " + camera.deviceName + " at resolution " + CStr(workingRes.Width) + "x" + CStr(workingRes.Height) + vbCrLf)
@@ -1242,6 +1242,16 @@ Public Class OpenCVB
                 End SyncLock
             End While
 
+            Dim saveFrameCount As Integer
+            If frameCount = 0 Then
+                saveFrameCount = Application.OpenForms.Count
+            Else
+                Dim frmCount = Application.OpenForms.Count
+                If saveFrameCount < frmCount Then saveFrameCount = Application.OpenForms.Count
+                If saveFrameCount > frmCount Then Exit Sub
+            End If
+            Console.Write(CStr(Application.OpenForms.Count))
+            If frameCount Mod 50 = 0 Then Console.WriteLine("")
             task.RunAlgorithm()
 
             If task.mousePointUpdated Then mousePoint = task.mousePoint ' in case the algorithm has changed the mouse location...
