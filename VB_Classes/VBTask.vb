@@ -363,7 +363,7 @@ Public Class ActiveTask : Implements IDisposable
     Public Sub RunAlgorithm()
         Try
             If task.parms.useRecordedData Then recordedData.Run(task.color.Clone)
-            If task.depth32f.Width = 0 Then Exit Sub ' no real data yet...
+
             ' run any global options algorithms here.
             If task.pythonTaskName.EndsWith(".py") = False Then
                 inrange.Run(Nothing) ' updates all the depth info.

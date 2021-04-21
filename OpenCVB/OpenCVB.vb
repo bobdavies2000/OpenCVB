@@ -23,12 +23,12 @@ Public Class OpenCVB
     Dim saveAlgorithmName As String
     Dim saveCameraName As String
     Dim activeCameraIndex As Integer
+    Const minFrames = 2 ' must have this many frames before algorithm or camera can be changed...
 
     Dim border As Integer = 6
     Dim BothFirstAndLastReady As Boolean
 
     Dim camera As Object
-    Dim cameraRS2Generic As Object ' used only to initialize D435i
     Dim cameraD435i As Object
     Dim cameraD455 As Object
     Dim cameraOakD As Object
@@ -243,7 +243,7 @@ Public Class OpenCVB
             If optionsForm.cameraDeviceCount(i) > 0 Then optionsForm.cameraTotalCount += 1
         Next
 
-        cameraRS2Generic = New CameraRS2
+        Dim cameraRS2Generic = New CameraRS2
         Dim RS2count = cameraRS2Generic.queryDeviceCount()
         For i = 0 To RS2count - 1
             Dim deviceName = cameraRS2Generic.queryDevice(i)
@@ -532,7 +532,7 @@ Public Class OpenCVB
         End If
     End Sub
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
-        If frameCount < 5 And TestAllButton.Text = "Stop Test" Then Exit Sub ' we have to see some output from the algorithm before moving on...
+        If frameCount < minFrames And TestAllButton.Text = "Stop Test" Then Exit Sub ' we have to see some output from the algorithm before moving on...
         TestAllTimer.Enabled = False ' it can take a while to restart the camera so stop watching until the timer event is complete.
         Me.Refresh()
 
@@ -1180,7 +1180,6 @@ Public Class OpenCVB
     End Sub
     Private Sub Run(task As VB_Classes.ActiveTask, algName As String)
         Dim saveWorkingRes = workingRes
-        Const minFrames = 5
         While 1
             Dim ratioImageToCampic = task.color.Width / camPic(0).Width  ' relative size of displayed image and algorithm size image.
             Dim currentCameraIndex = activeCameraIndex
