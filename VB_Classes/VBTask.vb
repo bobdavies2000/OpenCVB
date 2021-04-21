@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
-Imports System.IO
 Imports System.Windows.Forms
+Imports System.Threading
 Module Algorithm_Module
     Public task As ActiveTask
     Public aOptions As OptionsContainer
@@ -335,6 +335,7 @@ Public Class ActiveTask : Implements IDisposable
             IMULevel = algoList.createAlgorithm("IMU_IsCameraLevel")
             PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
         End If
+        Thread.Sleep(1000)
 
         algorithmObject = algoList.createAlgorithm(task.algName)
 

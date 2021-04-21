@@ -1356,7 +1356,23 @@ Public Class Histogram_Peaks : Inherits VBparent
             Dim h = CInt(vCount(i) * dst1.Height / maxVal)
             cv.Cv2.Rectangle(dst1, New cv.Rect(valleys(i) * barWidth, dst1.Height - h, barWidth, h), cv.Scalar.Blue, 2)
         Next
-        label1 = "Grayscale image: " + CStr(peaks.Count) + " peaks (yellow), valley=blue"
+
+        If valleys.Count > 0 Then
+            Dim incr = 255 / histogram.Rows
+            Dim startLut As Integer
+            Dim endLut As Integer
+            Dim myLut = New cv.Mat(256, 1, cv.MatType.CV_8U)
+            Dim lutIncr = 255 / valleys.Count
+            For i = 0 To valleys.Count - 1
+                endLut = valleys(i) * incr
+                For j = startLut To endLut
+                    myLut.Set(Of Byte)(j, 0, CInt((i + 1) * lutIncr))
+                Next
+                startLut = endLut + 1
+            Next
+            dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).LUT(myLut)
+            label1 = "Grayscale image: " + CStr(peaks.Count) + " peaks (yellow), valley=blue"
+        End If
     End Sub
 End Class
 
