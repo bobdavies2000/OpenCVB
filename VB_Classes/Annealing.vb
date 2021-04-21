@@ -240,9 +240,7 @@ Public Class Annealing_Options : Inherits VBparent
     Public anneal As Annealing_Basics_CPP
     Dim flow As Font_FlowText
     Public Sub New()
-        Static randomSlider = findSlider("Random Pixel Count")
         random = New Random_Basics()
-        randomSlider.Value = 25 ' change the default number of cities here.
         random.Run(Nothing) ' get the city positions (may or may not be used below.)
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -256,11 +254,10 @@ Public Class Annealing_Options : Inherits VBparent
 
         label1 = "Log of Annealing progress"
 
-
+        Const initialCities = 25
+        findSlider("Random Pixel Count").Value = initialCities ' change the default number of cities here.
         anneal = New Annealing_Basics_CPP()
-        anneal.numberOfCities = randomSlider.Value
-        anneal.circularPattern = check.Box(1).Checked
-        If check.Box(1).Checked = False Then anneal.cityPositions = random.Points2f.Clone()
+        anneal.numberOfCities = initialCities
         anneal.setup()
         anneal.Open()
         task.desc = "Setup and control finding the optimal route for a traveling salesman"
