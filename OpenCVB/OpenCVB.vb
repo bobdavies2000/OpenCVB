@@ -1249,9 +1249,9 @@ Public Class OpenCVB
                 Dim frmCount = Application.OpenForms.Count
                 If saveFrameCount < frmCount Then saveFrameCount = Application.OpenForms.Count
                 If saveFrameCount > frmCount Then Exit Sub
+                If frameCount Mod 50 = 0 Then Console.WriteLine("")
             End If
             Console.Write(CStr(Application.OpenForms.Count))
-            If frameCount Mod 50 = 0 Then Console.WriteLine("")
             task.RunAlgorithm()
 
             If task.mousePointUpdated Then mousePoint = task.mousePoint ' in case the algorithm has changed the mouse location...
