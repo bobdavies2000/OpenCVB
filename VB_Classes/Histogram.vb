@@ -732,7 +732,6 @@ End Class
 ' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
 Public Class Histogram_BackProjectionGrayscale : Inherits VBparent
     Dim hist As Histogram_Basics
-    Public histIndex As Single
     Public binSlider As Windows.Forms.TrackBar
     Public Sub New()
         hist = New Histogram_Basics
@@ -743,22 +742,24 @@ Public Class Histogram_BackProjectionGrayscale : Inherits VBparent
         hist.Run(src)
         dst1 = hist.dst1
 
-        histIndex = hist.histogram.Rows * task.mousePoint.X / src.Width
         Dim barWidth = dst1.Width / task.histogramBins
         Dim barRange = 255 / task.histogramBins
+        Dim histIndex = Math.Floor(task.mousePoint.X / barWidth)
 
-        Dim maxRange = (histIndex + 1) * barRange
-        If CInt(histIndex) = task.histogramBins Then maxRange = 255
-        If maxRange > 255 Then maxRange = 255
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(histIndex * barRange, maxRange)}
+        Dim minRange = If(histIndex = task.histogramBins, 255 - barRange, histIndex * barRange)
+        Dim maxRange = If(histIndex = task.histogramBins, 255, (histIndex + 1) * barRange)
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim mat() As cv.Mat = {gray}
         Dim bins() = {0}
-        cv.Cv2.CalcBackProject(mat, bins, hist.histogram, dst2, ranges)
-
-        label2 = "Backprojecting " + CStr(CInt(histIndex * barRange)) + " to " + CStr(CInt(maxRange)) + " with " +
-                 Format(hist.histogram.Get(Of Single)(histIndex, 0), "#0") + " samples"
-        dst1.Rectangle(New cv.Rect(barWidth * histIndex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 5)
+        Dim mask As New cv.Mat
+        cv.Cv2.CalcBackProject(mat, bins, hist.histogram, mask, ranges)
+        dst2 = src
+        If maxRange = 255 Then dst2.SetTo(cv.Scalar.Black, mask) Else dst2.SetTo(cv.Scalar.White, mask)
+        Dim count = hist.histogram.Get(Of Single)(histIndex, 0)
+        label2 = "Backprojecting " + CStr(CInt(minRange)) + " to " + CStr(CInt(maxRange)) + " with " +
+                 Format(count, "#0") + " (" + Format(count / dst1.Total, "0.0%") + ") samples"
+        dst1.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst1.Height), cv.Scalar.Yellow, task.lineSize)
     End Sub
 End Class
 
