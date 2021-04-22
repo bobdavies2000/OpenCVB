@@ -1307,6 +1307,8 @@ Public Class Histogram_Peaks : Inherits VBparent
         task.desc = "Find the peaks - columns taller that both neighbors - in the histogram"
     End Sub
     Public Sub Run(src As cv.Mat)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
         hist.Run(src)
         dst1 = hist.dst1
 
@@ -1361,7 +1363,7 @@ Public Class Histogram_Peaks : Inherits VBparent
             Dim incr = 255 / histogram.Rows
             Dim startLut As Integer
             Dim endLut As Integer
-            Dim myLut = New cv.Mat(256, 1, cv.MatType.CV_8U)
+            Dim myLut = New cv.Mat(256, 1, cv.MatType.CV_8U, 255)
             Dim lutIncr = 255 / valleys.Count
             For i = 0 To valleys.Count - 1
                 endLut = valleys(i) * incr
@@ -1370,11 +1372,71 @@ Public Class Histogram_Peaks : Inherits VBparent
                 Next
                 startLut = endLut + 1
             Next
-            dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).LUT(myLut)
+            dst2 = src.LUT(myLut)
             label1 = "Grayscale image: " + CStr(peaks.Count) + " peaks (yellow), valley=blue"
         End If
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Histogram_PeaksRGB : Inherits VBparent
+    Public mats As Mat_4Click
+    Dim peaks As Histogram_Peaks
+    Public Sub New()
+        mats = New Mat_4Click
+        peaks = New Histogram_Peaks
+        task.desc = "Find the peaks and valleys for each of the RGB channels."
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        Dim split = src.Split()
+
+        For i = 0 To 3 - 1
+            peaks.Run(split(i))
+            mats.mat(i) = peaks.dst2.Clone
+        Next
+
+        mats.Run(Nothing)
+        dst1 = mats.dst1
+        dst2 = mats.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Histogram_PeakEdges : Inherits VBparent
+    Dim peaks As Histogram_PeaksRGB
+    Dim edges As Edges_Sobel
+    Public mats As Mat_4to1
+    Public Sub New()
+        mats = New Mat_4to1
+        peaks = New Histogram_PeaksRGB
+        edges = New Edges_Sobel
+        task.desc = "Find edges that are common to all channels - red, green and blue."
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        peaks.Run(src)
+
+        For i = 0 To 3 - 1
+            edges.Run(peaks.mats.mat(i))
+            mats.mat(i) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            If i = 0 Then dst2 = mats.mat(i) Else cv.Cv2.BitwiseAnd(dst2, mats.mat(i), dst2)
+        Next
+
+        mats.Run(Nothing)
+        dst1 = mats.dst1
+    End Sub
+End Class
+
 
 
 

@@ -337,7 +337,7 @@ Public Class ActiveTask : Implements IDisposable
         End If
 
         algorithmObject = algoList.createAlgorithm(task.algName)
-        Thread.Sleep(1000)
+        'Thread.Sleep(1000)
 
         If algorithmObject Is Nothing Then
             MsgBox("The algorithm: " + task.algName + " was not found in the algorithmList.vb code." + vbCrLf +

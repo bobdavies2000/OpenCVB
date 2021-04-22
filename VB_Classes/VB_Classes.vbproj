@@ -601,8 +601,9 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
+    <PreBuildEvent>$(ProjectDir)\..\bin\Release\UI_Generator.exe
+$(ProjectDir)\..\bin\Release\UIindexer.exe
+$(ProjectDir)\..\bin\Release\VersionOpenCV.exe</PreBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -612,8 +613,7 @@
   </Target>
   <Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />
   <PropertyGroup>
-    <PostBuildEvent>$(ProjectDir)\..\bin\Release\UI_Generator.exe
-$(ProjectDir)\..\bin\Release\UIindexer.exe
-$(ProjectDir)\..\bin\Release\VersionOpenCV.exe</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
