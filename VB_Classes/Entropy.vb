@@ -1,22 +1,13 @@
 Imports cv = OpenCvSharp
 ' http://areshopencv.blogspot.com/2011/12/computing-entropy-of-image.html
 Public Class Entropy_Basics : Inherits VBparent
-    Dim flow As Font_FlowText
     Dim simple = New Entropy_Simple
     Public entropy As Single
     Public Sub New()
-        flow = New Font_FlowText()
-
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Number of Bins", 0, 100, 50)
-        End If
-
+        label1 = "Control entropy values with histogram bins slider"
         task.desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub
     Public Sub Run(src as cv.Mat)
-        Static binSlider = findSlider("Number of Bins")
-        simple.bins = binSlider.Value
         simple.run(src)
         entropy = 0
         Dim entropyChannels As String = ""
@@ -25,7 +16,8 @@ Public Class Entropy_Basics : Inherits VBparent
             entropyChannels += "Entropy for " + Choose(i + 1, "Red", "Green", "Blue") + " " + Format(nextEntropy, "0.00") + ", "
             entropy += nextEntropy
         Next
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
+            Static flow = New Font_FlowText()
             flow.msgs.Add("Entropy total = " + Format(entropy, "0.00") + " - " + entropyChannels)
             flow.Run(Nothing)
         End If
@@ -43,7 +35,6 @@ Public Class Entropy_Highest : Inherits VBparent
     Public eMaxRect As cv.Rect
     Dim addw As AddWeighted_Basics
     Public Sub New()
-
         addw = New AddWeighted_Basics
 
         grid = New Thread_Grid
@@ -120,13 +111,10 @@ End Class
 
 
 ' This algorithm is different and does not inherit from VBParent class.  It is used to reduce the memory load when running MT algorithms above.
-Public Class Entropy_Simple
+Public Class Entropy_Simple : Inherits VBparent
     Public entropy As Single
     Public histRaw(3 - 1) As cv.Mat
     Public histNormalized(3 - 1) As cv.Mat
-    Public bins As Integer = 256
-    Public minRange As Integer = 0
-    Public maxRange As Integer = 255
     Public Function channelEntropy(total As Integer, hist As cv.Mat) As Single
         channelEntropy = 0
         For i = 0 To hist.Rows - 1
@@ -136,8 +124,8 @@ Public Class Entropy_Simple
         Return channelEntropy
     End Function
     Public Sub Run(src As cv.Mat)
-        Dim dimensions() = New Integer() {bins}
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
+        Dim dimensions() = New Integer() {task.histogramBins}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 255)}
 
         entropy = 0
         Dim entropyChannels As String = ""

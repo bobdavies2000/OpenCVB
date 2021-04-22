@@ -191,7 +191,7 @@ Public Class Mat_2to1 : Inherits VBparent
             mat = {mat1, mat2}
         End If
         dst1.SetTo(0)
-        If dst1.Type <> mat(0).Type Then dst1 = New cv.Mat(src.Size(), mat(0).type)
+        If dst1.Type <> mat(0).Type Then dst1 = New cv.Mat(dst1.Size(), mat(0).Type)
         For i = 0 To 1
             Dim roi = Choose(i + 1, roiTop, roibot)
             If mat(i).Empty = False Then dst1(roi) = mat(i).Resize(nSize)

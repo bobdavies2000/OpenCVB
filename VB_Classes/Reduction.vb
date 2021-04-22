@@ -71,7 +71,6 @@ Public Class Reduction_KNN_Color : Inherits VBparent
     Public pTrack As KNN_PointTracker
     Dim highlight As Highlight_Basics
     Public Sub New()
-
         pTrack = New KNN_PointTracker()
         reduction = New Reduction_Floodfill()
         If standalone Then highlight = New Highlight_Basics()
@@ -154,7 +153,6 @@ Public Class Reduction_Lines : Inherits VBparent
         task.desc = "Present both the top and side view to minimize pixel counts."
     End Sub
     Public Sub Run(src As cv.Mat)
-
         reduction.Run(src)
 
         sideView.Run(src)
@@ -179,10 +177,10 @@ End Class
 
 Public Class Reduction_Histogram : Inherits VBparent
     Dim basics As Reduction_Basics
-    Dim hist As Histogram_BackProjectionGrayscale
+    Dim hist As BackProject_basics
     Public Sub New()
         basics = New Reduction_Basics()
-        hist = New Histogram_BackProjectionGrayscale()
+        hist = New BackProject_basics
 
         label2 = "Backprojection of highlighted histogram bin"
         task.desc = "Use the histogram of a reduced RGB image to isolate featureless portions of an image."
@@ -214,7 +212,6 @@ Public Class Reduction_PointCloud : Inherits VBparent
         task.desc = "Use reduction to smooth depth data"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
         Dim split() = src.Split()
 
@@ -248,7 +245,6 @@ Public Class Reduction_XYZ : Inherits VBparent
         task.desc = "Use reduction to slice the point cloud in 3 dimensions"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
         Dim split() = src.Split()
 
@@ -281,7 +277,6 @@ Public Class Reduction_Edges : Inherits VBparent
     Dim edges As Edges_Laplacian
     Dim reduction As Reduction_Basics
     Public Sub New()
-
         edges = New Edges_Laplacian()
         reduction = New Reduction_Basics()
         reduction.radio.check(0).Checked = True
@@ -352,7 +347,6 @@ Public Class Reduction_DepthMax : Inherits VBparent
         task.desc = "Use reduction to isolate depth in 1 meter increments"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
         dMax.Run(src)
         dst1 = dMax.dst2
@@ -363,19 +357,5 @@ Public Class Reduction_DepthMax : Inherits VBparent
 
         colorizer.Run(reducedDepth32F)
         dst2 = colorizer.dst1
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Reduction_ToPeaks : Inherits VBparent
-    Public Sub New()
-        task.desc = "Reduce an image to the histogram peaks"
-    End Sub
-    Public Sub Run(src As cv.Mat)
     End Sub
 End Class

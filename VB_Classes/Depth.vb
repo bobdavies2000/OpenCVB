@@ -1218,67 +1218,6 @@ End Class
 
 
 
-Public Class Depth_SmoothSurfaces : Inherits VBparent
-    Public pcValid As Motion_MinMaxPointCloud
-    Dim histX As Histogram_Basics
-    Dim histY As Histogram_Basics
-    Dim mats As Mat_4to1
-    Public Sub New()
-        mats = New Mat_4to1
-        histX = New Histogram_Basics
-        histY = New Histogram_Basics
-        pcValid = New Motion_MinMaxPointCloud
-
-        label1 = "1)HistX 2)HistY 3)backProject histX 4)backP histY"
-        label2 = "Likely smooth surfaces"
-        task.desc = "Find planes using the pointcloud X and Y differences"
-    End Sub
-    Public Sub Run(src As cv.Mat)
-        pcValid.Run(src)
-        Dim mask = pcValid.dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
-
-        Dim split = pcValid.dst2.Split()
-        Dim xDiff = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, 0)
-        Dim yDiff = New cv.Mat(dst2.Size, cv.MatType.CV_32FC1, 0)
-
-        Dim r1 = New cv.Rect(0, 0, dst1.Width - 1, dst1.Height - 1)
-        Dim r2 = New cv.Rect(1, 1, dst1.Width - 1, dst1.Height - 1)
-
-        cv.Cv2.Subtract(split(0)(r1), split(0)(r2), xDiff(r1))
-        cv.Cv2.Subtract(split(1)(r2), split(1)(r1), yDiff(r1))
-
-        xDiff.SetTo(0, mask)
-        yDiff.SetTo(0, mask)
-
-        Dim xMat = xDiff.ConvertScaleAbs(255)
-        histX.Run(xMat)
-        mats.mat(0) = histX.dst1
-
-        Dim yMat = yDiff.ConvertScaleAbs(255)
-        histY.Run(yMat)
-        mats.mat(1) = histY.dst1
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(1, 2)}
-        Dim mat() As cv.Mat = {xMat}
-        Dim bins() = {0}
-        cv.Cv2.CalcBackProject(mat, bins, histX.histogram, mats.mat(2), ranges)
-
-        mat(0) = yMat
-        cv.Cv2.CalcBackProject(mat, bins, histX.histogram, mats.mat(3), ranges)
-
-        mats.Run(Nothing)
-        dst1 = mats.dst1
-
-        cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), dst2)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 ' https://stackoverflow.com/questions/19093728/rotate-image-around-x-y-z-axis-in-opencv
 ' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv

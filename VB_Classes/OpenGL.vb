@@ -609,12 +609,12 @@ End Class
 
 
 
-Public Class OpenGL_SmoothSurfaces : Inherits VBparent
-    Dim smooth As Depth_SmoothSurfaces
+Public Class OpenGL_Surfaces : Inherits VBparent
+    Dim smooth As BackProject_Surfaces
     Public ogl As OpenGL_Callbacks
     Public Sub New()
 
-        smooth = New Depth_SmoothSurfaces
+        smooth = New BackProject_Surfaces
         ogl = New OpenGL_Callbacks
 
         task.desc = "Filter the 3D image to show only smooth surfaces."

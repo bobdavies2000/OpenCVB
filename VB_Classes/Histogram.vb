@@ -452,7 +452,6 @@ End Class
 Public Class Histogram_BackProjection2D : Inherits VBparent
     Dim hist As Histogram_2D_HueSaturation
     Public Sub New()
-
         hist = New Histogram_2D_HueSaturation()
 
         task.desc = "Backproject from a hue and saturation histogram."
@@ -492,12 +491,10 @@ Public Class Histogram_BackProjection2D : Inherits VBparent
             label2 = "Selection: min/max Hue " + Format(minHue, "0") + "/" + Format(maxHue, "0") + " min/max Sat " + Format(minSat, "0") + "/" + Format(maxSat, "0")
         End If
         ' Dim histogram = hist.histogram.Normalize(0, 255, cv.NormTypes.MinMax)
-        Dim bins() = {0, 1}
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-        Dim mat() As cv.Mat = {hsv}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(minHue, maxHue), New cv.Rangef(minSat, maxSat)}
         Dim mask As New cv.Mat
-        cv.Cv2.CalcBackProject(mat, bins, hist.histogram, mask, ranges)
+        cv.Cv2.CalcBackProject({hsv}, {0, 1}, hist.histogram, mask, ranges)
 
         dst2.SetTo(0)
         src.CopyTo(dst2, mask)
@@ -721,47 +718,6 @@ Public Class Histogram_SideView2D : Inherits VBparent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
-Public Class Histogram_BackProjectionGrayscale : Inherits VBparent
-    Dim hist As Histogram_Basics
-    Public binSlider As Windows.Forms.TrackBar
-    Public Sub New()
-        hist = New Histogram_Basics
-        label1 = "Move mouse to backproject each histogram column"
-        task.desc = "Explore Backprojection of each element of a grayscale histogram."
-    End Sub
-    Public Sub Run(src As cv.Mat)
-        hist.Run(src)
-        dst1 = hist.dst1
-
-        Dim barWidth = dst1.Width / task.histogramBins
-        Dim barRange = 255 / task.histogramBins
-        Dim histIndex = Math.Floor(task.mousePoint.X / barWidth)
-
-        Dim minRange = If(histIndex = task.histogramBins, 255 - barRange, histIndex * barRange)
-        Dim maxRange = If(histIndex = task.histogramBins, 255, (histIndex + 1) * barRange)
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim mat() As cv.Mat = {gray}
-        Dim bins() = {0}
-        Dim mask As New cv.Mat
-        cv.Cv2.CalcBackProject(mat, bins, hist.histogram, mask, ranges)
-        dst2 = src
-        If maxRange = 255 Then dst2.SetTo(cv.Scalar.Black, mask) Else dst2.SetTo(cv.Scalar.White, mask)
-        Dim count = hist.histogram.Get(Of Single)(histIndex, 0)
-        label2 = "Backprojecting " + CStr(CInt(minRange)) + " to " + CStr(CInt(maxRange)) + " with " +
-                 Format(count, "#0") + " (" + Format(count / dst1.Total, "0.0%") + ") samples"
-        dst1.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst1.Height), cv.Scalar.Yellow, task.lineSize)
-    End Sub
-End Class
 
 
 
