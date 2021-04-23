@@ -31,7 +31,7 @@ Public Class Fuzzy_Basics : Inherits VBparent
         options.setOptions()
         reduction.Run(src)
         dst1 = reduction.dst1
-        dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If dst1.Channels <> 1 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim srcData(dst1.Total) As Byte
         Marshal.Copy(dst1.Data, srcData, 0, srcData.Length - 1)
