@@ -15,7 +15,7 @@ Public Class LUT_Basics : Inherits VBparent
         Static nSegSlider = findSlider("Number of LUT Segments")
         Dim segments = nSegSlider.value
         Static myLut As New cv.Mat(1, 256, cv.MatType.CV_8U)
-        Static nSeg = segments
+        Static nSeg As Integer = -1
         If segments <> nSeg Then
             nSeg = segments
             Dim incr = 255 / nSeg
@@ -30,9 +30,8 @@ Public Class LUT_Basics : Inherits VBparent
                 If i >= segment(splitIndex) Then splitIndex += 1
             Next
         End If
-        Dim gray = src
-        If gray.Channels <> 1 Then gray = gray.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = gray.LUT(myLut)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = src.LUT(myLut)
         label1 = "Image segmented into " + CStr(segments + 1) + " divisions (0-" + CStr(segments) + ")"
     End Sub
 End Class
@@ -88,15 +87,16 @@ Public Class LUT_CustomColor : Inherits VBparent
     Public Sub New()
         reduction = New Reduction_Basics()
         gradMap = New Palette_RandomColorMap
+        findSlider("Number of color transitions (Used only with Random)").Value = 10
 
         label2 = "Custom Color Lookup Table"
         task.desc = "Use a palette to provide the lookup table for LUT - Painterly Effect"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If standalone Or task.intermediateReview = caller Then reduction.Run(src)
         gradMap.Run(src)
         colorMap = gradMap.gradientColorMap.Flip(cv.FlipMode.X)
-        dst1 = reduction.dst1.LUT(colorMap)
+        dst1 = src.LUT(colorMap)
         dst2 = colorMap.Resize(src.Size())
     End Sub
 End Class
@@ -119,7 +119,8 @@ Public Class LUT_Reduction : Inherits VBparent
     Public Sub Run(src As cv.Mat)
         task.palette.Run(Nothing)
         reduction.Run(src)
-        dst1 = reduction.dst1.LUT(task.palette.gradientColorMap.Row(0))
+        Dim vector = task.palette.gradientColorMap.Row(0).Clone
+        dst1 = reduction.dst2.LUT(vector)
         If standalone Or task.intermediateReview = caller Then dst2 = task.palette.gradientColorMap.Resize(src.Size())
     End Sub
 End Class

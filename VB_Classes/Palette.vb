@@ -305,7 +305,7 @@ Public Class Palette_RandomColorMap : Inherits VBparent
             Dim color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
             Dim gradMat As New cv.Mat
             For i = 0 To transitionCount - 1
-                gradMat = colorTransition(color1, color2, src.Width)
+                gradMat = colorTransition(color1, color2, dst1.Width)
                 color2 = color1
                 color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
                 If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
