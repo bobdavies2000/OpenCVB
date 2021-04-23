@@ -10,8 +10,8 @@ Public Class Reduction_Basics : Inherits VBparent
 
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)
-            radio.check(0).Text = "Use bitwise reduction"
-            radio.check(1).Text = "Use simple reduction"
+            radio.check(0).Text = "Use simple reduction"
+            radio.check(1).Text = "Use bitwise reduction"
             radio.check(2).Text = "No reduction"
             radio.check(1).Checked = True
         End If

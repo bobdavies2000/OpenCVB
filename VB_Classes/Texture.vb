@@ -56,8 +56,8 @@ Public Class Texture_Flow : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Texture Flow Delta", 2, 100, 12)
-            sliders.setupTrackBar(1, "Texture Eigen BlockSize", 1, 100, 20)
+            sliders.setupTrackBar(0, "Texture Flow Delta", 2, 100, 30)
+            sliders.setupTrackBar(1, "Texture Eigen BlockSize", 1, 100, 50)
             sliders.setupTrackBar(2, "Texture Eigen Ksize", 1, 15, 1)
         End If
 
@@ -67,9 +67,9 @@ Public Class Texture_Flow : Inherits VBparent
         Dim TFdelta = sliders.trackbar(0).Value
         Dim TFblockSize = sliders.trackbar(1).Value * 2 + 1
         Dim TFksize = sliders.trackbar(2).Value * 2 + 1
-        Dim gray = src.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2GRAY)
         dst1 = src.Clone
-        Dim eigen = gray.CornerEigenValsAndVecs(TFblockSize, TFksize)
+        If src.Channels <> 1 Then src = src.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2GRAY)
+        Dim eigen = src.CornerEigenValsAndVecs(TFblockSize, TFksize)
         Dim split = eigen.Split()
         Dim d2 = TFdelta / 2
         For y = d2 To dst1.Height - 1 Step d2
@@ -77,7 +77,7 @@ Public Class Texture_Flow : Inherits VBparent
                 Dim delta = New cv.Point2f(split(4).Get(Of Single)(y, x), split(5).Get(Of Single)(y, x)) * TFdelta
                 Dim p1 = New cv.Point(x - delta.X, y - delta.Y)
                 Dim p2 = New cv.Point(x + delta.X, y + delta.Y)
-                dst1.Line(p1, p2, cv.Scalar.Black, 1, task.lineType)
+                dst1.Line(p1, p2, cv.Scalar.Yellow, 1, task.lineType)
             Next
         Next
     End Sub
