@@ -4,7 +4,7 @@ Public Class Reduction_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Reduction factor", 0, 4096, 64)
+            sliders.setupTrackBar(0, "Reduction factor", 1, 4096, 64)
             sliders.setupTrackBar(1, "Bits to remove in bitwise reduction", 0, 7, 3)
         End If
 
@@ -24,18 +24,26 @@ Public Class Reduction_Basics : Inherits VBparent
         Static reductionSlider = findSlider("Reduction factor")
         Static bitSlider = findSlider("Bits to remove in bitwise reduction")
         Dim reductionVal = CInt(reductionSlider.Value)
+        bitSlider.enabled = bitwiseCheck.checked
+        reductionSlider.enabled = simpleCheck.checked
+
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
         If bitwiseCheck.Checked Then
             Dim zeroBits = Math.Pow(2, bitSlider.value) - 1
-            Dim tmp = New cv.Mat(src.Size, src.Type, cv.Scalar.All(255 - zeroBits))
-            cv.Cv2.BitwiseAnd(src, tmp, dst1)
+            dst2 = New cv.Mat(src.Size, src.Type, cv.Scalar.All(255 - zeroBits))
+            cv.Cv2.BitwiseAnd(src, dst2, dst1)
         ElseIf simpleCheck.Checked Then
-            If reductionVal = 0 Then reductionVal = 1
             dst1 = src / reductionVal
             dst1 *= reductionVal
             label1 = "Reduced image - factor = " + CStr(reductionVal)
         Else
             dst1 = src
             label1 = "No reduction requested"
+        End If
+        If standalone Or task.intermediateReview = caller Then
+            task.palette.Run(dst1)
+            dst2 = task.palette.dst1
         End If
     End Sub
 End Class
@@ -169,34 +177,6 @@ Public Class Reduction_Lines : Inherits VBparent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Reduction_Histogram : Inherits VBparent
-    Dim basics As Reduction_Basics
-    Dim hist As BackProject_basics
-    Public Sub New()
-        basics = New Reduction_Basics()
-        hist = New BackProject_basics
-
-        label2 = "Backprojection of highlighted histogram bin"
-        task.desc = "Use the histogram of a reduced RGB image to isolate featureless portions of an image."
-    End Sub
-    Public Sub Run(src As cv.Mat)
-        Static reductionSlider = findSlider("Reduction factor")
-
-        basics.Run(src)
-        reductionSlider.value = 112
-
-        hist.Run(basics.dst1)
-        dst1 = hist.dst1
-        dst2 = hist.dst2
-        label1 = "Reduction = " + CStr(reductionSlider.value) + " and bins = " + CStr(task.histogramBins)
-    End Sub
-End Class
 
 
 

@@ -13,13 +13,17 @@ Public Class Histogram_Basics : Inherits VBparent
         task.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
     End Sub
     Public Sub Run(src As cv.Mat)
-        Static splitIndex = -1
+        Static splitIndex As Integer
         Static colorName As String
         If standalone Or task.intermediateReview = caller Then
             Dim split() = src.Split()
-            If task.frameCount Mod 100 = 0 Then splitIndex = If(splitIndex < 2, splitIndex + 1, 0)
-            src = split(splitIndex)
-            colorName = Choose(splitIndex + 1, "Blue", "Green", "Red")
+            If split.Count > 1 Then
+                If task.frameCount Mod 100 = 0 Then splitIndex = If(splitIndex < 2, splitIndex + 1, 0)
+                src = split(splitIndex)
+                colorName = Choose(splitIndex + 1, "Blue", "Green", "Red")
+            Else
+                colorName = "Gray"
+            End If
         End If
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -439,100 +443,6 @@ Public Class Histogram_ColorsAndGray : Inherits VBparent
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-
-' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
-Public Class Histogram_BackProjection2D : Inherits VBparent
-    Dim hist As Histogram_2D_HueSaturation
-    Public Sub New()
-        hist = New Histogram_2D_HueSaturation()
-
-        task.desc = "Backproject from a hue and saturation histogram."
-        label1 = "X-axis is Hue, Y-axis is Sat.  Draw rectangle to isolate ranges"
-        label2 = "Backprojection of detected hue and saturation."
-    End Sub
-    Public Sub Run(src As cv.Mat)
-        Static hueBinSlider = findSlider("Hue bins")
-        Static hueBins = hueBinSlider.Value
-        Static satBinSlider = findSlider("Saturation bins")
-        Static satBins = satBinSlider.Value
-
-        hist.Run(src)
-        dst1 = hist.dst1
-        If hueBins <> hueBinSlider.Value Or satBins <> satBinSlider.Value Then
-            task.drawRectClear = True
-            hueBins = hueBinSlider.Value
-            satBins = satBinSlider.Value
-        End If
-
-        Dim unitsPerHueBin = 180 / hueBins
-        Dim unitsPerSatBin = 255 / satBins
-        Dim minHue = 0, maxHue = 180, minSat = 0, maxSat = 255
-        If task.drawRect.Width <> 0 And task.drawRect.Height <> 0 Then
-            Dim intBin = Math.Floor(hueBins * task.drawRect.X / dst1.Width)
-            minHue = intBin * unitsPerHueBin
-            intBin = Math.Ceiling(hueBins * (task.drawRect.X + task.drawRect.Width) / dst1.Width)
-            maxHue = intBin * unitsPerHueBin
-
-            intBin = Math.Floor(satBins * task.drawRect.Y / dst1.Height)
-            minSat = intBin * unitsPerSatBin
-            intBin = Math.Ceiling(satBins * (task.drawRect.Y + task.drawRect.Height) / dst1.Height)
-            maxSat = intBin * unitsPerSatBin
-
-            If minHue = maxHue Then maxHue = minHue + 1
-            If minSat = maxSat Then maxSat = minSat + 1
-            label2 = "Selection: min/max Hue " + Format(minHue, "0") + "/" + Format(maxHue, "0") + " min/max Sat " + Format(minSat, "0") + "/" + Format(maxSat, "0")
-        End If
-        ' Dim histogram = hist.histogram.Normalize(0, 255, cv.NormTypes.MinMax)
-        Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(minHue, maxHue), New cv.Rangef(minSat, maxSat)}
-        Dim mask As New cv.Mat
-        cv.Cv2.CalcBackProject({hsv}, {0, 1}, hist.histogram, mask, ranges)
-
-        dst2.SetTo(0)
-        src.CopyTo(dst2, mask)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Histogram_HueSaturation2DPlot : Inherits VBparent
-    Dim hueSat As PhotoShop_Hue
-    Dim hist2d As Histogram_BackProjection2D
-    Dim mats As Mat_4to1
-    Public Sub New()
-
-        hueSat = New PhotoShop_Hue()
-        hist2d = New Histogram_BackProjection2D()
-        mats = New Mat_4to1()
-        label2 = "Click any quadrant at left to view it below"
-        task.desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
-    End Sub
-    Public Sub Run(src As cv.Mat)
-        hueSat.Run(src)
-        mats.mat(0) = hueSat.dst1
-        mats.mat(1) = hueSat.dst2
-
-        hist2d.Run(src)
-        mats.mat(2) = hist2d.dst2
-        mats.mat(3) = hist2d.dst1
-
-        mats.Run(Nothing)
-        dst1 = mats.dst1
-        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
-        dst2 = mats.mat(quadrantIndex)
-    End Sub
-End Class
 
 
 

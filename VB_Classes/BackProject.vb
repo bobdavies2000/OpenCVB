@@ -8,6 +8,7 @@ Public Class BackProject_Basics : Inherits VBparent
         task.desc = "Explore Backprojection of each element of a grayscale histogram."
     End Sub
     Public Sub Run(src As cv.Mat)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.Run(src)
         dst1 = hist.dst1
 
@@ -18,9 +19,8 @@ Public Class BackProject_Basics : Inherits VBparent
         Dim minRange = If(histIndex = task.histogramBins, 255 - barRange, histIndex * barRange)
         Dim maxRange = If(histIndex = task.histogramBins, 255, (histIndex + 1) * barRange)
         Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim mask As New cv.Mat
-        cv.Cv2.CalcBackProject({gray}, {0}, hist.histogram, mask, ranges)
+        cv.Cv2.CalcBackProject({src}, {0}, hist.histogram, mask, ranges)
         dst2 = src
         If maxRange = 255 Then dst2.SetTo(cv.Scalar.Black, mask) Else dst2.SetTo(cv.Scalar.White, mask)
         Dim count = hist.histogram.Get(Of Single)(histIndex, 0)
@@ -30,33 +30,6 @@ Public Class BackProject_Basics : Inherits VBparent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class BackProject_Full : Inherits VBparent
-    Public hist As Histogram_Basics
-    Public Sub New()
-        hist = New Histogram_Basics
-        label1 = "Move mouse to backproject each histogram column"
-        task.desc = "Backproject the entire histogram."
-    End Sub
-    Public Sub Run(src As cv.Mat)
-        hist.Run(src)
-        dst1 = hist.dst1
-
-        Dim barWidth = dst1.Width / task.histogramBins
-        Dim barRange = 255 / task.histogramBins
-        Dim histIndex = Math.Floor(task.mousePoint.X / barWidth)
-
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 255)}
-        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim mask As New cv.Mat
-        cv.Cv2.CalcBackProject({gray}, {0}, hist.histogram, mask, ranges)
-    End Sub
-End Class
 
 
 
@@ -77,11 +50,11 @@ Public Class BackProject_Masks : Inherits VBparent
         Dim barWidth = dst1.Width / histogram.Rows
         Dim barRange = 255 / histogram.Rows
 
-        Dim minRange = If(histIndex = histogram.Rows, 255 - barRange, histIndex * barRange)
-        Dim maxRange = If(histIndex = histogram.Rows, 255, (histIndex + 1) * barRange)
+        Dim minRange = If(histIndex = histogram.Rows - 1, 255 - barRange, histIndex * barRange)
+        Dim maxRange = If(histIndex = histogram.Rows - 1, 255, (histIndex + 1) * barRange)
         Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
 
-        Dim mask = New cv.Mat
+        Dim mask As New cv.Mat
         cv.Cv2.CalcBackProject({gray}, {0}, histogram, mask, ranges)
         lines.Run(mask)
         Dim masklines As New List(Of cv.Vec4f)
@@ -199,6 +172,230 @@ Public Class BackProject_Surfaces : Inherits VBparent
         dst1 = mats.dst1
 
         cv.Cv2.BitwiseOr(mats.mat(0), mats.mat(1), dst2)
-        label2 = "Likely smooth surfaces " + CStr(task.frameCount)
+        label2 = "Likely smooth surfaces, framecount = " + CStr(task.frameCount)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
+Public Class BackProject_2D : Inherits VBparent
+    Dim hist As Histogram_2D_HueSaturation
+    Public Sub New()
+        hist = New Histogram_2D_HueSaturation()
+
+        task.desc = "Backproject from a hue and saturation histogram."
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        Static hueBinSlider = findSlider("Hue bins")
+        Static hueBins = hueBinSlider.Value
+        Static satBinSlider = findSlider("Saturation bins")
+        Static satBins = satBinSlider.Value
+
+        hist.Run(src)
+        dst1 = hist.dst1
+
+        Dim unitsPerHueBin = 180 / hueBins
+        Dim unitsPerSatBin = 255 / satBins
+        Dim huebarWidth = dst1.Width / hueBins
+        Dim satBarHeight = dst1.Height / satBins
+        Dim histX = Math.Floor(task.mousePoint.X / huebarWidth)
+        Dim histY = Math.Floor(satBins - task.mousePoint.Y / satBarHeight)
+
+        Dim minHue As Integer, maxHue As Integer, minSat As Integer, maxSat As Integer
+        minHue = If(histX = hueBins - 1, 180 - unitsPerHueBin, histX * unitsPerHueBin)
+        maxHue = If(histX = hueBins - 1, 180, (histX + 1) * unitsPerHueBin)
+        minSat = If(histY = satBins - 1, 255 - unitsPerSatBin, histY * unitsPerSatBin)
+        maxSat = If(histY = satBins - 1, 255, (histY + 1) * unitsPerSatBin)
+
+        Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        Dim maskHue As New cv.Mat, maskSat As New cv.Mat
+
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(minHue, maxHue), New cv.Rangef(0, 255)}
+        cv.Cv2.CalcBackProject({hsv}, {0, 1}, hist.histogram, maskHue, ranges)
+
+        ranges = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(minSat, maxSat)}
+        cv.Cv2.CalcBackProject({hsv}, {0, 1}, hist.histogram, maskSat, ranges)
+
+        dst2.SetTo(0)
+        dst2.SetTo(cv.Scalar.Yellow, maskHue)
+        dst2.SetTo(cv.Scalar.Blue, maskSat)
+        label1 = "Hue(X) min/max " + Format(minHue, "0") + "/" + Format(maxHue, "0") + " Sat(Y) min/max " + Format(minSat, "0") + "/" + Format(maxSat, "0")
+        label2 = "Hue pixels(yellow)=" + CStr(maskHue.CountNonZero()) + " Sat pixels(blue)=" + CStr(maskSat.CountNonZero())
+        dst1.Rectangle(New cv.Rect(histX * huebarWidth, 0, huebarWidth, dst1.Height), cv.Scalar.Yellow, task.lineSize, task.lineType)
+        dst1.Rectangle(New cv.Rect(0, (satBins - 1 - histY) * satBarHeight, dst1.Width, satBarHeight), cv.Scalar.Yellow, task.lineSize, task.lineType)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class BackProject_2DHSV : Inherits VBparent
+    Dim hueSat As PhotoShop_Hue
+    Dim hist2d As BackProject_2D
+    Dim mats As Mat_4to1
+    Public Sub New()
+        hueSat = New PhotoShop_Hue()
+        hist2d = New BackProject_2D()
+        mats = New Mat_4to1()
+        label1 = "Click any quadrant to enlarge it."
+        task.desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        hueSat.Run(src)
+        mats.mat(0) = hueSat.dst1
+        mats.mat(1) = hueSat.dst2
+
+        hist2d.Run(src)
+        mats.mat(2) = hist2d.dst2
+        mats.mat(3) = hist2d.dst1
+
+        mats.Run(Nothing)
+        dst1 = mats.dst1
+        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
+        dst2 = mats.mat(quadrantIndex)
+
+        label2 = hist2d.label1
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class BackProject_Full : Inherits VBparent
+    Public hist As Histogram_Basics
+    Public Sub New()
+        hist = New Histogram_Basics
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        label1 = "Move mouse to backproject each histogram column"
+        task.desc = "Backproject the entire histogram."
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        hist.Run(src)
+        dst1 = hist.dst1
+
+        Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim barWidth = dst1.Width / hist.histogram.Rows
+        Dim barRange = 255 / hist.histogram.Rows
+
+        For i = 0 To hist.histogram.Rows - 1
+            Dim minRange = If(i = hist.histogram.Rows - 1, 255 - barRange, i * barRange)
+            Dim maxRange = If(i = hist.histogram.Rows - 1, 255, (i + 1) * barRange)
+            Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
+
+            Dim mask As New cv.Mat
+            cv.Cv2.CalcBackProject({gray}, {0}, hist.histogram, mask, ranges)
+            dst2.SetTo(i, mask)
+        Next
+        dst2 *= 255 / hist.histogram.Rows
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class BackProject_Reduction : Inherits VBparent
+    Dim basics As Reduction_Basics
+    Dim hist As BackProject_Basics
+    Public Sub New()
+        basics = New Reduction_Basics()
+        findRadio("Use bitwise reduction").Checked = True
+        hist = New BackProject_Basics
+
+        label2 = "Backprojection of highlighted histogram bin"
+        task.desc = "Use the histogram of a reduced RGB image to isolate featureless portions of an image."
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        Static reductionSlider = findSlider("Reduction factor")
+
+        basics.Run(src)
+
+        hist.Run(basics.dst1)
+        dst1 = hist.dst1.Clone
+        dst2 = basics.dst1
+        label1 = "Reduction = " + CStr(reductionSlider.value) + " and bins = " + CStr(task.histogramBins)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class BackProject_ReductionLines : Inherits VBparent
+    Dim reduce As Reduction_Basics
+    Dim lines As Line_Basics
+    Public Sub New()
+        lines = New Line_Basics
+        reduce = New Reduction_Basics()
+        findRadio("Use bitwise reduction").Checked = True
+
+        label2 = "Backprojection of highlighted histogram bin"
+        task.desc = "Use the histogram of a reduced RGB image to isolate featureless portions of an image."
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        Static reductionSlider = findSlider("Reduction factor")
+
+        reduce.Run(src)
+        dst1 = reduce.dst1
+
+        lines.Run(dst1)
+
+        dst2 = src
+        For i = 0 To lines.sortlines.Count - 1
+            Dim v = lines.sortlines.ElementAt(i).Value
+            Dim pt1 = New cv.Point(v.Item0, v.Item1)
+            Dim pt2 = New cv.Point(v.Item2, v.Item3)
+            dst2.Line(pt1, pt2, cv.Scalar.Yellow, task.lineSize, task.lineType)
+        Next
+        label2 = CStr(lines.sortlines.Count) + " lines were found"
+
+        label1 = "Reduction = " + CStr(reductionSlider.value) + " and bins = " + CStr(task.histogramBins)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class BackProject_FullLines : Inherits VBparent
+    Dim hist As BackProject_Full
+    Dim lines As Line_Basics
+    Public Sub New()
+        hist = New BackProject_Full
+        lines = New Line_Basics
+        task.desc = "Find lines in the back projection"
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        hist.Run(src)
+        dst1 = hist.dst1
+        lines.Run(hist.dst2)
+        dst2 = src
+        For i = 0 To lines.sortlines.Count - 1
+            Dim v = lines.sortlines.ElementAt(i).Value
+            Dim pt1 = New cv.Point(v.Item0, v.Item1)
+            Dim pt2 = New cv.Point(v.Item2, v.Item3)
+            dst2.Line(pt1, pt2, cv.Scalar.Yellow, task.lineSize, task.lineType)
+        Next
+        label2 = CStr(lines.sortlines.Count) + " lines were found"
     End Sub
 End Class

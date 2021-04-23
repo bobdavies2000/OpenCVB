@@ -11,7 +11,7 @@ Public Class Line_Basics : Inherits VBparent
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Line thickness", 1, 20, 2)
-            sliders.setupTrackBar(1, "Line length threshold in pixels", 1, dst1.Width + dst1.Height, 50)
+            sliders.setupTrackBar(1, "Line length threshold in pixels", 1, dst1.Width + dst1.Height, 40)
             sliders.setupTrackBar(2, "Depth search radius in pixels", 1, 20, 2) ' not used in Run below but externally...
             sliders.setupTrackBar(3, "x- and y-intercept search range in pixels", 1, 50, 10) ' not used in Run below but externally...
         End If
