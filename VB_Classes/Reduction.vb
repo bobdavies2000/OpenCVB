@@ -13,7 +13,7 @@ Public Class Reduction_Basics : Inherits VBparent
             radio.check(0).Text = "Use simple reduction"
             radio.check(1).Text = "Use bitwise reduction"
             radio.check(2).Text = "No reduction"
-            radio.check(1).Checked = True
+            radio.check(0).Checked = True
         End If
 
         task.desc = "Reduction: a simpler way to KMeans by reducing color resolution"
@@ -41,10 +41,8 @@ Public Class Reduction_Basics : Inherits VBparent
             dst1 = src
             label1 = "No reduction requested"
         End If
-        If standalone Or task.intermediateReview = caller Then
-            task.palette.Run(dst1)
-            dst2 = task.palette.dst1
-        End If
+        task.palette.Run(dst1)
+        dst2 = task.palette.dst1
     End Sub
 End Class
 

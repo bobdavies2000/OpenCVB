@@ -71,9 +71,9 @@ Public Class Watershed_DepthReduction : Inherits VBparent
     End Sub
     Public Sub Run(src as cv.Mat)
         reduction.Run(task.RGBDepth)
-        dst2 = reduction.dst1
+        dst2 = reduction.dst2
 
-        watershed.Run(reduction.dst1)
+        watershed.Run(dst2)
         dst1 = watershed.dst1
         label1 = watershed.label1
     End Sub
