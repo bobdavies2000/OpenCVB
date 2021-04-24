@@ -184,12 +184,11 @@ End Class
 
 
 Public Class Smoothing_Contours : Inherits VBparent
-	Dim outline As Blob_Largest
+	Dim outline As New Blob_Largest
 	Dim smoothE As Smoothing_Exterior
 	Dim smoothI As Smoothing_Interior
 	Dim smOptions As Smoothing_Options
 	Public Sub New()
-		outline = New Blob_Largest
 		smoothE = New Smoothing_Exterior
 		smoothI = New Smoothing_Interior
 		smoothE.plotColor = cv.Scalar.Blue

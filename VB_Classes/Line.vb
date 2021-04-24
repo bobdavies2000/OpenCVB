@@ -676,9 +676,8 @@ End Class
 
 Public Class Line_SideView : Inherits VBparent
     Dim lines As New Line_Basics
-    Dim tView As TimeView_FloodFill
+    Dim tView As New TimeView_FloodFill
     Public Sub New()
-        tView = New TimeView_FloodFill
         label1 = "Side view of the lines detected in the RGB image"
         label2 = "Lines found in the RGB image view"
         task.desc = "Line in image are projected into the depth image"

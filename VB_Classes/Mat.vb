@@ -426,10 +426,9 @@ End Class
 
 
 Public Class Mat_4Click : Inherits VBparent
-    Dim mats As Mat_4to1
+    Dim mats As New Mat_4to1
     Public mat() As cv.Mat
     Public Sub New()
-        mats = New Mat_4to1
         mat = mats.mat
 
         label2 = "Click a quadrant in dst1 to view it in dst2"

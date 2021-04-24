@@ -63,10 +63,8 @@ End Class
 
 
 Public Class DilateErode_DepthSeed : Inherits VBparent
-    Dim dilate As DilateErode_Basics
+    Dim dilate As New DilateErode_Basics
     Public Sub New()
-        dilate = New DilateErode_Basics()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "DepthSeed flat depth", 1, 200, 100)

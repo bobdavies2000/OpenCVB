@@ -168,7 +168,7 @@ End Class
 
 
 Public Class DCT_Surfaces_debug : Inherits VBparent
-    Dim Mats As Mat_4to1
+    Dim Mats As New Mat_4to1
     Dim grid As New Thread_Grid
     Dim dct As DCT_FeatureLess
     Dim flow As New Font_FlowText
@@ -177,8 +177,6 @@ Public Class DCT_Surfaces_debug : Inherits VBparent
         findSlider("ThreadGrid Height").Value = 150
         dct = New DCT_FeatureLess()
         dct.dct.sliders.trackbar(0).Value = 1
-        Mats = New Mat_4to1()
-
         label1 = "Largest flat surface segment stats"
         label2 = "Lower right image identifies potential flat surface"
         task.desc = "Find plane equation for a featureless surface - debugging one region for now."
@@ -245,11 +243,9 @@ End Class
 
 Public Class DCT_CComponents : Inherits VBparent
     Dim dct As DCT_FeatureLess
-    Dim cc As CComp_ColorDepth
+    Dim cc As New CComp_ColorDepth
     Public Sub New()
         dct = New DCT_FeatureLess()
-        cc = New CComp_ColorDepth()
-
         label1 = "DCT masks colorized with average depth."
         label2 = "DCT mask"
         task.desc = "Find surfaces that lack texture with DCT (Discrete Cosine Transform) and use connected components to isolate those surfaces."

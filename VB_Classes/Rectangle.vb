@@ -2,9 +2,8 @@ Imports cv = OpenCvSharp
 Public Class Rectangle_Basics : Inherits VBparent
     Public rectangles As New List(Of cv.Rect)
     Public rotatedRectangles As New List(Of cv.RotatedRect)
-    Dim optDraw As Draw_Options
+    Dim optDraw As New Draw_Options
     Public Sub New()
-        optDraw = New Draw_Options
         task.desc = "Draw the requested number of rectangles."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -42,15 +41,14 @@ End Class
 
 
 Public Class Rectangle_Rotated : Inherits VBparent
-    Public rect As Rectangle_Basics
+    Public rectangle As New Rectangle_Basics
     Public Sub New()
-        rect = New Rectangle_Basics
         findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)").Checked = True
         task.desc = "Draw the requested number of rectangles."
     End Sub
     Public Sub Run(src As cv.Mat)
-        rect.Run(src)
-        dst1 = rect.dst1
+        rectangle.Run(src)
+        dst1 = rectangle.dst1
     End Sub
 End Class
 
@@ -63,9 +61,8 @@ End Class
 
 Public Class Rectangle_CComp : Inherits VBparent
     Dim ccomp As New CComp_Basics_FullImage
-    Dim rMotion As Rectangle_Motion
+    Dim rMotion As New Rectangle_Motion
     Public Sub New()
-        rMotion = New Rectangle_Motion
         label2 = "Connected component features isolated by rect's"
         task.desc = "Isolate rectanguler regions around connected components"
     End Sub
@@ -95,11 +92,9 @@ Public Class Rectangle_Overlap : Inherits VBparent
     Public rect1 As cv.Rect
     Public rect2 As cv.Rect
     Public enclosingRect As cv.Rect
-    Dim draw As Rectangle_Basics
+    Dim draw As New Rectangle_Basics
     Public Sub New()
-        draw = New Rectangle_Basics
         findSlider("DrawCount").Value = 2
-
         task.desc = "Test if 2 rectangles overlap"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -143,10 +138,9 @@ End Class
 
 Public Class Rectangle_Motion : Inherits VBparent
     Public motion As Motion_Basics
-    Public mOverlap As Rectangle_Intersection
+    Public mOverlap As New Rectangle_Intersection
     Public Sub New()
         motion = New Motion_Basics
-        mOverlap = New Rectangle_Intersection
         label1 = "Yellow is pixel motion.  Red is all pixel motion"
         task.desc = "Motion rectangles often overlap.  This algorithm consolidates those rectangles in the RGB image."
     End Sub
@@ -199,7 +193,7 @@ Public Class Rectangle_Intersection : Inherits VBparent
     Public rect1 As cv.Rect
     Public rect2 As cv.Rect
     Public inputRects As New List(Of cv.Rect)
-    Dim draw As Rectangle_Basics
+    Dim draw As New Rectangle_Basics
     Public enclosingRects As New List(Of cv.Rect)
     Dim otherRects As New List(Of cv.Rect)
     Public Sub New()
@@ -227,7 +221,6 @@ Public Class Rectangle_Intersection : Inherits VBparent
     Public Sub Run(src As cv.Mat)
         Static mergeSlider = findSlider("Merge rectangles within X pixels")
         If standalone Or task.intermediateReview = caller Then
-            If draw Is Nothing Then draw = New Rectangle_Basics
             Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             Static countSlider = findSlider("DrawCount")
 
@@ -277,7 +270,7 @@ End Class
 
 
 Public Class Rectangle_Union : Inherits VBparent
-    Dim draw As Rectangle_Basics
+    Dim draw As New Rectangle_Basics
     Public inputRects As New List(Of cv.Rect)
     Public allRect As cv.Rect ' a rectangle covering all the input
     Public Sub New()
@@ -285,8 +278,6 @@ Public Class Rectangle_Union : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat)
         If standalone Or task.intermediateReview = caller Then
-            If draw Is Nothing Then draw = New Rectangle_Basics
-
             Static countSlider = findSlider("DrawCount")
             Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             rotatedCheck.Enabled = False

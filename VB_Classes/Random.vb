@@ -436,11 +436,9 @@ End Class
 ' https://github.com/spmallick/learnopencv/tree/master/
 Public Class Random_60sTVFaster : Inherits VBparent
     Dim random As Random_UniformDist
-    Dim mats As Mat_4to1
+    Dim mats As New Mat_4to1
     Dim options As Random_60sTV
     Public Sub New()
-
-        mats = New Mat_4to1
         random = New Random_UniformDist
         options = New Random_60sTV
         label2 = "Changed pixels, add/sub mask, plusMask, minusMask"

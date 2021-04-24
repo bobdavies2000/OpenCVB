@@ -1,17 +1,14 @@
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
 Imports cv = OpenCvSharp
 Public Class Motion_Basics : Inherits VBparent
-    Dim diff As Diff_Basics
-    Dim contours As Contours_Basics
-    Public intersect As Rectangle_Intersection
+    Dim diff As New Diff_Basics
+    Dim contours As New Contours_Basics
+    Public intersect As New Rectangle_Intersection
     Public changedPixels As Integer
     Public cumulativePixels As Integer
     Public resetAll As Boolean
     Dim minSlider As Windows.Forms.TrackBar
     Public Sub New()
-        intersect = New Rectangle_Intersection
-        contours = New Contours_Basics()
-        diff = New Diff_Basics()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Single frame motion threshold", 1, 100000, If(task.color.Width = 1280, 20000, 1000)) ' used only externally...
@@ -24,7 +21,7 @@ Public Class Motion_Basics : Inherits VBparent
         label1 = "Enclosing rectangles are yellow in dst1 and dst2"
         task.desc = "Detect contours in the motion data and the resulting rectangles"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static cumulativeThreshold = findSlider("Cumulative motion threshold")
         Static pixelThreshold = findSlider("Single frame motion threshold")
 
@@ -77,18 +74,14 @@ End Class
 
 
 Public Class Motion_WithBlurDilate : Inherits VBparent
-    Dim blur As Blur_Basics
-    Dim diff As Diff_Basics
-    Dim dilate As DilateErode_Basics
-    Dim contours As Contours_Basics
+    Dim blur As New Blur_Basics
+    Dim diff As New Diff_Basics
+    Dim dilate As New DilateErode_Basics
+    Dim contours As New Contours_Basics
     Public rectList As New List(Of cv.Rect)
     Public changedPixels As Integer
     Public cumulativePixels As Integer
     Public Sub New()
-        contours = New Contours_Basics()
-        dilate = New DilateErode_Basics()
-        diff = New Diff_Basics()
-        blur = New Blur_Basics()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Frames to persist", 1, 100, 10)

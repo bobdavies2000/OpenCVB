@@ -589,12 +589,10 @@ Public Class FloodFill_FullImage : Inherits VBparent
     Dim initialMask As New cv.Mat
     Dim palette As Palette_RandomColorMap
     Public motion As Motion_Basics
-    Public mats As Mat_4Click
+    Public mats As New Mat_4Click
     Public missingSegments As cv.Mat
     Public Sub New()
-
         motion = New Motion_Basics
-        mats = New Mat_4Click
         palette = New Palette_RandomColorMap
         edges = New Edges_BinarizedSobel
 

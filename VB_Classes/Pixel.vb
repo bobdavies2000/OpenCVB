@@ -160,10 +160,8 @@ End Class
 
 ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/PixelAccess.cs
 Public Class Pixel_GetSet : Inherits VBparent
-    Dim mats As Mat_4to1
+    Dim mats As New Mat_4to1
     Public Sub New()
-        mats = New Mat_4to1()
-
         label1 = "Time to copy using get/set,Generic Index, Marshal Copy"
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."

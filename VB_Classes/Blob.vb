@@ -1,14 +1,11 @@
 Imports cv = OpenCvSharp
 ' https://stackoverflow.com/questions/14770756/opencv-simpleblobdetector-filterbyinertia-meaning
 Public Class Blob_Basics : Inherits VBparent
-    Dim options As Blob_Options
-    Dim input As Blob_Input
+    Dim options As New Blob_Options
+    Dim input As New Blob_Input
     Dim blobDetector As New CS_Classes.Blob_Basics
     Public Sub New()
-        options = New Blob_Options
         blobDetector = New CS_Classes.Blob_Basics
-        If standalone Then input = New Blob_Input()
-
         task.desc = "Isolate and list blobs with specified options"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -33,15 +30,12 @@ End Class
 
 
 Public Class Blob_Options : Inherits VBparent
-    Dim blob As Blob_Input
+    Dim blob As New Blob_Input
     Dim blobDetector As New CS_Classes.Blob_Basics
     Public blobParams = New cv.SimpleBlobDetector.Params
     Public Sub New()
         blobDetector = New CS_Classes.Blob_Basics
-        If standalone Then
-            blob = New Blob_Input()
-            blob.updateFrequency = 30
-        End If
+        If standalone Then blob.updateFrequency = 30
 
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 5)
@@ -96,14 +90,13 @@ End Class
 
 
 Public Class Blob_Input : Inherits VBparent
-    Dim rectangles As Rectangle_Rotated
+    Dim rectangles As New Rectangle_Rotated
     Dim circles As Draw_Circles
     Dim ellipses As Draw_Ellipses
     Dim poly As Draw_Polygon
-    Public Mats As Mat_4to1
+    Public Mats As New Mat_4to1
     Public updateFrequency = 30
     Public Sub New()
-        rectangles = New Rectangle_Rotated
         circles = New Draw_Circles
         ellipses = New Draw_Ellipses
         poly = New Draw_Polygon
@@ -112,7 +105,6 @@ Public Class Blob_Input : Inherits VBparent
         findSlider("Update Frequency").Value = 1
         findCheckBox("Draw filled (unchecked draw an outline)").Checked = True
 
-        Mats = New Mat_4to1()
         Mats.noLines = True
 
         label1 = "Click any quadrant below to view it on the right"
@@ -144,15 +136,13 @@ End Class
 
 
 Public Class Blob_RenderBlobs : Inherits VBparent
-    Dim input As Blob_Input
+    Dim input As New Blob_Input
     Public Sub New()
-        input = New Blob_Input()
-
         label1 = "Input blobs"
         label2 = "Largest blob, centroid in yellow"
         task.desc = "Use connected components to find blobs."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If task.frameCount Mod input.updateFrequency = 0 Then
             input.Run(src)
             dst1 = input.dst1
@@ -198,7 +188,7 @@ Public Class Blob_DepthClusters : Inherits VBparent
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
         'task.rank = 3
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         histBlobs.Run(task.noDepthMask)
         dst1 = histBlobs.dst1
         label1 = CStr(histBlobs.ranges.Count) + " Depth Clusters"
@@ -227,7 +217,7 @@ Public Class Blob_DepthPixelSampler : Inherits VBparent
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
         'task.rank = 2
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         histBlobs.Run(task.noDepthMask)
         dst1 = histBlobs.dst1
         flood.initialMask = task.noDepthMask
@@ -314,9 +304,8 @@ End Class
 
 
 Public Class Blob_Largest : Inherits VBparent
-    Public blobs As Blob_DepthRanges
+    Public blobs As New Blob_DepthRanges
     Public Sub New()
-        blobs = New Blob_DepthRanges()
         task.desc = "Gather all the blob data and display the largest."
     End Sub
     Public Sub Run(src as cv.Mat)

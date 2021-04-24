@@ -44,9 +44,8 @@ End Class
 
 Public Class GrabCut_FineTune : Inherits VBparent
     Dim basics As GrabCut_Basics
-    Dim mats As Mat_4to1
+    Dim mats as New Mat_4to1
     Public Sub New()
-        mats = New Mat_4to1
         basics = New GrabCut_Basics
 
         If findfrm(caller + " Radio Options") Is Nothing Then

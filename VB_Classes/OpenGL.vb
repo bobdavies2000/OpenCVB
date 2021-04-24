@@ -703,10 +703,9 @@ End Class
 
 
 Public Class OpenGL_ReducedSideView : Inherits VBparent
-    Dim reduced As PointCloud_ReducedSideView
+    Dim reduced As New PointCloud_ReducedSideView
     Dim ogl As OpenGL_Callbacks
     Public Sub New()
-        reduced = New PointCloud_ReducedSideView
         ogl = New OpenGL_Callbacks
         task.desc = "Use the reduced depth pointcloud in 3D but allow it to be rotated in Options_Common"
     End Sub

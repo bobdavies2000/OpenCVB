@@ -131,13 +131,12 @@ End Class
 
 Public Class LeftRightView_BRISK : Inherits VBparent
     Dim lrView As LeftRightView_Basics
-    Dim brisk As BRISK_Basics
+    Dim brisk As New BRISK_Basics
     Public Sub New()
         task.desc = "Add color to the 8-bit infrared images."
         label1 = "Infrared Left Image"
         label2 = "Infrared Right Image"
 
-        brisk = New BRISK_Basics()
         brisk.sliders.trackbar(0).Value = 20
 
         lrView = New LeftRightView_Basics()

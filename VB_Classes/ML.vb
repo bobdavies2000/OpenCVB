@@ -117,11 +117,9 @@ End Class
 Public Class ML_DepthFromColor_MT : Inherits VBparent
     Dim colorizer As Depth_Colorizer_CPP
     Dim grid As New Thread_Grid
-    Dim dilate As DilateErode_Basics
+    Dim dilate As New DilateErode_Basics
     Public Sub New()
         colorizer = New Depth_Colorizer_CPP()
-
-        dilate = New DilateErode_Basics()
         dilate.sliders.trackbar(1).Value = 2
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -135,7 +133,7 @@ Public Class ML_DepthFromColor_MT : Inherits VBparent
         label2 = "Mask of color and depth input"
         task.desc = "Use RGB, X, and Y to predict depth across the entire image, maxDepth = slider value."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         grid.Run(Nothing)
 
         Dim mask = task.depth32f.Threshold(sliders.trackbar(0).Value, sliders.trackbar(0).Value, cv.ThresholdTypes.Binary).ConvertScaleAbs()
@@ -177,13 +175,11 @@ End Class
 
 Public Class ML_DepthFromColor : Inherits VBparent
     Dim colorizer As Depth_Colorizer_CPP
-    Dim mats As Mat_4to1
+    Dim mats As New Mat_4to1
     Dim shadow As Depth_Holes
     Dim resized As Resize_Percentage
     Public Sub New()
         colorizer = New Depth_Colorizer_CPP()
-
-        mats = New Mat_4to1()
 
         shadow = New Depth_Holes()
 
@@ -197,7 +193,7 @@ Public Class ML_DepthFromColor : Inherits VBparent
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         shadow.Run(src)
         mats.mat(1) = shadow.holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -252,14 +248,12 @@ End Class
 
 
 Public Class ML_DepthFromXYColor : Inherits VBparent
-    Dim mats As Mat_4to1
+    Dim mats As New Mat_4to1
     Dim shadow As Depth_Holes
     Dim resized As Resize_Percentage
     Dim colorizer As Depth_Colorizer_CPP
     Public Sub New()
         colorizer = New Depth_Colorizer_CPP()
-
-        mats = New Mat_4to1()
 
         shadow = New Depth_Holes()
 
@@ -273,7 +267,7 @@ Public Class ML_DepthFromXYColor : Inherits VBparent
         label1 = "Predicted Depth"
         task.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         shadow.Run(src)
         mats.mat(0) = shadow.holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -346,11 +340,9 @@ End Class
 Public Class ML_EdgeDepth_MT : Inherits VBparent
     Dim colorizer As Depth_Colorizer_CPP
     Dim grid As New Thread_Grid
-    Dim dilate As DilateErode_Basics
+    Dim dilate As New DilateErode_Basics
     Public Sub New()
         colorizer = New Depth_Colorizer_CPP()
-
-        dilate = New DilateErode_Basics()
         dilate.sliders.trackbar(1).Value = 5
 
         If findfrm(caller + " Slider Options") Is Nothing Then

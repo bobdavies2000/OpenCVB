@@ -36,9 +36,8 @@ End Class
 Public Class Edges_DepthAndColor : Inherits VBparent
     Dim shadow As Depth_Holes
     Dim canny As New Edges_Basics
-    Dim dilate As DilateErode_Basics
+    Dim dilate As New DilateErode_Basics
     Public Sub New()
-        dilate = New DilateErode_Basics()
         dilate.radio.check(2).Checked = True
 
         canny.sliders.trackbar(0).Value = 100
@@ -364,14 +363,13 @@ End Class
 Public Class Edges_BinarizedCanny : Inherits VBparent
     Dim edges As New Edges_Basics
     Dim binarize As Binarize_Recurse
-    Dim mats As Mat_4Click
+    Dim mats As New Mat_4Click
     Public Sub New()
-        mats = New Mat_4Click
         binarize = New Binarize_Recurse
         label1 = "Edges between halves, lightest, darkest, and the combo"
         task.desc = "Collect edges from binarized images"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         binarize.Run(src)
 
@@ -415,7 +413,7 @@ Public Class Edges_BinarizedBrightness : Inherits VBparent
 
         task.desc = "Visualize the impact of brightness on Edges_BinarizeSobel"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         bright.Run(src)
         dst1 = bright.dst2
@@ -438,7 +436,7 @@ Public Class Edges_BinarizedReduction : Inherits VBparent
         edges = New Edges_BinarizedSobel
         task.desc = "Visualize the impact of reduction on Edges_BinarizeSobel"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         reduction.Run(src)
         dst1 = reduction.dst1
@@ -457,14 +455,13 @@ End Class
 
 Public Class Edges_Depth : Inherits VBparent
     Dim dMax As Depth_SmoothMax
-    Dim sobel As Edges_Sobel
+    Dim sobel As New Edges_Sobel
     Public Sub New()
         dMax = New Depth_SmoothMax
-        sobel = New Edges_Sobel
         findSlider("Sobel kernel Size").Value = 14
         task.desc = "Use Depth_SmoothMax to find edges in Depth"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         dMax.Run(task.depth32f)
         dst1 = dMax.dst1
@@ -492,7 +489,7 @@ Public Class Edges_FeaturesOnly : Inherits VBparent
         label2 = "dst1 with featureless areas removed."
         task.desc = "Removing the featureless regions after a binarized sobel"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         task.mouseClickFlag = False ' edges calls a mat_4clicks algorithm.
         edges.Run(src)
@@ -524,7 +521,7 @@ Public Class Edges_Consistent : Inherits VBparent
 
         task.desc = "Edges that are consistent for x number of frames"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static nFrameSlider = findSlider("Edges present n frames")
         Dim nFrames = nFrameSlider.value
 
@@ -566,7 +563,7 @@ Public Class Edges_Stdev : Inherits VBparent
         label2 = "Mask of low stdev areas"
         task.desc = "Edges where stdev is above a threshold"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         stdev.Run(src)
         edges.Run(src)
@@ -641,10 +638,9 @@ End Class
 
 Public Class Edges_SobelLR : Inherits VBparent
     Dim red As LeftRightView_Basics
-    Dim sobel As Edges_Sobel
+    Dim sobel As New Edges_Sobel
     Public Sub New()
         red = New LeftRightView_Basics()
-        sobel = New Edges_Sobel()
         sobel.sliders.trackbar(0).Value = 5
 
         task.desc = "Find the edges in the LeftViewimages."
@@ -724,9 +720,8 @@ End Class
 
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
 Public Class Edges_SobelHorizontal : Inherits VBparent
-    Dim edges As Edges_Sobel
+    Dim edges As New Edges_Sobel
     Public Sub New()
-        edges = New Edges_Sobel
         edges.horizontalOnly = True
         task.desc = "Find edges with Sobel only in the horizontal direction"
     End Sub
@@ -759,7 +754,7 @@ Public Class Edges_SobelLRBinarized : Inherits VBparent
         label2 = "Horizontal Sobel - Right View"
         task.desc = "Isolate edges in the left and right views."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         If task.mouseClickFlag Then task.mouseClickFlag = False ' preempt use of quadrants.
         red.Run(src)
@@ -792,23 +787,18 @@ End Class
 
 
 Public Class Edges_BinarizedSobel : Inherits VBparent
-    Dim edges As Edges_Sobel
+    Dim edges As New Edges_Sobel
     Dim binarize As Binarize_Recurse
-    Public mats As Mat_4Click
+    Public mats As New Mat_4Click
     Public Sub New()
-        mats = New Mat_4Click
-
         binarize = New Binarize_Recurse
-
-        edges = New Edges_Sobel
-
         findSlider("Sobel kernel Size").Value = 5
 
         label1 = "Edges between halves, lightest, darkest, and the combo"
         label2 = "Click any quadrant in dst1 to enlarge it in dst2"
         task.desc = "Collect Sobel edges from binarized images"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
 
@@ -871,7 +861,7 @@ Public Class Edges_Matching : Inherits VBparent
 
         task.desc = "Match edges in the left and right views to determine distance"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static overlayCheck = findCheckBox("Overlay thread grid")
         Static highlightCheck = findCheckBox("Highlight all grid entries above threshold")
         Static clearCheck = findCheckBox("Clear selected highlights (if Highlight all grid entries is unchecked)")
@@ -960,10 +950,8 @@ End Class
 
 
 Public Class Edges_MotionOverlay : Inherits VBparent
-    Dim diff As Diff_Basics
+    Dim diff As New Diff_Basics
     Public Sub New()
-
-        diff = New Diff_Basics
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Displacement in the X direction (in pixels)", 0, 100, 7)
@@ -973,7 +961,7 @@ Public Class Edges_MotionOverlay : Inherits VBparent
         label2 = "AbsDiff output of offset with original"
         task.desc = "Find edges by displacing the current RGB image in any direction and diff it with the original."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static xSlider = findSlider("Displacement in the X direction (in pixels)")
         Static ySlider = findSlider("Displacement in the Y direction (in pixels)")
         Dim xDisp = xSlider.value
@@ -1002,9 +990,8 @@ End Class
 
 ' https://scikit-image.org/docs/dev/auto_examples/color_exposure/plot_adapt_rgb.html#sphx-glr-auto-examples-color-exposure-plot-adapt-rgb-py
 Public Class Edges_RGB : Inherits VBparent
-    Dim sobel As Edges_Sobel
+    Dim sobel As New Edges_Sobel
     Public Sub New()
-        sobel = New Edges_Sobel
         findCheckBox("Threshold Sobel Results").Checked = False
         task.desc = "Combine the edges from all 3 channels.  Painterly"
     End Sub

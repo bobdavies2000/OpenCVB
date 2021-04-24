@@ -542,10 +542,9 @@ Public Class PointCloud_Kalman_SideView : Inherits VBparent
     Public flood As Floodfill_Identifiers
     Public sideView As Histogram_SideView2D
     Public pTrack As KNN_PointTracker
-    Public setupSide As PointCloud_SetupSide
+    Public setupSide As New PointCloud_SetupSide
     Public Sub New()
         pTrack = New KNN_PointTracker
-        setupSide = New PointCloud_SetupSide
         flood = New Floodfill_Identifiers
 
         findSlider("FloodFill Minimum Size").Value = 100
@@ -584,11 +583,9 @@ End Class
 
 
 Public Class PointCloud_BackProject : Inherits VBparent
-    Dim both As PointCloud_BothViews
-    Dim mats As Mat_4to1
+    Dim both As New PointCloud_BothViews
+    Dim mats As New Mat_4to1
     Public Sub New()
-        both = New PointCloud_BothViews()
-        mats = New Mat_4to1()
         label1 = "Click any quadrant below to enlarge it"
         label2 = "Click any centroid to display details"
         task.desc = "Backproject the selected object"
@@ -624,9 +621,8 @@ End Class
 Public Class PointCloud_FrustrumTop : Inherits VBparent
     Dim frustrum As Draw_Frustrum
     Dim topView As Histogram_TopView2D
-    Dim setupTop As PointCloud_SetupTop
+    Dim setupTop As New PointCloud_SetupTop
     Public Sub New()
-        setupTop = New PointCloud_SetupTop
         frustrum = New Draw_Frustrum
         topView = New Histogram_TopView2D
 
@@ -657,9 +653,8 @@ End Class
 Public Class PointCloud_FrustrumSide : Inherits VBparent
     Dim frustrum As Draw_Frustrum
     Dim sideView As Histogram_SideView2D
-    Dim setupSide As PointCloud_SetupSide
+    Dim setupSide As New PointCloud_SetupSide
     Public Sub New()
-        setupSide = New PointCloud_SetupSide
         frustrum = New Draw_Frustrum
         sideView = New Histogram_SideView2D
 
@@ -759,14 +754,11 @@ End Class
 
 
 Public Class PointCloud_ObjectsTop : Inherits VBparent
-    Public measureTop As PointCloud_Kalman_TopView
+    Public measureTop As New PointCloud_Kalman_TopView
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Dim setupTop As PointCloud_SetupTop
+    Dim setupTop As New PointCloud_SetupTop
     Public colorizeNeeded As Boolean
     Public Sub New()
-        setupTop = New PointCloud_SetupTop
-        measureTop = New PointCloud_Kalman_TopView
-
         If standalone Then
             If findfrm(caller + " Slider Options") Is Nothing Then
                 sliders.Setup(caller, 1)
@@ -868,13 +860,10 @@ End Class
 
 
 Public Class PointCloud_ObjectsSide : Inherits VBparent
-    Public measureSide As PointCloud_Kalman_SideView
+    Public measureSide As New PointCloud_Kalman_SideView
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Dim setupSide As PointCloud_SetupSide
+    Dim setupSide As New PointCloud_SetupSide
     Public Sub New()
-        setupSide = New PointCloud_SetupSide
-        measureSide = New PointCloud_Kalman_SideView
-
         If standalone Then
             If findfrm(caller + " Slider Options") Is Nothing Then
                 sliders.Setup(caller)
@@ -980,21 +969,16 @@ End Class
 
 
 Public Class PointCloud_BothViews : Inherits VBparent
-    Public topPixel As PointCloud_ObjectsTop
-    Public sidePixel As PointCloud_ObjectsSide
+    Public topPixel As New PointCloud_ObjectsTop
+    Public sidePixel As New PointCloud_ObjectsSide
     Public detailText As String
     Public backMat As New cv.Mat
     Public backMatMask As New cv.Mat
     Public vwTop As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Public vwSide As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Dim setupSide As PointCloud_SetupSide
-    Dim setupTop As PointCloud_SetupTop
+    Dim setupSide As New PointCloud_SetupSide
+    Dim setupTop As New PointCloud_SetupTop
     Public Sub New()
-        topPixel = New PointCloud_ObjectsTop
-        sidePixel = New PointCloud_ObjectsSide
-        setupSide = New PointCloud_SetupSide
-        setupTop = New PointCloud_SetupTop
-
         backMat = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC3)
         backMatMask = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
 
@@ -1105,9 +1089,8 @@ End Class
 
 
 Public Class PointCloud_BackProjectTopView : Inherits VBparent
-    Dim view As PointCloud_ObjectsTop
+    Dim view As New PointCloud_ObjectsTop
     Public Sub New()
-        view = New PointCloud_ObjectsTop
         view.colorizeNeeded = True
 
         label1 = "Back projection of objects identified in the top view"
@@ -1165,11 +1148,9 @@ End Class
 
 
 Public Class PointCloud_BackProjectSideView : Inherits VBparent
-    Dim view As PointCloud_ObjectsSide
-    Dim setupSide As PointCloud_SetupSide
+    Dim view As New PointCloud_ObjectsSide
+    Dim setupSide As New PointCloud_SetupSide
     Public Sub New()
-        view = New PointCloud_ObjectsSide
-        setupSide = New PointCloud_SetupSide
         task.desc = "Display only the side view of the depth data - with and without the IMU active"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -1257,9 +1238,8 @@ End Class
 
 Public Class PointCloud_SingletonRegions : Inherits VBparent
     Public topView As Histogram_TopView2D
-    Dim dilate As DilateErode_Basics
+    Dim dilate As New DilateErode_Basics
     Public Sub New()
-        dilate = New DilateErode_Basics
         topView = New Histogram_TopView2D
         topView.resizeHistOutput = False
         task.hist3DThreshold = 1

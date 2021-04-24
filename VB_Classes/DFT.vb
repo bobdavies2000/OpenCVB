@@ -16,7 +16,7 @@ End Module
 
 ' http://stackoverflow.com/questions/19761526/how-to-do-inverse-dft-in-opencv
 Public Class DFT_Basics : Inherits VBparent
-    Dim mats As Mat_4to1
+    Dim mats As New Mat_4to1
     Public magnitude As New cv.Mat
     Public spectrum As New cv.Mat
     Public complexImage As New cv.Mat
@@ -24,7 +24,6 @@ Public Class DFT_Basics : Inherits VBparent
     Public rows As integer
     Public cols As integer
     Public Sub New()
-        mats = New Mat_4to1()
         mats.noLines = True
 
         task.desc = "Explore the Discrete Fourier Transform."
@@ -225,19 +224,15 @@ Public Class DFT_Shapes : Inherits VBparent
     Dim circle As Draw_Circles
     Dim ellipse As Draw_Ellipses
     Dim polygon As Draw_Polygon
-    Dim rectangle As Rectangle_Basics
+    Dim rectangle As New Rectangle_Basics
     Dim lines As Draw_Line
     Dim symShapes As Draw_SymmetricalShapes
-    Dim optDraw As Draw_Options
+    Dim optDraw As New Draw_Options
     Public Sub New()
         dft = New DFT_Basics
-
-        optDraw = New Draw_Options
-
         circle = New Draw_Circles
         ellipse = New Draw_Ellipses
         polygon = New Draw_Polygon
-        rectangle = New Rectangle_Basics
         lines = New Draw_Line
         symShapes = New Draw_SymmetricalShapes
 

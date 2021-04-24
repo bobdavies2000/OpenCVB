@@ -2,13 +2,11 @@ Imports cv = OpenCvSharp
 Public Class TimeView_Basics : Inherits VBparent
     Public sideView As Histogram_SideView2D
     Public topView As Histogram_TopView2D
-    Dim setupSide As PointCloud_SetupSide
-    Dim setupTop As PointCloud_SetupTop
+    Dim setupSide As New PointCloud_SetupSide
+    Dim setupTop As New PointCloud_SetupTop
     Public Sub New()
         sideView = New Histogram_SideView2D
-        setupSide = New PointCloud_SetupSide
         topView = New Histogram_TopView2D
-        setupTop = New PointCloud_SetupTop
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -18,7 +16,7 @@ Public Class TimeView_Basics : Inherits VBparent
         dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_32F, 0)
         task.desc = "TimeView that highlights concentrations of depth pixels"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static frameSlider = findSlider("Number of frames to include")
         Static sideAccum As New cv.Mat(src.Size, cv.MatType.CV_32FC1)
         Static topAccum As New cv.Mat(src.Size, cv.MatType.CV_32FC1)
@@ -69,12 +67,11 @@ End Class
 
 
 Public Class TimeView_TopBackProjection : Inherits VBparent
-    Dim tFlood As TimeView_FloodFill
+    Dim tFlood As New TimeView_FloodFill
     Public Sub New()
-        tFlood = New TimeView_FloodFill
         task.desc = "Backproject the side and top views into the image view"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         tFlood.Run(src)
         dst2 = tFlood.dst2
 
@@ -123,15 +120,14 @@ End Class
 Public Class TimeView_FloodFill : Inherits VBparent
     Public floodSide As FloodFill_Basics
     Public floodTop As FloodFill_Basics
-    Public tBasics As TimeView_Basics
+    Public tBasics As New TimeView_Basics
     Public Sub New()
         floodSide = New FloodFill_Basics
         floodTop = New FloodFill_Basics
         findSlider("FloodFill Minimum Size").Value = 10
-        tBasics = New TimeView_Basics
         task.desc = "FloodFill the histograms of side and top views - TimeView_Basics"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         tBasics.Run(src)
 
@@ -154,18 +150,17 @@ End Class
 
 Public Class TimeView_Centroids : Inherits VBparent
     Public knn As KNN_BasicsQT
-    Dim tflood As TimeView_FloodFill
+    Dim tflood As New TimeView_FloodFill
     Public queryPoints As New List(Of cv.Point2f)
     Public responses As New List(Of cv.Point2f)
     Public Sub New()
-        tflood = New TimeView_FloodFill
         knn = New KNN_BasicsQT
 
         label1 = "Top view with centroids in yellow"
         label2 = "Side view with centroids in yellow"
         task.desc = "Use KNN to track the query points"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         tflood.Run(src)
         dst1 = tflood.dst2
         dst2 = tflood.dst1
@@ -203,17 +198,14 @@ End Class
 
 
 Public Class TimeView_Rectangles : Inherits VBparent
-    Dim mOverLap As Rectangle_MultiOverlap
-    Public tflood As TimeView_FloodFill
+    Dim mOverLap As New Rectangle_MultiOverlap
+    Public tflood As New TimeView_FloodFill
     Public Sub New()
-        mOverLap = New Rectangle_MultiOverlap
-        tflood = New TimeView_FloodFill
-
         label1 = "Top view with rectangles in yellow"
         label2 = "Side view with rectangles in yellow"
         task.desc = "Use KNN to track the query points"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         tflood.Run(src)
         dst1 = tflood.dst2
         dst2 = tflood.dst1
@@ -242,15 +234,11 @@ End Class
 
 
 Public Class TimeView_Frustrum : Inherits VBparent
-    Dim tView As TimeView_Rectangles
-    Dim setupSide As PointCloud_SetupSide
-    Dim setupTop As PointCloud_SetupTop
-    Dim mats As Mat_4Click
+    Dim tView As New TimeView_Rectangles
+    Dim setupSide As New PointCloud_SetupSide
+    Dim setupTop As New PointCloud_SetupTop
+    Dim mats As New Mat_4Click
     Public Sub New()
-        mats = New Mat_4Click
-        setupSide = New PointCloud_SetupSide
-        setupTop = New PointCloud_SetupTop
-        tView = New TimeView_Rectangles
         label2 = "Click a quadrant in dst1 to show it in dst2 "
         task.desc = "Colorize the back and side views"
     End Sub

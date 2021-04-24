@@ -244,12 +244,10 @@ End Class
 
 
 Public Class Histogram_2D_XZ_YZ : Inherits VBparent
-    Dim xyz As Mat_ImageXYZ_MT
+    Dim xyz As New Mat_ImageXYZ_MT
     Dim minSlider As Windows.Forms.TrackBar
     Dim maxSlider As Windows.Forms.TrackBar
     Public Sub New()
-        xyz = New Mat_ImageXYZ_MT
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Histogram X bins", 1, dst1.Cols, 30)
@@ -385,10 +383,8 @@ End Class
 
 Public Class Histogram_ColorsAndGray : Inherits VBparent
     Dim histogram As New Histogram_Basics
-    Dim mats As Mat_4to1
+    Dim mats As New Mat_4to1
     Public Sub New()
-        mats = New Mat_4to1()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
@@ -436,10 +432,9 @@ End Class
 
 Public Class Histogram_SmoothTopView2D : Inherits VBparent
     Public topView As Histogram_TopView2D
-    Dim setupTop As PointCloud_SetupTop
+    Dim setupTop As New PointCloud_SetupTop
     Dim stable As New Motion_MinMaxPointCloud
     Public Sub New()
-        setupTop = New PointCloud_SetupTop
         topView = New Histogram_TopView2D
         label1 = "XZ (Top View)"
         task.desc = "Create a 2D top view with stable depth data."
@@ -471,10 +466,9 @@ End Class
 
 Public Class Histogram_SmoothSideView2D : Inherits VBparent
     Public sideView As Histogram_SideView2D
-    Dim setupSide As PointCloud_SetupSide
+    Dim setupSide As New PointCloud_SetupSide
     Dim stable As New Motion_MinMaxPointCloud
     Public Sub New()
-        setupSide = New PointCloud_SetupSide
         sideView = New Histogram_SideView2D
         label1 = "ZY (Side View)"
         task.desc = "Create a 2D side view of stable depth data"
@@ -536,10 +530,9 @@ Public Class Histogram_TopView2D : Inherits VBparent
     Public histOutput As New cv.Mat
     Public originalHistOutput As New cv.Mat
     Public markers(2 - 1) As cv.Point2f
-    Public setupTop As PointCloud_SetupTop
+    Public setupTop As New PointCloud_SetupTop
     Public resizeHistOutput As Boolean = True
     Public Sub New()
-        setupTop = New PointCloud_SetupTop
         gCloud = New Depth_PointCloud_IMU
 
         label1 = "XZ (Top View)"
@@ -576,11 +569,10 @@ Public Class Histogram_SideView2D : Inherits VBparent
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Public originalHistOutput As New cv.Mat
-    Public setupSide As PointCloud_SetupSide
+    Public setupSide As New PointCloud_SetupSide
     Public frustrumAdjust As Single
     Public resizeHistOutput As Boolean = True
     Public Sub New()
-        setupSide = New PointCloud_SetupSide
         gCloud = New Depth_PointCloud_IMU
 
         label1 = "ZY (Side View)"
@@ -878,10 +870,8 @@ Public Class Histogram_Frustrum : Inherits VBparent
     Dim topFrustrumSlider As Windows.Forms.TrackBar
     Dim cameraXSlider As Windows.Forms.TrackBar
     Dim cameraYSlider As Windows.Forms.TrackBar
-    Dim tView As TimeView_Basics
+    Dim tView As New TimeView_Basics
     Public Sub New()
-        tView = New TimeView_Basics
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 200, 57)
@@ -1218,10 +1208,9 @@ End Class
 
 
 Public Class Histogram_PeaksRGB : Inherits VBparent
-    Public mats As Mat_4Click
+    Public mats As New Mat_4Click
     Dim peaks As Histogram_Peaks
     Public Sub New()
-        mats = New Mat_4Click
         peaks = New Histogram_Peaks
         task.desc = "Find the peaks and valleys for each of the RGB channels."
     End Sub
@@ -1248,12 +1237,10 @@ End Class
 
 Public Class Histogram_PeakEdges : Inherits VBparent
     Dim peaks As Histogram_PeaksRGB
-    Dim edges As Edges_Sobel
-    Public mats As Mat_4to1
+    Dim edges As New Edges_Sobel
+    Public mats As New Mat_4to1
     Public Sub New()
-        mats = New Mat_4to1
         peaks = New Histogram_PeaksRGB
-        edges = New Edges_Sobel
         task.desc = "Find edges that are common to all channels - red, green and blue."
     End Sub
     Public Sub Run(src As cv.Mat)

@@ -141,12 +141,10 @@ Public Class Reduction_Lines : Inherits VBparent
     Dim sideView As Histogram_SideView2D
     Dim topView As Histogram_TopView2D
     Public lDetect As New Line_Basics
-    Public setupSide As PointCloud_SetupSide
-    Public setupTop As PointCloud_SetupTop
+    Public setupSide As New PointCloud_SetupSide
+    Public setupTop As New PointCloud_SetupTop
     Dim reduction As Reduction_PointCloud
     Public Sub New()
-        setupSide = New PointCloud_SetupSide
-        setupTop = New PointCloud_SetupTop
         sideView = New Histogram_SideView2D()
         topView = New Histogram_TopView2D()
         reduction = New Reduction_PointCloud

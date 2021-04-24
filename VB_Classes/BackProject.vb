@@ -235,11 +235,10 @@ End Class
 Public Class BackProject_2DHSV : Inherits VBparent
     Dim hueSat As PhotoShop_Hue
     Dim hist2d As BackProject_2D
-    Dim mats As Mat_4to1
+    Dim mats As New Mat_4to1
     Public Sub New()
         hueSat = New PhotoShop_Hue()
         hist2d = New BackProject_2D()
-        mats = New Mat_4to1()
         label1 = "Click any quadrant to enlarge it."
         task.desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
     End Sub

@@ -463,11 +463,10 @@ End Class
 
 
 Public Class KNN_DepthClusters : Inherits VBparent
-    Public blobs As Blob_DepthClusters
+    Public blobs As New Blob_DepthClusters
     Public flood As New FloodFill_Palette
     Public pTrack As KNN_PointTracker
     Public Sub New()
-        blobs = New Blob_DepthClusters
         pTrack = New KNN_PointTracker
         label1 = "Output of Blob_DepthClusters"
         label2 = "Same output after KNN_PointTracker"
@@ -808,7 +807,7 @@ End Structure
 Public Class KNN_PointTracker : Inherits VBparent
     Public knn As KNN_1_to_1
     Dim newCentroids As New List(Of cv.Point2f)
-    Dim topView As PointCloud_Kalman_TopView
+    Dim topView As New PointCloud_Kalman_TopView
     Public kalman As New List(Of Kalman_Stripped)
     Public kalmanOptions As New Kalman_Basics
     Public queryPoints As New List(Of cv.Point2f)
@@ -817,7 +816,6 @@ Public Class KNN_PointTracker : Inherits VBparent
     Public floodPoints As New List(Of cv.Point)
     Public drawRC As Draw_ViewObjects
     Public Sub New()
-        If standalone Then topView = New PointCloud_Kalman_TopView()
         drawRC = New Draw_ViewObjects
         knn = New KNN_1_to_1
         allocateKalman(16) ' allocate some kalman objects
@@ -845,7 +843,6 @@ Public Class KNN_PointTracker : Inherits VBparent
         Static pixelSlider = findSlider("Minimum size of object in pixels")
         Static drawRCCheck = findCheckBox("Caller will handle any drawing required")
         If standalone Or task.intermediateReview = caller Then
-            If topView Is Nothing Then topView = New PointCloud_Kalman_TopView()
             topView.Run(task.pointCloud)
             dst1 = topView.dst1
             Exit Sub

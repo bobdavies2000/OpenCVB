@@ -3,10 +3,9 @@ Imports System.IO
 Imports System.Net
 Imports System.Threading
 Public Class Dlib_Sobel_CS : Inherits VBparent
-    Dim d2Mat As Mat_Dlib2Mat
+    Dim d2Mat as New Mat_Dlib2Mat
     Dim sobel As New CS_Classes.Dlib_EdgesSobel
     Public Sub New()
-        d2Mat = New Mat_Dlib2Mat
         task.desc = "Testing the DLib interface with a simple Sobel example"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -29,9 +28,8 @@ End Class
 
 Public Class Dlib_GaussianBlur_CS : Inherits VBparent
     Dim blur As New CS_Classes.Dlib_GaussianBlur
-    Dim d2Mat As Mat_Dlib2Mat
+    Dim d2Mat as New Mat_Dlib2Mat
     Public Sub New()
-        d2Mat = New Mat_Dlib2Mat
         label1 = "Gaussian Blur of grayscale image"
         label2 = "Gaussian Blur of BGR image"
         task.desc = "Use DlibDotNet to blur an image"
@@ -61,11 +59,9 @@ End Class
 
 Public Class Dlib_FaceDetectHOG_CS : Inherits VBparent
     Dim faces As New CS_Classes.Dlib_FaceDetectHOG
-    Dim d2Mat As Mat_Dlib2Mat
+    Dim d2Mat as New Mat_Dlib2Mat
     Public Sub New()
-
         faces.initialize()
-        d2Mat = New Mat_Dlib2Mat
         task.desc = "Use DlibDotNet to detect faces using the HOG detector"
     End Sub
     Public Sub Run(src as cv.Mat)

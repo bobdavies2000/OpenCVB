@@ -28,12 +28,11 @@ End Class
 
 Public Class Blur_Gaussian : Inherits VBparent
     Dim CS_BlurGaussian As New CS_BlurGaussian
-    Dim blur As Blur_Basics
+    Dim blur As New Blur_Basics
     Public Sub New()
-        blur = New Blur_Basics()
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = blurKernelSlider.Value
         If kernelSize > 0 Then
@@ -53,18 +52,17 @@ End Class
 
 Public Class Blur_Median_CS : Inherits VBparent
     Dim CS_BlurMedian As New CS_BlurMedian
-    Dim blur As Blur_Basics
+    Dim blur As New Blur_Basics
     Public Sub New()
-        blur = New Blur_Basics()
         task.desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = blurKernelSlider.Value
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
             CS_BlurMedian.Run(src, dst1, kernelSize)
-            If standalone or task.intermediateReview = caller Then CS_BlurMedian.Run(task.RGBDepth, dst2, kernelSize)
+            If standalone Or task.intermediateReview = caller Then CS_BlurMedian.Run(task.RGBDepth, dst2, kernelSize)
         Else
             dst1 = src
         End If
@@ -77,18 +75,17 @@ End Class
 
 
 Public Class Blur_Homogeneous : Inherits VBparent
-    Dim blur As Blur_Basics
+    Dim blur As New Blur_Basics
     Public Sub New()
-        blur = New Blur_Basics()
         task.desc = "Smooth each pixel with a kernel of 1's of different sizes."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = CDbl(blurKernelSlider.Value)
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
             dst1 = src.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
-            If standalone or task.intermediateReview = caller Then dst2 = task.RGBDepth.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
+            If standalone Or task.intermediateReview = caller Then dst2 = task.RGBDepth.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
         Else
             dst1 = src
             dst2 = task.RGBDepth
@@ -103,18 +100,17 @@ End Class
 
 
 Public Class Blur_Median : Inherits VBparent
-    Dim blur As Blur_Basics
+    Dim blur As New Blur_Basics
     Public Sub New()
-        blur = New Blur_Basics()
         task.desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = CDbl(blurKernelSlider.Value)
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
             cv.Cv2.MedianBlur(src, dst1, kernelSize)
-            If standalone or task.intermediateReview = caller Then cv.Cv2.MedianBlur(task.RGBDepth, dst2, kernelSize)
+            If standalone Or task.intermediateReview = caller Then cv.Cv2.MedianBlur(task.RGBDepth, dst2, kernelSize)
         Else
             dst1 = src
             dst2 = task.RGBDepth
@@ -129,9 +125,8 @@ End Class
 ' https://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html?highlight=bilateralfilter
 ' https://www.tutorialspoint.com/opencv/opencv_bilateral_filter.htm
 Public Class Blur_Bilateral : Inherits VBparent
-    Dim blur As Blur_Basics
+    Dim blur As New Blur_Basics
     Public Sub New()
-        blur = New Blur_Basics()
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -153,10 +148,9 @@ End Class
 
 Public Class Blur_PlusHistogram : Inherits VBparent
     Dim mat2to1 As New Mat_2to1
-    Dim blur As Blur_Bilateral
+    Dim blur As New Blur_Bilateral
     Dim myhist As Histogram_EqualizeGray
     Public Sub New()
-        blur = New Blur_Bilateral()
         myhist = New Histogram_EqualizeGray()
 
         label1 = "Use Blur slider to see impact on histogram peak values"

@@ -54,22 +54,19 @@ Public Class GeneticDrawing_Basics : Inherits VBparent
     Public generation As Integer
     Dim imgGeneration As cv.Mat
     Dim imgStage As cv.Mat
-    Public mats As Mat_4to1
+    Public mats as New Mat_4to1
     Dim brushPercent As Integer
     Dim options As GeneticDrawing_Options
     Dim stageTotal = 100
     Public gradient As Gradient_CartToPolar
     Public restartRequested As Boolean = True
     Public Sub New()
-
         options = New GeneticDrawing_Options()
 
         gradient = New Gradient_CartToPolar()
         For i = 0 To brushes.Count - 1
             brushes(i) = cv.Cv2.ImRead(task.parms.homeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg").CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Next
-
-        mats = New Mat_4to1()
 
         label1 = "(clkwise) original, imgStage, imgGeneration, magnitude"
         label2 = "Current result"

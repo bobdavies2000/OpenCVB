@@ -7,9 +7,8 @@ Public Class CComp_Basics : Inherits VBparent
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
     Public edgeMask As cv.Mat
-    Dim mats As Mat_4to1
+    Dim mats As New Mat_4to1
     Public Sub New()
-        mats = New Mat_4to1()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
@@ -44,7 +43,7 @@ Public Class CComp_Basics : Inherits VBparent
         Next
         Return count
     End Function
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static minSizeSlider = findSlider("CComp Min Area")
         Static maxSizeSlider = findSlider("CComp Max Area")
         Static thresholdSlider = findSlider("CComp threshold")
@@ -108,10 +107,9 @@ End Class
 
 
 Public Class CComp_Basics_FullImage : Inherits VBparent
-    Dim mats As Mat_4to1
+    Dim mats As New Mat_4to1
     Dim basics As New CComp_Basics
     Public Sub New()
-        mats = New Mat_4to1()
         task.desc = "Connect components in the light half of OTSU threshold output, then use the dark half, then combine results."
         label2 = "Masks binary+otsu used to compute mean depth"
     End Sub
@@ -198,12 +196,11 @@ End Class
 
 
 Public Class CComp_MaxBlobs : Inherits VBparent
-    Public tracker As CComp_PointTracker
+    Public tracker As New CComp_PointTracker
     Public maxBlobs As Integer = -1
     Public maxValues(255) As Integer ' march through all 255 values and find the best...
     Public incr = 2 ' some other algorithms change this...
     Public Sub New()
-        tracker = New CComp_PointTracker()
         Dim checkOTSU = findCheckBox("Use OTSU to binarize the image")
         checkOTSU.Checked = False ' turn off OTSU so the slider works...
 
@@ -214,7 +211,7 @@ Public Class CComp_MaxBlobs : Inherits VBparent
 
         task.desc = "Find the best CComp threshold to maximize the number of blobs"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static thresholdSlider = findSlider("CComp threshold")
         task.trueText("This algorithm will survey the different ccomp threshold options.", 10, 100, 3)
         If task.frameCount < 10 Then
@@ -257,14 +254,13 @@ End Class
 
 
 Public Class CComp_MaxPixels : Inherits VBparent
-    Dim maxBlob As CComp_MaxBlobs
+    Dim maxBlob As New CComp_MaxBlobs
     Public maxPixels As Integer = -1
     Public Sub New()
-        maxBlob = New CComp_MaxBlobs()
         maxBlob.incr = 5
         task.desc = "Find the best CComp threshold to maximize pixels"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static pixelValues(255) As Integer ' march through all 255 values and find the best...
         Static thresholdSlider = findSlider("CComp threshold")
 
@@ -297,11 +293,9 @@ End Class
 
 
 Public Class CComp_DepthEdges : Inherits VBparent
-    Dim ccomp As CComp_PointTracker
+    Dim ccomp As New CComp_PointTracker
     Dim depth As Depth_Edges
     Public Sub New()
-
-        ccomp = New CComp_PointTracker()
         depth = New Depth_Edges()
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -312,7 +306,7 @@ Public Class CComp_DepthEdges : Inherits VBparent
 
         task.desc = "Use depth edges to isolate connected components in depth"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         depth.Run(src)
         If standalone Or task.intermediateReview = caller Then dst2 = depth.dst2
 
@@ -329,18 +323,16 @@ End Class
 
 
 Public Class CComp_EdgeMask : Inherits VBparent
-    Dim ccomp As CComp_ColorDepth
+    Dim ccomp As New CComp_ColorDepth
     Dim edges As Edges_DepthAndColor
     Public Sub New()
         edges = New Edges_DepthAndColor()
-
-        ccomp = New CComp_ColorDepth()
 
         task.desc = "Isolate Color connected components after applying the Edge Mask"
         label1 = "Edges_DepthAndColor (input to ccomp)"
         label2 = "Blob Rectangles with centroids (white)"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         edges.Run(src)
         dst1 = edges.dst1
 
@@ -366,7 +358,7 @@ Public Class CComp_ColorDepth : Inherits VBparent
         label2 = "Binary image using threshold binary+Otsu"
         task.desc = "Color connected components based on their depth"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
         dst1 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -400,7 +392,7 @@ Public Class CComp_InRange_MT : Inherits VBparent
         task.desc = "Connected components in specific ranges"
         label2 = "Blob rectangles - largest to smallest"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Integer = sliders.trackbar(0).Value
@@ -453,7 +445,7 @@ Public Class CComp_InRange : Inherits VBparent
         End If
         task.desc = "Connect components in specific ranges"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim rangeCount As Integer = sliders.trackbar(0).Value
@@ -496,7 +488,7 @@ Public Class CComp_Shapes : Inherits VBparent
         label2 = "RectView, LabelView, Binary, grayscale"
         task.desc = "Use connected components to isolate objects in image."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim gray = shapes.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu + cv.ThresholdTypes.Binary)
         Dim labelview = shapes.EmptyClone()
@@ -544,7 +536,7 @@ Public Class CComp_Simple : Inherits VBparent
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         task.desc = "Draw bounding boxes around RGB binarized connected Components"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static thresholdSlider = findSlider("CComp threshold")
         Static minSizeSlider = findSlider("CComp Min Area")
         Static maxSizeSlider = findSlider("CComp Max Area")
@@ -586,9 +578,8 @@ End Class
 
 Public Class CComp_Binarized : Inherits VBparent
     Dim edges As Edges_BinarizedSobel
-    Dim ccomp As CComp_Simple
+    Dim ccomp As New CComp_Simple
     Public Sub New()
-        ccomp = New CComp_Simple
         edges = New Edges_BinarizedSobel
         task.desc = "Find connected components using an image with binarized edges"
     End Sub

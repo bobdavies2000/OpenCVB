@@ -1,13 +1,12 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Gradient_Basics : Inherits VBparent
-    Public sobel As Edges_Sobel
+    Public sobel As New Edges_Sobel
     Public Sub New()
-        sobel = New Edges_Sobel()
         label2 = "Phase Output"
         task.desc = "Use phase to compute gradient"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         sobel.Run(src)
         Dim x32f As New cv.Mat, y32f As New cv.Mat
         sobel.grayX.ConvertTo(x32f, cv.MatType.CV_32F)
@@ -21,9 +20,8 @@ End Class
 
 
 Public Class Gradient_Depth : Inherits VBparent
-    Dim sobel As Edges_Sobel
+    Dim sobel As New Edges_Sobel
     Public Sub New()
-        sobel = New Edges_Sobel()
         task.desc = "Use phase to compute gradient on depth image"
         label2 = "Phase Output"
     End Sub

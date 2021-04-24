@@ -109,7 +109,7 @@ End Class
 Public Class Annealing_CPP_MT : Inherits VBparent
     Dim random As New Random_Basics
     Dim anneal() As Annealing_Basics_CPP
-    Dim mats As Mat_4to1
+    Dim mats As New Mat_4to1
     Dim flow As New Font_FlowText
     Private Class CompareEnergy : Implements IComparer(Of Single)
         Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
@@ -141,8 +141,6 @@ Public Class Annealing_CPP_MT : Inherits VBparent
     End Sub
 
     Public Sub New()
-        mats = New Mat_4to1()
-
         ReDim anneal(Environment.ProcessorCount - 1)
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

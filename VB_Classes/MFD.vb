@@ -92,10 +92,9 @@ End Class
 
 Public Class MFD_Sobel : Inherits VBparent
     Dim mfd As MFD_Basics
-    Dim sobel As Edges_Sobel
+    Dim sobel As New Edges_Sobel
     Public Sub New()
         mfd = New MFD_Basics
-        sobel = New Edges_Sobel
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

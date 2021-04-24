@@ -267,8 +267,8 @@ OpenCVB is a WinForms application and most of the algorithms were written using
 Microsoft's managed code but C++ and Python examples are provided as well.
 Python examples don’t require a VB.Net wrapper. There are several VB.Net
 examples that demonstrate how to move images to Python and get results back into
-the OpenCVB user interface (see AddWeighted_Trackbar_PS.py as an example that is
-only a few lines of code.)
+the OpenCVB user interface (see AddWeighted_PS.py as an example that is only a
+few lines of code.)
 
 For C++, C\#, and VB.Net writing a new experiment requires a new class to be
 added in the “VB_Classes” project. OpenCVB will automatically detect the new

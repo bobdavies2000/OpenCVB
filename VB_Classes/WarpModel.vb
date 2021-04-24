@@ -106,7 +106,7 @@ End Class
 Public Class WarpModel_Input : Inherits VBparent
     Public rgb(3 - 1) As cv.Mat
     Public gradient(3 - 1) As cv.Mat
-    Dim sobel As Edges_Sobel
+    Dim sobel As New Edges_Sobel
     Public Sub New()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 12)
@@ -130,7 +130,6 @@ Public Class WarpModel_Input : Inherits VBparent
             check.Box(0).Text = "Use Gradient in WarpInput"
         End If
 
-        sobel = New Edges_Sobel()
         task.desc = "Import the misaligned input."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -239,13 +238,12 @@ End Class
 
 'Public Class WarpModel_Image : Inherits VBparent
 '    Public wbasics As WarpModel_Basics
-'    Dim sobel As Edges_Sobel
+'    Dim sobel As New Edges_Sobel
 '    Public lastFrame As cv.Mat
 '    Dim match As MatchTemplate_DrawRect
 '    Public Sub New()
 '        match = New MatchTemplate_DrawRect
 
-'        sobel = New Edges_Sobel
 '        wbasics = New WarpModel_Basics
 
 '        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)

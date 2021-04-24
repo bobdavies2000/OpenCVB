@@ -365,10 +365,9 @@ End Class
 ' https://github.com/spmallick/learnopencv/tree/master/
 Public Class PhotoShop_EmbossAll : Inherits VBparent
     Dim emboss As PhotoShop_Emboss
-    Dim mats As Mat_4to1
+    Dim mats As New Mat_4to1
     Dim sizeSlider As Windows.Forms.TrackBar
     Public Sub New()
-        mats = New Mat_4to1
         emboss = New PhotoShop_Emboss
 
         If findfrm(caller + " Slider Options") Is Nothing Then

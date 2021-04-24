@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class Contours_Basics : Inherits VBparent
-    Public rotatedRect As Rectangle_Rotated
+    Public rotatedRect As New Rectangle_Rotated
     Public retrievalMode As cv.RetrievalModes
     Public ApproximationMode As cv.ContourApproximationModes
     Public contourlist As New List(Of cv.Point())
@@ -49,7 +49,7 @@ Public Class Contours_Basics : Inherits VBparent
             End If
         Next
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static areaSlider = findSlider("Contour minimum area")
         Static epsilonSlider = findSlider("Contour epsilon (arc length percent)")
         Static dontchange As Boolean
@@ -62,7 +62,6 @@ Public Class Contours_Basics : Inherits VBparent
         End If
         If dontchange = False Then
             If standalone Or task.intermediateReview = caller Then
-                If rotatedRect Is Nothing Then rotatedRect = New Rectangle_Rotated
                 Dim imageInput As New cv.Mat
                 rotatedRect.Run(src)
                 imageInput = rotatedRect.dst1
@@ -140,7 +139,7 @@ Public Class Contours_RGB : Inherits VBparent
         task.desc = "Find and draw the contour of the largest foreground RGB contour."
         label2 = "Background"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim img = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         img.SetTo(0, task.noDepthMask)
 
@@ -190,7 +189,7 @@ Public Class Contours_RemoveLines : Inherits VBparent
         label2 = "Original with horizontal/vertical lines removed"
         task.desc = "Remove the lines from an invoice image"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim tmp = cv.Cv2.ImRead(task.parms.homeDir + "Data/invoice.jpg")
         Dim dstSize = New cv.Size(src.Height / tmp.Height * src.Width, src.Height)
         Dim dstRect = New cv.Rect(0, 0, dstSize.Width, src.Height)
@@ -231,7 +230,7 @@ Public Class Contours_Depth : Inherits VBparent
         label1 = "DepthContour input"
         label2 = "DepthContour output"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         dst1 = task.noDepthMask
         dst2.SetTo(0)
         Dim input As cv.Mat = task.depthMask
@@ -275,7 +274,7 @@ Public Class Contours_Prediction : Inherits VBparent
         label2 = "Image after smoothing with Kalman_Basics"
         task.desc = "Predict the next contour point with Kalman to smooth the outline"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         outline.Run(src)
         dst1 = outline.dst2
         dst2.SetTo(0)
@@ -306,9 +305,8 @@ End Class
 
 
 Public Class Contours_FindandDraw : Inherits VBparent
-    Dim rotatedRect As Rectangle_Rotated
+    Dim rotatedRect As New Rectangle_Rotated
     Public Sub New()
-        rotatedRect = New Rectangle_Rotated()
         findSlider("DrawCount").Value = 5
         label1 = "FindandDraw input"
         label2 = "FindandDraw output"
@@ -342,11 +340,9 @@ End Class
 
 
 Public Class Contours_Binarized : Inherits VBparent
-    Dim sobel As Edges_Sobel
-    Public basics As Contours_Basics
+    Dim sobel As New Edges_Sobel
+    Public basics As New Contours_Basics
     Public Sub New()
-        basics = New Contours_Basics
-        sobel = New Edges_Sobel
         findSlider("Sobel kernel Size").Value = 3
 
         label1 = "Sobel output of grayscale input"

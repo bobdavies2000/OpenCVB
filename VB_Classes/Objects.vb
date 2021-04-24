@@ -1,10 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Object_Basics : Inherits VBparent
-    Dim ccomp As CComp_ColorDepth
+    Dim ccomp As New CComp_ColorDepth
     Public Sub New()
-
-        ccomp = New CComp_ColorDepth()
-
         label1 = "Connected components for objects in the foreground - tracker algorithm"
         label2 = "Mask for background"
         task.desc = "Identify objects in the foreground."

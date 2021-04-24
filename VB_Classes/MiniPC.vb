@@ -92,7 +92,7 @@ End Class
 
 Public Class MiniPC_RotateAngle : Inherits VBparent
     Dim peak As MiniPC_Rotate
-    Dim mats As Mat_4to1
+    Dim mats as New Mat_4to1
     Public plot As Plot_OverTime
     Dim resetCheck As Windows.Forms.CheckBox
     Public Sub New()
@@ -104,7 +104,6 @@ Public Class MiniPC_RotateAngle : Inherits VBparent
         resetCheck = findCheckBox("Reset the plot scale")
         resetCheck.Checked = False
 
-        mats = New Mat_4to1
         peak = New MiniPC_Rotate
         peak.angleY = -45
 

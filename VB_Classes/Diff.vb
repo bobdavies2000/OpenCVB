@@ -10,7 +10,7 @@ Public Class Diff_Basics : Inherits VBparent
         label2 = "Unstable Color mask"
         task.desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static thresholdSlider = findSlider("Change threshold for each pixel")
         Dim gray = src
         If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -35,11 +35,10 @@ End Class
 
 
 Public Class Diff_UnstableDepthAndColor : Inherits VBparent
-    Public diff As Diff_Basics
+    Public diff As New Diff_Basics
     Public depth As Depth_NotMissing
     Dim lastFrames() As cv.Mat
     Public Sub New()
-        diff = New Diff_Basics()
         diff.sliders.trackbar(0).Value = 20 ' this is color threshold - low means detecting more motion.
 
         depth = New Depth_NotMissing()

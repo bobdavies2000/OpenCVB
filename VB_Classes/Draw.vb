@@ -120,9 +120,8 @@ End Class
 
 
 Public Class Draw_Ellipses : Inherits VBparent
-    Dim optDraw As Draw_Options
+    Dim optDraw As New Draw_Options
     Public Sub New()
-        optDraw = New Draw_Options
         task.desc = "Draw the requested number of ellipses."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -143,9 +142,8 @@ End Class
 
 
 Public Class Draw_Circles : Inherits VBparent
-    Dim optDraw As Draw_Options
+    Dim optDraw As New Draw_Options
     Public Sub New()
-        optDraw = New Draw_Options
         task.desc = "Draw the requested number of circles."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -165,9 +163,8 @@ End Class
 
 
 Public Class Draw_Line : Inherits VBparent
-    Dim optDraw As Draw_Options
+    Dim optDraw As New Draw_Options
     Public Sub New()
-        optDraw = New Draw_Options
         task.desc = "Draw the requested number of Lines."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -186,9 +183,8 @@ End Class
 
 
 Public Class Draw_Polygon : Inherits VBparent
-    Dim optDraw As Draw_Options
+    Dim optDraw As New Draw_Options
     Public Sub New()
-        optDraw = New Draw_Options
         task.desc = "Draw Polygon figures"
         label2 = "Convex Hull for the same polygon"
     End Sub

@@ -771,11 +771,10 @@ Public Class Depth_Smoothing : Inherits VBparent
     Dim smooth As Depth_SmoothingMat
     Dim reduction As New Reduction_Basics
     Public reducedDepth As New cv.Mat
-    Public mats As Mat_4to1
+    Public mats As New Mat_4to1
     Public colorize As Depth_ColorMap
     Public Sub New()
         colorize = New Depth_ColorMap()
-        mats = New Mat_4to1()
         findRadio("Use bitwise reduction").Checked = True
         smooth = New Depth_SmoothingMat()
 
@@ -1079,9 +1078,8 @@ End Class
 
 
 Public Class Depth_LowQualityMask : Inherits VBparent
-    Dim dilate As DilateErode_Basics
+    Dim dilate As New DilateErode_Basics
     Public Sub New()
-        dilate = New DilateErode_Basics
         findRadio("Dilate/Erode shape: Ellipse").Checked = True
 
         label2 = "Dilated zero depth - reduces flyout particles"
@@ -1157,9 +1155,8 @@ End Class
 Public Class Depth_PunchBlob : Inherits VBparent
     Dim depthDec As Depth_PunchDecreasing
     Dim depthInc As Depth_PunchDecreasing
-    Dim contours As Contours_Basics
+    Dim contours As New Contours_Basics
     Public Sub New()
-        contours = New Contours_Basics
         findSlider("Contour minimum area").Value = 5000
 
         depthInc = New Depth_PunchDecreasing
@@ -1573,9 +1570,8 @@ End Class
 
 
 Public Class Depth_Dilate : Inherits VBparent
-    Dim dilate As DilateErode_Basics
+    Dim dilate As New DilateErode_Basics
     Public Sub New()
-        dilate = New DilateErode_Basics
         task.desc = "Dilate the depth data to fill holes."
     End Sub
     Public Sub Run(src As cv.Mat)

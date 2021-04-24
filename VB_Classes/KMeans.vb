@@ -96,11 +96,9 @@ End Class
 
 
 Public Class KMeans_Clusters : Inherits VBparent
-    Dim Mats As Mat_4to1
+    Dim Mats As New Mat_4to1
     Dim km As KMeans_BasicsDepthColor
     Public Sub New()
-        Mats = New Mat_4to1()
-
         km = New KMeans_BasicsDepthColor()
 
         label1 = "kmeans - k=2,4,6,8"

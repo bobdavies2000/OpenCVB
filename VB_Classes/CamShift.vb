@@ -75,18 +75,17 @@ End Class
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class CamShift_Foreground : Inherits VBparent
-    Dim camshift As CamShift_Basics
+    Dim camshift As New CamShift_Basics
     Dim fore As Depth_Foreground
     Public Sub New()
-        camshift = New CamShift_Basics()
         fore = New Depth_Foreground()
         label1 = "Automatically finding the head - top of nearest object"
         task.desc = "Use depth to find the head and start the camshift demo.  Tracker Algorithm"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim restartRequested As Boolean
-        Static depthMin As integer
-        Static depthMax As integer
+        Static depthMin As Integer
+        Static depthMax As Integer
         If camshift.trackBox.Size.Width < 50 Then restartRequested = True
         If task.minDepth <> depthMin Then
             depthMin = task.minDepth
@@ -109,18 +108,14 @@ End Class
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class Camshift_Object : Inherits VBparent
-    Dim blob As Blob_DepthClusters
-    Dim camshift As CamShift_Basics
+    Dim blob As New Blob_DepthClusters
+    Dim camshift As New CamShift_Basics
     Public Sub New()
-        blob = New Blob_DepthClusters
-
-        camshift = New CamShift_Basics
-
         label1 = "Largest blob with hue tracked.  Draw enabled."
         label2 = "Backprojection of depth clusters masked with hue"
         task.desc = "Use the blob depth cluster as input to initialize a camshift algorithm.  Tracker Algorithm"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         blob.Run(src)
         dst2 = blob.dst2.Clone()
 
@@ -145,13 +140,10 @@ End Class
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class Camshift_TopObjects : Inherits VBparent
-    Dim blob As Blob_DepthClusters
+    Dim blob As New Blob_DepthClusters
     Dim cams(4 - 1) As CamShift_Basics
-    Dim mats As Mat_4to1
+    Dim mats As New Mat_4to1
     Public Sub New()
-        mats = New Mat_4to1
-
-        blob = New Blob_DepthClusters
         For i = 0 To cams.Length - 1
             cams(i) = New CamShift_Basics
         Next

@@ -11,10 +11,9 @@ Public Class Binarize_Basics : Inherits VBparent
     Public histogram As New cv.Mat
     Public meanScalar As cv.Scalar
     Public mask As New cv.Mat
-    Dim blur As Blur_Basics
+    Dim blur As New Blur_Basics
     Public useBlur As Boolean
     Public Sub New()
-        blur = New Blur_Basics()
         mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 255)
         task.desc = "Binarize an image using Threshold with OTSU."
     End Sub
@@ -283,10 +282,9 @@ End Class
 
 Public Class Binarize_Recurse : Inherits VBparent
     Dim binarize As Binarize_Simple
-    Public mats As Mat_4Click
+    Public mats As New Mat_4Click
     Public Sub New()
         binarize = New Binarize_Simple
-        mats = New Mat_4Click
         label1 = "Lighter half, lightest, darker half, darkest"
         task.desc = "Binarize an image twice using masks"
     End Sub
