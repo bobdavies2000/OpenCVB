@@ -339,7 +339,7 @@ Public Class ActiveTask : Implements IDisposable
         End If
 
         task.callTrace.Clear()
-        task.callTrace.Add(task.algName)
+        task.callTrace.Add(task.algName + "\")
         task.activeObjects.Clear()
         algorithmObject = algoList.createAlgorithm(task.algName)
 

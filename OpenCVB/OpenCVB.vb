@@ -630,7 +630,6 @@ Public Class OpenCVB
         TreeButton.Checked = Not TreeButton.Checked
         If TreeButton.Checked Then
             TreeViewDialog = New TreeviewForm
-            TreeViewDialog.updateTree()
             TreeViewDialog.TreeviewForm_Resize(sender, e)
             TreeViewDialog.Show()
             TreeViewDialog.BringToFront()
@@ -1304,10 +1303,7 @@ Public Class OpenCVB
             If frameCount Mod 100 = 0 Then
                 SyncLock callTraceLock
                     ' this allows for dynamic allocation of new algorithms.
-                    callTrace.Clear()
-                    For i = 0 To task.callTrace.Count - 1
-                        callTrace.Add(task.callTrace(i))
-                    Next
+                    callTrace = New List(Of String)(task.callTrace)
                 End SyncLock
             End If
             frameCount += 1

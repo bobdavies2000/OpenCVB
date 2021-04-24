@@ -516,11 +516,13 @@ Public Class PointCloud_Kalman_TopView : Inherits VBparent
         flood.Run(topView.histOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255))
 
         If flood.dst1.Channels = 3 Then src = flood.dst1 Else src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        pTrack.queryPoints = New List(Of cv.Point2f)(flood.basics.centroids)
-        pTrack.queryRects = New List(Of cv.Rect)(flood.basics.rects)
-        pTrack.queryMasks = New List(Of cv.Mat)(flood.basics.masks)
-        pTrack.Run(src)
-        dst1 = pTrack.dst1
+        If pTrack IsNot Nothing Then
+            pTrack.queryPoints = New List(Of cv.Point2f)(flood.basics.centroids)
+            pTrack.queryRects = New List(Of cv.Rect)(flood.basics.rects)
+            pTrack.queryMasks = New List(Of cv.Mat)(flood.basics.masks)
+            pTrack.Run(src)
+            dst1 = pTrack.dst1
+        End If
 
         If standalone Or task.intermediateReview = caller Then
             topView.setupTop.Run(dst1)
