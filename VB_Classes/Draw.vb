@@ -76,14 +76,11 @@ End Class
 
 
 Public Class Draw_Options : Inherits VBparent
-    Dim circles As Draw_Circles
     Public drawCount As Integer
     Public updateFrequency As Integer
     Public drawFilled As Integer
     Public drawRotated As Boolean
     Public Sub New()
-        If standalone Then circles = New Draw_Circles
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "DrawCount", 0, 20, 3)
@@ -107,10 +104,7 @@ Public Class Draw_Options : Inherits VBparent
         updateFrequency = freqSlider.value
         drawFilled = If(fillCheck.checked, -1, 2)
         drawRotated = rotateCheck.checked
-        If standalone Then
-            circles.Run(task.color)
-            dst1 = circles.dst1
-        End If
+        If standalone Then task.trueText("This algorithm is just to consolidate the options for the Draw algorithms.")
     End Sub
 End Class
 
@@ -141,6 +135,8 @@ End Class
 
 
 
+
+
 Public Class Draw_Circles : Inherits VBparent
     Dim optDraw As New Draw_Options
     Public Sub New()
@@ -162,6 +158,11 @@ End Class
 
 
 
+
+
+
+
+
 Public Class Draw_Line : Inherits VBparent
     Dim optDraw As New Draw_Options
     Public Sub New()
@@ -179,6 +180,9 @@ Public Class Draw_Line : Inherits VBparent
         Next
     End Sub
 End Class
+
+
+
 
 
 
