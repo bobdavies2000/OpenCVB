@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Text.RegularExpressions
 ' Benford's Law is pretty cool but I don't think it is a phenomenon of nature.  It is produced from bringing real world measurements to a human scale.
-' Reducing an image with compression occur because human understanding maps the data within reach of the understanding embedded in our number system.
+' Reducing an image with compression works because human understanding maps the data within reach of the understanding embedded in our number system.
 ' (Further investigation: would a base other than 10 provide the same results?)
 ' If real world measurements do not conform to Benford's Law, it is likely because the measurement is not a good one or has been manipulated.
 ' Benford's law is a good indicator that the scale for the measurement is appropriate.
@@ -15,7 +15,6 @@ Public Class Benford_Basics : Inherits VBparent
     Public expectedDistribution(10 - 1) As Single
     Public counts(expectedDistribution.Count - 1) As Single
     Dim plot As New Plot_Histogram
-    Dim benford As New Benford_NormalizedImage
     Dim addW As New AddWeighted_Basics
     Dim use99 As Boolean
     Public Sub New()
@@ -25,6 +24,7 @@ Public Class Benford_Basics : Inherits VBparent
             expectedDistribution(i) = Math.Log10(1 + 1 / i) ' get the precise expected values.
         Next
 
+        label2 = "Actual distribution of input"
         task.desc = "Build the capability to perform a Benford analysis."
     End Sub
     Public Sub setup99()
@@ -37,11 +37,9 @@ Public Class Benford_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat)
         If standalone Or task.intermediateReview = caller Then
-            benford.Run(src)
-            dst1 = benford.dst1
-            dst2 = benford.dst2
-            label2 = benford.label2
-            Exit Sub
+            dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            src = New cv.Mat(dst1.Size, cv.MatType.CV_32F)
+            dst1.ConvertTo(src, cv.MatType.CV_32F)
         End If
 
         src = src.Reshape(1, src.Width * src.Height)
@@ -84,7 +82,7 @@ Public Class Benford_Basics : Inherits VBparent
         addW.Run(dst2)
         dst1 = addW.dst1
 
-        label2 = "AddWeighted: " + CStr(addW.weightSlider.Value) + "% actual vs. " + CStr(100 - addW.weightSlider.Value) + "% Benford distribution"
+        label1 = "AddWeighted: " + CStr(addW.weightSlider.Value) + "% actual vs. " + CStr(100 - addW.weightSlider.Value) + "% Benford distribution"
     End Sub
 End Class
 

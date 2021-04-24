@@ -15,16 +15,19 @@ Public Class Edges_Basics : Inherits VBparent
         label1 = "Canny using L1 Norm"
         label2 = "Canny using L2 Norm"
     End Sub
-    Public Sub Run(src as cv.Mat)
-        Dim threshold1 As Integer = sliders.trackbar(0).Value
-        Dim threshold2 As Integer = sliders.trackbar(1).Value
-        Dim aperture = If(sliders.trackbar(2).Value Mod 2, sliders.trackbar(2).Value, sliders.trackbar(2).Value + 1)
+    Public Sub Run(src As cv.Mat)
+        Static t1Slider = findSlider("Canny threshold1")
+        Static t2Slider = findSlider("Canny threshold2")
+        Static apertureSlider = findSlider("Canny Aperture")
+        Dim threshold1 As Integer = t1Slider.value
+        Dim threshold2 As Integer = t2Slider.Value
+        Dim apTmp = apertureSlider.value
+        Dim aperture = If(apTmp Mod 2, apTmp, apTmp + 1)
 
-        Dim input = src
-        If input.Channels = 3 Then input = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        dst1 = input.Canny(threshold1, threshold2, aperture, False)
-        dst2 = input.Canny(threshold1, threshold2, aperture, True)
+        dst1 = src.Canny(threshold1, threshold2, aperture, False)
+        dst2 = src.Canny(threshold1, threshold2, aperture, True)
     End Sub
 End Class
 
