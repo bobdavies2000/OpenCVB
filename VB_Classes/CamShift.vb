@@ -76,9 +76,8 @@ End Class
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class CamShift_Foreground : Inherits VBparent
     Dim camshift As New CamShift_Basics
-    Dim fore As Depth_Foreground
+    Dim fore As New Depth_Foreground
     Public Sub New()
-        fore = New Depth_Foreground()
         label1 = "Automatically finding the head - top of nearest object"
         task.desc = "Use depth to find the head and start the camshift demo.  Tracker Algorithm"
     End Sub

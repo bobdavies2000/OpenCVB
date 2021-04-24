@@ -475,9 +475,8 @@ End Class
 
 
 Public Class Draw_Frustrum : Inherits VBparent
-    Public xyzDepth As Depth_WorldXYZ_MT
+    Public xyzDepth As New Depth_WorldXYZ_MT
     Public Sub New()
-        xyzDepth = New Depth_WorldXYZ_MT()
         xyzDepth.depthUnitsMeters = True
 
         label2 = "Frustrum's shape prepared."

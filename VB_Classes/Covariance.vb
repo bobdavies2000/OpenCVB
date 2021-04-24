@@ -41,10 +41,8 @@ End Class
 
 ' http://answers.opencv.org/question/31228/how-to-use-function-calccovarmatrix/
 Public Class Covariance_Test : Inherits VBparent
-    Dim covar As Covariance_Basics
+    Dim covar As New Covariance_Basics
     Public Sub New()
-
-        covar = New Covariance_Basics()
         task.desc = "Test the covariance basics algorithm."
     End Sub
     Public Sub Run(src as cv.Mat)

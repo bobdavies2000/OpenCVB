@@ -307,15 +307,12 @@ End Class
 
 
 Public Class Line_Vertical : Inherits VBparent
-    Dim gCloud As Depth_PointCloud_IMU
+    Dim gCloud As New Depth_PointCloud_IMU
     Public lines As Line_ConfirmedDepth
     Public thickness As Integer
     Public toleranceInMMs As Single
     Public Sub New()
-        gCloud = New Depth_PointCloud_IMU
         lines = New Line_ConfirmedDepth
-
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Error tolerance when measuring vertical lines in 3D (mm's)", 0, 300, 50)

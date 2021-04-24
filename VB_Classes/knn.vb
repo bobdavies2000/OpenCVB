@@ -561,10 +561,9 @@ End Class
 
 
 Public Class KNN_Contours : Inherits VBparent
-    Dim outline As Contours_Depth
+    Dim outline As New Contours_Depth
     Dim knn As KNN_BasicsQT
     Public Sub New()
-        outline = New Contours_Depth()
         knn = New KNN_BasicsQT()
         task.desc = "Use KNN to streamline the outline of a contour"
     End Sub

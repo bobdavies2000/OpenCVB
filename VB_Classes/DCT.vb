@@ -46,16 +46,13 @@ End Class
 
 
 Public Class DCT_RGB : Inherits VBparent
-    Public dct As DCT_Basics
+    Public dct As New DCT_Basics
     Public Sub New()
-        dct = New DCT_Basics()
-        dct.sliders.trackbar(0).Value = 1
-
         label1 = "Reconstituted RGB image"
         label2 = "Difference from original"
         task.desc = "Apply OpenCV's Discrete Cosine Transform to an RGB image and use slider to remove the highest frequencies."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim srcPlanes = src.Split()
 
         Dim dctFlag As cv.DctFlags
@@ -90,14 +87,12 @@ End Class
 
 
 Public Class DCT_Depth : Inherits VBparent
-    Public dct As DCT_Basics
+    Public dct As New DCT_Basics
     Public Sub New()
-        dct = New DCT_Basics()
-        dct.sliders.trackbar(0).Value = 1
         label2 = "Subtract DCT inverse from Grayscale depth"
         task.desc = "Find featureless surfaces in the depth data - expected to be useful only on the Kinect for Azure camera."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
@@ -120,15 +115,12 @@ End Class
 
 
 Public Class DCT_FeatureLess : Inherits VBparent
-    Public dct As DCT_Basics
+    Public dct As New DCT_Basics
     Public Sub New()
-
-        dct = New DCT_Basics()
-        dct.sliders.trackbar(0).Value = 1
         task.desc = "Find surfaces that lack any texture.  Remove just the highest frequency from the DCT to get horizontal lines through the image."
         label2 = "FeatureLess RGB regions"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         dct.Run(src)
         Dim runLenMin = dct.sliders.trackbar(1).Value
         dst1 = dct.dst1
@@ -170,18 +162,16 @@ End Class
 Public Class DCT_Surfaces_debug : Inherits VBparent
     Dim Mats As New Mat_4to1
     Dim grid As New Thread_Grid
-    Dim dct As DCT_FeatureLess
+    Dim dct As New DCT_FeatureLess
     Dim flow As New Font_FlowText
     Public Sub New()
         findSlider("ThreadGrid Width").Value = 100
         findSlider("ThreadGrid Height").Value = 150
-        dct = New DCT_FeatureLess()
-        dct.dct.sliders.trackbar(0).Value = 1
         label1 = "Largest flat surface segment stats"
         label2 = "Lower right image identifies potential flat surface"
         task.desc = "Find plane equation for a featureless surface - debugging one region for now."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         grid.Run(Nothing)
 
         Mats.mat(0) = src.Clone
@@ -242,10 +232,9 @@ End Class
 
 
 Public Class DCT_CComponents : Inherits VBparent
-    Dim dct As DCT_FeatureLess
+    Dim dct As New DCT_FeatureLess
     Dim cc As New CComp_ColorDepth
     Public Sub New()
-        dct = New DCT_FeatureLess()
         label1 = "DCT masks colorized with average depth."
         label2 = "DCT mask"
         task.desc = "Find surfaces that lack texture with DCT (Discrete Cosine Transform) and use connected components to isolate those surfaces."

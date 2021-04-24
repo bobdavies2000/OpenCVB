@@ -1,12 +1,10 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.3.1/de/dd0/grabcut_8cpp-example.html
 Public Class GrabCut_Basics : Inherits VBparent
-    Dim fgnd As Depth_Foreground
+    Dim fgnd As New Depth_Foreground
     Public fgFineTune As cv.Mat
     Public bgFineTune As cv.Mat
     Public Sub New()
-        fgnd = New Depth_Foreground
-
         label1 = "Foreground from depth data"
         label2 = "Foreground after GrabCut using mask in dst1"
         task.desc = "Use grabcut with just a foreground and background definition."

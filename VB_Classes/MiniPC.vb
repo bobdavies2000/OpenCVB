@@ -2,9 +2,8 @@ Imports cv = OpenCvSharp
 Public Class MiniPC_Basics : Inherits VBparent
     Dim resize As Resize_Percentage
     Public rect As cv.Rect
-    Dim gCloud As Depth_PointCloud_IMU
+    Dim gCloud As New Depth_PointCloud_IMU
     Public Sub New()
-        gCloud = New Depth_PointCloud_IMU()
         resize = New Resize_Percentage
         task.desc = "Create a mini point cloud for use with histograms"
     End Sub

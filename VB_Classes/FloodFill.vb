@@ -171,16 +171,13 @@ End Class
 
 Public Class FloodFill_DCT : Inherits VBparent
     Dim flood As FloodFill_Color_MT
-    Dim dct As DCT_FeatureLess
+    Dim dct As New DCT_FeatureLess
     Public Sub New()
         flood = New FloodFill_Color_MT()
-
-        dct = New DCT_FeatureLess()
         task.desc = "Find surfaces that lack any texture with DCT (highest frequency removed) and use floodfill to isolate those surfaces."
     End Sub
     Public Sub Run(src as cv.Mat)
         dct.Run(src)
-
         flood.Run(dct.dst2.Clone())
         dst1 = flood.dst1
     End Sub
@@ -729,12 +726,10 @@ Public Class FloodFill_Step : Inherits VBparent
     Public floodPoints As New List(Of cv.Point)
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Dim initialMask As New cv.Mat
-    Dim contours As Contours_Binarized
+    Dim contours As New Contours_Binarized
     Dim edgesInput As cv.Mat
     Dim contourInput As New SortedList(Of Integer, cv.Point())(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
-
-        contours = New Contours_Binarized
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "FloodFill Step Size", 1, dst1.Width / 2, 15)

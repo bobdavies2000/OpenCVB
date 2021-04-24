@@ -1,14 +1,13 @@
-Imports cv = OpenCvSharp
+Imports cv = OpenCvSharp 
 Public Class Coherent_Basics : Inherits VBparent
-    Dim flood As Coherent_FloodFill
+    Dim flood As New Coherent_FloodFill
     Dim pixel As Pixel_Sampler
     Public Sub New()
         pixel = New Pixel_Sampler
-        flood = New Coherent_FloodFill
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8UC1, 0)
         task.desc = "Segment image with same values at the same locations"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -57,7 +56,7 @@ Public Class Coherent_FloodFill : Inherits VBparent
         basics = New FloodFill_Basics
         task.desc = "Floodfill an image and make the colors consistent."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static minSlider = findSlider("FloodFill Minimum Size")
         Dim threshold = minSlider.value
 
@@ -140,9 +139,8 @@ End Class
 
 
 Public Class Coherent_Palette : Inherits VBparent
-    Public flood As Coherent_Pixel
+    Public flood As New Coherent_Pixel
     Public Sub New()
-        flood = New Coherent_Pixel
         task.desc = "Highlight a consistent 8-bit grayscale image regions with a palette"
     End Sub
     Public Sub Run(src as cv.Mat)

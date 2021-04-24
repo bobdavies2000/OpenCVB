@@ -227,9 +227,8 @@ End Class
 
 Public Class Motion_MinMaxDepthColorized : Inherits VBparent
     Dim stable As Motion_MinMaxDepth
-    Dim colorize As Depth_ColorizerFastFade_CPP
+    Dim colorize As New Depth_ColorizerFastFade_CPP
     Public Sub New()
-        colorize = New Depth_ColorizerFastFade_CPP
         stable = New Motion_MinMaxDepth
         label1 = "32-bit format stable depth data"
         label2 = "Colorized version of image at left"

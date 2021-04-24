@@ -61,7 +61,7 @@ Public Class VBparent : Implements IDisposable
         End If
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
         algorithm.Run(src)
-        If standalone Then
+        If standalone Or caller = "Python_Run" Then
             task.label1 = label1
             task.label2 = label2
             If task.intermediateReview <> "" And task.intermediateReview <> caller Then

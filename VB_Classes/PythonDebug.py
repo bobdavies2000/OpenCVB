@@ -1,41 +1,23 @@
-import pyglet
-import threading
-from PyStream import PyStreamRun
 import cv2 as cv
-import io
-import numpy as np
-from PIL import Image as im
-window = pyglet.window.Window()
+from PyStream import PyStreamRun
+
+alpha_slider_max = 100
+titleWindow = 'AddWeighted_PS.py'
+saveAlpha = 50
+    
+def on_trackbar(val):
+    global saveAlpha 
+    saveAlpha = val 
 
 def OpenCVCode(imgRGB, depth32f, frameCount):
-    global image, imageReady
-    img = cv.cvtColor(imgRGB, cv.COLOR_BGR2RGB)
-    image = pyglet.image.ImageData(imgRGB.shape[1], imgRGB.shape[0], 'RGB', img.tobytes(), pitch = -imgRGB.shape[1]*3)
-    imageReady = True
-    return imgRGB, None
+    alpha = saveAlpha / alpha_slider_max
+    beta = ( 1.0 - alpha )
+    depth_colormap = cv.applyColorMap(cv.convertScaleAbs(depth32f, alpha=0.03), cv.COLORMAP_HSV)
+    dst = cv.addWeighted(imgRGB, alpha, depth_colormap, beta, 0.0)
+    cv.imshow(titleWindow, dst)
+    return dst, None
 
-class PyStreamThread(object):
-    def __init__(self, interval=1):
-        thread = threading.Thread(target=self.run, args=())
-        thread.daemon = True                            
-        thread.start()                                  
-
-    def run(self):
-        titleWindow = 'Pyglet_Image_PS.py'
-        PyStreamRun(OpenCVCode, titleWindow)        
-
-@window.event
-def on_draw():
-    global image, imageReady
-    window.clear()
-    if imageReady: 
-        image.blit(0, 0)
-
-def update(dt):
-    pass
-
-image = None
-imageReady = False
-pyThread = PyStreamThread()
-pyglet.clock.schedule_interval(update, 1/30) # schedule 30 times per second
-pyglet.app.run()
+cv.namedWindow(titleWindow)
+cv.createTrackbar('Alpha', titleWindow , saveAlpha, alpha_slider_max, on_trackbar)
+on_trackbar(saveAlpha)
+PyStreamRun(OpenCVCode, titleWindow)

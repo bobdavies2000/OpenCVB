@@ -57,20 +57,18 @@ End Module
 
 
 Public Class ML_FillRGBDepth_MT : Inherits VBparent
-    Dim shadow As Depth_Holes
+    Dim shadow As New Depth_Holes
     Dim grid As New Thread_Grid
-    Dim colorizer As Depth_Colorizer_CPP
+    Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
-        colorizer = New Depth_Colorizer_CPP()
         findSlider("ThreadGrid Width").Value = dst1.Cols / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
         findSlider("ThreadGrid Height").Value = dst1.Rows / 4
 
-        shadow = New Depth_Holes()
         label1 = "ML filled shadow"
         label2 = ""
         task.desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         shadow.Run(src)
         grid.Run(Nothing)
         Dim minLearnCount = 5
@@ -87,23 +85,20 @@ End Class
 
 
 Public Class ML_FillRGBDepth : Inherits VBparent
-    Dim shadow As Depth_Holes
-    Dim colorizer As Depth_Colorizer_CPP
+    Dim shadow As New Depth_Holes
+    Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
-        colorizer = New Depth_Colorizer_CPP()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "ML Min Learn Count", 2, 100, 5)
         End If
 
-        shadow = New Depth_Holes()
         shadow.sliders.trackbar(0).Value = 3
 
         label2 = "ML filled shadow"
         task.desc = "Predict depth based on color and display colorized depth to confirm correctness of model."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         shadow.Run(src)
         Dim minLearnCount = sliders.trackbar(0).Value
         task.RGBDepth.CopyTo(dst1)
@@ -115,11 +110,10 @@ End Class
 
 
 Public Class ML_DepthFromColor_MT : Inherits VBparent
-    Dim colorizer As Depth_Colorizer_CPP
+    Dim colorizer As New Depth_Colorizer_CPP
     Dim grid As New Thread_Grid
     Dim dilate As New DilateErode_Basics
     Public Sub New()
-        colorizer = New Depth_Colorizer_CPP()
         dilate.sliders.trackbar(1).Value = 2
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -174,15 +168,11 @@ End Class
 
 
 Public Class ML_DepthFromColor : Inherits VBparent
-    Dim colorizer As Depth_Colorizer_CPP
+    Dim colorizer As New Depth_Colorizer_CPP
     Dim mats As New Mat_4to1
-    Dim shadow As Depth_Holes
+    Dim shadow As New Depth_Holes
     Dim resized As Resize_Percentage
     Public Sub New()
-        colorizer = New Depth_Colorizer_CPP()
-
-        shadow = New Depth_Holes()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Prediction Max Depth", 1000, 5000, 1500)
@@ -249,14 +239,10 @@ End Class
 
 Public Class ML_DepthFromXYColor : Inherits VBparent
     Dim mats As New Mat_4to1
-    Dim shadow As Depth_Holes
+    Dim shadow As New Depth_Holes
     Dim resized As Resize_Percentage
-    Dim colorizer As Depth_Colorizer_CPP
+    Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
-        colorizer = New Depth_Colorizer_CPP()
-
-        shadow = New Depth_Holes()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Prediction Max Depth", 1000, 5000, 1500)
@@ -338,11 +324,10 @@ End Class
 
 
 Public Class ML_EdgeDepth_MT : Inherits VBparent
-    Dim colorizer As Depth_Colorizer_CPP
+    Dim colorizer As New Depth_Colorizer_CPP
     Dim grid As New Thread_Grid
     Dim dilate As New DilateErode_Basics
     Public Sub New()
-        colorizer = New Depth_Colorizer_CPP()
         dilate.sliders.trackbar(1).Value = 5
 
         If findfrm(caller + " Slider Options") Is Nothing Then

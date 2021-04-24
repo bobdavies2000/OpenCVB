@@ -41,14 +41,12 @@ End Class
 
 
 Public Class Depth_HolesRect : Inherits VBparent
-    Dim shadow As Depth_Holes
+    Dim shadow As New Depth_Holes
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "shadowRect Min Size", 1, 20000, 2000)
         End If
-        shadow = New Depth_Holes()
-
         task.desc = "Identify the minimum rectangles of contours of the depth shadow"
     End Sub
 
@@ -768,16 +766,13 @@ End Class
 
 
 Public Class Depth_Smoothing : Inherits VBparent
-    Dim smooth As Depth_SmoothingMat
+    Dim smooth As New Depth_SmoothingMat
     Dim reduction As New Reduction_Basics
     Public reducedDepth As New cv.Mat
     Public mats As New Mat_4to1
-    Public colorize As Depth_ColorMap
+    Public colorize As New Depth_ColorMap
     Public Sub New()
-        colorize = New Depth_ColorMap()
         findRadio("Use bitwise reduction").Checked = True
-        smooth = New Depth_SmoothingMat()
-
         label2 = "Mask of depth that is smooth"
         task.desc = "This attempt to get the depth data to 'calm' down is not working well enough to be useful - needs more work"
     End Sub
@@ -1021,9 +1016,8 @@ End Class
 
 
 Public Class Depth_ForegroundOverTime : Inherits VBparent
-    Dim fore As Depth_Foreground
+    Dim fore As New Depth_Foreground
     Public Sub New()
-        fore = New Depth_Foreground
         label1 = "Pixels that are consistently present"
         label2 = "Latest foreground frame"
         task.desc = "Create a fused foreground mask over x number of frames"
@@ -1102,9 +1096,8 @@ End Class
 
 Public Class Depth_PunchDecreasing : Inherits VBparent
     Public Increasing As Boolean
-    Dim fore As Depth_Foreground
+    Dim fore As New Depth_Foreground
     Public Sub New()
-        fore = New Depth_Foreground
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Threshold in millimeters", 0, 1000, 8)
@@ -1135,9 +1128,8 @@ End Class
 
 
 Public Class Depth_PunchIncreasing : Inherits VBparent
-    Public depth As Depth_PunchDecreasing
+    Public depth As New Depth_PunchDecreasing
     Public Sub New()
-        depth = New Depth_PunchDecreasing
         depth.Increasing = True
         task.desc = "Identify where depth is increasing - retreating from the camera."
     End Sub
@@ -1153,13 +1145,11 @@ End Class
 
 
 Public Class Depth_PunchBlob : Inherits VBparent
-    Dim depthDec As Depth_PunchDecreasing
-    Dim depthInc As Depth_PunchDecreasing
+    Dim depthDec As New Depth_PunchDecreasing
+    Dim depthInc As New Depth_PunchDecreasing
     Dim contours As New Contours_Basics
     Public Sub New()
         findSlider("Contour minimum area").Value = 5000
-
-        depthInc = New Depth_PunchDecreasing
         task.desc = "Identify the punch with a rectangle around the largest blob"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -1278,14 +1268,10 @@ End Class
 
 
 Public Class Depth_SmoothAverage : Inherits VBparent
-    Dim dMin As Depth_SmoothMin
-    Dim dMax As Depth_SmoothMax
-    Dim colorize As Depth_ColorizerFastFade_CPP
+    Dim dMin As New Depth_SmoothMin
+    Dim dMax As New Depth_SmoothMax
+    Dim colorize As New Depth_ColorizerFastFade_CPP
     Public Sub New()
-        colorize = New Depth_ColorizerFastFade_CPP
-        dMin = New Depth_SmoothMin
-        dMax = New Depth_SmoothMax
-
         label1 = "InRange average depth (low quality depth removed)"
         label2 = "32-bit format average stable depth"
         task.desc = "To reduce z-Jitter, use the average depth value at each pixel as long as the camera is stable"
@@ -1307,9 +1293,8 @@ End Class
 Public Class Depth_SmoothMin : Inherits VBparent
     Public stableMin As cv.Mat
     Public motion As Motion_Basics
-    Dim colorize As Depth_ColorizerFastFade_CPP
+    Dim colorize As New Depth_ColorizerFastFade_CPP
     Public Sub New()
-        colorize = New Depth_ColorizerFastFade_CPP
         motion = New Motion_Basics
 
         label1 = "InRange depth with low quality depth removed."
@@ -1352,13 +1337,10 @@ End Class
 
 
 Public Class Depth_SmoothMax : Inherits VBparent
-    Public dMin As Depth_SmoothMin
-    Dim colorize As Depth_ColorizerFastFade_CPP
+    Public dMin As New Depth_SmoothMin
+    Dim colorize As New Depth_ColorizerFastFade_CPP
     Public stableMax As cv.Mat
     Public Sub New()
-        colorize = New Depth_ColorizerFastFade_CPP
-        dMin = New Depth_SmoothMin
-
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
             check.Box(0).Text = "Use SmoothMin to find zero depth pixels"
@@ -1405,11 +1387,9 @@ End Class
 
 Public Class Depth_Averaging : Inherits VBparent
     Public avg As Math_ImageAverage
-    Public colorize As Depth_Colorizer_CPP
+    Public colorize As New Depth_Colorizer_CPP
     Public Sub New()
         avg = New Math_ImageAverage()
-        colorize = New Depth_Colorizer_CPP()
-
         label2 = "32-bit format depth data"
         task.desc = "Take the average depth at each pixel but eliminate any pixels that had zero depth."
     End Sub
@@ -1430,14 +1410,11 @@ End Class
 
 
 Public Class Depth_SmoothMinMax : Inherits VBparent
-    Dim colorize As Depth_ColorizerFastFade_CPP
-    Public dMin As Depth_SmoothMin
-    Public dMax As Depth_SmoothMax
+    Dim colorize As New Depth_ColorizerFastFade_CPP
+    Public dMin As New Depth_SmoothMin
+    Public dMax As New Depth_SmoothMax
     Public resetAll As Boolean
     Public Sub New()
-        colorize = New Depth_ColorizerFastFade_CPP
-        dMin = New Depth_SmoothMin
-        dMax = New Depth_SmoothMax
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)
             radio.check(0).Text = "Use farthest distance"
@@ -1494,11 +1471,9 @@ End Class
 
 
 Public Class Depth_AveragingStable : Inherits VBparent
-    Dim dAvg As Depth_Averaging
-    Dim extrema As Depth_SmoothMinMax
+    Dim dAvg As New Depth_Averaging
+    Dim extrema As New Depth_SmoothMinMax
     Public Sub New()
-        dAvg = New Depth_Averaging
-        extrema = New Depth_SmoothMinMax
         findRadio("Use farthest distance").Checked = True
         task.desc = "Use Depth_SmoothMax to remove the artifacts from the Depth_Averaging"
     End Sub
@@ -1526,10 +1501,8 @@ End Class
 
 
 Public Class Depth_Fusion : Inherits VBparent
-    Dim dMax As Depth_SmoothMax
+    Dim dMax As New Depth_SmoothMax
     Public Sub New()
-        dMax = New Depth_SmoothMax
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Number of frames to fuse", 1, 300, 5)
@@ -1588,12 +1561,11 @@ End Class
 
 
 Public Class Depth_ForegroundHead : Inherits VBparent
-    Dim fgnd As Depth_Foreground
+    Dim fgnd As New Depth_Foreground
     Public kalman As New Kalman_Basics
     Public trustedRect As cv.Rect
     Public trustworthy As Boolean
     Public Sub New()
-        fgnd = New Depth_Foreground
         label1 = "Blue is current, red is kalman, green is trusted"
         task.desc = "Use Depth_ForeGround to find the foreground blob.  Then find the probable head of the person in front of the camera."
     End Sub

@@ -526,15 +526,13 @@ End Class
 
 
 Public Class Histogram_TopView2D : Inherits VBparent
-    Public gCloud As Depth_PointCloud_IMU
+    Public gCloud As New Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Public originalHistOutput As New cv.Mat
     Public markers(2 - 1) As cv.Point2f
     Public setupTop As New PointCloud_SetupTop
     Public resizeHistOutput As Boolean = True
     Public Sub New()
-        gCloud = New Depth_PointCloud_IMU
-
         label1 = "XZ (Top View)"
         task.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
     End Sub
@@ -566,15 +564,13 @@ End Class
 
 
 Public Class Histogram_SideView2D : Inherits VBparent
-    Public gCloud As Depth_PointCloud_IMU
+    Public gCloud As New Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Public originalHistOutput As New cv.Mat
     Public setupSide As New PointCloud_SetupSide
     Public frustrumAdjust As Single
     Public resizeHistOutput As Boolean = True
     Public Sub New()
-        gCloud = New Depth_PointCloud_IMU
-
         label1 = "ZY (Side View)"
         task.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
     End Sub
@@ -1037,15 +1033,11 @@ End Class
 
 
 Public Class Histogram_TopData : Inherits VBparent
-    Public gCloud As Depth_PointCloud_IMU
+    Public gCloud As New Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Dim kalman As New Kalman_Basics
-    Dim IntelBug As Boolean
     Public resizeHistOutput As Boolean = True
     Public Sub New()
-        gCloud = New Depth_PointCloud_IMU()
-        If VB_Classes.ActiveTask.algParms.camNames.D455 = task.parms.cameraName Then IntelBug = True
-
         task.desc = "Create a 2D top view for XZ histogram of depth in meters - NOTE: x and y scales differ!"
     End Sub
 
@@ -1071,12 +1063,11 @@ End Class
 
 
 Public Class Histogram_SideData : Inherits VBparent
-    Public gCloud As Depth_PointCloud_IMU
+    Public gCloud As New Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Dim kalman As New Kalman_Basics
     Public resizeHistOutput As Boolean = True
     Public Sub New()
-        gCloud = New Depth_PointCloud_IMU()
         task.desc = "Create a 2D side view for ZY histogram of depth in meters - NOTE: x and y scales differ!"
     End Sub
     Public Sub Run(src As cv.Mat)

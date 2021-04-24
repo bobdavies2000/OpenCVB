@@ -157,9 +157,8 @@ End Class
 
 Public Class Rectangle_MotionDepth : Inherits VBparent
     Public motion As Motion_Basics
-    Dim colorize As Depth_ColorizerFastFade_CPP
+    Dim colorize As New Depth_ColorizerFastFade_CPP
     Public Sub New()
-        colorize = New Depth_ColorizerFastFade_CPP
         motion = New Motion_Basics
         label1 = "Rectangles from contours of motion (unconsolidated)"
         label2 = "Pixel differences from motion (everything!)"

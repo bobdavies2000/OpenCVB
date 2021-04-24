@@ -1,10 +1,8 @@
 Imports cv = OpenCvSharp
 'https://github.com/opencv/opencv/blob/master/samples/cpp/stereo_match.cpp
 Public Class BlockMatching_Basics : Inherits VBparent
-    Dim colorizer As Depth_Colorizer_CPP
+    Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
-        colorizer = New Depth_Colorizer_CPP()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Blockmatch max disparity", 2, 5, 2)

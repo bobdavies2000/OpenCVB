@@ -37,10 +37,8 @@ End Class
 
 
 Public Class Clone_ColorChange : Inherits VBparent
-    Dim clone As Clone_Basics
+    Dim clone As New Clone_Basics
     Public Sub New()
-        clone = New Clone_Basics()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Color Change - Red", 5, 25, 15)
@@ -51,7 +49,7 @@ Public Class Clone_ColorChange : Inherits VBparent
         label2 = "Mask used for clone"
         task.desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         clone.cloneSpec = 0
         clone.colorChangeValues = New cv.Point3f(sliders.trackbar(0).Value / 10, sliders.trackbar(1).Value / 10, sliders.trackbar(0).Value / 10)
         clone.Run(src)
@@ -64,10 +62,8 @@ End Class
 
 
 Public Class Clone_IlluminationChange : Inherits VBparent
-    Dim clone As Clone_Basics
+    Dim clone As New Clone_Basics
     Public Sub New()
-        clone = New Clone_Basics()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Alpha", 0, 20, 2)
@@ -77,7 +73,7 @@ Public Class Clone_IlluminationChange : Inherits VBparent
         label2 = "Mask used for clone"
         task.desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         clone.cloneSpec = 1
         clone.illuminationChangeValues = New cv.Vec2f(sliders.trackbar(0).Value / 10, sliders.trackbar(1).Value / 10)
         clone.Run(src)
@@ -91,10 +87,8 @@ End Class
 
 
 Public Class Clone_TextureFlattening : Inherits VBparent
-    Dim clone As Clone_Basics
+    Dim clone As New Clone_Basics
     Public Sub New()
-        clone = New Clone_Basics()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Low Threshold", 0, 100, 10)

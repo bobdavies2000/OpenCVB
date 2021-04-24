@@ -108,9 +108,8 @@ End Class
 
 Public Class Reduction_KNN_ColorAndDepth : Inherits VBparent
     Dim reduction As Reduction_KNN_Color
-    Dim depth As Depth_Edges
+    Dim depth As New Depth_Edges
     Public Sub New()
-        depth = New Depth_Edges()
         reduction = New Reduction_KNN_Color()
         label1 = "Detecting objects using only color coherence"
         label2 = "Detecting objects with color and depth coherence"
@@ -268,11 +267,10 @@ End Class
 
 Public Class Reduction_Depth : Inherits VBparent
     Dim reduction As New Reduction_Basics
-    Dim colorizer As Depth_Colorizer_CPP
+    Dim colorizer As New Depth_Colorizer_CPP
     Public reducedDepth32F As New cv.Mat
     Public Sub New()
         reduction.radio.check(0).Checked = True
-        colorizer = New Depth_Colorizer_CPP()
         task.desc = "Use reduction to smooth depth data"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -298,13 +296,11 @@ End Class
 
 Public Class Reduction_DepthMax : Inherits VBparent
     Dim reduction As New Reduction_Basics
-    Dim colorizer As Depth_Colorizer_CPP
-    Dim dMax As Depth_SmoothMax
+    Dim colorizer As New Depth_Colorizer_CPP
+    Dim dMax As New Depth_SmoothMax
     Public reducedDepth32F As New cv.Mat
     Public Sub New()
         reduction.radio.check(0).Checked = True
-        colorizer = New Depth_Colorizer_CPP()
-        dMax = New Depth_SmoothMax
         task.desc = "Use reduction to isolate depth in 1 meter increments"
     End Sub
     Public Sub Run(src As cv.Mat)

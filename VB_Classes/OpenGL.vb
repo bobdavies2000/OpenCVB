@@ -350,11 +350,8 @@ End Class
 ' https://www.codeproject.com/Articles/1247960/Learning-Basic-Math-Used-In-3D-Graphics-Engines
 Public Class OpenGL_GravityTransform : Inherits VBparent
     Public ogl As OpenGL_Basics
-    Public gCloud As Depth_PointCloud_IMU
+    Public gCloud As New Depth_PointCloud_IMU
     Public Sub New()
-
-        gCloud = New Depth_PointCloud_IMU()
-
         ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Callbacks"
 
@@ -545,13 +542,10 @@ End Class
 
 
 Public Class OpenGL_AverageDepth : Inherits VBparent
-    Dim stable As Depth_AveragingStable
+    Dim stable As New Depth_AveragingStable
     Public ogl As OpenGL_Callbacks
     Public Sub New()
-
-        stable = New Depth_AveragingStable
         ogl = New OpenGL_Callbacks
-
         label2 = "32-bit format stabilized depth data"
         task.desc = "Use the depth_stabilizer output as input the an OpenGL display"
     End Sub

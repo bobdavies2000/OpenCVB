@@ -260,12 +260,10 @@ End Class
 
 
 Public Class Contours_Prediction : Inherits VBparent
-    Dim outline As Contours_Depth
+    Dim outline As New Contours_Depth
     Dim kalman As New Kalman_Basics
     Public Sub New()
         ReDim kalman.kInput(2 - 1)
-        outline = New Contours_Depth()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Predict the nth point ahead of the current point", 1, 100, 1)

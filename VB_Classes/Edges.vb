@@ -37,7 +37,7 @@ End Class
 
 
 Public Class Edges_DepthAndColor : Inherits VBparent
-    Dim shadow As Depth_Holes
+    Dim shadow As New Depth_Holes
     Dim canny As New Edges_Basics
     Dim dilate As New DilateErode_Basics
     Public Sub New()
@@ -45,8 +45,6 @@ Public Class Edges_DepthAndColor : Inherits VBparent
 
         canny.sliders.trackbar(0).Value = 100
         canny.sliders.trackbar(1).Value = 100
-
-        shadow = New Depth_Holes()
 
         task.desc = "Find all the edges in an image include Canny from the grayscale image and edges of depth shadow."
         label1 = "Edges in color and depth after dilate"
@@ -337,9 +335,8 @@ End Class
 
 Public Class Edges_DCTinput : Inherits VBparent
     Dim edges As New Edges_Basics
-    Dim dct As DCT_FeatureLess
+    Dim dct As New DCT_FeatureLess
     Public Sub New()
-        dct = New DCT_FeatureLess
         label1 = "Canny edges produced from original grayscale image"
         label2 = "Edges produced with featureless regions cleared"
         task.desc = "Use the featureless regions to enhance the edge detection"
@@ -457,10 +454,9 @@ End Class
 
 
 Public Class Edges_Depth : Inherits VBparent
-    Dim dMax As Depth_SmoothMax
+    Dim dMax As New Depth_SmoothMax
     Dim sobel As New Edges_Sobel
     Public Sub New()
-        dMax = New Depth_SmoothMax
         findSlider("Sobel kernel Size").Value = 14
         task.desc = "Use Depth_SmoothMax to find edges in Depth"
     End Sub

@@ -49,10 +49,8 @@ End Class
 
 
 Public Class Featureless_DCT_MT : Inherits VBparent
-    Dim dct As DCT_FeatureLess
+    Dim dct As New DCT_FeatureLess
     Public Sub New()
-        dct = New DCT_FeatureLess()
-
         label2 = "Largest FeatureLess Region"
         task.desc = "Use DCT to find featureless regions."
     End Sub

@@ -685,11 +685,10 @@ End Class
 
 
 Public Class PointCloud_ReducedSideView : Inherits VBparent
-    Dim gCloud As Depth_PointCloud_IMU
+    Dim gCloud As New Depth_PointCloud_IMU
     Dim reduction As New Reduction_Basics
     Dim histOutput As New cv.Mat
     Public Sub New()
-        gCloud = New Depth_PointCloud_IMU
         task.desc = "Create a stable side view of the point cloud"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -719,11 +718,10 @@ End Class
 
 
 Public Class PointCloud_ReducedTopView : Inherits VBparent
-    Dim gCloud As Depth_PointCloud_IMU
+    Dim gCloud As New Depth_PointCloud_IMU
     Dim reduction As New Reduction_Basics
     Dim histOutput As New cv.Mat
     Public Sub New()
-        gCloud = New Depth_PointCloud_IMU
         task.desc = "Create a stable side view of the point cloud"
     End Sub
     Public Sub Run(src As cv.Mat)

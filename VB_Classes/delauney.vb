@@ -1,5 +1,4 @@
 Imports cv = OpenCvSharp
-
 Module Delaunay_Exports
     Public Sub draw_line(img As cv.Mat, org As cv.Point, output As cv.Point, active_color As cv.Scalar)
         If org.X >= 0 And org.X <= img.Width Then
@@ -12,8 +11,7 @@ Module Delaunay_Exports
             End If
         End If
     End Sub
-
-    Public Sub draw_subdiv(img As cv.Mat, subdiv As cv.Subdiv2D, delaunay_color As cv.Scalar, testval As integer)
+    Public Sub draw_subdiv(img As cv.Mat, subdiv As cv.Subdiv2D, delaunay_color As cv.Scalar, testval As Integer)
         If testval Then
             Dim trianglelist() = subdiv.GetTriangleList()
             Dim pt(3) As cv.Point
@@ -38,7 +36,7 @@ Module Delaunay_Exports
         End If
     End Sub
     Public Sub locate_point(img As cv.Mat, subdiv As cv.Subdiv2D, fp As cv.Point2f, active_color As cv.Scalar)
-        Dim e0 As integer, vector As integer
+        Dim e0 As Integer, vector As Integer
 
         subdiv.Locate(fp, e0, vector)
         If e0 > 0 Then
@@ -191,9 +189,8 @@ End Class
 
 
 Public Class Delauney_Coverage : Inherits VBparent
-    Dim delauney As Delauney_Subdiv2D
+    Dim delauney as New Delauney_Subdiv2D
     Public Sub New()
-        delauney = New Delauney_Subdiv2D()
         delauney.updateFrequency = 1
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

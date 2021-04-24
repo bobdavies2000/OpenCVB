@@ -2,9 +2,8 @@ Imports cv = OpenCvSharp
 Public Class MFD_Basics : Inherits VBparent
     Public motion As Motion_Basics
     Public stableImg As cv.Mat
-    Dim dMax As Depth_SmoothMax
+    Dim dMax As New Depth_SmoothMax
     Public Sub New()
-        dMax = New Depth_SmoothMax
         motion = New Motion_Basics
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 2)
@@ -54,7 +53,6 @@ Public Class MFD_Depth : Inherits VBparent
         task.desc = "Stabilize the depth image but update any areas with motion"
     End Sub
     Public Sub Run(src as cv.Mat)
-
         mfd.Run(task.depth32f)
         dst1 = mfd.dst1
         dst2 = mfd.dst2
