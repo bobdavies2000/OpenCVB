@@ -152,9 +152,8 @@ End Class
 
 Public Class ImageSeg_CentroidTracker : Inherits VBparent
     Public iSeg As New ImageSeg_Basics
-    Public pTrack As KNN_PointTracker
+    Public pTrack As New KNN_PointTracker
     Public Sub New()
-        pTrack = New KNN_PointTracker
         findCheckBox("Caller will handle any drawing required").Checked = True
 
         label1 = "Output of ImageSeg_Basics"

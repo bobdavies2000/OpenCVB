@@ -46,13 +46,12 @@ End Class
 
 Public Class Coherent_FloodFill : Inherits VBparent
     Public basics As New FloodFill_Basics
-    Dim knn As KNN_1_to_1
+    Dim knn As New KNN_1_to_1
     Public lastPoints As New List(Of cv.Point2f)
     Public lastMasks As New List(Of cv.Mat)
     Public lastRects As New List(Of cv.Rect)
     Public lastSizes As New List(Of Integer)
     Public Sub New()
-        knn = New KNN_1_to_1
         task.desc = "Floodfill an image and make the colors consistent."
     End Sub
     Public Sub Run(src As cv.Mat)

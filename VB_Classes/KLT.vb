@@ -85,10 +85,9 @@ End Class
 
 ' https://github.com/opencv/opencv/blob/master/samples/python/lk_track.py
 Public Class KLT_OpticalFlow : Inherits VBparent
-    Dim klt As KLT_Basics
+    Dim klt As New KLT_Basics
     Dim lastpoints() As cv.Point2f
     Public Sub New()
-        klt = New KLT_Basics()
         task.desc = "KLT optical flow - needs more work"
     End Sub
     Public Sub Run(src as cv.Mat)

@@ -54,9 +54,8 @@ End Class
 
 Public Class Random_LUTMask : Inherits VBparent
     Dim random As New Random_Basics
-    Dim km As KMeans_Basics
+    Dim km As New KMeans_Basics
     Public Sub New()
-        km = New KMeans_Basics()
         task.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image."
         label2 = "kmeans run To Get colors"
     End Sub
@@ -503,14 +502,13 @@ End Class
 
 Public Class Random_KalmanPoints : Inherits VBparent
     Dim random As New Random_Basics
-    Dim knn As KNN_1_to_1FIFO
+    Dim knn As New KNN_1_to_1FIFO
     Dim kalman As New Kalman_Basics
     Dim countSlider As Windows.Forms.TrackBar
     Dim kalmanPoints As New List(Of cv.Point2f)
     Dim refreshPoints As Boolean = True
     Dim savePoints(0) As cv.Point
     Public Sub New()
-        knn = New KNN_1_to_1FIFO
         Dim offset = 100
         random.rangeRect = New cv.Rect(offset, offset, dst1.Width - offset * 2, dst1.Height - offset * 2)
         countSlider = findSlider("Random Pixel Count")

@@ -54,10 +54,8 @@ Public Class KNN_BasicsQT : Inherits VBparent
     Public testMode As Boolean
     Public desiredMatches = 1
     Public knn As cv.ML.KNearest
-    Public knnQT As KNN_Options
+    Public knnQT As New KNN_Options
     Public Sub New()
-
-        knnQT = New KNN_Options()
         If standalone Then knnQT.useRandomData = True
 
         label1 = "White=TrainingData, Red=queries"
@@ -170,10 +168,8 @@ End Class
 Public Class KNN_1_to_1 : Inherits VBparent
     Public matchedPoints() As cv.Point2f
     Public unmatchedPoints As New List(Of cv.Point2f)
-    Public basics As KNN_BasicsQT
+    Public basics As New KNN_BasicsQT
     Public Sub New()
-
-        basics = New KNN_BasicsQT()
         If standalone Then basics.knnQT.useRandomData = True
         basics.desiredMatches = 4 ' more than 1 to insure there are secondary choices below for 1:1 matching below.
 
@@ -248,7 +244,7 @@ End Class
 
 
 Public Class KNN_Emax : Inherits VBparent
-    Public knn As KNN_1_to_1
+    Public knn As New KNN_1_to_1
     Dim emax As New EMax_Centroids
     Public Sub New()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -261,7 +257,6 @@ Public Class KNN_Emax : Inherits VBparent
             check.Box(2).Checked = True
         End If
 
-        knn = New KNN_1_to_1()
         knn.basics.knnQT.useRandomData = False
 
         label1 = "Output from Emax"
@@ -296,7 +291,7 @@ End Class
 
 Public Class KNN_Test : Inherits VBparent
     Public grid As New Thread_Grid
-    Dim knn As KNN_BasicsQT
+    Dim knn As New KNN_BasicsQT
     Public Sub New()
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         Dim gridHeightSlider = findSlider("ThreadGrid Height")
@@ -305,7 +300,6 @@ Public Class KNN_Test : Inherits VBparent
         gridWidthSlider.Value = 100
         gridHeightSlider.Value = 100
 
-        knn = New KNN_BasicsQT()
         knn.testMode = True
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -339,7 +333,7 @@ End Class
 
 Public Class KNN_Test_1_to_1 : Inherits VBparent
     Public grid As New Thread_Grid
-    Dim knn As KNN_1_to_1
+    Dim knn As New KNN_1_to_1
     Public Sub New()
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         Dim gridHeightSlider = findSlider("ThreadGrid Height")
@@ -347,8 +341,6 @@ Public Class KNN_Test_1_to_1 : Inherits VBparent
         gridHeightSlider.Minimum = 50
         gridWidthSlider.Value = 100
         gridHeightSlider.Value = 100
-
-        knn = New KNN_1_to_1()
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
@@ -381,11 +373,10 @@ End Class
 
 Public Class KNN_Point3d : Inherits VBparent
     Public querySet() As cv.Point3f
-    Public kOptions As KNN_Options
+    Public kOptions As New KNN_Options
     Public responseSet() As Integer
     Public lastSet() As cv.Point3f ' default usage: find and connect points in 2D for this number of points.
     Public Sub New()
-        kOptions = New KNN_Options
         task.desc = "Use KNN to connect 3D points.  Results shown are a 2D projection of the 3D results."
         label1 = "Yellow=Query (in 3D) Blue=Best Response (in 3D)"
         label2 = "Top Down View to confirm 3D KNN is correct"
@@ -459,9 +450,8 @@ End Class
 Public Class KNN_DepthClusters : Inherits VBparent
     Public blobs As New Blob_DepthClusters
     Public flood As New FloodFill_Palette
-    Public pTrack As KNN_PointTracker
+    Public pTrack As New KNN_PointTracker
     Public Sub New()
-        pTrack = New KNN_PointTracker
         label1 = "Output of Blob_DepthClusters"
         label2 = "Same output after KNN_PointTracker"
         task.desc = "Use KNN to track and color the Blob results from clustering the depth data"
@@ -486,10 +476,9 @@ End Class
 
 
 Public Class KNN_SmoothAverage : Inherits VBparent
-    Dim knn As KNN_DepthClusters
+    Dim knn As New KNN_DepthClusters
     Dim lastinput As New cv.Mat
     Public Sub New()
-        knn = New KNN_DepthClusters()
         findCheckBox("Draw rectangle and centroid for each mask").Checked = False
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -524,11 +513,10 @@ End Class
 
 
 Public Class KNN_StabilizeRegions : Inherits VBparent
-    Public knn As KNN_DepthClusters
+    Public knn As New KNN_DepthClusters
     Public flood As New FloodFill_Palette
     Dim lastinput As New cv.Mat
     Public Sub New()
-        knn = New KNN_DepthClusters()
         findCheckBox("Draw rectangle and centroid for each mask").Checked = False
         label1 = "Output of KNN_DepthClusters"
         label2 = "KNN_DepthClusters output plus unstable regions"
@@ -556,9 +544,8 @@ End Class
 
 Public Class KNN_Contours : Inherits VBparent
     Dim outline As New Contours_Depth
-    Dim knn As KNN_BasicsQT
+    Dim knn As New KNN_BasicsQT
     Public Sub New()
-        knn = New KNN_BasicsQT()
         task.desc = "Use KNN to streamline the outline of a contour"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -599,7 +586,7 @@ End Class
 
 
 Public Class KNN_Cluster2DCities : Inherits VBparent
-    Dim knn As KNN_Point2d
+    Dim knn As New KNN_Point2d
     Public cityPositions() As cv.Point
     Public cityOrder() As Integer
     Public distances() As Integer
@@ -608,7 +595,6 @@ Public Class KNN_Cluster2DCities : Inherits VBparent
     Dim nearestCountSlider As Windows.Forms.TrackBar
     Dim cityCountSlider As Windows.Forms.TrackBar
     Public Sub New()
-        knn = New KNN_Point2d()
         ' If they changed Then number of elements in the set
         cityCountSlider = findSlider("KNN Query count")
         nearestCountSlider = findSlider("KNN k nearest points")
@@ -692,11 +678,9 @@ End Class
 
 
 Public Class KNN_Point2d : Inherits VBparent
-    Public knn As KNN_BasicsQT
+    Public knn As New KNN_BasicsQT
     Public responseSet() As Integer
     Public Sub New()
-
-        knn = New KNN_BasicsQT()
         If standalone Then knn.knnQT.useRandomData = True
 
         task.desc = "Use KNN to find n matching points for each query."
@@ -754,13 +738,13 @@ Public Class KNN_Learn : Inherits VBparent
 
         If standalone Then
             task.trueText("Database is ready for queries.  Use it with code like this " + vbCrLf + vbCrLf +
-                          "public learn as KNN_Learn" + vbCrLf + "learn = new KNN_Learn" + vbCrLf +
+                          "public learn as New KNN_Learn" + vbCrLf + "learn = new KNN_Learn" + vbCrLf +
                           "Dim neighbors As New cv.Mat" + vbCrLf + "Dim queries = New cv.Mat(1, 2, cv.MatType.CV_32F, {pt.x, pt.y})" + vbCrLf +
                           "learn.knn.FindNearest(queries, 1, neighbors)" + vbCrLf + vbCrLf + "And neighbors will have nearest point." + vbCrLf +
                           "See KNN_Learn for code to cut and paste...")
 
             ' cut and paste this code into any new algorithm to use KNN_Learn
-            '''''''''' Dim learn As KNN_Learn
+            '''''''''' Dim learn as New KNN_Learn
             '''''''''' learn = New KNN_Learn
             '''''''''' Dim neighbors As New cv.Mat
             '''''''''' Dim queries = New cv.Mat(1, 2, cv.MatType.CV_32F, {)
@@ -798,7 +782,7 @@ End Structure
 
 
 Public Class KNN_PointTracker : Inherits VBparent
-    Public knn As KNN_1_to_1
+    Public knn As New KNN_1_to_1
     Dim newCentroids As New List(Of cv.Point2f)
     Dim topView As New PointCloud_Kalman_TopView
     Public kalman As New List(Of Kalman_Stripped)
@@ -809,7 +793,6 @@ Public Class KNN_PointTracker : Inherits VBparent
     Public floodPoints As New List(Of cv.Point)
     Public drawRC As New Draw_ViewObjects
     Public Sub New()
-        knn = New KNN_1_to_1
         allocateKalman(16) ' allocate some kalman objects
 
         If findfrm(caller + " Slider Options") Is Nothing Then

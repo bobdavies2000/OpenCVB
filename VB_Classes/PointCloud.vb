@@ -500,7 +500,7 @@ End Class
 
 
 Public Class PointCloud_Kalman_TopView : Inherits VBparent
-    Public pTrack As KNN_PointTracker
+    Public pTrack As New KNN_PointTracker
     Public flood As New FloodFill_Palette
     Public topView As New Histogram_TopView2D
     Public Sub New()
@@ -538,10 +538,9 @@ End Class
 Public Class PointCloud_Kalman_SideView : Inherits VBparent
     Public flood As New Floodfill_Identifiers
     Public sideView As New Histogram_SideView2D
-    Public pTrack As KNN_PointTracker
+    Public pTrack As New KNN_PointTracker
     Public setupSide As New PointCloud_SetupSide
     Public Sub New()
-        pTrack = New KNN_PointTracker
         findSlider("FloodFill Minimum Size").Value = 100
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub

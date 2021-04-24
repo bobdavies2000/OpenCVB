@@ -475,7 +475,6 @@
     <Content Include="MPL_GradientDescent.py" />
     <Content Include="KAZE_match.py" />
     <Content Include="Depth_RGB_PS.py" />
-    <Content Include="Python_SurfaceBlit.py" />
     <Content Include="Sobel_AnisotropicSegmentation.py" />
     <Content Include="Tracker_PS.py" />
     <Content Include="Turing.py" />

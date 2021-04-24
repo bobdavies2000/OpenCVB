@@ -178,9 +178,8 @@ End Class
 
 Public Class FeatureLess_PointTracker : Inherits VBparent
     Public fLess As New Featureless_Basics
-    Public pTrack As KNN_PointTracker
+    Public pTrack As New KNN_PointTracker
     Public Sub New()
-        pTrack = New KNN_PointTracker()
         label1 = "After point tracker"
         label2 = "Before point tracker"
         task.desc = "Track the featureless regions with point tracker"

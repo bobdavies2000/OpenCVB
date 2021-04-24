@@ -397,10 +397,9 @@ End Class
 
 
 Public Class FloodFill_PointTracker : Inherits VBparent
-    Dim pTrack As KNN_PointTracker
+    Dim pTrack As New KNN_PointTracker
     Dim flood As New FloodFill_Palette
     Public Sub New()
-        pTrack = New KNN_PointTracker()
         label1 = "Point tracker output"
         task.desc = "Test the FloodFill output as input into the point tracker"
     End Sub

@@ -34,10 +34,9 @@ End Class
 
 Public Class Features_PointTracker : Inherits VBparent
     Dim features As New Features_GoodFeatures
-    Dim pTrack As KNN_PointTracker
+    Dim pTrack As New KNN_PointTracker
     Dim rRadius = 10
     Public Sub New()
-        pTrack = New KNN_PointTracker()
         findCheckBox("Draw rectangle and centroid for each mask").Checked = False
         findSlider("Minimum size of object in pixels").Value = 1
 

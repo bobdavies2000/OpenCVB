@@ -144,13 +144,11 @@ End Class
 
 
 Public Class TimeView_Centroids : Inherits VBparent
-    Public knn As KNN_BasicsQT
+    Public knn As New KNN_BasicsQT
     Dim tflood As New TimeView_FloodFill
     Public queryPoints As New List(Of cv.Point2f)
     Public responses As New List(Of cv.Point2f)
     Public Sub New()
-        knn = New KNN_BasicsQT
-
         label1 = "Top view with centroids in yellow"
         label2 = "Side view with centroids in yellow"
         task.desc = "Use KNN to track the query points"
@@ -176,8 +174,10 @@ Public Class TimeView_Centroids : Inherits VBparent
                 Dim qPoint = tflood.floodTop.centroids(i)
                 cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, task.lineType, 0)
                 Dim pt = saveTopQueries(knn.neighbors.Get(Of Single)(i, 0))
-                Dim cpt = New cv.Point(CInt(pt.X), CInt(pt.Y))
-                dst1.Line(cpt, qPoint, cv.Scalar.Red, 1, task.lineType)
+                If Single.IsNaN(pt.X) = False And Single.IsNaN(pt.Y) = False Then
+                    Dim cpt = New cv.Point(CInt(pt.X), CInt(pt.Y))
+                    dst1.Line(cpt, qPoint, cv.Scalar.Red, 1, task.lineType)
+                End If
             Next
 
             saveTopQueries = New List(Of cv.Point2f)(tflood.floodTop.centroids)

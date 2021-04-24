@@ -113,51 +113,51 @@ End Class
 
 
 
-Public Class Python_SurfaceBlit : Inherits VBparent
-    Dim memMap As Python_MemMap
-    Dim pipeName As String
-    Dim pipe As NamedPipeServerStream
-    Dim rgbBuffer(1) As Byte
-    Dim PythonReady As Boolean
-    Public Sub New()
-        pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
-        pipe = New NamedPipeServerStream(pipeName, PipeDirection.InOut)
-        PipeTaskIndex += 1
+'Public Class Python_SurfaceBlit : Inherits VBparent
+'    Dim memMap As Python_MemMap
+'    Dim pipeName As String
+'    Dim pipe As NamedPipeServerStream
+'    Dim rgbBuffer(1) As Byte
+'    Dim PythonReady As Boolean
+'    Public Sub New()
+'        pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
+'        pipe = New NamedPipeServerStream(pipeName, PipeDirection.InOut)
+'        PipeTaskIndex += 1
 
-        task.pythonTaskName = task.parms.homeDir + "VB_Classes/Python_SurfaceBlit.py"
-        memMap = New Python_MemMap()
+'        task.pythonTaskName = task.parms.homeDir + "VB_Classes/Python_SurfaceBlit.py"
+'        memMap = New Python_MemMap()
 
-        If task.parms.externalPythonInvocation Then
-            PythonReady = True ' python was already running and invoked OpenCVB.
-        Else
-            PythonReady = StartPython("--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
-        End If
-        If PythonReady Then pipe.WaitForConnection()
-        task.desc = "Stream data to Python_SurfaceBlit Python script."
-    End Sub
-    Public Sub Run(src as cv.Mat)
-        If PythonReady Then
-            For i = 0 To memMap.memMapValues.Length - 1
-                memMap.memMapValues(i) = Choose(i + 1, task.frameCount, src.Total * src.ElemSize, 0, src.Rows, src.Cols)
-            Next
-            memMap.Run(src)
+'        If task.parms.externalPythonInvocation Then
+'            PythonReady = True ' python was already running and invoked OpenCVB.
+'        Else
+'            PythonReady = StartPython("--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
+'        End If
+'        If PythonReady Then pipe.WaitForConnection()
+'        task.desc = "Stream data to Python_SurfaceBlit Python script."
+'    End Sub
+'    Public Sub Run(src as cv.Mat)
+'        If PythonReady Then
+'            For i = 0 To memMap.memMapValues.Length - 1
+'                memMap.memMapValues(i) = Choose(i + 1, task.frameCount, src.Total * src.ElemSize, 0, src.Rows, src.Cols)
+'            Next
+'            memMap.Run(src)
 
-            Dim rgb = src.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2RGB)
-            If rgbBuffer.Length <> rgb.Total * rgb.ElemSize Then ReDim rgbBuffer(rgb.Total * rgb.ElemSize - 1)
-            Marshal.Copy(rgb.Data, rgbBuffer, 0, rgb.Total * rgb.ElemSize)
+'            Dim rgb = src.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2RGB)
+'            If rgbBuffer.Length <> rgb.Total * rgb.ElemSize Then ReDim rgbBuffer(rgb.Total * rgb.ElemSize - 1)
+'            Marshal.Copy(rgb.Data, rgbBuffer, 0, rgb.Total * rgb.ElemSize)
 
-            If pipe.IsConnected Then
-                On Error Resume Next
-                pipe.Write(rgbBuffer, 0, rgbBuffer.Length)
-            End If
-            task.trueText("Blit works fine when here (Python_SurfaceBlit) but the same operation in Python_SurfaceBlit_PS.py fails." + vbCrLf +
-                          "The callback in the PyStream interface does not allow the SurfaceBlit API to work." + vbCrLf +
-                          "See 'Python_SurfaceBlit.py' to see how the surfaceBlit works then review Python_SurfaceBlit_PS.py failure.")
-        Else
-            task.trueText("Python is not available")
-        End If
-    End Sub
-End Class
+'            If pipe.IsConnected Then
+'                On Error Resume Next
+'                pipe.Write(rgbBuffer, 0, rgbBuffer.Length)
+'            End If
+'            task.trueText("Blit works fine when here (Python_SurfaceBlit) but the same operation in Python_SurfaceBlit_PS.py fails." + vbCrLf +
+'                          "The callback in the PyStream interface does not allow the SurfaceBlit API to work." + vbCrLf +
+'                          "See 'Python_SurfaceBlit.py' to see how the surfaceBlit works then review Python_SurfaceBlit_PS.py failure.")
+'        Else
+'            task.trueText("Python is not available")
+'        End If
+'    End Sub
+'End Class
 
 
 

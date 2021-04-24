@@ -282,10 +282,9 @@ End Class
 
 
 Public Class EMax_PointTracker : Inherits VBparent
-    Dim pTrack As KNN_PointTracker
+    Dim pTrack As New KNN_PointTracker
     Dim emax As New EMax_Centroids
     Public Sub New()
-        pTrack = New KNN_PointTracker()
         findCheckBox("Draw rectangle and centroid for each mask").Checked = False
         findSlider("FloodFill Minimum Size").Value = 100
 

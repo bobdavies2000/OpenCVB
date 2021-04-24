@@ -97,10 +97,8 @@ End Class
 
 Public Class KMeans_Clusters : Inherits VBparent
     Dim Mats As New Mat_4to1
-    Dim km As KMeans_BasicsDepthColor
+    Dim km As New KMeans_BasicsDepthColor
     Public Sub New()
-        km = New KMeans_BasicsDepthColor()
-
         label1 = "kmeans - k=2,4,6,8"
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Show clustering with various settings for cluster count.  Draw to select region of interest."
@@ -167,10 +165,9 @@ End Class
 
 
 Public Class KMeans_RGB_Plus_XYDepth : Inherits VBparent
-    Dim km As KMeans_BasicsDepthColor
+    Dim km As New KMeans_BasicsDepthColor
     Dim clusterColors() As cv.Vec6i
     Public Sub New()
-        km = New KMeans_BasicsDepthColor()
         label1 = "kmeans - RGB, XY, and Depth Raw"
         task.desc = "Cluster with kMeans RGB, x, y, and depth."
     End Sub
@@ -499,9 +496,8 @@ End Class
 
 
 Public Class KMeans_Subdivision : Inherits VBparent
-    Dim kmeans As KMeans_BasicsDepthColor
+    Dim kmeans As New KMeans_BasicsDepthColor
     Public Sub New()
-        kmeans = New KMeans_BasicsDepthColor()
         kmeans.resizeRequest = False
         task.desc = "Use KMeans to subdivide an image and then subdivide it again."
     End Sub
@@ -536,9 +532,8 @@ End Class
 
 
 Public Class KMeans_Subdivision1 : Inherits VBparent
-    Dim kmeans As KMeans_BasicsDepthColor
+    Dim kmeans As New KMeans_BasicsDepthColor
     Public Sub New()
-        kmeans = New KMeans_BasicsDepthColor()
         kmeans.resizeRequest = False
         kmeans.useDepthColor = False
         task.desc = "Use KMeans to subdivide an image and then subdivide it again."
