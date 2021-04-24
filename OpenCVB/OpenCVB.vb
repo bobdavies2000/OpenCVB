@@ -1128,11 +1128,11 @@ Public Class OpenCVB
     End Sub
     Private Sub StartAlgorithmTask()
         testAllRunning = TestAllButton.Text = "Stop Test"
-        saveAlgorithmName = "" ' this should terminate the current running algorithm - unless it is hung!
         If algorithmTaskHandle IsNot Nothing Then
             While algorithmTaskHandle.IsAlive
+                saveAlgorithmName = "" ' this should terminate the current running algorithm - unless it is hung!
                 If testAllRunning Then TestAllTimer.Enabled = False ' no more tasks please...
-                Thread.Sleep(1000)
+                Thread.Sleep(100)
                 Application.DoEvents()
             End While
             Console.WriteLine(AvailableAlgorithms.Text + " now starting since the previous algorithm thread has ended.")

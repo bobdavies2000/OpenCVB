@@ -19,6 +19,11 @@ Public Class Filter_Laplacian : Inherits VBparent
 End Class
 
 
+
+
+
+
+
 Public Class Filter_NormalizedKernel : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -60,6 +65,10 @@ Public Class Filter_NormalizedKernel : Inherits VBparent
 End Class
 
 
+
+
+
+
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/filter_2d/filter_2d.html
 Public Class Filter_Normalized2D : Inherits VBparent
     Public Sub New()
@@ -76,6 +85,10 @@ Public Class Filter_Normalized2D : Inherits VBparent
         label1 = "Normalized KernelSize = " + CStr(kernelSize)
     End Sub
 End Class
+
+
+
+
 
 
 

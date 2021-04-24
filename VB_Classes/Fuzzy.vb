@@ -2,19 +2,15 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Fuzzy_Basics : Inherits VBparent
     Dim Fuzzy As IntPtr
-    Dim reduction As Reduction_Basics
-    Dim options As Contours_Basics
+    Dim reduction As New Reduction_Basics
+    Dim options As New Contours_Basics
     Public gray As cv.Mat
     Public contours As cv.Point()()
     Public sortContours As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
-
-        options = New Contours_Basics()
-
         Dim floodRadio = findRadio("FloodFill")
         If floodRadio.Enabled Then floodRadio.Enabled = False ' too much special handling - cv_32SC1 image 
 
-        reduction = New Reduction_Basics()
         Fuzzy = Fuzzy_Open()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -45,7 +41,7 @@ Public Class Fuzzy_Basics : Inherits VBparent
             gray = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8UC1, dstData)
         End If
 
-        dst2 = gray.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
+        dst2 = gray.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
         Dim tmp As New cv.Mat
         dst2.ConvertTo(tmp, cv.MatType.CV_32S)
         contours = cv.Cv2.FindContoursAsArray(tmp, options.retrievalMode, options.ApproximationMode)
@@ -57,18 +53,17 @@ Public Class Fuzzy_Basics : Inherits VBparent
             Dim pt = contours(i)(0)
             For y = pt.Y - 1 To pt.Y + 1
                 For x = pt.X - 1 To pt.X + 1
-                    If x < src.Width And y < src.Height Then
+                    If x < src.Width And y < src.Height And x >= 0 And y >= 0 Then
                         Dim val = gray.Get(Of Byte)(y, x)
-                        If val <> 0 Then maskID = val
+                        If val <> 0 Then
+                            maskID = val
+                            Exit For
+                        End If
                     End If
                 Next
+                If maskID <> 0 Then Exit For
             Next
-
-            Dim len = contours(i).Length
-            For j = 0 To len
-                dst2.Line(contours(i)(j Mod len), contours(i)((j + 1) Mod len), cv.Scalar.White, 2, task.lineType)
-            Next
-            sortContours.Add(len, New cv.Point(i, maskID))
+            sortContours.Add(contours(i).Length, New cv.Point(i, maskID))
         Next
 
         task.palette.Run(gray)
@@ -77,6 +72,66 @@ Public Class Fuzzy_Basics : Inherits VBparent
     End Sub
     Public Sub Close()
         Fuzzy_Close(Fuzzy)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Fuzzy_Filter : Inherits VBparent
+    Dim kernel As cv.Mat
+    Dim reduction As New Reduction_Basics
+    Public contours As cv.Point()()
+    Public sortContours As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
+    Dim options As New Contours_Basics
+    Public Sub New()
+        Dim array() As Single = {1, 1, 1, 1, 1, 1, 1, 1, 1}
+        kernel = New cv.Mat(3, 3, cv.MatType.CV_32F, array)
+        kernel *= 1 / 9
+        task.desc = "Use a 2D filter to find smooth areas"
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        options.setOptions()
+
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        reduction.Run(src)
+
+        Dim src32f As New cv.Mat
+        reduction.dst1.ConvertTo(src32f, cv.MatType.CV_32F)
+        dst1 = src32f.Filter2D(-1, kernel)
+        dst2 = dst1.Subtract(src32f)
+        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst2 = dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+
+        Dim tmp As New cv.Mat
+        dst2.ConvertTo(tmp, cv.MatType.CV_32S)
+        contours = cv.Cv2.FindContoursAsArray(tmp, options.retrievalMode, options.ApproximationMode)
+
+        sortContours.Clear()
+        For i = 0 To contours.Length - 1
+            Dim maskID As Integer = 0
+            Dim pt = contours(i)(0)
+            For y = pt.Y - 1 To pt.Y + 1
+                For x = pt.X - 1 To pt.X + 1
+                    If x < src.Width And y < src.Height And x >= 0 And y >= 0 Then
+                        Dim val = reduction.dst1.Get(Of Byte)(y, x)
+                        If val <> 0 Then
+                            maskID = val
+                            Exit For
+                        End If
+                    End If
+                Next
+                If maskID <> 0 Then Exit For
+            Next
+            sortContours.Add(contours(i).Length, New cv.Point(i, maskID))
+        Next
+
+        task.palette.Run(reduction.dst1)
+        dst1 = task.palette.dst1
+        dst1.SetTo(0, dst2)
     End Sub
 End Class
 
