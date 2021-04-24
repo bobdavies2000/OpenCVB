@@ -404,11 +404,9 @@ End Class
 
 
 Public Class Edges_BinarizedBrightness : Inherits VBparent
-    Dim edges As Edges_BinarizedSobel
+    Dim edges As New Edges_BinarizedSobel
     Dim bright As PhotoShop_Brightness
     Public Sub New()
-
-        edges = New Edges_BinarizedSobel
         bright = New PhotoShop_Brightness
 
         task.desc = "Visualize the impact of brightness on Edges_BinarizeSobel"
@@ -430,10 +428,9 @@ End Class
 
 
 Public Class Edges_BinarizedReduction : Inherits VBparent
-    Dim edges As Edges_BinarizedSobel
+    Dim edges As New Edges_BinarizedSobel
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        edges = New Edges_BinarizedSobel
         task.desc = "Visualize the impact of reduction on Edges_BinarizeSobel"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -479,10 +476,9 @@ End Class
 
 
 Public Class Edges_FeaturesOnly : Inherits VBparent
-    Dim edges As Edges_BinarizedSobel
+    Dim edges As New Edges_BinarizedSobel
     Dim featLess As Featureless_Basics
     Public Sub New()
-        edges = New Edges_BinarizedSobel
         featLess = New Featureless_Basics
         label1 = "Output of Edges_BinarizedSobel"
         label2 = "dst1 with featureless areas removed."
@@ -509,10 +505,8 @@ End Class
 
 
 Public Class Edges_Consistent : Inherits VBparent
-    Dim edges As Edges_FeaturesOnly
+    Dim edges As New Edges_FeaturesOnly
     Public Sub New()
-        edges = New Edges_FeaturesOnly
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Edges present n frames", 1, 30, 10)
@@ -552,9 +546,8 @@ End Class
 
 Public Class Edges_Stdev : Inherits VBparent
     Dim stdev As Math_Stdev
-    Dim edges As Edges_BinarizedSobel
+    Dim edges As New Edges_BinarizedSobel
     Public Sub New()
-        edges = New Edges_BinarizedSobel
         stdev = New Math_Stdev
         findSlider("Sobel kernel Size").Value = 14
 
@@ -581,10 +574,9 @@ End Class
 
 Public Class Edges_BlackSquare : Inherits VBparent
     Dim std As Math_Stdev
-    Dim edges As Edges_BinarizedSobel
+    Dim edges As New Edges_BinarizedSobel
     Dim addW As New AddWeighted_Basics
     Public Sub New()
-        edges = New Edges_BinarizedSobel
         std = New Math_Stdev
         task.desc = "Visualize the impact of Sobel on a black square"
     End Sub
@@ -609,12 +601,9 @@ End Class
 
 
 Public Class Edges_Combo : Inherits VBparent
-    Dim edges1 As Edges_BinarizedCanny
-    Dim edges2 As Edges_BinarizedSobel
+    Dim edges1 As New Edges_BinarizedCanny
+    Dim edges2 As New Edges_BinarizedSobel
     Public Sub New()
-        edges1 = New Edges_BinarizedCanny
-        edges2 = New Edges_BinarizedSobel
-
         label1 = "Sobel = red, Canny = yellow - they are identical"
         task.desc = "Combine the results of binarized canny and sobel"
     End Sub
@@ -741,11 +730,10 @@ End Class
 
 Public Class Edges_SobelLRBinarized : Inherits VBparent
     Dim red As LeftRightView_Basics
-    Dim edges As Edges_BinarizedSobel
+    Dim edges As New Edges_BinarizedSobel
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         findSlider("Weight").Value = 75
-        edges = New Edges_BinarizedSobel
         red = New LeftRightView_Basics
         findSlider("Infrared Brightness").Value = 1
 
@@ -994,7 +982,7 @@ Public Class Edges_RGB : Inherits VBparent
         findCheckBox("Threshold Sobel Results").Checked = False
         task.desc = "Combine the edges from all 3 channels.  Painterly"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim img32f As New cv.Mat
         src.ConvertTo(img32f, cv.MatType.CV_32FC3)
         Dim split = img32f.Split()
@@ -1019,9 +1007,8 @@ End Class
 
 ' https://scikit-image.org/docs/dev/auto_examples/color_exposure/plot_adapt_rgb.html#sphx-glr-auto-examples-color-exposure-plot-adapt-rgb-py
 Public Class Edges_HSV : Inherits VBparent
-    Dim edges As Edges_RGB
+    Dim edges As New Edges_RGB
     Public Sub New()
-        edges = New Edges_RGB
         findSlider("Threshold to zero pixels below this value").Value = 25
         task.desc = "Combine the edges from all 3 HSV channels.  Painterly"
     End Sub

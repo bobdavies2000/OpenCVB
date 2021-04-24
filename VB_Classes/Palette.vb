@@ -229,11 +229,9 @@ End Class
 
 
 Public Class Palette_DrawTest : Inherits VBparent
-    Dim draw As Draw_Shapes
+    Dim draw As New Draw_Shapes
     Public Sub New()
         task.palette.whitebackground = True
-        draw = New Draw_Shapes()
-
         task.desc = "Experiment with palette using a drawn image"
     End Sub
     Public Sub Run(src as cv.Mat)

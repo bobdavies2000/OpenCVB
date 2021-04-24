@@ -14,7 +14,7 @@ Public Class Resize_Basics : Inherits VBparent
         label2 = "Difference from Cubic Resize (Best)"
     End Sub
     Public Sub Run(src as cv.Mat)
-        Static frm = findfrm("Resize_Basics Radio Options")
+        Static frm = findfrm(caller + " Radio Options")
 
         rotateOptions.Run(src)
 
@@ -41,16 +41,13 @@ Public Class Resize_Percentage : Inherits VBparent
     Public resizeOptions As Resize_Basics
     Public Sub New()
         resizeOptions = New Resize_Basics()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Resize Percentage (%)", 1, 100, 3)
         End If
-
         task.desc = "Resize by a percentage of the image."
     End Sub
     Public Sub Run(src as cv.Mat)
-
         Dim percent As Double = CDbl(sliders.trackbar(0).Value / 100)
         Dim resizePercent = sliders.trackbar(0).Value / 100
         resizePercent = Math.Sqrt(resizePercent)

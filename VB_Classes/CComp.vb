@@ -322,10 +322,8 @@ End Class
 
 Public Class CComp_EdgeMask : Inherits VBparent
     Dim ccomp As New CComp_ColorDepth
-    Dim edges As Edges_DepthAndColor
+    Dim edges As New Edges_DepthAndColor
     Public Sub New()
-        edges = New Edges_DepthAndColor()
-
         task.desc = "Isolate Color connected components after applying the Edge Mask"
         label1 = "Edges_DepthAndColor (input to ccomp)"
         label2 = "Blob Rectangles with centroids (white)"
@@ -575,10 +573,9 @@ End Class
 
 
 Public Class CComp_Binarized : Inherits VBparent
-    Dim edges As Edges_BinarizedSobel
+    Dim edges As New Edges_BinarizedSobel
     Dim ccomp As New CComp_Simple
     Public Sub New()
-        edges = New Edges_BinarizedSobel
         task.desc = "Find connected components using an image with binarized edges"
     End Sub
     Public Sub Run(src as cv.Mat)

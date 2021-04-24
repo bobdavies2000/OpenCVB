@@ -121,10 +121,9 @@ End Class
 
 Public Class MFD_BinarizedSobel : Inherits VBparent
     Public mfd As MFD_Basics
-    Dim sobel As Edges_BinarizedSobel
+    Dim sobel As New Edges_BinarizedSobel
     Public Sub New()
         mfd = New MFD_Basics
-        sobel = New Edges_BinarizedSobel
         label1 = "Binarized Sobel edges of Motion-Filtered RGB"
         task.desc = "Stabilize the binarized Sobel output with MFD"
     End Sub

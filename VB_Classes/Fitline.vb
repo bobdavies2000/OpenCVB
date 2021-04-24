@@ -1,10 +1,9 @@
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.4/js_contour_features_fitLine.html
 Public Class Fitline_Basics : Inherits VBparent
-    Public draw As Draw_Line
+    Public draw As New Draw_Line
     Public lines As New List(Of cv.Point) ' there are always an even number - 2 points define the line.
     Public Sub New()
-        draw = New Draw_Line
         findSlider("DrawCount").Value = 2
 
         If findfrm(caller + " Slider Options") Is Nothing Then

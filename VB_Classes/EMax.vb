@@ -5,9 +5,8 @@ Imports System.Runtime.InteropServices
 Public Class EMax_Raw : Inherits VBparent
     Dim inputDataMask As cv.Mat
     Dim EMax_Raw As IntPtr
-    Public options As EMax_Setup
+    Public options As New EMax_Setup
     Public Sub New()
-        options = New EMax_Setup()
         EMax_Raw = EMax_Raw_Open()
 
         label2 = "Emax regions as integers"
@@ -56,11 +55,10 @@ End Class
 
 Public Class EMax_Basics : Inherits VBparent
     Dim inputDataMask As cv.Mat
-    Public basics As EMax_Raw
+    Public basics As New EMax_Raw
     Dim lut As LUT_Color
     Public Sub New()
         lut = New LUT_Color
-        basics = New EMax_Raw
         label1 = "Emax regions around clusters"
         task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
     End Sub
@@ -148,8 +146,10 @@ Public Class EMax_Setup : Inherits VBparent
         For i = 0 To regionCount - 1
             regionColors(i) = colorMap.Get(Of cv.Vec3b)(0, i * spread)
         Next
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked = True Then
+
+        Static emaxFrm = findfrm(caller + " Radio Options")
+        For i = 0 To emaxFrm.check.Length - 1
+            If emaxFrm.check(i).Checked = True Then
                 covarianceMatrixType = Choose(i + 1, cv.EM.Types.CovMatSpherical, cv.EM.Types.CovMatDiagonal, cv.EM.Types.CovMatGeneric)
             End If
         Next
@@ -191,9 +191,8 @@ End Class
 ' https://docs.opencv.org/3.0-beta/modules/ml/doc/expectation_maximization.html
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/em.cpp
 Public Class EMax_VB_Failing : Inherits VBparent
-    Dim options As EMax_Setup
+    Dim options As New EMax_Setup
     Public Sub New()
-        options = New EMax_Setup
         task.desc = "OpenCV expectation maximization example."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -252,17 +251,16 @@ End Module
 
 
 Public Class EMax_Centroids : Inherits VBparent
-    Public emaxCPP As EMax_Basics
+    Public emaxCPP As New EMax_Basics
     Public flood As FloodFill_Basics
     Public Sub New()
         flood = New FloodFill_Basics
         findSlider("FloodFill LoDiff").Value = 0
         findSlider("FloodFill HiDiff").Value = 1
-        emaxCPP = New EMax_Basics
         findSlider("ThreadGrid Width").Value = dst1.Width * 170 / 640
         task.desc = "Get the Emax cluster centroids using floodfill "
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         emaxCPP.Run(src)
         flood.Run(emaxCPP.dst1.Clone)
         dst1 = flood.dst1
@@ -286,10 +284,8 @@ End Class
 
 Public Class EMax_PointTracker : Inherits VBparent
     Dim pTrack As KNN_PointTracker
-    Dim emax As EMax_Centroids
+    Dim emax As New EMax_Centroids
     Public Sub New()
-        emax = New EMax_Centroids
-
         pTrack = New KNN_PointTracker()
         findCheckBox("Draw rectangle and centroid for each mask").Checked = False
         findSlider("FloodFill Minimum Size").Value = 100

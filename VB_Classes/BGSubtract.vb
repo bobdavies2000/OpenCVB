@@ -75,7 +75,7 @@ Public Class BGSubtract_MotionDetect_MT : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat)
         Static correlationSlider = findSlider("Correlation Threshold")
-        Static frm = findfrm("BGSubtract_MotionDetect_MT Radio Options")
+        Static frm = findfrm(caller + " Radio Options")
         Dim threadData As New cv.Vec3i
         Dim width = src.Width, height = src.Height
         For i = 0 To frm.check.length - 1

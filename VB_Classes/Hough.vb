@@ -39,9 +39,8 @@ End Module
 
 ' https://docs.opencv.org/3.1.0/d6/d10/tutorial_py_houghlines.html
 Public Class Hough_Circles : Inherits VBparent
-    Dim circles As Draw_Circles
+    Dim circles As New Draw_Circles
     Public Sub New()
-        circles = New Draw_Circles()
         findSlider("DrawCount").Value = 3
         label1 = "Input circles to Hough"
         label2 = "Hough Circles found"

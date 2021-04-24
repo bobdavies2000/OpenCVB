@@ -88,7 +88,7 @@ Public Class Dither_Basics : Inherits VBparent
         End If
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 24)
-            Static frm = findfrm("Dither_Basics Radio Options")
+            Static frm = findfrm(caller + " Radio Options")
             For i = 0 To frm.check.length - 1
                 frm.check(i).Text = Choose(i + 1, "Bayer16", "Bayer8", "Bayer4", "Bayer3", "Bayer2", "BayerRgbNbpp", "BayerRgb3bpp", "BayerRgb6bpp",
                                            "BayerRgb9bpp", "BayerRgb12bpp", "BayerRgb15bpp", "BayerRgb18bpp", "FSRgbNbpp", "Floyd-Steinberg",
@@ -104,7 +104,7 @@ Public Class Dither_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src as cv.Mat)
         Dim radioIndex As Integer
-        Static frm = findfrm("Dither_Basics Radio Options")
+        Static frm = findfrm(caller + " Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then radioIndex = i
         Next

@@ -207,10 +207,8 @@ End Class
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
 Public Class OilPaint_Cartoon : Inherits VBparent
     Dim oil As OilPaint_Manual
-    Dim laplacian As Edges_Laplacian
+    Dim laplacian As New Edges_Laplacian
     Public Sub New()
-        laplacian = New Edges_Laplacian()
-
         oil = New OilPaint_Manual
         task.drawRect = New cv.Rect(dst1.Cols * 3 / 8, dst1.Rows * 3 / 8, dst1.Cols * 2 / 8, dst1.Rows * 2 / 8)
 

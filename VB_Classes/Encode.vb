@@ -56,7 +56,7 @@ Public Class Encode_Options : Inherits VBparent
     End Sub
     Public Function getEncodeParameter() As Integer
         Static qualitySlider = findSlider("Encode Quality Level")
-        Static frm = findfrm("Encode_Options Radio Options")
+        Static frm = findfrm(caller + " Radio Options")
         Dim encodeOption As Integer
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then

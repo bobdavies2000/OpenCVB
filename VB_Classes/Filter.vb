@@ -43,7 +43,7 @@ Public Class Filter_NormalizedKernel : Inherits VBparent
     Public Sub Run(src as cv.Mat)
         Dim kernel = New cv.Mat(1, 21, cv.MatType.CV_32FC1, New Single() {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1})
         Dim normType = cv.NormTypes.L1
-        Static frm = findfrm("Filter_NormalizedKernel Radio Options")
+        Static frm = findfrm(caller + " Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 normType = Choose(i + 1, cv.NormTypes.INF, cv.NormTypes.L1, cv.NormTypes.L2, cv.NormTypes.MinMax)

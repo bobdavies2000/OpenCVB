@@ -134,7 +134,7 @@ Public Class WarpModel_Input : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat)
         Static gradientCheck = findCheckBox("Use Gradient in WarpInput")
-        Static frm = findfrm("WarpModel_Input Radio Options")
+        Static frm = findfrm(caller + " Radio Options")
         Dim img As New cv.Mat
         For i = 0 To frm.check.length - 1
             Dim nextRadio = frm.check(i)

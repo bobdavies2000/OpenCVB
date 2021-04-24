@@ -98,7 +98,7 @@ Public Class XPhoto_OilPaint_CPP : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat)
         Dim colorCode As Integer = cv.ColorConversionCodes.BGR2GRAY
-        Static frm = findfrm("XPhoto_OilPaint_CPP Radio Options")
+        Static frm = findfrm(caller + " Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 colorCode = Choose(i + 1, cv.ColorConversionCodes.BGR2GRAY, cv.ColorConversionCodes.BGR2HSV, cv.ColorConversionCodes.BGR2YUV,

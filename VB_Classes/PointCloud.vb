@@ -619,11 +619,10 @@ End Class
 
 
 Public Class PointCloud_FrustrumTop : Inherits VBparent
-    Dim frustrum As Draw_Frustrum
+    Dim frustrum As New Draw_Frustrum
     Dim topView As Histogram_TopView2D
     Dim setupTop As New PointCloud_SetupTop
     Public Sub New()
-        frustrum = New Draw_Frustrum
         topView = New Histogram_TopView2D
 
         task.hist3DThreshold = 0
@@ -651,11 +650,10 @@ End Class
 
 
 Public Class PointCloud_FrustrumSide : Inherits VBparent
-    Dim frustrum As Draw_Frustrum
+    Dim frustrum As New Draw_Frustrum
     Dim sideView As Histogram_SideView2D
     Dim setupSide As New PointCloud_SetupSide
     Public Sub New()
-        frustrum = New Draw_Frustrum
         sideView = New Histogram_SideView2D
 
         task.hist3DThreshold = 0

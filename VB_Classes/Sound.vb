@@ -126,7 +126,7 @@ Public Class Sound_SignalGenerator : Inherits VBparent
 
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 7)
-            Static frm = findfrm("Sound_SignalGenerator Radio Options")
+            Static frm = findfrm(caller + " Radio Options")
             For i = 0 To frm.check.length - 1
                 frm.check(i).Text = Choose(i + 1, "Pink", "White", "Sweep", "Sin", "Square", "Triangle", "SawTooth")
             Next
@@ -154,7 +154,7 @@ Public Class Sound_SignalGenerator : Inherits VBparent
         Static reverse0Check = findCheckBox("PhaseReverse Left")
         Static reverse1Check = findCheckBox("PhaseReverse Right")
 
-        Static frm = findfrm("Sound_SignalGenerator Radio Options")
+        Static frm = findfrm(caller + " Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 wGen.Type = Choose(i + 1, Pink, White, Sweep, Sin, Square, Triangle, SawTooth)

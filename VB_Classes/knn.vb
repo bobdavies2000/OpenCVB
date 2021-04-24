@@ -255,7 +255,7 @@ End Class
 
 Public Class KNN_Emax : Inherits VBparent
     Public knn As KNN_1_to_1
-    Dim emax As EMax_Centroids
+    Dim emax As New EMax_Centroids
     Public Sub New()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 3)
@@ -813,9 +813,8 @@ Public Class KNN_PointTracker : Inherits VBparent
     Public queryRects As New List(Of cv.Rect)
     Public queryMasks As New List(Of cv.Mat)
     Public floodPoints As New List(Of cv.Point)
-    Public drawRC As Draw_ViewObjects
+    Public drawRC As New Draw_ViewObjects
     Public Sub New()
-        drawRC = New Draw_ViewObjects
         knn = New KNN_1_to_1
         allocateKalman(16) ' allocate some kalman objects
 

@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Threading
 Public Class Texture_Basics : Inherits VBparent
     Dim grid As New Thread_Grid
-    Dim ellipse As Draw_Ellipses
+    Dim ellipse As New Draw_Ellipses
     Public texture As New cv.Mat
     Public tRect As cv.Rect
     Dim texturePop As Integer
@@ -11,8 +11,6 @@ Public Class Texture_Basics : Inherits VBparent
         findSlider("ThreadGrid Width").Value = 64
         findSlider("ThreadGrid Height").Value = 64
         grid.Run(Nothing)
-
-        ellipse = New Draw_Ellipses()
         task.desc = "Use multi-threading to find the best sample 256x256 texture of a mask"
     End Sub
     Public Sub Run(src as cv.Mat)

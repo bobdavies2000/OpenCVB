@@ -804,10 +804,8 @@ End Class
 
 
 Public Class Depth_Edges : Inherits VBparent
-    Dim edges As Edges_Laplacian
+    Dim edges As New Edges_Laplacian
     Public Sub New()
-        edges = New Edges_Laplacian()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Threshold for depth disparity", 0, 255, 200)
@@ -1111,8 +1109,8 @@ Public Class Depth_PunchDecreasing : Inherits VBparent
         task.depth32f.CopyTo(depth32f, fore.dst1)
 
         Static lastDepth = depth32f
-
-        Dim mmThreshold = sliders.trackbar(0).Value
+        Static mmSlider = findSlider("Threshold in millimeters")
+        Dim mmThreshold = mmSlider.Value
         If Increasing Then
             cv.Cv2.Subtract(depth32f, lastDepth, dst1)
         Else
@@ -1431,7 +1429,7 @@ Public Class Depth_SmoothMinMax : Inherits VBparent
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.depth32f
 
         Dim radioVal As Integer
-        Static frm As OptionsRadioButtons = findfrm("Depth_SmoothMinMax Radio Options")
+        Static frm As OptionsRadioButtons = findfrm(caller + " Radio Options")
         For radioVal = 0 To frm.check.Count - 1
             If frm.check(radioVal).Checked Then Exit For
         Next

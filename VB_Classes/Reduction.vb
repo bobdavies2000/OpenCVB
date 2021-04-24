@@ -238,10 +238,9 @@ End Class
 
 
 Public Class Reduction_Edges : Inherits VBparent
-    Dim edges As Edges_Laplacian
+    Dim edges As New Edges_Laplacian
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        edges = New Edges_Laplacian()
         reduction.radio.check(0).Checked = True
         task.desc = "Get the edges after reducing the image."
     End Sub

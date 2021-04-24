@@ -391,7 +391,7 @@ End Class
 '    Public response As cv.Mat
 '    Dim rtree = cv.ML.RTrees.Create()
 '    Public predictions As New cv.Mat
-'    Dim emax As EMax_Centroids
+'    Dim emax as EMax_Centroids
 '    Public Sub New()
 
 '        If standalone or task.intermediateReview = caller Then

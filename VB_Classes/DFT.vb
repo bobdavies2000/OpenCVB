@@ -116,7 +116,7 @@ End Class
 ' http://breckon.eu/toby/teaching/dip/opencv/lecture_demos/c++/butterworth_lowpass.cpp
 ' https://github.com/ruohoruotsi/Butterworth-Filter-Design
 Public Class DFT_ButterworthFilter_MT : Inherits VBparent
-    Public dft As DFT_Basics
+    Public dft As New DFT_Basics
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -134,7 +134,6 @@ Public Class DFT_ButterworthFilter_MT : Inherits VBparent
             radio.check(0).Checked = True
         End If
 
-        dft = New DFT_Basics()
         task.desc = "Use the Butterworth filter on a DFT image - color image input."
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
@@ -168,7 +167,7 @@ Public Class DFT_ButterworthFilter_MT : Inherits VBparent
         End If
 
         Dim dftFlag As cv.DctFlags
-        Static frm = findfrm("DFT_ButterworthFilter_MT Radio Options")
+        Static frm = findfrm(caller + " Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 dftFlag = Choose(i + 1, cv.DftFlags.ComplexOutput, cv.DftFlags.Inverse, cv.DftFlags.None,
@@ -193,10 +192,8 @@ End Class
 ' http://breckon.eu/toby/teaching/dip/opencv/lecture_demos/c++/butterworth_lowpass.cpp
 ' https://github.com/ruohoruotsi/Butterworth-Filter-Design
 Public Class DFT_ButterworthDepth : Inherits VBparent
-    Dim bfilter As DFT_ButterworthFilter_MT
+    Dim bfilter As New DFT_ButterworthFilter_MT
     Public Sub New()
-        bfilter = New DFT_ButterworthFilter_MT()
-
         task.desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
@@ -220,22 +217,15 @@ End Class
 
 
 Public Class DFT_Shapes : Inherits VBparent
-    Dim dft As DFT_Basics
-    Dim circle As Draw_Circles
-    Dim ellipse As Draw_Ellipses
-    Dim polygon As Draw_Polygon
+    Dim dft As New DFT_Basics
+    Dim circle As New Draw_Circles
+    Dim ellipse As New Draw_Ellipses
+    Dim polygon As New Draw_Polygon
     Dim rectangle As New Rectangle_Basics
-    Dim lines As Draw_Line
-    Dim symShapes As Draw_SymmetricalShapes
+    Dim lines As New Draw_Line
+    Dim symShapes As New Draw_SymmetricalShapes
     Dim optDraw As New Draw_Options
     Public Sub New()
-        dft = New DFT_Basics
-        circle = New Draw_Circles
-        ellipse = New Draw_Ellipses
-        polygon = New Draw_Polygon
-        lines = New Draw_Line
-        symShapes = New Draw_SymmetricalShapes
-
         findSlider("DrawCount").Value = 1
 
         If findfrm(caller + " Radio Options") Is Nothing Then

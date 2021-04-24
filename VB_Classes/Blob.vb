@@ -91,16 +91,12 @@ End Class
 
 Public Class Blob_Input : Inherits VBparent
     Dim rectangles As New Rectangle_Rotated
-    Dim circles As Draw_Circles
-    Dim ellipses As Draw_Ellipses
-    Dim poly As Draw_Polygon
+    Dim circles As New Draw_Circles
+    Dim ellipses As New Draw_Ellipses
+    Dim poly As New Draw_Polygon
     Public Mats As New Mat_4to1
     Public updateFrequency = 30
     Public Sub New()
-        circles = New Draw_Circles
-        ellipses = New Draw_Ellipses
-        poly = New Draw_Polygon
-
         findSlider("DrawCount").Value = 5
         findSlider("Update Frequency").Value = 1
         findCheckBox("Draw filled (unchecked draw an outline)").Checked = True

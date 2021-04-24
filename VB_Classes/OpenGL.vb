@@ -288,10 +288,9 @@ End Class
 
 
 Public Class OpenGL_Draw3D : Inherits VBparent
-    Dim circle As Draw_Circles
+    Dim circle As New Draw_Circles
     Public ogl As OpenGL_Options
     Public Sub New()
-        circle = New Draw_Circles()
         findSlider("DrawCount").Value = 5
 
         ogl = New OpenGL_Options()

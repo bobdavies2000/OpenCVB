@@ -495,16 +495,15 @@ End Class
 
 
 Public Class FloodFill_Click : Inherits VBparent
-    Dim edges As Edges_BinarizedSobel
+    Dim edges As New Edges_BinarizedSobel
     Dim flood As FloodFill_Point
     Public Sub New()
-        edges = New Edges_BinarizedSobel
         flood = New FloodFill_Point
         flood.pt = New cv.Point(msRNG.Next(0, dst1.Width - 1), msRNG.Next(0, dst1.Height - 1))
         label2 = "Click anywhere to floodfill that area"
         task.desc = "FloodFill where the mouse clicks"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         If task.mouseClickFlag Then
             flood.pt = task.mouseClickPoint
@@ -530,14 +529,13 @@ End Class
 Public Class FloodFill_Point : Inherits VBparent
     Public pixelCount As Integer
     Public rect As cv.Rect
-    Dim edges As Edges_BinarizedSobel
+    Dim edges As New Edges_BinarizedSobel
     Public centroid As cv.Point2f
     Public initialMask As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public pt As cv.Point ' this is the floodfill point
     Public Sub New()
         If standalone Then
-            edges = New Edges_BinarizedSobel
             label2 = "FloodFill_Point standalone just shows the edges"
         Else
             label2 = "Resulting mask from floodfill"
@@ -545,7 +543,7 @@ Public Class FloodFill_Point : Inherits VBparent
         label1 = "Input image to floodfill"
         task.desc = "Use floodfill at a single location in a grayscale image."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         dst1 = src.Clone()
         If standalone Then
@@ -582,7 +580,7 @@ Public Class FloodFill_FullImage : Inherits VBparent
     Public centroids As New List(Of cv.Point2f)
     Public floodPoints As New List(Of cv.Point)
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
-    Public edges As Edges_BinarizedSobel
+    Public edges As New Edges_BinarizedSobel
     Dim initialMask As New cv.Mat
     Dim palette As Palette_RandomColorMap
     Public motion As Motion_Basics
@@ -591,7 +589,6 @@ Public Class FloodFill_FullImage : Inherits VBparent
     Public Sub New()
         motion = New Motion_Basics
         palette = New Palette_RandomColorMap
-        edges = New Edges_BinarizedSobel
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

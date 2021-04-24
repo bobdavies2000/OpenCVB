@@ -29,7 +29,7 @@ Public Class MatchTemplate_Basics : Inherits VBparent
     End Sub
     Public Function checkRadio() As cv.TemplateMatchModes
         matchOption = cv.TemplateMatchModes.CCoeffNormed
-        Static frm = findfrm("MatchTemplate_Basics Radio Options")
+        Static frm = findfrm(caller + " Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 matchOption = Choose(i + 1, cv.TemplateMatchModes.CCoeff, cv.TemplateMatchModes.CCoeffNormed, cv.TemplateMatchModes.CCorr,

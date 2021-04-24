@@ -45,10 +45,8 @@ End Class
 
 
 Public Class InPaint_Noise : Inherits VBparent
-    Dim noise As Draw_Noise
+    Dim noise as New Draw_Noise
     Public Sub New()
-        noise = New Draw_Noise()
-
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 2)
             radio.check(0).Text = "TELEA"

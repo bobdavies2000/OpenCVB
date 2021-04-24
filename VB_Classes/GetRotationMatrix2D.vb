@@ -51,7 +51,7 @@ Public Class GetRotationMatrix2D_Basics : Inherits VBparent
         task.desc = "Rotate a rectangle of a specified angle"
     End Sub
     Public Sub Run(src as cv.Mat)
-        Static frm = findfrm("GetRotationMatrix2D_Basics Radio Options")
+        Static frm = findfrm(caller + " Radio Options")
 
         rotateOptions.Run(src)
         Dim angle = sliders.trackbar(0).Value
