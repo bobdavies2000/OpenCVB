@@ -67,11 +67,9 @@ End Class
 ' https://docs.opencv.org/3.1.0/d6/d10/tutorial_py_houghlines.html
 ' https://github.com/JiphuTzu/opencvsharp/blob/master/sample/SamplesVB/Samples/HoughLinesSample.vb
 Public Class Hough_Lines : Inherits VBparent
-    Dim edges As Edges_Basics
+    Dim edges As New Edges_Basics
     Public segments() As cv.LineSegmentPolar
     Public Sub New()
-        edges = New Edges_Basics()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "rho", 1, 100, 1)
@@ -112,8 +110,8 @@ End Class
 
 
 Public Class Hough_Lines_MT : Inherits VBparent
-    Dim edges As Edges_Basics
-    Public grid As Thread_Grid
+    Dim edges As New Edges_Basics
+    Public grid As New Thread_Grid
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -121,9 +119,7 @@ Public Class Hough_Lines_MT : Inherits VBparent
             sliders.setupTrackBar(1, "theta", 1, 1000, 1000 * Math.PI / 180)
             sliders.setupTrackBar(2, "threshold", 1, 100, 3)
         End If
-        edges = New Edges_Basics()
 
-        grid = New Thread_Grid
         findSlider("ThreadGrid Width").Value = 16
         findSlider("ThreadGrid Height").Value = 16
 

@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Threading
-
 ' https://github.com/opencv/opencv_contrib/blob/master/modules/bgsegm/samples/bgfg.cpp
 Public Class BGSubtract_Basics_CPP : Inherits VBparent
     Dim bgfs As IntPtr
@@ -61,6 +60,7 @@ Public Class BGSubtract_MotionDetect_MT : Inherits VBparent
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
         End If
+
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 6)
             For i = 0 To radio.check.Length - 1
@@ -69,6 +69,7 @@ Public Class BGSubtract_MotionDetect_MT : Inherits VBparent
             radio.check(0).Text = "1 thread"
             radio.check(5).Checked = True
         End If
+
         label2 = "Only Motion Added"
         task.desc = "Detect Motion for use with background subtraction"
     End Sub
@@ -115,10 +116,8 @@ End Class
 
 
 Public Class BGSubtract_Basics_MT : Inherits VBparent
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Public Sub New()
-        grid = New Thread_Grid
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
@@ -157,9 +156,8 @@ End Class
 
 
 Public Class BGSubtract_Depth_MT : Inherits VBparent
-    Dim bgsub As BGSubtract_Basics_MT
+    Dim bgsub As New BGSubtract_Basics_MT
     Public Sub New()
-        bgsub = New BGSubtract_Basics_MT()
         task.desc = "Detect Motion in the depth image - needs more work"
         label1 = "Depth data src"
         label2 = "Accumulated depth image"
@@ -283,14 +281,10 @@ End Class
 
 
 Public Class BGSubtract_MOG_Retina : Inherits VBparent
-    Dim bgSub As BGSubtract_MOG
-    Dim retina As Retina_Basics_CPP
+    Dim bgSub As New BGSubtract_MOG
+    Dim retina As New Retina_Basics_CPP
     Public Sub New()
-        bgSub = New BGSubtract_MOG()
         findSlider("MOG Learn Rate").Value = 100
-
-        retina = New Retina_Basics_CPP()
-
         label1 = "MOG results of depth motion"
         label2 = "Difference from retina depth motion."
         task.desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
@@ -307,9 +301,8 @@ End Class
 
 
 Public Class BGSubtract_DepthOrColorMotion : Inherits VBparent
-    Public motion As Diff_UnstableDepthAndColor
+    Public motion As New Diff_UnstableDepthAndColor
     Public Sub New()
-        motion = New Diff_UnstableDepthAndColor()
         task.desc = "Detect motion with both depth and color changes"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -355,12 +348,9 @@ End Module
 
 
 Public Class BGSubtract_Video : Inherits VBparent
-    Dim bgfg As BGSubtract_Basics_CPP
-    Dim video As Video_Basics
+    Dim bgfg As New BGSubtract_Basics_CPP
+    Dim video As New Video_Basics
     Public Sub New()
-        bgfg = New BGSubtract_Basics_CPP()
-
-        video = New Video_Basics()
         video.srcVideo = task.parms.homeDir + "Data/vtest.avi"
         task.desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
     End Sub
@@ -429,12 +419,9 @@ End Class
 
 
 Public Class BGSubtract_Synthetic : Inherits VBparent
-    Dim bgfg As BGSubtract_Basics_CPP
-    Dim synth As BGSubtract_Synthetic_CPP
+    Dim bgfg As New BGSubtract_Basics_CPP
+    Dim synth As New BGSubtract_Synthetic_CPP
     Public Sub New()
-        bgfg = New BGSubtract_Basics_CPP()
-
-        synth = New BGSubtract_Synthetic_CPP()
         task.desc = "Demonstrate background subtraction algorithms with synthetic images - Painterly"
     End Sub
     Public Sub Run(src As cv.Mat)

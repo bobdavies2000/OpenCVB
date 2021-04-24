@@ -2,22 +2,17 @@ Imports cv = OpenCvSharp
 Public Class Moments_Basics : Inherits VBparent
     Public inputMask As cv.Mat
     Public centroid As cv.Point2f
-    Dim foreground As KMeans_Depth_FG_BG
+    Dim foreground As New KMeans_Depth_FG_BG
     Public scaleFactor As Integer = 1
     Public offsetPt As cv.Point
-    Public kalman As Kalman_Basics
+    Public kalman As New Kalman_Basics
     Public Sub New()
-
-        If standalone Then foreground = New KMeans_Depth_FG_BG()
-
-        kalman = New Kalman_Basics()
         ReDim kalman.kInput(2 - 1) ' 2 elements - cv.point
-
         label1 = "Red dot = Kalman smoothed centroid"
         task.desc = "Compute the centroid of the provided mask file."
     End Sub
-    Public Sub Run(src as cv.Mat)
-        If standalone or task.intermediateReview = caller Then
+    Public Sub Run(src As cv.Mat)
+        If standalone Or task.intermediateReview = caller Then
             foreground.Run(src)
             dst1 = foreground.dst1
             inputMask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -33,7 +28,7 @@ Public Class Moments_Basics : Inherits VBparent
         Else
             center = New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00)
         End If
-        If standalone or task.intermediateReview = caller Then dst1.Circle(center, 10, cv.Scalar.Red, -1, task.lineType)
+        If standalone Or task.intermediateReview = caller Then dst1.Circle(center, 10, cv.Scalar.Red, -1, task.lineType)
         centroid = New cv.Point2f(scaleFactor * (offsetPt.X + center.X), scaleFactor * (offsetPt.Y + center.Y))
     End Sub
 End Class
@@ -43,14 +38,10 @@ End Class
 
 
 Public Class Moments_CentroidKalman : Inherits VBparent
-    Dim foreground As KMeans_Depth_FG_BG
-    Dim kalman As Kalman_Basics
+    Dim foreground As New KMeans_Depth_FG_BG
+    Dim kalman As New Kalman_Basics
     Public Sub New()
-        kalman = New Kalman_Basics()
         ReDim kalman.kInput(2 - 1) ' 2 elements - cv.point
-
-        foreground = New KMeans_Depth_FG_BG()
-
         label1 = "Red dot = Kalman smoothed centroid"
         task.desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
     End Sub

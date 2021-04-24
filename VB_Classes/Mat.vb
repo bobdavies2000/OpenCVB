@@ -21,9 +21,8 @@ End Class
 
 
 Public Class Mat_PointToMat : Inherits VBparent
-    Dim random As Random_Basics
+    Dim random As New Random_Basics
     Public Sub New()
-        random = New Random_Basics()
         random.plotPoints = True
         label1 = "Random_Basics points (original)"
         label2 = "Random_Basics points after format change"
@@ -49,9 +48,7 @@ End Class
 
 
 Public Class Mat_MatToPoint : Inherits VBparent
-    Dim mask As Random_Basics
     Public Sub New()
-        mask = New Random_Basics()
         task.desc = "Convert a mat into a vector of points."
         label1 = "Reconstructed RGB Image"
     End Sub
@@ -210,11 +207,10 @@ End Class
 
 
 Public Class Mat_ImageXYZ_MT : Inherits VBparent
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Public xyDepth As cv.Mat
     Public xyzPlanes() As cv.Mat
     Public Sub New()
-        grid = New Thread_Grid
         findSlider("ThreadGrid Width").Value = 32
         findSlider("ThreadGrid Height").Value = 32
 
@@ -292,9 +288,8 @@ End Class
 
 
 Public Class Mat_MultiplyReview : Inherits VBparent
-    Dim flow As Font_FlowText
+    Dim flow As New Font_FlowText
     Public Sub New()
-        flow = New Font_FlowText()
         task.desc = "Review matrix multiplication"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -352,12 +347,11 @@ End Class
 
 ' https://stackoverflow.com/questions/11015119/inverse-matrix-opencv-matrix-inv-not-working-properly
 Public Class Mat_Inverse : Inherits VBparent
-    Dim flow As Font_FlowText
+    Dim flow As New Font_FlowText
     Public matrix(,) As Single = {{1.1688, 0.23, 62.2}, {-0.013, 1.225, -6.29}, {0, 0, 1}}
     Public validateInverse As Boolean
     Public inverse As New cv.Mat
     Public Sub New()
-        flow = New Font_FlowText()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 6)
             radio.check(0).Text = "Cholesky"
@@ -459,11 +453,8 @@ End Class
 
 
 Public Class Mat_2Click : Inherits VBparent
-    Dim mats As Mat_2to1
-    Public mat() As cv.Mat
+    Dim mats As New Mat_2to1
     Public Sub New()
-        mats = New Mat_2to1
-        mat = mats.mat
         task.desc = "Split an image into 2 segments and allow clicking on each half to open it in dst2"
     End Sub
     Public Sub Run(src As cv.Mat)

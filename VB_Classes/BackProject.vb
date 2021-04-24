@@ -1,9 +1,8 @@
 ﻿Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
 Public Class BackProject_Basics : Inherits VBparent
-    Public hist As Histogram_Basics
+    Public hist As New Histogram_Basics
     Public Sub New()
-        hist = New Histogram_Basics
         label1 = "Move mouse to backproject each histogram column"
         task.desc = "Explore Backprojection of each element of a grayscale histogram."
     End Sub
@@ -39,11 +38,9 @@ End Class
 
 
 Public Class BackProject_Masks : Inherits VBparent
-    Dim lines As Line_Basics
-    Dim hist As Histogram_Basics
+    Dim lines As New Line_Basics
+    Dim hist As New Histogram_Basics
     Public Sub New()
-        hist = New Histogram_Basics
-        lines = New Line_Basics
         task.desc = "Create all the backprojection masks from a histogram"
     End Sub
     Public Function maskLineDetect(gray As cv.Mat, histogram As cv.Mat, histIndex As Integer) As List(Of cv.Vec4f)
@@ -93,9 +90,8 @@ End Class
 
 Public Class BackProject_MasksLines : Inherits VBparent
     Dim lines As BackProject_Masks
-    Dim hist As Histogram_Basics
+    Dim hist As New Histogram_Basics
     Public Sub New()
-        hist = New Histogram_Basics
         lines = New BackProject_Masks
         task.desc = "Inspect the lines from individual backprojection masks from a histogram"
     End Sub
@@ -130,14 +126,10 @@ End Class
 
 
 Public Class BackProject_Surfaces : Inherits VBparent
-    Public pcValid As Motion_MinMaxPointCloud
-    Dim hist As Histogram_Basics
-    Dim mats As Mat_2to1
+    Public pcValid As New Motion_MinMaxPointCloud
+    Dim hist As New Histogram_Basics
+    Dim mats As New Mat_2to1
     Public Sub New()
-        mats = New Mat_2to1
-        hist = New Histogram_Basics
-        pcValid = New Motion_MinMaxPointCloud
-
         label1 = "Top=differences in X, Bot=differences in Y"
         task.desc = "Find solid surfaces using the pointcloud X and Y differences"
     End Sub
@@ -277,9 +269,8 @@ End Class
 
 
 Public Class BackProject_Full : Inherits VBparent
-    Public hist As Histogram_Basics
+    Public hist As New Histogram_Basics
     Public Sub New()
-        hist = New Histogram_Basics
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         label1 = "Move mouse to backproject each histogram column"
         task.desc = "Backproject the entire histogram."
@@ -312,10 +303,9 @@ End Class
 
 
 Public Class BackProject_Reduction : Inherits VBparent
-    Dim basics As Reduction_Basics
+    Dim basics As New Reduction_Basics
     Dim hist As BackProject_Basics
     Public Sub New()
-        basics = New Reduction_Basics()
         findRadio("Use bitwise reduction").Checked = True
         hist = New BackProject_Basics
 
@@ -341,11 +331,9 @@ End Class
 
 
 Public Class BackProject_ReductionLines : Inherits VBparent
-    Dim reduce As Reduction_Basics
-    Dim lines As Line_Basics
+    Dim reduce As New Reduction_Basics
+    Dim lines As New Line_Basics
     Public Sub New()
-        lines = New Line_Basics
-        reduce = New Reduction_Basics()
         findRadio("Use bitwise reduction").Checked = True
 
         label2 = "Backprojection of highlighted histogram bin"
@@ -379,10 +367,9 @@ End Class
 
 Public Class BackProject_FullLines : Inherits VBparent
     Dim hist As BackProject_Full
-    Dim lines As Line_Basics
+    Dim lines As New Line_Basics
     Public Sub New()
         hist = New BackProject_Full
-        lines = New Line_Basics
         task.desc = "Find lines in the back projection"
     End Sub
     Public Sub Run(src As cv.Mat)

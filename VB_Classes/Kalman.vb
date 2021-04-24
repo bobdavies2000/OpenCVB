@@ -63,7 +63,7 @@ Public Class Kalman_Stripped : Inherits VBparent
     Public kInput(4 - 1) As Single
     Public kOutput(4 - 1) As Single
     Public Sub New()
-        task.desc = "High volume usage only.  Same as Kalman_basics but no check boxes."
+        task.desc = "High volume usage only.  Same As New Kalman_Basics but no check boxes."
     End Sub
     Public Sub Run(src as cv.Mat)
         Static saveDimension = -1
@@ -240,10 +240,9 @@ End Class
 ' http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
 ' https://www.codeproject.com/Articles/865935/Object-Tracking-Kalman-Filter-with-Ease
 Public Class Kalman_MousePredict : Inherits VBparent
-    Dim kalman As Kalman_Basics
+    Dim kalman As New Kalman_Basics
     Dim lineWidth As Integer
     Public Sub New()
-        kalman = New Kalman_Basics()
         ReDim kalman.kInput(2 - 1)
         ReDim kalman.kOutput(2 - 1)
 
@@ -274,10 +273,9 @@ End Class
 Public Class Kalman_CVMat : Inherits VBparent
     Dim kalman() As Kalman_Simple
     Public output As cv.Mat
-    Dim basics As Kalman_Basics
+    Dim basics As New Kalman_Basics
     Public input As cv.Mat
     Public Sub New()
-        basics = New Kalman_Basics()
         ReDim basics.kInput(4 - 1)
         input = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
         If standalone Then label1 = "Rectangle moves smoothly to random locations"
@@ -638,11 +636,8 @@ Public Class Kalman_VB_Basics : Inherits VBparent
     Dim processCovar As Single = 0.001 'This is the process covarience matrix. It's how much we trust the accelerometer
     Dim matrix As New List(Of Single)
     Dim plot As Plot_OverTime
-    Dim basics As Kalman_Basics
+    Dim basics As New Kalman_Basics
     Public Sub New()
-
-        basics = New Kalman_Basics()
-
         plot = New Plot_OverTime()
         plot.plotCount = 3
         plot.topBottomPad = 20

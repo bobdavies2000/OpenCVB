@@ -18,7 +18,7 @@ Public Class Binarize_Basics : Inherits VBparent
         mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 255)
         task.desc = "Binarize an image using Threshold with OTSU."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         meanScalar = cv.Cv2.Mean(src, mask)
 
         Dim input = src
@@ -39,11 +39,10 @@ End Class
 
 'https://docs.opencv.org/3.4/d7/d4d/tutorial_py_thresholding.html
 Public Class Binarize_OTSU : Inherits VBparent
-    Dim plotHist As Plot_Histogram
+    Dim plotHist As New Plot_Histogram
     Dim binarize As Binarize_Basics
     Public Sub New()
         binarize = New Binarize_Basics()
-        plotHist = New Plot_Histogram()
 
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 4)
@@ -58,7 +57,7 @@ Public Class Binarize_OTSU : Inherits VBparent
         label2 = "Histograms correspond to images on the left"
         task.desc = "Binarize an image using Threshold with OTSU."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -103,7 +102,7 @@ Public Class Binarize_Niblack_Sauvola : Inherits VBparent
         label1 = "Binarize Niblack"
         label2 = "Binarize Sauvola"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
@@ -133,7 +132,7 @@ Public Class Binarize_Niblack_Nick : Inherits VBparent
         label1 = "Binarize Niblack"
         label2 = "Binarize Nick"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
@@ -164,7 +163,7 @@ Public Class Binarize_Bernson : Inherits VBparent
         task.drawRect = New cv.Rect(100, 100, 100, 100)
         task.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
@@ -183,9 +182,8 @@ End Class
 
 
 Public Class Binarize_Bernson_MT : Inherits VBparent
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Public Sub New()
-        grid = New Thread_Grid
         findSlider("ThreadGrid Width").Value = 32
         findSlider("ThreadGrid Height").Value = 32
 
@@ -228,11 +226,10 @@ End Class
 
 
 Public Class Binarize_Reduction : Inherits VBparent
-    Dim reduction As Reduction_Basics
+    Dim reduction As New Reduction_Basics
     Dim basics As Binarize_Basics
     Public Sub New()
         basics = New Binarize_Basics
-        reduction = New Reduction_Basics
         findRadio("Use bitwise reduction").Checked = True
         findSlider("Reduction factor").Value = 256
         label1 = "Binarize output from reduction"

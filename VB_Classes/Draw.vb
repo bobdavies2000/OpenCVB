@@ -348,7 +348,7 @@ End Class
 
 
 Public Class Draw_Arc : Inherits VBparent
-    Dim kalman As Kalman_Basics
+    Dim kalman As New Kalman_Basics
     Dim saveArcAngle As Integer
     Dim saveMargin As Integer
     Dim rect As cv.Rect
@@ -360,8 +360,6 @@ Public Class Draw_Arc : Inherits VBparent
     Dim colorIndex As Integer
     Dim thickness As Integer
     Public Sub New()
-
-        kalman = New Kalman_Basics()
         ReDim kalman.kInput(7 - 1)
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -392,7 +390,7 @@ Public Class Draw_Arc : Inherits VBparent
 
         kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If task.useKalman Then
             kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
             kalman.Run(src)
@@ -439,7 +437,7 @@ Public Class Draw_ViewObjects : Inherits VBparent
         End If
         task.desc = "Draw rectangles and centroids"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If standalone Or task.intermediateReview = caller Then
             task.trueText("Draw_ViewObjects has no standalone version." + vbCrLf + "It just draws rectangles and centroids for other algorithms.")
         Else
@@ -485,7 +483,7 @@ Public Class Draw_Frustrum : Inherits VBparent
         label2 = "Frustrum's shape prepared."
         task.desc = "Draw a frustrum for a camera viewport"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         dst1 = New cv.Mat(task.pointCloud.Height, task.pointCloud.Width, cv.MatType.CV_32F, 0)
         Dim fRect = New cv.Rect((dst2.Width - dst2.Height) / 2, 0, dst2.Height, dst2.Height)
         Dim mid = task.pointCloud.Height / 2
@@ -503,8 +501,8 @@ End Class
 
 
 Public Class Draw_ClipLine : Inherits VBparent
-    Dim flow As Font_FlowText
-    Dim kalman As Kalman_Basics
+    Dim flow As New Font_FlowText
+    Dim kalman As New Kalman_Basics
     Dim lastRect As cv.Rect
     Dim pt1 As cv.Point
     Dim pt2 As cv.Point
@@ -518,10 +516,6 @@ Public Class Draw_ClipLine : Inherits VBparent
         If task.useKalman Then flow.msgs.Add("--------------------------- setup ---------------------------")
     End Sub
     Public Sub New()
-
-        flow = New Font_FlowText()
-
-        kalman = New Kalman_Basics()
         setup()
 
         task.desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"

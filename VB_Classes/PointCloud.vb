@@ -404,11 +404,10 @@ End Class
 
 
 Public Class PointCloud_Raw_CPP : Inherits VBparent
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
     Public Sub New()
-        grid = New Thread_Grid
         findSlider("ThreadGrid Width").Value = 64
         findSlider("ThreadGrid Height").Value = 32
 
@@ -450,11 +449,10 @@ End Class
 
 
 Public Class PointCloud_Raw : Inherits VBparent
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Dim cPtr As IntPtr
     Dim depthBytes() As Byte
     Public Sub New()
-        grid = New Thread_Grid
         findSlider("ThreadGrid Width").Value = 64
         findSlider("ThreadGrid Height").Value = 32
 
@@ -505,15 +503,12 @@ End Class
 
 Public Class PointCloud_Kalman_TopView : Inherits VBparent
     Public pTrack As KNN_PointTracker
-    Public flood As FloodFill_Palette
+    Public flood As New FloodFill_Palette
     Public topView As Histogram_TopView2D
     Public Sub New()
-
         pTrack = New KNN_PointTracker
-        flood = New FloodFill_Palette
         findSlider("FloodFill Minimum Size").Value = 100
         topView = New Histogram_TopView2D
-
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -696,11 +691,10 @@ End Class
 
 Public Class PointCloud_ReducedSideView : Inherits VBparent
     Dim gCloud As Depth_PointCloud_IMU
-    Dim reduction As Reduction_Basics
+    Dim reduction As New Reduction_Basics
     Dim histOutput As New cv.Mat
     Public Sub New()
         gCloud = New Depth_PointCloud_IMU
-        reduction = New Reduction_Basics
         task.desc = "Create a stable side view of the point cloud"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -731,11 +725,10 @@ End Class
 
 Public Class PointCloud_ReducedTopView : Inherits VBparent
     Dim gCloud As Depth_PointCloud_IMU
-    Dim reduction As Reduction_Basics
+    Dim reduction As New Reduction_Basics
     Dim histOutput As New cv.Mat
     Public Sub New()
         gCloud = New Depth_PointCloud_IMU
-        reduction = New Reduction_Basics
         task.desc = "Create a stable side view of the point cloud"
     End Sub
     Public Sub Run(src As cv.Mat)

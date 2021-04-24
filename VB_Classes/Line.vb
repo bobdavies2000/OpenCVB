@@ -65,7 +65,7 @@ End Class
 
 Public Class Line_LeftRightOverlay : Inherits VBparent
     Dim lrLines As Line_LeftRightImages
-    Dim lines As Line_Basics
+    Dim lines As New Line_Basics
     Public Sub New()
         lrLines = New Line_LeftRightImages
 
@@ -76,14 +76,13 @@ Public Class Line_LeftRightOverlay : Inherits VBparent
             radio.check(0).Checked = True
         End If
 
-        lines = New Line_Basics
         lines.lenSlider.Value = 50
         dst2.SetTo(cv.Scalar.White)
         label1 = "Left image of Line_LeftRightImages"
         label2 = "Left image lines in red, right in blue"
         task.desc = "Plot the points found for stable lines in the left and right images"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static lrRadio = findRadio("Show Left image lines and right image lines")
         Dim showLeftRight = lrRadio.checked
 
@@ -127,19 +126,16 @@ End Class
 
 
 Public Class Line_Reduction : Inherits VBparent
-    Dim lDetect As Line_Basics
-    Dim reduction As Reduction_Basics
+    Dim lDetect As New Line_Basics
+    Dim reduction As New Reduction_Basics
     Public Sub New()
-        lDetect = New Line_Basics()
-
-        reduction = New Reduction_Basics()
         findRadio("Use simple reduction").Checked = True
 
         label1 = "Yellow > length threshold, red < length threshold"
         label2 = "Input image after reduction"
         task.desc = "Use the reduced rgb image as input to the line detector"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         reduction.Run(src)
 
         lDetect.Run(reduction.dst1)
@@ -168,7 +164,7 @@ Public Class Line_InterceptsUI : Inherits VBparent
         label1 = "Use mouse in right image to highlight lines"
         task.desc = "An alternative way to highlight line segments with common slope"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static redRadio = findRadio("Show Top intercepts")
         Static greenRadio = findRadio("Show Bottom intercepts")
         Static yellowRadio = findRadio("Show Right intercepts")
@@ -236,19 +232,18 @@ End Class
 
 
 Public Class Line_ConfirmedDepth : Inherits VBparent
-    Dim lines As Line_Basics
+    Dim lines As New Line_Basics
     Public pt1 As New List(Of cv.Point2f)
     Public pt2 As New List(Of cv.Point2f)
     Public z1 As New List(Of cv.Point3f) ' the point cloud values corresponding to pt1 and pt2
     Public z2 As New List(Of cv.Point3f)
     Public cloudInput As cv.Mat
     Public Sub New()
-        lines = New Line_Basics
         label1 = "Lines defined in RGB"
         label2 = "Lines in RGB confirmed in the point cloud"
         task.desc = "Find the RGB lines and confirm they are present in the cloud data."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static thickSlider = findSlider("Line thickness")
         Dim thickness = thickSlider.value
 
@@ -328,7 +323,7 @@ Public Class Line_Vertical : Inherits VBparent
 
         task.desc = "Find all the vertical lines in the IMU rectified cloud"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static thickSlider = findSlider("Line thickness")
         Static errorSlider = findSlider("Error tolerance when measuring vertical lines in 3D (mm's)")
         toleranceInMMs = errorSlider.value / 1000
@@ -362,7 +357,7 @@ Public Class Line_Horizontal : Inherits VBparent
         vLines = New Line_Vertical
         task.desc = "Find all the horizontal lines in the IMU rectified cloud"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         dst1 = src.Clone
 
         vLines.Run(src)
@@ -384,7 +379,7 @@ End Class
 
 
 Public Class Line_Intercepts : Inherits VBparent
-    Dim lines As Line_Basics
+    Dim lines As New Line_Basics
     Public pt1 As New List(Of cv.Point2f)
     Public pt2 As New List(Of cv.Point2f)
     Public topIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
@@ -394,7 +389,6 @@ Public Class Line_Intercepts : Inherits VBparent
     Public searchRange As Integer
     Public thickNess As Integer
     Public Sub New()
-        lines = New Line_Basics
         findSlider("Line length threshold in pixels").Value = 1
 
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -442,7 +436,7 @@ Public Class Line_Intercepts : Inherits VBparent
             If radio.checked Then hightLightIntercept(pt, intercepts, i, dst)
         Next
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static thickSlider = findSlider("Line thickness")
         Static searchSlider = findSlider("x- and y-intercept search range in pixels")
         thickNess = thickSlider.value
@@ -509,20 +503,16 @@ End Class
 
 Public Class Line_LeftRightImages : Inherits VBparent
     Dim lrPalette As Palette_LeftRightImages
-    Public leftLines As Line_Basics
-    Public rightLines As Line_Basics
+    Public leftLines As New Line_Basics
+    Public rightLines As New Line_Basics
     Public Sub New()
         lrPalette = New Palette_LeftRightImages
-
-        leftLines = New Line_Basics
-        rightLines = New Line_Basics
         findSlider("Line length threshold in pixels").Value = 1
-
         label1 = "Left infrared image with lines detected"
         label2 = "Right infrared image with lines detected"
         task.desc = "Find lines in the infrared images"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim color = cv.Scalar.Yellow
         If standalone Then color = cv.Scalar.Black
 
@@ -555,7 +545,7 @@ End Class
 
 
 Public Class Line_Sift_MT : Inherits VBparent
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Dim siftCS As New CS_SiftBasics
     Dim siftBasics As Sift_Basics
     Dim lrView As Line_LeftRightImages
@@ -563,7 +553,6 @@ Public Class Line_Sift_MT : Inherits VBparent
     Public Sub New()
         lrView = New Line_LeftRightImages
 
-        grid = New Thread_Grid
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         Dim gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Maximum = task.color.Cols * 2
@@ -662,7 +651,7 @@ Public Class Line_NearestPoint : Inherits VBparent
         Dim nearest = findNearest(p1, p2, pt)
         Return nearest.DistanceTo(pt)
     End Function
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         If task.frameCount Mod 30 = 0 And standalone Then
             Dim pt = getPoint()
@@ -686,11 +675,10 @@ End Class
 
 
 Public Class Line_SideView : Inherits VBparent
-    Dim lines As Line_Basics
+    Dim lines As New Line_Basics
     Dim tView As TimeView_FloodFill
     Public Sub New()
         tView = New TimeView_FloodFill
-        lines = New Line_Basics
         label1 = "Side view of the lines detected in the RGB image"
         label2 = "Lines found in the RGB image view"
         task.desc = "Line in image are projected into the depth image"

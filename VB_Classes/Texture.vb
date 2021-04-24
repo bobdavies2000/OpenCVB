@@ -1,14 +1,13 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
 Public Class Texture_Basics : Inherits VBparent
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Dim ellipse As Draw_Ellipses
     Public texture As New cv.Mat
     Public tRect As cv.Rect
     Dim texturePop As Integer
     Public tChange As Boolean ' if the texture hasn't changed this will be false.
     Public Sub New()
-        grid = New Thread_Grid
         findSlider("ThreadGrid Width").Value = 64
         findSlider("ThreadGrid Height").Value = 64
         grid.Run(Nothing)
@@ -106,10 +105,9 @@ End Class
 
 Public Class Texture_Flow_Reduction : Inherits VBparent
     Dim texture As Texture_Flow
-    Dim reduction As Reduction_Basics
+    Dim reduction As New Reduction_Basics
     Public Sub New()
         texture = New Texture_Flow
-        reduction = New Reduction_Basics
         task.desc = "Display texture flow in the reduced color image"
     End Sub
     Public Sub Run(src as cv.Mat)

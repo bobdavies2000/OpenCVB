@@ -133,10 +133,9 @@ End Module
 
 
 Public Class Depth_MeanStdev_MT : Inherits VBparent
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Dim meanSeries As New cv.Mat
     Public Sub New()
-        grid = New Thread_Grid
         findSlider("ThreadGrid Width").Value = 64
         findSlider("ThreadGrid Height").Value = 40
 
@@ -257,10 +256,8 @@ End Class
 
 
 Public Class Depth_Uncertainty : Inherits VBparent
-    Dim retina As Retina_Basics_CPP
+    Dim retina As New Retina_Basics_CPP
     Public Sub New()
-        retina = New Retina_Basics_CPP()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Uncertainty threshold", 1, 255, 100)
@@ -451,15 +448,13 @@ End Class
 
 
 Public Class Depth_ColorizerVB_MT : Inherits VBparent
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Min Depth", 0, 1000, 0)
             sliders.setupTrackBar(1, "Max Depth", 1001, 10000, 4000)
         End If
-        grid = New Thread_Grid
-
         task.desc = "Colorize depth manually with multi-threading."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -517,9 +512,8 @@ End Class
 
 
 Public Class Depth_Colorizer_MT : Inherits VBparent
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Public Sub New()
-        grid = New Thread_Grid
         task.desc = "Colorize normally uses CDF to stabilize the colors.  Just using sliders here - stabilized but not optimal range."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -557,12 +551,10 @@ End Class
 
 
 Public Class Depth_LocalMinMax_MT : Inherits VBparent
-    Public grid As Thread_Grid
+    Public grid As New Thread_Grid
     Public minPoint(0) As cv.Point2f
     Public maxPoint(0) As cv.Point2f
     Public Sub New()
-        grid = New Thread_Grid
-
         label1 = "Red is min distance, blue is max distance"
         task.desc = "Find min and max depth in each segment."
     End Sub
@@ -600,15 +592,13 @@ End Class
 
 
 Public Class Depth_LocalMinMax_Kalman_MT : Inherits VBparent
-    Dim kalman As Kalman_Basics
-    Public grid As Thread_Grid
+    Dim kalman As New Kalman_Basics
+    Public grid As New Thread_Grid
     Public Sub New()
-        grid = New Thread_Grid
         findSlider("ThreadGrid Width").Value = 128
         findSlider("ThreadGrid Height").Value = 90
         grid.Run(Nothing)
 
-        kalman = New Kalman_Basics()
         ReDim kalman.kInput(grid.roiList.Count * 4 - 1)
 
         label1 = "Red is min distance, blue is max distance"
@@ -690,11 +680,8 @@ End Class
 
 
 Public Class Depth_NotMissing : Inherits VBparent
-    Public mog As BGSubtract_Basics_CPP
+    Public mog As New BGSubtract_Basics_CPP
     Public Sub New()
-
-        mog = New BGSubtract_Basics_CPP()
-
         label2 = "Stable (non-zero) Depth"
         task.desc = "Collect X frames, compute stable depth using the RGB and Depth image."
     End Sub
@@ -782,14 +769,13 @@ End Class
 
 Public Class Depth_Smoothing : Inherits VBparent
     Dim smooth As Depth_SmoothingMat
-    Dim reduction As Reduction_Basics
+    Dim reduction As New Reduction_Basics
     Public reducedDepth As New cv.Mat
     Public mats As Mat_4to1
     Public colorize As Depth_ColorMap
     Public Sub New()
         colorize = New Depth_ColorMap()
         mats = New Mat_4to1()
-        reduction = New Reduction_Basics()
         findRadio("Use bitwise reduction").Checked = True
         smooth = New Depth_SmoothingMat()
 
@@ -941,10 +927,9 @@ End Class
 
 
 Public Class Depth_WorldXYZ_MT : Inherits VBparent
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Public depthUnitsMeters = False
     Public Sub New()
-        grid = New Thread_Grid
         label2 = "dst2 = pointcloud"
         task.desc = "Create OpenGL point cloud from depth data (slow)"
     End Sub
@@ -1608,13 +1593,11 @@ End Class
 
 Public Class Depth_ForegroundHead : Inherits VBparent
     Dim fgnd As Depth_Foreground
-    Public kalman As Kalman_Basics
+    Public kalman As New Kalman_Basics
     Public trustedRect As cv.Rect
     Public trustworthy As Boolean
     Public Sub New()
         fgnd = New Depth_Foreground
-        kalman = New Kalman_Basics()
-
         label1 = "Blue is current, red is kalman, green is trusted"
         task.desc = "Use Depth_ForeGround to find the foreground blob.  Then find the probable head of the person in front of the camera."
     End Sub

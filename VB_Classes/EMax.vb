@@ -103,7 +103,7 @@ End Class
 
 
 Public Class EMax_Setup : Inherits VBparent
-    Public grid As Thread_Grid
+    Public grid As New Thread_Grid
     Public regionCount As Integer
     Public regionColors() As cv.Vec3b
     Public covarianceMatrixType = 0
@@ -118,7 +118,6 @@ Public Class EMax_Setup : Inherits VBparent
             sliders.setupTrackBar(2, "EMax Sigma (spread)", 1, 100, 30)
         End If
 
-        grid = New Thread_Grid
         findSlider("ThreadGrid Width").Value = dst1.Width / 3
         findSlider("ThreadGrid Height").Value = dst1.Height / 3
 

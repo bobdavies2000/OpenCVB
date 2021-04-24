@@ -262,9 +262,8 @@ End Class
 
 Public Class Contours_Prediction : Inherits VBparent
     Dim outline As Contours_Depth
-    Dim kalman As Kalman_Basics
+    Dim kalman As New Kalman_Basics
     Public Sub New()
-        kalman = New Kalman_Basics()
         ReDim kalman.kInput(2 - 1)
         outline = New Contours_Depth()
 

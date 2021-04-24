@@ -47,7 +47,7 @@ End Class
 
 Public Class Structured_Ceiling : Inherits VBparent
     Public structD As Structured_SliceH
-    Dim kalman As Kalman_Basics
+    Dim kalman As New Kalman_Basics
     Public Sub New()
         kalman = New Kalman_Basics()
         ReDim kalman.kInput(0)
@@ -241,9 +241,8 @@ End Class
 
 Public Class Structured_MultiSliceLines : Inherits VBparent
     Dim multi As Structured_MultiSlice
-    Public ldetect As Line_Basics
+    Public ldetect As New Line_Basics
     Public Sub New()
-        ldetect = New Line_Basics()
         Dim lenSlider = findSlider("Line length threshold in pixels")
         lenSlider.Value = lenSlider.Maximum ' don't need the yellow line...
         multi = New Structured_MultiSlice()
@@ -654,14 +653,13 @@ End Class
 
 Public Class Structured_CenterSlice : Inherits VBparent
     Dim vSlice As Structured_SliceV
-    Dim line As Line_Basics
+    Dim line As New Line_Basics
     Public topPt As cv.Point2f, botPt As cv.Point2f
     Public slope As Single
     Public avgPt As cv.Point2f
     Public b As Integer
     Public Sub New()
         vSlice = New Structured_SliceV
-        line = New Line_Basics
         label1 = "Center Slice in yellow"
         label2 = "White = SliceV output, Red Dot is avgPt"
         task.desc = "Find the vertical center line with accurate depth data.."

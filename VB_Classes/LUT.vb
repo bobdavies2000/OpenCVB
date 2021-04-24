@@ -81,11 +81,10 @@ End Class
 
 
 Public Class LUT_CustomColor : Inherits VBparent
-    Public reduction As Reduction_Basics
+    Public reduction As New Reduction_Basics
     Dim gradMap As Palette_RandomColorMap
     Public colorMap As cv.Mat
     Public Sub New()
-        reduction = New Reduction_Basics()
         gradMap = New Palette_RandomColorMap
         findSlider("Number of color transitions (Used only with Random)").Value = 10
 
@@ -110,9 +109,8 @@ End Class
 
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
 Public Class LUT_Reduction : Inherits VBparent
-    Public reduction As Reduction_Basics
+    Public reduction As New Reduction_Basics
     Public Sub New()
-        reduction = New Reduction_Basics()
         label2 = "Custom Color Lookup Table"
         task.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub

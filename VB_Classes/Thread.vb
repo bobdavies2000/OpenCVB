@@ -114,9 +114,8 @@ End Class
 
 
 Public Class Thread_GridTest : Inherits VBparent
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Public Sub New()
-        grid = New Thread_Grid
         findSlider("ThreadGrid Width").Value = 64
         findSlider("ThreadGrid Height").Value = 40
         label1 = ""

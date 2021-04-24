@@ -169,13 +169,10 @@ End Class
 
 Public Class DCT_Surfaces_debug : Inherits VBparent
     Dim Mats As Mat_4to1
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Dim dct As DCT_FeatureLess
-    Dim flow As Font_FlowText
+    Dim flow As New Font_FlowText
     Public Sub New()
-        flow = New Font_FlowText()
-
-        grid = New Thread_Grid
         findSlider("ThreadGrid Width").Value = 100
         findSlider("ThreadGrid Height").Value = 150
         dct = New DCT_FeatureLess()

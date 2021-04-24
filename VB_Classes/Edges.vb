@@ -35,13 +35,12 @@ End Class
 
 Public Class Edges_DepthAndColor : Inherits VBparent
     Dim shadow As Depth_Holes
-    Dim canny As Edges_Basics
+    Dim canny As New Edges_Basics
     Dim dilate As DilateErode_Basics
     Public Sub New()
         dilate = New DilateErode_Basics()
         dilate.radio.check(2).Checked = True
 
-        canny = New Edges_Basics()
         canny.sliders.trackbar(0).Value = 100
         canny.sliders.trackbar(1).Value = 100
 
@@ -51,7 +50,7 @@ Public Class Edges_DepthAndColor : Inherits VBparent
         label1 = "Edges in color and depth after dilate"
         label2 = "Edges in color and depth no dilate"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         canny.Run(src)
         shadow.Run(src)
 
@@ -81,7 +80,7 @@ Public Class Edges_Laplacian : Inherits VBparent
         label2 = "Laplacian of Depth Image"
         task.desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim gaussiankernelSize = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value - 1)
         Dim laplaciankernelSize = If(sliders.trackbar(1).Value Mod 2, sliders.trackbar(1).Value, sliders.trackbar(1).Value - 1)
 
@@ -107,7 +106,7 @@ Public Class Edges_Scharr : Inherits VBparent
         label2 = "x field + y field in CV_32F format"
         task.desc = "Scharr is most accurate with 3x3 kernel."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim xField = gray.Scharr(cv.MatType.CV_32FC1, 1, 0)
         Dim yField = gray.Scharr(cv.MatType.CV_32FC1, 0, 1)
@@ -139,7 +138,7 @@ Public Class Edges_Preserving : Inherits VBparent
         label2 = "Edge preserving blur for RGB depth image above"
         task.desc = "OpenCV's edge preserving filter."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         If radio.check(0).Checked Then
@@ -202,7 +201,7 @@ Public Class Edges_RandomForest_CPP : Inherits VBparent
         ReDim rgbData(dst1.Total * dst1.ElemSize - 1)
         label2 = "Thresholded Edge Mask (use slider to adjust)"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If task.frameCount < 100 Then task.trueText("On the first call only, it takes a few seconds to load the randomForest model.", 10, 100)
 
         ' why not do this in the constructor?  Because the message is held up by the lengthy process of loading the model.
@@ -241,7 +240,7 @@ Public Class Edges_ResizeAdd : Inherits VBparent
         label1 = "Edges found with just resizing"
         label2 = "Found edges added to grayscale image source."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim newFrame = gray(New cv.Range(sliders.trackbar(0).Value, gray.Rows - sliders.trackbar(0).Value),
                             New cv.Range(sliders.trackbar(1).Value, gray.Cols - sliders.trackbar(1).Value))
@@ -269,7 +268,7 @@ Public Class Edges_DCTfrequency : Inherits VBparent
         label2 = "Mask for the isolated frequencies"
         task.desc = "Find edges by removing all the highest frequencies."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
@@ -305,7 +304,7 @@ Public Class Edges_Deriche_CPP : Inherits VBparent
         label2 = "Image enhanced with Deriche results"
         task.desc = "Edge detection using the Deriche X and Y gradients - Painterly"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, srcData, 0, srcData.Length)
         Dim handleSrc = GCHandle.Alloc(srcData, GCHandleType.Pinned)
@@ -335,16 +334,15 @@ End Class
 
 
 Public Class Edges_DCTinput : Inherits VBparent
-    Dim edges As Edges_Basics
+    Dim edges As New Edges_Basics
     Dim dct As DCT_FeatureLess
     Public Sub New()
-        edges = New Edges_Basics
         dct = New DCT_FeatureLess
         label1 = "Canny edges produced from original grayscale image"
         label2 = "Edges produced with featureless regions cleared"
         task.desc = "Use the featureless regions to enhance the edge detection"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         edges.Run(src)
         dst1 = edges.dst1.Clone
@@ -364,13 +362,12 @@ End Class
 
 
 Public Class Edges_BinarizedCanny : Inherits VBparent
-    Dim edges As Edges_Basics
+    Dim edges As New Edges_Basics
     Dim binarize As Binarize_Recurse
     Dim mats As Mat_4Click
     Public Sub New()
         mats = New Mat_4Click
         binarize = New Binarize_Recurse
-        edges = New Edges_Basics
         label1 = "Edges between halves, lightest, darkest, and the combo"
         task.desc = "Collect edges from binarized images"
     End Sub
@@ -436,12 +433,9 @@ End Class
 
 Public Class Edges_BinarizedReduction : Inherits VBparent
     Dim edges As Edges_BinarizedSobel
-    Dim reduction As Reduction_Basics
+    Dim reduction As New Reduction_Basics
     Public Sub New()
-
         edges = New Edges_BinarizedSobel
-        reduction = New Reduction_Basics
-
         task.desc = "Visualize the impact of reduction on Edges_BinarizeSobel"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -592,14 +586,13 @@ End Class
 Public Class Edges_BlackSquare : Inherits VBparent
     Dim std As Math_Stdev
     Dim edges As Edges_BinarizedSobel
-    Dim addW As AddWeighted_Basics
+    Dim addW As New AddWeighted_Basics
     Public Sub New()
-        addW = New AddWeighted_Basics
         edges = New Edges_BinarizedSobel
         std = New Math_Stdev
         task.desc = "Visualize the impact of Sobel on a black square"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         std.Run(src)
 
         edges.Run(std.dst2)
@@ -629,7 +622,7 @@ Public Class Edges_Combo : Inherits VBparent
         label1 = "Sobel = red, Canny = yellow - they are identical"
         task.desc = "Combine the results of binarized canny and sobel"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         edges1.Run(src)
         edges2.Run(src)
@@ -658,7 +651,7 @@ Public Class Edges_SobelLR : Inherits VBparent
         label1 = "Edges in Left Image"
         label2 = "Edges in Right Image (except on Kinect)"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         red.Run(src)
         Dim leftView = red.dst1
         sobel.Run(red.dst2)
@@ -679,9 +672,8 @@ Public Class Edges_Sobel : Inherits VBparent
     Public grayX As cv.Mat
     Public grayY As cv.Mat
     Public horizontalOnly As Boolean
-    Dim addw As AddWeighted_Basics
+    Dim addw As New AddWeighted_Basics
     Public Sub New()
-        If standalone Then addw = New AddWeighted_Basics
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Sobel kernel Size", 1, 32, 3)
@@ -698,7 +690,7 @@ Public Class Edges_Sobel : Inherits VBparent
 
         task.desc = "Show Sobel edge detection with varying kernel sizes"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
         Static thresholdCheck = findCheckBox("Threshold Sobel Results")
         Static ksizeSlider = findSlider("Sobel kernel Size")
@@ -738,7 +730,7 @@ Public Class Edges_SobelHorizontal : Inherits VBparent
         edges.horizontalOnly = True
         task.desc = "Find edges with Sobel only in the horizontal direction"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
         edges.Run(src)
 
@@ -756,12 +748,9 @@ End Class
 Public Class Edges_SobelLRBinarized : Inherits VBparent
     Dim red As LeftRightView_Basics
     Dim edges As Edges_BinarizedSobel
-    Dim addw As AddWeighted_Basics
+    Dim addw As New AddWeighted_Basics
     Public Sub New()
-        If standalone Then
-            addw = New AddWeighted_Basics
-            findSlider("Weight").Value = 75
-        End If
+        findSlider("Weight").Value = 75
         edges = New Edges_BinarizedSobel
         red = New LeftRightView_Basics
         findSlider("Infrared Brightness").Value = 1
@@ -860,11 +849,9 @@ End Class
 Public Class Edges_Matching : Inherits VBparent
     Dim match As MatchTemplate_Basics
     Dim red As LeftRightView_Basics
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Public Sub New()
-
         match = New MatchTemplate_Basics
-        grid = New Thread_Grid
         red = New LeftRightView_Basics
         findSlider("Infrared Brightness").Value = 1
 

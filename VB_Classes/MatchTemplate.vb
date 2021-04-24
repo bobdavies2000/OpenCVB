@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
 Public Class MatchTemplate_Basics : Inherits VBparent
-    Dim flow As Font_FlowText
+    Dim flow As New Font_FlowText
     Public searchArea As cv.Mat
     Public template As cv.Mat
     Public matchText As String = ""
@@ -9,8 +9,6 @@ Public Class MatchTemplate_Basics : Inherits VBparent
     Public correlation As Single
     Public matchOption As cv.TemplateMatchModes
     Public Sub New()
-        flow = New Font_FlowText()
-
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 6)
             radio.check(0).Text = "CCoeff"
@@ -42,7 +40,7 @@ Public Class MatchTemplate_Basics : Inherits VBparent
         Next
         Return matchOption
     End Function
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static sampleSlider = findSlider("Sample Size")
         If standalone Or task.intermediateReview = caller Then
             searchArea = New cv.Mat(New cv.Size(CInt(sampleSlider.Value), 1), cv.MatType.CV_32FC1)
@@ -70,12 +68,9 @@ End Class
 
 Public Class MatchTemplate_RowCorrelation : Inherits VBparent
     Dim match As MatchTemplate_Basics
-    Dim flow As Font_FlowText
+    Dim flow As New Font_FlowText
     Public Sub New()
-        flow = New Font_FlowText()
-
         match = New MatchTemplate_Basics()
-
         task.desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -113,11 +108,9 @@ Public Class MatchTemplate_DrawRect : Inherits VBparent
     Public saveTemplate As cv.Mat
     Public saveRect As cv.Rect
     Dim match As MatchTemplate_Basics
-    Dim addw As AddWeighted_Basics
+    Dim addw As New AddWeighted_Basics
     Public Sub New()
         If standalone Then task.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
-
-        addw = New AddWeighted_Basics
         match = New MatchTemplate_Basics
 
         label1 = "Probabilities (draw rectangle to test again)"
@@ -201,12 +194,11 @@ End Class
 
 
 Public Class MatchTemplate_Movement : Inherits VBparent
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Dim match As MatchTemplate_Basics
     Public mask As cv.Mat
     Public Sub New()
         match = New MatchTemplate_Basics
-        grid = New Thread_Grid
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

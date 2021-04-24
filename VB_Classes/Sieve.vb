@@ -48,10 +48,9 @@ End Class
 
 
 Public Class Sieve_Basics : Inherits VBparent
-    Dim printer As Sieve_BasicsVB
+    Dim printer As New Sieve_BasicsVB
     Dim sieve As New CS_Classes.Sieve
     Public Sub New()
-        printer = New Sieve_BasicsVB
         task.desc = "Implement the Sieve of Eratothenes in C#"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -59,8 +58,3 @@ Public Class Sieve_Basics : Inherits VBparent
         task.trueText(printer.shareResults(sieve.GetPrimeNumbers(countSlider.value)))
     End Sub
 End Class
-
-
-
-
-

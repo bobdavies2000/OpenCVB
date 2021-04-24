@@ -79,19 +79,15 @@ End Class
 
 
 Public Class SuperPixel_BinarizedImage : Inherits VBparent
-    Dim pixels As SuperPixel_Basics_CPP
+    Dim pixels As New SuperPixel_Basics_CPP
     Dim binarize As Binarize_Basics
     Public Sub New()
-
         binarize = New Binarize_Basics()
-
-        pixels = New SuperPixel_Basics_CPP()
         pixels.gridColor = cv.Scalar.Red
         findSlider("Number of SuperPixels").Value = 20 ' find the top 20 super pixels.
-
         task.desc = "Create SuperPixels from a binary image."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         binarize.Run(src)
 
         pixels.Run(binarize.dst1)
@@ -107,13 +103,11 @@ End Class
 
 
 Public Class SuperPixel_Depth : Inherits VBparent
-    Dim pixels As SuperPixel_Basics_CPP
+    Dim pixels As New SuperPixel_Basics_CPP
     Public Sub New()
-        pixels = New SuperPixel_Basics_CPP()
-
         task.desc = "Create SuperPixels using RGBDepth image."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         pixels.Run(task.RGBDepth)
         dst1 = pixels.dst1
         dst2 = pixels.dst2
@@ -126,16 +120,13 @@ End Class
 
 
 Public Class SuperPixel_WithCanny : Inherits VBparent
-    Dim pixels As SuperPixel_Basics_CPP
-    Dim edges As Edges_Basics
+    Dim pixels As New SuperPixel_Basics_CPP
+    Dim edges As New Edges_Basics
     Public Sub New()
         edges = New Edges_Basics()
-
-        pixels = New SuperPixel_Basics_CPP()
-
         task.desc = "Create SuperPixels using RGBDepth image."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         edges.Run(src)
         src = task.color.Clone()
         src.SetTo(cv.Scalar.White, edges.dst1)
@@ -153,13 +144,9 @@ End Class
 
 
 Public Class SuperPixel_WithLineDetector : Inherits VBparent
-    Dim pixels As SuperPixel_Basics_CPP
-    Dim lines As Line_Basics
+    Dim pixels As New SuperPixel_Basics_CPP
+    Dim lines As New Line_Basics
     Public Sub New()
-        lines = New Line_Basics()
-
-        pixels = New SuperPixel_Basics_CPP()
-
         label2 = "Input to superpixel basics."
         task.desc = "Create SuperPixels using RGBDepth image."
     End Sub

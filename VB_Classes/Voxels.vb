@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class Voxels_Basics_MT : Inherits VBparent
-    Public grid As Thread_Grid
+    Public grid As New Thread_Grid
     Public voxels(1) As Single
     Public voxelMat As cv.Mat
     Public Sub New()
@@ -10,7 +10,6 @@ Public Class Voxels_Basics_MT : Inherits VBparent
             check.Box(0).Checked = True
         End If
 
-        grid = New Thread_Grid
         findSlider("ThreadGrid Width").Value = 16
         findSlider("ThreadGrid Height").Value = 16
 

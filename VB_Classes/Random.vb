@@ -53,11 +53,10 @@ End Class
 
 
 Public Class Random_LUTMask : Inherits VBparent
-    Dim random As Random_Basics
+    Dim random As New Random_Basics
     Dim km As KMeans_Basics
     Public Sub New()
         km = New KMeans_Basics()
-        random = New Random_Basics()
         task.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image."
         label2 = "kmeans run To Get colors"
     End Sub
@@ -125,13 +124,10 @@ End Class
 
 
 Public Class Random_CheckUniformSmoothed : Inherits VBparent
-    Dim histogram As Histogram_Basics
+    Dim histogram As New Histogram_Basics
     Dim rUniform As Random_UniformDist
     Public Sub New()
-        histogram = New Histogram_Basics
-
         rUniform = New Random_UniformDist()
-
         task.desc = "Display the smoothed histogram for a uniform distribution."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -194,7 +190,7 @@ End Class
 
 
 Public Class Random_CheckNormalDistSmoothed : Inherits VBparent
-    Dim histogram As Histogram_Basics
+    Dim histogram As New Histogram_Basics
     Dim normalDist As Random_NormalDist
     Public Sub New()
         histogram = New Histogram_Basics
@@ -276,13 +272,10 @@ Public Class Random_CustomDistribution : Inherits VBparent
     Public inputCDF As cv.Mat ' place a cumulative distribution function here (or just put the histogram that reflects the desired random number distribution)
     Public outputRandom = New cv.Mat(10000, 1, cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
     Public outputHistogram As cv.Mat
-    Public plotHist As Plot_Histogram
+    Public plotHist As New Plot_Histogram
     Public Sub New()
         Dim loadedDice() As Single = {1, 3, 0.5, 0.5, 0.75, 0.25}
         inputCDF = New cv.Mat(loadedDice.Length, 1, cv.MatType.CV_32F, loadedDice)
-
-        If standalone Then plotHist = New Plot_Histogram()
-
         task.desc = "Create a custom random number distribution from any histogram"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -321,10 +314,9 @@ End Class
 
 ' https://www.khanacademy.org/computing/computer-programming/programming-natural-simulations/programming-randomness/a/custom-distribution-of-random-numbers
 Public Class Random_MonteCarlo : Inherits VBparent
-    Public plotHist As Plot_Histogram
+    Public plotHist As New Plot_Histogram
     Public outputRandom = New cv.Mat(4000, 1, cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
     Public Sub New()
-        plotHist = New Plot_Histogram()
         plotHist.fixedMaxVal = 100
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -528,9 +520,9 @@ End Class
 
 
 Public Class Random_KalmanPoints : Inherits VBparent
-    Dim random As Random_Basics
+    Dim random As New Random_Basics
     Dim knn As KNN_1_to_1FIFO
-    Dim kalman As Kalman_Basics
+    Dim kalman As New Kalman_Basics
     Dim countSlider As Windows.Forms.TrackBar
     Dim kalmanPoints As New List(Of cv.Point2f)
     Dim refreshPoints As Boolean = True

@@ -363,14 +363,13 @@ End Class
 
 
 Public Class KMeans_Color_MT : Inherits VBparent
-    Public grid As Thread_Grid
+    Public grid As New Thread_Grid
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 2)
         End If
 
-        grid = New Thread_Grid
         findSlider("ThreadGrid Width").Value = 128
         findSlider("ThreadGrid Height").Value = 160
 
@@ -450,14 +449,13 @@ End Class
 
 
 Public Class KMeans_ColorDepth_MT : Inherits VBparent
-    Public grid As Thread_Grid
+    Public grid As New Thread_Grid
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 3)
         End If
 
-        grid = New Thread_Grid
         grid.sliders.trackbar(0).Value = 32
         grid.sliders.trackbar(1).Value = 32
 

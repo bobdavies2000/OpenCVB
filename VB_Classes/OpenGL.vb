@@ -523,17 +523,14 @@ End Class
 
 
 Public Class OpenGL_StableDepth : Inherits VBparent
-    Dim pcValid As Motion_MinMaxPointCloud
+    Dim pcValid As New Motion_MinMaxPointCloud
     Public ogl As OpenGL_Options
     Public Sub New()
-
-        pcValid = New Motion_MinMaxPointCloud
         ogl = New OpenGL_Options
 
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         pcValid.Run(src)
         dst1 = pcValid.dst1
         dst2 = pcValid.dst2
@@ -582,18 +579,14 @@ End Class
 
 
 Public Class OpenGL_StableDepthMouse : Inherits VBparent
-    Dim pcValid As Motion_MinMaxPointCloud
+    Dim pcValid As New Motion_MinMaxPointCloud
     Public ogl As OpenGL_Callbacks
     Public Sub New()
-
-        pcValid = New Motion_MinMaxPointCloud
         ogl = New OpenGL_Callbacks
-
         label2 = "dst2 is a pointcloud"
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         pcValid.Run(src)
         dst1 = pcValid.dst1
         dst2 = pcValid.dst2
@@ -637,15 +630,13 @@ End Class
 
 
 Public Class OpenGL_Stable : Inherits VBparent
-    Dim stable As Motion_MinMaxPointCloud
+    Dim stable As New Motion_MinMaxPointCloud
     Dim ogl As OpenGL_Callbacks
     Public Sub New()
-        stable = New Motion_MinMaxPointCloud
         ogl = New OpenGL_Callbacks
         task.desc = "Use the Motion_MinMaxPointCloud in 3D"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         stable.Run(src)
         dst1 = stable.dst1
 

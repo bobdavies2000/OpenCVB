@@ -62,12 +62,10 @@ End Class
 
 
 Public Class Rectangle_CComp : Inherits VBparent
-    Dim ccomp As CComp_Basics_FullImage
+    Dim ccomp As New CComp_Basics_FullImage
     Dim rMotion As Rectangle_Motion
     Public Sub New()
         rMotion = New Rectangle_Motion
-        ccomp = New CComp_Basics_FullImage
-
         label2 = "Connected component features isolated by rect's"
         task.desc = "Isolate rectanguler regions around connected components"
     End Sub

@@ -79,11 +79,10 @@ End Class
 
 ' http://opencvexamples.blogspot.com/
 Public Class DFT_Inverse : Inherits VBparent
-    Dim mats As Mat_2to1
+    Dim mats As New Mat_2to1
     Public Sub New()
-        mats = New Mat_2to1()
-        task.desc = "Take the inverse of the Discrete Fourier Transform."
         label1 = "Image after Inverse DFT"
+        task.desc = "Take the inverse of the Discrete Fourier Transform."
     End Sub
     Public Sub Run(src As cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

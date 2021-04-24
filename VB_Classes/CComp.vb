@@ -109,11 +109,9 @@ End Class
 
 Public Class CComp_Basics_FullImage : Inherits VBparent
     Dim mats As Mat_4to1
-    Dim basics As CComp_Basics
+    Dim basics As New CComp_Basics
     Public Sub New()
         mats = New Mat_4to1()
-        basics = New CComp_Basics()
-
         task.desc = "Connect components in the light half of OTSU threshold output, then use the dark half, then combine results."
         label2 = "Masks binary+otsu used to compute mean depth"
     End Sub
@@ -141,7 +139,7 @@ Public Class CComp_Basics_FullImage : Inherits VBparent
         Next
         Return count
     End Function
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1.SetTo(0)
 
@@ -159,16 +157,13 @@ End Class
 
 
 Public Class CComp_PointTracker : Inherits VBparent
-    Public basics As CComp_Basics
+    Public basics As New CComp_Basics
     Public pTrack As KNN_PointTracker
     Public highlight As Highlight_Basics
     Public trackPoints As Boolean = True
     Public Sub New()
-
         highlight = New Highlight_Basics()
         pTrack = New KNN_PointTracker()
-        basics = New CComp_Basics()
-
         task.desc = "Track connected componenent centroids and use it to match coloring"
     End Sub
     Public Sub Run(src as cv.Mat)

@@ -106,11 +106,9 @@ End Class
 
 
 Public Class Math_RGBCorrelation : Inherits VBparent
-    Dim flow As Font_FlowText
+    Dim flow As New Font_FlowText
     Dim match As MatchTemplate_Basics
     Public Sub New()
-        flow = New Font_FlowText()
-
         match = New MatchTemplate_Basics()
         task.desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
     End Sub
@@ -185,13 +183,11 @@ End Class
 
 
 Public Class Math_Stdev : Inherits VBparent
-    Public grid As Thread_Grid
+    Public grid As New Thread_Grid
     Public highStdevMask As cv.Mat
     Public lowStdevMask As cv.Mat
     Public saveFrame As cv.Mat
     Public Sub New()
-        grid = New Thread_Grid
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Stdev Threshold", 0, 100, 10)

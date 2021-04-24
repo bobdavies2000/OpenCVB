@@ -2,7 +2,7 @@
 Imports cv = OpenCvSharp
 Public Class Keyboard_Basics : Inherits VBparent
     Public keyInput As New List(Of String)
-    Dim flow As Font_FlowText
+    Dim flow As New Font_FlowText
     Public checkKeys As New OptionsKeyboardInput
     Public Sub New()
         checkKeys.Setup(caller)
@@ -13,7 +13,6 @@ Public Class Keyboard_Basics : Inherits VBparent
         keyInput = New List(Of String)(checkKeys.inputText)
         checkKeys.inputText.Clear()
         If standalone or task.intermediateReview = caller Then
-            If flow Is Nothing Then flow = New Font_FlowText()
             Dim inputText As String = ""
             For i = 0 To keyInput.Count - 1
                 inputText += keyInput(i).ToString()

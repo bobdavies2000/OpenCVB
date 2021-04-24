@@ -145,9 +145,8 @@ End Module
 
 
 Public Class Palette_Reduction : Inherits VBparent
-    Dim reduction As Reduction_Basics
+    Dim reduction As New Reduction_Basics
     Public Sub New()
-        reduction = New Reduction_Basics()
         reduction.radio.check(0).Checked = True
         reduction.radio.check(2).Enabled = False ' must have some reduction for this to work...
 
@@ -425,9 +424,8 @@ End Class
 
 
 Public Class Palette_Layout2D : Inherits VBparent
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Public Sub New()
-        grid = New Thread_Grid
         findSlider("ThreadGrid Width").Value = 40
         Dim heightslider = findSlider("ThreadGrid Height").Value = 24
         grid.Run(Nothing)

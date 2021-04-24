@@ -91,9 +91,8 @@ End Class
 
 
 Public Class FloodFill_Top16_MT : Inherits VBparent
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Public Sub New()
-        grid = New Thread_Grid
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2000)
@@ -132,9 +131,8 @@ End Class
 
 Public Class FloodFill_Color_MT : Inherits VBparent
     Dim flood As FloodFill_Top16_MT
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Public Sub New()
-        grid = New Thread_Grid
         flood = New FloodFill_Top16_MT()
 
         task.desc = "Use floodfill to build image segments in an RGB image."
@@ -194,13 +192,10 @@ End Class
 
 
 Public Class FloodFill_CComp : Inherits VBparent
-    Dim ccomp As CComp_Basics
+    Dim ccomp As New CComp_Basics
     Dim range As FloodFill_RelativeRange
     Public Sub New()
-
-        ccomp = New CComp_Basics
         range = New FloodFill_RelativeRange
-
         label1 = "Input to Floodfill "
         task.desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
     End Sub
@@ -418,12 +413,9 @@ End Class
 
 Public Class FloodFill_PointTracker : Inherits VBparent
     Dim pTrack As KNN_PointTracker
-    Dim flood As FloodFill_Palette
+    Dim flood As New FloodFill_Palette
     Public Sub New()
-
         pTrack = New KNN_PointTracker()
-        flood = New FloodFill_Palette()
-
         label1 = "Point tracker output"
         task.desc = "Test the FloodFill output as input into the point tracker"
     End Sub
@@ -879,15 +871,13 @@ End Class
 Public Class FloodFill_LUT : Inherits VBparent
     Dim lut As LUT_Basics
     Dim flood As FloodFill_Basics
-    Dim addw As AddWeighted_Basics
+    Dim addw As New AddWeighted_Basics
     Public Sub New()
-        addw = New AddWeighted_Basics
         lut = New LUT_Basics
         flood = New FloodFill_Basics
         task.desc = "The input to a floodfill is the output of a LUT"
     End Sub
     Public Sub Run(src as cv.Mat)
-
         lut.Run(src)
 
         flood.Run(lut.dst1)

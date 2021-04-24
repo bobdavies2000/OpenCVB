@@ -57,19 +57,13 @@ End Class
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_CarCounting : Inherits VBparent
-    Dim flow As Font_FlowText
-    Dim video As Video_Basics
-    Dim bgSub As BGSubtract_MOG
+    Dim flow As New Font_FlowText
+    Dim video As New Video_Basics
+    Dim bgSub As New BGSubtract_MOG
     Public Sub New()
-        bgSub = New BGSubtract_MOG()
-
-        video = New Video_Basics()
-
-        flow = New Font_FlowText()
-
         task.desc = "Count cars in a video file"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         video.Run(src)
         If video.dst1.Empty() = False And video.image.Empty() = False Then
             dst1.SetTo(0)
@@ -111,18 +105,13 @@ End Class
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_CarCComp : Inherits VBparent
-    Dim cc As CComp_Basics
-    Dim video As Video_Basics
-    Dim bgSub As BGSubtract_MOG
+    Dim cc As New CComp_Basics
+    Dim video As New Video_Basics
+    Dim bgSub As New BGSubtract_MOG
     Public Sub New()
-
-        bgSub = New BGSubtract_MOG()
-        cc = New CComp_Basics()
-        video = New Video_Basics()
-
         task.desc = "Outline cars with a rectangle"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         video.Run(src)
         If video.dst1.Empty() = False Then
             bgSub.Run(video.dst1)
@@ -138,15 +127,12 @@ End Class
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_MinRect : Inherits VBparent
-    Public video As Video_Basics
-    Public bgSub As BGSubtract_MOG
+    Public video As New Video_Basics
+    Public bgSub As New BGSubtract_MOG
     Public contours As cv.Point()()
     Public Sub New()
-        video = New Video_Basics()
         video.srcVideo = task.parms.homeDir + "Data/CarsDrivingUnderBridge.mp4"
         video.Run(dst1)
-
-        bgSub = New BGSubtract_MOG()
         task.desc = "Find area of car outline - example of using minAreaRect"
     End Sub
     Public Sub Run(src as cv.Mat)

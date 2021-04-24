@@ -258,7 +258,7 @@ End Class
 
 
 Public Class Pixel_Sampler : Inherits VBparent
-    Public random As Random_Basics
+    Public random As New Random_Basics
     Public dominantGray As Byte
     Dim width = 100
     Dim height = 100

@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class ImageSeg_Basics : Inherits VBparent
-    Dim addw As AddWeighted_Basics
+    Dim addw As New AddWeighted_Basics
 
     Public maskSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
     Public rects As New List(Of cv.Rect)
@@ -10,7 +10,6 @@ Public Class ImageSeg_Basics : Inherits VBparent
 
     Public flood As FloodFill_FullImage
     Public Sub New()
-        addw = New AddWeighted_Basics
         flood = New FloodFill_FullImage
         task.desc = "Get the image segments and their associated features - centroids, masks, size, and enclosing rectangles"
     End Sub

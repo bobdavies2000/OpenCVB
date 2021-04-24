@@ -5,7 +5,7 @@ Public Class KNN_Basics : Inherits VBparent
     Public knn As cv.ML.KNearest
     Public lastSet As New List(Of cv.Point2f)
     Public currSet As New List(Of cv.Point2f)
-    Dim random As Random_Basics
+    Dim random As New Random_Basics
     Public Sub New()
 
         random = New Random_Basics
@@ -109,11 +109,10 @@ End Class
 Public Class KNN_Options : Inherits VBparent
     Public trainingPoints As New List(Of cv.Point2f)
     Public queryPoints As New List(Of cv.Point2f)
-    Public randomTrain As Random_Basics
-    Public randomQuery As Random_Basics
+    Public randomTrain As New Random_Basics
+    Public randomQuery As New Random_Basics
     Public useRandomData As Boolean
     Public Sub New()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "KNN Query count", 1, 100, 10)
@@ -139,8 +138,8 @@ Public Class KNN_Options : Inherits VBparent
 
         If useRandomData Then
             If randomTrain Is Nothing Then
-                randomTrain = New Random_Basics()
-                randomQuery = New Random_Basics()
+                randomTrain = New Random_Basics
+                randomQuery = New Random_Basics
             End If
             randomTrain.countSlider.Value = trainSlider.Value
             randomTrain.Run(Nothing)
@@ -302,10 +301,9 @@ End Class
 
 
 Public Class KNN_Test : Inherits VBparent
-    Public grid As Thread_Grid
+    Public grid As New Thread_Grid
     Dim knn As KNN_BasicsQT
     Public Sub New()
-        grid = New Thread_Grid
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         Dim gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Minimum = 50 ' limit the number of centroids - KNN can't handle more than a few thousand without rework.
@@ -346,10 +344,9 @@ End Class
 
 
 Public Class KNN_Test_1_to_1 : Inherits VBparent
-    Public grid As Thread_Grid
+    Public grid As New Thread_Grid
     Dim knn As KNN_1_to_1
     Public Sub New()
-        grid = New Thread_Grid
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         Dim gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Minimum = 50 ' limit the number of centroids - KNN can't handle more than a few thousand without rework.
@@ -467,14 +464,11 @@ End Class
 
 Public Class KNN_DepthClusters : Inherits VBparent
     Public blobs As Blob_DepthClusters
-    Public flood As FloodFill_Palette
+    Public flood As New FloodFill_Palette
     Public pTrack As KNN_PointTracker
     Public Sub New()
-
-        flood = New FloodFill_Palette
         blobs = New Blob_DepthClusters
         pTrack = New KNN_PointTracker
-
         label1 = "Output of Blob_DepthClusters"
         label2 = "Same output after KNN_PointTracker"
         task.desc = "Use KNN to track and color the Blob results from clustering the depth data"
@@ -538,14 +532,11 @@ End Class
 
 Public Class KNN_StabilizeRegions : Inherits VBparent
     Public knn As KNN_DepthClusters
-    Public flood As FloodFill_Palette
+    Public flood As New FloodFill_Palette
     Dim lastinput As New cv.Mat
     Public Sub New()
         knn = New KNN_DepthClusters()
         findCheckBox("Draw rectangle and centroid for each mask").Checked = False
-
-        flood = New FloodFill_Palette()
-
         label1 = "Output of KNN_DepthClusters"
         label2 = "KNN_DepthClusters output plus unstable regions"
         task.desc = "Identify major regions that are unstable - appearing and disappearing"
@@ -819,7 +810,7 @@ Public Class KNN_PointTracker : Inherits VBparent
     Dim newCentroids As New List(Of cv.Point2f)
     Dim topView As PointCloud_Kalman_TopView
     Public kalman As New List(Of Kalman_Stripped)
-    Public kalmanOptions As Kalman_Basics
+    Public kalmanOptions As New Kalman_Basics
     Public queryPoints As New List(Of cv.Point2f)
     Public queryRects As New List(Of cv.Rect)
     Public queryMasks As New List(Of cv.Mat)
@@ -827,10 +818,7 @@ Public Class KNN_PointTracker : Inherits VBparent
     Public drawRC As Draw_ViewObjects
     Public Sub New()
         If standalone Then topView = New PointCloud_Kalman_TopView()
-
         drawRC = New Draw_ViewObjects
-
-        kalmanOptions = New Kalman_Basics
         knn = New KNN_1_to_1
         allocateKalman(16) ' allocate some kalman objects
 
@@ -970,7 +958,7 @@ Public Class KNN_1_to_1FIFO : Inherits VBparent
     Public lastSet As New List(Of cv.Point2f)
     Public currSet As New List(Of cv.Point2f)
     Public knn As cv.ML.KNearest
-    Dim random As Random_Basics
+    Dim random As New Random_Basics
     Public Sub New()
 
         random = New Random_Basics

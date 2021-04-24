@@ -9,7 +9,7 @@ Public Class ProCon_Basics : Inherits VBparent
     Public head = -1
     Public tail = -1
     Public frameCount = 1
-    Public flow As Font_FlowText
+    Public flow As New Font_FlowText
     Public terminateConsumer As Boolean
     Public terminateProducer As Boolean
     Public pduration As Integer
@@ -24,8 +24,6 @@ Public Class ProCon_Basics : Inherits VBparent
         End If
         pduration = sliders.trackbar(1).Value
         cduration = sliders.trackbar(2).Value
-
-        flow = New Font_FlowText()
 
         buffer = Enumerable.Repeat(-1, buffer.Length).ToArray
 

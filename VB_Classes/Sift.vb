@@ -40,7 +40,7 @@ End Class
 
 
 Public Class Sift_Basics_MT : Inherits VBparent
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Dim siftCS As New CS_SiftBasics
     Dim siftBasics As Sift_Basics
     Dim lrView As LeftRightView_BrightnessContrast
@@ -48,7 +48,6 @@ Public Class Sift_Basics_MT : Inherits VBparent
     Public Sub New()
         lrView = New LeftRightView_BrightnessContrast
 
-        grid = New Thread_Grid
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         Dim gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Maximum = task.color.Cols * 2

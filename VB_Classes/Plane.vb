@@ -93,9 +93,8 @@ End Module
 
 
 Public Class Plane_Detect : Inherits VBparent
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Public Sub New()
-        grid = New Thread_Grid
         findSlider("ThreadGrid Width").Value = 64
         findSlider("ThreadGrid Height").Value = 64
 
@@ -161,9 +160,8 @@ End Class
 
 
 Public Class Plane_DetectDebug : Inherits VBparent
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Public Sub New()
-        grid = New Thread_Grid
         findSlider("ThreadGrid Width").Value = 32
         findSlider("ThreadGrid Height").Value = 32
 

@@ -84,7 +84,7 @@ End Class
 
 ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
 Public Class CellAuto_Life : Inherits VBparent
-    Dim random As Random_Basics
+    Dim random As New Random_Basics
     Dim grid As cv.Mat
     Dim nextgrid As cv.Mat
     Dim factor = 8

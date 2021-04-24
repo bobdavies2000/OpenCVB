@@ -250,16 +250,11 @@ End Class
 ' https://blog.csdn.net/just_sort/article/details/85982871
 Public Class PhotoShop_PlotHist : Inherits VBparent
     Dim white As PhotoShop_ChangeMask
-    Public hist1 As Histogram_Basics
-    Public hist2 As Histogram_Basics
-    Dim mat2to1 As Mat_2to1
+    Public hist1 As New Histogram_Basics
+    Public hist2 As New Histogram_Basics
+    Dim mat2to1 As New Mat_2to1
     Public Sub New()
         white = New PhotoShop_ChangeMask()
-
-        hist1 = New Histogram_Basics
-        hist2 = New Histogram_Basics
-        mat2to1 = New Mat_2to1()
-
         task.desc = "Plot the histogram of the before and after white balancing"
     End Sub
     Public Sub Run(src as cv.Mat)

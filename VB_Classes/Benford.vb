@@ -14,16 +14,12 @@ Imports System.Text.RegularExpressions
 Public Class Benford_Basics : Inherits VBparent
     Public expectedDistribution(10 - 1) As Single
     Public counts(expectedDistribution.Count - 1) As Single
-    Dim plot As Plot_Histogram
-    Dim benford As Benford_NormalizedImage
-    Dim addW As AddWeighted_Basics
+    Dim plot As New Plot_Histogram
+    Dim benford As New Benford_NormalizedImage
+    Dim addW As New AddWeighted_Basics
     Dim use99 As Boolean
     Public Sub New()
-        addW = New AddWeighted_Basics
         addW.weightSlider.Value = 75
-
-        plot = New Plot_Histogram()
-        If standalone or task.intermediateReview = caller Then benford = New Benford_NormalizedImage()
 
         For i = 1 To expectedDistribution.Count - 1
             expectedDistribution(i) = Math.Log10(1 + 1 / i) ' get the precise expected values.
@@ -99,12 +95,11 @@ End Class
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
 Public Class Benford_NormalizedImage : Inherits VBparent
-    Public benford As Benford_Basics
+    Public benford As New Benford_Basics
     Public Sub New()
-        benford = New Benford_Basics()
         task.desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
@@ -122,14 +117,13 @@ End Class
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
 Public Class Benford_NormalizedImage99 : Inherits VBparent
-    Public benford As Benford_Basics
+    Public benford As New Benford_Basics
     Public Sub New()
-        benford = New Benford_Basics()
         benford.setup99()
 
         task.desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
@@ -147,9 +141,8 @@ End Class
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
 Public Class Benford_JPEG : Inherits VBparent
-    Public benford As Benford_Basics
+    Public benford As New Benford_Basics
     Public Sub New()
-        benford = New Benford_Basics()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 1)
@@ -158,7 +151,7 @@ Public Class Benford_JPEG : Inherits VBparent
 
         task.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, sliders.trackbar(0).Value})
         Dim tmp = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
         dst1 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
@@ -175,9 +168,8 @@ End Class
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
 Public Class Benford_JPEG99 : Inherits VBparent
-    Public benford As Benford_Basics
+    Public benford As New Benford_Basics
     Public Sub New()
-        benford = New Benford_Basics()
         benford.setup99()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -186,7 +178,7 @@ Public Class Benford_JPEG99 : Inherits VBparent
         End If
         task.desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static qualitySlider = findSlider("JPEG Quality")
         Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, qualitySlider.Value})
         Dim tmp = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
@@ -205,17 +197,15 @@ End Class
 
 ' https://www.codeproject.com/Articles/215620/Detecting-Manipulations-in-Data-with-Benford-s-Law
 Public Class Benford_PNG : Inherits VBparent
-    Public benford As Benford_Basics
+    Public benford As New Benford_Basics
     Public Sub New()
-        benford = New Benford_Basics()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 1)
             sliders.setupTrackBar(0, "PNG Compression", 1, 100, 90)
         End If
         task.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static compressionSlider = findSlider("PNG Compression")
         Dim png = src.ImEncode(".png", New Integer() {cv.ImwriteFlags.PngCompression, compressionSlider.Value})
         Dim tmp = New cv.Mat(png.Count, 1, cv.MatType.CV_8U, png)
@@ -232,12 +222,11 @@ End Class
 
 
 Public Class Benford_Depth : Inherits VBparent
-    Public benford As Benford_Basics
+    Public benford As New Benford_Basics
     Public Sub New()
-        benford = New Benford_Basics()
         task.desc = "Apply Benford to the depth data"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         benford.Run(task.depth32f)
         dst1 = benford.dst1
         label1 = benford.label2
@@ -250,12 +239,11 @@ End Class
 
 
 Public Class Benford_DepthRGB : Inherits VBparent
-    Public benford As Benford_JPEG
+    Public benford As New Benford_JPEG
     Public Sub New()
-        benford = New Benford_JPEG()
         task.desc = "Apply Benford to the depth RGB image that is compressed with JPEG"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         benford.Run(task.RGBDepth)
         dst1 = benford.dst2
         label1 = benford.label2
@@ -270,11 +258,9 @@ End Class
 
 
 Public Class Benford_Primes : Inherits VBparent
-    Dim sieve As Sieve_BasicsVB
-    Dim benford As Benford_Basics
+    Dim sieve As New Sieve_BasicsVB
+    Dim benford As New Benford_Basics
     Public Sub New()
-        benford = New Benford_Basics
-        sieve = New Sieve_BasicsVB
         Dim countSlider = findSlider("Count of desired primes")
         countSlider.Value = countSlider.Maximum
         task.desc = "Apply Benford to a list of primes"

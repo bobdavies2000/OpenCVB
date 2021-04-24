@@ -90,10 +90,8 @@ End Class
 
 
 Public Class Retina_Depth : Inherits VBparent
-    Dim retina As Retina_Basics_CPP
+    Dim retina As New Retina_Basics_CPP
     Public Sub New()
-        retina = New Retina_Basics_CPP()
-
         task.desc = "Use the bio-inspired retina algorithm with the depth data."
         label1 = "Last result || current result"
         label2 = "Current depth motion result"

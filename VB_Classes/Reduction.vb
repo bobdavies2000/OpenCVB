@@ -52,10 +52,9 @@ End Class
 
 Public Class Reduction_Floodfill : Inherits VBparent
     Public flood As FloodFill_Basics
-    Public reduction As Reduction_Basics
+    Public reduction As New Reduction_Basics
     Public Sub New()
         flood = New FloodFill_Basics()
-        reduction = New Reduction_Basics()
         task.desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -141,7 +140,7 @@ End Class
 Public Class Reduction_Lines : Inherits VBparent
     Dim sideView As Histogram_SideView2D
     Dim topView As Histogram_TopView2D
-    Public lDetect As Line_Basics
+    Public lDetect As New Line_Basics
     Public setupSide As PointCloud_SetupSide
     Public setupTop As PointCloud_SetupTop
     Dim reduction As Reduction_PointCloud
@@ -151,9 +150,6 @@ Public Class Reduction_Lines : Inherits VBparent
         sideView = New Histogram_SideView2D()
         topView = New Histogram_TopView2D()
         reduction = New Reduction_PointCloud
-
-        lDetect = New Line_Basics()
-
         label1 = "Gravity rotated Side View with detected lines"
         label2 = "Gravity rotated Top View width detected lines"
         task.desc = "Present both the top and side view to minimize pixel counts."
@@ -181,9 +177,8 @@ End Class
 
 
 Public Class Reduction_PointCloud : Inherits VBparent
-    Dim reduction As Reduction_Basics
+    Dim reduction As New Reduction_Basics
     Public Sub New()
-        reduction = New Reduction_Basics()
         reduction.radio.check(0).Checked = True
         label1 = "Reduced depth"
         label2 = "Pointcloud with reduced z-Depth"
@@ -208,10 +203,8 @@ End Class
 
 
 Public Class Reduction_XYZ : Inherits VBparent
-    Dim reduction As Reduction_Basics
+    Dim reduction As New Reduction_Basics
     Public Sub New()
-        reduction = New Reduction_Basics()
-
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 3)
             check.Box(0).Text = "Slice point cloud in X direction"
@@ -253,12 +246,10 @@ End Class
 
 Public Class Reduction_Edges : Inherits VBparent
     Dim edges As Edges_Laplacian
-    Dim reduction As Reduction_Basics
+    Dim reduction As New Reduction_Basics
     Public Sub New()
         edges = New Edges_Laplacian()
-        reduction = New Reduction_Basics()
         reduction.radio.check(0).Checked = True
-
         task.desc = "Get the edges after reducing the image."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -282,11 +273,10 @@ End Class
 
 
 Public Class Reduction_Depth : Inherits VBparent
-    Dim reduction As Reduction_Basics
+    Dim reduction As New Reduction_Basics
     Dim colorizer As Depth_Colorizer_CPP
     Public reducedDepth32F As New cv.Mat
     Public Sub New()
-        reduction = New Reduction_Basics()
         reduction.radio.check(0).Checked = True
         colorizer = New Depth_Colorizer_CPP()
         task.desc = "Use reduction to smooth depth data"
@@ -313,12 +303,11 @@ End Class
 
 
 Public Class Reduction_DepthMax : Inherits VBparent
-    Dim reduction As Reduction_Basics
+    Dim reduction As New Reduction_Basics
     Dim colorizer As Depth_Colorizer_CPP
     Dim dMax As Depth_SmoothMax
     Public reducedDepth32F As New cv.Mat
     Public Sub New()
-        reduction = New Reduction_Basics()
         reduction.radio.check(0).Checked = True
         colorizer = New Depth_Colorizer_CPP()
         dMax = New Depth_SmoothMax

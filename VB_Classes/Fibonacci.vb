@@ -1,9 +1,8 @@
 Imports cv = OpenCvSharp
 ' https://www.codeproject.com/Articles/5280034/Generation-of-Infinite-Sequences-in-Csharp-and-Unm
 Public Class Fibonacci_Basics : Inherits VBparent
-    Dim flow As Font_FlowText
+    Dim flow As New Font_FlowText
     Public Sub New()
-        flow = New Font_FlowText()
         task.desc = "Generate the fibonacci sequence using conventional code"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -27,9 +26,8 @@ End Class
 
 ' https://www.codeproject.com/Articles/5280034/Generation-of-Infinite-Sequences-in-Csharp-and-Unm
 Public Class Fibonacci_Yield : Inherits VBparent
-    Dim flow As Font_FlowText
+    Dim flow As New Font_FlowText
     Public Sub New()
-        flow = New Font_FlowText()
         task.desc = "Generate the fibonacci sequence using ienumerable's"
     End Sub
     Private Iterator Function nextFib() As System.Collections.Generic.IEnumerable(Of Double)

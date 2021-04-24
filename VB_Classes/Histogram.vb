@@ -2,14 +2,11 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Histogram_Basics : Inherits VBparent
     Public histogram As New cv.Mat
-    Public kalman As Kalman_Basics
-    Public plotHist As Plot_Histogram
+    Public kalman As New Kalman_Basics
+    Public plotHist As New Plot_Histogram
     Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
     Public Sub New()
-        plotHist = New Plot_Histogram
         plotHist.minRange = 0
-        kalman = New Kalman_Basics()
-
         task.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -184,14 +181,13 @@ End Module
 
 
 Public Class Histogram_NormalizeGray : Inherits VBparent
-    Public histogram As Histogram_Basics
+    Public histogram As New Histogram_Basics
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
             sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
         End If
-        histogram = New Histogram_Basics
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
@@ -293,17 +289,12 @@ End Class
 
 ' https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
 Public Class Histogram_EqualizeColor : Inherits VBparent
-    Public kalmanEq As Histogram_Basics
-    Public kalman As Histogram_Basics
-    Dim mats As Mat_2to1
+    Public kalmanEq As New Histogram_Basics
+    Public kalman As New Histogram_Basics
+    Dim mats As New Mat_2to1
     Public displayHist As Boolean = False
     Public channel = 2
     Public Sub New()
-        kalmanEq = New Histogram_Basics
-        kalman = New Histogram_Basics
-
-        mats = New Mat_2to1
-
         task.desc = "Create an equalized histogram of the color image."
         label1 = "Image Enhanced with Equalized Histogram"
     End Sub
@@ -341,15 +332,10 @@ End Class
 
 'https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
 Public Class Histogram_EqualizeGray : Inherits VBparent
-    Public histogramEq As Histogram_Basics
-    Public histogram As Histogram_Basics
-    Dim mats As Mat_2to1
+    Public histogramEq As New Histogram_Basics
+    Public histogram As New Histogram_Basics
+    Dim mats As New Mat_2to1
     Public Sub New()
-        histogramEq = New Histogram_Basics
-
-        histogram = New Histogram_Basics
-        mats = New Mat_2to1
-
         label1 = "Before EqualizeHist"
         label2 = "After EqualizeHist"
         task.desc = "Create an equalized histogram of the grayscale image."
@@ -372,10 +358,8 @@ End Class
 
 
 Public Class Histogram_Simple : Inherits VBparent
-    Public plotHist As Plot_Histogram
+    Public plotHist As New Plot_Histogram
     Public Sub New()
-        plotHist = New Plot_Histogram()
-
         label1 = "Histogram of the grayscale video stream"
         task.desc = "Build a simple and reusable histogram for grayscale images."
     End Sub
@@ -400,7 +384,7 @@ End Class
 
 
 Public Class Histogram_ColorsAndGray : Inherits VBparent
-    Dim histogram As Histogram_Basics
+    Dim histogram As New Histogram_Basics
     Dim mats As Mat_4to1
     Public Sub New()
         mats = New Mat_4to1()
@@ -410,7 +394,6 @@ Public Class Histogram_ColorsAndGray : Inherits VBparent
             sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
             sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
         End If
-        histogram = New Histogram_Basics
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
@@ -454,14 +437,10 @@ End Class
 Public Class Histogram_SmoothTopView2D : Inherits VBparent
     Public topView As Histogram_TopView2D
     Dim setupTop As PointCloud_SetupTop
-    Dim stable As Motion_MinMaxPointCloud
+    Dim stable As New Motion_MinMaxPointCloud
     Public Sub New()
-
         setupTop = New PointCloud_SetupTop
         topView = New Histogram_TopView2D
-
-        stable = New Motion_MinMaxPointCloud
-
         label1 = "XZ (Top View)"
         task.desc = "Create a 2D top view with stable depth data."
     End Sub
@@ -493,14 +472,10 @@ End Class
 Public Class Histogram_SmoothSideView2D : Inherits VBparent
     Public sideView As Histogram_SideView2D
     Dim setupSide As PointCloud_SetupSide
-    Dim stable As Motion_MinMaxPointCloud
+    Dim stable As New Motion_MinMaxPointCloud
     Public Sub New()
-
         setupSide = New PointCloud_SetupSide
         sideView = New Histogram_SideView2D
-
-        stable = New Motion_MinMaxPointCloud
-
         label1 = "ZY (Side View)"
         task.desc = "Create a 2D side view of stable depth data"
     End Sub
@@ -955,10 +930,8 @@ End Class
 
 
 Public Class Histogram_Depth : Inherits VBparent
-    Public plotHist As Plot_Histogram
+    Public plotHist As New Plot_Histogram
     Public Sub New()
-        plotHist = New Plot_Histogram()
-
         task.desc = "Show depth data as a histogram."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -984,16 +957,13 @@ End Class
 
 
 Public Class Histogram_DepthValleys : Inherits VBparent
-    Dim kalman As Kalman_Basics
+    Dim kalman As New Kalman_Basics
     Dim hist As Histogram_Depth
     Public ranges As New List(Of cv.Point)
     Public rangeColors As New List(Of Integer)
     Public rangeCounts As New List(Of Integer)
     Public Sub New()
         hist = New Histogram_Depth()
-
-        kalman = New Kalman_Basics()
-
         label1 = "Histogram clustered by valleys and smoothed"
         task.desc = "Identify valleys in the Depth histogram."
     End Sub
@@ -1079,11 +1049,10 @@ End Class
 Public Class Histogram_TopData : Inherits VBparent
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
-    Dim kalman As Kalman_Basics
+    Dim kalman As New Kalman_Basics
     Dim IntelBug As Boolean
     Public resizeHistOutput As Boolean = True
     Public Sub New()
-        kalman = New Kalman_Basics()
         gCloud = New Depth_PointCloud_IMU()
         If VB_Classes.ActiveTask.algParms.camNames.D455 = task.parms.cameraName Then IntelBug = True
 
@@ -1114,12 +1083,10 @@ End Class
 Public Class Histogram_SideData : Inherits VBparent
     Public gCloud As Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
-    Dim kalman As Kalman_Basics
+    Dim kalman As New Kalman_Basics
     Public resizeHistOutput As Boolean = True
     Public Sub New()
-        kalman = New Kalman_Basics()
         gCloud = New Depth_PointCloud_IMU()
-
         task.desc = "Create a 2D side view for ZY histogram of depth in meters - NOTE: x and y scales differ!"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -1168,9 +1135,8 @@ End Class
 
 
 Public Class Histogram_Peaks : Inherits VBparent
-    Dim hist As Histogram_Basics
+    Dim hist As New Histogram_Basics
     Public Sub New()
-        hist = New Histogram_Basics
         task.desc = "Find the peaks - columns taller that both neighbors - in the histogram"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -1312,10 +1278,8 @@ End Class
 
 
 Public Class Histogram_PeakMax : Inherits VBparent
-    Dim hist As Histogram_Basics
+    Dim hist As New Histogram_Basics
     Public Sub New()
-        hist = New Histogram_Basics
-
         task.desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
         label2 = "Grayscale Histogram"
     End Sub

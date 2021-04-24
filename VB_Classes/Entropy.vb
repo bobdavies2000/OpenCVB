@@ -31,13 +31,10 @@ End Class
 
 Public Class Entropy_Highest : Inherits VBparent
     Dim entropyCalc As Entropy_Simple
-    Public grid As Thread_Grid
+    Public grid As New Thread_Grid
     Public eMaxRect As cv.Rect
-    Dim addw As AddWeighted_Basics
+    Dim addw As New AddWeighted_Basics
     Public Sub New()
-        addw = New AddWeighted_Basics
-
-        grid = New Thread_Grid
         findSlider("ThreadGrid Width").Value = 64
         findSlider("ThreadGrid Height").Value = 80
 

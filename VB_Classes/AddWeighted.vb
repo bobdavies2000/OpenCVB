@@ -24,11 +24,9 @@ End Class
 
 
 Public Class AddWeighted_Edges : Inherits VBparent
-    Dim edges As Edges_BinarizedSobel
-    Dim addw As AddWeighted_Basics
+    Dim edges As New Edges_BinarizedSobel
+    Dim addw As New AddWeighted_Basics
     Public Sub New()
-        edges = New Edges_BinarizedSobel
-        addw = New AddWeighted_Basics
         findSlider("Weight").Value = 75
         task.desc = "Add in the edges separating light and dark to the color image"
     End Sub
@@ -71,13 +69,10 @@ End Class
 
 
 Public Class AddWeighted_InfraRed : Inherits VBparent
-    Dim addw As AddWeighted_Basics
-    Dim infra As LeftRightView_BrightnessContrast
+    Dim infra As New LeftRightView_BrightnessContrast
+    Dim addw As New AddWeighted_Basics
     Dim src2 As New cv.Mat
     Public Sub New()
-        infra = New LeftRightView_BrightnessContrast
-        addw = New AddWeighted_Basics
-
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 2)
             radio.check(0).Text = "Use LeftView"

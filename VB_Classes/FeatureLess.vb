@@ -1,13 +1,9 @@
 Imports cv = OpenCvSharp
 Public Class Featureless_Basics : Inherits VBparent
-    Public edges As Edges_Basics
-    Public grid As Thread_Grid
-    Public flood As FloodFill_Palette
+    Public edges As New Edges_Basics
+    Public grid As New Thread_Grid
+    Public flood As New FloodFill_Palette
     Public Sub New()
-
-        edges = New Edges_Basics()
-
-        grid = New Thread_Grid
         findSlider("ThreadGrid Width").Value = 10
         findSlider("ThreadGrid Height").Value = 10
 
@@ -17,7 +13,6 @@ Public Class Featureless_Basics : Inherits VBparent
             sliders.setupTrackBar(1, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
             sliders.setupTrackBar(2, "FeatureLess threshold", 1, 100, 3)
         End If
-        flood = New FloodFill_Palette()
 
         label1 = "Featureless mask"
         task.desc = "Multithread Houghlines to find featureless regions in an image."
@@ -216,10 +211,9 @@ End Class
 
 Public Class FeatureLess_Highlights : Inherits VBparent
     Public fLessP As FeatureLess_PointTracker
-    Public addW As AddWeighted_Basics
+    Public addW As New AddWeighted_Basics
     Public Sub New()
         fLessP = New FeatureLess_PointTracker()
-        addW = New AddWeighted_Basics()
         task.desc = "Highlight the featureless regions in an RGB image"
     End Sub
     Public Sub Run(src as cv.Mat)

@@ -149,11 +149,10 @@ End Class
 
 Public Class OpticalFlow_DenseBasics_MT : Inherits VBparent
 
-    Public grid As Thread_Grid
+    Public grid As New Thread_Grid
     Dim accum As New cv.Mat
     Dim optFlow As OpticalFlow_DenseOptions
     Public Sub New()
-        grid = New Thread_Grid
         findSlider("ThreadGrid Width").Value = dst1.Cols / 4
         findSlider("ThreadGrid Height").Value = dst1.Rows / 4
         findSlider("ThreadGrid Border").Value = 5

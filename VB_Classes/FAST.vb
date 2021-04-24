@@ -32,9 +32,8 @@ End Class
 
 Public Class FAST_Centroid : Inherits VBparent
     Dim fast As FAST_Basics
-    Dim kalman As Kalman_Basics
+    Dim kalman As New Kalman_Basics
     Public Sub New()
-        kalman = New Kalman_Basics()
         ReDim kalman.kInput(1) ' 2 elements - cv.point
 
         fast = New FAST_Basics()

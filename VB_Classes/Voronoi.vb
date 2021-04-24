@@ -4,14 +4,13 @@ Imports System.Runtime.InteropServices
 'https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
 Public Class Voronoi_Basics : Inherits VBparent
     Public vDemo As New CS_Classes.VoronoiDemo
-    Public random As Random_Basics
+    Public random As New Random_Basics
     Public inputPoints As List(Of cv.Point)
     Public Sub New()
-        random = New Random_Basics()
         label1 = "Ordered list output for Voronoi algorithm"
         task.desc = "Use the ordered list method to find the Voronoi segments"
     End Sub
-    Public Sub vDisplay( ByRef dst As cv.Mat, points As List(Of cv.Point))
+    Public Sub vDisplay(ByRef dst As cv.Mat, points As List(Of cv.Point))
         dst = dst.Normalize(255).ConvertScaleAbs(255)
         dst = dst.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -19,7 +18,7 @@ Public Class Voronoi_Basics : Inherits VBparent
             dst.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         If task.frameCount = 0 Then
             findSlider("Random Pixel Count").Maximum = 100
@@ -40,10 +39,9 @@ End Class
 'https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
 Public Class Voronoi_Compare : Inherits VBparent
     Dim basics As Voronoi_Basics
-    Public random As Random_Basics
+    Public random As New Random_Basics
     Public Sub New()
         basics = New Voronoi_Basics()
-        random = New Random_Basics()
 
         label1 = "Brute Force method"
         label2 = "Ordered List method"

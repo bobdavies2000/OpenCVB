@@ -1,10 +1,9 @@
 Imports cv = OpenCvSharp
 Public Class Watershed_Basics : Inherits VBparent
-    Dim addW As AddWeighted_Basics
+    Dim addW As New AddWeighted_Basics
     Dim rects As New List(Of cv.Rect)
     Public UseCorners As Boolean
     Public Sub New()
-        addW = New AddWeighted_Basics
         label1 = "Draw rectangle to add another marker"
         label2 = "Mask for watershed (selected regions)."
         task.desc = "Watershed API experiment.  Draw on the image to test."
@@ -61,9 +60,8 @@ End Class
 
 Public Class Watershed_DepthReduction : Inherits VBparent
     Dim watershed As Watershed_Basics
-    Dim reduction As Reduction_Basics
+    Dim reduction As New Reduction_Basics
     Public Sub New()
-        reduction = New Reduction_Basics()
         watershed = New Watershed_Basics()
         watershed.UseCorners = True
         label2 = "Reduction input to WaterShed"

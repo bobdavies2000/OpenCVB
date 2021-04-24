@@ -13,8 +13,8 @@ Public Class Distance_Basics : Inherits VBparent
         label2 = "Input mask to distance transformm"
         task.desc = "Distance algorithm basics."
     End Sub
-    Public Sub Run(src as cv.Mat)
-        If standalone or task.intermediateReview = caller Then src = task.RGBDepth ' to get some zeros in the image...
+    Public Sub Run(src As cv.Mat)
+        If standalone Or task.intermediateReview = caller Then src = task.RGBDepth ' to get some zeros in the image...
         Dim gray = src
         If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim DistanceType = cv.DistanceTypes.L2
@@ -36,7 +36,7 @@ End Class
 
 
 Public Class Distance_Foreground : Inherits VBparent
-    Dim foreground As KMeans_Depth_FG_BG
+    Dim foreground As New KMeans_Depth_FG_BG
     Public Sub New()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)
@@ -45,7 +45,6 @@ Public Class Distance_Foreground : Inherits VBparent
             radio.check(2).Text = "L2"
             radio.check(2).Checked = True
         End If
-        foreground = New KMeans_Depth_FG_BG()
         label1 = "Distance results"
         label2 = "Input mask to distance transformm"
         task.desc = "Distance algorithm basics."

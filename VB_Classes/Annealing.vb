@@ -107,10 +107,10 @@ End Class
 
 
 Public Class Annealing_CPP_MT : Inherits VBparent
-    Dim random As Random_Basics
+    Dim random As New Random_Basics
     Dim anneal() As Annealing_Basics_CPP
     Dim mats As Mat_4to1
-    Dim flow As Font_FlowText
+    Dim flow As New Font_FlowText
     Private Class CompareEnergy : Implements IComparer(Of Single)
         Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
             ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
@@ -141,8 +141,6 @@ Public Class Annealing_CPP_MT : Inherits VBparent
     End Sub
 
     Public Sub New()
-        random = New Random_Basics()
-
         mats = New Mat_4to1()
 
         ReDim anneal(Environment.ProcessorCount - 1)
@@ -159,8 +157,6 @@ Public Class Annealing_CPP_MT : Inherits VBparent
             check.Box(1).Checked = True
             check.Box(2).Checked = True
         End If
-
-        flow = New Font_FlowText()
 
         label1 = "Log of Annealing progress"
         label2 = "Top 2 are best solutions, bottom 2 are worst."
@@ -236,11 +232,10 @@ End Class
 
 
 Public Class Annealing_Options : Inherits VBparent
-    Dim random As Random_Basics
+    Dim random As New Random_Basics
     Public anneal As Annealing_Basics_CPP
-    Dim flow As Font_FlowText
+    Dim flow As New Font_FlowText
     Public Sub New()
-        random = New Random_Basics()
         random.Run(Nothing) ' get the city positions (may or may not be used below.)
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
@@ -249,8 +244,6 @@ Public Class Annealing_Options : Inherits VBparent
             check.Box(1).Text = "Circular pattern of cities (allows you to visually check if successful.)"
             check.Box(1).Checked = True
         End If
-
-        flow = New Font_FlowText()
 
         label1 = "Log of Annealing progress"
 

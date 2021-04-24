@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
 Public Class IMU_Basics : Inherits VBparent
     Dim lastTimeStamp As Double
-    Dim flow As Font_FlowText
+    Dim flow As New Font_FlowText
     Public theta As cv.Point3f ' this is the description - x, y, and z - of the axes centered in the camera.
     Public gyroAngle As cv.Point3f ' this is the orientation of the gyro.
     Public Sub New()
@@ -10,8 +10,6 @@ Public Class IMU_Basics : Inherits VBparent
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
         End If
-        flow = New Font_FlowText()
-
         task.desc = "Read and display the IMU coordinates"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -56,15 +54,14 @@ End Class
 
 
 Public Class IMU_Stabilizer : Inherits VBparent
-    Dim kalman As Kalman_Basics
+    Dim kalman As New Kalman_Basics
     Public Sub New()
-        kalman = New Kalman_Basics()
         ReDim kalman.kInput(3 - 1)
         task.desc = "Stabilize the image with the IMU data."
         label1 = "IMU Stabilize (Move Camera + Select Kalman)"
         label2 = "Difference from Color Image"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim borderCrop = 5
         Dim vert_Border = borderCrop * src.Rows / src.Cols
         Dim dx = task.IMU_AngularVelocity.X
@@ -113,7 +110,7 @@ Public Class IMU_Magnetometer : Inherits VBparent
 
         task.desc = "Get the IMU_Magnetometer values from the IMU (if available)"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If task.IMU_Magnetometer = New cv.Point3f Then
             task.trueText("The IMU for this camera does not have Magnetometer readings.")
         Else
@@ -135,7 +132,7 @@ Public Class IMU_Barometer : Inherits VBparent
     Public Sub New()
         task.desc = "Get the barometric pressure from the IMU (if available)"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If task.IMU_Barometer = 0 Then
             task.trueText("The IMU for this camera does not have barometric pressure.")
         Else
@@ -152,7 +149,7 @@ Public Class IMU_Temperature : Inherits VBparent
     Public Sub New()
         task.desc = "Get the temperature of the IMU (if available)"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         task.trueText("IMU Temperature is " + Format(task.IMU_Temperature, "#0.00") + " degrees Celsius." + vbCrLf +
                       "IMU Temperature is " + Format(task.IMU_Temperature * 9 / 5 + 32, "#0.00") + " degrees Fahrenheit.")
     End Sub
@@ -181,7 +178,7 @@ Public Class IMU_FrameTime : Inherits VBparent
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         task.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static IMUanchor As Integer = task.IMU_FrameTime
         Static histogramIMU(plot.maxScale) As Integer
 
@@ -414,9 +411,8 @@ End Class
 
 
 Public Class IMU_GVector : Inherits VBparent
-    Public kalman As Kalman_Basics
+    Public kalman As New Kalman_Basics
     Public Sub New()
-        kalman = New Kalman_Basics()
         ReDim kalman.kInput(6 - 1)
 
         If findfrm(caller + " Slider Options") Is Nothing Then

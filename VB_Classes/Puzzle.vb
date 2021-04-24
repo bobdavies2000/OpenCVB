@@ -218,14 +218,13 @@ End Module
 
 ' https://github.com/nemanja-m/gaps
 Public Class Puzzle_Basics : Inherits VBparent
-    Public grid As Thread_Grid
+    Public grid As New Thread_Grid
     Public scrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
     Public unscrambled As New List(Of cv.Rect) ' this is every roi regardless of size.
     Public restartRequested As Boolean
     Dim gridWidthSlider As System.Windows.Forms.TrackBar
     Dim gridHeightSlider As System.Windows.Forms.TrackBar
     Public Sub New()
-        grid = New Thread_Grid
         gridWidthSlider = findSlider("ThreadGrid Width")
         gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Value = dst1.Cols / 10

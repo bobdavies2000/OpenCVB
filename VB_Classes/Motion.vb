@@ -262,9 +262,8 @@ End Class
 
 
 Public Class Motion_ThruCorrelation : Inherits VBparent
-    Dim grid As Thread_Grid
+    Dim grid As New Thread_Grid
     Public Sub New()
-        grid = New Thread_Grid
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Correlation coefficient threshold for motion X1000", 0, 1000, 950)
