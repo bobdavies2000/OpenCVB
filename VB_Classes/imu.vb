@@ -508,8 +508,6 @@ End Class
 
 Public Class IMU_IsCameraLevel : Inherits VBparent
     Public Sub New()
-        task.callTrace.Clear() ' special line to clear the tree view otherwise this common option is standalone.
-        standalone = False
         task.desc = "Answer the question: Is the camera level?"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -536,8 +534,6 @@ End Class
 
 Public Class IMU_IscameraStable : Inherits VBparent
     Public Sub New()
-        task.callTrace.Clear() ' special line to clear the tree view otherwise this common option is standalone.
-        standalone = False
         task.desc = "Answer the question: Is the camera stable?"
     End Sub
     Public Sub Run(src As cv.Mat)

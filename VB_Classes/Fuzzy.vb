@@ -47,28 +47,33 @@ Public Class Fuzzy_Basics : Inherits VBparent
         contours = cv.Cv2.FindContoursAsArray(tmp, options.retrievalMode, options.ApproximationMode)
 
         sortContours.Clear()
+        Dim countContours As Integer
         For i = 0 To contours.Length - 1
-            ' get this region's ID
-            Dim maskID As Integer = 0
-            Dim pt = contours(i)(0)
-            For y = pt.Y - 1 To pt.Y + 1
-                For x = pt.X - 1 To pt.X + 1
-                    If x < src.Width And y < src.Height And x >= 0 And y >= 0 Then
-                        Dim val = gray.Get(Of Byte)(y, x)
-                        If val <> 0 Then
-                            maskID = val
-                            Exit For
+            If contours(i).Length > 100 Then
+                countContours += 1
+                ' get this region's ID
+                Dim maskID As Integer = 0
+                Dim pt = contours(i)(0)
+                For y = pt.Y - 1 To pt.Y + 1
+                    For x = pt.X - 1 To pt.X + 1
+                        If x < src.Width And y < src.Height And x >= 0 And y >= 0 Then
+                            Dim val = gray.Get(Of Byte)(y, x)
+                            If val <> 0 Then
+                                maskID = val
+                                Exit For
+                            End If
                         End If
-                    End If
+                    Next
+                    If maskID <> 0 Then Exit For
                 Next
-                If maskID <> 0 Then Exit For
-            Next
-            sortContours.Add(contours(i).Length, New cv.Point(i, maskID))
+                sortContours.Add(contours(i).Length, New cv.Point(i, maskID))
+            End If
         Next
 
         task.palette.Run(gray)
         dst1 = task.palette.dst1
         dst1.SetTo(0, dst2)
+        label1 = "There were " + CStr(countContours) + " contour > 100 points."
     End Sub
     Public Sub Close()
         Fuzzy_Close(Fuzzy)

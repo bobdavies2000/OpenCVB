@@ -504,15 +504,13 @@ End Class
 Public Class PointCloud_Kalman_TopView : Inherits VBparent
     Public pTrack As KNN_PointTracker
     Public flood As New FloodFill_Palette
-    Public topView As Histogram_TopView2D
+    Public topView As New Histogram_TopView2D
     Public Sub New()
-        pTrack = New KNN_PointTracker
+        If standalone Then topView = New Histogram_TopView2D
         findSlider("FloodFill Minimum Size").Value = 100
-        topView = New Histogram_TopView2D
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         topView.Run(src)
 
         flood.Run(topView.histOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255))

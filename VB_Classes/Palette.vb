@@ -365,12 +365,9 @@ End Class
 
 
 Public Class Palette_ObjectColors : Inherits VBparent
-    Dim reduction As Reduction_KNN_Color
+    Dim reduction As New Reduction_KNN_Color
     Public gray As cv.Mat
     Public Sub New()
-
-        reduction = New Reduction_KNN_Color()
-
         label1 = "Consistent colors"
         label2 = "Original colors"
         task.desc = "New class description"

@@ -4,9 +4,6 @@ Public Class Pixel_Viewer : Inherits VBparent
     Dim firstUpdate = True
     Public viewerForm As New PixelViewerForm
     Public Sub New()
-
-        task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone (it is always present, not standalone)
-        standalone = False
         task.desc = "Display pixels under the cursor"
     End Sub
     Public Sub Run(src as cv.Mat)

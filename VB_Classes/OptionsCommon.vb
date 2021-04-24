@@ -2,9 +2,6 @@ Imports cv = OpenCvSharp
 Public Class OptionsCommon : Inherits VBparent
     Public gOptions As New OptionsGlobal
     Public Sub New()
-        task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone.
-        standalone = False
-
         gOptions = New OptionsGlobal
         gOptions.Show()
 
@@ -68,8 +65,6 @@ Public Class OptionsCommon_Histogram : Inherits VBparent
     Public sideFrustrumSetting = 57
     Public topFrustrumSetting = 57
     Public Sub New()
-        task.callTrace.Clear() ' special line to clear the tree view otherwise Options_Common is standalone.
-
         Dim cameraYSetting = 0
         Dim cameraXSetting = 0
 

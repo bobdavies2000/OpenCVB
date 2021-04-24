@@ -59,7 +59,7 @@ Public Class CellAuto_Basics : Inherits VBparent
         Next
         Return dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Function
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static rotateCheckBox = findCheckBox("Rotate through the different rules")
         If standalone Or task.intermediateReview = caller Then
             input = New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_8UC1, 0)
@@ -120,7 +120,7 @@ Public Class CellAuto_Life : Inherits VBparent
         findSlider("Random Pixel Count").Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
         task.desc = "Use OpenCV to implement the Game of Life"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static randomSlider = findSlider("Random Pixel Count")
         Static savePointCount As Integer
         If randomSlider.Value <> savePointCount Or generation = 0 Then
@@ -182,16 +182,15 @@ End Class
 
 ' https://natureofcode.com/book/chapter-7-cellular-automata/
 Public Class CellAuto_LifeColor : Inherits VBparent
-    Dim game As CellAuto_Life
+    Dim game As New CellAuto_Life
     Public Sub New()
-        game = New CellAuto_Life()
         game.backColor = cv.Scalar.White
         game.nodeColor = cv.Scalar.Black
 
         label1 = "Births are blue, deaths are red"
         task.desc = "Game of Life but with color added"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         game.Run(src)
         dst1 = game.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static lastBoard = dst1.Clone
@@ -216,10 +215,8 @@ End Class
 ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
 Public Class CellAuto_LifePopulation : Inherits VBparent
     Dim plot As Plot_OverTime
-    Dim game As CellAuto_Life
+    Dim game As New CellAuto_Life
     Public Sub New()
-        game = New CellAuto_Life()
-
         plot = New Plot_OverTime()
         plot.dst1 = dst2
         plot.maxScale = 2000
@@ -227,7 +224,7 @@ Public Class CellAuto_LifePopulation : Inherits VBparent
 
         task.desc = "Show Game of Life display with plot of population"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         game.Run(src)
         dst1 = game.dst1
 
@@ -244,17 +241,14 @@ End Class
 
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
 Public Class CellAuto_Basics_MP : Inherits VBparent
-    Dim cell As CellAuto_Basics
+    Dim cell As New CellAuto_Basics
     Dim i18 As New List(Of String)
     Dim i18Index As Integer
     Public Sub New()
-
-        cell = New CellAuto_Basics()
         i18 = cell.i18
-
         task.desc = "Multi-threaded version of CellAuto_Basics"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If standalone Or task.intermediateReview = caller Then
             cell.input = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
             cell.input.Set(Of Byte)(0, cell.input.Width / 2, 1)
@@ -286,9 +280,8 @@ End Class
 
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
 Public Class CellAuto_All256 : Inherits VBparent
-    Dim cell As CellAuto_Basics
+    Dim cell As New CellAuto_Basics
     Public Sub New()
-        cell = New CellAuto_Basics
         cell.combo.Visible = False ' won't need this...
 
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -305,7 +298,7 @@ Public Class CellAuto_All256 : Inherits VBparent
         Next
         Return outstr
     End Function
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim index = sliders.trackbar(0).Value
         Dim mtOn = cell.check.Box(0).Checked
 
@@ -334,10 +327,8 @@ End Class
 
 
 Public Class CellAuto_MultiPoint : Inherits VBparent
-    Dim cell As CellAuto_Basics
+    Dim cell As New CellAuto_Basics
     Public Sub New()
-
-        cell = New CellAuto_Basics()
         cell.combo.Box.SelectedIndex = 4 ' this one is nice...
         cell.check.Box(0).Checked = False ' just the one pattern.
         task.desc = "All256 above starts with just one point.  Here we start with multiple points."

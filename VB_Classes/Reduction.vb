@@ -72,14 +72,10 @@ End Class
 
 
 Public Class Reduction_KNN_Color : Inherits VBparent
-    Public reduction As Reduction_Floodfill
-    Public pTrack As KNN_PointTracker
-    Dim highlight As Highlight_Basics
+    Public pTrack As New KNN_PointTracker
+    Public reduction As New Reduction_Floodfill
+    Dim highlight As New Highlight_Basics
     Public Sub New()
-        pTrack = New KNN_PointTracker()
-        reduction = New Reduction_Floodfill()
-        If standalone Then highlight = New Highlight_Basics()
-
         label2 = "Original floodfill color selections"
         task.desc = "Use KNN with color reduction to consistently identify regions and color them."
     End Sub

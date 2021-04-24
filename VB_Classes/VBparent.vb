@@ -39,17 +39,9 @@ Public Class VBparent : Implements IDisposable
     Public quadrantIndex As Integer = QUAD3
     Public minVal As Double, maxVal As Double
     Public minLoc As cv.Point, maxLoc As cv.Point
-    Dim callStack = ""
     Public Sub initParent()
-        If task.callTrace.Count = 0 Then
-            standalone = True
-            task.callTrace.Clear()
-            task.activeObjects.Clear()
-            task.callTrace.Add(callStack)
-        Else
-            standalone = False
-            If task.callTrace.Contains(callStack) = False Then task.callTrace.Add(callStack)
-        End If
+        standalone = task.callTrace(0) = caller ' only the first is standalone (the primary algorithm.)
+        If standalone = False And task.callTrace.Contains(caller) = False Then task.callTrace.Add(caller)
         task.activeObjects.Add(Me)
         dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
         dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
@@ -123,21 +115,21 @@ Public Class VBparent : Implements IDisposable
         algorithm = Me
         caller = Me.GetType.Name
         label1 = caller
-        Dim stackTrace = Environment.StackTrace
-        Dim lines() = stackTrace.Split(vbCrLf)
-        For i = 0 To lines.Count - 1
-            lines(i) = Trim(lines(i))
-            Dim offset = InStr(lines(i), "VB_Classes.")
-            If offset > 0 Then
-                Dim partLine = Mid(lines(i), offset + 11)
-                If partLine.StartsWith("algorithmList.createAlgorithm") Then Exit For
-                Dim split() = partLine.Split("\")
-                partLine = Mid(partLine, 1, InStr(partLine, ".") - 1)
-                If Not (partLine.StartsWith("VBparent") Or partLine.StartsWith("ActiveTask")) Then
-                    callStack = partLine + "\" + callStack
-                End If
-            End If
-        Next
+        'Dim stackTrace = Environment.StackTrace
+        'Dim lines() = stackTrace.Split(vbCrLf)
+        'For i = 0 To lines.Count - 1
+        '    lines(i) = Trim(lines(i))
+        '    Dim offset = InStr(lines(i), "VB_Classes.")
+        '    If offset > 0 Then
+        '        Dim partLine = Mid(lines(i), offset + 11)
+        '        If partLine.StartsWith("algorithmList.createAlgorithm") Then Exit For
+        '        Dim split() = partLine.Split("\")
+        '        partLine = Mid(partLine, 1, InStr(partLine, ".") - 1)
+        '        If Not (partLine.StartsWith("VBparent") Or partLine.StartsWith("ActiveTask")) Then
+        '            callStack = partLine + "\" + callStack
+        '        End If
+        '    End If
+        'Next
         initParent()
     End Sub
     Public Function normalize32f(Input As cv.Mat) As cv.Mat

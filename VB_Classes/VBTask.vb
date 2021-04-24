@@ -329,13 +329,18 @@ Public Class ActiveTask : Implements IDisposable
         aOptions = New OptionsContainer
         If task.algName.EndsWith(".py") = False Then
             aOptions.Show()
+            task.callTrace.Add("OptionsCommon_Histogram") ' so calltrace is not nothing on initial call...
             viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
             inrange = algoList.createAlgorithm("OptionsCommon")
             IMUStable = algoList.createAlgorithm("IMU_IscameraStable")
             IMULevel = algoList.createAlgorithm("IMU_IsCameraLevel")
             PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
+            viewOptions.standalone = False
         End If
 
+        task.callTrace.Clear()
+        task.callTrace.Add(task.algName)
+        task.activeObjects.Clear()
         algorithmObject = algoList.createAlgorithm(task.algName)
 
         If algorithmObject Is Nothing Then
