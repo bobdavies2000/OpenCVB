@@ -7,7 +7,7 @@ Public Class Kalman_Basics : Inherits VBparent
     Public Sub New()
         task.desc = "Use Kalman to stabilize values (such as a cv.rect.)"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static saveDimension = -1
         If saveDimension <> kInput.Length Then
             If kalman IsNot Nothing Then
@@ -36,7 +36,7 @@ Public Class Kalman_Basics : Inherits VBparent
             kOutput = kInput ' do nothing to the input.
         End If
 
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             dst1 = src
             Dim rect = New cv.Rect(CInt(kOutput(0)), CInt(kOutput(1)), CInt(kOutput(2)), CInt(kOutput(3)))
             rect = validateRect(rect)
@@ -65,7 +65,7 @@ Public Class Kalman_Stripped : Inherits VBparent
     Public Sub New()
         task.desc = "High volume usage only.  Same As New Kalman_Basics but no check boxes."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static saveDimension = -1
         If saveDimension <> kInput.Length Then
             If kalman IsNot Nothing Then
@@ -78,7 +78,7 @@ Public Class Kalman_Stripped : Inherits VBparent
             saveDimension = kInput.Length
             ReDim kalman(kInput.Length - 1)
             For i = 0 To kInput.Length - 1
-                kalman(i) = New Kalman_Simple()
+                kalman(i) = New Kalman_Simple
             Next
             ReDim kOutput(kInput.Count - 1)
         End If
@@ -94,7 +94,7 @@ Public Class Kalman_Stripped : Inherits VBparent
             kOutput = kInput ' do nothing to the input.
         End If
 
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             dst1 = src.Clone()
             Dim rect = New cv.Rect(CInt(kOutput(0)), CInt(kOutput(1)), CInt(kOutput(2)), CInt(kOutput(3)))
             rect = validateRect(rect)
@@ -133,7 +133,7 @@ Public Class Kalman_Compare : Inherits VBparent
         label2 = "Kalman output: smoothed mean values for RGB"
         task.desc = "Use this kalman filter to predict the next value."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If task.frameCount = 0 Then
             If kalman IsNot Nothing Then
                 If kalman.Count > 0 Then
@@ -144,7 +144,7 @@ Public Class Kalman_Compare : Inherits VBparent
             End If
             ReDim kalman(3 - 1)
             For i = 0 To kalman.Count - 1
-                kalman(i) = New Kalman_Single()
+                kalman(i) = New Kalman_Single
             Next
         End If
 
@@ -204,7 +204,7 @@ Public Class Kalman_RotatingPoint : Inherits VBparent
         center = New cv.Point2f(dst1.Cols / 2, dst1.Rows / 2)
         task.desc = "Track a rotating point using a Kalman filter. Yellow line (estimate) should be shorter than red (real)."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim stateAngle = kState.Get(Of Single)(0)
 
         Dim prediction = kf.Predict()
@@ -250,7 +250,7 @@ Public Class Kalman_MousePredict : Inherits VBparent
         label1 = "Red is real mouse, white is prediction"
         task.desc = "Use kalman filter to predict the next mouse location."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If task.frameCount Mod 100 = 0 Then dst1.SetTo(0)
 
         Static lastRealMouse = task.mousePoint
@@ -294,7 +294,7 @@ Public Class Kalman_CVMat : Inherits VBparent
             saveDimension = input.Rows
             ReDim kalman(input.Rows - 1)
             For i = 0 To input.Rows - 1
-                kalman(i) = New Kalman_Simple()
+                kalman(i) = New Kalman_Simple
             Next
             output = New cv.Mat(input.Rows, 1, cv.MatType.CV_32F, 0)
         End If
@@ -339,11 +339,9 @@ End Class
 
 
 Public Class Kalman_ImageSmall : Inherits VBparent
-    Dim kalman As Kalman_CVMat
+    Dim kalman As New Kalman_CVMat
     Dim resize As Resize_Percentage
     Public Sub New()
-        kalman = New Kalman_CVMat()
-
         resize = New Resize_Percentage()
 
         label1 = "The small image is processed by the Kalman filter"
@@ -374,10 +372,8 @@ End Class
 
 
 Public Class Kalman_DepthSmall : Inherits VBparent
-    Dim kalman As Kalman_ImageSmall
+    Dim kalman As New Kalman_ImageSmall
     Public Sub New()
-        kalman = New Kalman_ImageSmall()
-
         label1 = "Mask of non-zero depth after Kalman smoothing"
         label2 = "Mask of the smoothed image minus original"
         task.desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)"
@@ -396,11 +392,9 @@ End Class
 
 
 Public Class Kalman_Depth32f : Inherits VBparent
-    Dim kalman As Kalman_CVMat
+    Dim kalman As New Kalman_CVMat
     Dim resize As Resize_Percentage
     Public Sub New()
-        kalman = New Kalman_CVMat()
-
         resize = New Resize_Percentage()
         resize.sliders.trackbar(0).Value = 4
 

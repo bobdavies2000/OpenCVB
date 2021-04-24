@@ -114,6 +114,8 @@
     <Compile Include="Download.vb" />
     <Compile Include="FishEye.vb" />
     <Compile Include="Fourier.vb" />
+    <Compile Include="ImageForm.Designer.vb" />
+    <Compile Include="imageForm.vb" />
     <Compile Include="ImageSeg.vb" />
     <Compile Include="imShow.vb" />
     <Compile Include="LineFLD.vb" />
@@ -282,10 +284,6 @@
     <Compile Include="OilPaint.vb" />
     <Compile Include="OpenGL.vb" />
     <Compile Include="OpticalFlow.vb" />
-    <Compile Include="imageForm.Designer.vb">
-      <DependentUpon>imageForm.vb</DependentUpon>
-    </Compile>
-    <Compile Include="imageForm.vb" />
     <Compile Include="OptionsSliders.Designer.vb">
       <DependentUpon>OptionsSliders.vb</DependentUpon>
     </Compile>
@@ -348,6 +346,7 @@
     <Compile Include="XPhoto.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="imageForm.resx" />
     <EmbeddedResource Include="OptionsCombo.resx">
       <DependentUpon>OptionsCombo.vb</DependentUpon>
     </EmbeddedResource>
@@ -365,9 +364,6 @@
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="imageForm.resx">
-      <DependentUpon>imageForm.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsCheckbox.resx">
       <DependentUpon>OptionsCheckbox.vb</DependentUpon>

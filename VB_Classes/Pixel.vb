@@ -258,7 +258,6 @@ Public Class Pixel_Sampler : Inherits VBparent
     Dim width = 100
     Dim height = 100
     Public Sub New()
-        random = New Random_Basics
         task.desc = "Find the dominanant pixel color - not an average! This can provide consistent colorizing."
     End Sub
     Public Sub Run(src as cv.Mat)

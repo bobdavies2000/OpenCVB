@@ -242,12 +242,11 @@ End Class
 ' https://www.mynteye.com/pages/mynt-eye-d
 Public Class PointCloud_SetupSide : Inherits VBparent
     Dim arcSize As Integer
-    Dim imu As IMU_GVector
+    Dim imu As New IMU_GVector
     Public xCheckbox As Windows.Forms.CheckBox
     Public zCheckbox As Windows.Forms.CheckBox
     Public Sub New()
         arcSize = dst1.Width / 15
-        If standalone Then imu = New IMU_GVector
         label1 = "Colorize mask for side view"
         task.desc = "Create the colorized mat used for side projections"
     End Sub
@@ -333,10 +332,9 @@ End Class
 ' https://www.mynteye.com/pages/mynt-eye-d
 Public Class PointCloud_SetupTop : Inherits VBparent
     Dim arcSize As Integer
-    Dim imu As IMU_GVector
+    Dim imu As New IMU_GVector
     Public xCheckbox As Windows.Forms.CheckBox
     Public Sub New()
-        If standalone Then imu = New IMU_GVector
         arcSize = dst1.Width / 15
 
         label1 = "Colorize mask for top down view"

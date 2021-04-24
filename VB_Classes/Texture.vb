@@ -124,7 +124,7 @@ End Class
 
 
 Public Class Texture_Shuffle : Inherits VBparent
-    Dim shuffle As Random_Shuffle
+    Dim shuffle As New Random_Shuffle
     Dim floor As OpenGL_FloorPlane
     Dim texture As Texture_Basics
     Public tRect As cv.Rect
@@ -132,7 +132,6 @@ Public Class Texture_Shuffle : Inherits VBparent
     Public Sub New()
         floor = New OpenGL_FloorPlane()
         texture = New Texture_Basics()
-        shuffle = New Random_Shuffle()
         task.desc = "Use random shuffling to homogenize a texture sample of what the floor looks like."
     End Sub
     Public Sub Run(src as cv.Mat)

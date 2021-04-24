@@ -128,10 +128,8 @@ End Class
 
 
 Public Class XPhoto_Inpaint : Inherits VBparent
-    Public basics As InPaint_Basics
+    Public basics As New InPaint_Basics
     Public Sub New()
-        basics = New InPaint_Basics
-
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)
             radio.check(0).Text = "FSR_Best"

@@ -1193,11 +1193,9 @@ End Class
 ' https://stackoverflow.com/questions/7019407/translating-and-rotating-an-image-in-3d-using-opencv
 Public Class Depth_PointCloud_IMU : Inherits VBparent
     Public Mask As New cv.Mat
-    Public imu As IMU_GVector
+    Public imu As New IMU_GVector
     Public gMatrix(,) As Single
     Public Sub New()
-        imu = New IMU_GVector
-
         task.desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU."
     End Sub
     Public Sub Run(src As cv.Mat)

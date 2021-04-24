@@ -338,16 +338,11 @@ End Class
 
 
 Public Class IMU_TotalDelay : Inherits VBparent
-    Dim host As IMU_HostFrameTimes
-    Dim imu As IMU_FrameTime
+    Dim host As New IMU_HostFrameTimes
+    Dim imu As New IMU_FrameTime
     Dim plot As Plot_OverTime
-    Dim kalman As Kalman_Single
+    Dim kalman As New Kalman_Single
     Public Sub New()
-
-        host = New IMU_HostFrameTimes()
-        imu = New IMU_FrameTime()
-        kalman = New Kalman_Single()
-
         plot = New Plot_OverTime()
         plot.dst1 = dst2
         plot.maxScale = 50

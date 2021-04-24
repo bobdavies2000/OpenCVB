@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
 Public Class Smoothing_Exterior : Inherits VBparent
-	Dim hull As Hull_Basics
+	Dim hull As New Hull_Basics
 	Public inputPoints As List(Of cv.Point)
 	Public smoothPoints As List(Of cv.Point)
 	Public plotColor = cv.Scalar.Yellow
@@ -43,9 +43,6 @@ Public Class Smoothing_Exterior : Inherits VBparent
 	End Function
 	Public Sub New()
 		smOptions = New Smoothing_Options
-		If standalone Then
-			hull = New Hull_Basics
-		End If
 
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
@@ -75,7 +72,7 @@ End Class
 
 ' https://www.codeproject.com/Articles/1093960/D-Polyline-Vertex-Smoothing
 Public Class Smoothing_Interior : Inherits VBparent
-	Dim hull As Hull_Basics
+	Dim hull As New Hull_Basics
 	Public inputPoints As List(Of cv.Point)
 	Public smoothPoints As List(Of cv.Point)
 	Public plotColor = cv.Scalar.Yellow
@@ -119,10 +116,7 @@ Public Class Smoothing_Interior : Inherits VBparent
 	End Function
 	Public Sub New()
 		smOptions = New Smoothing_Options
-		If standalone Then
-			hull = New Hull_Basics()
-			findSlider("Hull random points").Value = 16
-		End If
+		If standalone Then findSlider("Hull random points").Value = 16
 
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""

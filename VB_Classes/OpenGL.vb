@@ -211,11 +211,8 @@ End Class
 'https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
 Public Class OpenGL_IMU : Inherits VBparent
     Public ogl As OpenGL_Options
-    Public imu As IMU_GVector
-
+    Public imu As New IMU_GVector
     Public Sub New()
-        imu = New IMU_GVector()
-
         ogl = New OpenGL_Options()
         ogl.OpenGL.OpenGLTitle = "OpenGL_IMU"
         ogl.sliders.trackbar(1).Value = 0 ' pitch

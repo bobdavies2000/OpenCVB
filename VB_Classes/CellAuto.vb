@@ -114,8 +114,6 @@ Public Class CellAuto_Life : Inherits VBparent
     Public Sub New()
         grid = New cv.Mat(dst1.Height / factor, dst1.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
-
-        random = New Random_Basics
         random.rangeRect = New cv.Rect(0, 0, grid.Width, grid.Height)
         findSlider("Random Pixel Count").Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
         task.desc = "Use OpenCV to implement the Game of Life"

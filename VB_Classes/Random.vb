@@ -125,9 +125,8 @@ End Class
 
 Public Class Random_CheckUniformSmoothed : Inherits VBparent
     Dim histogram As New Histogram_Basics
-    Dim rUniform As Random_UniformDist
+    Dim rUniform As New Random_UniformDist
     Public Sub New()
-        rUniform = New Random_UniformDist()
         task.desc = "Display the smoothed histogram for a uniform distribution."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -146,9 +145,8 @@ End Class
 
 Public Class Random_CheckUniformDist : Inherits VBparent
     Dim histogram As New Histogram_Graph
-    Dim rUniform As Random_UniformDist
+    Dim rUniform As New Random_UniformDist
     Public Sub New()
-        rUniform = New Random_UniformDist()
         task.desc = "Display the histogram for a uniform distribution."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -167,9 +165,8 @@ End Class
 
 Public Class Random_CheckNormalDist : Inherits VBparent
     Dim histogram As New Histogram_Graph
-    Dim normalDist As Random_NormalDist
+    Dim normalDist As New Random_NormalDist
     Public Sub New()
-        normalDist = New Random_NormalDist()
         task.desc = "Display the histogram for a Normal distribution."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -187,10 +184,9 @@ End Class
 
 Public Class Random_CheckNormalDistSmoothed : Inherits VBparent
     Dim histogram As New Histogram_Basics
-    Dim normalDist As Random_NormalDist
+    Dim normalDist As New Random_NormalDist
     Public Sub New()
         histogram.plotHist.minRange = 1
-        normalDist = New Random_NormalDist()
         task.desc = "Display the histogram for a Normal distribution."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -350,11 +346,10 @@ End Class
 
 
 Public Class Random_CustomHistogram : Inherits VBparent
-    Public random As Random_CustomDistribution
+    Public random As New Random_CustomDistribution
     Public hist As New Histogram_Simple
     Public saveHist As cv.Mat
     Public Sub New()
-        random = New Random_CustomDistribution()
         random.outputRandom = New cv.Mat(1000, 1, cv.MatType.CV_32S, 0)
 
         label1 = "Histogram of the grayscale image"
@@ -428,12 +423,10 @@ End Class
 
 ' https://github.com/spmallick/learnopencv/tree/master/
 Public Class Random_60sTVFaster : Inherits VBparent
-    Dim random As Random_UniformDist
+    Dim random As New Random_UniformDist
     Dim mats As New Mat_4to1
-    Dim options As Random_60sTV
+    Dim options As New Random_60sTV
     Public Sub New()
-        random = New Random_UniformDist
-        options = New Random_60sTV
         label2 = "Changed pixels, add/sub mask, plusMask, minusMask"
         task.desc = "A faster way to apply noise to imitate an old TV appearance using randomness and thresholding."
     End Sub
@@ -474,11 +467,9 @@ End Class
 
 ' https://github.com/spmallick/learnopencv/tree/master/
 Public Class Random_60sTVFastSimple : Inherits VBparent
-    Dim random As Random_UniformDist
-    Dim options As Random_60sTV
+    Dim random As New Random_UniformDist
+    Dim options As New Random_60sTV
     Public Sub New()
-        random = New Random_UniformDist
-        options = New Random_60sTV
         task.desc = "Remove diagnostics from the faster algorithm to simplify code."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -520,9 +511,6 @@ Public Class Random_KalmanPoints : Inherits VBparent
     Dim savePoints(0) As cv.Point
     Public Sub New()
         knn = New KNN_1_to_1FIFO
-        kalman = New Kalman_Basics
-        random = New Random_Basics
-
         Dim offset = 100
         random.rangeRect = New cv.Rect(offset, offset, dst1.Width - offset * 2, dst1.Height - offset * 2)
         countSlider = findSlider("Random Pixel Count")

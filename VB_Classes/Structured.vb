@@ -1,11 +1,9 @@
 Imports cv = OpenCvSharp
 Public Class Structured_Floor : Inherits VBparent
     Public structD As Structured_SliceH
-    Dim kalman As Kalman_VB_Basics
+    Dim kalman As New Kalman_VB_Basics
     Public floorYplane As Single
     Public Sub New()
-        kalman = New Kalman_VB_Basics()
-
         structD = New Structured_SliceH()
         structD.cushionSlider.Value = 5 ' floor runs can use a thinner slice that ceilings...
 
@@ -49,7 +47,6 @@ Public Class Structured_Ceiling : Inherits VBparent
     Public structD As Structured_SliceH
     Dim kalman As New Kalman_Basics
     Public Sub New()
-        kalman = New Kalman_Basics()
         ReDim kalman.kInput(0)
 
         structD = New Structured_SliceH()
@@ -345,12 +342,11 @@ End Class
 
 Public Class Structured_LinearizeFloor : Inherits VBparent
     Public floor As Structured_Floor
-    Dim kalman As Kalman_VB_Basics
+    Dim kalman As New Kalman_VB_Basics
     Public imuPointCloud As cv.Mat
     Public sliceMask As cv.Mat
     Public floorYPlane As Single
     Public Sub New()
-        kalman = New Kalman_VB_Basics()
         floor = New Structured_Floor()
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then

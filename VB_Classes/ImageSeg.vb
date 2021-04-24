@@ -41,9 +41,8 @@ End Class
 
 
 Public Class ImageSeg_InRange : Inherits VBparent
-    Dim iSeg As ImageSeg_Basics
+    Dim iSeg As New ImageSeg_Basics
     Public Sub New()
-        iSeg = New ImageSeg_Basics
         task.desc = "Trim segments that are not in the range requested"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -73,7 +72,7 @@ Public Class ImageSeg_MissingSegments : Inherits VBparent
     Public Sub New()
         task.desc = "Floodfill segments which were marked as missing and clear small unused segments"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static lenContourSlider = findSlider("Minimum length for missing contours")
         Static stepSlider = findSlider("FloodFill Step Size")
         Static fillSlider = findSlider("FloodFill point distance from edge")
@@ -116,10 +115,8 @@ End Class
 
 
 Public Class ImageSeg_Unstable : Inherits VBparent
-    Dim iSeg As ImageSeg_Basics
+    Dim iSeg As New ImageSeg_Basics
     Public Sub New()
-        iSeg = New ImageSeg_Basics
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "A segment is considered present after this many appearances", 1, 40, 20)
@@ -127,7 +124,7 @@ Public Class ImageSeg_Unstable : Inherits VBparent
 
         task.desc = "Find the unstable segments and remove them"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static segSlider = findSlider("A segment is considered present after this many appearances")
         Dim refreshCount = segSlider.value
 
@@ -154,10 +151,9 @@ End Class
 
 
 Public Class ImageSeg_CentroidTracker : Inherits VBparent
-    Public iSeg As ImageSeg_Basics
+    Public iSeg As New ImageSeg_Basics
     Public pTrack As KNN_PointTracker
     Public Sub New()
-        iSeg = New ImageSeg_Basics
         pTrack = New KNN_PointTracker
         findCheckBox("Caller will handle any drawing required").Checked = True
 

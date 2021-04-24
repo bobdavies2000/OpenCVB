@@ -49,9 +49,8 @@ End Class
 
 
 Public Class Fitline_3DBasics_MT : Inherits VBparent
-    Dim hlines As Hough_Lines_MT
+    Dim hlines As New Hough_Lines_MT
     Public Sub New()
-        hlines = New Hough_Lines_MT
         task.desc = "Use visual lines to find 3D lines."
         label2 = "White is featureless RGB, blue depth shadow"
     End Sub
