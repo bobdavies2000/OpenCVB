@@ -1,17 +1,16 @@
 Imports cv = OpenCvSharp
 Public Class Highlight_Basics : Inherits VBparent
-    Dim reduction As Reduction_KNN_Color
     Public highlightPoint As New cv.Point
     Dim highlightRect As New cv.Rect
     Dim preKalmanRect As New cv.Rect
     Dim highlightMask As New cv.Mat
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Public Sub New()
-        If standalone Then reduction = New Reduction_KNN_Color()
         task.desc = "Pixels are grouped by reduction.  Highlight the rectangle and centroid nearest the mouse click"
     End Sub
     Public Sub Run(src as cv.Mat)
         If standalone Or task.intermediateReview = caller Then
+            Static reduction As New Reduction_KNN_Color
             reduction.Run(src)
             viewObjects = reduction.pTrack.drawRC.viewObjects
             src = reduction.dst1
