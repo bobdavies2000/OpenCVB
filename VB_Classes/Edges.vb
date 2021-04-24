@@ -544,10 +544,9 @@ End Class
 
 
 Public Class Edges_Stdev : Inherits VBparent
-    Dim stdev As Math_Stdev
+    Dim stdev As New Math_Stdev
     Dim edges As New Edges_BinarizedSobel
     Public Sub New()
-        stdev = New Math_Stdev
         findSlider("Sobel kernel Size").Value = 14
 
         label1 = "Edges in High Stdev areas"
@@ -572,11 +571,10 @@ End Class
 
 
 Public Class Edges_BlackSquare : Inherits VBparent
-    Dim std As Math_Stdev
+    Dim std As New Math_Stdev
     Dim edges As New Edges_BinarizedSobel
     Dim addW As New AddWeighted_Basics
     Public Sub New()
-        std = New Math_Stdev
         task.desc = "Visualize the impact of Sobel on a black square"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -821,11 +819,10 @@ End Class
 
 
 Public Class Edges_Matching : Inherits VBparent
-    Dim match As MatchTemplate_Basics
+    Dim match As New MatchTemplate_Basics
     Dim red As New LeftRightView_Basics
     Dim grid As New Thread_Grid
     Public Sub New()
-        match = New MatchTemplate_Basics
         findSlider("Infrared Brightness").Value = 1
 
         If findfrm(caller + " Slider Options") Is Nothing Then

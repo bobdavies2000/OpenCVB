@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class Stabilizer_Basics : Inherits VBparent
-    Dim match As MatchTemplate_Basics
+    Dim match As New MatchTemplate_Basics
     Public shiftX As Integer
     Public shiftY As Integer
     Public templateRect As cv.Rect
@@ -8,8 +8,6 @@ Public Class Stabilizer_Basics : Inherits VBparent
     Public stableRect As cv.Rect
     Dim pad = 20
     Public Sub New()
-        match = New MatchTemplate_Basics
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller, 5)
             sliders.setupTrackBar(0, "Maximum percentage of lost pixels before image is reset", 0, 100, 10)

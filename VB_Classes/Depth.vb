@@ -702,9 +702,8 @@ End Class
 
 
 Public Class Depth_Median : Inherits VBparent
-    Dim median As Math_Median_CDF
+    Dim median As New Math_Median_CDF
     Public Sub New()
-        median = New Math_Median_CDF()
         median.rangeMax = 10000
         median.rangeMin = 1 ' ignore depth of zero as it is not known.
         task.desc = "Divide the depth image ahead and behind the median."
@@ -1382,10 +1381,9 @@ End Class
 
 
 Public Class Depth_Averaging : Inherits VBparent
-    Public avg As Math_ImageAverage
+    Public avg As New Math_ImageAverage
     Public colorize As New Depth_Colorizer_CPP
     Public Sub New()
-        avg = New Math_ImageAverage()
         label2 = "32-bit format depth data"
         task.desc = "Take the average depth at each pixel but eliminate any pixels that had zero depth."
     End Sub

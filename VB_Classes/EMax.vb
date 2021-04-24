@@ -56,9 +56,8 @@ End Class
 Public Class EMax_Basics : Inherits VBparent
     Dim inputDataMask As cv.Mat
     Public basics As New EMax_Raw
-    Dim lut As LUT_Color
+    Dim lut As New LUT_Color
     Public Sub New()
-        lut = New LUT_Color
         label1 = "Emax regions around clusters"
         task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
     End Sub

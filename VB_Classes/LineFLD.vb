@@ -256,10 +256,9 @@ End Module
 ' https://docs.opencv.org/3.4.3/d1/d9e/fld_lines_8cpp-example.html
 Public Class LineFLD_CPP : Inherits VBparent
     Public sortedLines As New SortedList(Of cv.Vec6f, Integer)
-    Dim lineFLD As LineFLD_Basics
+    Dim lineFLD As New LineFLD_Basics
     Public lineMat As New cv.Mat
     Public Sub New()
-        lineFLD = New LineFLD_Basics
         task.desc = "Basics for a Fast Line Detector"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -294,10 +293,8 @@ End Class
 
 
 Public Class LineFLD_LongestLine : Inherits VBparent
-    Dim lines As lineFLD_CPP
+    Dim lines As New LineFLD_CPP
     Public Sub New()
-        lines = New lineFLD_CPP()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 1)
@@ -307,7 +304,7 @@ Public Class LineFLD_LongestLine : Inherits VBparent
         task.desc = "Identify planes using the lines present in the rgb image."
         label2 = ""
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If task.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
         lines.Run(src)
         src.CopyTo(dst1)
@@ -329,10 +326,8 @@ End Class
 
 
 Public Class LineFLD_MT : Inherits VBparent
-    Dim lines As lineFLD_CPP
+    Dim lines As New LineFLD_CPP
     Public Sub New()
-        lines = New lineFLD_CPP()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 1)
@@ -341,7 +336,7 @@ Public Class LineFLD_MT : Inherits VBparent
         task.desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
         label2 = ""
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If task.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
         lines.Run(src)
         src.CopyTo(dst1)
@@ -361,10 +356,8 @@ End Class
 
 
 'Public Class Line_3D_FitLineZ : Inherits VBparent
-'    Dim linesFLD As lineFLD_CPP
+'    Dim linesFLD as New LineFLD_CPP
 '    Public Sub New()
-'        linesFLD = New line_FLD_CPP()
-
 '        If findfrm(caller + " Slider Options") Is Nothing Then
 '            sliders.Setup(caller)
 '            sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 3)

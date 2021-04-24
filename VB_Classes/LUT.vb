@@ -133,9 +133,8 @@ End Class
 
 
 Public Class LUT_RGBDepth : Inherits VBparent
-    Dim lut As LUT_Basics
+    Dim lut As New LUT_Basics
     Public Sub New()
-        lut = New LUT_Basics
         task.desc = "Use a LUT on the RGBDepth to segregate depth data."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -153,9 +152,8 @@ End Class
 
 
 Public Class LUT_Depth32f : Inherits VBparent
-    Dim lut As LUT_Basics
+    Dim lut As New LUT_Basics
     Public Sub New()
-        lut = New LUT_Basics
         task.desc = "Use a LUT on the 32-bit depth to segregate depth data."
     End Sub
     Public Sub Run(src As cv.Mat)

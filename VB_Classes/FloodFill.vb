@@ -841,11 +841,10 @@ End Class
 
 
 Public Class FloodFill_LUT : Inherits VBparent
-    Dim lut As LUT_Basics
+    Dim lut As New LUT_Basics
     Dim flood As New FloodFill_Basics
     Dim addw As New AddWeighted_Basics
     Public Sub New()
-        lut = New LUT_Basics
         task.desc = "The input to a floodfill is the output of a LUT"
     End Sub
     Public Sub Run(src As cv.Mat)

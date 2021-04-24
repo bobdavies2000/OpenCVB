@@ -240,10 +240,8 @@ End Class
 '    Public wbasics As WarpModel_Basics
 '    Dim sobel As New Edges_Sobel
 '    Public lastFrame As cv.Mat
-'    Dim match As MatchTemplate_DrawRect
+'    Dim match as New MatchTemplate_DrawRect
 '    Public Sub New()
-'        match = New MatchTemplate_DrawRect
-
 '        wbasics = New WarpModel_Basics
 
 '        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)

@@ -64,11 +64,9 @@ End Class
 
 
 Public Class Line_LeftRightOverlay : Inherits VBparent
-    Dim lrLines As Line_LeftRightImages
+    Dim lrLines As New Line_LeftRightImages
     Dim lines As New Line_Basics
     Public Sub New()
-        lrLines = New Line_LeftRightImages
-
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 2)
             radio.check(0).Text = "Show Left image lines and right image lines"
@@ -158,9 +156,8 @@ End Class
 
 
 Public Class Line_InterceptsUI : Inherits VBparent
-    Dim lines As Line_Intercepts
+    Dim lines As New Line_Intercepts
     Public Sub New()
-        lines = New Line_Intercepts
         label1 = "Use mouse in right image to highlight lines"
         task.desc = "An alternative way to highlight line segments with common slope"
     End Sub
@@ -308,11 +305,10 @@ End Class
 
 Public Class Line_Vertical : Inherits VBparent
     Dim gCloud As New Depth_PointCloud_IMU
-    Public lines As Line_ConfirmedDepth
+    Public lines As New Line_ConfirmedDepth
     Public thickness As Integer
     Public toleranceInMMs As Single
     Public Sub New()
-        lines = New Line_ConfirmedDepth
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Error tolerance when measuring vertical lines in 3D (mm's)", 0, 300, 50)
@@ -349,9 +345,8 @@ End Class
 
 
 Public Class Line_Horizontal : Inherits VBparent
-    Dim vLines As Line_Vertical
+    Dim vLines As New Line_Vertical
     Public Sub New()
-        vLines = New Line_Vertical
         task.desc = "Find all the horizontal lines in the IMU rectified cloud"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -545,11 +540,9 @@ Public Class Line_Sift_MT : Inherits VBparent
     Dim grid As New Thread_Grid
     Dim siftCS As New CS_SiftBasics
     Dim siftBasics As Sift_Basics
-    Dim lrView As Line_LeftRightImages
+    Dim lrView As New Line_LeftRightImages
     Dim numPointSlider As System.Windows.Forms.TrackBar
     Public Sub New()
-        lrView = New Line_LeftRightImages
-
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         Dim gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Maximum = task.color.Cols * 2

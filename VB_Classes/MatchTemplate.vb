@@ -67,13 +67,12 @@ End Class
 
 
 Public Class MatchTemplate_RowCorrelation : Inherits VBparent
-    Dim match As MatchTemplate_Basics
+    Dim match As New MatchTemplate_Basics
     Dim flow As New Font_FlowText
     Public Sub New()
-        match = New MatchTemplate_Basics()
         task.desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim line1 = msRNG.Next(0, src.Height - 1)
         Dim line2 = msRNG.Next(0, src.Height - 1)
 
@@ -107,16 +106,14 @@ End Class
 Public Class MatchTemplate_DrawRect : Inherits VBparent
     Public saveTemplate As cv.Mat
     Public saveRect As cv.Rect
-    Dim match As MatchTemplate_Basics
+    Dim match As New MatchTemplate_Basics
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         If standalone Then task.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
-        match = New MatchTemplate_Basics
-
         label1 = "Probabilities (draw rectangle to test again)"
         task.desc = "Find the requested template in an image.  Tracker Algorithm"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static thresholdSlider = findSlider("Correlation Threshold X100")
         If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then Exit Sub
         If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
@@ -160,14 +157,13 @@ End Class
 
 Public Class MatchTemplate_BestEntropy_MT : Inherits VBparent
     Dim entropy As New Entropy_Highest
-    Dim match As MatchTemplate_DrawRect
+    Dim match As New MatchTemplate_DrawRect
     Public Sub New()
-        match = New MatchTemplate_DrawRect()
         label1 = "Probabilities that the template matches image"
         label2 = "Red is the best template to match (highest entropy)"
         task.desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate.  Tracker Algorithm"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If task.frameCount Mod 30 = 0 Then
             entropy.Run(src)
             task.drawRect = entropy.eMaxRect
@@ -191,11 +187,9 @@ End Class
 
 Public Class MatchTemplate_Movement : Inherits VBparent
     Dim grid As New Thread_Grid
-    Dim match As MatchTemplate_Basics
+    Dim match As New MatchTemplate_Basics
     Public mask As cv.Mat
     Public Sub New()
-        match = New MatchTemplate_Basics
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Correlation Threshold X1000", 0, 1000, 970)

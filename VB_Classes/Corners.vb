@@ -87,9 +87,8 @@ End Class
 
 
 Public Class Corners_PreCornerDetect : Inherits VBparent
-    Dim median As Math_Median_CDF
+    Dim median As New Math_Median_CDF
     Public Sub New()
-        median = New Math_Median_CDF()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "kernel Size", 1, 20, 19)

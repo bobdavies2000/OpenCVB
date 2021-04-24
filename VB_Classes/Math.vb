@@ -106,9 +106,8 @@ End Class
 
 Public Class Math_RGBCorrelation : Inherits VBparent
     Dim flow As New Font_FlowText
-    Dim match As MatchTemplate_Basics
+    Dim match As New MatchTemplate_Basics
     Public Sub New()
-        match = New MatchTemplate_Basics()
         task.desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -259,9 +258,8 @@ End Class
 
 
 Public Class Math_StdevBoundary : Inherits VBparent
-    Dim stdev As Math_Stdev
+    Dim stdev As New Math_Stdev
     Public Sub New()
-        stdev = New Math_Stdev
         label1 = "Low stdev regions.  Gaps filled with OTSU results"
         label2 = "High stdev segments after the first pass"
         task.desc = "Explore how to get a better boundary on the low stdev mask"
