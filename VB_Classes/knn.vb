@@ -784,7 +784,6 @@ End Structure
 Public Class KNN_PointTracker : Inherits VBparent
     Public knn As New KNN_1_to_1
     Dim newCentroids As New List(Of cv.Point2f)
-    Dim topView As New PointCloud_Kalman_TopView
     Public kalman As New List(Of Kalman_Stripped)
     Public kalmanOptions As New Kalman_Basics
     Public queryPoints As New List(Of cv.Point2f)
@@ -818,8 +817,7 @@ Public Class KNN_PointTracker : Inherits VBparent
         Static pixelSlider = findSlider("Minimum size of object in pixels")
         Static drawRCCheck = findCheckBox("Caller will handle any drawing required")
         If standalone Or task.intermediateReview = caller Then
-            topView.Run(task.pointCloud)
-            dst1 = topView.dst1
+            task.trueText("KNN_PointTracker running standalone has no output.")
             Exit Sub
         End If
 

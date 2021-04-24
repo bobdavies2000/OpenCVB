@@ -32,10 +32,8 @@ End Class
 
 
 Public Class Pyramid_Filter : Inherits VBparent
-    Dim laplace As Laplacian_PyramidFilter
+    Dim laplace As New Laplacian_PyramidFilter
     Public Sub New()
-        laplace = New Laplacian_PyramidFilter()
-
         task.desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively"
     End Sub
     Public Sub Run(src as cv.Mat)

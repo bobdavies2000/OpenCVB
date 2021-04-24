@@ -4,10 +4,8 @@ Imports CS_Classes
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
 Public Class Sift_Basics : Inherits VBparent
     Dim siftCS As New CS_SiftBasics
-    Dim lrView As LeftRightView_BrightnessContrast
+    Dim lrView As New LeftRightView_BrightnessContrast
     Public Sub New()
-        lrView = New LeftRightView_BrightnessContrast
-
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 2)
             radio.check(0).Text = "Use BF Matcher"
@@ -21,7 +19,7 @@ Public Class Sift_Basics : Inherits VBparent
         End If
         task.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         lrView.Run(src)
 
@@ -43,11 +41,9 @@ Public Class Sift_Basics_MT : Inherits VBparent
     Dim grid As New Thread_Grid
     Dim siftCS As New CS_SiftBasics
     Dim siftBasics As Sift_Basics
-    Dim lrView As LeftRightView_BrightnessContrast
+    Dim lrView As New LeftRightView_BrightnessContrast
     Dim numPointSlider As System.Windows.Forms.TrackBar
     Public Sub New()
-        lrView = New LeftRightView_BrightnessContrast
-
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
         Dim gridHeightSlider = findSlider("ThreadGrid Height")
         gridWidthSlider.Maximum = task.color.Cols * 2

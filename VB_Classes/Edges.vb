@@ -624,10 +624,9 @@ End Class
 
 
 Public Class Edges_SobelLR : Inherits VBparent
-    Dim red As LeftRightView_Basics
+    Dim red As New LeftRightView_Basics
     Dim sobel As New Edges_Sobel
     Public Sub New()
-        red = New LeftRightView_Basics()
         sobel.sliders.trackbar(0).Value = 5
 
         task.desc = "Find the edges in the LeftViewimages."
@@ -728,12 +727,11 @@ End Class
 
 
 Public Class Edges_SobelLRBinarized : Inherits VBparent
-    Dim red As LeftRightView_Basics
+    Dim red As New LeftRightView_Basics
     Dim edges As New Edges_BinarizedSobel
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         findSlider("Weight").Value = 75
-        red = New LeftRightView_Basics
         findSlider("Infrared Brightness").Value = 1
 
         label1 = "Horizontal Sobel - Left View"
@@ -824,11 +822,10 @@ End Class
 
 Public Class Edges_Matching : Inherits VBparent
     Dim match As MatchTemplate_Basics
-    Dim red As LeftRightView_Basics
+    Dim red As New LeftRightView_Basics
     Dim grid As New Thread_Grid
     Public Sub New()
         match = New MatchTemplate_Basics
-        red = New LeftRightView_Basics
         findSlider("Infrared Brightness").Value = 1
 
         If findfrm(caller + " Slider Options") Is Nothing Then

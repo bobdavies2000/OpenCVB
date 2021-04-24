@@ -156,7 +156,6 @@ End Class
 
 Public Class CComp_PointTracker : Inherits VBparent
     Public basics As New CComp_Basics
-    Public pTrack As New KNN_PointTracker
     Public highlight As New Highlight_Basics
     Public trackPoints As Boolean = True
     Public Sub New()
@@ -166,14 +165,15 @@ Public Class CComp_PointTracker : Inherits VBparent
         basics.Run(src)
 
         If trackPoints Then
+            Static topView As New PointCloud_Kalman_TopView
             dst2 = basics.dst1
-            pTrack.queryPoints = basics.centroids
-            pTrack.queryRects = basics.rects
-            pTrack.queryMasks = basics.masks
-            pTrack.Run(src)
-            dst1 = pTrack.dst1
+            topView.pTrack.queryPoints = basics.centroids
+            topView.pTrack.queryRects = basics.rects
+            topView.pTrack.queryMasks = basics.masks
+            topView.pTrack.Run(src)
+            dst1 = topView.pTrack.dst1
 
-            highlight.viewObjects = pTrack.drawRC.viewObjects
+            highlight.viewObjects = topView.pTrack.drawRC.viewObjects
             highlight.Run(dst1)
             dst1 = highlight.dst1
             If highlight.highlightPoint <> New cv.Point Then
@@ -243,7 +243,7 @@ Public Class CComp_MaxBlobs : Inherits VBparent
             thresholdSlider.value = 0
             ReDim maxValues(255)
         End If
-        label1 = "There were " + CStr(tracker.pTrack.queryPoints.Count) + " regions identified"
+        'label1 = "There were " + CStr(tracker.pTrack.queryPoints.Count) + " regions identified"
     End Sub
 End Class
 
@@ -282,7 +282,7 @@ Public Class CComp_MaxPixels : Inherits VBparent
             dst1 = maxBlob.dst1
         Else
             Dim pixelCount = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
-            label1 = CStr(CInt(pixelCount / 1024)) + "k pixels with " + CStr(maxBlob.tracker.pTrack.queryPoints.Count) + " regions width threshold=" + CStr(thresholdSlider.value)
+            ' label1 = CStr(CInt(pixelCount / 1024)) + "k pixels with " + CStr(maxBlob.tracker.pTrack.queryPoints.Count) + " regions width threshold=" + CStr(thresholdSlider.value)
         End If
     End Sub
 End Class

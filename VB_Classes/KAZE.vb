@@ -54,10 +54,9 @@ End Class
 
 
 Public Class KAZE_Match_CS : Inherits VBparent
-    Dim red As LeftRightView_Basics
+    Dim red As New LeftRightView_Basics
     Dim CS_Kaze As New CS_Classes.Kaze_Sample
     Public Sub New()
-        red = New LeftRightView_Basics()
         red.sliders.trackbar(0).Value = 45
         task.desc = "Match keypoints in the left and right images."
     End Sub
