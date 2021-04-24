@@ -90,9 +90,8 @@ End Class
 
 ' http://opencvexamples.blogspot.com/
 Public Class WarpAffine_Basics : Inherits VBparent
-    Public rotateOptions As GetRotationMatrix2D_Options
+    Public rotateOptions As New GetRotationMatrix2D_Options
     Public Sub New()
-        rotateOptions = New GetRotationMatrix2D_Options
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Angle", 0, 360, 10)

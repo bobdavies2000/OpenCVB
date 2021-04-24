@@ -49,12 +49,11 @@ End Class
 
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
 Public Class Fractal_Mandelbrot_MT : Inherits VBparent
-    Dim mandel As Fractal_Mandelbrot
+    Dim mandel As New Fractal_Mandelbrot
     Public Sub New()
-        mandel = New Fractal_Mandelbrot()
         task.desc = "Run a multi-threaded version of the Mandalbrot algorithm"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim iterations = mandel.sliders.trackbar(0).Value
         Parallel.For(0, src.Height,
         Sub(y)
@@ -71,21 +70,19 @@ End Class
 
 ' https://medium.com/farouk-ounanes-home-on-the-internet/mandelbrot-set-in-c-from-scratch-c7ad6a1bf2d9
 Public Class Fractal_MandelbrotZoom : Inherits VBparent
-    Public mandel As Fractal_Mandelbrot
+    Public mandel As New Fractal_Mandelbrot
     Public Sub New()
-        mandel = New Fractal_Mandelbrot()
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
             check.Box(0).Text = "Reset to original Mandelbrot"
         End If
         task.desc = "Run the classic Mandalbrot algorithm and allow zooming in"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim iterations = mandel.sliders.trackbar(0).Value
 
         If check.Box(0).Checked Then
             mandel.Dispose()
-            mandel = New Fractal_Mandelbrot()
         End If
         If task.drawRect.Width <> 0 Then
             Dim newStartX = mandel.startX + (mandel.endX - mandel.startX) * task.drawRect.X / src.Width
@@ -120,12 +117,11 @@ End Class
 
 
 Public Class Fractal_MandelbrotZoomColor : Inherits VBparent
-    Public mandel As Fractal_MandelbrotZoom
+    Public mandel As New Fractal_MandelbrotZoom
     Public Sub New()
-        mandel = New Fractal_MandelbrotZoom()
         task.desc = "Classic Mandelbrot in color"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         mandel.Run(src)
         task.palette.Run(mandel.dst1)
         dst1 = task.palette.dst1
@@ -143,11 +139,10 @@ End Class
 ' http://www.malinc.se/m/JuliaSets.php
 ' https://www.geeksforgeeks.org/julia-fractal-set-in-c-c-using-graphics/
 Public Class Fractal_Julia : Inherits VBparent
-    Dim mandel As Fractal_MandelbrotZoomColor
+    Dim mandel As New Fractal_MandelbrotZoomColor
     Dim rt As Double = 0.282
     Dim mt As Double = -0.58
     Public Sub New()
-        mandel = New Fractal_MandelbrotZoomColor()
         label2 = "Mouse selects different Julia Sets - zoom for detail"
         task.desc = "Build Julia set from any point in the Mandelbrot fractal"
     End Sub

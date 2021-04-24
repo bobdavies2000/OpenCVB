@@ -506,7 +506,6 @@ Public Class PointCloud_Kalman_TopView : Inherits VBparent
     Public flood As New FloodFill_Palette
     Public topView As New Histogram_TopView2D
     Public Sub New()
-        If standalone Then topView = New Histogram_TopView2D
         findSlider("FloodFill Minimum Size").Value = 100
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
@@ -539,17 +538,13 @@ End Class
 
 
 Public Class PointCloud_Kalman_SideView : Inherits VBparent
-    Public flood As Floodfill_Identifiers
-    Public sideView As Histogram_SideView2D
+    Public flood As New Floodfill_Identifiers
+    Public sideView As New Histogram_SideView2D
     Public pTrack As KNN_PointTracker
     Public setupSide As New PointCloud_SetupSide
     Public Sub New()
         pTrack = New KNN_PointTracker
-        flood = New Floodfill_Identifiers
-
         findSlider("FloodFill Minimum Size").Value = 100
-        sideView = New Histogram_SideView2D()
-
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -620,11 +615,9 @@ End Class
 
 Public Class PointCloud_FrustrumTop : Inherits VBparent
     Dim frustrum As New Draw_Frustrum
-    Dim topView As Histogram_TopView2D
+    Dim topView As New Histogram_TopView2D
     Dim setupTop As New PointCloud_SetupTop
     Public Sub New()
-        topView = New Histogram_TopView2D
-
         task.hist3DThreshold = 0
 
         findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ").Checked = False
@@ -651,11 +644,9 @@ End Class
 
 Public Class PointCloud_FrustrumSide : Inherits VBparent
     Dim frustrum As New Draw_Frustrum
-    Dim sideView As Histogram_SideView2D
+    Dim sideView As New Histogram_SideView2D
     Dim setupSide As New PointCloud_SetupSide
     Public Sub New()
-        sideView = New Histogram_SideView2D
-
         task.hist3DThreshold = 0
 
         findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ").Checked = False
@@ -1204,9 +1195,8 @@ End Class
 
 
 Public Class PointCloud_Singletons : Inherits VBparent
-    Public topView As Histogram_TopView2D
+    Public topView As New Histogram_TopView2D
     Public Sub New()
-        topView = New Histogram_TopView2D
         topView.resizeHistOutput = False
         task.hist3DThreshold = 1
 
@@ -1233,10 +1223,9 @@ End Class
 
 
 Public Class PointCloud_SingletonRegions : Inherits VBparent
-    Public topView As Histogram_TopView2D
+    Public topView As New Histogram_TopView2D
     Dim dilate As New DilateErode_Basics
     Public Sub New()
-        topView = New Histogram_TopView2D
         topView.resizeHistOutput = False
         task.hist3DThreshold = 1
 

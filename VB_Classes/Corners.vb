@@ -57,9 +57,8 @@ End Class
 
 
 Public Class Corners_SubPix : Inherits VBparent
-    Public good As Features_GoodFeatures
+    Public good As New Features_GoodFeatures
     Public Sub New()
-        good = New Features_GoodFeatures()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "SubPix kernel Size", 1, 20, 3)

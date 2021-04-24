@@ -9,6 +9,9 @@ Module FaceDetection_Exports
     End Sub
 End Module
 
+
+
+
 ' https://docs.opencv.org/2.4/doc/tutorials/objdetect/cascade_classifier/cascade_classifier.html
 Public Class Face_Haar_LBP : Inherits VBparent
     Dim haarCascade As cv.CascadeClassifier
@@ -30,6 +33,8 @@ End Class
 
 
 
+
+
 Public Class Face_Haar_Alt : Inherits VBparent
     Dim haarCascade As cv.CascadeClassifier
     Public Sub New()
@@ -37,7 +42,7 @@ Public Class Face_Haar_Alt : Inherits VBparent
         task.desc = "Detect faces Haar_alt database."
         label1 = "Faces detected with Haar_Alt"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         dst1 = src.Clone()
         detectFace(dst1, haarCascade)
     End Sub

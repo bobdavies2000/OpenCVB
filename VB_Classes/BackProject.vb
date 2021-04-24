@@ -179,10 +179,8 @@ End Class
 
 ' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
 Public Class BackProject_2D : Inherits VBparent
-    Dim hist As Histogram_2D_HueSaturation
+    Dim hist As New Histogram_2D_HueSaturation
     Public Sub New()
-        hist = New Histogram_2D_HueSaturation()
-
         task.desc = "Backproject from a hue and saturation histogram."
     End Sub
     Public Sub Run(src As cv.Mat)

@@ -83,13 +83,10 @@ End Class
 
 
 Public Class Structured_MultiSliceH : Inherits VBparent
-    Public side2D As Histogram_SideData
+    Public side2D As New Histogram_SideData
     Public structD As Structured_SliceH
     Public sliceMask As cv.Mat
     Public Sub New()
-        side2D = New Histogram_SideData
-        structD = New Structured_SliceH
-
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -129,13 +126,10 @@ End Class
 
 
 Public Class Structured_MultiSliceV : Inherits VBparent
-    Public top2D As Histogram_TopData
+    Public top2D As New Histogram_TopData
     Public structD As Structured_SliceV
     Public Sub New()
-
-        top2D = New Histogram_TopData
         structD = New Structured_SliceV
-
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -176,17 +170,13 @@ End Class
 
 
 Public Class Structured_MultiSlice : Inherits VBparent
-    Public top2D As Histogram_TopData
-    Public side2D As Histogram_SideData
+    Public top2D As New Histogram_TopData
+    Public side2D As New Histogram_SideData
     Dim struct As Structured_SliceV
     Public sliceMask As cv.Mat
     Public split() As cv.Mat
     Public Sub New()
-
-        side2D = New Histogram_SideData()
-        top2D = New Histogram_TopData()
         struct = New Structured_SliceV()
-
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -478,15 +468,13 @@ End Class
 
 
 Public Class Structured_SliceH : Inherits VBparent
-    Public side2D As Histogram_SideData
+    Public side2D As New Histogram_SideData
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
     Public sliceMask As cv.Mat
     Public sliceOptions As Structured_SliceOptions
     Public yPlaneOffset As Integer
     Public Sub New()
-        side2D = New Histogram_SideData()
-
         sliceOptions = New Structured_SliceOptions
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
@@ -538,15 +526,13 @@ End Class
 
 
 Public Class Structured_SliceV : Inherits VBparent
-    Public top2D As Histogram_TopData
+    Public top2D As New Histogram_TopData
     Dim sideStruct As Structured_SliceH
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
     Public sliceMask As cv.Mat
     Public sliceOptions As Structured_SliceOptions
     Public Sub New()
-        top2D = New Histogram_TopData()
-
         sliceOptions = New Structured_SliceOptions
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
@@ -600,13 +586,12 @@ End Class
 
 
 Public Class Structured_SliceVStable : Inherits VBparent
-    Public top2D As Histogram_TopData
+    Public top2D As New Histogram_TopData
     Dim structD As Structured_SliceV
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
     Public sliceMask As cv.Mat
     Public Sub New()
-        top2D = New Histogram_TopData
         structD = New Structured_SliceV
 
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")

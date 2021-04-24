@@ -149,10 +149,8 @@ End Class
 Public Class Blur_PlusHistogram : Inherits VBparent
     Dim mat2to1 As New Mat_2to1
     Dim blur As New Blur_Bilateral
-    Dim myhist As Histogram_EqualizeGray
+    Dim myhist As New Histogram_EqualizeGray
     Public Sub New()
-        myhist = New Histogram_EqualizeGray()
-
         label1 = "Use Blur slider to see impact on histogram peak values"
         label2 = "Top is before equalize, Bottom is after Equalize"
         task.desc = "Compound algorithms Blur and Histogram"
@@ -179,12 +177,10 @@ End Class
 
 
 Public Class Blur_TopoMap : Inherits VBparent
-    Dim gradient As Gradient_CartToPolar
+    Dim gradient As New Gradient_CartToPolar
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         findSlider("Weight").Value = 15
-
-        gradient = New Gradient_CartToPolar
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

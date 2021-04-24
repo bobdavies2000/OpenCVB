@@ -145,13 +145,10 @@ End Class
 
 
 Public Class Random_CheckUniformDist : Inherits VBparent
-    Dim histogram As Histogram_Graph
+    Dim histogram As New Histogram_Graph
     Dim rUniform As Random_UniformDist
     Public Sub New()
-        histogram = New Histogram_Graph()
-
         rUniform = New Random_UniformDist()
-
         task.desc = "Display the histogram for a uniform distribution."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -169,10 +166,9 @@ End Class
 
 
 Public Class Random_CheckNormalDist : Inherits VBparent
-    Dim histogram As Histogram_Graph
+    Dim histogram As New Histogram_Graph
     Dim normalDist As Random_NormalDist
     Public Sub New()
-        histogram = New Histogram_Graph()
         normalDist = New Random_NormalDist()
         task.desc = "Display the histogram for a Normal distribution."
     End Sub
@@ -193,7 +189,6 @@ Public Class Random_CheckNormalDistSmoothed : Inherits VBparent
     Dim histogram As New Histogram_Basics
     Dim normalDist As Random_NormalDist
     Public Sub New()
-        histogram = New Histogram_Basics
         histogram.plotHist.minRange = 1
         normalDist = New Random_NormalDist()
         task.desc = "Display the histogram for a Normal distribution."
@@ -356,13 +351,11 @@ End Class
 
 Public Class Random_CustomHistogram : Inherits VBparent
     Public random As Random_CustomDistribution
-    Public hist As Histogram_Simple
+    Public hist As New Histogram_Simple
     Public saveHist As cv.Mat
     Public Sub New()
         random = New Random_CustomDistribution()
         random.outputRandom = New cv.Mat(1000, 1, cv.MatType.CV_32S, 0)
-
-        hist = New Histogram_Simple()
 
         label1 = "Histogram of the grayscale image"
         label2 = "Custom random distribution that reflects dst1 image"

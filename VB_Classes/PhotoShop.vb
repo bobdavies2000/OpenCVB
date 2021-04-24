@@ -147,11 +147,10 @@ End Class
 
 ' https://blog.csdn.net/just_sort/article/details/85982871
 Public Class PhotoShop_WhiteBalance : Inherits VBparent
-    Dim hist As Histogram_Graph
+    Dim hist As New Histogram_Graph
     Dim whiteCPP As PhotoShop_WhiteBalance_CPP
     Dim wPtr As IntPtr
     Public Sub New()
-        hist = New Histogram_Graph()
         hist.plotRequested = True
         hist.bins = 256 * 3
         hist.maxRange = hist.bins

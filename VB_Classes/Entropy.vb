@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 ' http://areshopencv.blogspot.com/2011/12/computing-entropy-of-image.html
 Public Class Entropy_Basics : Inherits VBparent
-    Dim simple = New Entropy_Simple
+    Dim simple As New Entropy_Simple
     Public entropy As Single
     Public Sub New()
         label1 = "Control entropy values with histogram bins slider"
@@ -30,16 +30,13 @@ End Class
 
 
 Public Class Entropy_Highest : Inherits VBparent
-    Dim entropyCalc As Entropy_Simple
+    Dim entropyCalc as New Entropy_Simple
     Public grid As New Thread_Grid
     Public eMaxRect As cv.Rect
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         findSlider("ThreadGrid Width").Value = 64
         findSlider("ThreadGrid Height").Value = 80
-
-        entropyCalc = New Entropy_Simple
-
         label1 = "Highest entropy marked with red rectangle"
         task.desc = "Find the highest entropy section of the color image."
     End Sub
@@ -83,12 +80,9 @@ End Class
 
 
 Public Class Entropy_FAST : Inherits VBparent
-    Dim fast As FAST_Basics
-    Dim entropy As Entropy_Highest
+    Dim fast As New FAST_Basics
+    Dim entropy as New Entropy_Highest
     Public Sub New()
-        fast = New FAST_Basics()
-        entropy = New Entropy_Highest()
-
         label1 = "Output of Fast_Basics, input to entropy calculation"
         label2 = "Lighter color is higher entropy, Red marks highest"
         task.desc = "Use FAST markings to add to entropy"

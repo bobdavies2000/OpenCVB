@@ -167,10 +167,8 @@ End Module
 
 
 Public Class Fuzzy_ContoursDepth : Inherits VBparent
-    Public fuzzyD As Fuzzy_Basics
+    Public fuzzyD as New Fuzzy_Basics
     Public Sub New()
-        fuzzyD = New Fuzzy_Basics()
-
         task.desc = "Use contours to outline solids in the depth data"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -187,9 +185,8 @@ End Class
 
 
 Public Class Fuzzy_NeighborProof : Inherits VBparent
-    Dim fuzzy As Fuzzy_Basics
+    Dim fuzzy as New Fuzzy_Basics
     Public Sub New()
-        fuzzy = New Fuzzy_Basics()
         task.desc = "Prove that every contour point has at least one and only one neighbor with the mask ID and that the rest are zero"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -229,7 +226,7 @@ End Class
 
 
 Public Class Fuzzy_TrackerDepth : Inherits VBparent
-    Public fuzzy As Fuzzy_Basics
+    Public fuzzy as New Fuzzy_Basics
     Public centroids As New List(Of cv.Point)
     Public rects As New List(Of cv.Rect)
     Public layoutColor As New List(Of Integer)
@@ -237,8 +234,6 @@ Public Class Fuzzy_TrackerDepth : Inherits VBparent
     Public highlightRect As cv.Rect
     Public highlightRegion = -1
     Public Sub New()
-        fuzzy = New Fuzzy_Basics()
-
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 1)
             check.Box(0).Text = "Display centroid and rectangle for each region"
@@ -293,13 +288,12 @@ End Class
 
 
 Public Class Fuzzy_TrackerDepthClick : Inherits VBparent
-    Public tracker As Fuzzy_TrackerDepth
+    Public tracker as New Fuzzy_TrackerDepth
     Public highlightPoint As cv.Point
     Public highlightRect As cv.Rect
     Public highlightRegion = -1
     Public regionMask As cv.Mat
     Public Sub New()
-        tracker = New Fuzzy_TrackerDepth()
         task.desc = "Create centroids and rect's for solid regions and track them - tracker"
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -331,11 +325,10 @@ End Class
 
 
 Public Class Fuzzy_PointTracker : Inherits VBparent
-    Dim fuzzy As Fuzzy_Basics
+    Dim fuzzy as New Fuzzy_Basics
     Dim pTrack As KNN_PointTracker
     Dim flood As New FloodFill_Palette
     Public Sub New()
-        fuzzy = New Fuzzy_Basics()
         pTrack = New KNN_PointTracker()
         fuzzy.sliders.Visible = False
         task.desc = "FloodFill the regions defined as solid"

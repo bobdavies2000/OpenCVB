@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Threshold_LaplacianFilter : Inherits VBparent
-    Dim edges As Filter_Laplacian
+    Dim edges As New Filter_Laplacian
     Public Sub New()
-        edges = New Filter_Laplacian()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "z-Distance", 1, 3000, 200)

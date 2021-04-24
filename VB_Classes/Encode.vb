@@ -1,11 +1,8 @@
 Imports cv = OpenCvSharp
 ' https://www.programcreek.com/python/example/70396/cv2.imencode
 Public Class Encode_Basics : Inherits VBparent
-    Dim options As Encode_Options
+    Dim options As New Encode_Options
     Public Sub New()
-
-        options = New Encode_Options()
-
         task.desc = "Error Level Analysis - to verify a jpg image has not been modified."
         label1 = "absDiff with original"
         label2 = "Original decompressed"

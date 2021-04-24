@@ -172,12 +172,9 @@ End Class
 
 
 Public Class Blob_DepthClusters : Inherits VBparent
-    Public histBlobs As Histogram_DepthValleys
-    Public flood As FloodFill_Basics
+    Public histBlobs As New Histogram_DepthValleys
+    Public flood As New FloodFill_Basics
     Public Sub New()
-        histBlobs = New Histogram_DepthValleys
-
-        flood = New FloodFill_Basics()
         findSlider("FloodFill LoDiff").Value = 1
         findSlider("FloodFill HiDiff").Value = 1
 
@@ -198,14 +195,11 @@ End Class
 
 
 Public Class Blob_DepthPixelSampler : Inherits VBparent
-    Public histBlobs As Histogram_DepthClusters
-    Public flood As FloodFill_Basics
+    Public histBlobs As New Histogram_DepthClusters
+    Public flood As New FloodFill_Basics
     Dim pixel As Pixel_Sampler
     Public Sub New()
         pixel = New Pixel_Sampler
-        histBlobs = New Histogram_DepthClusters
-
-        flood = New FloodFill_Basics()
         findSlider("FloodFill LoDiff").Value = 1
         findSlider("FloodFill HiDiff").Value = 1
 
@@ -245,14 +239,12 @@ End Class
 
 
 Public Class Blob_DepthRanges : Inherits VBparent
-    Public histBlobs As Histogram_DepthClusters
+    Public histBlobs As New Histogram_DepthClusters
     Public grayOnly As Boolean
     Public masks As New List(Of cv.Mat)
     Public maskSizes As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public ranges As New List(Of cv.Point)
     Public Sub New()
-        histBlobs = New Histogram_DepthClusters
-
         label2 = "Identified histogram depth clusters."
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
         'task.rank = 4

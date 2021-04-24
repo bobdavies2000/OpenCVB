@@ -51,10 +51,9 @@ End Class
 
 
 Public Class Reduction_Floodfill : Inherits VBparent
-    Public flood As FloodFill_Basics
+    Public flood As New FloodFill_Basics
     Public reduction As New Reduction_Basics
     Public Sub New()
-        flood = New FloodFill_Basics()
         task.desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -133,15 +132,13 @@ End Class
 
 
 Public Class Reduction_Lines : Inherits VBparent
-    Dim sideView As Histogram_SideView2D
-    Dim topView As Histogram_TopView2D
+    Dim sideView As New Histogram_SideView2D
+    Dim topView As New Histogram_TopView2D
     Public lDetect As New Line_Basics
     Public setupSide As New PointCloud_SetupSide
     Public setupTop As New PointCloud_SetupTop
     Dim reduction As Reduction_PointCloud
     Public Sub New()
-        sideView = New Histogram_SideView2D()
-        topView = New Histogram_TopView2D()
         reduction = New Reduction_PointCloud
         label1 = "Gravity rotated Side View with detected lines"
         label2 = "Gravity rotated Top View width detected lines"

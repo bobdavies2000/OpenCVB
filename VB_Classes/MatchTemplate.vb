@@ -159,14 +159,10 @@ End Class
 
 
 Public Class MatchTemplate_BestEntropy_MT : Inherits VBparent
-    Dim entropy As Entropy_Highest
+    Dim entropy As New Entropy_Highest
     Dim match As MatchTemplate_DrawRect
     Public Sub New()
-
         match = New MatchTemplate_DrawRect()
-
-        entropy = New Entropy_Highest()
-
         label1 = "Probabilities that the template matches image"
         label2 = "Red is the best template to match (highest entropy)"
         task.desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate.  Tracker Algorithm"

@@ -62,11 +62,9 @@ End Class
 
 
 Public Class Palette_LinearPolar : Inherits VBparent
-    Public rotateOptions As GetRotationMatrix2D_Options
+    Public rotateOptions As New GetRotationMatrix2D_Options
     Public Sub New()
         task.desc = "Use LinearPolar to create gradient image"
-        rotateOptions = New GetRotationMatrix2D_Options
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "LinearPolar radius", 0, dst1.Cols, dst1.Cols / 2)

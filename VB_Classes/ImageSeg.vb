@@ -8,12 +8,11 @@ Public Class ImageSeg_Basics : Inherits VBparent
     Public centroids As New List(Of cv.Point2f)
     Public floodPoints As New List(Of cv.Point)
 
-    Public flood As FloodFill_FullImage
+    Public flood As New FloodFill_FullImage
     Public Sub New()
-        flood = New FloodFill_FullImage
         task.desc = "Get the image segments and their associated features - centroids, masks, size, and enclosing rectangles"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         flood.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst1 = flood.dst2
 
@@ -47,7 +46,7 @@ Public Class ImageSeg_InRange : Inherits VBparent
         iSeg = New ImageSeg_Basics
         task.desc = "Trim segments that are not in the range requested"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         iSeg.Run(src)
         dst1 = iSeg.dst2
@@ -70,11 +69,8 @@ End Class
 
 
 Public Class ImageSeg_MissingSegments : Inherits VBparent
-    Public flood As FloodFill_FullImage
+    Public flood As New FloodFill_FullImage
     Public Sub New()
-
-        flood = New FloodFill_FullImage
-
         task.desc = "Floodfill segments which were marked as missing and clear small unused segments"
     End Sub
     Public Sub Run(src as cv.Mat)

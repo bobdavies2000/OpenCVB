@@ -1,13 +1,10 @@
 Imports cv = OpenCvSharp
 Public Class TimeView_Basics : Inherits VBparent
-    Public sideView As Histogram_SideView2D
-    Public topView As Histogram_TopView2D
+    Public sideView As New Histogram_SideView2D
+    Public topView As New Histogram_TopView2D
     Dim setupSide As New PointCloud_SetupSide
     Dim setupTop As New PointCloud_SetupTop
     Public Sub New()
-        sideView = New Histogram_SideView2D
-        topView = New Histogram_TopView2D
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Number of frames to include", 2, 30, 10)
@@ -118,12 +115,10 @@ End Class
 
 
 Public Class TimeView_FloodFill : Inherits VBparent
-    Public floodSide As FloodFill_Basics
-    Public floodTop As FloodFill_Basics
+    Public floodSide As New FloodFill_Basics
+    Public floodTop As New FloodFill_Basics
     Public tBasics As New TimeView_Basics
     Public Sub New()
-        floodSide = New FloodFill_Basics
-        floodTop = New FloodFill_Basics
         findSlider("FloodFill Minimum Size").Value = 10
         task.desc = "FloodFill the histograms of side and top views - TimeView_Basics"
     End Sub

@@ -41,11 +41,9 @@ End Class
 
 
 Public Class GrabCut_FineTune : Inherits VBparent
-    Dim basics As GrabCut_Basics
+    Dim basics As New GrabCut_Basics
     Dim mats as New Mat_4to1
     Public Sub New()
-        basics = New GrabCut_Basics
-
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)
             radio.check(0).Text = "Selected rectangle is added to the foreground"

@@ -76,10 +76,8 @@ End Class
 
 Public Class LeftRightView_Features : Inherits VBparent
     Dim lrView As LeftRightView_Basics
-    Dim features As Features_GoodFeatures
+    Dim features As New Features_GoodFeatures
     Public Sub New()
-        features = New Features_GoodFeatures()
-
         lrView = New LeftRightView_Basics()
 
         task.desc = "Find GoodFeatures in the left and right depalettized infrared images"

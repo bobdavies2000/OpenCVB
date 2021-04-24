@@ -181,14 +181,12 @@ End Class
 
 ' https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
 Public Class Stabilizer_OpticalFlow : Inherits VBparent
-    Public good As Features_GoodFeatures
+    Public good As New Features_GoodFeatures
     Public inputFeat As New List(Of cv.Point2f)
     Public borderCrop = 30
     Dim sumScale As cv.Mat, sScale As cv.Mat, features1 As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
     Public Sub New()
-        good = New Features_GoodFeatures()
-
         task.desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
         label1 = "Stabilized Image"
     End Sub

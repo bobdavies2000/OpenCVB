@@ -40,9 +40,8 @@ End Class
 Public Class GetRotationMatrix2D_Basics : Inherits VBparent
     Public M As cv.Mat
     Public Mflip As cv.Mat
-    Public rotateOptions As GetRotationMatrix2D_Options
+    Public rotateOptions As New GetRotationMatrix2D_Options
     Public Sub New()
-        rotateOptions = New GetRotationMatrix2D_Options
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "GetRotation Matrix2D Angle (deg)", 0, 360, 24)
@@ -67,9 +66,8 @@ End Class
 
 
 Public Class GetRotationMatrix2D_Box : Inherits VBparent
-    Dim rotation As GetRotationMatrix2D_Basics
+    Dim rotation As New GetRotationMatrix2D_Basics
     Public Sub New()
-        rotation = New GetRotationMatrix2D_Basics()
         task.drawRect = New cv.Rect(100, 100, 100, 100)
 
         label1 = "Original Rectangle in the original perspective"

@@ -252,9 +252,8 @@ End Module
 
 Public Class EMax_Centroids : Inherits VBparent
     Public emaxCPP As New EMax_Basics
-    Public flood As FloodFill_Basics
+    Public flood As New FloodFill_Basics
     Public Sub New()
-        flood = New FloodFill_Basics
         findSlider("FloodFill LoDiff").Value = 0
         findSlider("FloodFill HiDiff").Value = 1
         findSlider("ThreadGrid Width").Value = dst1.Width * 170 / 640

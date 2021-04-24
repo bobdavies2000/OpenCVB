@@ -210,16 +210,12 @@ End Class
 
 ' https://www.learnopencv.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
 Public Class OpticalFlow_Sparse : Inherits VBparent
-
     Public features As New List(Of cv.Point2f)
-
-    Dim good As Features_GoodFeatures
+    Dim good As New Features_GoodFeatures
     Dim lastFrame As cv.Mat
     Dim sumScale As cv.Mat, sScale As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
     Public Sub New()
-        good = New Features_GoodFeatures()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "OpticalFlow window", 1, 20, 3)

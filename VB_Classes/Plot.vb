@@ -3,19 +3,16 @@ Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
 Public Class Plot_Basics : Inherits VBparent
     Dim plot As Plot_Basics_CPP
-    Dim hist As Histogram_Graph
+    Dim hist As New Histogram_Graph
     Public plotCount As Integer = 3
     Public Sub New()
-        hist = New Histogram_Graph()
         hist.plotRequested = True
-
         plot = New Plot_Basics_CPP()
-
         label1 = "Plot of grayscale histogram"
         label2 = "Same Data but using OpenCV C++ plot"
         task.desc = "Plot data provided in src Mat"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         hist.plotColors(0) = cv.Scalar.White
         hist.Run(src)
         dst1 = hist.dst1
@@ -42,9 +39,8 @@ Public Class Plot_Basics_CPP : Inherits VBparent
     Public Sub New()
         task.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
     End Sub
-    Public Sub Run(src as cv.Mat)
-
-        If standalone or task.intermediateReview = caller Then
+    Public Sub Run(src As cv.Mat)
+        If standalone Or task.intermediateReview = caller Then
             ReDim srcX(50 - 1)
             ReDim srcY(50 - 1)
             For i = 0 To srcX.Length - 1
@@ -85,13 +81,13 @@ End Class
 
 Public Class Plot_OverTime : Inherits VBparent
     Public plotData As cv.Scalar
-    Public plotCount As integer = 3
+    Public plotCount As Integer = 3
     Public plotColors() As cv.Scalar = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.White}
     Public backColor = cv.Scalar.Aquamarine
-    Public minScale As integer = 50
-    Public maxScale As integer = 200
+    Public minScale As Integer = 50
+    Public maxScale As Integer = 200
     Public plotTriggerRescale = 50
-    Public columnIndex As integer
+    Public columnIndex As Integer
     Public offChartCount As Integer
     Public lastXdelta As New List(Of cv.Scalar)
     Public topBottomPad As Integer
@@ -112,7 +108,7 @@ Public Class Plot_OverTime : Inherits VBparent
         task.desc = "Plot an input variable over time"
         myStopWatch = Stopwatch.StartNew()
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static widthSlider = findSlider("Plot Pixel Width")
         Static heightSlider = findSlider("Plot Pixel Height")
         Static resetCheck = findCheckBox("Reset the plot scale")
@@ -128,7 +124,7 @@ Public Class Plot_OverTime : Inherits VBparent
             columnIndex = 0
         End If
         dst1.ColRange(columnIndex, columnIndex + pixelWidth).SetTo(backColor)
-        If standalone or task.intermediateReview = caller Then plotData = src.Mean()
+        If standalone Or task.intermediateReview = caller Then plotData = src.Mean()
 
         For i = 0 To plotCount - 1
             If Math.Floor(plotData.Item(i)) < minScale Or Math.Ceiling(plotData.Item(i)) > maxScale Then
@@ -188,7 +184,7 @@ Public Class Plot_OverTime : Inherits VBparent
 
         columnIndex += pixelWidth
         dst1.Col(columnIndex).SetTo(0)
-        If standalone or task.intermediateReview = caller Then label1 = "RGB Means: blue = " + Format(plotData.Item(0), "#0.0") + " green = " + Format(plotData.Item(1), "#0.0") + " red = " + Format(plotData.Item(2), "#0.0")
+        If standalone Or task.intermediateReview = caller Then label1 = "RGB Means: blue = " + Format(plotData.Item(0), "#0.0") + " green = " + Format(plotData.Item(1), "#0.0") + " red = " + Format(plotData.Item(2), "#0.0")
         AddPlotScale(dst1, minScale - topBottomPad, maxScale + topBottomPad, task.fontSize * 2)
     End Sub
 End Class
@@ -200,14 +196,14 @@ End Class
 Public Class Plot_Histogram : Inherits VBparent
     Public hist As New cv.Mat
     Public minRange As Integer = 0
-    Public maxRange As integer = 255
+    Public maxRange As Integer = 255
     Public backColor As cv.Scalar = cv.Scalar.Red
     Public fixedMaxVal As Integer
     Public Sub New()
         task.desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
-    Public Sub Run(src as cv.Mat)
-        If standalone or task.intermediateReview = caller Then
+    Public Sub Run(src As cv.Mat)
+        If standalone Or task.intermediateReview = caller Then
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim dimensions() = New Integer() {task.histogramBins}
             Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
@@ -247,7 +243,7 @@ End Class
 
 Module Plot_OpenCV_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Plot_OpenCVBasics(inX As IntPtr, inY As IntPtr, inLen As integer, dstptr As IntPtr, rows As integer, cols As integer)
+    Public Sub Plot_OpenCVBasics(inX As IntPtr, inY As IntPtr, inLen As Integer, dstptr As IntPtr, rows As Integer, cols As Integer)
     End Sub
 
     Public Sub AddPlotScale(dst1 As cv.Mat, minVal As Double, maxVal As Double, fontSize As Double)
@@ -279,9 +275,8 @@ End Module
 
 Public Class Plot_Depth : Inherits VBparent
     Dim plot As Plot_Basics_CPP
-    Dim hist As Histogram_Depth
+    Dim hist As New Histogram_Depth
     Public Sub New()
-        hist = New Histogram_Depth()
         plot = New Plot_Basics_CPP()
         task.desc = "Show depth using OpenCV's plot format with variable bins."
     End Sub

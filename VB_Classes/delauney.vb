@@ -103,9 +103,8 @@ End Class
 
 
 Public Class Delaunay_GoodFeatures : Inherits VBparent
-    Dim features As Features_GoodFeatures
+    Dim features As New Features_GoodFeatures
     Public Sub New()
-        features = New Features_GoodFeatures()
         label2 = "Voronoi facets of delauney good features"
         task.desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
     End Sub

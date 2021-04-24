@@ -316,10 +316,9 @@ End Class
 
 'Public Class WarpModel_Entropy : Inherits VBparent
 '    Dim warp As WarpModel_Image
-'    Dim entropy As Entropy_Highest
+'    Dim entropy as New Entropy_Highest
 '    Public Sub New()
 '        warp = New WarpModel_Image
-'        entropy = New Entropy_Highest
 '        task.desc = "Find warp matrix for the whole image using just the segment with the highest entropy."
 '    End Sub
 '    Public Sub Run(src as cv.Mat)

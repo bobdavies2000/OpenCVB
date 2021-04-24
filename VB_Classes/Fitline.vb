@@ -182,9 +182,8 @@ End Class
 
 ' http://www.cs.cmu.edu/~youngwoo/doc/lineFittingTest.cpp
 Public Class Fitline_EigenFit : Inherits VBparent
-    Dim noisyLine As Fitline_RawInput
+    Dim noisyLine As New Fitline_RawInput
     Public Sub New()
-        noisyLine = New Fitline_RawInput()
         noisyLine.sliders.trackbar(0).Value = 30
         noisyLine.sliders.trackbar(1).Value = 400
         label1 = "blue=GT, red=fitline, yellow=EigenFit"

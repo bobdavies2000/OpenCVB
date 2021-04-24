@@ -31,12 +31,10 @@ End Class
 
 
 Public Class FAST_Centroid : Inherits VBparent
-    Dim fast As FAST_Basics
+    Dim fast As New FAST_Basics
     Dim kalman As New Kalman_Basics
     Public Sub New()
         ReDim kalman.kInput(1) ' 2 elements - cv.point
-
-        fast = New FAST_Basics()
         task.desc = "Find interesting points with the FAST and smooth the centroid with kalman"
     End Sub
     Public Sub Run(src as cv.Mat)

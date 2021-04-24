@@ -477,9 +477,8 @@ End Class
 
 Public Class Edges_FeaturesOnly : Inherits VBparent
     Dim edges As New Edges_BinarizedSobel
-    Dim featLess As Featureless_Basics
+    Dim featLess As New Featureless_Basics
     Public Sub New()
-        featLess = New Featureless_Basics
         label1 = "Output of Edges_BinarizedSobel"
         label2 = "dst1 with featureless areas removed."
         task.desc = "Removing the featureless regions after a binarized sobel"

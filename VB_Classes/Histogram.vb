@@ -431,11 +431,10 @@ End Class
 
 
 Public Class Histogram_SmoothTopView2D : Inherits VBparent
-    Public topView As Histogram_TopView2D
+    Public topView As New Histogram_TopView2D
     Dim setupTop As New PointCloud_SetupTop
     Dim stable As New Motion_MinMaxPointCloud
     Public Sub New()
-        topView = New Histogram_TopView2D
         label1 = "XZ (Top View)"
         task.desc = "Create a 2D top view with stable depth data."
     End Sub
@@ -465,11 +464,10 @@ End Class
 
 
 Public Class Histogram_SmoothSideView2D : Inherits VBparent
-    Public sideView As Histogram_SideView2D
+    Public sideView As New Histogram_SideView2D
     Dim setupSide As New PointCloud_SetupSide
     Dim stable As New Motion_MinMaxPointCloud
     Public Sub New()
-        sideView = New Histogram_SideView2D
         label1 = "ZY (Side View)"
         task.desc = "Create a 2D side view of stable depth data"
     End Sub
@@ -498,10 +496,9 @@ End Class
 
 
 Public Class Histogram_StableDepthClusters : Inherits VBparent
-    Dim clusters As Histogram_DepthClusters
+    Dim clusters As New Histogram_DepthClusters
     Dim motionSD As Motion_MinMaxDepth
     Public Sub New()
-        clusters = New Histogram_DepthClusters
         motionSD = New Motion_MinMaxDepth
         label1 = "Histogram of stable depth"
         label2 = "Backprojection of stable depth"
@@ -601,9 +598,8 @@ End Class
 
 
 Public Class Histogram_ViewIntersections : Inherits VBparent
-    Dim histCO As Histogram_ViewObjects
+    Dim histCO As New Histogram_ViewObjects
     Public Sub New()
-        histCO = New Histogram_ViewObjects
         label1 = "Yellow is largest intersection.  dst2 = point cloud"
         task.desc = "Find the intersections of the rectangles found in the Histogram_ConcentrationObjects"
     End Sub
@@ -671,18 +667,14 @@ End Class
 
 
 Public Class Histogram_ViewObjects : Inherits VBparent
-    Public histC As Histogram_ConcentrationPoints
-    Dim flood As FloodFill_Basics
+    Public histC As New Histogram_ConcentrationPoints
+    Dim flood As New FloodFill_Basics
     Public side2D As New List(Of cv.Rect)
     Public top2D As New List(Of cv.Rect)
     Public Sub New()
-        flood = New FloodFill_Basics
-        histC = New Histogram_ConcentrationPoints
-
         findSlider("FloodFill Minimum Size").Value = task.dotSize * task.dotSize
         findSlider("FloodFill LoDiff").Value = 250
         findSlider("FloodFill HiDiff").Value = 255
-
         task.desc = "Use the histogram concentrations to identify objects in the field of view"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -733,15 +725,10 @@ End Class
 
 
 Public Class Histogram_SmoothConcentration : Inherits VBparent
-    Public sideview As Histogram_SmoothSideView2D
-    Public topview As Histogram_SmoothTopView2D
-    Dim concent As Histogram_ConcentrationPoints
+    Public sideview As New Histogram_SmoothSideView2D
+    Public topview As New Histogram_SmoothTopView2D
+    Dim concent As New Histogram_ConcentrationPoints
     Public Sub New()
-
-        sideview = New Histogram_SmoothSideView2D
-        topview = New Histogram_SmoothTopView2D
-        concent = New Histogram_ConcentrationPoints
-
         task.desc = "Using stable depth data, highlight the histogram projections where concentrations are highest"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -766,19 +753,15 @@ End Class
 
 
 Public Class Histogram_ConcentrationPoints : Inherits VBparent
-    Public sideview As Histogram_SideView2D
-    Public topview As Histogram_TopView2D
+    Public sideview As New Histogram_SideView2D
+    Public topview As New Histogram_TopView2D
     Public Sub New()
-        sideview = New Histogram_SideView2D
-        topview = New Histogram_TopView2D
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 10)
             sliders.setupTrackBar(1, "Resize Factor x100", 1, 100, 10)
             sliders.setupTrackBar(2, "Concentration Threshold", 1, 100, 10)
         End If
-
         task.desc = "Highlight a fixed number of histogram projections where concentrations are highest"
     End Sub
     Public Function plotHighlights(histOutput As cv.Mat, dst As cv.Mat) As String
@@ -827,9 +810,8 @@ End Class
 
 
 Public Class Histogram_DepthClusters : Inherits VBparent
-    Public valleys As Histogram_DepthValleys
+    Public valleys As New Histogram_DepthValleys
     Public Sub New()
-        valleys = New Histogram_DepthValleys()
         task.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -944,12 +926,11 @@ End Class
 
 Public Class Histogram_DepthValleys : Inherits VBparent
     Dim kalman As New Kalman_Basics
-    Dim hist As Histogram_Depth
+    Dim hist As New Histogram_Depth
     Public ranges As New List(Of cv.Point)
     Public rangeColors As New List(Of Integer)
     Public rangeCounts As New List(Of Integer)
     Public Sub New()
-        hist = New Histogram_Depth()
         label1 = "Histogram clustered by valleys and smoothed"
         task.desc = "Identify valleys in the Depth histogram."
     End Sub
@@ -1091,11 +1072,9 @@ End Class
 
 
 Public Class Histogram_BothViews : Inherits VBparent
-    Dim sideview As Histogram_SideData
-    Dim topview As Histogram_TopData
+    Dim sideview As New Histogram_SideData
+    Dim topview As New Histogram_TopData
     Public Sub New()
-        sideview = New Histogram_SideData
-        topview = New Histogram_TopData
         label1 = "Side View Histogram"
         label2 = "Top View Histogram"
         task.desc = "Show both the side and top histograms."
@@ -1200,9 +1179,8 @@ End Class
 
 Public Class Histogram_PeaksRGB : Inherits VBparent
     Public mats As New Mat_4Click
-    Dim peaks As Histogram_Peaks
+    Dim peaks As New Histogram_Peaks
     Public Sub New()
-        peaks = New Histogram_Peaks
         task.desc = "Find the peaks and valleys for each of the RGB channels."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -1227,11 +1205,10 @@ End Class
 
 
 Public Class Histogram_PeakEdges : Inherits VBparent
-    Dim peaks As Histogram_PeaksRGB
+    Dim peaks As New Histogram_PeaksRGB
     Dim edges As New Edges_Sobel
     Public mats As New Mat_4to1
     Public Sub New()
-        peaks = New Histogram_PeaksRGB
         task.desc = "Find edges that are common to all channels - red, green and blue."
     End Sub
     Public Sub Run(src As cv.Mat)

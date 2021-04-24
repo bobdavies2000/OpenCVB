@@ -97,9 +97,8 @@ End Class
 
 Public Class SLR_Image : Inherits VBparent
     Dim slr As SLR_Basics
-    Dim hist As Histogram_Graph
+    Dim hist as New Histogram_Graph
     Public Sub New()
-        hist = New Histogram_Graph()
         hist.plotRequested = True
         slr = New SLR_Basics()
         label1 = "Original data"

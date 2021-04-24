@@ -95,17 +95,15 @@ End Class
 
 
 Public Class FeatureLess_Prediction : Inherits VBparent
-    Dim fLess As Featureless_Basics
+    Dim fLess As New Featureless_Basics
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "FeatureLess Resize Percent", 1, 100, 1)
         End If
-        fLess = New Featureless_Basics()
-
         task.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         fLess.Run(src)
         dst1 = fLess.dst1
         dst2 = fLess.dst2
@@ -179,17 +177,15 @@ End Class
 
 
 Public Class FeatureLess_PointTracker : Inherits VBparent
-    Public fLess As Featureless_Basics
+    Public fLess As New Featureless_Basics
     Public pTrack As KNN_PointTracker
     Public Sub New()
         pTrack = New KNN_PointTracker()
-        fLess = New Featureless_Basics()
-
         label1 = "After point tracker"
         label2 = "Before point tracker"
         task.desc = "Track the featureless regions with point tracker"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         fLess.Run(src)
         dst2 = fLess.dst1
 
@@ -208,10 +204,9 @@ End Class
 
 
 Public Class FeatureLess_Highlights : Inherits VBparent
-    Public fLessP As FeatureLess_PointTracker
+    Public fLessP As New FeatureLess_PointTracker
     Public addW As New AddWeighted_Basics
     Public Sub New()
-        fLessP = New FeatureLess_PointTracker()
         task.desc = "Highlight the featureless regions in an RGB image"
     End Sub
     Public Sub Run(src as cv.Mat)

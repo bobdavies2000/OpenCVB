@@ -157,10 +157,9 @@ End Class
 Public Class CComp_PointTracker : Inherits VBparent
     Public basics As New CComp_Basics
     Public pTrack As KNN_PointTracker
-    Public highlight As Highlight_Basics
+    Public highlight As New Highlight_Basics
     Public trackPoints As Boolean = True
     Public Sub New()
-        highlight = New Highlight_Basics()
         pTrack = New KNN_PointTracker()
         task.desc = "Track connected componenent centroids and use it to match coloring"
     End Sub
