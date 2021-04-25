@@ -4,6 +4,8 @@ Imports CS_Classes
 Public Class Line_Basics : Inherits VBparent
     Dim ld As cv.XImgProc.FastLineDetector
     Public sortlines As New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
+    Public pt1List As New List(Of cv.Point)
+    Public pt2List As New List(Of cv.Point)
     Public thickness As Integer
     Public pixelThreshold As Integer
     Public lenSlider As Windows.Forms.TrackBar
@@ -33,6 +35,8 @@ Public Class Line_Basics : Inherits VBparent
         pixelThreshold = lenSlider.Value
 
         sortlines.Clear()
+        pt1List.Clear()
+        pt2List.Clear()
 
         For Each v In lines
             If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And
@@ -42,6 +46,8 @@ Public Class Line_Basics : Inherits VBparent
                 Dim pixelLen = pt1.DistanceTo(pt2)
                 If pixelLen > pixelThreshold Then
                     dst1.Line(pt1, pt2, cv.Scalar.Yellow, thickness, task.lineType)
+                    pt1List.Add(pt1)
+                    pt2List.Add(pt2)
                     sortlines.Add(pixelLen, New cv.Vec4f(pt1.X, pt1.Y, pt2.X, pt2.Y))
                 End If
             End If
@@ -671,7 +677,7 @@ Public Class Line_SideView : Inherits VBparent
         label2 = "Lines found in the RGB image view"
         task.desc = "Line in image are projected into the depth image"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         lines.Run(src)
         dst2 = lines.dst2
@@ -682,5 +688,61 @@ Public Class Line_SideView : Inherits VBparent
         tView.Run(task.pointCloud)
 
         dst1 = tView.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_TimeView : Inherits VBparent
+    Dim pt1List() As List(Of cv.Point)
+    Dim pt2List() As List(Of cv.Point)
+    Dim lines As New Line_Basics
+    Public Sub New()
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Use lines from the last X frames", 0, 20, 10)
+        End If
+
+        task.desc = "Collect lines over time"
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        Static countSlider = findSlider("Use lines from the last X frames")
+        Static lineCount As Integer
+        Static lineIndex As Integer
+
+        lines.Run(src)
+
+        If lineCount <> countSlider.value Then
+            lineCount = countSlider.value
+            ReDim pt1List(lineCount - 1)
+            ReDim pt2List(lineCount - 1)
+            lineIndex = 0
+        End If
+
+        pt1List(lineIndex) = New List(Of cv.Point)(lines.pt1List)
+        pt2List(lineIndex) = New List(Of cv.Point)(lines.pt2List)
+
+        dst1 = src
+        dst2.SetTo(0)
+        Dim lineTotal As Integer
+        For i = 0 To pt1List.Count - 1
+            If pt1List(i) IsNot Nothing Then
+                lineTotal += pt1List(i).Count
+                For j = 0 To pt1List(i).Count - 1
+                    dst1.Line(pt1List(i)(j), pt2List(i)(j), cv.Scalar.Yellow, task.lineSize, task.lineType)
+                    dst2.Line(pt1List(i)(j), pt2List(i)(j), cv.Scalar.Yellow, task.lineSize, task.lineType)
+                Next
+            End If
+        Next
+
+        Dim pixelCount = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
+
+        lineIndex += 1
+        If lineIndex >= lineCount Then lineIndex = 0
+        label2 = "There were " + CStr(lineTotal) + " lines detected with " + Format(pixelCount / 1000, "#.0") + "k pixels"
     End Sub
 End Class

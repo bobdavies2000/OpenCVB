@@ -885,6 +885,7 @@ Public Class FloodFill_Neighbors : Inherits VBparent
             hiDiff = cv.Scalar.All(10)
         End If
         label1 = "Grayscale version"
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         task.desc = "Use floodfill to combine neighboring labels - regions that differ by only 1"
     End Sub
     Public Sub Run(src as cv.Mat)

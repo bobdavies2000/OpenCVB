@@ -122,6 +122,7 @@ Partial Class OpenCVB
         Me.SnapShotButton.Name = "SnapShotButton"
         Me.SnapShotButton.Size = New System.Drawing.Size(34, 53)
         Me.SnapShotButton.ToolTipText = "Capture a snapshot of the images below and put it on the clipboard"
+        Me.SnapShotButton.Visible = False
         '
         'TreeButton
         '
