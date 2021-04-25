@@ -14,8 +14,6 @@ Public Class Resize_Basics : Inherits VBparent
         label2 = "Difference from Cubic Resize (Best)"
     End Sub
     Public Sub Run(src as cv.Mat)
-        Static frm = findfrm(caller + " Radio Options")
-
         rotateOptions.Run(src)
 
         If standalone Or task.intermediateReview = caller Then

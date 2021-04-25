@@ -23,7 +23,7 @@ Public Class GetRotationMatrix2D_Options : Inherits VBparent
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 warpFlag = Choose(i + 1, cv.InterpolationFlags.Area, cv.InterpolationFlags.Cubic, cv.InterpolationFlags.Lanczos4, cv.InterpolationFlags.Linear,
-                                    cv.InterpolationFlags.Nearest, cv.InterpolationFlags.WarpFillOutliers, cv.InterpolationFlags.WarpInverseMap)
+                                         cv.InterpolationFlags.Nearest, cv.InterpolationFlags.WarpFillOutliers, cv.InterpolationFlags.WarpInverseMap)
                 Exit For
             End If
         Next
