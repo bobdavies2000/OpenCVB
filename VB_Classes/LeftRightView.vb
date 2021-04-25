@@ -163,8 +163,10 @@ Public Class LeftRightView_BrightnessContrast : Inherits VBparent
         label2 = "Right View"
         task.desc = "Enhance the left/right views with brightness and contrast."
     End Sub
-    Public Sub Run(src as cv.Mat)
-        dst1 = task.leftView.ConvertScaleAbs(sliders.trackbar(0).Value / 500, sliders.trackbar(1).Value)
-        dst2 = task.rightView.ConvertScaleAbs(sliders.trackbar(0).Value / 500, sliders.trackbar(1).Value)
+    Public Sub Run(src As cv.Mat)
+        Static alphaSlider = findSlider("Brightness Alpha (contrast)")
+        Static betaSlider = findSlider("Brightness Beta (brightness)")
+        dst1 = task.leftView.ConvertScaleAbs(alphaSlider.Value / 500, betaSlider.Value)
+        dst2 = task.rightView.ConvertScaleAbs(alphaSlider.Value / 500, betaSlider.Value)
     End Sub
 End Class
