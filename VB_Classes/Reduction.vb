@@ -130,7 +130,7 @@ End Class
 
 
 
-Public Class Reduction_Lines : Inherits VBparent
+Public Class Reduction_SideTopLines : Inherits VBparent
     Dim sideView As New Histogram_SideView2D
     Dim topView As New Histogram_TopView2D
     Public lDetect As New Line_Basics

@@ -11,11 +11,12 @@ Public Class Line_Basics : Inherits VBparent
     Public lenSlider As Windows.Forms.TrackBar
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+            sliders.Setup(caller, 5)
             sliders.setupTrackBar(0, "Line thickness", 1, 20, 2)
             sliders.setupTrackBar(1, "Line length threshold in pixels", 1, dst1.Width + dst1.Height, 40)
             sliders.setupTrackBar(2, "Depth search radius in pixels", 1, 20, 2) ' not used in Run below but externally...
             sliders.setupTrackBar(3, "x- and y-intercept search range in pixels", 1, 50, 10) ' not used in Run below but externally...
+            sliders.setupTrackBar(4, "Detect lines from the last X frames", 0, 20, 10)
         End If
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
@@ -29,6 +30,7 @@ Public Class Line_Basics : Inherits VBparent
     Public Sub Run(src as cv.Mat)
         Static thicknessSlider = findSlider("Line thickness")
         dst1 = src.Clone
+        If dst1.Channels <> 3 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim lines = ld.Detect(src)
         thickness = thicknessSlider.Value
@@ -146,7 +148,6 @@ Public Class Line_Reduction : Inherits VBparent
         dst1 = lDetect.dst1
 
         If task.cameraStable = False Then dst2.SetTo(0)
-
         For Each line In lDetect.sortlines
             Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
             Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
@@ -510,9 +511,6 @@ Public Class Line_LeftRightImages : Inherits VBparent
         task.desc = "Find lines in the infrared images"
     End Sub
     Public Sub Run(src As cv.Mat)
-        Dim color = cv.Scalar.Yellow
-        If standalone Then color = cv.Scalar.Black
-
         lrPalette.Run(src)
 
         leftLines.Run(lrPalette.dst1)
@@ -521,7 +519,7 @@ Public Class Line_LeftRightImages : Inherits VBparent
         For Each line In leftLines.sortlines
             Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
             Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-            dst1.Line(p1, p2, color, 1, task.lineType)
+            dst1.Line(p1, p2, cv.Scalar.Yellow, 1, task.lineType)
         Next
 
         rightLines.Run(lrPalette.dst2)
@@ -530,7 +528,7 @@ Public Class Line_LeftRightImages : Inherits VBparent
         For Each line In rightLines.sortlines
             Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
             Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-            dst2.Line(p1, p2, color, 1, task.lineType)
+            dst2.Line(p1, p2, cv.Scalar.Yellow, 1, task.lineType)
         Next
     End Sub
 End Class
@@ -702,15 +700,10 @@ Public Class Line_TimeView : Inherits VBparent
     Dim pt2List() As List(Of cv.Point)
     Dim lines As New Line_Basics
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Use lines from the last X frames", 0, 20, 10)
-        End If
-
         task.desc = "Collect lines over time"
     End Sub
     Public Sub Run(src As cv.Mat)
-        Static countSlider = findSlider("Use lines from the last X frames")
+        Static countSlider = findSlider("Detect lines from the last X frames")
         Static lineCount As Integer
         Static lineIndex As Integer
 
@@ -746,3 +739,34 @@ Public Class Line_TimeView : Inherits VBparent
         label2 = "There were " + CStr(lineTotal) + " lines detected with " + Format(pixelCount / 1000, "#.0") + "k pixels"
     End Sub
 End Class
+
+
+
+
+
+
+
+
+'Public Class Line_Regions : Inherits VBparent
+'    Dim lines As New Line_TimeView
+'    Dim reduction As New Reduction_Basics
+'    Public Sub New()
+'        findRadio("Use simple reduction").Checked = True
+'        label1 = "Yellow > length threshold, red < length threshold"
+'        label2 = "Input image after reduction"
+'        task.desc = "Use the reduced rgb image as input to the line detector"
+'    End Sub
+'    Public Sub Run(src As cv.Mat)
+'        reduction.Run(src)
+
+'        lDetect.Run(reduction.dst1)
+'        dst1 = lDetect.dst1
+
+'        If task.cameraStable = False Then dst2.SetTo(0)
+'        For Each line In lDetect.sortlines
+'            Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
+'            Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
+'            dst2.Line(p1, p2, cv.Scalar.Yellow, 1, task.lineType)
+'        Next
+'    End Sub
+'End Class
