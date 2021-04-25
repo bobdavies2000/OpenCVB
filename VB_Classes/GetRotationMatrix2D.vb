@@ -18,9 +18,10 @@ Public Class GetRotationMatrix2D_Options : Inherits VBparent
 
         task.desc = "Run to get the warpflag based on the current options"
     End Sub
-    Public Sub Run(src as cv.Mat)
-        For i = 0 To radio.check.Length - 1
-            If radio.check(i).Checked Then
+    Public Sub Run(src As cv.Mat)
+        Static frm = findfrm(caller + " Radio Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then
                 warpFlag = Choose(i + 1, cv.InterpolationFlags.Area, cv.InterpolationFlags.Cubic, cv.InterpolationFlags.Lanczos4, cv.InterpolationFlags.Linear,
                                     cv.InterpolationFlags.Nearest, cv.InterpolationFlags.WarpFillOutliers, cv.InterpolationFlags.WarpInverseMap)
                 Exit For
@@ -50,8 +51,6 @@ Public Class GetRotationMatrix2D_Basics : Inherits VBparent
         task.desc = "Rotate a rectangle of a specified angle"
     End Sub
     Public Sub Run(src as cv.Mat)
-        Static frm = findfrm(caller + " Radio Options")
-
         rotateOptions.Run(src)
         Dim angle = sliders.trackbar(0).Value
         M = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), angle, 1)

@@ -329,8 +329,9 @@ Public Class PhotoShop_Emboss : Inherits VBparent
         Dim kernel = kernelGenerator(sizeSlider.value)
 
         Dim direction As Integer
-        For direction = 0 To radio.check.Count - 1
-            If radio.check(direction).Checked Then Exit For
+        Static frm = findfrm(caller + " Radio Options")
+        For direction = 0 To frm.check.length - 1
+            If frm.check(direction).Checked Then Exit For
         Next
 
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -456,13 +457,15 @@ Public Class PhotoShop_DuoTone : Inherits VBparent
         Dim split = src.Split()
 
         Dim sw1 As Integer
-        For sw1 = 0 To radio.check.Count - 1
-            If radio.check(sw1).Checked Then Exit For
+        Static frm = findfrm(caller + " Radio Options")
+        For sw1 = 0 To frm.check.length - 1
+            If frm.check(sw1).Checked Then Exit For
         Next
 
         Dim sw2 As Integer
-        For sw2 = 0 To radio1.check.Count - 1
-            If radio1.check(sw2).Checked Then Exit For
+        Static frm1 = findfrm(caller + " ContourApproximation Mode Radio Options")
+        For sw2 = 0 To frm1.check.length - 1
+            If frm1.check(sw2).Checked Then Exit For
         Next
 
         For i = 0 To split.Count - 1
@@ -645,13 +648,15 @@ Public Class PhotoShop_Pencil_Manual : Inherits VBparent
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayinv As New cv.Mat
         cv.Cv2.BitwiseNot(src, grayinv)
-        Dim ksize = sliders.trackbar(0).Value
+        Static kernelSlider = findSlider("Blur kernel size")
+        Dim ksize As Integer = kernelSlider.Value
         If ksize Mod 2 = 0 Then ksize += 1
         Dim blur = grayinv.Blur(New cv.Size(ksize, ksize), New cv.Point(ksize / 2, ksize / 2))
         cv.Cv2.Divide(src, 255 - blur, dst1, 256)
 
-        Static index As Integer = -1
-        For index = 0 To radio.check.Count - 1
+        Dim index As Integer = -1
+        Static frm = findfrm(caller + " Radio Options")
+        For index = 0 To frm.check.length - 1
             If radio.check(index).Checked Then Exit For
         Next
         label2 = "Intermediate result: " + Choose(index + 1, "grayscale image", "grayscale inverted image", "blur image")

@@ -57,14 +57,13 @@ Public Class Binarize_OTSU : Inherits VBparent
         task.desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub Run(src As cv.Mat)
-
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         binarize.meanScalar = cv.Cv2.Mean(input)
-
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then label1 = radio.check(i).Text
+        Static frm = findfrm(caller + " Radio Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then label1 = radio.check(i).Text
         Next
 
         binarize.useBlur = False

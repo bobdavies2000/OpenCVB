@@ -4,8 +4,10 @@ Public Class Resize_Basics : Inherits VBparent
     Public rotateOptions As New GetRotationMatrix2D_Options
     Public Sub New()
         ' warp is not allowed in resize
-        rotateOptions.radio.check(5).Enabled = False
-        rotateOptions.radio.check(6).Enabled = False
+        Static warpRadio = findRadio("WarpFillOutliers")
+        Static warpInvRadio = findRadio("WarpInverseMap")
+        warpRadio.Enabled = False
+        warpInvRadio.Enabled = False
 
         task.desc = "Resize with different options and compare them"
         label1 = "Rectangle highlight above resized"

@@ -23,7 +23,7 @@ Public Class MFD_Basics : Inherits VBparent
 
         Dim radioVal As Integer
         Static frm As OptionsRadioButtons = findfrm(caller + " Radio Options")
-        For radioVal = 0 To frm.check.Count - 1
+        For radioVal = 0 To frm.check.Length - 1
             If frm.check(radioVal).Checked Then Exit For
         Next
 
