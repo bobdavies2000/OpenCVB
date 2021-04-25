@@ -2,9 +2,8 @@ Imports cv = OpenCvSharp
 Imports OpenCvSharp.XFeatures2D
 'https://github.com/shimat/opencvsharp/wiki/ORB-and-FREAK
 Public Class FREAK_Basics : Inherits VBparent
-    Dim orb As ORB_Basics
+    Dim orb As New ORB_Basics
     Public Sub New()
-        orb = New ORB_Basics()
         task.desc = "Find keypoints using ORB and FREAK algorithm"
     End Sub
     Public Sub Run(src as cv.Mat)

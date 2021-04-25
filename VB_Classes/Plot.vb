@@ -2,12 +2,11 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
 Public Class Plot_Basics : Inherits VBparent
-    Dim plot As Plot_Basics_CPP
+    Dim plot As New Plot_Basics_CPP
     Dim hist As New Histogram_Graph
     Public plotCount As Integer = 3
     Public Sub New()
         hist.plotRequested = True
-        plot = New Plot_Basics_CPP()
         label1 = "Plot of grayscale histogram"
         label2 = "Same Data but using OpenCV C++ plot"
         task.desc = "Plot data provided in src Mat"
@@ -274,10 +273,9 @@ End Module
 
 
 Public Class Plot_Depth : Inherits VBparent
-    Dim plot As Plot_Basics_CPP
+    Dim plot As New Plot_Basics_CPP
     Dim hist As New Histogram_Depth
     Public Sub New()
-        plot = New Plot_Basics_CPP()
         task.desc = "Show depth using OpenCV's plot format with variable bins."
     End Sub
     Public Sub Run(src as cv.Mat)

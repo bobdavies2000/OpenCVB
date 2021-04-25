@@ -137,10 +137,9 @@ End Class
 
 
 Public Class Rectangle_Motion : Inherits VBparent
-    Public motion As Motion_Basics
+    Public motion As New Motion_Basics
     Public mOverlap As New Rectangle_Intersection
     Public Sub New()
-        motion = New Motion_Basics
         label1 = "Yellow is pixel motion.  Red is all pixel motion"
         task.desc = "Motion rectangles often overlap.  This algorithm consolidates those rectangles in the RGB image."
     End Sub
@@ -156,10 +155,9 @@ End Class
 
 
 Public Class Rectangle_MotionDepth : Inherits VBparent
-    Public motion As Motion_Basics
+    Public motion As New Motion_Basics
     Dim colorize As New Depth_ColorizerFastFade_CPP
     Public Sub New()
-        motion = New Motion_Basics
         label1 = "Rectangles from contours of motion (unconsolidated)"
         label2 = "Pixel differences from motion (everything!)"
         task.desc = "Motion rectangles often overlap.  This algorithm consolidates those rectangles in the depth image."

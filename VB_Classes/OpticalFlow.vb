@@ -121,12 +121,11 @@ End Class
 
 'https://www.learnopencv.com/optical-flow-in-opencv/?ck_subscriber_id=785741175
 Public Class OpticalFlow_DenseBasics : Inherits VBparent
-    Dim optFlow As OpticalFlow_DenseOptions
+    Dim optFlow As New OpticalFlow_DenseOptions
     Public Sub New()
-        optFlow = New OpticalFlow_DenseOptions()
         task.desc = "Use dense optical flow algorithm  "
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static oldGray As New cv.Mat
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -151,13 +150,12 @@ Public Class OpticalFlow_DenseBasics_MT : Inherits VBparent
 
     Public grid As New Thread_Grid
     Dim accum As New cv.Mat
-    Dim optFlow As OpticalFlow_DenseOptions
+    Dim optFlow As New OpticalFlow_DenseOptions
     Public Sub New()
         findSlider("ThreadGrid Width").Value = dst1.Cols / 4
         findSlider("ThreadGrid Height").Value = dst1.Rows / 4
         findSlider("ThreadGrid Border").Value = 5
 
-        optFlow = New OpticalFlow_DenseOptions()
         optFlow.sliders.trackbar(0).Value = 75
 
         If findfrm(caller + " Slider Options") Is Nothing Then

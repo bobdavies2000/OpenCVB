@@ -497,9 +497,8 @@ End Class
 
 Public Class Histogram_StableDepthClusters : Inherits VBparent
     Dim clusters As New Histogram_DepthClusters
-    Dim motionSD As Motion_MinMaxDepth
+    Dim motionSD As New Motion_MinMaxDepth
     Public Sub New()
-        motionSD = New Motion_MinMaxDepth
         label1 = "Histogram of stable depth"
         label2 = "Backprojection of stable depth"
         task.desc = "Use the stable depth to identify the depth_clusters using histogram valleys"

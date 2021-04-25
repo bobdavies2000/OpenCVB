@@ -212,10 +212,9 @@ End Class
 
 ' http://ptgmedia.pearsoncmg.com/images/0672320665/downloads/The%20Game%20of%20Life.html
 Public Class CellAuto_LifePopulation : Inherits VBparent
-    Dim plot As Plot_OverTime
+    Dim plot As New Plot_OverTime
     Dim game As New CellAuto_Life
     Public Sub New()
-        plot = New Plot_OverTime()
         plot.dst1 = dst2
         plot.maxScale = 2000
         plot.plotCount = 1

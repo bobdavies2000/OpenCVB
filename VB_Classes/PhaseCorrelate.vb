@@ -78,17 +78,15 @@ End Class
 
 Public Class PhaseCorrelate_BasicsTest : Inherits VBparent
     Dim random As Stabilizer_BasicsRandomInput
-    Dim stable As PhaseCorrelate_Basics
+    Dim stable As New PhaseCorrelate_Basics
     Public Sub New()
-        stable = New PhaseCorrelate_Basics
         random = New Stabilizer_BasicsRandomInput
 
         label1 = "Unstable input to PhaseCorrelate_Basics"
         label2 = "Stabilized output from Phase_Correlate_Basics"
         task.desc = "Test the PhaseCorrelate_Basics with random movement"
     End Sub
-    Public Sub Run(src as cv.Mat)
-
+    Public Sub Run(src As cv.Mat)
         random.Run(src)
 
         stable.Run(random.dst2.Clone)
@@ -108,13 +106,11 @@ End Class
 
 
 Public Class PhaseCorrelate_Depth : Inherits VBparent
-    Dim phaseC As PhaseCorrelate_Basics
+    Dim phaseC As New PhaseCorrelate_Basics
     Public Sub New()
-        phaseC = New PhaseCorrelate_Basics
         task.desc = "Use phase correlation on the depth data"
     End Sub
     Public Sub Run(src as cv.Mat)
-
         Static lastFrame = task.depth32f.Clone
         phaseC.Run(task.depth32f)
         dst1 = task.depth32f

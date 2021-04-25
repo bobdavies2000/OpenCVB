@@ -118,14 +118,12 @@ End Class
 ' http://opencvexamples.blogspot.com/2014/01/kalman-filter-implementation-tracking.html
 Public Class Kalman_Compare : Inherits VBparent
     Dim kalman() As Kalman_Single
-    Public plot As Plot_OverTime
-    Public kPlot As Plot_OverTime
+    Public plot As New Plot_OverTime
+    Public kPlot As New Plot_OverTime
     Public Sub New()
-        plot = New Plot_OverTime()
         plot.plotCount = 3
         plot.topBottomPad = 20
 
-        kPlot = New Plot_OverTime()
         kPlot.plotCount = 3
         kPlot.topBottomPad = 20
 
@@ -421,7 +419,7 @@ End Class
 
 
 Public Class Kalman_Single : Inherits VBparent
-    Dim plot As Plot_OverTime
+    Dim plot As New Plot_OverTime
     Dim kf As New cv.KalmanFilter(2, 1, 0)
     Dim processNoise As New cv.Mat(2, 1, cv.MatType.CV_32F)
     Public measurement As New cv.Mat(1, 1, cv.MatType.CV_32F, 0)
@@ -439,14 +437,11 @@ Public Class Kalman_Single : Inherits VBparent
         kf.ProcessNoiseCov.SetIdentity(0.00001)
         kf.MeasurementNoiseCov.SetIdentity(0.1)
         kf.ErrorCovPost.SetIdentity(1)
-        If standalone Then
-            plot = New Plot_OverTime()
-            plot.plotCount = 2 ' 2 items to plot
-        End If
+        If standalone Then plot.plotCount = 2 ' 2 items to plot
         task.desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
     End Sub
-    Public Sub Run(src as cv.Mat)
-        If standalone or task.intermediateReview = caller Then
+    Public Sub Run(src As cv.Mat)
+        If standalone Or task.intermediateReview = caller Then
             dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             inputReal = dst1.Mean().Item(0)
         End If
@@ -454,7 +449,7 @@ Public Class Kalman_Single : Inherits VBparent
         Dim prediction = kf.Predict()
         measurement.Set(Of Single)(0, 0, inputReal)
         stateResult = kf.Correct(measurement).Get(Of Single)(0, 0)
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
             plot.Run(src)
             dst2 = plot.dst1
@@ -629,10 +624,9 @@ Public Class Kalman_VB_Basics : Inherits VBparent
     Dim outputError As Single = 0.002
     Dim processCovar As Single = 0.001 'This is the process covarience matrix. It's how much we trust the accelerometer
     Dim matrix As New List(Of Single)
-    Dim plot As Plot_OverTime
+    Dim plot As New Plot_OverTime
     Dim basics As New Kalman_Basics
     Public Sub New()
-        plot = New Plot_OverTime()
         plot.plotCount = 3
         plot.topBottomPad = 20
         plot.dst1 = dst1

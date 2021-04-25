@@ -273,13 +273,11 @@ End Class
 
 
 Public Class Puzzle_Solver : Inherits VBparent
-    Dim puzzle As Puzzle_Basics
+    Dim puzzle As New Puzzle_Basics
     Public roilist() As cv.Rect
     Dim usedList As New List(Of Integer)
     Dim fitlist As New List(Of bestFit)
     Public Sub New()
-        puzzle = New Puzzle_Basics()
-
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)
             radio.check(0).Text = "256x180 tile - Easy Puzzle"

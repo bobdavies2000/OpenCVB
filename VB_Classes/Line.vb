@@ -494,11 +494,10 @@ End Class
 
 
 Public Class Line_LeftRightImages : Inherits VBparent
-    Dim lrPalette As Palette_LeftRightImages
+    Dim lrPalette As New Palette_LeftRightImages
     Public leftLines As New Line_Basics
     Public rightLines As New Line_Basics
     Public Sub New()
-        lrPalette = New Palette_LeftRightImages
         findSlider("Line length threshold in pixels").Value = 1
         label1 = "Left infrared image with lines detected"
         label2 = "Right infrared image with lines detected"

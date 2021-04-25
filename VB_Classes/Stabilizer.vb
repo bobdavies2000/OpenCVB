@@ -289,12 +289,10 @@ End Class
 
 
 Public Class Stabilizer_MotionDetect : Inherits VBparent
-    Dim motion As Motion_Basics
+    Dim motion As New Motion_Basics
     Dim stable As Stabilizer_Basics
     Public Sub New()
-        motion = New Motion_Basics
         stable = New Stabilizer_Basics
-
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

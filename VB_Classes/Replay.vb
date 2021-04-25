@@ -254,11 +254,9 @@ End Class
 
 
 Public Class Replay_OpenGL : Inherits VBparent
-    Dim ogl As OpenGL_Callbacks
-    Dim replay As Replay_Play
+    Dim ogl As New OpenGL_Callbacks
+    Dim replay As New Replay_Play
     Public Sub New()
-        ogl = New OpenGL_Callbacks()
-        replay = New Replay_Play()
         task.desc = "Replay a recorded session with OpenGL"
     End Sub
     Public Sub Run(src as cv.Mat)

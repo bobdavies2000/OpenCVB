@@ -199,9 +199,8 @@ End Class
 
 
 Public Class Sound_Display : Inherits VBparent
-    Public soundSource As Object
+    Public soundSource As Object = New Sound_SignalGenerator
     Public Sub New()
-
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 4)
             radio.check(0).Text = "Max Absolute Value"
@@ -210,8 +209,6 @@ Public Class Sound_Display : Inherits VBparent
             radio.check(3).Text = "Scaled Average"
             radio.check(0).Checked = True
         End If
-
-        If standalone Then soundSource = New Sound_SignalGenerator
 
         task.desc = "Display a sound buffer in several styles"
     End Sub
@@ -313,10 +310,8 @@ End Class
 
 
 Public Class Sound_GenWaveDisplay : Inherits VBparent
-    Dim plotSound As Sound_Display
+    Dim plotSound As New Sound_Display
     Public Sub New()
-        plotSound = New Sound_Display
-        plotSound.soundSource = New Sound_SignalGenerator
         task.desc = "Display the generated sound waves"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -337,9 +332,8 @@ End Class
 
 
 Public Class Sound_WaveDisplay : Inherits VBparent
-    Dim plotSound As Sound_Display
+    Dim plotSound As New Sound_Display
     Public Sub New()
-        plotSound = New Sound_Display
         plotSound.soundSource = New Sound_Basics
         task.desc = "Display the generated sound waves"
     End Sub

@@ -106,10 +106,9 @@ End Class
 
 
 Public Class Reduction_KNN_ColorAndDepth : Inherits VBparent
-    Dim reduction As Reduction_KNN_Color
+    Dim reduction As New Reduction_KNN_Color
     Dim depth As New Depth_Edges
     Public Sub New()
-        reduction = New Reduction_KNN_Color()
         label1 = "Detecting objects using only color coherence"
         label2 = "Detecting objects with color and depth coherence"
         task.desc = "Reduction_KNN finds objects with depth.  This algorithm uses only color on the remaining objects."
@@ -137,9 +136,8 @@ Public Class Reduction_Lines : Inherits VBparent
     Public lDetect As New Line_Basics
     Public setupSide As New PointCloud_SetupSide
     Public setupTop As New PointCloud_SetupTop
-    Dim reduction As Reduction_PointCloud
+    Dim reduction As New Reduction_PointCloud
     Public Sub New()
-        reduction = New Reduction_PointCloud
         label1 = "Gravity rotated Side View with detected lines"
         label2 = "Gravity rotated Top View width detected lines"
         task.desc = "Present both the top and side view to minimize pixel counts."

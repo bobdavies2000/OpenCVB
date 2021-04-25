@@ -38,9 +38,8 @@ End Class
 
 
 Public Class PCA_Depth : Inherits VBparent
-    Dim pca As PCA_Basics
+    Dim pca As New PCA_Basics
     Public Sub New()
-        pca = New PCA_Basics()
         task.desc = "Reconstruct a depth stream as a composite of X images."
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -54,10 +53,9 @@ End Class
 
 ' https://docs.opencv.org/3.1.0/d1/dee/tutorial_introduction_to_pca.html
 Public Class PCA_DrawImage : Inherits VBparent
-    Dim pca As PCA_Basics
+    Dim pca As New PCA_Basics
     Dim image As New cv.Mat
     Public Sub New()
-        pca = New PCA_Basics()
         image = cv.Cv2.ImRead(task.parms.homeDir + "Data/pca_test1.jpg")
         task.desc = "Use PCA to find the principle direction of an object."
         label1 = "Original image"

@@ -1,10 +1,9 @@
 Imports cv = OpenCvSharp
 Public Class MFD_Basics : Inherits VBparent
-    Public motion As Motion_Basics
+    Public motion As New Motion_Basics
     Public stableImg As cv.Mat
     Dim dMax As New Depth_SmoothMax
     Public Sub New()
-        motion = New Motion_Basics
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 2)
             radio.check(0).Text = "Use motion-filtered pixel values"
@@ -46,13 +45,12 @@ End Class
 
 
 Public Class MFD_Depth : Inherits VBparent
-    Dim mfd As MFD_Basics
+    Dim mfd As New MFD_Basics
     Public Sub New()
-        mfd = New MFD_Basics
         label1 = "Motion-filtered depth data"
         task.desc = "Stabilize the depth image but update any areas with motion"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         mfd.Run(task.depth32f)
         dst1 = mfd.dst1
         dst2 = mfd.dst2
@@ -66,14 +64,12 @@ End Class
 
 
 Public Class MFD_PointCloud : Inherits VBparent
-    Dim mfd As MFD_Basics
+    Dim mfd As New MFD_Basics
     Public Sub New()
-        mfd = New MFD_Basics
         label1 = "Motion-filtered PointCloud"
         task.desc = "Stabilize the PointCloud but update any areas with motion"
     End Sub
-    Public Sub Run(src as cv.Mat)
-
+    Public Sub Run(src As cv.Mat)
         mfd.Run(task.pointCloud)
         dst1 = mfd.dst1
         dst2 = mfd.dst2
@@ -89,11 +85,9 @@ End Class
 
 
 Public Class MFD_Sobel : Inherits VBparent
-    Dim mfd As MFD_Basics
+    Dim mfd As New MFD_Basics
     Dim sobel As New Edges_Sobel
     Public Sub New()
-        mfd = New MFD_Basics
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Pixel threshold to zero", 0, 255, 100)
@@ -102,7 +96,7 @@ Public Class MFD_Sobel : Inherits VBparent
         label1 = "Sobel edges of Motion-Filtered RGB"
         task.desc = "Stabilize the Sobel output with MFD"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static thresholdSlider = findSlider("Pixel threshold to zero")
         mfd.Run(src)
         dst2 = mfd.dst2
@@ -120,14 +114,13 @@ End Class
 
 
 Public Class MFD_BinarizedSobel : Inherits VBparent
-    Public mfd As MFD_Basics
+    Public mfd As New MFD_Basics
     Dim sobel As New Edges_BinarizedSobel
     Public Sub New()
-        mfd = New MFD_Basics
         label1 = "Binarized Sobel edges of Motion-Filtered RGB"
         task.desc = "Stabilize the binarized Sobel output with MFD"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         mfd.Run(src)
 
@@ -151,13 +144,9 @@ Public Class MFD_FloodFill : Inherits VBparent
     Public floodPoints As New List(Of cv.Point)
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Dim initialMask As New cv.Mat
-    Dim palette As Palette_RandomColorMap
-    Dim sobel As MFD_BinarizedSobel
+    Dim palette As New Palette_RandomColorMap
+    Dim sobel As New MFD_BinarizedSobel
     Public Sub New()
-
-        palette = New Palette_RandomColorMap
-        sobel = New MFD_BinarizedSobel
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "FloodFill Step Size", 1, dst1.Cols / 2, 15)

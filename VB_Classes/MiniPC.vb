@@ -32,17 +32,15 @@ End Class
 
 
 Public Class MiniPC_Rotate : Inherits VBparent
-    Public mini As MiniPC_Basics
+    Public mini As New MiniPC_Basics
     Public histogram As New cv.Mat
     Public angleY As Integer
     Public Sub New()
-        mini = New MiniPC_Basics
-
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         label2 = "Side view after resize percentage"
         task.desc = "Create a histogram for the mini point cloud"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static angleYslider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
 
         Dim input = src
@@ -90,27 +88,24 @@ End Class
 
 
 Public Class MiniPC_RotateAngle : Inherits VBparent
-    Dim peak As MiniPC_Rotate
-    Dim mats as New Mat_4to1
-    Public plot As Plot_OverTime
+    Dim peak As New MiniPC_Rotate
+    Dim mats As New Mat_4to1
+    Public plot As New Plot_OverTime
     Dim resetCheck As Windows.Forms.CheckBox
     Public Sub New()
-
-        plot = New Plot_OverTime()
         plot.controlScale = True ' we are controlling the scale...
         plot.maxScale = 1
         plot.minScale = 0
         resetCheck = findCheckBox("Reset the plot scale")
         resetCheck.Checked = False
 
-        peak = New MiniPC_Rotate
         peak.angleY = -45
 
         label1 = "peak dst1, peak dst2, changed mask, maxvalues history"
         label2 = "Blue is mean*100, red is maxVal/100, green mask count"
         task.desc = "Find a peak value in the side view histograms"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then
             peak.mini.Run(src)
             src = peak.mini.dst2
@@ -157,14 +152,12 @@ End Class
 
 
 Public Class MiniPC_RotateSinglePass : Inherits VBparent
-    Dim peak As MiniPC_Rotate
+    Dim peak As New MiniPC_Rotate
     Public Sub New()
-        peak = New MiniPC_Rotate
         peak.angleY = -90
-        task.desc = "Same operation as MiniPC_RotateAngle but in a single pass."
+        task.desc = "Same operation as New MiniPC_RotateAngle but in a single pass."
     End Sub
     Public Sub Run(src as cv.Mat)
-
         peak.mini.Run(src)
 
         Dim r = peak.mini.rect

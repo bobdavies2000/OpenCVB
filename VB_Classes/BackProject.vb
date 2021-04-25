@@ -89,10 +89,9 @@ End Class
 
 
 Public Class BackProject_MasksLines : Inherits VBparent
-    Dim lines As BackProject_Masks
+    Dim lines As New BackProject_Masks
     Dim hist As New Histogram_Basics
     Public Sub New()
-        lines = New BackProject_Masks
         task.desc = "Inspect the lines from individual backprojection masks from a histogram"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -231,12 +230,10 @@ End Class
 
 
 Public Class BackProject_2DHSV : Inherits VBparent
-    Dim hueSat As PhotoShop_Hue
-    Dim hist2d As BackProject_2D
+    Dim hueSat As New PhotoShop_Hue
+    Dim hist2d As New BackProject_2D
     Dim mats As New Mat_4to1
     Public Sub New()
-        hueSat = New PhotoShop_Hue()
-        hist2d = New BackProject_2D()
         label1 = "Click any quadrant to enlarge it."
         task.desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
     End Sub
@@ -301,11 +298,9 @@ End Class
 
 Public Class BackProject_Reduction : Inherits VBparent
     Dim basics As New Reduction_Basics
-    Dim hist As BackProject_Basics
+    Dim hist As New BackProject_Basics
     Public Sub New()
         findRadio("Use bitwise reduction").Checked = True
-        hist = New BackProject_Basics
-
         label2 = "Backprojection of highlighted histogram bin"
         task.desc = "Use the histogram of a reduced RGB image to isolate featureless portions of an image."
     End Sub
@@ -363,10 +358,9 @@ End Class
 
 
 Public Class BackProject_FullLines : Inherits VBparent
-    Dim hist As BackProject_Full
+    Dim hist As New BackProject_Full
     Dim lines As New Line_Basics
     Public Sub New()
-        hist = New BackProject_Full
         task.desc = "Find lines in the back projection"
     End Sub
     Public Sub Run(src As cv.Mat)

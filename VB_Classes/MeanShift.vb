@@ -44,14 +44,13 @@ End Class
 
 
 Public Class MeanShift_Depth : Inherits VBparent
-    Dim ms As MeanShift_Basics
+    Dim ms As New MeanShift_Basics
     Dim blob As New Depth_ForegroundHead
     Public Sub New()
-        ms = New MeanShift_Basics()
         label1 = "Draw anywhere to start mean shift tracking."
         task.desc = "Use depth to start mean shift algorithm.  Tracker Algorithm"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         If task.drawRect.Width > 0 Then
             ms.usingDrawRect = True
             ms.inputRect = New cv.Rect
@@ -89,7 +88,7 @@ Public Class MeanShift_PyrFilter : Inherits VBparent
         End If
         task.desc = "Use PyrMeanShiftFiltering to segment an image."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim spatialRadius = sliders.trackbar(0).Value
         Dim colorRadius = sliders.trackbar(1).Value
         Dim maxPyrLevel = sliders.trackbar(2).Value

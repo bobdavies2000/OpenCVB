@@ -36,7 +36,7 @@ End Class
 
 
 Public Class Resize_Percentage : Inherits VBparent
-    Public resizeOptions As Resize_Basics
+    Public resizeOptions As New Resize_Basics
     Public Sub New()
         resizeOptions = New Resize_Basics()
         If findfrm(caller + " Slider Options") Is Nothing Then

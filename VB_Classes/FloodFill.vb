@@ -566,14 +566,11 @@ Public Class FloodFill_FullImage : Inherits VBparent
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public edges As New Edges_BinarizedSobel
     Dim initialMask As New cv.Mat
-    Dim palette As Palette_RandomColorMap
-    Public motion As Motion_Basics
+    Dim palette As New Palette_RandomColorMap
+    Public motion As New Motion_Basics
     Public mats As New Mat_4Click
     Public missingSegments As cv.Mat
     Public Sub New()
-        motion = New Motion_Basics
-        palette = New Palette_RandomColorMap
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "FloodFill Step Size", 1, dst1.Cols / 2, 15)

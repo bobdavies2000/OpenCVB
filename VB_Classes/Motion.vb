@@ -138,11 +138,9 @@ End Class
 
 
 Public Class Motion_MinMaxDepth : Inherits VBparent
-    Public motion As Motion_Basics
+    Public motion As New Motion_Basics
     Public externalReset As Boolean
     Public Sub New()
-        motion = New Motion_Basics
-
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 3)
             radio.check(0).Text = "Use farthest distance"
@@ -155,7 +153,7 @@ Public Class Motion_MinMaxDepth : Inherits VBparent
         label2 = "Motion mask"
         task.desc = "While minimizing options and dependencies, use RGB motion to figure out what depth values should change."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static useNone = findRadio("Use unchanged depth input")
         Static useMax = findRadio("Use farthest distance")
         Dim input = src
@@ -188,15 +186,14 @@ End Class
 
 
 Public Class Motion_MinMaxPointCloud : Inherits VBparent
-    Public stable As Motion_MinMaxDepth
+    Public stable As New Motion_MinMaxDepth
     Public splitPC() As cv.Mat
     Public Sub New()
-        stable = New Motion_MinMaxDepth
         label1 = stable.label1
         label2 = stable.label2
         task.desc = "Use the stable depth values to create a stable point cloud"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         Dim input = src.Clone
         If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud
@@ -226,15 +223,14 @@ End Class
 
 
 Public Class Motion_MinMaxDepthColorized : Inherits VBparent
-    Dim stable As Motion_MinMaxDepth
+    Dim stable As New Motion_MinMaxDepth
     Dim colorize As New Depth_ColorizerFastFade_CPP
     Public Sub New()
-        stable = New Motion_MinMaxDepth
         label1 = "32-bit format stable depth data"
         label2 = "Colorized version of image at left"
         task.desc = "Colorize the stable depth (keeps Motion_MinMaxDepth at a minimum complexity)"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         Static saveMin = task.minDepth
         Static saveMax = task.maxDepth
@@ -266,7 +262,7 @@ Public Class Motion_ThruCorrelation : Inherits VBparent
         dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         task.desc = "Detect motion through the correlation coefficient"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static ccSlider = findSlider("Correlation coefficient threshold for motion X1000")
         Static padSlider = findSlider("Pad size in pixels for the search area")
         Static stdevSlider = findSlider("Stdev threshold for using correlation")
@@ -320,10 +316,8 @@ End Class
 
 
 Public Class Motion_CCmerge : Inherits VBparent
-    Dim motionCC As Motion_ThruCorrelation
+    Dim motionCC As New Motion_ThruCorrelation
     Public Sub New()
-        motionCC = New Motion_ThruCorrelation
-
         task.desc = "Use the correlation coefficient to maintain an up-to-date image"
     End Sub
     Public Sub Run(src as cv.Mat)

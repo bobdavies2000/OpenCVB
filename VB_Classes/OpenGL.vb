@@ -153,10 +153,9 @@ End Module
 
 
 Public Class OpenGL_Options : Inherits VBparent
-    Public OpenGL As OpenGL_Basics
+    Public OpenGL As New OpenGL_Basics
     Public pointCloudInput As cv.Mat
     Public Sub New()
-        OpenGL = New OpenGL_Basics()
         setOpenGLsliders(caller, sliders)
         task.desc = "Adjust point size and FOV in OpenGL"
         label1 = ""
@@ -191,10 +190,9 @@ End Class
 
 
 Public Class OpenGL_Callbacks : Inherits VBparent
-    Public ogl As OpenGL_Basics
+    Public ogl As New OpenGL_Basics
     Public pointCloudInput As cv.Mat
     Public Sub New()
-        ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         task.desc = "Show the point cloud of 3D data and use callbacks to modify view."
     End Sub
@@ -210,10 +208,9 @@ End Class
 
 'https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
 Public Class OpenGL_IMU : Inherits VBparent
-    Public ogl As OpenGL_Options
+    Public ogl As New OpenGL_Options
     Public imu As New IMU_GVector
     Public Sub New()
-        ogl = New OpenGL_Options()
         ogl.OpenGL.OpenGLTitle = "OpenGL_IMU"
         ogl.sliders.trackbar(1).Value = 0 ' pitch
         ogl.sliders.trackbar(2).Value = 0 ' yaw
@@ -238,8 +235,8 @@ End Class
 
 ' https://docs.opencv.org/3.4/d1/d1d/tutorial_histo3D.html
 Public Class OpenGL_3Ddata : Inherits VBparent
-    Dim colors As Palette_Gradient
-    Public ogl As OpenGL_Options
+    Dim colors As New Palette_Gradient
+    Public ogl As New OpenGL_Options
     Dim histInput() As Byte
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -247,13 +244,11 @@ Public Class OpenGL_3Ddata : Inherits VBparent
             sliders.setupTrackBar(0, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
         End If
 
-        ogl = New OpenGL_Options()
         ogl.OpenGL.OpenGLTitle = "OpenGL_3Ddata"
         ogl.sliders.trackbar(1).Value = -10
         ogl.sliders.trackbar(6).Value = 5
         ogl.sliders.trackbar(2).Value = 10
 
-        colors = New Palette_Gradient()
         colors.color1 = cv.Scalar.Yellow
         colors.color2 = cv.Scalar.Blue
         colors.Run(dst1)
@@ -286,11 +281,10 @@ End Class
 
 Public Class OpenGL_Draw3D : Inherits VBparent
     Dim circle As New Draw_Circles
-    Public ogl As OpenGL_Options
+    Public ogl As New OpenGL_Options
     Public Sub New()
         findSlider("DrawCount").Value = 5
 
-        ogl = New OpenGL_Options()
         ogl.OpenGL.OpenGLTitle = "OpenGL_3DShapes"
         ogl.sliders.trackbar(0).Value = 80
         ogl.sliders.trackbar(8).Value = -140
@@ -316,11 +310,10 @@ End Class
 
 Public Class OpenGL_Voxels : Inherits VBparent
     Public voxels As Voxels_Basics_MT
-    Public ogl As OpenGL_Basics
+    Public ogl As New OpenGL_Basics
     Public Sub New()
         voxels = New Voxels_Basics_MT()
 
-        ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Voxels"
         task.desc = "Show the voxel representation in OpenGL"
     End Sub
@@ -345,12 +338,10 @@ End Class
 ' https://open.gl/transformations
 ' https://www.codeproject.com/Articles/1247960/Learning-Basic-Math-Used-In-3D-Graphics-Engines
 Public Class OpenGL_GravityTransform : Inherits VBparent
-    Public ogl As OpenGL_Basics
+    Public ogl As New OpenGL_Basics
     Public gCloud As New Depth_PointCloud_IMU
     Public Sub New()
-        ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Callbacks"
-
         task.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -373,9 +364,8 @@ End Class
 
 Public Class OpenGL_Floor : Inherits VBparent
     Dim plane As Structured_LinearizeFloor
-    Dim ogl As OpenGL_Basics
+    Dim ogl As New OpenGL_Basics
     Public Sub New()
-        ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Callbacks"
 
         plane = New Structured_LinearizeFloor()
@@ -404,10 +394,9 @@ End Class
 
 
 Public Class OpenGL_FloorPlane : Inherits VBparent
-    Public ogl As OpenGL_Basics
+    Public ogl As New OpenGL_Basics
     Public plane As Structured_LinearizeFloor
     Public Sub New()
-        ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_FloorPlane"
         plane = New Structured_LinearizeFloor()
         task.desc = "Show the floor in the pointcloud as a plane"
@@ -444,11 +433,10 @@ End Class
 
 
 'Public Class OpenGL_FloorTexture : Inherits VBparent
-'    Dim floor As OpenGL_FloorPlane
+'    Dim floor as New OpenGL_FloorPlane
 '    Dim shuffle As Texture_Shuffle
 '    Public Sub New()
 '        shuffle = New Texture_Shuffle()
-'        floor = New OpenGL_FloorPlane()
 '        task.desc = "Texture the plane of the floor with a good sample of the texture from the mask"
 '    End Sub
 '    Public Sub Run(src as cv.Mat)
@@ -486,14 +474,11 @@ End Class
 
 
 Public Class OpenGL_DepthSliceH : Inherits VBparent
-    Public ogl As OpenGL_Basics
+    Public ogl As New OpenGL_Basics
     Dim slices As Structured_MultiSliceH
     Public Sub New()
-
         slices = New Structured_MultiSliceH()
-        ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Callbacks"
-
         task.desc = "View depth slices in 3D with OpenGL"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -517,10 +502,8 @@ End Class
 
 Public Class OpenGL_StableDepth : Inherits VBparent
     Dim pcValid As New Motion_MinMaxPointCloud
-    Public ogl As OpenGL_Options
+    Public ogl As New OpenGL_Options
     Public Sub New()
-        ogl = New OpenGL_Options
-
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -539,9 +522,8 @@ End Class
 
 Public Class OpenGL_AverageDepth : Inherits VBparent
     Dim stable As New Depth_AveragingStable
-    Public ogl As OpenGL_Callbacks
+    Public ogl As New OpenGL_Callbacks
     Public Sub New()
-        ogl = New OpenGL_Callbacks
         label2 = "32-bit format stabilized depth data"
         task.desc = "Use the depth_stabilizer output as input the an OpenGL display"
     End Sub
@@ -570,9 +552,8 @@ End Class
 
 Public Class OpenGL_StableDepthMouse : Inherits VBparent
     Dim pcValid As New Motion_MinMaxPointCloud
-    Public ogl As OpenGL_Callbacks
+    Public ogl As New OpenGL_Callbacks
     Public Sub New()
-        ogl = New OpenGL_Callbacks
         label2 = "dst2 is a pointcloud"
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
     End Sub
@@ -593,17 +574,12 @@ End Class
 
 
 Public Class OpenGL_Surfaces : Inherits VBparent
-    Dim smooth As BackProject_Surfaces
-    Public ogl As OpenGL_Callbacks
+    Dim smooth As New BackProject_Surfaces
+    Public ogl As New OpenGL_Callbacks
     Public Sub New()
-
-        smooth = New BackProject_Surfaces
-        ogl = New OpenGL_Callbacks
-
         task.desc = "Filter the 3D image to show only smooth surfaces."
     End Sub
     Public Sub Run(src As cv.Mat)
-
         smooth.Run(src)
         dst1 = smooth.dst2
 
@@ -621,9 +597,8 @@ End Class
 
 Public Class OpenGL_Stable : Inherits VBparent
     Dim stable As New Motion_MinMaxPointCloud
-    Dim ogl As OpenGL_Callbacks
+    Dim ogl As New OpenGL_Callbacks
     Public Sub New()
-        ogl = New OpenGL_Callbacks
         task.desc = "Use the Motion_MinMaxPointCloud in 3D"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -644,11 +619,9 @@ End Class
 
 Public Class OpenGL_ReducedXYZ : Inherits VBparent
     Dim reduction As Reduction_XYZ
-    Public ogl As OpenGL_Basics
+    Public ogl As New OpenGL_Basics
     Public Sub New()
         reduction = New Reduction_XYZ
-
-        ogl = New OpenGL_Basics
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         task.desc = "Display the pointCloud after reduction in X, Y, or Z dimensions."
     End Sub
@@ -668,11 +641,9 @@ End Class
 
 Public Class OpenGL_Reduction : Inherits VBparent
     Dim reduction As Reduction_PointCloud
-    Public ogl As OpenGL_Basics
+    Public ogl As New OpenGL_Basics
     Public Sub New()
         reduction = New Reduction_PointCloud
-
-        ogl = New OpenGL_Basics()
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         task.desc = "Use the reduced depth pointcloud in OpenGL"
     End Sub
@@ -694,13 +665,11 @@ End Class
 
 Public Class OpenGL_ReducedSideView : Inherits VBparent
     Dim reduced As New PointCloud_ReducedSideView
-    Dim ogl As OpenGL_Callbacks
+    Dim ogl As New OpenGL_Callbacks
     Public Sub New()
-        ogl = New OpenGL_Callbacks
         task.desc = "Use the reduced depth pointcloud in 3D but allow it to be rotated in Options_Common"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         reduced.Run(src)
         dst1 = reduced.dst1
 
@@ -718,15 +687,12 @@ End Class
 
 
 Public Class OpenGL_MFD_PointCloud : Inherits VBparent
-    Dim mfd As MFD_PointCloud
-    Dim ogl As OpenGL_Callbacks
+    Dim mfd As New MFD_PointCloud
+    Dim ogl As New OpenGL_Callbacks
     Public Sub New()
-        mfd = New MFD_PointCloud
-        ogl = New OpenGL_Callbacks
         task.desc = "Use the MFD_PointCloud in 3D"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         mfd.Run(src)
         dst1 = mfd.dst1
         dst2 = mfd.dst2
@@ -746,16 +712,13 @@ End Class
 
 Public Class OpenGL_Structured_PointCloud : Inherits VBparent
     Dim sCloud As Structured_Cloud
-    Dim ogl As OpenGL_Callbacks
+    Dim ogl As New OpenGL_Callbacks
     Public Sub New()
         sCloud = New Structured_Cloud
-        ogl = New OpenGL_Callbacks
-
         label1 = "Structured cloud 32fC3 data"
         task.desc = "Visualize the Structured_Cloud"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         sCloud.Run(src)
         dst1 = sCloud.dst1
 

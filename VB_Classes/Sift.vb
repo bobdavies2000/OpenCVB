@@ -40,7 +40,7 @@ End Class
 Public Class Sift_Basics_MT : Inherits VBparent
     Dim grid As New Thread_Grid
     Dim siftCS As New CS_SiftBasics
-    Dim siftBasics As Sift_Basics
+    Dim siftBasics As New Sift_Basics
     Dim lrView As New LeftRightView_BrightnessContrast
     Dim numPointSlider As System.Windows.Forms.TrackBar
     Public Sub New()
@@ -52,7 +52,6 @@ Public Class Sift_Basics_MT : Inherits VBparent
 
         grid.Run(Nothing)
 
-        siftBasics = New Sift_Basics
         numPointSlider = findSlider("Points to Match")
         numPointSlider.Value = 1
 

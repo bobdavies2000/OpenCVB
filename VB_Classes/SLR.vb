@@ -2,12 +2,10 @@ Imports cv = OpenCvSharp
 Imports System.IO
 ' https://www.codeproject.com/Articles/5282014/Segmented-Linear-Regression
 Public Class SLR_Basics : Inherits VBparent
-    Public input As SLR_Data
+    Public input As New SLR_Data
     Dim slr As New CS_Classes.SLR
-    Dim plot As Plot_Basics_CPP
+    Dim plot As New Plot_Basics_CPP
     Public Sub New()
-        plot = New Plot_Basics_CPP()
-        input = New SLR_Data()
         If standalone Then
             input.Run(dst1)
             label1 = "Sample data input"
@@ -20,7 +18,7 @@ Public Class SLR_Basics : Inherits VBparent
         End If
         task.desc = "Segmented Linear Regression example"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static toleranceSlider = findSlider("Approximate accuracy (tolerance) X100")
         Static movingAvgSlider = findSlider("Simple moving average window size")
         Dim tolerance = toleranceSlider.value / 100
@@ -61,12 +59,10 @@ End Class
 
 ' https://www.codeproject.com/Articles/5282014/Segmented-Linear-Regression
 Public Class SLR_Data : Inherits VBparent
-    Dim plot As Plot_Basics_CPP
+    Dim plot As New Plot_Basics_CPP
     Public dataX As New List(Of Double)
     Public dataY As New List(Of Double)
     Public Sub New()
-        plot = New Plot_Basics_CPP()
-
         Dim sr = New StreamReader(task.parms.homeDir + "/Data/real_data.txt")
         Dim code As String = sr.ReadToEnd
         sr.Close()
@@ -81,7 +77,7 @@ Public Class SLR_Data : Inherits VBparent
         Next
         task.desc = "Plot the data used in SLR_Basics"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         plot.srcX = dataX.ToArray
         plot.srcY = dataY.ToArray
         plot.Run(src)
@@ -96,16 +92,14 @@ End Class
 
 
 Public Class SLR_Image : Inherits VBparent
-    Dim slr As SLR_Basics
+    Dim slr As New SLR_Basics
     Dim hist as New Histogram_Graph
     Public Sub New()
         hist.plotRequested = True
-        slr = New SLR_Basics()
         label1 = "Original data"
         task.desc = "Run Segmented Linear Regression on grayscale image data - just an experiment"
     End Sub
     Public Sub Run(src as cv.Mat)
-
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.plotColors(0) = cv.Scalar.White
         hist.Run(src)

@@ -47,11 +47,9 @@ End Class
 
 
 Public Class Salience_Basics_MT : Inherits VBparent
-    Dim salience As Salience_Basics_CPP
+    Dim salience As New Salience_Basics_CPP
     Public Sub New()
-        salience = New Salience_Basics_CPP()
         salience.sliders.trackbar(1).Value = 2
-
         task.desc = "Show results of multi-threaded Salience algorithm when using C++.  NOTE: salience is relative."
     End Sub
     Public Sub Run(src as cv.Mat)

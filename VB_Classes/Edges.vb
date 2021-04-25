@@ -405,14 +405,11 @@ End Class
 
 Public Class Edges_BinarizedBrightness : Inherits VBparent
     Dim edges As New Edges_BinarizedSobel
-    Dim bright As PhotoShop_Brightness
+    Dim bright As New PhotoShop_Brightness
     Public Sub New()
-        bright = New PhotoShop_Brightness
-
         task.desc = "Visualize the impact of brightness on Edges_BinarizeSobel"
     End Sub
     Public Sub Run(src As cv.Mat)
-
         bright.Run(src)
         dst1 = bright.dst2
 

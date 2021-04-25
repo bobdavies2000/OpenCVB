@@ -212,16 +212,13 @@ End Class
 
 
 Public Class Depth_MeanStdevPlot : Inherits VBparent
-    Dim plot1 As Plot_OverTime
-    Dim plot2 As Plot_OverTime
+    Dim plot1 As New Plot_OverTime
+    Dim plot2 As New Plot_OverTime
     Public Sub New()
-
-        plot1 = New Plot_OverTime()
         plot1.dst1 = dst1
         plot1.maxScale = 2000
         plot1.plotCount = 1
 
-        plot2 = New Plot_OverTime()
         plot2.dst1 = dst2
         plot2.maxScale = 1000
         plot2.plotCount = 1
@@ -1287,11 +1284,9 @@ End Class
 
 Public Class Depth_SmoothMin : Inherits VBparent
     Public stableMin As cv.Mat
-    Public motion As Motion_Basics
+    Public motion As New Motion_Basics
     Dim colorize As New Depth_ColorizerFastFade_CPP
     Public Sub New()
-        motion = New Motion_Basics
-
         label1 = "InRange depth with low quality depth removed."
         label2 = "Motion in the RGB image. Depth updated in rectangle."
         task.desc = "To reduce z-Jitter, use the closest depth value at each pixel as long as the camera is stable"

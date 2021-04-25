@@ -5,7 +5,7 @@ Public Class Smoothing_Exterior : Inherits VBparent
 	Public inputPoints As List(Of cv.Point)
 	Public smoothPoints As List(Of cv.Point)
 	Public plotColor = cv.Scalar.Yellow
-	Dim smOptions As Smoothing_Options
+	Dim smOptions As New Smoothing_Options
 	Private Function getSplineInterpolationCatmullRom(points As List(Of cv.Point), nrOfInterpolatedPoints As Integer) As List(Of cv.Point)
 		Dim spline As New List(Of cv.Point)
 		' Create a new pointlist to spline.  If you don't do this, the original pointlist is included with the extrapolated points
@@ -42,13 +42,11 @@ Public Class Smoothing_Exterior : Inherits VBparent
 		Return spline
 	End Function
 	Public Sub New()
-		smOptions = New Smoothing_Options
-
 		label1 = "Original Points (white) Smoothed (yellow)"
 		label2 = ""
 		task.desc = "Smoothing the line connecting a series of points."
 	End Sub
-	Public Sub Run(src as cv.Mat)
+	Public Sub Run(src As cv.Mat)
 		smOptions.Run(Nothing)
 		If standalone Or task.intermediateReview = caller Then
 			If task.frameCount Mod 30 Then Exit Sub
@@ -76,7 +74,7 @@ Public Class Smoothing_Interior : Inherits VBparent
 	Public inputPoints As List(Of cv.Point)
 	Public smoothPoints As List(Of cv.Point)
 	Public plotColor = cv.Scalar.Yellow
-	Dim smOptions As Smoothing_Options
+	Dim smOptions As New Smoothing_Options
 	Private Function getCurveSmoothingChaikin(points As List(Of cv.Point), tension As Double, nrOfIterations As Integer) As List(Of cv.Point2d)
 		'the tension factor defines a scale between corner cutting distance in segment half length, i.e. between 0.05 and 0.45
 		'the opposite corner will be cut by the inverse (i.e. 1-cutting distance) to keep symmetry
@@ -115,7 +113,6 @@ Public Class Smoothing_Interior : Inherits VBparent
 		Return nl
 	End Function
 	Public Sub New()
-		smOptions = New Smoothing_Options
 		If standalone Then findSlider("Hull random points").Value = 16
 
 		label1 = "Original Points (white) Smoothed (yellow)"
@@ -179,15 +176,12 @@ End Class
 
 Public Class Smoothing_Contours : Inherits VBparent
 	Dim outline As New Blob_Largest
-	Dim smoothE As Smoothing_Exterior
-	Dim smoothI As Smoothing_Interior
-	Dim smOptions As Smoothing_Options
+	Dim smoothE As New Smoothing_Exterior
+	Dim smoothI As New Smoothing_Interior
+	Dim smOptions As New Smoothing_Options
 	Public Sub New()
-		smoothE = New Smoothing_Exterior
-		smoothI = New Smoothing_Interior
 		smoothE.plotColor = cv.Scalar.Blue
 		smoothI.plotColor = cv.Scalar.Blue
-		smOptions = New Smoothing_Options
 
 		If findfrm(caller + " Radio Options") Is Nothing Then
 			radio.Setup(caller, 2)

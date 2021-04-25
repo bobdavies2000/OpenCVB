@@ -148,19 +148,17 @@ End Class
 ' https://blog.csdn.net/just_sort/article/details/85982871
 Public Class PhotoShop_WhiteBalance : Inherits VBparent
     Dim hist As New Histogram_Graph
-    Dim whiteCPP As PhotoShop_WhiteBalance_CPP
+    Dim whiteCPP As New PhotoShop_WhiteBalance_CPP
     Dim wPtr As IntPtr
     Public Sub New()
         hist.plotRequested = True
         hist.bins = 256 * 3
         hist.maxRange = hist.bins
 
-        whiteCPP = New PhotoShop_WhiteBalance_CPP()
-
         label1 = "Image with auto white balance"
         task.desc = "Automate getting the right white balance"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static thresholdSlider = findSlider("White balance threshold X100")
         Dim thresholdVal = thresholdSlider.Value / 100
 
@@ -209,15 +207,12 @@ End Class
 
 ' https://blog.csdn.net/just_sort/article/details/85982871
 Public Class PhotoShop_ChangeMask : Inherits VBparent
-    Dim white As PhotoShop_WhiteBalance
-    Dim whiteCPP As PhotoShop_WhiteBalance_CPP
+    Dim white As New PhotoShop_WhiteBalance
+    Dim whiteCPP As New PhotoShop_WhiteBalance_CPP
     Public Sub New()
-        white = New PhotoShop_WhiteBalance()
-        whiteCPP = New PhotoShop_WhiteBalance_CPP()
-
         task.desc = "Create a mask for the changed pixels after white balance"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static countdown = 120
         Static whiteFlag As Boolean
         If countdown = 0 Then
@@ -248,15 +243,14 @@ End Class
 
 ' https://blog.csdn.net/just_sort/article/details/85982871
 Public Class PhotoShop_PlotHist : Inherits VBparent
-    Dim white As PhotoShop_ChangeMask
+    Dim white As New PhotoShop_ChangeMask
     Public hist1 As New Histogram_Basics
     Public hist2 As New Histogram_Basics
     Dim mat2to1 As New Mat_2to1
     Public Sub New()
-        white = New PhotoShop_ChangeMask()
         task.desc = "Plot the histogram of the before and after white balancing"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         hist1.Run(src)
         mat2to1.mat(0) = hist1.dst1
 
@@ -285,7 +279,7 @@ Public Class PhotoShop_Sepia : Inherits VBparent
     Public Sub New()
         task.desc = "Create a sepia image"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2RGB)
         Dim tMatrix = New cv.Mat(3, 3, cv.MatType.CV_64F, {{0.393, 0.769, 0.189}, {0.349, 0.686, 0.168}, {0.272, 0.534, 0.131}})
         dst1 = dst1.Transform(tMatrix).Threshold(255, 255, cv.ThresholdTypes.Trunc)
@@ -330,7 +324,7 @@ Public Class PhotoShop_Emboss : Inherits VBparent
         Next
         Return kernel
     End Function
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static sizeSlider = findSlider("Emboss Kernel Size")
         Dim kernel = kernelGenerator(sizeSlider.value)
 
@@ -363,12 +357,10 @@ End Class
 
 ' https://github.com/spmallick/learnopencv/tree/master/
 Public Class PhotoShop_EmbossAll : Inherits VBparent
-    Dim emboss As PhotoShop_Emboss
+    Dim emboss As New PhotoShop_Emboss
     Dim mats As New Mat_4to1
     Dim sizeSlider As Windows.Forms.TrackBar
     Public Sub New()
-        emboss = New PhotoShop_Emboss
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Emboss threshold", 0, 255, 200)

@@ -36,7 +36,7 @@ End Class
 
 ' https://docs.opencv.org/trunk/d1/dfd/tutorial_motion_deblur_filter.html
 Public Class MotionBlur_Deblur : Inherits VBparent
-    Dim mblur As MotionBlur_Basics
+    Dim mblur As New MotionBlur_Basics
     Private Function calcPSF(filterSize As cv.Size, len As integer, theta As Double) As cv.Mat
         Dim h As New cv.Mat(filterSize, cv.MatType.CV_32F, 0)
         Dim pt = New cv.Point(filterSize.Width / 2, filterSize.Height / 2)
@@ -119,8 +119,6 @@ Public Class MotionBlur_Deblur : Inherits VBparent
             check.Box(0).Text = "Redo motion blurred image"
             check.Box(0).Checked = True
         End If
-
-        mblur = New MotionBlur_Basics()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)

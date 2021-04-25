@@ -101,9 +101,8 @@ End Class
 
 
 Public Class IMU_Magnetometer : Inherits VBparent
-    Public plot As Plot_OverTime
+    Public plot As New Plot_OverTime
     Public Sub New()
-        plot = New Plot_OverTime()
         plot.dst1 = dst2
         plot.maxScale = 10
         plot.minScale = -10
@@ -159,11 +158,10 @@ End Class
 
 
 Public Class IMU_FrameTime : Inherits VBparent
-    Public plot As Plot_OverTime
+    Public plot As New Plot_OverTime
     Public CPUInterval As Double
     Public IMUtoCaptureEstimate As Double
     Public Sub New()
-        plot = New Plot_OverTime()
         plot.dst1 = dst2
         plot.maxScale = 150
         plot.minScale = 0
@@ -255,11 +253,10 @@ End Class
 
 
 Public Class IMU_HostFrameTimes : Inherits VBparent
-    Public plot As Plot_OverTime
+    Public plot As New Plot_OverTime
     Public CPUInterval As Double
     Public HostInterruptDelayEstimate As Double
     Public Sub New()
-        plot = New Plot_OverTime()
         plot.dst1 = dst2
         plot.maxScale = 150
         plot.minScale = 0
@@ -340,10 +337,9 @@ End Class
 Public Class IMU_TotalDelay : Inherits VBparent
     Dim host As New IMU_HostFrameTimes
     Dim imu As New IMU_FrameTime
-    Dim plot As Plot_OverTime
+    Dim plot As New Plot_OverTime
     Dim kalman As New Kalman_Single
     Public Sub New()
-        plot = New Plot_OverTime()
         plot.dst1 = dst2
         plot.maxScale = 50
         plot.minScale = 0

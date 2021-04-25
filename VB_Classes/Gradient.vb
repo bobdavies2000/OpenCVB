@@ -86,10 +86,9 @@ End Class
 
 
 Public Class Gradient_StableDepth : Inherits VBparent
-    Dim motionSD As Motion_MinMaxDepth
+    Dim motionSD As New Motion_MinMaxDepth
     Dim basics As New Gradient_Basics
     Public Sub New()
-        motionSD = New Motion_MinMaxDepth
         label1 = "Stable depth input to Gradient"
         label2 = "Phase component of the gradient output"
         task.desc = "Use the stable depth as input to get a map of the phase of the gradient in the depth data."
