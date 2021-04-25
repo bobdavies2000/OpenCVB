@@ -162,9 +162,8 @@ End Class
 
 Public Class XPhoto_Inpaint_CPP : Inherits VBparent
     Dim xPhoto_Inpaint As IntPtr
-    Dim inpVB As xPhoto_Inpaint
+    Dim inpVB As New XPhoto_Inpaint
     Public Sub New()
-        inpVB = New xPhoto_Inpaint
         xPhoto_Inpaint = xPhoto_Inpaint_Open()
         task.desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
     End Sub

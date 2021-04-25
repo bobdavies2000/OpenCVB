@@ -149,13 +149,10 @@ Public Class SuperPixel_WithLineDetector : Inherits VBparent
         label2 = "Input to superpixel basics."
         task.desc = "Create SuperPixels using RGBDepth image."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         lines.Run(src)
         dst2 = lines.dst1
         pixels.Run(dst2)
         dst1 = pixels.dst1
     End Sub
 End Class
-
-
-

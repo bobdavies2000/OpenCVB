@@ -151,16 +151,13 @@ End Class
 
 
 Public Class Stabilizer_BasicsTest : Inherits VBparent
-    Dim random As Stabilizer_BasicsRandomInput
-    Dim stable As Stabilizer_Basics
+    Dim random As New Stabilizer_BasicsRandomInput
+    Dim stable As New Stabilizer_Basics
     Public Sub New()
-        stable = New Stabilizer_Basics
-        random = New Stabilizer_BasicsRandomInput
-
         label1 = "Unstable input to Stabilizer_Basics"
         task.desc = "Test the Stabilizer_Basics with random movement"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         random.Run(src)
         stable.Run(random.dst2.Clone)
@@ -188,7 +185,7 @@ Public Class Stabilizer_OpticalFlow : Inherits VBparent
         task.desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
         label1 = "Stabilized Image"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Dim vert_Border = borderCrop * src.Rows / src.Cols
         If task.frameCount = 0 Then
             errScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 1)
@@ -290,10 +287,8 @@ End Class
 
 Public Class Stabilizer_MotionDetect : Inherits VBparent
     Dim motion As New Motion_Basics
-    Dim stable As Stabilizer_Basics
+    Dim stable As New Stabilizer_Basics
     Public Sub New()
-        stable = New Stabilizer_Basics
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Offset of stable rectangle from each side in pixels", 0, 100, 30)

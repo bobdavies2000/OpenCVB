@@ -1,10 +1,9 @@
 Imports cv = OpenCvSharp
 Public Class Structured_Floor : Inherits VBparent
-    Public structD As Structured_SliceH
+    Public structD As New Structured_SliceH
     Dim kalman As New Kalman_VB_Basics
     Public floorYplane As Single
     Public Sub New()
-        structD = New Structured_SliceH()
         structD.cushionSlider.Value = 5 ' floor runs can use a thinner slice that ceilings...
 
         task.desc = "Find the floor plane"
@@ -44,12 +43,10 @@ End Class
 
 
 Public Class Structured_Ceiling : Inherits VBparent
-    Public structD As Structured_SliceH
+    Public structD As New Structured_SliceH
     Dim kalman As New Kalman_Basics
     Public Sub New()
         ReDim kalman.kInput(0)
-
-        structD = New Structured_SliceH()
         structD.cushionSlider.Value = 10
         task.desc = "Find the ceiling plane"
     End Sub
@@ -81,7 +78,7 @@ End Class
 
 Public Class Structured_MultiSliceH : Inherits VBparent
     Public side2D As New Histogram_SideData
-    Public structD As Structured_SliceH
+    Public structD As New Structured_SliceH
     Public sliceMask As cv.Mat
     Public Sub New()
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
@@ -124,9 +121,8 @@ End Class
 
 Public Class Structured_MultiSliceV : Inherits VBparent
     Public top2D As New Histogram_TopData
-    Public structD As Structured_SliceV
+    Public structD As New Structured_SliceV
     Public Sub New()
-        structD = New Structured_SliceV
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -169,11 +165,10 @@ End Class
 Public Class Structured_MultiSlice : Inherits VBparent
     Public top2D As New Histogram_TopData
     Public side2D As New Histogram_SideData
-    Dim struct As Structured_SliceV
+    Dim struct As New Structured_SliceV
     Public sliceMask As cv.Mat
     Public split() As cv.Mat
     Public Sub New()
-        struct = New Structured_SliceV()
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -227,12 +222,11 @@ End Class
 
 
 Public Class Structured_MultiSliceLines : Inherits VBparent
-    Dim multi As Structured_MultiSlice
+    Dim multi As New Structured_MultiSlice
     Public ldetect As New Line_Basics
     Public Sub New()
         Dim lenSlider = findSlider("Line length threshold in pixels")
         lenSlider.Value = lenSlider.Maximum ' don't need the yellow line...
-        multi = New Structured_MultiSlice()
         task.desc = "Detect lines in the multiSlice output"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -250,9 +244,8 @@ End Class
 
 
 Public Class Structured_MultiSlicePolygon : Inherits VBparent
-    Dim multi As Structured_MultiSlice
+    Dim multi As New Structured_MultiSlice
     Public Sub New()
-        multi = New Structured_MultiSlice()
         label1 = "Input to FindContours"
         label2 = "ApproxPolyDP 4-corner object from FindContours input"
 
@@ -291,12 +284,10 @@ End Class
 
 
 Public Class Structured_SliceXPlot : Inherits VBparent
-    Dim multi As Structured_MultiSlice
-    Dim structD As Structured_SliceV
+    Dim multi As New Structured_MultiSlice
+    Dim structD As New Structured_SliceV
     Dim cushionSlider As Windows.Forms.TrackBar
     Public Sub New()
-        multi = New Structured_MultiSlice()
-        structD = New Structured_SliceV()
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         cushionSlider.Value = cushionSlider.Maximum
         task.desc = "Find any plane around a peak value in the top-down histogram"
@@ -341,14 +332,12 @@ End Class
 
 
 Public Class Structured_LinearizeFloor : Inherits VBparent
-    Public floor As Structured_Floor
+    Public floor As New Structured_Floor
     Dim kalman As New Kalman_VB_Basics
     Public imuPointCloud As cv.Mat
     Public sliceMask As cv.Mat
     Public floorYPlane As Single
     Public Sub New()
-        floor = New Structured_Floor()
-
         If findfrm(caller + " CheckBox Options") Is Nothing Then
             check.Setup(caller, 3)
             check.Box(0).Text = "Smooth in X-direction"
@@ -468,11 +457,9 @@ Public Class Structured_SliceH : Inherits VBparent
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
     Public sliceMask As cv.Mat
-    Public sliceOptions As Structured_SliceOptions
+    Public sliceOptions As New Structured_SliceOptions
     Public yPlaneOffset As Integer
     Public Sub New()
-        sliceOptions = New Structured_SliceOptions
-
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         offsetSlider = findSlider("Standalone only horizontal slice offset")
 
@@ -523,14 +510,12 @@ End Class
 
 Public Class Structured_SliceV : Inherits VBparent
     Public top2D As New Histogram_TopData
-    Dim sideStruct As Structured_SliceH
+    Dim sideStruct As New Structured_SliceH
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
     Public sliceMask As cv.Mat
-    Public sliceOptions As Structured_SliceOptions
+    Public sliceOptions As New Structured_SliceOptions
     Public Sub New()
-        sliceOptions = New Structured_SliceOptions
-
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         offsetSlider = findSlider("Standalone only vertical slice offset")
         offsetSlider.Maximum = dst1.Width - 1
@@ -583,17 +568,14 @@ End Class
 
 Public Class Structured_SliceVStable : Inherits VBparent
     Public top2D As New Histogram_TopData
-    Dim structD As Structured_SliceV
+    Dim structD As New Structured_SliceV
     Public cushionSlider As Windows.Forms.TrackBar
     Public offsetSlider As Windows.Forms.TrackBar
     Public sliceMask As cv.Mat
     Public Sub New()
-        structD = New Structured_SliceV
-
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         offsetSlider = structD.offsetSlider
         offsetSlider.Value = dst1.Width / 2
-
         task.desc = "Find and isolate planes using the top view histogram data"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -633,14 +615,13 @@ End Class
 
 
 Public Class Structured_CenterSlice : Inherits VBparent
-    Dim vSlice As Structured_SliceV
+    Dim vSlice As New Structured_SliceV
     Dim line As New Line_Basics
     Public topPt As cv.Point2f, botPt As cv.Point2f
     Public slope As Single
     Public avgPt As cv.Point2f
     Public b As Integer
     Public Sub New()
-        vSlice = New Structured_SliceV
         label1 = "Center Slice in yellow"
         label2 = "White = SliceV output, Red Dot is avgPt"
         task.desc = "Find the vertical center line with accurate depth data.."
@@ -847,9 +828,8 @@ End Class
 
 
 Public Class Structured_Crosshairs : Inherits VBparent
-    Dim sCloud As Structured_Cloud
+    Dim sCloud As New Structured_Cloud
     Public Sub New()
-        sCloud = New Structured_Cloud
         task.desc = "Connect vertical and horizontal dots that are in the same column and row."
     End Sub
     Public Sub Run(src as cv.Mat)

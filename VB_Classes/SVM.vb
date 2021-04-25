@@ -103,15 +103,14 @@ End Class
 
 
 Public Class SVM_Basics : Inherits VBparent
-    Dim svmOptions As SVM_Options
+    Dim svmOptions As New SVM_Options
     Public Sub New()
-        svmOptions = New SVM_Options()
         task.desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
         label1 = "SVM_Basics input data"
         label2 = "Results - white line is ground truth"
     End Sub
 
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         svmOptions.Run(src) ' update any options specified in the interface.
         dst1 = svmOptions.dst1
 
@@ -152,9 +151,8 @@ End Class
 
 
 Public Class SVM_Random : Inherits VBparent
-    Dim svmOptions As SVM_Options
+    Dim svmOptions As New SVM_Options
     Public Sub New()
-        svmOptions = New SVM_Options()
         svmOptions.sliders.trackbar(1).Value = 15
 
         task.drawRect = New cv.Rect(task.color.Cols / 4, task.color.Rows / 4, task.color.Cols / 2, task.color.Rows / 2)
@@ -167,7 +165,7 @@ Public Class SVM_Random : Inherits VBparent
         label1 = "SVM Training data"
         task.desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         svmOptions.Run(src)
         dst1.SetTo(cv.Scalar.White)
         dst2.SetTo(cv.Scalar.White)
@@ -241,13 +239,12 @@ Public Class SVM_TestCase : Inherits VBparent
     Dim trainData(,) As Single = {{501, 50}, {255, 50}, {501, 255}, {50, 200}}
     Dim trainMat As cv.Mat
     Dim labelsMat As cv.Mat
-    Dim svmOptions As SVM_Options
+    Dim svmOptions As New SVM_Options
     Public Sub New()
 
         trainMat = New cv.Mat(4, 2, cv.MatType.CV_32F, trainData)
         labelsMat = New cv.Mat(4, 1, cv.MatType.CV_32SC1, labels)
 
-        svmOptions = New SVM_Options()
         svmOptions.sliders.trackbar(1).Value = 15
         svmOptions.radio.check(3).Enabled = False
 

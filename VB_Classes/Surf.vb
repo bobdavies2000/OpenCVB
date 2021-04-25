@@ -5,12 +5,10 @@ Imports CS_Classes
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
 Public Class Surf_Basics : Inherits VBparent
     Public CS_SurfBasics As New CS_SurfBasics
-    Dim fisheye As FishEye_Rectified
+    Dim fisheye As New FishEye_Rectified
     Public srcLeft As New cv.Mat
     Public srcRight As New cv.Mat
     Public Sub New()
-        fisheye = New FishEye_Rectified()
-
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 2)
             radio.check(0).Text = "Use BF Matcher"
@@ -45,11 +43,9 @@ End Class
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
 Public Class Surf_BasicsVB : Inherits VBparent
-    Dim surf As Surf_Basics
-    Dim fisheye As FishEye_Rectified
+    Dim surf As New Surf_Basics
+    Dim fisheye As New FishEye_Rectified
     Public Sub New()
-        fisheye = New FishEye_Rectified()
-        surf = New Surf_Basics()
         task.desc = "Use left and right views to match points in horizontal slices."
     End Sub
     Public Sub Run(src as cv.Mat)
@@ -65,9 +61,8 @@ End Class
 
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
 Public Class Surf_DrawMatchManual_CS : Inherits VBparent
-    Dim surf As Surf_Basics
+    Dim surf As New Surf_Basics
     Public Sub New()
-        surf = New Surf_Basics()
         surf.CS_SurfBasics.drawPoints = False
 
         If findfrm(caller + " Slider Options") Is Nothing Then

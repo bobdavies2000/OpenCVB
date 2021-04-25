@@ -15,10 +15,8 @@ End Class
 
 
 Public Class ImShow_WaitKey : Inherits VBparent
-    Dim vDemo As Voronoi_Basics
+    Dim vDemo As New Voronoi_Basics
     Public Sub New()
-        vDemo = New Voronoi_Basics()
-
         task.desc = "You can use the HighGUI WaitKey call to pause an algorithm and review output one frame at a time."
     End Sub
     Public Sub Run(src As cv.Mat)

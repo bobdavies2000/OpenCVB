@@ -38,16 +38,14 @@ End Class
 
 'https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
 Public Class Voronoi_Compare : Inherits VBparent
-    Dim basics As Voronoi_Basics
+    Dim basics As New Voronoi_Basics
     Public random As New Random_Basics
     Public Sub New()
-        basics = New Voronoi_Basics()
-
         label1 = "Brute Force method"
         label2 = "Ordered List method"
         task.desc = "C# implementations of the BruteForce and OrderedList Voronoi algorithms"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
 
         random.Run(Nothing)
         Dim points = New List(Of cv.Point)(random.Points)
@@ -86,9 +84,8 @@ End Module
 'https://www.codeproject.com/Articles/882739/Simple-approach-to-Voronoi-diagrams
 Public Class Voronoi_CPP : Inherits VBparent
     Dim vPtr As IntPtr
-    Dim vDemo As Voronoi_Basics
+    Dim vDemo As New Voronoi_Basics
     Public Sub New()
-        vDemo = New Voronoi_Basics()
         vPtr = VoronoiDemo_Open(task.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
         task.desc = "Use the C++ version of the Voronoi code"
     End Sub

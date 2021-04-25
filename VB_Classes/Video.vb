@@ -158,9 +158,8 @@ End Class
 
 
 Public Class Video_MinCircle : Inherits VBparent
-    Dim video As Video_MinRect
+    Dim video As New Video_MinRect
     Public Sub New()
-        video = New Video_MinRect()
         task.desc = "Find area of car outline - example of using MinEnclosingCircle"
     End Sub
     Public Sub Run(src as cv.Mat)

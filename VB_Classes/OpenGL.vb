@@ -363,12 +363,10 @@ End Class
 
 
 Public Class OpenGL_Floor : Inherits VBparent
-    Dim plane As Structured_LinearizeFloor
+    Dim plane As New Structured_LinearizeFloor
     Dim ogl As New OpenGL_Basics
     Public Sub New()
         ogl.OpenGLTitle = "OpenGL_Callbacks"
-
-        plane = New Structured_LinearizeFloor()
         task.desc = "Convert depth cloud floor to a plane and visualize it with OpenGL"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -395,10 +393,9 @@ End Class
 
 Public Class OpenGL_FloorPlane : Inherits VBparent
     Public ogl As New OpenGL_Basics
-    Public plane As Structured_LinearizeFloor
+    Public plane As New Structured_LinearizeFloor
     Public Sub New()
         ogl.OpenGLTitle = "OpenGL_FloorPlane"
-        plane = New Structured_LinearizeFloor()
         task.desc = "Show the floor in the pointcloud as a plane"
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -475,9 +472,8 @@ End Class
 
 Public Class OpenGL_DepthSliceH : Inherits VBparent
     Public ogl As New OpenGL_Basics
-    Dim slices As Structured_MultiSliceH
+    Dim slices As New Structured_MultiSliceH
     Public Sub New()
-        slices = New Structured_MultiSliceH()
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         task.desc = "View depth slices in 3D with OpenGL"
     End Sub
@@ -711,10 +707,9 @@ End Class
 
 
 Public Class OpenGL_Structured_PointCloud : Inherits VBparent
-    Dim sCloud As Structured_Cloud
+    Dim sCloud As New Structured_Cloud
     Dim ogl As New OpenGL_Callbacks
     Public Sub New()
-        sCloud = New Structured_Cloud
         label1 = "Structured cloud 32fC3 data"
         task.desc = "Visualize the Structured_Cloud"
     End Sub

@@ -3,7 +3,7 @@ Imports System.IO
 Imports System.Runtime.InteropServices
 ' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
 Public Class WarpModel_Basics : Inherits VBparent
-    Public warpInput As WarpModel_Input
+    Public warpInput As New WarpModel_Input
     Dim cPtr As IntPtr
     Public warpMatrix() As Single
     Public src2 As New cv.Mat
@@ -21,8 +21,6 @@ Public Class WarpModel_Basics : Inherits VBparent
             radio.check(3).Text = "Motion_Homography (even slower - Use CPP_Classes in Release Mode)"
             radio.check(0).Checked = True
         End If
-
-        warpInput = New WarpModel_Input()
 
         label1 = "Src image (align to this image)"
         label2 = "Src2 image aligned to src image"
@@ -196,10 +194,8 @@ End Module
 
 ' https://www.learnopencv.com/image-alignment-ecc-in-opencv-c-python/
 Public Class WarpModel_AlignImages : Inherits VBparent
-    Dim ecc As WarpModel_Basics
+    Dim ecc As New WarpModel_Basics
     Public Sub New()
-        ecc = New WarpModel_Basics()
-
         label1 = "Aligned image"
         task.desc = "Align the RGB inputs raw images from the Prokudin examples."
     End Sub
@@ -237,13 +233,11 @@ End Class
 
 
 'Public Class WarpModel_Image : Inherits VBparent
-'    Public wbasics As WarpModel_Basics
+'    Public wbasics as New WarpModel_Basics
 '    Dim sobel As New Edges_Sobel
 '    Public lastFrame As cv.Mat
 '    Dim match as New MatchTemplate_DrawRect
 '    Public Sub New()
-'        wbasics = New WarpModel_Basics
-
 '        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
 '        dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
 
@@ -313,10 +307,9 @@ End Class
 
 
 'Public Class WarpModel_Entropy : Inherits VBparent
-'    Dim warp As WarpModel_Image
+'    Dim warp as New WarpModel_Image
 '    Dim entropy as New Entropy_Highest
 '    Public Sub New()
-'        warp = New WarpModel_Image
 '        task.desc = "Find warp matrix for the whole image using just the segment with the highest entropy."
 '    End Sub
 '    Public Sub Run(src as cv.Mat)

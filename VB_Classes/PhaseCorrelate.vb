@@ -77,11 +77,9 @@ End Class
 
 
 Public Class PhaseCorrelate_BasicsTest : Inherits VBparent
-    Dim random As Stabilizer_BasicsRandomInput
+    Dim random As New Stabilizer_BasicsRandomInput
     Dim stable As New PhaseCorrelate_Basics
     Public Sub New()
-        random = New Stabilizer_BasicsRandomInput
-
         label1 = "Unstable input to PhaseCorrelate_Basics"
         label2 = "Stabilized output from Phase_Correlate_Basics"
         task.desc = "Test the PhaseCorrelate_Basics with random movement"

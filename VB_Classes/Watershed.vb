@@ -59,10 +59,9 @@ End Class
 
 
 Public Class Watershed_DepthReduction : Inherits VBparent
-    Dim watershed As Watershed_Basics
+    Dim watershed As New Watershed_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        watershed = New Watershed_Basics()
         watershed.UseCorners = True
         label2 = "Reduction input to WaterShed"
         task.desc = "Watershed the depth image using shadow, close, and far points."
@@ -85,9 +84,8 @@ End Class
 
 
 Public Class Watershed_DepthAuto : Inherits VBparent
-    Dim watershed As Watershed_Basics
+    Dim watershed As New Watershed_Basics
     Public Sub New()
-        watershed = New Watershed_Basics()
         watershed.UseCorners = True
         task.desc = "Watershed the four corners of the depth image."
     End Sub
