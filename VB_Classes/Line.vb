@@ -747,26 +747,65 @@ End Class
 
 
 
-'Public Class Line_Regions : Inherits VBparent
-'    Dim lines As New Line_TimeView
-'    Dim reduction As New Reduction_Basics
-'    Public Sub New()
-'        findRadio("Use simple reduction").Checked = True
-'        label1 = "Yellow > length threshold, red < length threshold"
-'        label2 = "Input image after reduction"
-'        task.desc = "Use the reduced rgb image as input to the line detector"
-'    End Sub
-'    Public Sub Run(src As cv.Mat)
-'        reduction.Run(src)
+Public Class Line_Regions : Inherits VBparent
+    Dim lines As New Line_TimeView
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        label1 = "Lines detected (below) Regions detected (right image)"
+        findRadio("Use bitwise reduction").Checked = True
+        findSlider("Bits to remove in bitwise reduction").Value = 5
+        task.desc = "Use the reduction values between lines to identify regions."
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        reduction.Run(src)
+        dst2 = reduction.dst1
 
-'        lDetect.Run(reduction.dst1)
-'        dst1 = lDetect.dst1
+        lines.Run(src)
 
-'        If task.cameraStable = False Then dst2.SetTo(0)
-'        For Each line In lDetect.sortlines
-'            Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
-'            Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-'            dst2.Line(p1, p2, cv.Scalar.Yellow, 1, task.lineType)
-'        Next
-'    End Sub
-'End Class
+        Const lineMatch = 254
+        dst2.SetTo(lineMatch, lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst1 = dst2.Clone
+
+        Dim indexer1 = dst1.GetGenericIndexer(Of Byte)()
+        Dim indexer2 = dst2.GetGenericIndexer(Of Byte)()
+        Dim nextB As Byte
+        Dim region As Byte
+        Dim noRegion = True
+
+        For x = 0 To dst1.Width - 1
+            noRegion = True
+            For y = 0 To dst1.Height - 1
+                nextB = indexer1(y, x)
+                If nextB = lineMatch Then
+                    noRegion = True
+                Else
+                    If noRegion Then
+                        region = nextB
+                        noRegion = False
+                    Else
+                        indexer1(y, x) = region
+                    End If
+                End If
+            Next
+        Next
+
+        For y = 0 To dst2.Height - 1
+            noRegion = True
+            For x = 0 To dst2.Width - 1
+                nextB = indexer2(y, x)
+                If nextB = lineMatch Then
+                    noRegion = True
+                Else
+                    If noRegion Then
+                        region = indexer1(y, x)
+                        noRegion = False
+                    Else
+                        indexer2(y, x) = region
+                    End If
+                End If
+            Next
+        Next
+
+        dst1 = lines.dst1
+    End Sub
+End Class
