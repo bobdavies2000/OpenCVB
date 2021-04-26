@@ -71,64 +71,6 @@ End Class
 
 
 
-Public Class Line_LeftRightOverlay : Inherits VBparent
-    Dim lrLines As New Line_LeftRightImages
-    Dim lines As New Line_Basics
-    Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 2)
-            radio.check(0).Text = "Show Left image lines and right image lines"
-            radio.check(1).Text = "Show Left image lines and RGB lines"
-            radio.check(0).Checked = True
-        End If
-
-        lines.lenSlider.Value = 50
-        dst2.SetTo(cv.Scalar.White)
-        label1 = "Left image of Line_LeftRightImages"
-        label2 = "Left image lines in red, right in blue"
-        task.desc = "Plot the points found for stable lines in the left and right images"
-    End Sub
-    Public Sub Run(src As cv.Mat)
-        Static lrRadio = findRadio("Show Left image lines and right image lines")
-        Dim showLeftRight = lrRadio.checked
-
-        lines.Run(src)
-
-        lrLines.Run(src)
-        dst1 = lrLines.dst1
-        Static saveLRradio = lrRadio.checked
-        If task.cameraStable = False Or saveLRradio <> lrRadio.checked Then
-            dst2.SetTo(cv.Scalar.White)
-            saveLRradio = lrRadio.checked
-        End If
-
-        For Each line In lrLines.leftLines.sortlines
-            Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
-            Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-            dst2.Line(p1, p2, cv.Scalar.Red, 1, task.lineType)
-        Next
-
-        If showLeftRight Then
-            For Each line In lrLines.rightLines.sortlines
-                Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
-                Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-                dst2.Line(p1, p2, cv.Scalar.Blue, 1, task.lineType)
-            Next
-        Else
-            For Each line In lines.sortlines
-                Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
-                Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-                dst2.Line(p1, p2, cv.Scalar.Blue, 1, task.lineType)
-            Next
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class Line_Reduction : Inherits VBparent
@@ -499,46 +441,6 @@ End Class
 
 
 
-
-Public Class Line_LeftRightImages : Inherits VBparent
-    Dim lrPalette As New Palette_LeftRightImages
-    Public leftLines As New Line_Basics
-    Public rightLines As New Line_Basics
-    Public Sub New()
-        findSlider("Line length threshold in pixels").Value = 1
-        label1 = "Left infrared image with lines detected"
-        label2 = "Right infrared image with lines detected"
-        task.desc = "Find lines in the infrared images"
-    End Sub
-    Public Sub Run(src As cv.Mat)
-        lrPalette.Run(src)
-
-        leftLines.Run(lrPalette.dst1)
-        If standalone Then dst1 = lrPalette.dst2 Else dst1.SetTo(0)
-
-        For Each line In leftLines.sortlines
-            Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
-            Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-            dst1.Line(p1, p2, cv.Scalar.Yellow, 1, task.lineType)
-        Next
-
-        rightLines.Run(lrPalette.dst2)
-        If standalone Then dst2 = lrPalette.dst2 Else dst2.SetTo(0)
-
-        For Each line In rightLines.sortlines
-            Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
-            Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-            dst2.Line(p1, p2, cv.Scalar.Yellow, 1, task.lineType)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Line_Sift_MT : Inherits VBparent
     Dim grid As New Thread_Grid
     Dim siftCS As New CS_SiftBasics
@@ -696,21 +598,21 @@ End Class
 
 
 Public Class Line_TimeView : Inherits VBparent
-    Dim pt1List() As List(Of cv.Point)
-    Dim pt2List() As List(Of cv.Point)
+    Public pt1List() As List(Of cv.Point)
+    Public pt2List() As List(Of cv.Point)
     Dim lines As New Line_Basics
     Public Sub New()
         task.desc = "Collect lines over time"
     End Sub
     Public Sub Run(src As cv.Mat)
-        Static countSlider = findSlider("Detect lines from the last X frames")
+        Static frameSlider = findSlider("Detect lines from the last X frames")
         Static lineCount As Integer
         Static lineIndex As Integer
 
         lines.Run(src)
 
-        If lineCount <> countSlider.value Then
-            lineCount = countSlider.value
+        If lineCount <> frameSlider.value Then
+            lineCount = frameSlider.value
             ReDim pt1List(lineCount - 1)
             ReDim pt2List(lineCount - 1)
             lineIndex = 0
@@ -753,7 +655,7 @@ Public Class Line_Regions : Inherits VBparent
     Public Sub New()
         label1 = "Lines detected (below) Regions detected (right image)"
         findRadio("Use bitwise reduction").Checked = True
-        findSlider("Bits to remove in bitwise reduction").Value = 5
+        findSlider("Bits to remove in bitwise reduction").Value = 6
         task.desc = "Use the reduction values between lines to identify regions."
     End Sub
     Public Sub Run(src As cv.Mat)
@@ -807,5 +709,51 @@ Public Class Line_Regions : Inherits VBparent
         Next
 
         dst1 = lines.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class Line_LeftRightImages : Inherits VBparent
+    Dim lrPalette As New Palette_LeftRightImages
+    Public leftLines As New Line_TimeView
+    Public rightLines As New Line_TimeView
+    Public rgbLines As New Line_TimeView
+    Public Sub New()
+        findSlider("Line length threshold in pixels").Value = 1
+
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Show lines from RGB in green"
+        End If
+
+        findSlider("Line length threshold in pixels").Value = 30
+        label1 = "Left image lines(red) with Right(blue)"
+        task.desc = "Find lines in the infrared images and overlay them in a single image"
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        Static rgbCheck = findCheckBox("Show lines from RGB in green")
+        lrPalette.Run(src)
+
+        If task.cameraStable = False Then dst1.SetTo(cv.Scalar.White)
+
+        leftLines.Run(lrPalette.dst1)
+        dst1.SetTo(cv.Scalar.White)
+        dst1.SetTo(cv.Scalar.Red, leftLines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
+        rightLines.Run(lrPalette.dst2)
+        dst1.SetTo(cv.Scalar.Blue, rightLines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
+        If rgbCheck.checked Then
+            rgbLines.Run(src)
+            dst1.SetTo(cv.Scalar.Green, rgbLines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        End If
     End Sub
 End Class

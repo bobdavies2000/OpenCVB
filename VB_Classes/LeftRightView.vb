@@ -1,35 +1,4 @@
 Imports cv = OpenCvSharp
-Public Class LeftRightView_Basics : Inherits VBparent
-    Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Infrared Brightness", 0, 255, 100)
-        End If
-        task.desc = "Show the left and right views from the 3D Camera"
-        Select Case task.parms.cameraName
-            Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
-                label1 = "Infrared Image"
-                label2 = "There is only one infrared image"
-                sliders.trackbar(0).Value = 0
-            Case Else
-                label1 = "Left Image"
-                label2 = "Right Image"
-        End Select
-    End Sub
-    Public Sub Run(src as cv.Mat)
-        dst1 = task.leftView
-        dst2 = task.rightView
-
-        dst1 += sliders.trackbar(0).Value
-        dst2 += sliders.trackbar(0).Value
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class LeftRightView_CompareRaw : Inherits VBparent
     Dim lrView As New LeftRightView_Basics
     Public Sub New()
@@ -146,7 +115,7 @@ End Class
 
 
 
-Public Class LeftRightView_BrightnessContrast : Inherits VBparent
+Public Class LeftRightView_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -159,14 +128,25 @@ Public Class LeftRightView_BrightnessContrast : Inherits VBparent
             End If
         End If
 
-        label1 = "Left View"
-        label2 = "Right View"
+        Select Case task.parms.cameraName
+            Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
+                label1 = "Infrared Image"
+                label2 = "There is only one infrared image"
+                sliders.trackbar(0).Value = 0
+            Case Else
+                label1 = "Left Image"
+                label2 = "Right Image"
+        End Select
+
         task.desc = "Enhance the left/right views with brightness and contrast."
     End Sub
     Public Sub Run(src As cv.Mat)
         Static alphaSlider = findSlider("Brightness Alpha (contrast)")
         Static betaSlider = findSlider("Brightness Beta (brightness)")
-        dst1 = task.leftView.ConvertScaleAbs(alphaSlider.Value / 500, betaSlider.Value)
-        dst2 = task.rightView.ConvertScaleAbs(alphaSlider.Value / 500, betaSlider.Value)
+        dst1 = (task.leftView * cv.Scalar.All(alphaSlider.Value / 500)).ToMat
+        dst2 = (task.rightView * cv.Scalar.All(alphaSlider.Value / 500)).ToMat
+
+        'dst1 += betaSlider.Value
+        'dst2 += betaSlider.Value
     End Sub
 End Class

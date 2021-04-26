@@ -366,11 +366,9 @@ Public Class OpenCVB
             If camera.color IsNot Nothing Then
                 If camera.color.width > 0 Then
                     SyncLock delegateLock
-                        Dim RGBDepth = camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height))
-                        Dim color = camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height))
                         Try
-                            cvext.BitmapConverter.ToBitmap(color, camPic(0).Image)
-                            cvext.BitmapConverter.ToBitmap(RGBDepth, camPic(1).Image)
+                            cvext.BitmapConverter.ToBitmap(camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)), camPic(0).Image)
+                            cvext.BitmapConverter.ToBitmap(camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height)), camPic(1).Image)
                         Catch ex As Exception
                             Console.WriteLine("OpenCVB: Error in campic_Paint: " + ex.Message)
                         End Try
