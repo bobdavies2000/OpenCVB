@@ -7,21 +7,12 @@ Public Class LeftRightView_Basics : Inherits VBparent
             sliders.setupTrackBar(1, "Brightness Beta (brightness)", -255, 255, -100)
         End If
         If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Then findSlider("Brightness Alpha (contrast)").Value = 1500
-
-        Select Case task.parms.cameraName
-            Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
-                label1 = "Infrared Image"
-                label2 = "There is only one infrared image"
-            Case Else
-                label1 = "Left Image"
-                label2 = "Right Image"
-        End Select
-
+        label2 = If(task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam, "No right image", "Right Image")
         task.desc = "Enhance the left/right views with brightness and contrast."
     End Sub
     Public Sub Run(src As cv.Mat)
-        Static alphaSlider = findSlider("Brightness Alpha (contrast)")
         Static betaSlider = findSlider("Brightness Beta (brightness)")
+        Static alphaSlider = findSlider("Brightness Alpha (contrast)")
         dst1 = (task.leftView * cv.Scalar.All(alphaSlider.Value / 500) + betaSlider.Value).ToMat
         dst2 = (task.rightView * cv.Scalar.All(alphaSlider.Value / 500) + betaSlider.Value).ToMat
     End Sub
