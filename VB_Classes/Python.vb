@@ -192,7 +192,8 @@ Public Class Python_Stream : Inherits VBparent
         If task.parms.externalPythonInvocation Then
             pythonReady = True ' python was already running and invoked OpenCVB.
         Else
-            pythonReady = StartPython("--MemMapLength=" + CStr(memMap.memMapbufferSize) + " --pipeName=" + pipeName)
+            Dim testallStr = " --TestAllRunning=" + If(task.parms.testAllRunning, "1", "0")
+            pythonReady = StartPython("--MemMapLength=" + CStr(memMap.memMapbufferSize) + testallStr + " --pipeName=" + pipeName)
         End If
         If pythonReady Then
             pipeOut.WaitForConnection()
