@@ -443,7 +443,7 @@ End Class
 
 
 Public Class Palette_LeftRightImages : Inherits VBparent
-    Dim lrViews As New LeftRightView_Basics
+    Dim lrViews As New LeftRight_Basics
     Public Sub New()
         task.desc = "Use a palette with the left image."
     End Sub

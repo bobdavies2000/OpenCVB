@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class LeftRightView_Basics : Inherits VBparent
+Public Class LeftRight_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -24,8 +24,8 @@ End Class
 
 
 
-Public Class LeftRightView_CompareRaw : Inherits VBparent
-    Dim lrView As New LeftRightView_Basics
+Public Class LeftRight_CompareRaw : Inherits VBparent
+    Dim lrView As New LeftRight_Basics
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -33,25 +33,19 @@ Public Class LeftRightView_CompareRaw : Inherits VBparent
             sliders.setupTrackBar(1, "Slice Height", 1, (dst1.Rows - 100) / 2, 30)
         End If
 
-        Select Case task.parms.cameraName
-            Case VB_Classes.ActiveTask.algParms.camNames.D435i, VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2,
-                label1 = "Left Image"
-                label2 = "Right Image"
-            Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
-                label1 = "Infrared Image"
-                label2 = "There is only one infrared image"
-                sliders.trackbar(0).Value = 0
-        End Select
-        lrView.sliders.Hide()
+        label1 = lrView.label1
+        label2 = lrView.label2
         task.desc = "Show slices of the left and right view next to each other for visual comparison"
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static startYSlider = findSlider("Slice Starting Y")
+        Static hSlider = findSlider("Slice Height")
         lrView.Run(src)
 
         dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, 0)
 
-        Dim sliceY = sliders.trackbar(1).Value
-        Dim slideHeight = sliders.trackbar(2).Value
+        Dim sliceY = startYSlider.Value
+        Dim slideHeight = hSlider.Value
         Dim r1 = New cv.Rect(0, sliceY, lrView.dst1.Width, slideHeight)
         Dim r2 = New cv.Rect(0, 100, lrView.dst1.Width, slideHeight)
         lrView.dst1(r1).CopyTo(dst1(r2))
@@ -66,8 +60,8 @@ End Class
 
 
 
-Public Class LeftRightView_Features : Inherits VBparent
-    Dim lrView As New LeftRightView_Basics
+Public Class LeftRight_Features : Inherits VBparent
+    Dim lrView As New LeftRight_Basics
     Dim features As New Features_GoodFeatures
     Public Sub New()
         task.desc = "Find GoodFeatures in the left and right depalettized infrared images"
@@ -94,8 +88,8 @@ End Class
 
 
 
-Public Class LeftRightView_Palettized : Inherits VBparent
-    Dim lrView As New LeftRightView_Basics
+Public Class LeftRight_Palettized : Inherits VBparent
+    Dim lrView As New LeftRight_Basics
     Public Sub New()
         task.desc = "Add color to the 8-bit infrared images."
         label1 = "Left Image"
@@ -115,8 +109,8 @@ End Class
 
 
 
-Public Class LeftRightView_BRISK : Inherits VBparent
-    Dim lrView As New LeftRightView_Basics
+Public Class LeftRight_BRISK : Inherits VBparent
+    Dim lrView As New LeftRight_Basics
     Dim brisk As New BRISK_Basics
     Public Sub New()
         brisk.sliders.trackbar(0).Value = 20
