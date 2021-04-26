@@ -727,8 +727,6 @@ Public Class Edges_SobelLRBinarized : Inherits VBparent
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         findSlider("Weight").Value = 75
-        findSlider("Infrared Brightness").Value = 1
-
         label1 = "Horizontal Sobel - Left View"
         label2 = "Horizontal Sobel - Right View"
         task.desc = "Isolate edges in the left and right views."
@@ -820,8 +818,6 @@ Public Class Edges_Matching : Inherits VBparent
     Dim red As New LeftRightView_Basics
     Dim grid As New Thread_Grid
     Public Sub New()
-        findSlider("Infrared Brightness").Value = 1
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Search depth in pixels", 1, 256, 256)
@@ -836,6 +832,7 @@ Public Class Edges_Matching : Inherits VBparent
             check.Box(1).Checked = True
         End If
 
+        If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Then findSlider("Brightness Alpha (contrast)").Value = 1500
         task.desc = "Match edges in the left and right views to determine distance"
     End Sub
     Public Sub Run(src As cv.Mat)

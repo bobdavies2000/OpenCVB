@@ -4,9 +4,8 @@ Public Class LeftRightView_CompareRaw : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Infrared Brightness", 0, 255, 100)
-            sliders.setupTrackBar(1, "Slice Starting Y", 0, 300, 100)
-            sliders.setupTrackBar(2, "Slice Height", 1, (dst1.Rows - 100) / 2, 30)
+            sliders.setupTrackBar(0, "Slice Starting Y", 0, 300, 100)
+            sliders.setupTrackBar(1, "Slice Height", 1, (dst1.Rows - 100) / 2, 30)
         End If
 
         Select Case task.parms.cameraName

@@ -445,7 +445,6 @@ End Class
 Public Class Palette_LeftRightImages : Inherits VBparent
     Dim lrViews As New LeftRightView_Basics
     Public Sub New()
-        ' findSlider("Infrared Brightness").Value = 0
         task.desc = "Use a palette with the left image."
     End Sub
     Public Sub Run(src as cv.Mat)
