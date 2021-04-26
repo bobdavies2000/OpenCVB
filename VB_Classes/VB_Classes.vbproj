@@ -243,7 +243,7 @@
     <Compile Include="HOG.vb" />
     <Compile Include="Hough.vb" />
     <Compile Include="IMU.vb" />
-    <Compile Include="LeftRightView.vb" />
+    <Compile Include="LeftRight.vb" />
     <Compile Include="InPaint.vb" />
     <Compile Include="Kalman.vb" />
     <Compile Include="KAZE.vb" />
