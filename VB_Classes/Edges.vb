@@ -832,7 +832,6 @@ Public Class Edges_Matching : Inherits VBparent
             check.Box(1).Checked = True
         End If
 
-        If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Then findSlider("Brightness Alpha (contrast)").Value = 1500
         task.desc = "Match edges in the left and right views to determine distance"
     End Sub
     Public Sub Run(src As cv.Mat)

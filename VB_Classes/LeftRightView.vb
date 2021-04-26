@@ -1,4 +1,38 @@
 Imports cv = OpenCvSharp
+Public Class LeftRightView_Basics : Inherits VBparent
+    Public Sub New()
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 10000, 5000)
+            sliders.setupTrackBar(1, "Brightness Beta (brightness)", -255, 255, -100)
+        End If
+        If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Then findSlider("Brightness Alpha (contrast)").Value = 1500
+
+        Select Case task.parms.cameraName
+            Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
+                label1 = "Infrared Image"
+                label2 = "There is only one infrared image"
+            Case Else
+                label1 = "Left Image"
+                label2 = "Right Image"
+        End Select
+
+        task.desc = "Enhance the left/right views with brightness and contrast."
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        Static alphaSlider = findSlider("Brightness Alpha (contrast)")
+        Static betaSlider = findSlider("Brightness Beta (brightness)")
+        dst1 = (task.leftView * cv.Scalar.All(alphaSlider.Value / 500) + betaSlider.Value).ToMat
+        dst2 = (task.rightView * cv.Scalar.All(alphaSlider.Value / 500) + betaSlider.Value).ToMat
+    End Sub
+End Class
+
+
+
+
+
+
+
 Public Class LeftRightView_CompareRaw : Inherits VBparent
     Dim lrView As New LeftRightView_Basics
     Public Sub New()
@@ -106,43 +140,5 @@ Public Class LeftRightView_BRISK : Inherits VBparent
 
         brisk.Run(lrView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
         dst1 = brisk.dst1
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class LeftRightView_Basics : Inherits VBparent
-    Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.OakDCamera Then
-                sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 10000, 1200)
-                sliders.setupTrackBar(1, "Brightness Beta (brightness)", -255, 255, -50)
-            Else
-                sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 10000, 5000)
-                sliders.setupTrackBar(1, "Brightness Beta (brightness)", -255, 255, -100)
-            End If
-        End If
-
-        Select Case task.parms.cameraName
-            Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
-                label1 = "Infrared Image"
-                label2 = "There is only one infrared image"
-                sliders.trackbar(0).Value = 0
-            Case Else
-                label1 = "Left Image"
-                label2 = "Right Image"
-        End Select
-
-        task.desc = "Enhance the left/right views with brightness and contrast."
-    End Sub
-    Public Sub Run(src As cv.Mat)
-        Static alphaSlider = findSlider("Brightness Alpha (contrast)")
-        Static betaSlider = findSlider("Brightness Beta (brightness)")
-        dst1 = (task.leftView * cv.Scalar.All(alphaSlider.Value / 500) + betaSlider.Value).ToMat
-        dst2 = (task.rightView * cv.Scalar.All(alphaSlider.Value / 500) + betaSlider.Value).ToMat
     End Sub
 End Class
