@@ -649,89 +649,6 @@ End Class
 
 
 
-Public Class Line_Regions : Inherits VBparent
-    Dim lines As New Line_TimeView
-    Dim reduction As New Reduction_Basics
-    Public Sub New()
-        findRadio("Use bitwise reduction").Checked = True
-        findSlider("Bits to remove in bitwise reduction").Value = 6
-
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
-            check.Box(0).Text = "Show intermediate vertical step results."
-            check.Box(1).Text = "Run horizontal without vertical step"
-        End If
-
-        task.desc = "Use the reduction values between lines to identify regions."
-    End Sub
-    Public Sub Run(src As cv.Mat)
-        Static verticalCheck = findCheckBox("Show intermediate vertical step results")
-        Static noVertCheck = findCheckBox("Run horizontal without vertical step")
-        reduction.Run(src)
-        dst1 = reduction.dst1
-        dst2 = dst1.Clone
-
-        lines.Run(src)
-
-        Const lineMatch = 254
-        Dim lineMask = lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1.SetTo(lineMatch, lineMask)
-        dst2.SetTo(lineMatch, lineMask)
-
-        Dim indexer1 = dst1.GetGenericIndexer(Of Byte)()
-        Dim indexer2 = dst2.GetGenericIndexer(Of Byte)()
-        Dim nextB As Byte
-        Dim region As Byte
-        Dim noRegion = True
-
-        If noVertCheck.checked = False Then
-            For x = 0 To dst1.Width - 1
-                noRegion = True
-                For y = 0 To dst1.Height - 1
-                    nextB = indexer1(y, x)
-                    If nextB = lineMatch Then
-                        noRegion = True
-                    Else
-                        If noRegion Then
-                            region = nextB
-                            noRegion = False
-                        Else
-                            indexer1(y, x) = region
-                        End If
-                    End If
-                Next
-            Next
-        End If
-
-        For y = 0 To dst2.Height - 1
-            noRegion = True
-            For x = 0 To dst2.Width - 1
-                nextB = indexer2(y, x)
-                If nextB = lineMatch Then
-                    noRegion = True
-                Else
-                    If noRegion Then
-                        region = indexer1(y, x)
-                        noRegion = False
-                    Else
-                        indexer2(y, x) = region
-                    End If
-                End If
-            Next
-        Next
-        label1 = If(verticalCheck.checked, "Intermediate result of vertical step", "Lines detected (below) Regions detected (right image)")
-        If noVertCheck.checked And verticalCheck.checked Then label1 = "Input to vertical step"
-        If verticalCheck.checked = False Then dst1 = lines.dst1.Clone
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 
 
 Public Class Line_LeftRightImages : Inherits VBparent
@@ -768,5 +685,123 @@ Public Class Line_LeftRightImages : Inherits VBparent
             rgbLines.Run(src)
             dst1.SetTo(cv.Scalar.Green, rgbLines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Line_RegionsVB : Inherits VBparent
+    Dim lines As New Line_TimeView
+    Dim reduction As New Reduction_Basics
+    Const lineMatch = 254
+    Public Sub New()
+        findRadio("Use bitwise reduction").Checked = True
+        findSlider("Bits to remove in bitwise reduction").Value = 6
+
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 2)
+            check.Box(0).Text = "Show intermediate vertical step results."
+            check.Box(1).Text = "Run horizontal without vertical step"
+        End If
+
+        task.desc = "Use the reduction values between lines to identify regions."
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        Static verticalCheck = findCheckBox("Show intermediate vertical step results")
+        Static noVertCheck = findCheckBox("Run horizontal without vertical step")
+        reduction.Run(src)
+        dst1 = reduction.dst1
+        dst2 = dst1.Clone
+
+        lines.Run(src)
+
+        Dim lineMask = lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1.SetTo(lineMatch, lineMask)
+        dst2.SetTo(lineMatch, lineMask)
+
+        Dim nextB As Byte
+        Dim region As Integer = -1
+        Dim indexer1 = dst1.GetGenericIndexer(Of Byte)()
+        Dim indexer2 = dst2.GetGenericIndexer(Of Byte)()
+        If noVertCheck.checked = False Then
+            For x = 0 To dst1.Width - 1
+                region = -1
+                For y = 0 To dst1.Height - 1
+                    nextB = indexer1(y, x)
+                    If nextB = lineMatch Then
+                        region = -1
+                    Else
+                        If region = -1 Then
+                            region = nextB
+                        Else
+                            indexer1(y, x) = region
+                        End If
+                    End If
+                Next
+            Next
+        End If
+
+        For y = 0 To dst2.Height - 1
+            region = -1
+            For x = 0 To dst2.Width - 1
+                nextB = indexer2(y, x)
+                If nextB = lineMatch Then
+                    region = -1
+                Else
+                    If region = -1 Then
+                        If y = 0 Then
+                            region = indexer1(y, x)
+                        Else
+                            Dim vals As New List(Of Integer)
+                            Dim counts As New List(Of Integer)
+                            For i = x To dst2.Width - 1
+                                Dim nextVal = indexer1(y - 1, i)
+                                If nextVal = lineMatch Then Exit For
+                                If vals.Contains(nextVal) Then
+                                    counts(vals.IndexOf(nextVal)) += 1
+                                Else
+                                    vals.Add(nextVal)
+                                    counts.Add(1)
+                                End If
+                                Dim maxVal = counts.Max
+                                region = vals(counts.IndexOf(maxVal))
+                            Next
+                        End If
+                    Else
+                        indexer2(y, x) = region
+                    End If
+                End If
+            Next
+        Next
+        label1 = If(verticalCheck.checked, "Intermediate result of vertical step", "Lines detected (below) Regions detected (right image)")
+        If noVertCheck.checked And verticalCheck.checked Then label1 = "Input to vertical step"
+        If verticalCheck.checked = False Then dst1 = lines.dst1.Clone
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_LUT : Inherits VBparent
+    Dim lines As New Line_Basics
+    Dim lut As New LUT_Basics
+    Public Sub New()
+        task.desc = "Compare the lines produced with the RGB and those produced after LUT"
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        lines.Run(src)
+        dst1 = lines.dst1
+
+        lut.Run(src)
+        lines.Run(lut.dst1)
+        dst2 = lines.dst1
     End Sub
 End Class

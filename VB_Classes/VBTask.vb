@@ -103,6 +103,7 @@ Public Class ActiveTask : Implements IDisposable
     Dim algoList As New algorithmList
     Public algorithmObject As Object
     Public frameCount As Integer = 0
+    Public paused As Boolean
 
     Public color As cv.Mat
     Public RGBDepth As cv.Mat
@@ -329,13 +330,17 @@ Public Class ActiveTask : Implements IDisposable
         aOptions = New OptionsContainer
         If task.algName.EndsWith(".py") = False Then
             aOptions.Show()
-            task.callTrace.Add("OptionsCommon_Histogram") ' so calltrace is not nothing on initial call...
-            viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
-            inrange = algoList.createAlgorithm("OptionsCommon")
-            IMUStable = algoList.createAlgorithm("IMU_IscameraStable")
-            IMULevel = algoList.createAlgorithm("IMU_IsCameraLevel")
-            PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
-            viewOptions.standalone = False
+            If task.paused Then
+                PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
+            Else
+                task.callTrace.Add("OptionsCommon_Histogram") ' so calltrace is not nothing on initial call...
+                viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
+                inrange = algoList.createAlgorithm("OptionsCommon")
+                IMUStable = algoList.createAlgorithm("IMU_IscameraStable")
+                IMULevel = algoList.createAlgorithm("IMU_IsCameraLevel")
+                PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
+                viewOptions.standalone = False
+            End If
         End If
 
         task.callTrace.Clear()

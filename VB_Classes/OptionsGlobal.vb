@@ -5,7 +5,7 @@ Public Class OptionsGlobal
     Public scheme As cv.ColormapTypes = 0
     Public schemeName As String
     Dim mapNames() As String = {"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
-                                   "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "TwilightShifted", "Viridis", "Winter"}
+                                   "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter"}
     Private Sub MaxRange_Scroll(sender As Object, e As EventArgs) Handles MaxRange.Scroll
         maxCount.Text = CStr(MaxRange.Value)
     End Sub

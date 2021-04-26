@@ -7,7 +7,6 @@ Public Class Pixel_Viewer : Inherits VBparent
         task.desc = "Display pixels under the cursor"
     End Sub
     Public Sub Run(src as cv.Mat)
-
         dst1 = Choose(task.mousePicTag + 1, task.color, task.RGBDepth, task.algorithmObject.dst1, task.algorithmObject.dst2)
 
         Dim displayType = -1 ' default is 8uc3

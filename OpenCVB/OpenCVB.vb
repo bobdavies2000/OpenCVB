@@ -1211,7 +1211,20 @@ Public Class OpenCVB
                 If saveAlgorithmName <> algName And frameCount > minFrames Then Exit Sub ' 
                 SyncLock bufferLock
                     If saveWorkingRes <> workingRes And frameCount > minFrames Then Exit Sub ' switching camera resolution means stopping the current algorithm
-                    If taskNewImages And pauseAlgorithmThread = False Then
+                    If ignoreMouseMove = False Then
+                        task.mousePoint = mousePoint
+                        task.mousePicTag = mousePicTag
+                        task.mouseClickFlag = mouseClickFlag
+                        If mouseClickFlag Then task.mouseClickPoint = mousePoint
+                        mouseClickFlag = False
+                    End If
+
+                    If pauseAlgorithmThread Then
+                        task.paused = True
+                        Exit While ' this is useful because the pixelviewer can be used if paused.
+                    End If
+
+                    If taskNewImages Then
                         ' bring the data into the algorithm task.
                         task.color = camera.color.clone
                         task.RGBDepth = camera.RGBDepth.clone
@@ -1252,13 +1265,7 @@ Public Class OpenCVB
                             BothFirstAndLastReady = False
                         End If
 
-                        If ignoreMouseMove = False Then
-                            task.mousePoint = mousePoint
-                            task.mousePicTag = mousePicTag
-                            task.mouseClickFlag = mouseClickFlag
-                            If mouseClickFlag Then task.mouseClickPoint = mousePoint
-                            mouseClickFlag = False
-                        End If
+
                         taskNewImages = False
                         Exit While
                     End If
