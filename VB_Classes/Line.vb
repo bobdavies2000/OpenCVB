@@ -656,17 +656,26 @@ Public Class Line_Regions : Inherits VBparent
         label1 = "Lines detected (below) Regions detected (right image)"
         findRadio("Use bitwise reduction").Checked = True
         findSlider("Bits to remove in bitwise reduction").Value = 6
+
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 1)
+            check.Box(0).Text = "Show intermediate vertical step results."
+        End If
+
         task.desc = "Use the reduction values between lines to identify regions."
     End Sub
     Public Sub Run(src As cv.Mat)
+        Static verticalCheck = findCheckBox("Show intermediate vertical step results")
         reduction.Run(src)
-        dst2 = reduction.dst1
+        dst1 = reduction.dst1
+        dst2 = dst1.Clone
 
         lines.Run(src)
 
         Const lineMatch = 254
-        dst2.SetTo(lineMatch, lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        dst1 = dst2.Clone
+        Dim lineMask = lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1.SetTo(lineMatch, lineMask)
+        dst2.SetTo(lineMatch, lineMask)
 
         Dim indexer1 = dst1.GetGenericIndexer(Of Byte)()
         Dim indexer2 = dst2.GetGenericIndexer(Of Byte)()
@@ -707,8 +716,7 @@ Public Class Line_Regions : Inherits VBparent
                 End If
             Next
         Next
-
-        dst1 = lines.dst1
+        If verticalCheck.checked = False Then dst1 = lines.dst1.Clone
     End Sub
 End Class
 

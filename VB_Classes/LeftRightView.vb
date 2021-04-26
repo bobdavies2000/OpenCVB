@@ -143,10 +143,7 @@ Public Class LeftRightView_Basics : Inherits VBparent
     Public Sub Run(src As cv.Mat)
         Static alphaSlider = findSlider("Brightness Alpha (contrast)")
         Static betaSlider = findSlider("Brightness Beta (brightness)")
-        dst1 = (task.leftView * cv.Scalar.All(alphaSlider.Value / 500)).ToMat
-        dst2 = (task.rightView * cv.Scalar.All(alphaSlider.Value / 500)).ToMat
-
-        'dst1 += betaSlider.Value
-        'dst2 += betaSlider.Value
+        dst1 = (task.leftView * cv.Scalar.All(alphaSlider.Value / 500) + betaSlider.Value).ToMat
+        dst2 = (task.rightView * cv.Scalar.All(alphaSlider.Value / 500) + betaSlider.Value).ToMat
     End Sub
 End Class
