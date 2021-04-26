@@ -537,6 +537,7 @@ Public Class OpenCVB
         ' switching cameras automatically restarts the algorithm.
         With AvailableAlgorithms
             .SelectedIndex = If(.SelectedIndex < .Items.Count - 1, .SelectedIndex + 1, 0)
+            If .Text = "PythonDebug.py" Then .SelectedIndex += 1 ' skip the pythondebug - might invoke the PyStream...
         End With
 
         If AvailableAlgorithms.Text = saveSelectedAlgorithm And AlgorithmTestAllCount > 0 Then
