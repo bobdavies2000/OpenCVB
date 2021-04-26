@@ -54,8 +54,6 @@ Module ML__Exports
         Return depth32f
     End Function
 End Module
-
-
 Public Class ML_FillRGBDepth_MT : Inherits VBparent
     Dim shadow As New Depth_Holes
     Dim grid As New Thread_Grid
@@ -84,6 +82,9 @@ Public Class ML_FillRGBDepth_MT : Inherits VBparent
 End Class
 
 
+
+
+
 Public Class ML_FillRGBDepth : Inherits VBparent
     Dim shadow As New Depth_Holes
     Dim colorizer As New Depth_Colorizer_CPP
@@ -107,6 +108,9 @@ Public Class ML_FillRGBDepth : Inherits VBparent
         dst2 = colorizer.dst1
     End Sub
 End Class
+
+
+
 
 
 Public Class ML_DepthFromColor_MT : Inherits VBparent
@@ -179,6 +183,7 @@ Public Class ML_DepthFromColor : Inherits VBparent
         End If
         resized = New Resize_Percentage()
         resized.sliders.trackbar(0).Value = 2 ' 2% of the image.
+
 
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."

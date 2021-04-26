@@ -653,19 +653,20 @@ Public Class Line_Regions : Inherits VBparent
     Dim lines As New Line_TimeView
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        label1 = "Lines detected (below) Regions detected (right image)"
         findRadio("Use bitwise reduction").Checked = True
         findSlider("Bits to remove in bitwise reduction").Value = 6
 
         If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+            check.Setup(caller, 2)
             check.Box(0).Text = "Show intermediate vertical step results."
+            check.Box(1).Text = "Run horizontal without vertical step"
         End If
 
         task.desc = "Use the reduction values between lines to identify regions."
     End Sub
     Public Sub Run(src As cv.Mat)
         Static verticalCheck = findCheckBox("Show intermediate vertical step results")
+        Static noVertCheck = findCheckBox("Run horizontal without vertical step")
         reduction.Run(src)
         dst1 = reduction.dst1
         dst2 = dst1.Clone
@@ -683,22 +684,24 @@ Public Class Line_Regions : Inherits VBparent
         Dim region As Byte
         Dim noRegion = True
 
-        For x = 0 To dst1.Width - 1
-            noRegion = True
-            For y = 0 To dst1.Height - 1
-                nextB = indexer1(y, x)
-                If nextB = lineMatch Then
-                    noRegion = True
-                Else
-                    If noRegion Then
-                        region = nextB
-                        noRegion = False
+        If noVertCheck.checked = False Then
+            For x = 0 To dst1.Width - 1
+                noRegion = True
+                For y = 0 To dst1.Height - 1
+                    nextB = indexer1(y, x)
+                    If nextB = lineMatch Then
+                        noRegion = True
                     Else
-                        indexer1(y, x) = region
+                        If noRegion Then
+                            region = nextB
+                            noRegion = False
+                        Else
+                            indexer1(y, x) = region
+                        End If
                     End If
-                End If
+                Next
             Next
-        Next
+        End If
 
         For y = 0 To dst2.Height - 1
             noRegion = True
@@ -716,6 +719,8 @@ Public Class Line_Regions : Inherits VBparent
                 End If
             Next
         Next
+        label1 = If(verticalCheck.checked, "Intermediate result of vertical step", "Lines detected (below) Regions detected (right image)")
+        If noVertCheck.checked And verticalCheck.checked Then label1 = "Input to vertical step"
         If verticalCheck.checked = False Then dst1 = lines.dst1.Clone
     End Sub
 End Class
