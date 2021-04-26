@@ -619,7 +619,7 @@ End Class
 
 
 Public Class Edges_SobelLR : Inherits VBparent
-    Dim red As New LeftRight_Basics
+    Dim red As New LeftRightView_Basics
     Dim sobel As New Edges_Sobel
     Public Sub New()
         sobel.sliders.trackbar(0).Value = 5
@@ -722,7 +722,7 @@ End Class
 
 
 Public Class Edges_SobelLRBinarized : Inherits VBparent
-    Dim red As New LeftRight_Basics
+    Dim red As New LeftRightView_Basics
     Dim edges As New Edges_BinarizedSobel
     Dim addw As New AddWeighted_Basics
     Public Sub New()
@@ -815,7 +815,7 @@ End Class
 
 Public Class Edges_Matching : Inherits VBparent
     Dim match As New MatchTemplate_Basics
-    Dim red As New LeftRight_Basics
+    Dim red As New LeftRightView_Basics
     Dim grid As New Thread_Grid
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then

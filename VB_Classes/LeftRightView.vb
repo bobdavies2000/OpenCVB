@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class LeftRight_Basics : Inherits VBparent
+Public Class LeftRightView_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -24,8 +24,8 @@ End Class
 
 
 
-Public Class LeftRight_CompareRaw : Inherits VBparent
-    Dim lrView As New LeftRight_Basics
+Public Class LeftRightView_CompareRaw : Inherits VBparent
+    Dim lrView As New LeftRightView_Basics
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
@@ -60,8 +60,8 @@ End Class
 
 
 
-Public Class LeftRight_Features : Inherits VBparent
-    Dim lrView As New LeftRight_Basics
+Public Class LeftRightView_Features : Inherits VBparent
+    Dim lrView As New LeftRightView_Basics
     Dim features As New Features_GoodFeatures
     Public Sub New()
         task.desc = "Find GoodFeatures in the left and right depalettized infrared images"
@@ -88,8 +88,8 @@ End Class
 
 
 
-Public Class LeftRight_Palettized : Inherits VBparent
-    Dim lrView As New LeftRight_Basics
+Public Class LeftRightView_Palettized : Inherits VBparent
+    Dim lrView As New LeftRightView_Basics
     Public Sub New()
         task.desc = "Add color to the 8-bit infrared images."
         label1 = "Left Image"
@@ -109,8 +109,8 @@ End Class
 
 
 
-Public Class LeftRight_BRISK : Inherits VBparent
-    Dim lrView As New LeftRight_Basics
+Public Class LeftRightView_BRISK : Inherits VBparent
+    Dim lrView As New LeftRightView_Basics
     Dim brisk As New BRISK_Basics
     Public Sub New()
         brisk.sliders.trackbar(0).Value = 20

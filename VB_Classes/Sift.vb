@@ -4,7 +4,7 @@ Imports CS_Classes
 ' https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_feature2d/py_surf_intro/py_surf_intro.html
 Public Class Sift_Basics : Inherits VBparent
     Dim siftCS As New CS_SiftBasics
-    Dim lrView As New LeftRight_Basics
+    Dim lrView As New LeftRightView_Basics
     Public Sub New()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 2)
@@ -41,7 +41,7 @@ Public Class Sift_Basics_MT : Inherits VBparent
     Dim grid As New Thread_Grid
     Dim siftCS As New CS_SiftBasics
     Dim siftBasics As New Sift_Basics
-    Dim lrView As New LeftRight_Basics
+    Dim lrView As New LeftRightView_Basics
     Dim numPointSlider As System.Windows.Forms.TrackBar
     Public Sub New()
         Dim gridWidthSlider = findSlider("ThreadGrid Width")
