@@ -69,7 +69,7 @@ End Class
 
 
 Public Class AddWeighted_InfraRed : Inherits VBparent
-    Dim infra As New LeftRightView_Basics
+    Dim infra As New LeftRight_Basics
     Dim addw As New AddWeighted_Basics
     Dim src2 As New cv.Mat
     Public Sub New()

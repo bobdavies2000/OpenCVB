@@ -54,7 +54,7 @@ End Class
 
 
 Public Class KAZE_Match_CS : Inherits VBparent
-    Dim red As New LeftRightView_Basics
+    Dim red As New LeftRight_Basics
     Dim CS_Kaze As New CS_Classes.Kaze_Sample
     Public Sub New()
         red.sliders.trackbar(0).Value = 45
