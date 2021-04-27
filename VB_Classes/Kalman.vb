@@ -153,7 +153,7 @@ Public Class Kalman_Compare : Inherits VBparent
         End If
 
         plot.plotData = src.Mean()
-        plot.Run(src)
+        plot.Run(Nothing)
         dst1 = plot.dst1
 
         For i = 0 To kalman.Count - 1
@@ -164,7 +164,7 @@ Public Class Kalman_Compare : Inherits VBparent
         kPlot.maxScale = plot.maxScale ' keep the scale the same for the side-by-side plots.
         kPlot.minScale = plot.minScale
         kPlot.plotData = New cv.Scalar(kalman(0).stateResult, kalman(1).stateResult, kalman(2).stateResult)
-        kPlot.Run(src)
+        kplot.Run(Nothing)
         dst2 = kPlot.dst1
     End Sub
 End Class
@@ -451,7 +451,7 @@ Public Class Kalman_Single : Inherits VBparent
         stateResult = kf.Correct(measurement).Get(Of Single)(0, 0)
         If standalone Or task.intermediateReview = caller Then
             plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
-            plot.Run(src)
+            plot.Run(Nothing)
             dst2 = plot.dst1
             label1 = "Mean of the grayscale image is predicted"
             label2 = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
@@ -709,7 +709,7 @@ Public Class Kalman_VB_Basics : Inherits VBparent
 
         If standalone Or task.intermediateReview = caller Then
             plot.plotData = New cv.Scalar(kOutput, kInput, kAverage)
-            plot.Run(src)
+            plot.Run(Nothing)
         End If
     End Sub
 End Class

@@ -805,3 +805,53 @@ Public Class Line_LUT : Inherits VBparent
         dst2 = lines.dst1
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Line_Longest : Inherits VBparent
+    Dim lines As New Line_Basics
+    Dim plot As New Plot_OverTime
+    Public Sub New()
+        plot.minScale = 0
+        plot.plotCount = 1
+        task.desc = "Find the longest line in RGB and use it to validate depth"
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        lines.Run(src)
+        dst1 = src
+
+        Dim pt1 = lines.pt1List.ElementAt(0)
+        Dim pt2 = lines.pt2List.ElementAt(0)
+
+        dst1.Line(pt1, pt2, cv.Scalar.Yellow, task.lineSize, task.lineType)
+
+        Dim sq = 3
+        Dim x = Math.Min(pt1.X, pt2.X)
+        Dim y = If(x = pt1.X, pt1.Y, pt2.Y)
+        Dim maskRect = New cv.Rect(Math.Max(x, 0), Math.Max(y, 0), Math.Abs(pt1.X - pt2.X) + 2 * sq, Math.Abs(pt1.Y - pt2.Y) + 2 * sq)
+        Dim mask = New cv.Mat(maskRect.Height, maskRect.Width, cv.MatType.CV_8U, 0)
+        dst1.Rectangle(maskRect, cv.Scalar.White, task.lineSize, task.lineType)
+        Dim lineMask = dst1(maskRect).InRange(cv.Scalar.Yellow, cv.Scalar.Yellow)
+
+        Dim depth1 = task.depth32f(maskRect).Mean(lineMask).Item(0) / 1000
+        task.trueText("Depth = " + Format(depth1, "#0.0") + "m", (pt1.X + pt2.X) / 2 + 30, (pt1.Y + pt2.Y) / 2)
+
+        Static lastXvalues As New List(Of Single)
+        lastXvalues.add(depth1)
+        Dim meanVal = lastXvalues.Average()
+        If lastXvalues.count > 50 Then lastXvalues.removeat(0)
+        label2 = "Mean (horizontal line) = " + Format(meanVal, "#0.0") + "m with " + CStr(lastXvalues.Count) + " samples."
+
+        plot.plotData = New cv.Scalar(depth1, 0, 0)
+        plot.maxScale = task.maxDepth / 1000
+        plot.Run(Nothing)
+        dst2 = plot.dst1.Clone
+
+        Dim yMean = (1 - meanVal / plot.maxScale) * dst1.Height
+        dst2.Line(New cv.Point(0, yMean), New cv.Point(dst2.Width, yMean), cv.Scalar.Black, 1)
+    End Sub
+End Class

@@ -41,9 +41,9 @@ reused in other algorithms so variations can be easily built.
 A full installation can take about 30-50 minutes using the 1-step
 “PrepareTree.bat” file discussed below. But there is no obligation to install
 needed libraries just to read the code for an algorithm. Open the OpenCVB.sln
-file after download and inspect the code in the VB_Classes, CPP_Classes, or
-CS_Classes. VB_Classes also contains all the Python examples. All algorithms are
-automatically provided with color, depth, point cloud, and IMU data.
+file after download and inspect the code in the C++, C\#, VB.Net or Python. Each
+algorithm gets a standardized presentation of all the data from any of the RGBZ
+cameras listed below.
 
 However, a full installation is recommended. The algorithms may fit in one page
 of code and reading the code is one way to review them but understanding the
@@ -220,7 +220,8 @@ Support for some optional cameras can be added.
         (luxonis.com)](https://docs.luxonis.com/en/latest/pages/api/#python-api)
 
 Edit “Cameras/CameraDefines.hpp” file to add OpenCVB’s support for StereoLabs
-Zed 2 or Mynt Eye D 1000 support. No changes are required for Oak-D.
+Zed 2 or Mynt Eye D 1000 support. No changes are required for Oak-D but Oak-D
+support is turned off because it is missing the IMU support from the vendor.
 
 Trouble-Shooting New Install
 ============================

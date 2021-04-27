@@ -132,7 +132,7 @@ Public Class MiniPC_RotateAngle : Inherits VBparent
             resetCheck.Checked = True
         End If
         plot.plotData = New cv.Scalar(metric)
-        plot.Run(src)
+        plot.Run(Nothing)
         dst2 = plot.dst1
         mats.mat(3) = peak.histogram.ConvertScaleAbs(255)
 

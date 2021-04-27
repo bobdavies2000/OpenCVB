@@ -22,7 +22,7 @@ Public Class Plot_Basics : Inherits VBparent
             plot.srcX(i) = i
             plot.srcY(i) = hist.histRaw(0).Get(Of Single)(i, 0)
         Next
-        plot.Run(src)
+        plot.Run(Nothing)
         dst2 = plot.dst1
         label1 = hist.label1
     End Sub
@@ -118,12 +118,12 @@ Public Class Plot_OverTime : Inherits VBparent
         Dim pixelWidth = CInt(widthSlider.Value)
 
         If task.frameCount = 0 Then dst1.SetTo(0)
-        If columnIndex + pixelWidth >= src.Width Then
-            dst1.ColRange(columnIndex, src.Width).SetTo(backColor)
+        If columnIndex + pixelWidth >= dst1.Width Then
+            dst1.ColRange(columnIndex, dst1.Width).SetTo(backColor)
             columnIndex = 0
         End If
         dst1.ColRange(columnIndex, columnIndex + pixelWidth).SetTo(backColor)
-        If standalone Or task.intermediateReview = caller Then plotData = src.Mean()
+        If standalone Or task.intermediateReview = caller Then plotData = task.color.Mean()
 
         For i = 0 To plotCount - 1
             If Math.Floor(plotData.Item(i)) < minScale Or Math.Ceiling(plotData.Item(i)) > maxScale Then
@@ -158,7 +158,7 @@ Public Class Plot_OverTime : Inherits VBparent
         Dim ellipseSize = New cv.Size(pixelWidth, pixelHeight * 2)
         For i = 0 To plotCount - 1
             Dim y = 1 - (plotData.Item(i) - minScale) / (maxScale - minScale)
-            y *= src.Height - 1
+            y *= dst1.Height - 1
             Dim c As New cv.Point(columnIndex - pixelWidth, y - pixelHeight)
             Dim rect = New cv.Rect(c.X, c.Y, pixelWidth * 2, pixelHeight * 2)
             Select Case i
@@ -273,23 +273,23 @@ End Module
 
 
 Public Class Plot_Depth : Inherits VBparent
-    Dim plot As New Plot_Basics_CPP
+    Dim plotDepth As New Plot_Basics_CPP
     Dim hist As New Histogram_Depth
     Public Sub New()
         task.desc = "Show depth using OpenCV's plot format with variable bins."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         hist.Run(src)
-        ReDim plot.srcX(hist.plotHist.hist.Rows - 1)
-        ReDim plot.srcY(hist.plotHist.hist.Rows - 1)
-        For i = 0 To plot.srcX.Length - 1
-            plot.srcX(i) = i * (task.maxDepth - task.minDepth) / plot.srcX.Length
-            plot.srcY(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
+        ReDim plotDepth.srcX(hist.plotHist.hist.Rows - 1)
+        ReDim plotDepth.srcY(hist.plotHist.hist.Rows - 1)
+        For i = 0 To plotDepth.srcX.Length - 1
+            plotDepth.srcX(i) = i * (task.maxDepth - task.minDepth) / plotDepth.srcX.Length
+            plotDepth.srcY(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
         Next
-        plot.Run(src)
-        dst1 = plot.dst1
+        plotDepth.Run(Nothing)
+        dst1 = plotDepth.dst1
 
-        label1 = plot.label1
+        label1 = plotDepth.label1
         Dim Split = Regex.Split(label1, "\W+")
         Dim lineCount = CInt(Split(4) / 1000)
         If lineCount > 0 Then

@@ -38,7 +38,6 @@ End Class
 
 'https://docs.opencv.org/3.4/d7/d4d/tutorial_py_thresholding.html
 Public Class Binarize_OTSU : Inherits VBparent
-    Dim plotHist As New Plot_Histogram
     Dim binarize As Binarize_Basics
     Public Sub New()
         binarize = New Binarize_Basics()

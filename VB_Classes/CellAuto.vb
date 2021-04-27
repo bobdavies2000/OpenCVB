@@ -226,7 +226,7 @@ Public Class CellAuto_LifePopulation : Inherits VBparent
         dst1 = game.dst1
 
         plot.plotData = New cv.Scalar(game.population, 0, 0)
-        plot.Run(src)
+        plot.Run(Nothing)
         dst2 = plot.dst1
     End Sub
 End Class

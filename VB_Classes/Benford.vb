@@ -14,7 +14,7 @@ Imports System.Text.RegularExpressions
 Public Class Benford_Basics : Inherits VBparent
     Public expectedDistribution(10 - 1) As Single
     Public counts(expectedDistribution.Count - 1) As Single
-    Dim plot As New Plot_Histogram
+    Dim plotHist As New Plot_Histogram
     Dim addW As New AddWeighted_Basics
     Dim use99 As Boolean
     Public Sub New()
@@ -68,17 +68,17 @@ Public Class Benford_Basics : Inherits VBparent
             Next
         End If
 
-        plot.hist = New cv.Mat(counts.Length, 1, cv.MatType.CV_32F, counts)
-        plot.Run(src)
-        dst2 = plot.dst1.Clone
+        plotHist.hist = New cv.Mat(counts.Length, 1, cv.MatType.CV_32F, counts)
+        plotHist.Run(src)
+        dst2 = plotHist.dst1.Clone
         For i = 0 To counts.Count - 1
             counts(i) = src.Rows * expectedDistribution(i)
         Next
 
-        plot.hist = New cv.Mat(counts.Length, 1, cv.MatType.CV_32F, counts)
-        plot.Run(src)
+        plotHist.hist = New cv.Mat(counts.Length, 1, cv.MatType.CV_32F, counts)
+        plotHist.Run(src)
 
-        cv.Cv2.BitwiseNot(plot.dst1, addW.src2)
+        cv.Cv2.BitwiseNot(plotHist.dst1, addW.src2)
         addW.Run(dst2)
         dst1 = addW.dst1
 

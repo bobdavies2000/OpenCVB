@@ -44,12 +44,12 @@ Partial Class OptionsGlobal
         Me.PaletteGroup = New System.Windows.Forms.GroupBox()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.CameraOptions = New System.Windows.Forms.GroupBox()
-        Me.MotionThresholdValue = New System.Windows.Forms.Label()
-        Me.IMUmotionSlider = New System.Windows.Forms.TrackBar()
-        Me.Label4 = New System.Windows.Forms.Label()
         Me.LevelThresholdValue = New System.Windows.Forms.Label()
         Me.IMUlevelSlider = New System.Windows.Forms.TrackBar()
         Me.Label2 = New System.Windows.Forms.Label()
+        Me.MotionThresholdValue = New System.Windows.Forms.Label()
+        Me.IMUmotionSlider = New System.Windows.Forms.TrackBar()
+        Me.Label4 = New System.Windows.Forms.Label()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.MaxRange, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MinRange, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -59,8 +59,8 @@ Partial Class OptionsGlobal
         Me.GroupBox2.SuspendLayout()
         Me.PaletteGroup.SuspendLayout()
         Me.CameraOptions.SuspendLayout()
-        CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.IMUlevelSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'MinMaxDepth
@@ -103,9 +103,9 @@ Partial Class OptionsGlobal
         Me.InrangeMaxLabel.AutoSize = True
         Me.InrangeMaxLabel.Location = New System.Drawing.Point(18, 112)
         Me.InrangeMaxLabel.Name = "InrangeMaxLabel"
-        Me.InrangeMaxLabel.Size = New System.Drawing.Size(188, 20)
+        Me.InrangeMaxLabel.Size = New System.Drawing.Size(192, 20)
         Me.InrangeMaxLabel.TabIndex = 3
-        Me.InrangeMaxLabel.Text = "InRange Min Depth (mm)"
+        Me.InrangeMaxLabel.Text = "InRange Max Depth (mm)"
         '
         'minCount
         '
@@ -288,34 +288,6 @@ Partial Class OptionsGlobal
         Me.CameraOptions.TabStop = False
         Me.CameraOptions.Text = "Camera Settings"
         '
-        'MotionThresholdValue
-        '
-        Me.MotionThresholdValue.AutoSize = True
-        Me.MotionThresholdValue.Location = New System.Drawing.Point(722, 32)
-        Me.MotionThresholdValue.Name = "MotionThresholdValue"
-        Me.MotionThresholdValue.Size = New System.Drawing.Size(127, 20)
-        Me.MotionThresholdValue.TabIndex = 5
-        Me.MotionThresholdValue.Text = "MotionThreshold"
-        '
-        'IMUmotionSlider
-        '
-        Me.IMUmotionSlider.Location = New System.Drawing.Point(198, 25)
-        Me.IMUmotionSlider.Maximum = 20
-        Me.IMUmotionSlider.Name = "IMUmotionSlider"
-        Me.IMUmotionSlider.Size = New System.Drawing.Size(505, 69)
-        Me.IMUmotionSlider.TabIndex = 4
-        Me.IMUmotionSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.IMUmotionSlider.Value = 1
-        '
-        'Label4
-        '
-        Me.Label4.Location = New System.Drawing.Point(4, 25)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(196, 44)
-        Me.Label4.TabIndex = 3
-        Me.Label4.Text = "Motion Threshold in IMU (radians X100)"
-        Me.Label4.TextAlign = System.Drawing.ContentAlignment.TopRight
-        '
         'LevelThresholdValue
         '
         Me.LevelThresholdValue.AutoSize = True
@@ -344,6 +316,34 @@ Partial Class OptionsGlobal
         Me.Label2.Text = "Level Threshold in IMU (degrees X10)"
         Me.Label2.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
+        'MotionThresholdValue
+        '
+        Me.MotionThresholdValue.AutoSize = True
+        Me.MotionThresholdValue.Location = New System.Drawing.Point(722, 32)
+        Me.MotionThresholdValue.Name = "MotionThresholdValue"
+        Me.MotionThresholdValue.Size = New System.Drawing.Size(127, 20)
+        Me.MotionThresholdValue.TabIndex = 5
+        Me.MotionThresholdValue.Text = "MotionThreshold"
+        '
+        'IMUmotionSlider
+        '
+        Me.IMUmotionSlider.Location = New System.Drawing.Point(198, 25)
+        Me.IMUmotionSlider.Maximum = 20
+        Me.IMUmotionSlider.Name = "IMUmotionSlider"
+        Me.IMUmotionSlider.Size = New System.Drawing.Size(505, 69)
+        Me.IMUmotionSlider.TabIndex = 4
+        Me.IMUmotionSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.IMUmotionSlider.Value = 1
+        '
+        'Label4
+        '
+        Me.Label4.Location = New System.Drawing.Point(4, 25)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(196, 44)
+        Me.Label4.TabIndex = 3
+        Me.Label4.Text = "Motion Threshold in IMU (radians X100)"
+        Me.Label4.TextAlign = System.Drawing.ContentAlignment.TopRight
+        '
         'OptionsGlobal
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -370,8 +370,8 @@ Partial Class OptionsGlobal
         Me.PaletteGroup.ResumeLayout(False)
         Me.CameraOptions.ResumeLayout(False)
         Me.CameraOptions.PerformLayout()
-        CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.IMUlevelSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
