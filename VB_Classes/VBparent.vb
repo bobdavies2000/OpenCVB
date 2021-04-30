@@ -155,23 +155,23 @@ Public Class VBparent : Implements IDisposable
         Return outMat
     End Function
     Public Sub Dispose() Implements IDisposable.Dispose
-        On Error Resume Next
-        Dim proc = Process.GetProcessesByName("python")
-        For i = 0 To proc.Count - 1
-            ' the Oak-D interface runs as a Python script - so don't kill that one.  No one else can run with high priority.
-            If proc(i).HasExited = False Then
-                If proc(i).PriorityClass <> ProcessPriorityClass.High Then proc(i).Kill()
-            End If
-        Next
-        If pyStream IsNot Nothing Then pyStream.Dispose()
-        Dim type As Type = algorithm.GetType()
-        If type.GetMethod("Close") IsNot Nothing Then algorithm.Close()  ' Close any unmanaged classes...
+        If aOptions IsNot Nothing Then aOptions.Close()
+        If task.pythonTaskName.EndsWith(".py") Then
+            Dim proc = Process.GetProcessesByName("python")
+            For i = 0 To proc.Count - 1
+                ' the Oak-D interface runs as a Python script - so don't kill that one.  No one else can run with high priority.
+                If proc(i).HasExited = False Then
+                    If proc(i).PriorityClass <> ProcessPriorityClass.High Then proc(i).Kill()
+                End If
+            Next
+            If pyStream IsNot Nothing Then pyStream.Dispose()
+        End If
+        If caller.EndsWith("_CPP") Then algorithm.Close()  ' Close any unmanaged classes...
         sliders.Dispose()
         check.Dispose()
         radio.Dispose()
         radio1.Dispose()
         combo.Dispose()
-        If aOptions IsNot Nothing Then aOptions.Close()
     End Sub
 
     Public Const QUAD0 = 0 ' there are 4 images to the user interface when using Mat_4to1.

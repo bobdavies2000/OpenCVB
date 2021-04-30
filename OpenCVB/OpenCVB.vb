@@ -9,7 +9,6 @@ Imports cvext = OpenCvSharp.Extensions
 Imports System.Management
 Module opencv_module
     Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
-    Public delegateLock As New Mutex(True, "delegateLock") ' this is a lock to coordinate paint and the camera task
     Public callTraceLock As New Mutex(True, "callTraceLock")
     Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
 End Module
@@ -365,7 +364,7 @@ Public Class OpenCVB
             paintNewImages = False
             If camera.color IsNot Nothing Then
                 If camera.color.width > 0 Then
-                    SyncLock delegateLock
+                    SyncLock bufferLock
                         Try
                             cvext.BitmapConverter.ToBitmap(camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)), camPic(0).Image)
                             cvext.BitmapConverter.ToBitmap(camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height)), camPic(1).Image)
@@ -577,6 +576,24 @@ Public Class OpenCVB
 
         TestAllTimer.Enabled = True
     End Sub
+    Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
+        MsgBox("The objective is to solve many small computer vision problems " + vbCrLf +
+               "and do so in a way that enables any of the solutions to be reused." + vbCrLf +
+               "The result is a toolkit for solving ever bigger and more difficult" + vbCrLf +
+               "problems.  The philosophy behind this approach is that human vision" + vbCrLf +
+               "is not computationally intensive but is built on many almost trivial" + vbCrLf +
+               "algorithms working together." + vbCrLf)
+    End Sub
+    Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        Me.Visible = False
+        activeCameraIndex = -1
+        saveAlgorithmName = "" ' this will close the current algorithm.
+
+        SaveSetting("OpenCVB", "TreeButton", "TreeButton", TreeButton.Checked)
+        SaveSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", PixelViewerButton.Checked)
+        saveLayout()
+        Application.ExitThread()
+    End Sub
     Private Sub startCamera()
         activeCameraIndex = optionsForm.cameraIndex
         paintNewImages = False
@@ -590,10 +607,10 @@ Public Class OpenCVB
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub
     Private Sub CameraTask()
-        On Error Resume Next
+        Static delegateX As New delegateEvent(AddressOf raiseEventCamera)
         Dim currentCameraIndex = -1
         Dim changeResolution As Boolean
-        While (1)
+        While 1
             SyncLock bufferLock
                 If camera IsNot Nothing Then
                     If camera.width <> workingRes.Width Then changeResolution = True
@@ -614,10 +631,14 @@ Public Class OpenCVB
             paintNewImages = True ' trigger the paint 
             taskNewImages = True ' trigger the algorithm task
 
-            If saveAlgorithmName <> "" Then ' if the main thread is trying to queue up another algorithm, we don't need to raise this event.
-                Static delegateX As New delegateEvent(AddressOf raiseEventCamera)
-                Me.Invoke(delegateX)
-            End If
+            ' if the main thread is trying to queue up another algorithm, we don't need to raise this event.
+            Try
+                Invoke(delegateX)
+            Catch ex As ObjectDisposedException
+                Exit Sub
+            End Try
+
+            If activeCameraIndex < 0 Then Exit Sub
 
             GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
 
@@ -1012,7 +1033,7 @@ Public Class OpenCVB
         saveLayout()
     End Sub
     Public Sub raiseEventCamera()
-        SyncLock delegateLock
+        SyncLock bufferLock
             For i = 0 To camPic.Length - 1
                 camPic(i).Refresh()
             Next
@@ -1055,24 +1076,6 @@ Public Class OpenCVB
         Dim details = " Display at " + CStr(camPic(0).Width) + "x" + CStr(camPic(0).Height) + ", Working Res. = " + If(optionsForm.resolution640.Checked, "640x480", "1280x720")
         picLabels(0) = "RGB:" + details
         picLabels(1) = "Depth:" + details
-    End Sub
-    Private Sub Exit_Click(sender As Object, e As EventArgs) Handles ExitCall.Click
-        SaveSetting("OpenCVB", "TreeButton", "TreeButton", TreeButton.Checked)
-        SaveSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", PixelViewerButton.Checked)
-        activeCameraIndex = -1 ' this will close the camera task
-        saveAlgorithmName = "" ' this will close the current algorithm.
-        saveLayout()
-    End Sub
-    Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
-        MsgBox("The objective is to solve many small computer vision problems " + vbCrLf +
-               "and do so in a way that enables any of the solutions to be reused." + vbCrLf +
-               "The result is a toolkit for solving ever bigger and more difficult" + vbCrLf +
-               "problems.  The philosophy behind this approach is that human vision" + vbCrLf +
-               "is not computationally intensive but is built on many almost trivial" + vbCrLf +
-               "algorithms working together." + vbCrLf)
-    End Sub
-    Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        Exit_Click(sender, e)
     End Sub
     Private Sub SnapShotButton_Click(sender As Object, e As EventArgs) Handles SnapShotButton.Click
         Dim img As New Bitmap(Me.Width, Me.Height)
