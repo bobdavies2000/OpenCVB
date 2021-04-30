@@ -166,7 +166,8 @@ Public Class VBparent : Implements IDisposable
             Next
             If pyStream IsNot Nothing Then pyStream.Dispose()
         End If
-        If caller.EndsWith("_CPP") Then algorithm.Close()  ' Close any unmanaged classes...
+        Dim type As Type = algorithm.GetType()
+        If type.GetMethod("Close") IsNot Nothing Then algorithm.Close()  ' Close any unmanaged classes...
         sliders.Dispose()
         check.Dispose()
         radio.Dispose()
