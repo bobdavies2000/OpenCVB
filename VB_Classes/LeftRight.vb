@@ -10,7 +10,7 @@ Public Class LeftRight_Basics : Inherits VBparent
         label2 = If(task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam, "No right image", "Right Image")
         task.desc = "Enhance the left/right views with brightness and contrast."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static betaSlider = findSlider("Brightness Beta (brightness)")
         Static alphaSlider = findSlider("Brightness Alpha (contrast)")
         dst1 = (task.leftView * cv.Scalar.All(alphaSlider.Value / 500) + betaSlider.Value).ToMat
@@ -37,7 +37,7 @@ Public Class LeftRight_CompareRaw : Inherits VBparent
         label2 = lrView.label2
         task.desc = "Show slices of the left and right view next to each other for visual comparison"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static startYSlider = findSlider("Slice Starting Y")
         Static hSlider = findSlider("Slice Height")
         lrView.Run(src)
@@ -68,7 +68,7 @@ Public Class LeftRight_Features : Inherits VBparent
         label1 = "Left Image"
         label2 = "Right Image"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         lrView.Run(src)
 
         features.Run(lrView.dst2)
@@ -95,7 +95,7 @@ Public Class LeftRight_Palettized : Inherits VBparent
         label1 = "Left Image"
         label2 = "Right Image"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         lrView.Run(src)
 
         task.palette.Run(lrView.dst1)
@@ -118,7 +118,7 @@ Public Class LeftRight_BRISK : Inherits VBparent
         label2 = "Infrared Right Image"
         task.desc = "Add color to the 8-bit infrared images."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         lrView.Run(src)
         brisk.Run(lrView.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
         dst2 = brisk.dst1

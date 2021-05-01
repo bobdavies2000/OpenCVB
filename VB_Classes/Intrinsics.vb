@@ -4,7 +4,7 @@ Public Class IntrinsicsLeft_Basics : Inherits VBparent
         task.desc = "Show the depth camera intrinsicsLeft."
         label2 = "ppx/ppy location"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.parms.intrinsicsLeft.coeffs Is Nothing Then
             task.trueText("This camera is missing the intrinsics.")
             Exit Sub

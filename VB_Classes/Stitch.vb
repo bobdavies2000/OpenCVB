@@ -10,7 +10,7 @@ Public Class Stitch_Basics : Inherits VBparent
         End If
         task.desc = "Stitch together random parts of a color image."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim mats As New List(Of cv.Mat)
         Dim imageCount = sliders.trackbar(0).Value
         Dim width = sliders.trackbar(1).Value

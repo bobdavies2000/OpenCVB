@@ -36,7 +36,7 @@ Public Class Retina_Basics_CPP : Inherits VBparent
         label2 = "Retina Magno"
         task.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If check.Box(1).Checked Then
             check.Box(1).Checked = False
             Dim fileinfo = New FileInfo(CurDir() + "/RetinaDefaultParameters.xml")
@@ -96,7 +96,7 @@ Public Class Retina_Depth : Inherits VBparent
         label1 = "Last result || current result"
         label2 = "Current depth motion result"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         retina.Run(task.RGBDepth)
         dst2 = retina.dst2
         Static lastMotion As New cv.Mat

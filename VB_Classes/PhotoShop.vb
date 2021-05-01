@@ -12,7 +12,7 @@ Public Class PhotoShop_Clahe : Inherits VBparent
         label2 = "CLAHE Result"
         task.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = src
         Dim claheObj = cv.Cv2.CreateCLAHE()
@@ -31,7 +31,7 @@ Public Class PhotoShop_Hue : Inherits VBparent
         label2 = "Saturation"
         task.desc = "Show hue (Result1) and Saturation (Result2)."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim imghsv = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         cv.Cv2.CvtColor(src, imghsv, cv.ColorConversionCodes.RGB2HSV)
         Dim hsv_planes = imghsv.Split()
@@ -55,7 +55,7 @@ Public Class PhotoShop_AlphaBeta : Inherits VBparent
             sliders.setupTrackBar(1, "Brightness Beta (brightness)", -100, 100, 0)
         End If
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dst1 = src.ConvertScaleAbs(sliders.trackbar(0).Value / 500, sliders.trackbar(1).Value)
     End Sub
 End Class
@@ -76,7 +76,7 @@ Public Class PhotoShop_Gamma : Inherits VBparent
             sliders.setupTrackBar(0, "Brightness Gamma correction", 0, 200, 100)
         End If
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static lastGamma As Integer = -1
         If lastGamma <> sliders.trackbar(0).Value Then
             lastGamma = sliders.trackbar(0).Value
@@ -120,7 +120,7 @@ Public Class PhotoShop_WhiteBalance_CPP : Inherits VBparent
         label2 = "White pixels were altered from the original"
         task.desc = "Automate getting the right white balance"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static thresholdSlider = findSlider("White balance threshold X100")
         Dim thresholdVal As Single = thresholdSlider.Value / 100
 
@@ -158,7 +158,7 @@ Public Class PhotoShop_WhiteBalance : Inherits VBparent
         label1 = "Image with auto white balance"
         task.desc = "Automate getting the right white balance"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static thresholdSlider = findSlider("White balance threshold X100")
         Dim thresholdVal = thresholdSlider.Value / 100
 
@@ -212,7 +212,7 @@ Public Class PhotoShop_ChangeMask : Inherits VBparent
     Public Sub New()
         task.desc = "Create a mask for the changed pixels after white balance"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static countdown = 120
         Static whiteFlag As Boolean
         If countdown = 0 Then
@@ -250,7 +250,7 @@ Public Class PhotoShop_PlotHist : Inherits VBparent
     Public Sub New()
         task.desc = "Plot the histogram of the before and after white balancing"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         hist1.Run(src)
         mat2to1.mat(0) = hist1.dst1
 
@@ -279,7 +279,7 @@ Public Class PhotoShop_Sepia : Inherits VBparent
     Public Sub New()
         task.desc = "Create a sepia image"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2RGB)
         Dim tMatrix = New cv.Mat(3, 3, cv.MatType.CV_64F, {{0.393, 0.769, 0.189}, {0.349, 0.686, 0.168}, {0.272, 0.534, 0.131}})
         dst1 = dst1.Transform(tMatrix).Threshold(255, 255, cv.ThresholdTypes.Trunc)
@@ -324,7 +324,7 @@ Public Class PhotoShop_Emboss : Inherits VBparent
         Next
         Return kernel
     End Function
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static sizeSlider = findSlider("Emboss Kernel Size")
         Dim kernel = kernelGenerator(sizeSlider.value)
 
@@ -373,7 +373,7 @@ Public Class PhotoShop_EmbossAll : Inherits VBparent
         label2 = "bottom left, bottom right, top left, top right"
         task.desc = "Emboss using all the directions provided"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static threshSlider = findSlider("Emboss threshold")
         Dim kernel = emboss.kernelGenerator(sizeSlider.Value)
 
@@ -444,7 +444,7 @@ Public Class PhotoShop_DuoTone : Inherits VBparent
 
         task.desc = "Create a DuoTone image"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static expSlider = findSlider("DuoTone Exponent")
         Dim exp = 1 + expSlider.value / 100
         Dim expMat As New cv.Mat(256, 1, cv.MatType.CV_8U)
@@ -499,7 +499,7 @@ Public Class PhotoShop_Brightness : Inherits VBparent
         label1 = "RGB straight to HSV"
         task.desc = "Implement the traditional brightness effect"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static brightnessSlider = findSlider("Brightness Value")
         Dim brightness As Single = brightnessSlider.value / 100
 
@@ -536,7 +536,7 @@ Public Class PhotoShop_UnsharpMask : Inherits VBparent
         task.desc = "Sharpen an image - Painterly Effect"
         label2 = "Unsharp mask (difference from Blur)"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim blurred As New cv.Mat
         Dim sigma As Double = sliders.trackbar(0).Value / 100
         Dim threshold As Double = sliders.trackbar(1).Value
@@ -566,7 +566,7 @@ Public Class PhotoShop_SharpenDetail : Inherits VBparent
         End If
         task.desc = "Enhance detail on an image - Painterly Effect"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         cv.Cv2.DetailEnhance(src, dst1, sigma_s, sigma_r)
@@ -589,7 +589,7 @@ Public Class PhotoShop_SharpenStylize : Inherits VBparent
         End If
         task.desc = "Stylize an image - Painterly Effect"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         cv.Cv2.Stylization(src, dst1, sigma_s, sigma_r)
@@ -614,7 +614,7 @@ Public Class PhotoShop_Pencil_Basics : Inherits VBparent
 
         task.desc = "Convert image to a pencil sketch - Painterly Effect"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         Dim shadowFactor = sliders.trackbar(2).Value / 1000
@@ -644,7 +644,7 @@ Public Class PhotoShop_Pencil_Manual : Inherits VBparent
         End If
         task.desc = "Break down the process of converting an image to a sketch - Painterly Effect"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim grayinv As New cv.Mat
         cv.Cv2.BitwiseNot(src, grayinv)

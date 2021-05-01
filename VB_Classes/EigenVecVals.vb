@@ -6,7 +6,7 @@ Public Class EigenVecVals_Basics : Inherits VBparent
         label1 = "EigenVec (solution)"
         label2 = "Relationship between Eigen Vec and Vals"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim a() As Double = {1.96, -6.49, -0.47, -7.2, -0.65,
                              -6.49, 3.8, -6.39, 1.5, -6.34,
                              -0.47, -6.39, 4.17, -1.51, 2.67,

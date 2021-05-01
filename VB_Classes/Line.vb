@@ -30,7 +30,7 @@ Public Class Line_Basics : Inherits VBparent
         label2 = "Lines detected since camera motion threshold"
         task.desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static thicknessSlider = findSlider("Line thickness")
         dst1 = src.Clone
         If dst1.Channels <> 3 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -90,7 +90,7 @@ Public Class Line_Reduction : Inherits VBparent
         label2 = "Input image after reduction"
         task.desc = "Use the reduced rgb image as input to the line detector"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         reduction.Run(src)
 
         lDetect.Run(reduction.dst1)
@@ -117,7 +117,7 @@ Public Class Line_InterceptsUI : Inherits VBparent
         label1 = "Use mouse in right image to highlight lines"
         task.desc = "An alternative way to highlight line segments with common slope"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static redRadio = findRadio("Show Top intercepts")
         Static greenRadio = findRadio("Show Bottom intercepts")
         Static yellowRadio = findRadio("Show Right intercepts")
@@ -196,7 +196,7 @@ Public Class Line_ConfirmedDepth : Inherits VBparent
         label2 = "Lines in RGB confirmed in the point cloud"
         task.desc = "Find the RGB lines and confirm they are present in the cloud data."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static thickSlider = findSlider("Line thickness")
         Dim thickness = thickSlider.value
 
@@ -272,7 +272,7 @@ Public Class Line_Vertical : Inherits VBparent
 
         task.desc = "Find all the vertical lines in the IMU rectified cloud"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static thickSlider = findSlider("Line thickness")
         Static errorSlider = findSlider("Error tolerance when measuring vertical lines in 3D (mm's)")
         toleranceInMMs = errorSlider.value / 1000
@@ -305,7 +305,7 @@ Public Class Line_Horizontal : Inherits VBparent
     Public Sub New()
         task.desc = "Find all the horizontal lines in the IMU rectified cloud"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dst1 = src.Clone
 
         vLines.Run(src)
@@ -384,7 +384,7 @@ Public Class Line_Intercepts : Inherits VBparent
             If radio.checked Then hightLightIntercept(pt, intercepts, i, dst)
         Next
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static thickSlider = findSlider("Line thickness")
         Static searchSlider = findSlider("x- and y-intercept search range in pixels")
         thickNess = thickSlider.value
@@ -500,7 +500,7 @@ Public Class Line_NearestPoint : Inherits VBparent
         Dim nearest = findNearestPt(p1, p2, pt)
         Return nearest.DistanceTo(pt)
     End Function
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod 30 = 0 And standalone Then
             pt = getPoint()
             p1 = getPoint()
@@ -530,7 +530,7 @@ Public Class Line_SideView : Inherits VBparent
         label2 = "Lines found in the RGB image view"
         task.desc = "Line in image are projected into the depth image"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         lines.Run(src)
         dst2 = lines.dst2
@@ -571,7 +571,7 @@ Public Class Line_LeftRightImages : Inherits VBparent
         label1 = "Left image lines(red) with Right(blue)"
         task.desc = "Find lines in the infrared images and overlay them in a single image"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static rgbCheck = findCheckBox("Show lines from RGB in green")
         lrPalette.Run(src)
 
@@ -614,7 +614,7 @@ Public Class Line_RegionsVB : Inherits VBparent
 
         task.desc = "Use the reduction values between lines to identify regions."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static verticalCheck = findCheckBox("Show intermediate vertical step results")
         Static noVertCheck = findCheckBox("Run horizontal without vertical step")
         reduction.Run(src)
@@ -699,7 +699,7 @@ Public Class Line_LUT : Inherits VBparent
     Public Sub New()
         task.desc = "Compare the lines produced with the RGB and those produced after LUT"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         lines.Run(src)
         dst1 = lines.dst1
 
@@ -730,7 +730,7 @@ Public Class Line_Longest : Inherits VBparent
 
         task.desc = "Find the longest line in RGB and use it to validate depth"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         lines.Run(src)
         dst1 = src
         If lines.pt1List.Count > 0 Then
@@ -798,7 +798,7 @@ Public Class Line_TimeViewLines : Inherits VBparent
         label2 = "Lines (Yellow) Vertical (blue) Horizontal (Red)"
         task.desc = "Find slope and y-intercept of lines over time."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         lines.Run(src)
         If lines.pixelcount = 0 Then Exit Sub
         basics.Run(lines.dst2)
@@ -852,7 +852,7 @@ Public Class Line_TimeView : Inherits VBparent
         findSlider("Line thickness").Value = 1
         task.desc = "Collect lines over time"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static frameSlider = findSlider("Detect lines from the last X frames")
         Static thicknessSlider = findSlider("Line thickness")
         Static lineCount As Integer

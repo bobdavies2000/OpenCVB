@@ -65,7 +65,7 @@ Public Class ProCon_Basics : Inherits VBparent
             If terminateProducer Then Exit While Else Thread.Sleep(pduration)
         End While
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If sliders.trackbar(0).Value <> buffer.Length Then
             SyncLock mutex
                 ReDim buffer(sliders.trackbar(0).Value - 1)
@@ -102,7 +102,7 @@ Public Class ProCon_Variation : Inherits VBparent
         procon.terminateProducer = True ' we don't want 2 producer tasks...
         task.desc = "DijKstra's Producer/Consumer - similar to Basics above but producer is the algorithm thread."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         SyncLock procon.mutex
             procon.tail = procon.success(procon.tail)
             If procon.buffer(procon.tail) = -1 Then

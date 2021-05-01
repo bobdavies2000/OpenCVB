@@ -30,7 +30,7 @@ Public Class Quaterion_Basics : Inherits VBparent
 
         task.desc = "Use the quaternion values to multiply and compute conjugate"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim q1 = New Quaternion(CSng(sliders.trackbar(0).Value / 100), CSng(sliders.trackbar(1).Value / 100),
                                     CSng(sliders.trackbar(2).Value / 100), CSng(sliders.trackbar(3).Value / 100))
         Dim q2 = New Quaternion(CSng(sliders.trackbar(4).Value / 100), CSng(sliders.trackbar(5).Value / 100),
@@ -52,7 +52,7 @@ Public Class Quaterion_IMUPrediction : Inherits VBparent
         label2 = ""
         task.desc = "IMU data arrives at the CPU after a delay.  Predict changes to the image based on delay and motion data."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         host.Run(src)
 
         Dim dt = host.HostInterruptDelayEstimate

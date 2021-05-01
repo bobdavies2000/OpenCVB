@@ -40,7 +40,7 @@ Public Class MatchTemplate_Basics : Inherits VBparent
         Next
         Return matchOption
     End Function
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static sampleSlider = findSlider("Sample Size")
         If standalone Or task.intermediateReview = caller Then
             searchArea = New cv.Mat(New cv.Size(CInt(sampleSlider.Value), 1), cv.MatType.CV_32FC1)
@@ -72,7 +72,7 @@ Public Class MatchTemplate_RowCorrelation : Inherits VBparent
     Public Sub New()
         task.desc = "Find correlation coefficients for 2 random rows in the RGB image to show variability"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim line1 = msRNG.Next(0, src.Height - 1)
         Dim line2 = msRNG.Next(0, src.Height - 1)
 
@@ -113,7 +113,7 @@ Public Class MatchTemplate_DrawRect : Inherits VBparent
         label1 = "Probabilities (draw rectangle to test again)"
         task.desc = "Find the requested template in an image.  Tracker Algorithm"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static thresholdSlider = findSlider("Correlation Threshold X100")
         If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then Exit Sub
         If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
@@ -163,7 +163,7 @@ Public Class MatchTemplate_BestEntropy_MT : Inherits VBparent
         label2 = "Red is the best template to match (highest entropy)"
         task.desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate.  Tracker Algorithm"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod 30 = 0 Then
             entropy.Run(src)
             task.drawRect = entropy.eMaxRect
@@ -200,7 +200,7 @@ Public Class MatchTemplate_Movement : Inherits VBparent
         dst2 = mask.Clone
         task.desc = "Assign each segment a correlation coefficient and stdev to the previous frame"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static stdevSlider = findSlider("Stdev Threshold")
         Static correlationSlider = findSlider("Correlation Threshold X1000")
         Dim stdevThreshold = CSng(stdevSlider.Value)

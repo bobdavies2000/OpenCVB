@@ -5,7 +5,7 @@ Public Class Concat_Basics : Inherits VBparent
         label2 = "Vertical concatenation"
         task.desc = "Concatenate 2 images - horizontally and vertically"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim tmp As New cv.Mat
         cv.Cv2.HConcat(src, task.RGBDepth, tmp)
         dst1 = tmp.Resize(src.Size())
@@ -26,7 +26,7 @@ Public Class Concat_4way : Inherits VBparent
         label1 = "Color/RGBDepth/Left/Right views"
         task.desc = "Concatenate 4 images - horizontally and vertically"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone or task.intermediateReview = caller Then
             img(0) = src
             img(1) = task.RGBDepth

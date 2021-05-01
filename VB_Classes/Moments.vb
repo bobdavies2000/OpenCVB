@@ -11,7 +11,7 @@ Public Class Moments_Basics : Inherits VBparent
         label1 = "Red dot = Kalman smoothed centroid"
         task.desc = "Compute the centroid of the provided mask file."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateReview = caller Then
             foreground.Run(src)
             dst1 = foreground.dst1
@@ -45,7 +45,7 @@ Public Class Moments_CentroidKalman : Inherits VBparent
         label1 = "Red dot = Kalman smoothed centroid"
         task.desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         foreground.Run(src)
         dst1 = foreground.dst1
         Dim mask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

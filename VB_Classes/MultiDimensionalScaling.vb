@@ -34,7 +34,7 @@ Public Class MultiDimensionScaling_Cities : Inherits VBparent
     Private Function CenteringMatrix(n As integer) As cv.Mat
         Return cv.Mat.Eye(n, n, cv.MatType.CV_64F) - 1.0 / n
     End Function
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim size = 10 ' we are working with 10 cities.
         Dim cityMat = New cv.Mat(size, size, cv.MatType.CV_64FC1, CityDistance)
         cityMat += Torgerson(cityMat)

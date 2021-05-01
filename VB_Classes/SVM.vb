@@ -78,7 +78,7 @@ Public Class SVM_Options : Inherits VBparent
     Public Function f(x As Double) As Double
         Return x + 50 * Math.Sin(x / 15.0)
     End Function
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         ReDim points(sliders.trackbar(0).Value)
         ReDim responses(points.Length - 1)
         For i = 0 To points.Length - 1
@@ -110,7 +110,7 @@ Public Class SVM_Basics : Inherits VBparent
         label2 = "Results - white line is ground truth"
     End Sub
 
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         svmOptions.Run(src) ' update any options specified in the interface.
         dst1 = svmOptions.dst1
 
@@ -165,7 +165,7 @@ Public Class SVM_Random : Inherits VBparent
         label1 = "SVM Training data"
         task.desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         svmOptions.Run(src)
         dst1.SetTo(cv.Scalar.White)
         dst2.SetTo(cv.Scalar.White)
@@ -250,7 +250,7 @@ Public Class SVM_TestCase : Inherits VBparent
 
         task.desc = "Text book example on SVM"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dst1.SetTo(cv.Scalar.White)
         dst2.SetTo(0)
         svmOptions.Run(src)

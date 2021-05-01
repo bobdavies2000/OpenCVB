@@ -26,7 +26,7 @@ Public Class GeneticDrawing_Options : Inherits VBparent
         End If
         task.desc = "Display all the options available to genetic drawing algorithms."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         task.trueText("There is no output for this algorithm - just controls showing the genetic drawing options")
     End Sub
 End Class
@@ -140,7 +140,7 @@ Public Class GeneticDrawing_Basics : Inherits VBparent
         mats.mat(3) = runDNAseq(DNAseq)
         totalError = calculateError(mats.mat(3))
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static genSlider = findSlider("Number of Generations")
         Static stageSlider = findSlider("Number of Stages")
         Static brushSlider = findSlider("Brush size Percentage")
@@ -250,7 +250,7 @@ Public Class GeneticDrawing_Color : Inherits VBparent
         label1 = "Intermediate results - original+2 partial+Mag"
         task.desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes. Painterly"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static restartCheck = findCheckBox("Restart the algorithm with the current settings")
         Dim split() As cv.Mat
         split = src.Split()
@@ -299,7 +299,7 @@ Public Class GeneticDrawing_Photo : Inherits VBparent
 
         task.desc = "Apply genetic drawing technique to any still photo.  Draw anywhere to focus brushes. Painterly"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         Static fileInputName = New FileInfo(fileNameForm.filename.Text)
         If inputFileName <> fileInputName.FullName Or task.frameCount = 0 Then

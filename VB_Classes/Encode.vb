@@ -7,7 +7,7 @@ Public Class Encode_Basics : Inherits VBparent
         label1 = "absDiff with original"
         label2 = "Original decompressed"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim encodeParams() As Integer = {options.getEncodeParameter(), options.qualityLevel}
 
         Dim buf() = src.ImEncode(".jpg", encodeParams)
@@ -67,7 +67,7 @@ Public Class Encode_Options : Inherits VBparent
         If encodeOption = cv.ImwriteFlags.JpegOptimize Then qualityLevel = 1 ' just on or off
         Return encodeOption
     End Function
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         Dim fileExtension = ".jpg"
         Dim encodeParams() As integer = {getEncodeParameter(), qualityLevel}

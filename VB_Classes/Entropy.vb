@@ -7,7 +7,7 @@ Public Class Entropy_Basics : Inherits VBparent
         label1 = "Control entropy values with histogram bins slider"
         task.desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         simple.run(src)
         entropy = 0
         Dim entropyChannels As String = ""
@@ -40,7 +40,7 @@ Public Class Entropy_Highest : Inherits VBparent
         label1 = "Highest entropy marked with red rectangle"
         task.desc = "Find the highest entropy section of the color image."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)
 
         Dim entropyMap = New cv.Mat(src.Size(), cv.MatType.CV_32F)
@@ -87,7 +87,7 @@ Public Class Entropy_FAST : Inherits VBparent
         label2 = "Lighter color is higher entropy, Red marks highest"
         task.desc = "Use FAST markings to add to entropy"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         fast.Run(src)
 
         entropy.Run(fast.dst1)
@@ -114,7 +114,7 @@ Public Class Entropy_Simple : Inherits VBparent
         Next
         Return channelEntropy
     End Function
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim dimensions() = New Integer() {task.histogramBins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 255)}
 

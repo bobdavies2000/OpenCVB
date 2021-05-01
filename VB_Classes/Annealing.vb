@@ -69,7 +69,7 @@ Public Class Annealing_Basics_CPP : Inherits VBparent
         setup()
         task.desc = "Simulated annealing with traveling salesman.  NOTE: No guarantee simulated annealing will find the optimal solution."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If closed = True Then Exit Sub
         If standalone Or task.intermediateReview = caller Then
             If task.frameCount = 0 Then
@@ -161,7 +161,7 @@ Public Class Annealing_CPP_MT : Inherits VBparent
 
         task.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static CityCountSlider = findSlider("Anneal Number of Cities")
         Static restartCheck = findCheckBox("Restart TravelingSalesman")
         Static copyBestCheck = findCheckBox("Copy Best Intermediate solutions (top half) to Bottom Half")
@@ -253,7 +253,7 @@ Public Class Annealing_Options : Inherits VBparent
         anneal.Open()
         task.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static randomSlider = findSlider("Random Pixel Count")
         Dim numberOfCities = randomSlider.Value
         Dim circularPattern = check.Box(1).Checked ' do they want a circular pattern?

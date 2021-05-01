@@ -7,7 +7,7 @@ Public Class Palette_Basics : Inherits VBparent
     Public Sub New()
         task.desc = "Apply the different color maps in OpenCV - Painterly Effect"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         label1 = "ColorMap = " + task.paletteSchemeName
 
         Static cMapDir As New DirectoryInfo(task.parms.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
@@ -44,7 +44,7 @@ Public Class Palette_Color : Inherits VBparent
         End If
         task.desc = "Define a color using sliders."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim b = sliders.trackbar(0).Value
         Dim g = sliders.trackbar(1).Value
         Dim r = sliders.trackbar(2).Value
@@ -70,7 +70,7 @@ Public Class Palette_LinearPolar : Inherits VBparent
             sliders.setupTrackBar(0, "LinearPolar radius", 0, dst1.Cols, dst1.Cols / 2)
         End If
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static radiusSlider = findSlider("LinearPolar radius")
         Dim radius = radiusSlider.Value ' msRNG.next(0, dst1.Cols)
 
@@ -166,7 +166,7 @@ Public Class Palette_Reduction : Inherits VBparent
             Return If(a(2) < b(2), -1, 1)
         End Function
     End Class
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static reductionSlider = findSlider("Reduction factor")
         If reductionSlider.value < 32 Then
             reductionSlider.value = 32
@@ -232,7 +232,7 @@ Public Class Palette_DrawTest : Inherits VBparent
         task.palette.whitebackground = True
         task.desc = "Experiment with palette using a drawn image"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         draw.Run(src)
         task.palette.Run(draw.dst1)
         dst1 = task.palette.dst1
@@ -251,7 +251,7 @@ Public Class Palette_Gradient : Inherits VBparent
         label2 = "From and To colors"
         task.desc = "Create gradient image"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod frameModulo = 0 Then
             If standalone Or task.intermediateReview = caller Then
                 color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
@@ -291,7 +291,7 @@ Public Class Palette_RandomColorMap : Inherits VBparent
         label2 = "Generated colormap"
         task.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static paletteSlider = findSlider("Number of color transitions (Used only with Random)")
         If standalone Or transitionCount <> paletteSlider.value Then
             transitionCount = paletteSlider.value
@@ -329,7 +329,7 @@ Public Class Palette_DepthColorMap : Inherits VBparent
         label2 = "Palette used to color left image"
         task.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static cvtScaleSlider = findSlider("Convert and Scale value X100")
         If task.frameCount = 0 Then
             Dim color1 = cv.Scalar.Yellow
@@ -368,7 +368,7 @@ Public Class Palette_ObjectColors : Inherits VBparent
         label2 = "Original colors"
         task.desc = "New class description"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         src.SetTo(0, task.noDepthMask)
         reduction.Run(src)
         dst2 = reduction.dst2
@@ -424,7 +424,7 @@ Public Class Palette_Layout2D : Inherits VBparent
         grid.Run(Nothing)
         task.desc = "Layout the available colors in a 2D grid"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)
         Dim index As Integer
         For Each r In grid.roiList
@@ -447,7 +447,7 @@ Public Class Palette_LeftRightImages : Inherits VBparent
     Public Sub New()
         task.desc = "Use a palette with the left image."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         lrViews.Run(src)
 
         task.palette.Run(lrViews.dst1)

@@ -30,7 +30,7 @@ Public Class InPaint_Basics : Inherits VBparent
         mask.Line(p1, p2, cv.Scalar.All(255), thickness, task.lineType)
         Return mask
     End Function
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
 
         src.CopyTo(dst1)
@@ -57,7 +57,7 @@ Public Class InPaint_Noise : Inherits VBparent
         task.desc = "Create noise in an image and then use inPaint to remove it."
         label2 = "Repaired Image"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod 100 Then Exit Sub ' give them time to review the inpaint results
         noise.Run(src) ' create some noise in the result1 image.
         dst1 = noise.dst1
@@ -78,7 +78,7 @@ Public Class InPaint_Depth : Inherits VBparent
         label2 = "32-bit depth repaired with inpainting"
         task.desc = "Use Navier-Stokes to fill in the holes in the depth"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
         dst1 = src.Clone
         cv.Cv2.Inpaint(src, task.noDepthMask, dst2, 20, cv.InpaintMethod.NS)

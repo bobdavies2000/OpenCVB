@@ -10,7 +10,7 @@ Public Class Grayscale_Basics : Inherits VBparent
         label2 = ""
         task.desc = "Manually create a grayscale image.  The only reason for this example is to show how slow it can be to do the work manually in VB.Net"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If check.Box(0).Checked Then
             dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else

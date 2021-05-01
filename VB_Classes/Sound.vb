@@ -53,7 +53,7 @@ Public Class Sound_Basics : Inherits VBparent
 
         task.desc = "Load an audio file, play it, and convert to PCM"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim sender As New Object, e As New EventArgs
         Static fileinfo = New FileInfo(fileNameForm.filename.Text)
         If fileinfo.Exists And fileNameForm.PlayButton.Text = "Start" Then
@@ -143,7 +143,7 @@ Public Class Sound_SignalGenerator : Inherits VBparent
 
         task.desc = "Generate sound with a sine waveform."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static radioIndex As Integer
         Static wgenSlider = findSlider("Sine Wave Frequency")
         Static DecibelSlider = findSlider("Decibels")
@@ -212,7 +212,7 @@ Public Class Sound_Display : Inherits VBparent
 
         task.desc = "Display a sound buffer in several styles"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static sliderPercent As Single
         Static fileStarted As Boolean
         Static formatIndex As Integer
@@ -314,7 +314,7 @@ Public Class Sound_GenWaveDisplay : Inherits VBparent
     Public Sub New()
         task.desc = "Display the generated sound waves"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         plotSound.soundSource.run(src)
         plotSound.Run(src)
         Dim r1 = New cv.Rect(0, 0, src.Width, src.Height)
@@ -337,7 +337,7 @@ Public Class Sound_WaveDisplay : Inherits VBparent
         plotSound.soundSource = New Sound_Basics
         task.desc = "Display the generated sound waves"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         plotSound.soundSource.run(src)
         plotSound.Run(src)
         Dim r1 = New cv.Rect(0, 0, src.Width, src.Height)

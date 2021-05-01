@@ -3,7 +3,7 @@ Public Class Extrinsics_Basics : Inherits VBparent
     Public Sub New()
         task.desc = "Show the depth camera extrinsics."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim nextline = "Rotation MatrixTranslation" + vbCrLf
         Dim fmt = "#0.0000"
         If task.parms.extrinsics.rotation Is Nothing Then

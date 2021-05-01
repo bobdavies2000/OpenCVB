@@ -10,7 +10,7 @@ Public Class Diff_Basics : Inherits VBparent
         label2 = "Unstable Color mask"
         task.desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static thresholdSlider = findSlider("Change threshold for each pixel")
         Dim gray = src
         If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -43,7 +43,7 @@ Public Class Diff_UnstableDepthAndColor : Inherits VBparent
         label1 = "Stable depth and color"
         task.desc = "Build a mask for any pixels that have either unstable depth or color"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         diff.Run(src)
         Dim unstableColor = diff.dst2.Clone()
         depth.Run(task.RGBDepth)

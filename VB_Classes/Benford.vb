@@ -35,7 +35,7 @@ Public Class Benford_Basics : Inherits VBparent
         ReDim counts(expectedDistribution.Count - 1)
         use99 = True
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateReview = caller Then
             dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             src = New cv.Mat(dst1.Size, cv.MatType.CV_32F)
@@ -97,7 +97,7 @@ Public Class Benford_NormalizedImage : Inherits VBparent
     Public Sub New()
         task.desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
@@ -121,7 +121,7 @@ Public Class Benford_NormalizedImage99 : Inherits VBparent
 
         task.desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
@@ -149,7 +149,7 @@ Public Class Benford_JPEG : Inherits VBparent
 
         task.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, sliders.trackbar(0).Value})
         Dim tmp = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
         dst1 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
@@ -176,7 +176,7 @@ Public Class Benford_JPEG99 : Inherits VBparent
         End If
         task.desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static qualitySlider = findSlider("JPEG Quality")
         Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, qualitySlider.Value})
         Dim tmp = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
@@ -203,7 +203,7 @@ Public Class Benford_PNG : Inherits VBparent
         End If
         task.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static compressionSlider = findSlider("PNG Compression")
         Dim png = src.ImEncode(".png", New Integer() {cv.ImwriteFlags.PngCompression, compressionSlider.Value})
         Dim tmp = New cv.Mat(png.Count, 1, cv.MatType.CV_8U, png)
@@ -224,7 +224,7 @@ Public Class Benford_Depth : Inherits VBparent
     Public Sub New()
         task.desc = "Apply Benford to the depth data"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         benford.Run(task.depth32f)
         dst1 = benford.dst1
         label1 = benford.label2
@@ -241,7 +241,7 @@ Public Class Benford_DepthRGB : Inherits VBparent
     Public Sub New()
         task.desc = "Apply Benford to the depth RGB image that is compressed with JPEG"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         benford.Run(task.RGBDepth)
         dst1 = benford.dst2
         label1 = benford.label2
@@ -263,7 +263,7 @@ Public Class Benford_Primes : Inherits VBparent
         countSlider.Value = countSlider.Maximum
         task.desc = "Apply Benford to a list of primes"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount = 0 Then sieve.Run(src) ' only need to compute this once...
         task.trueText(CStr(sieve.primes.Count) + " primes were found")
 

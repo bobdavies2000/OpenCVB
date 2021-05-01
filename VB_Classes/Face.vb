@@ -23,7 +23,7 @@ Public Class Face_Haar_LBP : Inherits VBparent
         label1 = "Faces detected with Haar"
         label2 = "Faces detected with LBP"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dst1 = src.Clone()
         detectFace(dst1, haarCascade)
         dst2 = src.Clone()
@@ -42,7 +42,7 @@ Public Class Face_Haar_Alt : Inherits VBparent
         task.desc = "Detect faces Haar_alt database."
         label1 = "Faces detected with Haar_Alt"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dst1 = src.Clone()
         detectFace(dst1, haarCascade)
     End Sub

@@ -35,7 +35,7 @@ Public Class Hull_Basics : Inherits VBparent
         label1 = "Convex Hull Output"
         label2 = "Convex Hull Input"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim Count = sliders.trackbar(0).Value
         Dim points(Count - 1) As cv.Point
         Dim pad = 4

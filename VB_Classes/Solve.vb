@@ -4,7 +4,7 @@ Public Class Solve_ByMat : Inherits VBparent
     Public Sub New()
         task.desc = "Solve a set of equations with OpenCV's Solve API."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         ' x + y = 10
         ' 2x + 3y = 26
         ' (x=4, y=6)
@@ -27,7 +27,7 @@ Public Class Solve_ByArray : Inherits VBparent
     Public Sub New()
         task.desc = "Solve a set of equations with OpenCV's Solve API with a normal array as input  "
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         ' x + y = 10
         ' 2x + 3y = 26
         ' (x=4, y=6)

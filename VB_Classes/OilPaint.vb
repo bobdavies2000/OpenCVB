@@ -21,7 +21,7 @@ Public Class OilPaint_Pointilism : Inherits VBparent
         task.drawRect = New cv.Rect(dst1.Cols * 3 / 8, dst1.Rows * 3 / 8, dst1.Cols * 2 / 8, dst1.Rows * 2 / 8)
         task.desc = "Alter the image to effect the pointilism style - Painterly Effect"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dst1 = src
         Dim img = src(task.drawRect)
         Static saveDrawRect As New cv.Rect
@@ -89,7 +89,7 @@ Public Class OilPaint_ColorProbability : Inherits VBparent
         ReDim color_probability(km.sliders.trackbar(0).Value - 1)
         task.desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         km.Run(src)
         dst1 = km.dst1
         Dim c() = km.clusterColors
@@ -126,7 +126,7 @@ Public Class OilPaint_ManualVB : Inherits VBparent
         task.desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
         task.drawRect = New cv.Rect(dst1.Cols * 3 / 8, dst1.Rows * 3 / 8, dst1.Cols * 2 / 8, dst1.Rows * 2 / 8)
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim filtersize = sliders.trackbar(0).Value
         Dim levels = sliders.trackbar(1).Value
 
@@ -187,7 +187,7 @@ Public Class OilPaint_Manual : Inherits VBparent
 
         task.drawRect = New cv.Rect(dst1.Cols * 3 / 8, dst1.Rows * 3 / 8, dst1.Cols * 2 / 8, dst1.Rows * 2 / 8)
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         Dim roi = task.drawRect
@@ -213,7 +213,7 @@ Public Class OilPaint_Cartoon : Inherits VBparent
         label1 = "OilPaint_Cartoon"
         label2 = "Laplacian Edges"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim roi = task.drawRect
         laplacian.Run(src)
         dst2 = laplacian.dst1

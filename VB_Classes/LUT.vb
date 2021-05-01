@@ -10,7 +10,7 @@ Public Class LUT_Basics : Inherits VBparent
 
         task.desc = "Divide the image into n-segments controlled with a slider."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static segment() As Integer
         Static nSegSlider = findSlider("Number of LUT Segments")
         Dim segments = nSegSlider.value
@@ -55,7 +55,7 @@ Public Class LUT_Sliders : Inherits VBparent
 
         task.desc = "Use an OpenCV Lookup Table to define 5 regions in a grayscale image - Painterly Effect."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         sliders.sLabels(0).Text = "LUT zero through " + CStr(sliders.trackbar(0).Value)
         sliders.sLabels(1).Text = "LUT " + CStr(sliders.trackbar(0).Value) + " through " + CStr(sliders.trackbar(1).Value)
         sliders.sLabels(2).Text = "LUT " + CStr(sliders.trackbar(1).Value) + " through " + CStr(sliders.trackbar(2).Value)
@@ -89,7 +89,7 @@ Public Class LUT_CustomColor : Inherits VBparent
         label2 = "Custom Color Lookup Table"
         task.desc = "Use a palette to provide the lookup table for LUT - Painterly Effect"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateReview = caller Then reduction.Run(src)
         gradMap.Run(src)
         colorMap = gradMap.gradientColorMap.Flip(cv.FlipMode.X)
@@ -112,7 +112,7 @@ Public Class LUT_Reduction : Inherits VBparent
         label2 = "Custom Color Lookup Table"
         task.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         task.palette.Run(Nothing)
         reduction.Run(src)
         Dim vector = task.palette.gradientColorMap.Row(0).Clone
@@ -135,7 +135,7 @@ Public Class LUT_RGBDepth : Inherits VBparent
     Public Sub New()
         task.desc = "Use a LUT on the RGBDepth to segregate depth data."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         lut.Run(task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst1 = lut.dst1
         label1 = lut.label1
@@ -154,7 +154,7 @@ Public Class LUT_Depth32f : Inherits VBparent
     Public Sub New()
         task.desc = "Use a LUT on the 32-bit depth to segregate depth data."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         lut.Run(task.depth32f.Normalize(255).ConvertScaleAbs(255))
         dst1 = lut.dst1
         dst1.SetTo(0, task.noDepthMask)
@@ -174,7 +174,7 @@ Public Class LUT_Color : Inherits VBparent
     Public Sub New()
         task.desc = "Apply the current LUT to the input image"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         task.palette.Run(Nothing)
 
     End Sub

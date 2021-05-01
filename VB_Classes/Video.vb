@@ -29,7 +29,7 @@ Public Class Video_Basics : Inherits VBparent
         label1 = fileInfo.Name
         task.desc = "Show a video file"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If srcVideo <> fileNameForm.filename.Text Then
             If fileInfo.Exists = False Then
                 task.trueText("File not found: " + fileInfo.FullName, 10, 125)
@@ -63,7 +63,7 @@ Public Class Video_CarCounting : Inherits VBparent
     Public Sub New()
         task.desc = "Count cars in a video file"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         video.Run(src)
         If video.dst1.Empty() = False And video.image.Empty() = False Then
             dst1.SetTo(0)
@@ -111,7 +111,7 @@ Public Class Video_CarCComp : Inherits VBparent
     Public Sub New()
         task.desc = "Outline cars with a rectangle"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         video.Run(src)
         If video.dst1.Empty() = False Then
             bgSub.Run(video.dst1)
@@ -135,7 +135,7 @@ Public Class Video_MinRect : Inherits VBparent
         video.Run(dst1)
         task.desc = "Find area of car outline - example of using minAreaRect"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         video.Run(src)
         If video.dst1.Empty() = False Then
             bgSub.Run(video.dst1)
@@ -162,7 +162,7 @@ Public Class Video_MinCircle : Inherits VBparent
     Public Sub New()
         task.desc = "Find area of car outline - example of using MinEnclosingCircle"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         video.Run(src)
         dst1 = video.dst1
         dst2 = video.dst2

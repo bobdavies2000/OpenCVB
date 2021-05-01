@@ -14,7 +14,7 @@ Public Class Polylines_IEnumerableExample : Inherits VBparent
         End If
         task.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim points = Enumerable.Range(0, sliders.trackbar(0).Value).Select(Of cv.Point)(
             Function(i)
                 Return New cv.Point(CInt(msRNG.Next(0, src.Width)), CInt(msRNG.Next(0, src.Height)))
@@ -40,7 +40,7 @@ Public Class Polylines_Random : Inherits VBparent
         label1 = CStr(zoomFactor) + "X zoom around mouse movement on image"
         task.desc = "Create a random procedural image - Painterly Effect"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod 150 = 0 Then ' every x frames.
             Dim h = src.Height, w = src.Width
             Dim autorand As New Random

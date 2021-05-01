@@ -11,7 +11,7 @@ Public Class Rodrigues_ValidateKinect : Inherits VBparent
     Public Sub New()
         task.desc = "Validate the Rodrigues calibration for Kinect camera (only)"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
             dst2.SetTo(0)
             task.trueText("Only the Kinect4Azure camera is currently supported for the Rodrigues calibration", 10, 140)
@@ -37,7 +37,7 @@ Public Class Rodrigues_ValidateVector : Inherits VBparent
     Public Sub New()
         task.desc = "Validate the Rodrigues calibration for Stereolabs Zed 2 camera (only)"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2 Then
             dst2.SetTo(0)
             task.trueText("Only the StereoLabs Zed 2 and Intel T265 cameras are supported for this Rodrigues validation")
@@ -75,7 +75,7 @@ Public Class Rodrigues_RotationMatrix : Inherits VBparent
     Public Sub New()
         task.desc = "Display the contents of the IMU Rotation Matrix"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim rot = task.parms.RotationMatrix
         Dim output = "IMU Rotation Matrix (rotate the camera to see if it is working)" + vbCrLf
         For i = 0 To 2
@@ -104,7 +104,7 @@ Public Class Rodrigues_Extrinsics : Inherits VBparent
     Public Sub New()
         task.desc = "Convert Camera extrinsics array to a Vector with Rodrigues"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim rot = task.parms.extrinsics.rotation
         Dim output As String = "Extrinsics Rotation Matrix" + vbCrLf
         For i = 0 To 2

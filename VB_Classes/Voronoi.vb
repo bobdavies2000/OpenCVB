@@ -18,7 +18,7 @@ Public Class Voronoi_Basics : Inherits VBparent
             dst.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         If task.frameCount = 0 Then
             findSlider("Random Pixel Count").Maximum = 100
@@ -45,7 +45,7 @@ Public Class Voronoi_Compare : Inherits VBparent
         label2 = "Ordered List method"
         task.desc = "C# implementations of the BruteForce and OrderedList Voronoi algorithms"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         random.Run(Nothing)
         Dim points = New List(Of cv.Point)(random.Points)
@@ -89,7 +89,7 @@ Public Class Voronoi_CPP : Inherits VBparent
         vPtr = VoronoiDemo_Open(task.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
         task.desc = "Use the C++ version of the Voronoi code"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static countSlider = findSlider("Random Pixel Count")
         vDemo.random.Run(Nothing)
         Dim handleSrc = GCHandle.Alloc(vDemo.random.Points, GCHandleType.Pinned)

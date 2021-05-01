@@ -13,7 +13,7 @@ Public Class BlockMatching_Basics : Inherits VBparent
         label1 = "Block matching disparity colorized like depth"
         label2 = "Right Image (used with left image)"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
             task.trueText("For the Kinect 4 Azure camera, the left and right views are the same.")
         End If

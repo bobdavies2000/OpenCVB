@@ -11,7 +11,7 @@ Public Class Plot_Basics : Inherits VBparent
         label2 = "Same Data but using OpenCV C++ plot"
         task.desc = "Plot data provided in src Mat"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         hist.plotColors(0) = cv.Scalar.White
         hist.Run(src)
         dst1 = hist.dst1
@@ -38,7 +38,7 @@ Public Class Plot_Basics_CPP : Inherits VBparent
     Public Sub New()
         task.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateReview = caller Then
             ReDim srcX(50 - 1)
             ReDim srcY(50 - 1)
@@ -107,7 +107,7 @@ Public Class Plot_OverTime : Inherits VBparent
         task.desc = "Plot an input variable over time"
         myStopWatch = Stopwatch.StartNew()
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static widthSlider = findSlider("Plot Pixel Width")
         Static heightSlider = findSlider("Plot Pixel Height")
         Static resetCheck = findCheckBox("Reset the plot scale")
@@ -201,7 +201,7 @@ Public Class Plot_Histogram : Inherits VBparent
     Public Sub New()
         task.desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateReview = caller Then
             Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim dimensions() = New Integer() {task.histogramBins}
@@ -278,7 +278,7 @@ Public Class Plot_Depth : Inherits VBparent
     Public Sub New()
         task.desc = "Show depth using OpenCV's plot format with variable bins."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         hist.Run(src)
         ReDim plotDepth.srcX(hist.plotHist.hist.Rows - 1)
         ReDim plotDepth.srcY(hist.plotHist.hist.Rows - 1)

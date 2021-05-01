@@ -8,7 +8,7 @@ Public Class Blob_Basics : Inherits VBparent
         blobDetector = New CS_Classes.Blob_Basics
         task.desc = "Isolate and list blobs with specified options"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         options.Run(src)
 
         If standalone Then
@@ -55,7 +55,7 @@ Public Class Blob_Options : Inherits VBparent
         End If
         task.desc = "Prepare options for a blob detection run."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         blobParams = New cv.SimpleBlobDetector.Params
         If radio.check(0).Checked Then blobParams.FilterByArea = radio.check(0).Checked
         If radio.check(1).Checked Then blobParams.FilterByCircularity = radio.check(1).Checked
@@ -107,7 +107,7 @@ Public Class Blob_Input : Inherits VBparent
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Generate data to test Blob Detector."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod updateFrequency = 0 Then
             rectangles.Run(src)
             Mats.mat(0) = rectangles.dst1
@@ -138,7 +138,7 @@ Public Class Blob_RenderBlobs : Inherits VBparent
         label2 = "Largest blob, centroid in yellow"
         task.desc = "Use connected components to find blobs."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod input.updateFrequency = 0 Then
             input.Run(src)
             dst1 = input.dst1
@@ -181,7 +181,7 @@ Public Class Blob_DepthClusters : Inherits VBparent
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
         'task.rank = 3
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         histBlobs.Run(task.noDepthMask)
         dst1 = histBlobs.dst1
         label1 = CStr(histBlobs.ranges.Count) + " Depth Clusters"
@@ -207,7 +207,7 @@ Public Class Blob_DepthPixelSampler : Inherits VBparent
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
         'task.rank = 2
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         histBlobs.Run(task.noDepthMask)
         dst1 = histBlobs.dst1
         flood.initialMask = task.noDepthMask
@@ -249,7 +249,7 @@ Public Class Blob_DepthRanges : Inherits VBparent
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
         'task.rank = 4
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         histBlobs.Run(src)
         dst1 = histBlobs.dst1
 
@@ -296,7 +296,7 @@ Public Class Blob_Largest : Inherits VBparent
     Public Sub New()
         task.desc = "Gather all the blob data and display the largest."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         blobs.Run(src)
         dst2 = blobs.dst2
 

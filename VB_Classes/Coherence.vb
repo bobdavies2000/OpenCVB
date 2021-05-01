@@ -12,7 +12,7 @@ Public Class Coherence_Basics : Inherits VBparent
         label1 = "Coherence - draw rectangle to apply"
         task.desc = "Find lines that are artistically coherent in the image - Painterly"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim sigma = sliders.trackbar(0).Value * 2 + 1
         Dim blend = sliders.trackbar(1).Value / 10
         Dim str_sigma = sliders.trackbar(2).Value * 2 + 1
@@ -87,7 +87,7 @@ Public Class Coherent_Depth : Inherits VBparent
     Public Sub New()
         task.desc = "Find coherent lines in the depth image - Painterly"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         coherent.Run(task.RGBDepth)
         dst1 = coherent.dst1
     End Sub

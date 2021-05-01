@@ -10,7 +10,7 @@ Public Class ORB_Basics : Inherits VBparent
         End If
         task.desc = "Find keypoints using ORB - Oriented Fast and Rotated BRIEF"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         orb = cv.ORB.Create(sliders.trackbar(0).Value)
         keypoints = orb.Detect(src)

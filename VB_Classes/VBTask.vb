@@ -339,7 +339,6 @@ Public Class ActiveTask : Implements IDisposable
                 IMUStable = algoList.createAlgorithm("IMU_IscameraStable")
                 IMULevel = algoList.createAlgorithm("IMU_IsCameraLevel")
                 PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
-                viewOptions.standalone = False
             End If
         End If
 
@@ -349,11 +348,10 @@ Public Class ActiveTask : Implements IDisposable
         algorithmObject = algoList.createAlgorithm(task.algName)
 
         If algorithmObject Is Nothing Then
-            MsgBox("The algorithm: " + task.algName + " was not found in the algorithmList.vb code." + vbCrLf +
-                   "Problem likely originated with the UIindexer.")
             task.desc = "The algorithm: " + task.algName + " was not found"
             task.trueText("The algorithm: " + task.algName + " was not found in the algorithmList.vb code." + vbCrLf +
-                   "Problem likely originated with the UIindexer.", 10, 200, 3)
+                          "If using on the <Rank x> groups, rerun the Survey (takes a while) and then the UIRanking project." + vbCrLf +
+                          "Otherwise, there must be a problem in the UIindexer", 10, 200, 3)
 
             inrange.standalone = True
             algorithmObject = inrange

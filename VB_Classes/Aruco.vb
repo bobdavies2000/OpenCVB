@@ -6,7 +6,7 @@ Public Class Aruco_Basics : Inherits VBparent
     Public Sub New()
         task.desc = "Show how to use the Aruco markers and rotate the image accordingly."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim tmp = cv.Cv2.ImRead(task.parms.homeDir + "Data/aruco_markers_photo.jpg")
         Static detectorParameters = cv.Aruco.DetectorParameters.Create()
         detectorParameters.CornerRefinementMethod = cv.Aruco.CornerRefineMethod.Subpix
@@ -33,7 +33,7 @@ Public Class Aruco_Test : Inherits VBparent
         label2 = "Normalized image after WarpPerspective."
         task.desc = "Testing the Aruco marker detection in C#"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim tmp = cv.Cv2.ImRead(task.parms.homeDir + "Data/aruco_markers_photo.jpg")
         aruco.Run(tmp)
         dst1 = aruco.detectedMarkers.Resize(src.Size())

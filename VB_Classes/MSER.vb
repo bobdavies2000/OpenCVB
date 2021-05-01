@@ -10,7 +10,7 @@ Public Class MSER_Basics : Inherits VBparent
         maxSlider.Value = If(dst1.Width = 1280, 50000, 20000)
         task.desc = "Run MSER (Maximally Stable Extremal Region) algorithm with all default options except for maximum area"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static minSlider = findSlider("MSER Min Area")
         options.Run(src)
 
@@ -98,7 +98,7 @@ Public Class MSER_Options : Inherits VBparent
         ReDim saveParms(sliders.trackbar.Count + check.Box.Count - 1)
         task.desc = "Extract the Maximally Stable Extremal Region (MSER) for an image using all the available options."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim delta = sliders.trackbar(0).Value
         Dim minArea = sliders.trackbar(1).Value
         Dim maxArea = sliders.trackbar(2).Value
@@ -161,7 +161,7 @@ Public Class MSER_SyntheticInput : Inherits VBparent
     Public Sub New()
         task.desc = "Build a synthetic image for MSER (Maximal Stable Extremal Regions) testing"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim img = New cv.Mat(800, 800, cv.MatType.CV_8U, 0)
         Dim width() = {390, 380, 300, 290, 280, 270, 260, 250, 210, 190, 150, 100, 80, 70}
         Dim color1() = {80, 180, 160, 140, 120, 100, 90, 110, 170, 150, 140, 100, 220}
@@ -216,7 +216,7 @@ Public Class MSER_TestSynthetic : Inherits VBparent
         label1 = "Output image from MSER"
         task.desc = "Test MSER with the synthetic image."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         synth.Run(src)
         dst1 = synth.dst1.Clone()
         dst2 = synth.dst1
@@ -239,7 +239,7 @@ Public Class MSER_CPPStyle : Inherits VBparent
         image = cv.Cv2.ImRead(task.parms.homeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
         gray = image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim mser = cv.MSER.Create()
         Dim regions()() As cv.Point = Nothing
         Dim boxes() As cv.Rect = Nothing
@@ -273,7 +273,7 @@ Public Class MSER_Contours : Inherits VBparent
         mser.sliders.trackbar(1).Value = 4000
         task.desc = "Use MSER but show the contours of each region."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         mser.Run(src)
 
         Dim pixels As integer

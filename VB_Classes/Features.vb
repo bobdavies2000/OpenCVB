@@ -12,7 +12,7 @@ Public Class Features_GoodFeatures : Inherits VBparent
         End If
         task.desc = "Find good features to track in an RGB image."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim numPoints = sliders.trackbar(0).Value
         Dim quality = sliders.trackbar(1).Value / 100
@@ -44,7 +44,7 @@ Public Class Features_PointTracker : Inherits VBparent
         label2 = "Good features with Kalman"
         task.desc = "Find good features and track them"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         features.Run(src)
         dst1 = features.dst1
 

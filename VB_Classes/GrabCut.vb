@@ -9,7 +9,7 @@ Public Class GrabCut_Basics : Inherits VBparent
         label2 = "Foreground after GrabCut using mask in dst1"
         task.desc = "Use grabcut with just a foreground and background definition."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         fgnd.Run(src)
         dst1 = fgnd.dst1
 
@@ -56,7 +56,7 @@ Public Class GrabCut_FineTune : Inherits VBparent
         label2 = "Grabcut results after adding fine tuning selections"
         task.desc = "There are probably mistakes in the initial Grabcut_Basics.  Use the checkbox to fine tune what is background and foreground"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static fgFineTuning = findRadio("Selected rectangle is added to the foreground")
         Static clearCheck = findRadio("Clear all foreground and background fine tuning")
         Static saveRadio = fgFineTuning.checked

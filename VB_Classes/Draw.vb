@@ -53,7 +53,7 @@ Public Class Draw_Noise : Inherits VBparent
         End If
         task.desc = "Add Noise to the color image"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         maxNoiseWidth = sliders.trackbar(1).Value
         src.CopyTo(dst1)
         noiseMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1).SetTo(0)
@@ -95,7 +95,7 @@ Public Class Draw_Options : Inherits VBparent
 
         task.desc = "Show the options for the draw algorithms"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static countSlider = findSlider("DrawCount")
         Static freqSlider = findSlider("Update Frequency")
         Static fillCheck = findCheckBox("Draw filled (unchecked draw an outline)")
@@ -118,7 +118,7 @@ Public Class Draw_Ellipses : Inherits VBparent
     Public Sub New()
         task.desc = "Draw the requested number of ellipses."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         optDraw.Run(Nothing)
         If task.frameCount Mod optDraw.updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.Black)
@@ -142,7 +142,7 @@ Public Class Draw_Circles : Inherits VBparent
     Public Sub New()
         task.desc = "Draw the requested number of circles."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         optDraw.Run(Nothing)
         If task.frameCount Mod optDraw.updateFrequency = 0 Then
             dst1.SetTo(cv.Scalar.Black)
@@ -168,7 +168,7 @@ Public Class Draw_Line : Inherits VBparent
     Public Sub New()
         task.desc = "Draw the requested number of Lines."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         optDraw.Run(Nothing)
         If task.frameCount Mod optDraw.updateFrequency Then Exit Sub
         dst1.SetTo(cv.Scalar.Black)
@@ -192,7 +192,7 @@ Public Class Draw_Polygon : Inherits VBparent
         task.desc = "Draw Polygon figures"
         label2 = "Convex Hull for the same polygon"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         optDraw.Run(Nothing)
 
         If task.frameCount Mod optDraw.updateFrequency Then Exit Sub
@@ -237,7 +237,7 @@ Public Class Draw_Shapes : Inherits VBparent
     Public Sub New()
         task.desc = "Use RNG to draw the same set of shapes every time"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim offsetX = 50, offsetY = 25, lineLength = 50, thickness = 2
 
         dst1.SetTo(0)
@@ -292,7 +292,7 @@ Public Class Draw_SymmetricalShapes : Inherits VBparent
         End If
         task.desc = "Generate shapes programmatically"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static rotateAngle As Single = 0
         Static fillColor = cv.Scalar.Red
         If check.Box(4).Checked Then
@@ -390,7 +390,7 @@ Public Class Draw_Arc : Inherits VBparent
 
         kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.useKalman Then
             kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
             kalman.Run(src)
@@ -437,7 +437,7 @@ Public Class Draw_ViewObjects : Inherits VBparent
         End If
         task.desc = "Draw rectangles and centroids"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateReview = caller Then
             task.trueText("Draw_ViewObjects has no standalone version." + vbCrLf + "It just draws rectangles and centroids for other algorithms.")
         Else
@@ -482,7 +482,7 @@ Public Class Draw_Frustrum : Inherits VBparent
         label2 = "Frustrum's shape prepared."
         task.desc = "Draw a frustrum for a camera viewport"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dst1 = New cv.Mat(task.pointCloud.Height, task.pointCloud.Width, cv.MatType.CV_32F, 0)
         Dim fRect = New cv.Rect((dst2.Width - dst2.Height) / 2, 0, dst2.Height, dst2.Height)
         Dim mid = task.pointCloud.Height / 2
@@ -519,7 +519,7 @@ Public Class Draw_ClipLine : Inherits VBparent
 
         task.desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dst2 = src
         kalman.kInput = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
         kalman.Run(src)
@@ -563,7 +563,7 @@ Public Class Draw_Intersection : Inherits VBparent
     Public Sub New()
         task.desc = "Determine if 2 lines intersect"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateReview = caller Then
             If task.frameCount Mod 100 <> 0 Then Exit Sub
             p1 = New cv.Point(Rnd() * src.Width, Rnd() * src.Height)
@@ -612,6 +612,6 @@ Public Class Draw_Hexagon : Inherits VBparent
         alpha.Text = "Perception is the key"
         task.desc = "What it means to recognize a cube.  Zygmunt Pizlo - UC Irvine"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
     End Sub
 End Class

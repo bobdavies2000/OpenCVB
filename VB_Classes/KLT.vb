@@ -22,7 +22,7 @@ Public Class KLT_Basics : Inherits VBparent
         End If
         task.desc = "Track movement with Kanada-Lucas-Tomasi algorithm"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static prevGray As New cv.Mat
 
         If check.Box(1).Checked Or task.frameCount Mod 25 = 0 Then
@@ -90,7 +90,7 @@ Public Class KLT_OpticalFlow : Inherits VBparent
     Public Sub New()
         task.desc = "KLT optical flow - needs more work"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         klt.Run(src)
         If task.frameCount > 0 And lastpoints IsNot Nothing And klt.inputPoints IsNot Nothing Then
             dst1 = klt.dst1

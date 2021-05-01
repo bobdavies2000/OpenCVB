@@ -21,7 +21,7 @@ Public Class Motion_Basics : Inherits VBparent
         label1 = "Enclosing rectangles are yellow in dst1 and dst2"
         task.desc = "Detect contours in the motion data and the resulting rectangles"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static cumulativeThreshold = findSlider("Cumulative motion threshold")
         Static pixelThreshold = findSlider("Single frame motion threshold")
 
@@ -92,7 +92,7 @@ Public Class Motion_WithBlurDilate : Inherits VBparent
         label2 = "Mask of pixel differences "
         task.desc = "Detect contours in the motion data using blur and dilate"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static persistSlider = findSlider("Frames to persist")
 
         dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
@@ -153,7 +153,7 @@ Public Class Motion_MinMaxDepth : Inherits VBparent
         label2 = "Motion mask"
         task.desc = "While minimizing options and dependencies, use RGB motion to figure out what depth values should change."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static useNone = findRadio("Use unchanged depth input")
         Static useMax = findRadio("Use farthest distance")
         Dim input = src
@@ -193,7 +193,7 @@ Public Class Motion_MinMaxPointCloud : Inherits VBparent
         label2 = stable.label2
         task.desc = "Use the stable depth values to create a stable point cloud"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         Dim input = src.Clone
         If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud
@@ -230,7 +230,7 @@ Public Class Motion_MinMaxDepthColorized : Inherits VBparent
         label2 = "Colorized version of image at left"
         task.desc = "Colorize the stable depth (keeps Motion_MinMaxDepth at a minimum complexity)"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         Static saveMin = task.minDepth
         Static saveMax = task.maxDepth
@@ -262,7 +262,7 @@ Public Class Motion_ThruCorrelation : Inherits VBparent
         dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         task.desc = "Detect motion through the correlation coefficient"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static ccSlider = findSlider("Correlation coefficient threshold for motion X1000")
         Static padSlider = findSlider("Pad size in pixels for the search area")
         Static stdevSlider = findSlider("Stdev threshold for using correlation")
@@ -320,7 +320,7 @@ Public Class Motion_CCmerge : Inherits VBparent
     Public Sub New()
         task.desc = "Use the correlation coefficient to maintain an up-to-date image"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount < 10 Then dst1 = src.Clone
 
         motionCC.Run(src)

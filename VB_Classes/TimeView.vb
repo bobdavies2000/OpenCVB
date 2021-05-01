@@ -13,7 +13,7 @@ Public Class TimeView_Basics : Inherits VBparent
         dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_32F, 0)
         task.desc = "TimeView that highlights concentrations of depth pixels"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static frameSlider = findSlider("Number of frames to include")
         Static sideAccum As New cv.Mat(src.Size, cv.MatType.CV_32FC1)
         Static topAccum As New cv.Mat(src.Size, cv.MatType.CV_32FC1)
@@ -68,7 +68,7 @@ Public Class TimeView_TopBackProjection : Inherits VBparent
     Public Sub New()
         task.desc = "Backproject the side and top views into the image view"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         tFlood.Run(src)
         dst2 = tFlood.dst2
 
@@ -122,7 +122,7 @@ Public Class TimeView_FloodFill : Inherits VBparent
         findSlider("FloodFill Minimum Size").Value = 10
         task.desc = "FloodFill the histograms of side and top views - TimeView_Basics"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         tBasics.Run(src)
 
@@ -153,7 +153,7 @@ Public Class TimeView_Centroids : Inherits VBparent
         label2 = "Side view with centroids in yellow"
         task.desc = "Use KNN to track the query points"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         tflood.Run(src)
         dst1 = tflood.dst2
         dst2 = tflood.dst1
@@ -200,7 +200,7 @@ Public Class TimeView_Rectangles : Inherits VBparent
         label2 = "Side view with rectangles in yellow"
         task.desc = "Use KNN to track the query points"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         tflood.Run(src)
         dst1 = tflood.dst2
         dst2 = tflood.dst1
@@ -237,7 +237,7 @@ Public Class TimeView_Frustrum : Inherits VBparent
         label2 = "Click a quadrant in dst1 to show it in dst2 "
         task.desc = "Colorize the back and side views"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         tView.Run(src)
         mats.mat(0) = tView.dst1.Clone
         mats.mat(1) = tView.dst2.Clone

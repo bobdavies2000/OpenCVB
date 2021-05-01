@@ -70,7 +70,7 @@ Public Class AnyName_CPP : Inherits VBparent
         cPtr = Anyname_Open()
         task.desc = "description"
 	  End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src as cv.Mat) ' Rank = 1
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 

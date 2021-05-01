@@ -6,7 +6,7 @@ Public Class Fourier_MathNet : Inherits VBparent
     Public Sub New()
         task.desc = "Use the 1D Fourier support in MathNet to do a 2D Fourier transform"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 

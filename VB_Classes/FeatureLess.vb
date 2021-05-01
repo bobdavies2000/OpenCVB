@@ -17,7 +17,7 @@ Public Class Featureless_Basics : Inherits VBparent
         label1 = "Featureless mask"
         task.desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)
 
         edges.Run(src)
@@ -55,7 +55,7 @@ Public Class Featureless_DCT_MT : Inherits VBparent
         task.desc = "Use DCT to find featureless regions."
     End Sub
 
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dct.Run(src)
         dst1 = dct.dst1
         dst2 = dct.dst2
@@ -103,7 +103,7 @@ Public Class FeatureLess_Prediction : Inherits VBparent
         End If
         task.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         fLess.Run(src)
         dst1 = fLess.dst1
         dst2 = fLess.dst2
@@ -184,7 +184,7 @@ Public Class FeatureLess_PointTracker : Inherits VBparent
         label2 = "Before point tracker"
         task.desc = "Track the featureless regions with point tracker"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         fLess.Run(src)
         dst2 = fLess.dst1
 
@@ -208,7 +208,7 @@ Public Class FeatureLess_Highlights : Inherits VBparent
     Public Sub New()
         task.desc = "Highlight the featureless regions in an RGB image"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         fLessP.Run(src)
 
         addW.src2 = fLessP.dst1

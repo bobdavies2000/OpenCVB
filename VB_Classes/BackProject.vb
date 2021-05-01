@@ -6,7 +6,7 @@ Public Class BackProject_Basics : Inherits VBparent
         label1 = "Move mouse to backproject each histogram column"
         task.desc = "Explore Backprojection of each element of a grayscale histogram."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.Run(src)
         dst1 = hist.dst1
@@ -60,7 +60,7 @@ Public Class BackProject_Masks : Inherits VBparent
         Next
         Return masklines
     End Function
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         hist.Run(src)
         dst1 = hist.dst1
 
@@ -94,7 +94,7 @@ Public Class BackProject_MasksLines : Inherits VBparent
     Public Sub New()
         task.desc = "Inspect the lines from individual backprojection masks from a histogram"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         hist.Run(src)
         dst1 = hist.dst1
 
@@ -132,7 +132,7 @@ Public Class BackProject_Surfaces : Inherits VBparent
         label1 = "Top=differences in X, Bot=differences in Y"
         task.desc = "Find solid surfaces using the pointcloud X and Y differences"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         pcValid.Run(src)
         Dim mask = pcValid.dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
 
@@ -182,7 +182,7 @@ Public Class BackProject_2D : Inherits VBparent
     Public Sub New()
         task.desc = "Backproject from a hue and saturation histogram."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static hueBinSlider = findSlider("Hue bins")
         Static hueBins = hueBinSlider.Value
         Static satBinSlider = findSlider("Saturation bins")
@@ -237,7 +237,7 @@ Public Class BackProject_2DHSV : Inherits VBparent
         label1 = "Click any quadrant to enlarge it."
         task.desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         hueSat.Run(src)
         mats.mat(0) = hueSat.dst1
         mats.mat(1) = hueSat.dst2
@@ -269,7 +269,7 @@ Public Class BackProject_Full : Inherits VBparent
         label1 = "Move mouse to backproject each histogram column"
         task.desc = "Backproject the entire histogram."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         hist.Run(src)
         dst1 = hist.dst1
 
@@ -304,7 +304,7 @@ Public Class BackProject_Reduction : Inherits VBparent
         label2 = "Backprojection of highlighted histogram bin"
         task.desc = "Use the histogram of a reduced RGB image to isolate featureless portions of an image."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static reductionSlider = findSlider("Reduction factor")
 
         basics.Run(src)
@@ -331,7 +331,7 @@ Public Class BackProject_ReductionLines : Inherits VBparent
         label2 = "Backprojection of highlighted histogram bin"
         task.desc = "Use the histogram of a reduced RGB image to isolate featureless portions of an image."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static reductionSlider = findSlider("Reduction factor")
 
         reduce.Run(src)
@@ -363,7 +363,7 @@ Public Class BackProject_FullLines : Inherits VBparent
     Public Sub New()
         task.desc = "Find lines in the back projection"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         hist.Run(src)
         dst1 = hist.dst1
         lines.Run(hist.dst2)

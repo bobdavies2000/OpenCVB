@@ -237,7 +237,7 @@ Public Class Puzzle_Basics : Inherits VBparent
         Dim r As Random = New Random()
         Shuffle = collection.OrderBy(Function(a) r.Next()).ToList()
     End Function
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static width As Integer
         Static height As Integer
         If width <> gridWidthSlider.Value Or height <> gridHeightSlider.Value Or task.frameCount = 0 Or restartRequested Then
@@ -304,7 +304,7 @@ Public Class Puzzle_Solver : Inherits VBparent
         Next
         Return bfit
     End Function
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         If src.Width = 640 Then
             task.trueText("This algorithm was not setup to work at 640x480.  It works only at 1280x720")

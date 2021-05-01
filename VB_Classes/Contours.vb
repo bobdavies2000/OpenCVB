@@ -49,7 +49,7 @@ Public Class Contours_Basics : Inherits VBparent
             End If
         Next
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static areaSlider = findSlider("Contour minimum area")
         Static epsilonSlider = findSlider("Contour epsilon (arc length percent)")
         Static dontchange As Boolean
@@ -139,7 +139,7 @@ Public Class Contours_RGB : Inherits VBparent
         task.desc = "Find and draw the contour of the largest foreground RGB contour."
         label2 = "Background"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim img = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         img.SetTo(0, task.noDepthMask)
 
@@ -189,7 +189,7 @@ Public Class Contours_RemoveLines : Inherits VBparent
         label2 = "Original with horizontal/vertical lines removed"
         task.desc = "Remove the lines from an invoice image"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim tmp = cv.Cv2.ImRead(task.parms.homeDir + "Data/invoice.jpg")
         Dim dstSize = New cv.Size(src.Height / tmp.Height * src.Width, src.Height)
         Dim dstRect = New cv.Rect(0, 0, dstSize.Width, src.Height)
@@ -230,7 +230,7 @@ Public Class Contours_Depth : Inherits VBparent
         label1 = "DepthContour input"
         label2 = "DepthContour output"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dst1 = task.noDepthMask
         dst2.SetTo(0)
         Dim input As cv.Mat = task.depthMask
@@ -272,7 +272,7 @@ Public Class Contours_Prediction : Inherits VBparent
         label2 = "Image after smoothing with Kalman_Basics"
         task.desc = "Predict the next contour point with Kalman to smooth the outline"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         outline.Run(src)
         dst1 = outline.dst2
         dst2.SetTo(0)
@@ -310,7 +310,7 @@ Public Class Contours_FindandDraw : Inherits VBparent
         label2 = "FindandDraw output"
         task.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         rotatedRect.Run(src)
         dst1 = rotatedRect.dst1
         Dim img = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
@@ -347,7 +347,7 @@ Public Class Contours_Binarized : Inherits VBparent
         label2 = "DrawContours output after FindContours"
         task.desc = "Find contours using Edges after image is binarized"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         sobel.Run(src)
         dst1 = sobel.dst1
 

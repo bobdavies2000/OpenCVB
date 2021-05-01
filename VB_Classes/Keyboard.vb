@@ -9,7 +9,7 @@ Public Class Keyboard_Basics : Inherits VBparent
         label1 = "Use the Options form to send in keystrokes"
         task.desc = "Test the keyboard interface available to all algorithms"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         keyInput = New List(Of String)(checkKeys.inputText)
         checkKeys.inputText.Clear()
         If standalone or task.intermediateReview = caller Then

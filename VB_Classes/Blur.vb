@@ -8,7 +8,7 @@ Public Class Blur_Basics : Inherits VBparent
         End If
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static kernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize As Integer = kernelSlider.Value
         If kernelSize > 0 Then
@@ -32,7 +32,7 @@ Public Class Blur_Gaussian : Inherits VBparent
     Public Sub New()
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = blurKernelSlider.Value
         If kernelSize > 0 Then
@@ -56,7 +56,7 @@ Public Class Blur_Median_CS : Inherits VBparent
     Public Sub New()
         task.desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = blurKernelSlider.Value
         If kernelSize > 0 Then
@@ -79,7 +79,7 @@ Public Class Blur_Homogeneous : Inherits VBparent
     Public Sub New()
         task.desc = "Smooth each pixel with a kernel of 1's of different sizes."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = CDbl(blurKernelSlider.Value)
         If kernelSize > 0 Then
@@ -104,7 +104,7 @@ Public Class Blur_Median : Inherits VBparent
     Public Sub New()
         task.desc = "Replace each pixel with the median of neighborhood of varying sizes."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = CDbl(blurKernelSlider.Value)
         If kernelSize > 0 Then
@@ -129,7 +129,7 @@ Public Class Blur_Bilateral : Inherits VBparent
     Public Sub New()
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes but preserve edges"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static blurKernelSlider = findSlider("Blur Kernel Size")
         Dim kernelSize = CDbl(blurKernelSlider.Value)
         If kernelSize > 0 Then
@@ -155,7 +155,7 @@ Public Class Blur_PlusHistogram : Inherits VBparent
         label2 = "Top is before equalize, Bottom is after Equalize"
         task.desc = "Compound algorithms Blur and Histogram"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         myhist.Run(src)
 
         mat2to1.mat(0) = myhist.dst1.Clone()
@@ -191,7 +191,7 @@ Public Class Blur_TopoMap : Inherits VBparent
         label1 = "Image Gradient"
         task.desc = "Create a topo map from the blurred image"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static reductionSlider = findSlider("Reduction Factor")
         Static frameSlider = findSlider("Frame Count Cycle")
         Static percentSlider = findSlider("Percent of Blurring")

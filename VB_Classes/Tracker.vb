@@ -27,7 +27,7 @@ Imports System.Runtime.InteropServices
 
 '        task.desc = "Track an object using cv.Tracking API's - tracker algorithm"
 '    End Sub
-'    Public Sub Run(src as cv.Mat)
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
 
 '        Dim input = src
 '        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -85,7 +85,7 @@ Imports System.Runtime.InteropServices
 '    Public Sub New()
 '        task.desc = "Track any number of objects simultaneously - tracker algorithm"
 '    End Sub
-'    Public Sub Run(src as cv.Mat)
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
 '        If task.drawRect.Width <> 0 Then
 '            Dim tr = New Tracker_Basics()
 '            tr.src = src
@@ -153,7 +153,7 @@ Public Class Tracker_Basics : Inherits VBparent
 
         task.desc = "Use C++ to track objects"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
 
         Dim input = src

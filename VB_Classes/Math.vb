@@ -12,7 +12,7 @@ Public Class Math_Subtract : Inherits VBparent
 
         task.desc = "Subtract a Mat using a scalar.  Set scalar to zero to see pixels saturate to zero."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim bgr = New cv.Scalar(sliders.trackbar(2).Value, sliders.trackbar(1).Value, sliders.trackbar(0).Value)
         cv.Cv2.Subtract(bgr, src, dst1) ' or dst1 = bgr - src
         dst2 = src - bgr
@@ -56,7 +56,7 @@ Public Class Math_Median_CDF : Inherits VBparent
     Public Sub New()
         task.desc = "Compute the src image median"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         medianVal = computeMedian(src, New cv.Mat, src.Total, task.histogramBins, rangeMin, rangeMax)
 
@@ -85,7 +85,7 @@ Public Class Math_DepthMeanStdev : Inherits VBparent
     Public Sub New()
         task.desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         minMax.Run(src)
         Dim mean As Single = 0, stdev As Single = 0
         Dim mask = minMax.dst2 ' the mask for stable depth.
@@ -110,7 +110,7 @@ Public Class Math_RGBCorrelation : Inherits VBparent
     Public Sub New()
         task.desc = "Compute the correlation coefficient of Red-Green and Red-Blue and Green-Blue"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim split = src.Split()
         match.searchArea = split(0)
         match.template = split(1)
@@ -146,7 +146,7 @@ Public Class Math_ImageAverage : Inherits VBparent
         End If
         task.desc = "Create an image that is the mean of x number of previous images."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static avgSlider = findSlider("Average - number of input images")
         Static saveImageCount = avgSlider.Value
         If avgSlider.Value <> saveImageCount Then
@@ -204,7 +204,7 @@ Public Class Math_Stdev : Inherits VBparent
         lowStdevMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
         task.desc = "Compute the standard deviation in each segment"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static stdevSlider = findSlider("Stdev Threshold")
         Static meanCheck = findCheckBox("Show mean")
         Static stdevCheck = findCheckBox("Show Stdev")
@@ -264,7 +264,7 @@ Public Class Math_StdevBoundary : Inherits VBparent
         label2 = "High stdev segments after the first pass"
         task.desc = "Explore how to get a better boundary on the low stdev mask"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         stdev.Run(src)
         dst1 = stdev.dst1

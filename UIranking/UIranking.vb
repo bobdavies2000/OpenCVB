@@ -49,7 +49,7 @@ Module UIranking
                 End If
             Next
             If rankList.Contains("IMU_GVector") Then rankList += ",Kalman_Basics" ' kalman_basics is so far ahead of the others.  This clips it.
-            If rankList <> "" Then sw.WriteLine("<Rank " + CStr(i) + ">," + rankList)
+            If rankList <> "" Then sw.WriteLine("<Reuse Rank " + CStr(i) + ">," + rankList)
         Next
         sw.Close()
 

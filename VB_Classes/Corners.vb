@@ -12,7 +12,7 @@ Public Class Corners_Harris : Inherits VBparent
         task.desc = "Find corners using Eigen values and vectors"
         label2 = "Corner Eigen values"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static color As New cv.Mat
         Static gray As New cv.Mat
         Static mc As New cv.Mat
@@ -66,7 +66,7 @@ Public Class Corners_SubPix : Inherits VBparent
         label1 = "Output of GoodFeatures"
         task.desc = "Use PreCornerDetect to find features in the image."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         good.Run(src)
         If good.goodFeatures.Count = 0 Then Exit Sub ' no good features right now...
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -95,7 +95,7 @@ Public Class Corners_PreCornerDetect : Inherits VBparent
         End If
         task.desc = "Use PreCornerDetect to find features in the image."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim ksize = sliders.trackbar(0).Value
         If ksize Mod 2 = 0 Then ksize += 1
@@ -134,7 +134,7 @@ Public Class Corners_ShiTomasi_CPP : Inherits VBparent
         task.desc = "Find corners using Eigen values and vectors"
         label2 = "Corner Eigen values"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim data(src.Total - 1) As Byte
 
         Dim blocksize = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value + 1)

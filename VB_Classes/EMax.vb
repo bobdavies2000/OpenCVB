@@ -12,7 +12,7 @@ Public Class EMax_Raw : Inherits VBparent
         label2 = "Emax regions as integers"
         task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         options.Run(Nothing)
         Dim inCount = options.samples.Rows
         label1 = CStr(inCount) + " Random samples in " + CStr(options.regionCount) + " clusters"
@@ -61,7 +61,7 @@ Public Class EMax_Basics : Inherits VBparent
         label1 = "Emax regions around clusters"
         task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         basics.Run(Nothing)
         label1 = basics.label1
 
@@ -129,7 +129,7 @@ Public Class EMax_Setup : Inherits VBparent
         label1 = "EMax algorithms input samples"
         task.desc = "Options for EMax algorithms."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static sampleSlider = findSlider("EMax Number of Samples")
         Static stepSlider = findSlider("EMax Prediction Step Size")
         Static sigmaSlider = findSlider("EMax Sigma (spread)")
@@ -194,7 +194,7 @@ Public Class EMax_VB_Failing : Inherits VBparent
     Public Sub New()
         task.desc = "OpenCV expectation maximization example."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateReview = caller Then
             task.trueText("The EMax algorithm fails as a result of a bug in em_model.Predict2.  See code for details." + vbCrLf +
                           "The C++ version works fine (EMax_Raw) and the 2 are functionally identical.", 20, 100)
@@ -258,7 +258,7 @@ Public Class EMax_Centroids : Inherits VBparent
         findSlider("ThreadGrid Width").Value = dst1.Width * 170 / 640
         task.desc = "Get the Emax cluster centroids using floodfill "
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         emaxCPP.Run(src)
         flood.Run(emaxCPP.dst1.Clone)
         dst1 = flood.dst1
@@ -290,7 +290,7 @@ Public Class EMax_PointTracker : Inherits VBparent
         label1 = "Original before KNN/Kalman tracking (red=previous)"
         task.desc = "Use KNN and Kalman to track the EMax Centroids and map consisten colors"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         emax.Run(src)
         dst1 = emax.dst1
 

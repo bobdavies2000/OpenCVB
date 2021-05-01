@@ -57,7 +57,7 @@ Public Class WarpAffine_Captcha : Inherits VBparent
         cv.Cv2.WarpPerspective(charImage, charImage, perpectiveTranx, New cv.Size(charImage.Cols, charImage.Rows), cv.InterpolationFlags.Cubic,
                                cv.BorderTypes.Constant, cv.Scalar.White)
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim characters() As String = {"a", "A", "b", "B", "c", "C", "D", "d", "e", "E", "f", "F", "g", "G", "h", "H", "j", "J", "k", "K", "m", "M", "n", "N", "q", "Q", "R", "t", "T", "w", "W", "x", "X", "y", "Y", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
         Dim charactersSize = characters.Length / characters(0).Length
 
@@ -99,7 +99,7 @@ Public Class WarpAffine_Basics : Inherits VBparent
 
         task.desc = "Use WarpAffine to transform input images."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static frm = findfrm("WarpAffine_Basics Radio Options")
 
         rotateOptions.Run(src)
@@ -135,7 +135,7 @@ Public Class WarpAffine_3Points : Inherits VBparent
         label1 = "Triangles define the affine transform"
         label2 = "Image with affine transform applied"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static M As New cv.Mat
         If task.frameCount Mod 60 = 0 Then
             Dim triangles(1) As cv.Mat
@@ -204,7 +204,7 @@ Public Class WarpAffine_4Points : Inherits VBparent
         task.desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."
         label1 = "Color image with perspective transform applied"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static M As New cv.Mat
         If task.frameCount Mod 60 = 0 Then
 

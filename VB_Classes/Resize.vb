@@ -13,7 +13,7 @@ Public Class Resize_Basics : Inherits VBparent
         label1 = "Rectangle highlight above resized"
         label2 = "Difference from Cubic Resize (Best)"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         rotateOptions.Run(src)
 
         If standalone Or task.intermediateReview = caller Then
@@ -45,7 +45,7 @@ Public Class Resize_Percentage : Inherits VBparent
         End If
         task.desc = "Resize by a percentage of the image."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim percent As Double = CDbl(sliders.trackbar(0).Value / 100)
         Dim resizePercent = sliders.trackbar(0).Value / 100
         resizePercent = Math.Sqrt(resizePercent)

@@ -75,7 +75,7 @@ Public Class OpenGL_Basics : Inherits VBparent
         imageLabel = OpenGLTitle ' default title - can be overridden with each image.
         pipe.WaitForConnection()
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateReview = caller Or pointCloudInput Is Nothing Then pointCloudInput = task.pointCloud
 
         If task.noDepthMask.Width = pointCloudInput.Width Then pointCloudInput.SetTo(0, task.noDepthMask)
@@ -160,7 +160,7 @@ Public Class OpenGL_Options : Inherits VBparent
         task.desc = "Adjust point size and FOV in OpenGL"
         label1 = ""
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         OpenGL.FOV = sliders.trackbar(0).Value
         OpenGL.yaw = sliders.trackbar(1).Value
@@ -196,7 +196,7 @@ Public Class OpenGL_Callbacks : Inherits VBparent
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         task.desc = "Show the point cloud of 3D data and use callbacks to modify view."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Then pointCloudInput = task.pointCloud
         ogl.pointCloudInput = pointCloudInput
         ogl.Run(src)
@@ -217,7 +217,7 @@ Public Class OpenGL_IMU : Inherits VBparent
         ogl.sliders.trackbar(3).Value = 0 ' roll
         task.desc = "Show how to use IMU coordinates in OpenGL"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.parms.IMU_Present Then
             imu.Run(src)
             ogl.OpenGL.dataInput = New cv.Mat(100, 100, cv.MatType.CV_32F, 0)
@@ -257,7 +257,7 @@ Public Class OpenGL_3Ddata : Inherits VBparent
         label1 = "Input to Histogram 3D"
         task.desc = "Plot the results of a 3D histogram in OpenGL."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim bins = sliders.trackbar(0).Value
 
         If histInput Is Nothing Then ReDim histInput(src.Total * src.ElemSize - 1)
@@ -295,7 +295,7 @@ Public Class OpenGL_Draw3D : Inherits VBparent
         label2 = "Grayscale image sent to OpenGL"
         task.desc = "Draw in an image show it in 3D in OpenGL without any explicit math"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         circle.Run(src)
         dst2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ogl.OpenGL.dataInput = dst2
@@ -317,7 +317,7 @@ Public Class OpenGL_Voxels : Inherits VBparent
         ogl.OpenGLTitle = "OpenGL_Voxels"
         task.desc = "Show the voxel representation in OpenGL"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static intermediateResults = findCheckBox("Display intermediate results")
         voxels.Run(src)
         If intermediateResults.checked Then
@@ -344,7 +344,7 @@ Public Class OpenGL_GravityTransform : Inherits VBparent
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         task.desc = "Use the IMU's acceleration values to build the transformation matrix of an OpenGL viewer"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.parms.IMU_Present Then
             gCloud.Run(task.pointCloud)
 
@@ -369,7 +369,7 @@ Public Class OpenGL_Floor : Inherits VBparent
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         task.desc = "Convert depth cloud floor to a plane and visualize it with OpenGL"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         If task.parms.IMU_Present Then
             plane.Run(src)
@@ -398,7 +398,7 @@ Public Class OpenGL_FloorPlane : Inherits VBparent
         ogl.OpenGLTitle = "OpenGL_FloorPlane"
         task.desc = "Show the floor in the pointcloud as a plane"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         If task.parms.IMU_Present Then
             plane.Run(src)
@@ -436,7 +436,7 @@ End Class
 '        shuffle = New Texture_Shuffle()
 '        task.desc = "Texture the plane of the floor with a good sample of the texture from the mask"
 '    End Sub
-'    Public Sub Run(src as cv.Mat)
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
 
 '        If task.parms.IMU_Present Then
 '            floor.plane.src = src
@@ -477,7 +477,7 @@ Public Class OpenGL_DepthSliceH : Inherits VBparent
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         task.desc = "View depth slices in 3D with OpenGL"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         slices.Run(src)
         dst1 = slices.dst1
         Dim mask As New cv.Mat
@@ -502,7 +502,7 @@ Public Class OpenGL_StableDepth : Inherits VBparent
     Public Sub New()
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         pcValid.Run(src)
         dst1 = pcValid.dst1
         dst2 = pcValid.dst2
@@ -523,7 +523,7 @@ Public Class OpenGL_AverageDepth : Inherits VBparent
         label2 = "32-bit format stabilized depth data"
         task.desc = "Use the depth_stabilizer output as input the an OpenGL display"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         Dim split = task.pointCloud.Split()
 
@@ -553,7 +553,7 @@ Public Class OpenGL_StableDepthMouse : Inherits VBparent
         label2 = "dst2 is a pointcloud"
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         pcValid.Run(src)
         dst1 = pcValid.dst1
         dst2 = pcValid.dst2
@@ -575,7 +575,7 @@ Public Class OpenGL_Surfaces : Inherits VBparent
     Public Sub New()
         task.desc = "Filter the 3D image to show only smooth surfaces."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         smooth.Run(src)
         dst1 = smooth.dst2
 
@@ -597,7 +597,7 @@ Public Class OpenGL_Stable : Inherits VBparent
     Public Sub New()
         task.desc = "Use the Motion_MinMaxPointCloud in 3D"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         stable.Run(src)
         dst1 = stable.dst1
 
@@ -621,7 +621,7 @@ Public Class OpenGL_ReducedXYZ : Inherits VBparent
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         task.desc = "Display the pointCloud after reduction in X, Y, or Z dimensions."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         reduction.Run(src)
         dst2 = reduction.dst2
 
@@ -643,7 +643,7 @@ Public Class OpenGL_Reduction : Inherits VBparent
         ogl.OpenGLTitle = "OpenGL_Callbacks"
         task.desc = "Use the reduced depth pointcloud in OpenGL"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         reduction.Run(src)
         dst1 = reduction.dst1
         dst2 = reduction.dst2
@@ -665,7 +665,7 @@ Public Class OpenGL_ReducedSideView : Inherits VBparent
     Public Sub New()
         task.desc = "Use the reduced depth pointcloud in 3D but allow it to be rotated in Options_Common"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         reduced.Run(src)
         dst1 = reduced.dst1
 
@@ -688,7 +688,7 @@ Public Class OpenGL_MFD_PointCloud : Inherits VBparent
     Public Sub New()
         task.desc = "Use the MFD_PointCloud in 3D"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         mfd.Run(src)
         dst1 = mfd.dst1
         dst2 = mfd.dst2
@@ -713,7 +713,7 @@ Public Class OpenGL_Structured_PointCloud : Inherits VBparent
         label1 = "Structured cloud 32fC3 data"
         task.desc = "Visualize the Structured_Cloud"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         sCloud.Run(src)
         dst1 = sCloud.dst1
 

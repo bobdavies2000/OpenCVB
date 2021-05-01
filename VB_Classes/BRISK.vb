@@ -10,7 +10,7 @@ Public Class BRISK_Basics : Inherits VBparent
         task.desc = "Detect features with BRISK"
         Brisk = cv.BRISK.Create()
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         src.CopyTo(dst1)
         Dim keyPoints = Brisk.Detect(src)
 

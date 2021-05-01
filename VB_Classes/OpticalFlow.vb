@@ -94,7 +94,7 @@ Public Class OpticalFlow_DenseOptions : Inherits VBparent
         label1 = "No output - just option settings..."
         task.desc = "Use dense optical flow algorithm options"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         pyrScale = sliders.trackbar(0).Value / sliders.trackbar(0).Maximum
         levels = sliders.trackbar(1).Value
         winSize = sliders.trackbar(2).Value
@@ -125,7 +125,7 @@ Public Class OpticalFlow_DenseBasics : Inherits VBparent
     Public Sub New()
         task.desc = "Use dense optical flow algorithm  "
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static oldGray As New cv.Mat
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -165,7 +165,7 @@ Public Class OpticalFlow_DenseBasics_MT : Inherits VBparent
 
         task.desc = "MultiThread dense optical flow algorithm  "
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static thresholdSlider = findSlider("OpticalFlow Correlation Threshold")
         Static oldGray As New cv.Mat
 
@@ -245,7 +245,7 @@ Public Class OpticalFlow_Sparse : Inherits VBparent
             errScale.Set(Of Double)(i, 0, (1 - gainScale) * f1err.Get(Of Double)(i, 0))
         Next
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dst1 = src.Clone()
         dst2 = src.Clone()
 

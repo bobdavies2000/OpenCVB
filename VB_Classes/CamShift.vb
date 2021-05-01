@@ -20,7 +20,7 @@ Public Class CamShift_Basics : Inherits VBparent
         label2 = "Histogram of targeted region (hue only)"
         task.desc = "CamShift Demo - draw on the images to define the object to track. Tracker Algorithm"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static vMinSlider = findSlider("CamShift vMin")
         Static vMaxSlider = findSlider("CamShift vMax")
         Static sMinSlider = findSlider("CamShift Smin")
@@ -81,7 +81,7 @@ Public Class CamShift_Foreground : Inherits VBparent
         label1 = "Automatically finding the head - top of nearest object"
         task.desc = "Use depth to find the head and start the camshift demo.  Tracker Algorithm"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim restartRequested As Boolean
         Static depthMin As Integer
         Static depthMax As Integer
@@ -114,7 +114,7 @@ Public Class Camshift_Object : Inherits VBparent
         label2 = "Backprojection of depth clusters masked with hue"
         task.desc = "Use the blob depth cluster as input to initialize a camshift algorithm.  Tracker Algorithm"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         blob.Run(src)
         dst2 = blob.dst2.Clone()
 
@@ -153,7 +153,7 @@ Public Class Camshift_TopObjects : Inherits VBparent
         End If
         task.desc = "Track - Tracker Algorithm"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static updateSlider = findSlider("Reinitialize camshift after x frames")
         blob.Run(src)
         dst1 = blob.dst2

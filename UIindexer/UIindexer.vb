@@ -2,7 +2,6 @@
 Imports System.Text.RegularExpressions
 Module IndexMain
     Dim CPPnames As New SortedList(Of String, String)
-    ' Dim MTnames As New SortedList(Of String, String)
     Dim CSnames As New SortedList(Of String, String)
     Dim OpenGLnames As New SortedList(Of String, String)
     Dim numpy As New SortedList(Of String, String)
@@ -10,9 +9,9 @@ Module IndexMain
     Dim nonPYnames As New SortedList(Of String, String)
     Dim PYStreamNames As New SortedList(Of String, String)
     Dim Painterly As New SortedList(Of String, String)
+    Dim rankings(10 - 1) As String
     Dim Basics As New SortedList(Of String, String)
     Dim MoreWork As New SortedList(Of String, String)
-    ' Dim Trackers As New SortedList(Of String, String)
     Private Function trimQuotes(line As String)
         While InStr(line, """")
             Dim startq = InStr(line, """")
@@ -80,20 +79,20 @@ Module IndexMain
             While nextFile.Peek() <> -1
                 line = Trim(nextFile.ReadLine())
                 Dim lcaseLine = " " + LCase(line)
-                If lcaseLine.Contains("painterly") And Painterly.ContainsKey(classname) = False Then Painterly.Add(classname, classname)
-
-                If line = "" Or Trim(line).StartsWith("'") Or Trim(line).StartsWith("#") Then Continue While
-
-                If lcaseLine.Contains("needs more work") And MoreWork.ContainsKey(classname) = False Then MoreWork.Add(classname, classname)
-                ' If lcaseLine.Contains("tracker algorithm") And Trackers.ContainsKey(classname) = False Then Trackers.Add(classname, classname)
-                If (lcaseLine.Contains("np.") Or LCase(classname).Contains("numpy")) And numpy.ContainsKey(classname) = False Then numpy.Add(classname, classname)
-                If LCase(line).StartsWith("public class") Then
+                If line.Contains(" ' Rank = ") Then
                     Dim split As String() = Regex.Split(line, "\W+")
-                    ' next line must be "Inherits VBparent"
-                    If line.EndsWith(" : Inherits VBparent") Then classname = split(2) ' public class <classname>
+                    Dim index = split(split.Length - 1)
+                    rankings(index) += "," + classname
+                End If
+                If lcaseLine.Contains("painterly") And Painterly.ContainsKey(classname) = False Then Painterly.Add(classname, classname)
+                If line = "" Or Trim(line).StartsWith("'") Or Trim(line).StartsWith("#") Then Continue While
+                If lcaseLine.Contains("needs more work") And MoreWork.ContainsKey(classname) = False Then MoreWork.Add(classname, classname)
+                If (lcaseLine.Contains("np.") Or LCase(classname).Contains("numpy")) And numpy.ContainsKey(classname) = False Then numpy.Add(classname, classname)
+                If LCase(line).StartsWith("public class") And LCase(line).EndsWith("inherits vbparent") Then
+                    Dim split As String() = Regex.Split(line, "\W+")
+                    classname = split(2) ' public class <classname>
                     If classname.StartsWith("Python_") Then PYnames.Add(classname, classname)
                     If classname.EndsWith("_PS.py") Then PYStreamNames.Add(classname, classname)
-                    ' If classname.EndsWith("_MT") Then MTnames.Add(classname, classname)
                     If classname.EndsWith("_CPP") Then CPPnames.Add(classname, classname)
                     If classname.StartsWith("OpenGL") Then OpenGLnames.Add(classname, classname)
                     If classname.StartsWith("OpenCVGL") Then OpenGLnames.Add(classname, classname)
@@ -128,11 +127,6 @@ Module IndexMain
         Dim sortedNames As New SortedList(Of String, String)
         For i = 0 To tokens.Count - 1
             If tokens(i) IsNot Nothing Then
-
-                ' once we hit the first OpenCVB name, we are done because we are going to use the output of the UIranking.exe instead.
-                ' The ranking includes the indirect references while the apilist created above only has the direct references.
-                If apiList(i).StartsWith(nonPYnames.ElementAt(0).Key) Then Exit For
-
                 If apiList(i).EndsWith("(") Then apiList(i) = apiList(i).Substring(0, Len(apiList(i)) - 1)
                 ' sort the tokens before creating the final entry
                 Dim split As String() = Regex.Split(tokens(i), ",")
@@ -147,15 +141,6 @@ Module IndexMain
                 sortedNames.Add(apiList(i), finalEntry)
             End If
         Next
-
-        ' this is where we add the direct and indirect references to the OpenCVKeywords.
-        sr = New StreamReader(directoryInfo.FullName + "\..\Data\OpenCVBKeywords.txt")
-        While sr.EndOfStream = False
-            Dim nextKey = sr.ReadLine()
-            Dim split = nextKey.Split(",")
-            sortedNames.Add(split(0), nextKey)
-        End While
-        sr.Close()
 
         Dim sw As New StreamWriter(directoryInfo.FullName + "/../Data/AlgorithmMapToOpenCV.txt")
         sw.WriteLine("<All>")
@@ -194,12 +179,6 @@ Module IndexMain
             sw.WriteLine()
         End If
 
-        'sw.Write("<Multi-Threaded Algorithms>")
-        'For i = 0 To MTnames.Count - 1
-        '    sw.Write("," + MTnames.ElementAt(i).Key)
-        'Next
-        'sw.WriteLine()
-
         sw.Write("<NumPy>")
         For i = 0 To numpy.Count - 1
             sw.Write("," + numpy.ElementAt(i).Key)
@@ -236,11 +215,12 @@ Module IndexMain
         End While
         sr.Close()
 
-        'sw.Write("<Trackers>")
-        'For i = 0 To Trackers.Count - 1
-        '    sw.Write("," + Trackers.ElementAt(i).Key)
-        'Next
-        'sw.WriteLine()
+        For i = 2 To rankings.Count - 1
+            If Len(rankings(i)) > 0 Then
+                sw.Write("<Value Rank " + CStr(i) + " (Manual)>")
+                sw.WriteLine(rankings(i))
+            End If
+        Next
 
         For i = 0 To sortedNames.Count - 1
             Dim token = sortedNames.ElementAt(i)

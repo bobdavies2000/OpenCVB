@@ -16,7 +16,7 @@ Public Class Voxels_Basics_MT : Inherits VBparent
         label2 = "Voxels labeled with their median distance"
         task.desc = "Use multi-threading to get median depth values as voxels."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
         Dim split() = src.Split()

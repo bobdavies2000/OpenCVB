@@ -89,7 +89,7 @@ Public Class Replay_Record : Inherits VBparent
 
         task.desc = "Create a recording of camera data that contains color, depth, RGBDepth, pointCloud, and IMU data in an .bob file."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static bytesTotal As Int64
         recordingFilename = New FileInfo(fileNameForm.filename.Text)
         If task.parms.useRecordedData And recordingFilename.Exists = False Then
@@ -180,7 +180,7 @@ Public Class Replay_Play : Inherits VBparent
 
         task.desc = "Playback a file recorded by OpenCVB"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static bytesTotal As Int64
         recordingFilename = New FileInfo(fileNameForm.filename.Text)
         If recordingFilename.Exists = False Then task.trueText("File not found: " + recordingFilename.FullName, 10, 125)
@@ -259,7 +259,7 @@ Public Class Replay_OpenGL : Inherits VBparent
     Public Sub New()
         task.desc = "Replay a recorded session with OpenGL"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         replay.Run(src)
         ogl.pointCloudInput = task.pointCloud
         ogl.Run(task.color)

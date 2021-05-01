@@ -8,7 +8,7 @@ Public Class Structured_Floor : Inherits VBparent
 
         task.desc = "Find the floor plane"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         structD.Run(src)
 
@@ -50,7 +50,7 @@ Public Class Structured_Ceiling : Inherits VBparent
         structD.cushionSlider.Value = 10
         task.desc = "Find the ceiling plane"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         structD.Run(src)
 
@@ -83,7 +83,7 @@ Public Class Structured_MultiSliceH : Inherits VBparent
     Public Sub New()
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
         Dim cushion = cushionSlider.Value
@@ -125,7 +125,7 @@ Public Class Structured_MultiSliceV : Inherits VBparent
     Public Sub New()
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
         Dim cushion = cushionSlider.Value
@@ -171,7 +171,7 @@ Public Class Structured_MultiSlice : Inherits VBparent
     Public Sub New()
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
         Dim stepsize = stepSlider.value
@@ -229,7 +229,7 @@ Public Class Structured_MultiSliceLines : Inherits VBparent
         lenSlider.Value = lenSlider.Maximum ' don't need the yellow line...
         task.desc = "Detect lines in the multiSlice output"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         multi.Run(src)
         cv.Cv2.BitwiseNot(multi.dst2, dst2)
         ldetect.Run(multi.dst2)
@@ -255,7 +255,7 @@ Public Class Structured_MultiSlicePolygon : Inherits VBparent
         End If
         task.desc = "Detect polygons in the multiSlice output"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static sidesSlider = findSlider("Max number of sides in the identified polygons")
         Dim maxSides = sidesSlider.Value
 
@@ -292,7 +292,7 @@ Public Class Structured_SliceXPlot : Inherits VBparent
         cushionSlider.Value = cushionSlider.Maximum
         task.desc = "Find any plane around a peak value in the top-down histogram"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         structD.Run(src)
         dst2 = structD.dst2
         multi.Run(src)
@@ -347,7 +347,7 @@ Public Class Structured_LinearizeFloor : Inherits VBparent
         End If
         task.desc = "Using the mask for the floor create a better representation of the floor plane"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static xCheck = findCheckBox("Smooth in X-direction")
         Static yCheck = findCheckBox("Smooth in Y-direction")
         Static zCheck = findCheckBox("Smooth in Z-direction")
@@ -443,7 +443,7 @@ Public Class Structured_SliceOptions : Inherits VBparent
 
         task.desc = "Structured Slice options"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         task.trueText("This algorithm is used to share the horizontal and vertical slice options.")
     End Sub
 End Class
@@ -466,7 +466,7 @@ Public Class Structured_SliceH : Inherits VBparent
         label2 = "Yellow bar is ceiling.  Yellow line is camera level."
         task.desc = "Find and isolate planes (floor and ceiling) in a side view histogram."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         side2D.Run(src)
 
         Dim depthShadow = task.noDepthMask
@@ -523,7 +523,7 @@ Public Class Structured_SliceV : Inherits VBparent
 
         task.desc = "Find and isolate planes using the top view histogram data"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim xCoordinate = offsetSlider.Value
         top2D.Run(src)
 
@@ -578,7 +578,7 @@ Public Class Structured_SliceVStable : Inherits VBparent
         offsetSlider.Value = dst1.Width / 2
         task.desc = "Find and isolate planes using the top view histogram data"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim xCoordinate = offsetSlider.Value
         top2D.Run(src)
         dst2 = top2D.dst1
@@ -626,7 +626,7 @@ Public Class Structured_CenterSlice : Inherits VBparent
         label2 = "White = SliceV output, Red Dot is avgPt"
         task.desc = "Find the vertical center line with accurate depth data.."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         vSlice.Run(src)
         dst1 = task.color
@@ -714,7 +714,7 @@ Public Class Structured_CloudFail : Inherits VBparent
 
         task.desc = "Attempt to impose a structure on the point cloud data."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static xLineSlider = findSlider("Lines in X-Direction")
         Static yLineSlider = findSlider("Lines in Y-Direction")
         Static thresholdSlider = findSlider("Continuity threshold in mm")
@@ -794,7 +794,7 @@ Public Class Structured_Cloud : Inherits VBparent
 
         task.desc = "Attempt to impose a linear structure on the pointcloud."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static sliceSlider = findSlider("Number of slices")
         Dim xLines = sliceSlider.value
         Dim yLines = CInt(xLines * dst1.Height / dst1.Width)
@@ -832,7 +832,7 @@ Public Class Structured_Crosshairs : Inherits VBparent
     Public Sub New()
         task.desc = "Connect vertical and horizontal dots that are in the same column and row."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static sliceSlider = findSlider("Number of slices")
         Static xSlider = findSlider("Slice index X")
         Static ySlider = findSlider("Slice index Y")

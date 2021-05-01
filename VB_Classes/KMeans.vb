@@ -10,7 +10,7 @@ Public Class KMeans_Basics : Inherits VBparent
 
         task.desc = "Cluster the rgb image pixels using kMeans."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim kInput = src.Resize(New cv.Size(CInt(src.Width / resizeFactor), CInt(src.Height / resizeFactor)))
         Dim columnVector = kInput.Reshape(src.Channels, kInput.Height * kInput.Width)
         Dim src32f As New cv.Mat
@@ -58,7 +58,7 @@ Public Class KMeans_BasicsDepthColor : Inherits VBparent
         End If
         task.desc = "Cluster the rgb image pixels using kMeans."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim resizeVal = If(resizeRequest, 4, 1)
         Dim small = src.Resize(New cv.Size(src.Width / resizeVal, src.Height / resizeVal))
         Dim rectMat = small.Clone
@@ -103,7 +103,7 @@ Public Class KMeans_Clusters : Inherits VBparent
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Show clustering with various settings for cluster count.  Draw to select region of interest."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static saveRect = task.drawRect
         task.drawRect = saveRect
         For i = 0 To 3
@@ -133,7 +133,7 @@ Public Class KMeans_RGBFast : Inherits VBparent
         End If
         task.desc = "Cluster a small rgb image using kMeans.  Specify clusterCount value."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim small8uC3 = src.Resize(New cv.Size(CInt(src.Rows / resizeFactor), CInt(src.Cols / resizeFactor)))
         Dim columnVector As New cv.Mat
         columnVector = small8uC3.Reshape(small8uC3.Channels, small8uC3.Rows * small8uC3.Cols)
@@ -171,7 +171,7 @@ Public Class KMeans_RGB_Plus_XYDepth : Inherits VBparent
         label1 = "kmeans - RGB, XY, and Depth Raw"
         task.desc = "Cluster with kMeans RGB, x, y, and depth."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         km.Run(src) ' cluster the rgb image - output is in dst2
         Dim rgb32f As New cv.Mat
         km.dst1.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
@@ -230,7 +230,7 @@ Public Class KMeans_XYDepth : Inherits VBparent
         label2 = "Currently selected region"
         task.desc = "Cluster with x, y, and depth using kMeans.  Draw on the image to select a region."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim roi = task.drawRect
         Dim xyDepth32f As New cv.Mat(task.depth32f(roi).Size(), cv.MatType.CV_32FC3, 0)
         For y = 0 To xyDepth32f.Rows - 1
@@ -261,7 +261,7 @@ Public Class KMeans_Depth_FG_BG : Inherits VBparent
         label2 = "Background Mask"
         task.desc = "Separate foreground and background using Kmeans (with k=2) using the depth value of center point."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim columnVector As New cv.Mat
         columnVector = task.depth32f.Reshape(1, task.depth32f.Rows * task.depth32f.Cols)
         columnVector.ConvertTo(columnVector, cv.MatType.CV_32FC1)
@@ -298,7 +298,7 @@ Public Class KMeans_LAB : Inherits VBparent
         task.drawRect = New cv.Rect(w, h, w * 2, h * 2)
         task.desc = "Cluster the LAB image using kMeans.  Is it better?  Optionally draw on the image and select k."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim roi = task.drawRect
         Dim labMat = src(roi).CvtColor(cv.ColorConversionCodes.RGB2Lab)
         Dim columnVector As New cv.Mat
@@ -334,7 +334,7 @@ Public Class KMeans_Color : Inherits VBparent
         End If
         task.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim columnVector = src.Reshape(src.Channels, src.Height * src.Width)
         Dim rgb32f As New cv.Mat
         columnVector.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
@@ -370,7 +370,7 @@ Public Class KMeans_Color_MT : Inherits VBparent
 
         task.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)
         Dim clusterCount = sliders.trackbar(0).Value
         Parallel.ForEach(grid.roiList,
@@ -410,7 +410,7 @@ Public Class KMeans_ColorDepth : Inherits VBparent
 
         task.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim rgb32f As New cv.Mat
         src.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
         Dim srcPlanes() As cv.Mat = Nothing
@@ -456,7 +456,7 @@ Public Class KMeans_ColorDepth_MT : Inherits VBparent
 
         task.desc = "Cluster the rgb+Depth using kMeans.  Color each cluster by average depth."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)
 
         Dim clusterCount = sliders.trackbar(0).Value
@@ -501,7 +501,7 @@ Public Class KMeans_Subdivision : Inherits VBparent
         kmeans.resizeRequest = False
         task.desc = "Use KMeans to subdivide an image and then subdivide it again."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static kmeansKslider = findSlider("kMeans k")
         kmeansKslider.value = 2
 
@@ -538,7 +538,7 @@ Public Class KMeans_Subdivision1 : Inherits VBparent
         kmeans.useDepthColor = False
         task.desc = "Use KMeans to subdivide an image and then subdivide it again."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static kmeansKslider = findSlider("kMeans k")
         kmeansKslider.value = 2
 

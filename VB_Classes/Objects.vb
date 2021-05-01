@@ -6,7 +6,7 @@ Public Class Object_Basics : Inherits VBparent
         label2 = "Mask for background"
         task.desc = "Identify objects in the foreground."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone or task.intermediateReview = caller Then
             dst1 = task.depthmask
             dst2 = task.noDepthMask

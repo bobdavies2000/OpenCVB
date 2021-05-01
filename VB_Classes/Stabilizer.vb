@@ -21,7 +21,7 @@ Public Class Stabilizer_Basics : Inherits VBparent
         label1 = "Current frame - rectangle input to matchTemplate"
         task.desc = "if reasonable stdev and no motion in correlation rectangle, stabilize image across frames"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static widthSlider = findSlider("Width of input to matchtemplate")
         Static heightSlider = findSlider("Height of input to matchtemplate")
         Static netSlider = findSlider("Maximum percentage of lost pixels before image is reset")
@@ -107,7 +107,7 @@ Public Class Stabilizer_BasicsRandomInput : Inherits VBparent
         label2 = "Image after shift"
         task.desc = "Generate images that have been arbitrarily shifted"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static rangeSlider = findSlider("Range of random motion introduced (absolute value in pixels)")
         Dim range = rangeSlider.value
 
@@ -157,7 +157,7 @@ Public Class Stabilizer_BasicsTest : Inherits VBparent
         label1 = "Unstable input to Stabilizer_Basics"
         task.desc = "Test the Stabilizer_Basics with random movement"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         random.Run(src)
         stable.Run(random.dst2.Clone)
@@ -185,7 +185,7 @@ Public Class Stabilizer_OpticalFlow : Inherits VBparent
         task.desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
         label1 = "Stabilized Image"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim vert_Border = borderCrop * src.Rows / src.Cols
         If task.frameCount = 0 Then
             errScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 1)
@@ -296,7 +296,7 @@ Public Class Stabilizer_MotionDetect : Inherits VBparent
 
         task.desc = "Detect motiion in the stabilizer output"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static offsetSlider = findSlider("Offset of stable rectangle from each side in pixels")
         Dim offset = offsetSlider.value
 

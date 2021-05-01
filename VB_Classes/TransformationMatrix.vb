@@ -12,7 +12,7 @@ Public Class TransformationMatrix_Basics : Inherits VBparent
         label2 = "View from side of the camera"
         task.desc = "Show the contents of the transformation matrix"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.transformationMatrix IsNot Nothing Then
             Dim t = task.transformationMatrix
             Dim mul = sliders.trackbar(0).Value

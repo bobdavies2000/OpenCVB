@@ -23,7 +23,7 @@ Public Class Gabor_Basics : Inherits VBparent
         End If
         task.desc = "Explore Gabor kernel - Painterly Effect"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone or task.intermediateReview = caller Then
             ksize = sliders.trackbar(0).Value * 2 + 1
             Sigma = sliders.trackbar(1).Value
@@ -60,7 +60,7 @@ Public Class Gabor_Basics_MT : Inherits VBparent
 
         task.desc = "Apply multiple Gabor filters sweeping through different values of theta - Painterly Effect."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static ksizeSlider = findSlider("Gabor Kernel Size")
         Static sigmaSlider = findSlider("Gabor Sigma")
         Static lambdaSlider = findSlider("Gabor lambda")

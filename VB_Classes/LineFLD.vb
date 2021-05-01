@@ -38,7 +38,7 @@ Public Class LineFLD_Basics : Inherits VBparent
         label2 = "If camera motion, image is reset"
         task.desc = "A Fast Line Detector"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         lines.Clear()
 
         Dim length_threshold = minLenSlider.Value
@@ -261,7 +261,7 @@ Public Class LineFLD_CPP : Inherits VBparent
     Public Sub New()
         task.desc = "Basics for a Fast Line Detector"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static sizeSlider = findSlider("FLD - Line Thickness")
         sortedLines.Clear()
 
@@ -304,7 +304,7 @@ Public Class LineFLD_LongestLine : Inherits VBparent
         task.desc = "Identify planes using the lines present in the rgb image."
         label2 = ""
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
         lines.Run(src)
         src.CopyTo(dst1)
@@ -336,7 +336,7 @@ Public Class LineFLD_MT : Inherits VBparent
         task.desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
         label2 = ""
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
         lines.Run(src)
         src.CopyTo(dst1)
@@ -374,7 +374,7 @@ End Class
 '        task.desc = "Use Fitline with the sparse Z data and X or Y (in RGB pixels)."
 '        label2 = ""
 '    End Sub
-'    Public Sub Run(src as cv.Mat)
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
 '        If task.frameCount Mod sliders.trackbar(2).Value Then Exit Sub
 '        Dim useX As Boolean = check.Box(0).Checked
 '        linesFLD.src = src

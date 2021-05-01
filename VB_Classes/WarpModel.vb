@@ -26,7 +26,7 @@ Public Class WarpModel_Basics : Inherits VBparent
         label2 = "Src2 image aligned to src image"
         task.desc = "Use FindTransformECC to align 2 images"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Then
             warpInput.Run(src)
 
@@ -130,7 +130,7 @@ Public Class WarpModel_Input : Inherits VBparent
 
         task.desc = "Import the misaligned input."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static gradientCheck = findCheckBox("Use Gradient in WarpInput")
         Static frm = findfrm(caller + " Radio Options")
         Dim img As New cv.Mat
@@ -199,7 +199,7 @@ Public Class WarpModel_AlignImages : Inherits VBparent
         label1 = "Aligned image"
         task.desc = "Align the RGB inputs raw images from the Prokudin examples."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static gradientCheck = findCheckBox("Use Gradient in WarpInput")
         If standalone Then ecc.warpInput.Run(src)
         Dim aligned() = {New cv.Mat, New cv.Mat}
@@ -252,7 +252,7 @@ End Class
 '        label2 = "Current ROI aligned to previous frame (dst1)"
 '        task.desc = "Find the Translation and Euclidean warp matrix for the current grayscale image to the previous - needs more work"
 '    End Sub
-'    Public Sub Run(src as cv.Mat)
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
 '        Static stdevSlider = findSlider("Stdev Threshold")
 '        Dim stdevThreshold = CSng(stdevSlider.Value)
 '        Static correlationSlider = findSlider("Correlation Threshold X1000")
@@ -312,7 +312,7 @@ End Class
 '    Public Sub New()
 '        task.desc = "Find warp matrix for the whole image using just the segment with the highest entropy."
 '    End Sub
-'    Public Sub Run(src as cv.Mat)
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
 
 '        ' we only need to compute the max entropy every once in a while.  
 '        If task.frameCount Mod 10 = 0 Then

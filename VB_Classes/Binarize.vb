@@ -17,7 +17,7 @@ Public Class Binarize_Basics : Inherits VBparent
         mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 255)
         task.desc = "Binarize an image using Threshold with OTSU."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         meanScalar = cv.Cv2.Mean(src, mask)
 
         Dim input = src
@@ -55,7 +55,7 @@ Public Class Binarize_OTSU : Inherits VBparent
         label2 = "Histograms correspond to images on the left"
         task.desc = "Binarize an image using Threshold with OTSU."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -99,7 +99,7 @@ Public Class Binarize_Niblack_Sauvola : Inherits VBparent
         label1 = "Binarize Niblack"
         label2 = "Binarize Sauvola"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
@@ -129,7 +129,7 @@ Public Class Binarize_Niblack_Nick : Inherits VBparent
         label1 = "Binarize Niblack"
         label2 = "Binarize Nick"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
@@ -160,7 +160,7 @@ Public Class Binarize_Bernson : Inherits VBparent
         task.drawRect = New cv.Rect(100, 100, 100, 100)
         task.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
@@ -193,7 +193,7 @@ Public Class Binarize_Bernson_MT : Inherits VBparent
         task.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
         label1 = "Binarize Bernson"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static kernelSlider = findSlider("Kernel Size")
         Static contrastSlider = findSlider("Contrast min")
         Static bgSlider = findSlider("bg Threshold")
@@ -233,7 +233,7 @@ Public Class Binarize_Reduction : Inherits VBparent
         label2 = "Binarize Basics Output"
         task.desc = "Binarize an image using reduction"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim tmp = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         reduction.Run(tmp)
         dst1 = reduction.dst1.Threshold(reduction.maskVal / 2, 255, cv.ThresholdTypes.Binary)
@@ -256,7 +256,7 @@ Public Class Binarize_Simple : Inherits VBparent
 
         task.desc = "Binarize an image using Threshold with OTSU."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         Dim input = src.Clone
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -286,7 +286,7 @@ Public Class Binarize_Recurse : Inherits VBparent
         label1 = "Lighter half, lightest, darker half, darkest"
         task.desc = "Binarize an image twice using masks"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 

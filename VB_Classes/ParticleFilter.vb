@@ -12,7 +12,7 @@ Public Class ParticleFilter_Example : Inherits VBparent
         pfPtr = ParticleFilterTest_Open(task.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
         task.desc = "Particle Filter example downloaded from github - hyperlink in the code shows URL."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static imageFrame = 12
         imageFrame += 1
         If imageFrame Mod 45 = 0 Then

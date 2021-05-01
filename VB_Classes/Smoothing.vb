@@ -46,7 +46,7 @@ Public Class Smoothing_Exterior : Inherits VBparent
 		label2 = ""
 		task.desc = "Smoothing the line connecting a series of points."
 	End Sub
-	Public Sub Run(src As cv.Mat)
+	Public Sub Run(src As cv.Mat) ' Rank = 1
 		smOptions.Run(Nothing)
 		If standalone Or task.intermediateReview = caller Then
 			If task.frameCount Mod 30 Then Exit Sub
@@ -119,7 +119,7 @@ Public Class Smoothing_Interior : Inherits VBparent
 		label2 = ""
 		task.desc = "Smoothing the line connecting a series of points staying inside the outline."
 	End Sub
-	Public Sub Run(src As cv.Mat)
+	Public Sub Run(src As cv.Mat) ' Rank = 1
 		smOptions.Run(Nothing)
 		If standalone Or task.intermediateReview = caller Then
 			If task.frameCount Mod 30 Then Exit Sub
@@ -160,7 +160,7 @@ Public Class Smoothing_Options : Inherits VBparent
 		label1 = "No output - just options for smoothing..."
 		task.desc = "Options for smoothing operations."
 	End Sub
-	Public Sub Run(src As cv.Mat)
+	Public Sub Run(src As cv.Mat) ' Rank = 1
 		Static iterSlider = findSlider("Smoothing iterations")
 		Static tensionSlider = findSlider("Smoothing tension X100 (Interior Only)")
 		Static stepSlider = findSlider("Step size when adding points (1 is identity)")
@@ -192,7 +192,7 @@ Public Class Smoothing_Contours : Inherits VBparent
 
 		task.desc = "Use Smoothing exterior or interior to get a smoother representation of a contour"
 	End Sub
-	Public Sub Run(src As cv.Mat)
+	Public Sub Run(src As cv.Mat) ' Rank = 1
 		smOptions.Run(Nothing)
 
 		outline.Run(src)

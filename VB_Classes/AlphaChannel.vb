@@ -33,7 +33,7 @@ Public Class AlphaChannel_Blend : Inherits VBparent
 
         task.desc = "Use alpha blending to smoothly separate background from foreground"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dst2.SetTo(0)
         src.CopyTo(dst2, task.noDepthMask)
 

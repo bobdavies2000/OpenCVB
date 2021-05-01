@@ -5,7 +5,7 @@ Public Class Mat_Repeat : Inherits VBparent
     Public Sub New()
         task.desc = "Use the repeat method to replicate data."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim small = src.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
         dst1 = small.Repeat(10, 10)
         small = task.RGBDepth.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
@@ -28,7 +28,7 @@ Public Class Mat_PointToMat : Inherits VBparent
         label2 = "Random_Basics points after format change"
         task.desc = "Convert pointf3 into a mat of points"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         random.Run(Nothing)
         dst1 = random.dst1
         Dim rows = random.Points.Length
@@ -52,7 +52,7 @@ Public Class Mat_MatToPoint : Inherits VBparent
         task.desc = "Convert a mat into a vector of points."
         label1 = "Reconstructed RGB Image"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim points(src.Total - 1) As cv.Vec3b
         Dim vec As New cv.Vec3b
         Dim index As integer = 0
@@ -81,7 +81,7 @@ Public Class Mat_Transpose : Inherits VBparent
         label1 = "Color Image Transposed"
         label2 = "Color Image Transposed back (artifacts)"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim trColor = src.T()
         dst1 = trColor.ToMat.Resize(New cv.Size(src.Cols, src.Rows))
         Dim trBack = dst1.T()
@@ -101,7 +101,7 @@ Public Class Mat_Tricks : Inherits VBparent
         label2 = "Mat transposed around the diagonal"
         task.desc = "Show some Mat tricks."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim mat = src.Resize(New cv.Size(src.Height, src.Height))
         Dim roi = New cv.Rect(0, 0, mat.Width, mat.Height)
         dst1(roi) = mat
@@ -137,7 +137,7 @@ Public Class Mat_4to1 : Inherits VBparent
         mat4 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         mat = {mat1, mat2, mat3, mat4}
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static nSize = New cv.Size(dst1.Width / 2, dst1.Height / 2)
         Static roiTopLeft = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
@@ -178,7 +178,7 @@ Public Class Mat_2to1 : Inherits VBparent
         label1 = ""
         task.desc = "Fill a Mat with 2 images"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static nSize = New cv.Size(task.color.Width, task.color.Height / 2)
         Static roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
@@ -225,7 +225,7 @@ Public Class Mat_ImageXYZ_MT : Inherits VBparent
 
         task.desc = "Create a cv.Point3f vector with x, y, and z."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)
         Parallel.ForEach(grid.roiList,
           Sub(roi)
@@ -248,7 +248,7 @@ Public Class Mat_RowColRange : Inherits VBparent
         label1 = "BitwiseNot of RowRange and ColRange"
         task.desc = "Perform operation on a range of cols and/or Rows."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim midX = src.Width / 2
         Dim midY = src.Height / 2
         dst1 = src
@@ -266,7 +266,7 @@ Public Class Mat_Managed : Inherits VBparent
         label1 = "Color change is in the managed cv.vec3b array"
         task.desc = "There is a limited ability to use Mat data in Managed code directly."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static autoRand As New Random()
         Static img(src.Total) As cv.Vec3b
         dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, img)
@@ -292,7 +292,7 @@ Public Class Mat_MultiplyReview : Inherits VBparent
     Public Sub New()
         task.desc = "Review matrix multiplication"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim a(,) = {{1, 4, 2}, {2, 5, 1}}
         Dim b(,) = {{3, 4, 2}, {3, 5, 7}, {1, 2, 1}}
         Dim nextLine = ""
@@ -366,7 +366,7 @@ Public Class Mat_Inverse : Inherits VBparent
         End If
         task.desc = "Given a 3x3 matrix, invert it and present results."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim nextline = ""
 
         Dim decompType = cv.DecompTypes.Cholesky
@@ -434,7 +434,7 @@ Public Class Mat_4Click : Inherits VBparent
         label2 = "Click a quadrant in dst1 to view it in dst2"
         task.desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst2"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         If standalone Or task.intermediateReview = caller Then mats.defaultMats()
         mats.Run(Nothing)
@@ -456,7 +456,7 @@ Public Class Mat_2Click : Inherits VBparent
     Public Sub New()
         task.desc = "Split an image into 2 segments and allow clicking on each half to open it in dst2"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Then
             mats.mat(0) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             cv.Cv2.BitwiseNot(mats.mat(0), mats.mat(1))
@@ -484,7 +484,7 @@ Public Class Mat_2Dlib : Inherits VBparent
     Public Sub New()
         task.desc = "Convert a Mat to the expected Array2D for a DLib API"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         Dim array(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, array, 0, array.Length)
@@ -516,7 +516,7 @@ Public Class Mat_Dlib2Mat : Inherits VBparent
     Public Sub New()
         task.desc = "Convert a Dlib Array2D to an OpenCV Mat"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         If dGray IsNot Nothing Then
             dst1 = New cv.Mat(dGray.Rows, dGray.Columns, cv.MatType.CV_8U)

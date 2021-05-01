@@ -66,7 +66,7 @@ Public Class ML_FillRGBDepth_MT : Inherits VBparent
         label2 = ""
         task.desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         shadow.Run(src)
         grid.Run(Nothing)
         Dim minLearnCount = 5
@@ -99,7 +99,7 @@ Public Class ML_FillRGBDepth : Inherits VBparent
         label2 = "ML filled shadow"
         task.desc = "Predict depth based on color and display colorized depth to confirm correctness of model."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         shadow.Run(src)
         Dim minLearnCount = sliders.trackbar(0).Value
         task.RGBDepth.CopyTo(dst1)
@@ -131,7 +131,7 @@ Public Class ML_DepthFromColor_MT : Inherits VBparent
         label2 = "Mask of color and depth input"
         task.desc = "Use RGB, X, and Y to predict depth across the entire image, maxDepth = slider value."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)
 
         Dim mask = task.depth32f.Threshold(sliders.trackbar(0).Value, sliders.trackbar(0).Value, cv.ThresholdTypes.Binary).ConvertScaleAbs()
@@ -188,7 +188,7 @@ Public Class ML_DepthFromColor : Inherits VBparent
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         shadow.Run(src)
         mats.mat(1) = shadow.holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -258,7 +258,7 @@ Public Class ML_DepthFromXYColor : Inherits VBparent
         label1 = "Predicted Depth"
         task.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         shadow.Run(src)
         mats.mat(0) = shadow.holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
@@ -346,7 +346,7 @@ Public Class ML_EdgeDepth_MT : Inherits VBparent
         label2 = "Predicted Depth"
         task.desc = "Use RGB to predict depth near edges."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)
 
         Dim mask = task.depth32f.Threshold(sliders.trackbar(0).Value, sliders.trackbar(0).Value, cv.ThresholdTypes.Binary).ConvertScaleAbs()
@@ -415,7 +415,7 @@ End Class
 '        tmp.ConvertTo(vec, cv.MatType.CV_8UC3)
 '        Return New cv.Vec3b(vec.Get(Of Byte)(0, 0), vec.Get(Of Byte)(0, 1), vec.Get(Of Byte)(0, 2))
 '    End Function
-'    Public Sub Run(src as cv.Mat)
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
 '        Static lastColors As New cv.Mat
 '        If standalone or task.intermediateReview = caller Then
 '            emax.Run()

@@ -9,7 +9,7 @@ Public Class XPhoto_Bm3dDenoise : Inherits VBparent
         label1 = "Bm3dDenoising"
         label2 = "Difference from Input"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.EqualizeHist(src, src)
         CvXPhoto.Bm3dDenoising(src, dst1)
@@ -29,7 +29,7 @@ Public Class XPhoto_Bm3dDenoiseDepthImage : Inherits VBparent
         task.desc = "Denoise the depth image with block matching and filtering."
         label2 = "Difference from Input"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.EqualizeHist(gray, gray)
         CvXPhoto.Bm3dDenoising(gray, dst1)
@@ -96,7 +96,7 @@ Public Class XPhoto_OilPaint_CPP : Inherits VBparent
         xPhoto_OilPaint = xPhoto_OilPaint_Open()
         task.desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim colorCode As Integer = cv.ColorConversionCodes.BGR2GRAY
         Static frm = findfrm(caller + " Radio Options")
         For i = 0 To frm.check.length - 1
@@ -142,7 +142,7 @@ Public Class XPhoto_Inpaint : Inherits VBparent
         label2 = "Repaired result..."
         task.desc = "Use the xPhoto inpaint to fill in the depth holes"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static radioFast = findRadio("FSR_Fast")
         Static radioSMap = findRadio("ShiftMap")
         dst1 = src
@@ -167,7 +167,7 @@ Public Class XPhoto_Inpaint_CPP : Inherits VBparent
         xPhoto_Inpaint = xPhoto_Inpaint_Open()
         task.desc = "Use the xPhoto Oil Painting transform - Painterly Effect"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static radioFast = findRadio("FSR_Fast")
         Static radioSMap = findRadio("ShiftMap")
         Dim iType = InpaintTypes.FSR_BEST

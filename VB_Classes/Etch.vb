@@ -25,7 +25,7 @@ Public Class Etch_ASketch : Inherits VBparent
         dst1.SetTo(slateColor)
         task.desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         keys.Run(src)
         Dim Input = New List(Of String)(keys.keyInput)
 

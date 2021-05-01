@@ -34,7 +34,7 @@ Public Class MatrixInverse_Basics_CS : Inherits VBparent
         input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
         task.desc = "Manually invert a matrix"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If input.Width <> input.Height Then
             task.trueText("The src matrix must be square!")
             Exit Sub
@@ -61,7 +61,7 @@ Public Class MatrixInverse_OpenCV : Inherits VBparent
         input = New cv.Mat(4, 4, cv.MatType.CV_64F, defaultInput)
         task.desc = "Use OpenCV to invert a matrix"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If input.Width <> input.Height Then
             task.trueText("The input matrix must be square!")
             Exit Sub

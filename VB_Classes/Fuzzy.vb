@@ -23,7 +23,7 @@ Public Class Fuzzy_Basics : Inherits VBparent
         label2 = "Fuzzy pixels - not solid"
         task.desc = "That which is not solid is fuzzy"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         options.setOptions()
         reduction.Run(src)
         dst1 = reduction.dst1
@@ -97,7 +97,7 @@ Public Class Fuzzy_Filter : Inherits VBparent
         kernel *= 1 / 9
         task.desc = "Use a 2D filter to find smooth areas"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         options.setOptions()
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -171,7 +171,7 @@ Public Class Fuzzy_ContoursDepth : Inherits VBparent
     Public Sub New()
         task.desc = "Use contours to outline solids in the depth data"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         fuzzyD.Run(task.RGBDepth)
         dst1 = fuzzyD.dst1
     End Sub
@@ -189,7 +189,7 @@ Public Class Fuzzy_NeighborProof : Inherits VBparent
     Public Sub New()
         task.desc = "Prove that every contour point has at least one and only one neighbor with the mask ID and that the rest are zero"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static proofFailed As Boolean = False
         If proofFailed Then Exit Sub
         fuzzy.Run(src)
@@ -241,7 +241,7 @@ Public Class Fuzzy_TrackerDepth : Inherits VBparent
         End If
         task.desc = "Create centroids and rect's for solid regions and track them - tracker"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static displayCheck = findCheckBox("Display centroid and rectangle for each region")
         Static minRectSizeSlider = findSlider("Threshold for rectangle size")
 
@@ -296,7 +296,7 @@ Public Class Fuzzy_TrackerDepthClick : Inherits VBparent
     Public Sub New()
         task.desc = "Create centroids and rect's for solid regions and track them - tracker"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         tracker.Run(src)
         dst1 = tracker.dst1
 
@@ -332,7 +332,7 @@ Public Class Fuzzy_PointTracker : Inherits VBparent
         fuzzy.sliders.Visible = False
         task.desc = "FloodFill the regions defined as solid"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         fuzzy.Run(src)
         dst2 = fuzzy.dst1
 

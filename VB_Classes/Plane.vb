@@ -101,7 +101,7 @@ Public Class Plane_Detect : Inherits VBparent
         task.desc = "Identify planes in each segment."
         label2 = "Blue, green, and red show different planes"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)
 
         dst2.SetTo(0)
@@ -168,7 +168,7 @@ Public Class Plane_DetectDebug : Inherits VBparent
         task.desc = "Debug code to identify planes in just one segment."
         label2 = "Blue, green, and red show different planes"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)
 
         dst2.SetTo(0)

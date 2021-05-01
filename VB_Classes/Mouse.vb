@@ -4,7 +4,7 @@ Public Class Mouse_Basics : Inherits VBparent
         label1 = "Move the mouse below to show mouse tracking."
         task.desc = "Test the mousePoint interface"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static lastPoint = New cv.Point
         ' only display mouse movement in the lower left image (pic.tag = 2)
         If lastPoint = task.mousePoint Or task.mousePicTag <> 2 Then Exit Sub
@@ -26,7 +26,7 @@ Public Class Mouse_LeftClickZoom : Inherits VBparent
         label1 = "Left click and drag to draw a rectangle"
         task.desc = "Demonstrate what the left-click enables"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         task.trueText("Left-click and drag to select a region in any of the images." + vbCrLf +
                       "The selected area is presented to ocvbClass in task.drawRect." + vbCrLf +
                       "In this example, the selected region from the RGB image will be resized to fit in the Result2 image to the right." + vbCrLf +

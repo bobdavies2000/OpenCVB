@@ -15,7 +15,7 @@ Public Class QRcode_Basics : Inherits VBparent
         End If
         task.desc = "Read a QR code"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim x = msRNG.Next(0, src.Width - Math.Max(qrInput1.Width, qrInput2.Width))
         Dim y = msRNG.Next(0, src.Height - Math.Max(qrInput1.Height, qrInput2.Height))
         If CInt(task.frameCount / 50) Mod 2 = 0 Then

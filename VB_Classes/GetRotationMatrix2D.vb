@@ -18,7 +18,7 @@ Public Class GetRotationMatrix2D_Options : Inherits VBparent
 
         task.desc = "Run to get the warpflag based on the current options"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static frm = findfrm(caller + " Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
@@ -50,7 +50,7 @@ Public Class GetRotationMatrix2D_Basics : Inherits VBparent
 
         task.desc = "Rotate a rectangle of a specified angle"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         rotateOptions.Run(src)
         Dim angle = sliders.trackbar(0).Value
         M = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), angle, 1)
@@ -73,7 +73,7 @@ Public Class GetRotationMatrix2D_Box : Inherits VBparent
         label2 = "Same Rectangle in the new warped perspective"
         task.desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         rotation.Run(src)
         dst2 = dst1.Clone()
 

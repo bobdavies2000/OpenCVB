@@ -55,7 +55,7 @@ Public Class Python_Run : Inherits VBparent
         End If
         task.desc = "Run Python app: " + pythonApp.Name
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If pyStream IsNot Nothing Then
             pyStream.Run(src)
             dst1 = pyStream.dst1
@@ -102,7 +102,7 @@ Public Class Python_MemMap : Inherits VBparent
             task.desc = "Run Python app: " + pythonApp.Name + " to share memory with OpenCVB and Python."
         End If
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateReview = caller Then memMapValues(0) = task.frameCount
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
@@ -135,7 +135,7 @@ End Class
 '        If PythonReady Then pipe.WaitForConnection()
 '        task.desc = "Stream data to Python_SurfaceBlit Python script."
 '    End Sub
-'    Public Sub Run(src as cv.Mat)
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
 '        If PythonReady Then
 '            For i = 0 To memMap.memMapValues.Length - 1
 '                memMap.memMapValues(i) = Choose(i + 1, task.frameCount, src.Total * src.ElemSize, 0, src.Rows, src.Cols)
@@ -202,7 +202,7 @@ Public Class Python_Stream : Inherits VBparent
         label1 = "Output of Python Backend"
         task.desc = "General purpose class to pipe RGB and Depth to Python scripts."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If pythonReady Then
             For i = 0 To memMap.memMapValues.Length - 1
                 memMap.memMapValues(i) = Choose(i + 1, task.frameCount, src.Total * src.ElemSize,

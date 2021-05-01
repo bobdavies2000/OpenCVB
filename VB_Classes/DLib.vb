@@ -8,7 +8,7 @@ Public Class Dlib_Sobel_CS : Inherits VBparent
     Public Sub New()
         task.desc = "Testing the DLib interface with a simple Sobel example"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -34,7 +34,7 @@ Public Class Dlib_GaussianBlur_CS : Inherits VBparent
         label2 = "Gaussian Blur of BGR image"
         task.desc = "Use DlibDotNet to blur an image"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -64,7 +64,7 @@ Public Class Dlib_FaceDetectHOG_CS : Inherits VBparent
         faces.initialize()
         task.desc = "Use DlibDotNet to detect faces using the HOG detector"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         Dim input = src
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -102,7 +102,7 @@ Public Class Dlib_iBug300WDownload : Inherits VBparent
 
         task.desc = "Multi-threaded (responsive) download of the iBug 300W face database.  Not using iBug yet but planning to..."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static checkDownload = findCheckBox("Download the 1.7 Gb 300 Faces In-The-Wild database")
         Dim ibugDir = New DirectoryInfo(task.parms.homeDir + "Data/ibug_300W_large_face_landmark_dataset")
         If ibugDir.Exists And downloadActive = False And pythonActive = False Then

@@ -59,7 +59,7 @@ Public Class CellAuto_Basics : Inherits VBparent
         Next
         Return dst.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Function
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static rotateCheckBox = findCheckBox("Rotate through the different rules")
         If standalone Or task.intermediateReview = caller Then
             input = New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_8UC1, 0)
@@ -118,7 +118,7 @@ Public Class CellAuto_Life : Inherits VBparent
         findSlider("Random Pixel Count").Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
         task.desc = "Use OpenCV to implement the Game of Life"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static randomSlider = findSlider("Random Pixel Count")
         Static savePointCount As Integer
         If randomSlider.Value <> savePointCount Or generation = 0 Then
@@ -188,7 +188,7 @@ Public Class CellAuto_LifeColor : Inherits VBparent
         label1 = "Births are blue, deaths are red"
         task.desc = "Game of Life but with color added"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         game.Run(src)
         dst1 = game.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static lastBoard = dst1.Clone
@@ -221,7 +221,7 @@ Public Class CellAuto_LifePopulation : Inherits VBparent
 
         task.desc = "Show Game of Life display with plot of population"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         game.Run(src)
         dst1 = game.dst1
 
@@ -245,7 +245,7 @@ Public Class CellAuto_Basics_MP : Inherits VBparent
         i18 = cell.i18
         task.desc = "Multi-threaded version of CellAuto_Basics"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateReview = caller Then
             cell.input = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
             cell.input.Set(Of Byte)(0, cell.input.Width / 2, 1)
@@ -295,7 +295,7 @@ Public Class CellAuto_All256 : Inherits VBparent
         Next
         Return outstr
     End Function
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim index = sliders.trackbar(0).Value
         Dim mtOn = cell.check.Box(0).Checked
 
@@ -330,7 +330,7 @@ Public Class CellAuto_MultiPoint : Inherits VBparent
         cell.check.Box(0).Checked = False ' just the one pattern.
         task.desc = "All256 above starts with just one point.  Here we start with multiple points."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim tmp = New cv.Mat(New cv.Size(src.Width / 4, src.Height / 4), cv.MatType.CV_8UC1, 0)
         Static pt1 = 0
         Static pt2 = tmp.Width / 2

@@ -24,7 +24,7 @@ Public Class Download_Databases : Inherits VBparent
 
         task.desc = "Multi-threaded (responsive) download of the iBug 300W face database.  Not using iBug yet but planning to..."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static checkiBug = findRadio("Download the 1.7 Gb 300 Faces In-The-Wild database")
         Static checkTensor1 = findRadio("Download TensorFlow MobileNet-SSD v1")
         Static checkTensor2 = findRadio("Download TensorFlow MobileNet-SSD v1 PPN")

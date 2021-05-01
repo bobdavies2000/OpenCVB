@@ -14,7 +14,7 @@ Public Class FAST_Basics : Inherits VBparent
         End If
         task.desc = "Find interesting points with the FAST (Features from Accelerated Segment Test) algorithm"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         src.CopyTo(dst1)
         keypoints = cv.Cv2.FAST(src, sliders.trackbar(0).Value, If(check.Box(0).Checked, True, False))
@@ -37,7 +37,7 @@ Public Class FAST_Centroid : Inherits VBparent
         ReDim kalman.kInput(1) ' 2 elements - cv.point
         task.desc = "Find interesting points with the FAST and smooth the centroid with kalman"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         fast.Run(src)
         dst1 = fast.dst1
         dst2.SetTo(0)

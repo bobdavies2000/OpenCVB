@@ -17,7 +17,7 @@ Public Class DCT_Basics : Inherits VBparent
         task.desc = "Apply OpenCV's Discrete Cosine Transform to a grayscale image and use slider to remove the highest frequencies."
         label2 = "Difference from original"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
@@ -52,7 +52,7 @@ Public Class DCT_RGB : Inherits VBparent
         label2 = "Difference from original"
         task.desc = "Apply OpenCV's Discrete Cosine Transform to an RGB image and use slider to remove the highest frequencies."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim srcPlanes = src.Split()
 
         Dim dctFlag As cv.DctFlags
@@ -92,7 +92,7 @@ Public Class DCT_Depth : Inherits VBparent
         label2 = "Subtract DCT inverse from Grayscale depth"
         task.desc = "Find featureless surfaces in the depth data - expected to be useful only on the Kinect for Azure camera."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim frequencies As New cv.Mat
         Dim src32f As New cv.Mat
@@ -120,7 +120,7 @@ Public Class DCT_FeatureLess : Inherits VBparent
         task.desc = "Find surfaces that lack any texture.  Remove just the highest frequency from the DCT to get horizontal lines through the image."
         label2 = "FeatureLess RGB regions"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dct.Run(src)
         Dim runLenMin = dct.sliders.trackbar(1).Value
         dst1 = dct.dst1
@@ -171,7 +171,7 @@ Public Class DCT_Surfaces_debug : Inherits VBparent
         label2 = "Lower right image identifies potential flat surface"
         task.desc = "Find plane equation for a featureless surface - debugging one region for now."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)
 
         Mats.mat(0) = src.Clone
@@ -239,7 +239,7 @@ Public Class DCT_CComponents : Inherits VBparent
         label2 = "DCT mask"
         task.desc = "Find surfaces that lack texture with DCT (Discrete Cosine Transform) and use connected components to isolate those surfaces."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dct.Run(src)
         cc.Run(dct.dst1.Clone())
         dst1 = cc.dst1

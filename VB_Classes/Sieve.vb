@@ -23,7 +23,7 @@ Public Class Sieve_BasicsVB : Inherits VBparent
         Next
         Return completeList + Mid(nextList, 1, If(nextList.Length > 2, Len(nextList) - 2, ""))
     End Function
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim count = sliders.trackbar(0).Value
         Dim nextEntry As Integer = 2
         Dim output = New List(Of Integer)
@@ -53,7 +53,7 @@ Public Class Sieve_Basics : Inherits VBparent
     Public Sub New()
         task.desc = "Implement the Sieve of Eratothenes in C#"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static countSlider = findSlider("Count of desired primes")
         task.trueText(printer.shareResults(sieve.GetPrimeNumbers(countSlider.value)))
     End Sub

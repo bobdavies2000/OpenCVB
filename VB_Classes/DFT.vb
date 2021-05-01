@@ -30,7 +30,7 @@ Public Class DFT_Basics : Inherits VBparent
         label1 = "Image after inverse DFT"
         label2 = "DFT_Basics Spectrum Magnitude"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         gray = src
         If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -83,7 +83,7 @@ Public Class DFT_Inverse : Inherits VBparent
         label1 = "Image after Inverse DFT"
         task.desc = "Take the inverse of the Discrete Fourier Transform."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
         src.ConvertTo(gray32f, cv.MatType.CV_32F)
@@ -138,7 +138,7 @@ Public Class DFT_ButterworthFilter_MT : Inherits VBparent
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dft.Run(src)
 
         Static radius As Integer
@@ -198,7 +198,7 @@ Public Class DFT_ButterworthDepth : Inherits VBparent
         label1 = "Image with Butterworth Low Pass Filter Applied"
         label2 = "Same filter with radius / 2"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         bfilter.Run(task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst1 = bfilter.dst1
         dst2 = bfilter.dst2
@@ -244,7 +244,7 @@ Public Class DFT_Shapes : Inherits VBparent
         label2 = "Discrete Fourier Transform Output"
         task.desc = "Show the spectrum magnitude for some standard shapes. Painterly"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static circleRadio = findRadio("Draw Circle")
         Static ellipseRadio = findRadio("Draw Ellipse")
         Static lineRadio = findRadio("Draw Line")

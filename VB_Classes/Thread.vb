@@ -39,7 +39,7 @@ Public Class Thread_Grid : Inherits VBparent
         gridToRoi = New cv.Mat(dst1.Size(), cv.MatType.CV_32S)
         task.desc = "Create a grid for use with parallel.ForEach."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 4
         Static widthSlider = findSlider("ThreadGrid Width")
         Static heightSlider = findSlider("ThreadGrid Height")
         Static borderSlider = findSlider("ThreadGrid Border")
@@ -121,7 +121,7 @@ Public Class Thread_GridTest : Inherits VBparent
         label1 = ""
         task.desc = "Validation test for thread_grid algorithm"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)
         Dim mean = cv.Cv2.Mean(src)
 

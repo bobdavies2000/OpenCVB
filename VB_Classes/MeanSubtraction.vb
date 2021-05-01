@@ -8,7 +8,7 @@ Public Class MeanSubtraction_Basics : Inherits VBparent
         End If
         task.desc = "Subtract the mean from the image with a scaling factor"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim mean = cv.Cv2.Mean(src)
         cv.Cv2.Subtract(mean, src, dst1)
         Dim scalingFactor = sliders.trackbar(0).Value / 100

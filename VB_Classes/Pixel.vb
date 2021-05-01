@@ -6,7 +6,7 @@ Public Class Pixel_Viewer : Inherits VBparent
     Public Sub New()
         task.desc = "Display pixels under the cursor"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dst1 = Choose(task.mousePicTag + 1, task.color, task.RGBDepth, task.algorithmObject.dst1, task.algorithmObject.dst2)
 
         Dim displayType = -1 ' default is 8uc3
@@ -162,7 +162,7 @@ Public Class Pixel_GetSet : Inherits VBparent
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim rows = src.Height
         Dim cols = src.Width
         Dim output As String = ""
@@ -232,7 +232,7 @@ Public Class Pixel_Measure : Inherits VBparent
         Dim halfLineInMeters = Math.Tan(0.0174533 * task.hFov / 2) * mmDist
         Return halfLineInMeters * 2 / dst1.Width
     End Function
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static distanceSlider = findSlider("Distance in mm")
         Dim mmPP = Compute(distanceSlider.value)
         If standalone Then
@@ -259,7 +259,7 @@ Public Class Pixel_Sampler : Inherits VBparent
     Public Sub New()
         task.desc = "Find the dominanant pixel color - not an average! This can provide consistent colorizing."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         If standalone Then
             If task.frameCount Mod 30 = 0 Then

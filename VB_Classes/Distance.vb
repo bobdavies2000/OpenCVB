@@ -13,7 +13,7 @@ Public Class Distance_Basics : Inherits VBparent
         label2 = "Input mask to distance transformm"
         task.desc = "Distance algorithm basics."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateReview = caller Then src = task.RGBDepth ' to get some zeros in the image...
         Dim gray = src
         If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -49,7 +49,7 @@ Public Class Distance_Foreground : Inherits VBparent
         label2 = "Input mask to distance transformm"
         task.desc = "Distance algorithm basics."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         foreground.Run(src)
         dst2 = foreground.dst1
         Dim fg = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)

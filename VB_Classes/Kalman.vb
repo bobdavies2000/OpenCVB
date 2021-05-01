@@ -7,7 +7,7 @@ Public Class Kalman_Basics : Inherits VBparent
     Public Sub New()
         task.desc = "Use Kalman to stabilize values (such as a cv.rect.)"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static saveDimension = -1
         If saveDimension <> kInput.Length Then
             If kalman IsNot Nothing Then
@@ -65,7 +65,7 @@ Public Class Kalman_Stripped : Inherits VBparent
     Public Sub New()
         task.desc = "High volume usage only.  Same As New Kalman_Basics but no check boxes."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static saveDimension = -1
         If saveDimension <> kInput.Length Then
             If kalman IsNot Nothing Then
@@ -131,7 +131,7 @@ Public Class Kalman_Compare : Inherits VBparent
         label2 = "Kalman output: smoothed mean values for RGB"
         task.desc = "Use this kalman filter to predict the next value."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount = 0 Then
             If kalman IsNot Nothing Then
                 If kalman.Count > 0 Then
@@ -202,7 +202,7 @@ Public Class Kalman_RotatingPoint : Inherits VBparent
         center = New cv.Point2f(dst1.Cols / 2, dst1.Rows / 2)
         task.desc = "Track a rotating point using a Kalman filter. Yellow line (estimate) should be shorter than red (real)."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim stateAngle = kState.Get(Of Single)(0)
 
         Dim prediction = kf.Predict()
@@ -248,7 +248,7 @@ Public Class Kalman_MousePredict : Inherits VBparent
         label1 = "Red is real mouse, white is prediction"
         task.desc = "Use kalman filter to predict the next mouse location."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod 100 = 0 Then dst1.SetTo(0)
 
         Static lastRealMouse = task.mousePoint
@@ -279,7 +279,7 @@ Public Class Kalman_CVMat : Inherits VBparent
         If standalone Then label1 = "Rectangle moves smoothly to random locations"
         task.desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static saveDimension = -1
         If saveDimension <> input.Rows Then
             If kalman IsNot Nothing Then
@@ -346,7 +346,7 @@ Public Class Kalman_ImageSmall : Inherits VBparent
         label2 = "Mask of the smoothed image minus original"
         task.desc = "Resize the image to allow the Kalman filter to process the whole image."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         resize.Run(src)
 
@@ -376,7 +376,7 @@ Public Class Kalman_DepthSmall : Inherits VBparent
         label2 = "Mask of the smoothed image minus original"
         task.desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         kalman.Run(task.RGBDepth)
         dst1 = kalman.dst1
         dst2 = kalman.dst2
@@ -400,7 +400,7 @@ Public Class Kalman_Depth32f : Inherits VBparent
         label2 = "Difference from original depth"
         task.desc = "Use a resized depth Mat to find where depth is decreasing (getting closer.)"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         resize.Run(task.depth32f)
 
         kalman.input = resize.dst1.Reshape(1, resize.dst1.Width * resize.dst1.Height)
@@ -440,7 +440,7 @@ Public Class Kalman_Single : Inherits VBparent
         If standalone Then plot.plotCount = 2 ' 2 items to plot
         task.desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateReview = caller Then
             dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             inputReal = dst1.Mean().Item(0)
@@ -484,7 +484,7 @@ Public Class Kalman_Simple : Implements IDisposable
         kf.MeasurementNoiseCov.SetIdentity(0.1)
         kf.ErrorCovPost.SetIdentity(1)
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim prediction = kf.Predict()
         measurement.Set(Of Single)(0, 0, inputReal)
         stateResult = kf.Correct(measurement).Get(Of Single)(0, 0)
@@ -564,7 +564,7 @@ Public Class Kalman_VB : Inherits VBparent
         angle += K_0 * angle_err 'Update our state estimate
         q_bias += K_1 * angle_err
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         input = sliders.trackbar(0).Value
         Dim noiselevel = sliders.trackbar(6).Value
         Dim additionalbias = sliders.trackbar(7).Value
@@ -678,7 +678,7 @@ Public Class Kalman_VB_Basics : Inherits VBparent
         kOutput += K_0 * kError 'Update our state estimate
         q_bias += K_1 * kError
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         If standalone Or task.intermediateReview = caller Then
             Dim gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

@@ -23,7 +23,7 @@ Public Class Surf_Basics : Inherits VBparent
 
         task.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         srcLeft = task.leftView
         srcRight = task.rightView
         Dim doubleSize As New cv.Mat
@@ -48,7 +48,7 @@ Public Class Surf_BasicsVB : Inherits VBparent
     Public Sub New()
         task.desc = "Use left and right views to match points in horizontal slices."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         surf.Run(src)
         dst1 = surf.dst1
         dst2 = surf.dst2
@@ -71,7 +71,7 @@ Public Class Surf_DrawMatchManual_CS : Inherits VBparent
         End If
         task.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         surf.Run(src)
         dst1 = surf.srcLeft.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2 = surf.srcRight.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

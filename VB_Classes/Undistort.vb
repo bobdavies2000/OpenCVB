@@ -80,7 +80,7 @@ Public Class Undistort_Basics : Inherits VBparent
         label1 = "Left Image with sliders applied"
         task.desc = "Use sliders to control the undistort OpenCV API - Painterly"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         If task.parms.intrinsicsLeft.coeffs Is Nothing Then
             task.trueText("The intrinsics values are missing for this camera.")

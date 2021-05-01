@@ -7,7 +7,7 @@ Public Class MiniPC_Basics : Inherits VBparent
         resize = New Resize_Percentage
         task.desc = "Create a mini point cloud for use with histograms"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         gCloud.Run(src)
         resize.Run(gCloud.dst1)
@@ -40,7 +40,7 @@ Public Class MiniPC_Rotate : Inherits VBparent
         label2 = "Side view after resize percentage"
         task.desc = "Create a histogram for the mini point cloud"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static angleYslider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
 
         Dim input = src
@@ -105,7 +105,7 @@ Public Class MiniPC_RotateAngle : Inherits VBparent
         label2 = "Blue is mean*100, red is maxVal/100, green mask count"
         task.desc = "Find a peak value in the side view histograms"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Type <> cv.MatType.CV_32FC3 Then
             peak.mini.Run(src)
             src = peak.mini.dst2
@@ -157,7 +157,7 @@ Public Class MiniPC_RotateSinglePass : Inherits VBparent
         peak.angleY = -90
         task.desc = "Same operation as New MiniPC_RotateAngle but in a single pass."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         peak.mini.Run(src)
 
         Dim r = peak.mini.rect

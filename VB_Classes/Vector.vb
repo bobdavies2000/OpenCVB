@@ -5,7 +5,7 @@ Public Class Vector_Magnitude : Inherits VBparent
         task.desc = "Compute Euclidian and Manhattan Distance on a single vector."
         label1 = "Vector Magnitude"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim cVector() As Single = {1, 4, 4, 8}
         task.trueText("p1 = (" + CStr(cVector(0)) + ", " + CStr(cVector(1)) + ")" + vbTab + " p2 = (" + CStr(cVector(2)) + ", " + CStr(cVector(3)) + ")", 10, 40)
         Dim coordinates As New cv.Mat(1, 4, cv.MatType.CV_32F, cVector)

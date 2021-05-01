@@ -7,7 +7,7 @@ Public Class Gradient_Basics : Inherits VBparent
         label2 = "Phase Output"
         task.desc = "Use phase to compute gradient"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         sobel.Run(src)
         Dim x32f As New cv.Mat, y32f As New cv.Mat
         sobel.grayX.ConvertTo(x32f, cv.MatType.CV_32F)
@@ -26,7 +26,7 @@ Public Class Gradient_Depth : Inherits VBparent
         task.desc = "Use phase to compute gradient on depth image"
         label2 = "Phase Output"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         sobel.Run(task.depth32f)
         Dim x32f As New cv.Mat, y32f As New cv.Mat
         sobel.grayX.ConvertTo(x32f, cv.MatType.CV_32F)
@@ -58,7 +58,7 @@ Public Class Gradient_CartToPolar : Inherits VBparent
         label2 = "CartToPolar Angle Output"
         task.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static contrastSlider = findSlider("Contrast exponent to use X100")
         Dim tmp As New cv.Mat
         src.ConvertTo(tmp, cv.MatType.CV_32FC3, 1 / 255)
@@ -93,7 +93,7 @@ Public Class Gradient_StableDepth : Inherits VBparent
         label2 = "Phase component of the gradient output"
         task.desc = "Use the stable depth as input to get a map of the phase of the gradient in the depth data."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         motionSD.Run(src)
         dst1 = motionSD.dst1.Clone
         basics.Run(dst1.Clone)

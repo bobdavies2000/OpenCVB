@@ -12,7 +12,7 @@ Public Class IMU_Basics : Inherits VBparent
         End If
         task.desc = "Read and display the IMU coordinates"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim alpha As Double = sliders.trackbar(0).Value / 1000
         If task.frameCount = 0 Then
             lastTimeStamp = task.IMU_TimeStamp
@@ -61,7 +61,7 @@ Public Class IMU_Stabilizer : Inherits VBparent
         label1 = "IMU Stabilize (Move Camera + Select Kalman)"
         label2 = "Difference from Color Image"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim borderCrop = 5
         Dim vert_Border = borderCrop * src.Rows / src.Cols
         Dim dx = task.IMU_AngularVelocity.X
@@ -109,7 +109,7 @@ Public Class IMU_Magnetometer : Inherits VBparent
 
         task.desc = "Get the IMU_Magnetometer values from the IMU (if available)"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.IMU_Magnetometer = New cv.Point3f Then
             task.trueText("The IMU for this camera does not have Magnetometer readings.")
         Else
@@ -131,7 +131,7 @@ Public Class IMU_Barometer : Inherits VBparent
     Public Sub New()
         task.desc = "Get the barometric pressure from the IMU (if available)"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.IMU_Barometer = 0 Then
             task.trueText("The IMU for this camera does not have barometric pressure.")
         Else
@@ -148,7 +148,7 @@ Public Class IMU_Temperature : Inherits VBparent
     Public Sub New()
         task.desc = "Get the temperature of the IMU (if available)"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         task.trueText("IMU Temperature is " + Format(task.IMU_Temperature, "#0.00") + " degrees Celsius." + vbCrLf +
                       "IMU Temperature is " + Format(task.IMU_Temperature * 9 / 5 + 32, "#0.00") + " degrees Fahrenheit.")
     End Sub
@@ -176,7 +176,7 @@ Public Class IMU_FrameTime : Inherits VBparent
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         task.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static IMUanchor As Integer = task.IMU_FrameTime
         Static histogramIMU(plot.maxScale) As Integer
 
@@ -271,7 +271,7 @@ Public Class IMU_HostFrameTimes : Inherits VBparent
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         task.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static CPUanchor As Integer = task.CPU_FrameTime
         Static hist(plot.maxScale) As Integer
 
@@ -349,7 +349,7 @@ Public Class IMU_TotalDelay : Inherits VBparent
         label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         task.desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static countSlider = findSlider("Number of Plot Values")
         Dim plotLastX = countSlider.value
         host.Run(src)
@@ -424,7 +424,7 @@ Public Class IMU_GVector : Inherits VBparent
 
         task.desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static xRotateSlider = findSlider("Amount to rotate pointcloud around X-axis (degrees)")
         Static yRotateSlider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
         Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
@@ -501,7 +501,7 @@ Public Class IMU_IsCameraLevel : Inherits VBparent
     Public Sub New()
         task.desc = "Answer the question: Is the camera level?"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim gx = task.IMU_Acceleration.X
         Dim gy = task.IMU_Acceleration.Y
         Dim gz = task.IMU_Acceleration.Z
@@ -527,7 +527,7 @@ Public Class IMU_IscameraStable : Inherits VBparent
     Public Sub New()
         task.desc = "Answer the question: Is the camera stable?"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim pitch = task.IMU_AngularVelocity.X
         Dim yaw = task.IMU_AngularVelocity.Y
         Dim roll = task.IMU_AngularVelocity.Z

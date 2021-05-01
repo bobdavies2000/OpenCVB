@@ -13,7 +13,7 @@ Public Class MFD_Basics : Inherits VBparent
         label1 = "Motion-filtered image"
         task.desc = "Motion-Filtered basics - update only the changed regions"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         dMax.Run(src)
 
@@ -50,7 +50,7 @@ Public Class MFD_Depth : Inherits VBparent
         label1 = "Motion-filtered depth data"
         task.desc = "Stabilize the depth image but update any areas with motion"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         mfd.Run(task.depth32f)
         dst1 = mfd.dst1
         dst2 = mfd.dst2
@@ -69,7 +69,7 @@ Public Class MFD_PointCloud : Inherits VBparent
         label1 = "Motion-filtered PointCloud"
         task.desc = "Stabilize the PointCloud but update any areas with motion"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         mfd.Run(task.pointCloud)
         dst1 = mfd.dst1
         dst2 = mfd.dst2
@@ -96,7 +96,7 @@ Public Class MFD_Sobel : Inherits VBparent
         label1 = "Sobel edges of Motion-Filtered RGB"
         task.desc = "Stabilize the Sobel output with MFD"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static thresholdSlider = findSlider("Pixel threshold to zero")
         mfd.Run(src)
         dst2 = mfd.dst2
@@ -120,7 +120,7 @@ Public Class MFD_BinarizedSobel : Inherits VBparent
         label1 = "Binarized Sobel edges of Motion-Filtered RGB"
         task.desc = "Stabilize the binarized Sobel output with MFD"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         mfd.Run(src)
 
@@ -155,7 +155,7 @@ Public Class MFD_FloodFill : Inherits VBparent
 
         task.desc = "Floodfill the image of MFD edges (binarized Sobel output)"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static MFD_OnOffRadio = findRadio("Use motion-filtered pixel values")
         Static stepSlider = findSlider("FloodFill Step Size")
         Static fillSlider = findSlider("FloodFill point distance from edge")

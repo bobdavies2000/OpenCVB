@@ -31,7 +31,7 @@ Public Class OptionsCommon : Inherits VBparent
         task.maxY = task.maxZ * task.viewOptions.sideFrustrumSetting / 100 / 2
         task.maxX = task.maxZ * task.viewOptions.topFrustrumSetting / 100 / 2
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         updateSettings()
 
         Static saveMaxVal As Integer
@@ -117,6 +117,6 @@ Public Class OptionsCommon_Histogram : Inherits VBparent
 
         task.desc = "The options for the side view are shared with this algorithm"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
     End Sub
 End Class

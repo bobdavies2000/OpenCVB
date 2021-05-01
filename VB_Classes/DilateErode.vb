@@ -18,7 +18,7 @@ Public Class DilateErode_Basics : Inherits VBparent
             radio.check(0).Checked = True
         End If
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static ellipseRadio = findRadio("Dilate/Erode shape: Ellipse")
         Static rectRadio = findRadio("Dilate/Erode shape: Rect")
         Static iterSlider = findSlider("Erode (-) to Dilate (+)")
@@ -72,7 +72,7 @@ Public Class DilateErode_DepthSeed : Inherits VBparent
         End If
         task.desc = "Erode depth to build a depth mask for inrange data."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim iterations = dilate.sliders.trackbar(1).Value
         Dim kernelsize = If(dilate.sliders.trackbar(0).Value Mod 2, dilate.sliders.trackbar(0).Value, dilate.sliders.trackbar(0).Value + 1)
         Dim morphShape = cv.MorphShapes.Cross
@@ -112,7 +112,7 @@ Public Class DilateErode_OpenClose : Inherits VBparent
         End If
         task.desc = "Erode and dilate with MorphologyEx on the RGB and Depth image."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim n = sliders.trackbar(0).Value
         Dim an As integer = If(n > 0, n, -n)
         Dim morphShape = cv.MorphShapes.Rect

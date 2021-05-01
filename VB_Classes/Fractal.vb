@@ -32,7 +32,7 @@ Public Class Fractal_Mandelbrot : Inherits VBparent
             dst1.Set(Of Byte)(y, x, If(iter < iterations, 255 * iter / (iterations - 1), 0))
         Next
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim iterations = sliders.trackbar(0).Value
         If saveIterations <> iterations Then
             saveIterations = iterations
@@ -53,7 +53,7 @@ Public Class Fractal_Mandelbrot_MT : Inherits VBparent
     Public Sub New()
         task.desc = "Run a multi-threaded version of the Mandalbrot algorithm"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim iterations = mandel.sliders.trackbar(0).Value
         Parallel.For(0, src.Height,
         Sub(y)
@@ -78,7 +78,7 @@ Public Class Fractal_MandelbrotZoom : Inherits VBparent
         End If
         task.desc = "Run the classic Mandalbrot algorithm and allow zooming in"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim iterations = mandel.sliders.trackbar(0).Value
 
         If check.Box(0).Checked Then
@@ -121,7 +121,7 @@ Public Class Fractal_MandelbrotZoomColor : Inherits VBparent
     Public Sub New()
         task.desc = "Classic Mandelbrot in color"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         mandel.Run(src)
         task.palette.Run(mandel.dst1)
         dst1 = task.palette.dst1
@@ -156,7 +156,7 @@ Public Class Fractal_Julia : Inherits VBparent
         If depth < max / 4 Then Return 0
         Return julia_point(x, y, r, depth - 1, max, c, Complex.Pow(z, 2) + c)
     End Function
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static savedMouse = New cv.Point(-1, -1)
         If savedMouse <> task.mousePoint Or mandel.mandel.check.Box(0).Checked Then
             savedMouse = task.mousePoint

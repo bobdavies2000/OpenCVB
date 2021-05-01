@@ -46,7 +46,7 @@ Public Class Hough_Circles : Inherits VBparent
         label2 = "Hough Circles found"
         task.desc = "Find circles using HoughCircles."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         circles.Run(src)
         dst1 = circles.dst1
         Static Dim method As integer = 3
@@ -79,7 +79,7 @@ Public Class Hough_Lines : Inherits VBparent
         task.desc = "Use Houghlines to find lines in the image."
     End Sub
 
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         edges.Run(src)
 
         Dim rhoIn = sliders.trackbar(0).Value
@@ -127,7 +127,7 @@ Public Class Hough_Lines_MT : Inherits VBparent
         label2 = "Hough_Lines_MT"
     End Sub
 
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)
 
         edges.Run(src)

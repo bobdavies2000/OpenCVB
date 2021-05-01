@@ -19,7 +19,7 @@ Public Class Sift_Basics : Inherits VBparent
         End If
         task.desc = "Compare 2 images to get a homography.  We will use left and right images."
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
 
         lrView.Run(src)
 
@@ -57,7 +57,7 @@ Public Class Sift_Basics_MT : Inherits VBparent
 
         task.desc = "Compare 2 images to get a homography.  We will use left and right images - needs more work"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)
 
         lrView.Run(src)

@@ -25,7 +25,7 @@ Public Class SemiGlobalMatching_CPP : Inherits VBparent
     Public Sub New()
         task.desc = "Find depth using the semi-global matching algorithm."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         'If task.frameCount < 10 Then Exit Sub
         'If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
         '    task.trueText("The left and right views are identical with the Microsoft Kinect 4 Azure camera.")

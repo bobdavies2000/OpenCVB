@@ -17,7 +17,7 @@ Public Class OpenGL_MyOpenGLtest : Inherits VBparent
         ogl.OpenGLTitle = "OpenGL_MyOpenGLtest"
         task.desc = "description"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src as cv.Mat) ' Rank = 1
         ogl.pointCloudInput = task.PointCloud
         ogl.src = task.color
         ogl.Run()

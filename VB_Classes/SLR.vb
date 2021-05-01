@@ -18,7 +18,7 @@ Public Class SLR_Basics : Inherits VBparent
         End If
         task.desc = "Segmented Linear Regression example"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         Static toleranceSlider = findSlider("Approximate accuracy (tolerance) X100")
         Static movingAvgSlider = findSlider("Simple moving average window size")
         Dim tolerance = toleranceSlider.value / 100
@@ -77,7 +77,7 @@ Public Class SLR_Data : Inherits VBparent
         Next
         task.desc = "Plot the data used in SLR_Basics"
     End Sub
-    Public Sub Run(src As cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         plot.srcX = dataX.ToArray
         plot.srcY = dataY.ToArray
         plot.Run(src)
@@ -99,7 +99,7 @@ Public Class SLR_Image : Inherits VBparent
         label1 = "Original data"
         task.desc = "Run Segmented Linear Regression on grayscale image data - just an experiment"
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat) ' Rank = 1
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.plotColors(0) = cv.Scalar.White
         hist.Run(src)
