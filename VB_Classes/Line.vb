@@ -589,7 +589,7 @@ Public Class Line_SideView : Inherits VBparent
         lines.Run(src)
         dst2 = lines.dst2
 
-        Dim mask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim mask = dst2
         ' tView.src = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
         'task.pointCloud.CopyTo(tView.src, mask)
         tView.Run(task.pointCloud)
@@ -633,14 +633,14 @@ Public Class Line_LeftRightImages : Inherits VBparent
 
         leftLines.Run(lrPalette.dst1)
         dst1.SetTo(cv.Scalar.White)
-        dst1.SetTo(cv.Scalar.Red, leftLines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst1.SetTo(cv.Scalar.Red, leftLines.dst2)
 
         rightLines.Run(lrPalette.dst2)
-        dst1.SetTo(cv.Scalar.Blue, rightLines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst1.SetTo(cv.Scalar.Blue, rightLines.dst2)
 
         If rgbCheck.checked Then
             rgbLines.Run(src)
-            dst1.SetTo(cv.Scalar.Green, rgbLines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            dst1.SetTo(cv.Scalar.Green, rgbLines.dst2)
         End If
     End Sub
 End Class
@@ -677,7 +677,7 @@ Public Class Line_RegionsVB : Inherits VBparent
 
         lines.Run(src)
 
-        Dim lineMask = lines.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim lineMask = lines.dst2
         dst1.SetTo(lineMatch, lineMask)
         dst2.SetTo(lineMatch, lineMask)
 
