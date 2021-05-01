@@ -179,6 +179,7 @@ Public Class VBparent : Implements IDisposable
     Public Const QUAD1 = 1
     Public Const QUAD2 = 2
     Public Const QUAD3 = 3
+    Public Const verticalSlope As Single = 1000000
 
     Public Sub setMyActiveMat()
         If task.mouseClickFlag Then

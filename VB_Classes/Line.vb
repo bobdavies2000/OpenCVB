@@ -6,6 +6,8 @@ Public Class Line_Basics : Inherits VBparent
     Public sortlines As New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
     Public pt1List As New List(Of cv.Point)
     Public pt2List As New List(Of cv.Point)
+    Public slopes As New List(Of Single)
+    Public yintercepts As New List(Of Single)
     Public thickness As Integer
     Public pixelThreshold As Integer
     Public lenSlider As Windows.Forms.TrackBar
@@ -23,11 +25,12 @@ Public Class Line_Basics : Inherits VBparent
 
         lenSlider = findSlider("Line length threshold in pixels")
 
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         label1 = "Lines detected in the current frame"
         label2 = "Lines detected since camera motion threshold"
         task.desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
-    Public Sub Run(src as cv.Mat)
+    Public Sub Run(src As cv.Mat)
         Static thicknessSlider = findSlider("Line thickness")
         dst1 = src.Clone
         If dst1.Channels <> 3 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -39,6 +42,8 @@ Public Class Line_Basics : Inherits VBparent
         sortlines.Clear()
         pt1List.Clear()
         pt2List.Clear()
+        slopes.Clear()
+        yintercepts.Clear()
 
         For Each v In lines
             If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And
@@ -50,6 +55,8 @@ Public Class Line_Basics : Inherits VBparent
                     dst1.Line(pt1, pt2, cv.Scalar.Yellow, thickness, task.lineType)
                     pt1List.Add(pt1)
                     pt2List.Add(pt2)
+                    slopes.Add(If((pt1.X <> pt2.X), (pt1.Y - pt2.Y) / (pt1.X - pt2.X), verticalSlope))
+                    yintercepts.Add(pt1.Y - slopes.ElementAt(slopes.Count - 1) * pt1.X)
                     sortlines.Add(pixelLen, New cv.Vec4f(pt1.X, pt1.Y, pt2.X, pt2.Y))
                 End If
             End If
@@ -60,7 +67,7 @@ Public Class Line_Basics : Inherits VBparent
         For Each line In sortlines
             Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
             Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-            dst2.Line(p1, p2, cv.Scalar.Yellow, 2, task.lineType)
+            dst2.Line(p1, p2, cv.Scalar.White, 2, task.lineType)
         Next
     End Sub
 End Class
@@ -597,56 +604,6 @@ End Class
 
 
 
-Public Class Line_TimeView : Inherits VBparent
-    Public pt1List() As List(Of cv.Point)
-    Public pt2List() As List(Of cv.Point)
-    Dim lines As New Line_Basics
-    Public Sub New()
-        task.desc = "Collect lines over time"
-    End Sub
-    Public Sub Run(src As cv.Mat)
-        Static frameSlider = findSlider("Detect lines from the last X frames")
-        Static lineCount As Integer
-        Static lineIndex As Integer
-
-        lines.Run(src)
-
-        If lineCount <> frameSlider.value Then
-            lineCount = frameSlider.value
-            ReDim pt1List(lineCount - 1)
-            ReDim pt2List(lineCount - 1)
-            lineIndex = 0
-        End If
-
-        pt1List(lineIndex) = New List(Of cv.Point)(lines.pt1List)
-        pt2List(lineIndex) = New List(Of cv.Point)(lines.pt2List)
-
-        dst1 = src
-        dst2.SetTo(0)
-        Dim lineTotal As Integer
-        For i = 0 To pt1List.Count - 1
-            If pt1List(i) IsNot Nothing Then
-                lineTotal += pt1List(i).Count
-                For j = 0 To pt1List(i).Count - 1
-                    dst1.Line(pt1List(i)(j), pt2List(i)(j), cv.Scalar.Yellow, task.lineSize, task.lineType)
-                    dst2.Line(pt1List(i)(j), pt2List(i)(j), cv.Scalar.Yellow, task.lineSize, task.lineType)
-                Next
-            End If
-        Next
-
-        Dim pixelCount = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
-
-        lineIndex += 1
-        If lineIndex >= lineCount Then lineIndex = 0
-        label2 = "There were " + CStr(lineTotal) + " lines detected with " + Format(pixelCount / 1000, "#.0") + "k pixels"
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 
@@ -813,28 +770,47 @@ End Class
 
 
 Public Class Line_Longest : Inherits VBparent
-    Dim lines As New Line_Basics
+    Dim lines As New Line_TimeViewLines
     Dim plot As New Plot_OverTime
     Public Sub New()
         plot.minScale = 0
         plot.plotCount = 1
+
+
+        If findfrm(caller + " Slider Options") Is Nothing Then
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Index of line (sorted by length", 0, 100, 0)
+        End If
+
         task.desc = "Find the longest line in RGB and use it to validate depth"
     End Sub
     Public Sub Run(src As cv.Mat)
         lines.Run(src)
         dst1 = src
         If lines.pt1List.Count > 0 Then
-            Dim pt1 = lines.pt1List.ElementAt(0)
-            Dim pt2 = lines.pt2List.ElementAt(0)
+            Static indexSlider = findSlider("Index of line (sorted by length")
+            If indexSlider.value >= lines.pt1List.Count Then indexSlider.value = 0
+            indexSlider.maximum = lines.pt1List.Count
+            Dim pt1 = lines.pt1List(indexSlider.value)
+            Dim pt2 = lines.pt2list(indexSlider.value)
 
             dst1.Line(pt1, pt2, cv.Scalar.Yellow, task.lineSize, task.lineType)
 
             Dim sq = 3
-            Dim x = Math.Min(pt1.X, pt2.X)
-            Dim y = If(x = pt1.X, pt1.Y, pt2.Y)
-            Dim maskRect = New cv.Rect(Math.Max(x, 0), Math.Max(y, 0), Math.Abs(pt1.X - pt2.X) + 2 * sq, Math.Abs(pt1.Y - pt2.Y) + 2 * sq)
-            Dim mask = New cv.Mat(maskRect.Height, maskRect.Width, cv.MatType.CV_8U, 0)
-            dst1.Rectangle(maskRect, cv.Scalar.White, task.lineSize, task.lineType)
+            Dim pt = pt1
+            If pt1.X = pt2.X Then
+                If pt1.Y > pt2.Y Then pt = pt2
+            Else
+                Dim slope = -(pt1.Y - pt2.Y) / (pt1.X - pt2.X)
+                If slope < 0 Then
+                    pt = If(pt1.X < pt2.X, pt1, pt2)
+                Else
+                    pt = If(pt1.Y > pt2.Y, pt1, pt2)
+                End If
+            End If
+            Dim maskRect = New cv.Rect(Math.Max(pt.X, 0), Math.Max(pt.Y, 0), Math.Abs(pt1.X - pt2.X) + 2 * sq, Math.Abs(pt1.Y - pt2.Y) + 2 * sq)
+            If maskRect.X + maskRect.Width >= dst1.Width Then maskRect.Width = dst1.Width - maskRect.X
+            If maskRect.Y + maskRect.Height >= dst1.Height Then maskRect.Height = dst1.Height - maskRect.Y
             Dim lineMask = dst1(maskRect).InRange(cv.Scalar.Yellow, cv.Scalar.Yellow)
 
             Dim depth1 = task.depth32f(maskRect).Mean(lineMask).Item(0) / 1000
@@ -853,6 +829,114 @@ Public Class Line_Longest : Inherits VBparent
 
             Dim yMean = (1 - meanVal / plot.maxScale) * dst1.Height
             dst2.Line(New cv.Point(0, yMean), New cv.Point(dst2.Width, yMean), cv.Scalar.Black, 1)
+            dst1.Rectangle(maskRect, cv.Scalar.White, task.lineSize, task.lineType)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Line_TimeViewLines : Inherits VBparent
+    Dim lines As New Line_TimeView
+    Dim basics As New Line_Basics
+    Public pt1List As New List(Of cv.Point)
+    Public pt2list As New List(Of cv.Point)
+    Public Sub New()
+        label1 = "Lines from the latest Line_TimeLine"
+        label2 = "Lines (Yellow) Vertical (blue) Horizontal (Red)"
+        task.desc = "Find slope and y-intercept of lines over time."
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        lines.Run(src)
+        If lines.pixelcount = 0 Then Exit Sub
+        basics.Run(lines.dst2)
+
+        Dim sortlines As New SortedList(Of Single, cv.Vec6f)(New compareAllowIdenticalSingleInverted)
+        pt1List.Clear()
+        pt2list.Clear()
+
+        For i = 0 To basics.slopes.Count - 1
+            Dim pt1 = basics.pt1List(i)
+            Dim pt2 = basics.pt2List(i)
+            sortlines.Add(pt1.DistanceTo(pt2), New cv.Vec6f(basics.yintercepts(i), pt1.X, pt1.Y, pt2.X, pt2.Y, CSng(i)))
+        Next
+
+        dst1 = lines.dst2
+        dst2.SetTo(cv.Scalar.White)
+        Dim index = lines.lineIndex
+        For Each sl In sortlines
+            Dim v = sl.Value
+            Dim pt1 = New cv.Point(v.Item1, v.Item2)
+            Dim pt2 = New cv.Point(v.Item3, v.Item4)
+            dst2.Line(pt1, pt2, cv.Scalar.Green, 1, task.lineType)
+            pt1List.Add(pt1)
+            pt2list.Add(pt2)
+            If sl.Key = verticalSlope Then
+                dst2.Line(pt1, pt2, cv.Scalar.Blue, 1, task.lineType)
+            Else
+                If sl.Key = 0 Then
+                    dst2.Line(pt1, pt2, cv.Scalar.Red, 1, task.lineType)
+                End If
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_TimeView : Inherits VBparent
+    Public ptList1() As List(Of cv.Point)
+    Public ptList2() As List(Of cv.Point)
+    Public lineIndex As Integer = -1
+    Dim lines As New Line_Basics
+    Public pixelcount As Integer
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        task.desc = "Collect lines over time"
+    End Sub
+    Public Sub Run(src As cv.Mat)
+        Static frameSlider = findSlider("Detect lines from the last X frames")
+        Static lineCount As Integer
+
+        lines.Run(src)
+
+        If lineCount <> frameSlider.value Then
+            lineCount = frameSlider.value
+            ReDim ptList1(lineCount - 1)
+            ReDim ptList2(lineCount - 1)
+            lineIndex = lineCount
+        End If
+
+        lineIndex += 1
+        If lineIndex >= lineCount Then lineIndex = 0
+
+        ptList1(lineIndex) = New List(Of cv.Point)(lines.pt1List)
+        ptList2(lineIndex) = New List(Of cv.Point)(lines.pt2List)
+
+        dst1 = src
+        dst2.SetTo(0)
+        Dim lineTotal As Integer
+        For i = 0 To ptList1.Count - 1
+            If ptList1(i) IsNot Nothing Then
+                lineTotal += ptList1(i).Count
+                For j = 0 To ptList1(i).Count - 1
+                    dst1.Line(ptList1(i)(j), ptList2(i)(j), cv.Scalar.Yellow, 1, task.lineType)
+                    dst2.Line(ptList1(i)(j), ptList2(i)(j), cv.Scalar.White, 1, task.lineType)
+                Next
+            End If
+        Next
+
+        pixelcount = dst2.CountNonZero()
+        label2 = "There were " + CStr(lineTotal) + " lines detected using " + Format(pixelCount / 1000, "#.0") + "k pixels"
     End Sub
 End Class
