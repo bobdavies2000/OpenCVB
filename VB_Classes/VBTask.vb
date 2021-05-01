@@ -351,6 +351,12 @@ Public Class ActiveTask : Implements IDisposable
         If algorithmObject Is Nothing Then
             MsgBox("The algorithm: " + task.algName + " was not found in the algorithmList.vb code." + vbCrLf +
                    "Problem likely originated with the UIindexer.")
+            task.desc = "The algorithm: " + task.algName + " was not found"
+            task.trueText("The algorithm: " + task.algName + " was not found in the algorithmList.vb code." + vbCrLf +
+                   "Problem likely originated with the UIindexer.", 10, 200, 3)
+
+            inrange.standalone = True
+            algorithmObject = inrange
         End If
         If parms.useRecordedData Then recordedData = New Replay_Play()
 
