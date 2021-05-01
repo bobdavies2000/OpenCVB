@@ -448,64 +448,11 @@ End Class
 
 
 
-Public Class Line_Sift_MT : Inherits VBparent
-    Dim grid As New Thread_Grid
-    Dim siftCS As New CS_SiftBasics
-    Dim siftBasics As Sift_Basics
-    Dim lrView As New Line_LeftRightImages
-    Dim numPointSlider As System.Windows.Forms.TrackBar
-    Public Sub New()
-        Dim gridWidthSlider = findSlider("ThreadGrid Width")
-        Dim gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Maximum = task.color.Cols * 2
-        gridWidthSlider.Value = task.color.Cols * 2 ' we are just taking horizontal slices of the image.
-        gridHeightSlider.Value = 10
-
-        grid.Run(Nothing)
-
-        siftBasics = New Sift_Basics
-        findRadio("Use Flann Matcher").Enabled = False
-
-        numPointSlider = findSlider("Points to Match")
-        numPointSlider.Value = 1
-
-        label1 = "Left image - lines connect SIFT dots"
-        label2 = "Right image - note inaccurate results"
-        task.desc = "Using the lines highlighted in left/right infrared images, find corresponding lines."
-    End Sub
-    Public Sub Run(src As cv.Mat)
-        grid.Run(Nothing)
-
-        lrView.Run(src)
-        dst1 = lrView.dst1
-        dst2 = lrView.dst2
-
-        Dim output As New cv.Mat(src.Rows, src.Cols * 2, cv.MatType.CV_8UC3)
-        Dim numFeatures = numPointSlider.Value
-        Parallel.ForEach(grid.roiList,
-        Sub(roi)
-            Dim left = lrView.dst1(roi).Clone()  ' sift wants the inputs to be continuous and roi-modified Mats are not continuous.
-            Dim right = lrView.dst2(roi).Clone()
-            Dim dstROI = New cv.Rect(roi.X, roi.Y, roi.Width * 2, roi.Height)
-            Dim dstTmp = output(dstROI).Clone()
-            siftCS.Run(left, right, dstTmp, siftBasics.radio.check(0).Checked, numFeatures)
-            dstTmp.CopyTo(output(dstROI))
-        End Sub)
-
-        dst1 = output(New cv.Rect(0, 0, src.Width, src.Height))
-        dst2 = output(New cv.Rect(src.Width, 0, src.Width, src.Height))
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Line_NearestPoint : Inherits VBparent
     Dim rangeRect As cv.Rect
+    Public pt As cv.Point2f
+    Public p1 As cv.Point2f
+    Public p2 As cv.Point2f
     Public Sub New()
         Dim offset = 20
         rangeRect = New cv.Rect(offset, offset, dst1.Width - offset * 2, dst1.Height - offset * 2)
@@ -517,7 +464,7 @@ Public Class Line_NearestPoint : Inherits VBparent
 
         Return New cv.Point2f(x, y)
     End Function
-    Public Function findNearest(p1 As cv.Point2f, p2 As cv.Point2f, pt As cv.Point2f) As cv.Point2f
+    Public Function findNearestPt(p1 As cv.Point2f, p2 As cv.Point2f, pt As cv.Point2f) As cv.Point2f
         Dim nearest As cv.Point2f
         Dim minX = Math.Min(p1.X, p2.X)
         Dim minY = Math.Min(p1.Y, p2.Y)
@@ -550,22 +497,21 @@ Public Class Line_NearestPoint : Inherits VBparent
         Return nearest
     End Function
     Public Function findDistance(p1 As cv.Point2f, p2 As cv.Point2f, pt As cv.Point2f) As Single
-        Dim nearest = findNearest(p1, p2, pt)
+        Dim nearest = findNearestPt(p1, p2, pt)
         Return nearest.DistanceTo(pt)
     End Function
     Public Sub Run(src As cv.Mat)
-
         If task.frameCount Mod 30 = 0 And standalone Then
-            Dim pt = getPoint()
-            Dim p1 = getPoint()
-            Dim p2 = getPoint()
-            Dim nearest = findNearest(p1, p2, pt)
-            dst1.SetTo(0)
-            dst1.Circle(New cv.Point2f(pt.X, pt.Y), task.dotSize, cv.Scalar.White, -1, task.lineType)
-            dst1.Line(New cv.Point2f(p1.X, p1.Y), New cv.Point2f(p2.X, p2.Y), cv.Scalar.Yellow, 1, task.lineType)
-            dst1.Line(pt, nearest, cv.Scalar.White, 1, task.lineType)
-            label1 = "nearest point = (" + CStr(nearest.X) + "," + CStr(nearest.Y) + ")"
+            pt = getPoint()
+            p1 = getPoint()
+            p2 = getPoint()
         End If
+        Dim nearest = findNearestPt(p1, p2, pt)
+        dst1.SetTo(0)
+        dst1.Circle(New cv.Point2f(pt.X, pt.Y), task.dotSize, cv.Scalar.White, -1, task.lineType)
+        dst1.Line(New cv.Point2f(p1.X, p1.Y), New cv.Point2f(p2.X, p2.Y), cv.Scalar.Yellow, 1, task.lineType)
+        dst1.Line(pt, nearest, cv.Scalar.White, 1, task.lineType)
+        label1 = "nearest point = (" + CStr(nearest.X) + "," + CStr(nearest.Y) + ")"
     End Sub
 End Class
 
@@ -874,14 +820,14 @@ Public Class Line_TimeViewLines : Inherits VBparent
             Dim v = sl.Value
             Dim pt1 = New cv.Point(v.Item1, v.Item2)
             Dim pt2 = New cv.Point(v.Item3, v.Item4)
-            dst2.Line(pt1, pt2, cv.Scalar.Green, 1, task.lineType)
+            dst2.Line(pt1, pt2, cv.Scalar.Green, lines.lineWidth, task.lineType)
             pt1List.Add(pt1)
             pt2list.Add(pt2)
             If sl.Key = verticalSlope Then
-                dst2.Line(pt1, pt2, cv.Scalar.Blue, 1, task.lineType)
+                dst2.Line(pt1, pt2, cv.Scalar.Blue, lines.lineWidth, task.lineType)
             Else
                 If sl.Key = 0 Then
-                    dst2.Line(pt1, pt2, cv.Scalar.Red, 1, task.lineType)
+                    dst2.Line(pt1, pt2, cv.Scalar.Red, lines.lineWidth, task.lineType)
                 End If
             End If
         Next
@@ -900,13 +846,17 @@ Public Class Line_TimeView : Inherits VBparent
     Public lineIndex As Integer = -1
     Dim lines As New Line_Basics
     Public pixelcount As Integer
+    Public lineWidth As Integer
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        findSlider("Line thickness").Value = 1
         task.desc = "Collect lines over time"
     End Sub
     Public Sub Run(src As cv.Mat)
         Static frameSlider = findSlider("Detect lines from the last X frames")
+        Static thicknessSlider = findSlider("Line thickness")
         Static lineCount As Integer
+        lineWidth = thicknessSlider.value
 
         lines.Run(src)
 
@@ -930,8 +880,8 @@ Public Class Line_TimeView : Inherits VBparent
             If ptList1(i) IsNot Nothing Then
                 lineTotal += ptList1(i).Count
                 For j = 0 To ptList1(i).Count - 1
-                    dst1.Line(ptList1(i)(j), ptList2(i)(j), cv.Scalar.Yellow, 1, task.lineType)
-                    dst2.Line(ptList1(i)(j), ptList2(i)(j), cv.Scalar.White, 1, task.lineType)
+                    dst1.Line(ptList1(i)(j), ptList2(i)(j), cv.Scalar.Yellow, lineWidth, task.lineType)
+                    dst2.Line(ptList1(i)(j), ptList2(i)(j), cv.Scalar.White, lineWidth, task.lineType)
                 Next
             End If
         Next

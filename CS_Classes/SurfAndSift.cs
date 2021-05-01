@@ -42,6 +42,7 @@ namespace CS_Classes
 
     public class CS_SiftBasics
     {
+        public KeyPoint[] kp1, kp2;
         public void Run(Mat gray1, Mat gray2, Mat dst1, bool useBFMatcher, int pointsToMatch)
         {
             var sift = SIFT.Create(pointsToMatch);
@@ -64,6 +65,8 @@ namespace CS_Classes
                 DMatch[] flannMatches = flannMatcher.Match(descriptors1, descriptors2);
                 Cv2.DrawMatches(gray1, keypoints1, gray2, keypoints2, flannMatches, dst1);
             }
+            kp1 = keypoints1;
+            kp2 = keypoints2;
         }
     }
 }
