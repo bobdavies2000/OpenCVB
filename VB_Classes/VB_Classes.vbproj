@@ -338,7 +338,6 @@
     <Compile Include="Surf.vb" />
     <Compile Include="SVM.vb" />
     <Compile Include="Thread.vb" />
-    <Compile Include="Threshold.vb" />
     <Compile Include="Transform.vb" />
     <Compile Include="Vector.vb" />
     <Compile Include="WarpAffine.vb" />
