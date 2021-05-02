@@ -807,14 +807,14 @@ Public Class Line_TimeViewLines : Inherits VBparent
             Dim v = sl.Value
             Dim pt1 = New cv.Point(v.Item1, v.Item2)
             Dim pt2 = New cv.Point(v.Item3, v.Item4)
-            dst2.Line(pt1, pt2, cv.Scalar.Green, lines.lineWidth, task.lineType)
+            dst2.Line(pt1, pt2, cv.Scalar.Green, task.lineThickness, task.lineType)
             pt1List.Add(pt1)
             pt2list.Add(pt2)
             If sl.Key = verticalSlope Then
-                dst2.Line(pt1, pt2, cv.Scalar.Blue, lines.lineWidth, task.lineType)
+                dst2.Line(pt1, pt2, cv.Scalar.Blue, task.lineThickness, task.lineType)
             Else
                 If sl.Key = 0 Then
-                    dst2.Line(pt1, pt2, cv.Scalar.Red, lines.lineWidth, task.lineType)
+                    dst2.Line(pt1, pt2, cv.Scalar.Red, task.lineThickness, task.lineType)
                 End If
             End If
         Next
@@ -833,7 +833,6 @@ Public Class Line_TimeView : Inherits VBparent
     Public lineIndex As Integer = -1
     Dim lines As New Line_Basics
     Public pixelcount As Integer
-    Public lineWidth As Integer
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         task.desc = "Collect lines over time"
