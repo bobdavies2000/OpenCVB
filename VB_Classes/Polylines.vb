@@ -10,7 +10,6 @@ Public Class Polylines_IEnumerableExample : Inherits VBparent
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Polyline Count", 2, 500, 100)
-            sliders.setupTrackBar(1, "Polyline Thickness", 0, 10, 1)
         End If
         task.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."
     End Sub
@@ -24,7 +23,7 @@ Public Class Polylines_IEnumerableExample : Inherits VBparent
 
         dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         ' NOTE: when there are 2 points, there will be 1 line.
-        dst1.Polylines(pts, check.Box(0).Checked, cv.Scalar.White, sliders.trackbar(1).Value, task.lineType)
+        dst1.Polylines(pts, check.Box(0).Checked, cv.Scalar.White, task.lineThickness, task.lineType)
     End Sub
 End Class
 

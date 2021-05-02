@@ -176,6 +176,9 @@ End Class
 
 
 
+
+
+
 ' https://github.com/SciSharp/SharpCV/blob/master/src/SharpCV.Examples/Program.cs
 Public Class Contours_RemoveLines : Inherits VBparent
     Public Sub New()
@@ -183,7 +186,6 @@ Public Class Contours_RemoveLines : Inherits VBparent
             sliders.Setup(caller, 3)
             sliders.setupTrackBar(0, "Morphology width/height", 1, 100, 20)
             sliders.setupTrackBar(1, "MorphologyEx iterations", 1, 5, 1)
-            sliders.setupTrackBar(2, "Contour thickness", 1, 10, 3)
         End If
         label1 = "Original image"
         label2 = "Original with horizontal/vertical lines removed"
@@ -203,7 +205,7 @@ Public Class Contours_RemoveLines : Inherits VBparent
         cv.Cv2.MorphologyEx(thresh, removedH, cv.MorphTypes.Open, hkernel,, sliders.trackbar(1).Value)
         Dim cnts = cv.Cv2.FindContoursAsArray(removedH, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
         For i = 0 To cnts.Count - 1
-            cv.Cv2.DrawContours(tmp, cnts, i, cv.Scalar.White, sliders.trackbar(2).Value)
+            cv.Cv2.DrawContours(tmp, cnts, i, cv.Scalar.White, task.lineThickness)
         Next
 
         Dim vkernel = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(1, sliders.trackbar(0).Value))
@@ -211,7 +213,7 @@ Public Class Contours_RemoveLines : Inherits VBparent
         cv.Cv2.MorphologyEx(thresh, removedV, cv.MorphTypes.Open, vkernel,, sliders.trackbar(1).Value)
         cnts = cv.Cv2.FindContoursAsArray(removedV, cv.RetrievalModes.External, cv.ContourApproximationModes.ApproxSimple)
         For i = 0 To cnts.Count - 1
-            cv.Cv2.DrawContours(tmp, cnts, i, cv.Scalar.White, sliders.trackbar(2).Value)
+            cv.Cv2.DrawContours(tmp, cnts, i, cv.Scalar.White, task.lineThickness)
         Next
 
         dst2(dstRect) = tmp.Resize(dstSize)
