@@ -1101,7 +1101,6 @@ Public Class OpenCVB
     Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
         If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
 
-        saveAlgorithmName = ""
         Dim saveCameraIndex As Integer = activeCameraIndex
         Dim OKcancel = optionsForm.ShowDialog()
 
@@ -1117,9 +1116,9 @@ Public Class OpenCVB
     End Sub
     Private Sub StartAlgorithmTask()
         testAllRunning = TestAllButton.Text = "Stop Test"
+        saveAlgorithmName = AvailableAlgorithms.Text ' this tells the previous algorithmTask to terminate.
         If algorithmTaskHandle IsNot Nothing Then
             While algorithmTaskHandle.IsAlive
-                saveAlgorithmName = "" ' this should terminate the current running algorithm - unless it is hung!
                 If testAllRunning Then TestAllTimer.Enabled = False ' no more tasks please...
                 Thread.Sleep(100)
                 Application.DoEvents()
@@ -1127,8 +1126,6 @@ Public Class OpenCVB
             Console.WriteLine(AvailableAlgorithms.Text + " now starting since the previous algorithm thread has ended.")
             If testAllRunning Then TestAllTimer.Enabled = True
         End If
-
-        saveAlgorithmName = AvailableAlgorithms.Text ' this tells the previous algorithmTask to terminate.
 
         Dim parms As New VB_Classes.ActiveTask.algParms
         ReDim parms.RotationMatrix(9 - 1)
@@ -1200,7 +1197,7 @@ Public Class OpenCVB
             Dim currentCameraIndex = activeCameraIndex
             While 1
                 Application.DoEvents()
-                If saveAlgorithmName <> algName And frameCount > minFrames Then Exit Sub ' 
+                If saveAlgorithmName <> algName And frameCount > minFrames Then Exit Sub
                 SyncLock bufferLock
                     If saveWorkingRes <> workingRes And frameCount > minFrames Then Exit Sub ' switching camera resolution means stopping the current algorithm
                     If ignoreMouseMove = False Then
@@ -1256,7 +1253,6 @@ Public Class OpenCVB
                             End If
                             BothFirstAndLastReady = False
                         End If
-
 
                         taskNewImages = False
                         Exit While
