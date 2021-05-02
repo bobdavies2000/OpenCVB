@@ -12,7 +12,7 @@ Public Class IMU_Basics : Inherits VBparent
         End If
         task.desc = "Read and display the IMU coordinates"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 3
         Dim alpha As Double = sliders.trackbar(0).Value / 1000
         If task.frameCount = 0 Then
             lastTimeStamp = task.IMU_TimeStamp
@@ -424,7 +424,7 @@ Public Class IMU_GVector : Inherits VBparent
 
         task.desc = "Find the angle of tilt for the camera with respect to gravity."
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 4
         Static xRotateSlider = findSlider("Amount to rotate pointcloud around X-axis (degrees)")
         Static yRotateSlider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
         Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
@@ -501,7 +501,7 @@ Public Class IMU_IsCameraLevel : Inherits VBparent
     Public Sub New()
         task.desc = "Answer the question: Is the camera level?"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 2
         Dim gx = task.IMU_Acceleration.X
         Dim gy = task.IMU_Acceleration.Y
         Dim gz = task.IMU_Acceleration.Z
@@ -527,7 +527,7 @@ Public Class IMU_IscameraStable : Inherits VBparent
     Public Sub New()
         task.desc = "Answer the question: Is the camera stable?"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 2
         Dim pitch = task.IMU_AngularVelocity.X
         Dim yaw = task.IMU_AngularVelocity.Y
         Dim roll = task.IMU_AngularVelocity.Z

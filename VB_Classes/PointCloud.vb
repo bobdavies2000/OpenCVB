@@ -250,7 +250,7 @@ Public Class PointCloud_SetupSide : Inherits VBparent
         label1 = "Colorize mask for side view"
         task.desc = "Create the colorized mat used for side projections"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 2
         Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
         Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
@@ -342,7 +342,7 @@ Public Class PointCloud_SetupTop : Inherits VBparent
         label1 = "Colorize mask for top down view"
         task.desc = "Create the colorize the mat for a topdown projections"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 2
         Dim distanceRatio As Single = 1
         Dim fsize = task.fontSize * 1.5
         If standalone Then dst1.SetTo(0) Else src.CopyTo(dst1)
@@ -509,7 +509,7 @@ Public Class PointCloud_Kalman_TopView : Inherits VBparent
         findSlider("FloodFill Minimum Size").Value = 100
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 3
         topView.Run(src)
 
         flood.Run(topView.histOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255))
@@ -546,7 +546,7 @@ Public Class PointCloud_Kalman_SideView : Inherits VBparent
         findSlider("FloodFill Minimum Size").Value = 100
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 3
         sideView.Run(src)
 
         flood.Run(sideView.histOutput.ConvertScaleAbs(255))

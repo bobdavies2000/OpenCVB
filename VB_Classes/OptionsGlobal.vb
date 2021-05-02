@@ -79,9 +79,9 @@ Public Class OptionsGlobal
         SaveSetting("OpenCVB", "UseKalmanWhenStable", "UseKalmanWhenStable", UseKalmanWhenStable.Checked)
         SaveSetting("OpenCVB", "DefaultPalette", "DefaultPalette", schemeName)
         If task.color.Width = 640 Then
-            SaveSetting("OpenCVB", "LineThickness640", "LineThickness640", 1)
+            SaveSetting("OpenCVB", "LineThickness640", "LineThickness640", LineThickness.Value)
         Else
-            SaveSetting("OpenCVB", "LineThickness", "LineThickness", 2)
+            SaveSetting("OpenCVB", "LineThickness", "LineThickness", LineThickness.Value)
         End If
     End Sub
     Private Sub thresholdSlider_Scroll(sender As Object, e As EventArgs) Handles HistBinSlider.Scroll
@@ -116,7 +116,6 @@ Public Class OptionsGlobal
     Private Sub IMUmotionSlider_Scroll(sender As Object, e As EventArgs) Handles IMUmotionSlider.Scroll
         MotionThresholdValue.Text = CStr(IMUmotionSlider.Value)
     End Sub
-
     Private Sub LineThickness_Scroll(sender As Object, e As EventArgs) Handles LineThickness.Scroll
         LineThicknessAmount.Text = CStr(LineThickness.Value)
     End Sub

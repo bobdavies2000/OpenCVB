@@ -43,7 +43,7 @@ Public Class BackProject_Masks : Inherits VBparent
     Public Sub New()
         task.desc = "Create all the backprojection masks from a histogram"
     End Sub
-    Public Function maskLineDetect(gray As cv.Mat, histogram As cv.Mat, histIndex As Integer) As List(Of cv.Vec4f)
+    Public Function maskLineDetect(gray As cv.Mat, histogram As cv.Mat, histIndex As Integer) As List(Of cv.Vec6f)
         Dim barWidth = dst1.Width / histogram.Rows
         Dim barRange = 255 / histogram.Rows
 
@@ -54,7 +54,7 @@ Public Class BackProject_Masks : Inherits VBparent
         Dim mask As New cv.Mat
         cv.Cv2.CalcBackProject({gray}, {0}, histogram, mask, ranges)
         lines.Run(mask)
-        Dim masklines As New List(Of cv.Vec4f)
+        Dim masklines As New List(Of cv.Vec6f)
         For i = 0 To lines.sortlines.Count - 1
             masklines.Add(lines.sortlines.ElementAt(i).Value)
         Next
@@ -65,7 +65,7 @@ Public Class BackProject_Masks : Inherits VBparent
         dst1 = hist.dst1
 
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim allLines As New List(Of cv.Vec4f)
+        Dim allLines As New List(Of cv.Vec6f)
         For i = 0 To task.histogramBins - 1
             Dim masklines = maskLineDetect(gray, hist.histogram, i)
             For j = 0 To masklines.Count - 1

@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Imports CS_Classes
 Public Class Line_Basics : Inherits VBparent
     Dim ld As cv.XImgProc.FastLineDetector
-    Public sortlines As New SortedList(Of Integer, cv.Vec4f)(New compareAllowIdenticalIntegerInverted)
+    Public sortlines As New SortedList(Of Integer, cv.Vec6f)(New compareAllowIdenticalIntegerInverted)
     Public pt1List As New List(Of cv.Point)
     Public pt2List As New List(Of cv.Point)
     Public slopes As New List(Of Single)
@@ -13,7 +13,7 @@ Public Class Line_Basics : Inherits VBparent
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Line length threshold in pixels", 1, dst1.Width + dst1.Height, 40)
+            sliders.setupTrackBar(0, "Line length threshold in pixels", 1, 400, 20)
             sliders.setupTrackBar(1, "Depth search radius in pixels", 1, 20, 2) ' not used in Run below but externally...
             sliders.setupTrackBar(2, "x- and y-intercept search range in pixels", 1, 50, 10) ' not used in Run below but externally...
             sliders.setupTrackBar(3, "Detect lines from the last X frames", 0, 20, 10)
@@ -53,7 +53,7 @@ Public Class Line_Basics : Inherits VBparent
                     pt2List.Add(pt2)
                     slopes.Add(If((pt1.X <> pt2.X), (pt1.Y - pt2.Y) / (pt1.X - pt2.X), verticalSlope))
                     yintercepts.Add(pt1.Y - slopes.ElementAt(slopes.Count - 1) * pt1.X)
-                    sortlines.Add(pixelLen, New cv.Vec4f(pt1.X, pt1.Y, pt2.X, pt2.Y))
+                    sortlines.Add(pixelLen, New cv.Vec6f(pt1.X, pt1.Y, pt2.X, pt2.Y, pt1.DistanceTo(pt2), slopes(slopes.Count - 1)))
                 End If
             End If
         Next
@@ -77,7 +77,7 @@ End Class
 
 
 Public Class Line_Reduction : Inherits VBparent
-    Dim lDetect As New Line_Basics
+    Dim lines As New Line_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
         findRadio("Use simple reduction").Checked = True
@@ -89,11 +89,11 @@ Public Class Line_Reduction : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         reduction.Run(src)
 
-        lDetect.Run(reduction.dst1)
-        dst1 = lDetect.dst1
+        lines.Run(reduction.dst1)
+        dst1 = lines.dst1
 
         If task.cameraStable = False Then dst2.SetTo(0)
-        For Each line In lDetect.sortlines
+        For Each line In lines.sortlines
             Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
             Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
             dst2.Line(p1, p2, cv.Scalar.Yellow, 1, task.lineType)
@@ -782,7 +782,7 @@ Public Class Line_TimeViewLines : Inherits VBparent
     Public pt2list As New List(Of cv.Point)
     Public Sub New()
         label1 = "Lines from the latest Line_TimeLine"
-        label2 = "Lines (Yellow) Vertical (blue) Horizontal (Red)"
+        label2 = "Lines (green) Vertical (blue) Horizontal (Red)"
         task.desc = "Find slope and y-intercept of lines over time."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -797,7 +797,7 @@ Public Class Line_TimeViewLines : Inherits VBparent
         For i = 0 To basics.slopes.Count - 1
             Dim pt1 = basics.pt1List(i)
             Dim pt2 = basics.pt2List(i)
-            sortlines.Add(pt1.DistanceTo(pt2), New cv.Vec6f(basics.yintercepts(i), pt1.X, pt1.Y, pt2.X, pt2.Y, CSng(i)))
+            sortlines.Add(pt1.DistanceTo(pt2), New cv.Vec6f(pt1.X, pt1.Y, pt2.X, pt2.Y, basics.yintercepts(i), basics.slopes(i)))
         Next
 
         dst1 = lines.dst2
@@ -805,16 +805,16 @@ Public Class Line_TimeViewLines : Inherits VBparent
         Dim index = lines.lineIndex
         For Each sl In sortlines
             Dim v = sl.Value
-            Dim pt1 = New cv.Point(v.Item1, v.Item2)
-            Dim pt2 = New cv.Point(v.Item3, v.Item4)
+            Dim pt1 = New cv.Point(v.Item0, v.Item1)
+            Dim pt2 = New cv.Point(v.Item2, v.Item3)
             dst2.Line(pt1, pt2, cv.Scalar.Green, task.lineThickness, task.lineType)
             pt1List.Add(pt1)
             pt2list.Add(pt2)
-            If sl.Key = verticalSlope Then
-                dst2.Line(pt1, pt2, cv.Scalar.Blue, task.lineThickness, task.lineType)
+            If v.Item5 = verticalSlope Then
+                dst2.Line(pt1, pt2, cv.Scalar.Blue, task.lineThickness + 1, task.lineType)
             Else
-                If sl.Key = 0 Then
-                    dst2.Line(pt1, pt2, cv.Scalar.Red, task.lineThickness, task.lineType)
+                If v.Item5 = 0 Then
+                    dst2.Line(pt1, pt2, cv.Scalar.Red, task.lineThickness + 1, task.lineType)
                 End If
             End If
         Next
