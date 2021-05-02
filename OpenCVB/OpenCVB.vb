@@ -606,8 +606,10 @@ Public Class OpenCVB
 
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub
+    Private Sub RefreshTimer_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
+        If paintNewImages Or algorithmRefresh Then Me.Refresh()
+    End Sub
     Private Sub CameraTask()
-        Static delegateX As New delegateEvent(AddressOf raiseEventCamera)
         Dim currentCameraIndex = -1
         Dim changeResolution As Boolean
         While 1
@@ -630,13 +632,6 @@ Public Class OpenCVB
 
             paintNewImages = True ' trigger the paint 
             taskNewImages = True ' trigger the algorithm task
-
-            ' if the main thread is trying to queue up another algorithm, we don't need to raise this event.
-            Try
-                Invoke(delegateX)
-            Catch ex As ObjectDisposedException
-                Exit Sub
-            End Try
 
             If activeCameraIndex < 0 Then Exit Sub
 
@@ -1031,13 +1026,6 @@ Public Class OpenCVB
     End Sub
     Private Sub OpenCVB_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         saveLayout()
-    End Sub
-    Public Sub raiseEventCamera()
-        SyncLock bufferLock
-            For i = 0 To camPic.Length - 1
-                camPic(i).Refresh()
-            Next
-        End SyncLock
     End Sub
     Private Sub fpsTimer_Tick(sender As Object, e As EventArgs) Handles fpsTimer.Tick
         Static lastAlgorithmFrame As Integer

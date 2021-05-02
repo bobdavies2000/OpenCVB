@@ -46,6 +46,7 @@ Partial Class OpenCVB
         Me.SurveyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CreateSurveyImagesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.RefreshTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ToolStrip1.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -228,6 +229,11 @@ Partial Class OpenCVB
         Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(78, 29)
         Me.AboutToolStripMenuItem.Text = "About"
         '
+        'RefreshTimer
+        '
+        Me.RefreshTimer.Enabled = True
+        Me.RefreshTimer.Interval = 10
+        '
         'OpenCVB
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -273,4 +279,5 @@ Partial Class OpenCVB
     Friend WithEvents ToolStripButton2 As ToolStripButton
     Friend WithEvents SurveyToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents CreateSurveyImagesToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents RefreshTimer As Timer
 End Class
