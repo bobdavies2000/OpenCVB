@@ -988,18 +988,20 @@ Public Class Depth_Foreground : Inherits VBparent
                 End If
             Next
         Next
-        Dim maxBlob As Integer
-        maxIndex = -1
-        For i = 0 To blobSize.Count - 1
-            If maxBlob < blobSize.Item(i) Then
-                maxBlob = blobSize.Item(i)
-                maxIndex = i
-            End If
-        Next
-        dst2.FloodFill(blobLocation(maxIndex), 250)
-        cv.Cv2.InRange(dst2, 250, 250, dst1)
-        dst1.SetTo(0, task.noDepthMask)
-        label2 = "Mask of all depth pixels < " + Format(depthSlider.value / 1000, "0.0") + "m"
+        If blobSize.Count > 0 Then
+            Dim maxBlob As Integer
+            maxIndex = -1
+            For i = 0 To blobSize.Count - 1
+                If maxBlob < blobSize.Item(i) Then
+                    maxBlob = blobSize.Item(i)
+                    maxIndex = i
+                End If
+            Next
+            dst2.FloodFill(blobLocation(maxIndex), 250)
+            cv.Cv2.InRange(dst2, 250, 250, dst1)
+            dst1.SetTo(0, task.noDepthMask)
+            label2 = "Mask of all depth pixels < " + Format(depthSlider.value / 1000, "0.0") + "m"
+        End If
     End Sub
 End Class
 

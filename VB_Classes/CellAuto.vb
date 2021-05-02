@@ -237,7 +237,7 @@ End Class
 
 
 ' https://mathworld.wolfram.com/ElementaryCellularAutomaton.html
-Public Class CellAuto_Basics_MP : Inherits VBparent
+Public Class CellAuto_Basics_MT : Inherits VBparent
     Dim cell As New CellAuto_Basics
     Dim i18 As New List(Of String)
     Dim i18Index As Integer
