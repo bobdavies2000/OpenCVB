@@ -531,7 +531,6 @@ Public Class OpenCVB
     Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
         If frameCount < minFrames And TestAllButton.Text = "Stop Test" Then Exit Sub ' we have to see some output from the algorithm before moving on...
         TestAllTimer.Enabled = False ' it can take a while to restart the camera so stop watching until the timer event is complete.
-        Me.Refresh()
 
         ' switching cameras automatically restarts the algorithm.
         With AvailableAlgorithms
@@ -607,7 +606,7 @@ Public Class OpenCVB
         SaveSetting("OpenCVB", "CameraIndex", "CameraIndex", optionsForm.cameraIndex)
     End Sub
     Private Sub RefreshTimer_Tick(sender As Object, e As EventArgs) Handles RefreshTimer.Tick
-        If paintNewImages Or algorithmRefresh Then Me.Refresh()
+        If (paintNewImages Or algorithmRefresh) And saveAlgorithmName = AvailableAlgorithms.Text Then Me.Refresh()
     End Sub
     Private Sub CameraTask()
         Dim currentCameraIndex = -1
@@ -1116,7 +1115,7 @@ Public Class OpenCVB
     End Sub
     Private Sub StartAlgorithmTask()
         testAllRunning = TestAllButton.Text = "Stop Test"
-        saveAlgorithmName = AvailableAlgorithms.Text ' this tells the previous algorithmTask to terminate.
+        saveAlgorithmName = ""
         If algorithmTaskHandle IsNot Nothing Then
             While algorithmTaskHandle.IsAlive
                 If testAllRunning Then TestAllTimer.Enabled = False ' no more tasks please...
@@ -1126,6 +1125,7 @@ Public Class OpenCVB
             Console.WriteLine(AvailableAlgorithms.Text + " now starting since the previous algorithm thread has ended.")
             If testAllRunning Then TestAllTimer.Enabled = True
         End If
+        saveAlgorithmName = AvailableAlgorithms.Text ' this tells the previous algorithmTask to terminate.
 
         Dim parms As New VB_Classes.ActiveTask.algParms
         ReDim parms.RotationMatrix(9 - 1)
@@ -1153,7 +1153,7 @@ Public Class OpenCVB
         Thread.CurrentThread.Priority = ThreadPriority.Lowest
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)
         algorithmTaskHandle.Name = AvailableAlgorithms.Text
-        algorithmTaskHandle.SetApartmentState(ApartmentState.STA)
+        algorithmTaskHandle.SetApartmentState(ApartmentState.STA) ' this allows the algorithm task to display forms and react to input.
         algorithmTaskHandle.Start(parms)
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algParms)
