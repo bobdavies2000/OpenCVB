@@ -13,12 +13,11 @@ Public Class Line_Basics : Inherits VBparent
     Public lenSlider As Windows.Forms.TrackBar
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 5)
-            sliders.setupTrackBar(0, "Line thickness", 1, 20, 2)
-            sliders.setupTrackBar(1, "Line length threshold in pixels", 1, dst1.Width + dst1.Height, 40)
-            sliders.setupTrackBar(2, "Depth search radius in pixels", 1, 20, 2) ' not used in Run below but externally...
-            sliders.setupTrackBar(3, "x- and y-intercept search range in pixels", 1, 50, 10) ' not used in Run below but externally...
-            sliders.setupTrackBar(4, "Detect lines from the last X frames", 0, 20, 10)
+            sliders.Setup(caller)
+            sliders.setupTrackBar(0, "Line length threshold in pixels", 1, dst1.Width + dst1.Height, 40)
+            sliders.setupTrackBar(1, "Depth search radius in pixels", 1, 20, 2) ' not used in Run below but externally...
+            sliders.setupTrackBar(2, "x- and y-intercept search range in pixels", 1, 50, 10) ' not used in Run below but externally...
+            sliders.setupTrackBar(3, "Detect lines from the last X frames", 0, 20, 10)
         End If
 
         ld = cv.XImgProc.CvXImgProc.CreateFastLineDetector
@@ -31,12 +30,10 @@ Public Class Line_Basics : Inherits VBparent
         task.desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static thicknessSlider = findSlider("Line thickness")
         dst1 = src.Clone
         If dst1.Channels <> 3 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim lines = ld.Detect(src)
-        thickness = thicknessSlider.Value
         pixelThreshold = lenSlider.Value
 
         sortlines.Clear()
@@ -52,7 +49,7 @@ Public Class Line_Basics : Inherits VBparent
                 Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
                 Dim pixelLen = pt1.DistanceTo(pt2)
                 If pixelLen > pixelThreshold Then
-                    dst1.Line(pt1, pt2, cv.Scalar.Yellow, thickness, task.lineType)
+                    dst1.Line(pt1, pt2, cv.Scalar.Yellow, task.lineThickness, task.lineType)
                     pt1List.Add(pt1)
                     pt2List.Add(pt2)
                     slopes.Add(If((pt1.X <> pt2.X), (pt1.Y - pt2.Y) / (pt1.X - pt2.X), verticalSlope))
@@ -197,9 +194,6 @@ Public Class Line_ConfirmedDepth : Inherits VBparent
         task.desc = "Find the RGB lines and confirm they are present in the cloud data."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static thickSlider = findSlider("Line thickness")
-        Dim thickness = thickSlider.value
-
         lines.Run(src)
         dst1 = lines.dst1
 
@@ -222,7 +216,7 @@ Public Class Line_ConfirmedDepth : Inherits VBparent
             Dim h = Math.Abs(p1.Y - p2.Y)
             Dim r = New cv.Rect(minXX, minYY, If(w > 0, w, 2), If(h > 0, h, 2))
             Dim mask = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, 0)
-            mask.Line(New cv.Point(CInt(p1.X - r.X), CInt(p1.Y - r.Y)), New cv.Point(CInt(p2.X - r.X), CInt(p2.Y - r.Y)), 255, thickness, cv.LineTypes.Link4)
+            mask.Line(New cv.Point(CInt(p1.X - r.X), CInt(p1.Y - r.Y)), New cv.Point(CInt(p2.X - r.X), CInt(p2.Y - r.Y)), 255, task.lineThickness, cv.LineTypes.Link4)
             Dim mean = cloudInput(r).Mean(mask)
 
             If mean <> New cv.Scalar Then
@@ -240,7 +234,7 @@ Public Class Line_ConfirmedDepth : Inherits VBparent
                     p2 = New cv.Point(Loc(3).X + r.X, Loc(3).Y + r.Y)
                 End If
                 If p1.DistanceTo(p2) > 1 Then
-                    dst2.Line(p1, p2, cv.Scalar.Yellow, thickness, task.lineType)
+                    dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineThickness, task.lineType)
                     pt1.Add(p1)
                     pt2.Add(p2)
                     z1.Add(cloudInput.Get(Of cv.Point3f)(p1.Y, p1.X))
@@ -273,10 +267,8 @@ Public Class Line_Vertical : Inherits VBparent
         task.desc = "Find all the vertical lines in the IMU rectified cloud"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static thickSlider = findSlider("Line thickness")
         Static errorSlider = findSlider("Error tolerance when measuring vertical lines in 3D (mm's)")
         toleranceInMMs = errorSlider.value / 1000
-        thickness = thickSlider.value
         dst1 = src.Clone
 
         gCloud.Run(src)
@@ -287,7 +279,7 @@ Public Class Line_Vertical : Inherits VBparent
             Dim p1 = lines.z1(i)
             Dim p2 = lines.z2(i)
             If Math.Abs(p1.X - p2.X) < toleranceInMMs And Math.Abs(p1.Z - p2.Z) < toleranceInMMs Then
-                dst1.Line(lines.pt1(i), lines.pt2(i), cv.Scalar.Yellow, thickness, task.lineType)
+                dst1.Line(lines.pt1(i), lines.pt2(i), cv.Scalar.Yellow, task.lineThickness, task.lineType)
             End If
         Next
     End Sub
@@ -361,13 +353,13 @@ Public Class Line_Intercepts : Inherits VBparent
         For Each inter In intercepts
             Select Case axis
                 Case 0
-                    dst.Line(New cv.Point(inter.Key, 0), New cv.Point(inter.Key, 10), cv.Scalar.White, task.lineSize)
+                    dst.Line(New cv.Point(inter.Key, 0), New cv.Point(inter.Key, 10), cv.Scalar.White, task.lineThickness)
                 Case 1
-                    dst.Line(New cv.Point(inter.Key, dst1.Height), New cv.Point(inter.Key, dst1.Height - 10), cv.Scalar.White, task.lineSize)
+                    dst.Line(New cv.Point(inter.Key, dst1.Height), New cv.Point(inter.Key, dst1.Height - 10), cv.Scalar.White, task.lineThickness)
                 Case 2
-                    dst.Line(New cv.Point(0, inter.Key), New cv.Point(10, inter.Key), cv.Scalar.White, task.lineSize)
+                    dst.Line(New cv.Point(0, inter.Key), New cv.Point(10, inter.Key), cv.Scalar.White, task.lineThickness)
                 Case 3
-                    dst.Line(New cv.Point(dst1.Width, inter.Key), New cv.Point(dst1.Width - 10, inter.Key), cv.Scalar.White, task.lineSize)
+                    dst.Line(New cv.Point(dst1.Width, inter.Key), New cv.Point(dst1.Width - 10, inter.Key), cv.Scalar.White, task.lineThickness)
             End Select
         Next
     End Sub
@@ -385,9 +377,7 @@ Public Class Line_Intercepts : Inherits VBparent
         Next
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static thickSlider = findSlider("Line thickness")
         Static searchSlider = findSlider("x- and y-intercept search range in pixels")
-        thickNess = thickSlider.value
         searchRange = searchSlider.value
 
         lines.Run(src)
@@ -414,7 +404,7 @@ Public Class Line_Intercepts : Inherits VBparent
 
             pt1.Add(p1)
             pt2.Add(p2)
-            dst1.Line(p1, p2, cv.Scalar.Yellow, thickNess, task.lineType)
+            dst1.Line(p1, p2, cv.Scalar.Yellow, task.lineThickness, task.lineType)
             If p1.X = p2.X Then
                 topIntercepts.Add(p1.X, i)
                 botIntercepts.Add(p1.X, i)
@@ -740,7 +730,7 @@ Public Class Line_Longest : Inherits VBparent
             Dim pt1 = lines.pt1List(indexSlider.value)
             Dim pt2 = lines.pt2list(indexSlider.value)
 
-            dst1.Line(pt1, pt2, cv.Scalar.Yellow, task.lineSize, task.lineType)
+            dst1.Line(pt1, pt2, cv.Scalar.Yellow, task.lineThickness, task.lineType)
 
             Dim sq = 3
             Dim pt = pt1
@@ -775,7 +765,7 @@ Public Class Line_Longest : Inherits VBparent
 
             Dim yMean = (1 - meanVal / plot.maxScale) * dst1.Height
             dst2.Line(New cv.Point(0, yMean), New cv.Point(dst2.Width, yMean), cv.Scalar.Black, 1)
-            dst1.Rectangle(maskRect, cv.Scalar.White, task.lineSize, task.lineType)
+            dst1.Rectangle(maskRect, cv.Scalar.White, task.lineThickness, task.lineType)
         End If
     End Sub
 End Class
@@ -849,14 +839,11 @@ Public Class Line_TimeView : Inherits VBparent
     Public lineWidth As Integer
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        findSlider("Line thickness").Value = 1
         task.desc = "Collect lines over time"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static frameSlider = findSlider("Detect lines from the last X frames")
-        Static thicknessSlider = findSlider("Line thickness")
         Static lineCount As Integer
-        lineWidth = thicknessSlider.value
 
         lines.Run(src)
 
@@ -880,8 +867,8 @@ Public Class Line_TimeView : Inherits VBparent
             If ptList1(i) IsNot Nothing Then
                 lineTotal += ptList1(i).Count
                 For j = 0 To ptList1(i).Count - 1
-                    dst1.Line(ptList1(i)(j), ptList2(i)(j), cv.Scalar.Yellow, lineWidth, task.lineType)
-                    dst2.Line(ptList1(i)(j), ptList2(i)(j), cv.Scalar.White, lineWidth, task.lineType)
+                    dst1.Line(ptList1(i)(j), ptList2(i)(j), cv.Scalar.Yellow, task.lineThickness, task.lineType)
+                    dst2.Line(ptList1(i)(j), ptList2(i)(j), cv.Scalar.White, task.lineThickness, task.lineType)
                 Next
             End If
         Next

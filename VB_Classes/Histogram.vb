@@ -91,7 +91,7 @@ Public Class Histogram_Graph : Inherits VBparent
                     points.Add(New cv.Point(CInt(j * plotWidth), dst1.Rows - dst1.Rows * histRaw(i).Get(Of Single)(j, 0) / maxVal))
                 Next
                 listOfPoints.Add(points)
-                dst1.Polylines(listOfPoints, False, plotColors(i), task.lineSize, task.lineType)
+                dst1.Polylines(listOfPoints, False, plotColors(i), task.lineThickness, task.lineType)
             End If
         Next
 

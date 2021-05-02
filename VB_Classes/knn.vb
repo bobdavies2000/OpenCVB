@@ -959,7 +959,7 @@ Public Class KNN_1_to_1FIFO : Inherits VBparent
             Dim pt = trainData.Get(Of cv.Point2f)(index, 0)
             Dim qpoint = currSet(i)
             cv.Cv2.Circle(dst1, qpoint, task.dotSize, cv.Scalar.Red, -1, task.lineType, 0)
-            dst1.Line(pt, qpoint, cv.Scalar.Red, task.lineSize, task.lineType)
+            dst1.Line(pt, qpoint, cv.Scalar.Red, task.lineThickness, task.lineType)
             cv.Cv2.Circle(dst1, pt, task.dotSize, cv.Scalar.White, -1, task.lineType, 0)
         Next
     End Sub

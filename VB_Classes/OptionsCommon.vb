@@ -23,6 +23,7 @@ Public Class OptionsCommon : Inherits VBparent
         task.histogramBins = gOptions.HistBinSlider.Value
         task.cameraMotionLimit = gOptions.IMUmotionSlider.Value / 100
         task.cameraLevelLimit = gOptions.IMUlevelSlider.Value / 10
+        task.lineThickness = gOptions.LineThickness.Value
 
         task.minDepth = gOptions.MinRange.Value
         task.maxDepth = gOptions.MaxRange.Value

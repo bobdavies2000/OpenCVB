@@ -25,7 +25,7 @@ Public Class BackProject_Basics : Inherits VBparent
         Dim count = hist.histogram.Get(Of Single)(histIndex, 0)
         label2 = "Backprojecting " + CStr(CInt(minRange)) + " to " + CStr(CInt(maxRange)) + " with " +
                  Format(count, "#0") + " (" + Format(count / dst1.Total, "0.0%") + ") samples"
-        dst1.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst1.Height), cv.Scalar.Yellow, task.lineSize)
+        dst1.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst1.Height), cv.Scalar.Yellow, task.lineThickness)
     End Sub
 End Class
 
@@ -77,7 +77,7 @@ Public Class BackProject_Masks : Inherits VBparent
             Dim v = allLines(i)
             Dim pt1 = New cv.Point(v.Item0, v.Item1)
             Dim pt2 = New cv.Point(v.Item2, v.Item3)
-            dst2.Line(pt1, pt2, cv.Scalar.Yellow, task.lineSize, task.lineType)
+            dst2.Line(pt1, pt2, cv.Scalar.Yellow, task.lineThickness, task.lineType)
         Next
     End Sub
 End Class
@@ -108,9 +108,9 @@ Public Class BackProject_MasksLines : Inherits VBparent
             Dim v = allLines(i)
             Dim pt1 = New cv.Point(v.Item0, v.Item1)
             Dim pt2 = New cv.Point(v.Item2, v.Item3)
-            dst2.Line(pt1, pt2, cv.Scalar.Yellow, task.lineSize, task.lineType)
+            dst2.Line(pt1, pt2, cv.Scalar.Yellow, task.lineThickness, task.lineType)
         Next
-        dst1.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst1.Height), cv.Scalar.Yellow, task.lineSize)
+        dst1.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst1.Height), cv.Scalar.Yellow, task.lineThickness)
     End Sub
 End Class
 
@@ -218,8 +218,8 @@ Public Class BackProject_2D : Inherits VBparent
         dst2.SetTo(cv.Scalar.Blue, maskSat)
         label1 = "Hue(X) min/max " + Format(minHue, "0") + "/" + Format(maxHue, "0") + " Sat(Y) min/max " + Format(minSat, "0") + "/" + Format(maxSat, "0")
         label2 = "Hue pixels(yellow)=" + CStr(maskHue.CountNonZero()) + " Sat pixels(blue)=" + CStr(maskSat.CountNonZero())
-        dst1.Rectangle(New cv.Rect(histX * huebarWidth, 0, huebarWidth, dst1.Height), cv.Scalar.Yellow, task.lineSize, task.lineType)
-        dst1.Rectangle(New cv.Rect(0, (satBins - 1 - histY) * satBarHeight, dst1.Width, satBarHeight), cv.Scalar.Yellow, task.lineSize, task.lineType)
+        dst1.Rectangle(New cv.Rect(histX * huebarWidth, 0, huebarWidth, dst1.Height), cv.Scalar.Yellow, task.lineThickness, task.lineType)
+        dst1.Rectangle(New cv.Rect(0, (satBins - 1 - histY) * satBarHeight, dst1.Width, satBarHeight), cv.Scalar.Yellow, task.lineThickness, task.lineType)
     End Sub
 End Class
 
@@ -344,7 +344,7 @@ Public Class BackProject_ReductionLines : Inherits VBparent
             Dim v = lines.sortlines.ElementAt(i).Value
             Dim pt1 = New cv.Point(v.Item0, v.Item1)
             Dim pt2 = New cv.Point(v.Item2, v.Item3)
-            dst2.Line(pt1, pt2, cv.Scalar.Yellow, task.lineSize, task.lineType)
+            dst2.Line(pt1, pt2, cv.Scalar.Yellow, task.lineThickness, task.lineType)
         Next
         label2 = CStr(lines.sortlines.Count) + " lines were found"
 
@@ -372,7 +372,7 @@ Public Class BackProject_FullLines : Inherits VBparent
             Dim v = lines.sortlines.ElementAt(i).Value
             Dim pt1 = New cv.Point(v.Item0, v.Item1)
             Dim pt2 = New cv.Point(v.Item2, v.Item3)
-            dst2.Line(pt1, pt2, cv.Scalar.Yellow, task.lineSize, task.lineType)
+            dst2.Line(pt1, pt2, cv.Scalar.Yellow, task.lineThickness, task.lineType)
         Next
         label2 = CStr(lines.sortlines.Count) + " lines were found"
     End Sub

@@ -16,20 +16,18 @@ Public Class OptionsGlobal
         Me.MdiParent = aOptions
         MinRange.Value = GetSetting("OpenCVB", "MinRangeDepth", "MinRangeDepth", 200)
         MaxRange.Value = GetSetting("OpenCVB", "MaxRangeDepth", "MaxRangeDepth", 4000)
+        HistBinSlider.Value = GetSetting("OpenCVB", "HistogramBins", "HistogramBins", 40)
+        ProjectionSlider.Value = GetSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", 2)
+        IMUmotionSlider.Value = GetSetting("OpenCVB", "IMUmotionSlider", "IMUmotionSlider", 1)
+        IMUlevelSlider.Value = GetSetting("OpenCVB", "IMUlevelSlider", "IMUlevelSlider", 20)
+        LineThickness.Value = GetSetting("OpenCVB", "LineThickness", "LineThickness", 1)
         maxCount.Text = CStr(MaxRange.Value)
         minCount.Text = CStr(MinRange.Value)
-
-        HistBinSlider.Value = GetSetting("OpenCVB", "HistogramBins", "HistogramBins", 40)
         HistBinsCount.Text = CStr(HistBinSlider.Value)
-
-        ProjectionSlider.Value = GetSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", 2)
         ProjectionThreshold.Text = CStr(ProjectionSlider.Value)
-
-        IMUmotionSlider.Value = GetSetting("OpenCVB", "IMUmotionSlider", "IMUmotionSlider", 1)
         MotionThresholdValue.Text = CStr(IMUmotionSlider.Value)
-
-        IMUlevelSlider.Value = GetSetting("OpenCVB", "IMUlevelSlider", "IMUlevelSlider", 20)
         LevelThresholdValue.Text = CStr(IMUlevelSlider.Value)
+        LineThicknessAmount.Text = CStr(LineThickness.Value)
 
         UseKalman.Checked = GetSetting("OpenCVB", "useKalman", "useKalman", True)
         UseKalmanWhenStable.Checked = GetSetting("OpenCVB", "UseKalmanWhenStable", "UseKalmanWhenStable", False)
@@ -76,6 +74,7 @@ Public Class OptionsGlobal
         SaveSetting("OpenCVB", "useKalman", "useKalman", UseKalman.Checked)
         SaveSetting("OpenCVB", "UseKalmanWhenStable", "UseKalmanWhenStable", UseKalmanWhenStable.Checked)
         SaveSetting("OpenCVB", "DefaultPalette", "DefaultPalette", schemeName)
+        SaveSetting("OpenCVB", "LineThickness", "LineThickness", 1)
     End Sub
     Private Sub thresholdSlider_Scroll(sender As Object, e As EventArgs) Handles HistBinSlider.Scroll
         HistBinsCount.Text = CStr(HistBinSlider.Value)
@@ -95,6 +94,7 @@ Public Class OptionsGlobal
         SaveSetting("OpenCVB", "useKalman", "useKalman", True)
         SaveSetting("OpenCVB", "UseKalmanWhenStable", "UseKalmanWhenStable", False)
         SaveSetting("OpenCVB", "DefaultPalette", "DefaultPalette", "Jet")
+        SaveSetting("OpenCVB", "LineThickness", "LineThickness", 1)
         OptionsGlobal_Load(sender, e)
         resetToDefaults.Checked = False
     End Sub
@@ -103,5 +103,9 @@ Public Class OptionsGlobal
     End Sub
     Private Sub IMUmotionSlider_Scroll(sender As Object, e As EventArgs) Handles IMUmotionSlider.Scroll
         MotionThresholdValue.Text = CStr(IMUmotionSlider.Value)
+    End Sub
+
+    Private Sub LineThickness_Scroll(sender As Object, e As EventArgs) Handles LineThickness.Scroll
+        LineThicknessAmount.Text = CStr(LineThickness.Value)
     End Sub
 End Class

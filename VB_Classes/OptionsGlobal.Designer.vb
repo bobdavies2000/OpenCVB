@@ -39,6 +39,10 @@ Partial Class OptionsGlobal
         Me.HistBins = New System.Windows.Forms.Label()
         Me.resetToDefaults = New System.Windows.Forms.CheckBox()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.GeometrySettings = New System.Windows.Forms.GroupBox()
+        Me.LineThicknessAmount = New System.Windows.Forms.Label()
+        Me.LineThickness = New System.Windows.Forms.TrackBar()
+        Me.LineSizeLabel = New System.Windows.Forms.Label()
         Me.UseKalmanWhenStable = New System.Windows.Forms.CheckBox()
         Me.UseKalman = New System.Windows.Forms.CheckBox()
         Me.PaletteGroup = New System.Windows.Forms.GroupBox()
@@ -57,6 +61,8 @@ Partial Class OptionsGlobal
         CType(Me.ProjectionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox2.SuspendLayout()
+        Me.GeometrySettings.SuspendLayout()
+        CType(Me.LineThickness, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.PaletteGroup.SuspendLayout()
         Me.CameraOptions.SuspendLayout()
         CType(Me.IMUlevelSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -226,6 +232,7 @@ Partial Class OptionsGlobal
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.GeometrySettings)
         Me.GroupBox2.Controls.Add(Me.UseKalmanWhenStable)
         Me.GroupBox2.Controls.Add(Me.UseKalman)
         Me.GroupBox2.Location = New System.Drawing.Point(854, 17)
@@ -234,6 +241,46 @@ Partial Class OptionsGlobal
         Me.GroupBox2.TabIndex = 3
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
+        '
+        'GeometrySettings
+        '
+        Me.GeometrySettings.Controls.Add(Me.LineThicknessAmount)
+        Me.GeometrySettings.Controls.Add(Me.LineThickness)
+        Me.GeometrySettings.Controls.Add(Me.LineSizeLabel)
+        Me.GeometrySettings.Location = New System.Drawing.Point(15, 104)
+        Me.GeometrySettings.Name = "GeometrySettings"
+        Me.GeometrySettings.Size = New System.Drawing.Size(816, 158)
+        Me.GeometrySettings.TabIndex = 2
+        Me.GeometrySettings.TabStop = False
+        Me.GeometrySettings.Text = "Geometry"
+        '
+        'LineThicknessAmount
+        '
+        Me.LineThicknessAmount.AutoSize = True
+        Me.LineThicknessAmount.Location = New System.Drawing.Point(731, 32)
+        Me.LineThicknessAmount.Name = "LineThicknessAmount"
+        Me.LineThicknessAmount.Size = New System.Drawing.Size(166, 20)
+        Me.LineThicknessAmount.TabIndex = 5
+        Me.LineThicknessAmount.Text = "LineThicknessAmount"
+        '
+        'LineThickness
+        '
+        Me.LineThickness.Location = New System.Drawing.Point(207, 25)
+        Me.LineThickness.Minimum = 1
+        Me.LineThickness.Name = "LineThickness"
+        Me.LineThickness.Size = New System.Drawing.Size(505, 69)
+        Me.LineThickness.TabIndex = 4
+        Me.LineThickness.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.LineThickness.Value = 1
+        '
+        'LineSizeLabel
+        '
+        Me.LineSizeLabel.AutoSize = True
+        Me.LineSizeLabel.Location = New System.Drawing.Point(13, 36)
+        Me.LineSizeLabel.Name = "LineSizeLabel"
+        Me.LineSizeLabel.Size = New System.Drawing.Size(110, 20)
+        Me.LineSizeLabel.TabIndex = 3
+        Me.LineSizeLabel.Text = "Line thickness"
         '
         'UseKalmanWhenStable
         '
@@ -367,6 +414,9 @@ Partial Class OptionsGlobal
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
+        Me.GeometrySettings.ResumeLayout(False)
+        Me.GeometrySettings.PerformLayout()
+        CType(Me.LineThickness, System.ComponentModel.ISupportInitialize).EndInit()
         Me.PaletteGroup.ResumeLayout(False)
         Me.CameraOptions.ResumeLayout(False)
         Me.CameraOptions.PerformLayout()
@@ -405,4 +455,8 @@ Partial Class OptionsGlobal
     Friend WithEvents MotionThresholdValue As Windows.Forms.Label
     Friend WithEvents IMUmotionSlider As Windows.Forms.TrackBar
     Friend WithEvents Label4 As Windows.Forms.Label
+    Friend WithEvents GeometrySettings As Windows.Forms.GroupBox
+    Friend WithEvents LineThicknessAmount As Windows.Forms.Label
+    Friend WithEvents LineThickness As Windows.Forms.TrackBar
+    Friend WithEvents LineSizeLabel As Windows.Forms.Label
 End Class

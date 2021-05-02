@@ -153,7 +153,7 @@ Public Class ActiveTask : Implements IDisposable
     Public font As cv.HersheyFonts
     Public fontSize As Single
     Public dotSize As Integer
-    Public lineSize As Integer
+    Public lineThickness As Integer
     Public resolutionIndex As Integer
 
     Public IMU_Barometer As Single
@@ -310,17 +310,14 @@ Public Class ActiveTask : Implements IDisposable
             Case 320
                 fontSize = task.color.Width / task.pointCloud.Width
                 dotSize = 3
-                lineSize = 1
                 resolutionIndex = 1
             Case 640
                 fontSize = task.color.Width / task.pointCloud.Width
                 dotSize = 7
-                lineSize = 2
                 resolutionIndex = 2
             Case 1280
                 fontSize = 1
                 dotSize = 15
-                lineSize = 4
                 resolutionIndex = 3
         End Select
 
