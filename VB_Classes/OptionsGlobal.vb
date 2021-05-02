@@ -20,7 +20,11 @@ Public Class OptionsGlobal
         ProjectionSlider.Value = GetSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", 2)
         IMUmotionSlider.Value = GetSetting("OpenCVB", "IMUmotionSlider", "IMUmotionSlider", 1)
         IMUlevelSlider.Value = GetSetting("OpenCVB", "IMUlevelSlider", "IMUlevelSlider", 20)
-        LineThickness.Value = GetSetting("OpenCVB", "LineThickness", "LineThickness", 1)
+        If task.color.Width = 640 Then
+            LineThickness.Value = GetSetting("OpenCVB", "LineThickness640", "LineThickness640", 1)
+        Else
+            LineThickness.Value = GetSetting("OpenCVB", "LineThickness", "LineThickness", 2)
+        End If
         maxCount.Text = CStr(MaxRange.Value)
         minCount.Text = CStr(MinRange.Value)
         HistBinsCount.Text = CStr(HistBinSlider.Value)
@@ -74,7 +78,11 @@ Public Class OptionsGlobal
         SaveSetting("OpenCVB", "useKalman", "useKalman", UseKalman.Checked)
         SaveSetting("OpenCVB", "UseKalmanWhenStable", "UseKalmanWhenStable", UseKalmanWhenStable.Checked)
         SaveSetting("OpenCVB", "DefaultPalette", "DefaultPalette", schemeName)
-        SaveSetting("OpenCVB", "LineThickness", "LineThickness", 1)
+        If task.color.Width = 640 Then
+            SaveSetting("OpenCVB", "LineThickness640", "LineThickness640", 1)
+        Else
+            SaveSetting("OpenCVB", "LineThickness", "LineThickness", 2)
+        End If
     End Sub
     Private Sub thresholdSlider_Scroll(sender As Object, e As EventArgs) Handles HistBinSlider.Scroll
         HistBinsCount.Text = CStr(HistBinSlider.Value)
@@ -94,7 +102,11 @@ Public Class OptionsGlobal
         SaveSetting("OpenCVB", "useKalman", "useKalman", True)
         SaveSetting("OpenCVB", "UseKalmanWhenStable", "UseKalmanWhenStable", False)
         SaveSetting("OpenCVB", "DefaultPalette", "DefaultPalette", "Jet")
-        SaveSetting("OpenCVB", "LineThickness", "LineThickness", 1)
+        If task.color.Width = 640 Then
+            SaveSetting("OpenCVB", "LineThickness640", "LineThickness640", 1)
+        Else
+            SaveSetting("OpenCVB", "LineThickness", "LineThickness", 2)
+        End If
         OptionsGlobal_Load(sender, e)
         resetToDefaults.Checked = False
     End Sub
