@@ -3,12 +3,7 @@ Imports cv = OpenCvSharp
 
 ' https://docs.opencv.org/master/df/d3d/tutorial_py_inpainting.html#gsc.tab=0
 Public Class InPaint_Basics : Inherits VBparent
-    Public thickness As Integer
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
-            sliders.setupTrackBar(0, "Thickness", 1, 25, 2)
-        End If
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 2)
             radio.check(0).Text = "TELEA"
@@ -20,14 +15,12 @@ Public Class InPaint_Basics : Inherits VBparent
         label2 = "Repaired Image"
     End Sub
     Public Function drawRandomLine(dst As cv.Mat)
-        Static thickSlider = findSlider("Thickness")
-        thickness = thickSlider.value
         Dim p1 = New cv.Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
         Dim p2 = New cv.Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
-        dst1.Line(p1, p2, New cv.Scalar(0, 0, 0), thickness, task.lineType)
+        dst1.Line(p1, p2, New cv.Scalar(0, 0, 0), task.lineThickness, task.lineType)
         Dim mask = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
         mask.SetTo(0)
-        mask.Line(p1, p2, cv.Scalar.All(255), thickness, task.lineType)
+        mask.Line(p1, p2, cv.Scalar.All(255), task.lineThickness, task.lineType)
         Return mask
     End Function
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -35,7 +28,7 @@ Public Class InPaint_Basics : Inherits VBparent
 
         src.CopyTo(dst1)
         Dim mask As cv.Mat = drawRandomLine(dst1)
-        cv.Cv2.Inpaint(dst1, mask, dst2, thickness, inPaintFlag)
+        cv.Cv2.Inpaint(dst1, mask, dst2, task.lineThickness, inPaintFlag)
     End Sub
 End Class
 

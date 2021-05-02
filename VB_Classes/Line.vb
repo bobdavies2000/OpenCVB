@@ -8,7 +8,6 @@ Public Class Line_Basics : Inherits VBparent
     Public pt2List As New List(Of cv.Point)
     Public slopes As New List(Of Single)
     Public yintercepts As New List(Of Single)
-    Public thickness As Integer
     Public pixelThreshold As Integer
     Public lenSlider As Windows.Forms.TrackBar
     Public Sub New()
@@ -256,7 +255,6 @@ End Class
 Public Class Line_Vertical : Inherits VBparent
     Dim gCloud As New Depth_PointCloud_IMU
     Public lines As New Line_ConfirmedDepth
-    Public thickness As Integer
     Public toleranceInMMs As Single
     Public Sub New()
         If findfrm(caller + " Slider Options") Is Nothing Then
@@ -306,7 +304,7 @@ Public Class Line_Horizontal : Inherits VBparent
             Dim p1 = vLines.lines.z1(i)
             Dim p2 = vLines.lines.z2(i)
             If Math.Abs(p1.Y - p2.Y) < vLines.toleranceInMMs And Math.Abs(p1.Z - p2.Z) < vLines.toleranceInMMs Then
-                dst1.Line(vLines.lines.pt1(i), vLines.lines.pt2(i), cv.Scalar.Yellow, vLines.thickness, task.lineType)
+                dst1.Line(vLines.lines.pt1(i), vLines.lines.pt2(i), cv.Scalar.Yellow, task.lineThickness, task.lineType)
             End If
         Next
     End Sub
@@ -327,7 +325,6 @@ Public Class Line_Intercepts : Inherits VBparent
     Public leftIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public rightIntercepts As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public searchRange As Integer
-    Public thickNess As Integer
     Public Sub New()
         findSlider("Line length threshold in pixels").Value = 1
 
@@ -346,8 +343,8 @@ Public Class Line_Intercepts : Inherits VBparent
     Public Sub hightLightIntercept(mousePoint As Integer, intercepts As SortedList(Of Integer, Integer), axis As Integer, dst As cv.Mat)
         For Each inter In intercepts
             If Math.Abs(mousePoint - inter.Key) < searchRange Then
-                dst1.Line(pt1(inter.Value), pt2(inter.Value), cv.Scalar.White, thickNess + 4, task.lineType)
-                dst1.Line(pt1(inter.Value), pt2(inter.Value), cv.Scalar.Blue, thickNess, task.lineType)
+                dst1.Line(pt1(inter.Value), pt2(inter.Value), cv.Scalar.White, task.lineThickness + 4, task.lineType)
+                dst1.Line(pt1(inter.Value), pt2(inter.Value), cv.Scalar.Blue, task.lineThickness, task.lineType)
             End If
         Next
         For Each inter In intercepts

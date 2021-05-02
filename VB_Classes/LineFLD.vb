@@ -6,25 +6,22 @@ Public Class LineFLD_Basics : Inherits VBparent
     Public minLenSlider As Windows.Forms.TrackBar
     Public maxDistanceSlider As Windows.Forms.TrackBar
     Public ApertureSlider As Windows.Forms.TrackBar
-    Public thicknessSlider As Windows.Forms.TrackBar
     Public canny1Slider As Windows.Forms.TrackBar
     Public canny2Slider As Windows.Forms.TrackBar
     Public mergeCheckBox As Windows.Forms.CheckBox
     Public Sub New()
 
         If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 6)
+            sliders.Setup(caller, 5)
             sliders.setupTrackBar(0, "FLD - Min Length", 1, 200, 30)
             sliders.setupTrackBar(1, "FLD - max distance", 1, 100, 14)
             sliders.setupTrackBar(2, "FLD - Canny Aperture", 3, 7, 7)
-            sliders.setupTrackBar(3, "FLD - Line Thickness", 1, 7, 3)
-            sliders.setupTrackBar(4, "FLD - canny Threshold1", 1, 100, 50)
-            sliders.setupTrackBar(5, "FLD - canny Threshold2", 1, 100, 50)
+            sliders.setupTrackBar(3, "FLD - canny Threshold1", 1, 100, 50)
+            sliders.setupTrackBar(4, "FLD - canny Threshold2", 1, 100, 50)
         End If
         minLenSlider = findSlider("FLD - Min Length")
         maxDistanceSlider = findSlider("FLD - max distance")
         ApertureSlider = findSlider("FLD - Canny Aperture")
-        thicknessSlider = findSlider("FLD - Line Thickness")
         canny1Slider = findSlider("FLD - canny Threshold1")
         canny2Slider = findSlider("FLD - canny Threshold2")
 
@@ -45,7 +42,6 @@ Public Class LineFLD_Basics : Inherits VBparent
         Dim distance_threshold = maxDistanceSlider.Value / 10
         Dim canny_aperture_size = ApertureSlider.Value
         If canny_aperture_size Mod 2 = 0 Then canny_aperture_size += 1
-        Dim thickness = thicknessSlider.Value
         Dim canny_th1 = canny1Slider.Value
         Dim canny_th2 = canny2Slider.Value
         Dim do_merge = mergeCheckBox.Checked
@@ -77,8 +73,8 @@ Public Class LineFLD_Basics : Inherits VBparent
             For j = 0 To lines.Count - 1 Step 4
                 Dim v = lines(j)
                 Dim pt1 = New cv.Point(v(0), v(1))
-                dst1.Line(New cv.Point(v(0), v(1)), New cv.Point(v(2), v(3)), cv.Scalar.Yellow, thickness, task.lineType)
-                dst2.Line(New cv.Point(v(0), v(1)), New cv.Point(v(2), v(3)), cv.Scalar.Yellow, thickness, task.lineType)
+                dst1.Line(New cv.Point(v(0), v(1)), New cv.Point(v(2), v(3)), cv.Scalar.Yellow, task.lineThickness, task.lineType)
+                dst2.Line(New cv.Point(v(0), v(1)), New cv.Point(v(2), v(3)), cv.Scalar.Yellow, task.lineThickness, task.lineType)
             Next
         End If
     End Sub
@@ -262,14 +258,12 @@ Public Class LineFLD_CPP : Inherits VBparent
         task.desc = "Basics for a Fast Line Detector"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static sizeSlider = findSlider("FLD - Line Thickness")
         sortedLines.Clear()
 
         Dim length_threshold = lineFLD.minLenSlider.Value
         Dim distance_threshold = lineFLD.maxDistanceSlider.Value / 10
         Dim canny_aperture_size = lineFLD.ApertureSlider.Value
         If canny_aperture_size Mod 2 = 0 Then canny_aperture_size += 1
-        Dim thickness = lineFLD.thicknessSlider.Value
         Dim canny_th1 = lineFLD.canny1Slider.Value
         Dim canny_th2 = lineFLD.canny2Slider.Value
         Dim do_merge = lineFLD.mergeCheckBox.Checked
@@ -283,7 +277,7 @@ Public Class LineFLD_CPP : Inherits VBparent
         Dim lineCount = lineDetectorFast_Run(handle.AddrOfPinnedObject, src.Height, src.Width, length_threshold, distance_threshold, canny_th1, canny_th2, canny_aperture_size, do_merge)
         handle.Free()
 
-        If lineCount > 0 Then sortedLines = drawSegments(dst1, lineCount, sizeSlider.Value, lineMat)
+        If lineCount > 0 Then sortedLines = drawSegments(dst1, lineCount, task.lineThickness, lineMat)
     End Sub
 End Class
 
