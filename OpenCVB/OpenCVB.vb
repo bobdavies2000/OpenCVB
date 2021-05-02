@@ -47,7 +47,7 @@ Public Class OpenCVB
     Dim drawRect As New cv.Rect
     Dim drawRectPic As Integer
     Dim externalPythonInvocation As Boolean
-    Dim fps As Integer = 30
+    Dim fps As Integer = 60
     Dim imgResult As New cv.Mat
     Dim frameCount As Integer
     Dim GrabRectangleData As Boolean
