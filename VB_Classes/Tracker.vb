@@ -25,7 +25,7 @@ Imports System.Runtime.InteropServices
 '            check.Box(0).Text = "Stop tracking selected object"
 '        End If
 
-'        task.desc = "Track an object using cv.Tracking API's - tracker algorithm"
+'        task.desc = "Track an object using cv.Tracking API's - "
 '    End Sub
 '    Public Sub Run(src As cv.Mat) ' Rank = 1
 
@@ -83,7 +83,7 @@ Imports System.Runtime.InteropServices
 'Public Class Tracker_MultiObject : Inherits VBparent
 '    Dim trackers As New List(Of Tracker_Basics)
 '    Public Sub New()
-'        task.desc = "Track any number of objects simultaneously - tracker algorithm"
+'        task.desc = "Track any number of objects simultaneously - "
 '    End Sub
 '    Public Sub Run(src As cv.Mat) ' Rank = 1
 '        If task.drawRect.Width <> 0 Then

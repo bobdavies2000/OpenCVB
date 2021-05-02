@@ -9,12 +9,8 @@ Public Class OptionsGlobal
     Private Sub MaxRange_Scroll(sender As Object, e As EventArgs) Handles MaxRange.Scroll
         maxCount.Text = CStr(MaxRange.Value)
     End Sub
-    Private Sub MinRange_Scroll(sender As Object, e As EventArgs) Handles MinRange.Scroll
-        minCount.Text = CStr(MinRange.Value)
-    End Sub
     Private Sub OptionsGlobal_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = aOptions
-        MinRange.Value = GetSetting("OpenCVB", "MinRangeDepth", "MinRangeDepth", 200)
         MaxRange.Value = GetSetting("OpenCVB", "MaxRangeDepth", "MaxRangeDepth", 4000)
         HistBinSlider.Value = GetSetting("OpenCVB", "HistogramBins", "HistogramBins", 40)
         ProjectionSlider.Value = GetSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", 2)
@@ -26,7 +22,6 @@ Public Class OptionsGlobal
             LineThickness.Value = GetSetting("OpenCVB", "LineThickness", "LineThickness", 2)
         End If
         maxCount.Text = CStr(MaxRange.Value)
-        minCount.Text = CStr(MinRange.Value)
         HistBinsCount.Text = CStr(HistBinSlider.Value)
         ProjectionThreshold.Text = CStr(ProjectionSlider.Value)
         MotionThresholdValue.Text = CStr(IMUmotionSlider.Value)
@@ -67,7 +62,6 @@ Public Class OptionsGlobal
         Next
     End Sub
     Private Sub OptionsGlobal_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        SaveSetting("OpenCVB", "MinRangeDepth", "MinRangeDepth", MinRange.Value)
         SaveSetting("OpenCVB", "MaxRangeDepth", "MaxRangeDepth", MaxRange.Value)
         SaveSetting("OpenCVB", "HistogramBins", "HistogramBins", HistBinSlider.Value)
         SaveSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", ProjectionSlider.Value)
@@ -91,7 +85,6 @@ Public Class OptionsGlobal
         checkRadios()
     End Sub
     Private Sub resetToDefaults_CheckedChanged(sender As Object, e As EventArgs) Handles resetToDefaults.CheckedChanged
-        SaveSetting("OpenCVB", "MinRangeDepth", "MinRangeDepth", 200)
         SaveSetting("OpenCVB", "MaxRangeDepth", "MaxRangeDepth", 4000)
         SaveSetting("OpenCVB", "HistogramBins", "HistogramBins", 40)
         SaveSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", 2)

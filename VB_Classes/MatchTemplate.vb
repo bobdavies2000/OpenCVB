@@ -111,7 +111,7 @@ Public Class MatchTemplate_DrawRect : Inherits VBparent
     Public Sub New()
         If standalone Then task.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
         label1 = "Probabilities (draw rectangle to test again)"
-        task.desc = "Find the requested template in an image.  Tracker Algorithm"
+        task.desc = "Find the requested template in an image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static thresholdSlider = findSlider("Correlation Threshold X100")
@@ -161,7 +161,7 @@ Public Class MatchTemplate_BestEntropy_MT : Inherits VBparent
     Public Sub New()
         label1 = "Probabilities that the template matches image"
         label2 = "Red is the best template to match (highest entropy)"
-        task.desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate.  Tracker Algorithm"
+        task.desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod 30 = 0 Then

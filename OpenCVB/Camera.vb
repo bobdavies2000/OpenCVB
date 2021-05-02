@@ -160,9 +160,8 @@ Public Class Camera
 
         ' if the camera is not providing the depth then build it manually here.
         If cameraRGBDepth = False Then
-            Dim minDepth = 0
             Dim maxDepth = 4000
-            Dim depthNormalized = (depth16 * 255 / (maxDepth - minDepth)).ToMat
+            Dim depthNormalized = (depth16 * 255 / (maxDepth)).ToMat
             depthNormalized.ConvertTo(depthNormalized, cv.MatType.CV_8U)
             Dim mask = depthNormalized.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
             RGBDepth = Palette_Custom_Apply(depthNormalized.CvtColor(cv.ColorConversionCodes.GRAY2BGR), customColorMap)

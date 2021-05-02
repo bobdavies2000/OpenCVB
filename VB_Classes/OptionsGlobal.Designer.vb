@@ -26,9 +26,6 @@ Partial Class OptionsGlobal
         Me.maxCount = New System.Windows.Forms.Label()
         Me.MaxRange = New System.Windows.Forms.TrackBar()
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
-        Me.minCount = New System.Windows.Forms.Label()
-        Me.MinRange = New System.Windows.Forms.TrackBar()
-        Me.InrangeMinLabel = New System.Windows.Forms.Label()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
         Me.HistogramSettings = New System.Windows.Forms.GroupBox()
         Me.ProjectionThreshold = New System.Windows.Forms.Label()
@@ -56,7 +53,6 @@ Partial Class OptionsGlobal
         Me.Label4 = New System.Windows.Forms.Label()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.MaxRange, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.MinRange, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.HistogramSettings.SuspendLayout()
         CType(Me.ProjectionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -74,9 +70,6 @@ Partial Class OptionsGlobal
         Me.MinMaxDepth.Controls.Add(Me.maxCount)
         Me.MinMaxDepth.Controls.Add(Me.MaxRange)
         Me.MinMaxDepth.Controls.Add(Me.InrangeMaxLabel)
-        Me.MinMaxDepth.Controls.Add(Me.minCount)
-        Me.MinMaxDepth.Controls.Add(Me.MinRange)
-        Me.MinMaxDepth.Controls.Add(Me.InrangeMinLabel)
         Me.MinMaxDepth.Location = New System.Drawing.Point(12, 63)
         Me.MinMaxDepth.Name = "MinMaxDepth"
         Me.MinMaxDepth.Size = New System.Drawing.Size(829, 169)
@@ -87,7 +80,7 @@ Partial Class OptionsGlobal
         'maxCount
         '
         Me.maxCount.AutoSize = True
-        Me.maxCount.Location = New System.Drawing.Point(736, 112)
+        Me.maxCount.Location = New System.Drawing.Point(736, 37)
         Me.maxCount.Name = "maxCount"
         Me.maxCount.Size = New System.Drawing.Size(81, 20)
         Me.maxCount.TabIndex = 5
@@ -95,7 +88,7 @@ Partial Class OptionsGlobal
         '
         'MaxRange
         '
-        Me.MaxRange.Location = New System.Drawing.Point(212, 105)
+        Me.MaxRange.Location = New System.Drawing.Point(212, 30)
         Me.MaxRange.Maximum = 15000
         Me.MaxRange.Minimum = 200
         Me.MaxRange.Name = "MaxRange"
@@ -107,40 +100,11 @@ Partial Class OptionsGlobal
         'InrangeMaxLabel
         '
         Me.InrangeMaxLabel.AutoSize = True
-        Me.InrangeMaxLabel.Location = New System.Drawing.Point(18, 112)
+        Me.InrangeMaxLabel.Location = New System.Drawing.Point(18, 37)
         Me.InrangeMaxLabel.Name = "InrangeMaxLabel"
         Me.InrangeMaxLabel.Size = New System.Drawing.Size(192, 20)
         Me.InrangeMaxLabel.TabIndex = 3
         Me.InrangeMaxLabel.Text = "InRange Max Depth (mm)"
-        '
-        'minCount
-        '
-        Me.minCount.AutoSize = True
-        Me.minCount.Location = New System.Drawing.Point(737, 36)
-        Me.minCount.Name = "minCount"
-        Me.minCount.Size = New System.Drawing.Size(77, 20)
-        Me.minCount.TabIndex = 2
-        Me.minCount.Text = "minCount"
-        '
-        'MinRange
-        '
-        Me.MinRange.Location = New System.Drawing.Point(213, 29)
-        Me.MinRange.Maximum = 2000
-        Me.MinRange.Minimum = 1
-        Me.MinRange.Name = "MinRange"
-        Me.MinRange.Size = New System.Drawing.Size(505, 69)
-        Me.MinRange.TabIndex = 1
-        Me.MinRange.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.MinRange.Value = 1
-        '
-        'InrangeMinLabel
-        '
-        Me.InrangeMinLabel.AutoSize = True
-        Me.InrangeMinLabel.Location = New System.Drawing.Point(19, 40)
-        Me.InrangeMinLabel.Name = "InrangeMinLabel"
-        Me.InrangeMinLabel.Size = New System.Drawing.Size(188, 20)
-        Me.InrangeMinLabel.TabIndex = 0
-        Me.InrangeMinLabel.Text = "InRange Min Depth (mm)"
         '
         'OpenFileDialog1
         '
@@ -407,7 +371,6 @@ Partial Class OptionsGlobal
         Me.MinMaxDepth.ResumeLayout(False)
         Me.MinMaxDepth.PerformLayout()
         CType(Me.MaxRange, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.MinRange, System.ComponentModel.ISupportInitialize).EndInit()
         Me.HistogramSettings.ResumeLayout(False)
         Me.HistogramSettings.PerformLayout()
         CType(Me.ProjectionSlider, System.ComponentModel.ISupportInitialize).EndInit()
@@ -428,12 +391,9 @@ Partial Class OptionsGlobal
     End Sub
 
     Friend WithEvents MinMaxDepth As Windows.Forms.GroupBox
-    Friend WithEvents InrangeMinLabel As Windows.Forms.Label
-    Friend WithEvents MinRange As Windows.Forms.TrackBar
     Friend WithEvents maxCount As Windows.Forms.Label
     Friend WithEvents MaxRange As Windows.Forms.TrackBar
     Friend WithEvents InrangeMaxLabel As Windows.Forms.Label
-    Friend WithEvents minCount As Windows.Forms.Label
     Friend WithEvents OpenFileDialog1 As Windows.Forms.OpenFileDialog
     Friend WithEvents HistogramSettings As Windows.Forms.GroupBox
     Friend WithEvents HistBinsCount As Windows.Forms.Label

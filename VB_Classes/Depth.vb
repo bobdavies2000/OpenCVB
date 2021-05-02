@@ -957,7 +957,6 @@ Public Class Depth_Foreground : Inherits VBparent
     Public blobLocation As New List(Of cv.Point)
     Public maxIndex As Integer
     Public Sub New()
-
         If findfrm(caller + " Slider Options") Is Nothing Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Max Range for foreground depth in mm's", 200, 2000, 1200)
@@ -970,7 +969,7 @@ Public Class Depth_Foreground : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static depthSlider = findSlider("Max Range for foreground depth in mm's")
 
-        cv.Cv2.InRange(task.depth32f, 0, depthSlider.value, dst1)
+        cv.Cv2.InRange(task.depth32f, 1, depthSlider.value, dst1)
         dst2 = dst1.Clone
 
         ' find the largest blob and use that define that to be the foreground object.

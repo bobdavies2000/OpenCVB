@@ -25,7 +25,7 @@ Public Class OptionsCommon : Inherits VBparent
         task.cameraLevelLimit = gOptions.IMUlevelSlider.Value / 10
         task.lineThickness = gOptions.LineThickness.Value
 
-        task.minDepth = gOptions.MinRange.Value
+        task.minDepth = 1
         task.maxDepth = gOptions.MaxRange.Value
         If task.minDepth >= task.maxDepth Then task.maxDepth = task.minDepth + 1
         task.maxZ = task.maxDepth / 1000

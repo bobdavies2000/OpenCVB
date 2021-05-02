@@ -7,16 +7,16 @@ Public Class MeanShift_Basics : Inherits VBparent
     Public usingDrawRect As Boolean
     Public Sub New()
         label1 = "Draw anywhere to start mean shift tracking."
-        task.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track.  Tracker Algorithm"
+        task.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone or task.intermediateReview = caller Then usingDrawRect = True
+        If standalone Or task.intermediateReview = caller Then usingDrawRect = True
         If usingDrawRect Then inputRect = task.drawRect
         If inputRect.X + inputRect.Width > src.Width Then inputRect.Width = src.Width - inputRect.X
         If inputRect.Y + inputRect.Height > src.Height Then inputRect.Height = src.Height - inputRect.Y
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-        Dim ch() As integer = {0, 1, 2}
-        Dim hsize() As integer = {16, 16, 16}
+        Dim ch() As Integer = {0, 1, 2}
+        Dim hsize() As Integer = {16, 16, 16}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 180)}
         Static roi_hist As New cv.Mat
         If inputRect.Width > 0 And inputRect.Height > 0 Then
@@ -48,7 +48,7 @@ Public Class MeanShift_Depth : Inherits VBparent
     Dim blob As New Depth_ForegroundHead
     Public Sub New()
         label1 = "Draw anywhere to start mean shift tracking."
-        task.desc = "Use depth to start mean shift algorithm.  Tracker Algorithm"
+        task.desc = "Use depth to start mean shift algorithm."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.drawRect.Width > 0 Then
