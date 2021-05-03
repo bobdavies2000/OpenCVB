@@ -8,20 +8,22 @@ Public Class Contours_Basics : Inherits VBparent
     Public sortedContours As New SortedList(Of Integer, cv.Point())(New compareAllowIdenticalIntegerInverted)
     Public contours0 As cv.Point()()
     Public Sub New()
-        radio.Setup(caller + " Retrieval Mode", 5)
-        radio.check(0).Text = "CComp"
-        radio.check(1).Text = "External"
-        radio.check(2).Text = "FloodFill"
-        radio.check(3).Text = "List"
-        radio.check(4).Text = "Tree"
-        radio.check(2).Checked = True
+        If radio.Setup(caller + " Retrieval Mode", 5) Then
+            radio.check(0).Text = "CComp"
+            radio.check(1).Text = "External"
+            radio.check(2).Text = "FloodFill"
+            radio.check(3).Text = "List"
+            radio.check(4).Text = "Tree"
+            radio.check(2).Checked = True
+        End If
 
-        radio1.Setup(caller + " ContourApproximation Mode", 4)
-        radio1.check(0).Text = "ApproxNone"
-        radio1.check(1).Text = "ApproxSimple"
-        radio1.check(2).Text = "ApproxTC89KCOS"
-        radio1.check(3).Text = "ApproxTC89L1"
-        radio1.check(1).Checked = True
+        If radio1.Setup(caller + " ContourApproximation Mode", 4) Then
+            radio1.check(0).Text = "ApproxNone"
+            radio1.check(1).Text = "ApproxSimple"
+            radio1.check(2).Text = "ApproxTC89KCOS"
+            radio1.check(3).Text = "ApproxTC89L1"
+            radio1.check(1).Checked = True
+        End If
 
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Contour minimum area", 0, 50000, 1000)
