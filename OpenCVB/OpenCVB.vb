@@ -1255,7 +1255,7 @@ Public Class OpenCVB
                         End If
 
                         taskNewImages = False
-                        Exit While
+                        If task.depth32f.Width > 0 Then Exit While
                     End If
                 End SyncLock
             End While
