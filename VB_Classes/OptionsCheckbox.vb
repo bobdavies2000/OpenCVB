@@ -1,7 +1,8 @@
 ﻿Imports System.Windows.Forms
 Public Class OptionsCheckbox
     Public Box() As CheckBox
-    Public Sub Setup(caller As String, count As Integer)
+    Public Function Setup(caller As String, count As Integer) As Boolean
+        If findfrm(caller + " CheckBox Options") IsNot Nothing Then Return False
         Me.MdiParent = aOptions
         ReDim Box(count - 1)
         Me.Text = caller + " CheckBox Options"
@@ -12,5 +13,6 @@ Public Class OptionsCheckbox
             FlowLayoutPanel1.Controls.Add(Box(i))
         Next
         Me.Show()
-    End Sub
+        Return True
+    End Function
 End Class

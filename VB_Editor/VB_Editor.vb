@@ -58,7 +58,8 @@ Module VB_EditorMain
         Dim response = InputBox("Respond 'Yes' to make the changes.", "Make Changes?", "")
         If response = "Yes" Then
             changeLines = 0
-            For Each filename In changeFiles
+            For Each filename In fileEntries
+                If filename.EndsWith(".vb") = False Then Continue For
                 Dim sr = New StreamReader(filename)
                 Dim code As String = sr.ReadToEnd
                 sr.Close()
@@ -71,24 +72,41 @@ Module VB_EditorMain
                     lines = code.Split(vbLf) ' just in case they don't have CR.
                 End If
                 sr.Close()
+
+                Dim changeFound As Boolean = False
+                For i = 0 To lines.Count - 1
+                    If lines(i) IsNot Nothing Then
+                        If lines(i).Contains("findfrm(caller + "" CheckBox Options"") Is Nothing") Then
+                            lines(i) = "If " + Trim(lines(i + 1)) + " Then "
+                            lines(i + 1) = Nothing ' delete this line...
+                            changeFound = True
+                        End If
+                    End If
+                Next
+                If changeFound Then
+                    Dim sw = New StreamWriter(filename)
+                    For i = 0 To lines.Count - 1
+                        If lines(i) IsNot Nothing Then sw.WriteLine(lines(i))
+                    Next
+                End If
                 'For i = 0 To lines.Count - 1
                 '    lines(i) = makeChange(Trim(lines(i)))
                 'Next
 
-                Dim sw = New StreamWriter(filename)
-                For i = 0 To lines.Count - 1
-                    If lines(i) Is Nothing Then Continue For
-                    'sw.WriteLine(lines(i))
-                    'If insertLine(lines(i)) Then
-                    '    sw.WriteLine(vbTab + vbTab + "' task.rank = 1")
-                    'End If
-                    If deleteLine(lines(i)) Then
-                        Console.WriteLine("Deleting: " + lines(i))
-                    Else
-                        sw.WriteLine(lines(i))
-                    End If
-                Next
-                sw.Close()
+                'Dim sw = New StreamWriter(filename)
+                'For i = 0 To lines.Count - 1
+                '    If lines(i) Is Nothing Then Continue For
+                '    'sw.WriteLine(lines(i))
+                '    'If insertLine(lines(i)) Then
+                '    '    sw.WriteLine(vbTab + vbTab + "' task.rank = 1")
+                '    'End If
+                '    If deleteLine(lines(i)) Then
+                '        Console.WriteLine("Deleting: " + lines(i))
+                '    Else
+                '        sw.WriteLine(lines(i))
+                '    End If
+                'Next
+                'sw.Close()
             Next
         End If
 
