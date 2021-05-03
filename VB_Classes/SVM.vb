@@ -18,7 +18,7 @@ Public Class SVM_Options : Inherits VBparent
             sliders.setupTrackBar(6, "SVM P X100", 0, 100, 10)
         End If
 
-        If radio.Setup(caller, 4) Then
+        If radio.Setup(caller + " Kernel", 4) Then
             radio.check(0).Text = "kernel Type = Linear"
             radio.check(1).Text = "kernel Type = Poly (not working)"
             radio.check(1).Enabled = False
@@ -28,14 +28,14 @@ Public Class SVM_Options : Inherits VBparent
             radio.check(3).Enabled = False
         End If
 
-        radio1.Setup(caller, 5)
-        radio1.check(0).Text = "SVM Type = CSvc"
-        radio1.check(0).Checked = True
-        radio1.check(1).Text = "SVM Type = EpsSvr"
-        radio1.check(2).Text = "SVM Type = NuSvc"
-        radio1.check(3).Text = "SVM Type = NuSvr"
-        radio1.check(4).Text = "SVM Type = OneClass"
-
+        If radio1.Setup(caller + " Type", 5) Then
+            radio1.check(0).Text = "SVM Type = CSvc"
+            radio1.check(0).Checked = True
+            radio1.check(1).Text = "SVM Type = EpsSvr"
+            radio1.check(2).Text = "SVM Type = NuSvc"
+            radio1.check(3).Text = "SVM Type = NuSvr"
+            radio1.check(4).Text = "SVM Type = OneClass"
+        End If
         radio1.Text = caller + " SVM Type Radio Options"
         aOptions.optionsTitle.Add(radio1.Text)
         aOptions.hiddenOptions.Remove(caller + " Radio Options")
@@ -44,7 +44,7 @@ Public Class SVM_Options : Inherits VBparent
         task.desc = "SVM has many options - enough to make a class for it."
     End Sub
     Public Function createSVM() As cv.ML.SVM
-        Static frm = findfrm(caller + " Radio Options")
+        Static frm = findfrm(caller + " Kernel Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 kernelType = Choose(i + 1, cv.ML.SVM.KernelTypes.Linear, cv.ML.SVM.KernelTypes.Poly, cv.ML.SVM.KernelTypes.Rbf, cv.ML.SVM.KernelTypes.Sigmoid)
@@ -52,7 +52,7 @@ Public Class SVM_Options : Inherits VBparent
             End If
         Next
 
-        Static frm1 = findfrm(caller + " SVM Type Radio Options")
+        Static frm1 = findfrm(caller + " Type Radio Options")
         For i = 0 To frm.check.length - 1
             If frm.check(i).Checked Then
                 SVMType = Choose(i + 1, cv.ML.SVM.Types.CSvc, cv.ML.SVM.Types.EpsSvr, cv.ML.SVM.Types.NuSvc, cv.ML.SVM.Types.NuSvr, cv.ML.SVM.Types.OneClass)

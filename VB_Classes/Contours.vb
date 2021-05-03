@@ -132,9 +132,6 @@ End Class
 
 
 
-
-
-
 Public Class Contours_RGB : Inherits VBparent
     Public Sub New()
         task.desc = "Find and draw the contour of the largest foreground RGB contour."
