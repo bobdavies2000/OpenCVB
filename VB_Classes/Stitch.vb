@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 ' https://github.com/shimat/opencvsharp/blob/master/test/OpenCvSharp.Tests/stitching/StitchingTest.cs
 Public Class Stitch_Basics : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Number of random images", 10, 50, 10)
             sliders.setupTrackBar(1, "Rectangle width", task.color.Width / 4, task.color.Width - 1, task.color.Width / 2)
             sliders.setupTrackBar(2, "Rectangle height", task.color.Height / 4, task.color.Height - 1, task.color.Height / 2)

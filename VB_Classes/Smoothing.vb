@@ -150,8 +150,7 @@ Public Class Smoothing_Options : Inherits VBparent
 	Public interiorTension As Single
 	Public stepSize As Integer
 	Public Sub New()
-		If findfrm(caller + " Slider Options") Is Nothing Then
-			sliders.Setup(caller)
+		If sliders.Setup(caller) Then
 			sliders.setupTrackBar(0, "Smoothing iterations", 1, 20, 8)
 			sliders.setupTrackBar(1, "Smoothing tension X100 (Interior Only)", 1, 100, 50)
 			sliders.setupTrackBar(2, "Step size when adding points (1 is identity)", 1, 500, 30)

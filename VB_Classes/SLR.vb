@@ -11,8 +11,7 @@ Public Class SLR_Basics : Inherits VBparent
             label1 = "Sample data input"
         End If
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Approximate accuracy (tolerance) X100", 1, 1000, 30)
             sliders.setupTrackBar(1, "Simple moving average window size", 1, 100, 20)
         End If

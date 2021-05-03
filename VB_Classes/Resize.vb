@@ -39,8 +39,7 @@ Public Class Resize_Percentage : Inherits VBparent
     Public resizeOptions As New Resize_Basics
     Public Sub New()
         resizeOptions = New Resize_Basics()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Resize Percentage (%)", 1, 100, 3)
         End If
         task.desc = "Resize by a percentage of the image."

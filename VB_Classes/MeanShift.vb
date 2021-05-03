@@ -80,8 +80,7 @@ End Class
 'http://study.marearts.com/2014/12/opencv-meanshiftfiltering-example.html
 Public Class MeanShift_PyrFilter : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "MeanShift Spatial Radius", 1, 100, 10)
             sliders.setupTrackBar(1, "MeanShift color Radius", 1, 100, 15)
             sliders.setupTrackBar(2, "MeanShift Max Pyramid level", 1, 8, 3)
@@ -107,8 +106,7 @@ Public Class Meanshift_TopObjects : Inherits VBparent
     Dim mats1 As New Mat_4to1
     Dim mats2 As New Mat_4to1
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "How often should meanshift be reinitialized", 1, 500, 100)
         End If
         For i = 0 To cams.Length - 1

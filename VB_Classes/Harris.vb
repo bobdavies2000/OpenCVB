@@ -32,8 +32,7 @@ Public Class Harris_Features_CPP : Inherits VBparent
     Dim Harris_Features As IntPtr
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 5)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Harris Threshold", 1, 100, 1)
             sliders.setupTrackBar(1, "Harris Neighborhood", 1, 41, 21)
             sliders.setupTrackBar(2, "Harris aperture", 1, 31, 21)
@@ -81,8 +80,7 @@ Public Class Harris_Detector_CPP : Inherits VBparent
     Dim Harris_Detector As IntPtr
     Public FeaturePoints As New List(Of cv.Point2f)
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Harris qualityLevel", 1, 100, 2)
         End If
         task.desc = "Use Harris detector to identify interesting points."

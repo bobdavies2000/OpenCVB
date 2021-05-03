@@ -39,8 +39,7 @@ End Class
 Public Class Clone_ColorChange : Inherits VBparent
     Dim clone As New Clone_Basics
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Color Change - Red", 5, 25, 15)
             sliders.setupTrackBar(1, "Color Change - Green", 5, 25, 5)
             sliders.setupTrackBar(2, "Color Change - Blue", 5, 25, 5)
@@ -64,8 +63,7 @@ End Class
 Public Class Clone_IlluminationChange : Inherits VBparent
     Dim clone As New Clone_Basics
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Alpha", 0, 20, 2)
             sliders.setupTrackBar(1, "Beta", 0, 20, 2)
         End If
@@ -89,8 +87,7 @@ End Class
 Public Class Clone_TextureFlattening : Inherits VBparent
     Dim clone As New Clone_Basics
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Low Threshold", 0, 100, 10)
             sliders.setupTrackBar(1, "High Threshold", 0, 100, 50)
         End If

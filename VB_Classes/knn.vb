@@ -109,8 +109,7 @@ Public Class KNN_Options : Inherits VBparent
     Public randomQuery As New Random_Basics
     Public useRandomData As Boolean
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "KNN Query count", 1, 100, 10)
             sliders.setupTrackBar(1, "KNN Train count", 1, 100, 20)
             sliders.setupTrackBar(2, "KNN k nearest points", 1, 100, 1)
@@ -481,8 +480,7 @@ Public Class KNN_SmoothAverage : Inherits VBparent
     Public Sub New()
         findCheckBox("Draw rectangle and centroid for each mask").Checked = False
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Weight X100", 0, 100, 50)
         End If
 
@@ -794,7 +792,7 @@ Public Class KNN_PointTracker : Inherits VBparent
     Public Sub New()
         allocateKalman(16) ' allocate some kalman objects
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
+        If sliders.Setup(caller) Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Minimum size of object in pixels", 1, 10000, 3000)
         End If

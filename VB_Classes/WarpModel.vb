@@ -241,8 +241,7 @@ End Class
 '        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
 '        dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
 
-'        If findfrm(caller + " Slider Options") Is Nothing Then
-'            sliders.Setup(caller)
+'        If sliders.Setup(caller) Then
 '            sliders.setupTrackBar(0, "Correlation Threshold X1000", 0, 1000, 950)
 '            sliders.setupTrackBar(1, "Stdev Threshold", 0, 100, 10)
 '        End If

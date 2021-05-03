@@ -7,8 +7,7 @@ Public Class KLT_Basics : Inherits VBparent
     Public circleColor = cv.Scalar.Red
     Dim term As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "KLT - MaxCorners", 1, 200, 100)
             sliders.setupTrackBar(1, "KLT - qualityLevel", 1, 100, 1) ' low quality!  We want lots of points.
             sliders.setupTrackBar(2, "KLT - minDistance", 1, 100, 7)

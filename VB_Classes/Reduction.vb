@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 Public Class Reduction_Basics : Inherits VBparent
     Public maskVal As Integer
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Reduction factor", 1, 4096, 64)
             sliders.setupTrackBar(1, "Bits to remove in bitwise reduction", 0, 7, 3)
         End If

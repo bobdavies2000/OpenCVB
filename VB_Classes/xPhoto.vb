@@ -77,8 +77,7 @@ End Module
 Public Class XPhoto_OilPaint_CPP : Inherits VBparent
     Dim xPhoto_OilPaint As IntPtr
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "XPhoto Dynamic Ratio", 1, 127, 7)
             sliders.setupTrackBar(1, "XPhoto Block Size", 1, 100, 3)
         End If

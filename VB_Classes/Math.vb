@@ -3,7 +3,7 @@ Imports System.Threading
 ' https://answers.opencv.org/question/122331/how-to-subtract-a-constant-from-a-3-channel-mat/
 Public Class Math_Subtract : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
+        If sliders.Setup(caller) Then
             sliders.Setup(caller)
             sliders.setupTrackBar(0, "Red", 0, 255, 255)
             sliders.setupTrackBar(1, "Green", 0, 255, 255)
@@ -140,8 +140,7 @@ End Class
 Public Class Math_ImageAverage : Inherits VBparent
     Dim images As New List(Of cv.Mat)
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Average - number of input images", 1, 100, 10)
         End If
         task.desc = "Create an image that is the mean of x number of previous images."
@@ -186,8 +185,7 @@ Public Class Math_Stdev : Inherits VBparent
     Public lowStdevMask As cv.Mat
     Public saveFrame As cv.Mat
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Stdev Threshold", 0, 100, 10)
         End If
         findSlider("ThreadGrid Width").Value = 16

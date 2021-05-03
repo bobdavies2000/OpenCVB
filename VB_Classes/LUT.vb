@@ -3,8 +3,7 @@ Imports cv = OpenCvSharp
 ' https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
 Public Class LUT_Basics : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Number of LUT Segments", 2, 100, 10)
         End If
 
@@ -45,8 +44,7 @@ End Class
 
 Public Class LUT_Sliders : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "LUT zero through xxx", 1, 255, 65)
             sliders.setupTrackBar(1, "LUT xxx through yyy", 1, 255, 110)
             sliders.setupTrackBar(2, "LUT xxx through yyy", 1, 255, 160)

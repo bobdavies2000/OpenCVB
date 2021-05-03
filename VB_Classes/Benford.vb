@@ -142,8 +142,7 @@ Public Class Benford_JPEG : Inherits VBparent
     Public benford As New Benford_Basics
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 1)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "JPEG Quality", 1, 100, 90)
         End If
 
@@ -170,8 +169,7 @@ Public Class Benford_JPEG99 : Inherits VBparent
     Public Sub New()
         benford.setup99()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 1)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "JPEG Quality", 1, 100, 90)
         End If
         task.desc = "Perform a Benford analysis for 10-99, not 1-9, of a JPEG compressed image."
@@ -197,8 +195,7 @@ End Class
 Public Class Benford_PNG : Inherits VBparent
     Public benford As New Benford_Basics
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 1)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "PNG Compression", 1, 100, 90)
         End If
         task.desc = "Perform a Benford analysis for 1-9 of a JPEG compressed image."

@@ -281,8 +281,7 @@ Public Class CellAuto_All256 : Inherits VBparent
     Public Sub New()
         cell.combo.Visible = False ' won't need this...
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Current Rule", 0, 255, 0)
         End If
         task.desc = "Run through all 256 combinations of outcomes"

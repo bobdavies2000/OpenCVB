@@ -23,8 +23,7 @@ Public Class Contours_Basics : Inherits VBparent
         radio1.check(3).Text = "ApproxTC89L1"
         radio1.check(1).Checked = True
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Contour minimum area", 0, 50000, 1000)
             sliders.setupTrackBar(1, "Contour epsilon (arc length percent)", 0, 100, 3)
         End If
@@ -182,8 +181,7 @@ End Class
 ' https://github.com/SciSharp/SharpCV/blob/master/src/SharpCV.Examples/Program.cs
 Public Class Contours_RemoveLines : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 3)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Morphology width/height", 1, 100, 20)
             sliders.setupTrackBar(1, "MorphologyEx iterations", 1, 5, 1)
         End If
@@ -266,8 +264,7 @@ Public Class Contours_Prediction : Inherits VBparent
     Dim kalman As New Kalman_Basics
     Public Sub New()
         ReDim kalman.kInput(2 - 1)
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Predict the nth point ahead of the current point", 1, 100, 1)
         End If
         label1 = "Original contour image"

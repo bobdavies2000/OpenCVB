@@ -4,8 +4,7 @@ Imports System.IO
 'https://docs.opencv.org/3.1.0/da/d22/tutorial_py_canny.html
 Public Class Edges_Basics : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Canny threshold1", 1, 255, 50)
             sliders.setupTrackBar(1, "Canny threshold2", 1, 255, 50)
             sliders.setupTrackBar(2, "Canny Aperture", 3, 7, 3)
@@ -72,8 +71,7 @@ End Class
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Edges_Laplacian : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Gaussian Kernel", 1, 32, 7)
             sliders.setupTrackBar(1, "Laplacian Kernel", 1, 32, 5)
         End If
@@ -99,8 +97,7 @@ End Class
 'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
 Public Class Edges_Scharr : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Scharr multiplier X100", 1, 500, 50)
         End If
         label2 = "x field + y field in CV_32F format"
@@ -130,8 +127,7 @@ Public Class Edges_Preserving : Inherits VBparent
             radio.check(0).Checked = True
         End If
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Edge Sigma_s", 0, 200, 10)
             sliders.setupTrackBar(1, "Edge Sigma_r", 1, 100, 40)
         End If
@@ -192,8 +188,7 @@ Public Class Edges_RandomForest_CPP : Inherits VBparent
     Dim rgbData() As Byte
     Dim EdgesPtr As IntPtr
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Edges RF Threshold", 1, 255, 35)
         End If
 
@@ -230,8 +225,7 @@ End Class
 
 Public Class Edges_ResizeAdd : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Border Vertical in Pixels", 1, 20, 5)
             sliders.setupTrackBar(1, "Border Horizontal in Pixels", 1, 20, 5)
             sliders.setupTrackBar(2, "Threshold for Pixel Difference", 1, 50, 16)
@@ -259,8 +253,7 @@ End Class
 
 Public Class Edges_DCTfrequency : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Remove Frequencies < x", 0, 100, 32)
             sliders.setupTrackBar(1, "Threshold after Removal", 1, 255, 20)
         End If
@@ -295,8 +288,7 @@ End Class
 Public Class Edges_Deriche_CPP : Inherits VBparent
     Dim Edges_Deriche As IntPtr
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Deriche Alpha", 1, 400, 100)
             sliders.setupTrackBar(1, "Deriche Omega", 1, 1000, 100)
         End If
@@ -503,8 +495,7 @@ End Class
 Public Class Edges_Consistent : Inherits VBparent
     Dim edges As New Edges_FeaturesOnly
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Edges present n frames", 1, 30, 10)
         End If
 
@@ -651,8 +642,7 @@ Public Class Edges_Sobel : Inherits VBparent
     Public horizontalOnly As Boolean
     Dim addw As New AddWeighted_Basics
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Sobel kernel Size", 1, 32, 3)
             sliders.setupTrackBar(1, "Threshold to zero pixels below this value", 0, 255, 100)
         End If
@@ -818,8 +808,7 @@ Public Class Edges_Matching : Inherits VBparent
     Dim red As New LeftRight_Basics
     Dim grid As New Thread_Grid
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Search depth in pixels", 1, 256, 256)
             sliders.setupTrackBar(1, "Correlation threshold for display X100", 1, 100, 80)
         End If
@@ -925,8 +914,7 @@ End Class
 Public Class Edges_MotionOverlay : Inherits VBparent
     Dim diff As New Diff_Basics
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Displacement in the X direction (in pixels)", 0, 100, 7)
             sliders.setupTrackBar(1, "Displacement in the Y direction (in pixels)", 0, 100, 11)
         End If

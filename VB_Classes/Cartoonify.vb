@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 ' https://github.com/davemk99/Cartoonify-Image/blob/master/main.cpp
 Public Class CartoonifyImage_Basics : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Cartoon Median Blur kernel", 1, 21, 7)
             sliders.setupTrackBar(1, "Cartoon Median Blur kernel 2", 1, 21, 3)
             sliders.setupTrackBar(2, "Cartoon threshold", 1, 255, 80)

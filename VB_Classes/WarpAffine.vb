@@ -92,8 +92,7 @@ End Class
 Public Class WarpAffine_Basics : Inherits VBparent
     Public rotateOptions As New GetRotationMatrix2D_Options
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Angle", 0, 360, 10)
         End If
 

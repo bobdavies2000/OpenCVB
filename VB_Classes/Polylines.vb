@@ -7,8 +7,7 @@ Public Class Polylines_IEnumerableExample : Inherits VBparent
             check.Box(0).Checked = True
         End If
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Polyline Count", 2, 500, 100)
         End If
         task.desc = "Manually create an ienumerable(of ienumerable(of cv.point))."

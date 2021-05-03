@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 Imports CS_Classes
 Public Class Blur_Basics : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Blur Kernel Size", 0, 32, 5)
         End If
         task.desc = "Smooth each pixel with a Gaussian kernel of different sizes."
@@ -182,8 +181,7 @@ Public Class Blur_TopoMap : Inherits VBparent
     Public Sub New()
         findSlider("Weight").Value = 15
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Percent of Blurring", 0, 100, 20)
             sliders.setupTrackBar(1, "Reduction Factor", 2, 64, 20)
             sliders.setupTrackBar(2, "Frame Count Cycle", 1, 200, 50)

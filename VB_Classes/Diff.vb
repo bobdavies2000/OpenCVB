@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 Public Class Diff_Basics : Inherits VBparent
     Public lastFrame As cv.Mat
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Change threshold for each pixel", 1, 255, 25)
         End If
         label1 = "Stable Color"

@@ -56,8 +56,7 @@ End Class
 
 Public Class BGSubtract_MotionDetect_MT : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
         End If
 
@@ -118,8 +117,7 @@ End Class
 Public Class BGSubtract_Basics_MT : Inherits VBparent
     Dim grid As New Thread_Grid
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
         End If
 
@@ -176,8 +174,7 @@ Public Class BGSubtract_MOG : Inherits VBparent
     Dim MOG As cv.BackgroundSubtractorMOG
     Public gray As New cv.Mat
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "MOG Learn Rate", 0, 1000, 10)
         End If
 
@@ -202,8 +199,7 @@ Public Class BGSubtract_MOG2 : Inherits VBparent
     Public gray As New cv.Mat
     Dim MOG2 As cv.BackgroundSubtractorMOG2
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "MOG Learn Rate", 0, 1000, 10)
         End If
         MOG2 = cv.BackgroundSubtractorMOG2.Create()
@@ -223,8 +219,7 @@ Public Class BGSubtract_GMG_KNN : Inherits VBparent
     Dim gmg As cv.BackgroundSubtractorGMG
     Dim knn As cv.BackgroundSubtractorKNN
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Learn Rate", 1, 1000, 1)
         End If
 
@@ -255,8 +250,7 @@ Public Class BGSubtract_MOG_RGBDepth : Inherits VBparent
     Dim MOGDepth As cv.BackgroundSubtractorMOG
     Dim MOGRGB As cv.BackgroundSubtractorMOG
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "MOG Learn Rate x1000", 0, 1000, 10)
         End If
 
@@ -374,8 +368,7 @@ Public Class BGSubtract_Synthetic_CPP : Inherits VBparent
     Dim synthPtr As IntPtr
     Dim amplitude As Double, magnitude As Double, waveSpeed As Double, objectSpeed As Double
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Synthetic Amplitude x100", 1, 400, 200)
             sliders.setupTrackBar(1, "Synthetic Magnitude", 1, 40, 20)
             sliders.setupTrackBar(2, "Synthetic Wavespeed x100", 1, 400, 20)

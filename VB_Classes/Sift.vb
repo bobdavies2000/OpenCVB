@@ -13,8 +13,7 @@ Public Class Sift_Basics : Inherits VBparent
             radio.check(0).Checked = True
         End If
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Points to Match", 1, 1000, 200)
         End If
         task.desc = "Compare 2 images to get a homography.  We will use left and right images."

@@ -3,8 +3,7 @@ Imports System.Runtime.InteropServices
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
 Public Class Corners_Harris : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Corner block size", 1, 21, 3)
             sliders.setupTrackBar(1, "Corner aperture size", 1, 21, 3)
             sliders.setupTrackBar(2, "Corner quality level", 1, 100, 50)
@@ -59,8 +58,7 @@ End Class
 Public Class Corners_SubPix : Inherits VBparent
     Public good As New Features_GoodFeatures
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "SubPix kernel Size", 1, 20, 3)
         End If
         label1 = "Output of GoodFeatures"
@@ -89,8 +87,7 @@ End Class
 Public Class Corners_PreCornerDetect : Inherits VBparent
     Dim median As New Math_Median_CDF
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "kernel Size", 1, 20, 19)
         End If
         task.desc = "Use PreCornerDetect to find features in the image."
@@ -124,8 +121,7 @@ End Module
 ' https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/generic_corner_detector/generic_corner_detector.html
 Public Class Corners_ShiTomasi_CPP : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Corner block size", 1, 21, 3)
             sliders.setupTrackBar(1, "Corner aperture size", 1, 21, 3)
             sliders.setupTrackBar(2, "Corner quality level", 1, 100, 50)

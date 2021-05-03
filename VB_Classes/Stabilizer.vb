@@ -8,8 +8,7 @@ Public Class Stabilizer_Basics : Inherits VBparent
     Public stableRect As cv.Rect
     Dim pad = 20
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 5)
+        If sliders.Setup(caller, 5) Then
             sliders.setupTrackBar(0, "Maximum percentage of lost pixels before image is reset", 0, 100, 10)
             sliders.setupTrackBar(1, "Stabilizer Correlation Threshold X1000", 0, 1000, 950)
             sliders.setupTrackBar(2, "Width of input to matchtemplate", 10, dst1.Width - pad, 128)
@@ -98,8 +97,7 @@ End Class
 
 Public Class Stabilizer_BasicsRandomInput : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Range of random motion introduced (absolute value in pixels)", 0, 30, 8)
         End If
 
@@ -289,8 +287,7 @@ Public Class Stabilizer_MotionDetect : Inherits VBparent
     Dim motion As New Motion_Basics
     Dim stable As New Stabilizer_Basics
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Offset of stable rectangle from each side in pixels", 0, 100, 30)
         End If
 

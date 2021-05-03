@@ -6,8 +6,7 @@ Public Class OilPaint_Pointilism : Inherits VBparent
     Dim randomMask As cv.Mat
     Dim myRNG As New cv.RNG
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Stroke Scale", 1, 5, 3)
             sliders.setupTrackBar(1, "Smoothing Radius", 0, 100, 32)
         End If
@@ -118,8 +117,7 @@ End Class
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
 Public Class OilPaint_ManualVB : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Filter Size", 3, 15, 3)
             sliders.setupTrackBar(1, "Intensity", 5, 150, 25)
         End If
@@ -176,8 +174,7 @@ End Class
 Public Class OilPaint_Manual : Inherits VBparent
     Dim oilPaint As New CS_Classes.OilPaintManual
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Kernel Size", 2, 10, 4)
             sliders.setupTrackBar(1, "Intensity", 1, 250, 20)
             sliders.setupTrackBar(2, "Threshold", 0, 200, 25) ' add the third slider for the threshold.

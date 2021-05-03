@@ -21,8 +21,7 @@ Public Class Salience_Basics_CPP : Inherits VBparent
     Dim numScales As integer
     Dim salience As IntPtr
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Salience numScales", 1, 6, 6)
         End If
 

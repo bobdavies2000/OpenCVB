@@ -517,8 +517,7 @@ Public Class Kalman_VB : Inherits VBparent
         For i = 0 To MAX_INPUT - 1
             matrix.Add(0)
         Next
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 9)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Move this to see results", 0, 1000, 500)
             sliders.setupTrackBar(1, "Input with Noise", 0, 1000, 500)
             sliders.setupTrackBar(2, "20 point average of output", 0, 1000, 500)
@@ -631,8 +630,7 @@ Public Class Kalman_VB_Basics : Inherits VBparent
         plot.topBottomPad = 20
         plot.dst1 = dst1
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Average input count", 1, 500, 20)
             sliders.setupTrackBar(1, "Delta Time X100", 1, 30, 5)
             sliders.setupTrackBar(2, "Process Covariance X10000", 0, 10000, 10)

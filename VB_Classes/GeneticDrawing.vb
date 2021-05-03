@@ -17,8 +17,7 @@ Public Class GeneticDrawing_Options : Inherits VBparent
 
         Windows.Forms.Application.DoEvents()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Number of Generations", 1, 200, 20)
             sliders.setupTrackBar(1, "Number of Stages", 1, 2000, stageTotal)
             sliders.setupTrackBar(2, "Brushstroke count per generation", 1, 20, 10)

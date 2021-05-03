@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 
 Public Class DilateErode_Basics : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Dilate/Erode Kernel Size", 1, 32, 3)
             sliders.setupTrackBar(1, "Erode (-) to Dilate (+)", -32, 32, 1)
         End If
@@ -65,8 +64,7 @@ End Class
 Public Class DilateErode_DepthSeed : Inherits VBparent
     Dim dilate As New DilateErode_Basics
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "DepthSeed flat depth", 1, 200, 100)
             sliders.setupTrackBar(1, "DepthSeed max Depth", 1, 5000, 3000)
         End If
@@ -106,8 +104,7 @@ Public Class DilateErode_OpenClose : Inherits VBparent
             radio.check(2).Text = "Open/Close shape: Rect"
             radio.check(2).Checked = True
         End If
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Dilate Open/Close Iterations", -10, 10, 10)
         End If
         task.desc = "Erode and dilate with MorphologyEx on the RGB and Depth image."

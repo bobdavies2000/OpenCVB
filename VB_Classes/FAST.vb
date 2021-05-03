@@ -3,8 +3,7 @@ Imports cv = OpenCvSharp
 Public Class FAST_Basics : Inherits VBparent
     Public keypoints() As cv.KeyPoint
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Threshold", 0, 200, 15)
         End If
         If findfrm(caller + " CheckBox Options") Is Nothing Then

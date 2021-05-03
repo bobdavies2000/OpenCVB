@@ -3,8 +3,7 @@ Public Class MotionBlur_Basics : Inherits VBparent
     Public kernel As cv.Mat
     Public showDirection As Boolean = True
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Motion Blur Length", 1, 101, 51)
             sliders.setupTrackBar(1, "Motion Blur Angle", -90, 90, 0)
         End If
@@ -120,8 +119,7 @@ Public Class MotionBlur_Deblur : Inherits VBparent
             check.Box(0).Checked = True
         End If
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Deblur Restore Vector", 1, mblur.sliders.trackbar(0).Maximum, 10)
             sliders.setupTrackBar(1, "Deblur Angle of Restore Vector", mblur.sliders.trackbar(1).Minimum, mblur.sliders.trackbar(1).Maximum, 0)
             sliders.setupTrackBar(2, "Deblur Signal to Noise Ratio", 1, 1000, 700)

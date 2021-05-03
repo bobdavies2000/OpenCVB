@@ -4,8 +4,7 @@ Public Class HOG_Basics : Inherits VBparent
     Dim staticImage As cv.Mat
     Dim staticImageProcessed As Boolean
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Threshold", 0, 100, 0)
             sliders.setupTrackBar(1, "Stride", 1, 100, 1)
             sliders.setupTrackBar(2, "Scale", 0, 2000, 300)

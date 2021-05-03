@@ -3,8 +3,7 @@ Imports cv = OpenCvSharp
 Public Class BlockMatching_Basics : Inherits VBparent
     Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Blockmatch max disparity", 2, 5, 2)
             sliders.setupTrackBar(1, "Blockmatch block size", 5, 255, 15)
             sliders.setupTrackBar(2, "Blockmatch distance factor (approx) X1000", 1, 100, 20)

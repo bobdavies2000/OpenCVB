@@ -88,8 +88,7 @@ End Class
 
 Public Class Binarize_Niblack_Sauvola : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
             sliders.setupTrackBar(1, "Niblack k", -1000, 1000, -200)
             sliders.setupTrackBar(2, "Sauvola k", -1000, 1000, 100)
@@ -119,8 +118,7 @@ End Class
 
 Public Class Binarize_Niblack_Nick : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
             sliders.setupTrackBar(1, "Niblack k", -1000, 1000, -200)
             sliders.setupTrackBar(2, "Nick k", -1000, 1000, 100)
@@ -149,8 +147,7 @@ End Class
 
 Public Class Binarize_Bernson : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
             sliders.setupTrackBar(1, "Contrast min", 0, 255, 50)
             sliders.setupTrackBar(2, "bg Threshold", 0, 255, 100)
@@ -184,8 +181,7 @@ Public Class Binarize_Bernson_MT : Inherits VBparent
         findSlider("ThreadGrid Width").Value = 32
         findSlider("ThreadGrid Height").Value = 32
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Kernel Size", 3, 500, 51)
             sliders.setupTrackBar(1, "Contrast min", 0, 255, 50)
             sliders.setupTrackBar(2, "bg Threshold", 0, 255, 100)

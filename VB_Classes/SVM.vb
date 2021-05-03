@@ -7,8 +7,7 @@ Public Class SVM_Options : Inherits VBparent
     Public responses() As Integer
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 8)
+        If sliders.Setup(caller, 8) Then
             sliders.setupTrackBar(0, "SampleCount", 5, 1000, 500)
             sliders.setupTrackBar(1, "Granularity", 1, 50, 5)
             sliders.setupTrackBar(2, "SVM Degree", 1, 200, 100)

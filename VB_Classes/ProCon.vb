@@ -16,8 +16,7 @@ Public Class ProCon_Basics : Inherits VBparent
     Public cduration As Integer
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Buffer Size", 1, 100, buffer.Length)
             sliders.setupTrackBar(1, "Producer Workload Duration (ms)", 1, 1000, 100)
             sliders.setupTrackBar(2, "Consumer Workload Duration (ms)", 1, 1000, 10)

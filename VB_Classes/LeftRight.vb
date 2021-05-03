@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class LeftRight_Basics : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 10000, 5000)
             sliders.setupTrackBar(1, "Brightness Beta (brightness)", -255, 255, -100)
         End If
@@ -27,8 +26,7 @@ End Class
 Public Class LeftRight_CompareRaw : Inherits VBparent
     Dim lrView As New LeftRight_Basics
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Slice Starting Y", 0, 300, 100)
             sliders.setupTrackBar(1, "Slice Height", 1, (dst1.Rows - 100) / 2, 30)
         End If

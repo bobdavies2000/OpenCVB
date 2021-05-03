@@ -10,8 +10,7 @@ Public Class CamShift_Basics : Inherits VBparent
     Public trackBox As New cv.RotatedRect
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "CamShift vMin", 0, 255, 32)
             sliders.setupTrackBar(1, "CamShift vMax", 0, 255, 255)
             sliders.setupTrackBar(2, "CamShift Smin", 0, 255, 60)
@@ -142,8 +141,7 @@ Public Class Camshift_TopObjects : Inherits VBparent
             cams(i) = New CamShift_Basics
         Next
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Reinitialize camshift after x frames", 1, 500, 100)
         End If
         task.desc = "Track - "

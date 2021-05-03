@@ -3,8 +3,7 @@ Public Class BRISK_Basics : Inherits VBparent
     Public Brisk As cv.BRISK
     Public features As New List(Of cv.Point2f)
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "BRISK Radius Threshold", 1, 100, 50)
         End If
         task.desc = "Detect features with BRISK"

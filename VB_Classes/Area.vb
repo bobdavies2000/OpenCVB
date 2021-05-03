@@ -19,8 +19,7 @@ Public Class Area_MinTriangle_CPP : Inherits VBparent
         ReDim dstData(3 * Marshal.SizeOf(numberOfPoints) * 2 - 1) ' minTriangle returns 3 points
     End Sub
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Area Number of Points", 1, 30, 5)
             sliders.setupTrackBar(1, "Area size", 10, 300, 200)
         End If
@@ -70,8 +69,7 @@ Public Class Area_MinRect : Inherits VBparent
     End Sub
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Area Number of Points", 1, 30, 5)
             sliders.setupTrackBar(1, "Area size", 10, 300, 200)
         End If

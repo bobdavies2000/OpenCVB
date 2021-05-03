@@ -183,8 +183,7 @@ End Module
 Public Class Histogram_NormalizeGray : Inherits VBparent
     Public histogram As New Histogram_Basics
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
             sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
         End If
@@ -217,8 +216,7 @@ Public Class Histogram_2D_HueSaturation : Inherits VBparent
     Public hsv As cv.Mat
 
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Hue bins", 1, 180, 30) ' quantize hue to 30 levels
             sliders.setupTrackBar(1, "Saturation bins", 1, 256, 32) ' quantize sat to 32 levels
         End If
@@ -248,8 +246,7 @@ Public Class Histogram_2D_XZ_YZ : Inherits VBparent
     Dim minSlider As Windows.Forms.TrackBar
     Dim maxSlider As Windows.Forms.TrackBar
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Histogram X bins", 1, dst1.Cols, 30)
             sliders.setupTrackBar(1, "Histogram Y bins", 1, dst1.Rows, 30)
             sliders.setupTrackBar(2, "Histogram Z bins", 1, 200, 100)
@@ -385,8 +382,7 @@ Public Class Histogram_ColorsAndGray : Inherits VBparent
     Dim histogram As New Histogram_Basics
     Dim mats As New Mat_4to1
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
             sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
         End If
@@ -755,8 +751,7 @@ Public Class Histogram_ConcentrationPoints : Inherits VBparent
     Public sideview As New Histogram_SideView2D
     Public topview As New Histogram_TopView2D
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 10)
             sliders.setupTrackBar(1, "Resize Factor x100", 1, 100, 10)
             sliders.setupTrackBar(2, "Concentration Threshold", 1, 100, 10)
@@ -849,8 +844,7 @@ Public Class Histogram_Frustrum : Inherits VBparent
     Dim cameraYSlider As Windows.Forms.TrackBar
     Dim tView As New TimeView_Basics
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "SideView Frustrum adjustment", 1, 200, 57)
             sliders.setupTrackBar(1, "SideCameraPoint adjustment", -100, 100, 0)
             sliders.setupTrackBar(2, "TopView Frustrum adjustment", 1, 200, 57)

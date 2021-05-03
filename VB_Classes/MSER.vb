@@ -75,8 +75,7 @@ Public Class MSER_Options : Inherits VBparent
     Dim saveParms() As Integer
     Public mser = cv.MSER.Create
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 9)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "MSER Delta", 1, 100, 9)
             sliders.setupTrackBar(1, "MSER Min Area", 1, 10000, 2500)
             sliders.setupTrackBar(2, "MSER Max Area", 1000, 100000, 100000)

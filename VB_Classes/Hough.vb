@@ -69,8 +69,7 @@ Public Class Hough_Lines : Inherits VBparent
     Dim edges As New Edges_Basics
     Public segments() As cv.LineSegmentPolar
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "rho", 1, 100, 1)
             sliders.setupTrackBar(1, "theta", 1, 1000, 1000 * Math.PI / 180)
             sliders.setupTrackBar(2, "threshold", 1, 100, 50)
@@ -112,8 +111,7 @@ Public Class Hough_Lines_MT : Inherits VBparent
     Dim edges As New Edges_Basics
     Public grid As New Thread_Grid
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "rho", 1, 100, 1)
             sliders.setupTrackBar(1, "theta", 1, 1000, 1000 * Math.PI / 180)
             sliders.setupTrackBar(2, "threshold", 1, 100, 3)

@@ -16,8 +16,7 @@ Public Class Surf_Basics : Inherits VBparent
             radio.check(0).Checked = True
         End If
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Hessian threshold", 1, 5000, 2000)
         End If
 
@@ -65,8 +64,7 @@ Public Class Surf_DrawMatchManual_CS : Inherits VBparent
     Public Sub New()
         surf.CS_SurfBasics.drawPoints = False
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Surf Vertical Range to Search", 0, 50, 10)
         End If
         task.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."

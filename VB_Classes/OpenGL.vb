@@ -239,8 +239,7 @@ Public Class OpenGL_3Ddata : Inherits VBparent
     Public ogl As New OpenGL_Options
     Dim histInput() As Byte
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Histogram Red/Green/Blue bins", 1, 128, 32) ' why 128 and not 256? There is some limit on the max pinned memory.  Not sure...
         End If
 

@@ -8,7 +8,8 @@ Public Class OptionsSliders
     Dim defaultHeight = 260
     Dim defaultWidth = 630
     Dim algoIndex As Integer
-    Public Sub Setup(caller As String, Optional count As Integer = 4)
+    Public Function Setup(caller As String, Optional count As Integer = 4) As Boolean
+        If findfrm(caller + " Slider Options") IsNot Nothing Then Return False
         If aOptions.Text <> "" Then Me.MdiParent = aOptions
         ReDim trackbar(count - 1)
         ReDim sLabels(count - 1)
@@ -41,7 +42,8 @@ Public Class OptionsSliders
             FlowLayoutPanel1.Height = defaultHeight - 30
             Me.Height = FlowLayoutPanel1.Height + 30
         End If
-    End Sub
+        Return True
+    End Function
     Public Sub setupTrackBar(index As Integer, label As String, min As Integer, max As Integer, value As Integer)
         sLabels(index).Text = label
         trackbar(index).Minimum = min

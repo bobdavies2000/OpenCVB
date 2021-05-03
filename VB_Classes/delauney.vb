@@ -191,8 +191,7 @@ Public Class Delauney_Coverage : Inherits VBparent
     Dim delauney as New Delauney_Subdiv2D
     Public Sub New()
         delauney.updateFrequency = 1
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Clear image after x frames", 1, 100, 50)
         End If
         label1 = "Coverage of space"

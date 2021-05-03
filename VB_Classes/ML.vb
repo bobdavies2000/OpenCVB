@@ -89,8 +89,7 @@ Public Class ML_FillRGBDepth : Inherits VBparent
     Dim shadow As New Depth_Holes
     Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "ML Min Learn Count", 2, 100, 5)
         End If
 
@@ -120,8 +119,7 @@ Public Class ML_DepthFromColor_MT : Inherits VBparent
     Public Sub New()
         dilate.sliders.trackbar(1).Value = 2
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Prediction Max Depth", 500, 5000, 1000)
         End If
         findSlider("ThreadGrid Width").Value = 16
@@ -177,8 +175,7 @@ Public Class ML_DepthFromColor : Inherits VBparent
     Dim shadow As New Depth_Holes
     Dim resized As Resize_Percentage
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Prediction Max Depth", 1000, 5000, 1500)
         End If
         resized = New Resize_Percentage()
@@ -248,8 +245,7 @@ Public Class ML_DepthFromXYColor : Inherits VBparent
     Dim resized As Resize_Percentage
     Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Prediction Max Depth", 1000, 5000, 1500)
         End If
         resized = New Resize_Percentage()
@@ -335,8 +331,7 @@ Public Class ML_EdgeDepth_MT : Inherits VBparent
     Public Sub New()
         dilate.sliders.trackbar(1).Value = 5
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Prediction Max Depth", 500, 5000, 1000)
         End If
         findSlider("ThreadGrid Width").Value = 16

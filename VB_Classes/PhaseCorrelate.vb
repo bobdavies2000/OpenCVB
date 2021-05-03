@@ -12,8 +12,7 @@ Public Class PhaseCorrelate_Basics : Inherits VBparent
     Public resetLastFrame As Boolean
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Threshold shift to cause reset of lastFrame", 0, 100, 30)
         End If
 

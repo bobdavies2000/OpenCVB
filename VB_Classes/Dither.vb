@@ -82,8 +82,7 @@ End Module
 ' https://www.codeproject.com/Articles/5259216/Dither-Ordered-and-Floyd-Steinberg-Monochrome-Colo
 Public Class Dither_Basics : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Bits per color plane (Nbpp only)", 1, 5, 1)
         End If
         If findfrm(caller + " Radio Options") Is Nothing Then

@@ -6,8 +6,7 @@ Public Class IMU_Basics : Inherits VBparent
     Public theta As cv.Point3f ' this is the description - x, y, and z - of the axes centered in the camera.
     Public gyroAngle As cv.Point3f ' this is the orientation of the gyro.
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
         End If
         task.desc = "Read and display the IMU coordinates"
@@ -168,8 +167,7 @@ Public Class IMU_FrameTime : Inherits VBparent
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Minimum IMU to Capture time (ms)", 1, 10, 2)
             sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 20)
         End If
@@ -263,8 +261,7 @@ Public Class IMU_HostFrameTimes : Inherits VBparent
         plot.backColor = cv.Scalar.Aquamarine
         plot.plotCount = 4
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Minimum Host interrupt delay (ms)", 1, 10, 4)
             sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 20)
         End If
@@ -406,8 +403,7 @@ Public Class IMU_GVector : Inherits VBparent
     Public Sub New()
         ReDim kalman.kInput(6 - 1)
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Amount to rotate pointcloud around X-axis (degrees)", -90, 90, 0)
             sliders.setupTrackBar(1, "Amount to rotate pointcloud around Y-axis (degrees)", -90, 90, 0)
             sliders.setupTrackBar(2, "Amount to rotate pointcloud around Z-axis (degrees)", -90, 90, 0)

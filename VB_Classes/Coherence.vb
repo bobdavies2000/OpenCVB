@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 ' http://www.mia.uni-saarland.de/Publications/weickert-dagm03.pdf
 Public Class Coherence_Basics : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Coherence Sigma", 1, 15, 9)
             sliders.setupTrackBar(1, "Coherence Blend", 1, 10, 10)
             sliders.setupTrackBar(2, "Coherence str_sigma", 1, 15, 15)

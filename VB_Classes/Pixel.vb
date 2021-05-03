@@ -221,8 +221,7 @@ End Class
 Public Class Pixel_Measure : Inherits VBparent
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Distance in mm", 50, task.maxZ * 1000, 1500)
         End If
 

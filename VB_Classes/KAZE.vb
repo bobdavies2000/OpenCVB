@@ -77,8 +77,7 @@ Public Class KAZE_LeftAligned_CS : Inherits VBparent
     Dim CS_KazeLeft As New CS_Classes.Kaze_Basics
     Dim CS_KazeRight As New CS_Classes.Kaze_Basics
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Max number of points to match", 1, 300, 100)
             sliders.setupTrackBar(1, "When matching, max possible distance", 1, 200, 100)
         End If

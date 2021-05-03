@@ -26,8 +26,7 @@ End Module
 Public Class Hull_Basics : Inherits VBparent
     Public hull() As cv.Point
         Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Hull random points", 4, 20, 10)
         End If
 

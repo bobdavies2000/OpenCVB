@@ -5,8 +5,7 @@ Public Class TimeView_Basics : Inherits VBparent
     Dim setupSide As New PointCloud_SetupSide
     Dim setupTop As New PointCloud_SetupTop
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Number of frames to include", 2, 30, 10)
         End If
         dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_32F, 0)

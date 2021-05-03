@@ -249,8 +249,7 @@ Public Class Structured_MultiSlicePolygon : Inherits VBparent
         label1 = "Input to FindContours"
         label2 = "ApproxPolyDP 4-corner object from FindContours input"
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Max number of sides in the identified polygons", 3, 100, 4)
         End If
         task.desc = "Detect polygons in the multiSlice output"
@@ -433,8 +432,7 @@ End Class
 Public Class Structured_SliceOptions : Inherits VBparent
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 10, 1)
             sliders.setupTrackBar(1, "Slice step size in pixels (multi-slice option only)", 1, 100, 20)
             sliders.setupTrackBar(2, "Standalone only horizontal slice offset", 0, dst1.Width - 1, dst1.Width / 2)
@@ -696,8 +694,7 @@ Public Class Structured_CloudFail : Inherits VBparent
     Dim mmPixel As Pixel_Measure
     Public Sub New()
         mmPixel = New Pixel_Measure
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Lines in X-Direction", 0, 200, 50)
             sliders.setupTrackBar(1, "Lines in Y-Direction", 0, 200, 50)
             sliders.setupTrackBar(2, "Continuity threshold in mm", 0, 100, 10)
@@ -785,8 +782,7 @@ End Class
 Public Class Structured_Cloud : Inherits VBparent
     Public data As New cv.Mat
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Number of slices", 0, 200, 100)
             sliders.setupTrackBar(1, "Slice index X", 1, 200, 50)
             sliders.setupTrackBar(2, "Slice index Y", 1, 200, 50)

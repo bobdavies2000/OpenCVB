@@ -4,8 +4,7 @@ Imports System.Numerics
 Public Class Sieve_BasicsVB : Inherits VBparent
     Public primes As New List(Of Integer)
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Count of desired primes", 1, 10000, 400)
         End If
 

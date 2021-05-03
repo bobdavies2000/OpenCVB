@@ -51,8 +51,7 @@ End Class
 
 Public Class Texture_Flow : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Texture Flow Delta", 2, 100, 30)
             sliders.setupTrackBar(1, "Texture Eigen BlockSize", 1, 100, 50)
             sliders.setupTrackBar(2, "Texture Eigen Ksize", 1, 15, 1)

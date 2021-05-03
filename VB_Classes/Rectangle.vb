@@ -194,8 +194,7 @@ Public Class Rectangle_Intersection : Inherits VBparent
     Public enclosingRects As New List(Of cv.Rect)
     Dim otherRects As New List(Of cv.Rect)
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Merge rectangles within X pixels", 0, dst1.Width, If(dst1.Width = 1280, 500, 250))
         End If
 

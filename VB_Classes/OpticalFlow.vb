@@ -82,8 +82,7 @@ Public Class OpticalFlow_DenseOptions : Inherits VBparent
             radio.check(0).Checked = True
         End If
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 6)
+        If sliders.Setup(caller, 6) Then
             sliders.setupTrackBar(0, "Optical Flow pyrScale", 1, 100, 35)
             sliders.setupTrackBar(1, "Optical Flow Levels", 1, 10, 1)
             sliders.setupTrackBar(2, "Optical Flow winSize", 1, 9, 1)
@@ -158,8 +157,7 @@ Public Class OpticalFlow_DenseBasics_MT : Inherits VBparent
 
         optFlow.sliders.trackbar(0).Value = 75
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "OpticalFlow Correlation Threshold", 0, 1000, 1000)
         End If
 
@@ -214,8 +212,7 @@ Public Class OpticalFlow_Sparse : Inherits VBparent
     Dim sumScale As cv.Mat, sScale As cv.Mat
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "OpticalFlow window", 1, 20, 3)
             sliders.setupTrackBar(1, "OpticalFlow Max Pixels Distance", 1, 100, 30)
         End If

@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Depth_Flatland : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Region Count", 1, 250, 10)
         End If
         label2 = "Grayscale version"
@@ -43,8 +42,7 @@ End Class
 Public Class Depth_HolesRect : Inherits VBparent
     Dim shadow As New Depth_Holes
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "shadowRect Min Size", 1, 20000, 2000)
         End If
         task.desc = "Identify the minimum rectangles of contours of the depth shadow"
@@ -82,8 +80,7 @@ End Class
 
 Public Class Depth_FlatData : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "FlatData Region Count", 1, 250, 200)
         End If
         label1 = "Reduced resolution RGBDepth"
@@ -137,8 +134,7 @@ Public Class Depth_MeanStdev_MT : Inherits VBparent
         findSlider("ThreadGrid Width").Value = 64
         findSlider("ThreadGrid Height").Value = 40
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "MeanStdev Max Depth Range", 1, 20000, 3500)
             sliders.setupTrackBar(1, "MeanStdev Frame Series", 1, 100, 5)
         End If
@@ -253,8 +249,7 @@ End Class
 Public Class Depth_Uncertainty : Inherits VBparent
     Dim retina As New Retina_Basics_CPP
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Uncertainty threshold", 1, 255, 100)
         End If
         label2 = "Mask of areas with unstable depth"
@@ -445,8 +440,7 @@ End Class
 Public Class Depth_ColorizerVB_MT : Inherits VBparent
     Dim grid As New Thread_Grid
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Min Depth", 0, 1000, 0)
             sliders.setupTrackBar(1, "Max Depth", 1001, 10000, 4000)
         End If
@@ -650,8 +644,7 @@ End Class
 
 Public Class Depth_ColorMap : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Depth ColorMap Alpha X100", 1, 100, 5)
             sliders.setupTrackBar(1, "Depth ColorMap Beta", 1, 100, 3)
         End If
@@ -732,8 +725,7 @@ End Class
 Public Class Depth_SmoothingMat : Inherits VBparent
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Threshold in millimeters", 1, 1000, 10)
         End If
         label2 = "Depth pixels after smoothing"
@@ -802,8 +794,7 @@ End Class
 Public Class Depth_Edges : Inherits VBparent
     Dim edges As New Edges_Laplacian
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Threshold for depth disparity", 0, 255, 200)
         End If
         task.desc = "Find edges in depth data"
@@ -824,8 +815,7 @@ Public Class Depth_HolesOverTime : Inherits VBparent
     Dim recentImages As New List(Of cv.Mat)
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Number of images to retain", 0, 30, 3)
         End If
         label2 = "Latest hole mask"
@@ -855,8 +845,7 @@ Public Class Depth_Holes : Inherits VBparent
     Public holeMask As New cv.Mat
     Dim element As New cv.Mat
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Amount of dilation of borderMask", 1, 10, 1)
             sliders.setupTrackBar(1, "Amount of dilation of holeMask", 0, 10, 0)
         End If
@@ -957,8 +946,7 @@ Public Class Depth_Foreground : Inherits VBparent
     Public blobLocation As New List(Of cv.Point)
     Public maxIndex As Integer
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Max Range for foreground depth in mm's", 200, 2000, 1200)
             sliders.setupTrackBar(1, "Number of frames to fuse", 1, 20, 10)
         End If
@@ -1093,8 +1081,7 @@ Public Class Depth_PunchDecreasing : Inherits VBparent
     Public Increasing As Boolean
     Dim fore As New Depth_Foreground
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Threshold in millimeters", 0, 1000, 8)
         End If
 
@@ -1493,8 +1480,7 @@ End Class
 Public Class Depth_Fusion : Inherits VBparent
     Dim dMax As New Depth_SmoothMax
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Number of frames to fuse", 1, 300, 5)
         End If
 

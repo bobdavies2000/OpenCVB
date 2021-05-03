@@ -13,8 +13,7 @@ Public Class Fuzzy_Basics : Inherits VBparent
 
         Fuzzy = Fuzzy_Open()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Threshold for rectangle size", 50, 50000, 10000)
         End If
         If standalone Then sliders.Visible = False

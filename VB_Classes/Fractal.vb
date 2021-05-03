@@ -10,8 +10,7 @@ Public Class Fractal_Mandelbrot : Inherits VBparent
     Public incrX As Single
     Public incrY As Single
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Mandelbrot iterations", 1, 50, 34)
         End If
         task.desc = "Run the classic Mandalbrot algorithm"

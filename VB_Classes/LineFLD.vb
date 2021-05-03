@@ -11,8 +11,7 @@ Public Class LineFLD_Basics : Inherits VBparent
     Public mergeCheckBox As Windows.Forms.CheckBox
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 5)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "FLD - Min Length", 1, 200, 30)
             sliders.setupTrackBar(1, "FLD - max distance", 1, 100, 14)
             sliders.setupTrackBar(2, "FLD - Canny Aperture", 3, 7, 7)
@@ -289,8 +288,7 @@ End Class
 Public Class LineFLD_LongestLine : Inherits VBparent
     Dim lines As New LineFLD_CPP
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 1)
             sliders.setupTrackBar(1, "Update frequency (in frames)", 1, 100, 1)
         End If
@@ -322,8 +320,7 @@ End Class
 Public Class LineFLD_MT : Inherits VBparent
     Dim lines As New LineFLD_CPP
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 1)
             sliders.setupTrackBar(1, "Update frequency (in frames)", 1, 100, 1)
         End If
@@ -352,8 +349,7 @@ End Class
 'Public Class Line_3D_FitLineZ : Inherits VBparent
 '    Dim linesFLD as New LineFLD_CPP
 '    Public Sub New()
-'        If findfrm(caller + " Slider Options") Is Nothing Then
-'            sliders.Setup(caller)
+'        If sliders.Setup(caller) Then
 '            sliders.setupTrackBar(0, "Mask Line Width", 1, 20, 3)
 '            sliders.setupTrackBar(1, "Point count threshold", 5, 500, 50)
 '            sliders.setupTrackBar(2, "Update frequency (in frames)", 1, 100, 1)

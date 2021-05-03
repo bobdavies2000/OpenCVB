@@ -45,8 +45,7 @@ Public Class FLANN_Basics : Inherits VBparent
     Dim random As New Random_Basics
     Dim qArray() As cv.Point2f
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Query count", 1, 100, 1)
             sliders.setupTrackBar(1, "Match count", 1, 100, 1)
             sliders.setupTrackBar(2, "Search check count", 1, 1000, 1)

@@ -9,8 +9,7 @@ Public Class CComp_Basics : Inherits VBparent
     Public edgeMask As cv.Mat
     Dim mats As New Mat_4to1
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
             sliders.setupTrackBar(1, "CComp Max Area", 0, dst1.Width * dst1.Height / 2, dst1.Width * dst1.Height / 4)
             sliders.setupTrackBar(2, "CComp threshold", 0, 255, 128)
@@ -344,8 +343,7 @@ End Class
 
 Public Class CComp_ColorDepth : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 1)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Min Blob size", 0, 10000, 100)
         End If
         label1 = "Color by Mean Depth"
@@ -379,10 +377,10 @@ End Class
 
 Public Class CComp_InRange_MT : Inherits VBparent
     Public Sub New()
-        sliders.Setup(caller)
-        sliders.setupTrackBar(0, "InRange # of ranges", 2, 255, 15)
-        sliders.setupTrackBar(1, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
-
+        If sliders.Setup(caller) Then
+            sliders.setupTrackBar(0, "InRange # of ranges", 2, 255, 15)
+            sliders.setupTrackBar(1, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
+        End If
         task.desc = "Connected components in specific ranges"
         label2 = "Blob rectangles - largest to smallest"
     End Sub
@@ -432,8 +430,7 @@ End Class
 
 Public Class CComp_InRange : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "InRange # of ranges", 1, 20, 15)
             sliders.setupTrackBar(1, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
         End If
@@ -520,8 +517,7 @@ Public Class CComp_Simple : Inherits VBparent
     Public rects As New List(Of cv.Rect)
     Public centroids As New List(Of cv.Point2f)
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
             sliders.setupTrackBar(1, "CComp Max Area", 0, dst1.Width * dst1.Height / 2, dst1.Width * dst1.Height / 4)
             sliders.setupTrackBar(2, "CComp threshold", 0, 255, 50)

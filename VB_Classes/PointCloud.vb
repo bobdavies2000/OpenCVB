@@ -117,8 +117,7 @@ End Class
 Public Class PointCloud_Continuous : Inherits VBparent
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Threshold of continuity in mm", 0, 1000, 10)
         End If
 
@@ -151,8 +150,7 @@ End Class
 
 Public Class PointCloud_Inspector : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Inspection Line", 0, dst1.Width, dst1.Width / 2)
             sliders.setupTrackBar(1, "Y-Direction intervals", 0, 100, 30)
         End If
@@ -199,8 +197,7 @@ End Class
 
 Public Class PointCloud_Continuous_VB : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Threshold of continuity in mm", 0, 1000, 10)
         End If
 
@@ -746,7 +743,7 @@ Public Class PointCloud_ObjectsTop : Inherits VBparent
     Public colorizeNeeded As Boolean
     Public Sub New()
         If standalone Then
-            If findfrm(caller + " Slider Options") Is Nothing Then
+            If sliders.Setup(caller) Then
                 sliders.Setup(caller, 1)
                 sliders.setupTrackBar(0, "Test Bar Distance from camera in mm", 1, 4000, 1500)
             End If
@@ -851,8 +848,7 @@ Public Class PointCloud_ObjectsSide : Inherits VBparent
     Dim setupSide As New PointCloud_SetupSide
     Public Sub New()
         If standalone Then
-            If findfrm(caller + " Slider Options") Is Nothing Then
-                sliders.Setup(caller)
+            If sliders.Setup(caller) Then
                 sliders.setupTrackBar(0, "Test Bar Distance from camera in mm", 1, 4000, 1500)
             End If
         End If

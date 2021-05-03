@@ -15,8 +15,7 @@ End Module
 Public Class Quaterion_Basics : Inherits VBparent
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 8)
+        If sliders.Setup(caller, 8) Then
             sliders.setupTrackBar(0, "quaternion A.x X100", -100, 100, -50)
             sliders.setupTrackBar(1, "quaternion A.y X100", -100, 100, 10)
             sliders.setupTrackBar(2, "quaternion A.z X100", -100, 100, 20)

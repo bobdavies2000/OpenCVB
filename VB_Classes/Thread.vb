@@ -27,8 +27,7 @@ Public Class Thread_Grid : Inherits VBparent
         Next
     End Sub
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "ThreadGrid Width", 2, dst1.Width, 32)
             sliders.setupTrackBar(1, "ThreadGrid Height", 2, dst1.Height, 32)
             sliders.setupTrackBar(2, "ThreadGrid Border", 0, 20, 0)

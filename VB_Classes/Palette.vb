@@ -36,8 +36,7 @@ End Class
 
 Public Class Palette_Color : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "blue", 0, 255, msRNG.Next(0, 255))
             sliders.setupTrackBar(1, "green", 0, 255, msRNG.Next(0, 255))
             sliders.setupTrackBar(2, "red", 0, 255, msRNG.Next(0, 255))
@@ -65,8 +64,7 @@ Public Class Palette_LinearPolar : Inherits VBparent
     Public rotateOptions As New GetRotationMatrix2D_Options
     Public Sub New()
         task.desc = "Use LinearPolar to create gradient image"
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "LinearPolar radius", 0, dst1.Cols, dst1.Cols / 2)
         End If
     End Sub
@@ -148,8 +146,7 @@ Public Class Palette_Reduction : Inherits VBparent
         reduction.radio.check(0).Checked = True
         reduction.radio.check(2).Enabled = False ' must have some reduction for this to work...
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "InRange offset from specific color", 1, 100, 10)
         End If
         task.desc = "Map colors to different palette - Painterly Effect."
@@ -283,8 +280,7 @@ Public Class Palette_RandomColorMap : Inherits VBparent
     Public gradientColorMap As New cv.Mat
     Public transitionCount As Integer = -1
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Number of color transitions (Used only with Random)", 1, 255, 180)
         End If
 
@@ -321,8 +317,7 @@ Public Class Palette_DepthColorMap : Inherits VBparent
     Dim gradientColorMap As New cv.Mat
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Convert and Scale value X100", 0, 100, 8)
         End If
 

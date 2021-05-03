@@ -21,8 +21,7 @@ Public Class Retina_Basics_CPP : Inherits VBparent
     Dim magnoData(0) As Byte
     Dim srcData(0) As Byte
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Retina Sample Factor", 1, 10, 2)
         End If
 

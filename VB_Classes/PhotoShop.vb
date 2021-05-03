@@ -3,8 +3,7 @@ Imports System.Runtime.InteropServices
 Public Class PhotoShop_Clahe : Inherits VBparent
     ' Contrast Limited Adaptive Histogram Equalization (CLAHE) : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Clip Limit", 1, 100, 10)
         End If
         sliders.setupTrackBar(1, "Grid Size", 1, 100, 8)
@@ -49,8 +48,7 @@ End Class
 Public Class PhotoShop_AlphaBeta : Inherits VBparent
     Public Sub New()
         task.desc = "Use alpha and beta with ConvertScaleAbs."
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 500, 300)
             sliders.setupTrackBar(1, "Brightness Beta (brightness)", -100, 100, 0)
         End If
@@ -71,8 +69,7 @@ Public Class PhotoShop_Gamma : Inherits VBparent
     Dim lookupTable(255) As Byte
     Public Sub New()
         task.desc = "Use gamma with ConvertScaleAbs."
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Brightness Gamma correction", 0, 200, 100)
         End If
     End Sub
@@ -111,8 +108,7 @@ End Module
 Public Class PhotoShop_WhiteBalance_CPP : Inherits VBparent
     Dim wPtr As IntPtr
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "White balance threshold X100", 1, 100, 10)
         End If
         wPtr = WhiteBalance_Open()
@@ -297,8 +293,7 @@ Public Class PhotoShop_Emboss : Inherits VBparent
     Public gray128 As cv.Mat
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Emboss Kernel Size", 2, 10, 2)
         End If
 
@@ -362,8 +357,7 @@ Public Class PhotoShop_EmbossAll : Inherits VBparent
     Dim mats As New Mat_4to1
     Dim sizeSlider As Windows.Forms.TrackBar
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Emboss threshold", 0, 255, 200)
         End If
         sizeSlider = findSlider("Emboss Kernel Size")
@@ -437,8 +431,7 @@ Public Class PhotoShop_DuoTone : Inherits VBparent
             check.Box(0).Text = "DuoTone Dark if checked, Light otherwise"
         End If
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "DuoTone Exponent", 0, 50, 0)
         End If
 
@@ -491,8 +484,7 @@ End Class
 Public Class PhotoShop_Brightness : Inherits VBparent
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Brightness Value", 0, 255, 100)
         End If
 
@@ -527,8 +519,7 @@ End Class
 
 Public Class PhotoShop_UnsharpMask : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "sigma", 1, 2000, 100)
             sliders.setupTrackBar(1, "threshold", 0, 255, 5)
             sliders.setupTrackBar(2, "Shift Amount", 0, 5000, 1000)
@@ -559,8 +550,7 @@ End Class
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
 Public Class PhotoShop_SharpenDetail : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "DetailEnhance Sigma_s", 0, 200, 60)
             sliders.setupTrackBar(1, "DetailEnhance Sigma_r X100", 1, 100, 7)
         End If
@@ -582,8 +572,7 @@ End Class
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
 Public Class PhotoShop_SharpenStylize : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Stylize Sigma_s", 0, 200, 60)
             sliders.setupTrackBar(1, "Stylize Sigma_r X100", 1, 100, 7)
         End If
@@ -605,8 +594,7 @@ End Class
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
 Public Class PhotoShop_Pencil_Basics : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Pencil Sigma_s", 0, 200, 60)
             sliders.setupTrackBar(1, "Pencil Sigma_r", 1, 100, 7)
             sliders.setupTrackBar(2, "Pencil Shade Factor X100", 1, 200, 40)
@@ -630,8 +618,7 @@ End Class
 ' https://cppsecrets.com/users/2582658986657266505064717765737646677977/Convert-photo-to-sketch-using-python.php?fbclid=IwAR3pOtiqxeOPiqouii7tmN9Q7yA5vG4dFdXGqA0XgZqcMB87w5a1PEMzGOw
 Public Class PhotoShop_Pencil_Manual : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Blur kernel size", 2, 100, 10)
         End If
 

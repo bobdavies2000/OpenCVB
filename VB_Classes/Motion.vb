@@ -9,8 +9,7 @@ Public Class Motion_Basics : Inherits VBparent
     Public resetAll As Boolean
     Dim minSlider As Windows.Forms.TrackBar
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Single frame motion threshold", 1, 100000, If(task.color.Width = 1280, 20000, 1000)) ' used only externally...
             sliders.setupTrackBar(1, "Cumulative motion threshold", 1, dst1.Total, If(task.color.Width = 1280, 200000, 100000)) ' used only externally...
         End If
@@ -82,8 +81,7 @@ Public Class Motion_WithBlurDilate : Inherits VBparent
     Public changedPixels As Integer
     Public cumulativePixels As Integer
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Frames to persist", 1, 100, 10)
         End If
 
@@ -252,8 +250,7 @@ End Class
 Public Class Motion_ThruCorrelation : Inherits VBparent
     Dim grid As New Thread_Grid
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Correlation coefficient threshold for motion X1000", 0, 1000, 950)
             sliders.setupTrackBar(1, "Stdev threshold for using correlation", 0, 100, 15)
             sliders.setupTrackBar(2, "Pad size in pixels for the search area", 0, 100, 20)

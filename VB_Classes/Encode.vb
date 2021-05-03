@@ -32,8 +32,7 @@ End Class
 Public Class Encode_Options : Inherits VBparent
     Public qualityLevel As Integer
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
             sliders.setupTrackBar(1, "Encode Output Scaling", 1, 100, 85)
         End If

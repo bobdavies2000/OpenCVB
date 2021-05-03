@@ -11,8 +11,7 @@ Public Class Line_Basics : Inherits VBparent
     Public pixelThreshold As Integer
     Public lenSlider As Windows.Forms.TrackBar
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Line length threshold in pixels", 1, 400, 20)
             sliders.setupTrackBar(1, "Depth search radius in pixels", 1, 20, 2) ' not used in Run below but externally...
             sliders.setupTrackBar(2, "x- and y-intercept search range in pixels", 1, 50, 10) ' not used in Run below but externally...
@@ -257,8 +256,7 @@ Public Class Line_Vertical : Inherits VBparent
     Public lines As New Line_ConfirmedDepth
     Public toleranceInMMs As Single
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Error tolerance when measuring vertical lines in 3D (mm's)", 0, 300, 50)
         End If
 
@@ -710,8 +708,7 @@ Public Class Line_Longest : Inherits VBparent
         plot.plotCount = 1
 
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Index of line (sorted by length", 0, 100, 0)
         End If
 

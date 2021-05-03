@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Transform_Resize : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Resize Percent", 50, 1000, 50)
         End If
         task.desc = "Resize an image based on the slider value."
@@ -30,8 +29,7 @@ End Class
 Public Class Transform_Rotate : Inherits VBparent
     Public imageCenter As cv.Point2f
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Angle", -180, 180, 30)
             sliders.setupTrackBar(1, "Scale Factor% (100% means no scaling)", 1, 100, 100)
             sliders.setupTrackBar(2, "Rotation center X", 1, dst1.Width, dst1.Width / 2)

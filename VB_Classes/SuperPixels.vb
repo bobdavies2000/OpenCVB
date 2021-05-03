@@ -25,8 +25,7 @@ Public Class SuperPixel_Basics_CPP : Inherits VBparent
     Public wireGrid As cv.Mat
     Public gridColor = cv.Scalar.White
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Number of SuperPixels", 1, 1000, 400)
             sliders.setupTrackBar(1, "Iterations", 0, 10, 4)
             sliders.setupTrackBar(2, "Prior", 1, 10, 2)

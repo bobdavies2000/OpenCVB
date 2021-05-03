@@ -115,8 +115,7 @@ Public Class Sound_SignalGenerator : Inherits VBparent
     Dim startTime As Date
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 5)
+        If sliders.Setup(caller, 5) Then
             sliders.setupTrackBar(0, "Sine Wave Frequency", 10, 4000, 1000)
             sliders.setupTrackBar(1, "Decibels", -100, 0, -20)
             sliders.setupTrackBar(2, "Sweep Only - End Frequency", 20, 4000, 1000)

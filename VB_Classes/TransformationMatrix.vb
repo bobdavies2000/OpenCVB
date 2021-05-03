@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 Public Class TransformationMatrix_Basics : Inherits VBparent
     Dim topLocations As New List(Of cv.Point3d)
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "TMatrix Top View multiplier", 1, 1000, 500)
         End If
         If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2 Then sliders.trackbar(0).Value = 1 ' need a smaller multiplier...

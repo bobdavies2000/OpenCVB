@@ -99,8 +99,7 @@ Public Class Plot_OverTime : Inherits VBparent
             check.Box(0).Checked = True
         End If
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Plot Pixel Height", 1, 40, 4)
             sliders.setupTrackBar(1, "Plot Pixel Width", 1, 40, 4)
         End If

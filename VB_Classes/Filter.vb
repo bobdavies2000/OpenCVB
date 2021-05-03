@@ -34,8 +34,7 @@ Public Class Filter_NormalizedKernel : Inherits VBparent
             radio.check(2).Text = "L2"
             radio.check(3).Text = "MinMax"
         End If
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Normalize alpha X10", 1, 100, 10)
         End If
         task.desc = "Create a normalized kernel and use it."
@@ -72,8 +71,7 @@ End Class
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/filter_2d/filter_2d.html
 Public Class Filter_Normalized2D : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Filter Normalized 2D kernel size", 1, 21, 3)
         End If
         task.desc = "Create and apply a normalized kernel."
@@ -102,8 +100,7 @@ Public Class Filter_SepFilter2D : Inherits VBparent
             check.Box(0).Checked = True
         End If
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Kernel X size", 1, 21, 5)
             sliders.setupTrackBar(1, "Kernel Y size", 1, 21, 11)
             sliders.setupTrackBar(2, "SepFilter2D Sigma X10", 0, 100, 17)

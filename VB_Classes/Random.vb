@@ -8,8 +8,7 @@ Public Class Random_Basics : Inherits VBparent
     Public plotPoints As Boolean = False
     Public countSlider As Windows.Forms.TrackBar
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Random Pixel Count", 1, dst1.Cols * dst1.Rows, 20)
             countSlider = sliders.trackbar(0)
         Else
@@ -98,8 +97,7 @@ End Class
 
 Public Class Random_NormalDist : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Random_NormalDist Blue Mean", 0, 255, 125)
             sliders.setupTrackBar(1, "Random_NormalDist Green Mean", 0, 255, 25)
             sliders.setupTrackBar(2, "Random_NormalDist Red Mean", 0, 255, 180)
@@ -309,8 +307,7 @@ Public Class Random_MonteCarlo : Inherits VBparent
     Public Sub New()
         plotHist.fixedMaxVal = 100
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Number of bins", 1, 255, 91)
         End If
         task.desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
@@ -385,8 +382,7 @@ End Class
 Public Class Random_60sTV : Inherits VBparent
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Range of noise to apply (from 0 to this value)", 0, 255, 50)
             sliders.setupTrackBar(1, "Percentage of pixels to include noise", 0, 100, 20)
         End If

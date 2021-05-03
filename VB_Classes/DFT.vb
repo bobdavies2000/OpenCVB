@@ -118,8 +118,7 @@ End Class
 Public Class DFT_ButterworthFilter_MT : Inherits VBparent
     Public dft As New DFT_Basics
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "DFT B Filter - Radius", 1, dst1.Rows, dst1.Rows)
             sliders.setupTrackBar(1, "DFT B Filter - Order", 1, dst1.Rows, 2)
         End If

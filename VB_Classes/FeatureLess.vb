@@ -7,8 +7,7 @@ Public Class Featureless_Basics : Inherits VBparent
         findSlider("ThreadGrid Width").Value = 10
         findSlider("ThreadGrid Height").Value = 10
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "FeatureLess rho", 1, 100, 1)
             sliders.setupTrackBar(1, "FeatureLess theta", 1, 1000, 1000 * Math.PI / 180)
             sliders.setupTrackBar(2, "FeatureLess threshold", 1, 100, 3)
@@ -97,8 +96,7 @@ End Class
 Public Class FeatureLess_Prediction : Inherits VBparent
     Dim fLess As New Featureless_Basics
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "FeatureLess Resize Percent", 1, 100, 1)
         End If
         task.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"

@@ -47,8 +47,7 @@ Public Class Blob_Options : Inherits VBparent
             radio.check(1).Checked = True
         End If
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "min Threshold", 0, 255, 100)
             sliders.setupTrackBar(1, "max Threshold", 0, 255, 255)
             sliders.setupTrackBar(2, "Threshold Step", 1, 50, 5)

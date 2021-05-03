@@ -64,8 +64,7 @@ Public Class Undistort_Basics : Inherits VBparent
     Dim stereo_cx As integer
     Dim stereo_cy As integer
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "undistort intrinsics Left", 1, 200, 100)
         End If
         sliders.setupTrackBar(1, "undistort intrinsics coeff's", -1000, 1000, 100)

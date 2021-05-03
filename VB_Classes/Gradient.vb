@@ -50,8 +50,7 @@ Public Class Gradient_CartToPolar : Inherits VBparent
     Public Sub New()
         findSlider("Sobel kernel Size").Value = 1
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
         End If
         label1 = "CartToPolar Magnitude Output Normalized"

@@ -20,8 +20,7 @@ Public Class MatchTemplate_Basics : Inherits VBparent
             radio.check(1).Checked = True
         End If
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Sample Size", 2, 10000, 100)
             sliders.setupTrackBar(1, "Correlation Threshold X100", 1, 100, 90)
         End If
@@ -190,8 +189,7 @@ Public Class MatchTemplate_Movement : Inherits VBparent
     Dim match As New MatchTemplate_Basics
     Public mask As cv.Mat
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Correlation Threshold X1000", 0, 1000, 970)
             sliders.setupTrackBar(1, "Stdev Threshold", 0, 100, 10)
         End If

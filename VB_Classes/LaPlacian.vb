@@ -2,8 +2,7 @@ Imports cv = OpenCvSharp
 ' https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/laplace_operator/laplace_operator.html
 Public Class Laplacian_Basics : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Laplacian Kernel size", 1, 21, 3)
             sliders.setupTrackBar(1, "Laplacian Scale", 0, 100, 100)
             sliders.setupTrackBar(2, "Laplacian Delta", 0, 1000, 0)
@@ -31,8 +30,7 @@ End Class
 ' https://docs.opencv.org/3.2.0/de/db2/laplace_8cpp-example.html
 Public Class Laplacian_Blur : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Laplacian Kernel size", 1, 21, 3)
             sliders.setupTrackBar(1, "Laplacian Scale", 0, 100, 100)
             sliders.setupTrackBar(2, "Laplacian Delta", 0, 1000, 0)
@@ -79,8 +77,7 @@ End Class
 ' http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.54.299
 Public Class Laplacian_PyramidFilter : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 6)
+        If sliders.Setup(caller, 6) Then
             sliders.setupTrackBar(0, "Sharpest", 0, 10, 1)
             sliders.setupTrackBar(1, "blurryMin", 0, 10, 1)
             sliders.setupTrackBar(2, "blurryMed1", 0, 10, 1)

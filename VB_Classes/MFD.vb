@@ -88,8 +88,7 @@ Public Class MFD_Sobel : Inherits VBparent
     Dim mfd As New MFD_Basics
     Dim sobel As New Edges_Sobel
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Pixel threshold to zero", 0, 255, 100)
         End If
 
@@ -147,8 +146,7 @@ Public Class MFD_FloodFill : Inherits VBparent
     Dim palette As New Palette_RandomColorMap
     Dim sobel As New MFD_BinarizedSobel
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "FloodFill Step Size", 1, dst1.Cols / 2, 15)
             sliders.setupTrackBar(1, "FloodFill point distance from edge", 1, 25, 10)
         End If

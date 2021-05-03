@@ -12,8 +12,7 @@ Public Class FloodFill_Basics : Inherits VBparent
     Public initialMask As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 4)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2500)
             sliders.setupTrackBar(1, "FloodFill LoDiff", 0, 255, 25)
             sliders.setupTrackBar(2, "FloodFill HiDiff", 0, 255, 25)
@@ -93,8 +92,7 @@ End Class
 Public Class FloodFill_Top16_MT : Inherits VBparent
     Dim grid As New Thread_Grid
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2000)
             sliders.setupTrackBar(1, "FloodFill LoDiff", 1, 255, 5)
             sliders.setupTrackBar(2, "FloodFill HiDiff", 1, 255, 5)
@@ -245,8 +243,7 @@ Public Class Floodfill_Objects : Inherits VBparent
     Dim minSlider As Windows.Forms.TrackBar
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 1)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Desired number of objects", 1, 100, 30)
         End If
         minSlider = findSlider("FloodFill Minimum Size")
@@ -571,8 +568,7 @@ Public Class FloodFill_FullImage : Inherits VBparent
     Public mats As New Mat_4Click
     Public missingSegments As cv.Mat
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "FloodFill Step Size", 1, dst1.Cols / 2, 15)
             sliders.setupTrackBar(1, "FloodFill point distance from edge", 1, 25, 10)
             sliders.setupTrackBar(2, "Minimum length for missing contours", 3, 25, 4)
@@ -708,8 +704,7 @@ Public Class FloodFill_Step : Inherits VBparent
     Dim edgesInput As cv.Mat
     Dim contourInput As New SortedList(Of Integer, cv.Point())(New compareAllowIdenticalIntegerInverted)
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "FloodFill Step Size", 1, dst1.Width / 2, 15)
             sliders.setupTrackBar(1, "FloodFill point distance from edge", 1, 25, 10)
             sliders.setupTrackBar(2, "Minimum length for missing contours", 3, 25, 4)

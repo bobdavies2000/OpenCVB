@@ -43,8 +43,7 @@ Public Class GetRotationMatrix2D_Basics : Inherits VBparent
     Public Mflip As cv.Mat
     Public rotateOptions As New GetRotationMatrix2D_Options
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "GetRotation Matrix2D Angle (deg)", 0, 360, 24)
         End If
 

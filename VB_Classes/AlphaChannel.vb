@@ -26,8 +26,7 @@ End Class
 ' https://www.learnopencv.com/alpha-blending-using-opencv-cpp-python/
 Public Class AlphaChannel_Blend : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Transparency amount", 0, 255, 100)
         End If
 

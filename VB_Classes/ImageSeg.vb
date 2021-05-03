@@ -117,8 +117,7 @@ End Class
 Public Class ImageSeg_Unstable : Inherits VBparent
     Dim iSeg As New ImageSeg_Basics
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "A segment is considered present after this many appearances", 1, 40, 20)
         End If
 

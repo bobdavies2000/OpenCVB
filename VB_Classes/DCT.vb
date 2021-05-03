@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class DCT_Basics : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Remove Frequencies < x", 0, 100, 1)
             sliders.setupTrackBar(1, "Run Length Minimum", 1, 100, 15)
         End If

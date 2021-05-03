@@ -142,8 +142,7 @@ Public Class Annealing_CPP_MT : Inherits VBparent
 
     Public Sub New()
         ReDim anneal(Environment.ProcessorCount - 1)
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Anneal Number of Cities", 5, 500, 25)
             sliders.setupTrackBar(1, "Success = top X threads agree on energy level.", 2, anneal.Count, anneal.Count)
         End If

@@ -3,8 +3,7 @@ Public Class KMeans_Basics : Inherits VBparent
     Public kmeansK As Integer
     Public resizeFactor = 1 ' update this to 2 or 4 to speed up the kmeans performance.
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
         End If
 
@@ -52,8 +51,7 @@ Public Class KMeans_BasicsDepthColor : Inherits VBparent
     Public resizeRequest As Boolean = True
     Public useDepthColor As Boolean = True
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
         End If
         task.desc = "Cluster the rgb image pixels using kMeans."
@@ -127,8 +125,7 @@ Public Class KMeans_RGBFast : Inherits VBparent
     Public resizeFactor = 2
     Public clusterCount = 6
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
         End If
         task.desc = "Cluster a small rgb image using kMeans.  Specify clusterCount value."
@@ -219,8 +216,7 @@ End Class
 
 Public Class KMeans_XYDepth : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
         End If
         Dim w = dst1.Cols / 4
@@ -288,8 +284,7 @@ End Class
 
 Public Class KMeans_LAB : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
         End If
         label1 = "kMeans_LAB - draw to select region"
@@ -328,8 +323,7 @@ End Class
 
 Public Class KMeans_Color : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "kMeans cluster count (k)", 2, 32, 3)
         End If
         task.desc = "Cluster the rgb image using kMeans.  Color each cluster by average depth."
@@ -360,8 +354,7 @@ End Class
 Public Class KMeans_Color_MT : Inherits VBparent
     Public grid As New Thread_Grid
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 2)
         End If
 
@@ -403,8 +396,7 @@ End Class
 
 Public Class KMeans_ColorDepth : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 3)
         End If
 
@@ -446,8 +438,7 @@ End Class
 Public Class KMeans_ColorDepth_MT : Inherits VBparent
     Public grid As New Thread_Grid
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 3)
         End If
 

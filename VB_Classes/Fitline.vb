@@ -6,8 +6,7 @@ Public Class Fitline_Basics : Inherits VBparent
     Public Sub New()
         findSlider("DrawCount").Value = 2
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Accuracy for the radius X100", 0, 100, 10)
             sliders.setupTrackBar(1, "Accuracy for the angle X100", 0, 100, 10)
         End If
@@ -107,8 +106,7 @@ Public Class Fitline_RawInput : Inherits VBparent
     Public m As Single
     Public bb As Single
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Random point count", 0, 500, 100)
             sliders.setupTrackBar(1, "Line Point Count", 0, 500, 20)
             sliders.setupTrackBar(2, "Line Noise", 1, 100, 10)

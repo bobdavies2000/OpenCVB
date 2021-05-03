@@ -46,8 +46,7 @@ Public Class Draw_Noise : Inherits VBparent
     Public addRandomColor As Boolean
     Public noiseMask As cv.Mat
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Noise Count", 1, 1000, 100)
             sliders.setupTrackBar(1, "Noise Width", 1, 10, 3)
         End If
@@ -81,8 +80,7 @@ Public Class Draw_Options : Inherits VBparent
     Public drawFilled As Integer
     Public drawRotated As Boolean
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "DrawCount", 0, 20, 3)
             sliders.setupTrackBar(1, "Update Frequency", 1, 50, 1)
         End If
@@ -274,8 +272,7 @@ End Class
 
 Public Class Draw_SymmetricalShapes : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Number of points", 200, 1000, 500)
             sliders.setupTrackBar(1, "Radius 1", 1, dst1.Rows / 2, dst1.Rows / 4)
             sliders.setupTrackBar(2, "Radius 2", 1, dst1.Rows / 2, dst1.Rows / 8)
@@ -362,8 +359,7 @@ Public Class Draw_Arc : Inherits VBparent
     Public Sub New()
         ReDim kalman.kInput(7 - 1)
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Clearance from image edge (margin size)", 5, dst1.Width / 8, dst1.Width / 16)
         End If
         If findfrm(caller + " Radio Options") Is Nothing Then

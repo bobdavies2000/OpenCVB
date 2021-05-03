@@ -12,8 +12,7 @@ Public Class Gabor_Basics : Inherits VBparent
     Public phaseOffset As Double
     Public Sub New()
 
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller, 6)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Gabor Kernel Size", 0, 50, 15)
             sliders.setupTrackBar(1, "Gabor Sigma", 0, 100, 4)
             sliders.setupTrackBar(2, "Gabor Theta (degrees)", 0, 180, 90)
