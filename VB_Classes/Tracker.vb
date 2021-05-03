@@ -19,8 +19,7 @@ Imports System.Runtime.InteropServices
 '            radio.check(0).Checked = True ' TrackerMIL is the default
 '        End If
 
-'        If findfrm(caller + " CheckBox Options") Is Nothing Then
-'            check.Setup(caller, 1)
+'        If  check.Setup(caller, 1) then
 '            check.Box(0).Text = "Stop tracking selected object"
 '        End If
 

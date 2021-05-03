@@ -93,8 +93,7 @@ Public Class Plot_OverTime : Inherits VBparent
     Public controlScale As Boolean ' Use this to programmatically control the scale (rather than let the automated way below keep the scale.)
     Dim myStopWatch As Stopwatch
     Public Sub New()
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Reset the plot scale"
             check.Box(0).Checked = True
         End If

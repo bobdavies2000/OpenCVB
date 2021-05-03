@@ -8,8 +8,7 @@ Public Class Download_Databases : Inherits VBparent
     Dim linkAddress As String = ""
     Dim zippedBuffer As New MemoryStream
     Public Sub New()
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            radio.Setup(caller, 9)
+        If radio.Setup(caller, 9) Then
             radio.check(0).Text = "Download the 1.7 Gb 300 Faces In-The-Wild database"
             radio.check(1).Text = "Download TensorFlow MobileNet-SSD v1"
             radio.check(2).Text = "Download TensorFlow MobileNet-SSD v1 PPN"

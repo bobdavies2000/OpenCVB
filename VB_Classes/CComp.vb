@@ -14,8 +14,7 @@ Public Class CComp_Basics : Inherits VBparent
             sliders.setupTrackBar(1, "CComp Max Area", 0, dst1.Width * dst1.Height / 2, dst1.Width * dst1.Height / 4)
             sliders.setupTrackBar(2, "CComp threshold", 0, 255, 128)
         End If
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
+        If check.Setup(caller, 2) Then
             check.Box(0).Text = "Use OTSU to binarize the image"
             check.Box(1).Text = "Input to CComp is above CComp threshold"
             check.Box(0).Checked = True
@@ -201,8 +200,7 @@ Public Class CComp_MaxBlobs : Inherits VBparent
         Dim checkOTSU = findCheckBox("Use OTSU to binarize the image")
         checkOTSU.Checked = False ' turn off OTSU so the slider works...
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Reassess the best CComp threshold"
         End If
 
@@ -293,8 +291,7 @@ Public Class CComp_DepthEdges : Inherits VBparent
     Dim ccomp As New CComp_PointTracker
     Dim depth As New Depth_Edges
     Public Sub New()
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Use edge mask in connected components"
             check.Box(0).Checked = True
         End If

@@ -8,8 +8,7 @@ Public Class GeneticDrawing_Options : Inherits VBparent
     Public Sub New()
         Windows.Forms.Application.DoEvents()
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
+        If check.Setup(caller, 2) Then
             check.Box(0).Text = "Snapshot Video input to initialize genetic drawing"
             check.Box(1).Text = "Restart the algorithm with the current settings"
             check.Box(1).Checked = True

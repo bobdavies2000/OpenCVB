@@ -29,8 +29,7 @@ Public Class CellAuto_Basics : Inherits VBparent
         Dim label = "The 18 most interesting automata from the first 256 in 'New Kind of Science'" + vbCrLf + "The input combinations are: " + inputCombo
         combo.Setup(caller, label + vbCrLf + "output below:", i18)
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Rotate through the different rules"
             check.Box(0).Checked = True
         End If

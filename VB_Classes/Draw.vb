@@ -85,8 +85,7 @@ Public Class Draw_Options : Inherits VBparent
             sliders.setupTrackBar(1, "Update Frequency", 1, 50, 1)
         End If
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
+        If check.Setup(caller, 2) Then
             check.Box(0).Text = "Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)"
             check.Box(1).Text = "Draw filled (unchecked draw an outline)"
         End If
@@ -278,8 +277,7 @@ Public Class Draw_SymmetricalShapes : Inherits VBparent
             sliders.setupTrackBar(2, "Radius 2", 1, dst1.Rows / 2, dst1.Rows / 8)
             sliders.setupTrackBar(3, "nGenPer", 1, 500, 100)
         End If
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 5)
+        If check.Setup(caller, 5) Then
             check.Box(0).Text = "Symmetric Ripple"
             check.Box(1).Text = "Only Regular Shapes"
             check.Box(2).Text = "Filled Shapes"
@@ -424,8 +422,7 @@ Public Class Draw_ViewObjects : Inherits VBparent
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Public Sub New()
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
+        If check.Setup(caller, 2) Then
             check.Box(0).Text = "Draw rectangle and centroid for each mask"
             check.Box(1).Text = "Caller will handle any drawing required"
             check.Box(0).Checked = True

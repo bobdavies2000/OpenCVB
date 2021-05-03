@@ -71,8 +71,7 @@ Public Class Undistort_Basics : Inherits VBparent
         sliders.setupTrackBar(2, "undistort stereo height", 1, dst1.Rows, dst1.Rows)
         sliders.setupTrackBar(3, "undistort Offset left/right", 1, 200, 112)
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Restore Original matrices"
             check.Box(0).Checked = True
         End If

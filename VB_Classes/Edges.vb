@@ -646,8 +646,7 @@ Public Class Edges_Sobel : Inherits VBparent
             sliders.setupTrackBar(1, "Threshold to zero pixels below this value", 0, 255, 100)
         End If
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
+        If check.Setup(caller, 2) Then
             check.Box(0).Text = "Threshold Sobel Results"
             check.Box(1).Text = "Use Sobel Results"
             check.Box(0).Checked = True
@@ -812,8 +811,7 @@ Public Class Edges_Matching : Inherits VBparent
             sliders.setupTrackBar(1, "Correlation threshold for display X100", 1, 100, 80)
         End If
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 3)
+        If check.Setup(caller, 3) Then
             check.Box(0).Text = "Overlay thread grid"
             check.Box(1).Text = "Highlight all grid entries above threshold"
             check.Box(2).Text = "Clear selected highlights (if Highlight all grid entries is unchecked)"

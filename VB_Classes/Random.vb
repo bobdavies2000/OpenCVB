@@ -104,8 +104,7 @@ Public Class Random_NormalDist : Inherits VBparent
             sliders.setupTrackBar(3, "Random_NormalDist Stdev", 0, 255, 50)
         End If
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Use Grayscale image"
         End If
 

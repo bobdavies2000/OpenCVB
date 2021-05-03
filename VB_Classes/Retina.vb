@@ -25,8 +25,7 @@ Public Class Retina_Basics_CPP : Inherits VBparent
             sliders.setupTrackBar(0, "Retina Sample Factor", 1, 10, 2)
         End If
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
+        If check.Setup(caller, 2) Then
             check.Box(0).Text = "Use log sampling"
             check.Box(1).Text = "Open resulting xml file"
         End If

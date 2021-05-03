@@ -121,8 +121,7 @@ Public Class WarpModel_Input : Inherits VBparent
             radio.check(9).Checked = True
         End If
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Use Gradient in WarpInput"
         End If
 

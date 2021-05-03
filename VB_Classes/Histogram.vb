@@ -188,8 +188,7 @@ Public Class Histogram_NormalizeGray : Inherits VBparent
             sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
         End If
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Normalize Before Histogram"
             check.Box(0).Checked = True
         End If
@@ -387,8 +386,7 @@ Public Class Histogram_ColorsAndGray : Inherits VBparent
             sliders.setupTrackBar(1, "Max Gray", 0, 255, 255)
         End If
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Normalize Before Histogram"
             check.Box(0).Checked = True
         End If

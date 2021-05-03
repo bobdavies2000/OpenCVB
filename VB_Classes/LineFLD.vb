@@ -24,8 +24,7 @@ Public Class LineFLD_Basics : Inherits VBparent
         canny1Slider = findSlider("FLD - canny Threshold1")
         canny2Slider = findSlider("FLD - canny Threshold2")
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "FLD - incremental merge"
             check.Box(0).Checked = True
         End If
@@ -354,8 +353,7 @@ End Class
 '            sliders.setupTrackBar(1, "Point count threshold", 5, 500, 50)
 '            sliders.setupTrackBar(2, "Update frequency (in frames)", 1, 100, 1)
 '        End If
-'        If findfrm(caller + " CheckBox Options") Is Nothing Then
-'            check.Setup(caller, 2)
+'        If  check.Setup(caller, 2) then
 '            check.Box(0).Text = "Fitline using x and z (unchecked it will use y and z)"
 '            check.Box(1).Text = "Display only the longest line"
 '            check.Box(1).Checked = True

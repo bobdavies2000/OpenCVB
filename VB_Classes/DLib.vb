@@ -94,12 +94,9 @@ Public Class Dlib_iBug300WDownload : Inherits VBparent
     Dim downloadActive As Boolean
     Dim pythonActive As Boolean
     Public Sub New()
-
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Download the 1.7 Gb 300 Faces In-The-Wild database"
         End If
-
         task.desc = "Multi-threaded (responsive) download of the iBug 300W face database.  Not using iBug yet but planning to..."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

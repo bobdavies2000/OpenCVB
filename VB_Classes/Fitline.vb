@@ -111,8 +111,7 @@ Public Class Fitline_RawInput : Inherits VBparent
             sliders.setupTrackBar(1, "Line Point Count", 0, 500, 20)
             sliders.setupTrackBar(2, "Line Noise", 1, 100, 10)
         End If
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
+        If check.Setup(caller, 2) Then
             check.Box(0).Text = "Highlight Line Data"
             check.Box(1).Text = "Recompute with new random data"
             check.Box(0).Checked = True

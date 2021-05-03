@@ -191,8 +191,7 @@ End Class
 Public Class Reduction_XYZ : Inherits VBparent
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 3)
+        If check.Setup(caller, 3) Then
             check.Box(0).Text = "Slice point cloud in X direction"
             check.Box(1).Text = "Slice point cloud in Y direction"
             check.Box(2).Text = "Slice point cloud in Z direction"

@@ -1319,8 +1319,7 @@ Public Class Depth_SmoothMax : Inherits VBparent
     Dim colorize As New Depth_ColorizerFastFade_CPP
     Public stableMax As cv.Mat
     Public Sub New()
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Use SmoothMin to find zero depth pixels"
         End If
 

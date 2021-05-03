@@ -100,8 +100,7 @@ End Class
 
 Public Class Transform_Affine3D : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
+        If check.Setup(caller, 2) Then
             check.Box(0).Text = "Check to snap the first point cloud"
             check.Box(1).Text = "Check to snap the second point cloud"
         End If

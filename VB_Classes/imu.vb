@@ -409,8 +409,7 @@ Public Class IMU_GVector : Inherits VBparent
             sliders.setupTrackBar(2, "Amount to rotate pointcloud around Z-axis (degrees)", -90, 90, 0)
         End If
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 3)
+        If check.Setup(caller, 3) Then
             check.Box(0).Text = "Rotate pointcloud around X-axis using gravity vector angleZ"
             check.Box(1).Text = "Rotate pointcloud around Z-axis using gravity vector angleX"
             check.Box(2).Text = "Initialize the X- and Z-axis sliders with gravity but allow manual after initialization"

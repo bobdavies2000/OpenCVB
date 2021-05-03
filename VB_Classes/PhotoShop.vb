@@ -424,8 +424,7 @@ Public Class PhotoShop_DuoTone : Inherits VBparent
             radio1.check(3).Checked = True
         End If
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "DuoTone Dark if checked, Light otherwise"
         End If
 

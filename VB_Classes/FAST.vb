@@ -6,8 +6,7 @@ Public Class FAST_Basics : Inherits VBparent
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Threshold", 0, 200, 15)
         End If
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Use Non-Max = True"
             check.Box(0).Checked = True
         End If

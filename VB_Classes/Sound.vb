@@ -131,8 +131,7 @@ Public Class Sound_SignalGenerator : Inherits VBparent
             radio.check(0).Checked = True
         End If
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
+        If check.Setup(caller, 2) Then
             check.Box(0).Text = "PhaseReverse Left"
             check.Box(1).Text = "PhaseReverse Right"
         End If

@@ -87,8 +87,7 @@ Public Class MSER_Options : Inherits VBparent
             sliders.setupTrackBar(8, "MSER Edge BlurSize", 1, 20, 5)
         End If
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 3)
+        If check.Setup(caller, 3) Then
             check.Box(0).Text = "Pass2Only"
             check.Box(1).Text = "Use Grayscale, not color input (default)"
             check.Box(2).Text = "Use all default options - ignore all but min and max area"

@@ -115,8 +115,7 @@ Public Class KNN_Options : Inherits VBparent
             sliders.setupTrackBar(2, "KNN k nearest points", 1, 100, 1)
         End If
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Reuse the training and query data"
         End If
 
@@ -246,8 +245,7 @@ Public Class KNN_Emax : Inherits VBparent
     Public knn As New KNN_1_to_1
     Dim emax As New EMax_Centroids
     Public Sub New()
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 3)
+        If check.Setup(caller, 3) Then
             check.Box(0).Text = "Map queries to training data 1:1 (Off means many:1)"
             check.Box(1).Text = "Display queries"
             check.Box(2).Text = "Display training input and connecting line"
@@ -301,8 +299,7 @@ Public Class KNN_Test : Inherits VBparent
 
         knn.testMode = True
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Show grid mask"
         End If
 
@@ -341,8 +338,7 @@ Public Class KNN_Test_1_to_1 : Inherits VBparent
         gridWidthSlider.Value = 100
         gridHeightSlider.Value = 100
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Show grid mask"
         End If
         task.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."

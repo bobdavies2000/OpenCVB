@@ -51,8 +51,7 @@ Public Class FLANN_Basics : Inherits VBparent
             sliders.setupTrackBar(2, "Search check count", 1, 1000, 1)
             sliders.setupTrackBar(3, "EPS X100", 0, 100, 0)
         End If
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
+        If check.Setup(caller, 2) Then
             check.Box(0).Text = "Search params sorted"
             check.Box(1).Text = "Reuse the same feature list (test different search parameters)"
             check.Box(1).Checked = True

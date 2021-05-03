@@ -14,8 +14,7 @@ Public Class KLT_Basics : Inherits VBparent
             sliders.setupTrackBar(3, "KLT - BlockSize", 1, 100, 7)
         End If
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 2)
+        If check.Setup(caller, 2) Then
             check.Box(0).Text = "KLT - Night Mode"
             check.Box(1).Text = "KLT - delete all Points"
         End If

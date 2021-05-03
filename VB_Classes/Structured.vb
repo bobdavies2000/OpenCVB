@@ -337,8 +337,7 @@ Public Class Structured_LinearizeFloor : Inherits VBparent
     Public sliceMask As cv.Mat
     Public floorYPlane As Single
     Public Sub New()
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 3)
+        If check.Setup(caller, 3) Then
             check.Box(0).Text = "Smooth in X-direction"
             check.Box(1).Text = "Smooth in Y-direction"
             check.Box(2).Text = "Smooth in Z-direction"
@@ -700,8 +699,7 @@ Public Class Structured_CloudFail : Inherits VBparent
             sliders.setupTrackBar(2, "Continuity threshold in mm", 0, 100, 10)
         End If
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 3)
+        If check.Setup(caller, 3) Then
             check.Box(0).Text = "Impose constraints on X"
             check.Box(1).Text = "Impose constraints on Y"
             check.Box(2).Text = "Impose constraints on neither"

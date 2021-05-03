@@ -209,8 +209,7 @@ End Class
 Public Class FloodFill_RelativeRange : Inherits VBparent
     Public fBasics As New FloodFill_Basics
     Public Sub New()
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 3)
+        If check.Setup(caller, 3) Then
             check.Box(0).Text = "Use Fixed range - when off, it means use relative range "
             check.Box(0).Checked = True
             check.Box(1).Text = "Use 4 nearest pixels (Link4) - when off, it means use 8 nearest pixels (Link8)"
@@ -428,8 +427,7 @@ Public Class FloodFill_Top16 : Inherits VBparent
     Public thumbNails As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
     Public Sub New()
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Show (up to) the first 16 largest objects in view (in order of size)"
         End If
 
@@ -574,8 +572,7 @@ Public Class FloodFill_FullImage : Inherits VBparent
             sliders.setupTrackBar(2, "Minimum length for missing contours", 3, 25, 4)
         End If
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Use filter to remove low stdev areas"
         End If
 

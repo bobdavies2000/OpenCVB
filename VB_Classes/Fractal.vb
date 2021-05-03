@@ -71,8 +71,7 @@ End Class
 Public Class Fractal_MandelbrotZoom : Inherits VBparent
     Public mandel As New Fractal_Mandelbrot
     Public Sub New()
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Reset to original Mandelbrot"
         End If
         task.desc = "Run the classic Mandalbrot algorithm and allow zooming in"

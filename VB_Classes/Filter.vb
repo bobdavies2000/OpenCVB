@@ -93,8 +93,7 @@ End Class
 'https://www.cc.gatech.edu/classes/AY2015/cs4475_summer/documents/smoothing_separable.py
 Public Class Filter_SepFilter2D : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Show Difference SepFilter2D and Gaussian"
             check.Box(0).Checked = True
         End If

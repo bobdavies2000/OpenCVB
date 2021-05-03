@@ -1,8 +1,7 @@
 Imports cv = OpenCvSharp
 Public Class Grayscale_Basics : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Use OpenCV to create grayscale image"
             check.Box(0).Checked = True
         End If

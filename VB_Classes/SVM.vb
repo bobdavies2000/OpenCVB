@@ -155,8 +155,7 @@ Public Class SVM_Random : Inherits VBparent
 
         task.drawRect = New cv.Rect(task.color.Cols / 4, task.color.Rows / 4, task.color.Cols / 2, task.color.Rows / 2)
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 1)
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Restrict random test to square area"
         End If
 

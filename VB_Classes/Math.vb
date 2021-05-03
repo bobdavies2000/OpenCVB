@@ -191,8 +191,7 @@ Public Class Math_Stdev : Inherits VBparent
         findSlider("ThreadGrid Width").Value = 16
         findSlider("ThreadGrid Height").Value = 16
 
-        If findfrm(caller + " CheckBox Options") Is Nothing Then
-            check.Setup(caller, 3)
+        If check.Setup(caller, 3) Then
             check.Box(0).Text = "Show mean"
             check.Box(1).Text = "Show Stdev"
             check.Box(2).Text = "Show Grid Mask"
