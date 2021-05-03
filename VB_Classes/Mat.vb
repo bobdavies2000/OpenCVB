@@ -352,8 +352,7 @@ Public Class Mat_Inverse : Inherits VBparent
     Public validateInverse As Boolean
     Public inverse As New cv.Mat
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 6)
+        If radio.Setup(caller, 6) Then
             radio.check(0).Text = "Cholesky"
             radio.check(1).Text = "Eig (works but results are incorrect)"
             radio.check(2).Text = "LU"

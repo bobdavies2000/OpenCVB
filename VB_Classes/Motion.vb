@@ -139,8 +139,7 @@ Public Class Motion_MinMaxDepth : Inherits VBparent
     Public motion As New Motion_Basics
     Public externalReset As Boolean
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
+        If radio.Setup(caller, 3) Then
             radio.check(0).Text = "Use farthest distance"
             radio.check(1).Text = "Use closest distance"
             radio.check(2).Text = "Use unchanged depth input"

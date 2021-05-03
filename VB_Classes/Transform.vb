@@ -50,8 +50,7 @@ End Class
 
 Public Class Transform_Sort : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 4)
+        If radio.Setup(caller, 4) Then
             radio.check(0).Text = "Ascending"
             radio.check(0).Checked = True
             radio.check(1).Text = "Descending"
@@ -78,8 +77,7 @@ End Class
 Public Class Transform_SortReshape : Inherits VBparent
     Public sortVector As cv.Mat
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 2)
+        If radio.Setup(caller, 2) Then
             radio.check(0).Text = "Ascending"
             radio.check(0).Checked = True
             radio.check(1).Text = "Descending"

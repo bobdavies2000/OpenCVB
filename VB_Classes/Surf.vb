@@ -9,8 +9,7 @@ Public Class Surf_Basics : Inherits VBparent
     Public srcLeft As New cv.Mat
     Public srcRight As New cv.Mat
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 2)
+        If radio.Setup(caller, 2) Then
             radio.check(0).Text = "Use BF Matcher"
             radio.check(1).Text = "Use Flann Matcher"
             radio.check(0).Checked = True

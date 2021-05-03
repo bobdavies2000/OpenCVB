@@ -36,8 +36,7 @@ Public Class Laplacian_Blur : Inherits VBparent
             sliders.setupTrackBar(2, "Laplacian Delta", 0, 1000, 0)
         End If
 
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
+        If radio.Setup(caller, 3) Then
             radio.check(0).Text = "Add Gaussian Blur"
             radio.check(1).Text = "Add boxfilter Blur"
             radio.check(2).Text = "Add median Blur"

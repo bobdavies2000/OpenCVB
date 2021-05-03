@@ -117,8 +117,7 @@ Public Class EMax_Setup : Inherits VBparent
         findSlider("ThreadGrid Width").Value = dst1.Width / 3
         findSlider("ThreadGrid Height").Value = dst1.Height / 3
 
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
+        If radio.Setup(caller, 3) Then
             radio.check(0).Text = "EMax matrix type Spherical"
             radio.check(1).Text = "EMax matrix type Diagonal"
             radio.check(2).Text = "EMax matrix type Generic"

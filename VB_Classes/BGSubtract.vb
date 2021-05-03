@@ -6,8 +6,7 @@ Public Class BGSubtract_Basics_CPP : Inherits VBparent
     Dim bgfs As IntPtr
     Public currMethod As integer = -1
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 7)
+        If radio.Setup(caller, 7) Then
             radio.check(0).Text = "GMG"
             radio.check(1).Text = "CNT - Counting"
             radio.check(2).Text = "KNN"
@@ -60,8 +59,7 @@ Public Class BGSubtract_MotionDetect_MT : Inherits VBparent
             sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
         End If
 
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 6)
+        If radio.Setup(caller, 6) Then
             For i = 0 To radio.check.Length - 1
                 radio.check(i).Text = CStr(2 ^ i) + " threads"
             Next

@@ -278,8 +278,7 @@ Public Class Puzzle_Solver : Inherits VBparent
     Dim usedList As New List(Of Integer)
     Dim fitlist As New List(Of bestFit)
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
+        If radio.Setup(caller, 3) Then
             radio.check(0).Text = "256x180 tile - Easy Puzzle"
             radio.check(1).Text = "128x90  tile - Medium Puzzle"
             radio.check(2).Text = "64x90   tile - Hard Puzzle"

@@ -38,8 +38,7 @@ End Class
 Public Class Distance_Foreground : Inherits VBparent
     Dim foreground As New KMeans_Depth_FG_BG
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
+        If radio.Setup(caller, 3) Then
             radio.check(0).Text = "C"
             radio.check(1).Text = "L1"
             radio.check(2).Text = "L2"

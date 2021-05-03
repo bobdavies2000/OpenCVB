@@ -9,8 +9,7 @@ Public Class MatchTemplate_Basics : Inherits VBparent
     Public correlation As Single
     Public matchOption As cv.TemplateMatchModes
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 6)
+        If radio.Setup(caller, 6) Then
             radio.check(0).Text = "CCoeff"
             radio.check(1).Text = "CCoeffNormed"
             radio.check(2).Text = "CCorr"

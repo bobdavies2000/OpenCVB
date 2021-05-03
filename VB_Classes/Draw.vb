@@ -362,8 +362,7 @@ Public Class Draw_Arc : Inherits VBparent
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Clearance from image edge (margin size)", 5, dst1.Width / 8, dst1.Width / 16)
         End If
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
+        If radio.Setup(caller, 3) Then
             radio.check(0).Text = "Draw Full Ellipse"
             radio.check(1).Text = "Draw Filled Arc"
             radio.check(2).Text = "Draw Arc"

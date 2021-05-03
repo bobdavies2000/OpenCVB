@@ -122,8 +122,7 @@ Public Class DFT_ButterworthFilter_MT : Inherits VBparent
             sliders.setupTrackBar(0, "DFT B Filter - Radius", 1, dst1.Rows, dst1.Rows)
             sliders.setupTrackBar(1, "DFT B Filter - Order", 1, dst1.Rows, 2)
         End If
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 6)
+        If radio.Setup(caller, 6) Then
             radio.check(0).Text = "DFT Flags ComplexOutput"
             radio.check(1).Text = "DFT Flags Inverse"
             radio.check(2).Text = "DFT Flags None"
@@ -227,8 +226,7 @@ Public Class DFT_Shapes : Inherits VBparent
     Public Sub New()
         findSlider("DrawCount").Value = 1
 
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 7)
+        If radio.Setup(caller, 7) Then
             radio.check(0).Text = "Draw Circle"
             radio.check(1).Text = "Draw Ellipse"
             radio.check(2).Text = "Draw Rectangle"

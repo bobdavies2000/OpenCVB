@@ -18,8 +18,7 @@ Public Class SVM_Options : Inherits VBparent
             sliders.setupTrackBar(6, "SVM P X100", 0, 100, 10)
         End If
 
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 4)
+        If radio.Setup(caller, 4) Then
             radio.check(0).Text = "kernel Type = Linear"
             radio.check(1).Text = "kernel Type = Poly (not working)"
             radio.check(1).Enabled = False

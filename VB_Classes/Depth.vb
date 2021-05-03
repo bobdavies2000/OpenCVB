@@ -1392,8 +1392,7 @@ Public Class Depth_SmoothMinMax : Inherits VBparent
     Public dMax As New Depth_SmoothMax
     Public resetAll As Boolean
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
+        If radio.Setup(caller, 3) Then
             radio.check(0).Text = "Use farthest distance"
             radio.check(1).Text = "Use closest distance"
             radio.check(2).Text = "Use unchanged depth input"

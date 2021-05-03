@@ -123,8 +123,7 @@ Public Class Sound_SignalGenerator : Inherits VBparent
             sliders.setupTrackBar(4, "Retain Data for x seconds", 1, 100, 2)
         End If
 
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 7)
+        If radio.Setup(caller, 7) Then
             Static frm = findfrm(caller + " Radio Options")
             For i = 0 To frm.check.length - 1
                 frm.check(i).Text = Choose(i + 1, "Pink", "White", "Sweep", "Sin", "Square", "Triangle", "SawTooth")
@@ -200,8 +199,7 @@ End Class
 Public Class Sound_Display : Inherits VBparent
     Public soundSource As Object = New Sound_SignalGenerator
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 4)
+        If radio.Setup(caller, 4) Then
             radio.check(0).Text = "Max Absolute Value"
             radio.check(1).Text = "Max RMS Value"
             radio.check(2).Text = "Sampled Peaks"

@@ -326,8 +326,7 @@ Public Class Line_Intercepts : Inherits VBparent
     Public Sub New()
         findSlider("Line length threshold in pixels").Value = 1
 
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 4)
+        If radio.Setup(caller, 4) Then
             radio.check(0).Text = "Show Top intercepts"
             radio.check(1).Text = "Show Bottom intercepts"
             radio.check(2).Text = "Show Left intercepts"

@@ -4,8 +4,7 @@ Public Class MFD_Basics : Inherits VBparent
     Public stableImg As cv.Mat
     Dim dMax As New Depth_SmoothMax
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 2)
+        If radio.Setup(caller, 2) Then
             radio.check(0).Text = "Use motion-filtered pixel values"
             radio.check(1).Text = "Use original (unchanged) pixels"
             radio.check(0).Checked = True

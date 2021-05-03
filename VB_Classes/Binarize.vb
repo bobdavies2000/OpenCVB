@@ -42,8 +42,7 @@ Public Class Binarize_OTSU : Inherits VBparent
     Public Sub New()
         binarize = New Binarize_Basics()
 
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 4)
+        If radio.Setup(caller, 4) Then
             radio.check(0).Text = "Binary"
             radio.check(1).Text = "Binary + OTSU"
             radio.check(2).Text = "OTSU"

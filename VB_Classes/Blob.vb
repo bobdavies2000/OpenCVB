@@ -37,8 +37,7 @@ Public Class Blob_Options : Inherits VBparent
         blobDetector = New CS_Classes.Blob_Basics
         If standalone Then blob.updateFrequency = 30
 
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 5)
+        If radio.Setup(caller, 5) Then
             radio.check(0).Text = "FilterByArea"
             radio.check(1).Text = "FilterByCircularity"
             radio.check(2).Text = "FilterByConvexity"

@@ -7,8 +7,7 @@ Public Class Reduction_Basics : Inherits VBparent
             sliders.setupTrackBar(1, "Bits to remove in bitwise reduction", 0, 7, 3)
         End If
 
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
+        If radio.Setup(caller, 3) Then
             radio.check(0).Text = "Use simple reduction"
             radio.check(1).Text = "Use bitwise reduction"
             radio.check(2).Text = "No reduction"

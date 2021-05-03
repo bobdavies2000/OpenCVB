@@ -6,8 +6,7 @@ Public Class Sift_Basics : Inherits VBparent
     Dim siftCS As New CS_SiftBasics
     Dim lrView As New LeftRight_Basics
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 2)
+        If radio.Setup(caller, 2) Then
             radio.check(0).Text = "Use BF Matcher"
             radio.check(1).Text = "Use Flann Matcher"
             radio.check(0).Checked = True

@@ -1,7 +1,8 @@
 ﻿Imports System.Windows.Forms
 Public Class OptionsRadioButtons
     Public check() As RadioButton
-    Public Sub Setup(caller As String, count As Integer)
+    Public Function Setup(caller As String, count As Integer) As Boolean
+        If findfrm(caller + " Radio Options") IsNot Nothing Then Return False
         Me.MdiParent = aOptions
         ReDim check(count - 1)
         Me.Text = caller + " Radio Options"
@@ -11,5 +12,6 @@ Public Class OptionsRadioButtons
             check(i).AutoSize = True
             FlowLayoutPanel1.Controls.Add(check(i))
         Next
-    End Sub
+        Return True
+    End Function
 End Class

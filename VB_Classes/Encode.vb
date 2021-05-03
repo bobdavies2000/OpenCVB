@@ -36,8 +36,7 @@ Public Class Encode_Options : Inherits VBparent
             sliders.setupTrackBar(0, "Encode Quality Level", 1, 100, 1) ' make it low quality to highlight how different it can be.
             sliders.setupTrackBar(1, "Encode Output Scaling", 1, 100, 85)
         End If
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 6)
+        If radio.Setup(caller, 6) Then
             radio.check(0).Text = "JpegChromaQuality"
             radio.check(1).Text = "JpegLumaQuality"
             radio.check(2).Text = "JpegOptimize"

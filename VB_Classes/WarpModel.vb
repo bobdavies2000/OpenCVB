@@ -13,8 +13,7 @@ Public Class WarpModel_Basics : Inherits VBparent
     Public Sub New()
         cPtr = WarpModel_Open()
 
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 4)
+        If radio.Setup(caller, 4) Then
             radio.check(0).Text = "Motion_Translation (fastest)"
             radio.check(1).Text = "Motion_Euclidean"
             radio.check(2).Text = "Motion_Affine (very slow - Be sure to configure CPP_Classes in Release Mode)"
@@ -106,8 +105,7 @@ Public Class WarpModel_Input : Inherits VBparent
     Public gradient(3 - 1) As cv.Mat
     Dim sobel As New Edges_Sobel
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 12)
+        If radio.Setup(caller, 12) Then
             radio.check(0).Text = "building.jpg"
             radio.check(1).Text = "church.jpg"
             radio.check(2).Text = "emir.jpg"

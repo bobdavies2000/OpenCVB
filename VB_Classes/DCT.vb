@@ -5,8 +5,7 @@ Public Class DCT_Basics : Inherits VBparent
             sliders.setupTrackBar(0, "Remove Frequencies < x", 0, 100, 1)
             sliders.setupTrackBar(1, "Run Length Minimum", 1, 100, 15)
         End If
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
+        If radio.Setup(caller, 3) Then
             radio.check(0).Text = "DCT Flags None"
             radio.check(1).Text = "DCT Flags Row"
             radio.check(2).Text = "DCT Flags Inverse"

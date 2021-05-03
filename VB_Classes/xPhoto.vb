@@ -81,8 +81,7 @@ Public Class XPhoto_OilPaint_CPP : Inherits VBparent
             sliders.setupTrackBar(0, "XPhoto Dynamic Ratio", 1, 127, 7)
             sliders.setupTrackBar(1, "XPhoto Block Size", 1, 100, 3)
         End If
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 5)
+        If radio.Setup(caller, 5) Then
             radio.check(0).Text = "BGR2GRAY"
             radio.check(1).Text = "BGR2HSV"
             radio.check(2).Text = "BGR2YUV  "
@@ -129,8 +128,7 @@ End Class
 Public Class XPhoto_Inpaint : Inherits VBparent
     Public basics As New InPaint_Basics
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
+        If radio.Setup(caller, 3) Then
             radio.check(0).Text = "FSR_Best"
             radio.check(1).Text = "FSR_Fast"
             radio.check(2).Text = "ShiftMap"

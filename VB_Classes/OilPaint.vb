@@ -10,8 +10,7 @@ Public Class OilPaint_Pointilism : Inherits VBparent
             sliders.setupTrackBar(0, "Stroke Scale", 1, 5, 3)
             sliders.setupTrackBar(1, "Smoothing Radius", 0, 100, 32)
         End If
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 2)
+        If radio.Setup(caller, 2) Then
             radio.check(0).Text = "Use Elliptical stroke"
             radio.check(1).Text = "Use Circular stroke"
             radio.check(1).Checked = True

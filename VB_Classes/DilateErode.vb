@@ -8,8 +8,7 @@ Public Class DilateErode_Basics : Inherits VBparent
         End If
         task.desc = "Dilate and Erode the RGB and Depth image."
 
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 4)
+        If radio.Setup(caller, 4) Then
             radio.check(0).Text = "Dilate/Erode shape: Cross"
             radio.check(1).Text = "Dilate/Erode shape: Ellipse"
             radio.check(2).Text = "Dilate/Erode shape: Rect"
@@ -97,8 +96,7 @@ End Class
 
 Public Class DilateErode_OpenClose : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
+        If radio.Setup(caller, 3) Then
             radio.check(0).Text = "Open/Close shape: Cross"
             radio.check(1).Text = "Open/Close shape: Ellipse"
             radio.check(2).Text = "Open/Close shape: Rect"

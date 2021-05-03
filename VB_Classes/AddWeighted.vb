@@ -71,8 +71,7 @@ Public Class AddWeighted_InfraRed : Inherits VBparent
     Dim addw As New AddWeighted_Basics
     Dim src2 As New cv.Mat
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 2)
+        If radio.Setup(caller, 2) Then
             radio.check(0).Text = "Use LeftView"
             radio.check(1).Text = "Use RightView"
             radio.check(1).Checked = True

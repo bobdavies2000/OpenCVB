@@ -11,8 +11,7 @@ Imports System.Runtime.InteropServices
 '    Public trackerIndex As Integer
 '    Public Sub New()
 
-'        If findfrm(caller + " Radio Options") Is Nothing Then
-'            radio.Setup(caller, 8)
+'        If radio.Setup(caller, 8) then
 '            radio.check(0).Text = "TrackerCSRT - Channel and Spatial Reliability Tracker"
 '            radio.check(1).Text = "TrackerGOTURN"
 '            radio.check(2).Text = "TrackerMIL"
@@ -138,8 +137,7 @@ Public Class Tracker_Basics : Inherits VBparent
     Dim trackType As Integer
     Public Sub New()
 
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 8)
+        If radio.Setup(caller, 8) Then
             radio.check(0).Text = "Boosting"
             radio.check(1).Text = "MIL"
             radio.check(2).Text = "KCF"

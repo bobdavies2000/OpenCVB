@@ -72,8 +72,7 @@ Public Class OpticalFlow_DenseOptions : Inherits VBparent
     Public OpticalFlowFlags As cv.OpticalFlowFlags
     Public outputScaling As Integer
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 5)
+        If radio.Setup(caller, 5) Then
             radio.check(0).Text = "FarnebackGaussian"
             radio.check(1).Text = "LkGetMinEigenvals"
             radio.check(2).Text = "None"
@@ -217,8 +216,7 @@ Public Class OpticalFlow_Sparse : Inherits VBparent
             sliders.setupTrackBar(1, "OpticalFlow Max Pixels Distance", 1, 100, 30)
         End If
 
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 6)
+        If radio.Setup(caller, 6) Then
             radio.check(0).Text = "FarnebackGaussian"
             radio.check(1).Text = "LkGetMinEigenvals"
             radio.check(2).Text = "None"

@@ -4,8 +4,7 @@ Public Class GetRotationMatrix2D_Options : Inherits VBparent
     Public warpFlag As cv.InterpolationFlags
     Public Sub New()
 
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 7)
+        If radio.Setup(caller, 7) Then
             radio.check(0).Text = "Area"
             radio.check(1).Text = "Cubic flag"
             radio.check(2).Text = "Lanczos4"

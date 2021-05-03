@@ -297,8 +297,7 @@ Public Class PhotoShop_Emboss : Inherits VBparent
             sliders.setupTrackBar(0, "Emboss Kernel Size", 2, 10, 2)
         End If
 
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 4)
+        If radio.Setup(caller, 4) Then
             radio.check(0).Text = "Bottom Left"
             radio.check(1).Text = "Bottom Right"
             radio.check(2).Text = "Top Left"
@@ -411,8 +410,7 @@ End Class
 Public Class PhotoShop_DuoTone : Inherits VBparent
     Public Sub New()
 
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
+        If radio.Setup(caller, 3) Then
             radio.check(0).Text = "First DuoTone Blue"
             radio.check(1).Text = "First DuoTone Green"
             radio.check(2).Text = "First DuoTone Red"
@@ -622,8 +620,7 @@ Public Class PhotoShop_Pencil_Manual : Inherits VBparent
             sliders.setupTrackBar(0, "Blur kernel size", 2, 100, 10)
         End If
 
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
+        If radio.Setup(caller, 3) Then
             radio.check(0).Text = "Pencil grayscale image"
             radio.check(1).Text = "Pencil grayscale inverted image"
             radio.check(2).Text = "Pencil blur image"

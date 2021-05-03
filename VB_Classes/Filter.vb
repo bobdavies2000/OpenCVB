@@ -26,8 +26,7 @@ End Class
 
 Public Class Filter_NormalizedKernel : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 4)
+        If radio.Setup(caller, 4) Then
             radio.check(0).Text = "INF"
             radio.check(1).Text = "L1"
             radio.check(1).Checked = True

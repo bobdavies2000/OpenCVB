@@ -120,8 +120,7 @@ End Class
 ' https://www.learnopencv.com/non-photorealistic-rendering-using-opencv-python-c/
 Public Class Edges_Preserving : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 2)
+        If radio.Setup(caller, 2) Then
             radio.check(0).Text = "Edge RecurseFilter"
             radio.check(1).Text = "Edge NormconvFilter"
             radio.check(0).Checked = True

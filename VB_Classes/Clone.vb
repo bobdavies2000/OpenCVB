@@ -119,8 +119,7 @@ Public Class Clone_Eagle : Inherits VBparent
     Dim maskROI As cv.Rect
     Dim pt As cv.Point
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
+        If radio.Setup(caller, 3) Then
             radio.check(0).Text = "Seamless - Mixed Clone"
             radio.check(1).Text = "Seamless - MonochromeTransfer Clone"
             radio.check(2).Text = "Seamless - Normal Clone"
@@ -171,8 +170,7 @@ End Class
 ' https://www.csharpcodi.com/csharp-examples/OpenCvSharp.Cv2.SeamlessClone(OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.InputArray,%20OpenCvSharp.Point,%20OpenCvSharp.OutputArray,%20OpenCvSharp.SeamlessCloneMethods)/
 Public Class Clone_Seamless : Inherits VBparent
     Public Sub New()
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
+        If radio.Setup(caller, 3) Then
             radio.check(0).Text = "Seamless Normal Clone"
             radio.check(1).Text = "Seamless Mono Clone"
             radio.check(2).Text = "Seamless Mixed Clone"

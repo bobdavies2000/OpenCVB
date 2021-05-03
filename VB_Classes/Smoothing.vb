@@ -182,8 +182,7 @@ Public Class Smoothing_Contours : Inherits VBparent
 		smoothE.plotColor = cv.Scalar.Blue
 		smoothI.plotColor = cv.Scalar.Blue
 
-		If findfrm(caller + " Radio Options") Is Nothing Then
-			radio.Setup(caller, 2)
+		If radio.Setup(caller, 2) Then
 			radio.check(0).Text = "Interior smoothing"
 			radio.check(1).Text = "Exterior smoothing"
 			radio.check(1).Checked = True

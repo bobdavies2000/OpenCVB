@@ -85,8 +85,7 @@ Public Class Dither_Basics : Inherits VBparent
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Bits per color plane (Nbpp only)", 1, 5, 1)
         End If
-        If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 24)
+        If radio.Setup(caller, 24) Then
             Static frm = findfrm(caller + " Radio Options")
             For i = 0 To frm.check.length - 1
                 frm.check(i).Text = Choose(i + 1, "Bayer16", "Bayer8", "Bayer4", "Bayer3", "Bayer2", "BayerRgbNbpp", "BayerRgb3bpp", "BayerRgb6bpp",
