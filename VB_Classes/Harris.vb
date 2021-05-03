@@ -32,7 +32,7 @@ Public Class Harris_Features_CPP : Inherits VBparent
     Dim Harris_Features As IntPtr
     Public Sub New()
 
-        If sliders.Setup(caller) Then
+        If sliders.Setup(caller, 5) Then
             sliders.setupTrackBar(0, "Harris Threshold", 1, 100, 1)
             sliders.setupTrackBar(1, "Harris Neighborhood", 1, 41, 21)
             sliders.setupTrackBar(2, "Harris aperture", 1, 31, 21)

@@ -517,7 +517,7 @@ Public Class Kalman_VB : Inherits VBparent
         For i = 0 To MAX_INPUT - 1
             matrix.Add(0)
         Next
-        If sliders.Setup(caller) Then
+        If sliders.Setup(caller, 9) Then
             sliders.setupTrackBar(0, "Move this to see results", 0, 1000, 500)
             sliders.setupTrackBar(1, "Input with Noise", 0, 1000, 500)
             sliders.setupTrackBar(2, "20 point average of output", 0, 1000, 500)
