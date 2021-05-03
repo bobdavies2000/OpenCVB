@@ -120,25 +120,25 @@ Public Class Meanshift_TopObjects : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         blob.Run(src)
 
-        Dim updateFrequency = sliders.trackbar(0).Value
-        Dim trackBoxes As New List(Of cv.Rect)
-        For i = 0 To Math.Min(cams.Length, blob.flood.sortedSizes.Count) - 1
-            If blob.flood.maskSizes.Count > i Then
-                Dim camIndex = blob.flood.sortedSizes.ElementAt(i).Value
-                If task.frameCount Mod updateFrequency = 0 Or cams(i).trackbox.Size.Width = 0 Or task.frameCount < 3 Then
-                    cams(i).inputRect = blob.flood.rects(camIndex)
-                End If
+        'Dim updateFrequency = sliders.trackbar(0).Value
+        'Dim trackBoxes As New List(Of cv.Rect)
+        'For i = 0 To Math.Min(cams.Length, blob.flood.sortedSizes.Count) - 1
+        '    If blob.flood.maskSizes.Count > i Then
+        '        Dim camIndex = blob.flood.sortedSizes.ElementAt(i).Value
+        '        If task.frameCount Mod updateFrequency = 0 Or cams(i).trackbox.Size.Width = 0 Or task.frameCount < 3 Then
+        '            cams(i).inputRect = blob.flood.rects(camIndex)
+        '        End If
 
-                cams(i).Run(src)
-                mats1.mat(i) = cams(i).dst1.Clone()
-                mats2.mat(i) = cams(i).dst2.Clone()
-                trackBoxes.Add(cams(i).trackbox)
-            End If
-        Next
-        mats1.Run(Nothing)
-        dst1 = mats1.dst1
-        mats2.Run(Nothing)
-        dst2 = mats2.dst1
+        '        cams(i).Run(src)
+        '        mats1.mat(i) = cams(i).dst1.Clone()
+        '        mats2.mat(i) = cams(i).dst2.Clone()
+        '        trackBoxes.Add(cams(i).trackbox)
+        '    End If
+        'Next
+        'mats1.Run(Nothing)
+        'dst1 = mats1.dst1
+        'mats2.Run(Nothing)
+        'dst2 = mats2.dst1
     End Sub
 End Class
 

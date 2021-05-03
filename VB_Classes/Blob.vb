@@ -173,13 +173,8 @@ End Class
 
 Public Class Blob_DepthClusters : Inherits VBparent
     Public histBlobs As New Histogram_DepthValleys
-    Public flood As New FloodFill_Basics
     Public Sub New()
-        findSlider("FloodFill LoDiff").Value = 1
-        findSlider("FloodFill HiDiff").Value = 1
-
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
-        'task.rank = 3
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         histBlobs.Run(task.noDepthMask)
@@ -205,7 +200,6 @@ Public Class Blob_DepthPixelSampler : Inherits VBparent
 
         label2 = "Backprojection of identified histogram depth clusters."
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
-        'task.rank = 2
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         histBlobs.Run(task.noDepthMask)
@@ -247,7 +241,6 @@ Public Class Blob_DepthRanges : Inherits VBparent
     Public Sub New()
         label2 = "Identified histogram depth clusters."
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
-        'task.rank = 4
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         histBlobs.Run(src)

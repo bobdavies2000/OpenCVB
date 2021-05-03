@@ -98,29 +98,33 @@ End Class
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class Camshift_Object : Inherits VBparent
-    Dim blob As New Blob_DepthClusters
+    Dim blob As New Blob_DepthRanges
     Dim camshift As New CamShift_Basics
+    Dim flood As New FloodFill_Basics
     Public Sub New()
-        label1 = "Largest blob with hue tracked.  Draw enabled."
-        label2 = "Backprojection of depth clusters masked with hue"
+        findSlider("FloodFill LoDiff").Value = 1
+        findSlider("FloodFill HiDiff").Value = 1
+        label1 = "Largest blob with hue tracked. "
         task.desc = "Use the blob depth cluster as input to initialize a camshift algorithm."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         blob.Run(src)
-        dst2 = blob.dst2.Clone()
+        flood.Run(blob.dst2)
 
-        If blob.flood.masks.Count > 0 Then
-            Dim largestMask = blob.flood.sortedSizes.ElementAt(0).Value
+        If flood.masks.Count > 0 Then
+            Dim index = flood.sortedSizes.ElementAt(0).Value
             If camshift.trackBox.Size.Width > src.Width Or camshift.trackBox.Size.Height > src.Height Then
-                task.drawRect = blob.flood.rects(largestMask)
+                task.drawRect = flood.rects(index)
             End If
-            If camshift.trackBox.Size.Width < 50 Then task.drawRect = blob.flood.rects(largestMask)
+            If camshift.trackBox.Size.Width < 50 Then task.drawRect = flood.rects(index)
             camshift.Run(src)
             dst1 = camshift.dst1
-            Dim mask = dst1.ConvertScaleAbs(255)
-            cv.Cv2.BitwiseNot(mask.CvtColor(cv.ColorConversionCodes.BGR2GRAY), mask)
-            dst2.SetTo(0, mask)
-            If camshift.trackBox.Size.Width > 0 Then dst2.Ellipse(camshift.trackBox, cv.Scalar.White, 2, task.lineType)
+            dst2 = camshift.dst2
+            ' dst1.CopyTo(dst2, flood.masks(index))
+            'Dim mask = dst1.ConvertScaleAbs(255)
+            'cv.Cv2.BitwiseNot(mask.CvtColor(cv.ColorConversionCodes.BGR2GRAY), mask)
+            'dst2.SetTo(0, mask)
+            ' If camshift.trackBox.Size.Width > 0 Then dst2.Ellipse(camshift.trackBox, cv.Scalar.White, 2, task.lineType)
         End If
     End Sub
 End Class
@@ -149,25 +153,25 @@ Public Class Camshift_TopObjects : Inherits VBparent
         blob.Run(src)
         dst1 = blob.dst2
 
-        Dim updateFrequency = updateSlider.Value
-        Dim trackBoxes As New List(Of cv.RotatedRect)
-        For i = 0 To Math.Min(cams.Length, blob.flood.sortedSizes.Count) - 1
-            If blob.flood.maskSizes.Count > i Then
-                Dim camIndex = blob.flood.sortedSizes.ElementAt(i).Value
-                If task.frameCount Mod updateFrequency = 0 Or cams(i).trackBox.Size.Width = 0 Then
-                    task.drawRect = blob.flood.rects(camIndex)
-                End If
+        'Dim updateFrequency = updateSlider.Value
+        'Dim trackBoxes As New List(Of cv.RotatedRect)
+        'For i = 0 To Math.Min(cams.Length, blob.flood.sortedSizes.Count) - 1
+        '    If blob.flood.maskSizes.Count > i Then
+        '        Dim camIndex = blob.flood.sortedSizes.ElementAt(i).Value
+        '        If task.frameCount Mod updateFrequency = 0 Or cams(i).trackBox.Size.Width = 0 Then
+        '            task.drawRect = blob.flood.rects(camIndex)
+        '        End If
 
-                cams(i).Run(src)
-                mats.mat(i) = cams(i).dst1.Clone()
-                trackBoxes.Add(cams(i).trackBox)
-            End If
-        Next
-        For i = 0 To trackBoxes.Count - 1
-            dst1.Ellipse(trackBoxes(i), cv.Scalar.White, 2, task.lineType)
-        Next
-        mats.Run(Nothing)
-        dst2 = mats.dst1
+        '        cams(i).Run(src)
+        '        mats.mat(i) = cams(i).dst1.Clone()
+        '        trackBoxes.Add(cams(i).trackBox)
+        '    End If
+        'Next
+        'For i = 0 To trackBoxes.Count - 1
+        '    dst1.Ellipse(trackBoxes(i), cv.Scalar.White, 2, task.lineType)
+        'Next
+        'mats.Run(Nothing)
+        'dst2 = mats.dst1
     End Sub
 End Class
 
