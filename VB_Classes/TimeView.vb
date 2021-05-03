@@ -37,11 +37,16 @@ Public Class TimeView_Basics : Inherits VBparent
         topFrames.Add(topView.originalHistOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary))
 
         sideAccum = sideAccum.Add(sideFrames.ElementAt(sideFrames.Count - 1))
-        setupSide.Run(sideAccum.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR))
-        dst1 = setupSide.dst1
         topAccum = topAccum.Add(topFrames.ElementAt(sideFrames.Count - 1))
-        setupTop.Run(topAccum.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR))
-        dst2 = setupTop.dst1
+        If standalone Or task.intermediateReview = caller Then
+            setupSide.Run(sideAccum.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+            dst1 = setupSide.dst1
+            setupTop.Run(topAccum.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+            dst2 = setupTop.dst1
+        Else
+            dst1 = sideAccum
+            dst2 = topAccum
+        End If
 
         label1 = "Accum " + CStr(topFrames.Count) + " side frames with hist threshold > " + CStr(task.hist3DThreshold)
         label2 = "Accum " + CStr(topFrames.Count) + " top frames with hist threshold > " + CStr(task.hist3DThreshold)

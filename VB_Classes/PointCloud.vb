@@ -1,113 +1,123 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Module PointCloud
-    ' for performance we are putting this in an optimized C++ interface to the Kinect camera for convenience...
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function SimpleProjectionRun(cPtr As IntPtr, depth As IntPtr, desiredMin As Single, desiredMax As Single, rows As Integer, cols As Integer) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function SimpleProjectionSide(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function SimpleProjectionOpen() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub SimpleProjectionClose(cPtr As IntPtr)
-    End Sub
-
-
-
-
-
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Project_GravityHist_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Project_GravityHist_Close(cPtr As IntPtr)
-    End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Project_GravityHist_Side(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Project_GravityHist_Run(cPtr As IntPtr, xyzPtr As IntPtr, maxZ As Single, rows As Integer, cols As Integer) As IntPtr
-    End Function
-
-    Public Class compareAllowIdenticalSingleInverted : Implements IComparer(Of Single)
-        Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
-            ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
-            If a <= b Then Return 1
-            Return -1
-        End Function
-    End Class
-    Public Class compareAllowIdenticalSingle : Implements IComparer(Of Single)
-        Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
-            ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
-            If a <= b Then Return 1
-            Return -1
-        End Function
-    End Class
-    Public Class CompareMaskSize : Implements IComparer(Of Integer)
-        Public Function Compare(ByVal a As Integer, ByVal b As Integer) As Integer Implements IComparer(Of Integer).Compare
-            If a <= b Then Return 1
-            Return -1
-        End Function
-    End Class
-    Public Class compareAllowIdenticalIntegerInverted : Implements IComparer(Of Integer)
-        Public Function Compare(ByVal a As Integer, ByVal b As Integer) As Integer Implements IComparer(Of Integer).Compare
-            ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
-            If a <= b Then Return 1
-            Return -1
-        End Function
-    End Class
-    Public Class compareAllowIdenticalInteger : Implements IComparer(Of Integer)
-        Public Function Compare(ByVal a As Integer, ByVal b As Integer) As Integer Implements IComparer(Of Integer).Compare
-            ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
-            If a >= b Then Return 1
-            Return -1
-        End Function
-    End Class
-    Public Function findNearestPoint(detailPoint As cv.Point, viewObjects As SortedList(Of Single, viewObject)) As Integer
-        Dim minIndex As Integer
-        Dim minDistance As Single = Single.MaxValue
-        For i = 0 To viewObjects.Count - 1
-            Dim pt = viewObjects.Values(i).centroid
-            Dim distance = Math.Sqrt((detailPoint.X - pt.X) * (detailPoint.X - pt.X) + (detailPoint.Y - pt.Y) * (detailPoint.Y - pt.Y))
-            If distance < minDistance Then
-                minIndex = i
-                minDistance = distance
-            End If
-        Next
-        Return minIndex
-    End Function
-    Public Function findNearestCentroid(detailPoint As cv.Point, centroids As List(Of cv.Point)) As Integer
-        Dim minIndex As Integer
-        Dim minDistance As Single = Single.MaxValue
-        For i = 0 To centroids.Count - 1
-            Dim pt = centroids.ElementAt(i)
-            Dim distance = Math.Sqrt((detailPoint.X - pt.X) * (detailPoint.X - pt.X) + (detailPoint.Y - pt.Y) * (detailPoint.Y - pt.Y))
-            If distance < minDistance Then
-                minIndex = i
-                minDistance = distance
-            End If
-        Next
-        Return minIndex
-    End Function
-End Module
-
-
-
-
-
-
-
 Public Class PointCloud_Basics : Inherits VBparent
+    Public detailText As String
+    Public backMat As New cv.Mat
+    Public backMatMask As New cv.Mat
+    Public vwTop As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
+    Public vwSide As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
+    Public topPixel As New Histogram_TopView2D
+    Public sidePixel As New Histogram_SideView2D
+    Dim setupSide As New PointCloud_SetupSide
+    Dim setupTop As New PointCloud_SetupTop
     Public Sub New()
-        task.desc = "Display the point cloud in a 2D image for use with the PixelViewer"
+        backMat = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC3)
+        backMatMask = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
+
+        task.desc = "Find the actual width in pixels for the objects detected in the top view"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dst1 = task.pointCloud
+        Static xRotateSlider = findSlider("Amount to rotate pointcloud around X-axis (degrees)")
+        Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
+
+        topPixel.Run(src)
+        sidePixel.Run(src)
+
+        If standalone Or task.intermediateReview = caller Then
+            Dim instructions = "Click any centroid to get details"
+            Dim accMsg1 = "TopView - distances are accurate"
+            Dim accMsg2 = "SideView - distances are accurate"
+            If xRotateSlider.Value <> 0 Or zRotateSlider.Value <> 0 Then
+                If task.cameraLevel Then
+                    accMsg1 = "Distances are good - camera is level"
+                    accMsg2 = "Distances are good - camera is level"
+                Else
+                    accMsg1 = "Camera NOT level - distances approximate"
+                    accMsg2 = "Camera NOT level - distances approximate"
+                End If
+            End If
+
+            Dim pad = CInt(src.Width / 15)
+            task.trueText(accMsg1 + vbCrLf + instructions, 10, src.Height - pad)
+            task.trueText(accMsg2 + vbCrLf + instructions, 10, src.Height - pad, 3)
+        End If
+
+        'Static minDepth As Single, maxDepth As Single
+        'vwTop = topPixel.viewObjects
+        'vwSide = sidePixel.viewObjects
+        'Dim roi = New cv.Rect(0, 0, dst1.Width, dst1.Height)
+        'Dim minIndex As Integer
+        'Dim detailPoint As cv.Point
+        'Dim vw As New SortedList(Of Single, viewObject)
+        'Dim topActive = If(standalone, True, (quadrantIndex = QUAD0 Or quadrantIndex = QUAD2))
+        'Dim sideActive = If(standalone, True, (quadrantIndex = QUAD1 Or quadrantIndex = QUAD3))
+
+        'Dim widthInfo As String = ""
+        'If vwTop.Count And topActive Then
+        '    minIndex = findNearestPoint(task.mouseClickPoint, vwTop)
+        '    Dim rView = vwTop.Values(minIndex).rectInHist
+        '    detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y))
+        '    Dim rFront = vwTop.Values(minIndex).rectFront
+
+        '    minDepth = task.maxZ * (task.topCameraPoint.Y - rView.Y - rView.Height) / src.Height
+        '    maxDepth = task.maxZ * (task.topCameraPoint.Y - rView.Y) / src.Height
+        '    widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Width / task.pixelsPerMeter, "0.0") + "m"
+        '    detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m" + widthInfo
+
+        '    roi = New cv.Rect(rFront.X, 0, rFront.Width, src.Height)
+        '    vw = vwTop
+        '    If showDetails Then
+        '        task.trueText(detailText, detailPoint.X, detailPoint.Y, picTag:=If(standalone, 2, 3))
+        '        If standalone Or task.intermediateReview = caller Then label1 = "Clicked: " + detailText Else label2 = "Clicked: " + detailText
+        '    End If
+        'End If
+
+        'If vwSide.Count And sideActive Then
+        '    minIndex = findNearestPoint(task.mouseClickPoint, vwSide)
+        '    Dim rView = vwSide.Values(minIndex).rectInHist
+        '    detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y - 15))
+        '    Dim rFront = vwSide.Values(minIndex).rectFront
+        '    minDepth = task.maxZ * (rView.X - task.sideCameraPoint.X) / src.Height
+        '    maxDepth = task.maxZ * (rView.X + rView.Width - task.sideCameraPoint.X) / src.Height
+
+        '    widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Height / task.pixelsPerMeter, "0.0") + "m"
+        '    detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m " + widthInfo
+
+        '    roi = New cv.Rect(0, rFront.Y, src.Width, rFront.Y + rFront.Height)
+        '    vw = vwSide
+        '    If showDetails Then
+        '        task.trueText(detailText, detailPoint.X, detailPoint.Y, 3)
+        '        label2 = "Clicked: " + detailText
+        '    End If
+        'End If
+
+        'If vw.Count > 0 Then
+        '    If roi.X + roi.Width > task.depth32f.Width Then roi.Width = task.depth32f.Width - roi.X
+        '    If roi.Y + roi.Height > task.depth32f.Height Then roi.Height = task.depth32f.Height - roi.Y
+        '    If roi.Width > 0 And roi.Height > 0 Then
+        '        backMatMask.SetTo(0)
+        '        cv.Cv2.InRange(task.depth32f(roi), cv.Scalar.All(minDepth * 1000), cv.Scalar.All(maxDepth * 1000), backMatMask(roi))
+
+        '        backMat.SetTo(0)
+        '        backMat(roi).SetTo(vw.Values(minIndex).LayoutColor, backMatMask(roi))
+        '    End If
+        'End If
+
+        setupSide.Run(sidePixel.dst1)
+        dst1 = setupSide.dst1
+
+        setupTop.Run(topPixel.dst1)
+        dst2 = setupTop.dst1
     End Sub
 End Class
+
+
+
+
+
+
+
+
 
 
 
@@ -229,6 +239,105 @@ Public Class PointCloud_Continuous_VB : Inherits VBparent
     End Sub
 End Class
 
+
+
+
+
+
+
+Module PointCloud
+    ' for performance we are putting this in an optimized C++ interface to the Kinect camera for convenience...
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function SimpleProjectionRun(cPtr As IntPtr, depth As IntPtr, desiredMin As Single, desiredMax As Single, rows As Integer, cols As Integer) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function SimpleProjectionSide(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function SimpleProjectionOpen() As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub SimpleProjectionClose(cPtr As IntPtr)
+    End Sub
+
+
+
+
+
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Project_GravityHist_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub Project_GravityHist_Close(cPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Project_GravityHist_Side(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Project_GravityHist_Run(cPtr As IntPtr, xyzPtr As IntPtr, maxZ As Single, rows As Integer, cols As Integer) As IntPtr
+    End Function
+
+    Public Class compareAllowIdenticalSingleInverted : Implements IComparer(Of Single)
+        Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
+            ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
+            If a <= b Then Return 1
+            Return -1
+        End Function
+    End Class
+    Public Class compareAllowIdenticalSingle : Implements IComparer(Of Single)
+        Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
+            ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
+            If a <= b Then Return 1
+            Return -1
+        End Function
+    End Class
+    Public Class CompareMaskSize : Implements IComparer(Of Integer)
+        Public Function Compare(ByVal a As Integer, ByVal b As Integer) As Integer Implements IComparer(Of Integer).Compare
+            If a <= b Then Return 1
+            Return -1
+        End Function
+    End Class
+    Public Class compareAllowIdenticalIntegerInverted : Implements IComparer(Of Integer)
+        Public Function Compare(ByVal a As Integer, ByVal b As Integer) As Integer Implements IComparer(Of Integer).Compare
+            ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
+            If a <= b Then Return 1
+            Return -1
+        End Function
+    End Class
+    Public Class compareAllowIdenticalInteger : Implements IComparer(Of Integer)
+        Public Function Compare(ByVal a As Integer, ByVal b As Integer) As Integer Implements IComparer(Of Integer).Compare
+            ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
+            If a >= b Then Return 1
+            Return -1
+        End Function
+    End Class
+    Public Function findNearestPoint(detailPoint As cv.Point, viewObjects As SortedList(Of Single, viewObject)) As Integer
+        Dim minIndex As Integer
+        Dim minDistance As Single = Single.MaxValue
+        For i = 0 To viewObjects.Count - 1
+            Dim pt = viewObjects.Values(i).centroid
+            Dim distance = Math.Sqrt((detailPoint.X - pt.X) * (detailPoint.X - pt.X) + (detailPoint.Y - pt.Y) * (detailPoint.Y - pt.Y))
+            If distance < minDistance Then
+                minIndex = i
+                minDistance = distance
+            End If
+        Next
+        Return minIndex
+    End Function
+    Public Function findNearestCentroid(detailPoint As cv.Point, centroids As List(Of cv.Point)) As Integer
+        Dim minIndex As Integer
+        Dim minDistance As Single = Single.MaxValue
+        For i = 0 To centroids.Count - 1
+            Dim pt = centroids.ElementAt(i)
+            Dim distance = Math.Sqrt((detailPoint.X - pt.X) * (detailPoint.X - pt.X) + (detailPoint.Y - pt.Y) * (detailPoint.Y - pt.Y))
+            If distance < minDistance Then
+                minIndex = i
+                minDistance = distance
+            End If
+        Next
+        Return minIndex
+    End Function
+End Module
 
 
 
@@ -574,7 +683,7 @@ End Class
 
 
 Public Class PointCloud_BackProject : Inherits VBparent
-    Dim both As New PointCloud_BothViews
+    Dim both As New PointCloud_Basics
     Dim mats As New Mat_4to1
     Public Sub New()
         label1 = "Click any quadrant below to enlarge it"
@@ -948,128 +1057,6 @@ End Class
 
 
 
-
-
-Public Class PointCloud_BothViews : Inherits VBparent
-    Public topPixel As New PointCloud_ObjectsTop
-    Public sidePixel As New PointCloud_ObjectsSide
-    Public detailText As String
-    Public backMat As New cv.Mat
-    Public backMatMask As New cv.Mat
-    Public vwTop As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Public vwSide As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
-    Dim setupSide As New PointCloud_SetupSide
-    Dim setupTop As New PointCloud_SetupTop
-    Public Sub New()
-        backMat = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC3)
-        backMatMask = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
-
-        task.desc = "Find the actual width in pixels for the objects detected in the top view"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static xRotateSlider = findSlider("Amount to rotate pointcloud around X-axis (degrees)")
-        Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
-        Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
-        Dim showDetails = showRectanglesCheck.checked
-
-        topPixel.Run(src)
-        sidePixel.Run(src)
-
-        If standalone Or task.intermediateReview = caller Then
-            Dim instructions = "Click any centroid to get details"
-            Dim accMsg1 = "TopView - distances are accurate"
-            Dim accMsg2 = "SideView - distances are accurate"
-            If xRotateSlider.Value <> 0 Or zRotateSlider.Value <> 0 Then
-                If task.cameraLevel Then
-                    accMsg1 = "Distances are good - camera is level"
-                    accMsg2 = "Distances are good - camera is level"
-                Else
-                    accMsg1 = "Camera NOT level - distances approximate"
-                    accMsg2 = "Camera NOT level - distances approximate"
-                End If
-            End If
-
-            Dim pad = CInt(src.Width / 15)
-            task.trueText(accMsg1 + vbCrLf + instructions, 10, src.Height - pad)
-            task.trueText(accMsg2 + vbCrLf + instructions, 10, src.Height - pad, 3)
-        End If
-
-        Static minDepth As Single, maxDepth As Single
-        vwTop = topPixel.viewObjects
-        vwSide = sidePixel.viewObjects
-        Dim roi = New cv.Rect(0, 0, dst1.Width, dst1.Height)
-        Dim minIndex As Integer
-        Dim detailPoint As cv.Point
-        Dim vw As New SortedList(Of Single, viewObject)
-        Dim topActive = If(standalone, True, (quadrantIndex = QUAD0 Or quadrantIndex = QUAD2))
-        Dim sideActive = If(standalone, True, (quadrantIndex = QUAD1 Or quadrantIndex = QUAD3))
-
-        Dim widthInfo As String = ""
-        If vwTop.Count And topActive Then
-            minIndex = findNearestPoint(task.mouseClickPoint, vwTop)
-            Dim rView = vwTop.Values(minIndex).rectInHist
-            detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y))
-            Dim rFront = vwTop.Values(minIndex).rectFront
-
-            minDepth = task.maxZ * (task.topCameraPoint.Y - rView.Y - rView.Height) / src.Height
-            maxDepth = task.maxZ * (task.topCameraPoint.Y - rView.Y) / src.Height
-            widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Width / task.pixelsPerMeter, "0.0") + "m"
-            detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m" + widthInfo
-
-            roi = New cv.Rect(rFront.X, 0, rFront.Width, src.Height)
-            vw = vwTop
-            If showDetails Then
-                task.trueText(detailText, detailPoint.X, detailPoint.Y, picTag:=If(standalone, 2, 3))
-                If standalone Or task.intermediateReview = caller Then label1 = "Clicked: " + detailText Else label2 = "Clicked: " + detailText
-            End If
-        End If
-
-        If vwSide.Count And sideActive Then
-            minIndex = findNearestPoint(task.mouseClickPoint, vwSide)
-            Dim rView = vwSide.Values(minIndex).rectInHist
-            detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y - 15))
-            Dim rFront = vwSide.Values(minIndex).rectFront
-            minDepth = task.maxZ * (rView.X - task.sideCameraPoint.X) / src.Height
-            maxDepth = task.maxZ * (rView.X + rView.Width - task.sideCameraPoint.X) / src.Height
-
-            widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Height / task.pixelsPerMeter, "0.0") + "m"
-            detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m " + widthInfo
-
-            roi = New cv.Rect(0, rFront.Y, src.Width, rFront.Y + rFront.Height)
-            vw = vwSide
-            If showDetails Then
-                task.trueText(detailText, detailPoint.X, detailPoint.Y, 3)
-                label2 = "Clicked: " + detailText
-            End If
-        End If
-
-        If vw.Count > 0 Then
-            If roi.X + roi.Width > task.depth32f.Width Then roi.Width = task.depth32f.Width - roi.X
-            If roi.Y + roi.Height > task.depth32f.Height Then roi.Height = task.depth32f.Height - roi.Y
-            If roi.Width > 0 And roi.Height > 0 Then
-                backMatMask.SetTo(0)
-                cv.Cv2.InRange(task.depth32f(roi), cv.Scalar.All(minDepth * 1000), cv.Scalar.All(maxDepth * 1000), backMatMask(roi))
-
-                backMat.SetTo(0)
-                backMat(roi).SetTo(vw.Values(minIndex).LayoutColor, backMatMask(roi))
-            End If
-        End If
-
-        setupSide.Run(sidePixel.dst1)
-        dst1 = setupSide.dst1
-
-        setupTop.Run(topPixel.dst1)
-        dst2 = setupTop.dst1
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class PointCloud_BackProjectTopView : Inherits VBparent
     Dim view As New PointCloud_ObjectsTop
     Public Sub New()
@@ -1234,5 +1221,141 @@ Public Class PointCloud_SingletonRegions : Inherits VBparent
         Dim mask = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
         dilate.Run(dst2.Clone)
         dst1 = dilate.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class PointCloud_BothViews : Inherits VBparent
+    Public topPixel As New PointCloud_ObjectsTop
+    Public sidePixel As New PointCloud_ObjectsSide
+    Public detailText As String
+    Public backMat As New cv.Mat
+    Public backMatMask As New cv.Mat
+    Public vwTop As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
+    Public vwSide As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
+    Dim setupSide As New PointCloud_SetupSide
+    Dim setupTop As New PointCloud_SetupTop
+    Public Sub New()
+        backMat = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC3)
+        backMatMask = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
+
+        task.desc = "Find the actual width in pixels for the objects detected in the top view"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static xRotateSlider = findSlider("Amount to rotate pointcloud around X-axis (degrees)")
+        Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
+        Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
+        Dim showDetails = showRectanglesCheck.checked
+
+        topPixel.Run(src)
+        sidePixel.Run(src)
+
+        If standalone Or task.intermediateReview = caller Then
+            Dim instructions = "Click any centroid to get details"
+            Dim accMsg1 = "TopView - distances are accurate"
+            Dim accMsg2 = "SideView - distances are accurate"
+            If xRotateSlider.Value <> 0 Or zRotateSlider.Value <> 0 Then
+                If task.cameraLevel Then
+                    accMsg1 = "Distances are good - camera is level"
+                    accMsg2 = "Distances are good - camera is level"
+                Else
+                    accMsg1 = "Camera NOT level - distances approximate"
+                    accMsg2 = "Camera NOT level - distances approximate"
+                End If
+            End If
+
+            Dim pad = CInt(src.Width / 15)
+            task.trueText(accMsg1 + vbCrLf + instructions, 10, src.Height - pad)
+            task.trueText(accMsg2 + vbCrLf + instructions, 10, src.Height - pad, 3)
+        End If
+
+        Static minDepth As Single, maxDepth As Single
+        vwTop = topPixel.viewObjects
+        vwSide = sidePixel.viewObjects
+        Dim roi = New cv.Rect(0, 0, dst1.Width, dst1.Height)
+        Dim minIndex As Integer
+        Dim detailPoint As cv.Point
+        Dim vw As New SortedList(Of Single, viewObject)
+        Dim topActive = If(standalone, True, (quadrantIndex = QUAD0 Or quadrantIndex = QUAD2))
+        Dim sideActive = If(standalone, True, (quadrantIndex = QUAD1 Or quadrantIndex = QUAD3))
+
+        Dim widthInfo As String = ""
+        If vwTop.Count And topActive Then
+            minIndex = findNearestPoint(task.mouseClickPoint, vwTop)
+            Dim rView = vwTop.Values(minIndex).rectInHist
+            detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y))
+            Dim rFront = vwTop.Values(minIndex).rectFront
+
+            minDepth = task.maxZ * (task.topCameraPoint.Y - rView.Y - rView.Height) / src.Height
+            maxDepth = task.maxZ * (task.topCameraPoint.Y - rView.Y) / src.Height
+            widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Width / task.pixelsPerMeter, "0.0") + "m"
+            detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m" + widthInfo
+
+            roi = New cv.Rect(rFront.X, 0, rFront.Width, src.Height)
+            vw = vwTop
+            If showDetails Then
+                task.trueText(detailText, detailPoint.X, detailPoint.Y, picTag:=If(standalone, 2, 3))
+                If standalone Or task.intermediateReview = caller Then label1 = "Clicked: " + detailText Else label2 = "Clicked: " + detailText
+            End If
+        End If
+
+        If vwSide.Count And sideActive Then
+            minIndex = findNearestPoint(task.mouseClickPoint, vwSide)
+            Dim rView = vwSide.Values(minIndex).rectInHist
+            detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y - 15))
+            Dim rFront = vwSide.Values(minIndex).rectFront
+            minDepth = task.maxZ * (rView.X - task.sideCameraPoint.X) / src.Height
+            maxDepth = task.maxZ * (rView.X + rView.Width - task.sideCameraPoint.X) / src.Height
+
+            widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Height / task.pixelsPerMeter, "0.0") + "m"
+            detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m " + widthInfo
+
+            roi = New cv.Rect(0, rFront.Y, src.Width, rFront.Y + rFront.Height)
+            vw = vwSide
+            If showDetails Then
+                task.trueText(detailText, detailPoint.X, detailPoint.Y, 3)
+                label2 = "Clicked: " + detailText
+            End If
+        End If
+
+        If vw.Count > 0 Then
+            If roi.X + roi.Width > task.depth32f.Width Then roi.Width = task.depth32f.Width - roi.X
+            If roi.Y + roi.Height > task.depth32f.Height Then roi.Height = task.depth32f.Height - roi.Y
+            If roi.Width > 0 And roi.Height > 0 Then
+                backMatMask.SetTo(0)
+                cv.Cv2.InRange(task.depth32f(roi), cv.Scalar.All(minDepth * 1000), cv.Scalar.All(maxDepth * 1000), backMatMask(roi))
+
+                backMat.SetTo(0)
+                backMat(roi).SetTo(vw.Values(minIndex).LayoutColor, backMatMask(roi))
+            End If
+        End If
+
+        setupSide.Run(sidePixel.dst1)
+        dst1 = setupSide.dst1
+
+        setupTop.Run(topPixel.dst1)
+        dst2 = setupTop.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_TimeView : Inherits VBparent
+    Dim tView As New TimeView_Basics
+    Public Sub New()
+        task.desc = "Time View input instead of latest point cloud"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        tView.Run(src)
+        dst1 = tView.dst1
+        dst2 = tView.dst2
     End Sub
 End Class
