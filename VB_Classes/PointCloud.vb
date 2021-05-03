@@ -1044,56 +1044,56 @@ End Class
 
 
 
-Public Class PointCloud_BackProjectSideView : Inherits VBparent
-    Dim view As New PointCloud_ObjectsSide
-    Dim setupSide As New PointCloud_SetupSide
-    Public Sub New()
-        task.desc = "Display only the side view of the depth data - with and without the IMU active"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        view.Run(src)
-        setupSide.Run(view.dst1)
-        dst2 = setupSide.dst1
+'Public Class PointCloud_BackProjectSideView : Inherits VBparent
+'    Dim view As New PointCloud_ObjectsSide
+'    Dim setupSide As New PointCloud_SetupSide
+'    Public Sub New()
+'        task.desc = "Display only the side view of the depth data - with and without the IMU active"
+'    End Sub
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
+'        view.Run(src)
+'        setupSide.Run(view.dst1)
+'        dst2 = setupSide.dst1
 
-        Dim rectList = New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
-        For Each obj In view.viewObjects
-            rectList.Add(obj.Value.rectInHist.Y + obj.Value.rectInHist.Height, obj.Value.rectInHist)
-        Next
+'        Dim rectList = New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
+'        For Each obj In view.viewObjects
+'            rectList.Add(obj.Value.rectInHist.Y + obj.Value.rectInHist.Height, obj.Value.rectInHist)
+'        Next
 
-        If rectList.Count > 0 Then
-            Dim colorBump = CInt(255 / rectList.Count)
+'        If rectList.Count > 0 Then
+'            Dim colorBump = CInt(255 / rectList.Count)
 
-            Dim split = view.measureSide.sideView.gCloud.dst1.Split()
-            Dim colorMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            dst1 = src
-            For i = 0 To rectList.Count - 1
-                Dim r = rectList.ElementAt(i).Value
-                If r.Width > 0 And r.Height > 0 Then
-                    Dim minDepth = task.maxZ * r.X / dst2.Width
-                    Dim maxDepth = task.maxZ * (r.X + r.Width) / dst2.Width
+'            Dim split = view.measureSide.sideView.gCloud.dst1.Split()
+'            Dim colorMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+'            dst1 = src
+'            For i = 0 To rectList.Count - 1
+'                Dim r = rectList.ElementAt(i).Value
+'                If r.Width > 0 And r.Height > 0 Then
+'                    Dim minDepth = task.maxZ * r.X / dst2.Width
+'                    Dim maxDepth = task.maxZ * (r.X + r.Width) / dst2.Width
 
-                    Dim minHeight = task.maxZ - task.maxZ * (r.Y + r.Height) / dst2.Height - task.maxY
-                    Dim maxHeight = task.maxZ - task.maxZ * r.Y / dst2.Height - task.maxY
+'                    Dim minHeight = task.maxZ - task.maxZ * (r.Y + r.Height) / dst2.Height - task.maxY
+'                    Dim maxHeight = task.maxZ - task.maxZ * r.Y / dst2.Height - task.maxY
 
-                    Dim mask32f = New cv.Mat
+'                    Dim mask32f = New cv.Mat
 
-                    cv.Cv2.InRange(split(2), minDepth, maxDepth, mask32f)
-                    Dim mask = mask32f.Threshold(0, 255, cv.ThresholdTypes.Binary)
+'                    cv.Cv2.InRange(split(2), minDepth, maxDepth, mask32f)
+'                    Dim mask = mask32f.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-                    cv.Cv2.InRange(split(1), minHeight, maxHeight, mask32f)
-                    Dim hMask = mask32f.Threshold(0, 255, cv.ThresholdTypes.Binary)
-                    cv.Cv2.BitwiseAnd(mask, hMask, mask)
+'                    cv.Cv2.InRange(split(1), minHeight, maxHeight, mask32f)
+'                    Dim hMask = mask32f.Threshold(0, 255, cv.ThresholdTypes.Binary)
+'                    cv.Cv2.BitwiseAnd(mask, hMask, mask)
 
-                    colorMask.SetTo((i * colorBump) Mod 255, mask)
-                End If
-            Next
-            task.palette.Run(colorMask)
-            dst1 = task.palette.dst1
-        Else
-            task.trueText("No objects found")
-        End If
-    End Sub
-End Class
+'                    colorMask.SetTo((i * colorBump) Mod 255, mask)
+'                End If
+'            Next
+'            task.palette.Run(colorMask)
+'            dst1 = task.palette.dst1
+'        Else
+'            task.trueText("No objects found")
+'        End If
+'    End Sub
+'End Class
 
 
 
@@ -1199,8 +1199,8 @@ Public Class PointCloud_BothViews : Inherits VBparent
         End If
 
         Static minDepth As Single, maxDepth As Single
-        vwTop = views.pTrackTop.drawRC.viewObjects
-        vwSide = views.pTrackSide.drawRC.viewObjects
+        vwTop = views.topView.pTrack.drawRC.viewObjects
+        vwSide = views.sideView.pTrack.drawRC.viewObjects
         Dim roi = New cv.Rect(0, 0, dst1.Width, dst1.Height)
         Dim minIndex As Integer
         Dim detailPoint As cv.Point
@@ -1295,31 +1295,28 @@ End Class
 Public Class PointCloud_Kalman_TopView : Inherits VBparent
     Public pTrack As New KNN_PointTracker
     Public flood As New FloodFill_Palette
-    Public topView As New PointCloud_TimeView
+    Public timeView As New PointCloud_TimeView
     Public setupTop As New PointCloud_SetupTop
     Public Sub New()
         findSlider("FloodFill Minimum Size").Value = 100
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 3
-        topView.Run(src)
-
-        flood.Run(topView.dst2.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255))
+        If standalone Or task.intermediateReview = caller Then
+            timeView.Run(src)
+            src = timeView.dst2
+        End If
+        flood.Run(src.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255))
 
         If flood.dst1.Channels = 3 Then src = flood.dst1 Else src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        If pTrack IsNot Nothing Then
-            pTrack.queryPoints = New List(Of cv.Point2f)(flood.basics.centroids)
-            pTrack.queryRects = New List(Of cv.Rect)(flood.basics.rects)
-            pTrack.queryMasks = New List(Of cv.Mat)(flood.basics.masks)
-            pTrack.Run(src)
-            dst2 = pTrack.dst1
-        End If
+        pTrack.queryPoints = New List(Of cv.Point2f)(flood.basics.centroids)
+        pTrack.queryRects = New List(Of cv.Rect)(flood.basics.rects)
+        pTrack.queryMasks = New List(Of cv.Mat)(flood.basics.masks)
+        pTrack.Run(src)
 
-        If standalone Or task.intermediateReview = caller Then
-            setupTop.Run(dst2)
-            dst2 = setupTop.dst1
-        End If
-        label1 = Format(task.pixelsPerMeter, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
+        setupTop.Run(pTrack.dst1)
+        dst1 = setupTop.dst1
+        label1 = Format(dst1.Height / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
     End Sub
 End Class
 
@@ -1329,52 +1326,21 @@ End Class
 
 
 Public Class PointCloud_Tracker : Inherits VBparent
-    Public pTrackTop As New KNN_PointTracker
-    Public pTrackSide As New KNN_PointTracker
-    Public flood As New FloodFill_Palette
-    Public timeView As New PointCloud_TimeView
-    Public setupTop As New PointCloud_SetupTop
-    Public setupSide As New PointCloud_SetupSide
+    Public topView As New PointCloud_Kalman_TopView
+    Public sideView As New PointCloud_Kalman_SideView
     Public Sub New()
         findSlider("FloodFill Minimum Size").Value = 100
         findSlider("Amount to rotate pointcloud around Y-axis (degrees)").Value = 1
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 3
-        timeView.Run(src)
-
-        flood.Run(timeView.dst1.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255))
-
-        If flood.dst1.Channels = 3 Then src = flood.dst1 Else src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        If pTrackSide IsNot Nothing Then
-            pTrackSide.queryPoints = New List(Of cv.Point2f)(flood.basics.centroids)
-            pTrackSide.queryRects = New List(Of cv.Rect)(flood.basics.rects)
-            pTrackSide.queryMasks = New List(Of cv.Mat)(flood.basics.masks)
-            pTrackSide.Run(src)
-            dst1 = pTrackSide.dst1
-        End If
-
-        If standalone Or task.intermediateReview = caller Then
-            setupSide.Run(dst1)
-            dst1 = setupSide.dst1
-        End If
+        sideView.timeView.Run(src)
+        sideView.Run(sideView.timeView.dst1)
+        dst1 = sideView.dst1
         label1 = Format(dst1.Width / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
 
-        flood.Run(timeView.dst2.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255))
-
-        If flood.dst1.Channels = 3 Then src = flood.dst1 Else src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        If pTrackTop IsNot Nothing Then
-            pTrackTop.queryPoints = New List(Of cv.Point2f)(flood.basics.centroids)
-            pTrackTop.queryRects = New List(Of cv.Rect)(flood.basics.rects)
-            pTrackTop.queryMasks = New List(Of cv.Mat)(flood.basics.masks)
-            pTrackTop.Run(src)
-            dst2 = pTrackTop.dst1
-        End If
-
-        If standalone Or task.intermediateReview = caller Then
-            setupTop.Run(dst2)
-            dst2 = setupTop.dst1
-        End If
+        topView.Run(sideView.timeView.dst2)
+        dst2 = topView.dst1
         label2 = Format(dst1.Height / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
     End Sub
 End Class
@@ -1385,31 +1351,30 @@ End Class
 
 
 Public Class PointCloud_Kalman_SideView : Inherits VBparent
-    Public flood As New Floodfill_Identifiers
-    Public sideView As New Histogram_SideView2D
     Public pTrack As New KNN_PointTracker
+    Public flood As New FloodFill_Palette
+    Public timeView As New PointCloud_TimeView
     Public setupSide As New PointCloud_SetupSide
     Public Sub New()
         findSlider("FloodFill Minimum Size").Value = 100
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 3
-        sideView.Run(src)
-
-        flood.Run(sideView.histOutput.ConvertScaleAbs(255))
-
-        pTrack.queryPoints = New List(Of cv.Point2f)(flood.centroids)
-        pTrack.queryRects = New List(Of cv.Rect)(flood.rects)
-        pTrack.queryMasks = New List(Of cv.Mat)(flood.masks)
-        pTrack.Run(flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
-        dst1 = pTrack.dst1
-
         If standalone Or task.intermediateReview = caller Then
-            setupSide.Run(dst1)
-            dst1 = setupSide.dst1
+            timeView.Run(src)
+            src = timeView.dst1
         End If
 
-        Dim FOV = (180 - task.vFov) / 2
-        label1 = Format(task.pixelsPerMeter, "0") + " pixels per meter at " + Format(task.maxZ, "0.0") + " meters"
+        flood.Run(src.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255))
+
+        If flood.dst1.Channels = 3 Then src = flood.dst1 Else src = flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        pTrack.queryPoints = New List(Of cv.Point2f)(flood.basics.centroids)
+        pTrack.queryRects = New List(Of cv.Rect)(flood.basics.rects)
+        pTrack.queryMasks = New List(Of cv.Mat)(flood.basics.masks)
+        pTrack.Run(src)
+
+        setupSide.Run(pTrack.dst1)
+        dst1 = setupSide.dst1
+        label1 = Format(dst1.Width / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
     End Sub
 End Class

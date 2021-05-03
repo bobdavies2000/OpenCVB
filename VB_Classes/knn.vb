@@ -810,7 +810,7 @@ Public Class KNN_PointTracker : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static pixelSlider = findSlider("Minimum size of object in pixels")
         Static drawRCCheck = findCheckBox("Caller will handle any drawing required")
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Then
             task.trueText("KNN_PointTracker running standalone has no output.")
             Exit Sub
         End If
