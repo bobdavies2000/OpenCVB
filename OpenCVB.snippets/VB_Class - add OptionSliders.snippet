@@ -7,8 +7,7 @@
         <Snippet>
             <Code Language="VB">
                 <![CDATA[
-        If findfrm(caller + " Slider Options") Is Nothing Then
-            sliders.Setup(caller)
+        If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "FirstSlider", 0, 100, 50)
         End If
         'static firstSlider = findSlider("FirstSlider")

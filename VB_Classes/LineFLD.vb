@@ -11,7 +11,7 @@ Public Class LineFLD_Basics : Inherits VBparent
     Public mergeCheckBox As Windows.Forms.CheckBox
     Public Sub New()
 
-        If sliders.Setup(caller) Then
+        If sliders.Setup(caller, 5) Then
             sliders.setupTrackBar(0, "FLD - Min Length", 1, 200, 30)
             sliders.setupTrackBar(1, "FLD - max distance", 1, 100, 14)
             sliders.setupTrackBar(2, "FLD - Canny Aperture", 3, 7, 7)
