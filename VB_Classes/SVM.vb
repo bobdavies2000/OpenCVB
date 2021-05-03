@@ -26,9 +26,8 @@ Public Class SVM_Options : Inherits VBparent
             radio.check(2).Checked = True
             radio.check(3).Text = "kernel Type = Sigmoid (not working)"
             radio.check(3).Enabled = False
-        End If
 
-        If radio1.Setup(caller + " Type", 5) Then
+            radio1.Setup(caller + " Type", 5)
             radio1.check(0).Text = "SVM Type = CSvc"
             radio1.check(0).Checked = True
             radio1.check(1).Text = "SVM Type = EpsSvr"

@@ -15,9 +15,8 @@ Public Class Contours_Basics : Inherits VBparent
             radio.check(3).Text = "List"
             radio.check(4).Text = "Tree"
             radio.check(2).Checked = True
-        End If
 
-        If radio1.Setup(caller + " ContourApproximation Mode", 4) Then
+            radio1.Setup(caller + " ContourApproximation Mode", 4)
             radio1.check(0).Text = "ApproxNone"
             radio1.check(1).Text = "ApproxSimple"
             radio1.check(2).Text = "ApproxTC89KCOS"

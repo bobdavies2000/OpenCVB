@@ -76,6 +76,7 @@ End Class
 Public Class CamShift_Foreground : Inherits VBparent
     Dim camshift As New CamShift_Basics
     Dim fore As New Depth_Foreground
+    Dim flood As New FloodFill_Basics
     Public Sub New()
         label1 = "Draw anywhere to start Camshift"
         label2 = "The foreground RGB from depth data"
@@ -83,10 +84,17 @@ Public Class CamShift_Foreground : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         fore.Run(src)
-        dst2.SetTo(0)
-        src.CopyTo(dst2, fore.dst2)
-        camshift.Run(dst2)
-        dst1 = camshift.dst1
+        flood.Run(fore.dst2)
+        If flood.masks.Count > 0 Then
+            Dim index = flood.sortedSizes.ElementAt(0).Value
+            If camshift.trackBox.Size.Width > src.Width Or camshift.trackBox.Size.Height > src.Height Then
+                task.drawRect = flood.rects(index)
+            End If
+            If camshift.trackBox.Size.Width < 50 Then task.drawRect = flood.rects(index)
+            camshift.Run(src)
+            dst1 = camshift.dst1
+            dst2 = camshift.dst2
+        End If
     End Sub
 End Class
 
@@ -119,11 +127,6 @@ Public Class Camshift_Object : Inherits VBparent
             camshift.Run(src)
             dst1 = camshift.dst1
             dst2 = camshift.dst2
-            ' dst1.CopyTo(dst2, flood.masks(index))
-            'Dim mask = dst1.ConvertScaleAbs(255)
-            'cv.Cv2.BitwiseNot(mask.CvtColor(cv.ColorConversionCodes.BGR2GRAY), mask)
-            'dst2.SetTo(0, mask)
-            ' If camshift.trackBox.Size.Width > 0 Then dst2.Ellipse(camshift.trackBox, cv.Scalar.White, 2, task.lineType)
         End If
     End Sub
 End Class
@@ -133,9 +136,10 @@ End Class
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class Camshift_TopObjects : Inherits VBparent
-    Dim blob As New Blob_DepthClusters
+    Dim blob As New Blob_DepthRanges
     Dim cams(4 - 1) As CamShift_Basics
     Dim mats As New Mat_4to1
+    Dim flood As New FloodFill_Basics
     Public Sub New()
         For i = 0 To cams.Length - 1
             cams(i) = New CamShift_Basics
@@ -144,32 +148,33 @@ Public Class Camshift_TopObjects : Inherits VBparent
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Reinitialize camshift after x frames", 1, 500, 100)
         End If
-        task.desc = "Track - "
+        task.desc = "Track up to 4 objects with camshift"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static updateSlider = findSlider("Reinitialize camshift after x frames")
         blob.Run(src)
         dst1 = blob.dst2
+        flood.Run(dst1)
 
-        'Dim updateFrequency = updateSlider.Value
-        'Dim trackBoxes As New List(Of cv.RotatedRect)
-        'For i = 0 To Math.Min(cams.Length, blob.flood.sortedSizes.Count) - 1
-        '    If blob.flood.maskSizes.Count > i Then
-        '        Dim camIndex = blob.flood.sortedSizes.ElementAt(i).Value
-        '        If task.frameCount Mod updateFrequency = 0 Or cams(i).trackBox.Size.Width = 0 Then
-        '            task.drawRect = blob.flood.rects(camIndex)
-        '        End If
+        Dim updateFrequency = updateSlider.Value
+        Dim trackBoxes As New List(Of cv.RotatedRect)
+        For i = 0 To Math.Min(cams.Length, flood.sortedSizes.Count) - 1
+            If flood.maskSizes.Count > i Then
+                Dim camIndex = flood.sortedSizes.ElementAt(i).Value
+                If task.frameCount Mod updateFrequency = 0 Or cams(i).trackBox.Size.Width = 0 Then
+                    task.drawRect = flood.rects(camIndex)
+                End If
 
-        '        cams(i).Run(src)
-        '        mats.mat(i) = cams(i).dst1.Clone()
-        '        trackBoxes.Add(cams(i).trackBox)
-        '    End If
-        'Next
-        'For i = 0 To trackBoxes.Count - 1
-        '    dst1.Ellipse(trackBoxes(i), cv.Scalar.White, 2, task.lineType)
-        'Next
-        'mats.Run(Nothing)
-        'dst2 = mats.dst1
+                cams(i).Run(src)
+                mats.mat(i) = cams(i).dst1.Clone()
+                trackBoxes.Add(cams(i).trackBox)
+            End If
+        Next
+        For i = 0 To trackBoxes.Count - 1
+            dst1.Ellipse(trackBoxes(i), cv.Scalar.White, 2, task.lineType)
+        Next
+        mats.Run(Nothing)
+        dst2 = mats.dst1
     End Sub
 End Class
 

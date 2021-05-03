@@ -101,10 +101,11 @@ End Class
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class Meanshift_TopObjects : Inherits VBparent
-    Dim blob As New Blob_DepthClusters
+    Dim blob As New Blob_DepthRanges
     Dim cams(4 - 1) As MeanShift_Basics
     Dim mats1 As New Mat_4to1
     Dim mats2 As New Mat_4to1
+    Dim flood As New FloodFill_Basics
     Public Sub New()
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "How often should meanshift be reinitialized", 1, 500, 100)
@@ -113,30 +114,32 @@ Public Class Meanshift_TopObjects : Inherits VBparent
             cams(i) = New MeanShift_Basics()
             cams(i).rectangleEdgeWidth = 8
         Next
-        task.desc = "Track - tracking algorithm"
+        task.desc = "Track up to 4 objects with meanshift"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         blob.Run(src)
+        dst1 = blob.dst2
+        flood.Run(dst1)
 
-        'Dim updateFrequency = sliders.trackbar(0).Value
-        'Dim trackBoxes As New List(Of cv.Rect)
-        'For i = 0 To Math.Min(cams.Length, blob.flood.sortedSizes.Count) - 1
-        '    If blob.flood.maskSizes.Count > i Then
-        '        Dim camIndex = blob.flood.sortedSizes.ElementAt(i).Value
-        '        If task.frameCount Mod updateFrequency = 0 Or cams(i).trackbox.Size.Width = 0 Or task.frameCount < 3 Then
-        '            cams(i).inputRect = blob.flood.rects(camIndex)
-        '        End If
+        Dim updateFrequency = sliders.trackbar(0).Value
+        Dim trackBoxes As New List(Of cv.Rect)
+        For i = 0 To Math.Min(cams.Length, flood.sortedSizes.Count) - 1
+            If flood.maskSizes.Count > i Then
+                Dim camIndex = flood.sortedSizes.ElementAt(i).Value
+                If task.frameCount Mod updateFrequency = 0 Or cams(i).trackbox.Size.Width = 0 Or task.frameCount < 3 Then
+                    cams(i).inputRect = flood.rects(camIndex)
+                End If
 
-        '        cams(i).Run(src)
-        '        mats1.mat(i) = cams(i).dst1.Clone()
-        '        mats2.mat(i) = cams(i).dst2.Clone()
-        '        trackBoxes.Add(cams(i).trackbox)
-        '    End If
-        'Next
-        'mats1.Run(Nothing)
-        'dst1 = mats1.dst1
-        'mats2.Run(Nothing)
-        'dst2 = mats2.dst1
+                cams(i).Run(src)
+                mats1.mat(i) = cams(i).dst1.Clone()
+                mats2.mat(i) = cams(i).dst2.Clone()
+                trackBoxes.Add(cams(i).trackbox)
+            End If
+        Next
+        mats1.Run(Nothing)
+        dst1 = mats1.dst1
+        mats2.Run(Nothing)
+        dst2 = mats2.dst1
     End Sub
 End Class
 
