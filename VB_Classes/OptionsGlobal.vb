@@ -5,7 +5,7 @@ Public Class OptionsGlobal
     Public scheme As cv.ColormapTypes = 0
     Public schemeName As String
     Dim mapNames() As String = {"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
-                                   "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter"}
+                                "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter"}
     Private Sub MaxRange_Scroll(sender As Object, e As EventArgs) Handles MaxRange.Scroll
         maxCount.Text = CStr(MaxRange.Value)
     End Sub
@@ -18,8 +18,12 @@ Public Class OptionsGlobal
         IMUlevelSlider.Value = GetSetting("OpenCVB", "IMUlevelSlider", "IMUlevelSlider", 20)
         If task.color.Width = 640 Then
             LineThickness.Value = GetSetting("OpenCVB", "LineThickness640", "LineThickness640", 1)
+            dotSizeSlider.Value = GetSetting("OpenCVB", "dotSizeSlider640", "dotSizeSlider640", 2)
+            fontSizeSlider.Value = GetSetting("OpenCVB", "fontSizeSlider640", "fontSizeSlider640", 6)
         Else
             LineThickness.Value = GetSetting("OpenCVB", "LineThickness", "LineThickness", 2)
+            dotSizeSlider.Value = GetSetting("OpenCVB", "dotSizeSlider", "dotSizeSlider", 5)
+            fontSizeSlider.Value = GetSetting("OpenCVB", "fontSizeSlider", "fontSizeSlider", 12)
         End If
         maxCount.Text = CStr(MaxRange.Value)
         HistBinsCount.Text = CStr(HistBinSlider.Value)
@@ -27,6 +31,8 @@ Public Class OptionsGlobal
         MotionThresholdValue.Text = CStr(IMUmotionSlider.Value)
         LevelThresholdValue.Text = CStr(IMUlevelSlider.Value)
         LineThicknessAmount.Text = CStr(LineThickness.Value)
+        DotSizeLabel.Text = CStr(dotSizeSlider.Value)
+        FontSizeLabel.Text = CStr(fontSizeSlider.Value)
 
         UseKalman.Checked = GetSetting("OpenCVB", "useKalman", "useKalman", True)
         UseKalmanWhenStable.Checked = GetSetting("OpenCVB", "UseKalmanWhenStable", "UseKalmanWhenStable", False)
@@ -74,8 +80,12 @@ Public Class OptionsGlobal
         SaveSetting("OpenCVB", "DefaultPalette", "DefaultPalette", schemeName)
         If task.color.Width = 640 Then
             SaveSetting("OpenCVB", "LineThickness640", "LineThickness640", LineThickness.Value)
+            SaveSetting("OpenCVB", "dotSizeSlider640", "dotSizeSlider640", dotSizeSlider.Value)
+            SaveSetting("OpenCVB", "fontSizeSlider640", "fontSizeSlider640", fontSizeSlider.Value)
         Else
             SaveSetting("OpenCVB", "LineThickness", "LineThickness", LineThickness.Value)
+            SaveSetting("OpenCVB", "dotSizeSlider", "dotSizeSlider", dotSizeSlider.Value)
+            SaveSetting("OpenCVB", "fontSizeSlider", "fontSizeSlider", fontSizeSlider.Value)
         End If
     End Sub
     Private Sub thresholdSlider_Scroll(sender As Object, e As EventArgs) Handles HistBinSlider.Scroll
@@ -97,8 +107,12 @@ Public Class OptionsGlobal
         SaveSetting("OpenCVB", "DefaultPalette", "DefaultPalette", "Jet")
         If task.color.Width = 640 Then
             SaveSetting("OpenCVB", "LineThickness640", "LineThickness640", 1)
+            SaveSetting("OpenCVB", "dotSizeSlider640", "dotSizeSlider640", 2)
+            SaveSetting("OpenCVB", "fontSizeSlider640", "fontSizeSlider640", 6)
         Else
             SaveSetting("OpenCVB", "LineThickness", "LineThickness", 2)
+            SaveSetting("OpenCVB", "dotSizeSlider", "dotSizeSlider", 5)
+            SaveSetting("OpenCVB", "fontSizeSlider", "fontSizeSlider", 12)
         End If
         OptionsGlobal_Load(sender, e)
         resetToDefaults.Checked = False
@@ -111,5 +125,11 @@ Public Class OptionsGlobal
     End Sub
     Private Sub LineThickness_Scroll(sender As Object, e As EventArgs) Handles LineThickness.Scroll
         LineThicknessAmount.Text = CStr(LineThickness.Value)
+    End Sub
+    Private Sub dotSizeSlider_Scroll(sender As Object, e As EventArgs) Handles dotSizeSlider.Scroll
+        DotSizeLabel.Text = CStr(dotSizeSlider.Value)
+    End Sub
+    Private Sub fontSizeSlider_Scroll(sender As Object, e As EventArgs) Handles fontSizeSlider.Scroll
+        FontSizeLabel.Text = CStr(fontSizeSlider.Value)
     End Sub
 End Class

@@ -51,6 +51,12 @@ Partial Class OptionsGlobal
         Me.MotionThresholdValue = New System.Windows.Forms.Label()
         Me.IMUmotionSlider = New System.Windows.Forms.TrackBar()
         Me.Label4 = New System.Windows.Forms.Label()
+        Me.DotSizeLabel = New System.Windows.Forms.Label()
+        Me.dotSizeSlider = New System.Windows.Forms.TrackBar()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.FontSizeLabel = New System.Windows.Forms.Label()
+        Me.fontSizeSlider = New System.Windows.Forms.TrackBar()
+        Me.Label5 = New System.Windows.Forms.Label()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.MaxRange, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.HistogramSettings.SuspendLayout()
@@ -63,6 +69,8 @@ Partial Class OptionsGlobal
         Me.CameraOptions.SuspendLayout()
         CType(Me.IMUlevelSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dotSizeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.fontSizeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'MinMaxDepth
@@ -201,19 +209,25 @@ Partial Class OptionsGlobal
         Me.GroupBox2.Controls.Add(Me.UseKalman)
         Me.GroupBox2.Location = New System.Drawing.Point(854, 17)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(839, 281)
+        Me.GroupBox2.Size = New System.Drawing.Size(839, 436)
         Me.GroupBox2.TabIndex = 3
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Miscelaneous Globals"
         '
         'GeometrySettings
         '
+        Me.GeometrySettings.Controls.Add(Me.FontSizeLabel)
+        Me.GeometrySettings.Controls.Add(Me.fontSizeSlider)
+        Me.GeometrySettings.Controls.Add(Me.Label5)
+        Me.GeometrySettings.Controls.Add(Me.DotSizeLabel)
+        Me.GeometrySettings.Controls.Add(Me.dotSizeSlider)
+        Me.GeometrySettings.Controls.Add(Me.Label3)
         Me.GeometrySettings.Controls.Add(Me.LineThicknessAmount)
         Me.GeometrySettings.Controls.Add(Me.LineThickness)
         Me.GeometrySettings.Controls.Add(Me.LineSizeLabel)
         Me.GeometrySettings.Location = New System.Drawing.Point(15, 104)
         Me.GeometrySettings.Name = "GeometrySettings"
-        Me.GeometrySettings.Size = New System.Drawing.Size(816, 158)
+        Me.GeometrySettings.Size = New System.Drawing.Size(816, 254)
         Me.GeometrySettings.TabIndex = 2
         Me.GeometrySettings.TabStop = False
         Me.GeometrySettings.Text = "Geometry"
@@ -221,7 +235,7 @@ Partial Class OptionsGlobal
         'LineThicknessAmount
         '
         Me.LineThicknessAmount.AutoSize = True
-        Me.LineThicknessAmount.Location = New System.Drawing.Point(731, 32)
+        Me.LineThicknessAmount.Location = New System.Drawing.Point(714, 36)
         Me.LineThicknessAmount.Name = "LineThicknessAmount"
         Me.LineThicknessAmount.Size = New System.Drawing.Size(166, 20)
         Me.LineThicknessAmount.TabIndex = 5
@@ -242,9 +256,9 @@ Partial Class OptionsGlobal
         Me.LineSizeLabel.AutoSize = True
         Me.LineSizeLabel.Location = New System.Drawing.Point(13, 36)
         Me.LineSizeLabel.Name = "LineSizeLabel"
-        Me.LineSizeLabel.Size = New System.Drawing.Size(110, 20)
+        Me.LineSizeLabel.Size = New System.Drawing.Size(169, 20)
         Me.LineSizeLabel.TabIndex = 3
-        Me.LineSizeLabel.Text = "Line thickness"
+        Me.LineSizeLabel.Text = "Line thickness in pixels"
         '
         'UseKalmanWhenStable
         '
@@ -269,9 +283,9 @@ Partial Class OptionsGlobal
         'PaletteGroup
         '
         Me.PaletteGroup.Controls.Add(Me.FlowLayoutPanel1)
-        Me.PaletteGroup.Location = New System.Drawing.Point(854, 300)
+        Me.PaletteGroup.Location = New System.Drawing.Point(12, 459)
         Me.PaletteGroup.Name = "PaletteGroup"
-        Me.PaletteGroup.Size = New System.Drawing.Size(838, 153)
+        Me.PaletteGroup.Size = New System.Drawing.Size(829, 153)
         Me.PaletteGroup.TabIndex = 5
         Me.PaletteGroup.TabStop = False
         Me.PaletteGroup.Text = "Palette Setting"
@@ -281,7 +295,7 @@ Partial Class OptionsGlobal
         Me.FlowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(6, 25)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(826, 113)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(817, 113)
         Me.FlowLayoutPanel1.TabIndex = 5
         '
         'CameraOptions
@@ -355,6 +369,63 @@ Partial Class OptionsGlobal
         Me.Label4.Text = "Motion Threshold in IMU (radians X100)"
         Me.Label4.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
+        'DotSizeLabel
+        '
+        Me.DotSizeLabel.AutoSize = True
+        Me.DotSizeLabel.Location = New System.Drawing.Point(714, 91)
+        Me.DotSizeLabel.Name = "DotSizeLabel"
+        Me.DotSizeLabel.Size = New System.Drawing.Size(105, 20)
+        Me.DotSizeLabel.TabIndex = 8
+        Me.DotSizeLabel.Text = "DotSizeLabel"
+        '
+        'dotSizeSlider
+        '
+        Me.dotSizeSlider.Location = New System.Drawing.Point(207, 89)
+        Me.dotSizeSlider.Minimum = 1
+        Me.dotSizeSlider.Name = "dotSizeSlider"
+        Me.dotSizeSlider.Size = New System.Drawing.Size(505, 69)
+        Me.dotSizeSlider.TabIndex = 7
+        Me.dotSizeSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.dotSizeSlider.Value = 1
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(13, 94)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(129, 20)
+        Me.Label3.TabIndex = 6
+        Me.Label3.Text = "Dot Size in pixels"
+        '
+        'FontSizeLabel
+        '
+        Me.FontSizeLabel.AutoSize = True
+        Me.FontSizeLabel.Location = New System.Drawing.Point(714, 151)
+        Me.FontSizeLabel.Name = "FontSizeLabel"
+        Me.FontSizeLabel.Size = New System.Drawing.Size(112, 20)
+        Me.FontSizeLabel.TabIndex = 11
+        Me.FontSizeLabel.Text = "FontSizeLabel"
+        '
+        'fontSizeSlider
+        '
+        Me.fontSizeSlider.Location = New System.Drawing.Point(207, 155)
+        Me.fontSizeSlider.Maximum = 50
+        Me.fontSizeSlider.Minimum = 1
+        Me.fontSizeSlider.Name = "fontSizeSlider"
+        Me.fontSizeSlider.Size = New System.Drawing.Size(505, 69)
+        Me.fontSizeSlider.TabIndex = 10
+        Me.fontSizeSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.fontSizeSlider.Value = 1
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(13, 160)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(110, 20)
+        Me.Label5.TabIndex = 9
+        Me.Label5.Text = "Font Size X10"
+        '
         'OptionsGlobal
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -385,6 +456,8 @@ Partial Class OptionsGlobal
         Me.CameraOptions.PerformLayout()
         CType(Me.IMUlevelSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dotSizeSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.fontSizeSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -419,4 +492,10 @@ Partial Class OptionsGlobal
     Friend WithEvents LineThicknessAmount As Windows.Forms.Label
     Friend WithEvents LineThickness As Windows.Forms.TrackBar
     Friend WithEvents LineSizeLabel As Windows.Forms.Label
+    Friend WithEvents DotSizeLabel As Windows.Forms.Label
+    Friend WithEvents dotSizeSlider As Windows.Forms.TrackBar
+    Friend WithEvents Label3 As Windows.Forms.Label
+    Friend WithEvents FontSizeLabel As Windows.Forms.Label
+    Friend WithEvents fontSizeSlider As Windows.Forms.TrackBar
+    Friend WithEvents Label5 As Windows.Forms.Label
 End Class

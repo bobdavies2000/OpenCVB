@@ -163,7 +163,7 @@ Public Class CComp_PointTracker : Inherits VBparent
         basics.Run(src)
 
         If trackPoints Then
-            Static topView As New PointCloud_Kalman_TopView
+            Static topView As New PointCloud_TrackerTop
             dst2 = basics.dst1
             topView.pTrack.queryPoints = basics.centroids
             topView.pTrack.queryRects = basics.rects

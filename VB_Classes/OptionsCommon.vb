@@ -24,6 +24,8 @@ Public Class OptionsCommon : Inherits VBparent
         task.cameraMotionLimit = gOptions.IMUmotionSlider.Value / 100
         task.cameraLevelLimit = gOptions.IMUlevelSlider.Value / 10
         task.lineThickness = gOptions.LineThickness.Value
+        task.dotSize = gOptions.dotSizeSlider.Value
+        task.fontSize = gOptions.fontSizeSlider.Value / 10
 
         task.minDepth = 1
         task.maxDepth = gOptions.MaxRange.Value

@@ -146,6 +146,12 @@ Public Class Plot_OverTime : Inherits VBparent
             If minScale < 5 And minScale > 0 Then minScale = 0 ' nice location...
             minScale -= topBottomPad
             maxScale += topBottomPad
+
+            If minScale = 0 And maxScale = 0 Then
+                minScale = 50
+                maxScale = 200
+            End If
+
             lastXdelta.Clear()
             offChartCount = 0
             columnIndex = 0 ' restart at the left side of the chart
