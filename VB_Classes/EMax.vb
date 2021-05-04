@@ -1,5 +1,51 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Public Class EMax_Basics : Inherits VBparent
+    Dim inputDataMask As cv.Mat
+    Public basics As New EMax_Raw
+    Dim lut As New LUT_Color
+    Public Sub New()
+        label1 = "Emax regions around clusters"
+        task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        basics.Run(Nothing)
+        label1 = basics.label1
+
+        Dim regions = basics.options.regionCount
+        Dim regionCount(regions - 1, regions - 1)
+        For i = 0 To basics.options.samples.Rows - 1
+            Dim p = basics.options.samples.Get(Of cv.Point2f)(i, 0)
+            Dim pt = New cv.Point(CInt(p.X), CInt(p.Y))
+            If pt.X >= 0 And pt.Y >= 0 And pt.X < dst2.Width And pt.Y < dst2.Height Then
+                Dim label = basics.options.labels.Get(Of Integer)(i, 0)
+                Dim eGrp = basics.dst2.Get(Of Byte)(CInt(pt.Y), CInt(pt.X))
+                If eGrp < regions Then regionCount(label, eGrp) += 1
+            End If
+        Next
+
+        Dim maxCount As Integer
+        For i = 0 To regions - 1
+            maxCount = 0
+            For j = 0 To regions - 1
+                Dim index = regionCount(i, j)
+                If index Is Nothing Then Continue For
+                If maxCount < index Then
+                    maxCount = index
+                    task.palette.gradientColorMap.Set(Of cv.Vec3b)(0, j, basics.options.regionColors(i))
+                End If
+            Next
+        Next
+        task.palette.Run(basics.dst2)
+        dst1 = task.palette.dst1
+    End Sub
+End Class
+
+
+
+
+
+
 ' https://docs.opencv.org/3.0-beta/modules/ml/doc/expectation_maximization.html
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/em.cpp
 Public Class EMax_Raw : Inherits VBparent
@@ -47,52 +93,6 @@ Public Class EMax_Raw : Inherits VBparent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class EMax_Basics : Inherits VBparent
-    Dim inputDataMask As cv.Mat
-    Public basics As New EMax_Raw
-    Dim lut As New LUT_Color
-    Public Sub New()
-        label1 = "Emax regions around clusters"
-        task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        basics.Run(Nothing)
-        label1 = basics.label1
-
-        Dim regions = basics.options.regionCount
-        Dim regionCount(regions - 1, regions - 1)
-        For i = 0 To basics.options.samples.Rows - 1
-            Dim p = basics.options.samples.Get(Of cv.Point2f)(i, 0)
-            Dim pt = New cv.Point(CInt(p.X), CInt(p.Y))
-            If pt.X >= 0 And pt.Y >= 0 And pt.X < dst2.Width And pt.Y < dst2.Height Then
-                Dim label = basics.options.labels.Get(Of Integer)(i, 0)
-                Dim eGrp = basics.dst2.Get(Of Byte)(CInt(pt.Y), CInt(pt.X))
-                If eGrp < regions Then regionCount(label, eGrp) += 1
-            End If
-        Next
-
-        Dim maxCount As Integer
-        For i = 0 To regions - 1
-            maxCount = 0
-            For j = 0 To regions - 1
-                Dim index = regionCount(i, j)
-                If index Is Nothing Then Continue For
-                If maxCount < index Then
-                    maxCount = index
-                    task.palette.gradientColorMap.Set(Of cv.Vec3b)(0, j, basics.options.regionColors(i))
-                End If
-            Next
-        Next
-        task.palette.Run(basics.dst2)
-        dst1 = task.palette.dst1
-    End Sub
-End Class
 
 
 
@@ -172,7 +172,7 @@ Public Class EMax_Setup : Inherits VBparent
             For i = 0 To samples.Rows - 1
                 Dim pt = samples.Get(Of cv.Point2f)(i, 0)
                 Dim label = labels.Get(Of Integer)(i, 0)
-                dst1.Circle(pt, 4, regionColors(label), -1, task.lineType)
+                dst1.Circle(pt, task.dotSize + 2, regionColors(label), -1, task.lineType)
             Next
         End If
     End Sub
@@ -216,7 +216,7 @@ Public Class EMax_VB_Failing : Inherits VBparent
                     Dim response = Math.Round(em_model.Predict2(sample).Item1)
 
                     Dim c = task.vecColors(response)
-                    dst1.Circle(New cv.Point(j, i), 1, c, -1)
+                    dst1.Circle(New cv.Point(j, i), task.dotSize, c, -1)
                 Next
             Next
         End If
@@ -263,9 +263,9 @@ Public Class EMax_Centroids : Inherits VBparent
 
         Static lastCentroids As New List(Of cv.Point2f)
         For i = 0 To flood.centroids.Count - 1
-            dst1.Circle(flood.centroids(i), 3, cv.Scalar.White, -1, task.lineType)
+            dst1.Circle(flood.centroids(i), task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
             If i < lastCentroids.Count Then
-                dst1.Circle(lastCentroids(i), 3, cv.Scalar.Red, -1, task.lineType)
+                dst1.Circle(lastCentroids(i), task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
             End If
         Next
         lastCentroids = New List(Of cv.Point2f)(flood.centroids)

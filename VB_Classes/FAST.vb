@@ -18,7 +18,7 @@ Public Class FAST_Basics : Inherits VBparent
         keypoints = cv.Cv2.FAST(src, sliders.trackbar(0).Value, If(check.Box(0).Checked, True, False))
 
         For Each kp As cv.KeyPoint In keypoints
-            dst1.Circle(kp.Pt, 3, cv.Scalar.Red, -1, task.lineType, 0)
+            dst1.Circle(kp.Pt, task.dotSize, cv.Scalar.Red, -1, task.lineType, 0)
         Next kp
         label1 = "FAST_Basics nonMax = " + If(check.Box(0).Checked, "True", "False")
     End Sub
@@ -40,7 +40,7 @@ Public Class FAST_Centroid : Inherits VBparent
         dst1 = fast.dst1
         dst2.SetTo(0)
         For Each kp As cv.KeyPoint In fast.keypoints
-            dst2.Circle(kp.Pt, 10, cv.Scalar.White, -1, task.lineType, 0)
+            dst2.Circle(kp.Pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType, 0)
         Next kp
         Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim m = cv.Cv2.Moments(gray, True)

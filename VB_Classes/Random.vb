@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-
 Public Class Random_Basics : Inherits VBparent
     Public Points(0) As cv.Point
     Public Points2f(0) As cv.Point2f
@@ -29,7 +28,7 @@ Public Class Random_Basics : Inherits VBparent
             Dim y = msRNG.Next(rangeRect.Y, rangeRect.Y + rangeRect.Height)
             Points(i) = New cv.Point2f(x, y)
             Points2f(i) = New cv.Point2f(x, y)
-            If standalone Or plotPoints = True Then cv.Cv2.Circle(dst1, Points(i), 3, cv.Scalar.Gray, -1, task.lineType, 0)
+            If standalone Or plotPoints = True Then dst1.Circle(Points(i), task.dotSize + 2, cv.Scalar.Gray, -1, task.lineType, 0)
         Next
     End Sub
 End Class

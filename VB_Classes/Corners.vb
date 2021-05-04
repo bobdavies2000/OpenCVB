@@ -40,8 +40,8 @@ Public Class Corners_Harris : Inherits VBparent
         For j = 0 To gray.Rows - 1
             For i = 0 To gray.Cols - 1
                 If mc.Get(Of Single)(j, i) > minval + (maxval - minval) * sliders.trackbar(2).Value / sliders.trackbar(2).Maximum Then
-                    dst1.Circle(New cv.Point(i, j), 4, cv.Scalar.White, -1, task.lineType)
-                    dst1.Circle(New cv.Point(i, j), 2, cv.Scalar.Red, -1, task.lineType)
+                    dst1.Circle(New cv.Point(i, j), task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
+                    dst1.Circle(New cv.Point(i, j), task.dotSize, cv.Scalar.Red, -1, task.lineType)
                 End If
             Next
         Next
@@ -76,7 +76,7 @@ Public Class Corners_SubPix : Inherits VBparent
         For i = 0 To good.goodFeatures.Count - 1
             p.X = CInt(good.goodFeatures(i).X)
             p.Y = CInt(good.goodFeatures(i).Y)
-            cv.Cv2.Circle(dst1, p, 3, New cv.Scalar(0, 0, 255), -1, task.lineType)
+            dst1.Circle(p, 3, New cv.Scalar(0, 0, 255), -1, task.lineType)
         Next
     End Sub
 End Class

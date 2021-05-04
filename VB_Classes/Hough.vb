@@ -55,7 +55,7 @@ Public Class Hough_Circles : Inherits VBparent
         Dim foundColor = New cv.Scalar(0, 0, 255)
         dst1.CopyTo(dst2)
         For i = 0 To cFound.Length - 1
-            cv.Cv2.Circle(dst2, New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y)), cFound(i).Radius, foundColor, 5, task.lineType)
+            dst2.Circle(New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y)), cFound(i).Radius, foundColor, 5, task.lineType)
         Next
         label2 = CStr(cFound.Length) + " circles were identified"
     End Sub

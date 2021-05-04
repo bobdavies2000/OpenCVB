@@ -71,14 +71,14 @@ Public Class CComp_Basics : Inherits VBparent
         connectedComponents.renderblobs(mats.mat(3))
 
         count += renderBlobs(minSize, mats.mat(1), maxSize)
+        label1 = CStr(count) + " items found > " + CStr(minSize) + " and < " + CStr(maxSize)
+        connectedComponents.renderblobs(dst1)
         If standalone Then
             For i = 0 To centroids.Count - 1
-                dst1.Circle(centroids.ElementAt(i), 5, cv.Scalar.Yellow, -1, task.lineType)
+                dst1.Circle(centroids.ElementAt(i), task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
                 dst1.Rectangle(rects.ElementAt(i), cv.Scalar.White, 2)
             Next
         End If
-        label1 = CStr(count) + " items found > " + CStr(minSize) + " and < " + CStr(maxSize)
-        connectedComponents.renderblobs(dst1)
 
         mats.Run(Nothing)
         If check.Box(0).Checked Then

@@ -27,7 +27,7 @@ Public Class KNN_Basics : Inherits VBparent
         Dim response = New cv.Mat(trainData.Rows, 1, cv.MatType.CV_32S)
         For i = 0 To trainData.Rows - 1
             response.Set(Of Integer)(i, 0, i)
-            cv.Cv2.Circle(dst1, trainData.Get(Of cv.Point2f)(i, 0), 5, cv.Scalar.White, -1, task.lineType, 0)
+            dst1.Circle(trainData.Get(Of cv.Point2f)(i, 0), 5, cv.Scalar.White, -1, task.lineType, 0)
         Next
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
         knn.FindNearest(queries, desiredMatches, New cv.Mat, neighbors)
@@ -35,7 +35,7 @@ Public Class KNN_Basics : Inherits VBparent
         If standalone Then
             For i = 0 To neighbors.Rows - 1
                 Dim qPoint = queries.Get(Of cv.Point2f)(i, 0)
-                cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, task.lineType, 0)
+                dst1.Circle(qPoint, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType, 0)
                 Dim pt = trainData.Get(Of cv.Point2f)(neighbors.Get(Of Single)(i, 0), 0)
                 dst1.Line(pt, qPoint, cv.Scalar.Red, 1, task.lineType)
             Next
@@ -81,7 +81,7 @@ Public Class KNN_BasicsQT : Inherits VBparent
         Dim response = New cv.Mat(trainData.Rows, 1, cv.MatType.CV_32S)
         For i = 0 To trainData.Rows - 1
             response.Set(Of Integer)(i, 0, i)
-            cv.Cv2.Circle(dst1, trainData.Get(Of cv.Point2f)(i, 0), 5, cv.Scalar.White, -1, task.lineType, 0)
+            dst1.Circle(trainData.Get(Of cv.Point2f)(i, 0), task.dotSize + 2, cv.Scalar.White, -1, task.lineType, 0)
         Next
         knn.Train(trainData, cv.ML.SampleTypes.RowSample, response)
         knn.FindNearest(queries, desiredMatches, New cv.Mat, neighbors)
@@ -89,7 +89,7 @@ Public Class KNN_BasicsQT : Inherits VBparent
         If standalone Or testMode Then
             For i = 0 To neighbors.Rows - 1
                 Dim qPoint = queries.Get(Of cv.Point2f)(i, 0)
-                cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, task.lineType, 0)
+                dst1.Circle(qPoint, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType, 0)
                 Dim pt = trainData.Get(Of cv.Point2f)(neighbors.Get(Of Single)(i, 0), 0)
                 dst1.Line(pt, qPoint, cv.Scalar.Red, 1, task.lineType)
             Next
@@ -148,11 +148,11 @@ Public Class KNN_Options : Inherits VBparent
             dst2.SetTo(cv.Scalar.White)
             For i = 0 To randomTrain.Points2f.Count - 1
                 Dim pt = randomTrain.Points2f(i)
-                cv.Cv2.Circle(dst1, pt, 5, cv.Scalar.Blue, -1, task.lineType, 0)
+                dst1.Circle(pt, task.dotSize + 2, cv.Scalar.Blue, -1, task.lineType, 0)
             Next
             For i = 0 To randomQuery.Points2f.Count - 1
                 Dim pt = randomQuery.Points2f(i)
-                cv.Cv2.Circle(dst2, pt, 5, cv.Scalar.Red, -1, task.lineType, 0)
+                dst2.Circle(pt, task.dotSize + 2, cv.Scalar.Red, -1, task.lineType, 0)
             Next
         End If
     End Sub
@@ -226,11 +226,11 @@ Public Class KNN_1_to_1 : Inherits VBparent
             Dim mpt = matchedPoints(i)
             Dim qPoint = basics.knnQT.queryPoints(i)
             If mpt.X >= 0 Then
-                cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, task.lineType, 0)
+                dst1.Circle(qPoint, 3, cv.Scalar.Red, -1, task.lineType, 0)
                 dst1.Line(mpt, qPoint, cv.Scalar.Red, 1, task.lineType)
             Else
                 unmatchedPoints.Add(qPoint)
-                cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Yellow, -1, task.lineType, 0)
+                dst1.Circle(qPoint, 3, cv.Scalar.Yellow, -1, task.lineType, 0)
             End If
         Next
     End Sub
@@ -565,7 +565,7 @@ Public Class KNN_Contours : Inherits VBparent
         dst2.SetTo(0)
         For i = 0 To knn.neighbors.Rows - 1
             Dim qPoint = queries.Get(Of cv.Point2f)(i, 0)
-            cv.Cv2.Circle(dst2, qPoint, 3, cv.Scalar.Red, -1, task.lineType, 0)
+            dst2.Circle(qPoint, 3, cv.Scalar.Red, -1, task.lineType, 0)
             Dim pt = trainData.Get(Of cv.Point2f)(knn.neighbors.Get(Of Single)(i, 0), 0)
             dst2.Line(pt, qPoint, cv.Scalar.Red, 1, task.lineType)
         Next
@@ -683,7 +683,7 @@ Public Class KNN_Point2d : Inherits VBparent
     Public Sub prepareImage(dst As cv.Mat, dotSize As Integer)
         dst.SetTo(0)
         'For i = 0 To knn.knnQT.trainingPoints.Count - 1
-        '    cv.Cv2.Circle(dst, knn.knnQT.trainingPoints(i), dotSize + 2, cv.Scalar.Blue, -1, task.lineType, 0)
+        '    dst.Circle(knn.knnQT.trainingPoints(i), dotSize + 2, cv.Scalar.Blue, -1, task.lineType, 0)
         'Next
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -706,8 +706,8 @@ Public Class KNN_Point2d : Inherits VBparent
             If standalone Or task.intermediateReview = caller Then
                 For j = 0 To findXnearest - 1
                     dst1.Line(knn.knnQT.trainingPoints(responseSet(i * findXnearest + j)), knn.knnQT.queryPoints(i), cv.Scalar.White, 1, task.lineType)
-                    cv.Cv2.Circle(dst1, knn.knnQT.trainingPoints(responseSet(i * findXnearest + j)), task.dotSize, cv.Scalar.Blue, -1, task.lineType, 0)
-                    cv.Cv2.Circle(dst1, knn.knnQT.queryPoints(i), task.dotSize, cv.Scalar.Yellow, -1, task.lineType, 0)
+                    dst1.Circle(knn.knnQT.trainingPoints(responseSet(i * findXnearest + j)), task.dotSize, cv.Scalar.Blue, -1, task.lineType, 0)
+                    dst1.Circle(knn.knnQT.queryPoints(i), task.dotSize, cv.Scalar.Yellow, -1, task.lineType, 0)
                 Next
             End If
         Next
@@ -952,9 +952,9 @@ Public Class KNN_1_to_1FIFO : Inherits VBparent
             lastSet.RemoveAt(index)
             Dim pt = trainData.Get(Of cv.Point2f)(index, 0)
             Dim qpoint = currSet(i)
-            cv.Cv2.Circle(dst1, qpoint, task.dotSize, cv.Scalar.Red, -1, task.lineType, 0)
+            dst1.Circle(qpoint, task.dotSize, cv.Scalar.Red, -1, task.lineType, 0)
             dst1.Line(pt, qpoint, cv.Scalar.Red, task.lineThickness, task.lineType)
-            cv.Cv2.Circle(dst1, pt, task.dotSize, cv.Scalar.White, -1, task.lineType, 0)
+            dst1.Circle(pt, task.dotSize, cv.Scalar.White, -1, task.lineType, 0)
         Next
     End Sub
 End Class

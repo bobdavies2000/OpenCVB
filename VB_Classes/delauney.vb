@@ -52,7 +52,7 @@ Module Delaunay_Exports
             Loop
         End If
 
-        cv.Cv2.Circle(img, fp, 10, active_color, -1, task.lineType, 0)
+        img.Circle(fp, task.dotSize + 2, active_color, -1, task.lineType, 0)
     End Sub
     Public Sub paint_voronoi(colors() As cv.Scalar, img As cv.Mat, subdiv As cv.Subdiv2D)
         Dim facets = New cv.Point2f()() {Nothing}
@@ -151,7 +151,7 @@ Public Class Delauney_Subdiv2D : Inherits VBparent
                 Return New cv.Point2f(rand.Next(0, src.Width), rand.Next(0, src.Height))
             End Function).ToArray()
         For Each p In points
-            dst1.Circle(p, 4, cv.Scalar.Red, -1, task.lineType)
+            dst1.Circle(p, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType)
         Next
         dst2 = dst1.Clone()
 

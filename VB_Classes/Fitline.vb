@@ -123,7 +123,6 @@ Public Class Fitline_RawInput : Inherits VBparent
         If check.Box(1).Checked Or task.frameCount = 0 Then
             If task.parms.testAllRunning = False Then check.Box(1).Checked = False
             dst1.SetTo(0)
-            Dim rdotSize = 2
             Dim width = src.Width
             Dim height = src.Height
 
@@ -135,7 +134,7 @@ Public Class Fitline_RawInput : Inherits VBparent
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y > height Then pt.Y = height
                 points.Add(pt)
-                dst1.Circle(points(i), rdotSize, cv.Scalar.White, -1, task.lineType)
+                dst1.Circle(points(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
             Next
 
             Dim p1 As cv.Point2f, p2 As cv.Point2f
@@ -167,7 +166,7 @@ Public Class Fitline_RawInput : Inherits VBparent
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y > height Then pt.Y = height
                 points.Add(pt)
-                dst1.Circle(pt, task.dotSize, highLight, -1, task.lineType)
+                dst1.Circle(pt, task.dotSize + 1, highLight, -1, task.lineType)
             Next
         End If
     End Sub

@@ -53,10 +53,13 @@ Public Class Draw_Noise : Inherits VBparent
         task.desc = "Add Noise to the color image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        maxNoiseWidth = sliders.trackbar(1).Value
+        Static widthSlider = findSlider("Noise Width")
+        Static CountSlider = findSlider("Noise Count")
+        maxNoiseWidth = widthSlider.Value
         src.CopyTo(dst1)
         noiseMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1).SetTo(0)
-        For n = 0 To sliders.trackbar(0).Value
+        Dim count = CountSlider.value
+        For n = 0 To count - 1
             Dim i = msRNG.Next(0, src.Cols - 1)
             Dim j = msRNG.Next(0, src.Rows - 1)
             Dim center = New cv.Point2f(i, j)
@@ -452,8 +455,8 @@ Public Class Draw_ViewObjects : Inherits VBparent
                 For i = 0 To viewObjects.Count - 1
                     Dim vw = viewObjects.ElementAt(i).Value
                     Dim pt = vw.centroid
-                    cv.Cv2.Circle(dst1, pt, task.dotSize, cv.Scalar.White, -1, task.lineType, 0)
-                    cv.Cv2.Circle(dst1, pt, task.dotSize - 2, cv.Scalar.Blue, -1, task.lineType, 0)
+                    dst1.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType, 0)
+                    dst1.Circle(pt, task.dotSize + 2, cv.Scalar.Blue, -1, task.lineType, 0)
                     dst1.Rectangle(vw.rectInHist, cv.Scalar.White, 1)
                 Next
             End If
@@ -580,7 +583,7 @@ Public Class Draw_Intersection : Inherits VBparent
         dst1.SetTo(0)
         dst1.Line(p1, p2, cv.Scalar.Yellow, 2, task.lineType)
         dst1.Line(p3, p4, cv.Scalar.Yellow, 2, task.lineType)
-        If intersectionPoint <> New cv.Point2f Then dst1.Circle(intersectionPoint, 10, cv.Scalar.White, -1, task.lineType)
+        If intersectionPoint <> New cv.Point2f Then dst1.Circle(intersectionPoint, task.dotSize + 4, cv.Scalar.White, -1, task.lineType)
         If intersect Then label1 = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y)) Else label1 = "Parallel!!!"
         If intersectionPoint.X < 0 Or intersectionPoint.X > dst1.Width Or intersectionPoint.Y < 0 Or intersectionPoint.Y > dst1.Height Then
             label1 += " (off screen)"

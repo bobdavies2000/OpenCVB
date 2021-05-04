@@ -27,7 +27,7 @@ Public Class ImageSeg_Basics : Inherits VBparent
         dst2 = addw.dst1
 
         For Each pt In floodPoints
-            dst1.Circle(pt, task.dotSize - 3, cv.Scalar.Yellow, -1, task.lineType)
+            dst1.Circle(pt, task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
         Next
 
         label2 = addw.label1.Replace("depth", "ImageSeg")
@@ -172,12 +172,12 @@ Public Class ImageSeg_CentroidTracker : Inherits VBparent
         dst2 = dst1.Clone
         For Each vo In pTrack.drawRC.viewObjects
             dst2.Circle(vo.Value.centroid, task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
-            dst2.Circle(vo.Value.centroid, task.dotSize - 2, cv.Scalar.Blue, -1, task.lineType)
+            dst2.Circle(vo.Value.centroid, task.dotSize, cv.Scalar.Blue, -1, task.lineType)
             dst2.Line(vo.Value.floodPoint, vo.Value.centroid, cv.Scalar.White, 1, task.lineType)
         Next
 
         For Each pt In pTrack.floodPoints
-            dst2.Circle(pt, task.dotSize - 3, cv.Scalar.Yellow, -1, task.lineType)
+            dst2.Circle(pt, task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
         Next
         label2 = "Centroid " + CStr(pTrack.drawRC.viewObjects.Count) + " blue, floodPoint " + CStr(pTrack.floodPoints.Count) + " yellow"
     End Sub

@@ -570,8 +570,8 @@ Public Class Depth_LocalMinMax_MT : Inherits VBparent
             minPoint(i) = New cv.Point(minLoc.X + roi.X, minLoc.Y + roi.Y)
             maxPoint(i) = New cv.Point(maxLoc.X + roi.X, maxLoc.Y + roi.Y)
 
-            cv.Cv2.Circle(dst1(roi), minLoc, 5, cv.Scalar.Red, -1, task.lineType)
-            cv.Cv2.Circle(dst1(roi), maxLoc, 5, cv.Scalar.Blue, -1, task.lineType)
+            dst1(roi).Circle(minLoc, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+            dst1(roi).Circle(maxLoc, task.dotSize, cv.Scalar.Blue, -1, task.lineType)
         End Sub)
     End Sub
 End Class
@@ -631,8 +631,8 @@ Public Class Depth_LocalMinMax_Kalman_MT : Inherits VBparent
             ptmin = validatePoint2f(ptmin)
             ptmax = validatePoint2f(ptmax)
             subdiv.Insert(ptmin)
-            cv.Cv2.Circle(dst1, ptmin, radius, cv.Scalar.Red, -1, task.lineType)
-            cv.Cv2.Circle(dst1, ptmax, radius, cv.Scalar.Blue, -1, task.lineType)
+            dst1.Circle(ptmin, radius, cv.Scalar.Red, -1, task.lineType)
+            dst1.Circle(ptmax, radius, cv.Scalar.Blue, -1, task.lineType)
         Next
         paint_voronoi(task.scalarColors, dst2, subdiv)
     End Sub

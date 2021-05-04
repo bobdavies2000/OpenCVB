@@ -87,7 +87,7 @@ Public Class Reduction_KNN_Color : Inherits VBparent
         pTrack.Run(src)
         dst1 = pTrack.dst1
 
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Then
             highlight.viewObjects = pTrack.drawRC.viewObjects
             highlight.Run(dst1)
             dst1 = highlight.dst1

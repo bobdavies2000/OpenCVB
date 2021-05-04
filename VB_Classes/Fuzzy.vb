@@ -268,8 +268,8 @@ Public Class Fuzzy_TrackerDepth : Inherits VBparent
                 rects.Add(rect)
                 layoutColor.Add(c.Value.Item1)
                 If displayRect Then
-                    dst1.Circle(centroid, 6, cv.Scalar.Yellow, -1, task.lineType)
-                    dst1.Circle(centroid, 3, cv.Scalar.Red, -1, task.lineType)
+                    dst1.Circle(centroid, task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
+                    dst1.Circle(centroid, task.dotSize, cv.Scalar.Red, -1, task.lineType)
                     dst1.Rectangle(rect, cv.Scalar.Yellow, 2)
                 End If
             End If

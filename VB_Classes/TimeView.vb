@@ -176,7 +176,7 @@ Public Class TimeView_Centroids : Inherits VBparent
             knn.Run(src)
             For i = 0 To knn.neighbors.Rows - 1
                 Dim qPoint = tflood.floodTop.centroids(i)
-                cv.Cv2.Circle(dst1, qPoint, 3, cv.Scalar.Red, -1, task.lineType, 0)
+                dst1.Circle(qPoint, 3, cv.Scalar.Red, -1, task.lineType, 0)
                 Dim pt = saveTopQueries(knn.neighbors.Get(Of Single)(i, 0))
                 If Single.IsNaN(pt.X) = False And Single.IsNaN(pt.Y) = False Then
                     Dim cpt = New cv.Point(CInt(pt.X), CInt(pt.Y))

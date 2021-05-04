@@ -70,7 +70,7 @@ Public Class FLANN_Basics : Inherits VBparent
         dst1.SetTo(cv.Scalar.White)
         For i = 0 To features.Rows - 1
             Dim pt = random.Points(i)
-            cv.Cv2.Circle(dst1, pt, 5, cv.Scalar.Blue, -1, task.lineType, 0)
+            dst1.Circle(pt, task.dotSize + 1, cv.Scalar.Blue, -1, task.lineType, 0)
         Next
 
         If reuseData = False Or task.frameCount = 0 Then
@@ -99,7 +99,7 @@ Public Class FLANN_Basics : Inherits VBparent
                         dst1.Line(pt1, pt2, cv.Scalar.Red, 1, task.lineType)
                     End If
                 Next
-                cv.Cv2.Circle(dst1, pt1, 5, cv.Scalar.Red, -1, task.lineType, 0)
+                dst1.Circle(pt1, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType, 0)
             Next
         End Using
 

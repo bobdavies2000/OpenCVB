@@ -57,7 +57,7 @@ Public Class FitEllipse_Basics_CPP : Inherits VBparent
             End If
             ' draw the input dots on top of everything...
             For i = 0 To area.srcPoints.Count - 1
-                dst1.Circle(area.srcPoints(i), 2, cv.Scalar.White, -1, task.lineType)
+                dst1.Circle(area.srcPoints(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
             Next
         End If
     End Sub

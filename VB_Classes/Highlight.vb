@@ -6,6 +6,8 @@ Public Class Highlight_Basics : Inherits VBparent
     Dim highlightMask As New cv.Mat
     Public viewObjects As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Public Sub New()
+        label1 = "Click near any dot to highlight object"
+        highlightPoint = New cv.Point(dst1.Width / 2, dst2.Height / 2)
         task.desc = "Pixels are grouped by reduction.  Highlight the rectangle and centroid nearest the mouse click"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -29,7 +31,7 @@ Public Class Highlight_Basics : Inherits VBparent
             highlightMask = viewObjects.ElementAt(index).Value.mask
             preKalmanRect = viewObjects.ElementAt(index).Value.preKalmanRect
 
-            dst1.Circle(highlightPoint, 5, cv.Scalar.Red, -1, task.lineType)
+            dst1.Circle(highlightPoint, task.dotSize + 4, cv.Scalar.Red, -1, task.lineType)
             dst1.Rectangle(highlightRect, cv.Scalar.Red, 2)
             Dim rect = New cv.Rect(0, 0, highlightMask.Width, highlightMask.Height)
             task.color.CopyTo(dst2)
