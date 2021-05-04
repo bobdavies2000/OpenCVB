@@ -247,8 +247,8 @@ Public Class Sound_Display : Inherits VBparent
                     If minVal > 0 Then minVal = 0
                     If maxVal < 0 Then maxVal = 0
 
-                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * maxVal / absMaxVal)), cv.Scalar.Red, 1)
-                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + Math.Abs(minVal) * halfHeight / -absMinVal)), cv.Scalar.Gray, 1)
+                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * maxVal / absMaxVal)), cv.Scalar.Red, task.lineThickness)
+                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + Math.Abs(minVal) * halfHeight / -absMinVal)), cv.Scalar.Gray, task.lineThickness)
                 Next
                 label1 = CStr(CInt(soundSource.pcmDuration)) + " seconds displayed with Max Absolute Value"
             Case 1
@@ -259,8 +259,8 @@ Public Class Sound_Display : Inherits VBparent
                     Dim sum = tmp.sum()
                     Dim nextVal = Math.Sqrt(sum.Item(0) / samplesperLine)
 
-                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * nextVal / absMaxVal)), cv.Scalar.Red, 1)
-                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + halfHeight * nextVal / -absMinVal)), cv.Scalar.Gray, 1)
+                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * nextVal / absMaxVal)), cv.Scalar.Red, task.lineThickness)
+                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + halfHeight * nextVal / -absMinVal)), cv.Scalar.Gray, task.lineThickness)
                 Next
                 label1 = CStr(CInt(soundSource.pcmDuration)) + " seconds displayed with Max RMS Value"
             Case 2
@@ -271,8 +271,8 @@ Public Class Sound_Display : Inherits VBparent
                     If minVal > 0 Then minVal = 0
                     If maxVal < 0 Then maxVal = 0
 
-                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * maxVal / absMaxVal)), cv.Scalar.Red, 1)
-                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + Math.Abs(minVal) * halfHeight / -absMinVal)), cv.Scalar.Gray, 1)
+                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * maxVal / absMaxVal)), cv.Scalar.Red, task.lineThickness)
+                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + Math.Abs(minVal) * halfHeight / -absMinVal)), cv.Scalar.Gray, task.lineThickness)
                 Next
             Case 3
                 pcm = cv.Cv2.Abs(pcm).toMat
@@ -282,8 +282,8 @@ Public Class Sound_Display : Inherits VBparent
                     Dim sum = pcm(rect).sum
                     Dim nextVal = sum.Item(0) / samplesperLine
 
-                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * nextVal / absMaxVal)), cv.Scalar.Red, 1)
-                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + halfHeight * nextVal / -absMinVal)), cv.Scalar.Gray, 1)
+                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * nextVal / absMaxVal)), cv.Scalar.Red, task.lineThickness)
+                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + halfHeight * nextVal / -absMinVal)), cv.Scalar.Gray, task.lineThickness)
                 Next
                 label1 = CStr(CInt(soundSource.pcmDuration)) + " seconds displayed with Scaled Average"
         End Select
@@ -294,7 +294,7 @@ Public Class Sound_Display : Inherits VBparent
             starttime = Now
         End If
         Dim x = dst1.Width * sliderPercent
-        dst1.Line(New cv.Point(x, 0), New cv.Point(x, dst1.Height), cv.Scalar.Black, 2)
+        dst1.Line(New cv.Point(x, 0), New cv.Point(x, dst1.Height), cv.Scalar.Black, task.lineThickness + 1)
     End Sub
 End Class
 

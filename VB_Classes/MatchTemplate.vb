@@ -226,7 +226,7 @@ Public Class MatchTemplate_Movement : Inherits VBparent
                 If correlation.Get(Of Single)(0, 0) < CCthreshold Then
                     Interlocked.Increment(updateCount)
                     Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                    cv.Cv2.PutText(dst1, Format(correlation.Get(Of Single)(0, 0), "#0.00"), pt, task.font, fsize, cv.Scalar.White, 1, task.lineType)
+                    cv.Cv2.PutText(dst1, Format(correlation.Get(Of Single)(0, 0), "#0.00"), pt, task.font, fsize, cv.Scalar.White, task.lineThickness, task.lineType)
                 Else
                     mask(roi).SetTo(255)
                     dst1(roi).SetTo(0)

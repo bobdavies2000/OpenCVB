@@ -92,7 +92,7 @@ Public Class Contours_Basics : Inherits VBparent
             If retrievalMode = cv.RetrievalModes.FloodFill Then
                 cv.Cv2.DrawContours(dst2, cnt, -1, cv.Scalar.Yellow, -1, task.lineType)
             Else
-                cv.Cv2.DrawContours(dst2, cnt, -1, cv.Scalar.Yellow, 3, task.lineType)
+                cv.Cv2.DrawContours(dst2, cnt, -1, cv.Scalar.Yellow, task.lineThickness + 2, task.lineType)
             End If
 
             For i = 0 To contours0.Length - 1 Step 2
@@ -284,9 +284,9 @@ Public Class Contours_Prediction : Inherits VBparent
                 kalman.kInput = {outline.contours(i Mod len).X, outline.contours(i Mod len).Y}
                 kalman.Run(src)
                 Dim pt2 = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
-                dst2.Line(pt1, pt2, cv.Scalar.Yellow, 1, task.lineType)
+                dst2.Line(pt1, pt2, cv.Scalar.Yellow, task.lineThickness, task.lineType)
             Next
-            dst2.Line(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), origin, cv.Scalar.Yellow, 1, task.lineType)
+            dst2.Line(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), origin, cv.Scalar.Yellow, task.lineThickness, task.lineType)
         End If
         label1 = "There were " + CStr(outline.contours.Count) + " points in this contour"
     End Sub
@@ -321,7 +321,7 @@ Public Class Contours_FindandDraw : Inherits VBparent
             If nextContour.Length > 2 Then contours.Add(nextContour)
         Next
 
-        cv.Cv2.DrawContours(dst2, contours.ToArray, -1, New cv.Scalar(0, 255, 255), 2, task.lineType)
+        cv.Cv2.DrawContours(dst2, contours.ToArray, -1, New cv.Scalar(0, 255, 255), task.lineThickness + 1, task.lineType)
     End Sub
 End Class
 

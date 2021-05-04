@@ -65,13 +65,13 @@ Public Class PCA_DrawImage : Inherits VBparent
         Dim hypotenuse = Math.Sqrt((p.Y - q.Y) * (p.Y - q.Y) + (p.X - q.X) * (p.X - q.X))
         q.X = p.X - scale * hypotenuse * Math.Cos(angle)
         q.Y = p.Y - scale * hypotenuse * Math.Sin(angle)
-        img.Line(p, q, color, 1, task.lineType)
+        img.Line(p, q, color, task.lineThickness, task.lineType)
         p.X = q.X + 9 * Math.Cos(angle + Math.PI / 4)
         p.Y = q.Y + 9 * Math.Sin(angle + Math.PI / 4)
-        img.Line(p, q, color, 1, task.lineType)
+        img.Line(p, q, color, task.lineThickness, task.lineType)
         p.X = q.X + 9 * Math.Cos(angle - Math.PI / 4)
         p.Y = q.Y + 9 * Math.Sin(angle - Math.PI / 4)
-        img.Line(p, q, color, 1, task.lineType)
+        img.Line(p, q, color, task.lineThickness, task.lineType)
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         dst1 = image.Resize(dst1.Size())
@@ -84,7 +84,7 @@ Public Class PCA_DrawImage : Inherits VBparent
         For i = 0 To contours.Length - 1
             Dim area = cv.Cv2.ContourArea(contours(i))
             If area < 100 Or area > 100000 Then Continue For
-            cv.Cv2.DrawContours(dst2, contours, i, cv.Scalar.Red, 1, task.lineType)
+            cv.Cv2.DrawContours(dst2, contours, i, cv.Scalar.Red, task.lineThickness, task.lineType)
             Dim sz = contours(i).Length
             Dim data_pts = New cv.Mat(sz, 2, cv.MatType.CV_64FC1)
             For j = 0 To data_pts.Rows - 1

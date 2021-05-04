@@ -33,10 +33,10 @@ Public Class Annealing_Basics_CPP : Inherits VBparent
         dst1.SetTo(0)
         For i = 0 To cityOrder.Length - 1
             dst1.Circle(cityPositions(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
-            dst1.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 1, task.lineType)
+            dst1.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, task.lineThickness, task.lineType)
         Next
-        cv.Cv2.PutText(dst1, "Energy", New cv.Point(10, 100), task.font, task.fontSize, cv.Scalar.Yellow, 1, task.lineType)
-        cv.Cv2.PutText(dst1, Format(energy, "#0"), New cv.Point(10, 160), task.font, task.fontSize, cv.Scalar.Yellow, 1, task.lineType)
+        cv.Cv2.PutText(dst1, "Energy", New cv.Point(10, 100), task.font, task.fontSize, cv.Scalar.Yellow, task.lineThickness, task.lineType)
+        cv.Cv2.PutText(dst1, Format(energy, "#0"), New cv.Point(10, 160), task.font, task.fontSize, cv.Scalar.Yellow, task.lineThickness, task.lineType)
     End Sub
     Public Sub setup()
         ReDim cityOrder(numberOfCities - 1)

@@ -28,8 +28,8 @@ Public Class Covariance_Basics : Inherits VBparent
             Dim newCenter = New cv.Point(overallMean(0), overallMean(1))
             Static lastCenter = newCenter
             dst2.Circle(newCenter, 5, cv.Scalar.Red, -1, task.lineType)
-            dst2.Circle(lastCenter, 5, cv.Scalar.Yellow, 2, task.lineType)
-            dst2.Line(newCenter, lastCenter, cv.Scalar.Red, 2, task.lineType)
+            dst2.Circle(lastCenter, 5, cv.Scalar.Yellow, task.lineThickness + 1, task.lineType)
+            dst2.Line(newCenter, lastCenter, cv.Scalar.Red, task.lineThickness + 1, task.lineType)
             lastCenter = newCenter
             output += "Yellow is last center, red is the current center"
         End If

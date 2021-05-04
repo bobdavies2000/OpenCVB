@@ -95,9 +95,9 @@ Public Class KLT_OpticalFlow : Inherits VBparent
             src.CopyTo(dst2)
             For i = 0 To klt.inputPoints.Length - 1
                 If klt.status.Get(Of Byte)(i) And i < lastpoints.Length And i < klt.inputPoints.Length Then
-                    ' dst1.Line(lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, 2, task.lineType)
+                    ' dst1.Line(lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, task.lineThickness + 1, task.lineType)
                     'Static lastFlowPoints() As cv.Point2f = klt.inputPoints
-                    ' dst2.Line(lastFlowPoints(i), klt.inputPoints(i), cv.Scalar.Yellow, 2, task.lineType)
+                    ' dst2.Line(lastFlowPoints(i), klt.inputPoints(i), cv.Scalar.Yellow, task.lineThickness + 1, task.lineType)
                     'If task.frameCount Mod 10 = 0 Then lastFlowPoints = klt.inputPoints
                 End If
             Next

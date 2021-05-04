@@ -44,7 +44,7 @@ Public Class Stitch_Basics : Inherits VBparent
             pano.CopyTo(dst2(New cv.Rect(0, 0, w, h)))
         Else
             If status = cv.Stitcher.Status.ErrorNeedMoreImgs Then
-                dst2.PutText("Need more images", New cv.Point(10, 60), cv.HersheyFonts.HersheySimplex, 0.5, cv.Scalar.White, 1, task.lineType)
+                dst2.PutText("Need more images", New cv.Point(10, 60), cv.HersheyFonts.HersheySimplex, 0.5, cv.Scalar.White, task.lineThickness, task.lineType)
             End If
         End If
     End Sub

@@ -37,7 +37,7 @@ Public Class KNN_Basics : Inherits VBparent
                 Dim qPoint = queries.Get(Of cv.Point2f)(i, 0)
                 dst1.Circle(qPoint, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType, 0)
                 Dim pt = trainData.Get(Of cv.Point2f)(neighbors.Get(Of Single)(i, 0), 0)
-                dst1.Line(pt, qPoint, cv.Scalar.Red, 1, task.lineType)
+                dst1.Line(pt, qPoint, cv.Scalar.Red, task.lineThickness, task.lineType)
             Next
         End If
     End Sub
@@ -91,7 +91,7 @@ Public Class KNN_BasicsQT : Inherits VBparent
                 Dim qPoint = queries.Get(Of cv.Point2f)(i, 0)
                 dst1.Circle(qPoint, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType, 0)
                 Dim pt = trainData.Get(Of cv.Point2f)(neighbors.Get(Of Single)(i, 0), 0)
-                dst1.Line(pt, qPoint, cv.Scalar.Red, 1, task.lineType)
+                dst1.Line(pt, qPoint, cv.Scalar.Red, task.lineThickness, task.lineType)
             Next
         End If
     End Sub
@@ -227,7 +227,7 @@ Public Class KNN_1_to_1 : Inherits VBparent
             Dim qPoint = basics.knnQT.queryPoints(i)
             If mpt.X >= 0 Then
                 dst1.Circle(qPoint, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType, 0)
-                dst1.Line(mpt, qPoint, cv.Scalar.Red, 1, task.lineType)
+                dst1.Line(mpt, qPoint, cv.Scalar.Red, task.lineThickness, task.lineType)
             Else
                 unmatchedPoints.Add(qPoint)
                 dst1.Circle(qPoint, task.dotSize + 1, cv.Scalar.Yellow, -1, task.lineType, 0)
@@ -423,12 +423,12 @@ Public Class KNN_Point3d : Inherits VBparent
                 For j = 0 To findXnearest - 1
                     Dim plast = New cv.Point2f(lastSet(responseSet(i * findXnearest + j)).X, lastSet(responseSet(i * findXnearest + j)).Y)
                     Dim pQ = New cv.Point2f(querySet(i).X, querySet(i).Y)
-                    dst1.Line(plast, pQ, cv.Scalar.White, 1, task.lineType)
+                    dst1.Line(plast, pQ, cv.Scalar.White, task.lineThickness, task.lineType)
                     dst1.Circle(pQ, task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType, 0)
 
                     plast = New cv.Point2f(lastSet(responseSet(i * findXnearest + j)).X, lastSet(responseSet(i * findXnearest + j)).Z * src.Rows / maxDepth)
                     pQ = New cv.Point2f(querySet(i).X, querySet(i).Z * src.Rows / maxDepth)
-                    dst2.Line(plast, pQ, cv.Scalar.White, 1, task.lineType)
+                    dst2.Line(plast, pQ, cv.Scalar.White, task.lineThickness, task.lineType)
                     dst2.Circle(pQ, task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType, 0)
                 Next
             End If
@@ -567,7 +567,7 @@ Public Class KNN_Contours : Inherits VBparent
             Dim qPoint = queries.Get(Of cv.Point2f)(i, 0)
             dst2.Circle(qPoint, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType, 0)
             Dim pt = trainData.Get(Of cv.Point2f)(knn.neighbors.Get(Of Single)(i, 0), 0)
-            dst2.Line(pt, qPoint, cv.Scalar.Red, 1, task.lineType)
+            dst2.Line(pt, qPoint, cv.Scalar.Red, task.lineThickness, task.lineType)
         Next
     End Sub
 End Class
@@ -615,7 +615,7 @@ Public Class KNN_Cluster2DCities : Inherits VBparent
             Next
         Next
         For i = 0 To cityOrder.Length - 1
-            result.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, 4 * task.fontSize)
+            result.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, task.lineThickness + 3)
         Next
 
         closedRegions = 0
@@ -705,7 +705,7 @@ Public Class KNN_Point2d : Inherits VBparent
             Next
             If standalone Or task.intermediateReview = caller Then
                 For j = 0 To findXnearest - 1
-                    dst1.Line(knn.knnQT.trainingPoints(responseSet(i * findXnearest + j)), knn.knnQT.queryPoints(i), cv.Scalar.White, 1, task.lineType)
+                    dst1.Line(knn.knnQT.trainingPoints(responseSet(i * findXnearest + j)), knn.knnQT.queryPoints(i), cv.Scalar.White, task.lineThickness, task.lineType)
                     dst1.Circle(knn.knnQT.trainingPoints(responseSet(i * findXnearest + j)), task.dotSize, cv.Scalar.Blue, -1, task.lineType, 0)
                     dst1.Circle(knn.knnQT.queryPoints(i), task.dotSize, cv.Scalar.Yellow, -1, task.lineType, 0)
                 Next

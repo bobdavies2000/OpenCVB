@@ -182,7 +182,7 @@ Public Class Plot_OverTime : Inherits VBparent
         Dim nextWatchVal = myStopWatch.ElapsedMilliseconds
         If nextWatchVal - lastSeconds > 1000 Then
             lastSeconds = nextWatchVal
-            dst1.Line(New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst1.Height), cv.Scalar.White, 1)
+            dst1.Line(New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst1.Height), cv.Scalar.White, task.lineThickness)
         End If
 
         columnIndex += pixelWidth
@@ -257,7 +257,7 @@ Module Plot_OpenCV_Module
         For i = 0 To 4
             Dim pt1 = New cv.Point(0, spacer * i)
             Dim pt2 = New cv.Point(dst1.Width, spacer * i)
-            dst1.Line(pt1, pt2, cv.Scalar.White, 1)
+            dst1.Line(pt1, pt2, cv.Scalar.White, task.lineThickness)
             If i = 0 Then pt2.Y += 10
             Dim nextVal = (maxVal - spaceVal * i)
             If maxVal > 1000 Then
@@ -300,7 +300,7 @@ Public Class Plot_Depth : Inherits VBparent
             Dim meterDepth = CInt(src.Width / lineCount)
             For i = 1 To lineCount
                 Dim x = i * meterDepth
-                dst1.Line(New cv.Point(x, 0), New cv.Point(x, src.Height), cv.Scalar.White, 1)
+                dst1.Line(New cv.Point(x, 0), New cv.Point(x, src.Height), cv.Scalar.White, task.lineThickness)
                 cv.Cv2.PutText(dst1, Format(i, "0") + "m", New cv.Point(x + 5, src.Height - 10), cv.HersheyFonts.HersheyComplexSmall, 0.7, cv.Scalar.White, 2)
             Next
         End If

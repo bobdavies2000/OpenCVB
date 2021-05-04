@@ -229,8 +229,8 @@ Public Class Math_Stdev : Inherits VBparent
             If stdev < stdevThreshold Then
                 Interlocked.Increment(updateCount)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                If showMean Then cv.Cv2.PutText(dst1, Format(mean, "#0"), pt, task.font, fsize, cv.Scalar.White, 1, task.lineType)
-                If showStdev Then cv.Cv2.PutText(dst1, Format(stdev, "#0.00"), New cv.Point(pt.X, roi.Y + roi.Height - 4), task.font, fsize, cv.Scalar.White, 1, task.lineType)
+                If showMean Then cv.Cv2.PutText(dst1, Format(mean, "#0"), pt, task.font, fsize, cv.Scalar.White, task.lineThickness, task.lineType)
+                If showStdev Then cv.Cv2.PutText(dst1, Format(stdev, "#0.00"), New cv.Point(pt.X, roi.Y + roi.Height - 4), task.font, fsize, cv.Scalar.White, task.lineThickness, task.lineType)
                 lowStdevMask(roi).SetTo(255)
             Else
                 highStdevMask(roi).SetTo(255)

@@ -32,7 +32,7 @@ Public Class QRcode_Basics : Inherits VBparent
 
         src.CopyTo(dst1)
         For i = 0 To box.Length - 1
-            dst1.Line(box(i), box((i + 1) Mod 4), cv.Scalar.Red, 3, task.lineType)
+            dst1.Line(box(i), box((i + 1) Mod 4), cv.Scalar.Red, task.lineThickness + 2, task.lineType)
         Next
         If refersTo <> "" Then label1 = refersTo
     End Sub

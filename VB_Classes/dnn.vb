@@ -168,7 +168,7 @@ Public Class DNN_Basics : Inherits VBparent
                         kalman(minIndex).Run(src)
                         rect = New cv.Rect(kalman(minIndex).kOutput(0), kalman(minIndex).kOutput(1), kalman(minIndex).kOutput(2), kalman(minIndex).kOutput(3))
                     End If
-                    dst2.Rectangle(rect, cv.Scalar.Yellow, 3, task.lineType)
+                    dst2.Rectangle(rect, cv.Scalar.Yellow, task.lineThickness + 2, task.lineType)
                     rect.Width = src.Width / 12
                     rect.Height = src.Height / 16
                     dst2.Rectangle(rect, cv.Scalar.Black, -1)

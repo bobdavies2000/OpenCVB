@@ -49,8 +49,8 @@ Public Class Hull_Basics : Inherits VBparent
             dst1.SetTo(0)
             dst2.SetTo(0)
             For i = 0 To hull.Count - 1
-                cv.Cv2.Line(dst1, hull.ElementAt(i), hull.ElementAt((i + 1) Mod hull.Count), cv.Scalar.White, 2)
-                cv.Cv2.Line(dst2, hull.ElementAt(i), hull.ElementAt((i + 1) Mod hull.Count), cv.Scalar.White, 2)
+                dst1.Line(hull.ElementAt(i), hull.ElementAt((i + 1) Mod hull.Count), cv.Scalar.White, task.lineThickness + 1)
+                dst2.Line(hull.ElementAt(i), hull.ElementAt((i + 1) Mod hull.Count), cv.Scalar.White, task.lineThickness + 1)
             Next
 
             Dim pMat As New cv.Mat(hull.Count, 1, cv.MatType.CV_32SC2, hull)

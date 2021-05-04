@@ -181,13 +181,13 @@ Public Class PointCloud_Inspector : Inherits VBparent
         Dim topPt = New cv.Point2f(cLine, 0)
         Dim botPt = New cv.Point2f(cLine, dst1.Height)
         dst1 = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1.Line(topPt, botPt, 255, 3, task.lineType)
+        dst1.Line(topPt, botPt, 255, task.lineThickness + 2, task.lineType)
 
         Dim stepY = dst1.Height / yLines
         For i = 0 To yLines - 1
             Dim pt1 = New cv.Point2f(dst1.Width, i * stepY)
             Dim pt2 = New cv.Point2f(0, i * stepY)
-            dst1.Line(pt1, pt2, 255, 1, cv.LineTypes.Link4)
+            dst1.Line(pt1, pt2, 255, task.lineThickness, cv.LineTypes.Link4)
 
             Dim pt = New cv.Point2f(cLine, i * stepY)
             Dim xyz = task.pointCloud.Get(Of cv.Vec3f)(pt.Y, pt.X)
@@ -369,8 +369,8 @@ Public Class PointCloud_SetupSide : Inherits VBparent
         dst1.Circle(task.sideCameraPoint, task.dotSize, cv.Scalar.BlueViolet, -1, task.lineType)
         For i = 1 To task.maxZ
             Dim xmeter = CInt(dst1.Width * i / task.maxZ * distanceRatio)
-            dst1.Line(New cv.Point(xmeter, 0), New cv.Point(xmeter, dst1.Height), cv.Scalar.AliceBlue, 1)
-            cv.Cv2.PutText(dst1, CStr(i) + "m", New cv.Point(xmeter - src.Width / 15, dst1.Height - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, task.lineType)
+            dst1.Line(New cv.Point(xmeter, 0), New cv.Point(xmeter, dst1.Height), cv.Scalar.AliceBlue, task.lineThickness)
+            cv.Cv2.PutText(dst1, CStr(i) + "m", New cv.Point(xmeter - src.Width / 15, dst1.Height - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, task.lineThickness, task.lineType)
         Next
 
         Dim cam = task.sideCameraPoint
@@ -414,19 +414,19 @@ Public Class PointCloud_SetupSide : Inherits VBparent
         Dim fovTop = New cv.Point(dst1.Width, cam.Y - y)
         Dim fovBot = New cv.Point(dst1.Width, cam.Y + y)
 
-        dst1.Ellipse(cam, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, 2, task.lineType)
-        dst1.Ellipse(cam, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, 2, task.lineType)
-        dst1.Line(cam, fovTop, cv.Scalar.White, 1, task.lineType)
-        dst1.Line(cam, fovBot, cv.Scalar.White, 1, task.lineType)
+        dst1.Ellipse(cam, New cv.Size(arcSize, arcSize), -startAngle + 90, startAngle, 0, cv.Scalar.White, task.lineThickness + 1, task.lineType)
+        dst1.Ellipse(cam, New cv.Size(arcSize, arcSize), 90, 180, 180 + startAngle, cv.Scalar.White, task.lineThickness + 1, task.lineType)
+        dst1.Line(cam, fovTop, cv.Scalar.White, task.lineThickness, task.lineType)
+        dst1.Line(cam, fovBot, cv.Scalar.White, task.lineThickness, task.lineType)
 
         dst1.Circle(markerLeft, task.dotSize, cv.Scalar.Red, -1, task.lineType)
         dst1.Circle(markerRight, task.dotSize, cv.Scalar.Red, -1, task.lineType)
-        dst1.Line(cam, markerLeft, cv.Scalar.Red, 1, task.lineType)
-        dst1.Line(cam, markerRight, cv.Scalar.Red, 1, task.lineType)
+        dst1.Line(cam, markerLeft, cv.Scalar.Red, task.lineThickness, task.lineType)
+        dst1.Line(cam, markerRight, cv.Scalar.Red, task.lineThickness, task.lineType)
 
         Dim labelLocation = New cv.Point(src.Width * 0.02, src.Height * 7 / 8)
         cv.Cv2.PutText(dst1, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize,
-                       cv.Scalar.White, 1, task.lineType)
+                       cv.Scalar.White, task.lineThickness, task.lineType)
     End Sub
 End Class
 
@@ -455,8 +455,8 @@ Public Class PointCloud_SetupTop : Inherits VBparent
         dst1.Circle(task.topCameraPoint, task.dotSize, cv.Scalar.BlueViolet, -1, task.lineType)
         For i = 1 To task.maxZ
             Dim ymeter = CInt(dst1.Height - dst1.Height * i / (task.maxZ * distanceRatio))
-            dst1.Line(New cv.Point(0, ymeter), New cv.Point(dst1.Width, ymeter), cv.Scalar.AliceBlue, 1)
-            cv.Cv2.PutText(dst1, CStr(i) + "m", New cv.Point(10, ymeter - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, task.lineType)
+            dst1.Line(New cv.Point(0, ymeter), New cv.Point(dst1.Width, ymeter), cv.Scalar.AliceBlue, task.lineThickness)
+            cv.Cv2.PutText(dst1, CStr(i) + "m", New cv.Point(10, ymeter - 10), cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, task.lineThickness, task.lineType)
         Next
 
         Dim cam = task.topCameraPoint
@@ -487,19 +487,19 @@ Public Class PointCloud_SetupTop : Inherits VBparent
         Dim fovRight = New cv.Point(task.topCameraPoint.X + x, 0)
         Dim fovLeft = New cv.Point(task.topCameraPoint.X - x, fovRight.Y)
 
-        dst1.Ellipse(task.topCameraPoint, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, 2, task.lineType)
-        dst1.Ellipse(task.topCameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, 2, task.lineType)
-        dst1.Line(task.topCameraPoint, fovLeft, cv.Scalar.White, 1, task.lineType)
+        dst1.Ellipse(task.topCameraPoint, New cv.Size(arcSize, arcSize), -startAngle, startAngle, 0, cv.Scalar.White, task.lineThickness + 1, task.lineType)
+        dst1.Ellipse(task.topCameraPoint, New cv.Size(arcSize, arcSize), 0, 180, 180 + startAngle, cv.Scalar.White, task.lineThickness + 1, task.lineType)
+        dst1.Line(task.topCameraPoint, fovLeft, cv.Scalar.White, task.lineThickness, task.lineType)
 
         dst1.Circle(markerLeft, task.dotSize, cv.Scalar.Red, -1, task.lineType)
         dst1.Circle(markerRight, task.dotSize, cv.Scalar.Red, -1, task.lineType)
-        dst1.Line(cam, markerLeft, cv.Scalar.Red, 1, task.lineType)
-        dst1.Line(cam, markerRight, cv.Scalar.Red, 1, task.lineType)
+        dst1.Line(cam, markerLeft, cv.Scalar.Red, task.lineThickness, task.lineType)
+        dst1.Line(cam, markerRight, cv.Scalar.Red, task.lineThickness, task.lineType)
 
         Dim shift = (src.Width - src.Height) / 2
         Dim labelLocation = New cv.Point(dst1.Width / 2 + shift, dst1.Height * 15 / 16)
-        cv.Cv2.PutText(dst1, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, 1, task.lineType)
-        dst1.Line(task.topCameraPoint, fovRight, cv.Scalar.White, 1, task.lineType)
+        cv.Cv2.PutText(dst1, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, task.lineThickness, task.lineType)
+        dst1.Line(task.topCameraPoint, fovRight, cv.Scalar.White, task.lineThickness, task.lineType)
     End Sub
 End Class
 
@@ -1202,7 +1202,7 @@ Public Class PointCloud_ObjectsTop : Inherits VBparent
 
             xpt1 = New cv.Point2f(task.topCameraPoint.X - lineHalf, src.Height - pixeldistance)
             xpt2 = New cv.Point2f(task.topCameraPoint.X + lineHalf, src.Height - pixeldistance)
-            If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Blue, 3)
+            If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Blue, task.lineThickness + 2)
             Dim lineWidth = xpt2.X - xpt1.X
             Dim blueLineMeters As Single
             If lineWidth = 0 Then
@@ -1235,7 +1235,7 @@ Public Class PointCloud_ObjectsTop : Inherits VBparent
             Dim drawpt2 = New cv.Point2f(coneRight, r.Y + r.Height)
 
             If lineHalf = 0 Then Continue For
-            If drawLines Then dst1.Line(drawPt1, drawpt2, cv.Scalar.Yellow, 3)
+            If drawLines Then dst1.Line(drawPt1, drawpt2, cv.Scalar.Yellow, task.lineThickness + 2)
 
             Dim vo = measureTop.pTrack.drawRC.viewObjects.Values(i)
             Dim addlen As Single = 0
@@ -1243,11 +1243,11 @@ Public Class PointCloud_ObjectsTop : Inherits VBparent
             If Not (task.topCameraPoint.X > r.X And task.topCameraPoint.X < r.X + r.Width) Then
                 If r.X > task.topCameraPoint.X Then
                     addlen = r.Height * Math.Abs(r.X - task.topCameraPoint.X) / (src.Height - r.Y)
-                    If drawLines Then dst1.Line(New cv.Point2f(r.X, r.Y + r.Height), New cv.Point2f(r.X - addlen, r.Y + r.Height), cv.Scalar.Yellow, 3)
+                    If drawLines Then dst1.Line(New cv.Point2f(r.X, r.Y + r.Height), New cv.Point2f(r.X - addlen, r.Y + r.Height), cv.Scalar.Yellow, task.lineThickness + 2)
                     coneleft -= addlen
                 Else
                     addlen = r.Height * (task.topCameraPoint.X - (r.X + r.Width)) / (src.Height - r.Y)
-                    If drawLines Then dst1.Line(New cv.Point2f(r.X + r.Width, r.Y + r.Height), New cv.Point2f(r.X + r.Width + addlen, r.Y + r.Height), cv.Scalar.Yellow, 3)
+                    If drawLines Then dst1.Line(New cv.Point2f(r.X + r.Width, r.Y + r.Height), New cv.Point2f(r.X + r.Width + addlen, r.Y + r.Height), cv.Scalar.Yellow, task.lineThickness + 2)
                     If coneleft - addlen >= xpt1.X Then coneleft -= addlen
                 End If
             End If
@@ -1298,7 +1298,7 @@ Public Class PointCloud_ObjectsSide : Inherits VBparent
 
             xpt1 = New cv.Point2f(task.sideCameraPoint.X + pixeldistance, task.sideCameraPoint.Y - lineHalf)
             xpt2 = New cv.Point2f(task.sideCameraPoint.X + pixeldistance, task.sideCameraPoint.Y + lineHalf)
-            If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Blue, 3)
+            If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Blue, task.lineThickness + 2)
             Dim lineWidth = xpt2.Y - xpt1.Y
             Dim blueLineMeters As Single
             If lineWidth = 0 Then
@@ -1340,7 +1340,7 @@ Public Class PointCloud_ObjectsSide : Inherits VBparent
             drawpt2 = New cv.Point2f(r.X, coneRight)
 
             If lineHalf = 0 Then Continue For
-            If drawLines Then dst1.Line(drawPt1, drawpt2, cv.Scalar.Yellow, 3)
+            If drawLines Then dst1.Line(drawPt1, drawpt2, cv.Scalar.Yellow, task.lineThickness + 2)
 
             Dim vo = measureSide.pTrack.drawRC.viewObjects.Values(i)
             Dim addlen As Single = 0
@@ -1353,7 +1353,7 @@ Public Class PointCloud_ObjectsSide : Inherits VBparent
                     If coneRight - addlen >= xpt2.Y Then coneRight -= addlen
                 Else
                     addlen = r.Width * (task.sideCameraPoint.Y - r.Y) / (r.X + r.Width - task.sideCameraPoint.X)
-                    If drawLines Then dst1.Line(New cv.Point2f(r.X, r.Y + r.Height), New cv.Point2f(r.X, r.Y + r.Height + addlen), cv.Scalar.Yellow, 3)
+                    If drawLines Then dst1.Line(New cv.Point2f(r.X, r.Y + r.Height), New cv.Point2f(r.X, r.Y + r.Height + addlen), cv.Scalar.Yellow, task.lineThickness + 2)
                     r = New cv.Rect(r.X, r.Y + addlen, r.Width, coneRight - coneleft + addlen)
                     coneleft += addlen
                 End If

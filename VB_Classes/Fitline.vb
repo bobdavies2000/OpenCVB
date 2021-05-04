@@ -40,7 +40,7 @@ Public Class Fitline_Basics : Inherits VBparent
                 lines.Add(p1)
                 lines.Add(p2)
             End If
-            dst1.Line(p1, p2, cv.Scalar.Red, 1, task.lineType)
+            dst1.Line(p1, p2, cv.Scalar.Red, task.lineThickness, task.lineType)
         Next
     End Sub
 End Class
@@ -262,7 +262,7 @@ Public Class Fitline_EigenFit : Inherits VBparent
             End If
             p1 = New cv.Point(0, noisyLine.bb)
             p2 = New cv.Point(width, noisyLine.m * width + noisyLine.bb)
-            dst1.Line(p1, p2, cv.Scalar.Blue, 3, task.lineType)
+            dst1.Line(p1, p2, cv.Scalar.Blue, task.lineThickness + 2, task.lineType)
         End If
         task.trueText("GT m = " + Format(noisyLine.m, "#0.00") + " eigen m = " + Format(m2, "#0.00") + "    len = " + CStr(CInt(len)) + vbCrLf +
                                               "Confidence = " + Format(eigenVal.Get(Of Single)(0, 0) / eigenVal.Get(Of Single)(1, 0), "#0.0") + vbCrLf +

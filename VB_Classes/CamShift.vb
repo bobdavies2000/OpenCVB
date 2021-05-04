@@ -64,7 +64,7 @@ Public Class CamShift_Basics : Inherits VBparent
         dst1.SetTo(0)
         src.CopyTo(dst1, mask)
         If trackBox.Size.Width > 0 Then
-            dst1.Ellipse(trackBox, cv.Scalar.White, 2, task.lineType)
+            dst1.Ellipse(trackBox, cv.Scalar.White, task.lineThickness + 1, task.lineType)
         End If
     End Sub
 End Class
@@ -171,7 +171,7 @@ Public Class Camshift_TopObjects : Inherits VBparent
             End If
         Next
         For i = 0 To trackBoxes.Count - 1
-            dst1.Ellipse(trackBoxes(i), cv.Scalar.White, 2, task.lineType)
+            dst1.Ellipse(trackBoxes(i), cv.Scalar.White, task.lineThickness + 1, task.lineType)
         Next
         mats.Run(Nothing)
         dst2 = mats.dst1

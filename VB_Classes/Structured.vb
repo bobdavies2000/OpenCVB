@@ -286,7 +286,7 @@ Public Class Structured_MultiSlicePolygon : Inherits VBparent
         For i = 0 To contours.Length - 1
             If contours(i).Length = 2 Then Continue For
             If contours(i).Length <= maxSides Then
-                cv.Cv2.DrawContours(dst2, contours, i, New cv.Scalar(0, 255, 255), 2, task.lineType)
+                cv.Cv2.DrawContours(dst2, contours, i, New cv.Scalar(0, 255, 255), task.lineThickness + 1, task.lineType)
             End If
         Next
     End Sub
@@ -463,8 +463,8 @@ Public Class Structured_LinearizeFloor : Inherits VBparent
                             'Next
                         End If
                     Next
-                    dst1.Line(New cv.Point(0, firstRow), New cv.Point(dst1.Width, firstRow), cv.Scalar.Yellow, 2)
-                    dst1.Line(New cv.Point(0, lastRow), New cv.Point(dst1.Width, lastRow), cv.Scalar.Yellow, 2)
+                    dst1.Line(New cv.Point(0, firstRow), New cv.Point(dst1.Width, firstRow), cv.Scalar.Yellow, task.lineThickness + 1)
+                    dst1.Line(New cv.Point(0, lastRow), New cv.Point(dst1.Width, lastRow), cv.Scalar.Yellow, task.lineThickness + 1)
                 End If
             End If
 
@@ -697,8 +697,8 @@ Public Class Structured_CenterSlice : Inherits VBparent
             botPt = New cv.Point2f(topPt.X, dst1.Height)
         End If
         dst2.Circle(avgPt, task.dotSize, cv.Scalar.Red, -1, task.lineType)
-        dst2.Line(topPt, botPt, cv.Scalar.Red, 1, task.lineType)
-        dst1.Line(topPt, botPt, cv.Scalar.Yellow, 1, task.lineType)
+        dst2.Line(topPt, botPt, cv.Scalar.Red, task.lineThickness, task.lineType)
+        dst1.Line(topPt, botPt, cv.Scalar.Yellow, task.lineThickness, task.lineType)
     End Sub
 End Class
 
@@ -897,14 +897,14 @@ Public Class Structured_Crosshairs : Inherits VBparent
                         Dim p1 = New cv.Point(pointX.Get(Of Integer)(y - 1, x), pointY.Get(Of Integer)(y - 1, x))
                         If p1.X > 0 Then
                             Dim p2 = New cv.Point(xx, yy)
-                            dst1.Line(p1, p2, cv.Scalar.White, 2, task.lineType)
+                            dst1.Line(p1, p2, cv.Scalar.White, task.lineThickness + 1, task.lineType)
                         End If
                     End If
                     If y = indexY Then
                         Dim p1 = New cv.Point(pointX.Get(Of Integer)(y, x - 1), pointY.Get(Of Integer)(y, x - 1))
                         If p1.X > 0 Then
                             Dim p2 = New cv.Point(xx, yy)
-                            dst1.Line(p1, p2, cv.Scalar.White, 2, task.lineType)
+                            dst1.Line(p1, p2, cv.Scalar.White, task.lineThickness + 1, task.lineType)
                         End If
                     End If
                 End If

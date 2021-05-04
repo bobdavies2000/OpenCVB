@@ -138,8 +138,8 @@ Public Class SVM_Basics : Inherits VBparent
         For x = 1 To src.Height - 1
             Dim y1 = CInt(src.Height - svmOptions.f(x - 1))
             Dim y2 = CInt(src.Height - svmOptions.f(x))
-            dst1.Line(x - 1, y1, x, y2, cv.Scalar.White, 1, task.lineType)
-            dst2.Line(x - 1, y1, x, y2, cv.Scalar.White, 1, task.lineType)
+            dst1.Line(x - 1, y1, x, y2, cv.Scalar.White, task.lineThickness, task.lineType)
+            dst2.Line(x - 1, y1, x, y2, cv.Scalar.White, task.lineThickness, task.lineType)
         Next
     End Sub
 End Class

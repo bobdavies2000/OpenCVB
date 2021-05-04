@@ -184,8 +184,8 @@ Public Class Kalman_RotatingPoint : Inherits VBparent
     End Function
     Private Sub drawCross(dst1 As cv.Mat, center As cv.Point, color As cv.Scalar)
         Dim d = 3
-        cv.Cv2.Line(dst1, New cv.Point(center.X - d, center.Y - d), New cv.Point(center.X + d, center.Y + d), color, 1, task.lineType)
-        cv.Cv2.Line(dst1, New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, 1, task.lineType)
+        dst1.Line(New cv.Point(center.X - d, center.Y - d), New cv.Point(center.X + d, center.Y + d), color, task.lineThickness, task.lineType)
+        dst1.Line(New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, task.lineThickness, task.lineType)
     End Sub
     Public Sub New()
         label1 = "Estimate Yellow < Real Red (if working)"
@@ -220,8 +220,8 @@ Public Class Kalman_RotatingPoint : Inherits VBparent
         drawCross(dst1, statePt, cv.Scalar.White)
         drawCross(dst1, measPt, cv.Scalar.White)
         drawCross(dst1, predictPt, cv.Scalar.White)
-        cv.Cv2.Line(dst1, statePt, measPt, New cv.Scalar(0, 0, 255), 3, task.lineType)
-        cv.Cv2.Line(dst1, statePt, predictPt, New cv.Scalar(0, 255, 255), 3, task.lineType)
+        dst1.Line(statePt, measPt, New cv.Scalar(0, 0, 255), task.lineThickness + 2, task.lineType)
+        dst1.Line(statePt, predictPt, New cv.Scalar(0, 255, 255), task.lineThickness + 2, task.lineType)
 
         If msRNG.Next(0, 4) <> 0 Then kf.Correct(measurement)
 
@@ -256,8 +256,8 @@ Public Class Kalman_MousePredict : Inherits VBparent
         kalman.kInput(1) = task.mousePoint.Y
         Dim lastStateResult = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
         kalman.Run(src)
-        cv.Cv2.Line(dst1, New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), lastStateResult, cv.Scalar.All(255), lineWidth, task.lineType)
-        cv.Cv2.Line(dst1, task.mousePoint, lastRealMouse, New cv.Scalar(0, 0, 255), lineWidth, task.lineType)
+        dst1.Line(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), lastStateResult, cv.Scalar.All(255), lineWidth, task.lineType)
+        dst1.Line(task.mousePoint, lastRealMouse, New cv.Scalar(0, 0, 255), lineWidth, task.lineType)
         lastRealMouse = task.mousePoint
     End Sub
 End Class

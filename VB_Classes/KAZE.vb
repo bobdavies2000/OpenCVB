@@ -114,7 +114,7 @@ Public Class KAZE_LeftAligned_CS : Inherits VBparent
                 dst2.Circle(pt1.Pt, task.dotSize + 2, cv.Scalar.Blue, -1, task.lineType)
                 dst1.Circle(pt1.Pt, task.dotSize + 2, cv.Scalar.Blue, -1, task.lineType)
                 dst2.Circle(CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
-                dst2.Line(pt1.Pt, CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, cv.Scalar.Yellow, 1, task.lineType)
+                dst2.Line(pt1.Pt, CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, cv.Scalar.Yellow, task.lineThickness, task.lineType)
             End If
         Next
         label1 = "Right image has " + CStr(CS_KazeRight.kazeKeyPoints.Count) + " key points"

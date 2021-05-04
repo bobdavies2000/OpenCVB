@@ -48,14 +48,14 @@ Public Class PhaseCorrelate_Basics : Inherits VBparent
             center = New cv.Point(input64.Cols / 2, input64.Rows / 2)
             If src.Channels = 1 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             dst1 = src.Clone
-            dst1.Circle(center, radius, cv.Scalar.Yellow, 3, task.lineType)
-            dst1.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, 2, task.lineType)
+            dst1.Circle(center, radius, cv.Scalar.Yellow, task.lineThickness + 2, task.lineType)
+            dst1.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, task.lineThickness + 1, task.lineType)
 
             src(srcRect).CopyTo(dst2(stableRect))
 
             If radius > 5 Then
-                dst2.Circle(center, radius, cv.Scalar.Yellow, 3, task.lineType)
-                dst2.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, 2, task.lineType)
+                dst2.Circle(center, radius, cv.Scalar.Yellow, task.lineThickness + 2, task.lineType)
+                dst2.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, task.lineThickness + 1, task.lineType)
             End If
         Else
             resetLastFrame = True
@@ -121,8 +121,8 @@ Public Class PhaseCorrelate_Depth : Inherits VBparent
         tmp.ConvertTo(dst2, cv.MatType.CV_8UC1)
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        dst2.Circle(phaseC.center, phaseC.radius, cv.Scalar.Yellow, 3, task.lineType)
-        dst2.Line(phaseC.center, New cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), cv.Scalar.Red, 2, task.lineType)
+        dst2.Circle(phaseC.center, phaseC.radius, cv.Scalar.Yellow, task.lineThickness + 2, task.lineType)
+        dst2.Line(phaseC.center, New cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), cv.Scalar.Red, task.lineThickness + 1, task.lineType)
     End Sub
 End Class
 

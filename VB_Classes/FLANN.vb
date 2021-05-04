@@ -96,7 +96,7 @@ Public Class FLANN_Basics : Inherits VBparent
                     Dim index = indices(j)
                     If index >= 0 And index < random.Points2f.Length Then
                         Dim pt2 = random.Points(index)
-                        dst1.Line(pt1, pt2, cv.Scalar.Red, 1, task.lineType)
+                        dst1.Line(pt1, pt2, cv.Scalar.Red, task.lineThickness, task.lineType)
                     End If
                 Next
                 dst1.Circle(pt1, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType, 0)

@@ -52,7 +52,7 @@ Public Class Polylines_Random : Inherits VBparent
             pts.Add(points)
 
             dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
-            dst1.Polylines(pts, False, cv.Scalar.White, 1, task.lineType)
+            dst1.Polylines(pts, False, cv.Scalar.White, task.lineThickness, task.lineType)
             dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
 

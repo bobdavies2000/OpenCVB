@@ -17,11 +17,11 @@ Public Class Thread_Grid : Inherits VBparent
             Dim p1 = New cv.Point(roi.X + roi.Width, roi.Y)
             Dim p2 = New cv.Point(roi.X + roi.Width, roi.Y + roi.Height)
             If roi.X + roi.Width <= gridMask.Width Then
-                gridMask.Line(p1, p2, cv.Scalar.White, 1)
+                gridMask.Line(p1, p2, cv.Scalar.White, task.lineThickness)
             End If
             If roi.Y + roi.Height <= gridMask.Height Then
                 Dim p3 = New cv.Point(roi.X, roi.Y + roi.Height)
-                gridMask.Line(p2, p3, cv.Scalar.White, 1)
+                gridMask.Line(p2, p3, cv.Scalar.White, task.lineThickness)
             End If
             gridToRoi.Rectangle(roi, i, -1)
         Next
@@ -137,7 +137,7 @@ Public Class Thread_GridTest : Inherits VBparent
          Sub(i)
              Dim roi = grid.roiList(i)
              cv.Cv2.Subtract(mean, src(roi), dst2(roi))
-             dst2(roi).Line(New cv.Point(0, 0), New cv.Point(roi.Width, roi.Height), cv.Scalar.White, 1, task.lineType)
+             dst2(roi).Line(New cv.Point(0, 0), New cv.Point(roi.Width, roi.Height), cv.Scalar.White, task.lineThickness, task.lineType)
          End Sub)
     End Sub
 End Class

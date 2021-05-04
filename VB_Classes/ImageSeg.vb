@@ -173,7 +173,7 @@ Public Class ImageSeg_CentroidTracker : Inherits VBparent
         For Each vo In pTrack.drawRC.viewObjects
             dst2.Circle(vo.Value.centroid, task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
             dst2.Circle(vo.Value.centroid, task.dotSize, cv.Scalar.Blue, -1, task.lineType)
-            dst2.Line(vo.Value.floodPoint, vo.Value.centroid, cv.Scalar.White, 1, task.lineType)
+            dst2.Line(vo.Value.floodPoint, vo.Value.centroid, cv.Scalar.White, task.lineThickness, task.lineType)
         Next
 
         For Each pt In pTrack.floodPoints

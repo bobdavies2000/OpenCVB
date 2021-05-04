@@ -62,7 +62,7 @@ Public Class Line_Basics : Inherits VBparent
         For Each line In sortlines
             Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
             Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-            dst2.Line(p1, p2, cv.Scalar.White, 2, task.lineType)
+            dst2.Line(p1, p2, cv.Scalar.White, task.lineThickness + 1, task.lineType)
         Next
     End Sub
 End Class
@@ -95,7 +95,7 @@ Public Class Line_Reduction : Inherits VBparent
         For Each line In lines.sortlines
             Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
             Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-            dst2.Line(p1, p2, cv.Scalar.Yellow, 1, task.lineType)
+            dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineThickness, task.lineType)
         Next
     End Sub
 End Class
@@ -128,10 +128,10 @@ Public Class Line_InterceptsUI : Inherits VBparent
         Dim blue = New cv.Scalar(254, 0, 0)
 
         Dim center = New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        dst2.Line(New cv.Point(0, 0), center, blue, 1, cv.LineTypes.Link4)
-        dst2.Line(New cv.Point(dst1.Width, 0), center, red, 1, cv.LineTypes.Link4)
-        dst2.Line(New cv.Point(0, dst1.Height), center, blue, 1, cv.LineTypes.Link4)
-        dst2.Line(New cv.Point(dst1.Width, dst1.Height), center, yellow, 1, cv.LineTypes.Link4)
+        dst2.Line(New cv.Point(0, 0), center, blue, task.lineThickness, cv.LineTypes.Link4)
+        dst2.Line(New cv.Point(dst1.Width, 0), center, red, task.lineThickness, cv.LineTypes.Link4)
+        dst2.Line(New cv.Point(0, dst1.Height), center, blue, task.lineThickness, cv.LineTypes.Link4)
+        dst2.Line(New cv.Point(dst1.Width, dst1.Height), center, yellow, task.lineThickness, cv.LineTypes.Link4)
 
         Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
         Dim pt = New cv.Point(center.X, center.Y - 30)
@@ -159,7 +159,7 @@ Public Class Line_InterceptsUI : Inherits VBparent
             If color.Item0 = 1 Then p2 = New cv.Point((dst2.Height - b) / m, dst2.Height) ' green
             If color.Item0 = 2 Then p2 = New cv.Point(dst2.Width, dst2.Width * m + b) ' yellow
             If color.Item0 = 254 Then p2 = New cv.Point(0, b) ' blue
-            dst2.Line(center, p2, cv.Scalar.Black, 1, task.lineType)
+            dst2.Line(center, p2, cv.Scalar.Black, task.lineThickness, task.lineType)
         End If
         dst2.Circle(center, task.dotSize, cv.Scalar.White, -1, task.lineType)
 
@@ -493,8 +493,8 @@ Public Class Line_NearestPoint : Inherits VBparent
         Dim nearest = findNearestPt(p1, p2, pt)
         dst1.SetTo(0)
         dst1.Circle(New cv.Point2f(pt.X, pt.Y), task.dotSize, cv.Scalar.White, -1, task.lineType)
-        dst1.Line(New cv.Point2f(p1.X, p1.Y), New cv.Point2f(p2.X, p2.Y), cv.Scalar.Yellow, 1, task.lineType)
-        dst1.Line(pt, nearest, cv.Scalar.White, 1, task.lineType)
+        dst1.Line(New cv.Point2f(p1.X, p1.Y), New cv.Point2f(p2.X, p2.Y), cv.Scalar.Yellow, task.lineThickness, task.lineType)
+        dst1.Line(pt, nearest, cv.Scalar.White, task.lineThickness, task.lineType)
         label1 = "nearest point = (" + CStr(nearest.X) + "," + CStr(nearest.Y) + ")"
     End Sub
 End Class
@@ -755,7 +755,7 @@ Public Class Line_Longest : Inherits VBparent
             dst2 = plot.dst1.Clone
 
             Dim yMean = (1 - meanVal / plot.maxScale) * dst1.Height
-            dst2.Line(New cv.Point(0, yMean), New cv.Point(dst2.Width, yMean), cv.Scalar.Black, 1)
+            dst2.Line(New cv.Point(0, yMean), New cv.Point(dst2.Width, yMean), cv.Scalar.Black, task.lineThickness)
             dst1.Rectangle(maskRect, cv.Scalar.White, task.lineThickness, task.lineType)
         End If
     End Sub
@@ -805,10 +805,10 @@ Public Class Line_TimeViewLines : Inherits VBparent
             pt1List.Add(pt1)
             pt2list.Add(pt2)
             If v.Item5 = verticalSlope Then
-                dst2.Line(pt1, pt2, cv.Scalar.Blue, task.lineThickness + 1, task.lineType)
+                dst2.Line(pt1, pt2, cv.Scalar.Blue, task.lineThickness + task.lineThickness, task.lineType)
             Else
                 If v.Item5 = 0 Then
-                    dst2.Line(pt1, pt2, cv.Scalar.Red, task.lineThickness + 1, task.lineType)
+                    dst2.Line(pt1, pt2, cv.Scalar.Red, task.lineThickness + task.lineThickness, task.lineType)
                 End If
             End If
         Next

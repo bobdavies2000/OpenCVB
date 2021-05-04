@@ -27,9 +27,9 @@ Public Class FitEllipse_Basics_CPP : Inherits VBparent
             ' draw a rotatedRectangle
             Dim vertices = box.Points()
             For j = 0 To vertices.Count - 1
-                dst1.Line(vertices(j), vertices((j + 1) Mod 4), cv.Scalar.Green, 2, task.lineType)
+                dst1.Line(vertices(j), vertices((j + 1) Mod 4), cv.Scalar.Green, task.lineThickness + 1, task.lineType)
             Next
-            dst1.Ellipse(box, cv.Scalar.Green, 2, task.lineType)
+            dst1.Ellipse(box, cv.Scalar.Green, task.lineThickness + 1, task.lineType)
 
             ' AMS method
             Dim input As New cv.Mat(area.srcPoints.Count, 1, cv.MatType.CV_32FC2, area.srcPoints)
@@ -53,7 +53,7 @@ Public Class FitEllipse_Basics_CPP : Inherits VBparent
                 center = New cv.Point2f(output.Get(Of Single)(1), output.Get(Of Single)(2))
                 size = New cv.Size2f(output.Get(Of Single)(3), output.Get(Of Single)(4))
                 box = New cv.RotatedRect(center, size, angle)
-                dst1.Ellipse(box, cv.Scalar.Red, 2, task.lineType)
+                dst1.Ellipse(box, cv.Scalar.Red, task.lineThickness + 1, task.lineType)
             End If
             ' draw the input dots on top of everything...
             For i = 0 To area.srcPoints.Count - 1

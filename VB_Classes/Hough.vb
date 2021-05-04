@@ -13,7 +13,7 @@ Module Hough_Exports
 
             Dim pt1 As cv.Point = New cv.Point(Math.Round(x + 1000 * -b), Math.Round(y + 1000 * a))
             Dim pt2 As cv.Point = New cv.Point(Math.Round(x - 1000 * -b), Math.Round(y - 1000 * a))
-            dst1.Line(pt1, pt2, cv.Scalar.Red, 2, task.lineType, 0)
+            dst1.Line(pt1, pt2, cv.Scalar.Red, task.lineThickness + 1, task.lineType, 0)
         Next
     End Sub
 
@@ -30,7 +30,7 @@ Module Hough_Exports
         Dim pt1 As cv.Point = New cv.Point(x, y)
         Dim pt2 As cv.Point
         If m = 0 Then pt2 = New cv.Point(x, dst1.Rows) Else pt2 = New cv.Point((dst1.Rows - b) / m, dst1.Rows)
-        dst1.Line(pt1, pt2, cv.Scalar.Red, 3, task.lineType, 0)
+        dst1.Line(pt1, pt2, cv.Scalar.Red, task.lineThickness + 2, task.lineType, 0)
     End Sub
 End Module
 
@@ -49,7 +49,7 @@ Public Class Hough_Circles : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         circles.Run(src)
         dst1 = circles.dst1
-        Static Dim method As integer = 3
+        Static Dim method As Integer = 3
         cv.Cv2.CvtColor(dst1, dst2, cv.ColorConversionCodes.BGR2GRAY)
         Dim cFound = cv.Cv2.HoughCircles(dst2, method, 1, dst1.Rows / 4, 100, 10, 1, 200)
         Dim foundColor = New cv.Scalar(0, 0, 255)
@@ -88,7 +88,7 @@ Public Class Hough_Lines : Inherits VBparent
         segments = cv.Cv2.HoughLines(edges.dst1, rhoIn, thetaIn, threshold)
         label1 = "Found " + CStr(segments.Length) + " Lines"
 
-        If standalone or task.intermediateReview = caller Then
+        If standalone Or task.intermediateReview = caller Then
             src.CopyTo(dst1)
             dst1.SetTo(cv.Scalar.White, edges.dst1)
             src.CopyTo(dst2)
@@ -96,7 +96,7 @@ Public Class Hough_Lines : Inherits VBparent
             Dim probSegments = cv.Cv2.HoughLinesP(edges.dst1, rhoIn, thetaIn, threshold)
             For i = 0 To Math.Min(probSegments.Length, sliders.trackbar(3).Value) - 1
                 Dim line = probSegments(i)
-                dst2.Line(line.P1, line.P2, cv.Scalar.Red, 3, task.lineType)
+                dst2.Line(line.P1, line.P2, cv.Scalar.Red, task.lineThickness + 2, task.lineType)
             Next
             label2 = "Probablistic lines = " + CStr(probSegments.Length)
         End If
