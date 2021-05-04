@@ -155,6 +155,7 @@ Public Class TimeView_Centroids : Inherits VBparent
     Public Sub New()
         label1 = "Top view with centroids in yellow"
         label2 = "Side view with centroids in yellow"
+        findSlider("Amount to rotate pointcloud around Y-axis (degrees)").Value = 1
         task.desc = "Use KNN to track the query points"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -163,10 +164,10 @@ Public Class TimeView_Centroids : Inherits VBparent
         dst2 = tflood.dst1
 
         For i = 0 To tflood.floodTop.centroids.Count - 1
-            dst1.Circle(tflood.floodTop.centroids(i), task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+            dst1.Circle(tflood.floodTop.centroids(i), task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
         Next
         For i = 0 To tflood.floodSide.centroids.Count - 1
-            dst2.Circle(tflood.floodSide.centroids(i), task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+            dst2.Circle(tflood.floodSide.centroids(i), task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
         Next
 
         Dim saveTopQueries = New List(Of cv.Point2f)(tflood.floodTop.centroids)
@@ -176,7 +177,7 @@ Public Class TimeView_Centroids : Inherits VBparent
             knn.Run(src)
             For i = 0 To knn.neighbors.Rows - 1
                 Dim qPoint = tflood.floodTop.centroids(i)
-                dst1.Circle(qPoint, 3, cv.Scalar.Red, -1, task.lineType, 0)
+                dst1.Circle(qPoint, task.dotSize + 3, cv.Scalar.Red, -1, task.lineType, 0)
                 Dim pt = saveTopQueries(knn.neighbors.Get(Of Single)(i, 0))
                 If Single.IsNaN(pt.X) = False And Single.IsNaN(pt.Y) = False Then
                     Dim cpt = New cv.Point(CInt(pt.X), CInt(pt.Y))

@@ -16,7 +16,7 @@ Public Class ORB_Basics : Inherits VBparent
         If standalone or task.intermediateReview = caller Then
             dst1 = src.Clone().CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             For Each kpt In keypoints
-                dst1.Circle(kpt.Pt, 3, cv.Scalar.Yellow, -1, task.lineType)
+                dst1.Circle(kpt.Pt, task.dotSize + 1, cv.Scalar.Yellow, -1, task.lineType)
             Next
             label1 = CStr(keypoints.Count) + " key points were identified"
         End If

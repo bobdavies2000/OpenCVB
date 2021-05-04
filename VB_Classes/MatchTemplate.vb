@@ -139,7 +139,7 @@ Public Class MatchTemplate_DrawRect : Inherits VBparent
         addw.Run(src)
         dst2 = addw.dst1
 
-        dst2.Circle(maxLoc.X, maxLoc.Y, task.dotSize / 2, cv.Scalar.Red, -1, task.lineType)
+        dst2.Circle(maxLoc.X, maxLoc.Y, task.dotSize, cv.Scalar.Red, -1, task.lineType)
         label2 = "Red is best match, white has correlation > " + Format(thresholdSlider.value / 100, "#0%")
     End Sub
 End Class

@@ -246,7 +246,7 @@ Public Class MSER_CPPStyle : Inherits VBparent
         For Each pts In regions
             Dim color = cv.Scalar.RandomColor
             For Each pt In pts
-                mat.Circle(pt, 1, color, -1, task.lineType)
+                mat.Circle(pt, task.dotSize, color, -1, task.lineType)
             Next
         Next
         dst1 = mat.Resize(dst1.Size())

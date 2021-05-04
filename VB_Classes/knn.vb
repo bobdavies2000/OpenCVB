@@ -226,11 +226,11 @@ Public Class KNN_1_to_1 : Inherits VBparent
             Dim mpt = matchedPoints(i)
             Dim qPoint = basics.knnQT.queryPoints(i)
             If mpt.X >= 0 Then
-                dst1.Circle(qPoint, 3, cv.Scalar.Red, -1, task.lineType, 0)
+                dst1.Circle(qPoint, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType, 0)
                 dst1.Line(mpt, qPoint, cv.Scalar.Red, 1, task.lineType)
             Else
                 unmatchedPoints.Add(qPoint)
-                dst1.Circle(qPoint, 3, cv.Scalar.Yellow, -1, task.lineType, 0)
+                dst1.Circle(qPoint, task.dotSize + 1, cv.Scalar.Yellow, -1, task.lineType, 0)
             End If
         Next
     End Sub
@@ -407,9 +407,9 @@ Public Class KNN_Point3d : Inherits VBparent
         dst2.SetTo(0)
         For i = 0 To lastSet.Count - 1
             Dim p = New cv.Point2f(lastSet(i).X, lastSet(i).Y)
-            dst1.Circle(p, 9, cv.Scalar.Blue, -1, task.lineType)
+            dst1.Circle(p, task.dotSize + 4, cv.Scalar.Blue, -1, task.lineType)
             p = New cv.Point2f(lastSet(i).X, lastSet(i).Z * src.Rows / maxDepth)
-            dst2.Circle(p, 9, cv.Scalar.Blue, -1, task.lineType)
+            dst2.Circle(p, task.dotSize + 4, cv.Scalar.Blue, -1, task.lineType)
         Next
 
         ReDim responseSet(querySet.Length * findXnearest - 1)
@@ -424,12 +424,12 @@ Public Class KNN_Point3d : Inherits VBparent
                     Dim plast = New cv.Point2f(lastSet(responseSet(i * findXnearest + j)).X, lastSet(responseSet(i * findXnearest + j)).Y)
                     Dim pQ = New cv.Point2f(querySet(i).X, querySet(i).Y)
                     dst1.Line(plast, pQ, cv.Scalar.White, 1, task.lineType)
-                    dst1.Circle(pQ, 5, cv.Scalar.Yellow, -1, task.lineType, 0)
+                    dst1.Circle(pQ, task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType, 0)
 
                     plast = New cv.Point2f(lastSet(responseSet(i * findXnearest + j)).X, lastSet(responseSet(i * findXnearest + j)).Z * src.Rows / maxDepth)
                     pQ = New cv.Point2f(querySet(i).X, querySet(i).Z * src.Rows / maxDepth)
                     dst2.Line(plast, pQ, cv.Scalar.White, 1, task.lineType)
-                    dst2.Circle(pQ, 5, cv.Scalar.Yellow, -1, task.lineType, 0)
+                    dst2.Circle(pQ, task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType, 0)
                 Next
             End If
         Next
@@ -565,7 +565,7 @@ Public Class KNN_Contours : Inherits VBparent
         dst2.SetTo(0)
         For i = 0 To knn.neighbors.Rows - 1
             Dim qPoint = queries.Get(Of cv.Point2f)(i, 0)
-            dst2.Circle(qPoint, 3, cv.Scalar.Red, -1, task.lineType, 0)
+            dst2.Circle(qPoint, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType, 0)
             Dim pt = trainData.Get(Of cv.Point2f)(knn.neighbors.Get(Of Single)(i, 0), 0)
             dst2.Line(pt, qPoint, cv.Scalar.Red, 1, task.lineType)
         Next
@@ -628,7 +628,7 @@ Public Class KNN_Cluster2DCities : Inherits VBparent
             Next
         Next
         For i = 0 To cityOrder.Length - 1
-            result.Circle(cityPositions(i), 4 * task.fontSize, cv.Scalar.Red, -1, task.lineType)
+            result.Circle(cityPositions(i), task.dotSize + 1, cv.Scalar.Red, -1, task.lineType)
         Next
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -683,7 +683,7 @@ Public Class KNN_Point2d : Inherits VBparent
     Public Sub prepareImage(dst As cv.Mat, dotSize As Integer)
         dst.SetTo(0)
         'For i = 0 To knn.knnQT.trainingPoints.Count - 1
-        '    dst.Circle(knn.knnQT.trainingPoints(i), dotSize + 2, cv.Scalar.Blue, -1, task.lineType, 0)
+        '    dst.Circle(knn.knnQT.trainingPoints(i), task.dotSize + 2, cv.Scalar.Blue, -1, task.lineType, 0)
         'Next
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

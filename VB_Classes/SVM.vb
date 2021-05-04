@@ -189,7 +189,7 @@ Public Class SVM_Random : Inherits VBparent
                 If pt.X > rect.X And pt.X < rect.X + rect.Width And pt.Y > rect.Y And pt.Y < rect.Y + rect.Height Then resp = 1 Else resp = -1
             End If
             response.Set(Of Integer)(i, 0, resp)
-            dst1.Circle(pt, 5, If(resp = 1, cv.Scalar.Blue, cv.Scalar.Green), -1, task.lineType)
+            dst1.Circle(pt, task.dotSize + 3, If(resp = 1, cv.Scalar.Blue, cv.Scalar.Green), -1, task.lineType)
             trainData.Set(Of Single)(i, 0, pt.X)
             trainData.Set(Of Single)(i, 1, pt.Y)
         Next
@@ -208,10 +208,10 @@ Public Class SVM_Random : Inherits VBparent
                     Dim ret = svmx.Predict(sampleMat)
                     output.Add(ret)
                     If ret >= 0 Then
-                        dst2.Circle(New cv.Point(x, y), 5, cv.Scalar.Blue, -1, task.lineType)
+                        dst2.Circle(New cv.Point(x, y), task.dotSize + 3, cv.Scalar.Blue, -1, task.lineType)
                         blueCount += 1
                     Else
-                        dst2.Circle(New cv.Point(x, y), 5, cv.Scalar.Green, -1, task.lineType)
+                        dst2.Circle(New cv.Point(x, y), task.dotSize + 3, cv.Scalar.Green, -1, task.lineType)
                     End If
                 Next
             Next
@@ -247,6 +247,7 @@ Public Class SVM_TestCase : Inherits VBparent
         task.desc = "Text book example on SVM"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static granSlider = findSlider("Granularity")
         dst1.SetTo(cv.Scalar.White)
         dst2.SetTo(0)
         svmOptions.Run(src)
@@ -255,22 +256,22 @@ Public Class SVM_TestCase : Inherits VBparent
         svmx.Train(trainMat, cv.ML.SampleTypes.RowSample, labelsMat)
 
         Dim sampleMat As New cv.Mat(1, 2, cv.MatType.CV_32F)
-        Dim granularity = svmOptions.sliders.trackbar(1).Value
+        Dim granularity = granSlider.value
         For y = 0 To dst1.Height - 1 Step granularity
             For x = 0 To dst1.Width - 1 Step granularity
                 sampleMat.Set(Of Single)(0, 0, x)
                 sampleMat.Set(Of Single)(0, 1, y)
                 Dim response = svmx.Predict(sampleMat)
                 Dim color = If(response >= 0, cv.Scalar.Blue, cv.Scalar.Green)
-                dst2.Circle(New cv.Point(x, y), 5, color, -1, task.lineType)
+                dst2.Circle(New cv.Point(CInt(x), CInt(y)), task.dotSize + 3, color, -1, task.lineType)
             Next
         Next
 
         For i = 0 To trainMat.Rows - 1
             Dim color = If(labelsMat.Get(Of Integer)(i) = 1, cv.Scalar.Yellow, cv.Scalar.Red)
             Dim pt = New cv.Point(trainMat.Get(Of Single)(i, 0), trainMat.Get(Of Single)(i, 1))
-            dst1.Circle(pt, 5, color, -1, task.lineType)
-            dst2.Circle(pt, 5, color, -1, task.lineType)
+            dst1.Circle(pt, task.dotSize + 3, color, -1, task.lineType)
+            dst2.Circle(pt, task.dotSize + 3, color, -1, task.lineType)
         Next
     End Sub
 End Class

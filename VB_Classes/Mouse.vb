@@ -9,11 +9,10 @@ Public Class Mouse_Basics : Inherits VBparent
         ' only display mouse movement in the lower left image (pic.tag = 2)
         If lastPoint = task.mousePoint Or task.mousePicTag <> 2 Then Exit Sub
         lastPoint = task.mousePoint
-        Dim radius = 10
         Static colorIndex As Integer
         Dim nextColor = task.scalarColors(colorIndex)
         Dim nextPt = task.mousePoint
-        dst1.Circle(nextPt, radius, nextColor, -1, task.lineType)
+        dst1.Circle(nextPt, task.dotSize + 3, nextColor, -1, task.lineType)
         colorIndex += 1
         If colorIndex >= task.scalarColors.Count Then colorIndex = 0
     End Sub

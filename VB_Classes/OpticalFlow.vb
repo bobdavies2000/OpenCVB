@@ -282,9 +282,9 @@ Public Class OpticalFlow_Sparse : Inherits VBparent
                     If length < 30 Then
                         features.Add(pt1)
                         lastFeatures.Add(pt2)
-                        dst1.Line(pt1, pt2, cv.Scalar.Red, 5, task.lineType)
-                        dst2.Circle(pt1, 5, cv.Scalar.White, -1, task.lineType)
-                        dst2.Circle(pt2, 3, cv.Scalar.Red, -1, task.lineType)
+                        dst1.Line(pt1, pt2, cv.Scalar.Red, task.lineThickness + 3, task.lineType)
+                        dst2.Circle(pt1, task.dotSize + 3, cv.Scalar.White, -1, task.lineType)
+                        dst2.Circle(pt2, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType)
                     End If
                 End If
             Next

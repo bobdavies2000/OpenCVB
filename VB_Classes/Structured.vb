@@ -1,4 +1,23 @@
 Imports cv = OpenCvSharp
+Public Class Structured_SliceOptions : Inherits VBparent
+    Public Sub New()
+        If sliders.Setup(caller) Then
+            sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 10, 1)
+            sliders.setupTrackBar(1, "Slice step size in pixels (multi-slice option only)", 1, 100, 20)
+        End If
+        task.desc = "Structured Slice options"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        task.trueText("This algorithm is used to share the horizontal and vertical slice options.")
+    End Sub
+End Class
+
+
+
+
+
+
+
 Public Class Structured_Floor : Inherits VBparent
     Public structD As New Structured_SliceH
     Dim kalman As New Kalman_VB_Basics
@@ -9,7 +28,6 @@ Public Class Structured_Floor : Inherits VBparent
         task.desc = "Find the floor plane"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-
         structD.Run(src)
 
         Dim yCoordinate = dst2.Height
@@ -27,8 +45,6 @@ Public Class Structured_Floor : Inherits VBparent
         If task.frameCount > 30 Then yCoordinate = kalman.kAverage
 
         floorYplane = (task.maxY) * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
-
-        structD.offsetSlider.Value = If(yCoordinate >= 0, yCoordinate, 0)
 
         dst1 = structD.dst1
         dst2 = structD.dst2
@@ -64,7 +80,6 @@ Public Class Structured_Ceiling : Inherits VBparent
 
         kalman.kInput(0) = yCoordinate
         kalman.Run(src)
-        structD.offsetSlider.Value = If(kalman.kOutput(0) >= 0, kalman.kOutput(0), 0)
 
         dst1 = structD.dst1
         dst2 = structD.dst2
@@ -285,10 +300,8 @@ End Class
 Public Class Structured_SliceXPlot : Inherits VBparent
     Dim multi As New Structured_MultiSlice
     Dim structD As New Structured_SliceV
-    Dim cushionSlider As Windows.Forms.TrackBar
     Public Sub New()
-        cushionSlider = findSlider("Structured Depth slice thickness in pixels")
-        cushionSlider.Value = cushionSlider.Maximum
+        structD.cushionSlider.Value = structD.cushionSlider.Maximum
         task.desc = "Find any plane around a peak value in the top-down histogram"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -296,31 +309,66 @@ Public Class Structured_SliceXPlot : Inherits VBparent
         dst2 = structD.dst2
         multi.Run(src)
 
-        Dim col = CInt(structD.offsetSlider.Value)
+        Dim col = If(task.mousePoint.X = 0, dst1.Width / 2, task.mousePoint.X)
 
-        Dim cushion = cushionSlider.Value
+        Dim cushion = structD.cushionSlider.Value
         Dim rect = New cv.Rect(col, 0, If(col + cushion >= dst2.Width, dst2.Width - col, cushion), dst2.Height - 1)
         Dim minLoc As cv.Point, maxLoc As cv.Point
         multi.top2D.histOutput(rect).MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
 
-        dst2.Circle(New cv.Point(col, dst2.Height - maxLoc.Y), 10, cv.Scalar.Red, -1, task.lineType)
+        dst2.Circle(New cv.Point(col, dst2.Height - maxLoc.Y), task.dotSize + 6, cv.Scalar.Red, -1, task.lineType)
         Dim filterZ = maxLoc.Y / dst2.Height * task.maxZ
 
-        Dim maskZplane As New cv.Mat(multi.split(0).Size, cv.MatType.CV_8U)
-        If filterZ > 0 Then
-            Dim depthMask As New cv.Mat
-            minVal = filterZ - 0.05 ' a 10 cm buffer surrounding the z value
-            maxVal = filterZ + 0.05
-            cv.Cv2.InRange(multi.split(2), minVal, maxVal, depthMask)
-            maskZplane = depthMask
-        End If
-
-        If filterZ > 0 Then cv.Cv2.BitwiseAnd(multi.sliceMask, maskZplane, maskZplane)
-
+        Dim depthMask As New cv.Mat(multi.split(0).Size, cv.MatType.CV_8U)
+        If filterZ > 0 Then cv.Cv2.InRange(multi.split(2), filterZ - 0.05, filterZ + 0.05, depthMask) ' a 10 cm buffer surrounding the z value
+        If filterZ > 0 Then cv.Cv2.BitwiseAnd(multi.sliceMask, depthMask, depthMask)
         dst1 = task.color.Clone
-        dst1.SetTo(cv.Scalar.White, maskZplane)
+        dst1.SetTo(cv.Scalar.White, depthMask)
 
-        label2 = "Peak histogram count (" + Format(maxVal, "#0") + ") at " + Format(filterZ, "#0.00") + " meters +-" + Format(10 / task.pixelsPerMeter, "#0.00") + " m"
+        label2 = "Peak histogram count (" + Format(maxVal, "#0") + ") at " + Format(filterZ, "#0.00") + " meters +-" + Format(5 / task.pixelsPerMeter, "#0.00") + " m"
+        task.trueText("Use the mouse to move the slice.", 10, dst1.Height * 3 / 4, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Structured_SliceYPlot : Inherits VBparent
+    Dim multi As New Structured_MultiSlice
+    Dim structD As New Structured_SliceH
+    Public Sub New()
+        structD.cushionSlider.Value = structD.cushionSlider.Maximum
+        task.desc = "Find any plane around a peak value in the side view histogram"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        structD.Run(src)
+        dst2 = structD.dst2
+        multi.Run(src)
+
+        Dim row = If(task.mousePoint.Y = 0, dst1.Height / 2, task.mousePoint.Y)
+
+        Dim cushion = structD.cushionSlider.Value
+        Dim rect = New cv.Rect(0, row, dst2.Width - 1, If(row + cushion >= dst2.Height, dst2.Height - row, cushion))
+        Dim minLoc As cv.Point, maxLoc As cv.Point
+        multi.side2D.histOutput(rect).MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
+        cv.Cv2.ImShow("hist", multi.side2D.histOutput)
+
+        If maxVal > 0 Then
+            dst2.Circle(New cv.Point(maxLoc.X, row), task.dotSize + 6, cv.Scalar.Red, -1, task.lineType)
+            Dim filterZ = maxLoc.X / dst2.Width * task.maxZ
+
+            Dim depthMask As New cv.Mat(multi.split(1).Size, cv.MatType.CV_8U)
+            cv.Cv2.InRange(multi.split(2), filterZ - 0.05, filterZ + 0.05, depthMask) ' a 10 cm buffer surrounding the z value
+
+            dst1 = task.color.Clone
+            dst1.SetTo(cv.Scalar.White, depthMask)
+            Dim pixelsPerMeter = dst1.Width / task.maxZ
+            label2 = "Peak histogram count (" + Format(maxVal, "#0") + ") at " + Format(filterZ, "#0.00") + " meters +-" + Format(5 / pixelsPerMeter, "#0.00") + " m"
+            task.trueText("Use the mouse to move the slice.", 10, dst1.Height * 3 / 4, 3)
+        End If
     End Sub
 End Class
 
@@ -428,23 +476,6 @@ Public Class Structured_LinearizeFloor : Inherits VBparent
 End Class
 
 
-Public Class Structured_SliceOptions : Inherits VBparent
-    Public Sub New()
-
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Structured Depth slice thickness in pixels", 1, 10, 1)
-            sliders.setupTrackBar(1, "Slice step size in pixels (multi-slice option only)", 1, 100, 20)
-            sliders.setupTrackBar(2, "Standalone only horizontal slice offset", 0, dst1.Width - 1, dst1.Width / 2)
-            sliders.setupTrackBar(3, "Standalone only vertical slice offset", 0, dst1.Width - 1, dst1.Width / 2)
-        End If
-
-        task.desc = "Structured Slice options"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        task.trueText("This algorithm is used to share the horizontal and vertical slice options.")
-    End Sub
-End Class
-
 
 
 
@@ -452,13 +483,11 @@ End Class
 Public Class Structured_SliceH : Inherits VBparent
     Public side2D As New Histogram_SideData
     Public cushionSlider As Windows.Forms.TrackBar
-    Public offsetSlider As Windows.Forms.TrackBar
     Public sliceMask As cv.Mat
     Public sliceOptions As New Structured_SliceOptions
     Public yPlaneOffset As Integer
     Public Sub New()
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
-        offsetSlider = findSlider("Standalone only horizontal slice offset")
 
         label2 = "Yellow bar is ceiling.  Yellow line is camera level."
         task.desc = "Find and isolate planes (floor and ceiling) in a side view histogram."
@@ -469,7 +498,7 @@ Public Class Structured_SliceH : Inherits VBparent
         Dim depthShadow = task.noDepthMask
         Dim Split = side2D.gCloud.dst1.Split()
 
-        Dim yCoordinate = CInt(offsetSlider.Value)
+        Dim yCoordinate = If(task.mousePoint.Y = 0, dst1.Height / 2, task.mousePoint.Y)
 
         Dim planeY = -task.maxY * (task.sideCameraPoint.Y - yCoordinate) / task.sideCameraPoint.Y
         If yCoordinate > task.sideCameraPoint.Y Then planeY = task.maxY * (yCoordinate - task.sideCameraPoint.Y) / (dst2.Height - task.sideCameraPoint.Y)
@@ -493,7 +522,7 @@ Public Class Structured_SliceH : Inherits VBparent
         dst2 = side2D.dst1.ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
         dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        yPlaneOffset = If(offsetSlider.Value < dst2.Height - cushion, CInt(offsetSlider.Value), dst2.Height - cushion - 1)
+        yPlaneOffset = If(yCoordinate < dst2.Height - cushion, CInt(yCoordinate), dst2.Height - cushion - 1)
         dst2.Circle(New cv.Point(0, task.sideCameraPoint.Y), task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         dst2.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst2.Width, yPlaneOffset), cv.Scalar.Yellow, cushion)
     End Sub
@@ -509,19 +538,14 @@ Public Class Structured_SliceV : Inherits VBparent
     Public top2D As New Histogram_TopData
     Dim sideStruct As New Structured_SliceH
     Public cushionSlider As Windows.Forms.TrackBar
-    Public offsetSlider As Windows.Forms.TrackBar
     Public sliceMask As cv.Mat
     Public sliceOptions As New Structured_SliceOptions
     Public Sub New()
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
-        offsetSlider = findSlider("Standalone only vertical slice offset")
-        offsetSlider.Maximum = dst1.Width - 1
-        offsetSlider.Value = dst1.Width / 2
-
         task.desc = "Find and isolate planes using the top view histogram data"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Dim xCoordinate = offsetSlider.Value
+        Dim xCoordinate = If(task.mousePoint.X = 0, dst1.Width / 2, task.mousePoint.X)
         top2D.Run(src)
 
         Dim split = top2D.gCloud.dst1.Split()
@@ -551,8 +575,7 @@ Public Class Structured_SliceV : Inherits VBparent
         dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2.Circle(New cv.Point(task.topCameraPoint.X, dst2.Height), task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
-        Dim offset = CInt(offsetSlider.Value)
-        dst2.Line(New cv.Point(offset, 0), New cv.Point(offset, dst2.Height), cv.Scalar.Yellow, cushion)
+        dst2.Line(New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst2.Height), cv.Scalar.Yellow, cushion)
     End Sub
 End Class
 
@@ -567,16 +590,13 @@ Public Class Structured_SliceVStable : Inherits VBparent
     Public top2D As New Histogram_TopData
     Dim structD As New Structured_SliceV
     Public cushionSlider As Windows.Forms.TrackBar
-    Public offsetSlider As Windows.Forms.TrackBar
     Public sliceMask As cv.Mat
     Public Sub New()
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
-        offsetSlider = structD.offsetSlider
-        offsetSlider.Value = dst1.Width / 2
         task.desc = "Find and isolate planes using the top view histogram data"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Dim xCoordinate = offsetSlider.Value
+        Dim xCoordinate = If(task.mousePoint.X = 0, dst1.Width / 2, task.mousePoint.X)
         top2D.Run(src)
         dst2 = top2D.dst1
         Dim split = top2D.gCloud.dst1.Split()

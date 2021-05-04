@@ -148,8 +148,8 @@ Module LineFLD_Exports
                 cv.Cv2.PutText(dst2, Format((endPoints(1).Item1 - endPoints(0).Item1) / (endPoints(1).Item2 - endPoints(0).Item2), "0.00") + "y/z",
                                    New cv.Point(centerPoint.X, centerPoint.Y + 10), cv.HersheyFonts.HersheyTriplex, 0.4, cv.Scalar.White, 1, task.lineType)
                 ' show the final endpoints in xy projection.
-                dst2.Circle(New cv.Point(b.Item3, b.Item4), 2, cv.Scalar.White, -1, task.lineType)
-                dst2.Circle(New cv.Point(d.Item3, d.Item4), 2, cv.Scalar.White, -1, task.lineType)
+                dst2.Circle(New cv.Point(b.Item3, b.Item4), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
+                dst2.Circle(New cv.Point(d.Item3, d.Item4), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
             End If
         End If
     End Sub
@@ -435,8 +435,8 @@ End Class
 '                                    New cv.Point(textPoint.X, textPoint.Y + 10), cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, 1, task.lineType)
 
 '                    ' show the final endpoints in xy projection.
-'                    dst1.Circle(New cv.Point(b.Item3, b.Item4), 3, cv.Scalar.White, -1, task.lineType)
-'                    dst1.Circle(New cv.Point(d.Item3, d.Item4), 3, cv.Scalar.White, -1, task.lineType)
+'                    dst1.Circle(New cv.Point(b.Item3, b.Item4), task.dotsize + 1, cv.Scalar.White, -1, task.lineType)
+'                    dst1.Circle(New cv.Point(d.Item3, d.Item4), task.dotsize + 1, cv.Scalar.White, -1, task.lineType)
 '                End Sub)
 '        End If
 '    End Sub

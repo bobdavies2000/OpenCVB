@@ -444,7 +444,7 @@ End Class
 '                cv.Cv2.FloodFill(dst1, New cv.Mat, pt, task.scalarColors(cIndex), New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
 '                Dim vec = convertScalarToVec3b(task.scalarColors(cIndex))
 '                If vec = lastColors.Get(Of cv.Vec3b)(pt.Y, pt.X) Then truthCount += 1
-'                dst1.Circle(pt, 10, cv.Scalar.Black, -1, task.lineType)
+'                dst1.Circle(pt, task.dotsize + 5, cv.Scalar.Black, -1, task.lineType)
 '            Next
 '            dst2 = (dst1 - lastColors).ToMat
 '            label2 = CStr(truthCount) + " colors correctly predicted with centroid"

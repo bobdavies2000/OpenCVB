@@ -267,8 +267,8 @@ Public Class Stabilizer_OpticalFlow : Inherits VBparent
             dst2 = smoothedFrame.Resize(src.Size())
 
             For i = 0 To commonPoints.Count - 1
-                dst1.Circle(commonPoints.ElementAt(i), 5, cv.Scalar.Red, -1, task.lineType)
-                dst1.Circle(lastFeatures.ElementAt(i), 3, cv.Scalar.Blue, -1, task.lineType)
+                dst1.Circle(commonPoints.ElementAt(i), task.dotSize + 3, cv.Scalar.Red, -1, task.lineType)
+                dst1.Circle(lastFeatures.ElementAt(i), task.dotSize + 1, cv.Scalar.Blue, -1, task.lineType)
             Next
         End If
         inputFeat = Nothing ' show that we consumed the current set of features.

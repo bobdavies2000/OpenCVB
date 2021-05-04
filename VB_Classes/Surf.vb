@@ -76,7 +76,7 @@ Public Class Surf_DrawMatchManual_CS : Inherits VBparent
         Dim keys2 = surf.CS_SurfBasics.keypoints2
 
         For i = 0 To keys1.Count - 1
-            dst1.Circle(keys1(i).Pt, 5, cv.Scalar.Red, -1, task.lineType)
+            dst1.Circle(keys1(i).Pt, task.dotSize + 3, cv.Scalar.Red, -1, task.lineType)
         Next
 
         Dim matchCount As Integer
@@ -84,7 +84,7 @@ Public Class Surf_DrawMatchManual_CS : Inherits VBparent
             Dim pt = keys1(i).Pt
             For j = 0 To keys2.Count - 1
                 If Math.Abs(keys2(j).Pt.X - pt.X) < sliders.trackbar(0).Value And Math.Abs(keys2(j).Pt.Y - pt.Y) < sliders.trackbar(0).Value Then
-                    dst2.Circle(keys2(j).Pt, 5, cv.Scalar.Yellow, -1, task.lineType)
+                    dst2.Circle(keys2(j).Pt, task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
                     keys2(j).Pt.Y = -1 ' so we don't match it again.
                     matchCount += 1
                 End If
@@ -93,7 +93,7 @@ Public Class Surf_DrawMatchManual_CS : Inherits VBparent
         ' mark those that were not
         For i = 0 To keys2.Count - 1
             Dim pt = keys2(i).Pt
-            If pt.Y <> -1 Then dst2.Circle(keys2(i).Pt, 5, cv.Scalar.Red, -1, task.lineType)
+            If pt.Y <> -1 Then dst2.Circle(keys2(i).Pt, task.dotSize + 3, cv.Scalar.Red, -1, task.lineType)
         Next
         label2 = "Yellow matched left to right = " + CStr(matchCount) + ". Red is unmatched."
     End Sub

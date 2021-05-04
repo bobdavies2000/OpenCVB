@@ -72,13 +72,13 @@ Public Class LeftRight_Features : Inherits VBparent
         features.Run(lrView.dst2)
         lrView.dst2.CopyTo(dst2)
         For i = 0 To features.goodFeatures.Count - 1
-            dst2.Circle(features.goodFeatures(i), 3, cv.Scalar.White, -1, task.lineType)
+            dst2.Circle(features.goodFeatures(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
         Next
 
         features.Run(lrView.dst1)
         lrView.dst1.CopyTo(dst1)
         For i = 0 To features.goodFeatures.Count - 1
-            dst1.Circle(features.goodFeatures(i), 3, cv.Scalar.White, -1, task.lineType)
+            dst1.Circle(features.goodFeatures(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
         Next
     End Sub
 End Class
