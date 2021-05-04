@@ -306,20 +306,7 @@ Public Class ActiveTask : Implements IDisposable
         task.parms = parms
         task.defaultRect = _defaultRect
         font = cv.HersheyFonts.HersheyComplex
-        Select Case task.color.Width
-            Case 320
-                fontSize = task.color.Width / task.pointCloud.Width
-                dotSize = 3
-                resolutionIndex = 1
-            Case 640
-                fontSize = task.color.Width / task.pointCloud.Width
-                dotSize = 7
-                resolutionIndex = 2
-            Case 1280
-                fontSize = 1
-                dotSize = 15
-                resolutionIndex = 3
-        End Select
+        resolutionIndex = If(task.color.Width = 640, 2, 3)
 
         buildColors()
         task.pythonTaskName = task.parms.homeDir + "VB_Classes\" + task.algName
