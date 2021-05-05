@@ -66,10 +66,8 @@ Public Class PointCloud_Basics : Inherits VBparent
 
         '    roi = New cv.Rect(rFront.X, 0, rFront.Width, src.Height)
         '    vw = vwTop
-        '    If showDetails Then
-        '        task.trueText(detailText, detailPoint.X, detailPoint.Y, picTag:=If(standalone, 2, 3))
-        '        If standalone Or task.intermediateReview = caller Then label1 = "Clicked: " + detailText Else label2 = "Clicked: " + detailText
-        '    End If
+        '    task.trueText(detailText, detailPoint.X, detailPoint.Y, picTag:=If(standalone, 2, 3))
+        '    If standalone Or task.intermediateReview = caller Then label1 = "Clicked: " + detailText Else label2 = "Clicked: " + detailText
         'End If
 
         'If vwSide.Count And sideActive Then
@@ -85,10 +83,8 @@ Public Class PointCloud_Basics : Inherits VBparent
 
         '    roi = New cv.Rect(0, rFront.Y, src.Width, rFront.Y + rFront.Height)
         '    vw = vwSide
-        '    If showDetails Then
-        '        task.trueText(detailText, detailPoint.X, detailPoint.Y, 3)
-        '        label2 = "Clicked: " + detailText
-        '    End If
+        '    task.trueText(detailText, detailPoint.X, detailPoint.Y, 3)
+        '    label2 = "Clicked: " + detailText
         'End If
 
         'If vw.Count > 0 Then
