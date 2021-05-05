@@ -1,32 +1,38 @@
-Recent Changes – March 2021
-===========================
+Recent Changes – May 2021
+=========================
 
--   Almost 940 algorithms – almost all less than a page of code
+-   980 algorithms – almost all less than a page of code
 
--   Stream-lined install: no environmental variable, library builds are
-    automated.
+-   Global variables introduced – settings that apply to all algorithms, line
+    width, max depth, font size.
 
--   Latest version of the OpenCV library - 4.5.2
+    -   Global variables are remembered across runs and can be reset to know
+        working values
 
--   Improved Python support – now using “requirements.txt”
+-   Fewer lines of code. Code size dropped about 4000 lines with more
+    algorithms. Average algorithm: 31 lines.
 
--   An experimental Python interface to the LibRealSense2 cameras has been added
+-   Algorithms are now ranked by usage (“Reuse Rank”) and “Value Rank”, a graded
+    estimate of algorithm value.
 
--   VTK support is being dropped – it is too big and cumbersome. Recommended:
-    Python Pyglet
+    -   Rankings are part of the group combo pulldown.
 
--   Oak-D camera Python interface is present but turned off pending IMU support
-    from the vendor
+-   New Survey function to build images of all algorithm output to allow visual
+    searches for desired algorithm.
 
--   “PyStream” support is now a 2-way pipeline. Output can appear in the OpenCVB
-    interface
+-   Global setting for palette control
 
--   Tensorflow database downloads are automated with algorithm
-    “Download_Database”
+-   Improved regression testing – all algorithms are tested with each attached
+    camera at all supported resolutions.
 
--   Emgu examples removed. LineDetector library removed – it was redundant
+-   Navigation aids now available – back to previous algorithm, forward to next,
+    and full history.
 
--   Version 1.0.0 defined and released
+-   Image microscope works even when stream is paused, allowing more detailed
+    image analysis.
+
+-   Improved tree view to study how algorithm was constructed from other
+    algorithms.
 
 Introduction
 ============
@@ -53,10 +59,9 @@ algorithm’s intent.
 
 The basic layout of OpenCVB is shown below. Any of the algorithms can be
 selected from the first combo box at the top of the form. The second combo box
-is used to select an algorithms group. The default grouping is to select the
-special grouping “\<All\>”. There are a variety of other special groupings that
-select, for example, all Python or all C++ algorithms or all multi-threaded
-algorithms.
+is used to select an algorithm group. The default grouping is “\<All\>”. There
+are a variety of other special groupings that select, for example, all Python or
+all C++ algorithms.
 
 ![](media/0094dd80a047099af3fa5ecf92dee723.png)
 
@@ -313,11 +318,11 @@ Box is set to “\<All\>”, the Algorithm Combo Box will contain all the algori
 in OpenCVB.*
 
 The ability to create subsets from the hundreds of algorithms makes it easier to
-study examples of an OpenCV API or OpenCVB algorithm usage. In addition to all
-the OpenCV API’s or OpenCVB algorithms, the Subset Combo Box has several
-higher-level groupings. For example, “\<Python\>” selects all Python algorithms.
-Or “\<OpenGL\>” selects only the OpenGL algorithms. The “\<All\>” entry in the
-Subset Combo Box will restore the complete list of algorithms.
+study examples of an OpenCV API or OpenCVB algorithm usage. In addition, the
+Subset Combo Box has several higher-level groupings. For example, “\<Python\>”
+selects all Python algorithms. Or “\<OpenGL\>” selects only the OpenGL
+algorithms. The “\<All\>” entry in the Subset Combo Box will restore the
+complete list of algorithms.
 
 Regression Testing All Experiments
 ==================================
@@ -1197,3 +1202,33 @@ Recent Changes – 2/15/2021
 
 -   Motion Filtered Data series of algorithms – an attempt at reducing data
     analysis at input
+
+Recent Changes – March 2021
+===========================
+
+-   Almost 940 algorithms – almost all less than a page of code
+
+-   Stream-lined install: no environmental variable, library builds are
+    automated.
+
+-   Latest version of the OpenCV library - 4.5.2
+
+-   Improved Python support – now using “requirements.txt”
+
+-   An experimental Python interface to the LibRealSense2 cameras has been added
+
+-   VTK support is being dropped – it is too big and cumbersome. Recommended:
+    Python Pyglet
+
+-   Oak-D camera Python interface is present but turned off pending IMU support
+    from the vendor
+
+-   “PyStream” support is now a 2-way pipeline. Output can appear in the OpenCVB
+    interface
+
+-   Tensorflow database downloads are automated with algorithm
+    “Download_Database”
+
+-   Emgu examples removed. LineDetector library removed – it was redundant
+
+-   Version 1.0.0 defined and released
