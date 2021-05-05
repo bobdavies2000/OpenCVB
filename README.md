@@ -238,6 +238,12 @@ Some typical problems with new installations:
     recently? Post if some configuration problems prevent the camera from
     working in OpenCVB.
 
+-   “Mark of the Web” problem. Some of the .resx files are marked as coming from
+    the web as part of the download of a release. It is not clear how to avoid
+    this but the solution is to right click the offending file, select
+    “Properties”, and click the “Unblock” checkbox in the General tab of the
+    properties. Any suggestions on how to avoid this problem would be welcome.
+
 -   Python Scripts Fail: Python setup has 2 parts – telling OpenCVB which Python
     to use and running the requirements.txt. There is a description below on how
     to set those up.
@@ -559,24 +565,18 @@ Tree View
 =========
 
 The tree view shows how an algorithm was built using the other OpenCVB
-algorithms. Here is a simple algorithm tree view that shows how the Benford_JPEG
-algorithm was built:
+algorithms. Here is a simple algorithm tree view that shows how the
+KNN_PointTracker algorithm was built:
 
-![](media/eee2426c6b6dc32aae9454fdc4dfc1f5.png)
+![Graphical user interface, text, application, email Description automatically generated](media/5f4b6c13e3d0e852b0705339f893603e.png)
 
-The Benford_JPEG algorithm applies the “Benford_Basics” algorithm to a JPEG
-image data. The “Benford_Basics” algorithm builds a histogram. The histogram is
-then displayed using OpenCV’s “AddWeighted_Basics” API and a histogram plot
-algorithm called “Plot_Histogram”.
-
-Note the pair of radio buttons below the tree view. The tree view is “live” in
-the sense that clicking on any entry in the view will show one of 2 different
-outputs in the main OpenCVB form: 1) the output of the clicked algorithm’s
-“standalone” run; or 2) the output of the currently running algorithm. The
-objective is to show and understand the intermediate stages of compound
-algorithms while running. All output will show up in OpenCVB’s main form in the
-bottom 2 images. Play with this when running OpenCVB. It is a fun feature and
-helps understand the composition of the increasingly complex algorithms.
+The tree describes how the algorithm calls KNN_1_to_1 and how KNN_1_to_1 calls
+KNN_BasicsQT and so on. Clicking on any of the tree entries will show the output
+of the selected algorithm in this context. This is useful to understand the
+various steps needed build the output. All output will show up in OpenCVB’s main
+form in the bottom 2 images. Play with this when running OpenCVB. It is a fun
+feature and helps increase understanding of the composition of the increasingly
+complex algorithms.
 
 Pixel Viewer
 ============
