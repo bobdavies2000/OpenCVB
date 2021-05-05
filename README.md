@@ -6,7 +6,7 @@ Recent Changes – May 2021
 -   Global variables introduced – settings that apply to all algorithms, line
     width, max depth, font size.
 
-    -   Global variables are remembered across runs and can be reset to know
+    -   Global variables are remembered across runs and can be reset to known
         working values
 
 -   Fewer lines of code. Code size dropped about 4000 lines with more
