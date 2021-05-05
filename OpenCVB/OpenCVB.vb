@@ -311,24 +311,24 @@ Public Class OpenCVB
 
                     count = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
                     If count > 0 Then cv.Cv2.ImWrite(surveyDir.FullName + "/" + AvailableAlgorithms.Text + "2.jpg", dst2, encodeParams)
-
-                    frameCount = 0
-                    If surveyIndex >= 0 Then
-                        Dim callEntry As String = ""
-                        For i = 0 To callTrace.Count - 1
-                            Dim split() = callTrace(i).Split("\")
-                            callEntry += split(split.Length - 2) + If(i = callTrace.Count - 1, "", ",")
-                        Next
-                        surveyFileWriter.WriteLine(callEntry)
-                    End If
-                    If surveyIndex = AvailableAlgorithms.Items.Count - 1 Then
-                        surveyFileWriter.Close()
-                        surveyActive = False
-                    Else
-                        surveyIndex += 1
-                        AvailableAlgorithms.SelectedIndex = surveyIndex
-                    End If
                 End SyncLock
+
+                frameCount = 0
+                If surveyIndex >= 0 Then
+                    Dim callEntry As String = ""
+                    For i = 0 To callTrace.Count - 1
+                        Dim split() = callTrace(i).Split("\")
+                        callEntry += split(split.Length - 2) + If(i = callTrace.Count - 1, "", ",")
+                    Next
+                    surveyFileWriter.WriteLine(callEntry)
+                End If
+                If surveyIndex = AvailableAlgorithms.Items.Count - 1 Then
+                    surveyFileWriter.Close()
+                    surveyActive = False
+                Else
+                    surveyIndex += 1
+                    AvailableAlgorithms.SelectedIndex = surveyIndex
+                End If
             End If
         End If
 

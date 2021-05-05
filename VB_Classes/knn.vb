@@ -508,7 +508,6 @@ End Class
 
 Public Class KNN_StabilizeRegions : Inherits VBparent
     Public knn As New KNN_DepthClusters
-    Public flood As New FloodFill_Palette
     Dim lastinput As New cv.Mat
     Public Sub New()
         findCheckBox("Draw rectangle and centroid for each mask").Checked = False
@@ -524,9 +523,6 @@ Public Class KNN_StabilizeRegions : Inherits VBparent
         If task.frameCount = 0 Then lastinput = tmp.Clone
         cv.Cv2.BitwiseXor(tmp, lastinput, dst2)
         lastinput = tmp
-
-        'flood.Run(dst2)
-        'dst2 = flood.dst2
     End Sub
 End Class
 
