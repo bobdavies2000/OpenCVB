@@ -512,10 +512,9 @@ Public Class Line_SideView : Inherits VBparent
     Public Sub New()
         label1 = "Side view of the lines detected in the RGB image"
         label2 = "Lines found in the RGB image view"
-        task.desc = "Line in image are projected into the depth image"
+        task.desc = "Line in image are projected into the depth image - not yet complete..."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-
         lines.Run(src)
         dst2 = lines.dst2
 
@@ -523,8 +522,7 @@ Public Class Line_SideView : Inherits VBparent
         ' tView.src = New cv.Mat(dst1.Size, cv.MatType.CV_32FC3, 0)
         'task.pointCloud.CopyTo(tView.src, mask)
         tView.Run(task.pointCloud)
-
-        dst1 = tView.dst2
+        dst1 = tView.dst1
     End Sub
 End Class
 

@@ -155,7 +155,6 @@ Public Class TimeView_Centroids : Inherits VBparent
     Public Sub New()
         label1 = "Top view with centroids in yellow"
         label2 = "Side view with centroids in yellow"
-        findSlider("Amount to rotate pointcloud around Y-axis (degrees)").Value = 1
         task.desc = "Use KNN to track the query points"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

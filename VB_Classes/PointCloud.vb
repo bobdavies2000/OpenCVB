@@ -1141,7 +1141,6 @@ Public Class PointCloud_TrackerSide : Inherits VBparent
     Public setupSide As New PointCloud_SetupSide
     Public Sub New()
         findSlider("FloodFill Minimum Size").Value = 100
-        findSlider("Amount to rotate pointcloud around Y-axis (degrees)").Value = 1
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 3
