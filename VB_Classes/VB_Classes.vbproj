@@ -163,7 +163,9 @@
     <Compile Include="PixelViewerForm.Designer.vb">
       <DependentUpon>PixelViewerForm.vb</DependentUpon>
     </Compile>
-    <Compile Include="PixelViewerForm.vb" />
+    <Compile Include="PixelViewerForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Rectangle.vb" />
     <Compile Include="Fibonacci.vb" />
     <Compile Include="Fuzzy.vb" />
@@ -287,7 +289,9 @@
     <Compile Include="OptionsSliders.Designer.vb">
       <DependentUpon>OptionsSliders.vb</DependentUpon>
     </Compile>
-    <Compile Include="OptionsSliders.vb" />
+    <Compile Include="OptionsSliders.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="ORB.vb" />
     <Compile Include="PointCloud.vb" />
     <Compile Include="Pixel.vb" />
@@ -323,7 +327,9 @@
     <Compile Include="OptionsCheckbox.Designer.vb">
       <DependentUpon>OptionsCheckbox.vb</DependentUpon>
     </Compile>
-    <Compile Include="OptionsCheckbox.vb" />
+    <Compile Include="OptionsCheckbox.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Palette.vb" />
     <Compile Include="PCA.vb" />
     <Compile Include="Random.vb" />
