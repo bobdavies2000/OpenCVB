@@ -443,7 +443,7 @@ End Class
 
 
 Public Class KNN_DepthClusters : Inherits VBparent
-    Public blobs As New Blob_DepthClusters
+    Public blobs As New Histogram_DepthClusters
     Public flood As New FloodFill_Palette
     Public pTrack As New KNN_PointTracker
     Public Sub New()
@@ -525,9 +525,8 @@ Public Class KNN_StabilizeRegions : Inherits VBparent
         cv.Cv2.BitwiseXor(tmp, lastinput, dst2)
         lastinput = tmp
 
-        flood.Run(dst2)
-        dst2 = flood.dst2
-
+        'flood.Run(dst2)
+        'dst2 = flood.dst2
     End Sub
 End Class
 

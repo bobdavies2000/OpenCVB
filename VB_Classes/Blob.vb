@@ -169,24 +169,6 @@ End Class
 
 
 
-Public Class Blob_DepthClusters : Inherits VBparent
-    Public histBlobs As New Histogram_DepthValleys
-    Public Sub New()
-        task.desc = "Highlight the distinct histogram blobs found with depth clustering."
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        histBlobs.Run(task.noDepthMask)
-        dst1 = histBlobs.dst1
-        label1 = CStr(histBlobs.ranges.Count) + " Depth Clusters"
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Blob_DepthPixelSampler : Inherits VBparent
     Public histBlobs As New Histogram_DepthClusters
     Public flood As New FloodFill_Basics
