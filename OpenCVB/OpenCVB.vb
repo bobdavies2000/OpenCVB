@@ -1197,6 +1197,7 @@ Public Class OpenCVB
             Dim currentCameraIndex = activeCameraIndex
             While 1
                 Application.DoEvents()
+                If activeCameraIndex < 0 Then Exit Sub ' camera has exited...
                 If saveAlgorithmName <> algName And frameCount > minFrames Then Exit Sub
                 SyncLock bufferLock
                     If saveWorkingRes <> workingRes And frameCount > minFrames Then Exit Sub ' switching camera resolution means stopping the current algorithm

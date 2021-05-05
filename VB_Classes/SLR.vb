@@ -66,7 +66,7 @@ Public Class SLR_Data : Inherits VBparent
         Dim code As String = sr.ReadToEnd
         sr.Close()
 
-        Dim lines = code.Split(vbCrLf)
+        Dim lines = code.Split(vbLf)
         For Each line In lines
             Dim split = line.Split(" ")
             If split.Length > 1 Then
