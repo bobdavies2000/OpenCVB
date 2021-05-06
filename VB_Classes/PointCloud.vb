@@ -3,16 +3,13 @@ Imports System.Runtime.InteropServices
 Public Class PointCloud_Basics : Inherits VBparent
     Public views As New PointCloud_Tracker
     Public detailText As String
-    Public backMat As New cv.Mat
-    Public backMatMask As New cv.Mat
+    Public maskTopView As New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
+    Public maskSideView As New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
     Public vwTop As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Public vwSide As New SortedList(Of Single, viewObject)(New compareAllowIdenticalSingleInverted)
     Dim setupSide As New PointCloud_SetupSide
     Dim setupTop As New PointCloud_SetupTop
     Public Sub New()
-        backMat = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC3)
-        backMatMask = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
-
         task.desc = "Find the actual width in pixels for the objects detected in the top view"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -20,6 +17,8 @@ Public Class PointCloud_Basics : Inherits VBparent
         Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
         Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim showDetails = showRectanglesCheck.checked
+        maskTopView.SetTo(0)
+        maskSideView.SetTo(0)
 
         views.Run(src)
 
@@ -48,11 +47,9 @@ Public Class PointCloud_Basics : Inherits VBparent
         Dim minIndex As Integer
         Dim detailPoint As cv.Point
         Dim vw As New SortedList(Of Single, viewObject)
-        Dim topActive = If(standalone, True, (quadrantIndex = QUAD0 Or quadrantIndex = QUAD2))
-        Dim sideActive = If(standalone, True, (quadrantIndex = QUAD1 Or quadrantIndex = QUAD3))
 
         Dim widthInfo As String = ""
-        If vwTop.Count And topActive Then
+        If vwTop.Count Then
             minIndex = findNearestPoint(task.mouseClickPoint, vwTop)
             Dim rView = vwTop.Values(minIndex).rectInHist
             detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y))
@@ -63,43 +60,30 @@ Public Class PointCloud_Basics : Inherits VBparent
             widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Width / task.pixelsPerMeterTop, "0.0") + "m"
             detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m" + widthInfo
 
-            roi = New cv.Rect(rFront.X, 0, rFront.Width, src.Height)
             vw = vwTop
             If showDetails Then
                 task.trueText(detailText, detailPoint.X, detailPoint.Y, 3)
                 label2 = "Clicked: " + detailText
             End If
+            cv.Cv2.InRange(task.depth32f, minDepth * 1000, maxDepth * 1000, maskTopView)
         End If
 
-        If vwSide.Count And sideActive Then
+        If vwSide.Count Then
             minIndex = findNearestPoint(task.mouseClickPoint, vwSide)
             Dim rView = vwSide.Values(minIndex).rectInHist
             detailPoint = New cv.Point(CInt(rView.X), CInt(rView.Y - 15))
-            Dim rFront = vwSide.Values(minIndex).rectFront
             minDepth = task.maxZ * rView.X / dst1.Width
             maxDepth = task.maxZ * (rView.X + rView.Width) / dst1.Width
 
             widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Height / task.pixelsPerMeterSide, "0.0") + "m"
             detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m " + widthInfo
 
-            roi = New cv.Rect(0, rFront.Y, src.Width, rFront.Y + rFront.Height)
             vw = vwSide
             If showDetails Then
                 task.trueText(detailText, detailPoint.X, detailPoint.Y, 2)
                 label1 = "Clicked: " + detailText
             End If
-        End If
-
-        If vw.Count > 0 Then
-            If roi.X + roi.Width > task.depth32f.Width Then roi.Width = task.depth32f.Width - roi.X
-            If roi.Y + roi.Height > task.depth32f.Height Then roi.Height = task.depth32f.Height - roi.Y
-            If roi.Width > 0 And roi.Height > 0 Then
-                backMatMask.SetTo(0)
-                cv.Cv2.InRange(task.depth32f(roi), cv.Scalar.All(minDepth * 1000), cv.Scalar.All(maxDepth * 1000), backMatMask(roi))
-
-                backMat.SetTo(0)
-                backMat(roi).SetTo(vw.Values(minIndex).LayoutColor, backMatMask(roi))
-            End If
+            cv.Cv2.InRange(task.depth32f, minDepth * 1000, maxDepth * 1000, maskSideView)
         End If
 
         setupSide.Run(views.dst1)
@@ -605,7 +589,8 @@ Public Class PointCloud_BackProject : Inherits VBparent
     Dim mats As New Mat_4to1
     Public Sub New()
         label1 = "Click any quadrant below to enlarge it"
-        label2 = "Click any centroid to display details"
+        label2 = "Click any quadrant below to enlarge it"
+        quadrantIndex = 0
         task.desc = "Backproject the selected object"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -620,12 +605,13 @@ Public Class PointCloud_BackProject : Inherits VBparent
 
         mats.mat(0) = both.dst1
         mats.mat(1) = both.dst2
-        mats.mat(2) = both.backMat.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        mats.mat(3) = both.backMatMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        mats.mat(2) = both.maskSideView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        mats.mat(3) = both.maskTopView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         mats.Run(Nothing)
         dst1 = mats.dst1
         dst2 = mats.mat(quadrantIndex)
-        label2 = both.detailText
+        If quadrantIndex < 2 Then label2 = If(quadrantIndex = 0, both.label1, both.label2) Else label2 = "Click quadrant 0 or 1 to see side/top views"
+        task.ttTextData.Clear()
     End Sub
 End Class
 
