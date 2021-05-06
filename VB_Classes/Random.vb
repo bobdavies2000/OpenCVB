@@ -498,19 +498,16 @@ Public Class Random_KalmanPoints : Inherits VBparent
     Dim random As New Random_Basics
     Dim knn As New KNN_1_to_1FIFO
     Dim kalman As New Kalman_Basics
-    Dim countSlider As Windows.Forms.TrackBar
     Dim kalmanPoints As New List(Of cv.Point2f)
     Dim refreshPoints As Boolean = True
     Dim savePoints(0) As cv.Point
     Public Sub New()
         Dim offset = 100
         random.rangeRect = New cv.Rect(offset, offset, dst1.Width - offset * 2, dst1.Height - offset * 2)
-        countSlider = findSlider("Random Pixel Count")
-        countSlider.Value = 5
+        findSlider("Random Pixel Count").Value = 10
         task.desc = "Smoothly transition a random point from location to location."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-
         If refreshPoints Then
             random.Run(Nothing)
             knn.lastSet = New List(Of cv.Point2f)(random.Points2f)
@@ -537,8 +534,8 @@ Public Class Random_KalmanPoints : Inherits VBparent
 
         dst1.SetTo(0)
         For i = 0 To knn.currSet.Count - 1
-            dst1.Circle(knn.currSet(i), task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
-            dst1.Circle(knn.lastSet(i), task.dotSize, cv.Scalar.Red, -1, task.lineType)
+            dst1.Circle(knn.currSet(i), task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
+            dst1.Circle(knn.lastSet(i), task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
         Next
 
         Dim noChanges As Boolean = True
