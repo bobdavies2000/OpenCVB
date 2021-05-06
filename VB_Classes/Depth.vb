@@ -1237,8 +1237,6 @@ Public Class Depth_PointCloud_IMU : Inherits VBparent
             dst1 = input.Clone
             label1 = "dst1 = pointcloud without rotation"
         End If
-
-        task.pixelsPerMeter = dst1.Width / task.maxZ
     End Sub
 End Class
 

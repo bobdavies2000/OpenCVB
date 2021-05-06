@@ -728,12 +728,12 @@ Public Class Histogram_SmoothConcentration : Inherits VBparent
         sideview.Run(src)
         dst1 = sideview.dst1
         Dim noDepth = sideview.sideView.histOutput.Get(Of Single)(sideview.sideView.histOutput.Height / 2, 0)
-        label1 = "SideView " + concent.plotHighlights(sideview.sideView.histOutput, dst1) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        label1 = "SideView " + concent.plotHighlights(sideview.sideView.histOutput, dst1, task.pixelsPerMeterSide) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
         dst1 = task.palette.dst1.Clone
 
         topview.Run(src)
         dst2 = topview.dst1
-        label2 = "TopView " + concent.plotHighlights(topview.topView.histOutput, dst2) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        label2 = "TopView " + concent.plotHighlights(topview.topView.histOutput, dst2, task.pixelsPerMeterTop) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
         dst2 = task.palette.dst1.Clone
     End Sub
 End Class
@@ -756,13 +756,13 @@ Public Class Histogram_ConcentrationPoints : Inherits VBparent
         End If
         task.desc = "Highlight a fixed number of histogram projections where concentrations are highest"
     End Sub
-    Public Function plotHighlights(histOutput As cv.Mat, dst As cv.Mat) As String
+    Public Function plotHighlights(histOutput As cv.Mat, dst As cv.Mat, pixelsPM As Single) As String
         Static ResizeSlider = findSlider("Resize Factor x100")
         Static cThresholdSlider = findSlider("Concentration Threshold")
         Dim resizeFactor = ResizeSlider.Value / 100
         Dim concentrationThreshold = cThresholdSlider.Value
 
-        Dim minPixel = CInt(resizeFactor * task.minDepth * task.pixelsPerMeter / 1000)
+        Dim minPixel = CInt(resizeFactor * task.minDepth * pixelsPM / 1000)
 
         Dim tmp = histOutput.Resize(New cv.Size(CInt(histOutput.Width * resizeFactor), CInt(histOutput.Height * resizeFactor)))
         Dim pts As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
@@ -785,11 +785,11 @@ Public Class Histogram_ConcentrationPoints : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         sideview.Run(src)
         dst1 = sideview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        label1 = "SideView " + plotHighlights(sideview.originalHistOutput, dst1)
+        label1 = "SideView " + plotHighlights(sideview.originalHistOutput, dst1, task.pixelsPerMeterSide)
 
         topview.Run(src)
         dst2 = topview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        label2 = "TopView " + plotHighlights(topview.originalHistOutput, dst2)
+        label2 = "TopView " + plotHighlights(topview.originalHistOutput, dst2, task.pixelsPerMeterTop)
     End Sub
 End Class
 

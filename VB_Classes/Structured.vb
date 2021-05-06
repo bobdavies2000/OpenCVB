@@ -325,7 +325,7 @@ Public Class Structured_SliceXPlot : Inherits VBparent
         dst1 = task.color.Clone
         dst1.SetTo(cv.Scalar.White, depthMask)
 
-        label2 = "Peak histogram count (" + Format(maxVal, "#0") + ") at " + Format(filterZ, "#0.00") + " meters +-" + Format(5 / task.pixelsPerMeter, "#0.00") + " m"
+        label2 = "Peak histogram count (" + Format(maxVal, "#0") + ") at " + Format(filterZ, "#0.00") + " meters +-" + Format(5 / task.pixelsPerMeterTop, "#0.00") + " m"
         task.trueText("Use the mouse to move the slice.", 10, dst1.Height * 3 / 4, 3)
     End Sub
 End Class
