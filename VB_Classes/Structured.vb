@@ -543,6 +543,7 @@ Public Class Structured_SliceV : Inherits VBparent
         task.desc = "Find and isolate planes using the top view histogram data"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
+        If task.mousePoint = New cv.Point Then task.mousePoint = New cv.Point(dst1.Width / 2, dst1.Height)
         Dim xCoordinate = If(task.mousePoint.X = 0, dst1.Width / 2, task.mousePoint.X)
         tView.Run(src)
 
@@ -627,7 +628,7 @@ End Class
 
 
 
-Public Class Structured_CenterSlice : Inherits VBparent
+Public Class Structured_MouseSlice : Inherits VBparent
     Dim vSlice As New Structured_SliceV
     Dim line As New Line_Basics
     Public Sub New()

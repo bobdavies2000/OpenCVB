@@ -869,20 +869,20 @@ End Class
 
 
 Public Class PointCloud_Singletons : Inherits VBparent
-    Public topView As New Histogram_TopView2D
+    Public tView As New TimeView_Basics
     Public Sub New()
-        topView.resizeHistOutput = False
-        task.hist3DThreshold = 1
-
         label1 = "Top down view before inrange sampling"
         label2 = "Histogram after filtering for single-only histogram bins"
         task.desc = "Find floor and ceiling using gravity aligned top-down view and selecting bins with exactly 1 sample"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        topView.Run(src)
-        dst1 = topView.dst1
+        Static frameSlider = findSlider("Number of frames to include")
+        Dim frameCount = frameSlider.value
 
-        cv.Cv2.InRange(topView.originalHistOutput, 1, 1, dst2)
+        tView.Run(src)
+        dst1 = tView.dst2
+
+        cv.Cv2.InRange(tView.topView.originalHistOutput, frameCount, frameCount, dst2)
         Dim mask = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
     End Sub
 End Class
