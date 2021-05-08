@@ -17,7 +17,7 @@ Public Class Random_Basics : Inherits VBparent
         rangeRect = New cv.Rect(0, 0, dst1.Cols, dst1.Rows)
         task.desc = "Create a uniform random mask with a specificied number of pixels."
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 3
         If Points.Length <> countSlider.Value Then
             ReDim Points(countSlider.Value - 1)
             ReDim Points2f(countSlider.Value - 1)
@@ -310,7 +310,7 @@ Public Class Random_MonteCarlo : Inherits VBparent
         End If
         task.desc = "Generate random numbers but prefer higher values - a linearly increasing random distribution"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 2
         Dim dimension = sliders.trackbar(0).Value
         Dim histogram = New cv.Mat(dimension, 1, cv.MatType.CV_32F, 0)
         For i = 0 To outputRandom.rows - 1
@@ -507,7 +507,7 @@ Public Class Random_KalmanPoints : Inherits VBparent
         findSlider("Random Pixel Count").Value = 10
         task.desc = "Smoothly transition a random point from location to location."
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 2
         If refreshPoints Then
             random.Run(Nothing)
             knn.lastSet = New List(Of cv.Point2f)(random.Points2f)

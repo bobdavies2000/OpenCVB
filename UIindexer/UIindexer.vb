@@ -217,7 +217,7 @@ Module IndexMain
 
         For i = 2 To rankings.Count - 1
             If Len(rankings(i)) > 0 Then
-                sw.Write("<Value Rank " + CStr(i) + " (Manual)>")
+                sw.Write("<Value Rank " + CStr(i) + " (Graded)>")
                 sw.WriteLine(rankings(i))
             End If
         Next

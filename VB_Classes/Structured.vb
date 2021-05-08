@@ -67,7 +67,6 @@ Public Class Structured_Ceiling : Inherits VBparent
         task.desc = "Find the ceiling plane"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-
         structD.Run(src)
 
         Dim yCoordinate As Integer
@@ -304,7 +303,7 @@ Public Class Structured_SliceXPlot : Inherits VBparent
         structD.cushionSlider.Value = structD.cushionSlider.Maximum
         task.desc = "Find any plane around a peak value in the top-down histogram"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 2
         structD.Run(src)
         dst2 = structD.dst2
         multi.Run(src)
@@ -317,6 +316,7 @@ Public Class Structured_SliceXPlot : Inherits VBparent
         multi.top2D.histOutput(rect).MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
 
         dst2.Circle(New cv.Point(col, dst2.Height - maxLoc.Y), task.dotSize + 6, cv.Scalar.Red, -1, task.lineType)
+        dst2.Line(New cv.Point(0, dst2.Height - maxLoc.Y), New cv.Point(dst2.Width, dst2.Height - maxLoc.Y), cv.Scalar.Yellow, task.lineThickness, task.lineType)
         Dim filterZ = maxLoc.Y / dst2.Height * task.maxZ
 
         Dim depthMask As New cv.Mat(multi.split(0).Size, cv.MatType.CV_8U)
@@ -343,7 +343,7 @@ Public Class Structured_SliceYPlot : Inherits VBparent
         structD.cushionSlider.Value = structD.cushionSlider.Maximum
         task.desc = "Find any plane around a peak value in the side view histogram"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 2
         structD.Run(src)
         dst2 = structD.dst2
         multi.Run(src)
@@ -354,10 +354,10 @@ Public Class Structured_SliceYPlot : Inherits VBparent
         Dim rect = New cv.Rect(0, row, dst2.Width - 1, If(row + cushion >= dst2.Height, dst2.Height - row, cushion))
         Dim minLoc As cv.Point, maxLoc As cv.Point
         multi.side2D.histOutput(rect).MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
-        cv.Cv2.ImShow("hist", multi.side2D.histOutput)
 
         If maxVal > 0 Then
             dst2.Circle(New cv.Point(maxLoc.X, row), task.dotSize + 6, cv.Scalar.Red, -1, task.lineType)
+            dst2.Line(New cv.Point(maxLoc.X, 0), New cv.Point(maxLoc.X, dst2.Height), cv.Scalar.Yellow, task.lineThickness, task.lineType)
             Dim filterZ = maxLoc.X / dst2.Width * task.maxZ
 
             Dim depthMask As New cv.Mat(multi.split(1).Size, cv.MatType.CV_8U)
@@ -481,7 +481,7 @@ End Class
 
 
 Public Class Structured_SliceH : Inherits VBparent
-    Public side2D As New Histogram_SideData
+    Public tView As New TimeView_Basics
     Public cushionSlider As Windows.Forms.TrackBar
     Public sliceMask As cv.Mat
     Public sliceOptions As New Structured_SliceOptions
@@ -493,10 +493,10 @@ Public Class Structured_SliceH : Inherits VBparent
         task.desc = "Find and isolate planes (floor and ceiling) in a side view histogram."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        side2D.Run(src)
+        tView.Run(src)
 
         Dim depthShadow = task.noDepthMask
-        Dim Split = side2D.gCloud.dst1.Split()
+        Dim Split = tView.sideView.gCloud.dst1.Split()
 
         Dim yCoordinate = If(task.mousePoint.Y = 0, dst1.Height / 2, task.mousePoint.Y)
 
@@ -517,11 +517,9 @@ Public Class Structured_SliceH : Inherits VBparent
         label1 = "At offset " + CStr(yCoordinate) + " y = " + Format((maxVal + minVal) / 2, "#0.00") + " with " +
                  Format(Math.Abs(maxVal - minVal) * 100, "0.00") + " cm width"
         dst1.SetTo(cv.Scalar.White, sliceMask)
-        label2 = side2D.label2
+        label2 = tView.label2
 
-        dst2 = side2D.dst1.ConvertScaleAbs(255).Threshold(1, 255, cv.ThresholdTypes.Binary)
-        dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
-        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = tView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         yPlaneOffset = If(yCoordinate < dst2.Height - cushion, CInt(yCoordinate), dst2.Height - cushion - 1)
         dst2.Circle(New cv.Point(0, task.sideCameraPoint.Y), task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         dst2.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst2.Width, yPlaneOffset), cv.Scalar.Yellow, cushion)
@@ -535,7 +533,7 @@ End Class
 
 
 Public Class Structured_SliceV : Inherits VBparent
-    Public top2D As New Histogram_TopData
+    Public tView As New TimeView_Basics
     Dim sideStruct As New Structured_SliceH
     Public cushionSlider As Windows.Forms.TrackBar
     Public sliceMask As cv.Mat
@@ -546,9 +544,9 @@ Public Class Structured_SliceV : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim xCoordinate = If(task.mousePoint.X = 0, dst1.Width / 2, task.mousePoint.X)
-        top2D.Run(src)
+        tView.Run(src)
 
-        Dim split = top2D.gCloud.dst1.Split()
+        Dim split = tView.topView.gCloud.dst1.Split()
 
         Dim planeX = -task.maxX * (task.topCameraPoint.X - xCoordinate) / task.topCameraPoint.X
         If xCoordinate > task.topCameraPoint.X Then planeX = task.maxX * (xCoordinate - task.topCameraPoint.X) / (dst2.Width - task.topCameraPoint.X)
@@ -569,11 +567,9 @@ Public Class Structured_SliceV : Inherits VBparent
 
         dst1 = task.color.Clone
         dst1.SetTo(cv.Scalar.White, sliceMask)
-        label2 = top2D.label2
+        label2 = tView.label2
 
-        dst2 = top2D.dst1.Normalize(0, 255, cv.NormTypes.MinMax)
-        dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
-        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = tView.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2.Circle(New cv.Point(task.topCameraPoint.X, dst2.Height), task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         dst2.Line(New cv.Point(xCoordinate, 0), New cv.Point(xCoordinate, dst2.Height), cv.Scalar.Yellow, cushion)
     End Sub
@@ -634,71 +630,39 @@ End Class
 Public Class Structured_CenterSlice : Inherits VBparent
     Dim vSlice As New Structured_SliceV
     Dim line As New Line_Basics
-    Public topPt As cv.Point2f, botPt As cv.Point2f
-    Public slope As Single
-    Public avgPt As cv.Point2f
-    Public b As Integer
     Public Sub New()
         label1 = "Center Slice in yellow"
         label2 = "White = SliceV output, Red Dot is avgPt"
         task.desc = "Find the vertical center line with accurate depth data.."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-
+        If task.mousePoint = New cv.Point Then task.mousePoint = New cv.Point(dst1.Width / 2, dst1.Height)
         vSlice.Run(src)
         dst1 = task.color
 
         line.Run(vSlice.sliceMask)
-        dst2 = line.dst1
-
+        Dim tops As New List(Of Integer)
+        Dim bots As New List(Of Integer)
+        Dim topsList As New List(Of cv.Point)
+        Dim botsList As New List(Of cv.Point)
         If line.sortlines.Count > 0 Then
-            Dim count As Integer
-            Dim minY = Single.MaxValue, maxY = Single.MinValue
-            avgPt = New cv.Point2f
-            For Each nl In line.sortlines
-                Dim p1 = New cv.Point2f(nl.Value.Item0, nl.Value.Item1)
-                Dim p2 = New cv.Point2f(nl.Value.Item2, nl.Value.Item3)
-                If Math.Abs(p2.X - p1.X) > 1 Then
-                    avgPt += p1
-                    avgPt += p2
-                    Dim nextSlope = (p2.Y - p1.Y) / (p2.X - p1.X)
-                    slope = If(slope = 0, nextSlope, (nextSlope + slope) / 2)
-                    count += 2
-                End If
-                If p1.Y < minY Then
-                    topPt = p1
-                    minY = p1.Y
-                End If
-                If p1.Y > maxY Then
-                    botPt = p1
-                    maxY = p1.Y
-                End If
-                If p2.Y < minY Then
-                    topPt = p2
-                    minY = p2.Y
-                End If
-                If p2.Y > maxY Then
-                    botPt = p2
-                    maxY = p2.Y
-                End If
+            dst2 = line.dst1
+            For i = 0 To line.sortlines.Count - 1
+                Dim p1 = line.pt1List(i)
+                Dim p2 = line.pt2List(i)
+                dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineThickness + 3, task.lineType)
+                tops.Add(If(p1.Y < p2.Y, p1.Y, p2.Y))
+                bots.Add(If(p1.Y > p2.Y, p1.Y, p2.Y))
+                topsList.Add(p1)
+                botsList.Add(p2)
             Next
 
-            If count > 0 Then
-                If slope = 0 And topPt.X <> botPt.X Then slope = (topPt.Y - botPt.Y) / (topPt.X - botPt.X)
-                avgPt = New cv.Point2f(avgPt.X / count, avgPt.Y / count)
-                b = avgPt.Y - slope * avgPt.X ' y = slope * x + b, b = y - slope * x
-                topPt = New cv.Point2f(-b / slope, 0)  ' y = 0, 0 = slope * x + b, x = -b / slope
-                botPt = New cv.Point2f((dst1.Height - b) / slope, dst1.Height)
-            End If
+            Dim topPt = topsList(tops.IndexOf(tops.Min))
+            Dim botPt = botsList(bots.IndexOf(bots.Max))
+            dst2.Circle(New cv.Point2f((topPt.X + botPt.X) / 2, (topPt.Y + botPt.Y) / 2), task.dotSize + 5, cv.Scalar.Red, -1, task.lineType)
+            dst2.Line(topPt, botPt, cv.Scalar.Red, task.lineThickness, task.lineType)
+            dst1.Line(topPt, botPt, cv.Scalar.Yellow, task.lineThickness + 2, task.lineType)
         End If
-
-        If Math.Abs(topPt.X - botPt.X) < 1 Or topPt.Y <> 0 Or botPt.Y <> dst1.Height Then
-            topPt = New cv.Point2f(topPt.X, 0)
-            botPt = New cv.Point2f(topPt.X, dst1.Height)
-        End If
-        dst2.Circle(avgPt, task.dotSize, cv.Scalar.Red, -1, task.lineType)
-        dst2.Line(topPt, botPt, cv.Scalar.Red, task.lineThickness, task.lineType)
-        dst1.Line(topPt, botPt, cv.Scalar.Yellow, task.lineThickness, task.lineType)
     End Sub
 End Class
 
