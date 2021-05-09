@@ -864,10 +864,6 @@ End Class
 
 
 
-
-
-
-
 Public Class PointCloud_Singletons : Inherits VBparent
     Public tView As New TimeView_Basics
     Public Sub New()
@@ -1225,5 +1221,50 @@ Public Class PointCloud_ObjectsSide : Inherits VBparent
             setupSide.Run(dst1)
             dst1 = setupSide.dst1
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCoud_SurfaceH : Inherits VBparent
+    Public tView As New TimeView_Basics
+    Public plot As New Plot_Basics_CPP
+    Public topRow As Integer
+    Public botRow As Integer
+    Public peakRow As Integer
+    Public Sub New()
+        task.desc = "Find the horizontal surfaces with a projects of the SideView histogram."
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        tView.Run(src)
+        dst1 = tView.dst1
+
+        ReDim plot.srcX(dst1.Height - 1)
+        ReDim plot.srcY(dst1.Height - 1)
+        topRow = 0
+        botRow = 0
+        peakRow = 0
+        Dim peakVal As Integer
+        For i = 0 To dst1.Height - 1
+            plot.srcX(i) = i
+            plot.srcY(i) = dst1.Row(i).CountNonZero()
+            If peakVal < plot.srcY(i) Then
+                peakVal = plot.srcY(i)
+                peakRow = i
+            End If
+            If topRow = 0 And plot.srcY(i) > 10 Then topRow = i
+        Next
+
+        For i = plot.srcY.Count - 1 To 0 Step -1
+            If botRow = 0 And plot.srcY(i) > 10 Then botRow = i
+        Next
+        plot.Run(Nothing)
+        dst2 = plot.dst1.Transpose()
+        dst2 = dst2.Flip(cv.FlipMode.Y)
+        label1 = "Top row = " + CStr(topRow) + " peak row = " + CStr(peakRow) + " bottom row = " + CStr(botRow)
     End Sub
 End Class
