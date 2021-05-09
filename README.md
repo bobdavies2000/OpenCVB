@@ -15,7 +15,7 @@ Recent Changes – May 2021
 -   Algorithms are now ranked by usage (“Reuse Rank”) and “Value Rank”, a graded
     estimate of algorithm value.
 
-    -   Rankings are part of the group combo pulldown.
+    -   Rankings are entries in the Group ComboBox.
 
 -   New Survey function to build images of all algorithm output to allow visual
     searches for desired algorithm.
@@ -569,6 +569,9 @@ algorithms. Here is a simple algorithm tree view that shows how the
 KNN_PointTracker algorithm was built:
 
 ![Graphical user interface, text, application, email Description automatically generated](media/5f4b6c13e3d0e852b0705339f893603e.png)
+
+Graphical user interface, text, application, email Description automatically
+generated
 
 The tree describes how the algorithm calls KNN_1_to_1 and how KNN_1_to_1 calls
 KNN_BasicsQT and so on. Clicking on any of the tree entries will show the output
