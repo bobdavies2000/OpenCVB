@@ -180,7 +180,7 @@ Public Class TimeView_Centroids : Inherits VBparent
                 Dim pt = saveTopQueries(knn.neighbors.Get(Of Single)(i, 0))
                 If Single.IsNaN(pt.X) = False And Single.IsNaN(pt.Y) = False Then
                     Dim cpt = New cv.Point(CInt(pt.X), CInt(pt.Y))
-                    dst1.Line(cpt, qPoint, cv.Scalar.Red, task.lineThickness, task.lineType)
+                    dst1.Line(cpt, qPoint, cv.Scalar.Red, task.lineWidth, task.lineType)
                 End If
             Next
 

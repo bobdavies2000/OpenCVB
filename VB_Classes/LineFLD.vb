@@ -71,8 +71,8 @@ Public Class LineFLD_Basics : Inherits VBparent
             For j = 0 To lines.Count - 1 Step 4
                 Dim v = lines(j)
                 Dim pt1 = New cv.Point(v(0), v(1))
-                dst1.Line(New cv.Point(v(0), v(1)), New cv.Point(v(2), v(3)), cv.Scalar.Yellow, task.lineThickness, task.lineType)
-                dst2.Line(New cv.Point(v(0), v(1)), New cv.Point(v(2), v(3)), cv.Scalar.Yellow, task.lineThickness, task.lineType)
+                dst1.Line(New cv.Point(v(0), v(1)), New cv.Point(v(2), v(3)), cv.Scalar.Yellow, task.lineWidth, task.lineType)
+                dst2.Line(New cv.Point(v(0), v(1)), New cv.Point(v(2), v(3)), cv.Scalar.Yellow, task.lineWidth, task.lineType)
             Next
         End If
     End Sub
@@ -97,7 +97,7 @@ Module LineFLD_Exports
         Dim pt2 = New cv.Point(aa(2), aa(3))
         Dim centerPoint = New cv.Point((aa(0) + aa(2)) / 2, (aa(1) + aa(3)) / 2)
         _mask.Line(pt1, pt2, New cv.Scalar(1), maskLineWidth, task.lineType)
-        dst2.Line(pt1, pt2, cv.Scalar.Red, task.lineThickness + 2, task.lineType)
+        dst2.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
 
         Dim roi = New cv.Rect(Math.Min(aa(0), aa(2)), Math.Min(aa(1), aa(3)), Math.Abs(aa(0) - aa(2)), Math.Abs(aa(1) - aa(3)))
 
@@ -146,7 +146,7 @@ Module LineFLD_Exports
                                    task.lineType)
                 If endPoints(0).Item2 = endPoints(1).Item2 Then endPoints(0).Item2 += 1 ' prevent NaN
                 cv.Cv2.PutText(dst2, Format((endPoints(1).Item1 - endPoints(0).Item1) / (endPoints(1).Item2 - endPoints(0).Item2), "0.00") + "y/z",
-                                   New cv.Point(centerPoint.X, centerPoint.Y + 10), cv.HersheyFonts.HersheyTriplex, 0.4, cv.Scalar.White, task.lineThickness, task.lineType)
+                                   New cv.Point(centerPoint.X, centerPoint.Y + 10), cv.HersheyFonts.HersheyTriplex, 0.4, cv.Scalar.White, task.lineWidth, task.lineType)
                 ' show the final endpoints in xy projection.
                 dst2.Circle(New cv.Point(b.Item3, b.Item4), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
                 dst2.Circle(New cv.Point(d.Item3, d.Item4), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
@@ -275,7 +275,7 @@ Public Class LineFLD_CPP : Inherits VBparent
         Dim lineCount = lineDetectorFast_Run(handle.AddrOfPinnedObject, src.Height, src.Width, length_threshold, distance_threshold, canny_th1, canny_th2, canny_aperture_size, do_merge)
         handle.Free()
 
-        If lineCount > 0 Then sortedLines = drawSegments(dst1, lineCount, task.lineThickness, lineMat)
+        If lineCount > 0 Then sortedLines = drawSegments(dst1, lineCount, task.lineWidth, lineMat)
     End Sub
 End Class
 
@@ -385,7 +385,7 @@ End Class
 '                    Dim aa = sortedlines.ElementAt(i).Key
 '                    Dim pt1 = New cv.Point(aa(0), aa(1))
 '                    Dim pt2 = New cv.Point(aa(2), aa(3))
-'                    dst1.Line(pt1, pt2, cv.Scalar.Red, task.lineThickness + 1, task.lineType)
+'                    dst1.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
 '                    mask.Line(pt1, pt2, New cv.Scalar(i), maskLineWidth, task.lineType)
 
 '                    Dim roi = New cv.Rect(Math.Min(aa(0), aa(2)), Math.Min(aa(1), aa(3)), Math.Abs(aa(0) - aa(2)), Math.Abs(aa(1) - aa(3)))
@@ -429,10 +429,10 @@ End Class
 '                    Dim textPoint = New cv.Point(worldDepth(ptIndex).Item3, worldDepth(ptIndex).Item4)
 '                    If textPoint.X > mask.Width - 50 Then textPoint.X = mask.Width - 50
 '                    If textPoint.Y > mask.Height - 50 Then textPoint.Y = mask.Height - 50
-'                    cv.Cv2.PutText(dst1, Format(lenBD / 1000, "#0.00") + "m", textPoint, cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, task.lineThickness, task.lineType)
+'                    cv.Cv2.PutText(dst1, Format(lenBD / 1000, "#0.00") + "m", textPoint, cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, task.lineWidth, task.lineType)
 '                    If endPoints(0).Item2 = endPoints(1).Item2 Then endPoints(0).Item2 += 1 ' prevent NaN
 '                    cv.Cv2.PutText(dst1, Format((endPoints(1).Item1 - endPoints(0).Item1) / (endPoints(1).Item2 - endPoints(0).Item2), "#0.00") + If(useX, "x/z", "y/z"),
-'                                    New cv.Point(textPoint.X, textPoint.Y + 10), cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, task.lineThickness, task.lineType)
+'                                    New cv.Point(textPoint.X, textPoint.Y + 10), cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, task.lineWidth, task.lineType)
 
 '                    ' show the final endpoints in xy projection.
 '                    dst1.Circle(New cv.Point(b.Item3, b.Item4), task.dotsize + 1, cv.Scalar.White, -1, task.lineType)

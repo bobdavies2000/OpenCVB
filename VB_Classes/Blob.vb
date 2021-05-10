@@ -150,7 +150,7 @@ Public Class Blob_RenderBlobs : Inherits VBparent
             cc.RenderBlobs(labelView)
 
             For Each b In cc.Blobs.Skip(1)
-                dst1.Rectangle(b.Rect, cv.Scalar.Red, task.lineThickness + 1, task.lineType)
+                dst1.Rectangle(b.Rect, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
             Next
 
             Dim maxBlob = cc.GetLargestBlob()

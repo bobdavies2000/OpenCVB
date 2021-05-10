@@ -51,7 +51,7 @@ Public Class Area_MinTriangle_CPP : Inherits VBparent
         For i = 0 To 2
             Dim p1 = triangle.Get(Of cv.Point2f)(i)
             Dim p2 = triangle.Get(Of cv.Point2f)((i + 1) Mod 3)
-            dst1.Line(p1, p2, cv.Scalar.White, task.lineThickness + 1, task.lineType)
+            dst1.Line(p1, p2, cv.Scalar.White, task.lineWidth + 1, task.lineType)
         Next
     End Sub
 End Class

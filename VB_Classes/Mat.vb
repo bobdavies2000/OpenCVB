@@ -152,8 +152,8 @@ Public Class Mat_4to1 : Inherits VBparent
             dst1(roi) = tmp.Resize(nSize)
         Next
         If noLines = False Then
-            dst1.Line(New cv.Point(0, dst1.Height / 2), New cv.Point(dst1.Width, dst1.Height / 2), cv.Scalar.White, task.lineThickness + 1)
-            dst1.Line(New cv.Point(dst1.Width / 2, 0), New cv.Point(dst1.Width / 2, dst1.Height), cv.Scalar.White, task.lineThickness + 1)
+            dst1.Line(New cv.Point(0, dst1.Height / 2), New cv.Point(dst1.Width, dst1.Height / 2), cv.Scalar.White, task.lineWidth + 1)
+            dst1.Line(New cv.Point(dst1.Width / 2, 0), New cv.Point(dst1.Width / 2, dst1.Height), cv.Scalar.White, task.lineWidth + 1)
         End If
     End Sub
 End Class
@@ -194,7 +194,7 @@ Public Class Mat_2to1 : Inherits VBparent
             If mat(i).Empty = False Then dst1(roi) = mat(i).Resize(nSize)
         Next
         If noLines = False Then
-            dst1.Line(New cv.Point(0, dst1.Height / 2), New cv.Point(dst1.Width, dst1.Height / 2), cv.Scalar.White, task.lineThickness + 1)
+            dst1.Line(New cv.Point(0, dst1.Height / 2), New cv.Point(dst1.Width, dst1.Height / 2), cv.Scalar.White, task.lineWidth + 1)
         End If
     End Sub
 End Class

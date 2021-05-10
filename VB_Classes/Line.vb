@@ -47,7 +47,7 @@ Public Class Line_Basics : Inherits VBparent
                 Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
                 Dim pixelLen = pt1.DistanceTo(pt2)
                 If pixelLen > pixelThreshold Then
-                    dst1.Line(pt1, pt2, cv.Scalar.Yellow, task.lineThickness, task.lineType)
+                    dst1.Line(pt1, pt2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
                     pt1List.Add(pt1)
                     pt2List.Add(pt2)
                     slopes.Add(If((pt1.X <> pt2.X), (pt1.Y - pt2.Y) / (pt1.X - pt2.X), verticalSlope))
@@ -62,7 +62,7 @@ Public Class Line_Basics : Inherits VBparent
         For Each line In sortlines
             Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
             Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-            dst2.Line(p1, p2, cv.Scalar.White, task.lineThickness + 1, task.lineType)
+            dst2.Line(p1, p2, cv.Scalar.White, task.lineWidth + 1, task.lineType)
         Next
     End Sub
 End Class
@@ -95,7 +95,7 @@ Public Class Line_Reduction : Inherits VBparent
         For Each line In lines.sortlines
             Dim p1 = New cv.Point(line.Value.Item0, line.Value.Item1)
             Dim p2 = New cv.Point(line.Value.Item2, line.Value.Item3)
-            dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineThickness, task.lineType)
+            dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class
@@ -128,10 +128,10 @@ Public Class Line_InterceptsUI : Inherits VBparent
         Dim blue = New cv.Scalar(254, 0, 0)
 
         Dim center = New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        dst2.Line(New cv.Point(0, 0), center, blue, task.lineThickness, cv.LineTypes.Link4)
-        dst2.Line(New cv.Point(dst1.Width, 0), center, red, task.lineThickness, cv.LineTypes.Link4)
-        dst2.Line(New cv.Point(0, dst1.Height), center, blue, task.lineThickness, cv.LineTypes.Link4)
-        dst2.Line(New cv.Point(dst1.Width, dst1.Height), center, yellow, task.lineThickness, cv.LineTypes.Link4)
+        dst2.Line(New cv.Point(0, 0), center, blue, task.lineWidth, cv.LineTypes.Link4)
+        dst2.Line(New cv.Point(dst1.Width, 0), center, red, task.lineWidth, cv.LineTypes.Link4)
+        dst2.Line(New cv.Point(0, dst1.Height), center, blue, task.lineWidth, cv.LineTypes.Link4)
+        dst2.Line(New cv.Point(dst1.Width, dst1.Height), center, yellow, task.lineWidth, cv.LineTypes.Link4)
 
         Dim mask = New cv.Mat(New cv.Size(dst1.Width + 2, dst1.Height + 2), cv.MatType.CV_8U, 0)
         Dim pt = New cv.Point(center.X, center.Y - 30)
@@ -159,7 +159,7 @@ Public Class Line_InterceptsUI : Inherits VBparent
             If color.Item0 = 1 Then p2 = New cv.Point((dst2.Height - b) / m, dst2.Height) ' green
             If color.Item0 = 2 Then p2 = New cv.Point(dst2.Width, dst2.Width * m + b) ' yellow
             If color.Item0 = 254 Then p2 = New cv.Point(0, b) ' blue
-            dst2.Line(center, p2, cv.Scalar.Black, task.lineThickness, task.lineType)
+            dst2.Line(center, p2, cv.Scalar.Black, task.lineWidth, task.lineType)
         End If
         dst2.Circle(center, task.dotSize, cv.Scalar.White, -1, task.lineType)
 
@@ -214,7 +214,7 @@ Public Class Line_ConfirmedDepth : Inherits VBparent
             Dim h = Math.Abs(p1.Y - p2.Y)
             Dim r = New cv.Rect(minXX, minYY, If(w > 0, w, 2), If(h > 0, h, 2))
             Dim mask = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, 0)
-            mask.Line(New cv.Point(CInt(p1.X - r.X), CInt(p1.Y - r.Y)), New cv.Point(CInt(p2.X - r.X), CInt(p2.Y - r.Y)), 255, task.lineThickness, cv.LineTypes.Link4)
+            mask.Line(New cv.Point(CInt(p1.X - r.X), CInt(p1.Y - r.Y)), New cv.Point(CInt(p2.X - r.X), CInt(p2.Y - r.Y)), 255, task.lineWidth, cv.LineTypes.Link4)
             Dim mean = cloudInput(r).Mean(mask)
 
             If mean <> New cv.Scalar Then
@@ -232,7 +232,7 @@ Public Class Line_ConfirmedDepth : Inherits VBparent
                     p2 = New cv.Point(Loc(3).X + r.X, Loc(3).Y + r.Y)
                 End If
                 If p1.DistanceTo(p2) > 1 Then
-                    dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineThickness, task.lineType)
+                    dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
                     pt1.Add(p1)
                     pt2.Add(p2)
                     z1.Add(cloudInput.Get(Of cv.Point3f)(p1.Y, p1.X))
@@ -275,7 +275,7 @@ Public Class Line_Vertical : Inherits VBparent
             Dim p1 = lines.z1(i)
             Dim p2 = lines.z2(i)
             If Math.Abs(p1.X - p2.X) < toleranceInMMs And Math.Abs(p1.Z - p2.Z) < toleranceInMMs Then
-                dst1.Line(lines.pt1(i), lines.pt2(i), cv.Scalar.Yellow, task.lineThickness, task.lineType)
+                dst1.Line(lines.pt1(i), lines.pt2(i), cv.Scalar.Yellow, task.lineWidth, task.lineType)
             End If
         Next
     End Sub
@@ -302,7 +302,7 @@ Public Class Line_Horizontal : Inherits VBparent
             Dim p1 = vLines.lines.z1(i)
             Dim p2 = vLines.lines.z2(i)
             If Math.Abs(p1.Y - p2.Y) < vLines.toleranceInMMs And Math.Abs(p1.Z - p2.Z) < vLines.toleranceInMMs Then
-                dst1.Line(vLines.lines.pt1(i), vLines.lines.pt2(i), cv.Scalar.Yellow, task.lineThickness, task.lineType)
+                dst1.Line(vLines.lines.pt1(i), vLines.lines.pt2(i), cv.Scalar.Yellow, task.lineWidth, task.lineType)
             End If
         Next
     End Sub
@@ -340,20 +340,20 @@ Public Class Line_Intercepts : Inherits VBparent
     Public Sub hightLightIntercept(mousePoint As Integer, intercepts As SortedList(Of Integer, Integer), axis As Integer, dst As cv.Mat)
         For Each inter In intercepts
             If Math.Abs(mousePoint - inter.Key) < searchRange Then
-                dst1.Line(pt1(inter.Value), pt2(inter.Value), cv.Scalar.White, task.lineThickness + 4, task.lineType)
-                dst1.Line(pt1(inter.Value), pt2(inter.Value), cv.Scalar.Blue, task.lineThickness, task.lineType)
+                dst1.Line(pt1(inter.Value), pt2(inter.Value), cv.Scalar.White, task.lineWidth + 4, task.lineType)
+                dst1.Line(pt1(inter.Value), pt2(inter.Value), cv.Scalar.Blue, task.lineWidth, task.lineType)
             End If
         Next
         For Each inter In intercepts
             Select Case axis
                 Case 0
-                    dst.Line(New cv.Point(inter.Key, 0), New cv.Point(inter.Key, 10), cv.Scalar.White, task.lineThickness)
+                    dst.Line(New cv.Point(inter.Key, 0), New cv.Point(inter.Key, 10), cv.Scalar.White, task.lineWidth)
                 Case 1
-                    dst.Line(New cv.Point(inter.Key, dst1.Height), New cv.Point(inter.Key, dst1.Height - 10), cv.Scalar.White, task.lineThickness)
+                    dst.Line(New cv.Point(inter.Key, dst1.Height), New cv.Point(inter.Key, dst1.Height - 10), cv.Scalar.White, task.lineWidth)
                 Case 2
-                    dst.Line(New cv.Point(0, inter.Key), New cv.Point(10, inter.Key), cv.Scalar.White, task.lineThickness)
+                    dst.Line(New cv.Point(0, inter.Key), New cv.Point(10, inter.Key), cv.Scalar.White, task.lineWidth)
                 Case 3
-                    dst.Line(New cv.Point(dst1.Width, inter.Key), New cv.Point(dst1.Width - 10, inter.Key), cv.Scalar.White, task.lineThickness)
+                    dst.Line(New cv.Point(dst1.Width, inter.Key), New cv.Point(dst1.Width - 10, inter.Key), cv.Scalar.White, task.lineWidth)
             End Select
         Next
     End Sub
@@ -398,7 +398,7 @@ Public Class Line_Intercepts : Inherits VBparent
 
             pt1.Add(p1)
             pt2.Add(p2)
-            dst1.Line(p1, p2, cv.Scalar.Yellow, task.lineThickness, task.lineType)
+            dst1.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
             If p1.X = p2.X Then
                 topIntercepts.Add(p1.X, i)
                 botIntercepts.Add(p1.X, i)
@@ -493,8 +493,8 @@ Public Class Line_NearestPoint : Inherits VBparent
         Dim nearest = findNearestPt(p1, p2, pt)
         dst1.SetTo(0)
         dst1.Circle(New cv.Point2f(pt.X, pt.Y), task.dotSize, cv.Scalar.White, -1, task.lineType)
-        dst1.Line(New cv.Point2f(p1.X, p1.Y), New cv.Point2f(p2.X, p2.Y), cv.Scalar.Yellow, task.lineThickness, task.lineType)
-        dst1.Line(pt, nearest, cv.Scalar.White, task.lineThickness, task.lineType)
+        dst1.Line(New cv.Point2f(p1.X, p1.Y), New cv.Point2f(p2.X, p2.Y), cv.Scalar.Yellow, task.lineWidth, task.lineType)
+        dst1.Line(pt, nearest, cv.Scalar.White, task.lineWidth, task.lineType)
         label1 = "nearest point = (" + CStr(nearest.X) + "," + CStr(nearest.Y) + ")"
     End Sub
 End Class
@@ -719,7 +719,7 @@ Public Class Line_Longest : Inherits VBparent
             Dim pt1 = lines.pt1List(indexSlider.value)
             Dim pt2 = lines.pt2list(indexSlider.value)
 
-            dst1.Line(pt1, pt2, cv.Scalar.Yellow, task.lineThickness, task.lineType)
+            dst1.Line(pt1, pt2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
 
             Dim sq = 3
             Dim pt = pt1
@@ -753,8 +753,8 @@ Public Class Line_Longest : Inherits VBparent
             dst2 = plot.dst1.Clone
 
             Dim yMean = (1 - meanVal / plot.maxScale) * dst1.Height
-            dst2.Line(New cv.Point(0, yMean), New cv.Point(dst2.Width, yMean), cv.Scalar.Black, task.lineThickness)
-            dst1.Rectangle(maskRect, cv.Scalar.White, task.lineThickness, task.lineType)
+            dst2.Line(New cv.Point(0, yMean), New cv.Point(dst2.Width, yMean), cv.Scalar.Black, task.lineWidth)
+            dst1.Rectangle(maskRect, cv.Scalar.White, task.lineWidth, task.lineType)
         End If
     End Sub
 End Class
@@ -799,14 +799,14 @@ Public Class Line_TimeViewLines : Inherits VBparent
             Dim v = sl.Value
             Dim pt1 = New cv.Point(v.Item0, v.Item1)
             Dim pt2 = New cv.Point(v.Item2, v.Item3)
-            dst2.Line(pt1, pt2, cv.Scalar.Green, task.lineThickness, task.lineType)
+            dst2.Line(pt1, pt2, cv.Scalar.Green, task.lineWidth, task.lineType)
             pt1List.Add(pt1)
             pt2list.Add(pt2)
             If v.Item5 = verticalSlope Then
-                dst2.Line(pt1, pt2, cv.Scalar.Blue, task.lineThickness + task.lineThickness, task.lineType)
+                dst2.Line(pt1, pt2, cv.Scalar.Blue, task.lineWidth + task.lineWidth, task.lineType)
             Else
                 If v.Item5 = 0 Then
-                    dst2.Line(pt1, pt2, cv.Scalar.Red, task.lineThickness + task.lineThickness, task.lineType)
+                    dst2.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + task.lineWidth, task.lineType)
                 End If
             End If
         Next
@@ -855,8 +855,8 @@ Public Class Line_TimeView : Inherits VBparent
             If ptList1(i) IsNot Nothing Then
                 lineTotal += ptList1(i).Count
                 For j = 0 To ptList1(i).Count - 1
-                    dst1.Line(ptList1(i)(j), ptList2(i)(j), cv.Scalar.Yellow, task.lineThickness, task.lineType)
-                    dst2.Line(ptList1(i)(j), ptList2(i)(j), cv.Scalar.White, task.lineThickness, task.lineType)
+                    dst1.Line(ptList1(i)(j), ptList2(i)(j), cv.Scalar.Yellow, task.lineWidth, task.lineType)
+                    dst2.Line(ptList1(i)(j), ptList2(i)(j), cv.Scalar.White, task.lineWidth, task.lineType)
                 Next
             End If
         Next

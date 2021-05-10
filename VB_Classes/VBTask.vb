@@ -152,7 +152,8 @@ Public Class ActiveTask : Implements IDisposable
     Public font As cv.HersheyFonts
     Public fontSize As Single
     Public dotSize As Integer
-    Public lineThickness As Integer
+    Public lineWidth As Integer
+    Public lineType As cv.LineTypes
     Public resolutionIndex As Integer
 
     Public IMU_Barometer As Single
@@ -208,7 +209,6 @@ Public Class ActiveTask : Implements IDisposable
 
     Public pythonTaskName As String
     Public algName As String
-    Public lineType As cv.LineTypes
 
     Public ttTextData As New List(Of TTtext)
     Public callTrace As New List(Of String)

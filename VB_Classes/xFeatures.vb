@@ -14,8 +14,8 @@ Public Class XFeatures2D_StarDetector : Inherits VBparent
             For Each kpt As cv.KeyPoint In keypoints
                 Dim r As Single = kpt.Size / 2
                 dst1.Circle(kpt.Pt, CInt(Math.Truncate(r)), New cv.Scalar(0, 255, 0), 1, cv.LineTypes.Link8, 0)
-                dst1.Line(New cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), New cv.Scalar(0, 255, 0), task.lineThickness, cv.LineTypes.Link8, 0)
-                dst1.Line(New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New cv.Scalar(0, 255, 0), task.lineThickness, cv.LineTypes.Link8, 0)
+                dst1.Line(New cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), New cv.Scalar(0, 255, 0), task.lineWidth, cv.LineTypes.Link8, 0)
+                dst1.Line(New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New cv.Scalar(0, 255, 0), task.lineWidth, cv.LineTypes.Link8, 0)
             Next kpt
         End If
     End Sub

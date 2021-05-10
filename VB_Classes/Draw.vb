@@ -14,9 +14,9 @@ Module Draw_Exports
         Dim vertices = rr.Points()
         For i = 0 To 4 - 1
             dst.Line(New cv.Point(vertices(i).X, vertices(i).Y), New cv.Point(vertices((i + 1) Mod 4).X, vertices((i + 1) Mod 4).Y),
-                     color, task.lineThickness, task.lineType)
+                     color, task.lineWidth, task.lineType)
         Next
-        dst.Rectangle(rr.BoundingRect, color, task.lineThickness, task.lineType)
+        dst.Rectangle(rr.BoundingRect, color, task.lineWidth, task.lineType)
     End Sub
     Public Function initRandomRect(width As Integer, height As Integer, margin As Integer) As cv.Rect
         Dim x As Integer, y As Integer, w As Integer, h As Integer
@@ -209,7 +209,7 @@ Public Class Draw_Polygon : Inherits VBparent
             Next
             listOfPoints.Add(points)
             If optDraw.drawFilled <> -1 Then
-                cv.Cv2.Polylines(dst1, listOfPoints, True, polyColor, task.lineThickness + 1, task.lineType)
+                cv.Cv2.Polylines(dst1, listOfPoints, True, polyColor, task.lineWidth + 1, task.lineType)
             Else
                 dst1.FillPoly(listOfPoints, New cv.Scalar(0, 0, 255))
             End If
@@ -333,7 +333,7 @@ Public Class Draw_SymmetricalShapes : Inherits VBparent
         Next
 
         For i = 0 To numPoints - 1
-            dst1.Line(points.ElementAt(i), points.ElementAt((i + 1) Mod numPoints), task.scalarColors(i Mod task.scalarColors.Count), task.lineThickness + 1, task.lineType)
+            dst1.Line(points.ElementAt(i), points.ElementAt((i + 1) Mod numPoints), task.scalarColors(i Mod task.scalarColors.Count), task.lineWidth + 1, task.lineType)
         Next
 
         If check.Box(2).Checked Then dst1.FloodFill(center, fillColor)
@@ -526,8 +526,8 @@ Public Class Draw_ClipLine : Inherits VBparent
         Dim r = New cv.Rect(kalman.kOutput(4), kalman.kOutput(5), kalman.kOutput(6), kalman.kOutput(7))
 
         Dim clipped = cv.Cv2.ClipLine(r, p1, p2) ' Returns false when the line and the rectangle don't intersect.
-        dst2.Line(p1, p2, If(clipped, cv.Scalar.White, cv.Scalar.Black), task.lineThickness + 1, task.lineType)
-        dst2.Rectangle(r, If(clipped, cv.Scalar.Yellow, cv.Scalar.Red), task.lineThickness + 1, task.lineType)
+        dst2.Line(p1, p2, If(clipped, cv.Scalar.White, cv.Scalar.Black), task.lineWidth + 1, task.lineType)
+        dst2.Rectangle(r, If(clipped, cv.Scalar.Yellow, cv.Scalar.Red), task.lineWidth + 1, task.lineType)
 
         Static linenum = 0
         flow.msgs.Add("(" + CStr(linenum) + ") line " + If(clipped, "interects rectangle", "does not intersect rectangle"))
@@ -581,8 +581,8 @@ Public Class Draw_Intersection : Inherits VBparent
         End If
 
         dst1.SetTo(0)
-        dst1.Line(p1, p2, cv.Scalar.Yellow, task.lineThickness + 1, task.lineType)
-        dst1.Line(p3, p4, cv.Scalar.Yellow, task.lineThickness + 1, task.lineType)
+        dst1.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+        dst1.Line(p3, p4, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
         If intersectionPoint <> New cv.Point2f Then dst1.Circle(intersectionPoint, task.dotSize + 4, cv.Scalar.White, -1, task.lineType)
         If intersect Then label1 = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y)) Else label1 = "Parallel!!!"
         If intersectionPoint.X < 0 Or intersectionPoint.X > dst1.Width Or intersectionPoint.Y < 0 Or intersectionPoint.Y > dst1.Height Then

@@ -5,7 +5,7 @@ Module Delaunay_Exports
             If org.Y >= 0 And org.Y <= img.Height Then
                 If output.X >= 0 And output.X <= img.Width Then
                     If output.Y >= 0 And output.Y <= img.Height Then
-                        cv.Cv2.Line(img, org, output, active_color, task.lineThickness, task.lineType, 0)
+                        cv.Cv2.Line(img, org, output, active_color, task.lineWidth, task.lineType, 0)
                     End If
                 End If
             End If
@@ -70,7 +70,7 @@ Module Delaunay_Exports
             Dim nextColor = colors(i Mod colors.Length)
             ifacets(0) = ifacet
             cv.Cv2.FillConvexPoly(img, ifacet, nextColor, task.lineType)
-            cv.Cv2.Polylines(img, ifacets, True, New cv.Scalar(0), task.lineThickness, task.lineType, 0)
+            cv.Cv2.Polylines(img, ifacets, True, New cv.Scalar(0), task.lineWidth, task.lineType, 0)
         Next
     End Sub
 End Module

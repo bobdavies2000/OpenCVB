@@ -201,7 +201,7 @@ Public Class Clone_Seamless : Inherits VBparent
         Next
         dst1 = src.Clone()
         cv.Cv2.SeamlessClone(task.RGBDepth, src, dst2, center, dst1, style)
-        dst1.Circle(center, radius, cv.Scalar.White, task.lineThickness, task.lineType)
+        dst1.Circle(center, radius, cv.Scalar.White, task.lineWidth, task.lineType)
     End Sub
 End Class
 

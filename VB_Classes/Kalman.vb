@@ -184,8 +184,8 @@ Public Class Kalman_RotatingPoint : Inherits VBparent
     End Function
     Private Sub drawCross(dst1 As cv.Mat, center As cv.Point, color As cv.Scalar)
         Dim d = 3
-        dst1.Line(New cv.Point(center.X - d, center.Y - d), New cv.Point(center.X + d, center.Y + d), color, task.lineThickness, task.lineType)
-        dst1.Line(New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, task.lineThickness, task.lineType)
+        dst1.Line(New cv.Point(center.X - d, center.Y - d), New cv.Point(center.X + d, center.Y + d), color, task.lineWidth, task.lineType)
+        dst1.Line(New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, task.lineWidth, task.lineType)
     End Sub
     Public Sub New()
         label1 = "Estimate Yellow < Real Red (if working)"
@@ -220,8 +220,8 @@ Public Class Kalman_RotatingPoint : Inherits VBparent
         drawCross(dst1, statePt, cv.Scalar.White)
         drawCross(dst1, measPt, cv.Scalar.White)
         drawCross(dst1, predictPt, cv.Scalar.White)
-        dst1.Line(statePt, measPt, New cv.Scalar(0, 0, 255), task.lineThickness + 2, task.lineType)
-        dst1.Line(statePt, predictPt, New cv.Scalar(0, 255, 255), task.lineThickness + 2, task.lineType)
+        dst1.Line(statePt, measPt, New cv.Scalar(0, 0, 255), task.lineWidth + 2, task.lineType)
+        dst1.Line(statePt, predictPt, New cv.Scalar(0, 255, 255), task.lineWidth + 2, task.lineType)
 
         If msRNG.Next(0, 4) <> 0 Then kf.Correct(measurement)
 

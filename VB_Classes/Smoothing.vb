@@ -208,7 +208,7 @@ Public Class Smoothing_Contours : Inherits VBparent
 				maxNodes = c.Length
 			End If
 		Next
-		cv.Cv2.DrawContours(dst2, contours0, maxIndex, New cv.Scalar(0, 255, 255), task.lineThickness)
+		cv.Cv2.DrawContours(dst2, contours0, maxIndex, New cv.Scalar(0, 255, 255), task.lineWidth)
 
 		smooth.inputPoints = New List(Of cv.Point)
 		For i = 0 To contours0(maxIndex).Count - 1 Step smOptions.stepSize

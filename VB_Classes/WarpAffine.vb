@@ -156,10 +156,10 @@ Public Class WarpAffine_3Points : Inherits VBparent
                     Dim p1 = triangles(j).Get(Of cv.Point2f)(i) + New cv.Point2f(j * src.Width, 0)
                     Dim p2 = triangles(j).Get(Of cv.Point2f)((i + 1) Mod 3) + New cv.Point2f(j * src.Width, 0)
                     Dim color = Choose(i + 1, cv.Scalar.Red, cv.Scalar.White, cv.Scalar.Yellow)
-                    wideMat.Line(p1, p2, color, task.lineThickness + 3, task.lineType)
+                    wideMat.Line(p1, p2, color, task.lineWidth + 3, task.lineType)
                     If j = 0 Then
                         Dim p3 = triangles(j + 1).Get(Of cv.Point2f)(i) + New cv.Point2f(src.Width, 0)
-                        wideMat.Line(p1, p3, cv.Scalar.White, task.lineThickness, task.lineType)
+                        wideMat.Line(p1, p3, cv.Scalar.White, task.lineWidth, task.lineType)
                     End If
                 Next
             Next
@@ -227,10 +227,10 @@ Public Class WarpAffine_4Points : Inherits VBparent
                     Dim p2 = rectangles(j).Points((i + 1) Mod rectangles(j).Points.Length)
                     If j = 0 Then
                         Dim p3 = rectangles(1).Points(i)
-                        dst1.Line(p1, p3, cv.Scalar.White, task.lineThickness, task.lineType)
+                        dst1.Line(p1, p3, cv.Scalar.White, task.lineWidth, task.lineType)
                     End If
                     Dim color = Choose(i + 1, cv.Scalar.Red, cv.Scalar.White, cv.Scalar.Yellow, cv.Scalar.Green)
-                    dst1.Line(p1, p2, color, task.lineThickness + 3, task.lineType)
+                    dst1.Line(p1, p2, color, task.lineWidth + 3, task.lineType)
                 Next
             Next
         End If
