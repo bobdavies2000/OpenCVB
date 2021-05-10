@@ -1230,7 +1230,7 @@ End Class
 
 
 
-Public Class PointCoud_SurfaceH : Inherits VBparent
+Public Class PointCoud_SurfaceH_CPP : Inherits VBparent
     Public tView As New TimeView_Basics
     Public plot As New Plot_Basics_CPP
     Public topRow As Integer
@@ -1263,6 +1263,51 @@ Public Class PointCoud_SurfaceH : Inherits VBparent
             If botRow = 0 And plot.srcY(i) > 10 Then botRow = i
         Next
         plot.Run(Nothing)
+        dst2 = plot.dst1.Transpose()
+        dst2 = dst2.Flip(cv.FlipMode.Y)
+        label1 = "Top row = " + CStr(topRow) + " peak row = " + CStr(peakRow) + " bottom row = " + CStr(botRow)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCoud_SurfaceH : Inherits VBparent
+    Public tView As New TimeView_Basics
+    Public plot As New Plot_Histogram
+    Public topRow As Integer
+    Public botRow As Integer
+    Public peakRow As Integer
+    Public Sub New()
+        task.desc = "Find the horizontal surfaces with a projects of the SideView histogram."
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        tView.Run(src)
+        dst1 = tView.dst1
+        plot.hist = New cv.Mat(dst1.Height, 1, cv.MatType.CV_32F, 0)
+        Dim indexer = plot.hist.GetGenericIndexer(Of Single)()
+
+        topRow = 0
+        botRow = 0
+        peakRow = 0
+        Dim peakVal As Integer
+        For i = 0 To dst1.Height - 1
+            indexer(i) = dst1.Row(i).CountNonZero()
+            If peakVal < indexer(i) Then
+                peakVal = indexer(i)
+                peakRow = i
+            End If
+            If topRow = 0 And indexer(i) > 10 Then topRow = i
+        Next
+
+        plot.fixedMaxVal = peakVal
+        For i = plot.hist.Rows - 1 To 0 Step -1
+            If botRow = 0 And indexer(i) > 10 Then botRow = i
+        Next
+        plot.Run(src)
         dst2 = plot.dst1.Transpose()
         dst2 = dst2.Flip(cv.FlipMode.Y)
         label1 = "Top row = " + CStr(topRow) + " peak row = " + CStr(peakRow) + " bottom row = " + CStr(botRow)

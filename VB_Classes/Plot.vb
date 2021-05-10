@@ -69,7 +69,11 @@ Public Class Plot_Basics_CPP : Inherits VBparent
         handlePlot.Free()
         handleX.Free()
         handleY.Free()
-        dst1.Rectangle(New cv.Rect(0, 0, 240, 55), New cv.Scalar(255, 200, 200), -1)
+        If dst1.Width = 640 Then
+            dst1.Rectangle(New cv.Rect(0, 0, 240, 55), New cv.Scalar(255, 200, 200), -1)
+        Else
+            dst1.Rectangle(New cv.Rect(0, 0, 465, 80), New cv.Scalar(255, 200, 200), -1)
+        End If
         label1 = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + ", y-axis: " + CStr(minY) + " to " + CStr(maxY)
     End Sub
 End Class
@@ -208,7 +212,7 @@ Public Class Plot_Histogram : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateReview = caller Then
-            Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            Dim gray = If(src.Channels = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             Dim dimensions() = New Integer() {task.histogramBins}
             Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
             cv.Cv2.CalcHist(New cv.Mat() {gray}, New Integer() {0}, New cv.Mat(), hist, 1, dimensions, ranges)
