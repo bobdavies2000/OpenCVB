@@ -1294,6 +1294,7 @@ Public Class PointCoud_SurfaceH : Inherits VBparent
         botRow = 0
         peakRow = 0
         Dim peakVal As Integer
+        If dst1.Channels <> 1 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         For i = 0 To dst1.Height - 1
             indexer(i) = dst1.Row(i).CountNonZero()
             If peakVal < indexer(i) Then
