@@ -396,7 +396,7 @@ Public Class OpenCVB
                             If maxline <= 0 Then Exit For
                         End If
                     Next
-                    ' ttTextData.Clear()
+                    ttTextData.Clear()
                 End If
             Catch ex As Exception
                 Console.WriteLine("Error in ttextData update: " + ex.Message)
@@ -1240,6 +1240,7 @@ Public Class OpenCVB
                         task.CPU_TimeStamp = camera.CPU_TimeStamp
                         task.CPU_FrameTime = camera.CPU_FrameTime
                         task.intermediateReview = intermediateReview
+
                         task.ratioImageToCampic = ratioImageToCampic
                         task.pixelViewerOn = If(testAllRunning Or surveyActive, False, pixelViewerOn)
 

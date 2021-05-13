@@ -52,12 +52,16 @@ Public Class VBparent : Implements IDisposable
     End Sub
     Public Sub NextFrame(src As cv.Mat)
         If task.intermediateReview <> "" Then
-            For Each obj In task.activeObjects
-                If obj.caller = task.intermediateReview Then
-                    task.intermediateObject = obj
-                    Exit For
-                End If
-            Next
+            If task.intermediateObject Is Nothing Then task.intermediateObject = task.activeObjects(0)
+            If task.intermediateReview <> task.intermediateObject.caller Then
+                For Each obj In task.activeObjects
+                    If obj.caller = task.intermediateReview Then
+                        task.intermediateObject = obj
+                        Exit For
+                    End If
+                Next
+                task.ttTextData.Clear()
+            End If
         End If
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
         algorithm.Run(src)
