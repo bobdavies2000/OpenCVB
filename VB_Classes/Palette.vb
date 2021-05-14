@@ -61,7 +61,7 @@ End Class
 
 
 Public Class Palette_LinearPolar : Inherits VBparent
-    Public rotateOptions As New GetRotationMatrix2D_Options
+    Public rotateOptions As New Resize_Options
     Public Sub New()
         task.desc = "Use LinearPolar to create gradient image"
         If sliders.Setup(caller) Then
