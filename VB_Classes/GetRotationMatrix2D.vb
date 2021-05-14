@@ -3,13 +3,12 @@ Imports System.Windows.Forms
 Public Class GetRotationMatrix2D_Options : Inherits VBparent
     Public warpFlag As cv.InterpolationFlags
     Public Sub New()
-
         If radio.Setup(caller, 7) Then
             radio.check(0).Text = "Area"
-            radio.check(1).Text = "Cubic flag"
+            radio.check(1).Text = "Cubic flag (best blended)"
             radio.check(2).Text = "Lanczos4"
             radio.check(3).Text = "Linear"
-            radio.check(4).Text = "Nearest"
+            radio.check(4).Text = "Nearest (preserves pixel values)"
             radio.check(5).Text = "WarpFillOutliers"
             radio.check(6).Text = "WarpInverseMap"
             radio.check(3).Checked = True
@@ -45,7 +44,6 @@ Public Class GetRotationMatrix2D_Basics : Inherits VBparent
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "GetRotation Matrix2D Angle (deg)", 0, 360, 24)
         End If
-
         task.desc = "Rotate a rectangle of a specified angle"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -66,7 +64,6 @@ Public Class GetRotationMatrix2D_Box : Inherits VBparent
     Dim rotation As New GetRotationMatrix2D_Basics
     Public Sub New()
         task.drawRect = New cv.Rect(100, 100, 100, 100)
-
         label1 = "Original Rectangle in the original perspective"
         label2 = "Same Rectangle in the new warped perspective"
         task.desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
