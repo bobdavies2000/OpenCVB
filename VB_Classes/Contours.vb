@@ -13,27 +13,19 @@ Public Class Contours_Basics : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static areaSlider = findSlider("Contour minimum area")
         Static epsilonSlider = findSlider("Contour epsilon (arc length percent)")
-        Static dontchange As Boolean
         options.Run(Nothing)
 
-        If task.mouseClickFlag And dontchange Then
-            dontchange = False
-        Else
-            If task.mouseClickFlag Then dontchange = True
-        End If
-        If dontchange = False Then
-            If standalone Or task.intermediateReview = caller Then
-                Dim imageInput As New cv.Mat
-                rotatedRect.Run(src)
-                imageInput = rotatedRect.dst1
-                If imageInput.Channels = 3 Then
-                    dst1 = imageInput.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
-                Else
-                    dst1 = imageInput.ConvertScaleAbs(255)
-                End If
+        If standalone Then
+            Dim imageInput As New cv.Mat
+            rotatedRect.Run(src)
+            imageInput = rotatedRect.dst1
+            If imageInput.Channels = 3 Then
+                dst1 = imageInput.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
             Else
-                If src.Channels = 3 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = src
+                dst1 = imageInput.ConvertScaleAbs(255)
             End If
+        Else
+            If src.Channels = 3 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = src
         End If
 
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then
@@ -90,6 +82,10 @@ End Class
 
 
 
+
+
+
+
 Public Class Contours_Options : Inherits VBparent
     Public retrievalMode As cv.RetrievalModes
     Public ApproximationMode As cv.ContourApproximationModes
@@ -137,6 +133,9 @@ Public Class Contours_Options : Inherits VBparent
         End If
     End Sub
 End Class
+
+
+
 
 
 Public Class Contours_RGB : Inherits VBparent
