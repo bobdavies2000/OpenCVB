@@ -14,7 +14,7 @@ Public Class Distance_Basics : Inherits VBparent
         task.desc = "Distance algorithm basics."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Or task.intermediateReview = caller Then src = task.RGBDepth ' to get some zeros in the image...
+        If standalone Or task.intermediateName = caller Then src = task.RGBDepth ' to get some zeros in the image...
         Dim gray = src
         If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim DistanceType = cv.DistanceTypes.L2

@@ -12,7 +12,7 @@ Public Class Keyboard_Basics : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         keyInput = New List(Of String)(checkKeys.inputText)
         checkKeys.inputText.Clear()
-        If standalone or task.intermediateReview = caller Then
+        If standalone or task.intermediateName = caller Then
             Dim inputText As String = ""
             For i = 0 To keyInput.Count - 1
                 inputText += keyInput(i).ToString()

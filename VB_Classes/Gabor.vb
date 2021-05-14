@@ -23,7 +23,7 @@ Public Class Gabor_Basics : Inherits VBparent
         task.desc = "Explore Gabor kernel - Painterly Effect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone or task.intermediateReview = caller Then
+        If standalone or task.intermediateName = caller Then
             ksize = sliders.trackbar(0).Value * 2 + 1
             Sigma = sliders.trackbar(1).Value
             lambda = sliders.trackbar(3).Value

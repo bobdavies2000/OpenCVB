@@ -158,7 +158,7 @@ Public Class GeneticDrawing_Basics : Inherits VBparent
             generation = 0
             stage = 0
 
-            If standalone Or task.intermediateReview = caller Then
+            If standalone Or task.intermediateName = caller Then
                 src = If(snapCheck.Checked, src.Clone, cv.Cv2.ImRead(task.parms.homeDir + "Data/GeneticDrawingExample.jpg").Resize(src.Size()))
             End If
             snapCheck.Checked = False

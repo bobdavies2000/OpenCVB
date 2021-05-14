@@ -88,7 +88,7 @@ Public Class LUT_CustomColor : Inherits VBparent
         task.desc = "Use a palette to provide the lookup table for LUT - Painterly Effect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Or task.intermediateReview = caller Then reduction.Run(src)
+        If standalone Or task.intermediateName = caller Then reduction.Run(src)
         gradMap.Run(src)
         colorMap = gradMap.gradientColorMap.Flip(cv.FlipMode.X)
         dst1 = src.LUT(colorMap)
@@ -115,7 +115,7 @@ Public Class LUT_Reduction : Inherits VBparent
         reduction.Run(src)
         Dim vector = task.palette.gradientColorMap.Row(0).Clone
         dst1 = reduction.dst2.LUT(vector)
-        If standalone Or task.intermediateReview = caller Then dst2 = task.palette.gradientColorMap.Resize(src.Size())
+        If standalone Or task.intermediateName = caller Then dst2 = task.palette.gradientColorMap.Resize(src.Size())
     End Sub
 End Class
 

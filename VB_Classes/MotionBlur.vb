@@ -10,7 +10,7 @@ Public Class MotionBlur_Basics : Inherits VBparent
         task.desc = "Use Filter2D to create a motion blur"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone or task.intermediateReview = caller Then
+        If standalone or task.intermediateName = caller Then
             If sliders.trackbar(1).Value < sliders.trackbar(1).Maximum Then
                 sliders.trackbar(1).Value += 1
             Else

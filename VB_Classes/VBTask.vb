@@ -180,7 +180,8 @@ Public Class ActiveTask : Implements IDisposable
     Public label1 As String
     Public label2 As String
     Public desc As String
-    Public intermediateReview As String
+    Public intermediateName As String
+    Public intermediateObject As VBparent
     Public activeObjects As New List(Of Object)
     Public ratioImageToCampic As Single
     Public pixelViewerOn As Boolean
@@ -204,8 +205,6 @@ Public Class ActiveTask : Implements IDisposable
     Public angleX As Single  ' rotation angle in radians around x-axis to align with gravity
     Public angleY As Single  ' this angle is only used manually - no IMU connection.
     Public angleZ As Single  ' rotation angle in radians around z-axis to align with gravity
-
-    Public intermediateObject As VBparent
 
     Public pythonTaskName As String
     Public algName As String
@@ -345,7 +344,7 @@ Public Class ActiveTask : Implements IDisposable
 
         ' https://docs.microsoft.com/en-us/azure/kinect-dk/hardware-specification
         ' https://support.stereolabs.com/hc/en-us/articles/360007395634-What-is-the-camera-focal-length-and-field-of-view-
-        ' https://www.mynteye.com/pages/mynt-eye-d
+        ' https://www.mynteye.com/pages/mynt-eye-d   
         ' https://www.intelrealsense.com/depth-camera-d435i/
         ' https://www.intelrealsense.com/depth-camera-d455/
         ' https://towardsdatascience.com/opinion-26190c7fed1b
@@ -363,6 +362,19 @@ Public Class ActiveTask : Implements IDisposable
         Try
             If task.parms.useRecordedData Then recordedData.Run(task.color.Clone)
 
+            If task.intermediateName <> "" Then
+                If task.intermediateObject Is Nothing Then task.intermediateObject = task.activeObjects(0)
+                If task.intermediateName <> task.intermediateObject.caller Then
+                    For Each obj In task.activeObjects
+                        If obj.caller = task.intermediateName Then
+                            task.intermediateObject = obj
+                            Exit For
+                        End If
+                    Next
+                    task.ttTextData.Clear()
+                End If
+            End If
+
             ' run any global options algorithms here.
             If task.pythonTaskName.EndsWith(".py") = False Then
                 inrange.Run(Nothing) ' updates all the depth info.
@@ -373,10 +385,6 @@ Public Class ActiveTask : Implements IDisposable
             TaskTimer.Enabled = True
             algorithmObject.NextFrame(task.color.Clone)
             TaskTimer.Enabled = False
-
-            label1 = task.label1
-            label2 = task.label2
-            intermediateReview = task.intermediateReview
         Catch ex As Exception
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try

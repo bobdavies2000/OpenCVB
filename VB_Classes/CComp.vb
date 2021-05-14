@@ -300,7 +300,7 @@ Public Class CComp_DepthEdges : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         depth.Run(src)
-        If standalone Or task.intermediateReview = caller Then dst2 = depth.dst2
+        If standalone Or task.intermediateName = caller Then dst2 = depth.dst2
 
         'If check.Box(0).Checked Then ccomp.basics.edgeMask = depth.dst2 Else ccomp.basics.edgeMask = Nothing
         If check.Box(0).Checked Then src.SetTo(0, depth.dst2)

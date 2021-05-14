@@ -126,7 +126,7 @@ Public Class KNN_Options : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static trainSlider = findSlider("KNN Train count")
         Static querySlider = findSlider("KNN Query count")
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Or task.intermediateName = caller Then
             If check.Box(0).Checked = False Then useRandomData = True
         End If
 
@@ -139,7 +139,7 @@ Public Class KNN_Options : Inherits VBparent
         End If
 
         ' algorithm does nothing but provide a location for query/train points when not running standalone.
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Or task.intermediateName = caller Then
             ' query/train points need to be manufactured when standalone
             trainingPoints = New List(Of cv.Point2f)(randomTrain.Points2f)
             queryPoints = New List(Of cv.Point2f)(randomQuery.Points2f)
@@ -265,14 +265,14 @@ Public Class KNN_Emax : Inherits VBparent
             emax = New EMax_Centroids()
             emax.Run(src) ' set the first generation of points.
         End If
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Or task.intermediateName = caller Then
             knn.basics.knnQT.trainingPoints = New List(Of cv.Point2f)(emax.flood.centroids)
             emax.Run(src)
             knn.basics.knnQT.queryPoints = New List(Of cv.Point2f)(emax.flood.centroids)
         End If
 
         knn.Run(src)
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Or task.intermediateName = caller Then
             dst1 = emax.dst1 + knn.dst1
             dst2 = knn.dst1
         Else
@@ -383,7 +383,7 @@ Public Class KNN_Point3d : Inherits VBparent
 
         Dim maxDepth As Integer = 4000 ' this is an arbitrary max depth
         Dim knn = cv.ML.KNearest.Create()
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Or task.intermediateName = caller Then
             ReDim lastSet(countSlider.Value - 1)
             ReDim querySet(lastSet.Count - 1)
             For i = 0 To lastSet.Count - 1
@@ -419,7 +419,7 @@ Public Class KNN_Point3d : Inherits VBparent
             For j = 0 To findXnearest - 1
                 responseSet(i * findXnearest + j) = CInt(neighbors.Get(Of Single)(0, j))
             Next
-            If standalone Or task.intermediateReview = caller Then
+            If standalone Or task.intermediateName = caller Then
                 For j = 0 To findXnearest - 1
                     Dim plast = New cv.Point2f(lastSet(responseSet(i * findXnearest + j)).X, lastSet(responseSet(i * findXnearest + j)).Y)
                     Dim pQ = New cv.Point2f(querySet(i).X, querySet(i).Y)
@@ -685,7 +685,7 @@ Public Class KNN_Point2d : Inherits VBparent
         Static nearestCountSlider = findSlider("KNN k nearest points")
         Dim findXnearest = nearestCountSlider.Value
 
-        If standalone Or task.intermediateReview = caller Then prepareImage(dst1, task.dotSize)
+        If standalone Or task.intermediateName = caller Then prepareImage(dst1, task.dotSize)
 
         knn.Run(src)
 
@@ -698,7 +698,7 @@ Public Class KNN_Point2d : Inherits VBparent
                 Dim index = neighbors.Get(Of Single)(0, j)
                 responseSet(i * findXnearest + j) = CInt(index)
             Next
-            If standalone Or task.intermediateReview = caller Then
+            If standalone Or task.intermediateName = caller Then
                 For j = 0 To findXnearest - 1
                     dst1.Line(knn.knnQT.trainingPoints(responseSet(i * findXnearest + j)), knn.knnQT.queryPoints(i), cv.Scalar.White, task.lineWidth, task.lineType)
                     dst1.Circle(knn.knnQT.trainingPoints(responseSet(i * findXnearest + j)), task.dotSize, cv.Scalar.Blue, -1, task.lineType, 0)

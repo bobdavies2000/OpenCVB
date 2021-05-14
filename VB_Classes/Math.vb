@@ -60,7 +60,7 @@ Public Class Math_Median_CDF : Inherits VBparent
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         medianVal = computeMedian(src, New cv.Mat, src.Total, task.histogramBins, rangeMin, rangeMax)
 
-        If standalone or task.intermediateReview = caller Then
+        If standalone or task.intermediateName = caller Then
             Dim mask = New cv.Mat
             mask = src.GreaterThan(medianVal)
 

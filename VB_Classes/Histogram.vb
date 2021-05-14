@@ -12,7 +12,7 @@ Public Class Histogram_Basics : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static splitIndex As Integer
         Static colorName As String
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Or task.intermediateName = caller Then
             Dim split() = src.Split()
             If split.Count > 1 Then
                 If task.frameCount Mod 100 = 0 Then splitIndex = If(splitIndex < 2, splitIndex + 1, 0)
@@ -43,7 +43,7 @@ Public Class Histogram_Basics : Inherits VBparent
         End If
 
         plotHist.hist = histogram
-        If standalone Or task.intermediateReview = caller Then plotHist.backColor = splitColors(splitIndex)
+        If standalone Or task.intermediateName = caller Then plotHist.backColor = splitColors(splitIndex)
         plotHist.Run(src)
         dst1 = plotHist.dst1
         label1 = colorName + " histogram, bins = " + CStr(task.histogramBins)
@@ -690,7 +690,7 @@ Public Class Histogram_ViewObjects : Inherits VBparent
             dst1.Rectangle(r, cv.Scalar.White, 1)
             minZ = task.maxZ * r.X / w
             maxZ = task.maxZ * (r.X + r.Width) / w
-            If standalone Or task.intermediateReview = caller Then task.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset)
+            If standalone Or task.intermediateName = caller Then task.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset)
         Next
         label1 = CStr(flood.rects.Count) + " objects were identified in the side view"
 
@@ -703,7 +703,7 @@ Public Class Histogram_ViewObjects : Inherits VBparent
             dst2.Rectangle(r, cv.Scalar.White, 1)
             minZ = task.maxZ * (h - r.Y - r.Height) / h
             maxZ = task.maxZ * (h - r.Y) / h
-            If standalone Or task.intermediateReview = caller Then task.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset, 3)
+            If standalone Or task.intermediateName = caller Then task.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset, 3)
         Next
 
         label2 = CStr(flood.rects.Count) + " objects identified.  Largest is yellow."
@@ -824,7 +824,7 @@ Public Class Histogram_DepthClusters : Inherits VBparent
         Next
         task.palette.Run(paletteSrc)
         dst2 = task.palette.dst1
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Or task.intermediateName = caller Then
             label1 = "Histogram of " + CStr(valleys.ranges.Count) + " Depth Clusters"
             label2 = "Backprojection of " + CStr(valleys.ranges.Count) + " histogram clusters"
         End If
@@ -902,7 +902,7 @@ Public Class Histogram_Depth : Inherits VBparent
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
         cv.Cv2.CalcHist(New cv.Mat() {task.depth32f}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Or task.intermediateName = caller Then
             plotHist.Run(src)
             dst1 = plotHist.dst1
         End If

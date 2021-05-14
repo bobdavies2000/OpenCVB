@@ -35,12 +35,12 @@ Public Class Texture_Basics : Inherits VBparent
             For Each roi In grid.roiList
                 sortcounts.Add(dst1(roi).CountNonZero(), roi)
             Next
-            If standalone or task.intermediateReview = caller Then dst2.Rectangle(sortcounts.ElementAt(0).Value, cv.Scalar.White, 2)
+            If standalone or task.intermediateName = caller Then dst2.Rectangle(sortcounts.ElementAt(0).Value, cv.Scalar.White, 2)
             tRect = sortcounts.ElementAt(0).Value
             texture = task.color(tRect)
             texturePop = dst1(tRect).CountNonZero()
         End If
-        If standalone or task.intermediateReview = caller Then dst2.Rectangle(tRect, cv.Scalar.White, 2)
+        If standalone or task.intermediateName = caller Then dst2.Rectangle(tRect, cv.Scalar.White, 2)
     End Sub
 End Class
 
@@ -133,7 +133,7 @@ Public Class Texture_Shuffle : Inherits VBparent
         task.desc = "Use random shuffling to homogenize a texture sample of what the floor looks like."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Or task.intermediateName = caller Then
             floor.plane.Run(src)
             dst2.SetTo(0)
             src.CopyTo(dst2, floor.plane.sliceMask)

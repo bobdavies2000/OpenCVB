@@ -21,7 +21,7 @@ Public Class BRISK_Basics : Inherits VBparent
                 dst1.Circle(pt.Pt, task.dotSize, cv.Scalar.Green, r / task.lineWidth + 1, task.lineType)
             End If
         Next
-        If standalone or task.intermediateReview = caller Then cv.Cv2.AddWeighted(src, 0.5, dst1, 0.5, 0, dst1)
+        If standalone or task.intermediateName = caller Then cv.Cv2.AddWeighted(src, 0.5, dst1, 0.5, 0, dst1)
     End Sub
 End Class
 

@@ -45,7 +45,7 @@ Public Class Hull_Basics : Inherits VBparent
         Next
         hull = cv.Cv2.ConvexHull(points, True)
 
-        If standalone or task.intermediateReview = caller Then
+        If standalone or task.intermediateName = caller Then
             dst1.SetTo(0)
             dst2.SetTo(0)
             For i = 0 To hull.Count - 1

@@ -48,7 +48,7 @@ Public Class Smoothing_Exterior : Inherits VBparent
 	End Sub
 	Public Sub Run(src As cv.Mat) ' Rank = 1
 		smOptions.Run(Nothing)
-		If standalone Or task.intermediateReview = caller Then
+		If standalone Or task.intermediateName = caller Then
 			If task.frameCount Mod 30 Then Exit Sub
 			dst1.SetTo(0)
 			hull.Run(src)
@@ -121,7 +121,7 @@ Public Class Smoothing_Interior : Inherits VBparent
 	End Sub
 	Public Sub Run(src As cv.Mat) ' Rank = 1
 		smOptions.Run(Nothing)
-		If standalone Or task.intermediateReview = caller Then
+		If standalone Or task.intermediateName = caller Then
 			If task.frameCount Mod 30 Then Exit Sub
 			dst1.SetTo(0)
 			hull.Run(src)

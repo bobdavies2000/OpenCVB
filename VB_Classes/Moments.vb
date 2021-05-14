@@ -12,7 +12,7 @@ Public Class Moments_Basics : Inherits VBparent
         task.desc = "Compute the centroid of the provided mask file."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Or task.intermediateName = caller Then
             foreground.Run(src)
             dst1 = foreground.dst1
             inputMask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -28,7 +28,7 @@ Public Class Moments_Basics : Inherits VBparent
         Else
             center = New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00)
         End If
-        If standalone Or task.intermediateReview = caller Then dst1.Circle(center, task.dotSize + 5, cv.Scalar.Red, -1, task.lineType)
+        If standalone Or task.intermediateName = caller Then dst1.Circle(center, task.dotSize + 5, cv.Scalar.Red, -1, task.lineType)
         centroid = New cv.Point2f(scaleFactor * (offsetPt.X + center.X), scaleFactor * (offsetPt.Y + center.Y))
     End Sub
 End Class

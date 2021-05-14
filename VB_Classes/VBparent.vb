@@ -51,26 +51,14 @@ Public Class VBparent : Implements IDisposable
         dst3 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
     End Sub
     Public Sub NextFrame(src As cv.Mat)
-        If task.intermediateReview <> "" Then
-            If task.intermediateObject Is Nothing Then task.intermediateObject = task.activeObjects(0)
-            If task.intermediateReview <> task.intermediateObject.caller Then
-                For Each obj In task.activeObjects
-                    If obj.caller = task.intermediateReview Then
-                        task.intermediateObject = obj
-                        Exit For
-                    End If
-                Next
-                task.ttTextData.Clear()
-            End If
-        End If
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
         algorithm.Run(src)
         If standalone Or caller = "Python_Run" Then
             task.label1 = label1
             task.label2 = label2
-            If task.intermediateReview <> "" And task.intermediateReview <> caller Then
+            If task.intermediateName <> "" And task.intermediateName <> caller Then
                 If task.intermediateObject Is Nothing Then
-                    task.trueText(task.intermediateReview + " is not active.", 10, 100)
+                    task.trueText(task.intermediateName + " is not active.", 10, 100)
                     dst1.SetTo(0)
                     dst2.SetTo(0)
                 Else

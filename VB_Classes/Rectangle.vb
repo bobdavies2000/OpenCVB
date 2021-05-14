@@ -99,7 +99,7 @@ Public Class Rectangle_Overlap : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static typeCheckBox = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Or task.intermediateName = caller Then
             draw.Run(src)
             dst1 = draw.dst1
         End If
@@ -274,7 +274,7 @@ Public Class Rectangle_Union : Inherits VBparent
         task.desc = "Create a rectangle that contains all the input rectangles"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Or task.intermediateName = caller Then
             Static countSlider = findSlider("DrawCount")
             Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             rotatedCheck.Enabled = False

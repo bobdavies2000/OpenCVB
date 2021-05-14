@@ -38,7 +38,7 @@ Public Class TimeView_Basics : Inherits VBparent
 
         sideAccum = sideAccum.Add(sideFrames.ElementAt(sideFrames.Count - 1))
         topAccum = topAccum.Add(topFrames.ElementAt(sideFrames.Count - 1))
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Or task.intermediateName = caller Then
             setupSide.Run(sideAccum.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR))
             dst1 = setupSide.dst1
             setupTop.Run(topAccum.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR))

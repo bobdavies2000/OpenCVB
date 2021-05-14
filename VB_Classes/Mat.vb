@@ -143,7 +143,7 @@ Public Class Mat_4to1 : Inherits VBparent
         Static roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
         Static roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         Static roibotRight = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
-        If standalone Or task.intermediateReview = caller Then defaultMats()
+        If standalone Or task.intermediateName = caller Then defaultMats()
 
         For i = 0 To 4 - 1
             Dim tmp = mat(i).Clone
@@ -182,7 +182,7 @@ Public Class Mat_2to1 : Inherits VBparent
         Static nSize = New cv.Size(task.color.Width, task.color.Height / 2)
         Static roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
-        If standalone or task.intermediateReview = caller Then
+        If standalone or task.intermediateName = caller Then
             mat1 = src
             mat2 = task.RGBDepth
             mat = {mat1, mat2}
@@ -233,7 +233,7 @@ Public Class Mat_ImageXYZ_MT : Inherits VBparent
           End Sub)
 
         cv.Cv2.Merge(xyzPlanes, xyDepth)
-        If standalone Or task.intermediateReview = caller Then task.trueText("Mat built with X, Y, and Z (Depth)", 10, 125)
+        If standalone Or task.intermediateName = caller Then task.trueText("Mat built with X, Y, and Z (Depth)", 10, 125)
     End Sub
 End Class
 
@@ -435,7 +435,7 @@ Public Class Mat_4Click : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
-        If standalone Or task.intermediateReview = caller Then mats.defaultMats()
+        If standalone Or task.intermediateName = caller Then mats.defaultMats()
         mats.Run(Nothing)
         dst1 = mats.dst1
 

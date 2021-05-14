@@ -338,7 +338,7 @@ Public Class Depth_Colorizer_CPP : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Type <> cv.MatType.CV_32F Then
-            If standalone Or task.intermediateReview = caller Then src = task.depth32f Else dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
+            If standalone Or task.intermediateName = caller Then src = task.depth32f Else dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8UC3)
         End If
         Dim depthData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
@@ -381,7 +381,7 @@ Public Class Depth_ColorizerFastFade_CPP : Inherits VBparent
 
         If imagePtr <> 0 Then
             dst1 = New cv.Mat(input.Rows, input.Cols, cv.MatType.CV_8UC3, imagePtr)
-            If standalone Or task.intermediateReview = caller Then dst1.SetTo(0, dst2)
+            If standalone Or task.intermediateName = caller Then dst1.SetTo(0, dst2)
         End If
     End Sub
     Public Sub Close()
@@ -449,7 +449,7 @@ Public Class Depth_ColorizerVB_MT : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)
 
-        If standalone Or task.intermediateReview = caller Then src = task.depth32f
+        If standalone Or task.intermediateName = caller Then src = task.depth32f
         Dim nearColor = New Single() {0, 1, 1}
         Dim farColor = New Single() {1, 0, 0}
 
@@ -508,7 +508,7 @@ Public Class Depth_Colorizer_MT : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)
 
-        If standalone Or task.intermediateReview = caller Then src = task.depth32f
+        If standalone Or task.intermediateName = caller Then src = task.depth32f
         Dim nearColor = New Single() {0, 1, 1}
         Dim farColor = New Single() {1, 0, 0}
 
@@ -553,7 +553,7 @@ Public Class Depth_LocalMinMax_MT : Inherits VBparent
         Dim mask = task.depth32f.Threshold(1, 5000, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8UC1)
 
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Or task.intermediateName = caller Then
             src.CopyTo(dst1)
             dst1.SetTo(cv.Scalar.White, grid.gridMask)
         End If
@@ -674,7 +674,7 @@ Public Class Depth_NotMissing : Inherits VBparent
         task.desc = "Collect X frames, compute stable depth using the RGB and Depth image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Or task.intermediateReview = caller Then src = task.RGBDepth
+        If standalone Or task.intermediateName = caller Then src = task.RGBDepth
         mog.Run(src)
         dst1 = mog.dst1
         cv.Cv2.BitwiseNot(mog.dst1, dst2)
@@ -735,7 +735,7 @@ Public Class Depth_SmoothingMat : Inherits VBparent
         Static thresholdSlider = findSlider("Threshold in millimeters")
         Static lastDepth = task.depth32f
 
-        If standalone Or task.intermediateReview = caller Then src = task.depth32f
+        If standalone Or task.intermediateName = caller Then src = task.depth32f
         Dim rect = If(task.drawRect.Width <> 0, task.drawRect, New cv.Rect(0, 0, src.Width, src.Height))
 
         cv.Cv2.Subtract(lastDepth, task.depth32f, dst1)
@@ -860,7 +860,7 @@ Public Class Depth_Holes : Inherits VBparent
 
         dst2 = holeMask.Dilate(element, Nothing, sliders.trackbar(0).Value)
         cv.Cv2.BitwiseXor(dst2, holeMask, dst2)
-        If standalone Or task.intermediateReview = caller Then task.RGBDepth.CopyTo(dst2, dst2)
+        If standalone Or task.intermediateName = caller Then task.RGBDepth.CopyTo(dst2, dst2)
     End Sub
 End Class
 
@@ -894,7 +894,7 @@ Public Class Depth_WorldXYZ : Inherits VBparent
                 End If
             Next
         Next
-        If standalone Or task.intermediateReview = caller Then task.trueText("OpenGL data prepared.")
+        If standalone Or task.intermediateName = caller Then task.trueText("OpenGL data prepared.")
     End Sub
 End Class
 
@@ -933,7 +933,7 @@ Public Class Depth_WorldXYZ_MT : Inherits VBparent
                       Next
                   Next
               End Sub)
-        If standalone Or task.intermediateReview = caller Then task.trueText("OpenGL data prepared.")
+        If standalone Or task.intermediateName = caller Then task.trueText("OpenGL data prepared.")
     End Sub
 End Class
 

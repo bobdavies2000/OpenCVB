@@ -91,14 +91,14 @@ Public Class Thread_Grid : Inherits VBparent
                 borderList.Add(broi)
             Next
 
-            If standalone Or task.intermediateReview = caller Then drawGrid()
+            If standalone Or task.intermediateName = caller Then drawGrid()
 
             lastWidth = gWidth
             lastHeight = gHeight
             lastBorder = borderSize
         End If
 
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Or task.intermediateName = caller Then
             task.color.CopyTo(dst1)
             dst1.SetTo(cv.Scalar.All(255), gridMask)
             label1 = "Thread_Grid " + CStr(roiList.Count - incompleteRegions) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +

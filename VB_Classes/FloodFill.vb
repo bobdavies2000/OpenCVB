@@ -819,7 +819,7 @@ Public Class FloodFill_Palette : Inherits VBparent
         task.palette.dst1.CopyTo(dst1, allRegionMask)
 
         label2 = CStr(basics.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
-        If standalone Or task.intermediateReview = caller Then dst2 = task.palette.gradientColorMap.Resize(src.Size())
+        If standalone Or task.intermediateName = caller Then dst2 = task.palette.gradientColorMap.Resize(src.Size())
     End Sub
 End Class
 

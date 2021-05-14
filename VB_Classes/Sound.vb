@@ -89,7 +89,7 @@ Public Class Sound_Basics : Inherits VBparent
             fileNameForm.PlayButton_Click(sender, e)
             player?.Stop()
         End If
-        If standalone Or task.intermediateReview = caller Then task.trueText("Requested sound data is in the pcm32f cv.Mat")
+        If standalone Or task.intermediateName = caller Then task.trueText("Requested sound data is in the pcm32f cv.Mat")
     End Sub
     Public Sub Close()
         player?.Stop()
@@ -182,7 +182,7 @@ Public Class Sound_SignalGenerator : Inherits VBparent
             pcm32f = New cv.Mat(pcmData.Length, 1, cv.MatType.CV_32F, pcmData)
             player.Play()
         End If
-        If standalone Or task.intermediateReview = caller Then task.trueText("Requested sound data is in the pcm32f cv.Mat")
+        If standalone Or task.intermediateName = caller Then task.trueText("Requested sound data is in the pcm32f cv.Mat")
     End Sub
     Public Sub Close()
         player?.Stop()

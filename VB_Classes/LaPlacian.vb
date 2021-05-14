@@ -16,7 +16,7 @@ Public Class Laplacian_Basics : Inherits VBparent
         Dim delta = sliders.trackbar(2).Value / 100
         Dim ddepth = cv.MatType.CV_16S
 
-        If standalone or task.intermediateReview = caller Then src = src.GaussianBlur(New cv.Size(kernelSize, kernelSize), 0, 0)
+        If standalone or task.intermediateName = caller Then src = src.GaussianBlur(New cv.Size(kernelSize, kernelSize), 0, 0)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = gray.Laplacian(ddepth, kernelSize, scale, delta).ConvertScaleAbs()
         label1 = "Laplacian Filter k = " + CStr(kernelSize)

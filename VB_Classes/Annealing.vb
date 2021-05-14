@@ -71,7 +71,7 @@ Public Class Annealing_Basics_CPP : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If closed = True Then Exit Sub
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Or task.intermediateName = caller Then
             If task.frameCount = 0 Then
                 setup()
                 Open()
@@ -90,7 +90,7 @@ Public Class Annealing_Basics_CPP : Inherits VBparent
         If restartComputation Or InStr(msg, "temp=0.000") Or InStr(msg, "changesApplied=0 temp") Then
             Annealing_Basics_Close(saPtr)
             restartComputation = False
-            If standalone Or task.intermediateReview = caller Then
+            If standalone Or task.intermediateName = caller Then
                 setup()
                 Open()
             End If

@@ -16,7 +16,7 @@ Public Class Resize_Basics : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         rotateOptions.Run(src)
 
-        If standalone Or task.intermediateReview = caller Then
+        If standalone Or task.intermediateName = caller Then
             Dim roi = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
             If task.drawRect.Width <> 0 Then roi = task.drawRect
 
@@ -51,7 +51,7 @@ Public Class Resize_Percentage : Inherits VBparent
         resizeOptions.newSize = New cv.Size(Math.Ceiling(src.Width * resizePercent), Math.Ceiling(src.Height * resizePercent))
         resizeOptions.Run(src)
 
-        If standalone or task.intermediateReview = caller Then
+        If standalone or task.intermediateName = caller Then
             Dim roi As New cv.Rect(0, 0, resizeOptions.dst1.Width, resizeOptions.dst1.Height)
             dst1 = resizeOptions.dst1(roi).Resize(resizeOptions.dst1.Size())
             label1 = "Image after resizing to " + Format(sliders.trackbar(0).Value, "#0.0") + "% of original size"

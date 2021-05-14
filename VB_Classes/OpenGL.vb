@@ -76,7 +76,7 @@ Public Class OpenGL_Basics : Inherits VBparent
         pipe.WaitForConnection()
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Or task.intermediateReview = caller Or pointCloudInput Is Nothing Then pointCloudInput = task.pointCloud
+        If standalone Or task.intermediateName = caller Or pointCloudInput Is Nothing Then pointCloudInput = task.pointCloud
 
         If task.noDepthMask.Width = pointCloudInput.Width Then pointCloudInput.SetTo(0, task.noDepthMask)
 
