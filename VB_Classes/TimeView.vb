@@ -12,7 +12,7 @@ Public Class TimeView_Basics : Inherits VBparent
         dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_32F, 0)
         task.desc = "TimeView that highlights concentrations of depth pixels"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 3
         Static frameSlider = findSlider("Number of frames to include")
         Static sideAccum As New cv.Mat(src.Size, cv.MatType.CV_32FC1)
         Static topAccum As New cv.Mat(src.Size, cv.MatType.CV_32FC1)
