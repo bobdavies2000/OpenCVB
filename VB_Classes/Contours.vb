@@ -1,60 +1,21 @@
 Imports cv = OpenCvSharp
 Public Class Contours_Basics : Inherits VBparent
     Public rotatedRect As New Rectangle_Rotated
-    Public retrievalMode As cv.RetrievalModes
-    Public ApproximationMode As cv.ContourApproximationModes
+    Public options As New Contours_Options
     Public contourlist As New List(Of cv.Point())
     Public centroids As New List(Of cv.Point)
     Public sortedContours As New SortedList(Of Integer, cv.Point())(New compareAllowIdenticalIntegerInverted)
     Public contours0 As cv.Point()()
     Public Sub New()
-        If radio.Setup(caller + " Retrieval Mode", 5) Then
-            radio.check(0).Text = "CComp"
-            radio.check(1).Text = "External"
-            radio.check(2).Text = "FloodFill"
-            radio.check(3).Text = "List"
-            radio.check(4).Text = "Tree"
-            radio.check(2).Checked = True
-
-            radio1.Setup(caller + " ContourApproximation Mode", 4)
-            radio1.check(0).Text = "ApproxNone"
-            radio1.check(1).Text = "ApproxSimple"
-            radio1.check(2).Text = "ApproxTC89KCOS"
-            radio1.check(3).Text = "ApproxTC89L1"
-            radio1.check(1).Checked = True
-        End If
-
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Contour minimum area", 0, 50000, 1000)
-            sliders.setupTrackBar(1, "Contour epsilon (arc length percent)", 0, 100, 3)
-        End If
-
         label2 = "Contours_Basics with centroid in red"
         task.desc = "Demo options on FindContours."
-    End Sub
-    Public Sub setOptions()
-        Static frm = findfrm(caller + " Retrieval Mode Radio Options")
-        For i = 0 To frm.check.length - 1
-            If frm.check(i).Checked Then
-                retrievalMode = Choose(i + 1, cv.RetrievalModes.CComp, cv.RetrievalModes.External, cv.RetrievalModes.FloodFill, cv.RetrievalModes.List, cv.RetrievalModes.Tree)
-                Exit For
-            End If
-        Next
-        Static frm1 = findfrm(caller + " ContourApproximation Mode Radio Options")
-        For i = 0 To frm1.check.length - 1
-            If frm1.check(i).Checked Then
-                ApproximationMode = Choose(i + 1, cv.ContourApproximationModes.ApproxNone, cv.ContourApproximationModes.ApproxSimple,
-                                              cv.ContourApproximationModes.ApproxTC89KCOS, cv.ContourApproximationModes.ApproxTC89L1)
-                Exit For
-            End If
-        Next
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static areaSlider = findSlider("Contour minimum area")
         Static epsilonSlider = findSlider("Contour epsilon (arc length percent)")
         Static dontchange As Boolean
+        options.Run(Nothing)
 
-        setOptions()
         If task.mouseClickFlag And dontchange Then
             dontchange = False
         Else
@@ -75,13 +36,13 @@ Public Class Contours_Basics : Inherits VBparent
             End If
         End If
 
-        If retrievalMode = cv.RetrievalModes.FloodFill Then
+        If options.retrievalMode = cv.RetrievalModes.FloodFill Then
             Dim img32sc1 As New cv.Mat
             dst1.ConvertTo(img32sc1, cv.MatType.CV_32SC1)
-            contours0 = cv.Cv2.FindContoursAsArray(img32sc1, retrievalMode, ApproximationMode)
+            contours0 = cv.Cv2.FindContoursAsArray(img32sc1, options.retrievalMode, options.ApproximationMode)
             img32sc1.ConvertTo(dst1, cv.MatType.CV_8UC1)
         Else
-            contours0 = cv.Cv2.FindContoursAsArray(dst1, retrievalMode, ApproximationMode)
+            contours0 = cv.Cv2.FindContoursAsArray(dst1, options.retrievalMode, options.ApproximationMode)
         End If
 
         Dim minArea = areaSlider.value
@@ -89,7 +50,7 @@ Public Class Contours_Basics : Inherits VBparent
         If standalone Then
             dst2.SetTo(0)
             Dim cnt = contours0.ToArray
-            If retrievalMode = cv.RetrievalModes.FloodFill Then
+            If options.retrievalMode = cv.RetrievalModes.FloodFill Then
                 cv.Cv2.DrawContours(dst2, cnt, -1, cv.Scalar.Yellow, -1, task.lineType)
             Else
                 cv.Cv2.DrawContours(dst2, cnt, -1, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
@@ -129,6 +90,53 @@ End Class
 
 
 
+Public Class Contours_Options : Inherits VBparent
+    Public retrievalMode As cv.RetrievalModes
+    Public ApproximationMode As cv.ContourApproximationModes
+    Public Sub New()
+        If radio.Setup(caller + " Retrieval Mode", 5) Then
+            radio.check(0).Text = "CComp"
+            radio.check(1).Text = "External"
+            radio.check(2).Text = "FloodFill"
+            radio.check(3).Text = "List"
+            radio.check(4).Text = "Tree"
+            radio.check(2).Checked = True
+
+            radio1.Setup(caller + " ContourApproximation Mode", 4)
+            radio1.check(0).Text = "ApproxNone"
+            radio1.check(1).Text = "ApproxSimple"
+            radio1.check(2).Text = "ApproxTC89KCOS"
+            radio1.check(3).Text = "ApproxTC89L1"
+            radio1.check(1).Checked = True
+        End If
+
+        If sliders.Setup(caller) Then
+            sliders.setupTrackBar(0, "Contour minimum area", 0, 50000, 1000)
+            sliders.setupTrackBar(1, "Contour epsilon (arc length percent)", 0, 100, 3)
+        End If
+        task.desc = "Options for use with the find/draw contours."
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static frm = findfrm(caller + " Retrieval Mode Radio Options")
+        For i = 0 To frm.check.length - 1
+            If frm.check(i).Checked Then
+                retrievalMode = Choose(i + 1, cv.RetrievalModes.CComp, cv.RetrievalModes.External, cv.RetrievalModes.FloodFill, cv.RetrievalModes.List, cv.RetrievalModes.Tree)
+                Exit For
+            End If
+        Next
+        Static frm1 = findfrm(caller + " ContourApproximation Mode Radio Options")
+        For i = 0 To frm1.check.length - 1
+            If frm1.check(i).Checked Then
+                ApproximationMode = Choose(i + 1, cv.ContourApproximationModes.ApproxNone, cv.ContourApproximationModes.ApproxSimple,
+                                              cv.ContourApproximationModes.ApproxTC89KCOS, cv.ContourApproximationModes.ApproxTC89L1)
+                Exit For
+            End If
+        Next
+        If standalone Or task.intermediateReview = caller Then
+            task.trueText("There is no output for the contours_options - just options to set.")
+        End If
+    End Sub
+End Class
 
 
 Public Class Contours_RGB : Inherits VBparent

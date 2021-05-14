@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Public Class Fuzzy_Basics : Inherits VBparent
     Dim Fuzzy As IntPtr
     Dim reduction As New Reduction_Basics
-    Dim options As New Contours_Basics
+    Dim options As New Contours_Options
     Public gray As cv.Mat
     Public contours As cv.Point()()
     Public sortContours As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
@@ -23,7 +23,7 @@ Public Class Fuzzy_Basics : Inherits VBparent
         task.desc = "That which is not solid is fuzzy"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        options.setOptions()
+        options.Run(Nothing)
         reduction.Run(src)
         dst1 = reduction.dst1
         If dst1.Channels <> 1 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -89,7 +89,7 @@ Public Class Fuzzy_Filter : Inherits VBparent
     Dim reduction As New Reduction_Basics
     Public contours As cv.Point()()
     Public sortContours As New SortedList(Of Integer, cv.Vec2i)(New compareAllowIdenticalIntegerInverted)
-    Dim options As New Contours_Basics
+    Dim options As New Contours_Options
     Public Sub New()
         Dim array() As Single = {1, 1, 1, 1, 1, 1, 1, 1, 1}
         kernel = New cv.Mat(3, 3, cv.MatType.CV_32F, array)
@@ -97,7 +97,7 @@ Public Class Fuzzy_Filter : Inherits VBparent
         task.desc = "Use a 2D filter to find smooth areas"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        options.setOptions()
+        options.Run(Nothing)
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         reduction.Run(src)
