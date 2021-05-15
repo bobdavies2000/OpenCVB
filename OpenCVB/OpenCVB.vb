@@ -396,7 +396,6 @@ Public Class OpenCVB
                             If maxline <= 0 Then Exit For
                         End If
                     Next
-                    ttTextData.Clear()
                 End If
             Catch ex As Exception
                 Console.WriteLine("Error in ttextData update: " + ex.Message)
@@ -1283,10 +1282,8 @@ Public Class OpenCVB
 
             ' share the results of the algorithm task.
             SyncLock ttTextData
-                If task.ttTextData.Count Then
-                    ttTextData = New List(Of VB_Classes.TTtext)(task.ttTextData)
-                    task.ttTextData.Clear()
-                End If
+                If task.ttTextData.Count Then ttTextData = New List(Of VB_Classes.TTtext)(task.ttTextData) Else ttTextData = New List(Of VB_Classes.TTtext)
+                task.ttTextData.Clear()
             End SyncLock
 
             SyncLock imgResult

@@ -418,7 +418,7 @@ Public Class Palette_LeftRightImages : Inherits VBparent
     Public Sub New()
         task.desc = "Use a palette with the left image."
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 2
         lrViews.Run(src)
 
         task.palette.Run(lrViews.dst1)

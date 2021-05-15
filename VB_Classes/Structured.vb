@@ -367,8 +367,8 @@ Public Class Structured_SliceYPlot : Inherits VBparent
             dst1.SetTo(cv.Scalar.White, depthMask)
             Dim pixelsPerMeter = dst1.Width / task.maxZ
             label2 = "Peak histogram count (" + Format(maxVal, "#0") + ") at " + Format(filterZ, "#0.00") + " meters +-" + Format(5 / pixelsPerMeter, "#0.00") + " m"
-            task.trueText("Use the mouse to move the slice.", 10, dst1.Height * 3 / 4, 3)
         End If
+        task.trueText("Use the mouse to move the slice.", 10, dst1.Height * 3 / 4, 3)
     End Sub
 End Class
 
