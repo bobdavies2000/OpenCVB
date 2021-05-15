@@ -10,14 +10,8 @@ Public Class Fuzzy_Basics : Inherits VBparent
     Public Sub New()
         Dim floodRadio = findRadio("FloodFill")
         If floodRadio.Enabled Then floodRadio.Enabled = False ' too much special handling - cv_32SC1 image 
-
+        findSlider("Reduction factor").Value = 32
         Fuzzy = Fuzzy_Open()
-
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Threshold for rectangle size", 50, 50000, 10000)
-        End If
-        If standalone Then sliders.Visible = False
-
         label1 = "Solid regions"
         label2 = "Fuzzy pixels - not solid"
         task.desc = "That which is not solid is fuzzy"
@@ -186,7 +180,7 @@ End Class
 Public Class Fuzzy_NeighborProof : Inherits VBparent
     Dim fuzzy as New Fuzzy_Basics
     Public Sub New()
-        task.desc = "Prove that every contour point has at least one and only one neighbor with the mask ID and that the rest are zero"
+        task.desc = "Prove that every contour point has at one and only one neighbor with the mask ID and that the rest are zero"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static proofFailed As Boolean = False
@@ -213,7 +207,7 @@ Public Class Fuzzy_NeighborProof : Inherits VBparent
                 Next
             Next
         Next
-        task.trueText("Mask ID's for all contour points in each region identified only one region.", 10, 50, 3)
+        If standalone Then task.trueText("Mask ID's for all contour points in each region identified only one region.", 10, 50, 3)
     End Sub
 End Class
 
@@ -237,6 +231,7 @@ Public Class Fuzzy_TrackerDepth : Inherits VBparent
             check.Box(0).Text = "Display centroid and rectangle for each region"
             check.Box(0).Checked = True
         End If
+        If sliders.Setup(caller) Then sliders.setupTrackBar(0, "Threshold for rectangle size", 50, 50000, 10000)
         task.desc = "Create centroids and rect's for solid regions and track them - tracker"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
