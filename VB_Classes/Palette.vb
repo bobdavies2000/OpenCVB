@@ -145,24 +145,9 @@ Public Class Palette_Reduction : Inherits VBparent
     Public Sub New()
         reduction.radio.check(0).Checked = True
         reduction.radio.check(2).Enabled = False ' must have some reduction for this to work...
-
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "InRange offset from specific color", 1, 100, 10)
-        End If
         task.desc = "Map colors to different palette - Painterly Effect."
         label1 = "Reduced Colors"
     End Sub
-    Private Class CompareVec3b : Implements IComparer(Of cv.Vec3b)
-        Public Function Compare(ByVal a As cv.Vec3b, ByVal b As cv.Vec3b) As Integer Implements IComparer(Of cv.Vec3b).Compare
-            If a(0) <> b(0) Then
-                Return If(a(0) < b(0), -1, 1)
-            ElseIf a(1) <> b(1) Then
-                Return If(a(1) < b(1), -1, 1)
-            End If
-            If a(2) = b(2) Then Return 0
-            Return If(a(2) < b(2), -1, 1)
-        End Function
-    End Class
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static reductionSlider = findSlider("Reduction factor")
         If reductionSlider.value < 32 Then
@@ -172,15 +157,15 @@ Public Class Palette_Reduction : Inherits VBparent
         reduction.Run(src)
         dst1 = reduction.dst1
 
-        Dim palette As New SortedList(Of cv.Vec3b, Integer)(New CompareVec3b)
+        Dim palette As New SortedList(Of Byte, Integer)
         For y = 0 To dst1.Height - 1
             For x = 0 To dst1.Width - 1
-                Dim nextVec = dst1.Get(Of cv.Vec3b)(y, x)
-                If nextVec <> cv.Scalar.Black Then
-                    If palette.ContainsKey(nextVec) Then
-                        palette(nextVec) = palette(nextVec) + 1
+                Dim nextVal = dst1.Get(Of Byte)(y, x)
+                If nextVal <> cv.Scalar.Black Then
+                    If palette.ContainsKey(nextVal) Then
+                        palette(nextVal) = palette(nextVal) + 1
                     Else
-                        palette.Add(nextVec, 1)
+                        palette.Add(nextVal, 1)
                     End If
                 End If
             Next
@@ -197,25 +182,20 @@ Public Class Palette_Reduction : Inherits VBparent
         Next
 
         If palette.Count > 0 Then
-            Dim c = palette.ElementAt(maxIndex).Key
-            Dim offset = sliders.trackbar(0).Value
-            Dim loValue As New cv.Scalar(c(0) - offset, c(1) - offset, c(2) - offset)
-            Dim hiValue As New cv.Scalar(c(0) + offset, c(1) + offset, c(2) + offset)
+            Dim nextVal = palette.ElementAt(maxIndex).Key
+            Dim loValue = cv.Scalar.All(nextVal - 1)
+            Dim hiValue = cv.Scalar.All(nextVal + 1)
             If loValue.Item(0) < 0 Then loValue.Item(0) = 0
-            If loValue.Item(1) < 0 Then loValue.Item(1) = 0
-            If loValue.Item(2) < 0 Then loValue.Item(2) = 0
             If hiValue.Item(0) > 255 Then hiValue.Item(0) = 255
-            If hiValue.Item(1) > 255 Then hiValue.Item(1) = 255
-            If hiValue.Item(2) > 255 Then hiValue.Item(2) = 255
 
             Dim mask As New cv.Mat
-            cv.Cv2.InRange(src, loValue, hiValue, mask)
+            cv.Cv2.InRange(dst1, loValue, hiValue, mask)
 
             Dim maxCount = cv.Cv2.CountNonZero(mask)
 
             dst2 = src.EmptyClone.SetTo(0)
             dst2.SetTo(cv.Scalar.All(255), mask)
-            label2 = "Most Common Color +- " + CStr(offset) + " count = " + CStr(maxCount)
+            label2 = "Most Common Color +- " + CStr(1) + " count = " + CStr(maxCount)
         End If
     End Sub
 End Class
@@ -316,11 +296,7 @@ End Class
 Public Class Palette_DepthColorMap : Inherits VBparent
     Dim gradientColorMap As New cv.Mat
     Public Sub New()
-
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Convert and Scale value X100", 0, 100, 8)
-        End If
-
+        If sliders.Setup(caller) Then sliders.setupTrackBar(0, "Convert and Scale value X100", 0, 100, 6)
         label2 = "Palette used to color left image"
         task.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
     End Sub

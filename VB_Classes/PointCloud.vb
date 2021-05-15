@@ -924,7 +924,7 @@ Public Class PointCloud_TimeView : Inherits VBparent
         label2 = "Accumulated top view"
         task.desc = "Use the undecorated TimeView input instead of latest point cloud"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 3
         tView.Run(src)
         dst1 = tView.dst1
         dst2 = tView.dst2
