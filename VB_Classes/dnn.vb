@@ -194,19 +194,16 @@ End Class
 
 ' https//github.com/Saafke/FSRCNN_Tensorflow/tree/master/models
 Public Class DNN_SuperRes : Inherits VBparent
-    Dim modelFile As FileInfo
+    Dim dnn = New DnnSuperResImpl("fsrcnn", 4)
     Public Sub New()
-        Dim modelFileName = task.parms.homeDir + "Data/FSRCNN_x4.pb"
-        modelFile = New FileInfo(modelFileName)
+        Dim modelFile = New FileInfo(task.parms.homeDir + "Data/FSRCNN_x4.pb")
+        dnn.ReadModel(modelFile.FullName)
         task.drawRect = New cv.Rect(100, 100, 80, 60)
         label1 = "Output of a resize using OpenCV"
         label2 = "4X resize of selected area using DNN super resolution"
         task.desc = "Get better super-resolution through a DNN"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If modelFile.Exists Then Console.WriteLine("test")
-        Dim dnn = New DnnSuperResImpl("fsrcnn", 4)
-        dnn.ReadModel(modelFile.FullName)
         dst1 = src(task.drawRect)
         dnn.Upsample(src(task.drawRect), dst2)
     End Sub
