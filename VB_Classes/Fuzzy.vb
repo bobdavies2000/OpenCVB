@@ -207,7 +207,7 @@ Public Class Fuzzy_NeighborProof : Inherits VBparent
                 Next
             Next
         Next
-        If standalone Then task.trueText("Mask ID's for all contour points in each region identified only one region.", 10, 50, 3)
+        task.trueText("Mask ID's for all contour points in each region identified only one region.", 10, 50, 3)
     End Sub
 End Class
 
