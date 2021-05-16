@@ -194,7 +194,7 @@ End Class
 
 ' https//github.com/Saafke/FSRCNN_Tensorflow/tree/master/models
 Public Class DNN_SuperRes : Inherits VBparent
-    Dim dnn = New DnnSuperResImpl("fsrcnn", 4)
+    Public dnn = New DnnSuperResImpl("fsrcnn", 4)
     Public Sub New()
         Dim modelFile = New FileInfo(task.parms.homeDir + "Data/FSRCNN_x4.pb")
         dnn.ReadModel(modelFile.FullName)
@@ -219,5 +219,27 @@ Public Class DNN_SuperRes : Inherits VBparent
         dst2.SetTo(0)
         dst1(outRect) = src(r).Resize(New cv.Size(r.Width * 4, r.Height * 4))
         dnn.Upsample(src(r), dst2(outRect))
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class DNN_SuperResize : Inherits VBparent
+    Dim super = New DNN_SuperRes
+    Public Sub New()
+        label1 = "Super Res resized back to original size"
+        label2 = "dst2 = dst1 - src or no difference - honors original"
+        task.desc = "Compare superRes reduced to original size"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Dim r = New cv.Rect(0, 0, dst1.Width, dst1.Height)
+        Dim tmp As New cv.Mat
+        super.dnn.upsample(src, tmp)
+        dst1 = tmp.Resize(dst1.Size)
+        dst2 = dst1 - src
     End Sub
 End Class
