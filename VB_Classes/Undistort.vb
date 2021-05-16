@@ -81,7 +81,7 @@ Public Class Undistort_Basics : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
         If task.parms.intrinsicsLeft.coeffs Is Nothing Then
-            task.trueText("The intrinsics values are missing for this camera.")
+            setTrueText("The intrinsics values are missing for this camera.")
             Exit Sub
         End If
 

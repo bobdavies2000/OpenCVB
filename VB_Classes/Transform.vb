@@ -153,7 +153,7 @@ Public Class Transform_Affine3D : Inherits VBparent
             Next
             output += "0" + vbTab + "0" + vbTab + "0" + vbTab + "1" + vbCrLf
         End If
-        task.trueText(output)
+        setTrueText(output)
     End Sub
 End Class
 

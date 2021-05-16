@@ -15,7 +15,7 @@ Public Class Solve_ByMat : Inherits VBparent
         Dim x As New cv.Mat
         cv.Cv2.Solve(a, y, x, cv.DecompTypes.LU)
 
-        task.trueText("Solution ByMat: X1 = " + CStr(x.Get(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(Of Double)(0, 1)), 10, 125)
+        setTrueText("Solution ByMat: X1 = " + CStr(x.Get(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(Of Double)(0, 1)), 10, 125)
     End Sub
 End Class
 
@@ -36,7 +36,7 @@ Public Class Solve_ByArray : Inherits VBparent
         Dim x As New cv.Mat
         cv.Cv2.Solve(cv.InputArray.Create(av), cv.InputArray.Create(yv), x, cv.DecompTypes.LU)
 
-        task.trueText("Solution ByArray: X1 = " + CStr(x.Get(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(Of Double)(0, 1)), 10, 125)
+        setTrueText("Solution ByArray: X1 = " + CStr(x.Get(Of Double)(0, 0)) + vbTab + "X2 = " + CStr(x.Get(Of Double)(0, 1)), 10, 125)
     End Sub
 End Class
 

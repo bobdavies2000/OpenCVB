@@ -34,7 +34,7 @@ Public Class Font_TrueType : Inherits VBparent
         Dim gfontSize = GetSetting("OpenCVB", "FontSize", "FontSize", 12)
         Dim fontName = GetSetting("OpenCVB", "FontName", "FontName", "Tahoma")
         ' get the font on every iteration because it could have changed.  This should be done in any algorithm using OptionsFont.
-        task.trueText("TrueType Font is currently set to " + fontName + " with size = " + CStr(gfontSize) + vbCrLf +
+        setTrueText("TrueType Font is currently set to " + fontName + " with size = " + CStr(gfontSize) + vbCrLf +
                       "Use the Settings button above to change the font name and size.")
     End Sub
 End Class
@@ -67,7 +67,7 @@ Public Class Font_FlowText : Inherits VBparent
         For i = firstLine To msgs.Count - 1
             fullText += msgs(i) + vbCrLf
         Next
-        task.trueText(fullText, 10, 20, dst)
+        setTrueText(fullText, 10, 20, dst)
 
         If msgs.Count >= maxlines Then
             Try

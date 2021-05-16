@@ -33,7 +33,7 @@ Public Class Covariance_Basics : Inherits VBparent
             lastCenter = newCenter
             output += "Yellow is last center, red is the current center"
         End If
-        task.trueText(output, 20, 60)
+        setTrueText(output, 20, 60)
     End Sub
 End Class
 
@@ -49,7 +49,7 @@ Public Class Covariance_Test : Inherits VBparent
         Dim testInput() As Double = {1.5, 2.3, 3.0, 1.7, 1.2, 2.9, 2.1, 2.2, 3.1, 3.1, 1.3, 2.7, 2.0, 1.7, 1.0, 2.0, 0.5, 0.6, 1.0, 0.9}
         covar.samples = New cv.Mat(10, 2, cv.MatType.CV_64F, testInput)
         covar.Run(src)
-        task.trueText("Results should be a symmetric array with 2.1 and -2.1", 20, 150)
+        setTrueText("Results should be a symmetric array with 2.1 and -2.1", 20, 150)
     End Sub
 End Class
 

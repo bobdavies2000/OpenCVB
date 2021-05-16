@@ -107,7 +107,7 @@ Public Class TimeView_TopBackProjection : Inherits VBparent
             task.palette.Run(colorMask)
             dst1 = task.palette.dst1
         Else
-            task.trueText("No objects found")
+            setTrueText("No objects found")
         End If
     End Sub
 End Class

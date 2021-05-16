@@ -25,7 +25,7 @@ Public Class Stitch_Basics : Inherits VBparent
 
         'If task.parms.testAllRunning  Then
         ' It runs fine but after several runs, it will fail with an external exception.  Only happens on 'Test All' runs.
-        task.trueText("Stitch_Basics only fails when running 'Test All'." + vbCrLf +
+        setTrueText("Stitch_Basics only fails when running 'Test All'." + vbCrLf +
                                      "Skipping it during a 'Test All' just so all the other tests can be exercised.")
         Exit Sub
         'End If

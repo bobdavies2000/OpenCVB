@@ -894,7 +894,7 @@ Public Class Depth_WorldXYZ : Inherits VBparent
                 End If
             Next
         Next
-        If standalone Or task.intermediateName = caller Then task.trueText("OpenGL data prepared.")
+        If standalone Or task.intermediateName = caller Then setTrueText("OpenGL data prepared.")
     End Sub
 End Class
 
@@ -933,7 +933,7 @@ Public Class Depth_WorldXYZ_MT : Inherits VBparent
                       Next
                   Next
               End Sub)
-        If standalone Or task.intermediateName = caller Then task.trueText("OpenGL data prepared.")
+        If standalone Or task.intermediateName = caller Then setTrueText("OpenGL data prepared.")
     End Sub
 End Class
 
@@ -1151,7 +1151,7 @@ Public Class Depth_PunchBlob : Inherits VBparent
         label2 = CStr(punchCount) + " Punches Thrown"
 
         If showMessage > 0 Then
-            task.trueText("Punched!!!", 10, 100, 3)
+            setTrueText("Punched!!!", 10, 100, 3)
             showMessage -= 1
         End If
 
@@ -1160,7 +1160,7 @@ Public Class Depth_PunchBlob : Inherits VBparent
 
         If showWarningInfo Then
             showWarningInfo -= 1
-            task.trueText("Too many contours!  Reduce the Max Depth.", 10, 130, 3)
+            setTrueText("Too many contours!  Reduce the Max Depth.", 10, 130, 3)
         End If
     End Sub
 End Class

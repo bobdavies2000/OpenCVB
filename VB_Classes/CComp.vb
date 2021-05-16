@@ -208,7 +208,7 @@ Public Class CComp_MaxBlobs : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static thresholdSlider = findSlider("CComp threshold")
-        task.trueText("This algorithm will survey the different ccomp threshold options.", 10, 100, 3)
+        setTrueText("This algorithm will survey the different ccomp threshold options.", 10, 100, 3)
         If task.frameCount < 10 Then
             thresholdSlider.value = 0
             Exit Sub

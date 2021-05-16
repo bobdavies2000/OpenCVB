@@ -90,7 +90,7 @@ Public Class IMU_Stabilizer : Inherits VBparent
 
         dst1(New cv.Rect(10, 95, 50, 50)).SetTo(0)
         Dim Text = "dx = " + Format(dx, "#0.00") + vbNewLine + "dy = " + Format(dy, "#0.00") + vbNewLine + "da = " + Format(da, "#0.00")
-        task.trueText(Text)
+        setTrueText(Text)
     End Sub
 End Class
 
@@ -110,9 +110,9 @@ Public Class IMU_Magnetometer : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.IMU_Magnetometer = New cv.Point3f Then
-            task.trueText("The IMU for this camera does not have Magnetometer readings.")
+            setTrueText("The IMU for this camera does not have Magnetometer readings.")
         Else
-            task.trueText("Uncalibrated IMU Magnetometer reading:  x = " + CStr(task.IMU_Magnetometer.X) + vbCrLf +
+            setTrueText("Uncalibrated IMU Magnetometer reading:  x = " + CStr(task.IMU_Magnetometer.X) + vbCrLf +
                                                   "Uncalibrated IMU Magnetometer reading:  y = " + CStr(task.IMU_Magnetometer.Y) + vbCrLf +
                                                   "Uncalibrated IMU Magnetometer reading:  z = " + CStr(task.IMU_Magnetometer.Z))
             plot.plotData = New cv.Scalar(task.IMU_Magnetometer.X, task.IMU_Magnetometer.Y, task.IMU_Magnetometer.Z)
@@ -132,9 +132,9 @@ Public Class IMU_Barometer : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.IMU_Barometer = 0 Then
-            task.trueText("The IMU for this camera does not have barometric pressure.")
+            setTrueText("The IMU for this camera does not have barometric pressure.")
         Else
-            task.trueText("Barometric pressure is " + CStr(task.IMU_Barometer) + " hectopascal." + vbCrLf +
+            setTrueText("Barometric pressure is " + CStr(task.IMU_Barometer) + " hectopascal." + vbCrLf +
                                                   "Barometric pressure is " + Format(task.IMU_Barometer * 0.02953, "#0.00") + " inches of mercury.")
         End If
     End Sub
@@ -148,7 +148,7 @@ Public Class IMU_Temperature : Inherits VBparent
         task.desc = "Get the temperature of the IMU (if available)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        task.trueText("IMU Temperature is " + Format(task.IMU_Temperature, "#0.00") + " degrees Celsius." + vbCrLf +
+        setTrueText("IMU Temperature is " + Format(task.IMU_Temperature, "#0.00") + " degrees Celsius." + vbCrLf +
                       "IMU Temperature is " + Format(task.IMU_Temperature * 9 / 5 + 32, "#0.00") + " degrees Fahrenheit.")
     End Sub
 End Class
@@ -188,7 +188,7 @@ Public Class IMU_FrameTime : Inherits VBparent
             Static allZeroCount As Integer
             allZeroCount += 1
             If allZeroCount > 20 Then
-                task.trueText("Is IMU present?  No IMU FrameTimes")
+                setTrueText("Is IMU present?  No IMU FrameTimes")
                 allZeroCount = Integer.MinValue ' don't show message again.
             End If
             Exit Sub ' if the IMU frametime was 0, then no new IMU data was generated (or it is unsupported!)
@@ -241,7 +241,7 @@ Public Class IMU_FrameTime : Inherits VBparent
                     output += vbCrLf
                 Next
             End If
-            task.trueText(output)
+            setTrueText(output)
         End If
     End Sub
 End Class
@@ -323,7 +323,7 @@ Public Class IMU_HostFrameTimes : Inherits VBparent
                     output += vbCrLf
                 Next
             End If
-            task.trueText(output)
+            setTrueText(output)
         End If
     End Sub
 End Class
@@ -388,7 +388,7 @@ Public Class IMU_TotalDelay : Inherits VBparent
                 output += vbCrLf
             Next
         End If
-        task.trueText(output)
+        setTrueText(output)
     End Sub
 End Class
 
@@ -479,7 +479,7 @@ Public Class IMU_GVector : Inherits VBparent
                             vbTab + Format(Math.Sqrt(gx * gx + gy * gy + gz * gz), "#0.0000") + vbCrLf +
                             "Should be close to the earth's gravitational constant of 9.807 (or the camera was moving.)"
 
-            task.trueText(outStr)
+            setTrueText(outStr)
         End If
     End Sub
 End Class

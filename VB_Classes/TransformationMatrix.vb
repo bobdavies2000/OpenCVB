@@ -32,7 +32,7 @@ Public Class TransformationMatrix_Basics : Inherits VBparent
 
             If topLocations.Count > 20 Then topLocations.RemoveAt(0) ' just show the last x points
         Else
-            task.trueText("The transformation matrix for the current camera has not been set", 10, 125)
+            setTrueText("The transformation matrix for the current camera has not been set", 10, 125)
         End If
     End Sub
 End Class

@@ -262,7 +262,7 @@ Public Class Benford_Primes : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount = 0 Then sieve.Run(src) ' only need to compute this once...
-        task.trueText(CStr(sieve.primes.Count) + " primes were found")
+        setTrueText(CStr(sieve.primes.Count) + " primes were found")
 
         Dim tmp = New cv.Mat(sieve.primes.Count, 1, cv.MatType.CV_32S, sieve.primes.ToArray())
         tmp.ConvertTo(tmp, cv.MatType.CV_32F)

@@ -196,7 +196,7 @@ Public Class Edges_RandomForest_CPP : Inherits VBparent
         label2 = "Thresholded Edge Mask (use slider to adjust)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If task.frameCount < 100 Then task.trueText("On the first call only, it takes a few seconds to load the randomForest model.", 10, 100)
+        If task.frameCount < 100 Then setTrueText("On the first call only, it takes a few seconds to load the randomForest model.", 10, 100)
 
         ' why not do this in the constructor?  Because the message is held up by the lengthy process of loading the model.
         If task.frameCount = 5 Then

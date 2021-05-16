@@ -42,7 +42,7 @@ Public Class SLR_Basics : Inherits VBparent
         Else
             dst1.SetTo(0)
             dst2.SetTo(0)
-            task.trueText(label1 + " yielded no results...")
+            setTrueText(label1 + " yielded no results...")
         End If
         If standalone = False Then
             input.dataX.Clear()

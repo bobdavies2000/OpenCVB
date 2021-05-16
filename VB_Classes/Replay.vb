@@ -93,7 +93,7 @@ Public Class Replay_Record : Inherits VBparent
         Static bytesTotal As Int64
         recordingFilename = New FileInfo(fileNameForm.filename.Text)
         If task.parms.useRecordedData And recordingFilename.Exists = False Then
-            task.trueText("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125)
+            setTrueText("Record the file: " + recordingFilename.FullName + " first before attempting to use it in the regression tests.", 10, 125)
             Exit Sub
         End If
 
@@ -183,7 +183,7 @@ Public Class Replay_Play : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static bytesTotal As Int64
         recordingFilename = New FileInfo(fileNameForm.filename.Text)
-        If recordingFilename.Exists = False Then task.trueText("File not found: " + recordingFilename.FullName, 10, 125)
+        If recordingFilename.Exists = False Then setTrueText("File not found: " + recordingFilename.FullName, 10, 125)
         If fileNameForm.fileStarted And recordingFilename.Exists Then
             Dim maxBytes = recordingFilename.Length
             If playbackActive Then
@@ -231,7 +231,7 @@ Public Class Replay_Play : Inherits VBparent
                     ReDim cloudBytes(bytesPerCloud - 1)
                     playbackActive = True
                 Else
-                    task.trueText("Recorded data was saved at " + CStr(fh.cloudWidth) + "x" + CStr(fh.cloudHeight) + vbCrLf +
+                    setTrueText("Recorded data was saved at " + CStr(fh.cloudWidth) + "x" + CStr(fh.cloudHeight) + vbCrLf +
                                       "and the current format is " + CStr(src.Width) + "x" + CStr(src.Height))
                 End If
             End If

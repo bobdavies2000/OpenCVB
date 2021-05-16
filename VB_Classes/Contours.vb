@@ -129,7 +129,7 @@ Public Class Contours_Options : Inherits VBparent
             End If
         Next
         If standalone Or task.intermediateName = caller Then
-            task.trueText("There is no output for the contours_options - just options to set.")
+            setTrueText("There is no output for the contours_options - just options to set.")
         End If
     End Sub
 End Class

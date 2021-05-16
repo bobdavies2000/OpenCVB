@@ -6,7 +6,7 @@ Public Class IntrinsicsLeft_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.parms.intrinsicsLeft.coeffs Is Nothing Then
-            task.trueText("This camera is missing the intrinsics.")
+            setTrueText("This camera is missing the intrinsics.")
             Exit Sub
         End If
         Dim ttStart = 40
@@ -27,7 +27,7 @@ Public Class IntrinsicsLeft_Basics : Inherits VBparent
             ttStr += "Approximate FOV in x = " + CStr(task.hFov) + vbCrLf +
                      "Approximate FOV in y = " + CStr(task.vFov) + vbCrLf
         End If
-        task.trueText(ttStr)
+        setTrueText(ttStr)
 
         dst2.SetTo(0)
         dst2.Line(New cv.Point(src.Width / 2, 0), New cv.Point(src.Width / 2, src.Height), cv.Scalar.White, task.lineWidth)

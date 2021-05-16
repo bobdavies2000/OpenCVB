@@ -180,7 +180,7 @@ Public Class WarpAffine_3Points : Inherits VBparent
                 dst2.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
             Next
         End If
-        task.trueText("M defined as: " + vbCrLf +
+        setTrueText("M defined as: " + vbCrLf +
                       Format(M.Get(Of Double)(0, 0), "#0.00") + vbTab +
                       Format(M.Get(Of Double)(0, 1), "#0.00") + vbTab +
                       Format(M.Get(Of Double)(0, 2), "#0.00") + vbCrLf +
@@ -235,7 +235,7 @@ Public Class WarpAffine_4Points : Inherits VBparent
             Next
         End If
 
-        task.trueText("M defined as: " + vbCrLf +
+        setTrueText("M defined as: " + vbCrLf +
                       Format(M.Get(Of Double)(0, 0), "#0.00") + vbTab +
                       Format(M.Get(Of Double)(0, 1), "#0.00") + vbTab +
                       Format(M.Get(Of Double)(0, 2), "#0.00") + vbCrLf +

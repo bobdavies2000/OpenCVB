@@ -63,15 +63,15 @@ Public Class Download_Databases : Inherits VBparent
         Dim fileToDecompress = New FileInfo(task.parms.homeDir + "Data/" + filename)
         Dim downloadDir = New DirectoryInfo(task.parms.homeDir + "Data/" + Mid(fileToDecompress.Name, 1, Len(fileToDecompress.Name) - Len(".tar.gz")))
         If downloadActive And pythonActive = False Then
-            task.trueText("Downloading active (takes a while).  Current download size = " + Format(zippedBuffer.Length / 1000, "###,##0") + "k bytes" + vbCrLf +
+            setTrueText("Downloading active (takes a while).  Current download size = " + Format(zippedBuffer.Length / 1000, "###,##0") + "k bytes" + vbCrLf +
                           "Download is " + Format(zippedBuffer.Length / 1797000000, "#0%") + " complete", 40, 200)
         Else
             If pythonActive Then
-                task.trueText("Unzipping files to " + downloadDir.FullName, 40, 200)
+                setTrueText("Unzipping files to " + downloadDir.FullName, 40, 200)
             Else
                 If linkAddress <> "" Then
                     If downloadDir.Exists Then
-                        task.trueText("The database " + downloadDir.Name + " has been downloaded and is ready for use.", 40, 100)
+                        setTrueText("The database " + downloadDir.Name + " has been downloaded and is ready for use.", 40, 100)
                         Exit Sub
                     End If
                     downloadActive = True
@@ -116,7 +116,7 @@ Public Class Download_Databases : Inherits VBparent
                         End Sub)
                     downloadThread.Start()
                 Else
-                    task.trueText("Check the database to be downloaded in the Options nearby.", 40, 200)
+                    setTrueText("Check the database to be downloaded in the Options nearby.", 40, 200)
                 End If
             End If
         End If

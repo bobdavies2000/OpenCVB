@@ -18,7 +18,7 @@ Public Class Extrinsics_Basics : Inherits VBparent
             nextline += Format(task.parms.extrinsics.rotation(6), fmt) + vbTab + Format(task.parms.extrinsics.rotation(7), fmt) + vbTab +
                            Format(task.parms.extrinsics.rotation(8), fmt) + vbTab + vbTab + vbTab + Format(task.parms.extrinsics.translation(2), fmt) + vbCrLf
         End If
-        task.trueText(nextline)
+        setTrueText(nextline)
     End Sub
 End Class
 

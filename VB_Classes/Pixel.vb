@@ -15,7 +15,7 @@ Public Class Pixel_Viewer : Inherits VBparent
         If dst1.Type = cv.MatType.CV_32F Then displayType = 2
         If dst1.Type = cv.MatType.CV_32FC3 Then displayType = 3
         If displayType < 0 Or dst1.Channels > 4 Then
-            task.trueText("The pixel Viewer does not support this cv.Mat!  Please add support.")
+            setTrueText("The pixel Viewer does not support this cv.Mat!  Please add support.")
             Exit Sub
         End If
         If viewerForm.GrayScaleOnly.Checked And dst1.Channels <> 1 And displayType < 2 Then
@@ -138,7 +138,7 @@ Public Class Pixel_Viewer : Inherits VBparent
         End If
 
         If task.desc = "Display pixels under the cursor" Then
-            task.trueText("Move the mouse to location that you want to inspect." + vbCrLf +
+            setTrueText("Move the mouse to location that you want to inspect." + vbCrLf +
                           "Click and hold the right-mouse button to move away from that location")
         End If
     End Sub
@@ -202,7 +202,7 @@ Public Class Pixel_GetSet : Inherits VBparent
         watch.Stop()
         output += "Marshal Copy took " + CStr(watch.ElapsedMilliseconds) + "ms" + vbCrLf
 
-        task.trueText(output, src.Width / 2 + 10, src.Height / 2 + 20)
+        setTrueText(output, src.Width / 2 + 10, src.Height / 2 + 20)
 
         mats.Run(Nothing)
         dst1 = mats.dst1
@@ -235,7 +235,7 @@ Public Class Pixel_Measure : Inherits VBparent
         Static distanceSlider = findSlider("Distance in mm")
         Dim mmPP = Compute(distanceSlider.value)
         If standalone Then
-            task.trueText("At a distance of " + CStr(distanceSlider.value) + " mm's the camera's FOV is " +
+            setTrueText("At a distance of " + CStr(distanceSlider.value) + " mm's the camera's FOV is " +
                            Format(mmPP * src.Width / 1000, "#0.00") + " meters wide" + vbCrLf +
                           "Pixels are " + Format(mmPP, "#0.00") + " mm per pixel at " +
                            CStr(distanceSlider.value) + " mm's in the image view", 10, 60)
@@ -310,7 +310,7 @@ Public Class Pixel_Sampler : Inherits VBparent
                 dst1.Circle(random.Points2f(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
             Next
             label1 = "Dominant gray value = " + CStr(dominantGray)
-            task.trueText("Draw in the image to select a region for testing.", 10, 200, 3)
+            setTrueText("Draw in the image to select a region for testing.", 10, 200, 3)
         End If
     End Sub
 End Class

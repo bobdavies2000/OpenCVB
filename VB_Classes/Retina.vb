@@ -64,7 +64,7 @@ Public Class Retina_Basics_CPP : Inherits VBparent
             Marshal.Copy(src.Data, srcData, 0, srcData.Length)
             magnoPtr = Retina_Basics_Run(Retina, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, handleMagno.AddrOfPinnedObject(), useLogSampling)
         Else
-            task.trueText("Retina_Basics_CPP runs fine but during 'Test All' it is not run because it can oversubscribe OpenCL memory.")
+            setTrueText("Retina_Basics_CPP runs fine but during 'Test All' it is not run because it can oversubscribe OpenCL memory.")
             dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1, 0)
         End If
         handleSrc.Free()

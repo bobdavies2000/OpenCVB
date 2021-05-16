@@ -14,7 +14,7 @@ Public Class Rodrigues_ValidateKinect : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
             dst2.SetTo(0)
-            task.trueText("Only the Kinect4Azure camera is currently supported for the Rodrigues calibration", 10, 140)
+            setTrueText("Only the Kinect4Azure camera is currently supported for the Rodrigues calibration", 10, 140)
             Exit Sub
         End If
 
@@ -26,7 +26,7 @@ Public Class Rodrigues_ValidateKinect : Inherits VBparent
         For i = 0 To split.Length - 1
             output += split(i) + vbCrLf
         Next
-        task.trueText(output)
+        setTrueText(output)
     End Sub
 End Class
 
@@ -40,7 +40,7 @@ Public Class Rodrigues_ValidateVector : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2 Then
             dst2.SetTo(0)
-            task.trueText("Only the StereoLabs Zed 2 and Intel T265 cameras are supported for this Rodrigues validation")
+            setTrueText("Only the StereoLabs Zed 2 and Intel T265 cameras are supported for this Rodrigues validation")
             Exit Sub
         End If
 
@@ -63,7 +63,7 @@ Public Class Rodrigues_ValidateVector : Inherits VBparent
         output += vbTab + Format(task.parms.RotationVector.X, "#0.000000000") + vbTab
         output += vbTab + Format(task.parms.RotationVector.Y, "#0.000000000") + vbTab
         output += vbTab + Format(task.parms.RotationVector.Z, "#0.000000000") + vbTab
-        task.trueText(output)
+        setTrueText(output)
     End Sub
 End Class
 
@@ -90,7 +90,7 @@ Public Class Rodrigues_RotationMatrix : Inherits VBparent
         For i = 0 To 2
             output += vbTab + Format(dst1.Get(Of Single)(i), "#0.000000000") + vbTab
         Next
-        task.trueText(output)
+        setTrueText(output)
     End Sub
 End Class
 
@@ -121,7 +121,7 @@ Public Class Rodrigues_Extrinsics : Inherits VBparent
         For i = 0 To 2
             output += vbTab + Format(dst1.Get(Of Double)(i), "#0.000000000") + vbTab
         Next
-        task.trueText(output)
+        setTrueText(output)
     End Sub
 End Class
 

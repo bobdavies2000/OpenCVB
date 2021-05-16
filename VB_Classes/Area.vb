@@ -162,7 +162,7 @@ Public Class Area_FindNonZero : Inherits VBparent
             Dim pt = nonzero.Get(Of cv.Point)(0, i)
             outstr += "X = " + vbTab + CStr(pt.X) + vbTab + " y = " + vbTab + CStr(pt.Y) + vbCrLf
         Next
-        task.trueText(outstr)
+        setTrueText(outstr)
     End Sub
 End Class
 

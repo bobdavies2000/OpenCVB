@@ -58,7 +58,7 @@ Public Class VBparent : Implements IDisposable
             task.label2 = label2
             If task.intermediateName <> "" And task.intermediateName <> caller Then
                 If task.intermediateObject Is Nothing Then
-                    task.trueText(task.intermediateName + " is not active.", 10, 100)
+                    setTrueText(task.intermediateName + " is not active.", 10, 100)
                     dst1.SetTo(0)
                     dst2.SetTo(0)
                 Else
@@ -87,6 +87,10 @@ Public Class VBparent : Implements IDisposable
             task.imgResult(New cv.Rect(task.color.Width, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst2)
             task.frameCount += 1
         End If
+    End Sub
+    Public Sub setTrueText(text As String, Optional x As Integer = 10, Optional y As Integer = 40, Optional picTag As Integer = 2)
+        Dim str As New TTtext(text, x, y, picTag)
+        If task.intermediateName = caller Then task.ttTextData.Add(str)
     End Sub
     Public Function validateRect(r As cv.Rect) As cv.Rect
         If r.Width < 0 Then r.Width = 1

@@ -39,7 +39,7 @@ Public Class DNN_Test : Inherits VBparent
         Dim prob = net.Forward("prob")
         Dim minLoc As cv.Point, maxLoc As cv.Point
         cv.Cv2.MinMaxLoc(prob.Reshape(1, 1), minVal, maxVal, minLoc, maxLoc)
-        task.trueText("Best classification: index = " + CStr(maxLoc.X) + " which is for '" + classnames(maxLoc.X) + "' with Probability " + Format(maxVal, "#0.00%"), 40, 200)
+        setTrueText("Best classification: index = " + CStr(maxLoc.X) + " which is for '" + classnames(maxLoc.X) + "' with Probability " + Format(maxVal, "#0.00%"), 40, 200)
     End Sub
 End Class
 
@@ -62,7 +62,7 @@ Public Class DNN_Caffe_CS : Inherits VBparent
         Dim image = cv.Cv2.ImRead(task.parms.homeDir + "Data/space_shuttle.jpg")
         Dim str = caffeCS.Run(image)
         dst2 = image.Resize(dst2.Size())
-        task.trueText(str, 10, 100)
+        setTrueText(str, 10, 100)
     End Sub
 End Class
 
@@ -106,7 +106,7 @@ Public Class DNN_Basics : Inherits VBparent
             End If
         End If
         If dnnPrepared = False Then
-            task.trueText("Caffe databases not found.  It should be in <OpenCVB_HomeDir>/Data.", 10, 100)
+            setTrueText("Caffe databases not found.  It should be in <OpenCVB_HomeDir>/Data.", 10, 100)
         End If
         task.desc = "Use OpenCV's dnn from Caffe file."
         label1 = "Cropped Input Image - must be square!"
@@ -172,7 +172,7 @@ Public Class DNN_Basics : Inherits VBparent
                     rect.Width = src.Width / 12
                     rect.Height = src.Height / 16
                     dst2.Rectangle(rect, cv.Scalar.Black, -1)
-                    task.trueText(nextName, CInt(rect.X), CInt(rect.Y), 3)
+                    setTrueText(nextName, CInt(rect.X), CInt(rect.Y), 3)
                 End If
             Next
 

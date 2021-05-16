@@ -264,7 +264,7 @@ Public Class Fitline_EigenFit : Inherits VBparent
             p2 = New cv.Point(width, noisyLine.m * width + noisyLine.bb)
             dst1.Line(p1, p2, cv.Scalar.Blue, task.lineWidth + 2, task.lineType)
         End If
-        task.trueText("GT m = " + Format(noisyLine.m, "#0.00") + " eigen m = " + Format(m2, "#0.00") + "    len = " + CStr(CInt(len)) + vbCrLf +
+        setTrueText("GT m = " + Format(noisyLine.m, "#0.00") + " eigen m = " + Format(m2, "#0.00") + "    len = " + CStr(CInt(len)) + vbCrLf +
                                               "Confidence = " + Format(eigenVal.Get(Of Single)(0, 0) / eigenVal.Get(Of Single)(1, 0), "#0.0") + vbCrLf +
                                               "theta: atan2(" + Format(eigenVec.Get(Of Single)(1, 0), "#0.0") + ", " + Format(eigenVec.Get(Of Single)(0, 0), "#0.0") + ") = " +
                                               Format(theta, "#0.0000"))

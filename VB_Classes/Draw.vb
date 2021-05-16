@@ -104,7 +104,7 @@ Public Class Draw_Options : Inherits VBparent
         updateFrequency = freqSlider.value
         drawFilled = If(fillCheck.checked, -1, 2)
         drawRotated = rotateCheck.checked
-        If standalone Then task.trueText("This algorithm is just to consolidate the options for the Draw algorithms.")
+        If standalone Then setTrueText("This algorithm is just to consolidate the options for the Draw algorithms.")
     End Sub
 End Class
 
@@ -434,7 +434,7 @@ Public Class Draw_ViewObjects : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateName = caller Then
-            task.trueText("Draw_ViewObjects has no standalone version." + vbCrLf + "It just draws rectangles and centroids for other algorithms.")
+            setTrueText("Draw_ViewObjects has no standalone version." + vbCrLf + "It just draws rectangles and centroids for other algorithms.")
         Else
             dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
             Dim incr = If(viewObjects.Count < 10, 25, 255 / viewObjects.Count)  'reduces flicker of slightly different colors when < 10
@@ -535,7 +535,7 @@ Public Class Draw_ClipLine : Inherits VBparent
 
         Static hitCount = 0
         hitCount += If(clipped, 1, 0)
-        task.trueText("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
+        setTrueText("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
                      CInt(src.Width / 2), 200)
         If r = rect Then setup()
         flow.Run(Nothing)

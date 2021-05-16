@@ -65,7 +65,7 @@ Public Class Python_Run : Inherits VBparent
         Else
             Dim pythonApp = New FileInfo(task.pythonTaskName)
             If pythonApp.Name.StartsWith("OakD") Then
-                task.trueText("The " + pythonApp.Name + " python script is merely a placeholder while working on the OakD support " + vbCrLf +
+                setTrueText("The " + pythonApp.Name + " python script is merely a placeholder while working on the OakD support " + vbCrLf +
                           "It can only be run outside of OpenCVB.")
                 Exit Sub
             End If
@@ -150,11 +150,11 @@ End Class
 '                On Error Resume Next
 '                pipe.Write(rgbBuffer, 0, rgbBuffer.Length)
 '            End If
-'            task.trueText("Blit works fine when here (Python_SurfaceBlit) but the same operation in Python_SurfaceBlit_PS.py fails." + vbCrLf +
+'            setTrueText("Blit works fine when here (Python_SurfaceBlit) but the same operation in Python_SurfaceBlit_PS.py fails." + vbCrLf +
 '                          "The callback in the PyStream interface does not allow the SurfaceBlit API to work." + vbCrLf +
 '                          "See 'Python_SurfaceBlit.py' to see how the surfaceBlit works then review Python_SurfaceBlit_PS.py failure.")
 '        Else
-'            task.trueText("Python is not available")
+'            setTrueText("Python is not available")
 '        End If
 '    End Sub
 'End Class

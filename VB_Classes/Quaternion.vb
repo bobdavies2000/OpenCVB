@@ -36,7 +36,7 @@ Public Class Quaterion_Basics : Inherits VBparent
                                     CSng(sliders.trackbar(6).Value / 100), CSng(sliders.trackbar(7).Value / 100))
 
         Dim quatmul = Quaternion.Multiply(q1, q2)
-        task.trueText("q1 = " + q1.ToString() + vbCrLf + "q2 = " + q2.ToString() + vbCrLf + "Multiply q1 * q2" + quatmul.ToString())
+        setTrueText("q1 = " + q1.ToString() + vbCrLf + "q2 = " + q2.ToString() + vbCrLf + "Multiply q1 * q2" + quatmul.ToString())
     End Sub
 End Class
 
@@ -70,7 +70,7 @@ Public Class Quaterion_IMUPrediction : Inherits VBparent
 
         Dim diffq = Quaternion.Subtract(task.IMU_Rotation, predictedRotation)
 
-        task.trueText("IMU_Acceleration = " + vbTab +
+        setTrueText("IMU_Acceleration = " + vbTab +
                                  Format(task.IMU_Acceleration.X, "0.0000") + ", " + vbTab +
                                  Format(task.IMU_Acceleration.Y, "0.0000") + ", " + vbTab +
                                  Format(task.IMU_Acceleration.Z, "0.0000") + ", " + vbTab + vbCrLf +

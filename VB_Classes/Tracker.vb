@@ -30,7 +30,7 @@ Imports System.Runtime.InteropServices
 '        Dim input = src
 '        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-'        task.trueText("Draw a rectangle around object to be tracked.", 10, 140, 3)
+'        setTrueText("Draw a rectangle around object to be tracked.", 10, 140, 3)
 '        If check.Box(0).Checked Then
 '            check.Box(0).Checked = False
 '            If tracker IsNot Nothing Then tracker.Dispose()
@@ -189,7 +189,7 @@ Public Class Tracker_Basics : Inherits VBparent
                 dst1 = New cv.Mat(input.Rows, input.Cols, If(input.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), dstData)
             End If
         Else
-            task.trueText("Draw a rectangle around any object to be tracked in the RGB image above.", 10, 140)
+            setTrueText("Draw a rectangle around any object to be tracked in the RGB image above.", 10, 140)
         End If
     End Sub
     Public Sub Close()

@@ -103,16 +103,16 @@ Public Class Dlib_iBug300WDownload : Inherits VBparent
         Static checkDownload = findCheckBox("Download the 1.7 Gb 300 Faces In-The-Wild database")
         Dim ibugDir = New DirectoryInfo(task.parms.homeDir + "Data/ibug_300W_large_face_landmark_dataset")
         If ibugDir.Exists And downloadActive = False And pythonActive = False Then
-            task.trueText("The iBug 300W face database was downloaded and is ready for use.", 40, 200)
+            setTrueText("The iBug 300W face database was downloaded and is ready for use.", 40, 200)
             Exit Sub
         End If
         Dim fileToDecompress As New FileInfo(task.parms.homeDir + "Data/ibug_300W_large_face_landmark_dataset.tar.gz")
         If downloadActive And pythonActive = False Then
-            task.trueText("Downloading active (takes a while).  Current download size = " + Format(zippedBuffer.Length / 1000, "###,##0") + "k bytes" + vbCrLf +
+            setTrueText("Downloading active (takes a while).  Current download size = " + Format(zippedBuffer.Length / 1000, "###,##0") + "k bytes" + vbCrLf +
                           "Download is " + Format(zippedBuffer.Length / 1797000000, "#0%") + " complete", 40, 200)
         Else
             If pythonActive Then
-                task.trueText("iBug files are being unzipped to " + ibugDir.FullName, 40, 200)
+                setTrueText("iBug files are being unzipped to " + ibugDir.FullName, 40, 200)
             Else
                 If checkDownload.checked Then
                     Static client = HttpWebRequest.CreateHttp("http://dlib.net/files/data/ibug_300W_large_face_landmark_dataset.tar.gz")
@@ -156,7 +156,7 @@ Public Class Dlib_iBug300WDownload : Inherits VBparent
                         End Sub)
                     downloadthread.Start()
                 Else
-                    task.trueText("Check the box in the Options to download the iBug 300W face database", 40, 200)
+                    setTrueText("Check the box in the Options to download the iBug 300W face database", 40, 200)
                 End If
             End If
         End If

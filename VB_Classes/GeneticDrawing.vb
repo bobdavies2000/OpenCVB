@@ -25,7 +25,7 @@ Public Class GeneticDrawing_Options : Inherits VBparent
         task.desc = "Display all the options available to genetic drawing algorithms."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        task.trueText("There is no output for this algorithm - just controls showing the genetic drawing options")
+        setTrueText("There is no output for this algorithm - just controls showing the genetic drawing options")
     End Sub
 End Class
 

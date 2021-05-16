@@ -53,7 +53,7 @@ Public Class FishEye_Rectified : Inherits VBparent
 
         dst1.SetTo(0)
         dst2.SetTo(0)
-        task.trueText("The T265 camera is not supported.  No depth data or point cloud.", 10, 100, 3)
+        setTrueText("The T265 camera is not supported.  No depth data or point cloud.", 10, 100, 3)
 
         label1 = "Left View (no fisheye lens present)"
         label2 = "Right View (no fisheye lens present)"

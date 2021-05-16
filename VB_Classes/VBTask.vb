@@ -291,6 +291,10 @@ Public Class ActiveTask : Implements IDisposable
         End If
         saveFrameCount = frameCount
     End Sub
+    Public Sub trueText(text As String, Optional x As Integer = 10, Optional y As Integer = 40, Optional picTag As Integer = 2)
+        Dim str As New TTtext(text, x, y, picTag)
+        task.ttTextData.Add(str)
+    End Sub
     Public Sub New(parms As algParms, resolution As cv.Size, _algName As String, camWidth As Integer, camHeight As Integer, _defaultRect As cv.Rect)
         AddHandler TaskTimer.Elapsed, New Timers.ElapsedEventHandler(AddressOf VBTaskTimerPop)
         TaskTimer.AutoReset = True
@@ -393,10 +397,6 @@ Public Class ActiveTask : Implements IDisposable
         TaskTimer.Enabled = False
         If recordedData IsNot Nothing Then recordedData.Dispose()
         If algorithmObject IsNot Nothing Then algorithmObject.Dispose()
-    End Sub
-    Public Sub trueText(text As String, Optional x As Integer = 10, Optional y As Integer = 40, Optional picTag As Integer = 2)
-        Dim str As New TTtext(text, x, y, picTag)
-        task.ttTextData.Add(str)
     End Sub
     Public Sub trueText(text As String, pt As cv.Point, Optional picTag As Integer = 2)
         Dim str As New TTtext(text, pt.X, pt.Y, picTag)

@@ -234,7 +234,7 @@ Public Class Stabilizer_OpticalFlow : Inherits VBparent
             Dim saveDX = dx, saveDY = dy, saveDA = da
 
             Dim text = "Original dx = " + Format(dx, "#0.00") + vbNewLine + " dy = " + Format(dy, "#0.00") + vbNewLine + " da = " + Format(da, "#0.00")
-            task.trueText(text)
+            setTrueText(text)
 
             Dim sx = ds_x, sy = ds_y
 
@@ -252,7 +252,7 @@ Public Class Stabilizer_OpticalFlow : Inherits VBparent
             If Math.Abs(da) > 50 Then da = saveDA
 
             text = "dx = " + Format(dx, "#0.00") + vbNewLine + " dy = " + Format(dy, "#0.00") + vbNewLine + " da = " + Format(da, "#0.00")
-            task.trueText(text, 10, 100)
+            setTrueText(text, 10, 100)
 
             Dim smoothedMat = New cv.Mat(2, 3, cv.MatType.CV_64F)
             smoothedMat.Set(Of Double)(0, 0, sx * Math.Cos(da))

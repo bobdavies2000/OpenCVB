@@ -32,7 +32,7 @@ Public Class Video_Basics : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If srcVideo <> fileNameForm.filename.Text Then
             If fileInfo.Exists = False Then
-                task.trueText("File not found: " + fileInfo.FullName, 10, 125)
+                setTrueText("File not found: " + fileInfo.FullName, 10, 125)
                 Exit Sub
             End If
             srcVideo = fileNameForm.filename.Text

@@ -86,7 +86,7 @@ Public Class WarpModel_Basics : Inherits VBparent
         If radio.check(2).Checked Or radio.check(3).Checked Then
             outStr += vbCrLf + "NOTE: Gradients may give better results."
         End If
-        task.trueText(outStr, aligned.Width + 10, 220)
+        setTrueText(outStr, aligned.Width + 10, 220)
     End Sub
     Public Sub Close()
         WarpModel_Close(cPtr)
@@ -217,7 +217,7 @@ Public Class WarpModel_AlignImages : Inherits VBparent
         cv.Cv2.Merge(mergeInput, merged)
         dst1.SetTo(0)
         dst1(New cv.Rect(0, 0, merged.Width, merged.Height)) = merged
-        task.trueText("Note small displacement of" + vbCrLf + "the image when gradient is used." + vbCrLf +
+        setTrueText("Note small displacement of" + vbCrLf + "the image when gradient is used." + vbCrLf +
                       "Other than that, images look the same." + vbCrLf +
                       "Displacement increases with Sobel" + vbCrLf + "kernel size", merged.Width + 10, 40)
     End Sub
@@ -291,7 +291,7 @@ End Class
 '            thresholdError = "The stdev was only " + Format(stdev, "#0.00") + " which is below the threshold of " + Format(stdevThreshold, "#0.00")
 '        End If
 
-'        If thresholdError.Length > 0 Then task.trueText(thresholdError)
+'        If thresholdError.Length > 0 Then setTrueText(thresholdError)
 '        lastFrame = dst1.Clone
 '    End Sub
 'End Class

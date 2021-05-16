@@ -305,7 +305,7 @@ Public Class Puzzle_Solver : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
         If src.Width = 640 Then
-            task.trueText("This algorithm was not setup to work at 640x480.  It works only at 1280x720")
+            setTrueText("This algorithm was not setup to work at 640x480.  It works only at 1280x720")
             Exit Sub
         End If
         If task.frameCount = 0 Then

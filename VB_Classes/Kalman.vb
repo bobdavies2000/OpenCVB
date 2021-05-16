@@ -603,7 +603,7 @@ Public Class Kalman_VB : Inherits VBparent
         If KalmanDiff > sliders.trackbar(5).Maximum Then KalmanDiff = sliders.trackbar(5).Maximum
         sliders.trackbar(5).Value = KalmanDiff
 
-        task.trueText(label1)
+        setTrueText(label1)
     End Sub
 End Class
 

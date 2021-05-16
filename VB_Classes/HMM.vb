@@ -26,7 +26,7 @@ Public Class HMM_Example_CPP : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.parms.testAllRunning Then
-            task.trueText("When HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.")
+            setTrueText("When HMM_Example_CPP is run repeatedly as part of a 'Test All', it can run out of OpenCL memory.")
             Exit Sub
         End If
         Dim srcData(src.Total * src.ElemSize - 1) As Byte

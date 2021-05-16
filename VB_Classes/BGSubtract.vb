@@ -228,9 +228,9 @@ Public Class BGSubtract_GMG_KNN : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static learnRateSlider = findSlider("Learn Rate")
         If task.frameCount < 120 Then
-            task.trueText("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(task.frameCount))
+            setTrueText("Waiting to get sufficient frames to learn background.  frameCount = " + CStr(task.frameCount))
         Else
-            task.trueText("")
+            setTrueText("")
         End If
 
         dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)

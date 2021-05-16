@@ -26,7 +26,7 @@ Public Class Mouse_LeftClickZoom : Inherits VBparent
         task.desc = "Demonstrate what the left-click enables"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        task.trueText("Left-click and drag to select a region in any of the images." + vbCrLf +
+        setTrueText("Left-click and drag to select a region in any of the images." + vbCrLf +
                       "The selected area is presented to ocvbClass in task.drawRect." + vbCrLf +
                       "In this example, the selected region from the RGB image will be resized to fit in the Result2 image to the right." + vbCrLf +
                       "Double-click an image to remove the selected region.")

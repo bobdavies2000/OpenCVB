@@ -739,7 +739,7 @@ Public Class Line_Longest : Inherits VBparent
             Dim lineMask = dst1(maskRect).InRange(cv.Scalar.Yellow, cv.Scalar.Yellow)
 
             Dim depth1 = task.depth32f(maskRect).Mean(lineMask).Item(0) / 1000
-            task.trueText("Depth = " + Format(depth1, "#0.0") + "m", (pt1.X + pt2.X) / 2 + 30, (pt1.Y + pt2.Y) / 2)
+            setTrueText("Depth = " + Format(depth1, "#0.0") + "m", (pt1.X + pt2.X) / 2 + 30, (pt1.Y + pt2.Y) / 2)
 
             Static lastXvalues As New List(Of Single)
             lastXvalues.Add(depth1)

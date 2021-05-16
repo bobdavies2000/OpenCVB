@@ -34,7 +34,7 @@ Public Class Sieve_BasicsVB : Inherits VBparent
             nextEntry += 1
         End While
         If standalone Or task.intermediateName = caller Then
-            If output.Count > 0 Then task.trueText(shareResults(output))
+            If output.Count > 0 Then setTrueText(shareResults(output))
         Else
             primes = New List(Of Integer)(output)
         End If
@@ -54,6 +54,6 @@ Public Class Sieve_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static countSlider = findSlider("Count of desired primes")
-        task.trueText(printer.shareResults(sieve.GetPrimeNumbers(countSlider.value)))
+        setTrueText(printer.shareResults(sieve.GetPrimeNumbers(countSlider.value)))
     End Sub
 End Class

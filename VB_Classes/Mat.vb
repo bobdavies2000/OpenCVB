@@ -233,7 +233,7 @@ Public Class Mat_ImageXYZ_MT : Inherits VBparent
           End Sub)
 
         cv.Cv2.Merge(xyzPlanes, xyDepth)
-        If standalone Or task.intermediateName = caller Then task.trueText("Mat built with X, Y, and Z (Depth)", 10, 125)
+        If standalone Or task.intermediateName = caller Then setTrueText("Mat built with X, Y, and Z (Depth)", 10, 125)
     End Sub
 End Class
 
@@ -494,7 +494,7 @@ Public Class Mat_2Dlib : Inherits VBparent
             dRGB = Dlib.LoadImageData(Of BgrPixel)(array, src.Rows, src.Cols, src.Cols * src.ElemSize)
         End If
         If standalone Then
-            task.trueText("OpenCVB Mat converted to an Array2D for use with DlibDotNet")
+            setTrueText("OpenCVB Mat converted to an Array2D for use with DlibDotNet")
         End If
 
     End Sub

@@ -85,7 +85,7 @@ Public Class OpenGL_Basics : Inherits VBparent
         Dim readPipe(4) As Byte ' we read 4 bytes because that is the signal that the other end of the named pipe wrote 4 bytes to indicate iteration complete.
         If task.frameCount > 0 And pipe IsNot Nothing Then
             Dim bytesRead = pipe.Read(readPipe, 0, 4)
-            If bytesRead = 0 Then task.trueText("The OpenGL process appears to have stopped.", 20, 100)
+            If bytesRead = 0 Then setTrueText("The OpenGL process appears to have stopped.", 20, 100)
         End If
 
         Dim rgb = task.color.CvtColor(cv.ColorConversionCodes.BGR2RGB) ' OpenGL needs RGB, not BGR
@@ -223,7 +223,7 @@ Public Class OpenGL_IMU : Inherits VBparent
             ogl.OpenGL.dataInput = New cv.Mat(100, 100, cv.MatType.CV_32F, 0)
             ogl.Run(src) ' we are not moving any images to OpenGL - just the IMU value which are already in the memory mapped file.
         Else
-            task.trueText("The IMU is not working or is unavailable")
+            setTrueText("The IMU is not working or is unavailable")
         End If
     End Sub
 End Class
@@ -350,7 +350,7 @@ Public Class OpenGL_GravityTransform : Inherits VBparent
             ogl.pointCloudInput = gCloud.dst1
             ogl.Run(src)
         Else
-            task.trueText("The IMU is not working or is unavailable")
+            setTrueText("The IMU is not working or is unavailable")
         End If
     End Sub
 End Class
@@ -378,7 +378,7 @@ Public Class OpenGL_Floor : Inherits VBparent
             ogl.pointCloudInput = plane.imuPointCloud
             ogl.Run(src)
         Else
-            task.trueText("The IMU is not working or is unavailable")
+            setTrueText("The IMU is not working or is unavailable")
         End If
     End Sub
 End Class
@@ -414,7 +414,7 @@ Public Class OpenGL_FloorPlane : Inherits VBparent
             ogl.pointCloudInput = plane.imuPointCloud
             ogl.Run(src)
         Else
-            task.trueText("The IMU is not working or is unavailable")
+            setTrueText("The IMU is not working or is unavailable")
         End If
     End Sub
 End Class
@@ -458,7 +458,7 @@ End Class
 '            floor.ogl.src = src
 '            floor.ogl.Run()
 '        Else
-'            task.trueText("The IMU is not working or not available.")
+'            setTrueText("The IMU is not working or not available.")
 '        End If
 '    End Sub
 'End Class

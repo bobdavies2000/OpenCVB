@@ -194,7 +194,7 @@ Public Class EMax_VB_Failing : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateName = caller Then
-            task.trueText("The EMax algorithm fails as a result of a bug in em_model.Predict2.  See code for details." + vbCrLf +
+            setTrueText("The EMax algorithm fails as a result of a bug in em_model.Predict2.  See code for details." + vbCrLf +
                           "The C++ version works fine (EMax_Raw) and the 2 are functionally identical.", 20, 100)
 
             Exit Sub ' comment this line to see the bug in the VB.Net version of this Predict2 below.

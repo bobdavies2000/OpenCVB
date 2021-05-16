@@ -148,7 +148,7 @@ Public Class XPhoto_Inpaint : Inherits VBparent
         If radioFast.checked Then iType = InpaintTypes.FSR_FAST
         If radioSMap.checked Then iType = InpaintTypes.SHIFTMAP
         ' CvXPhoto.Inpaint(dst1, mask, dst2, InpaintTypes.FSR_BEST)
-        task.trueText("This VB interface for xPhoto Inpaint does not work...  Uncomment the line above this msg to test.", 10, 200, 3)
+        setTrueText("This VB interface for xPhoto Inpaint does not work...  Uncomment the line above this msg to test.", 10, 200, 3)
     End Sub
 End Class
 
@@ -186,7 +186,7 @@ Public Class XPhoto_Inpaint_CPP : Inherits VBparent
 
         If imagePtr <> 0 Then dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
 
-        task.trueText("The infrastructure is all in place but the xPhoto Inpaint call hangs.  Uncomment the C++ line in Run to test", 10, 200, 3)
+        setTrueText("The infrastructure is all in place but the xPhoto Inpaint call hangs.  Uncomment the C++ line in Run to test", 10, 200, 3)
     End Sub
     Public Sub Close()
         xPhoto_Inpaint_Close(xPhoto_Inpaint)

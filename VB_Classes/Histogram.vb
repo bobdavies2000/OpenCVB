@@ -634,7 +634,7 @@ Public Class Histogram_ViewIntersections : Inherits VBparent
             dst1.Rectangle(rIntersect(maxIndex), cv.Scalar.Yellow, 2)
             minZ = task.maxZ * (h - rIntersect(maxIndex).Y - rIntersect(maxIndex).Height) / h
             maxZ = task.maxZ * (h - rIntersect(maxIndex).Y) / h
-            task.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", rIntersect(maxIndex).X, rIntersect(maxIndex).Y - offset)
+            setTrueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", rIntersect(maxIndex).X, rIntersect(maxIndex).Y - offset)
 
             Dim pc = histCO.histC.sideview.gCloud.dst1
             Dim split = pc.Split()
@@ -690,7 +690,7 @@ Public Class Histogram_ViewObjects : Inherits VBparent
             dst1.Rectangle(r, cv.Scalar.White, 1)
             minZ = task.maxZ * r.X / w
             maxZ = task.maxZ * (r.X + r.Width) / w
-            If standalone Or task.intermediateName = caller Then task.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset)
+            If standalone Or task.intermediateName = caller Then setTrueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset)
         Next
         label1 = CStr(flood.rects.Count) + " objects were identified in the side view"
 
@@ -703,7 +703,7 @@ Public Class Histogram_ViewObjects : Inherits VBparent
             dst2.Rectangle(r, cv.Scalar.White, 1)
             minZ = task.maxZ * (h - r.Y - r.Height) / h
             maxZ = task.maxZ * (h - r.Y) / h
-            If standalone Or task.intermediateName = caller Then task.trueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset, 3)
+            If standalone Or task.intermediateName = caller Then setTrueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset, 3)
         Next
 
         label2 = CStr(flood.rects.Count) + " objects identified.  Largest is yellow."
@@ -873,7 +873,7 @@ Public Class Histogram_Frustrum : Inherits VBparent
         dst2 = tView.dst2
 
         If standalone Then
-            task.trueText("This algorithm was created to tune the frustrum and camera locations." + vbCrLf +
+            setTrueText("This algorithm was created to tune the frustrum and camera locations." + vbCrLf +
                           "Without these tuning parameters the side and top views would not be correct." + vbCrLf +
                           "To see how these adjustments work or to add a new camera, " + vbCrLf +
                           "use the Histogram_TopView2D or Histogram_SideView2D algorithms." + vbCrLf +

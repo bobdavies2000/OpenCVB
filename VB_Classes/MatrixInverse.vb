@@ -36,7 +36,7 @@ Public Class MatrixInverse_Basics_CS : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If input.Width <> input.Height Then
-            task.trueText("The src matrix must be square!")
+            setTrueText("The src matrix must be square!")
             Exit Sub
         End If
 
@@ -45,7 +45,7 @@ Public Class MatrixInverse_Basics_CS : Inherits VBparent
         Dim result = matrix.Run(input) ' C# class Run - see MatrixInverse.cs file...
 
         Dim outstr = printMatrixResults(input, result)
-        task.trueText(outstr + vbCrLf + "Intermediate results are optionally available in the console log.")
+        setTrueText(outstr + vbCrLf + "Intermediate results are optionally available in the console log.")
     End Sub
 End Class
 
@@ -63,14 +63,14 @@ Public Class MatrixInverse_OpenCV : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If input.Width <> input.Height Then
-            task.trueText("The input matrix must be square!")
+            setTrueText("The input matrix must be square!")
             Exit Sub
         End If
 
         Dim result As New cv.Mat
         cv.Cv2.Invert(input, result, cv.DecompTypes.LU)
         Dim outstr = printMatrixResults(input, result)
-        task.trueText(outstr)
+        setTrueText(outstr)
     End Sub
 End Class
 

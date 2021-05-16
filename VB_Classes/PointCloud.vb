@@ -36,8 +36,8 @@ Public Class PointCloud_Basics : Inherits VBparent
             End If
 
             Dim pad = CInt(src.Width / 15)
-            task.trueText(accMsg1, 10, src.Height - pad)
-            task.trueText(accMsg2, 10, src.Height - pad, 3)
+            setTrueText(accMsg1, 10, src.Height - pad)
+            setTrueText(accMsg2, 10, src.Height - pad, 3)
         End If
 
         Static minDepth As Single, maxDepth As Single
@@ -62,7 +62,7 @@ Public Class PointCloud_Basics : Inherits VBparent
 
             vw = vwTop
             If showDetails Then
-                task.trueText(detailText, detailPoint.X, detailPoint.Y, 3)
+                setTrueText(detailText, detailPoint.X, detailPoint.Y, 3)
                 label2 = "Clicked: " + detailText
             End If
             cv.Cv2.InRange(task.depth32f, minDepth * 1000, maxDepth * 1000, maskTopView)
@@ -80,7 +80,7 @@ Public Class PointCloud_Basics : Inherits VBparent
 
             vw = vwSide
             If showDetails Then
-                task.trueText(detailText, detailPoint.X, detailPoint.Y, 2)
+                setTrueText(detailText, detailPoint.X, detailPoint.Y, 2)
                 label1 = "Clicked: " + detailText
             End If
             cv.Cv2.InRange(task.depth32f, minDepth * 1000, maxDepth * 1000, maskSideView)
@@ -611,7 +611,6 @@ Public Class PointCloud_BackProject : Inherits VBparent
         dst1 = mats.dst1
         dst2 = mats.mat(quadrantIndex)
         If quadrantIndex < 2 Then label2 = If(quadrantIndex = 0, both.label1, both.label2) Else label2 = "Click quadrant 0 or 1 to see side/top views"
-        task.ttTextData.Clear()
     End Sub
 End Class
 
@@ -796,7 +795,7 @@ End Class
 '            task.palette.Run(colorMask)
 '            dst1 = task.palette.dst1
 '        Else
-'            task.trueText("No objects found")
+'            setTrueText("No objects found")
 '        End If
 '    End Sub
 'End Class
@@ -854,7 +853,7 @@ End Class
 '            task.palette.Run(colorMask)
 '            dst1 = task.palette.dst1
 '        Else
-'            task.trueText("No objects found")
+'            setTrueText("No objects found")
 '        End If
 '    End Sub
 'End Class
@@ -1065,7 +1064,7 @@ Public Class PointCloud_ObjectsTop : Inherits VBparent
             Else
                 blueLineMeters = distanceSlider.Value * lineWidth / (1000 * pixeldistance)
             End If
-            task.trueText("Blue Line is " + CStr(pixeldistance) + " pixels from the camera" + vbCrLf +
+            setTrueText("Blue Line is " + CStr(pixeldistance) + " pixels from the camera" + vbCrLf +
                           "Blue Line is " + CStr(lineWidth) + " pixels long" + vbCrLf +
                           "Blue Line is " + Format(distanceSlider.Value / 1000, "#0.00") + " meters from the camera" + vbCrLf +
                           "Blue Line is " + Format(blueLineMeters, "#0.00") + " meters long" + vbCrLf +
@@ -1161,7 +1160,7 @@ Public Class PointCloud_ObjectsSide : Inherits VBparent
             Else
                 blueLineMeters = distanceSlider.Value * lineWidth / (1000 * pixeldistance)
             End If
-            task.trueText("Blue Line is " + CStr(pixeldistance) + " pixels from the camera" + vbCrLf +
+            setTrueText("Blue Line is " + CStr(pixeldistance) + " pixels from the camera" + vbCrLf +
                           "Blue Line is " + CStr(lineWidth) + " pixels long" + vbCrLf +
                           "Blue Line is " + Format(distanceSlider.Value / 1000, "#0.00") + " meters from the camera" + vbCrLf +
                           "Blue Line is " + Format(blueLineMeters, "#0.00") + " meters long" + vbCrLf +

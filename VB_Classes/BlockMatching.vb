@@ -14,7 +14,7 @@ Public Class BlockMatching_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
-            task.trueText("For the Kinect 4 Azure camera, the left and right views are the same.")
+            setTrueText("For the Kinect 4 Azure camera, the left and right views are the same.")
         End If
 
         Dim numDisparity = sliders.trackbar(0).Value * 16 ' must be a multiple of 16

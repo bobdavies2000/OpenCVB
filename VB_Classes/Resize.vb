@@ -89,6 +89,6 @@ Public Class Resize_Options : Inherits VBparent
             End If
         Next
 
-        If standalone Or task.intermediateName = caller Then task.trueText("No output - just options for Resize and GetRotationMatrix2D")
+        If standalone Or task.intermediateName = caller Then setTrueText("No output - just options for Resize and GetRotationMatrix2D")
     End Sub
 End Class

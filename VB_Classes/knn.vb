@@ -653,7 +653,7 @@ Public Class KNN_Cluster2DCities : Inherits VBparent
 
             dst1.SetTo(0)
             cluster(dst1, nearestCountSlider.Value)
-            task.trueText("knn closed regions = " + CStr(closedRegions), 10, 40, 3)
+            setTrueText("knn closed regions = " + CStr(closedRegions), 10, 40, 3)
         End If
     End Sub
 End Class
@@ -726,7 +726,7 @@ Public Class KNN_Learn : Inherits VBparent
         dst1.SetTo(cv.Scalar.Black)
 
         If standalone Then
-            task.trueText("Database is ready for queries.  Use it with code like this " + vbCrLf + vbCrLf +
+            setTrueText("Database is ready for queries.  Use it with code like this " + vbCrLf + vbCrLf +
                           "public learn as New KNN_Learn" + vbCrLf + "learn = new KNN_Learn" + vbCrLf +
                           "Dim neighbors As New cv.Mat" + vbCrLf + "Dim queries = New cv.Mat(1, 2, cv.MatType.CV_32F, {pt.x, pt.y})" + vbCrLf +
                           "learn.knn.FindNearest(queries, 1, neighbors)" + vbCrLf + vbCrLf + "And neighbors will have nearest point." + vbCrLf +
@@ -806,7 +806,7 @@ Public Class KNN_PointTracker : Inherits VBparent
         Static pixelSlider = findSlider("Minimum size of object in pixels")
         Static drawRCCheck = findCheckBox("Caller will handle any drawing required")
         If standalone Then
-            task.trueText("KNN_PointTracker running standalone has no output.")
+            setTrueText("KNN_PointTracker running standalone has no output.")
             Exit Sub
         End If
 

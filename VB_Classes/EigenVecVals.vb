@@ -42,7 +42,7 @@ Public Class EigenVecVals_Basics : Inherits VBparent
             Next
             nextLine += " = " + vbTab + "0.0" + vbCrLf
         Next
-        task.trueText(nextLine, 10, 80)
+        setTrueText(nextLine, 10, 80)
     End Sub
 End Class
 

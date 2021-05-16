@@ -8,7 +8,7 @@ Public Class Structured_SliceOptions : Inherits VBparent
         task.desc = "Structured Slice options"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        task.trueText("This algorithm is used to share the horizontal and vertical slice options.")
+        setTrueText("This algorithm is used to share the horizontal and vertical slice options.")
     End Sub
 End Class
 
@@ -326,7 +326,7 @@ Public Class Structured_SliceXPlot : Inherits VBparent
         dst1.SetTo(cv.Scalar.White, depthMask)
 
         label2 = "Peak histogram count (" + Format(maxVal, "#0") + ") at " + Format(filterZ, "#0.00") + " meters +-" + Format(5 / task.pixelsPerMeterTop, "#0.00") + " m"
-        task.trueText("Use the mouse to move the slice.", 10, dst1.Height * 3 / 4, 3)
+        setTrueText("Use the mouse to move the slice.", 10, dst1.Height * 3 / 4, 3)
     End Sub
 End Class
 
@@ -368,7 +368,7 @@ Public Class Structured_SliceYPlot : Inherits VBparent
             Dim pixelsPerMeter = dst1.Width / task.maxZ
             label2 = "Peak histogram count (" + Format(maxVal, "#0") + ") at " + Format(filterZ, "#0.00") + " meters +-" + Format(5 / pixelsPerMeter, "#0.00") + " m"
         End If
-        task.trueText("Use the mouse to move the slice.", 10, dst1.Height * 3 / 4, 3)
+        setTrueText("Use the mouse to move the slice.", 10, dst1.Height * 3 / 4, 3)
     End Sub
 End Class
 

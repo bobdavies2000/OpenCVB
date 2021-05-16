@@ -207,7 +207,7 @@ Public Class Fuzzy_NeighborProof : Inherits VBparent
                 Next
             Next
         Next
-        task.trueText("Mask ID's for all contour points in each region identified only one region.", 10, 50, 3)
+        setTrueText("Mask ID's for all contour points in each region identified only one region.", 10, 50, 3)
     End Sub
 End Class
 
@@ -219,7 +219,7 @@ End Class
 
 
 Public Class Fuzzy_TrackerDepth : Inherits VBparent
-    Public fuzzy as New Fuzzy_Basics
+    Public fuzzy As New Fuzzy_Basics
     Public centroids As New List(Of cv.Point)
     Public rects As New List(Of cv.Rect)
     Public layoutColor As New List(Of Integer)
@@ -281,7 +281,7 @@ End Class
 
 
 Public Class Fuzzy_TrackerDepthClick : Inherits VBparent
-    Public tracker as New Fuzzy_TrackerDepth
+    Public tracker As New Fuzzy_TrackerDepth
     Public highlightPoint As cv.Point
     Public highlightRect As cv.Rect
     Public highlightRegion = -1
@@ -293,7 +293,7 @@ Public Class Fuzzy_TrackerDepthClick : Inherits VBparent
         tracker.Run(src)
         dst1 = tracker.dst1
 
-        If standalone And highlightRegion < 0 Then task.trueText("Click any color region to get more details and track it", 10, 50, 3)
+        If standalone And highlightRegion < 0 Then setTrueText("Click any color region to get more details and track it", 10, 50, 3)
 
         Dim gray = tracker.fuzzy.gray
         If task.mouseClickFlag Then

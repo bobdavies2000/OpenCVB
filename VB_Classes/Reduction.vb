@@ -217,7 +217,7 @@ Public Class Reduction_XYZ : Inherits VBparent
         Next
 
         cv.Cv2.Merge(split, dst2)
-        task.trueText("Task.PointCloud has been reduced and is in dst2")
+        setTrueText("Task.PointCloud has been reduced and is in dst2")
     End Sub
 End Class
 
