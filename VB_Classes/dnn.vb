@@ -204,7 +204,20 @@ Public Class DNN_SuperRes : Inherits VBparent
         task.desc = "Get better super-resolution through a DNN"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dst1 = src(task.drawRect)
-        dnn.Upsample(src(task.drawRect), dst2)
+        Dim r = task.drawRect
+        If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then Exit Sub
+        Dim outRect = New cv.Rect(0, 0, r.Width * 4, r.Height * 4)
+        If outRect.Width > dst2.Width Then
+            r.Width = dst2.Width / 4
+            outRect.Width = dst2.Width
+        End If
+        If outRect.Height > dst2.Height Then
+            r.Height = dst2.Height / 4
+            outRect.Height = dst2.Height
+        End If
+        dst1.SetTo(0)
+        dst2.SetTo(0)
+        dst1(outRect) = src(r).Resize(New cv.Size(r.Width * 4, r.Height * 4))
+        dnn.Upsample(src(r), dst2(outRect))
     End Sub
 End Class
