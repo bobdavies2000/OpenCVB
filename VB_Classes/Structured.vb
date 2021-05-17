@@ -98,9 +98,7 @@ Public Class Structured_MultiSliceH : Inherits VBparent
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
-        Dim cushion = cushionSlider.Value
         Dim stepsize = stepSlider.value
 
         side2D.Run(src)
@@ -108,7 +106,7 @@ Public Class Structured_MultiSliceH : Inherits VBparent
         Dim Split = side2D.gCloud.dst1.Split()
 
         Dim metersPerPixel = task.maxZ / dst2.Height
-        Dim thicknessMeters = cushion * metersPerPixel
+        Dim thicknessMeters = metersPerPixel ' 1 pixel width
 
         sliceMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For yCoordinate = 0 To src.Height - 1 Step stepsize
@@ -140,9 +138,7 @@ Public Class Structured_MultiSliceV : Inherits VBparent
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
-        Dim cushion = cushionSlider.Value
         Dim stepsize = stepSlider.value
 
         top2D.Run(src)
@@ -151,7 +147,7 @@ Public Class Structured_MultiSliceV : Inherits VBparent
         Dim split = top2D.gCloud.dst1.Split()
 
         Dim metersPerPixel = task.maxZ / dst2.Height
-        Dim thicknessMeters = cushion * metersPerPixel
+        Dim thicknessMeters = metersPerPixel ' 1 pixel width
 
         Dim sliceMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For xCoordinate = 0 To src.Width - 1 Step stepsize
@@ -186,16 +182,14 @@ Public Class Structured_MultiSlice : Inherits VBparent
         task.desc = "Use slices through the point cloud to find straight lines indicating planes present in the depth data."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static cushionSlider = findSlider("Structured Depth slice thickness in pixels")
         Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
         Dim stepsize = stepSlider.value
-        Dim cushion = cushionSlider.Value
 
         top2D.Run(src)
         side2D.Run(src)
 
         Dim metersPerPixel = task.maxZ / dst2.Height
-        Dim thicknessMeters = cushion * metersPerPixel
+        Dim thicknessMeters = metersPerPixel ' 1 pixel width...
 
         split = side2D.gCloud.dst1.Split()
 
