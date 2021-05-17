@@ -246,6 +246,7 @@ Public Class DNN_SuperResize : Inherits VBparent
         task.desc = "Compare superRes reduced to original size"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
+        super.run(src)
         Dim r = New cv.Rect(0, 0, dst1.Width, dst1.Height)
         Dim tmp As New cv.Mat
         super.dnn.upsample(src, tmp)
