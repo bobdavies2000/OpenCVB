@@ -25,7 +25,7 @@ Partial Class TreeviewForm
         Me.components = New System.ComponentModel.Container()
         Me.TreeView1 = New System.Windows.Forms.TreeView()
         Me.ClickTreeLabel = New System.Windows.Forms.Label()
-        Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
+        Me.TreeViewTimer = New System.Windows.Forms.Timer(Me.components)
         Me.OK_Button = New System.Windows.Forms.Button()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.TableLayoutPanel1.SuspendLayout()
@@ -48,9 +48,9 @@ Partial Class TreeviewForm
         Me.ClickTreeLabel.TabIndex = 2
         Me.ClickTreeLabel.Text = "Click any tree entry to view its intermediate results"
         '
-        'Timer1
+        'TreeViewTimer
         '
-        Me.Timer1.Enabled = True
+        Me.TreeViewTimer.Enabled = True
         '
         'OK_Button
         '
@@ -98,7 +98,7 @@ Partial Class TreeviewForm
     End Sub
     Friend WithEvents TreeView1 As TreeView
     Friend WithEvents ClickTreeLabel As Label
-    Friend WithEvents Timer1 As Timer
+    Friend WithEvents TreeViewTimer As Timer
     Friend WithEvents OK_Button As Button
     Friend WithEvents TableLayoutPanel1 As TableLayoutPanel
 End Class

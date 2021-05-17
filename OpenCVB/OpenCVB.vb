@@ -520,7 +520,7 @@ Public Class OpenCVB
             TestAllButton.Text = "Stop Test"
             TestAllTimer.Enabled = True
             AvailableAlgorithms.Enabled = False  ' the algorithm will be started in the testAllTimer event.
-            If TreeViewDialog IsNot Nothing Then TreeViewDialog.Timer1.Enabled = True
+            If TreeViewDialog IsNot Nothing Then TreeViewDialog.TreeViewTimer.Enabled = True
         Else
             AvailableAlgorithms.Enabled = True
             TestAllTimer.Enabled = False
@@ -940,11 +940,6 @@ Public Class OpenCVB
             Console.WriteLine("Error in camPic_MouseDown: " + ex.Message)
         End Try
     End Sub
-    Private Sub AvailableAlgorithms_MouseClick(sender As Object, e As MouseEventArgs) Handles AvailableAlgorithms.MouseClick
-        ' If they Then had been Using the treeview feature To click On a tree entry, the timer was disable.  
-        ' Clicking on availablealgorithms indicates they are done with using the treeview.
-        If TreeViewDialog IsNot Nothing Then TreeViewDialog.Timer1.Enabled = True
-    End Sub
     Private Sub camPic_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs)
         Try
             Dim pic = DirectCast(sender, PictureBox)
@@ -1149,6 +1144,10 @@ Public Class OpenCVB
 
         Dim imgSize = New cv.Size(CInt(workingRes.Width * 2), CInt(workingRes.Height))
         imgResult = New cv.Mat(imgSize, cv.MatType.CV_8UC3, 0)
+
+        ' If they Then had been Using the treeview feature To click On a tree entry, the timer was disabled.  
+        ' Clicking on availablealgorithms indicates they are done with using the treeview.
+        If TreeViewDialog IsNot Nothing Then TreeViewDialog.TreeViewTimer.Enabled = True
 
         Thread.CurrentThread.Priority = ThreadPriority.Lowest
         algorithmTaskHandle = New Thread(AddressOf AlgorithmTask)

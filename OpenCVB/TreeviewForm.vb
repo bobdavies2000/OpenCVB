@@ -11,7 +11,7 @@ Public Class TreeviewForm
         Me.Close()
     End Sub
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
-        Me.Timer1.Enabled = False
+        Me.TreeViewTimer.Enabled = False
         OpenCVB.intermediateReview = e.Node.Text
     End Sub
     Private Sub TreeviewForm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
@@ -92,8 +92,7 @@ Public Class TreeviewForm
         Me.Height = 200 + entryCount * 26
         If Me.Height > 1000 Then Me.Height = 1000 ' when too big, use the scroll bar.
     End Sub
-
-    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
+    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
         SyncLock callTraceLock
             If OpenCVB.callTrace Is Nothing Then Exit Sub
             If OpenCVB.callTrace.Count > 0 Then
