@@ -371,8 +371,11 @@ Public Class ActiveTask : Implements IDisposable
                 If task.intermediateName <> task.intermediateObject.caller Then
                     For Each obj In task.activeObjects
                         If obj.caller = task.intermediateName Then
+                            Dim tmp As New cv.Mat
+                            ' there may be several instances of an algorithmobject.  This will find one that is actually active.
+                            If obj.dst1.channels <> 1 Then tmp = obj.dst1.cvtcolor(cv.ColorConversionCodes.BGR2GRAY)
                             task.intermediateObject = obj
-                            Exit For
+                            If tmp.CountNonZero() > 0 Then Exit For ' if this dst1 has been modified, then it is an active one...
                         End If
                     Next
                     task.ttTextData.Clear()
@@ -389,6 +392,7 @@ Public Class ActiveTask : Implements IDisposable
             TaskTimer.Enabled = True
             algorithmObject.NextFrame(task.color.Clone)
             TaskTimer.Enabled = False
+
         Catch ex As Exception
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)
         End Try

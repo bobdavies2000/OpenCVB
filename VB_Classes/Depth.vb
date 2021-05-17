@@ -367,20 +367,17 @@ Public Class Depth_ColorizerFastFade_CPP : Inherits VBparent
         task.desc = "Display depth data with InRange.  Higher contrast than others - yellow to blue always present."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
+        If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
+        dst2 = task.noDepthMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32F Then input = task.depth32f
-
-        dst2 = task.noDepthMask
-
-        Dim depthData(input.Total * input.ElemSize - 1) As Byte
+        Dim depthData(src.Total * src.ElemSize - 1) As Byte
         Dim handleSrc = GCHandle.Alloc(depthData, GCHandleType.Pinned)
-        Marshal.Copy(input.Data, depthData, 0, depthData.Length)
-        Dim imagePtr = Depth_Colorizer2_Run(dcPtr, handleSrc.AddrOfPinnedObject(), input.Rows, input.Cols, task.maxDepth)
+        Marshal.Copy(src.Data, depthData, 0, depthData.Length)
+        Dim imagePtr = Depth_Colorizer2_Run(dcPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.maxDepth)
         handleSrc.Free()
 
         If imagePtr <> 0 Then
-            dst1 = New cv.Mat(input.Rows, input.Cols, cv.MatType.CV_8UC3, imagePtr)
+            dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
             If standalone Or task.intermediateName = caller Then dst1.SetTo(0, dst2)
         End If
     End Sub

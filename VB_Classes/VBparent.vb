@@ -45,10 +45,10 @@ Public Class VBparent : Implements IDisposable
         If standalone = False And task.callTrace.Contains(callStack) = False Then
             task.callTrace.Add(callStack)
         End If
-        task.activeObjects.Add(Me)
         dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
         dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
         dst3 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
+        task.activeObjects.Add(Me)
     End Sub
     Public Sub NextFrame(src As cv.Mat)
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
