@@ -520,7 +520,6 @@ Public Class OpenCVB
             TestAllButton.Text = "Stop Test"
             TestAllTimer.Enabled = True
             AvailableAlgorithms.Enabled = False  ' the algorithm will be started in the testAllTimer event.
-            If TreeViewDialog IsNot Nothing Then TreeViewDialog.TreeViewTimer.Enabled = True
         Else
             AvailableAlgorithms.Enabled = True
             TestAllTimer.Enabled = False
