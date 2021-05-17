@@ -58,9 +58,12 @@ Public Class VBparent : Implements IDisposable
             task.label2 = label2
             If task.intermediateName <> "" And task.intermediateName <> caller Then
                 If task.intermediateObject Is Nothing Then
-                    setTrueText(task.intermediateName + " is not active.", 10, 100)
+                    Dim str As New TTtext("The " + task.intermediateName + " algorithm is not active in this configuration.", 10, 100, 2)
+                    task.ttTextData.Add(str)
                     dst1.SetTo(0)
                     dst2.SetTo(0)
+                    task.label1 = ""
+                    task.label2 = ""
                 Else
                     dst1 = task.intermediateObject.dst1
                     dst2 = task.intermediateObject.dst2

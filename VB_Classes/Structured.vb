@@ -519,7 +519,7 @@ Public Class Structured_SliceH : Inherits VBparent
         dst1.SetTo(cv.Scalar.White, sliceMask)
         label2 = tView.label2
 
-        dst2 = tView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = If(tView.dst1.Channels = 1, tView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR), tView.dst1)
         yPlaneOffset = If(yCoordinate < dst2.Height - cushion, CInt(yCoordinate), dst2.Height - cushion - 1)
         dst2.Circle(New cv.Point(0, task.sideCameraPoint.Y), task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         dst2.Line(New cv.Point(0, yPlaneOffset), New cv.Point(dst2.Width, yPlaneOffset), cv.Scalar.Yellow, cushion)

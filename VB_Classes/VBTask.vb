@@ -362,26 +362,32 @@ Public Class ActiveTask : Implements IDisposable
         If aOptions IsNot Nothing Then aOptions.layoutOptions()
         Application.DoEvents()
     End Sub
+    Public Sub checkIntermediateResults()
+        If task.intermediateName <> "" Then
+            Dim activeObjectFound As Boolean
+            If task.intermediateObject Is Nothing Then task.intermediateObject = task.activeObjects(0)
+            If task.intermediateName <> task.intermediateObject.caller Then
+                For Each obj In task.activeObjects
+                    If obj.caller = task.intermediateName Then
+                        Dim tmp = obj.dst1
+                        ' there may be several instances of an algorithmobject.  This will find one that is actually active.
+                        If obj.dst1.channels <> 1 Then tmp = obj.dst1.cvtcolor(cv.ColorConversionCodes.BGR2GRAY)
+                        task.intermediateObject = obj
+                        If tmp.CountNonZero() > 0 Then
+                            activeObjectFound = True
+                            Exit For ' if this dst1 has been modified, then it is an active one...
+                        End If
+                    End If
+                Next
+                task.ttTextData.Clear()
+                If activeObjectFound = False Then task.intermediateObject = Nothing ' this will show a message that the selected algorithm is not active.
+            End If
+        End If
+    End Sub
     Public Sub RunAlgorithm()
         Try
             If task.parms.useRecordedData Then recordedData.Run(task.color.Clone)
-
-            If task.intermediateName <> "" Then
-                If task.intermediateObject Is Nothing Then task.intermediateObject = task.activeObjects(0)
-                If task.intermediateName <> task.intermediateObject.caller Then
-                    For Each obj In task.activeObjects
-                        If obj.caller = task.intermediateName Then
-                            Dim tmp As New cv.Mat
-                            ' there may be several instances of an algorithmobject.  This will find one that is actually active.
-                            If obj.dst1.channels <> 1 Then tmp = obj.dst1.cvtcolor(cv.ColorConversionCodes.BGR2GRAY)
-                            task.intermediateObject = obj
-                            If tmp.CountNonZero() > 0 Then Exit For ' if this dst1 has been modified, then it is an active one...
-                        End If
-                    Next
-                    task.ttTextData.Clear()
-                End If
-            End If
-
+            checkIntermediateResults()
             ' run any global options algorithms here.
             If task.pythonTaskName.EndsWith(".py") = False Then
                 inrange.Run(Nothing) ' updates all the depth info.
