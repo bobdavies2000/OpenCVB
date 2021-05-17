@@ -300,7 +300,6 @@ Public Class Structured_SliceXPlot : Inherits VBparent
     Dim multi As New Structured_MultiSlice
     Dim structD As New Structured_SliceV
     Public Sub New()
-        structD.cushionSlider.Value = structD.cushionSlider.Maximum
         task.desc = "Find any plane around a peak value in the top-down histogram"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
@@ -340,7 +339,6 @@ Public Class Structured_SliceYPlot : Inherits VBparent
     Dim multi As New Structured_MultiSlice
     Dim structD As New Structured_SliceH
     Public Sub New()
-        structD.cushionSlider.Value = structD.cushionSlider.Maximum
         task.desc = "Find any plane around a peak value in the side view histogram"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
