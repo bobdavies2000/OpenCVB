@@ -190,35 +190,45 @@ End Class
 
 
 
-
-
+' https://github.com/Saafke/EDSR_Tensorflow
+' https://github.com/fannymonori/TF-ESPCN
+' https://github.com/Saafke/FSRCNN_Tensorflow
+' https://github.com/fannymonori/TF-LapSRN
 ' https//github.com/Saafke/FSRCNN_Tensorflow/tree/master/models
 Public Class DNN_SuperRes : Inherits VBparent
+    Public options As New DNN_SuperResOptions
     Public dnn = New DnnSuperResImpl("fsrcnn", 4)
     Public Sub New()
-        Dim modelFile = New FileInfo(task.parms.homeDir + "Data/FSRCNN_x4.pb")
-        dnn.ReadModel(modelFile.FullName)
         task.drawRect = New cv.Rect(100, 100, 80, 60)
         label1 = "Output of a resize using OpenCV"
-        label2 = "4X resize of selected area using DNN super resolution"
         task.desc = "Get better super-resolution through a DNN"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
+        options.Run(Nothing)
+        Static saveModelFile = ""
+        Static multiplier As Integer
+        If saveModelFile <> options.superResModelFileName Then
+            saveModelFile = options.superResModelFileName
+            multiplier = options.superResMultiplier
+            dnn = New DnnSuperResImpl(options.shortModelName, multiplier)
+            dnn.ReadModel(saveModelFile)
+        End If
         Dim r = task.drawRect
         If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then Exit Sub
-        Dim outRect = New cv.Rect(0, 0, r.Width * 4, r.Height * 4)
+        Dim outRect = New cv.Rect(0, 0, r.Width * multiplier, r.Height * multiplier)
         If outRect.Width > dst2.Width Then
-            r.Width = dst2.Width / 4
+            r.Width = dst2.Width / multiplier
             outRect.Width = dst2.Width
         End If
         If outRect.Height > dst2.Height Then
-            r.Height = dst2.Height / 4
+            r.Height = dst2.Height / multiplier
             outRect.Height = dst2.Height
         End If
         dst1.SetTo(0)
         dst2.SetTo(0)
-        dst1(outRect) = src(r).Resize(New cv.Size(r.Width * 4, r.Height * 4))
+        dst1(outRect) = src(r).Resize(New cv.Size(r.Width * multiplier, r.Height * multiplier))
         dnn.Upsample(src(r), dst2(outRect))
+        label2 = CStr(multiplier) + "X resize of selected area using DNN super resolution"
     End Sub
 End Class
 
@@ -241,5 +251,59 @@ Public Class DNN_SuperResize : Inherits VBparent
         super.dnn.upsample(src, tmp)
         dst1 = tmp.Resize(dst1.Size)
         dst2 = dst1 - src
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class DNN_SuperResOptions : Inherits VBparent
+    Public superResModelFileName As String
+    Public shortModelName As String
+    Public superResMultiplier As Integer
+    Public Sub New()
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 12)
+            radio.check(0).Text = "EDSR_x2.pb"
+            radio.check(1).Text = "EDSR_x3.pb"
+            radio.check(2).Text = "EDSR_x4.pb"
+            radio.check(3).Text = "ESPCN_x2.pb"
+            radio.check(4).Text = "ESPCN_x3.pb"
+            radio.check(5).Text = "ESPCN_x4.pb"
+            radio.check(6).Text = "FSRCNN_X2.pb"
+            radio.check(7).Text = "FSRCNN_X3.pb"
+            radio.check(8).Text = "FSRCNN_X4.pb"
+            radio.check(9).Text = "LapSRN_x2.pb"
+            radio.check(10).Text = "LapSRN_x4.pb"
+            radio.check(11).Text = "LapSRN_x8.pb"
+            radio.check(8).Checked = True
+        End If
+        task.desc = "Options for the different SuperRes models and multipliers."
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        superResModelFileName = task.parms.homeDir + "Data/DNN_SuperResModels/"
+        For i = 0 To radio.check.Count - 1
+            If radio.check(i).Checked Then
+                superResModelFileName += radio.check(i).Text
+                Dim split = radio.check(i).Text.Split("_")
+                shortModelName = LCase(split(0))
+                superResMultiplier = CInt(split(1).Substring(1, 1))
+                Dim testFile As New FileInfo(superResModelFileName)
+                If testFile.Exists = False Then
+                    MsgBox("The " + radio.check(i).Text + " super res model file is missing!")
+                    superResModelFileName = ""
+                End If
+                Exit For
+            End If
+        Next
+        If standalone Then
+            setTrueText("Current Options: " + shortModelName + " at resolution " + CStr(superResMultiplier) + vbCrLf +
+                        superResModelFileName + " is present and will be used.")
+        End If
     End Sub
 End Class
