@@ -216,9 +216,20 @@ Module IndexMain
         sr.Close()
 
         For i = 2 To rankings.Count - 1
-            If Len(rankings(i)) > 0 Then
-                sw.Write("<Value Rank " + CStr(i) + " (Graded)>")
-                sw.WriteLine(rankings(i))
+            Dim rankSort As New SortedList(Of String, String)
+            If rankings(i) IsNot Nothing Then
+                Dim split = rankings(i).Split(",")
+                For j = 0 To split.Length - 1
+                    If Len(split(j)) > 0 Then rankSort.Add(split(j), split(j))
+                Next
+                rankings(i) = ""
+                For j = 0 To rankSort.Count - 1
+                    rankings(i) += rankSort.ElementAt(j).Key + If(j = rankSort.Count - 1, "", ",")
+                Next
+                If Len(rankings(i)) > 0 Then
+                    sw.Write("<Value Rank " + CStr(i) + " (Graded)>")
+                    sw.WriteLine("," + rankings(i))
+                End If
             End If
         Next
 

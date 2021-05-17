@@ -2,4 +2,4 @@
 <Reuse Rank 2>,Binarize_Recurse,Binarize_Simple,Draw_ViewObjects,Edges_BinarizedSobel,FloodFill_Palette,Histogram_Basics,Histogram_SideData,Histogram_SideView2D,Histogram_TopView2D,Kalman_Stripped,KNN_1_to_1,KNN_PointTracker,Mat_4Click,OpenGL_Basics,PointCloud_SetupSide,PointCloud_SetupTop,Reduction_Basics
 <Reuse Rank 3>,Diff_Basics,Edges_Sobel,KNN_BasicsQT,KNN_Options,Motion_Basics,Rectangle_Intersection,Thread_Grid
 <Reuse Rank 4>,Contours_Basics,FloodFill_Basics,Plot_Histogram,Random_Basics
-<Reuse Rank 5>,AddWeighted_Basics,Depth_PointCloud_IMU,Draw_Options,IMU_GVector,Mat_4to1,Rectangle_Basics,Rectangle_Rotated,Kalman_Basics
+<Reuse Rank 5>,AddWeighted_Basics,Depth_PointCloud_IMU,Draw_Options,IMU_GVector,Mat_4to1,Rectangle_Basics,Rectangle_Rotated
