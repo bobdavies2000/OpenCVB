@@ -5,7 +5,7 @@ Public Class OptionsDialog
     Public cameraIndex As Integer ' an index into the cameraRadioButton array.
 
     ' The OakD camera must be the last camera in the enumeration!!!
-    Public cameraDeviceCount(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) As Integer
+    Public cameraCount(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) As Integer
     Public cameraRadioButton(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) As RadioButton
     Public cameraTotalCount = 0
 
@@ -47,7 +47,7 @@ Public Class OptionsDialog
     End Sub
     Public Sub enableCameras()
         For i = 0 To cameraRadioButton.Count - 1
-            If cameraDeviceCount(i) > 0 Then cameraRadioButton(i).Enabled = True
+            If cameraCount(i) > 0 Then cameraRadioButton(i).Enabled = True
         Next
     End Sub
     Public Sub OptionsDialog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -58,7 +58,7 @@ Public Class OptionsDialog
                 cameraRadioButton(i) = New RadioButton
                 CameraGroup.Controls.Add(cameraRadioButton(i))
                 cameraRadioButton(i).Visible = True
-                If cameraDeviceCount(i) = 0 Then cameraRadioButton(i).Enabled = False
+                If cameraCount(i) = 0 Then cameraRadioButton(i).Enabled = False
                 cameraRadioButton(i).AutoSize = True
                 cameraRadioButton(i).Tag = i ' this will manage the public type for the camera - see VB_Classes.vb.
                 cameraRadioButton(i).Text = Choose(i + 1, "Microsoft Kinect for Azure Camera", "StereoLabs ZED 2 camera",

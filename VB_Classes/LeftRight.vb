@@ -2,8 +2,9 @@ Imports cv = OpenCvSharp
 Public Class LeftRight_Basics : Inherits VBparent
     Public Sub New()
         If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 10000, 5000)
-            sliders.setupTrackBar(1, "Brightness Beta (brightness)", -255, 255, -100)
+            Dim kinect = task.parms.cameraName = ActiveTask.algParms.camNames.Kinect4AzureCam
+            sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 10000, If(kinect, 600, 2000))
+            sliders.setupTrackBar(1, "Brightness Beta (brightness)", -255, 255, If(kinect, 0, -100))
         End If
         If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Then findSlider("Brightness Alpha (contrast)").Value = 1500
         label2 = If(task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam, "No right image", "Right Image")
