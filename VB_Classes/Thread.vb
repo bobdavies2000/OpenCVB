@@ -91,8 +91,6 @@ Public Class Thread_Grid : Inherits VBparent
                 borderList.Add(broi)
             Next
 
-            If standalone Or task.intermediateName = caller Then drawGrid()
-
             lastWidth = gWidth
             lastHeight = gHeight
             lastBorder = borderSize
