@@ -69,7 +69,9 @@ Public Class Python_Run : Inherits VBparent
                           "It can only be run outside of OpenCVB.")
                 Exit Sub
             End If
-
+            If pythonApp.Name = "PyStream.py" Then
+                setTrueText("The PyStream.py algorithm is used by a wide variety of apps but has no output when run by itself.")
+            End If
             Dim proc = Process.GetProcessesByName("python")
         End If
     End Sub

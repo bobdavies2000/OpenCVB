@@ -438,7 +438,7 @@ Partial Class OptionsGlobal
         Me.Controls.Add(Me.HistogramSettings)
         Me.Controls.Add(Me.MinMaxDepth)
         Me.Name = "OptionsGlobal"
-        Me.Text = "Options Available to all Algorithms"
+        Me.Text = "Options Available to all Algorithms - changes will be remembered across sessions"
         Me.MinMaxDepth.ResumeLayout(False)
         Me.MinMaxDepth.PerformLayout()
         CType(Me.MaxRange, System.ComponentModel.ISupportInitialize).EndInit()
