@@ -322,10 +322,11 @@ End Module
 Public Class PointCloud_SetupSide : Inherits VBparent
     Dim arcSize As Integer
     Public xCheckbox As Windows.Forms.CheckBox
+    Dim imu As New IMU_GVector
     Public zCheckbox As Windows.Forms.CheckBox
     Public Sub New()
         arcSize = dst1.Width / 15
-        label1 = "Colorize mask for side view"
+        label1 = "Layout markers for side view"
         task.desc = "Create the colorized mat used for side projections"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
@@ -352,10 +353,8 @@ Public Class PointCloud_SetupSide : Inherits VBparent
         Dim markerLeft = New cv.Point(marker.X, cam.Y - marker.Y)
         Dim markerRight = New cv.Point(marker.X, cam.Y + marker.Y)
 
-        If standalone Then
-            Static imu As New IMU_GVector
-            imu.Run(src)
-        End If
+        If standalone Then imu.Run(src)
+
         Dim offset = Math.Sin(task.angleX) * marker.Y
         If zCheckbox.checked Then
             If task.angleX > 0 Then
@@ -415,11 +414,12 @@ End Class
 ' https://www.mynteye.com/pages/mynt-eye-d
 Public Class PointCloud_SetupTop : Inherits VBparent
     Dim arcSize As Integer
+    Public imu As New IMU_GVector
     Public xCheckbox As Windows.Forms.CheckBox
     Public Sub New()
         arcSize = dst1.Width / 15
 
-        label1 = "Colorize mask for top down view"
+        label1 = "Layout markers for top view"
         task.desc = "Create the colorize the mat for a topdown projections"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
@@ -442,10 +442,7 @@ Public Class PointCloud_SetupTop : Inherits VBparent
 
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
         Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
-        If standalone Then
-            Static imu As New IMU_GVector
-            imu.Run(src)
-        End If
+        If standalone Then imu.Run(src)
         Dim offset = Math.Sin(task.angleZ) * topLen
         If zCheckbox.checked Then
             If task.angleZ > 0 Then

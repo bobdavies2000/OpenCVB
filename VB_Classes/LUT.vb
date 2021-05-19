@@ -159,20 +159,3 @@ Public Class LUT_Depth32f : Inherits VBparent
         label1 = lut.label1
     End Sub
 End Class
-
-
-
-
-
-
-
-
-' https://github.com/opencv/opencv/blob/master/samples/cpp/falsecolor.cpp
-Public Class LUT_Color : Inherits VBparent
-    Public Sub New()
-        task.desc = "Apply the current LUT to the input image"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        task.palette.Run(src)
-    End Sub
-End Class
