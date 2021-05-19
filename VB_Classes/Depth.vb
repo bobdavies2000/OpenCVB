@@ -1182,6 +1182,7 @@ Public Class Depth_PointCloud_IMU : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
+        Static manualCheckbox = findCheckBox("Initialize the X- and Z-axis sliders with gravity but allow manual after")
         Static angleYslider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
 
         Dim input = src
@@ -1193,7 +1194,7 @@ Public Class Depth_PointCloud_IMU : Inherits VBparent
         '[sin(a)  cos(a)    0]
         '[0       0         1] rotate the point cloud around
         '  the x-axis.
-        If xCheckbox.Checked Then
+        If xCheckbox.Checked Or manualCheckbox.checked Then
             cz = Math.Cos(task.angleZ)
             sz = Math.Sin(task.angleZ)
         End If
@@ -1201,7 +1202,7 @@ Public Class Depth_PointCloud_IMU : Inherits VBparent
         '[1       0         0      ] rotate the point cloud around the z-axis.
         '[0       cos(a)    -sin(a)]
         '[0       sin(a)    cos(a) ]
-        If zCheckbox.Checked Then
+        If zCheckbox.Checked Or manualCheckbox.checked Then
             cx = Math.Cos(task.angleX)
             sx = Math.Sin(task.angleX)
         End If

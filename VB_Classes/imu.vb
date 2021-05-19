@@ -446,7 +446,7 @@ Public Class IMU_GVector : Inherits VBparent
 
         kalman.kInput = {gx, gy, gz, task.angleX, task.angleY, task.angleZ}
 
-        If task.useKalman Then
+        If task.useKalman And manualCheckbox.checked = False Then
             kalman.Run(src)
             gx = kalman.kOutput(0)
             gy = kalman.kOutput(1)
