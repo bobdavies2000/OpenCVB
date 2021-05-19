@@ -173,7 +173,6 @@ Public Class LUT_Color : Inherits VBparent
         task.desc = "Apply the current LUT to the input image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        task.palette.Run(Nothing)
-
+        task.palette.Run(src)
     End Sub
 End Class
