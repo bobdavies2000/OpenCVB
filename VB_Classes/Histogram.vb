@@ -60,7 +60,6 @@ End Class
 Public Class Histogram_Graph : Inherits VBparent
     Public histRaw(3 - 1) As cv.Mat
     Public histNormalized(3 - 1) As cv.Mat
-    Public bins = 50
     Public minRange As Single = 0
     Public maxRange As Single = 255
     Public backColor = cv.Scalar.Gray
@@ -70,7 +69,7 @@ Public Class Histogram_Graph : Inherits VBparent
         task.desc = "Plot histograms for up to 3 channels."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Then bins = task.histogramBins
+        Dim bins = task.histogramBins
         Dim dimensions() = New Integer() {bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
 

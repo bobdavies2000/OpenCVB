@@ -69,11 +69,6 @@ Public Class Plot_Basics_CPP : Inherits VBparent
         handlePlot.Free()
         handleX.Free()
         handleY.Free()
-        If dst1.Width = 640 Then
-            dst1.Rectangle(New cv.Rect(0, 0, 240, 55), New cv.Scalar(255, 200, 200), -1)
-        Else
-            dst1.Rectangle(New cv.Rect(0, 0, 465, 80), New cv.Scalar(255, 200, 200), -1)
-        End If
         label1 = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + ", y-axis: " + CStr(minY) + " to " + CStr(maxY)
     End Sub
 End Class

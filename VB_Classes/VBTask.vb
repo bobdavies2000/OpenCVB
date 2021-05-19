@@ -386,6 +386,10 @@ Public Class ActiveTask : Implements IDisposable
     End Sub
     Public Sub RunAlgorithm()
         Try
+            If task.depth32f.Width = 0 Then
+                trueText("Hit the transition problem with depth32f uninitialized.")
+                Exit Sub
+            End If
             If task.parms.useRecordedData Then recordedData.Run(task.color.Clone)
             checkIntermediateResults()
             ' run any global options algorithms here.

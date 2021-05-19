@@ -52,6 +52,8 @@ Public Class OptionsCommon : Inherits VBparent
 
         task.lineType = cv.LineTypes.AntiAlias ' cv.LineTypes.Link4 or cv.LineTypes.Link8
 
+        If task.depth32f.Width = 0 Then Exit Sub ' some kind of transition is causing this to show up.  Need a breakpoint here...
+
         If task.depth32f.Size <> task.color.Size Then task.depth32f = task.depth32f.Resize(task.color.Size, 0, 0, cv.InterpolationFlags.Nearest)
         If task.pointCloud.Size <> task.color.Size Then task.pointCloud = task.pointCloud.Resize(task.color.Size, 0, 0, cv.InterpolationFlags.Nearest)
         cv.Cv2.InRange(task.depth32f, task.minDepth, task.maxDepth, task.depthMask)

@@ -6,9 +6,7 @@ Public Class IMU_Basics : Inherits VBparent
     Public theta As cv.Point3f ' this is the description - x, y, and z - of the axes centered in the camera.
     Public gyroAngle As cv.Point3f ' this is the orientation of the gyro.
     Public Sub New()
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
-        End If
+        If sliders.Setup(caller) Then sliders.setupTrackBar(0, "IMU_Basics: Alpha x 1000", 0, 1000, 980)
         task.desc = "Read and display the IMU coordinates"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 3
@@ -427,6 +425,10 @@ Public Class IMU_GVector : Inherits VBparent
         Static xCheckbox = findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ")
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
         Static manualCheckbox = findCheckBox("Initialize the X- and Z-axis sliders with gravity but allow manual after")
+        If manualCheckbox.checked Then
+            xCheckbox.checked = False
+            zCheckbox.checked = False
+        End If
 
         Dim gx = task.IMU_Acceleration.X
         Dim gy = task.IMU_Acceleration.Y

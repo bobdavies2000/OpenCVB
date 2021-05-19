@@ -14,6 +14,7 @@ Public Class SLR_Basics : Inherits VBparent
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Approximate accuracy (tolerance) X100", 1, 1000, 30)
             sliders.setupTrackBar(1, "Simple moving average window size", 1, 100, 20)
+            sliders.setupTrackBar(2, "Desired number of segments (for SLR_Trends)", 1, 100, 20)
         End If
         task.desc = "Segmented Linear Regression example"
     End Sub
@@ -91,25 +92,40 @@ End Class
 
 
 Public Class SLR_Image : Inherits VBparent
-    Dim slr As New SLR_Basics
-    Dim hist as New Histogram_Graph
+    Public slr As New SLR_Basics
+    Public hist As New Histogram_Graph
     Public Sub New()
         hist.plotRequested = True
         label1 = "Original data"
         task.desc = "Run Segmented Linear Regression on grayscale image data - just an experiment"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.plotColors(0) = cv.Scalar.White
-        hist.Run(src)
+        hist.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst1 = hist.dst1
         For i = 0 To hist.histRaw(0).Rows - 1
-            For j = 0 To 3 - 1
-                slr.input.dataX.Add(i)
-                slr.input.dataY.Add(hist.histRaw(j).Get(Of Single)(i, 0))
-            Next
+            slr.input.dataX.Add(i)
+            slr.input.dataY.Add(hist.histRaw(0).Get(Of Single)(i, 0))
         Next
         slr.Run(src)
         dst2 = slr.dst2
     End Sub
-End Class 
+End Class
+
+
+
+
+
+
+
+
+Public Class SLR_Trends : Inherits VBparent
+    Dim slr As New SLR_Image
+    Public Sub New()
+        task.desc = "Manual SLR - just find the trends of the plot data within the each segment"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        slr.Run(src)
+        dst1 = slr.dst1
+    End Sub
+End Class

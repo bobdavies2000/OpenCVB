@@ -148,9 +148,6 @@ Public Class PhotoShop_WhiteBalance : Inherits VBparent
     Dim wPtr As IntPtr
     Public Sub New()
         hist.plotRequested = True
-        hist.bins = 256 * 3
-        hist.maxRange = hist.bins
-
         label1 = "Image with auto white balance"
         task.desc = "Automate getting the right white balance"
     End Sub
