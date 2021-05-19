@@ -100,7 +100,6 @@ End Class
 
 Public Class PointCloud_Continuous : Inherits VBparent
     Public Sub New()
-
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Threshold of continuity in mm", 0, 1000, 10)
         End If
@@ -322,7 +321,6 @@ End Module
 ' https://www.mynteye.com/pages/mynt-eye-d
 Public Class PointCloud_SetupSide : Inherits VBparent
     Dim arcSize As Integer
-    Dim imu As New IMU_GVector
     Public xCheckbox As Windows.Forms.CheckBox
     Public zCheckbox As Windows.Forms.CheckBox
     Public Sub New()
@@ -354,7 +352,10 @@ Public Class PointCloud_SetupSide : Inherits VBparent
         Dim markerLeft = New cv.Point(marker.X, cam.Y - marker.Y)
         Dim markerRight = New cv.Point(marker.X, cam.Y + marker.Y)
 
-        If standalone Then imu.Run(src)
+        If standalone Then
+            Static imu As New IMU_GVector
+            imu.Run(src)
+        End If
         Dim offset = Math.Sin(task.angleX) * marker.Y
         If zCheckbox.checked Then
             If task.angleX > 0 Then
@@ -414,7 +415,6 @@ End Class
 ' https://www.mynteye.com/pages/mynt-eye-d
 Public Class PointCloud_SetupTop : Inherits VBparent
     Dim arcSize As Integer
-    Dim imu As New IMU_GVector
     Public xCheckbox As Windows.Forms.CheckBox
     Public Sub New()
         arcSize = dst1.Width / 15
@@ -442,7 +442,10 @@ Public Class PointCloud_SetupTop : Inherits VBparent
 
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
         Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
-        If standalone Then imu.Run(src)
+        If standalone Then
+            Static imu As New IMU_GVector
+            imu.Run(src)
+        End If
         Dim offset = Math.Sin(task.angleZ) * topLen
         If zCheckbox.checked Then
             If task.angleZ > 0 Then

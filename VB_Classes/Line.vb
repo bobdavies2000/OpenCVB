@@ -699,14 +699,8 @@ Public Class Line_Longest : Inherits VBparent
     Dim lines As New Line_TimeViewLines
     Dim plot As New Plot_OverTime
     Public Sub New()
-        plot.minScale = 0
         plot.plotCount = 1
-
-
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Index of line (sorted by length", 0, 100, 0)
-        End If
-
+        If sliders.Setup(caller) Then sliders.setupTrackBar(0, "Index of line (sorted by length", 0, 100, 0)
         task.desc = "Find the longest line in RGB and use it to validate depth"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -719,7 +713,8 @@ Public Class Line_Longest : Inherits VBparent
             Dim pt1 = lines.pt1List(indexSlider.value)
             Dim pt2 = lines.pt2list(indexSlider.value)
 
-            dst1.Line(pt1, pt2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+            dst1.Line(pt1, pt2, cv.Scalar.Black, task.lineWidth + 4, task.lineType)
+            dst1.Line(pt1, pt2, cv.Scalar.White, task.lineWidth + 1, task.lineType)
 
             Dim sq = 3
             Dim pt = pt1
@@ -738,23 +733,25 @@ Public Class Line_Longest : Inherits VBparent
             If maskRect.Y + maskRect.Height >= dst1.Height Then maskRect.Height = dst1.Height - maskRect.Y
             Dim lineMask = dst1(maskRect).InRange(cv.Scalar.Yellow, cv.Scalar.Yellow)
 
-            Dim depth1 = task.depth32f(maskRect).Mean(lineMask).Item(0) / 1000
-            setTrueText("Depth = " + Format(depth1, "#0.0") + "m", (pt1.X + pt2.X) / 2 + 30, (pt1.Y + pt2.Y) / 2)
-
+            Dim depth = task.depth32f(maskRect).Mean(lineMask).Item(0) / 1000
             Static lastXvalues As New List(Of Single)
-            lastXvalues.Add(depth1)
+            lastXvalues.Add(depth)
             Dim meanVal = lastXvalues.Average()
             If lastXvalues.Count > 50 Then lastXvalues.RemoveAt(0)
+
+            setTrueText("Depth = " + Format(meanVal, "#0.0") + "m", (pt1.X + pt2.X) / 2 + 30, (pt1.Y + pt2.Y) / 2)
+
             label2 = "Mean (horizontal line) = " + Format(meanVal, "#0.0") + "m with " + CStr(lastXvalues.Count) + " samples."
 
-            plot.plotData = New cv.Scalar(depth1, 0, 0)
-            plot.maxScale = task.maxDepth / 1000
+            plot.minScale = 0
+            plot.maxScale = task.maxZ
+            plot.plotData = New cv.Scalar(meanVal, 0, 0)
             plot.Run(Nothing)
             dst2 = plot.dst1.Clone
 
             Dim yMean = (1 - meanVal / plot.maxScale) * dst1.Height
             dst2.Line(New cv.Point(0, yMean), New cv.Point(dst2.Width, yMean), cv.Scalar.Black, task.lineWidth)
-            dst1.Rectangle(maskRect, cv.Scalar.White, task.lineWidth, task.lineType)
+            dst1.Rectangle(maskRect, cv.Scalar.White, task.lineWidth + 2, task.lineType)
         End If
     End Sub
 End Class

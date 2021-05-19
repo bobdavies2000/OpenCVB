@@ -520,7 +520,6 @@ Public Class Histogram_TopView2D : Inherits VBparent
     Public histOutput As New cv.Mat
     Public originalHistOutput As New cv.Mat
     Public markers(2 - 1) As cv.Point2f
-    Public setupTop As New PointCloud_SetupTop
     Public resizeHistOutput As Boolean = True
     Public Sub New()
         label1 = "XZ (Top View)"
@@ -539,9 +538,6 @@ Public Class Histogram_TopView2D : Inherits VBparent
         histOutput = originalHistOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary)
         dst1 = histOutput.Clone
         dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
-        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        setupTop.Run(dst2)
-        dst2 = setupTop.dst1
     End Sub
 End Class
 
@@ -557,7 +553,6 @@ Public Class Histogram_SideView2D : Inherits VBparent
     Public gCloud As New Depth_PointCloud_IMU
     Public histOutput As New cv.Mat
     Public originalHistOutput As New cv.Mat
-    Public setupSide As New PointCloud_SetupSide
     Public frustrumAdjust As Single
     Public resizeHistOutput As Boolean = True
     Public Sub New()
@@ -574,10 +569,6 @@ Public Class Histogram_SideView2D : Inherits VBparent
 
         histOutput = originalHistOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
         histOutput.ConvertTo(dst1, cv.MatType.CV_8UC1)
-
-        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        setupSide.Run(dst2)
-        dst2 = setupSide.dst1
     End Sub
 End Class
 

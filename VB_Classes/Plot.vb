@@ -152,11 +152,6 @@ Public Class Plot_OverTime : Inherits VBparent
             minScale -= topBottomPad
             maxScale += topBottomPad
 
-            If minScale = 0 And maxScale = 0 Then
-                minScale = 50
-                maxScale = 200
-            End If
-
             lastXdelta.Clear()
             offChartCount = 0
             columnIndex = 0 ' restart at the left side of the chart
@@ -256,10 +251,10 @@ Module Plot_OpenCV_Module
 
     Public Sub AddPlotScale(dst1 As cv.Mat, minVal As Double, maxVal As Double, fontSize As Double)
         ' draw a scale along the side
-        Dim spacer = CInt(dst1.Height / 5)
-        Dim spaceVal = CInt((maxVal - minVal) / 5)
+        Dim spacer = CInt(dst1.Height / 4)
+        Dim spaceVal = CInt((maxVal - minVal) / 4)
         If spaceVal < 1 Then spaceVal = 1
-        For i = 0 To 4
+        For i = 0 To 4 - 1
             Dim pt1 = New cv.Point(0, spacer * i)
             Dim pt2 = New cv.Point(dst1.Width, spacer * i)
             dst1.Line(pt1, pt2, cv.Scalar.White, task.lineWidth)
