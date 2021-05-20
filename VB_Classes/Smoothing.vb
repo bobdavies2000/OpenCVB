@@ -216,10 +216,11 @@ Public Class Smoothing_Contours : Inherits VBparent
 		Next
 
 		smooth.Run(Nothing)
-		If smooth.smoothPoints.Count > 0 Then drawPoly(dst1, smooth.smoothPoints.ToArray, smooth.plotColor)
-
-		label1 = "Smoothing with " + If(radio.check(0).Checked, "Interior", "Exterior") + " lines"
-		label2 = "Found " + CStr(contours0.Count) + " countours in the largest blob"
+		If smooth.smoothpoints IsNot Nothing Then
+			If smooth.smoothPoints.Count > 0 Then drawPoly(dst1, smooth.smoothPoints.ToArray, smooth.plotColor)
+			label1 = "Smoothing with " + If(radio.check(0).Checked, "Interior", "Exterior") + " lines"
+			label2 = "Found " + CStr(contours0.Count) + " countours in the largest blob"
+		End If
 	End Sub
 End Class
 

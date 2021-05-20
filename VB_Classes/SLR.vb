@@ -145,7 +145,23 @@ Public Class SLR_Trends : Inherits VBparent
             valList.Add(indexer(i))
         Next
 
-        'Dim incr = task.histogramBins / segs
+        Dim spacer = dst1.Width / segs
+        For i = 0 To segs - 1
+            Dim offset = CInt(i * spacer)
+            Dim p1 = New cv.Point2f(offset, 0)
+            Dim p2 = New cv.Point2f(offset, dst1.Height)
+            dst1.Line(p1, p2, cv.Scalar.Black, task.lineWidth)
+
+            minVal = Single.MaxValue
+            maxVal = Single.MinValue
+            'For j = 0 To CInt(spacer - 1)
+            '    If minVal > valList(offset + j) Then
+            '        'minVal = 
+            '    End If
+            'Next
+        Next
+
+        Dim incr = task.histogramBins / segs
         'Dim index As Integer
         'While index < valList.Count
         '    Dim min = Single.MaxValue
