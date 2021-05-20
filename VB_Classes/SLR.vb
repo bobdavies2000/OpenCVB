@@ -14,7 +14,7 @@ Public Class SLR_Basics : Inherits VBparent
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Approximate accuracy (tolerance) X100", 1, 1000, 30)
             sliders.setupTrackBar(1, "Simple moving average window size", 1, 100, 20)
-            sliders.setupTrackBar(2, "Desired number of segments (for SLR_Trends)", 1, 100, 20)
+            sliders.setupTrackBar(2, "Desired number of segments (for SLR_Trends)", 1, 80, 20)
         End If
         task.desc = "Segmented Linear Regression example"
     End Sub
@@ -121,11 +121,41 @@ End Class
 
 Public Class SLR_Trends : Inherits VBparent
     Dim slr As New SLR_Image
+    Structure trend
+        Dim min As Single
+        Dim max As Single
+        Dim peakLeft As Boolean
+        Dim peakRight As Boolean
+    End Structure
     Public Sub New()
         task.desc = "Manual SLR - just find the trends of the plot data within the each segment"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static segSlider = findSlider("Desired number of segments (for SLR_Trends)")
+        Dim segs = segSlider.value
+
+        task.histogramBins = 256
+        label1 = "There are " + CStr(segs) + " with " + CStr(task.histogramBins) + " histogram bins."
         slr.Run(src)
         dst1 = slr.dst1
+
+        Dim indexer = slr.hist.histRaw(0).GetGenericIndexer(Of Single)()
+        Dim valList As New List(Of Single)
+        For i = 0 To slr.hist.histRaw(0).Rows - 1
+            valList.Add(indexer(i))
+        Next
+
+        'Dim incr = task.histogramBins / segs
+        'Dim index As Integer
+        'While index < valList.Count
+        '    Dim min = Single.MaxValue
+        '    Dim max = Single.MinValue
+        '    For j = CInt(index) To CInt(index + incr) - 1
+        '        If min > indexer(j) Then
+        '            min = indexer(j)
+        '        End If
+        '        If max < indexer(j) Then max = indexer(j)
+        '    Next
+        'End While
     End Sub
 End Class

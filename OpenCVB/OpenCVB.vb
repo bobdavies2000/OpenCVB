@@ -548,7 +548,7 @@ Public Class OpenCVB
                     workingRes = New cv.Size(1280, 720)
                     If .cameraRadioButton.Count > 1 Then
                         While 1
-                            nextCameraIndex = If(nextCameraIndex = .cameraRadioButton.Count - 1, 0, nextCameraIndex + 1)
+                            nextCameraIndex = If(nextCameraIndex < .cameraRadioButton.Count - 1, nextCameraIndex + 1, 0)
                             If .cameraRadioButton(nextCameraIndex).Enabled Then
                                 .cameraRadioButton(nextCameraIndex).Checked = True
                                 .resolution1280.Checked = True ' start every camera at 1280x720
