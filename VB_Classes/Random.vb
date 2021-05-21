@@ -303,7 +303,7 @@ Public Class Random_MonteCarlo : Inherits VBparent
     Public plotHist As New Plot_Histogram
     Public outputRandom = New cv.Mat(4000, 1, cv.MatType.CV_32S, 0) ' allocate the desired number of random numbers - size can be just one to get the next random value
     Public Sub New()
-        plotHist.fixedMaxVal = 100
+        plotHist.plotMaxValue = 100
 
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Number of bins", 1, 255, 91)
@@ -353,7 +353,7 @@ Public Class Random_CustomHistogram : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        hist.plotHist.fixedMaxVal = 0 ' we are sharing the plothist with the code below...
+        hist.plotHist.plotMaxValue = 0 ' we are sharing the plothist with the code below...
         hist.Run(src)
         dst1 = hist.dst1.Clone()
         saveHist = hist.plotHist.hist.Clone()
@@ -362,7 +362,7 @@ Public Class Random_CustomHistogram : Inherits VBparent
         random.Run(src)
 
         If standalone Or task.intermediateName = caller Then
-            hist.plotHist.fixedMaxVal = 100
+            hist.plotHist.plotMaxValue = 100
             hist.plotHist.hist = random.outputHistogram
             hist.plotHist.Run(src)
             dst2 = hist.plotHist.dst1

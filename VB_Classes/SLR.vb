@@ -93,19 +93,17 @@ End Class
 
 Public Class SLR_Image : Inherits VBparent
     Public slr As New SLR_Basics
-    Public hist As New Histogram_Graph
+    Public hist As New Histogram_Basics
     Public Sub New()
-        hist.plotRequested = True
         label1 = "Original data"
         task.desc = "Run Segmented Linear Regression on grayscale image data - just an experiment"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        hist.plotColors(0) = cv.Scalar.White
         hist.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst1 = hist.dst1
-        For i = 0 To hist.histRaw(0).Rows - 1
+        For i = 0 To hist.histogram.Rows - 1
             slr.input.dataX.Add(i)
-            slr.input.dataY.Add(hist.histRaw(0).Get(Of Single)(i, 0))
+            slr.input.dataY.Add(hist.histogram.Get(Of Single)(i, 0))
         Next
         slr.Run(src)
         dst2 = slr.dst2
@@ -121,12 +119,6 @@ End Class
 
 Public Class SLR_Trends : Inherits VBparent
     Dim slr As New SLR_Image
-    Structure trend
-        Dim min As Single
-        Dim max As Single
-        Dim peakLeft As Boolean
-        Dim peakRight As Boolean
-    End Structure
     Public Sub New()
         task.desc = "Manual SLR - just find the trends of the plot data within the each segment"
     End Sub
@@ -139,39 +131,144 @@ Public Class SLR_Trends : Inherits VBparent
         slr.Run(src)
         dst1 = slr.dst1
 
-        Dim indexer = slr.hist.histRaw(0).GetGenericIndexer(Of Single)()
+        Dim indexer = slr.hist.histogram.GetGenericIndexer(Of Single)()
         Dim valList As New List(Of Single)
-        For i = 0 To slr.hist.histRaw(0).Rows - 1
+        For i = 0 To slr.hist.histogram.Rows - 1
             valList.Add(indexer(i))
         Next
+        slr.hist.plotHist.plotMaxValue = valList.Max
 
+        Dim incr = valList.Count / segs
         Dim spacer = dst1.Width / segs
-        For i = 0 To segs - 1
-            Dim offset = CInt(i * spacer)
+        Dim pixelsPerUnit = dst1.Height / slr.hist.plotHist.plotMaxValue
+        Dim accum As Single, lastI As Integer, offset As Single, segIndex As Integer
+        For i = 0 To valList.Count - 1
+            offset = CInt(segIndex * spacer)
+            If i >= segIndex * incr Then
+                If segIndex > 0 Then
+                    Dim p0 = New cv.Point2f(offset - spacer / 2, dst1.Height - accum * pixelsPerUnit / (i - lastI))
+                    dst1.Circle(p0, task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
+                End If
+                accum = 0
+                segIndex += 1
+                lastI = i
+            End If
             Dim p1 = New cv.Point2f(offset, 0)
             Dim p2 = New cv.Point2f(offset, dst1.Height)
             dst1.Line(p1, p2, cv.Scalar.Black, task.lineWidth)
+            accum += valList(i)
+        Next
+        Dim pt = New cv.Point2f(offset - spacer / 2, dst1.Height - accum * pixelsPerUnit / (valList.Count - lastI - 1))
+        dst1.Circle(pt, task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
+    End Sub
+End Class
 
-            minVal = Single.MaxValue
-            maxVal = Single.MinValue
-            'For j = 0 To CInt(spacer - 1)
-            '    If minVal > valList(offset + j) Then
-            '        'minVal = 
-            '    End If
-            'Next
+
+
+
+
+
+
+
+Public Class SLR_TrendSplitter : Inherits VBparent
+    Dim slr As New SLR_Image
+    Public Sub New()
+        task.desc = "Find trends by finding peak/valley and splitting data."
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static segSlider = findSlider("Desired number of segments (for SLR_Trends)")
+        Dim segs = segSlider.value
+
+        'task.histogramBins = 256
+        label1 = ""
+        slr.Run(src)
+        dst1 = slr.dst1
+
+        Dim indexer = slr.hist.histogram.GetGenericIndexer(Of Single)()
+        Dim valList As New List(Of Single)
+        Dim spacer = dst1.Width / segs
+        Dim offset As Single, segIndex As Integer
+        Dim incr = CInt(slr.hist.histogram.Rows / segs / 2)
+        For i = 0 To slr.hist.histogram.Rows - 1
+            offset = CInt(segIndex * spacer)
+            If i > segIndex * incr * 2 Then
+                Dim p1 = New cv.Point2f(offset, 0)
+                Dim p2 = New cv.Point2f(offset, dst1.Height)
+                dst1.Line(p1, p2, cv.Scalar.Black, task.lineWidth)
+                segIndex += 1
+            End If
+            valList.Add(indexer(i))
         Next
 
-        Dim incr = task.histogramBins / segs
-        'Dim index As Integer
-        'While index < valList.Count
-        '    Dim min = Single.MaxValue
-        '    Dim max = Single.MinValue
-        '    For j = CInt(index) To CInt(index + incr) - 1
-        '        If min > indexer(j) Then
-        '            min = indexer(j)
-        '        End If
-        '        If max < indexer(j) Then max = indexer(j)
-        '    Next
-        'End While
+        Dim sortList As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
+        Dim avg = valList.Average()
+        For i = 0 To valList.Count - 1
+            If valList(i) > avg / 4 Then sortList.Add(valList(i), i) Else sortList.Add(avg, i)
+        Next
+
+        Dim used(valList.Count - 1) As Boolean
+        Dim usedCount As Integer
+        Dim toggle As Boolean
+        Dim backSide As Integer
+        slr.hist.plotHist.plotMaxValue = valList.Max
+        For i = 0 To valList.Count - 1
+            Dim index = sortList.ElementAt(i).Value
+            If used(index) = False Then
+                If toggle Then
+                    index = sortList.ElementAt(sortList.Count - backSide - 1).Value
+                    backSide += 1
+                End If
+                toggle = Not toggle
+                Dim pt = New cv.Point2f(dst1.Width * index / valList.Count, dst1.Height - dst1.Height * valList(index) / slr.hist.plotHist.plotMaxValue)
+                dst1.Circle(pt, task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
+
+                For j = Math.Max(0, index - incr) To Math.Min(valList.Count, index + incr) - 1
+                    used(j) = True
+                Next
+                usedCount += 1
+                If usedCount >= segs Then Exit For
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class SLR_TrendFusion : Inherits VBparent
+    Dim slr As New SLR_Image
+    Public Sub New()
+        task.desc = "Find trends by filling in short gaps."
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static segSlider = findSlider("Desired number of segments (for SLR_Trends)")
+        Dim segs = segSlider.value
+
+        label1 = ""
+        slr.Run(src)
+        dst1 = slr.dst1
+
+        Dim indexer = slr.hist.histogram.GetGenericIndexer(Of Single)()
+        Dim valList As New List(Of Single)
+        Dim incr = CInt(slr.hist.histogram.Rows / segs / 2)
+        For i = 0 To slr.hist.histogram.Rows - 1
+            valList.Add(indexer(i))
+        Next
+
+        If valList.Count < 2 Then Exit Sub
+        slr.hist.plotHist.plotMaxValue = valList.Max
+        For i = 1 To valList.Count - 2
+            Dim prevVal = valList(i - 1)
+            Dim currVal = valList(i)
+            Dim nextVal = valList(i + 1)
+            If prevVal > currVal And nextVal > currVal Then valList(i) = (prevVal + nextVal) / 2
+            Dim p1 = New cv.Point2f(dst1.Width * (i - 1) / valList.Count, dst1.Height - dst1.Height * valList(i - 1) / slr.hist.plotHist.plotMaxValue)
+            Dim p2 = New cv.Point2f(dst1.Width * i / valList.Count, dst1.Height - dst1.Height * valList(i) / slr.hist.plotHist.plotMaxValue)
+            dst1.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+        Next
     End Sub
 End Class

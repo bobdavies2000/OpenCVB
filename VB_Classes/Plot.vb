@@ -196,7 +196,7 @@ Public Class Plot_Histogram : Inherits VBparent
     Public minRange As Integer = 0
     Public maxRange As Integer = 255
     Public backColor As cv.Scalar = cv.Scalar.Red
-    Public fixedMaxVal As Integer
+    Public plotMaxValue As Integer
     Public Sub New()
         task.desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
@@ -211,13 +211,13 @@ Public Class Plot_Histogram : Inherits VBparent
         Dim barWidth = dst1.Width / hist.Rows
         hist.MinMaxLoc(minVal, maxVal)
 
-        If fixedMaxVal = 0 Then
+        If plotMaxValue = 0 Then
             Static savedMaxVal = maxVal
             maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000
             If maxVal < 0 Then maxVal = savedMaxVal
             If Math.Abs((maxVal - savedMaxVal)) / maxVal < 0.5 Then maxVal = savedMaxVal Else savedMaxVal = maxVal
         Else
-            maxVal = fixedMaxVal
+            maxVal = plotMaxValue
         End If
 
         If maxVal > 0 And hist.Rows > 0 Then

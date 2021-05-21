@@ -1303,7 +1303,7 @@ Public Class PointCoud_SurfaceH : Inherits VBparent
             If topRow = 0 And indexer(i) > 10 Then topRow = i
         Next
 
-        plot.fixedMaxVal = (Math.Floor(peakVal / 100) + 1) * 100
+        plot.plotMaxValue = (Math.Floor(peakVal / 100) + 1) * 100
         For i = plot.hist.Rows - 1 To 0 Step -1
             If botRow = 0 And indexer(i) > 10 Then botRow = i
         Next

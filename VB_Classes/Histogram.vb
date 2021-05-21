@@ -31,16 +31,14 @@ Public Class Histogram_Basics : Inherits VBparent
         Dim dimensions() = New Integer() {task.histogramBins}
         cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, New cv.Mat, histogram, 1, dimensions, ranges)
 
-        If task.useKalman Then
-            ReDim kalman.kInput(task.histogramBins - 1)
-            For i = 0 To task.histogramBins - 1
-                kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
-            Next
-            kalman.Run(src)
-            For i = 0 To task.histogramBins - 1
-                histogram.Set(Of Single)(i, 0, kalman.kOutput(i))
-            Next
-        End If
+        ReDim kalman.kInput(task.histogramBins - 1)
+        For i = 0 To task.histogramBins - 1
+            kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
+        Next
+        kalman.Run(src)
+        For i = 0 To task.histogramBins - 1
+            histogram.Set(Of Single)(i, 0, kalman.kOutput(i))
+        Next
 
         plotHist.hist = histogram
         If standalone Or task.intermediateName = caller Then plotHist.backColor = splitColors(splitIndex)
@@ -65,6 +63,7 @@ Public Class Histogram_Graph : Inherits VBparent
     Public backColor = cv.Scalar.Gray
     Public plotRequested As Boolean
     Public plotColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
+    Public plotMaxValue As Single
     Public Sub New()
         task.desc = "Plot histograms for up to 3 channels."
     End Sub
@@ -76,7 +75,6 @@ Public Class Histogram_Graph : Inherits VBparent
         Dim plotWidth = dst1.Width / bins
 
         dst1.SetTo(backColor)
-        Dim maxVal As Double
         For i = 0 To src.Channels - 1
             Dim hist As New cv.Mat
             cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {i}, New cv.Mat(), hist, 1, dimensions, ranges)
@@ -95,8 +93,8 @@ Public Class Histogram_Graph : Inherits VBparent
         Next
 
         If standalone Or plotRequested Then
-            maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000 ' smooth things out a little for the scale below
-            AddPlotScale(dst1, 0, maxVal, task.fontSize * 2)
+            plotMaxValue = Math.Round(maxVal / 1000, 0) * 1000 + 1000 ' smooth things out a little for the scale below
+            AddPlotScale(dst1, 0, plotMaxValue, task.fontSize * 2)
             label1 = "Histogram for src image (default color) - " + CStr(bins) + " bins"
         End If
     End Sub
