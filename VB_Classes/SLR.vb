@@ -148,8 +148,7 @@ End Class
 
 
 Public Class SLR_Trends : Inherits VBparent
-    Public slr As Object
-    Dim slrImage As New SLR_Image
+    Public slr As Object = New SLR_Image
     Dim valList As New List(Of Single)
     Dim barMidPoint As Integer
     Dim lastPoint As cv.Point2f
@@ -165,7 +164,7 @@ Public Class SLR_Trends : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         label1 = "Histogram with Yellow line showing the trends"
-        If standalone Then slr = slrImage
+        slr.hist.plothist.backcolor = cv.Scalar.Red
         slr.Run(src)
         dst1 = slr.dst1
 
@@ -216,6 +215,7 @@ Public Class SLR_TrendImages : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim split = src.Split()
+
         trends.slr = slrGray
 
         Dim splitIndex = 0
@@ -241,6 +241,24 @@ Public Class SLR_TrendImages : Inherits VBparent
             trends.Run(split(splitIndex))
         Next
 
+        dst1 = trends.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class SLR_V2V : Inherits VBparent
+    Dim trends As New SLR_Depth
+    Public Sub New()
+        task.desc = "Identify ranges by marking histogram entries from valley to valley"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        trends.Run(task.depth32f)
         dst1 = trends.dst1
     End Sub
 End Class
