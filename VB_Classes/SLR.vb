@@ -98,7 +98,8 @@ Public Class SLR_Image : Inherits VBparent
         task.desc = "Run Segmented Linear Regression on grayscale image data - just an experiment"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        hist.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        hist.Run(src)
         dst1 = hist.dst1
         For i = 0 To hist.histogram.Rows - 1
             slr.input.dataX.Add(i)
@@ -202,19 +203,44 @@ Public Class SLR_TrendImages : Inherits VBparent
     Dim slrDepth As New SLR_Depth
     Public Sub New()
         If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 2)
-            radio.check(0).Text = "Grayscale input"
-            radio.check(1).Text = "Depth32f input"
+            radio.Setup(caller, 5)
+            radio.check(0).Text = "Depth32f input"
+            radio.check(1).Text = "Grayscale input"
+            radio.check(2).Text = "Blue input"
+            radio.check(3).Text = "Green input"
+            radio.check(4).Text = "Red input"
             radio.check(1).Checked = True
         End If
 
         task.desc = "Find trends by filling in short histogram gaps for depth or grayscale images"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static grayRadio = findRadio("Grayscale input")
-        Dim useDepth = grayRadio.checked = False
-        trends.slr = If(useDepth, slrDepth, slrGray)
-        trends.Run(If(useDepth, task.depth32f, src))
+        Dim split = src.Split()
+        trends.slr = slrGray
+
+        Dim splitIndex = 0
+        For i = 0 To radio.check.Count - 1
+            If radio.check(0).Checked Then
+                trends.slr = slrDepth
+                trends.Run(task.depth32f)
+                label1 = "SLR_TrendImages - Depth32f"
+                Exit For
+            End If
+            If radio.check(1).Checked Then
+                trends.Run(src)
+                label1 = "SLR_TrendImages - grayscale"
+                Exit For
+            End If
+            If radio.check(2).Checked Then
+                label1 = "SLR_TrendImages - blue channel"
+                splitIndex = 0
+            Else
+                splitIndex = If(radio.check(3).Checked, 1, 2)
+                label1 = "SLR_TrendImages - " + If(radio.check(3).Checked, "Green", "Red") + " channel"
+            End If
+            trends.Run(split(splitIndex))
+        Next
+
         dst1 = trends.dst1
     End Sub
 End Class
