@@ -13,8 +13,7 @@ Public Class SLR_Basics : Inherits VBparent
 
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Approximate accuracy (tolerance) X100", 1, 1000, 30)
-            sliders.setupTrackBar(1, "Simple moving average window size", 1, 100, 20)
-            sliders.setupTrackBar(2, "Desired number of segments (for SLR_Trends)", 1, 80, 20)
+            sliders.setupTrackBar(1, "Simple moving average window size", 1, 100, 10)
         End If
         task.desc = "Segmented Linear Regression example"
     End Sub
@@ -116,159 +115,106 @@ End Class
 
 
 
+Public Class SLR_Depth : Inherits VBparent
+    Public slr As New SLR_Basics
+    Public hist As New Histogram_Basics
+    Public Sub New()
+        label1 = "Original data"
+        task.desc = "Run Segmented Linear Regression on depth data"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        If src.Type <> cv.MatType.CV_32FC1 Then src = task.depth32f
+        hist.plotHist.maxRange = task.maxZ * 1000
+        hist.depthNoZero = True ' not interested in the undefined depth areas...
+        hist.Run(src)
+        hist.histogram.Set(Of Single)(0, 0, 0)
+        dst1 = hist.dst1
+        For i = 0 To hist.histogram.Rows - 1
+            slr.input.dataX.Add(i)
+            slr.input.dataY.Add(hist.histogram.Get(Of Single)(i, 0))
+        Next
+        slr.Run(src)
+        dst2 = slr.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
 
 Public Class SLR_Trends : Inherits VBparent
-    Dim slr As New SLR_Image
+    Public slr As Object
+    Dim slrImage As New SLR_Image
+    Dim valList As New List(Of Single)
+    Dim barMidPoint As Integer
+    Dim lastPoint As cv.Point2f
+    Public resultingPoints As New List(Of cv.Point2f)
     Public Sub New()
-        task.desc = "Manual SLR - just find the trends of the plot data within the each segment"
+        task.desc = "Find trends by filling in short histogram gaps in the given image's histogram."
+    End Sub
+    Private Sub connectLine(i As Integer)
+        Dim p1 = New cv.Point2f(barMidPoint + dst1.Width * i / valList.Count, dst1.Height - dst1.Height * valList(i) / slr.hist.plotHist.plotMaxValue)
+        resultingPoints.Add(p1)
+        dst1.Line(lastPoint, p1, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+        lastPoint = p1
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static segSlider = findSlider("Desired number of segments (for SLR_Trends)")
-        Dim segs = segSlider.value
-
-        task.histogramBins = 256
-        label1 = "There are " + CStr(segs) + " with " + CStr(task.histogramBins) + " histogram bins."
+        label1 = "Histogram with Yellow line showing the trends"
+        If standalone Then slr = slrImage
         slr.Run(src)
         dst1 = slr.dst1
 
         Dim indexer = slr.hist.histogram.GetGenericIndexer(Of Single)()
-        Dim valList As New List(Of Single)
+        valList = New List(Of Single)
         For i = 0 To slr.hist.histogram.Rows - 1
             valList.Add(indexer(i))
         Next
-        slr.hist.plotHist.plotMaxValue = valList.Max
-
-        Dim incr = valList.Count / segs
-        Dim spacer = dst1.Width / segs
-        Dim pixelsPerUnit = dst1.Height / slr.hist.plotHist.plotMaxValue
-        Dim accum As Single, lastI As Integer, offset As Single, segIndex As Integer
-        For i = 0 To valList.Count - 1
-            offset = CInt(segIndex * spacer)
-            If i >= segIndex * incr Then
-                If segIndex > 0 Then
-                    Dim p0 = New cv.Point2f(offset - spacer / 2, dst1.Height - accum * pixelsPerUnit / (i - lastI))
-                    dst1.Circle(p0, task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
-                End If
-                accum = 0
-                segIndex += 1
-                lastI = i
-            End If
-            Dim p1 = New cv.Point2f(offset, 0)
-            Dim p2 = New cv.Point2f(offset, dst1.Height)
-            dst1.Line(p1, p2, cv.Scalar.Black, task.lineWidth)
-            accum += valList(i)
-        Next
-        Dim pt = New cv.Point2f(offset - spacer / 2, dst1.Height - accum * pixelsPerUnit / (valList.Count - lastI - 1))
-        dst1.Circle(pt, task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class SLR_TrendSplitter : Inherits VBparent
-    Dim slr As New SLR_Image
-    Public Sub New()
-        task.desc = "Find trends by finding peak/valley and splitting data."
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static segSlider = findSlider("Desired number of segments (for SLR_Trends)")
-        Dim segs = segSlider.value
-
-        'task.histogramBins = 256
-        label1 = ""
-        slr.Run(src)
-        dst1 = slr.dst1
-
-        Dim indexer = slr.hist.histogram.GetGenericIndexer(Of Single)()
-        Dim valList As New List(Of Single)
-        Dim spacer = dst1.Width / segs
-        Dim offset As Single, segIndex As Integer
-        Dim incr = CInt(slr.hist.histogram.Rows / segs / 2)
-        For i = 0 To slr.hist.histogram.Rows - 1
-            offset = CInt(segIndex * spacer)
-            If i > segIndex * incr * 2 Then
-                Dim p1 = New cv.Point2f(offset, 0)
-                Dim p2 = New cv.Point2f(offset, dst1.Height)
-                dst1.Line(p1, p2, cv.Scalar.Black, task.lineWidth)
-                segIndex += 1
-            End If
-            valList.Add(indexer(i))
-        Next
-
-        Dim sortList As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
-        Dim avg = valList.Average()
-        For i = 0 To valList.Count - 1
-            If valList(i) > avg / 4 Then sortList.Add(valList(i), i) Else sortList.Add(avg, i)
-        Next
-
-        Dim used(valList.Count - 1) As Boolean
-        Dim usedCount As Integer
-        Dim toggle As Boolean
-        Dim backSide As Integer
-        slr.hist.plotHist.plotMaxValue = valList.Max
-        For i = 0 To valList.Count - 1
-            Dim index = sortList.ElementAt(i).Value
-            If used(index) = False Then
-                If toggle Then
-                    index = sortList.ElementAt(sortList.Count - backSide - 1).Value
-                    backSide += 1
-                End If
-                toggle = Not toggle
-                Dim pt = New cv.Point2f(dst1.Width * index / valList.Count, dst1.Height - dst1.Height * valList(index) / slr.hist.plotHist.plotMaxValue)
-                dst1.Circle(pt, task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
-
-                For j = Math.Max(0, index - incr) To Math.Min(valList.Count, index + incr) - 1
-                    used(j) = True
-                Next
-                usedCount += 1
-                If usedCount >= segs Then Exit For
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class SLR_TrendFusion : Inherits VBparent
-    Dim slr As New SLR_Image
-    Public Sub New()
-        task.desc = "Find trends by filling in short gaps."
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static segSlider = findSlider("Desired number of segments (for SLR_Trends)")
-        Dim segs = segSlider.value
-
-        label1 = ""
-        slr.Run(src)
-        dst1 = slr.dst1
-
-        Dim indexer = slr.hist.histogram.GetGenericIndexer(Of Single)()
-        Dim valList As New List(Of Single)
-        Dim incr = CInt(slr.hist.histogram.Rows / segs / 2)
-        For i = 0 To slr.hist.histogram.Rows - 1
-            valList.Add(indexer(i))
-        Next
+        barMidPoint = dst1.Width / valList.Count / 2
 
         If valList.Count < 2 Then Exit Sub
         slr.hist.plotHist.plotMaxValue = valList.Max
+        lastPoint = New cv.Point2f(barMidPoint, dst1.Height - dst1.Height * valList(0) / slr.hist.plotHist.plotMaxValue)
+        resultingPoints.Clear()
+        resultingPoints.Add(lastPoint)
         For i = 1 To valList.Count - 2
-            Dim prevVal = valList(i - 1)
-            Dim currVal = valList(i)
-            Dim nextVal = valList(i + 1)
-            If prevVal > currVal And nextVal > currVal Then valList(i) = (prevVal + nextVal) / 2
-            Dim p1 = New cv.Point2f(dst1.Width * (i - 1) / valList.Count, dst1.Height - dst1.Height * valList(i - 1) / slr.hist.plotHist.plotMaxValue)
-            Dim p2 = New cv.Point2f(dst1.Width * i / valList.Count, dst1.Height - dst1.Height * valList(i) / slr.hist.plotHist.plotMaxValue)
-            dst1.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+            If valList(i - 1) > valList(i) And valList(i + 1) > valList(i) Then valList(i) = (valList(i - 1) + valList(i + 1)) / 2
+            connectLine(i)
         Next
+        connectLine(valList.Count - 1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class SLR_TrendImages : Inherits VBparent
+    Dim trends As New SLR_Trends
+    Dim slrGray As New SLR_Image
+    Dim slrDepth As New SLR_Depth
+    Public Sub New()
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 2)
+            radio.check(0).Text = "Grayscale input"
+            radio.check(1).Text = "Depth32f input"
+            radio.check(1).Checked = True
+        End If
+
+        task.desc = "Find trends by filling in short histogram gaps for depth or grayscale images"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static grayRadio = findRadio("Grayscale input")
+        Dim useDepth = grayRadio.checked = False
+        trends.slr = If(useDepth, slrDepth, slrGray)
+        trends.Run(If(useDepth, task.depth32f, src))
+        dst1 = trends.dst1
     End Sub
 End Class

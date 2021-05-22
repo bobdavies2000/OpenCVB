@@ -4,6 +4,7 @@ Public Class Histogram_Basics : Inherits VBparent
     Public histogram As New cv.Mat
     Public kalman As New Kalman_Basics
     Public plotHist As New Plot_Histogram
+    Public depthNoZero As Boolean
     Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
     Public Sub New()
         plotHist.minRange = 0
@@ -40,6 +41,7 @@ Public Class Histogram_Basics : Inherits VBparent
             histogram.Set(Of Single)(i, 0, kalman.kOutput(i))
         Next
 
+        If depthNoZero Then histogram.Set(Of Single)(0, 0, 0) ' let's not plot the depth at zero...
         plotHist.hist = histogram
         If standalone Or task.intermediateName = caller Then plotHist.backColor = splitColors(splitIndex)
         plotHist.Run(src)
