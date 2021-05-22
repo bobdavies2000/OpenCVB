@@ -147,7 +147,7 @@ End Class
 
 
 
-Public Class SLR_Trends : Inherits VBparent
+Public Class SLR_TrendCompare : Inherits VBparent
     Public slr As Object = New SLR_Image
     Dim valList As New List(Of Single)
     Dim barMidPoint As Integer
@@ -167,6 +167,7 @@ Public Class SLR_Trends : Inherits VBparent
         slr.hist.plothist.backcolor = cv.Scalar.Red
         slr.Run(src)
         dst1 = slr.dst1
+        dst2 = slr.dst2
 
         Dim indexer = slr.hist.histogram.GetGenericIndexer(Of Single)()
         valList = New List(Of Single)
@@ -196,10 +197,57 @@ End Class
 
 
 
+Public Class SLR_Trends : Inherits VBparent
+    Public hist As New Histogram_Basics
+    Dim valList As New List(Of Single)
+    Dim barMidPoint As Integer
+    Dim lastPoint As cv.Point2f
+    Public resultingPoints As New List(Of cv.Point2f)
+    Public Sub New()
+        task.desc = "Find trends by filling in short histogram gaps in the given image's histogram."
+    End Sub
+    Private Sub connectLine(i As Integer)
+        Dim p1 = New cv.Point2f(barMidPoint + dst1.Width * i / valList.Count, dst1.Height - dst1.Height * valList(i) / hist.plotHist.plotMaxValue)
+        resultingPoints.Add(p1)
+        dst1.Line(lastPoint, p1, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+        lastPoint = p1
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        label1 = "Histogram with Yellow line showing the trends"
+        hist.plotHist.backColor = cv.Scalar.Red
+        hist.Run(src)
+        dst1 = hist.dst1
+
+        Dim indexer = hist.histogram.GetGenericIndexer(Of Single)()
+        valList = New List(Of Single)
+        For i = 0 To hist.histogram.Rows - 1
+            valList.Add(indexer(i))
+        Next
+        barMidPoint = dst1.Width / valList.Count / 2
+
+        If valList.Count < 2 Then Exit Sub
+        hist.plotHist.plotMaxValue = valList.Max
+        lastPoint = New cv.Point2f(barMidPoint, dst1.Height - dst1.Height * valList(0) / hist.plotHist.plotMaxValue)
+        resultingPoints.Clear()
+        resultingPoints.Add(lastPoint)
+        For i = 1 To valList.Count - 2
+            If valList(i - 1) > valList(i) And valList(i + 1) > valList(i) Then valList(i) = (valList(i - 1) + valList(i + 1)) / 2
+            connectLine(i)
+        Next
+        connectLine(valList.Count - 1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
 Public Class SLR_TrendImages : Inherits VBparent
     Dim trends As New SLR_Trends
-    Dim slrGray As New SLR_Image
-    Dim slrDepth As New SLR_Depth
     Public Sub New()
         If findfrm(caller + " Radio Options") Is Nothing Then
             radio.Setup(caller, 5)
@@ -215,24 +263,25 @@ Public Class SLR_TrendImages : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim split = src.Split()
-
-        trends.slr = slrGray
+        trends.hist.plotHist.maxRange = 255
+        trends.hist.depthNoZero = False ' default is to look at element 0....
 
         Dim splitIndex = 0
         For i = 0 To radio.check.Count - 1
             If radio.check(0).Checked Then
-                trends.slr = slrDepth
+                trends.hist.plotHist.maxRange = task.maxZ * 1000
+                trends.hist.depthNoZero = True ' not interested in the undefined depth areas...
                 trends.Run(task.depth32f)
                 label1 = "SLR_TrendImages - Depth32f"
                 Exit For
             End If
             If radio.check(1).Checked Then
-                trends.Run(src)
+                trends.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
                 label1 = "SLR_TrendImages - grayscale"
                 Exit For
             End If
             If radio.check(2).Checked Then
-                label1 = "SLR_TrendImages - blue channel"
+                label1 = "SLR_TrendImages - Blue channel"
                 splitIndex = 0
             Else
                 splitIndex = If(radio.check(3).Checked, 1, 2)
@@ -253,11 +302,13 @@ End Class
 
 
 Public Class SLR_V2V : Inherits VBparent
-    Dim trends As New SLR_Depth
+    Dim trends As New SLR_Trends
     Public Sub New()
         task.desc = "Identify ranges by marking histogram entries from valley to valley"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
+        trends.hist.plotHist.maxRange = task.maxZ * 1000
+        trends.hist.depthNoZero = True ' not interested in the undefined depth areas...
         trends.Run(task.depth32f)
         dst1 = trends.dst1
     End Sub
