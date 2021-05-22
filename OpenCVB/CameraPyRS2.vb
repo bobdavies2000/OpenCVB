@@ -57,9 +57,7 @@ Public Class CameraPyRS2
         Extrinsics_VB.translation = extrinsics.translation
         RS2Stop(cPtr)
 
-        Static PipeTaskIndex As Integer
-        pipeName = "PyRS2Images" + CStr(PipeTaskIndex)
-        PipeTaskIndex += 1
+        pipeName = "PyRS2Images"
         pipeImages = New NamedPipeServerStream(pipeName, PipeDirection.In)
         pipeSync = New NamedPipeServerStream(pipeName + "in", PipeDirection.Out)
 

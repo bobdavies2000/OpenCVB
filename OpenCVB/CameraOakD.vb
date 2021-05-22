@@ -48,9 +48,7 @@ Public Class CameraOakD
         height = _height
         deviceName = "Oak-D"
 
-        Static PipeTaskIndex As Integer
-        pipeName = "OakDImages" + CStr(PipeTaskIndex)
-        PipeTaskIndex += 1
+        pipeName = "OakDImages"
         pipeImages = New NamedPipeServerStream(pipeName, PipeDirection.In)
         pipeSync = New NamedPipeServerStream(pipeName + "in", PipeDirection.Out)
 

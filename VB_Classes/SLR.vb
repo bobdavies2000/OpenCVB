@@ -213,7 +213,7 @@ Public Class SLR_Trends : Inherits VBparent
         lastPoint = p1
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        label1 = "Histogram with Yellow line showing the trends"
+        label1 = "Grayscale histogram - yellow line shows trend"
         hist.plotHist.backColor = cv.Scalar.Red
         hist.Run(src)
         dst1 = hist.dst1

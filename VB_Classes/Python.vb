@@ -122,9 +122,8 @@ End Class
 '    Dim rgbBuffer(1) As Byte
 '    Dim PythonReady As Boolean
 '    Public Sub New()
-'        pipeName = "OpenCVBImages" + CStr(PipeTaskIndex)
+'        pipeName = "OpenCVBImages"
 '        pipe = New NamedPipeServerStream(pipeName, PipeDirection.InOut)
-'        PipeTaskIndex += 1
 
 '        task.pythonTaskName = task.parms.homeDir + "VB_Classes/Python_SurfaceBlit.py"
 '        memMap = New Python_MemMap()
@@ -179,10 +178,14 @@ Public Class Python_Stream : Inherits VBparent
     Dim pythonReady As Boolean
     Dim memMap As Python_MemMap
     Public Sub New()
-        pipeName = "PyStream2Way" + CStr(PipeTaskIndex)
-        pipeOut = New NamedPipeServerStream(pipeName, PipeDirection.Out)
+        pipeName = "PyStream2Way"
+        Try
+            pipeOut = New NamedPipeServerStream(pipeName, PipeDirection.Out)
+        Catch ex As Exception
+            pipeName = "PyStream2Way_" ' try another name 
+            pipeOut = New NamedPipeServerStream(pipeName, PipeDirection.Out)
+        End Try
         pipeIn = New NamedPipeServerStream(pipeName + "Results", PipeDirection.In)
-        PipeTaskIndex += 1
 
         ' Was this class invoked standalone?  Then just run something that works with RGB and depth...
         If task.pythonTaskName.EndsWith("Python_Stream") Then
