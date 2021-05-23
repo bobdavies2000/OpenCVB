@@ -5,44 +5,37 @@ Public Class Histogram_Basics : Inherits VBparent
     Public kalman As New Kalman_Basics
     Public plotHist As New Plot_Histogram
     Public depthNoZero As Boolean
-    Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
     Public Sub New()
         plotHist.minRange = 0
         task.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static splitIndex As Integer
-        Static colorName As String
+        Static splitIndex = 0
+        Static colorName = "Gray"
         If standalone Or task.intermediateName = caller Then
-            Dim split() = src.Split()
-            If split.Count > 1 Then
+            If src.Channels <> 1 Then
                 If task.frameCount Mod 100 = 0 Then splitIndex = If(splitIndex < 2, splitIndex + 1, 0)
-                src = split(splitIndex)
                 colorName = Choose(splitIndex + 1, "Blue", "Green", "Red")
-            Else
-                colorName = "Gray"
             End If
         End If
-
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim histSize() = {task.histogramBins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
 
         Dim dimensions() = New Integer() {task.histogramBins}
-        cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, New cv.Mat, histogram, 1, dimensions, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {splitIndex}, New cv.Mat, histogram, 1, dimensions, ranges)
 
-        ReDim kalman.kInput(task.histogramBins - 1)
+        If kalman.kInput.Length <> task.histogramBins Then ReDim kalman.kInput(task.histogramBins - 1)
+
         For i = 0 To task.histogramBins - 1
             kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
         Next
         kalman.Run(src)
-        For i = 0 To task.histogramBins - 1
-            histogram.Set(Of Single)(i, 0, kalman.kOutput(i))
-        Next
+        histogram = New cv.Mat(kalman.kOutput.Length, 1, cv.MatType.CV_32FC1, kalman.kOutput)
 
         If depthNoZero Then histogram.Set(Of Single)(0, 0, 0) ' let's not plot the depth at zero...
         plotHist.hist = histogram
+        Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
         If standalone Or task.intermediateName = caller Then plotHist.backColor = splitColors(splitIndex)
         plotHist.Run(src)
         dst1 = plotHist.dst1
@@ -148,30 +141,6 @@ Module histogram_Functions
             If h = 0 Then h = 5 ' show the color range in the plot
             cv.Cv2.Rectangle(img, New cv.Rect(i * binWidth + 1, img.Height - h, binWidth - 2, h), New cv.Scalar(CInt(180.0 * i / binCount), 255, 255), -1)
         Next
-    End Sub
-
-    Public Sub histogramBars(hist As cv.Mat, dst1 As cv.Mat, savedMaxVal As Single)
-        Dim barWidth = Int(dst1.Width / hist.Rows)
-        Dim minVal As Single, maxVal As Single
-        hist.MinMaxLoc(minVal, maxVal)
-
-        maxVal = Math.Round(maxVal / 1000, 0) * 1000 + 1000
-
-        If maxVal < 0 Then maxVal = savedMaxVal
-        If Math.Abs((maxVal - savedMaxVal)) / maxVal < 0.2 Then maxVal = savedMaxVal Else savedMaxVal = Math.Max(maxVal, savedMaxVal)
-
-        dst1.SetTo(cv.Scalar.Red)
-        If maxVal > 0 And hist.Rows > 0 Then
-            Dim incr = CInt(255 / hist.Rows)
-            For i = 0 To hist.Rows - 1
-                Dim offset = hist.Get(Of Single)(i)
-                If Single.IsNaN(offset) Then offset = 0
-                Dim h = CInt(offset * dst1.Height / maxVal)
-                Dim color As cv.Scalar = cv.Scalar.Black
-                If hist.Rows <= 255 Then color = cv.Scalar.All((i Mod 255) * incr)
-                cv.Cv2.Rectangle(dst1, New cv.Rect(i * barWidth, dst1.Height - h, barWidth, h), color, -1)
-            Next
-        End If
     End Sub
 End Module
 
@@ -329,8 +298,8 @@ Public Class Histogram_EqualizeGray : Inherits VBparent
     Public histogram As New Histogram_Basics
     Dim mats As New Mat_2to1
     Public Sub New()
-        label1 = "Before EqualizeHist"
-        label2 = "After EqualizeHist"
+        label1 = "Input image"
+        label2 = "top is before and bot is after EqualizeHist"
         task.desc = "Create an equalized histogram of the grayscale image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

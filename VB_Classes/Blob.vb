@@ -201,7 +201,6 @@ Public Class Blob_DepthPixelSampler : Inherits VBparent
             Next
             lastFrame = dst2.Clone
         End If
-        'dst2.SetTo(0, task.noDepthMask)
         label1 = CStr(histBlobs.valleys.ranges.Count) + " Depth Clusters"
     End Sub
 End Class
@@ -228,18 +227,6 @@ Public Class Blob_DepthRanges : Inherits VBparent
 
         ranges = New List(Of cv.Point)(histBlobs.valleys.ranges)
         Dim map = task.palette.gradientColorMap
-
-        ' this is close and more efficient but not precise!
-        'Dim rangeColors = New List(Of Integer)(histBlobs.valleys.rangeColors)
-        'Dim depth = task.depth32f.Normalize(255).ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        'Dim myLUT = New cv.Mat(1, 256, cv.MatType.CV_8UC3)
-        'Dim index As Integer
-        'For i = 0 To 255
-        '    If rangeColors(index) = i And rangeColors(index) < 255 Then index += 1
-        '    myLUT.Set(Of cv.Vec3b)(0, i, map.Get(Of cv.Vec3b)(0, rangeColors(index)))
-        'Next
-        'dst2 = depth.LUT(myLUT)
-
         Dim mask As New cv.Mat
         masks.Clear()
         maskSizes.Clear()

@@ -203,12 +203,14 @@ Public Class SLR_Trends : Inherits VBparent
     Dim barMidPoint As Integer
     Dim lastPoint As cv.Point2f
     Public resultingPoints As New List(Of cv.Point2f)
+    Public resultingValues As New List(Of Single)
     Public Sub New()
         task.desc = "Find trends by filling in short histogram gaps in the given image's histogram."
     End Sub
     Private Sub connectLine(i As Integer)
         Dim p1 = New cv.Point2f(barMidPoint + dst1.Width * i / valList.Count, dst1.Height - dst1.Height * valList(i) / hist.plotHist.plotMaxValue)
         resultingPoints.Add(p1)
+        resultingValues.Add(p1.Y)
         dst1.Line(lastPoint, p1, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
         lastPoint = p1
     End Sub
@@ -229,7 +231,9 @@ Public Class SLR_Trends : Inherits VBparent
         hist.plotHist.plotMaxValue = valList.Max
         lastPoint = New cv.Point2f(barMidPoint, dst1.Height - dst1.Height * valList(0) / hist.plotHist.plotMaxValue)
         resultingPoints.Clear()
+        resultingValues.Clear()
         resultingPoints.Add(lastPoint)
+        resultingValues.Add(lastPoint.Y)
         For i = 1 To valList.Count - 2
             If valList(i - 1) > valList(i) And valList(i + 1) > valList(i) Then valList(i) = (valList(i - 1) + valList(i + 1)) / 2
             connectLine(i)
@@ -259,7 +263,7 @@ Public Class SLR_TrendImages : Inherits VBparent
             radio.check(1).Checked = True
         End If
 
-        task.desc = "Find trends by filling in short histogram gaps for depth or grayscale images"
+        task.desc = "Find trends by filling in short histogram gaps for depth or 1-channel images"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim split = src.Split()
@@ -303,6 +307,8 @@ End Class
 
 Public Class SLR_V2V : Inherits VBparent
     Dim trends As New SLR_Trends
+    Public kalman As New Kalman_Basics
+    Public depthRegions As New List(Of Integer)
     Public Sub New()
         task.desc = "Identify ranges by marking histogram entries from valley to valley"
     End Sub
@@ -310,6 +316,35 @@ Public Class SLR_V2V : Inherits VBparent
         trends.hist.plotHist.maxRange = task.maxZ * 1000
         trends.hist.depthNoZero = True ' not interested in the undefined depth areas...
         trends.Run(task.depth32f)
-        dst1 = trends.dst1
+        dst1.SetTo(cv.Scalar.Black)
+        Dim barWidth = Int(dst1.Width / trends.resultingValues.Count)
+        Dim colorIndex As Integer
+        Dim color = task.scalarColors(colorIndex Mod 255)
+        Dim vals() = {-1, -1, -1}
+        For i = 0 To trends.resultingValues.Count - 1
+            Dim h = dst1.Height - trends.resultingValues(i)
+            vals(0) = vals(1)
+            vals(1) = vals(2)
+            vals(2) = h
+            If vals(0) >= 0 Then
+                If vals(0) > vals(1) And vals(2) > vals(1) Then
+                    colorIndex += 1
+                    color = task.scalarColors(colorIndex Mod 255)
+                End If
+            End If
+            cv.Cv2.Rectangle(dst1, New cv.Rect(i * barWidth, dst1.Height - h, barWidth, h), color, -1)
+            depthRegions.Add(colorIndex)
+        Next
+        label1 = "Depth regions between 0 and " + CStr(CInt(task.maxZ)) + " meters"
+
+
+        'If kalman.kInput.Length <> task.histogramBins Then ReDim kalman.kInput(task.histogramBins - 1)
+        'For i = 0 To task.histogramBins - 1
+        '    kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
+        'Next
+        'kalman.Run(src)
+        'For i = 0 To task.histogramBins - 1
+        '    histogram.Set(Of Single)(i, 0, kalman.kOutput(i))
+        'Next
     End Sub
 End Class
