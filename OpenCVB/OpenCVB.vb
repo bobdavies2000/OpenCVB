@@ -632,9 +632,6 @@ Public Class OpenCVB
             taskNewImages = True ' trigger the algorithm task
 
             If activeCameraIndex < 0 Then Exit Sub
-
-            GC.Collect() ' minimize memory footprint - the frames have just been sent so this task isn't busy.
-
             Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
             totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
         End While
@@ -1027,6 +1024,7 @@ Public Class OpenCVB
         If lastCameraFrame > camera.frameCount Then lastCameraFrame = 0
         If AvailableAlgorithms.Text.Contains(".py") Then meActivateNeeded = False
         If AvailableAlgorithms.Text.StartsWith("OpenGL") Then meActivateNeeded = False
+        If ValidateTreeView.Enabled Then meActivateNeeded = False
         If meActivateNeeded Then
             Me.Activate()
             meActivateNeeded = False
@@ -1156,6 +1154,7 @@ Public Class OpenCVB
     End Sub
     Private Sub AlgorithmTask(ByVal parms As VB_Classes.ActiveTask.algParms)
         Dim algName = algorithmTaskHandle.Name
+        If algName = "" Then Exit Sub ' closing?
         SyncLock algorithmThreadLock ' the duration of any algorithm varies a lot so wait here if previous algorithm is not finished.
             AlgorithmTestAllCount += 1
             drawRect = New cv.Rect
@@ -1301,6 +1300,42 @@ Public Class OpenCVB
         End While
     End Sub
     Private Sub ValidateAllTreeViewsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ValidateAllTreeViewsToolStripMenuItem.Click
+        If ValidateAllTreeViewsToolStripMenuItem.Text = "Stop Validating TreeView's" Then
+            ValidateTreeView.Enabled = False
+            ValidateAllTreeViewsToolStripMenuItem.Text = "Validate All TreeView's (Admin use only)"
+        Else
+            ValidateAllTreeViewsToolStripMenuItem.Text = "Stop Validating TreeView's"
+            ValidateTreeView.Enabled = True
+        End If
+        AvailableAlgorithms.SelectedIndex = 0
+        Application.DoEvents()
+        Thread.Sleep(1000)
+    End Sub
+    Private Sub ValidateTreeView_Tick(sender As Object, e As EventArgs) Handles ValidateTreeView.Tick
+        Static lastFrameCount = frameCount
+        If TreeButton.Checked = False Then
+            TreeButton.Checked = True
+            Exit Sub
+        End If
+        TreeViewDialog.Activate()
+        If Math.Abs(frameCount - lastFrameCount) < 200 Then Exit Sub
 
+        Static index = 0
+        index += 1
+
+        SendKeys.Send("{DOWN}")
+        If index >= callTrace.Count Then
+            Try
+                If AvailableAlgorithms.SelectedIndex >= AvailableAlgorithms.Items.Count - 1 Then
+                    ValidateAllTreeViewsToolStripMenuItem_Click(sender, e)
+                    Exit Sub
+                End If
+                AvailableAlgorithms.SelectedIndex += 1
+                index = 0
+            Catch ex As Exception
+                Exit Sub
+            End Try
+        End If
+        lastFrameCount = frameCount
     End Sub
 End Class

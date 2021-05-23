@@ -12,7 +12,11 @@ Public Class AddWeighted_Basics : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 2
         If standalone Or task.intermediateName = caller Then src2 = task.RGBDepth ' external use must provide src2!
         Dim alpha = weightSlider.Value / 100
-        cv.Cv2.AddWeighted(src, alpha, src2, 1.0 - alpha, 0, dst1)
+        If src.Channels = src2.Channels And src.Type = src2.Type Then
+            cv.Cv2.AddWeighted(src, alpha, src2, 1.0 - alpha, 0, dst1)
+        Else
+            task.trueText("Unable to mix src and src2 - not the same number of channels or type...")
+        End If
         label1 = "depth " + Format(1 - weightSlider.Value / 100, "#0%") + " RGB " + Format(weightSlider.Value / 100, "#0%")
     End Sub
 End Class

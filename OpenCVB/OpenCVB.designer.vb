@@ -45,9 +45,10 @@ Partial Class OpenCVB
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.SurveyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CreateSurveyImagesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ValidateAllTreeViewsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RefreshTimer = New System.Windows.Forms.Timer(Me.components)
-        Me.ValidateAllTreeViewsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ValidateTreeView = New System.Windows.Forms.Timer(Me.components)
         Me.ToolStrip1.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -224,6 +225,12 @@ Partial Class OpenCVB
         Me.CreateSurveyImagesToolStripMenuItem.Size = New System.Drawing.Size(397, 34)
         Me.CreateSurveyImagesToolStripMenuItem.Text = "Create Survey Images and Rankings"
         '
+        'ValidateAllTreeViewsToolStripMenuItem
+        '
+        Me.ValidateAllTreeViewsToolStripMenuItem.Name = "ValidateAllTreeViewsToolStripMenuItem"
+        Me.ValidateAllTreeViewsToolStripMenuItem.Size = New System.Drawing.Size(425, 34)
+        Me.ValidateAllTreeViewsToolStripMenuItem.Text = "Validate All TreeView's (Admin use only)"
+        '
         'AboutToolStripMenuItem
         '
         Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
@@ -235,11 +242,9 @@ Partial Class OpenCVB
         Me.RefreshTimer.Enabled = True
         Me.RefreshTimer.Interval = 10
         '
-        'ValidateAllTreeViewsToolStripMenuItem
+        'ValidateTreeView
         '
-        Me.ValidateAllTreeViewsToolStripMenuItem.Name = "ValidateAllTreeViewsToolStripMenuItem"
-        Me.ValidateAllTreeViewsToolStripMenuItem.Size = New System.Drawing.Size(397, 34)
-        Me.ValidateAllTreeViewsToolStripMenuItem.Text = "Validate All TreeView's"
+        Me.ValidateTreeView.Interval = 500
         '
         'OpenCVB
         '
@@ -288,4 +293,5 @@ Partial Class OpenCVB
     Friend WithEvents CreateSurveyImagesToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents RefreshTimer As Timer
     Friend WithEvents ValidateAllTreeViewsToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ValidateTreeView As Timer
 End Class

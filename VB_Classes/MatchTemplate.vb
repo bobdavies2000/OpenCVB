@@ -127,7 +127,8 @@ Public Class MatchTemplate_DrawRect : Inherits VBparent
 
         dst1 = New cv.Mat(src.Size, cv.MatType.CV_32F, 0)
         Dim rect = New cv.Rect(task.drawRect.Width / 2, task.drawRect.Height / 2, src.Width - task.drawRect.Width + 1, src.Height - task.drawRect.Height + 1)
-        dst1(rect) = match.correlationMat
+
+        If match.correlationMat.Rows = rect.Height And match.correlationMat.Cols = rect.Width Then dst1(rect) = match.correlationMat
         dst2 = src
 
         Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point

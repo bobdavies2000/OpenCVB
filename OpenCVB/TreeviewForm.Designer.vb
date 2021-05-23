@@ -37,7 +37,7 @@ Partial Class TreeviewForm
         Me.TreeView1.Location = New System.Drawing.Point(0, 0)
         Me.TreeView1.Name = "TreeView1"
         Me.TreeView1.Size = New System.Drawing.Size(943, 113)
-        Me.TreeView1.TabIndex = 1
+        Me.TreeView1.TabIndex = 0
         '
         'ClickTreeLabel
         '
@@ -59,7 +59,7 @@ Partial Class TreeviewForm
         Me.OK_Button.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.OK_Button.Name = "OK_Button"
         Me.OK_Button.Size = New System.Drawing.Size(92, 35)
-        Me.OK_Button.TabIndex = 0
+        Me.OK_Button.TabIndex = 1
         Me.OK_Button.Text = "OK"
         '
         'TableLayoutPanel1

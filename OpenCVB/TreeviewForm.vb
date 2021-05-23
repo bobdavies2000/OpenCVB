@@ -91,6 +91,8 @@ Public Class TreeviewForm
         tv.ExpandAll()
         Me.Height = 200 + entryCount * 26
         If Me.Height > 1000 Then Me.Height = 1000 ' when too big, use the scroll bar.
+        tv.HideSelection = False
+        tv.SelectedNode = n
     End Sub
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
         SyncLock callTraceLock
