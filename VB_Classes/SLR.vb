@@ -309,6 +309,7 @@ Public Class SLR_V2V : Inherits VBparent
     Dim trends As New SLR_Trends
     Public kalman As New Kalman_Basics
     Public depthRegions As New List(Of Integer)
+    Public plotHist As New Plot_Histogram
     Public Sub New()
         task.desc = "Identify ranges by marking histogram entries from valley to valley"
     End Sub
@@ -316,13 +317,18 @@ Public Class SLR_V2V : Inherits VBparent
         trends.hist.plotHist.maxRange = task.maxZ * 1000
         trends.hist.depthNoZero = True ' not interested in the undefined depth areas...
         trends.Run(task.depth32f)
+
+        If kalman.kInput.Length <> task.histogramBins Then ReDim kalman.kInput(task.histogramBins - 1)
+        kalman.kInput = trends.resultingValues.ToArray
+        kalman.Run(src)
+
         dst1.SetTo(cv.Scalar.Black)
         Dim barWidth = Int(dst1.Width / trends.resultingValues.Count)
         Dim colorIndex As Integer
         Dim color = task.scalarColors(colorIndex Mod 255)
         Dim vals() = {-1, -1, -1}
-        For i = 0 To trends.resultingValues.Count - 1
-            Dim h = dst1.Height - trends.resultingValues(i)
+        For i = 0 To kalman.kOutput.Count - 1
+            Dim h = dst1.Height - kalman.kOutput(i)
             vals(0) = vals(1)
             vals(1) = vals(2)
             vals(2) = h
@@ -336,15 +342,5 @@ Public Class SLR_V2V : Inherits VBparent
             depthRegions.Add(colorIndex)
         Next
         label1 = "Depth regions between 0 and " + CStr(CInt(task.maxZ)) + " meters"
-
-
-        'If kalman.kInput.Length <> task.histogramBins Then ReDim kalman.kInput(task.histogramBins - 1)
-        'For i = 0 To task.histogramBins - 1
-        '    kalman.kInput(i) = histogram.Get(Of Single)(i, 0)
-        'Next
-        'kalman.Run(src)
-        'For i = 0 To task.histogramBins - 1
-        '    histogram.Set(Of Single)(i, 0, kalman.kOutput(i))
-        'Next
     End Sub
 End Class

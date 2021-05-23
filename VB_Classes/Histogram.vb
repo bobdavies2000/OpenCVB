@@ -9,7 +9,7 @@ Public Class Histogram_Basics : Inherits VBparent
         plotHist.minRange = 0
         task.desc = "Create a histogram of the grayscale image and smooth the bar chart with a kalman filter."
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 3
         Static splitIndex = 0
         Static colorName = "Gray"
         If standalone Or task.intermediateName = caller Then
@@ -299,7 +299,7 @@ Public Class Histogram_EqualizeGray : Inherits VBparent
     Dim mats As New Mat_2to1
     Public Sub New()
         label1 = "Input image"
-        label2 = "top is before and bot is after EqualizeHist"
+        label2 = "top is before and bottom is after EqualizeHist"
         task.desc = "Create an equalized histogram of the grayscale image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

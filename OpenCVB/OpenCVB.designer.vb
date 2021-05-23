@@ -47,6 +47,7 @@ Partial Class OpenCVB
         Me.CreateSurveyImagesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RefreshTimer = New System.Windows.Forms.Timer(Me.components)
+        Me.ValidateAllTreeViewsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStrip1.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -212,7 +213,7 @@ Partial Class OpenCVB
         '
         'SurveyToolStripMenuItem
         '
-        Me.SurveyToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CreateSurveyImagesToolStripMenuItem})
+        Me.SurveyToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CreateSurveyImagesToolStripMenuItem, Me.ValidateAllTreeViewsToolStripMenuItem})
         Me.SurveyToolStripMenuItem.Name = "SurveyToolStripMenuItem"
         Me.SurveyToolStripMenuItem.Size = New System.Drawing.Size(81, 29)
         Me.SurveyToolStripMenuItem.Text = "Survey"
@@ -233,6 +234,12 @@ Partial Class OpenCVB
         '
         Me.RefreshTimer.Enabled = True
         Me.RefreshTimer.Interval = 10
+        '
+        'ValidateAllTreeViewsToolStripMenuItem
+        '
+        Me.ValidateAllTreeViewsToolStripMenuItem.Name = "ValidateAllTreeViewsToolStripMenuItem"
+        Me.ValidateAllTreeViewsToolStripMenuItem.Size = New System.Drawing.Size(397, 34)
+        Me.ValidateAllTreeViewsToolStripMenuItem.Text = "Validate All TreeView's"
         '
         'OpenCVB
         '
@@ -280,4 +287,5 @@ Partial Class OpenCVB
     Friend WithEvents SurveyToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents CreateSurveyImagesToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents RefreshTimer As Timer
+    Friend WithEvents ValidateAllTreeViewsToolStripMenuItem As ToolStripMenuItem
 End Class
