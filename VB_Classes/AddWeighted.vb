@@ -10,7 +10,7 @@ Public Class AddWeighted_Basics : Inherits VBparent
         task.desc = "Add 2 images with specified weights."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
-        If standalone Or task.intermediateName = caller Then src2 = task.RGBDepth ' external use must provide src2!
+        If standalone Then src2 = task.RGBDepth ' external use must provide src2!
         Dim alpha = weightSlider.Value / 100
         If src.Channels = src2.Channels And src.Type = src2.Type Then
             cv.Cv2.AddWeighted(src, alpha, src2, 1.0 - alpha, 0, dst1)

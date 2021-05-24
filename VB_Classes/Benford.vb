@@ -37,7 +37,7 @@ Public Class Benford_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateName = caller Then
-            dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst1 = If(src.Channels = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             src = New cv.Mat(dst1.Size, cv.MatType.CV_32F)
             dst1.ConvertTo(src, cv.MatType.CV_32F)
         End If

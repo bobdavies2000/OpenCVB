@@ -1307,9 +1307,6 @@ Public Class OpenCVB
             ValidateAllTreeViewsToolStripMenuItem.Text = "Stop Validating TreeView's"
             ValidateTreeView.Enabled = True
         End If
-        AvailableAlgorithms.SelectedIndex = 0
-        Application.DoEvents()
-        Thread.Sleep(1000)
     End Sub
     Private Sub ValidateTreeView_Tick(sender As Object, e As EventArgs) Handles ValidateTreeView.Tick
         Static lastFrameCount = frameCount

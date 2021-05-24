@@ -33,7 +33,7 @@ Public Class Sieve_BasicsVB : Inherits VBparent
                           End Function) Then output.Add(nextEntry)
             nextEntry += 1
         End While
-        If standalone Or task.intermediateName = caller Then
+        If standalone Then
             If output.Count > 0 Then setTrueText(shareResults(output))
         Else
             primes = New List(Of Integer)(output)
