@@ -204,7 +204,7 @@ Public Class Pixel_GetSet : Inherits VBparent
 
         setTrueText(output, src.Width / 2 + 10, src.Height / 2 + 20)
 
-        mats.Run(Nothing)
+        mats.Run(src)
         dst1 = mats.dst1
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
         dst2 = mats.mat(quadrantIndex)

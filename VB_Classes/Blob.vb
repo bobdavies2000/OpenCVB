@@ -118,7 +118,7 @@ Public Class Blob_Input : Inherits VBparent
 
             poly.Run(src)
             Mats.mat(3) = poly.dst2
-            Mats.Run(Nothing)
+            mats.Run(src)
             Mats.dst1.CopyTo(dst1)
             If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
             dst2 = Mats.mat(quadrantIndex)

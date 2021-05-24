@@ -674,7 +674,7 @@ Public Class FloodFill_FullImage : Inherits VBparent
             mats.mat(2).Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
 
-        mats.Run(Nothing)
+        mats.Run(src)
         dst1 = mats.dst1
         dst2 = mats.mat(quadrantIndex)
     End Sub

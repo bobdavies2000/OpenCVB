@@ -447,7 +447,7 @@ Public Class Random_60sTVFaster : Inherits VBparent
 
         cv.Cv2.Add(dst1, valMat, dst1, plusMask)
         cv.Cv2.Subtract(dst1, valMat, dst1, minusMask)
-        mats.Run(Nothing)
+        mats.Run(src)
         dst2 = mats.dst1
     End Sub
 End Class

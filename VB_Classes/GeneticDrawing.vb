@@ -222,7 +222,7 @@ Public Class GeneticDrawing_Basics : Inherits VBparent
             startNewStage(r)
         End If
 
-        mats.Run(Nothing)
+        mats.Run(src)
         dst1 = mats.dst1
         label2 = " stage " + CStr(stage) + "/" + CStr(stageTotal) + " Gen " + Format(generation, "00") + " chgs = " + CStr(changes) + " err/1000 = " + CStr(CInt(totalError / 1000))
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()

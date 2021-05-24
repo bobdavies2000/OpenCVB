@@ -173,7 +173,7 @@ Public Class Camshift_TopObjects : Inherits VBparent
         For i = 0 To trackBoxes.Count - 1
             dst1.Ellipse(trackBoxes(i), cv.Scalar.White, task.lineWidth + 1, task.lineType)
         Next
-        mats.Run(Nothing)
+        mats.Run(src)
         dst2 = mats.dst1
     End Sub
 End Class

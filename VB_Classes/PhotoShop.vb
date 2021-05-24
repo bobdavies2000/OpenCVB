@@ -392,7 +392,7 @@ Public Class PhotoShop_EmbossAll : Inherits VBparent
             cv.Cv2.BitwiseOr(mats.mat(i), dst1, dst1)
         Next
 
-        mats.Run(Nothing)
+        mats.Run(src)
         dst2 = mats.dst1
     End Sub
 End Class

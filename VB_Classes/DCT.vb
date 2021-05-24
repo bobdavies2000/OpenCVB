@@ -194,7 +194,7 @@ Public Class DCT_Surfaces_debug : Inherits VBparent
 
         Mats.mat(3) = New cv.Mat(src.Size(), cv.MatType.CV_8UC3, 0)
         src(grid.roiList(maxIndex)).CopyTo(Mats.mat(3)(grid.roiList(maxIndex)), mask(grid.roiList(maxIndex)))
-        Mats.Run(Nothing)
+        mats.Run(src)
         dst2 = Mats.dst1
 
         Dim world As New cv.Mat(src.Size(), cv.MatType.CV_32FC3, 0)

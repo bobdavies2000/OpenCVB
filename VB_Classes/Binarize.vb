@@ -300,7 +300,7 @@ Public Class Binarize_Recurse : Inherits VBparent
         binarize.Run(gray)
         mats.mat(3) = binarize.dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
 
-        mats.Run(Nothing)
+        mats.Run(src)
         dst1 = mats.dst1
         dst2 = mats.mat(quadrantIndex)
         label2 = mats.label2

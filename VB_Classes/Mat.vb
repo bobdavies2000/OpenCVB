@@ -436,7 +436,7 @@ Public Class Mat_4Click : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
         If standalone Or task.intermediateName = caller Then mats.defaultMats()
-        mats.Run(Nothing)
+        mats.Run(src)
         dst1 = mats.dst1
 
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()

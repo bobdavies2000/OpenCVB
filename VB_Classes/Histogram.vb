@@ -309,7 +309,7 @@ Public Class Histogram_EqualizeGray : Inherits VBparent
         cv.Cv2.EqualizeHist(src, dst1)
         histogramEq.Run(dst1)
         mats.mat(1) = histogramEq.dst1
-        mats.Run(Nothing)
+        mats.Run(src)
         dst2 = mats.dst1
     End Sub
 End Class
@@ -377,7 +377,7 @@ Public Class Histogram_ColorsAndGray : Inherits VBparent
             mats.mat(i) = histogram.dst1.Clone()
         Next
 
-        mats.Run(Nothing)
+        mats.Run(src)
         dst1 = mats.dst1
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
         dst2 = mats.mat(quadrantIndex)
@@ -1139,7 +1139,7 @@ Public Class Histogram_PeaksRGB : Inherits VBparent
             mats.mat(i) = peaks.dst2.Clone
         Next
 
-        mats.Run(Nothing)
+        mats.Run(src)
         dst1 = mats.dst1
         dst2 = mats.dst2
     End Sub
@@ -1168,7 +1168,7 @@ Public Class Histogram_PeakEdges : Inherits VBparent
             If i = 0 Then dst2 = mats.mat(i) Else cv.Cv2.BitwiseAnd(dst2, mats.mat(i), dst2)
         Next
 
-        mats.Run(Nothing)
+        mats.Run(src)
         dst1 = mats.dst1
     End Sub
 End Class

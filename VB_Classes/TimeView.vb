@@ -252,7 +252,7 @@ Public Class TimeView_Frustrum : Inherits VBparent
         setupSide.Run(tView.dst2)
         mats.mat(3) = setupSide.dst1
 
-        mats.Run(Nothing)
+        mats.Run(src)
         dst1 = mats.dst1
         dst2 = mats.dst2
     End Sub

@@ -84,7 +84,7 @@ Public Class GrabCut_FineTune : Inherits VBparent
         mats.mat(0) = basics.dst1
         mats.mat(1) = basics.fgFineTune
         mats.mat(2) = basics.bgFineTune
-        mats.Run(Nothing)
+        mats.Run(src)
         dst1 = mats.dst1
 
         dst2 = basics.dst2

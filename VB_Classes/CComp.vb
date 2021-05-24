@@ -80,7 +80,7 @@ Public Class CComp_Basics : Inherits VBparent
             Next
         End If
 
-        mats.Run(Nothing)
+        mats.Run(src)
         If check.Box(0).Checked Then
             If check.Box(1).Checked Then
                 label2 = "OTSU light, OTSU dark, rendered light, rendered dark"
@@ -145,7 +145,7 @@ Public Class CComp_Basics_FullImage : Inherits VBparent
         count += colorWithDepth(1)
         label1 = CStr(count) + " items found and colored mean depth"
 
-        mats.Run(Nothing)
+        mats.Run(src)
         dst2 = mats.dst1
     End Sub
 End Class

@@ -229,7 +229,7 @@ Public Class ML_DepthFromColor : Inherits VBparent
         colorizer.Run(predictedDepth)
         mats.mat(0) = colorizer.dst1.Clone()
 
-        mats.Run(Nothing)
+        mats.Run(src)
         dst1 = mats.dst1
         label1 = "prediction, shadow, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
@@ -315,7 +315,7 @@ Public Class ML_DepthFromXYColor : Inherits VBparent
         colorizer.Run(predictedDepth)
         dst1 = colorizer.dst1.Clone()
 
-        mats.Run(Nothing)
+        mats.Run(src)
         dst2 = mats.dst1
         label2 = "shadow, empty, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
     End Sub

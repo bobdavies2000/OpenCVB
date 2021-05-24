@@ -109,7 +109,7 @@ Public Class KMeans_Clusters : Inherits VBparent
             km.Run(src)
             Mats.mat(i) = km.dst1.Clone
         Next
-        Mats.Run(Nothing)
+        mats.Run(src)
         dst1 = Mats.dst1
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
         dst2 = Mats.mat(quadrantIndex)

@@ -159,7 +159,7 @@ Public Class BackProject_Surfaces : Inherits VBparent
         hist.Run(yMat)
         cv.Cv2.CalcBackProject({yMat}, {0}, hist.histogram, mats.mat(1), ranges)
 
-        mats.Run(Nothing)
+        mats.Run(src)
         dst1 = mats.dst1
 
         cv.Cv2.BitwiseOr(mats.mat(0), mats.mat(1), dst2)
@@ -246,7 +246,7 @@ Public Class BackProject_2DHSV : Inherits VBparent
         mats.mat(2) = hist2d.dst2
         mats.mat(3) = hist2d.dst1
 
-        mats.Run(Nothing)
+        mats.Run(src)
         dst1 = mats.dst1
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
         dst2 = mats.mat(quadrantIndex)

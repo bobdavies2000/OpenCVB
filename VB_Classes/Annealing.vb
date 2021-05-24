@@ -210,7 +210,7 @@ Public Class Annealing_CPP_MT : Inherits VBparent
             mats.mat(2) = anneal(CInt(bestList.ElementAt(bestList.Count - 2).Value)).dst1
             mats.mat(3) = anneal(CInt(bestList.ElementAt(bestList.Count - 1).Value)).dst1
         End If
-        mats.Run(Nothing)
+        mats.Run(src)
         dst2 = mats.dst1
 
         ' copy the top half of the solutions to the bottom half (worst solutions)

@@ -607,7 +607,7 @@ Public Class PointCloud_BackProject : Inherits VBparent
         mats.mat(1) = both.dst2
         mats.mat(2) = both.maskSideView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         mats.mat(3) = both.maskTopView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        mats.Run(Nothing)
+        mats.Run(src)
         dst1 = mats.dst1
         dst2 = mats.mat(quadrantIndex)
         If quadrantIndex < 2 Then label2 = If(quadrantIndex = 0, both.label1, both.label2) Else label2 = "Click quadrant 0 or 1 to see side/top views"

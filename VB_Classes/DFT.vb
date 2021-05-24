@@ -65,7 +65,7 @@ Public Class DFT_Basics : Inherits VBparent
         mats.mat(2) = padded(New cv.Rect(cx, 0, cx, cy)).Clone()
         mats.mat(1) = padded(New cv.Rect(0, cy, cx, cy)).Clone()
         mats.mat(0) = padded(New cv.Rect(cx, cy, cx, cy)).Clone()
-        mats.Run(Nothing)
+        mats.Run(src)
         dst2 = mats.dst1
 
         dst1 = inverseDFT(complexImage)

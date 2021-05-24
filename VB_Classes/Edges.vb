@@ -376,7 +376,7 @@ Public Class Edges_BinarizedCanny : Inherits VBparent
         mats.mat(2) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), mats.mat(3))
 
-        mats.Run(Nothing)
+        mats.Run(src)
         dst1 = mats.dst1
         If mats.dst2.Channels = 3 Then
             label2 = "Combo of first 3 below.  Click quadrants in dst1."
@@ -781,7 +781,7 @@ Public Class Edges_BinarizedSobel : Inherits VBparent
         mats.mat(2) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), mats.mat(3))
 
-        mats.Run(Nothing)
+        mats.Run(src)
         dst1 = mats.dst1
         If mats.dst2.Channels = 3 Then
             label2 = "Bitwise or of images 1-3 at left.  Click dst1."

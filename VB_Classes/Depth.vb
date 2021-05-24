@@ -773,7 +773,7 @@ Public Class Depth_Smoothing : Inherits VBparent
         reduction.dst1.ConvertTo(reducedDepth, cv.MatType.CV_32F)
         colorize.Run(reducedDepth)
         dst1 = colorize.dst1
-        mats.Run(Nothing)
+        mats.Run(src)
         dst2 = mats.dst1
         label1 = smooth.label1
     End Sub

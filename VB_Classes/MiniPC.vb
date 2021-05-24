@@ -138,7 +138,7 @@ Public Class MiniPC_RotateAngle : Inherits VBparent
 
         mats.mat(0) = peak.dst1(peak.mini.rect)
         mats.mat(1) = peak.dst2(peak.mini.rect)
-        mats.Run(Nothing)
+        mats.Run(src)
         dst1 = mats.dst1
     End Sub
 End Class
