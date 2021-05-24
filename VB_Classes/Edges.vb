@@ -53,7 +53,7 @@ Public Class Edges_DepthAndColor : Inherits VBparent
         canny.Run(src)
         shadow.Run(src)
 
-        dst2 = shadow.dst2
+        dst2 = If(shadow.dst2.Channels <> 1, shadow.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY), shadow.dst2)
         dst2 += canny.dst1.Threshold(1, 255, cv.ThresholdTypes.Binary)
 
         dilate.Run(dst2)
