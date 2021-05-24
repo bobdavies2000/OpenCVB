@@ -126,7 +126,7 @@ Public Class BGSubtract_Basics_MT : Inherits VBparent
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst1 = input.EmptyClone.SetTo(0)
-        If task.frameCount = 0 Then dst2 = input.Clone()
+        dst2 = input.Clone()
         Static correlationSlider = findSlider("Correlation Threshold")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
         dst1.SetTo(0)
