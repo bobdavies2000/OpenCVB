@@ -1315,7 +1315,7 @@ Public Class OpenCVB
             Exit Sub
         End If
         TreeViewDialog.Activate()
-        If Math.Abs(frameCount - lastFrameCount) < 200 Then Exit Sub
+        If Math.Abs(frameCount - lastFrameCount) < 20 Then Exit Sub
 
         Static index = 0
         index += 1
