@@ -53,6 +53,7 @@ Public Class Depth_HolesRect : Inherits VBparent
         shadow.Run(src)
 
         Dim contours As cv.Point()()
+        If shadow.dst2.Channels = 3 Then shadow.dst2 = shadow.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         contours = cv.Cv2.FindContoursAsArray(shadow.dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
 
         Dim minEllipse(contours.Length - 1) As cv.RotatedRect
