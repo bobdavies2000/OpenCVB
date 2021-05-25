@@ -70,7 +70,6 @@ Public Class GeneticDrawing_Basics : Inherits VBparent
     End Sub
     Private Function runDNAseq(dna() As DNAentry) As cv.Mat
         Dim nextImage = imgGeneration.Clone()
-
         For i = 0 To dna.Count - 1
             Dim d = dna(i)
             Dim brushImg = brushes(d.brushNumber)
@@ -145,6 +144,11 @@ Public Class GeneticDrawing_Basics : Inherits VBparent
         Static gradientMagSlider = findSlider("Contrast exponent to use X100")
         Static sobelSlider = findSlider("Sobel kernel Size")
         Static snapCheck = findCheckBox("Snapshot Video input to initialize genetic drawing")
+
+        If task.intermediateObject IsNot Nothing Then
+            task.trueText("There are too many operations inside GeneticDrawing_Basics to break down the intermediate results", 20, 200)
+            Exit Sub
+        End If
 
         brushPercent = brushSlider.Value
         stageTotal = stageSlider.Value
@@ -264,7 +268,7 @@ Public Class GeneticDrawing_Color : Inherits VBparent
         cv.Cv2.Merge(split, dst2)
 
         For i = 0 To split.Count - 1
-            split(i) = gDraw(i).dst1
+            split(i) = If(gDraw(i).dst1.Channels = 1, gDraw(i).dst1, gDraw(i).dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         Next
         cv.Cv2.Merge(split, dst1)
 

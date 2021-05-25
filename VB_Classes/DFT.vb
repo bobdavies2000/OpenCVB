@@ -24,7 +24,7 @@ Public Class DFT_Basics : Inherits VBparent
     Public rows As integer
     Public cols As integer
     Public Sub New()
-        mats.noLines = True
+        mats.lineSeparators = False
 
         task.desc = "Explore the Discrete Fourier Transform."
         label1 = "Image after inverse DFT"

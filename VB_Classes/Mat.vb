@@ -118,7 +118,7 @@ Public Class Mat_4to1 : Inherits VBparent
     Dim mat3 As cv.Mat
     Dim mat4 As cv.Mat
     Public mat() As cv.Mat = {mat1, mat2, mat3, mat4}
-    Public noLines As Boolean ' if they want lines or not...
+    Public lineSeparators = True ' if they want lines or not...
     Public Sub New()
         mat1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
@@ -143,7 +143,7 @@ Public Class Mat_4to1 : Inherits VBparent
         Static roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
         Static roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         Static roibotRight = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
-        If standalone Or task.intermediateName = caller Then defaultMats()
+        If standalone Then defaultMats()
 
         For i = 0 To 4 - 1
             Dim tmp = mat(i).Clone
@@ -151,7 +151,7 @@ Public Class Mat_4to1 : Inherits VBparent
             Dim roi = Choose(i + 1, roiTopLeft, roiTopRight, roibotLeft, roibotRight)
             dst1(roi) = tmp.Resize(nSize)
         Next
-        If noLines = False Then
+        If lineSeparators Then
             dst1.Line(New cv.Point(0, dst1.Height / 2), New cv.Point(dst1.Width, dst1.Height / 2), cv.Scalar.White, task.lineWidth + 1)
             dst1.Line(New cv.Point(dst1.Width / 2, 0), New cv.Point(dst1.Width / 2, dst1.Height), cv.Scalar.White, task.lineWidth + 1)
         End If
@@ -169,7 +169,7 @@ Public Class Mat_2to1 : Inherits VBparent
     Dim mat1 As cv.Mat
     Dim mat2 As cv.Mat
     Public mat() As cv.Mat = {mat1, mat2}
-    Public noLines As Boolean ' if they want lines or not...
+    Public lineSeparators = True ' if they want lines or not...
     Public Sub New()
         mat1 = New cv.Mat(New cv.Size(dst1.Rows, dst1.Cols), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
@@ -193,7 +193,7 @@ Public Class Mat_2to1 : Inherits VBparent
             Dim roi = Choose(i + 1, roiTop, roibot)
             If mat(i).Empty = False Then dst1(roi) = mat(i).Resize(nSize)
         Next
-        If noLines = False Then
+        If lineSeparators Then
             dst1.Line(New cv.Point(0, dst1.Height / 2), New cv.Point(dst1.Width, dst1.Height / 2), cv.Scalar.White, task.lineWidth + 1)
         End If
     End Sub

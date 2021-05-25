@@ -181,7 +181,7 @@ Public Class ActiveTask : Implements IDisposable
     Public desc As String
     Public intermediateName As String
     Public intermediateObject As VBparent
-    Public intermediateNotActive As Boolean
+    Public intermediateActive As Boolean
     Public activeObjects As New List(Of Object)
     Public ratioImageToCampic As Single
     Public pixelViewerOn As Boolean
@@ -365,16 +365,16 @@ Public Class ActiveTask : Implements IDisposable
     Public Sub checkIntermediateResults()
         If task.intermediateObject Is Nothing Then task.intermediateObject = task.activeObjects(0)
         If task.intermediateName <> task.intermediateObject.caller Then
-            task.intermediateNotActive = True
+            task.intermediateActive = False
             task.intermediateObject = Nothing
             For Each obj In task.activeObjects
                 If obj.caller = task.intermediateName Then
                     Dim tmp = obj.dst1
                     ' there may be several instances of an algorithmobject.  This will find one that is actually active.
-                    If obj.dst1.channels <> 1 Then tmp = obj.dst1.cvtcolor(cv.ColorConversionCodes.BGR2GRAY)
+                    If obj.dst1.channels = 3 Then tmp = obj.dst1.cvtcolor(cv.ColorConversionCodes.BGR2GRAY)
                     task.intermediateObject = obj
                     If tmp.CountNonZero() > 0 Then
-                        task.intermediateNotActive = False
+                        task.intermediateActive = True
                         Exit For ' if this dst1 has been modified, then it is an active one...
                     End If
                 End If
@@ -384,7 +384,7 @@ Public Class ActiveTask : Implements IDisposable
     Public Sub RunAlgorithm()
         Try
             If task.parms.useRecordedData Then recordedData.Run(task.color.Clone)
-            If task.intermediateName <> "" Then checkIntermediateResults()
+            If task.intermediateName <> "" Then checkIntermediateResults() Else task.intermediateObject = Nothing
             ' run any global options algorithms here.
             If task.pythonTaskName.EndsWith(".py") = False Then
                 inrange.Run(Nothing) ' updates all the depth info.

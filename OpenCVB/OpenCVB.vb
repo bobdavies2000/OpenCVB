@@ -1235,7 +1235,7 @@ Public Class OpenCVB
                         task.IMU_FrameTime = camera.IMU_FrameTime
                         task.CPU_TimeStamp = camera.CPU_TimeStamp
                         task.CPU_FrameTime = camera.CPU_FrameTime
-                        task.intermediateName = intermediateReview
+                        If intermediateReview <> "" And intermediateReview <> algName Then task.intermediateName = intermediateReview Else task.intermediateName = ""
 
                         task.ratioImageToCampic = ratioImageToCampic
                         task.pixelViewerOn = If(testAllRunning Or surveyActive, False, pixelViewerOn)

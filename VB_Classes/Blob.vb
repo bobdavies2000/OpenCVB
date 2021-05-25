@@ -99,7 +99,7 @@ Public Class Blob_Input : Inherits VBparent
         findSlider("Update Frequency").Value = 1
         findCheckBox("Draw filled (unchecked draw an outline)").Checked = True
 
-        Mats.noLines = True
+        Mats.lineSeparators = False
 
         label1 = "Click any quadrant below to view it on the right"
         label2 = "Click any quadrant at left to view it below"
