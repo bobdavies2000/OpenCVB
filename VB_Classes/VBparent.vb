@@ -143,6 +143,10 @@ Public Class VBparent : Implements IDisposable
         Dim outMat = input
         If input.Type = cv.MatType.CV_32F Then
             outMat = normalize32f(input)
+        ElseIf input.Type = cv.MatType.CV_32SC1 Then
+            Dim tmp As New cv.Mat
+            input.ConvertTo(tmp, cv.MatType.CV_32F)
+            outMat = normalize32f(tmp)
         ElseIf input.Type = cv.MatType.CV_32FC3 Then
             Dim split = input.Split()
             split(0) = split(0).ConvertScaleAbs(255)

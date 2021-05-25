@@ -11,7 +11,6 @@ Public Class Gabor_Basics : Inherits VBparent
     Public gamma As Double
     Public phaseOffset As Double
     Public Sub New()
-
         If sliders.Setup(caller, 6) Then
             sliders.setupTrackBar(0, "Gabor Kernel Size", 0, 50, 15)
             sliders.setupTrackBar(1, "Gabor Sigma", 0, 100, 4)
@@ -23,13 +22,19 @@ Public Class Gabor_Basics : Inherits VBparent
         task.desc = "Explore Gabor kernel - Painterly Effect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone or task.intermediateName = caller Then
-            ksize = sliders.trackbar(0).Value * 2 + 1
-            Sigma = sliders.trackbar(1).Value
-            lambda = sliders.trackbar(3).Value
-            gamma = sliders.trackbar(4).Value / 10
-            phaseOffset = sliders.trackbar(5).Value / 1000
-            theta = Math.PI * sliders.trackbar(2).Value / 180
+        Static ksizeSlider = findSlider("Gabor Kernel Size")
+        Static sigmaSlider = findSlider("Gabor Sigma")
+        Static lambdaSlider = findSlider("Gabor lambda")
+        Static gammaSlider = findSlider("Gabor gamma X10")
+        Static phaseSlider = findSlider("Gabor Phase offset X100")
+        Static thetaSlider = findSlider("Gabor Theta (degrees)")
+        If standalone Then
+            ksize = ksizeSlider.Value * 2 + 1
+            Sigma = sigmaSlider.Value
+            lambda = lambdaSlider.Value
+            gamma = gammaSlider.Value / 10
+            phaseOffset = phaseSlider.Value / 1000
+            theta = Math.PI * thetaSlider.value / 180
         End If
         gKernel = cv.Cv2.GetGaborKernel(New cv.Size(ksize, ksize), Sigma, theta, lambda, gamma, phaseOffset, cv.MatType.CV_32F)
         Dim multiplier = gKernel.Sum()
