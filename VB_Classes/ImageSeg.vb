@@ -134,6 +134,7 @@ Public Class ImageSeg_Unstable : Inherits VBparent
         Static previousFrame = tmp
 
         If task.frameCount Mod refreshCount = 0 Then previousFrame = tmp
+        If previousFrame.channels <> 1 Then previousFrame = previousFrame.cvtcolor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.Min(tmp, previousFrame, dst2)
         previousFrame = dst2
 
