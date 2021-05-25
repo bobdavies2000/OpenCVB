@@ -677,8 +677,7 @@ Public Class Depth_NotMissing : Inherits VBparent
         dst1 = mog.dst1
         cv.Cv2.BitwiseNot(mog.dst1, dst2)
         label1 = "Unstable Depth" + " using " + mog.radio.check(mog.currMethod).Text + " method"
-        Dim zeroDepth = task.depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(1)
-        dst2.SetTo(0, zeroDepth)
+        dst2.SetTo(0, task.noDepthMask)
     End Sub
 End Class
 

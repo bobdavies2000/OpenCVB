@@ -91,6 +91,7 @@ Public Class Math_DepthMeanStdev : Inherits VBparent
         Dim mask = minMax.dst2 ' the mask for stable depth.
         dst2.SetTo(0)
         task.RGBDepth.CopyTo(dst2, mask)
+        If mask.Type <> cv.MatType.CV_8U Then mask = mask.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.MeanStdDev(task.depth32f, mean, stdev, mask)
         label2 = "stablized depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
 

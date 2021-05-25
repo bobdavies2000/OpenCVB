@@ -44,13 +44,13 @@ Public Class Diff_UnstableDepthAndColor : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         diff.Run(src)
-        Dim unstableColor = diff.dst2.Clone()
+        Dim unstableGray = diff.dst2.Clone()
         depth.Run(task.RGBDepth)
         Dim unstableDepth As New cv.Mat
         Dim mask As New cv.Mat
         cv.Cv2.BitwiseNot(depth.dst2, unstableDepth)
-        If unstableColor.Channels = 3 Then unstableColor = unstableColor.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.BitwiseOr(unstableColor, unstableDepth, mask)
+        If unstableGray.Channels = 3 Then unstableGray = unstableGray.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        cv.Cv2.BitwiseOr(unstableGray, unstableDepth, mask)
         dst1 = src.Clone()
         dst1.SetTo(0, mask)
         label2 = "Unstable depth/color mask"
