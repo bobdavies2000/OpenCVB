@@ -21,6 +21,10 @@ Public Class Palette_Basics : Inherits VBparent
         End If
 
         If src IsNot Nothing Then
+            If src.Type = cv.MatType.CV_32F Then
+                src = normalize32f(src)
+                src.ConvertTo(src, cv.MatType.CV_8U)
+            End If
             dst1 = Palette_Custom_Apply(src, gradientColorMap)
             dst2 = gradientColorMap.Resize(dst2.Size)
         End If

@@ -34,12 +34,13 @@ Public Class Reduction_Basics : Inherits VBparent
         ElseIf simpleCheck.Checked Then
             dst1 = src / reductionVal
             dst1 *= reductionVal
+            dst1.ConvertTo(dst1, cv.MatType.CV_32F)
             label1 = "Reduced image - factor = " + CStr(reductionVal)
         Else
             dst1 = src
             label1 = "No reduction requested"
         End If
-        task.palette.Run(dst1)
+        task.palette.Run(dst1.Clone)
         dst2 = task.palette.dst1
     End Sub
 End Class
