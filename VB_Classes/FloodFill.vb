@@ -77,7 +77,7 @@ Public Class FloodFill_Basics : Inherits VBparent
                 End If
             Next
         Next
-        dst1 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst1 = If(dst2.Channels = 3, dst2, dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
         label1 = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
 End Class
