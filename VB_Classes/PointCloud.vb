@@ -1229,7 +1229,7 @@ End Class
 
 
 
-Public Class PointCoud_SurfaceH_CPP : Inherits VBparent
+Public Class PointCloud_SurfaceH_CPP : Inherits VBparent
     Public tView As New TimeView_Basics
     Public plot As New Plot_Basics_CPP
     Public topRow As Integer
@@ -1274,7 +1274,7 @@ End Class
 
 
 
-Public Class PointCoud_SurfaceH : Inherits VBparent
+Public Class PointCloud_SurfaceH : Inherits VBparent
     Public tView As New TimeView_Basics
     Public plot As New Plot_Histogram
     Public topRow As Integer

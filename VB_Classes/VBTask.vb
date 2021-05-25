@@ -181,6 +181,7 @@ Public Class ActiveTask : Implements IDisposable
     Public desc As String
     Public intermediateName As String
     Public intermediateObject As VBparent
+    Public intermediateNotActive As Boolean
     Public activeObjects As New List(Of Object)
     Public ratioImageToCampic As Single
     Public pixelViewerOn As Boolean
@@ -362,9 +363,10 @@ Public Class ActiveTask : Implements IDisposable
         Application.DoEvents()
     End Sub
     Public Sub checkIntermediateResults()
-        Dim activeObjectFound As Boolean
         If task.intermediateObject Is Nothing Then task.intermediateObject = task.activeObjects(0)
         If task.intermediateName <> task.intermediateObject.caller Then
+            task.intermediateNotActive = True
+            task.intermediateObject = Nothing
             For Each obj In task.activeObjects
                 If obj.caller = task.intermediateName Then
                     Dim tmp = obj.dst1
@@ -372,21 +374,15 @@ Public Class ActiveTask : Implements IDisposable
                     If obj.dst1.channels <> 1 Then tmp = obj.dst1.cvtcolor(cv.ColorConversionCodes.BGR2GRAY)
                     task.intermediateObject = obj
                     If tmp.CountNonZero() > 0 Then
-                        activeObjectFound = True
+                        task.intermediateNotActive = False
                         Exit For ' if this dst1 has been modified, then it is an active one...
                     End If
                 End If
             Next
-            task.ttTextData.Clear()
-            If activeObjectFound = False Then task.intermediateObject = Nothing ' this will show a message that the selected algorithm is not active.
         End If
     End Sub
     Public Sub RunAlgorithm()
         Try
-            If task.depth32f.Width = 0 Then
-                trueText("Hit the transition problem with depth32f uninitialized.")
-                Exit Sub
-            End If
             If task.parms.useRecordedData Then recordedData.Run(task.color.Clone)
             If task.intermediateName <> "" Then checkIntermediateResults()
             ' run any global options algorithms here.

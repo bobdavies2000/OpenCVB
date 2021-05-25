@@ -387,12 +387,8 @@ Public Class Draw_Arc : Inherits VBparent
         kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If task.useKalman Then
-            kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
-            kalman.Run(src)
-        Else
-            kalman.kOutput = kalman.kInput ' do nothing...
-        End If
+        kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
+        kalman.Run(src)
         Dim r = New cv.Rect(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2), kalman.kOutput(3))
         If r.Width <= 5 Then r.Width = 5
         If r.Height <= 5 Then r.Height = 5

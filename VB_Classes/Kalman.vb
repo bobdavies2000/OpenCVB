@@ -7,7 +7,7 @@ Public Class Kalman_Basics : Inherits VBparent
     Public Sub New()
         task.desc = "Use Kalman to stabilize values (such as a cv.rect.)"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 4
         Static saveDimension = -1
         If saveDimension <> kInput.Length Then
             If kalman IsNot Nothing Then
@@ -36,7 +36,7 @@ Public Class Kalman_Basics : Inherits VBparent
             kOutput = kInput ' do nothing to the input.
         End If
 
-        If standalone Or task.intermediateName = caller Then
+        If standalone Then
             dst1 = src
             Dim rect = New cv.Rect(CInt(kOutput(0)), CInt(kOutput(1)), CInt(kOutput(2)), CInt(kOutput(3)))
             rect = validateRect(rect)
@@ -48,6 +48,14 @@ Public Class Kalman_Basics : Inherits VBparent
             lastRect = rect
             dst1.Rectangle(rect, cv.Scalar.White, 6)
             dst1.Rectangle(rect, cv.Scalar.Red, 1)
+        End If
+        If task.intermediateName = caller Then
+            Dim str = "The kalman output is: "
+            For i = 0 To kOutput.Count - 1
+                str += " " + CStr(kOutput(i))
+            Next
+            task.ttTextData.Clear()
+            task.trueText(str)
         End If
     End Sub
 End Class
@@ -168,6 +176,9 @@ Public Class Kalman_Compare : Inherits VBparent
         dst2 = kPlot.dst1
     End Sub
 End Class
+
+
+
 
 
 
@@ -440,7 +451,7 @@ Public Class Kalman_Single : Inherits VBparent
         If standalone Then plot.plotCount = 2 ' 2 items to plot
         task.desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 2
         If standalone Or task.intermediateName = caller Then
             dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             inputReal = dst1.Mean().Item(0)
@@ -490,6 +501,7 @@ Public Class Kalman_Simple : Implements IDisposable
         stateResult = kf.Correct(measurement).Get(Of Single)(0, 0)
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
+        ' required dispose function.  It is tempting to remove this but it is needed...It does not inherit from VBParent...
     End Sub
 End Class
 

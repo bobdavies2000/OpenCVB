@@ -344,3 +344,22 @@ Public Class SLR_V2V : Inherits VBparent
         label1 = "Depth regions between 0 and " + CStr(CInt(task.maxZ)) + " meters"
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+Public Class SLR_SurfaceH : Inherits VBparent
+    Dim surface As New pointcloud_surfaceH
+    Public Sub New()
+        task.desc = "Use the PointCloud_SurfaceH data to indicate valleys and peaks."
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        surface.Run(src)
+        dst1 = surface.dst2
+    End Sub
+End Class
