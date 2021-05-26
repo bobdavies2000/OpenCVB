@@ -34,7 +34,7 @@ Public Class Reduction_Basics : Inherits VBparent
         ElseIf simpleCheck.Checked Then
             dst1 = src / reductionVal
             dst1 *= reductionVal
-            dst1.ConvertTo(dst1, cv.MatType.CV_32F)
+            If task.intermediateName = caller Then dst1.ConvertTo(dst1, cv.MatType.CV_32F)
             label1 = "Reduced image - factor = " + CStr(reductionVal)
         Else
             dst1 = src
@@ -57,9 +57,9 @@ Public Class Reduction_Floodfill : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         reduction.Run(src)
+        dst1 = reduction.dst1
         flood.Run(reduction.dst1)
-
-        dst1 = flood.dst1
+        dst2 = flood.dst1
         label1 = flood.label2
     End Sub
 End Class

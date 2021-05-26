@@ -32,11 +32,10 @@ Public Class FloodFill_Basics : Inherits VBparent
         Dim hiDiff = cv.Scalar.All(hiDiffSlider.Value)
         Dim stepSize = stepSlider.Value
 
-        Dim input = src
-        If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim maskPlus = New cv.Mat(New cv.Size(input.Width + 2, input.Height + 2), cv.MatType.CV_8UC1)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1)
         Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
-        initialMask = input.EmptyClone().SetTo(0)
+        initialMask = src.EmptyClone().SetTo(0)
 
         masks.Clear()
         sortedSizes.Clear()
@@ -48,7 +47,7 @@ Public Class FloodFill_Basics : Inherits VBparent
         maskPlus.SetTo(0)
         Dim ignoreMasks = initialMask.Clone()
 
-        Dim gray = input.Clone()
+        Dim gray = src.Clone()
         dst2.SetTo(0)
         For y = 0 To gray.Height - 1 Step stepSize
             For x = 0 To gray.Width - 1 Step stepSize

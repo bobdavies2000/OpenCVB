@@ -12,10 +12,7 @@ Public Class Highlight_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateName = caller Then
-            Static reduction As New Reduction_KNN_Color
-            reduction.Run(src)
-            viewObjects = reduction.pTrack.drawRC.viewObjects
-            src = reduction.dst1
+            task.trueText("In standalone mode, this algorithm does nothing.  See Reduction_KNN_Color to see how to use it.")
         End If
 
         dst1 = src
