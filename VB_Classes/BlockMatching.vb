@@ -17,6 +17,12 @@ Public Class BlockMatching_Basics : Inherits VBparent
             setTrueText("For the Kinect 4 Azure camera, the left and right views are the same.")
         End If
 
+        If task.intermediateName <> "" Then
+            dst1.SetTo(0)
+            task.intermediateName = ""
+            setTrueText("The intermediate results are the same for BlockMatching_Basics", 10, 200)
+            Exit Sub
+        End If
         Dim numDisparity = sliders.trackbar(0).Value * 16 ' must be a multiple of 16
         Dim blockSize = sliders.trackbar(1).Value
         If blockSize Mod 2 = 0 Then blockSize += 1 ' must be odd
