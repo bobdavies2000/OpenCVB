@@ -31,6 +31,7 @@ Public Class Line_Basics : Inherits VBparent
         dst1 = src.Clone
         If dst1.Channels <> 3 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Type <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
         Dim lines = ld.Detect(src)
         pixelThreshold = lenSlider.Value
 
