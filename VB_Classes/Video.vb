@@ -93,9 +93,10 @@ Public Class Video_CarCounting : Inherits VBparent
             Next
 
             Dim tmp = videoImage.Resize(src.Size())
+            If tmp.Channels <> dst1.Channels Then tmp = tmp.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             flow.msgs.Add("  Cars " + CStr(carCount))
             flow.Run(Nothing)
-            cv.Cv2.BitwiseOr(dst1, tmp.CvtColor(cv.ColorConversionCodes.GRAY2BGR), dst1)
+            cv.Cv2.BitwiseOr(dst1, tmp, dst1)
         End If
     End Sub
 End Class

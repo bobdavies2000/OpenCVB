@@ -258,6 +258,7 @@ Public Class Binarize_Simple : Inherits VBparent
 
         If mask.Width Then
             Dim tmp As New cv.Mat(input.Size, cv.MatType.CV_8U, 255)
+            If mask.Type <> cv.MatType.CV_8U Then mask.ConvertTo(mask, cv.MatType.CV_8U)
             input.CopyTo(tmp, mask)
             meanScalar = cv.Cv2.Mean(tmp, mask)
         Else
