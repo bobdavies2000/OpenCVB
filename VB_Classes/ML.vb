@@ -11,6 +11,7 @@ Module ML__Exports
         Dim learnData As New SortedList(Of cv.Vec3f, Single)(New CompareVec3f)
         Dim rng As New System.Random
         Dim holeCount = cv.Cv2.CountNonZero(holeMask)
+        If borderMask.Channels <> 1 Then borderMask = borderMask.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim borderCount = cv.Cv2.CountNonZero(borderMask)
         If holeCount > 0 And borderCount > minLearnCount Then
             Dim color32f As New cv.Mat
