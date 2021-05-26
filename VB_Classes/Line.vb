@@ -733,9 +733,7 @@ Public Class Line_Longest : Inherits VBparent
             If maskRect.Y + maskRect.Height >= dst1.Height Then maskRect.Height = dst1.Height - maskRect.Y
             Dim lineMask = dst1(maskRect).InRange(cv.Scalar.Yellow, cv.Scalar.Yellow)
 
-            cv.Cv2.ImShow("linemask", lineMask)
             src.Rectangle(maskRect, cv.Scalar.White, 1)
-            cv.Cv2.ImShow("src", src)
 
             Dim depth = task.depth32f(maskRect).Mean(lineMask).Item(0) / 1000
             Static lastXvalues As New List(Of Single)
