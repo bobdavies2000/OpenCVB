@@ -1332,6 +1332,10 @@ Public Class Depth_SmoothMax : Inherits VBparent
         If dMin.motion.resetAll Or stableMax Is Nothing Then
             stableMax = src.Clone
         Else
+            If stableMax.Type <> cv.MatType.CV_32FC1 Then
+                If stableMax.Channels <> 1 Then stableMax = stableMax.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+                stableMax.ConvertTo(stableMax, cv.MatType.CV_32FC1)
+            End If
             For Each rect In dMin.motion.intersect.enclosingRects
                 If rect.Width And rect.Height Then src(rect).CopyTo(stableMax(rect))
                 cv.Cv2.Max(src, stableMax, stableMax)

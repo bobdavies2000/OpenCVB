@@ -363,23 +363,20 @@ Public Class ActiveTask : Implements IDisposable
         Application.DoEvents()
     End Sub
     Public Sub checkIntermediateResults()
-        If task.intermediateObject Is Nothing Then task.intermediateObject = task.activeObjects(0)
-        If task.intermediateName <> task.intermediateObject.caller Then
-            task.intermediateActive = False
-            task.intermediateObject = Nothing
-            For Each obj In task.activeObjects
-                If obj.caller = task.intermediateName Then
-                    Dim tmp = obj.dst1
-                    ' there may be several instances of an algorithmobject.  This will find one that is actually active.
-                    If obj.dst1.channels = 3 Then tmp = obj.dst1.cvtcolor(cv.ColorConversionCodes.BGR2GRAY)
-                    task.intermediateObject = obj
-                    If tmp.CountNonZero() > 0 Then
-                        task.intermediateActive = True
-                        Exit For ' if this dst1 has been modified, then it is an active one...
-                    End If
+        task.intermediateActive = False
+        task.intermediateObject = Nothing
+        For Each obj In task.activeObjects
+            If obj.caller = task.intermediateName Then
+                Dim tmp = obj.dst1
+                ' there may be several instances of an algorithmobject.  This will find one that is actually active.
+                If obj.dst1.channels = 3 Then tmp = obj.dst1.cvtcolor(cv.ColorConversionCodes.BGR2GRAY)
+                task.intermediateObject = obj
+                If tmp.CountNonZero() > 0 Then
+                    task.intermediateActive = True
+                    Exit For ' if this dst1 has been modified, then it is an active one...
                 End If
-            Next
-        End If
+            End If
+        Next
     End Sub
     Public Sub RunAlgorithm()
         Try

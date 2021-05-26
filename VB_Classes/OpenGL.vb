@@ -58,7 +58,12 @@ Public Class OpenGL_Basics : Inherits VBparent
     Private Sub startOpenGLWindow()
         ' first setup the named pipe that will be used to feed data to the OpenGL window
         pipeName = "OpenCVBImages"
-        pipe = New NamedPipeServerStream(pipeName, PipeDirection.InOut, 1)
+        Try
+            pipe = New NamedPipeServerStream(pipeName, PipeDirection.InOut, 1)
+        Catch ex As Exception
+            pipeName = "OpenCVBImages_" ' try another name 
+            pipe = New NamedPipeServerStream(pipeName, PipeDirection.InOut, 1)
+        End Try
 
         memMapbufferSize = 8 * memMapValues.Length - 1
 
@@ -75,7 +80,11 @@ Public Class OpenGL_Basics : Inherits VBparent
         pipe.WaitForConnection()
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Or task.intermediateName = caller Or pointCloudInput Is Nothing Then pointCloudInput = task.pointCloud
+        If task.intermediateName <> "" Then
+            task.trueText("The OpenGL examples don't have a need to display intermediate results and it is likely to cause pipe issues.", 20, 220)
+            Exit Sub
+        End If
+        If standalone Or pointCloudInput Is Nothing Then pointCloudInput = task.pointCloud
 
         If task.noDepthMask.Width = pointCloudInput.Width Then pointCloudInput.SetTo(0, task.noDepthMask)
 
