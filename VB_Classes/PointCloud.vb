@@ -1250,7 +1250,7 @@ Public Class PointCloud_SurfaceH_CPP : Inherits VBparent
         Dim peakVal As Integer
         For i = 0 To dst1.Height - 1
             plot.srcX(i) = i
-            plot.srcY(i) = dst1.Row(i).CountNonZero()
+            If dst1.Channels = 1 Then plot.srcY(i) = dst1.Row(i).CountNonZero() Else plot.srcY(i) = dst1.Row(i).CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
             If peakVal < plot.srcY(i) Then
                 peakVal = plot.srcY(i)
                 peakRow = i

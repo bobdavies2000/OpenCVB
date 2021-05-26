@@ -704,7 +704,7 @@ Public Class Line_Longest : Inherits VBparent
         task.desc = "Find the longest line in RGB and use it to validate depth"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        lines.Run(src)
+        lines.Run(src.Clone)
         dst1 = src
         If lines.pt1List.Count > 0 Then
             Static indexSlider = findSlider("Index of line (sorted by length")
@@ -713,8 +713,7 @@ Public Class Line_Longest : Inherits VBparent
             Dim pt1 = lines.pt1List(indexSlider.value)
             Dim pt2 = lines.pt2list(indexSlider.value)
 
-            dst1.Line(pt1, pt2, cv.Scalar.Black, task.lineWidth + 4, task.lineType)
-            dst1.Line(pt1, pt2, cv.Scalar.White, task.lineWidth + 1, task.lineType)
+            dst1.Line(pt1, pt2, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
 
             Dim sq = 3
             Dim pt = pt1
@@ -733,13 +732,17 @@ Public Class Line_Longest : Inherits VBparent
             If maskRect.Y + maskRect.Height >= dst1.Height Then maskRect.Height = dst1.Height - maskRect.Y
             Dim lineMask = dst1(maskRect).InRange(cv.Scalar.Yellow, cv.Scalar.Yellow)
 
+            cv.Cv2.ImShow("linemask", lineMask)
+            src.Rectangle(maskRect, cv.Scalar.White, 1)
+            cv.Cv2.ImShow("src", src)
+
             Dim depth = task.depth32f(maskRect).Mean(lineMask).Item(0) / 1000
             Static lastXvalues As New List(Of Single)
             lastXvalues.Add(depth)
             Dim meanVal = lastXvalues.Average()
             If lastXvalues.Count > 50 Then lastXvalues.RemoveAt(0)
 
-            setTrueText("Depth = " + Format(meanVal, "#0.0") + "m", (pt1.X + pt2.X) / 2 + 30, (pt1.Y + pt2.Y) / 2)
+            setTrueText("Average Depth = " + Format(meanVal, "#0.0") + "m", (pt1.X + pt2.X) / 2 + 30, (pt1.Y + pt2.Y) / 2)
 
             label2 = "Mean (horizontal line) = " + Format(meanVal, "#0.0") + "m with " + CStr(lastXvalues.Count) + " samples."
 
@@ -751,7 +754,6 @@ Public Class Line_Longest : Inherits VBparent
 
             Dim yMean = (1 - meanVal / plot.maxScale) * dst1.Height
             dst2.Line(New cv.Point(0, yMean), New cv.Point(dst2.Width, yMean), cv.Scalar.Black, task.lineWidth)
-            dst1.Rectangle(maskRect, cv.Scalar.White, task.lineWidth + 2, task.lineType)
         End If
     End Sub
 End Class
