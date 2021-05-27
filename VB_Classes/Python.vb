@@ -178,11 +178,12 @@ Public Class Python_Stream : Inherits VBparent
     Dim pythonReady As Boolean
     Dim memMap As Python_MemMap
     Public Sub New()
-        pipeName = "PyStream2Way"
+        pipeName = "PyStream2Way" + CStr(pipeIndex)
         Try
             pipeOut = New NamedPipeServerStream(pipeName, PipeDirection.Out)
         Catch ex As Exception
-            pipeName = "PyStream2Way_" ' try another name 
+            pipeIndex += 1
+            pipeName = "PyStream2Way" + CStr(pipeIndex) ' try another name 
             pipeOut = New NamedPipeServerStream(pipeName, PipeDirection.Out)
         End Try
         pipeIn = New NamedPipeServerStream(pipeName + "Results", PipeDirection.In)

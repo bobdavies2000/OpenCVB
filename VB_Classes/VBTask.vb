@@ -3,6 +3,7 @@ Imports System.Windows.Forms
 Imports System.Threading
 Module Algorithm_Module
     Public task As ActiveTask
+    Public pipeIndex As Integer ' back-to-back pipe usage can sometimes have 2 active pipes.  This index avoids conflict...
     Public aOptions As OptionsContainer
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
     Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2

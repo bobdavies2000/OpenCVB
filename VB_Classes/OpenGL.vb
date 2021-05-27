@@ -57,11 +57,12 @@ Public Class OpenGL_Basics : Inherits VBparent
     End Sub
     Private Sub startOpenGLWindow()
         ' first setup the named pipe that will be used to feed data to the OpenGL window
-        pipeName = "OpenCVBImages"
+        pipeName = "OpenCVBImages" + CStr(pipeIndex)
         Try
             pipe = New NamedPipeServerStream(pipeName, PipeDirection.InOut, 1)
         Catch ex As Exception
-            pipeName = "OpenCVBImages_" ' try another name 
+            pipeIndex += 1
+            pipeName = "OpenCVBImages" + CStr(pipeIndex) ' try another name 
             pipe = New NamedPipeServerStream(pipeName, PipeDirection.InOut, 1)
         End Try
 
