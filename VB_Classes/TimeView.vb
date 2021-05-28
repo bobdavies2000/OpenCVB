@@ -48,8 +48,8 @@ Public Class TimeView_Basics : Inherits VBparent
             dst2 = topAccum
         End If
 
-        label1 = "Accum " + CStr(topFrames.Count) + " side frames with hist threshold > " + CStr(task.hist3DThreshold)
-        label2 = "Accum " + CStr(topFrames.Count) + " top frames with hist threshold > " + CStr(task.hist3DThreshold)
+        label1 = "Accum " + CStr(topFrames.Count) + " latest side frames with hist threshold > " + CStr(task.hist3DThreshold)
+        label2 = "Accum " + CStr(topFrames.Count) + " latest top frames with hist threshold > " + CStr(task.hist3DThreshold)
 
         If sideFrames.Count >= saveFrameCount Then
             sideAccum = sideAccum.Subtract(sideFrames.ElementAt(0))

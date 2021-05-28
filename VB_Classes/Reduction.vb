@@ -204,8 +204,7 @@ Public Class Reduction_XYZ : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
         Dim split() = src.Split()
-
-        For i = 0 To 3 - 1
+        For i = 0 To split.Length - 1
             If check.Box(i).Checked Then
                 split(i) += 10
                 split(i) *= 1000
