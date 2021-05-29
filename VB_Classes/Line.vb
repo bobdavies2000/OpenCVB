@@ -180,81 +180,11 @@ End Class
 
 
 
-Public Class Line_ConfirmedDepth : Inherits VBparent
-    Dim lines As New Line_Basics
-    Public pt1 As New List(Of cv.Point2f)
-    Public pt2 As New List(Of cv.Point2f)
-    Public z1 As New List(Of cv.Point3f) ' the point cloud values corresponding to pt1 and pt2
-    Public z2 As New List(Of cv.Point3f)
-    Public cloudInput As cv.Mat
-    Public Sub New()
-        label1 = "Lines defined in RGB"
-        label2 = "Lines in RGB confirmed in the point cloud"
-        task.desc = "Find the RGB lines and confirm they are present in the cloud data."
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        lines.Run(src)
-        dst1 = lines.dst1
-
-        If lines.sortlines.Count = 0 Then Exit Sub
-        Dim lineList = New List(Of cv.Rect)
-        If cloudInput Is Nothing Then cloudInput = task.pointCloud
-        Dim split = cloudInput.Split()
-        If task.cameraStable = False Then dst2.SetTo(0)
-        pt1.Clear()
-        pt2.Clear()
-        z1.Clear()
-        z2.Clear()
-        For Each nl In lines.sortlines
-            Dim p1 = New cv.Point2f(nl.Value.Item0, nl.Value.Item1)
-            Dim p2 = New cv.Point2f(nl.Value.Item2, nl.Value.Item3)
-
-            Dim minXX = Math.Min(p1.X, p2.X)
-            Dim minYY = Math.Min(p1.Y, p2.Y)
-            Dim w = Math.Abs(p1.X - p2.X)
-            Dim h = Math.Abs(p1.Y - p2.Y)
-            Dim r = New cv.Rect(minXX, minYY, If(w > 0, w, 2), If(h > 0, h, 2))
-            Dim mask = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, 0)
-            mask.Line(New cv.Point(CInt(p1.X - r.X), CInt(p1.Y - r.Y)), New cv.Point(CInt(p2.X - r.X), CInt(p2.Y - r.Y)), 255, task.lineWidth, cv.LineTypes.Link4)
-            Dim mean = cloudInput(r).Mean(mask)
-
-            If mean <> New cv.Scalar Then
-                Dim min As Double, max As Double, Loc(4 - 1) As cv.Point
-                cv.Cv2.MinMaxLoc(split(0)(r), min, max, Loc(0), Loc(1), mask)
-
-                cv.Cv2.MinMaxLoc(split(1)(r), min, max, Loc(2), Loc(3), mask)
-                Dim len1 = Loc(0).DistanceTo(Loc(1))
-                Dim len2 = Loc(2).DistanceTo(Loc(3))
-                If len1 > len2 Then
-                    p1 = New cv.Point(Loc(0).X + r.X, Loc(0).Y + r.Y)
-                    p2 = New cv.Point(Loc(1).X + r.X, Loc(1).Y + r.Y)
-                Else
-                    p1 = New cv.Point(Loc(2).X + r.X, Loc(2).Y + r.Y)
-                    p2 = New cv.Point(Loc(3).X + r.X, Loc(3).Y + r.Y)
-                End If
-                If p1.DistanceTo(p2) > 1 Then
-                    dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-                    pt1.Add(p1)
-                    pt2.Add(p2)
-                    z1.Add(cloudInput.Get(Of cv.Point3f)(p1.Y, p1.X))
-                    z2.Add(cloudInput.Get(Of cv.Point3f)(p2.Y, p2.X))
-                End If
-            End If
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 Public Class Line_Vertical : Inherits VBparent
     Dim gCloud As New Depth_PointCloud_IMU
-    Public lines As New Line_ConfirmedDepth
+    Public lines As New Line_InDepthAndRGB
     Public toleranceInMMs As Single
     Public Sub New()
         If sliders.Setup(caller) Then
@@ -861,5 +791,124 @@ Public Class Line_TimeView : Inherits VBparent
 
         pixelcount = dst2.CountNonZero()
         label2 = "There were " + CStr(lineTotal) + " lines detected using " + Format(pixelCount / 1000, "#.0") + "k pixels"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_InDepthAndRGB : Inherits VBparent
+    Dim lines As New Line_Basics
+    Public pt1 As New List(Of cv.Point2f)
+    Public pt2 As New List(Of cv.Point2f)
+    Public z1 As New List(Of cv.Point3f) ' the point cloud values corresponding to pt1 and pt2
+    Public z2 As New List(Of cv.Point3f)
+    Public cloudInput As cv.Mat
+    Public Sub New()
+        label1 = "Lines defined in RGB"
+        label2 = "Lines in RGB confirmed in the point cloud"
+        task.desc = "Find the RGB lines and confirm they are present in the cloud data."
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        lines.Run(src)
+        dst1 = lines.dst1
+
+        If lines.sortlines.Count = 0 Then Exit Sub
+        Dim lineList = New List(Of cv.Rect)
+        If cloudInput Is Nothing Then cloudInput = task.pointCloud
+        Dim split = cloudInput.Split()
+        If task.cameraStable = False Then dst2.SetTo(0)
+        pt1.Clear()
+        pt2.Clear()
+        z1.Clear()
+        z2.Clear()
+        For Each nl In lines.sortlines
+            Dim p1 = New cv.Point2f(nl.Value.Item0, nl.Value.Item1)
+            Dim p2 = New cv.Point2f(nl.Value.Item2, nl.Value.Item3)
+
+            Dim minXX = Math.Min(p1.X, p2.X)
+            Dim minYY = Math.Min(p1.Y, p2.Y)
+            Dim w = Math.Abs(p1.X - p2.X)
+            Dim h = Math.Abs(p1.Y - p2.Y)
+            Dim r = New cv.Rect(minXX, minYY, If(w > 0, w, 2), If(h > 0, h, 2))
+            Dim mask = New cv.Mat(New cv.Size(w, h), cv.MatType.CV_8U, 0)
+            mask.Line(New cv.Point(CInt(p1.X - r.X), CInt(p1.Y - r.Y)), New cv.Point(CInt(p2.X - r.X), CInt(p2.Y - r.Y)), 255, task.lineWidth, cv.LineTypes.Link4)
+            Dim mean = cloudInput(r).Mean(mask)
+
+            If mean <> New cv.Scalar Then
+                Dim min As Double, max As Double, Loc(4 - 1) As cv.Point
+                cv.Cv2.MinMaxLoc(split(0)(r), min, max, Loc(0), Loc(1), mask)
+
+                cv.Cv2.MinMaxLoc(split(1)(r), min, max, Loc(2), Loc(3), mask)
+                Dim len1 = Loc(0).DistanceTo(Loc(1))
+                Dim len2 = Loc(2).DistanceTo(Loc(3))
+                If len1 > len2 Then
+                    p1 = New cv.Point(Loc(0).X + r.X, Loc(0).Y + r.Y)
+                    p2 = New cv.Point(Loc(1).X + r.X, Loc(1).Y + r.Y)
+                Else
+                    p1 = New cv.Point(Loc(2).X + r.X, Loc(2).Y + r.Y)
+                    p2 = New cv.Point(Loc(3).X + r.X, Loc(3).Y + r.Y)
+                End If
+                If p1.DistanceTo(p2) > 1 Then
+                    dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+                    pt1.Add(p1)
+                    pt2.Add(p2)
+                    z1.Add(cloudInput.Get(Of cv.Point3f)(p1.Y, p1.X))
+                    z2.Add(cloudInput.Get(Of cv.Point3f)(p2.Y, p2.X))
+                End If
+            End If
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_InDepth : Inherits VBparent
+    Dim cloud As New PointCloud_Continuous
+    Dim lines As New Line_Basics
+    Dim addw As New AddWeighted_Basics
+    Public Sub New()
+        findSlider("Line length threshold in pixels").Value = 10
+        label1 = "Highlights show where depth is most accurate"
+        label2 = "Draw small rectangle to see depth value"
+        task.desc = "Detect lines in the PointCloud_Continuity output where linear patterns show where depth is accurate."
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        cloud.Run(src)
+        dst2 = cloud.dst1.Clone
+
+        lines.Run(cloud.dst1)
+
+        addw.src2.SetTo(0)
+        For i = 0 To lines.pt1List.Count - 1
+            Dim pt1 = lines.pt1List(i)
+            Dim pt2 = lines.pt2List(i)
+            addw.src2.Line(pt1, pt2, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
+        Next
+
+        addw.Run(src)
+        dst1 = addw.dst1
+
+        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
+            Static means As New List(Of Single)
+            Static saveDrawRect = task.drawRect
+            If saveDrawRect <> task.drawRect Then
+                saveDrawRect = task.drawRect
+                means.Clear()
+            End If
+            Dim mean = task.depth32f(task.drawRect).Mean(task.depthMask(task.drawRect))
+            Dim pt = New cv.Point(task.drawRect.X + task.drawRect.Width + 10, task.drawRect.Y)
+            setTrueText("Depth = " + Format(mean.Item(0) / 1000, "#0.000") + " meters", pt.X, pt.Y, 3)
+            means.Add(mean)
+            If means.Count > 10 Then means.RemoveAt(0)
+            label2 = "Mean depth over 10 frames = " + Format(means.Average() / 1000, "#.000")
+        End If
     End Sub
 End Class

@@ -6,6 +6,7 @@ Public Class AddWeighted_Basics : Inherits VBparent
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Weight", 0, 100, 50)
         End If
+        src2 = New cv.Mat(dst1.Size, cv.MatType.CV_8UC3, 0)
         weightSlider = findSlider("Weight")
         task.desc = "Add 2 images with specified weights."
     End Sub
@@ -80,7 +81,6 @@ Public Class AddWeighted_InfraRed : Inherits VBparent
             radio.check(1).Text = "Use RightView"
             radio.check(1).Checked = True
         End If
-
         task.desc = "Align the depth data with the left or right view.  Oak-D is aligned with the right image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
