@@ -25,6 +25,8 @@ Public Class OptionsGlobal
             dotSizeSlider.Value = GetSetting("OpenCVB", "dotSizeSlider", "dotSizeSlider", 5)
             fontSizeSlider.Value = GetSetting("OpenCVB", "fontSizeSlider", "fontSizeSlider", 12)
         End If
+        AddWeightedSlider.Value = GetSetting("OpenCVB", "AddWeighted", "AddWeighted", 50)
+
         maxCount.Text = CStr(MaxRange.Value)
         HistBinsCount.Text = CStr(HistBinSlider.Value)
         ProjectionThreshold.Text = CStr(ProjectionSlider.Value)
@@ -33,6 +35,7 @@ Public Class OptionsGlobal
         LineThicknessAmount.Text = CStr(LineThickness.Value)
         DotSizeLabel.Text = CStr(dotSizeSlider.Value)
         FontSizeLabel.Text = CStr(fontSizeSlider.Value)
+        AddWeighted.Text = CStr(AddWeightedSlider.Value)
 
         UseKalman.Checked = GetSetting("OpenCVB", "useKalman", "useKalman", True)
         UseKalmanWhenStable.Checked = GetSetting("OpenCVB", "UseKalmanWhenStable", "UseKalmanWhenStable", False)
@@ -87,6 +90,7 @@ Public Class OptionsGlobal
             SaveSetting("OpenCVB", "dotSizeSlider", "dotSizeSlider", dotSizeSlider.Value)
             SaveSetting("OpenCVB", "fontSizeSlider", "fontSizeSlider", fontSizeSlider.Value)
         End If
+        SaveSetting("OpenCVB", "AddWeighted", "AddWeighted", AddWeighted.Text)
     End Sub
     Private Sub thresholdSlider_Scroll(sender As Object, e As EventArgs) Handles HistBinSlider.Scroll
         HistBinsCount.Text = CStr(HistBinSlider.Value)
@@ -114,6 +118,7 @@ Public Class OptionsGlobal
             SaveSetting("OpenCVB", "dotSizeSlider", "dotSizeSlider", 5)
             SaveSetting("OpenCVB", "fontSizeSlider", "fontSizeSlider", 12)
         End If
+        SaveSetting("OpenCVB", "AddWeighted", "AddWeighted", 50)
         OptionsGlobal_Load(sender, e)
         resetToDefaults.Checked = False
     End Sub
@@ -131,5 +136,8 @@ Public Class OptionsGlobal
     End Sub
     Private Sub fontSizeSlider_Scroll(sender As Object, e As EventArgs) Handles fontSizeSlider.Scroll
         FontSizeLabel.Text = CStr(fontSizeSlider.Value)
+    End Sub
+    Private Sub AddWeightedSlider_Scroll(sender As Object, e As EventArgs) Handles AddWeightedSlider.Scroll
+        AddWeighted.Text = CStr(AddWeightedSlider.Value)
     End Sub
 End Class

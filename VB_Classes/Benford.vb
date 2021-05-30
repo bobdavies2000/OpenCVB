@@ -18,8 +18,6 @@ Public Class Benford_Basics : Inherits VBparent
     Dim addW As New AddWeighted_Basics
     Dim use99 As Boolean
     Public Sub New()
-        addW.weightSlider.Value = 75
-
         For i = 1 To expectedDistribution.Count - 1
             expectedDistribution(i) = Math.Log10(1 + 1 / i) ' get the precise expected values.
         Next
@@ -82,7 +80,7 @@ Public Class Benford_Basics : Inherits VBparent
         addW.Run(dst2)
         dst1 = addW.dst1
 
-        label1 = "AddWeighted: " + CStr(addW.weightSlider.Value) + "% actual vs. " + CStr(100 - addW.weightSlider.Value) + "% Benford distribution"
+        label1 = "AddWeighted: " + Format(task.AddWeighted, "%0.0") + " actual vs. " + Format(1 - task.AddWeighted, "%0.0") + " Benford distribution"
     End Sub
 End Class
 

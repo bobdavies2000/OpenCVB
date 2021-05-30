@@ -714,7 +714,6 @@ Public Class Edges_SobelLRBinarized : Inherits VBparent
     Dim edges As New Edges_BinarizedSobel
     Dim addw As New AddWeighted_Basics
     Public Sub New()
-        findSlider("Weight").Value = 75
         label1 = "Horizontal Sobel - Left View"
         label2 = "Horizontal Sobel - Right View"
         task.desc = "Isolate edges in the left and right views."

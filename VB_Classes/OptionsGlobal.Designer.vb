@@ -37,6 +37,12 @@ Partial Class OptionsGlobal
         Me.resetToDefaults = New System.Windows.Forms.CheckBox()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.GeometrySettings = New System.Windows.Forms.GroupBox()
+        Me.FontSizeLabel = New System.Windows.Forms.Label()
+        Me.fontSizeSlider = New System.Windows.Forms.TrackBar()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.DotSizeLabel = New System.Windows.Forms.Label()
+        Me.dotSizeSlider = New System.Windows.Forms.TrackBar()
+        Me.Label3 = New System.Windows.Forms.Label()
         Me.LineThicknessAmount = New System.Windows.Forms.Label()
         Me.LineThickness = New System.Windows.Forms.TrackBar()
         Me.LineSizeLabel = New System.Windows.Forms.Label()
@@ -51,12 +57,9 @@ Partial Class OptionsGlobal
         Me.MotionThresholdValue = New System.Windows.Forms.Label()
         Me.IMUmotionSlider = New System.Windows.Forms.TrackBar()
         Me.Label4 = New System.Windows.Forms.Label()
-        Me.DotSizeLabel = New System.Windows.Forms.Label()
-        Me.dotSizeSlider = New System.Windows.Forms.TrackBar()
-        Me.Label3 = New System.Windows.Forms.Label()
-        Me.FontSizeLabel = New System.Windows.Forms.Label()
-        Me.fontSizeSlider = New System.Windows.Forms.TrackBar()
-        Me.Label5 = New System.Windows.Forms.Label()
+        Me.AddWeighted = New System.Windows.Forms.Label()
+        Me.AddWeightedSlider = New System.Windows.Forms.TrackBar()
+        Me.Label6 = New System.Windows.Forms.Label()
         Me.MinMaxDepth.SuspendLayout()
         CType(Me.MaxRange, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.HistogramSettings.SuspendLayout()
@@ -64,17 +67,21 @@ Partial Class OptionsGlobal
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox2.SuspendLayout()
         Me.GeometrySettings.SuspendLayout()
+        CType(Me.fontSizeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dotSizeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.LineThickness, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.PaletteGroup.SuspendLayout()
         Me.CameraOptions.SuspendLayout()
         CType(Me.IMUlevelSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.dotSizeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.fontSizeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.AddWeightedSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'MinMaxDepth
         '
+        Me.MinMaxDepth.Controls.Add(Me.AddWeighted)
+        Me.MinMaxDepth.Controls.Add(Me.AddWeightedSlider)
+        Me.MinMaxDepth.Controls.Add(Me.Label6)
         Me.MinMaxDepth.Controls.Add(Me.maxCount)
         Me.MinMaxDepth.Controls.Add(Me.MaxRange)
         Me.MinMaxDepth.Controls.Add(Me.InrangeMaxLabel)
@@ -83,7 +90,7 @@ Partial Class OptionsGlobal
         Me.MinMaxDepth.Size = New System.Drawing.Size(829, 169)
         Me.MinMaxDepth.TabIndex = 0
         Me.MinMaxDepth.TabStop = False
-        Me.MinMaxDepth.Text = "Global Depth Min/Max"
+        Me.MinMaxDepth.Text = "Global Misc Sliders"
         '
         'maxCount
         '
@@ -232,6 +239,63 @@ Partial Class OptionsGlobal
         Me.GeometrySettings.TabStop = False
         Me.GeometrySettings.Text = "Geometry"
         '
+        'FontSizeLabel
+        '
+        Me.FontSizeLabel.AutoSize = True
+        Me.FontSizeLabel.Location = New System.Drawing.Point(714, 151)
+        Me.FontSizeLabel.Name = "FontSizeLabel"
+        Me.FontSizeLabel.Size = New System.Drawing.Size(112, 20)
+        Me.FontSizeLabel.TabIndex = 11
+        Me.FontSizeLabel.Text = "FontSizeLabel"
+        '
+        'fontSizeSlider
+        '
+        Me.fontSizeSlider.Location = New System.Drawing.Point(207, 155)
+        Me.fontSizeSlider.Maximum = 50
+        Me.fontSizeSlider.Minimum = 1
+        Me.fontSizeSlider.Name = "fontSizeSlider"
+        Me.fontSizeSlider.Size = New System.Drawing.Size(505, 69)
+        Me.fontSizeSlider.TabIndex = 10
+        Me.fontSizeSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.fontSizeSlider.Value = 1
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(13, 160)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(110, 20)
+        Me.Label5.TabIndex = 9
+        Me.Label5.Text = "Font Size X10"
+        '
+        'DotSizeLabel
+        '
+        Me.DotSizeLabel.AutoSize = True
+        Me.DotSizeLabel.Location = New System.Drawing.Point(714, 91)
+        Me.DotSizeLabel.Name = "DotSizeLabel"
+        Me.DotSizeLabel.Size = New System.Drawing.Size(105, 20)
+        Me.DotSizeLabel.TabIndex = 8
+        Me.DotSizeLabel.Text = "DotSizeLabel"
+        '
+        'dotSizeSlider
+        '
+        Me.dotSizeSlider.Location = New System.Drawing.Point(207, 89)
+        Me.dotSizeSlider.Minimum = 1
+        Me.dotSizeSlider.Name = "dotSizeSlider"
+        Me.dotSizeSlider.Size = New System.Drawing.Size(505, 69)
+        Me.dotSizeSlider.TabIndex = 7
+        Me.dotSizeSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.dotSizeSlider.Value = 1
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(13, 94)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(129, 20)
+        Me.Label3.TabIndex = 6
+        Me.Label3.Text = "Dot Size in pixels"
+        '
         'LineThicknessAmount
         '
         Me.LineThicknessAmount.AutoSize = True
@@ -369,62 +433,33 @@ Partial Class OptionsGlobal
         Me.Label4.Text = "Motion Threshold in IMU (radians X100)"
         Me.Label4.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
-        'DotSizeLabel
+        'AddWeighted
         '
-        Me.DotSizeLabel.AutoSize = True
-        Me.DotSizeLabel.Location = New System.Drawing.Point(714, 91)
-        Me.DotSizeLabel.Name = "DotSizeLabel"
-        Me.DotSizeLabel.Size = New System.Drawing.Size(105, 20)
-        Me.DotSizeLabel.TabIndex = 8
-        Me.DotSizeLabel.Text = "DotSizeLabel"
+        Me.AddWeighted.AutoSize = True
+        Me.AddWeighted.Location = New System.Drawing.Point(737, 90)
+        Me.AddWeighted.Name = "AddWeighted"
+        Me.AddWeighted.Size = New System.Drawing.Size(88, 20)
+        Me.AddWeighted.TabIndex = 8
+        Me.AddWeighted.Text = "AddWeight"
         '
-        'dotSizeSlider
+        'AddWeightedSlider
         '
-        Me.dotSizeSlider.Location = New System.Drawing.Point(207, 89)
-        Me.dotSizeSlider.Minimum = 1
-        Me.dotSizeSlider.Name = "dotSizeSlider"
-        Me.dotSizeSlider.Size = New System.Drawing.Size(505, 69)
-        Me.dotSizeSlider.TabIndex = 7
-        Me.dotSizeSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.dotSizeSlider.Value = 1
+        Me.AddWeightedSlider.Location = New System.Drawing.Point(213, 83)
+        Me.AddWeightedSlider.Maximum = 100
+        Me.AddWeightedSlider.Name = "AddWeightedSlider"
+        Me.AddWeightedSlider.Size = New System.Drawing.Size(505, 69)
+        Me.AddWeightedSlider.TabIndex = 7
+        Me.AddWeightedSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.AddWeightedSlider.Value = 100
         '
-        'Label3
+        'Label6
         '
-        Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(13, 94)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(129, 20)
-        Me.Label3.TabIndex = 6
-        Me.Label3.Text = "Dot Size in pixels"
-        '
-        'FontSizeLabel
-        '
-        Me.FontSizeLabel.AutoSize = True
-        Me.FontSizeLabel.Location = New System.Drawing.Point(714, 151)
-        Me.FontSizeLabel.Name = "FontSizeLabel"
-        Me.FontSizeLabel.Size = New System.Drawing.Size(112, 20)
-        Me.FontSizeLabel.TabIndex = 11
-        Me.FontSizeLabel.Text = "FontSizeLabel"
-        '
-        'fontSizeSlider
-        '
-        Me.fontSizeSlider.Location = New System.Drawing.Point(207, 155)
-        Me.fontSizeSlider.Maximum = 50
-        Me.fontSizeSlider.Minimum = 1
-        Me.fontSizeSlider.Name = "fontSizeSlider"
-        Me.fontSizeSlider.Size = New System.Drawing.Size(505, 69)
-        Me.fontSizeSlider.TabIndex = 10
-        Me.fontSizeSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.fontSizeSlider.Value = 1
-        '
-        'Label5
-        '
-        Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(13, 160)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(110, 20)
-        Me.Label5.TabIndex = 9
-        Me.Label5.Text = "Font Size X10"
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(19, 90)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(110, 20)
+        Me.Label6.TabIndex = 6
+        Me.Label6.Text = "Add Weighted"
         '
         'OptionsGlobal
         '
@@ -450,14 +485,15 @@ Partial Class OptionsGlobal
         Me.GroupBox2.PerformLayout()
         Me.GeometrySettings.ResumeLayout(False)
         Me.GeometrySettings.PerformLayout()
+        CType(Me.fontSizeSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dotSizeSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.LineThickness, System.ComponentModel.ISupportInitialize).EndInit()
         Me.PaletteGroup.ResumeLayout(False)
         Me.CameraOptions.ResumeLayout(False)
         Me.CameraOptions.PerformLayout()
         CType(Me.IMUlevelSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.dotSizeSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.fontSizeSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.AddWeightedSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -498,4 +534,7 @@ Partial Class OptionsGlobal
     Friend WithEvents FontSizeLabel As Windows.Forms.Label
     Friend WithEvents fontSizeSlider As Windows.Forms.TrackBar
     Friend WithEvents Label5 As Windows.Forms.Label
+    Friend WithEvents AddWeighted As Windows.Forms.Label
+    Friend WithEvents AddWeightedSlider As Windows.Forms.TrackBar
+    Friend WithEvents Label6 As Windows.Forms.Label
 End Class

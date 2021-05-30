@@ -26,6 +26,7 @@ Public Class OptionsCommon : Inherits VBparent
         task.lineWidth = gOptions.LineThickness.Value
         task.dotSize = gOptions.dotSizeSlider.Value
         task.fontSize = gOptions.fontSizeSlider.Value / 10
+        task.AddWeighted = gOptions.AddWeightedSlider.Value / 100
 
         task.minDepth = 1
         task.maxDepth = gOptions.MaxRange.Value
@@ -51,8 +52,6 @@ Public Class OptionsCommon : Inherits VBparent
         End If
 
         task.lineType = cv.LineTypes.AntiAlias ' cv.LineTypes.Link4 or cv.LineTypes.Link8
-
-        If task.depth32f.Width = 0 Then Exit Sub ' some kind of transition is causing this to show up.  Need a breakpoint here...
 
         If task.depth32f.Size <> task.color.Size Then task.depth32f = task.depth32f.Resize(task.color.Size, 0, 0, cv.InterpolationFlags.Nearest)
         If task.pointCloud.Size <> task.color.Size Then task.pointCloud = task.pointCloud.Resize(task.color.Size, 0, 0, cv.InterpolationFlags.Nearest)

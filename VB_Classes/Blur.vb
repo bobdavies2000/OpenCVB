@@ -179,8 +179,6 @@ Public Class Blur_TopoMap : Inherits VBparent
     Dim gradient As New Gradient_CartToPolar
     Dim addw As New AddWeighted_Basics
     Public Sub New()
-        findSlider("Weight").Value = 15
-
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Percent of Blurring", 0, 100, 20)
             sliders.setupTrackBar(1, "Reduction Factor", 2, 64, 20)

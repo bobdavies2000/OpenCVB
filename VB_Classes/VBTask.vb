@@ -155,6 +155,7 @@ Public Class ActiveTask : Implements IDisposable
     Public lineWidth As Integer
     Public lineType As cv.LineTypes
     Public resolutionIndex As Integer
+    Public AddWeighted As Single
 
     Public IMU_Barometer As Single
     Public IMU_Magnetometer As cv.Point3f

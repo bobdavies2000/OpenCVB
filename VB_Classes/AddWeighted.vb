@@ -1,24 +1,18 @@
 Imports cv = OpenCvSharp
 Public Class AddWeighted_Basics : Inherits VBparent
     Public src2 As New cv.Mat
-    Public weightSlider As System.Windows.Forms.TrackBar
     Public Sub New()
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Weight", 0, 100, 50)
-        End If
         src2 = New cv.Mat(dst1.Size, cv.MatType.CV_8UC3, 0)
-        weightSlider = findSlider("Weight")
         task.desc = "Add 2 images with specified weights."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
         If standalone Then src2 = task.RGBDepth ' external use must provide src2!
-        Dim alpha = weightSlider.Value / 100
         If src.Channels = src2.Channels And src.Type = src2.Type Then
-            cv.Cv2.AddWeighted(src, alpha, src2, 1.0 - alpha, 0, dst1)
+            cv.Cv2.AddWeighted(src, task.AddWeighted, src2, 1.0 - task.AddWeighted, 0, dst1)
         Else
             task.trueText("Unable to mix src and src2 - not the same number of channels or type...")
         End If
-        label1 = "depth " + Format(1 - weightSlider.Value / 100, "#0%") + " RGB " + Format(weightSlider.Value / 100, "#0%")
+        label1 = "depth " + Format(1 - task.AddWeighted, "#0%") + " RGB " + Format(task.AddWeighted, "#0%")
     End Sub
 End Class
 
@@ -31,7 +25,6 @@ Public Class AddWeighted_Edges : Inherits VBparent
     Dim edges As New Edges_BinarizedSobel
     Dim addw As New AddWeighted_Basics
     Public Sub New()
-        findSlider("Weight").Value = 75
         task.desc = "Add in the edges separating light and dark to the color image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -99,8 +92,8 @@ Public Class AddWeighted_InfraRed : Inherits VBparent
 
         addw.Run(src)
         dst2 = addw.dst1
-        label1 = "InfraRed " + leftOrRight + " " + Format(1 - addw.weightSlider.Value / 100, "#0%") + " Depth " + Format(addw.weightSlider.Value / 100, "#0%")
-        label2 = "InfraRed " + leftOrRight + " " + Format(1 - addw.weightSlider.Value / 100, "#0%") + " RGB " + Format(addw.weightSlider.Value / 100, "#0%")
+        label1 = "InfraRed " + leftOrRight + " " + Format(1 - task.AddWeighted, "#0%") + " Depth " + Format(task.AddWeighted, "#0%")
+        label2 = "InfraRed " + leftOrRight + " " + Format(1 - task.AddWeighted, "#0%") + " RGB " + Format(task.AddWeighted, "#0%")
     End Sub
 End Class
 
