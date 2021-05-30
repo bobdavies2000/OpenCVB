@@ -25,7 +25,7 @@ Public Class OptionsGlobal
             dotSizeSlider.Value = GetSetting("OpenCVB", "dotSizeSlider", "dotSizeSlider", 5)
             fontSizeSlider.Value = GetSetting("OpenCVB", "fontSizeSlider", "fontSizeSlider", 12)
         End If
-        AddWeightedSlider.Value = GetSetting("OpenCVB", "AddWeighted", "AddWeighted", 50)
+        AddWeightedSlider.Value = GetSetting("OpenCVB", "addweight", "addweight", 50)
 
         maxCount.Text = CStr(MaxRange.Value)
         HistBinsCount.Text = CStr(HistBinSlider.Value)
@@ -90,7 +90,7 @@ Public Class OptionsGlobal
             SaveSetting("OpenCVB", "dotSizeSlider", "dotSizeSlider", dotSizeSlider.Value)
             SaveSetting("OpenCVB", "fontSizeSlider", "fontSizeSlider", fontSizeSlider.Value)
         End If
-        SaveSetting("OpenCVB", "AddWeighted", "AddWeighted", AddWeighted.Text)
+        SaveSetting("OpenCVB", "addweight", "addweight", CInt(AddWeighted.Text))
     End Sub
     Private Sub thresholdSlider_Scroll(sender As Object, e As EventArgs) Handles HistBinSlider.Scroll
         HistBinsCount.Text = CStr(HistBinSlider.Value)
@@ -118,7 +118,7 @@ Public Class OptionsGlobal
             SaveSetting("OpenCVB", "dotSizeSlider", "dotSizeSlider", 5)
             SaveSetting("OpenCVB", "fontSizeSlider", "fontSizeSlider", 12)
         End If
-        SaveSetting("OpenCVB", "AddWeighted", "AddWeighted", 50)
+        SaveSetting("OpenCVB", "addweight", "addweight", 50)
         OptionsGlobal_Load(sender, e)
         resetToDefaults.Checked = False
     End Sub
