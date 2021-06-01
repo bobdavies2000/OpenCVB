@@ -886,13 +886,14 @@ Public Class Line_InDepth : Inherits VBparent
 
         lines.Run(cloud.dst1)
 
-        addw.src2.SetTo(0)
+        Dim latest As New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For i = 0 To lines.pt1List.Count - 1
             Dim pt1 = lines.pt1List(i)
             Dim pt2 = lines.pt2List(i)
-            addw.src2.Line(pt1, pt2, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
+            If pt1.X = pt2.X Then latest.Line(pt1, pt2, cv.Scalar.White, task.lineWidth + 2, task.lineType)
         Next
 
+        addw.src2 = latest.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         addw.Run(src)
         dst1 = addw.dst1
 
