@@ -98,8 +98,9 @@ End Class
 
 
 
-Public Class PointCloud_DuplicateH : Inherits VBparent
+Public Class PointCloud_DuplicateV : Inherits VBparent
     Public Sub New()
+        label1 = "White pixels: duplicate depth values in the X direction"
         task.desc = "Show where horizontally adjoining depth values are identical"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -120,8 +121,9 @@ End Class
 
 
 
-Public Class PointCloud_DuplicateV : Inherits VBparent
+Public Class PointCloud_DuplicateH : Inherits VBparent
     Public Sub New()
+        label1 = "White pixels: duplicate depth values in the Y direction"
         task.desc = "Show where vertically adjoining depth values are identical"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -135,7 +137,6 @@ Public Class PointCloud_DuplicateV : Inherits VBparent
         tmp32f = tmp32f.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
         dst1 = tmp32f.ConvertScaleAbs(255)
         dst1.SetTo(0, task.noDepthMask)
-        label1 = "White pixels: Z-values within 0 mm's of X neighbor"
     End Sub
 End Class
 
