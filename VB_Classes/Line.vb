@@ -870,54 +870,128 @@ End Class
 
 
 
-Public Class Line_DupDepthH : Inherits VBparent
-    Dim cloud As New PointCloud_DuplicateH
-    Dim lines As New Line_Basics
-    Dim addw As New AddWeighted_Basics
+Public Class Line_DupDepthV : Inherits VBparent
+    Dim cloud As New PointCloud_DuplicateV
+    Public lines As New Line_Basics
+    Public addw As New AddWeighted_Basics
     Public Sub New()
-        findSlider("Line length threshold in pixels").Value = 10
-        label1 = "Highlights: adjoining depth values are identical"
+        findSlider("Line length threshold in pixels").Value = 1
+        label1 = "Move mouse over the image to see the depth data"
         label2 = "Draw rectangle to see average depth value"
-        task.desc = "Detect lines in the PointCloud_Continuity output where linear patterns show where duplicate depth values are neighbors."
+        task.desc = "Detect lines in the PointCloud_DuplicateV output where linear patterns show where duplicate depth values are neighbors."
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        cloud.Run(src)
-        dst2 = cloud.dst1.Clone
-
-        lines.Run(cloud.dst1)
-
+    Public Function drawLines() As cv.Mat
         Dim latest As New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For i = 0 To lines.pt1List.Count - 1
             Dim pt1 = lines.pt1List(i)
             Dim pt2 = lines.pt2List(i)
             If pt1.X = pt2.X Then latest.Line(pt1, pt2, cv.Scalar.White, 1, cv.LineTypes.Link4)
         Next
+        Return latest
+    End Function
+    Public Function avgRect() As String
+        Static means As New List(Of Single)
+        Static saveDrawRect = task.drawRect
+        If saveDrawRect <> task.drawRect Then
+            saveDrawRect = task.drawRect
+            means.Clear()
+        End If
+        Dim mean = task.depth32f(task.drawRect).Mean(task.depthMask(task.drawRect))
+        Dim nextVal = mean.Item(0) / 1000
+        means.Add(nextVal)
+        Dim meanCount = 100
+        If means.Count > meanCount Then means.RemoveAt(0)
+        Dim avg = means.Average()
+        Static meanMin = avg, meanMax = avg
+        If means.Count = 1 Then
+            meanMin = avg
+            meanMax = avg
+        End If
+        If meanMin > avg Then meanMin = avg
+        If meanMax < avg Then meanMax = avg
+        Return "Average (" + CStr(meanCount) + " frames)=" + Format(avg, "#.000") + " Min=" + Format(meanMin, "#0.000") + " Max=" + Format(meanMax, "#.000")
+    End Function
+    Public Function setDepthData()
+        Dim str As String = ""
+        str += "x = " + CStr(task.mousePoint.X) + " y = " + CStr(task.mousePoint.Y) + vbCrLf
+        For y = task.mousePoint.Y To Math.Min(dst1.Height - 1, task.mousePoint.Y + 20)
+            For x = task.mousePoint.X To Math.Min(dst1.Width - 1, task.mousePoint.X + 18)
+                str += Format(task.depth32f.Get(Of Single)(y, x), "0000") + " "
+            Next
+            str += vbCrLf
+        Next
+        Return str
+    End Function
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        cloud.Run(src)
 
-        addw.src2 = latest
+        lines.Run(cloud.dst1)
+        addw.src2 = drawLines()
+
         addw.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst1 = addw.dst1
 
-        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
-            Static means As New List(Of Single)
-            Static saveDrawRect = task.drawRect
-            If saveDrawRect <> task.drawRect Then
-                saveDrawRect = task.drawRect
-                means.Clear()
-            End If
-            Dim mean = task.depth32f(task.drawRect).Mean(task.depthMask(task.drawRect))
-            Dim nextVal = mean.Item(0) / 1000
-            means.Add(nextVal)
-            Dim meanCount = 100
-            If means.Count > meanCount Then means.RemoveAt(0)
-            Dim avg = means.Average()
-            Static meanMin = avg, meanMax = avg
-            If means.Count = 1 Then
-                meanMin = avg
-                meanMax = avg
-            End If
-            If meanMin > avg Then meanMin = avg
-            If meanMax < avg Then meanMax = avg
-            label2 = "Average (" + CStr(meanCount) + " frames)=" + Format(avg, "#.000") + " Min=" + Format(meanMin, "#0.000") + " Max=" + Format(meanMax, "#.000")
-        End If
+        setTrueText(setDepthData(), 10, 40, 3)
+        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then label2 = avgRect()
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_DupDepthH : Inherits VBparent
+    Public dupV As New Line_DupDepthV
+    Public lines As New Line_Basics
+    Public addw As New AddWeighted_Basics
+    Dim cloud As New PointCloud_DuplicateH
+    Public Sub New()
+        label1 = "Move mouse over the image to see the depth data"
+        task.desc = "Detect lines in the PointCloud_DuplicateH output where linear patterns show where duplicate depth values are neighbors."
+    End Sub
+    Public Function drawLines() As cv.Mat
+        Dim latest As New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        For i = 0 To lines.pt1List.Count - 1
+            Dim pt1 = lines.pt1List(i)
+            Dim pt2 = lines.pt2List(i)
+            If pt1.Y = pt2.Y Then latest.Line(pt1, pt2, cv.Scalar.White, 1, cv.LineTypes.Link4)
+        Next
+        Return latest
+    End Function
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        cloud.Run(src)
+
+        lines.Run(cloud.dst1)
+        addw.src2 = drawLines()
+
+        addw.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst1 = addw.dst1
+
+        setTrueText(dupV.setDepthData(), 10, 40, 3)
+        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then label2 = dupV.avgRect()
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_DupDepth : Inherits VBparent
+    Dim dupH As New Line_DupDepthH
+    Dim dupV As New Line_DupDepthV
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        task.desc = "Merge the horizontal and vertical lines with duplicate depth"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        dupH.Run(src)
+        dupV.Run(src)
+        task.ttTextData.Clear()
+        cv.Cv2.BitwiseAnd(dupH.addw.src2, dupV.addw.src2, dst1)
+        cv.Cv2.BitwiseOr(dupH.addw.src2, dupV.addw.src2, dst2)
     End Sub
 End Class

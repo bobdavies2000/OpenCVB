@@ -114,7 +114,6 @@ Public Class PointCloud_DuplicateV : Inherits VBparent
         tmp32f = tmp32f.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
         dst1 = tmp32f.ConvertScaleAbs(255)
         dst1.SetTo(0, task.noDepthMask)
-        label1 = "White pixels: Z-values within 0 mm's of X neighbor"
     End Sub
 End Class
 

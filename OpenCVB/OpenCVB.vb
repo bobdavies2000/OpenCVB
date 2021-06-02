@@ -1199,6 +1199,10 @@ Public Class OpenCVB
                 SyncLock bufferLock
                     If saveWorkingRes <> workingRes And frameCount > minFrames Then Exit Sub ' switching camera resolution means stopping the current algorithm
                     If ignoreMouseMove = False Then
+                        If mousePoint.X < 0 Then mousePoint.X = 0
+                        If mousePoint.Y < 0 Then mousePoint.Y = 0
+                        If mousePoint.X > task.color.Width Then mousePoint.X = task.color.Width
+                        If mousePoint.Y > task.color.Height Then mousePoint.Y = task.color.Height
                         task.mousePoint = mousePoint
                         task.mousePicTag = mousePicTag
                         task.mouseClickFlag = mouseClickFlag
