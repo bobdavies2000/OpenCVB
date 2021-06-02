@@ -870,15 +870,15 @@ End Class
 
 
 
-Public Class Line_InDepth : Inherits VBparent
-    Dim cloud As New PointCloud_Continuous
+Public Class Line_DupDepthH : Inherits VBparent
+    Dim cloud As New PointCloud_DuplicateH
     Dim lines As New Line_Basics
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         findSlider("Line length threshold in pixels").Value = 10
-        label1 = "Highlights show where depth is most accurate"
-        label2 = "Draw small rectangle to see depth value"
-        task.desc = "Detect lines in the PointCloud_Continuity output where linear patterns show where depth is accurate."
+        label1 = "Highlights: adjoining depth values are identical"
+        label2 = "Draw rectangle to see average depth value"
+        task.desc = "Detect lines in the PointCloud_Continuity output where linear patterns show where duplicate depth values are neighbors."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         cloud.Run(src)
@@ -890,11 +890,11 @@ Public Class Line_InDepth : Inherits VBparent
         For i = 0 To lines.pt1List.Count - 1
             Dim pt1 = lines.pt1List(i)
             Dim pt2 = lines.pt2List(i)
-            If pt1.X = pt2.X Then latest.Line(pt1, pt2, cv.Scalar.White, task.lineWidth + 2, task.lineType)
+            If pt1.X = pt2.X Then latest.Line(pt1, pt2, cv.Scalar.White, 1, cv.LineTypes.Link4)
         Next
 
-        addw.src2 = latest.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        addw.Run(src)
+        addw.src2 = latest
+        addw.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst1 = addw.dst1
 
         If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
@@ -905,11 +905,19 @@ Public Class Line_InDepth : Inherits VBparent
                 means.Clear()
             End If
             Dim mean = task.depth32f(task.drawRect).Mean(task.depthMask(task.drawRect))
-            Dim pt = New cv.Point(task.drawRect.X + task.drawRect.Width + 10, task.drawRect.Y)
-            setTrueText("Depth = " + Format(mean.Item(0) / 1000, "#0.000") + " meters", pt.X, pt.Y, 3)
-            means.Add(mean)
-            If means.Count > 10 Then means.RemoveAt(0)
-            label2 = "Mean depth over 10 frames = " + Format(means.Average() / 1000, "#.000")
+            Dim nextVal = mean.Item(0) / 1000
+            means.Add(nextVal)
+            Dim meanCount = 100
+            If means.Count > meanCount Then means.RemoveAt(0)
+            Dim avg = means.Average()
+            Static meanMin = avg, meanMax = avg
+            If means.Count = 1 Then
+                meanMin = avg
+                meanMax = avg
+            End If
+            If meanMin > avg Then meanMin = avg
+            If meanMax < avg Then meanMax = avg
+            label2 = "Average (" + CStr(meanCount) + " frames)=" + Format(avg, "#.000") + " Min=" + Format(meanMin, "#0.000") + " Max=" + Format(meanMax, "#.000")
         End If
     End Sub
 End Class

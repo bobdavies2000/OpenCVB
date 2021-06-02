@@ -98,18 +98,11 @@ End Class
 
 
 
-Public Class PointCloud_Continuous : Inherits VBparent
+Public Class PointCloud_DuplicateH : Inherits VBparent
     Public Sub New()
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Threshold of continuity in mm", 0, 1000, 10)
-        End If
-
-        task.desc = "Show where the pointcloud is continuous"
+        task.desc = "Show where horizontally adjoining depth values are identical"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static thresholdSlider = findSlider("Threshold of continuity in mm")
-        Dim threshold = thresholdSlider.value
-
         Dim input = src
         If input.Type <> cv.MatType.CV_32F Then input = task.depth32f
 
@@ -117,13 +110,32 @@ Public Class PointCloud_Continuous : Inherits VBparent
         Dim r1 = New cv.Rect(1, 0, dst1.Width - 1, dst1.Height)
         Dim r2 = New cv.Rect(0, 0, dst1.Width - 1, dst1.Height)
         cv.Cv2.Absdiff(input(r1), input(r2), tmp32f(r1))
-        tmp32f = tmp32f.Threshold(threshold, 255, cv.ThresholdTypes.BinaryInv)
+        tmp32f = tmp32f.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
         dst1 = tmp32f.ConvertScaleAbs(255)
-        cv.Cv2.BitwiseNot(dst1, dst2)
         dst1.SetTo(0, task.noDepthMask)
-        dst2.SetTo(0, task.noDepthMask)
-        label1 = "White pixels: Z-values within " + CStr(thresholdSlider.value) + " mm's of X neighbor"
-        label2 = "Mask showing discontinuities > " + CStr(thresholdSlider.value) + " mm's of X neighbor"
+        label1 = "White pixels: Z-values within 0 mm's of X neighbor"
+    End Sub
+End Class
+
+
+
+
+Public Class PointCloud_DuplicateV : Inherits VBparent
+    Public Sub New()
+        task.desc = "Show where vertically adjoining depth values are identical"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Dim input = src
+        If input.Type <> cv.MatType.CV_32F Then input = task.depth32f
+
+        Dim tmp32f = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        Dim r1 = New cv.Rect(0, 0, dst1.Width, dst1.Height - 1)
+        Dim r2 = New cv.Rect(0, 1, dst1.Width, dst1.Height - 1)
+        cv.Cv2.Absdiff(input(r1), input(r2), tmp32f(r1))
+        tmp32f = tmp32f.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        dst1 = tmp32f.ConvertScaleAbs(255)
+        dst1.SetTo(0, task.noDepthMask)
+        label1 = "White pixels: Z-values within 0 mm's of X neighbor"
     End Sub
 End Class
 
