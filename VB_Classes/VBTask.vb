@@ -7,6 +7,8 @@ Module Algorithm_Module
     Public aOptions As OptionsContainer
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
     Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
+    Public Const screenDWidth As Integer = 18
+    Public Const screenDHeight As Integer = 20
     Public term As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
     Public recordedData As Replay_Play
     <System.Runtime.CompilerServices.Extension()>

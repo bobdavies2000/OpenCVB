@@ -869,23 +869,28 @@ End Class
 
 
 
-
-Public Class Line_DupDepthV : Inherits VBparent
-    Dim cloud As New PointCloud_DuplicateV
+Public Class Line_DupDepthOptions : Inherits VBparent
     Public lines As New Line_Basics
     Public addw As New AddWeighted_Basics
     Public Sub New()
         findSlider("Line length threshold in pixels").Value = 1
-        label1 = "Move mouse over the image to see the depth data"
-        label2 = "Draw rectangle to see average depth value"
-        task.desc = "Detect lines in the PointCloud_DuplicateV output where linear patterns show where duplicate depth values are neighbors."
+        task.desc = "Options for the Line_DupDepth algorithms."
     End Sub
-    Public Function drawLines() As cv.Mat
+    Public Function drawLinesV() As cv.Mat
         Dim latest As New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         For i = 0 To lines.pt1List.Count - 1
             Dim pt1 = lines.pt1List(i)
             Dim pt2 = lines.pt2List(i)
             If pt1.X = pt2.X Then latest.Line(pt1, pt2, cv.Scalar.White, 1, cv.LineTypes.Link4)
+        Next
+        Return latest
+    End Function
+    Public Function drawLinesH() As cv.Mat
+        Dim latest As New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        For i = 0 To lines.pt1List.Count - 1
+            Dim pt1 = lines.pt1List(i)
+            Dim pt2 = lines.pt2List(i)
+            If pt1.Y = pt2.Y Then latest.Line(pt1, pt2, cv.Scalar.White, 1, cv.LineTypes.Link4)
         Next
         Return latest
     End Function
@@ -911,28 +916,66 @@ Public Class Line_DupDepthV : Inherits VBparent
         If meanMax < avg Then meanMax = avg
         Return "Average (" + CStr(meanCount) + " frames)=" + Format(avg, "#.000") + " Min=" + Format(meanMin, "#0.000") + " Max=" + Format(meanMax, "#.000")
     End Function
-    Public Function setDepthData()
+    Public Function showDepthData()
         Dim str As String = ""
-        str += "x = " + CStr(task.mousePoint.X) + " y = " + CStr(task.mousePoint.Y) + vbCrLf
-        For y = task.mousePoint.Y To Math.Min(dst1.Height - 1, task.mousePoint.Y + 20)
-            For x = task.mousePoint.X To Math.Min(dst1.Width - 1, task.mousePoint.X + 18)
+        str += "x = " + CStr(task.drawRect.X) + " y = " + CStr(task.drawRect.Y) + vbCrLf
+        Dim w = task.drawRect.Width
+        Dim h = task.drawRect.Height
+        If w = 0 Or w > screenDWidth Then w = screenDWidth ' standard screen amount...
+        If h = 0 Or h > screenDHeight Then h = screenDHeight ' standard screen amount...
+        For y = task.drawRect.Y To Math.Min(dst1.Height, task.drawRect.Y + h) - 1
+            For x = task.drawRect.X To Math.Min(dst1.Width, task.drawRect.X + w) - 1
                 str += Format(task.depth32f.Get(Of Single)(y, x), "0000") + " "
             Next
             str += vbCrLf
         Next
         Return str
     End Function
+    Public Function showCloudData(showX As Boolean)
+        Dim str As String = ""
+        str += "Showing pointcloud " + If(showX, "x", "y") + " data at x = " + CStr(task.drawRect.X) + " y = " + CStr(task.drawRect.Y) + vbCrLf
+        Dim w = task.drawRect.Width
+        Dim h = task.drawRect.Height
+        If w = 0 Or w > screenDWidth Then w = screenDWidth ' standard screen amount...
+        If h = 0 Or h > screenDHeight Then h = screenDHeight ' standard screen amount...
+        For y = task.drawRect.Y To Math.Min(dst1.Height, task.drawRect.Y + h) - 1
+            For x = task.drawRect.X To Math.Min(dst1.Width, task.drawRect.X + w) - 1
+                Dim vec = task.pointCloud.Get(Of cv.Vec3f)(y, x)
+                If showX Then str += Format(vec.Item0 * 1000, "0000") + " " Else str += Format(vec.Item1 * 1000, "0000") + " "
+            Next
+            str += vbCrLf
+        Next
+        Return str
+    End Function
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        setTrueText("Line_DupDepthOptions has no output - just consolidates all the options and functions needed for Line_DupDepth algorithms.")
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_DupDepthV : Inherits VBparent
+    Public dOptions As New Line_DupDepthOptions
+    Dim cloud As New PointCloud_DuplicateV
+    Public Sub New()
+        label1 = "Move mouse over the image to see the depth data"
+        label2 = "Draw a rectangle around lines to get stats"
+        task.desc = "Detect lines in the PointCloud_DuplicateV output where linear patterns show where duplicate depth values are neighbors."
+    End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         cloud.Run(src)
 
-        lines.Run(cloud.dst1)
-        addw.src2 = drawLines()
+        dOptions.lines.Run(cloud.dst1)
+        dOptions.addw.src2 = dOptions.drawLinesV()
 
-        addw.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        dst1 = addw.dst1
+        dOptions.addw.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst1 = dOptions.addw.dst1
 
-        setTrueText(setDepthData(), 10, 40, 3)
-        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then label2 = avgRect()
+        setTrueText(dOptions.showDepthData(), 10, 40, 3)
+        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then label2 = dOptions.avgRect()
     End Sub
 End Class
 
@@ -943,34 +986,24 @@ End Class
 
 
 Public Class Line_DupDepthH : Inherits VBparent
-    Public dupV As New Line_DupDepthV
-    Public lines As New Line_Basics
-    Public addw As New AddWeighted_Basics
+    Public dOptions As New Line_DupDepthOptions
     Dim cloud As New PointCloud_DuplicateH
     Public Sub New()
         label1 = "Move mouse over the image to see the depth data"
+        label2 = "Draw a rectangle around lines to get stats"
         task.desc = "Detect lines in the PointCloud_DuplicateH output where linear patterns show where duplicate depth values are neighbors."
     End Sub
-    Public Function drawLines() As cv.Mat
-        Dim latest As New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        For i = 0 To lines.pt1List.Count - 1
-            Dim pt1 = lines.pt1List(i)
-            Dim pt2 = lines.pt2List(i)
-            If pt1.Y = pt2.Y Then latest.Line(pt1, pt2, cv.Scalar.White, 1, cv.LineTypes.Link4)
-        Next
-        Return latest
-    End Function
     Public Sub Run(src As cv.Mat) ' Rank = 1
         cloud.Run(src)
 
-        lines.Run(cloud.dst1)
-        addw.src2 = drawLines()
+        dOptions.lines.Run(cloud.dst1)
+        dOptions.addw.src2 = dOptions.drawLinesH()
 
-        addw.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        dst1 = addw.dst1
+        dOptions.addw.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst1 = dOptions.addw.dst1
 
-        setTrueText(dupV.setDepthData(), 10, 40, 3)
-        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then label2 = dupV.avgRect()
+        setTrueText(dOptions.showDepthData(), 10, 40, 3)
+        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then label2 = dOptions.avgRect()
     End Sub
 End Class
 
@@ -985,13 +1018,70 @@ Public Class Line_DupDepth : Inherits VBparent
     Dim dupV As New Line_DupDepthV
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        label1 = "AND dupDephH and DupDepthV"
+        label2 = "OR dupDephH and DupDepthV"
         task.desc = "Merge the horizontal and vertical lines with duplicate depth"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         dupH.Run(src)
         dupV.Run(src)
         task.ttTextData.Clear()
-        cv.Cv2.BitwiseAnd(dupH.addw.src2, dupV.addw.src2, dst1)
-        cv.Cv2.BitwiseOr(dupH.addw.src2, dupV.addw.src2, dst2)
+        cv.Cv2.BitwiseAnd(dupH.dOptions.addw.src2, dupV.dOptions.addw.src2, dst1)
+        cv.Cv2.BitwiseOr(dupH.dOptions.addw.src2, dupV.dOptions.addw.src2, dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Line_DupLongestH : Inherits VBparent
+    Dim dupH As New Line_DupDepthH
+    Public longestP1 As cv.Point
+    Public longestP2 As cv.Point
+    Dim longestLen As Integer
+    Public Sub New()
+        label1 = "Longest line is highlighted.  dst2 shows values"
+        task.desc = "Use the depth along the longest line in Line_DupDepthH to find line in 3D."
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        dupH.Run(src)
+        dst1 = dupH.dst1
+
+        Dim latest As New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        For i = 0 To dupH.dOptions.lines.pt1List.Count - 1
+            Dim pt1 = dupH.dOptions.lines.pt1List(i)
+            Dim pt2 = dupH.dOptions.lines.pt2List(i)
+            If pt1.Y = pt2.Y Then
+                Dim len = Math.Abs(pt1.X - pt2.X)
+                If len > longestLen Then
+                    longestP1 = If(pt1.X < pt2.X, pt1, pt2)
+                    longestP2 = If(pt1.X > pt2.X, pt1, pt2)
+                    longestLen = len
+                End If
+            End If
+        Next
+
+        task.ttTextData.Clear()
+        task.drawRect = New cv.Rect(longestP1.X, longestP1.Y, longestP2.X - longestP1.X, 1)
+        dst1.Rectangle(task.drawRect, cv.Scalar.White, task.lineWidth + 2)
+
+        setTrueText(dupH.dOptions.showDepthData(), 10, 40, 3)
+        label2 = dupH.dOptions.avgRect()
+
+        setTrueText(dupH.dOptions.showCloudData(True), 10, 120, 3)
+        setTrueText(dupH.dOptions.showCloudData(False), 10, 220, 3)
+        'Dim tmp As String = dupH.dOptions.showDepthData()
+        'Dim w = 90
+
+        'setTrueText(tmp.Substring(0, InStr(tmp, vbCrLf) - 1), 10, 40, 3)
+        'tmp = tmp.Substring(InStr(tmp, vbCrLf) + 1)
+        'Dim split = tmp.Split(" ")
+        'For i = 0 To tmp.length / w
+        '    Dim nextStr = tmp.Substring(i * w, Math.Min(tmp.Length - i * w, w))
+        '    setTrueText(nextStr, 10, 40 + (i + 1) * 20, 3)
+        'Next
     End Sub
 End Class
