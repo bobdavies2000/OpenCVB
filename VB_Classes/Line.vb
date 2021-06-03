@@ -881,7 +881,7 @@ Public Class Line_DupDepthOptions : Inherits VBparent
         For i = 0 To lines.pt1List.Count - 1
             Dim pt1 = lines.pt1List(i)
             Dim pt2 = lines.pt2List(i)
-            If pt1.X = pt2.X Then latest.Line(pt1, pt2, cv.Scalar.White, 1, cv.LineTypes.Link4)
+            If pt1.X = pt2.X Then latest.Line(pt1, pt2, cv.Scalar.White, task.lineWidth, cv.LineTypes.Link4)
         Next
         Return latest
     End Function
@@ -890,7 +890,7 @@ Public Class Line_DupDepthOptions : Inherits VBparent
         For i = 0 To lines.pt1List.Count - 1
             Dim pt1 = lines.pt1List(i)
             Dim pt2 = lines.pt2List(i)
-            If pt1.Y = pt2.Y Then latest.Line(pt1, pt2, cv.Scalar.White, 1, cv.LineTypes.Link4)
+            If pt1.Y = pt2.Y Then latest.Line(pt1, pt2, cv.Scalar.White, task.lineWidth, cv.LineTypes.Link4)
         Next
         Return latest
     End Function
@@ -1018,16 +1018,14 @@ Public Class Line_DupDepth : Inherits VBparent
     Dim dupV As New Line_DupDepthV
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        label1 = "AND dupDephH and DupDepthV"
-        label2 = "OR dupDephH and DupDepthV"
+        label1 = "OR dupDephH and DupDepthV"
         task.desc = "Merge the horizontal and vertical lines with duplicate depth"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         dupH.Run(src)
         dupV.Run(src)
         task.ttTextData.Clear()
-        cv.Cv2.BitwiseAnd(dupH.dOptions.addw.src2, dupV.dOptions.addw.src2, dst1)
-        cv.Cv2.BitwiseOr(dupH.dOptions.addw.src2, dupV.dOptions.addw.src2, dst2)
+        cv.Cv2.BitwiseOr(dupH.dOptions.addw.src2, dupV.dOptions.addw.src2, dst1)
     End Sub
 End Class
 
