@@ -931,21 +931,14 @@ Public Class Line_DupDepthOptions : Inherits VBparent
         Next
         Return str
     End Function
-    Public Function showCloudData(showX As Boolean)
-        Dim str As String = ""
-        str += "Showing pointcloud " + If(showX, "x", "y") + " data at x = " + CStr(task.drawRect.X) + " y = " + CStr(task.drawRect.Y) + vbCrLf
-        Dim w = task.drawRect.Width
-        Dim h = task.drawRect.Height
-        If w = 0 Or w > screenDWidth Then w = screenDWidth ' standard screen amount...
-        If h = 0 Or h > screenDHeight Then h = screenDHeight ' standard screen amount...
-        For y = task.drawRect.Y To Math.Min(dst1.Height, task.drawRect.Y + h) - 1
-            For x = task.drawRect.X To Math.Min(dst1.Width, task.drawRect.X + w) - 1
-                Dim vec = task.pointCloud.Get(Of cv.Vec3f)(y, x)
-                If showX Then str += Format(vec.Item0 * 1000, "0000") + " " Else str += Format(vec.Item1 * 1000, "0000") + " "
+    Public Function getCloudData() As List(Of cv.Vec3f)
+        Dim vals As New List(Of cv.Vec3f)
+        For y = task.drawRect.Y To task.drawRect.Y + task.drawRect.Height - 1
+            For x = task.drawRect.X To task.drawRect.X + task.drawRect.Width - 1
+                vals.Add(task.pointCloud.Get(Of cv.Vec3f)(y, x))
             Next
-            str += vbCrLf
         Next
-        Return str
+        Return vals
     End Function
     Public Sub Run(src As cv.Mat) ' Rank = 1
         setTrueText("Line_DupDepthOptions has no output - just consolidates all the options and functions needed for Line_DupDepth algorithms.")
@@ -1049,6 +1042,7 @@ Public Class Line_DupLongestH : Inherits VBparent
         dst1 = dupH.dst1
 
         Dim latest As New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        longestLen = 0
         For i = 0 To dupH.dOptions.lines.pt1List.Count - 1
             Dim pt1 = dupH.dOptions.lines.pt1List(i)
             Dim pt2 = dupH.dOptions.lines.pt2List(i)
@@ -1069,17 +1063,13 @@ Public Class Line_DupLongestH : Inherits VBparent
         setTrueText(dupH.dOptions.showDepthData(), 10, 40, 3)
         label2 = dupH.dOptions.avgRect()
 
-        setTrueText(dupH.dOptions.showCloudData(True), 10, 120, 3)
-        setTrueText(dupH.dOptions.showCloudData(False), 10, 220, 3)
-        'Dim tmp As String = dupH.dOptions.showDepthData()
-        'Dim w = 90
-
-        'setTrueText(tmp.Substring(0, InStr(tmp, vbCrLf) - 1), 10, 40, 3)
-        'tmp = tmp.Substring(InStr(tmp, vbCrLf) + 1)
-        'Dim split = tmp.Split(" ")
-        'For i = 0 To tmp.length / w
-        '    Dim nextStr = tmp.Substring(i * w, Math.Min(tmp.Length - i * w, w))
-        '    setTrueText(nextStr, 10, 40 + (i + 1) * 20, 3)
-        'Next
+        Dim lineData = dupH.dOptions.getCloudData()
+        Dim lineMat = New cv.Mat(lineData.Count, 1, cv.MatType.CV_32FC3, lineData.ToArray())
+        Dim meanVec = lineMat.Mean()
+        Dim split = lineMat.Split()
+        For i = 0 To 3 - 1
+            split(i).MinMaxLoc(minVal, maxVal)
+            setTrueText("mean = " + Format(meanVec.Item(i) * 1000, "0000") + " minVal = " + Format(minVal * 1000, "0000") + " maxVal = " + Format(maxVal * 1000, "0000"), 10, 100 + i * 25, 3)
+        Next
     End Sub
 End Class
