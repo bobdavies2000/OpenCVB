@@ -1297,13 +1297,16 @@ End Class
 Public Class PointCloud_Neighbor_Options : Inherits VBparent
     Public thresholdSlider As Windows.Forms.TrackBar
     Public pixelSlider As Windows.Forms.TrackBar
+    Public errorSlider As Windows.Forms.TrackBar
     Public Sub New()
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Difference from neighbor in mm's", 0, 20, 0)
             sliders.setupTrackBar(1, "Offset to neighbor pixel", 1, 500, 10)
+            sliders.setupTrackBar(2, "Z-Error tolerance from vertical/horizontal in mm's", 1, 50, 20)
         End If
         thresholdSlider = findSlider("Difference from neighbor in mm's")
         pixelSlider = findSlider("Offset to neighbor pixel")
+        errorSlider = findSlider("Z-Error tolerance from vertical/horizontal in mm's")
         task.desc = "Display options for PointCloud_Neighbor algorithms."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -1460,7 +1463,7 @@ End Class
 
 
 
-Public Class PointCloud_NeighborGH : Inherits VBparent
+Public Class PointCloud_NeighborIMUH : Inherits VBparent
     Dim gCloud As New Depth_PointCloud_IMU
     Dim horiz As New PointCloud_NeighborsH
     Public Sub New()
@@ -1484,7 +1487,7 @@ End Class
 
 
 
-Public Class PointCloud_NeighborGV : Inherits VBparent
+Public Class PointCloud_NeighborIMUV : Inherits VBparent
     Dim gCloud As New Depth_PointCloud_IMU
     Dim verticals As New PointCloud_NeighborsV
     Public Sub New()
