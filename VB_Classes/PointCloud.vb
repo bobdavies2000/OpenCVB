@@ -98,48 +98,6 @@ End Class
 
 
 
-Public Class PointCloud_DuplicateV : Inherits VBparent
-    Public Sub New()
-        label1 = "White pixels: duplicate depth values in the X direction"
-        task.desc = "Show where horizontally adjoining depth values are identical"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32F Then input = task.depth32f
-
-        Dim tmp32f = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
-        Dim r1 = New cv.Rect(1, 0, dst1.Width - 1, dst1.Height)
-        Dim r2 = New cv.Rect(0, 0, dst1.Width - 1, dst1.Height)
-        cv.Cv2.Absdiff(input(r1), input(r2), tmp32f(r1))
-        tmp32f = tmp32f.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        dst1 = tmp32f.ConvertScaleAbs(255)
-        dst1.SetTo(0, task.noDepthMask)
-    End Sub
-End Class
-
-
-
-
-Public Class PointCloud_DuplicateH : Inherits VBparent
-    Public Sub New()
-        label1 = "White pixels: duplicate depth values in the Y direction"
-        task.desc = "Show where vertically adjoining depth values are identical"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        Dim input = src
-        If input.Type <> cv.MatType.CV_32F Then input = task.depth32f
-
-        Dim tmp32f = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
-        Dim r1 = New cv.Rect(0, 0, dst1.Width, dst1.Height - 1)
-        Dim r2 = New cv.Rect(0, 1, dst1.Width, dst1.Height - 1)
-        cv.Cv2.Absdiff(input(r1), input(r2), tmp32f(r1))
-        tmp32f = tmp32f.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        dst1 = tmp32f.ConvertScaleAbs(255)
-        dst1.SetTo(0, task.noDepthMask)
-    End Sub
-End Class
-
-
 
 
 
@@ -149,9 +107,7 @@ Public Class PointCloud_Inspector : Inherits VBparent
             sliders.setupTrackBar(0, "Inspection Line", 0, dst1.Width, dst1.Width / 2)
             sliders.setupTrackBar(1, "Y-Direction intervals", 0, 100, 30)
         End If
-
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-
         task.desc = "Inspect x, y, and z values in a row or column"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -1329,5 +1285,219 @@ Public Class PointCloud_SurfaceH : Inherits VBparent
         dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst1.Line(New cv.Point(0, task.mousePoint.Y), New cv.Point(dst1.Width, task.mousePoint.Y), cv.Scalar.Yellow, task.lineWidth)
         dst2.Line(New cv.Point(0, offset), New cv.Point(dst2.Width, offset), cv.Scalar.Yellow, task.lineWidth)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_Neighbor_Options : Inherits VBparent
+    Public thresholdSlider As Windows.Forms.TrackBar
+    Public pixelSlider As Windows.Forms.TrackBar
+    Public Sub New()
+        If sliders.Setup(caller) Then
+            sliders.setupTrackBar(0, "Difference from neighbor in mm's", 0, 20, 0)
+            sliders.setupTrackBar(1, "Offset to neighbor pixel", 1, 500, 10)
+        End If
+        thresholdSlider = findSlider("Difference from neighbor in mm's")
+        pixelSlider = findSlider("Offset to neighbor pixel")
+        task.desc = "Display options for PointCloud_Neighbor algorithms."
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        setTrueText("PointCloud_NeighborOptions has no output - just options for PointCloud_Neighbor algorithms")
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class PointCloud_NeighborV : Inherits VBparent
+    Dim options As New PointCloud_Neighbor_Options
+    Public Sub New()
+        task.desc = "Show where vertical neighbor depth values are within Y pixels"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Dim shift = options.pixelSlider.Value
+        Dim shiftZ = options.thresholdSlider.Value
+        If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
+
+        Dim tmp32f = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        Dim r1 = New cv.Rect(shift, 0, dst1.Width - shift, dst1.Height)
+        Dim r2 = New cv.Rect(0, 0, dst1.Width - shift, dst1.Height)
+        cv.Cv2.Absdiff(src(r1), src(r2), tmp32f(r1))
+        tmp32f = tmp32f.Threshold(shiftZ, 255, cv.ThresholdTypes.BinaryInv)
+        dst1 = tmp32f.ConvertScaleAbs(255)
+        dst1.SetTo(0, task.noDepthMask)
+        dst1(New cv.Rect(0, dst1.Height - shift, dst1.Width, shift)).SetTo(0)
+        label1 = "White: z is within " + CStr(shiftZ) + " mm's with Y pixel offset " + CStr(shift)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class PointCloud_NeighborH : Inherits VBparent
+    Dim options As New PointCloud_Neighbor_Options
+    Public Sub New()
+        task.desc = "Show where horizontal neighbor depth values are within X pixels"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Dim shift = options.pixelSlider.Value
+        Dim shiftZ = options.thresholdSlider.Value
+        If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
+
+        Dim tmp32f = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        Dim r1 = New cv.Rect(0, 0, dst1.Width, dst1.Height - shift)
+        Dim r2 = New cv.Rect(0, shift, dst1.Width, dst1.Height - shift)
+        cv.Cv2.Absdiff(src(r1), src(r2), tmp32f(r1))
+        tmp32f = tmp32f.Threshold(shiftZ, 255, cv.ThresholdTypes.BinaryInv)
+        dst1 = tmp32f.ConvertScaleAbs(255)
+        dst1.SetTo(0, task.noDepthMask)
+        dst1(New cv.Rect(dst1.Width - shift, 0, shift, dst1.Height)).SetTo(0)
+        label1 = "White: z is within " + CStr(shiftZ) + " mm's with X pixel offset " + CStr(shift)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class PointCloud_NeighborsH : Inherits VBparent
+    Public options As New PointCloud_Neighbor_Options
+    Public pt1 As New List(Of cv.Point)
+    Public pt2 As New List(Of cv.Point)
+    Public Sub New()
+        options.pixelSlider.Value = options.pixelSlider.Maximum
+        task.desc = "Manual step through depth data to find horizontal neighbors within x mm's"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Dim shift = options.pixelSlider.Value
+        Dim shiftZ = options.thresholdSlider.Value
+        If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
+
+        pt1.Clear()
+        pt2.Clear()
+        For y = 0 To src.Height - 1
+            For x = 0 To src.Width - shift - 1
+                Dim x1 = src.Get(Of Single)(y, x)
+                Dim x2 = src.Get(Of Single)(y, x + shift)
+                If x1 = 0 Or x2 = 0 Then Continue For
+                If Math.Abs(x1 - x2) <= shiftZ Then
+                    pt1.Add(New cv.Point(x, y))
+                    pt2.Add(New cv.Point(x + shift, y))
+                    x += shift
+                End If
+            Next
+        Next
+
+        dst1 = task.color.Clone
+        For i = 0 To pt1.Count - 1
+            dst1.Line(pt1(i), pt2(i), cv.Scalar.Yellow, task.lineWidth)
+        Next
+        label1 = CStr(pt1.Count) + " z-values within " + CStr(shiftZ) + " mm's with X pixel offset " + CStr(shift)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class PointCloud_NeighborsV : Inherits VBparent
+    Public options As New PointCloud_Neighbor_Options
+    Public pt1 As New List(Of cv.Point)
+    Public pt2 As New List(Of cv.Point)
+    Public Sub New()
+        options.pixelSlider.Value = options.pixelSlider.Maximum
+        task.desc = "Manual step through depth data to find vertical neighbors within x mm's"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Dim shift = options.pixelSlider.Value
+        Dim shiftZ = options.thresholdSlider.Value
+        If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
+
+        pt1.Clear()
+        pt2.Clear()
+        For x = 0 To src.Width - 1
+            For y = 0 To src.Height - shift - 1
+                Dim x1 = src.Get(Of Single)(y, x)
+                Dim x2 = src.Get(Of Single)(y + shift, x)
+                If x1 = 0 Or x2 = 0 Then Continue For
+                If Math.Abs(x1 - x2) <= shiftZ Then
+                    pt1.Add(New cv.Point(x, y))
+                    pt2.Add(New cv.Point(x, y + shift))
+                    y += shift
+                End If
+            Next
+        Next
+
+        dst1 = task.color.Clone
+        For i = 0 To pt1.Count - 1
+            dst1.Line(pt1(i), pt2(i), cv.Scalar.Yellow, task.lineWidth)
+        Next
+        label1 = CStr(pt1.Count) + " z-values within " + CStr(shiftZ) + " mm's with Y pixel offset " + CStr(shift)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class PointCloud_NeighborGH : Inherits VBparent
+    Dim gCloud As New Depth_PointCloud_IMU
+    Dim horiz As New PointCloud_NeighborsH
+    Public Sub New()
+        horiz.options.thresholdSlider.Value = 1
+        horiz.options.pixelSlider.Value = 300
+        task.desc = "Use the IMU adjusted cloud to find horizontals"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        gCloud.Run(src)
+
+        Dim split = gCloud.dst1.Split()
+        horiz.Run(split(2) * 1000)
+        dst1 = horiz.dst1
+        label1 = horiz.label1
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class PointCloud_NeighborGV : Inherits VBparent
+    Dim gCloud As New Depth_PointCloud_IMU
+    Dim verticals As New PointCloud_NeighborsV
+    Public Sub New()
+        verticals.options.thresholdSlider.Value = 1
+        verticals.options.pixelSlider.Value = 300
+        task.desc = "Use the IMU adjusted cloud to find verticals"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        gCloud.Run(src)
+
+        Dim split = gCloud.dst1.Split()
+        verticals.Run(split(2) * 1000)
+        dst1 = verticals.dst1
+        label1 = verticals.label1
     End Sub
 End Class

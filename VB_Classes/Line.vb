@@ -952,11 +952,11 @@ End Class
 
 Public Class Line_DupDepthV : Inherits VBparent
     Public dOptions As New Line_DupDepthOptions
-    Dim cloud As New PointCloud_DuplicateV
+    Dim cloud As New PointCloud_NeighborV
     Public Sub New()
         label1 = "Move mouse over the image to see the depth data"
         label2 = "Draw a rectangle around lines to get stats"
-        task.desc = "Detect lines in the PointCloud_DuplicateV output where linear patterns show where duplicate depth values are neighbors."
+        task.desc = "Detect lines in the PointCloud_NeighborV output where linear patterns show where duplicate depth values are neighbors."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         cloud.Run(src)
@@ -980,11 +980,11 @@ End Class
 
 Public Class Line_DupDepthH : Inherits VBparent
     Public dOptions As New Line_DupDepthOptions
-    Dim cloud As New PointCloud_DuplicateH
+    Dim cloud As New PointCloud_NeighborH
     Public Sub New()
         label1 = "Move mouse over the image to see the depth data"
         label2 = "Draw a rectangle around lines to get stats"
-        task.desc = "Detect lines in the PointCloud_DuplicateH output where linear patterns show where duplicate depth values are neighbors."
+        task.desc = "Detect lines in the PointCloud_NeighborH output where linear patterns show where duplicate depth values are neighbors."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         cloud.Run(src)
@@ -1046,30 +1046,37 @@ Public Class Line_DupLongestH : Inherits VBparent
         For i = 0 To dupH.dOptions.lines.pt1List.Count - 1
             Dim pt1 = dupH.dOptions.lines.pt1List(i)
             Dim pt2 = dupH.dOptions.lines.pt2List(i)
-            If pt1.Y = pt2.Y Then
-                Dim len = Math.Abs(pt1.X - pt2.X)
+            'If pt1.Y = pt2.Y Then
+            Dim len = Math.Abs(pt1.X - pt2.X)
                 If len > longestLen Then
-                    longestP1 = If(pt1.X < pt2.X, pt1, pt2)
-                    longestP2 = If(pt1.X > pt2.X, pt1, pt2)
-                    longestLen = len
+                    Dim val1 = task.depth32f.Get(Of Single)(pt1.Y, pt1.X)
+                    If val1 > 0 Then
+                        longestP1 = If(pt1.X < pt2.X, pt1, pt2)
+                        longestP2 = If(pt1.X > pt2.X, pt1, pt2)
+                        longestLen = len
+                    End If
                 End If
-            End If
+            'End If
         Next
 
         task.ttTextData.Clear()
+
         task.drawRect = New cv.Rect(longestP1.X, longestP1.Y, longestP2.X - longestP1.X, 1)
-        dst1.Rectangle(task.drawRect, cv.Scalar.White, task.lineWidth + 2)
+        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then
+            dst1.Rectangle(task.drawRect, cv.Scalar.White, task.lineWidth + 2)
 
-        setTrueText(dupH.dOptions.showDepthData(), 10, 40, 3)
-        label2 = dupH.dOptions.avgRect()
+            setTrueText(dupH.dOptions.showDepthData(), 10, 40, 3)
+            label2 = dupH.dOptions.avgRect()
 
-        Dim lineData = dupH.dOptions.getCloudData()
-        Dim lineMat = New cv.Mat(lineData.Count, 1, cv.MatType.CV_32FC3, lineData.ToArray())
-        Dim meanVec = lineMat.Mean()
-        Dim split = lineMat.Split()
-        For i = 0 To 3 - 1
-            split(i).MinMaxLoc(minVal, maxVal)
-            setTrueText("mean = " + Format(meanVec.Item(i) * 1000, "0000") + " minVal = " + Format(minVal * 1000, "0000") + " maxVal = " + Format(maxVal * 1000, "0000"), 10, 100 + i * 25, 3)
-        Next
+            Dim lineData = dupH.dOptions.getCloudData()
+            Dim lineMat = New cv.Mat(lineData.Count, 1, cv.MatType.CV_32FC3, lineData.ToArray())
+            Dim meanVec = lineMat.Mean()
+            Dim split = lineMat.Split()
+            For i = 0 To 3 - 1
+                split(i).MinMaxLoc(minVal, maxVal)
+                Dim prefix = Choose(i + 1, "X", "Y", "Z")
+                setTrueText(prefix + " mean = " + Format(meanVec.Item(i) * 1000, "0000") + " minVal = " + Format(minVal * 1000, "0000") + " maxVal = " + Format(maxVal * 1000, "0000"), 10, 100 + i * 25, 3)
+            Next
+        End If
     End Sub
 End Class
