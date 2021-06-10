@@ -201,9 +201,6 @@ Public Class ActiveTask : Implements IDisposable
     Public maxY As Single
     Public maxZ As Single
 
-    Public pixelsPerMeterTop As Single
-    Public pixelsPerMeterSide As Single
-
     Public hFov As Single
     Public vFov As Single
     Public angleX As Single  ' rotation angle in radians around x-axis to align with gravity

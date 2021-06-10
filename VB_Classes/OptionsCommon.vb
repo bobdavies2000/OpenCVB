@@ -34,9 +34,6 @@ Public Class OptionsCommon : Inherits VBparent
         task.maxZ = task.maxDepth / 1000
         task.maxY = task.maxZ * task.viewOptions.sideFrustrumSetting / 100 / 2
         task.maxX = task.maxZ * task.viewOptions.topFrustrumSetting / 100 / 2
-
-        task.pixelsPerMeterSide = dst1.Width / task.maxZ
-        task.pixelsPerMeterTop = dst1.Height / task.maxZ
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         updateSettings()

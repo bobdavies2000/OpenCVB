@@ -57,7 +57,7 @@ Public Class PointCloud_Basics : Inherits VBparent
 
             minDepth = task.maxZ * (dst1.Height - (rView.Y + rView.Height)) / dst1.Height
             maxDepth = task.maxZ * (dst1.Height - rView.Y) / dst1.Height
-            widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Width / task.pixelsPerMeterTop, "0.0") + "m"
+            widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Width / dst1.Height / task.maxZ, "0.0") + "m"
             detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m" + widthInfo
 
             vw = vwTop
@@ -75,7 +75,7 @@ Public Class PointCloud_Basics : Inherits VBparent
             minDepth = task.maxZ * rView.X / dst1.Width
             maxDepth = task.maxZ * (rView.X + rView.Width) / dst1.Width
 
-            widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Height / task.pixelsPerMeterSide, "0.0") + "m"
+            widthInfo = " & " + CStr(rView.Width) + " pixels wide or " + Format(rView.Height / dst1.Width / task.maxZ, "0.0") + "m"
             detailText = Format(minDepth, "#0.0") + "-" + Format(maxDepth, "#0.0") + "m " + widthInfo
 
             vw = vwSide
@@ -1012,7 +1012,7 @@ Public Class PointCloud_ObjectsTop : Inherits VBparent
         measureTop.Run(src)
         dst1 = measureTop.dst1
 
-        label1 = "Pixels/Meter horizontal: " + CStr(CInt(dst1.Width / task.maxZ)) + " vertical: " + CStr(CInt(task.pixelsPerMeterTop))
+        label1 = "Pixels/Meter horizontal: " + CStr(CInt(dst1.Width / task.maxZ)) + " vertical: " + CStr(CInt(dst1.Height / task.maxZ))
 
         Dim FOV = task.hFov / 2
 
@@ -1025,10 +1025,9 @@ Public Class PointCloud_ObjectsTop : Inherits VBparent
             xpt2 = New cv.Point2f(task.topCameraPoint.X + lineHalf, src.Height - pixeldistance)
             If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Blue, task.lineWidth + 2)
             Dim lineWidth = xpt2.X - xpt1.X
-            Dim blueLineMeters As Single
+            Dim blueLineMeters = 0.0
             If lineWidth = 0 Then
                 lineWidth = 1
-                blueLineMeters = 0
             Else
                 blueLineMeters = distanceSlider.Value * lineWidth / (1000 * pixeldistance)
             End If
@@ -1109,7 +1108,7 @@ Public Class PointCloud_ObjectsSide : Inherits VBparent
         measureSide.Run(src)
         dst1 = measureSide.dst1
 
-        label1 = "Pixels/Meter horizontal: " + CStr(CInt(task.pixelsPerMeterSide)) + " vertical: " + CStr(CInt(task.pixelsPerMeterTop))
+        label1 = "Pixels/Meter horizontal: " + CStr(CInt(dst1.Width / task.maxZ)) + " vertical: " + CStr(CInt(dst1.Height / task.maxZ))
         Dim FOV = task.vFov / 2
 
         Dim xpt1 As cv.Point2f, xpt2 As cv.Point2f
@@ -1121,10 +1120,9 @@ Public Class PointCloud_ObjectsSide : Inherits VBparent
             xpt2 = New cv.Point2f(task.sideCameraPoint.X + pixeldistance, task.sideCameraPoint.Y + lineHalf)
             If drawLines Then dst1.Line(xpt1, xpt2, cv.Scalar.Blue, task.lineWidth + 2)
             Dim lineWidth = xpt2.Y - xpt1.Y
-            Dim blueLineMeters As Single
+            Dim blueLineMeters = 0.0
             If lineWidth = 0 Then
                 lineWidth = 1
-                blueLineMeters = 0
             Else
                 blueLineMeters = distanceSlider.Value * lineWidth / (1000 * pixeldistance)
             End If

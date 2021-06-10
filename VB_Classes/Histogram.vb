@@ -684,15 +684,17 @@ Public Class Histogram_SmoothConcentration : Inherits VBparent
         task.desc = "Using stable depth data, highlight the histogram projections where concentrations are highest"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
+        concent.ptList.Clear()
+
         sideview.Run(src)
         dst1 = sideview.dst1
         Dim noDepth = sideview.sideView.histOutput.Get(Of Single)(sideview.sideView.histOutput.Height / 2, 0)
-        label1 = "SideView " + concent.plotHighlights(sideview.sideView.histOutput, dst1, task.pixelsPerMeterSide) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        label1 = "SideView " + concent.plotHighlights(sideview.sideView.histOutput, dst1, True) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
         dst1 = task.palette.dst1.Clone
 
         topview.Run(src)
         dst2 = topview.dst1
-        label2 = "TopView " + concent.plotHighlights(topview.topView.histOutput, dst2, task.pixelsPerMeterTop) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
+        label2 = "TopView " + concent.plotHighlights(topview.topView.histOutput, dst2, False) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
         dst2 = task.palette.dst1.Clone
     End Sub
 End Class
@@ -707,26 +709,25 @@ End Class
 Public Class Histogram_ConcentrationPoints : Inherits VBparent
     Public sideview As New Histogram_SideView2D
     Public topview As New Histogram_TopView2D
+    Public ptList As New SortedList(Of Single, cv.Vec3f)(New compareAllowIdenticalSingleInverted)
     Public Sub New()
         If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 10)
+            sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 100)
             sliders.setupTrackBar(1, "Resize Factor x100", 1, 100, 10)
             sliders.setupTrackBar(2, "Concentration Threshold", 1, 100, 10)
         End If
         task.desc = "Highlight a fixed number of histogram projections where concentrations are highest"
     End Sub
-    Public Function plotHighlights(histOutput As cv.Mat, dst As cv.Mat, pixelsPM As Single) As String
+    Public Function plotHighlights(histOutput As cv.Mat, dst As cv.Mat, sideRun As Boolean) As String
         Static ResizeSlider = findSlider("Resize Factor x100")
         Static cThresholdSlider = findSlider("Concentration Threshold")
         Dim resizeFactor = ResizeSlider.Value / 100
         Dim concentrationThreshold = cThresholdSlider.Value
 
-        Dim minPixel = CInt(resizeFactor * task.minDepth * pixelsPM / 1000)
-
         Dim tmp = histOutput.Resize(New cv.Size(CInt(histOutput.Width * resizeFactor), CInt(histOutput.Height * resizeFactor)))
-        Dim pts As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalIntegerInverted)
+        Dim pts As New SortedList(Of Single, cv.Point)(New compareAllowIdenticalSingleInverted)
         For y = 0 To tmp.Height - 1
-            For x = minPixel To tmp.Width - 1
+            For x = 0 To tmp.Width - 1
                 Dim val = tmp.Get(Of Single)(y, x)
                 If val > concentrationThreshold Then pts.Add(val, New cv.Point(CInt(x / resizeFactor), CInt(y / resizeFactor)))
             Next
@@ -734,21 +735,38 @@ Public Class Histogram_ConcentrationPoints : Inherits VBparent
 
         Static topXslider = findSlider("Display the top x highlights")
         Dim topX = Math.Min(pts.Count, topXslider.value)
+        Dim FOV = If(sideRun, task.vFov, task.hFov) / 2
+        Dim camPoint = If(sideRun, task.sideCameraPoint, task.topCameraPoint)
         For i = 0 To topX - 1
             Dim pt = pts.ElementAt(i).Value
-            dst.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+            Dim distance = If(sideRun, pt.X / dst1.Width, pt.Y / dst1.Height) * task.maxZ * 1000
+
+            Dim lineHalf = CInt(Math.Tan(FOV * 0.0174533) * distance)
+            Dim pt1 = New cv.Point2f(camPoint.X + distance, camPoint.Y - lineHalf)
+            Dim pt2 = New cv.Point2f(camPoint.X + distance, camPoint.Y + lineHalf)
+            If sideRun = False Then
+                pt1 = New cv.Point2f(camPoint.X - lineHalf, camPoint.Y - distance)
+                pt2 = New cv.Point2f(camPoint.X + lineHalf, camPoint.Y - distance)
+            End If
+
+            Dim xLoc = If(sideRun, 0, dst1.Width * (pt.X - pt1.X) / (pt2.X - pt1.X))
+            Dim yLoc = If(sideRun, dst1.Width * (pt.Y - pt1.Y) / (pt2.Y - pt1.Y), 0)
+            ptList.Add(distance, New cv.Vec3f(xLoc, yLoc, distance))
+            dst.Circle(pt, task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
         Next
         Dim maxConcentration = If(pts.Count > 0, pts.ElementAt(0).Key, 0)
         Return CStr(topX) + " highlights. Max=" + CStr(maxConcentration)
     End Function
     Public Sub Run(src As cv.Mat) ' Rank = 1
+        ptList.Clear()
+
         sideview.Run(src)
         dst1 = sideview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        label1 = "SideView " + plotHighlights(sideview.originalHistOutput, dst1, task.pixelsPerMeterSide)
+        label1 = "SideView " + plotHighlights(sideview.originalHistOutput, dst1, True)
 
         topview.Run(src)
         dst2 = topview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        label2 = "TopView " + plotHighlights(topview.originalHistOutput, dst2, task.pixelsPerMeterTop)
+        label2 = "TopView " + plotHighlights(topview.originalHistOutput, dst2, False)
     End Sub
 End Class
 
