@@ -676,35 +676,6 @@ End Class
 
 
 
-Public Class Histogram_SmoothConcentration : Inherits VBparent
-    Public sideview As New Histogram_SmoothSideView2D
-    Public topview As New Histogram_SmoothTopView2D
-    Dim concent As New Histogram_ConcentrationPoints
-    Public Sub New()
-        task.desc = "Using stable depth data, highlight the histogram projections where concentrations are highest"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        concent.ptList.Clear()
-
-        sideview.Run(src)
-        dst1 = sideview.dst1
-        Dim noDepth = sideview.sideView.histOutput.Get(Of Single)(sideview.sideView.histOutput.Height / 2, 0)
-        label1 = "SideView " + concent.plotHighlights(sideview.sideView.histOutput, dst1, True) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        dst1 = task.palette.dst1.Clone
-
-        topview.Run(src)
-        dst2 = topview.dst1
-        label2 = "TopView " + concent.plotHighlights(topview.topView.histOutput, dst2, False) + " No depth: " + CStr(CInt(noDepth / 1000)) + "k"
-        dst2 = task.palette.dst1.Clone
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class Histogram_ConcentrationPoints : Inherits VBparent
     Public sideview As New Histogram_SideView2D
