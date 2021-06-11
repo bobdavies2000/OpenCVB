@@ -1184,6 +1184,8 @@ Public Class Depth_PointCloud_IMU : Inherits VBparent
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
         Static manualCheckbox = findCheckBox("Initialize the X- and Z-axis sliders with gravity but allow manual after")
         Static angleYslider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
+        Static resizeSlider = findSlider("Resize Factor x100")
+        Dim resizeFactor = resizeSlider.Value / 100
 
         Dim input = src
         If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud.Clone
@@ -1234,6 +1236,10 @@ Public Class Depth_PointCloud_IMU : Inherits VBparent
         Else
             dst1 = input.Clone
             label1 = "dst1 = pointcloud without rotation"
+        End If
+        If resizeFactor <> 1 Then
+            dst2 = dst1.Resize(New cv.Size(CInt(dst1.Width * resizeFactor), CInt(dst1.Height * resizeFactor)))
+            label2 = "After rotation and resize to " + CStr(dst2.Width) + "x" + CStr(dst2.Height)
         End If
     End Sub
 End Class

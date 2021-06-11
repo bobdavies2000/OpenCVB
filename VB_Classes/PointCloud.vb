@@ -863,7 +863,6 @@ Public Class PointCloud_SingletonRegions : Inherits VBparent
     Public topView As New Histogram_TopView2D
     Dim dilate As New DilateErode_Basics
     Public Sub New()
-        topView.resizeHistOutput = False
         task.hist3DThreshold = 1
 
         label1 = "Top down view before inrange sampling"
@@ -1299,11 +1298,11 @@ Public Class PointCloud_Neighbor_Options : Inherits VBparent
     Public Sub New()
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Difference from neighbor in mm's", 0, 20, 0)
-            sliders.setupTrackBar(1, "Offset to neighbor pixel", 1, 500, 10)
+            sliders.setupTrackBar(1, "Minimum offset to neighbor pixel", 1, 500, 10)
             sliders.setupTrackBar(2, "Z-Error tolerance from vertical/horizontal in mm's", 1, 50, 20)
         End If
         thresholdSlider = findSlider("Difference from neighbor in mm's")
-        pixelSlider = findSlider("Offset to neighbor pixel")
+        pixelSlider = findSlider("Minimum offset to neighbor pixel")
         errorSlider = findSlider("Z-Error tolerance from vertical/horizontal in mm's")
         task.desc = "Display options for PointCloud_Neighbor algorithms."
     End Sub
