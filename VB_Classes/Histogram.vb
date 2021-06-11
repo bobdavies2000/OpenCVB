@@ -677,16 +677,19 @@ Public Class Histogram_ConcentrationPoints : Inherits VBparent
     Public topview As New Histogram_TopView2D
     Public ptSide As New SortedList(Of Integer, Integer)
     Public ptTop As New SortedList(Of Integer, Integer)
+    Dim resizeSlider As Windows.Forms.TrackBar
     Public Sub New()
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 100)
             sliders.setupTrackBar(1, "Concentration Threshold", 1, 100, 10)
         End If
+        resizeSlider = findSlider("Resize Factor x100")
+        resizeSlider.Value = 10
+
         task.desc = "Highlight a fixed number of histogram projections where concentrations are highest"
     End Sub
     Public Function plotHighlights(histOutput As cv.Mat, dst As cv.Mat, sideRun As Boolean) As String
         Static cThresholdSlider = findSlider("Concentration Threshold")
-        Static ResizeSlider = findSlider("Resize Factor x100")
         Dim resizeFactor = ResizeSlider.Value / 100
         Dim concentrationThreshold = cThresholdSlider.Value
 
@@ -695,6 +698,7 @@ Public Class Histogram_ConcentrationPoints : Inherits VBparent
         For y = 0 To tmp.Height - 1
             For x = 0 To tmp.Width - 1
                 Dim val = tmp.Get(Of Single)(y, x)
+                If val > 1000 And (x = 0 Or y = tmp.Height - 1) Then val = 0 ' this eliminates the histogram entry for missing depth...
                 If val > concentrationThreshold Then pts.Add(val, New cv.Point(CInt(x / resizeFactor), CInt(y / resizeFactor)))
             Next
         Next

@@ -405,7 +405,7 @@ Public Class IMU_GVector : Inherits VBparent
             sliders.setupTrackBar(0, "Amount to rotate pointcloud around X-axis (degrees)", -90, 90, 0)
             sliders.setupTrackBar(1, "Amount to rotate pointcloud around Y-axis (degrees)", -90, 90, 1)
             sliders.setupTrackBar(2, "Amount to rotate pointcloud around Z-axis (degrees)", -90, 90, 0)
-            sliders.setupTrackBar(3, "Resize Factor x100", 1, 100, 10)
+            sliders.setupTrackBar(3, "Resize Factor x100", 1, 100, 100)
         End If
 
         If check.Setup(caller, 3) Then
