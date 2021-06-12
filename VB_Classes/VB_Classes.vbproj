@@ -118,6 +118,7 @@
     <Compile Include="imageForm.vb" />
     <Compile Include="ImageSeg.vb" />
     <Compile Include="imShow.vb" />
+    <Compile Include="Interpolate.vb" />
     <Compile Include="LineFLD.vb" />
     <Compile Include="MFD.vb" />
     <Compile Include="MiniPC.vb" />

@@ -725,10 +725,12 @@ Public Class Histogram_ConcentrationPoints : Inherits VBparent
         ptTop.Clear()
 
         sideview.Run(src)
+        ' dst1.SetTo(0)
         dst1 = sideview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         label1 = "SideView " + plotHighlights(sideview.originalHistOutput, dst1, True)
 
         topview.Run(src)
+        ' dst2.SetTo(0)
         dst2 = topview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         label2 = "TopView " + plotHighlights(topview.originalHistOutput, dst2, False)
     End Sub
