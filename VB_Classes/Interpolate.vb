@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Interpolate_Basics : Inherits VBparent
-    Dim flags As New Resize_Options
+    Public flags As New Resize_Options
     Public Sub New()
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Resize % (Grab to control)", 1, 100, 50)
@@ -48,17 +48,22 @@ Public Class Interpolate_Kalman : Inherits VBparent
     Dim kalman As New Kalman_Basics
     Public Sub New()
         findRadio("Nearest (preserves pixel values best)").Checked = True
-        findSlider("Resize % (Grab to control)").Value = 1
-        findSlider("Interpolation threshold").Value = 1
+        findSlider("Resize % (Grab to control)").Value = 3
+        findSlider("Interpolation threshold").Value = 4
         task.desc = "Use Kalman to smooth the grayscale results of interpolation"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static thresholdSlider = findSlider("Interpolation threshold")
+        Static updatedFrames As Integer
+        Static radioSelection As Integer
 
         inter.Run(src)
         dst1 = inter.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If dst1.Width * dst1.Height <> kalman.kInput.Length Then
-            ReDim kalman.kInput(dst1.Width * dst1.Height)
+        If dst1.Width * dst1.Height <> kalman.kInput.Length Or radioSelection <> inter.flags.radioIndex Then
+            ReDim kalman.kInput(dst1.Width * dst1.Height - 1)
+            task.frameCount = 1
+            updatedFrames = 0
+            radioSelection = inter.flags.radioIndex
         End If
 
         Dim i As Integer
@@ -90,8 +95,13 @@ Public Class Interpolate_Kalman : Inherits VBparent
 
         Static lastframe = dst1.Clone
         If lastframe.size <> dst1.Size Then lastframe = dst1.Clone
-        dst2 = (dst1 - lastframe).tomat.threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
-        lastframe = dst1.Clone
+        Dim tmp = (dst1 - lastframe).tomat.threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
+        If tmp.CountNonZero > 0 Then
+            lastframe = dst1.Clone
+            dst2 = src.Clone
+            updatedFrames += 1
+        End If
+        label2 = "Total frames = " + CStr(task.frameCount) + " updates=" + CStr(updatedFrames) + " savings = " + CStr(task.frameCount - updatedFrames)
     End Sub
 End Class
 
@@ -105,7 +115,7 @@ Public Class Interpolate_Lines : Inherits VBparent
     Dim inter As New Interpolate_Basics
     Public Sub New()
         findRadio("Nearest (preserves pixel values best)").Checked = True
-        findSlider("Resize % (Grab to control)").Value = 1
+        findSlider("Resize % (Grab to control)").Value = 4
         task.desc = "Detect lines in interpolation results."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

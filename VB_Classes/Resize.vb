@@ -65,6 +65,7 @@ End Class
 
 Public Class Resize_Options : Inherits VBparent
     Public warpFlag As cv.InterpolationFlags
+    Public radioIndex As Integer
     Public Sub New()
         If radio.Setup(caller, 7) Then
             radio.check(0).Text = "Area"
@@ -85,6 +86,7 @@ Public Class Resize_Options : Inherits VBparent
             If frm.check(i).Checked Then
                 warpFlag = Choose(i + 1, cv.InterpolationFlags.Area, cv.InterpolationFlags.Cubic, cv.InterpolationFlags.Lanczos4, cv.InterpolationFlags.Linear,
                                          cv.InterpolationFlags.Nearest, cv.InterpolationFlags.WarpFillOutliers, cv.InterpolationFlags.WarpInverseMap)
+                radioIndex = i
                 Exit For
             End If
         Next
