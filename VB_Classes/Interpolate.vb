@@ -47,7 +47,7 @@ Public Class Interpolate_Kalman : Inherits VBparent
     Dim inter As New Interpolate_Basics
     Dim kalman As New Kalman_Basics
     Public Sub New()
-        findRadio("Nearest (preserves pixel values best)").Checked = True
+        findRadio("Area").Checked = True
         findSlider("Resize % (Grab to control)").Value = 3
         findSlider("Interpolation threshold").Value = 4
         task.desc = "Use Kalman to smooth the grayscale results of interpolation"
@@ -97,6 +97,7 @@ Public Class Interpolate_Kalman : Inherits VBparent
         If lastframe.size <> dst1.Size Then lastframe = dst1.Clone
         Dim tmp = (dst1 - lastframe).tomat.threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
         If tmp.CountNonZero > 0 Then
+            Console.WriteLine("Count non zero = " + CStr(tmp.countnonzero))
             lastframe = dst1.Clone
             dst2 = src.Clone
             updatedFrames += 1
@@ -114,7 +115,7 @@ Public Class Interpolate_Lines : Inherits VBparent
     Dim lines As New Line_Basics
     Dim inter As New Interpolate_Basics
     Public Sub New()
-        findRadio("Nearest (preserves pixel values best)").Checked = True
+        findRadio("Area").Checked = True
         findSlider("Resize % (Grab to control)").Value = 4
         task.desc = "Detect lines in interpolation results."
     End Sub

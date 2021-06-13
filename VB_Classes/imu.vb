@@ -522,16 +522,54 @@ End Class
 
 
 Public Class IMU_IscameraStable : Inherits VBparent
+    Public yaw As Single
+    Public pitch As Single
+    Public roll As Single
     Public Sub New()
         task.desc = "Answer the question: Is the camera stable?"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
-        Dim pitch = task.IMU_AngularVelocity.X
-        Dim yaw = task.IMU_AngularVelocity.Y
-        Dim roll = task.IMU_AngularVelocity.Z
+        pitch = task.IMU_AngularVelocity.X
+        yaw = task.IMU_AngularVelocity.Y
+        roll = task.IMU_AngularVelocity.Z
 
         Dim totalRadians = Math.Abs(pitch) + Math.Abs(yaw) + Math.Abs(roll)
         task.cameraStable = If(totalRadians > task.cameraMotionLimit, False, True)
         If task.useKalmanWhenStable Then task.useKalman = If(task.cameraStable, task.useKalman, False)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class IMU_MotionPlot : Inherits VBparent
+    Dim camIMU As New IMU_IscameraStable
+    Dim plot As New Plot_OverTime
+    Public Sub New()
+        plot.plotCount = 3
+        label1 = "Yaw (blue), pitch (green), and roll (roll) X 1000"
+        task.desc = "Plot the motion of the camera based on the IMU data"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        camIMU.Run(Nothing)
+
+        Static stableCount As Integer
+        If task.cameraStable Then
+            stableCount += 1
+            If stableCount > 30 Then
+                plot.maxScale = 20
+                plot.minScale = -20
+            End If
+        Else
+            stableCount -= 1
+            If stableCount < 0 Then stableCount = 0
+        End If
+            plot.plotData = New cv.Scalar(camIMU.yaw * 1000, camIMU.pitch * 1000, camIMU.roll * 1000)
+        plot.Run(Nothing)
+        dst1 = plot.dst1
     End Sub
 End Class

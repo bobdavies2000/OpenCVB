@@ -177,7 +177,7 @@ Public Class Plot_OverTime : Inherits VBparent
         Dim nextWatchVal = myStopWatch.ElapsedMilliseconds
         If nextWatchVal - lastSeconds > 1000 Then
             lastSeconds = nextWatchVal
-            dst1.Line(New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst1.Height), cv.Scalar.White, task.lineWidth)
+            dst1.Line(New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst1.Height), cv.Scalar.White, 1)
         End If
 
         columnIndex += pixelWidth
@@ -252,7 +252,7 @@ Module Plot_OpenCV_Module
         For i = 0 To 4 - 1
             Dim pt1 = New cv.Point(0, spacer * i)
             Dim pt2 = New cv.Point(dst1.Width, spacer * i)
-            dst1.Line(pt1, pt2, cv.Scalar.White, task.lineWidth)
+            dst1.Line(pt1, pt2, cv.Scalar.White, 1)
             If i = 0 Then pt2.Y += 10
             Dim nextVal = (maxVal - spaceVal * i)
             If maxVal > 1000 Then
