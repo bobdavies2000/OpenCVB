@@ -81,8 +81,8 @@ End Class
 Public Class Plot_OverTime : Inherits VBparent
     Public plotData As cv.Scalar
     Public plotCount As Integer = 3
-    Public plotColors() As cv.Scalar = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.White}
-    Public backColor = cv.Scalar.Aquamarine
+    Public plotColors() As cv.Scalar = {cv.Scalar.Blue, cv.Scalar.LawnGreen, cv.Scalar.Red, cv.Scalar.White}
+    Public backColor = cv.Scalar.LightGray
     Public minScale As Integer = 50
     Public maxScale As Integer = 200
     Public plotTriggerRescale = 50

@@ -677,62 +677,59 @@ Public Class Histogram_ConcentrationPoints : Inherits VBparent
     Public topview As New Histogram_TopView2D
     Public ptSide As New SortedList(Of Integer, Integer)
     Public ptTop As New SortedList(Of Integer, Integer)
+    Dim unsorted As New List(Of Single)
     Dim resizeSlider As Windows.Forms.TrackBar
     Public Sub New()
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Display the top x highlights", 1, 1000, 100)
-            sliders.setupTrackBar(1, "Concentration Threshold", 1, 100, 10)
-        End If
         resizeSlider = findSlider("Resize Factor x100")
         resizeSlider.Value = 10
 
         task.desc = "Highlight a fixed number of histogram projections where concentrations are highest"
     End Sub
     Public Function plotHighlights(histOutput As cv.Mat, dst As cv.Mat, sideRun As Boolean) As String
-        Static cThresholdSlider = findSlider("Concentration Threshold")
-        Dim resizeFactor = ResizeSlider.Value / 100
-        Dim concentrationThreshold = cThresholdSlider.Value
+        Dim resizeFactor = resizeSlider.Value / 100
 
-        Dim tmp = histOutput.Resize(New cv.Size(CInt(histOutput.Width * resizeFactor), CInt(histOutput.Height * resizeFactor)))
+        Dim tmp = histOutput.Resize(New cv.Size(CInt(histOutput.Width * resizeFactor), CInt(histOutput.Height * resizeFactor)), 0, 0, cv.InterpolationFlags.Nearest)
         Dim pts As New SortedList(Of Single, cv.Point)(New compareAllowIdenticalSingleInverted)
+        unsorted.Clear()
         For y = 0 To tmp.Height - 1
             For x = 0 To tmp.Width - 1
                 Dim val = tmp.Get(Of Single)(y, x)
                 If val > 1000 And (x = 0 Or y = tmp.Height - 1) Then val = 0 ' this eliminates the histogram entry for missing depth...
-                If val > concentrationThreshold Then pts.Add(val, New cv.Point(CInt(x / resizeFactor), CInt(y / resizeFactor)))
+                If val > 5 Then
+                    pts.Add(val, New cv.Point(CInt(x / resizeFactor), CInt(y / resizeFactor)))
+                    unsorted.Add(val)
+                End If
             Next
         Next
 
-        Static topXslider = findSlider("Display the top x highlights")
-        Dim topX = Math.Min(pts.Count, topXslider.value)
         Dim ptList = If(sideRun, ptSide, ptTop)
-        For i = 0 To topX - 1
+        For i = 0 To pts.Count - 1
             Dim pt = pts.ElementAt(i).Value
             dst.Circle(pt, task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
-
             Dim distance = CInt(task.maxZ * 1000 * If(sideRun, pt.X / dst1.Width, pt.Y / dst1.Height))
-            If ptList.ContainsKey(distance) Then
-                ptList(distance) += 1
-            Else
-                ptList.Add(distance, 1)
-            End If
+            If ptList.ContainsKey(distance) Then ptList(distance) += 1 Else ptList.Add(distance, 1)
         Next
+
         Dim maxConcentration = If(pts.Count > 0, pts.ElementAt(0).Key, 0)
-        Return CStr(topX) + " highlights. Max histogram value =" + CStr(CInt(maxConcentration))
+        Return CStr(ptList.Count) + " highlights. Max histogram value =" + CStr(CInt(maxConcentration))
     End Function
     Public Sub Run(src As cv.Mat) ' Rank = 1
         ptSide.Clear()
         ptTop.Clear()
 
         sideview.Run(src)
-        ' dst1.SetTo(0)
         dst1 = sideview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         label1 = "SideView " + plotHighlights(sideview.originalHistOutput, dst1, True)
+        If unsorted.Count > 0 Then
+            setTrueText(CStr(unsorted.Count) + " points" + vbCrLf + "max = " + CStr(unsorted.Max()) + vbCrLf + "Average = " + Format(unsorted.Average, "#0.0"))
+        End If
 
         topview.Run(src)
-        ' dst2.SetTo(0)
         dst2 = topview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         label2 = "TopView " + plotHighlights(topview.originalHistOutput, dst2, False)
+        If unsorted.Count > 0 Then
+            setTrueText(CStr(unsorted.Count) + " points" + vbCrLf + "max = " + CStr(unsorted.Max()) + vbCrLf + "Average = " + Format(unsorted.Average, "#0.0"), 10, dst1.Height - 100, 3)
+        End If
     End Sub
 End Class
 
