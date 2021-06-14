@@ -110,6 +110,7 @@
     <Compile Include="BackProject.vb" />
     <Compile Include="BGSubtract.vb" />
     <Compile Include="Coherence.vb" />
+    <Compile Include="Concentration.vb" />
     <Compile Include="DLib.vb" />
     <Compile Include="Download.vb" />
     <Compile Include="FishEye.vb" />
