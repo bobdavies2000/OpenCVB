@@ -17,6 +17,7 @@ Public Class Transform_Resize : Inherits VBparent
             Dim roi = New cv.Rect((w - src.Width) / 2, (h - src.Height) / 2, src.Width, src.Height)
             tmp(roi).CopyTo(dst1)
         Else
+            dst1.SetTo(0)
             Dim roi = New cv.Rect((src.Width - w) / 2, (src.Height - h) / 2, w, h)
             dst1(roi) = src.Resize(New cv.Size(w, h), 0)
         End If
@@ -24,27 +25,6 @@ Public Class Transform_Resize : Inherits VBparent
 End Class
 
 
-
-
-Public Class Transform_Rotate : Inherits VBparent
-    Public imageCenter As cv.Point2f
-    Public Sub New()
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Angle", -180, 180, 30)
-            sliders.setupTrackBar(1, "Scale Factor% (100% means no scaling)", 1, 100, 100)
-            sliders.setupTrackBar(2, "Rotation center X", 1, dst1.Width, dst1.Width / 2)
-            sliders.setupTrackBar(3, "Rotation center Y", 1, dst1.Height, dst1.Height / 2)
-        End If
-        task.desc = "Rotate and scale and image based on the slider values."
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        imageCenter = New cv.Point2f(sliders.trackbar(2).Value, sliders.trackbar(3).Value)
-        Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, sliders.trackbar(0).Value, sliders.trackbar(1).Value / 100)
-        cv.Cv2.WarpAffine(src, dst1, rotationMat, New cv.Size())
-        dst1.Circle(imageCenter, task.dotSize * 2, cv.Scalar.Yellow, -1, task.lineType)
-        dst1.Circle(imageCenter, task.dotSize, cv.Scalar.Blue, -1, task.lineType)
-    End Sub
-End Class
 
 
 
@@ -160,3 +140,35 @@ End Class
 
 
 
+
+
+
+
+
+Public Class Transform_Rotate : Inherits VBparent
+    Public imageCenter As cv.Point2f
+    Public angleSlider As Windows.Forms.TrackBar
+    Public scaleSlider As Windows.Forms.TrackBar
+    Public centerXSlider As Windows.Forms.TrackBar
+    Public centerYSlider As Windows.Forms.TrackBar
+    Public Sub New()
+        If sliders.Setup(caller) Then
+            sliders.setupTrackBar(0, "Angle", -180, 180, 30)
+            sliders.setupTrackBar(1, "Scale Factor% (100% means no scaling)", 1, 100, 100)
+            sliders.setupTrackBar(2, "Rotation center X", 1, dst1.Width, dst1.Width / 2)
+            sliders.setupTrackBar(3, "Rotation center Y", 1, dst1.Height, dst1.Height / 2)
+        End If
+        angleSlider = findSlider("Angle")
+        scaleSlider = findSlider("Scale Factor% (100% means no scaling)")
+        centerXSlider = findSlider("Rotation center X")
+        centerYSlider = findSlider("Rotation center Y")
+        task.desc = "Rotate and scale and image based on the slider values."
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        imageCenter = New cv.Point2f(centerXSlider.Value, centerYSlider.Value)
+        Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, angleSlider.Value, scaleSlider.Value / 100)
+        cv.Cv2.WarpAffine(src, dst1, rotationMat, New cv.Size())
+        dst1.Circle(imageCenter, task.dotSize * 2, cv.Scalar.Yellow, -1, task.lineType)
+        dst1.Circle(imageCenter, task.dotSize, cv.Scalar.Blue, -1, task.lineType)
+    End Sub
+End Class

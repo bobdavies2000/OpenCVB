@@ -568,7 +568,7 @@ Public Class IMU_MotionPlot : Inherits VBparent
             stableCount -= 1
             If stableCount < 0 Then stableCount = 0
         End If
-            plot.plotData = New cv.Scalar(camIMU.yaw * 1000, camIMU.pitch * 1000, camIMU.roll * 1000)
+        plot.plotData = New cv.Scalar(camIMU.yaw * 1000, camIMU.pitch * 1000, camIMU.roll * 1000)
         plot.Run(Nothing)
         dst1 = plot.dst1
     End Sub
