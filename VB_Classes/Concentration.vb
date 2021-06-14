@@ -171,6 +171,7 @@ Public Class Concentration_PeakLines : Inherits VBparent
     Public Sub New()
         histC.drawLines = True
         histC.markerColor = cv.Scalar.Gray
+        label1 = "Grab the Y-axis rotation slider to manually review peaks."
         task.desc = "Rotate around Y-axis to find peak line length"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
