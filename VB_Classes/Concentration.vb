@@ -178,6 +178,7 @@ Public Class Concentration_PeakLines : Inherits VBparent
     Dim lines As New Line_Basics
     Dim mats As New Mat_4to1
     Public histC As New Concentration_Basics
+    Public optimalRotation As Integer
     Public Sub New()
         histC.drawLines = True
         histC.markerColor = cv.Scalar.Gray
@@ -187,7 +188,7 @@ Public Class Concentration_PeakLines : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static rotateSlider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
         Static maxLength As Single
-        Static peakRotation As Integer
+        Static peakRotation As Integer = -90
 
         histC.Run(src)
         mats.mat(0) = histC.dst1
@@ -204,7 +205,7 @@ Public Class Concentration_PeakLines : Inherits VBparent
             End If
         End If
 
-        label2 = "Longest line = " + CStr(maxLength) + " pixels at " + CStr(peakRotation) + " degrees"
+        label2 = "Longest line = " + CStr(maxLength) + " pixels at " + CStr(If(optimalRotation = -90, peakRotation, optimalRotation)) + " degrees"
 
         Static saveRotation = rotateSlider.value
         Static automateRotate As Boolean = True
@@ -212,6 +213,7 @@ Public Class Concentration_PeakLines : Inherits VBparent
         If Math.Abs(saveRotation - rotateSlider.value) <> 1 And saveRotation <> 90 Then automateRotate = False
         saveRotation = rotateSlider.value
         If rotateSlider.value >= 90 Then
+            optimalRotation = peakRotation
             maxLength = 0
             peakRotation = -90
             rotateSlider.value = -90
