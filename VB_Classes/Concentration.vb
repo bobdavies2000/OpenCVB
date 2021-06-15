@@ -188,7 +188,7 @@ Public Class Concentration_PeakLines : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static rotateSlider = findSlider("Amount to rotate pointcloud around Y-axis (degrees)")
         Static maxLength As Single
-        Static peakRotation As Integer = -90
+        Static peakRotation As Integer = -91
 
         histC.Run(src)
         mats.mat(0) = histC.dst1
@@ -205,7 +205,7 @@ Public Class Concentration_PeakLines : Inherits VBparent
             End If
         End If
 
-        label2 = "Longest line = " + CStr(maxLength) + " pixels at " + CStr(If(optimalRotation = -90, peakRotation, optimalRotation)) + " degrees"
+        label2 = "Longest line = " + CStr(maxLength) + " pixels at " + CStr(If(optimalRotation = -91, peakRotation, optimalRotation)) + " degrees"
 
         Static saveRotation = rotateSlider.value
         Static automateRotate As Boolean = True

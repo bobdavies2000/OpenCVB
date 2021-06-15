@@ -685,22 +685,22 @@ Public Class Histogram_DepthClusters : Inherits VBparent
         valleys.Run(src)
         dst1 = valleys.dst1
 
-        Dim mask As New cv.Mat
         Dim tmp As New cv.Mat
         Dim colorIncr = 255 / valleys.ranges.Count
         Dim paletteSrc = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         For i = 0 To valleys.ranges.Count - 1
             Dim startEndDepth = valleys.ranges.ElementAt(i)
             cv.Cv2.InRange(src, startEndDepth.X, startEndDepth.Y, tmp)
-            cv.Cv2.ConvertScaleAbs(tmp, mask)
-            paletteSrc.SetTo(i * colorIncr + 1, mask)
+            paletteSrc.SetTo(colorIncr * (i + 1), tmp.ConvertScaleAbs())
         Next
+        paletteSrc += 1
         task.palette.Run(paletteSrc)
         dst2 = task.palette.dst1
         If standalone Or task.intermediateName = caller Then
             label1 = "Histogram of " + CStr(valleys.ranges.Count) + " Depth Clusters"
             label2 = "Backprojection of " + CStr(valleys.ranges.Count) + " histogram clusters"
         End If
+        dst2.SetTo(0, task.noDepthMask)
     End Sub
 End Class
 
