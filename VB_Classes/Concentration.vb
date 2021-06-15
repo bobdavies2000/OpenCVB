@@ -12,6 +12,7 @@ Public Class Concentration_Basics : Inherits VBparent
     Public drawLines As Boolean
     Dim resizeSlider As Windows.Forms.TrackBar
     Public markerColor = cv.Scalar.Yellow
+    Public showHistogram As Boolean
     Public Sub New()
         resizeSlider = findSlider("Resize Factor x100")
         resizeSlider.Value = 10
@@ -60,7 +61,7 @@ Public Class Concentration_Basics : Inherits VBparent
         ptTop.Clear()
 
         sideview.Run(src)
-        If standalone Then dst1 = sideview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR) Else dst1.SetTo(0)
+        If standalone Or showHistogram Then dst1 = sideview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR) Else dst1.SetTo(0)
         plotHighlights(sideview.originalHistOutput, dst1, True)
         If unsorted.Count > 0 Then
             maxSide = unsorted.Max()
@@ -71,7 +72,7 @@ Public Class Concentration_Basics : Inherits VBparent
         End If
 
         topview.Run(src)
-        If standalone Then dst2 = topview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR) Else dst2.SetTo(0)
+        If standalone Or showHistogram Then dst2 = topview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR) Else dst2.SetTo(0)
         plotHighlights(topview.originalHistOutput, dst2, False)
         If unsorted.Count > 0 Then
             maxTop = unsorted.Max()
@@ -92,9 +93,18 @@ End Class
 Public Class Concentration_BothViews : Inherits VBparent
     Public histC As New Concentration_Basics
     Public Sub New()
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 2)
+            check.Box(0).Text = "Use Lines instead of Dots to show concentration points - uncheck will use Dots"
+            check.Box(1).Text = "Show histogram data (white)"
+        End If
         task.desc = "Monitor the histogram concentration points"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static dotCheck = findCheckBox("Use Lines instead of Dots to show concentration points - uncheck will use Dots")
+        Static histCheck = findCheckBox("Show histogram data (white)")
+        histC.drawLines = dotCheck.checked
+        histC.showHistogram = histCheck.checked
         histC.Run(src)
         dst1 = histC.dst1
         dst2 = histC.dst2
