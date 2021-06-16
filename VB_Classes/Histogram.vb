@@ -458,7 +458,7 @@ End Class
 
 
 Public Class Histogram_StableDepthClusters : Inherits VBparent
-    Dim clusters As New Histogram_DepthClusters
+    Dim clusters As New Proximity_Clusters
     Dim motionSD As New Motion_MinMaxDepth
     Public Sub New()
         label1 = "Histogram of stable depth"
@@ -670,44 +670,6 @@ End Class
 
 
 
-
-
-
-
-Public Class Histogram_DepthClusters : Inherits VBparent
-    Public valleys As New Histogram_DepthValleys
-    Public Sub New()
-        task.desc = "Color each of the Depth Clusters found with Histogram_DepthValleys - stabilized with Kalman."
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        If src.Type <> cv.MatType.CV_32F Then src = task.depth32f.Clone
-
-        valleys.Run(src)
-        dst1 = valleys.dst1
-
-        Dim tmp As New cv.Mat
-        Dim colorIncr = 255 / valleys.ranges.Count
-        Dim paletteSrc = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        For i = 0 To valleys.ranges.Count - 1
-            Dim startEndDepth = valleys.ranges.ElementAt(i)
-            cv.Cv2.InRange(src, startEndDepth.X, startEndDepth.Y, tmp)
-            paletteSrc.SetTo(colorIncr * (i + 1), tmp.ConvertScaleAbs())
-        Next
-        paletteSrc += 1
-        task.palette.Run(paletteSrc)
-        dst2 = task.palette.dst1
-        If standalone Or task.intermediateName = caller Then
-            label1 = "Histogram of " + CStr(valleys.ranges.Count) + " Depth Clusters"
-            label2 = "Backprojection of " + CStr(valleys.ranges.Count) + " histogram clusters"
-        End If
-        dst2.SetTo(0, task.noDepthMask)
-    End Sub
-End Class
-
-
-
-
-
 Public Class Histogram_Frustrum : Inherits VBparent
     Dim sideFrustrumSlider As Windows.Forms.TrackBar
     Dim topFrustrumSlider As Windows.Forms.TrackBar
@@ -783,92 +745,6 @@ Public Class Histogram_Depth : Inherits VBparent
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Histogram_DepthValleys : Inherits VBparent
-    Dim kalman As New Kalman_Basics
-    Dim hist As New Histogram_Depth
-    Public ranges As New List(Of cv.Point)
-    Public rangeColors As New List(Of Integer)
-    Public rangeCounts As New List(Of Integer)
-    Public Sub New()
-        label1 = "Histogram clustered by valleys and smoothed"
-        task.desc = "Identify valleys in the Depth histogram."
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
-        hist.Run(src)
-        If kalman.kInput.Length <> hist.plotHist.hist.Rows Then ReDim kalman.kInput(hist.plotHist.hist.Rows - 1)
-        For i = 0 To hist.plotHist.hist.Rows - 1
-            kalman.kInput(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
-        Next
-        kalman.Run(src)
-        Dim histogram = hist.plotHist.hist
-        For i = 0 To histogram.Rows - 1
-            histogram.Set(Of Single)(i, 0, kalman.kOutput(i))
-        Next
-
-        Dim depthIncr = task.maxDepth / task.histogramBins ' each bar represents this number of millimeters
-        Dim startDepth = 1
-        ranges.Clear()
-        rangeColors.Clear()
-        rangeCounts.Clear()
-
-        Dim pointcount As Integer
-        For i = 2 To kalman.kOutput.Length - 3
-            Dim prev2 = kalman.kOutput(i - 2)
-            Dim prev = kalman.kOutput(i - 1)
-            Dim curr = kalman.kOutput(i)
-            Dim post = kalman.kOutput(i + 1)
-            Dim post2 = kalman.kOutput(i + 2)
-            If curr < 100 Then curr = 0 ' too small to worry about plotting...
-            pointcount += curr
-            If (prev2 > 1 And prev > 1 And curr > 1 And post > 1 And post2 > 1) Or curr = 0 Then
-                If (curr < (prev + prev2) / 2 And curr < (post + post2) / 2 And i * depthIncr > startDepth + depthIncr) Or curr = 0 Then
-                    If pointcount > 1000 Then
-                        ranges.Add(New cv.Point(startDepth, i * depthIncr))
-                        rangeCounts.Add(pointcount)
-                        pointcount = 0
-                    End If
-                    startDepth = i * depthIncr + 1
-                End If
-            End If
-        Next
-        If ranges.Count > 0 Then
-            ranges.Add(New cv.Point(ranges(ranges.Count - 1).Y, CInt(task.maxZ * 1000)))
-        Else
-            ranges.Add(New cv.Point(0, CInt(task.maxZ * 1000)))
-        End If
-        rangeCounts.Add(pointcount)
-
-        dst1 = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
-        Dim binWidth = CInt(dst1.Width / histogram.Rows)
-        histogram.MinMaxLoc(minVal, maxVal)
-        Dim splitIndex As Integer
-        If maxVal > 0 Then
-            For i = 0 To histogram.Rows - 1
-                Dim depth = i * depthIncr + 1
-                If splitIndex >= ranges.Count - 1 Then splitIndex = ranges.Count - 1
-
-                If depth >= ranges(splitIndex).Y And rangeColors.Count < ranges.Count Then
-                    rangeColors.Add(splitIndex + 1)
-                    splitIndex += 1
-                End If
-                Dim h = CInt(dst1.Height * kalman.kOutput(i) / maxVal)
-
-                If h > 0 Then cv.Cv2.Rectangle(dst1, New cv.Rect(i * binWidth, dst1.Height - h, binWidth, h), splitIndex + 1, -1)
-            Next
-        End If
-        rangeColors.Add(ranges.Count + 1)
-
-        Dim spread = 255 / ranges.Count
-        task.palette.Run(dst1 * spread)
-        dst1 = task.palette.dst1
-    End Sub
-End Class
 
 
 
@@ -1124,4 +1000,3 @@ Public Class Histogram_PeakMax : Inherits VBparent
         dst2.Rectangle(New cv.Rect(barWidth * histindex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 1)
     End Sub
 End Class
-

@@ -443,7 +443,7 @@ End Class
 
 
 Public Class KNN_DepthClusters : Inherits VBparent
-    Public blobs As New Histogram_DepthClusters
+    Public blobs As New Proximity_Clusters
     Public flood As New FloodFill_Palette
     Public pTrack As New KNN_PointTracker
     Public Sub New()

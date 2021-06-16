@@ -170,7 +170,7 @@ End Class
 
 
 Public Class Blob_DepthPixelSampler : Inherits VBparent
-    Public histBlobs As New Histogram_DepthClusters
+    Public histBlobs As New Proximity_Clusters
     Public flood As New FloodFill_Basics
     Dim pixel As Pixel_Sampler
     Public Sub New()
@@ -212,7 +212,7 @@ End Class
 
 
 Public Class Blob_DepthRanges : Inherits VBparent
-    Public histBlobs As New Histogram_DepthClusters
+    Public histBlobs As New Proximity_Clusters
     Public grayOnly As Boolean
     Public masks As New List(Of cv.Mat)
     Public maskSizes As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)

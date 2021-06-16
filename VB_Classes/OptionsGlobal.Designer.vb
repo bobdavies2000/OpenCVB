@@ -23,6 +23,9 @@ Partial Class OptionsGlobal
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.MinMaxDepth = New System.Windows.Forms.GroupBox()
+        Me.AddWeighted = New System.Windows.Forms.Label()
+        Me.AddWeightedSlider = New System.Windows.Forms.TrackBar()
+        Me.Label6 = New System.Windows.Forms.Label()
         Me.maxCount = New System.Windows.Forms.Label()
         Me.MaxRange = New System.Windows.Forms.TrackBar()
         Me.InrangeMaxLabel = New System.Windows.Forms.Label()
@@ -57,10 +60,8 @@ Partial Class OptionsGlobal
         Me.MotionThresholdValue = New System.Windows.Forms.Label()
         Me.IMUmotionSlider = New System.Windows.Forms.TrackBar()
         Me.Label4 = New System.Windows.Forms.Label()
-        Me.AddWeighted = New System.Windows.Forms.Label()
-        Me.AddWeightedSlider = New System.Windows.Forms.TrackBar()
-        Me.Label6 = New System.Windows.Forms.Label()
         Me.MinMaxDepth.SuspendLayout()
+        CType(Me.AddWeightedSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.MaxRange, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.HistogramSettings.SuspendLayout()
         CType(Me.ProjectionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -74,7 +75,6 @@ Partial Class OptionsGlobal
         Me.CameraOptions.SuspendLayout()
         CType(Me.IMUlevelSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.AddWeightedSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'MinMaxDepth
@@ -85,12 +85,40 @@ Partial Class OptionsGlobal
         Me.MinMaxDepth.Controls.Add(Me.maxCount)
         Me.MinMaxDepth.Controls.Add(Me.MaxRange)
         Me.MinMaxDepth.Controls.Add(Me.InrangeMaxLabel)
-        Me.MinMaxDepth.Location = New System.Drawing.Point(12, 63)
+        Me.MinMaxDepth.Location = New System.Drawing.Point(12, 49)
         Me.MinMaxDepth.Name = "MinMaxDepth"
         Me.MinMaxDepth.Size = New System.Drawing.Size(829, 169)
         Me.MinMaxDepth.TabIndex = 0
         Me.MinMaxDepth.TabStop = False
-        Me.MinMaxDepth.Text = "Global Misc Sliders"
+        Me.MinMaxDepth.Text = "Misc Global Sliders"
+        '
+        'AddWeighted
+        '
+        Me.AddWeighted.AutoSize = True
+        Me.AddWeighted.Location = New System.Drawing.Point(737, 90)
+        Me.AddWeighted.Name = "AddWeighted"
+        Me.AddWeighted.Size = New System.Drawing.Size(88, 20)
+        Me.AddWeighted.TabIndex = 8
+        Me.AddWeighted.Text = "AddWeight"
+        '
+        'AddWeightedSlider
+        '
+        Me.AddWeightedSlider.Location = New System.Drawing.Point(213, 83)
+        Me.AddWeightedSlider.Maximum = 100
+        Me.AddWeightedSlider.Name = "AddWeightedSlider"
+        Me.AddWeightedSlider.Size = New System.Drawing.Size(505, 69)
+        Me.AddWeightedSlider.TabIndex = 7
+        Me.AddWeightedSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.AddWeightedSlider.Value = 100
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(19, 90)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(110, 20)
+        Me.Label6.TabIndex = 6
+        Me.Label6.Text = "Add Weighted"
         '
         'maxCount
         '
@@ -133,7 +161,7 @@ Partial Class OptionsGlobal
         Me.HistogramSettings.Controls.Add(Me.HistBinsCount)
         Me.HistogramSettings.Controls.Add(Me.HistBinSlider)
         Me.HistogramSettings.Controls.Add(Me.HistBins)
-        Me.HistogramSettings.Location = New System.Drawing.Point(12, 243)
+        Me.HistogramSettings.Location = New System.Drawing.Point(12, 222)
         Me.HistogramSettings.Name = "HistogramSettings"
         Me.HistogramSettings.Size = New System.Drawing.Size(829, 195)
         Me.HistogramSettings.TabIndex = 1
@@ -347,7 +375,7 @@ Partial Class OptionsGlobal
         'PaletteGroup
         '
         Me.PaletteGroup.Controls.Add(Me.FlowLayoutPanel1)
-        Me.PaletteGroup.Location = New System.Drawing.Point(12, 459)
+        Me.PaletteGroup.Location = New System.Drawing.Point(12, 424)
         Me.PaletteGroup.Name = "PaletteGroup"
         Me.PaletteGroup.Size = New System.Drawing.Size(829, 153)
         Me.PaletteGroup.TabIndex = 5
@@ -433,34 +461,6 @@ Partial Class OptionsGlobal
         Me.Label4.Text = "Motion Threshold in IMU (radians X100)"
         Me.Label4.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
-        'AddWeighted
-        '
-        Me.AddWeighted.AutoSize = True
-        Me.AddWeighted.Location = New System.Drawing.Point(737, 90)
-        Me.AddWeighted.Name = "AddWeighted"
-        Me.AddWeighted.Size = New System.Drawing.Size(88, 20)
-        Me.AddWeighted.TabIndex = 8
-        Me.AddWeighted.Text = "AddWeight"
-        '
-        'AddWeightedSlider
-        '
-        Me.AddWeightedSlider.Location = New System.Drawing.Point(213, 83)
-        Me.AddWeightedSlider.Maximum = 100
-        Me.AddWeightedSlider.Name = "AddWeightedSlider"
-        Me.AddWeightedSlider.Size = New System.Drawing.Size(505, 69)
-        Me.AddWeightedSlider.TabIndex = 7
-        Me.AddWeightedSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.AddWeightedSlider.Value = 100
-        '
-        'Label6
-        '
-        Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(19, 90)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(110, 20)
-        Me.Label6.TabIndex = 6
-        Me.Label6.Text = "Add Weighted"
-        '
         'OptionsGlobal
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -476,6 +476,7 @@ Partial Class OptionsGlobal
         Me.Text = "Options Available to all Algorithms - changes will be remembered across sessions"
         Me.MinMaxDepth.ResumeLayout(False)
         Me.MinMaxDepth.PerformLayout()
+        CType(Me.AddWeightedSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.MaxRange, System.ComponentModel.ISupportInitialize).EndInit()
         Me.HistogramSettings.ResumeLayout(False)
         Me.HistogramSettings.PerformLayout()
@@ -493,7 +494,6 @@ Partial Class OptionsGlobal
         Me.CameraOptions.PerformLayout()
         CType(Me.IMUlevelSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.IMUmotionSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.AddWeightedSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

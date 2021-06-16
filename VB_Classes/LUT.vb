@@ -3,10 +3,7 @@ Imports cv = OpenCvSharp
 ' https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html
 Public Class LUT_Basics : Inherits VBparent
     Public Sub New()
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Number of LUT Segments", 2, 100, 10)
-        End If
-
+        If sliders.Setup(caller) Then sliders.setupTrackBar(0, "Number of LUT Segments", 2, 100, 10)
         task.desc = "Divide the image into n-segments controlled with a slider."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

@@ -116,35 +116,6 @@ End Class
 
 
 
-Public Class SLR_Depth : Inherits VBparent
-    Public slr As New SLR_Basics
-    Public hist As New Histogram_Basics
-    Public Sub New()
-        label1 = "Original data"
-        task.desc = "Run Segmented Linear Regression on depth data"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        If src.Type <> cv.MatType.CV_32FC1 Then src = task.depth32f
-        hist.plotHist.maxRange = task.maxZ * 1000
-        hist.depthNoZero = True ' not interested in the undefined depth areas...
-        hist.Run(src)
-        hist.histogram.Set(Of Single)(0, 0, 0)
-        dst1 = hist.dst1
-        For i = 0 To hist.histogram.Rows - 1
-            slr.input.dataX.Add(i)
-            slr.input.dataY.Add(hist.histogram.Get(Of Single)(i, 0))
-        Next
-        slr.Run(src)
-        dst2 = slr.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 Public Class SLR_TrendCompare : Inherits VBparent
@@ -305,56 +276,10 @@ End Class
 
 
 
-Public Class SLR_V2V : Inherits VBparent
-    Dim trends As New SLR_Trends
-    Public kalman As New Kalman_Basics
-    Public depthRegions As New List(Of Integer)
-    Public plotHist As New Plot_Histogram
-    Public Sub New()
-        task.desc = "Identify ranges by marking histogram entries from valley to valley"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        trends.hist.plotHist.maxRange = task.maxZ * 1000
-        trends.hist.depthNoZero = True ' not interested in the undefined depth areas...
-        trends.Run(task.depth32f)
-
-        If kalman.kInput.Length <> task.histogramBins Then ReDim kalman.kInput(task.histogramBins - 1)
-        kalman.kInput = trends.resultingValues.ToArray
-        kalman.Run(src)
-
-        dst1.SetTo(cv.Scalar.Black)
-        Dim barWidth = Int(dst1.Width / trends.resultingValues.Count)
-        Dim colorIndex As Integer
-        Dim color = task.scalarColors(colorIndex Mod 255)
-        Dim vals() = {-1, -1, -1}
-        For i = 0 To kalman.kOutput.Count - 1
-            Dim h = dst1.Height - kalman.kOutput(i)
-            vals(0) = vals(1)
-            vals(1) = vals(2)
-            vals(2) = h
-            If vals(0) >= 0 Then
-                If vals(0) > vals(1) And vals(2) > vals(1) Then
-                    colorIndex += 1
-                    color = task.scalarColors(colorIndex Mod 255)
-                End If
-            End If
-            cv.Cv2.Rectangle(dst1, New cv.Rect(i * barWidth, dst1.Height - h, barWidth, h), color, -1)
-            depthRegions.Add(colorIndex)
-        Next
-        label1 = "Depth regions between 0 and " + CStr(CInt(task.maxZ)) + " meters"
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 Public Class SLR_SurfaceH : Inherits VBparent
-    Dim surface As New pointcloud_surfaceH
+    Dim surface As New PointCloud_SurfaceH
     Public Sub New()
         task.desc = "Use the PointCloud_SurfaceH data to indicate valleys and peaks."
     End Sub

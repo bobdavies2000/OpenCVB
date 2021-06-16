@@ -1,24 +1,18 @@
 Imports cv = OpenCvSharp
 Public Class KMeans_Basics : Inherits VBparent
-    Public kmeansK As Integer
     Public resizeFactor = 1 ' update this to 2 or 4 to speed up the kmeans performance.
     Public Sub New()
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
-        End If
-
+        If sliders.Setup(caller) Then sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
         task.desc = "Cluster the rgb image pixels using kMeans."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static kSlider = findSlider("kMeans k")
+        Dim kMeansK = kSlider.value
+
         Dim kInput = src.Resize(New cv.Size(CInt(src.Width / resizeFactor), CInt(src.Height / resizeFactor)))
         Dim columnVector = kInput.Reshape(src.Channels, kInput.Height * kInput.Width)
         Dim src32f As New cv.Mat
         columnVector.ConvertTo(src32f, cv.MatType.CV_32FC3)
-        Static lastClusterCount As Integer
-        If lastClusterCount <> sliders.trackbar(0).Value Then
-            lastClusterCount = sliders.trackbar(0).Value
-            kmeansK = lastClusterCount
-        End If
 
         Dim labels = New cv.Mat()
         Dim colors As New cv.Mat
@@ -47,16 +41,16 @@ End Class
 
 
 Public Class KMeans_BasicsDepthColor : Inherits VBparent
-    Public kmeansK As Integer
     Public resizeRequest As Boolean = True
     Public useDepthColor As Boolean = True
     Public Sub New()
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
-        End If
+        If sliders.Setup(caller) Then sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
         task.desc = "Cluster the rgb image pixels using kMeans."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static kSlider = findSlider("kMeans k")
+        Dim kMeansK = kSlider.value
+
         Dim resizeVal = If(resizeRequest, 4, 1)
         Dim small = src.Resize(New cv.Size(src.Width / resizeVal, src.Height / resizeVal))
         Dim rectMat = small.Clone
@@ -64,22 +58,18 @@ Public Class KMeans_BasicsDepthColor : Inherits VBparent
         columnVector = rectMat.Reshape(src.Channels, small.Height * small.Width)
         Dim rgb32f As New cv.Mat
         columnVector.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
-        Static lastClusterCount As Integer
-        If lastClusterCount <> sliders.trackbar(0).Value Then
-            lastClusterCount = sliders.trackbar(0).Value
-            kmeansK = lastClusterCount
-        End If
         Dim labels = New cv.Mat()
         Dim colors As New cv.Mat
 
-        cv.Cv2.Kmeans(rgb32f, kmeansK, labels, term, 1, cv.KMeansFlags.PpCenters, colors)
+        cv.Cv2.Kmeans(rgb32f, kMeansK, labels, term, 1, cv.KMeansFlags.PpCenters, colors)
         labels.Reshape(1, small.Height).ConvertTo(labels, cv.MatType.CV_8U)
         labels = labels.Resize(New cv.Size(src.Width, src.Height))
 
         ' color the result with the mean depth value for each label k
         If useDepthColor Then
-            For i = 0 To kmeansK - 1
-                Dim mask = labels.InRange(i, i)
+            Dim mask As New cv.Mat
+            For i = 0 To kMeansK - 1
+                mask = labels.InRange(i, i)
                 Dim mean = task.RGBDepth.Mean(mask)
                 dst1.SetTo(mean, mask)
             Next
@@ -102,10 +92,11 @@ Public Class KMeans_Clusters : Inherits VBparent
         task.desc = "Show clustering with various settings for cluster count.  Draw to select region of interest."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static kSlider = findSlider("kMeans k")
         Static saveRect = task.drawRect
         task.drawRect = saveRect
         For i = 0 To 3
-            km.kmeansK = Choose(i + 1, 2, 4, 6, 8)
+            kSlider.value = Choose(i + 1, 2, 4, 6, 8)
             km.Run(src)
             Mats.mat(i) = km.dst1.Clone
         Next
@@ -530,8 +521,8 @@ Public Class KMeans_Subdivision1 : Inherits VBparent
         task.desc = "Use KMeans to subdivide an image and then subdivide it again."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static kmeansKslider = findSlider("kMeans k")
-        kmeansKslider.value = 2
+        Static kslider = findSlider("kMeans k")
+        kslider.value = 2
 
         kmeans.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         Dim gray1 = kmeans.dst1.Clone
@@ -539,19 +530,19 @@ Public Class KMeans_Subdivision1 : Inherits VBparent
         Dim maskDark = gray1.Threshold(1, 255, cv.ThresholdTypes.BinaryInv)
         src.SetTo(0)
         src.CopyTo(src, maskDark)
-        kmeansKslider.value = 3
+        kslider.value = 3
         kmeans.Run(src)
         Dim gray2 = kmeans.dst1.Clone
 
         Dim maskLite = gray1.Threshold(1, 255, cv.ThresholdTypes.Binary)
         src.SetTo(0)
         src.CopyTo(src, maskLite)
-        kmeansKslider.value = 3
+        kslider.value = 3
         kmeans.Run(src)
         kmeans.dst1.CopyTo(gray2, maskLite)
 
         Dim centroids As New List(Of cv.Point)
-        For i = 0 To kmeans.kmeansK - 1
+        For i = 0 To kslider.value - 1
             Dim mask = gray1.InRange(i, i)
             Dim m = cv.Cv2.Moments(mask, True)
             centroids.Add(New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00))
