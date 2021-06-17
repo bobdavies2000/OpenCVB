@@ -256,44 +256,17 @@ End Class
 
 
 
-
-
-
-
 Public Class Proximity_KMeans : Inherits VBparent
-    Public resizeRequest As Boolean = True
-    Public useDepthColor As Boolean = True
+    Dim km As New KMeans_Basics
     Public Sub New()
-        If sliders.Setup(caller) Then sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
-        task.desc = "Cluster the depth image pixels using kMeans."
+        task.desc = "Cluster just depth using kMeans"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static kSlider = findSlider("kMeans k")
         Dim kMeansK = kSlider.value
-
-        If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
-        Dim labels = New cv.Mat()
-        Dim colors As New cv.Mat
-        Dim columnVector As New cv.Mat
-        If standalone Then src.SetTo(100000, task.noDepthMask)
-        columnVector = src.Reshape(1, src.Height * src.Width)
-
-        cv.Cv2.Kmeans(columnVector, kMeansK, labels, term, 1, cv.KMeansFlags.PpCenters, colors)
-        labels.Reshape(1, src.Height).ConvertTo(labels, cv.MatType.CV_8U)
-
-        Dim depthVals As New SortedList(Of Single, Integer)
-        For i = 0 To kMeansK - 1
-            depthVals.Add(colors.Get(Of Single)(i, 0), i)
-        Next
-
-        Dim incr = 255 / kMeansK
-        Dim myLut As New cv.Mat(1, 256, cv.MatType.CV_8UC1, 0)
-        For i = 0 To kMeansK - 1
-            myLut.Set(Of Byte)(0, depthVals.ElementAt(i).Value, (i + 1) * incr)
-        Next
-
-        dst1 = labels.LUT(myLut)
-        If standalone Then dst1.SetTo(0, task.noDepthMask)
+        km.Run(task.depth32f)
+        dst1 = km.dst1
+        dst1.SetTo(0, task.noDepthMask)
     End Sub
 End Class
 

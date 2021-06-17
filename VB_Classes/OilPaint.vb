@@ -81,10 +81,12 @@ End Class
 
 Public Class OilPaint_ColorProbability : Inherits VBparent
     Public color_probability() As Single
-    Public km As New KMeans_RGBFast
+    Public km As New KMeans_BasicsFast
+    Dim kSlider As Windows.Forms.TrackBar
     Public Sub New()
-        km.sliders.trackbar(0).Value = 12 ' we would like a dozen colors or so in the color image.
-        ReDim color_probability(km.sliders.trackbar(0).Value - 1)
+        kSlider = findSlider("kMeans k")
+        kSlider.Value = 12 ' we would like a dozen colors or so in the color image.
+        ReDim color_probability(kSlider.Value - 1)
         task.desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

@@ -17,6 +17,7 @@ Public Class KMeans_Basics : Inherits VBparent
             radio.check(0).Checked = True
         End If
 
+        label1 = "KMeans_Basics output with just RGB input"
         task.desc = "Cluster the input image pixels using kMeans."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -191,7 +192,7 @@ End Class
 
 
 
-Public Class KMeans_RGBFast : Inherits VBparent
+Public Class KMeans_BasicsFast : Inherits VBparent
     Dim km As New KMeans_Basics
     Public clusterColors() As cv.Vec3b
     Public clusterCount = 6

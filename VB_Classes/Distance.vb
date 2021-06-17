@@ -75,7 +75,6 @@ Public Class Distance_Background : Inherits VBparent
     Dim dist As New Distance_Foreground
     Public Sub New()
         dist.useBackgroundAsInput = True
-
         task.desc = "Use distance algorithm on the background"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
