@@ -719,7 +719,6 @@ Public Class Edges_SobelLRBinarized : Inherits VBparent
         task.desc = "Isolate edges in the left and right views."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-
         If task.mouseClickFlag Then task.mouseClickFlag = False ' preempt use of quadrants.
         red.Run(src)
 
@@ -763,7 +762,6 @@ Public Class Edges_BinarizedSobel : Inherits VBparent
         task.desc = "Collect Sobel edges from binarized images"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
 
         binarize.Run(src)
@@ -783,7 +781,7 @@ Public Class Edges_BinarizedSobel : Inherits VBparent
         mats.Run(src)
         dst1 = mats.dst1
         If mats.dst2.Channels = 3 Then
-            label2 = "Bitwise or of images 1-3 at left.  Click dst1."
+            label2 = "BitwiseOr of images 1-3 at left.  Click dst1."
             dst2 = mats.mat(3).Threshold(0, 255, cv.ThresholdTypes.Binary)
         Else
             dst2 = mats.mat(quadrantIndex)

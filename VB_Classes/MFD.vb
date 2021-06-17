@@ -10,7 +10,7 @@ Public Class MFD_Basics : Inherits VBparent
             radio.check(0).Checked = True
         End If
         label1 = "Motion-filtered image"
-        task.desc = "Motion-Filtered basics - update only the changed regions"
+        task.desc = "Motion-Filtered Data (MFD) - update only the changed regions"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
@@ -47,7 +47,7 @@ Public Class MFD_Depth : Inherits VBparent
     Dim mfd As New MFD_Basics
     Public Sub New()
         label1 = "Motion-filtered depth data"
-        task.desc = "Stabilize the depth image but update any areas with motion"
+        task.desc = "Motion-Filtered Data (MFD) - Stabilize the depth image but update any areas with motion"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         mfd.Run(task.depth32f)
@@ -66,7 +66,7 @@ Public Class MFD_PointCloud : Inherits VBparent
     Dim mfd As New MFD_Basics
     Public Sub New()
         label1 = "Motion-filtered PointCloud"
-        task.desc = "Stabilize the PointCloud but update any areas with motion"
+        task.desc = "Motion-Filtered Data (MFD) - Stabilize the PointCloud but update any areas with motion"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         mfd.Run(task.pointCloud)
@@ -92,7 +92,7 @@ Public Class MFD_Sobel : Inherits VBparent
         End If
 
         label1 = "Sobel edges of Motion-Filtered RGB"
-        task.desc = "Stabilize the Sobel output with MFD"
+        task.desc = "Motion-Filtered Data (MFD) - Stabilize the Sobel output with MFD"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static thresholdSlider = findSlider("Pixel threshold to zero")
@@ -116,7 +116,7 @@ Public Class MFD_BinarizedSobel : Inherits VBparent
     Dim sobel As New Edges_BinarizedSobel
     Public Sub New()
         label1 = "Binarized Sobel edges of Motion-Filtered RGB"
-        task.desc = "Stabilize the binarized Sobel output with MFD"
+        task.desc = "Motion-Filtered Data (MFD) - Stabilize the binarized Sobel output with MFD"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
@@ -150,7 +150,7 @@ Public Class MFD_FloodFill : Inherits VBparent
             sliders.setupTrackBar(1, "FloodFill point distance from edge", 1, 25, 10)
         End If
 
-        task.desc = "Floodfill the image of MFD edges (binarized Sobel output)"
+        task.desc = "Motion-Filtered Data (MFD) - Floodfill the image of MFD edges (binarized Sobel output)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static MFD_OnOffRadio = findRadio("Use motion-filtered pixel values")

@@ -347,7 +347,7 @@ End Class
 
 Public Class Histogram_ColorsAndGray : Inherits VBparent
     Dim histogram As New Histogram_Basics
-    Dim mats As New Mat_4to1
+    Dim mats As New Mat_4Click
     Public Sub New()
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Min Gray", 0, 255, 0)
@@ -379,8 +379,7 @@ Public Class Histogram_ColorsAndGray : Inherits VBparent
 
         mats.Run(src)
         dst1 = mats.dst1
-        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
-        dst2 = mats.mat(quadrantIndex)
+        dst2 = mats.dst2
     End Sub
 End Class
 

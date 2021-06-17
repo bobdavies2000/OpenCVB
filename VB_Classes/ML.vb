@@ -172,7 +172,7 @@ End Class
 
 Public Class ML_DepthFromColor : Inherits VBparent
     Dim colorizer As New Depth_Colorizer_CPP
-    Dim mats As New Mat_4to1
+    Dim mats As New Mat_4Click
     Dim shadow As New Depth_Holes
     Dim resized As Resize_Percentage
     Public Sub New()
@@ -233,8 +233,7 @@ Public Class ML_DepthFromColor : Inherits VBparent
         mats.Run(src)
         dst1 = mats.dst1
         label1 = "prediction, shadow, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
-        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
-        dst2 = mats.mat(quadrantIndex)
+        dst2 = mats.dst2
     End Sub
 End Class
 

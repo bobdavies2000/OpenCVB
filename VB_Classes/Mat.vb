@@ -429,12 +429,10 @@ Public Class Mat_4Click : Inherits VBparent
     Public mat() As cv.Mat
     Public Sub New()
         mat = mats.mat
-
         label2 = "Click a quadrant in dst1 to view it in dst2"
         task.desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst2"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-
         If standalone Or task.intermediateName = caller Then mats.defaultMats()
         mats.Run(src)
         dst1 = mats.dst1
@@ -464,7 +462,7 @@ Public Class Mat_2Click : Inherits VBparent
         dst1 = mats.dst1
 
         ' click in dst1 to display the quadrant in dst2
-        If task.mouseClickFlag And task.mousePicTag = 2 Then
+        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then
             If task.mouseClickPoint.Y < dst1.Height / 2 Then dst2 = mats.mat(0) Else dst2 = mats.mat(1)
         End If
     End Sub
@@ -484,7 +482,6 @@ Public Class Mat_2Dlib : Inherits VBparent
         task.desc = "Convert a Mat to the expected Array2D for a DLib API"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-
         Dim array(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, array, 0, array.Length)
 
@@ -496,7 +493,6 @@ Public Class Mat_2Dlib : Inherits VBparent
         If standalone Then
             setTrueText("OpenCVB Mat converted to an Array2D for use with DlibDotNet")
         End If
-
     End Sub
 End Class
 

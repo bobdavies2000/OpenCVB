@@ -156,7 +156,7 @@ End Class
 
 ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/PixelAccess.cs
 Public Class Pixel_GetSet : Inherits VBparent
-    Dim mats As New Mat_4to1
+    Dim mats As New Mat_4Click
     Public Sub New()
         label1 = "Time to copy using get/set,Generic Index, Marshal Copy"
         label2 = "Click any quadrant at left to view it below"
@@ -206,8 +206,7 @@ Public Class Pixel_GetSet : Inherits VBparent
 
         mats.Run(src)
         dst1 = mats.dst1
-        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
-        dst2 = mats.mat(quadrantIndex)
+        dst2 = mats.dst2
     End Sub
 End Class
 

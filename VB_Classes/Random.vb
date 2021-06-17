@@ -50,6 +50,9 @@ End Class
 
 
 
+
+
+
 Public Class Random_LUTMask : Inherits VBparent
     Dim random As New Random_Basics
     Dim km As New KMeans_Basics
@@ -81,6 +84,9 @@ End Class
 
 
 
+
+
+
 Public Class Random_UniformDist : Inherits VBparent
     Public Sub New()
         minVal = 0
@@ -92,6 +98,9 @@ Public Class Random_UniformDist : Inherits VBparent
         cv.Cv2.Randu(dst1, minVal, maxVal)
     End Sub
 End Class
+
+
+
 
 
 
@@ -116,6 +125,9 @@ Public Class Random_NormalDist : Inherits VBparent
         cv.Cv2.Randn(dst1, New cv.Scalar(sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value), cv.Scalar.All(sliders.trackbar(3).Value))
     End Sub
 End Class
+
+
+
 
 
 

@@ -191,7 +191,7 @@ End Class
 
 
 Public Class KMeans_Clusters : Inherits VBparent
-    Dim Mats As New Mat_4to1
+    Dim Mats As New Mat_4Click
     Dim km As New KMeans_Basics
     Public Sub New()
         label1 = "kmeans - k=2,4,6,8"
@@ -211,8 +211,7 @@ Public Class KMeans_Clusters : Inherits VBparent
         Next
         Mats.Run(src)
         dst1 = Mats.dst1
-        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
-        dst2 = Mats.mat(quadrantIndex)
+        dst2 = Mats.dst2
     End Sub
 End Class
 

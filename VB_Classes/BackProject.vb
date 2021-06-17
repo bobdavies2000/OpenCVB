@@ -248,8 +248,7 @@ Public Class BackProject_2DHSV : Inherits VBparent
 
         mats.Run(src)
         dst1 = mats.dst1
-        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
-        dst2 = mats.mat(quadrantIndex)
+        dst2 = mats.dst2
 
         label2 = hist2d.label1
     End Sub

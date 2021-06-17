@@ -554,7 +554,7 @@ End Class
 
 Public Class PointCloud_BackProject : Inherits VBparent
     Dim both As New PointCloud_Basics
-    Dim mats As New Mat_4to1
+    Dim mats As New Mat_4Click
     Public Sub New()
         label1 = "Click any quadrant below to enlarge it"
         label2 = "Click any quadrant below to enlarge it"
@@ -563,9 +563,8 @@ Public Class PointCloud_BackProject : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.mouseClickFlag Then
-            ' lower left image is the mat_4to1
-            If task.mousePicTag = 2 Then
-                If task.mouseClickFlag Then setMyActiveMat()
+            If task.mousePicTag = RESULT1 Then
+                setMyActiveMat()
                 task.mouseClickFlag = False ' absorb the mouse click here only
             End If
         End If

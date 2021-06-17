@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Proximity_Basics : Inherits VBparent
-    Dim km As New KMeans_Basics
+    Public km As New KMeans_Basics
     Public Sub New()
         task.desc = "Cluster just depth using kMeans"
     End Sub
@@ -331,5 +331,31 @@ Public Class Proximity_Reduction : Inherits VBparent
         task.palette.Run(dst1)
         dst1 = task.palette.dst1
         label1 = reduction.label1 + " with " + CStr(counts.Count) + " levels"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Proximity_Masks : Inherits VBparent
+    Dim proxy As New Proximity_Basics
+    Dim mats As New Mat_4Click
+    Public Sub New()
+        task.desc = "Display the top 4 masks from the rgb kmeans output"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        proxy.Run(src)
+        For i = 0 To proxy.km.masks.Count - 1
+            mats.mat(i) = proxy.km.masks(i)
+            If i >= 3 Then Exit For
+        Next
+
+        mats.Run(Nothing)
+        dst1 = mats.dst1
+        dst2 = mats.dst2
     End Sub
 End Class
