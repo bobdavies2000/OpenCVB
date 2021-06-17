@@ -5,8 +5,8 @@ Public Class KMeans_Basics : Inherits VBparent
     Public Sub New()
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
-            sliders.setupTrackBar(1, "Resize Factor (used only with KMeans_RGBFast)", 1, 8, 2)
-            findSlider("Resize Factor (used only with KMeans_RGBFast)").Enabled = False
+            sliders.setupTrackBar(1, "Resize Factor (used only with KMeans_BasicsFast)", 1, 8, 2)
+            findSlider("Resize Factor (used only with KMeans_BasicsFast)").Enabled = False
         End If
 
         If findfrm(caller + " Radio Options") Is Nothing Then
@@ -22,7 +22,7 @@ Public Class KMeans_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static kSlider = findSlider("kMeans k")
-        Static resizeSlider = findSlider("Resize Factor (used only with KMeans_RGBFast)")
+        Static resizeSlider = findSlider("Resize Factor (used only with KMeans_BasicsFast)")
         Dim kMeansK = kSlider.value
 
         If standalone Then task.color.ConvertTo(src, cv.MatType.CV_32FC3)
@@ -67,8 +67,8 @@ Public Class KMeans_Basics : Inherits VBparent
         For i = 0 To kMeansK - 1
             Dim mask = labels.InRange(i, i)
             masks.Add(mask)
+            dst1 = dst1.Resize(src.Size)
             If src.Channels = 3 Then
-                dst1 = dst1.Resize(src.Size)
                 dst1.SetTo(colors.Get(Of cv.Vec3f)(i, 0), mask)
             Else
                 ' if the src was not 3-channel, then just use the first channel of colors.  Be sure that the first src channel was RGB/grayscale...
@@ -78,6 +78,31 @@ Public Class KMeans_Basics : Inherits VBparent
         Next
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class KMeans_BasicsFast : Inherits VBparent
+    Public km As New KMeans_Basics
+    Public Sub New()
+        findSlider("Resize Factor (used only with KMeans_BasicsFast)").Enabled = True
+        task.desc = "Speed up the KMeans_Basics with a resize factor"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static resizeSlider = findSlider("Resize Factor (used only with KMeans_BasicsFast)")
+        Dim resizeFactor = resizeSlider.value
+
+        Dim small8uC3 = src.Resize(New cv.Size(CInt(src.Rows / resizeFactor), CInt(src.Cols / resizeFactor)))
+        Dim small32fC3 As New cv.Mat
+        small8uC3.ConvertTo(small32fC3, cv.MatType.CV_32FC3)
+        km.Run(small32fC3)
+        dst1 = km.dst1.Resize(dst1.Size())
+    End Sub
+End Class
+
 
 
 
@@ -188,27 +213,6 @@ Public Class KMeans_Clusters : Inherits VBparent
     End Sub
 End Class
 
-
-
-
-
-Public Class KMeans_BasicsFast : Inherits VBparent
-    Public km As New KMeans_Basics
-    Public Sub New()
-        findSlider("Resize Factor (used only with KMeans_RGBFast)").Enabled = True
-        task.desc = "Speed up the KMeans_Basics with a resize factor"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static resizeSlider = findSlider("Resize Factor (used only with KMeans_RGBFast)")
-        Dim resizeFactor = resizeSlider.value
-
-        Dim small8uC3 = src.Resize(New cv.Size(CInt(src.Rows / resizeFactor), CInt(src.Cols / resizeFactor)))
-        Dim small32fC3 As New cv.Mat
-        small8uC3.ConvertTo(small32fC3, cv.MatType.CV_32FC3)
-        km.Run(small32fC3)
-        dst1 = km.dst1.Resize(dst1.Size())
-    End Sub
-End Class
 
 
 

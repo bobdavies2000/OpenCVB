@@ -113,6 +113,9 @@ End Class
 
 
 
+
+
+
 ' https://code.msdn.microsoft.com/Image-Oil-Painting-and-b0977ea9
 Public Class OilPaint_ManualVB : Inherits VBparent
     Public Sub New()

@@ -1,5 +1,49 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Proximity_Basics : Inherits VBparent
+    Dim km As New KMeans_Basics
+    Public Sub New()
+        task.desc = "Cluster just depth using kMeans"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        km.Run(task.depth32f)
+        dst1 = km.dst1
+        dst1.SetTo(0, task.noDepthMask)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Proximity_BasicsFast : Inherits VBparent
+    Dim km As New KMeans_Basics
+    Public Sub New()
+        findSlider("Resize Factor (used only with KMeans_BasicsFast)").Enabled = True
+        task.desc = "Cluster just depth using kMeans but hopefully faster than Proximity_Basics"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static resizeSlider = findSlider("Resize Factor (used only with KMeans_BasicsFast)")
+        Dim resizeFactor = resizeSlider.value
+
+        Dim w = CInt(task.depth32f.Width / resizeFactor)
+        Dim h = CInt(task.depth32f.Height / resizeFactor)
+        Dim depth32f = task.depth32f.Resize(New cv.Size(w, h), 0, 0, cv.InterpolationFlags.Nearest)
+        depth32f.SetTo(0, task.noDepthMask.Resize(depth32f.Size))
+        km.Run(depth32f)
+        dst1 = km.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Proximity_Valleys : Inherits VBparent
     Dim kalman As New Kalman_Basics
     Public hist As New Histogram_Depth
     Public ranges As New List(Of cv.Point)
@@ -95,7 +139,7 @@ End Class
 
 
 Public Class Proximity_Clusters : Inherits VBparent
-    Public valleys As New Proximity_Basics
+    Public valleys As New Proximity_Valleys
     Public Sub New()
         task.desc = "Color each of the Depth Clusters found with Proximity_Basics - stabilized with Kalman."
     End Sub
@@ -132,7 +176,7 @@ End Class
 
 Public Class Proximity_ClustersKalman : Inherits VBparent
     Dim kalman As New Kalman_Basics
-    Public valleys As New Proximity_Basics
+    Public valleys As New Proximity_Valleys
     Public Sub New()
         task.desc = "Use Kalman to keep the bar chart similar across frames"
     End Sub
@@ -180,7 +224,7 @@ End Class
 
 
 
-Public Class Proximity_Valleys : Inherits VBparent
+Public Class Proximity_ValleysKalman : Inherits VBparent
     Dim trends As New SLR_Trends
     Public kalman As New Kalman_Basics
     Public depthRegions As New List(Of Integer)
@@ -256,26 +300,6 @@ End Class
 
 
 
-Public Class Proximity_KMeans : Inherits VBparent
-    Dim km As New KMeans_Basics
-    Public Sub New()
-        task.desc = "Cluster just depth using kMeans"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static kSlider = findSlider("kMeans k")
-        Dim kMeansK = kSlider.value
-        km.Run(task.depth32f)
-        dst1 = km.dst1
-        dst1.SetTo(0, task.noDepthMask)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class Proximity_Reduction : Inherits VBparent
     Dim reduction As New Reduction_Basics
@@ -307,27 +331,5 @@ Public Class Proximity_Reduction : Inherits VBparent
         task.palette.Run(dst1)
         dst1 = task.palette.dst1
         label1 = reduction.label1 + " with " + CStr(counts.Count) + " levels"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Proximity_KMeansFast : Inherits VBparent
-    Dim proxy As New Proximity_KMeans
-    Public Sub New()
-        task.desc = "Use resize with Nearest flag to speed up Proximity_KMeans and preserve accuracy"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
-        If standalone Then src.SetTo(100000, task.noDepthMask)
-        Dim tmp = src.Resize(New cv.Size(src.Width / 2, src.Height / 2), 0, 0, cv.InterpolationFlags.Nearest)
-        proxy.Run(tmp)
-        dst1 = proxy.dst1.Resize(src.Size)
-        dst1.SetTo(0, task.noDepthMask)
     End Sub
 End Class
