@@ -193,9 +193,7 @@ End Class
 
 
 Public Class KMeans_BasicsFast : Inherits VBparent
-    Dim km As New KMeans_Basics
-    Public clusterColors() As cv.Vec3b
-    Public clusterCount = 6
+    Public km As New KMeans_Basics
     Public Sub New()
         findSlider("Resize Factor (used only with KMeans_RGBFast)").Enabled = True
         task.desc = "Speed up the KMeans_Basics with a resize factor"

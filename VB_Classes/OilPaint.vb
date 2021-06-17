@@ -87,28 +87,26 @@ Public Class OilPaint_ColorProbability : Inherits VBparent
         kSlider = findSlider("kMeans k")
         kSlider.Value = 12 ' we would like a dozen colors or so in the color image.
         ReDim color_probability(kSlider.Value - 1)
+        label2 = "Color probabilities"
         task.desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         km.Run(src)
         dst1 = km.dst1
-        Dim c() = km.clusterColors
-        If c Is Nothing Then Exit Sub
-        For y = 0 To dst1.Height - 1
-            For x = 0 To dst1.Width - 1
-                Dim pixel = dst1.Get(Of cv.Vec3b)(y, x)
-                For i = 0 To c.Length - 1
-                    If pixel = c(i) Then
-                        color_probability(i) += 1
-                        Exit For
-                    End If
-                Next
-            Next
+        ReDim color_probability(kSlider.Value - 1)
+        For i = 0 To km.km.masks.Count - 1
+            color_probability(i) = km.km.masks(i).CountNonZero
         Next
 
+        Dim str = ""
+        Dim total = 0.0
         For i = 0 To color_probability.Length - 1
-            color_probability(i) /= dst1.Total
+            color_probability(i) /= km.km.masks(0).Total
+            str += Format(color_probability(i), "0.0%") + vbCrLf
+            total += color_probability(i)
         Next
+        str += "Total = " + Format(total, "#0.0%")
+        setTrueText(str, 20, 40, 3)
     End Sub
 End Class
 
