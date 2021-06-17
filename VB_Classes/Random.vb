@@ -55,7 +55,7 @@ Public Class Random_LUTMask : Inherits VBparent
     Dim km As New KMeans_Basics
     Public Sub New()
         task.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image."
-        label2 = "kmeans run To Get colors"
+        label2 = "kmeans run to get colors"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static lutMat As cv.Mat
@@ -73,6 +73,7 @@ Public Class Random_LUTMask : Inherits VBparent
                 If lutIndex >= lutMat.Rows Then Exit For
             Next
         End If
+
         dst2 = src.LUT(lutMat)
         label1 = "Using kmeans colors with interpolation"
     End Sub

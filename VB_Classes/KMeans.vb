@@ -25,8 +25,11 @@ Public Class KMeans_Basics : Inherits VBparent
         Static resizeSlider = findSlider("Resize Factor (used only with KMeans_BasicsFast)")
         Dim kMeansK = kSlider.value
 
-        If standalone Then task.color.ConvertTo(src, cv.MatType.CV_32FC3)
-        Dim columnVector = src.Reshape(src.Channels, src.Height * src.Width)
+        Dim input = src.Clone
+        If standalone Then task.color.ConvertTo(input, cv.MatType.CV_32FC3)
+        If input.Type = cv.MatType.CV_8UC3 Then input.ConvertTo(input, cv.MatType.CV_32FC3)
+        If input.Type = cv.MatType.CV_8U Then input.ConvertTo(input, cv.MatType.CV_32F)
+        Dim columnVector = input.Reshape(input.Channels, input.Height * input.Width)
         Dim labels As New cv.Mat()
         Static saveLabels As New cv.Mat()
         Static saveK = kMeansK
@@ -52,7 +55,7 @@ Public Class KMeans_Basics : Inherits VBparent
 
         cv.Cv2.Kmeans(columnVector, kMeansK, labels, term, 1, kmeansFlag, colors)
         saveLabels = labels.Clone
-        labels.Reshape(1, src.Height).ConvertTo(labels, cv.MatType.CV_8U)
+        labels.Reshape(1, input.Height).ConvertTo(labels, cv.MatType.CV_8U)
 
         ' if the input is depth, the colors need to be normalized to 255
         For i = 0 To colors.Rows - 1
@@ -67,11 +70,11 @@ Public Class KMeans_Basics : Inherits VBparent
         For i = 0 To kMeansK - 1
             Dim mask = labels.InRange(i, i)
             masks.Add(mask)
-            dst1 = dst1.Resize(src.Size)
-            If src.Channels = 3 Then
+            dst1 = dst1.Resize(input.Size)
+            If input.Channels = 3 Then
                 dst1.SetTo(colors.Get(Of cv.Vec3f)(i, 0), mask)
             Else
-                ' if the src was not 3-channel, then just use the first channel of colors.  Be sure that the first src channel was RGB/grayscale...
+                ' if the input was not 3-channel, then just use the first channel of colors.  Be sure that the first input channel was RGB/grayscale...
                 Dim gray = colors.Get(Of Single)(i, 0)
                 dst1.SetTo(cv.Scalar.All(gray), mask)
             End If
