@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
 Public Class Moments_Basics : Inherits VBparent
-    Public inputMask As cv.Mat
     Public centroid As cv.Point2f
     Dim foreground As New KMeans_Depth_FG_BG
     Public scaleFactor As Integer = 1
@@ -14,10 +13,9 @@ Public Class Moments_Basics : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateName = caller Then
             foreground.Run(src)
-            dst1 = foreground.dst1
-            inputMask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst1 = foreground.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
-        Dim m = cv.Cv2.Moments(inputMask, True)
+        Dim m = cv.Cv2.Moments(foreground.dst1, True)
 
         Dim center As cv.Point2f
         If task.useKalman Then
@@ -47,9 +45,8 @@ Public Class Moments_CentroidKalman : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         foreground.Run(src)
-        dst1 = foreground.dst1
-        Dim mask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim m = cv.Cv2.Moments(mask, True)
+        dst1 = foreground.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Dim m = cv.Cv2.Moments(foreground.dst1, True)
         If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
             kalman.kInput(0) = m.M10 / m.M00
             kalman.kInput(1) = m.M01 / m.M00

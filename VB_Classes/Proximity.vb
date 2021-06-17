@@ -275,7 +275,7 @@ Public Class Proximity_KMeans : Inherits VBparent
         Dim labels = New cv.Mat()
         Dim colors As New cv.Mat
         Dim columnVector As New cv.Mat
-        src.SetTo(100000, task.noDepthMask)
+        If standalone Then src.SetTo(100000, task.noDepthMask)
         columnVector = src.Reshape(1, src.Height * src.Width)
 
         cv.Cv2.Kmeans(columnVector, kMeansK, labels, term, 1, cv.KMeansFlags.PpCenters, colors)
@@ -293,6 +293,7 @@ Public Class Proximity_KMeans : Inherits VBparent
         Next
 
         dst1 = labels.LUT(myLut)
+        If standalone Then dst1.SetTo(0, task.noDepthMask)
     End Sub
 End Class
 
@@ -333,5 +334,27 @@ Public Class Proximity_Reduction : Inherits VBparent
         task.palette.Run(dst1)
         dst1 = task.palette.dst1
         label1 = reduction.label1 + " with " + CStr(counts.Count) + " levels"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Proximity_KMeansFast : Inherits VBparent
+    Dim proxy As New Proximity_KMeans
+    Public Sub New()
+        task.desc = "Use resize with Nearest flag to speed up Proximity_KMeans and preserve accuracy"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
+        If standalone Then src.SetTo(100000, task.noDepthMask)
+        Dim tmp = src.Resize(New cv.Size(src.Width / 2, src.Height / 2), 0, 0, cv.InterpolationFlags.Nearest)
+        proxy.Run(tmp)
+        dst1 = proxy.dst1.Resize(src.Size)
+        dst1.SetTo(0, task.noDepthMask)
     End Sub
 End Class
