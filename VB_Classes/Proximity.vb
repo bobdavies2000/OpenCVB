@@ -26,7 +26,7 @@ End Class
 
 
 
-Public Class Proximity_BasicsFast : Inherits VBparent
+Public Class Proximity_BasicsDepth : Inherits VBparent
     Dim km As New KMeans_Basics
     Public Sub New()
         findSlider("Resize Factor (used only with KMeans_BasicsFast)").Enabled = True
@@ -42,6 +42,33 @@ Public Class Proximity_BasicsFast : Inherits VBparent
         depth32f.SetTo(0, task.noDepthMask.Resize(depth32f.Size))
         km.Run(depth32f)
         dst1 = km.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Proximity_BasicsRGB : Inherits VBparent
+    Dim km As New KMeans_Basics
+    Public Sub New()
+        findSlider("Resize Factor (used only with KMeans_BasicsFast)").Enabled = True
+        task.desc = "Cluster just RGB using kMeans but hopefully faster than Proximity_Basics"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static resizeSlider = findSlider("Resize Factor (used only with KMeans_BasicsFast)")
+        Dim resizeFactor = resizeSlider.value
+
+        Dim w = CInt(task.depth32f.Width / resizeFactor)
+        Dim h = CInt(task.depth32f.Height / resizeFactor)
+
+        km.Run(src)
+        dst1 = km.dst1
+        dst2 = km.dst2
     End Sub
 End Class
 

@@ -6,6 +6,7 @@ Public Class KMeans_Basics : Inherits VBparent
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
             sliders.setupTrackBar(1, "Resize Factor (used only with KMeans_BasicsFast)", 1, 8, 2)
+            sliders.setupTrackBar(2, "Mask - light to dark or farthest to closest", 0, 100, 0)
             findSlider("Resize Factor (used only with KMeans_BasicsFast)").Enabled = False
         End If
 
@@ -21,6 +22,7 @@ Public Class KMeans_Basics : Inherits VBparent
         task.desc = "Cluster the input image pixels using kMeans."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 5
+        Static maskSlider = findSlider("Mask - light to dark or farthest to closest")
         Static radioPP = findRadio("Use PpCenters")
         Static radioLabels = findRadio("Use Initialized Labels")
         Static kSlider = findSlider("kMeans k")
@@ -85,6 +87,14 @@ Public Class KMeans_Basics : Inherits VBparent
                 dst1.SetTo(cv.Scalar.All(gray), mask)
             End If
         Next
+
+        Static saveMaskCount As Integer
+        If saveMaskCount <> masks.Count Then
+            maskSlider.value = 0
+            maskSlider.maximum = masks.Count - 1
+            saveMaskCount = masks.Count
+        End If
+        dst2 = masks(maskSlider.value)
     End Sub
 End Class
 
