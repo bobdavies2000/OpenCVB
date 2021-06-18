@@ -21,6 +21,8 @@ Public Class KMeans_Basics : Inherits VBparent
         task.desc = "Cluster the input image pixels using kMeans."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 5
+        Static radioPP = findRadio("Use PpCenters")
+        Static radioLabels = findRadio("Use Initialized Labels")
         Static kSlider = findSlider("kMeans k")
         Static resizeSlider = findSlider("Resize Factor (used only with KMeans_BasicsFast)")
         Dim kMeansK = kSlider.value
@@ -36,22 +38,18 @@ Public Class KMeans_Basics : Inherits VBparent
         Static saveSize As Integer
         If task.frameCount > 0 And saveK = kMeansK And saveSize = resizeSlider.value Then
             labels = saveLabels
-            radio.check(2).Checked = True
+            radioLabels.Checked = True
         Else
-            radio.check(0).Checked = True
+            radioPP.Checked = True
             saveK = kMeansK
             saveSize = resizeSlider.value
             labels = New cv.Mat()
             colors = New cv.Mat
         End If
 
-        Dim kmeansFlag As cv.KMeansFlags
-        For i = 0 To radio.check.Count - 1
-            If radio.check(i).Checked Then
-                kmeansFlag = Choose(i + 1, cv.KMeansFlags.PpCenters, cv.KMeansFlags.RandomCenters, cv.KMeansFlags.UseInitialLabels)
-                Exit For
-            End If
-        Next
+        Dim kmeansFlag = cv.KMeansFlags.RandomCenters
+        If radioPP.checked Then kmeansFlag = cv.KMeansFlags.PpCenters
+        If radioLabels.checked Then kmeansFlag = cv.KMeansFlags.UseInitialLabels
 
         cv.Cv2.Kmeans(columnVector, kMeansK, labels, term, 1, kmeansFlag, colors)
         saveLabels = labels.Clone
@@ -198,9 +196,12 @@ End Class
 
 
 
-Public Class KMeans_Clusters : Inherits VBparent
+Public Class KMeans_k2_to_k8 : Inherits VBparent
     Dim Mats As New Mat_4Click
-    Dim km As New KMeans_Basics
+    Dim km2 As New KMeans_BasicsFast
+    Dim km4 As New KMeans_BasicsFast
+    Dim km6 As New KMeans_BasicsFast
+    Dim km8 As New KMeans_BasicsFast
     Public Sub New()
         label1 = "kmeans - k=2,4,6,8"
         label2 = "Click any quadrant at left to view it below"
@@ -214,6 +215,7 @@ Public Class KMeans_Clusters : Inherits VBparent
         task.color.ConvertTo(rgb32f, cv.MatType.CV_32FC3)
         For i = 0 To 3
             kSlider.value = Choose(i + 1, 2, 4, 6, 8)
+            Dim km = Choose(i + 1, km2, km4, km6, km8)
             km.Run(rgb32f)
             Mats.mat(i) = km.dst1.Clone
         Next
