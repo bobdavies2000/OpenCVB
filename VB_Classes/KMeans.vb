@@ -20,7 +20,7 @@ Public Class KMeans_Basics : Inherits VBparent
         label1 = "KMeans_Basics output with just RGB input"
         task.desc = "Cluster the input image pixels using kMeans."
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 5
         Static kSlider = findSlider("kMeans k")
         Static resizeSlider = findSlider("Resize Factor (used only with KMeans_BasicsFast)")
         Dim kMeansK = kSlider.value
@@ -57,25 +57,33 @@ Public Class KMeans_Basics : Inherits VBparent
         saveLabels = labels.Clone
         labels.Reshape(1, input.Height).ConvertTo(labels, cv.MatType.CV_8U)
 
-        ' if the input is depth, the colors need to be normalized to 255
+        Dim range255 As Boolean = True
         For i = 0 To colors.Rows - 1
-            Dim gray = colors.Get(Of Single)(i, 0)
-            If gray > 255 Then
-                colors = colors.Normalize(0, 255, cv.NormTypes.MinMax)
-                Exit For
-            End If
+            Dim val = colors.Get(Of Single)(i, 0)
+            If val > 255 Then range255 = False
+        Next
+        If range255 = False Then
+            colors = colors.Normalize(0, 255, cv.NormTypes.MinMax)
+        End If
+
+        Dim maskOrder As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
+        For i = 0 To colors.Rows - 1
+            Dim val = colors.Get(Of Single)(i, 0)
+            If val > 255 Then range255 = False
+            maskOrder.Add(val, i)
         Next
 
         masks.Clear()
-        For i = 0 To kMeansK - 1
-            Dim mask = labels.InRange(i, i)
+        For i = 0 To maskOrder.Count - 1
+            Dim index = maskOrder.ElementAt(i).Value
+            Dim mask = labels.InRange(index, index)
             masks.Add(mask)
             dst1 = dst1.Resize(input.Size)
             If input.Channels = 3 Then
                 dst1.SetTo(colors.Get(Of cv.Vec3f)(i, 0), mask)
             Else
                 ' if the input was not 3-channel, then just use the first channel of colors.  Be sure that the first input channel was RGB/grayscale...
-                Dim gray = colors.Get(Of Single)(i, 0)
+                Dim gray = colors.Get(Of Single)(index, 0)
                 dst1.SetTo(cv.Scalar.All(gray), mask)
             End If
         Next

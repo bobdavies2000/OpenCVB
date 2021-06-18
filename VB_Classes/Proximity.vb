@@ -5,7 +5,14 @@ Public Class Proximity_Basics : Inherits VBparent
         task.desc = "Cluster just depth using kMeans"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        km.Run(task.depth32f)
+        Dim input = src.Clone
+        If input.Type <> cv.MatType.CV_32F Then
+            If input.Channels = 3 Then
+                input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            End If
+            input.ConvertTo(input, cv.MatType.CV_32F)
+        End If
+        km.Run(src)
         dst1 = km.dst1
         dst1.SetTo(0, task.noDepthMask)
     End Sub
@@ -341,10 +348,11 @@ End Class
 
 
 
-Public Class Proximity_Masks : Inherits VBparent
+Public Class Proximity_MasksRGB : Inherits VBparent
     Dim proxy As New Proximity_Basics
     Dim mats As New Mat_4Click
     Public Sub New()
+        label1 = "Ordered from light to dark"
         task.desc = "Display the top 4 masks from the rgb kmeans output"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -357,5 +365,24 @@ Public Class Proximity_Masks : Inherits VBparent
         mats.Run(Nothing)
         dst1 = mats.dst1
         dst2 = mats.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Proximity_MasksDepth : Inherits VBparent
+    Dim proxy As New Proximity_MasksRGB
+    Public Sub New()
+        label1 = "Ordered from farthest to closest in depth"
+        task.desc = "Display the top 4 masks from the depth kmeans output"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        proxy.Run(task.depth32f)
+        dst1 = proxy.dst1
+        dst2 = proxy.dst2
     End Sub
 End Class
