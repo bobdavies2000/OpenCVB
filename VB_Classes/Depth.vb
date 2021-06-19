@@ -1594,3 +1594,31 @@ Public Class Depth_RGBShadow : Inherits VBparent
         dst1.SetTo(0, task.noDepthMask)
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class Depth_Unstable : Inherits VBparent
+    Dim pixel As New Pixel_Unstable
+    Public Sub New()
+        findSlider("kMeans k").Value = 6 ' the default is only 4 and depth needs more...
+        findSlider("Retain x frames to measure unstable pixels").Value = 10
+        If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Then
+            findSlider("KMeans clustered difference threshold").Value = 20
+            findSlider("Resize Factor (used only with KMeans_BasicsFast)").Value = 5
+        End If
+        label1 = "KMeans_Basics output for depth data"
+        task.desc = "Detect where depth data is unstable"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        pixel.Run(task.depth32f)
+
+        dst1 = pixel.dst1
+        dst2 = pixel.dst2
+        label2 = pixel.label2
+    End Sub
+End Class

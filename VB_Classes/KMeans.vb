@@ -7,7 +7,7 @@ Public Class KMeans_Basics : Inherits VBparent
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
             sliders.setupTrackBar(1, "Resize Factor (used only with KMeans_BasicsFast)", 1, 8, 2)
             sliders.setupTrackBar(2, "Select Mask - light to dark or farthest to closest", 0, 100, 0)
-            sliders.setupTrackBar(3, "Retain x frames to measure unstable pixels", 0, 20, 5)
+            sliders.setupTrackBar(3, "Retain x frames to measure unstable pixels", 1, 20, 5)
             findSlider("Resize Factor (used only with KMeans_BasicsFast)").Enabled = False
         End If
 

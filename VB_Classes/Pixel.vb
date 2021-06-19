@@ -320,31 +320,43 @@ End Class
 
 
 Public Class Pixel_Unstable : Inherits VBparent
-    Dim km As New KMeans_Basics
+    Dim km As New KMeans_BasicsFast
     Public unstablePixels As New cv.Mat
     Public Sub New()
+        If sliders.Setup(caller) Then sliders.setupTrackBar(0, "KMeans clustered difference threshold", 1, 50, 5)
         label1 = "KMeans_Basics output"
         task.desc = "Detect where pixels are unstable"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 3
+        Static diffSlider = findSlider("KMeans clustered difference threshold")
         Static retainSlider = findSlider("Retain x frames to measure unstable pixels")
+        Static kSlider = findSlider("kMeans k")
         Static saveMaskIndex = -1
         Static pixelCounts As New List(Of Integer)
-        If saveMaskIndex <> retainSlider.value Then
+        Static k As Integer = -1
+        Static unstable As New List(Of cv.Mat)
+        If saveMaskIndex <> retainSlider.value Or k <> kSlider.value Then
             saveMaskIndex = retainSlider.value
             pixelCounts.Clear()
+            unstable.Clear()
+            k = kSlider.value
         End If
 
-        km.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        dst1 = km.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        km.Run(src)
+        If km.dst1.Channels <> 1 Then
+            dst1 = km.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Else
+            dst1 = km.dst1
+        End If
         dst1.ConvertTo(dst1, cv.MatType.CV_32F)
         Static lastImage As cv.Mat = dst1
         cv.Cv2.Subtract(dst1, lastImage, dst2)
-        dst2 = dst2.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst2 = dst2.Threshold(diffSlider.value, 255, cv.ThresholdTypes.Binary)
 
-        Static unstable As New List(Of cv.Mat)
         unstable.Add(dst2)
-        If unstable.Count >= retainSlider.value Then unstable.RemoveAt(0)
+        If unstable.Count > retainSlider.value Then unstable.RemoveAt(0)
 
         unstablePixels = unstable(0)
         For i = 1 To unstable.Count - 1
