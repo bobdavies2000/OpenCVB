@@ -7,6 +7,14 @@ Public Class MaskShape_Basics : Inherits VBparent
         task.desc = "Get a mask from the Proximity_Basics (default RGB mode) and use it to find its shape in depth"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static maskSlider = findSlider("Select Mask - light to dark or farthest to closest")
+        Static saveMaskIndex = -1
+        Static pixelCounts As New List(Of Integer)
+        If saveMaskIndex <> maskSlider.value Then
+            saveMaskIndex = maskSlider.value
+            pixelCounts.Clear()
+        End If
+
         proxy.Run(src)
         mats.mat(0) = proxy.dst1
         mats.mat(1) = proxy.dst2
@@ -26,6 +34,17 @@ Public Class MaskShape_Basics : Inherits VBparent
 
         dst1 = mats.dst1
         dst2 = mats.dst2
+
+        pixelCounts.Add(mats.mat(1).CountNonZero)
+        If pixelCounts.Count > 100 Then pixelCounts.RemoveAt(0)
+
+        ' compute stdev from the list
+        Dim avg = pixelCounts.Average()
+        Dim sum = pixelCounts.Sum(Function(d As Integer) Math.Pow(d - avg, 2))
+        Dim stdev = Math.Sqrt(sum / pixelCounts.Count)
+
+        label1 = "KMeans, selected mask, mask sideview, mask topview"
+        label2 = "Selected mask has stdev of " + Format(stdev, "#0.00") + " n=" + CStr(pixelCounts.Count) + " avg=" + Format(avg, "#0")
     End Sub
 End Class
 
@@ -41,10 +60,14 @@ Public Class MaskShape_Depth : Inherits VBparent
         task.desc = "Get a mask from the Proximity_Basics using depth and use it to find its shape in depth"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static maskSlider = findSlider("Mask - light to dark or farthest to closest")
-        If maskSlider.maximum = maskSlider.value Then setTrueText("The closest mask in depth matches the area with no depth so no data is displayed.", 10, 40, 3)
-        proxy.Run(task.depth32f)
-        dst1 = proxy.dst1
-        dst2 = proxy.dst2
+        Static maskSlider = findSlider("Select Mask - light to dark or farthest to closest")
+        If maskSlider.maximum = maskSlider.value Then
+            setTrueText("The closest mask in depth matches the area with no depth so no data is displayed.", 10, 40, 3)
+            dst2.SetTo(0)
+        Else
+            proxy.Run(task.depth32f)
+            dst1 = proxy.dst1
+            dst2 = proxy.dst2
+        End If
     End Sub
 End Class

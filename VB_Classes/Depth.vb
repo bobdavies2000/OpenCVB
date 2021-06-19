@@ -169,7 +169,7 @@ Public Class Depth_MeanStdev_MT : Inherits VBparent
         Parallel.For(0, grid.roiList.Count,
         Sub(i)
             Dim roi = grid.roiList(i)
-            Dim mean As Single = 0, stdev As Single = 0
+            Dim mean As cv.Scalar, stdev As cv.Scalar
             cv.Cv2.MeanStdDev(task.depth32f(roi), mean, stdev, mask(roi))
             meanSeries.Set(Of Single)(i, meanIndex, mean)
             If task.frameCount >= meanCount - 1 Then
@@ -224,12 +224,12 @@ Public Class Depth_MeanStdevPlot : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
-        Dim mean As Single = 0, stdev As Single = 0
+        Dim mean As cv.Scalar, stdev As cv.Scalar
         Dim depthMask As cv.Mat = task.depthMask
         cv.Cv2.MeanStdDev(task.depth32f, mean, stdev, depthMask)
 
-        If mean > plot1.maxScale Then plot1.maxScale = mean + 1000 - (mean + 1000) Mod 1000
-        If stdev > plot2.maxScale Then plot2.maxScale = stdev + 1000 - (stdev + 1000) Mod 1000
+        If mean.Item(0) > plot1.maxScale Then plot1.maxScale = mean.Item(0) + 1000 - (mean.Item(0) + 1000) Mod 1000
+        If stdev.Item(0) > plot2.maxScale Then plot2.maxScale = stdev.Item(0) + 1000 - (stdev.Item(0) + 1000) Mod 1000
 
         plot1.plotData = New cv.Scalar(mean, 0, 0)
         plot1.Run(src)

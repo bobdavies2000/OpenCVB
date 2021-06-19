@@ -313,3 +313,54 @@ Public Class Pixel_Sampler : Inherits VBparent
         End If
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Pixel_Unstable : Inherits VBparent
+    Dim km As New KMeans_Basics
+    Public unstablePixels As New cv.Mat
+    Public Sub New()
+        label1 = "KMeans_Basics output"
+        task.desc = "Detect where pixels are unstable"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static retainSlider = findSlider("Retain x frames to measure unstable pixels")
+        Static saveMaskIndex = -1
+        Static pixelCounts As New List(Of Integer)
+        If saveMaskIndex <> retainSlider.value Then
+            saveMaskIndex = retainSlider.value
+            pixelCounts.Clear()
+        End If
+
+        km.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst1 = km.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1.ConvertTo(dst1, cv.MatType.CV_32F)
+        Static lastImage As cv.Mat = dst1
+        cv.Cv2.Subtract(dst1, lastImage, dst2)
+        dst2 = dst2.Threshold(1, 255, cv.ThresholdTypes.Binary)
+
+        Static unstable As New List(Of cv.Mat)
+        unstable.Add(dst2)
+        If unstable.Count >= retainSlider.value Then unstable.RemoveAt(0)
+
+        unstablePixels = unstable(0)
+        For i = 1 To unstable.Count - 1
+            cv.Cv2.BitwiseOr(unstablePixels, unstable(i), unstablePixels)
+        Next
+        dst2 = unstablePixels
+        Dim unstableCount = dst2.CountNonZero
+
+        pixelCounts.Add(unstableCount)
+        If pixelCounts.Count > 100 Then pixelCounts.RemoveAt(0)
+
+        ' compute stdev from the list
+        Dim avg = pixelCounts.Average()
+        Dim sum = pixelCounts.Sum(Function(d As Integer) Math.Pow(d - avg, 2))
+        Dim stdev = Math.Sqrt(sum / pixelCounts.Count)
+        label2 = "Unstable pixel count = " + Format(avg, "###,##0") + "    stdev = " + Format(stdev, "0.0")
+        lastImage = dst1.Clone
+    End Sub
+End Class
