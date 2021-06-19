@@ -290,3 +290,24 @@ Public Class KMeans_LAB : Inherits VBparent
         dst1 = km.dst1
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class KMeans_Fuzzy : Inherits VBparent
+    Dim km As New KMeans_Basics
+    Public fuzzyD As New Fuzzy_Basics
+    Public Sub New()
+        task.desc = "Use the KMeans output as input to the Fuzzy detector"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        km.Run(src)
+        dst1 = km.dst1
+        fuzzyD.Run(km.dst1)
+        dst2 = fuzzyD.dst2
+    End Sub
+End Class

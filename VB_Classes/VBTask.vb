@@ -1,9 +1,8 @@
 Imports cv = OpenCvSharp
 Imports System.Windows.Forms
-Imports System.Threading
+Imports System.IO.Pipes
 Module Algorithm_Module
     Public task As ActiveTask
-    Public pipeIndex As Integer ' back-to-back pipe usage can sometimes have 2 active pipes.  This index avoids conflict...
     Public aOptions As OptionsContainer
     Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
     Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
@@ -180,6 +179,13 @@ Public Class ActiveTask : Implements IDisposable
     Public pixelViewerRect As cv.Rect
     Public pixelViewTag As Integer
 
+    Public pipeIn As NamedPipeServerStream
+    Public pipeOut As NamedPipeServerStream
+    Public pipeName As String
+    Public pipeIndex As Integer ' back-to-back pipe usage can sometimes have 2 active pipes.  This index avoids conflict...
+    Public pipe As NamedPipeServerStream
+    Public pythonTaskName As String
+
     Public label1 As String
     Public label2 As String
     Public desc As String
@@ -207,7 +213,6 @@ Public Class ActiveTask : Implements IDisposable
     Public angleY As Single  ' this angle is only used manually - no IMU connection.
     Public angleZ As Single  ' rotation angle in radians around z-axis to align with gravity
 
-    Public pythonTaskName As String
     Public algName As String
 
     Public ttTextData As New List(Of TTtext)
@@ -400,6 +405,9 @@ Public Class ActiveTask : Implements IDisposable
     End Sub
     Public Sub Dispose() Implements IDisposable.Dispose
         TaskTimer.Enabled = False
+        If task.pipeOut IsNot Nothing Then pipeOut.Close()
+        If task.pipeIn IsNot Nothing Then pipeIn.Close()
+        If task.pipe IsNot Nothing Then pipe.Close()
         If recordedData IsNot Nothing Then recordedData.Dispose()
         If algorithmObject IsNot Nothing Then algorithmObject.Dispose()
     End Sub

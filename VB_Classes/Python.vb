@@ -168,9 +168,6 @@ End Class
 
 
 Public Class Python_Stream : Inherits VBparent
-    Dim pipeName As String
-    Dim pipeIn As NamedPipeServerStream
-    Dim pipeOut As NamedPipeServerStream
     Dim rgbBuffer(1) As Byte
     Dim depthBuffer(1) As Byte
     Dim dst1Buffer(1) As Byte
@@ -178,15 +175,15 @@ Public Class Python_Stream : Inherits VBparent
     Dim pythonReady As Boolean
     Dim memMap As Python_MemMap
     Public Sub New()
-        pipeName = "PyStream2Way" + CStr(pipeIndex)
+        task.pipeName = "PyStream2Way" + CStr(task.pipeIndex)
         Try
-            pipeOut = New NamedPipeServerStream(pipeName, PipeDirection.Out)
+            task.pipeOut = New NamedPipeServerStream(task.pipeName, PipeDirection.Out)
         Catch ex As Exception
-            pipeIndex += 1
-            pipeName = "PyStream2Way" + CStr(pipeIndex) ' try another name 
-            pipeOut = New NamedPipeServerStream(pipeName, PipeDirection.Out)
+            task.pipeIndex += 1
+            task.pipeName = "PyStream2Way" + CStr(task.pipeIndex) ' try another name 
+            task.pipeOut = New NamedPipeServerStream(task.pipeName, PipeDirection.Out)
         End Try
-        pipeIn = New NamedPipeServerStream(pipeName + "Results", PipeDirection.In)
+        task.pipeIn = New NamedPipeServerStream(task.pipeName + "Results", PipeDirection.In)
 
         ' Was this class invoked standalone?  Then just run something that works with RGB and depth...
         If task.pythonTaskName.EndsWith("Python_Stream") Then
@@ -199,11 +196,11 @@ Public Class Python_Stream : Inherits VBparent
             pythonReady = True ' python was already running and invoked OpenCVB.
         Else
             Dim testallStr = " --TestAllRunning=" + If(task.parms.testAllRunning, "1", "0")
-            pythonReady = StartPython("--MemMapLength=" + CStr(memMap.memMapbufferSize) + testallStr + " --pipeName=" + pipeName)
+            pythonReady = StartPython("--MemMapLength=" + CStr(memMap.memMapbufferSize) + testallStr + " --pipeName=" + task.pipeName)
         End If
         If pythonReady Then
-            pipeOut.WaitForConnection()
-            pipeIn.WaitForConnection()
+            task.pipeOut.WaitForConnection()
+            task.pipeIn.WaitForConnection()
         End If
         label1 = "Output of Python Backend"
         task.desc = "General purpose class to pipe RGB and Depth to Python scripts."
@@ -223,12 +220,12 @@ Public Class Python_Stream : Inherits VBparent
             If dst2Buffer.Length <> dst2.Total * dst2.ElemSize Then ReDim dst2Buffer(dst2.Total * dst2.ElemSize - 1)
             Marshal.Copy(src.Data, rgbBuffer, 0, src.Total * src.ElemSize)
             Marshal.Copy(task.depth32f.Data, depthBuffer, 0, depthBuffer.Length)
-            If pipeOut.IsConnected Then
+            If task.pipeOut.IsConnected Then
                 On Error Resume Next
-                pipeOut.Write(rgbBuffer, 0, rgbBuffer.Length)
-                pipeOut.Write(depthBuffer, 0, depthBuffer.Length)
-                pipeIn.Read(dst1Buffer, 0, dst1Buffer.Length)
-                pipeIn.Read(dst2Buffer, 0, dst2Buffer.Length)
+                task.pipeOut.Write(rgbBuffer, 0, rgbBuffer.Length)
+                task.pipeOut.Write(depthBuffer, 0, depthBuffer.Length)
+                task.pipeIn.Read(dst1Buffer, 0, dst1Buffer.Length)
+                task.pipeIn.Read(dst2Buffer, 0, dst2Buffer.Length)
             End If
             Marshal.Copy(dst1Buffer, 0, dst1.Data, dst1Buffer.Length)
             Marshal.Copy(dst2Buffer, 0, dst2.Data, dst2Buffer.Length)

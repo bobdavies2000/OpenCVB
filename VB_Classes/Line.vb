@@ -1046,17 +1046,15 @@ Public Class Line_DupLongestH : Inherits VBparent
         For i = 0 To dupH.dOptions.lines.pt1List.Count - 1
             Dim pt1 = dupH.dOptions.lines.pt1List(i)
             Dim pt2 = dupH.dOptions.lines.pt2List(i)
-            'If pt1.Y = pt2.Y Then
             Dim len = Math.Abs(pt1.X - pt2.X)
-                If len > longestLen Then
-                    Dim val1 = task.depth32f.Get(Of Single)(pt1.Y, pt1.X)
-                    If val1 > 0 Then
-                        longestP1 = If(pt1.X < pt2.X, pt1, pt2)
-                        longestP2 = If(pt1.X > pt2.X, pt1, pt2)
-                        longestLen = len
-                    End If
+            If len > longestLen Then
+                Dim val1 = task.depth32f.Get(Of Single)(pt1.Y, pt1.X)
+                If val1 > 0 Then
+                    longestP1 = If(pt1.X < pt2.X, pt1, pt2)
+                    longestP2 = If(pt1.X > pt2.X, pt1, pt2)
+                    longestLen = len
                 End If
-            'End If
+            End If
         Next
 
         task.ttTextData.Clear()
@@ -1078,5 +1076,42 @@ Public Class Line_DupLongestH : Inherits VBparent
                 setTrueText(prefix + " mean = " + Format(meanVec.Item(i) * 1000, "0000") + " minVal = " + Format(minVal * 1000, "0000") + " maxVal = " + Format(maxVal * 1000, "0000"), 10, 100 + i * 25, 3)
             Next
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Line_KMeans : Inherits VBparent
+    Dim km As New KMeans_Basics
+    Dim lines As New Line_Basics
+    Public Sub New()
+        task.desc = "Detect lines in the KMeans output"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        km.Run(src)
+        dst1 = km.dst1
+        lines.Run(km.dst1)
+        dst2 = lines.dst1
+    End Sub
+End Class
+
+
+
+
+
+Public Class Line_KMeansFuzzy : Inherits VBparent
+    Dim km As New KMeans_Fuzzy
+    Dim lines As New Line_Basics
+    Public Sub New()
+        task.desc = "Detect lines in the KMeans fuzzy output"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        km.Run(src)
+        dst1 = km.dst1
+        lines.Run(km.dst2)
+        dst2 = lines.dst1
     End Sub
 End Class

@@ -5,8 +5,6 @@ Imports System.IO.Pipes
 
 Public Class OpenGL_Basics : Inherits VBparent
     Dim memMapWriter As MemoryMappedViewAccessor
-    Dim pipeName As String ' this is name of pipe to the OpenGL task.  It is dynamic and increments.
-    Dim pipe As NamedPipeServerStream
     Dim startInfo As New ProcessStartInfo
     Dim memMapbufferSize As integer
     Dim memMapFile As MemoryMappedFile
@@ -57,19 +55,19 @@ Public Class OpenGL_Basics : Inherits VBparent
     End Sub
     Private Sub startOpenGLWindow()
         ' first setup the named pipe that will be used to feed data to the OpenGL window
-        pipeName = "OpenCVBImages" + CStr(pipeIndex)
+        task.pipeName = "OpenCVBImages" + CStr(task.pipeIndex)
         Try
-            pipe = New NamedPipeServerStream(pipeName, PipeDirection.InOut, 1)
+            task.pipe = New NamedPipeServerStream(task.pipeName, PipeDirection.InOut, 1)
         Catch ex As Exception
-            pipeIndex += 1
-            pipeName = "OpenCVBImages" + CStr(pipeIndex) ' try another name 
-            pipe = New NamedPipeServerStream(pipeName, PipeDirection.InOut, 1)
+            task.pipeIndex += 1
+            task.pipeName = "OpenCVBImages" + CStr(task.pipeIndex) ' try another name 
+            task.pipe = New NamedPipeServerStream(task.pipeName, PipeDirection.InOut, 1)
         End Try
 
         memMapbufferSize = 8 * memMapValues.Length - 1
 
         startInfo.FileName = OpenGLTitle + ".exe"
-        startInfo.Arguments = CStr(openGLWidth) + " " + CStr(openGLHeight) + " " + CStr(memMapbufferSize) + " " + pipeName
+        startInfo.Arguments = CStr(openGLWidth) + " " + CStr(openGLHeight) + " " + CStr(memMapbufferSize) + " " + task.pipeName
         If task.parms.ShowConsoleLog = False Then startInfo.WindowStyle = ProcessWindowStyle.Hidden
         Process.Start(startInfo)
 
@@ -78,7 +76,7 @@ Public Class OpenGL_Basics : Inherits VBparent
         memMapWriter = memMapFile.CreateViewAccessor(0, memMapbufferSize)
 
         imageLabel = OpenGLTitle ' default title - can be overridden with each image.
-        pipe.WaitForConnection()
+        task.pipe.WaitForConnection()
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.intermediateName <> "" Then
@@ -92,8 +90,8 @@ Public Class OpenGL_Basics : Inherits VBparent
         Dim pcSize = pointCloudInput.Total * pointCloudInput.ElemSize
         If task.frameCount = 0 Then startOpenGLWindow()
         Dim readPipe(4) As Byte ' we read 4 bytes because that is the signal that the other end of the named pipe wrote 4 bytes to indicate iteration complete.
-        If task.frameCount > 0 And pipe IsNot Nothing Then
-            Dim bytesRead = pipe.Read(readPipe, 0, 4)
+        If task.frameCount > 0 And task.pipe IsNot Nothing Then
+            Dim bytesRead = task.pipe.Read(readPipe, 0, 4)
             If bytesRead = 0 Then setTrueText("The OpenGL process appears to have stopped.", 20, 100)
         End If
 
@@ -113,14 +111,14 @@ Public Class OpenGL_Basics : Inherits VBparent
         If textureInput.Width > 0 Then Marshal.Copy(textureInput.Data, textureBuffer, 0, textureBuffer.Length)
         If pointCloudInput.Width > 0 Then Marshal.Copy(pointCloudInput.Data, pointCloudBuffer, 0, pcSize)
 
-        If pipe.IsConnected Then
+        If task.pipe.IsConnected Then
             On Error Resume Next
-            If rgb.Width > 0 Then pipe.Write(rgbBuffer, 0, rgbBuffer.Length)
-            If dataInput.Width > 0 Then pipe.Write(dataBuffer, 0, dataBuffer.Length)
-            If textureInput.Width > 0 Then pipe.Write(textureBuffer, 0, textureBuffer.Length)
-            If pointCloudInput.Width > 0 Then pipe.Write(pointCloudBuffer, 0, pointCloudBuffer.Length)
+            If rgb.Width > 0 Then task.pipe.Write(rgbBuffer, 0, rgbBuffer.Length)
+            If dataInput.Width > 0 Then task.pipe.Write(dataBuffer, 0, dataBuffer.Length)
+            If textureInput.Width > 0 Then task.pipe.Write(textureBuffer, 0, textureBuffer.Length)
+            If pointCloudInput.Width > 0 Then task.pipe.Write(pointCloudBuffer, 0, pointCloudBuffer.Length)
             Dim buff = System.Text.Encoding.UTF8.GetBytes(imageLabel)
-            pipe.Write(buff, 0, imageLabel.Length)
+            task.pipe.Write(buff, 0, imageLabel.Length)
         End If
     End Sub
     Public Sub Close()
