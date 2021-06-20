@@ -239,8 +239,8 @@ Public Class Depth_MeanStdevPlot : Inherits VBparent
         plot2.Run(src)
         dst2 = plot2.dst1
 
-        label1 = "Plot of mean depth = " + Format(mean, "#0.0")
-        label2 = "Plot of depth stdev = " + Format(stdev, "#0.0")
+        label1 = "Plot of mean depth = " + Format(mean.Item(0), "#0.0")
+        label2 = "Plot of depth stdev = " + Format(stdev.Item(0), "#0.0")
     End Sub
 End Class
 

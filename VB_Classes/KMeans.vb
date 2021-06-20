@@ -369,3 +369,64 @@ Public Class KMeans_CCompImage : Inherits VBparent
         Next
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class KMeans_CCompMasks : Inherits VBparent
+    Dim ccomp() As CComp_Basics
+    Dim km As New KMeans_Basics
+    Public masks As New List(Of cv.Mat)
+    Public rects As New List(Of cv.Rect)
+    Public Sub New()
+        task.desc = "Use each KMeans mask with CComp"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static kSlider = findSlider("kMeans k")
+        Static k = -1
+        If k <> kSlider.value Then
+            k = kSlider.value
+            ReDim ccomp(k)
+            For i = 0 To k - 1
+                ccomp(i) = New CComp_Basics
+            Next
+        End If
+
+        km.Run(src)
+        dst1 = km.dst1
+
+        masks.Clear()
+        rects.Clear()
+        dst2.SetTo(0)
+        Dim sortAreas As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        Dim centroids As New List(Of cv.Point2f)
+        For i = 0 To k - 1
+            ccomp(i).Run(km.masks(i))
+            For j = 0 To ccomp(i).masks.Count - 1
+                sortAreas.Add(ccomp(i).areas(j), masks.Count)
+                masks.Add(ccomp(i).masks(j))
+                rects.Add(ccomp(i).rects(j))
+                centroids.Add(ccomp(i).centroids(j))
+                dst1.Circle(centroids(centroids.Count - 1), task.dotSize + 3, cv.Scalar.White, -1, task.lineType)
+                dst1.Circle(centroids(centroids.Count - 1), task.dotSize, cv.Scalar.Black, -1, task.lineType)
+            Next
+        Next
+
+        Static minIndex As Integer
+        If task.mouseClickPoint <> New cv.Point Or minIndex >= masks.Count Then
+            Dim minDistance As Single = Single.MaxValue
+            For i = 0 To centroids.Count - 1
+                Dim distance = task.mouseClickPoint.DistanceTo(centroids(i))
+                If minDistance > distance Then
+                    minDistance = distance
+                    minIndex = i
+                End If
+            Next
+        End If
+        dst2 = masks(minIndex)
+        label2 = "Pixel count = " + CStr(sortAreas.ElementAt(minindex).Key)
+    End Sub
+End Class

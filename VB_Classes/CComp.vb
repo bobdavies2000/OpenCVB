@@ -2,18 +2,23 @@ Imports cv = OpenCvSharp
 Imports System.Threading
 ' https://docs.opencv.org/master/de/d01/samples_2cpp_2connected_components_8cpp-example.html
 Public Class CComp_Basics : Inherits VBparent
+    Public masks As New List(Of cv.Mat)
     Public rects As New List(Of cv.Rect)
+    Public areas As New List(Of Integer)
+    Public centroids As New List(Of cv.Point2f)
     Dim colorMap As cv.Mat
     Public Sub New()
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
             sliders.setupTrackBar(1, "Threshold for grayscale input", 0, 255, 128)
+            sliders.setupTrackBar(2, "Select Mask - largest to smallest", 0, 100, 0)
         End If
         task.palette.Run(task.color)
         colorMap = task.palette.gradientColorMap.Row(0).Clone
         task.desc = "Use a threshold slider on the CComp input"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 5
+        Static maskSlider = findSlider("Select Mask - light to dark or farthest to closest")
         Static areaSlider = findSlider("CComp Min Area")
         Static thresholdSlider = findSlider("Threshold for grayscale input")
         Dim threshVal = thresholdSlider.value
@@ -27,23 +32,38 @@ Public Class CComp_Basics : Inherits VBparent
         End If
         Dim labels As New cv.Mat
         Dim stats As New cv.Mat
-        Dim centroids As New cv.Mat
-        Dim nLabels = dst1.ConnectedComponentsWithStats(labels, stats, centroids)
+        Dim centroidRaw As New cv.Mat
+        Dim nLabels = dst1.ConnectedComponentsWithStats(labels, stats, centroidRaw)
 
         rects.Clear()
+        areas.Clear()
+        centroids.Clear()
         Dim black = New cv.Vec3b(0, 0, 0)
         Dim colors As New List(Of cv.Vec3b)
         Dim index As New List(Of Integer)
+        Dim maskOrder As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
         For i = 0 To Math.Min(256, stats.Rows) - 1
             Dim area = stats.Get(Of Integer)(i, 4)
             If area > minSize And area <> src.Total Then
+                areas.Add(area)
                 Dim r = stats.Get(Of cv.Rect)(i, 0)
                 If r.Width <> dst1.Width And r.Height <> dst1.Height Then
                     rects.Add(r)
                     colors.Add(task.vecColors(colors.Count))
                     index.Add(i)
+                    maskOrder.Add(area, i)
+                    Dim x = centroidRaw.Get(Of Double)(i, 0)
+                    Dim y = centroidRaw.Get(Of Double)(i, 1)
+                    centroids.Add(New cv.Point2f(x, y))
                 End If
             End If
+        Next
+
+        masks.Clear()
+        For i = 0 To maskOrder.Count - 1
+            Dim mIndex = maskOrder.ElementAt(i).Value
+            Dim mask = labels.InRange(mIndex, mIndex)
+            masks.Add(mask)
         Next
 
         ' this does not fix the color flashing problem but if the component count is the same (for the same areas) the colors will be stable.
@@ -56,6 +76,14 @@ Public Class CComp_Basics : Inherits VBparent
         task.palette.Run(labels)
         dst2 = task.palette.dst1
         label2 = CStr(nLabels) + " Connected Components found"
+
+        Static saveMaskCount As Integer
+        If saveMaskCount <> masks.Count Then
+            maskSlider.value = 0
+            maskSlider.maximum = masks.Count - 1
+            saveMaskCount = masks.Count
+        End If
+        If masks.Count > 0 Then dst2 = masks(maskSlider.value)
     End Sub
 End Class
 
