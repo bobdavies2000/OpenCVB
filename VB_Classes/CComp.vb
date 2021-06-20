@@ -2,10 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Threading
 ' https://docs.opencv.org/master/de/d01/samples_2cpp_2connected_components_8cpp-example.html
 Public Class CComp_Basics : Inherits VBparent
-    Public labels As New cv.Mat
-    Public stats As New cv.Mat
     Public rects As New List(Of cv.Rect)
-    Public centroids As New cv.Mat
     Dim colorMap As cv.Mat
     Public Sub New()
         If sliders.Setup(caller) Then
@@ -28,6 +25,9 @@ Public Class CComp_Basics : Inherits VBparent
         Else
             dst1 = src.Threshold(threshVal, 255, cv.ThresholdTypes.Binary)
         End If
+        Dim labels As New cv.Mat
+        Dim stats As New cv.Mat
+        Dim centroids As New cv.Mat
         Dim nLabels = dst1.ConnectedComponentsWithStats(labels, stats, centroids)
 
         rects.Clear()
@@ -178,7 +178,7 @@ End Class
 
 Public Class CComp_Basics_FullImage : Inherits VBparent
     Dim mats As New Mat_4to1
-    Dim basics As New CComp_Basics
+    Dim basics As New CComp_BasicsOld
     Public Sub New()
         task.desc = "Connect components in the light half of OTSU threshold output, then use the dark half, then combine results."
         label2 = "Masks binary+otsu used to compute mean depth"
@@ -646,5 +646,66 @@ Public Class CComp_Binarized : Inherits VBparent
         dst1 = edges.dst2
         ccomp.Run(dst1)
         dst2 = ccomp.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
+Public Class CComp_GrayScale : Inherits VBparent
+    Public rects As New List(Of cv.Rect)
+    Dim vecColors(255) As cv.Vec3b
+    Dim colorMap As cv.Mat
+    Public Sub New()
+        Dim msrng As New System.Random
+        For i = 0 To vecColors.Length - 1
+            vecColors(i) = New cv.Vec3b(msrng.Next(50, 255), msrng.Next(50, 255), msrng.Next(50, 255)) ' note: cannot generate black!
+        Next
+        If sliders.Setup(caller) Then sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
+        task.palette.Run(task.color)
+        colorMap = task.palette.gradientColorMap.Row(0).Clone
+        task.desc = "Isolate the full image using RGB binarized connected Components"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static areaSlider = findSlider("CComp Min Area")
+        Dim minSize = areaSlider.value
+        If src.Channels <> 1 Then
+            setTrueText("CComp_KMeans only accepts 8uC1 images.  It produces no output when run standalone.")
+        Else
+            Dim labels As New cv.Mat
+            Dim stats As New cv.Mat
+            Dim centroids As New cv.Mat
+            Dim nLabels = src.ConnectedComponentsWithStats(labels, stats, centroids)
+
+            rects.Clear()
+            Dim black = New cv.Vec3b(0, 0, 0)
+            Dim colors As New List(Of cv.Vec3b)
+            Dim index As New List(Of Integer)
+            For i = 0 To Math.Min(256, stats.Rows) - 1
+                Dim area = stats.Get(Of Integer)(i, 4)
+                If area > minSize And area <> src.Total Then
+                    Dim r = stats.Get(Of cv.Rect)(i, 0)
+                    If r.Width <> dst1.Width And r.Height <> dst1.Height Then
+                        rects.Add(r)
+                        colors.Add(vecColors(colors.Count))
+                        index.Add(i)
+                    End If
+                End If
+            Next
+
+            ' this does not fix the color flashing problem but if the component count is the same (for the same areas) the colors will be stable.
+            task.palette.gradientColorMap = colorMap.Clone
+            For i = 0 To colors.Count - 1
+                task.palette.gradientColorMap.Set(Of cv.Vec3b)(0, index(i), colors(i))
+            Next
+
+            labels.ConvertTo(labels, cv.MatType.CV_8U)
+            task.palette.Run(labels)
+            dst2 = task.palette.dst1
+            label2 = CStr(nLabels) + " Connected Components found"
+        End If
     End Sub
 End Class

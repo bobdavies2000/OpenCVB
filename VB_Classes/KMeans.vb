@@ -312,3 +312,60 @@ Public Class KMeans_Fuzzy : Inherits VBparent
         dst2 = fuzzyD.dst2
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class KMeans_CComp : Inherits VBparent
+    Dim ccomp As New CComp_GrayScale
+    Dim km As New KMeans_Basics
+    Public Sub New()
+        task.desc = "Use each KMeans mask with CComp"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static maskSlider = findSlider("Select Mask - light to dark or farthest to closest")
+        Dim maskIndex = maskSlider.value
+        km.Run(src)
+        dst1 = km.dst1
+
+        ccomp.Run(km.masks(maskIndex))
+        dst2 = ccomp.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class KMeans_CCompImage : Inherits VBparent
+    Dim ccomp() As CComp_GrayScale
+    Dim km As New KMeans_Basics
+    Public Sub New()
+        task.desc = "Use each KMeans mask with CComp"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static kSlider = findSlider("kMeans k")
+        Static k = -1
+        If k <> kSlider.value Then
+            k = kSlider.value
+            ReDim ccomp(k)
+            For i = 0 To k - 1
+                ccomp(i) = New CComp_GrayScale
+            Next
+        End If
+
+        km.Run(src)
+        dst1 = km.dst1
+
+        dst2.SetTo(0)
+        For i = 0 To k - 1
+            ccomp(i).Run(km.masks(i))
+            cv.Cv2.BitwiseOr(dst2, ccomp(i).dst2, dst2)
+        Next
+    End Sub
+End Class
