@@ -425,7 +425,7 @@ End Class
 
 
 Public Class Mat_4Click : Inherits VBparent
-    Dim mats As New Mat_4to1
+    Public mats As New Mat_4to1
     Public mat() As cv.Mat
     Public Sub New()
         mat = mats.mat

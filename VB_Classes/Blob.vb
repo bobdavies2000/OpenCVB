@@ -92,36 +92,34 @@ Public Class Blob_Input : Inherits VBparent
     Dim circles As New Draw_Circles
     Dim ellipses As New Draw_Ellipses
     Dim poly As New Draw_Polygon
-    Public Mats As New Mat_4to1
+    Public Mats As New Mat_4Click
     Public updateFrequency = 30
     Public Sub New()
         findSlider("DrawCount").Value = 5
         findSlider("Update Frequency").Value = 1
         findCheckBox("Draw filled (unchecked draw an outline)").Checked = True
 
-        Mats.lineSeparators = False
+        Mats.mats.lineSeparators = False
 
         label1 = "Click any quadrant below to view it on the right"
         label2 = "Click any quadrant at left to view it below"
         task.desc = "Generate data to test Blob Detector."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If task.frameCount Mod updateFrequency = 0 Then
-            rectangles.Run(src)
-            Mats.mat(0) = rectangles.dst1
+        rectangles.Run(src)
+        Mats.mat(0) = rectangles.dst1
 
-            circles.Run(src)
-            Mats.mat(1) = circles.dst1
+        circles.Run(src)
+        Mats.mat(1) = circles.dst1
 
-            ellipses.Run(src)
-            Mats.mat(2) = ellipses.dst1
+        ellipses.Run(src)
+        Mats.mat(2) = ellipses.dst1
 
-            poly.Run(src)
-            Mats.mat(3) = poly.dst2
-            mats.Run(src)
-            Mats.dst1.CopyTo(dst1)
-            dst2 = Mats.dst2
-        End If
+        poly.Run(src)
+        Mats.mat(3) = poly.dst2
+        mats.Run(src)
+        dst1 = Mats.dst1
+        dst2 = Mats.dst2
     End Sub
 End Class
 

@@ -1,25 +1,108 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
-'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
+' https://docs.opencv.org/master/de/d01/samples_2cpp_2connected_components_8cpp-example.html
 Public Class CComp_Basics : Inherits VBparent
+    Public labels As New cv.Mat
+    Public stats As New cv.Mat
+    Public rects As New List(Of cv.Rect)
+    Public centroids As New cv.Mat
+    Dim colorMap As cv.Mat
+    Public Sub New()
+        If sliders.Setup(caller) Then
+            sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
+            sliders.setupTrackBar(1, "Threshold for grayscale input", 0, 255, 128)
+        End If
+        task.palette.Run(task.color)
+        colorMap = task.palette.gradientColorMap.Row(0).Clone
+        task.desc = "Use a threshold slider on the CComp input"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static areaSlider = findSlider("CComp Min Area")
+        Static thresholdSlider = findSlider("Threshold for grayscale input")
+        Dim threshVal = thresholdSlider.value
+        Dim minSize = areaSlider.value
+
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If threshVal < 128 Then
+            dst1 = src.Threshold(threshVal, 255, cv.ThresholdTypes.BinaryInv)
+        Else
+            dst1 = src.Threshold(threshVal, 255, cv.ThresholdTypes.Binary)
+        End If
+        Dim nLabels = dst1.ConnectedComponentsWithStats(labels, stats, centroids)
+
+        rects.Clear()
+        Dim black = New cv.Vec3b(0, 0, 0)
+        Dim colors As New List(Of cv.Vec3b)
+        Dim index As New List(Of Integer)
+        For i = 0 To Math.Min(256, stats.Rows) - 1
+            Dim area = stats.Get(Of Integer)(i, 4)
+            If area > minSize And area <> src.Total Then
+                Dim r = stats.Get(Of cv.Rect)(i, 0)
+                If r.Width <> dst1.Width And r.Height <> dst1.Height Then
+                    rects.Add(r)
+                    colors.Add(task.vecColors(colors.Count))
+                    index.Add(i)
+                End If
+            End If
+        Next
+
+        ' this does not fix the color flashing problem but if the component count is the same (for the same areas) the colors will be stable.
+        task.palette.gradientColorMap = colorMap.Clone
+        For i = 0 To colors.Count - 1
+            task.palette.gradientColorMap.Set(Of cv.Vec3b)(0, index(i), colors(i))
+        Next
+
+        labels.ConvertTo(labels, cv.MatType.CV_8U)
+        task.palette.Run(labels)
+        dst2 = task.palette.dst1
+        label2 = CStr(nLabels) + " Connected Components found"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class CComp_Both : Inherits VBparent
+    Dim above As New CComp_Basics
+    Dim below As New CComp_Basics
+    Public Sub New()
+        label1 = "Connected components in the dark half of the image"
+        label2 = "Connected components in the light half of the image"
+        task.desc = "Prepare the connected components for both above and below the threshold"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static thresholdSlider = findSlider("Threshold for grayscale input")
+        thresholdSlider.value = 120
+        below.Run(src)
+        dst1 = below.dst2
+
+        thresholdSlider.value = 130
+        above.Run(src)
+        dst2 = above.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
+Public Class CComp_BasicsOld : Inherits VBparent
     Public connectedComponents As Object
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
-    Public edgeMask As cv.Mat
-    Dim mats As New Mat_4to1
+    Dim mats As New Mat_4Click
     Public Sub New()
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
             sliders.setupTrackBar(1, "CComp Max Area", 0, dst1.Width * dst1.Height / 2, dst1.Width * dst1.Height / 4)
             sliders.setupTrackBar(2, "CComp threshold", 0, 255, 128)
         End If
-        If check.Setup(caller, 2) Then
-            check.Box(0).Text = "Use OTSU to binarize the image"
-            check.Box(1).Text = "Input to CComp is above CComp threshold"
-            check.Box(0).Checked = True
-        End If
-
         task.desc = "Draw bounding boxes around RGB binarized connected Components"
     End Sub
     Private Function renderBlobs(minSize As Integer, mask As cv.Mat, maxSize As Integer) As Integer
@@ -55,11 +138,11 @@ Public Class CComp_Basics : Inherits VBparent
         dst1.SetTo(0)
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        Dim tFlag = If(check.Box(1).Checked, OpenCvSharp.ThresholdTypes.Binary, OpenCvSharp.ThresholdTypes.BinaryInv)
-        tFlag += If(check.Box(0).Checked, OpenCvSharp.ThresholdTypes.Otsu, 0)
-        mats.mat(0) = src.Threshold(threshold, 255, tFlag)
-        If edgeMask IsNot Nothing Then mats.mat(0).SetTo(0, edgeMask)
+        If threshold < 128 Then
+            mats.mat(0) = src.Threshold(threshold, 255, cv.ThresholdTypes.BinaryInv)
+        Else
+            mats.mat(0) = src.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
+        End If
 
         connectedComponents = cv.Cv2.ConnectedComponentsEx(mats.mat(0))
         connectedComponents.renderblobs(mats.mat(2))
@@ -71,7 +154,7 @@ Public Class CComp_Basics : Inherits VBparent
         connectedComponents.renderblobs(mats.mat(3))
 
         count += renderBlobs(minSize, mats.mat(1), maxSize)
-        label1 = CStr(count) + " items found > " + CStr(minSize) + " and < " + CStr(maxSize)
+        label2 = CStr(count) + " items found > " + CStr(minSize) + " and < " + CStr(maxSize)
         connectedComponents.renderblobs(dst1)
         If standalone Then
             For i = 0 To centroids.Count - 1
@@ -81,20 +164,9 @@ Public Class CComp_Basics : Inherits VBparent
         End If
 
         mats.Run(src)
-        If check.Box(0).Checked Then
-            If check.Box(1).Checked Then
-                label2 = "OTSU light, OTSU dark, rendered light, rendered dark"
-            Else
-                label2 = "OTSU dark, OTSU light, rendered dark, rendered light"
-            End If
-        Else
-            If check.Box(1).Checked Then
-                label2 = ">Slider, <Slider, rendered >Slider, rendered <slider"
-            Else
-                label2 = "<Slider, >Slider, rendered <Slider, rendered >slider"
-            End If
-        End If
-        dst2 = mats.dst1
+        dst1 = mats.dst1
+        dst2 = mats.dst2
+        label1 = ">Slider, <Slider, rendered >Slider, rendered <slider"
     End Sub
 End Class
 
@@ -152,163 +224,163 @@ End Class
 
 
 
-Public Class CComp_PointTracker : Inherits VBparent
-    Public basics As New CComp_Basics
-    Public highlight As New Highlight_Basics
-    Public trackPoints As Boolean = True
-    Public Sub New()
-        task.desc = "Track connected componenent centroids and use it to match coloring"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        basics.Run(src)
+'Public Class CComp_PointTracker : Inherits VBparent
+'    Public basics As New CComp_Basics
+'    Public highlight As New Highlight_Basics
+'    Public trackPoints As Boolean = True
+'    Public Sub New()
+'        task.desc = "Track connected componenent centroids and use it to match coloring"
+'    End Sub
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
+'        basics.Run(src)
 
-        If trackPoints Then
-            Static topView As New PointCloud_TrackerTop
-            dst2 = basics.dst1
-            topView.pTrack.queryPoints = basics.centroids
-            topView.pTrack.queryRects = basics.rects
-            topView.pTrack.queryMasks = basics.masks
-            topView.pTrack.Run(src)
-            dst1 = topView.pTrack.dst1
+'        If trackPoints Then
+'            Static topView As New PointCloud_TrackerTop
+'            dst2 = basics.dst1
+'            topView.pTrack.queryPoints = basics.centroids
+'            topView.pTrack.queryRects = basics.rects
+'            topView.pTrack.queryMasks = basics.masks
+'            topView.pTrack.Run(src)
+'            dst1 = topView.pTrack.dst1
 
-            highlight.viewObjects = topView.pTrack.drawRC.viewObjects
-            highlight.Run(dst1)
-            dst1 = highlight.dst1
-            If highlight.highlightPoint <> New cv.Point Then
-                dst2 = highlight.dst2
-                label2 = "Selected region in yellow"
-            Else
-                dst2 = src
-            End If
-            label1 = basics.label1
-        End If
-    End Sub
-End Class
-
-
+'            highlight.viewObjects = topView.pTrack.drawRC.viewObjects
+'            highlight.Run(dst1)
+'            dst1 = highlight.dst1
+'            If highlight.highlightPoint <> New cv.Point Then
+'                dst2 = highlight.dst2
+'                label2 = "Selected region in yellow"
+'            Else
+'                dst2 = src
+'            End If
+'            label1 = basics.label1
+'        End If
+'    End Sub
+'End Class
 
 
 
 
 
-Public Class CComp_MaxBlobs : Inherits VBparent
-    Public tracker As New CComp_PointTracker
-    Public maxBlobs As Integer = -1
-    Public maxValues(255) As Integer ' march through all 255 values and find the best...
-    Public incr = 2 ' some other algorithms change this...
-    Public Sub New()
-        Dim checkOTSU = findCheckBox("Use OTSU to binarize the image")
-        checkOTSU.Checked = False ' turn off OTSU so the slider works...
-
-        If check.Setup(caller, 1) Then
-            check.Box(0).Text = "Reassess the best CComp threshold"
-        End If
-
-        task.desc = "Find the best CComp threshold to maximize the number of blobs"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static thresholdSlider = findSlider("CComp threshold")
-        setTrueText("This algorithm will survey the different ccomp threshold options.", 10, 100, 3)
-        If task.frameCount < 10 Then
-            thresholdSlider.value = 0
-            Exit Sub
-        End If
-
-        tracker.Run(src)
-        dst1 = tracker.dst1
-
-        If maxBlobs = -1 Then
-            tracker.trackPoints = False ' not tracking yet...
-            For i = 10 To 160 Step incr
-                maxValues(thresholdSlider.value) = tracker.basics.centroids.Count
-                If thresholdSlider.value + incr < 255 Then thresholdSlider.value = i
-                tracker.Run(src)
-            Next
-            tracker.trackPoints = True
-
-            For i = 0 To maxValues.Count - 1
-                If maxBlobs <= maxValues(i) Then
-                    maxBlobs = maxValues(i)
-                    thresholdSlider.value = i
-                End If
-            Next
-        End If
-
-        If check.Box(0).Checked Then
-            check.Box(0).Checked = False
-            maxBlobs = -1
-            thresholdSlider.value = 0
-            ReDim maxValues(255)
-        End If
-        'label1 = "There were " + CStr(tracker.pTrack.queryPoints.Count) + " regions identified"
-    End Sub
-End Class
 
 
+'Public Class CComp_MaxBlobs : Inherits VBparent
+'    Public tracker As New CComp_PointTracker
+'    Public maxBlobs As Integer = -1
+'    Public maxValues(255) As Integer ' march through all 255 values and find the best...
+'    Public incr = 2 ' some other algorithms change this...
+'    Public Sub New()
+'        Dim checkOTSU = findCheckBox("Use OTSU to binarize the image")
+'        checkOTSU.Checked = False ' turn off OTSU so the slider works...
 
+'        If check.Setup(caller, 1) Then
+'            check.Box(0).Text = "Reassess the best CComp threshold"
+'        End If
 
+'        task.desc = "Find the best CComp threshold to maximize the number of blobs"
+'    End Sub
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
+'        Static thresholdSlider = findSlider("CComp threshold")
+'        setTrueText("This algorithm will survey the different ccomp threshold options.", 10, 100, 3)
+'        If task.frameCount < 10 Then
+'            thresholdSlider.value = 0
+'            Exit Sub
+'        End If
 
-Public Class CComp_MaxPixels : Inherits VBparent
-    Dim maxBlob As New CComp_MaxBlobs
-    Public maxPixels As Integer = -1
-    Public Sub New()
-        maxBlob.incr = 5
-        task.desc = "Find the best CComp threshold to maximize pixels"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static pixelValues(255) As Integer ' march through all 255 values and find the best...
-        Static thresholdSlider = findSlider("CComp threshold")
+'        tracker.Run(src)
+'        dst1 = tracker.dst1
 
-        maxBlob.Run(src)
-        dst1 = maxBlob.dst1
+'        If maxBlobs = -1 Then
+'            tracker.trackPoints = False ' not tracking yet...
+'            For i = 10 To 160 Step incr
+'                maxValues(thresholdSlider.value) = tracker.basics.centroids.Rows
+'                If thresholdSlider.value + incr < 255 Then thresholdSlider.value = i
+'                tracker.Run(src)
+'            Next
+'            tracker.trackPoints = True
 
-        If maxPixels = -1 Then
-            For i = Math.Max(thresholdSlider.value - 10, 0) To Math.Min(thresholdSlider.value + 10, 255)
-                thresholdSlider.value = i
-                maxBlob.Run(src)
-                Dim pixelCount = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
-                pixelValues(thresholdSlider.value) = pixelCount
-            Next
-            For i = 0 To pixelValues.Count - 1
-                If maxPixels < pixelValues(i) Then
-                    maxPixels = pixelValues(i)
-                    thresholdSlider.value = i
-                End If
-            Next
-            maxBlob.Run(src)
-            dst1 = maxBlob.dst1
-        Else
-            Dim pixelCount = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
-            ' label1 = CStr(CInt(pixelCount / 1024)) + "k pixels with " + CStr(maxBlob.tracker.pTrack.queryPoints.Count) + " regions width threshold=" + CStr(thresholdSlider.value)
-        End If
-    End Sub
-End Class
+'            For i = 0 To maxValues.Count - 1
+'                If maxBlobs <= maxValues(i) Then
+'                    maxBlobs = maxValues(i)
+'                    thresholdSlider.value = i
+'                End If
+'            Next
+'        End If
+
+'        If check.Box(0).Checked Then
+'            check.Box(0).Checked = False
+'            maxBlobs = -1
+'            thresholdSlider.value = 0
+'            ReDim maxValues(255)
+'        End If
+'        'label1 = "There were " + CStr(tracker.pTrack.queryPoints.Count) + " regions identified"
+'    End Sub
+'End Class
 
 
 
 
-Public Class CComp_DepthEdges : Inherits VBparent
-    Dim ccomp As New CComp_PointTracker
-    Dim depth As New Depth_Edges
-    Public Sub New()
-        If check.Setup(caller, 1) Then
-            check.Box(0).Text = "Use edge mask in connected components"
-            check.Box(0).Checked = True
-        End If
 
-        task.desc = "Use depth edges to isolate connected components in depth"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        depth.Run(src)
-        If standalone Or task.intermediateName = caller Then dst2 = depth.dst2
+'Public Class CComp_MaxPixels : Inherits VBparent
+'    Dim maxBlob As New CComp_MaxBlobs
+'    Public maxPixels As Integer = -1
+'    Public Sub New()
+'        maxBlob.incr = 5
+'        task.desc = "Find the best CComp threshold to maximize pixels"
+'    End Sub
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
+'        Static pixelValues(255) As Integer ' march through all 255 values and find the best...
+'        Static thresholdSlider = findSlider("CComp threshold")
 
-        'If check.Box(0).Checked Then ccomp.basics.edgeMask = depth.dst2 Else ccomp.basics.edgeMask = Nothing
-        If check.Box(0).Checked Then src.SetTo(0, depth.dst2)
-        ccomp.Run(src)
-        dst1 = ccomp.dst1
-        If ccomp.highlight.highlightPoint <> New cv.Point Then dst2 = ccomp.highlight.dst2
-    End Sub
-End Class
+'        maxBlob.Run(src)
+'        dst1 = maxBlob.dst1
+
+'        If maxPixels = -1 Then
+'            For i = Math.Max(thresholdSlider.value - 10, 0) To Math.Min(thresholdSlider.value + 10, 255)
+'                thresholdSlider.value = i
+'                maxBlob.Run(src)
+'                Dim pixelCount = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
+'                pixelValues(thresholdSlider.value) = pixelCount
+'            Next
+'            For i = 0 To pixelValues.Count - 1
+'                If maxPixels < pixelValues(i) Then
+'                    maxPixels = pixelValues(i)
+'                    thresholdSlider.value = i
+'                End If
+'            Next
+'            maxBlob.Run(src)
+'            dst1 = maxBlob.dst1
+'        Else
+'            Dim pixelCount = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
+'            ' label1 = CStr(CInt(pixelCount / 1024)) + "k pixels with " + CStr(maxBlob.tracker.pTrack.queryPoints.Count) + " regions width threshold=" + CStr(thresholdSlider.value)
+'        End If
+'    End Sub
+'End Class
+
+
+
+
+'Public Class CComp_DepthEdges : Inherits VBparent
+'    Dim ccomp As New CComp_PointTracker
+'    Dim depth As New Depth_Edges
+'    Public Sub New()
+'        If check.Setup(caller, 1) Then
+'            check.Box(0).Text = "Use edge mask in connected components"
+'            check.Box(0).Checked = True
+'        End If
+
+'        task.desc = "Use depth edges to isolate connected components in depth"
+'    End Sub
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
+'        depth.Run(src)
+'        If standalone Or task.intermediateName = caller Then dst2 = depth.dst2
+
+'        'If check.Box(0).Checked Then ccomp.basics.edgeMask = depth.dst2 Else ccomp.basics.edgeMask = Nothing
+'        If check.Box(0).Checked Then src.SetTo(0, depth.dst2)
+'        ccomp.Run(src)
+'        dst1 = ccomp.dst1
+'        If ccomp.highlight.highlightPoint <> New cv.Point Then dst2 = ccomp.highlight.dst2
+'    End Sub
+'End Class
 
 
 
@@ -576,8 +648,3 @@ Public Class CComp_Binarized : Inherits VBparent
         dst2 = ccomp.dst2
     End Sub
 End Class
-
-
-
-
-
