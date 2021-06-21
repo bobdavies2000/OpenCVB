@@ -1,21 +1,14 @@
 Imports cv = OpenCvSharp
 Public Class Object_Basics : Inherits VBparent
-    Dim ccomp As New CComp_ColorDepth
+    Dim km As New KMeans_CCompMasks
     Public Sub New()
-        label1 = "Connected components for objects in the foreground"
-        label2 = "Mask for background"
-        task.desc = "Identify objects in the foreground."
+        label1 = "Objects - click centroid to confirm"
+        task.desc = "Identify objects in RGB"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone or task.intermediateName = caller Then
-            dst1 = task.depthmask
-            dst2 = task.noDepthMask
-        End If
-
-        src.SetTo(0)
-        src.SetTo(0, task.noDepthMask)
-        ccomp.Run(src)
-        dst1 = ccomp.dst1
+        km.Run(src)
+        dst1 = km.dst1
+        dst2 = km.dst2
     End Sub
 End Class
 

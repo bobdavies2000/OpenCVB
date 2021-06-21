@@ -59,35 +59,6 @@ End Class
 
 
 
-Public Class Rectangle_CComp : Inherits VBparent
-    Dim ccomp As New CComp_Basics_FullImage
-    Dim rMotion As New Rectangle_Motion
-    Public Sub New()
-        label2 = "Connected component features isolated by rect's"
-        task.desc = "Isolate rectanguler regions around connected components"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        ccomp.Run(src)
-        dst1 = ccomp.dst1.Clone
-
-        src = If(task.frameCount Mod 2 = 0, ccomp.dst1.Clone, New cv.Mat(ccomp.dst1.Size, cv.MatType.CV_8UC1, 0))
-        rMotion.Run(src)
-        If task.frameCount Mod 2 = 0 Then
-            dst2 = task.color
-            For Each r In rMotion.mOverlap.enclosingRects
-                dst2.Rectangle(r, cv.Scalar.Yellow, 2)
-            Next
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Rectangle_Overlap : Inherits VBparent
     Public rect1 As cv.Rect
     Public rect2 As cv.Rect

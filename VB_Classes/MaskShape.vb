@@ -71,3 +71,40 @@ Public Class MaskShape_Depth : Inherits VBparent
         End If
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class MaskShape_KMeans : Inherits VBparent
+    Dim km As New KMeans_CCompMasks
+    Dim mats As New Mat_4to1
+    Dim tView As New TimeView_Basics
+    Public Sub New()
+        label1 = "Click the centroid to identify shape"
+        label2 = "KMeans output, selected mask, side view, top view"
+        task.desc = "Identify the shape of each object identified in RGB"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        km.Run(src)
+        dst1 = km.dst1
+        mats.mat(0) = km.dst1
+        mats.mat(1) = km.dst2
+
+        Dim pc = New cv.Mat(task.pointCloud.Size, cv.MatType.CV_32FC3, 0)
+        task.pointCloud.CopyTo(pc, km.dst2)
+
+        tView.Run(pc)
+        mats.mat(2) = tView.dst1.Normalize(0, 255, cv.NormTypes.MinMax)
+        mats.mat(2).ConvertTo(mats.mat(2), cv.MatType.CV_8UC1)
+
+        mats.mat(3) = tView.dst2.Normalize(0, 255, cv.NormTypes.MinMax)
+        mats.mat(3).ConvertTo(mats.mat(3), cv.MatType.CV_8UC1)
+
+        mats.Run(Nothing)
+        dst2 = mats.dst1
+    End Sub
+End Class

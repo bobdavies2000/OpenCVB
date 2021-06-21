@@ -342,11 +342,11 @@ End Class
 
 
 
-Public Class KMeans_CCompImage : Inherits VBparent
+Public Class KMeans_CCompImage1 : Inherits VBparent
     Dim ccomp() As CComp_GrayScale
     Dim km As New KMeans_Basics
     Public Sub New()
-        task.desc = "Use each KMeans mask with CComp"
+        task.desc = "First attempt at coloring the entire image with connected components"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static kSlider = findSlider("kMeans k")
@@ -376,15 +376,46 @@ End Class
 
 
 
+Public Class KMeans_CCompImage : Inherits VBparent
+    Dim km As New KMeans_CCompMasks
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        task.desc = "A second, better attempt at coloring an entire image with connected components.  All masks are available."
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        km.Run(src)
+        dst1 = km.dst1
+
+        dst2.SetTo(0)
+        Dim incr = 255 / km.masks.Count
+        For i = 0 To km.masks.Count - 1
+            Dim r As cv.Rect = km.rects(i)
+            Dim m As cv.Mat = km.masks(i)
+            dst2(r).SetTo(cv.Scalar.All((i + 1) * incr), m)
+        Next
+
+        task.palette.Run(dst2)
+        dst2 = task.palette.dst1
+    End Sub
+End Class
+
+
+
+
+
+
+
 Public Class KMeans_CCompMasks : Inherits VBparent
     Dim ccomp() As CComp_Basics
     Dim km As New KMeans_Basics
     Public masks As New List(Of cv.Mat)
     Public rects As New List(Of cv.Rect)
     Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        label1 = "Click the centroid to display the mask in dst2"
         task.desc = "Use each KMeans mask with CComp"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 5
         Static kSlider = findSlider("kMeans k")
         Static k = -1
         If k <> kSlider.value Then
@@ -401,17 +432,20 @@ Public Class KMeans_CCompMasks : Inherits VBparent
         masks.Clear()
         rects.Clear()
         dst2.SetTo(0)
-        Dim sortAreas As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        Dim centroids As New List(Of cv.Point2f)
+        Dim sortMasks As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        Dim centroids As New List(Of cv.Point)
         For i = 0 To k - 1
             ccomp(i).Run(km.masks(i))
             For j = 0 To ccomp(i).masks.Count - 1
-                sortAreas.Add(ccomp(i).areas(j), masks.Count)
+                Dim r = ccomp(i).rects(j)
+                sortMasks.Add(r.Width * r.Height, masks.Count)
                 masks.Add(ccomp(i).masks(j))
-                rects.Add(ccomp(i).rects(j))
-                centroids.Add(ccomp(i).centroids(j))
-                dst1.Circle(centroids(centroids.Count - 1), task.dotSize + 3, cv.Scalar.White, -1, task.lineType)
-                dst1.Circle(centroids(centroids.Count - 1), task.dotSize, cv.Scalar.Black, -1, task.lineType)
+                rects.Add(r)
+                Dim c = ccomp(i).centroids(j)
+                centroids.Add(c)
+                dst1.Circle(c, task.dotSize + 3, cv.Scalar.White, -1, task.lineType)
+                dst1.Circle(c, task.dotSize, cv.Scalar.Black, -1, task.lineType)
+                setTrueText(CStr(masks.Count - 1), c.X + 10, c.Y)
             Next
         Next
 
@@ -426,7 +460,8 @@ Public Class KMeans_CCompMasks : Inherits VBparent
                 End If
             Next
         End If
-        dst2 = masks(minIndex)
-        label2 = "Pixel count = " + CStr(sortAreas.ElementAt(minindex).Key)
+
+        dst2(rects(minIndex)) = masks(minIndex)
+        label2 = "Pixel count = " + CStr(sortMasks.ElementAt(minIndex).Key)
     End Sub
 End Class
