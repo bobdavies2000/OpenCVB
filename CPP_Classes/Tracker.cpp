@@ -18,31 +18,26 @@ private:
 public:
     Ptr<Tracker> tracker;
     bool bboxInitialized = false;
-    Mat src, dst;
+    Mat src;
     Tracker_Basics(int trackType)
     {
         // switch is based on the older tracking alternatives.  Some are disabled in the user interface for now.
         switch (trackType)
         {
-        //case 0: // Boosting
-        //    break;
         case 1: // MIL
             tracker = cv::TrackerMIL::create();
             break;
         case 2: // KCF
             tracker = cv::TrackerKCF::create();
             break;
-        //case 3: // TLD
-        //    break;
-        //case 4: // MEDIANFLOW
-        //    break;
         case 5: // GOTURN
             tracker = cv::TrackerGOTURN::create();
             break;
-        //case 6: // MOSSE
-        //    break;
-        default: // CSRT
+        case 7: // CSRT
             tracker = cv::TrackerCSRT::create();
+            break;
+        default: // MIL
+            tracker = cv::TrackerMIL::create();
             break;
         }
     }
@@ -50,17 +45,17 @@ public:
         if (bboxInitialized == false)
         {
             bboxInitialized = true;
-            //tracker->init(src, bbox);
+            tracker->init(src, bbox);
         }
         else {
-            //bool ok = tracker->update(src, bbox);
-            //if (ok)
-            //{
-            //    rectangle(src, bbox, Scalar(255, 255, 255), 2, 1);
-            //} else {
-            //    putText(src, "Tracking failure detected", Point(100, 80), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 0, 255), 2);
-            //    bboxInitialized = false;
-            //}
+            bool ok = tracker->update(src, bbox);
+            if (ok)
+            {
+                rectangle(src, bbox, Scalar(255, 255, 255), 2, 1);
+            } else {
+                putText(src, "Tracking failure detected", Point(100, 80), FONT_HERSHEY_SIMPLEX, 0.75, Scalar(0, 0, 255), 2);
+                bboxInitialized = false;
+            }
         }
     }
 };
@@ -78,10 +73,10 @@ void Tracker_Basics_Close(Tracker_Basics *cPtr)
 }
 
 extern "C" __declspec(dllexport)
-int *Tracker_Basics_Run(Tracker_Basics *cPtr, int *rgbPtr, int rows, int cols, int channels, int trackType, int x, int y, int w, int h)
+int *Tracker_Basics_Run(Tracker_Basics *cPtr, int *rgbPtr, int rows, int cols, int x, int y, int w, int h)
 {
-		cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, rgbPtr);
-        Rect bbox(x, y, w, h);
-		cPtr->Run(bbox);
-		return (int *) cPtr->dst.data; // return this C++ allocated data to managed code
+	cPtr->src = Mat(rows, cols, CV_8UC1, rgbPtr);
+    Rect bbox(x, y, w, h);
+	cPtr->Run(bbox);
+	return (int *) cPtr->src.data; // return this C++ allocated data to managed code
 }

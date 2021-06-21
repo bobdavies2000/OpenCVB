@@ -181,30 +181,6 @@ End Class
 
 
 
-
-'Public Class FloodFill_CComp : Inherits VBparent
-'    Dim ccomp As New CComp_Basics
-'    Dim range As New FloodFill_RelativeRange
-'    Public Sub New()
-'        label1 = "Input to Floodfill "
-'        task.desc = "Use Floodfill with the output of the connected components to stabilize the colors used."
-'    End Sub
-'    Public Sub Run(src As cv.Mat) ' Rank = 1
-'        Static minSlider = findSlider("FloodFill Minimum Size")
-
-'        ccomp.Run(src)
-'        range.Run(ccomp.dst1)
-'        dst1 = range.dst1
-'        dst2 = range.dst2
-'        label2 = CStr(ccomp.connectedComponents.blobs.length) + " blobs found. " + CStr(range.fBasics.rects.Count) + " were more than " +
-'                 CStr(minSlider.Value) + " pixels"
-'    End Sub
-'End Class
-
-
-
-
-
 Public Class FloodFill_RelativeRange : Inherits VBparent
     Public fBasics As New FloodFill_Basics
     Public Sub New()
