@@ -17,6 +17,7 @@ Public Class Tracker_Basics : Inherits VBparent
             radio.check(1).Checked = True
         End If
 
+        task.drawRect = New cv.Rect(100, 100, 100, 100)
         task.desc = "Use C++ to track objects"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

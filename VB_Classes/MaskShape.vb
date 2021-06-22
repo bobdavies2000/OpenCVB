@@ -85,13 +85,14 @@ Public Class MaskShape_KMeans : Inherits VBparent
     Dim tView As New TimeView_Basics
     Public Sub New()
         label1 = "Click the centroid to identify shape"
-        label2 = "KMeans output, selected mask, side view, top view"
+        label2 = "Object in RGB, object mask, side view, top view"
         task.desc = "Identify the shape of each object identified in RGB"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         km.Run(src)
         dst1 = km.dst1
-        mats.mat(0) = km.dst1
+        mats.mat(0).SetTo(0)
+        src.CopyTo(mats.mat(0), km.dst2)
         mats.mat(1) = km.dst2
 
         Dim pc = New cv.Mat(task.pointCloud.Size, cv.MatType.CV_32FC3, 0)

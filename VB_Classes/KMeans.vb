@@ -1,4 +1,5 @@
 Imports cv = OpenCvSharp
+
 Public Class KMeans_Basics : Inherits VBparent
     Public masks As New List(Of cv.Mat)
     Public colors As New cv.Mat
