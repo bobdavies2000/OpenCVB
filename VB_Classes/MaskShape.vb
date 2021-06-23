@@ -2,19 +2,11 @@
 Public Class MaskShape_Basics : Inherits VBparent
     Dim tView As New TimeView_Basics
     Dim mats As New Mat_4Click
-    Dim proxy As New Proximity_BasicsRGB
+    Public proxy As New Proximity_BasicsRGB
     Public Sub New()
         task.desc = "Get a mask from the Proximity_Basics (default RGB mode) and use it to find its shape in depth"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static maskSlider = findSlider("Select Mask - light to dark or farthest to closest")
-        Static saveMaskIndex = -1
-        Static pixelCounts As New List(Of Integer)
-        If saveMaskIndex <> maskSlider.value Then
-            saveMaskIndex = maskSlider.value
-            pixelCounts.Clear()
-        End If
-
         proxy.Run(src)
         mats.mat(0) = proxy.dst1
         mats.mat(1) = proxy.dst2
@@ -35,7 +27,13 @@ Public Class MaskShape_Basics : Inherits VBparent
         dst1 = mats.dst1
         dst2 = mats.dst2
 
-        pixelCounts.Add(mats.mat(1).CountNonZero)
+        Static pixelCounts As New List(Of Integer)
+        Static saveMaskIndex As Integer
+        If saveMaskIndex <> proxy.km.maskIndex Then
+            pixelCounts.Clear()
+            saveMaskIndex = proxy.km.maskIndex
+        End If
+        pixelCounts.Add(proxy.km.masks(saveMaskIndex).CountNonZero)
         If pixelCounts.Count > 100 Then pixelCounts.RemoveAt(0)
 
         ' compute stdev from the list
@@ -45,6 +43,8 @@ Public Class MaskShape_Basics : Inherits VBparent
 
         label1 = "KMeans, selected mask, mask sideview, mask topview"
         label2 = "Selected mask has stdev of " + Format(stdev, "#0.00") + " n=" + CStr(pixelCounts.Count) + " avg=" + Format(avg, "#0")
+
+        setTrueText("Click upper left in dst1 to display regions" + vbCrLf + "Then select a region in dst2 to see projections", 10, 40, 3)
     End Sub
 End Class
 
@@ -60,8 +60,8 @@ Public Class MaskShape_Depth : Inherits VBparent
         task.desc = "Get a mask from the Proximity_Basics using depth and use it to find its shape in depth"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static maskSlider = findSlider("Select Mask - light to dark or farthest to closest")
-        If maskSlider.maximum = maskSlider.value Then
+        Dim kSlider = findSlider("kMeans k")
+        If proxy.proxy.km.maskIndex = kSlider.Maximum Then
             setTrueText("The closest mask in depth matches the area with no depth so no data is displayed.", 10, 40, 3)
             dst2.SetTo(0)
         Else
@@ -69,6 +69,8 @@ Public Class MaskShape_Depth : Inherits VBparent
             dst1 = proxy.dst1
             dst2 = proxy.dst2
         End If
+        label1 = proxy.label1
+        label2 = proxy.label2
     End Sub
 End Class
 

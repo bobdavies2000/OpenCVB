@@ -545,6 +545,7 @@ End Class
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
 Public Class CComp_GrayScale : Inherits VBparent
     Public rects As New List(Of cv.Rect)
+    Public labels As New cv.Mat
     Dim vecColors(255) As cv.Vec3b
     Dim colorMap As cv.Mat
     Public Sub New()
@@ -561,39 +562,41 @@ Public Class CComp_GrayScale : Inherits VBparent
         Static areaSlider = findSlider("CComp Min Area")
         Dim minSize = areaSlider.value
         If src.Channels <> 1 Then
-            setTrueText("CComp_KMeans only accepts 8uC1 images.  It produces no output when run standalone.")
+            src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            Dim meanScalar = cv.Cv2.Mean(src)
+            dst1 = src.Threshold(meanScalar(0), 255, cv.ThresholdTypes.Otsu)
         Else
-            Dim labels As New cv.Mat
-            Dim stats As New cv.Mat
-            Dim centroids As New cv.Mat
-            Dim nLabels = src.ConnectedComponentsWithStats(labels, stats, centroids)
-
-            rects.Clear()
-            Dim black = New cv.Vec3b(0, 0, 0)
-            Dim colors As New List(Of cv.Vec3b)
-            Dim index As New List(Of Integer)
-            For i = 0 To Math.Min(256, stats.Rows) - 1
-                Dim area = stats.Get(Of Integer)(i, 4)
-                If area > minSize And area <> src.Total Then
-                    Dim r = stats.Get(Of cv.Rect)(i, 0)
-                    If r.Width <> dst1.Width And r.Height <> dst1.Height Then
-                        rects.Add(r)
-                        colors.Add(vecColors(colors.Count))
-                        index.Add(i)
-                    End If
-                End If
-            Next
-
-            ' this does not fix the color flashing problem but if the component count is the same (for the same areas) the colors will be stable.
-            task.palette.gradientColorMap = colorMap.Clone
-            For i = 0 To colors.Count - 1
-                task.palette.gradientColorMap.Set(Of cv.Vec3b)(0, index(i), colors(i))
-            Next
-
-            labels.ConvertTo(labels, cv.MatType.CV_8U)
-            task.palette.Run(labels)
-            dst2 = task.palette.dst1
-            label2 = CStr(nLabels) + " Connected Components found"
+            dst1 = src
         End If
+        Dim stats As New cv.Mat
+        Dim centroids As New cv.Mat
+        Dim nLabels = dst1.ConnectedComponentsWithStats(labels, stats, centroids)
+
+        rects.Clear()
+        Dim black = New cv.Vec3b(0, 0, 0)
+        Dim colors As New List(Of cv.Vec3b)
+        Dim index As New List(Of Integer)
+        For i = 0 To Math.Min(256, stats.Rows) - 1
+            Dim area = stats.Get(Of Integer)(i, 4)
+            If area > minSize And area <> src.Total Then
+                Dim r = stats.Get(Of cv.Rect)(i, 0)
+                If r.Width <> dst1.Width And r.Height <> dst1.Height Then
+                    rects.Add(r)
+                    colors.Add(vecColors(colors.Count))
+                    index.Add(i)
+                End If
+            End If
+        Next
+
+        ' this does not fix the color flashing problem but if the component count is the same (for the same areas) the colors will be stable.
+        task.palette.gradientColorMap = colorMap.Clone
+        For i = 0 To colors.Count - 1
+            task.palette.gradientColorMap.Set(Of cv.Vec3b)(0, index(i), colors(i))
+        Next
+
+        labels.ConvertTo(labels, cv.MatType.CV_8U)
+        task.palette.Run(labels)
+        dst2 = task.palette.dst1
+        label2 = CStr(nLabels) + " Connected Components found"
     End Sub
 End Class

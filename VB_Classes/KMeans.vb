@@ -1,14 +1,14 @@
 Imports cv = OpenCvSharp
-
 Public Class KMeans_Basics : Inherits VBparent
+    Public labels As New cv.Mat()
     Public masks As New List(Of cv.Mat)
     Public colors As New cv.Mat
+    Public maskIndex As Integer
     Public Sub New()
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
             sliders.setupTrackBar(1, "Resize Factor (used only with KMeans_BasicsFast)", 1, 8, 2)
-            sliders.setupTrackBar(2, "Select Mask - light to dark or farthest to closest", 0, 100, 0)
-            sliders.setupTrackBar(3, "Retain x frames to measure unstable pixels", 1, 20, 5)
+            sliders.setupTrackBar(2, "Retain x frames to measure unstable pixels", 1, 20, 5)
             findSlider("Resize Factor (used only with KMeans_BasicsFast)").Enabled = False
         End If
 
@@ -24,7 +24,6 @@ Public Class KMeans_Basics : Inherits VBparent
         task.desc = "Cluster the input image pixels using kMeans."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 5
-        Static maskSlider = findSlider("Select Mask - light to dark or farthest to closest")
         Static radioPP = findRadio("Use PpCenters")
         Static radioLabels = findRadio("Use Initialized Labels")
         Static kSlider = findSlider("kMeans k")
@@ -36,7 +35,6 @@ Public Class KMeans_Basics : Inherits VBparent
         If input.Type = cv.MatType.CV_8UC3 Then input.ConvertTo(input, cv.MatType.CV_32FC3)
         If input.Type = cv.MatType.CV_8U Then input.ConvertTo(input, cv.MatType.CV_32F)
         Dim columnVector = input.Reshape(input.Channels, input.Height * input.Width)
-        Dim labels As New cv.Mat()
         Static saveLabels As New cv.Mat()
         Static saveK = kMeansK
         Static saveSize As Integer
@@ -64,9 +62,7 @@ Public Class KMeans_Basics : Inherits VBparent
             Dim val = colors.Get(Of Single)(i, 0)
             If val > 255 Then range255 = False
         Next
-        If range255 = False Then
-            colors = colors.Normalize(0, 255, cv.NormTypes.MinMax)
-        End If
+        If range255 = False Then colors = colors.Normalize(0, 255, cv.NormTypes.MinMax)
 
         Dim maskOrder As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
         For i = 0 To colors.Rows - 1
@@ -89,14 +85,15 @@ Public Class KMeans_Basics : Inherits VBparent
                 dst1.SetTo(cv.Scalar.All(gray), mask)
             End If
         Next
-
-        Static saveMaskCount As Integer
-        If saveMaskCount <> masks.Count Then
-            maskSlider.value = 0
-            maskSlider.maximum = masks.Count - 1
-            saveMaskCount = masks.Count
+        If task.mouseClickFlag Then
+            For Each m In masks
+                If m.Get(Of Byte)(task.mouseClickPoint.Y, task.mouseClickPoint.X) Then
+                    maskIndex = masks.IndexOf(m)
+                    Exit For
+                End If
+            Next
         End If
-        dst2 = masks(maskSlider.value)
+        dst2 = masks(maskIndex)
     End Sub
 End Class
 
@@ -324,15 +321,13 @@ Public Class KMeans_CComp : Inherits VBparent
     Dim ccomp As New CComp_GrayScale
     Dim km As New KMeans_Basics
     Public Sub New()
+        label1 = "Click to see connected components in dst2"
         task.desc = "Use each KMeans mask with CComp"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static maskSlider = findSlider("Select Mask - light to dark or farthest to closest")
-        Dim maskIndex = maskSlider.value
+    Public Sub Run(src As cv.Mat) ' Rank = 2
         km.Run(src)
         dst1 = km.dst1
-
-        ccomp.Run(km.masks(maskIndex))
+        ccomp.Run(km.masks(km.maskIndex))
         dst2 = ccomp.dst2
     End Sub
 End Class

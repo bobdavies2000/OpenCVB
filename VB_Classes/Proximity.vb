@@ -54,7 +54,7 @@ End Class
 
 
 Public Class Proximity_BasicsRGB : Inherits VBparent
-    Dim km As New KMeans_Basics
+    Public km As New KMeans_Basics
     Public Sub New()
         findSlider("Resize Factor (used only with KMeans_BasicsFast)").Enabled = True
         task.desc = "Cluster just RGB using kMeans but hopefully faster than Proximity_Basics"
