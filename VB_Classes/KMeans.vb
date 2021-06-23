@@ -406,6 +406,7 @@ Public Class KMeans_CCompMasks : Inherits VBparent
     Public km As New KMeans_Basics
     Public masks As New List(Of cv.Mat)
     Public rects As New List(Of cv.Rect)
+    Public selectedIndex As Integer
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         label1 = "Click the centroid to display the mask in dst2"
@@ -446,19 +447,18 @@ Public Class KMeans_CCompMasks : Inherits VBparent
             Next
         Next
 
-        Static minIndex As Integer
-        If task.mouseClickPoint <> New cv.Point Or minIndex >= masks.Count Then
+        If task.mouseClickPoint <> New cv.Point Or selectedIndex >= masks.Count Then
             Dim minDistance As Single = Single.MaxValue
             For i = 0 To centroids.Count - 1
                 Dim distance = task.mouseClickPoint.DistanceTo(centroids(i))
                 If minDistance > distance Then
                     minDistance = distance
-                    minIndex = i
+                    selectedIndex = i
                 End If
             Next
         End If
 
-        dst2(rects(minIndex)) = masks(minIndex)
-        label2 = "Pixel count = " + CStr(sortMasks.ElementAt(minIndex).Key)
+        dst2(rects(selectedIndex)) = masks(selectedIndex)
+        label2 = "Pixel count = " + CStr(sortMasks.ElementAt(selectedIndex).Key)
     End Sub
 End Class
