@@ -39,7 +39,7 @@ Public Class Gabor_Basics : Inherits VBparent
         gKernel = cv.Cv2.GetGaborKernel(New cv.Size(ksize, ksize), Sigma, theta, lambda, gamma, phaseOffset, cv.MatType.CV_32F)
         Dim multiplier = gKernel.Sum()
         gKernel /= 1.5 * multiplier.Item(0)
-        dst1 = src.Filter2D(cv.MatType.CV_8UC3, gKernel)
+        dst2 = src.Filter2D(cv.MatType.CV_8UC3, gKernel)
     End Sub
 End Class
 
@@ -52,8 +52,8 @@ Public Class Gabor_Basics_MT : Inherits VBparent
     Dim gabor(31) As Gabor_Basics
     Public Sub New()
         label2 = "The 32 kernels used"
-        findSlider("ThreadGrid Width").Value = dst1.Width / 8
-        findSlider("ThreadGrid Height").Value = dst1.Height / 4
+        findSlider("ThreadGrid Width").Value = dst2.Width / 8
+        findSlider("ThreadGrid Height").Value = dst2.Height / 4
 
         grid.Run(Nothing) ' we only run this one time!  It needs to be 32 Gabor filters only.
 
@@ -81,17 +81,17 @@ Public Class Gabor_Basics_MT : Inherits VBparent
         Next
 
         Dim accum = src.Clone()
-        dst2 = New cv.Mat(src.Height, src.Width, cv.MatType.CV_32F, 0)
+        dst3 = New cv.Mat(src.Height, src.Width, cv.MatType.CV_32F, 0)
         Parallel.For(0, grid.roiList.Count,
         Sub(i)
             Dim roi = grid.roiList(i)
             gabor(i).Run(src)
             SyncLock accum
-                cv.Cv2.Max(accum, gabor(i).dst1, accum)
-                dst2(roi) = gabor(i).gKernel.Normalize(0, 255, cv.NormTypes.MinMax).Resize(New cv.Size(roi.Width, roi.Height))
+                cv.Cv2.Max(accum, gabor(i).dst2, accum)
+                dst3(roi) = gabor(i).gKernel.Normalize(0, 255, cv.NormTypes.MinMax).Resize(New cv.Size(roi.Width, roi.Height))
             End SyncLock
         End Sub)
-        dst1 = accum
+        dst2 = accum
     End Sub
 End Class
 

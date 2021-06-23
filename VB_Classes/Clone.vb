@@ -10,7 +10,7 @@ Public Class Clone_Basics : Inherits VBparent
         label1 = "Clone result - draw anywhere to clone a region"
         label2 = "Clone Region Mask"
         task.desc = "Clone a portion of one image into another.  Draw on any image to change selected area."
-        task.drawRect = New cv.Rect(dst1.Width / 4, dst1.Height / 4, dst1.Width / 2, dst1.Height / 2)
+        task.drawRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2)
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim mask As New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
@@ -19,16 +19,16 @@ Public Class Clone_Basics : Inherits VBparent
         Else
             cv.Cv2.Rectangle(mask, task.drawRect, cv.Scalar.White, -1)
         End If
-        dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         If standalone And task.frameCount Mod 10 = 0 Then cloneSpec += 1
         Select Case cloneSpec Mod 3
             Case 0
-                cv.Cv2.ColorChange(src, mask, dst1, colorChangeValues(0), colorChangeValues(1), colorChangeValues(2))
+                cv.Cv2.ColorChange(src, mask, dst2, colorChangeValues(0), colorChangeValues(1), colorChangeValues(2))
             Case 1
-                cv.Cv2.IlluminationChange(src, mask, dst1, illuminationChangeValues(0), illuminationChangeValues(1))
+                cv.Cv2.IlluminationChange(src, mask, dst2, illuminationChangeValues(0), illuminationChangeValues(1))
             Case 2
-                cv.Cv2.TextureFlattening(src, mask, dst1, textureFlatteningValues(0), textureFlatteningValues(1))
+                cv.Cv2.TextureFlattening(src, mask, dst2, textureFlatteningValues(0), textureFlatteningValues(1))
         End Select
     End Sub
 End Class
@@ -52,8 +52,8 @@ Public Class Clone_ColorChange : Inherits VBparent
         clone.cloneSpec = 0
         clone.colorChangeValues = New cv.Point3f(sliders.trackbar(0).Value / 10, sliders.trackbar(1).Value / 10, sliders.trackbar(0).Value / 10)
         clone.Run(src)
-        dst1 = clone.dst1
         dst2 = clone.dst2
+        dst3 = clone.dst3
     End Sub
 End Class
 
@@ -75,8 +75,8 @@ Public Class Clone_IlluminationChange : Inherits VBparent
         clone.cloneSpec = 1
         clone.illuminationChangeValues = New cv.Vec2f(sliders.trackbar(0).Value / 10, sliders.trackbar(1).Value / 10)
         clone.Run(src)
-        dst1 = clone.dst1
         dst2 = clone.dst2
+        dst3 = clone.dst3
     End Sub
 End Class
 
@@ -99,8 +99,8 @@ Public Class Clone_TextureFlattening : Inherits VBparent
         clone.cloneSpec = 2
         clone.textureFlatteningValues = New cv.Vec2f(sliders.trackbar(0).Value, sliders.trackbar(1).Value)
         clone.Run(src)
-        dst1 = clone.dst1
         dst2 = clone.dst2
+        dst3 = clone.dst3
     End Sub
 End Class
 
@@ -126,24 +126,24 @@ Public Class Clone_Eagle : Inherits VBparent
             radio.check(2).Checked = True
         End If
         sourceImage = cv.Cv2.ImRead(task.parms.homeDir + "Data/CloneSource.png")
-        sourceImage = sourceImage.Resize(New cv.Size(sourceImage.Width * dst1.Width / 1280, sourceImage.Height * dst1.Height / 720))
+        sourceImage = sourceImage.Resize(New cv.Size(sourceImage.Width * dst2.Width / 1280, sourceImage.Height * dst2.Height / 720))
         srcROI = New cv.Rect(0, 40, sourceImage.Width, sourceImage.Height)
 
         mask = cv.Cv2.ImRead(task.parms.homeDir + "Data/Clonemask.png")
-        mask = mask.Resize(New cv.Size(mask.Width * dst1.Width / 1280, mask.Height * dst1.Height / 720))
+        mask = mask.Resize(New cv.Size(mask.Width * dst2.Width / 1280, mask.Height * dst2.Height / 720))
         maskROI = New cv.Rect(srcROI.Width, 40, mask.Width, mask.Height)
 
-        dst2.SetTo(0)
-        dst2(srcROI) = sourceImage
-        dst2(maskROI) = mask
+        dst3.SetTo(0)
+        dst3(srcROI) = sourceImage
+        dst3(maskROI) = mask
 
-        pt = New cv.Point(dst1.Width / 2, dst1.Height / 2)
+        pt = New cv.Point(dst2.Width / 2, dst2.Height / 2)
         label1 = "Move Eagle by clicking in any location."
         label2 = "Source image and source mask."
         task.desc = "Clone an eagle into the video stream."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dst1 = src.Clone()
+        dst2 = src.Clone()
         If task.mouseClickFlag Then
             pt = task.mouseClickPoint  ' pt corresponds To the center Of the source image.  Roi can't be outside image boundary.
             If pt.X + srcROI.Width / 2 >= src.Width Then pt.X = src.Width - srcROI.Width / 2
@@ -160,7 +160,7 @@ Public Class Clone_Eagle : Inherits VBparent
                 Exit For
             End If
         Next
-        cv.Cv2.SeamlessClone(sourceImage, dst1, mask, pt, dst1, cloneFlag)
+        cv.Cv2.SeamlessClone(sourceImage, dst2, mask, pt, dst2, cloneFlag)
     End Sub
 End Class
 
@@ -185,10 +185,10 @@ Public Class Clone_Seamless : Inherits VBparent
         Dim center As New cv.Point(src.Width / 2, src.Height / 2)
         Dim radius = 100
         If task.drawRect = New cv.Rect Then
-            dst2.SetTo(0)
-            dst2.Circle(center.X, center.Y, radius, cv.Scalar.White, -1, task.lineType)
+            dst3.SetTo(0)
+            dst3.Circle(center.X, center.Y, radius, cv.Scalar.White, -1, task.lineType)
         Else
-            cv.Cv2.Rectangle(dst2, task.drawRect, cv.Scalar.White, -1)
+            cv.Cv2.Rectangle(dst3, task.drawRect, cv.Scalar.White, -1)
         End If
 
         Dim style = cv.SeamlessCloneMethods.NormalClone
@@ -199,9 +199,9 @@ Public Class Clone_Seamless : Inherits VBparent
                 Exit For
             End If
         Next
-        dst1 = src.Clone()
-        cv.Cv2.SeamlessClone(task.RGBDepth, src, dst2, center, dst1, style)
-        dst1.Circle(center, radius, cv.Scalar.White, task.lineWidth, task.lineType)
+        dst2 = src.Clone()
+        cv.Cv2.SeamlessClone(task.RGBDepth, src, dst3, center, dst2, style)
+        dst2.Circle(center, radius, cv.Scalar.White, task.lineWidth, task.lineType)
     End Sub
 End Class
 

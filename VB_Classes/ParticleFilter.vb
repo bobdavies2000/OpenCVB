@@ -9,7 +9,7 @@ Imports System.IO
 Public Class ParticleFilter_Example : Inherits VBparent
     Dim pfPtr As IntPtr
     Public Sub New()
-        pfPtr = ParticleFilterTest_Open(task.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
+        pfPtr = ParticleFilterTest_Open(task.parms.homeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols)
         task.desc = "Particle Filter example downloaded from github - hyperlink in the code shows URL."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -18,15 +18,15 @@ Public Class ParticleFilter_Example : Inherits VBparent
         If imageFrame Mod 45 = 0 Then
             imageFrame = 13
             ParticleFilterTest_Close(pfPtr)
-            pfPtr = ParticleFilterTest_Open(task.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
+            pfPtr = ParticleFilterTest_Open(task.parms.homeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols)
         End If
         Dim nextFile As New FileInfo(task.parms.homeDir + "Data/ballSequence/color_" + CStr(imageFrame) + ".png")
-        dst2 = cv.Cv2.ImRead(nextFile.FullName).Resize(dst1.Size)
+        dst3 = cv.Cv2.ImRead(nextFile.FullName).Resize(dst2.Size)
         Dim imagePtr = ParticleFilterTest_Run(pfPtr)
         If imagePtr <> 0 Then
-            Dim dstData(dst1.Total * dst1.ElemSize - 1) As Byte
+            Dim dstData(dst2.Total * dst2.ElemSize - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8UC3, dstData)
+            dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, dstData)
         End If
     End Sub
     Public Sub Close()

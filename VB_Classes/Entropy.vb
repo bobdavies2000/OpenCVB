@@ -58,18 +58,18 @@ Public Class Entropy_Highest : Inherits VBparent
             If entropyCalc.entropy < minEntropy Then minEntropy = entropyCalc.entropy
         Next
 
-        dst2 = entropyMap.ConvertScaleAbs(255 / (maxEntropy - minEntropy), minEntropy)
+        dst3 = entropyMap.ConvertScaleAbs(255 / (maxEntropy - minEntropy), minEntropy)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         addw.src2 = src
-        addw.Run(dst2)
-        dst2 = addw.dst1
+        addw.Run(dst3)
+        dst3 = addw.dst2
 
         Dim tmp = entropyMap.ConvertScaleAbs(255 / (maxEntropy - minEntropy))
         cv.Cv2.MinMaxLoc(tmp, minval, maxval)
 
-        dst1 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        If standalone Or task.intermediateName = caller Then dst1.Rectangle(eMaxRect, cv.Scalar.Red, 4)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If standalone Or task.intermediateName = caller Then dst2.Rectangle(eMaxRect, cv.Scalar.Red, 4)
         label2 = "Lighter = higher entropy. Range: " + Format(minEntropy, "0.0") + " to " + Format(maxEntropy, "0.0")
     End Sub
 End Class
@@ -90,10 +90,10 @@ Public Class Entropy_FAST : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         fast.Run(src)
 
-        entropy.Run(fast.dst1)
-        dst1 = entropy.dst1
+        entropy.Run(fast.dst2)
         dst2 = entropy.dst2
-        dst2.Rectangle(entropy.eMaxRect, cv.Scalar.Red, 4)
+        dst3 = entropy.dst3
+        dst3.Rectangle(entropy.eMaxRect, cv.Scalar.Red, 4)
     End Sub
 End Class
 

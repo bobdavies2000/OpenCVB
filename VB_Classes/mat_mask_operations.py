@@ -84,8 +84,8 @@ def main(argv):
     dst0 = sharpen(src)
     t = (time.time() - t)
     
-    dst1 = np.empty((src.shape[0], src.shape[1], src.shape[2]), src.dtype)
-    cv.cvtColor(src, cv.COLOR_BGRA2BGR, dst1)
+    dst2 = np.empty((src.shape[0], src.shape[1], src.shape[2]), src.dtype)
+    cv.cvtColor(src, cv.COLOR_BGRA2BGR, dst2)
     both = np.empty((src.shape[0], src.shape[1]*2, src.shape[2]), src.dtype)
     both = cv.hconcat([src, dst])
     cv.imshow("Original and sharpened version", both)

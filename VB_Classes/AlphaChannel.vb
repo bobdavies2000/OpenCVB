@@ -6,7 +6,7 @@ Public Class AlphaChannel_Basics : Inherits VBparent
     Dim alpha As New imageForm
     Public Sub New()
         alpha.Show()
-        alpha.Size = New System.Drawing.Size(dst1.Width + 10, dst1.Height + 10)
+        alpha.Size = New System.Drawing.Size(dst2.Width + 10, dst2.Height + 10)
 
         task.desc = "Use the the Windows 10 alpha channel to separate foreground and background"
     End Sub
@@ -33,12 +33,12 @@ Public Class AlphaChannel_Blend : Inherits VBparent
         task.desc = "Use alpha blending to smoothly separate background from foreground"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dst2.SetTo(0)
-        src.CopyTo(dst2, task.noDepthMask)
+        dst3.SetTo(0)
+        src.CopyTo(dst3, task.noDepthMask)
 
         Static transparencySlider = findSlider("Transparency amount")
         Dim alpha = transparencySlider.Value / 255
-        cv.Cv2.AddWeighted(src, alpha, dst2, 1.0 - alpha, 0, dst1)
+        cv.Cv2.AddWeighted(src, alpha, dst3, 1.0 - alpha, 0, dst2)
     End Sub
 End Class
 

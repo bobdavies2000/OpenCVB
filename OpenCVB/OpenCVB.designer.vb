@@ -144,7 +144,7 @@ Partial Class OpenCVB
         Me.PixelViewerButton.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.PixelViewerButton.Name = "PixelViewerButton"
         Me.PixelViewerButton.Size = New System.Drawing.Size(34, 53)
-        Me.PixelViewerButton.ToolTipText = "Display pixel data when the mouse moves over dst1 or dst2 below"
+        Me.PixelViewerButton.ToolTipText = "Display pixel data when the mouse moves over dst2 or dst3 below"
         '
         'TestAllTimer
         '

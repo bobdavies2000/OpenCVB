@@ -8,8 +8,8 @@ Public Class TimeView_Basics : Inherits VBparent
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Number of frames to include", 2, 30, 10)
         End If
-        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_32F, 0)
         dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_32F, 0)
+        dst3 = New cv.Mat(task.color.Size, cv.MatType.CV_32F, 0)
         task.desc = "TimeView that highlights concentrations of depth pixels"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 3
@@ -40,12 +40,12 @@ Public Class TimeView_Basics : Inherits VBparent
         topAccum = topAccum.Add(topFrames.ElementAt(sideFrames.Count - 1))
         If standalone Or task.intermediateName = caller Then
             setupSide.Run(sideAccum.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR))
-            dst1 = setupSide.dst1
+            dst2 = setupSide.dst2
             setupTop.Run(topAccum.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR))
-            dst2 = setupTop.dst1
+            dst3 = setupTop.dst2
         Else
-            dst1 = sideAccum
-            dst2 = topAccum
+            dst2 = sideAccum
+            dst3 = topAccum
         End If
 
         label1 = "Accum " + CStr(topFrames.Count) + " latest side frames with hist threshold > " + CStr(task.hist3DThreshold)
@@ -74,23 +74,23 @@ Public Class TimeView_TopBackProjection : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         tFlood.Run(src)
-        dst2 = tFlood.dst2
+        dst3 = tFlood.dst3
 
         Dim rectlist = tFlood.floodTop.rects
-        Dim split = tFlood.tBasics.sideView.gCloud.dst1.Split()
+        Dim split = tFlood.tBasics.sideView.gCloud.dst2.Split()
         If rectlist.Count > 0 Then
             Dim colorBump = CInt(255 / rectlist.Count)
 
-            Dim colorMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-            dst1 = src
+            Dim colorMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+            dst2 = src
             For i = 0 To rectlist.Count - 1
                 Dim r = rectlist(i)
                 If r.Width > 0 And r.Height > 0 Then
-                    Dim minDepth = task.maxZ * r.X / dst2.Width
-                    Dim maxDepth = task.maxZ * (r.X + r.Width) / dst2.Width
+                    Dim minDepth = task.maxZ * r.X / dst3.Width
+                    Dim maxDepth = task.maxZ * (r.X + r.Width) / dst3.Width
 
-                    Dim minHeight = task.maxZ - task.maxZ * (r.Y + r.Height) / dst2.Height - task.maxY
-                    Dim maxHeight = task.maxZ - task.maxZ * r.Y / dst2.Height - task.maxY
+                    Dim minHeight = task.maxZ - task.maxZ * (r.Y + r.Height) / dst3.Height - task.maxY
+                    Dim maxHeight = task.maxZ - task.maxZ * r.Y / dst3.Height - task.maxY
 
                     Dim mask32f = New cv.Mat
 
@@ -105,7 +105,7 @@ Public Class TimeView_TopBackProjection : Inherits VBparent
                 End If
             Next
             task.palette.Run(colorMask)
-            dst1 = task.palette.dst1
+            dst2 = task.palette.dst2
         Else
             setTrueText("No objects found")
         End If
@@ -130,12 +130,12 @@ Public Class TimeView_FloodFill : Inherits VBparent
 
         tBasics.Run(src)
 
-        floodSide.Run(tBasics.dst1.ConvertScaleAbs(255))
-        dst1 = floodSide.dst1
+        floodSide.Run(tBasics.dst2.ConvertScaleAbs(255))
+        dst2 = floodSide.dst2
         label1 = "SideView " + floodSide.label1
 
-        floodTop.Run(tBasics.dst2.ConvertScaleAbs(255))
-        dst2 = floodTop.dst1
+        floodTop.Run(tBasics.dst3.ConvertScaleAbs(255))
+        dst3 = floodTop.dst2
         label2 = "TopView " + floodTop.label1
     End Sub
 End Class
@@ -159,14 +159,14 @@ Public Class TimeView_Centroids : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         tflood.Run(src)
-        dst1 = tflood.dst2
-        dst2 = tflood.dst1
+        dst2 = tflood.dst3
+        dst3 = tflood.dst2
 
         For i = 0 To tflood.floodTop.centroids.Count - 1
-            dst1.Circle(tflood.floodTop.centroids(i), task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
+            dst2.Circle(tflood.floodTop.centroids(i), task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
         Next
         For i = 0 To tflood.floodSide.centroids.Count - 1
-            dst2.Circle(tflood.floodSide.centroids(i), task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
+            dst3.Circle(tflood.floodSide.centroids(i), task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
         Next
 
         Dim saveTopQueries = New List(Of cv.Point2f)(tflood.floodTop.centroids)
@@ -176,11 +176,11 @@ Public Class TimeView_Centroids : Inherits VBparent
             knn.Run(src)
             For i = 0 To knn.neighbors.Rows - 1
                 Dim qPoint = tflood.floodTop.centroids(i)
-                dst1.Circle(qPoint, task.dotSize + 3, cv.Scalar.Red, -1, task.lineType, 0)
+                dst2.Circle(qPoint, task.dotSize + 3, cv.Scalar.Red, -1, task.lineType, 0)
                 Dim pt = saveTopQueries(knn.neighbors.Get(Of Single)(i, 0))
                 If Single.IsNaN(pt.X) = False And Single.IsNaN(pt.Y) = False Then
                     Dim cpt = New cv.Point(CInt(pt.X), CInt(pt.Y))
-                    dst1.Line(cpt, qPoint, cv.Scalar.Red, task.lineWidth, task.lineType)
+                    dst2.Line(cpt, qPoint, cv.Scalar.Red, task.lineWidth, task.lineType)
                 End If
             Next
 
@@ -206,19 +206,19 @@ Public Class TimeView_Rectangles : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         tflood.Run(src)
-        dst1 = tflood.dst2
-        dst2 = tflood.dst1
+        dst2 = tflood.dst3
+        dst3 = tflood.dst2
 
         mOverLap.inputRects = New List(Of cv.Rect)(tflood.floodTop.rects)
         mOverLap.Run(src)
         For i = 0 To mOverLap.outputRects.Count - 1
-            dst1.Rectangle(mOverLap.outputRects(i), cv.Scalar.Yellow, 1)
+            dst2.Rectangle(mOverLap.outputRects(i), cv.Scalar.Yellow, 1)
         Next
 
         mOverLap.inputRects = New List(Of cv.Rect)(tflood.floodSide.rects)
         mOverLap.Run(src)
         For i = 0 To mOverLap.outputRects.Count - 1
-            dst2.Rectangle(mOverLap.outputRects(i), cv.Scalar.Yellow, 1)
+            dst3.Rectangle(mOverLap.outputRects(i), cv.Scalar.Yellow, 1)
         Next
     End Sub
 End Class
@@ -238,22 +238,22 @@ Public Class TimeView_Frustrum : Inherits VBparent
     Dim setupTop As New PointCloud_SetupTop
     Dim mats As New Mat_4Click
     Public Sub New()
-        label2 = "Click a quadrant in dst1 to show it in dst2 "
+        label2 = "Click a quadrant in dst2 to show it in dst3 "
         task.desc = "Colorize the back and side views"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         tView.Run(src)
-        mats.mat(0) = tView.dst1.Clone
-        mats.mat(1) = tView.dst2.Clone
+        mats.mat(0) = tView.dst2.Clone
+        mats.mat(1) = tView.dst3.Clone
 
-        setupTop.Run(tView.dst1)
-        mats.mat(2) = setupTop.dst1
+        setupTop.Run(tView.dst2)
+        mats.mat(2) = setupTop.dst2
 
-        setupSide.Run(tView.dst2)
-        mats.mat(3) = setupSide.dst1
+        setupSide.Run(tView.dst3)
+        mats.mat(3) = setupSide.dst2
 
         mats.Run(src)
-        dst1 = mats.dst1
         dst2 = mats.dst2
+        dst3 = mats.dst3
     End Sub
 End Class

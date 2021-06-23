@@ -8,10 +8,10 @@ Public Class Correlation_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         km.Run(src)
-        dst1 = km.dst1
-        dst2 = km.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = km.dst2
+        dst3 = km.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim r = km.rects(km.selectedIndex)
-        dst2.Rectangle(r, cv.Scalar.Yellow, 1)
+        dst3.Rectangle(r, cv.Scalar.Yellow, 1)
         Dim split = task.pointCloud.Split()
 
         'Dim row = task.mousePoint.Y
@@ -19,7 +19,7 @@ Public Class Correlation_Basics : Inherits VBparent
         'If row >= r.Y + r.Height Then row = r.Y + r.Height - 1
         'Dim row1 = split(0)(r).Row(row)
         'Dim row2 = split(2)(r).Row(row)
-        'dst2.Line(New cv.Point(0, row), New cv.Point(dst2.Width, row), cv.Scalar.Yellow, 1)
+        'dst3.Line(New cv.Point(0, row), New cv.Point(dst3.Width, row), cv.Scalar.Yellow, 1)
 
         'Dim matchOption = corr.checkRadio()
         'Dim correlationMat As New cv.Mat

@@ -13,8 +13,8 @@ Public Class Filter_Laplacian : Inherits VBparent
         src.ConvertTo(sharp, cv.MatType.CV_32F)
         Dim imgResult = (sharp - imgLaplacian).ToMat
         imgResult.ConvertTo(imgResult, cv.MatType.CV_8UC3)
-        imgResult.ConvertTo(dst1, cv.MatType.CV_8UC3)
-        imgLaplacian.ConvertTo(dst2, cv.MatType.CV_8UC3)
+        imgResult.ConvertTo(dst2, cv.MatType.CV_8UC3)
+        imgLaplacian.ConvertTo(dst3, cv.MatType.CV_8UC3)
     End Sub
 End Class
 
@@ -58,7 +58,7 @@ Public Class Filter_NormalizedKernel : Inherits VBparent
         label1 = "kernel sum = " + Format(sum, "#0.000")
 
         Dim dst32f = src.Filter2D(cv.MatType.CV_32FC1, kernel, anchor:=New cv.Point(0, 0))
-        dst32f.ConvertTo(dst1, cv.MatType.CV_8UC3)
+        dst32f.ConvertTo(dst2, cv.MatType.CV_8UC3)
     End Sub
 End Class
 
@@ -78,7 +78,7 @@ Public Class Filter_Normalized2D : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim kernelSize = If(standalone, (task.frameCount Mod 20) + 1, sliders.trackbar(0).Value)
         Dim kernel = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
-        dst1 = src.Filter2D(-1, kernel)
+        dst2 = src.Filter2D(-1, kernel)
         label1 = "Normalized KernelSize = " + CStr(kernelSize)
     End Sub
 End Class
@@ -111,13 +111,13 @@ Public Class Filter_SepFilter2D : Inherits VBparent
         Dim yDim = If(sliders.trackbar(1).Value Mod 2, sliders.trackbar(1).Value, sliders.trackbar(1).Value + 1)
         Dim sigma = sliders.trackbar(2).Value / 10
         Dim kernel = cv.Cv2.GetGaussianKernel(xDim, sigma)
-        dst1 = src.GaussianBlur(New cv.Size(xDim, yDim), sigma)
-        dst2 = src.SepFilter2D(cv.MatType.CV_8UC3, kernel, kernel)
+        dst2 = src.GaussianBlur(New cv.Size(xDim, yDim), sigma)
+        dst3 = src.SepFilter2D(cv.MatType.CV_8UC3, kernel, kernel)
         If check.Box(0).Checked Then
-            Dim graySep = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            Dim grayGauss = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            dst2 = (graySep - grayGauss).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            label2 = "Gaussian - SepFilter2D " + CStr(dst2.CountNonZero()) + " pixels different."
+            Dim graySep = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            Dim grayGauss = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst3 = (graySep - grayGauss).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            label2 = "Gaussian - SepFilter2D " + CStr(dst3.CountNonZero()) + " pixels different."
         Else
             label2 = "SepFilter2D Result"
         End If

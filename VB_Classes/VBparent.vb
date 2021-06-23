@@ -27,6 +27,7 @@ Public Class VBparent : Implements IDisposable
     Public sliders As New OptionsSliders
     Public pyStream As Object
     Public standalone As Boolean
+    Public dst0 As cv.Mat
     Public dst1 As cv.Mat
     Public dst2 As cv.Mat
     Public dst3 As cv.Mat
@@ -45,6 +46,7 @@ Public Class VBparent : Implements IDisposable
         If standalone = False And task.callTrace.Contains(callStack) = False Then
             task.callTrace.Add(callStack)
         End If
+        dst0 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
         dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
         dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
         dst3 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
@@ -59,23 +61,23 @@ Public Class VBparent : Implements IDisposable
             If task.intermediateName <> "" Then
                 If task.intermediateActive = False And task.ttTextData.Count = 0 Then
                     Dim str As New TTtext("The " + task.intermediateName + " algorithm is not active in this configuration" + vbCrLf +
-                                          "or the dst1 output was empty.", 10, 100, 2)
+                                          "or the dst2 output was empty.", 10, 100, 2)
                     task.ttTextData.Add(str)
-                    dst1.SetTo(0)
                     dst2.SetTo(0)
+                    dst3.SetTo(0)
                     task.label1 = ""
                     task.label2 = ""
                 Else
-                    dst1 = task.intermediateObject.dst1
                     dst2 = task.intermediateObject.dst2
+                    dst3 = task.intermediateObject.dst3
                     task.label1 = task.intermediateObject.label1
                     task.label2 = task.intermediateObject.label2
                 End If
             End If
-            If dst1.Width <> task.color.Width Then dst1 = dst1.Resize(task.color.Size)
             If dst2.Width <> task.color.Width Then dst2 = dst2.Resize(task.color.Size)
-            If task.imgResult.Width <> dst1.Width * 2 Or task.imgResult.Height <> dst1.Height Then
-                task.imgResult = New cv.Mat(New cv.Size(dst1.Width * 2, dst1.Height), cv.MatType.CV_8UC3)
+            If dst3.Width <> task.color.Width Then dst3 = dst3.Resize(task.color.Size)
+            If task.imgResult.Width <> dst2.Width * 2 Or task.imgResult.Height <> dst2.Height Then
+                task.imgResult = New cv.Mat(New cv.Size(dst2.Width * 2, dst2.Height), cv.MatType.CV_8UC3)
             End If
 
             If task.pythonTaskName.EndsWith(".py") = False Then
@@ -87,8 +89,8 @@ Public Class VBparent : Implements IDisposable
                 End If
             End If
 
-            task.imgResult(New cv.Rect(0, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst1)
-            task.imgResult(New cv.Rect(task.color.Width, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst2)
+            task.imgResult(New cv.Rect(0, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst2)
+            task.imgResult(New cv.Rect(task.color.Width, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst3)
             task.frameCount += 1
         End If
     End Sub
@@ -101,17 +103,17 @@ Public Class VBparent : Implements IDisposable
         If r.Height < 0 Then r.Height = 1
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
-        If r.X > dst1.Width Then r.X = dst1.Width
-        If r.Y > dst1.Height Then r.Y = dst1.Height
-        If r.X + r.Width > dst1.Width Then r.Width = dst1.Width - r.X
-        If r.Y + r.Height > dst1.Height Then r.Height = dst1.Height - r.Y
+        If r.X > dst2.Width Then r.X = dst2.Width
+        If r.Y > dst2.Height Then r.Y = dst2.Height
+        If r.X + r.Width > dst2.Width Then r.Width = dst2.Width - r.X
+        If r.Y + r.Height > dst2.Height Then r.Height = dst2.Height - r.Y
         Return r
     End Function
     Public Function validatePoint2f(p As cv.Point2f) As cv.Point2f
         If p.X < 0 Then p.X = 0
         If p.Y < 0 Then p.Y = 0
-        If p.X > dst1.Width Then p.X = dst1.Width - 1
-        If p.Y > dst1.Height Then p.Y = dst1.Height - 1
+        If p.X > dst2.Width Then p.X = dst2.Width - 1
+        If p.Y > dst2.Height Then p.Y = dst2.Height - 1
         Return p
     End Function
     Public Sub New()

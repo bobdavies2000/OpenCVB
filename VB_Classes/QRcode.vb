@@ -9,7 +9,7 @@ Public Class QRcode_Basics : Inherits VBparent
         If fileInfo.Exists Then qrInput1 = cv.Cv2.ImRead(fileInfo.FullName)
         fileInfo = New FileInfo(task.parms.homeDir + "Data/QRCode2.png")
         If fileInfo.Exists Then qrInput2 = cv.Cv2.ImRead(fileInfo.FullName)
-        If dst1.Width < 480 Then ' for the smallest configurations the default size can be too big!
+        If dst2.Width < 480 Then ' for the smallest configurations the default size can be too big!
             qrInput1 = qrInput1.Resize(New cv.Size(120, 160))
             qrInput2 = qrInput2.Resize(New cv.Size(120, 160))
         End If
@@ -30,9 +30,9 @@ Public Class QRcode_Basics : Inherits VBparent
         Dim rectifiedImage As New cv.Mat
         Dim refersTo = qrDecoder.DetectAndDecode(src, box, rectifiedImage)
 
-        src.CopyTo(dst1)
+        src.CopyTo(dst2)
         For i = 0 To box.Length - 1
-            dst1.Line(box(i), box((i + 1) Mod 4), cv.Scalar.Red, task.lineWidth + 2, task.lineType)
+            dst2.Line(box(i), box((i + 1) Mod 4), cv.Scalar.Red, task.lineWidth + 2, task.lineType)
         Next
         If refersTo <> "" Then label1 = refersTo
     End Sub

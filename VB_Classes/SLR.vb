@@ -7,7 +7,7 @@ Public Class SLR_Basics : Inherits VBparent
     Dim plot As New Plot_Basics_CPP
     Public Sub New()
         If standalone Then
-            input.Run(dst1)
+            input.Run(dst2)
             label1 = "Sample data input"
         End If
 
@@ -33,15 +33,15 @@ Public Class SLR_Basics : Inherits VBparent
             plot.srcX = input.dataX.ToArray
             plot.srcY = input.dataY.ToArray
             plot.Run(src)
-            dst1 = plot.dst1.Clone
+            dst2 = plot.dst2.Clone
 
             plot.srcX = resultX.ToArray
             plot.srcY = resultY.ToArray
             plot.Run(src)
-            dst2 = plot.dst1
+            dst3 = plot.dst2
         Else
-            dst1.SetTo(0)
             dst2.SetTo(0)
+            dst3.SetTo(0)
             setTrueText(label1 + " yielded no results...")
         End If
         If standalone = False Then
@@ -80,7 +80,7 @@ Public Class SLR_Data : Inherits VBparent
         plot.srcX = dataX.ToArray
         plot.srcY = dataY.ToArray
         plot.Run(src)
-        dst1 = plot.dst1
+        dst2 = plot.dst2
     End Sub
 End Class
 
@@ -100,13 +100,13 @@ Public Class SLR_Image : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.Run(src)
-        dst1 = hist.dst1
+        dst2 = hist.dst2
         For i = 0 To hist.histogram.Rows - 1
             slr.input.dataX.Add(i)
             slr.input.dataY.Add(hist.histogram.Get(Of Single)(i, 0))
         Next
         slr.Run(src)
-        dst2 = slr.dst2
+        dst3 = slr.dst3
     End Sub
 End Class
 
@@ -128,28 +128,28 @@ Public Class SLR_TrendCompare : Inherits VBparent
         task.desc = "Find trends by filling in short histogram gaps in the given image's histogram."
     End Sub
     Private Sub connectLine(i As Integer)
-        Dim p1 = New cv.Point2f(barMidPoint + dst1.Width * i / valList.Count, dst1.Height - dst1.Height * valList(i) / slr.hist.plotHist.plotMaxValue)
+        Dim p1 = New cv.Point2f(barMidPoint + dst2.Width * i / valList.Count, dst2.Height - dst2.Height * valList(i) / slr.hist.plotHist.plotMaxValue)
         resultingPoints.Add(p1)
-        dst1.Line(lastPoint, p1, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+        dst2.Line(lastPoint, p1, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
         lastPoint = p1
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         label1 = "Histogram with Yellow line showing the trends"
         slr.hist.plothist.backcolor = cv.Scalar.Red
         slr.Run(src)
-        dst1 = slr.dst1
         dst2 = slr.dst2
+        dst3 = slr.dst3
 
         Dim indexer = slr.hist.histogram.GetGenericIndexer(Of Single)()
         valList = New List(Of Single)
         For i = 0 To slr.hist.histogram.Rows - 1
             valList.Add(indexer(i))
         Next
-        barMidPoint = dst1.Width / valList.Count / 2
+        barMidPoint = dst2.Width / valList.Count / 2
 
         If valList.Count < 2 Then Exit Sub
         slr.hist.plotHist.plotMaxValue = valList.Max
-        lastPoint = New cv.Point2f(barMidPoint, dst1.Height - dst1.Height * valList(0) / slr.hist.plotHist.plotMaxValue)
+        lastPoint = New cv.Point2f(barMidPoint, dst2.Height - dst2.Height * valList(0) / slr.hist.plotHist.plotMaxValue)
         resultingPoints.Clear()
         resultingPoints.Add(lastPoint)
         For i = 1 To valList.Count - 2
@@ -179,28 +179,28 @@ Public Class SLR_Trends : Inherits VBparent
         task.desc = "Find trends by filling in short histogram gaps in the given image's histogram."
     End Sub
     Private Sub connectLine(i As Integer)
-        Dim p1 = New cv.Point2f(barMidPoint + dst1.Width * i / valList.Count, dst1.Height - dst1.Height * valList(i) / hist.plotHist.plotMaxValue)
+        Dim p1 = New cv.Point2f(barMidPoint + dst2.Width * i / valList.Count, dst2.Height - dst2.Height * valList(i) / hist.plotHist.plotMaxValue)
         resultingPoints.Add(p1)
         resultingValues.Add(p1.Y)
-        dst1.Line(lastPoint, p1, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+        dst2.Line(lastPoint, p1, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
         lastPoint = p1
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         label1 = "Grayscale histogram - yellow line shows trend"
         hist.plotHist.backColor = cv.Scalar.Red
         hist.Run(src)
-        dst1 = hist.dst1
+        dst2 = hist.dst2
 
         Dim indexer = hist.histogram.GetGenericIndexer(Of Single)()
         valList = New List(Of Single)
         For i = 0 To hist.histogram.Rows - 1
             valList.Add(indexer(i))
         Next
-        barMidPoint = dst1.Width / valList.Count / 2
+        barMidPoint = dst2.Width / valList.Count / 2
 
         If valList.Count < 2 Then Exit Sub
         hist.plotHist.plotMaxValue = valList.Max
-        lastPoint = New cv.Point2f(barMidPoint, dst1.Height - dst1.Height * valList(0) / hist.plotHist.plotMaxValue)
+        lastPoint = New cv.Point2f(barMidPoint, dst2.Height - dst2.Height * valList(0) / hist.plotHist.plotMaxValue)
         resultingPoints.Clear()
         resultingValues.Clear()
         resultingPoints.Add(lastPoint)
@@ -265,7 +265,7 @@ Public Class SLR_TrendImages : Inherits VBparent
             trends.Run(split(splitIndex))
         Next
 
-        dst1 = trends.dst1
+        dst2 = trends.dst2
     End Sub
 End Class
 
@@ -285,6 +285,6 @@ Public Class SLR_SurfaceH : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         surface.Run(src)
-        dst1 = surface.dst2
+        dst2 = surface.dst3
     End Sub
 End Class

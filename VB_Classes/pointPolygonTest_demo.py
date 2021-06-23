@@ -46,8 +46,8 @@ for i in range(src.shape[0]):
             drawing[i,j,2] = 255
 
 cv.circle(drawing,maxDistPt, int(maxVal),255, 1, cv.LINE_8, 0)
-dst1 = np.zeros((src.shape[0], src.shape[1], 3), dtype=np.uint8)
-cv.cvtColor(src, cv.COLOR_GRAY2BGR, dst1)
-CombinedImages = cv.hconcat([dst1, drawing])
+dst2 = np.zeros((src.shape[0], src.shape[1], 3), dtype=np.uint8)
+cv.cvtColor(src, cv.COLOR_GRAY2BGR, dst2)
+CombinedImages = cv.hconcat([dst2, drawing])
 cv.imshow(titleWindow, CombinedImages)
 cv.waitKey()

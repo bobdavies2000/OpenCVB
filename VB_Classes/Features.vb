@@ -18,11 +18,11 @@ Public Class Features_GoodFeatures : Inherits VBparent
         Dim minDistance = sliders.trackbar(2).Value
         Dim features = cv.Cv2.GoodFeaturesToTrack(src, numPoints, quality, minDistance, Nothing, 7, True, 3)
 
-        src.CopyTo(dst1)
+        src.CopyTo(dst2)
         goodFeatures.Clear()
         For i = 0 To features.Length - 1
             goodFeatures.Add(features.ElementAt(i))
-            dst1.Circle(features(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
+            dst2.Circle(features(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -45,7 +45,7 @@ Public Class Features_PointTracker : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         features.Run(src)
-        dst1 = features.dst1
+        dst2 = features.dst2
 
         pTrack.queryPoints.Clear()
         pTrack.queryRects.Clear()
@@ -61,11 +61,11 @@ Public Class Features_PointTracker : Inherits VBparent
 
         pTrack.Run(src)
 
-        dst2.SetTo(0)
+        dst3.SetTo(0)
         For Each obj In pTrack.drawRC.viewObjects
             Dim r = obj.Value.rectInHist
             If r.Width > 0 And r.Height > 0 Then
-                If r.X + r.Width < dst2.Width And r.Y + r.Height < dst2.Height Then src(obj.Value.rectInHist).CopyTo(dst2(obj.Value.rectInHist))
+                If r.X + r.Width < dst3.Width And r.Y + r.Height < dst3.Height Then src(obj.Value.rectInHist).CopyTo(dst3(obj.Value.rectInHist))
             End If
         Next
     End Sub

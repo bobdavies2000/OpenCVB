@@ -7,9 +7,9 @@ Public Class Mat_Repeat : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim small = src.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
-        dst1 = small.Repeat(10, 10)
-        small = task.RGBDepth.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
         dst2 = small.Repeat(10, 10)
+        small = task.RGBDepth.Resize(New cv.Size(src.Cols / 10, src.Rows / 10))
+        dst3 = small.Repeat(10, 10)
     End Sub
 End Class
 
@@ -30,14 +30,14 @@ Public Class Mat_PointToMat : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         random.Run(Nothing)
-        dst1 = random.dst1
+        dst2 = random.dst2
         Dim rows = random.Points.Length
         Dim pMat = New cv.Mat(rows, 1, cv.MatType.CV_32SC2, random.Points)
         Dim indexer = pMat.GetGenericIndexer(Of cv.Vec2i)()
-        dst2.SetTo(0)
+        dst3.SetTo(0)
         Dim white = New cv.Vec3b(255, 255, 255)
         For i = 0 To rows - 1
-            dst2.Set(Of cv.Vec3b)(indexer(i).Item1, indexer(i).Item0, white)
+            dst3.Set(Of cv.Vec3b)(indexer(i).Item1, indexer(i).Item0, white)
         Next
     End Sub
 End Class
@@ -65,7 +65,7 @@ Public Class Mat_MatToPoint : Inherits VBparent
                 index += 1
             Next
         Next
-        dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, points)
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, points)
     End Sub
 End Class
 
@@ -83,9 +83,9 @@ Public Class Mat_Transpose : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim trColor = src.T()
-        dst1 = trColor.ToMat.Resize(New cv.Size(src.Cols, src.Rows))
-        Dim trBack = dst1.T()
-        dst2 = trBack.ToMat.Resize(src.Size())
+        dst2 = trColor.ToMat.Resize(New cv.Size(src.Cols, src.Rows))
+        Dim trBack = dst2.T()
+        dst3 = trBack.ToMat.Resize(src.Size())
     End Sub
 End Class
 
@@ -104,8 +104,8 @@ Public Class Mat_Tricks : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim mat = src.Resize(New cv.Size(src.Height, src.Height))
         Dim roi = New cv.Rect(0, 0, mat.Width, mat.Height)
-        dst1(roi) = mat
-        dst2(roi) = mat.T
+        dst2(roi) = mat
+        dst3(roi) = mat.T
     End Sub
 End Class
 
@@ -120,7 +120,7 @@ Public Class Mat_4to1 : Inherits VBparent
     Public mat() As cv.Mat = {mat1, mat2, mat3, mat4}
     Public lineSeparators = True ' if they want lines or not...
     Public Sub New()
-        mat1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8UC3, 0)
+        mat1 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat3 = mat1.Clone()
         mat4 = mat1.Clone()
@@ -138,7 +138,7 @@ Public Class Mat_4to1 : Inherits VBparent
         mat = {mat1, mat2, mat3, mat4}
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static nSize = New cv.Size(dst1.Width / 2, dst1.Height / 2)
+        Static nSize = New cv.Size(dst2.Width / 2, dst2.Height / 2)
         Static roiTopLeft = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
         Static roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
@@ -147,13 +147,13 @@ Public Class Mat_4to1 : Inherits VBparent
 
         For i = 0 To 4 - 1
             Dim tmp = mat(i).Clone
-            If tmp.Channels <> dst1.Channels Then tmp = mat(i).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            If tmp.Channels <> dst2.Channels Then tmp = mat(i).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             Dim roi = Choose(i + 1, roiTopLeft, roiTopRight, roibotLeft, roibotRight)
-            dst1(roi) = tmp.Resize(nSize)
+            dst2(roi) = tmp.Resize(nSize)
         Next
         If lineSeparators Then
-            dst1.Line(New cv.Point(0, dst1.Height / 2), New cv.Point(dst1.Width, dst1.Height / 2), cv.Scalar.White, task.lineWidth + 1)
-            dst1.Line(New cv.Point(dst1.Width / 2, 0), New cv.Point(dst1.Width / 2, dst1.Height), cv.Scalar.White, task.lineWidth + 1)
+            dst2.Line(New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), cv.Scalar.White, task.lineWidth + 1)
+            dst2.Line(New cv.Point(dst2.Width / 2, 0), New cv.Point(dst2.Width / 2, dst2.Height), cv.Scalar.White, task.lineWidth + 1)
         End If
     End Sub
 End Class
@@ -171,7 +171,7 @@ Public Class Mat_2to1 : Inherits VBparent
     Public mat() As cv.Mat = {mat1, mat2}
     Public lineSeparators = True ' if they want lines or not...
     Public Sub New()
-        mat1 = New cv.Mat(New cv.Size(dst1.Rows, dst1.Cols), cv.MatType.CV_8UC3, 0)
+        mat1 = New cv.Mat(New cv.Size(dst2.Rows, dst2.Cols), cv.MatType.CV_8UC3, 0)
         mat2 = mat1.Clone()
         mat = {mat1, mat2}
 
@@ -187,14 +187,14 @@ Public Class Mat_2to1 : Inherits VBparent
             mat2 = task.RGBDepth
             mat = {mat1, mat2}
         End If
-        dst1.SetTo(0)
-        If dst1.Type <> mat(0).Type Then dst1 = New cv.Mat(dst1.Size(), mat(0).Type)
+        dst2.SetTo(0)
+        If dst2.Type <> mat(0).Type Then dst2 = New cv.Mat(dst2.Size(), mat(0).Type)
         For i = 0 To 1
             Dim roi = Choose(i + 1, roiTop, roibot)
-            If mat(i).Empty = False Then dst1(roi) = mat(i).Resize(nSize)
+            If mat(i).Empty = False Then dst2(roi) = mat(i).Resize(nSize)
         Next
         If lineSeparators Then
-            dst1.Line(New cv.Point(0, dst1.Height / 2), New cv.Point(dst1.Width, dst1.Height / 2), cv.Scalar.White, task.lineWidth + 1)
+            dst2.Line(New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), cv.Scalar.White, task.lineWidth + 1)
         End If
     End Sub
 End Class
@@ -214,7 +214,7 @@ Public Class Mat_ImageXYZ_MT : Inherits VBparent
         findSlider("ThreadGrid Width").Value = 32
         findSlider("ThreadGrid Height").Value = 32
 
-        xyDepth = New cv.Mat(dst1.Size(), cv.MatType.CV_32FC3, 0)
+        xyDepth = New cv.Mat(dst2.Size(), cv.MatType.CV_32FC3, 0)
         Dim xyz As New cv.Point3f
         For xyz.Y = 0 To xyDepth.Height - 1
             For xyz.X = 0 To xyDepth.Width - 1
@@ -251,9 +251,9 @@ Public Class Mat_RowColRange : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim midX = src.Width / 2
         Dim midY = src.Height / 2
-        dst1 = src
-        cv.Cv2.BitwiseNot(dst1.RowRange(midY - 50, midY + 50), dst1.RowRange(midY - 50, midY + 50))
-        cv.Cv2.BitwiseNot(dst1.ColRange(midX - 50, midX + 50), dst1.ColRange(midX - 50, midX + 50))
+        dst2 = src
+        cv.Cv2.BitwiseNot(dst2.RowRange(midY - 50, midY + 50), dst2.RowRange(midY - 50, midY + 50))
+        cv.Cv2.BitwiseNot(dst2.ColRange(midX - 50, midX + 50), dst2.ColRange(midX - 50, midX + 50))
     End Sub
 End Class
 
@@ -269,7 +269,7 @@ Public Class Mat_Managed : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static autoRand As New Random()
         Static img(src.Total) As cv.Vec3b
-        dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, img)
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, img)
         Static nextColor As cv.Vec3b
         If task.frameCount Mod 30 = 0 Then
             If nextColor = New cv.Vec3b(0, 0, 255) Then nextColor = New cv.Vec3b(0, 255, 0) Else nextColor = New cv.Vec3b(0, 0, 255)
@@ -278,7 +278,7 @@ Public Class Mat_Managed : Inherits VBparent
             img(i) = nextColor
         Next
         Dim rect As New cv.Rect(autoRand.Next(0, src.Width - 50), autoRand.Next(0, src.Height - 50), 50, 50)
-        dst1(rect).SetTo(0)
+        dst2(rect).SetTo(0)
     End Sub
 End Class
 
@@ -429,16 +429,16 @@ Public Class Mat_4Click : Inherits VBparent
     Public mat() As cv.Mat
     Public Sub New()
         mat = mats.mat
-        label2 = "Click a quadrant in dst1 to view it in dst2"
-        task.desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst2"
+        label2 = "Click a quadrant in dst2 to view it in dst3"
+        task.desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst3"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateName = caller Then mats.defaultMats()
         mats.Run(src)
-        dst1 = mats.dst1
+        dst2 = mats.dst2
 
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
-        dst2 = mats.mat(quadrantIndex)
+        dst3 = mats.mat(quadrantIndex)
     End Sub
 End Class
 
@@ -451,7 +451,7 @@ End Class
 Public Class Mat_2Click : Inherits VBparent
     Dim mats As New Mat_2to1
     Public Sub New()
-        task.desc = "Split an image into 2 segments and allow clicking on each half to open it in dst2"
+        task.desc = "Split an image into 2 segments and allow clicking on each half to open it in dst3"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Then
@@ -459,11 +459,11 @@ Public Class Mat_2Click : Inherits VBparent
             cv.Cv2.BitwiseNot(mats.mat(0), mats.mat(1))
         End If
         mats.Run(src)
-        dst1 = mats.dst1
+        dst2 = mats.dst2
 
-        ' click in dst1 to display the quadrant in dst2
+        ' click in dst2 to display the quadrant in dst3
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then
-            If task.mouseClickPoint.Y < dst1.Height / 2 Then dst2 = mats.mat(0) Else dst2 = mats.mat(1)
+            If task.mouseClickPoint.Y < dst2.Height / 2 Then dst3 = mats.mat(0) Else dst3 = mats.mat(1)
         End If
     End Sub
 End Class
@@ -514,13 +514,13 @@ Public Class Mat_Dlib2Mat : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
         If dGray IsNot Nothing Then
-            dst1 = New cv.Mat(dGray.Rows, dGray.Columns, cv.MatType.CV_8U)
-            Marshal.Copy(dGray.ToBytes, 0, dst1.Data, dst1.Total)
+            dst2 = New cv.Mat(dGray.Rows, dGray.Columns, cv.MatType.CV_8U)
+            Marshal.Copy(dGray.ToBytes, 0, dst2.Data, dst2.Total)
         End If
 
         If dRGB IsNot Nothing Then
-            dst2 = New cv.Mat(dRGB.Rows, dRGB.Columns, cv.MatType.CV_8UC3)
-            Marshal.Copy(dRGB.ToBytes, 0, dst2.Data, dst2.Total * dst2.ElemSize)
+            dst3 = New cv.Mat(dRGB.Rows, dRGB.Columns, cv.MatType.CV_8UC3)
+            Marshal.Copy(dRGB.ToBytes, 0, dst3.Data, dst3.Total * dst3.ElemSize)
         End If
     End Sub
 End Class

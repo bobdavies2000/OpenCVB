@@ -18,7 +18,7 @@ Public Class BlockMatching_Basics : Inherits VBparent
         End If
 
         If task.intermediateName <> "" Then
-            dst1.SetTo(0)
+            dst2.SetTo(0)
             task.intermediateName = ""
             setTrueText("The intermediate results are the same for BlockMatching_Basics", 10, 200)
             Exit Sub
@@ -51,7 +51,7 @@ Public Class BlockMatching_Basics : Inherits VBparent
         cv.Cv2.Divide(distance, ctmp(rect), ctmp(rect)) ' this needs much more refinement.  The trackbar3 value is just an approximation.
         ctmp(rect) = ctmp(rect).Threshold(10000, 10000, cv.ThresholdTypes.Trunc)
         colorizer.Run(ctmp)
-        dst1(rect) = colorizer.dst1(rect)
-        dst2 = task.rightView.Resize(src.Size())
+        dst2(rect) = colorizer.dst2(rect)
+        dst3 = task.rightView.Resize(src.Size())
     End Sub
 End Class

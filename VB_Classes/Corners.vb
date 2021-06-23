@@ -19,36 +19,36 @@ Public Class Corners_Harris : Inherits VBparent
 
         gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         mc = New cv.Mat(gray.Size(), cv.MatType.CV_32FC1, 0)
-        dst1 = New cv.Mat(gray.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(gray.Size(), cv.MatType.CV_8U, 0)
         Dim blocksize = sliders.trackbar(0).Value
         If blocksize Mod 2 = 0 Then blocksize += 1
         Dim aperture = sliders.trackbar(1).Value
         If aperture Mod 2 = 0 Then aperture += 1
-        cv.Cv2.CornerEigenValsAndVecs(gray, dst1, blocksize, aperture, cv.BorderTypes.Default)
+        cv.Cv2.CornerEigenValsAndVecs(gray, dst2, blocksize, aperture, cv.BorderTypes.Default)
 
         For j = 0 To gray.Rows - 1
             For i = 0 To gray.Cols - 1
-                Dim lambda_1 = dst1.Get(Of cv.Vec6f)(j, i)(0)
-                Dim lambda_2 = dst1.Get(Of cv.Vec6f)(j, i)(1)
+                Dim lambda_1 = dst2.Get(Of cv.Vec6f)(j, i)(0)
+                Dim lambda_2 = dst2.Get(Of cv.Vec6f)(j, i)(1)
                 mc.Set(Of Single)(j, i, lambda_1 * lambda_2 - 0.04 * Math.Pow(lambda_1 + lambda_2, 2))
             Next
         Next
 
         mc.MinMaxLoc(minval, maxval)
 
-        src.CopyTo(dst1)
+        src.CopyTo(dst2)
         For j = 0 To gray.Rows - 1
             For i = 0 To gray.Cols - 1
                 If mc.Get(Of Single)(j, i) > minval + (maxval - minval) * sliders.trackbar(2).Value / sliders.trackbar(2).Maximum Then
-                    dst1.Circle(New cv.Point(i, j), task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
-                    dst1.Circle(New cv.Point(i, j), task.dotSize, cv.Scalar.Red, -1, task.lineType)
+                    dst2.Circle(New cv.Point(i, j), task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
+                    dst2.Circle(New cv.Point(i, j), task.dotSize, cv.Scalar.Red, -1, task.lineType)
                 End If
             Next
         Next
 
         Dim McNormal As New cv.Mat
         cv.Cv2.Normalize(mc, McNormal, 127, 255, cv.NormTypes.MinMax)
-        McNormal.ConvertTo(dst2, cv.MatType.CV_8U)
+        McNormal.ConvertTo(dst3, cv.MatType.CV_8U)
     End Sub
 End Class
 
@@ -71,12 +71,12 @@ Public Class Corners_SubPix : Inherits VBparent
         Dim winSize = New cv.Size(sliders.trackbar(0).Value, sliders.trackbar(0).Value)
         cv.Cv2.CornerSubPix(gray, good.goodFeatures, winSize, New cv.Size(-1, -1), term)
 
-        src.CopyTo(dst1)
+        src.CopyTo(dst2)
         Dim p As New cv.Point
         For i = 0 To good.goodFeatures.Count - 1
             p.X = CInt(good.goodFeatures(i).X)
             p.Y = CInt(good.goodFeatures(i).Y)
-            dst1.Circle(p, 3, New cv.Scalar(0, 0, 255), -1, task.lineType)
+            dst2.Circle(p, 3, New cv.Scalar(0, 0, 255), -1, task.lineType)
         Next
     End Sub
 End Class
@@ -102,8 +102,8 @@ Public Class Corners_PreCornerDetect : Inherits VBparent
         cv.Cv2.Normalize(prob, prob, 0, 255, cv.NormTypes.MinMax)
         prob.ConvertTo(gray, cv.MatType.CV_8U)
         median.Run(gray.Clone())
-        dst1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2 = gray.Threshold(160, 255, cv.ThresholdTypes.BinaryInv).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = gray.Threshold(160, 255, cv.ThresholdTypes.BinaryInv).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         label2 = "median = " + CStr(median.medianVal)
     End Sub
 End Class
@@ -136,10 +136,10 @@ Public Class Corners_ShiTomasi_CPP : Inherits VBparent
         Dim blocksize = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value + 1)
         Dim aperture = If(sliders.trackbar(1).Value Mod 2, sliders.trackbar(1).Value, sliders.trackbar(1).Value + 1)
 
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim handle = GCHandle.Alloc(data, GCHandleType.Pinned)
-        Marshal.Copy(dst1.Data, data, 0, data.Length)
+        Marshal.Copy(dst2.Data, data, 0, data.Length)
         Dim imagePtr = Corners_ShiTomasi(handle.AddrOfPinnedObject, src.Rows, src.Cols, blocksize, aperture)
         handle.Free()
 
@@ -147,7 +147,7 @@ Public Class Corners_ShiTomasi_CPP : Inherits VBparent
 
         Dim stNormal As New cv.Mat
         cv.Cv2.Normalize(output, stNormal, sliders.trackbar(3).Value, 255, cv.NormTypes.MinMax)
-        stNormal.ConvertTo(dst2, cv.MatType.CV_8U)
+        stNormal.ConvertTo(dst3, cv.MatType.CV_8U)
     End Sub
 End Class
 

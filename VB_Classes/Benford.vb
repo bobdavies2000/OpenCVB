@@ -35,9 +35,9 @@ Public Class Benford_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateName = caller Then
-            dst1 = If(src.Channels = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            src = New cv.Mat(dst1.Size, cv.MatType.CV_32F)
-            dst1.ConvertTo(src, cv.MatType.CV_32F)
+            dst2 = If(src.Channels = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            src = New cv.Mat(dst2.Size, cv.MatType.CV_32F)
+            dst2.ConvertTo(src, cv.MatType.CV_32F)
         End If
 
         src = src.Reshape(1, src.Width * src.Height)
@@ -68,7 +68,7 @@ Public Class Benford_Basics : Inherits VBparent
 
         plotHist.hist = New cv.Mat(counts.Length, 1, cv.MatType.CV_32F, counts)
         plotHist.Run(src)
-        dst2 = plotHist.dst1.Clone
+        dst3 = plotHist.dst2.Clone
         For i = 0 To counts.Count - 1
             counts(i) = src.Rows * expectedDistribution(i)
         Next
@@ -76,9 +76,9 @@ Public Class Benford_Basics : Inherits VBparent
         plotHist.hist = New cv.Mat(counts.Length, 1, cv.MatType.CV_32F, counts)
         plotHist.Run(src)
 
-        cv.Cv2.BitwiseNot(plotHist.dst1, addW.src2)
-        addW.Run(dst2)
-        dst1 = addW.dst1
+        cv.Cv2.BitwiseNot(plotHist.dst2, addW.src2)
+        addW.Run(dst3)
+        dst2 = addW.dst2
 
         label1 = "AddWeighted: " + Format(task.AddWeighted, "%0.0") + " actual vs. " + Format(1 - task.AddWeighted, "%0.0") + " Benford distribution"
     End Sub
@@ -96,12 +96,12 @@ Public Class Benford_NormalizedImage : Inherits VBparent
         task.desc = "Perform a Benford analysis of an image normalized to between 0 and 1"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
-        dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
+        dst2.ConvertTo(gray32f, cv.MatType.CV_32F)
 
         benford.Run(gray32f.Normalize(1))
-        dst2 = benford.dst1
+        dst3 = benford.dst2
         label2 = benford.label2
     End Sub
 End Class
@@ -120,12 +120,12 @@ Public Class Benford_NormalizedImage99 : Inherits VBparent
         task.desc = "Perform a Benford analysis for 10-99, not 1-9, of an image normalized to between 0 and 1"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim gray32f As New cv.Mat
-        dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
+        dst2.ConvertTo(gray32f, cv.MatType.CV_32F)
 
         benford.Run(gray32f.Normalize(1))
-        dst2 = benford.dst1
+        dst3 = benford.dst2
         label2 = benford.label2
     End Sub
 End Class
@@ -149,9 +149,9 @@ Public Class Benford_JPEG : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, sliders.trackbar(0).Value})
         Dim tmp = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
-        dst1 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
+        dst2 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)
-        dst2 = benford.dst1
+        dst3 = benford.dst2
         label2 = benford.label2
     End Sub
 End Class
@@ -176,9 +176,9 @@ Public Class Benford_JPEG99 : Inherits VBparent
         Static qualitySlider = findSlider("JPEG Quality")
         Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, qualitySlider.Value})
         Dim tmp = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
-        dst1 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
+        dst2 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)
-        dst2 = benford.dst1
+        dst3 = benford.dst2
         label2 = benford.label2
     End Sub
 End Class
@@ -202,9 +202,9 @@ Public Class Benford_PNG : Inherits VBparent
         Static compressionSlider = findSlider("PNG Compression")
         Dim png = src.ImEncode(".png", New Integer() {cv.ImwriteFlags.PngCompression, compressionSlider.Value})
         Dim tmp = New cv.Mat(png.Count, 1, cv.MatType.CV_8U, png)
-        dst1 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
+        dst2 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)
-        dst2 = benford.dst1
+        dst3 = benford.dst2
         label2 = benford.label2
     End Sub
 End Class
@@ -221,7 +221,7 @@ Public Class Benford_Depth : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         benford.Run(task.depth32f)
-        dst1 = benford.dst1
+        dst2 = benford.dst2
         label1 = benford.label2
     End Sub
 End Class
@@ -238,7 +238,7 @@ Public Class Benford_DepthRGB : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         benford.Run(task.RGBDepth)
-        dst1 = benford.dst2
+        dst2 = benford.dst3
         label1 = benford.label2
     End Sub
 End Class
@@ -265,7 +265,7 @@ Public Class Benford_Primes : Inherits VBparent
         Dim tmp = New cv.Mat(sieve.primes.Count, 1, cv.MatType.CV_32S, sieve.primes.ToArray())
         tmp.ConvertTo(tmp, cv.MatType.CV_32F)
         benford.Run(tmp)
-        dst2 = benford.dst1
+        dst3 = benford.dst2
         label2 = benford.label2
     End Sub
 End Class

@@ -30,19 +30,19 @@ Public Class Annealing_Basics_CPP : Inherits VBparent
     Public circularPattern As Boolean = True
     Dim saPtr As IntPtr
     Public Sub drawMap()
-        dst1.SetTo(0)
+        dst2.SetTo(0)
         For i = 0 To cityOrder.Length - 1
-            dst1.Circle(cityPositions(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
-            dst1.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, task.lineWidth, task.lineType)
+            dst2.Circle(cityPositions(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
+            dst2.Line(cityPositions(i), cityPositions(cityOrder(i)), cv.Scalar.White, task.lineWidth, task.lineType)
         Next
-        cv.Cv2.PutText(dst1, "Energy", New cv.Point(10, 100), task.font, task.fontSize, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-        cv.Cv2.PutText(dst1, Format(energy, "#0"), New cv.Point(10, 160), task.font, task.fontSize, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+        cv.Cv2.PutText(dst2, "Energy", New cv.Point(10, 100), task.font, task.fontSize, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+        cv.Cv2.PutText(dst2, Format(energy, "#0"), New cv.Point(10, 160), task.font, task.fontSize, cv.Scalar.Yellow, task.lineWidth, task.lineType)
     End Sub
     Public Sub setup()
         ReDim cityOrder(numberOfCities - 1)
 
-        Dim radius = dst1.Rows * 0.45
-        Dim center = New cv.Point(dst1.Cols / 2, dst1.Rows / 2)
+        Dim radius = dst2.Rows * 0.45
+        Dim center = New cv.Point(dst2.Cols / 2, dst2.Rows / 2)
         If circularPattern Then
             ReDim cityPositions(numberOfCities - 1)
             Dim gen As New System.Random()
@@ -57,7 +57,7 @@ Public Class Annealing_Basics_CPP : Inherits VBparent
         For i = 0 To cityOrder.Length - 1
             cityOrder(i) = (i + 1) Mod numberOfCities
         Next
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8UC3, 0)
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, 0)
     End Sub
     Public Sub Open()
         Dim hCityPosition = GCHandle.Alloc(cityPositions, GCHandleType.Pinned)
@@ -204,14 +204,14 @@ Public Class Annealing_CPP_MT : Inherits VBparent
             label1 = "Energy level is " + CStr(anneal(0).energy)
         End If
 
-        mats.mat(0) = anneal(CInt(bestList.ElementAt(0).Value)).dst1
+        mats.mat(0) = anneal(CInt(bestList.ElementAt(0).Value)).dst2
         If bestList.Count >= 2 Then
-            mats.mat(1) = anneal(CInt(bestList.ElementAt(1).Value)).dst1
-            mats.mat(2) = anneal(CInt(bestList.ElementAt(bestList.Count - 2).Value)).dst1
-            mats.mat(3) = anneal(CInt(bestList.ElementAt(bestList.Count - 1).Value)).dst1
+            mats.mat(1) = anneal(CInt(bestList.ElementAt(1).Value)).dst2
+            mats.mat(2) = anneal(CInt(bestList.ElementAt(bestList.Count - 2).Value)).dst2
+            mats.mat(3) = anneal(CInt(bestList.ElementAt(bestList.Count - 1).Value)).dst2
         End If
         mats.Run(src)
-        dst2 = mats.dst1
+        dst3 = mats.dst2
 
         ' copy the top half of the solutions to the bottom half (worst solutions)
         If copyBestCheck.Checked Then
@@ -264,7 +264,7 @@ Public Class Annealing_Options : Inherits VBparent
         End If
 
         anneal.Run(src)
-        dst2 = anneal.dst1
+        dst3 = anneal.dst2
 
         If anneal.restartComputation Then
             anneal.restartComputation = False

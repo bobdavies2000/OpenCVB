@@ -68,7 +68,7 @@ Public Class Undistort_Basics : Inherits VBparent
             sliders.setupTrackBar(0, "undistort intrinsics Left", 1, 200, 100)
         End If
         sliders.setupTrackBar(1, "undistort intrinsics coeff's", -1000, 1000, 100)
-        sliders.setupTrackBar(2, "undistort stereo height", 1, dst1.Rows, dst1.Rows)
+        sliders.setupTrackBar(2, "undistort stereo height", 1, dst2.Rows, dst2.Rows)
         sliders.setupTrackBar(3, "undistort Offset left/right", 1, 200, 112)
 
         If check.Setup(caller, 1) Then
@@ -128,8 +128,8 @@ Public Class Undistort_Basics : Inherits VBparent
 
         cv.Cv2.FishEye.InitUndistortRectifyMap(kMat, dMat, rMatLeft, pMatLeft, New cv.Size(rawWidth, rawHeight),
                                                cv.MatType.CV_32FC1, leftViewMap1, leftViewMap2)
-        dst1 = task.leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(src.Size())
-        dst2 = src.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(src.Size())
+        dst2 = task.leftView.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(src.Size())
+        dst3 = src.Remap(leftViewMap1, leftViewMap2, cv.InterpolationFlags.Linear).Resize(src.Size())
     End Sub
 End Class
 

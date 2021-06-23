@@ -70,12 +70,12 @@ Public Class WarpModel_Basics : Inherits VBparent
             cv.Cv2.WarpPerspective(src2, aligned, warpMat, src.Size(), cv.InterpolationFlags.Linear + cv.InterpolationFlags.WarpInverseMap)
         End If
 
-        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
         dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
 
         outputRect = New cv.Rect(0, 0, src.Width, src.Height)
-        dst1(outputRect) = src
-        dst2(outputRect) = src2
+        dst2(outputRect) = src
+        dst3(outputRect) = src2
 
         Dim outStr = "The warp matrix is:" + vbCrLf
         For i = 0 To warpMatrix.Length - 1
@@ -147,7 +147,7 @@ Public Class WarpModel_Input : Inherits VBparent
         For i = 0 To r.Count - 1
             If gradientCheck.checked Then
                 sobel.Run(img(r(i)))
-                gradient(i) = sobel.dst1.Clone()
+                gradient(i) = sobel.dst2.Clone()
             End If
             rgb(i) = img(r(i))
         Next
@@ -161,10 +161,10 @@ Public Class WarpModel_Input : Inherits VBparent
         End If
         Dim merged As New cv.Mat
         cv.Cv2.Merge(rgb, merged)
-        dst1.SetTo(0)
         dst2.SetTo(0)
-        dst1(r(0)) = rgb(0).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2(r(0)) = merged
+        dst3.SetTo(0)
+        dst2(r(0)) = rgb(0).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3(r(0)) = merged
     End Sub
 End Class
 
@@ -215,8 +215,8 @@ Public Class WarpModel_AlignImages : Inherits VBparent
         Dim mergeInput() = {src, aligned(0), aligned(1)}
         Dim merged As New cv.Mat
         cv.Cv2.Merge(mergeInput, merged)
-        dst1.SetTo(0)
-        dst1(New cv.Rect(0, 0, merged.Width, merged.Height)) = merged
+        dst2.SetTo(0)
+        dst2(New cv.Rect(0, 0, merged.Width, merged.Height)) = merged
         setTrueText("Note small displacement of" + vbCrLf + "the image when gradient is used." + vbCrLf +
                       "Other than that, images look the same." + vbCrLf +
                       "Displacement increases with Sobel" + vbCrLf + "kernel size", merged.Width + 10, 40)
@@ -235,8 +235,8 @@ End Class
 '    Public lastFrame As cv.Mat
 '    Dim match as New MatchTemplate_DrawRect
 '    Public Sub New()
-'        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
 '        dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
+'        dst3 = New cv.Mat(task.color.Size, cv.MatType.CV_8U, 0)
 
 '        If sliders.Setup(caller) Then
 '            sliders.setupTrackBar(0, "Correlation Threshold X1000", 0, 1000, 950)
@@ -245,7 +245,7 @@ End Class
 
 '        task.drawRect = New cv.Rect(100, 100, 100, 100)
 '        label1 = "Previous ROI (align to this image)"
-'        label2 = "Current ROI aligned to previous frame (dst1)"
+'        label2 = "Current ROI aligned to previous frame (dst2)"
 '        task.desc = "Find the Translation and Euclidean warp matrix for the current grayscale image to the previous - needs more work"
 '    End Sub
 '    Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -257,27 +257,27 @@ End Class
 '        sobel.src = src
 '        sobel.Run()
 
-'        dst1 = sobel.dst1
-'        If lastFrame Is Nothing Then lastFrame = dst1.Clone
+'        dst2 = sobel.dst2
+'        If lastFrame Is Nothing Then lastFrame = dst2.Clone
 
 '        ' if the ROI has low stdev or low correlation between the 2 images, it may never converge.
 '        ' Try to prevent failure by measuring stdev and correlation before findTransformECC
-'        wbasics.src = dst1(task.drawRect)
+'        wbasics.src = dst2(task.drawRect)
 '        wbasics.src2 = lastFrame(task.drawRect)
 
 
 '        Dim mean As Single, stdev As Single
-'        cv.Cv2.MeanStdDev(dst1(task.drawRect), mean, stdev)
+'        cv.Cv2.MeanStdDev(dst2(task.drawRect), mean, stdev)
 '        Dim thresholdError As String = ""
 '        If stdev > stdevThreshold Then
 '            Dim correlation As New cv.Mat
-'            cv.Cv2.MatchTemplate(dst1(task.drawRect), lastFrame(task.drawRect), correlation, cv.TemplateMatchModes.CCoeffNormed)
-'            dst2 = lastFrame.Clone
+'            cv.Cv2.MatchTemplate(dst2(task.drawRect), lastFrame(task.drawRect), correlation, cv.TemplateMatchModes.CCoeffNormed)
+'            dst3 = lastFrame.Clone
 '            Dim corr = correlation.Get(Of Single)(0, 0)
 
 
 '            ' This line makes the algorithm work but also makes it a tautology (or just plain useless.)  This needs more study...
-'            wbasics.src2 = dst1(task.drawRect)
+'            wbasics.src2 = dst2(task.drawRect)
 
 
 
@@ -285,14 +285,14 @@ End Class
 '                thresholdError = "The correlation is only " + Format(corr, "#0.00") + " which is below the threshold of " + Format(CCthreshold, "#0.00")
 '            End If
 '            wbasics.Run()
-'            dst1(wbasics.outputRect) = wbasics.dst1(wbasics.outputRect)
 '            dst2(wbasics.outputRect) = wbasics.dst2(wbasics.outputRect)
+'            dst3(wbasics.outputRect) = wbasics.dst3(wbasics.outputRect)
 '        Else
 '            thresholdError = "The stdev was only " + Format(stdev, "#0.00") + " which is below the threshold of " + Format(stdevThreshold, "#0.00")
 '        End If
 
 '        If thresholdError.Length > 0 Then setTrueText(thresholdError)
-'        lastFrame = dst1.Clone
+'        lastFrame = dst2.Clone
 '    End Sub
 'End Class
 
@@ -320,9 +320,9 @@ End Class
 '        warp.src = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
 '        warp.src(r) = src(r)
 '        warp.Run()
-'        'dst1(warp.basics.outputRect) = warp.dst1(warp.basics.outputRect)
 '        'dst2(warp.basics.outputRect) = warp.dst2(warp.basics.outputRect)
-'        dst1 = warp.dst1
+'        'dst3(warp.basics.outputRect) = warp.dst3(warp.basics.outputRect)
 '        dst2 = warp.dst2
+'        dst3 = warp.dst3
 '    End Sub
 'End Class

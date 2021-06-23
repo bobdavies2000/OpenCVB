@@ -16,7 +16,7 @@ Public Class Dlib_Sobel_CS : Inherits VBparent
 
         d2Mat.dGray = sobel.edgeImage
         d2Mat.Run(src)
-        dst1 = d2Mat.dst1
+        dst2 = d2Mat.dst2
     End Sub
 End Class
 
@@ -43,11 +43,11 @@ Public Class Dlib_GaussianBlur_CS : Inherits VBparent
 
         d2Mat.dGray = blur.blurredGray
         d2Mat.Run(src)
-        dst1 = d2Mat.dst1
+        dst2 = d2Mat.dst2
 
         blur.Run(src) ' now blur the 8uc3 image
         d2Mat.dRGB = blur.blurredRGB
-        dst2 = d2Mat.dst2
+        dst3 = d2Mat.dst3
     End Sub
 End Class
 
@@ -71,11 +71,11 @@ Public Class Dlib_FaceDetectHOG_CS : Inherits VBparent
 
         faces.Run(input)
 
-        dst1 = src
+        dst2 = src
         For Each r In faces.rects
             ' why divide by 2?  The algorithm did a pyramidUp to "allow the algorithm to detect more faces".
             Dim rect = New cv.Rect(r.Left / 2, r.Top / 2, r.Width / 2, r.Height / 2)
-            dst1.Rectangle(rect, cv.Scalar.Yellow, 1)
+            dst2.Rectangle(rect, cv.Scalar.Yellow, 1)
         Next
     End Sub
 End Class

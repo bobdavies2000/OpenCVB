@@ -44,8 +44,8 @@ ind = 0
 while True:
     update_map(ind, map_x, map_y)
     ind = (ind + 1) % 4
-    dst1 = cv.remap(src, map_x, map_y, cv.INTER_LINEAR)
-    cv.imshow(titleWindow, dst1)
+    dst2 = cv.remap(src, map_x, map_y, cv.INTER_LINEAR)
+    cv.imshow(titleWindow, dst2)
     c = cv.waitKey(1000)
     if c == 27:
         break

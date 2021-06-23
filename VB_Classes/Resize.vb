@@ -18,11 +18,11 @@ Public Class Resize_Basics : Inherits VBparent
             Dim roi = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
             If task.drawRect.Width <> 0 Then roi = task.drawRect
 
-            dst1 = src(roi).Resize(dst1.Size(), 0, 0, rotateOptions.warpFlag)
-            dst2 = (src(roi).Resize(dst1.Size(), 0, 0, cv.InterpolationFlags.Cubic) - dst1).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            dst2 = src(roi).Resize(dst2.Size(), 0, 0, rotateOptions.warpFlag)
+            dst3 = (src(roi).Resize(dst2.Size(), 0, 0, cv.InterpolationFlags.Cubic) - dst2).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
             src.Rectangle(roi, cv.Scalar.White, 2)
         Else
-            dst1 = src.Resize(newSize, 0, 0, rotateOptions.warpFlag)
+            dst2 = src.Resize(newSize, 0, 0, rotateOptions.warpFlag)
         End If
     End Sub
 End Class
@@ -48,12 +48,12 @@ Public Class Resize_Percentage : Inherits VBparent
         resizeOptions.Run(src)
 
         If standalone or task.intermediateName = caller Then
-            Dim roi As New cv.Rect(0, 0, resizeOptions.dst1.Width, resizeOptions.dst1.Height)
-            dst1 = resizeOptions.dst1(roi).Resize(resizeOptions.dst1.Size())
+            Dim roi As New cv.Rect(0, 0, resizeOptions.dst2.Width, resizeOptions.dst2.Height)
+            dst2 = resizeOptions.dst2(roi).Resize(resizeOptions.dst2.Size())
             label1 = "Image after resizing to " + Format(sliders.trackbar(0).Value, "#0.0") + "% of original size"
             label2 = ""
         Else
-            dst1 = resizeOptions.dst1
+            dst2 = resizeOptions.dst2
         End If
     End Sub
 End Class

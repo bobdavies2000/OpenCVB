@@ -33,7 +33,7 @@ Public Class DNN_Test : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
         Dim image = cv.Cv2.ImRead(task.parms.homeDir + "Data/space_shuttle.jpg")
-        dst2 = image.Resize(dst2.Size())
+        dst3 = image.Resize(dst3.Size())
         Dim inputBlob = CvDnn.BlobFromImage(image, 1, New cv.Size(224, 224), New cv.Scalar(104, 117, 123))
         net.SetInput(inputBlob, "data")
         Dim prob = net.Forward("prob")
@@ -61,7 +61,7 @@ Public Class DNN_Caffe_CS : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim image = cv.Cv2.ImRead(task.parms.homeDir + "Data/space_shuttle.jpg")
         Dim str = caffeCS.Run(image)
-        dst2 = image.Resize(dst2.Size())
+        dst3 = image.Resize(dst3.Size())
         setTrueText(str, 10, 100)
     End Sub
 End Class
@@ -93,9 +93,9 @@ Public Class DNN_Basics : Inherits VBparent
             ReDim kalman(i).kOutput(4 - 1)
         Next
 
-        dnnWidth = dst1.Height ' height is always smaller than width...
-        dnnHeight = dst1.Height
-        crop = New cv.Rect(dst1.Width / 2 - dnnWidth / 2, dst1.Height / 2 - dnnHeight / 2, dnnWidth, dnnHeight)
+        dnnWidth = dst2.Height ' height is always smaller than width...
+        dnnHeight = dst2.Height
+        crop = New cv.Rect(dst2.Width / 2 - dnnWidth / 2, dst2.Height / 2 - dnnHeight / 2, dnnWidth, dnnHeight)
 
         Dim infoText As New FileInfo(task.parms.homeDir + "Data/MobileNetSSD_deploy.prototxt")
         If infoText.Exists Then
@@ -116,8 +116,8 @@ Public Class DNN_Basics : Inherits VBparent
             Dim inScaleFactor = sliders.trackbar(0).Value / sliders.trackbar(0).Maximum ' should be 0.0078 by default...
             Dim meanVal = CSng(sliders.trackbar(1).Value)
             Dim inputBlob = CvDnn.BlobFromImage(src(crop), inScaleFactor, New cv.Size(300, 300), meanVal, False)
-            src.CopyTo(dst2)
-            src(crop).CopyTo(dst1(crop))
+            src.CopyTo(dst3)
+            src(crop).CopyTo(dst2(crop))
             net.SetInput(inputBlob, "data")
 
             Dim detection = net.Forward("detection_out")
@@ -168,10 +168,10 @@ Public Class DNN_Basics : Inherits VBparent
                         kalman(minIndex).Run(src)
                         rect = New cv.Rect(kalman(minIndex).kOutput(0), kalman(minIndex).kOutput(1), kalman(minIndex).kOutput(2), kalman(minIndex).kOutput(3))
                     End If
-                    dst2.Rectangle(rect, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
+                    dst3.Rectangle(rect, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
                     rect.Width = src.Width / 12
                     rect.Height = src.Height / 16
-                    dst2.Rectangle(rect, cv.Scalar.Black, -1)
+                    dst3.Rectangle(rect, cv.Scalar.Black, -1)
                     setTrueText(nextName, CInt(rect.X), CInt(rect.Y), 3)
                 End If
             Next
@@ -216,18 +216,18 @@ Public Class DNN_SuperRes : Inherits VBparent
         Dim r = task.drawRect
         If task.drawRect.Width = 0 Or task.drawRect.Height = 0 Then Exit Sub
         Dim outRect = New cv.Rect(0, 0, r.Width * multiplier, r.Height * multiplier)
-        If outRect.Width > dst2.Width Then
-            r.Width = dst2.Width / multiplier
-            outRect.Width = dst2.Width
+        If outRect.Width > dst3.Width Then
+            r.Width = dst3.Width / multiplier
+            outRect.Width = dst3.Width
         End If
-        If outRect.Height > dst2.Height Then
-            r.Height = dst2.Height / multiplier
-            outRect.Height = dst2.Height
+        If outRect.Height > dst3.Height Then
+            r.Height = dst3.Height / multiplier
+            outRect.Height = dst3.Height
         End If
-        dst1.SetTo(0)
         dst2.SetTo(0)
-        dst1(outRect) = src(r).Resize(New cv.Size(r.Width * multiplier, r.Height * multiplier))
-        dnn.Upsample(src(r), dst2(outRect))
+        dst3.SetTo(0)
+        dst2(outRect) = src(r).Resize(New cv.Size(r.Width * multiplier, r.Height * multiplier))
+        dnn.Upsample(src(r), dst3(outRect))
         label2 = CStr(multiplier) + "X resize of selected area using DNN super resolution"
     End Sub
 End Class
@@ -242,16 +242,16 @@ Public Class DNN_SuperResize : Inherits VBparent
     Dim super = New DNN_SuperRes
     Public Sub New()
         label1 = "Super Res resized back to original size"
-        label2 = "dst2 = dst1 - src or no difference - honors original"
+        label2 = "dst3 = dst2 - src or no difference - honors original"
         task.desc = "Compare superRes reduced to original size"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         super.run(src)
-        Dim r = New cv.Rect(0, 0, dst1.Width, dst1.Height)
+        Dim r = New cv.Rect(0, 0, dst2.Width, dst2.Height)
         Dim tmp As New cv.Mat
         super.dnn.upsample(src, tmp)
-        dst1 = tmp.Resize(dst1.Size)
-        dst2 = dst1 - src
+        dst2 = tmp.Resize(dst2.Size)
+        dst3 = dst2 - src
     End Sub
 End Class
 

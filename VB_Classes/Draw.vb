@@ -2,13 +2,13 @@ Imports cv = OpenCvSharp
 Imports System.Drawing
 Module Draw_Exports
     Dim rng As System.Random
-    Public Sub drawRotatedRectangle(rotatedRect As cv.RotatedRect, dst1 As cv.Mat, color As cv.Scalar)
+    Public Sub drawRotatedRectangle(rotatedRect As cv.RotatedRect, dst2 As cv.Mat, color As cv.Scalar)
         Dim vertices2f = rotatedRect.Points()
         Dim vertices(vertices2f.Length - 1) As cv.Point
         For j = 0 To vertices2f.Length - 1
             vertices(j) = New cv.Point(CInt(vertices2f(j).X), CInt(vertices2f(j).Y))
         Next
-        cv.Cv2.FillConvexPoly(dst1, vertices, color, task.lineType)
+        cv.Cv2.FillConvexPoly(dst2, vertices, color, task.lineType)
     End Sub
     Public Sub drawRotatedOutline(rr As cv.RotatedRect, dst As cv.Mat, color As cv.Scalar)
         Dim vertices = rr.Points()
@@ -56,7 +56,7 @@ Public Class Draw_Noise : Inherits VBparent
         Static widthSlider = findSlider("Noise Width")
         Static CountSlider = findSlider("Noise Count")
         maxNoiseWidth = widthSlider.Value
-        src.CopyTo(dst1)
+        src.CopyTo(dst2)
         noiseMask = New cv.Mat(src.Size(), cv.MatType.CV_8UC1).SetTo(0)
         Dim count = CountSlider.value
         For n = 0 To count - 1
@@ -66,7 +66,7 @@ Public Class Draw_Noise : Inherits VBparent
             Dim c = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
             If addRandomColor = False Then c = cv.Scalar.Black
             Dim noiseWidth = msRNG.Next(1, maxNoiseWidth)
-            dst1.Circle(center, noiseWidth, c, -1, task.lineType)
+            dst2.Circle(center, noiseWidth, c, -1, task.lineType)
             noiseMask.Circle(center, noiseWidth, cv.Scalar.White, -1, task.lineType)
         Next
     End Sub
@@ -121,13 +121,13 @@ Public Class Draw_Ellipses : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         optDraw.Run(Nothing)
         If task.frameCount Mod optDraw.updateFrequency = 0 Then
-            dst1.SetTo(cv.Scalar.Black)
+            dst2.SetTo(cv.Scalar.Black)
             For i = 0 To optDraw.drawCount - 1
                 Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
                 Dim eSize = New cv.Size2f(CSng(msRNG.Next(0, src.Cols - nPoint.X - 1)), CSng(msRNG.Next(0, src.Rows - nPoint.Y - 1)))
                 Dim angle = 180.0F * CSng(msRNG.Next(0, 1000) / 1000.0F)
                 Dim nextColor = New cv.Scalar(task.vecColors(i).Item0, task.vecColors(i).Item1, task.vecColors(i).Item2)
-                dst1.Ellipse(New cv.RotatedRect(nPoint, eSize, angle), nextColor, optDraw.drawFilled)
+                dst2.Ellipse(New cv.RotatedRect(nPoint, eSize, angle), nextColor, optDraw.drawFilled)
             Next
         End If
     End Sub
@@ -145,12 +145,12 @@ Public Class Draw_Circles : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         optDraw.Run(Nothing)
         If task.frameCount Mod optDraw.updateFrequency = 0 Then
-            dst1.SetTo(cv.Scalar.Black)
+            dst2.SetTo(cv.Scalar.Black)
             For i = 0 To optDraw.drawCount - 1
                 Dim nPoint = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
                 Dim radius = msRNG.Next(10, 10 + msRNG.Next(src.Cols / 4))
                 Dim nextColor = New cv.Scalar(task.vecColors(i).Item0, task.vecColors(i).Item1, task.vecColors(i).Item2)
-                dst1.Circle(nPoint, radius, nextColor, optDraw.drawFilled, task.lineType)
+                dst2.Circle(nPoint, radius, nextColor, optDraw.drawFilled, task.lineType)
             Next
         End If
     End Sub
@@ -171,12 +171,12 @@ Public Class Draw_Line : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         optDraw.Run(Nothing)
         If task.frameCount Mod optDraw.updateFrequency Then Exit Sub
-        dst1.SetTo(cv.Scalar.Black)
+        dst2.SetTo(cv.Scalar.Black)
         For i = 0 To optDraw.drawCount - 1
             Dim nPoint1 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
             Dim nPoint2 = New cv.Point2f(msRNG.Next(src.Cols / 4, src.Cols * 3 / 4), msRNG.Next(src.Rows / 4, src.Rows * 3 / 4))
             Dim nextColor = New cv.Scalar(task.vecColors(i).Item0, task.vecColors(i).Item1, task.vecColors(i).Item2)
-            dst1.Line(nPoint1, nPoint2, nextColor, optDraw.drawFilled, task.lineType)
+            dst2.Line(nPoint1, nPoint2, nextColor, optDraw.drawFilled, task.lineType)
         Next
     End Sub
 End Class
@@ -199,8 +199,8 @@ Public Class Draw_Polygon : Inherits VBparent
         Dim height = src.Height / 8
         Dim width = src.Width / 8
         Dim polyColor = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
-        dst1.SetTo(cv.Scalar.Black)
-        dst2 = dst1.Clone()
+        dst2.SetTo(cv.Scalar.Black)
+        dst3 = dst2.Clone()
         For i = 0 To optDraw.drawCount - 1
             Dim points = New List(Of cv.Point)
             Dim listOfPoints = New List(Of List(Of cv.Point))
@@ -209,9 +209,9 @@ Public Class Draw_Polygon : Inherits VBparent
             Next
             listOfPoints.Add(points)
             If optDraw.drawFilled <> -1 Then
-                cv.Cv2.Polylines(dst1, listOfPoints, True, polyColor, task.lineWidth + 1, task.lineType)
+                cv.Cv2.Polylines(dst2, listOfPoints, True, polyColor, task.lineWidth + 1, task.lineType)
             Else
-                dst1.FillPoly(listOfPoints, New cv.Scalar(0, 0, 255))
+                dst2.FillPoly(listOfPoints, New cv.Scalar(0, 0, 255))
             End If
 
             Dim hull() As cv.Point
@@ -222,8 +222,8 @@ Public Class Draw_Polygon : Inherits VBparent
                 points.Add(New cv.Point(hull(j).X, hull(j).Y))
             Next
             listOfPoints.Add(points)
-            dst2.SetTo(cv.Scalar.Black)
-            cv.Cv2.DrawContours(dst2, listOfPoints, 0, polyColor, optDraw.drawFilled)
+            dst3.SetTo(cv.Scalar.Black)
+            cv.Cv2.DrawContours(dst3, listOfPoints, 0, polyColor, optDraw.drawFilled)
         Next
     End Sub
 End Class
@@ -240,29 +240,29 @@ Public Class Draw_Shapes : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim offsetX = 50, offsetY = 25, lineLength = 50, thickness = 2
 
-        dst1.SetTo(0)
+        dst2.SetTo(0)
         For i = 1 To 256
-            dst1.Line(New cv.Point(thickness * i + offsetX, offsetY), New cv.Point(thickness * i + offsetX, offsetY + lineLength), New cv.Scalar(i, i, i), thickness)
+            dst2.Line(New cv.Point(thickness * i + offsetX, offsetY), New cv.Point(thickness * i + offsetX, offsetY + lineLength), New cv.Scalar(i, i, i), thickness)
         Next
         For i = 1 To 256
             Dim color = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
             Select Case msRNG.Next(0, 3)
                 Case 0 ' circle
-                    Dim center = New cv.Point(msRNG.Next(offsetX, dst1.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst1.Rows - offsetY))
+                    Dim center = New cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
                     Dim radius = msRNG.Next(1, Math.Min(offsetX, offsetY))
-                    dst1.Circle(center, radius, color, -1, cv.LineTypes.Link8)
+                    dst2.Circle(center, radius, color, -1, cv.LineTypes.Link8)
                 Case 1 ' Rectangle
-                    Dim center = New cv.Point(msRNG.Next(offsetX, dst1.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst1.Rows - offsetY))
+                    Dim center = New cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
                     Dim width = msRNG.Next(1, Math.Min(offsetX, offsetY))
                     Dim height = msRNG.Next(1, Math.Min(offsetX, offsetY))
                     Dim rc = New cv.Rect(center.X - width, center.Y - height / 2, width, height)
-                    dst1.Rectangle(rc, color, -1, cv.LineTypes.Link8)
+                    dst2.Rectangle(rc, color, -1, cv.LineTypes.Link8)
                 Case 2 ' Ellipse
-                    Dim center = New cv.Point(msRNG.Next(offsetX, dst1.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst1.Rows - offsetY))
+                    Dim center = New cv.Point(msRNG.Next(offsetX, dst2.Cols - offsetX), msRNG.Next(offsetY + lineLength, dst2.Rows - offsetY))
                     Dim width = msRNG.Next(1, Math.Min(offsetX, offsetY))
                     Dim height = msRNG.Next(1, Math.Min(offsetX, offsetY))
                     Dim angle = msRNG.Next(0, 180)
-                    dst1.Ellipse(center, New cv.Size(width / 2, height / 2), angle, 0, 360, color, -1, cv.LineTypes.Link8)
+                    dst2.Ellipse(center, New cv.Size(width / 2, height / 2), angle, 0, 360, color, -1, cv.LineTypes.Link8)
             End Select
         Next
     End Sub
@@ -276,8 +276,8 @@ Public Class Draw_SymmetricalShapes : Inherits VBparent
     Public Sub New()
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Number of points", 200, 1000, 500)
-            sliders.setupTrackBar(1, "Radius 1", 1, dst1.Rows / 2, dst1.Rows / 4)
-            sliders.setupTrackBar(2, "Radius 2", 1, dst1.Rows / 2, dst1.Rows / 8)
+            sliders.setupTrackBar(1, "Radius 1", 1, dst2.Rows / 2, dst2.Rows / 4)
+            sliders.setupTrackBar(2, "Radius 2", 1, dst2.Rows / 2, dst2.Rows / 8)
             sliders.setupTrackBar(3, "nGenPer", 1, 500, 100)
         End If
         If check.Setup(caller, 5) Then
@@ -309,7 +309,7 @@ Public Class Draw_SymmetricalShapes : Inherits VBparent
 
         End If
 
-        dst1.SetTo(cv.Scalar.Black)
+        dst2.SetTo(cv.Scalar.Black)
         Dim numPoints = sliders.trackbar(0).Value
         Dim nGenPer = sliders.trackbar(3).Value
         If check.Box(1).Checked Then numPoints = CInt(numPoints / nGenPer) * nGenPer ' harmonize
@@ -333,10 +333,10 @@ Public Class Draw_SymmetricalShapes : Inherits VBparent
         Next
 
         For i = 0 To numPoints - 1
-            dst1.Line(points.ElementAt(i), points.ElementAt((i + 1) Mod numPoints), task.scalarColors(i Mod task.scalarColors.Count), task.lineWidth + 1, task.lineType)
+            dst2.Line(points.ElementAt(i), points.ElementAt((i + 1) Mod numPoints), task.scalarColors(i Mod task.scalarColors.Count), task.lineWidth + 1, task.lineType)
         Next
 
-        If check.Box(2).Checked Then dst1.FloodFill(center, fillColor)
+        If check.Box(2).Checked Then dst2.FloodFill(center, fillColor)
     End Sub
 End Class
 
@@ -361,7 +361,7 @@ Public Class Draw_Arc : Inherits VBparent
         ReDim kalman.kInput(7 - 1)
 
         If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Clearance from image edge (margin size)", 5, dst1.Width / 8, dst1.Width / 16)
+            sliders.setupTrackBar(0, "Clearance from image edge (margin size)", 5, dst2.Width / 8, dst2.Width / 16)
         End If
         If radio.Setup(caller, 3) Then
             radio.check(0).Text = "Draw Full Ellipse"
@@ -377,7 +377,7 @@ Public Class Draw_Arc : Inherits VBparent
     Private Sub setup()
         saveMargin = sliders.trackbar(0).Value ' work in the middle of the image.
 
-        rect = initRandomRect(dst1.Width, dst1.Height, saveMargin)
+        rect = initRandomRect(dst2.Width, dst2.Height, saveMargin)
         angle = msRNG.Next(0, 360)
         colorIndex = msRNG.Next(0, 255)
         thickness = msRNG.Next(1, 5)
@@ -395,16 +395,16 @@ Public Class Draw_Arc : Inherits VBparent
         Dim rr = New cv.RotatedRect(New cv.Point2f(r.X, r.Y), New cv.Size2f(r.Width, r.Height), angle)
         Dim color = task.scalarColors(colorIndex)
 
-        dst1.SetTo(cv.Scalar.White)
+        dst2.SetTo(cv.Scalar.White)
         If radio.check(0).Checked Then
-            dst1.Ellipse(rr, color, thickness, task.lineType)
-            drawRotatedOutline(rr, dst1, task.scalarColors(colorIndex))
+            dst2.Ellipse(rr, color, thickness, task.lineType)
+            drawRotatedOutline(rr, dst2, task.scalarColors(colorIndex))
         Else
             Dim angle = kalman.kOutput(4)
             Dim startAngle = kalman.kOutput(5)
             Dim endAngle = kalman.kOutput(6)
             If radio.check(1).Checked Then thickness = -1
-            dst1.Ellipse(New cv.Point(rr.Center.X, rr.Center.Y), New cv.Size(rr.BoundingRect.Size.Width, rr.BoundingRect.Size.Height),
+            dst2.Ellipse(New cv.Point(rr.Center.X, rr.Center.Y), New cv.Size(rr.BoundingRect.Size.Width, rr.BoundingRect.Size.Height),
                          angle, startAngle, endAngle, color, thickness, task.lineType)
         End If
         If r = rect Or sliders.trackbar(0).Value <> saveMargin Then setup()
@@ -432,28 +432,28 @@ Public Class Draw_ViewObjects : Inherits VBparent
         If standalone Or task.intermediateName = caller Then
             setTrueText("Draw_ViewObjects has no standalone version." + vbCrLf + "It just draws rectangles and centroids for other algorithms.")
         Else
-            dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
             Dim incr = If(viewObjects.Count < 10, 25, 255 / viewObjects.Count)  'reduces flicker of slightly different colors when < 10
             ' render masks first so they don't cover circles or rectangles below
             For i = 0 To viewObjects.Count - 1
                 Dim vo = viewObjects.ElementAt(i).Value
                 If vo.mask IsNot Nothing Then
                     Dim r = vo.preKalmanRect
-                    If r.Width = vo.mask.Width And r.Height = vo.mask.Height Then dst1(r).SetTo(vo.LayoutColor, vo.mask)
+                    If r.Width = vo.mask.Width And r.Height = vo.mask.Height Then dst2(r).SetTo(vo.LayoutColor, vo.mask)
                 End If
             Next
 
-            task.palette.Run(dst1 * cv.Scalar.All(incr))
-            dst1 = task.palette.dst1
+            task.palette.Run(dst2 * cv.Scalar.All(incr))
+            dst2 = task.palette.dst2
 
             Static drawRectangleCheck = findCheckBox("Draw rectangle and centroid for each mask")
             If drawRectangleCheck.checked Then
                 For i = 0 To viewObjects.Count - 1
                     Dim vw = viewObjects.ElementAt(i).Value
                     Dim pt = vw.centroid
-                    dst1.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType, 0)
-                    dst1.Circle(pt, task.dotSize + 2, cv.Scalar.Blue, -1, task.lineType, 0)
-                    dst1.Rectangle(vw.rectInHist, cv.Scalar.White, 1)
+                    dst2.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType, 0)
+                    dst2.Circle(pt, task.dotSize + 2, cv.Scalar.Blue, -1, task.lineType, 0)
+                    dst2.Rectangle(vw.rectInHist, cv.Scalar.White, 1)
                 Next
             End If
         End If
@@ -474,15 +474,15 @@ Public Class Draw_Frustrum : Inherits VBparent
         task.desc = "Draw a frustrum for a camera viewport"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dst1 = New cv.Mat(task.pointCloud.Height, task.pointCloud.Width, cv.MatType.CV_32F, 0)
-        Dim fRect = New cv.Rect((dst2.Width - dst2.Height) / 2, 0, dst2.Height, dst2.Height)
+        dst2 = New cv.Mat(task.pointCloud.Height, task.pointCloud.Width, cv.MatType.CV_32F, 0)
+        Dim fRect = New cv.Rect((dst3.Width - dst3.Height) / 2, 0, dst3.Height, dst3.Height)
         Dim mid = task.pointCloud.Height / 2
         Dim zIncr = task.maxZ / mid
         For i = 0 To task.pointCloud.Height / 2
-            dst1(fRect).Rectangle(New cv.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), cv.Scalar.All(i * zIncr), 1)
+            dst2(fRect).Rectangle(New cv.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), cv.Scalar.All(i * zIncr), 1)
         Next
-        xyzDepth.Run(dst1)
-        dst2 = xyzDepth.dst2
+        xyzDepth.Run(dst2)
+        dst3 = xyzDepth.dst3
     End Sub
 End Class
 
@@ -499,10 +499,10 @@ Public Class Draw_ClipLine : Inherits VBparent
     Dim rect As cv.Rect
     Private Sub setup()
         ReDim kalman.kInput(8)
-        Dim r = initRandomRect(dst2.Width, dst2.Height, 25)
+        Dim r = initRandomRect(dst3.Width, dst3.Height, 25)
         pt1 = New cv.Point(r.X, r.Y)
         pt2 = New cv.Point(r.X + r.Width, r.Y + r.Height)
-        rect = initRandomRect(dst2.Width, dst2.Height, 25)
+        rect = initRandomRect(dst3.Width, dst3.Height, 25)
         If task.useKalman Then flow.msgs.Add("--------------------------- setup ---------------------------")
     End Sub
     Public Sub New()
@@ -511,7 +511,7 @@ Public Class Draw_ClipLine : Inherits VBparent
         task.desc = "Demonstrate the use of the ClipLine function in OpenCV. NOTE: when clipline returns true, p1/p2 are clipped by the rectangle"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dst2 = src
+        dst3 = src
         kalman.kInput = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
         kalman.Run(src)
         Dim p1 = New cv.Point(CInt(kalman.kOutput(0)), CInt(kalman.kOutput(1)))
@@ -522,8 +522,8 @@ Public Class Draw_ClipLine : Inherits VBparent
         Dim r = New cv.Rect(kalman.kOutput(4), kalman.kOutput(5), kalman.kOutput(6), kalman.kOutput(7))
 
         Dim clipped = cv.Cv2.ClipLine(r, p1, p2) ' Returns false when the line and the rectangle don't intersect.
-        dst2.Line(p1, p2, If(clipped, cv.Scalar.White, cv.Scalar.Black), task.lineWidth + 1, task.lineType)
-        dst2.Rectangle(r, If(clipped, cv.Scalar.Yellow, cv.Scalar.Red), task.lineWidth + 1, task.lineType)
+        dst3.Line(p1, p2, If(clipped, cv.Scalar.White, cv.Scalar.Black), task.lineWidth + 1, task.lineType)
+        dst3.Rectangle(r, If(clipped, cv.Scalar.Yellow, cv.Scalar.Red), task.lineWidth + 1, task.lineType)
 
         Static linenum = 0
         flow.msgs.Add("(" + CStr(linenum) + ") line " + If(clipped, "interects rectangle", "does not intersect rectangle"))
@@ -576,12 +576,12 @@ Public Class Draw_Intersection : Inherits VBparent
             intersect = True
         End If
 
-        dst1.SetTo(0)
-        dst1.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
-        dst1.Line(p3, p4, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
-        If intersectionPoint <> New cv.Point2f Then dst1.Circle(intersectionPoint, task.dotSize + 4, cv.Scalar.White, -1, task.lineType)
+        dst2.SetTo(0)
+        dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+        dst2.Line(p3, p4, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+        If intersectionPoint <> New cv.Point2f Then dst2.Circle(intersectionPoint, task.dotSize + 4, cv.Scalar.White, -1, task.lineType)
         If intersect Then label1 = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y)) Else label1 = "Parallel!!!"
-        If intersectionPoint.X < 0 Or intersectionPoint.X > dst1.Width Or intersectionPoint.Y < 0 Or intersectionPoint.Y > dst1.Height Then
+        If intersectionPoint.X < 0 Or intersectionPoint.X > dst2.Width Or intersectionPoint.Y < 0 Or intersectionPoint.Y > dst2.Height Then
             label1 += " (off screen)"
         End If
     End Sub
@@ -599,7 +599,7 @@ Public Class Draw_Hexagon : Inherits VBparent
     Public Sub New()
         alpha.imagePic.Image = Image.FromFile(task.parms.homeDir + "Data/GestaltCube.gif")
         alpha.Show()
-        alpha.Size = New System.Drawing.Size(dst1.Width + 10, dst1.Height + 10)
+        alpha.Size = New System.Drawing.Size(dst2.Width + 10, dst2.Height + 10)
         alpha.Text = "Perception is the key"
         task.desc = "What it means to recognize a cube.  Zygmunt Pizlo - UC Irvine"
     End Sub

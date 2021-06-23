@@ -27,7 +27,7 @@ Public Class LUT_Basics : Inherits VBparent
             Next
         End If
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = src.LUT(myLut)
+        dst2 = src.LUT(myLut)
         label1 = "Image segmented into " + CStr(segments + 1) + " divisions (0-" + CStr(segments) + ")"
     End Sub
 End Class
@@ -64,7 +64,7 @@ Public Class LUT_Sliders : Inherits VBparent
             myLut.Set(Of Byte)(0, i, vals(splitIndex))
             If i >= splits(splitIndex) Then splitIndex += 1
         Next
-        dst1 = gray.LUT(myLut)
+        dst2 = gray.LUT(myLut)
     End Sub
 End Class
 
@@ -88,8 +88,8 @@ Public Class LUT_CustomColor : Inherits VBparent
         If standalone Or task.intermediateName = caller Then reduction.Run(src)
         gradMap.Run(src)
         colorMap = gradMap.gradientColorMap.Flip(cv.FlipMode.X)
-        dst1 = src.LUT(colorMap)
-        dst2 = colorMap.Resize(src.Size())
+        dst2 = src.LUT(colorMap)
+        dst3 = colorMap.Resize(src.Size())
     End Sub
 End Class
 
@@ -111,8 +111,8 @@ Public Class LUT_Reduction : Inherits VBparent
         task.palette.Run(Nothing)
         reduction.Run(src)
         Dim vector = task.palette.gradientColorMap.Row(0).Clone
-        dst1 = reduction.dst2.LUT(vector)
-        If standalone Or task.intermediateName = caller Then dst2 = task.palette.gradientColorMap.Resize(src.Size())
+        dst2 = reduction.dst3.LUT(vector)
+        If standalone Or task.intermediateName = caller Then dst3 = task.palette.gradientColorMap.Resize(src.Size())
     End Sub
 End Class
 
@@ -132,7 +132,7 @@ Public Class LUT_RGBDepth : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         lut.Run(task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        dst1 = lut.dst1
+        dst2 = lut.dst2
         label1 = lut.label1
     End Sub
 End Class
@@ -151,8 +151,8 @@ Public Class LUT_Depth32f : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         lut.Run(task.depth32f.Normalize(255).ConvertScaleAbs(255))
-        dst1 = lut.dst1
-        dst1.SetTo(0, task.noDepthMask)
+        dst2 = lut.dst2
+        dst2.SetTo(0, task.noDepthMask)
         label1 = lut.label1
     End Sub
 End Class

@@ -50,16 +50,16 @@ Public Class Smoothing_Exterior : Inherits VBparent
 		smOptions.Run(Nothing)
 		If standalone Or task.intermediateName = caller Then
 			If task.frameCount Mod 30 Then Exit Sub
-			dst1.SetTo(0)
+			dst2.SetTo(0)
 			hull.Run(src)
 			Dim nextHull = hull.hull
-			inputPoints = drawPoly(dst1, nextHull, cv.Scalar.White)
+			inputPoints = drawPoly(dst2, nextHull, cv.Scalar.White)
 		Else
-			dst1.SetTo(0)
+			dst2.SetTo(0)
 		End If
 		If inputPoints.Count > 1 Then
 			smoothPoints = getSplineInterpolationCatmullRom(inputPoints, smOptions.iterations)
-			drawPoly(dst1, smoothPoints.ToArray, plotColor)
+			drawPoly(dst2, smoothPoints.ToArray, plotColor)
 		End If
 	End Sub
 End Class
@@ -123,19 +123,19 @@ Public Class Smoothing_Interior : Inherits VBparent
 		smOptions.Run(Nothing)
 		If standalone Or task.intermediateName = caller Then
 			If task.frameCount Mod 30 Then Exit Sub
-			dst1.SetTo(0)
+			dst2.SetTo(0)
 			hull.Run(src)
 			Dim nextHull = hull.hull
-			inputPoints = drawPoly(dst1, nextHull, cv.Scalar.White)
+			inputPoints = drawPoly(dst2, nextHull, cv.Scalar.White)
 		Else
-			dst1.SetTo(0)
+			dst2.SetTo(0)
 		End If
 		Dim smoothPoints2d = getCurveSmoothingChaikin(inputPoints, smOptions.interiorTension, smOptions.iterations)
 		smoothPoints = New List(Of cv.Point)
 		For i = 0 To smoothPoints2d.Count - 1 Step smOptions.stepSize
 			smoothPoints.Add(New cv.Point(CInt(smoothPoints2d.ElementAt(i).X), CInt(smoothPoints2d.ElementAt(i).Y)))
 		Next
-		If smoothPoints.Count > 0 Then drawPoly(dst1, smoothPoints.ToArray, plotColor)
+		If smoothPoints.Count > 0 Then drawPoly(dst2, smoothPoints.ToArray, plotColor)
 	End Sub
 End Class
 
@@ -194,11 +194,11 @@ Public Class Smoothing_Contours : Inherits VBparent
 		smOptions.Run(Nothing)
 
 		outline.Run(src)
-		dst1 = outline.dst1.Clone
-		dst2 = outline.dst1
+		dst2 = outline.dst2.Clone
+		dst3 = outline.dst2
 
 		Dim smooth = If(radio.check(0).Checked, smoothI, smoothE)
-		Dim contours0 = cv.Cv2.FindContoursAsArray(outline.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY), cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+		Dim contours0 = cv.Cv2.FindContoursAsArray(outline.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY), cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
 		Dim maxIndex As Integer
 		Dim maxNodes As Integer
 		For i = 0 To contours0.Length - 1
@@ -208,7 +208,7 @@ Public Class Smoothing_Contours : Inherits VBparent
 				maxNodes = c.Length
 			End If
 		Next
-		cv.Cv2.DrawContours(dst2, contours0, maxIndex, New cv.Scalar(0, 255, 255), task.lineWidth)
+		cv.Cv2.DrawContours(dst3, contours0, maxIndex, New cv.Scalar(0, 255, 255), task.lineWidth)
 
 		smooth.inputPoints = New List(Of cv.Point)
 		For i = 0 To contours0(maxIndex).Count - 1 Step smOptions.stepSize
@@ -217,7 +217,7 @@ Public Class Smoothing_Contours : Inherits VBparent
 
 		smooth.Run(src)
 		If smooth.smoothpoints IsNot Nothing Then
-			If smooth.smoothPoints.Count > 0 Then drawPoly(dst1, smooth.smoothPoints.ToArray, smooth.plotColor)
+			If smooth.smoothPoints.Count > 0 Then drawPoly(dst2, smooth.smoothPoints.ToArray, smooth.plotColor)
 			label1 = "Smoothing with " + If(radio.check(0).Checked, "Interior", "Exterior") + " lines"
 			label2 = "Found " + CStr(contours0.Count) + " countours in the largest blob"
 		End If

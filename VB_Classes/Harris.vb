@@ -37,11 +37,11 @@ Public Class Harris_Features_CPP : Inherits VBparent
             sliders.setupTrackBar(1, "Harris Neighborhood", 1, 41, 21)
             sliders.setupTrackBar(2, "Harris aperture", 1, 31, 21)
             sliders.setupTrackBar(3, "Harris Parameter", 1, 100, 1)
-            sliders.setupTrackBar(4, "Weight for dst1 X100", 1, 100, 50)
+            sliders.setupTrackBar(4, "Weight for dst2 X100", 1, 100, 50)
         End If
         task.desc = "Use Harris feature detectors to identify interesting points."
 
-        ReDim srcData(dst1.Total - 1)
+        ReDim srcData(dst2.Total - 1)
         Harris_Features = Harris_Features_Open()
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -59,10 +59,10 @@ Public Class Harris_Features_CPP : Inherits VBparent
         handleSrc.Free() ' free the pinned memory...
 
         Dim gray32f = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_32F, imagePtr)
-        gray32f.ConvertTo(dst1, cv.MatType.CV_8U)
-        dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        gray32f.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim weight = sliders.trackbar(4).Value / 100
-        cv.Cv2.AddWeighted(dst1, weight, task.color, 1 - weight, 0, dst2)
+        cv.Cv2.AddWeighted(dst2, weight, task.color, 1 - weight, 0, dst3)
         label2 = "RGB overlaid with Harris result. Weight = " + Format(weight, "0%")
     End Sub
     Public Sub Close()
@@ -85,7 +85,7 @@ Public Class Harris_Detector_CPP : Inherits VBparent
         End If
         task.desc = "Use Harris detector to identify interesting points."
 
-        ReDim srcData(dst1.Total - 1)
+        ReDim srcData(dst2.Total - 1)
         Harris_Detector = Harris_Detector_Open()
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -102,11 +102,11 @@ Public Class Harris_Detector_CPP : Inherits VBparent
             Dim pts((ptCount(0) - 1) * 2 - 1) As integer
             Marshal.Copy(ptPtr, pts, 0, ptCount(0))
             Dim ptMat = New cv.Mat(ptCount(0), 2, cv.MatType.CV_32S, pts)
-            If standalone Or task.intermediateName = caller Then src.CvtColor(cv.ColorConversionCodes.GRAY2BGR).CopyTo(dst1)
+            If standalone Or task.intermediateName = caller Then src.CvtColor(cv.ColorConversionCodes.GRAY2BGR).CopyTo(dst2)
             FeaturePoints.Clear()
             For i = 0 To ptMat.Rows - 1
                 FeaturePoints.Add(New cv.Point2f(ptMat.Get(of integer)(i, 0), ptMat.Get(of integer)(i, 1)))
-                If standalone Or task.intermediateName = caller Then dst1.Circle(FeaturePoints(i), task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
+                If standalone Or task.intermediateName = caller Then dst2.Circle(FeaturePoints(i), task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
             Next
         End If
     End Sub

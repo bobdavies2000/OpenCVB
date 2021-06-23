@@ -66,9 +66,9 @@ Public Class DFT_Basics : Inherits VBparent
         mats.mat(1) = padded(New cv.Rect(0, cy, cx, cy)).Clone()
         mats.mat(0) = padded(New cv.Rect(cx, cy, cx, cy)).Clone()
         mats.Run(src)
-        dst2 = mats.dst1
+        dst3 = mats.dst2
 
-        dst1 = inverseDFT(complexImage)
+        dst2 = inverseDFT(complexImage)
     End Sub
 End Class
 
@@ -92,19 +92,19 @@ Public Class DFT_Inverse : Inherits VBparent
         cv.Cv2.Merge(planes, complex)
         cv.Cv2.Dft(complex, complexImage)
 
-        dst1 = inverseDFT(complexImage)
+        dst2 = inverseDFT(complexImage)
 
         Dim diff As New cv.Mat
-        cv.Cv2.Absdiff(src, dst1, diff)
+        cv.Cv2.Absdiff(src, dst2, diff)
         mats.mat(0) = diff.Threshold(0, 255, cv.ThresholdTypes.Binary)
         mats.mat(1) = (diff * 50).ToMat
         mats.Run(src)
         If mats.mat(0).countnonzero() > 0 Then
-            dst2 = mats.dst1
+            dst3 = mats.dst2
             label2 = "Mask of difference (top) and relative diff (bot)"
         Else
             label2 = "InverseDFT reproduced original"
-            dst2.SetTo(0)
+            dst3.SetTo(0)
         End If
     End Sub
 End Class
@@ -119,8 +119,8 @@ Public Class DFT_ButterworthFilter_MT : Inherits VBparent
     Public dft As New DFT_Basics
     Public Sub New()
         If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "DFT B Filter - Radius", 1, dst1.Rows, dst1.Rows)
-            sliders.setupTrackBar(1, "DFT B Filter - Order", 1, dst1.Rows, 2)
+            sliders.setupTrackBar(0, "DFT B Filter - Radius", 1, dst2.Rows, dst2.Rows)
+            sliders.setupTrackBar(1, "DFT B Filter - Order", 1, dst2.Rows, 2)
         End If
         If radio.Setup(caller, 6) Then
             radio.check(0).Text = "DFT Flags ComplexOutput"
@@ -177,7 +177,7 @@ Public Class DFT_ButterworthFilter_MT : Inherits VBparent
        Sub(k)
            Dim complex As New cv.Mat
            cv.Cv2.MulSpectrums(butterworthFilter(k), dft.complexImage, complex, dftFlag)
-           If k = 0 Then dst1 = inverseDFT(complex) Else dst2 = inverseDFT(complex)
+           If k = 0 Then dst2 = inverseDFT(complex) Else dst3 = inverseDFT(complex)
        End Sub)
     End Sub
 End Class
@@ -198,8 +198,8 @@ Public Class DFT_ButterworthDepth : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         bfilter.Run(task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        dst1 = bfilter.dst1
         dst2 = bfilter.dst2
+        dst3 = bfilter.dst3
     End Sub
 End Class
 
@@ -254,37 +254,37 @@ Public Class DFT_Shapes : Inherits VBparent
 
         If circleRadio.checked Then
             circle.Run(src)
-            dst1 = circle.dst1
+            dst2 = circle.dst2
         ElseIf ellipseRadio.checked Then
             ellipse.Run(src)
-            dst1 = ellipse.dst1
+            dst2 = ellipse.dst2
         ElseIf rectangleRadio.checked Then
             rectangle.Run(src)
-            dst1 = rectangle.dst1
+            dst2 = rectangle.dst2
         ElseIf polygonRadio.checked Then
             polygon.Run(src)
-            dst1 = polygon.dst1
+            dst2 = polygon.dst2
         ElseIf symShapeRadio.checked Then
             symShapes.Run(src)
-            dst1 = symShapes.dst1
+            dst2 = symShapes.dst2
         ElseIf lineRadio.checked Then
             lines.Run(src)
-            dst1 = lines.dst1
+            dst2 = lines.dst2
         ElseIf pointRadio.checked Then
             If task.frameCount Mod optDraw.updateFrequency = 0 Then
-                dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-                Dim pt1 = New cv.Point(msRNG.Next(0, dst1.Width / 10), msRNG.Next(0, dst1.Height / 10))
-                Dim pt2 = New cv.Point(msRNG.Next(0, dst1.Width / 10), msRNG.Next(0, dst1.Height / 10))
-                dst1.Set(Of Byte)(pt1.Y, pt1.X, 255)
-                dst1.Set(Of Byte)(pt2.Y, pt2.X, 255)
+                dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+                Dim pt1 = New cv.Point(msRNG.Next(0, dst2.Width / 10), msRNG.Next(0, dst2.Height / 10))
+                Dim pt2 = New cv.Point(msRNG.Next(0, dst2.Width / 10), msRNG.Next(0, dst2.Height / 10))
+                dst2.Set(Of Byte)(pt1.Y, pt1.X, 255)
+                dst2.Set(Of Byte)(pt2.Y, pt2.X, 255)
                 label1 = "pt1 = (" + CStr(pt1.X) + "," + CStr(pt1.Y) + ")  pt2 = (" + CStr(pt2.X) + "," + CStr(pt2.Y) + ")"
             End If
         End If
 
-        dft.Run(dst1)
-        dst2 = dft.dst2
+        dft.Run(dst2)
+        dst3 = dft.dst3
 
         ' uncomment the following line to view the inverse of the DFT transform.  It is the grayscale image of the input - no surprise.  It works!
-        ' dst1 = inverseDFT(dft.complexImage)
+        ' dst2 = inverseDFT(dft.complexImage)
     End Sub
 End Class

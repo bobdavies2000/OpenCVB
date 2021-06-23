@@ -58,8 +58,8 @@ Public Class Python_Run : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If pyStream IsNot Nothing Then
             pyStream.Run(src)
-            dst1 = pyStream.dst1
             dst2 = pyStream.dst2
+            dst3 = pyStream.dst3
             label1 = "Output of Python Backend"
             label2 = "Second Output of Python Backend"
         Else
@@ -216,8 +216,8 @@ Public Class Python_Stream : Inherits VBparent
 
             If rgbBuffer.Length <> src.Total * src.ElemSize Then ReDim rgbBuffer(src.Total * src.ElemSize - 1)
             If depthBuffer.Length <> task.depth32f.Total * task.depth32f.ElemSize Then ReDim depthBuffer(task.depth32f.Total * task.depth32f.ElemSize - 1)
-            If dst1Buffer.Length <> dst1.Total * dst1.ElemSize Then ReDim dst1Buffer(dst1.Total * dst1.ElemSize - 1)
-            If dst2Buffer.Length <> dst2.Total * dst2.ElemSize Then ReDim dst2Buffer(dst2.Total * dst2.ElemSize - 1)
+            If dst1Buffer.Length <> dst2.Total * dst2.ElemSize Then ReDim dst1Buffer(dst2.Total * dst2.ElemSize - 1)
+            If dst2Buffer.Length <> dst3.Total * dst3.ElemSize Then ReDim dst2Buffer(dst3.Total * dst3.ElemSize - 1)
             Marshal.Copy(src.Data, rgbBuffer, 0, src.Total * src.ElemSize)
             Marshal.Copy(task.depth32f.Data, depthBuffer, 0, depthBuffer.Length)
             If task.pipeOut.IsConnected Then
@@ -227,8 +227,8 @@ Public Class Python_Stream : Inherits VBparent
                 task.pipeIn.Read(dst1Buffer, 0, dst1Buffer.Length)
                 task.pipeIn.Read(dst2Buffer, 0, dst2Buffer.Length)
             End If
-            Marshal.Copy(dst1Buffer, 0, dst1.Data, dst1Buffer.Length)
-            Marshal.Copy(dst2Buffer, 0, dst2.Data, dst2Buffer.Length)
+            Marshal.Copy(dst1Buffer, 0, dst2.Data, dst1Buffer.Length)
+            Marshal.Copy(dst2Buffer, 0, dst3.Data, dst2Buffer.Length)
         End If
     End Sub
 End Class

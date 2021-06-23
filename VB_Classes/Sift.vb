@@ -21,12 +21,12 @@ Public Class Sift_Basics : Inherits VBparent
 
         lrView.Run(src)
 
-        Dim doubleSize As New cv.Mat(lrView.dst1.Rows, lrView.dst1.Cols * 2, cv.MatType.CV_8UC3)
+        Dim doubleSize As New cv.Mat(lrView.dst2.Rows, lrView.dst2.Cols * 2, cv.MatType.CV_8UC3)
 
-        siftCS.Run(lrView.dst1, lrView.dst2, doubleSize, radio.check(0).Checked, sliders.trackbar(0).Value)
+        siftCS.Run(lrView.dst2, lrView.dst3, doubleSize, radio.check(0).Checked, sliders.trackbar(0).Value)
 
-        doubleSize(New cv.Rect(0, 0, dst1.Width, dst1.Height)).CopyTo(dst1)
-        doubleSize(New cv.Rect(dst1.Width, 0, dst1.Width, dst1.Height)).CopyTo(dst2)
+        doubleSize(New cv.Rect(0, 0, dst2.Width, dst2.Height)).CopyTo(dst2)
+        doubleSize(New cv.Rect(dst2.Width, 0, dst2.Width, dst2.Height)).CopyTo(dst3)
 
         label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
     End Sub
@@ -64,16 +64,16 @@ Public Class Sift_Basics_MT : Inherits VBparent
         Dim numFeatures = numPointSlider.Value
         Parallel.ForEach(grid.roiList,
         Sub(roi)
-            Dim left = lrView.dst1(roi).Clone()  ' sift wants the inputs to be continuous and roi-modified Mats are not continuous.
-            Dim right = lrView.dst2(roi).Clone()
+            Dim left = lrView.dst2(roi).Clone()  ' sift wants the inputs to be continuous and roi-modified Mats are not continuous.
+            Dim right = lrView.dst3(roi).Clone()
             Dim dstROI = New cv.Rect(roi.X, roi.Y, roi.Width * 2, roi.Height)
             Dim dstTmp = output(dstROI).Clone()
             siftCS.Run(left, right, dstTmp, siftBasics.radio.check(0).Checked, numFeatures)
             dstTmp.CopyTo(output(dstROI))
         End Sub)
 
-        dst1 = output(New cv.Rect(0, 0, src.Width, src.Height))
-        dst2 = output(New cv.Rect(src.Width, 0, src.Width, src.Height))
+        dst2 = output(New cv.Rect(0, 0, src.Width, src.Height))
+        dst3 = output(New cv.Rect(src.Width, 0, src.Width, src.Height))
 
         label1 = If(siftBasics.radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
     End Sub

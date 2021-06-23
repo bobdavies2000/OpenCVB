@@ -12,15 +12,15 @@ Public Class Encode_Basics : Inherits VBparent
 
         Dim buf() = src.ImEncode(".jpg", encodeParams)
         Dim image = New cv.Mat(buf.Count, 1, cv.MatType.CV_8U, buf)
-        dst2 = cv.Cv2.ImDecode(image, cv.ImreadModes.AnyColor)
+        dst3 = cv.Cv2.ImDecode(image, cv.ImreadModes.AnyColor)
 
         Dim output As New cv.Mat
-        cv.Cv2.Absdiff(src, dst2, output)
+        cv.Cv2.Absdiff(src, dst3, output)
 
         Static scaleSlider = findSlider("Encode Output Scaling")
         If task.frameCount = 0 Then scaleSlider.value = 10
 
-        output.ConvertTo(dst1, cv.MatType.CV_8UC3, scaleSlider.Value)
+        output.ConvertTo(dst2, cv.MatType.CV_8UC3, scaleSlider.Value)
         Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)
         label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.0%") + ")"
     End Sub
@@ -72,13 +72,13 @@ Public Class Encode_Options : Inherits VBparent
 
         Dim buf() = src.ImEncode(".jpg", encodeParams)
         Dim image = New cv.Mat(buf.Count, 1, cv.MatType.CV_8U, buf)
-        dst2 = cv.Cv2.ImDecode(image, cv.ImreadModes.AnyColor)
+        dst3 = cv.Cv2.ImDecode(image, cv.ImreadModes.AnyColor)
 
         Dim output As New cv.Mat
-        cv.Cv2.Absdiff(src, dst2, output)
+        cv.Cv2.Absdiff(src, dst3, output)
 
         Dim scale = sliders.trackbar(1).Value
-        output.ConvertTo(dst1, cv.MatType.CV_8UC3, scale)
+        output.ConvertTo(dst2, cv.MatType.CV_8UC3, scale)
         Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)
         label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.0%") + ")"
     End Sub

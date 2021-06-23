@@ -18,7 +18,7 @@ Public Class MFD_Basics : Inherits VBparent
 
         motion.Run(task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         label2 = motion.label2
-        dst2 = If(motion.dst2.Channels = 1, motion.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR), motion.dst2.Clone)
+        dst3 = If(motion.dst3.Channels = 1, motion.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR), motion.dst3.Clone)
 
         Dim radioVal As Integer
         Static frm As OptionsRadioButtons = findfrm(caller + " Radio Options")
@@ -34,7 +34,7 @@ Public Class MFD_Basics : Inherits VBparent
             Next
         End If
 
-        dst1 = stableImg.Clone
+        dst2 = stableImg.Clone
     End Sub
 End Class
 
@@ -51,8 +51,8 @@ Public Class MFD_Depth : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         mfd.Run(task.depth32f)
-        dst1 = mfd.dst1
         dst2 = mfd.dst2
+        dst3 = mfd.dst3
         label2 = mfd.label2
     End Sub
 End Class
@@ -70,8 +70,8 @@ Public Class MFD_PointCloud : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         mfd.Run(task.pointCloud)
-        dst1 = mfd.dst1
         dst2 = mfd.dst2
+        dst3 = mfd.dst3
         label2 = mfd.label2
     End Sub
 End Class
@@ -97,11 +97,11 @@ Public Class MFD_Sobel : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static thresholdSlider = findSlider("Pixel threshold to zero")
         mfd.Run(src)
-        dst2 = mfd.dst2
+        dst3 = mfd.dst3
         label2 = mfd.label2
 
-        sobel.Run(mfd.dst1)
-        dst1 = sobel.dst1.Threshold(thresholdSlider.value, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary)
+        sobel.Run(mfd.dst2)
+        dst2 = sobel.dst2.Threshold(thresholdSlider.value, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -122,10 +122,10 @@ Public Class MFD_BinarizedSobel : Inherits VBparent
 
         mfd.Run(src)
 
-        sobel.Run(mfd.dst1.Clone)
+        sobel.Run(mfd.dst2.Clone)
 
-        dst1 = sobel.dst1
         dst2 = sobel.dst2
+        dst3 = sobel.dst3
     End Sub
 End Class
 
@@ -146,7 +146,7 @@ Public Class MFD_FloodFill : Inherits VBparent
     Dim sobel As New MFD_BinarizedSobel
     Public Sub New()
         If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "FloodFill Step Size", 1, dst1.Cols / 2, 15)
+            sliders.setupTrackBar(0, "FloodFill Step Size", 1, dst2.Cols / 2, 15)
             sliders.setupTrackBar(1, "FloodFill point distance from edge", 1, 25, 10)
         End If
 
@@ -162,7 +162,7 @@ Public Class MFD_FloodFill : Inherits VBparent
         Dim input = src.Clone
         If input.Type <> cv.MatType.CV_8UC1 Then
             sobel.Run(src)
-            input = sobel.dst2.Clone
+            input = sobel.dst3.Clone
         End If
 
         Static saveStepSize As Integer
@@ -200,7 +200,7 @@ Public Class MFD_FloodFill : Inherits VBparent
 
         Dim depthThreshold = fill * fill / 2
         Static lastFrame = input.Clone
-        dst1 = input.Clone
+        dst2 = input.Clone
         For Each rect In imageRects
             Dim edgeCount = input(rect).CountNonZero
             Dim depthCount = task.depth32f(rect).CountNonZero
@@ -210,7 +210,7 @@ Public Class MFD_FloodFill : Inherits VBparent
                 If resetColors Or colorIndex = 0 Then colorIndex = (255 - masks.Count - 1) Mod 255
 
                 Dim floodRect As cv.Rect
-                Dim pixelCount = cv.Cv2.FloodFill(dst1, maskPlus, pt, cv.Scalar.All(colorIndex), floodRect, zero, zero, floodFlag Or (255 << 8))
+                Dim pixelCount = cv.Cv2.FloodFill(dst2, maskPlus, pt, cv.Scalar.All(colorIndex), floodRect, zero, zero, floodFlag Or (255 << 8))
                 If floodRect.Width And floodRect.Height Then
                     floodPoints.Add(pt)
                     Dim m = cv.Cv2.Moments(maskPlus(rect), True)
@@ -223,17 +223,17 @@ Public Class MFD_FloodFill : Inherits VBparent
             End If
         Next
 
-        lastFrame = dst1.Clone
-        palette.Run(dst1)
-        dst1 = palette.dst1
+        lastFrame = dst2.Clone
+        palette.Run(dst2)
+        dst2 = palette.dst2
 
-        dst2 = input.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = input.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each pt In floodPoints
-            dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+            dst3.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
 
         For Each rect In sobel.mfd.motion.intersect.enclosingRects
-            dst2.Rectangle(rect, cv.Scalar.Yellow, 1)
+            dst3.Rectangle(rect, cv.Scalar.Yellow, 1)
         Next
         label2 = sobel.mfd.label2
     End Sub

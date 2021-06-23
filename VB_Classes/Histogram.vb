@@ -38,7 +38,7 @@ Public Class Histogram_Basics : Inherits VBparent
         Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
         If standalone Or task.intermediateName = caller Then plotHist.backColor = splitColors(splitIndex)
         plotHist.Run(src)
-        dst1 = plotHist.dst1
+        dst2 = plotHist.dst2
         label1 = colorName + " histogram, bins = " + CStr(task.histogramBins)
     End Sub
 End Class
@@ -67,9 +67,9 @@ Public Class Histogram_Graph : Inherits VBparent
         Dim dimensions() = New Integer() {bins}
         Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
 
-        Dim plotWidth = dst1.Width / bins
+        Dim plotWidth = dst2.Width / bins
 
-        dst1.SetTo(backColor)
+        dst2.SetTo(backColor)
         For i = 0 To src.Channels - 1
             Dim hist As New cv.Mat
             cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {i}, New cv.Mat(), hist, 1, dimensions, ranges)
@@ -80,16 +80,16 @@ Public Class Histogram_Graph : Inherits VBparent
                 Dim points = New List(Of cv.Point)
                 Dim listOfPoints = New List(Of List(Of cv.Point))
                 For j = 0 To bins - 1
-                    points.Add(New cv.Point(CInt(j * plotWidth), dst1.Rows - dst1.Rows * histRaw(i).Get(Of Single)(j, 0) / maxVal))
+                    points.Add(New cv.Point(CInt(j * plotWidth), dst2.Rows - dst2.Rows * histRaw(i).Get(Of Single)(j, 0) / maxVal))
                 Next
                 listOfPoints.Add(points)
-                dst1.Polylines(listOfPoints, False, plotColors(i), task.lineWidth, task.lineType)
+                dst2.Polylines(listOfPoints, False, plotColors(i), task.lineWidth, task.lineType)
             End If
         Next
 
         If standalone Or plotRequested Then
             plotMaxValue = Math.Round(maxVal / 1000, 0) * 1000 + 1000 ' smooth things out a little for the scale below
-            AddPlotScale(dst1, 0, plotMaxValue, task.fontSize * 2)
+            AddPlotScale(dst2, 0, plotMaxValue, task.fontSize * 2)
             label1 = "Histogram for src image (default color) - " + CStr(bins) + " bins"
         End If
     End Sub
@@ -104,26 +104,26 @@ Module histogram_Functions
     Public Function Histogram_3D_RGB(rgbPtr As IntPtr, rows As Integer, cols As Integer, bins As Integer) As IntPtr
     End Function
 
-    Public Sub histogram2DPlot(histogram As cv.Mat, dst1 As cv.Mat, xBins As Integer, yBins As Integer)
+    Public Sub histogram2DPlot(histogram As cv.Mat, dst2 As cv.Mat, xBins As Integer, yBins As Integer)
         Dim maxVal As Double
         histogram.MinMaxLoc(0, maxVal)
-        Dim xScale = dst1.Cols / xBins
-        Dim yScale = dst1.Rows / yBins
+        Dim xScale = dst2.Cols / xBins
+        Dim yScale = dst2.Rows / yBins
         For y = 0 To yBins - 1
             For x = 0 To xBins - 1
                 Dim binVal = histogram.Get(Of Single)(y, x)
                 Dim intensity = Math.Round(binVal * 255 / maxVal)
                 Dim pt1 = New cv.Point(x * xScale, y * yScale)
                 Dim pt2 = New cv.Point((x + 1) * xScale - 1, (y + 1) * yScale - 1)
-                If pt1.X >= dst1.Cols Then pt1.X = dst1.Cols - 1
-                If pt1.Y >= dst1.Rows Then pt1.Y = dst1.Rows - 1
-                If pt2.X >= dst1.Cols Then pt2.X = dst1.Cols - 1
-                If pt2.Y >= dst1.Rows Then pt2.Y = dst1.Rows - 1
+                If pt1.X >= dst2.Cols Then pt1.X = dst2.Cols - 1
+                If pt1.Y >= dst2.Rows Then pt1.Y = dst2.Rows - 1
+                If pt2.X >= dst2.Cols Then pt2.X = dst2.Cols - 1
+                If pt2.Y >= dst2.Rows Then pt2.Y = dst2.Rows - 1
                 If pt1.X <> pt2.X And pt1.Y <> pt2.Y Then
                     Dim value = cv.Scalar.All(255 - intensity)
-                    'value = New cv.Scalar(pt1.X * 255 / dst1.Cols, pt1.Y * 255 / dst1.Rows, 255 - intensity)
+                    'value = New cv.Scalar(pt1.X * 255 / dst2.Cols, pt1.Y * 255 / dst2.Rows, 255 - intensity)
                     value = New cv.Scalar(intensity, intensity, intensity)
-                    dst1.Rectangle(pt1, pt2, value, -1, task.lineType)
+                    dst2.Rectangle(pt1, pt2, value, -1, task.lineType)
                 End If
             Next
         Next
@@ -168,7 +168,7 @@ Public Class Histogram_NormalizeGray : Inherits VBparent
             cv.Cv2.Normalize(src, src, sliders.trackbar(0).Value, sliders.trackbar(1).Value, cv.NormTypes.MinMax) ' only minMax is working...
         End If
         histogram.Run(src)
-        dst1 = histogram.dst1
+        dst2 = histogram.dst2
     End Sub
 End Class
 
@@ -198,7 +198,7 @@ Public Class Histogram_2D_HueSaturation : Inherits VBparent
 
         cv.Cv2.CalcHist(New cv.Mat() {hsv}, New Integer() {0, 1}, New cv.Mat(), histogram, 2, histSize, ranges)
 
-        histogram2DPlot(histogram, dst1, hbins, sbins)
+        histogram2DPlot(histogram, dst2, hbins, sbins)
     End Sub
 End Class
 
@@ -214,8 +214,8 @@ Public Class Histogram_2D_XZ_YZ : Inherits VBparent
     Dim maxSlider As Windows.Forms.TrackBar
     Public Sub New()
         If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Histogram X bins", 1, dst1.Cols, 30)
-            sliders.setupTrackBar(1, "Histogram Y bins", 1, dst1.Rows, 30)
+            sliders.setupTrackBar(0, "Histogram X bins", 1, dst2.Cols, 30)
+            sliders.setupTrackBar(1, "Histogram Y bins", 1, dst2.Rows, 30)
             sliders.setupTrackBar(2, "Histogram Z bins", 1, 200, 100)
         End If
         task.desc = "Create a 2D histogram for depth in XZ and YZ."
@@ -234,11 +234,11 @@ Public Class Histogram_2D_XZ_YZ : Inherits VBparent
         xyz.Run(src)
         Dim sizesX() = {xbins, zbins}
         cv.Cv2.CalcHist(New cv.Mat() {xyz.xyDepth}, New Integer() {0, 2}, New cv.Mat(), histogram, 2, sizesX, rangesX)
-        histogram2DPlot(histogram, dst1, zbins, xbins)
+        histogram2DPlot(histogram, dst2, zbins, xbins)
 
         Dim sizesY() = {ybins, zbins}
         cv.Cv2.CalcHist(New cv.Mat() {xyz.xyDepth}, New Integer() {1, 2}, New cv.Mat(), histogram, 2, sizesY, rangesY)
-        histogram2DPlot(histogram, dst2, zbins, ybins)
+        histogram2DPlot(histogram, dst3, zbins, ybins)
     End Sub
 End Class
 
@@ -273,16 +273,16 @@ Public Class Histogram_EqualizeColor : Inherits VBparent
             cv.Cv2.Split(src, rgb) ' equalizehist alters the input...
             kalman.plotHist.backColor = cv.Scalar.Red
             kalman.Run(rgb(channel).Clone())
-            mats.mat(0) = kalman.dst1.Clone()
+            mats.mat(0) = kalman.dst2.Clone()
 
             kalmanEq.Run(rgbEq(channel).Clone())
-            mats.mat(1) = kalmanEq.dst1.Clone()
+            mats.mat(1) = kalmanEq.dst2.Clone()
 
             mats.Run(src)
-            dst2 = mats.dst1
+            dst3 = mats.dst2
             label2 = "Before (top) and After Red Histogram"
 
-            cv.Cv2.Merge(rgbEq, dst1)
+            cv.Cv2.Merge(rgbEq, dst2)
         End If
     End Sub
 End Class
@@ -305,12 +305,12 @@ Public Class Histogram_EqualizeGray : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         histogram.Run(src)
-        mats.mat(0) = histogram.dst1.Clone
-        cv.Cv2.EqualizeHist(src, dst1)
-        histogramEq.Run(dst1)
-        mats.mat(1) = histogramEq.dst1
+        mats.mat(0) = histogram.dst2.Clone
+        cv.Cv2.EqualizeHist(src, dst2)
+        histogramEq.Run(dst2)
+        mats.mat(1) = histogramEq.dst2
         mats.Run(src)
-        dst2 = mats.dst1
+        dst3 = mats.dst2
     End Sub
 End Class
 
@@ -333,7 +333,7 @@ Public Class Histogram_Simple : Inherits VBparent
         cv.Cv2.CalcHist(New cv.Mat() {src}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 
         plotHist.Run(src)
-        dst1 = plotHist.dst1
+        dst2 = plotHist.dst2
     End Sub
 End Class
 
@@ -374,12 +374,12 @@ Public Class Histogram_ColorsAndGray : Inherits VBparent
             End If
             histogram.plotHist.backColor = Choose(i + 1, cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red, cv.Scalar.PowderBlue)
             histogram.Run(histSrc)
-            mats.mat(i) = histogram.dst1.Clone()
+            mats.mat(i) = histogram.dst2.Clone()
         Next
 
         mats.Run(src)
-        dst1 = mats.dst1
         dst2 = mats.dst2
+        dst3 = mats.dst3
     End Sub
 End Class
 
@@ -402,19 +402,19 @@ Public Class Histogram_SmoothTopView2D : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         topView.gCloud.Run(src)
 
-        stable.Run(topView.gCloud.dst1)
+        stable.Run(topView.gCloud.dst2)
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(-task.maxX, task.maxX)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {stable.dst2}, New Integer() {2, 0}, New cv.Mat, topView.histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {stable.dst3}, New Integer() {2, 0}, New cv.Mat, topView.histOutput, 2, histSize, ranges)
 
         topView.histOutput = topView.histOutput.Flip(cv.FlipMode.X)
-        dst1 = topView.histOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary)
-        dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        dst2 = topView.histOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
 
-        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        setupTop.Run(dst2)
-        dst2 = setupTop.dst1
+        dst3 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        setupTop.Run(dst3)
+        dst3 = setupTop.dst2
     End Sub
 End Class
 
@@ -435,18 +435,18 @@ Public Class Histogram_SmoothSideView2D : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         sideView.gCloud.Run(src)
 
-        stable.Run(sideView.gCloud.dst1)
+        stable.Run(sideView.gCloud.dst2)
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.maxY, task.maxY), New cv.Rangef(0, task.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {stable.dst2}, New Integer() {1, 2}, New cv.Mat, sideView.histOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {stable.dst3}, New Integer() {1, 2}, New cv.Mat, sideView.histOutput, 2, histSize, ranges)
 
-        dst1 = sideView.histOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary)
-        dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        dst2 = sideView.histOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
 
-        dst2 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        setupSide.Run(dst2)
-        dst2 = setupSide.dst1
+        dst3 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        setupSide.Run(dst3)
+        dst3 = setupSide.dst2
     End Sub
 End Class
 
@@ -466,9 +466,9 @@ Public Class Histogram_StableDepthClusters : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         motionSD.Run(src)
-        clusters.Run(motionSD.dst1)
-        dst1 = clusters.dst1
+        clusters.Run(motionSD.dst2)
         dst2 = clusters.dst2
+        dst3 = clusters.dst3
     End Sub
 End Class
 
@@ -497,12 +497,12 @@ Public Class Histogram_TopView2D : Inherits VBparent
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(-task.maxX, task.maxX)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {2, 0}, New cv.Mat, originalHistOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {2, 0}, New cv.Mat, originalHistOutput, 2, histSize, ranges)
 
         originalHistOutput = originalHistOutput.Flip(cv.FlipMode.X)
         histOutput = originalHistOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary)
-        dst1 = histOutput.Clone
-        dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        dst2 = histOutput.Clone
+        dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
     End Sub
 End Class
 
@@ -528,10 +528,10 @@ Public Class Histogram_SideView2D : Inherits VBparent
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.maxY, task.maxY), New cv.Rangef(0, task.maxZ)}
         Dim histSize() = {task.pointCloud.Height, task.pointCloud.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {1, 2}, New cv.Mat, originalHistOutput, 2, histSize, ranges)
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {1, 2}, New cv.Mat, originalHistOutput, 2, histSize, ranges)
 
-        histOutput = originalHistOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
-        histOutput.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        histOutput = originalHistOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).Resize(dst2.Size)
+        histOutput.ConvertTo(dst2, cv.MatType.CV_8UC1)
     End Sub
 End Class
 
@@ -547,23 +547,23 @@ End Class
 Public Class Histogram_ViewIntersections : Inherits VBparent
     Dim histCO As New Histogram_ViewObjects
     Public Sub New()
-        label1 = "Yellow is largest intersection.  dst2 = point cloud"
+        label1 = "Yellow is largest intersection.  dst3 = point cloud"
         task.desc = "Find the intersections of the rectangles found in the Histogram_ConcentrationObjects"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
         histCO.Run(src)
-        dst1 = histCO.dst2
+        dst2 = histCO.dst3
 
         Dim offset = If(src.Width = 1280, 10, 16)
-        Dim w = dst1.Width
-        Dim h = dst1.Height
+        Dim w = dst2.Width
+        Dim h = dst2.Height
         Dim minZ As Single, maxZ As Single
         Dim rIntersect As New List(Of cv.Rect)
         Dim yRange As New List(Of cv.Vec2f)
         For Each r In histCO.side2D
-            minZ = task.maxZ * r.X / dst1.Width
-            maxZ = task.maxZ * (r.X + r.Width) / dst1.Width
+            minZ = task.maxZ * r.X / dst2.Width
+            maxZ = task.maxZ * (r.X + r.Width) / dst2.Width
             Dim newRect = New cv.Rect(0, h - h * minZ / task.maxZ - r.Width, w, r.Width)
             For Each r2 In histCO.top2D
                 Dim rNext = r2.Intersect(newRect)
@@ -585,19 +585,19 @@ Public Class Histogram_ViewIntersections : Inherits VBparent
         Next
 
         If rIntersect.Count > 0 Then
-            dst1.Rectangle(rIntersect(maxIndex), cv.Scalar.Yellow, 2)
+            dst2.Rectangle(rIntersect(maxIndex), cv.Scalar.Yellow, 2)
             minZ = task.maxZ * (h - rIntersect(maxIndex).Y - rIntersect(maxIndex).Height) / h
             maxZ = task.maxZ * (h - rIntersect(maxIndex).Y) / h
             setTrueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", rIntersect(maxIndex).X, rIntersect(maxIndex).Y - offset)
 
-            Dim pc = histCO.histC.sideview.gCloud.dst1
+            Dim pc = histCO.histC.sideview.gCloud.dst2
             Dim split = pc.Split()
             Dim mask As New cv.Mat
             cv.Cv2.InRange(split(2), minZ, maxZ, mask)
             cv.Cv2.BitwiseNot(mask, mask)
             split(2).SetTo(0, mask)
 
-            cv.Cv2.Merge(split, dst2)
+            cv.Cv2.Merge(split, dst3)
         End If
     End Sub
 End Class
@@ -627,34 +627,34 @@ Public Class Histogram_ViewObjects : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         histC.Run(src)
 
-        dst1 = histC.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
         dst2 = histC.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst3 = histC.dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        flood.Run(dst1)
-        dst1 = flood.dst1.Clone
+        flood.Run(dst2)
+        dst2 = flood.dst2.Clone
 
         Dim offset = If(src.Width = 1280, 10, 16)
-        Dim w = dst1.Width
-        Dim h = dst1.Height
+        Dim w = dst2.Width
+        Dim h = dst2.Height
         Dim minZ As Single, maxZ As Single
         side2D.Clear()
 
         For Each r In flood.rects
             side2D.Add(r)
-            dst1.Rectangle(r, cv.Scalar.White, 1)
+            dst2.Rectangle(r, cv.Scalar.White, 1)
             minZ = task.maxZ * r.X / w
             maxZ = task.maxZ * (r.X + r.Width) / w
             If standalone Or task.intermediateName = caller Then setTrueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset)
         Next
         label1 = CStr(flood.rects.Count) + " objects were identified in the side view"
 
-        flood.Run(dst2)
-        dst2 = flood.dst1
+        flood.Run(dst3)
+        dst3 = flood.dst2
 
         top2D.Clear()
         For Each r In flood.rects
             top2D.Add(r)
-            dst2.Rectangle(r, cv.Scalar.White, 1)
+            dst3.Rectangle(r, cv.Scalar.White, 1)
             minZ = task.maxZ * (h - r.Y - r.Height) / h
             maxZ = task.maxZ * (h - r.Y) / h
             If standalone Or task.intermediateName = caller Then setTrueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset, 3)
@@ -692,8 +692,8 @@ Public Class Histogram_Frustrum : Inherits VBparent
 
         sideFrustrumSlider.Value = 100 * 2 * task.maxY / task.maxZ
         topFrustrumSlider.Value = 100 * 2 * task.maxX / task.maxZ
-        cameraXSlider.Value = task.topCameraPoint.X - dst1.Width / 2
-        cameraYSlider.Value = task.sideCameraPoint.Y - dst1.Height / 2
+        cameraXSlider.Value = task.topCameraPoint.X - dst2.Width / 2
+        cameraYSlider.Value = task.sideCameraPoint.Y - dst2.Height / 2
         task.desc = "The global options for the side and top view.  See OptionCommon_Histogram to make settings permanent."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -703,8 +703,8 @@ Public Class Histogram_Frustrum : Inherits VBparent
         task.topCameraPoint = New cv.Point(CInt(src.Width / 2 + cameraXSlider.Value), CInt(src.Height))
 
         tView.Run(src)
-        dst1 = tView.dst1
         dst2 = tView.dst2
+        dst3 = tView.dst3
 
         If standalone Then
             setTrueText("This algorithm was created to tune the frustrum and camera locations." + vbCrLf +
@@ -738,7 +738,7 @@ Public Class Histogram_Depth : Inherits VBparent
 
         If standalone Or task.intermediateName = caller Then
             plotHist.Run(src)
-            dst1 = plotHist.dst1
+            dst2 = plotHist.dst2
         End If
         label1 = "Histogram Depth: " + Format(plotHist.minRange / 1000, "0.0") + "m to " + Format(plotHist.maxRange / 1000, "0.0") + " m"
     End Sub
@@ -764,11 +764,11 @@ Public Class Histogram_TopData : Inherits VBparent
         gCloud.Run(src)
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZ), New cv.Rangef(-task.maxX, task.maxX)}
-        Dim histSize() = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
+        Dim histSize() = {dst3.Height, dst3.Width}
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {2, 0}, New cv.Mat, histOutput, 2, histSize, ranges)
         histOutput.Row(0).SetTo(0) ' this removes the samples for the areas with no depth.
 
-        dst1 = histOutput.Flip(cv.FlipMode.X).Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).Resize(dst1.Size)
+        dst2 = histOutput.Flip(cv.FlipMode.X).Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).Resize(dst2.Size)
         label1 = "Left x = " + Format(-task.maxX, "#0.00") + " Right X = " + Format(task.maxX, "#0.00") + " x and y scales differ!"
     End Sub
 End Class
@@ -792,11 +792,11 @@ Public Class Histogram_SideData : Inherits VBparent
         gCloud.Run(src)
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(-task.maxY, task.maxY), New cv.Rangef(0, task.maxZ)}
-        Dim histSize() = {dst2.Height, dst2.Width}
-        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst1}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
+        Dim histSize() = {dst3.Height, dst3.Width}
+        cv.Cv2.CalcHist(New cv.Mat() {gCloud.dst2}, New Integer() {1, 2}, New cv.Mat, histOutput, 2, histSize, ranges)
         histOutput.Col(0).SetTo(0) ' this removes the samples for the areas with no depth.
 
-        dst1 = histOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary)
+        dst2 = histOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary)
         label1 = "Top y = " + Format(-task.maxY, "#0.00") + " Bottom Y = " + Format(task.maxY, "#0.00") + " x and y scales differ!"
     End Sub
 End Class
@@ -818,10 +818,10 @@ Public Class Histogram_BothViews : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         sideview.Run(src)
-        dst1 = sideview.dst1
+        dst2 = sideview.dst2
 
         topview.Run(src)
-        dst2 = topview.dst1
+        dst3 = topview.dst2
     End Sub
 End Class
 
@@ -840,7 +840,7 @@ Public Class Histogram_Peaks : Inherits VBparent
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         hist.Run(src)
-        dst1 = hist.dst1
+        dst2 = hist.dst2
 
         Dim histogram = hist.histogram
         Dim peaks As New List(Of Integer)
@@ -879,14 +879,14 @@ Public Class Histogram_Peaks : Inherits VBparent
         Next
 
         histogram.MinMaxLoc(minVal, maxVal)
-        Dim barWidth = dst1.Width / histogram.Rows
+        Dim barWidth = dst2.Width / histogram.Rows
         For i = 0 To peaks.Count - 1
-            Dim h = CInt(hCount(i) * dst1.Height / maxVal)
-            cv.Cv2.Rectangle(dst1, New cv.Rect(peaks(i) * barWidth, dst1.Height - h, barWidth, h), cv.Scalar.Yellow, 2)
+            Dim h = CInt(hCount(i) * dst2.Height / maxVal)
+            cv.Cv2.Rectangle(dst2, New cv.Rect(peaks(i) * barWidth, dst2.Height - h, barWidth, h), cv.Scalar.Yellow, 2)
         Next
         For i = 0 To valleys.Count - 1
-            Dim h = CInt(vCount(i) * dst1.Height / maxVal)
-            cv.Cv2.Rectangle(dst1, New cv.Rect(valleys(i) * barWidth, dst1.Height - h, barWidth, h), cv.Scalar.Blue, 2)
+            Dim h = CInt(vCount(i) * dst2.Height / maxVal)
+            cv.Cv2.Rectangle(dst2, New cv.Rect(valleys(i) * barWidth, dst2.Height - h, barWidth, h), cv.Scalar.Blue, 2)
         Next
 
         If valleys.Count > 0 Then
@@ -902,7 +902,7 @@ Public Class Histogram_Peaks : Inherits VBparent
                 Next
                 startLut = endLut + 1
             Next
-            dst2 = src.LUT(myLut)
+            dst3 = src.LUT(myLut)
             label1 = "Grayscale image: " + CStr(peaks.Count) + " peaks (yellow), valley=blue"
         End If
     End Sub
@@ -925,12 +925,12 @@ Public Class Histogram_PeaksRGB : Inherits VBparent
 
         For i = 0 To 3 - 1
             peaks.Run(split(i))
-            mats.mat(i) = peaks.dst2.Clone
+            mats.mat(i) = peaks.dst3.Clone
         Next
 
         mats.Run(src)
-        dst1 = mats.dst1
         dst2 = mats.dst2
+        dst3 = mats.dst3
     End Sub
 End Class
 
@@ -953,12 +953,12 @@ Public Class Histogram_PeakEdges : Inherits VBparent
 
         For i = 0 To 3 - 1
             edges.Run(peaks.mats.mat(i))
-            mats.mat(i) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            If i = 0 Then dst2 = mats.mat(i) Else cv.Cv2.BitwiseAnd(dst2, mats.mat(i), dst2)
+            mats.mat(i) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+            If i = 0 Then dst3 = mats.mat(i) Else cv.Cv2.BitwiseAnd(dst3, mats.mat(i), dst3)
         Next
 
         mats.Run(src)
-        dst1 = mats.dst1
+        dst2 = mats.dst2
     End Sub
 End Class
 
@@ -979,23 +979,23 @@ Public Class Histogram_PeakMax : Inherits VBparent
         task.useKalman = False
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         hist.Run(src)
-        dst2 = hist.dst1
+        dst3 = hist.dst2
 
         Dim minVal As Single, maxVal As Single
         Dim minIdx As cv.Point, maxIdx As cv.Point
         hist.histogram.MinMaxLoc(minVal, maxVal, minIdx, maxIdx)
-        Dim barWidth = dst1.Width / task.histogramBins
+        Dim barWidth = dst2.Width / task.histogramBins
         Dim barRange = 255 / task.histogramBins
         Dim histindex = maxIdx.Y
         Dim pixelMin = CInt((histindex) * barRange)
         Dim pixelMax = CInt((histindex + 1) * barRange)
 
         Dim mask = src.InRange(pixelMin, pixelMax).Threshold(1, 255, cv.ThresholdTypes.Binary)
-        Dim tmp = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        Dim tmp = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         src.CopyTo(tmp, mask)
-        dst1 = tmp.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst2 = tmp.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         label1 = "BackProjection of most frequent gray pixel"
-        dst2.Rectangle(New cv.Rect(barWidth * histindex, 0, barWidth, dst1.Height), cv.Scalar.Yellow, 1)
+        dst3.Rectangle(New cv.Rect(barWidth * histindex, 0, barWidth, dst2.Height), cv.Scalar.Yellow, 1)
     End Sub
 End Class

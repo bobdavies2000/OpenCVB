@@ -32,11 +32,11 @@ Public Class Area_MinTriangle_CPP : Inherits VBparent
         If numberOfPoints <> pointCountSlider.Value Then setup()
         Dim squareWidth = sizeSlider.Value / 2
 
-        dst1.SetTo(0)
+        dst2.SetTo(0)
         For i = 0 To srcPoints.Length - 1
             srcPoints(i).X = msRNG.Next(src.Width / 2 - squareWidth, src.Width / 2 + squareWidth)
             srcPoints(i).Y = msRNG.Next(src.Height / 2 - squareWidth, src.Height / 2 + squareWidth)
-            dst1.Circle(srcPoints(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
+            dst2.Circle(srcPoints(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
         Next
 
         Dim input As New cv.Mat(numberOfPoints, 1, cv.MatType.CV_32FC2, srcPoints)
@@ -51,7 +51,7 @@ Public Class Area_MinTriangle_CPP : Inherits VBparent
         For i = 0 To 2
             Dim p1 = triangle.Get(Of cv.Point2f)(i)
             Dim p2 = triangle.Get(Of cv.Point2f)((i + 1) Mod 3)
-            dst1.Line(p1, p2, cv.Scalar.White, task.lineWidth + 1, task.lineType)
+            dst2.Line(p1, p2, cv.Scalar.White, task.lineWidth + 1, task.lineType)
         Next
     End Sub
 End Class
@@ -84,15 +84,15 @@ Public Class Area_MinRect : Inherits VBparent
         If numberOfPoints <> pointCountSlider.Value Then setup(pointCountSlider.value)
         Dim squareWidth = sizeSlider.Value / 2
 
-        dst1.SetTo(0)
+        dst2.SetTo(0)
         For i = 0 To srcPoints.Length - 1
             srcPoints(i).X = msRNG.Next(src.Width / 2 - squareWidth, src.Width / 2 + squareWidth)
             srcPoints(i).Y = msRNG.Next(src.Height / 2 - squareWidth, src.Height / 2 + squareWidth)
-            dst1.Circle(srcPoints(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
+            dst2.Circle(srcPoints(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
         Next
 
         minRect = cv.Cv2.MinAreaRect(srcPoints)
-        drawRotatedRectangle(minRect, dst1, cv.Scalar.Yellow)
+        drawRotatedRectangle(minRect, dst2, cv.Scalar.Yellow)
     End Sub
 End Class
 
@@ -122,9 +122,9 @@ Public Class Area_MinMotionRect : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         bgSub.Run(src)
         Dim gray As cv.Mat
-        If bgSub.dst1.Channels = 1 Then gray = bgSub.dst1 Else gray = bgSub.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = motionRectangles(gray, task.vecColors)
-        dst1.SetTo(cv.Scalar.All(255), gray)
+        If bgSub.dst2.Channels = 1 Then gray = bgSub.dst2 Else gray = bgSub.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = motionRectangles(gray, task.vecColors)
+        dst2.SetTo(cv.Scalar.All(255), gray)
     End Sub
 End Class
 
@@ -151,10 +151,10 @@ Public Class Area_FindNonZero : Inherits VBparent
 
         Dim nonzero = gray.FindNonZero()
 
-        dst2 = gray.EmptyClone().SetTo(0)
+        dst3 = gray.EmptyClone().SetTo(0)
         ' mark the points so they are visible...
         For i = 0 To srcPoints.Length - 1
-            dst2.Circle(srcPoints(i), task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
+            dst3.Circle(srcPoints(i), task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
         Next
 
         Dim outstr As String = "Coordinates of the non-zero points (ordered by row - top to bottom): " + vbCrLf + vbCrLf

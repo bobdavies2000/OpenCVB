@@ -37,7 +37,7 @@ Public Class Kalman_Basics : Inherits VBparent
         End If
 
         If standalone Then
-            dst1 = src
+            dst2 = src
             Dim rect = New cv.Rect(CInt(kOutput(0)), CInt(kOutput(1)), CInt(kOutput(2)), CInt(kOutput(3)))
             rect = validateRect(rect)
             Static lastRect = rect
@@ -46,8 +46,8 @@ Public Class Kalman_Basics : Inherits VBparent
                 kInput = New Single() {r.X, r.Y, r.Width, r.Height}
             End If
             lastRect = rect
-            dst1.Rectangle(rect, cv.Scalar.White, 6)
-            dst1.Rectangle(rect, cv.Scalar.Red, 1)
+            dst2.Rectangle(rect, cv.Scalar.White, 6)
+            dst2.Rectangle(rect, cv.Scalar.Red, 1)
         End If
         If task.intermediateName = caller Then
             Dim str = "The kalman output is: "
@@ -103,7 +103,7 @@ Public Class Kalman_Stripped : Inherits VBparent
         End If
 
         If standalone Or task.intermediateName = caller Then
-            dst1 = src.Clone()
+            dst2 = src.Clone()
             Dim rect = New cv.Rect(CInt(kOutput(0)), CInt(kOutput(1)), CInt(kOutput(2)), CInt(kOutput(3)))
             rect = validateRect(rect)
             Static lastRect = rect
@@ -112,8 +112,8 @@ Public Class Kalman_Stripped : Inherits VBparent
                 kInput = New Single() {r.X, r.Y, r.Width, r.Height}
             End If
             lastRect = rect
-            dst1.Rectangle(rect, cv.Scalar.White, 6)
-            dst1.Rectangle(rect, cv.Scalar.Red, 1)
+            dst2.Rectangle(rect, cv.Scalar.White, 6)
+            dst2.Rectangle(rect, cv.Scalar.Red, 1)
         End If
     End Sub
 End Class
@@ -162,7 +162,7 @@ Public Class Kalman_Compare : Inherits VBparent
 
         plot.plotData = src.Mean()
         plot.Run(Nothing)
-        dst1 = plot.dst1
+        dst2 = plot.dst2
 
         For i = 0 To kalman.Count - 1
             kalman(i).inputReal = plot.plotData.Item(i)
@@ -173,7 +173,7 @@ Public Class Kalman_Compare : Inherits VBparent
         kPlot.minScale = plot.minScale
         kPlot.plotData = New cv.Scalar(kalman(0).stateResult, kalman(1).stateResult, kalman(2).stateResult)
         kplot.Run(Nothing)
-        dst2 = kPlot.dst1
+        dst3 = kPlot.dst2
     End Sub
 End Class
 
@@ -193,10 +193,10 @@ Public Class Kalman_RotatingPoint : Inherits VBparent
     Private Function calcPoint(center As cv.Point2f, R As Double, angle As Double) As cv.Point
         Return center + New cv.Point2f(Math.Cos(angle), -Math.Sin(angle)) * R
     End Function
-    Private Sub drawCross(dst1 As cv.Mat, center As cv.Point, color As cv.Scalar)
+    Private Sub drawCross(dst2 As cv.Mat, center As cv.Point, color As cv.Scalar)
         Dim d = 3
-        dst1.Line(New cv.Point(center.X - d, center.Y - d), New cv.Point(center.X + d, center.Y + d), color, task.lineWidth, task.lineType)
-        dst1.Line(New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, task.lineWidth, task.lineType)
+        dst2.Line(New cv.Point(center.X - d, center.Y - d), New cv.Point(center.X + d, center.Y + d), color, task.lineWidth, task.lineType)
+        dst2.Line(New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, task.lineWidth, task.lineType)
     End Sub
     Public Sub New()
         label1 = "Estimate Yellow < Real Red (if working)"
@@ -209,8 +209,8 @@ Public Class Kalman_RotatingPoint : Inherits VBparent
         cv.Cv2.SetIdentity(kf.MeasurementNoiseCov, cv.Scalar.All(0.1))
         cv.Cv2.SetIdentity(kf.ErrorCovPost, cv.Scalar.All(1))
         cv.Cv2.Randn(kf.StatePost, New cv.Scalar(0), cv.Scalar.All(1))
-        radius = dst1.Rows / 2.4 ' so we see the entire circle...
-        center = New cv.Point2f(dst1.Cols / 2, dst1.Rows / 2)
+        radius = dst2.Rows / 2.4 ' so we see the entire circle...
+        center = New cv.Point2f(dst2.Cols / 2, dst2.Rows / 2)
         task.desc = "Track a rotating point using a Kalman filter. Yellow line (estimate) should be shorter than red (real)."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -227,12 +227,12 @@ Public Class Kalman_RotatingPoint : Inherits VBparent
         Dim measAngle = measurement.Get(Of Single)(0)
         Dim measPt = calcPoint(center, radius, measAngle)
 
-        dst1.SetTo(0)
-        drawCross(dst1, statePt, cv.Scalar.White)
-        drawCross(dst1, measPt, cv.Scalar.White)
-        drawCross(dst1, predictPt, cv.Scalar.White)
-        dst1.Line(statePt, measPt, New cv.Scalar(0, 0, 255), task.lineWidth + 2, task.lineType)
-        dst1.Line(statePt, predictPt, New cv.Scalar(0, 255, 255), task.lineWidth + 2, task.lineType)
+        dst2.SetTo(0)
+        drawCross(dst2, statePt, cv.Scalar.White)
+        drawCross(dst2, measPt, cv.Scalar.White)
+        drawCross(dst2, predictPt, cv.Scalar.White)
+        dst2.Line(statePt, measPt, New cv.Scalar(0, 0, 255), task.lineWidth + 2, task.lineType)
+        dst2.Line(statePt, predictPt, New cv.Scalar(0, 255, 255), task.lineWidth + 2, task.lineType)
 
         If msRNG.Next(0, 4) <> 0 Then kf.Correct(measurement)
 
@@ -255,20 +255,20 @@ Public Class Kalman_MousePredict : Inherits VBparent
         ReDim kalman.kInput(2 - 1)
         ReDim kalman.kOutput(2 - 1)
 
-        lineWidth = dst1.Width / 300
+        lineWidth = dst2.Width / 300
         label1 = "Red is real mouse, white is prediction"
         task.desc = "Use kalman filter to predict the next mouse location."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If task.frameCount Mod 100 = 0 Then dst1.SetTo(0)
+        If task.frameCount Mod 100 = 0 Then dst2.SetTo(0)
 
         Static lastRealMouse = task.mousePoint
         kalman.kInput(0) = task.mousePoint.X
         kalman.kInput(1) = task.mousePoint.Y
         Dim lastStateResult = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
         kalman.Run(src)
-        dst1.Line(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), lastStateResult, cv.Scalar.All(255), lineWidth, task.lineType)
-        dst1.Line(task.mousePoint, lastRealMouse, New cv.Scalar(0, 0, 255), lineWidth, task.lineType)
+        dst2.Line(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), lastStateResult, cv.Scalar.All(255), lineWidth, task.lineType)
+        dst2.Line(task.mousePoint, lastRealMouse, New cv.Scalar(0, 0, 255), lineWidth, task.lineType)
         lastRealMouse = task.mousePoint
     End Sub
 End Class
@@ -325,7 +325,7 @@ Public Class Kalman_CVMat : Inherits VBparent
             For i = 0 To input.Rows - 1
                 rx(i) = output.Get(Of Single)(i, 0)
             Next
-            dst1 = src
+            dst2 = src
             Dim rect = New cv.Rect(CInt(rx(0)), CInt(rx(1)), CInt(rx(2)), CInt(rx(3)))
             rect = validateRect(rect)
 
@@ -335,7 +335,7 @@ Public Class Kalman_CVMat : Inherits VBparent
                 Dim array() As Single = {r.X, r.Y, r.Width, r.Height}
                 input = New cv.Mat(4, 1, cv.MatType.CV_32F, array)
             End If
-            dst1.Rectangle(rect, cv.Scalar.Red, 2)
+            dst2.Rectangle(rect, cv.Scalar.Red, 2)
             lastRect = rect
         End If
     End Sub
@@ -361,18 +361,18 @@ Public Class Kalman_ImageSmall : Inherits VBparent
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         resize.Run(src)
 
-        Dim saveOriginal = resize.dst1.Clone()
+        Dim saveOriginal = resize.dst2.Clone()
         Dim gray32f As New cv.Mat
-        resize.dst1.ConvertTo(gray32f, cv.MatType.CV_32F)
+        resize.dst2.ConvertTo(gray32f, cv.MatType.CV_32F)
         kalman.input = gray32f.Reshape(1, gray32f.Width * gray32f.Height)
         kalman.Run(src)
         Dim tmp As New cv.Mat
         kalman.output.ConvertTo(tmp, cv.MatType.CV_8U)
         tmp = tmp.Reshape(1, gray32f.Height)
-        dst1 = tmp.Resize(dst1.Size())
-        cv.Cv2.Subtract(tmp, saveOriginal, dst2)
-        dst2 = dst2.Threshold(1, 255, cv.ThresholdTypes.Binary)
-        dst2 = dst2.Resize(dst1.Size())
+        dst2 = tmp.Resize(dst2.Size())
+        cv.Cv2.Subtract(tmp, saveOriginal, dst3)
+        dst3 = dst3.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst3 = dst3.Resize(dst2.Size())
     End Sub
 End Class
 
@@ -389,8 +389,8 @@ Public Class Kalman_DepthSmall : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         kalman.Run(task.RGBDepth)
-        dst1 = kalman.dst1
         dst2 = kalman.dst2
+        dst3 = kalman.dst3
     End Sub
 End Class
 
@@ -414,12 +414,12 @@ Public Class Kalman_Depth32f : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         resize.Run(task.depth32f)
 
-        kalman.input = resize.dst1.Reshape(1, resize.dst1.Width * resize.dst1.Height)
+        kalman.input = resize.dst2.Reshape(1, resize.dst2.Width * resize.dst2.Height)
         kalman.Run(src)
-        dst1 = kalman.output.Reshape(1, resize.dst1.Height)
-        dst1 = dst1.Resize(src.Size())
-        cv.Cv2.Subtract(dst1, task.depth32f, dst2)
-        dst2 = dst2.Normalize(255)
+        dst2 = kalman.output.Reshape(1, resize.dst2.Height)
+        dst2 = dst2.Resize(src.Size())
+        cv.Cv2.Subtract(dst2, task.depth32f, dst3)
+        dst3 = dst3.Normalize(255)
     End Sub
 End Class
 
@@ -453,8 +453,8 @@ Public Class Kalman_Single : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
         If standalone Or task.intermediateName = caller Then
-            dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            inputReal = dst1.Mean().Item(0)
+            dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            inputReal = dst2.Mean().Item(0)
         End If
 
         Dim prediction = kf.Predict()
@@ -463,7 +463,7 @@ Public Class Kalman_Single : Inherits VBparent
         If standalone Or task.intermediateName = caller Then
             plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
             plot.Run(Nothing)
-            dst2 = plot.dst1
+            dst3 = plot.dst2
             label1 = "Mean of the grayscale image is predicted"
             label2 = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
         End If
@@ -640,7 +640,7 @@ Public Class Kalman_VB_Basics : Inherits VBparent
     Public Sub New()
         plot.plotCount = 3
         plot.topBottomPad = 20
-        plot.dst1 = dst1
+        plot.dst2 = dst2
 
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Average input count", 1, 500, 20)

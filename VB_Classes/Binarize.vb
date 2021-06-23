@@ -14,7 +14,7 @@ Public Class Binarize_Basics : Inherits VBparent
     Dim blur As New Blur_Basics
     Public useBlur As Boolean
     Public Sub New()
-        mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 255)
+        mask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
         task.desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -25,9 +25,9 @@ Public Class Binarize_Basics : Inherits VBparent
 
         If useBlur Then
             blur.Run(input)
-            dst1 = blur.dst1.Threshold(meanScalar(0), 255, thresholdType)
+            dst2 = blur.dst2.Threshold(meanScalar(0), 255, thresholdType)
         Else
-            dst1 = input.Threshold(meanScalar(0), 255, thresholdType)
+            dst2 = input.Threshold(meanScalar(0), 255, thresholdType)
         End If
     End Sub
 End Class
@@ -77,7 +77,7 @@ Public Class Binarize_OTSU : Inherits VBparent
                 binarize.thresholdType = cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu
         End Select
         binarize.Run(input)
-        dst1 = binarize.dst1
+        dst2 = binarize.dst2
     End Sub
 End Class
 
@@ -106,9 +106,9 @@ Public Class Binarize_Niblack_Sauvola : Inherits VBparent
 
         Dim grayBin As New cv.Mat
         cv.Extensions.Binarizer.Niblack(input, grayBin, kernelSize, sliders.trackbar(1).Value / 1000)
-        dst1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cv.Extensions.Binarizer.Sauvola(input, grayBin, kernelSize, sliders.trackbar(2).Value / 1000, sliders.trackbar(3).Value)
         dst2 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Extensions.Binarizer.Sauvola(input, grayBin, kernelSize, sliders.trackbar(2).Value / 1000, sliders.trackbar(3).Value)
+        dst3 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -135,9 +135,9 @@ Public Class Binarize_Niblack_Nick : Inherits VBparent
 
         Dim grayBin As New cv.Mat
         cv.Extensions.Binarizer.Niblack(input, grayBin, kernelSize, sliders.trackbar(1).Value / 1000)
-        dst1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cv.Extensions.Binarizer.Nick(input, grayBin, kernelSize, sliders.trackbar(2).Value / 1000)
         dst2 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        cv.Extensions.Binarizer.Nick(input, grayBin, kernelSize, sliders.trackbar(2).Value / 1000)
+        dst3 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -167,7 +167,7 @@ Public Class Binarize_Bernson : Inherits VBparent
         Else
             cv.Extensions.Binarizer.Bernsen(gray(task.drawRect), grayBin(task.drawRect), kernelSize, sliders.trackbar(1).Value, sliders.trackbar(2).Value)
         End If
-        dst1 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -205,7 +205,7 @@ Public Class Binarize_Bernson_MT : Inherits VBparent
             Sub(roi)
                 Dim grayBin = input(roi).Clone()
                 cv.Extensions.Binarizer.Bernsen(input(roi), grayBin, kernelSize, contrastMin, bgThreshold)
-                dst1(roi) = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                dst2(roi) = grayBin.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             End Sub)
     End Sub
 End Class
@@ -231,10 +231,10 @@ Public Class Binarize_Reduction : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim tmp = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         reduction.Run(tmp)
-        dst1 = reduction.dst1.Threshold(reduction.maskVal / 2, 255, cv.ThresholdTypes.Binary)
+        dst2 = reduction.dst2.Threshold(reduction.maskVal / 2, 255, cv.ThresholdTypes.Binary)
 
         basics.Run(tmp)
-        dst2 = basics.dst1
+        dst3 = basics.dst2
     End Sub
 End Class
 
@@ -247,7 +247,7 @@ Public Class Binarize_Simple : Inherits VBparent
     Public meanScalar As cv.Scalar
     Public mask As New cv.Mat
     Public Sub New()
-        mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 255)
+        mask = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 255)
 
         task.desc = "Binarize an image using Threshold with OTSU."
     End Sub
@@ -265,7 +265,7 @@ Public Class Binarize_Simple : Inherits VBparent
             meanScalar = cv.Cv2.Mean(input)
         End If
 
-        dst1 = input.Threshold(meanScalar(0), 255, cv.ThresholdTypes.Binary)
+        dst2 = input.Threshold(meanScalar(0), 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -288,20 +288,20 @@ Public Class Binarize_Recurse : Inherits VBparent
 
         binarize.mask = New cv.Mat
         binarize.Run(gray)
-        mats.mat(0) = binarize.dst1.Clone
+        mats.mat(0) = binarize.dst2.Clone
 
         binarize.mask = mats.mat(0)
         binarize.Run(gray)
-        mats.mat(1) = binarize.dst1.Clone
+        mats.mat(1) = binarize.dst2.Clone
 
         cv.Cv2.BitwiseNot(mats.mat(0), mats.mat(2))
         binarize.mask = mats.mat(0).Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
         binarize.Run(gray)
-        mats.mat(3) = binarize.dst1.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        mats.mat(3) = binarize.dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
 
         mats.Run(src)
-        dst1 = mats.dst1
         dst2 = mats.dst2
+        dst3 = mats.dst3
         label2 = mats.label2
     End Sub
 End Class

@@ -13,17 +13,17 @@ Public Class FREAK_Basics : Inherits VBparent
         Dim fdesc = New cv.Mat
         freak.Compute(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), orb.keypoints, fDesc)
 
-        dst1 = src.Clone()
+        dst2 = src.Clone()
 
         For Each kpt In orb.keypoints
             Dim r = kpt.Size / 2
-            dst1.Circle(kpt.Pt, r, cv.Scalar.Green, -1, task.lineType)
-            dst1.Line(New cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), cv.Scalar.Green)
-            dst1.Line(New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), cv.Scalar.Green)
+            dst2.Circle(kpt.Pt, r, cv.Scalar.Green, -1, task.lineType)
+            dst2.Line(New cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), cv.Scalar.Green)
+            dst2.Line(New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), cv.Scalar.Green)
         Next
         label1 = CStr(orb.keypoints.Count) + " key points were identified"
         label2 = CStr(orb.keypoints.Count) + " FREAK Descriptors (resized) One row = keypoint"
-        If fDesc.Width > 0 And fDesc.Height > 0 Then dst2 = fDesc.Resize(dst2.Size())
+        If fDesc.Width > 0 And fDesc.Height > 0 Then dst3 = fDesc.Resize(dst3.Size())
     End Sub
 End Class
 

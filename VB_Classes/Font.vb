@@ -12,13 +12,13 @@ Public Class Font_OpenCV : Inherits VBparent
                                  "HersheyScriptSimplex", "HersheySimplex", "HersheyTriplex", "Italic")
         label1 = hersheyName
         label2 = "Italicized " + hersheyName
-        dst1.SetTo(0)
         dst2.SetTo(0)
+        dst3.SetTo(0)
         For i = 1 To 10
             Dim size = 1.5 - i * 0.1
-            cv.Cv2.PutText(dst1, hersheyName + " " + Format(size, "#0.0"), New cv.Point(10, 30 + i * 30), hersheyFont, size, cv.Scalar.White, task.lineWidth, task.lineType)
+            cv.Cv2.PutText(dst2, hersheyName + " " + Format(size, "#0.0"), New cv.Point(10, 30 + i * 30), hersheyFont, size, cv.Scalar.White, task.lineWidth, task.lineType)
             Dim hersheyFontItalics = hersheyFont + cv.HersheyFonts.Italic
-            cv.Cv2.PutText(dst2, hersheyName + " " + Format(size, "#0.0"), New cv.Point(10, 30 + i * 30), hersheyFontItalics, size, cv.Scalar.White, task.lineWidth, task.lineType)
+            cv.Cv2.PutText(dst3, hersheyName + " " + Format(size, "#0.0"), New cv.Point(10, 30 + i * 30), hersheyFontItalics, size, cv.Scalar.White, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class
@@ -44,10 +44,10 @@ End Class
 
 Public Class Font_FlowText : Inherits VBparent
     Public msgs As New List(Of String)
-    Public dst As Integer = RESULT1 ' set to result2 to appear in dst2
+    Public dst As Integer = RESULT1 ' set to result2 to appear in dst3
     Public maxLineCount = 22
     Public Sub New()
-        If dst1.Height = 480 Then maxLineCount = 26
+        If dst2.Height = 480 Then maxLineCount = 26
         task.desc = "Show TrueType text flowing through an image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -61,7 +61,7 @@ Public Class Font_FlowText : Inherits VBparent
         Static lastCount As Integer
 
         Dim maxlines = 22
-        If dst1.Height = 480 Then maxlines = 28
+        If dst2.Height = 480 Then maxlines = 28
         Dim firstLine = If(msgs.Count - maxlines < 0, 0, msgs.Count - maxlines)
         Dim fullText As String = ""
         For i = firstLine To msgs.Count - 1

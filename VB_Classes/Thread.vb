@@ -28,14 +28,14 @@ Public Class Thread_Grid : Inherits VBparent
     End Sub
     Public Sub New()
         If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "ThreadGrid Width", 2, dst1.Width, 32)
-            sliders.setupTrackBar(1, "ThreadGrid Height", 2, dst1.Height, 32)
+            sliders.setupTrackBar(0, "ThreadGrid Width", 2, dst2.Width, 32)
+            sliders.setupTrackBar(1, "ThreadGrid Height", 2, dst2.Height, 32)
             sliders.setupTrackBar(2, "ThreadGrid Border", 0, 20, 0)
         End If
         roiList = New List(Of cv.Rect)
         borderList = New List(Of cv.Rect)
-        gridMask = New cv.Mat(dst1.Size(), cv.MatType.CV_8U)
-        gridToRoi = New cv.Mat(dst1.Size(), cv.MatType.CV_32S)
+        gridMask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
+        gridToRoi = New cv.Mat(dst2.Size(), cv.MatType.CV_32S)
         task.desc = "Create a grid for use with parallel.ForEach."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 4
@@ -57,11 +57,11 @@ Public Class Thread_Grid : Inherits VBparent
 
             gridMask.SetTo(0)
             incompleteRegions = 0
-            For y = 0 To dst1.Height - 1 Step gHeight
-                For x = 0 To dst1.Width - 1 Step gWidth
+            For y = 0 To dst2.Height - 1 Step gHeight
+                For x = 0 To dst2.Width - 1 Step gWidth
                     Dim roi = New cv.Rect(x, y, gWidth, gHeight)
-                    If x + roi.Width >= dst1.Width Then roi.Width = dst1.Width - x
-                    If y + roi.Height >= dst1.Height Then roi.Height = dst1.Height - y
+                    If x + roi.Width >= dst2.Width Then roi.Width = dst2.Width - x
+                    If y + roi.Height >= dst2.Height Then roi.Height = dst2.Height - y
                     If roi.Width > 0 And roi.Height > 0 Then
                         If y = 0 Then tilesPerRow += 1
                         If x = 0 Then tilesPerCol += 1
@@ -82,11 +82,11 @@ Public Class Thread_Grid : Inherits VBparent
                     broi.Height += broi.Y
                     broi.Y = 0
                 End If
-                If broi.Width + broi.X > dst1.Width Then
-                    broi.Width = dst1.Width - broi.X
+                If broi.Width + broi.X > dst2.Width Then
+                    broi.Width = dst2.Width - broi.X
                 End If
-                If broi.Height + broi.Y > dst1.Height Then
-                    broi.Height = dst1.Height - broi.Y
+                If broi.Height + broi.Y > dst2.Height Then
+                    broi.Height = dst2.Height - broi.Y
                 End If
                 borderList.Add(broi)
             Next
@@ -97,8 +97,8 @@ Public Class Thread_Grid : Inherits VBparent
         End If
 
         If standalone Or task.intermediateName = caller Then
-            task.color.CopyTo(dst1)
-            dst1.SetTo(cv.Scalar.All(255), gridMask)
+            task.color.CopyTo(dst2)
+            dst2.SetTo(cv.Scalar.All(255), gridMask)
             label1 = "Thread_Grid " + CStr(roiList.Count - incompleteRegions) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +
                           CStr(roiList(0).Width) + "X" + CStr(roiList(0).Height) + " regions"
         End If
@@ -125,17 +125,17 @@ Public Class Thread_GridTest : Inherits VBparent
         Parallel.For(0, grid.roiList.Count,
          Sub(i)
              Dim roi = grid.roiList(i)
-             cv.Cv2.Subtract(mean, src(roi), dst1(roi))
-             cv.Cv2.PutText(dst1(roi), CStr(i), New cv.Point(10, 20), cv.HersheyFonts.HersheyDuplex, 0.7, cv.Scalar.White, 1)
+             cv.Cv2.Subtract(mean, src(roi), dst2(roi))
+             cv.Cv2.PutText(dst2(roi), CStr(i), New cv.Point(10, 20), cv.HersheyFonts.HersheyDuplex, 0.7, cv.Scalar.White, 1)
          End Sub)
-        dst1.SetTo(cv.Scalar.White, grid.gridMask)
+        dst2.SetTo(cv.Scalar.White, grid.gridMask)
 
-        dst2.SetTo(0)
+        dst3.SetTo(0)
         Parallel.For(0, grid.roiList.Count,
          Sub(i)
              Dim roi = grid.roiList(i)
-             cv.Cv2.Subtract(mean, src(roi), dst2(roi))
-             dst2(roi).Line(New cv.Point(0, 0), New cv.Point(roi.Width, roi.Height), cv.Scalar.White, task.lineWidth, task.lineType)
+             cv.Cv2.Subtract(mean, src(roi), dst3(roi))
+             dst3(roi).Line(New cv.Point(0, 0), New cv.Point(roi.Width, roi.Height), cv.Scalar.White, task.lineWidth, task.lineType)
          End Sub)
     End Sub
 End Class

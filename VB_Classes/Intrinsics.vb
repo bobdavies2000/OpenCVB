@@ -29,16 +29,16 @@ Public Class IntrinsicsLeft_Basics : Inherits VBparent
         End If
         setTrueText(ttStr)
 
-        dst2.SetTo(0)
-        dst2.Line(New cv.Point(src.Width / 2, 0), New cv.Point(src.Width / 2, src.Height), cv.Scalar.White, task.lineWidth)
-        dst2.Line(New cv.Point(0, src.Height / 2), New cv.Point(src.Width, src.Height / 2), cv.Scalar.White, task.lineWidth)
+        dst3.SetTo(0)
+        dst3.Line(New cv.Point(src.Width / 2, 0), New cv.Point(src.Width / 2, src.Height), cv.Scalar.White, task.lineWidth)
+        dst3.Line(New cv.Point(0, src.Height / 2), New cv.Point(src.Width, src.Height / 2), cv.Scalar.White, task.lineWidth)
 
         Dim nextline = "(" + CStr(task.parms.intrinsicsLeft.ppx) + ", " + CStr(task.parms.intrinsicsLeft.ppy) + ")"
         Dim ttLocation = New cv.Point(CInt(src.Width / 2) + 20, CInt(src.Height / 2) + 40)
-        cv.Cv2.PutText(dst2, nextline, ttLocation, task.font, task.fontSize, cv.Scalar.White, task.lineWidth, task.lineType)
+        cv.Cv2.PutText(dst3, nextline, ttLocation, task.font, task.fontSize, cv.Scalar.White, task.lineWidth, task.lineType)
 
         Dim ptLoc = New cv.Point(src.Width / 2 + 4, src.Height / 2 + 4)
-        dst2.Line(ptLoc, ttLocation, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+        dst3.Line(ptLoc, ttLocation, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
     End Sub
 End Class
 

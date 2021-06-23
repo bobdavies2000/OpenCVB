@@ -11,14 +11,14 @@ Public Class Grayscale_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If check.Box(0).Checked Then
-            dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
-            dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U)
+            dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U)
             Parallel.For(0, src.Rows,
                 Sub(y)
                     For x = 0 To src.Cols - 1
                         Dim cc = src.Get(Of cv.Vec3b)(y, x)
-                        dst1.Set(Of Byte)(y, x, CByte((cc.Item0 * 1140 + cc.Item1 * 5870 + cc.Item2 * 2989) / 10000))
+                        dst2.Set(Of Byte)(y, x, CByte((cc.Item0 * 1140 + cc.Item1 * 5870 + cc.Item2 * 2989) / 10000))
                     Next
                 End Sub)
         End If

@@ -14,13 +14,13 @@ Public Class Fractal_Mandelbrot : Inherits VBparent
             sliders.setupTrackBar(0, "Mandelbrot iterations", 1, 50, 34)
         End If
         task.desc = "Run the classic Mandalbrot algorithm"
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         saveIterations = 0
     End Sub
     Public Sub mandelbrotLoop(y As Integer, iterations As Integer)
-        incrX = (endX - startX) / dst1.Width
-        incrY = (endY - startY) / dst1.Height
-        For x = 0 To dst1.Width - 1
+        incrX = (endX - startX) / dst2.Width
+        incrY = (endY - startY) / dst2.Height
+        For x = 0 To dst2.Width - 1
             Dim c = New Complex(startX + x * incrX, startY + y * incrY)
             Dim z = New Complex(0, 0)
             Dim iter = 0
@@ -28,7 +28,7 @@ Public Class Fractal_Mandelbrot : Inherits VBparent
                 z = z * z + c
                 iter += 1
             End While
-            dst1.Set(Of Byte)(y, x, If(iter < iterations, 255 * iter / (iterations - 1), 0))
+            dst2.Set(Of Byte)(y, x, If(iter < iterations, 255 * iter / (iterations - 1), 0))
         Next
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -58,7 +58,7 @@ Public Class Fractal_Mandelbrot_MT : Inherits VBparent
         Sub(y)
             mandel.mandelbrotLoop(y, iterations)
         End Sub)
-        dst1 = mandel.dst1
+        dst2 = mandel.dst2
     End Sub
 End Class
 
@@ -103,7 +103,7 @@ Public Class Fractal_MandelbrotZoom : Inherits VBparent
             End Sub)
             check.Box(0).Checked = False
         End If
-        dst1 = mandel.dst1
+        dst2 = mandel.dst2
         label1 = If(mandel.endX - mandel.startX >= 3.999, "Mandelbrot Zoom - draw anywhere", "Mandelbrot Zoom = ~" +
                                                           Format(4 / (mandel.endX - mandel.startX), "###,###.0") + "X zoom")
     End Sub
@@ -121,8 +121,8 @@ Public Class Fractal_MandelbrotZoomColor : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         mandel.Run(src)
-        task.palette.Run(mandel.dst1)
-        dst1 = task.palette.dst1
+        task.palette.Run(mandel.dst2)
+        dst2 = task.palette.dst2
         label1 = mandel.label1
     End Sub
 End Class
@@ -147,10 +147,10 @@ Public Class Fractal_Julia : Inherits VBparent
     Private Function julia_point(x As Single, y As Single, r As Integer, depth As Integer, max As Integer, c As Complex, z As Complex)
         If Complex.Abs(z) > r Then
             Dim mt = (255 * Math.Pow(max - depth, 2) Mod (max * max)) Mod 255
-            dst1.Set(Of Byte)(y, x, 255 - mt)
+            dst2.Set(Of Byte)(y, x, 255 - mt)
             depth = 0
         End If
-        If Math.Sqrt(Math.Pow(x - dst1.Width / 2, 2) + Math.Pow(y - dst1.Height / 2, 2)) > dst1.Height / 2 Then dst1.Set(Of Byte)(y, x, 0)
+        If Math.Sqrt(Math.Pow(x - dst2.Width / 2, 2) + Math.Pow(y - dst2.Height / 2, 2)) > dst2.Height / 2 Then dst2.Set(Of Byte)(y, x, 0)
         If depth < max / 4 Then Return 0
         Return julia_point(x, y, r, depth - 1, max, c, Complex.Pow(z, 2) + c)
     End Function
@@ -159,12 +159,12 @@ Public Class Fractal_Julia : Inherits VBparent
         If savedMouse <> task.mousePoint Or mandel.mandel.check.Box(0).Checked Then
             savedMouse = task.mousePoint
             mandel.Run(src)
-            dst2 = mandel.dst1.Clone
+            dst3 = mandel.dst2.Clone
 
             Dim detail = 1
             Dim depth = 100
             Dim r = 2
-            dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+            dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
             Dim m = mandel.mandel.mandel
             rt = m.startX + (m.endX - m.startX) * task.mousePoint.X / src.Width
             mt = m.startY + (m.endY - m.startY) * task.mousePoint.Y / src.Height
@@ -176,8 +176,8 @@ Public Class Fractal_Julia : Inherits VBparent
                         julia_point(x, y, r, depth, depth, c, z)
                     Next
                 End Sub)
-            task.palette.Run(dst1)
-            dst1 = task.palette.dst1
+            task.palette.Run(dst2)
+            dst2 = task.palette.dst2
         End If
     End Sub
 End Class

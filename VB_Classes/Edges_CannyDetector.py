@@ -13,8 +13,8 @@ def CannyThreshold(val):
     img_blur = cv.blur(src_gray, (3,3))
     detected_edges = cv.Canny(img_blur, low_threshold, low_threshold*ratio, kernel_size)
     mask = detected_edges != 0
-    dst1 = src * (mask[:,:,None].astype(src.dtype))
-    cv.imshow(window_name, dst1)
+    dst2 = src * (mask[:,:,None].astype(src.dtype))
+    cv.imshow(window_name, dst2)
     cv.waitKey(1000000)
 
 parser = argparse.ArgumentParser(description='Code for Canny Edge Detector tutorial.')

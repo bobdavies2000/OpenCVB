@@ -54,7 +54,7 @@ Public Class OptionsCommon : Inherits VBparent
         If task.pointCloud.Size <> task.color.Size Then task.pointCloud = task.pointCloud.Resize(task.color.Size, 0, 0, cv.InterpolationFlags.Nearest)
         cv.Cv2.InRange(task.depth32f, task.minDepth, task.maxDepth, task.depthMask)
         cv.Cv2.BitwiseNot(task.depthMask, task.noDepthMask)
-        dst1 = task.depth32f.SetTo(0, task.noDepthMask)
+        dst2 = task.depth32f.SetTo(0, task.noDepthMask)
         If task.pointCloud.Width = task.noDepthMask.Width Then task.pointCloud.SetTo(0, task.noDepthMask) ' reflect the range bounds into the task.pointcloud as well.
     End Sub
 End Class
@@ -91,7 +91,7 @@ Public Class OptionsCommon_Histogram : Inherits VBparent
                 cameraXSetting = If(task.resolutionIndex = 1, 4, 8)
                 cameraYSetting = If(task.resolutionIndex = 3, -8, -3)
             Case VB_Classes.ActiveTask.algParms.camNames.D435i
-                If dst1.Width = 640 Then
+                If dst2.Width = 640 Then
                     sideFrustrumSetting = 76
                     topFrustrumSetting = 101
                     cameraXSetting = -3
@@ -103,7 +103,7 @@ Public Class OptionsCommon_Histogram : Inherits VBparent
                     cameraYSetting = 0
                 End If
             Case VB_Classes.ActiveTask.algParms.camNames.D455
-                If dst1.Width = 640 Then
+                If dst2.Width = 640 Then
                     sideFrustrumSetting = 84
                     topFrustrumSetting = 108
                     cameraXSetting = 3
@@ -116,8 +116,8 @@ Public Class OptionsCommon_Histogram : Inherits VBparent
                 End If
         End Select
 
-        task.sideCameraPoint = New cv.Point(0, CInt(dst1.Height / 2 + cameraYSetting))
-        task.topCameraPoint = New cv.Point(CInt(dst1.Width / 2 + cameraXSetting), CInt(dst1.Height))
+        task.sideCameraPoint = New cv.Point(0, CInt(dst2.Height / 2 + cameraYSetting))
+        task.topCameraPoint = New cv.Point(CInt(dst2.Width / 2 + cameraXSetting), CInt(dst2.Height))
 
         task.desc = "The options for the side view are shared with this algorithm"
     End Sub

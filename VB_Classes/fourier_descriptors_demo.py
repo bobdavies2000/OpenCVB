@@ -160,8 +160,8 @@ while (code!=27):
         print( "Transform *********\n Origin = ", 1-alphaPhiST[0,0] ," expected ", p.origin / 100. ,"\n")
         print( "Angle = ", alphaPhiST[0,1] * 180 / math.pi ," expected " , p.angle,"\n")
         print( "Scale = " ,alphaPhiST[0,2] ," expected " , p.scale10 / 10.0 , "\n")
-        dst1 = cv.ximgproc.transformFD(ctrRot2d, alphaPhiST,cn, False);
-        ctmp= np.reshape(dst1,[dst1.shape[0],2])
+        dst2 = cv.ximgproc.transformFD(ctrRot2d, alphaPhiST,cn, False);
+        ctmp= np.reshape(dst2,[dst2.shape[0],2])
         cdst=ctmp.astype(int)
 
         c = [ ctrRef,cc,cdst]

@@ -41,12 +41,12 @@ def main(argv):
 
     # [laplacian]
     # Apply Laplace function
-    dst1 = cv.Laplacian(src_gray, ddepth, kernel_size)
+    dst2 = cv.Laplacian(src_gray, ddepth, kernel_size)
     # [laplacian]
 
     # [convert]
     # converting back to uint8
-    abs_dst1 = cv.convertScaleAbs(dst1)
+    abs_dst1 = cv.convertScaleAbs(dst2)
     # [convert]
 
     # [display]

@@ -212,8 +212,8 @@ Public Class Replay_Play : Inherits VBparent
                     bytesTotal = 0
                 End If
                 fileNameForm.TrackBar1.Value = 10000 * bytesTotal / recordingFilename.Length
-                dst1 = task.color.Clone()
-                dst2 = task.RGBDepth.Clone()
+                dst2 = task.color.Clone()
+                dst3 = task.RGBDepth.Clone()
             Else
                 ' start playback...
                 fs = New FileStream(recordingFilename.FullName, FileMode.Open, FileAccess.Read)

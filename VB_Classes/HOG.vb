@@ -11,9 +11,9 @@ Public Class HOG_Basics : Inherits VBparent
         End If
         task.desc = "Find people with Histogram of Gradients (HOG) 2D feature"
         staticImage = cv.Cv2.ImRead(task.parms.homeDir + "Data/Asahiyama.jpg", cv.ImreadModes.Color)
-        dst2 = staticImage.Resize(dst2.Size)
+        dst3 = staticImage.Resize(dst3.Size)
     End Sub
-    Private Sub drawFoundRectangles(dst1 As cv.Mat, found() As cv.Rect)
+    Private Sub drawFoundRectangles(dst2 As cv.Mat, found() As cv.Rect)
         For Each rect As cv.Rect In found
             ' the HOG detector returns slightly larger rectangles than the real objects.
             ' so we slightly shrink the rectangles to get a nicer output.
@@ -24,7 +24,7 @@ Public Class HOG_Basics : Inherits VBparent
                 .Width = CInt(Math.Truncate(Math.Round(rect.Width * 0.8))),
                 .Height = CInt(Math.Truncate(Math.Round(rect.Height * 0.8)))
             }
-            dst1.Rectangle(r.TopLeft, r.BottomRight, cv.Scalar.Red, 3, cv.LineTypes.Link8, 0)
+            dst2.Rectangle(r.TopLeft, r.BottomRight, cv.Scalar.Red, 3, cv.LineTypes.Link8, 0)
         Next rect
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -42,12 +42,12 @@ Public Class HOG_Basics : Inherits VBparent
         Dim scale = sliders.trackbar(2).Value / 1000
         Dim found() As cv.Rect = hog.DetectMultiScale(src, threshold, New cv.Size(stride, stride), New cv.Size(24, 16), scale, 2)
         label1 = String.Format("{0} region(s) found", found.Length)
-        src.CopyTo(dst1)
-        drawFoundRectangles(dst1, found)
+        src.CopyTo(dst2)
+        drawFoundRectangles(dst2, found)
 
         If staticImageProcessed = False Then
-            found = hog.DetectMultiScale(dst2, threshold, New cv.Size(stride, stride), New cv.Size(24, 16), scale, 2)
-            drawFoundRectangles(dst2, found)
+            found = hog.DetectMultiScale(dst3, threshold, New cv.Size(stride, stride), New cv.Size(24, 16), scale, 2)
+            drawFoundRectangles(dst3, found)
             If found.Length > 0 Then
                 staticImageProcessed = True
                 label2 = String.Format("{0} region(s) found", found.Length)

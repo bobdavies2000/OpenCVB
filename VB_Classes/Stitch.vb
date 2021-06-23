@@ -14,12 +14,12 @@ Public Class Stitch_Basics : Inherits VBparent
         Dim imageCount = sliders.trackbar(0).Value
         Dim width = sliders.trackbar(1).Value
         Dim height = sliders.trackbar(2).Value
-        dst1 = src.Clone()
+        dst2 = src.Clone()
         For i = 0 To imageCount - 1
             Dim x1 = CInt(msRNG.next(0, src.Width - width))
             Dim x2 = CInt(msRNG.next(0, src.Height - height))
             Dim rect = New cv.Rect(x1, x2, width, height)
-            dst1.Rectangle(rect, cv.Scalar.Red, 2)
+            dst2.Rectangle(rect, cv.Scalar.Red, 2)
             mats.Add(src(rect).Clone())
         Next
 
@@ -36,15 +36,15 @@ Public Class Stitch_Basics : Inherits VBparent
         ' stitcher may fail with an external exception if you make width and height too small.
         Dim status = stitcher.Stitch(mats, pano)
 
-        dst2.SetTo(0)
+        dst3.SetTo(0)
         If status = cv.Stitcher.Status.OK Then
             Dim w = pano.Width, h = pano.Height
-            If w > dst1.Width Then w = dst1.Width
-            If h > dst1.Height Then h = dst1.Height
-            pano.CopyTo(dst2(New cv.Rect(0, 0, w, h)))
+            If w > dst2.Width Then w = dst2.Width
+            If h > dst2.Height Then h = dst2.Height
+            pano.CopyTo(dst3(New cv.Rect(0, 0, w, h)))
         Else
             If status = cv.Stitcher.Status.ErrorNeedMoreImgs Then
-                dst2.PutText("Need more images", New cv.Point(10, 60), cv.HersheyFonts.HersheySimplex, 0.5, cv.Scalar.White, task.lineWidth, task.lineType)
+                dst3.PutText("Need more images", New cv.Point(10, 60), cv.HersheyFonts.HersheySimplex, 0.5, cv.Scalar.White, task.lineWidth, task.lineType)
             End If
         End If
     End Sub

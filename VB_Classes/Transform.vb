@@ -15,11 +15,11 @@ Public Class Transform_Resize : Inherits VBparent
             Dim tmp As New cv.Mat
             tmp = src.Resize(New cv.Size(w, h), 0)
             Dim roi = New cv.Rect((w - src.Width) / 2, (h - src.Height) / 2, src.Width, src.Height)
-            tmp(roi).CopyTo(dst1)
+            tmp(roi).CopyTo(dst2)
         Else
-            dst1.SetTo(0)
+            dst2.SetTo(0)
             Dim roi = New cv.Rect((src.Width - w) / 2, (src.Height - h) / 2, w, h)
-            dst1(roi) = src.Resize(New cv.Size(w, h), 0)
+            dst2(roi) = src.Resize(New cv.Size(w, h), 0)
         End If
     End Sub
 End Class
@@ -45,7 +45,7 @@ Public Class Transform_Sort : Inherits VBparent
         If radio.check(1).Checked Then sortOption = cv.SortFlags.Descending
         If radio.check(2).Checked Then sortOption = cv.SortFlags.EveryColumn
         If radio.check(3).Checked Then sortOption = cv.SortFlags.EveryRow
-        dst1 = src.Sort(sortOption + cv.SortFlags.EveryColumn)
+        dst2 = src.Sort(sortOption + cv.SortFlags.EveryColumn)
     End Sub
 End Class
 
@@ -70,7 +70,7 @@ Public Class Transform_SortReshape : Inherits VBparent
         If radio.check(1).Checked Then sortOption = cv.SortFlags.Descending
         Dim tmp = src.Reshape(1, src.Rows * src.Cols)
         sortVector = tmp.Sort(sortOption + cv.SortFlags.EveryColumn)
-        dst1 = sortVector.Reshape(1, src.Rows)
+        dst2 = sortVector.Reshape(1, src.Rows)
     End Sub
 End Class
 
@@ -155,8 +155,8 @@ Public Class Transform_Rotate : Inherits VBparent
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Angle", -180, 180, 30)
             sliders.setupTrackBar(1, "Scale Factor% (100% means no scaling)", 1, 100, 100)
-            sliders.setupTrackBar(2, "Rotation center X", 1, dst1.Width, dst1.Width / 2)
-            sliders.setupTrackBar(3, "Rotation center Y", 1, dst1.Height, dst1.Height / 2)
+            sliders.setupTrackBar(2, "Rotation center X", 1, dst2.Width, dst2.Width / 2)
+            sliders.setupTrackBar(3, "Rotation center Y", 1, dst2.Height, dst2.Height / 2)
         End If
         angleSlider = findSlider("Angle")
         scaleSlider = findSlider("Scale Factor% (100% means no scaling)")
@@ -167,8 +167,8 @@ Public Class Transform_Rotate : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         imageCenter = New cv.Point2f(centerXSlider.Value, centerYSlider.Value)
         Dim rotationMat = cv.Cv2.GetRotationMatrix2D(imageCenter, angleSlider.Value, scaleSlider.Value / 100)
-        cv.Cv2.WarpAffine(src, dst1, rotationMat, New cv.Size())
-        dst1.Circle(imageCenter, task.dotSize * 2, cv.Scalar.Yellow, -1, task.lineType)
-        dst1.Circle(imageCenter, task.dotSize, cv.Scalar.Blue, -1, task.lineType)
+        cv.Cv2.WarpAffine(src, dst2, rotationMat, New cv.Size())
+        dst2.Circle(imageCenter, task.dotSize * 2, cv.Scalar.Yellow, -1, task.lineType)
+        dst2.Circle(imageCenter, task.dotSize, cv.Scalar.Blue, -1, task.lineType)
     End Sub
 End Class

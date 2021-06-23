@@ -25,8 +25,8 @@ Public Class Edges_Basics : Inherits VBparent
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        dst1 = src.Canny(threshold1, threshold2, aperture, False)
-        dst2 = src.Canny(threshold1, threshold2, aperture, True)
+        dst2 = src.Canny(threshold1, threshold2, aperture, False)
+        dst3 = src.Canny(threshold1, threshold2, aperture, True)
     End Sub
 End Class
 
@@ -53,12 +53,12 @@ Public Class Edges_DepthAndColor : Inherits VBparent
         canny.Run(src)
         shadow.Run(src)
 
-        dst2 = If(shadow.dst2.Channels <> 1, shadow.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY), shadow.dst2)
-        dst2 += canny.dst1.Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst3 = If(shadow.dst3.Channels <> 1, shadow.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY), shadow.dst3)
+        dst3 += canny.dst2.Threshold(1, 255, cv.ThresholdTypes.Binary)
 
-        dilate.Run(dst2)
-        dilate.dst1.SetTo(0, shadow.holeMask)
-        dst1 = dilate.dst1
+        dilate.Run(dst3)
+        dilate.dst2.SetTo(0, shadow.holeMask)
+        dst2 = dilate.dst2
     End Sub
 End Class
 
@@ -82,13 +82,13 @@ Public Class Edges_Laplacian : Inherits VBparent
         Dim gaussiankernelSize = If(sliders.trackbar(0).Value Mod 2, sliders.trackbar(0).Value, sliders.trackbar(0).Value - 1)
         Dim laplaciankernelSize = If(sliders.trackbar(1).Value Mod 2, sliders.trackbar(1).Value, sliders.trackbar(1).Value - 1)
 
-        dst1 = src.GaussianBlur(New cv.Size(gaussiankernelSize, gaussiankernelSize), 0, 0)
-        dst1 = dst1.Laplacian(cv.MatType.CV_8U, laplaciankernelSize, 1, 0)
-        dst1 = dst1.ConvertScaleAbs()
-
-        dst2 = task.RGBDepth.GaussianBlur(New cv.Size(gaussiankernelSize, gaussiankernelSize), 0, 0)
+        dst2 = src.GaussianBlur(New cv.Size(gaussiankernelSize, gaussiankernelSize), 0, 0)
         dst2 = dst2.Laplacian(cv.MatType.CV_8U, laplaciankernelSize, 1, 0)
         dst2 = dst2.ConvertScaleAbs()
+
+        dst3 = task.RGBDepth.GaussianBlur(New cv.Size(gaussiankernelSize, gaussiankernelSize), 0, 0)
+        dst3 = dst3.Laplacian(cv.MatType.CV_8U, laplaciankernelSize, 1, 0)
+        dst3 = dst3.ConvertScaleAbs()
     End Sub
 End Class
 
@@ -107,8 +107,8 @@ Public Class Edges_Scharr : Inherits VBparent
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim xField = gray.Scharr(cv.MatType.CV_32FC1, 1, 0)
         Dim yField = gray.Scharr(cv.MatType.CV_32FC1, 0, 1)
-        cv.Cv2.Add(xField, yField, dst2)
-        dst2.ConvertTo(dst1, cv.MatType.CV_8U, sliders.trackbar(0).Value / 100)
+        cv.Cv2.Add(xField, yField, dst3)
+        dst3.ConvertTo(dst2, cv.MatType.CV_8U, sliders.trackbar(0).Value / 100)
     End Sub
 End Class
 
@@ -137,14 +137,14 @@ Public Class Edges_Preserving : Inherits VBparent
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         If radio.check(0).Checked Then
-            cv.Cv2.EdgePreservingFilter(src, dst1, cv.EdgePreservingMethods.RecursFilter, sigma_s, sigma_r)
+            cv.Cv2.EdgePreservingFilter(src, dst2, cv.EdgePreservingMethods.RecursFilter, sigma_s, sigma_r)
         Else
-            cv.Cv2.EdgePreservingFilter(src, dst1, cv.EdgePreservingMethods.NormconvFilter, sigma_s, sigma_r)
+            cv.Cv2.EdgePreservingFilter(src, dst2, cv.EdgePreservingMethods.NormconvFilter, sigma_s, sigma_r)
         End If
         If radio.check(0).Checked Then
-            cv.Cv2.EdgePreservingFilter(task.RGBDepth, dst2, cv.EdgePreservingMethods.RecursFilter, sigma_s, sigma_r)
+            cv.Cv2.EdgePreservingFilter(task.RGBDepth, dst3, cv.EdgePreservingMethods.RecursFilter, sigma_s, sigma_r)
         Else
-            cv.Cv2.EdgePreservingFilter(task.RGBDepth, dst2, cv.EdgePreservingMethods.NormconvFilter, sigma_s, sigma_r)
+            cv.Cv2.EdgePreservingFilter(task.RGBDepth, dst3, cv.EdgePreservingMethods.NormconvFilter, sigma_s, sigma_r)
         End If
     End Sub
 End Class
@@ -192,7 +192,7 @@ Public Class Edges_RandomForest_CPP : Inherits VBparent
         End If
 
         task.desc = "Detect edges using structured forests - Opencv Contrib"
-        ReDim rgbData(dst1.Total * dst1.ElemSize - 1)
+        ReDim rgbData(dst2.Total * dst2.ElemSize - 1)
         label2 = "Thresholded Edge Mask (use slider to adjust)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -209,7 +209,7 @@ Public Class Edges_RandomForest_CPP : Inherits VBparent
             Dim gray8u = Edges_RandomForest_Run(EdgesPtr, handleRGB.AddrOfPinnedObject(), src.Rows, src.Cols)
             handleRGB.Free() ' free the pinned memory...
 
-            dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, gray8u).Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
+            dst3 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, gray8u).Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
         End If
     End Sub
     Public Sub Close()
@@ -238,9 +238,9 @@ Public Class Edges_ResizeAdd : Inherits VBparent
         Dim newFrame = gray(New cv.Range(sliders.trackbar(0).Value, gray.Rows - sliders.trackbar(0).Value),
                             New cv.Range(sliders.trackbar(1).Value, gray.Cols - sliders.trackbar(1).Value))
         newFrame = newFrame.Resize(gray.Size())
-        cv.Cv2.Absdiff(gray, newFrame, dst1)
-        dst1 = dst1.Threshold(sliders.trackbar(2).Value, 255, cv.ThresholdTypes.Binary)
-        cv.Cv2.Add(gray, dst1, dst2)
+        cv.Cv2.Absdiff(gray, newFrame, dst2)
+        dst2 = dst2.Threshold(sliders.trackbar(2).Value, 255, cv.ThresholdTypes.Binary)
+        cv.Cv2.Add(gray, dst2, dst3)
     End Sub
 End Class
 
@@ -272,8 +272,8 @@ Public Class Edges_DCTfrequency : Inherits VBparent
         label1 = "Highest " + CStr(sliders.trackbar(0).Value) + " frequencies removed from RGBDepth"
 
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
-        src32f.ConvertTo(dst1, cv.MatType.CV_8UC1, 255)
-        dst2 = dst1.Threshold(sliders.trackbar(1).Value, 255, cv.ThresholdTypes.Binary)
+        src32f.ConvertTo(dst2, cv.MatType.CV_8UC1, 255)
+        dst3 = dst2.Threshold(sliders.trackbar(1).Value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -307,9 +307,9 @@ Public Class Edges_Deriche_CPP : Inherits VBparent
         If imagePtr <> 0 Then
             Dim dstData(src.Total * src.ElemSize() - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
+            dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, dstData)
         End If
-        cv.Cv2.BitwiseOr(src, dst1, dst2)
+        cv.Cv2.BitwiseOr(src, dst2, dst3)
     End Sub
     Public Sub Close()
         Edges_Deriche_Close(Edges_Deriche)
@@ -335,12 +335,12 @@ Public Class Edges_DCTinput : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
         edges.Run(src)
-        dst1 = edges.dst1.Clone
+        dst2 = edges.dst2.Clone
 
         dct.Run(src)
-        Dim tmp = src.SetTo(cv.Scalar.White, dct.dst1)
+        Dim tmp = src.SetTo(cv.Scalar.White, dct.dst2)
         edges.Run(tmp)
-        dst2 = edges.dst1
+        dst3 = edges.dst2
     End Sub
 End Class
 
@@ -365,24 +365,24 @@ Public Class Edges_BinarizedCanny : Inherits VBparent
         binarize.Run(src)
 
         edges.Run(binarize.mats.mat(0))  ' the light and dark halves
-        mats.mat(0) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        mats.mat(3) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        mats.mat(0) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        mats.mat(3) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         edges.Run(binarize.mats.mat(1))  ' the lightest of the light half
-        mats.mat(1) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        mats.mat(1) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.BitwiseOr(mats.mat(1), mats.mat(3), mats.mat(3))
 
         edges.Run(binarize.mats.mat(3))  ' the darkest of the dark half
-        mats.mat(2) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        mats.mat(2) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), mats.mat(3))
 
         mats.Run(src)
-        dst1 = mats.dst1
-        If mats.dst2.Channels = 3 Then
-            label2 = "Combo of first 3 below.  Click quadrants in dst1."
-            dst2 = mats.mat(3)
+        dst2 = mats.dst2
+        If mats.dst3.Channels = 3 Then
+            label2 = "Combo of first 3 below.  Click quadrants in dst2."
+            dst3 = mats.mat(3)
         Else
-            dst2 = mats.dst2
+            dst3 = mats.dst3
         End If
     End Sub
 End Class
@@ -402,10 +402,10 @@ Public Class Edges_BinarizedBrightness : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         bright.Run(src)
-        dst1 = bright.dst2
+        dst2 = bright.dst3
 
-        edges.Run(bright.dst2)
-        dst2 = edges.dst2
+        edges.Run(bright.dst3)
+        dst3 = edges.dst3
     End Sub
 End Class
 
@@ -424,10 +424,10 @@ Public Class Edges_BinarizedReduction : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
         reduction.Run(src)
-        dst1 = reduction.dst1
+        dst2 = reduction.dst2
 
-        edges.Run(dst1)
-        dst2 = edges.dst2
+        edges.Run(dst2)
+        dst3 = edges.dst3
     End Sub
 End Class
 
@@ -448,10 +448,10 @@ Public Class Edges_Depth : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
         dMax.Run(task.depth32f)
-        dst1 = dMax.dst1
+        dst2 = dMax.dst2
 
-        sobel.Run(dMax.dst2)
-        dst2 = sobel.dst1
+        sobel.Run(dMax.dst3)
+        dst3 = sobel.dst2
     End Sub
 End Class
 
@@ -468,18 +468,18 @@ Public Class Edges_FeaturesOnly : Inherits VBparent
     Dim featLess As New Featureless_Basics
     Public Sub New()
         label1 = "Output of Edges_BinarizedSobel"
-        label2 = "dst1 with featureless areas removed."
+        label2 = "dst2 with featureless areas removed."
         task.desc = "Removing the featureless regions after a binarized sobel"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
         task.mouseClickFlag = False ' edges calls a mat_4clicks algorithm.
         edges.Run(src)
-        dst1 = edges.dst2
+        dst2 = edges.dst3
 
         featLess.Run(src)
-        dst2 = dst1.Clone
-        dst2.SetTo(0, featLess.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst3 = dst2.Clone
+        dst3.SetTo(0, featLess.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
     End Sub
 End Class
 
@@ -513,12 +513,12 @@ Public Class Edges_Consistent : Inherits VBparent
 
         edges.Run(src)
 
-        saveFrames.Add(edges.dst2.Clone)
+        saveFrames.Add(edges.dst3.Clone)
         If saveFrames.Count > nFrames Then saveFrames.RemoveAt(0)
 
-        dst1 = saveFrames(0)
+        dst2 = saveFrames(0)
         For i = 1 To saveFrames.Count - 1
-            cv.Cv2.BitwiseAnd(saveFrames(i), dst1, dst1)
+            cv.Cv2.BitwiseAnd(saveFrames(i), dst2, dst2)
         Next
     End Sub
 End Class
@@ -544,9 +544,9 @@ Public Class Edges_Stdev : Inherits VBparent
 
         stdev.Run(src)
         edges.Run(src)
-        dst1 = edges.dst2
-        dst1.SetTo(0, stdev.lowStdevMask)
-        dst2 = stdev.lowStdevMask
+        dst2 = edges.dst3
+        dst2.SetTo(0, stdev.lowStdevMask)
+        dst3 = stdev.lowStdevMask
     End Sub
 End Class
 
@@ -567,15 +567,15 @@ Public Class Edges_BlackSquare : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         std.Run(src)
 
-        edges.Run(std.dst2)
-        dst1 = edges.dst2
+        edges.Run(std.dst3)
+        dst2 = edges.dst3
 
-        addW.src2 = std.dst2
-        addW.Run(dst1)
-        dst2 = addW.dst1
+        addW.src2 = std.dst3
+        addW.Run(dst2)
+        dst3 = addW.dst2
 
-        'Dim mask = std.dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        'dst2 = dst1.Clone.SetTo(0, mask)
+        'Dim mask = std.dst3.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        'dst3 = dst2.Clone.SetTo(0, mask)
     End Sub
 End Class
 
@@ -596,9 +596,9 @@ Public Class Edges_Combo : Inherits VBparent
         edges1.Run(src)
         edges2.Run(src)
 
-        dst1 = task.color
-        dst1.SetTo(cv.Scalar.Red, edges2.dst2)
-        dst1.SetTo(cv.Scalar.Yellow, edges1.dst2)
+        dst2 = task.color
+        dst2.SetTo(cv.Scalar.Red, edges2.dst3)
+        dst2.SetTo(cv.Scalar.Yellow, edges1.dst3)
     End Sub
 End Class
 
@@ -620,12 +620,12 @@ Public Class Edges_SobelLR : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         red.Run(src)
-        Dim leftView = red.dst1
-        sobel.Run(red.dst2)
-        dst2 = sobel.dst1.Clone()
+        Dim leftView = red.dst2
+        sobel.Run(red.dst3)
+        dst3 = sobel.dst2.Clone()
 
         sobel.Run(leftView)
-        dst1 = sobel.dst1
+        dst2 = sobel.dst2
     End Sub
 End Class
 
@@ -660,7 +660,7 @@ Public Class Edges_Sobel : Inherits VBparent
         Static thresholdCheck = findCheckBox("Threshold Sobel Results")
         Static ksizeSlider = findSlider("Sobel kernel Size")
         Dim kernelSize = If(ksizeSlider.Value Mod 2, ksizeSlider.Value, ksizeSlider.Value - 1)
-        dst1 = New cv.Mat(src.Rows, src.Cols, src.Type)
+        dst2 = New cv.Mat(src.Rows, src.Cols, src.Type)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         grayX = src.Sobel(cv.MatType.CV_32F, 1, 0, kernelSize)
         If horizontalOnly = False Then
@@ -668,15 +668,15 @@ Public Class Edges_Sobel : Inherits VBparent
             If standalone Then
                 addw.src2 = grayY
                 addw.Run(grayX)
-                dst1 = addw.dst1.ConvertScaleAbs()
+                dst2 = addw.dst2.ConvertScaleAbs()
             Else
-                dst1 = (grayY + grayX).ToMat.ConvertScaleAbs()
+                dst2 = (grayY + grayX).ToMat.ConvertScaleAbs()
             End If
         Else
-            dst1 = grayX.ConvertScaleAbs()
+            dst2 = grayX.ConvertScaleAbs()
         End If
         If thresholdCheck.checked Then
-            dst1 = dst1.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Tozero).Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
+            dst2 = dst2.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Tozero).Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
         End If
     End Sub
 End Class
@@ -698,7 +698,7 @@ Public Class Edges_SobelHorizontal : Inherits VBparent
         Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
         edges.Run(src)
 
-        dst1 = edges.dst1.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
+        dst2 = edges.dst2.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -722,22 +722,22 @@ Public Class Edges_SobelLRBinarized : Inherits VBparent
         If task.mouseClickFlag Then task.mouseClickFlag = False ' preempt use of quadrants.
         red.Run(src)
 
-        edges.Run(red.dst2)
+        edges.Run(red.dst3)
         If standalone Then
-            addw.src2 = edges.dst2
-            addw.Run(red.dst2)
-            dst2 = addw.dst1
+            addw.src2 = edges.dst3
+            addw.Run(red.dst3)
+            dst3 = addw.dst2
         Else
-            dst2 = edges.dst2
+            dst3 = edges.dst3
         End If
 
-        edges.Run(red.dst1)
+        edges.Run(red.dst2)
         If standalone Then
-            addw.src2 = edges.dst2
-            addw.Run(red.dst1)
-            dst1 = addw.dst1
+            addw.src2 = edges.dst3
+            addw.Run(red.dst2)
+            dst2 = addw.dst2
         Else
-            dst1 = edges.dst2
+            dst2 = edges.dst3
         End If
     End Sub
 End Class
@@ -758,7 +758,7 @@ Public Class Edges_BinarizedSobel : Inherits VBparent
         findSlider("Sobel kernel Size").Value = 5
 
         label1 = "Edges between halves, lightest, darkest, and the combo"
-        label2 = "Click any quadrant in dst1 to enlarge it in dst2"
+        label2 = "Click any quadrant in dst2 to enlarge it in dst3"
         task.desc = "Collect Sobel edges from binarized images"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -767,24 +767,24 @@ Public Class Edges_BinarizedSobel : Inherits VBparent
         binarize.Run(src)
 
         edges.Run(binarize.mats.mat(0)) ' the light and dark halves
-        mats.mat(0) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        mats.mat(3) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        mats.mat(0) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        mats.mat(3) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
         edges.Run(binarize.mats.mat(1)) ' the lightest of the light half
-        mats.mat(1) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        mats.mat(1) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.BitwiseOr(mats.mat(1), mats.mat(3), mats.mat(3))
 
         edges.Run(binarize.mats.mat(3))  ' the darkest of the dark half
-        mats.mat(2) = edges.dst1.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        mats.mat(2) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), mats.mat(3))
 
         mats.Run(src)
-        dst1 = mats.dst1
-        If mats.dst2.Channels = 3 Then
-            label2 = "BitwiseOr of images 1-3 at left.  Click dst1."
-            dst2 = mats.mat(3).Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst2 = mats.dst2
+        If mats.dst3.Channels = 3 Then
+            label2 = "BitwiseOr of images 1-3 at left.  Click dst2."
+            dst3 = mats.mat(3).Threshold(0, 255, cv.ThresholdTypes.Binary)
         Else
-            dst2 = mats.mat(quadrantIndex)
+            dst3 = mats.mat(quadrantIndex)
         End If
     End Sub
 End Class
@@ -830,8 +830,8 @@ Public Class Edges_Matching : Inherits VBparent
         grid.Run(Nothing)
 
         red.Run(src)
-        dst1 = red.dst1
         dst2 = red.dst2
+        dst3 = red.dst3
 
         Dim matchOption = match.checkRadio()
         Dim fsize = task.fontSize / 3
@@ -839,10 +839,10 @@ Public Class Edges_Matching : Inherits VBparent
         Dim highlights As New List(Of Integer)
         For i = 0 To grid.roiList.Count - 1
             Dim roi = grid.roiList(i)
-            Dim width = If(roi.X + roi.Width + searchDepth < dst1.Width, roi.Width + searchDepth, dst1.Width - roi.X - 1)
+            Dim width = If(roi.X + roi.Width + searchDepth < dst2.Width, roi.Width + searchDepth, dst2.Width - roi.X - 1)
             Dim searchROI = New cv.Rect(roi.X, roi.Y, width, roi.Height)
-            match.searchArea = dst2(roi)
-            match.template = dst1(searchROI)
+            match.searchArea = dst3(roi)
+            match.template = dst2(searchROI)
             match.Run(src)
             Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
             match.correlationMat.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
@@ -850,31 +850,31 @@ Public Class Edges_Matching : Inherits VBparent
             If maxVal > threshold Or redRects.Contains(i) Then
                 highlights.Add(i)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                dst2.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
-                cv.Cv2.PutText(dst2, Format(maxVal, "#0.00"), pt, task.font, fsize, cv.Scalar.White, task.lineWidth, task.lineType)
+                dst3.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
+                cv.Cv2.PutText(dst3, Format(maxVal, "#0.00"), pt, task.font, fsize, cv.Scalar.White, task.lineWidth, task.lineType)
             End If
         Next
 
         If overlayCheck.checked Then
-            dst1.SetTo(255, grid.gridMask)
             dst2.SetTo(255, grid.gridMask)
+            dst3.SetTo(255, grid.gridMask)
         End If
 
-        dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If highlightCheck.checked Then
-            label1 = "Matched grid segments in dst2 with disparity"
+            label1 = "Matched grid segments in dst3 with disparity"
             For Each i In highlights
                 Dim roi = grid.roiList(i)
-                dst2.Rectangle(roi, cv.Scalar.Red, 2)
+                dst3.Rectangle(roi, cv.Scalar.Red, 2)
                 roi.X += maxLocs(i)
-                dst1.Rectangle(roi, cv.Scalar.Red, 2)
+                dst2.Rectangle(roi, cv.Scalar.Red, 2)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                dst1.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
-                cv.Cv2.PutText(dst1, CStr(maxLocs(i)), pt, task.font, fsize, cv.Scalar.White, task.lineWidth, task.lineType)
+                dst2.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
+                cv.Cv2.PutText(dst2, CStr(maxLocs(i)), pt, task.font, fsize, cv.Scalar.White, task.lineWidth, task.lineType)
             Next
         Else
-            label1 = "Click in dst2 to highlight segment in dst1"
+            label1 = "Click in dst3 to highlight segment in dst2"
             If clearCheck.checked Then
                 redRects.Clear()
                 grid.mouseClickROI = 0
@@ -884,12 +884,12 @@ Public Class Edges_Matching : Inherits VBparent
                 If redRects.Contains(grid.mouseClickROI) = False Then redRects.Add(grid.mouseClickROI)
                 For Each i In redRects
                     Dim roi = grid.roiList(i)
-                    dst2.Rectangle(roi, cv.Scalar.Red, 2)
+                    dst3.Rectangle(roi, cv.Scalar.Red, 2)
                     roi.X += maxLocs(i)
-                    dst1.Rectangle(roi, cv.Scalar.Red, 2)
+                    dst2.Rectangle(roi, cv.Scalar.Red, 2)
                     Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                    dst1.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
-                    cv.Cv2.PutText(dst1, CStr(maxLocs(i)), pt, task.font, fsize, cv.Scalar.White, task.lineWidth, task.lineType)
+                    dst2.Rectangle(New cv.Rect(roi.X, roi.Y, roi.Width, roi.Height * 3 / 8), cv.Scalar.Black, -1)
+                    cv.Cv2.PutText(dst2, CStr(maxLocs(i)), pt, task.font, fsize, cv.Scalar.White, task.lineWidth, task.lineType)
                 Next
             End If
         End If
@@ -925,14 +925,14 @@ Public Class Edges_MotionOverlay : Inherits VBparent
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         diff.lastFrame = src.Clone
-        Dim rect1 = New cv.Rect(xDisp, yDisp, dst1.Width - xDisp - 1, dst1.Height - yDisp - 1)
-        Dim rect2 = New cv.Rect(0, 0, dst1.Width - xDisp - 1, dst1.Height - yDisp - 1)
+        Dim rect1 = New cv.Rect(xDisp, yDisp, dst2.Width - xDisp - 1, dst2.Height - yDisp - 1)
+        Dim rect2 = New cv.Rect(0, 0, dst2.Width - xDisp - 1, dst2.Height - yDisp - 1)
         diff.lastFrame(rect2) = src(rect1).Clone
 
         diff.Run(src)
-        dst1 = diff.dst1
         dst2 = diff.dst2
-        dst2.SetTo(0, task.noDepthMask)
+        dst3 = diff.dst3
+        dst3.SetTo(0, task.noDepthMask)
         label1 = "Src offset (x,y) = (" + CStr(xDisp) + "," + CStr(yDisp) + ")"
     End Sub
 End Class
@@ -958,12 +958,12 @@ Public Class Edges_RGB : Inherits VBparent
             split(i) = split(i).Normalize(0, 255, cv.NormTypes.MinMax)
         Next
         cv.Cv2.Merge(split, img32f)
-        img32f.ConvertTo(dst1, cv.MatType.CV_8UC3)
+        img32f.ConvertTo(dst2, cv.MatType.CV_8UC3)
         For i = 0 To 3 - 1
             sobel.Run(split(i))
-            split(i) = 255 - sobel.dst1
+            split(i) = 255 - sobel.dst2
         Next
-        cv.Cv2.Merge(split, dst1)
+        cv.Cv2.Merge(split, dst2)
     End Sub
 End Class
 
@@ -983,6 +983,6 @@ Public Class Edges_HSV : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         edges.Run(hsv)
-        dst1 = edges.dst1
+        dst2 = edges.dst2
     End Sub
 End Class

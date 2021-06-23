@@ -57,14 +57,14 @@ Public Class CamShift_Basics : Inherits VBparent
             cv.Cv2.CalcBackProject({hue}, {0, 0}, roi_hist, backproj, ranges)
             cv.Cv2.BitwiseAnd(backproj, mask, backproj)
             trackBox = cv.Cv2.CamShift(backproj, roi, cv.TermCriteria.Both(10, 1))
-            Show_HSV_Hist(dst2, roi_hist)
-            If dst2.Channels = 1 Then dst2 = src
-            dst2 = dst2.CvtColor(cv.ColorConversionCodes.HSV2BGR)
+            Show_HSV_Hist(dst3, roi_hist)
+            If dst3.Channels = 1 Then dst3 = src
+            dst3 = dst3.CvtColor(cv.ColorConversionCodes.HSV2BGR)
         End If
-        dst1.SetTo(0)
-        src.CopyTo(dst1, mask)
+        dst2.SetTo(0)
+        src.CopyTo(dst2, mask)
         If trackBox.Size.Width > 0 Then
-            dst1.Ellipse(trackBox, cv.Scalar.White, task.lineWidth + 1, task.lineType)
+            dst2.Ellipse(trackBox, cv.Scalar.White, task.lineWidth + 1, task.lineType)
         End If
     End Sub
 End Class
@@ -84,7 +84,7 @@ Public Class CamShift_Foreground : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         fore.Run(src)
-        flood.Run(fore.dst2)
+        flood.Run(fore.dst3)
         If flood.masks.Count > 0 Then
             Dim index = flood.sortedSizes.ElementAt(0).Value
             If camshift.trackBox.Size.Width > src.Width Or camshift.trackBox.Size.Height > src.Height Then
@@ -92,8 +92,8 @@ Public Class CamShift_Foreground : Inherits VBparent
             End If
             If camshift.trackBox.Size.Width < 50 Then task.drawRect = flood.rects(index)
             camshift.Run(src)
-            dst1 = camshift.dst1
             dst2 = camshift.dst2
+            dst3 = camshift.dst3
         End If
     End Sub
 End Class
@@ -116,7 +116,7 @@ Public Class Camshift_Object : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         blob.Run(src)
-        flood.Run(blob.dst2)
+        flood.Run(blob.dst3)
 
         If flood.masks.Count > 0 Then
             Dim index = flood.sortedSizes.ElementAt(0).Value
@@ -125,8 +125,8 @@ Public Class Camshift_Object : Inherits VBparent
             End If
             If camshift.trackBox.Size.Width < 50 Then task.drawRect = flood.rects(index)
             camshift.Run(src)
-            dst1 = camshift.dst1
             dst2 = camshift.dst2
+            dst3 = camshift.dst3
         End If
     End Sub
 End Class
@@ -153,8 +153,8 @@ Public Class Camshift_TopObjects : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static updateSlider = findSlider("Reinitialize camshift after x frames")
         blob.Run(src)
-        dst1 = blob.dst2
-        flood.Run(dst1)
+        dst2 = blob.dst3
+        flood.Run(dst2)
 
         Dim updateFrequency = updateSlider.Value
         Dim trackBoxes As New List(Of cv.RotatedRect)
@@ -166,15 +166,15 @@ Public Class Camshift_TopObjects : Inherits VBparent
                 End If
 
                 cams(i).Run(src)
-                mats.mat(i) = cams(i).dst1.Clone()
+                mats.mat(i) = cams(i).dst2.Clone()
                 trackBoxes.Add(cams(i).trackBox)
             End If
         Next
         For i = 0 To trackBoxes.Count - 1
-            dst1.Ellipse(trackBoxes(i), cv.Scalar.White, task.lineWidth + 1, task.lineType)
+            dst2.Ellipse(trackBoxes(i), cv.Scalar.White, task.lineWidth + 1, task.lineType)
         Next
         mats.Run(src)
-        dst2 = mats.dst1
+        dst3 = mats.dst2
     End Sub
 End Class
 

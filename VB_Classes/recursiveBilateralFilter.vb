@@ -32,7 +32,7 @@ Public Class RecursiveBilateralFilter_CPP : Inherits VBparent
         Dim imagePtr = RecursiveBilateralFilter_Run(rbf, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, sliders.trackbar(0).Value)
         handleSrc.Free() ' free the pinned memory...
 
-        dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
     End Sub
     Public Sub Close()
         RecursiveBilateralFilter_Close(rbf)

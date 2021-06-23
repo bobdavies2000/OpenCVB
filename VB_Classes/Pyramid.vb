@@ -13,14 +13,14 @@ Public Class Pyramid_Basics : Inherits VBparent
             If zoom < 0 Then
                 Dim tmp = src.PyrDown(New cv.Size(src.Cols / 2, src.Rows / 2))
                 Dim roi = New cv.Rect((src.Cols - tmp.Cols) / 2, (src.Rows - tmp.Rows) / 2, tmp.Width, tmp.Height)
-                dst1(roi) = tmp
+                dst2(roi) = tmp
             Else
                 Dim tmp = src.PyrUp(New cv.Size(src.Cols * 2, src.Rows * 2))
                 Dim roi = New cv.Rect((tmp.Cols - src.Cols) / 2, (tmp.Rows - src.Rows) / 2, src.Width, src.Height)
-                dst1 = tmp(roi)
+                dst2 = tmp(roi)
             End If
         Else
-            src.CopyTo(dst1)
+            src.CopyTo(dst2)
         End If
     End Sub
 End Class
@@ -37,7 +37,7 @@ Public Class Pyramid_Filter : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         laplace.Run(src)
-        dst1 = laplace.dst1
+        dst2 = laplace.dst2
     End Sub
 End Class
 

@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports CS_Classes
 Module matrixInverse_Module
-    Public Function printMatrixResults(src As cv.Mat, dst1 As cv.Mat) As String
+    Public Function printMatrixResults(src As cv.Mat, dst2 As cv.Mat) As String
         Dim outstr As String = "Original Matrix " + vbCrLf
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
@@ -12,7 +12,7 @@ Module matrixInverse_Module
         outstr += vbCrLf + "Matrix Inverse" + vbCrLf
         For y = 0 To src.Rows - 1
             For x = 0 To src.Cols - 1
-                outstr += Format(dst1.Get(of Double)(y, x), "#0.0000") + vbTab
+                outstr += Format(dst2.Get(of Double)(y, x), "#0.0000") + vbTab
             Next
             outstr += vbCrLf
         Next

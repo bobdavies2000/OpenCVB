@@ -36,7 +36,7 @@ Public Class KLT_Basics : Inherits VBparent
         Dim subPixWinSize As New cv.Size(10, 10)
         Dim nightMode = check.Box(0).Checked
 
-        If nightMode Then dst1.SetTo(0) Else src.CopyTo(dst1)
+        If nightMode Then dst2.SetTo(0) Else src.CopyTo(dst2)
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If inputPoints Is Nothing Then
@@ -67,7 +67,7 @@ Public Class KLT_Basics : Inherits VBparent
             Dim pt = outputMat.Get(Of cv.Point2f)(i)
             If pt.X >= 0 And pt.X <= src.Cols And pt.Y >= 0 And pt.Y <= src.Rows Then
                 If status.Get(Of Byte)(i) Then
-                    dst1.Circle(pt, task.dotSize + 1, circleColor, -1, task.lineType)
+                    dst2.Circle(pt, task.dotSize + 1, circleColor, -1, task.lineType)
                 End If
             Else
                 status.Set(Of Byte)(i, 0) ' this point is not visible!
@@ -91,13 +91,13 @@ Public Class KLT_OpticalFlow : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         klt.Run(src)
         If task.frameCount > 0 And lastpoints IsNot Nothing And klt.inputPoints IsNot Nothing Then
-            dst1 = klt.dst1
-            src.CopyTo(dst2)
+            dst2 = klt.dst2
+            src.CopyTo(dst3)
             For i = 0 To klt.inputPoints.Length - 1
                 If klt.status.Get(Of Byte)(i) And i < lastpoints.Length And i < klt.inputPoints.Length Then
-                    ' dst1.Line(lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+                    ' dst2.Line(lastpoints(i), klt.inputPoints(i), cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
                     'Static lastFlowPoints() As cv.Point2f = klt.inputPoints
-                    ' dst2.Line(lastFlowPoints(i), klt.inputPoints(i), cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+                    ' dst3.Line(lastFlowPoints(i), klt.inputPoints(i), cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
                     'If task.frameCount Mod 10 = 0 Then lastFlowPoints = klt.inputPoints
                 End If
             Next

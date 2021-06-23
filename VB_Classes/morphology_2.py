@@ -26,8 +26,8 @@ def morphology_operations(val):
 
     element = cv.getStructuringElement(morph_elem, (2*morph_size + 1, 2*morph_size+1), (morph_size, morph_size))
     operation = morph_op_dic[morph_operator]
-    dst1 = cv.morphologyEx(src, operation, element)
-    cv.imshow(titleWindow, dst1)
+    dst2 = cv.morphologyEx(src, operation, element)
+    cv.imshow(titleWindow, dst2)
 
 parser = argparse.ArgumentParser(description='Code for More Morphology Transformations tutorial.')
 parser.add_argument('--input', help='Path to input image.', default='../Data/LinuxLogo.jpg')

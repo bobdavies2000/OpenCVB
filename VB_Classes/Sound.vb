@@ -215,7 +215,7 @@ Public Class Sound_Display : Inherits VBparent
         Static samplesperLine As Single
         Static starttime As Date
         If standalone Then soundSource.Run(src)
-        dst1 = New cv.Mat(New cv.Size(src.Width * 2, src.Height), cv.MatType.CV_8UC3, cv.Scalar.Beige)
+        dst2 = New cv.Mat(New cv.Size(src.Width * 2, src.Height), cv.MatType.CV_8UC3, cv.Scalar.Beige)
         If fileStarted = False Then
             fileStarted = True
             soundSource.Run(src)
@@ -225,7 +225,7 @@ Public Class Sound_Display : Inherits VBparent
             If soundSource.pcm32f.width = 0 Then Exit Sub ' sound hasn't loaded yet.
 
             Dim totalSamples = soundSource.pcm32f.Rows
-            samplesperLine = If(soundSource.stereo, totalSamples / 2 / dst1.Width, totalSamples / dst1.Width)
+            samplesperLine = If(soundSource.stereo, totalSamples / 2 / dst2.Width, totalSamples / dst2.Width)
         End If
         Static frm = findfrm("Sound_Display Radio Options")
         For i = 0 To frm.check.length - 1
@@ -237,53 +237,53 @@ Public Class Sound_Display : Inherits VBparent
         pcm.MinMaxLoc(absMinVal, absMaxVal)
         If Double.IsNaN(absMaxVal) Or Double.IsNaN(absMinVal) Then Exit Sub ' bad input data...
         If Double.IsNegativeInfinity(absMinVal) Or Double.IsInfinity(absMaxVal) Then Exit Sub ' bad input data...
-        Dim halfHeight As Integer = dst1.Height / 2
+        Dim halfHeight As Integer = dst2.Height / 2
         Select Case formatIndex
             Case 0
-                For i = 0 To dst1.Width - 1
+                For i = 0 To dst2.Width - 1
                     Dim rect = New cv.Rect(0, i * samplesperLine, 1, samplesperLine)
                     If rect.Y + rect.Height > pcm.height Then rect.Height = pcm.Height - rect.Y ' rounding possible when changing buffer size...
                     pcm(rect).MinMaxLoc(minVal, maxVal)
                     If minVal > 0 Then minVal = 0
                     If maxVal < 0 Then maxVal = 0
 
-                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * maxVal / absMaxVal)), cv.Scalar.Red, task.lineWidth)
-                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + Math.Abs(minVal) * halfHeight / -absMinVal)), cv.Scalar.Gray, task.lineWidth)
+                    dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * maxVal / absMaxVal)), cv.Scalar.Red, task.lineWidth)
+                    dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + Math.Abs(minVal) * halfHeight / -absMinVal)), cv.Scalar.Gray, task.lineWidth)
                 Next
                 label1 = CStr(CInt(soundSource.pcmDuration)) + " seconds displayed with Max Absolute Value"
             Case 1
-                For i = 0 To dst1.Width - 1
+                For i = 0 To dst2.Width - 1
                     Dim rect = New cv.Rect(0, i * samplesperLine, 1, samplesperLine)
                     If rect.Y + rect.Height > pcm.height Then rect.Height = pcm.Height - rect.Y ' rounding possible when changing buffer size...
                     Dim tmp = pcm(rect).mul(pcm(rect)).toMat()
                     Dim sum = tmp.sum()
                     Dim nextVal = Math.Sqrt(sum.Item(0) / samplesperLine)
 
-                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * nextVal / absMaxVal)), cv.Scalar.Red, task.lineWidth)
-                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + halfHeight * nextVal / -absMinVal)), cv.Scalar.Gray, task.lineWidth)
+                    dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * nextVal / absMaxVal)), cv.Scalar.Red, task.lineWidth)
+                    dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + halfHeight * nextVal / -absMinVal)), cv.Scalar.Gray, task.lineWidth)
                 Next
                 label1 = CStr(CInt(soundSource.pcmDuration)) + " seconds displayed with Max RMS Value"
             Case 2
-                For i = 0 To dst1.Width - 1
+                For i = 0 To dst2.Width - 1
                     Dim rect = New cv.Rect(0, i * samplesperLine, 1, samplesperLine)
                     If rect.Y + rect.Height > pcm.height Then rect.Height = pcm.Height - rect.Y ' rounding possible when changing buffer size...
                     pcm(rect).MinMaxLoc(minVal, maxVal)
                     If minVal > 0 Then minVal = 0
                     If maxVal < 0 Then maxVal = 0
 
-                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * maxVal / absMaxVal)), cv.Scalar.Red, task.lineWidth)
-                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + Math.Abs(minVal) * halfHeight / -absMinVal)), cv.Scalar.Gray, task.lineWidth)
+                    dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * maxVal / absMaxVal)), cv.Scalar.Red, task.lineWidth)
+                    dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + Math.Abs(minVal) * halfHeight / -absMinVal)), cv.Scalar.Gray, task.lineWidth)
                 Next
             Case 3
                 pcm = cv.Cv2.Abs(pcm).toMat
-                For i = 0 To dst1.Width - 1
+                For i = 0 To dst2.Width - 1
                     Dim rect = New cv.Rect(0, i * samplesperLine, 1, samplesperLine)
                     If rect.Y + rect.Height > pcm.height Then rect.Height = pcm.Height - rect.Y ' rounding possible when changing buffer size...
                     Dim sum = pcm(rect).sum
                     Dim nextVal = sum.Item(0) / samplesperLine
 
-                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * nextVal / absMaxVal)), cv.Scalar.Red, task.lineWidth)
-                    dst1.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + halfHeight * nextVal / -absMinVal)), cv.Scalar.Gray, task.lineWidth)
+                    dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * nextVal / absMaxVal)), cv.Scalar.Red, task.lineWidth)
+                    dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + halfHeight * nextVal / -absMinVal)), cv.Scalar.Gray, task.lineWidth)
                 Next
                 label1 = CStr(CInt(soundSource.pcmDuration)) + " seconds displayed with Scaled Average"
         End Select
@@ -293,8 +293,8 @@ Public Class Sound_Display : Inherits VBparent
             sliderPercent = 0
             starttime = Now
         End If
-        Dim x = dst1.Width * sliderPercent
-        dst1.Line(New cv.Point(x, 0), New cv.Point(x, dst1.Height), cv.Scalar.Black, task.lineWidth + 1)
+        Dim x = dst2.Width * sliderPercent
+        dst2.Line(New cv.Point(x, 0), New cv.Point(x, dst2.Height), cv.Scalar.Black, task.lineWidth + 1)
     End Sub
 End Class
 
@@ -315,8 +315,8 @@ Public Class Sound_GenWaveDisplay : Inherits VBparent
         plotSound.Run(src)
         Dim r1 = New cv.Rect(0, 0, src.Width, src.Height)
         Dim r2 = New cv.Rect(src.Width, 0, src.Width, src.Height)
-        dst1 = plotSound.dst1(r1)
-        dst2 = plotSound.dst1(r2)
+        dst2 = plotSound.dst2(r1)
+        dst3 = plotSound.dst2(r2)
     End Sub
 End Class
 
@@ -338,7 +338,7 @@ Public Class Sound_WaveDisplay : Inherits VBparent
         plotSound.Run(src)
         Dim r1 = New cv.Rect(0, 0, src.Width, src.Height)
         Dim r2 = New cv.Rect(src.Width, 0, src.Width, src.Height)
-        dst1 = plotSound.dst1(r1)
-        dst2 = plotSound.dst1(r2)
+        dst2 = plotSound.dst2(r1)
+        dst3 = plotSound.dst2(r2)
     End Sub
 End Class

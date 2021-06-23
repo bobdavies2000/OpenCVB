@@ -103,7 +103,7 @@ Module Puzzle_Solvers
         End If
         Return cornerType.none
     End Function
-    Public Function fitCheck(dst1 As cv.Mat, roilist() As cv.Rect, ByRef fitlist As List(Of bestFit)) As List(Of bestFit)
+    Public Function fitCheck(dst2 As cv.Mat, roilist() As cv.Rect, ByRef fitlist As List(Of bestFit)) As List(Of bestFit)
         ' compute absDiff of every top/bottom to every left/right side
         Dim sample(8 - 1) As cv.Mat
         Dim corners As New List(Of bestFit)
@@ -112,18 +112,18 @@ Module Puzzle_Solvers
         For roiIndex = 0 To roilist.Count - 1
             Dim maxDiff() = {Single.MinValue, Single.MinValue, Single.MinValue, Single.MinValue}
             Dim roi1 = roilist(roiIndex)
-            sample(0) = dst1(roi1).Row(0)
-            sample(2) = dst1(roi1).Row(roi1.Height - 1)
-            sample(4) = dst1(roi1).Col(0)
-            sample(6) = dst1(roi1).Col(roi1.Width - 1)
+            sample(0) = dst2(roi1).Row(0)
+            sample(2) = dst2(roi1).Row(roi1.Height - 1)
+            sample(4) = dst2(roi1).Col(0)
+            sample(6) = dst2(roi1).Col(roi1.Width - 1)
             Dim nextFitList As New List(Of fit)
             For j = 0 To roilist.Count - 1
                 If roiIndex = j Then Continue For
                 Dim roi2 = roilist(j)
-                sample(1) = dst1(roi2).Row(roi1.Height - 1)
-                sample(3) = dst1(roi2).Row(0)
-                sample(5) = dst1(roi2).Col(roi2.Width - 1)
-                sample(7) = dst1(roi2).Col(0)
+                sample(1) = dst2(roi2).Row(roi1.Height - 1)
+                sample(3) = dst2(roi2).Row(0)
+                sample(5) = dst2(roi2).Col(roi2.Width - 1)
+                sample(7) = dst2(roi2).Col(0)
 
                 Dim absDiff() = computeMetric(sample)
                 For k = 0 To maxDiff.Count - 1
@@ -227,8 +227,8 @@ Public Class Puzzle_Basics : Inherits VBparent
     Public Sub New()
         gridWidthSlider = findSlider("ThreadGrid Width")
         gridHeightSlider = findSlider("ThreadGrid Height")
-        gridWidthSlider.Value = dst1.Cols / 10
-        gridHeightSlider.Value = dst1.Rows / 8
+        gridWidthSlider.Value = dst2.Cols / 10
+        gridHeightSlider.Value = dst2.Rows / 8
 
         grid.Run(Nothing)
         task.desc = "Create the puzzle pieces for toy genetic or annealing algorithm."
@@ -263,7 +263,7 @@ Public Class Puzzle_Basics : Inherits VBparent
         For i = 0 To scrambled.Count - 1
             Dim roi = grid.roiList(i)
             Dim roi2 = scrambled(i)
-            If roi.Width = width And roi.Height = height And roi2.Width = width And roi2.Height = height Then dst1(roi2) = src(roi)
+            If roi.Width = width And roi.Height = height And roi2.Width = width And roi2.Height = height Then dst2(roi2) = src(roi)
         Next
     End Sub
 End Class
@@ -389,8 +389,8 @@ Public Class Puzzle_Solver : Inherits VBparent
             roilist = puzzle.grid.roiList.ToArray
         End If
 
-        dst1 = puzzle.dst1
-        Dim cornerlist = fitCheck(dst1, roilist, fitlist)
+        dst2 = puzzle.dst2
+        Dim cornerlist = fitCheck(dst2, roilist, fitlist)
 
         If cornerlist.Count = 0 Then Exit Sub ' rare condition, found no corner tiles.  How is this possible?
         Dim bestCorner = cornerlist.ElementAt(0)
@@ -407,9 +407,9 @@ Public Class Puzzle_Solver : Inherits VBparent
 
         Select Case bestCorner.corner
             Case cornerType.upperLeft, cornerType.upperRight
-                For nexty = 0 To dst2.Height - 1 Step roi.Height
-                    For nextx = 0 To dst2.Width - 1 Step roi.Width
-                        dst1(roi).CopyTo(dst2(New cv.Rect(nextx, nexty, roi.Width, roi.Height)))
+                For nexty = 0 To dst3.Height - 1 Step roi.Height
+                    For nextx = 0 To dst3.Width - 1 Step roi.Width
+                        dst2(roi).CopyTo(dst3(New cv.Rect(nextx, nexty, roi.Width, roi.Height)))
                         usedList.Add(fit.index)
                         col += 1
                         If col < cols Then
@@ -427,9 +427,9 @@ Public Class Puzzle_Solver : Inherits VBparent
                     bestCorner = fit
                 Next
             Case cornerType.lowerLeft, cornerType.lowerRight
-                For nexty = dst2.Height - roi.Height To 0 Step -roi.Height
-                    For nextx = 0 To dst2.Width - 1 Step roi.Width
-                        dst1(roi).CopyTo(dst2(New cv.Rect(nextx, nexty, roi.Width, roi.Height)))
+                For nexty = dst3.Height - roi.Height To 0 Step -roi.Height
+                    For nextx = 0 To dst3.Width - 1 Step roi.Width
+                        dst2(roi).CopyTo(dst3(New cv.Rect(nextx, nexty, roi.Width, roi.Height)))
                         usedList.Add(fit.index)
                         col += 1
                         If col < cols Then
@@ -452,38 +452,38 @@ Public Class Puzzle_Solver : Inherits VBparent
             ' how well did we do?
             Dim tmp As New cv.Mat
             Dim left As cv.Mat, right As cv.Mat, bottom As cv.Mat, top As cv.Mat
-            For y = 0 To dst2.Height - 1 Step roi.Height
-                For x = 0 To dst2.Width - 1 Step roi.Width
+            For y = 0 To dst3.Height - 1 Step roi.Height
+                For x = 0 To dst3.Width - 1 Step roi.Width
                     Dim tileRoi = New cv.Rect(x, y, roi.Width, roi.Height)
                     Dim tileRight = New cv.Rect(x + roi.Width, y, roi.Width, roi.Height)
                     Dim tileBelow = New cv.Rect(x, y + roi.Height, roi.Width, roi.Height)
-                    If x <> dst2.Width - roi.Width Then
-                        right = dst2(tileRoi).Col(roi.Width - 1)
-                        left = dst2(tileRight).Col(0)
+                    If x <> dst3.Width - roi.Width Then
+                        right = dst3(tileRoi).Col(roi.Width - 1)
+                        left = dst3(tileRight).Col(0)
                         cv.Cv2.MatchTemplate(right, left, tmp, cv.TemplateMatchModes.CCoeffNormed)
                         Dim correlationRight = tmp.Get(Of Single)(0, 0)
                         If check.Box(1).Checked And correlationRight < 0.9 Then
-                            cv.Cv2.PutText(dst2, Format(correlationRight, "0.00"), New cv.Point(x + yxOffset, y + yyOffset),
+                            cv.Cv2.PutText(dst3, Format(correlationRight, "0.00"), New cv.Point(x + yxOffset, y + yyOffset),
                                        cv.HersheyFonts.HersheySimplex, task.fontSize, cv.Scalar.White, task.lineWidth, task.lineType)
                         End If
                     End If
 
-                    If y <> dst2.Height - roi.Height Then
-                        bottom = dst2(tileRoi).Row(roi.Height - 1)
-                        top = dst2(tileBelow).Row(0)
+                    If y <> dst3.Height - roi.Height Then
+                        bottom = dst3(tileRoi).Row(roi.Height - 1)
+                        top = dst3(tileBelow).Row(0)
 
                         cv.Cv2.MatchTemplate(bottom, top, tmp, cv.TemplateMatchModes.CCoeffNormed)
                         Dim correlationBottom = tmp.Get(Of Single)(0, 0)
 
                         If check.Box(1).Checked And correlationBottom < 0.9 Then
-                            cv.Cv2.PutText(dst2, Format(correlationBottom, "0.00"), New cv.Point(x + xxOffset, y + xyOffset),
+                            cv.Cv2.PutText(dst3, Format(correlationBottom, "0.00"), New cv.Point(x + xxOffset, y + xyOffset),
                                        cv.HersheyFonts.HersheySimplex, task.fontSize, cv.Scalar.White, task.lineWidth, task.lineType)
                         End If
                     End If
                 Next
             Next
 
-            dst2.SetTo(cv.Scalar.White, puzzle.grid.gridMask)
+            dst3.SetTo(cv.Scalar.White, puzzle.grid.gridMask)
         End If
 
         fitlist.Clear()

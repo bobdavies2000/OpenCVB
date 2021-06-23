@@ -18,34 +18,34 @@ Public Class Contours_Basics : Inherits VBparent
         If standalone Then
             Dim imageInput As New cv.Mat
             rotatedRect.Run(src)
-            imageInput = rotatedRect.dst1
+            imageInput = rotatedRect.dst2
             If imageInput.Channels = 3 Then
-                dst1 = imageInput.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
+                dst2 = imageInput.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
             Else
-                dst1 = imageInput.ConvertScaleAbs(255)
+                dst2 = imageInput.ConvertScaleAbs(255)
             End If
         Else
-            If src.Channels = 3 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = src
+            If src.Channels = 3 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst2 = src
         End If
 
         If options.retrievalMode = cv.RetrievalModes.FloodFill Then
             Dim img32sc1 As New cv.Mat
-            dst1.ConvertTo(img32sc1, cv.MatType.CV_32SC1)
+            dst2.ConvertTo(img32sc1, cv.MatType.CV_32SC1)
             contours0 = cv.Cv2.FindContoursAsArray(img32sc1, options.retrievalMode, options.ApproximationMode)
-            img32sc1.ConvertTo(dst1, cv.MatType.CV_8UC1)
+            img32sc1.ConvertTo(dst2, cv.MatType.CV_8UC1)
         Else
-            contours0 = cv.Cv2.FindContoursAsArray(dst1, options.retrievalMode, options.ApproximationMode)
+            contours0 = cv.Cv2.FindContoursAsArray(dst2, options.retrievalMode, options.ApproximationMode)
         End If
 
         Dim minArea = areaSlider.value
         Dim epsilon = epsilonSlider.value
         If standalone Then
-            dst2.SetTo(0)
+            dst3.SetTo(0)
             Dim cnt = contours0.ToArray
             If options.retrievalMode = cv.RetrievalModes.FloodFill Then
-                cv.Cv2.DrawContours(dst2, cnt, -1, cv.Scalar.Yellow, -1, task.lineType)
+                cv.Cv2.DrawContours(dst3, cnt, -1, cv.Scalar.Yellow, -1, task.lineType)
             Else
-                cv.Cv2.DrawContours(dst2, cnt, -1, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
+                cv.Cv2.DrawContours(dst3, cnt, -1, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
             End If
 
             For i = 0 To contours0.Length - 1 Step 2
@@ -55,10 +55,10 @@ Public Class Contours_Basics : Inherits VBparent
                 Dim area = cv.Cv2.ContourArea(contours0(i))
                 If area > minArea Then
                     contourlist.Add(cv.Cv2.ApproxPolyDP(contours0(i), epsilon, True))
-                    dst2.Circle(pt, task.dotSize, cv.Scalar.Red, -1, task.lineType)
-                    cv.Cv2.PutText(dst2, Format(area / 1000, "#0") + "k pixels", New cv.Point(pt.X + task.dotSize, pt.Y), cv.HersheyFonts.HersheyComplexSmall, task.fontSize, cv.Scalar.White)
+                    dst3.Circle(pt, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+                    cv.Cv2.PutText(dst3, Format(area / 1000, "#0") + "k pixels", New cv.Point(pt.X + task.dotSize, pt.Y), cv.HersheyFonts.HersheyComplexSmall, task.fontSize, cv.Scalar.White)
                 Else
-                    cv.Cv2.PutText(dst2, "too small", New cv.Point(pt.X + task.dotSize, pt.Y), cv.HersheyFonts.HersheyComplexSmall, task.fontSize, cv.Scalar.White)
+                    cv.Cv2.PutText(dst3, "too small", New cv.Point(pt.X + task.dotSize, pt.Y), cv.HersheyFonts.HersheyComplexSmall, task.fontSize, cv.Scalar.White)
                 End If
             Next
         Else
@@ -168,11 +168,11 @@ Public Class Contours_RGB : Inherits VBparent
             points.Add(New cv.Point(hull(i).X, hull(i).Y))
         Next
         listOfPoints.Add(points)
-        dst1.SetTo(0)
-        cv.Cv2.DrawContours(dst1, listOfPoints, 0, New cv.Scalar(255, 0, 0), -1)
-        cv.Cv2.DrawContours(dst1, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
         dst2.SetTo(0)
-        src.CopyTo(dst2, task.noDepthMask)
+        cv.Cv2.DrawContours(dst2, listOfPoints, 0, New cv.Scalar(255, 0, 0), -1)
+        cv.Cv2.DrawContours(dst2, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
+        dst3.SetTo(0)
+        src.CopyTo(dst3, task.noDepthMask)
     End Sub
 End Class
 
@@ -198,7 +198,7 @@ Public Class Contours_RemoveLines : Inherits VBparent
         Dim tmp = cv.Cv2.ImRead(task.parms.homeDir + "Data/invoice.jpg")
         Dim dstSize = New cv.Size(src.Height / tmp.Height * src.Width, src.Height)
         Dim dstRect = New cv.Rect(0, 0, dstSize.Width, src.Height)
-        dst1(dstRect) = tmp.Resize(dstSize)
+        dst2(dstRect) = tmp.Resize(dstSize)
         Dim gray = tmp.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim thresh = gray.Threshold(0, 255, cv.ThresholdTypes.BinaryInv Or cv.ThresholdTypes.Otsu)
 
@@ -219,7 +219,7 @@ Public Class Contours_RemoveLines : Inherits VBparent
             cv.Cv2.DrawContours(tmp, cnts, i, cv.Scalar.White, task.lineWidth)
         Next
 
-        dst2(dstRect) = tmp.Resize(dstSize)
+        dst3(dstRect) = tmp.Resize(dstSize)
         cv.Cv2.ImShow("Altered image at original resolution", tmp)
     End Sub
 End Class
@@ -236,8 +236,8 @@ Public Class Contours_Depth : Inherits VBparent
         label2 = "DepthContour output"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dst1 = task.noDepthMask
-        dst2.SetTo(0)
+        dst2 = task.noDepthMask
+        dst3.SetTo(0)
         Dim input As cv.Mat = task.depthMask
         Dim contours0 = cv.Cv2.FindContoursAsArray(input, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
         Dim maxIndex As Integer
@@ -250,7 +250,7 @@ Public Class Contours_Depth : Inherits VBparent
             End If
         Next
         If contours0.Length Then
-            cv.Cv2.DrawContours(dst2, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
+            cv.Cv2.DrawContours(dst3, contours0, maxIndex, New cv.Scalar(0, 255, 255), -1)
             contours.Clear()
             For Each ct In contours0(maxIndex)
                 contours.Add(ct)
@@ -278,8 +278,8 @@ Public Class Contours_Prediction : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         outline.Run(src)
-        dst1 = outline.dst2
-        dst2.SetTo(0)
+        dst2 = outline.dst3
+        dst3.SetTo(0)
         Dim stepSize = sliders.trackbar(0).Value
         Dim len = outline.contours.Count
         If len > 0 Then
@@ -291,9 +291,9 @@ Public Class Contours_Prediction : Inherits VBparent
                 kalman.kInput = {outline.contours(i Mod len).X, outline.contours(i Mod len).Y}
                 kalman.Run(src)
                 Dim pt2 = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
-                dst2.Line(pt1, pt2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+                dst3.Line(pt1, pt2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
             Next
-            dst2.Line(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), origin, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+            dst3.Line(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), origin, cv.Scalar.Yellow, task.lineWidth, task.lineType)
         End If
         label1 = "There were " + CStr(outline.contours.Count) + " points in this contour"
     End Sub
@@ -316,19 +316,19 @@ Public Class Contours_FindandDraw : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         rotatedRect.Run(src)
-        dst1 = rotatedRect.dst1
-        Dim img = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst2 = rotatedRect.dst2
+        Dim img = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
         Dim tmp As New cv.Mat
         img.ConvertTo(tmp, cv.MatType.CV_32SC1)
         Dim contours0 = cv.Cv2.FindContoursAsArray(tmp, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxSimple)
         Dim contours As New List(Of cv.Point())
-        dst2.SetTo(0)
+        dst3.SetTo(0)
         For j = 0 To contours0.Length - 1
             Dim nextContour = cv.Cv2.ApproxPolyDP(contours0(j), 3, True)
             If nextContour.Length > 2 Then contours.Add(nextContour)
         Next
 
-        cv.Cv2.DrawContours(dst2, contours.ToArray, -1, New cv.Scalar(0, 255, 255), task.lineWidth + 1, task.lineType)
+        cv.Cv2.DrawContours(dst3, contours.ToArray, -1, New cv.Scalar(0, 255, 255), task.lineWidth + 1, task.lineType)
     End Sub
 End Class
 
@@ -353,21 +353,21 @@ Public Class Contours_Binarized : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         sobel.Run(src)
-        dst1 = sobel.dst1
+        dst2 = sobel.dst2
 
-        basics.Run(dst1.Clone)
+        basics.Run(dst2.Clone)
 
         Dim cntList = basics.sortedContours
         If cntList.Count = 0 Then Exit Sub ' there were no lines?
         Dim incr = If(cntList.Count > 255, 1, CInt(255 / cntList.Count))
-        dst2.SetTo(0)
-        Static lastFrame = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst3.SetTo(0)
+        Static lastFrame = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         For i = 0 To cntList.Count - 1
             Dim lPoints = New List(Of List(Of cv.Point))
             lPoints.Add(cntList.ElementAt(i).Value.ToList)
-            cv.Cv2.DrawContours(CType(dst2, cv.InputOutputArray), lPoints, 0, task.scalarColors(i Mod 255), -1)
+            cv.Cv2.DrawContours(CType(dst3, cv.InputOutputArray), lPoints, 0, task.scalarColors(i Mod 255), -1)
         Next
 
-        lastFrame = dst2.Clone
+        lastFrame = dst3.Clone
     End Sub
 End Class

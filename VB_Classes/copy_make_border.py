@@ -48,10 +48,10 @@ def main(argv):
         value = [randint(0, 255), randint(0, 255), randint(0, 255)]
         ## [update_value]
         ## [copymakeborder]
-        dst1 = cv.copyMakeBorder(src, top, bottom, left, right, borderType, None, value)
+        dst2 = cv.copyMakeBorder(src, top, bottom, left, right, borderType, None, value)
         ## [copymakeborder]
         ## [display]
-        cv.imshow(window_name, dst1)
+        cv.imshow(window_name, dst2)
         ## [display]
         ## [check_keypress]
         c = cv.waitKey(500)

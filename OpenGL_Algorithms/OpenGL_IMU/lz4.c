@@ -240,9 +240,9 @@ static void LZ4_writeLE16(void* memPtr, U16 value)
     }
 }
 
-static void LZ4_copy8(void* dst1, const void* src)
+static void LZ4_copy8(void* dst2, const void* src)
 {
-    memcpy(dst1,src,8);
+    memcpy(dst2,src,8);
 }
 
 /* customized variant of memcpy, which can overwrite up to 8 bytes beyond dstEnd */
@@ -885,22 +885,22 @@ _last_literals:
 }
 
 
-static int LZ4_compress_destSize_extState (LZ4_stream_t* state, const char* src, char* dst1, int* srcSizePtr, int targetDstSize)
+static int LZ4_compress_destSize_extState (LZ4_stream_t* state, const char* src, char* dst2, int* srcSizePtr, int targetDstSize)
 {
     LZ4_resetStream(state);
 
     if (targetDstSize >= LZ4_compressBound(*srcSizePtr)) {  /* compression success is guaranteed */
-        return LZ4_compress_fast_extState(state, src, dst1, *srcSizePtr, targetDstSize, 1);
+        return LZ4_compress_fast_extState(state, src, dst2, *srcSizePtr, targetDstSize, 1);
     } else {
         if (*srcSizePtr < LZ4_64Klimit)
-            return LZ4_compress_destSize_generic(&state->internal_donotuse, src, dst1, srcSizePtr, targetDstSize, byU16);
+            return LZ4_compress_destSize_generic(&state->internal_donotuse, src, dst2, srcSizePtr, targetDstSize, byU16);
         else
-            return LZ4_compress_destSize_generic(&state->internal_donotuse, src, dst1, srcSizePtr, targetDstSize, sizeof(void*)==8 ? byU32 : byPtr);
+            return LZ4_compress_destSize_generic(&state->internal_donotuse, src, dst2, srcSizePtr, targetDstSize, sizeof(void*)==8 ? byU32 : byPtr);
     }
 }
 
 
-int LZ4_compress_destSize(const char* src, char* dst1, int* srcSizePtr, int targetDstSize)
+int LZ4_compress_destSize(const char* src, char* dst2, int* srcSizePtr, int targetDstSize)
 {
 #if (LZ4_HEAPMODE)
     LZ4_stream_t* ctx = (LZ4_stream_t*)ALLOCATOR(1, sizeof(LZ4_stream_t));   /* malloc-calloc always properly aligned */
@@ -909,7 +909,7 @@ int LZ4_compress_destSize(const char* src, char* dst1, int* srcSizePtr, int targ
     LZ4_stream_t* ctx = &ctxBody;
 #endif
 
-    int result = LZ4_compress_destSize_extState(ctx, src, dst1, srcSizePtr, targetDstSize);
+    int result = LZ4_compress_destSize_extState(ctx, src, dst2, srcSizePtr, targetDstSize);
 
 #if (LZ4_HEAPMODE)
     FREEMEM(ctx);
@@ -1413,9 +1413,9 @@ int LZ4_decompress_safe_forceExtDict(const char* source, char* dest, int compres
 /* obsolete compression functions */
 int LZ4_compress_limitedOutput(const char* source, char* dest, int inputSize, int maxOutputSize) { return LZ4_compress_default(source, dest, inputSize, maxOutputSize); }
 int LZ4_compress(const char* source, char* dest, int inputSize) { return LZ4_compress_default(source, dest, inputSize, LZ4_compressBound(inputSize)); }
-int LZ4_compress_limitedOutput_withState (void* state, const char* src, char* dst1, int srcSize, int dstSize) { return LZ4_compress_fast_extState(state, src, dst1, srcSize, dstSize, 1); }
-int LZ4_compress_withState (void* state, const char* src, char* dst1, int srcSize) { return LZ4_compress_fast_extState(state, src, dst1, srcSize, LZ4_compressBound(srcSize), 1); }
-int LZ4_compress_limitedOutput_continue (LZ4_stream_t* LZ4_stream, const char* src, char* dst1, int srcSize, int maxDstSize) { return LZ4_compress_fast_continue(LZ4_stream, src, dst1, srcSize, maxDstSize, 1); }
+int LZ4_compress_limitedOutput_withState (void* state, const char* src, char* dst2, int srcSize, int dstSize) { return LZ4_compress_fast_extState(state, src, dst2, srcSize, dstSize, 1); }
+int LZ4_compress_withState (void* state, const char* src, char* dst2, int srcSize) { return LZ4_compress_fast_extState(state, src, dst2, srcSize, LZ4_compressBound(srcSize), 1); }
+int LZ4_compress_limitedOutput_continue (LZ4_stream_t* LZ4_stream, const char* src, char* dst2, int srcSize, int maxDstSize) { return LZ4_compress_fast_continue(LZ4_stream, src, dst2, srcSize, maxDstSize, 1); }
 int LZ4_compress_continue (LZ4_stream_t* LZ4_stream, const char* source, char* dest, int inputSize) { return LZ4_compress_fast_continue(LZ4_stream, source, dest, inputSize, LZ4_compressBound(inputSize), 1); }
 
 /*

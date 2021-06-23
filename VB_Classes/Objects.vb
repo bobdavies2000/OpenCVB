@@ -7,8 +7,8 @@ Public Class Object_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         km.Run(src)
-        dst1 = km.dst1
         dst2 = km.dst2
+        dst3 = km.dst3
     End Sub
 End Class
 

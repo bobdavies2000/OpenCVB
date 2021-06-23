@@ -19,17 +19,17 @@ titleWindow = 'Hough_example5.py'
 def main():
     fn = '../Data/pic1.png'
     src = cv.imread(cv.samples.findFile(fn))
-    dst1 = cv.Canny(src, 50, 200)
-    cdst1 = cv.cvtColor(dst1, cv.COLOR_GRAY2BGR)
+    dst2 = cv.Canny(src, 50, 200)
+    cdst1 = cv.cvtColor(dst2, cv.COLOR_GRAY2BGR)
 
     if True: # HoughLinesP
-        lines = cv.HoughLinesP(dst1, 1, math.pi/180.0, 40, np.array([]), 50, 10)
+        lines = cv.HoughLinesP(dst2, 1, math.pi/180.0, 40, np.array([]), 50, 10)
         a,b,c = lines.shape
         for i in range(a):
             cv.line(cdst1, (lines[i][0][0], lines[i][0][1]), (lines[i][0][2], lines[i][0][3]), (0, 0, 255), 3, cv.LINE_AA)
 
     else:    # HoughLines
-        lines = cv.HoughLines(dst1, 1, math.pi/180.0, 50, np.array([]), 0, 0)
+        lines = cv.HoughLines(dst2, 1, math.pi/180.0, 50, np.array([]), 0, 0)
         if lines is not None:
             a,b,c = lines.shape
             for i in range(a):

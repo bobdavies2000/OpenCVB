@@ -8,13 +8,13 @@ Public Class Random_Basics : Inherits VBparent
     Public countSlider As Windows.Forms.TrackBar
     Public Sub New()
         If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Random Pixel Count", 1, dst1.Cols * dst1.Rows, 20)
+            sliders.setupTrackBar(0, "Random Pixel Count", 1, dst2.Cols * dst2.Rows, 20)
             countSlider = sliders.trackbar(0)
         Else
             countSlider = findSlider("Random Pixel Count")
         End If
 
-        rangeRect = New cv.Rect(0, 0, dst1.Cols, dst1.Rows)
+        rangeRect = New cv.Rect(0, 0, dst2.Cols, dst2.Rows)
         task.desc = "Create a uniform random mask with a specificied number of pixels."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 3
@@ -22,13 +22,13 @@ Public Class Random_Basics : Inherits VBparent
             ReDim Points(countSlider.Value - 1)
             ReDim Points2f(countSlider.Value - 1)
         End If
-        dst1.SetTo(0)
+        dst2.SetTo(0)
         For i = 0 To Points.Length - 1
             Dim x = msRNG.Next(rangeRect.X, rangeRect.X + rangeRect.Width)
             Dim y = msRNG.Next(rangeRect.Y, rangeRect.Y + rangeRect.Height)
             Points(i) = New cv.Point2f(x, y)
             Points2f(i) = New cv.Point2f(x, y)
-            If standalone Or plotPoints = True Then dst1.Circle(Points(i), task.dotSize + 2, cv.Scalar.Gray, -1, task.lineType, 0)
+            If standalone Or plotPoints = True Then dst2.Circle(Points(i), task.dotSize + 2, cv.Scalar.Gray, -1, task.lineType, 0)
         Next
     End Sub
 End Class
@@ -42,8 +42,8 @@ Public Class Random_Shuffle : Inherits VBparent
         task.desc = "Use randomShuffle to reorder an image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        src.CopyTo(dst1)
-        cv.Cv2.RandShuffle(dst1, 1.0, myRNG) ' don't remove that myRNG!  It will fail in RandShuffle.
+        src.CopyTo(dst2)
+        cv.Cv2.RandShuffle(dst2, 1.0, myRNG) ' don't remove that myRNG!  It will fail in RandShuffle.
         label1 = "Random_shuffle - wave at camera"
     End Sub
 End Class
@@ -67,17 +67,17 @@ Public Class Random_LUTMask : Inherits VBparent
             lutMat = cv.Mat.Zeros(New cv.Size(1, 256), cv.MatType.CV_8UC3)
             Dim lutIndex = 0
             km.Run(src)
-            dst1 = km.dst1
+            dst2 = km.dst2
             For i = 0 To random.Points.Length - 1
                 Dim x = random.Points(i).X
                 Dim y = random.Points(i).Y
-                lutMat.Set(lutIndex, 0, dst1.Get(Of cv.Vec3b)(y, x))
+                lutMat.Set(lutIndex, 0, dst2.Get(Of cv.Vec3b)(y, x))
                 lutIndex += 1
                 If lutIndex >= lutMat.Rows Then Exit For
             Next
         End If
 
-        dst2 = src.LUT(lutMat)
+        dst3 = src.LUT(lutMat)
         label1 = "Using kmeans colors with interpolation"
     End Sub
 End Class
@@ -94,8 +94,8 @@ Public Class Random_UniformDist : Inherits VBparent
         task.desc = "Create a uniform distribution."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U)
-        cv.Cv2.Randu(dst1, minVal, maxVal)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
+        cv.Cv2.Randu(dst2, minVal, maxVal)
     End Sub
 End Class
 
@@ -121,8 +121,8 @@ Public Class Random_NormalDist : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static grayCheck = findCheckBox("Use Grayscale image")
-        If grayCheck.checked And dst1.Channels <> 1 Then dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
-        cv.Cv2.Randn(dst1, New cv.Scalar(sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value), cv.Scalar.All(sliders.trackbar(3).Value))
+        If grayCheck.checked And dst2.Channels <> 1 Then dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        cv.Cv2.Randn(dst2, New cv.Scalar(sliders.trackbar(0).Value, sliders.trackbar(1).Value, sliders.trackbar(2).Value), cv.Scalar.All(sliders.trackbar(3).Value))
     End Sub
 End Class
 
@@ -139,10 +139,10 @@ Public Class Random_CheckUniformSmoothed : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         rUniform.Run(src)
-        dst1 = rUniform.dst1
+        dst2 = rUniform.dst2
         histogram.plotHist.maxRange = 255
-        histogram.Run(dst1)
-        dst2 = histogram.dst1
+        histogram.Run(dst2)
+        dst3 = histogram.dst2
     End Sub
 End Class
 
@@ -159,10 +159,10 @@ Public Class Random_CheckUniformDist : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         rUniform.Run(src)
-        dst1 = rUniform.dst1
+        dst2 = rUniform.dst2
         histogram.plotRequested = True
-        histogram.Run(dst1)
-        dst2 = histogram.dst1
+        histogram.Run(dst2)
+        dst3 = histogram.dst2
     End Sub
 End Class
 
@@ -179,10 +179,10 @@ Public Class Random_CheckNormalDist : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         normalDist.Run(src)
-        dst1 = normalDist.dst1
+        dst2 = normalDist.dst2
         histogram.plotRequested = True
-        histogram.Run(dst1)
-        dst2 = histogram.dst1
+        histogram.Run(dst2)
+        dst3 = histogram.dst2
     End Sub
 End Class
 
@@ -199,9 +199,9 @@ Public Class Random_CheckNormalDistSmoothed : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         normalDist.Run(src)
-        dst1 = normalDist.dst1
-        histogram.Run(dst1)
-        dst2 = histogram.dst1
+        dst2 = normalDist.dst2
+        histogram.Run(dst2)
+        dst3 = histogram.dst2
     End Sub
 End Class
 
@@ -252,7 +252,7 @@ Public Class Random_PatternGenerator_CPP : Inherits VBparent
         If imagePtr <> 0 Then
             Dim dstData(src.Total - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
+            dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
         End If
     End Sub
     Public Sub Close()
@@ -301,7 +301,7 @@ Public Class Random_CustomDistribution : Inherits VBparent
         If standalone Or task.intermediateName = caller Then
             plotHist.hist = outputHistogram
             plotHist.Run(src)
-            dst1 = plotHist.dst1
+            dst2 = plotHist.dst2
         End If
     End Sub
 End Class
@@ -342,7 +342,7 @@ Public Class Random_MonteCarlo : Inherits VBparent
         If standalone Or task.intermediateName = caller Then
             plotHist.hist = histogram
             plotHist.Run(src)
-            dst1 = plotHist.dst1
+            dst2 = plotHist.dst2
         End If
     End Sub
 End Class
@@ -360,7 +360,7 @@ Public Class Random_CustomHistogram : Inherits VBparent
         random.outputRandom = New cv.Mat(1000, 1, cv.MatType.CV_32S, 0)
 
         label1 = "Histogram of the grayscale image"
-        label2 = "Custom random distribution that reflects dst1 image"
+        label2 = "Custom random distribution that reflects dst2 image"
         task.desc = "Create a random number distribution that reflects histogram of a grayscale image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -368,7 +368,7 @@ Public Class Random_CustomHistogram : Inherits VBparent
 
         hist.plotHist.plotMaxValue = 0 ' we are sharing the plothist with the code below...
         hist.Run(src)
-        dst1 = hist.dst1.Clone()
+        dst2 = hist.dst2.Clone()
         saveHist = hist.plotHist.hist.Clone()
 
         random.inputCDF = saveHist ' it will convert the histogram into a cdf where the last value must be near one.
@@ -378,7 +378,7 @@ Public Class Random_CustomHistogram : Inherits VBparent
             hist.plotHist.plotMaxValue = 100
             hist.plotHist.hist = random.outputHistogram
             hist.plotHist.Run(src)
-            dst2 = hist.plotHist.dst1
+            dst3 = hist.plotHist.dst2
         End If
     End Sub
 End Class
@@ -400,7 +400,7 @@ Public Class Random_60sTV : Inherits VBparent
 
         task.drawRect = New cv.Rect(100, 100, 100, 100)
         label1 = "Draw anywhere to select a test region"
-        label2 = "Resized selection rectangle in dst1"
+        label2 = "Resized selection rectangle in dst2"
         task.desc = "Imitate an old TV appearance using randomness."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -409,13 +409,13 @@ Public Class Random_60sTV : Inherits VBparent
         Dim val = valSlider.value
         Dim thresh = threshSlider.value
 
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = dst1(task.drawRect)
-        For y = 0 To dst2.Height - 1
-            For x = 0 To dst2.Width - 1
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst3 = dst2(task.drawRect)
+        For y = 0 To dst3.Height - 1
+            For x = 0 To dst3.Width - 1
                 If 255 * Rnd() <= thresh Then
-                    Dim v = dst2.Get(Of Byte)(y, x)
-                    dst2.Set(Of Byte)(y, x, If(2 * Rnd() = 0, Math.Min(v + (val + 1) * Rnd(), 255), Math.Max(v - (val + 1) * Rnd(), 0)))
+                    Dim v = dst3.Get(Of Byte)(y, x)
+                    dst3.Set(Of Byte)(y, x, If(2 * Rnd() = 0, Math.Min(v + (val + 1) * Rnd(), 255), Math.Max(v - (val + 1) * Rnd(), 0)))
                 End If
             Next
         Next
@@ -440,28 +440,28 @@ Public Class Random_60sTVFaster : Inherits VBparent
         Static valSlider = findSlider("Range of noise to apply (from 0 to this value)")
         Static percentSlider = findSlider("Percentage of pixels to include noise")
 
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         random.Run(src)
-        mats.mat(0) = random.dst1.Threshold(255 - percentSlider.value * 255 / 100, 255, cv.ThresholdTypes.Binary)
-        Dim nochangeMask = random.dst1.Threshold(255 - percentSlider.value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
+        mats.mat(0) = random.dst2.Threshold(255 - percentSlider.value * 255 / 100, 255, cv.ThresholdTypes.Binary)
+        Dim nochangeMask = random.dst2.Threshold(255 - percentSlider.value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
 
-        Dim valMat As New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        Dim valMat As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         cv.Cv2.Randu(valMat, 0, valSlider.value)
         valMat.SetTo(0, nochangeMask)
 
         random.Run(src)
-        Dim plusMask = random.dst1.Threshold(128, 255, cv.ThresholdTypes.Binary)
-        Dim minusMask = random.dst1.Threshold(128, 255, cv.ThresholdTypes.BinaryInv)
+        Dim plusMask = random.dst2.Threshold(128, 255, cv.ThresholdTypes.Binary)
+        Dim minusMask = random.dst2.Threshold(128, 255, cv.ThresholdTypes.BinaryInv)
 
         mats.mat(2) = plusMask
         mats.mat(3) = minusMask
         mats.mat(1) = (plusMask + minusMask).ToMat.SetTo(0, nochangeMask)
 
-        cv.Cv2.Add(dst1, valMat, dst1, plusMask)
-        cv.Cv2.Subtract(dst1, valMat, dst1, minusMask)
+        cv.Cv2.Add(dst2, valMat, dst2, plusMask)
+        cv.Cv2.Subtract(dst2, valMat, dst2, minusMask)
         mats.Run(src)
-        dst2 = mats.dst1
+        dst3 = mats.dst2
     End Sub
 End Class
 
@@ -482,22 +482,22 @@ Public Class Random_60sTVFastSimple : Inherits VBparent
         Static valSlider = findSlider("Range of noise to apply (from 0 to this value)")
         Static percentSlider = findSlider("Percentage of pixels to include noise")
 
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         random.Run(src)
-        Dim nochangeMask = random.dst1.Threshold(255 - percentSlider.value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
+        Dim nochangeMask = random.dst2.Threshold(255 - percentSlider.value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
 
-        dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
-        cv.Cv2.Randu(dst2, 0, valSlider.value)
-        dst2.SetTo(0, nochangeMask)
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        cv.Cv2.Randu(dst3, 0, valSlider.value)
+        dst3.SetTo(0, nochangeMask)
 
-        Dim tmp As New cv.Mat(dst1.Size, cv.MatType.CV_8U)
+        Dim tmp As New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         cv.Cv2.Randu(tmp, 0, 255)
         Dim plusMask = tmp.Threshold(128, 255, cv.ThresholdTypes.Binary)
         Dim minusMask = tmp.Threshold(128, 255, cv.ThresholdTypes.BinaryInv)
 
-        cv.Cv2.Add(dst1, dst2, dst1, plusMask)
-        cv.Cv2.Subtract(dst1, dst2, dst1, minusMask)
+        cv.Cv2.Add(dst2, dst3, dst2, plusMask)
+        cv.Cv2.Subtract(dst2, dst3, dst2, minusMask)
         label2 = "Mat of random values < " + CStr(valSlider.value)
     End Sub
 End Class
@@ -516,7 +516,7 @@ Public Class Random_KalmanPoints : Inherits VBparent
     Dim savePoints(0) As cv.Point
     Public Sub New()
         Dim offset = 100
-        random.rangeRect = New cv.Rect(offset, offset, dst1.Width - offset * 2, dst1.Height - offset * 2)
+        random.rangeRect = New cv.Rect(offset, offset, dst2.Width - offset * 2, dst2.Height - offset * 2)
         findSlider("Random Pixel Count").Value = 10
         task.desc = "Smoothly transition a random point from location to location."
     End Sub
@@ -545,10 +545,10 @@ Public Class Random_KalmanPoints : Inherits VBparent
             knn.currSet(i / 2) = New cv.Point2f(kalman.kOutput(i), kalman.kOutput(i + 1))
         Next
 
-        dst1.SetTo(0)
+        dst2.SetTo(0)
         For i = 0 To knn.currSet.Count - 1
-            dst1.Circle(knn.currSet(i), task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
-            dst1.Circle(knn.lastSet(i), task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
+            dst2.Circle(knn.currSet(i), task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
+            dst2.Circle(knn.lastSet(i), task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
         Next
 
         Dim noChanges As Boolean = True

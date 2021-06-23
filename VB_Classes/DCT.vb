@@ -33,9 +33,9 @@ Public Class DCT_Basics : Inherits VBparent
         label1 = "Highest " + CStr(sliders.trackbar(0).Value) + " frequencies removed"
 
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
-        src32f.ConvertTo(dst1, cv.MatType.CV_8UC1, 255)
+        src32f.ConvertTo(dst2, cv.MatType.CV_8UC1, 255)
 
-        cv.Cv2.Subtract(src, dst1, dst2)
+        cv.Cv2.Subtract(src, dst2, dst3)
     End Sub
 End Class
 
@@ -75,9 +75,9 @@ Public Class DCT_RGB : Inherits VBparent
         Next
         label1 = "Highest " + CStr(dct.sliders.trackbar(0).Value) + " frequencies removed"
 
-        cv.Cv2.Merge(srcPlanes, dst1)
+        cv.Cv2.Merge(srcPlanes, dst2)
 
-        cv.Cv2.Subtract(src, dst1, dst2)
+        cv.Cv2.Subtract(src, dst2, dst3)
     End Sub
 End Class
 
@@ -102,9 +102,9 @@ Public Class DCT_Depth : Inherits VBparent
         label1 = "Highest " + CStr(dct.sliders.trackbar(0).Value) + " frequencies removed"
 
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
-        src32f.ConvertTo(dst1, cv.MatType.CV_8UC1, 255)
+        src32f.ConvertTo(dst2, cv.MatType.CV_8UC1, 255)
 
-        cv.Cv2.Subtract(gray, dst1, dst2)
+        cv.Cv2.Subtract(gray, dst2, dst3)
     End Sub
 End Class
 
@@ -121,34 +121,34 @@ Public Class DCT_FeatureLess : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         dct.Run(src)
         Dim runLenMin = dct.sliders.trackbar(1).Value
-        dst1 = dct.dst1
         dst2 = dct.dst2
+        dst3 = dct.dst3
 
         ' Result2 contain the RGB image with highest frequency removed.
-        Parallel.For(0, dst2.Rows,
+        Parallel.For(0, dst3.Rows,
         Sub(i)
             Dim runLen = 0
             Dim runStart = 0
-            For j = 1 To dst2.Cols - 1
-                If dst2.Get(Of Byte)(i, j) = dst2.Get(Of Byte)(i, j - 1) Then
+            For j = 1 To dst3.Cols - 1
+                If dst3.Get(Of Byte)(i, j) = dst3.Get(Of Byte)(i, j - 1) Then
                     runLen += 1
                 Else
                     If runLen > runLenMin Then
                         Dim roi = New cv.Rect(runStart, i, runLen, 1)
-                        dst1(roi).SetTo(255)
+                        dst2(roi).SetTo(255)
                     End If
                     runStart = j
                     runLen = 1
                 End If
             Next
         End Sub)
-        dst2.SetTo(0)
-        If dst1.Channels = 3 Then
-            dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst3.SetTo(0)
+        If dst2.Channels = 3 Then
+            dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
         Else
-            dst1 = dst1.Threshold(1, 255, cv.ThresholdTypes.Binary)
+            dst2 = dst2.Threshold(1, 255, cv.ThresholdTypes.Binary)
         End If
-        src.CopyTo(dst2, dst1)
+        src.CopyTo(dst3, dst2)
         label1 = "Mask of DCT with highest frequency removed"
     End Sub
 End Class
@@ -176,10 +176,10 @@ Public Class DCT_Surfaces_debug : Inherits VBparent
         Mats.mat(0).SetTo(cv.Scalar.White, grid.gridMask)
 
         dct.Run(src)
-        Mats.mat(1) = dct.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Clone()
-        Mats.mat(2) = dct.dst2.Clone()
+        Mats.mat(1) = dct.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Clone()
+        Mats.mat(2) = dct.dst3.Clone()
 
-        Dim mask = dct.dst1.Clone() ' result1 contains the DCT mask of featureless surfaces.
+        Dim mask = dct.dst2.Clone() ' result1 contains the DCT mask of featureless surfaces.
         Dim notMask As New cv.Mat
         cv.Cv2.BitwiseNot(mask, notMask)
         task.depth32f.SetTo(0, notMask) ' remove non-featureless surface depth data.
@@ -195,7 +195,7 @@ Public Class DCT_Surfaces_debug : Inherits VBparent
         Mats.mat(3) = New cv.Mat(src.Size(), cv.MatType.CV_8UC3, 0)
         src(grid.roiList(maxIndex)).CopyTo(Mats.mat(3)(grid.roiList(maxIndex)), mask(grid.roiList(maxIndex)))
         mats.Run(src)
-        dst2 = Mats.dst1
+        dst3 = Mats.dst2
 
         Dim world As New cv.Mat(src.Size(), cv.MatType.CV_32FC3, 0)
         Dim roi = grid.roiList(maxIndex) ' this is where the debug comes in.  We just want to look at one region which hopefully is a single plane.
@@ -239,9 +239,9 @@ Public Class DCT_CComponents : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         dct.Run(src)
-        cc.Run(dct.dst1.Clone())
-        dst1 = cc.dst1
+        cc.Run(dct.dst2.Clone())
         dst2 = cc.dst2
+        dst3 = cc.dst3
     End Sub
 End Class
 

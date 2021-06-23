@@ -13,8 +13,8 @@ Public Class LeftRight_Basics : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static betaSlider = findSlider("Brightness Beta (brightness)")
         Static alphaSlider = findSlider("Brightness Alpha (contrast)")
-        dst1 = (task.leftView * cv.Scalar.All(alphaSlider.Value / 500) + betaSlider.Value).ToMat
-        dst2 = (task.rightView * cv.Scalar.All(alphaSlider.Value / 500) + betaSlider.Value).ToMat
+        dst2 = (task.leftView * cv.Scalar.All(alphaSlider.Value / 500) + betaSlider.Value).ToMat
+        dst3 = (task.rightView * cv.Scalar.All(alphaSlider.Value / 500) + betaSlider.Value).ToMat
     End Sub
 End Class
 
@@ -29,7 +29,7 @@ Public Class LeftRight_CompareRaw : Inherits VBparent
     Public Sub New()
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Slice Starting Y", 0, 300, 100)
-            sliders.setupTrackBar(1, "Slice Height", 1, (dst1.Rows - 100) / 2, 30)
+            sliders.setupTrackBar(1, "Slice Height", 1, (dst2.Rows - 100) / 2, 30)
         End If
 
         label1 = lrView.label1
@@ -41,17 +41,17 @@ Public Class LeftRight_CompareRaw : Inherits VBparent
         Static hSlider = findSlider("Slice Height")
         lrView.Run(src)
 
-        dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8U, 0)
 
         Dim sliceY = startYSlider.Value
         Dim slideHeight = hSlider.Value
-        Dim r1 = New cv.Rect(0, sliceY, lrView.dst1.Width, slideHeight)
-        Dim r2 = New cv.Rect(0, 100, lrView.dst1.Width, slideHeight)
-        lrView.dst1(r1).CopyTo(dst1(r2))
+        Dim r1 = New cv.Rect(0, sliceY, lrView.dst2.Width, slideHeight)
+        Dim r2 = New cv.Rect(0, 100, lrView.dst2.Width, slideHeight)
+        lrView.dst2(r1).CopyTo(dst2(r2))
 
         r2.Y += slideHeight
-        lrView.dst2(r1).CopyTo(dst1(r2))
-        dst2 = lrView.dst2
+        lrView.dst3(r1).CopyTo(dst2(r2))
+        dst3 = lrView.dst3
     End Sub
 End Class
 
@@ -70,16 +70,16 @@ Public Class LeftRight_Features : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         lrView.Run(src)
 
+        features.Run(lrView.dst3)
+        lrView.dst3.CopyTo(dst3)
+        For i = 0 To features.goodFeatures.Count - 1
+            dst3.Circle(features.goodFeatures(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
+        Next
+
         features.Run(lrView.dst2)
         lrView.dst2.CopyTo(dst2)
         For i = 0 To features.goodFeatures.Count - 1
             dst2.Circle(features.goodFeatures(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
-        Next
-
-        features.Run(lrView.dst1)
-        lrView.dst1.CopyTo(dst1)
-        For i = 0 To features.goodFeatures.Count - 1
-            dst1.Circle(features.goodFeatures(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -97,11 +97,11 @@ Public Class LeftRight_Palettized : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         lrView.Run(src)
 
-        task.palette.Run(lrView.dst1)
-        dst1 = task.palette.dst1
-
         task.palette.Run(lrView.dst2)
-        dst2 = task.palette.dst1
+        dst2 = task.palette.dst2
+
+        task.palette.Run(lrView.dst3)
+        dst3 = task.palette.dst2
     End Sub
 End Class
 
@@ -119,10 +119,10 @@ Public Class LeftRight_BRISK : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         lrView.Run(src)
-        brisk.Run(lrView.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
-        dst2 = brisk.dst1
+        brisk.Run(lrView.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+        dst3 = brisk.dst2
 
-        brisk.Run(lrView.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
-        dst1 = brisk.dst1
+        brisk.Run(lrView.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+        dst2 = brisk.dst2
     End Sub
 End Class

@@ -51,16 +51,16 @@ Public Class FishEye_Rectified : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
-        dst1.SetTo(0)
         dst2.SetTo(0)
+        dst3.SetTo(0)
         setTrueText("The T265 camera is not supported.  No depth data or point cloud.", 10, 100, 3)
 
         label1 = "Left View (no fisheye lens present)"
         label2 = "Right View (no fisheye lens present)"
         leftView = task.leftView
         rightView = task.rightView
-        dst1 = leftView
-        dst2 = rightView
+        dst2 = leftView
+        dst3 = rightView
     End Sub
 End Class
 
@@ -75,8 +75,8 @@ Public Class FishEye_Raw : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         label1 = "Left Fisheye Image"
         label2 = "Right Fisheye Image"
-        dst1 = task.leftView
-        dst2 = task.rightView
+        dst2 = task.leftView
+        dst3 = task.rightView
     End Sub
 End Class
 

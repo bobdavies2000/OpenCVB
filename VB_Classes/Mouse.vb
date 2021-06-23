@@ -12,7 +12,7 @@ Public Class Mouse_Basics : Inherits VBparent
         Static colorIndex As Integer
         Dim nextColor = task.scalarColors(colorIndex)
         Dim nextPt = task.mousePoint
-        dst1.Circle(nextPt, task.dotSize + 3, nextColor, -1, task.lineType)
+        dst2.Circle(nextPt, task.dotSize + 3, nextColor, -1, task.lineType)
         colorIndex += 1
         If colorIndex >= task.scalarColors.Count Then colorIndex = 0
     End Sub
@@ -31,7 +31,7 @@ Public Class Mouse_LeftClickZoom : Inherits VBparent
                       "In this example, the selected region from the RGB image will be resized to fit in the Result2 image to the right." + vbCrLf +
                       "Double-click an image to remove the selected region.")
 
-        If task.drawRect.Width <> 0 And task.drawRect.Height <> 0 Then dst2 = src(task.drawRect).Resize(dst2.Size())
+        If task.drawRect.Width <> 0 And task.drawRect.Height <> 0 Then dst3 = src(task.drawRect).Resize(dst3.Size())
     End Sub
 End Class
 

@@ -39,13 +39,13 @@ Public Class Watershed_Basics : Inherits VBparent
             Dim tmp As New cv.Mat
             markers.ConvertTo(tmp, cv.MatType.CV_8U)
             task.palette.Run(tmp)
-            dst2 = task.palette.dst1
+            dst3 = task.palette.dst2
 
-            addW.src2 = task.palette.dst1
+            addW.src2 = task.palette.dst2
             addW.Run(src)
-            dst1 = addW.dst1
+            dst2 = addW.dst2
         Else
-            dst1 = src
+            dst2 = src
         End If
         task.drawRect = New cv.Rect
         label1 = "There were " + CStr(rects.Count) + " regions defined as input"
@@ -68,10 +68,10 @@ Public Class Watershed_DepthReduction : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         reduction.Run(task.RGBDepth)
-        dst2 = reduction.dst2
+        dst3 = reduction.dst3
 
-        watershed.Run(dst2)
-        dst1 = watershed.dst1
+        watershed.Run(dst3)
+        dst2 = watershed.dst2
         label1 = watershed.label1
     End Sub
 End Class
@@ -91,7 +91,7 @@ Public Class Watershed_DepthAuto : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         watershed.Run(task.RGBDepth)
-        dst1 = watershed.dst1
+        dst2 = watershed.dst2
         label1 = watershed.label1
     End Sub
 End Class

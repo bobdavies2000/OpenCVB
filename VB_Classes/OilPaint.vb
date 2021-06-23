@@ -16,11 +16,11 @@ Public Class OilPaint_Pointilism : Inherits VBparent
             radio.check(1).Checked = True
         End If
 
-        task.drawRect = New cv.Rect(dst1.Cols * 3 / 8, dst1.Rows * 3 / 8, dst1.Cols * 2 / 8, dst1.Rows * 2 / 8)
+        task.drawRect = New cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8)
         task.desc = "Alter the image to effect the pointilism style - Painterly Effect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dst1 = src
+        dst2 = src
         Dim img = src(task.drawRect)
         Static saveDrawRect As New cv.Rect
         If saveDrawRect <> task.drawRect Then
@@ -66,9 +66,9 @@ Public Class OilPaint_Pointilism : Inherits VBparent
 
                 Dim rotatedRect = New cv.RotatedRect(nPoint, eSize, angle)
                 If radio.check(0).Checked Then
-                    dst1(saveDrawRect).Ellipse(rotatedRect, nextColor, -1, task.lineType)
+                    dst2(saveDrawRect).Ellipse(rotatedRect, nextColor, -1, task.lineType)
                 Else
-                    dst1(saveDrawRect).Circle(nPoint, slen / 4, nextColor, -1, task.lineType)
+                    dst2(saveDrawRect).Circle(nPoint, slen / 4, nextColor, -1, task.lineType)
                 End If
             Next
         Next
@@ -92,7 +92,7 @@ Public Class OilPaint_ColorProbability : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         km.Run(src)
-        dst1 = km.dst1
+        dst2 = km.dst2
         ReDim color_probability(kSlider.Value - 1)
         For i = 0 To km.km.masks.Count - 1
             color_probability(i) = km.km.masks(i).CountNonZero
@@ -124,7 +124,7 @@ Public Class OilPaint_ManualVB : Inherits VBparent
             sliders.setupTrackBar(1, "Intensity", 5, 150, 25)
         End If
         task.desc = "Alter an image so it appears more like an oil painting - Painterly Effect.  Select a region of interest."
-        task.drawRect = New cv.Rect(dst1.Cols * 3 / 8, dst1.Rows * 3 / 8, dst1.Cols * 2 / 8, dst1.Rows * 2 / 8)
+        task.drawRect = New cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8)
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim filtersize = sliders.trackbar(0).Value
@@ -132,7 +132,7 @@ Public Class OilPaint_ManualVB : Inherits VBparent
 
         If filtersize Mod 2 = 0 Then filtersize += 1 ' must be odd
         Dim roi = task.drawRect
-        src.CopyTo(dst1)
+        src.CopyTo(dst2)
         Dim color = src(roi)
         Dim result1 = color.Clone()
         For y = filtersize To roi.Height - filtersize - 1
@@ -166,7 +166,7 @@ Public Class OilPaint_ManualVB : Inherits VBparent
                 result1.Set(Of cv.Vec3b)(y, x, vec)
             Next
         Next
-        result1.CopyTo(dst1(roi))
+        result1.CopyTo(dst2(roi))
     End Sub
 End Class
 
@@ -184,18 +184,18 @@ Public Class OilPaint_Manual : Inherits VBparent
         task.desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
         label2 = "Selected area only"
 
-        task.drawRect = New cv.Rect(dst1.Cols * 3 / 8, dst1.Rows * 3 / 8, dst1.Cols * 2 / 8, dst1.Rows * 2 / 8)
+        task.drawRect = New cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8)
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim kernelSize = sliders.trackbar(0).Value
         If kernelSize Mod 2 = 0 Then kernelSize += 1
         Dim roi = task.drawRect
-        src.CopyTo(dst1)
-        oilPaint.Start(src(roi), dst1(roi), kernelSize, sliders.trackbar(1).Value)
-        dst2 = src.EmptyClone.SetTo(0)
-        Dim factor As Integer = Math.Min(Math.Floor(dst2.Width / roi.Width), Math.Floor(dst2.Height / roi.Height))
+        src.CopyTo(dst2)
+        oilPaint.Start(src(roi), dst2(roi), kernelSize, sliders.trackbar(1).Value)
+        dst3 = src.EmptyClone.SetTo(0)
+        Dim factor As Integer = Math.Min(Math.Floor(dst3.Width / roi.Width), Math.Floor(dst3.Height / roi.Height))
         Dim s = New cv.Size(roi.Width * factor, roi.Height * factor)
-        cv.Cv2.Resize(dst1(roi), dst2(New cv.Rect(0, 0, s.Width, s.Height)), s)
+        cv.Cv2.Resize(dst2(roi), dst3(New cv.Rect(0, 0, s.Width, s.Height)), s)
     End Sub
 End Class
 
@@ -207,7 +207,7 @@ Public Class OilPaint_Cartoon : Inherits VBparent
     Dim oil As New OilPaint_Manual
     Dim laplacian As New Edges_Laplacian
     Public Sub New()
-        task.drawRect = New cv.Rect(dst1.Cols * 3 / 8, dst1.Rows * 3 / 8, dst1.Cols * 2 / 8, dst1.Rows * 2 / 8)
+        task.drawRect = New cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8)
         task.desc = "Alter an image so it appears more like a cartoon - Painterly Effect"
         label1 = "OilPaint_Cartoon"
         label2 = "Laplacian Edges"
@@ -215,17 +215,17 @@ Public Class OilPaint_Cartoon : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim roi = task.drawRect
         laplacian.Run(src)
-        dst2 = laplacian.dst1
+        dst3 = laplacian.dst2
 
         oil.Run(src)
-        dst1 = oil.dst1
+        dst2 = oil.dst2
 
         Dim threshold = oil.sliders.trackbar(2).Value
         Dim vec000 = New cv.Vec3b(0, 0, 0)
         For y = 0 To roi.Height - 1
             For x = 0 To roi.Width - 1
-                If dst2(roi).Get(Of Byte)(y, x) >= threshold Then
-                    dst1(roi).Set(Of cv.Vec3b)(y, x, vec000)
+                If dst3(roi).Get(Of Byte)(y, x) >= threshold Then
+                    dst2(roi).Set(Of cv.Vec3b)(y, x, vec000)
                 End If
             Next
         Next

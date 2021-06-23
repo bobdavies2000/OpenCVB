@@ -29,7 +29,7 @@ Public Class PCA_Basics : Inherits VBparent
             Dim point = pca.Project(data.Row(0))
             Dim reconstruction = pca.BackProject(point)
             reconstruction = reconstruction.Reshape(images(0).Channels(), images(0).Rows)
-            reconstruction.ConvertTo(dst1, cv.MatType.CV_8UC1)
+            reconstruction.ConvertTo(dst2, cv.MatType.CV_8UC1)
         End If
     End Sub
 End Class
@@ -43,7 +43,7 @@ Public Class PCA_Depth : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         pca.Run(task.RGBDepth)
-        dst1 = pca.dst1
+        dst2 = pca.dst2
     End Sub
 End Class
 
@@ -74,17 +74,17 @@ Public Class PCA_DrawImage : Inherits VBparent
         img.Line(p, q, color, task.lineWidth, task.lineType)
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dst1 = image.Resize(dst1.Size())
-        Dim gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, cv.ThresholdTypes.Binary Or cv.ThresholdTypes.Otsu)
+        dst2 = image.Resize(dst2.Size())
+        Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(50, 255, cv.ThresholdTypes.Binary Or cv.ThresholdTypes.Otsu)
         Dim hierarchy() As cv.HierarchyIndex = Nothing
         Dim contours As cv.Point()() = Nothing
         cv.Cv2.FindContours(gray, contours, hierarchy, cv.RetrievalModes.List, cv.ContourApproximationModes.ApproxNone)
 
-        dst2.SetTo(0)
+        dst3.SetTo(0)
         For i = 0 To contours.Length - 1
             Dim area = cv.Cv2.ContourArea(contours(i))
             If area < 100 Or area > 100000 Then Continue For
-            cv.Cv2.DrawContours(dst2, contours, i, cv.Scalar.Red, task.lineWidth, task.lineType)
+            cv.Cv2.DrawContours(dst3, contours, i, cv.Scalar.Red, task.lineWidth, task.lineType)
             Dim sz = contours(i).Length
             Dim data_pts = New cv.Mat(sz, 2, cv.MatType.CV_64FC1)
             For j = 0 To data_pts.Rows - 1
@@ -101,13 +101,13 @@ Public Class PCA_DrawImage : Inherits VBparent
                 eigen_val(j) = pca_analysis.Eigenvalues.Get(Of Double)(0, j)
             Next
 
-            dst2.Circle(cntr, task.dotSize + 1, cv.Scalar.BlueViolet, -1, task.lineType)
+            dst3.Circle(cntr, task.dotSize + 1, cv.Scalar.BlueViolet, -1, task.lineType)
             Dim factor As Single = 0.02 ' scaling factor for the lines depicting the principle components.
             Dim ept1 = New cv.Point(cntr.X + factor * eigen_vecs(0).X * eigen_val(0), cntr.Y + factor * eigen_vecs(0).Y * eigen_val(0))
             Dim ept2 = New cv.Point(cntr.X - factor * eigen_vecs(1).X * eigen_val(1), cntr.Y - factor * eigen_vecs(1).Y * eigen_val(1))
 
-            drawAxis(dst2, cntr, ept1, cv.Scalar.Red, 1) ' primary principle component
-            drawAxis(dst2, cntr, ept2, cv.Scalar.BlueViolet, 5) ' secondary principle component
+            drawAxis(dst3, cntr, ept1, cv.Scalar.Red, 1) ' primary principle component
+            drawAxis(dst3, cntr, ept2, cv.Scalar.BlueViolet, 5) ' secondary principle component
         Next
     End Sub
 End Class

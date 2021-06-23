@@ -41,7 +41,7 @@ Public Class BGSubtract_Basics_CPP : Inherits VBparent
         If imagePtr <> 0 Then
             Dim dstData(src.Total - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
+            dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
         End If
     End Sub
     Public Sub Close()
@@ -83,7 +83,7 @@ Public Class BGSubtract_MotionDetect_MT : Inherits VBparent
             End If
         Next
 
-        If task.frameCount = 0 Then src.CopyTo(dst2)
+        If task.frameCount = 0 Then src.CopyTo(dst3)
         Dim threadCount = threadData(0)
         width = threadData(1)
         height = threadData(2)
@@ -91,17 +91,17 @@ Public Class BGSubtract_MotionDetect_MT : Inherits VBparent
         Dim xfactor = CInt(src.Width / width)
         Dim yfactor = Math.Max(CInt(src.Height / height), CInt(src.Width / width))
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
-        dst1.SetTo(0)
+        dst2.SetTo(0)
         For i = 0 To threadCount - 1
             Dim section = i
             taskArray(i) = System.Threading.Tasks.Task.Factory.StartNew(
                 Sub()
                     Dim roi = New cv.Rect((section Mod xfactor) * width, height * Math.Floor(section / yfactor), width, height)
                     Dim correlation As New cv.Mat
-                    cv.Cv2.MatchTemplate(src(roi), dst2(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+                    cv.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
                     If CCthreshold > correlation.Get(Of Single)(0, 0) Then
-                        src(roi).CopyTo(dst1(roi))
                         src(roi).CopyTo(dst2(roi))
+                        src(roi).CopyTo(dst3(roi))
                     End If
                 End Sub)
         Next
@@ -125,23 +125,23 @@ Public Class BGSubtract_Basics_MT : Inherits VBparent
         grid.Run(Nothing)
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = input.EmptyClone.SetTo(0)
-        dst2 = input.Clone()
+        dst2 = input.EmptyClone.SetTo(0)
+        dst3 = input.Clone()
         Static correlationSlider = findSlider("Correlation Threshold")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
-        dst1.SetTo(0)
+        dst2.SetTo(0)
         Dim updateCount As Integer
         Parallel.ForEach(Of cv.Rect)(grid.roiList,
         Sub(roi)
             Dim correlation As New cv.Mat
-            cv.Cv2.MatchTemplate(input(roi), dst2(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+            cv.Cv2.MatchTemplate(input(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
             If correlation.Get(Of Single)(0, 0) < CCthreshold Then
                 Interlocked.Increment(updateCount)
-                input(roi).CopyTo(dst2(roi))
+                input(roi).CopyTo(dst3(roi))
             End If
-            input(roi).CopyTo(dst1(roi))
+            input(roi).CopyTo(dst2(roi))
         End Sub)
-        label1 = "Motion added to dst2 for " + CStr(updateCount) + " segments out of " + CStr(grid.roiList.Count)
+        label1 = "Motion added to dst3 for " + CStr(updateCount) + " segments out of " + CStr(grid.roiList.Count)
         label2 = CStr(grid.roiList.Count - updateCount) + " segments had > " + Format(correlationSlider.value / 1000, "0.0%") + " correlation"
     End Sub
 End Class
@@ -160,9 +160,9 @@ Public Class BGSubtract_Depth_MT : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         bgsub.Run(task.RGBDepth)
-        dst1 = task.RGBDepth
-        dst2 = bgsub.dst2
-        dst2.SetTo(0, task.noDepthMask)
+        dst2 = task.RGBDepth
+        dst3 = bgsub.dst3
+        dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class
 
@@ -187,7 +187,7 @@ Public Class BGSubtract_MOG : Inherits VBparent
             gray = src
         End If
         MOG.Apply(gray, gray, learnRateSlider.Value / 1000)
-        dst1 = gray
+        dst2 = gray
     End Sub
 End Class
 
@@ -207,7 +207,7 @@ Public Class BGSubtract_MOG2 : Inherits VBparent
         Static learnRateSlider = findSlider("MOG Learn Rate")
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOG2.Apply(input, dst1, learnRateSlider.Value / 1000)
+        MOG2.Apply(input, dst2, learnRateSlider.Value / 1000)
     End Sub
 End Class
 
@@ -233,9 +233,9 @@ Public Class BGSubtract_GMG_KNN : Inherits VBparent
             setTrueText("")
         End If
 
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        gmg.Apply(dst1, dst1, learnRateSlider.Value / 1000)
-        knn.Apply(dst1, dst1, learnRateSlider.Value / 1000)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        gmg.Apply(dst2, dst2, learnRateSlider.Value / 1000)
+        knn.Apply(dst2, dst2, learnRateSlider.Value / 1000)
     End Sub
 End Class
 
@@ -262,11 +262,11 @@ Public Class BGSubtract_MOG_RGBDepth : Inherits VBparent
         Static learnRateSlider = findSlider("Learn Rate")
         gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         MOGDepth.Apply(gray, gray, learnRateSlider.Value / 1000)
-        dst1 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        MOGRGB.Apply(input, dst2, learnRateSlider.Value / 1000)
+        MOGRGB.Apply(input, dst3, learnRateSlider.Value / 1000)
     End Sub
 End Class
 
@@ -283,9 +283,9 @@ Public Class BGSubtract_MOG_Retina : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         retina.Run(task.RGBDepth)
-        bgSub.Run(retina.dst2.Clone())
-        dst1 = bgSub.dst1
-        cv.Cv2.Subtract(bgSub.dst1, retina.dst2, dst2)
+        bgSub.Run(retina.dst3.Clone())
+        dst2 = bgSub.dst2
+        cv.Cv2.Subtract(bgSub.dst2, retina.dst3, dst3)
     End Sub
 End Class
 
@@ -299,11 +299,11 @@ Public Class BGSubtract_DepthOrColorMotion : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         motion.Run(src)
-        dst1 = motion.dst1
         dst2 = motion.dst2
-        Dim mask = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs()
+        dst3 = motion.dst3
+        Dim mask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs()
         cv.Cv2.BitwiseNot(mask, mask)
-        src.CopyTo(dst2, mask)
+        src.CopyTo(dst3, mask)
         label2 = "Image with instability filled with color data"
     End Sub
 End Class
@@ -348,9 +348,9 @@ Public Class BGSubtract_Video : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         video.Run(src)
-        dst2 = video.dst1
-        bgfg.Run(dst2)
-        dst1 = bgfg.dst1
+        dst3 = video.dst2
+        bgfg.Run(dst3)
+        dst2 = bgfg.dst2
     End Sub
 End Class
 
@@ -397,7 +397,7 @@ Public Class BGSubtract_Synthetic_CPP : Inherits VBparent
             handleSrc.Free()
         End If
         Dim imagePtr = BGSubtract_Synthetic_Run(synthPtr)
-        If imagePtr <> 0 Then dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_8UC3, imagePtr)
+        If imagePtr <> 0 Then dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, imagePtr)
     End Sub
     Public Sub Close()
         BGSubtract_Synthetic_Close(synthPtr)
@@ -417,9 +417,9 @@ Public Class BGSubtract_Synthetic : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         synth.Run(src)
-        dst2 = synth.dst1
-        bgfg.Run(dst2)
-        dst1 = bgfg.dst1
+        dst3 = synth.dst2
+        bgfg.Run(dst3)
+        dst2 = bgfg.dst2
     End Sub
 End Class
 

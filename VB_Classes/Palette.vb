@@ -25,8 +25,8 @@ Public Class Palette_Basics : Inherits VBparent
                 src = normalize32f(src)
                 src.ConvertTo(src, cv.MatType.CV_8U)
             End If
-            dst1 = Palette_Custom_Apply(src, gradientColorMap)
-            dst2 = gradientColorMap.Resize(dst2.Size)
+            dst2 = Palette_Custom_Apply(src, gradientColorMap)
+            dst3 = gradientColorMap.Resize(dst3.Size)
         End If
     End Sub
 End Class
@@ -51,8 +51,8 @@ Public Class Palette_Color : Inherits VBparent
         Dim b = sliders.trackbar(0).Value
         Dim g = sliders.trackbar(1).Value
         Dim r = sliders.trackbar(2).Value
-        dst1.SetTo(New cv.Scalar(b, g, r))
-        dst2.SetTo(New cv.Scalar(255 - b, 255 - g, 255 - r))
+        dst2.SetTo(New cv.Scalar(b, g, r))
+        dst3.SetTo(New cv.Scalar(255 - b, 255 - g, 255 - r))
         label1 = "Color (RGB) = " + CStr(b) + " " + CStr(g) + " " + CStr(r)
         label2 = "Color (255 - RGB) = " + CStr(255 - b) + " " + CStr(255 - g) + " " + CStr(255 - r)
     End Sub
@@ -69,26 +69,26 @@ Public Class Palette_LinearPolar : Inherits VBparent
     Public Sub New()
         task.desc = "Use LinearPolar to create gradient image"
         If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "LinearPolar radius", 0, dst1.Cols, dst1.Cols / 2)
+            sliders.setupTrackBar(0, "LinearPolar radius", 0, dst2.Cols, dst2.Cols / 2)
         End If
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static radiusSlider = findSlider("LinearPolar radius")
-        Dim radius = radiusSlider.Value ' msRNG.next(0, dst1.Cols)
+        Dim radius = radiusSlider.Value ' msRNG.next(0, dst2.Cols)
 
-        dst1.SetTo(0)
-        For i = 0 To dst1.Rows - 1
-            Dim c = i * 255 / dst1.Rows
-            dst1.Row(i).SetTo(New cv.Scalar(c, c, c))
+        dst2.SetTo(0)
+        For i = 0 To dst2.Rows - 1
+            Dim c = i * 255 / dst2.Rows
+            dst2.Row(i).SetTo(New cv.Scalar(c, c, c))
         Next
 
         rotateOptions.Run(src)
 
-        Static pt = New cv.Point2f(msRNG.Next(0, dst1.Cols - 1), msRNG.Next(0, dst1.Rows - 1))
-        dst2.SetTo(0)
+        Static pt = New cv.Point2f(msRNG.Next(0, dst2.Cols - 1), msRNG.Next(0, dst2.Rows - 1))
+        dst3.SetTo(0)
         If rotateOptions.warpFlag = cv.InterpolationFlags.WarpInverseMap Then radiusSlider.Value = radiusSlider.Maximum
-        cv.Cv2.LinearPolar(dst1, dst1, pt, radius, rotateOptions.warpFlag)
-        cv.Cv2.LinearPolar(src, dst2, pt, radius, rotateOptions.warpFlag)
+        cv.Cv2.LinearPolar(dst2, dst2, pt, radius, rotateOptions.warpFlag)
+        cv.Cv2.LinearPolar(src, dst3, pt, radius, rotateOptions.warpFlag)
     End Sub
 End Class
 
@@ -97,7 +97,7 @@ End Class
 
 Module Palette_Custom_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Palette_Custom(img As IntPtr, map As IntPtr, dst1 As IntPtr, rows As Integer, cols As Integer, channels As Integer)
+    Public Sub Palette_Custom(img As IntPtr, map As IntPtr, dst2 As IntPtr, rows As Integer, cols As Integer, channels As Integer)
     End Sub
     Public Function Palette_Custom_Apply(src As cv.Mat, customColorMap As cv.Mat) As cv.Mat
         ' the VB.Net interface to OpenCV doesn't support adding a random lookup table to ApplyColorMap API.  It is available in C++ though.
@@ -159,12 +159,12 @@ Public Class Palette_Reduction : Inherits VBparent
             Console.WriteLine("This algorithm gets very slow unless there is lots of reduction.  Resetting reduction slider value to 2^^5")
         End If
         reduction.Run(src)
-        dst1 = reduction.dst1
+        dst2 = reduction.dst2
 
         Dim palette As New SortedList(Of Byte, Integer)
-        For y = 0 To dst1.Height - 1
-            For x = 0 To dst1.Width - 1
-                Dim nextVal = dst1.Get(Of Byte)(y, x)
+        For y = 0 To dst2.Height - 1
+            For x = 0 To dst2.Width - 1
+                Dim nextVal = dst2.Get(Of Byte)(y, x)
                 If nextVal <> cv.Scalar.Black Then
                     If palette.ContainsKey(nextVal) Then
                         palette(nextVal) = palette(nextVal) + 1
@@ -193,12 +193,12 @@ Public Class Palette_Reduction : Inherits VBparent
             If hiValue.Item(0) > 255 Then hiValue.Item(0) = 255
 
             Dim mask As New cv.Mat
-            cv.Cv2.InRange(dst1, loValue, hiValue, mask)
+            cv.Cv2.InRange(dst2, loValue, hiValue, mask)
 
             Dim maxCount = cv.Cv2.CountNonZero(mask)
 
-            dst2 = src.EmptyClone.SetTo(0)
-            dst2.SetTo(cv.Scalar.All(255), mask)
+            dst3 = src.EmptyClone.SetTo(0)
+            dst3.SetTo(cv.Scalar.All(255), mask)
             label2 = "Most Common Color +- " + CStr(1) + " count = " + CStr(maxCount)
         End If
     End Sub
@@ -215,8 +215,8 @@ Public Class Palette_DrawTest : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         draw.Run(src)
-        task.palette.Run(draw.dst1)
-        dst1 = task.palette.dst1
+        task.palette.Run(draw.dst2)
+        dst2 = task.palette.dst2
     End Sub
 End Class
 
@@ -238,19 +238,19 @@ Public Class Palette_Gradient : Inherits VBparent
                 color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
                 color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
             End If
-            dst2.SetTo(color1)
-            dst2(New cv.Rect(0, 0, dst2.Width, dst2.Height / 2)).SetTo(color2)
+            dst3.SetTo(color1)
+            dst3(New cv.Rect(0, 0, dst3.Width, dst3.Height / 2)).SetTo(color2)
 
-            Dim gradientColors As New cv.Mat(dst1.Rows, 1, cv.MatType.CV_64FC3)
+            Dim gradientColors As New cv.Mat(dst2.Rows, 1, cv.MatType.CV_64FC3)
             Dim f As Double = 1.0
-            For i = 0 To dst1.Rows - 1
+            For i = 0 To dst2.Rows - 1
                 gradientColors.Set(Of cv.Scalar)(i, 0, New cv.Scalar(f * color2(0) + (1 - f) * color1(0), f * color2(1) + (1 - f) * color1(1),
                                                                          f * color2(2) + (1 - f) * color1(2)))
-                f -= 1 / dst1.Rows
+                f -= 1 / dst2.Rows
             Next
 
-            For i = 0 To dst1.Rows - 1
-                dst1.Row(i).SetTo(gradientColors.Get(Of cv.Scalar)(i))
+            For i = 0 To dst2.Rows - 1
+                dst2.Row(i).SetTo(gradientColors.Get(Of cv.Scalar)(i))
             Next
         End If
     End Sub
@@ -280,16 +280,16 @@ Public Class Palette_RandomColorMap : Inherits VBparent
             Dim color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
             Dim gradMat As New cv.Mat
             For i = 0 To transitionCount - 1
-                gradMat = colorTransition(color1, color2, dst1.Width)
+                gradMat = colorTransition(color1, color2, dst2.Width)
                 color2 = color1
                 color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
                 If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
             Next
             gradientColorMap = gradientColorMap.Resize(New cv.Size(256, 1))
-            If standalone Or task.intermediateName = caller Then dst2 = gradientColorMap
+            If standalone Or task.intermediateName = caller Then dst3 = gradientColorMap
         End If
         gradientColorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b) ' black is black!
-        dst1 = Palette_Custom_Apply(src.Clone, gradientColorMap)
+        dst2 = Palette_Custom_Apply(src.Clone, gradientColorMap)
     End Sub
 End Class
 
@@ -318,15 +318,15 @@ Public Class Palette_DepthColorMap : Inherits VBparent
             gradientColorMap = gradientColorMap.Resize(New cv.Size(255, 1))
 
             Dim r As New cv.Rect(0, 0, 255, 1)
-            For i = 0 To dst2.Height - 1
+            For i = 0 To dst3.Height - 1
                 r.Y = i
-                dst2(r) = gradientColorMap
+                dst3(r) = gradientColorMap
             Next
         End If
         Dim depth8u = task.depth32f.ConvertScaleAbs(cvtScaleSlider.Value / 100)
-        dst1 = Palette_Custom_Apply(depth8u, gradientColorMap)
+        dst2 = Palette_Custom_Apply(depth8u, gradientColorMap)
 
-        dst1.SetTo(0, task.noDepthMask)
+        dst2.SetTo(0, task.noDepthMask)
     End Sub
 End Class
 
@@ -346,7 +346,7 @@ Public Class Palette_ObjectColors : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         src.SetTo(0, task.noDepthMask)
         reduction.Run(src)
-        dst2 = reduction.dst2
+        dst3 = reduction.dst3
 
         Dim blobList As New SortedList(Of Single, Integer)
         For i = 0 To reduction.pTrack.drawRC.viewObjects.Count - 1
@@ -365,23 +365,23 @@ Public Class Palette_ObjectColors : Inherits VBparent
             End If
         Next
 
-        gray = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        gray = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         For i = 0 To blobList.Count - 1
             Dim index = blobList.ElementAt(i).Value
             Dim blob = reduction.pTrack.drawRC.viewObjects.Values(index)
             gray(blob.preKalmanRect).SetTo(i + 1, blob.mask)
         Next
-        dst1 = gray * Math.Floor(255 / blobList.Count) ' map to 0-255
-        cv.Cv2.ApplyColorMap(src, dst1, task.paletteScheme)
+        dst2 = gray * Math.Floor(255 / blobList.Count) ' map to 0-255
+        cv.Cv2.ApplyColorMap(src, dst2, task.paletteScheme)
 
-        dst1.SetTo(0, gray.ConvertScaleAbs(255))
+        dst2.SetTo(0, gray.ConvertScaleAbs(255))
         For i = 0 To blobList.Count - 1
             Dim index = blobList.ElementAt(i).Value
             Dim blob = reduction.pTrack.drawRC.viewObjects.Values(index)
-            dst1.Rectangle(New cv.Rect(blob.centroid.X, blob.centroid.Y, 60 * task.fontSize, 30 * task.fontSize), cv.Scalar.Black, -1)
+            dst2.Rectangle(New cv.Rect(blob.centroid.X, blob.centroid.Y, 60 * task.fontSize, 30 * task.fontSize), cv.Scalar.Black, -1)
             task.trueText(CStr(CInt(blobList.ElementAt(i).Key)), blob.centroid)
         Next
-        dst1.SetTo(0, task.noDepthMask)
+        dst2.SetTo(0, task.noDepthMask)
         label1 = CStr(blobList.Count) + " regions between " + Format(task.minDepth / 1000, "0.0") + " and " + Format(task.maxDepth / 1000, "0.0") + " meters"
     End Sub
 End Class
@@ -403,7 +403,7 @@ Public Class Palette_Layout2D : Inherits VBparent
         grid.Run(Nothing)
         Dim index As Integer
         For Each r In grid.roiList
-            dst1(r).SetTo(task.scalarColors(index Mod 255))
+            dst2(r).SetTo(task.scalarColors(index Mod 255))
             index += 1
         Next
         label1 = "Palette_Layout2D - " + CStr(grid.roiList.Count) + " regions"
@@ -425,11 +425,11 @@ Public Class Palette_LeftRightImages : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 2
         lrViews.Run(src)
 
-        task.palette.Run(lrViews.dst1)
-        dst1 = task.palette.dst1
-
         task.palette.Run(lrViews.dst2)
-        dst2 = task.palette.dst1
+        dst2 = task.palette.dst2
+
+        task.palette.Run(lrViews.dst3)
+        dst3 = task.palette.dst2
     End Sub
 End Class
 

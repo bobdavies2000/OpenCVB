@@ -11,12 +11,12 @@ Public Class Stabilizer_Basics : Inherits VBparent
         If sliders.Setup(caller, 5) Then
             sliders.setupTrackBar(0, "Maximum percentage of lost pixels before image is reset", 0, 100, 10)
             sliders.setupTrackBar(1, "Stabilizer Correlation Threshold X1000", 0, 1000, 950)
-            sliders.setupTrackBar(2, "Width of input to matchtemplate", 10, dst1.Width - pad, 128)
-            sliders.setupTrackBar(3, "Height of input to matchtemplate", 10, dst1.Height - pad, 96)
+            sliders.setupTrackBar(2, "Width of input to matchtemplate", 10, dst2.Width - pad, 128)
+            sliders.setupTrackBar(3, "Height of input to matchtemplate", 10, dst2.Height - pad, 96)
             sliders.setupTrackBar(4, "Min stdev in correlation rect", 1, 50, 10)
         End If
 
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         label1 = "Current frame - rectangle input to matchTemplate"
         task.desc = "if reasonable stdev and no motion in correlation rectangle, stabilize image across frames"
     End Sub
@@ -35,10 +35,10 @@ Public Class Stabilizer_Basics : Inherits VBparent
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Static lastFrame = input
-        dst1 = input
+        dst2 = input
 
         Dim mean As Single, stdev As Single
-        cv.Cv2.MeanStdDev(dst1(templateRect), mean, stdev)
+        cv.Cv2.MeanStdDev(dst2(templateRect), mean, stdev)
 
         If stdev > stdevSlider.value Then
             Dim t = templateRect
@@ -56,15 +56,15 @@ Public Class Stabilizer_Basics : Inherits VBparent
                 Dim x1 = If(shiftX < 0, Math.Abs(shiftX), 0)
                 Dim y1 = If(shiftY < 0, Math.Abs(shiftY), 0)
 
-                dst2.SetTo(0)
+                dst3.SetTo(0)
 
                 Dim x2 = If(shiftX < 0, 0, shiftX)
                 Dim y2 = If(shiftY < 0, 0, shiftY)
                 stableRect = New cv.Rect(x1, y1, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY))
                 Dim srcRect = New cv.Rect(x2, y2, stableRect.Width, stableRect.Height)
                 stableRect = New cv.Rect(x1, y1, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY))
-                input(srcRect).CopyTo(dst2(stableRect))
-                Dim nonZero = dst2.CountNonZero() / (dst2.Width * dst2.Height)
+                input(srcRect).CopyTo(dst3(stableRect))
+                Dim nonZero = dst3.CountNonZero() / (dst3.Width * dst3.Height)
                 If nonZero < (1 - lostMax) Then
                     label2 = "Lost pixels = " + Format(1 - nonZero, "00%")
                     resetImage = True
@@ -81,9 +81,9 @@ Public Class Stabilizer_Basics : Inherits VBparent
 
         If resetImage Then
             input.CopyTo(lastFrame)
-            dst2 = lastFrame.clone
+            dst3 = lastFrame.clone
         End If
-        If standalone Then dst2.Rectangle(templateRect, cv.Scalar.White, 1) ' when not standalone, caller doesn't want artificial rectangle.
+        If standalone Then dst3.Rectangle(templateRect, cv.Scalar.White, 1) ' when not standalone, caller doesn't want artificial rectangle.
     End Sub
 End Class
 
@@ -124,7 +124,7 @@ Public Class Stabilizer_BasicsRandomInput : Inherits VBparent
         lastShiftX = shiftX
         lastShiftY = shiftY
 
-        dst1 = input.Clone
+        dst2 = input.Clone
         If shiftX <> 0 Or shiftY <> 0 Then
             Dim x = If(shiftX < 0, Math.Abs(shiftX), 0)
             Dim y = If(shiftY < 0, Math.Abs(shiftY), 0)
@@ -134,10 +134,10 @@ Public Class Stabilizer_BasicsRandomInput : Inherits VBparent
 
             Dim srcRect = New cv.Rect(x, y, src.Width - Math.Abs(shiftX), src.Height - Math.Abs(shiftY))
             Dim dstRect = New cv.Rect(x2, y2, srcRect.Width, srcRect.Height)
-            dst1(srcRect).CopyTo(input(dstRect))
+            dst2(srcRect).CopyTo(input(dstRect))
         End If
 
-        dst2 = input
+        dst3 = input
     End Sub
 End Class
 
@@ -158,11 +158,11 @@ Public Class Stabilizer_BasicsTest : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
         random.Run(src)
-        stable.Run(random.dst2.Clone)
+        stable.Run(random.dst3.Clone)
 
-        dst1 = stable.dst1
         dst2 = stable.dst2
-        If standalone Then dst2.Rectangle(stable.templateRect, cv.Scalar.White, 1)
+        dst3 = stable.dst3
+        If standalone Then dst3.Rectangle(stable.templateRect, cv.Scalar.White, 1)
         label2 = stable.label2
     End Sub
 End Class
@@ -193,7 +193,7 @@ Public Class Stabilizer_OpticalFlow : Inherits VBparent
             sScale = New cv.Mat(5, 1, cv.MatType.CV_64F, 0)
         End If
 
-        dst1 = src
+        dst2 = src
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If inputFeat Is Nothing Then
@@ -264,11 +264,11 @@ Public Class Stabilizer_OpticalFlow : Inherits VBparent
 
             Dim smoothedFrame = task.color.WarpAffine(smoothedMat, src.Size())
             smoothedFrame = smoothedFrame(New cv.Range(vert_Border, smoothedFrame.Rows - vert_Border), New cv.Range(borderCrop, smoothedFrame.Cols - borderCrop))
-            dst2 = smoothedFrame.Resize(src.Size())
+            dst3 = smoothedFrame.Resize(src.Size())
 
             For i = 0 To commonPoints.Count - 1
-                dst1.Circle(commonPoints.ElementAt(i), task.dotSize + 3, cv.Scalar.Red, -1, task.lineType)
-                dst1.Circle(lastFeatures.ElementAt(i), task.dotSize + 1, cv.Scalar.Blue, -1, task.lineType)
+                dst2.Circle(commonPoints.ElementAt(i), task.dotSize + 3, cv.Scalar.Red, -1, task.lineType)
+                dst2.Circle(lastFeatures.ElementAt(i), task.dotSize + 1, cv.Scalar.Blue, -1, task.lineType)
             Next
         End If
         inputFeat = Nothing ' show that we consumed the current set of features.
@@ -299,9 +299,9 @@ Public Class Stabilizer_MotionDetect : Inherits VBparent
 
         stable.Run(src)
 
-        motion.Run(stable.dst2(stable.templateRect))
-        dst1 = stable.dst2
-        dst1.Rectangle(stable.templateRect, cv.Scalar.White, 1)
-        dst2 = motion.dst2
+        motion.Run(stable.dst3(stable.templateRect))
+        dst2 = stable.dst3
+        dst2.Rectangle(stable.templateRect, cv.Scalar.White, 1)
+        dst3 = motion.dst3
     End Sub
 End Class

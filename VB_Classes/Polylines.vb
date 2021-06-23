@@ -19,9 +19,9 @@ Public Class Polylines_IEnumerableExample : Inherits VBparent
         Dim pts As New List(Of List(Of cv.Point))
         pts.Add(points)
 
-        dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         ' NOTE: when there are 2 points, there will be 1 line.
-        dst1.Polylines(pts, check.Box(0).Checked, cv.Scalar.White, task.lineWidth, task.lineType)
+        dst2.Polylines(pts, check.Box(0).Checked, cv.Scalar.White, task.lineWidth, task.lineType)
     End Sub
 End Class
 
@@ -51,16 +51,16 @@ Public Class Polylines_Random : Inherits VBparent
             Next
             pts.Add(points)
 
-            dst1 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
-            dst1.Polylines(pts, False, cv.Scalar.White, task.lineWidth, task.lineType)
-            dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst2 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+            dst2.Polylines(pts, False, cv.Scalar.White, task.lineWidth, task.lineType)
+            dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
 
-        Dim width As Double = dst1.Width / zoomFactor
-        Dim height As Double = dst1.Height / zoomFactor
-        Dim x = Math.Min(task.mousePoint.X, dst1.Width - width)
-        Dim y = Math.Min(task.mousePoint.Y, dst1.Height - height)
-        dst2 = dst1.GetRectSubPix(New cv.Size(width, height), New cv.Point2f(x, y)).Resize(dst2.Size)
+        Dim width As Double = dst2.Width / zoomFactor
+        Dim height As Double = dst2.Height / zoomFactor
+        Dim x = Math.Min(task.mousePoint.X, dst2.Width - width)
+        Dim y = Math.Min(task.mousePoint.Y, dst2.Height - height)
+        dst3 = dst2.GetRectSubPix(New cv.Size(width, height), New cv.Point2f(x, y)).Resize(dst3.Size)
     End Sub
 End Class
 

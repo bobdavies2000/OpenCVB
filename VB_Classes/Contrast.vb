@@ -9,12 +9,12 @@ Public Class Contrast_POW : Inherits VBparent
         task.desc = "Reduce contrast with POW function"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1.ConvertTo(dst2, cv.MatType.CV_32FC3)
-        dst2 = dst2.Normalize()
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2.ConvertTo(dst3, cv.MatType.CV_32FC3)
+        dst3 = dst3.Normalize()
 
         Dim exponent = sliders.trackbar(0).Value / 100
-        dst2 = dst2.Pow(exponent)
+        dst3 = dst3.Pow(exponent)
     End Sub
 End Class
 
@@ -32,7 +32,7 @@ Public Class Contrast_Basics : Inherits VBparent
         task.desc = "Show image with varying contrast and brightness."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        src.ConvertTo(dst1, -1, sliders.trackbar(1).Value / 50, sliders.trackbar(0).Value)
+        src.ConvertTo(dst2, -1, sliders.trackbar(1).Value / 50, sliders.trackbar(0).Value)
         label1 = "Brightness/Contrast"
         label2 = ""
     End Sub

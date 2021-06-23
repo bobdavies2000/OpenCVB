@@ -11,13 +11,13 @@ Public Class Motion_Basics : Inherits VBparent
     Public Sub New()
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Single frame motion threshold", 1, 100000, If(task.color.Width = 1280, 20000, 1000)) ' used only externally...
-            sliders.setupTrackBar(1, "Cumulative motion threshold", 1, dst1.Total, If(task.color.Width = 1280, 200000, 100000)) ' used only externally...
+            sliders.setupTrackBar(1, "Cumulative motion threshold", 1, dst2.Total, If(task.color.Width = 1280, 200000, 100000)) ' used only externally...
         End If
 
         minSlider = findSlider("Contour minimum area")
         minSlider.Value = 5
 
-        label1 = "Enclosing rectangles are yellow in dst1 and dst2"
+        label1 = "Enclosing rectangles are yellow in dst2 and dst3"
         task.desc = "Detect contours in the motion data and the resulting rectangles"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -27,8 +27,8 @@ Public Class Motion_Basics : Inherits VBparent
         src = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
 
         diff.Run(src)
-        dst2 = diff.dst2
-        changedPixels = dst2.CountNonZero()
+        dst3 = diff.dst3
+        changedPixels = dst3.CountNonZero()
         cumulativePixels += changedPixels
 
         resetAll = task.cameraStable = False Or cumulativePixels > cumulativeThreshold.value Or changedPixels > pixelThreshold.value Or task.depthOptionsChanged
@@ -37,25 +37,25 @@ Public Class Motion_Basics : Inherits VBparent
             task.depthOptionsChanged = False
         End If
 
-        contours.Run(dst2)
+        contours.Run(dst3)
 
-        dst1 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If contours.contourlist.Count Then
             intersect.inputRects.Clear()
             For Each c In contours.contourlist
                 Dim r = cv.Cv2.BoundingRect(c)
                 If r.X < 0 Then r.X = 0
                 If r.Y < 0 Then r.Y = 0
-                If r.X + r.Width > dst2.Width Then r.Width = dst2.Width - r.X
-                If r.Y + r.Height > dst2.Height Then r.Height = dst2.Height - r.Y
+                If r.X + r.Width > dst3.Width Then r.Width = dst3.Width - r.X
+                If r.Y + r.Height > dst3.Height Then r.Height = dst3.Height - r.Y
                 intersect.inputRects.Add(r)
             Next
             intersect.Run(src)
 
-            If dst2.Channels = 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            If dst3.Channels = 1 Then dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             For Each r In intersect.enclosingRects
-                dst1.Rectangle(r, cv.Scalar.Yellow, 2)
                 dst2.Rectangle(r, cv.Scalar.Yellow, 2)
+                dst3.Rectangle(r, cv.Scalar.Yellow, 2)
             Next
             label2 = "Motion detected"
         Else
@@ -93,9 +93,9 @@ Public Class Motion_WithBlurDilate : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static persistSlider = findSlider("Frames to persist")
 
-        dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
-        blur.Run(dst1)
-        dst1 = blur.dst1
+        dst2 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
+        blur.Run(dst2)
+        dst2 = blur.dst2
 
         Static delayCounter = 0
         delayCounter += 1
@@ -105,26 +105,26 @@ Public Class Motion_WithBlurDilate : Inherits VBparent
             rectList.Clear()
         End If
 
-        diff.Run(dst1)
-        dst2 = diff.dst2
-        changedPixels = dst2.CountNonZero()
+        diff.Run(dst2)
+        dst3 = diff.dst3
+        changedPixels = dst3.CountNonZero()
         cumulativePixels += changedPixels
 
-        dilate.Run(dst2)
+        dilate.Run(dst3)
 
-        contours.Run(dilate.dst1)
+        contours.Run(dilate.dst2)
 
         For Each c In contours.contourlist
             Dim r = cv.Cv2.BoundingRect(c)
-            If r.X >= 0 And r.Y >= 0 And r.X + r.Width < dst1.Width And r.Y + r.Height < dst1.Height Then
-                Dim count = diff.dst2(r).CountNonZero()
+            If r.X >= 0 And r.Y >= 0 And r.X + r.Width < dst2.Width And r.Y + r.Height < dst2.Height Then
+                Dim count = diff.dst3(r).CountNonZero()
                 If count > 100 Then rectList.Add(r)
             End If
         Next
 
-        dst1 = If(src.Channels = 1, src.CvtColor(cv.ColorConversionCodes.GRAY2BGR), src.Clone)
+        dst2 = If(src.Channels = 1, src.CvtColor(cv.ColorConversionCodes.GRAY2BGR), src.Clone)
         For i = 0 To rectList.Count - 1
-            dst1.Rectangle(rectList(i), cv.Scalar.Yellow, 2)
+            dst2.Rectangle(rectList(i), cv.Scalar.Yellow, 2)
         Next
     End Sub
 End Class
@@ -157,19 +157,19 @@ Public Class Motion_MinMaxDepth : Inherits VBparent
         If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f.Clone
 
         motion.Run(task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        dst2 = motion.dst2.Clone
+        dst3 = motion.dst3.Clone
 
         If motion.resetAll Or externalReset Then
             externalReset = False
-            dst1 = input.Clone
+            dst2 = input.Clone
         Else
-            If dst2.Channels <> 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            input.CopyTo(dst1, dst2)
+            If dst3.Channels <> 1 Then dst3 = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            input.CopyTo(dst2, dst3)
 
             If useNone.checked = False Then
-                If useMax.checked Then cv.Cv2.Max(input, dst1, dst1) Else cv.Cv2.Min(input, dst1, dst1)
+                If useMax.checked Then cv.Cv2.Max(input, dst2, dst2) Else cv.Cv2.Min(input, dst2, dst2)
             Else
-                dst1 = input.Clone()
+                dst2 = input.Clone()
             End If
         End If
     End Sub
@@ -197,17 +197,17 @@ Public Class Motion_MinMaxPointCloud : Inherits VBparent
         Dim split = input.Split()
         stable.Run(split(2) * 1000)
 
-        dst1 = stable.dst1
         dst2 = stable.dst2
+        dst3 = stable.dst3
         label2 = "Cumulative Motion = " + Format(stable.motion.changedPixels / 1000, "#0.0") + "k pixels "
         If stable.motion.resetAll Or splitPC Is Nothing Or task.frameCount < 30 Then
             splitPC = split
-            dst2 = input
+            dst3 = input
         Else
-            splitPC(2) = (stable.dst1 * 0.001).ToMat
-            split(0).CopyTo(splitPC(0), dst2)
-            split(1).CopyTo(splitPC(1), dst2)
-            cv.Cv2.Merge(splitPC, dst2)
+            splitPC(2) = (stable.dst2 * 0.001).ToMat
+            split(0).CopyTo(splitPC(0), dst3)
+            split(1).CopyTo(splitPC(1), dst3)
+            cv.Cv2.Merge(splitPC, dst3)
         End If
     End Sub
 End Class
@@ -233,10 +233,10 @@ Public Class Motion_MinMaxDepthColorized : Inherits VBparent
         Static saveMax = task.maxDepth
         If saveMin <> task.minDepth Or saveMax <> task.maxDepth Then stable.externalReset = True
         stable.Run(src)
-        dst1 = stable.dst1
+        dst2 = stable.dst2
 
-        colorize.Run(dst1)
-        dst2 = colorize.dst1
+        colorize.Run(dst2)
+        dst3 = colorize.dst2
     End Sub
 End Class
 
@@ -255,7 +255,7 @@ Public Class Motion_ThruCorrelation : Inherits VBparent
             sliders.setupTrackBar(2, "Pad size in pixels for the search area", 0, 100, 20)
         End If
 
-        dst2 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         task.desc = "Detect motion through the correlation coefficient"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -272,7 +272,7 @@ Public Class Motion_ThruCorrelation : Inherits VBparent
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Static lastFrame As cv.Mat = input.Clone
-        dst2.SetTo(0)
+        dst3.SetTo(0)
         Parallel.For(0, grid.roiList.Count,
         Sub(i)
             Dim roi = grid.roiList(i)
@@ -284,24 +284,24 @@ Public Class Motion_ThruCorrelation : Inherits VBparent
                 Dim minVal As Single, maxVal As Single
                 correlation.MinMaxLoc(minVal, maxVal)
                 If maxVal < ccThreshold / 1000 Then
-                    If (i Mod grid.tilesPerRow) <> 0 Then dst2(grid.roiList(i - 1)).SetTo(255)
-                    If (i Mod grid.tilesPerRow) < grid.tilesPerRow And i < grid.roiList.Count - 1 Then dst2(grid.roiList(i + 1)).SetTo(255)
+                    If (i Mod grid.tilesPerRow) <> 0 Then dst3(grid.roiList(i - 1)).SetTo(255)
+                    If (i Mod grid.tilesPerRow) < grid.tilesPerRow And i < grid.roiList.Count - 1 Then dst3(grid.roiList(i + 1)).SetTo(255)
                     If i > grid.tilesPerRow Then
-                        dst2(grid.roiList(i - grid.tilesPerRow)).SetTo(255)
-                        dst2(grid.roiList(i - grid.tilesPerRow + 1)).SetTo(255)
+                        dst3(grid.roiList(i - grid.tilesPerRow)).SetTo(255)
+                        dst3(grid.roiList(i - grid.tilesPerRow + 1)).SetTo(255)
                     End If
                     If i < (grid.roiList.Count - grid.tilesPerRow - 1) Then
-                        dst2(grid.roiList(i + grid.tilesPerRow)).SetTo(255)
-                        dst2(grid.roiList(i + grid.tilesPerRow + 1)).SetTo(255)
+                        dst3(grid.roiList(i + grid.tilesPerRow)).SetTo(255)
+                        dst3(grid.roiList(i + grid.tilesPerRow + 1)).SetTo(255)
                     End If
-                    dst2(roi).SetTo(255)
+                    dst3(roi).SetTo(255)
                 End If
             End If
         End Sub)
 
         lastFrame = input.Clone
 
-        dst1 = src
+        dst2 = src
     End Sub
 End Class
 
@@ -317,17 +317,17 @@ Public Class Motion_CCmerge : Inherits VBparent
         task.desc = "Use the correlation coefficient to maintain an up-to-date image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If task.frameCount < 10 Then dst1 = src.Clone
+        If task.frameCount < 10 Then dst2 = src.Clone
 
         motionCC.Run(src)
 
         Static lastFrame = src.Clone
-        If motionCC.dst2.CountNonZero() > src.Total / 2 Then
-            dst1 = src.Clone
+        If motionCC.dst3.CountNonZero() > src.Total / 2 Then
+            dst2 = src.Clone
             lastFrame = src.Clone
         End If
 
-        src.CopyTo(dst1, motionCC.dst2)
-        dst2 = motionCC.dst2
+        src.CopyTo(dst2, motionCC.dst3)
+        dst3 = motionCC.dst3
     End Sub
 End Class

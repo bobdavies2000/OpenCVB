@@ -16,7 +16,7 @@ Public Class PhaseCorrelate_Basics : Inherits VBparent
             sliders.setupTrackBar(0, "Threshold shift to cause reset of lastFrame", 0, 100, 30)
         End If
 
-        cv.Cv2.CreateHanningWindow(hanning, dst1.Size, cv.MatType.CV_64F)
+        cv.Cv2.CreateHanningWindow(hanning, dst2.Size, cv.MatType.CV_64F)
         task.desc = "Look for a shift between the current frame and the previous"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -47,15 +47,15 @@ Public Class PhaseCorrelate_Basics : Inherits VBparent
 
             center = New cv.Point(input64.Cols / 2, input64.Rows / 2)
             If src.Channels = 1 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst1 = src.Clone
-            dst1.Circle(center, radius, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
-            dst1.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+            dst2 = src.Clone
+            dst2.Circle(center, radius, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
+            dst2.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
 
-            src(srcRect).CopyTo(dst2(stableRect))
+            src(srcRect).CopyTo(dst3(stableRect))
 
             If radius > 5 Then
-                dst2.Circle(center, radius, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
-                dst2.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+                dst3.Circle(center, radius, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
+                dst3.Line(center, New cv.Point(center.X + shift.X, center.Y + shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
             End If
         Else
             resetLastFrame = True
@@ -86,10 +86,10 @@ Public Class PhaseCorrelate_BasicsTest : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         random.Run(src)
 
-        stable.Run(random.dst2.Clone)
+        stable.Run(random.dst3.Clone)
 
-        dst1 = stable.dst1
         dst2 = stable.dst2
+        dst3 = stable.dst3
         label2 = stable.label2
     End Sub
 End Class
@@ -110,19 +110,19 @@ Public Class PhaseCorrelate_Depth : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static lastFrame = task.depth32f.Clone
         phaseC.Run(task.depth32f)
-        dst1 = task.depth32f
-        Dim tmp = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        dst2 = task.depth32f
+        Dim tmp = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         If phaseC.resetLastFrame Then task.depth32f.CopyTo(lastFrame)
         lastFrame(phaseC.srcRect).CopyTo(tmp(phaseC.stableRect))
         label1 = phaseC.label1
         label2 = phaseC.label2
 
         tmp = tmp.Normalize(0, 255, cv.NormTypes.MinMax)
-        tmp.ConvertTo(dst2, cv.MatType.CV_8UC1)
-        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        tmp.ConvertTo(dst3, cv.MatType.CV_8UC1)
+        dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        dst2.Circle(phaseC.center, phaseC.radius, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
-        dst2.Line(phaseC.center, New cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+        dst3.Circle(phaseC.center, phaseC.radius, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
+        dst3.Line(phaseC.center, New cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
     End Sub
 End Class
 
@@ -139,6 +139,6 @@ Public Class PhaseCorrelate_HanningWindow : Inherits VBparent
         task.desc = "Show what a Hanning window looks like"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        cv.Cv2.CreateHanningWindow(dst1, src.Size, cv.MatType.CV_32F)
+        cv.Cv2.CreateHanningWindow(dst2, src.Size, cv.MatType.CV_32F)
     End Sub
 End Class

@@ -12,8 +12,8 @@ Public Class Gradient_Basics : Inherits VBparent
         Dim x32f As New cv.Mat, y32f As New cv.Mat
         sobel.grayX.ConvertTo(x32f, cv.MatType.CV_32F)
         sobel.grayY.ConvertTo(y32f, cv.MatType.CV_32F)
-        cv.Cv2.Phase(x32f, y32f, dst2)
-        dst1 = sobel.dst1
+        cv.Cv2.Phase(x32f, y32f, dst3)
+        dst2 = sobel.dst2
     End Sub
 End Class
 
@@ -31,8 +31,8 @@ Public Class Gradient_Depth : Inherits VBparent
         Dim x32f As New cv.Mat, y32f As New cv.Mat
         sobel.grayX.ConvertTo(x32f, cv.MatType.CV_32F)
         sobel.grayY.ConvertTo(y32f, cv.MatType.CV_32F)
-        cv.Cv2.Phase(x32f, y32f, dst2)
-        dst1 = sobel.dst1
+        cv.Cv2.Phase(x32f, y32f, dst3)
+        dst2 = sobel.dst2
     End Sub
 End Class
 
@@ -63,15 +63,15 @@ Public Class Gradient_CartToPolar : Inherits VBparent
         src.ConvertTo(tmp, cv.MatType.CV_32FC3, 1 / 255)
         basics.Run(tmp)
 
-        basics.sobel.grayX.ConvertTo(dst1, cv.MatType.CV_32F)
         basics.sobel.grayX.ConvertTo(dst2, cv.MatType.CV_32F)
+        basics.sobel.grayX.ConvertTo(dst3, cv.MatType.CV_32F)
 
-        cv.Cv2.CartToPolar(dst1, dst2, magnitude, angle, True)
+        cv.Cv2.CartToPolar(dst2, dst3, magnitude, angle, True)
         magnitude = magnitude.Normalize()
         Dim exponent = contrastSlider.Value / 100
         magnitude = magnitude.Pow(exponent)
 
-        dst1 = magnitude
+        dst2 = magnitude
     End Sub
 End Class
 
@@ -94,8 +94,8 @@ Public Class Gradient_StableDepth : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         motionSD.Run(src)
-        dst1 = motionSD.dst1.Clone
-        basics.Run(dst1.Clone)
-        dst2 = basics.dst2
+        dst2 = motionSD.dst2.Clone
+        basics.Run(dst2.Clone)
+        dst3 = basics.dst3
     End Sub
 End Class

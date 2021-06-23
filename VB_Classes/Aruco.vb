@@ -36,10 +36,10 @@ Public Class Aruco_Test : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim tmp = cv.Cv2.ImRead(task.parms.homeDir + "Data/aruco_markers_photo.jpg")
         aruco.Run(tmp)
-        dst1 = aruco.detectedMarkers.Resize(src.Size())
+        dst2 = aruco.detectedMarkers.Resize(src.Size())
 
-        dst2.SetTo(0)
-        dst2(New cv.Rect(0, 0, dst2.Height, dst2.Height)) = aruco.normalizedImage.Resize(New cv.Size(dst1.Height, dst1.Height))
+        dst3.SetTo(0)
+        dst3(New cv.Rect(0, 0, dst3.Height, dst3.Height)) = aruco.normalizedImage.Resize(New cv.Size(dst2.Height, dst2.Height))
     End Sub
 End Class
 

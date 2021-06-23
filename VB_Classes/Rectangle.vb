@@ -11,7 +11,7 @@ Public Class Rectangle_Basics : Inherits VBparent
         Static saveType = optDraw.drawRotated
         If task.frameCount Mod optDraw.updateFrequency = 0 Or saveType <> optDraw.drawRotated Then
             saveType = optDraw.drawRotated
-            dst1.SetTo(cv.Scalar.Black)
+            dst2.SetTo(cv.Scalar.Black)
             rectangles.Clear()
             rotatedRectangles.Clear()
             For i = 0 To optDraw.drawCount - 1
@@ -25,11 +25,11 @@ Public Class Rectangle_Basics : Inherits VBparent
                 Dim nextColor = New cv.Scalar(task.vecColors(i).Item0, task.vecColors(i).Item1, task.vecColors(i).Item2)
                 If optDraw.drawRotated Then
                     Dim r = New cv.RotatedRect(nPoint, eSize, angle)
-                    drawRotatedRectangle(r, dst1, nextColor)
+                    drawRotatedRectangle(r, dst2, nextColor)
                     rotatedRectangles.Add(r)
                 Else
                     Dim r = New cv.Rect(nPoint.X, nPoint.Y, width, height)
-                    cv.Cv2.Rectangle(dst1, r, nextColor, optDraw.drawFilled)
+                    cv.Cv2.Rectangle(dst2, r, nextColor, optDraw.drawFilled)
                     rectangles.Add(r)
                 End If
             Next
@@ -48,7 +48,7 @@ Public Class Rectangle_Rotated : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         rectangle.Run(src)
-        dst1 = rectangle.dst1
+        dst2 = rectangle.dst2
     End Sub
 End Class
 
@@ -72,17 +72,17 @@ Public Class Rectangle_Overlap : Inherits VBparent
         Static typeCheckBox = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
         If standalone Or task.intermediateName = caller Then
             draw.Run(src)
-            dst1 = draw.dst1
+            dst2 = draw.dst2
         End If
 
-        dst2.SetTo(0)
+        dst3.SetTo(0)
         If typeCheckBox.Checked Then
             Dim r1 As cv.RotatedRect = draw.rotatedRectangles(0)
             Dim r2 As cv.RotatedRect = draw.rotatedRectangles(1)
             rect1 = r1.BoundingRect
             rect2 = r2.BoundingRect
-            drawRotatedOutline(r1, dst2, cv.Scalar.Yellow)
-            drawRotatedOutline(r2, dst2, cv.Scalar.Yellow)
+            drawRotatedOutline(r1, dst3, cv.Scalar.Yellow)
+            drawRotatedOutline(r2, dst3, cv.Scalar.Yellow)
         Else
             rect1 = draw.rectangles(0)
             rect2 = draw.rectangles(1)
@@ -91,14 +91,14 @@ Public Class Rectangle_Overlap : Inherits VBparent
         enclosingRect = New cv.Rect
         If rect1.IntersectsWith(rect2) Then
             enclosingRect = rect1.Union(rect2)
-            dst2.Rectangle(enclosingRect, cv.Scalar.White, 4)
+            dst3.Rectangle(enclosingRect, cv.Scalar.White, 4)
             label2 = "Rectangles intersect - red marks overlapping rectangle"
-            dst2.Rectangle(rect1.Intersect(rect2), cv.Scalar.Red, -1)
+            dst3.Rectangle(rect1.Intersect(rect2), cv.Scalar.Red, -1)
         Else
             label2 = "Rectangles don't intersect"
         End If
-        dst2.Rectangle(rect1, cv.Scalar.Yellow, 2)
-        dst2.Rectangle(rect2, cv.Scalar.Yellow, 2)
+        dst3.Rectangle(rect1, cv.Scalar.Yellow, 2)
+        dst3.Rectangle(rect2, cv.Scalar.Yellow, 2)
     End Sub
 End Class
 
@@ -116,7 +116,7 @@ Public Class Rectangle_Motion : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         motion.Run(src)
-        dst1 = motion.dst1.Clone
+        dst2 = motion.dst2.Clone
     End Sub
 End Class
 
@@ -138,7 +138,7 @@ Public Class Rectangle_MotionDepth : Inherits VBparent
         cv.Cv2.Min(task.depth32f, lastDepth, src)
 
         motion.Run(src)
-        dst2 = motion.dst2
+        dst3 = motion.dst3
         If motion.resetAll Then
             lastDepth = task.depth32f
             src = task.depth32f
@@ -146,7 +146,7 @@ Public Class Rectangle_MotionDepth : Inherits VBparent
             lastDepth = src
         End If
         colorize.Run(src)
-        dst1 = colorize.dst1
+        dst2 = colorize.dst2
     End Sub
 End Class
 
@@ -166,7 +166,7 @@ Public Class Rectangle_Intersection : Inherits VBparent
     Dim otherRects As New List(Of cv.Rect)
     Public Sub New()
         If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Merge rectangles within X pixels", 0, dst1.Width, If(dst1.Width = 1280, 500, 250))
+            sliders.setupTrackBar(0, "Merge rectangles within X pixels", 0, dst2.Width, If(dst2.Width = 1280, 500, 250))
         End If
 
         task.desc = "Test if any number of rectangles overlap."
@@ -196,12 +196,12 @@ Public Class Rectangle_Intersection : Inherits VBparent
             label1 = "Input rectangles = " + CStr(countSlider.value)
 
             draw.Run(src)
-            dst1 = draw.dst1
+            dst2 = draw.dst2
             inputRects = New List(Of cv.Rect)(draw.rectangles)
         Else
-            dst1.SetTo(0)
+            dst2.SetTo(0)
             For Each r In inputRects
-                dst1.Rectangle(r, cv.Scalar.Yellow, 1)
+                dst2.Rectangle(r, cv.Scalar.Yellow, 1)
             Next
         End If
 
@@ -223,9 +223,9 @@ Public Class Rectangle_Intersection : Inherits VBparent
         End While
         label2 = CStr(enclosingRects.Count) + " enclosing rectangles were found"
 
-        dst2.SetTo(0)
+        dst3.SetTo(0)
         For Each r In enclosingRects
-            dst2.Rectangle(r, cv.Scalar.Yellow, 2)
+            dst3.Rectangle(r, cv.Scalar.Yellow, 2)
         Next
     End Sub
 End Class
@@ -253,12 +253,12 @@ Public Class Rectangle_Union : Inherits VBparent
             label1 = "Input rectangles = " + CStr(draw.rectangles.Count)
 
             draw.Run(src)
-            dst1 = draw.dst1
+            dst2 = draw.dst2
             inputRects = New List(Of cv.Rect)(draw.rectangles)
         Else
-            dst1.SetTo(0)
+            dst2.SetTo(0)
             For Each r In inputRects
-                dst1.Rectangle(r, cv.Scalar.Yellow, 1)
+                dst2.Rectangle(r, cv.Scalar.Yellow, 1)
             Next
             label1 = "Input rectangles = " + CStr(inputRects.Count)
         End If
@@ -271,13 +271,13 @@ Public Class Rectangle_Union : Inherits VBparent
             If r.Y < 0 Then r.Y = 0
             If allRect.Width > 0 And allRect.Height > 0 Then
                 allRect = r.Union(allRect)
-                If allRect.X + allRect.Width >= dst1.Width Then allRect.Width = dst1.Width - allRect.X
-                If allRect.Height >= dst1.Height Then allRect.Height = dst1.Height - allRect.Y
+                If allRect.X + allRect.Width >= dst2.Width Then allRect.Width = dst2.Width - allRect.X
+                If allRect.Height >= dst2.Height Then allRect.Height = dst2.Height - allRect.Y
             End If
         Next
-        If allRect.X + allRect.Width >= dst1.Width Then allRect.Width = dst1.Width - allRect.X
-        If allRect.Y + allRect.Height >= dst1.Height Then allRect.Height = dst1.Height - allRect.Y
-        dst1.Rectangle(allRect, cv.Scalar.Red, 2)
+        If allRect.X + allRect.Width >= dst2.Width Then allRect.Width = dst2.Width - allRect.X
+        If allRect.Y + allRect.Height >= dst2.Height Then allRect.Height = dst2.Height - allRect.Y
+        dst2.Rectangle(allRect, cv.Scalar.Red, 2)
     End Sub
 End Class
 
@@ -305,7 +305,7 @@ Public Class Rectangle_MultiOverlap : Inherits VBparent
             label1 = "Input rectangles = " + CStr(draw.rectangles.Count)
 
             draw.Run(src)
-            dst1 = draw.dst1
+            dst2 = draw.dst2
             inputRects = draw.rectangles
         End If
 
@@ -331,7 +331,7 @@ Public Class Rectangle_MultiOverlap : Inherits VBparent
         outputRects = inputRects
         If standalone Then
             For Each r In outputRects
-                dst1.Rectangle(r, cv.Scalar.Yellow, 2)
+                dst2.Rectangle(r, cv.Scalar.Yellow, 2)
             Next
         End If
     End Sub

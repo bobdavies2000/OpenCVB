@@ -18,14 +18,14 @@ Public Class Fitline_Basics : Inherits VBparent
 
         If standalone Or task.intermediateName = caller Then
             draw.Run(src)
-            dst2 = draw.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
-            dst1 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst3 = draw.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+            dst2 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Else
             lines.Clear()
         End If
 
         Dim contours As cv.Point()()
-        contours = cv.Cv2.FindContoursAsArray(dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+        contours = cv.Cv2.FindContoursAsArray(dst3, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
         Dim radiusAccuracy = radiusSlider.Value / 100
         Dim angleAccuracy = angleSlider.Value / 100
         For i = 0 To contours.Length - 1
@@ -40,7 +40,7 @@ Public Class Fitline_Basics : Inherits VBparent
                 lines.Add(p1)
                 lines.Add(p2)
             End If
-            dst1.Line(p1, p2, cv.Scalar.Red, task.lineWidth, task.lineType)
+            dst2.Line(p1, p2, cv.Scalar.Red, task.lineWidth, task.lineType)
         Next
     End Sub
 End Class
@@ -55,10 +55,10 @@ Public Class Fitline_3DBasics_MT : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         hlines.Run(src)
-        dst2 = hlines.dst2
-        Dim mask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
-        dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        src.CopyTo(dst1)
+        dst3 = hlines.dst3
+        Dim mask = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst3 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        src.CopyTo(dst2)
 
         Dim lines As New List(Of cv.Line3D)
         Dim nullLine = New cv.Line3D(0, 0, 0, 0, 0, 0)
@@ -83,7 +83,7 @@ Public Class Fitline_3DBasics_MT : Inherits VBparent
                 ' save the average color for this roi
                 Dim mean = task.RGBDepth(roi).Mean()
                 mean(0) = 255 - mean(0)
-                dst2.Rectangle(roi, mean, -1, task.lineType)
+                dst3.Rectangle(roi, mean, -1, task.lineType)
             Else
                 line = cv.Cv2.FitLine(points.ToArray, cv.DistanceTypes.L2, 0, 0, 0.01)
             End If
@@ -93,9 +93,9 @@ Public Class Fitline_3DBasics_MT : Inherits VBparent
         End Sub)
         ' putting this in the parallel for above causes a memory leak - could not find it...
         For i = 0 To hlines.grid.roiList.Count - 1
-            houghShowLines3D(dst1(hlines.grid.roiList(i)), lines.ElementAt(i))
+            houghShowLines3D(dst2(hlines.grid.roiList(i)), lines.ElementAt(i))
         Next
-        dst1.SetTo(cv.Scalar.White, hlines.grid.gridMask)
+        dst2.SetTo(cv.Scalar.White, hlines.grid.gridMask)
     End Sub
 End Class
 
@@ -122,7 +122,7 @@ Public Class Fitline_RawInput : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If check.Box(1).Checked Or task.frameCount = 0 Then
             If task.parms.testAllRunning = False Then check.Box(1).Checked = False
-            dst1.SetTo(0)
+            dst2.SetTo(0)
             Dim width = src.Width
             Dim height = src.Height
 
@@ -134,7 +134,7 @@ Public Class Fitline_RawInput : Inherits VBparent
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y > height Then pt.Y = height
                 points.Add(pt)
-                dst1.Circle(points(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
+                dst2.Circle(points(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
             Next
 
             Dim p1 As cv.Point2f, p2 As cv.Point2f
@@ -166,7 +166,7 @@ Public Class Fitline_RawInput : Inherits VBparent
                 If pt.Y < 0 Then pt.Y = 0
                 If pt.Y > height Then pt.Y = height
                 points.Add(pt)
-                dst1.Circle(pt, task.dotSize + 1, highLight, -1, task.lineType)
+                dst2.Circle(pt, task.dotSize + 1, highLight, -1, task.lineType)
             Next
         End If
     End Sub
@@ -200,8 +200,8 @@ Public Class Fitline_EigenFit : Inherits VBparent
             '    noisyLine.sliders.trackbar(2).Value <> lineNoise Or noisyLine.check.Box(0).Checked <> highlight Or noisyLine.check.Box(1).Checked Then
             noisyLine.check.Box(1).Checked = True
             noisyLine.Run(src)
-            dst2 = noisyLine.dst1
-            dst1.SetTo(0)
+            dst3 = noisyLine.dst2
+            dst2.SetTo(0)
             noisyLine.check.Box(1).Checked = False
             'End If
 
@@ -217,7 +217,7 @@ Public Class Fitline_EigenFit : Inherits VBparent
             Dim bb = line.Y1 - m * line.X1
             Dim p1 = New cv.Point(0, bb)
             Dim p2 = New cv.Point(width, m * width + bb)
-            dst1.Line(p1, p2, cv.Scalar.Red, 20, task.lineType)
+            dst2.Line(p1, p2, cv.Scalar.Red, 20, task.lineType)
 
             Dim pointMat = New cv.Mat(noisyLine.points.Count, 1, cv.MatType.CV_32FC2, noisyLine.points.ToArray)
             Dim mean = pointMat.Mean()
@@ -253,16 +253,16 @@ Public Class Fitline_EigenFit : Inherits VBparent
             m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
 
             If Math.Abs(m2) > 1.0 Then
-                dst1.Line(p1, p2, cv.Scalar.Yellow, 10, task.lineType)
+                dst2.Line(p1, p2, cv.Scalar.Yellow, 10, task.lineType)
             Else
                 p1 = New cv.Point2f(mean.Val0 - Math.Cos(-theta) * len / 2, mean.Val1 - Math.Sin(-theta) * len / 2)
                 p2 = New cv.Point2f(mean.Val0 + Math.Cos(-theta) * len / 2, mean.Val1 + Math.Sin(-theta) * len / 2)
                 m2 = (p2.Y - p1.Y) / (p2.X - p1.X)
-                dst1.Line(p1, p2, cv.Scalar.Yellow, 10, task.lineType)
+                dst2.Line(p1, p2, cv.Scalar.Yellow, 10, task.lineType)
             End If
             p1 = New cv.Point(0, noisyLine.bb)
             p2 = New cv.Point(width, noisyLine.m * width + noisyLine.bb)
-            dst1.Line(p1, p2, cv.Scalar.Blue, task.lineWidth + 2, task.lineType)
+            dst2.Line(p1, p2, cv.Scalar.Blue, task.lineWidth + 2, task.lineType)
         End If
         setTrueText("GT m = " + Format(noisyLine.m, "#0.00") + " eigen m = " + Format(m2, "#0.00") + "    len = " + CStr(CInt(len)) + vbCrLf +
                                               "Confidence = " + Format(eigenVal.Get(Of Single)(0, 0) / eigenVal.Get(Of Single)(1, 0), "#0.0") + vbCrLf +

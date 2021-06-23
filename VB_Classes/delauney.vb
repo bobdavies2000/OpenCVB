@@ -44,7 +44,7 @@ Module Delaunay_Exports
             Do
                 Dim org As cv.Point2f, dstpt As cv.Point2f
                 If subdiv.EdgeOrg(e, org) > 0 And subdiv.EdgeDst(e, dstpt) > 0 Then
-                    'draw_line(img, org, dst1, active_color)
+                    'draw_line(img, org, dst2, active_color)
                 End If
 
                 e = subdiv.GetEdge(e, 19) ' next_around_left const missing ?
@@ -90,12 +90,12 @@ Public Class Delaunay_Basics : Inherits VBparent
 
         For i = 0 To 100
             Dim fp = New cv.Point2f(msRNG.Next(0, rect.Width), msRNG.Next(0, rect.Height))
-            locate_point(dst1, subdiv, fp, active_facet_color)
+            locate_point(dst2, subdiv, fp, active_facet_color)
             subdiv.Insert(fp)
-            draw_subdiv(dst1, subdiv, cv.Scalar.White, task.frameCount Mod 2)
+            draw_subdiv(dst2, subdiv, cv.Scalar.White, task.frameCount Mod 2)
         Next
 
-        paint_voronoi(task.scalarColors, dst1, subdiv)
+        paint_voronoi(task.scalarColors, dst2, subdiv)
     End Sub
 End Class
 
@@ -111,24 +111,24 @@ Public Class Delaunay_GoodFeatures : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         features.Run(src)
 
-        dst1 = src
+        dst2 = src
         Dim active_facet_color = New cv.Scalar(0, 0, 255)
         Dim subdiv As New cv.Subdiv2D(New cv.Rect(0, 0, src.Width, src.Height))
         For i = 0 To features.goodFeatures.Count - 1
-            locate_point(dst1, subdiv, features.goodFeatures(i), active_facet_color)
+            locate_point(dst2, subdiv, features.goodFeatures(i), active_facet_color)
             subdiv.Insert(features.goodFeatures(i))
         Next
 
-        paint_voronoi(task.scalarColors, dst2, subdiv)
-        Static lastFrame As cv.Mat = dst2
+        paint_voronoi(task.scalarColors, dst3, subdiv)
+        Static lastFrame As cv.Mat = dst3
         For i = 0 To features.goodFeatures.Count - 1
             Dim pt = features.goodFeatures(i)
             Dim color = lastFrame.Get(Of cv.Vec3b)(pt.Y, pt.X)
             If color.Item0 < 100 Then color = task.vecColors(i)
+            dst3.FloodFill(pt, color)
             dst2.FloodFill(pt, color)
-            dst1.FloodFill(pt, color)
         Next
-        lastFrame = dst2.Clone
+        lastFrame = dst3.Clone
     End Sub
 End Class
 
@@ -145,18 +145,18 @@ Public Class Delauney_Subdiv2D : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod updateFrequency <> 0 Then Exit Sub ' too fast otherwise...
         Dim rand As New Random()
-        dst1.SetTo(0)
+        dst2.SetTo(0)
         Dim points = Enumerable.Range(0, 100).Select(Of cv.Point2f)(
             Function(i)
                 Return New cv.Point2f(rand.Next(0, src.Width), rand.Next(0, src.Height))
             End Function).ToArray()
         For Each p In points
-            dst1.Circle(p, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType)
+            dst2.Circle(p, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType)
         Next
-        dst2 = dst1.Clone()
+        dst3 = dst2.Clone()
 
         Dim subdiv = New cv.Subdiv2D()
-        subdiv.InitDelaunay(New cv.Rect(0, 0, dst2.Width, dst2.Height))
+        subdiv.InitDelaunay(New cv.Rect(0, 0, dst3.Width, dst3.Height))
         subdiv.Insert(points)
 
         ' draw voronoi diagram
@@ -167,7 +167,7 @@ Public Class Delauney_Subdiv2D : Inherits VBparent
         For Each list In facetList
             Dim before = list.Last()
             For Each p In list
-                dst2.Line(before, p, cv.Scalar.Green, 1)
+                dst3.Line(before, p, cv.Scalar.Green, 1)
                 before = p
             Next
         Next
@@ -177,7 +177,7 @@ Public Class Delauney_Subdiv2D : Inherits VBparent
         For Each edge In edgelist
             Dim p1 = New cv.Point(edge.Item0, edge.Item1)
             Dim p2 = New cv.Point(edge.Item2, edge.Item3)
-            dst1.Line(p1, p2, cv.Scalar.Green, 1)
+            dst2.Line(p1, p2, cv.Scalar.Green, 1)
         Next
     End Sub
 End Class
@@ -198,8 +198,8 @@ Public Class Delauney_Coverage : Inherits VBparent
         task.desc = "Combine random points with linear connections to neighbors to cover space. Note that space fills rapidly."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If task.frameCount Mod sliders.trackbar(0).Value = 0 Then dst1.SetTo(0)
+        If task.frameCount Mod sliders.trackbar(0).Value = 0 Then dst2.SetTo(0)
         delauney.Run(src)
-        cv.Cv2.BitwiseOr(delauney.dst1, dst1, dst1)
+        cv.Cv2.BitwiseOr(delauney.dst2, dst2, dst2)
     End Sub
 End Class

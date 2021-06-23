@@ -63,10 +63,10 @@ Public Class CellAuto_Basics : Inherits VBparent
         If standalone Or task.intermediateName = caller Then
             input = New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_8UC1, 0)
             input.Set(Of Byte)(0, src.Width / 2, 1)
-            If task.frameCount Mod 2 Then dst2 = createCells(combo.Box.Text) Else dst1 = createCells(combo.Box.Text)
+            If task.frameCount Mod 2 Then dst3 = createCells(combo.Box.Text) Else dst2 = createCells(combo.Box.Text)
         Else
             input = src.Clone
-            dst1 = createCells(combo.Box.Text)
+            dst2 = createCells(combo.Box.Text)
         End If
         If rotateCheckBox.Checked Then
             Dim index = combo.Box.SelectedIndex
@@ -111,7 +111,7 @@ Public Class CellAuto_Life : Inherits VBparent
         Return CountNeighbors
     End Function
     Public Sub New()
-        grid = New cv.Mat(dst1.Height / factor, dst1.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
+        grid = New cv.Mat(dst2.Height / factor, dst2.Width / factor, cv.MatType.CV_8UC1).SetTo(0)
         nextgrid = grid.Clone()
         random.rangeRect = New cv.Rect(0, 0, grid.Width, grid.Height)
         findSlider("Random Pixel Count").Value = grid.Width * grid.Height * 0.3 ' we want about 30% of cells filled.
@@ -131,7 +131,7 @@ Public Class CellAuto_Life : Inherits VBparent
         generation += 1
 
         population = 0
-        dst1.SetTo(backColor)
+        dst2.SetTo(backColor)
         For y = 0 To grid.Height - 1
             For x = 0 To grid.Width - 1
                 Dim neighbors = CountNeighbors(x, y)
@@ -146,7 +146,7 @@ Public Class CellAuto_Life : Inherits VBparent
                 End If
                 If nextgrid.Get(Of Byte)(y, x) Then
                     Dim pt = New cv.Point(x, y) * factor
-                    dst1.Circle(pt, factor / 2, nodeColor, -1, task.lineType)
+                    dst2.Circle(pt, factor / 2, nodeColor, -1, task.lineType)
                     population += 1
                 End If
             Next
@@ -189,19 +189,19 @@ Public Class CellAuto_LifeColor : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         game.Run(src)
-        dst1 = game.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Static lastBoard = dst1.Clone
+        dst2 = game.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Static lastBoard = dst2.Clone
 
         Dim deaths As New cv.Mat, births As New cv.Mat
 
-        cv.Cv2.Subtract(dst1, lastBoard, births)
-        cv.Cv2.Subtract(lastBoard, dst1, deaths)
+        cv.Cv2.Subtract(dst2, lastBoard, births)
+        cv.Cv2.Subtract(lastBoard, dst2, deaths)
         births = births.Threshold(0, 255, cv.ThresholdTypes.Binary)
         deaths = deaths.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        lastBoard = dst1.Clone
-        dst1 = game.dst1.Clone()
-        dst1.SetTo(cv.Scalar.Blue, births)
-        dst1.SetTo(cv.Scalar.Red, deaths)
+        lastBoard = dst2.Clone
+        dst2 = game.dst2.Clone()
+        dst2.SetTo(cv.Scalar.Blue, births)
+        dst2.SetTo(cv.Scalar.Red, deaths)
     End Sub
 End Class
 
@@ -214,7 +214,7 @@ Public Class CellAuto_LifePopulation : Inherits VBparent
     Dim plot As New Plot_OverTime
     Dim game As New CellAuto_Life
     Public Sub New()
-        plot.dst1 = dst2
+        plot.dst2 = dst3
         plot.maxScale = 2000
         plot.plotCount = 1
 
@@ -222,11 +222,11 @@ Public Class CellAuto_LifePopulation : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         game.Run(src)
-        dst1 = game.dst1
+        dst2 = game.dst2
 
         plot.plotData = New cv.Scalar(game.population, 0, 0)
         plot.Run(Nothing)
-        dst2 = plot.dst1
+        dst3 = plot.dst2
     End Sub
 End Class
 
@@ -254,7 +254,7 @@ Public Class CellAuto_Basics_MT : Inherits VBparent
               Select Case i
                   Case 0
                       label1 = i18.ElementAt(i18Index)
-                      dst1 = cell.createCells(label1)
+                      dst2 = cell.createCells(label1)
                   Case 1
                       If cell.check.Box(0).Checked Then
                           If i18Index + 1 < i18.Count - 1 Then i18Index += 1 Else i18Index = 0
@@ -262,7 +262,7 @@ Public Class CellAuto_Basics_MT : Inherits VBparent
                       Else
                           If i18Index < i18.Count - 1 Then label2 = i18.ElementAt(i18Index + 1) Else label2 = i18.ElementAt(0)
                       End If
-                      dst2 = cell.createCells(label2)
+                      dst3 = cell.createCells(label2)
               End Select
           End Sub)
     End Sub
@@ -305,12 +305,12 @@ Public Class CellAuto_All256 : Inherits VBparent
               Select Case i
                   Case 0
                       label1 = createOutcome(index) + " index = " + CStr(index)
-                      dst1 = cell.createCells(label1)
+                      dst2 = cell.createCells(label1)
                   Case 1
                       If mtOn = False Then Exit Sub
                       If index < 255 Then index += 1 Else index = 0
                       label2 = createOutcome(index) + " index = " + CStr(index)
-                      dst2 = cell.createCells(label2)
+                      dst3 = cell.createCells(label2)
               End Select
           End Sub)
         sliders.trackbar(0).Value = index
@@ -336,7 +336,7 @@ Public Class CellAuto_MultiPoint : Inherits VBparent
         tmp.Set(0, pt2, 1)
         cell.Run(tmp)
 
-        dst1 = cell.dst1
+        dst2 = cell.dst2
         pt1 += 1
         If pt1 > tmp.Width Then pt1 = 0
         If pt1 >= src.Width Then pt1 = 0

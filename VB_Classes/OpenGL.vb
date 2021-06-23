@@ -44,7 +44,7 @@ Public Class OpenGL_Basics : Inherits VBparent
         For i = 0 To memMapValues.Length - 1
             ' only change this if you are changing the data in the OpenGL C++ code at the same time...
             memMapValues(i) = Choose(i + 1, task.frameCount, task.parms.intrinsicsLeft.fx, task.parms.intrinsicsLeft.fy,
-                                     task.parms.intrinsicsLeft.ppx, task.parms.intrinsicsLeft.ppy, dst1.Width, dst1.Height, dst1.ElemSize * dst1.Total,
+                                     task.parms.intrinsicsLeft.ppx, task.parms.intrinsicsLeft.ppy, dst2.Width, dst2.Height, dst2.ElemSize * dst2.Total,
                                      dataInput.Total * dataInput.ElemSize, FOV, yaw, pitch, roll, zNear, zFar, pointSize, dataInput.Width, dataInput.Height,
                                      task.IMU_AngularVelocity.X, task.IMU_AngularVelocity.Y, task.IMU_AngularVelocity.Z,
                                      task.IMU_Acceleration.X, task.IMU_Acceleration.Y, task.IMU_Acceleration.Z, task.IMU_TimeStamp,
@@ -257,8 +257,8 @@ Public Class OpenGL_3Ddata : Inherits VBparent
 
         colors.color1 = cv.Scalar.Yellow
         colors.color2 = cv.Scalar.Blue
-        colors.Run(dst1)
-        ' ogl.OpenGL.src = dst1.Clone() ' only need to set this once.
+        colors.Run(dst2)
+        ' ogl.OpenGL.src = dst2.Clone() ' only need to set this once.
 
         label1 = "Input to Histogram 3D"
         task.desc = "Plot the results of a 3D histogram in OpenGL."
@@ -303,8 +303,8 @@ Public Class OpenGL_Draw3D : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         circle.Run(src)
-        dst2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        ogl.OpenGL.dataInput = dst2
+        dst3 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        ogl.OpenGL.dataInput = dst3
         ' ogl.OpenGL.src = New cv.Mat(1, task.vecColors.Length - 1, cv.MatType.CV_8UC3, task.vecColors.ToArray)
         ogl.Run(src)
     End Sub
@@ -327,8 +327,8 @@ Public Class OpenGL_Voxels : Inherits VBparent
         Static intermediateResults = findCheckBox("Display intermediate results")
         voxels.Run(src)
         If intermediateResults.checked Then
-            dst1 = voxels.dst1
             dst2 = voxels.dst2
+            dst3 = voxels.dst3
         End If
 
         ogl.dataInput = New cv.Mat(voxels.grid.tilesPerCol, voxels.grid.tilesPerRow, cv.MatType.CV_32F, voxels.voxels)
@@ -354,7 +354,7 @@ Public Class OpenGL_GravityTransform : Inherits VBparent
         If task.parms.IMU_Present Then
             gCloud.Run(task.pointCloud)
 
-            ogl.pointCloudInput = gCloud.dst1
+            ogl.pointCloudInput = gCloud.dst2
             ogl.Run(src)
         Else
             setTrueText("The IMU is not working or is unavailable")
@@ -379,8 +379,8 @@ Public Class OpenGL_Floor : Inherits VBparent
 
         If task.parms.IMU_Present Then
             plane.Run(src)
-            dst1 = plane.dst1
             dst2 = plane.dst2
+            dst3 = plane.dst3
 
             ogl.pointCloudInput = plane.imuPointCloud
             ogl.Run(src)
@@ -408,8 +408,8 @@ Public Class OpenGL_FloorPlane : Inherits VBparent
 
         If task.parms.IMU_Present Then
             plane.Run(src)
-            dst1 = plane.dst1
             dst2 = plane.dst2
+            dst3 = plane.dst3
 
             Dim floorColor = task.color.Mean(plane.sliceMask)
             Dim data As New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
@@ -447,8 +447,8 @@ End Class
 '        If task.parms.IMU_Present Then
 '            floor.plane.src = src
 '            floor.plane.Run()
-'            dst1 = floor.plane.dst1
 '            dst2 = floor.plane.dst2
+'            dst3 = floor.plane.dst3
 
 '            shuffle.src = floor.plane.sliceMask
 '            shuffle.Run()
@@ -485,11 +485,11 @@ Public Class OpenGL_DepthSliceH : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         slices.Run(src)
-        dst1 = slices.dst1
+        dst2 = slices.dst2
         Dim mask As New cv.Mat
         cv.Cv2.BitwiseNot(slices.sliceMask, mask)
 
-        ogl.pointCloudInput = slices.side2D.gCloud.dst1.Clone
+        ogl.pointCloudInput = slices.side2D.gCloud.dst2.Clone
         ogl.pointCloudInput.SetTo(0, mask)
         ogl.Run(New cv.Mat(mask.Size, cv.MatType.CV_8UC3, cv.Scalar.White))
     End Sub
@@ -510,9 +510,9 @@ Public Class OpenGL_StableDepth : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         pcValid.Run(src)
-        dst1 = pcValid.dst1
         dst2 = pcValid.dst2
-        ogl.pointCloudInput = pcValid.dst2
+        dst3 = pcValid.dst3
+        ogl.pointCloudInput = pcValid.dst3
         ogl.Run(task.color)
     End Sub
 End Class
@@ -536,11 +536,11 @@ Public Class OpenGL_AverageDepth : Inherits VBparent
         If src.Type <> cv.MatType.CV_32F Then src = split(2) * 1000
 
         stable.Run(src)
-        dst1 = stable.dst2
+        dst2 = stable.dst3
 
-        split(2) = stable.dst2 * 0.001
-        cv.Cv2.Merge(split, dst2)
-        ogl.pointCloudInput = dst2
+        split(2) = stable.dst3 * 0.001
+        cv.Cv2.Merge(split, dst3)
+        ogl.pointCloudInput = dst3
         ogl.Run(task.color)
     End Sub
 End Class
@@ -556,15 +556,15 @@ Public Class OpenGL_StableDepthMouse : Inherits VBparent
     Dim pcValid As New Motion_MinMaxPointCloud
     Public ogl As New OpenGL_Callbacks
     Public Sub New()
-        label2 = "dst2 is a pointcloud"
+        label2 = "dst3 is a pointcloud"
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         pcValid.Run(src)
-        dst1 = pcValid.dst1
         dst2 = pcValid.dst2
+        dst3 = pcValid.dst3
 
-        ogl.pointCloudInput = pcValid.dst2
+        ogl.pointCloudInput = pcValid.dst3
         ogl.Run(task.color)
     End Sub
 End Class
@@ -583,10 +583,10 @@ Public Class OpenGL_Surfaces : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         smooth.Run(src)
-        dst1 = smooth.dst2
+        dst2 = smooth.dst3
 
-        smooth.pcValid.dst2.CopyTo(dst2, smooth.dst2)
-        ogl.pointCloudInput = dst2
+        smooth.pcValid.dst3.CopyTo(dst3, smooth.dst3)
+        ogl.pointCloudInput = dst3
         ogl.Run(task.color)
     End Sub
 End Class
@@ -605,9 +605,9 @@ Public Class OpenGL_Stable : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         stable.Run(src)
-        dst1 = stable.dst1
+        dst2 = stable.dst2
 
-        ogl.pointCloudInput = stable.dst2
+        ogl.pointCloudInput = stable.dst3
         ogl.Run(task.color)
 
         label2 = stable.label2
@@ -629,9 +629,9 @@ Public Class OpenGL_ReducedXYZ : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         reduction.Run(src)
-        dst2 = reduction.dst2
+        dst3 = reduction.dst3
 
-        ogl.pointCloudInput = reduction.dst2
+        ogl.pointCloudInput = reduction.dst3
         ogl.Run(src)
     End Sub
 End Class
@@ -651,10 +651,10 @@ Public Class OpenGL_Reduction : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         reduction.Run(src)
-        dst1 = reduction.dst1
         dst2 = reduction.dst2
+        dst3 = reduction.dst3
 
-        ogl.pointCloudInput = reduction.dst2
+        ogl.pointCloudInput = reduction.dst3
         ogl.Run(src)
     End Sub
 End Class
@@ -673,9 +673,9 @@ Public Class OpenGL_ReducedSideView : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         reduced.Run(src)
-        dst1 = reduced.dst1
+        dst2 = reduced.dst2
 
-        ogl.pointCloudInput = reduced.dst2
+        ogl.pointCloudInput = reduced.dst3
         ogl.Run(task.color)
 
         label1 = reduced.label1
@@ -696,10 +696,10 @@ Public Class OpenGL_MFD_PointCloud : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         mfd.Run(src)
-        dst1 = mfd.dst1
         dst2 = mfd.dst2
+        dst3 = mfd.dst3
 
-        ogl.pointCloudInput = dst1
+        ogl.pointCloudInput = dst2
         ogl.Run(task.color)
 
         label2 = mfd.label2
@@ -721,9 +721,9 @@ Public Class OpenGL_Structured_PointCloud : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         sCloud.Run(src)
-        dst1 = sCloud.dst1
+        dst2 = sCloud.dst2
 
-        ogl.pointCloudInput = dst1
+        ogl.pointCloudInput = dst2
         ogl.Run(New cv.Mat(src.Size, cv.MatType.CV_8UC3, cv.Scalar.White))
     End Sub
 End Class

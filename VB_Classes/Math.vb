@@ -14,8 +14,8 @@ Public Class Math_Subtract : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim bgr = New cv.Scalar(sliders.trackbar(2).Value, sliders.trackbar(1).Value, sliders.trackbar(0).Value)
-        cv.Cv2.Subtract(bgr, src, dst1) ' or dst1 = bgr - src
-        dst2 = src - bgr
+        cv.Cv2.Subtract(bgr, src, dst2) ' or dst2 = bgr - src
+        dst3 = src - bgr
 
         Dim scalar = "(" + CStr(bgr.Item(0)) + "," + CStr(bgr.Item(1)) + "," + CStr(bgr.Item(2)) + ")"
         label1 = "Subtract Mat from scalar " + scalar
@@ -64,13 +64,13 @@ Public Class Math_Median_CDF : Inherits VBparent
             Dim mask = New cv.Mat
             mask = src.GreaterThan(medianVal)
 
-            dst1.SetTo(0)
-            src.CopyTo(dst1, mask)
+            dst2.SetTo(0)
+            src.CopyTo(dst2, mask)
             label1 = "Grayscale pixels > " + Format(medianVal, "#0.0")
 
             cv.Cv2.BitwiseNot(mask, mask)
-            dst2.SetTo(0)
-            src.CopyTo(dst2, mask) ' show the other half.
+            dst3.SetTo(0)
+            src.CopyTo(dst3, mask) ' show the other half.
             label2 = "Grayscale pixels < " + Format(medianVal, "#0.0")
         End If
     End Sub
@@ -88,14 +88,14 @@ Public Class Math_DepthMeanStdev : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         minMax.Run(src)
         Dim mean As Single = 0, stdev As Single = 0
-        Dim mask = minMax.dst2 ' the mask for stable depth.
-        dst2.SetTo(0)
-        task.RGBDepth.CopyTo(dst2, mask)
+        Dim mask = minMax.dst3 ' the mask for stable depth.
+        dst3.SetTo(0)
+        task.RGBDepth.CopyTo(dst3, mask)
         If mask.Type <> cv.MatType.CV_8U Then mask = mask.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.MeanStdDev(task.depth32f, mean, stdev, mask)
         label2 = "stablized depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
 
-        dst1 = task.RGBDepth
+        dst2 = task.RGBDepth
         cv.Cv2.MeanStdDev(task.depth32f, mean, stdev)
         label1 = "raw depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
     End Sub
@@ -163,7 +163,7 @@ Public Class Math_ImageAverage : Inherits VBparent
             nextImage += img
         Next
         If images.Count > saveImageCount Then images.RemoveAt(0)
-        If nextImage.Type <> src.Type Then nextImage.ConvertTo(dst1, src.Type) Else dst1 = nextImage
+        If nextImage.Type <> src.Type Then nextImage.ConvertTo(dst2, src.Type) Else dst2 = nextImage
         label1 = "Average image over previous " + CStr(avgSlider.value) + " images"
     End Sub
 End Class
@@ -198,8 +198,8 @@ Public Class Math_Stdev : Inherits VBparent
             check.Box(2).Text = "Show Grid Mask"
         End If
 
-        highStdevMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
-        lowStdevMask = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
+        highStdevMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        lowStdevMask = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
         task.desc = "Compute the standard deviation in each segment"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -216,31 +216,31 @@ Public Class Math_Stdev : Inherits VBparent
 
         grid.Run(Nothing)
 
-        dst1 = src.Clone
-        If dst1.Channels = 3 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = src.Clone
+        If dst2.Channels = 3 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Dim showMean = meanCheck.checked
         Dim showStdev = stdevCheck.checked
-        Static lastFrame As cv.Mat = dst1.Clone()
-        saveFrame = dst1.Clone
+        Static lastFrame As cv.Mat = dst2.Clone()
+        saveFrame = dst2.Clone
         Parallel.ForEach(grid.roiList,
         Sub(roi)
             Dim mean As Single, stdev As Single
-            cv.Cv2.MeanStdDev(dst1(roi), mean, stdev)
+            cv.Cv2.MeanStdDev(dst2(roi), mean, stdev)
             If stdev < stdevThreshold Then
                 Interlocked.Increment(updateCount)
                 Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                If showMean Then cv.Cv2.PutText(dst1, Format(mean, "#0"), pt, task.font, fsize, cv.Scalar.White, task.lineWidth, task.lineType)
-                If showStdev Then cv.Cv2.PutText(dst1, Format(stdev, "#0.00"), New cv.Point(pt.X, roi.Y + roi.Height - 4), task.font, fsize, cv.Scalar.White, task.lineWidth, task.lineType)
+                If showMean Then cv.Cv2.PutText(dst2, Format(mean, "#0"), pt, task.font, fsize, cv.Scalar.White, task.lineWidth, task.lineType)
+                If showStdev Then cv.Cv2.PutText(dst2, Format(stdev, "#0.00"), New cv.Point(pt.X, roi.Y + roi.Height - 4), task.font, fsize, cv.Scalar.White, task.lineWidth, task.lineType)
                 lowStdevMask(roi).SetTo(255)
             Else
                 highStdevMask(roi).SetTo(255)
-                dst1(roi).SetTo(0)
+                dst2(roi).SetTo(0)
             End If
         End Sub)
-        If gridCheck.checked Then dst1.SetTo(255, grid.gridMask)
-        dst2.SetTo(0)
-        saveFrame.CopyTo(dst2, highStdevMask)
+        If gridCheck.checked Then dst2.SetTo(255, grid.gridMask)
+        dst3.SetTo(0)
+        saveFrame.CopyTo(dst3, highStdevMask)
         lastFrame = saveFrame
         Dim stdevPercent = " stdev " + Format(stdevSlider.value, "0.0")
         label1 = CStr(updateCount) + " of " + CStr(grid.roiList.Count) + " segments with < " + stdevPercent
@@ -265,8 +265,8 @@ Public Class Math_StdevBoundary : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
         stdev.Run(src)
-        dst1 = stdev.dst1
-        stdev.saveFrame.CopyTo(dst2)
+        dst2 = stdev.dst2
+        stdev.saveFrame.CopyTo(dst3)
 
         Static stdevSlider = findSlider("Stdev Threshold")
         Dim stdevThreshold = CSng(stdevSlider.Value)
@@ -274,34 +274,34 @@ Public Class Math_StdevBoundary : Inherits VBparent
         'Parallel.ForEach(stdev.grid.roiList, ' surprisingly it runs faster in serial mode...
         'Sub(roi)
         For Each roi In stdev.grid.roiList
-            If roi.X + roi.Width < dst2.Width Then
-                Dim m1 = dst1.Get(Of Byte)(roi.Y, roi.X)
-                Dim m2 = dst1.Get(Of Byte)(roi.Y, roi.X + roi.Width)
+            If roi.X + roi.Width < dst3.Width Then
+                Dim m1 = dst2.Get(Of Byte)(roi.Y, roi.X)
+                Dim m2 = dst2.Get(Of Byte)(roi.Y, roi.X + roi.Width)
                 If m1 = 0 And m2 <> 0 Then
-                    Dim meanScalar = cv.Cv2.Mean(dst2(roi))
-                    dst2(roi).CopyTo(dst1(roi), dst2(roi).Threshold(meanScalar(0), 255, cv.ThresholdTypes.Otsu))
+                    Dim meanScalar = cv.Cv2.Mean(dst3(roi))
+                    dst3(roi).CopyTo(dst2(roi), dst3(roi).Threshold(meanScalar(0), 255, cv.ThresholdTypes.Otsu))
                 End If
                 If m1 > 0 And m2 = 0 Then
                     Dim newROI = New cv.Rect(roi.X + roi.Width, roi.Y, roi.Width, roi.Height)
-                    Dim meanScalar = cv.Cv2.Mean(dst2(newROI))
-                    dst2(newROI).CopyTo(dst1(newROI), dst2(newROI).Threshold(meanScalar(0), 255, cv.ThresholdTypes.Otsu))
+                    Dim meanScalar = cv.Cv2.Mean(dst3(newROI))
+                    dst3(newROI).CopyTo(dst2(newROI), dst3(newROI).Threshold(meanScalar(0), 255, cv.ThresholdTypes.Otsu))
                 End If
             End If
-            If roi.Y + roi.Height < dst2.Height Then
-                Dim m1 = dst1.Get(Of Byte)(roi.Y, roi.X)
-                Dim m2 = dst1.Get(Of Byte)(roi.Y + roi.Height, roi.X)
+            If roi.Y + roi.Height < dst3.Height Then
+                Dim m1 = dst2.Get(Of Byte)(roi.Y, roi.X)
+                Dim m2 = dst2.Get(Of Byte)(roi.Y + roi.Height, roi.X)
                 If m1 = 0 And m2 <> 0 Then
-                    Dim meanScalar = cv.Cv2.Mean(dst2(roi))
-                    dst2(roi).CopyTo(dst1(roi), dst2(roi).Threshold(meanScalar(0), 255, cv.ThresholdTypes.Otsu))
+                    Dim meanScalar = cv.Cv2.Mean(dst3(roi))
+                    dst3(roi).CopyTo(dst2(roi), dst3(roi).Threshold(meanScalar(0), 255, cv.ThresholdTypes.Otsu))
                 End If
                 If m1 > 0 And m2 = 0 Then
                     Dim newROI = New cv.Rect(roi.X, roi.Y + roi.Height, roi.Width, roi.Height)
-                    Dim meanScalar = cv.Cv2.Mean(dst2(newROI))
-                    dst2(newROI).CopyTo(dst1(newROI), dst2(newROI).Threshold(meanScalar(0), 255, cv.ThresholdTypes.Otsu))
+                    Dim meanScalar = cv.Cv2.Mean(dst3(newROI))
+                    dst3(newROI).CopyTo(dst2(newROI), dst3(newROI).Threshold(meanScalar(0), 255, cv.ThresholdTypes.Otsu))
                 End If
             End If
             'End Sub)
         Next
-        dst2.SetTo(0, stdev.lowStdevMask)
+        dst3.SetTo(0, stdev.lowStdevMask)
     End Sub
 End Class

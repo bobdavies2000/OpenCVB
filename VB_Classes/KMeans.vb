@@ -76,13 +76,13 @@ Public Class KMeans_Basics : Inherits VBparent
             Dim index = maskOrder.ElementAt(i).Value
             Dim mask = labels.InRange(index, index)
             masks.Add(mask)
-            dst1 = dst1.Resize(input.Size)
+            dst2 = dst2.Resize(input.Size)
             If input.Channels = 3 Then
-                dst1.SetTo(colors.Get(Of cv.Vec3f)(i, 0), mask)
+                dst2.SetTo(colors.Get(Of cv.Vec3f)(i, 0), mask)
             Else
                 ' if the input was not 3-channel, then just use the first channel of colors.  Be sure that the first input channel was RGB/grayscale...
                 Dim gray = colors.Get(Of Single)(index, 0)
-                dst1.SetTo(cv.Scalar.All(gray), mask)
+                dst2.SetTo(cv.Scalar.All(gray), mask)
             End If
         Next
         If task.mouseClickFlag Then
@@ -93,7 +93,7 @@ Public Class KMeans_Basics : Inherits VBparent
                 End If
             Next
         End If
-        dst2 = masks(maskIndex)
+        dst3 = masks(maskIndex)
     End Sub
 End Class
 
@@ -117,7 +117,7 @@ Public Class KMeans_BasicsFast : Inherits VBparent
         Dim small32fC3 As New cv.Mat
         small8uC3.ConvertTo(small32fC3, cv.MatType.CV_32FC3)
         km.Run(small32fC3)
-        dst1 = km.dst1.Resize(dst1.Size())
+        dst2 = km.dst2.Resize(dst2.Size())
     End Sub
 End Class
 
@@ -146,8 +146,8 @@ Public Class KMeans_DepthPlusGray : Inherits VBparent
         Dim merge As New cv.Mat
         cv.Cv2.Merge(grayPlus, merge)
         km.Run(merge)
-        dst1 = km.dst1
-        dst1.SetTo(0, task.noDepthMask)
+        dst2 = km.dst2
+        dst2.SetTo(0, task.noDepthMask)
     End Sub
 End Class
 
@@ -166,8 +166,8 @@ Public Class KMeans_Depth : Inherits VBparent
         Dim kMeansK = kSlider.value
 
         km.Run(task.depth32f)
-        dst1 = km.dst1
-        dst1.SetTo(0, task.noDepthMask)
+        dst2 = km.dst2
+        dst2.SetTo(0, task.noDepthMask)
     End Sub
 End Class
 
@@ -195,8 +195,8 @@ Public Class KMeans_DepthPlusColor : Inherits VBparent
         Dim merge As New cv.Mat
         cv.Cv2.Merge(split, merge)
         km.Run(merge)
-        dst1 = km.dst1
-        dst1.SetTo(0, task.noDepthMask)
+        dst2 = km.dst2
+        dst2.SetTo(0, task.noDepthMask)
     End Sub
 End Class
 
@@ -226,11 +226,11 @@ Public Class KMeans_k2_to_k8 : Inherits VBparent
             kSlider.value = Choose(i + 1, 2, 4, 6, 8)
             Dim km = Choose(i + 1, km2, km4, km6, km8)
             km.Run(rgb32f)
-            Mats.mat(i) = km.dst1.Clone
+            Mats.mat(i) = km.dst2.Clone
         Next
         Mats.Run(src)
-        dst1 = Mats.dst1
         dst2 = Mats.dst2
+        dst3 = Mats.dst3
     End Sub
 End Class
 
@@ -245,8 +245,8 @@ Public Class KMeans_Depth_FG_BG : Inherits VBparent
         findSlider("kMeans k").Value = 2
         label1 = "Background Mask"
         label2 = "Foreground Mask"
-        dst1 = New cv.Mat(task.color.Size, cv.MatType.CV_8U)
         dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8U)
+        dst3 = New cv.Mat(task.color.Size, cv.MatType.CV_8U)
         task.desc = "Separate foreground and background using Kmeans (with k=2) using the depth value of center point."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -261,12 +261,12 @@ Public Class KMeans_Depth_FG_BG : Inherits VBparent
                 minIndex = i
             End If
         Next
-        dst1.SetTo(0)
-        dst1.SetTo(255, km.masks(minIndex))
-        dst1.SetTo(0, task.noDepthMask)
-
-        cv.Cv2.BitwiseNot(dst1, dst2)
+        dst2.SetTo(0)
+        dst2.SetTo(255, km.masks(minIndex))
         dst2.SetTo(0, task.noDepthMask)
+
+        cv.Cv2.BitwiseNot(dst2, dst3)
+        dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class
 
@@ -286,7 +286,7 @@ Public Class KMeans_LAB : Inherits VBparent
         Dim lab32f As New cv.Mat
         labMat.ConvertTo(lab32f, cv.MatType.CV_32FC3)
         km.Run(lab32f)
-        dst1 = km.dst1
+        dst2 = km.dst2
     End Sub
 End Class
 
@@ -305,9 +305,9 @@ Public Class KMeans_Fuzzy : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         km.Run(src)
-        dst1 = km.dst1
-        fuzzyD.Run(km.dst1)
-        dst2 = fuzzyD.dst2
+        dst2 = km.dst2
+        fuzzyD.Run(km.dst2)
+        dst3 = fuzzyD.dst3
     End Sub
 End Class
 
@@ -321,14 +321,14 @@ Public Class KMeans_CComp : Inherits VBparent
     Dim ccomp As New CComp_GrayScale
     Dim km As New KMeans_Basics
     Public Sub New()
-        label1 = "Click to see connected components in dst2"
+        label1 = "Click to see connected components in dst3"
         task.desc = "Use each KMeans mask with CComp"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
         km.Run(src)
-        dst1 = km.dst1
+        dst2 = km.dst2
         ccomp.Run(km.masks(km.maskIndex))
-        dst2 = ccomp.dst2
+        dst3 = ccomp.dst3
     End Sub
 End Class
 
@@ -356,12 +356,12 @@ Public Class KMeans_CCompImage1 : Inherits VBparent
         End If
 
         km.Run(src)
-        dst1 = km.dst1
+        dst2 = km.dst2
 
-        dst2.SetTo(0)
+        dst3.SetTo(0)
         For i = 0 To k - 1
             ccomp(i).Run(km.masks(i))
-            cv.Cv2.BitwiseOr(dst2, ccomp(i).dst2, dst2)
+            cv.Cv2.BitwiseOr(dst3, ccomp(i).dst3, dst3)
         Next
     End Sub
 End Class
@@ -375,23 +375,23 @@ End Class
 Public Class KMeans_CCompImage : Inherits VBparent
     Dim km As New KMeans_CCompMasks
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         task.desc = "A second, better attempt at coloring an entire image with connected components.  All masks are available."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         km.Run(src)
-        dst1 = km.dst1
+        dst2 = km.dst2
 
-        dst2.SetTo(0)
+        dst3.SetTo(0)
         Dim incr = 255 / km.masks.Count
         For i = 0 To km.masks.Count - 1
             Dim r As cv.Rect = km.rects(i)
             Dim m As cv.Mat = km.masks(i)
-            dst2(r).SetTo(cv.Scalar.All((i + 1) * incr), m)
+            dst3(r).SetTo(cv.Scalar.All((i + 1) * incr), m)
         Next
 
-        task.palette.Run(dst2)
-        dst2 = task.palette.dst1
+        task.palette.Run(dst3)
+        dst3 = task.palette.dst2
     End Sub
 End Class
 
@@ -408,8 +408,8 @@ Public Class KMeans_CCompMasks : Inherits VBparent
     Public rects As New List(Of cv.Rect)
     Public selectedIndex As Integer
     Public Sub New()
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
-        label1 = "Click the centroid to display the mask in dst2"
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+        label1 = "Click the centroid to display the mask in dst3"
         task.desc = "Use each KMeans mask with CComp"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 5
@@ -424,11 +424,11 @@ Public Class KMeans_CCompMasks : Inherits VBparent
         End If
 
         km.Run(src)
-        dst1 = km.dst1
+        dst2 = km.dst2
 
         masks.Clear()
         rects.Clear()
-        dst2.SetTo(0)
+        dst3.SetTo(0)
         Dim sortMasks As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
         Dim centroids As New List(Of cv.Point)
         For i = 0 To k - 1
@@ -440,9 +440,9 @@ Public Class KMeans_CCompMasks : Inherits VBparent
                 rects.Add(r)
                 Dim c = ccomp(i).centroids(j)
                 centroids.Add(c)
-                dst1.Circle(c, task.dotSize + 5, cv.Scalar.White, -1, task.lineType)
-                dst1.Circle(c, task.dotSize + 3, cv.Scalar.Black, -1, task.lineType)
-                dst1.Circle(c, task.dotSize, cv.Scalar.White, -1, task.lineType)
+                dst2.Circle(c, task.dotSize + 5, cv.Scalar.White, -1, task.lineType)
+                dst2.Circle(c, task.dotSize + 3, cv.Scalar.Black, -1, task.lineType)
+                dst2.Circle(c, task.dotSize, cv.Scalar.White, -1, task.lineType)
                 setTrueText(CStr(masks.Count - 1), c.X + 10, c.Y)
             Next
         Next
@@ -458,7 +458,7 @@ Public Class KMeans_CCompMasks : Inherits VBparent
             Next
         End If
 
-        dst2(rects(selectedIndex)) = masks(selectedIndex)
+        dst3(rects(selectedIndex)) = masks(selectedIndex)
         label2 = "Pixel count = " + CStr(sortMasks.ElementAt(selectedIndex).Key)
     End Sub
 End Class

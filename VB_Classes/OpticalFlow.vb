@@ -133,9 +133,9 @@ Public Class OpticalFlow_DenseBasics : Inherits VBparent
             Dim hsv = opticalFlow_Dense(oldGray, src, optFlow.pyrScale, optFlow.levels, optFlow.winSize, optFlow.iterations, optFlow.polyN,
                                         optFlow.polySigma, optFlow.OpticalFlowFlags)
 
-            dst1 = hsv.CvtColor(cv.ColorConversionCodes.HSV2RGB)
-            dst1 = dst1.ConvertScaleAbs(optFlow.outputScaling)
-            dst2 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst2 = hsv.CvtColor(cv.ColorConversionCodes.HSV2RGB)
+            dst2 = dst2.ConvertScaleAbs(optFlow.outputScaling)
+            dst3 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
         oldGray = src.Clone()
     End Sub
@@ -150,8 +150,8 @@ Public Class OpticalFlow_DenseBasics_MT : Inherits VBparent
     Dim accum As New cv.Mat
     Dim optFlow As New OpticalFlow_DenseOptions
     Public Sub New()
-        findSlider("ThreadGrid Width").Value = dst1.Cols / 4
-        findSlider("ThreadGrid Height").Value = dst1.Rows / 4
+        findSlider("ThreadGrid Width").Value = dst2.Cols / 4
+        findSlider("ThreadGrid Height").Value = dst2.Rows / 4
         findSlider("ThreadGrid Border").Value = 5
 
         optFlow.sliders.trackbar(0).Value = 75
@@ -184,15 +184,15 @@ Public Class OpticalFlow_DenseBasics_MT : Inherits VBparent
                     Dim hsv = opticalFlow_Dense(oldGray(broi), gray, optFlow.pyrScale, optFlow.levels, optFlow.winSize, optFlow.iterations,
                                                 optFlow.polyN, optFlow.polySigma, optFlow.OpticalFlowFlags)
                     Dim tROI = New cv.Rect(roi.X - broi.X, roi.Y - broi.Y, roi.Width, roi.Height)
-                    dst1(roi) = hsv(tROI).CvtColor(cv.ColorConversionCodes.HSV2RGB)
-                    dst1(roi) = dst1(roi).ConvertScaleAbs(optFlow.outputScaling)
+                    dst2(roi) = hsv(tROI).CvtColor(cv.ColorConversionCodes.HSV2RGB)
+                    dst2(roi) = dst2(roi).ConvertScaleAbs(optFlow.outputScaling)
                 Else
-                    dst1(roi).SetTo(0)
+                    dst2(roi).SetTo(0)
                 End If
                 oldGray(roi) = accum(roi).Clone()
             End Sub)
-            dst2 = accum.Clone()
-            dst2.SetTo(cv.Scalar.All(255), grid.gridMask)
+            dst3 = accum.Clone()
+            dst3.SetTo(cv.Scalar.All(255), grid.gridMask)
         Else
             oldGray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             accum = src.Clone()
@@ -241,8 +241,8 @@ Public Class OpticalFlow_Sparse : Inherits VBparent
         Next
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dst1 = src.Clone()
         dst2 = src.Clone()
+        dst3 = src.Clone()
 
         Dim OpticalFlowFlag As cv.OpticalFlowFlags
         Static frm = findfrm(caller + " Radio Options")
@@ -282,9 +282,9 @@ Public Class OpticalFlow_Sparse : Inherits VBparent
                     If length < 30 Then
                         features.Add(pt1)
                         lastFeatures.Add(pt2)
-                        dst1.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + task.lineWidth + 2, task.lineType)
-                        dst2.Circle(pt1, task.dotSize + 3, cv.Scalar.White, -1, task.lineType)
-                        dst2.Circle(pt2, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType)
+                        dst2.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + task.lineWidth + 2, task.lineType)
+                        dst3.Circle(pt1, task.dotSize + 3, cv.Scalar.White, -1, task.lineType)
+                        dst3.Circle(pt2, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType)
                     End If
                 End If
             Next

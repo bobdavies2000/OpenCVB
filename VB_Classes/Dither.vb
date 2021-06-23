@@ -113,10 +113,10 @@ Public Class Dither_Basics : Inherits VBparent
                 sliders.trackbar(0).Enabled = False
         End Select
 
-        Dim w = dst1.Width
-        Dim h = dst1.Height
+        Dim w = dst2.Width
+        Dim h = dst2.Height
         Dim nColors = Choose(sliders.trackbar(0).Value, 1, 3, 7, 15, 31) ' indicate 3, 6, 9, 12, 15 bits per pixel.
-        Dim pixels(dst1.Total * dst1.ElemSize - 1) As Byte
+        Dim pixels(dst2.Total * dst2.ElemSize - 1) As Byte
         Dim hpixels = GCHandle.Alloc(pixels, GCHandleType.Pinned)
         For i = 0 To 1
             Dim copySrc = Choose(i + 1, src, task.RGBDepth)
@@ -172,9 +172,9 @@ Public Class Dither_Basics : Inherits VBparent
                     ditherSierra(hpixels.AddrOfPinnedObject, w, h)
             End Select
             If i = 0 Then
-                dst1 = New cv.Mat(src.Height, src.Width, cv.MatType.CV_8UC3, pixels).Clone()
-            Else
                 dst2 = New cv.Mat(src.Height, src.Width, cv.MatType.CV_8UC3, pixels).Clone()
+            Else
+                dst3 = New cv.Mat(src.Height, src.Width, cv.MatType.CV_8UC3, pixels).Clone()
             End If
         Next
         hpixels.Free()

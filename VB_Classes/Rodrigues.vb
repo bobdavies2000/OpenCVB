@@ -13,7 +13,7 @@ Public Class Rodrigues_ValidateKinect : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then
-            dst2.SetTo(0)
+            dst3.SetTo(0)
             setTrueText("Only the Kinect4Azure camera is currently supported for the Rodrigues calibration", 10, 140)
             Exit Sub
         End If
@@ -39,7 +39,7 @@ Public Class Rodrigues_ValidateVector : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.parms.cameraName <> VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2 Then
-            dst2.SetTo(0)
+            dst3.SetTo(0)
             setTrueText("Only the StereoLabs Zed 2 and Intel T265 cameras are supported for this Rodrigues validation")
             Exit Sub
         End If
@@ -51,12 +51,12 @@ Public Class Rodrigues_ValidateVector : Inherits VBparent
         Next
 
         src = New cv.Mat(3, 3, cv.MatType.CV_32F, task.parms.RotationMatrix)
-        Dim dst1 As New cv.Mat(3, 1, src.Type)
-        cv.Cv2.Rodrigues(src, dst1)
+        Dim dst2 As New cv.Mat(3, 1, src.Type)
+        cv.Cv2.Rodrigues(src, dst2)
 
         output += vbCrLf + "Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
         For i = 0 To 2
-            output += vbTab + Format(dst1.Get(Of Single)(i), "#0.000000000") + vbTab
+            output += vbTab + Format(dst2.Get(Of Single)(i), "#0.000000000") + vbTab
         Next
 
         output += vbCrLf + "Rotation Vector from IMU: " + vbCrLf
@@ -83,12 +83,12 @@ Public Class Rodrigues_RotationMatrix : Inherits VBparent
         Next
 
         src = New cv.Mat(3, 3, cv.MatType.CV_32F, task.parms.RotationMatrix)
-        Dim dst1 As New cv.Mat(3, 1, src.Type, 3)
-        cv.Cv2.Rodrigues(src, dst1)
+        Dim dst2 As New cv.Mat(3, 1, src.Type, 3)
+        cv.Cv2.Rodrigues(src, dst2)
 
         output += vbCrLf + "Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
         For i = 0 To 2
-            output += vbTab + Format(dst1.Get(Of Single)(i), "#0.000000000") + vbTab
+            output += vbTab + Format(dst2.Get(Of Single)(i), "#0.000000000") + vbTab
         Next
         setTrueText(output)
     End Sub
@@ -114,12 +114,12 @@ Public Class Rodrigues_Extrinsics : Inherits VBparent
         Dim src32f As New cv.Mat(3, 3, cv.MatType.CV_32F, task.parms.extrinsics.rotation)
         src32f.ConvertTo(src, cv.MatType.CV_64F)
         Dim Jacobian As New cv.Mat(9, 3, src.Type, 0)
-        Dim dst1 As New cv.Mat(3, 1, src.Type, 3)
-        cv.Cv2.Rodrigues(src, dst1)
+        Dim dst2 As New cv.Mat(3, 1, src.Type, 3)
+        cv.Cv2.Rodrigues(src, dst2)
 
         output += "Extrinsic Rotation matrix produces the following Rotation Vector after Rodrigues: " + vbCrLf
         For i = 0 To 2
-            output += vbTab + Format(dst1.Get(Of Double)(i), "#0.000000000") + vbTab
+            output += vbTab + Format(dst2.Get(Of Double)(i), "#0.000000000") + vbTab
         Next
         setTrueText(output)
     End Sub

@@ -55,9 +55,9 @@ Public Class SuperPixel_Basics_CPP : Inherits VBparent
         handleSrc.Free()
 
         If imagePtr <> 0 Then
-            dst1 = input
+            dst2 = input
             wireGrid = New cv.Mat(input.Rows, input.Cols, cv.MatType.CV_8UC1, imagePtr)
-            dst1.SetTo(gridColor, wireGrid)
+            dst2.SetTo(gridColor, wireGrid)
         End If
 
         Dim labelData(input.Total * 4 - 1) As Byte ' labels are 32-bit integers.
@@ -65,7 +65,7 @@ Public Class SuperPixel_Basics_CPP : Inherits VBparent
         Marshal.Copy(labelPtr, labelData, 0, labelData.Length)
         Dim labels = New cv.Mat(input.Rows, input.Cols, cv.MatType.CV_32S, labelData)
         If numSuperPixels < 255 Then labels *= 255 / numSuperPixels
-        labels.ConvertTo(dst2, cv.MatType.CV_8U)
+        labels.ConvertTo(dst3, cv.MatType.CV_8U)
     End Sub
     Public Sub Close()
         SuperPixel_Close(spPtr)
@@ -89,10 +89,10 @@ Public Class SuperPixel_BinarizedImage : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         binarize.Run(src)
 
-        pixels.Run(binarize.dst1)
-        dst1 = pixels.dst1
+        pixels.Run(binarize.dst2)
         dst2 = pixels.dst2
-        dst2.SetTo(cv.Scalar.White, pixels.wireGrid)
+        dst3 = pixels.dst3
+        dst3.SetTo(cv.Scalar.White, pixels.wireGrid)
     End Sub
 End Class
 
@@ -108,8 +108,8 @@ Public Class SuperPixel_Depth : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         pixels.Run(task.RGBDepth)
-        dst1 = pixels.dst1
         dst2 = pixels.dst2
+        dst3 = pixels.dst3
     End Sub
 End Class
 
@@ -127,11 +127,11 @@ Public Class SuperPixel_WithCanny : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         edges.Run(src)
         src = task.color.Clone()
-        src.SetTo(cv.Scalar.White, edges.dst1)
+        src.SetTo(cv.Scalar.White, edges.dst2)
         pixels.Run(src)
-        dst1 = pixels.dst1
-        dst2 = pixels.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2.SetTo(cv.Scalar.Red, edges.dst1)
+        dst2 = pixels.dst2
+        dst3 = pixels.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3.SetTo(cv.Scalar.Red, edges.dst2)
         label2 = "Edges provided by Canny in red"
     End Sub
 End Class
@@ -150,8 +150,8 @@ Public Class SuperPixel_WithLineDetector : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         lines.Run(src)
-        dst2 = lines.dst1
-        pixels.Run(dst2)
-        dst1 = pixels.dst1
+        dst3 = lines.dst2
+        pixels.Run(dst3)
+        dst2 = pixels.dst2
     End Sub
 End Class

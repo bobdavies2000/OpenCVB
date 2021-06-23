@@ -30,7 +30,7 @@ Public Class Trace_OpenCV_CPP : Inherits VBparent
         Dim imagePtr = Trace_OpenCV_Run(Trace_OpenCV, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
         handleSrc.Free()
 
-        If imagePtr <> 0 Then dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
+        If imagePtr <> 0 Then dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr)
     End Sub
     Public Sub Close()
         Trace_OpenCV_Close(Trace_OpenCV)

@@ -14,9 +14,9 @@ Public Class ORB_Basics : Inherits VBparent
         orb = cv.ORB.Create(sliders.trackbar(0).Value)
         keypoints = orb.Detect(src)
         If standalone or task.intermediateName = caller Then
-            dst1 = src.Clone().CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst2 = src.Clone().CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             For Each kpt In keypoints
-                dst1.Circle(kpt.Pt, task.dotSize + 1, cv.Scalar.Yellow, -1, task.lineType)
+                dst2.Circle(kpt.Pt, task.dotSize + 1, cv.Scalar.Yellow, -1, task.lineType)
             Next
             label1 = CStr(keypoints.Count) + " key points were identified"
         End If

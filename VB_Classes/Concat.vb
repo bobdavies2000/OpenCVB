@@ -8,9 +8,9 @@ Public Class Concat_Basics : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim tmp As New cv.Mat
         cv.Cv2.HConcat(src, task.RGBDepth, tmp)
-        dst1 = tmp.Resize(src.Size())
-        cv.Cv2.VConcat(src, task.RGBDepth, tmp)
         dst2 = tmp.Resize(src.Size())
+        cv.Cv2.VConcat(src, task.RGBDepth, tmp)
+        dst3 = tmp.Resize(src.Size())
     End Sub
 End Class
 
@@ -37,7 +37,7 @@ Public Class Concat_4way : Inherits VBparent
         cv.Cv2.HConcat(img(0), img(1), tmp1)
         cv.Cv2.HConcat(img(2), img(3), tmp2)
         cv.Cv2.VConcat(tmp1, tmp2, tmp3)
-        dst1 = tmp3.Resize(src.Size())
+        dst2 = tmp3.Resize(src.Size())
     End Sub
 End Class
 

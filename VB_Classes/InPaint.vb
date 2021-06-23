@@ -17,8 +17,8 @@ Public Class InPaint_Basics : Inherits VBparent
     Public Function drawRandomLine(dst As cv.Mat)
         Dim p1 = New cv.Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
         Dim p2 = New cv.Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
-        dst1.Line(p1, p2, New cv.Scalar(0, 0, 0), task.lineWidth, task.lineType)
-        Dim mask = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1)
+        dst2.Line(p1, p2, New cv.Scalar(0, 0, 0), task.lineWidth, task.lineType)
+        Dim mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1)
         mask.SetTo(0)
         mask.Line(p1, p2, cv.Scalar.All(255), task.lineWidth, task.lineType)
         Return mask
@@ -26,9 +26,9 @@ Public Class InPaint_Basics : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
 
-        src.CopyTo(dst1)
-        Dim mask As cv.Mat = drawRandomLine(dst1)
-        cv.Cv2.Inpaint(dst1, mask, dst2, task.lineWidth, inPaintFlag)
+        src.CopyTo(dst2)
+        Dim mask As cv.Mat = drawRandomLine(dst2)
+        cv.Cv2.Inpaint(dst2, mask, dst3, task.lineWidth, inPaintFlag)
     End Sub
 End Class
 
@@ -52,9 +52,9 @@ Public Class InPaint_Noise : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod 100 Then Exit Sub ' give them time to review the inpaint results
         noise.Run(src) ' create some noise in the result1 image.
-        dst1 = noise.dst1
+        dst2 = noise.dst2
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
-        cv.Cv2.Inpaint(dst1, noise.noiseMask, dst2, noise.maxNoiseWidth, inPaintFlag)
+        cv.Cv2.Inpaint(dst2, noise.noiseMask, dst3, noise.maxNoiseWidth, inPaintFlag)
     End Sub
 End Class
 
@@ -72,7 +72,7 @@ Public Class InPaint_Depth : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
-        dst1 = src.Clone
-        cv.Cv2.Inpaint(src, task.noDepthMask, dst2, 20, cv.InpaintMethod.NS)
+        dst2 = src.Clone
+        cv.Cv2.Inpaint(src, task.noDepthMask, dst3, 20, cv.InpaintMethod.NS)
     End Sub
 End Class

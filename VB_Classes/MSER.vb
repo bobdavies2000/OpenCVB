@@ -7,15 +7,15 @@ Public Class MSER_Basics : Inherits VBparent
     Dim maxSlider As Windows.Forms.TrackBar
     Public Sub New()
         maxSlider = findSlider("MSER Max Area")
-        maxSlider.Value = If(dst1.Width = 1280, 50000, 20000)
+        maxSlider.Value = If(dst2.Width = 1280, 50000, 20000)
         task.desc = "Run MSER (Maximally Stable Extremal Region) algorithm with all default options except for maximum area"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static minSlider = findSlider("MSER Min Area")
         options.Run(src)
 
-        dst1 = src.Clone
         dst2 = src.Clone
+        dst3 = src.Clone
 
         sortedBoxes.Clear()
         For Each box In options.boxes
@@ -40,7 +40,7 @@ Public Class MSER_Basics : Inherits VBparent
                 If center.X >= box.X And center.X <= (box.X + box.Width) Then
                     If center.Y >= box.Y And center.Y <= (box.Y + box.Height) Then
                         removeBoxes.Add(i)
-                        dst2.Rectangle(b, cv.Scalar.Yellow, 1)
+                        dst3.Rectangle(b, cv.Scalar.Yellow, 1)
                     End If
                 End If
             Next
@@ -52,7 +52,7 @@ Public Class MSER_Basics : Inherits VBparent
 
         Dim minArea = minSlider.value
         For Each rect In containers
-            If rect.Width * rect.Height > minArea Then dst1.Rectangle(rect, cv.Scalar.Yellow, If(src.Width = 1280, 2, 1))
+            If rect.Width * rect.Height > minArea Then dst2.Rectangle(rect, cv.Scalar.Yellow, If(src.Width = 1280, 2, 1))
         Next
 
         label1 = CStr(containers.Count) + " consolidated regions of interest located"
@@ -129,9 +129,9 @@ Public Class MSER_Options : Inherits VBparent
         mser.DetectRegions(input, regions, boxes)
 
         If standalone Or task.intermediateName = caller Then
-            dst1 = src.Clone
+            dst2 = src.Clone
             For Each z In boxes
-                If z.Size.Width * z.Size.Height > minArea Then dst1.Rectangle(z, cv.Scalar.Yellow, 1)
+                If z.Size.Width * z.Size.Height > minArea Then dst2.Rectangle(z, cv.Scalar.Yellow, 1)
             Next
         End If
     End Sub
@@ -174,7 +174,7 @@ Public Class MSER_SyntheticInput : Inherits VBparent
         addNestedCircles(img, New cv.Point(600, 600), width, color4, 13)
 
         img = img.Resize(New cv.Size(src.Rows, src.Rows))
-        dst1(New cv.Rect(0, 0, src.Rows, src.Rows)) = img.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2(New cv.Rect(0, 0, src.Rows, src.Rows)) = img.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -216,10 +216,10 @@ Public Class MSER_TestSynthetic : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         synth.Run(src)
-        dst1 = synth.dst1.Clone()
-        dst2 = synth.dst1
+        dst2 = synth.dst2.Clone()
+        dst3 = synth.dst2
 
-        testSynthetic(dst2, True, 100)
+        testSynthetic(dst3, True, 100)
     End Sub
 End Class
 
@@ -249,14 +249,14 @@ Public Class MSER_CPPStyle : Inherits VBparent
                 mat.Circle(pt, task.dotSize, color, -1, task.lineType)
             Next
         Next
-        dst1 = mat.Resize(dst1.Size())
+        dst2 = mat.Resize(dst2.Size())
 
         mat = image.Clone()
         For Each box In boxes
             Dim color = cv.Scalar.RandomColor
             mat.Rectangle(box, color, -1, task.lineType)
         Next
-        dst2 = mat.Resize(dst2.Size())
+        dst3 = mat.Resize(dst3.Size())
     End Sub
 End Class
 
@@ -275,7 +275,7 @@ Public Class MSER_Contours : Inherits VBparent
         mser.Run(src)
 
         Dim pixels As integer
-        dst1 = src
+        dst2 = src
         Dim hull() As cv.Point
         For i = 0 To mser.regions.Length - 1
             Dim nextRegion = mser.regions(i)
@@ -287,7 +287,7 @@ Public Class MSER_Contours : Inherits VBparent
                 points.Add(hull(j))
             Next
             listOfPoints.Add(points)
-            dst1.DrawContours(listOfPoints, 0, cv.Scalar.Yellow, 1)
+            dst2.DrawContours(listOfPoints, 0, cv.Scalar.Yellow, 1)
         Next
 
         label1 = CStr(mser.regions.Length) + " Regions " + Format(pixels / mser.regions.Length, "#0.0") + " pixels/region (avg)"

@@ -32,23 +32,23 @@ Public Class DilateErode_Basics : Inherits VBparent
 
         Static noShape = findRadio("Dilate/Erode shape: None")
         If noShape.Checked Then
-            dst1 = src
+            dst2 = src
         Else
             If iterations >= 0 Then
-                src.Dilate(element, Nothing, iterations).CopyTo(dst1)
+                src.Dilate(element, Nothing, iterations).CopyTo(dst2)
             Else
-                src.Erode(element, Nothing, -iterations).CopyTo(dst1)
+                src.Erode(element, Nothing, -iterations).CopyTo(dst2)
             End If
         End If
 
 
         If standalone or task.intermediateName = caller Then
             If iterations >= 0 Then
-                dst2 = task.RGBDepth.Dilate(element, Nothing, iterations)
+                dst3 = task.RGBDepth.Dilate(element, Nothing, iterations)
                 label1 = "Dilate RGB " + CStr(iterations) + " times"
                 label2 = "Dilate Depth " + CStr(iterations) + " times"
             Else
-                dst2 = task.RGBDepth.Erode(element, Nothing, -iterations)
+                dst3 = task.RGBDepth.Erode(element, Nothing, -iterations)
                 label1 = "Erode RGB " + CStr(-iterations) + " times"
                 label2 = "Erode Depth " + CStr(-iterations) + " times"
             End If
@@ -82,13 +82,13 @@ Public Class DilateErode_DepthSeed : Inherits VBparent
         cv.Cv2.Erode(task.depth32f, mat, element)
         mat = task.depth32f - mat
         Dim seeds = mat.LessThan(sliders.trackbar(0).Value).ToMat
-        dst2 = seeds
+        dst3 = seeds
 
         Dim validImg = task.depth32f.GreaterThan(0).ToMat
         validImg.SetTo(0, task.depth32f.GreaterThan(sliders.trackbar(1).Value)) ' max distance
         cv.Cv2.BitwiseAnd(seeds, validImg, seeds)
-        dst1.SetTo(0)
-        task.RGBDepth.CopyTo(dst1, seeds)
+        dst2.SetTo(0)
+        task.RGBDepth.CopyTo(dst2, seeds)
     End Sub
 End Class
 
@@ -117,11 +117,11 @@ Public Class DilateErode_OpenClose : Inherits VBparent
 
         Dim element = cv.Cv2.GetStructuringElement(morphShape, New cv.Size(an * 2 + 1, an * 2 + 1), New cv.Point(an, an))
         If n < 0 Then
-            cv.Cv2.MorphologyEx(task.RGBDepth, dst2, cv.MorphTypes.Open, element)
-            cv.Cv2.MorphologyEx(src, dst1, cv.MorphTypes.Open, element)
+            cv.Cv2.MorphologyEx(task.RGBDepth, dst3, cv.MorphTypes.Open, element)
+            cv.Cv2.MorphologyEx(src, dst2, cv.MorphTypes.Open, element)
         Else
-            cv.Cv2.MorphologyEx(task.RGBDepth, dst2, cv.MorphTypes.Close, element)
-            cv.Cv2.MorphologyEx(src, dst1, cv.MorphTypes.Close, element)
+            cv.Cv2.MorphologyEx(task.RGBDepth, dst3, cv.MorphTypes.Close, element)
+            cv.Cv2.MorphologyEx(src, dst2, cv.MorphTypes.Close, element)
         End If
     End Sub
 End Class

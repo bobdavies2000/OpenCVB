@@ -53,7 +53,7 @@ Public Class Tracker_Basics : Inherits VBparent
             If imagePtr <> 0 Then
                 Dim dstData(src.Total * src.ElemSize - 1) As Byte
                 Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-                dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
+                dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, dstData)
             End If
         Else
             setTrueText("Draw a rectangle around any object to be tracked in the RGB image above.", 10, 140)

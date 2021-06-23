@@ -9,9 +9,9 @@ Public Class KAZE_KeypointsKAZE_CS : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         CS_Kaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        src.CopyTo(dst1)
+        src.CopyTo(dst2)
         For i = 0 To CS_Kaze.kazeKeyPoints.Count - 1
-            dst1.Circle(CS_Kaze.kazeKeyPoints.ElementAt(i).Pt, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+            dst2.Circle(CS_Kaze.kazeKeyPoints.ElementAt(i).Pt, task.dotSize, cv.Scalar.Red, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -27,9 +27,9 @@ Public Class KAZE_KeypointsAKAZE_CS : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         CS_AKaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        src.CopyTo(dst1)
+        src.CopyTo(dst2)
         For i = 0 To CS_AKaze.akazeKeyPoints.Count - 1
-            dst1.Circle(CS_AKaze.akazeKeyPoints.ElementAt(i).Pt, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+            dst2.Circle(CS_AKaze.akazeKeyPoints.ElementAt(i).Pt, task.dotSize, cv.Scalar.Red, -1, task.lineType)
         Next
     End Sub
 End Class
@@ -47,7 +47,7 @@ Public Class KAZE_Sample_CS : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim result = CS_Kaze.Run(box, box_in_scene)
-        dst1 = result.Resize(src.Size())
+        dst2 = result.Resize(src.Size())
     End Sub
 End Class
 
@@ -62,11 +62,11 @@ Public Class KAZE_Match_CS : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         red.Run(src)
-        dst1 = red.dst1
         dst2 = red.dst2
-        Dim result = CS_Kaze.Run(dst1, dst2)
-        result(New cv.Rect(0, 0, dst1.Width, dst1.Height)).CopyTo(dst1)
-        result(New cv.Rect(dst1.Width, 0, dst1.Width, dst1.Height)).CopyTo(dst2)
+        dst3 = red.dst3
+        Dim result = CS_Kaze.Run(dst2, dst3)
+        result(New cv.Rect(0, 0, dst2.Width, dst2.Height)).CopyTo(dst2)
+        result(New cv.Rect(dst2.Width, 0, dst2.Width, dst2.Height)).CopyTo(dst3)
     End Sub
 End Class
 
@@ -88,8 +88,8 @@ Public Class KAZE_LeftAligned_CS : Inherits VBparent
         CS_KazeLeft.GetKeypoints(task.leftView)
         CS_KazeRight.GetKeypoints(task.rightView)
 
-        dst1 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim topDistance = sliders.trackbar(1).Value
         Dim maxPoints = sliders.trackbar(0).Value
@@ -111,10 +111,10 @@ Public Class KAZE_LeftAligned_CS : Inherits VBparent
                 End If
             Next
             If minDistance < Single.MaxValue Then
+                dst3.Circle(pt1.Pt, task.dotSize + 2, cv.Scalar.Blue, -1, task.lineType)
                 dst2.Circle(pt1.Pt, task.dotSize + 2, cv.Scalar.Blue, -1, task.lineType)
-                dst1.Circle(pt1.Pt, task.dotSize + 2, cv.Scalar.Blue, -1, task.lineType)
-                dst2.Circle(CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
-                dst2.Line(pt1.Pt, CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+                dst3.Circle(CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
+                dst3.Line(pt1.Pt, CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, cv.Scalar.Yellow, task.lineWidth, task.lineType)
             End If
         Next
         label1 = "Right image has " + CStr(CS_KazeRight.kazeKeyPoints.Count) + " key points"

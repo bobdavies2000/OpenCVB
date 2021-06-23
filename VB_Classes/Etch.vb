@@ -7,7 +7,7 @@ Public Class Etch_ASketch : Inherits VBparent
     Dim cursor As cv.Point
     Dim ms_rng As New System.Random
     Private Function randomCursor()
-        Return New cv.Point(ms_rng.Next(0, dst1.Width), ms_rng.Next(0, dst1.Height))
+        Return New cv.Point(ms_rng.Next(0, dst2.Width), ms_rng.Next(0, dst2.Height))
     End Function
     Public Sub New()
 
@@ -21,7 +21,7 @@ Public Class Etch_ASketch : Inherits VBparent
         keys = New Keyboard_Basics()
 
         cursor = randomCursor()
-        dst1.SetTo(slateColor)
+        dst2.SetTo(slateColor)
         task.desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -41,7 +41,7 @@ Public Class Etch_ASketch : Inherits VBparent
         If check.Box(0).Checked Then
             check.Box(0).Checked = False
             cursor = randomCursor()
-            dst1.SetTo(slateColor)
+            dst2.SetTo(slateColor)
         End If
 
         For i = 0 To Input.Count - 1
@@ -59,7 +59,7 @@ Public Class Etch_ASketch : Inherits VBparent
             If cursor.Y < 0 Then cursor.Y = 0
             If cursor.X >= src.Width Then cursor.X = src.Width - 1
             If cursor.Y >= src.Height Then cursor.Y = src.Height - 1
-            dst1.Set(Of cv.Vec3b)(cursor.Y, cursor.X, black)
+            dst2.Set(Of cv.Vec3b)(cursor.Y, cursor.X, black)
         Next
         If check.Box(1).Checked Then
             Static lastCursor = cursor

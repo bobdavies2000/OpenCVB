@@ -29,19 +29,19 @@ Public Class Reduction_Basics : Inherits VBparent
 
         If bitwiseCheck.Checked Then
             Dim zeroBits = Math.Pow(2, bitSlider.value) - 1
-            dst2 = New cv.Mat(src.Size, src.Type, cv.Scalar.All(255 - zeroBits))
-            cv.Cv2.BitwiseAnd(src, dst2, dst1)
+            dst3 = New cv.Mat(src.Size, src.Type, cv.Scalar.All(255 - zeroBits))
+            cv.Cv2.BitwiseAnd(src, dst3, dst2)
         ElseIf simpleCheck.Checked Then
-            dst1 = src / reductionVal
-            dst1 *= reductionVal
-            If task.intermediateName = caller Then dst1.ConvertTo(dst1, cv.MatType.CV_32F)
+            dst2 = src / reductionVal
+            dst2 *= reductionVal
+            If task.intermediateName = caller Then dst2.ConvertTo(dst2, cv.MatType.CV_32F)
             label1 = "Reduced image - factor = " + CStr(reductionVal)
         Else
-            dst1 = src
+            dst2 = src
             label1 = "No reduction requested"
         End If
-        task.palette.Run(dst1.Clone)
-        dst2 = task.palette.dst1
+        task.palette.Run(dst2.Clone)
+        dst3 = task.palette.dst2
     End Sub
 End Class
 
@@ -57,9 +57,9 @@ Public Class Reduction_Floodfill : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         reduction.Run(src)
-        dst1 = reduction.dst1
-        flood.Run(reduction.dst1)
-        dst2 = flood.dst1
+        dst2 = reduction.dst2
+        flood.Run(reduction.dst2)
+        dst3 = flood.dst2
         label1 = flood.label2
     End Sub
 End Class
@@ -80,18 +80,18 @@ Public Class Reduction_KNN_Color : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
         reduction.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        dst2 = reduction.dst1
+        dst3 = reduction.dst2
 
         pTrack.queryPoints = New List(Of cv.Point2f)(reduction.flood.centroids)
         pTrack.queryRects = New List(Of cv.Rect)(reduction.flood.rects)
         pTrack.queryMasks = New List(Of cv.Mat)(reduction.flood.masks)
         pTrack.Run(src)
-        dst1 = pTrack.dst1
+        dst2 = pTrack.dst2
 
         If standalone Then
             highlight.viewObjects = pTrack.drawRC.viewObjects
-            highlight.Run(dst1)
-            dst1 = highlight.dst1
+            highlight.Run(dst2)
+            dst2 = highlight.dst2
         End If
 
         label1 = "There were " + CStr(pTrack.drawRC.viewObjects.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
@@ -114,10 +114,10 @@ Public Class Reduction_KNN_ColorAndDepth : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         reduction.Run(src)
-        dst1 = reduction.dst1
+        dst2 = reduction.dst2
 
         depth.Run(src)
-        dst2 = depth.dst1
+        dst3 = depth.dst2
     End Sub
 End Class
 
@@ -145,16 +145,16 @@ Public Class Reduction_SideTopLines : Inherits VBparent
         reduction.Run(src)
 
         sideView.Run(src)
-        lDetect.Run(sideView.dst1)
+        lDetect.Run(sideView.dst2)
 
-        setupSide.Run(lDetect.dst1)
-        dst1 = setupSide.dst1
+        setupSide.Run(lDetect.dst2)
+        dst2 = setupSide.dst2
 
         topView.Run(src)
-        lDetect.Run(topView.dst1)
+        lDetect.Run(topView.dst2)
 
-        setupTop.Run(lDetect.dst1)
-        dst2 = setupTop.dst1
+        setupTop.Run(lDetect.dst2)
+        dst3 = setupTop.dst2
     End Sub
 End Class
 
@@ -178,9 +178,9 @@ Public Class Reduction_PointCloud : Inherits VBparent
         split(2) *= 1000
         split(2).ConvertTo(src, cv.MatType.CV_32S)
         reduction.Run(src)
-        reduction.dst1.ConvertTo(dst1, cv.MatType.CV_32F)
-        split(2) = dst1 * 0.001
-        cv.Cv2.Merge(split, dst2)
+        reduction.dst2.ConvertTo(dst2, cv.MatType.CV_32F)
+        split(2) = dst2 * 0.001
+        cv.Cv2.Merge(split, dst3)
     End Sub
 End Class
 
@@ -210,14 +210,14 @@ Public Class Reduction_XYZ : Inherits VBparent
                 split(i) *= 1000
                 split(i).ConvertTo(src, cv.MatType.CV_32S)
                 reduction.Run(src)
-                reduction.dst1.ConvertTo(split(i), cv.MatType.CV_32F)
+                reduction.dst2.ConvertTo(split(i), cv.MatType.CV_32F)
                 split(i) *= 0.001
                 split(i) -= 10
             End If
         Next
 
-        cv.Cv2.Merge(split, dst2)
-        setTrueText("Task.PointCloud has been reduced and is in dst2")
+        cv.Cv2.Merge(split, dst3)
+        setTrueText("Task.PointCloud has been reduced and is in dst3")
     End Sub
 End Class
 
@@ -238,14 +238,14 @@ Public Class Reduction_Edges : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         reduction.Run(src)
-        dst1 = reduction.dst1.Clone
+        dst2 = reduction.dst2.Clone
 
         Dim reductionRequested = False
         If reduction.radio.check(0).Checked Or reduction.radio.check(1).Checked Then reductionRequested = True
         label1 = If(reductionRequested, "Reduced image", "Original image")
         label2 = If(reductionRequested, "Laplacian edges of reduced image", "Laplacian edges of original image")
-        edges.Run(dst1)
-        dst2 = edges.dst1
+        edges.Run(dst2)
+        dst3 = edges.dst2
     End Sub
 End Class
 
@@ -270,9 +270,9 @@ Public Class Reduction_Depth : Inherits VBparent
             src.ConvertTo(src, cv.MatType.CV_32S)
         End If
         reduction.Run(src)
-        reduction.dst1.ConvertTo(reducedDepth32F, cv.MatType.CV_32F)
+        reduction.dst2.ConvertTo(reducedDepth32F, cv.MatType.CV_32F)
         colorizer.Run(reducedDepth32F)
-        dst1 = colorizer.dst1
+        dst2 = colorizer.dst2
         label1 = reduction.label1
     End Sub
 End Class
@@ -297,13 +297,13 @@ Public Class Reduction_DepthMax : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
         dMax.Run(src)
-        dst1 = dMax.dst2
+        dst2 = dMax.dst3
 
-        dst1.ConvertTo(src, cv.MatType.CV_32S)
+        dst2.ConvertTo(src, cv.MatType.CV_32S)
         reduction.Run(src)
-        reduction.dst1.ConvertTo(reducedDepth32F, cv.MatType.CV_32F)
+        reduction.dst2.ConvertTo(reducedDepth32F, cv.MatType.CV_32F)
 
         colorizer.Run(reducedDepth32F)
-        dst2 = colorizer.dst1
+        dst3 = colorizer.dst2
     End Sub
 End Class

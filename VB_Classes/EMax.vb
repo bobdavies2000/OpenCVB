@@ -16,9 +16,9 @@ Public Class EMax_Basics : Inherits VBparent
         For i = 0 To basics.options.samples.Rows - 1
             Dim p = basics.options.samples.Get(Of cv.Point2f)(i, 0)
             Dim pt = New cv.Point(CInt(p.X), CInt(p.Y))
-            If pt.X >= 0 And pt.Y >= 0 And pt.X < dst2.Width And pt.Y < dst2.Height Then
+            If pt.X >= 0 And pt.Y >= 0 And pt.X < dst3.Width And pt.Y < dst3.Height Then
                 Dim label = basics.options.labels.Get(Of Integer)(i, 0)
-                Dim eGrp = basics.dst2.Get(Of Byte)(CInt(pt.Y), CInt(pt.X))
+                Dim eGrp = basics.dst3.Get(Of Byte)(CInt(pt.Y), CInt(pt.X))
                 If eGrp < regions Then regionCount(label, eGrp) += 1
             End If
         Next
@@ -35,8 +35,8 @@ Public Class EMax_Basics : Inherits VBparent
                 End If
             Next
         Next
-        task.palette.Run(basics.dst2)
-        dst1 = task.palette.dst1
+        task.palette.Run(basics.dst3)
+        dst2 = task.palette.dst2
     End Sub
 End Class
 
@@ -74,17 +74,17 @@ Public Class EMax_Raw : Inherits VBparent
         Marshal.Copy(options.labels.Data, labelData, 0, labelData.Length)
 
         Dim imagePtr = EMax_Raw_Run(EMax_Raw, handleSrc.AddrOfPinnedObject(), handleLabels.AddrOfPinnedObject(), inCount, 2,
-                                       dst1.Rows, dst1.Cols, options.regionCount, options.predictionStepSize, options.covarianceMatrixType)
+                                       dst2.Rows, dst2.Cols, options.regionCount, options.predictionStepSize, options.covarianceMatrixType)
         handleLabels.Free() ' free the pinned memory...
         handleSrc.Free() ' free the pinned memory...
 
-        dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8U, imagePtr)
+        dst3 = New cv.Mat(dst3.Rows, dst3.Cols, cv.MatType.CV_8U, imagePtr)
 
-        task.palette.Run(dst2 * 255 / options.regionCount)
-        dst1 = task.palette.dst1
+        task.palette.Run(dst3 * 255 / options.regionCount)
+        dst2 = task.palette.dst2
         If standalone Or task.intermediateName = caller Then
-            inputDataMask = options.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
-            dst1.SetTo(cv.Scalar.White, inputDataMask)
+            inputDataMask = options.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+            dst2.SetTo(cv.Scalar.White, inputDataMask)
         End If
     End Sub
     Public Sub Close()
@@ -113,8 +113,8 @@ Public Class EMax_Setup : Inherits VBparent
             sliders.setupTrackBar(2, "EMax Sigma (spread)", 1, 100, 30)
         End If
 
-        findSlider("ThreadGrid Width").Value = dst1.Width / 3
-        findSlider("ThreadGrid Height").Value = dst1.Height / 3
+        findSlider("ThreadGrid Width").Value = dst2.Width / 3
+        findSlider("ThreadGrid Height").Value = dst2.Height / 3
 
         If radio.Setup(caller, 3) Then
             radio.check(0).Text = "EMax matrix type Spherical"
@@ -166,12 +166,12 @@ Public Class EMax_Setup : Inherits VBparent
         samples = samples.Reshape(1, 0)
 
         If standalone Or task.intermediateName = caller Then
-            dst1.SetTo(cv.Scalar.Black)
+            dst2.SetTo(cv.Scalar.Black)
             ' draw the clustered samples
             For i = 0 To samples.Rows - 1
                 Dim pt = samples.Get(Of cv.Point2f)(i, 0)
                 Dim label = labels.Get(Of Integer)(i, 0)
-                dst1.Circle(pt, task.dotSize + 2, regionColors(label), -1, task.lineType)
+                dst2.Circle(pt, task.dotSize + 2, regionColors(label), -1, task.lineType)
             Next
         End If
     End Sub
@@ -207,15 +207,15 @@ Public Class EMax_VB_Failing : Inherits VBparent
 
             ' now classify every image pixel based on the samples.
             Dim sample As New cv.Mat(1, 2, cv.MatType.CV_32FC1, 0)  ' tried doubles but it fails as well...
-            For i = 0 To dst1.Rows - 1
-                For j = 0 To dst1.Cols - 1
+            For i = 0 To dst2.Rows - 1
+                For j = 0 To dst2.Cols - 1
                     sample.Set(Of Single)(0, 0, CSng(j))
                     sample.Set(Of Single)(0, 1, CSng(i))
 
                     Dim response = Math.Round(em_model.Predict2(sample).Item1)
 
                     Dim c = task.vecColors(response)
-                    dst1.Circle(New cv.Point(j, i), task.dotSize, c, -1)
+                    dst2.Circle(New cv.Point(j, i), task.dotSize, c, -1)
                 Next
             Next
         End If
@@ -252,19 +252,19 @@ Public Class EMax_Centroids : Inherits VBparent
     Public Sub New()
         findSlider("FloodFill LoDiff").Value = 0
         findSlider("FloodFill HiDiff").Value = 1
-        findSlider("ThreadGrid Width").Value = dst1.Width * 170 / 640
+        findSlider("ThreadGrid Width").Value = dst2.Width * 170 / 640
         task.desc = "Get the Emax cluster centroids using floodfill "
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         emaxCPP.Run(src)
-        flood.Run(emaxCPP.dst1.Clone)
-        dst1 = flood.dst1
+        flood.Run(emaxCPP.dst2.Clone)
+        dst2 = flood.dst2
 
         Static lastCentroids As New List(Of cv.Point2f)
         For i = 0 To flood.centroids.Count - 1
-            dst1.Circle(flood.centroids(i), task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
+            dst2.Circle(flood.centroids(i), task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
             If i < lastCentroids.Count Then
-                dst1.Circle(lastCentroids(i), task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
+                dst2.Circle(lastCentroids(i), task.dotSize + 2, cv.Scalar.Red, -1, task.lineType)
             End If
         Next
         lastCentroids = New List(Of cv.Point2f)(flood.centroids)
@@ -289,23 +289,23 @@ Public Class EMax_PointTracker : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         emax.Run(src)
-        dst1 = emax.dst1
+        dst2 = emax.dst2
 
         pTrack.queryPoints = emax.flood.centroids
         pTrack.queryMasks = emax.flood.masks
         pTrack.queryRects = emax.flood.rects
         pTrack.Run(src)
-        dst2 = pTrack.dst1
+        dst3 = pTrack.dst2
 
         ' this is to verify that the colors are remaining largely consistent (they may change if more centroids appear.)
-        Static lastImage = dst2
+        Static lastImage = dst3
         Dim tallyErrors = 0
         For Each pt In emax.flood.centroids
-            Dim v1 = dst2.Get(Of cv.Vec3b)(pt.Y, pt.X)
+            Dim v1 = dst3.Get(Of cv.Vec3b)(pt.Y, pt.X)
             Dim v2 = lastImage.Get(Of cv.Vec3b)(pt.Y, pt.X)
             If v1 <> v2 Then tallyErrors += 1
         Next
-        lastImage = dst2.Clone
+        lastImage = dst3.Clone
         Static totalErrors = 0
         Static generationCount = 0
         Static saveCount = 0

@@ -25,16 +25,16 @@ def main(argv):
 
     ## [edge_detection]
     # Edge detection
-    dst1 = cv.Canny(src, 50, 200, None, 3)
+    dst2 = cv.Canny(src, 50, 200, None, 3)
     ## [edge_detection]
 
     # Copy edges to the images that will display the results in BGR
-    cdst1 = cv.cvtColor(dst1, cv.COLOR_GRAY2BGR)
+    cdst1 = cv.cvtColor(dst2, cv.COLOR_GRAY2BGR)
     cdstP = np.copy(cdst1)
 
     ## [hough_lines]
     #  Standard Hough Line Transform
-    lines = cv.HoughLines(dst1, 1, np.pi / 180, 150, None, 0, 0)
+    lines = cv.HoughLines(dst2, 1, np.pi / 180, 150, None, 0, 0)
     ## [hough_lines]
     ## [draw_lines]
     # Draw the lines
@@ -54,7 +54,7 @@ def main(argv):
 
     ## [hough_lines_p]
     # Probabilistic Line Transform
-    linesP = cv.HoughLinesP(dst1, 1, np.pi / 180, 50, None, 50, 10)
+    linesP = cv.HoughLinesP(dst2, 1, np.pi / 180, 50, None, 50, 10)
     ## [hough_lines_p]
     ## [draw_lines_p]
     # Draw the lines

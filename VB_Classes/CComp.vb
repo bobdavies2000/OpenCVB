@@ -12,7 +12,7 @@ Public Class CComp_Basics : Inherits VBparent
             sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
             sliders.setupTrackBar(1, "Threshold for grayscale input", 0, 255, 128)
         End If
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         task.palette.Run(task.color)
         colorMap = task.palette.gradientColorMap.Row(0).Clone
         task.desc = "Use a threshold slider on the CComp input"
@@ -25,16 +25,16 @@ Public Class CComp_Basics : Inherits VBparent
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If threshVal < 128 Then
-            dst1 = src.Threshold(threshVal, 255, cv.ThresholdTypes.BinaryInv)
+            dst2 = src.Threshold(threshVal, 255, cv.ThresholdTypes.BinaryInv)
             label1 = "CComp_Basics - dark half"
         Else
-            dst1 = src.Threshold(threshVal, 255, cv.ThresholdTypes.Binary)
+            dst2 = src.Threshold(threshVal, 255, cv.ThresholdTypes.Binary)
             label1 = "CComp_Basics - light half"
         End If
         Dim labels As New cv.Mat
         Dim stats As New cv.Mat
         Dim centroidRaw As New cv.Mat
-        Dim nLabels = dst1.ConnectedComponentsWithStats(labels, stats, centroidRaw)
+        Dim nLabels = dst2.ConnectedComponentsWithStats(labels, stats, centroidRaw)
 
         rects.Clear()
         areas.Clear()
@@ -51,7 +51,7 @@ Public Class CComp_Basics : Inherits VBparent
             If area > minSize And area <> src.Total Then
                 Dim r1 = stats.Get(Of cv.Rect)(i, 0)
                 Dim r = New cv.Rect(CInt(r1.X), CInt(r1.Y), CInt(r1.Width), CInt(r1.Height))
-                If r.Width <> dst1.Width And r.Height <> dst1.Height Then
+                If r.Width <> dst2.Width And r.Height <> dst2.Height Then
                     areas.Add(area)
                     unsortedRects.Add(r)
                     index.Add(i)
@@ -80,7 +80,7 @@ Public Class CComp_Basics : Inherits VBparent
 
         labels.ConvertTo(labels, cv.MatType.CV_8U)
         task.palette.Run(labels)
-        dst2 = task.palette.dst1
+        dst3 = task.palette.dst2
         label2 = CStr(masks.Count) + " Connected Components with size > " + CStr(minSize) + " pixels"
     End Sub
 End Class
@@ -102,11 +102,11 @@ Public Class CComp_Both : Inherits VBparent
         Static thresholdSlider = findSlider("Threshold for grayscale input")
         thresholdSlider.value = 120
         below.Run(src)
-        dst1 = below.dst1
+        dst2 = below.dst2
 
         thresholdSlider.value = 130
         above.Run(src)
-        dst2 = above.dst1
+        dst3 = above.dst2
     End Sub
 End Class
 
@@ -126,7 +126,7 @@ Public Class CComp_BasicsOld : Inherits VBparent
     Public Sub New()
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
-            sliders.setupTrackBar(1, "CComp Max Area", 0, dst1.Width * dst1.Height / 2, dst1.Width * dst1.Height / 4)
+            sliders.setupTrackBar(1, "CComp Max Area", 0, dst2.Width * dst2.Height / 2, dst2.Width * dst2.Height / 4)
             sliders.setupTrackBar(2, "CComp threshold", 0, 255, 128)
         End If
         task.desc = "Draw bounding boxes around RGB binarized connected Components"
@@ -135,8 +135,8 @@ Public Class CComp_BasicsOld : Inherits VBparent
         Dim count As Integer = 0
         For Each blob In connectedComponents.Blobs
             If blob.Area < minSize Or blob.Area > maxSize Then Continue For ' skip it if too small or too big ...
-            If blob.rect.width * blob.rect.height >= dst1.Width * dst1.Height Then Continue For
-            If blob.rect.width = dst1.Width Or blob.rect.height = dst1.Height Then Continue For
+            If blob.rect.width * blob.rect.height >= dst2.Width * dst2.Height Then Continue For
+            If blob.rect.width = dst2.Width Or blob.rect.height = dst2.Height Then Continue For
             Dim rect = blob.Rect
             rects.Add(rect)
             Dim nextMask = mask(rect)
@@ -145,7 +145,7 @@ Public Class CComp_BasicsOld : Inherits VBparent
             Dim m = cv.Cv2.Moments(nextMask, True)
             If m.M00 = 0 Then Continue For ' avoid divide by zero...
             centroids.Add(New cv.Point(CInt(m.M10 / m.M00 + rect.x), CInt(m.M01 / m.M00 + rect.y)))
-            If standalone Then dst1(blob.Rect).SetTo(task.scalarColors(count), (dst2)(blob.Rect))
+            If standalone Then dst2(blob.Rect).SetTo(task.scalarColors(count), (dst3)(blob.Rect))
             count += 1
         Next
         Return count
@@ -161,7 +161,7 @@ Public Class CComp_BasicsOld : Inherits VBparent
         rects.Clear()
         centroids.Clear()
         masks.Clear()
-        dst1.SetTo(0)
+        dst2.SetTo(0)
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If threshold < 128 Then
@@ -181,17 +181,17 @@ Public Class CComp_BasicsOld : Inherits VBparent
 
         count += renderBlobs(minSize, mats.mat(1), maxSize)
         label2 = CStr(count) + " items found > " + CStr(minSize) + " and < " + CStr(maxSize)
-        connectedComponents.renderblobs(dst1)
+        connectedComponents.renderblobs(dst2)
         If standalone Then
             For i = 0 To centroids.Count - 1
-                dst1.Circle(centroids.ElementAt(i), task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
-                dst1.Rectangle(rects.ElementAt(i), cv.Scalar.White, 2)
+                dst2.Circle(centroids.ElementAt(i), task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
+                dst2.Rectangle(rects.ElementAt(i), cv.Scalar.White, 2)
             Next
         End If
 
         mats.Run(src)
-        dst1 = mats.dst1
         dst2 = mats.dst2
+        dst3 = mats.dst3
         label1 = ">Slider, <Slider, rendered >Slider, rendered <slider"
     End Sub
 End Class
@@ -211,21 +211,21 @@ Public Class CComp_PointTracker : Inherits VBparent
 
         If trackPoints Then
             Static topView As New PointCloud_TrackerTop
-            dst2 = basics.dst1
+            dst3 = basics.dst2
             topView.pTrack.queryPoints = basics.centroids
             topView.pTrack.queryRects = basics.rects
             topView.pTrack.queryMasks = basics.masks
             topView.pTrack.Run(src)
-            dst1 = topView.pTrack.dst1
+            dst2 = topView.pTrack.dst2
 
             highlight.viewObjects = topView.pTrack.drawRC.viewObjects
-            highlight.Run(dst1)
-            dst1 = highlight.dst1
+            highlight.Run(dst2)
+            dst2 = highlight.dst2
             If highlight.highlightPoint <> New cv.Point Then
-                dst2 = highlight.dst2
+                dst3 = highlight.dst3
                 label2 = "Selected region in yellow"
             Else
-                dst2 = src
+                dst3 = src
             End If
             label1 = basics.label1
         End If
@@ -249,13 +249,13 @@ Public Class CComp_DepthEdges : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         depth.Run(src)
-        If standalone Or task.intermediateName = caller Then dst2 = depth.dst2
+        If standalone Or task.intermediateName = caller Then dst3 = depth.dst3
 
-        'If check.Box(0).Checked Then ccomp.basics.edgeMask = depth.dst2 Else ccomp.basics.edgeMask = Nothing
-        If check.Box(0).Checked Then src.SetTo(0, depth.dst2)
+        'If check.Box(0).Checked Then ccomp.basics.edgeMask = depth.dst3 Else ccomp.basics.edgeMask = Nothing
+        If check.Box(0).Checked Then src.SetTo(0, depth.dst3)
         ccomp.Run(src)
-        dst1 = ccomp.dst1
-        If ccomp.highlight.highlightPoint <> New cv.Point Then dst2 = ccomp.highlight.dst2
+        dst2 = ccomp.dst2
+        If ccomp.highlight.highlightPoint <> New cv.Point Then dst3 = ccomp.highlight.dst3
     End Sub
 End Class
 
@@ -273,10 +273,10 @@ Public Class CComp_EdgeMask : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         edges.Run(src)
-        dst1 = edges.dst1
+        dst2 = edges.dst2
 
         ccomp.Run(src)
-        dst2 = ccomp.dst1
+        dst3 = ccomp.dst2
     End Sub
 End Class
 
@@ -298,18 +298,18 @@ Public Class CComp_ColorDepth : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = src.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
-        dst1 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        Dim cc = cv.Cv2.ConnectedComponentsEx(dst2)
+        dst3 = src.Threshold(0, 255, OpenCvSharp.ThresholdTypes.Binary + OpenCvSharp.ThresholdTypes.Otsu)
+        dst2 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        Dim cc = cv.Cv2.ConnectedComponentsEx(dst3)
 
         For Each blob In cc.Blobs.Skip(1)
             Dim roi = blob.Rect
-            Dim avg = task.RGBDepth(roi).Mean(dst2(roi))
-            dst1(roi).SetTo(avg, dst2(roi))
+            Dim avg = task.RGBDepth(roi).Mean(dst3(roi))
+            dst2(roi).SetTo(avg, dst3(roi))
         Next
 
         For Each blob In cc.Blobs.Skip(1)
-            If blob.Area > sliders.trackbar(0).Value Then dst1.Rectangle(blob.Rect, cv.Scalar.White, 2)
+            If blob.Area > sliders.trackbar(0).Value Then dst2.Rectangle(blob.Rect, cv.Scalar.White, 2)
         Next
     End Sub
 End Class
@@ -338,7 +338,7 @@ Public Class CComp_InRange_MT : Inherits VBparent
 
         Dim mask = task.depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
-        dst1.SetTo(0)
+        dst2.SetTo(0)
         Dim totalBlobs As Integer
         Parallel.For(0, rangeCount,
         Sub(i)
@@ -358,8 +358,8 @@ Public Class CComp_InRange_MT : Inherits VBparent
                 Dim meanDepth = depth.Mean(mask(roiList(j)))
                 If meanDepth.Item(0) < task.maxDepth Then
                     Dim avg = task.RGBDepth(roiList(j)).Mean(mask(roiList(j)))
-                    dst1(roiList(j)).SetTo(avg, bin)
-                    dst2(roiList(j)).SetTo(avg)
+                    dst2(roiList(j)).SetTo(avg, bin)
+                    dst3(roiList(j)).SetTo(avg)
                 End If
             Next
         End Sub)
@@ -403,11 +403,11 @@ Public Class CComp_InRange : Inherits VBparent
         roiList.Sort(Function(a, b) (a.Width * a.Height).CompareTo(b.Width * b.Height))
         For i = 0 To roiList.Count - 1
             Dim avg = task.RGBDepth(roiList(i)).Mean(mask(roiList(i)))
-            dst1(roiList(i)).SetTo(avg)
+            dst2(roiList(i)).SetTo(avg)
         Next
 
         src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cv.Cv2.AddWeighted(dst1, 0.5, src, 0.5, 0, dst1)
+        cv.Cv2.AddWeighted(dst2, 0.5, src, 0.5, 0, dst2)
         label1 = "# of blobs = " + CStr(roiList.Count) + " in " + CStr(rangeCount) + " regions - smallest in front"
     End Sub
 End Class
@@ -441,14 +441,14 @@ Public Class CComp_Shapes : Inherits VBparent
         Dim maxBlob = cc.GetLargestBlob()
         Dim filtered = New cv.Mat
         cc.FilterByBlob(shapes, filtered, maxBlob)
-        dst1 = filtered.Resize(dst1.Size())
+        dst2 = filtered.Resize(dst2.Size())
 
         Dim matTop As New cv.Mat, matBot As New cv.Mat, mat As New cv.Mat
         cv.Cv2.HConcat(rectView, labelview, matTop)
         cv.Cv2.HConcat(binary, gray, matBot)
         matBot = matBot.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.VConcat(matTop, matBot, mat)
-        dst2 = mat.Resize(dst2.Size())
+        dst3 = mat.Resize(dst3.Size())
     End Sub
 End Class
 
@@ -465,11 +465,11 @@ Public Class CComp_Simple : Inherits VBparent
     Public Sub New()
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
-            sliders.setupTrackBar(1, "CComp Max Area", 0, dst1.Width * dst1.Height / 2, dst1.Width * dst1.Height / 4)
+            sliders.setupTrackBar(1, "CComp Max Area", 0, dst2.Width * dst2.Height / 2, dst2.Width * dst2.Height / 4)
             sliders.setupTrackBar(2, "CComp threshold", 0, 255, 50)
         End If
 
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         task.desc = "Draw bounding boxes around RGB binarized connected Components"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -485,17 +485,17 @@ Public Class CComp_Simple : Inherits VBparent
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        dst1 = input.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.BinaryInv) '  + cv.ThresholdTypes.Otsu
+        dst2 = input.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.BinaryInv) '  + cv.ThresholdTypes.Otsu
 
-        connectedComponents = cv.Cv2.ConnectedComponentsEx(dst1)
-        connectedComponents.renderblobs(dst2)
+        connectedComponents = cv.Cv2.ConnectedComponentsEx(dst2)
+        connectedComponents.renderblobs(dst3)
 
         Dim count As Integer = 0
         For Each blob In connectedComponents.Blobs
             If blob.Area < minSize Or blob.Area > maxSize Then Continue For
             Dim rect = blob.Rect
 
-            Dim m = cv.Cv2.Moments(dst1(rect), True)
+            Dim m = cv.Cv2.Moments(dst2(rect), True)
             If m.M00 = 0 Then Continue For ' avoid divide by zero...
             rects.Add(rect)
             centroids.Add(New cv.Point(CInt(m.M10 / m.M00 + rect.x), CInt(m.M01 / m.M00 + rect.y)))
@@ -520,9 +520,9 @@ Public Class CComp_Binarized : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         edges.Run(src)
-        dst1 = edges.dst2
-        ccomp.Run(dst1)
-        dst2 = ccomp.dst2
+        dst2 = edges.dst3
+        ccomp.Run(dst2)
+        dst3 = ccomp.dst3
     End Sub
 End Class
 
@@ -553,13 +553,13 @@ Public Class CComp_GrayScale : Inherits VBparent
         If src.Channels <> 1 Then
             src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim meanScalar = cv.Cv2.Mean(src)
-            dst1 = src.Threshold(meanScalar(0), 255, cv.ThresholdTypes.Otsu)
+            dst2 = src.Threshold(meanScalar(0), 255, cv.ThresholdTypes.Otsu)
         Else
-            dst1 = src
+            dst2 = src
         End If
         Dim stats As New cv.Mat
         Dim centroids As New cv.Mat
-        Dim nLabels = dst1.ConnectedComponentsWithStats(labels, stats, centroids)
+        Dim nLabels = dst2.ConnectedComponentsWithStats(labels, stats, centroids)
 
         rects.Clear()
         Dim black = New cv.Vec3b(0, 0, 0)
@@ -569,7 +569,7 @@ Public Class CComp_GrayScale : Inherits VBparent
             Dim area = stats.Get(Of Integer)(i, 4)
             If area > minSize And area <> src.Total Then
                 Dim r = stats.Get(Of cv.Rect)(i, 0)
-                If r.Width <> dst1.Width And r.Height <> dst1.Height Then
+                If r.Width <> dst2.Width And r.Height <> dst2.Height Then
                     rects.Add(r)
                     colors.Add(vecColors(colors.Count))
                     index.Add(i)
@@ -585,7 +585,7 @@ Public Class CComp_GrayScale : Inherits VBparent
 
         labels.ConvertTo(labels, cv.MatType.CV_8U)
         task.palette.Run(labels)
-        dst2 = task.palette.dst1
+        dst3 = task.palette.dst2
         label2 = CStr(nLabels) + " Connected Components found"
     End Sub
 End Class

@@ -67,10 +67,10 @@ Public Class FLANN_Basics : Inherits VBparent
 
         Dim matchCount = Math.Min(sliders.trackbar(1).Value, random.Points2f.Length - 1)
         Dim queryCount = sliders.trackbar(0).Value
-        dst1.SetTo(cv.Scalar.White)
+        dst2.SetTo(cv.Scalar.White)
         For i = 0 To features.Rows - 1
             Dim pt = random.Points(i)
-            dst1.Circle(pt, task.dotSize + 1, cv.Scalar.Blue, -1, task.lineType, 0)
+            dst2.Circle(pt, task.dotSize + 1, cv.Scalar.Blue, -1, task.lineType, 0)
         Next
 
         If reuseData = False Or task.frameCount = 0 Then
@@ -96,10 +96,10 @@ Public Class FLANN_Basics : Inherits VBparent
                     Dim index = indices(j)
                     If index >= 0 And index < random.Points2f.Length Then
                         Dim pt2 = random.Points(index)
-                        dst1.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth, task.lineType)
+                        dst2.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth, task.lineType)
                     End If
                 Next
-                dst1.Circle(pt1, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType, 0)
+                dst2.Circle(pt1, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType, 0)
             Next
         End Using
 

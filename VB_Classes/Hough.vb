@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 
 Module Hough_Exports
-    Public Sub houghShowLines(ByRef dst1 As cv.Mat, segments() As cv.LineSegmentPolar, desiredCount As integer)
+    Public Sub houghShowLines(ByRef dst2 As cv.Mat, segments() As cv.LineSegmentPolar, desiredCount As integer)
         For i = 0 To Math.Min(segments.Length, desiredCount) - 1
             Dim rho As Single = segments(i).Rho
             Dim theta As Single = segments(i).Theta
@@ -13,13 +13,13 @@ Module Hough_Exports
 
             Dim pt1 As cv.Point = New cv.Point(Math.Round(x + 1000 * -b), Math.Round(y + 1000 * a))
             Dim pt2 As cv.Point = New cv.Point(Math.Round(x - 1000 * -b), Math.Round(y - 1000 * a))
-            dst1.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 1, task.lineType, 0)
+            dst2.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 1, task.lineType, 0)
         Next
     End Sub
 
-    Public Sub houghShowLines3D(ByRef dst1 As cv.Mat, segment As cv.Line3D)
-        Dim x As Double = segment.X1 * dst1.Cols
-        Dim y As Double = segment.Y1 * dst1.Rows
+    Public Sub houghShowLines3D(ByRef dst2 As cv.Mat, segment As cv.Line3D)
+        Dim x As Double = segment.X1 * dst2.Cols
+        Dim y As Double = segment.Y1 * dst2.Rows
         Dim m As Double
         If segment.Vx < 0.001 Then
             m = 0
@@ -29,8 +29,8 @@ Module Hough_Exports
         Dim b As Double = y - m * x
         Dim pt1 As cv.Point = New cv.Point(x, y)
         Dim pt2 As cv.Point
-        If m = 0 Then pt2 = New cv.Point(x, dst1.Rows) Else pt2 = New cv.Point((dst1.Rows - b) / m, dst1.Rows)
-        dst1.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 2, task.lineType, 0)
+        If m = 0 Then pt2 = New cv.Point(x, dst2.Rows) Else pt2 = New cv.Point((dst2.Rows - b) / m, dst2.Rows)
+        dst2.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 2, task.lineType, 0)
     End Sub
 End Module
 
@@ -48,14 +48,14 @@ Public Class Hough_Circles : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         circles.Run(src)
-        dst1 = circles.dst1
+        dst2 = circles.dst2
         Static Dim method As Integer = 3
-        cv.Cv2.CvtColor(dst1, dst2, cv.ColorConversionCodes.BGR2GRAY)
-        Dim cFound = cv.Cv2.HoughCircles(dst2, method, 1, dst1.Rows / 4, 100, 10, 1, 200)
+        cv.Cv2.CvtColor(dst2, dst3, cv.ColorConversionCodes.BGR2GRAY)
+        Dim cFound = cv.Cv2.HoughCircles(dst3, method, 1, dst2.Rows / 4, 100, 10, 1, 200)
         Dim foundColor = New cv.Scalar(0, 0, 255)
-        dst1.CopyTo(dst2)
+        dst2.CopyTo(dst3)
         For i = 0 To cFound.Length - 1
-            dst2.Circle(New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y)), cFound(i).Radius, foundColor, 5, task.lineType)
+            dst3.Circle(New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y)), cFound(i).Radius, foundColor, 5, task.lineType)
         Next
         label2 = CStr(cFound.Length) + " circles were identified"
     End Sub
@@ -85,18 +85,18 @@ Public Class Hough_Lines : Inherits VBparent
         Dim thetaIn = sliders.trackbar(1).Value / 1000
         Dim threshold = sliders.trackbar(2).Value
 
-        segments = cv.Cv2.HoughLines(edges.dst1, rhoIn, thetaIn, threshold)
+        segments = cv.Cv2.HoughLines(edges.dst2, rhoIn, thetaIn, threshold)
         label1 = "Found " + CStr(segments.Length) + " Lines"
 
         If standalone Or task.intermediateName = caller Then
-            src.CopyTo(dst1)
-            dst1.SetTo(cv.Scalar.White, edges.dst1)
             src.CopyTo(dst2)
-            houghShowLines(dst1, segments, sliders.trackbar(3).Value)
-            Dim probSegments = cv.Cv2.HoughLinesP(edges.dst1, rhoIn, thetaIn, threshold)
+            dst2.SetTo(cv.Scalar.White, edges.dst2)
+            src.CopyTo(dst3)
+            houghShowLines(dst2, segments, sliders.trackbar(3).Value)
+            Dim probSegments = cv.Cv2.HoughLinesP(edges.dst2, rhoIn, thetaIn, threshold)
             For i = 0 To Math.Min(probSegments.Length, sliders.trackbar(3).Value) - 1
                 Dim line = probSegments(i)
-                dst2.Line(line.P1, line.P2, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
+                dst3.Line(line.P1, line.P2, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
             Next
             label2 = "Probablistic lines = " + CStr(probSegments.Length)
         End If
@@ -129,7 +129,7 @@ Public Class Hough_Lines_MT : Inherits VBparent
         grid.Run(Nothing)
 
         edges.Run(src)
-        dst1 = edges.dst1
+        dst2 = edges.dst2
 
         Dim rhoIn = sliders.trackbar(0).Value
         Dim thetaIn = sliders.trackbar(1).Value / 1000
@@ -137,15 +137,15 @@ Public Class Hough_Lines_MT : Inherits VBparent
 
         Parallel.ForEach(grid.roiList,
         Sub(roi)
-            Dim segments() = cv.Cv2.HoughLines(dst1(roi), rhoIn, thetaIn, threshold)
+            Dim segments() = cv.Cv2.HoughLines(dst2(roi), rhoIn, thetaIn, threshold)
             If segments.Count = 0 Then
-                dst2(roi) = task.RGBDepth(roi)
+                dst3(roi) = task.RGBDepth(roi)
                 Exit Sub
             End If
-            dst2(roi).SetTo(0)
-            houghShowLines(dst2(roi), segments, 1)
+            dst3(roi).SetTo(0)
+            houghShowLines(dst3(roi), segments, 1)
         End Sub)
-        dst1.SetTo(cv.Scalar.White, grid.gridMask)
+        dst2.SetTo(cv.Scalar.White, grid.gridMask)
     End Sub
 End Class
 

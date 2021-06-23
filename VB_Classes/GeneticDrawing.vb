@@ -157,8 +157,8 @@ Public Class GeneticDrawing_Basics : Inherits VBparent
         If task.drawRect.Width > 0 Then r = task.drawRect
         If restartRequested Then
             restartRequested = False
-            dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
-            imgStage = dst2.Clone
+            dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
+            imgStage = dst3.Clone
             generation = 0
             stage = 0
 
@@ -227,10 +227,10 @@ Public Class GeneticDrawing_Basics : Inherits VBparent
         End If
 
         mats.Run(src)
-        dst1 = mats.dst1
+        dst2 = mats.dst2
         label2 = " stage " + CStr(stage) + "/" + CStr(stageTotal) + " Gen " + Format(generation, "00") + " chgs = " + CStr(changes) + " err/1000 = " + CStr(CInt(totalError / 1000))
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
-        dst2 = mats.mat(quadrantIndex)
+        dst3 = mats.mat(quadrantIndex)
     End Sub
 End Class
 
@@ -262,15 +262,15 @@ Public Class GeneticDrawing_Color : Inherits VBparent
         For i = 0 To split.Count - 1
             gDraw(i).restartRequested = restartRequested
             gDraw(i).Run(split(i))
-            split(i) = gDraw(i).dst2
+            split(i) = gDraw(i).dst3
         Next
 
-        cv.Cv2.Merge(split, dst2)
+        cv.Cv2.Merge(split, dst3)
 
         For i = 0 To split.Count - 1
-            split(i) = If(gDraw(i).dst1.Channels = 1, gDraw(i).dst1, gDraw(i).dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            split(i) = If(gDraw(i).dst2.Channels = 1, gDraw(i).dst2, gDraw(i).dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         Next
-        cv.Cv2.Merge(split, dst1)
+        cv.Cv2.Merge(split, dst2)
 
         label2 = gDraw(2).label2
     End Sub
@@ -319,10 +319,10 @@ Public Class GeneticDrawing_Photo : Inherits VBparent
             If gDraw IsNot Nothing Then gDraw.Dispose()
             gDraw = New GeneticDrawing_Color()
 
-            If fullsizeImage.Width <> dst1.Width Or fullsizeImage.Height <> dst1.Height Then
-                Dim newSize = New cv.Size(dst1.Height * fullsizeImage.Width / fullsizeImage.Height, dst1.Height)
-                If newSize.Width > dst1.Width Then
-                    newSize = New cv.Size(dst1.Width, dst1.Width * fullsizeImage.Height / fullsizeImage.Width)
+            If fullsizeImage.Width <> dst2.Width Or fullsizeImage.Height <> dst2.Height Then
+                Dim newSize = New cv.Size(dst2.Height * fullsizeImage.Width / fullsizeImage.Height, dst2.Height)
+                If newSize.Width > dst2.Width Then
+                    newSize = New cv.Size(dst2.Width, dst2.Width * fullsizeImage.Height / fullsizeImage.Width)
                 End If
                 src.SetTo(0)
                 src(New cv.Rect(0, 0, newSize.Width, newSize.Height)) = fullsizeImage.Resize(newSize)
@@ -334,8 +334,8 @@ Public Class GeneticDrawing_Photo : Inherits VBparent
 
         gDraw.Run(src)
 
-        dst1 = gDraw.dst1
         dst2 = gDraw.dst2
+        dst3 = gDraw.dst3
         label1 = gDraw.label1
         label2 = gDraw.label2
     End Sub

@@ -13,11 +13,11 @@ Public Class Blob_Basics : Inherits VBparent
 
         If standalone Then
             input.Run(src)
-            dst1 = input.dst1
+            dst2 = input.dst2
         Else
-            dst1 = src
+            dst2 = src
         End If
-        blobDetector.Run(dst1, dst2, options.blobParams)
+        blobDetector.Run(dst2, dst3, options.blobParams)
     End Sub
 End Class
 
@@ -73,10 +73,10 @@ Public Class Blob_Options : Inherits VBparent
 
         If standalone Then
             blob.Run(src)
-            dst1 = blob.dst1
+            dst2 = blob.dst2
 
             ' The create method in SimpleBlobDetector is not available in VB.Net.  Not sure why.  To get around this, just use C# where create method works fine.
-            blobDetector.Run(dst1, dst2, blobParams)
+            blobDetector.Run(dst2, dst3, blobParams)
         End If
     End Sub
 End Class
@@ -107,19 +107,19 @@ Public Class Blob_Input : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         rectangles.Run(src)
-        Mats.mat(0) = rectangles.dst1
+        Mats.mat(0) = rectangles.dst2
 
         circles.Run(src)
-        Mats.mat(1) = circles.dst1
+        Mats.mat(1) = circles.dst2
 
         ellipses.Run(src)
-        Mats.mat(2) = ellipses.dst1
+        Mats.mat(2) = ellipses.dst2
 
         poly.Run(src)
-        Mats.mat(3) = poly.dst2
+        Mats.mat(3) = poly.dst3
         mats.Run(src)
-        dst1 = Mats.dst1
         dst2 = Mats.dst2
+        dst3 = Mats.dst3
     End Sub
 End Class
 
@@ -136,10 +136,10 @@ Public Class Blob_RenderBlobs : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod input.updateFrequency = 0 Then
             input.Run(src)
-            dst1 = input.dst1
-            Dim gray = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            dst2 = input.dst2
+            Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.Binary)
-            Dim labelView = dst1.EmptyClone
+            Dim labelView = dst2.EmptyClone
             Dim stats As New cv.Mat
             Dim centroids As New cv.Mat
             Dim cc = cv.Cv2.ConnectedComponentsEx(binary)
@@ -147,15 +147,15 @@ Public Class Blob_RenderBlobs : Inherits VBparent
             cc.RenderBlobs(labelView)
 
             For Each b In cc.Blobs.Skip(1)
-                dst1.Rectangle(b.Rect, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+                dst2.Rectangle(b.Rect, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
             Next
 
             Dim maxBlob = cc.GetLargestBlob()
-            dst2.SetTo(0)
-            cc.FilterByBlob(dst1, dst2, maxBlob)
+            dst3.SetTo(0)
+            cc.FilterByBlob(dst2, dst3, maxBlob)
 
-            dst2.Circle(maxBlob.Centroid, task.dotSize + 3, cv.Scalar.Blue, -1, task.lineType)
-            dst2.Circle(maxBlob.Centroid, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+            dst3.Circle(maxBlob.Centroid, task.dotSize + 3, cv.Scalar.Blue, -1, task.lineType)
+            dst3.Circle(maxBlob.Centroid, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         End If
     End Sub
 End Class
@@ -180,23 +180,23 @@ Public Class Blob_DepthPixelSampler : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         histBlobs.Run(task.noDepthMask)
-        dst1 = histBlobs.dst1
+        dst2 = histBlobs.dst2
         flood.initialMask = task.noDepthMask
-        flood.Run(histBlobs.dst2)
+        flood.Run(histBlobs.dst3)
 
-        Static lastFrame = flood.dst2
+        Static lastFrame = flood.dst3
         Static lastCount = flood.rects.Count
         If task.cameraStable = False Or task.frameCount = 0 Then
-            lastFrame = flood.dst2.Clone
-            dst2 = flood.dst2.Clone
+            lastFrame = flood.dst3.Clone
+            dst3 = flood.dst3.Clone
         Else
             For i = 0 To flood.rects.Count - 1
                 Dim rect = flood.rects(i)
                 Dim mask = flood.masks(i)(rect)
                 pixel.Run(lastFrame(rect).Clone.setTo(0, 255 - mask))
-                dst2(rect).SetTo(pixel.dominantGray, mask)
+                dst3(rect).SetTo(pixel.dominantGray, mask)
             Next
-            lastFrame = dst2.Clone
+            lastFrame = dst3.Clone
         End If
         label1 = CStr(histBlobs.valleys.ranges.Count) + " Depth Clusters"
     End Sub
@@ -220,7 +220,7 @@ Public Class Blob_DepthRanges : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         histBlobs.Run(src)
-        dst1 = histBlobs.dst1
+        dst2 = histBlobs.dst2
 
         ranges = New List(Of cv.Point)(histBlobs.valleys.ranges)
         Dim map = task.palette.gradientColorMap
@@ -228,15 +228,15 @@ Public Class Blob_DepthRanges : Inherits VBparent
         masks.Clear()
         maskSizes.Clear()
         Dim spread = 255 / ranges.Count
-        If grayOnly Then dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        If grayOnly Then dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         For i = 0 To ranges.Count - 1
             cv.Cv2.InRange(task.depth32f, ranges(i).X, ranges(i).Y, mask)
             Dim nextColor = If(grayOnly, i + 1, map.Get(Of cv.Vec3b)(0, (i + 1) * spread))
             masks.Add(mask.Clone)
             maskSizes.Add(mask.CountNonZero(), i)
-            dst2.SetTo(nextColor, mask)
+            dst3.SetTo(nextColor, mask)
         Next
-        dst2.SetTo(0, task.noDepthMask)
+        dst3.SetTo(0, task.noDepthMask)
 
         label1 = CStr(histBlobs.valleys.ranges.Count) + " Depth Clusters"
     End Sub
@@ -255,12 +255,12 @@ Public Class Blob_Largest : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         blobs.Run(src)
-        dst2 = blobs.dst2
+        dst3 = blobs.dst3
 
         If blobs.masks.Count > 0 Then
-            dst1.SetTo(0)
+            dst2.SetTo(0)
             Dim maskIndex = blobs.maskSizes.ElementAt(blobs.masks.Count - 1).Value
-            src.CopyTo(dst1, blobs.masks(maskIndex))
+            src.CopyTo(dst2, blobs.masks(maskIndex))
         End If
         label1 = "Show the largest blob of the " + CStr(blobs.masks.Count) + " blobs"
     End Sub

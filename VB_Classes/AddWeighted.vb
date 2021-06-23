@@ -2,13 +2,13 @@ Imports cv = OpenCvSharp
 Public Class AddWeighted_Basics : Inherits VBparent
     Public src2 As New cv.Mat
     Public Sub New()
-        src2 = New cv.Mat(dst1.Size, cv.MatType.CV_8UC3, 0)
+        src2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3, 0)
         task.desc = "Add 2 images with specified weights."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
         If standalone Then src2 = task.RGBDepth ' external use must provide src2!
         If src.Channels = src2.Channels And src.Type = src2.Type Then
-            cv.Cv2.AddWeighted(src, task.AddWeighted, src2, 1.0 - task.AddWeighted, 0, dst1)
+            cv.Cv2.AddWeighted(src, task.AddWeighted, src2, 1.0 - task.AddWeighted, 0, dst2)
         Else
             task.trueText("Unable to mix src and src2 - not the same number of channels or type...")
         End If
@@ -29,11 +29,11 @@ Public Class AddWeighted_Edges : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         edges.Run(src)
-        dst1 = edges.dst2
+        dst2 = edges.dst3
 
-        addw.src2 = edges.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        addw.src2 = edges.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         addw.Run(src)
-        dst2 = addw.dst1
+        dst3 = addw.dst2
     End Sub
 End Class
 
@@ -53,8 +53,8 @@ Public Class AddWeighted_ImageAccumulate : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static weightSlider = findSlider("Accumulation weight of each image X100")
-        dst1 = New cv.Mat(task.depth32f.Size, cv.MatType.CV_32F)
-        cv.Cv2.AccumulateWeighted(task.depth32f, dst1, weightSlider.value / 100, New cv.Mat)
+        dst2 = New cv.Mat(task.depth32f.Size, cv.MatType.CV_32F)
+        cv.Cv2.AccumulateWeighted(task.depth32f, dst2, weightSlider.value / 100, New cv.Mat)
     End Sub
 End Class
 
@@ -82,16 +82,16 @@ Public Class AddWeighted_InfraRed : Inherits VBparent
 
         Dim leftOrRight As String = "Right"
         If rightRadio.checked Then
-            addw.src2 = infra.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            addw.src2 = infra.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Else
-            addw.src2 = infra.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            addw.src2 = infra.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             leftOrRight = "Left"
         End If
         addw.Run(task.RGBDepth)
-        dst1 = addw.dst1.Clone
+        dst2 = addw.dst2.Clone
 
         addw.Run(src)
-        dst2 = addw.dst1
+        dst3 = addw.dst2
         label1 = "InfraRed " + leftOrRight + " " + Format(1 - task.AddWeighted, "#0%") + " Depth " + Format(task.AddWeighted, "#0%")
         label2 = "InfraRed " + leftOrRight + " " + Format(1 - task.AddWeighted, "#0%") + " RGB " + Format(task.AddWeighted, "#0%")
     End Sub

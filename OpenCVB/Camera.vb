@@ -4,7 +4,7 @@ Imports rs = Intel.RealSense
 Imports System.Runtime.InteropServices
 Module Palette_Custom_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Palette_Custom(img As IntPtr, map As IntPtr, dst1 As IntPtr, rows As Integer, cols As Integer, channels As Integer)
+    Public Sub Palette_Custom(img As IntPtr, map As IntPtr, dst2 As IntPtr, rows As Integer, cols As Integer, channels As Integer)
     End Sub
     Public Function Palette_Custom_Apply(src As cv.Mat, customColorMap As cv.Mat) As cv.Mat
         ' the VB.Net interface to OpenCV doesn't support adding a random lookup table to ApplyColorMap API.  It is available in C++ though.

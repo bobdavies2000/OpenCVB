@@ -104,8 +104,8 @@ Public Class Plane_Detect : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)
 
-        dst2.SetTo(0)
-        task.RGBDepth.CopyTo(dst1)
+        dst3.SetTo(0)
+        task.RGBDepth.CopyTo(dst2)
 
         Parallel.ForEach(grid.roiList,
         Sub(roi)
@@ -140,7 +140,7 @@ Public Class Plane_Detect : Inherits VBparent
                 Dim p2 = contours(maxIndex)(k + stepj)
                 worldDepth.Add(getWorldCoordinates(New cv.Point3f(roi.X + p1.X, roi.Y + p1.Y, depthROI.Get(Of Single)(p1.Y, p1.X))))
                 worldDepth.Add(getWorldCoordinates(New cv.Point3f(roi.X + p2.X, roi.Y + p2.Y, depthROI.Get(Of Single)(p2.Y, p2.X))))
-                dst1(roi).Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType) ' show the line connecting the 2 points used to create the normal
+                dst2(roi).Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType) ' show the line connecting the 2 points used to create the normal
             Next
 
             ' compute plane equation from the worlddepth points.
@@ -149,10 +149,10 @@ Public Class Plane_Detect : Inherits VBparent
 
             Dim showNormal As New cv.Mat(roi.Height, roi.Width, cv.MatType.CV_8UC3)
             showNormal.SetTo(New cv.Scalar(Math.Abs(255 * plane.Item0), Math.Abs(255 * plane.Item1), Math.Abs(255 * plane.Item2)))
-            cv.Cv2.AddWeighted(src(roi), 0.5, showNormal, 0.5, 0, dst2(roi))
+            cv.Cv2.AddWeighted(src(roi), 0.5, showNormal, 0.5, 0, dst3(roi))
         End Sub)
         Dim mask = grid.gridMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cv.Cv2.BitwiseOr(dst1, mask, dst1)
+        cv.Cv2.BitwiseOr(dst2, mask, dst2)
     End Sub
 End Class
 
@@ -171,8 +171,8 @@ Public Class Plane_DetectDebug : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)
 
-        dst2.SetTo(0)
-        task.RGBDepth.CopyTo(dst1)
+        dst3.SetTo(0)
+        task.RGBDepth.CopyTo(dst2)
 
         Parallel.ForEach(grid.roiList,
         Sub(roi)
@@ -207,7 +207,7 @@ Public Class Plane_DetectDebug : Inherits VBparent
                 Dim p2 = contours(maxIndex)(k + stepj)
                 worldDepth.Add(getWorldCoordinates(New cv.Point3f(roi.X + p1.X, roi.Y + p1.Y, depthROI.Get(Of Single)(p1.Y, p1.X))))
                 worldDepth.Add(getWorldCoordinates(New cv.Point3f(roi.X + p2.X, roi.Y + p2.Y, depthROI.Get(Of Single)(p2.Y, p2.X))))
-                dst1(roi).Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType) ' show the line connecting the 2 points used to create the normal
+                dst2(roi).Line(p1, p2, cv.Scalar.White, task.lineWidth, task.lineType) ' show the line connecting the 2 points used to create the normal
             Next
 
             ' compute plane equation from the worlddepth points.
@@ -216,10 +216,10 @@ Public Class Plane_DetectDebug : Inherits VBparent
 
             Dim showNormal As New cv.Mat(roi.Height, roi.Width, cv.MatType.CV_8UC3)
             showNormal.SetTo(New cv.Scalar(Math.Abs(255 * plane.Item0), Math.Abs(255 * plane.Item1), Math.Abs(255 * plane.Item2)))
-            cv.Cv2.AddWeighted(src(roi), 0.5, showNormal, 0.5, 0, dst2(roi))
+            cv.Cv2.AddWeighted(src(roi), 0.5, showNormal, 0.5, 0, dst3(roi))
         End Sub)
         Dim mask = grid.gridMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        cv.Cv2.BitwiseOr(dst1, mask, dst1)
+        cv.Cv2.BitwiseOr(dst2, mask, dst2)
     End Sub
 End Class
 

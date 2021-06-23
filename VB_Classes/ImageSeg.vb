@@ -14,7 +14,7 @@ Public Class ImageSeg_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         flood.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        dst1 = flood.dst2
+        dst2 = flood.dst3
 
         maskSizes = New SortedList(Of Integer, Integer)(flood.maskSizes)
         rects = New List(Of cv.Rect)(flood.rects)
@@ -23,11 +23,11 @@ Public Class ImageSeg_Basics : Inherits VBparent
         floodPoints = New List(Of cv.Point)(flood.floodPoints)
 
         addw.src2 = src
-        addw.Run(dst1)
-        dst2 = addw.dst1
+        addw.Run(dst2)
+        dst3 = addw.dst2
 
         For Each pt In floodPoints
-            dst1.Circle(pt, task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
+            dst2.Circle(pt, task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
         Next
 
         label2 = addw.label1.Replace("depth", "ImageSeg")
@@ -48,14 +48,14 @@ Public Class ImageSeg_InRange : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
         iSeg.Run(src)
-        dst1 = iSeg.dst2
+        dst2 = iSeg.dst3
 
         For i = 0 To iSeg.maskSizes.Count - 1
             Dim mask = iSeg.masks(i)
             Dim r = iSeg.rects(i)
             Dim meanDepth = task.depth32f(r).Mean(mask)
-            If meanDepth.Val0 >= task.maxDepth Then dst1(r).SetTo(0, mask)
-            If meanDepth.Val0 <= task.minDepth Then dst1(r).SetTo(0, mask)
+            If meanDepth.Val0 >= task.maxDepth Then dst2(r).SetTo(0, mask)
+            If meanDepth.Val0 <= task.minDepth Then dst2(r).SetTo(0, mask)
         Next
     End Sub
 End Class
@@ -90,9 +90,9 @@ Public Class ImageSeg_MissingSegments : Inherits VBparent
         End If
 
         flood.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        dst1 = flood.dst2
+        dst2 = flood.dst3
 
-        dst2 = flood.missingSegments
+        dst3 = flood.missingSegments
         Dim tmp As New cv.Mat
         flood.missingSegments.ConvertTo(tmp, cv.MatType.CV_32SC1)
         Dim contours0 = cv.Cv2.FindContoursAsArray(tmp, cv.RetrievalModes.FloodFill, cv.ContourApproximationModes.ApproxSimple)
@@ -102,7 +102,7 @@ Public Class ImageSeg_MissingSegments : Inherits VBparent
 
             If nextContour.Length >= maxLen Then contours.Add(nextContour)
         Next
-        cv.Cv2.DrawContours(dst2, contours.ToArray, -1, 128, -1, task.lineType)
+        cv.Cv2.DrawContours(dst3, contours.ToArray, -1, 128, -1, task.lineType)
         label2 = CStr(contours.Count) + " contours were found "
     End Sub
 End Class
@@ -128,19 +128,19 @@ Public Class ImageSeg_Unstable : Inherits VBparent
         Dim refreshCount = segSlider.value
 
         iSeg.Run(src)
-        dst1 = iSeg.dst1
+        dst2 = iSeg.dst2
 
-        Dim tmp = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim tmp = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static previousFrame = tmp
 
         If task.frameCount Mod refreshCount = 0 Then previousFrame = tmp
         If previousFrame.channels <> 1 Then previousFrame = previousFrame.cvtcolor(cv.ColorConversionCodes.BGR2GRAY)
-        cv.Cv2.Min(tmp, previousFrame, dst2)
-        previousFrame = dst2
+        cv.Cv2.Min(tmp, previousFrame, dst3)
+        previousFrame = dst3
 
-        task.palette.Run(dst2)
-        dst2 = task.palette.dst1
-        dst2.SetTo(0, iSeg.flood.mats.mat(1))
+        task.palette.Run(dst3)
+        dst3 = task.palette.dst2
+        dst3.SetTo(0, iSeg.flood.mats.mat(1))
     End Sub
 End Class
 
@@ -162,23 +162,23 @@ Public Class ImageSeg_CentroidTracker : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
         iSeg.Run(src)
-        dst1 = iSeg.dst1
+        dst2 = iSeg.dst2
 
-        Dim tmp = If(iSeg.flood.dst1.Channels = 3, iSeg.flood.dst1, iSeg.flood.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+        Dim tmp = If(iSeg.flood.dst2.Channels = 3, iSeg.flood.dst2, iSeg.flood.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
         pTrack.queryPoints = New List(Of cv.Point2f)(iSeg.centroids)
         pTrack.queryRects = New List(Of cv.Rect)(iSeg.rects)
         pTrack.queryMasks = New List(Of cv.Mat)(iSeg.masks)
         pTrack.floodPoints = New List(Of cv.Point)(iSeg.floodPoints)
         pTrack.Run(tmp)
-        dst2 = dst1.Clone
+        dst3 = dst2.Clone
         For Each vo In pTrack.drawRC.viewObjects
-            dst2.Circle(vo.Value.centroid, task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
-            dst2.Circle(vo.Value.centroid, task.dotSize, cv.Scalar.Blue, -1, task.lineType)
-            dst2.Line(vo.Value.floodPoint, vo.Value.centroid, cv.Scalar.White, task.lineWidth, task.lineType)
+            dst3.Circle(vo.Value.centroid, task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
+            dst3.Circle(vo.Value.centroid, task.dotSize, cv.Scalar.Blue, -1, task.lineType)
+            dst3.Line(vo.Value.floodPoint, vo.Value.centroid, cv.Scalar.White, task.lineWidth, task.lineType)
         Next
 
         For Each pt In pTrack.floodPoints
-            dst2.Circle(pt, task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
+            dst3.Circle(pt, task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
         Next
         label2 = "Centroid " + CStr(pTrack.drawRC.viewObjects.Count) + " blue, floodPoint " + CStr(pTrack.floodPoints.Count) + " yellow"
     End Sub

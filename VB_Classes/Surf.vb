@@ -27,8 +27,8 @@ Public Class Surf_Basics : Inherits VBparent
         Dim doubleSize As New cv.Mat
         CS_SurfBasics.Run(srcLeft, srcRight, doubleSize, sliders.trackbar(0).Value, radio.check(0).Checked)
 
-        doubleSize(New cv.Rect(0, 0, src.Width, src.Height)).CopyTo(dst1)
-        doubleSize(New cv.Rect(src.Width, 0, src.Width, src.Height)).CopyTo(dst2)
+        doubleSize(New cv.Rect(0, 0, src.Width, src.Height)).CopyTo(dst2)
+        doubleSize(New cv.Rect(src.Width, 0, src.Width, src.Height)).CopyTo(dst3)
         label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
         If CS_SurfBasics.keypoints1 IsNot Nothing Then label1 += " " + CStr(CS_SurfBasics.keypoints1.Count)
     End Sub
@@ -48,8 +48,8 @@ Public Class Surf_BasicsVB : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         surf.Run(src)
-        dst1 = surf.dst1
         dst2 = surf.dst2
+        dst3 = surf.dst3
     End Sub
 End Class
 
@@ -70,13 +70,13 @@ Public Class Surf_DrawMatchManual_CS : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         surf.Run(src)
-        dst1 = surf.srcLeft.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        dst2 = surf.srcRight.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = surf.srcLeft.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = surf.srcRight.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim keys1 = surf.CS_SurfBasics.keypoints1
         Dim keys2 = surf.CS_SurfBasics.keypoints2
 
         For i = 0 To keys1.Count - 1
-            dst1.Circle(keys1(i).Pt, task.dotSize + 3, cv.Scalar.Red, -1, task.lineType)
+            dst2.Circle(keys1(i).Pt, task.dotSize + 3, cv.Scalar.Red, -1, task.lineType)
         Next
 
         Dim matchCount As Integer
@@ -84,7 +84,7 @@ Public Class Surf_DrawMatchManual_CS : Inherits VBparent
             Dim pt = keys1(i).Pt
             For j = 0 To keys2.Count - 1
                 If Math.Abs(keys2(j).Pt.X - pt.X) < sliders.trackbar(0).Value And Math.Abs(keys2(j).Pt.Y - pt.Y) < sliders.trackbar(0).Value Then
-                    dst2.Circle(keys2(j).Pt, task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
+                    dst3.Circle(keys2(j).Pt, task.dotSize + 3, cv.Scalar.Yellow, -1, task.lineType)
                     keys2(j).Pt.Y = -1 ' so we don't match it again.
                     matchCount += 1
                 End If
@@ -93,7 +93,7 @@ Public Class Surf_DrawMatchManual_CS : Inherits VBparent
         ' mark those that were not
         For i = 0 To keys2.Count - 1
             Dim pt = keys2(i).Pt
-            If pt.Y <> -1 Then dst2.Circle(keys2(i).Pt, task.dotSize + 3, cv.Scalar.Red, -1, task.lineType)
+            If pt.Y <> -1 Then dst3.Circle(keys2(i).Pt, task.dotSize + 3, cv.Scalar.Red, -1, task.lineType)
         Next
         label2 = "Yellow matched left to right = " + CStr(matchCount) + ". Red is unmatched."
     End Sub

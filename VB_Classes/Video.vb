@@ -46,7 +46,7 @@ Public Class Video_Basics : Inherits VBparent
         End If
 
         fileNameForm.TrackBar1.Value = 10000 * captureVideo.PosFrames / captureVideo.FrameCount
-        If image.Empty() = False Then dst1 = image.Resize(src.Size())
+        If image.Empty() = False Then dst2 = image.Resize(src.Size())
     End Sub
 End Class
 
@@ -65,16 +65,16 @@ Public Class Video_CarCounting : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         video.Run(src)
-        If video.dst1.Empty() = False And video.image.Empty() = False Then
-            dst1.SetTo(0)
+        If video.dst2.Empty() = False And video.image.Empty() = False Then
+            dst2.SetTo(0)
             bgSub.Run(video.image)
-            Dim videoImage = bgSub.dst1
-            dst2 = video.dst1
+            Dim videoImage = bgSub.dst2
+            dst3 = video.dst2
 
             ' there are 5 lanes of traffic so setup 5 regions
             ' NOTE: if long shadows are present this approach will not work without provision for the width of a car.  Needs more sample data.
             Dim activeHeight = 30
-            Dim finishLine = bgSub.dst1.Height - activeHeight * 8
+            Dim finishLine = bgSub.dst2.Height - activeHeight * 8
             Static activeState(5) As Boolean
             Static carCount As Integer
             For i = 1 To activeState.Length - 1
@@ -83,20 +83,20 @@ Public Class Video_CarCounting : Inherits VBparent
                 If cellCount Then
                     activeState(i) = True
                     videoImage.Rectangle(lane, cv.Scalar.Red, -1)
-                    dst2.Rectangle(lane, cv.Scalar.Red, -1)
+                    dst3.Rectangle(lane, cv.Scalar.Red, -1)
                 End If
                 If cellCount = 0 And activeState(i) = True Then
                     activeState(i) = False
                     carCount += 1
                 End If
-                dst2.Rectangle(lane, cv.Scalar.White, 2)
+                dst3.Rectangle(lane, cv.Scalar.White, 2)
             Next
 
             Dim tmp = videoImage.Resize(src.Size())
-            If tmp.Channels <> dst1.Channels Then tmp = tmp.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            If tmp.Channels <> dst2.Channels Then tmp = tmp.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             flow.msgs.Add("  Cars " + CStr(carCount))
             flow.Run(Nothing)
-            cv.Cv2.BitwiseOr(dst1, tmp, dst1)
+            cv.Cv2.BitwiseOr(dst2, tmp, dst2)
         End If
     End Sub
 End Class
@@ -114,11 +114,11 @@ Public Class Video_CarCComp : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         video.Run(src)
-        If video.dst1.Empty() = False Then
-            bgSub.Run(video.dst1)
-            cc.Run(bgSub.dst1)
-            dst1 = cc.dst2
-            dst2 = cc.dst1
+        If video.dst2.Empty() = False Then
+            bgSub.Run(video.dst2)
+            cc.Run(bgSub.dst2)
+            dst2 = cc.dst3
+            dst3 = cc.dst2
         End If
     End Sub
 End Class
@@ -133,23 +133,23 @@ Public Class Video_MinRect : Inherits VBparent
     Public contours As cv.Point()()
     Public Sub New()
         video.srcVideo = task.parms.homeDir + "Data/CarsDrivingUnderBridge.mp4"
-        video.Run(dst1)
+        video.Run(dst2)
         task.desc = "Find area of car outline - example of using minAreaRect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         video.Run(src)
-        If video.dst1.Empty() = False Then
-            bgSub.Run(video.dst1)
+        If video.dst2.Empty() = False Then
+            bgSub.Run(video.dst2)
 
-            contours = cv.Cv2.FindContoursAsArray(bgSub.dst1, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
-            dst1 = bgSub.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            contours = cv.Cv2.FindContoursAsArray(bgSub.dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
+            dst2 = bgSub.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             If standalone Or task.intermediateName = caller Then
                 For i = 0 To contours.Length - 1
                     Dim minRect = cv.Cv2.MinAreaRect(contours(i))
-                    drawRotatedRectangle(minRect, dst1, cv.Scalar.Red)
+                    drawRotatedRectangle(minRect, dst2, cv.Scalar.Red)
                 Next
             End If
-            dst2 = video.dst1
+            dst3 = video.dst2
         End If
     End Sub
 End Class
@@ -165,15 +165,15 @@ Public Class Video_MinCircle : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         video.Run(src)
-        dst1 = video.dst1
         dst2 = video.dst2
+        dst3 = video.dst3
 
         Dim center As New cv.Point2f
         Dim radius As Single
         If video.contours IsNot Nothing Then
             For i = 0 To video.contours.Length - 1
                 cv.Cv2.MinEnclosingCircle(video.contours(i), center, radius)
-                dst1.Circle(center, radius, cv.Scalar.White, task.lineWidth, task.lineType)
+                dst2.Circle(center, radius, cv.Scalar.White, task.lineWidth, task.lineType)
             Next
         End If
     End Sub

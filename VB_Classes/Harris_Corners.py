@@ -16,11 +16,11 @@ def cornerHarris_demo(val):
     k = 0.04
 
     # Detecting corners
-    dst1 = cv.cornerHarris(src_gray, blockSize, apertureSize, k)
+    dst2 = cv.cornerHarris(src_gray, blockSize, apertureSize, k)
 
     # Normalizing
-    dst_norm = np.empty(dst1.shape, dtype=np.float32)
-    cv.normalize(dst1, dst_norm, alpha=0, beta=255, norm_type=cv.NORM_MINMAX)
+    dst_norm = np.empty(dst2.shape, dtype=np.float32)
+    cv.normalize(dst2, dst_norm, alpha=0, beta=255, norm_type=cv.NORM_MINMAX)
     dst_norm_scaled = cv.convertScaleAbs(dst_norm)
 
     # Drawing a circle around corners

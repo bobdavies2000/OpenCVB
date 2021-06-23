@@ -13,11 +13,11 @@ Public Class PhotoShop_Clahe : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst1 = src
+        dst2 = src
         Dim claheObj = cv.Cv2.CreateCLAHE()
         claheObj.TilesGridSize() = New cv.Size(sliders.trackbar(0).Value, sliders.trackbar(1).Value)
         claheObj.ClipLimit = sliders.trackbar(0).Value
-        claheObj.Apply(src, dst2)
+        claheObj.Apply(src, dst3)
     End Sub
 End Class
 
@@ -35,8 +35,8 @@ Public Class PhotoShop_Hue : Inherits VBparent
         cv.Cv2.CvtColor(src, imghsv, cv.ColorConversionCodes.RGB2HSV)
         Dim hsv_planes = imghsv.Split()
 
-        cv.Cv2.CvtColor(hsv_planes(0), dst1, cv.ColorConversionCodes.GRAY2BGR)
-        cv.Cv2.CvtColor(hsv_planes(1), dst2, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(hsv_planes(0), dst2, cv.ColorConversionCodes.GRAY2BGR)
+        cv.Cv2.CvtColor(hsv_planes(1), dst3, cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -54,7 +54,7 @@ Public Class PhotoShop_AlphaBeta : Inherits VBparent
         End If
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dst1 = src.ConvertScaleAbs(sliders.trackbar(0).Value / 500, sliders.trackbar(1).Value)
+        dst2 = src.ConvertScaleAbs(sliders.trackbar(0).Value / 500, sliders.trackbar(1).Value)
     End Sub
 End Class
 
@@ -81,7 +81,7 @@ Public Class PhotoShop_Gamma : Inherits VBparent
                 lookupTable(i) = Math.Pow(i / 255, sliders.trackbar(0).Value / 100) * 255
             Next
         End If
-        dst1 = src.LUT(lookupTable)
+        dst2 = src.LUT(lookupTable)
     End Sub
 End Class
 
@@ -127,10 +127,10 @@ Public Class PhotoShop_WhiteBalance_CPP : Inherits VBparent
         Dim rgbPtr = WhiteBalance_Run(wPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, thresholdVal)
         handleSrc.Free()
 
-        dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, rgbPtr) ' no need to copy.  rgbPtr points to C++ data, not managed.
-        Dim diff = dst1 - src
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, rgbPtr) ' no need to copy.  rgbPtr points to C++ data, not managed.
+        Dim diff = dst2 - src
         diff = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
+        dst3 = diff.ToMat().Threshold(1, 255, cv.ThresholdTypes.Binary)
     End Sub
     Public Sub Close()
         WhiteBalance_Close(wPtr)
@@ -165,7 +165,7 @@ Public Class PhotoShop_WhiteBalance : Inherits VBparent
         sum32f = planes(0) + planes(1) + planes(2)
         src = sum32f
         hist.Run(src)
-        dst2 = hist.dst1
+        dst3 = hist.dst2
 
         Dim sum As Single
         Dim threshold As Integer
@@ -186,7 +186,7 @@ Public Class PhotoShop_WhiteBalance : Inherits VBparent
         Next
 
         cv.Cv2.Merge(planes, rgb32f)
-        rgb32f.ConvertTo(dst1, cv.MatType.CV_8UC3)
+        rgb32f.ConvertTo(dst2, cv.MatType.CV_8UC3)
     End Sub
     Public Sub Close()
         WhiteBalance_Close(wPtr)
@@ -216,17 +216,17 @@ Public Class PhotoShop_ChangeMask : Inherits VBparent
 
         If whiteFlag Then
             white.Run(src)
-            dst1 = white.dst1
+            dst2 = white.dst2
             label1 = "White balanced image - VB version"
             label2 = "Mask of changed pixels - VB version"
         Else
             whiteCPP.Run(src)
-            dst1 = whiteCPP.dst1
+            dst2 = whiteCPP.dst2
             label1 = "White balanced image - C++ version"
             label2 = "Mask of changed pixels - C++ version"
         End If
-        Dim diff = dst1 - src
-        dst2 = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
+        Dim diff = dst2 - src
+        dst3 = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
 
@@ -245,17 +245,17 @@ Public Class PhotoShop_PlotHist : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         hist1.Run(src)
-        mat2to1.mat(0) = hist1.dst1
+        mat2to1.mat(0) = hist1.dst2
 
         white.Run(src)
-        dst1 = white.dst1
+        dst2 = white.dst2
         label1 = white.label1
 
-        hist2.Run(dst1)
-        mat2to1.mat(1) = hist2.dst1
+        hist2.Run(dst2)
+        mat2to1.mat(1) = hist2.dst2
 
         mat2to1.Run(src)
-        dst2 = mat2to1.dst1
+        dst3 = mat2to1.dst2
         label2 = "The top is before white balance"
     End Sub
 End Class
@@ -273,9 +273,9 @@ Public Class PhotoShop_Sepia : Inherits VBparent
         task.desc = "Create a sepia image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2RGB)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2RGB)
         Dim tMatrix = New cv.Mat(3, 3, cv.MatType.CV_64F, {{0.393, 0.769, 0.189}, {0.349, 0.686, 0.168}, {0.272, 0.534, 0.131}})
-        dst1 = dst1.Transform(tMatrix).Threshold(255, 255, cv.ThresholdTypes.Trunc)
+        dst2 = dst2.Transform(tMatrix).Threshold(255, 255, cv.ThresholdTypes.Trunc)
     End Sub
 End Class
 
@@ -302,7 +302,7 @@ Public Class PhotoShop_Emboss : Inherits VBparent
             radio.check(0).Checked = True
         End If
 
-        gray128 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 128)
+        gray128 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 128)
         label2 = "Embossed output"
         task.desc = "Use the video stream to make it appear like an embossed paper image."
     End Sub
@@ -325,7 +325,7 @@ Public Class PhotoShop_Emboss : Inherits VBparent
             If frm.check(direction).Checked Then Exit For
         Next
 
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         Select Case direction
             Case 0 ' do nothing!
@@ -337,8 +337,8 @@ Public Class PhotoShop_Emboss : Inherits VBparent
                 cv.Cv2.Flip(kernel, kernel, cv.FlipMode.XY)
         End Select
 
-        dst2 = dst1.Filter2D(-1, kernel)
-        cv.Cv2.Add(dst2, gray128, dst2)
+        dst3 = dst2.Filter2D(-1, kernel)
+        cv.Cv2.Add(dst3, gray128, dst3)
     End Sub
 End Class
 
@@ -367,33 +367,33 @@ Public Class PhotoShop_EmbossAll : Inherits VBparent
         Static threshSlider = findSlider("Emboss threshold")
         Dim kernel = emboss.kernelGenerator(sizeSlider.Value)
 
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = dst1.Filter2D(-1, kernel)
-        cv.Cv2.Add(dst2, emboss.gray128, mats.mat(0))
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst3 = dst2.Filter2D(-1, kernel)
+        cv.Cv2.Add(dst3, emboss.gray128, mats.mat(0))
         mats.mat(0) = mats.mat(0).Threshold(threshSlider.value, 255, cv.ThresholdTypes.Binary)
 
         cv.Cv2.Flip(kernel, kernel, cv.FlipMode.Y)
-        dst2 = dst1.Filter2D(-1, kernel)
-        cv.Cv2.Add(dst2, emboss.gray128, mats.mat(1))
+        dst3 = dst2.Filter2D(-1, kernel)
+        cv.Cv2.Add(dst3, emboss.gray128, mats.mat(1))
         mats.mat(1) = mats.mat(1).Threshold(threshSlider.value, 255, cv.ThresholdTypes.Binary)
 
         cv.Cv2.Flip(kernel, kernel, cv.FlipMode.X)
-        dst2 = dst1.Filter2D(-1, kernel)
-        cv.Cv2.Add(dst2, emboss.gray128, mats.mat(2))
+        dst3 = dst2.Filter2D(-1, kernel)
+        cv.Cv2.Add(dst3, emboss.gray128, mats.mat(2))
         mats.mat(2) = mats.mat(2).Threshold(threshSlider.value, 255, cv.ThresholdTypes.Binary)
 
         cv.Cv2.Flip(kernel, kernel, cv.FlipMode.XY)
-        dst2 = dst1.Filter2D(-1, kernel)
-        cv.Cv2.Add(dst2, emboss.gray128, mats.mat(3))
+        dst3 = dst2.Filter2D(-1, kernel)
+        cv.Cv2.Add(dst3, emboss.gray128, mats.mat(3))
         mats.mat(3) = mats.mat(3).Threshold(threshSlider.value, 255, cv.ThresholdTypes.Binary)
 
-        dst1.SetTo(0)
+        dst2.SetTo(0)
         For i = 0 To mats.mat.Count - 1
-            cv.Cv2.BitwiseOr(mats.mat(i), dst1, dst1)
+            cv.Cv2.BitwiseOr(mats.mat(i), dst2, dst2)
         Next
 
         mats.Run(src)
-        dst2 = mats.dst1
+        dst3 = mats.dst2
     End Sub
 End Class
 
@@ -465,7 +465,7 @@ Public Class PhotoShop_DuoTone : Inherits VBparent
             End If
         Next
 
-        cv.Cv2.Merge(split, dst1)
+        cv.Cv2.Merge(split, dst2)
     End Sub
 End Class
 
@@ -489,9 +489,9 @@ Public Class PhotoShop_Brightness : Inherits VBparent
         Static brightnessSlider = findSlider("Brightness Value")
         Dim brightness As Single = brightnessSlider.value / 100
 
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         Dim hsv64 As New cv.Mat
-        dst1.ConvertTo(hsv64, cv.MatType.CV_64F)
+        dst2.ConvertTo(hsv64, cv.MatType.CV_64F)
         Dim split = hsv64.Split()
 
         split(1) *= brightness
@@ -501,8 +501,8 @@ Public Class PhotoShop_Brightness : Inherits VBparent
         split(2) = split(2).Threshold(255, 255, cv.ThresholdTypes.Trunc)
 
         cv.Cv2.Merge(split, hsv64)
-        hsv64.ConvertTo(dst2, cv.MatType.CV_8UC3)
-        dst2 = dst2.CvtColor(cv.ColorConversionCodes.HSV2BGR)
+        hsv64.ConvertTo(dst3, cv.MatType.CV_8UC3)
+        dst3 = dst3.CvtColor(cv.ColorConversionCodes.HSV2BGR)
         label2 = "Brightness level = " + CStr(brightnessSlider.value)
     End Sub
 End Class
@@ -526,13 +526,13 @@ Public Class PhotoShop_UnsharpMask : Inherits VBparent
         Dim sigma As Double = sliders.trackbar(0).Value / 100
         Dim threshold As Double = sliders.trackbar(1).Value
         Dim amount As Double = sliders.trackbar(2).Value / 1000
-        cv.Cv2.GaussianBlur(src, dst2, New cv.Size(), sigma, sigma)
+        cv.Cv2.GaussianBlur(src, dst3, New cv.Size(), sigma, sigma)
 
         Dim diff As New cv.Mat
-        cv.Cv2.Absdiff(src, dst2, diff)
+        cv.Cv2.Absdiff(src, dst3, diff)
         diff = diff.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
-        dst1 = src * (1 + amount) + diff * (-amount)
-        diff.CopyTo(dst2)
+        dst2 = src * (1 + amount) + diff * (-amount)
+        diff.CopyTo(dst3)
     End Sub
 End Class
 
@@ -553,7 +553,7 @@ Public Class PhotoShop_SharpenDetail : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
-        cv.Cv2.DetailEnhance(src, dst1, sigma_s, sigma_r)
+        cv.Cv2.DetailEnhance(src, dst2, sigma_s, sigma_r)
     End Sub
 End Class
 
@@ -575,7 +575,7 @@ Public Class PhotoShop_SharpenStylize : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
-        cv.Cv2.Stylization(src, dst1, sigma_s, sigma_r)
+        cv.Cv2.Stylization(src, dst2, sigma_s, sigma_r)
     End Sub
 End Class
 
@@ -600,7 +600,7 @@ Public Class PhotoShop_Pencil_Basics : Inherits VBparent
         Dim sigma_s = sliders.trackbar(0).Value
         Dim sigma_r = sliders.trackbar(1).Value / sliders.trackbar(1).Maximum
         Dim shadowFactor = sliders.trackbar(2).Value / 1000
-        cv.Cv2.PencilSketch(src, dst2, dst1, sigma_s, sigma_r, shadowFactor)
+        cv.Cv2.PencilSketch(src, dst3, dst2, sigma_s, sigma_r, shadowFactor)
     End Sub
 End Class
 
@@ -632,7 +632,7 @@ Public Class PhotoShop_Pencil_Manual : Inherits VBparent
         Dim ksize As Integer = kernelSlider.Value
         If ksize Mod 2 = 0 Then ksize += 1
         Dim blur = grayinv.Blur(New cv.Size(ksize, ksize), New cv.Point(ksize / 2, ksize / 2))
-        cv.Cv2.Divide(src, 255 - blur, dst1, 256)
+        cv.Cv2.Divide(src, 255 - blur, dst2, 256)
 
         Dim index As Integer = -1
         Static frm = findfrm(caller + " Radio Options")
@@ -640,7 +640,7 @@ Public Class PhotoShop_Pencil_Manual : Inherits VBparent
             If radio.check(index).Checked Then Exit For
         Next
         label2 = "Intermediate result: " + Choose(index + 1, "grayscale image", "grayscale inverted image", "blur image")
-        dst2 = Choose(index + 1, src, grayinv, blur)
+        dst3 = Choose(index + 1, src, grayinv, blur)
     End Sub
 End Class
 

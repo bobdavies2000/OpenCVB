@@ -40,8 +40,8 @@ Public Class Voxels_Basics_MT : Inherits VBparent
         End Sub)
         voxelMat = New cv.Mat(voxels.Length, 1, cv.MatType.CV_32F)
         If check.Box(0).Checked Then
-            dst1 = task.RGBDepth.Clone()
-            dst1.SetTo(cv.Scalar.White, grid.gridMask)
+            dst2 = task.RGBDepth.Clone()
+            dst2.SetTo(cv.Scalar.White, grid.gridMask)
             Dim nearColor = cv.Scalar.Yellow
             Dim farColor = cv.Scalar.Blue
             Dim img = New cv.Mat(split(2).Size, cv.MatType.CV_8UC3, 0)
@@ -57,7 +57,7 @@ Public Class Voxels_Basics_MT : Inherits VBparent
                         img(roi).SetTo(color, depthMask(roi))
                     End If
                 End Sub)
-            dst2 = img.Resize(dst1.Size)
+            dst3 = img.Resize(dst2.Size)
         End If
         voxelMat *= 255 / (task.maxDepth - task.minDepth) ' do the normalize manually to use the min and max Depth (more stable image)
     End Sub

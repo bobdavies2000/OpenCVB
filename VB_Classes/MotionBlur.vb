@@ -23,10 +23,10 @@ Public Class MotionBlur_Basics : Inherits VBparent
         Dim pt1 = New cv.Point(0, (kernelSize - 1) / 2)
         Dim pt2 = New cv.Point(kernelSize * Math.Cos(theta) + pt1.X, kernelSize * Math.Sin(theta) + pt1.Y)
         kernel.Line(pt1, pt2, New cv.Scalar(1 / kernelSize))
-        dst1 = src.Filter2D(-1, kernel)
+        dst2 = src.Filter2D(-1, kernel)
         pt1 += New cv.Point(src.Width / 2, src.Height / 2)
         pt2 += New cv.Point(src.Width / 2, src.Height / 2)
-        If showDirection Then dst1.Line(pt1, pt2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
+        If showDirection Then dst2.Line(pt1, pt2, cv.Scalar.Yellow, task.lineWidth + 3, task.lineType)
     End Sub
 End Class
 
@@ -139,7 +139,7 @@ Public Class MotionBlur_Deblur : Inherits VBparent
         Else
             mblur.Run(src) ' the motion blurred image is in result1
         End If
-        dst1 = mblur.dst1
+        dst2 = mblur.dst2
 
         Dim len = sliders.trackbar(0).Value
         Dim theta = sliders.trackbar(1).Value / (180 / Math.PI)
@@ -154,14 +154,14 @@ Public Class MotionBlur_Deblur : Inherits VBparent
         Dim h = calcPSF(roi.Size(), len, theta)
         Dim hW = calcWeinerFilter(h, 1.0 / SNR)
 
-        Dim gray8u = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray8u = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim imgIn As New cv.Mat
         gray8u.ConvertTo(imgIn, cv.MatType.CV_32F)
         imgIn = edgeTaper(imgIn, gamma, beta)
 
         Dim imgOut = filter2DFreq(imgIn(roi), hW)
-        imgOut.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst2.Normalize(0, 255, cv.NormTypes.MinMax)
+        imgOut.ConvertTo(dst3, cv.MatType.CV_8U)
+        dst3.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
 End Class
 

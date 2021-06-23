@@ -373,13 +373,13 @@ Public Class ActiveTask : Implements IDisposable
         task.intermediateObject = Nothing
         For Each obj In task.activeObjects
             If obj.caller = task.intermediateName Then
-                Dim tmp = obj.dst1
+                Dim tmp = obj.dst2
                 ' there may be several instances of an algorithmobject.  This will find one that is actually active.
-                If obj.dst1.channels = 3 Then tmp = obj.dst1.cvtcolor(cv.ColorConversionCodes.BGR2GRAY)
+                If obj.dst2.channels = 3 Then tmp = obj.dst2.cvtcolor(cv.ColorConversionCodes.BGR2GRAY)
                 task.intermediateObject = obj
                 If tmp.CountNonZero() > 0 Then
                     task.intermediateActive = True
-                    Exit For ' if this dst1 has been modified, then it is an active one...
+                    Exit For ' if this dst2 has been modified, then it is an active one...
                 End If
             End If
         Next

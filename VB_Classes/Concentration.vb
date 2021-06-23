@@ -52,7 +52,7 @@ Public Class Concentration_Basics : Inherits VBparent
             Else
                 dst.Circle(pt, task.dotSize + 2, markerColor, -1, task.lineType)
             End If
-            Dim distance = CInt(task.maxZ * 1000 * If(sideRun, pt.X / dst1.Width, pt.Y / dst1.Height))
+            Dim distance = CInt(task.maxZ * 1000 * If(sideRun, pt.X / dst2.Width, pt.Y / dst2.Height))
             If ptList.ContainsKey(distance) Then ptList(distance) += 1 Else ptList.Add(distance, 1)
         Next
     End Sub
@@ -61,8 +61,8 @@ Public Class Concentration_Basics : Inherits VBparent
         ptTop.Clear()
 
         sideview.Run(src)
-        If standalone Or showHistogram Then dst1 = sideview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR) Else dst1.SetTo(0)
-        plotHighlights(sideview.originalHistOutput, dst1, True)
+        If standalone Or showHistogram Then dst2 = sideview.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR) Else dst2.SetTo(0)
+        plotHighlights(sideview.originalHistOutput, dst2, True)
         If unsorted.Count > 0 Then
             maxSide = unsorted.Max()
             avgSide = unsorted.Average()
@@ -72,13 +72,13 @@ Public Class Concentration_Basics : Inherits VBparent
         End If
 
         topview.Run(src)
-        If standalone Or showHistogram Then dst2 = topview.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR) Else dst2.SetTo(0)
-        plotHighlights(topview.originalHistOutput, dst2, False)
+        If standalone Or showHistogram Then dst3 = topview.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR) Else dst3.SetTo(0)
+        plotHighlights(topview.originalHistOutput, dst3, False)
         If unsorted.Count > 0 Then
             maxTop = unsorted.Max()
             avgTop = unsorted.Average()
             If standalone Then
-                setTrueText(CStr(unsorted.Count) + " points" + vbCrLf + "max = " + CStr(maxTop) + vbCrLf + "Average = " + Format(avgTop, "#0.0"), 10, dst1.Height - 100, 3)
+                setTrueText(CStr(unsorted.Count) + " points" + vbCrLf + "max = " + CStr(maxTop) + vbCrLf + "Average = " + Format(avgTop, "#0.0"), 10, dst2.Height - 100, 3)
             End If
         End If
     End Sub
@@ -106,8 +106,8 @@ Public Class Concentration_BothViews : Inherits VBparent
         histC.drawLines = dotCheck.checked
         histC.showHistogram = histCheck.checked
         histC.Run(src)
-        dst1 = histC.dst1
         dst2 = histC.dst2
+        dst3 = histC.dst3
     End Sub
 End Class
 
@@ -139,8 +139,8 @@ Public Class Concentration_Peaks : Inherits VBparent
         dots.Run(src)
         task.ttTextData.Clear()
 
-        mats.mat(0) = dots.dst1
-        mats.mat(1) = dots.dst2
+        mats.mat(0) = dots.dst2
+        mats.mat(1) = dots.dst3
         If maxAverage < dots.histC.avgSide Then
             maxAverage = dots.histC.avgSide
             peakRotation = rotateSlider.value
@@ -148,10 +148,10 @@ Public Class Concentration_Peaks : Inherits VBparent
         plot.plotData = New cv.Scalar(dots.histC.avgSide, 0, 0)
         plot.maxScale = 30
         plot.Run(Nothing)
-        dst2 = plot.dst1
+        dst3 = plot.dst2
 
         mats.Run(Nothing)
-        dst1 = mats.dst1
+        dst2 = mats.dst2
 
         Static saveRotation = rotateSlider.value
         Static automateRotate As Boolean = True
@@ -191,11 +191,11 @@ Public Class Concentration_PeakLines : Inherits VBparent
         Static peakRotation As Integer = -91
 
         histC.Run(src)
-        mats.mat(0) = histC.dst1
-        mats.mat(1) = histC.dst2
+        mats.mat(0) = histC.dst2
+        mats.mat(1) = histC.dst3
 
-        lines.Run(histC.dst1)
-        dst2 = lines.dst1
+        lines.Run(histC.dst2)
+        dst3 = lines.dst2
 
         If lines.sortlines.Count > 0 Then
             Dim nextLen = CInt(lines.sortlines.ElementAt(0).Value.Item4)
@@ -220,6 +220,6 @@ Public Class Concentration_PeakLines : Inherits VBparent
         End If
 
         mats.Run(Nothing)
-        dst1 = mats.dst1
+        dst2 = mats.dst2
     End Sub
 End Class

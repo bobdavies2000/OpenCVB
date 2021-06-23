@@ -12,10 +12,10 @@ Public Class Blur_Basics : Inherits VBparent
         Dim kernelSize As Integer = kernelSlider.Value
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
-            cv.Cv2.GaussianBlur(src, dst1, New cv.Size(kernelSize, kernelSize), 0, 0)
-            If standalone Or task.intermediateName = caller Then cv.Cv2.GaussianBlur(task.RGBDepth, dst2, New cv.Size(kernelSize, kernelSize), 0, 0)
+            cv.Cv2.GaussianBlur(src, dst2, New cv.Size(kernelSize, kernelSize), 0, 0)
+            If standalone Or task.intermediateName = caller Then cv.Cv2.GaussianBlur(task.RGBDepth, dst3, New cv.Size(kernelSize, kernelSize), 0, 0)
         Else
-            dst1 = src
+            dst2 = src
         End If
     End Sub
 End Class
@@ -36,10 +36,10 @@ Public Class Blur_Gaussian : Inherits VBparent
         Dim kernelSize = blurKernelSlider.Value
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
-            CS_BlurGaussian.Run(src, dst1, kernelSize)
-            If standalone Or task.intermediateName = caller Then CS_BlurGaussian.Run(task.RGBDepth, dst2, kernelSize)
+            CS_BlurGaussian.Run(src, dst2, kernelSize)
+            If standalone Or task.intermediateName = caller Then CS_BlurGaussian.Run(task.RGBDepth, dst3, kernelSize)
         Else
-            dst1 = src
+            dst2 = src
         End If
     End Sub
 End Class
@@ -60,10 +60,10 @@ Public Class Blur_Median_CS : Inherits VBparent
         Dim kernelSize = blurKernelSlider.Value
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
-            CS_BlurMedian.Run(src, dst1, kernelSize)
-            If standalone Or task.intermediateName = caller Then CS_BlurMedian.Run(task.RGBDepth, dst2, kernelSize)
+            CS_BlurMedian.Run(src, dst2, kernelSize)
+            If standalone Or task.intermediateName = caller Then CS_BlurMedian.Run(task.RGBDepth, dst3, kernelSize)
         Else
-            dst1 = src
+            dst2 = src
         End If
     End Sub
 End Class
@@ -83,11 +83,11 @@ Public Class Blur_Homogeneous : Inherits VBparent
         Dim kernelSize = CDbl(blurKernelSlider.Value)
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
-            dst1 = src.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
-            If standalone Or task.intermediateName = caller Then dst2 = task.RGBDepth.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
+            dst2 = src.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
+            If standalone Or task.intermediateName = caller Then dst3 = task.RGBDepth.Blur(New cv.Size(kernelSize, kernelSize), New cv.Point(-1, -1))
         Else
-            dst1 = src
-            dst2 = task.RGBDepth
+            dst2 = src
+            dst3 = task.RGBDepth
         End If
     End Sub
 End Class
@@ -108,11 +108,11 @@ Public Class Blur_Median : Inherits VBparent
         Dim kernelSize = CDbl(blurKernelSlider.Value)
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
-            cv.Cv2.MedianBlur(src, dst1, kernelSize)
-            If standalone Or task.intermediateName = caller Then cv.Cv2.MedianBlur(task.RGBDepth, dst2, kernelSize)
+            cv.Cv2.MedianBlur(src, dst2, kernelSize)
+            If standalone Or task.intermediateName = caller Then cv.Cv2.MedianBlur(task.RGBDepth, dst3, kernelSize)
         Else
-            dst1 = src
-            dst2 = task.RGBDepth
+            dst2 = src
+            dst3 = task.RGBDepth
         End If
     End Sub
 End Class
@@ -133,9 +133,9 @@ Public Class Blur_Bilateral : Inherits VBparent
         Dim kernelSize = CDbl(blurKernelSlider.Value)
         If kernelSize > 0 Then
             If kernelSize Mod 2 = 0 Then kernelSize -= 1 ' kernel size must be odd
-            cv.Cv2.BilateralFilter(src, dst1, kernelSize, kernelSize * 2, kernelSize / 2)
+            cv.Cv2.BilateralFilter(src, dst2, kernelSize, kernelSize * 2, kernelSize / 2)
         Else
-            dst1 = src
+            dst2 = src
         End If
     End Sub
 End Class
@@ -157,16 +157,16 @@ Public Class Blur_PlusHistogram : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         myhist.Run(src)
 
-        mat2to1.mat(0) = myhist.dst1.Clone()
+        mat2to1.mat(0) = myhist.dst2.Clone()
 
         blur.Run(src)
 
-        myhist.Run(blur.dst1.Clone)
+        myhist.Run(blur.dst2.Clone)
 
-        mat2to1.mat(1) = myhist.dst2.Clone()
+        mat2to1.mat(1) = myhist.dst3.Clone()
         mat2to1.Run(src)
-        dst2 = mat2to1.dst1
-        dst1 = blur.dst1
+        dst3 = mat2to1.dst2
+        dst2 = blur.dst2
     End Sub
 End Class
 
@@ -203,20 +203,20 @@ Public Class Blur_TopoMap : Inherits VBparent
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
         gradient.Run(src)
-        dst1 = gradient.magnitude
+        dst2 = gradient.magnitude
 
-        If kernelSize > 1 Then cv.Cv2.GaussianBlur(dst1, dst2, New cv.Size(kernelSize, kernelSize), 0, 0)
-        dst2 = dst2.Normalize(255)
-        dst2 = dst2.ConvertScaleAbs(255)
+        If kernelSize > 1 Then cv.Cv2.GaussianBlur(dst2, dst3, New cv.Size(kernelSize, kernelSize), 0, 0)
+        dst3 = dst3.Normalize(255)
+        dst3 = dst3.ConvertScaleAbs(255)
 
-        dst2 = (dst2 * 1 / reductionSlider.Value).tomat
-        dst2 = (dst2 * reductionSlider.Value).toMat
+        dst3 = (dst3 * 1 / reductionSlider.Value).tomat
+        dst3 = (dst3 * reductionSlider.Value).toMat
 
-        task.palette.Run(dst2)
+        task.palette.Run(dst3)
 
-        addw.src2 = task.palette.dst1
+        addw.src2 = task.palette.dst2
         addw.Run(task.color)
-        dst2 = addw.dst1
+        dst3 = addw.dst2
 
         label2 = "Blur = " + CStr(nextPercent) + "% Reduction Factor = " + CStr(reductionSlider.Value)
         If task.frameCount Mod frameSlider.Value = 0 Then nextPercent -= 1

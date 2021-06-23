@@ -10,23 +10,23 @@ Public Class MaskShape_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 5
         km.Run(src)
-        dst1 = km.dst1
+        dst2 = km.dst2
         mats.mat(0).SetTo(0)
-        task.color.CopyTo(mats.mat(0), km.dst2)
-        mats.mat(1) = km.dst2
+        task.color.CopyTo(mats.mat(0), km.dst3)
+        mats.mat(1) = km.dst3
 
         Dim pc = New cv.Mat(task.pointCloud.Size, cv.MatType.CV_32FC3, 0)
-        task.pointCloud.CopyTo(pc, km.dst2)
+        task.pointCloud.CopyTo(pc, km.dst3)
 
         tView.Run(pc)
-        mats.mat(2) = tView.dst1.Normalize(0, 255, cv.NormTypes.MinMax)
+        mats.mat(2) = tView.dst2.Normalize(0, 255, cv.NormTypes.MinMax)
         mats.mat(2).ConvertTo(mats.mat(2), cv.MatType.CV_8UC1)
 
-        mats.mat(3) = tView.dst2.Normalize(0, 255, cv.NormTypes.MinMax)
+        mats.mat(3) = tView.dst3.Normalize(0, 255, cv.NormTypes.MinMax)
         mats.mat(3).ConvertTo(mats.mat(3), cv.MatType.CV_8UC1)
 
         mats.Run(Nothing)
-        dst2 = mats.dst1
+        dst3 = mats.dst2
 
         Static pixelCounts As New List(Of Integer)
         Static saveMaskIndex As Integer
@@ -60,11 +60,11 @@ Public Class MaskShape_Depth : Inherits VBparent
         Static kSlider = findSlider("kMeans k")
         If proxy.km.km.maskIndex = kSlider.Maximum Then
             setTrueText("The closest mask in depth matches the area with no depth so no data is displayed.", 10, 40, 3)
-            dst2.SetTo(0)
+            dst3.SetTo(0)
         Else
             proxy.Run(task.depth32f)
-            dst1 = proxy.dst1
             dst2 = proxy.dst2
+            dst3 = proxy.dst3
         End If
         label1 = proxy.label1
         label2 = proxy.label2

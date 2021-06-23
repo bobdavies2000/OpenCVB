@@ -36,7 +36,7 @@ Public Class Salience_Basics_CPP : Inherits VBparent
         Dim imagePtr = Salience_Run(salience, sliders.trackbar(0).Value, grayHandle.AddrOfPinnedObject, src.Height, src.Width)
         grayHandle.Free()
 
-        dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr)
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr)
     End Sub
     Public Sub Close()
         Salience_Close(salience)
@@ -56,7 +56,7 @@ Public Class Salience_Basics_MT : Inherits VBparent
         Dim numScales = salience.sliders.trackbar(0).Value
         Dim threads = salience.sliders.trackbar(1).Value
         Dim h = CInt(src.Height / threads)
-        dst1 = New cv.Mat(dst1.Size(), cv.MatType.CV_8U)
+        dst2 = New cv.Mat(dst2.Size(), cv.MatType.CV_8U)
         Parallel.For(0, threads,
             Sub(i)
                 Dim roi = New cv.Rect(0, i * h, src.Width, Math.Min(h, src.Height - i * h))
@@ -71,7 +71,7 @@ Public Class Salience_Basics_MT : Inherits VBparent
                 grayHandle.Free()
 
                 Dim tmp As New cv.Mat(roi.Height, roi.Width, cv.MatType.CV_8U, imagePtr)
-                dst1(roi) = tmp
+                dst2(roi) = tmp
                 Salience_Close(salience)
             End Sub)
     End Sub

@@ -48,7 +48,7 @@ Public Class SemiGlobalMatching_CPP : Inherits VBparent
         'handleLeft.Free()
         'handleRight.Free()
 
-        'Dim dst1 = New cv.Mat(task.leftView.Rows, task.leftView.Cols, cv.MatType.CV_8U, imagePtr)
+        'Dim dst2 = New cv.Mat(task.leftView.Rows, task.leftView.Cols, cv.MatType.CV_8U, imagePtr)
         setTrueText("This algorithm runs but always returns zero - a bug in the C++ algorithm as ported." + vbCrLf +
                       "Needs work but investing further is not needed - we have disparity from the device.", 10, 40, 3)
     End Sub

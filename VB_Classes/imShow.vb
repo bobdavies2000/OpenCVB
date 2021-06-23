@@ -21,9 +21,9 @@ Public Class ImShow_WaitKey : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         vDemo.Run(src)
-        cv.Cv2.ImShow("Hit space bar to advance to the next frame", vDemo.dst1)
+        cv.Cv2.ImShow("Hit space bar to advance to the next frame", vDemo.dst2)
         cv.Cv2.WaitKey(1000) ' It will halt the test all run if 0 but 0 is the useful value for debugging interactively.
-        dst1 = vDemo.dst1
+        dst2 = vDemo.dst2
     End Sub
 End Class
 

@@ -53,7 +53,7 @@ Public Class MatchTemplate_Basics : Inherits VBparent
         correlation = correlationMat.Get(Of Single)(0, 0)
         label1 = "Correlation = " + Format(correlation, "#,##0.000")
         If standalone Or task.intermediateName = caller Then
-            dst1.SetTo(0)
+            dst2.SetTo(0)
             label1 = matchText + " for " + CStr(searchArea.Cols) + " samples = " + Format(correlation, "#,##0.00")
             flow.msgs.Add(matchText + " = " + Format(correlation, "#,##0.00"))
             flow.Run(Nothing)
@@ -125,22 +125,22 @@ Public Class MatchTemplate_DrawRect : Inherits VBparent
         match.template = src
         match.Run(src)
 
-        dst1 = New cv.Mat(src.Size, cv.MatType.CV_32F, 0)
+        dst2 = New cv.Mat(src.Size, cv.MatType.CV_32F, 0)
         Dim rect = New cv.Rect(task.drawRect.Width / 2, task.drawRect.Height / 2, src.Width - task.drawRect.Width + 1, src.Height - task.drawRect.Height + 1)
 
-        If match.correlationMat.Rows = rect.Height And match.correlationMat.Cols = rect.Width Then dst1(rect) = match.correlationMat
-        dst2 = src
+        If match.correlationMat.Rows = rect.Height And match.correlationMat.Cols = rect.Width Then dst2(rect) = match.correlationMat
+        dst3 = src
 
         Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
-        dst1.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
+        dst2.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
 
-        Dim mask = dst1.Threshold(thresholdSlider.value / 100, 255, cv.ThresholdTypes.Binary)
+        Dim mask = dst2.Threshold(thresholdSlider.value / 100, 255, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
         addw.src2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         addw.Run(src)
-        dst2 = addw.dst1
+        dst3 = addw.dst2
 
-        dst2.Circle(maxLoc.X, maxLoc.Y, task.dotSize, cv.Scalar.Red, -1, task.lineType)
+        dst3.Circle(maxLoc.X, maxLoc.Y, task.dotSize, cv.Scalar.Red, -1, task.lineType)
         label2 = "Red is best match, white has correlation > " + Format(thresholdSlider.value / 100, "#0%")
     End Sub
 End Class
@@ -168,8 +168,8 @@ Public Class MatchTemplate_BestEntropy_MT : Inherits VBparent
             task.drawRect = entropy.eMaxRect
         End If
         match.Run(src)
-        dst1 = match.dst1
         dst2 = match.dst2
+        dst3 = match.dst3
     End Sub
 End Class
 
@@ -194,8 +194,8 @@ Public Class MatchTemplate_Movement : Inherits VBparent
             sliders.setupTrackBar(1, "Stdev Threshold", 0, 100, 10)
         End If
 
-        mask = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
-        dst2 = mask.Clone
+        mask = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+        dst3 = mask.Clone
         task.desc = "Assign each segment a correlation coefficient and stdev to the previous frame"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -207,11 +207,11 @@ Public Class MatchTemplate_Movement : Inherits VBparent
         Dim fsize = task.fontSize / 3
 
         grid.Run(Nothing)
-        dst1 = src.Clone
-        If dst1.Channels = 3 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = src.Clone
+        If dst2.Channels = 3 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        Static lastFrame As cv.Mat = dst1.Clone()
-        Dim saveFrame As cv.Mat = dst1.Clone
+        Static lastFrame As cv.Mat = dst2.Clone()
+        Dim saveFrame As cv.Mat = dst2.Clone
         Dim updateCount As Integer
         mask.SetTo(0)
 
@@ -220,25 +220,25 @@ Public Class MatchTemplate_Movement : Inherits VBparent
         Parallel.ForEach(grid.roiList,
         Sub(roi)
             Dim mean As Single, stdev As Single
-            cv.Cv2.MeanStdDev(dst1(roi), mean, stdev)
+            cv.Cv2.MeanStdDev(dst2(roi), mean, stdev)
             If stdev > stdevThreshold Then
                 Dim correlation As New cv.Mat
-                cv.Cv2.MatchTemplate(dst1(roi), lastFrame(roi), correlation, matchOption)
+                cv.Cv2.MatchTemplate(dst2(roi), lastFrame(roi), correlation, matchOption)
                 If correlation.Get(Of Single)(0, 0) < CCthreshold Then
                     Interlocked.Increment(updateCount)
                     Dim pt = New cv.Point(roi.X + 2, roi.Y + 10)
-                    cv.Cv2.PutText(dst1, Format(correlation.Get(Of Single)(0, 0), "#0.00"), pt, task.font, fsize, cv.Scalar.White, task.lineWidth, task.lineType)
+                    cv.Cv2.PutText(dst2, Format(correlation.Get(Of Single)(0, 0), "#0.00"), pt, task.font, fsize, cv.Scalar.White, task.lineWidth, task.lineType)
                 Else
                     mask(roi).SetTo(255)
-                    dst1(roi).SetTo(0)
+                    dst2(roi).SetTo(0)
                 End If
             Else
                 Interlocked.Increment(updateCount)
             End If
         End Sub)
-        dst1.SetTo(255, grid.gridMask)
-        dst2.SetTo(0)
-        saveFrame.CopyTo(dst2, mask)
+        dst2.SetTo(255, grid.gridMask)
+        dst3.SetTo(0)
+        saveFrame.CopyTo(dst3, mask)
         lastFrame = saveFrame
         Dim corrPercent = Format(correlationSlider.value / 1000, "0.0%") + " correlation"
         label1 = CStr(updateCount) + " of " + CStr(grid.roiList.Count) + " with < " + corrPercent + " or low stdev"

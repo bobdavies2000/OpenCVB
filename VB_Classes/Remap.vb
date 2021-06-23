@@ -28,7 +28,7 @@ Public Class Remap_Basics : Inherits VBparent
             Next
         Next
 
-        If direction <> 0 Then cv.Cv2.Remap(src, dst1, map_x, map_y) Else dst1 = src
+        If direction <> 0 Then cv.Cv2.Remap(src, dst2, map_x, map_y) Else dst2 = src
 
         If task.frameCount Mod 30 = 0 Then
             direction += 1
@@ -50,13 +50,13 @@ Public Class Remap_Flip : Inherits VBparent
                                             "Remap_Flip - flip horizontal and vertical")
         Select Case direction
             Case 0 ' do nothing!
-                src.CopyTo(dst1)
+                src.CopyTo(dst2)
             Case 1 ' flip vertically
-                cv.Cv2.Flip(src, dst1, cv.FlipMode.Y)
+                cv.Cv2.Flip(src, dst2, cv.FlipMode.Y)
             Case 2 ' flip horizontally
-                cv.Cv2.Flip(src, dst1, cv.FlipMode.X)
+                cv.Cv2.Flip(src, dst2, cv.FlipMode.X)
             Case 3 ' flip horizontally and vertically
-                cv.Cv2.Flip(src, dst1, cv.FlipMode.XY)
+                cv.Cv2.Flip(src, dst2, cv.FlipMode.XY)
         End Select
         If task.frameCount Mod 100 = 0 Then
             direction += 1

@@ -83,10 +83,10 @@ Public Class IMU_Stabilizer : Inherits VBparent
 
         Dim smoothedFrame = src.WarpAffine(smoothedMat, src.Size())
         smoothedFrame = smoothedFrame(New cv.Range(borderCrop, smoothedFrame.Rows - borderCrop), New cv.Range(borderCrop, smoothedFrame.Cols - borderCrop))
-        dst1 = smoothedFrame.Resize(src.Size())
-        cv.Cv2.Subtract(src, dst1, dst2)
+        dst2 = smoothedFrame.Resize(src.Size())
+        cv.Cv2.Subtract(src, dst2, dst3)
 
-        dst1(New cv.Rect(10, 95, 50, 50)).SetTo(0)
+        dst2(New cv.Rect(10, 95, 50, 50)).SetTo(0)
         Dim Text = "dx = " + Format(dx, "#0.00") + vbNewLine + "dy = " + Format(dy, "#0.00") + vbNewLine + "da = " + Format(da, "#0.00")
         setTrueText(Text)
     End Sub
@@ -100,7 +100,7 @@ End Class
 Public Class IMU_Magnetometer : Inherits VBparent
     Public plot As New Plot_OverTime
     Public Sub New()
-        plot.dst1 = dst2
+        plot.dst2 = dst3
         plot.maxScale = 10
         plot.minScale = -10
 
@@ -159,7 +159,7 @@ Public Class IMU_FrameTime : Inherits VBparent
     Public CPUInterval As Double
     Public IMUtoCaptureEstimate As Double
     Public Sub New()
-        plot.dst1 = dst2
+        plot.dst2 = dst3
         plot.maxScale = 150
         plot.minScale = 0
         plot.backColor = cv.Scalar.Aquamarine
@@ -253,7 +253,7 @@ Public Class IMU_HostFrameTimes : Inherits VBparent
     Public CPUInterval As Double
     Public HostInterruptDelayEstimate As Double
     Public Sub New()
-        plot.dst1 = dst2
+        plot.dst2 = dst3
         plot.maxScale = 150
         plot.minScale = 0
         plot.backColor = cv.Scalar.Aquamarine
@@ -335,7 +335,7 @@ Public Class IMU_TotalDelay : Inherits VBparent
     Dim plot As New Plot_OverTime
     Dim kalman As New Kalman_Single
     Public Sub New()
-        plot.dst1 = dst2
+        plot.dst2 = dst3
         plot.maxScale = 50
         plot.minScale = 0
         plot.plotCount = 4
@@ -570,6 +570,6 @@ Public Class IMU_MotionPlot : Inherits VBparent
         End If
         plot.plotData = New cv.Scalar(camIMU.yaw * 1000, camIMU.pitch * 1000, camIMU.roll * 1000)
         plot.Run(Nothing)
-        dst1 = plot.dst1
+        dst2 = plot.dst2
     End Sub
 End Class

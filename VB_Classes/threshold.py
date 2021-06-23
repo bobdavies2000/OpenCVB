@@ -17,8 +17,8 @@ def Threshold_Demo(val):
     #4: Threshold to Zero Inverted
     threshold_type = cv.getTrackbarPos(trackbar_type, titleWindow)
     threshold_value = cv.getTrackbarPos(trackbar_value, titleWindow)
-    _, dst1 = cv.threshold(src_gray, threshold_value, max_binary_value, threshold_type )
-    cv.imshow(titleWindow, dst1)
+    _, dst2 = cv.threshold(src_gray, threshold_value, max_binary_value, threshold_type )
+    cv.imshow(titleWindow, dst2)
 ## [Threshold_Demo]
 
 parser = argparse.ArgumentParser(description='Code for Basic Thresholding Operations tutorial.')

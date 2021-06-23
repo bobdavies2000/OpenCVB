@@ -12,11 +12,11 @@ Public Class XPhoto_Bm3dDenoise : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.EqualizeHist(src, src)
-        CvXPhoto.Bm3dDenoising(src, dst1)
-        cv.Cv2.Subtract(dst1, src, dst2)
-        dst2.MinMaxLoc(minVal, maxVal)
+        CvXPhoto.Bm3dDenoising(src, dst2)
+        cv.Cv2.Subtract(dst2, src, dst3)
+        dst3.MinMaxLoc(minVal, maxVal)
         label2 = "Diff from input - max change=" + CStr(maxVal)
-        dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
+        dst3 = dst3.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
 End Class
 
@@ -32,11 +32,11 @@ Public Class XPhoto_Bm3dDenoiseDepthImage : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.EqualizeHist(gray, gray)
-        CvXPhoto.Bm3dDenoising(gray, dst1)
-        cv.Cv2.Subtract(dst1, gray, dst2)
-        dst2.MinMaxLoc(minVal, maxVal)
+        CvXPhoto.Bm3dDenoising(gray, dst2)
+        cv.Cv2.Subtract(dst2, gray, dst3)
+        dst3.MinMaxLoc(minVal, maxVal)
         label2 = "Diff from input - max change=" + CStr(maxVal)
-        dst2 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
+        dst3 = dst3.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
 End Class
 
@@ -112,7 +112,7 @@ Public Class XPhoto_OilPaint_CPP : Inherits VBparent
                                            sliders.trackbar(1).Value, sliders.trackbar(0).Value, colorCode)
         handleSrc.Free()
 
-        If imagePtr <> 0 Then dst1 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
+        If imagePtr <> 0 Then dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
     End Sub
     Public Sub Close()
         xPhoto_OilPaint_Close(xPhoto_OilPaint)
@@ -142,12 +142,12 @@ Public Class XPhoto_Inpaint : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static radioFast = findRadio("FSR_Fast")
         Static radioSMap = findRadio("ShiftMap")
-        dst1 = src
-        Dim mask = basics.drawRandomLine(dst1)
+        dst2 = src
+        Dim mask = basics.drawRandomLine(dst2)
         Dim iType = InpaintTypes.FSR_BEST
         If radioFast.checked Then iType = InpaintTypes.FSR_FAST
         If radioSMap.checked Then iType = InpaintTypes.SHIFTMAP
-        ' CvXPhoto.Inpaint(dst1, mask, dst2, InpaintTypes.FSR_BEST)
+        ' CvXPhoto.Inpaint(dst2, mask, dst3, InpaintTypes.FSR_BEST)
         setTrueText("This VB interface for xPhoto Inpaint does not work...  Uncomment the line above this msg to test.", 10, 200, 3)
     End Sub
 End Class
@@ -172,7 +172,7 @@ Public Class XPhoto_Inpaint_CPP : Inherits VBparent
         If radioSMap.checked Then iType = InpaintTypes.SHIFTMAP
 
         Dim mask = inpVB.basics.drawRandomLine(src)
-        dst1 = src
+        dst2 = src
 
         Dim srcData(src.Total * src.ElemSize - 1) As Byte
         Dim maskData(mask.Total * mask.ElemSize - 1) As Byte
@@ -184,7 +184,7 @@ Public Class XPhoto_Inpaint_CPP : Inherits VBparent
         handleSrc.Free()
         handleMask.Free()
 
-        If imagePtr <> 0 Then dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
+        If imagePtr <> 0 Then dst3 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC3, imagePtr)
 
         setTrueText("The infrastructure is all in place but the xPhoto Inpaint call hangs.  Uncomment the C++ line in Run to test", 10, 200, 3)
     End Sub

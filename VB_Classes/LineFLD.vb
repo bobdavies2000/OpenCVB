@@ -44,7 +44,7 @@ Public Class LineFLD_Basics : Inherits VBparent
         Dim canny_th2 = canny2Slider.Value
         Dim do_merge = mergeCheckBox.Checked
 
-        src.CopyTo(dst1)
+        src.CopyTo(dst2)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim cols = src.Width
         Dim rows = src.Height
@@ -55,7 +55,7 @@ Public Class LineFLD_Basics : Inherits VBparent
         Dim lineCount = lineDetectorFast_Run(handle.AddrOfPinnedObject, rows, cols, length_threshold, distance_threshold, canny_th1, canny_th2, canny_aperture_size, do_merge)
         handle.Free()
 
-        If task.cameraStable = False Then dst2.SetTo(0)
+        If task.cameraStable = False Then dst3.SetTo(0)
 
         If lineCount > 0 Then
             Dim pts(4 * lineCount - 1) As Single
@@ -71,8 +71,8 @@ Public Class LineFLD_Basics : Inherits VBparent
             For j = 0 To lines.Count - 1 Step 4
                 Dim v = lines(j)
                 Dim pt1 = New cv.Point(v(0), v(1))
-                dst1.Line(New cv.Point(v(0), v(1)), New cv.Point(v(2), v(3)), cv.Scalar.Yellow, task.lineWidth, task.lineType)
                 dst2.Line(New cv.Point(v(0), v(1)), New cv.Point(v(2), v(3)), cv.Scalar.Yellow, task.lineWidth, task.lineType)
+                dst3.Line(New cv.Point(v(0), v(1)), New cv.Point(v(2), v(3)), cv.Scalar.Yellow, task.lineWidth, task.lineType)
             Next
         End If
     End Sub
@@ -92,12 +92,12 @@ Module LineFLD_Exports
     Public Function lineDetector_Lines() As IntPtr
     End Function
 
-    Public Sub find3DLineSegment(dst2 As cv.Mat, _mask As cv.Mat, _depth32f As cv.Mat, aa As cv.Vec6f, maskLineWidth As Integer)
+    Public Sub find3DLineSegment(dst3 As cv.Mat, _mask As cv.Mat, _depth32f As cv.Mat, aa As cv.Vec6f, maskLineWidth As Integer)
         Dim pt1 = New cv.Point(aa(0), aa(1))
         Dim pt2 = New cv.Point(aa(2), aa(3))
         Dim centerPoint = New cv.Point((aa(0) + aa(2)) / 2, (aa(1) + aa(3)) / 2)
         _mask.Line(pt1, pt2, New cv.Scalar(1), maskLineWidth, task.lineType)
-        dst2.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
+        dst3.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
 
         Dim roi = New cv.Rect(Math.Min(aa(0), aa(2)), Math.Min(aa(1), aa(3)), Math.Abs(aa(0) - aa(2)), Math.Abs(aa(1) - aa(3)))
 
@@ -142,14 +142,14 @@ Module LineFLD_Exports
                 Dim b = endPoints(0)
                 Dim d = endPoints(1)
                 Dim lenBD = Math.Sqrt((b.Item0 - d.Item0) * (b.Item0 - d.Item0) + (b.Item1 - d.Item1) * (b.Item1 - d.Item1) + (b.Item2 - d.Item2) * (b.Item2 - d.Item2))
-                cv.Cv2.PutText(dst2, Format(lenBD / 1000, "0.00") + "m", centerPoint, cv.HersheyFonts.HersheyTriplex, 0.4, cv.Scalar.White, 1,
+                cv.Cv2.PutText(dst3, Format(lenBD / 1000, "0.00") + "m", centerPoint, cv.HersheyFonts.HersheyTriplex, 0.4, cv.Scalar.White, 1,
                                    task.lineType)
                 If endPoints(0).Item2 = endPoints(1).Item2 Then endPoints(0).Item2 += 1 ' prevent NaN
-                cv.Cv2.PutText(dst2, Format((endPoints(1).Item1 - endPoints(0).Item1) / (endPoints(1).Item2 - endPoints(0).Item2), "0.00") + "y/z",
+                cv.Cv2.PutText(dst3, Format((endPoints(1).Item1 - endPoints(0).Item1) / (endPoints(1).Item2 - endPoints(0).Item2), "0.00") + "y/z",
                                    New cv.Point(centerPoint.X, centerPoint.Y + 10), cv.HersheyFonts.HersheyTriplex, 0.4, cv.Scalar.White, task.lineWidth, task.lineType)
                 ' show the final endpoints in xy projection.
-                dst2.Circle(New cv.Point(b.Item3, b.Item4), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
-                dst2.Circle(New cv.Point(d.Item3, d.Item4), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
+                dst3.Circle(New cv.Point(b.Item3, b.Item4), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
+                dst3.Circle(New cv.Point(d.Item3, d.Item4), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
             End If
         End If
     End Sub
@@ -198,7 +198,7 @@ Module LineFLD_Exports
 
     ' there is a drawsegments in the contrib library but this code will operate on the full size of the image - not the small copy passed to the C++ code
     ' But, more importantly, this code uses anti-alias for the lines.  It adds the lines to a mask that may be useful with depth data.
-    Public Function drawSegments(dst1 As cv.Mat, lineCount As Integer, thickness As Integer, ByRef lineMat As cv.Mat) As SortedList(Of cv.Vec6f, Integer)
+    Public Function drawSegments(dst2 As cv.Mat, lineCount As Integer, thickness As Integer, ByRef lineMat As cv.Mat) As SortedList(Of cv.Vec6f, Integer)
         Dim sortedLines As New SortedList(Of cv.Vec6f, Integer)(New CompareVec6f)
 
         Dim lines(lineCount * 4 - 1) As Single
@@ -232,10 +232,10 @@ Module LineFLD_Exports
 
         For i = sortedLines.Count - 1 To 0 Step -1
             Dim v = sortedLines.ElementAt(i).Key
-            If v(0) >= 0 And v(0) <= dst1.Cols And v(1) >= 0 And v(1) <= dst1.Rows And v(2) >= 0 And v(2) <= dst1.Cols And v(3) >= 0 And v(3) <= dst1.Rows Then
+            If v(0) >= 0 And v(0) <= dst2.Cols And v(1) >= 0 And v(1) <= dst2.Rows And v(2) >= 0 And v(2) <= dst2.Cols And v(3) >= 0 And v(3) <= dst2.Rows Then
                 Dim pt1 = New cv.Point(CInt(v(0)), CInt(v(1)))
                 Dim pt2 = New cv.Point(CInt(v(2)), CInt(v(3)))
-                dst1.Line(pt1, pt2, cv.Scalar.Yellow, thickness, task.lineType)
+                dst2.Line(pt1, pt2, cv.Scalar.Yellow, thickness, task.lineType)
             End If
         Next
         Return sortedLines
@@ -266,7 +266,7 @@ Public Class LineFLD_CPP : Inherits VBparent
         Dim canny_th2 = lineFLD.canny2Slider.Value
         Dim do_merge = lineFLD.mergeCheckBox.Checked
 
-        src.CopyTo(dst1)
+        src.CopyTo(dst2)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim data(src.Total - 1) As Byte
 
@@ -275,7 +275,7 @@ Public Class LineFLD_CPP : Inherits VBparent
         Dim lineCount = lineDetectorFast_Run(handle.AddrOfPinnedObject, src.Height, src.Width, length_threshold, distance_threshold, canny_th1, canny_th2, canny_aperture_size, do_merge)
         handle.Free()
 
-        If lineCount > 0 Then sortedLines = drawSegments(dst1, lineCount, task.lineWidth, lineMat)
+        If lineCount > 0 Then sortedLines = drawSegments(dst2, lineCount, task.lineWidth, lineMat)
     End Sub
 End Class
 
@@ -298,13 +298,13 @@ Public Class LineFLD_LongestLine : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
         lines.Run(src)
-        src.CopyTo(dst1)
+        src.CopyTo(dst2)
 
         If lines.sortedLines.Count > 0 Then
             ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
             Dim maskLineWidth As Integer = sliders.trackbar(0).Value
             Dim mask = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, 0)
-            find3DLineSegment(dst1, mask, task.depth32f, lines.sortedLines.ElementAt(lines.sortedLines.Count - 1).Key, maskLineWidth)
+            find3DLineSegment(dst2, mask, task.depth32f, lines.sortedLines.ElementAt(lines.sortedLines.Count - 1).Key, maskLineWidth)
         End If
     End Sub
 End Class
@@ -329,7 +329,7 @@ Public Class LineFLD_MT : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
         lines.Run(src)
-        src.CopyTo(dst1)
+        src.CopyTo(dst2)
 
         ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
         Dim maskLineWidth As Integer = sliders.trackbar(0).Value
@@ -337,7 +337,7 @@ Public Class LineFLD_MT : Inherits VBparent
         Dim lineCount = Math.Max(lines.sortedLines.Count - 20, 0)
         Parallel.For(lineCount, lines.sortedLines.Count,
             Sub(i)
-                find3DLineSegment(dst1, mask, task.depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
+                find3DLineSegment(dst2, mask, task.depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
             End Sub)
         label1 = "Showing the " + CStr(Math.Min(lines.sortedLines.Count, 20)) + " longest lines out of " + CStr(lines.sortedLines.Count)
     End Sub
@@ -367,7 +367,7 @@ End Class
 '        Dim useX As Boolean = check.Box(0).Checked
 '        linesFLD.src = src
 '        linesFLD.Run()
-'        src.CopyTo(dst1)
+'        src.CopyTo(dst2)
 
 '        Dim sortedlines As SortedList(Of cv.Vec6f, Integer)
 '        sortedlines = linesFLD.sortedLines
@@ -385,7 +385,7 @@ End Class
 '                    Dim aa = sortedlines.ElementAt(i).Key
 '                    Dim pt1 = New cv.Point(aa(0), aa(1))
 '                    Dim pt2 = New cv.Point(aa(2), aa(3))
-'                    dst1.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+'                    dst2.Line(pt1, pt2, cv.Scalar.Red, task.lineWidth + 1, task.lineType)
 '                    mask.Line(pt1, pt2, New cv.Scalar(i), maskLineWidth, task.lineType)
 
 '                    Dim roi = New cv.Rect(Math.Min(aa(0), aa(2)), Math.Min(aa(1), aa(3)), Math.Abs(aa(0) - aa(2)), Math.Abs(aa(1) - aa(3)))
@@ -429,14 +429,14 @@ End Class
 '                    Dim textPoint = New cv.Point(worldDepth(ptIndex).Item3, worldDepth(ptIndex).Item4)
 '                    If textPoint.X > mask.Width - 50 Then textPoint.X = mask.Width - 50
 '                    If textPoint.Y > mask.Height - 50 Then textPoint.Y = mask.Height - 50
-'                    cv.Cv2.PutText(dst1, Format(lenBD / 1000, "#0.00") + "m", textPoint, cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, task.lineWidth, task.lineType)
+'                    cv.Cv2.PutText(dst2, Format(lenBD / 1000, "#0.00") + "m", textPoint, cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, task.lineWidth, task.lineType)
 '                    If endPoints(0).Item2 = endPoints(1).Item2 Then endPoints(0).Item2 += 1 ' prevent NaN
-'                    cv.Cv2.PutText(dst1, Format((endPoints(1).Item1 - endPoints(0).Item1) / (endPoints(1).Item2 - endPoints(0).Item2), "#0.00") + If(useX, "x/z", "y/z"),
+'                    cv.Cv2.PutText(dst2, Format((endPoints(1).Item1 - endPoints(0).Item1) / (endPoints(1).Item2 - endPoints(0).Item2), "#0.00") + If(useX, "x/z", "y/z"),
 '                                    New cv.Point(textPoint.X, textPoint.Y + 10), cv.HersheyFonts.HersheyComplexSmall, 0.5, cv.Scalar.White, task.lineWidth, task.lineType)
 
 '                    ' show the final endpoints in xy projection.
-'                    dst1.Circle(New cv.Point(b.Item3, b.Item4), task.dotsize + 1, cv.Scalar.White, -1, task.lineType)
-'                    dst1.Circle(New cv.Point(d.Item3, d.Item4), task.dotsize + 1, cv.Scalar.White, -1, task.lineType)
+'                    dst2.Circle(New cv.Point(b.Item3, b.Item4), task.dotsize + 1, cv.Scalar.White, -1, task.lineType)
+'                    dst2.Circle(New cv.Point(d.Item3, d.Item4), task.dotsize + 1, cv.Scalar.White, -1, task.lineType)
 '                End Sub)
 '        End If
 '    End Sub

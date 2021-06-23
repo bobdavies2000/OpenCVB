@@ -7,23 +7,23 @@ Public Class Pixel_Viewer : Inherits VBparent
         task.desc = "Display pixels under the cursor"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dst1 = Choose(task.mousePicTag + 1, task.color, task.RGBDepth, task.algorithmObject.dst1, task.algorithmObject.dst2)
+        dst2 = Choose(task.mousePicTag + 1, task.color, task.RGBDepth, task.algorithmObject.dst2, task.algorithmObject.dst3)
 
         Dim displayType = -1 ' default is 8uc3
-        If dst1.Type = cv.MatType.CV_8UC3 Then displayType = 0
-        If dst1.Type = cv.MatType.CV_8U Then displayType = 1
-        If dst1.Type = cv.MatType.CV_32F Then displayType = 2
-        If dst1.Type = cv.MatType.CV_32FC3 Then displayType = 3
-        If displayType < 0 Or dst1.Channels > 4 Then
+        If dst2.Type = cv.MatType.CV_8UC3 Then displayType = 0
+        If dst2.Type = cv.MatType.CV_8U Then displayType = 1
+        If dst2.Type = cv.MatType.CV_32F Then displayType = 2
+        If dst2.Type = cv.MatType.CV_32FC3 Then displayType = 3
+        If displayType < 0 Or dst2.Channels > 4 Then
             setTrueText("The pixel Viewer does not support this cv.Mat!  Please add support.")
             Exit Sub
         End If
-        If viewerForm.GrayScaleOnly.Checked And dst1.Channels <> 1 And displayType < 2 Then
-            dst1 = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If viewerForm.GrayScaleOnly.Checked And dst2.Channels <> 1 And displayType < 2 Then
+            dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
 
         Dim formatType = Choose(displayType + 1, "8UC3", "8UC1", "32FC1", "32FC3")
-        viewerForm.Text = "Pixel Viewer for " + Choose(task.mousePicTag + 1, "Color", "RGB Depth", "dst1", "dst2") + " " + formatType
+        viewerForm.Text = "Pixel Viewer for " + Choose(task.mousePicTag + 1, "Color", "RGB Depth", "dst2", "dst3") + " " + formatType
 
         Dim drWidth = Choose(displayType + 1, 7, 22, 13, 4) * viewerForm.Width / 650 + 3
         Dim drHeight = CInt(viewerForm.Height / 16) + If(viewerForm.Height < 400, -3, If(viewerForm.Height < 800, -1, 1))
@@ -46,16 +46,16 @@ Public Class Pixel_Viewer : Inherits VBparent
         Dim dw = New cv.Rect(mouseLoc.x, mouseLoc.y, drWidth, drHeight)
         If dw.X < 0 Then dw.X = 0
         If dw.Y < 0 Then dw.Y = 0
-        If dw.X + dw.Width > dst1.Width Then
-            dw.X = dst1.Width - dw.Width
+        If dw.X + dw.Width > dst2.Width Then
+            dw.X = dst2.Width - dw.Width
             dw.Width = dw.Width
         End If
-        If dw.Y + dw.Height > dst1.Height Then
-            dw.Y = dst1.Height - dw.Height
+        If dw.Y + dw.Height > dst2.Height Then
+            dw.Y = dst2.Height - dw.Height
             dw.Height = dw.Height
         End If
 
-        Dim testChange As cv.Mat = If(dst1.Channels = 1, dst1(dw).Clone, dst1(dw).CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        Dim testChange As cv.Mat = If(dst2.Channels = 1, dst2(dw).Clone, dst2(dw).CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         Dim diff As New cv.Mat
         Static saveviewerForm As cv.Mat = testChange
         If saveviewerForm.Size <> testChange.Size Or saveviewerForm.Type <> testChange.Type Then
@@ -64,7 +64,7 @@ Public Class Pixel_Viewer : Inherits VBparent
             cv.Cv2.Absdiff(saveviewerForm, testChange, diff)
         End If
 
-        Dim img = dst1(dw)
+        Dim img = dst2(dw)
         Dim minVal As Single = 0, maxVal As Single = 255
         Dim format32f = "0000.0"
         If img.Type = cv.MatType.CV_32F Or img.Type = cv.MatType.CV_32FC3 Then
@@ -205,8 +205,8 @@ Public Class Pixel_GetSet : Inherits VBparent
         setTrueText(output, src.Width / 2 + 10, src.Height / 2 + 20)
 
         mats.Run(src)
-        dst1 = mats.dst1
         dst2 = mats.dst2
+        dst3 = mats.dst3
     End Sub
 End Class
 
@@ -228,7 +228,7 @@ Public Class Pixel_Measure : Inherits VBparent
     End Sub
     Public Function Compute(mmDist As Single) As Single
         Dim halfLineInMeters = Math.Tan(0.0174533 * task.hFov / 2) * mmDist
-        Return halfLineInMeters * 2 / dst1.Width
+        Return halfLineInMeters * 2 / dst2.Width
     End Function
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static distanceSlider = findSlider("Distance in mm")
@@ -303,10 +303,10 @@ Public Class Pixel_Sampler : Inherits VBparent
         End If
 
         If standalone Then
-            dst1 = src
-            dst1.Rectangle(random.rangeRect, cv.Scalar.White, 1)
+            dst2 = src
+            dst2.Rectangle(random.rangeRect, cv.Scalar.White, 1)
             For i = 0 To random.Points2f.Count - 1
-                dst1.Circle(random.Points2f(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
+                dst2.Circle(random.Points2f(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
             Next
             label1 = "Dominant gray value = " + CStr(dominantGray)
             setTrueText("Draw in the image to select a region for testing.", 10, 200, 3)
@@ -345,25 +345,25 @@ Public Class Pixel_Unstable : Inherits VBparent
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         km.Run(src)
-        If km.dst1.Channels <> 1 Then
-            dst1 = km.dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If km.dst2.Channels <> 1 Then
+            dst2 = km.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
-            dst1 = km.dst1
+            dst2 = km.dst2
         End If
-        dst1.ConvertTo(dst1, cv.MatType.CV_32F)
-        Static lastImage As cv.Mat = dst1
-        cv.Cv2.Subtract(dst1, lastImage, dst2)
-        dst2 = dst2.Threshold(diffSlider.value, 255, cv.ThresholdTypes.Binary)
+        dst2.ConvertTo(dst2, cv.MatType.CV_32F)
+        Static lastImage As cv.Mat = dst2
+        cv.Cv2.Subtract(dst2, lastImage, dst3)
+        dst3 = dst3.Threshold(diffSlider.value, 255, cv.ThresholdTypes.Binary)
 
-        unstable.Add(dst2)
+        unstable.Add(dst3)
         If unstable.Count > retainSlider.value Then unstable.RemoveAt(0)
 
         unstablePixels = unstable(0)
         For i = 1 To unstable.Count - 1
             cv.Cv2.BitwiseOr(unstablePixels, unstable(i), unstablePixels)
         Next
-        dst2 = unstablePixels
-        Dim unstableCount = dst2.CountNonZero
+        dst3 = unstablePixels
+        Dim unstableCount = dst3.CountNonZero
 
         pixelCounts.Add(unstableCount)
         If pixelCounts.Count > 100 Then pixelCounts.RemoveAt(0)
@@ -373,6 +373,6 @@ Public Class Pixel_Unstable : Inherits VBparent
         Dim sum = pixelCounts.Sum(Function(d As Integer) Math.Pow(d - avg, 2))
         Dim stdev = Math.Sqrt(sum / pixelCounts.Count)
         label2 = "Unstable pixel count = " + Format(avg, "###,##0") + "    stdev = " + Format(stdev, "0.0")
-        lastImage = dst1.Clone
+        lastImage = dst2.Clone
     End Sub
 End Class

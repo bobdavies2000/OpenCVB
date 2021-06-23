@@ -31,7 +31,7 @@ Public Class Coherence_Basics : Inherits VBparent
         Dim srcRect = New cv.Rect(xoffset, yoffset, side, side)
         If task.drawRect.Width <> 0 Then srcRect = task.drawRect
 
-        dst1 = src.Clone()
+        dst2 = src.Clone()
         src = src(srcRect)
 
         Dim gray As New cv.Mat
@@ -69,9 +69,9 @@ Public Class Coherence_Basics : Inherits VBparent
             dilate.CopyTo(imgl, mask)
             src = src * (1 - blend) + imgl * blend
         Next
-        dst1(srcRect) = src
-        dst1.Rectangle(srcRect, cv.Scalar.Yellow, 2)
-        dst2.SetTo(0)
+        dst2(srcRect) = src
+        dst2.Rectangle(srcRect, cv.Scalar.Yellow, 2)
+        dst3.SetTo(0)
     End Sub
 End Class
 
@@ -88,6 +88,6 @@ Public Class Coherent_Depth : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         coherent.Run(task.RGBDepth)
-        dst1 = coherent.dst1
+        dst2 = coherent.dst2
     End Sub
 End Class

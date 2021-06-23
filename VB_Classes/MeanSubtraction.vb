@@ -9,9 +9,9 @@ Public Class MeanSubtraction_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim mean = cv.Cv2.Mean(src)
-        cv.Cv2.Subtract(mean, src, dst1)
+        cv.Cv2.Subtract(mean, src, dst2)
         Dim scalingFactor = sliders.trackbar(0).Value / 100
-        dst1 *= 1 / scalingFactor
+        dst2 *= 1 / scalingFactor
     End Sub
 End Class
 

@@ -15,16 +15,16 @@ Public Class Diff_Basics : Inherits VBparent
         If src.Channels = 3 Then gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If lastFrame Is Nothing Then lastFrame = src.Clone
         If task.frameCount > 0 Then
-            dst1 = lastFrame
-            cv.Cv2.Absdiff(gray, lastFrame, dst2)
-            If dst2.Type = cv.MatType.CV_8U Then
-                dst2 = dst2.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
+            dst2 = lastFrame
+            cv.Cv2.Absdiff(gray, lastFrame, dst3)
+            If dst3.Type = cv.MatType.CV_8U Then
+                dst3 = dst3.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
             Else
-                dst2 = dst2.ConvertScaleAbs(255).Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
+                dst3 = dst3.ConvertScaleAbs(255).Threshold(thresholdSlider.Value, 255, cv.ThresholdTypes.Binary)
             End If
-            dst1 = src.Clone().SetTo(0, dst2)
+            dst2 = src.Clone().SetTo(0, dst3)
         Else
-            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC1, 0)
+            dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8UC1, 0)
         End If
         lastFrame = gray.Clone()
     End Sub
@@ -44,17 +44,17 @@ Public Class Diff_UnstableDepthAndColor : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         diff.Run(src)
-        Dim unstableGray = diff.dst2.Clone()
+        Dim unstableGray = diff.dst3.Clone()
         depth.Run(task.RGBDepth)
         Dim unstableDepth As New cv.Mat
         Dim mask As New cv.Mat
-        cv.Cv2.BitwiseNot(depth.dst2, unstableDepth)
+        cv.Cv2.BitwiseNot(depth.dst3, unstableDepth)
         If unstableGray.Channels = 3 Then unstableGray = unstableGray.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.BitwiseOr(unstableGray, unstableDepth, mask)
-        dst1 = src.Clone()
-        dst1.SetTo(0, mask)
+        dst2 = src.Clone()
+        dst2.SetTo(0, mask)
         label2 = "Unstable depth/color mask"
-        dst2 = mask
+        dst3 = mask
     End Sub
 End Class
 

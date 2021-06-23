@@ -14,7 +14,7 @@ Public Class Plot_Basics : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         hist.plotColors(0) = cv.Scalar.White
         hist.Run(src)
-        dst1 = hist.dst1
+        dst2 = hist.dst2
 
         ReDim plot.srcX(hist.histRaw(0).Rows - 1)
         ReDim plot.srcY(hist.histRaw(0).Rows - 1)
@@ -23,7 +23,7 @@ Public Class Plot_Basics : Inherits VBparent
             plot.srcY(i) = hist.histRaw(0).Get(Of Single)(i, 0)
         Next
         plot.Run(Nothing)
-        dst2 = plot.dst1
+        dst3 = plot.dst2
         label1 = hist.label1
     End Sub
 End Class
@@ -58,14 +58,14 @@ Public Class Plot_Basics_CPP : Inherits VBparent
             If srcY(i) < minY Then minY = CInt(srcY(i))
         Next
 
-        Dim plotData(dst1.Total * dst1.ElemSize - 1) As Byte
+        Dim plotData(dst2.Total * dst2.ElemSize - 1) As Byte
         Dim handlePlot = GCHandle.Alloc(plotData, GCHandleType.Pinned)
         Dim handleX = GCHandle.Alloc(srcX, GCHandleType.Pinned)
         Dim handleY = GCHandle.Alloc(srcY, GCHandleType.Pinned)
 
-        Plot_OpenCVBasics(handleX.AddrOfPinnedObject, handleY.AddrOfPinnedObject, srcX.Length - 1, handlePlot.AddrOfPinnedObject, dst1.Rows, dst1.Cols)
+        Plot_OpenCVBasics(handleX.AddrOfPinnedObject, handleY.AddrOfPinnedObject, srcX.Length - 1, handlePlot.AddrOfPinnedObject, dst2.Rows, dst2.Cols)
 
-        Marshal.Copy(plotData, 0, dst1.Data, plotData.Length)
+        Marshal.Copy(plotData, 0, dst2.Data, plotData.Length)
         handlePlot.Free()
         handleX.Free()
         handleY.Free()
@@ -115,12 +115,12 @@ Public Class Plot_OverTime : Inherits VBparent
         Dim pixelHeight = CInt(heightSlider.Value)
         Dim pixelWidth = CInt(widthSlider.Value)
 
-        If task.frameCount = 0 Then dst1.SetTo(0)
-        If columnIndex + pixelWidth >= dst1.Width Then
-            dst1.ColRange(columnIndex, dst1.Width).SetTo(backColor)
+        If task.frameCount = 0 Then dst2.SetTo(0)
+        If columnIndex + pixelWidth >= dst2.Width Then
+            dst2.ColRange(columnIndex, dst2.Width).SetTo(backColor)
             columnIndex = 0
         End If
-        dst1.ColRange(columnIndex, columnIndex + pixelWidth).SetTo(backColor)
+        dst2.ColRange(columnIndex, columnIndex + pixelWidth).SetTo(backColor)
         If standalone Or task.intermediateName = caller Then plotData = task.color.Mean()
 
         For i = 0 To plotCount - 1
@@ -133,7 +133,7 @@ Public Class Plot_OverTime : Inherits VBparent
         ' if enough points are off the charted area or if manually requested, then redo the scale.
         If (offChartCount > plotTriggerRescale And lastXdelta.Count >= plotSeriesCount And controlScale = False) Or resetCheck.Checked Then
             resetCheck.Checked = False
-            dst1.SetTo(0)
+            dst2.SetTo(0)
             maxScale = Integer.MinValue
             minScale = Integer.MaxValue
             For i = 0 To lastXdelta.Count - 1
@@ -157,19 +157,19 @@ Public Class Plot_OverTime : Inherits VBparent
         Dim ellipseSize = New cv.Size(pixelWidth, pixelHeight * 2)
         For i = 0 To plotCount - 1
             Dim y = 1 - (plotData.Item(i) - minScale) / (maxScale - minScale)
-            y *= dst1.Height - 1
+            y *= dst2.Height - 1
             Dim c As New cv.Point(columnIndex - pixelWidth, y - pixelHeight)
             Dim rect = New cv.Rect(c.X, c.Y, pixelWidth * 2, pixelHeight * 2)
             Select Case i
                 Case 0
-                    dst1.Circle(c, pixelWidth, plotColors(i), -1, task.lineType)
+                    dst2.Circle(c, pixelWidth, plotColors(i), -1, task.lineType)
                 Case 1
-                    dst1.Rectangle(rect, plotColors(i), -1)
+                    dst2.Rectangle(rect, plotColors(i), -1)
                 Case 2
-                    dst1.Ellipse(c, ellipseSize, 0, 0, 360, plotColors(i), -1)
+                    dst2.Ellipse(c, ellipseSize, 0, 0, 360, plotColors(i), -1)
                 Case 3
                     Dim rotatedRect = New cv.RotatedRect(c, rectSize, 45)
-                    drawRotatedRectangle(rotatedRect, dst2, plotColors(i))
+                    drawRotatedRectangle(rotatedRect, dst3, plotColors(i))
             End Select
         Next
 
@@ -177,13 +177,13 @@ Public Class Plot_OverTime : Inherits VBparent
         Dim nextWatchVal = myStopWatch.ElapsedMilliseconds
         If nextWatchVal - lastSeconds > 1000 Then
             lastSeconds = nextWatchVal
-            dst1.Line(New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst1.Height), cv.Scalar.White, 1)
+            dst2.Line(New cv.Point(columnIndex, 0), New cv.Point(columnIndex, dst2.Height), cv.Scalar.White, 1)
         End If
 
         columnIndex += pixelWidth
-        dst1.Col(columnIndex).SetTo(0)
+        dst2.Col(columnIndex).SetTo(0)
         If standalone Or task.intermediateName = caller Then label1 = "RGB Means: blue = " + Format(plotData.Item(0), "#0.0") + " green = " + Format(plotData.Item(1), "#0.0") + " red = " + Format(plotData.Item(2), "#0.0")
-        AddPlotScale(dst1, minScale - topBottomPad, maxScale + topBottomPad, task.fontSize * 2)
+        AddPlotScale(dst2, minScale - topBottomPad, maxScale + topBottomPad, task.fontSize * 2)
     End Sub
 End Class
 
@@ -207,8 +207,8 @@ Public Class Plot_Histogram : Inherits VBparent
             Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
             cv.Cv2.CalcHist(New cv.Mat() {gray}, New Integer() {0}, New cv.Mat(), hist, 1, dimensions, ranges)
         End If
-        dst1.SetTo(backColor)
-        Dim barWidth = dst1.Width / hist.Rows
+        dst2.SetTo(backColor)
+        Dim barWidth = dst2.Width / hist.Rows
         hist.MinMaxLoc(minVal, maxVal)
 
         If plotMaxValue = 0 Then
@@ -225,12 +225,12 @@ Public Class Plot_Histogram : Inherits VBparent
             For i = 0 To hist.Rows - 1
                 Dim offset = hist.Get(Of Single)(i)
                 If Single.IsNaN(offset) Then offset = 0
-                Dim h = CInt(offset * dst1.Height / maxVal)
+                Dim h = CInt(offset * dst2.Height / maxVal)
                 Dim color As cv.Scalar = cv.Scalar.Black
                 If hist.Rows <= 255 Then color = cv.Scalar.All((i Mod 255) * incr)
-                cv.Cv2.Rectangle(dst1, New cv.Rect(i * barWidth, dst1.Height - h, barWidth, h), color, -1)
+                cv.Cv2.Rectangle(dst2, New cv.Rect(i * barWidth, dst2.Height - h, barWidth, h), color, -1)
             Next
-            AddPlotScale(dst1, 0, maxVal, task.fontSize * 2)
+            AddPlotScale(dst2, 0, maxVal, task.fontSize * 2)
         End If
     End Sub
 End Class
@@ -244,22 +244,22 @@ Module Plot_OpenCV_Module
     Public Sub Plot_OpenCVBasics(inX As IntPtr, inY As IntPtr, inLen As Integer, dstptr As IntPtr, rows As Integer, cols As Integer)
     End Sub
 
-    Public Sub AddPlotScale(dst1 As cv.Mat, minVal As Double, maxVal As Double, fontSize As Double)
+    Public Sub AddPlotScale(dst2 As cv.Mat, minVal As Double, maxVal As Double, fontSize As Double)
         ' draw a scale along the side
-        Dim spacer = CInt(dst1.Height / 4)
+        Dim spacer = CInt(dst2.Height / 4)
         Dim spaceVal = CInt((maxVal - minVal) / 4)
         If spaceVal < 1 Then spaceVal = 1
         For i = 0 To 4 - 1
             Dim pt1 = New cv.Point(0, spacer * i)
-            Dim pt2 = New cv.Point(dst1.Width, spacer * i)
-            dst1.Line(pt1, pt2, cv.Scalar.White, 1)
+            Dim pt2 = New cv.Point(dst2.Width, spacer * i)
+            dst2.Line(pt1, pt2, cv.Scalar.White, 1)
             If i = 0 Then pt2.Y += 10
             Dim nextVal = (maxVal - spaceVal * i)
             If maxVal > 1000 Then
-                cv.Cv2.PutText(dst1, Format(nextVal / 1000, "###,###,##0.0") + "k", New cv.Point(pt1.X + 5, pt1.Y - 4),
+                cv.Cv2.PutText(dst2, Format(nextVal / 1000, "###,###,##0.0") + "k", New cv.Point(pt1.X + 5, pt1.Y - 4),
                            cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.Beige, 2)
             Else
-                cv.Cv2.PutText(dst1, Format(nextVal, "##0"), New cv.Point(pt1.X + 5, pt1.Y - 4),
+                cv.Cv2.PutText(dst2, Format(nextVal, "##0"), New cv.Point(pt1.X + 5, pt1.Y - 4),
                            cv.HersheyFonts.HersheyComplexSmall, fontSize, cv.Scalar.Beige, 2)
             End If
         Next
@@ -286,7 +286,7 @@ Public Class Plot_Depth : Inherits VBparent
             plotDepth.srcY(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
         Next
         plotDepth.Run(Nothing)
-        dst1 = plotDepth.dst1
+        dst2 = plotDepth.dst2
 
         label1 = plotDepth.label1
         Dim Split = Regex.Split(label1, "\W+")
@@ -295,8 +295,8 @@ Public Class Plot_Depth : Inherits VBparent
             Dim meterDepth = CInt(src.Width / lineCount)
             For i = 1 To lineCount
                 Dim x = i * meterDepth
-                dst1.Line(New cv.Point(x, 0), New cv.Point(x, src.Height), cv.Scalar.White, task.lineWidth)
-                cv.Cv2.PutText(dst1, Format(i, "0") + "m", New cv.Point(x + 5, src.Height - 10), cv.HersheyFonts.HersheyComplexSmall, 0.7, cv.Scalar.White, 2)
+                dst2.Line(New cv.Point(x, 0), New cv.Point(x, src.Height), cv.Scalar.White, task.lineWidth)
+                cv.Cv2.PutText(dst2, Format(i, "0") + "m", New cv.Point(x + 5, src.Height - 10), cv.HersheyFonts.HersheyComplexSmall, 0.7, cv.Scalar.White, 2)
             Next
         End If
     End Sub

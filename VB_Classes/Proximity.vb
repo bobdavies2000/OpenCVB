@@ -13,8 +13,8 @@ Public Class Proximity_Basics : Inherits VBparent
             input.ConvertTo(input, cv.MatType.CV_32F)
         End If
         km.Run(src)
-        dst1 = km.dst1
-        dst1.SetTo(0, task.noDepthMask)
+        dst2 = km.dst2
+        dst2.SetTo(0, task.noDepthMask)
     End Sub
 End Class
 
@@ -41,7 +41,7 @@ Public Class Proximity_BasicsDepth : Inherits VBparent
         Dim depth32f = task.depth32f.Resize(New cv.Size(w, h), 0, 0, cv.InterpolationFlags.Nearest)
         depth32f.SetTo(0, task.noDepthMask.Resize(depth32f.Size))
         km.Run(depth32f)
-        dst1 = km.dst1
+        dst2 = km.dst2
     End Sub
 End Class
 
@@ -67,8 +67,8 @@ Public Class Proximity_BasicsRGB : Inherits VBparent
         Dim h = CInt(task.depth32f.Height / resizeFactor)
 
         km.Run(src)
-        dst1 = km.dst1
         dst2 = km.dst2
+        dst3 = km.dst3
     End Sub
 End Class
 
@@ -143,8 +143,8 @@ Public Class Proximity_Valleys : Inherits VBparent
         End If
         rangeCounts.Add(pointcount)
 
-        dst1 = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
-        Dim binWidth = CInt(dst1.Width / histogram.Rows)
+        dst2 = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
+        Dim binWidth = CInt(dst2.Width / histogram.Rows)
         histogram.MinMaxLoc(minVal, maxVal)
         Dim splitIndex As Integer
         If maxVal > 0 Then
@@ -153,16 +153,16 @@ Public Class Proximity_Valleys : Inherits VBparent
                 If splitIndex >= ranges.Count - 1 Then splitIndex = ranges.Count - 1
 
                 If depth >= ranges(splitIndex).Y Then splitIndex += 1
-                Dim h = CInt(dst1.Height * kalman.kOutput(i) / maxVal)
+                Dim h = CInt(dst2.Height * kalman.kOutput(i) / maxVal)
 
-                If h > 0 Then dst1.Rectangle(New cv.Rect(i * binWidth, dst1.Height - h, binWidth, h), splitIndex + 1, -1)
+                If h > 0 Then dst2.Rectangle(New cv.Rect(i * binWidth, dst2.Height - h, binWidth, h), splitIndex + 1, -1)
                 barHeight.Add(h)
             Next
         End If
 
         Dim spread = 255 / ranges.Count
-        task.palette.Run(dst1 * spread)
-        dst1 = task.palette.dst1
+        task.palette.Run(dst2 * spread)
+        dst2 = task.palette.dst2
     End Sub
 End Class
 
@@ -181,11 +181,11 @@ Public Class Proximity_Clusters : Inherits VBparent
         If src.Type <> cv.MatType.CV_32F Then src = task.depth32f.Clone
 
         valleys.Run(src)
-        dst1 = valleys.dst1
+        dst2 = valleys.dst2
 
         Dim tmp As New cv.Mat
         Dim colorIncr = 255 / valleys.ranges.Count
-        Dim paletteSrc = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Dim paletteSrc = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         For i = 0 To valleys.ranges.Count - 1
             Dim startEndDepth = valleys.ranges.ElementAt(i)
             cv.Cv2.InRange(src, startEndDepth.X, startEndDepth.Y, tmp)
@@ -193,12 +193,12 @@ Public Class Proximity_Clusters : Inherits VBparent
         Next
         paletteSrc += 1
         task.palette.Run(paletteSrc)
-        dst2 = task.palette.dst1
+        dst3 = task.palette.dst2
         If standalone Or task.intermediateName = caller Then
             label1 = "Histogram of " + CStr(valleys.ranges.Count) + " Depth Clusters"
             label2 = "Backprojection of " + CStr(valleys.ranges.Count) + " histogram clusters"
         End If
-        dst2.SetTo(0, task.noDepthMask)
+        dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class
 
@@ -227,25 +227,25 @@ Public Class Proximity_ClustersKalman : Inherits VBparent
 
         Dim tmp As New cv.Mat
         Dim colorIncr = 255 / valleys.ranges.Count
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         Dim depthIncr = task.maxDepth / task.histogramBins ' each bar represents this number of millimeters
-        Dim binWidth = CInt(dst1.Width / task.histogramBins)
+        Dim binWidth = CInt(dst2.Width / task.histogramBins)
         For i = 0 To kalman.kOutput.Length - 1
             Dim h = valleys.barHeight(i)
-            If h > 0 Then dst1.Rectangle(New cv.Rect(i * binWidth, dst1.Height - h, binWidth, h), colorIncr * CInt(kalman.kOutput(i)), -1)
+            If h > 0 Then dst2.Rectangle(New cv.Rect(i * binWidth, dst2.Height - h, binWidth, h), colorIncr * CInt(kalman.kOutput(i)), -1)
 
             Dim startDepth = i * depthIncr
             Dim endDepth = (i + 1) * depthIncr
             cv.Cv2.InRange(src, startDepth, endDepth, tmp)
-            dst2.SetTo(colorIncr * CInt(kalman.kOutput(i)), tmp.ConvertScaleAbs())
+            dst3.SetTo(colorIncr * CInt(kalman.kOutput(i)), tmp.ConvertScaleAbs())
         Next
 
-        task.palette.Run(dst1)
-        dst1 = task.palette.dst1
         task.palette.Run(dst2)
-        dst2 = task.palette.dst1
-        dst2.SetTo(0, task.noDepthMask)
+        dst2 = task.palette.dst2
+        task.palette.Run(dst3)
+        dst3 = task.palette.dst2
+        dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class
 
@@ -275,13 +275,13 @@ Public Class Proximity_ValleysKalman : Inherits VBparent
         kalman.kInput = trends.resultingValues.ToArray
         kalman.Run(src)
 
-        dst1.SetTo(cv.Scalar.Black)
-        Dim barWidth = Int(dst1.Width / trends.resultingValues.Count)
+        dst2.SetTo(cv.Scalar.Black)
+        Dim barWidth = Int(dst2.Width / trends.resultingValues.Count)
         Dim colorIndex As Integer
         Dim color = task.scalarColors(colorIndex Mod 255)
         Dim vals() = {-1, -1, -1}
         For i = 0 To kalman.kOutput.Count - 1
-            Dim h = dst1.Height - kalman.kOutput(i)
+            Dim h = dst2.Height - kalman.kOutput(i)
             vals(0) = vals(1)
             vals(1) = vals(2)
             vals(2) = h
@@ -291,7 +291,7 @@ Public Class Proximity_ValleysKalman : Inherits VBparent
                     color = task.scalarColors(colorIndex Mod 255)
                 End If
             End If
-            cv.Cv2.Rectangle(dst1, New cv.Rect(i * barWidth, dst1.Height - h, barWidth, h), color, -1)
+            cv.Cv2.Rectangle(dst2, New cv.Rect(i * barWidth, dst2.Height - h, barWidth, h), color, -1)
             depthRegions.Add(colorIndex)
         Next
         label1 = "Depth regions between 0 and " + CStr(CInt(task.maxZ)) + " meters"
@@ -319,13 +319,13 @@ Public Class Proximity_SLR : Inherits VBparent
         hist.depthNoZero = True ' not interested in the undefined depth areas...
         hist.Run(src)
         hist.histogram.Set(Of Single)(0, 0, 0)
-        dst1 = hist.dst1
+        dst2 = hist.dst2
         For i = 0 To hist.histogram.Rows - 1
             slr.input.dataX.Add(i)
             slr.input.dataY.Add(hist.histogram.Get(Of Single)(i, 0))
         Next
         slr.Run(src)
-        dst2 = slr.dst2
+        dst3 = slr.dst3
     End Sub
 End Class
 
@@ -347,23 +347,23 @@ Public Class Proximity_Reduction : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         task.depth32f.ConvertTo(src, cv.MatType.CV_32S)
         reduction.Run(src)
-        reduction.dst1.ConvertTo(dst2, cv.MatType.CV_32F)
+        reduction.dst2.ConvertTo(dst3, cv.MatType.CV_32F)
 
-        dst1 = dst2.Normalize(0, 255, cv.NormTypes.MinMax)
-        dst1.ConvertTo(dst1, cv.MatType.CV_8UC1)
+        dst2 = dst3.Normalize(0, 255, cv.NormTypes.MinMax)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8UC1)
 
         If task.frameCount Mod 30 = 0 Then
             counts.Clear()
-            For y = 0 To dst1.Rows - 1 Step dst1.Rows / 10
-                For x = 0 To dst1.Cols - 1 Step dst1.Cols / 10
-                    Dim val = CInt(dst1.Get(Of Byte)(y, x))
+            For y = 0 To dst2.Rows - 1 Step dst2.Rows / 10
+                For x = 0 To dst2.Cols - 1 Step dst2.Cols / 10
+                    Dim val = CInt(dst2.Get(Of Byte)(y, x))
                     If counts.Contains(val) = False Then counts.Add(val)
                 Next
             Next
         End If
 
-        task.palette.Run(dst1)
-        dst1 = task.palette.dst1
+        task.palette.Run(dst2)
+        dst2 = task.palette.dst2
         label1 = reduction.label1 + " with " + CStr(counts.Count) + " levels"
     End Sub
 End Class
@@ -390,8 +390,8 @@ Public Class Proximity_MasksRGB : Inherits VBparent
         Next
 
         mats.Run(Nothing)
-        dst1 = mats.dst1
         dst2 = mats.dst2
+        dst3 = mats.dst3
     End Sub
 End Class
 
@@ -409,7 +409,7 @@ Public Class Proximity_MasksDepth : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         proxy.Run(task.depth32f)
-        dst1 = proxy.dst1
         dst2 = proxy.dst2
+        dst3 = proxy.dst3
     End Sub
 End Class

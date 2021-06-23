@@ -30,12 +30,12 @@ Public Class MeanShift_Basics : Inherits VBparent
             Dim backProj As New cv.Mat
             cv.Cv2.CalcBackProject(New cv.Mat() {hsv}, ch, roi_hist, backProj, ranges)
             cv.Cv2.MeanShift(backProj, trackbox, cv.TermCriteria.Both(10, 1))
-            dst1 = backProj.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            dst1.Rectangle(trackbox, cv.Scalar.Red, rectangleEdgeWidth, task.lineType)
-            Show_HSV_Hist(dst2, roi_hist)
-            dst2 = dst2.CvtColor(cv.ColorConversionCodes.HSV2BGR)
+            dst2 = backProj.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            dst2.Rectangle(trackbox, cv.Scalar.Red, rectangleEdgeWidth, task.lineType)
+            Show_HSV_Hist(dst3, roi_hist)
+            dst3 = dst3.CvtColor(cv.ColorConversionCodes.HSV2BGR)
         Else
-            dst1 = src
+            dst2 = src
         End If
     End Sub
 End Class
@@ -57,19 +57,19 @@ Public Class MeanShift_Depth : Inherits VBparent
         End If
         If ms.usingDrawRect Then
             ms.Run(src)
-            dst1 = ms.dst1
             dst2 = ms.dst2
+            dst3 = ms.dst3
         Else
             blob.Run(src)
-            dst1 = blob.dst1
+            dst2 = blob.dst2
 
             If blob.trustworthy Then
                 ms.inputRect = blob.trustedRect
                 ms.Run(src)
+                dst3 = ms.dst3
                 dst2 = ms.dst2
-                dst1 = ms.dst1
             Else
-                dst2 = src
+                dst3 = src
             End If
         End If
     End Sub
@@ -91,7 +91,7 @@ Public Class MeanShift_PyrFilter : Inherits VBparent
         Dim spatialRadius = sliders.trackbar(0).Value
         Dim colorRadius = sliders.trackbar(1).Value
         Dim maxPyrLevel = sliders.trackbar(2).Value
-        cv.Cv2.PyrMeanShiftFiltering(src, dst1, spatialRadius, colorRadius, maxPyrLevel)
+        cv.Cv2.PyrMeanShiftFiltering(src, dst2, spatialRadius, colorRadius, maxPyrLevel)
     End Sub
 End Class
 
@@ -118,8 +118,8 @@ Public Class Meanshift_TopObjects : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         blob.Run(src)
-        dst1 = blob.dst2
-        flood.Run(dst1)
+        dst2 = blob.dst3
+        flood.Run(dst2)
 
         Dim updateFrequency = sliders.trackbar(0).Value
         Dim trackBoxes As New List(Of cv.Rect)
@@ -131,15 +131,15 @@ Public Class Meanshift_TopObjects : Inherits VBparent
                 End If
 
                 cams(i).Run(src)
-                mats1.mat(i) = cams(i).dst1.Clone()
-                mats2.mat(i) = cams(i).dst2.Clone()
+                mats1.mat(i) = cams(i).dst2.Clone()
+                mats2.mat(i) = cams(i).dst3.Clone()
                 trackBoxes.Add(cams(i).trackbox)
             End If
         Next
         mats1.Run(Nothing)
-        dst1 = mats1.dst1
+        dst2 = mats1.dst2
         mats2.Run(Nothing)
-        dst2 = mats2.dst1
+        dst3 = mats2.dst2
     End Sub
 End Class
 

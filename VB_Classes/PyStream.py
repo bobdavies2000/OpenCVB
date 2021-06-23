@@ -76,22 +76,22 @@ def PyStreamRun(OpenCVCode, titleWindow):
                             except:
                                 print("Unable to reshape the RGB data")
                                 sys.exit(0)
-                            dst1, dst2 = OpenCVCode(imgRGB, depth32f, frameCount)
-                            if len(dst1.shape) == 2:
-                                dst1 = cv.cvtColor(dst1, cv.COLOR_GRAY2BGR)
-                            if dst1.shape[2]==4:
-                                dst1 = cv.cvtColor(dst1, cv.COLOR_RGBA2BGR)
-                            dst1 = cv.resize(dst1, (cols, rows))
-                            if np.any(dst2 != None):
-                                if len(dst2.shape) == 2:
-                                    dst2 = cv.cvtColor(dst2, cv.COLOR_GRAY2BGR)
-                                if dst2.shape[2] == 4:
-                                    dst2 = cv.cvtColor(dst2, cv.COLOR_RGBA2BGR)
-                                dst2 = cv.resize(dst2, (cols, rows))
+                            dst2, dst3 = OpenCVCode(imgRGB, depth32f, frameCount)
+                            if len(dst2.shape) == 2:
+                                dst2 = cv.cvtColor(dst2, cv.COLOR_GRAY2BGR)
+                            if dst2.shape[2]==4:
+                                dst2 = cv.cvtColor(dst2, cv.COLOR_RGBA2BGR)
+                            dst2 = cv.resize(dst2, (cols, rows))
+                            if np.any(dst3 != None):
+                                if len(dst3.shape) == 2:
+                                    dst3 = cv.cvtColor(dst3, cv.COLOR_GRAY2BGR)
+                                if dst3.shape[2] == 4:
+                                    dst3 = cv.cvtColor(dst3, cv.COLOR_RGBA2BGR)
+                                dst3 = cv.resize(dst3, (cols, rows))
                             else:
-                                dst2 = np.zeros(dst1.shape, np.uint8)
-                            pipeOut.write(np.asarray(dst1)) # Assumption here is that we are always returning 8uC3.  Needs more work to generalize...
-                            pipeOut.write(np.asarray(dst2))
+                                dst3 = np.zeros(dst2.shape, np.uint8)
+                            pipeOut.write(np.asarray(dst2)) # Assumption here is that we are always returning 8uC3.  Needs more work to generalize...
+                            pipeOut.write(np.asarray(dst3))
 
                             cv.waitKey(1) # this is only needed if the OpenCVCode function is calling imshow
             except:

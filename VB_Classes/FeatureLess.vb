@@ -25,19 +25,19 @@ Public Class Featureless_Basics : Inherits VBparent
         Dim thetaIn = sliders.trackbar(1).Value / 1000
         Dim threshold = sliders.trackbar(2).Value
 
-        src.CopyTo(dst1)
-        Dim mask = New cv.Mat(dst1.Size(), cv.MatType.CV_8U, 0)
+        src.CopyTo(dst2)
+        Dim mask = New cv.Mat(dst2.Size(), cv.MatType.CV_8U, 0)
         Parallel.ForEach(grid.roiList,
         Sub(roi)
-            Dim segments() = cv.Cv2.HoughLines(edges.dst1(roi), rhoIn, thetaIn, threshold)
+            Dim segments() = cv.Cv2.HoughLines(edges.dst2(roi), rhoIn, thetaIn, threshold)
             If segments.Count = 0 Then mask(roi).SetTo(255)
         End Sub)
 
         flood.Run(mask)
-        dst1 = flood.dst1
+        dst2 = flood.dst2
 
-        dst2.SetTo(0)
-        src.CopyTo(dst2, flood.allRegionMask)
+        dst3.SetTo(0)
+        src.CopyTo(dst3, flood.allRegionMask)
         Static floodSlider = findSlider("FloodFill Minimum Size")
         label2 = "FeatureLess Regions = " + CStr(flood.basics.centroids.Count) + " with more than " + CStr(floodSlider.value) + " pixels"
     End Sub
@@ -56,10 +56,10 @@ Public Class Featureless_DCT_MT : Inherits VBparent
 
     Public Sub Run(src As cv.Mat) ' Rank = 1
         dct.Run(src)
-        dst1 = dct.dst1
         dst2 = dct.dst2
+        dst3 = dct.dst3
 
-        Dim mask = dst1.Clone()
+        Dim mask = dst2.Clone()
         Dim objectSize As New List(Of Integer)
         Dim regionCount = 1
         For y = 0 To mask.Rows - 1
@@ -84,7 +84,7 @@ Public Class Featureless_DCT_MT : Inherits VBparent
         Dim label = mask.InRange(maxIndex + 1, maxIndex + 1)
         Dim nonZ = label.CountNonZero()
         label2 = "Largest FeatureLess Region (" + CStr(nonZ) + " " + Format(nonZ / label.Total, "#0.0%") + " pixels)"
-        dst2.SetTo(cv.Scalar.White, label)
+        dst3.SetTo(cv.Scalar.White, label)
     End Sub
 End Class
 
@@ -103,27 +103,27 @@ Public Class FeatureLess_Prediction : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         fLess.Run(src)
-        dst1 = fLess.dst1
         dst2 = fLess.dst2
-        Dim labels = fLess.dst2.Clone()
+        dst3 = fLess.dst3
+        Dim labels = fLess.dst3.Clone()
 
         Dim percent = Math.Sqrt(sliders.trackbar(0).Value / 100)
         Dim newSize = New cv.Size(src.Width * percent, src.Height * percent)
 
         Dim rgb = src.Clone()
         Dim depth32f As cv.Mat = task.depth32f.Resize(newSize)
-        Dim mask = fLess.dst2
+        Dim mask = fLess.dst3
 
         rgb = rgb.Resize(newSize)
 
         ' manually resize the mask to make sure there is no dithering...
         mask = New cv.Mat(depth32f.Size(), cv.MatType.CV_8U, 0)
         Dim labelSmall As New cv.Mat(mask.Size(), cv.MatType.CV_32S, 0)
-        Dim xFactor = CInt(fLess.dst2.Width / newSize.Width)
-        Dim yFactor = CInt(fLess.dst2.Height / newSize.Height)
+        Dim xFactor = CInt(fLess.dst3.Width / newSize.Width)
+        Dim yFactor = CInt(fLess.dst3.Height / newSize.Height)
         For y = 0 To mask.Height - 2
             For x = 0 To mask.Width - 2
-                If fLess.dst2.Get(Of Byte)(y * yFactor, x * xFactor) = 255 Then
+                If fLess.dst3.Get(Of Byte)(y * yFactor, x * xFactor) = 255 Then
                     mask.Set(Of Byte)(y, x, 255)
                     labelSmall.Set(Of Byte)(y, x, labels.Get(Of Byte)(y, x))
                 End If
@@ -166,7 +166,7 @@ Public Class FeatureLess_Prediction : Inherits VBparent
         Dim predictedDepth = response.Reshape(1, depth32f.Height)
         predictedDepth.Normalize(0, 255, cv.NormTypes.MinMax)
         predictedDepth.ConvertTo(mask, cv.MatType.CV_8U)
-        dst2 = mask.ConvertScaleAbs().Resize(src.Size())
+        dst3 = mask.ConvertScaleAbs().Resize(src.Size())
     End Sub
 End Class
 
@@ -184,13 +184,13 @@ Public Class FeatureLess_PointTracker : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         fLess.Run(src)
-        dst2 = fLess.dst1
+        dst3 = fLess.dst2
 
         pTrack.queryPoints = fLess.flood.basics.centroids
         pTrack.queryRects = fLess.flood.basics.rects
         pTrack.queryMasks = fLess.flood.basics.masks
         pTrack.Run(src)
-        dst1 = pTrack.dst1
+        dst2 = pTrack.dst2
     End Sub
 End Class
 
@@ -209,9 +209,9 @@ Public Class FeatureLess_Highlights : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         fLessP.Run(src)
 
-        addW.src2 = fLessP.dst1
+        addW.src2 = fLessP.dst2
         addW.Run(src)
-        dst1 = addW.dst1
+        dst2 = addW.dst2
     End Sub
 End Class
 

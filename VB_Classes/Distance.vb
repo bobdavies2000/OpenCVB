@@ -25,7 +25,7 @@ Public Class Distance_Basics : Inherits VBparent
         Dim dist = src.DistanceTransform(DistanceType, kernelSize)
         Dim dist32f = dist.Normalize(0, 255, cv.NormTypes.MinMax)
         dist32f.ConvertTo(src, cv.MatType.CV_8UC1)
-        dst1 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -48,20 +48,20 @@ Public Class Distance_Foreground : Inherits VBparent
         Static l1Radio = findRadio("L1")
 
         foreground.Run(src)
-        dst2 = If(useBackgroundAsInput, foreground.dst1, foreground.dst2)
+        dst3 = If(useBackgroundAsInput, foreground.dst2, foreground.dst3)
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim DistanceType = cv.DistanceTypes.L2
         If cRadio.Checked Then DistanceType = cv.DistanceTypes.C
         If l1Radio.Checked Then DistanceType = cv.DistanceTypes.L1
 
-        cv.Cv2.BitwiseAnd(src, dst2, src)
+        cv.Cv2.BitwiseAnd(src, dst3, src)
         Dim kernelSize = 0 ' this is precise distance (there is no distance of 1)
 
         Dim dist = src.DistanceTransform(DistanceType, kernelSize)
         Dim dist32f = dist.Normalize(0, 255, cv.NormTypes.MinMax)
         dist32f.ConvertTo(src, cv.MatType.CV_8UC1)
-        dst1 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
     End Sub
 End Class
 
@@ -79,8 +79,8 @@ Public Class Distance_Background : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         dist.Run(src)
-        dst1 = dist.dst1
         dst2 = dist.dst2
+        dst3 = dist.dst3
         label1 = dist.label1
         label2 = dist.label2
     End Sub

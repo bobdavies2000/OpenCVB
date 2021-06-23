@@ -60,8 +60,8 @@ Public Class ML_FillRGBDepth_MT : Inherits VBparent
     Dim grid As New Thread_Grid
     Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
-        findSlider("ThreadGrid Width").Value = dst1.Cols / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
-        findSlider("ThreadGrid Height").Value = dst1.Rows / 4
+        findSlider("ThreadGrid Width").Value = dst2.Cols / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
+        findSlider("ThreadGrid Height").Value = dst2.Rows / 4
 
         label1 = "ML filled shadow"
         label2 = ""
@@ -73,12 +73,12 @@ Public Class ML_FillRGBDepth_MT : Inherits VBparent
         Dim minLearnCount = 5
         Parallel.ForEach(grid.roiList,
             Sub(roi)
-                task.depth32f(roi) = detectAndFillShadow(shadow.holeMask(roi), shadow.dst2(roi), task.depth32f(roi), src(roi), minLearnCount)
+                task.depth32f(roi) = detectAndFillShadow(shadow.holeMask(roi), shadow.dst3(roi), task.depth32f(roi), src(roi), minLearnCount)
             End Sub)
 
         colorizer.Run(task.depth32f)
-        dst1 = colorizer.dst1.Clone()
-        dst1.SetTo(cv.Scalar.White, grid.gridMask)
+        dst2 = colorizer.dst2.Clone()
+        dst2.SetTo(cv.Scalar.White, grid.gridMask)
     End Sub
 End Class
 
@@ -102,10 +102,10 @@ Public Class ML_FillRGBDepth : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         shadow.Run(src)
         Dim minLearnCount = sliders.trackbar(0).Value
-        task.RGBDepth.CopyTo(dst1)
-        task.depth32f = detectAndFillShadow(shadow.holeMask, shadow.dst2, task.depth32f, src, minLearnCount)
+        task.RGBDepth.CopyTo(dst2)
+        task.depth32f = detectAndFillShadow(shadow.holeMask, shadow.dst3, task.depth32f, src, minLearnCount)
         colorizer.Run(task.depth32f)
-        dst2 = colorizer.dst1
+        dst3 = colorizer.dst2
     End Sub
 End Class
 
@@ -140,8 +140,8 @@ Public Class ML_DepthFromColor_MT : Inherits VBparent
 
         mask = task.depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         dilate.Run(mask)
-        mask = dilate.dst1
-        dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        mask = dilate.dst2
+        dst3 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim color32f As New cv.Mat
         src.ConvertTo(color32f, cv.MatType.CV_32FC3)
@@ -164,7 +164,7 @@ Public Class ML_DepthFromColor_MT : Inherits VBparent
             End Sub)
         label2 = "Input region count = " + CStr(predictedRegions) + " of " + CStr(grid.roiList.Count)
         colorizer.Run(predictedDepth)
-        dst1 = colorizer.dst1
+        dst2 = colorizer.dst2
     End Sub
 End Class
 
@@ -195,7 +195,7 @@ Public Class ML_DepthFromColor : Inherits VBparent
         resized.Run(src)
 
         Dim colorROI As New cv.Rect(0, 0, resized.resizeOptions.newSize.Width, resized.resizeOptions.newSize.Height)
-        resized.dst1.ConvertTo(color32f, cv.MatType.CV_32FC3)
+        resized.dst2.ConvertTo(color32f, cv.MatType.CV_32FC3)
         Dim shadowSmall = mats.mat(1).Resize(color32f.Size()).Clone()
         color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
         Dim depth32f = task.depth32f.Resize(color32f.Size())
@@ -208,11 +208,11 @@ Public Class ML_DepthFromColor : Inherits VBparent
         depth32f.SetTo(sliders.trackbar(0).Value, mask)
 
         colorizer.Run(depth32f)
-        mats.mat(3) = colorizer.dst1.Clone()
+        mats.mat(3) = colorizer.dst2.Clone()
 
         mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         Dim maskCount = mask.CountNonZero()
-        dst1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim learnInput = color32f.Reshape(1, color32f.Total)
         Dim depthResponse = depth32f.Reshape(1, depth32f.Total)
@@ -228,12 +228,12 @@ Public Class ML_DepthFromColor : Inherits VBparent
         Dim predictedDepth = output.Reshape(1, src.Height)
 
         colorizer.Run(predictedDepth)
-        mats.mat(0) = colorizer.dst1.Clone()
+        mats.mat(0) = colorizer.dst2.Clone()
 
         mats.Run(src)
-        dst1 = mats.dst1
-        label1 = "prediction, shadow, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
         dst2 = mats.dst2
+        label1 = "prediction, shadow, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
+        dst3 = mats.dst3
     End Sub
 End Class
 
@@ -263,7 +263,7 @@ Public Class ML_DepthFromXYColor : Inherits VBparent
         resized.Run(src)
 
         Dim colorROI As New cv.Rect(0, 0, resized.resizeOptions.newSize.Width, resized.resizeOptions.newSize.Height)
-        resized.dst1.ConvertTo(color32f, cv.MatType.CV_32FC3)
+        resized.dst2.ConvertTo(color32f, cv.MatType.CV_32FC3)
         Dim shadowSmall = shadow.holeMask.Resize(color32f.Size()).Clone()
         color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
         Dim depth32f = task.depth32f.Resize(color32f.Size())
@@ -277,11 +277,11 @@ Public Class ML_DepthFromXYColor : Inherits VBparent
         depth32f.SetTo(sliders.trackbar(0).Value, mask)
 
         colorizer.Run(depth32f)
-        mats.mat(3) = colorizer.dst1.Clone()
+        mats.mat(3) = colorizer.dst2.Clone()
 
         mask = depth32f.Threshold(1, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
         Dim maskCount = mask.CountNonZero()
-        dst1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim c = color32f.Reshape(1, color32f.Total)
         Dim depthResponse = depth32f.Reshape(1, depth32f.Total)
@@ -313,10 +313,10 @@ Public Class ML_DepthFromXYColor : Inherits VBparent
         Dim predictedDepth = output.Reshape(1, src.Height)
 
         colorizer.Run(predictedDepth)
-        dst1 = colorizer.dst1.Clone()
+        dst2 = colorizer.dst2.Clone()
 
         mats.Run(src)
-        dst2 = mats.dst1
+        dst3 = mats.dst2
         label2 = "shadow, empty, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
     End Sub
 End Class
@@ -351,7 +351,7 @@ Public Class ML_EdgeDepth_MT : Inherits VBparent
 
         mask = task.depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         dilate.Run(mask)
-        dst1 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim color32f As New cv.Mat
         src.ConvertTo(color32f, cv.MatType.CV_32FC3)
@@ -375,7 +375,7 @@ Public Class ML_EdgeDepth_MT : Inherits VBparent
             End Sub)
         label2 = "Input region count = " + CStr(predictedRegions) + " of " + CStr(grid.roiList.Count)
         colorizer.Run(predictedDepth)
-        dst2 = colorizer.dst1
+        dst3 = colorizer.dst2
     End Sub
 End Class
 
@@ -414,7 +414,7 @@ End Class
 '        Static lastColors As New cv.Mat
 '        If standalone or task.intermediateName = caller Then
 '            emax.Run()
-'            dst1 = emax.dst1.Clone()
+'            dst2 = emax.dst2.Clone()
 '        End If
 '        Dim nextResponse = emax.response.Clone
 '        Dim nextInput = emax.descriptors.Clone
@@ -422,7 +422,7 @@ End Class
 '            trainData = nextInput
 '            response = nextResponse
 '            rtree.Train(trainData, cv.ML.SampleTypes.RowSample, response)
-'            lastColors = emax.dst1.Clone()
+'            lastColors = emax.dst2.Clone()
 '        Else
 '            Dim residual As Integer = 20 * nextInput.Rows ' we need about x iterations to settle in on the right values...
 '            If trainData.Rows > residual Then
@@ -441,17 +441,17 @@ End Class
 '            For i = 0 To nextInput.Rows - 1
 '                Dim pt = nextInput.Get(Of cv.Point2f)(i, 0)
 '                Dim cIndex = CInt(predictions.Get(Of Single)(i, 0))
-'                cv.Cv2.FloodFill(dst1, New cv.Mat, pt, task.scalarColors(cIndex), New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
+'                cv.Cv2.FloodFill(dst2, New cv.Mat, pt, task.scalarColors(cIndex), New cv.Rect, 1, 1, cv.FloodFillFlags.FixedRange Or (255 << 8) Or 4)
 '                Dim vec = convertScalarToVec3b(task.scalarColors(cIndex))
 '                If vec = lastColors.Get(Of cv.Vec3b)(pt.Y, pt.X) Then truthCount += 1
-'                dst1.Circle(pt, task.dotsize + 5, cv.Scalar.Black, -1, task.lineType)
+'                dst2.Circle(pt, task.dotsize + 5, cv.Scalar.Black, -1, task.lineType)
 '            Next
-'            dst2 = (dst1 - lastColors).ToMat
+'            dst3 = (dst2 - lastColors).ToMat
 '            label2 = CStr(truthCount) + " colors correctly predicted with centroid"
 '        End If
 
 '        rtree.Train(trainData, cv.ML.SampleTypes.RowSample, response) ' use the latest results to train the next iteration.
-'        lastColors = emax.dst1.Clone()
+'        lastColors = emax.dst2.Clone()
 '    End Sub
 'End Class
 

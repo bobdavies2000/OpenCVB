@@ -302,15 +302,15 @@ Public Class OpenCVB
             ' This code is only active during a survey. 
             If pic.Tag = 2 Then
                 SyncLock imgResult
-                    Dim dst1 = imgResult(New cv.Rect(0, 0, imgResult.Width / 2, imgResult.Height))
-                    Dim dst2 = imgResult(New cv.Rect(imgResult.Width / 2, 0, imgResult.Width / 2, imgResult.Height))
+                    Dim dst2 = imgResult(New cv.Rect(0, 0, imgResult.Width / 2, imgResult.Height))
+                    Dim dst3 = imgResult(New cv.Rect(imgResult.Width / 2, 0, imgResult.Width / 2, imgResult.Height))
 
                     Dim encodeParams() As Integer = {cv.ImwriteFlags.JpegQuality, 99}
-                    Dim count = dst1.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
-                    If count > 0 Then cv.Cv2.ImWrite(surveyDir.FullName + "/" + AvailableAlgorithms.Text + "1.jpg", dst1, encodeParams)
+                    Dim count = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
+                    If count > 0 Then cv.Cv2.ImWrite(surveyDir.FullName + "/" + AvailableAlgorithms.Text + "1.jpg", dst2, encodeParams)
 
-                    count = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
-                    If count > 0 Then cv.Cv2.ImWrite(surveyDir.FullName + "/" + AvailableAlgorithms.Text + "2.jpg", dst2, encodeParams)
+                    count = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
+                    If count > 0 Then cv.Cv2.ImWrite(surveyDir.FullName + "/" + AvailableAlgorithms.Text + "2.jpg", dst3, encodeParams)
                 End SyncLock
 
                 frameCount = 0
@@ -950,7 +950,7 @@ Public Class OpenCVB
                     drawRect.X = Math.Min(mouseDownPoint.X, mouseMovePoint.X)
                 Else
                     drawRect.X = Math.Min(mouseDownPoint.X - camPic(0).Width, mouseMovePoint.X - camPic(0).Width)
-                    drawRectPic = 3 ' When wider than campic(0), it can only be dst2 which has no pic.tag (because campic(2) is double-wide for timing reasons.
+                    drawRectPic = 3 ' When wider than campic(0), it can only be dst3 which has no pic.tag (because campic(2) is double-wide for timing reasons.
                 End If
                 drawRect.Y = Math.Min(mouseDownPoint.Y, mouseMovePoint.Y)
                 drawRect.Width = Math.Abs(mouseDownPoint.X - mouseMovePoint.X)
@@ -964,7 +964,7 @@ Public Class OpenCVB
             mousePoint.Y = e.Y
             If mousePicTag = 2 And mousePoint.X > camPic(0).Width Then
                 mousePoint.X -= camPic(0).Width
-                mousePicTag = 3 ' pretend this is coming from the fictional campic(3) which was dst2
+                mousePicTag = 3 ' pretend this is coming from the fictional campic(3) which was dst3
             End If
             mousePoint *= workingRes.Width / camPic(0).Width
 

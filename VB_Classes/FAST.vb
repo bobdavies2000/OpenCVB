@@ -14,11 +14,11 @@ Public Class FAST_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        src.CopyTo(dst1)
+        src.CopyTo(dst2)
         keypoints = cv.Cv2.FAST(src, sliders.trackbar(0).Value, If(check.Box(0).Checked, True, False))
 
         For Each kp As cv.KeyPoint In keypoints
-            dst1.Circle(kp.Pt, task.dotSize, cv.Scalar.Red, -1, task.lineType, 0)
+            dst2.Circle(kp.Pt, task.dotSize, cv.Scalar.Red, -1, task.lineType, 0)
         Next kp
         label1 = "FAST_Basics nonMax = " + If(check.Box(0).Checked, "True", "False")
     End Sub
@@ -37,18 +37,18 @@ Public Class FAST_Centroid : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         fast.Run(src)
-        dst1 = fast.dst1
-        dst2.SetTo(0)
+        dst2 = fast.dst2
+        dst3.SetTo(0)
         For Each kp As cv.KeyPoint In fast.keypoints
-            dst2.Circle(kp.Pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType, 0)
+            dst3.Circle(kp.Pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType, 0)
         Next kp
-        Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Dim gray = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim m = cv.Cv2.Moments(gray, True)
         If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
             kalman.kInput(0) = m.M10 / m.M00
             kalman.kInput(1) = m.M01 / m.M00
             kalman.Run(src)
-            dst2.Circle(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, cv.Scalar.Red, -1, task.lineType)
+            dst3.Circle(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, cv.Scalar.Red, -1, task.lineType)
         End If
     End Sub
 End Class

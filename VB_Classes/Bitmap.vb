@@ -9,10 +9,10 @@ Public Class Bitmap_ToMat : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim bitmap = New Bitmap(task.parms.homeDir + "Data/lena.jpg")
-        dst1 = cv.Extensions.BitmapConverter.ToMat(bitmap).Resize(src.Size)
+        dst2 = cv.Extensions.BitmapConverter.ToMat(bitmap).Resize(src.Size)
 
         bitmap = cv.Extensions.BitmapConverter.ToBitmap(src)
-        dst2 = cv.Extensions.BitmapConverter.ToMat(bitmap)
+        dst3 = cv.Extensions.BitmapConverter.ToMat(bitmap)
     End Sub
 End Class
 

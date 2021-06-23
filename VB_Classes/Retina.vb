@@ -65,7 +65,7 @@ Public Class Retina_Basics_CPP : Inherits VBparent
             magnoPtr = Retina_Basics_Run(Retina, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, handleMagno.AddrOfPinnedObject(), useLogSampling)
         Else
             setTrueText("Retina_Basics_CPP runs fine but during 'Test All' it is not run because it can oversubscribe OpenCL memory.")
-            dst2 = New cv.Mat(dst1.Size(), cv.MatType.CV_8UC1, 0)
+            dst3 = New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1, 0)
         End If
         handleSrc.Free()
         handleMagno.Free()
@@ -73,8 +73,8 @@ Public Class Retina_Basics_CPP : Inherits VBparent
         If magnoPtr <> 0 Then
             Dim nextFactor = samplingFactor
             If useLogSampling = False Then nextFactor = 1
-            dst1 = New cv.Mat(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8UC3, magnoPtr).Resize(src.Size())
-            dst2 = New cv.Mat(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8U, magnoData).Resize(src.Size())
+            dst2 = New cv.Mat(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8UC3, magnoPtr).Resize(src.Size())
+            dst3 = New cv.Mat(src.Rows / nextFactor, src.Cols / nextFactor, cv.MatType.CV_8U, magnoData).Resize(src.Size())
         End If
     End Sub
     Public Sub Close()
@@ -96,11 +96,11 @@ Public Class Retina_Depth : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         retina.Run(task.RGBDepth)
-        dst2 = retina.dst2
+        dst3 = retina.dst3
         Static lastMotion As New cv.Mat
-        If lastMotion.Width = 0 Then lastMotion = retina.dst2
-        cv.Cv2.BitwiseOr(lastMotion, retina.dst2, dst1)
-        lastMotion = retina.dst2
+        If lastMotion.Width = 0 Then lastMotion = retina.dst3
+        cv.Cv2.BitwiseOr(lastMotion, retina.dst3, dst2)
+        lastMotion = retina.dst3
     End Sub
 End Class
 

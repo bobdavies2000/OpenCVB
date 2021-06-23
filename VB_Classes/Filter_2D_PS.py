@@ -9,8 +9,8 @@ def OpenCVCode(imgRGB, depth32f, frameCount):
     kernel_size = 3 + 2 * (int(frameCount) % 5)
     kernel = np.ones((kernel_size, kernel_size), dtype=np.float32)
     kernel /= (kernel_size * kernel_size)
-    dst1 = cv.filter2D(imgRGB, ddepth, kernel)
-    dst2 = cv.filter2D(depth32f, ddepth, kernel)
-    return dst1, np.asarray(dst2, dtype=np.uint8)
+    dst2 = cv.filter2D(imgRGB, ddepth, kernel)
+    dst3 = cv.filter2D(depth32f, ddepth, kernel)
+    return dst2, np.asarray(dst3, dtype=np.uint8)
 
 PyStreamRun(OpenCVCode, titleWindow)

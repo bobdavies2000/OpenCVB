@@ -6,15 +6,15 @@ Public Class GrabCut_Basics : Inherits VBparent
     Public bgFineTune As cv.Mat
     Public Sub New()
         label1 = "Foreground from depth data"
-        label2 = "Foreground after GrabCut using mask in dst1"
+        label2 = "Foreground after GrabCut using mask in dst2"
         task.desc = "Use grabcut with just a foreground and background definition."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         fgnd.Run(src)
-        dst1 = fgnd.dst1
+        dst2 = fgnd.dst2
 
-        Dim fg = dst1.Threshold(1, cv.GrabCutClasses.FGD, cv.ThresholdTypes.Binary)
-        Dim bg = dst1.Threshold(1, cv.GrabCutClasses.BGD, cv.ThresholdTypes.BinaryInv)
+        Dim fg = dst2.Threshold(1, cv.GrabCutClasses.FGD, cv.ThresholdTypes.Binary)
+        Dim bg = dst2.Threshold(1, cv.GrabCutClasses.BGD, cv.ThresholdTypes.BinaryInv)
 
         Dim mask As New cv.Mat
         cv.Cv2.BitwiseOr(bg, fg, mask)
@@ -27,8 +27,8 @@ Public Class GrabCut_Basics : Inherits VBparent
         If fg.CountNonZero() > 100 And bg.CountNonZero() > 100 Then
             cv.Cv2.GrabCut(src, mask, rect, bgModel, fgModel, 1, cv.GrabCutModes.InitWithMask)
         End If
-        dst2.SetTo(0)
-        src.CopyTo(dst2, mask)
+        dst3.SetTo(0)
+        src.CopyTo(dst3, mask)
     End Sub
 End Class
 
@@ -81,13 +81,13 @@ Public Class GrabCut_FineTune : Inherits VBparent
 
         basics.Run(src)
 
-        mats.mat(0) = basics.dst1
+        mats.mat(0) = basics.dst2
         mats.mat(1) = basics.fgFineTune
         mats.mat(2) = basics.bgFineTune
         mats.Run(src)
-        dst1 = mats.dst1
+        dst2 = mats.dst2
 
-        dst2 = basics.dst2
+        dst3 = basics.dst3
     End Sub
 End Class
 

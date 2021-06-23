@@ -26,8 +26,8 @@ Public Class Voronoi_Basics : Inherits VBparent
         random.Run(Nothing)
         inputPoints = New List(Of cv.Point)(random.Points)
 
-        vDemo.Run(dst1, inputPoints)
-        vDisplay(dst1, inputPoints)
+        vDemo.Run(dst2, inputPoints)
+        vDisplay(dst2, inputPoints)
     End Sub
 End Class
 
@@ -49,11 +49,11 @@ Public Class Voronoi_Compare : Inherits VBparent
 
         random.Run(Nothing)
         Dim points = New List(Of cv.Point)(random.Points)
-        basics.vDemo.Run(dst1, points, True)
-        basics.vDisplay(dst1, points)
-
-        basics.vDemo.Run(dst2, points, False)
+        basics.vDemo.Run(dst2, points, True)
         basics.vDisplay(dst2, points)
+
+        basics.vDemo.Run(dst3, points, False)
+        basics.vDisplay(dst3, points)
     End Sub
 End Class
 
@@ -86,23 +86,23 @@ Public Class Voronoi_CPP : Inherits VBparent
     Dim vPtr As IntPtr
     Dim vDemo As New Voronoi_Basics
     Public Sub New()
-        vPtr = VoronoiDemo_Open(task.parms.homeDir + "/Data/ballSequence/", dst1.Rows, dst1.Cols)
+        vPtr = VoronoiDemo_Open(task.parms.homeDir + "/Data/ballSequence/", dst2.Rows, dst2.Cols)
         task.desc = "Use the C++ version of the Voronoi code"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static countSlider = findSlider("Random Pixel Count")
         vDemo.random.Run(Nothing)
         Dim handleSrc = GCHandle.Alloc(vDemo.random.Points, GCHandleType.Pinned)
-        Dim imagePtr = VoronoiDemo_Run(vPtr, handleSrc.AddrOfPinnedObject(), countSlider.Value, dst1.Width, dst1.Height)
+        Dim imagePtr = VoronoiDemo_Run(vPtr, handleSrc.AddrOfPinnedObject(), countSlider.Value, dst2.Width, dst2.Height)
         handleSrc.Free()
         If imagePtr <> 0 Then
-            Dim tmp As New cv.Mat(dst1.Size, cv.MatType.CV_32F)
+            Dim tmp As New cv.Mat(dst2.Size, cv.MatType.CV_32F)
             Dim dstData(tmp.Total * tmp.ElemSize - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            dst1 = New cv.Mat(dst1.Rows, dst1.Cols, cv.MatType.CV_32F, dstData)
+            dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_32F, dstData)
 
             Dim inputPoints = New List(Of cv.Point)(vDemo.random.Points)
-            vDemo.vDisplay(dst1, inputPoints)
+            vDemo.vDisplay(dst2, inputPoints)
         End If
     End Sub
     Public Sub Close()
