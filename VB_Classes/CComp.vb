@@ -11,7 +11,6 @@ Public Class CComp_Basics : Inherits VBparent
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
             sliders.setupTrackBar(1, "Threshold for grayscale input", 0, 255, 128)
-            sliders.setupTrackBar(2, "Select Mask - largest to smallest", 0, 100, 0)
         End If
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         task.palette.Run(task.color)
@@ -19,7 +18,6 @@ Public Class CComp_Basics : Inherits VBparent
         task.desc = "Use a threshold slider on the CComp input"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 5
-        Static maskSlider = findSlider("Select Mask - largest to smallest")
         Static areaSlider = findSlider("CComp Min Area")
         Static thresholdSlider = findSlider("Threshold for grayscale input")
         Dim threshVal = thresholdSlider.value
@@ -28,8 +26,10 @@ Public Class CComp_Basics : Inherits VBparent
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If threshVal < 128 Then
             dst1 = src.Threshold(threshVal, 255, cv.ThresholdTypes.BinaryInv)
+            label1 = "CComp_Basics - dark half"
         Else
             dst1 = src.Threshold(threshVal, 255, cv.ThresholdTypes.Binary)
+            label1 = "CComp_Basics - light half"
         End If
         Dim labels As New cv.Mat
         Dim stats As New cv.Mat
@@ -80,19 +80,8 @@ Public Class CComp_Basics : Inherits VBparent
 
         labels.ConvertTo(labels, cv.MatType.CV_8U)
         task.palette.Run(labels)
-        'dst2 = task.palette.dst1
+        dst2 = task.palette.dst1
         label2 = CStr(masks.Count) + " Connected Components with size > " + CStr(minSize) + " pixels"
-
-        Static saveMaskCount As Integer
-        If saveMaskCount <> masks.Count Then
-            If maskSlider.value >= masks.Count Then maskSlider.value = 0
-            maskSlider.maximum = masks.Count - 1
-            saveMaskCount = masks.Count
-        End If
-        If masks.Count > 0 And standalone Then
-            dst2.SetTo(0)
-            dst2(rects(maskSlider.value)) = masks(maskSlider.value)
-        End If
     End Sub
 End Class
 
@@ -113,11 +102,11 @@ Public Class CComp_Both : Inherits VBparent
         Static thresholdSlider = findSlider("Threshold for grayscale input")
         thresholdSlider.value = 120
         below.Run(src)
-        dst1 = below.dst2
+        dst1 = below.dst1
 
         thresholdSlider.value = 130
         above.Run(src)
-        dst2 = above.dst2
+        dst2 = above.dst1
     End Sub
 End Class
 

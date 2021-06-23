@@ -403,7 +403,7 @@ End Class
 
 Public Class KMeans_CCompMasks : Inherits VBparent
     Dim ccomp() As CComp_Basics
-    Dim km As New KMeans_Basics
+    Public km As New KMeans_Basics
     Public masks As New List(Of cv.Mat)
     Public rects As New List(Of cv.Rect)
     Public Sub New()
@@ -439,8 +439,9 @@ Public Class KMeans_CCompMasks : Inherits VBparent
                 rects.Add(r)
                 Dim c = ccomp(i).centroids(j)
                 centroids.Add(c)
-                dst1.Circle(c, task.dotSize + 3, cv.Scalar.White, -1, task.lineType)
-                dst1.Circle(c, task.dotSize, cv.Scalar.Black, -1, task.lineType)
+                dst1.Circle(c, task.dotSize + 5, cv.Scalar.White, -1, task.lineType)
+                dst1.Circle(c, task.dotSize + 3, cv.Scalar.Black, -1, task.lineType)
+                dst1.Circle(c, task.dotSize, cv.Scalar.White, -1, task.lineType)
                 setTrueText(CStr(masks.Count - 1), c.X + 10, c.Y)
             Next
         Next

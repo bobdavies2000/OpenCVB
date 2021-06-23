@@ -106,7 +106,7 @@ End Class
 
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_CarCComp : Inherits VBparent
-    Dim cc As New CComp_Basics
+    Dim cc As New CComp_Both
     Dim video As New Video_Basics
     Dim bgSub As New BGSubtract_MOG
     Public Sub New()
@@ -117,8 +117,8 @@ Public Class Video_CarCComp : Inherits VBparent
         If video.dst1.Empty() = False Then
             bgSub.Run(video.dst1)
             cc.Run(bgSub.dst1)
-            dst1 = cc.dst1
-            dst2 = cc.dst2
+            dst1 = cc.dst2
+            dst2 = cc.dst1
         End If
     End Sub
 End Class
