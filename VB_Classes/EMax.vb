@@ -4,12 +4,12 @@ Public Class EMax_Basics : Inherits VBparent
     Dim inputDataMask As cv.Mat
     Public basics As New EMax_Raw
     Public Sub New()
-        label1 = "Emax regions around clusters"
+        labels(2) = "Emax regions around clusters"
         task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         basics.Run(Nothing)
-        label1 = basics.label1
+        labels(2) = basics.labels(2)
 
         Dim regions = basics.options.regionCount
         Dim regionCount(regions - 1, regions - 1)
@@ -17,7 +17,7 @@ Public Class EMax_Basics : Inherits VBparent
             Dim p = basics.options.samples.Get(Of cv.Point2f)(i, 0)
             Dim pt = New cv.Point(CInt(p.X), CInt(p.Y))
             If pt.X >= 0 And pt.Y >= 0 And pt.X < dst3.Width And pt.Y < dst3.Height Then
-                Dim label = basics.options.labels.Get(Of Integer)(i, 0)
+                Dim label = basics.options.elabels.Get(Of Integer)(i, 0)
                 Dim eGrp = basics.dst3.Get(Of Byte)(CInt(pt.Y), CInt(pt.X))
                 If eGrp < regions Then regionCount(label, eGrp) += 1
             End If
@@ -54,13 +54,13 @@ Public Class EMax_Raw : Inherits VBparent
     Public Sub New()
         EMax_Raw = EMax_Raw_Open()
 
-        label2 = "Emax regions as integers"
+        labels(3) = "Emax regions as integers"
         task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         options.Run(Nothing)
         Dim inCount = options.samples.Rows
-        label1 = CStr(inCount) + " Random samples in " + CStr(options.regionCount) + " clusters"
+        labels(2) = CStr(inCount) + " Random samples in " + CStr(options.regionCount) + " clusters"
         If options.regionCount <= 0 Then Exit Sub
 
         Dim srcData((inCount - 1) * 2) As Single
@@ -71,7 +71,7 @@ Public Class EMax_Raw : Inherits VBparent
         Dim labelData(inCount - 1) As Integer
         Dim handleLabels As GCHandle
         handleLabels = GCHandle.Alloc(labelData, GCHandleType.Pinned)
-        Marshal.Copy(options.labels.Data, labelData, 0, labelData.Length)
+        Marshal.Copy(options.elabels.Data, labelData, 0, labelData.Length)
 
         Dim imagePtr = EMax_Raw_Run(EMax_Raw, handleSrc.AddrOfPinnedObject(), handleLabels.AddrOfPinnedObject(), inCount, 2,
                                        dst2.Rows, dst2.Cols, options.regionCount, options.predictionStepSize, options.covarianceMatrixType)
@@ -104,7 +104,7 @@ Public Class EMax_Setup : Inherits VBparent
     Public regionColors() As cv.Vec3b
     Public covarianceMatrixType = 0
     Public samples As cv.Mat
-    Public labels As cv.Mat
+    Public elabels As cv.Mat
     Public predictionStepSize As Integer
     Public Sub New()
         If sliders.Setup(caller) Then
@@ -123,7 +123,7 @@ Public Class EMax_Setup : Inherits VBparent
             radio.check(0).Checked = True
         End If
 
-        label1 = "EMax algorithms input samples"
+        labels(2) = "EMax algorithms input samples"
         task.desc = "Options for EMax algorithms."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -152,13 +152,13 @@ Public Class EMax_Setup : Inherits VBparent
 
         samples = New cv.Mat(sampleSlider.Value, 2, cv.MatType.CV_32FC1, 0).Reshape(2, 0)
         If regionCount > sampleSlider.Value / 2 Then regionCount = sampleSlider.Value / 2
-        labels = New cv.Mat(sampleSlider.Value, 1, cv.MatType.CV_32S, 0)
+        elabels = New cv.Mat(sampleSlider.Value, 1, cv.MatType.CV_32S, 0)
 
         Dim sigma = sigmaSlider.Value
         predictionStepSize = stepSlider.value
         For i = 0 To regionCount - 1
             Dim samples_part = samples.RowRange(i * samples.Rows / regionCount, (i + 1) * samples.Rows / regionCount)
-            labels.RowRange(i * samples.Rows / regionCount, (i + 1) * samples.Rows / regionCount).SetTo(i)
+            elabels.RowRange(i * samples.Rows / regionCount, (i + 1) * samples.Rows / regionCount).SetTo(i)
             Dim r = grid.roiList(i)
             cv.Cv2.Randn(samples_part, New cv.Scalar(r.X + r.Width / 2, r.Y + r.Height / 2), cv.Scalar.All(sigma))
         Next
@@ -170,7 +170,7 @@ Public Class EMax_Setup : Inherits VBparent
             ' draw the clustered samples
             For i = 0 To samples.Rows - 1
                 Dim pt = samples.Get(Of cv.Point2f)(i, 0)
-                Dim label = labels.Get(Of Integer)(i, 0)
+                Dim label = elabels.Get(Of Integer)(i, 0)
                 dst2.Circle(pt, task.dotSize + 2, regionColors(label), -1, task.lineType)
             Next
         End If
@@ -203,7 +203,7 @@ Public Class EMax_VB_Failing : Inherits VBparent
             em_model.ClustersNumber = options.regionCount
             em_model.CovarianceMatrixType = options.covarianceMatrixType
             em_model.TermCriteria = New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 300, 1.0)
-            em_model.TrainEM(options.samples, Nothing, options.labels, Nothing)
+            em_model.TrainEM(options.samples, Nothing, options.elabels, Nothing)
 
             ' now classify every image pixel based on the samples.
             Dim sample As New cv.Mat(1, 2, cv.MatType.CV_32FC1, 0)  ' tried doubles but it fails as well...
@@ -284,7 +284,7 @@ Public Class EMax_PointTracker : Inherits VBparent
         findCheckBox("Draw rectangle and centroid for each mask").Checked = False
         findSlider("FloodFill Minimum Size").Value = 100
 
-        label1 = "Original before KNN/Kalman tracking (red=previous)"
+        labels(2) = "Original before KNN/Kalman tracking (red=previous)"
         task.desc = "Use KNN and Kalman to track the EMax Centroids and map consisten colors"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -316,7 +316,7 @@ Public Class EMax_PointTracker : Inherits VBparent
         End If
         totalErrors += tallyErrors
         generationCount += 1
-        label2 = "After: there were " + Format(totalErrors / generationCount, "0.0") + " average errors matching centroids"
+        labels(3) = "After: there were " + Format(totalErrors / generationCount, "0.0") + " average errors matching centroids"
     End Sub
 End Class
 

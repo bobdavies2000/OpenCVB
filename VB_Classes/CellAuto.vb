@@ -72,7 +72,7 @@ Public Class CellAuto_Basics : Inherits VBparent
             Dim index = combo.Box.SelectedIndex
             If index + 1 < i18.Count - 1 Then combo.Box.SelectedIndex += 1 Else combo.Box.SelectedIndex = 0
         End If
-        label1 = combo.Box.Text
+        labels(2) = combo.Box.Text
     End Sub
 End Class
 
@@ -166,7 +166,7 @@ Public Class CellAuto_Life : Inherits VBparent
             End If
         End If
         lastPopulation = population
-        label1 = "Population " + CStr(population) + " Generation = " + CStr(generation) + countdownText
+        labels(2) = "Population " + CStr(population) + " Generation = " + CStr(generation) + countdownText
         grid = nextgrid.Clone()
     End Sub
 End Class
@@ -184,7 +184,7 @@ Public Class CellAuto_LifeColor : Inherits VBparent
         game.backColor = cv.Scalar.White
         game.nodeColor = cv.Scalar.Black
 
-        label1 = "Births are blue, deaths are red"
+        labels(2) = "Births are blue, deaths are red"
         task.desc = "Game of Life but with color added"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -253,16 +253,16 @@ Public Class CellAuto_Basics_MT : Inherits VBparent
           Sub(i)
               Select Case i
                   Case 0
-                      label1 = i18.ElementAt(i18Index)
-                      dst2 = cell.createCells(label1)
+                      labels(2) = i18.ElementAt(i18Index)
+                      dst2 = cell.createCells(labels(2))
                   Case 1
                       If cell.check.Box(0).Checked Then
                           If i18Index + 1 < i18.Count - 1 Then i18Index += 1 Else i18Index = 0
-                          label2 = i18.ElementAt(i18Index)
+                          labels(3) = i18.ElementAt(i18Index)
                       Else
-                          If i18Index < i18.Count - 1 Then label2 = i18.ElementAt(i18Index + 1) Else label2 = i18.ElementAt(0)
+                          If i18Index < i18.Count - 1 Then labels(3) = i18.ElementAt(i18Index + 1) Else labels(3) = i18.ElementAt(0)
                       End If
-                      dst3 = cell.createCells(label2)
+                      dst3 = cell.createCells(labels(3))
               End Select
           End Sub)
     End Sub
@@ -304,13 +304,13 @@ Public Class CellAuto_All256 : Inherits VBparent
           Sub(i)
               Select Case i
                   Case 0
-                      label1 = createOutcome(index) + " index = " + CStr(index)
-                      dst2 = cell.createCells(label1)
+                      labels(2) = createOutcome(index) + " index = " + CStr(index)
+                      dst2 = cell.createCells(labels(2))
                   Case 1
                       If mtOn = False Then Exit Sub
                       If index < 255 Then index += 1 Else index = 0
-                      label2 = createOutcome(index) + " index = " + CStr(index)
-                      dst3 = cell.createCells(label2)
+                      labels(3) = createOutcome(index) + " index = " + CStr(index)
+                      dst3 = cell.createCells(labels(3))
               End Select
           End Sub)
         sliders.trackbar(0).Value = index

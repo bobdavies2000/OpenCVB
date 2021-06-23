@@ -34,7 +34,7 @@ End Class
 Public Class Polylines_Random : Inherits VBparent
     Dim zoomFactor = 4
     Public Sub New()
-        label1 = CStr(zoomFactor) + "X zoom around mouse movement on image"
+        labels(2) = CStr(zoomFactor) + "X zoom around mouse movement on image"
         task.desc = "Create a random procedural image - Painterly Effect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

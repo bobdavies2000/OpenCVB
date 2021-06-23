@@ -7,7 +7,7 @@ Public Class LeftRight_Basics : Inherits VBparent
             sliders.setupTrackBar(1, "Brightness Beta (brightness)", -255, 255, If(kinect, 0, -100))
         End If
         If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Then findSlider("Brightness Alpha (contrast)").Value = 1500
-        label2 = If(task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam, "No right image", "Right Image")
+        labels(3) = If(task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam, "No right image", "Right Image")
         task.desc = "Enhance the left/right views with brightness and contrast."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -32,8 +32,8 @@ Public Class LeftRight_CompareRaw : Inherits VBparent
             sliders.setupTrackBar(1, "Slice Height", 1, (dst2.Rows - 100) / 2, 30)
         End If
 
-        label1 = lrView.label1
-        label2 = lrView.label2
+        labels(2) = lrView.labels(2)
+        labels(3) = lrView.labels(3)
         task.desc = "Show slices of the left and right view next to each other for visual comparison"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -64,8 +64,8 @@ Public Class LeftRight_Features : Inherits VBparent
     Dim features As New Features_GoodFeatures
     Public Sub New()
         task.desc = "Find GoodFeatures in the left and right depalettized infrared images"
-        label1 = "Left Image"
-        label2 = "Right Image"
+        labels(2) = "Left Image"
+        labels(3) = "Right Image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         lrView.Run(src)
@@ -91,8 +91,8 @@ Public Class LeftRight_Palettized : Inherits VBparent
     Dim lrView As New LeftRight_Basics
     Public Sub New()
         task.desc = "Add color to the 8-bit infrared images."
-        label1 = "Left Image"
-        label2 = "Right Image"
+        labels(2) = "Left Image"
+        labels(3) = "Right Image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         lrView.Run(src)
@@ -113,8 +113,8 @@ Public Class LeftRight_BRISK : Inherits VBparent
     Dim brisk As New BRISK_Basics
     Public Sub New()
         brisk.sliders.trackbar(0).Value = 20
-        label1 = "Infrared Left Image"
-        label2 = "Infrared Right Image"
+        labels(2) = "Infrared Left Image"
+        labels(3) = "Infrared Right Image"
         task.desc = "Add color to the 8-bit infrared images."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

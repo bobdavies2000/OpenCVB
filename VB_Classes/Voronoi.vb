@@ -7,7 +7,7 @@ Public Class Voronoi_Basics : Inherits VBparent
     Public random As New Random_Basics
     Public inputPoints As List(Of cv.Point)
     Public Sub New()
-        label1 = "Ordered list output for Voronoi algorithm"
+        labels(2) = "Ordered list output for Voronoi algorithm"
         task.desc = "Use the ordered list method to find the Voronoi segments"
     End Sub
     Public Sub vDisplay(ByRef dst As cv.Mat, points As List(Of cv.Point))
@@ -41,8 +41,8 @@ Public Class Voronoi_Compare : Inherits VBparent
     Dim basics As New Voronoi_Basics
     Public random As New Random_Basics
     Public Sub New()
-        label1 = "Brute Force method"
-        label2 = "Ordered List method"
+        labels(2) = "Brute Force method"
+        labels(3) = "Ordered List method"
         task.desc = "C# implementations of the BruteForce and OrderedList Voronoi algorithms"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

@@ -5,8 +5,8 @@ Public Class Grayscale_Basics : Inherits VBparent
             check.Box(0).Text = "Use OpenCV to create grayscale image"
             check.Box(0).Checked = True
         End If
-        label1 = "Grayscale_Basics"
-        label2 = ""
+        labels(2) = "Grayscale_Basics"
+        labels(3) = ""
         task.desc = "Manually create a grayscale image.  The only reason for this example is to show how slow it can be to do the work manually in VB.Net"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

@@ -490,8 +490,8 @@ Public Class Puzzle_Solver : Inherits VBparent
         usedList.Clear()
         check.Box(0).Checked = False
 
-        label1 = "Input to puzzle solver"
-        label2 = If(check.Box(1).Checked, "Poor correlations shown (ambiguities possible)", "Solution (ambiguities possible)")
+        labels(2) = "Input to puzzle solver"
+        labels(3) = If(check.Box(1).Checked, "Poor correlations shown (ambiguities possible)", "Solution (ambiguities possible)")
         If radio.check(1).Checked Or radio.check(2).Checked Then Thread.Sleep(1000)
     End Sub
 End Class

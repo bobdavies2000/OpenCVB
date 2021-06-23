@@ -61,10 +61,10 @@ Public Class PhaseCorrelate_Basics : Inherits VBparent
             resetLastFrame = True
         End If
 
-        label2 = If(resetLastFrame, "lastFrame Reset", "Restored lastFrame")
+        labels(3) = If(resetLastFrame, "lastFrame Reset", "Restored lastFrame")
         If resetLastFrame Then lastFrame = input64
 
-        label1 = "Shift = (" + Format(shift.X, "0.00") + "," + Format(shift.Y, "0.00") + ") with radius = " + Format(radius, "#0.00")
+        labels(2) = "Shift = (" + Format(shift.X, "0.00") + "," + Format(shift.Y, "0.00") + ") with radius = " + Format(radius, "#0.00")
     End Sub
 End Class
 
@@ -79,8 +79,8 @@ Public Class PhaseCorrelate_BasicsTest : Inherits VBparent
     Dim random As New Stabilizer_BasicsRandomInput
     Dim stable As New PhaseCorrelate_Basics
     Public Sub New()
-        label1 = "Unstable input to PhaseCorrelate_Basics"
-        label2 = "Stabilized output from Phase_Correlate_Basics"
+        labels(2) = "Unstable input to PhaseCorrelate_Basics"
+        labels(3) = "Stabilized output from Phase_Correlate_Basics"
         task.desc = "Test the PhaseCorrelate_Basics with random movement"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -90,7 +90,7 @@ Public Class PhaseCorrelate_BasicsTest : Inherits VBparent
 
         dst2 = stable.dst2
         dst3 = stable.dst3
-        label2 = stable.label2
+        labels(3) = stable.labels(3)
     End Sub
 End Class
 
@@ -114,8 +114,8 @@ Public Class PhaseCorrelate_Depth : Inherits VBparent
         Dim tmp = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         If phaseC.resetLastFrame Then task.depth32f.CopyTo(lastFrame)
         lastFrame(phaseC.srcRect).CopyTo(tmp(phaseC.stableRect))
-        label1 = phaseC.label1
-        label2 = phaseC.label2
+        labels(2) = phaseC.labels(2)
+        labels(3) = phaseC.labels(3)
 
         tmp = tmp.Normalize(0, 255, cv.NormTypes.MinMax)
         tmp.ConvertTo(dst3, cv.MatType.CV_8UC1)
@@ -135,7 +135,7 @@ End Class
 ' https://docs.opencv.org/master/d7/df3/group__imgproc__motion.html
 Public Class PhaseCorrelate_HanningWindow : Inherits VBparent
     Public Sub New()
-        label1 = "Looking down on a bell curve in 2 dimensions"
+        labels(2) = "Looking down on a bell curve in 2 dimensions"
         task.desc = "Show what a Hanning window looks like"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

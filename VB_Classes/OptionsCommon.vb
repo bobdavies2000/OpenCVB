@@ -8,8 +8,8 @@ Public Class OptionsCommon : Inherits VBparent
         task.palette = New Palette_Basics
         task.histogramBins = gOptions.HistBinSlider.Value
         updateSettings()
-        label1 = "Depth values that are in-range"
-        label2 = "Depth values that are out of range (and < 8m)"
+        labels(2) = "Depth values that are in-range"
+        labels(3) = "Depth values that are out of range (and < 8m)"
         task.desc = "Show depth with OpenCV using varying min and max depths."
     End Sub
     Private Sub updateSettings()

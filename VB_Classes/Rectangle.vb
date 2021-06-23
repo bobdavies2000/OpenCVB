@@ -92,10 +92,10 @@ Public Class Rectangle_Overlap : Inherits VBparent
         If rect1.IntersectsWith(rect2) Then
             enclosingRect = rect1.Union(rect2)
             dst3.Rectangle(enclosingRect, cv.Scalar.White, 4)
-            label2 = "Rectangles intersect - red marks overlapping rectangle"
+            labels(3) = "Rectangles intersect - red marks overlapping rectangle"
             dst3.Rectangle(rect1.Intersect(rect2), cv.Scalar.Red, -1)
         Else
-            label2 = "Rectangles don't intersect"
+            labels(3) = "Rectangles don't intersect"
         End If
         dst3.Rectangle(rect1, cv.Scalar.Yellow, 2)
         dst3.Rectangle(rect2, cv.Scalar.Yellow, 2)
@@ -111,7 +111,7 @@ Public Class Rectangle_Motion : Inherits VBparent
     Public motion As New Motion_Basics
     Public mOverlap As New Rectangle_Intersection
     Public Sub New()
-        label1 = "Yellow is pixel motion.  Red is all pixel motion"
+        labels(2) = "Yellow is pixel motion.  Red is all pixel motion"
         task.desc = "Motion rectangles often overlap.  This algorithm consolidates those rectangles in the RGB image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -129,8 +129,8 @@ Public Class Rectangle_MotionDepth : Inherits VBparent
     Public motion As New Motion_Basics
     Dim colorize As New Depth_ColorizerFastFade_CPP
     Public Sub New()
-        label1 = "Rectangles from contours of motion (unconsolidated)"
-        label2 = "Pixel differences from motion (everything!)"
+        labels(2) = "Rectangles from contours of motion (unconsolidated)"
+        labels(3) = "Pixel differences from motion (everything!)"
         task.desc = "Motion rectangles often overlap.  This algorithm consolidates those rectangles in the depth image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -193,7 +193,7 @@ Public Class Rectangle_Intersection : Inherits VBparent
 
             rotatedCheck.Enabled = False
             countSlider.Value = msRNG.Next(2, 10)
-            label1 = "Input rectangles = " + CStr(countSlider.value)
+            labels(2) = "Input rectangles = " + CStr(countSlider.value)
 
             draw.Run(src)
             dst2 = draw.dst2
@@ -221,7 +221,7 @@ Public Class Rectangle_Intersection : Inherits VBparent
             Dim enclosing = findEnclosingRect(otherRects, proximity)
             enclosingRects.Add(enclosing)
         End While
-        label2 = CStr(enclosingRects.Count) + " enclosing rectangles were found"
+        labels(3) = CStr(enclosingRects.Count) + " enclosing rectangles were found"
 
         dst3.SetTo(0)
         For Each r In enclosingRects
@@ -250,7 +250,7 @@ Public Class Rectangle_Union : Inherits VBparent
             Static rotatedCheck = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
             rotatedCheck.Enabled = False
             countSlider.Value = msRNG.Next(2, 10)
-            label1 = "Input rectangles = " + CStr(draw.rectangles.Count)
+            labels(2) = "Input rectangles = " + CStr(draw.rectangles.Count)
 
             draw.Run(src)
             dst2 = draw.dst2
@@ -260,7 +260,7 @@ Public Class Rectangle_Union : Inherits VBparent
             For Each r In inputRects
                 dst2.Rectangle(r, cv.Scalar.Yellow, 1)
             Next
-            label1 = "Input rectangles = " + CStr(inputRects.Count)
+            labels(2) = "Input rectangles = " + CStr(inputRects.Count)
         End If
 
         If inputRects.Count = 0 Then Exit Sub
@@ -302,7 +302,7 @@ Public Class Rectangle_MultiOverlap : Inherits VBparent
             rotatedCheck.Enabled = False
             countSlider.Value = msRNG.Next(2, 10)
 
-            label1 = "Input rectangles = " + CStr(draw.rectangles.Count)
+            labels(2) = "Input rectangles = " + CStr(draw.rectangles.Count)
 
             draw.Run(src)
             dst2 = draw.dst2

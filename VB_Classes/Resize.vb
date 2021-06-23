@@ -8,8 +8,8 @@ Public Class Resize_Basics : Inherits VBparent
         findRadio("WarpInverseMap").Enabled = False
 
         task.desc = "Resize with different options and compare them"
-        label1 = "Rectangle highlight above resized"
-        label2 = "Difference from Cubic Resize (Best)"
+        labels(2) = "Rectangle highlight above resized"
+        labels(3) = "Difference from Cubic Resize (Best)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         rotateOptions.Run(src)
@@ -50,8 +50,8 @@ Public Class Resize_Percentage : Inherits VBparent
         If standalone or task.intermediateName = caller Then
             Dim roi As New cv.Rect(0, 0, resizeOptions.dst2.Width, resizeOptions.dst2.Height)
             dst2 = resizeOptions.dst2(roi).Resize(resizeOptions.dst2.Size())
-            label1 = "Image after resizing to " + Format(sliders.trackbar(0).Value, "#0.0") + "% of original size"
-            label2 = ""
+            labels(2) = "Image after resizing to " + Format(sliders.trackbar(0).Value, "#0.0") + "% of original size"
+            labels(3) = ""
         Else
             dst2 = resizeOptions.dst2
         End If

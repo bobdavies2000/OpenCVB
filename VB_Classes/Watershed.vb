@@ -4,8 +4,8 @@ Public Class Watershed_Basics : Inherits VBparent
     Dim rects As New List(Of cv.Rect)
     Public UseCorners As Boolean
     Public Sub New()
-        label1 = "Draw rectangle to add another marker"
-        label2 = "Mask for watershed (selected regions)."
+        labels(2) = "Draw rectangle to add another marker"
+        labels(3) = "Mask for watershed (selected regions)."
         task.desc = "Watershed API experiment.  Draw on the image to test."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -48,7 +48,7 @@ Public Class Watershed_Basics : Inherits VBparent
             dst2 = src
         End If
         task.drawRect = New cv.Rect
-        label1 = "There were " + CStr(rects.Count) + " regions defined as input"
+        labels(2) = "There were " + CStr(rects.Count) + " regions defined as input"
     End Sub
 End Class
 
@@ -63,7 +63,7 @@ Public Class Watershed_DepthReduction : Inherits VBparent
     Dim reduction As New Reduction_Basics
     Public Sub New()
         watershed.UseCorners = True
-        label2 = "Reduction input to WaterShed"
+        labels(3) = "Reduction input to WaterShed"
         task.desc = "Watershed the depth image using shadow, close, and far points."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -72,7 +72,7 @@ Public Class Watershed_DepthReduction : Inherits VBparent
 
         watershed.Run(dst3)
         dst2 = watershed.dst2
-        label1 = watershed.label1
+        labels(2) = watershed.labels(2)
     End Sub
 End Class
 
@@ -92,7 +92,7 @@ Public Class Watershed_DepthAuto : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         watershed.Run(task.RGBDepth)
         dst2 = watershed.dst2
-        label1 = watershed.label1
+        labels(2) = watershed.labels(2)
     End Sub
 End Class
 

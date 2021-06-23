@@ -30,8 +30,8 @@ Public Class GetRotationMatrix2D_Box : Inherits VBparent
     Dim rotation As New GetRotationMatrix2D_Basics
     Public Sub New()
         task.drawRect = New cv.Rect(100, 100, 100, 100)
-        label1 = "Original Rectangle in the original perspective"
-        label2 = "Same Rectangle in the new warped perspective"
+        labels(2) = "Original Rectangle in the original perspective"
+        labels(3) = "Same Rectangle in the new warped perspective"
         task.desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

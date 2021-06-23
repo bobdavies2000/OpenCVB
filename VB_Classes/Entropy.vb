@@ -4,7 +4,7 @@ Public Class Entropy_Basics : Inherits VBparent
     Dim simple As New Entropy_Simple
     Public entropy As Single
     Public Sub New()
-        label1 = "Control entropy values with histogram bins slider"
+        labels(2) = "Control entropy values with histogram bins slider"
         task.desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -37,7 +37,7 @@ Public Class Entropy_Highest : Inherits VBparent
     Public Sub New()
         findSlider("ThreadGrid Width").Value = 64
         findSlider("ThreadGrid Height").Value = 80
-        label1 = "Highest entropy marked with red rectangle"
+        labels(2) = "Highest entropy marked with red rectangle"
         task.desc = "Find the highest entropy section of the color image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -70,7 +70,7 @@ Public Class Entropy_Highest : Inherits VBparent
         dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If standalone Or task.intermediateName = caller Then dst2.Rectangle(eMaxRect, cv.Scalar.Red, 4)
-        label2 = "Lighter = higher entropy. Range: " + Format(minEntropy, "0.0") + " to " + Format(maxEntropy, "0.0")
+        labels(3) = "Lighter = higher entropy. Range: " + Format(minEntropy, "0.0") + " to " + Format(maxEntropy, "0.0")
     End Sub
 End Class
 
@@ -83,8 +83,8 @@ Public Class Entropy_FAST : Inherits VBparent
     Dim fast As New FAST_Basics
     Dim entropy as New Entropy_Highest
     Public Sub New()
-        label1 = "Output of Fast_Basics, input to entropy calculation"
-        label2 = "Lighter color is higher entropy, Red marks highest"
+        labels(2) = "Output of Fast_Basics, input to entropy calculation"
+        labels(3) = "Lighter color is higher entropy, Red marks highest"
         task.desc = "Use FAST markings to add to entropy"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

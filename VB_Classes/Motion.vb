@@ -17,7 +17,7 @@ Public Class Motion_Basics : Inherits VBparent
         minSlider = findSlider("Contour minimum area")
         minSlider.Value = 5
 
-        label1 = "Enclosing rectangles are yellow in dst2 and dst3"
+        labels(2) = "Enclosing rectangles are yellow in dst2 and dst3"
         task.desc = "Detect contours in the motion data and the resulting rectangles"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -57,9 +57,9 @@ Public Class Motion_Basics : Inherits VBparent
                 dst2.Rectangle(r, cv.Scalar.Yellow, 2)
                 dst3.Rectangle(r, cv.Scalar.Yellow, 2)
             Next
-            label2 = "Motion detected"
+            labels(3) = "Motion detected"
         Else
-            label2 = "No motion detected with contours > " + CStr(minSlider.Value)
+            labels(3) = "No motion detected with contours > " + CStr(minSlider.Value)
         End If
     End Sub
 End Class
@@ -87,7 +87,7 @@ Public Class Motion_WithBlurDilate : Inherits VBparent
 
         findSlider("Dilate/Erode Kernel Size").Value = 2
 
-        label2 = "Mask of pixel differences "
+        labels(3) = "Mask of pixel differences "
         task.desc = "Detect contours in the motion data using blur and dilate"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -146,8 +146,8 @@ Public Class Motion_MinMaxDepth : Inherits VBparent
             radio.check(0).Checked = True
         End If
 
-        label1 = "32-bit format of the stable depth"
-        label2 = "Motion mask"
+        labels(2) = "32-bit format of the stable depth"
+        labels(3) = "Motion mask"
         task.desc = "While minimizing options and dependencies, use RGB motion to figure out what depth values should change."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -186,8 +186,8 @@ Public Class Motion_MinMaxPointCloud : Inherits VBparent
     Public stable As New Motion_MinMaxDepth
     Public splitPC() As cv.Mat
     Public Sub New()
-        label1 = stable.label1
-        label2 = stable.label2
+        labels(2) = stable.labels(2)
+        labels(3) = stable.labels(3)
         task.desc = "Use the stable depth values to create a stable point cloud"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -199,7 +199,7 @@ Public Class Motion_MinMaxPointCloud : Inherits VBparent
 
         dst2 = stable.dst2
         dst3 = stable.dst3
-        label2 = "Cumulative Motion = " + Format(stable.motion.changedPixels / 1000, "#0.0") + "k pixels "
+        labels(3) = "Cumulative Motion = " + Format(stable.motion.changedPixels / 1000, "#0.0") + "k pixels "
         If stable.motion.resetAll Or splitPC Is Nothing Or task.frameCount < 30 Then
             splitPC = split
             dst3 = input
@@ -223,8 +223,8 @@ Public Class Motion_MinMaxDepthColorized : Inherits VBparent
     Dim stable As New Motion_MinMaxDepth
     Dim colorize As New Depth_ColorizerFastFade_CPP
     Public Sub New()
-        label1 = "32-bit format stable depth data"
-        label2 = "Colorized version of image at left"
+        labels(2) = "32-bit format stable depth data"
+        labels(3) = "Colorized version of image at left"
         task.desc = "Colorize the stable depth (keeps Motion_MinMaxDepth at a minimum complexity)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

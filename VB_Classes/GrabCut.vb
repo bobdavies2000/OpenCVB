@@ -5,8 +5,8 @@ Public Class GrabCut_Basics : Inherits VBparent
     Public fgFineTune As cv.Mat
     Public bgFineTune As cv.Mat
     Public Sub New()
-        label1 = "Foreground from depth data"
-        label2 = "Foreground after GrabCut using mask in dst2"
+        labels(2) = "Foreground from depth data"
+        labels(3) = "Foreground after GrabCut using mask in dst2"
         task.desc = "Use grabcut with just a foreground and background definition."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -51,8 +51,8 @@ Public Class GrabCut_FineTune : Inherits VBparent
             radio.check(2).Checked = True
         End If
 
-        label1 = "Foreground Mask, fg fine tuning, bg fine tuning, blank"
-        label2 = "Grabcut results after adding fine tuning selections"
+        labels(2) = "Foreground Mask, fg fine tuning, bg fine tuning, blank"
+        labels(3) = "Grabcut results after adding fine tuning selections"
         task.desc = "There are probably mistakes in the initial Grabcut_Basics.  Use the checkbox to fine tune what is background and foreground"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

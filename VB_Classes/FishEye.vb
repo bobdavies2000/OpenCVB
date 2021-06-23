@@ -46,8 +46,8 @@ Public Class FishEye_Rectified : Inherits VBparent
         '                                       cv.MatType.CV_32FC1, rightViewMap1, rightViewMap2)
 
         task.desc = "Use OpenCV's FishEye API to undistort a fisheye lens input - needs more work"
-        label1 = "Left View"
-        label2 = "Right View"
+        labels(2) = "Left View"
+        labels(3) = "Right View"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
@@ -55,8 +55,8 @@ Public Class FishEye_Rectified : Inherits VBparent
         dst3.SetTo(0)
         setTrueText("The T265 camera is not supported.  No depth data or point cloud.", 10, 100, 3)
 
-        label1 = "Left View (no fisheye lens present)"
-        label2 = "Right View (no fisheye lens present)"
+        labels(2) = "Left View (no fisheye lens present)"
+        labels(3) = "Right View (no fisheye lens present)"
         leftView = task.leftView
         rightView = task.rightView
         dst2 = leftView
@@ -73,8 +73,8 @@ Public Class FishEye_Raw : Inherits VBparent
         task.desc = "Display the Raw FishEye images for the T265 (only)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        label1 = "Left Fisheye Image"
-        label2 = "Right Fisheye Image"
+        labels(2) = "Left Fisheye Image"
+        labels(3) = "Right Fisheye Image"
         dst2 = task.leftView
         dst3 = task.rightView
     End Sub

@@ -7,7 +7,7 @@ Public Class Moments_Basics : Inherits VBparent
     Public kalman As New Kalman_Basics
     Public Sub New()
         ReDim kalman.kInput(2 - 1) ' 2 elements - cv.point
-        label1 = "Red dot = Kalman smoothed centroid"
+        labels(2) = "Red dot = Kalman smoothed centroid"
         task.desc = "Compute the centroid of the provided mask file."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -40,7 +40,7 @@ Public Class Moments_CentroidKalman : Inherits VBparent
     Dim kalman As New Kalman_Basics
     Public Sub New()
         ReDim kalman.kInput(2 - 1) ' 2 elements - cv.point
-        label1 = "Red dot = Kalman smoothed centroid"
+        labels(2) = "Red dot = Kalman smoothed centroid"
         task.desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

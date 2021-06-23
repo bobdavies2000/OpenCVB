@@ -29,8 +29,8 @@ Public Class Surf_Basics : Inherits VBparent
 
         doubleSize(New cv.Rect(0, 0, src.Width, src.Height)).CopyTo(dst2)
         doubleSize(New cv.Rect(src.Width, 0, src.Width, src.Height)).CopyTo(dst3)
-        label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
-        If CS_SurfBasics.keypoints1 IsNot Nothing Then label1 += " " + CStr(CS_SurfBasics.keypoints1.Count)
+        labels(2) = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
+        If CS_SurfBasics.keypoints1 IsNot Nothing Then labels(2) += " " + CStr(CS_SurfBasics.keypoints1.Count)
     End Sub
 End Class
 
@@ -95,7 +95,7 @@ Public Class Surf_DrawMatchManual_CS : Inherits VBparent
             Dim pt = keys2(i).Pt
             If pt.Y <> -1 Then dst3.Circle(keys2(i).Pt, task.dotSize + 3, cv.Scalar.Red, -1, task.lineType)
         Next
-        label2 = "Yellow matched left to right = " + CStr(matchCount) + ". Red is unmatched."
+        labels(3) = "Yellow matched left to right = " + CStr(matchCount) + ". Red is unmatched."
     End Sub
 End Class
 

@@ -16,7 +16,7 @@ Public Class FitEllipse_Basics_CPP : Inherits VBparent
     Dim area As New Area_MinTriangle_CPP
     Public dstData(5 * 4 - 1) As Byte ' enough space for a float describing angle, center, and width/height - this will be filled in on the C++ side.
     Public Sub New()
-        label1 = "Green FitEllipse, Yellow=AMS, Red=Direct"
+        labels(2) = "Green FitEllipse, Yellow=AMS, Red=Direct"
         task.desc = "Use FitEllipse to draw around a set of points"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

@@ -63,8 +63,8 @@ Public Class ML_FillRGBDepth_MT : Inherits VBparent
         findSlider("ThreadGrid Width").Value = dst2.Cols / 2 ' change this higher to see the memory leak (or comment prediction loop above - it is the problem.)
         findSlider("ThreadGrid Height").Value = dst2.Rows / 4
 
-        label1 = "ML filled shadow"
-        label2 = ""
+        labels(2) = "ML filled shadow"
+        labels(3) = ""
         task.desc = "Predict depth based on color and colorize depth to confirm correctness of model.  NOTE: memory leak occurs if more multi-threading is used!"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -96,7 +96,7 @@ Public Class ML_FillRGBDepth : Inherits VBparent
 
         shadow.sliders.trackbar(0).Value = 3
 
-        label2 = "ML filled shadow"
+        labels(3) = "ML filled shadow"
         task.desc = "Predict depth based on color and display colorized depth to confirm correctness of model."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -126,8 +126,8 @@ Public Class ML_DepthFromColor_MT : Inherits VBparent
         findSlider("ThreadGrid Width").Value = 16
         findSlider("ThreadGrid Height").Value = 16
 
-        label1 = "Predicted Depth"
-        label2 = "Mask of color and depth input"
+        labels(2) = "Predicted Depth"
+        labels(3) = "Mask of color and depth input"
         task.desc = "Use RGB, X, and Y to predict depth across the entire image, maxDepth = slider value."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -162,7 +162,7 @@ Public Class ML_DepthFromColor_MT : Inherits VBparent
                     predictedDepth(roi) = depthResponse.Reshape(1, roi.Height)
                 End If
             End Sub)
-        label2 = "Input region count = " + CStr(predictedRegions) + " of " + CStr(grid.roiList.Count)
+        labels(3) = "Input region count = " + CStr(predictedRegions) + " of " + CStr(grid.roiList.Count)
         colorizer.Run(predictedDepth)
         dst2 = colorizer.dst2
     End Sub
@@ -183,7 +183,7 @@ Public Class ML_DepthFromColor : Inherits VBparent
         resized.sliders.trackbar(0).Value = 2 ' 2% of the image.
 
 
-        label2 = "Click any quadrant at left to view it below"
+        labels(3) = "Click any quadrant at left to view it below"
         task.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -232,7 +232,7 @@ Public Class ML_DepthFromColor : Inherits VBparent
 
         mats.Run(src)
         dst2 = mats.dst2
-        label1 = "prediction, shadow, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
+        labels(2) = "prediction, shadow, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
         dst3 = mats.dst3
     End Sub
 End Class
@@ -251,7 +251,7 @@ Public Class ML_DepthFromXYColor : Inherits VBparent
         resized = New Resize_Percentage()
         resized.sliders.trackbar(0).Value = 2
 
-        label1 = "Predicted Depth"
+        labels(2) = "Predicted Depth"
         task.desc = "Use RGB to predict depth across the entire image, maxDepth = slider value, resize % as well."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -317,7 +317,7 @@ Public Class ML_DepthFromXYColor : Inherits VBparent
 
         mats.Run(src)
         dst3 = mats.dst2
-        label2 = "shadow, empty, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
+        labels(3) = "shadow, empty, Depth Mask < " + CStr(sliders.trackbar(0).Value) + ", Learn Input"
     End Sub
 End Class
 
@@ -337,8 +337,8 @@ Public Class ML_EdgeDepth_MT : Inherits VBparent
         findSlider("ThreadGrid Width").Value = 16
         findSlider("ThreadGrid Height").Value = 16
 
-        label1 = "Depth Shadow (inverse of color and depth)"
-        label2 = "Predicted Depth"
+        labels(2) = "Depth Shadow (inverse of color and depth)"
+        labels(3) = "Predicted Depth"
         task.desc = "Use RGB to predict depth near edges."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -373,7 +373,7 @@ Public Class ML_EdgeDepth_MT : Inherits VBparent
                     predictedDepth(roi) = depthResponse.Reshape(1, roi.Height)
                 End If
             End Sub)
-        label2 = "Input region count = " + CStr(predictedRegions) + " of " + CStr(grid.roiList.Count)
+        labels(3) = "Input region count = " + CStr(predictedRegions) + " of " + CStr(grid.roiList.Count)
         colorizer.Run(predictedDepth)
         dst3 = colorizer.dst2
     End Sub
@@ -400,8 +400,8 @@ End Class
 '            emax.emaxCPP.basics.grid.sliders.trackbar(1).Value = 150
 '        End If
 
-'        label1 = ""
-'        label2 = ""
+'        labels(2) = ""
+'        labels(3) = ""
 '        task.desc = "Simplest form for using RandomForest in OpenCV"
 '    End Sub
 '    Private Function convertScalarToVec3b(s As cv.Scalar) As cv.Vec3b
@@ -447,7 +447,7 @@ End Class
 '                dst2.Circle(pt, task.dotsize + 5, cv.Scalar.Black, -1, task.lineType)
 '            Next
 '            dst3 = (dst2 - lastColors).ToMat
-'            label2 = CStr(truthCount) + " colors correctly predicted with centroid"
+'            labels(3) = CStr(truthCount) + " colors correctly predicted with centroid"
 '        End If
 
 '        rtree.Train(trainData, cv.ML.SampleTypes.RowSample, response) ' use the latest results to train the next iteration.

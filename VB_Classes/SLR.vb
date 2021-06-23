@@ -8,7 +8,7 @@ Public Class SLR_Basics : Inherits VBparent
     Public Sub New()
         If standalone Then
             input.Run(dst2)
-            label1 = "Sample data input"
+            labels(2) = "Sample data input"
         End If
 
         If sliders.Setup(caller) Then
@@ -28,7 +28,7 @@ Public Class SLR_Basics : Inherits VBparent
 
         slr.SegmentedRegressionFast(input.dataX, input.dataY, tolerance, halfLength, resultX, resultY)
 
-        label1 = "Tolerance = " + CStr(tolerance) + " and moving average window = " + CStr(halfLength)
+        labels(2) = "Tolerance = " + CStr(tolerance) + " and moving average window = " + CStr(halfLength)
         If resultX.Count > 0 Then
             plot.srcX = input.dataX.ToArray
             plot.srcY = input.dataY.ToArray
@@ -42,7 +42,7 @@ Public Class SLR_Basics : Inherits VBparent
         Else
             dst2.SetTo(0)
             dst3.SetTo(0)
-            setTrueText(label1 + " yielded no results...")
+            setTrueText(labels(2) + " yielded no results...")
         End If
         If standalone = False Then
             input.dataX.Clear()
@@ -94,7 +94,7 @@ Public Class SLR_Image : Inherits VBparent
     Public slr As New SLR_Basics
     Public hist As New Histogram_Basics
     Public Sub New()
-        label1 = "Original data"
+        labels(2) = "Original data"
         task.desc = "Run Segmented Linear Regression on grayscale image data - just an experiment"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -134,7 +134,7 @@ Public Class SLR_TrendCompare : Inherits VBparent
         lastPoint = p1
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        label1 = "Histogram with Yellow line showing the trends"
+        labels(2) = "Histogram with Yellow line showing the trends"
         slr.hist.plothist.backcolor = cv.Scalar.Red
         slr.Run(src)
         dst2 = slr.dst2
@@ -186,7 +186,7 @@ Public Class SLR_Trends : Inherits VBparent
         lastPoint = p1
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        label1 = "Grayscale histogram - yellow line shows trend"
+        labels(2) = "Grayscale histogram - yellow line shows trend"
         hist.plotHist.backColor = cv.Scalar.Red
         hist.Run(src)
         dst2 = hist.dst2
@@ -247,20 +247,20 @@ Public Class SLR_TrendImages : Inherits VBparent
                 trends.hist.plotHist.maxRange = task.maxZ * 1000
                 trends.hist.depthNoZero = True ' not interested in the undefined depth areas...
                 trends.Run(task.depth32f)
-                label1 = "SLR_TrendImages - Depth32f"
+                labels(2) = "SLR_TrendImages - Depth32f"
                 Exit For
             End If
             If radio.check(1).Checked Then
                 trends.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-                label1 = "SLR_TrendImages - grayscale"
+                labels(2) = "SLR_TrendImages - grayscale"
                 Exit For
             End If
             If radio.check(2).Checked Then
-                label1 = "SLR_TrendImages - Blue channel"
+                labels(2) = "SLR_TrendImages - Blue channel"
                 splitIndex = 0
             Else
                 splitIndex = If(radio.check(3).Checked, 1, 2)
-                label1 = "SLR_TrendImages - " + If(radio.check(3).Checked, "Green", "Red") + " channel"
+                labels(2) = "SLR_TrendImages - " + If(radio.check(3).Checked, "Green", "Red") + " channel"
             End If
             trends.Run(split(splitIndex))
         Next

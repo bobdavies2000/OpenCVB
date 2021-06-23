@@ -7,7 +7,7 @@ Public Class Contours_Basics : Inherits VBparent
     Public sortedContours As New SortedList(Of Integer, cv.Point())(New compareAllowIdenticalIntegerInverted)
     Public contours0 As cv.Point()()
     Public Sub New()
-        label2 = "Contours_Basics with centroid in red"
+        labels(3) = "Contours_Basics with centroid in red"
         task.desc = "Demo options on FindContours."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -141,7 +141,7 @@ End Class
 Public Class Contours_RGB : Inherits VBparent
     Public Sub New()
         task.desc = "Find and draw the contour of the largest foreground RGB contour."
-        label2 = "Background"
+        labels(3) = "Background"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim img = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -190,8 +190,8 @@ Public Class Contours_RemoveLines : Inherits VBparent
             sliders.setupTrackBar(0, "Morphology width/height", 1, 100, 20)
             sliders.setupTrackBar(1, "MorphologyEx iterations", 1, 5, 1)
         End If
-        label1 = "Original image"
-        label2 = "Original with horizontal/vertical lines removed"
+        labels(2) = "Original image"
+        labels(3) = "Original with horizontal/vertical lines removed"
         task.desc = "Remove the lines from an invoice image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -232,8 +232,8 @@ Public Class Contours_Depth : Inherits VBparent
     Public contours As New List(Of cv.Point)
     Public Sub New()
         task.desc = "Find and draw the contour of the depth foreground."
-        label1 = "DepthContour input"
-        label2 = "DepthContour output"
+        labels(2) = "DepthContour input"
+        labels(3) = "DepthContour output"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         dst2 = task.noDepthMask
@@ -272,8 +272,8 @@ Public Class Contours_Prediction : Inherits VBparent
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Predict the nth point ahead of the current point", 1, 100, 1)
         End If
-        label1 = "Original contour image"
-        label2 = "Image after smoothing with Kalman_Basics"
+        labels(2) = "Original contour image"
+        labels(3) = "Image after smoothing with Kalman_Basics"
         task.desc = "Predict the next contour point with Kalman to smooth the outline"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -295,7 +295,7 @@ Public Class Contours_Prediction : Inherits VBparent
             Next
             dst3.Line(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), origin, cv.Scalar.Yellow, task.lineWidth, task.lineType)
         End If
-        label1 = "There were " + CStr(outline.contours.Count) + " points in this contour"
+        labels(2) = "There were " + CStr(outline.contours.Count) + " points in this contour"
     End Sub
 End Class
 
@@ -310,8 +310,8 @@ Public Class Contours_FindandDraw : Inherits VBparent
     Dim rotatedRect As New Rectangle_Rotated
     Public Sub New()
         findSlider("DrawCount").Value = 5
-        label1 = "FindandDraw input"
-        label2 = "FindandDraw output"
+        labels(2) = "FindandDraw input"
+        labels(3) = "FindandDraw output"
         task.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -347,8 +347,8 @@ Public Class Contours_Binarized : Inherits VBparent
     Public Sub New()
         findSlider("Sobel kernel Size").Value = 3
 
-        label1 = "Sobel output of grayscale input"
-        label2 = "DrawContours output after FindContours"
+        labels(2) = "Sobel output of grayscale input"
+        labels(3) = "DrawContours output after FindContours"
         task.desc = "Find contours using Edges after image is binarized"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

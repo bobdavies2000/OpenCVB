@@ -63,7 +63,7 @@ Public Class PointCloud_Basics : Inherits VBparent
             vw = vwTop
             If showDetails Then
                 setTrueText(detailText, detailPoint.X, detailPoint.Y, 3)
-                label2 = "Clicked: " + detailText
+                labels(3) = "Clicked: " + detailText
             End If
             cv.Cv2.InRange(task.depth32f, minDepth * 1000, maxDepth * 1000, maskTopView)
         End If
@@ -81,7 +81,7 @@ Public Class PointCloud_Basics : Inherits VBparent
             vw = vwSide
             If showDetails Then
                 setTrueText(detailText, detailPoint.X, detailPoint.Y, 2)
-                label1 = "Clicked: " + detailText
+                labels(2) = "Clicked: " + detailText
             End If
             cv.Cv2.InRange(task.depth32f, minDepth * 1000, maxDepth * 1000, maskSideView)
         End If
@@ -138,7 +138,7 @@ Public Class PointCloud_Inspector : Inherits VBparent
             cv.Cv2.PutText(dst2, "Row " + CStr(i) + " " + Format(xyz.Item0, "#0.00") + " " + Format(xyz.Item1, "#0.00") + " " +
                            Format(xyz.Item2, "#0.00"), pt, cv.HersheyFonts.HersheyComplexSmall, 0.7, cv.Scalar.White, 2)
         Next
-        label1 = "Values displayed are for column " + CStr(cLine)
+        labels(2) = "Values displayed are for column " + CStr(cLine)
     End Sub
 End Class
 
@@ -175,8 +175,8 @@ Public Class PointCloud_Continuous_VB : Inherits VBparent
 
         dst3.SetTo(0, task.noDepthMask)
         dst2.SetTo(0, task.noDepthMask)
-        label1 = "White pixels: Z-values within " + CStr(thresholdSlider.value) + " mm's of X neighbor"
-        label2 = "Mask showing discontinuities > " + CStr(thresholdSlider.value) + " mm's of X neighbor"
+        labels(2) = "White pixels: Z-values within " + CStr(thresholdSlider.value) + " mm's of X neighbor"
+        labels(3) = "Mask showing discontinuities > " + CStr(thresholdSlider.value) + " mm's of X neighbor"
     End Sub
 End Class
 
@@ -294,7 +294,7 @@ Public Class PointCloud_SetupSide : Inherits VBparent
     Public zCheckbox As Windows.Forms.CheckBox
     Public Sub New()
         arcSize = dst2.Width / 15
-        label1 = "Layout markers for side view"
+        labels(2) = "Layout markers for side view"
         task.desc = "Create the colorized mat used for side projections"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
@@ -387,7 +387,7 @@ Public Class PointCloud_SetupTop : Inherits VBparent
     Public Sub New()
         arcSize = dst2.Width / 15
 
-        label1 = "Layout markers for top view"
+        labels(2) = "Layout markers for top view"
         task.desc = "Create the colorize the mat for a topdown projections"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
@@ -459,8 +459,8 @@ Public Class PointCloud_Raw_CPP : Inherits VBparent
         findSlider("ThreadGrid Width").Value = 64
         findSlider("ThreadGrid Height").Value = 32
 
-        label1 = "Top View"
-        label2 = "Side View"
+        labels(2) = "Top View"
+        labels(3) = "Side View"
         task.desc = "Project the depth data onto a top view and side view."
 
         cPtr = SimpleProjectionOpen()
@@ -484,8 +484,8 @@ Public Class PointCloud_Raw_CPP : Inherits VBparent
         dst3 = New cv.Mat(task.depth32f.Rows, task.depth32f.Cols, cv.MatType.CV_8U, SimpleProjectionSide(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         handleDepth.Free()
-        label1 = "Top View (looking down)"
-        label2 = "Side View"
+        labels(2) = "Top View (looking down)"
+        labels(3) = "Side View"
     End Sub
     Public Sub Close()
         SimpleProjectionClose(cPtr)
@@ -504,8 +504,8 @@ Public Class PointCloud_Raw : Inherits VBparent
         findSlider("ThreadGrid Width").Value = 64
         findSlider("ThreadGrid Height").Value = 32
 
-        label1 = "Top View"
-        label2 = "Side View"
+        labels(2) = "Top View"
+        labels(3) = "Side View"
         task.desc = "Project the depth data onto a top view and side view - using only VB code (too slow.)"
 
         cPtr = SimpleProjectionOpen()
@@ -536,8 +536,8 @@ Public Class PointCloud_Raw : Inherits VBparent
                      Next
                  Next
              End Sub)
-        label1 = "Top View (looking down)"
-        label2 = "Side View"
+        labels(2) = "Top View (looking down)"
+        labels(3) = "Side View"
     End Sub
     Public Sub Close()
         SimpleProjectionClose(cPtr)
@@ -556,8 +556,8 @@ Public Class PointCloud_BackProject : Inherits VBparent
     Dim both As New PointCloud_Basics
     Dim mats As New Mat_4Click
     Public Sub New()
-        label1 = "Click any quadrant below to enlarge it"
-        label2 = "Click any quadrant below to enlarge it"
+        labels(2) = "Click any quadrant below to enlarge it"
+        labels(3) = "Click any quadrant below to enlarge it"
         quadrantIndex = 0
         task.desc = "Backproject the selected object"
     End Sub
@@ -577,7 +577,7 @@ Public Class PointCloud_BackProject : Inherits VBparent
         mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.mat(quadrantIndex)
-        If quadrantIndex < 2 Then label2 = If(quadrantIndex = 0, both.label1, both.label2) Else label2 = "Click quadrant 0 or 1 to see side/top views"
+        If quadrantIndex < 2 Then labels(3) = If(quadrantIndex = 0, both.labels(2), both.labels(3)) Else labels(3) = "Click quadrant 0 or 1 to see side/top views"
     End Sub
 End Class
 
@@ -598,7 +598,7 @@ Public Class PointCloud_FrustrumTop : Inherits VBparent
         findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ").Checked = False
         findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX").Checked = False
 
-        label2 = "Draw_Frustrum output"
+        labels(3) = "Draw_Frustrum output"
         task.desc = "Translate only the frustrum with gravity"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -627,7 +627,7 @@ Public Class PointCloud_FrustrumSide : Inherits VBparent
         findCheckBox("Rotate pointcloud around X-axis using gravity vector angleZ").Checked = False
         findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX").Checked = False
 
-        label2 = "Draw_Frustrum output"
+        labels(3) = "Draw_Frustrum output"
         task.desc = "Translate only the frustrum with gravity"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -720,8 +720,8 @@ End Class
 '    Public Sub New()
 '        view.colorizeNeeded = True
 
-'        label1 = "Back projection of objects identified in the top view"
-'        label2 = "Objects identified in the top view"
+'        labels(2) = "Back projection of objects identified in the top view"
+'        labels(3) = "Objects identified in the top view"
 '        task.desc = "Display only the top view of the depth data and backproject the histogram onto the RGB image."
 '    End Sub
 '    Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -833,8 +833,8 @@ End Class
 Public Class PointCloud_Singletons : Inherits VBparent
     Public tView As New TimeView_Basics
     Public Sub New()
-        label1 = "Top down view before inrange sampling"
-        label2 = "Histogram after filtering for single-only histogram bins"
+        labels(2) = "Top down view before inrange sampling"
+        labels(3) = "Histogram after filtering for single-only histogram bins"
         task.desc = "Find floor and ceiling using gravity aligned top-down view and selecting bins with exactly 1 sample"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -864,8 +864,8 @@ Public Class PointCloud_SingletonRegions : Inherits VBparent
     Public Sub New()
         task.hist3DThreshold = 1
 
-        label1 = "Top down view before inrange sampling"
-        label2 = "Histogram after filtering for single-only histogram bins"
+        labels(2) = "Top down view before inrange sampling"
+        labels(3) = "Histogram after filtering for single-only histogram bins"
         task.desc = "Find floor and ceiling using gravity aligned top-down view and selecting bins with exactly 1 sample"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -885,8 +885,8 @@ End Class
 Public Class PointCloud_TimeView : Inherits VBparent
     Dim tView As New TimeView_Basics
     Public Sub New()
-        label1 = "Accumulated side view"
-        label2 = "Accumulated top view"
+        labels(2) = "Accumulated side view"
+        labels(3) = "Accumulated top view"
         task.desc = "Use the undecorated TimeView input instead of latest point cloud"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 3
@@ -923,7 +923,7 @@ Public Class PointCloud_TrackerTop : Inherits VBparent
 
         setupTop.Run(pTrack.dst2)
         dst2 = setupTop.dst2
-        label1 = Format(dst2.Height / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
+        labels(2) = Format(dst2.Height / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
     End Sub
 End Class
 
@@ -942,11 +942,11 @@ Public Class PointCloud_Tracker : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 3
         sideView.Run(sideView.timeView.dst2)
         dst2 = sideView.dst2
-        label1 = Format(dst2.Width / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
+        labels(2) = Format(dst2.Width / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
 
         topView.Run(sideView.timeView.dst3)
         dst3 = topView.dst2
-        label2 = Format(dst2.Height / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
+        labels(3) = Format(dst2.Height / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
     End Sub
 End Class
 
@@ -978,7 +978,7 @@ Public Class PointCloud_TrackerSide : Inherits VBparent
 
         setupSide.Run(pTrack.dst2)
         dst2 = setupSide.dst2
-        label1 = Format(dst2.Width / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
+        labels(2) = Format(dst2.Width / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
     End Sub
 End Class
 
@@ -1010,7 +1010,7 @@ Public Class PointCloud_ObjectsTop : Inherits VBparent
         measureTop.Run(src)
         dst2 = measureTop.dst2
 
-        label1 = "Pixels/Meter horizontal: " + CStr(CInt(dst2.Width / task.maxZ)) + " vertical: " + CStr(CInt(dst2.Height / task.maxZ))
+        labels(2) = "Pixels/Meter horizontal: " + CStr(CInt(dst2.Width / task.maxZ)) + " vertical: " + CStr(CInt(dst2.Height / task.maxZ))
 
         Dim FOV = task.hFov / 2
 
@@ -1106,7 +1106,7 @@ Public Class PointCloud_ObjectsSide : Inherits VBparent
         measureSide.Run(src)
         dst2 = measureSide.dst2
 
-        label1 = "Pixels/Meter horizontal: " + CStr(CInt(dst2.Width / task.maxZ)) + " vertical: " + CStr(CInt(dst2.Height / task.maxZ))
+        labels(2) = "Pixels/Meter horizontal: " + CStr(CInt(dst2.Width / task.maxZ)) + " vertical: " + CStr(CInt(dst2.Height / task.maxZ))
         Dim FOV = task.vFov / 2
 
         Dim xpt1 As cv.Point2f, xpt2 As cv.Point2f
@@ -1228,7 +1228,7 @@ Public Class PointCloud_SurfaceH_CPP : Inherits VBparent
         plot.Run(Nothing)
         dst3 = plot.dst2.Transpose()
         dst3 = dst3.Flip(cv.FlipMode.Y)
-        label1 = "Top row = " + CStr(topRow) + " peak row = " + CStr(peakRow) + " bottom row = " + CStr(botRow)
+        labels(2) = "Top row = " + CStr(topRow) + " peak row = " + CStr(peakRow) + " bottom row = " + CStr(botRow)
     End Sub
 End Class
 
@@ -1274,7 +1274,7 @@ Public Class PointCloud_SurfaceH : Inherits VBparent
         plot.Run(src)
         dst3 = plot.dst2.Transpose()
         dst3 = dst3.Flip(cv.FlipMode.Y)
-        label1 = "Top row = " + CStr(topRow) + " peak row = " + CStr(peakRow) + " bottom row = " + CStr(botRow)
+        labels(2) = "Top row = " + CStr(topRow) + " peak row = " + CStr(peakRow) + " bottom row = " + CStr(botRow)
 
         Dim ratio = task.mousePoint.Y / dst2.Height
         Dim offset = ratio * dst3.Height
@@ -1335,7 +1335,7 @@ Public Class PointCloud_NeighborV : Inherits VBparent
         dst2 = tmp32f.ConvertScaleAbs(255)
         dst2.SetTo(0, task.noDepthMask)
         dst2(New cv.Rect(0, dst2.Height - shift, dst2.Width, shift)).SetTo(0)
-        label1 = "White: z is within " + CStr(shiftZ) + " mm's with Y pixel offset " + CStr(shift)
+        labels(2) = "White: z is within " + CStr(shiftZ) + " mm's with Y pixel offset " + CStr(shift)
     End Sub
 End Class
 
@@ -1362,7 +1362,7 @@ Public Class PointCloud_NeighborH : Inherits VBparent
         dst2 = tmp32f.ConvertScaleAbs(255)
         dst2.SetTo(0, task.noDepthMask)
         dst2(New cv.Rect(dst2.Width - shift, 0, shift, dst2.Height)).SetTo(0)
-        label1 = "White: z is within " + CStr(shiftZ) + " mm's with X pixel offset " + CStr(shift)
+        labels(2) = "White: z is within " + CStr(shiftZ) + " mm's with X pixel offset " + CStr(shift)
     End Sub
 End Class
 
@@ -1405,7 +1405,7 @@ Public Class PointCloud_NeighborsH : Inherits VBparent
         For i = 0 To pt1.Count - 1
             dst2.Line(pt1(i), pt2(i), cv.Scalar.Yellow, task.lineWidth)
         Next
-        label1 = CStr(pt1.Count) + " z-values within " + CStr(shiftZ) + " mm's with X pixel offset " + CStr(shift)
+        labels(2) = CStr(pt1.Count) + " z-values within " + CStr(shiftZ) + " mm's with X pixel offset " + CStr(shift)
     End Sub
 End Class
 
@@ -1448,7 +1448,7 @@ Public Class PointCloud_NeighborsV : Inherits VBparent
         For i = 0 To pt1.Count - 1
             dst2.Line(pt1(i), pt2(i), cv.Scalar.Yellow, task.lineWidth)
         Next
-        label1 = CStr(pt1.Count) + " z-values within " + CStr(shiftZ) + " mm's with Y pixel offset " + CStr(shift)
+        labels(2) = CStr(pt1.Count) + " z-values within " + CStr(shiftZ) + " mm's with Y pixel offset " + CStr(shift)
     End Sub
 End Class
 
@@ -1473,7 +1473,7 @@ Public Class PointCloud_NeighborIMUH : Inherits VBparent
         Dim split = gCloud.dst2.Split()
         horiz.Run(split(2) * 1000)
         dst2 = horiz.dst2
-        label1 = horiz.label1
+        labels(2) = horiz.labels(2)
     End Sub
 End Class
 
@@ -1497,6 +1497,6 @@ Public Class PointCloud_NeighborIMUV : Inherits VBparent
         Dim split = gCloud.dst2.Split()
         verticals.Run(split(2) * 1000)
         dst2 = verticals.dst2
-        label1 = verticals.label1
+        labels(2) = verticals.labels(2)
     End Sub
 End Class

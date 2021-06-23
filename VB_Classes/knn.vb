@@ -7,7 +7,7 @@ Public Class KNN_Basics : Inherits VBparent
     Public currSet As New List(Of cv.Point2f)
     Dim random As New Random_Basics
     Public Sub New()
-        label1 = "White=TrainingData, Red=queries"
+        labels(2) = "White=TrainingData, Red=queries"
         knn = cv.ML.KNearest.Create()
         task.desc = "Test knn with random points in the image.  Find the nearest n points."
     End Sub
@@ -58,7 +58,7 @@ Public Class KNN_BasicsQT : Inherits VBparent
     Public Sub New()
         If standalone Then knnQT.useRandomData = True
 
-        label1 = "White=TrainingData, Red=queries"
+        labels(2) = "White=TrainingData, Red=queries"
         knn = cv.ML.KNearest.Create()
         task.desc = "Test knn with random points in the image.  Find the nearest n points."
     End Sub
@@ -119,8 +119,8 @@ Public Class KNN_Options : Inherits VBparent
             check.Box(0).Text = "Reuse the training and query data"
         End If
 
-        label1 = "Random training points"
-        label2 = "Random query points"
+        labels(2) = "Random training points"
+        labels(3) = "Random query points"
         task.desc = "Source of query/train points - generate points if standalone.  Reuse points if requested."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -171,7 +171,7 @@ Public Class KNN_1_to_1 : Inherits VBparent
         If standalone Then basics.knnQT.useRandomData = True
         basics.desiredMatches = 4 ' more than 1 to insure there are secondary choices below for 1:1 matching below.
 
-        label1 = "White=TrainingData, Red=queries, yellow=unmatched"
+        labels(2) = "White=TrainingData, Red=queries, yellow=unmatched"
         task.desc = "Use knn to find the nearest n points but use only the best and no duplicates - 1:1 mapping."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -256,8 +256,8 @@ Public Class KNN_Emax : Inherits VBparent
 
         knn.basics.knnQT.useRandomData = False
 
-        label1 = "Output from Emax"
-        label2 = "White=TrainingData, Red=queries yellow=unmatched"
+        labels(2) = "Output from Emax"
+        labels(3) = "White=TrainingData, Red=queries yellow=unmatched"
         task.desc = "Emax centroids move but here KNN is used to matched the old and new locations and keep the colors the same."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -318,7 +318,7 @@ Public Class KNN_Test : Inherits VBparent
         knn.Run(src)
         dst2 = knn.dst2
         knn.knnQT.trainingPoints = New List(Of cv.Point2f)(knn.knnQT.queryPoints)
-        label1 = knn.label1
+        labels(2) = knn.labels(2)
         If check.Box(0).Checked Then dst2.SetTo(cv.Scalar.White, grid.gridMask)
     End Sub
 End Class
@@ -356,7 +356,7 @@ Public Class KNN_Test_1_to_1 : Inherits VBparent
         knn.Run(src)
         dst2 = knn.dst2
         knn.basics.knnQT.trainingPoints = New List(Of cv.Point2f)(knn.basics.knnQT.queryPoints)
-        label1 = knn.label1
+        labels(2) = knn.labels(2)
         If check.Box(0).Checked Then dst2.SetTo(cv.Scalar.White, grid.gridMask)
     End Sub
 End Class
@@ -373,8 +373,8 @@ Public Class KNN_Point3d : Inherits VBparent
     Public lastSet() As cv.Point3f ' default usage: find and connect points in 2D for this number of points.
     Public Sub New()
         task.desc = "Use KNN to connect 3D points.  Results shown are a 2D projection of the 3D results."
-        label1 = "Yellow=Query (in 3D) Blue=Best Response (in 3D)"
-        label2 = "Top Down View to confirm 3D KNN is correct"
+        labels(2) = "Yellow=Query (in 3D) Blue=Best Response (in 3D)"
+        labels(3) = "Top Down View to confirm 3D KNN is correct"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static countSlider = findSlider("KNN Query count")
@@ -447,8 +447,8 @@ Public Class KNN_DepthClusters : Inherits VBparent
     Public flood As New FloodFill_Palette
     Public pTrack As New KNN_PointTracker
     Public Sub New()
-        label1 = "Output of Blob_DepthClusters"
-        label2 = "Same output after KNN_PointTracker"
+        labels(2) = "Output of Blob_DepthClusters"
+        labels(3) = "Same output after KNN_PointTracker"
         task.desc = "Use KNN to track and color the Blob results from clustering the depth data"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -480,8 +480,8 @@ Public Class KNN_SmoothAverage : Inherits VBparent
             sliders.setupTrackBar(0, "Weight X100", 0, 100, 50)
         End If
 
-        label1 = "AddWeight result of current and previous frame"
-        label2 = "Mask for difference between current and last frame"
+        labels(2) = "AddWeight result of current and previous frame"
+        labels(3) = "Mask for difference between current and last frame"
         task.desc = "Smooth out the abrupt appearance/disappearance of floodfilled regions"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -511,8 +511,8 @@ Public Class KNN_StabilizeRegions : Inherits VBparent
     Dim lastinput As New cv.Mat
     Public Sub New()
         findCheckBox("Draw rectangle and centroid for each mask").Checked = False
-        label1 = "Output of KNN_DepthClusters"
-        label2 = "KNN_DepthClusters output plus unstable regions"
+        labels(2) = "Output of KNN_DepthClusters"
+        labels(3) = "KNN_DepthClusters output plus unstable regions"
         task.desc = "Identify major regions that are unstable - appearing and disappearing"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -589,7 +589,7 @@ Public Class KNN_Cluster2DCities : Inherits VBparent
         nearestCountSlider = findSlider("KNN k nearest points")
         nearestCountSlider.Value = cityCountSlider.Value
 
-        label1 = ""
+        labels(2) = ""
         task.desc = "Use knn to cluster cities - a primitive attempt at traveling salesman problem."
     End Sub
     Public Sub cluster(result As cv.Mat, findXnearest As Integer)
@@ -673,7 +673,7 @@ Public Class KNN_Point2d : Inherits VBparent
         If standalone Then knn.knnQT.useRandomData = True
 
         task.desc = "Use KNN to find n matching points for each query."
-        label1 = "Yellow=Queries, Blue=Best Responses"
+        labels(2) = "Yellow=Queries, Blue=Best Responses"
     End Sub
     Public Sub prepareImage(dst As cv.Mat, dotSize As Integer)
         dst.SetTo(0)
@@ -920,7 +920,7 @@ Public Class KNN_1_to_1FIFO : Inherits VBparent
     Dim random As New Random_Basics
     Public Sub New()
         random.rangeRect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-        label1 = "White=TrainingData, Red=queries"
+        labels(2) = "White=TrainingData, Red=queries"
         knn = cv.ML.KNearest.Create()
         task.desc = "Using the last set of points, find the nearest point for each the current set - first come, first served."
     End Sub

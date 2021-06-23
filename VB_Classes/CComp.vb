@@ -26,15 +26,15 @@ Public Class CComp_Basics : Inherits VBparent
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If threshVal < 128 Then
             dst2 = src.Threshold(threshVal, 255, cv.ThresholdTypes.BinaryInv)
-            label1 = "CComp_Basics - dark half"
+            labels(2) = "CComp_Basics - dark half"
         Else
             dst2 = src.Threshold(threshVal, 255, cv.ThresholdTypes.Binary)
-            label1 = "CComp_Basics - light half"
+            labels(2) = "CComp_Basics - light half"
         End If
-        Dim labels As New cv.Mat
+        Dim cclabels As New cv.Mat
         Dim stats As New cv.Mat
         Dim centroidRaw As New cv.Mat
-        Dim nLabels = dst2.ConnectedComponentsWithStats(labels, stats, centroidRaw)
+        Dim nLabels = dst2.ConnectedComponentsWithStats(cclabels, stats, centroidRaw)
 
         rects.Clear()
         areas.Clear()
@@ -57,7 +57,7 @@ Public Class CComp_Basics : Inherits VBparent
                     index.Add(i)
                     colors.Add(task.vecColors(colors.Count))
                     maskOrder.Add(area, unsortedMasks.Count)
-                    unsortedMasks.Add(labels.InRange(i, i)(r))
+                    unsortedMasks.Add(cclabels.InRange(i, i)(r))
                     Dim c = New cv.Point(CInt(centroidRaw.Get(Of Double)(i, 0)), CInt(centroidRaw.Get(Of Double)(i, 1)))
                     unsortedCentroids.Add(c)
                 End If
@@ -78,10 +78,10 @@ Public Class CComp_Basics : Inherits VBparent
             task.palette.gradientColorMap.Set(Of cv.Vec3b)(0, index(i), colors(i))
         Next
 
-        labels.ConvertTo(labels, cv.MatType.CV_8U)
-        task.palette.Run(labels)
+        cclabels.ConvertTo(cclabels, cv.MatType.CV_8U)
+        task.palette.Run(cclabels)
         dst3 = task.palette.dst2
-        label2 = CStr(masks.Count) + " Connected Components with size > " + CStr(minSize) + " pixels"
+        labels(3) = CStr(masks.Count) + " Connected Components with size > " + CStr(minSize) + " pixels"
     End Sub
 End Class
 
@@ -94,8 +94,8 @@ Public Class CComp_Both : Inherits VBparent
     Dim above As New CComp_Basics
     Dim below As New CComp_Basics
     Public Sub New()
-        label1 = "Connected components in the dark half of the image"
-        label2 = "Connected components in the light half of the image"
+        labels(2) = "Connected components in the dark half of the image"
+        labels(3) = "Connected components in the light half of the image"
         task.desc = "Prepare the connected components for both above and below the threshold"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -180,7 +180,7 @@ Public Class CComp_BasicsOld : Inherits VBparent
         connectedComponents.renderblobs(mats.mat(3))
 
         count += renderBlobs(minSize, mats.mat(1), maxSize)
-        label2 = CStr(count) + " items found > " + CStr(minSize) + " and < " + CStr(maxSize)
+        labels(3) = CStr(count) + " items found > " + CStr(minSize) + " and < " + CStr(maxSize)
         connectedComponents.renderblobs(dst2)
         If standalone Then
             For i = 0 To centroids.Count - 1
@@ -192,7 +192,7 @@ Public Class CComp_BasicsOld : Inherits VBparent
         mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
-        label1 = ">Slider, <Slider, rendered >Slider, rendered <slider"
+        labels(2) = ">Slider, <Slider, rendered >Slider, rendered <slider"
     End Sub
 End Class
 
@@ -223,11 +223,11 @@ Public Class CComp_PointTracker : Inherits VBparent
             dst2 = highlight.dst2
             If highlight.highlightPoint <> New cv.Point Then
                 dst3 = highlight.dst3
-                label2 = "Selected region in yellow"
+                labels(3) = "Selected region in yellow"
             Else
                 dst3 = src
             End If
-            label1 = basics.label1
+            labels(2) = basics.labels(2)
         End If
     End Sub
 End Class
@@ -268,8 +268,8 @@ Public Class CComp_EdgeMask : Inherits VBparent
     Dim edges As New Edges_DepthAndColor
     Public Sub New()
         task.desc = "Isolate Color connected components after applying the Edge Mask"
-        label1 = "Edges_DepthAndColor (input to ccomp)"
-        label2 = "Blob Rectangles with centroids (white)"
+        labels(2) = "Edges_DepthAndColor (input to ccomp)"
+        labels(3) = "Blob Rectangles with centroids (white)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         edges.Run(src)
@@ -292,8 +292,8 @@ Public Class CComp_ColorDepth : Inherits VBparent
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Min Blob size", 0, 10000, 100)
         End If
-        label1 = "Color by Mean Depth"
-        label2 = "Binary image using threshold binary+Otsu"
+        labels(2) = "Color by Mean Depth"
+        labels(3) = "Binary image using threshold binary+Otsu"
         task.desc = "Color connected components based on their depth"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -328,7 +328,7 @@ Public Class CComp_InRange_MT : Inherits VBparent
             sliders.setupTrackBar(1, "InRange min Blob Size (in pixels) X1000", 1, 100, 10)
         End If
         task.desc = "Connected components in specific ranges"
-        label2 = "Blob rectangles - largest to smallest"
+        labels(3) = "Blob rectangles - largest to smallest"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -363,7 +363,7 @@ Public Class CComp_InRange_MT : Inherits VBparent
                 End If
             Next
         End Sub)
-        label1 = "# of blobs = " + CStr(totalBlobs) + " in " + CStr(rangeCount) + " regions"
+        labels(2) = "# of blobs = " + CStr(totalBlobs) + " in " + CStr(rangeCount) + " regions"
     End Sub
 End Class
 
@@ -408,7 +408,7 @@ Public Class CComp_InRange : Inherits VBparent
 
         src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         cv.Cv2.AddWeighted(dst2, 0.5, src, 0.5, 0, dst2)
-        label1 = "# of blobs = " + CStr(roiList.Count) + " in " + CStr(rangeCount) + " regions - smallest in front"
+        labels(2) = "# of blobs = " + CStr(roiList.Count) + " in " + CStr(rangeCount) + " regions - smallest in front"
     End Sub
 End Class
 
@@ -421,8 +421,8 @@ Public Class CComp_Shapes : Inherits VBparent
     Dim shapes As cv.Mat
     Public Sub New()
         shapes = New cv.Mat(task.parms.homeDir + "Data/Shapes.png", cv.ImreadModes.Color)
-        label1 = "Largest connected component"
-        label2 = "RectView, LabelView, Binary, grayscale"
+        labels(2) = "Largest connected component"
+        labels(3) = "RectView, LabelView, Binary, grayscale"
         task.desc = "Use connected components to isolate objects in image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -502,7 +502,7 @@ Public Class CComp_Simple : Inherits VBparent
             count += 1
         Next
 
-        label1 = CStr(count) + " items found > " + CStr(minSize) + " and < " + CStr(maxSize)
+        labels(2) = CStr(count) + " items found > " + CStr(minSize) + " and < " + CStr(maxSize)
     End Sub
 End Class
 
@@ -534,7 +534,7 @@ End Class
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
 Public Class CComp_GrayScale : Inherits VBparent
     Public rects As New List(Of cv.Rect)
-    Public labels As New cv.Mat
+    Public cclabels As New cv.Mat
     Dim vecColors(255) As cv.Vec3b
     Dim colorMap As cv.Mat
     Public Sub New()
@@ -559,7 +559,7 @@ Public Class CComp_GrayScale : Inherits VBparent
         End If
         Dim stats As New cv.Mat
         Dim centroids As New cv.Mat
-        Dim nLabels = dst2.ConnectedComponentsWithStats(labels, stats, centroids)
+        Dim nLabels = dst2.ConnectedComponentsWithStats(cclabels, stats, centroids)
 
         rects.Clear()
         Dim black = New cv.Vec3b(0, 0, 0)
@@ -583,9 +583,9 @@ Public Class CComp_GrayScale : Inherits VBparent
             task.palette.gradientColorMap.Set(Of cv.Vec3b)(0, index(i), colors(i))
         Next
 
-        labels.ConvertTo(labels, cv.MatType.CV_8U)
-        task.palette.Run(labels)
+        cclabels.ConvertTo(cclabels, cv.MatType.CV_8U)
+        task.palette.Run(cclabels)
         dst3 = task.palette.dst2
-        label2 = CStr(nLabels) + " Connected Components found"
+        labels(3) = CStr(nLabels) + " Connected Components found"
     End Sub
 End Class

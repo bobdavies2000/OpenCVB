@@ -20,7 +20,7 @@ Public Class FAST_Basics : Inherits VBparent
         For Each kp As cv.KeyPoint In keypoints
             dst2.Circle(kp.Pt, task.dotSize, cv.Scalar.Red, -1, task.lineType, 0)
         Next kp
-        label1 = "FAST_Basics nonMax = " + If(check.Box(0).Checked, "True", "False")
+        labels(2) = "FAST_Basics nonMax = " + If(check.Box(0).Checked, "True", "False")
     End Sub
 End Class
 

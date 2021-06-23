@@ -99,7 +99,7 @@ Public Class Thread_Grid : Inherits VBparent
         If standalone Or task.intermediateName = caller Then
             task.color.CopyTo(dst2)
             dst2.SetTo(cv.Scalar.All(255), gridMask)
-            label1 = "Thread_Grid " + CStr(roiList.Count - incompleteRegions) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +
+            labels(2) = "Thread_Grid " + CStr(roiList.Count - incompleteRegions) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +
                           CStr(roiList(0).Width) + "X" + CStr(roiList(0).Height) + " regions"
         End If
     End Sub
@@ -115,7 +115,7 @@ Public Class Thread_GridTest : Inherits VBparent
     Public Sub New()
         findSlider("ThreadGrid Width").Value = 64
         findSlider("ThreadGrid Height").Value = 40
-        label1 = ""
+        labels(2) = ""
         task.desc = "Validation test for thread_grid algorithm"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

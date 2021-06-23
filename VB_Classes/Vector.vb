@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Public Class Vector_Magnitude : Inherits VBparent
     Public Sub New()
         task.desc = "Compute Euclidian and Manhattan Distance on a single vector."
-        label1 = "Vector Magnitude"
+        labels(2) = "Vector Magnitude"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim cVector() As Single = {1, 4, 4, 8}

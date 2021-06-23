@@ -75,7 +75,7 @@ Public Class KLT_Basics : Inherits VBparent
         Next
 
         prevGray = src.Clone()
-        label1 = "KLT Basics - " + If(inputPoints Is Nothing, "0", CStr(inputPoints.Length)) + " points"
+        labels(2) = "KLT Basics - " + If(inputPoints Is Nothing, "0", CStr(inputPoints.Length)) + " points"
     End Sub
 End Class
 

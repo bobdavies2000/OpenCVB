@@ -126,8 +126,8 @@ Public Class MotionBlur_Deblur : Inherits VBparent
         End If
 
         task.desc = "Deblur a motion blurred image"
-        label1 = "Blurred Image Input"
-        label2 = "Deblurred Image Output"
+        labels(2) = "Blurred Image Input"
+        labels(3) = "Deblurred Image Output"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If check.Box(0).Checked Then

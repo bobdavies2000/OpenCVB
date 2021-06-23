@@ -63,7 +63,7 @@ Public Class Harris_Features_CPP : Inherits VBparent
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim weight = sliders.trackbar(4).Value / 100
         cv.Cv2.AddWeighted(dst2, weight, task.color, 1 - weight, 0, dst3)
-        label2 = "RGB overlaid with Harris result. Weight = " + Format(weight, "0%")
+        labels(3) = "RGB overlaid with Harris result. Weight = " + Format(weight, "0%")
     End Sub
     Public Sub Close()
         Harris_Features_Close(Harris_Features)

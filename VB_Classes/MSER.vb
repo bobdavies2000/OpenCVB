@@ -55,8 +55,8 @@ Public Class MSER_Basics : Inherits VBparent
             If rect.Width * rect.Height > minArea Then dst2.Rectangle(rect, cv.Scalar.Yellow, If(src.Width = 1280, 2, 1))
         Next
 
-        label1 = CStr(containers.Count) + " consolidated regions of interest located"
-        label2 = CStr(sortedBoxes.Count) + " total rectangles found with MSER"
+        labels(2) = CStr(containers.Count) + " consolidated regions of interest located"
+        labels(3) = CStr(sortedBoxes.Count) + " total rectangles found with MSER"
     End Sub
 End Class
 
@@ -210,8 +210,8 @@ Public Class MSER_TestSynthetic : Inherits VBparent
         mser.sliders.trackbar(4).Value = 0
         mser.check.Box(1).Checked = False ' the grayscale result is quite unimpressive.
 
-        label1 = "Input image to MSER"
-        label1 = "Output image from MSER"
+        labels(2) = "Input image to MSER"
+        labels(2) = "Output image from MSER"
         task.desc = "Test MSER with the synthetic image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -231,8 +231,8 @@ Public Class MSER_CPPStyle : Inherits VBparent
     Dim gray As cv.Mat
     Dim image As cv.Mat
     Public Sub New()
-        label1 = "Contour regions from MSER"
-        label2 = "Box regions from MSER"
+        labels(2) = "Contour regions from MSER"
+        labels(3) = "Box regions from MSER"
         task.desc = "Maximally Stable Extremal Regions example - still image"
         image = cv.Cv2.ImRead(task.parms.homeDir + "Data/MSERtestfile.jpg", cv.ImreadModes.Color)
         gray = image.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -290,7 +290,7 @@ Public Class MSER_Contours : Inherits VBparent
             dst2.DrawContours(listOfPoints, 0, cv.Scalar.Yellow, 1)
         Next
 
-        label1 = CStr(mser.regions.Length) + " Regions " + Format(pixels / mser.regions.Length, "#0.0") + " pixels/region (avg)"
+        labels(2) = CStr(mser.regions.Length) + " Regions " + Format(pixels / mser.regions.Length, "#0.0") + " pixels/region (avg)"
     End Sub
 End Class
 

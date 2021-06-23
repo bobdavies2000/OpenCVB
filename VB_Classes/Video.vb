@@ -26,7 +26,7 @@ Public Class Video_Basics : Inherits VBparent
         srcVideo = fileInfo.FullName
 
         captureVideo = New cv.VideoCapture(fileInfo.FullName)
-        label1 = fileInfo.Name
+        labels(2) = fileInfo.Name
         task.desc = "Show a video file"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

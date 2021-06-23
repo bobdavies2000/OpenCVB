@@ -30,7 +30,7 @@ Public Class ImageSeg_Basics : Inherits VBparent
             dst2.Circle(pt, task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
         Next
 
-        label2 = addw.label1.Replace("depth", "ImageSeg")
+        labels(3) = addw.labels(2).Replace("depth", "ImageSeg")
     End Sub
 End Class
 
@@ -103,7 +103,7 @@ Public Class ImageSeg_MissingSegments : Inherits VBparent
             If nextContour.Length >= maxLen Then contours.Add(nextContour)
         Next
         cv.Cv2.DrawContours(dst3, contours.ToArray, -1, 128, -1, task.lineType)
-        label2 = CStr(contours.Count) + " contours were found "
+        labels(3) = CStr(contours.Count) + " contours were found "
     End Sub
 End Class
 
@@ -156,7 +156,7 @@ Public Class ImageSeg_CentroidTracker : Inherits VBparent
     Public Sub New()
         findCheckBox("Caller will handle any drawing required").Checked = True
 
-        label1 = "Output of ImageSeg_Basics"
+        labels(2) = "Output of ImageSeg_Basics"
         task.desc = "Track the centroids that are found consistently from frame to frame."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -180,6 +180,6 @@ Public Class ImageSeg_CentroidTracker : Inherits VBparent
         For Each pt In pTrack.floodPoints
             dst3.Circle(pt, task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
         Next
-        label2 = "Centroid " + CStr(pTrack.drawRC.viewObjects.Count) + " blue, floodPoint " + CStr(pTrack.floodPoints.Count) + " yellow"
+        labels(3) = "Centroid " + CStr(pTrack.drawRC.viewObjects.Count) + " blue, floodPoint " + CStr(pTrack.floodPoints.Count) + " yellow"
     End Sub
 End Class

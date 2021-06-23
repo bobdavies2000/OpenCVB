@@ -99,7 +99,7 @@ Public Class Plane_Detect : Inherits VBparent
         findSlider("ThreadGrid Height").Value = 64
 
         task.desc = "Identify planes in each segment."
-        label2 = "Blue, green, and red show different planes"
+        labels(3) = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)
@@ -166,7 +166,7 @@ Public Class Plane_DetectDebug : Inherits VBparent
         findSlider("ThreadGrid Height").Value = 32
 
         task.desc = "Debug code to identify planes in just one segment."
-        label2 = "Blue, green, and red show different planes"
+        labels(3) = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         grid.Run(Nothing)

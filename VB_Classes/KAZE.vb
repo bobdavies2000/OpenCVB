@@ -5,7 +5,7 @@ Public Class KAZE_KeypointsKAZE_CS : Inherits VBparent
     Dim CS_Kaze As New CS_Classes.Kaze_Basics
     Public Sub New()
         task.desc = "Find keypoints using KAZE algorithm."
-        label1 = "KAZE key points"
+        labels(2) = "KAZE key points"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         CS_Kaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -23,7 +23,7 @@ Public Class KAZE_KeypointsAKAZE_CS : Inherits VBparent
     Dim CS_AKaze As New CS_Classes.AKaze_Basics
     Public Sub New()
         task.desc = "Find keypoints using AKAZE algorithm."
-        label1 = "AKAZE key points"
+        labels(2) = "AKAZE key points"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         CS_AKaze.GetKeypoints(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -117,8 +117,8 @@ Public Class KAZE_LeftAligned_CS : Inherits VBparent
                 dst3.Line(pt1.Pt, CS_KazeLeft.kazeKeyPoints.ElementAt(minIndex).Pt, cv.Scalar.Yellow, task.lineWidth, task.lineType)
             End If
         Next
-        label1 = "Right image has " + CStr(CS_KazeRight.kazeKeyPoints.Count) + " key points"
-        label2 = "Left image has " + CStr(CS_KazeLeft.kazeKeyPoints.Count) + " key points"
+        labels(2) = "Right image has " + CStr(CS_KazeRight.kazeKeyPoints.Count) + " key points"
+        labels(3) = "Left image has " + CStr(CS_KazeLeft.kazeKeyPoints.Count) + " key points"
     End Sub
 End Class
 

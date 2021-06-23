@@ -21,8 +21,8 @@ Public Class WarpModel_Basics : Inherits VBparent
             radio.check(0).Checked = True
         End If
 
-        label1 = "Src image (align to this image)"
-        label2 = "Src2 image aligned to src image"
+        labels(2) = "Src image (align to this image)"
+        labels(3) = "Src2 image aligned to src image"
         task.desc = "Use FindTransformECC to align 2 images"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -136,8 +136,8 @@ Public Class WarpModel_Input : Inherits VBparent
             If nextRadio.Checked Then
                 Dim photo As New FileInfo(task.parms.homeDir + "Data\Prokudin\" + nextRadio.Text)
                 img = cv.Cv2.ImRead(photo.FullName, cv.ImreadModes.Grayscale)
-                label1 = photo.Name + " - red image"
-                label2 = photo.Name + " - Naively aligned merge"
+                labels(2) = photo.Name + " - red image"
+                labels(3) = photo.Name + " - Naively aligned merge"
                 Exit For
             End If
         Next
@@ -193,7 +193,7 @@ End Module
 Public Class WarpModel_AlignImages : Inherits VBparent
     Dim ecc As New WarpModel_Basics
     Public Sub New()
-        label1 = "Aligned image"
+        labels(2) = "Aligned image"
         task.desc = "Align the RGB inputs raw images from the Prokudin examples."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -244,8 +244,8 @@ End Class
 '        End If
 
 '        task.drawRect = New cv.Rect(100, 100, 100, 100)
-'        label1 = "Previous ROI (align to this image)"
-'        label2 = "Current ROI aligned to previous frame (dst2)"
+'        labels(2) = "Previous ROI (align to this image)"
+'        labels(3) = "Current ROI aligned to previous frame (dst2)"
 '        task.desc = "Find the Translation and Euclidean warp matrix for the current grayscale image to the previous - needs more work"
 '    End Sub
 '    Public Sub Run(src As cv.Mat) ' Rank = 1

@@ -57,8 +57,8 @@ Public Class PCA_DrawImage : Inherits VBparent
     Public Sub New()
         image = cv.Cv2.ImRead(task.parms.homeDir + "Data/pca_test1.jpg")
         task.desc = "Use PCA to find the principle direction of an object."
-        label1 = "Original image"
-        label2 = "PCA Output"
+        labels(2) = "Original image"
+        labels(3) = "PCA Output"
     End Sub
     Private Sub drawAxis(img As cv.Mat, p As cv.Point, q As cv.Point, color As cv.Scalar, scale As Single)
         Dim angle = Math.Atan2(p.Y - q.Y, p.X - q.X) ' angle in radians

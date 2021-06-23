@@ -57,7 +57,7 @@ Partial Class OptionsFileName
         Me.FileNameLabel.Name = "FileNameLabel"
         Me.FileNameLabel.Size = New System.Drawing.Size(51, 20)
         Me.FileNameLabel.TabIndex = 8
-        Me.FileNameLabel.Text = "label1"
+        Me.FileNameLabel.Text = "labels(2)"
         '
         'Button1
         '

@@ -28,7 +28,7 @@ Public Class LUT_Basics : Inherits VBparent
         End If
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src.LUT(myLut)
-        label1 = "Image segmented into " + CStr(segments + 1) + " divisions (0-" + CStr(segments) + ")"
+        labels(2) = "Image segmented into " + CStr(segments + 1) + " divisions (0-" + CStr(segments) + ")"
     End Sub
 End Class
 
@@ -81,7 +81,7 @@ Public Class LUT_CustomColor : Inherits VBparent
     Public colorMap As cv.Mat
     Public Sub New()
         findSlider("Number of color transitions (Used only with Random)").Value = 10
-        label2 = "Custom Color Lookup Table"
+        labels(3) = "Custom Color Lookup Table"
         task.desc = "Use a palette to provide the lookup table for LUT - Painterly Effect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -104,7 +104,7 @@ End Class
 Public Class LUT_Reduction : Inherits VBparent
     Public reduction As New Reduction_Basics
     Public Sub New()
-        label2 = "Custom Color Lookup Table"
+        labels(3) = "Custom Color Lookup Table"
         task.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -133,7 +133,7 @@ Public Class LUT_RGBDepth : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         lut.Run(task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = lut.dst2
-        label1 = lut.label1
+        labels(2) = lut.labels(2)
     End Sub
 End Class
 
@@ -153,6 +153,6 @@ Public Class LUT_Depth32f : Inherits VBparent
         lut.Run(task.depth32f.Normalize(255).ConvertScaleAbs(255))
         dst2 = lut.dst2
         dst2.SetTo(0, task.noDepthMask)
-        label1 = lut.label1
+        labels(2) = lut.labels(2)
     End Sub
 End Class

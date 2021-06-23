@@ -190,7 +190,7 @@ Public Class Draw_Polygon : Inherits VBparent
     Dim optDraw As New Draw_Options
     Public Sub New()
         task.desc = "Draw Polygon figures"
-        label2 = "Convex Hull for the same polygon"
+        labels(3) = "Convex Hull for the same polygon"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         optDraw.Run(Nothing)
@@ -470,7 +470,7 @@ Public Class Draw_Frustrum : Inherits VBparent
     Public Sub New()
         xyzDepth.depthUnitsMeters = True
 
-        label2 = "Frustrum's shape prepared."
+        labels(3) = "Frustrum's shape prepared."
         task.desc = "Draw a frustrum for a camera viewport"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -580,9 +580,9 @@ Public Class Draw_Intersection : Inherits VBparent
         dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
         dst2.Line(p3, p4, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
         If intersectionPoint <> New cv.Point2f Then dst2.Circle(intersectionPoint, task.dotSize + 4, cv.Scalar.White, -1, task.lineType)
-        If intersect Then label1 = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y)) Else label1 = "Parallel!!!"
+        If intersect Then labels(2) = "Intersection point = " + CStr(CInt(intersectionPoint.X)) + " x " + CStr(CInt(intersectionPoint.Y)) Else labels(2) = "Parallel!!!"
         If intersectionPoint.X < 0 Or intersectionPoint.X > dst2.Width Or intersectionPoint.Y < 0 Or intersectionPoint.Y > dst2.Height Then
-            label1 += " (off screen)"
+            labels(2) += " (off screen)"
         End If
     End Sub
 End Class

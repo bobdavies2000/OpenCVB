@@ -89,7 +89,7 @@ Public Class OpticalFlow_DenseOptions : Inherits VBparent
             sliders.setupTrackBar(4, "Optical Flow PolyN", 1, 15, 5)
             sliders.setupTrackBar(5, "Optical Flow Scaling Output", 1, 100, 50)
         End If
-        label1 = "No output - just option settings..."
+        labels(2) = "No output - just option settings..."
         task.desc = "Use dense optical flow algorithm options"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -228,8 +228,8 @@ Public Class OpticalFlow_Sparse : Inherits VBparent
         End If
 
         task.desc = "Show the optical flow of a sparse matrix."
-        label1 = ""
-        label2 = ""
+        labels(2) = ""
+        labels(3) = ""
     End Sub
     Private Sub kalmanFilter()
         Dim f1err As New cv.Mat
@@ -288,7 +288,7 @@ Public Class OpticalFlow_Sparse : Inherits VBparent
                     End If
                 End If
             Next
-            label1 = "Matched " + CStr(features.Count) + " points "
+            labels(2) = "Matched " + CStr(features.Count) + " points "
 
             If task.frameCount Mod 10 = 0 Then lastFrame = src.Clone()
         Else

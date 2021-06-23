@@ -87,7 +87,7 @@ Public Class OilPaint_ColorProbability : Inherits VBparent
         kSlider = findSlider("kMeans k")
         kSlider.Value = 12 ' we would like a dozen colors or so in the color image.
         ReDim color_probability(kSlider.Value - 1)
-        label2 = "Color probabilities"
+        labels(3) = "Color probabilities"
         task.desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -182,7 +182,7 @@ Public Class OilPaint_Manual : Inherits VBparent
             sliders.setupTrackBar(2, "Threshold", 0, 200, 25) ' add the third slider for the threshold.
         End If
         task.desc = "Alter an image so it appears painted by a pointilist - Painterly Effect.  Select a region of interest to paint."
-        label2 = "Selected area only"
+        labels(3) = "Selected area only"
 
         task.drawRect = New cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8)
     End Sub
@@ -209,8 +209,8 @@ Public Class OilPaint_Cartoon : Inherits VBparent
     Public Sub New()
         task.drawRect = New cv.Rect(dst2.Cols * 3 / 8, dst2.Rows * 3 / 8, dst2.Cols * 2 / 8, dst2.Rows * 2 / 8)
         task.desc = "Alter an image so it appears more like a cartoon - Painterly Effect"
-        label1 = "OilPaint_Cartoon"
-        label2 = "Laplacian Edges"
+        labels(2) = "OilPaint_Cartoon"
+        labels(3) = "Laplacian Edges"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim roi = task.drawRect

@@ -12,8 +12,8 @@ Public Class Fuzzy_Basics : Inherits VBparent
         If floodRadio.Enabled Then floodRadio.Enabled = False ' too much special handling - cv_32SC1 image 
         findSlider("Reduction factor").Value = 32
         Fuzzy = Fuzzy_Open()
-        label1 = "Solid regions"
-        label2 = "Fuzzy pixels - not solid"
+        labels(2) = "Solid regions"
+        labels(3) = "Fuzzy pixels - not solid"
         task.desc = "That which is not solid is fuzzy"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -66,7 +66,7 @@ Public Class Fuzzy_Basics : Inherits VBparent
         task.palette.Run(gray)
         dst2 = task.palette.dst2
         dst2.SetTo(0, dst3)
-        label1 = "There were " + CStr(countContours) + " contour > 100 points."
+        labels(2) = "There were " + CStr(countContours) + " contour > 100 points."
     End Sub
     Public Sub Close()
         Fuzzy_Close(Fuzzy)
@@ -270,7 +270,7 @@ Public Class Fuzzy_TrackerDepth : Inherits VBparent
             End If
         Next
 
-        label1 = CStr(fuzzy.sortContours.Count) + " regions were found in the image."
+        labels(2) = CStr(fuzzy.sortContours.Count) + " regions were found in the image."
     End Sub
 End Class
 
@@ -306,7 +306,7 @@ Public Class Fuzzy_TrackerDepthClick : Inherits VBparent
             regionMask = gray.InRange(highlightRegion, highlightRegion + 1)
             dst3.SetTo(cv.Scalar.Yellow, regionMask)
         End If
-        label1 = CStr(tracker.fuzzy.sortContours.Count) + " regions were found in the image."
+        labels(2) = CStr(tracker.fuzzy.sortContours.Count) + " regions were found in the image."
     End Sub
 End Class
 
@@ -336,7 +336,7 @@ Public Class Fuzzy_PointTracker : Inherits VBparent
         pTrack.queryMasks = flood.basics.masks
         pTrack.Run(src)
 
-        label2 = CStr(pTrack.drawRC.viewObjects.Count) + " regions were found"
+        labels(3) = CStr(pTrack.drawRC.viewObjects.Count) + " regions were found"
         dst2 = pTrack.dst2
     End Sub
 End Class

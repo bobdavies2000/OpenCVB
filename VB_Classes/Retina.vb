@@ -30,8 +30,8 @@ Public Class Retina_Basics_CPP : Inherits VBparent
             check.Box(1).Text = "Open resulting xml file"
         End If
 
-        label1 = "Retina Parvo"
-        label2 = "Retina Magno"
+        labels(2) = "Retina Parvo"
+        labels(3) = "Retina Magno"
         task.desc = "Use the bio-inspired retina algorithm to adjust color and monitor motion."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -91,8 +91,8 @@ Public Class Retina_Depth : Inherits VBparent
     Dim retina As New Retina_Basics_CPP
     Public Sub New()
         task.desc = "Use the bio-inspired retina algorithm with the depth data."
-        label1 = "Last result || current result"
-        label2 = "Current depth motion result"
+        labels(2) = "Last result || current result"
+        labels(3) = "Current depth motion result"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         retina.Run(task.RGBDepth)

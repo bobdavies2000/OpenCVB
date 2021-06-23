@@ -12,7 +12,7 @@ Public Class InPaint_Basics : Inherits VBparent
         End If
 
         task.desc = "Create a flaw in an image and then use inPaint to mask it."
-        label2 = "Repaired Image"
+        labels(3) = "Repaired Image"
     End Sub
     Public Function drawRandomLine(dst As cv.Mat)
         Dim p1 = New cv.Point2f(msRNG.Next(dst.Cols / 4, dst.Cols * 3 / 4), msRNG.Next(dst.Rows / 4, dst.Rows * 3 / 4))
@@ -47,7 +47,7 @@ Public Class InPaint_Noise : Inherits VBparent
         End If
 
         task.desc = "Create noise in an image and then use inPaint to remove it."
-        label2 = "Repaired Image"
+        labels(3) = "Repaired Image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod 100 Then Exit Sub ' give them time to review the inpaint results
@@ -66,8 +66,8 @@ End Class
 
 Public Class InPaint_Depth : Inherits VBparent
     Public Sub New()
-        label1 = "32-bit representation of original depth"
-        label2 = "32-bit depth repaired with inpainting"
+        labels(2) = "32-bit representation of original depth"
+        labels(3) = "32-bit depth repaired with inpainting"
         task.desc = "Use Navier-Stokes to fill in the holes in the depth"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

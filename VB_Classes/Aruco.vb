@@ -29,8 +29,8 @@ End Class
 Public Class Aruco_Test : Inherits VBparent
     Dim aruco As New CS_Classes.Aruco_Detect
     Public Sub New()
-        label1 = "Original Image with marker ID's"
-        label2 = "Normalized image after WarpPerspective."
+        labels(2) = "Original Image with marker ID's"
+        labels(3) = "Normalized image after WarpPerspective."
         task.desc = "Testing the Aruco marker detection in C#"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

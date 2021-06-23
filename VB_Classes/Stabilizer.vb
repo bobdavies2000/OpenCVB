@@ -17,7 +17,7 @@ Public Class Stabilizer_Basics : Inherits VBparent
         End If
 
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        label1 = "Current frame - rectangle input to matchTemplate"
+        labels(2) = "Current frame - rectangle input to matchTemplate"
         task.desc = "if reasonable stdev and no motion in correlation rectangle, stabilize image across frames"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -66,16 +66,16 @@ Public Class Stabilizer_Basics : Inherits VBparent
                 input(srcRect).CopyTo(dst3(stableRect))
                 Dim nonZero = dst3.CountNonZero() / (dst3.Width * dst3.Height)
                 If nonZero < (1 - lostMax) Then
-                    label2 = "Lost pixels = " + Format(1 - nonZero, "00%")
+                    labels(3) = "Lost pixels = " + Format(1 - nonZero, "00%")
                     resetImage = True
                 End If
-                label2 = "Offset (x, y) = (" + CStr(shiftX) + "," + CStr(shiftY) + "), " + Format(nonZero, "00%") + " preserved, cc=" + Format(maxVal, "0.00")
+                labels(3) = "Offset (x, y) = (" + CStr(shiftX) + "," + CStr(shiftY) + "), " + Format(nonZero, "00%") + " preserved, cc=" + Format(maxVal, "0.00")
             Else
-                label2 = "Below correlation threshold " + Format(thresholdSlider.value, "0.00") + " with " + Format(maxVal, "0.00")
+                labels(3) = "Below correlation threshold " + Format(thresholdSlider.value, "0.00") + " with " + Format(maxVal, "0.00")
                 resetImage = True
             End If
         Else
-            label2 = "Correlation rectangle stdev is " + Format(stdev, "00") + " - too low"
+            labels(3) = "Correlation rectangle stdev is " + Format(stdev, "00") + " - too low"
             resetImage = True
         End If
 
@@ -101,8 +101,8 @@ Public Class Stabilizer_BasicsRandomInput : Inherits VBparent
             sliders.setupTrackBar(0, "Range of random motion introduced (absolute value in pixels)", 0, 30, 8)
         End If
 
-        label1 = "Current frame (before)"
-        label2 = "Image after shift"
+        labels(2) = "Current frame (before)"
+        labels(3) = "Image after shift"
         task.desc = "Generate images that have been arbitrarily shifted"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -152,7 +152,7 @@ Public Class Stabilizer_BasicsTest : Inherits VBparent
     Dim random As New Stabilizer_BasicsRandomInput
     Dim stable As New Stabilizer_Basics
     Public Sub New()
-        label1 = "Unstable input to Stabilizer_Basics"
+        labels(2) = "Unstable input to Stabilizer_Basics"
         task.desc = "Test the Stabilizer_Basics with random movement"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -163,7 +163,7 @@ Public Class Stabilizer_BasicsTest : Inherits VBparent
         dst2 = stable.dst2
         dst3 = stable.dst3
         If standalone Then dst3.Rectangle(stable.templateRect, cv.Scalar.White, 1)
-        label2 = stable.label2
+        labels(3) = stable.labels(3)
     End Sub
 End Class
 
@@ -181,7 +181,7 @@ Public Class Stabilizer_OpticalFlow : Inherits VBparent
     Dim errScale As cv.Mat, qScale As cv.Mat, rScale As cv.Mat
     Public Sub New()
         task.desc = "Stabilize video with a Kalman filter.  Shake camera to see image edges appear.  This is not really working!"
-        label1 = "Stabilized Image"
+        labels(2) = "Stabilized Image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim vert_Border = borderCrop * src.Rows / src.Cols

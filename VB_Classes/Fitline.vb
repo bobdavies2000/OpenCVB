@@ -51,7 +51,7 @@ Public Class Fitline_3DBasics_MT : Inherits VBparent
     Dim hlines As New Hough_Lines_MT
     Public Sub New()
         task.desc = "Use visual lines to find 3D lines."
-        label2 = "White is featureless RGB, blue depth shadow"
+        labels(3) = "White is featureless RGB, blue depth shadow"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         hlines.Run(src)
@@ -181,8 +181,8 @@ Public Class Fitline_EigenFit : Inherits VBparent
     Public Sub New()
         noisyLine.sliders.trackbar(0).Value = 30
         noisyLine.sliders.trackbar(1).Value = 400
-        label1 = "blue=GT, red=fitline, yellow=EigenFit"
-        label2 = "Raw input (use sliders below to explore)"
+        labels(2) = "blue=GT, red=fitline, yellow=EigenFit"
+        labels(3) = "Raw input (use sliders below to explore)"
         task.desc = "Remove outliers when trying to fit a line.  Fitline and the Eigen computation below produce the same result."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

@@ -39,7 +39,7 @@ Public Class SVM_Options : Inherits VBparent
         aOptions.optionsTitle.Add(radio1.Text)
         aOptions.hiddenOptions.Remove(caller + " Radio Options")
         radio1.Show()
-        label1 = "SVM_Options - only options, no output"
+        labels(2) = "SVM_Options - only options, no output"
         task.desc = "SVM has many options - enough to make a class for it."
     End Sub
     Public Function createSVM() As cv.ML.SVM
@@ -103,8 +103,8 @@ Public Class SVM_Basics : Inherits VBparent
     Dim svmOptions As New SVM_Options
     Public Sub New()
         task.desc = "Use SVM to classify random points.  Increase the sample count to see the value of more data."
-        label1 = "SVM_Basics input data"
-        label2 = "Results - white line is ground truth"
+        labels(2) = "SVM_Basics input data"
+        labels(3) = "Results - white line is ground truth"
     End Sub
 
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -158,7 +158,7 @@ Public Class SVM_Random : Inherits VBparent
             check.Box(0).Text = "Restrict random test to square area"
         End If
 
-        label1 = "SVM Training data"
+        labels(2) = "SVM Training data"
         task.desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -215,7 +215,7 @@ Public Class SVM_Random : Inherits VBparent
                     End If
                 Next
             Next
-            label2 = "There were " + CStr(blueCount) + " blue predictions"
+            labels(3) = "There were " + CStr(blueCount) + " blue predictions"
             If setLinear = False Then
                 dst2.Rectangle(rect, cv.Scalar.Black, 2)
                 dst3.Rectangle(rect, cv.Scalar.Black, 2)
@@ -231,7 +231,7 @@ End Class
 
 ' https://docs.opencv.org/3.4/d1/d73/tutorial_introduction_to_svm.html
 Public Class SVM_TestCase : Inherits VBparent
-    Dim labels() As Integer = {1, -1, -1, -1}
+    Dim svmlabels() As Integer = {1, -1, -1, -1}
     Dim trainData(,) As Single = {{501, 50}, {255, 50}, {501, 255}, {50, 200}}
     Dim trainMat As cv.Mat
     Dim labelsMat As cv.Mat
@@ -239,7 +239,7 @@ Public Class SVM_TestCase : Inherits VBparent
     Public Sub New()
 
         trainMat = New cv.Mat(4, 2, cv.MatType.CV_32F, trainData)
-        labelsMat = New cv.Mat(4, 1, cv.MatType.CV_32SC1, labels)
+        labelsMat = New cv.Mat(4, 1, cv.MatType.CV_32SC1, svmlabels)
 
         svmOptions.sliders.trackbar(1).Value = 15
         svmOptions.radio.check(3).Enabled = False

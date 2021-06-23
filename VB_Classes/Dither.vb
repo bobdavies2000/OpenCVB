@@ -96,8 +96,8 @@ Public Class Dither_Basics : Inherits VBparent
             radio.check(4).Checked = True ' this one was interesting...
         End If
 
-        label1 = "Dither applied to the RGB image"
-        label2 = "Dither applied to the Depth image"
+        labels(2) = "Dither applied to the RGB image"
+        labels(3) = "Dither applied to the Depth image"
         task.desc = "Explore all the varieties of dithering"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

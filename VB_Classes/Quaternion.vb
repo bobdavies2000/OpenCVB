@@ -47,8 +47,8 @@ End Class
 Public Class Quaterion_IMUPrediction : Inherits VBparent
     Dim host As New IMU_HostFrameTimes
     Public Sub New()
-        label1 = "Quaternion_IMUPrediction"
-        label2 = ""
+        labels(2) = "Quaternion_IMUPrediction"
+        labels(3) = ""
         task.desc = "IMU data arrives at the CPU after a delay.  Predict changes to the image based on delay and motion data."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

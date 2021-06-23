@@ -105,7 +105,7 @@ End Class
 Public Class Delaunay_GoodFeatures : Inherits VBparent
     Dim features As New Features_GoodFeatures
     Public Sub New()
-        label2 = "Voronoi facets of delauney good features"
+        labels(3) = "Voronoi facets of delauney good features"
         task.desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -139,7 +139,7 @@ End Class
 Public Class Delauney_Subdiv2D : Inherits VBparent
     Public updateFrequency As Integer = 30
     Public Sub New()
-        label2 = "Voronoi facets for the same subdiv2D"
+        labels(3) = "Voronoi facets for the same subdiv2D"
         task.desc = "Generate random points and divide the image around those points."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -194,7 +194,7 @@ Public Class Delauney_Coverage : Inherits VBparent
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Clear image after x frames", 1, 100, 50)
         End If
-        label1 = "Coverage of space"
+        labels(2) = "Coverage of space"
         task.desc = "Combine random points with linear connections to neighbors to cover space. Note that space fills rapidly."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

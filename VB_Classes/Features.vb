@@ -39,8 +39,8 @@ Public Class Features_PointTracker : Inherits VBparent
         findCheckBox("Draw rectangle and centroid for each mask").Checked = False
         findSlider("Minimum size of object in pixels").Value = 1
 
-        label1 = "Good features without Kalman"
-        label2 = "Good features with Kalman"
+        labels(2) = "Good features without Kalman"
+        labels(3) = "Good features with Kalman"
         task.desc = "Find good features and track them"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

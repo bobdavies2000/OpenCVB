@@ -105,7 +105,7 @@ Public Class Area_MinMotionRect : Inherits VBparent
     Public Sub New()
         findSlider("MOG Learn Rate").Value = 100 ' low threshold to maximize motion
         task.desc = "Use minRectArea to encompass detected motion"
-        label1 = "MinRectArea of MOG motion"
+        labels(2) = "MinRectArea of MOG motion"
     End Sub
 
     Private Function motionRectangles(gray As cv.Mat, colors() As cv.Vec3b) As cv.Mat
@@ -136,8 +136,8 @@ End Class
 
 Public Class Area_FindNonZero : Inherits VBparent
     Public Sub New()
-        label1 = "Coordinates of non-zero points"
-        label2 = "Non-zero original points"
+        labels(2) = "Coordinates of non-zero points"
+        labels(3) = "Non-zero original points"
         task.desc = "Use FindNonZero API to get coordinates of non-zero points."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

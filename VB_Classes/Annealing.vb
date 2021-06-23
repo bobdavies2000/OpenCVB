@@ -154,8 +154,8 @@ Public Class Annealing_CPP_MT : Inherits VBparent
             check.Box(2).Checked = True
         End If
 
-        label1 = "Log of Annealing progress"
-        label2 = "Top 2 are best solutions, bottom 2 are worst."
+        labels(2) = "Log of Annealing progress"
+        labels(3) = "Top 2 are best solutions, bottom 2 are worst."
 
         task.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
@@ -196,12 +196,12 @@ Public Class Annealing_CPP_MT : Inherits VBparent
             Next
             If sameEnergy = successCounter Then allClosed = True
             If sameEnergy = 1 Then
-                label1 = "There is only " + CStr(sameEnergy) + " thread at the best energy level."
+                labels(2) = "There is only " + CStr(sameEnergy) + " thread at the best energy level."
             Else
-                label1 = "There are " + CStr(sameEnergy) + " threads at the best energy level."
+                labels(2) = "There are " + CStr(sameEnergy) + " threads at the best energy level."
             End If
         Else
-            label1 = "Energy level is " + CStr(anneal(0).energy)
+            labels(2) = "Energy level is " + CStr(anneal(0).energy)
         End If
 
         mats.mat(0) = anneal(CInt(bestList.ElementAt(0).Value)).dst2
@@ -240,7 +240,7 @@ Public Class Annealing_Options : Inherits VBparent
             check.Box(1).Checked = True
         End If
 
-        label1 = "Log of Annealing progress"
+        labels(2) = "Log of Annealing progress"
 
         Const initialCities = 25
         findSlider("Random Pixel Count").Value = initialCities ' change the default number of cities here.

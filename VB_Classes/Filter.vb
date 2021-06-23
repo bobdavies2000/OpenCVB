@@ -3,8 +3,8 @@ Imports cv = OpenCvSharp
 Public Class Filter_Laplacian : Inherits VBparent
     Public Sub New()
         task.desc = "Use a filter to approximate the Laplacian derivative."
-        label1 = "Sharpened image using Filter2D output"
-        label2 = "Output of Filter2D (approximated Laplacian)"
+        labels(2) = "Sharpened image using Filter2D output"
+        labels(3) = "Output of Filter2D (approximated Laplacian)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim kernel = New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {1, 1, 1, 1, -8, 1, 1, 1, 1})
@@ -55,7 +55,7 @@ Public Class Filter_NormalizedKernel : Inherits VBparent
         For i = 0 To kernel.Width - 1
             sum += Math.Abs(kernel.Get(Of Single)(0, i))
         Next
-        label1 = "kernel sum = " + Format(sum, "#0.000")
+        labels(2) = "kernel sum = " + Format(sum, "#0.000")
 
         Dim dst32f = src.Filter2D(cv.MatType.CV_32FC1, kernel, anchor:=New cv.Point(0, 0))
         dst32f.ConvertTo(dst2, cv.MatType.CV_8UC3)
@@ -79,7 +79,7 @@ Public Class Filter_Normalized2D : Inherits VBparent
         Dim kernelSize = If(standalone, (task.frameCount Mod 20) + 1, sliders.trackbar(0).Value)
         Dim kernel = New cv.Mat(kernelSize, kernelSize, cv.MatType.CV_32F).SetTo(1 / (kernelSize * kernelSize))
         dst2 = src.Filter2D(-1, kernel)
-        label1 = "Normalized KernelSize = " + CStr(kernelSize)
+        labels(2) = "Normalized KernelSize = " + CStr(kernelSize)
     End Sub
 End Class
 
@@ -103,7 +103,7 @@ Public Class Filter_SepFilter2D : Inherits VBparent
             sliders.setupTrackBar(1, "Kernel Y size", 1, 21, 11)
             sliders.setupTrackBar(2, "SepFilter2D Sigma X10", 0, 100, 17)
         End If
-        label1 = "Gaussian Blur result"
+        labels(2) = "Gaussian Blur result"
         task.desc = "Apply kernel X then kernel Y with OpenCV's SepFilter2D and compare to Gaussian blur"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -117,9 +117,9 @@ Public Class Filter_SepFilter2D : Inherits VBparent
             Dim graySep = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim grayGauss = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst3 = (graySep - grayGauss).ToMat.Threshold(0, 255, cv.ThresholdTypes.Binary)
-            label2 = "Gaussian - SepFilter2D " + CStr(dst3.CountNonZero()) + " pixels different."
+            labels(3) = "Gaussian - SepFilter2D " + CStr(dst3.CountNonZero()) + " pixels different."
         Else
-            label2 = "SepFilter2D Result"
+            labels(3) = "SepFilter2D Result"
         End If
     End Sub
 End Class

@@ -7,8 +7,8 @@ Public Class PhotoShop_Clahe : Inherits VBparent
             sliders.setupTrackBar(0, "Clip Limit", 1, 100, 10)
         End If
         sliders.setupTrackBar(1, "Grid Size", 1, 100, 8)
-        label1 = "GrayScale"
-        label2 = "CLAHE Result"
+        labels(2) = "GrayScale"
+        labels(3) = "CLAHE Result"
         task.desc = "Show a Contrast Limited Adaptive Histogram Equalization image (CLAHE)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -26,8 +26,8 @@ End Class
 Public Class PhotoShop_Hue : Inherits VBparent
     Public hsv_planes(2) As cv.Mat
     Public Sub New()
-        label1 = "Hue"
-        label2 = "Saturation"
+        labels(2) = "Hue"
+        labels(3) = "Saturation"
         task.desc = "Show hue (Result1) and Saturation (Result2)."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -112,8 +112,8 @@ Public Class PhotoShop_WhiteBalance_CPP : Inherits VBparent
             sliders.setupTrackBar(0, "White balance threshold X100", 1, 100, 10)
         End If
         wPtr = WhiteBalance_Open()
-        label1 = "Image with auto white balance"
-        label2 = "White pixels were altered from the original"
+        labels(2) = "Image with auto white balance"
+        labels(3) = "White pixels were altered from the original"
         task.desc = "Automate getting the right white balance"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -148,7 +148,7 @@ Public Class PhotoShop_WhiteBalance : Inherits VBparent
     Dim wPtr As IntPtr
     Public Sub New()
         hist.plotRequested = True
-        label1 = "Image with auto white balance"
+        labels(2) = "Image with auto white balance"
         task.desc = "Automate getting the right white balance"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -217,13 +217,13 @@ Public Class PhotoShop_ChangeMask : Inherits VBparent
         If whiteFlag Then
             white.Run(src)
             dst2 = white.dst2
-            label1 = "White balanced image - VB version"
-            label2 = "Mask of changed pixels - VB version"
+            labels(2) = "White balanced image - VB version"
+            labels(3) = "Mask of changed pixels - VB version"
         Else
             whiteCPP.Run(src)
             dst2 = whiteCPP.dst2
-            label1 = "White balanced image - C++ version"
-            label2 = "Mask of changed pixels - C++ version"
+            labels(2) = "White balanced image - C++ version"
+            labels(3) = "Mask of changed pixels - C++ version"
         End If
         Dim diff = dst2 - src
         dst3 = diff.ToMat().CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
@@ -249,14 +249,14 @@ Public Class PhotoShop_PlotHist : Inherits VBparent
 
         white.Run(src)
         dst2 = white.dst2
-        label1 = white.label1
+        labels(2) = white.labels(2)
 
         hist2.Run(dst2)
         mat2to1.mat(1) = hist2.dst2
 
         mat2to1.Run(src)
         dst3 = mat2to1.dst2
-        label2 = "The top is before white balance"
+        labels(3) = "The top is before white balance"
     End Sub
 End Class
 
@@ -303,7 +303,7 @@ Public Class PhotoShop_Emboss : Inherits VBparent
         End If
 
         gray128 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 128)
-        label2 = "Embossed output"
+        labels(3) = "Embossed output"
         task.desc = "Use the video stream to make it appear like an embossed paper image."
     End Sub
     Public Function kernelGenerator(size As Integer) As cv.Mat
@@ -359,8 +359,8 @@ Public Class PhotoShop_EmbossAll : Inherits VBparent
         sizeSlider = findSlider("Emboss Kernel Size")
         sizeSlider.Value = 5
 
-        label1 = "The combination of all angles"
-        label2 = "bottom left, bottom right, top left, top right"
+        labels(2) = "The combination of all angles"
+        labels(3) = "bottom left, bottom right, top left, top right"
         task.desc = "Emboss using all the directions provided"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -482,7 +482,7 @@ Public Class PhotoShop_Brightness : Inherits VBparent
             sliders.setupTrackBar(0, "Brightness Value", 0, 255, 100)
         End If
 
-        label1 = "RGB straight to HSV"
+        labels(2) = "RGB straight to HSV"
         task.desc = "Implement the traditional brightness effect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -503,7 +503,7 @@ Public Class PhotoShop_Brightness : Inherits VBparent
         cv.Cv2.Merge(split, hsv64)
         hsv64.ConvertTo(dst3, cv.MatType.CV_8UC3)
         dst3 = dst3.CvtColor(cv.ColorConversionCodes.HSV2BGR)
-        label2 = "Brightness level = " + CStr(brightnessSlider.value)
+        labels(3) = "Brightness level = " + CStr(brightnessSlider.value)
     End Sub
 End Class
 
@@ -519,7 +519,7 @@ Public Class PhotoShop_UnsharpMask : Inherits VBparent
             sliders.setupTrackBar(2, "Shift Amount", 0, 5000, 1000)
         End If
         task.desc = "Sharpen an image - Painterly Effect"
-        label2 = "Unsharp mask (difference from Blur)"
+        labels(3) = "Unsharp mask (difference from Blur)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim blurred As New cv.Mat
@@ -639,7 +639,7 @@ Public Class PhotoShop_Pencil_Manual : Inherits VBparent
         For index = 0 To frm.check.length - 1
             If radio.check(index).Checked Then Exit For
         Next
-        label2 = "Intermediate result: " + Choose(index + 1, "grayscale image", "grayscale inverted image", "blur image")
+        labels(3) = "Intermediate result: " + Choose(index + 1, "grayscale image", "grayscale inverted image", "blur image")
         dst3 = Choose(index + 1, src, grayinv, blur)
     End Sub
 End Class

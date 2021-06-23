@@ -6,8 +6,8 @@ Imports System.Windows.Forms
 Public Class XPhoto_Bm3dDenoise : Inherits VBparent
     Public Sub New()
         task.desc = "Denoise image with block matching and filtering."
-        label1 = "Bm3dDenoising"
-        label2 = "Difference from Input"
+        labels(2) = "Bm3dDenoising"
+        labels(3) = "Difference from Input"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -15,7 +15,7 @@ Public Class XPhoto_Bm3dDenoise : Inherits VBparent
         CvXPhoto.Bm3dDenoising(src, dst2)
         cv.Cv2.Subtract(dst2, src, dst3)
         dst3.MinMaxLoc(minVal, maxVal)
-        label2 = "Diff from input - max change=" + CStr(maxVal)
+        labels(3) = "Diff from input - max change=" + CStr(maxVal)
         dst3 = dst3.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
 End Class
@@ -27,7 +27,7 @@ End Class
 Public Class XPhoto_Bm3dDenoiseDepthImage : Inherits VBparent
     Public Sub New()
         task.desc = "Denoise the depth image with block matching and filtering."
-        label2 = "Difference from Input"
+        labels(3) = "Difference from Input"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim gray = task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -35,7 +35,7 @@ Public Class XPhoto_Bm3dDenoiseDepthImage : Inherits VBparent
         CvXPhoto.Bm3dDenoising(gray, dst2)
         cv.Cv2.Subtract(dst2, gray, dst3)
         dst3.MinMaxLoc(minVal, maxVal)
-        label2 = "Diff from input - max change=" + CStr(maxVal)
+        labels(3) = "Diff from input - max change=" + CStr(maxVal)
         dst3 = dst3.Normalize(0, 255, cv.NormTypes.MinMax)
     End Sub
 End Class
@@ -135,8 +135,8 @@ Public Class XPhoto_Inpaint : Inherits VBparent
             radio.check(0).Checked = True
         End If
 
-        label1 = "RGB input to xPhoto Inpaint"
-        label2 = "Repaired result..."
+        labels(2) = "RGB input to xPhoto Inpaint"
+        labels(3) = "Repaired result..."
         task.desc = "Use the xPhoto inpaint to fill in the depth holes"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

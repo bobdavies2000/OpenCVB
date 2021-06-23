@@ -3,8 +3,8 @@ Imports System.Runtime.InteropServices
 Public Class Gradient_Basics : Inherits VBparent
     Public sobel As New Edges_Sobel
     Public Sub New()
-        label1 = "Gradient_Basics - Sobel output"
-        label2 = "Phase Output"
+        labels(2) = "Gradient_Basics - Sobel output"
+        labels(3) = "Phase Output"
         task.desc = "Use phase to compute gradient"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -24,7 +24,7 @@ Public Class Gradient_Depth : Inherits VBparent
     Dim sobel As New Edges_Sobel
     Public Sub New()
         task.desc = "Use phase to compute gradient on depth image"
-        label2 = "Phase Output"
+        labels(3) = "Phase Output"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         sobel.Run(task.depth32f)
@@ -53,8 +53,8 @@ Public Class Gradient_CartToPolar : Inherits VBparent
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
         End If
-        label1 = "CartToPolar Magnitude Output Normalized"
-        label2 = "CartToPolar Angle Output"
+        labels(2) = "CartToPolar Magnitude Output Normalized"
+        labels(3) = "CartToPolar Angle Output"
         task.desc = "Compute the gradient and use CartToPolar to image the magnitude and angle"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -88,8 +88,8 @@ Public Class Gradient_StableDepth : Inherits VBparent
     Dim motionSD As New Motion_MinMaxDepth
     Dim basics As New Gradient_Basics
     Public Sub New()
-        label1 = "Stable depth input to Gradient"
-        label2 = "Phase component of the gradient output"
+        labels(2) = "Stable depth input to Gradient"
+        labels(3) = "Phase component of the gradient output"
         task.desc = "Use the stable depth as input to get a map of the phase of the gradient in the depth data."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

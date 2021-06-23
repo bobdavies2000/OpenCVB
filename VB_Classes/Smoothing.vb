@@ -42,8 +42,8 @@ Public Class Smoothing_Exterior : Inherits VBparent
 		Return spline
 	End Function
 	Public Sub New()
-		label1 = "Original Points (white) Smoothed (yellow)"
-		label2 = ""
+		labels(2) = "Original Points (white) Smoothed (yellow)"
+		labels(3) = ""
 		task.desc = "Smoothing the line connecting a series of points."
 	End Sub
 	Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -115,8 +115,8 @@ Public Class Smoothing_Interior : Inherits VBparent
 	Public Sub New()
 		If standalone Then findSlider("Hull random points").Value = 16
 
-		label1 = "Original Points (white) Smoothed (yellow)"
-		label2 = ""
+		labels(2) = "Original Points (white) Smoothed (yellow)"
+		labels(3) = ""
 		task.desc = "Smoothing the line connecting a series of points staying inside the outline."
 	End Sub
 	Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -156,7 +156,7 @@ Public Class Smoothing_Options : Inherits VBparent
 			sliders.setupTrackBar(2, "Step size when adding points (1 is identity)", 1, 500, 30)
 		End If
 
-		label1 = "No output - just options for smoothing..."
+		labels(2) = "No output - just options for smoothing..."
 		task.desc = "Options for smoothing operations."
 	End Sub
 	Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -218,8 +218,8 @@ Public Class Smoothing_Contours : Inherits VBparent
 		smooth.Run(src)
 		If smooth.smoothpoints IsNot Nothing Then
 			If smooth.smoothPoints.Count > 0 Then drawPoly(dst2, smooth.smoothPoints.ToArray, smooth.plotColor)
-			label1 = "Smoothing with " + If(radio.check(0).Checked, "Interior", "Exterior") + " lines"
-			label2 = "Found " + CStr(contours0.Count) + " countours in the largest blob"
+			labels(2) = "Smoothing with " + If(radio.check(0).Checked, "Interior", "Exterior") + " lines"
+			labels(3) = "Found " + CStr(contours0.Count) + " countours in the largest blob"
 		End If
 	End Sub
 End Class

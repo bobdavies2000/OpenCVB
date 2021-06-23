@@ -19,7 +19,7 @@ Public Class FloodFill_Basics : Inherits VBparent
             sliders.setupTrackBar(3, "Step Size", 1, dst2.Cols / 2, 30)
         End If
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-        label2 = "Grayscale version"
+        labels(3) = "Grayscale version"
         task.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -77,7 +77,7 @@ Public Class FloodFill_Basics : Inherits VBparent
             Next
         Next
         dst2 = If(dst3.Channels = 3, dst3, dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
-        label1 = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
+        labels(2) = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
 End Class
 
@@ -157,7 +157,7 @@ Public Class FloodFill_Color_MT : Inherits VBparent
                 Next
             Next
         End Sub)
-        label1 = CStr(regionCount) + " regions were filled with Floodfill"
+        labels(2) = CStr(regionCount) + " regions were filled with Floodfill"
     End Sub
 End Class
 
@@ -191,8 +191,8 @@ Public Class FloodFill_RelativeRange : Inherits VBparent
             check.Box(1).Checked = True ' link4 produces better results.
             check.Box(2).Text = "Use 'Mask Only'"
         End If
-        label1 = "Input to floodfill basics"
-        label2 = "Output of floodfill basics"
+        labels(2) = "Input to floodfill basics"
+        labels(3) = "Output of floodfill basics"
         task.desc = "Experiment with 'relative' range option to floodfill.  Compare to fixed range option."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -233,7 +233,7 @@ Public Class Floodfill_Objects : Inherits VBparent
         basics.Run(src)
         dst2 = basics.dst2
 
-        label1 = CStr(basics.masks.Count) + " objects with more than " + CStr(minSlider.Value) + " bytes"
+        labels(2) = CStr(basics.masks.Count) + " objects with more than " + CStr(minSlider.Value) + " bytes"
         Static lastSetting As Integer = loDiffSlider.Value
         If dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero() < 0.9 * src.Total And minSlider.Value > 500 Then
             minSlider.Value -= 10
@@ -259,8 +259,8 @@ End Class
 Public Class FloodFill_WithDepth : Inherits VBparent
     Dim range As New FloodFill_RelativeRange
     Public Sub New()
-        label1 = "Floodfill results after removing unknown depth"
-        label2 = "Mask showing where depth data is missing"
+        labels(2) = "Floodfill results after removing unknown depth"
+        labels(3) = "Mask showing where depth data is missing"
         task.desc = "Floodfill only the areas where there is depth"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -284,7 +284,7 @@ Public Class Floodfill_Identifiers : Inherits VBparent
     Public minFloodSize As Integer
     Public basics As New FloodFill_Basics
     Public Sub New()
-        label1 = "Input image to floodfill"
+        labels(2) = "Input image to floodfill"
         task.desc = "Use floodfill on a projection to determine how many objects and where they are - needs more work"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -323,7 +323,7 @@ Public Class Floodfill_Identifiers : Inherits VBparent
             Next
         Next
 
-        label2 = CStr(rects.Count) + " regions > " + CStr(minFloodSize) + " pixels"
+        labels(3) = CStr(rects.Count) + " regions > " + CStr(minFloodSize) + " pixels"
 
         dst3.SetTo(0)
         For i = 0 To masks.Count - 1
@@ -371,7 +371,7 @@ Public Class FloodFill_PointTracker : Inherits VBparent
     Dim pTrack As New KNN_PointTracker
     Dim flood As New FloodFill_Palette
     Public Sub New()
-        label1 = "Point tracker output"
+        labels(2) = "Point tracker output"
         task.desc = "Test the FloodFill output as input into the point tracker"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -383,7 +383,7 @@ Public Class FloodFill_PointTracker : Inherits VBparent
         pTrack.queryMasks = flood.basics.masks
         pTrack.Run(src)
 
-        label2 = CStr(pTrack.drawRC.viewObjects.Count) + " regions were found"
+        labels(3) = CStr(pTrack.drawRC.viewObjects.Count) + " regions were found"
         dst2 = pTrack.dst2
     End Sub
 End Class
@@ -406,7 +406,7 @@ Public Class FloodFill_Top16 : Inherits VBparent
             check.Box(0).Text = "Show (up to) the first 16 largest objects in view (in order of size)"
         End If
 
-        label1 = "Input image to floodfill"
+        labels(2) = "Input image to floodfill"
         task.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -436,7 +436,7 @@ Public Class FloodFill_Top16 : Inherits VBparent
             End If
         Next
         If check.Box(0).Checked Then dst2 = thumbNails.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        label1 = CStr(flood.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
+        labels(2) = CStr(flood.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
     End Sub
 End Class
 
@@ -454,7 +454,7 @@ Public Class FloodFill_Click : Inherits VBparent
     Dim flood As New FloodFill_Point
     Public Sub New()
         flood.pt = New cv.Point(msRNG.Next(0, dst2.Width - 1), msRNG.Next(0, dst2.Height - 1))
-        label2 = "Click anywhere to floodfill that area"
+        labels(3) = "Click anywhere to floodfill that area"
         task.desc = "FloodFill where the mouse clicks"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -490,11 +490,11 @@ Public Class FloodFill_Point : Inherits VBparent
     Public pt As cv.Point ' this is the floodfill point
     Public Sub New()
         If standalone Then
-            label2 = "FloodFill_Point standalone just shows the edges"
+            labels(3) = "FloodFill_Point standalone just shows the edges"
         Else
-            label2 = "Resulting mask from floodfill"
+            labels(3) = "Resulting mask from floodfill"
         End If
-        label1 = "Input image to floodfill"
+        labels(2) = "Input image to floodfill"
         task.desc = "Use floodfill at a single location in a grayscale image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -515,7 +515,7 @@ Public Class FloodFill_Point : Inherits VBparent
             pixelCount = pixelCount
             Dim m = cv.Cv2.Moments(maskPlus(rect), True)
             centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
-            label2 = CStr(pixelCount) + " pixels at point pt(x=" + CStr(pt.X) + ",y=" + CStr(pt.Y)
+            labels(3) = CStr(pixelCount) + " pixels at point pt(x=" + CStr(pt.X) + ",y=" + CStr(pt.Y)
         End If
     End Sub
 End Class
@@ -636,13 +636,13 @@ Public Class FloodFill_FullImage : Inherits VBparent
         task.palette.Run(dst2)
         mats.mat(3) = task.palette.dst2
         mats.mat(3).SetTo(0, mats.mat(1)) ' show the pixels that are not assigned (missing)
-        label2 = "Checked " + CStr(testCount) + " locations and used floodfill on " + CStr(floodCount)
+        labels(3) = "Checked " + CStr(testCount) + " locations and used floodfill on " + CStr(floodCount)
 
         missingSegments = dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
         Dim missed = mats.mat(1).CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero()
         Dim segmentedCount = src.Width * src.Height - missed
         Dim percentRGB = Format(segmentedCount / (src.Width * src.Height), "#0%")
-        label1 = "Segmented pixels = " + Format(segmentedCount, "###,###") + " or " + percentRGB + " of total pixels"
+        labels(2) = "Segmented pixels = " + Format(segmentedCount, "###,###") + " or " + percentRGB + " of total pixels"
 
         mats.mat(2) = mats.mat(1).Clone
         For Each pt In floodPoints
@@ -793,7 +793,7 @@ Public Class FloodFill_Palette : Inherits VBparent
         dst2.SetTo(0)
         task.palette.dst2.CopyTo(dst2, allRegionMask)
 
-        label2 = CStr(basics.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
+        labels(3) = CStr(basics.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
         If standalone Or task.intermediateName = caller Then dst3 = task.palette.gradientColorMap.Resize(src.Size())
     End Sub
 End Class
@@ -851,7 +851,7 @@ Public Class FloodFill_Neighbors : Inherits VBparent
             loDiff = cv.Scalar.All(10)
             hiDiff = cv.Scalar.All(10)
         End If
-        label1 = "Grayscale version"
+        labels(2) = "Grayscale version"
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         task.desc = "Use floodfill to combine neighboring labels - regions that differ by only 1"
     End Sub
@@ -908,6 +908,6 @@ Public Class FloodFill_Neighbors : Inherits VBparent
         Dim spread = If(rangeColors.Count > 0, CInt(255 / rangeColors.Count), 255)
         task.palette.Run(dst3 * spread)
         dst2 = task.palette.dst2
-        label2 = CStr(basics.masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
+        labels(3) = CStr(basics.masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
 End Class

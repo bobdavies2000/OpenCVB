@@ -8,7 +8,7 @@ Public Class Palette_Basics : Inherits VBparent
         task.desc = "Apply the different color maps in OpenCV - Painterly Effect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        label1 = "ColorMap = " + task.paletteSchemeName
+        labels(2) = "ColorMap = " + task.paletteSchemeName
 
         Static cMapDir As New DirectoryInfo(task.parms.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
         Static saveColorMap As Integer = -1
@@ -53,8 +53,8 @@ Public Class Palette_Color : Inherits VBparent
         Dim r = sliders.trackbar(2).Value
         dst2.SetTo(New cv.Scalar(b, g, r))
         dst3.SetTo(New cv.Scalar(255 - b, 255 - g, 255 - r))
-        label1 = "Color (RGB) = " + CStr(b) + " " + CStr(g) + " " + CStr(r)
-        label2 = "Color (255 - RGB) = " + CStr(255 - b) + " " + CStr(255 - g) + " " + CStr(255 - r)
+        labels(2) = "Color (RGB) = " + CStr(b) + " " + CStr(g) + " " + CStr(r)
+        labels(3) = "Color (255 - RGB) = " + CStr(255 - b) + " " + CStr(255 - g) + " " + CStr(255 - r)
     End Sub
 End Class
 
@@ -150,7 +150,7 @@ Public Class Palette_Reduction : Inherits VBparent
         reduction.radio.check(0).Checked = True
         reduction.radio.check(2).Enabled = False ' must have some reduction for this to work...
         task.desc = "Map colors to different palette - Painterly Effect."
-        label1 = "Reduced Colors"
+        labels(2) = "Reduced Colors"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static reductionSlider = findSlider("Reduction factor")
@@ -175,7 +175,7 @@ Public Class Palette_Reduction : Inherits VBparent
             Next
         Next
 
-        label1 = "palette count = " + CStr(palette.Count)
+        labels(2) = "palette count = " + CStr(palette.Count)
         Dim max As Integer
         Dim maxIndex As Integer
         For i = 0 To palette.Count - 1
@@ -199,7 +199,7 @@ Public Class Palette_Reduction : Inherits VBparent
 
             dst3 = src.EmptyClone.SetTo(0)
             dst3.SetTo(cv.Scalar.All(255), mask)
-            label2 = "Most Common Color +- " + CStr(1) + " count = " + CStr(maxCount)
+            labels(3) = "Most Common Color +- " + CStr(1) + " count = " + CStr(maxCount)
         End If
     End Sub
 End Class
@@ -229,7 +229,7 @@ Public Class Palette_Gradient : Inherits VBparent
     Public color1 As cv.Scalar
     Public color2 As cv.Scalar
     Public Sub New()
-        label2 = "From and To colors"
+        labels(3) = "From and To colors"
         task.desc = "Create gradient image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -268,7 +268,7 @@ Public Class Palette_RandomColorMap : Inherits VBparent
             sliders.setupTrackBar(0, "Number of color transitions (Used only with Random)", 1, 255, 180)
         End If
 
-        label2 = "Generated colormap"
+        labels(3) = "Generated colormap"
         task.desc = "Build a random colormap that smoothly transitions colors - Painterly Effect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -301,7 +301,7 @@ Public Class Palette_DepthColorMap : Inherits VBparent
     Dim gradientColorMap As New cv.Mat
     Public Sub New()
         If sliders.Setup(caller) Then sliders.setupTrackBar(0, "Convert and Scale value X100", 0, 100, 6)
-        label2 = "Palette used to color left image"
+        labels(3) = "Palette used to color left image"
         task.desc = "Build a colormap that best shows the depth.  NOTE: custom color maps need to use C++ ApplyColorMap."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -339,8 +339,8 @@ Public Class Palette_ObjectColors : Inherits VBparent
     Dim reduction As New Reduction_KNN_Color
     Public gray As cv.Mat
     Public Sub New()
-        label1 = "Consistent colors"
-        label2 = "Original colors"
+        labels(2) = "Consistent colors"
+        labels(3) = "Original colors"
         task.desc = "New class description"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -382,7 +382,7 @@ Public Class Palette_ObjectColors : Inherits VBparent
             task.trueText(CStr(CInt(blobList.ElementAt(i).Key)), blob.centroid)
         Next
         dst2.SetTo(0, task.noDepthMask)
-        label1 = CStr(blobList.Count) + " regions between " + Format(task.minDepth / 1000, "0.0") + " and " + Format(task.maxDepth / 1000, "0.0") + " meters"
+        labels(2) = CStr(blobList.Count) + " regions between " + Format(task.minDepth / 1000, "0.0") + " and " + Format(task.maxDepth / 1000, "0.0") + " meters"
     End Sub
 End Class
 
@@ -406,7 +406,7 @@ Public Class Palette_Layout2D : Inherits VBparent
             dst2(r).SetTo(task.scalarColors(index Mod 255))
             index += 1
         Next
-        label1 = "Palette_Layout2D - " + CStr(grid.roiList.Count) + " regions"
+        labels(2) = "Palette_Layout2D - " + CStr(grid.roiList.Count) + " regions"
     End Sub
 End Class
 

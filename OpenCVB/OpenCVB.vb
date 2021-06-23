@@ -45,9 +45,13 @@ Public Class OpenCVB
     Dim CodeLineCount As Integer
     Dim DrawingRectangle As Boolean
     Dim drawRect As New cv.Rect
+    Dim usingDst0 As Boolean
+    Dim usingDst1 As Boolean
     Dim drawRectPic As Integer
     Dim externalPythonInvocation As Boolean
     Dim fps As Integer = 60
+    Dim imgDst0 As New cv.Mat
+    Dim imgDst1 As New cv.Mat
     Dim imgResult As New cv.Mat
     Dim frameCount As Integer
     Dim GrabRectangleData As Boolean
@@ -67,7 +71,7 @@ Public Class OpenCVB
     Dim openCVKeywords As New List(Of String)
     Public optionsForm As OptionsDialog
     Dim TreeViewDialog As TreeviewForm
-    Dim picLabels() = {"RGB", "Depth", "", ""}
+    Dim picLabels() = {"RGB", "Depth", "dst1", "dst2"}
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
     Public workingRes As cv.Size
     Dim textDesc As String = ""
@@ -366,8 +370,16 @@ Public Class OpenCVB
                 If camera.color.width > 0 Then
                     SyncLock bufferLock
                         Try
-                            cvext.BitmapConverter.ToBitmap(camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)), camPic(0).Image)
-                            cvext.BitmapConverter.ToBitmap(camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height)), camPic(1).Image)
+                            If usingDst0 Then
+                                cvext.BitmapConverter.ToBitmap(imgDst0.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)), camPic(0).Image)
+                            Else
+                                cvext.BitmapConverter.ToBitmap(camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)), camPic(0).Image)
+                            End If
+                            If usingDst1 Then
+                                cvext.BitmapConverter.ToBitmap(imgDst1.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height)), camPic(1).Image)
+                            Else
+                                cvext.BitmapConverter.ToBitmap(camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height)), camPic(1).Image)
+                            End If
                         Catch ex As Exception
                             Console.WriteLine("OpenCVB: Error in campic_Paint: " + ex.Message)
                         End Try
@@ -380,17 +392,19 @@ Public Class OpenCVB
         Dim maxline = 21
         SyncLock ttTextData
             Try
-                If pic.Tag = 2 Or pic.Tag = 3 Then
-                    Dim ttText = New List(Of VB_Classes.TTtext)(ttTextData)
+                Dim ttText = New List(Of VB_Classes.TTtext)(ttTextData)
+                Dim tmpTag1 = pic.Tag
+                Dim tmpTag2 = pic.Tag
+                If usingDst1 = False And tmpTag1 = 1 Then tmpTag1 = -1
+                If usingDst1 And tmpTag2 = 2 Then tmpTag2 = -1 ' moving all the dst2 true text to dst1 when using dst1. 
+                If tmpTag1 = 1 Or tmpTag2 = 2 Or pic.Tag = 3 Then
                     For i = 0 To ttText.Count - 1
                         Dim tt = ttText(i)
                         If tt IsNot Nothing Then
                             If ttText(i).picTag = 3 Then
-                                g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(Color.White),
-                                             tt.x * ratio + camPic(0).Width, tt.y * ratio)
+                                g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(Color.White), tt.x * ratio + camPic(0).Width, tt.y * ratio)
                             Else
-                                g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(Color.White),
-                                             tt.x * ratio, tt.y * ratio)
+                                g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(Color.White), tt.x * ratio, tt.y * ratio)
                             End If
                             maxline -= 1
                             If maxline <= 0 Then Exit For
@@ -1267,6 +1281,8 @@ Public Class OpenCVB
 
             If task.mousePointUpdated Then mousePoint = task.mousePoint ' in case the algorithm has changed the mouse location...
             If task.drawRectUpdated Then drawRect = task.drawRect
+            usingDst0 = task.usingdst0
+            usingDst1 = task.usingdst1
             If task.drawRectClear Then
                 drawRect = New cv.Rect
                 task.drawRect = drawRect
@@ -1278,13 +1294,21 @@ Public Class OpenCVB
 
             If frameCount = 0 Then meActivateNeeded = True
 
-            picLabels(2) = task.label1
-            picLabels(3) = task.label2
+
+            If usingDst0 Then picLabels(0) = task.labels(0)
+            If usingDst1 Then picLabels(1) = task.labels(1)
+            picLabels(2) = task.labels(2)
+            picLabels(3) = task.labels(3)
 
             ' share the results of the algorithm task.
             SyncLock ttTextData
                 If task.ttTextData.Count Then ttTextData = New List(Of VB_Classes.TTtext)(task.ttTextData) Else ttTextData = New List(Of VB_Classes.TTtext)
                 task.ttTextData.Clear()
+            End SyncLock
+
+            SyncLock bufferLock
+                If usingDst0 Then imgDst0 = task.color ' task.color is overwritten with dst0
+                If usingDst1 Then imgDst1 = task.RGBDepth ' task.rgbdepth is overwritten with dst1
             End SyncLock
 
             SyncLock imgResult

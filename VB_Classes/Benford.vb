@@ -22,7 +22,7 @@ Public Class Benford_Basics : Inherits VBparent
             expectedDistribution(i) = Math.Log10(1 + 1 / i) ' get the precise expected values.
         Next
 
-        label2 = "Actual distribution of input"
+        labels(3) = "Actual distribution of input"
         task.desc = "Build the capability to perform a Benford analysis."
     End Sub
     Public Sub setup99()
@@ -80,7 +80,7 @@ Public Class Benford_Basics : Inherits VBparent
         addW.Run(dst3)
         dst2 = addW.dst2
 
-        label1 = "AddWeighted: " + Format(task.AddWeighted, "%0.0") + " actual vs. " + Format(1 - task.AddWeighted, "%0.0") + " Benford distribution"
+        labels(2) = "AddWeighted: " + Format(task.AddWeighted, "%0.0") + " actual vs. " + Format(1 - task.AddWeighted, "%0.0") + " Benford distribution"
     End Sub
 End Class
 
@@ -102,7 +102,7 @@ Public Class Benford_NormalizedImage : Inherits VBparent
 
         benford.Run(gray32f.Normalize(1))
         dst3 = benford.dst2
-        label2 = benford.label2
+        labels(3) = benford.labels(3)
     End Sub
 End Class
 
@@ -126,7 +126,7 @@ Public Class Benford_NormalizedImage99 : Inherits VBparent
 
         benford.Run(gray32f.Normalize(1))
         dst3 = benford.dst2
-        label2 = benford.label2
+        labels(3) = benford.labels(3)
     End Sub
 End Class
 
@@ -152,7 +152,7 @@ Public Class Benford_JPEG : Inherits VBparent
         dst2 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)
         dst3 = benford.dst2
-        label2 = benford.label2
+        labels(3) = benford.labels(3)
     End Sub
 End Class
 
@@ -179,7 +179,7 @@ Public Class Benford_JPEG99 : Inherits VBparent
         dst2 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)
         dst3 = benford.dst2
-        label2 = benford.label2
+        labels(3) = benford.labels(3)
     End Sub
 End Class
 
@@ -205,7 +205,7 @@ Public Class Benford_PNG : Inherits VBparent
         dst2 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
         benford.Run(tmp)
         dst3 = benford.dst2
-        label2 = benford.label2
+        labels(3) = benford.labels(3)
     End Sub
 End Class
 
@@ -222,7 +222,7 @@ Public Class Benford_Depth : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         benford.Run(task.depth32f)
         dst2 = benford.dst2
-        label1 = benford.label2
+        labels(2) = benford.labels(3)
     End Sub
 End Class
 
@@ -239,7 +239,7 @@ Public Class Benford_DepthRGB : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         benford.Run(task.RGBDepth)
         dst2 = benford.dst3
-        label1 = benford.label2
+        labels(2) = benford.labels(3)
     End Sub
 End Class
 
@@ -266,6 +266,6 @@ Public Class Benford_Primes : Inherits VBparent
         tmp.ConvertTo(tmp, cv.MatType.CV_32F)
         benford.Run(tmp)
         dst3 = benford.dst2
-        label2 = benford.label2
+        labels(3) = benford.labels(3)
     End Sub
 End Class

@@ -19,7 +19,7 @@ Public Class Laplacian_Basics : Inherits VBparent
         If standalone or task.intermediateName = caller Then src = src.GaussianBlur(New cv.Size(kernelSize, kernelSize), 0, 0)
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = gray.Laplacian(ddepth, kernelSize, scale, delta).ConvertScaleAbs()
-        label1 = "Laplacian Filter k = " + CStr(kernelSize)
+        labels(2) = "Laplacian Filter k = " + CStr(kernelSize)
     End Sub
 End Class
 
@@ -64,7 +64,7 @@ Public Class Laplacian_Blur : Inherits VBparent
         End If
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = src.Laplacian(ddepth, kernelSize, scale, delta).ConvertScaleAbs()
-        label1 = "Laplacian+" + blurText + " k = " + CStr(kernelSize)
+        labels(2) = "Laplacian+" + blurText + " k = " + CStr(kernelSize)
     End Sub
 End Class
 

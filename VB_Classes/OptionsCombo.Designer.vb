@@ -41,7 +41,7 @@ Partial Class OptionsCombo
         Me.ComboLabel.Name = "ComboLabel"
         Me.ComboLabel.Size = New System.Drawing.Size(57, 20)
         Me.ComboLabel.TabIndex = 1
-        Me.ComboLabel.Text = "Label1"
+        Me.ComboLabel.Text = "labels(2)"
         '
         'OptionsCombo
         '

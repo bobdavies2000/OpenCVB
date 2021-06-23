@@ -29,7 +29,7 @@ Public Class Tracker_Basics : Inherits VBparent
                 Static frm = findfrm(caller + " Radio Options")
                 For i = 0 To frm.check.length - 1
                     If frm.check(i).Checked = True Then
-                        label1 = "Method: " + radio.check(i).Text
+                        labels(2) = "Method: " + radio.check(i).Text
                         trackType = i
                         Exit For
                     End If

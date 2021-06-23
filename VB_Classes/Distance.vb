@@ -9,8 +9,8 @@ Public Class Distance_Basics : Inherits VBparent
             radio.check(2).Text = "L2"
             radio.check(1).Checked = True
         End If
-        label1 = "Distance results"
-        label2 = "Input mask to distance transformm"
+        labels(2) = "Distance results"
+        labels(3) = "Input mask to distance transformm"
         task.desc = "Distance algorithm basics."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -39,8 +39,8 @@ Public Class Distance_Foreground : Inherits VBparent
     Dim foreground As New KMeans_Depth_FG_BG
     Public useBackgroundAsInput As Boolean
     Public Sub New()
-        label1 = "Distance results"
-        label2 = "Input mask to distance transformm"
+        labels(2) = "Distance results"
+        labels(3) = "Input mask to distance transformm"
         task.desc = "Distance algorithm basics."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -81,7 +81,7 @@ Public Class Distance_Background : Inherits VBparent
         dist.Run(src)
         dst2 = dist.dst2
         dst3 = dist.dst3
-        label1 = dist.label1
-        label2 = dist.label2
+        labels(2) = dist.labels(2)
+        labels(3) = dist.labels(3)
     End Sub
 End Class

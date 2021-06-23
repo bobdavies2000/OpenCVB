@@ -4,7 +4,7 @@ Imports cv = OpenCvSharp
 Public Class FLANN_Test : Inherits VBparent
     Public Sub New()
         task.desc = "Test basics of FLANN - Fast Library for Approximate Nearest Neighbor. "
-        label1 = "FLANN Basics"
+        labels(2) = "FLANN Basics"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         ' creates data set
@@ -58,7 +58,7 @@ Public Class FLANN_Basics : Inherits VBparent
         End If
 
         task.desc = "FLANN - Fast Library for Approximate Nearest Neighbor.  Find nearest neighbor"
-        label1 = "Red is query, Nearest points blue"
+        labels(2) = "Red is query, Nearest points blue"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim reuseData = check.Box(1).Checked

@@ -29,8 +29,8 @@ Public Class LineFLD_Basics : Inherits VBparent
             check.Box(0).Checked = True
         End If
         mergeCheckBox = findCheckBox("FLD - incremental merge")
-        label1 = "Lines detected in the last frame"
-        label2 = "If camera motion, image is reset"
+        labels(2) = "Lines detected in the last frame"
+        labels(3) = "If camera motion, image is reset"
         task.desc = "A Fast Line Detector"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -293,7 +293,7 @@ Public Class LineFLD_LongestLine : Inherits VBparent
         End If
 
         task.desc = "Identify planes using the lines present in the rgb image."
-        label2 = ""
+        labels(3) = ""
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
@@ -324,7 +324,7 @@ Public Class LineFLD_MT : Inherits VBparent
             sliders.setupTrackBar(1, "Update frequency (in frames)", 1, 100, 1)
         End If
         task.desc = "Measure 3d line segments using a multi-threaded Fast Line Detector."
-        label2 = ""
+        labels(3) = ""
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
@@ -339,7 +339,7 @@ Public Class LineFLD_MT : Inherits VBparent
             Sub(i)
                 find3DLineSegment(dst2, mask, task.depth32f, lines.sortedLines.ElementAt(i).Key, maskLineWidth)
             End Sub)
-        label1 = "Showing the " + CStr(Math.Min(lines.sortedLines.Count, 20)) + " longest lines out of " + CStr(lines.sortedLines.Count)
+        labels(2) = "Showing the " + CStr(Math.Min(lines.sortedLines.Count, 20)) + " longest lines out of " + CStr(lines.sortedLines.Count)
     End Sub
 End Class
 
@@ -360,7 +360,7 @@ End Class
 '        End If
 
 '        task.desc = "Use Fitline with the sparse Z data and X or Y (in RGB pixels)."
-'        label2 = ""
+'        labels(3) = ""
 '    End Sub
 '    Public Sub Run(src As cv.Mat) ' Rank = 1
 '        If task.frameCount Mod sliders.trackbar(2).Value Then Exit Sub

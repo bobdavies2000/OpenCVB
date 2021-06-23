@@ -172,6 +172,9 @@ Public Class ActiveTask : Implements IDisposable
     Public CPU_TimeStamp As Double
     Public CPU_FrameTime As Double
 
+    Public usingdst0 As Boolean
+    Public usingdst1 As Boolean
+
     Public drawRect As cv.Rect ' filled in if the user draws on any of the images.
     Public drawRectClear As Boolean ' used to remove the drawing rectangle when it has been used to initialize a camshift or mean shift.
     Public drawRectUpdated As Boolean
@@ -186,8 +189,11 @@ Public Class ActiveTask : Implements IDisposable
     Public pipe As NamedPipeServerStream
     Public pythonTaskName As String
 
-    Public label1 As String
-    Public label2 As String
+    Public labels(4 - 1) As String
+    'Public labels(0) As String
+    'Public labels(1) As String
+    'Public labels(2) As String
+    'Public labels(3) As String
     Public desc As String
     Public intermediateName As String
     Public intermediateObject As VBparent

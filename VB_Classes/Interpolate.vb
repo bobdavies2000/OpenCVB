@@ -32,7 +32,7 @@ Public Class Interpolate_Basics : Inherits VBparent
         dst2 = src.Clone
         Dim rPercent = percentSlider.value / 100
         dst2 = src.Resize(New cv.Size(CInt(dst2.Width * rPercent), CInt(dst2.Height * rPercent)), 0, 0, flags.warpFlag)
-        label1 = "Resize % = " + Format(rPercent, "0%")
+        labels(2) = "Resize % = " + Format(rPercent, "0%")
     End Sub
 End Class
 
@@ -88,9 +88,9 @@ Public Class Interpolate_Kalman : Inherits VBparent
         Next
 
         If task.useKalman Then
-            label1 = "Kalman-smoothed output after resizing to " + CStr(dst2.Width) + "x" + CStr(dst2.Height)
+            labels(2) = "Kalman-smoothed output after resizing to " + CStr(dst2.Width) + "x" + CStr(dst2.Height)
         Else
-            label1 = "Raw output after resizing to " + CStr(dst2.Width) + "x" + CStr(dst2.Height)
+            labels(2) = "Raw output after resizing to " + CStr(dst2.Width) + "x" + CStr(dst2.Height)
         End If
 
         Static lastframe = dst2.Clone
@@ -102,7 +102,7 @@ Public Class Interpolate_Kalman : Inherits VBparent
             dst3 = src.Clone
             updatedFrames += 1
         End If
-        label2 = "Total frames = " + CStr(task.frameCount) + " updates=" + CStr(updatedFrames) + " savings = " + CStr(task.frameCount - updatedFrames)
+        labels(3) = "Total frames = " + CStr(task.frameCount) + " updates=" + CStr(updatedFrames) + " savings = " + CStr(task.frameCount - updatedFrames)
     End Sub
 End Class
 
@@ -128,7 +128,7 @@ Public Class Interpolate_Lines : Inherits VBparent
         For i = 0 To lines.pt1List.Count - 1
             dst3.Line(lines.pt1List(i), lines.pt2List(i), cv.Scalar.Yellow, task.lineWidth, task.lineType)
         Next
-        label1 = inter.label1
-        label2 = "There were " + CStr(lines.pt1List.Count) + " lines found"
+        labels(2) = inter.labels(2)
+        labels(3) = "There were " + CStr(lines.pt1List.Count) + " lines found"
     End Sub
 End Class

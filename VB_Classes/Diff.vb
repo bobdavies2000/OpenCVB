@@ -5,8 +5,8 @@ Public Class Diff_Basics : Inherits VBparent
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Change threshold for each pixel", 1, 255, 25)
         End If
-        label1 = "Stable Color"
-        label2 = "Unstable Color mask"
+        labels(2) = "Stable Color"
+        labels(3) = "Unstable Color mask"
         task.desc = "Capture an image and compare it to previous frame using absDiff and threshold"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -39,7 +39,7 @@ Public Class Diff_UnstableDepthAndColor : Inherits VBparent
     Dim lastFrames() As cv.Mat
     Public Sub New()
         diff.sliders.trackbar(0).Value = 20 ' this is color threshold - low means detecting more motion.
-        label1 = "Stable depth and color"
+        labels(2) = "Stable depth and color"
         task.desc = "Build a mask for any pixels that have either unstable depth or color"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -53,7 +53,7 @@ Public Class Diff_UnstableDepthAndColor : Inherits VBparent
         cv.Cv2.BitwiseOr(unstableGray, unstableDepth, mask)
         dst2 = src.Clone()
         dst2.SetTo(0, mask)
-        label2 = "Unstable depth/color mask"
+        labels(3) = "Unstable depth/color mask"
         dst3 = mask
     End Sub
 End Class

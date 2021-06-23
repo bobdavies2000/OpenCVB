@@ -11,8 +11,8 @@ Public Class Edges_Basics : Inherits VBparent
         End If
 
         task.desc = "Show canny edge detection with varying thresholds"
-        label1 = "Canny using L1 Norm"
-        label2 = "Canny using L2 Norm"
+        labels(2) = "Canny using L1 Norm"
+        labels(3) = "Canny using L2 Norm"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static t1Slider = findSlider("Canny threshold1")
@@ -46,8 +46,8 @@ Public Class Edges_DepthAndColor : Inherits VBparent
         canny.sliders.trackbar(1).Value = 100
 
         task.desc = "Find all the edges in an image include Canny from the grayscale image and edges of depth shadow."
-        label1 = "Edges in color and depth after dilate"
-        label2 = "Edges in color and depth no dilate"
+        labels(2) = "Edges in color and depth after dilate"
+        labels(3) = "Edges in color and depth no dilate"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         canny.Run(src)
@@ -75,7 +75,7 @@ Public Class Edges_Laplacian : Inherits VBparent
             sliders.setupTrackBar(0, "Gaussian Kernel", 1, 32, 7)
             sliders.setupTrackBar(1, "Laplacian Kernel", 1, 32, 5)
         End If
-        label2 = "Laplacian of Depth Image"
+        labels(3) = "Laplacian of Depth Image"
         task.desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -100,7 +100,7 @@ Public Class Edges_Scharr : Inherits VBparent
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Scharr multiplier X100", 1, 500, 50)
         End If
-        label2 = "x field + y field in CV_32F format"
+        labels(3) = "x field + y field in CV_32F format"
         task.desc = "Scharr is most accurate with 3x3 kernel."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -130,7 +130,7 @@ Public Class Edges_Preserving : Inherits VBparent
             sliders.setupTrackBar(0, "Edge Sigma_s", 0, 200, 10)
             sliders.setupTrackBar(1, "Edge Sigma_r", 1, 100, 40)
         End If
-        label2 = "Edge preserving blur for RGB depth image above"
+        labels(3) = "Edge preserving blur for RGB depth image above"
         task.desc = "OpenCV's edge preserving filter."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -193,7 +193,7 @@ Public Class Edges_RandomForest_CPP : Inherits VBparent
 
         task.desc = "Detect edges using structured forests - Opencv Contrib"
         ReDim rgbData(dst2.Total * dst2.ElemSize - 1)
-        label2 = "Thresholded Edge Mask (use slider to adjust)"
+        labels(3) = "Thresholded Edge Mask (use slider to adjust)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount < 100 Then setTrueText("On the first call only, it takes a few seconds to load the randomForest model.", 10, 100)
@@ -230,8 +230,8 @@ Public Class Edges_ResizeAdd : Inherits VBparent
             sliders.setupTrackBar(2, "Threshold for Pixel Difference", 1, 50, 16)
         End If
         task.desc = "Find edges using a resize, subtract, and threshold."
-        label1 = "Edges found with just resizing"
-        label2 = "Found edges added to grayscale image source."
+        labels(2) = "Edges found with just resizing"
+        labels(3) = "Found edges added to grayscale image source."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -257,7 +257,7 @@ Public Class Edges_DCTfrequency : Inherits VBparent
             sliders.setupTrackBar(1, "Threshold after Removal", 1, 255, 20)
         End If
 
-        label2 = "Mask for the isolated frequencies"
+        labels(3) = "Mask for the isolated frequencies"
         task.desc = "Find edges by removing all the highest frequencies."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -269,7 +269,7 @@ Public Class Edges_DCTfrequency : Inherits VBparent
 
         Dim roi As New cv.Rect(0, 0, sliders.trackbar(0).Value, src32f.Height)
         If roi.Width > 0 Then frequencies(roi).SetTo(0)
-        label1 = "Highest " + CStr(sliders.trackbar(0).Value) + " frequencies removed from RGBDepth"
+        labels(2) = "Highest " + CStr(sliders.trackbar(0).Value) + " frequencies removed from RGBDepth"
 
         cv.Cv2.Dct(frequencies, src32f, cv.DctFlags.Inverse)
         src32f.ConvertTo(dst2, cv.MatType.CV_8UC1, 255)
@@ -292,7 +292,7 @@ Public Class Edges_Deriche_CPP : Inherits VBparent
             sliders.setupTrackBar(1, "Deriche Omega", 1, 1000, 100)
         End If
         Edges_Deriche = Edges_Deriche_Open()
-        label2 = "Image enhanced with Deriche results"
+        labels(3) = "Image enhanced with Deriche results"
         task.desc = "Edge detection using the Deriche X and Y gradients - Painterly"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -328,8 +328,8 @@ Public Class Edges_DCTinput : Inherits VBparent
     Dim edges As New Edges_Basics
     Dim dct As New DCT_FeatureLess
     Public Sub New()
-        label1 = "Canny edges produced from original grayscale image"
-        label2 = "Edges produced with featureless regions cleared"
+        labels(2) = "Canny edges produced from original grayscale image"
+        labels(3) = "Edges produced with featureless regions cleared"
         task.desc = "Use the featureless regions to enhance the edge detection"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -357,7 +357,7 @@ Public Class Edges_BinarizedCanny : Inherits VBparent
     Dim mats As New Mat_4Click
     Public Sub New()
         binarize = New Binarize_Recurse
-        label1 = "Edges between halves, lightest, darkest, and the combo"
+        labels(2) = "Edges between halves, lightest, darkest, and the combo"
         task.desc = "Collect edges from binarized images"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -379,7 +379,7 @@ Public Class Edges_BinarizedCanny : Inherits VBparent
         mats.Run(src)
         dst2 = mats.dst2
         If mats.dst3.Channels = 3 Then
-            label2 = "Combo of first 3 below.  Click quadrants in dst2."
+            labels(3) = "Combo of first 3 below.  Click quadrants in dst2."
             dst3 = mats.mat(3)
         Else
             dst3 = mats.dst3
@@ -467,8 +467,8 @@ Public Class Edges_FeaturesOnly : Inherits VBparent
     Dim edges As New Edges_BinarizedSobel
     Dim featLess As New Featureless_Basics
     Public Sub New()
-        label1 = "Output of Edges_BinarizedSobel"
-        label2 = "dst2 with featureless areas removed."
+        labels(2) = "Output of Edges_BinarizedSobel"
+        labels(3) = "dst2 with featureless areas removed."
         task.desc = "Removing the featureless regions after a binarized sobel"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -536,8 +536,8 @@ Public Class Edges_Stdev : Inherits VBparent
     Public Sub New()
         findSlider("Sobel kernel Size").Value = 14
 
-        label1 = "Edges in High Stdev areas"
-        label2 = "Mask of low stdev areas"
+        labels(2) = "Edges in High Stdev areas"
+        labels(3) = "Mask of low stdev areas"
         task.desc = "Edges where stdev is above a threshold"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -588,7 +588,7 @@ Public Class Edges_Combo : Inherits VBparent
     Dim edges1 As New Edges_BinarizedCanny
     Dim edges2 As New Edges_BinarizedSobel
     Public Sub New()
-        label1 = "Sobel = red, Canny = yellow - they are identical"
+        labels(2) = "Sobel = red, Canny = yellow - they are identical"
         task.desc = "Combine the results of binarized canny and sobel"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -615,8 +615,8 @@ Public Class Edges_SobelLR : Inherits VBparent
         sobel.sliders.trackbar(0).Value = 5
 
         task.desc = "Find the edges in the LeftViewimages."
-        label1 = "Edges in Left Image"
-        label2 = "Edges in Right Image (except on Kinect)"
+        labels(2) = "Edges in Left Image"
+        labels(3) = "Edges in Right Image (except on Kinect)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         red.Run(src)
@@ -714,8 +714,8 @@ Public Class Edges_SobelLRBinarized : Inherits VBparent
     Dim edges As New Edges_BinarizedSobel
     Dim addw As New AddWeighted_Basics
     Public Sub New()
-        label1 = "Horizontal Sobel - Left View"
-        label2 = "Horizontal Sobel - Right View"
+        labels(2) = "Horizontal Sobel - Left View"
+        labels(3) = "Horizontal Sobel - Right View"
         task.desc = "Isolate edges in the left and right views."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -757,8 +757,8 @@ Public Class Edges_BinarizedSobel : Inherits VBparent
         binarize = New Binarize_Recurse
         findSlider("Sobel kernel Size").Value = 5
 
-        label1 = "Edges between halves, lightest, darkest, and the combo"
-        label2 = "Click any quadrant in dst2 to enlarge it in dst3"
+        labels(2) = "Edges between halves, lightest, darkest, and the combo"
+        labels(3) = "Click any quadrant in dst2 to enlarge it in dst3"
         task.desc = "Collect Sobel edges from binarized images"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -781,7 +781,7 @@ Public Class Edges_BinarizedSobel : Inherits VBparent
         mats.Run(src)
         dst2 = mats.dst2
         If mats.dst3.Channels = 3 Then
-            label2 = "BitwiseOr of images 1-3 at left.  Click dst2."
+            labels(3) = "BitwiseOr of images 1-3 at left.  Click dst2."
             dst3 = mats.mat(3).Threshold(0, 255, cv.ThresholdTypes.Binary)
         Else
             dst3 = mats.mat(quadrantIndex)
@@ -863,7 +863,7 @@ Public Class Edges_Matching : Inherits VBparent
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If highlightCheck.checked Then
-            label1 = "Matched grid segments in dst3 with disparity"
+            labels(2) = "Matched grid segments in dst3 with disparity"
             For Each i In highlights
                 Dim roi = grid.roiList(i)
                 dst3.Rectangle(roi, cv.Scalar.Red, 2)
@@ -874,7 +874,7 @@ Public Class Edges_Matching : Inherits VBparent
                 cv.Cv2.PutText(dst2, CStr(maxLocs(i)), pt, task.font, fsize, cv.Scalar.White, task.lineWidth, task.lineType)
             Next
         Else
-            label1 = "Click in dst3 to highlight segment in dst2"
+            labels(2) = "Click in dst3 to highlight segment in dst2"
             If clearCheck.checked Then
                 redRects.Clear()
                 grid.mouseClickROI = 0
@@ -893,7 +893,7 @@ Public Class Edges_Matching : Inherits VBparent
                 Next
             End If
         End If
-        label2 = "Grid segments > " + Format(threshold, "#0%") + " correlation coefficient"
+        labels(3) = "Grid segments > " + Format(threshold, "#0%") + " correlation coefficient"
     End Sub
 End Class
 
@@ -913,7 +913,7 @@ Public Class Edges_MotionOverlay : Inherits VBparent
             sliders.setupTrackBar(1, "Displacement in the Y direction (in pixels)", 0, 100, 11)
         End If
 
-        label2 = "AbsDiff output of offset with original"
+        labels(3) = "AbsDiff output of offset with original"
         task.desc = "Find edges by displacing the current RGB image in any direction and diff it with the original."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -933,7 +933,7 @@ Public Class Edges_MotionOverlay : Inherits VBparent
         dst2 = diff.dst2
         dst3 = diff.dst3
         dst3.SetTo(0, task.noDepthMask)
-        label1 = "Src offset (x,y) = (" + CStr(xDisp) + "," + CStr(yDisp) + ")"
+        labels(2) = "Src offset (x,y) = (" + CStr(xDisp) + "," + CStr(yDisp) + ")"
     End Sub
 End Class
 

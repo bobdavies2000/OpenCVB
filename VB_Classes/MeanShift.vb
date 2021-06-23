@@ -6,7 +6,7 @@ Public Class MeanShift_Basics : Inherits VBparent
     Public trackbox As New cv.Rect
     Public usingDrawRect As Boolean
     Public Sub New()
-        label1 = "Draw anywhere to start mean shift tracking."
+        labels(2) = "Draw anywhere to start mean shift tracking."
         task.desc = "Demonstrate the use of mean shift algorithm.  Draw on the images to define an object to track."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -47,7 +47,7 @@ Public Class MeanShift_Depth : Inherits VBparent
     Dim ms As New MeanShift_Basics
     Dim blob As New Depth_ForegroundHead
     Public Sub New()
-        label1 = "Draw anywhere to start mean shift tracking."
+        labels(2) = "Draw anywhere to start mean shift tracking."
         task.desc = "Use depth to start mean shift algorithm."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

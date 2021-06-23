@@ -31,8 +31,8 @@ Public Class Hull_Basics : Inherits VBparent
         End If
 
         task.desc = "Surround a set of random points with a convex hull"
-        label1 = "Convex Hull Output"
-        label2 = "Convex Hull Input"
+        labels(2) = "Convex Hull Output"
+        labels(3) = "Convex Hull Input"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim Count = sliders.trackbar(0).Value

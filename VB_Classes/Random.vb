@@ -44,7 +44,7 @@ Public Class Random_Shuffle : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         src.CopyTo(dst2)
         cv.Cv2.RandShuffle(dst2, 1.0, myRNG) ' don't remove that myRNG!  It will fail in RandShuffle.
-        label1 = "Random_shuffle - wave at camera"
+        labels(2) = "Random_shuffle - wave at camera"
     End Sub
 End Class
 
@@ -58,7 +58,7 @@ Public Class Random_LUTMask : Inherits VBparent
     Dim km As New KMeans_Basics
     Public Sub New()
         task.desc = "Use a random Look-Up-Table to modify few colors in a kmeans image."
-        label2 = "kmeans run to get colors"
+        labels(3) = "kmeans run to get colors"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static lutMat As cv.Mat
@@ -78,7 +78,7 @@ Public Class Random_LUTMask : Inherits VBparent
         End If
 
         dst3 = src.LUT(lutMat)
-        label1 = "Using kmeans colors with interpolation"
+        labels(2) = "Using kmeans colors with interpolation"
     End Sub
 End Class
 
@@ -359,8 +359,8 @@ Public Class Random_CustomHistogram : Inherits VBparent
     Public Sub New()
         random.outputRandom = New cv.Mat(1000, 1, cv.MatType.CV_32S, 0)
 
-        label1 = "Histogram of the grayscale image"
-        label2 = "Custom random distribution that reflects dst2 image"
+        labels(2) = "Histogram of the grayscale image"
+        labels(3) = "Custom random distribution that reflects dst2 image"
         task.desc = "Create a random number distribution that reflects histogram of a grayscale image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -399,8 +399,8 @@ Public Class Random_60sTV : Inherits VBparent
         End If
 
         task.drawRect = New cv.Rect(100, 100, 100, 100)
-        label1 = "Draw anywhere to select a test region"
-        label2 = "Resized selection rectangle in dst2"
+        labels(2) = "Draw anywhere to select a test region"
+        labels(3) = "Resized selection rectangle in dst2"
         task.desc = "Imitate an old TV appearance using randomness."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -433,7 +433,7 @@ Public Class Random_60sTVFaster : Inherits VBparent
     Dim mats As New Mat_4to1
     Dim options As New Random_60sTV
     Public Sub New()
-        label2 = "Changed pixels, add/sub mask, plusMask, minusMask"
+        labels(3) = "Changed pixels, add/sub mask, plusMask, minusMask"
         task.desc = "A faster way to apply noise to imitate an old TV appearance using randomness and thresholding."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -498,7 +498,7 @@ Public Class Random_60sTVFastSimple : Inherits VBparent
 
         cv.Cv2.Add(dst2, dst3, dst2, plusMask)
         cv.Cv2.Subtract(dst2, dst3, dst2, minusMask)
-        label2 = "Mat of random values < " + CStr(valSlider.value)
+        labels(3) = "Mat of random values < " + CStr(valSlider.value)
     End Sub
 End Class
 

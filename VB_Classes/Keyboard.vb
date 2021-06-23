@@ -6,7 +6,7 @@ Public Class Keyboard_Basics : Inherits VBparent
     Public checkKeys As New OptionsKeyboardInput
     Public Sub New()
         checkKeys.Setup(caller)
-        label1 = "Use the Options form to send in keystrokes"
+        labels(2) = "Use the Options form to send in keystrokes"
         task.desc = "Test the keyboard interface available to all algorithms"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

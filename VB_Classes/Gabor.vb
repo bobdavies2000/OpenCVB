@@ -51,7 +51,7 @@ Public Class Gabor_Basics_MT : Inherits VBparent
     Dim grid As New Thread_Grid
     Dim gabor(31) As Gabor_Basics
     Public Sub New()
-        label2 = "The 32 kernels used"
+        labels(3) = "The 32 kernels used"
         findSlider("ThreadGrid Width").Value = dst2.Width / 8
         findSlider("ThreadGrid Height").Value = dst2.Height / 4
 

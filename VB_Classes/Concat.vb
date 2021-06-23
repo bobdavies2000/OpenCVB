@@ -1,8 +1,8 @@
 Imports cv = OpenCvSharp
 Public Class Concat_Basics : Inherits VBparent
     Public Sub New()
-        label1 = "Horizontal concatenation"
-        label2 = "Vertical concatenation"
+        labels(2) = "Horizontal concatenation"
+        labels(3) = "Vertical concatenation"
         task.desc = "Concatenate 2 images - horizontally and vertically"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -23,7 +23,7 @@ Public Class Concat_4way : Inherits VBparent
         For i = 0 To img.Length - 1
             img(i) = New cv.Mat
         Next
-        label1 = "Color/RGBDepth/Left/Right views"
+        labels(2) = "Color/RGBDepth/Left/Right views"
         task.desc = "Concatenate 4 images - horizontally and vertically"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

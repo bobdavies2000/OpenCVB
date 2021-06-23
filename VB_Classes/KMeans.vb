@@ -1,6 +1,6 @@
 Imports cv = OpenCvSharp
 Public Class KMeans_Basics : Inherits VBparent
-    Public labels As New cv.Mat()
+    Public klabels As New cv.Mat()
     Public masks As New List(Of cv.Mat)
     Public colors As New cv.Mat
     Public maskIndex As Integer
@@ -20,7 +20,7 @@ Public Class KMeans_Basics : Inherits VBparent
             radio.check(0).Checked = True
         End If
 
-        label1 = "KMeans_Basics output with just RGB input"
+        labels(2) = "KMeans_Basics output with just RGB input"
         task.desc = "Cluster the input image pixels using kMeans."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 5
@@ -39,13 +39,13 @@ Public Class KMeans_Basics : Inherits VBparent
         Static saveK = kMeansK
         Static saveSize As Integer
         If task.frameCount > 0 And saveK = kMeansK And saveSize = resizeSlider.value Then
-            labels = saveLabels
+            klabels = saveLabels
             radioLabels.Checked = True
         Else
             radioPP.Checked = True
             saveK = kMeansK
             saveSize = resizeSlider.value
-            labels = New cv.Mat()
+            klabels = New cv.Mat()
             colors = New cv.Mat
         End If
 
@@ -53,9 +53,9 @@ Public Class KMeans_Basics : Inherits VBparent
         If radioPP.checked Then kmeansFlag = cv.KMeansFlags.PpCenters
         If radioLabels.checked Then kmeansFlag = cv.KMeansFlags.UseInitialLabels
 
-        cv.Cv2.Kmeans(columnVector, kMeansK, labels, term, 1, kmeansFlag, colors)
-        saveLabels = labels.Clone
-        labels.Reshape(1, input.Height).ConvertTo(labels, cv.MatType.CV_8U)
+        cv.Cv2.Kmeans(columnVector, kMeansK, klabels, term, 1, kmeansFlag, colors)
+        saveLabels = klabels.Clone
+        klabels.Reshape(1, input.Height).ConvertTo(klabels, cv.MatType.CV_8U)
 
         Dim range255 As Boolean = True
         For i = 0 To colors.Rows - 1
@@ -74,7 +74,7 @@ Public Class KMeans_Basics : Inherits VBparent
         masks.Clear()
         For i = 0 To maskOrder.Count - 1
             Dim index = maskOrder.ElementAt(i).Value
-            Dim mask = labels.InRange(index, index)
+            Dim mask = klabels.InRange(index, index)
             masks.Add(mask)
             dst2 = dst2.Resize(input.Size)
             If input.Channels = 3 Then
@@ -212,8 +212,8 @@ Public Class KMeans_k2_to_k8 : Inherits VBparent
     Dim km6 As New KMeans_BasicsFast
     Dim km8 As New KMeans_BasicsFast
     Public Sub New()
-        label1 = "kmeans - k=2,4,6,8"
-        label2 = "Click any quadrant at left to view it below"
+        labels(2) = "kmeans - k=2,4,6,8"
+        labels(3) = "Click any quadrant at left to view it below"
         task.desc = "Show clustering with various settings for cluster count.  Draw to select region of interest."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -243,8 +243,8 @@ Public Class KMeans_Depth_FG_BG : Inherits VBparent
     Dim km As New KMeans_Basics
     Public Sub New()
         findSlider("kMeans k").Value = 2
-        label1 = "Background Mask"
-        label2 = "Foreground Mask"
+        labels(2) = "Background Mask"
+        labels(3) = "Foreground Mask"
         dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8U)
         dst3 = New cv.Mat(task.color.Size, cv.MatType.CV_8U)
         task.desc = "Separate foreground and background using Kmeans (with k=2) using the depth value of center point."
@@ -321,7 +321,7 @@ Public Class KMeans_CComp : Inherits VBparent
     Dim ccomp As New CComp_GrayScale
     Dim km As New KMeans_Basics
     Public Sub New()
-        label1 = "Click to see connected components in dst3"
+        labels(2) = "Click to see connected components in dst3"
         task.desc = "Use each KMeans mask with CComp"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
@@ -409,7 +409,7 @@ Public Class KMeans_CCompMasks : Inherits VBparent
     Public selectedIndex As Integer
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-        label1 = "Click the centroid to display the mask in dst3"
+        labels(2) = "Click the centroid to display the mask in dst3"
         task.desc = "Use each KMeans mask with CComp"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 5
@@ -459,6 +459,6 @@ Public Class KMeans_CCompMasks : Inherits VBparent
         End If
 
         dst3(rects(selectedIndex)) = masks(selectedIndex)
-        label2 = "Pixel count = " + CStr(sortMasks.ElementAt(selectedIndex).Key)
+        labels(3) = "Pixel count = " + CStr(sortMasks.ElementAt(selectedIndex).Key)
     End Sub
 End Class

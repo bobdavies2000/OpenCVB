@@ -35,10 +35,10 @@ Public Class Reduction_Basics : Inherits VBparent
             dst2 = src / reductionVal
             dst2 *= reductionVal
             If task.intermediateName = caller Then dst2.ConvertTo(dst2, cv.MatType.CV_32F)
-            label1 = "Reduced image - factor = " + CStr(reductionVal)
+            labels(2) = "Reduced image - factor = " + CStr(reductionVal)
         Else
             dst2 = src
-            label1 = "No reduction requested"
+            labels(2) = "No reduction requested"
         End If
         task.palette.Run(dst2.Clone)
         dst3 = task.palette.dst2
@@ -60,7 +60,7 @@ Public Class Reduction_Floodfill : Inherits VBparent
         dst2 = reduction.dst2
         flood.Run(reduction.dst2)
         dst3 = flood.dst2
-        label1 = flood.label2
+        labels(2) = flood.labels(3)
     End Sub
 End Class
 
@@ -74,7 +74,7 @@ Public Class Reduction_KNN_Color : Inherits VBparent
     Public reduction As New Reduction_Floodfill
     Dim highlight As New Highlight_Basics
     Public Sub New()
-        label2 = "Original floodfill color selections"
+        labels(3) = "Original floodfill color selections"
         task.desc = "Use KNN with color reduction to consistently identify regions and color them."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -94,7 +94,7 @@ Public Class Reduction_KNN_Color : Inherits VBparent
             dst2 = highlight.dst2
         End If
 
-        label1 = "There were " + CStr(pTrack.drawRC.viewObjects.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
+        labels(2) = "There were " + CStr(pTrack.drawRC.viewObjects.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
     End Sub
 End Class
 
@@ -108,8 +108,8 @@ Public Class Reduction_KNN_ColorAndDepth : Inherits VBparent
     Dim reduction As New Reduction_KNN_Color
     Dim depth As New Depth_Edges
     Public Sub New()
-        label1 = "Detecting objects using only color coherence"
-        label2 = "Detecting objects with color and depth coherence"
+        labels(2) = "Detecting objects using only color coherence"
+        labels(3) = "Detecting objects with color and depth coherence"
         task.desc = "Reduction_KNN finds objects with depth.  This algorithm uses only color on the remaining objects."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -137,8 +137,8 @@ Public Class Reduction_SideTopLines : Inherits VBparent
     Public setupTop As New PointCloud_SetupTop
     Dim reduction As New Reduction_PointCloud
     Public Sub New()
-        label1 = "Gravity rotated Side View with detected lines"
-        label2 = "Gravity rotated Top View width detected lines"
+        labels(2) = "Gravity rotated Side View with detected lines"
+        labels(3) = "Gravity rotated Top View width detected lines"
         task.desc = "Present both the top and side view to minimize pixel counts."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -167,8 +167,8 @@ Public Class Reduction_PointCloud : Inherits VBparent
     Dim reduction As New Reduction_Basics
     Public Sub New()
         reduction.radio.check(0).Checked = True
-        label1 = "Reduced depth"
-        label2 = "Pointcloud with reduced z-Depth"
+        labels(2) = "Reduced depth"
+        labels(3) = "Pointcloud with reduced z-Depth"
         task.desc = "Use reduction to smooth depth data"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -242,8 +242,8 @@ Public Class Reduction_Edges : Inherits VBparent
 
         Dim reductionRequested = False
         If reduction.radio.check(0).Checked Or reduction.radio.check(1).Checked Then reductionRequested = True
-        label1 = If(reductionRequested, "Reduced image", "Original image")
-        label2 = If(reductionRequested, "Laplacian edges of reduced image", "Laplacian edges of original image")
+        labels(2) = If(reductionRequested, "Reduced image", "Original image")
+        labels(3) = If(reductionRequested, "Laplacian edges of reduced image", "Laplacian edges of original image")
         edges.Run(dst2)
         dst3 = edges.dst2
     End Sub
@@ -273,7 +273,7 @@ Public Class Reduction_Depth : Inherits VBparent
         reduction.dst2.ConvertTo(reducedDepth32F, cv.MatType.CV_32F)
         colorizer.Run(reducedDepth32F)
         dst2 = colorizer.dst2
-        label1 = reduction.label1
+        labels(2) = reduction.labels(2)
     End Sub
 End Class
 

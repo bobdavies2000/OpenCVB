@@ -4,8 +4,8 @@ Public Class Encode_Basics : Inherits VBparent
     Dim options As New Encode_Options
     Public Sub New()
         task.desc = "Error Level Analysis - to verify a jpg image has not been modified."
-        label1 = "absDiff with original"
-        label2 = "Original decompressed"
+        labels(2) = "absDiff with original"
+        labels(3) = "Original decompressed"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim encodeParams() As Integer = {options.getEncodeParameter(), options.qualityLevel}
@@ -22,7 +22,7 @@ Public Class Encode_Basics : Inherits VBparent
 
         output.ConvertTo(dst2, cv.MatType.CV_8UC3, scaleSlider.Value)
         Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)
-        label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.0%") + ")"
+        labels(3) = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.0%") + ")"
     End Sub
 End Class
 
@@ -47,7 +47,7 @@ Public Class Encode_Options : Inherits VBparent
         End If
 
         task.desc = "Encode options that affect quality."
-        label1 = "absDiff with original image"
+        labels(2) = "absDiff with original image"
     End Sub
     Public Function getEncodeParameter() As Integer
         Static qualitySlider = findSlider("Encode Quality Level")
@@ -80,7 +80,7 @@ Public Class Encode_Options : Inherits VBparent
         Dim scale = sliders.trackbar(1).Value
         output.ConvertTo(dst2, cv.MatType.CV_8UC3, scale)
         Dim compressionRatio = buf.Length / (src.Rows * src.Cols * src.ElemSize)
-        label2 = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.0%") + ")"
+        labels(3) = "Original compressed to len=" + CStr(buf.Length) + " (" + Format(compressionRatio, "0.0%") + ")"
     End Sub
 End Class
 

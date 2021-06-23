@@ -7,8 +7,8 @@ Public Class Clone_Basics : Inherits VBparent
     Public cloneSpec As Integer ' 0 is colorchange, 1 is illuminationchange, 2 is textureflattening
     Public Sub New()
 
-        label1 = "Clone result - draw anywhere to clone a region"
-        label2 = "Clone Region Mask"
+        labels(2) = "Clone result - draw anywhere to clone a region"
+        labels(3) = "Clone Region Mask"
         task.desc = "Clone a portion of one image into another.  Draw on any image to change selected area."
         task.drawRect = New cv.Rect(dst2.Width / 4, dst2.Height / 4, dst2.Width / 2, dst2.Height / 2)
     End Sub
@@ -44,8 +44,8 @@ Public Class Clone_ColorChange : Inherits VBparent
             sliders.setupTrackBar(1, "Color Change - Green", 5, 25, 5)
             sliders.setupTrackBar(2, "Color Change - Blue", 5, 25, 5)
         End If
-        label1 = "Draw anywhere to select different clone region"
-        label2 = "Mask used for clone"
+        labels(2) = "Draw anywhere to select different clone region"
+        labels(3) = "Mask used for clone"
         task.desc = "Clone a portion of one image into another controlling rgb.  Draw on any image to change selected area."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -67,8 +67,8 @@ Public Class Clone_IlluminationChange : Inherits VBparent
             sliders.setupTrackBar(0, "Alpha", 0, 20, 2)
             sliders.setupTrackBar(1, "Beta", 0, 20, 2)
         End If
-        label1 = "Draw anywhere to select different clone region"
-        label2 = "Mask used for clone"
+        labels(2) = "Draw anywhere to select different clone region"
+        labels(3) = "Mask used for clone"
         task.desc = "Clone a portion of one image into another controlling illumination.  Draw on any image to change selected area."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -91,8 +91,8 @@ Public Class Clone_TextureFlattening : Inherits VBparent
             sliders.setupTrackBar(0, "Low Threshold", 0, 100, 10)
             sliders.setupTrackBar(1, "High Threshold", 0, 100, 50)
         End If
-        label1 = "Draw anywhere to select different clone region"
-        label2 = "mask used for clone"
+        labels(2) = "Draw anywhere to select different clone region"
+        labels(3) = "mask used for clone"
         task.desc = "Clone a portion of one image into another controlling texture.  Draw on any image to change selected area."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -138,8 +138,8 @@ Public Class Clone_Eagle : Inherits VBparent
         dst3(maskROI) = mask
 
         pt = New cv.Point(dst2.Width / 2, dst2.Height / 2)
-        label1 = "Move Eagle by clicking in any location."
-        label2 = "Source image and source mask."
+        labels(2) = "Move Eagle by clicking in any location."
+        labels(3) = "Source image and source mask."
         task.desc = "Clone an eagle into the video stream."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -177,8 +177,8 @@ Public Class Clone_Seamless : Inherits VBparent
             radio.check(0).Checked = True
         End If
 
-        label1 = "Results for SeamlessClone"
-        label2 = "Mask for Clone"
+        labels(2) = "Results for SeamlessClone"
+        labels(3) = "Mask for Clone"
         task.desc = "Use the seamlessclone API to merge color and depth..."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

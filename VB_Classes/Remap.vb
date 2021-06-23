@@ -8,7 +8,7 @@ Public Class Remap_Basics : Inherits VBparent
         Dim map_x = New cv.Mat(src.Size(), cv.MatType.CV_32F)
         Dim map_y = New cv.Mat(src.Size(), cv.MatType.CV_32F)
 
-        label1 = Choose(direction + 1, "Remap_Basics - original", "Remap vertically", "Remap horizontally",
+        labels(2) = Choose(direction + 1, "Remap_Basics - original", "Remap vertically", "Remap horizontally",
                                             "Remap horizontally and vertically")
         ' build a map for use with remap!
         For j = 0 To map_x.Rows - 1
@@ -46,7 +46,7 @@ Public Class Remap_Flip : Inherits VBparent
         task.desc = "Use flip to remap an image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        label1 = Choose(direction + 1, "Remap_Flip - original", "Remap_Flip - flip horizontal", "Remap_Flip - flip veritical",
+        labels(2) = Choose(direction + 1, "Remap_Flip - original", "Remap_Flip - flip horizontal", "Remap_Flip - flip veritical",
                                             "Remap_Flip - flip horizontal and vertical")
         Select Case direction
             Case 0 ' do nothing!

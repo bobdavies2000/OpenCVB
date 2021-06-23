@@ -7,8 +7,8 @@ Public Class TransformationMatrix_Basics : Inherits VBparent
         End If
         If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2 Then sliders.trackbar(0).Value = 1 ' need a smaller multiplier...
 
-        label1 = "View from above the camera"
-        label2 = "View from side of the camera"
+        labels(2) = "View from above the camera"
+        labels(3) = "View from side of the camera"
         task.desc = "Show the contents of the transformation matrix"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

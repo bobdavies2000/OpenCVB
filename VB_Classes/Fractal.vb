@@ -104,7 +104,7 @@ Public Class Fractal_MandelbrotZoom : Inherits VBparent
             check.Box(0).Checked = False
         End If
         dst2 = mandel.dst2
-        label1 = If(mandel.endX - mandel.startX >= 3.999, "Mandelbrot Zoom - draw anywhere", "Mandelbrot Zoom = ~" +
+        labels(2) = If(mandel.endX - mandel.startX >= 3.999, "Mandelbrot Zoom - draw anywhere", "Mandelbrot Zoom = ~" +
                                                           Format(4 / (mandel.endX - mandel.startX), "###,###.0") + "X zoom")
     End Sub
 End Class
@@ -123,7 +123,7 @@ Public Class Fractal_MandelbrotZoomColor : Inherits VBparent
         mandel.Run(src)
         task.palette.Run(mandel.dst2)
         dst2 = task.palette.dst2
-        label1 = mandel.label1
+        labels(2) = mandel.labels(2)
     End Sub
 End Class
 
@@ -141,7 +141,7 @@ Public Class Fractal_Julia : Inherits VBparent
     Dim rt As Double = 0.282
     Dim mt As Double = -0.58
     Public Sub New()
-        label2 = "Mouse selects different Julia Sets - zoom for detail"
+        labels(3) = "Mouse selects different Julia Sets - zoom for detail"
         task.desc = "Build Julia set from any point in the Mandelbrot fractal"
     End Sub
     Private Function julia_point(x As Single, y As Single, r As Integer, depth As Integer, max As Integer, c As Complex, z As Complex)

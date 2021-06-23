@@ -24,8 +24,8 @@ Public Class Mat_PointToMat : Inherits VBparent
     Dim random As New Random_Basics
     Public Sub New()
         random.plotPoints = True
-        label1 = "Random_Basics points (original)"
-        label2 = "Random_Basics points after format change"
+        labels(2) = "Random_Basics points (original)"
+        labels(3) = "Random_Basics points after format change"
         task.desc = "Convert pointf3 into a mat of points"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -50,7 +50,7 @@ End Class
 Public Class Mat_MatToPoint : Inherits VBparent
     Public Sub New()
         task.desc = "Convert a mat into a vector of points."
-        label1 = "Reconstructed RGB Image"
+        labels(2) = "Reconstructed RGB Image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim points(src.Total - 1) As cv.Vec3b
@@ -78,8 +78,8 @@ End Class
 Public Class Mat_Transpose : Inherits VBparent
     Public Sub New()
         task.desc = "Transpose a Mat and show results."
-        label1 = "Color Image Transposed"
-        label2 = "Color Image Transposed back (artifacts)"
+        labels(2) = "Color Image Transposed"
+        labels(3) = "Color Image Transposed back (artifacts)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim trColor = src.T()
@@ -97,8 +97,8 @@ End Class
 ' https://csharp.hotexamples.com/examples/OpenCvSharp/Mat/-/php-mat-class-examples.html#0x95f170f4714e3258c220a78eacceeee99591440b9885a2997bbbc6b3aebdcf1c-19,,37,
 Public Class Mat_Tricks : Inherits VBparent
     Public Sub New()
-        label1 = "Image squeezed into square Mat"
-        label2 = "Mat transposed around the diagonal"
+        labels(2) = "Image squeezed into square Mat"
+        labels(3) = "Mat transposed around the diagonal"
         task.desc = "Show some Mat tricks."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -126,8 +126,8 @@ Public Class Mat_4to1 : Inherits VBparent
         mat4 = mat1.Clone()
         mat = {mat1, mat2, mat3, mat4}
 
-        label1 = "Combining 4 images into one"
-        label2 = "Click any quadrant at left to view it below"
+        labels(2) = "Combining 4 images into one"
+        labels(3) = "Click any quadrant at left to view it below"
         task.desc = "Use one Mat for up to 4 images"
     End Sub
     Public Sub defaultMats()
@@ -175,7 +175,7 @@ Public Class Mat_2to1 : Inherits VBparent
         mat2 = mat1.Clone()
         mat = {mat1, mat2}
 
-        label1 = ""
+        labels(2) = ""
         task.desc = "Fill a Mat with 2 images"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -245,7 +245,7 @@ End Class
 ' https://github.com/shimat/opencvsharp_samples/blob/cba08badef1d5ab3c81ab158a64828a918c73df5/SamplesCS/Samples/MatOperations.cs
 Public Class Mat_RowColRange : Inherits VBparent
     Public Sub New()
-        label1 = "BitwiseNot of RowRange and ColRange"
+        labels(2) = "BitwiseNot of RowRange and ColRange"
         task.desc = "Perform operation on a range of cols and/or Rows."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -263,7 +263,7 @@ End Class
 
 Public Class Mat_Managed : Inherits VBparent
     Public Sub New()
-        label1 = "Color change is in the managed cv.vec3b array"
+        labels(2) = "Color change is in the managed cv.vec3b array"
         task.desc = "There is a limited ability to use Mat data in Managed code directly."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -429,7 +429,7 @@ Public Class Mat_4Click : Inherits VBparent
     Public mat() As cv.Mat
     Public Sub New()
         mat = mats.mat
-        label2 = "Click a quadrant in dst2 to view it in dst3"
+        labels(3) = "Click a quadrant in dst2 to view it in dst3"
         task.desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst3"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

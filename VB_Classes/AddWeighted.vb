@@ -12,7 +12,7 @@ Public Class AddWeighted_Basics : Inherits VBparent
         Else
             task.trueText("Unable to mix src and src2 - not the same number of channels or type...")
         End If
-        label1 = "depth " + Format(1 - task.AddWeighted, "#0%") + " RGB " + Format(task.AddWeighted, "#0%")
+        labels(2) = "depth " + Format(1 - task.AddWeighted, "#0%") + " RGB " + Format(task.AddWeighted, "#0%")
     End Sub
 End Class
 
@@ -92,8 +92,8 @@ Public Class AddWeighted_InfraRed : Inherits VBparent
 
         addw.Run(src)
         dst3 = addw.dst2
-        label1 = "InfraRed " + leftOrRight + " " + Format(1 - task.AddWeighted, "#0%") + " Depth " + Format(task.AddWeighted, "#0%")
-        label2 = "InfraRed " + leftOrRight + " " + Format(1 - task.AddWeighted, "#0%") + " RGB " + Format(task.AddWeighted, "#0%")
+        labels(2) = "InfraRed " + leftOrRight + " " + Format(1 - task.AddWeighted, "#0%") + " Depth " + Format(task.AddWeighted, "#0%")
+        labels(3) = "InfraRed " + leftOrRight + " " + Format(1 - task.AddWeighted, "#0%") + " RGB " + Format(task.AddWeighted, "#0%")
     End Sub
 End Class
 

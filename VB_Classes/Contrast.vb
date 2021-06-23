@@ -4,8 +4,8 @@ Public Class Contrast_POW : Inherits VBparent
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Contrast exponent to use X100", 0, 200, 30)
         End If
-        label1 = "Original Image"
-        label2 = "Contrast reduced"
+        labels(2) = "Original Image"
+        labels(3) = "Contrast reduced"
         task.desc = "Reduce contrast with POW function"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -33,8 +33,8 @@ Public Class Contrast_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         src.ConvertTo(dst2, -1, sliders.trackbar(1).Value / 50, sliders.trackbar(0).Value)
-        label1 = "Brightness/Contrast"
-        label2 = ""
+        labels(2) = "Brightness/Contrast"
+        labels(3) = ""
     End Sub
 End Class
 

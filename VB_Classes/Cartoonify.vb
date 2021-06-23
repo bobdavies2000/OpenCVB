@@ -8,8 +8,8 @@ Public Class CartoonifyImage_Basics : Inherits VBparent
             sliders.setupTrackBar(2, "Cartoon threshold", 1, 255, 80)
             sliders.setupTrackBar(3, "Cartoon Laplacian kernel", 1, 21, 5)
         End If
-        label1 = "Mask for Cartoon"
-        label2 = "Cartoonify Result"
+        labels(2) = "Mask for Cartoon"
+        labels(3) = "Cartoonify Result"
         task.desc = "Create a cartoon from a color image - Painterly Effect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

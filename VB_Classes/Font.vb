@@ -10,8 +10,8 @@ Public Class Font_OpenCV : Inherits VBparent
                                  cv.HersheyFonts.HersheyTriplex, cv.HersheyFonts.Italic)
         Dim hersheyName = Choose(task.frameCount Mod 7 + 1, "HersheyComplex", "HersheyComplexSmall", "HersheyDuplex", "HersheyPlain", "HersheyScriptComplex",
                                  "HersheyScriptSimplex", "HersheySimplex", "HersheyTriplex", "Italic")
-        label1 = hersheyName
-        label2 = "Italicized " + hersheyName
+        labels(2) = hersheyName
+        labels(3) = "Italicized " + hersheyName
         dst2.SetTo(0)
         dst3.SetTo(0)
         For i = 1 To 10

@@ -36,7 +36,7 @@ Public Class Fourier_MathNet : Inherits VBparent
 
         Dim magnitude = inputC.Enumerate().Max(Function(x) mnum.Complex32.Abs(x))
         Dim phase = inputC.Enumerate().Max(Function(x As mnum.Complex32) Math.Abs(x.Phase))
-        label1 = "Magnitude=" + Format(magnitude, "###,##0") + " phase=" + Format(phase, "#.000")
+        labels(2) = "Magnitude=" + Format(magnitude, "###,##0") + " phase=" + Format(phase, "#.000")
     End Sub
 End Class
 

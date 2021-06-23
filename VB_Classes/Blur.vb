@@ -150,8 +150,8 @@ Public Class Blur_PlusHistogram : Inherits VBparent
     Dim blur As New Blur_Bilateral
     Dim myhist As New Histogram_EqualizeGray
     Public Sub New()
-        label1 = "Use Blur slider to see impact on histogram peak values"
-        label2 = "Top is before equalize, Bottom is after Equalize"
+        labels(2) = "Use Blur slider to see impact on histogram peak values"
+        labels(3) = "Top is before equalize, Bottom is after Equalize"
         task.desc = "Compound algorithms Blur and Histogram"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -184,7 +184,7 @@ Public Class Blur_TopoMap : Inherits VBparent
             sliders.setupTrackBar(1, "Reduction Factor", 2, 64, 20)
             sliders.setupTrackBar(2, "Frame Count Cycle", 1, 200, 50)
         End If
-        label1 = "Image Gradient"
+        labels(2) = "Image Gradient"
         task.desc = "Create a topo map from the blurred image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -218,7 +218,7 @@ Public Class Blur_TopoMap : Inherits VBparent
         addw.Run(task.color)
         dst3 = addw.dst2
 
-        label2 = "Blur = " + CStr(nextPercent) + "% Reduction Factor = " + CStr(reductionSlider.Value)
+        labels(3) = "Blur = " + CStr(nextPercent) + "% Reduction Factor = " + CStr(reductionSlider.Value)
         If task.frameCount Mod frameSlider.Value = 0 Then nextPercent -= 1
         If nextPercent <= 0 Then nextPercent = savePercent
     End Sub

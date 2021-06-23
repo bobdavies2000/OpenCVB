@@ -42,8 +42,8 @@ Public Class Hough_Circles : Inherits VBparent
     Dim circles As New Draw_Circles
     Public Sub New()
         findSlider("DrawCount").Value = 3
-        label1 = "Input circles to Hough"
-        label2 = "Hough Circles found"
+        labels(2) = "Input circles to Hough"
+        labels(3) = "Hough Circles found"
         task.desc = "Find circles using HoughCircles."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -57,7 +57,7 @@ Public Class Hough_Circles : Inherits VBparent
         For i = 0 To cFound.Length - 1
             dst3.Circle(New cv.Point(CInt(cFound(i).Center.X), CInt(cFound(i).Center.Y)), cFound(i).Radius, foundColor, 5, task.lineType)
         Next
-        label2 = CStr(cFound.Length) + " circles were identified"
+        labels(3) = CStr(cFound.Length) + " circles were identified"
     End Sub
 End Class
 
@@ -86,7 +86,7 @@ Public Class Hough_Lines : Inherits VBparent
         Dim threshold = sliders.trackbar(2).Value
 
         segments = cv.Cv2.HoughLines(edges.dst2, rhoIn, thetaIn, threshold)
-        label1 = "Found " + CStr(segments.Length) + " Lines"
+        labels(2) = "Found " + CStr(segments.Length) + " Lines"
 
         If standalone Or task.intermediateName = caller Then
             src.CopyTo(dst2)
@@ -98,7 +98,7 @@ Public Class Hough_Lines : Inherits VBparent
                 Dim line = probSegments(i)
                 dst3.Line(line.P1, line.P2, cv.Scalar.Red, task.lineWidth + 2, task.lineType)
             Next
-            label2 = "Probablistic lines = " + CStr(probSegments.Length)
+            labels(3) = "Probablistic lines = " + CStr(probSegments.Length)
         End If
     End Sub
 End Class
@@ -121,8 +121,8 @@ Public Class Hough_Lines_MT : Inherits VBparent
         findSlider("ThreadGrid Height").Value = 16
 
         task.desc = "Multithread Houghlines to find lines in image fragments."
-        label1 = "Hough_Lines_MT"
-        label2 = "Hough_Lines_MT"
+        labels(2) = "Hough_Lines_MT"
+        labels(3) = "Hough_Lines_MT"
     End Sub
 
     Public Sub Run(src As cv.Mat) ' Rank = 1

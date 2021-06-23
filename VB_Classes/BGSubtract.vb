@@ -27,7 +27,7 @@ Public Class BGSubtract_Basics_CPP : Inherits VBparent
                 Else
                     If task.frameCount > 0 Then BGSubtract_BGFG_Close(bgfs)
                     currMethod = i
-                    label1 = "Method = " + frm.check(i).Text
+                    labels(2) = "Method = " + frm.check(i).Text
                     bgfs = BGSubtract_BGFG_Open(currMethod)
                 End If
             End If
@@ -67,7 +67,7 @@ Public Class BGSubtract_MotionDetect_MT : Inherits VBparent
             radio.check(5).Checked = True
         End If
 
-        label2 = "Only Motion Added"
+        labels(3) = "Only Motion Added"
         task.desc = "Detect Motion for use with background subtraction"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -141,8 +141,8 @@ Public Class BGSubtract_Basics_MT : Inherits VBparent
             End If
             input(roi).CopyTo(dst2(roi))
         End Sub)
-        label1 = "Motion added to dst3 for " + CStr(updateCount) + " segments out of " + CStr(grid.roiList.Count)
-        label2 = CStr(grid.roiList.Count - updateCount) + " segments had > " + Format(correlationSlider.value / 1000, "0.0%") + " correlation"
+        labels(2) = "Motion added to dst3 for " + CStr(updateCount) + " segments out of " + CStr(grid.roiList.Count)
+        labels(3) = CStr(grid.roiList.Count - updateCount) + " segments had > " + Format(correlationSlider.value / 1000, "0.0%") + " correlation"
     End Sub
 End Class
 
@@ -155,8 +155,8 @@ Public Class BGSubtract_Depth_MT : Inherits VBparent
     Dim bgsub As New BGSubtract_Basics_MT
     Public Sub New()
         task.desc = "Detect Motion in the depth image - needs more work"
-        label1 = "Depth data src"
-        label2 = "Accumulated depth image"
+        labels(2) = "Depth data src"
+        labels(3) = "Accumulated depth image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         bgsub.Run(task.RGBDepth)
@@ -254,8 +254,8 @@ Public Class BGSubtract_MOG_RGBDepth : Inherits VBparent
 
         MOGDepth = cv.BackgroundSubtractorMOG.Create()
         MOGRGB = cv.BackgroundSubtractorMOG.Create()
-        label1 = "Unstable depth"
-        label2 = "Unstable color"
+        labels(2) = "Unstable depth"
+        labels(3) = "Unstable color"
         task.desc = "Isolate motion in both depth and color data using a mixture of Gaussians"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -277,8 +277,8 @@ Public Class BGSubtract_MOG_Retina : Inherits VBparent
     Dim retina As New Retina_Basics_CPP
     Public Sub New()
         findSlider("MOG Learn Rate").Value = 100
-        label1 = "MOG results of depth motion"
-        label2 = "Difference from retina depth motion."
+        labels(2) = "MOG results of depth motion"
+        labels(3) = "Difference from retina depth motion."
         task.desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -304,7 +304,7 @@ Public Class BGSubtract_DepthOrColorMotion : Inherits VBparent
         Dim mask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs()
         cv.Cv2.BitwiseNot(mask, mask)
         src.CopyTo(dst3, mask)
-        label2 = "Image with instability filled with color data"
+        labels(3) = "Image with instability filled with color data"
     End Sub
 End Class
 
@@ -372,7 +372,7 @@ Public Class BGSubtract_Synthetic_CPP : Inherits VBparent
             sliders.setupTrackBar(2, "Synthetic Wavespeed x100", 1, 400, 20)
             sliders.setupTrackBar(3, "Synthetic ObjectSpeed", 1, 20, 15)
         End If
-        label1 = "Synthetic background/foreground image."
+        labels(2) = "Synthetic background/foreground image."
         task.desc = "Generate a synthetic input to background subtraction method - Painterly"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

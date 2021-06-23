@@ -15,8 +15,8 @@ Public Class CamShift_Basics : Inherits VBparent
             sliders.setupTrackBar(1, "CamShift vMax", 0, 255, 255)
             sliders.setupTrackBar(2, "CamShift Smin", 0, 255, 60)
         End If
-        label1 = "Draw anywhere to create histogram and start camshift"
-        label2 = "Histogram of targeted region (hue only)"
+        labels(2) = "Draw anywhere to create histogram and start camshift"
+        labels(3) = "Histogram of targeted region (hue only)"
         task.desc = "CamShift Demo - draw on the images to define the object to track. "
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -78,8 +78,8 @@ Public Class CamShift_Foreground : Inherits VBparent
     Dim fore As New Depth_Foreground
     Dim flood As New FloodFill_Basics
     Public Sub New()
-        label1 = "Draw anywhere to start Camshift"
-        label2 = "The foreground RGB from depth data"
+        labels(2) = "Draw anywhere to start Camshift"
+        labels(3) = "The foreground RGB from depth data"
         task.desc = "Use depth to isolate foreground for use with camshift demo."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -111,7 +111,7 @@ Public Class Camshift_Object : Inherits VBparent
     Public Sub New()
         findSlider("FloodFill LoDiff").Value = 1
         findSlider("FloodFill HiDiff").Value = 1
-        label1 = "Largest blob with hue tracked. "
+        labels(2) = "Largest blob with hue tracked. "
         task.desc = "Use the blob depth cluster as input to initialize a camshift algorithm."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

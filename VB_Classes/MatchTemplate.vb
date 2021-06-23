@@ -51,10 +51,10 @@ Public Class MatchTemplate_Basics : Inherits VBparent
 
         cv.Cv2.MatchTemplate(searchArea, template, correlationMat, matchOption)
         correlation = correlationMat.Get(Of Single)(0, 0)
-        label1 = "Correlation = " + Format(correlation, "#,##0.000")
+        labels(2) = "Correlation = " + Format(correlation, "#,##0.000")
         If standalone Or task.intermediateName = caller Then
             dst2.SetTo(0)
-            label1 = matchText + " for " + CStr(searchArea.Cols) + " samples = " + Format(correlation, "#,##0.00")
+            labels(2) = matchText + " for " + CStr(searchArea.Cols) + " samples = " + Format(correlation, "#,##0.00")
             flow.msgs.Add(matchText + " = " + Format(correlation, "#,##0.00"))
             flow.Run(Nothing)
         End If
@@ -93,7 +93,7 @@ Public Class MatchTemplate_RowCorrelation : Inherits VBparent
 
         If correlation < minCorrelation Then minCorrelation = correlation
         If correlation > maxCorrelation Then maxCorrelation = correlation
-        label1 = "Min = " + Format(minCorrelation, "#,##0.00") + " max = " + Format(maxCorrelation, "#,##0.0000")
+        labels(2) = "Min = " + Format(minCorrelation, "#,##0.00") + " max = " + Format(maxCorrelation, "#,##0.0000")
     End Sub
 End Class
 
@@ -108,7 +108,7 @@ Public Class MatchTemplate_DrawRect : Inherits VBparent
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         If standalone Then task.drawRect = New cv.Rect(100, 100, 50, 50) ' arbitrary template to match
-        label1 = "Probabilities (draw rectangle to test again)"
+        labels(2) = "Probabilities (draw rectangle to test again)"
         task.desc = "Find the requested template in an image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -141,7 +141,7 @@ Public Class MatchTemplate_DrawRect : Inherits VBparent
         dst3 = addw.dst2
 
         dst3.Circle(maxLoc.X, maxLoc.Y, task.dotSize, cv.Scalar.Red, -1, task.lineType)
-        label2 = "Red is best match, white has correlation > " + Format(thresholdSlider.value / 100, "#0%")
+        labels(3) = "Red is best match, white has correlation > " + Format(thresholdSlider.value / 100, "#0%")
     End Sub
 End Class
 
@@ -158,8 +158,8 @@ Public Class MatchTemplate_BestEntropy_MT : Inherits VBparent
     Dim entropy As New Entropy_Highest
     Dim match As New MatchTemplate_DrawRect
     Public Sub New()
-        label1 = "Probabilities that the template matches image"
-        label2 = "Red is the best template to match (highest entropy)"
+        labels(2) = "Probabilities that the template matches image"
+        labels(3) = "Red is the best template to match (highest entropy)"
         task.desc = "Track an object - one with the highest entropy - using OpenCV's matchtemplate."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -241,7 +241,7 @@ Public Class MatchTemplate_Movement : Inherits VBparent
         saveFrame.CopyTo(dst3, mask)
         lastFrame = saveFrame
         Dim corrPercent = Format(correlationSlider.value / 1000, "0.0%") + " correlation"
-        label1 = CStr(updateCount) + " of " + CStr(grid.roiList.Count) + " with < " + corrPercent + " or low stdev"
-        label2 = CStr(grid.roiList.Count - updateCount) + " segments out of " + CStr(grid.roiList.Count) + " had > " + corrPercent
+        labels(2) = CStr(updateCount) + " of " + CStr(grid.roiList.Count) + " with < " + corrPercent + " or low stdev"
+        labels(3) = CStr(grid.roiList.Count - updateCount) + " segments out of " + CStr(grid.roiList.Count) + " had > " + corrPercent
     End Sub
 End Class

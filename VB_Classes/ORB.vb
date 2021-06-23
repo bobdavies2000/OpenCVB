@@ -18,7 +18,7 @@ Public Class ORB_Basics : Inherits VBparent
             For Each kpt In keypoints
                 dst2.Circle(kpt.Pt, task.dotSize + 1, cv.Scalar.Yellow, -1, task.lineType)
             Next
-            label1 = CStr(keypoints.Count) + " key points were identified"
+            labels(2) = CStr(keypoints.Count) + " key points were identified"
         End If
     End Sub
 End Class

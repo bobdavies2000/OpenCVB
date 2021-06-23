@@ -31,12 +31,12 @@ Public Class Etch_ASketch : Inherits VBparent
         If check.Box(1).Checked Then
             Input.Clear() ' ignore any keyboard input when in Demo mode.
             Dim nextKey = Choose(ms_rng.Next(1, 5), "Down", "Up", "Left", "Right")
-            label1 = "Etch_ASketch demo mode - moving randomly"
+            labels(2) = "Etch_ASketch demo mode - moving randomly"
             For i = 0 To ms_rng.Next(10, 50)
                 Input.Add(nextKey)
             Next
         Else
-            label1 = "Use Up/Down/Left/Right keys to create image"
+            labels(2) = "Use Up/Down/Left/Right keys to create image"
         End If
         If check.Box(0).Checked Then
             check.Box(0).Checked = False

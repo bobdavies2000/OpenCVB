@@ -18,8 +18,8 @@ Public Class Math_Subtract : Inherits VBparent
         dst3 = src - bgr
 
         Dim scalar = "(" + CStr(bgr.Item(0)) + "," + CStr(bgr.Item(1)) + "," + CStr(bgr.Item(2)) + ")"
-        label1 = "Subtract Mat from scalar " + scalar
-        label2 = "Subtract scalar " + scalar + " from Mat "
+        labels(2) = "Subtract Mat from scalar " + scalar
+        labels(3) = "Subtract scalar " + scalar + " from Mat "
     End Sub
 End Class
 
@@ -66,12 +66,12 @@ Public Class Math_Median_CDF : Inherits VBparent
 
             dst2.SetTo(0)
             src.CopyTo(dst2, mask)
-            label1 = "Grayscale pixels > " + Format(medianVal, "#0.0")
+            labels(2) = "Grayscale pixels > " + Format(medianVal, "#0.0")
 
             cv.Cv2.BitwiseNot(mask, mask)
             dst3.SetTo(0)
             src.CopyTo(dst3, mask) ' show the other half.
-            label2 = "Grayscale pixels < " + Format(medianVal, "#0.0")
+            labels(3) = "Grayscale pixels < " + Format(medianVal, "#0.0")
         End If
     End Sub
 End Class
@@ -93,11 +93,11 @@ Public Class Math_DepthMeanStdev : Inherits VBparent
         task.RGBDepth.CopyTo(dst3, mask)
         If mask.Type <> cv.MatType.CV_8U Then mask = mask.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         cv.Cv2.MeanStdDev(task.depth32f, mean, stdev, mask)
-        label2 = "stablized depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
+        labels(3) = "stablized depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
 
         dst2 = task.RGBDepth
         cv.Cv2.MeanStdDev(task.depth32f, mean, stdev)
-        label1 = "raw depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
+        labels(2) = "raw depth mean=" + Format(mean, "#0.0") + " stdev=" + Format(stdev, "#0.0")
     End Sub
 End Class
 
@@ -116,21 +116,21 @@ Public Class Math_RGBCorrelation : Inherits VBparent
         match.searchArea = split(0)
         match.template = split(1)
         match.Run(src)
-        Dim blueGreenCorrelation = "Blue-Green " + match.label1
+        Dim blueGreenCorrelation = "Blue-Green " + match.labels(2)
 
         match.searchArea = split(2)
         match.template = split(1)
         match.Run(src)
-        Dim redGreenCorrelation = "Red-Green " + match.label1
+        Dim redGreenCorrelation = "Red-Green " + match.labels(2)
 
         match.searchArea = split(2)
         match.template = split(0)
         match.Run(src)
-        Dim redBlueCorrelation = "Red-Blue " + match.label1
+        Dim redBlueCorrelation = "Red-Blue " + match.labels(2)
 
         flow.msgs.Add(blueGreenCorrelation + " " + redGreenCorrelation + " " + redBlueCorrelation)
         flow.Run(Nothing)
-        label1 = "Log of " + match.matchText
+        labels(2) = "Log of " + match.matchText
     End Sub
 End Class
 
@@ -164,7 +164,7 @@ Public Class Math_ImageAverage : Inherits VBparent
         Next
         If images.Count > saveImageCount Then images.RemoveAt(0)
         If nextImage.Type <> src.Type Then nextImage.ConvertTo(dst2, src.Type) Else dst2 = nextImage
-        label1 = "Average image over previous " + CStr(avgSlider.value) + " images"
+        labels(2) = "Average image over previous " + CStr(avgSlider.value) + " images"
     End Sub
 End Class
 
@@ -243,8 +243,8 @@ Public Class Math_Stdev : Inherits VBparent
         saveFrame.CopyTo(dst3, highStdevMask)
         lastFrame = saveFrame
         Dim stdevPercent = " stdev " + Format(stdevSlider.value, "0.0")
-        label1 = CStr(updateCount) + " of " + CStr(grid.roiList.Count) + " segments with < " + stdevPercent
-        label2 = CStr(grid.roiList.Count - updateCount) + " out of " + CStr(grid.roiList.Count) + " had stdev > " + Format(stdevSlider.value, "0.0")
+        labels(2) = CStr(updateCount) + " of " + CStr(grid.roiList.Count) + " segments with < " + stdevPercent
+        labels(3) = CStr(grid.roiList.Count - updateCount) + " out of " + CStr(grid.roiList.Count) + " had stdev > " + Format(stdevSlider.value, "0.0")
     End Sub
 End Class
 
@@ -258,8 +258,8 @@ End Class
 Public Class Math_StdevBoundary : Inherits VBparent
     Dim stdev As New Math_Stdev
     Public Sub New()
-        label1 = "Low stdev regions.  Gaps filled with OTSU results"
-        label2 = "High stdev segments after the first pass"
+        labels(2) = "Low stdev regions.  Gaps filled with OTSU results"
+        labels(3) = "High stdev segments after the first pass"
         task.desc = "Explore how to get a better boundary on the low stdev mask"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

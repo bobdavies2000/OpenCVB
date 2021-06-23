@@ -101,8 +101,8 @@ Public Class Blob_Input : Inherits VBparent
 
         Mats.mats.lineSeparators = False
 
-        label1 = "Click any quadrant below to view it on the right"
-        label2 = "Click any quadrant at left to view it below"
+        labels(2) = "Click any quadrant below to view it on the right"
+        labels(3) = "Click any quadrant at left to view it below"
         task.desc = "Generate data to test Blob Detector."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -129,8 +129,8 @@ End Class
 Public Class Blob_RenderBlobs : Inherits VBparent
     Dim input As New Blob_Input
     Public Sub New()
-        label1 = "Input blobs"
-        label2 = "Largest blob, centroid in yellow"
+        labels(2) = "Input blobs"
+        labels(3) = "Largest blob, centroid in yellow"
         task.desc = "Use connected components to find blobs."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -175,7 +175,7 @@ Public Class Blob_DepthPixelSampler : Inherits VBparent
         findSlider("FloodFill LoDiff").Value = 1
         findSlider("FloodFill HiDiff").Value = 1
 
-        label2 = "Backprojection of identified histogram depth clusters."
+        labels(3) = "Backprojection of identified histogram depth clusters."
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -198,7 +198,7 @@ Public Class Blob_DepthPixelSampler : Inherits VBparent
             Next
             lastFrame = dst3.Clone
         End If
-        label1 = CStr(histBlobs.valleys.ranges.Count) + " Depth Clusters"
+        labels(2) = CStr(histBlobs.valleys.ranges.Count) + " Depth Clusters"
     End Sub
 End Class
 
@@ -215,7 +215,7 @@ Public Class Blob_DepthRanges : Inherits VBparent
     Public maskSizes As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
     Public ranges As New List(Of cv.Point)
     Public Sub New()
-        label2 = "Identified histogram depth clusters."
+        labels(3) = "Identified histogram depth clusters."
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -238,7 +238,7 @@ Public Class Blob_DepthRanges : Inherits VBparent
         Next
         dst3.SetTo(0, task.noDepthMask)
 
-        label1 = CStr(histBlobs.valleys.ranges.Count) + " Depth Clusters"
+        labels(2) = CStr(histBlobs.valleys.ranges.Count) + " Depth Clusters"
     End Sub
 End Class
 
@@ -262,7 +262,7 @@ Public Class Blob_Largest : Inherits VBparent
             Dim maskIndex = blobs.maskSizes.ElementAt(blobs.masks.Count - 1).Value
             src.CopyTo(dst2, blobs.masks(maskIndex))
         End If
-        label1 = "Show the largest blob of the " + CStr(blobs.masks.Count) + " blobs"
+        labels(2) = "Show the largest blob of the " + CStr(blobs.masks.Count) + " blobs"
     End Sub
 End Class
 

@@ -21,8 +21,8 @@ Public Class FREAK_Basics : Inherits VBparent
             dst2.Line(New cv.Point(kpt.Pt.X + r, kpt.Pt.Y + r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y - r), cv.Scalar.Green)
             dst2.Line(New cv.Point(kpt.Pt.X + r, kpt.Pt.Y - r), New cv.Point(kpt.Pt.X - r, kpt.Pt.Y + r), cv.Scalar.Green)
         Next
-        label1 = CStr(orb.keypoints.Count) + " key points were identified"
-        label2 = CStr(orb.keypoints.Count) + " FREAK Descriptors (resized) One row = keypoint"
+        labels(2) = CStr(orb.keypoints.Count) + " key points were identified"
+        labels(3) = CStr(orb.keypoints.Count) + " FREAK Descriptors (resized) One row = keypoint"
         If fDesc.Width > 0 And fDesc.Height > 0 Then dst3 = fDesc.Resize(dst3.Size())
     End Sub
 End Class

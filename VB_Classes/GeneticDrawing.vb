@@ -64,8 +64,8 @@ Public Class GeneticDrawing_Basics : Inherits VBparent
             brushes(i) = cv.Cv2.ImRead(task.parms.homeDir + "Data/GeneticDrawingBrushes/" + CStr(i) + ".jpg").CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Next
 
-        label1 = "(clkwise) original, imgStage, imgGeneration, magnitude"
-        label2 = "Current result"
+        labels(2) = "(clkwise) original, imgStage, imgGeneration, magnitude"
+        labels(3) = "Current result"
         task.desc = "Create a painting from the current video input using a genetic algorithm. Draw anywhere to focus brushes. Painterly"
     End Sub
     Private Function runDNAseq(dna() As DNAentry) As cv.Mat
@@ -228,7 +228,7 @@ Public Class GeneticDrawing_Basics : Inherits VBparent
 
         mats.Run(src)
         dst2 = mats.dst2
-        label2 = " stage " + CStr(stage) + "/" + CStr(stageTotal) + " Gen " + Format(generation, "00") + " chgs = " + CStr(changes) + " err/1000 = " + CStr(CInt(totalError / 1000))
+        labels(3) = " stage " + CStr(stage) + "/" + CStr(stageTotal) + " Gen " + Format(generation, "00") + " chgs = " + CStr(changes) + " err/1000 = " + CStr(CInt(totalError / 1000))
         If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
         dst3 = mats.mat(quadrantIndex)
     End Sub
@@ -249,7 +249,7 @@ Public Class GeneticDrawing_Color : Inherits VBparent
         gDraw(1) = New GeneticDrawing_Basics()
         gDraw(2) = New GeneticDrawing_Basics()
 
-        label1 = "Intermediate results - original+2 partial+Mag"
+        labels(2) = "Intermediate results - original+2 partial+Mag"
         task.desc = "Use the GeneticDrawing_Basics to create a color painting.  Draw anywhere to focus brushes. Painterly"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -272,7 +272,7 @@ Public Class GeneticDrawing_Color : Inherits VBparent
         Next
         cv.Cv2.Merge(split, dst2)
 
-        label2 = gDraw(2).label2
+        labels(3) = gDraw(2).labels(3)
     End Sub
 End Class
 
@@ -307,13 +307,13 @@ Public Class GeneticDrawing_Photo : Inherits VBparent
         If inputFileName <> fileInputName.FullName Or task.frameCount = 0 Then
             inputFileName = fileInputName.FullName
             If fileInputName.Exists = False Then
-                label1 = "No input file specified or file not found."
+                labels(2) = "No input file specified or file not found."
                 Exit Sub
             End If
 
             Dim fullsizeImage = cv.Cv2.ImRead(fileInputName.FullName)
             If fullsizeImage.Channels <> 3 Then
-                label1 = "Input file must be RGB 3-channel image!"
+                labels(2) = "Input file must be RGB 3-channel image!"
                 Exit Sub
             End If
             If gDraw IsNot Nothing Then gDraw.Dispose()
@@ -336,8 +336,8 @@ Public Class GeneticDrawing_Photo : Inherits VBparent
 
         dst2 = gDraw.dst2
         dst3 = gDraw.dst3
-        label1 = gDraw.label1
-        label2 = gDraw.label2
+        labels(2) = gDraw.labels(2)
+        labels(3) = gDraw.labels(3)
     End Sub
 End Class
 

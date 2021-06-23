@@ -7,8 +7,8 @@ Public Class Plot_Basics : Inherits VBparent
     Public plotCount As Integer = 3
     Public Sub New()
         hist.plotRequested = True
-        label1 = "Plot of grayscale histogram"
-        label2 = "Same Data but using OpenCV C++ plot"
+        labels(2) = "Plot of grayscale histogram"
+        labels(3) = "Same Data but using OpenCV C++ plot"
         task.desc = "Plot data provided in src Mat"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -24,7 +24,7 @@ Public Class Plot_Basics : Inherits VBparent
         Next
         plot.Run(Nothing)
         dst3 = plot.dst2
-        label1 = hist.label1
+        labels(2) = hist.labels(2)
     End Sub
 End Class
 
@@ -69,7 +69,7 @@ Public Class Plot_Basics_CPP : Inherits VBparent
         handlePlot.Free()
         handleX.Free()
         handleY.Free()
-        label1 = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + ", y-axis: " + CStr(minY) + " to " + CStr(maxY)
+        labels(2) = "x-Axis: " + CStr(minX) + " to " + CStr(maxX) + ", y-axis: " + CStr(minY) + " to " + CStr(maxY)
     End Sub
 End Class
 
@@ -182,7 +182,7 @@ Public Class Plot_OverTime : Inherits VBparent
 
         columnIndex += pixelWidth
         dst2.Col(columnIndex).SetTo(0)
-        If standalone Or task.intermediateName = caller Then label1 = "RGB Means: blue = " + Format(plotData.Item(0), "#0.0") + " green = " + Format(plotData.Item(1), "#0.0") + " red = " + Format(plotData.Item(2), "#0.0")
+        If standalone Or task.intermediateName = caller Then labels(2) = "RGB Means: blue = " + Format(plotData.Item(0), "#0.0") + " green = " + Format(plotData.Item(1), "#0.0") + " red = " + Format(plotData.Item(2), "#0.0")
         AddPlotScale(dst2, minScale - topBottomPad, maxScale + topBottomPad, task.fontSize * 2)
     End Sub
 End Class
@@ -288,8 +288,8 @@ Public Class Plot_Depth : Inherits VBparent
         plotDepth.Run(Nothing)
         dst2 = plotDepth.dst2
 
-        label1 = plotDepth.label1
-        Dim Split = Regex.Split(label1, "\W+")
+        labels(2) = plotDepth.labels(2)
+        Dim Split = Regex.Split(labels(2), "\W+")
         Dim lineCount = CInt(Split(4) / 1000)
         If lineCount > 0 Then
             Dim meterDepth = CInt(src.Width / lineCount)

@@ -48,8 +48,8 @@ Public Class TimeView_Basics : Inherits VBparent
             dst3 = topAccum
         End If
 
-        label1 = "Accum " + CStr(topFrames.Count) + " latest side frames with hist threshold > " + CStr(task.hist3DThreshold)
-        label2 = "Accum " + CStr(topFrames.Count) + " latest top frames with hist threshold > " + CStr(task.hist3DThreshold)
+        labels(2) = "Accum " + CStr(topFrames.Count) + " latest side frames with hist threshold > " + CStr(task.hist3DThreshold)
+        labels(3) = "Accum " + CStr(topFrames.Count) + " latest top frames with hist threshold > " + CStr(task.hist3DThreshold)
 
         If sideFrames.Count >= saveFrameCount Then
             sideAccum = sideAccum.Subtract(sideFrames.ElementAt(0))
@@ -132,11 +132,11 @@ Public Class TimeView_FloodFill : Inherits VBparent
 
         floodSide.Run(tBasics.dst2.ConvertScaleAbs(255))
         dst2 = floodSide.dst2
-        label1 = "SideView " + floodSide.label1
+        labels(2) = "SideView " + floodSide.labels(2)
 
         floodTop.Run(tBasics.dst3.ConvertScaleAbs(255))
         dst3 = floodTop.dst2
-        label2 = "TopView " + floodTop.label1
+        labels(3) = "TopView " + floodTop.labels(2)
     End Sub
 End Class
 
@@ -153,8 +153,8 @@ Public Class TimeView_Centroids : Inherits VBparent
     Public queryPoints As New List(Of cv.Point2f)
     Public responses As New List(Of cv.Point2f)
     Public Sub New()
-        label1 = "Top view with centroids in yellow"
-        label2 = "Side view with centroids in yellow"
+        labels(2) = "Top view with centroids in yellow"
+        labels(3) = "Side view with centroids in yellow"
         task.desc = "Use KNN to track the query points"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -200,8 +200,8 @@ Public Class TimeView_Rectangles : Inherits VBparent
     Dim mOverLap As New Rectangle_MultiOverlap
     Public tflood As New TimeView_FloodFill
     Public Sub New()
-        label1 = "Top view with rectangles in yellow"
-        label2 = "Side view with rectangles in yellow"
+        labels(2) = "Top view with rectangles in yellow"
+        labels(3) = "Side view with rectangles in yellow"
         task.desc = "Use KNN to track the query points"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -238,7 +238,7 @@ Public Class TimeView_Frustrum : Inherits VBparent
     Dim setupTop As New PointCloud_SetupTop
     Dim mats As New Mat_4Click
     Public Sub New()
-        label2 = "Click a quadrant in dst2 to show it in dst3 "
+        labels(3) = "Click a quadrant in dst2 to show it in dst3 "
         task.desc = "Colorize the back and side views"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

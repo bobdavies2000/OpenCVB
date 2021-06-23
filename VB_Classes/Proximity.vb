@@ -86,7 +86,7 @@ Public Class Proximity_Valleys : Inherits VBparent
     Public barHeight As New List(Of Integer)
     Public rangeCounts As New List(Of Integer)
     Public Sub New()
-        label1 = "Histogram clustered by valleys and smoothed"
+        labels(2) = "Histogram clustered by valleys and smoothed"
         task.desc = "Identify valleys in the Depth histogram."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -195,8 +195,8 @@ Public Class Proximity_Clusters : Inherits VBparent
         task.palette.Run(paletteSrc)
         dst3 = task.palette.dst2
         If standalone Or task.intermediateName = caller Then
-            label1 = "Histogram of " + CStr(valleys.ranges.Count) + " Depth Clusters"
-            label2 = "Backprojection of " + CStr(valleys.ranges.Count) + " histogram clusters"
+            labels(2) = "Histogram of " + CStr(valleys.ranges.Count) + " Depth Clusters"
+            labels(3) = "Backprojection of " + CStr(valleys.ranges.Count) + " histogram clusters"
         End If
         dst3.SetTo(0, task.noDepthMask)
     End Sub
@@ -294,7 +294,7 @@ Public Class Proximity_ValleysKalman : Inherits VBparent
             cv.Cv2.Rectangle(dst2, New cv.Rect(i * barWidth, dst2.Height - h, barWidth, h), color, -1)
             depthRegions.Add(colorIndex)
         Next
-        label1 = "Depth regions between 0 and " + CStr(CInt(task.maxZ)) + " meters"
+        labels(2) = "Depth regions between 0 and " + CStr(CInt(task.maxZ)) + " meters"
     End Sub
 End Class
 
@@ -310,7 +310,7 @@ Public Class Proximity_SLR : Inherits VBparent
     Public slr As New SLR_Basics
     Public hist As New Histogram_Basics
     Public Sub New()
-        label1 = "Original data"
+        labels(2) = "Original data"
         task.desc = "Run Segmented Linear Regression on depth data"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -341,7 +341,7 @@ Public Class Proximity_Reduction : Inherits VBparent
     Public Sub New()
         reduction.radio.check(0).Checked = True
         findSlider("Reduction factor").Value = 800
-        label2 = "Reduced depth data before normalizing (32-bit)"
+        labels(3) = "Reduced depth data before normalizing (32-bit)"
         task.desc = "Use reduction to cluster depth data"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -364,7 +364,7 @@ Public Class Proximity_Reduction : Inherits VBparent
 
         task.palette.Run(dst2)
         dst2 = task.palette.dst2
-        label1 = reduction.label1 + " with " + CStr(counts.Count) + " levels"
+        labels(2) = reduction.labels(2) + " with " + CStr(counts.Count) + " levels"
     End Sub
 End Class
 
@@ -379,7 +379,7 @@ Public Class Proximity_MasksRGB : Inherits VBparent
     Dim proxy As New Proximity_Basics
     Dim mats As New Mat_4Click
     Public Sub New()
-        label1 = "Ordered from light to dark"
+        labels(2) = "Ordered from light to dark"
         task.desc = "Display the top 4 masks from the rgb kmeans output"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -404,7 +404,7 @@ End Class
 Public Class Proximity_MasksDepth : Inherits VBparent
     Dim proxy As New Proximity_MasksRGB
     Public Sub New()
-        label1 = "Ordered from farthest to closest in depth"
+        labels(2) = "Ordered from farthest to closest in depth"
         task.desc = "Display the top 4 masks from the depth kmeans output"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

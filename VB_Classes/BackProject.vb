@@ -3,7 +3,7 @@
 Public Class BackProject_Basics : Inherits VBparent
     Public hist As New Histogram_Basics
     Public Sub New()
-        label1 = "Move mouse to backproject each histogram column"
+        labels(2) = "Move mouse to backproject each histogram column"
         task.desc = "Explore Backprojection of each element of a grayscale histogram."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -23,7 +23,7 @@ Public Class BackProject_Basics : Inherits VBparent
         dst3 = src
         If maxRange = 255 Then dst3.SetTo(cv.Scalar.Black, mask) Else dst3.SetTo(cv.Scalar.White, mask)
         Dim count = hist.histogram.Get(Of Single)(histIndex, 0)
-        label2 = "Backprojecting " + CStr(CInt(minRange)) + " to " + CStr(CInt(maxRange)) + " with " +
+        labels(3) = "Backprojecting " + CStr(CInt(minRange)) + " to " + CStr(CInt(maxRange)) + " with " +
                  Format(count, "#0") + " (" + Format(count / dst2.Total, "0.0%") + ") samples"
         dst2.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
     End Sub
@@ -129,7 +129,7 @@ Public Class BackProject_Surfaces : Inherits VBparent
     Dim hist As New Histogram_Basics
     Dim mats As New Mat_2to1
     Public Sub New()
-        label1 = "Top=differences in X, Bot=differences in Y"
+        labels(2) = "Top=differences in X, Bot=differences in Y"
         task.desc = "Find solid surfaces using the pointcloud X and Y differences"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -163,7 +163,7 @@ Public Class BackProject_Surfaces : Inherits VBparent
         dst2 = mats.dst2
 
         cv.Cv2.BitwiseOr(mats.mat(0), mats.mat(1), dst3)
-        label2 = "Likely smooth surfaces, framecount = " + CStr(task.frameCount)
+        labels(3) = "Likely smooth surfaces, framecount = " + CStr(task.frameCount)
     End Sub
 End Class
 
@@ -216,8 +216,8 @@ Public Class BackProject_2D : Inherits VBparent
         dst3.SetTo(0)
         dst3.SetTo(cv.Scalar.Yellow, maskHue)
         dst3.SetTo(cv.Scalar.Blue, maskSat)
-        label1 = "Hue(X) min/max " + Format(minHue, "0") + "/" + Format(maxHue, "0") + " Sat(Y) min/max " + Format(minSat, "0") + "/" + Format(maxSat, "0")
-        label2 = "Hue pixels(yellow)=" + CStr(maskHue.CountNonZero()) + " Sat pixels(blue)=" + CStr(maskSat.CountNonZero())
+        labels(2) = "Hue(X) min/max " + Format(minHue, "0") + "/" + Format(maxHue, "0") + " Sat(Y) min/max " + Format(minSat, "0") + "/" + Format(maxSat, "0")
+        labels(3) = "Hue pixels(yellow)=" + CStr(maskHue.CountNonZero()) + " Sat pixels(blue)=" + CStr(maskSat.CountNonZero())
         dst2.Rectangle(New cv.Rect(histX * huebarWidth, 0, huebarWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth, task.lineType)
         dst2.Rectangle(New cv.Rect(0, (satBins - 1 - histY) * satBarHeight, dst2.Width, satBarHeight), cv.Scalar.Yellow, task.lineWidth, task.lineType)
     End Sub
@@ -234,7 +234,7 @@ Public Class BackProject_2DHSV : Inherits VBparent
     Dim hist2d As New BackProject_2D
     Dim mats As New Mat_4Click
     Public Sub New()
-        label1 = "Click to enlarge: Hue, sat, selection, histogram"
+        labels(2) = "Click to enlarge: Hue, sat, selection, histogram"
         task.desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -250,7 +250,7 @@ Public Class BackProject_2DHSV : Inherits VBparent
         dst2 = mats.dst2
         dst3 = mats.dst3
 
-        label2 = hist2d.label1
+        labels(3) = hist2d.labels(2)
     End Sub
 End Class
 
@@ -265,7 +265,7 @@ Public Class BackProject_Full : Inherits VBparent
     Public hist As New Histogram_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-        label1 = "Move mouse to backproject each histogram column"
+        labels(2) = "Move mouse to backproject each histogram column"
         task.desc = "Backproject the entire histogram."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -300,7 +300,7 @@ Public Class BackProject_Reduction : Inherits VBparent
     Dim hist As New BackProject_Basics
     Public Sub New()
         findRadio("Use bitwise reduction").Checked = True
-        label2 = "Backprojection of highlighted histogram bin"
+        labels(3) = "Backprojection of highlighted histogram bin"
         task.desc = "Use the histogram of a reduced RGB image to isolate featureless portions of an image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -311,7 +311,7 @@ Public Class BackProject_Reduction : Inherits VBparent
         hist.Run(basics.dst2)
         dst2 = hist.dst2.Clone
         dst3 = basics.dst2
-        label1 = "Reduction = " + CStr(reductionSlider.value) + " and bins = " + CStr(task.histogramBins)
+        labels(2) = "Reduction = " + CStr(reductionSlider.value) + " and bins = " + CStr(task.histogramBins)
     End Sub
 End Class
 
@@ -327,7 +327,7 @@ Public Class BackProject_ReductionLines : Inherits VBparent
     Public Sub New()
         findRadio("Use bitwise reduction").Checked = True
 
-        label2 = "Backprojection of highlighted histogram bin"
+        labels(3) = "Backprojection of highlighted histogram bin"
         task.desc = "Use the histogram of a reduced RGB image to isolate featureless portions of an image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -345,9 +345,9 @@ Public Class BackProject_ReductionLines : Inherits VBparent
             Dim pt2 = New cv.Point(v.Item2, v.Item3)
             dst3.Line(pt1, pt2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
         Next
-        label2 = CStr(lines.sortlines.Count) + " lines were found"
+        labels(3) = CStr(lines.sortlines.Count) + " lines were found"
 
-        label1 = "Reduction = " + CStr(reductionSlider.value) + " and bins = " + CStr(task.histogramBins)
+        labels(2) = "Reduction = " + CStr(reductionSlider.value) + " and bins = " + CStr(task.histogramBins)
     End Sub
 End Class
 
@@ -373,6 +373,6 @@ Public Class BackProject_FullLines : Inherits VBparent
             Dim pt2 = New cv.Point(v.Item2, v.Item3)
             dst3.Line(pt1, pt2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
         Next
-        label2 = CStr(lines.sortlines.Count) + " lines were found"
+        labels(3) = CStr(lines.sortlines.Count) + " lines were found"
     End Sub
 End Class

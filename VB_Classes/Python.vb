@@ -60,8 +60,8 @@ Public Class Python_Run : Inherits VBparent
             pyStream.Run(src)
             dst2 = pyStream.dst2
             dst3 = pyStream.dst3
-            label1 = "Output of Python Backend"
-            label2 = "Second Output of Python Backend"
+            labels(2) = "Output of Python Backend"
+            labels(3) = "Second Output of Python Backend"
         Else
             Dim pythonApp = New FileInfo(task.pythonTaskName)
             If pythonApp.Name.StartsWith("OakD") Then
@@ -100,7 +100,7 @@ Public Class Python_MemMap : Inherits VBparent
                 StartPython("--MemMapLength=" + CStr(memMapbufferSize))
             End If
             Dim pythonApp = New FileInfo(task.pythonTaskName)
-            label1 = "No output for Python_MemMap - see Python console"
+            labels(2) = "No output for Python_MemMap - see Python console"
             task.desc = "Run Python app: " + pythonApp.Name + " to share memory with OpenCVB and Python."
         End If
     End Sub
@@ -202,7 +202,7 @@ Public Class Python_Stream : Inherits VBparent
             task.pipeOut.WaitForConnection()
             task.pipeIn.WaitForConnection()
         End If
-        label1 = "Output of Python Backend"
+        labels(2) = "Output of Python Backend"
         task.desc = "General purpose class to pipe RGB and Depth to Python scripts."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

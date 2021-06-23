@@ -45,12 +45,12 @@ Public Class DilateErode_Basics : Inherits VBparent
         If standalone or task.intermediateName = caller Then
             If iterations >= 0 Then
                 dst3 = task.RGBDepth.Dilate(element, Nothing, iterations)
-                label1 = "Dilate RGB " + CStr(iterations) + " times"
-                label2 = "Dilate Depth " + CStr(iterations) + " times"
+                labels(2) = "Dilate RGB " + CStr(iterations) + " times"
+                labels(3) = "Dilate Depth " + CStr(iterations) + " times"
             Else
                 dst3 = task.RGBDepth.Erode(element, Nothing, -iterations)
-                label1 = "Erode RGB " + CStr(-iterations) + " times"
-                label2 = "Erode Depth " + CStr(-iterations) + " times"
+                labels(2) = "Erode RGB " + CStr(-iterations) + " times"
+                labels(3) = "Erode Depth " + CStr(-iterations) + " times"
             End If
         End If
     End Sub

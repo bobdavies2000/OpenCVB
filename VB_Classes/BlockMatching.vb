@@ -9,8 +9,8 @@ Public Class BlockMatching_Basics : Inherits VBparent
             sliders.setupTrackBar(2, "Blockmatch distance factor (approx) X1000", 1, 100, 20)
         End If
         task.desc = "Use OpenCV's block matching on left and right views"
-        label1 = "Block matching disparity colorized like depth"
-        label2 = "Right Image (used with left image)"
+        labels(2) = "Block matching disparity colorized like depth"
+        labels(3) = "Right Image (used with left image)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Then

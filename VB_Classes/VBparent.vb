@@ -31,8 +31,7 @@ Public Class VBparent : Implements IDisposable
     Public dst1 As cv.Mat
     Public dst2 As cv.Mat
     Public dst3 As cv.Mat
-    Public label1 As String
-    Public label2 As String
+    Public labels(4 - 1) As String
     Public msRNG As New System.Random
     Public algorithm As Object
     Public caller As String
@@ -56,8 +55,10 @@ Public Class VBparent : Implements IDisposable
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
         algorithm.Run(src)
         If standalone Or caller = "Python_Run" Then
-            task.label1 = label1
-            task.label2 = label2
+            task.labels(0) = labels(0)
+            task.labels(1) = labels(1)
+            task.labels(2) = labels(2)
+            task.labels(3) = labels(3)
             If task.intermediateName <> "" Then
                 If task.intermediateActive = False And task.ttTextData.Count = 0 Then
                     Dim str As New TTtext("The " + task.intermediateName + " algorithm is not active in this configuration" + vbCrLf +
@@ -65,13 +66,13 @@ Public Class VBparent : Implements IDisposable
                     task.ttTextData.Add(str)
                     dst2.SetTo(0)
                     dst3.SetTo(0)
-                    task.label1 = ""
-                    task.label2 = ""
+                    task.labels(2) = ""
+                    task.labels(3) = ""
                 Else
                     dst2 = task.intermediateObject.dst2
                     dst3 = task.intermediateObject.dst3
-                    task.label1 = task.intermediateObject.label1
-                    task.label2 = task.intermediateObject.label2
+                    task.labels(2) = task.intermediateObject.labels(2)
+                    task.labels(3) = task.intermediateObject.labels(3)
                 End If
             End If
             If dst2.Width <> task.color.Width Then dst2 = dst2.Resize(task.color.Size)
@@ -79,6 +80,9 @@ Public Class VBparent : Implements IDisposable
             If task.imgResult.Width <> dst2.Width * 2 Or task.imgResult.Height <> dst2.Height Then
                 task.imgResult = New cv.Mat(New cv.Size(dst2.Width * 2, dst2.Height), cv.MatType.CV_8UC3)
             End If
+
+            If task.usingdst0 Then task.color = dst0
+            If task.usingdst1 Then task.RGBDepth = dst1
 
             If task.pythonTaskName.EndsWith(".py") = False Then
                 If task.pixelViewerOn Then
@@ -95,6 +99,7 @@ Public Class VBparent : Implements IDisposable
         End If
     End Sub
     Public Sub setTrueText(text As String, Optional x As Integer = 10, Optional y As Integer = 40, Optional picTag As Integer = 2)
+        If task.usingdst1 And picTag = 2 Then picTag = 1
         Dim str As New TTtext(text, x, y, picTag)
         If task.intermediateName = caller Or task.intermediateName = "" Then task.ttTextData.Add(str)
     End Sub
@@ -119,7 +124,7 @@ Public Class VBparent : Implements IDisposable
     Public Sub New()
         algorithm = Me
         caller = Me.GetType.Name
-        label1 = caller
+        labels(2) = caller
         Dim stackTrace = Environment.StackTrace
         Dim lines() = stackTrace.Split(vbCrLf)
         For i = 0 To lines.Count - 1

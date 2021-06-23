@@ -110,8 +110,8 @@ Public Class WarpAffine_Basics : Inherits VBparent
         angle *= -1
         rotationMatrix = cv.Cv2.GetRotationMatrix2D(pt, angle, 1.0)
         cv.Cv2.WarpAffine(dst2, dst3, rotationMatrix, src.Size(), rotateOptions.warpFlag)
-        label1 = "Rotated with Warpaffine with angle: " + CStr(angle)
-        label2 = "Rotated back with inverse Warpaffine angle: " + CStr(-angle)
+        labels(2) = "Rotated with Warpaffine with angle: " + CStr(angle)
+        labels(3) = "Rotated back with inverse Warpaffine angle: " + CStr(-angle)
     End Sub
 End Class
 
@@ -131,8 +131,8 @@ Public Class WarpAffine_3Points : Inherits VBparent
         triangle.sliders.trackbar(1).Value = 150
 
         task.desc = "Use 3 non-colinear points to build an affine transform and apply it to the color image."
-        label1 = "Triangles define the affine transform"
-        label2 = "Image with affine transform applied"
+        labels(2) = "Triangles define the affine transform"
+        labels(3) = "Image with affine transform applied"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static M As New cv.Mat
@@ -201,7 +201,7 @@ Public Class WarpAffine_4Points : Inherits VBparent
         rect = New Area_MinRect()
 
         task.desc = "Use 4 non-colinear points to build a perspective transform and apply it to the color image."
-        label1 = "Color image with perspective transform applied"
+        labels(2) = "Color image with perspective transform applied"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static M As New cv.Mat

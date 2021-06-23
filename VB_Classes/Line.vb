@@ -23,8 +23,8 @@ Public Class Line_Basics : Inherits VBparent
         lenSlider = findSlider("Line length threshold in pixels")
 
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-        label1 = "Lines detected in the current frame"
-        label2 = "Lines detected since camera motion threshold"
+        labels(2) = "Lines detected in the current frame"
+        labels(3) = "Lines detected since camera motion threshold"
         task.desc = "Use FastLineDetector (OpenCV Contrib) to find all the lines present."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -82,8 +82,8 @@ Public Class Line_Reduction : Inherits VBparent
     Public Sub New()
         findRadio("Use simple reduction").Checked = True
 
-        label1 = "Yellow > length threshold, red < length threshold"
-        label2 = "Input image after reduction"
+        labels(2) = "Yellow > length threshold, red < length threshold"
+        labels(3) = "Input image after reduction"
         task.desc = "Use the reduced rgb image as input to the line detector"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -110,7 +110,7 @@ End Class
 Public Class Line_InterceptsUI : Inherits VBparent
     Dim lines As New Line_Intercepts
     Public Sub New()
-        label1 = "Use mouse in right image to highlight lines"
+        labels(2) = "Use mouse in right image to highlight lines"
         task.desc = "An alternative way to highlight line segments with common slope"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -265,7 +265,7 @@ Public Class Line_Intercepts : Inherits VBparent
             radio.check(1).Checked = True
         End If
 
-        label1 = "Mouse tracks top, bottom, left, or right intercepts."
+        labels(2) = "Mouse tracks top, bottom, left, or right intercepts."
         task.desc = "Consolidate RGB lines using the x- and y-intercepts"
     End Sub
     Public Sub hightLightIntercept(mousePoint As Integer, intercepts As SortedList(Of Integer, Integer), axis As Integer, dst As cv.Mat)
@@ -426,7 +426,7 @@ Public Class Line_NearestPoint : Inherits VBparent
         dst2.Circle(New cv.Point2f(pt.X, pt.Y), task.dotSize, cv.Scalar.White, -1, task.lineType)
         dst2.Line(New cv.Point2f(p1.X, p1.Y), New cv.Point2f(p2.X, p2.Y), cv.Scalar.Yellow, task.lineWidth, task.lineType)
         dst2.Line(pt, nearest, cv.Scalar.White, task.lineWidth, task.lineType)
-        label1 = "nearest point = (" + CStr(nearest.X) + "," + CStr(nearest.Y) + ")"
+        labels(2) = "nearest point = (" + CStr(nearest.X) + "," + CStr(nearest.Y) + ")"
     End Sub
 End Class
 
@@ -441,8 +441,8 @@ Public Class Line_SideView : Inherits VBparent
     Dim lines As New Line_Basics
     Dim tView As New TimeView_FloodFill
     Public Sub New()
-        label1 = "Side view of the lines detected in the RGB image"
-        label2 = "Lines found in the RGB image view"
+        labels(2) = "Side view of the lines detected in the RGB image"
+        labels(3) = "Lines found in the RGB image view"
         task.desc = "Line in image are projected into the depth image - not yet complete..."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -480,7 +480,7 @@ Public Class Line_LeftRightImages : Inherits VBparent
         End If
 
         findSlider("Line length threshold in pixels").Value = 30
-        label1 = "Left image lines(red) with Right(blue)"
+        labels(2) = "Left image lines(red) with Right(blue)"
         task.desc = "Find lines in the infrared images and overlay them in a single image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -592,8 +592,8 @@ Public Class Line_RegionsVB : Inherits VBparent
                 End If
             Next
         Next
-        label1 = If(verticalCheck.checked, "Intermediate result of vertical step", "Lines detected (below) Regions detected (right image)")
-        If noVertCheck.checked And verticalCheck.checked Then label1 = "Input to vertical step"
+        labels(2) = If(verticalCheck.checked, "Intermediate result of vertical step", "Lines detected (below) Regions detected (right image)")
+        If noVertCheck.checked And verticalCheck.checked Then labels(2) = "Input to vertical step"
         If verticalCheck.checked = False Then dst2 = lines.dst2.Clone
     End Sub
 End Class
@@ -673,7 +673,7 @@ Public Class Line_Longest : Inherits VBparent
 
             setTrueText("Average Depth = " + Format(meanVal, "#0.0") + "m", (pt1.X + pt2.X) / 2 + 30, (pt1.Y + pt2.Y) / 2)
 
-            label2 = "Mean (horizontal line) = " + Format(meanVal, "#0.0") + "m with " + CStr(lastXvalues.Count) + " samples."
+            labels(3) = "Mean (horizontal line) = " + Format(meanVal, "#0.0") + "m with " + CStr(lastXvalues.Count) + " samples."
 
             plot.minScale = 0
             plot.maxScale = task.maxZ
@@ -701,8 +701,8 @@ Public Class Line_TimeViewLines : Inherits VBparent
     Public pt1List As New List(Of cv.Point)
     Public pt2list As New List(Of cv.Point)
     Public Sub New()
-        label1 = "Lines from the latest Line_TimeLine"
-        label2 = "Lines (green) Vertical (blue) Horizontal (Red)"
+        labels(2) = "Lines from the latest Line_TimeLine"
+        labels(3) = "Lines (green) Vertical (blue) Horizontal (Red)"
         task.desc = "Find slope and y-intercept of lines over time."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -790,7 +790,7 @@ Public Class Line_TimeView : Inherits VBparent
         Next
 
         pixelcount = dst3.CountNonZero()
-        label2 = "There were " + CStr(lineTotal) + " lines detected using " + Format(pixelCount / 1000, "#.0") + "k pixels"
+        labels(3) = "There were " + CStr(lineTotal) + " lines detected using " + Format(pixelCount / 1000, "#.0") + "k pixels"
     End Sub
 End Class
 
@@ -808,8 +808,8 @@ Public Class Line_InDepthAndRGB : Inherits VBparent
     Public z2 As New List(Of cv.Point3f)
     Public cloudInput As cv.Mat
     Public Sub New()
-        label1 = "Lines defined in RGB"
-        label2 = "Lines in RGB confirmed in the point cloud"
+        labels(2) = "Lines defined in RGB"
+        labels(3) = "Lines in RGB confirmed in the point cloud"
         task.desc = "Find the RGB lines and confirm they are present in the cloud data."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -954,8 +954,8 @@ Public Class Line_DupDepthV : Inherits VBparent
     Public dOptions As New Line_DupDepthOptions
     Dim cloud As New PointCloud_NeighborV
     Public Sub New()
-        label1 = "Move mouse over the image to see the depth data"
-        label2 = "Draw a rectangle around lines to get stats"
+        labels(2) = "Move mouse over the image to see the depth data"
+        labels(3) = "Draw a rectangle around lines to get stats"
         task.desc = "Detect lines in the PointCloud_NeighborV output where linear patterns show where duplicate depth values are neighbors."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -968,7 +968,7 @@ Public Class Line_DupDepthV : Inherits VBparent
         dst2 = dOptions.addw.dst2
 
         setTrueText(dOptions.showDepthData(), 10, 40, 3)
-        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then label2 = dOptions.avgRect()
+        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then labels(3) = dOptions.avgRect()
     End Sub
 End Class
 
@@ -982,8 +982,8 @@ Public Class Line_DupDepthH : Inherits VBparent
     Public dOptions As New Line_DupDepthOptions
     Dim cloud As New PointCloud_NeighborH
     Public Sub New()
-        label1 = "Move mouse over the image to see the depth data"
-        label2 = "Draw a rectangle around lines to get stats"
+        labels(2) = "Move mouse over the image to see the depth data"
+        labels(3) = "Draw a rectangle around lines to get stats"
         task.desc = "Detect lines in the PointCloud_NeighborH output where linear patterns show where duplicate depth values are neighbors."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -996,7 +996,7 @@ Public Class Line_DupDepthH : Inherits VBparent
         dst2 = dOptions.addw.dst2
 
         setTrueText(dOptions.showDepthData(), 10, 40, 3)
-        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then label2 = dOptions.avgRect()
+        If task.drawRect.Width > 0 And task.drawRect.Height > 0 Then labels(3) = dOptions.avgRect()
     End Sub
 End Class
 
@@ -1011,7 +1011,7 @@ Public Class Line_DupDepth : Inherits VBparent
     Dim dupV As New Line_DupDepthV
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        label1 = "OR dupDephH and DupDepthV"
+        labels(2) = "OR dupDephH and DupDepthV"
         task.desc = "Merge the horizontal and vertical lines with duplicate depth"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -1034,7 +1034,7 @@ Public Class Line_DupLongestH : Inherits VBparent
     Public longestP2 As cv.Point
     Dim longestLen As Integer
     Public Sub New()
-        label1 = "Longest line is highlighted.  dst3 shows values"
+        labels(2) = "Longest line is highlighted.  dst3 shows values"
         task.desc = "Use the depth along the longest line in Line_DupDepthH to find line in 3D."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -1064,7 +1064,7 @@ Public Class Line_DupLongestH : Inherits VBparent
             dst2.Rectangle(task.drawRect, cv.Scalar.White, task.lineWidth + 2)
 
             setTrueText(dupH.dOptions.showDepthData(), 10, 40, 3)
-            label2 = dupH.dOptions.avgRect()
+            labels(3) = dupH.dOptions.avgRect()
 
             Dim lineData = dupH.dOptions.getCloudData()
             Dim lineMat = New cv.Mat(lineData.Count, 1, cv.MatType.CV_32FC3, lineData.ToArray())

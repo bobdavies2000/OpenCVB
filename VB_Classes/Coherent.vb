@@ -33,7 +33,7 @@ Public Class Coherent_Basics : Inherits VBparent
             task.palette.Run(dst2)
             dst3 = task.palette.dst2
         End If
-        label1 = CStr(flood.lastRects.Count) + " regions identified in the last frame"
+        labels(2) = CStr(flood.lastRects.Count) + " regions identified in the last frame"
     End Sub
 End Class
 
@@ -127,7 +127,7 @@ Public Class Coherent_FloodFill : Inherits VBparent
             dst2(rect).SetTo(index * incr, mask(rect))
         Next
 
-        label1 = CStr(lastPoints.Count) + " regions identified"
+        labels(2) = CStr(lastPoints.Count) + " regions identified"
     End Sub
 End Class
 
@@ -146,7 +146,7 @@ Public Class Coherent_Palette : Inherits VBparent
 
         task.palette.Run(flood.dst2)
         dst2 = task.palette.dst2
-        label1 = flood.label1
+        labels(2) = flood.labels(2)
     End Sub
 End Class
 
@@ -179,7 +179,7 @@ Public Class Coherent_Pixel : Inherits VBparent
             pixel.Run(lastFrame(rect).Clone.SetTo(0, 255 - mask))
             dst2(rect).SetTo(pixel.dominantGray, mask)
         Next
-        label1 = CStr(flood.rects.Count) + " regions identified in the last frame"
+        labels(2) = CStr(flood.rects.Count) + " regions identified in the last frame"
         lastFrame = dst2.Clone
     End Sub
 End Class

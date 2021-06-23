@@ -13,7 +13,7 @@ Public Class Featureless_Basics : Inherits VBparent
             sliders.setupTrackBar(2, "FeatureLess threshold", 1, 100, 3)
         End If
 
-        label1 = "Featureless mask"
+        labels(2) = "Featureless mask"
         task.desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -39,7 +39,7 @@ Public Class Featureless_Basics : Inherits VBparent
         dst3.SetTo(0)
         src.CopyTo(dst3, flood.allRegionMask)
         Static floodSlider = findSlider("FloodFill Minimum Size")
-        label2 = "FeatureLess Regions = " + CStr(flood.basics.centroids.Count) + " with more than " + CStr(floodSlider.value) + " pixels"
+        labels(3) = "FeatureLess Regions = " + CStr(flood.basics.centroids.Count) + " with more than " + CStr(floodSlider.value) + " pixels"
     End Sub
 End Class
 
@@ -50,7 +50,7 @@ End Class
 Public Class Featureless_DCT_MT : Inherits VBparent
     Dim dct As New DCT_FeatureLess
     Public Sub New()
-        label2 = "Largest FeatureLess Region"
+        labels(3) = "Largest FeatureLess Region"
         task.desc = "Use DCT to find featureless regions."
     End Sub
 
@@ -83,7 +83,7 @@ Public Class Featureless_DCT_MT : Inherits VBparent
 
         Dim label = mask.InRange(maxIndex + 1, maxIndex + 1)
         Dim nonZ = label.CountNonZero()
-        label2 = "Largest FeatureLess Region (" + CStr(nonZ) + " " + Format(nonZ / label.Total, "#0.0%") + " pixels)"
+        labels(3) = "Largest FeatureLess Region (" + CStr(nonZ) + " " + Format(nonZ / label.Total, "#0.0%") + " pixels)"
         dst3.SetTo(cv.Scalar.White, label)
     End Sub
 End Class
@@ -178,8 +178,8 @@ Public Class FeatureLess_PointTracker : Inherits VBparent
     Public fLess As New Featureless_Basics
     Public pTrack As New KNN_PointTracker
     Public Sub New()
-        label1 = "After point tracker"
-        label2 = "Before point tracker"
+        labels(2) = "After point tracker"
+        labels(3) = "Before point tracker"
         task.desc = "Track the featureless regions with point tracker"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

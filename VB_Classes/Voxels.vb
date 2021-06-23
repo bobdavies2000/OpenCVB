@@ -12,7 +12,7 @@ Public Class Voxels_Basics_MT : Inherits VBparent
         findSlider("ThreadGrid Width").Value = 16
         findSlider("ThreadGrid Height").Value = 16
 
-        label2 = "Voxels labeled with their median distance"
+        labels(3) = "Voxels labeled with their median distance"
         task.desc = "Use multi-threading to get median depth values as voxels."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

@@ -30,8 +30,8 @@ Public Class Dlib_GaussianBlur_CS : Inherits VBparent
     Dim blur As New CS_Classes.Dlib_GaussianBlur
     Dim d2Mat as New Mat_Dlib2Mat
     Public Sub New()
-        label1 = "Gaussian Blur of grayscale image"
-        label2 = "Gaussian Blur of BGR image"
+        labels(2) = "Gaussian Blur of grayscale image"
+        labels(3) = "Gaussian Blur of BGR image"
         task.desc = "Use DlibDotNet to blur an image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

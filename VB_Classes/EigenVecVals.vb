@@ -3,8 +3,8 @@ Imports cv = OpenCvSharp
 Public Class EigenVecVals_Basics : Inherits VBparent
     Public Sub New()
         task.desc = "Solve system of equations using OpenCV's EigenVV"
-        label1 = "EigenVec (solution)"
-        label2 = "Relationship between Eigen Vec and Vals"
+        labels(2) = "EigenVec (solution)"
+        labels(3) = "Relationship between Eigen Vec and Vals"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim a() As Double = {1.96, -6.49, -0.47, -7.2, -0.65,

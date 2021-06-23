@@ -165,7 +165,7 @@ Public Class OpenGL_Options : Inherits VBparent
     Public Sub New()
         setOpenGLsliders(caller, sliders)
         task.desc = "Adjust point size and FOV in OpenGL"
-        label1 = ""
+        labels(2) = ""
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
@@ -260,7 +260,7 @@ Public Class OpenGL_3Ddata : Inherits VBparent
         colors.Run(dst2)
         ' ogl.OpenGL.src = dst2.Clone() ' only need to set this once.
 
-        label1 = "Input to Histogram 3D"
+        labels(2) = "Input to Histogram 3D"
         task.desc = "Plot the results of a 3D histogram in OpenGL."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -298,7 +298,7 @@ Public Class OpenGL_Draw3D : Inherits VBparent
         ogl.sliders.trackbar(6).Value = 16
         ogl.sliders.trackbar(10).Value = -30
         ogl.pointCloudInput = New cv.Mat ' we are not using the point cloud when displaying data.
-        label2 = "Grayscale image sent to OpenGL"
+        labels(3) = "Grayscale image sent to OpenGL"
         task.desc = "Draw in an image show it in 3D in OpenGL without any explicit math"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -526,7 +526,7 @@ Public Class OpenGL_AverageDepth : Inherits VBparent
     Dim stable As New Depth_AveragingStable
     Public ogl As New OpenGL_Callbacks
     Public Sub New()
-        label2 = "32-bit format stabilized depth data"
+        labels(3) = "32-bit format stabilized depth data"
         task.desc = "Use the depth_stabilizer output as input the an OpenGL display"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -556,7 +556,7 @@ Public Class OpenGL_StableDepthMouse : Inherits VBparent
     Dim pcValid As New Motion_MinMaxPointCloud
     Public ogl As New OpenGL_Callbacks
     Public Sub New()
-        label2 = "dst3 is a pointcloud"
+        labels(3) = "dst3 is a pointcloud"
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -610,7 +610,7 @@ Public Class OpenGL_Stable : Inherits VBparent
         ogl.pointCloudInput = stable.dst3
         ogl.Run(task.color)
 
-        label2 = stable.label2
+        labels(3) = stable.labels(3)
     End Sub
 End Class
 
@@ -678,7 +678,7 @@ Public Class OpenGL_ReducedSideView : Inherits VBparent
         ogl.pointCloudInput = reduced.dst3
         ogl.Run(task.color)
 
-        label1 = reduced.label1
+        labels(2) = reduced.labels(2)
     End Sub
 End Class
 
@@ -702,7 +702,7 @@ Public Class OpenGL_MFD_PointCloud : Inherits VBparent
         ogl.pointCloudInput = dst2
         ogl.Run(task.color)
 
-        label2 = mfd.label2
+        labels(3) = mfd.labels(3)
     End Sub
 End Class
 
@@ -716,7 +716,7 @@ Public Class OpenGL_Structured_PointCloud : Inherits VBparent
     Dim sCloud As New Structured_Cloud
     Dim ogl As New OpenGL_Callbacks
     Public Sub New()
-        label1 = "Structured cloud 32fC3 data"
+        labels(2) = "Structured cloud 32fC3 data"
         task.desc = "Visualize the Structured_Cloud"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

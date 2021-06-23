@@ -27,8 +27,8 @@ Public Class DFT_Basics : Inherits VBparent
         mats.lineSeparators = False
 
         task.desc = "Explore the Discrete Fourier Transform."
-        label1 = "Image after inverse DFT"
-        label2 = "DFT_Basics Spectrum Magnitude"
+        labels(2) = "Image after inverse DFT"
+        labels(3) = "DFT_Basics Spectrum Magnitude"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         gray = src
@@ -80,7 +80,7 @@ End Class
 Public Class DFT_Inverse : Inherits VBparent
     Dim mats As New Mat_2to1
     Public Sub New()
-        label1 = "Image after Inverse DFT"
+        labels(2) = "Image after Inverse DFT"
         task.desc = "Take the inverse of the Discrete Fourier Transform."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -101,9 +101,9 @@ Public Class DFT_Inverse : Inherits VBparent
         mats.Run(src)
         If mats.mat(0).countnonzero() > 0 Then
             dst3 = mats.dst2
-            label2 = "Mask of difference (top) and relative diff (bot)"
+            labels(3) = "Mask of difference (top) and relative diff (bot)"
         Else
-            label2 = "InverseDFT reproduced original"
+            labels(3) = "InverseDFT reproduced original"
             dst3.SetTo(0)
         End If
     End Sub
@@ -133,8 +133,8 @@ Public Class DFT_ButterworthFilter_MT : Inherits VBparent
         End If
 
         task.desc = "Use the Butterworth filter on a DFT image - color image input."
-        label1 = "Image with Butterworth Low Pass Filter Applied"
-        label2 = "Same filter with radius / 2"
+        labels(2) = "Image with Butterworth Low Pass Filter Applied"
+        labels(3) = "Same filter with radius / 2"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         dft.Run(src)
@@ -193,8 +193,8 @@ Public Class DFT_ButterworthDepth : Inherits VBparent
     Dim bfilter As New DFT_ButterworthFilter_MT
     Public Sub New()
         task.desc = "Use the Butterworth filter on a DFT image - RGBDepth as input."
-        label1 = "Image with Butterworth Low Pass Filter Applied"
-        label2 = "Same filter with radius / 2"
+        labels(2) = "Image with Butterworth Low Pass Filter Applied"
+        labels(3) = "Same filter with radius / 2"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         bfilter.Run(task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -237,8 +237,8 @@ Public Class DFT_Shapes : Inherits VBparent
             radio.check(0).Checked = True
         End If
 
-        label1 = "Input to the DFT"
-        label2 = "Discrete Fourier Transform Output"
+        labels(2) = "Input to the DFT"
+        labels(3) = "Discrete Fourier Transform Output"
         task.desc = "Show the spectrum magnitude for some standard shapes. Painterly"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -277,7 +277,7 @@ Public Class DFT_Shapes : Inherits VBparent
                 Dim pt2 = New cv.Point(msRNG.Next(0, dst2.Width / 10), msRNG.Next(0, dst2.Height / 10))
                 dst2.Set(Of Byte)(pt1.Y, pt1.X, 255)
                 dst2.Set(Of Byte)(pt2.Y, pt2.X, 255)
-                label1 = "pt1 = (" + CStr(pt1.X) + "," + CStr(pt1.Y) + ")  pt2 = (" + CStr(pt2.X) + "," + CStr(pt2.Y) + ")"
+                labels(2) = "pt1 = (" + CStr(pt1.X) + "," + CStr(pt1.Y) + ")  pt2 = (" + CStr(pt2.X) + "," + CStr(pt2.Y) + ")"
             End If
         End If
 

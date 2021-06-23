@@ -31,7 +31,7 @@ Public Class SuperPixel_Basics_CPP : Inherits VBparent
             sliders.setupTrackBar(2, "Prior", 1, 10, 2)
         End If
 
-        label2 = "Superpixel label data (0-255)"
+        labels(3) = "Superpixel label data (0-255)"
         task.desc = "Sub-divide the image into super pixels."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -132,7 +132,7 @@ Public Class SuperPixel_WithCanny : Inherits VBparent
         dst2 = pixels.dst2
         dst3 = pixels.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst3.SetTo(cv.Scalar.Red, edges.dst2)
-        label2 = "Edges provided by Canny in red"
+        labels(3) = "Edges provided by Canny in red"
     End Sub
 End Class
 
@@ -145,7 +145,7 @@ Public Class SuperPixel_WithLineDetector : Inherits VBparent
     Dim pixels As New SuperPixel_Basics_CPP
     Dim lines As New Line_Basics
     Public Sub New()
-        label2 = "Input to superpixel basics."
+        labels(3) = "Input to superpixel basics."
         task.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

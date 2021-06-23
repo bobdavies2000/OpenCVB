@@ -75,7 +75,7 @@ Public Class Undistort_Basics : Inherits VBparent
             check.Box(0).Text = "Restore Original matrices"
             check.Box(0).Checked = True
         End If
-        label1 = "Left Image with sliders applied"
+        labels(2) = "Left Image with sliders applied"
         task.desc = "Use sliders to control the undistort OpenCV API - Painterly"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

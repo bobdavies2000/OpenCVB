@@ -122,7 +122,7 @@ Public Class Structured_MultiSliceH : Inherits VBparent
 
         dst2 = task.color.Clone
         dst2.SetTo(cv.Scalar.White, sliceMask)
-        label2 = side2D.label2
+        labels(3) = side2D.labels(3)
     End Sub
 End Class
 
@@ -163,7 +163,7 @@ Public Class Structured_MultiSliceV : Inherits VBparent
 
         dst2 = task.color.Clone
         dst2.SetTo(cv.Scalar.White, sliceMask)
-        label2 = top2D.label2
+        labels(3) = top2D.labels(3)
     End Sub
 End Class
 
@@ -254,8 +254,8 @@ End Class
 Public Class Structured_MultiSlicePolygon : Inherits VBparent
     Dim multi As New Structured_MultiSlice
     Public Sub New()
-        label1 = "Input to FindContours"
-        label2 = "ApproxPolyDP 4-corner object from FindContours input"
+        labels(2) = "Input to FindContours"
+        labels(3) = "ApproxPolyDP 4-corner object from FindContours input"
 
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Max number of sides in the identified polygons", 3, 100, 4)
@@ -318,7 +318,7 @@ Public Class Structured_SliceXPlot : Inherits VBparent
         dst2 = task.color.Clone
         dst2.SetTo(cv.Scalar.White, depthMask)
 
-        label2 = "Peak histogram count (" + Format(maxVal, "#0") + ") at " + Format(filterZ, "#0.00") + " meters +-" + Format(5 / dst2.Height / task.maxZ, "#0.00") + " m"
+        labels(3) = "Peak histogram count (" + Format(maxVal, "#0") + ") at " + Format(filterZ, "#0.00") + " meters +-" + Format(5 / dst2.Height / task.maxZ, "#0.00") + " m"
         setTrueText("Use the mouse to move the slice.", 10, dst2.Height * 3 / 4, 3)
     End Sub
 End Class
@@ -358,7 +358,7 @@ Public Class Structured_SliceYPlot : Inherits VBparent
             dst2 = task.color.Clone
             dst2.SetTo(cv.Scalar.White, depthMask)
             Dim pixelsPerMeter = dst2.Width / task.maxZ
-            label2 = "Peak histogram count (" + Format(maxVal, "#0") + ") at " + Format(filterZ, "#0.00") + " meters +-" + Format(5 / pixelsPerMeter, "#0.00") + " m"
+            labels(3) = "Peak histogram count (" + Format(maxVal, "#0") + ") at " + Format(filterZ, "#0.00") + " meters +-" + Format(5 / pixelsPerMeter, "#0.00") + " m"
         End If
         setTrueText("Use the mouse to move the slice.", 10, dst2.Height * 3 / 4, 3)
     End Sub
@@ -481,7 +481,7 @@ Public Class Structured_SliceH : Inherits VBparent
     Public Sub New()
         cushionSlider = findSlider("Structured Depth slice thickness in pixels")
 
-        label2 = "Yellow bar is ceiling.  Yellow line is camera level."
+        labels(3) = "Yellow bar is ceiling.  Yellow line is camera level."
         task.desc = "Find and isolate planes (floor and ceiling) in a side view histogram."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -506,10 +506,10 @@ Public Class Structured_SliceH : Inherits VBparent
         sliceMask = depthMask
         sliceMask.SetTo(0, task.noDepthMask)
 
-        label1 = "At offset " + CStr(yCoordinate) + " y = " + Format((maxVal + minVal) / 2, "#0.00") + " with " +
+        labels(2) = "At offset " + CStr(yCoordinate) + " y = " + Format((maxVal + minVal) / 2, "#0.00") + " with " +
                  Format(Math.Abs(maxVal - minVal) * 100, "0.00") + " cm width"
         dst2.SetTo(cv.Scalar.White, sliceMask)
-        label2 = tView.label2
+        labels(3) = tView.labels(3)
 
         dst3 = If(tView.dst2.Channels = 1, tView.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR), tView.dst2)
         yPlaneOffset = If(yCoordinate < dst3.Height - cushion, CInt(yCoordinate), dst3.Height - cushion - 1)
@@ -555,12 +555,12 @@ Public Class Structured_SliceV : Inherits VBparent
         sliceMask = depthMask
         sliceMask.SetTo(0, task.noDepthMask)
 
-        label1 = "At offset " + CStr(xCoordinate) + " x = " + Format((maxVal + minVal) / 2, "#0.00") + " with " +
+        labels(2) = "At offset " + CStr(xCoordinate) + " x = " + Format((maxVal + minVal) / 2, "#0.00") + " with " +
                  Format(Math.Abs(maxVal - minVal) * 100, "0.00") + " cm width"
 
         dst2 = task.color.Clone
         dst2.SetTo(cv.Scalar.White, sliceMask)
-        label2 = tView.label2
+        labels(3) = tView.labels(3)
 
         dst3 = If(tView.dst3.Channels = 1, tView.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR), tView.dst3)
         dst3.Circle(New cv.Point(task.topCameraPoint.X, dst3.Height), task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
@@ -604,12 +604,12 @@ Public Class Structured_SliceVStable : Inherits VBparent
         sliceMask = depthMask
         sliceMask.SetTo(0, task.noDepthMask)
 
-        label1 = "At offset " + CStr(xCoordinate) + " x = " + Format((maxVal + minVal) / 2, "#0.00") + " with " +
+        labels(2) = "At offset " + CStr(xCoordinate) + " x = " + Format((maxVal + minVal) / 2, "#0.00") + " with " +
                  Format(Math.Abs(maxVal - minVal) * 100, "0.00") + " cm width"
 
         dst2 = task.color.Clone
         dst2.SetTo(cv.Scalar.White, sliceMask)
-        label2 = top2D.label2
+        labels(3) = top2D.labels(3)
     End Sub
 End Class
 
@@ -624,8 +624,8 @@ Public Class Structured_MouseSlice : Inherits VBparent
     Dim vSlice As New Structured_SliceV
     Dim line As New Line_Basics
     Public Sub New()
-        label1 = "Center Slice in yellow"
-        label2 = "White = SliceV output, Red Dot is avgPt"
+        labels(2) = "Center Slice in yellow"
+        labels(3) = "White = SliceV output, Red Dot is avgPt"
         task.desc = "Find the vertical center line with accurate depth data.."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -786,7 +786,7 @@ Public Class Structured_Cloud : Inherits VBparent
         Next
         Dim rect = New cv.Rect(0, 0, xLines, yLines)
         data = dst3(rect).Clone
-        label1 = "Structured_Cloud with " + CStr(yLines) + " rows " + CStr(xLines) + " columns"
+        labels(2) = "Structured_Cloud with " + CStr(yLines) + " rows " + CStr(xLines) + " columns"
         dst2 = dst3(rect).Resize(dst2.Size, 0, 0, cv.InterpolationFlags.Nearest)
     End Sub
 End Class

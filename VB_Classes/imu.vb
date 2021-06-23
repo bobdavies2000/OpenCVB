@@ -40,7 +40,7 @@ Public Class IMU_Basics : Inherits VBparent
                                   " Motion (rads/sec) pitch = " + Format(task.IMU_AngularVelocity.X, "#0.00") +
                                   " Yaw = " + Format(task.IMU_AngularVelocity.Y, "#0.00") + " Roll = " + Format(task.IMU_AngularVelocity.Z, "#0.00"))
         End If
-        label1 = "theta.x " + Format(theta.X, "#0.000") + " y " + Format(theta.Y, "#0.000") + " z " + Format(theta.Z, "#0.000")
+        labels(2) = "theta.x " + Format(theta.X, "#0.000") + " y " + Format(theta.Y, "#0.000") + " z " + Format(theta.Z, "#0.000")
         flow.Run(Nothing)
     End Sub
 End Class
@@ -55,8 +55,8 @@ Public Class IMU_Stabilizer : Inherits VBparent
     Public Sub New()
         ReDim kalman.kInput(3 - 1)
         task.desc = "Stabilize the image with the IMU data."
-        label1 = "IMU Stabilize (Move Camera + Select Kalman)"
-        label2 = "Difference from Color Image"
+        labels(2) = "IMU Stabilize (Move Camera + Select Kalman)"
+        labels(3) = "Difference from Color Image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim borderCrop = 5
@@ -115,7 +115,7 @@ Public Class IMU_Magnetometer : Inherits VBparent
                                                   "Uncalibrated IMU Magnetometer reading:  z = " + CStr(task.IMU_Magnetometer.Z))
             plot.plotData = New cv.Scalar(task.IMU_Magnetometer.X, task.IMU_Magnetometer.Y, task.IMU_Magnetometer.Z)
             plot.Run(Nothing)
-            label2 = "x (blue) = " + Format(plot.plotData.Item(0), "#0.00") + " y (green) = " + Format(plot.plotData.Item(1), "#0.00") +
+            labels(3) = "x (blue) = " + Format(plot.plotData.Item(0), "#0.00") + " y (green) = " + Format(plot.plotData.Item(1), "#0.00") +
                           " z (red) = " + Format(plot.plotData.Item(2), "#0.00")
         End If
     End Sub
@@ -169,7 +169,7 @@ Public Class IMU_FrameTime : Inherits VBparent
             sliders.setupTrackBar(0, "Minimum IMU to Capture time (ms)", 1, 10, 2)
             sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 20)
         End If
-        label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
+        labels(3) = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         task.desc = "Use the IMU timestamp to estimate the delay from IMU capture to image capture.  Just an estimate!"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -263,7 +263,7 @@ Public Class IMU_HostFrameTimes : Inherits VBparent
             sliders.setupTrackBar(0, "Minimum Host interrupt delay (ms)", 1, 10, 4)
             sliders.setupTrackBar(1, "Number of Plot Values", 5, 30, 20)
         End If
-        label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
+        labels(3) = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         task.desc = "Use the Host timestamp to estimate the delay from image capture to host interrupt.  Just an estimate!"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -340,8 +340,8 @@ Public Class IMU_TotalDelay : Inherits VBparent
         plot.minScale = 0
         plot.plotCount = 4
 
-        label1 = "Timing data - total (white) right image"
-        label2 = "IMU (blue) Host (green) Latency est. (red) - all in ms"
+        labels(2) = "Timing data - total (white) right image"
+        labels(3) = "IMU (blue) Host (green) Latency est. (red) - all in ms"
         task.desc = "Estimate time from IMU capture to host processing to allow predicting effect of camera motion."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -551,7 +551,7 @@ Public Class IMU_MotionPlot : Inherits VBparent
     Dim plot As New Plot_OverTime
     Public Sub New()
         plot.plotCount = 3
-        label1 = "Yaw (blue), pitch (green), and roll (roll) X 1000"
+        labels(2) = "Yaw (blue), pitch (green), and roll (roll) X 1000"
         task.desc = "Plot the motion of the camera based on the IMU data"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

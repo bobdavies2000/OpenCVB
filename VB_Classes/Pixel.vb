@@ -158,8 +158,8 @@ End Class
 Public Class Pixel_GetSet : Inherits VBparent
     Dim mats As New Mat_4Click
     Public Sub New()
-        label1 = "Time to copy using get/set,Generic Index, Marshal Copy"
-        label2 = "Click any quadrant at left to view it below"
+        labels(2) = "Time to copy using get/set,Generic Index, Marshal Copy"
+        labels(3) = "Click any quadrant at left to view it below"
         task.desc = "Perform Pixel-level operations in 3 different ways to measure efficiency."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -308,7 +308,7 @@ Public Class Pixel_Sampler : Inherits VBparent
             For i = 0 To random.Points2f.Count - 1
                 dst2.Circle(random.Points2f(i), task.dotSize, cv.Scalar.White, -1, task.lineType)
             Next
-            label1 = "Dominant gray value = " + CStr(dominantGray)
+            labels(2) = "Dominant gray value = " + CStr(dominantGray)
             setTrueText("Draw in the image to select a region for testing.", 10, 200, 3)
         End If
     End Sub
@@ -324,7 +324,7 @@ Public Class Pixel_Unstable : Inherits VBparent
     Public unstablePixels As New cv.Mat
     Public Sub New()
         If sliders.Setup(caller) Then sliders.setupTrackBar(0, "KMeans clustered difference threshold", 1, 50, 5)
-        label1 = "KMeans_Basics output"
+        labels(2) = "KMeans_Basics output"
         task.desc = "Detect where pixels are unstable"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 3
@@ -372,7 +372,7 @@ Public Class Pixel_Unstable : Inherits VBparent
         Dim avg = pixelCounts.Average()
         Dim sum = pixelCounts.Sum(Function(d As Integer) Math.Pow(d - avg, 2))
         Dim stdev = Math.Sqrt(sum / pixelCounts.Count)
-        label2 = "Unstable pixel count = " + Format(avg, "###,##0") + "    stdev = " + Format(stdev, "0.0")
+        labels(3) = "Unstable pixel count = " + Format(avg, "###,##0") + "    stdev = " + Format(stdev, "0.0")
         lastImage = dst2.Clone
     End Sub
 End Class

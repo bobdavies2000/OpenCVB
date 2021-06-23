@@ -39,7 +39,7 @@ Public Class Histogram_Basics : Inherits VBparent
         If standalone Or task.intermediateName = caller Then plotHist.backColor = splitColors(splitIndex)
         plotHist.Run(src)
         dst2 = plotHist.dst2
-        label1 = colorName + " histogram, bins = " + CStr(task.histogramBins)
+        labels(2) = colorName + " histogram, bins = " + CStr(task.histogramBins)
     End Sub
 End Class
 
@@ -90,7 +90,7 @@ Public Class Histogram_Graph : Inherits VBparent
         If standalone Or plotRequested Then
             plotMaxValue = Math.Round(maxVal / 1000, 0) * 1000 + 1000 ' smooth things out a little for the scale below
             AddPlotScale(dst2, 0, plotMaxValue, task.fontSize * 2)
-            label1 = "Histogram for src image (default color) - " + CStr(bins) + " bins"
+            labels(2) = "Histogram for src image (default color) - " + CStr(bins) + " bins"
         End If
     End Sub
 End Class
@@ -219,7 +219,7 @@ Public Class Histogram_2D_XZ_YZ : Inherits VBparent
             sliders.setupTrackBar(2, "Histogram Z bins", 1, 200, 100)
         End If
         task.desc = "Create a 2D histogram for depth in XZ and YZ."
-        label2 = "Left is XZ (Top View) and Right is YZ (Side View)"
+        labels(3) = "Left is XZ (Top View) and Right is YZ (Side View)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim xbins = sliders.trackbar(0).Value
@@ -258,7 +258,7 @@ Public Class Histogram_EqualizeColor : Inherits VBparent
     Public channel = 2
     Public Sub New()
         task.desc = "Create an equalized histogram of the color image."
-        label1 = "Image Enhanced with Equalized Histogram"
+        labels(2) = "Image Enhanced with Equalized Histogram"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim rgb(2) As cv.Mat
@@ -280,7 +280,7 @@ Public Class Histogram_EqualizeColor : Inherits VBparent
 
             mats.Run(src)
             dst3 = mats.dst2
-            label2 = "Before (top) and After Red Histogram"
+            labels(3) = "Before (top) and After Red Histogram"
 
             cv.Cv2.Merge(rgbEq, dst2)
         End If
@@ -298,8 +298,8 @@ Public Class Histogram_EqualizeGray : Inherits VBparent
     Public histogram As New Histogram_Basics
     Dim mats As New Mat_2to1
     Public Sub New()
-        label1 = "Input image"
-        label2 = "top is before and bottom is after EqualizeHist"
+        labels(2) = "Input image"
+        labels(3) = "top is before and bottom is after EqualizeHist"
         task.desc = "Create an equalized histogram of the grayscale image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -322,7 +322,7 @@ End Class
 Public Class Histogram_Simple : Inherits VBparent
     Public plotHist As New Plot_Histogram
     Public Sub New()
-        label1 = "Histogram of the grayscale video stream"
+        labels(2) = "Histogram of the grayscale video stream"
         task.desc = "Build a simple and reusable histogram for grayscale images."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -359,7 +359,7 @@ Public Class Histogram_ColorsAndGray : Inherits VBparent
             check.Box(0).Checked = True
         End If
 
-        label2 = "Click any quadrant at left to view it below"
+        labels(3) = "Click any quadrant at left to view it below"
         task.desc = "Create a histogram of a normalized image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -396,7 +396,7 @@ Public Class Histogram_SmoothTopView2D : Inherits VBparent
     Dim setupTop As New PointCloud_SetupTop
     Dim stable As New Motion_MinMaxPointCloud
     Public Sub New()
-        label1 = "XZ (Top View)"
+        labels(2) = "XZ (Top View)"
         task.desc = "Create a 2D top view with stable depth data."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -429,7 +429,7 @@ Public Class Histogram_SmoothSideView2D : Inherits VBparent
     Dim setupSide As New PointCloud_SetupSide
     Dim stable As New Motion_MinMaxPointCloud
     Public Sub New()
-        label1 = "ZY (Side View)"
+        labels(2) = "ZY (Side View)"
         task.desc = "Create a 2D side view of stable depth data"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -460,8 +460,8 @@ Public Class Histogram_StableDepthClusters : Inherits VBparent
     Dim clusters As New Proximity_Clusters
     Dim motionSD As New Motion_MinMaxDepth
     Public Sub New()
-        label1 = "Histogram of stable depth"
-        label2 = "Backprojection of stable depth"
+        labels(2) = "Histogram of stable depth"
+        labels(3) = "Backprojection of stable depth"
         task.desc = "Use the stable depth to identify the depth_clusters using histogram valleys"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -488,7 +488,7 @@ Public Class Histogram_TopView2D : Inherits VBparent
     Public originalHistOutput As New cv.Mat
     Public markers(2 - 1) As cv.Point2f
     Public Sub New()
-        label1 = "XZ (Top View)"
+        labels(2) = "XZ (Top View)"
         task.desc = "Create a 2D top view for XZ histogram of depth - NOTE: x and y scales are the same"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -520,7 +520,7 @@ Public Class Histogram_SideView2D : Inherits VBparent
     Public originalHistOutput As New cv.Mat
     Public frustrumAdjust As Single
     Public Sub New()
-        label1 = "ZY (Side View)"
+        labels(2) = "ZY (Side View)"
         task.desc = "Create a 2D side view for ZY histogram of depth - NOTE: x and y scales are the same"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -547,7 +547,7 @@ End Class
 Public Class Histogram_ViewIntersections : Inherits VBparent
     Dim histCO As New Histogram_ViewObjects
     Public Sub New()
-        label1 = "Yellow is largest intersection.  dst3 = point cloud"
+        labels(2) = "Yellow is largest intersection.  dst3 = point cloud"
         task.desc = "Find the intersections of the rectangles found in the Histogram_ConcentrationObjects"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -646,7 +646,7 @@ Public Class Histogram_ViewObjects : Inherits VBparent
             maxZ = task.maxZ * (r.X + r.Width) / w
             If standalone Or task.intermediateName = caller Then setTrueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset)
         Next
-        label1 = CStr(flood.rects.Count) + " objects were identified in the side view"
+        labels(2) = CStr(flood.rects.Count) + " objects were identified in the side view"
 
         flood.Run(dst3)
         dst3 = flood.dst2
@@ -660,7 +660,7 @@ Public Class Histogram_ViewObjects : Inherits VBparent
             If standalone Or task.intermediateName = caller Then setTrueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset, 3)
         Next
 
-        label2 = CStr(flood.rects.Count) + " objects identified.  Largest is yellow."
+        labels(3) = CStr(flood.rects.Count) + " objects identified.  Largest is yellow."
     End Sub
 End Class
 
@@ -740,7 +740,7 @@ Public Class Histogram_Depth : Inherits VBparent
             plotHist.Run(src)
             dst2 = plotHist.dst2
         End If
-        label1 = "Histogram Depth: " + Format(plotHist.minRange / 1000, "0.0") + "m to " + Format(plotHist.maxRange / 1000, "0.0") + " m"
+        labels(2) = "Histogram Depth: " + Format(plotHist.minRange / 1000, "0.0") + "m to " + Format(plotHist.maxRange / 1000, "0.0") + " m"
     End Sub
 End Class
 
@@ -769,7 +769,7 @@ Public Class Histogram_TopData : Inherits VBparent
         histOutput.Row(0).SetTo(0) ' this removes the samples for the areas with no depth.
 
         dst2 = histOutput.Flip(cv.FlipMode.X).Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).Resize(dst2.Size)
-        label1 = "Left x = " + Format(-task.maxX, "#0.00") + " Right X = " + Format(task.maxX, "#0.00") + " x and y scales differ!"
+        labels(2) = "Left x = " + Format(-task.maxX, "#0.00") + " Right X = " + Format(task.maxX, "#0.00") + " x and y scales differ!"
     End Sub
 End Class
 
@@ -797,7 +797,7 @@ Public Class Histogram_SideData : Inherits VBparent
         histOutput.Col(0).SetTo(0) ' this removes the samples for the areas with no depth.
 
         dst2 = histOutput.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary)
-        label1 = "Top y = " + Format(-task.maxY, "#0.00") + " Bottom Y = " + Format(task.maxY, "#0.00") + " x and y scales differ!"
+        labels(2) = "Top y = " + Format(-task.maxY, "#0.00") + " Bottom Y = " + Format(task.maxY, "#0.00") + " x and y scales differ!"
     End Sub
 End Class
 
@@ -812,8 +812,8 @@ Public Class Histogram_BothViews : Inherits VBparent
     Dim sideview As New Histogram_SideData
     Dim topview As New Histogram_TopData
     Public Sub New()
-        label1 = "Side View Histogram"
-        label2 = "Top View Histogram"
+        labels(2) = "Side View Histogram"
+        labels(3) = "Top View Histogram"
         task.desc = "Show both the side and top histograms."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -903,7 +903,7 @@ Public Class Histogram_Peaks : Inherits VBparent
                 startLut = endLut + 1
             Next
             dst3 = src.LUT(myLut)
-            label1 = "Grayscale image: " + CStr(peaks.Count) + " peaks (yellow), valley=blue"
+            labels(2) = "Grayscale image: " + CStr(peaks.Count) + " peaks (yellow), valley=blue"
         End If
     End Sub
 End Class
@@ -973,7 +973,7 @@ Public Class Histogram_PeakMax : Inherits VBparent
     Dim hist As New Histogram_Basics
     Public Sub New()
         task.desc = "Create a histogram and back project into the image the grayscale color with the highest occurance."
-        label2 = "Grayscale Histogram"
+        labels(3) = "Grayscale Histogram"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         task.useKalman = False
@@ -995,7 +995,7 @@ Public Class Histogram_PeakMax : Inherits VBparent
         src.CopyTo(tmp, mask)
         dst2 = tmp.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        label1 = "BackProjection of most frequent gray pixel"
+        labels(2) = "BackProjection of most frequent gray pixel"
         dst3.Rectangle(New cv.Rect(barWidth * histindex, 0, barWidth, dst2.Height), cv.Scalar.Yellow, 1)
     End Sub
 End Class

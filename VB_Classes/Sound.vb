@@ -250,7 +250,7 @@ Public Class Sound_Display : Inherits VBparent
                     dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * maxVal / absMaxVal)), cv.Scalar.Red, task.lineWidth)
                     dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + Math.Abs(minVal) * halfHeight / -absMinVal)), cv.Scalar.Gray, task.lineWidth)
                 Next
-                label1 = CStr(CInt(soundSource.pcmDuration)) + " seconds displayed with Max Absolute Value"
+                labels(2) = CStr(CInt(soundSource.pcmDuration)) + " seconds displayed with Max Absolute Value"
             Case 1
                 For i = 0 To dst2.Width - 1
                     Dim rect = New cv.Rect(0, i * samplesperLine, 1, samplesperLine)
@@ -262,7 +262,7 @@ Public Class Sound_Display : Inherits VBparent
                     dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * nextVal / absMaxVal)), cv.Scalar.Red, task.lineWidth)
                     dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + halfHeight * nextVal / -absMinVal)), cv.Scalar.Gray, task.lineWidth)
                 Next
-                label1 = CStr(CInt(soundSource.pcmDuration)) + " seconds displayed with Max RMS Value"
+                labels(2) = CStr(CInt(soundSource.pcmDuration)) + " seconds displayed with Max RMS Value"
             Case 2
                 For i = 0 To dst2.Width - 1
                     Dim rect = New cv.Rect(0, i * samplesperLine, 1, samplesperLine)
@@ -285,7 +285,7 @@ Public Class Sound_Display : Inherits VBparent
                     dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight - halfHeight * nextVal / absMaxVal)), cv.Scalar.Red, task.lineWidth)
                     dst2.Line(New cv.Point(i, halfHeight), New cv.Point(i, CInt(halfHeight + halfHeight * nextVal / -absMinVal)), cv.Scalar.Gray, task.lineWidth)
                 Next
-                label1 = CStr(CInt(soundSource.pcmDuration)) + " seconds displayed with Scaled Average"
+                labels(2) = CStr(CInt(soundSource.pcmDuration)) + " seconds displayed with Scaled Average"
         End Select
         sliderPercent = If(fileStarted, (Now - starttime).TotalSeconds / soundSource.pcmduration, 0)
         ' when playing back an audio file, restart at the beginning when it is over...

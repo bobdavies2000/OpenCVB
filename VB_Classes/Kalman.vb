@@ -135,8 +135,8 @@ Public Class Kalman_Compare : Inherits VBparent
         kPlot.plotCount = 3
         kPlot.topBottomPad = 20
 
-        label1 = "Kalman input: mean values for RGB"
-        label2 = "Kalman output: smoothed mean values for RGB"
+        labels(2) = "Kalman input: mean values for RGB"
+        labels(3) = "Kalman output: smoothed mean values for RGB"
         task.desc = "Use this kalman filter to predict the next value."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -199,7 +199,7 @@ Public Class Kalman_RotatingPoint : Inherits VBparent
         dst2.Line(New cv.Point(center.X + d, center.Y - d), New cv.Point(center.X - d, center.Y + d), color, task.lineWidth, task.lineType)
     End Sub
     Public Sub New()
-        label1 = "Estimate Yellow < Real Red (if working)"
+        labels(2) = "Estimate Yellow < Real Red (if working)"
 
         cv.Cv2.Randn(kState, New cv.Scalar(0), cv.Scalar.All(0.1))
         kf.TransitionMatrix = New cv.Mat(2, 2, cv.MatType.CV_32F, New Single() {1, 1, 0, 1})
@@ -256,7 +256,7 @@ Public Class Kalman_MousePredict : Inherits VBparent
         ReDim kalman.kOutput(2 - 1)
 
         lineWidth = dst2.Width / 300
-        label1 = "Red is real mouse, white is prediction"
+        labels(2) = "Red is real mouse, white is prediction"
         task.desc = "Use kalman filter to predict the next mouse location."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -287,7 +287,7 @@ Public Class Kalman_CVMat : Inherits VBparent
     Public Sub New()
         ReDim basics.kInput(4 - 1)
         input = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
-        If standalone Then label1 = "Rectangle moves smoothly to random locations"
+        If standalone Then labels(2) = "Rectangle moves smoothly to random locations"
         task.desc = "Use Kalman to stabilize a set of values such as a cv.rect or cv.Mat"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -353,8 +353,8 @@ Public Class Kalman_ImageSmall : Inherits VBparent
     Public Sub New()
         resize = New Resize_Percentage()
 
-        label1 = "The small image is processed by the Kalman filter"
-        label2 = "Mask of the smoothed image minus original"
+        labels(2) = "The small image is processed by the Kalman filter"
+        labels(3) = "Mask of the smoothed image minus original"
         task.desc = "Resize the image to allow the Kalman filter to process the whole image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -383,8 +383,8 @@ End Class
 Public Class Kalman_DepthSmall : Inherits VBparent
     Dim kalman As New Kalman_ImageSmall
     Public Sub New()
-        label1 = "Mask of non-zero depth after Kalman smoothing"
-        label2 = "Mask of the smoothed image minus original"
+        labels(2) = "Mask of non-zero depth after Kalman smoothing"
+        labels(3) = "Mask of the smoothed image minus original"
         task.desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -407,8 +407,8 @@ Public Class Kalman_Depth32f : Inherits VBparent
         resize = New Resize_Percentage()
         resize.sliders.trackbar(0).Value = 4
 
-        label1 = "Mask of non-zero depth after Kalman smoothing"
-        label2 = "Difference from original depth"
+        labels(2) = "Mask of non-zero depth after Kalman smoothing"
+        labels(3) = "Difference from original depth"
         task.desc = "Use a resized depth Mat to find where depth is decreasing (getting closer.)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -464,8 +464,8 @@ Public Class Kalman_Single : Inherits VBparent
             plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
             plot.Run(Nothing)
             dst3 = plot.dst2
-            label1 = "Mean of the grayscale image is predicted"
-            label2 = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
+            labels(2) = "Mean of the grayscale image is predicted"
+            labels(3) = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
         End If
     End Sub
 End Class
@@ -540,7 +540,7 @@ Public Class Kalman_VB : Inherits VBparent
             sliders.setupTrackBar(7, "Simulated Bias", -100, 100, 0)
             sliders.setupTrackBar(8, "Simulated Scale", 0, 100, 0)
         End If
-        label1 = "Use first slider in the options to test the algorithm.  The other sliders in the options visualize the impact."
+        labels(2) = "Use first slider in the options to test the algorithm.  The other sliders in the options visualize the impact."
         task.desc = "A native VB Kalman filter"
     End Sub
     Public Sub State_Update(ByVal q_m As Single)
@@ -615,7 +615,7 @@ Public Class Kalman_VB : Inherits VBparent
         If KalmanDiff > sliders.trackbar(5).Maximum Then KalmanDiff = sliders.trackbar(5).Maximum
         sliders.trackbar(5).Value = KalmanDiff
 
-        setTrueText(label1)
+        setTrueText(labels(2))
     End Sub
 End Class
 
@@ -648,7 +648,7 @@ Public Class Kalman_VB_Basics : Inherits VBparent
             sliders.setupTrackBar(2, "Process Covariance X10000", 0, 10000, 10)
             sliders.setupTrackBar(3, "pDot entry X1000", 0, 1000, 300)
         End If
-        label1 = "Blue = gray mean, green = kalman, red = kalman avg"
+        labels(2) = "Blue = gray mean, green = kalman, red = kalman avg"
         task.desc = "Build a generic kalman filter based on Kalman_VB"
     End Sub
     Public Sub State_Update(ByVal q_m As Single)

@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Public Class IntrinsicsLeft_Basics : Inherits VBparent
     Public Sub New()
         task.desc = "Show the depth camera intrinsicsLeft."
-        label2 = "ppx/ppy location"
+        labels(3) = "ppx/ppy location"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.parms.intrinsicsLeft.coeffs Is Nothing Then

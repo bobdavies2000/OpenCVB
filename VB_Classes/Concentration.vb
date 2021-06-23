@@ -17,8 +17,8 @@ Public Class Concentration_Basics : Inherits VBparent
         resizeSlider = findSlider("Resize Factor x100")
         resizeSlider.Value = 10
 
-        label1 = "SideView"
-        label2 = "TopView"
+        labels(2) = "SideView"
+        labels(3) = "TopView"
         task.desc = "Highlight a fixed number of histogram projections where concentrations are highest"
     End Sub
     Public Sub plotHighlights(histOutput As cv.Mat, dst As cv.Mat, sideRun As Boolean)
@@ -127,8 +127,8 @@ Public Class Concentration_Peaks : Inherits VBparent
         plot.plotCount = 1
         plot.minScale = 0
 
-        label1 = "SideView, TopView, plot - Grab Y rotate slider..."
-        label2 = "Average is blue"
+        labels(2) = "SideView, TopView, plot - Grab Y rotate slider..."
+        labels(3) = "Average is blue"
         task.desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -164,7 +164,7 @@ Public Class Concentration_Peaks : Inherits VBparent
             rotateSlider.value = -90
         End If
 
-        label2 = "Peak average = " + CStr(CInt(maxAverage)) + " at " + CStr(peakRotation) + " degrees"
+        labels(3) = "Peak average = " + CStr(CInt(maxAverage)) + " at " + CStr(peakRotation) + " degrees"
     End Sub
 End Class
 
@@ -182,7 +182,7 @@ Public Class Concentration_PeakLines : Inherits VBparent
     Public Sub New()
         histC.drawLines = True
         histC.markerColor = cv.Scalar.Gray
-        label1 = "Grab the Y-axis rotation slider to manually review peaks."
+        labels(2) = "Grab the Y-axis rotation slider to manually review peaks."
         task.desc = "Rotate around Y-axis to find peak line length"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -205,7 +205,7 @@ Public Class Concentration_PeakLines : Inherits VBparent
             End If
         End If
 
-        label2 = "Longest line = " + CStr(maxLength) + " pixels at " + CStr(If(optimalRotation = -91, peakRotation, optimalRotation)) + " degrees"
+        labels(3) = "Longest line = " + CStr(maxLength) + " pixels at " + CStr(If(optimalRotation = -91, peakRotation, optimalRotation)) + " degrees"
 
         Static saveRotation = rotateSlider.value
         Static automateRotate As Boolean = True

@@ -41,7 +41,7 @@ Public Class HOG_Basics : Inherits VBparent
         Dim stride = sliders.trackbar(1).Value
         Dim scale = sliders.trackbar(2).Value / 1000
         Dim found() As cv.Rect = hog.DetectMultiScale(src, threshold, New cv.Size(stride, stride), New cv.Size(24, 16), scale, 2)
-        label1 = String.Format("{0} region(s) found", found.Length)
+        labels(2) = String.Format("{0} region(s) found", found.Length)
         src.CopyTo(dst2)
         drawFoundRectangles(dst2, found)
 
@@ -50,10 +50,10 @@ Public Class HOG_Basics : Inherits VBparent
             drawFoundRectangles(dst3, found)
             If found.Length > 0 Then
                 staticImageProcessed = True
-                label2 = String.Format("{0} region(s) found", found.Length)
+                labels(3) = String.Format("{0} region(s) found", found.Length)
                 sliders.trackbar(1).Value = 30 ' this will speed up the frame rate.  This algorithm is way too slow!  It won't find much at this rate...
             Else
-                label2 = "Try adjusting slider bars."
+                labels(3) = "Try adjusting slider bars."
             End If
         End If
     End Sub

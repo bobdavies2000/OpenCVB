@@ -28,7 +28,7 @@ Public Class Sift_Basics : Inherits VBparent
         doubleSize(New cv.Rect(0, 0, dst2.Width, dst2.Height)).CopyTo(dst2)
         doubleSize(New cv.Rect(dst2.Width, 0, dst2.Width, dst2.Height)).CopyTo(dst3)
 
-        label1 = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
+        labels(2) = If(radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
     End Sub
 End Class
 
@@ -75,6 +75,6 @@ Public Class Sift_Basics_MT : Inherits VBparent
         dst2 = output(New cv.Rect(0, 0, src.Width, src.Height))
         dst3 = output(New cv.Rect(src.Width, 0, src.Width, src.Height))
 
-        label1 = If(siftBasics.radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
+        labels(2) = If(siftBasics.radio.check(0).Checked, "BF Matcher output", "Flann Matcher output")
     End Sub
 End Class

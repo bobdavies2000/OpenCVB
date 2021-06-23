@@ -50,8 +50,8 @@ Public Class Binarize_OTSU : Inherits VBparent
             radio.check(0).Checked = True
         End If
 
-        label1 = "Threshold 1) binary 2) Binary+OTSU 3) OTSU 4) OTSU+Blur"
-        label2 = "Histograms correspond to images on the left"
+        labels(2) = "Threshold 1) binary 2) Binary+OTSU 3) OTSU 4) OTSU+Blur"
+        labels(3) = "Histograms correspond to images on the left"
         task.desc = "Binarize an image using Threshold with OTSU."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -61,11 +61,11 @@ Public Class Binarize_OTSU : Inherits VBparent
         binarize.meanScalar = cv.Cv2.Mean(input)
         Static frm = findfrm(caller + " Radio Options")
         For i = 0 To frm.check.length - 1
-            If frm.check(i).Checked Then label1 = radio.check(i).Text
+            If frm.check(i).Checked Then labels(2) = radio.check(i).Text
         Next
 
         binarize.useBlur = False
-        Select Case label1
+        Select Case labels(2)
             Case radio.check(0).Text
                 binarize.thresholdType = cv.ThresholdTypes.Binary
             Case radio.check(1).Text
@@ -94,8 +94,8 @@ Public Class Binarize_Niblack_Sauvola : Inherits VBparent
             sliders.setupTrackBar(3, "Sauvola r", 1, 100, 64)
         End If
         task.desc = "Binarize an image using Niblack and Sauvola"
-        label1 = "Binarize Niblack"
-        label2 = "Binarize Sauvola"
+        labels(2) = "Binarize Niblack"
+        labels(3) = "Binarize Sauvola"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim kernelSize = sliders.trackbar(0).Value
@@ -123,8 +123,8 @@ Public Class Binarize_Niblack_Nick : Inherits VBparent
             sliders.setupTrackBar(2, "Nick k", -1000, 1000, 100)
         End If
         task.desc = "Binarize an image using Niblack and Nick"
-        label1 = "Binarize Niblack"
-        label2 = "Binarize Nick"
+        labels(2) = "Binarize Niblack"
+        labels(3) = "Binarize Nick"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim kernelSize = sliders.trackbar(0).Value
@@ -151,7 +151,7 @@ Public Class Binarize_Bernson : Inherits VBparent
             sliders.setupTrackBar(1, "Contrast min", 0, 255, 50)
             sliders.setupTrackBar(2, "bg Threshold", 0, 255, 100)
         End If
-        label1 = "Binarize Bernson (Draw Enabled)"
+        labels(2) = "Binarize Bernson (Draw Enabled)"
 
         task.drawRect = New cv.Rect(100, 100, 100, 100)
         task.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
@@ -186,7 +186,7 @@ Public Class Binarize_Bernson_MT : Inherits VBparent
             sliders.setupTrackBar(2, "bg Threshold", 0, 255, 100)
         End If
         task.desc = "Binarize an image using Bernson.  Draw on image (because Bernson is so slow)."
-        label1 = "Binarize Bernson"
+        labels(2) = "Binarize Bernson"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static kernelSlider = findSlider("Kernel Size")
@@ -224,8 +224,8 @@ Public Class Binarize_Reduction : Inherits VBparent
         basics = New Binarize_Basics
         findRadio("Use bitwise reduction").Checked = True
         findSlider("Reduction factor").Value = 256
-        label1 = "Binarize output from reduction"
-        label2 = "Binarize Basics Output"
+        labels(2) = "Binarize output from reduction"
+        labels(3) = "Binarize Basics Output"
         task.desc = "Binarize an image using reduction"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -279,7 +279,7 @@ Public Class Binarize_Recurse : Inherits VBparent
     Public mats As New Mat_4Click
     Public Sub New()
         binarize = New Binarize_Simple
-        label1 = "Lighter half, lightest, darker half, darkest"
+        labels(2) = "Lighter half, lightest, darker half, darkest"
         task.desc = "Binarize an image twice using masks"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -302,7 +302,7 @@ Public Class Binarize_Recurse : Inherits VBparent
         mats.Run(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
-        label2 = mats.label2
+        labels(3) = mats.labels(3)
     End Sub
 End Class
 

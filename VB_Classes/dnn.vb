@@ -27,7 +27,7 @@ Public Class DNN_Test : Inherits VBparent
             classNames(i) = classNames(i).Split(" ").Last
         Next
 
-        label2 = "Input Image"
+        labels(3) = "Input Image"
         task.desc = "Download and use a Caffe database"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -50,7 +50,7 @@ End Class
 Public Class DNN_Caffe_CS : Inherits VBparent
     Dim caffeCS As New CS_Classes.DNN
     Public Sub New()
-        label2 = "Input Image"
+        labels(3) = "Input Image"
         task.desc = "Download and use a Caffe database"
 
         Dim protoTxt = task.parms.homeDir + "Data/bvlc_googlenet.prototxt"
@@ -109,7 +109,7 @@ Public Class DNN_Basics : Inherits VBparent
             setTrueText("Caffe databases not found.  It should be in <OpenCVB_HomeDir>/Data.", 10, 100)
         End If
         task.desc = "Use OpenCV's dnn from Caffe file."
-        label1 = "Cropped Input Image - must be square!"
+        labels(2) = "Cropped Input Image - must be square!"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If dnnPrepared Then
@@ -126,7 +126,7 @@ Public Class DNN_Basics : Inherits VBparent
             Dim confidenceThreshold = sliders.trackbar(2).Value / 100
             Dim rows = src(crop).Rows
             Dim cols = src(crop).Cols
-            label2 = ""
+            labels(3) = ""
 
             Dim kPoints As New List(Of cv.Point)
             For i = 0 To detectionMat.Rows - 1
@@ -147,7 +147,7 @@ Public Class DNN_Basics : Inherits VBparent
                 Dim confidence = detectionMat.Get(Of Single)(i, 2)
                 If confidence > confidenceThreshold Then
                     Dim nextName = classNames(CInt(detectionMat.Get(Of Single)(i, 1)))
-                    label2 += nextName + " "  ' display the name of what we found.
+                    labels(3) += nextName + " "  ' display the name of what we found.
                     Dim vec = detectionMat.Get(Of cv.Vec4f)(i, 3)
                     rect = New cv.Rect(vec.Item0 * cols + crop.Left, vec.Item1 * rows + crop.Top, (vec.Item2 - vec.Item0) * cols, (vec.Item3 - vec.Item1) * rows)
                     rect = New cv.Rect(rect.X, rect.Y, Math.Min(dnnWidth, rect.Width), Math.Min(dnnHeight, rect.Height))
@@ -200,7 +200,7 @@ Public Class DNN_SuperRes : Inherits VBparent
     Public dnn = New DnnSuperResImpl("fsrcnn", 4)
     Public Sub New()
         task.drawRect = New cv.Rect(100, 100, 80, 60)
-        label1 = "Output of a resize using OpenCV"
+        labels(2) = "Output of a resize using OpenCV"
         task.desc = "Get better super-resolution through a DNN"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -228,7 +228,7 @@ Public Class DNN_SuperRes : Inherits VBparent
         dst3.SetTo(0)
         dst2(outRect) = src(r).Resize(New cv.Size(r.Width * multiplier, r.Height * multiplier))
         dnn.Upsample(src(r), dst3(outRect))
-        label2 = CStr(multiplier) + "X resize of selected area using DNN super resolution"
+        labels(3) = CStr(multiplier) + "X resize of selected area using DNN super resolution"
     End Sub
 End Class
 
@@ -241,8 +241,8 @@ End Class
 Public Class DNN_SuperResize : Inherits VBparent
     Dim super = New DNN_SuperRes
     Public Sub New()
-        label1 = "Super Res resized back to original size"
-        label2 = "dst3 = dst2 - src or no difference - honors original"
+        labels(2) = "Super Res resized back to original size"
+        labels(3) = "dst3 = dst2 - src or no difference - honors original"
         task.desc = "Compare superRes reduced to original size"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1

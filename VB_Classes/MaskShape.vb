@@ -4,8 +4,8 @@ Public Class MaskShape_Basics : Inherits VBparent
     Dim mats As New Mat_4to1
     Dim tView As New TimeView_Basics
     Public Sub New()
-        label1 = "Click the centroid to identify shape"
-        label2 = "Object in RGB, object mask, side view, top view"
+        labels(2) = "Click the centroid to identify shape"
+        labels(3) = "Object in RGB, object mask, side view, top view"
         task.desc = "Identify the shape of each object identified in RGB"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 5
@@ -42,7 +42,7 @@ Public Class MaskShape_Basics : Inherits VBparent
         Dim sum = pixelCounts.Sum(Function(d As Integer) Math.Pow(d - avg, 2))
         Dim stdev = Math.Sqrt(sum / pixelCounts.Count)
 
-        ' label1 = "Selected mask has stdev of " + Format(stdev, "#0") + " n=" + CStr(pixelCounts.Count) + " avg=" + Format(avg, "###,##0")
+        ' labels(2) = "Selected mask has stdev of " + Format(stdev, "#0") + " n=" + CStr(pixelCounts.Count) + " avg=" + Format(avg, "###,##0")
     End Sub
 End Class
 
@@ -66,7 +66,7 @@ Public Class MaskShape_Depth : Inherits VBparent
             dst2 = proxy.dst2
             dst3 = proxy.dst3
         End If
-        label1 = proxy.label1
-        label2 = proxy.label2
+        labels(2) = proxy.labels(2)
+        labels(3) = proxy.labels(3)
     End Sub
 End Class

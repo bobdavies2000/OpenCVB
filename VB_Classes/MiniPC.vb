@@ -20,7 +20,7 @@ Public Class MiniPC_Basics : Inherits VBparent
         dst2(rect) = split(2).ConvertScaleAbs(255)
         dst2.Rectangle(rect, cv.Scalar.White, 1)
         cv.Cv2.Merge(split, dst3)
-        label1 = "MiniPC is " + CStr(rect.Width) + "x" + CStr(rect.Height) + " total pixels = " + CStr(rect.Width * rect.Height)
+        labels(2) = "MiniPC is " + CStr(rect.Width) + "x" + CStr(rect.Height) + " total pixels = " + CStr(rect.Width * rect.Height)
     End Sub
 End Class
 
@@ -37,7 +37,7 @@ Public Class MiniPC_Rotate : Inherits VBparent
     Public angleY As Integer
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        label2 = "Side view after resize percentage"
+        labels(3) = "Side view after resize percentage"
         task.desc = "Create a histogram for the mini point cloud"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -101,8 +101,8 @@ Public Class MiniPC_RotateAngle : Inherits VBparent
 
         peak.angleY = -45
 
-        label1 = "peak dst2, peak dst3, changed mask, maxvalues history"
-        label2 = "Blue is mean*100, red is maxVal/100, green mask count"
+        labels(2) = "peak dst2, peak dst3, changed mask, maxvalues history"
+        labels(3) = "Blue is mean*100, red is maxVal/100, green mask count"
         task.desc = "Find a peak value in the side view histograms"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
