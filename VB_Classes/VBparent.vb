@@ -117,8 +117,8 @@ Public Class VBparent : Implements IDisposable
     Public Function validatePoint2f(p As cv.Point2f) As cv.Point2f
         If p.X < 0 Then p.X = 0
         If p.Y < 0 Then p.Y = 0
-        If p.X > dst2.Width Then p.X = dst2.Width - 1
-        If p.Y > dst2.Height Then p.Y = dst2.Height - 1
+        If p.X >= dst2.Width Then p.X = dst2.Width - 1
+        If p.Y >= dst2.Height Then p.Y = dst2.Height - 1
         Return p
     End Function
     Public Sub New()
