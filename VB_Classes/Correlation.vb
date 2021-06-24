@@ -52,7 +52,7 @@ Public Class Correlation_Basics : Inherits VBparent
 
         If plotX.Count > 0 Then
             Dim minx = plotX.Min, maxx = plotX.Max
-        Dim miny = plotY.Min, maxy = plotY.Max
+            Dim miny = plotY.Min, maxy = plotY.Max
             For i = 0 To plotX.Count - 1
                 Dim x = dst3.Width * (plotX(i) - minx) / (maxx - minx)
                 Dim y = dst3.Height * (plotY(i) - miny) / (maxy - miny)
