@@ -458,7 +458,9 @@ Public Class KMeans_CCompMasks : Inherits VBparent
             Next
         End If
 
-        dst3(rects(selectedIndex)) = masks(selectedIndex)
-        labels(3) = "Pixel count = " + CStr(sortMasks.ElementAt(selectedIndex).Key)
+        If masks.Count > 0 Then
+            dst3(rects(selectedIndex)) = masks(selectedIndex)
+            labels(3) = "Pixel count = " + CStr(sortMasks.ElementAt(selectedIndex).Key)
+        End If
     End Sub
 End Class

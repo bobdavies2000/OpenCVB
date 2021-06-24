@@ -2,10 +2,11 @@
 Public Class Correlation_Basics : Inherits VBparent
     Dim km As New KMeans_CCompMasks
     Dim corr As New MatchTemplate_Basics
+    Dim reduction As New Reduction_PointCloud
     Public Sub New()
         If standalone Then task.usingdst1 = True
         labels(1) = "Click to select a mask to analyze"
-        task.desc = "Compute a correlation for src rows"
+        task.desc = "Compute a correlation for src rows (See also: MatchTemplate.vb"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         km.Run(src)
@@ -13,6 +14,8 @@ Public Class Correlation_Basics : Inherits VBparent
         dst2 = km.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim r = km.rects(km.selectedIndex)
         dst2.Rectangle(r, cv.Scalar.Yellow, task.lineWidth)
+
+        ' reduction.Run(task.pointCloud)
         Dim split = task.pointCloud.Split()
 
         Dim row = task.mousePoint.Y

@@ -296,7 +296,7 @@ End Class
 
 
 Public Class BackProject_Reduction : Inherits VBparent
-    Dim basics As New Reduction_Basics
+    Dim reduction As New Reduction_Basics
     Dim hist As New BackProject_Basics
     Public Sub New()
         findRadio("Use bitwise reduction").Checked = True
@@ -306,11 +306,11 @@ Public Class BackProject_Reduction : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static reductionSlider = findSlider("Reduction factor")
 
-        basics.Run(src)
+        reduction.Run(src)
 
-        hist.Run(basics.dst2)
+        hist.Run(reduction.dst2)
         dst2 = hist.dst2.Clone
-        dst3 = basics.dst2
+        dst3 = reduction.dst2
         labels(2) = "Reduction = " + CStr(reductionSlider.value) + " and bins = " + CStr(task.histogramBins)
     End Sub
 End Class
@@ -322,7 +322,7 @@ End Class
 
 
 Public Class BackProject_ReductionLines : Inherits VBparent
-    Dim reduce As New Reduction_Basics
+    Dim reduction As New Reduction_Basics
     Dim lines As New Line_Basics
     Public Sub New()
         findRadio("Use bitwise reduction").Checked = True
@@ -333,8 +333,8 @@ Public Class BackProject_ReductionLines : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static reductionSlider = findSlider("Reduction factor")
 
-        reduce.Run(src)
-        dst2 = reduce.dst2
+        reduction.Run(src)
+        dst2 = reduction.dst2
 
         lines.Run(dst2)
 
