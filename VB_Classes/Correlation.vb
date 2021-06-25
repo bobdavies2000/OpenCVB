@@ -12,6 +12,7 @@ Public Class Correlation_Basics : Inherits VBparent
         km.Run(src)
         dst1 = km.dst2
         dst2 = km.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If km.rects.Count = 0 Then Exit Sub ' well, we got nothing...
         Dim r = km.rects(km.selectedIndex)
         dst2.Rectangle(r, cv.Scalar.Yellow, task.lineWidth)
 
