@@ -375,7 +375,7 @@ Public Class OpenCVB
                             Else
                                 cvext.BitmapConverter.ToBitmap(camera.color.Resize(New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)), camPic(0).Image)
                             End If
-                            If usingDst1 And imgDst0.Width > 0 Then
+                            If usingDst1 And imgDst1.Width > 0 Then
                                 cvext.BitmapConverter.ToBitmap(imgDst1.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height)), camPic(1).Image)
                             Else
                                 cvext.BitmapConverter.ToBitmap(camera.RGBDepth.Resize(New cv.Size(camPic(1).Size.Width, camPic(1).Size.Height)), camPic(1).Image)
