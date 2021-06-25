@@ -123,6 +123,7 @@
     <Compile Include="Interpolate.vb" />
     <Compile Include="LineFLD.vb" />
     <Compile Include="MaskShape.vb" />
+    <Compile Include="MatchShapes.vb" />
     <Compile Include="MFD.vb" />
     <Compile Include="MiniPC.vb" />
     <Compile Include="OptionsCombo.Designer.vb">
