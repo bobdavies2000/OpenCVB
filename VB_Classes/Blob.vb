@@ -166,41 +166,42 @@ End Class
 
 
 
-Public Class Blob_DepthPixelSampler : Inherits VBparent
-    Public histBlobs As New Proximity_Clusters
-    Public flood As New FloodFill_Basics
-    Dim pixel As Pixel_Sampler
-    Public Sub New()
-        pixel = New Pixel_Sampler
-        findSlider("FloodFill LoDiff").Value = 1
-        findSlider("FloodFill HiDiff").Value = 1
+'Public Class Blob_DepthPixelSampler : Inherits VBparent
+'    Public histBlobs As New Proximity_Clusters
+'    Public flood As New FloodFill_Basics
+'    Dim pixel As Pixel_Sampler
+'    Public Sub New()
+'        pixel = New Pixel_Sampler
+'        findSlider("FloodFill LoDiff").Value = 1
+'        findSlider("FloodFill HiDiff").Value = 1
 
-        labels(3) = "Backprojection of identified histogram depth clusters."
-        task.desc = "Highlight the distinct histogram blobs found with depth clustering."
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        histBlobs.Run(task.noDepthMask)
-        dst2 = histBlobs.dst2
-        flood.initialMask = task.noDepthMask
-        flood.Run(histBlobs.dst3)
+'        labels(3) = "Backprojection of identified histogram depth clusters."
+'        task.desc = "Highlight the distinct histogram blobs found with depth clustering."
+'    End Sub
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
+'        histBlobs.Run(task.noDepthMask)
+'        dst2 = histBlobs.dst2
+'        flood.initialMask = task.noDepthMask
+'        flood.Run(histBlobs.dst3)
 
-        Static lastFrame = flood.dst3
-        Static lastCount = flood.rects.Count
-        If task.cameraStable = False Or task.frameCount = 0 Then
-            lastFrame = flood.dst3.Clone
-            dst3 = flood.dst3.Clone
-        Else
-            For i = 0 To flood.rects.Count - 1
-                Dim rect = flood.rects(i)
-                Dim mask = flood.masks(i)(rect)
-                pixel.Run(lastFrame(rect).Clone.setTo(0, 255 - mask))
-                dst3(rect).SetTo(pixel.dominantGray, mask)
-            Next
-            lastFrame = dst3.Clone
-        End If
-        labels(2) = CStr(histBlobs.valleys.ranges.Count) + " Depth Clusters"
-    End Sub
-End Class
+'        Static lastFrame = flood.dst3
+'        Static lastCount = flood.rects.Count
+'        If task.cameraStable = False Or task.frameCount = 0 Then
+'            lastFrame = flood.dst3.Clone
+'            dst3 = flood.dst3.Clone
+'        Else
+'            For i = 0 To 0 ' flood.rects.Count - 1
+'                Dim rect = flood.rects(i)
+'                Dim mask = flood.masks(i)
+'                pixel.Run(lastFrame(rect).Clone.setTo(0, 255 - mask))
+'                dst3(rect).SetTo(pixel.dominantGray, mask)
+'                cv.Cv2.ImShow("mask", mask)
+'            Next
+'            lastFrame = dst3.Clone
+'        End If
+'        labels(2) = CStr(histBlobs.valleys.ranges.Count) + " Depth Clusters"
+'    End Sub
+'End Class
 
 
 

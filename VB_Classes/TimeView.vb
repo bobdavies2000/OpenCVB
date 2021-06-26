@@ -127,13 +127,10 @@ Public Class TimeView_FloodFill : Inherits VBparent
         task.desc = "FloodFill the histograms of side and top views - TimeView_Basics"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-
         tBasics.Run(src)
-
         floodSide.Run(tBasics.dst2.ConvertScaleAbs(255))
         dst2 = floodSide.dst2
         labels(2) = "SideView " + floodSide.labels(2)
-
         floodTop.Run(tBasics.dst3.ConvertScaleAbs(255))
         dst3 = floodTop.dst2
         labels(3) = "TopView " + floodTop.labels(2)

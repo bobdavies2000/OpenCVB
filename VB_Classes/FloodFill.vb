@@ -57,16 +57,16 @@ Public Class FloodFill_Basics : Inherits VBparent
                     Dim count = cv.Cv2.FloodFill(gray, maskPlus, pt, cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
                     If count > minFloodSize And count <> gray.Total Then
                         floodPoints.Add(pt)
-                        masks.Add(maskPlus(maskRect).Clone().SetTo(0, ignoreMasks))
+                        masks.Add(maskPlus(maskRect).Clone().SetTo(0, ignoreMasks)(rect))
                         Dim i = masks.Count - 1
-                        masks(i).SetTo(0, initialMask) ' The initial mask is what should not be part of any mask.
+                        masks(i).SetTo(0, initialMask(rect)) ' The initial mask is what should not be part of any mask.
                         sortedSizes.Add(count, i)
                         maskSizes.Add(count)
                         rects.Add(rect)
                         Dim m = cv.Cv2.Moments(maskPlus(rect), True)
                         Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
                         centroids.Add(centroid)
-                        dst2.SetTo((i + 1) Mod 255, masks(i))
+                        dst2(rect).SetTo((i + 1) Mod 255, masks(i))
                     Else
                         rejectedRects.Add(rect)
                         rejectedCentroids.Add(New cv.Point2f(rect.X + rect.Width / 2, rect.Y + rect.Height / 2))
@@ -85,6 +85,99 @@ Public Class FloodFill_Basics : Inherits VBparent
         labels(2) = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
 End Class
+
+
+
+
+
+
+
+
+'Public Class FloodFill_OldBasics : Inherits VBparent
+'    Public sortedSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
+'    Public maskSizes As New List(Of Integer)
+'    Public rects As New List(Of cv.Rect)
+'    Public masks As New List(Of cv.Mat)
+'    Public centroids As New List(Of cv.Point2f)
+'    Public floodPoints As New List(Of cv.Point)
+'    Public rejectedCentroids As New List(Of cv.Point2f)
+'    Public rejectedRects As New List(Of cv.Rect)
+'    Public initialMask As New cv.Mat
+'    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
+'    Public Sub New()
+'        If sliders.Setup(caller) Then
+'            sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2500)
+'            sliders.setupTrackBar(1, "FloodFill LoDiff", 0, 255, 25)
+'            sliders.setupTrackBar(2, "FloodFill HiDiff", 0, 255, 25)
+'            sliders.setupTrackBar(3, "Step Size", 1, dst2.Cols / 2, 30)
+'        End If
+'        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+'        labels(3) = "Palette output"
+'        task.desc = "Use floodfill to build image segments in a grayscale image."
+'    End Sub
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
+'        Static minSizeSlider = findSlider("FloodFill Minimum Size")
+'        Static loDiffSlider = findSlider("FloodFill LoDiff")
+'        Static hiDiffSlider = findSlider("FloodFill HiDiff")
+'        Static stepSlider = findSlider("Step Size")
+'        Dim minFloodSize = minSizeSlider.Value
+'        Dim loDiff = cv.Scalar.All(loDiffSlider.Value)
+'        Dim hiDiff = cv.Scalar.All(hiDiffSlider.Value)
+'        Dim stepSize = stepSlider.Value
+
+'        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+'        Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1)
+'        Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
+'        initialMask = src.EmptyClone().SetTo(0)
+
+'        masks.Clear()
+'        sortedSizes.Clear()
+'        rects.Clear()
+'        centroids.Clear()
+'        rejectedCentroids.Clear()
+'        rejectedRects.Clear()
+
+'        maskPlus.SetTo(0)
+'        Dim ignoreMasks = initialMask.Clone()
+
+'        Dim gray = src.Clone()
+'        dst2.SetTo(0)
+'        For y = 0 To gray.Height - 1 Step stepSize
+'            For x = 0 To gray.Width - 1 Step stepSize
+'                If gray.Get(Of Byte)(y, x) > 0 Then
+'                    Dim rect As New cv.Rect
+'                    Dim pt = New cv.Point(CInt(x), CInt(y))
+'                    Dim count = cv.Cv2.FloodFill(gray, maskPlus, pt, cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
+'                    If count > minFloodSize And count <> gray.Total Then
+'                        floodPoints.Add(pt)
+'                        masks.Add(maskPlus(maskRect).Clone().SetTo(0, ignoreMasks))
+'                        Dim i = masks.Count - 1
+'                        masks(i).SetTo(0, initialMask) ' The initial mask is what should not be part of any mask.
+'                        sortedSizes.Add(count, i)
+'                        maskSizes.Add(count)
+'                        rects.Add(rect)
+'                        Dim m = cv.Cv2.Moments(maskPlus(rect), True)
+'                        Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
+'                        centroids.Add(centroid)
+'                        dst2.SetTo((i + 1) Mod 255, masks(i))
+'                    Else
+'                        rejectedRects.Add(rect)
+'                        rejectedCentroids.Add(New cv.Point2f(rect.X + rect.Width / 2, rect.Y + rect.Height / 2))
+'                    End If
+'                    ' Mask off any object that is too small or previously identified
+'                    cv.Cv2.BitwiseOr(ignoreMasks, maskPlus(maskRect), ignoreMasks)
+'                End If
+'            Next
+'        Next
+'        dst2 *= 255 / masks.Count
+'        If standalone Then
+'            task.palette.Run(dst2)
+'            dst3 = task.palette.dst2
+'            dst2 = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+'        End If
+'        labels(2) = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
+'    End Sub
+'End Class
 
 
 
@@ -759,7 +852,8 @@ Public Class FloodFill_Palette : Inherits VBparent
         dst3.SetTo(0)
         For i = 0 To basics.masks.Count - 1
             Dim maskIndex = basics.sortedSizes.ElementAt(i).Value
-            dst3.SetTo(cv.Scalar.All((i + 1) Mod 255), basics.masks(maskIndex))
+            Dim r = basics.rects(maskIndex)
+            dst3(r).SetTo(cv.Scalar.All((i + 1) Mod 255), basics.masks(maskIndex))
         Next
 
         allRegionMask = If(dst3.Channels = 1, dst3, dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255))

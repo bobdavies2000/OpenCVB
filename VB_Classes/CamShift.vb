@@ -135,47 +135,45 @@ End Class
 
 
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
-Public Class Camshift_TopObjects : Inherits VBparent
-    Dim blob As New Blob_DepthRanges
-    Dim cams(4 - 1) As CamShift_Basics
-    Dim mats As New Mat_4to1
-    Dim flood As New FloodFill_Basics
-    Public Sub New()
-        For i = 0 To cams.Length - 1
-            cams(i) = New CamShift_Basics
-        Next
+'Public Class Camshift_TopObjects : Inherits VBparent
+'    Dim blob As New Blob_DepthRanges
+'    Dim cams(4 - 1) As CamShift_Basics
+'    Dim mats As New Mat_4to1
+'    Dim flood As New FloodFill_Basics
+'    Public Sub New()
+'        For i = 0 To cams.Length - 1
+'            cams(i) = New CamShift_Basics
+'        Next
 
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Reinitialize camshift after x frames", 1, 500, 100)
-        End If
-        task.desc = "Track up to 4 objects with camshift"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static updateSlider = findSlider("Reinitialize camshift after x frames")
-        blob.Run(src)
-        dst2 = blob.dst3
-        flood.Run(dst2)
+'        If sliders.Setup(caller) Then
+'            sliders.setupTrackBar(0, "Reinitialize camshift after x frames", 1, 500, 100)
+'        End If
+'        task.desc = "Track up to 4 objects with camshift"
+'    End Sub
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
+'        Static updateSlider = findSlider("Reinitialize camshift after x frames")
+'        blob.Run(src)
+'        dst2 = blob.dst3
+'        flood.Run(dst2)
 
-        Dim updateFrequency = updateSlider.Value
-        Dim trackBoxes As New List(Of cv.RotatedRect)
-        For i = 0 To Math.Min(cams.Length, flood.sortedSizes.Count) - 1
-            If flood.maskSizes.Count > i Then
-                Dim camIndex = flood.sortedSizes.ElementAt(i).Value
-                If task.frameCount Mod updateFrequency = 0 Or cams(i).trackBox.Size.Width = 0 Then
-                    task.drawRect = flood.rects(camIndex)
-                End If
+'        Dim updateFrequency = updateSlider.Value
+'        Dim trackBoxes As New List(Of cv.RotatedRect)
+'        For i = 0 To Math.Min(cams.Length, flood.sortedSizes.Count) - 1
+'            If flood.maskSizes.Count > i Then
+'                Dim camIndex = flood.sortedSizes.ElementAt(i).Value
+'                If task.frameCount Mod updateFrequency = 0 Or cams(i).trackBox.Size.Width = 0 Then
+'                    task.drawRect = flood.rects(camIndex)
+'                End If
 
-                cams(i).Run(src)
-                mats.mat(i) = cams(i).dst2.Clone()
-                trackBoxes.Add(cams(i).trackBox)
-            End If
-        Next
-        For i = 0 To trackBoxes.Count - 1
-            dst2.Ellipse(trackBoxes(i), cv.Scalar.White, task.lineWidth + 1, task.lineType)
-        Next
-        mats.Run(src)
-        dst3 = mats.dst2
-    End Sub
-End Class
-
-
+'                cams(i).Run(src)
+'                mats.mat(i) = cams(i).dst2.Clone()
+'                trackBoxes.Add(cams(i).trackBox)
+'            End If
+'        Next
+'        For i = 0 To trackBoxes.Count - 1
+'            dst2.Ellipse(trackBoxes(i), cv.Scalar.White, task.lineWidth + 1, task.lineType)
+'        Next
+'        mats.Run(src)
+'        dst3 = mats.dst2
+'    End Sub
+'End Class
