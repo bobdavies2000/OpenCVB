@@ -1102,16 +1102,16 @@ End Class
 
 
 
-Public Class Line_KMeansFuzzy : Inherits VBparent
-    Dim km As New KMeans_Fuzzy
-    Dim lines As New Line_Basics
-    Public Sub New()
-        task.desc = "Detect lines in the KMeans fuzzy output"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        km.Run(src)
-        dst2 = km.dst2
-        lines.Run(km.dst3)
-        dst3 = lines.dst2
-    End Sub
-End Class
+'Public Class Line_KMeansFuzzy : Inherits VBparent
+'    Dim km As New KMeans_Fuzzy
+'    Dim lines As New Line_Basics
+'    Public Sub New()
+'        task.desc = "Detect lines in the KMeans fuzzy output"
+'    End Sub
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
+'        km.Run(src)
+'        dst2 = km.dst2
+'        lines.Run(km.dst3)
+'        dst3 = lines.dst2
+'    End Sub
+'End Class

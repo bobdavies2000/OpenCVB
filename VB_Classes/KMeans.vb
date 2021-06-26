@@ -324,62 +324,33 @@ End Class
 
 
 
-Public Class KMeans_CCompImage1 : Inherits VBparent
-    Dim ccomp() As CComp_GrayScale
-    Dim km As New KMeans_Basics
-    Public Sub New()
-        task.desc = "First attempt at coloring the entire image with connected components"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static kSlider = findSlider("kMeans k")
-        Static k = -1
-        If k <> kSlider.value Then
-            k = kSlider.value
-            ReDim ccomp(k)
-            For i = 0 To k - 1
-                ccomp(i) = New CComp_GrayScale
-            Next
-        End If
+'Public Class KMeans_CCompImage1 : Inherits VBparent
+'    Dim ccomp() As CComp_GrayScale
+'    Dim km As New KMeans_Basics
+'    Public Sub New()
+'        task.desc = "First attempt at coloring the entire image with connected components"
+'    End Sub
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
+'        Static kSlider = findSlider("kMeans k")
+'        Static k = -1
+'        If k <> kSlider.value Then
+'            k = kSlider.value
+'            ReDim ccomp(k)
+'            For i = 0 To k - 1
+'                ccomp(i) = New CComp_GrayScale
+'            Next
+'        End If
 
-        km.Run(src)
-        dst2 = km.dst2
+'        km.Run(src)
+'        dst2 = km.dst2
 
-        dst3.SetTo(0)
-        For i = 0 To k - 1
-            ccomp(i).Run(km.masks(i))
-            cv.Cv2.BitwiseOr(dst3, ccomp(i).dst3, dst3)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class KMeans_CCompImage : Inherits VBparent
-    Dim km As New KMeans_CCompMasks
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-        task.desc = "A second, better attempt at coloring an entire image with connected components.  All masks are available."
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        km.Run(src)
-        dst2 = km.dst2
-
-        dst3.SetTo(0)
-        Dim incr = 255 / km.masks.Count
-        For i = 0 To km.masks.Count - 1
-            Dim r As cv.Rect = km.rects(i)
-            Dim m As cv.Mat = km.masks(i)
-            dst3(r).SetTo(cv.Scalar.All((i + 1) * incr), m)
-        Next
-
-        task.palette.Run(dst3)
-        dst3 = task.palette.dst2
-    End Sub
-End Class
+'        dst3.SetTo(0)
+'        For i = 0 To k - 1
+'            ccomp(i).Run(km.masks(i))
+'            cv.Cv2.BitwiseOr(dst3, ccomp(i).dst3, dst3)
+'        Next
+'    End Sub
+'End Class
 
 
 
@@ -387,83 +358,28 @@ End Class
 
 
 
-Public Class KMeans_CCompMasks : Inherits VBparent
-    Public km As New KMeans_Basics
-    Dim ccomp() As CComp_Basics
-    Public masks As New List(Of cv.Mat)
-    Public rects As New List(Of cv.Rect)
-    Public centroids As New List(Of cv.Point)
-    Public selectedIndex As Integer
-    Dim sortMasks As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-    Dim allElseMask As cv.Mat
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-        labels(2) = "Click the centroid to display the mask in dst3"
-        task.desc = "Use each KMeans mask with CComp"
-    End Sub
-    Public Sub splitKMaskWithCComp(i As Integer)
-        For j = 0 To ccomp(i).masks.Count - 1
-            Dim r = ccomp(i).rects(j)
-            sortMasks.Add(r.Width * r.Height, masks.Count)
-            Dim mask = ccomp(i).masks(j)
-            masks.Add(mask)
-            allElseMask(r).SetTo(0, mask)
-            rects.Add(r)
-            Dim c = ccomp(i).centroids(j)
-            centroids.Add(c)
-            dst2.Circle(c, task.dotSize + 5, cv.Scalar.White, -1, task.lineType)
-            dst2.Circle(c, task.dotSize + 3, cv.Scalar.Black, -1, task.lineType)
-            dst2.Circle(c, task.dotSize, cv.Scalar.White, -1, task.lineType)
-            setTrueText(CStr(masks.Count - 1), c.X + 10, c.Y)
-        Next
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 5
-        Static kSlider = findSlider("kMeans k")
-        Static k = -1
-        If k <> kSlider.value Then
-            k = kSlider.value
-            ReDim ccomp(k)
-            For i = 0 To k
-                ccomp(i) = New CComp_Basics
-            Next
-        End If
+'Public Class KMeans_CCompImage : Inherits VBparent
+'    Dim km As New KMeans_CCompMasks
+'    Public Sub New()
+'        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+'        task.desc = "A second, better attempt at coloring an entire image with connected components.  All masks are available."
+'    End Sub
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
+'        km.Run(src)
+'        dst2 = km.dst2
 
-        km.Run(src)
-        dst2 = km.dst2
+'        dst3.SetTo(0)
+'        Dim incr = 255 / km.masks.Count
+'        For i = 0 To km.masks.Count - 1
+'            Dim r As cv.Rect = km.rects(i)
+'            Dim m As cv.Mat = km.masks(i)
+'            dst3(r).SetTo(cv.Scalar.All((i + 1) * incr), m)
+'        Next
 
-        masks.Clear()
-        rects.Clear()
-        sortMasks.Clear()
-        centroids.Clear()
-        dst3.SetTo(0)
-        allElseMask = New cv.Mat(src.Size, cv.MatType.CV_8U, 255)
-        For i = 0 To k - 1
-            ccomp(i).Run(km.masks(i))
-            splitKMaskWithCComp(i)
-        Next
-
-        If allElseMask.CountNonZero() > 0 Then
-            ccomp(k).Run(allElseMask)
-            splitKMaskWithCComp(k)
-        End If
-
-        If task.mouseClickPoint <> New cv.Point Or selectedIndex >= masks.Count Then
-            Dim minDistance As Single = Single.MaxValue
-            For i = 0 To centroids.Count - 1
-                Dim distance = task.mouseClickPoint.DistanceTo(centroids(i))
-                If minDistance > distance Then
-                    minDistance = distance
-                    selectedIndex = i
-                End If
-            Next
-        End If
-
-        If masks.Count > 0 Then
-            dst3(rects(selectedIndex)) = masks(selectedIndex)
-            labels(3) = "Pixel count = " + CStr(sortMasks.ElementAt(selectedIndex).Key)
-        End If
-    End Sub
-End Class
+'        task.palette.Run(dst3)
+'        dst3 = task.palette.dst2
+'    End Sub
+'End Class
 
 
 
@@ -471,21 +387,83 @@ End Class
 
 
 
+'Public Class KMeans_CCompMasks : Inherits VBparent
+'    Public km As New KMeans_Basics
+'    Dim ccomp() As CComp_Basics
+'    Public masks As New List(Of cv.Mat)
+'    Public rects As New List(Of cv.Rect)
+'    Public centroids As New List(Of cv.Point)
+'    Public selectedIndex As Integer
+'    Dim sortMasks As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+'    Dim allElseMask As cv.Mat
+'    Public Sub New()
+'        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+'        labels(2) = "Click the centroid to display the mask in dst3"
+'        task.desc = "Use each KMeans mask with CComp"
+'    End Sub
+'    Public Sub splitKMaskWithCComp(i As Integer)
+'        For j = 0 To ccomp(i).masks.Count - 1
+'            Dim r = ccomp(i).rects(j)
+'            sortMasks.Add(r.Width * r.Height, masks.Count)
+'            Dim mask = ccomp(i).masks(j)
+'            masks.Add(mask)
+'            allElseMask(r).SetTo(0, mask)
+'            rects.Add(r)
+'            Dim c = ccomp(i).centroids(j)
+'            centroids.Add(c)
+'            dst2.Circle(c, task.dotSize + 5, cv.Scalar.White, -1, task.lineType)
+'            dst2.Circle(c, task.dotSize + 3, cv.Scalar.Black, -1, task.lineType)
+'            dst2.Circle(c, task.dotSize, cv.Scalar.White, -1, task.lineType)
+'            setTrueText(CStr(masks.Count - 1), c.X + 10, c.Y)
+'        Next
+'    End Sub
+'    Public Sub Run(src As cv.Mat) ' Rank = 5
+'        Static kSlider = findSlider("kMeans k")
+'        Static k = -1
+'        If k <> kSlider.value Then
+'            k = kSlider.value
+'            ReDim ccomp(k)
+'            For i = 0 To k
+'                ccomp(i) = New CComp_Basics
+'            Next
+'        End If
 
-Public Class KMeans_CCompOld : Inherits VBparent
-    Dim ccomp As New CComp_GrayScaleOld
-    Dim km As New KMeans_Basics
-    Public Sub New()
-        labels(2) = "Click to see connected components in dst3"
-        task.desc = "Use each KMeans mask with CComp"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 2
-        km.Run(src)
-        dst2 = km.dst2
-        ccomp.Run(km.masks(km.maskIndex))
-        dst3 = ccomp.dst3
-    End Sub
-End Class
+'        km.Run(src)
+'        dst2 = km.dst2
+
+'        masks.Clear()
+'        rects.Clear()
+'        sortMasks.Clear()
+'        centroids.Clear()
+'        dst3.SetTo(0)
+'        allElseMask = New cv.Mat(src.Size, cv.MatType.CV_8U, 255)
+'        For i = 0 To k - 1
+'            ccomp(i).Run(km.masks(i))
+'            splitKMaskWithCComp(i)
+'        Next
+
+'        If allElseMask.CountNonZero() > 0 Then
+'            ccomp(k).Run(allElseMask)
+'            splitKMaskWithCComp(k)
+'        End If
+
+'        If task.mouseClickPoint <> New cv.Point Or selectedIndex >= masks.Count Then
+'            Dim minDistance As Single = Single.MaxValue
+'            For i = 0 To centroids.Count - 1
+'                Dim distance = task.mouseClickPoint.DistanceTo(centroids(i))
+'                If minDistance > distance Then
+'                    minDistance = distance
+'                    selectedIndex = i
+'                End If
+'            Next
+'        End If
+
+'        If masks.Count > 0 Then
+'            dst3(rects(selectedIndex)) = masks(selectedIndex)
+'            labels(3) = "Pixel count = " + CStr(sortMasks.ElementAt(selectedIndex).Key)
+'        End If
+'    End Sub
+'End Class
 
 
 
@@ -493,45 +471,67 @@ End Class
 
 
 
-Public Class KMeans_CComp : Inherits VBparent
-    Dim ccomp As New CComp_GrayScale
-    Dim km As New KMeans_Basics
-    Dim mats As New Mat_4Click
-    Public Sub New()
-        task.usingdst1 = True
-        labels(1) = "Click anywhere to see connected components in dst3"
-        labels(2) = "Results from the first CComp runs."
-        task.desc = "Use each KMeans mask with CComp to identify each connected component"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 2
-        Static kSlider = findSlider("kMeans k")
-        Dim k = kSlider.value
-        Static mousePoint = New cv.Point(msRNG.Next(0, dst1.Width), msRNG.Next(0, dst1.Height))
-        Static ccLabels(k - 1) As cv.Mat
-        If ccLabels.Length <> k Then ReDim ccLabels(k - 1)
 
-        km.Run(src)
-        dst1 = km.dst2
+'Public Class KMeans_CCompOld : Inherits VBparent
+'    Dim ccomp As New CComp_GrayScaleOld
+'    Dim km As New KMeans_Basics
+'    Public Sub New()
+'        labels(2) = "Click to see connected components in dst3"
+'        task.desc = "Use each KMeans mask with CComp"
+'    End Sub
+'    Public Sub Run(src As cv.Mat) ' Rank = 2
+'        km.Run(src)
+'        dst2 = km.dst2
+'        ccomp.Run(km.masks(km.maskIndex))
+'        dst3 = ccomp.dst3
+'    End Sub
+'End Class
 
-        For i = 0 To k - 1
-            ccomp.Run(km.masks(i))
-            ccLabels(i) = ccomp.cclabels.Clone
-            If i < 4 Then mats.mat(i) = ccomp.dst3
-        Next
 
-        mats.Run(Nothing)
-        dst2 = mats.dst2
 
-        If task.mouseClickFlag Then mousePoint = task.mouseClickPoint
-        For i = 0 To ccLabels.Length - 1
-            Dim maskVal = ccLabels(i).Get(Of Byte)(mousePoint.Y, mousePoint.X)
-            If maskVal > 0 Then
-                dst3 = ccLabels(i).InRange(maskVal, maskVal)
-                Exit For
-            End If
-        Next
-    End Sub
-End Class
+
+
+
+
+'Public Class KMeans_CComp : Inherits VBparent
+'    Dim ccomp As New CComp_GrayScale
+'    Dim km As New KMeans_Basics
+'    Dim mats As New Mat_4Click
+'    Public Sub New()
+'        task.usingdst1 = True
+'        labels(1) = "Click anywhere to see connected components in dst3"
+'        labels(2) = "Results from the first CComp runs."
+'        task.desc = "Use each KMeans mask with CComp to identify each connected component"
+'    End Sub
+'    Public Sub Run(src As cv.Mat) ' Rank = 2
+'        Static kSlider = findSlider("kMeans k")
+'        Dim k = kSlider.value
+'        Static mousePoint = New cv.Point(msRNG.Next(0, dst1.Width), msRNG.Next(0, dst1.Height))
+'        Static ccLabels(k - 1) As cv.Mat
+'        If ccLabels.Length <> k Then ReDim ccLabels(k - 1)
+
+'        km.Run(src)
+'        dst1 = km.dst2
+
+'        For i = 0 To k - 1
+'            ccomp.Run(km.masks(i))
+'            ccLabels(i) = ccomp.cclabels.Clone
+'            If i < 4 Then mats.mat(i) = ccomp.dst3
+'        Next
+
+'        mats.Run(Nothing)
+'        dst2 = mats.dst2
+
+'        If task.mouseClickFlag Then mousePoint = task.mouseClickPoint
+'        For i = 0 To ccLabels.Length - 1
+'            Dim maskVal = ccLabels(i).Get(Of Byte)(mousePoint.Y, mousePoint.X)
+'            If maskVal > 0 Then
+'                dst3 = ccLabels(i).InRange(maskVal, maskVal)
+'                Exit For
+'            End If
+'        Next
+'    End Sub
+'End Class
 
 
 
@@ -540,13 +540,15 @@ End Class
 
 
 Public Class KMeans_FloodFill : Inherits VBparent
-    Dim flood As New FloodFill_Basics
-    Dim km As New KMeans_Basics
+    Public flood As New FloodFill_Basics
+    Public km As New KMeans_Basics
+    Public selectedIndex As Integer
     Public Sub New()
         task.usingdst1 = True
-        findSlider("FloodFill Minimum Size").Value = 100
+        findSlider("FloodFill Minimum Size").Value = 1
         labels(1) = "Click anywhere to see connected components in dst3"
         labels(2) = "FloodFill Results"
+        labels(3) = "Selected region - click anywhere."
         task.desc = "Use each KMeans mask with floodfill to identify each segment in the image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
@@ -561,7 +563,7 @@ Public Class KMeans_FloodFill : Inherits VBparent
         dst2 = flood.dst2
 
         If task.mouseClickFlag Then mousePoint = task.mouseClickPoint
-        Dim maskVal = flood.dst2.Get(Of Byte)(mousePoint.Y, mousePoint.X)
-        dst3 = flood.dst2.InRange(maskVal, maskVal)
+        selectedIndex = flood.dst2.Get(Of Byte)(mousePoint.Y, mousePoint.X)
+        dst3 = flood.dst2.InRange(selectedIndex, selectedIndex)
     End Sub
 End Class

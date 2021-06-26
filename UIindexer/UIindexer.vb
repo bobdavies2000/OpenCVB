@@ -220,7 +220,7 @@ Module IndexMain
             If rankings(i) IsNot Nothing Then
                 Dim split = rankings(i).Split(",")
                 For j = 0 To split.Length - 1
-                    If Len(split(j)) > 0 Then rankSort.Add(split(j), split(j))
+                    If Len(split(j)) > 0 And rankSort.ContainsKey(split(j)) = False Then rankSort.Add(split(j), split(j))
                 Next
                 rankings(i) = ""
                 For j = 0 To rankSort.Count - 1

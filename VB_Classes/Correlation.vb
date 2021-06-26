@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Correlation_Basics : Inherits VBparent
-    Dim km As New KMeans_CCompMasks
+    Dim kFlood As New KMeans_FloodFill
     Dim corr As New MatchTemplate_Basics
     Dim reduction As New Reduction_PointCloud
     Public Sub New()
@@ -9,11 +9,11 @@ Public Class Correlation_Basics : Inherits VBparent
         task.desc = "Compute a correlation for src rows (See also: MatchTemplate.vb"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        km.Run(src)
-        dst1 = km.dst2
-        dst2 = km.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        If km.rects.Count = 0 Then Exit Sub ' well, we got nothing...
-        Dim r = km.rects(km.selectedIndex)
+        kFlood.Run(src)
+        dst1 = kFlood.dst2
+        dst2 = kFlood.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        If kFlood.flood.rects.Count = 0 Then Exit Sub ' well, we got nothing...
+        Dim r = kFlood.flood.rects(kFlood.selectedIndex)
         dst2.Rectangle(r, cv.Scalar.Yellow, task.lineWidth)
 
         ' reduction.Run(task.pointCloud)
@@ -27,9 +27,9 @@ Public Class Correlation_Basics : Inherits VBparent
         Dim dataY As New cv.Mat(New cv.Size(r.Width, r.Height), cv.MatType.CV_32F, 0)
         Dim dataZ As New cv.Mat(New cv.Size(r.Width, r.Height), cv.MatType.CV_32F, 0)
 
-        split(0)(r).CopyTo(dataX, km.dst3(r))
-        split(1)(r).CopyTo(dataY, km.dst3(r))
-        split(2)(r).CopyTo(dataZ, km.dst3(r))
+        split(0)(r).CopyTo(dataX, kFlood.dst3(r))
+        split(1)(r).CopyTo(dataY, kFlood.dst3(r))
+        split(2)(r).CopyTo(dataZ, kFlood.dst3(r))
 
         Dim row1 = dataX.Row(row - r.Y)
         Dim row2 = dataZ.Row(row - r.Y)
