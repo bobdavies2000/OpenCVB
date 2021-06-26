@@ -75,6 +75,8 @@ Public Class VBparent : Implements IDisposable
                     task.labels(3) = task.intermediateObject.labels(3)
                 End If
             End If
+            If dst0.Width <> task.color.Width Then dst0 = dst0.Resize(task.color.Size)
+            If dst1.Width <> task.color.Width Then dst1 = dst1.Resize(task.color.Size)
             If dst2.Width <> task.color.Width Then dst2 = dst2.Resize(task.color.Size)
             If dst3.Width <> task.color.Width Then dst3 = dst3.Resize(task.color.Size)
             If task.imgResult.Width <> dst2.Width * 2 Or task.imgResult.Height <> dst2.Height Then
@@ -93,6 +95,8 @@ Public Class VBparent : Implements IDisposable
                 End If
             End If
 
+            task.color = MakeSureImage8uC3(dst0)
+            task.RGBDepth = MakeSureImage8uC3(dst1)
             task.imgResult(New cv.Rect(0, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst2)
             task.imgResult(New cv.Rect(task.color.Width, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst3)
             task.frameCount += 1

@@ -195,7 +195,6 @@ End Class
 '                Dim mask = flood.masks(i)
 '                pixel.Run(lastFrame(rect).Clone.setTo(0, 255 - mask))
 '                dst3(rect).SetTo(pixel.dominantGray, mask)
-'                cv.Cv2.ImShow("mask", mask)
 '            Next
 '            lastFrame = dst3.Clone
 '        End If

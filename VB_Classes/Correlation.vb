@@ -13,6 +13,7 @@ Public Class Correlation_Basics : Inherits VBparent
         dst1 = kFlood.dst2
         dst2 = kFlood.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If kFlood.flood.rects.Count = 0 Then Exit Sub ' well, we got nothing...
+        If kFlood.flood.rects.Count <= kFlood.selectedIndex Then Exit Sub
         Dim r = kFlood.flood.rects(kFlood.selectedIndex)
         dst2.Rectangle(r, cv.Scalar.Yellow, task.lineWidth)
 
@@ -39,8 +40,6 @@ Public Class Correlation_Basics : Inherits VBparent
         Dim correlationmat As New cv.Mat
         cv.Cv2.MatchTemplate(row1, row2, correlationmat, matchoption)
         Dim correlation = correlationmat.Get(Of Single)(0, 0)
-
-        Console.WriteLine("correlation = " + Format(correlation, "#0.0"))
 
         dst3.SetTo(0)
         Dim plotX As New List(Of Single)
