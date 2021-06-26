@@ -113,16 +113,18 @@ Public Class PhaseCorrelate_Depth : Inherits VBparent
         dst2 = task.depth32f
         Dim tmp = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         If phaseC.resetLastFrame Then task.depth32f.CopyTo(lastFrame)
-        lastFrame(phaseC.srcRect).CopyTo(tmp(phaseC.stableRect))
-        labels(2) = phaseC.labels(2)
-        labels(3) = phaseC.labels(3)
+        If phaseC.srcRect.Width = phaseC.stableRect.Width Then
+            lastFrame(phaseC.srcRect).CopyTo(tmp(phaseC.stableRect))
+            labels(2) = phaseC.labels(2)
+            labels(3) = phaseC.labels(3)
 
-        tmp = tmp.Normalize(0, 255, cv.NormTypes.MinMax)
-        tmp.ConvertTo(dst3, cv.MatType.CV_8UC1)
-        dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            tmp = tmp.Normalize(0, 255, cv.NormTypes.MinMax)
+            tmp.ConvertTo(dst3, cv.MatType.CV_8UC1)
+            dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        dst3.Circle(phaseC.center, phaseC.radius, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
-        dst3.Line(phaseC.center, New cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+            dst3.Circle(phaseC.center, phaseC.radius, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
+            dst3.Line(phaseC.center, New cv.Point(phaseC.center.X + phaseC.shift.X, phaseC.center.Y + phaseC.shift.Y), cv.Scalar.Red, task.lineWidth + 1, task.lineType)
+        End If
     End Sub
 End Class
 
