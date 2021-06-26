@@ -800,6 +800,7 @@ Public Class Depth_Edges : Inherits VBparent
         edges.Run(src)
         dst2 = edges.dst3
         dst3 = edges.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(sliders.trackbar(0).Value, 255, cv.ThresholdTypes.Binary)
+        dst3.SetTo(cv.Scalar.White, task.noDepthMask)
     End Sub
 End Class
 
@@ -811,7 +812,6 @@ End Class
 Public Class Depth_HolesOverTime : Inherits VBparent
     Dim recentImages As New List(Of cv.Mat)
     Public Sub New()
-
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Number of images to retain", 0, 30, 3)
         End If
@@ -1606,6 +1606,7 @@ Public Class Depth_Unstable : Inherits VBparent
     Dim pixel As New Pixel_Unstable
     Public Sub New()
         findSlider("kMeans k").Value = 6 ' the default is only 4 and depth needs more...
+        findSlider("Retain x frames to measure unstable pixels").Enabled = True
         findSlider("Retain x frames to measure unstable pixels").Value = 10
         If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Then
             findSlider("KMeans clustered difference threshold").Value = 20

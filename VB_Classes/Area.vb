@@ -135,35 +135,60 @@ End Class
 
 
 Public Class Area_FindNonZero : Inherits VBparent
+    Public nonZero As cv.Mat
     Public Sub New()
         labels(2) = "Coordinates of non-zero points"
         labels(3) = "Non-zero original points"
         task.desc = "Use FindNonZero API to get coordinates of non-zero points."
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        Dim gray = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
-        Dim srcPoints(10 - 1) As cv.Point ' doesn't really matter how many there are.
-        For i = 0 To srcPoints.Length - 1
-            srcPoints(i).X = msRNG.Next(0, src.Width)
-            srcPoints(i).Y = msRNG.Next(0, src.Height)
-            gray.Set(Of Byte)(srcPoints(i).Y, srcPoints(i).X, 255)
-        Next
+    Public Sub Run(src As cv.Mat) ' Rank = 2
+        If standalone Then
+            src = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
+            Dim srcPoints(100 - 1) As cv.Point ' doesn't really matter how many there are.
+            For i = 0 To srcPoints.Length - 1
+                srcPoints(i).X = msRNG.Next(0, src.Width)
+                srcPoints(i).Y = msRNG.Next(0, src.Height)
+                src.Set(Of Byte)(srcPoints(i).Y, srcPoints(i).X, 255)
+            Next
+        End If
 
-        Dim nonzero = gray.FindNonZero()
+        nonZero = src.FindNonZero()
 
-        dst3 = gray.EmptyClone().SetTo(0)
+        dst3 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         ' mark the points so they are visible...
-        For i = 0 To srcPoints.Length - 1
-            dst3.Circle(srcPoints(i), task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
+        For i = 0 To nonzero.Rows - 1
+            dst3.Circle(nonzero.Get(Of cv.Point)(0, i), task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
         Next
 
-        Dim outstr As String = "Coordinates of the non-zero points (ordered by row - top to bottom): " + vbCrLf + vbCrLf
-        For i = 0 To srcPoints.Length - 1
-            Dim pt = nonzero.Get(Of cv.Point)(0, i)
-            outstr += "X = " + vbTab + CStr(pt.X) + vbTab + " y = " + vbTab + CStr(pt.Y) + vbCrLf
-        Next
-        setTrueText(outstr)
+        If standalone Then
+            Dim outstr As String = "Coordinates of the non-zero points (ordered by row - top to bottom): " + vbCrLf + vbCrLf
+            For i = 0 To nonzero.Rows - 1
+                Dim pt = nonzero.Get(Of cv.Point)(0, i)
+                outstr += "X = " + vbTab + CStr(pt.X) + vbTab + " y = " + vbTab + CStr(pt.Y) + vbCrLf
+            Next
+            setTrueText(outstr)
+        End If
     End Sub
 End Class
 
 
+
+
+
+
+
+Public Class Area_TimeViewSingletons : Inherits VBparent
+    Dim tView As New PointCloud_Singletons
+    Dim nZero As New Area_FindNonZero
+    Public Sub New()
+        task.desc = "Use FindNonZero to get the coordinates of the nonzero points in the TimeView output"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        tView.run(src)
+        dst2 = tView.dst3
+
+        nZero.Run(dst2)
+        dst3 = nZero.dst3
+        labels(3) = CStr(nZero.nonZero.Rows) + " points found"
+    End Sub
+End Class

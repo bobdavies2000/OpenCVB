@@ -81,7 +81,7 @@ End Class
 
 
 
-Public Class Coherent_Depth : Inherits VBparent
+Public Class Coherence_Depth : Inherits VBparent
     Dim coherent As New Coherence_Basics
     Public Sub New()
         task.desc = "Find coherent lines in the depth image - Painterly"

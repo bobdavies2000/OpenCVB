@@ -193,25 +193,3 @@ Public Class FeatureLess_PointTracker : Inherits VBparent
         dst2 = pTrack.dst2
     End Sub
 End Class
-
-
-
-
-
-
-
-Public Class FeatureLess_Highlights : Inherits VBparent
-    Public fLessP As New FeatureLess_PointTracker
-    Public addW As New AddWeighted_Basics
-    Public Sub New()
-        task.desc = "Highlight the featureless regions in an RGB image"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        fLessP.Run(src)
-
-        addW.src2 = fLessP.dst2
-        addW.Run(src)
-        dst2 = addW.dst2
-    End Sub
-End Class
-

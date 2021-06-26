@@ -312,33 +312,3 @@ End Class
 
 
 
-
-
-
-
-
-Public Class Fuzzy_PointTracker : Inherits VBparent
-    Dim fuzzy as New Fuzzy_Basics
-    Dim pTrack As New KNN_PointTracker
-    Dim flood As New FloodFill_Palette
-    Public Sub New()
-        fuzzy.sliders.Visible = False
-        task.desc = "FloodFill the regions defined as solid"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        fuzzy.Run(src)
-        dst3 = fuzzy.dst2
-
-        flood.Run(fuzzy.dst2)
-
-        pTrack.queryPoints = flood.basics.centroids
-        pTrack.queryRects = flood.basics.rects
-        pTrack.queryMasks = flood.basics.masks
-        pTrack.Run(src)
-
-        labels(3) = CStr(pTrack.drawRC.viewObjects.Count) + " regions were found"
-        dst2 = pTrack.dst2
-    End Sub
-End Class
-
-

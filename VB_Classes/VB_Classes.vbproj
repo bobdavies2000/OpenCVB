@@ -118,7 +118,6 @@
     <Compile Include="Fourier.vb" />
     <Compile Include="ImageForm.Designer.vb" />
     <Compile Include="imageForm.vb" />
-    <Compile Include="ImageSeg.vb" />
     <Compile Include="imShow.vb" />
     <Compile Include="Interpolate.vb" />
     <Compile Include="LineFLD.vb" />
@@ -190,7 +189,6 @@
     <Compile Include="Benford.vb" />
     <Compile Include="Bitmap.vb" />
     <Compile Include="Cartoonify.vb" />
-    <Compile Include="Coherent.vb" />
     <Compile Include="Concat.vb" />
     <Compile Include="Contrast.vb" />
     <Compile Include="Dither.vb" />

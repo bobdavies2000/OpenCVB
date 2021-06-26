@@ -544,65 +544,63 @@ End Class
 
 
 
-Public Class Histogram_ViewIntersections : Inherits VBparent
-    Dim histCO As New Histogram_ViewObjects
-    Public Sub New()
-        labels(2) = "Yellow is largest intersection.  dst3 = point cloud"
-        task.desc = "Find the intersections of the rectangles found in the Histogram_ConcentrationObjects"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+'Public Class Histogram_ViewIntersections : Inherits VBparent
+'    Dim histCO As New Histogram_ViewObjects
+'    Public Sub New()
+'        labels(2) = "Yellow is largest intersection.  dst3 = point cloud"
+'        task.desc = "Find the intersections of the rectangles found in the Histogram_ConcentrationObjects"
+'    End Sub
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
 
-        histCO.Run(src)
-        dst2 = histCO.dst3
+'        histCO.Run(src)
+'        dst2 = histCO.dst3
 
-        Dim offset = If(src.Width = 1280, 10, 16)
-        Dim w = dst2.Width
-        Dim h = dst2.Height
-        Dim minZ As Single, maxZ As Single
-        Dim rIntersect As New List(Of cv.Rect)
-        Dim yRange As New List(Of cv.Vec2f)
-        For Each r In histCO.side2D
-            minZ = task.maxZ * r.X / dst2.Width
-            maxZ = task.maxZ * (r.X + r.Width) / dst2.Width
-            Dim newRect = New cv.Rect(0, h - h * minZ / task.maxZ - r.Width, w, r.Width)
-            For Each r2 In histCO.top2D
-                Dim rNext = r2.Intersect(newRect)
-                If rNext.Width > 0 And rNext.Height > 0 Then
-                    rIntersect.Add(rNext)
-                    yRange.Add(New cv.Vec2f(minZ, maxZ))
-                End If
-            Next
-        Next
+'        Dim offset = If(src.Width = 1280, 10, 16)
+'        Dim w = dst2.Width
+'        Dim h = dst2.Height
+'        Dim minZ As Single, maxZ As Single
+'        Dim rIntersect As New List(Of cv.Rect)
+'        Dim yRange As New List(Of cv.Vec2f)
+'        For Each r In histCO.side2D
+'            minZ = task.maxZ * r.X / dst2.Width
+'            maxZ = task.maxZ * (r.X + r.Width) / dst2.Width
+'            Dim newRect = New cv.Rect(0, h - h * minZ / task.maxZ - r.Width, w, r.Width)
+'            For Each r2 In histCO.top2D
+'                Dim rNext = r2.Intersect(newRect)
+'                If rNext.Width > 0 And rNext.Height > 0 Then
+'                    rIntersect.Add(rNext)
+'                    yRange.Add(New cv.Vec2f(minZ, maxZ))
+'                End If
+'            Next
+'        Next
 
-        Dim maxSize As Single = Single.MinValue
-        Dim maxIndex As Integer
-        For i = 0 To rIntersect.Count - 1
-            Dim r = rIntersect(i)
-            If maxSize < r.Width * r.Height Then
-                maxSize = r.Width * r.Height
-                maxIndex = i
-            End If
-        Next
+'        Dim maxSize As Single = Single.MinValue
+'        Dim maxIndex As Integer
+'        For i = 0 To rIntersect.Count - 1
+'            Dim r = rIntersect(i)
+'            If maxSize < r.Width * r.Height Then
+'                maxSize = r.Width * r.Height
+'                maxIndex = i
+'            End If
+'        Next
 
-        If rIntersect.Count > 0 Then
-            dst2.Rectangle(rIntersect(maxIndex), cv.Scalar.Yellow, 2)
-            minZ = task.maxZ * (h - rIntersect(maxIndex).Y - rIntersect(maxIndex).Height) / h
-            maxZ = task.maxZ * (h - rIntersect(maxIndex).Y) / h
-            setTrueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", rIntersect(maxIndex).X, rIntersect(maxIndex).Y - offset)
+'        If rIntersect.Count > 0 Then
+'            dst2.Rectangle(rIntersect(maxIndex), cv.Scalar.Yellow, 2)
+'            minZ = task.maxZ * (h - rIntersect(maxIndex).Y - rIntersect(maxIndex).Height) / h
+'            maxZ = task.maxZ * (h - rIntersect(maxIndex).Y) / h
+'            setTrueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", rIntersect(maxIndex).X, rIntersect(maxIndex).Y - offset)
 
-            Dim pc = histCO.histC.sideview.gCloud.dst2
-            Dim split = pc.Split()
-            Dim mask As New cv.Mat
-            cv.Cv2.InRange(split(2), minZ, maxZ, mask)
-            cv.Cv2.BitwiseNot(mask, mask)
-            split(2).SetTo(0, mask)
+'            Dim pc = histCO.histC.sideview.gCloud.dst2
+'            Dim split = pc.Split()
+'            Dim mask As New cv.Mat
+'            cv.Cv2.InRange(split(2), minZ, maxZ, mask)
+'            cv.Cv2.BitwiseNot(mask, mask)
+'            split(2).SetTo(0, mask)
 
-            cv.Cv2.Merge(split, dst3)
-        End If
-    End Sub
-End Class
-
-
+'            cv.Cv2.Merge(split, dst3)
+'        End If
+'    End Sub
+'End Class
 
 
 
@@ -613,56 +611,58 @@ End Class
 
 
 
-Public Class Histogram_ViewObjects : Inherits VBparent
-    Public histC As New Concentration_Basics
-    Dim flood As New FloodFill_Basics
-    Public side2D As New List(Of cv.Rect)
-    Public top2D As New List(Of cv.Rect)
-    Public Sub New()
-        findSlider("FloodFill Minimum Size").Value = task.dotSize * task.dotSize
-        findSlider("FloodFill LoDiff").Value = 250
-        findSlider("FloodFill HiDiff").Value = 255
-        task.desc = "Use the histogram concentrations to identify objects in the field of view"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        histC.Run(src)
 
-        dst2 = histC.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        dst3 = histC.dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        flood.Run(dst2)
-        dst2 = flood.dst2.Clone
+'Public Class Histogram_ViewObjects : Inherits VBparent
+'    Public histC As New Concentration_Basics
+'    Dim flood As New FloodFill_Basics
+'    Public side2D As New List(Of cv.Rect)
+'    Public top2D As New List(Of cv.Rect)
+'    Public Sub New()
+'        findSlider("FloodFill Minimum Size").Value = task.dotSize * task.dotSize
+'        findSlider("FloodFill LoDiff").Value = 250
+'        findSlider("FloodFill HiDiff").Value = 255
+'        task.desc = "Use the histogram concentrations to identify objects in the field of view"
+'    End Sub
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
+'        histC.Run(src)
 
-        Dim offset = If(src.Width = 1280, 10, 16)
-        Dim w = dst2.Width
-        Dim h = dst2.Height
-        Dim minZ As Single, maxZ As Single
-        side2D.Clear()
+'        dst2 = histC.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+'        dst3 = histC.dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        For Each r In flood.rects
-            side2D.Add(r)
-            dst2.Rectangle(r, cv.Scalar.White, 1)
-            minZ = task.maxZ * r.X / w
-            maxZ = task.maxZ * (r.X + r.Width) / w
-            If standalone Or task.intermediateName = caller Then setTrueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset)
-        Next
-        labels(2) = CStr(flood.rects.Count) + " objects were identified in the side view"
+'        flood.Run(dst2)
+'        dst2 = flood.dst2.Clone
 
-        flood.Run(dst3)
-        dst3 = flood.dst2
+'        Dim offset = If(src.Width = 1280, 10, 16)
+'        Dim w = dst2.Width
+'        Dim h = dst2.Height
+'        Dim minZ As Single, maxZ As Single
+'        side2D.Clear()
 
-        top2D.Clear()
-        For Each r In flood.rects
-            top2D.Add(r)
-            dst3.Rectangle(r, cv.Scalar.White, 1)
-            minZ = task.maxZ * (h - r.Y - r.Height) / h
-            maxZ = task.maxZ * (h - r.Y) / h
-            If standalone Or task.intermediateName = caller Then setTrueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset, 3)
-        Next
+'        For Each r In flood.rects
+'            side2D.Add(r)
+'            dst2.Rectangle(r, cv.Scalar.White, 1)
+'            minZ = task.maxZ * r.X / w
+'            maxZ = task.maxZ * (r.X + r.Width) / w
+'            If standalone Or task.intermediateName = caller Then setTrueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset)
+'        Next
+'        labels(2) = CStr(flood.rects.Count) + " objects were identified in the side view"
 
-        labels(3) = CStr(flood.rects.Count) + " objects identified.  Largest is yellow."
-    End Sub
-End Class
+'        flood.Run(dst3)
+'        dst3 = flood.dst2
+
+'        top2D.Clear()
+'        For Each r In flood.rects
+'            top2D.Add(r)
+'            dst3.Rectangle(r, cv.Scalar.White, 1)
+'            minZ = task.maxZ * (h - r.Y - r.Height) / h
+'            maxZ = task.maxZ * (h - r.Y) / h
+'            If standalone Or task.intermediateName = caller Then setTrueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset, 3)
+'        Next
+
+'        labels(3) = CStr(flood.rects.Count) + " objects identified.  Largest is yellow."
+'    End Sub
+'End Class
 
 
 

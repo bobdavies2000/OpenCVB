@@ -330,6 +330,7 @@ Public Class Pixel_Unstable : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 3
         Static diffSlider = findSlider("KMeans clustered difference threshold")
         Static retainSlider = findSlider("Retain x frames to measure unstable pixels")
+        If task.frameCount = 0 Then retainSlider.enabled = True
         Static kSlider = findSlider("kMeans k")
         Static saveMaskIndex = -1
         Static pixelCounts As New List(Of Integer)

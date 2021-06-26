@@ -51,16 +51,15 @@ Public Class CComp_Basics : Inherits VBparent
             If area > minSize And area <> src.Total Then
                 Dim r1 = stats.Get(Of cv.Rect)(i, 0)
                 Dim r = New cv.Rect(CInt(r1.X), CInt(r1.Y), CInt(r1.Width), CInt(r1.Height))
-                If r.Width <> dst2.Width And r.Height <> dst2.Height Then
-                    areas.Add(area)
-                    unsortedRects.Add(r)
-                    index.Add(i)
-                    colors.Add(task.vecColors(colors.Count))
-                    maskOrder.Add(area, unsortedMasks.Count)
-                    unsortedMasks.Add(cclabels.InRange(i, i)(r))
-                    Dim c = New cv.Point(CInt(centroidRaw.Get(Of Double)(i, 0)), CInt(centroidRaw.Get(Of Double)(i, 1)))
-                    unsortedCentroids.Add(c)
-                End If
+                If r.Width = dst2.Width And r.Height = dst2.Height Then Continue For
+                areas.Add(area)
+                unsortedRects.Add(r)
+                index.Add(i)
+                colors.Add(task.vecColors(colors.Count))
+                maskOrder.Add(area, unsortedMasks.Count)
+                unsortedMasks.Add(cclabels.InRange(i, i)(r))
+                Dim c = New cv.Point(CInt(centroidRaw.Get(Of Double)(i, 0)), CInt(centroidRaw.Get(Of Double)(i, 1)))
+                unsortedCentroids.Add(c)
             End If
         Next
 
@@ -530,9 +529,8 @@ End Class
 
 
 
-
 'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
-Public Class CComp_GrayScale : Inherits VBparent
+Public Class CComp_GrayScaleOld : Inherits VBparent
     Public rects As New List(Of cv.Rect)
     Public cclabels As New cv.Mat
     Dim vecColors(255) As cv.Vec3b
@@ -587,5 +585,66 @@ Public Class CComp_GrayScale : Inherits VBparent
         task.palette.Run(cclabels)
         dst3 = task.palette.dst2
         labels(3) = CStr(nLabels) + " Connected Components found"
+    End Sub
+End Class
+
+
+
+
+
+'https://github.com/oreillymedia/Learning-OpenCV-3_examples/blob/master/example_14-03.cpp
+Public Class CComp_GrayScale : Inherits VBparent
+    Public rects As New List(Of cv.Rect)
+    Public cclabels As New cv.Mat
+    Dim vecColors(255) As cv.Vec3b
+    Dim colorMap As cv.Mat
+    Public Sub New()
+        Dim msrng As New System.Random
+        For i = 0 To vecColors.Length - 1
+            vecColors(i) = New cv.Vec3b(msrng.Next(50, 255), msrng.Next(50, 255), msrng.Next(50, 255)) ' note: cannot generate black!
+        Next
+        If sliders.Setup(caller) Then sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
+        task.palette.Run(task.color)
+        colorMap = task.palette.gradientColorMap.Row(0).Clone
+        task.desc = "Isolate the full image using RGB binarized connected Components"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static areaSlider = findSlider("CComp Min Area")
+        Dim minSize = areaSlider.value
+        If src.Channels <> 1 Then
+            src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            Dim meanScalar = cv.Cv2.Mean(src)
+            dst2 = src.Threshold(meanScalar(0), 255, cv.ThresholdTypes.Otsu)
+        Else
+            dst2 = src
+        End If
+        Dim stats As New cv.Mat
+        Dim centroids As New cv.Mat
+        Dim labels32S As New cv.Mat
+        Dim nLabels = dst2.ConnectedComponentsWithStats(labels32S, stats, centroids)
+
+        Dim sortedArea As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        rects.Clear()
+        For i = 0 To stats.Rows - 1
+            Dim area = stats.Get(Of Integer)(i, 4)
+            sortedArea.Add(area, i)
+        Next
+
+        cclabels = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        For i = 0 To Math.Min(50, sortedArea.Count) - 1 ' no more than 50 objects will be found...
+            Dim area = sortedArea.ElementAt(i).Key
+            If area < minSize Then Exit For
+            Dim areaIndex = sortedArea.ElementAt(i).Value
+            Dim r = stats.Get(Of cv.Rect)(areaIndex, 0)
+            rects.Add(r)
+            Dim mask = labels32S.InRange(i, i)
+            task.palette.gradientColorMap.Set(Of cv.Vec3b)(0, i + 1, vecColors(i))
+            cclabels.SetTo(i, mask)
+        Next
+
+        Dim maskVal = cclabels.Get(Of Byte)(task.mouseClickPoint.Y, task.mouseClickPoint.X)
+        task.palette.Run(cclabels)
+        dst3 = task.palette.dst2
+        labels(3) = CStr(nLabels) + " Connected Components found. MaskVal=" + CStr(maskVal)
     End Sub
 End Class
