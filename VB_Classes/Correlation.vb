@@ -2,7 +2,6 @@
 Public Class Correlation_Basics : Inherits VBparent
     Dim kFlood As New KMeans_FloodFill
     Dim corr As New MatchTemplate_Basics
-    Dim reduction As New Reduction_PointCloud
     Public Sub New()
         If standalone Then task.usingdst1 = True
         labels(1) = "Click to select a mask to analyze"
@@ -12,29 +11,21 @@ Public Class Correlation_Basics : Inherits VBparent
         kFlood.Run(src)
         dst1 = kFlood.dst2
         dst2 = kFlood.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        If kFlood.flood.rects.Count = 0 Then Exit Sub ' well, we got nothing...
-        If kFlood.flood.rects.Count <= kFlood.selectedIndex Then Exit Sub
-        Dim r = kFlood.flood.rects(kFlood.selectedIndex)
-        dst2.Rectangle(r, cv.Scalar.Yellow, task.lineWidth)
-
-        ' reduction.Run(task.pointCloud)
         Dim split = task.pointCloud.Split()
 
         Dim row = task.mousePoint.Y
-        If row < r.Y Then row = r.Y
-        If row >= r.Y + r.Height Then row = r.Y + r.Height - 1
 
-        Dim dataX As New cv.Mat(New cv.Size(r.Width, r.Height), cv.MatType.CV_32F, 0)
-        Dim dataY As New cv.Mat(New cv.Size(r.Width, r.Height), cv.MatType.CV_32F, 0)
-        Dim dataZ As New cv.Mat(New cv.Size(r.Width, r.Height), cv.MatType.CV_32F, 0)
+        Dim dataX As New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_32F, 0)
+        Dim dataY As New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_32F, 0)
+        Dim dataZ As New cv.Mat(New cv.Size(src.Width, src.Height), cv.MatType.CV_32F, 0)
 
-        split(0)(r).CopyTo(dataX, kFlood.dst3(r))
-        split(1)(r).CopyTo(dataY, kFlood.dst3(r))
-        split(2)(r).CopyTo(dataZ, kFlood.dst3(r))
+        split(0).CopyTo(dataX, kFlood.dst3)
+        split(1).CopyTo(dataY, kFlood.dst3)
+        split(2).CopyTo(dataZ, kFlood.dst3)
 
-        Dim row1 = dataX.Row(row - r.Y)
-        Dim row2 = dataZ.Row(row - r.Y)
-        dst2.Line(New cv.Point(r.X, row), New cv.Point(r.X + r.Width, row), cv.Scalar.Yellow, task.lineWidth + 1)
+        Dim row1 = dataX.Row(row)
+        Dim row2 = dataZ.Row(row)
+        dst2.Line(New cv.Point(0, row), New cv.Point(dst2.Width, row), cv.Scalar.Yellow, task.lineWidth + 1)
 
         Dim matchoption = corr.checkRadio()
         Dim correlationmat As New cv.Mat

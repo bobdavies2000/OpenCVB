@@ -66,7 +66,7 @@ Public Class FloodFill_Basics : Inherits VBparent
                         Dim m = cv.Cv2.Moments(maskPlus(rect), True)
                         Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
                         centroids.Add(centroid)
-                        dst2(rect).SetTo((i + 1) Mod 255, masks(i))
+                        dst2(rect).SetTo(i Mod 255, masks(i))
                     Else
                         rejectedRects.Add(rect)
                         rejectedCentroids.Add(New cv.Point2f(rect.X + rect.Width / 2, rect.Y + rect.Height / 2))
