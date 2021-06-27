@@ -6,11 +6,10 @@ Public Class FloodFill_Basics : Inherits VBparent
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
-    Public floodPoints As New List(Of cv.Point)
-    Public rejectedCentroids As New List(Of cv.Point2f)
-    Public rejectedRects As New List(Of cv.Rect)
     Public initialMask As New cv.Mat
     Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
+    Dim maskPlus As cv.Mat
+    Public leftovers As cv.Mat
     Public Sub New()
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2500)
@@ -18,9 +17,18 @@ Public Class FloodFill_Basics : Inherits VBparent
             sliders.setupTrackBar(2, "FloodFill HiDiff", 0, 255, 25)
             sliders.setupTrackBar(3, "Step Size", 1, dst2.Cols / 2, 30)
         End If
-        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+        dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         labels(3) = "Palette output"
         task.desc = "Use floodfill to build image segments in a grayscale image."
+    End Sub
+    Private Sub addRegion(mask As cv.Mat, rect As cv.Rect, count As Integer)
+        masks.Add(mask) ' the leftovers that were not flooded.
+        sortedSizes.Add(count, masks.Count)
+        maskSizes.Add(count)
+        rects.Add(rect)
+        Dim m = cv.Cv2.Moments(maskPlus(rect), True)
+        Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
+        centroids.Add(centroid)
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
@@ -33,7 +41,7 @@ Public Class FloodFill_Basics : Inherits VBparent
         Dim stepSize = stepSlider.Value
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1)
+        maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1, 0)
         Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
         initialMask = src.EmptyClone().SetTo(0)
 
@@ -41,14 +49,10 @@ Public Class FloodFill_Basics : Inherits VBparent
         sortedSizes.Clear()
         rects.Clear()
         centroids.Clear()
-        rejectedCentroids.Clear()
-        rejectedRects.Clear()
-
-        maskPlus.SetTo(0)
-        Dim ignoreMasks = initialMask.Clone()
-
+        leftOvers = initialMask.Clone()
         Dim gray = src.Clone()
-        dst2.SetTo(0)
+        dst1.SetTo(0)
+
         For y = 0 To gray.Height - 1 Step stepSize
             For x = 0 To gray.Width - 1 Step stepSize
                 If gray.Get(Of Byte)(y, x) > 0 Then
@@ -56,27 +60,21 @@ Public Class FloodFill_Basics : Inherits VBparent
                     Dim pt = New cv.Point(CInt(x), CInt(y))
                     Dim count = cv.Cv2.FloodFill(gray, maskPlus, pt, cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
                     If count > minFloodSize And count <> gray.Total Then
-                        floodPoints.Add(pt)
-                        masks.Add(maskPlus(maskRect).Clone().SetTo(0, ignoreMasks)(rect))
+                        addRegion(maskPlus(maskRect).Clone().SetTo(0, leftovers)(rect), rect, count)
                         Dim i = masks.Count - 1
                         masks(i).SetTo(0, initialMask(rect)) ' The initial mask is what should not be part of any mask.
-                        sortedSizes.Add(count, i)
-                        maskSizes.Add(count)
-                        rects.Add(rect)
-                        Dim m = cv.Cv2.Moments(maskPlus(rect), True)
-                        Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
-                        centroids.Add(centroid)
-                        dst2(rect).SetTo(i Mod 255, masks(i))
-                    Else
-                        rejectedRects.Add(rect)
-                        rejectedCentroids.Add(New cv.Point2f(rect.X + rect.Width / 2, rect.Y + rect.Height / 2))
+                        dst1(rect).SetTo(i Mod 255, masks(i))
                     End If
                     ' Mask off any object that is too small or previously identified
-                    cv.Cv2.BitwiseOr(ignoreMasks, maskPlus(maskRect), ignoreMasks)
+                    cv.Cv2.BitwiseOr(leftovers, maskPlus(maskRect), leftovers)
                 End If
             Next
         Next
-        dst2 *= 255 / masks.Count
+
+        cv.Cv2.BitwiseNot(leftovers, leftovers)
+        addRegion(leftovers, New cv.Rect(0, 0, dst1.Width, dst1.Height), leftovers.CountNonZero()) ' add the leftovers - unidentified regions.
+
+        dst2 = dst1 * 255 / masks.Count
         If standalone Then
             task.palette.Run(dst2)
             dst3 = task.palette.dst2

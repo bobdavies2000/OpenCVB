@@ -35,25 +35,25 @@ Public Class Correlation_Basics : Inherits VBparent
 
         dst3.SetTo(0)
         Dim plotX As New List(Of Single)
-        Dim plotY As New List(Of Single)
+        Dim plotZ As New List(Of Single)
         For i = 0 To row1.Cols - 1
             Dim x = row1.Get(Of Single)(0, i)
-            Dim y = row2.Get(Of Single)(0, i)
-            If x <> 0 And y <> 0 Then
+            Dim z = row2.Get(Of Single)(0, i)
+            If x <> 0 And z <> 0 Then
                 plotX.Add(x)
-                plotY.Add(y)
+                plotZ.Add(z)
             End If
         Next
 
         If plotX.Count > 0 Then
             Dim minx = plotX.Min, maxx = plotX.Max
-            Dim miny = plotY.Min, maxy = plotY.Max
+            Dim minZ = plotZ.Min, maxZ = plotZ.Max
             For i = 0 To plotX.Count - 1
                 Dim x = dst3.Width * (plotX(i) - minx) / (maxx - minx)
-                Dim y = dst3.Height * (plotY(i) - miny) / (maxy - miny)
+                Dim y = dst3.Height * (plotZ(i) - minZ) / (maxZ - minZ)
                 dst3.Circle(New cv.Point(x, y), task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
-            labels(3) = "Y=" + Format(miny, "0.00") + " to Y=" + Format(maxy, "0.00") + " X=" + Format(minx, "0.00") + " to X=" + Format(maxx, "0.00")
+            labels(3) = "Y=" + Format(minZ, "0.00") + " to Y=" + Format(maxZ, "0.00") + " X=" + Format(minx, "0.00") + " to X=" + Format(maxx, "0.00")
         End If
     End Sub
 End Class

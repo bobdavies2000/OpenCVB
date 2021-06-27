@@ -547,7 +547,7 @@ Public Class KMeans_FloodFill : Inherits VBparent
         task.usingdst1 = True
         findSlider("FloodFill Minimum Size").Value = 1
         labels(1) = "Click anywhere to see connected components in dst3"
-        labels(2) = "FloodFill Results"
+        labels(2) = "FloodFill Results - click to select another region"
         labels(3) = "Selected region - click anywhere."
         task.desc = "Use each KMeans mask with floodfill to identify each segment in the image"
     End Sub
@@ -563,7 +563,10 @@ Public Class KMeans_FloodFill : Inherits VBparent
         dst2 = flood.dst2
 
         If task.mouseClickFlag Then mousePoint = task.mouseClickPoint
-        selectedIndex = flood.dst2.Get(Of Byte)(mousePoint.Y, mousePoint.X)
-        dst3 = flood.dst2.InRange(selectedIndex, selectedIndex)
+        selectedIndex = flood.dst1.Get(Of Byte)(mousePoint.Y, mousePoint.X)
+        dst3 = flood.dst1.InRange(selectedIndex, selectedIndex)
+
+        Dim r = flood.rects(selectedIndex)
+        If r.Width <> dst1.Width And r.Height <> dst1.Height Then dst3.SetTo(0, flood.leftovers)  ' removed the unidentifed regions
     End Sub
 End Class
