@@ -22,8 +22,8 @@ Public Class FloodFill_Basics : Inherits VBparent
         task.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
     Private Sub addRegion(mask As cv.Mat, rect As cv.Rect, count As Integer)
-        masks.Add(mask) ' the leftovers that were not flooded.
         sortedSizes.Add(count, masks.Count)
+        masks.Add(mask) ' the leftovers that were not flooded.
         maskSizes.Add(count)
         rects.Add(rect)
         Dim m = cv.Cv2.Moments(maskPlus(rect), True)

@@ -548,7 +548,7 @@ Public Class KMeans_FloodFill : Inherits VBparent
         findSlider("FloodFill Minimum Size").Value = 1
         labels(1) = "Click anywhere to see connected components in dst3"
         labels(2) = "FloodFill Results - click to select another region"
-        labels(3) = "Selected region - click anywhere."
+        labels(3) = "Selected region"
         task.desc = "Use each KMeans mask with floodfill to identify each segment in the image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
