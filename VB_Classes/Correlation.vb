@@ -31,6 +31,7 @@ Public Class Correlation_Basics : Inherits VBparent
         Dim correlationmat As New cv.Mat
         cv.Cv2.MatchTemplate(row1, row2, correlationmat, matchoption)
         Dim correlation = correlationmat.Get(Of Single)(0, 0)
+        labels(2) = "Correlation of X to Z = " + Format(correlation, "#0.00")
 
         dst3.SetTo(0)
         Dim plotX As New List(Of Single)
@@ -52,6 +53,7 @@ Public Class Correlation_Basics : Inherits VBparent
                 Dim y = dst3.Height * (plotY(i) - miny) / (maxy - miny)
                 dst3.Circle(New cv.Point(x, y), task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
             Next
+            labels(3) = "Y=" + Format(miny, "0.00") + " to Y=" + Format(maxy, "0.00") + " X=" + Format(minx, "0.00") + " to X=" + Format(maxx, "0.00")
         End If
     End Sub
 End Class
