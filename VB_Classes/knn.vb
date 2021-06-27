@@ -273,7 +273,7 @@ Public Class KNN_Emax : Inherits VBparent
 
         knn.Run(src)
         If standalone Or task.intermediateName = caller Then
-            dst2 = emax.dst2 + knn.dst2
+            dst2 = emax.dst2 + knn.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst3 = knn.dst2
         Else
             dst2 = knn.dst2
