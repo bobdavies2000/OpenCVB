@@ -1667,25 +1667,37 @@ End Class
 
 
 
-'Public Class Depth_Objects : Inherits VBparent
-'    Public basics As New FloodFill_Basics
-'    Public Sub New()
-'        task.desc = "Create a floodfill image that is only 8-bit for use with a palette"
-'    End Sub
-'    Public Sub Run(src As cv.Mat) ' Rank = 1
-'        Static minSizeSlider = findSlider("FloodFill Minimum Size")
-'        basics.Run(src)
+Public Class Depth_Objects : Inherits VBparent
+    Public lutFlood As New LUT_FloodNoDepth
+    Dim nearColor = New Byte() {0, 255, 255}
+    Dim farColor = New Byte() {255, 0, 0}
+    Public Sub New()
+        labels(1) = "Click on any region to isolate that region and measure it."
+        task.desc = "Create a segmented image with LUT and establish the order of each region in depth"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static minSizeSlider = findSlider("FloodFill Minimum Size")
+        lutFlood.Run(src)
+        dst1 = lutFlood.dst1
+        dst2 = lutFlood.dst2
+        dst3 = lutFlood.dst3
 
-'        dst3.SetTo(0)
-'        For i = 0 To basics.masks.Count - 1
-'            Dim maskIndex = basics.sortedSizes.ElementAt(i).Value
-'            Dim r = basics.rects(maskIndex)
-'            dst3(r).SetTo(cv.Scalar.All((i + 1) Mod 255), basics.masks(maskIndex))
-'        Next
+        Dim meanDepth As cv.Scalar, stdevDepth As cv.Scalar
+        Dim means As New List(Of Single)
+        Dim stdevs As New List(Of Single)
+        For i = 0 To lutFlood.lut.flood.masks.Count - 1
+            Dim maskIndex = lutFlood.lut.flood.sortedSizes.ElementAt(i).Value
+            Dim r = lutFlood.lut.flood.rects(maskIndex)
+            Dim m = lutFlood.lut.flood.masks(maskIndex)
+            cv.Cv2.MeanStdDev(task.depth32f(r), meanDepth, stdevDepth, m)
+            means.Add(meanDepth.Item(0))
+            stdevs.Add(stdevDepth.Item(0))
+        Next
 
-'        task.palette.Run(dst3 * 255 / basics.masks.Count) ' spread the colors 
-'        dst2 = task.palette.dst2
-
-'        labels(2) = CStr(basics.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
-'    End Sub
-'End Class
+        Dim index = lutFlood.lut.selectedIndex
+        Dim rect = lutFlood.lut.flood.rects(index)
+        dst3.Rectangle(rect, cv.Scalar.White, 1)
+        labels(3) = "Region " + CStr(index) + " has depth " + Format(means(index), "0.0") + " with stdev " + Format(stdevs(index), "#.00")
+        labels(2) = CStr(lutFlood.lut.flood.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
+    End Sub
+End Class

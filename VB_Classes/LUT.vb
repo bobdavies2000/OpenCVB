@@ -191,6 +191,7 @@ Public Class LUT_FloodFill : Inherits VBparent
 
         Dim r = flood.rects(selectedIndex)
         If r.Width <> dst1.Width And r.Height <> dst1.Height Then dst3.SetTo(0, flood.leftovers)  ' removed the unidentifed regions
+        dst3.Rectangle(r, cv.Scalar.White, 1)
         labels(3) = CStr(flood.masks.Count) + " regions.  Selected region = " + CStr(selectedIndex)
     End Sub
 End Class
@@ -203,7 +204,7 @@ End Class
 
 
 Public Class LUT_FloodNoDepth : Inherits VBparent
-    Dim lut As New LUT_FloodFill
+    Public lut As New LUT_FloodFill
     Dim edges As New Edges_Basics
     Public Sub New()
         task.desc = "Removed regions with no depth"

@@ -561,6 +561,7 @@ Public Class KMeans_FloodFill : Inherits VBparent
 
         Dim r = flood.rects(selectedIndex)
         If r.Width <> dst1.Width And r.Height <> dst1.Height Then dst3.SetTo(0, flood.leftovers)  ' removed the unidentifed regions
+        dst3.Rectangle(r, cv.Scalar.White, 1)
         labels(3) = CStr(flood.masks.Count) + " regions.  Selected region = " + CStr(selectedIndex)
     End Sub
 End Class
