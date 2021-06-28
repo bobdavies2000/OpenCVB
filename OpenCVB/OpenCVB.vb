@@ -393,24 +393,23 @@ Public Class OpenCVB
         SyncLock ttTextData
             Try
                 Dim ttText = New List(Of VB_Classes.TTtext)(ttTextData)
-                Dim tmpTag1 = pic.Tag
-                Dim tmpTag2 = pic.Tag
-                If usingDst1 = False And tmpTag1 = 1 Then tmpTag1 = -1
-                If usingDst1 And tmpTag2 = 2 Then tmpTag2 = -1 ' moving all the dst2 true text to dst1 when using dst1. 
-                If tmpTag1 = 1 Or tmpTag2 = 2 Or pic.Tag = 3 Then
-                    For i = 0 To ttText.Count - 1
-                        Dim tt = ttText(i)
-                        If tt IsNot Nothing Then
-                            If ttText(i).picTag = 3 Then
-                                g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(Color.White), tt.x * ratio + camPic(0).Width, tt.y * ratio)
-                            Else
+                Dim special As Boolean
+                For i = 0 To ttText.Count - 1
+                    Dim tt = ttText(i)
+                    If pic.Tag = 2 And ttText(i).picTag = 3 Then special = True
+                    If tt IsNot Nothing And pic.Tag = ttText(i).picTag Or special Then
+                        Select Case ttText(i).picTag
+                            Case 1
                                 g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(Color.White), tt.x * ratio, tt.y * ratio)
-                            End If
-                            maxline -= 1
-                            If maxline <= 0 Then Exit For
-                        End If
-                    Next
-                End If
+                            Case 2
+                                g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(Color.White), tt.x * ratio, tt.y * ratio)
+                            Case 3
+                                g.DrawString(tt.text, optionsForm.fontInfo.Font, New SolidBrush(Color.White), tt.x * ratio + camPic(0).Width, tt.y * ratio)
+                        End Select
+                        maxline -= 1
+                        If maxline <= 0 Then Exit For
+                    End If
+                Next
             Catch ex As Exception
                 Console.WriteLine("Error in ttextData update: " + ex.Message)
             End Try

@@ -103,7 +103,6 @@ Public Class VBparent : Implements IDisposable
         End If
     End Sub
     Public Sub setTrueText(text As String, Optional x As Integer = 10, Optional y As Integer = 40, Optional picTag As Integer = 2)
-        If task.usingdst1 And picTag = 2 Then picTag = 1
         Dim str As New TTtext(text, x, y, picTag)
         If task.intermediateName = caller Or task.intermediateName = "" Then task.ttTextData.Add(str)
     End Sub

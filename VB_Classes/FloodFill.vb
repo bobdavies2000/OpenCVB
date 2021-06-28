@@ -2,7 +2,6 @@ Imports cv = OpenCvSharp
 Imports System.Threading
 Public Class FloodFill_Basics : Inherits VBparent
     Public sortedSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
-    Public maskSizes As New List(Of Integer)
     Public rects As New List(Of cv.Rect)
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
@@ -24,7 +23,6 @@ Public Class FloodFill_Basics : Inherits VBparent
     Private Sub addRegion(mask As cv.Mat, rect As cv.Rect, count As Integer)
         sortedSizes.Add(count, masks.Count)
         masks.Add(mask) ' the leftovers that were not flooded.
-        maskSizes.Add(count)
         rects.Add(rect)
         Dim m = cv.Cv2.Moments(maskPlus(rect), True)
         Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
@@ -43,13 +41,13 @@ Public Class FloodFill_Basics : Inherits VBparent
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1, 0)
         Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
-        initialMask = src.EmptyClone().SetTo(0)
+        initialMask = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
+        leftovers = initialMask
 
         masks.Clear()
         sortedSizes.Clear()
         rects.Clear()
         centroids.Clear()
-        leftOvers = initialMask.Clone()
         Dim gray = src.Clone()
         dst1.SetTo(0)
 
@@ -72,7 +70,8 @@ Public Class FloodFill_Basics : Inherits VBparent
         Next
 
         cv.Cv2.BitwiseNot(leftovers, leftovers)
-        addRegion(leftovers, New cv.Rect(0, 0, dst1.Width, dst1.Height), leftovers.CountNonZero()) ' add the leftovers - unidentified regions.
+        'dst1.SetTo(masks.Count, leftovers)
+        'addRegion(leftovers, New cv.Rect(0, 0, dst1.Width, dst1.Height), leftovers.CountNonZero()) ' add the leftovers - unidentified regions.
 
         dst2 = dst1 * 255 / masks.Count
         If standalone Then

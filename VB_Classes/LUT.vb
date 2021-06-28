@@ -168,12 +168,13 @@ End Class
 Public Class LUT_FloodFill : Inherits VBparent
     Public flood As New FloodFill_Basics
     Public lut As New LUT_Basics
-    Public selectedIndex As Integer
+    Public selectedIndex = 1
     Public Sub New()
         task.usingdst1 = True
         findSlider("FloodFill Minimum Size").Value = 1
         labels(1) = "Click anywhere to see connected components in dst3"
         labels(2) = "FloodFill Results - click to select another region"
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         task.desc = "Use LUT output with floodfill to identify each segment in the image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
@@ -185,13 +186,26 @@ Public Class LUT_FloodFill : Inherits VBparent
         flood.Run(lut.dst2)
         dst2 = flood.dst2
 
-        If task.mouseClickFlag Then mousePoint = task.mouseClickPoint
-        selectedIndex = flood.dst1.Get(Of Byte)(mousePoint.Y, mousePoint.X)
-        dst3 = flood.dst1.InRange(selectedIndex, selectedIndex)
+        If task.mouseClickFlag Then
+            mousePoint = task.mouseClickPoint
+            selectedIndex = flood.dst1.Get(Of Byte)(mousePoint.Y, mousePoint.X)
+        End If
 
-        Dim r = flood.rects(selectedIndex)
-        If r.Width <> dst1.Width And r.Height <> dst1.Height Then dst3.SetTo(0, flood.leftovers)  ' removed the unidentifed regions
-        dst3.Rectangle(r, cv.Scalar.White, 1)
+        dst3.SetTo(0)
+        Dim sample = flood.dst1.Get(Of Byte)(mousePoint.Y, mousePoint.X)
+        Static currentMask = flood.masks(selectedIndex)
+        Static currentRect = flood.rects(selectedIndex)
+        If sample = 0 Then
+            dst3(currentRect).SetTo(255, currentMask)
+            dst3.Rectangle(currentRect, cv.Scalar.White, 1)
+        Else
+            selectedIndex = sample
+            Dim r = flood.rects(selectedIndex)
+            dst3(r).SetTo(255, flood.masks(selectedIndex))
+            currentRect = r
+            currentMask = flood.masks(selectedIndex)
+            dst3.Rectangle(r, cv.Scalar.White, 1)
+        End If
         labels(3) = CStr(flood.masks.Count) + " regions.  Selected region = " + CStr(selectedIndex)
     End Sub
 End Class
@@ -213,7 +227,7 @@ Public Class LUT_FloodNoDepth : Inherits VBparent
         edges.Run(src)
 
         src.SetTo(cv.Scalar.White, edges.dst2)
-        src.SetTo(cv.Scalar.White, task.noDepthMask)
+        'src.SetTo(cv.Scalar.White, task.noDepthMask)
         lut.Run(src)
         dst1 = lut.dst1
         dst2 = lut.dst2
