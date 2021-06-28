@@ -36,8 +36,10 @@ Public Class Featureless_Basics : Inherits VBparent
         flood.Run(mask)
         dst2 = flood.dst2
 
+        Dim allRegions As New cv.Mat
+        cv.Cv2.BitwiseNot(flood.basics.leftovers, allRegions)
         dst3.SetTo(0)
-        src.CopyTo(dst3, flood.allRegionMask)
+        src.CopyTo(dst3, allRegions)
         Static floodSlider = findSlider("FloodFill Minimum Size")
         labels(3) = "FeatureLess Regions = " + CStr(flood.basics.centroids.Count) + " with more than " + CStr(floodSlider.value) + " pixels"
     End Sub

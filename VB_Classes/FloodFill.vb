@@ -835,41 +835,6 @@ End Class
 
 
 
-
-
-Public Class FloodFill_Palette : Inherits VBparent
-    Public basics As New FloodFill_Basics
-    Public allRegionMask As cv.Mat
-    Public Sub New()
-        task.desc = "Create a floodfill image that is only 8-bit for use with a palette"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static minSizeSlider = findSlider("FloodFill Minimum Size")
-        basics.Run(src)
-
-        dst3.SetTo(0)
-        For i = 0 To basics.masks.Count - 1
-            Dim maskIndex = basics.sortedSizes.ElementAt(i).Value
-            Dim r = basics.rects(maskIndex)
-            dst3(r).SetTo(cv.Scalar.All((i + 1) Mod 255), basics.masks(maskIndex))
-        Next
-
-        allRegionMask = If(dst3.Channels = 1, dst3, dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255))
-
-        Dim incr = If(basics.masks.Count < 10, 25, 255 / basics.masks.Count)  'reduces flicker of slightly different colors
-        task.palette.Run(dst3 * cv.Scalar.All(incr)) ' spread the colors 
-        dst2.SetTo(0)
-        task.palette.dst2.CopyTo(dst2, allRegionMask)
-
-        labels(3) = CStr(basics.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
-        If standalone Or task.intermediateName = caller Then dst3 = task.palette.gradientColorMap.Resize(src.Size())
-    End Sub
-End Class
-
-
-
-
-
 Public Class FloodFill_RelativeRange : Inherits VBparent
     Public fBasics As New FloodFill_Basics
     Public Sub New()
@@ -890,42 +855,6 @@ Public Class FloodFill_RelativeRange : Inherits VBparent
         If check.Box(2).Checked Then fBasics.floodFlag += cv.FloodFillFlags.MaskOnly
         fBasics.Run(src)
         dst2 = fBasics.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
-Public Class FloodFill_Click : Inherits VBparent
-    Dim edges As New Edges_BinarizedSobel
-    Dim flood As New FloodFill_Point
-    Public Sub New()
-        flood.pt = New cv.Point(msRNG.Next(0, dst2.Width - 1), msRNG.Next(0, dst2.Height - 1))
-        labels(3) = "Click anywhere to floodfill that area"
-        task.desc = "FloodFill where the mouse clicks"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-
-        If task.mouseClickFlag Then
-            flood.pt = task.mouseClickPoint
-            task.mouseClickFlag = False ' preempt any other uses
-        End If
-
-        edges.Run(src)
-        dst2 = edges.dst3
-
-        If flood.pt.X Or flood.pt.Y Then
-            flood.Run(dst2.Clone)
-            dst2.CopyTo(dst3)
-            If flood.pixelCount > 0 Then dst3.SetTo(255, flood.dst3)
-        End If
     End Sub
 End Class
 
@@ -971,5 +900,71 @@ Public Class FloodFill_Point : Inherits VBparent
             centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
             labels(3) = CStr(pixelCount) + " pixels at point pt(x=" + CStr(pt.X) + ",y=" + CStr(pt.Y)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class FloodFill_Click : Inherits VBparent
+    Dim edges As New Edges_BinarizedSobel
+    Dim flood As New FloodFill_Point
+    Public Sub New()
+        flood.pt = New cv.Point(msRNG.Next(0, dst2.Width - 1), msRNG.Next(0, dst2.Height - 1))
+        labels(3) = "Click anywhere to floodfill that area"
+        task.desc = "FloodFill where the mouse clicks"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        If task.mouseClickFlag Then
+            flood.pt = task.mouseClickPoint
+            task.mouseClickFlag = False ' preempt any other uses
+        End If
+
+        edges.Run(src)
+        dst2 = edges.dst3
+
+        If flood.pt.X Or flood.pt.Y Then
+            flood.Run(dst2.Clone)
+            dst2.CopyTo(dst3)
+            If flood.pixelCount > 0 Then dst3.SetTo(255, flood.dst3)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class FloodFill_Palette : Inherits VBparent
+    Public basics As New FloodFill_Basics
+    Public Sub New()
+        labels(3) = "Image below is 8UC1 input to Palette_Basics"
+        task.desc = "Create a floodfill image that is only 8-bit for use with a palette"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static minSizeSlider = findSlider("FloodFill Minimum Size")
+        basics.Run(src)
+
+        dst3.SetTo(0)
+        For i = 0 To basics.masks.Count - 1
+            Dim maskIndex = basics.sortedSizes.ElementAt(i).Value
+            Dim r = basics.rects(maskIndex)
+            dst3(r).SetTo(cv.Scalar.All((i + 1) Mod 255), basics.masks(maskIndex))
+        Next
+
+        task.palette.Run(dst3 * 255 / basics.masks.Count) ' spread the colors 
+        dst2 = task.palette.dst2
+
+        labels(2) = CStr(basics.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
     End Sub
 End Class

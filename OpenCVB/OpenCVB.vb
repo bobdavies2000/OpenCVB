@@ -71,7 +71,7 @@ Public Class OpenCVB
     Dim openCVKeywords As New List(Of String)
     Public optionsForm As OptionsDialog
     Dim TreeViewDialog As TreeviewForm
-    Dim picLabels() = {"RGB", "Depth", "dst1", "dst2"}
+    Dim picLabels() = {"RGB", "Depth", "dst2", "dst3"}
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
     Public workingRes As cv.Size
     Dim textDesc As String = ""

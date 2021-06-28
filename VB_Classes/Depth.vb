@@ -788,12 +788,10 @@ End Class
 
 
 
-Public Class Depth_Edges : Inherits VBparent
+Public Class Depth_EdgesLaplacian : Inherits VBparent
     Dim edges As New Edges_Laplacian
     Public Sub New()
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Threshold for depth disparity", 0, 255, 200)
-        End If
+        If sliders.Setup(caller) Then sliders.setupTrackBar(0, "Threshold for depth disparity", 0, 255, 200)
         task.desc = "Find edges in depth data"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -809,12 +807,44 @@ End Class
 
 
 
+
+
+
+Public Class Depth_Edges : Inherits VBparent
+    Public Sub New()
+        If sliders.Setup(caller) Then
+            sliders.setupTrackBar(0, "Threshold for depth disparity", 0, 255, 200)
+            sliders.setupTrackBar(1, "cv.rect offset", 0, 20, 1)
+        End If
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
+        task.desc = "Find edges in depth data"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static diffSlider = findSlider("Threshold for depth disparity")
+        Static rectSlider = findSlider("cv.rect offset")
+        Dim offset = rectSlider.value
+
+        Dim r1 = New cv.Rect(0, 0, dst2.Width - offset, dst2.Height - offset)
+        Dim r2 = New cv.Rect(offset, offset, dst2.Width - offset, dst2.Height - offset)
+        dst3.SetTo(0)
+        dst3.Rectangle(r1, cv.Scalar.White, 1)
+        dst3.Rectangle(r2, cv.Scalar.White, 1)
+        task.depth32f(r1).CopyTo(dst3(r2))
+
+        cv.Cv2.Subtract(task.depth32f(r1), task.depth32f(r2), dst1(r1))
+        dst2 = dst1.Threshold(diffSlider.value, 255, cv.ThresholdTypes.Binary)
+    End Sub
+End Class
+
+
+
+
+
+
 Public Class Depth_HolesOverTime : Inherits VBparent
     Dim recentImages As New List(Of cv.Mat)
     Public Sub New()
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Number of images to retain", 0, 30, 3)
-        End If
+        If sliders.Setup(caller) Then sliders.setupTrackBar(0, "Number of images to retain", 0, 30, 3)
         labels(3) = "Latest hole mask"
         task.desc = "Integrate memory holes over time to identify unstable depth"
     End Sub
@@ -1623,3 +1653,39 @@ Public Class Depth_Unstable : Inherits VBparent
         labels(3) = pixel.labels(3)
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'Public Class Depth_Objects : Inherits VBparent
+'    Public basics As New FloodFill_Basics
+'    Public Sub New()
+'        task.desc = "Create a floodfill image that is only 8-bit for use with a palette"
+'    End Sub
+'    Public Sub Run(src As cv.Mat) ' Rank = 1
+'        Static minSizeSlider = findSlider("FloodFill Minimum Size")
+'        basics.Run(src)
+
+'        dst3.SetTo(0)
+'        For i = 0 To basics.masks.Count - 1
+'            Dim maskIndex = basics.sortedSizes.ElementAt(i).Value
+'            Dim r = basics.rects(maskIndex)
+'            dst3(r).SetTo(cv.Scalar.All((i + 1) Mod 255), basics.masks(maskIndex))
+'        Next
+
+'        task.palette.Run(dst3 * 255 / basics.masks.Count) ' spread the colors 
+'        dst2 = task.palette.dst2
+
+'        labels(2) = CStr(basics.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
+'    End Sub
+'End Class

@@ -4,7 +4,6 @@ Public Class KMeans_Basics : Inherits VBparent
     Public masks As New List(Of cv.Mat)
     Public colors As New cv.Mat
     Public maskIndex As Integer
-    Dim depth As New Depth_Edges
     Public Sub New()
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "kMeans k", 2, 32, 4)
@@ -33,9 +32,6 @@ Public Class KMeans_Basics : Inherits VBparent
         Dim kMeansK = kSlider.value
 
         Dim input = src.Clone
-
-        'depth.Run(task.depth32f)
-        'input.SetTo(0, depth.dst3)
 
         If standalone Then task.color.ConvertTo(input, cv.MatType.CV_32FC3)
         If input.Type = cv.MatType.CV_8UC3 Then input.ConvertTo(input, cv.MatType.CV_32FC3)
@@ -548,7 +544,6 @@ Public Class KMeans_FloodFill : Inherits VBparent
         findSlider("FloodFill Minimum Size").Value = 1
         labels(1) = "Click anywhere to see connected components in dst3"
         labels(2) = "FloodFill Results - click to select another region"
-        labels(3) = "Selected region"
         task.desc = "Use each KMeans mask with floodfill to identify each segment in the image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
@@ -568,5 +563,58 @@ Public Class KMeans_FloodFill : Inherits VBparent
 
         Dim r = flood.rects(selectedIndex)
         If r.Width <> dst1.Width And r.Height <> dst1.Height Then dst3.SetTo(0, flood.leftovers)  ' removed the unidentifed regions
+        labels(3) = CStr(flood.masks.Count) + " regions.  Selected region = " + CStr(selectedIndex)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class KMeans_Binarized : Inherits VBparent
+    Dim km As New KMeans_FloodFill
+    Dim edges As New Edges_BinarizedSobel
+    Public Sub New()
+        task.usingdst1 = True
+        task.desc = "Use the binarized Sobel edges to break down regions - needs work"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        edges.Run(src)
+        src.SetTo(cv.Scalar.White, edges.dst3)
+
+        km.Run(src)
+        dst1 = km.dst1
+        dst2 = km.dst2
+        dst3 = km.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class KMeans_FloodNoDepth : Inherits VBparent
+    Dim km As New KMeans_FloodFill
+    Dim edges As New Edges_Basics
+    Public Sub New()
+        task.desc = "Removed regions with no depth"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        edges.Run(src)
+
+        src.SetTo(cv.Scalar.White, edges.dst2)
+        src.SetTo(cv.Scalar.White, task.noDepthMask)
+        km.Run(src)
+        dst1 = km.dst1
+        dst2 = km.dst2
+        dst3 = km.dst3
+        labels(1) = km.labels(1)
+        labels(2) = km.labels(2)
+        labels(3) = km.labels(3)
     End Sub
 End Class

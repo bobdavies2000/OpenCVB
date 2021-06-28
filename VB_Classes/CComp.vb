@@ -237,7 +237,7 @@ End Class
 
 Public Class CComp_DepthEdges : Inherits VBparent
     Dim ccomp As New CComp_PointTracker
-    Dim depth As New Depth_Edges
+    Dim depth As New Depth_EdgesLaplacian
     Public Sub New()
         If check.Setup(caller, 1) Then
             check.Box(0).Text = "Use edge mask in connected components"

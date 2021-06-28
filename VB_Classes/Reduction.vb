@@ -106,7 +106,7 @@ End Class
 
 Public Class Reduction_KNN_ColorAndDepth : Inherits VBparent
     Dim reduction As New Reduction_KNN_Color
-    Dim depth As New Depth_Edges
+    Dim depth As New Depth_EdgesLaplacian
     Public Sub New()
         labels(2) = "Detecting objects using only color coherence"
         labels(3) = "Detecting objects with color and depth coherence"
