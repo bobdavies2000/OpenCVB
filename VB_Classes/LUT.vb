@@ -156,3 +156,69 @@ Public Class LUT_Depth32f : Inherits VBparent
         labels(2) = lut.labels(2)
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+Public Class LUT_FloodFill : Inherits VBparent
+    Public flood As New FloodFill_Basics
+    Public lut As New LUT_Basics
+    Public selectedIndex As Integer
+    Public Sub New()
+        task.usingdst1 = True
+        findSlider("FloodFill Minimum Size").Value = 1
+        labels(1) = "Click anywhere to see connected components in dst3"
+        labels(2) = "FloodFill Results - click to select another region"
+        task.desc = "Use LUT output with floodfill to identify each segment in the image"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 2
+        Static mousePoint = New cv.Point(msRNG.Next(0, dst1.Width), msRNG.Next(0, dst1.Height))
+
+        lut.Run(src)
+        dst1 = lut.dst2
+
+        flood.Run(lut.dst2)
+        dst2 = flood.dst2
+
+        If task.mouseClickFlag Then mousePoint = task.mouseClickPoint
+        selectedIndex = flood.dst1.Get(Of Byte)(mousePoint.Y, mousePoint.X)
+        dst3 = flood.dst1.InRange(selectedIndex, selectedIndex)
+
+        Dim r = flood.rects(selectedIndex)
+        If r.Width <> dst1.Width And r.Height <> dst1.Height Then dst3.SetTo(0, flood.leftovers)  ' removed the unidentifed regions
+        labels(3) = CStr(flood.masks.Count) + " regions.  Selected region = " + CStr(selectedIndex)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class LUT_FloodNoDepth : Inherits VBparent
+    Dim lut As New LUT_FloodFill
+    Dim edges As New Edges_Basics
+    Public Sub New()
+        task.desc = "Removed regions with no depth"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        edges.Run(src)
+
+        src.SetTo(cv.Scalar.White, edges.dst2)
+        src.SetTo(cv.Scalar.White, task.noDepthMask)
+        lut.Run(src)
+        dst1 = lut.dst1
+        dst2 = lut.dst2
+        dst3 = lut.dst3
+        labels(1) = lut.labels(1)
+        labels(2) = lut.labels(2)
+        labels(3) = lut.labels(3)
+    End Sub
+End Class

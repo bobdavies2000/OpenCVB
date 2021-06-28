@@ -547,8 +547,6 @@ Public Class KMeans_FloodFill : Inherits VBparent
         task.desc = "Use each KMeans mask with floodfill to identify each segment in the image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
-        Static kSlider = findSlider("kMeans k")
-        Dim k = kSlider.value
         Static mousePoint = New cv.Point(msRNG.Next(0, dst1.Width), msRNG.Next(0, dst1.Height))
 
         km.Run(src)
