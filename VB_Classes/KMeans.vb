@@ -573,31 +573,7 @@ End Class
 
 
 
-Public Class KMeans_Binarized : Inherits VBparent
-    Dim km As New KMeans_FloodFill
-    Dim edges As New Edges_BinarizedSobel
-    Public Sub New()
-        usingdst1 = True
-        task.desc = "Use the binarized Sobel edges to break down regions - needs work"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        edges.Run(src)
-        src.SetTo(cv.Scalar.White, edges.dst3)
-
-        km.Run(src)
-        dst1 = km.dst1
-        dst2 = km.dst2
-        dst3 = km.dst3
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class KMeans_FloodNoDepth : Inherits VBparent
+Public Class KMeans_FloodEdges : Inherits VBparent
     Public km As New KMeans_FloodFill
     Dim edges As New Edges_Basics
     Public Sub New()
@@ -607,7 +583,6 @@ Public Class KMeans_FloodNoDepth : Inherits VBparent
         edges.Run(src)
 
         src.SetTo(cv.Scalar.White, edges.dst2)
-        src.SetTo(cv.Scalar.White, task.noDepthMask)
         km.Run(src)
         dst1 = km.dst1
         dst2 = km.dst2

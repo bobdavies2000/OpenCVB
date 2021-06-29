@@ -1668,17 +1668,21 @@ End Class
 
 
 Public Class Depth_ObjectsLUT : Inherits VBparent
-    Public lutFlood As New LUT_FloodNoDepth
+    Public lutFlood As New LUT_FloodEdges
     Public Sub New()
+        usingdst1 = True
         labels(1) = "Click on any region to isolate that region and measure everything about it."
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F)
-        task.desc = "Create a segmented image with LUT, select a region, and measure everything about it."
+        task.desc = "Create a segmented image with LUT, select a region, and isolate it for measurement"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
         Static lastRect As New cv.Rect
 
+        src.Rectangle(lastRect, If(task.frameCount Mod 2, 255, 0), 1)
+        src.Rectangle(New cv.Rect(lastRect.X - 1, lastRect.Y - 1, lastRect.Width + 2, lastRect.Height + 2), If(task.frameCount Mod 2, 0, 255), 1)
         lutFlood.Run(src)
+        dst1 = lutFlood.dst1
         dst2 = lutFlood.dst2
         dst3 = lutFlood.dst3
 
@@ -1692,8 +1696,7 @@ Public Class Depth_ObjectsLUT : Inherits VBparent
         labels(3) = "Region " + CStr(index) + " has depth " + Format(meanDepth.Item(0) / 1000, "0.000") + "m with stdev " + Format(stdevDepth.Item(0), "0.0")
         labels(2) = CStr(lutFlood.lut.flood.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
         If index = 0 Then
-            ' dst3.SetTo(0)
-            labels(3) = "Mask shows unmapped regions..."
+            labels(3) = "Click was on an ummapped region..."
             setTrueText("Selected region is unmapped (no depth or too small)", 10, 100, 3)
         End If
     End Sub
@@ -1712,17 +1715,21 @@ End Class
 
 
 Public Class Depth_ObjectsKMeans : Inherits VBparent
-    Public kFlood As New KMeans_FloodNoDepth
+    Public kFlood As New KMeans_FloodEdges
     Public Sub New()
+        usingdst1 = True
         labels(1) = "Click on any region to isolate that region and measure everything about it."
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F)
-        task.desc = "Create a segmented image with KMeans, select a region, and measure everything about it."
+        task.desc = "Create a segmented image with KMeans, select a region, and isolate it for measurement."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
         Static lastRect As New cv.Rect
 
+        src.Rectangle(lastRect, cv.Scalar.White, 1)
+        src.Rectangle(New cv.Rect(lastRect.X - 1, lastRect.Y - 1, lastRect.Width + 2, lastRect.Height + 2), cv.Scalar.Black, 1)
         kFlood.Run(src)
+        dst1 = kFlood.dst1
         dst2 = kFlood.dst2
         dst3 = kFlood.dst3
 
@@ -1736,8 +1743,7 @@ Public Class Depth_ObjectsKMeans : Inherits VBparent
         labels(3) = "Region " + CStr(index) + " has depth " + Format(meanDepth.Item(0) / 1000, "0.000") + "m with stdev " + Format(stdevDepth.Item(0), "0.0")
         labels(2) = CStr(kFlood.km.flood.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
         If index = 0 Then
-            ' dst3.SetTo(0)
-            labels(3) = "Mask shows unmapped regions..."
+            labels(3) = "Click was on an ummapped region..."
             setTrueText("Selected region is unmapped (no depth or too small)", 10, 100, 3)
         End If
     End Sub

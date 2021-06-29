@@ -218,7 +218,7 @@ End Class
 
 
 
-Public Class LUT_FloodNoDepth : Inherits VBparent
+Public Class LUT_FloodEdges : Inherits VBparent
     Public lut As New LUT_FloodFill
     Dim edges As New Edges_Basics
     Public Sub New()
@@ -229,7 +229,6 @@ Public Class LUT_FloodNoDepth : Inherits VBparent
         edges.Run(src)
 
         src.SetTo(cv.Scalar.White, edges.dst2)
-        'src.SetTo(cv.Scalar.White, task.noDepthMask)
         lut.Run(src)
         dst1 = lut.dst1
         dst2 = lut.dst2
