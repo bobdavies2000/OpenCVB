@@ -167,12 +167,13 @@ End Class
 
 Public Class LUT_FloodFill : Inherits VBparent
     Public flood As New FloodFill_Basics
-    Public lut As New LUT_Basics
+    Public lut As New LUT_Equalized
     Public selectedIndex = 1
     Dim edges As New Edges_Basics
     Public Sub New()
         usingdst1 = True
         findSlider("FloodFill Minimum Size").Value = 1
+        findSlider("Canny threshold1").Value = 170
         labels(1) = "Click anywhere to see connected components in dst3"
         labels(2) = "FloodFill Results - click to select another region"
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
@@ -212,5 +213,46 @@ Public Class LUT_FloodFill : Inherits VBparent
             dst3.Rectangle(r, cv.Scalar.White, 1)
         End If
         labels(3) = CStr(flood.masks.Count) + " regions.  Selected region = " + CStr(selectedIndex)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class LUT_Equalized : Inherits VBparent
+    Dim eq As New Histogram_EqualizeGray
+    Dim lut As New LUT_Basics
+    Public Sub New()
+        If standalone Then usingdst1 = True
+        labels(1) = "Equalized has the same number of pixels"
+        labels(2) = "Without Histogram Equalized"
+        labels(3) = "With Histogram Equalized"
+        task.desc = "Use LUT_Basics but with an equalized histogram image."
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static segSlider = findSlider("Number of LUT Segments")
+        If standalone Then
+            lut.Run(src.Clone)
+            dst3 = lut.dst2.Clone
+        End If
+
+        eq.Run(src)
+        lut.Run(eq.dst2)
+        dst2 = lut.dst2
+
+        If standalone Then
+            dst1 = eq.dst3
+            Dim lineCount = segSlider.value
+            Dim incr = dst1.Width / lineCount
+            For i = 0 To lineCount - 1
+                Dim p1 = New cv.Point(CInt(i * incr), 0)
+                Dim p2 = New cv.Point(CInt(i * incr), dst1.Height)
+                dst1.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth)
+            Next
+        End If
     End Sub
 End Class
