@@ -184,6 +184,7 @@ Public Class LUT_FloodFill : Inherits VBparent
         dst1 = lut.dst2
 
         flood.Run(lut.dst2)
+        If flood.rects.Count = 0 Then Exit Sub ' image is likely very dark and nothing is actually seen...
         dst2 = flood.dst2
 
         If task.mouseClickFlag Then

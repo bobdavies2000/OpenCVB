@@ -468,27 +468,6 @@ End Class
 
 
 
-'Public Class KMeans_CCompOld : Inherits VBparent
-'    Dim ccomp As New CComp_GrayScaleOld
-'    Dim km As New KMeans_Basics
-'    Public Sub New()
-'        labels(2) = "Click to see connected components in dst3"
-'        task.desc = "Use each KMeans mask with CComp"
-'    End Sub
-'    Public Sub Run(src As cv.Mat) ' Rank = 2
-'        km.Run(src)
-'        dst2 = km.dst2
-'        ccomp.Run(km.masks(km.maskIndex))
-'        dst3 = ccomp.dst3
-'    End Sub
-'End Class
-
-
-
-
-
-
-
 'Public Class KMeans_CComp : Inherits VBparent
 '    Dim ccomp As New CComp_GrayScale
 '    Dim km As New KMeans_Basics
@@ -544,6 +523,7 @@ Public Class KMeans_FloodFill : Inherits VBparent
         findSlider("FloodFill Minimum Size").Value = 1
         labels(1) = "Click anywhere to see connected components in dst3"
         labels(2) = "FloodFill Results - click to select another region"
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         task.desc = "Use each KMeans mask with floodfill to identify each segment in the image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
@@ -553,15 +533,30 @@ Public Class KMeans_FloodFill : Inherits VBparent
         dst1 = km.dst2
 
         flood.Run(km.dst2)
+        If flood.rects.Count = 0 Then Exit Sub ' image is likely very dark and nothing is actually seen...
         dst2 = flood.dst2
 
-        If task.mouseClickFlag Then mousePoint = task.mouseClickPoint
-        selectedIndex = flood.dst1.Get(Of Byte)(mousePoint.Y, mousePoint.X)
-        dst3 = flood.dst1.InRange(selectedIndex, selectedIndex)
+        If task.mouseClickFlag Then
+            mousePoint = task.mouseClickPoint
+            selectedIndex = flood.dst1.Get(Of Byte)(mousePoint.Y, mousePoint.X)
+        End If
 
-        Dim r = flood.rects(selectedIndex)
-        If r.Width <> dst1.Width And r.Height <> dst1.Height Then dst3.SetTo(0, flood.leftovers)  ' removed the unidentifed regions
-        dst3.Rectangle(r, cv.Scalar.White, 1)
+        dst3.SetTo(0)
+        Dim sample = flood.dst1.Get(Of Byte)(mousePoint.Y, mousePoint.X)
+        Static currentMask = flood.masks(selectedIndex)
+        Static currentRect = flood.rects(selectedIndex)
+        If sample = 0 Then
+            If selectedIndex >= flood.rects.Count Then selectedIndex = 0 ' if there are fewer regions found this pass and the sample is 0, then be safe.
+            dst3(currentRect).SetTo(255, currentMask)
+            dst3.Rectangle(currentRect, cv.Scalar.White, 1)
+        Else
+            selectedIndex = sample
+            Dim r = flood.rects(selectedIndex)
+            dst3(r).SetTo(255, flood.masks(selectedIndex))
+            currentRect = r
+            currentMask = flood.masks(selectedIndex)
+            dst3.Rectangle(r, cv.Scalar.White, 1)
+        End If
         labels(3) = CStr(flood.masks.Count) + " regions.  Selected region = " + CStr(selectedIndex)
     End Sub
 End Class
