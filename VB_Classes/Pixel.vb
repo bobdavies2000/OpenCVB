@@ -18,9 +18,6 @@ Public Class Pixel_Viewer : Inherits VBparent
             setTrueText("The pixel Viewer does not support this cv.Mat!  Please add support.")
             Exit Sub
         End If
-        If viewerForm.GrayScaleOnly.Checked And dst2.Channels <> 1 And displayType < 2 Then
-            dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        End If
 
         Dim formatType = Choose(displayType + 1, "8UC3", "8UC1", "32FC1", "32FC3")
         viewerForm.Text = "Pixel Viewer for " + Choose(task.mousePicTag + 1, "Color", "RGB Depth", "dst2", "dst3") + " " + formatType

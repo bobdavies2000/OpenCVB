@@ -16,7 +16,6 @@ Public Class PixelViewerForm
 
         Me.Width = GetSetting("OpenCVB", "PixelViewerWidth", "PixelViewerWidth", 1280)
         Me.Height = GetSetting("OpenCVB", "PixelViewerHeight", "PixelViewerHeight", 720)
-        GrayScaleOnly.Checked = GetSetting("OpenCVB", "grayscaleOnly", "grayscaleOnly", False)
         PixelViewerForm_ResizeEnd(sender, e)
         UpdateFrequency.Items.Add("Instantaneously")
         UpdateFrequency.Items.Add("Once a second")
@@ -55,10 +54,6 @@ Public Class PixelViewerForm
             Case Keys.Right
                 mousePoint.X += 1
         End Select
-    End Sub
-    Private Sub ToolStripButton5_Click(sender As Object, e As EventArgs) Handles GrayScaleOnly.Click
-        GrayScaleOnly.Checked = Not GrayScaleOnly.Checked
-        SaveSetting("OpenCVB", "grayscaleOnly", "grayscaleOnly", GrayScaleOnly.Checked)
     End Sub
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         If UpdateFrequency.SelectedIndex = 1 Then
