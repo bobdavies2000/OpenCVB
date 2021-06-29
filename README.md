@@ -570,16 +570,13 @@ KNN_PointTracker algorithm was built:
 
 ![Graphical user interface, text, application, email Description automatically generated](media/5f4b6c13e3d0e852b0705339f893603e.png)
 
-Graphical user interface, text, application, email Description automatically
-generated
-
-The tree describes how the algorithm calls KNN_1_to_1 and how KNN_1_to_1 calls
-KNN_BasicsQT and so on. Clicking on any of the tree entries will show the output
-of the selected algorithm in this context. This is useful to understand the
-various steps needed build the output. All output will show up in OpenCVB’s main
-form in the bottom 2 images. Play with this when running OpenCVB. It is a fun
-feature and helps increase understanding of the composition of the increasingly
-complex algorithms.
+*The tree above describes how the algorithm calls KNN_1_to_1 and how KNN_1_to_1
+calls KNN_BasicsQT and so on. Clicking on any of the tree entries will show the
+output of the selected algorithm in this context. This is useful to understand
+the various steps needed to build the output. All output will show up in
+OpenCVB’s main form in the bottom 2 images. Play with this when running OpenCVB.
+It is a fun feature and helps increase understanding of the composition of the
+increasingly complex algorithms.*
 
 Pixel Viewer
 ============

@@ -39,6 +39,8 @@ Public Class VBparent : Implements IDisposable
     Public quadrantIndex As Integer = QUAD3
     Public minVal As Double, maxVal As Double
     Public minLoc As cv.Point, maxLoc As cv.Point
+    Public usingdst0 As Boolean
+    Public usingdst1 As Boolean
     Dim callStack = ""
     Public Sub initParent()
         standalone = task.callTrace(0) = caller + "\" ' only the first is standalone (the primary algorithm.)
@@ -55,6 +57,8 @@ Public Class VBparent : Implements IDisposable
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
         algorithm.Run(src)
         If standalone Or caller = "Python_Run" Then
+            task.dst0Updated = usingdst0
+            task.dst1Updated = usingdst1
             task.labels(0) = labels(0)
             task.labels(1) = labels(1)
             task.labels(2) = labels(2)
@@ -83,8 +87,8 @@ Public Class VBparent : Implements IDisposable
                 task.imgResult = New cv.Mat(New cv.Size(dst2.Width * 2, dst2.Height), cv.MatType.CV_8UC3)
             End If
 
-            If task.usingdst0 Then task.color = dst0
-            If task.usingdst1 Then task.RGBDepth = dst1
+            If usingdst0 Then task.color = dst0
+            If usingdst1 Then task.RGBDepth = dst1
 
             If task.pythonTaskName.EndsWith(".py") = False Then
                 If task.pixelViewerOn Then

@@ -3,7 +3,7 @@ Public Class Correlation_Basics : Inherits VBparent
     Dim kFlood As New KMeans_FloodFill
     Dim corr As New MatchTemplate_Basics
     Public Sub New()
-        If standalone Then task.usingdst1 = True
+        If standalone Then usingdst1 = True
         labels(1) = "Click to select a mask to analyze"
         task.desc = "Compute a correlation for src rows (See also: MatchTemplate.vb"
     End Sub

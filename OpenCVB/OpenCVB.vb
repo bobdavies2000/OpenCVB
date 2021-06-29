@@ -1280,8 +1280,8 @@ Public Class OpenCVB
 
             If task.mousePointUpdated Then mousePoint = task.mousePoint ' in case the algorithm has changed the mouse location...
             If task.drawRectUpdated Then drawRect = task.drawRect
-            usingDst0 = task.usingdst0
-            usingDst1 = task.usingdst1
+            usingDst0 = task.dst0Updated
+            usingDst1 = task.dst1Updated
             If task.drawRectClear Then
                 drawRect = New cv.Rect
                 task.drawRect = drawRect

@@ -1667,40 +1667,74 @@ End Class
 
 
 
-Public Class Depth_Objects : Inherits VBparent
+Public Class Depth_ObjectsLUT : Inherits VBparent
     Public lutFlood As New LUT_FloodNoDepth
-    Dim nearColor = New Byte() {0, 255, 255}
-    Dim farColor = New Byte() {255, 0, 0}
     Public Sub New()
-        labels(1) = "Click on any region to isolate that region and measure it."
-        task.desc = "Create a segmented image with LUT and establish the order of each region in depth"
+        labels(1) = "Click on any region to isolate that region and measure everything about it."
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F)
+        task.desc = "Create a segmented image with LUT, select a region, and measure everything about it."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
         Static lastRect As New cv.Rect
 
         lutFlood.Run(src)
-        dst1 = lutFlood.dst1
         dst2 = lutFlood.dst2
         dst3 = lutFlood.dst3
 
         Dim meanDepth As cv.Scalar, stdevDepth As cv.Scalar
-        Dim means As New List(Of Single)
-        Dim stdevs As New List(Of Single)
-        For i = 0 To lutFlood.lut.flood.masks.Count - 1
-            Dim maskIndex = lutFlood.lut.flood.sortedSizes.ElementAt(i).Value
-            Dim rect = lutFlood.lut.flood.rects(maskIndex)
-            Dim m = lutFlood.lut.flood.masks(maskIndex).SetTo(0, task.noDepthMask(rect))
-            cv.Cv2.MeanStdDev(task.depth32f(rect), meanDepth, stdevDepth, m)
-            means.Add(meanDepth.Item(0))
-            stdevs.Add(stdevDepth.Item(0))
-        Next
-
         Dim index = lutFlood.lut.selectedIndex
         Dim r = lutFlood.lut.flood.rects(index)
-        If r.Width <> dst1.Width Or r.Height <> dst1.Height Then lastRect = New cv.Rect(r.X - 2, r.Y - 2, r.Width + 4, r.Height + 4)
-        labels(3) = "Region " + CStr(index) + " has depth " + Format(means(index) / 1000, "0.0") + "m with stdev " + Format(stdevs(index), "#.00")
+        lastRect = New cv.Rect(r.X - 2, r.Y - 2, r.Width + 4, r.Height + 4)
+
+        cv.Cv2.MeanStdDev(task.depth32f(r), meanDepth, stdevDepth, lutFlood.lut.flood.masks(index))
+
+        labels(3) = "Region " + CStr(index) + " has depth " + Format(meanDepth.Item(0) / 1000, "0.000") + "m with stdev " + Format(stdevDepth.Item(0), "0.0")
         labels(2) = CStr(lutFlood.lut.flood.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
+        If index = 0 Then
+            ' dst3.SetTo(0)
+            labels(3) = "Mask shows unmapped regions..."
+            setTrueText("Selected region is unmapped (no depth or too small)", 10, 100, 3)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+
+
+Public Class Depth_ObjectsKMeans : Inherits VBparent
+    Public kFlood As New KMeans_FloodNoDepth
+    Public Sub New()
+        labels(1) = "Click on any region to isolate that region and measure everything about it."
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F)
+        task.desc = "Create a segmented image with KMeans, select a region, and measure everything about it."
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static minSizeSlider = findSlider("FloodFill Minimum Size")
+        Static lastRect As New cv.Rect
+
+        kFlood.Run(src)
+        dst2 = kFlood.dst2
+        dst3 = kFlood.dst3
+
+        Dim meanDepth As cv.Scalar, stdevDepth As cv.Scalar
+        Dim index = kFlood.km.selectedIndex
+        Dim r = kFlood.km.flood.rects(index)
+        lastRect = New cv.Rect(r.X - 2, r.Y - 2, r.Width + 4, r.Height + 4)
+
+        cv.Cv2.MeanStdDev(task.depth32f(r), meanDepth, stdevDepth, kFlood.km.flood.masks(index))
+
+        labels(3) = "Region " + CStr(index) + " has depth " + Format(meanDepth.Item(0) / 1000, "0.000") + "m with stdev " + Format(stdevDepth.Item(0), "0.0")
+        labels(2) = CStr(kFlood.km.flood.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
         If index = 0 Then
             ' dst3.SetTo(0)
             labels(3) = "Mask shows unmapped regions..."

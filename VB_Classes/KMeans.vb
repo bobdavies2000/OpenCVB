@@ -540,7 +540,7 @@ Public Class KMeans_FloodFill : Inherits VBparent
     Public km As New KMeans_Basics
     Public selectedIndex As Integer
     Public Sub New()
-        task.usingdst1 = True
+        usingdst1 = True
         findSlider("FloodFill Minimum Size").Value = 1
         labels(1) = "Click anywhere to see connected components in dst3"
         labels(2) = "FloodFill Results - click to select another region"
@@ -577,7 +577,7 @@ Public Class KMeans_Binarized : Inherits VBparent
     Dim km As New KMeans_FloodFill
     Dim edges As New Edges_BinarizedSobel
     Public Sub New()
-        task.usingdst1 = True
+        usingdst1 = True
         task.desc = "Use the binarized Sobel edges to break down regions - needs work"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -598,7 +598,7 @@ End Class
 
 
 Public Class KMeans_FloodNoDepth : Inherits VBparent
-    Dim km As New KMeans_FloodFill
+    Public km As New KMeans_FloodFill
     Dim edges As New Edges_Basics
     Public Sub New()
         task.desc = "Removed regions with no depth"
