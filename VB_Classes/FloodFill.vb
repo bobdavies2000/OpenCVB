@@ -28,7 +28,7 @@ Public Class FloodFill_Basics : Inherits VBparent
         Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
         centroids.Add(centroid)
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 5
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
         Static loDiffSlider = findSlider("FloodFill LoDiff")
         Static hiDiffSlider = findSlider("FloodFill HiDiff")

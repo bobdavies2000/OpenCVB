@@ -1668,7 +1668,7 @@ End Class
 
 
 Public Class Depth_ObjectsLUT : Inherits VBparent
-    Public lutFlood As New LUT_FloodEdges
+    Public lutFlood As New LUT_FloodFill
     Public Sub New()
         usingdst1 = True
         labels(1) = "Click on any region to isolate that region and measure everything about it."
@@ -1687,14 +1687,14 @@ Public Class Depth_ObjectsLUT : Inherits VBparent
         dst3 = lutFlood.dst3
 
         Dim meanDepth As cv.Scalar, stdevDepth As cv.Scalar
-        Dim index = lutFlood.lut.selectedIndex
-        Dim r = lutFlood.lut.flood.rects(index)
+        Dim index = lutFlood.selectedIndex
+        Dim r = lutFlood.flood.rects(index)
         lastRect = New cv.Rect(r.X - 2, r.Y - 2, r.Width + 4, r.Height + 4)
 
-        cv.Cv2.MeanStdDev(task.depth32f(r), meanDepth, stdevDepth, lutFlood.lut.flood.masks(index))
+        cv.Cv2.MeanStdDev(task.depth32f(r), meanDepth, stdevDepth, lutFlood.flood.masks(index))
 
         labels(3) = "Region " + CStr(index) + " has depth " + Format(meanDepth.Item(0) / 1000, "0.000") + "m with stdev " + Format(stdevDepth.Item(0), "0.0")
-        labels(2) = CStr(lutFlood.lut.flood.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
+        labels(2) = CStr(lutFlood.flood.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
         If index = 0 Then
             labels(3) = "Click was on an ummapped region..."
             setTrueText("Selected region is unmapped (no depth or too small)", 10, 100, 3)
@@ -1715,7 +1715,7 @@ End Class
 
 
 Public Class Depth_ObjectsKMeans : Inherits VBparent
-    Public kFlood As New KMeans_FloodEdges
+    Public kFlood As New KMeans_FloodFill
     Public Sub New()
         usingdst1 = True
         labels(1) = "Click on any region to isolate that region and measure everything about it."
@@ -1734,14 +1734,14 @@ Public Class Depth_ObjectsKMeans : Inherits VBparent
         dst3 = kFlood.dst3
 
         Dim meanDepth As cv.Scalar, stdevDepth As cv.Scalar
-        Dim index = kFlood.km.selectedIndex
-        Dim r = kFlood.km.flood.rects(index)
+        Dim index = kFlood.selectedIndex
+        Dim r = kFlood.flood.rects(index)
         lastRect = New cv.Rect(r.X - 2, r.Y - 2, r.Width + 4, r.Height + 4)
 
-        cv.Cv2.MeanStdDev(task.depth32f(r), meanDepth, stdevDepth, kFlood.km.flood.masks(index))
+        cv.Cv2.MeanStdDev(task.depth32f(r), meanDepth, stdevDepth, kFlood.flood.masks(index))
 
         labels(3) = "Region " + CStr(index) + " has depth " + Format(meanDepth.Item(0) / 1000, "0.000") + "m with stdev " + Format(stdevDepth.Item(0), "0.0")
-        labels(2) = CStr(kFlood.km.flood.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
+        labels(2) = CStr(kFlood.flood.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
         If index = 0 Then
             labels(3) = "Click was on an ummapped region..."
             setTrueText("Selected region is unmapped (no depth or too small)", 10, 100, 3)

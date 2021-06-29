@@ -169,6 +169,7 @@ Public Class LUT_FloodFill : Inherits VBparent
     Public flood As New FloodFill_Basics
     Public lut As New LUT_Basics
     Public selectedIndex = 1
+    Dim edges As New Edges_Basics
     Public Sub New()
         usingdst1 = True
         findSlider("FloodFill Minimum Size").Value = 1
@@ -177,8 +178,10 @@ Public Class LUT_FloodFill : Inherits VBparent
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         task.desc = "Use LUT output with floodfill to identify each segment in the image"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 2
+    Public Sub Run(src As cv.Mat) ' Rank = 4
         Static mousePoint = New cv.Point(msRNG.Next(0, dst1.Width), msRNG.Next(0, dst1.Height))
+        edges.Run(src)
+        src.SetTo(cv.Scalar.White, edges.dst2)
 
         lut.Run(src)
         dst1 = lut.dst2
@@ -209,33 +212,5 @@ Public Class LUT_FloodFill : Inherits VBparent
             dst3.Rectangle(r, cv.Scalar.White, 1)
         End If
         labels(3) = CStr(flood.masks.Count) + " regions.  Selected region = " + CStr(selectedIndex)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class LUT_FloodEdges : Inherits VBparent
-    Public lut As New LUT_FloodFill
-    Dim edges As New Edges_Basics
-    Public Sub New()
-        usingdst1 = True
-        task.desc = "Removed regions with no depth"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        edges.Run(src)
-
-        src.SetTo(cv.Scalar.White, edges.dst2)
-        lut.Run(src)
-        dst1 = lut.dst1
-        dst2 = lut.dst2
-        dst3 = lut.dst3
-        labels(1) = lut.labels(1)
-        labels(2) = lut.labels(2)
-        labels(3) = lut.labels(3)
     End Sub
 End Class

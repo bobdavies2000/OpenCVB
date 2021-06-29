@@ -518,6 +518,7 @@ Public Class KMeans_FloodFill : Inherits VBparent
     Public flood As New FloodFill_Basics
     Public km As New KMeans_Basics
     Public selectedIndex As Integer
+    Dim edges As New Edges_Basics
     Public Sub New()
         usingdst1 = True
         findSlider("FloodFill Minimum Size").Value = 1
@@ -526,8 +527,10 @@ Public Class KMeans_FloodFill : Inherits VBparent
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         task.desc = "Use each KMeans mask with floodfill to identify each segment in the image"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 2
+    Public Sub Run(src As cv.Mat) ' Rank = 4
         Static mousePoint = New cv.Point(msRNG.Next(0, dst1.Width), msRNG.Next(0, dst1.Height))
+        edges.Run(src)
+        src.SetTo(cv.Scalar.White, edges.dst2)
 
         km.Run(src)
         dst1 = km.dst2
@@ -558,32 +561,5 @@ Public Class KMeans_FloodFill : Inherits VBparent
             dst3.Rectangle(r, cv.Scalar.White, 1)
         End If
         labels(3) = CStr(flood.masks.Count) + " regions.  Selected region = " + CStr(selectedIndex)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class KMeans_FloodEdges : Inherits VBparent
-    Public km As New KMeans_FloodFill
-    Dim edges As New Edges_Basics
-    Public Sub New()
-        task.desc = "Removed regions with no depth"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        edges.Run(src)
-
-        src.SetTo(cv.Scalar.White, edges.dst2)
-        km.Run(src)
-        dst1 = km.dst1
-        dst2 = km.dst2
-        dst3 = km.dst3
-        labels(1) = km.labels(1)
-        labels(2) = km.labels(2)
-        labels(3) = km.labels(3)
     End Sub
 End Class
