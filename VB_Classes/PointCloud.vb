@@ -1307,7 +1307,7 @@ Public Class PointCloud_Neighbor_Options : Inherits VBparent
     Public Sub New()
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "Difference from neighbor in mm's", 0, 20, 5)
-            sliders.setupTrackBar(1, "Minimum offset to neighbor pixel", 1, 50, 10)
+            sliders.setupTrackBar(1, "Minimum offset to neighbor pixel", 1, 300, 10)
             sliders.setupTrackBar(2, "Z-Error tolerance from vertical/horizontal in mm's", 1, 50, 20)
         End If
         thresholdSlider = findSlider("Difference from neighbor in mm's")
