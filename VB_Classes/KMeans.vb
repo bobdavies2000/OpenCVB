@@ -521,6 +521,7 @@ Public Class KMeans_FloodFill : Inherits VBparent
     Dim edges As New Edges_Basics
     Public Sub New()
         usingdst1 = True
+        flood.firstMaskZero = True
         findSlider("FloodFill Minimum Size").Value = 1
         labels(1) = "Click anywhere to see connected components in dst3"
         labels(2) = "FloodFill Results - click to select another region"

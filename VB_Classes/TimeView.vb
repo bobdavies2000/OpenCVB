@@ -5,9 +5,7 @@ Public Class TimeView_Basics : Inherits VBparent
     Dim setupSide As New PointCloud_SetupSide
     Dim setupTop As New PointCloud_SetupTop
     Public Sub New()
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Number of frames to include", 2, 30, 10)
-        End If
+        If sliders.Setup(caller) Then sliders.setupTrackBar(0, "Number of frames to include", 2, 30, 10)
         dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_32F, 0)
         dst3 = New cv.Mat(task.color.Size, cv.MatType.CV_32F, 0)
         task.desc = "TimeView that highlights concentrations of depth pixels"
@@ -38,7 +36,7 @@ Public Class TimeView_Basics : Inherits VBparent
 
         sideAccum = sideAccum.Add(sideFrames.ElementAt(sideFrames.Count - 1))
         topAccum = topAccum.Add(topFrames.ElementAt(sideFrames.Count - 1))
-        If standalone Or task.intermediateName = caller Then
+        If standalone Then
             setupSide.Run(sideAccum.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR))
             dst2 = setupSide.dst2
             setupTop.Run(topAccum.ConvertScaleAbs(255).CvtColor(cv.ColorConversionCodes.GRAY2BGR))
@@ -129,10 +127,10 @@ Public Class TimeView_FloodFill : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         tBasics.Run(src)
         floodSide.Run(tBasics.dst2.ConvertScaleAbs(255))
-        dst2 = floodSide.dst2
+        dst2 = floodSide.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         labels(2) = "SideView " + floodSide.labels(2)
         floodTop.Run(tBasics.dst3.ConvertScaleAbs(255))
-        dst3 = floodTop.dst2
+        dst3 = floodTop.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         labels(3) = "TopView " + floodTop.labels(2)
     End Sub
 End Class

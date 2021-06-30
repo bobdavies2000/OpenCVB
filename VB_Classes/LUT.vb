@@ -172,6 +172,7 @@ Public Class LUT_FloodFill : Inherits VBparent
     Dim edges As New Edges_Basics
     Public Sub New()
         usingdst1 = True
+        flood.firstMaskZero = True
         findSlider("FloodFill Minimum Size").Value = 1
         findSlider("Canny threshold1").Value = 170
         labels(1) = "Click anywhere to see connected components in dst3"
@@ -201,7 +202,7 @@ Public Class LUT_FloodFill : Inherits VBparent
         Static currentMask = flood.masks(selectedIndex)
         Static currentRect = flood.rects(selectedIndex)
         If sample = 0 Then
-            If selectedIndex >= flood.rects.Count Then selectedIndex = 0 ' if there are fewer regions found this pass and the sample is 0, then be safe.
+            If selectedIndex >= flood.rects.Count Then selectedIndex = 0 ' if there are fewer regions found this pass, then be safe.  Reset selectedIndex.
             dst3(currentRect).SetTo(255, currentMask)
             dst3.Rectangle(currentRect, cv.Scalar.White, 1)
         Else
@@ -233,7 +234,7 @@ Public Class LUT_Equalized : Inherits VBparent
         labels(3) = "With Histogram Equalized"
         task.desc = "Use LUT_Basics but with an equalized histogram image."
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 2
         Static segSlider = findSlider("Number of LUT Segments")
         If standalone Then
             lut.Run(src.Clone)

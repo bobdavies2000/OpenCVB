@@ -1,6 +1,34 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class PointCloud_Basics : Inherits VBparent
+    Public tView As New TimeView_FloodFill
+    Public objectCountSide As Integer
+    Public objectCountTop As Integer
+    Public Sub New()
+        task.desc = "Find out how many objects are in the side and top views"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        tView.Run(src)
+        dst2 = tView.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        dst3 = tView.dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        objectCountSide = tView.floodSide.masks.Count
+        objectCountTop = tView.floodTop.masks.Count
+
+        setTrueText("Adjust the Global Option 'Projection threshold' to see more objects", 10, dst2.Height - 40)
+        labels = tView.labels
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class PointCloud_Display : Inherits VBparent
     Public views As New PointCloud_Tracker
     Public detailText As String
     Public maskTopView As New cv.Mat(dst2.Size(), cv.MatType.CV_8UC1)
@@ -553,7 +581,7 @@ End Class
 
 
 Public Class PointCloud_BackProject : Inherits VBparent
-    Dim both As New PointCloud_Basics
+    Dim both As New PointCloud_Display
     Dim mats As New Mat_4Click
     Public Sub New()
         labels(2) = "Click any quadrant below to enlarge it"
@@ -882,29 +910,11 @@ End Class
 
 
 
-Public Class PointCloud_TimeView : Inherits VBparent
-    Dim tView As New TimeView_Basics
-    Public Sub New()
-        labels(2) = "Accumulated side view"
-        labels(3) = "Accumulated top view"
-        task.desc = "Use the undecorated TimeView input instead of latest point cloud"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 3
-        tView.Run(src)
-        dst2 = tView.dst2
-        dst3 = tView.dst3
-    End Sub
-End Class
-
-
-
-
-
 
 Public Class PointCloud_TrackerTop : Inherits VBparent
     Public pTrack As New KNN_PointTracker
     Public flood As New FloodFill_Palette
-    Public timeView As New PointCloud_TimeView
+    Public timeView As New TimeView_Basics
     Public setupTop As New PointCloud_SetupTop
     Public Sub New()
         findSlider("FloodFill Minimum Size").Value = 100
@@ -923,7 +933,7 @@ Public Class PointCloud_TrackerTop : Inherits VBparent
 
         setupTop.Run(pTrack.dst2)
         dst2 = setupTop.dst2
-        labels(2) = Format(dst2.Height / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
+        setTrueText(Format(dst2.Height / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters", 10, dst3.Height - 50, 3)
     End Sub
 End Class
 
@@ -958,7 +968,7 @@ End Class
 Public Class PointCloud_TrackerSide : Inherits VBparent
     Public pTrack As New KNN_PointTracker
     Public flood As New FloodFill_Palette
-    Public timeView As New PointCloud_TimeView
+    Public timeView As New TimeView_Basics
     Public setupSide As New PointCloud_SetupSide
     Public Sub New()
         findSlider("FloodFill Minimum Size").Value = 100
@@ -978,7 +988,7 @@ Public Class PointCloud_TrackerSide : Inherits VBparent
 
         setupSide.Run(pTrack.dst2)
         dst2 = setupSide.dst2
-        labels(2) = Format(dst2.Width / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
+        setTrueText(Format(dst2.Width / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters", 10, 40, 2)
     End Sub
 End Class
 
@@ -1296,8 +1306,8 @@ Public Class PointCloud_Neighbor_Options : Inherits VBparent
     Public errorSlider As Windows.Forms.TrackBar
     Public Sub New()
         If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Difference from neighbor in mm's", 0, 20, 0)
-            sliders.setupTrackBar(1, "Minimum offset to neighbor pixel", 1, 500, 10)
+            sliders.setupTrackBar(0, "Difference from neighbor in mm's", 0, 20, 5)
+            sliders.setupTrackBar(1, "Minimum offset to neighbor pixel", 1, 50, 10)
             sliders.setupTrackBar(2, "Z-Error tolerance from vertical/horizontal in mm's", 1, 50, 20)
         End If
         thresholdSlider = findSlider("Difference from neighbor in mm's")
@@ -1320,7 +1330,7 @@ End Class
 Public Class PointCloud_NeighborV : Inherits VBparent
     Dim options As New PointCloud_Neighbor_Options
     Public Sub New()
-        task.desc = "Show where vertical neighbor depth values are within Y pixels"
+        task.desc = "Show where vertical neighbor depth values are within Y mm's"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim shift = options.pixelSlider.Value
@@ -1347,7 +1357,7 @@ End Class
 Public Class PointCloud_NeighborH : Inherits VBparent
     Dim options As New PointCloud_Neighbor_Options
     Public Sub New()
-        task.desc = "Show where horizontal neighbor depth values are within X pixels"
+        task.desc = "Show where horizontal neighbor depth values are within X mm's"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim shift = options.pixelSlider.Value

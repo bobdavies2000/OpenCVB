@@ -42,7 +42,7 @@ Public Class FitEllipse_Basics_CPP : Inherits VBparent
             Dim angle = output.Get(Of Single)(0)
             Dim center As New cv.Point2f(output.Get(Of Single)(1), output.Get(Of Single)(2))
             Dim size As New cv.Size2f(output.Get(Of Single)(3), output.Get(Of Single)(4))
-            If Single.IsNaN(size.Width) = False And Single.IsNaN(size.Height) Then
+            If Single.IsNaN(size.Width) = False And Single.IsNaN(size.Height) = False Then
                 box = New cv.RotatedRect(center, size, angle)
                 dst2.Ellipse(box, cv.Scalar.Yellow, 6, task.lineType)
 
