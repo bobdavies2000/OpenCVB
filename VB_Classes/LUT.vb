@@ -175,7 +175,7 @@ Public Class LUT_FloodFill : Inherits VBparent
         flood.firstMaskZero = True
         findSlider("FloodFill Minimum Size").Value = 1
         findSlider("Canny threshold1").Value = 170
-        labels(1) = "Click anywhere to see connected components in dst3"
+        labels(1) = "Click anywhere to see the selected region isolated in dst3"
         labels(2) = "FloodFill Results - click to select another region"
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         task.desc = "Use LUT output with floodfill to identify each segment in the image"
@@ -255,5 +255,39 @@ Public Class LUT_Equalized : Inherits VBparent
                 dst1.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth)
             Next
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class LUT_Watershed : Inherits VBparent
+    Public wShed As New Watershed_Basics
+    Public lut As New LUT_Equalized
+    Public selectedIndex = 1
+    Dim edges As New Edges_Basics
+    Public Sub New()
+        usingdst1 = True
+        labels(1) = "LUT output - draw a rectangle to create a region"
+        labels(2) = "Watershed Results - draw a rectangle to create a region"
+        wShed.UseCorners = True
+        task.desc = "Use watershed algorithm with LUT input to identify regions in the image"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 4
+        Static mousePoint = New cv.Point(msRNG.Next(0, dst1.Width), msRNG.Next(0, dst1.Height))
+
+        lut.Run(src)
+        dst1 = lut.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
+        edges.Run(src)
+        dst1.SetTo(cv.Scalar.White, edges.dst2)
+
+        wShed.Run(dst1)
+        dst2 = wShed.dst3
     End Sub
 End Class

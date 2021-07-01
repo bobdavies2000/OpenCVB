@@ -523,7 +523,7 @@ Public Class KMeans_FloodFill : Inherits VBparent
         usingdst1 = True
         flood.firstMaskZero = True
         findSlider("FloodFill Minimum Size").Value = 1
-        labels(1) = "Click anywhere to see connected components in dst3"
+        labels(1) = "Click anywhere to see selected region isolated in dst3"
         labels(2) = "FloodFill Results - click to select another region"
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         task.desc = "Use each KMeans mask with floodfill to identify each segment in the image"
