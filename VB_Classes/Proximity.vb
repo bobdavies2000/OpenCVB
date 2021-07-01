@@ -172,89 +172,6 @@ End Class
 
 
 
-Public Class Proximity_Clusters : Inherits VBparent
-    Public valleys As New Proximity_Valleys
-    Public Sub New()
-        task.desc = "Color each of the Depth Clusters found with Proximity_Basics - stabilized with Kalman."
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        If src.Type <> cv.MatType.CV_32F Then src = task.depth32f.Clone
-
-        valleys.Run(src)
-        dst2 = valleys.dst2
-
-        Dim tmp As New cv.Mat
-        Dim colorIncr = 255 / valleys.ranges.Count
-        Dim paletteSrc = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        For i = 0 To valleys.ranges.Count - 1
-            Dim startEndDepth = valleys.ranges.ElementAt(i)
-            cv.Cv2.InRange(src, startEndDepth.X, startEndDepth.Y, tmp)
-            paletteSrc.SetTo(colorIncr * (i + 1), tmp.ConvertScaleAbs())
-        Next
-        paletteSrc += 1
-        task.palette.Run(paletteSrc)
-        dst3 = task.palette.dst2
-        If standalone Or task.intermediateName = caller Then
-            labels(2) = "Histogram of " + CStr(valleys.ranges.Count) + " Depth Clusters"
-            labels(3) = "Backprojection of " + CStr(valleys.ranges.Count) + " histogram clusters"
-        End If
-        dst3.SetTo(0, task.noDepthMask)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Proximity_ClustersKalman : Inherits VBparent
-    Dim kalman As New Kalman_Basics
-    Public valleys As New Proximity_Valleys
-    Public Sub New()
-        task.desc = "Use Kalman to keep the bar chart similar across frames"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        If src.Type <> cv.MatType.CV_32F Then src = task.depth32f.Clone
-
-        valleys.Run(src)
-
-        If kalman.kInput.Length - 1 <> valleys.hist.plotHist.hist.Rows Then ReDim kalman.kInput(valleys.hist.plotHist.hist.Rows - 1)
-        For i = 0 To valleys.hist.plotHist.hist.Rows - 1
-            kalman.kInput(i) = valleys.barValues(i)
-        Next
-        kalman.Run(src)
-
-        Dim tmp As New cv.Mat
-        Dim colorIncr = 255 / valleys.ranges.Count
-        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        Dim depthIncr = task.maxDepth / task.histogramBins ' each bar represents this number of millimeters
-        Dim binWidth = CInt(dst2.Width / task.histogramBins)
-        For i = 0 To kalman.kOutput.Length - 1
-            Dim h = valleys.barHeight(i)
-            If h > 0 Then dst2.Rectangle(New cv.Rect(i * binWidth, dst2.Height - h, binWidth, h), colorIncr * CInt(kalman.kOutput(i)), -1)
-
-            Dim startDepth = i * depthIncr
-            Dim endDepth = (i + 1) * depthIncr
-            cv.Cv2.InRange(src, startDepth, endDepth, tmp)
-            dst3.SetTo(colorIncr * CInt(kalman.kOutput(i)), tmp.ConvertScaleAbs())
-        Next
-
-        task.palette.Run(dst2)
-        dst2 = task.palette.dst2
-        task.palette.Run(dst3)
-        dst3 = task.palette.dst2
-        dst3.SetTo(0, task.noDepthMask)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 
@@ -411,5 +328,88 @@ Public Class Proximity_MasksDepth : Inherits VBparent
         proxy.Run(task.depth32f)
         dst2 = proxy.dst2
         dst3 = proxy.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Proximity_Clusters : Inherits VBparent
+    Public valleys As New Proximity_Valleys
+    Public Sub New()
+        task.desc = "Color each of the Depth Clusters found with Proximity_Basics - stabilized with Kalman."
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        If src.Type <> cv.MatType.CV_32F Then src = task.depth32f.Clone
+
+        valleys.Run(src)
+        dst2 = valleys.dst2
+
+        Dim tmp As New cv.Mat
+        Dim colorIncr = 255 / valleys.ranges.Count
+        Dim paletteSrc = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        For i = 0 To valleys.ranges.Count - 1
+            Dim startEndDepth = valleys.ranges.ElementAt(i)
+            cv.Cv2.InRange(src, startEndDepth.X, startEndDepth.Y, tmp)
+            paletteSrc.SetTo(colorIncr * (i + 1), tmp.ConvertScaleAbs())
+        Next
+        paletteSrc += 1
+        task.palette.Run(paletteSrc)
+        dst3 = task.palette.dst2
+        If standalone Or task.intermediateName = caller Then
+            labels(2) = "Histogram of " + CStr(valleys.ranges.Count) + " Depth Clusters"
+            labels(3) = "Backprojection of " + CStr(valleys.ranges.Count) + " histogram clusters"
+        End If
+        dst3.SetTo(0, task.noDepthMask)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Proximity_ClustersKalman : Inherits VBparent
+    Dim kalman As New Kalman_Basics
+    Public valleys As New Proximity_Valleys
+    Public Sub New()
+        task.desc = "Use Kalman to keep the bar chart similar across frames"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        If src.Type <> cv.MatType.CV_32F Then src = task.depth32f.Clone
+
+        valleys.Run(src)
+
+        If kalman.kInput.Length - 1 <> valleys.hist.plotHist.hist.Rows Then ReDim kalman.kInput(valleys.hist.plotHist.hist.Rows - 1)
+        For i = 0 To valleys.hist.plotHist.hist.Rows - 1
+            kalman.kInput(i) = valleys.barValues(i)
+        Next
+        kalman.Run(src)
+
+        Dim tmp As New cv.Mat
+        Dim colorIncr = 255 / valleys.ranges.Count
+        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        Dim depthIncr = task.maxDepth / task.histogramBins ' each bar represents this number of millimeters
+        Dim binWidth = CInt(dst2.Width / task.histogramBins)
+        For i = 0 To kalman.kOutput.Length - 1
+            Dim h = valleys.barHeight(i)
+            If h > 0 Then dst2.Rectangle(New cv.Rect(i * binWidth, dst2.Height - h, binWidth, h), colorIncr * CInt(kalman.kOutput(i)), -1)
+
+            Dim startDepth = i * depthIncr
+            Dim endDepth = (i + 1) * depthIncr
+            cv.Cv2.InRange(src, startDepth, endDepth, tmp)
+            dst3.SetTo(colorIncr * CInt(kalman.kOutput(i)), tmp.ConvertScaleAbs())
+        Next
+
+        task.palette.Run(dst2)
+        dst2 = task.palette.dst2
+        task.palette.Run(dst3)
+        dst3 = task.palette.dst2
+        dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class

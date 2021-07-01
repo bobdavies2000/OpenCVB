@@ -1688,6 +1688,7 @@ Public Class Depth_ObjectsLUT : Inherits VBparent
 
         Dim meanDepth As cv.Scalar, stdevDepth As cv.Scalar
         Dim index = lutFlood.selectedIndex
+        If lutFlood.flood.rects.Count = 0 Then Exit Sub ' the scene is completely dark (discovered in overnight testing.)
         Dim r = lutFlood.flood.rects(index)
         lastRect = New cv.Rect(r.X - 2, r.Y - 2, r.Width + 4, r.Height + 4)
 
@@ -1735,6 +1736,7 @@ Public Class Depth_ObjectsKMeans : Inherits VBparent
 
         Dim meanDepth As cv.Scalar, stdevDepth As cv.Scalar
         Dim index = kFlood.selectedIndex
+        If kFlood.flood.rects.Count = 0 Then Exit Sub ' the scene is completely dark (discovered in overnight testing.)
         Dim r = kFlood.flood.rects(index)
         lastRect = New cv.Rect(r.X - 2, r.Y - 2, r.Width + 4, r.Height + 4)
 

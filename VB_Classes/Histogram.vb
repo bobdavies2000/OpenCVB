@@ -722,32 +722,6 @@ End Class
 
 
 
-Public Class Histogram_Depth : Inherits VBparent
-    Public plotHist As New Plot_Histogram
-    Public Sub New()
-        task.desc = "Show depth data as a histogram."
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-
-        plotHist.minRange = 1 ' task.minDepth
-        plotHist.maxRange = task.maxDepth
-
-        Dim histSize() = {task.histogramBins}
-        Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
-        cv.Cv2.CalcHist(New cv.Mat() {task.depth32f}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
-
-        If standalone Or task.intermediateName = caller Then
-            plotHist.Run(src)
-            dst2 = plotHist.dst2
-        End If
-        labels(2) = "Histogram Depth: " + Format(plotHist.minRange / 1000, "0.0") + "m to " + Format(plotHist.maxRange / 1000, "0.0") + " m"
-    End Sub
-End Class
-
-
-
-
-
 
 
 
@@ -997,5 +971,60 @@ Public Class Histogram_PeakMax : Inherits VBparent
 
         labels(2) = "BackProjection of most frequent gray pixel"
         dst3.Rectangle(New cv.Rect(barWidth * histindex, 0, barWidth, dst2.Height), cv.Scalar.Yellow, 1)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Histogram_Depth : Inherits VBparent
+    Public plotHist As New Plot_Histogram
+    Public Sub New()
+        task.desc = "Show depth data as a histogram."
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        plotHist.minRange = 1
+        plotHist.maxRange = task.maxDepth
+
+        Dim histSize() = {task.histogramBins}
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
+        cv.Cv2.CalcHist(New cv.Mat() {task.depth32f}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
+
+        If standalone Or task.intermediateName = caller Then
+            plotHist.Run(src)
+            dst2 = plotHist.dst2
+        End If
+        labels(2) = "Histogram Depth: " + Format(plotHist.minRange / 1000, "0.0") + "m to " + Format(plotHist.maxRange / 1000, "0.0") + " m"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Public Class Histogram_DepthEq : Inherits VBparent
+    Dim hist As New Histogram_EqualizeGray
+    Public Sub New()
+        usingdst1 = True
+        task.desc = "What impact does Histogram equalize have on a depth histogram."
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        dst1 = task.depth32f.Normalize(0, 255, cv.NormTypes.MinMax)
+        dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
+        hist.Run(dst2)
+        dst2 = hist.dst2
+        dst3 = hist.dst3
+        labels = hist.labels
     End Sub
 End Class
