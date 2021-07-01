@@ -6,7 +6,7 @@ Public Class LUT_Basics : Inherits VBparent
         If sliders.Setup(caller) Then sliders.setupTrackBar(0, "Number of LUT Segments", 2, 100, 10)
         task.desc = "Divide the image into n-segments controlled with a slider."
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
+    Public Sub Run(src As cv.Mat) ' Rank = 2
         Static segment() As Integer
         Static nSegSlider = findSlider("Number of LUT Segments")
         Dim segments = nSegSlider.value
@@ -170,13 +170,14 @@ Public Class LUT_FloodFill : Inherits VBparent
     Public lut As New LUT_Equalized
     Public selectedIndex = 1
     Dim edges As New Edges_Basics
+    Dim saveStepSize As Integer
     Public Sub New()
+        saveStepSize = findSlider("Step Size").Value
         usingdst1 = True
         findSlider("FloodFill Minimum Size").Value = 1
         findSlider("Canny threshold1").Value = 170
         labels(1) = "Click anywhere to see the selected region isolated in dst3"
         labels(2) = "FloodFill Results - click to select another region"
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         task.desc = "Use LUT output with floodfill to identify each segment in the image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 4
@@ -186,11 +187,12 @@ Public Class LUT_FloodFill : Inherits VBparent
         lut.Run(src)
         dst1 = lut.dst2
 
+        ' flood.floodPointRun = flood.selectedIndexAvailable
         flood.Run(lut.dst2)
-        If flood.rects.Count = 0 Then Exit Sub ' image is likely very dark and nothing is actually seen...
         dst2 = flood.dst2
+        If flood.rects.Count = 0 Then Exit Sub ' image is likely very dark and nothing is actually seen...
 
-        flood.findSelectedRegion(dst3)
+        dst3 = flood.findSelectedRegion()
         labels(3) = CStr(flood.masks.Count) + " regions.  Selected region = " + CStr(flood.selectedIndex)
     End Sub
 End Class

@@ -2,21 +2,33 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class PointCloud_Basics : Inherits VBparent
     Public tView As New TimeView_FloodFill
-    Public objectCountSide As Integer
-    Public objectCountTop As Integer
+    Public sideObjects As Integer
+    Public topObjects As Integer
+    Public objectsFound As Integer
     Public Sub New()
         task.desc = "Find out how many objects are in the side and top views"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static minSlider = findSlider("FloodFill Minimum Size")
+
         tView.Run(src)
         dst2 = tView.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         dst3 = tView.dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        objectCountSide = tView.floodSide.masks.Count
-        objectCountTop = tView.floodTop.masks.Count
+        sideObjects = tView.floodSide.masks.Count
+        topObjects = tView.floodTop.masks.Count
 
-        setTrueText("Adjust the Global Option 'Projection threshold' to see more objects", 10, dst2.Height - 40)
+        If standalone Then setTrueText("Adjust the Global Option 'Projection threshold' to see more objects", 10, dst2.Height - 40)
         labels = tView.labels
+
+        If sideObjects + topObjects > 0 Then
+            If sideObjects + topObjects = 1 Then objectsFound = 1 Else objectsFound = Math.Min(sideObjects, topObjects)
+
+            If objectsFound > 1 Then minSlider.value -= If(minSlider.value > 50, 50, 0)
+            If objectsFound = 0 Then minSlider.value += If(minSlider.value < minSlider.maximum - 10, 10, 0)
+        Else
+            setTrueText("Is there depth at the location clicked?", 10, dst2.Height - 80, 3)
+        End If
     End Sub
 End Class
 

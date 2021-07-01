@@ -523,7 +523,6 @@ Public Class KMeans_FloodFill : Inherits VBparent
         findSlider("FloodFill Minimum Size").Value = 1
         labels(1) = "Click anywhere to see selected region isolated in dst3"
         labels(2) = "FloodFill Results - click to select another region"
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         task.desc = "Use each KMeans mask with floodfill to identify each segment in the image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 4
@@ -537,7 +536,7 @@ Public Class KMeans_FloodFill : Inherits VBparent
         If flood.rects.Count = 0 Then Exit Sub ' image is likely very dark and nothing is actually seen...
         dst2 = flood.dst2
 
-        flood.findSelectedRegion(dst3)
+        dst3 = flood.findSelectedRegion()
         labels(3) = CStr(flood.masks.Count) + " regions.  Selected region = " + CStr(flood.selectedIndex)
     End Sub
 End Class
@@ -556,7 +555,6 @@ Public Class KMeans_FloodFillDepth : Inherits VBparent
         findSlider("FloodFill Minimum Size").Value = 1
         labels(1) = "Click anywhere to see selected region isolated in dst3"
         labels(2) = "FloodFill Results - click to select another region"
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         task.desc = "Use KMeans with depth and find masks with floodfill"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 4
@@ -567,7 +565,7 @@ Public Class KMeans_FloodFillDepth : Inherits VBparent
         If flood.rects.Count = 0 Then Exit Sub ' image is likely very dark and no rects were found
         dst2 = flood.dst2
 
-        flood.findSelectedRegion(dst3)
+        dst3 = flood.findSelectedRegion()
         labels(3) = CStr(flood.masks.Count) + " regions.  Selected region = " + CStr(flood.selectedIndex)
     End Sub
 End Class

@@ -1723,7 +1723,7 @@ Public Class Depth_ObjectsKMeans : Inherits VBparent
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F)
         task.desc = "Create a segmented image with KMeans, select a region, and isolate it for measurement."
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 4
+    Public Sub Run(src As cv.Mat) ' Rank = 5
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
         Static lastRect As New cv.Rect
 

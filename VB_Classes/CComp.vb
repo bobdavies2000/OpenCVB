@@ -17,7 +17,7 @@ Public Class CComp_Basics : Inherits VBparent
         colorMap = task.palette.gradientColorMap.Row(0).Clone
         task.desc = "Use a threshold slider on the CComp input"
     End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 5
+    Public Sub Run(src As cv.Mat) ' Rank = 4
         Static areaSlider = findSlider("CComp Min Area")
         Static thresholdSlider = findSlider("Threshold for grayscale input")
         Dim threshVal = thresholdSlider.value
