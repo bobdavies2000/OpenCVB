@@ -34,7 +34,7 @@ Public Class FloodFill_Basics : Inherits VBparent
             selectedIndex = dst1.Get(Of Byte)(mousePoint.Y, mousePoint.X)
         End If
 
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         Dim sample = dst1.Get(Of Byte)(mousePoint.Y, mousePoint.X)
         selectedIndexAvailable = False
         If rects.Count > 0 Then
