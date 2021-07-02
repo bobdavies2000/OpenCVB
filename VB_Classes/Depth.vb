@@ -1677,6 +1677,11 @@ Public Class Depth_ObjectsLUT : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 5
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
+        Static lastRect As New cv.Rect
+
+        src.Rectangle(lastRect, If(task.frameCount Mod 2, 255, 0), 1)
+        src.Rectangle(New cv.Rect(lastRect.X - 1, lastRect.Y - 1, lastRect.Width + 2, lastRect.Height + 2), If(task.frameCount Mod 2, 0, 255), 1)
+
         lutFlood.Run(src)
         dst1 = lutFlood.dst1
         dst2 = lutFlood.dst2
@@ -1688,6 +1693,7 @@ Public Class Depth_ObjectsLUT : Inherits VBparent
             If lutFlood.flood.maskSizes(index) > minSizeSlider.value Then
                 If lutFlood.flood.rects.Count = 0 Then Exit Sub ' the scene is completely dark (discovered in overnight testing.)
                 Dim r = lutFlood.flood.rects(index)
+                lastRect = New cv.Rect(r.X - 2, r.Y - 2, r.Width + 4, r.Height + 4)
 
                 cv.Cv2.MeanStdDev(task.depth32f(r), meanDepth, stdevDepth, lutFlood.flood.masks(index))
 
@@ -1723,6 +1729,11 @@ Public Class Depth_ObjectsKMeans : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 5
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
+        Static lastRect As New cv.Rect
+
+        src.Rectangle(lastRect, If(task.frameCount Mod 2, 255, 0), 1)
+        src.Rectangle(New cv.Rect(lastRect.X - 1, lastRect.Y - 1, lastRect.Width + 2, lastRect.Height + 2), If(task.frameCount Mod 2, 0, 255), 1)
+
         kFlood.Run(src)
         dst1 = kFlood.dst1
         dst2 = kFlood.dst2
@@ -1734,6 +1745,7 @@ Public Class Depth_ObjectsKMeans : Inherits VBparent
             If kFlood.flood.maskSizes(index) > minSizeSlider.value Then
                 If kFlood.flood.rects.Count = 0 Then Exit Sub ' the scene is completely dark (discovered in overnight testing.)
                 Dim r = kFlood.flood.rects(index)
+                lastRect = New cv.Rect(r.X - 2, r.Y - 2, r.Width + 4, r.Height + 4)
 
                 cv.Cv2.MeanStdDev(task.depth32f(r), meanDepth, stdevDepth, kFlood.flood.masks(index))
 

@@ -166,13 +166,11 @@ End Class
 
 
 Public Class LUT_FloodFill : Inherits VBparent
+    Dim edges As New Edges_Basics
     Public flood As New FloodFill_Basics
     Public lut As New LUT_Equalized
     Public selectedIndex = 1
-    Dim edges As New Edges_Basics
-    Dim saveStepSize As Integer
     Public Sub New()
-        saveStepSize = findSlider("Step Size").Value
         usingdst1 = True
         findSlider("Canny threshold1").Value = 170
         labels(1) = "Click anywhere to see the selected region isolated in dst3"
@@ -186,7 +184,6 @@ Public Class LUT_FloodFill : Inherits VBparent
         lut.Run(src)
         dst1 = lut.dst2
 
-        'flood.floodPointRun = flood.selectedIndexAvailable
         flood.Run(lut.dst2)
         dst2 = flood.dst2
         dst3 = flood.dst3

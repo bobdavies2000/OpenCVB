@@ -515,9 +515,9 @@ End Class
 
 
 Public Class KMeans_FloodFill : Inherits VBparent
+    Dim edges As New Edges_Basics
     Public flood As New FloodFill_Basics
     Public km As New KMeans_Basics
-    Dim edges As New Edges_Basics
     Public Sub New()
         usingdst1 = True
         labels(1) = "Click anywhere to see selected region isolated in dst3"
