@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Threading
 Public Class FloodFill_Basics : Inherits VBparent
-    Public sortedSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
+    Public maskSizes As New List(Of Integer)
     Public rects As New List(Of cv.Rect)
     Dim floodPoints As New List(Of cv.Point)
     Public floodPoint As New cv.Point
@@ -23,8 +23,7 @@ Public Class FloodFill_Basics : Inherits VBparent
             sliders.setupTrackBar(3, "Step Size", 1, dst2.Cols / 2, 30)
         End If
 
-        dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U)
         labels(3) = "Palette output"
         task.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
@@ -35,7 +34,7 @@ Public Class FloodFill_Basics : Inherits VBparent
             selectedIndex = dst1.Get(Of Byte)(mousePoint.Y, mousePoint.X)
         End If
 
-        dst3.SetTo(0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
         Dim sample = dst1.Get(Of Byte)(mousePoint.Y, mousePoint.X)
         selectedIndexAvailable = False
         If rects.Count > 0 Then
@@ -76,19 +75,21 @@ Public Class FloodFill_Basics : Inherits VBparent
         If floodPointRun Then
             Dim pt = floodPoints(selectedIndex)
             Dim count = cv.Cv2.FloodFill(gray, maskPlus, pt, cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
-            If count > minFloodSize Then
-                masks(selectedIndex) = maskPlus(maskRect).Clone().SetTo(0, alreadyFlooded)(rect)
+            If count > maskSizes(selectedIndex) / 2 Then
                 rects(selectedIndex) = rect
+                masks(selectedIndex) = maskPlus(maskRect).Clone()(rect)
                 Dim m = cv.Cv2.Moments(masks(selectedIndex), True)
                 centroids(selectedIndex) = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
-                dst1(rect).SetTo(selectedIndex Mod 255, masks(selectedIndex))
+                dst1(rect).SetTo((selectedIndex - 1) Mod 255, masks(selectedIndex))
+                cv.Cv2.ImShow("m", masks(selectedIndex))
             Else
                 floodPointRun = False
+                gray = src.Clone()
             End If
         End If
         If floodPointRun = False Then
             masks.Clear()
-            sortedSizes.Clear()
+            maskSizes.Clear()
             rects.Clear()
             floodPoints.Clear()
             centroids.Clear()
@@ -104,8 +105,8 @@ Public Class FloodFill_Basics : Inherits VBparent
                             floodPoints.Add(pt)
                             Dim mask = maskPlus(maskRect).Clone().SetTo(0, alreadyFlooded)(rect)
 
-                            sortedSizes.Add(count, masks.Count)
-                            masks.Add(mask) ' the leftovers that were not flooded.
+                            maskSizes.Add(count)
+                            masks.Add(mask)
                             rects.Add(rect)
                             Dim m = cv.Cv2.Moments(mask, True)
                             Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
@@ -124,142 +125,13 @@ Public Class FloodFill_Basics : Inherits VBparent
             task.palette.Run(dst2)
             dst3 = task.palette.dst2
             dst2 = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        End If
-        labels(2) = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
-        findSelectedRegion()
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class FloodFill_BasicsOld : Inherits VBparent
-    Public sortedSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
-    Public rects As New List(Of cv.Rect)
-    Public masks As New List(Of cv.Mat)
-    Public centroids As New List(Of cv.Point2f)
-    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
-    Dim maskPlus As cv.Mat
-    Public leftovers As cv.Mat
-    Public Sub New()
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2500)
-            sliders.setupTrackBar(1, "FloodFill LoDiff", 0, 255, 25)
-            sliders.setupTrackBar(2, "FloodFill HiDiff", 0, 255, 25)
-            sliders.setupTrackBar(3, "Step Size", 1, dst2.Cols / 2, 30)
-        End If
-        dst1 = New cv.Mat(dst3.Size, cv.MatType.CV_8U)
-        labels(3) = "Palette output"
-        task.desc = "Use floodfill to build image segments in a grayscale image."
-    End Sub
-    Private Sub addRegion(mask As cv.Mat, rect As cv.Rect, count As Integer)
-        sortedSizes.Add(count, masks.Count)
-        masks.Add(mask) ' the leftovers that were not flooded.
-        rects.Add(rect)
-        Dim m = cv.Cv2.Moments(maskPlus(rect), True)
-        Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
-        centroids.Add(centroid)
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 5
-        Static minSizeSlider = findSlider("FloodFill Minimum Size")
-        Static loDiffSlider = findSlider("FloodFill LoDiff")
-        Static hiDiffSlider = findSlider("FloodFill HiDiff")
-        Static stepSlider = findSlider("Step Size")
-        Dim minFloodSize = minSizeSlider.Value
-        Dim loDiff = cv.Scalar.All(loDiffSlider.Value)
-        Dim hiDiff = cv.Scalar.All(hiDiffSlider.Value)
-        Dim stepSize = stepSlider.Value
-
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1, 0)
-        Dim maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
-        leftovers = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
-
-        masks.Clear()
-        sortedSizes.Clear()
-        rects.Clear()
-        centroids.Clear()
-        Dim gray = src.Clone()
-        dst1.SetTo(0)
-
-        For y = 0 To gray.Height - 1 Step stepSize
-            For x = 0 To gray.Width - 1 Step stepSize
-                If gray.Get(Of Byte)(y, x) > 0 Then
-                    Dim rect As New cv.Rect
-                    Dim pt = New cv.Point(CInt(x), CInt(y))
-                    Dim count = cv.Cv2.FloodFill(gray, maskPlus, pt, cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
-                    If count > minFloodSize And count <> gray.Total Then
-                        addRegion(maskPlus(maskRect).Clone().SetTo(0, leftovers)(rect), rect, count)
-                        Dim i = masks.Count - 1
-                        dst1(rect).SetTo(i Mod 255, masks(i))
-                    End If
-                    ' Mask off any object that is too small or previously identified
-                    cv.Cv2.BitwiseOr(leftovers, maskPlus(maskRect), leftovers)
-                End If
-            Next
-        Next
-
-        cv.Cv2.BitwiseNot(leftovers, leftovers)
-
-        dst2 = dst1 * 255 / masks.Count
-        If standalone Then
-            task.palette.Run(dst2)
-            dst3 = task.palette.dst2
-            dst2 = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Else
+            findSelectedRegion()
+            ' floodPointRun = selectedIndexAvailable
         End If
         labels(2) = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
     End Sub
 End Class
-
-
-
-
-
-
-
-'Public Class Floodfill_Objects : Inherits VBparent
-'    Dim basics As New FloodFill_Basics
-'    Dim minSlider As Windows.Forms.TrackBar
-'    Public Sub New()
-
-'        If sliders.Setup(caller) Then
-'            sliders.setupTrackBar(0, "Desired number of objects", 1, 100, 30)
-'        End If
-'        minSlider = findSlider("FloodFill Minimum Size")
-'        minSlider.Value = (dst2.Width Mod 100) * 25
-
-'        task.desc = "Use floodfill to identify the desired number of objects"
-'    End Sub
-'    Public Sub Run(src As cv.Mat) ' Rank = 1
-'        Static loDiffSlider = findSlider("FloodFill LoDiff")
-'        Static hiDiffSlider = findSlider("FloodFill HiDiff")
-'        Static stepSlider = findSlider("Step Size")
-
-'        basics.Run(src)
-'        dst2 = basics.dst2
-
-'        labels(2) = CStr(basics.masks.Count) + " objects with more than " + CStr(minSlider.Value) + " bytes"
-'        Static lastSetting As Integer = loDiffSlider.Value
-'        Dim tmp = If(dst2.Channels = 1, dst2, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-'        If tmp.CountNonZero() < 0.9 * src.Total And minSlider.Value > 500 Then
-'            minSlider.Value -= 10
-'        Else
-'            If basics.masks.Count >= sliders.trackbar(0).Value Then
-'                If loDiffSlider.Value < loDiffSlider.Maximum Then loDiffSlider.Value += 1
-'                If hiDiffSlider.Value < hiDiffSlider.Maximum Then hiDiffSlider.Value += 1
-'            Else
-'                If loDiffSlider.Value > 1 Then
-'                    loDiffSlider.Value -= 1
-'                    hiDiffSlider.Value -= 1
-'                End If
-'            End If
-'            lastSetting = loDiffSlider.Value
-'        End If
-'    End Sub
-'End Class
 
 
 
@@ -897,8 +769,13 @@ Public Class FloodFill_Palette : Inherits VBparent
         basics.Run(src)
 
         dst3.SetTo(0)
+        Dim sortedSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
+        For i = 0 To basics.maskSizes.Count - 1
+            sortedSizes.Add(basics.maskSizes(i), i)
+        Next
+
         For i = 0 To basics.masks.Count - 1
-            Dim maskIndex = basics.sortedSizes.ElementAt(i).Value
+            Dim maskIndex = sortedSizes.ElementAt(i).Value
             Dim r = basics.rects(maskIndex)
             dst3(r).SetTo(cv.Scalar.All((i + 1) Mod 255), basics.masks(maskIndex))
         Next

@@ -86,7 +86,11 @@ Public Class CamShift_Foreground : Inherits VBparent
         fore.Run(src)
         flood.Run(fore.dst3)
         If flood.masks.Count > 0 Then
-            Dim index = flood.sortedSizes.ElementAt(0).Value
+            Dim sortedSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
+            For i = 0 To flood.maskSizes.Count - 1
+                sortedSizes.Add(flood.maskSizes(i), i)
+            Next
+            Dim index = sortedSizes.ElementAt(0).Value
             If camshift.trackBox.Size.Width > src.Width Or camshift.trackBox.Size.Height > src.Height Then
                 task.drawRect = flood.rects(index)
             End If
@@ -119,7 +123,11 @@ Public Class Camshift_Object : Inherits VBparent
         flood.Run(blob.dst3)
 
         If flood.masks.Count > 0 Then
-            Dim index = flood.sortedSizes.ElementAt(0).Value
+            Dim sortedSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
+            For i = 0 To flood.maskSizes.Count - 1
+                sortedSizes.Add(flood.maskSizes(i), i)
+            Next
+            Dim index = sortedSizes.ElementAt(0).Value
             If camshift.trackBox.Size.Width > src.Width Or camshift.trackBox.Size.Height > src.Height Then
                 task.drawRect = flood.rects(index)
             End If
