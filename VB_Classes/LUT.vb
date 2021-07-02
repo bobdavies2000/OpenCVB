@@ -174,7 +174,6 @@ Public Class LUT_FloodFill : Inherits VBparent
     Public Sub New()
         saveStepSize = findSlider("Step Size").Value
         usingdst1 = True
-        findSlider("FloodFill Minimum Size").Value = 1
         findSlider("Canny threshold1").Value = 170
         labels(1) = "Click anywhere to see the selected region isolated in dst3"
         labels(2) = "FloodFill Results - click to select another region"

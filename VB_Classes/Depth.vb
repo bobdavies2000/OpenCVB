@@ -1677,28 +1677,26 @@ Public Class Depth_ObjectsLUT : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 5
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
-        Static lastRect As New cv.Rect
-
-        src.Rectangle(lastRect, If(task.frameCount Mod 2, 255, 0), 1)
-        src.Rectangle(New cv.Rect(lastRect.X - 1, lastRect.Y - 1, lastRect.Width + 2, lastRect.Height + 2), If(task.frameCount Mod 2, 0, 255), 1)
         lutFlood.Run(src)
         dst1 = lutFlood.dst1
         dst2 = lutFlood.dst2
         dst3 = lutFlood.dst3
 
         Dim meanDepth As cv.Scalar, stdevDepth As cv.Scalar
-        Dim index = lutFlood.flood.selectedIndex
-        If lutFlood.flood.rects.Count = 0 Then Exit Sub ' the scene is completely dark (discovered in overnight testing.)
-        Dim r = lutFlood.flood.rects(index)
-        lastRect = New cv.Rect(r.X - 2, r.Y - 2, r.Width + 4, r.Height + 4)
+        If lutFlood.flood.selectedIndexAvailable Then
+            Dim index = lutFlood.flood.selectedIndex
+            If lutFlood.flood.maskSizes(index) > minSizeSlider.value Then
+                If lutFlood.flood.rects.Count = 0 Then Exit Sub ' the scene is completely dark (discovered in overnight testing.)
+                Dim r = lutFlood.flood.rects(index)
 
-        cv.Cv2.MeanStdDev(task.depth32f(r), meanDepth, stdevDepth, lutFlood.flood.masks(index))
+                cv.Cv2.MeanStdDev(task.depth32f(r), meanDepth, stdevDepth, lutFlood.flood.masks(index))
 
-        labels(3) = "Region " + CStr(index) + " has depth " + Format(meanDepth.Item(0) / 1000, "0.000") + "m with stdev " + Format(stdevDepth.Item(0), "0.0")
-        labels(2) = CStr(lutFlood.flood.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
-        If index = 0 Then
-            labels(3) = "Click was on an ummapped region..."
-            setTrueText("Selected region is unmapped (no depth or too small)", 10, 100, 3)
+                labels(3) = "Region " + CStr(index) + " has depth " + Format(meanDepth.Item(0) / 1000, "0.000") + "m with stdev " + Format(stdevDepth.Item(0), "0.0")
+                labels(2) = CStr(lutFlood.flood.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
+            Else
+                labels(3) = "Area is too small to be useful"
+                setTrueText("Selected region is too small to be useful", 10, 100, 3)
+            End If
         End If
     End Sub
 End Class
@@ -1725,28 +1723,26 @@ Public Class Depth_ObjectsKMeans : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 5
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
-        Static lastRect As New cv.Rect
-
-        src.Rectangle(lastRect, cv.Scalar.White, 1)
-        src.Rectangle(New cv.Rect(lastRect.X - 1, lastRect.Y - 1, lastRect.Width + 2, lastRect.Height + 2), cv.Scalar.Black, 1)
         kFlood.Run(src)
         dst1 = kFlood.dst1
         dst2 = kFlood.dst2
         dst3 = kFlood.dst3
 
         Dim meanDepth As cv.Scalar, stdevDepth As cv.Scalar
-        Dim index = kFlood.flood.selectedIndex
-        If kFlood.flood.rects.Count = 0 Then Exit Sub ' the scene is completely dark (discovered in overnight testing.)
-        Dim r = kFlood.flood.rects(index)
-        lastRect = New cv.Rect(r.X - 2, r.Y - 2, r.Width + 4, r.Height + 4)
+        If kFlood.flood.selectedIndexAvailable Then
+            Dim index = kFlood.flood.selectedIndex
+            If kFlood.flood.maskSizes(index) > minSizeSlider.value Then
+                If kFlood.flood.rects.Count = 0 Then Exit Sub ' the scene is completely dark (discovered in overnight testing.)
+                Dim r = kFlood.flood.rects(index)
 
-        cv.Cv2.MeanStdDev(task.depth32f(r), meanDepth, stdevDepth, kFlood.flood.masks(index))
+                cv.Cv2.MeanStdDev(task.depth32f(r), meanDepth, stdevDepth, kFlood.flood.masks(index))
 
-        labels(3) = "Region " + CStr(index) + " has depth " + Format(meanDepth.Item(0) / 1000, "0.000") + "m with stdev " + Format(stdevDepth.Item(0), "0.0")
-        labels(2) = CStr(kFlood.flood.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
-        If index = 0 Then
-            labels(3) = "Click was on an ummapped region..."
-            setTrueText("Selected region is unmapped (no depth or too small)", 10, 100, 3)
+                labels(3) = "Region " + CStr(index) + " has depth " + Format(meanDepth.Item(0) / 1000, "0.000") + "m with stdev " + Format(stdevDepth.Item(0), "0.0")
+                labels(2) = CStr(kFlood.flood.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
+            Else
+                labels(3) = "Area is too small to be useful"
+                setTrueText("Selected region is too small to be useful", 10, 100, 3)
+            End If
         End If
     End Sub
 End Class

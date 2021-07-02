@@ -520,7 +520,6 @@ Public Class KMeans_FloodFill : Inherits VBparent
     Dim edges As New Edges_Basics
     Public Sub New()
         usingdst1 = True
-        findSlider("FloodFill Minimum Size").Value = 1
         labels(1) = "Click anywhere to see selected region isolated in dst3"
         labels(2) = "FloodFill Results - click to select another region"
         task.desc = "Use each KMeans mask with floodfill to identify each segment in the image"
@@ -552,7 +551,6 @@ Public Class KMeans_FloodFillDepth : Inherits VBparent
     Public km As New KMeans_Depth
     Public Sub New()
         usingdst1 = True
-        findSlider("FloodFill Minimum Size").Value = 1
         labels(1) = "Click anywhere to see selected region isolated in dst3"
         labels(2) = "FloodFill Results - click to select another region"
         task.desc = "Use KMeans with depth and find masks with floodfill"
