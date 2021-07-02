@@ -187,12 +187,11 @@ Public Class LUT_FloodFill : Inherits VBparent
         lut.Run(src)
         dst1 = lut.dst2
 
-        ' flood.floodPointRun = flood.selectedIndexAvailable
+        'flood.floodPointRun = flood.selectedIndexAvailable
         flood.Run(lut.dst2)
         dst2 = flood.dst2
+        dst3 = flood.dst3
         If flood.rects.Count = 0 Then Exit Sub ' image is likely very dark and nothing is actually seen...
-
-        dst3 = flood.findSelectedRegion()
         labels(3) = CStr(flood.masks.Count) + " regions.  Selected region = " + CStr(flood.selectedIndex)
     End Sub
 End Class

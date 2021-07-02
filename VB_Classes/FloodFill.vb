@@ -28,7 +28,7 @@ Public Class FloodFill_Basics : Inherits VBparent
         labels(3) = "Palette output"
         task.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
-    Public Function findSelectedRegion() As cv.Mat
+    Public Sub findSelectedRegion()
         Static mousePoint = New cv.Point(msRNG.Next(0, dst1.Width), msRNG.Next(0, dst1.Height))
         If task.mouseClickFlag Then
             mousePoint = task.mouseClickPoint
@@ -56,8 +56,7 @@ Public Class FloodFill_Basics : Inherits VBparent
                 selectedIndexAvailable = True
             End If
         End If
-        Return dst3
-    End Function
+    End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 5
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
         Static loDiffSlider = findSlider("FloodFill LoDiff")
@@ -77,7 +76,7 @@ Public Class FloodFill_Basics : Inherits VBparent
         If floodPointRun Then
             Dim pt = floodPoints(selectedIndex)
             Dim count = cv.Cv2.FloodFill(gray, maskPlus, pt, cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
-            If count > minFloodSize And count <> gray.Total Then
+            If count > minFloodSize Then
                 masks(selectedIndex) = maskPlus(maskRect).Clone().SetTo(0, alreadyFlooded)(rect)
                 rects(selectedIndex) = rect
                 Dim m = cv.Cv2.Moments(masks(selectedIndex), True)
@@ -101,7 +100,7 @@ Public Class FloodFill_Basics : Inherits VBparent
                     If gray.Get(Of Byte)(y, x) > 0 Then
                         Dim pt = New cv.Point(CInt(x), CInt(y))
                         Dim count = cv.Cv2.FloodFill(gray, maskPlus, pt, cv.Scalar.White, rect, loDiff, hiDiff, floodFlag Or (255 << 8))
-                        If count > minFloodSize And count <> gray.Total Then
+                        If count > minFloodSize Then
                             floodPoints.Add(pt)
                             Dim mask = maskPlus(maskRect).Clone().SetTo(0, alreadyFlooded)(rect)
 
@@ -127,6 +126,7 @@ Public Class FloodFill_Basics : Inherits VBparent
             dst2 = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         End If
         labels(2) = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
+        findSelectedRegion()
     End Sub
 End Class
 

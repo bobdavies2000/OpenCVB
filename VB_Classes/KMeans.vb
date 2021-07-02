@@ -536,7 +536,7 @@ Public Class KMeans_FloodFill : Inherits VBparent
         If flood.rects.Count = 0 Then Exit Sub ' image is likely very dark and nothing is actually seen...
         dst2 = flood.dst2
 
-        dst3 = flood.findSelectedRegion()
+        dst3 = flood.dst3
         labels(3) = CStr(flood.masks.Count) + " regions.  Selected region = " + CStr(flood.selectedIndex)
     End Sub
 End Class
@@ -565,7 +565,7 @@ Public Class KMeans_FloodFillDepth : Inherits VBparent
         If flood.rects.Count = 0 Then Exit Sub ' image is likely very dark and no rects were found
         dst2 = flood.dst2
 
-        dst3 = flood.findSelectedRegion()
+        dst3 = flood.dst3
         labels(3) = CStr(flood.masks.Count) + " regions.  Selected region = " + CStr(flood.selectedIndex)
     End Sub
 End Class
