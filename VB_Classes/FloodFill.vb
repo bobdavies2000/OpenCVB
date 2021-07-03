@@ -6,16 +6,12 @@ Public Class FloodFill_Basics : Inherits VBparent
     Dim floodPoints As New List(Of cv.Point)
     Public masks As New List(Of cv.Mat)
     Public centroids As New List(Of cv.Point2f)
-    Public floodFlag As cv.FloodFillFlags = cv.FloodFillFlags.FixedRange
-    Public alreadyFlooded As cv.Mat
+    Public floodFlag As Integer = cv.FloodFillFlags.FixedRange Or (255 << 8)
+    Dim alreadyFlooded As cv.Mat
     Public selectedIndex As Integer
-    Public selectedIndexAvailable As Boolean
     Dim selectedRect As cv.Rect
     Dim maskPlus As cv.Mat
     Dim maskRect As cv.Rect
-    Dim noRegionID As New cv.Mat
-    Dim gray As cv.Mat
-    Dim dWH As Integer = 5
     Public Sub New()
         If sliders.Setup(caller) Then
             sliders.setupTrackBar(0, "FloodFill Minimum Size", 1, 5000, 2500)
@@ -28,15 +24,8 @@ Public Class FloodFill_Basics : Inherits VBparent
         labels(3) = "Palette output"
         task.desc = "Use floodfill to build image segments in a grayscale image."
     End Sub
-    Private Function buildNewRegion(pt As cv.Point)
-        Dim rect As cv.Rect
-        Dim count = cv.Cv2.FloodFill(gray, maskPlus, pt, cv.Scalar.White, rect, 0, 0, floodFlag Or (255 << 8))
-        If rect.Width = 0 And rect.Height = 0 Then rect = New cv.Rect(pt.X, pt.Y, If(pt.X + dWH > dst1.Width, dst1.Width - dWH, dWH), If(pt.Y + dWH > dst1.Height, dst1.Height - dWH, dWH))
-        addRegion(pt, rect, count)
-        Return masks.Count - 1
-    End Function
     Private Sub findSelectedRegion()
-        Static mousePoint = New cv.Point(msRNG.Next(0, dst1.Width), msRNG.Next(0, dst1.Height))
+        Static mousePoint = New cv.Point(msRNG.Next(0, dst1.Width / 2), msRNG.Next(0, dst1.Height))
         If task.mouseClickFlag Then
             mousePoint = task.mouseClickPoint
             selectedIndex = dst1.Get(Of Byte)(mousePoint.Y, mousePoint.X)
@@ -44,30 +33,21 @@ Public Class FloodFill_Basics : Inherits VBparent
 
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         Dim sample = dst1.Get(Of Byte)(mousePoint.Y, mousePoint.X)
-        selectedIndexAvailable = False
         If rects.Count > 0 Then
-            Static currentMask = masks(selectedIndex)
-            Static currentRect = rects(selectedIndex)
-            If sample = 0 Then
-                Dim newID = buildNewRegion(mousePoint)
-                If newID <> 0 Then selectedIndex = newID
-            Else
-                selectedIndex = sample - 1
-            End If
-            If selectedIndex < rects.Count Then
+            selectedIndex = If(sample = 0, -1, sample)
+            If selectedIndex > 0 Then
                 Dim r = rects(selectedIndex)
                 dst3(r).SetTo(255, masks(selectedIndex))
-                currentRect = r
-                currentMask = masks(selectedIndex)
-                If r.Width <> dWH And r.Height <> dWH Then dst3.Rectangle(r, cv.Scalar.White, 1)
                 selectedRect = r
-                selectedIndexAvailable = True
+            Else
+                task.drawRectClear = True
             End If
         End If
     End Sub
     Private Sub addRegion(pt As cv.Point, rect As cv.Rect, count As Integer)
         floodPoints.Add(pt)
         Dim mask = maskPlus(maskRect).Clone().SetTo(0, alreadyFlooded)(rect)
+        dst1(rect).SetTo(masks.Count Mod 255, mask)
 
         maskSizes.Add(count)
         masks.Add(mask)
@@ -75,24 +55,18 @@ Public Class FloodFill_Basics : Inherits VBparent
         Dim m = cv.Cv2.Moments(mask, True)
         Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
         centroids.Add(centroid)
-
-        dst1(rect).SetTo(masks.Count Mod 255, masks(masks.Count - 1))
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 5
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
-        Static loDiffSlider = findSlider("FloodFill LoDiff")
-        Static hiDiffSlider = findSlider("FloodFill HiDiff")
         Static stepSlider = findSlider("Step Size")
         Dim minFloodSize = minSizeSlider.Value
-        Dim loDiff = cv.Scalar.All(loDiffSlider.Value)
-        Dim hiDiff = cv.Scalar.All(hiDiffSlider.Value)
         Dim stepSize = stepSlider.Value
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         maskPlus = New cv.Mat(New cv.Size(src.Width + 2, src.Height + 2), cv.MatType.CV_8UC1, 0)
         maskRect = New cv.Rect(1, 1, maskPlus.Width - 2, maskPlus.Height - 2)
-        gray = src.Clone()
+        Dim gray = src.Clone()
         Dim rect As New cv.Rect
         masks.Clear()
         maskSizes.Clear()
@@ -100,13 +74,14 @@ Public Class FloodFill_Basics : Inherits VBparent
         floodPoints.Clear()
         centroids.Clear()
         dst1.SetTo(0)
+        addRegion(New cv.Point(0, 0), New cv.Rect(0, 0, 20, 20), 400) ' fake region to get away from zero...
         alreadyFlooded = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
 
         For y = stepSize To gray.Height - 1 Step stepSize
             For x = stepSize To gray.Width - stepSize - 1 Step stepSize
                 If gray.Get(Of Byte)(y, x) > 0 Then
                     Dim pt = New cv.Point(CInt(x), CInt(y))
-                    Dim count = cv.Cv2.FloodFill(gray, maskPlus, pt, cv.Scalar.White, rect, 0, 0, floodFlag Or (255 << 8))
+                    Dim count = cv.Cv2.FloodFill(gray, maskPlus, pt, cv.Scalar.White, rect, 0, 0, floodFlag)
                     If count > minFloodSize Then addRegion(pt, rect, count)
                     ' Mask off any object that is too small or previously identified
                     cv.Cv2.BitwiseOr(alreadyFlooded, maskPlus(maskRect), alreadyFlooded)
@@ -122,7 +97,6 @@ Public Class FloodFill_Basics : Inherits VBparent
             findSelectedRegion()
         End If
         labels(2) = CStr(masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
-        cv.Cv2.BitwiseNot(maskPlus(maskRect), noRegionID)
     End Sub
 End Class
 

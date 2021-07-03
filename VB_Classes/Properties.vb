@@ -29,7 +29,7 @@ End Class
 
 
 Public Class Properties_DepthRegion : Inherits VBparent
-    Dim lut As New Depth_ObjectsLUT
+    Dim lut As New Depth_Objects
     Dim props As New Properties_Basics
     Dim mat As New Mat_4to1
     Public Sub New()
@@ -38,6 +38,9 @@ Public Class Properties_DepthRegion : Inherits VBparent
         task.desc = "Find the properties of a depth region"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static radioLUT = findRadio("Use RGB LUT")
+        radioLUT.checked = True
+
         lut.Run(src)
         dst0 = lut.dst1
         mat.mat(0) = dst0

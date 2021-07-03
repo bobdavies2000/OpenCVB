@@ -1663,97 +1663,64 @@ End Class
 
 
 
-
-
-
-
-Public Class Depth_ObjectsLUT : Inherits VBparent
+Public Class Depth_Objects : Inherits VBparent
+    Public kDepthFlood As New KMeans_FloodFillDepth
+    Public kFlood As New KMeans_FloodFill
     Public lutFlood As New LUT_FloodFill
     Public Sub New()
-        usingdst1 = True
-        labels(1) = "Click on any region to isolate that region and measure everything about it."
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F)
-        task.desc = "Create a segmented image with LUT, select a region, and isolate it for measurement"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 5
-        Static minSizeSlider = findSlider("FloodFill Minimum Size")
-        Static lastRect As New cv.Rect
-
-        src.Rectangle(lastRect, If(task.frameCount Mod 2, 255, 0), 1)
-        src.Rectangle(New cv.Rect(lastRect.X - 1, lastRect.Y - 1, lastRect.Width + 2, lastRect.Height + 2), If(task.frameCount Mod 2, 0, 255), 1)
-
-        lutFlood.Run(src)
-        dst1 = lutFlood.dst1
-        dst2 = lutFlood.dst2
-        dst3 = lutFlood.dst3
-
-        Dim meanDepth As cv.Scalar, stdevDepth As cv.Scalar
-        If lutFlood.flood.selectedIndexAvailable Then
-            Dim index = lutFlood.flood.selectedIndex
-            If lutFlood.flood.maskSizes(index) > minSizeSlider.value Then
-                If lutFlood.flood.rects.Count = 0 Then Exit Sub ' the scene is completely dark (discovered in overnight testing.)
-                Dim r = lutFlood.flood.rects(index)
-                lastRect = New cv.Rect(r.X - 2, r.Y - 2, r.Width + 4, r.Height + 4)
-
-                cv.Cv2.MeanStdDev(task.depth32f(r), meanDepth, stdevDepth, lutFlood.flood.masks(index))
-
-                labels(3) = "Region " + CStr(index) + " has depth " + Format(meanDepth.Item(0) / 1000, "0.000") + "m with stdev " + Format(stdevDepth.Item(0), "0.0")
-                labels(2) = CStr(lutFlood.flood.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
-            Else
-                labels(3) = "Area is too small to be useful"
-                setTrueText("Selected region is too small to be useful", 10, 100, 3)
-            End If
+        If findfrm(caller + " Radio Options") Is Nothing Then
+            radio.Setup(caller, 3)
+            radio.check(0).Text = "Use RGB KMeans"
+            radio.check(1).Text = "Use Depth KMeans"
+            radio.check(2).Text = "Use RGB LUT"
+            radio.check(2).Checked = True
         End If
-    End Sub
-End Class
 
-
-
-
-
-
-
-
-
-
-
-
-
-Public Class Depth_ObjectsKMeans : Inherits VBparent
-    Public kFlood As New KMeans_FloodFill
-    Public Sub New()
-        usingdst1 = True
-        labels(1) = "Click on any region to isolate that region and measure everything about it."
+        labels(2) = "Click on any region to isolate that region and measure everything about it."
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F)
         task.desc = "Create a segmented image with KMeans, select a region, and isolate it for measurement."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 5
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
+        Static radioDepth = findRadio("Use Depth KMeans")
+        Static radioLUT = findRadio("Use RGB LUT")
+
+        Dim flood As Object = kFlood
+        Dim rectVal As Integer = 255
+        If radioLUT.checked Then flood = lutFlood
+        If radioDepth.checked Then
+            src = task.depth32f
+            flood = kDepthFlood
+            rectVal = 10000
+        End If
+
         Static lastRect As New cv.Rect
-
-        src.Rectangle(lastRect, If(task.frameCount Mod 2, 255, 0), 1)
-        src.Rectangle(New cv.Rect(lastRect.X - 1, lastRect.Y - 1, lastRect.Width + 2, lastRect.Height + 2), If(task.frameCount Mod 2, 0, 255), 1)
-
-        kFlood.Run(src)
-        dst1 = kFlood.dst1
-        dst2 = kFlood.dst2
-        dst3 = kFlood.dst3
+        If task.mouseClickFlag = False Then
+            src.Rectangle(New cv.Rect(lastRect.X - 1, lastRect.Y - 1, lastRect.Width + 2, lastRect.Height + 2), 0, 2)
+            task.drawRectUpdated = True
+            task.drawRect = lastRect
+        End If
+        flood.Run(src)
+        dst2 = flood.dst2
+        dst3 = flood.dst3
 
         Dim meanDepth As cv.Scalar, stdevDepth As cv.Scalar
-        If kFlood.flood.selectedIndexAvailable Then
-            Dim index = kFlood.flood.selectedIndex
-            If kFlood.flood.maskSizes(index) > minSizeSlider.value Then
-                If kFlood.flood.rects.Count = 0 Then Exit Sub ' the scene is completely dark (discovered in overnight testing.)
-                Dim r = kFlood.flood.rects(index)
-                lastRect = New cv.Rect(r.X - 2, r.Y - 2, r.Width + 4, r.Height + 4)
+        Dim index = flood.flood.selectedIndex
+        labels(3) = "Selected area is an unstable region"
+        If index > 0 Then
+            If flood.flood.maskSizes(index) > minSizeSlider.value Then
+                If flood.flood.rects.Count = 0 Then Exit Sub ' the scene is completely dark (discovered in overnight testing.)
+                Dim r = flood.flood.rects(index)
+                lastRect = New cv.Rect(r.X - 1, r.Y - 1, r.Width + 2, r.Height + 2)
 
-                cv.Cv2.MeanStdDev(task.depth32f(r), meanDepth, stdevDepth, kFlood.flood.masks(index))
-
-                labels(3) = "Region " + CStr(index) + " has depth " + Format(meanDepth.Item(0) / 1000, "0.000") + "m with stdev " + Format(stdevDepth.Item(0), "0.0")
-                labels(2) = CStr(kFlood.flood.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"
-            Else
-                labels(3) = "Area is too small to be useful"
-                setTrueText("Selected region is too small to be useful", 10, 100, 3)
+                Dim mask As cv.Mat = flood.flood.masks(index)
+                Dim input As cv.Mat = task.depth32f(r)
+                cv.Cv2.MeanStdDev(input, meanDepth, stdevDepth, mask)
+                If meanDepth.Item(0) < 0.2 Then
+                    labels(3) = "Region " + CStr(index) + " has no depth"
+                Else
+                    labels(3) = "Region " + CStr(index) + " has depth " + Format(meanDepth.Item(0) / 1000, "0.000") + "m (on average) with stdev " + Format(stdevDepth.Item(0), "0.0")
+                End If
             End If
         End If
     End Sub

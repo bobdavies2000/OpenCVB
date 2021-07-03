@@ -36,8 +36,7 @@ Public Class Featureless_Basics : Inherits VBparent
         flood.Run(mask)
         dst2 = flood.dst2
 
-        Dim allRegions As New cv.Mat
-        cv.Cv2.BitwiseNot(flood.basics.alreadyFlooded, allRegions)
+        Dim allRegions = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         dst3.SetTo(0)
         src.CopyTo(dst3, allRegions)
         Static floodSlider = findSlider("FloodFill Minimum Size")
