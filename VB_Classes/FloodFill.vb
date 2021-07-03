@@ -53,8 +53,12 @@ Public Class FloodFill_Basics : Inherits VBparent
         masks.Add(mask)
         rects.Add(rect)
         Dim m = cv.Cv2.Moments(mask, True)
-        Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
-        centroids.Add(centroid)
+        If m.M00 = 0 Or m.M01 = 0 Then
+            centroids.Add(New cv.Point2f(0, 0))
+        Else
+            Dim centroid = New cv.Point2f(rect.X + m.M10 / m.M00, rect.Y + m.M01 / m.M00)
+            centroids.Add(centroid)
+        End If
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 5
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
