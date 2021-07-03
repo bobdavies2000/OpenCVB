@@ -1698,7 +1698,7 @@ Public Class Depth_Objects : Inherits VBparent
         If task.mouseClickFlag = False Then
             src.Rectangle(New cv.Rect(lastRect.X - 1, lastRect.Y - 1, lastRect.Width + 2, lastRect.Height + 2), 0, 2)
             task.drawRectUpdated = True
-            task.drawRect = lastRect
+            task.drawRect = If(dst1.Width = 640, lastRect, New cv.Rect(lastRect.X / 2, lastRect.Y / 2, lastRect.Width / 2, lastRect.Height / 2))
         End If
         flood.Run(src)
         dst2 = flood.dst2
