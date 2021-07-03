@@ -8,7 +8,7 @@ Public Class BackProject_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        hist.Run(src)
+        hist.RunClass(src)
         dst2 = hist.dst2
 
         Dim barWidth = dst2.Width / task.histogramBins
@@ -53,7 +53,7 @@ Public Class BackProject_Masks : Inherits VBparent
 
         Dim mask As New cv.Mat
         cv.Cv2.CalcBackProject({gray}, {0}, histogram, mask, ranges)
-        lines.Run(mask)
+        lines.RunClass(mask)
         Dim masklines As New List(Of cv.Vec6f)
         For i = 0 To lines.sortlines.Count - 1
             masklines.Add(lines.sortlines.ElementAt(i).Value)
@@ -61,7 +61,7 @@ Public Class BackProject_Masks : Inherits VBparent
         Return masklines
     End Function
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        hist.Run(src)
+        hist.RunClass(src)
         dst2 = hist.dst2
 
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -95,7 +95,7 @@ Public Class BackProject_MasksLines : Inherits VBparent
         task.desc = "Inspect the lines from individual backprojection masks from a histogram"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        hist.Run(src)
+        hist.RunClass(src)
         dst2 = hist.dst2
 
         Dim barWidth = dst2.Width / task.histogramBins
@@ -133,7 +133,7 @@ Public Class BackProject_Surfaces : Inherits VBparent
         task.desc = "Find solid surfaces using the pointcloud X and Y differences"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        pcValid.Run(src)
+        pcValid.RunClass(src)
         Dim mask = pcValid.dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
 
         Dim split = pcValid.dst3.Split()
@@ -151,15 +151,15 @@ Public Class BackProject_Surfaces : Inherits VBparent
 
         Dim xMat = xDiff.ConvertScaleAbs(255)
 
-        hist.Run(xMat)
+        hist.RunClass(xMat)
         Dim ranges() = New cv.Rangef() {New cv.Rangef(1, 2)}
         cv.Cv2.CalcBackProject({xMat}, {0}, hist.histogram, mats.mat(0), ranges)
 
         Dim yMat = yDiff.ConvertScaleAbs(255)
-        hist.Run(yMat)
+        hist.RunClass(yMat)
         cv.Cv2.CalcBackProject({yMat}, {0}, hist.histogram, mats.mat(1), ranges)
 
-        mats.Run(src)
+        mats.RunClass(src)
         dst2 = mats.dst2
 
         cv.Cv2.BitwiseOr(mats.mat(0), mats.mat(1), dst3)
@@ -188,7 +188,7 @@ Public Class BackProject_2D : Inherits VBparent
         Static satBinSlider = findSlider("Saturation bins")
         Static satBins = satBinSlider.Value
 
-        hist.Run(src)
+        hist.RunClass(src)
         dst2 = hist.dst2
 
         Dim unitsPerHueBin = 180 / hueBins
@@ -238,15 +238,15 @@ Public Class BackProject_2DHSV : Inherits VBparent
         task.desc = "Compare the hue and brightness images and the results of the histogram_backprojection2d"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        hueSat.Run(src)
+        hueSat.RunClass(src)
         mats.mat(0) = hueSat.dst2
         mats.mat(1) = hueSat.dst3
 
-        hist2d.Run(src)
+        hist2d.RunClass(src)
         mats.mat(2) = hist2d.dst3
         mats.mat(3) = hist2d.dst2
 
-        mats.Run(src)
+        mats.RunClass(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
 
@@ -269,7 +269,7 @@ Public Class BackProject_Full : Inherits VBparent
         task.desc = "Backproject the entire histogram."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        hist.Run(src)
+        hist.RunClass(src)
         dst2 = hist.dst2
 
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -306,9 +306,9 @@ Public Class BackProject_Reduction : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static reductionSlider = findSlider("Reduction factor")
 
-        reduction.Run(src)
+        reduction.RunClass(src)
 
-        hist.Run(reduction.dst2)
+        hist.RunClass(reduction.dst2)
         dst2 = hist.dst2.Clone
         dst3 = reduction.dst2
         labels(2) = "Reduction = " + CStr(reductionSlider.value) + " and bins = " + CStr(task.histogramBins)
@@ -333,10 +333,10 @@ Public Class BackProject_ReductionLines : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static reductionSlider = findSlider("Reduction factor")
 
-        reduction.Run(src)
+        reduction.RunClass(src)
         dst2 = reduction.dst2
 
-        lines.Run(dst2)
+        lines.RunClass(dst2)
 
         dst3 = src
         For i = 0 To lines.sortlines.Count - 1
@@ -363,9 +363,9 @@ Public Class BackProject_FullLines : Inherits VBparent
         task.desc = "Find lines in the back projection"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        hist.Run(src)
+        hist.RunClass(src)
         dst2 = hist.dst2
-        lines.Run(hist.dst3)
+        lines.RunClass(hist.dst3)
         dst3 = src
         For i = 0 To lines.sortlines.Count - 1
             Dim v = lines.sortlines.ElementAt(i).Value

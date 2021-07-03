@@ -55,7 +55,7 @@ Public Class Gabor_Basics_MT : Inherits VBparent
         findSlider("ThreadGrid Width").Value = dst2.Width / 8
         findSlider("ThreadGrid Height").Value = dst2.Height / 4
 
-        grid.Run(Nothing) ' we only run this one time!  It needs to be 32 Gabor filters only.
+        grid.RunClass(Nothing) ' we only run this one time!  It needs to be 32 Gabor filters only.
 
         For i = 0 To gabor.Length - 1
             gabor(i) = New Gabor_Basics()
@@ -85,7 +85,7 @@ Public Class Gabor_Basics_MT : Inherits VBparent
         Parallel.For(0, grid.roiList.Count,
         Sub(i)
             Dim roi = grid.roiList(i)
-            gabor(i).Run(src)
+            gabor(i).RunClass(src)
             SyncLock accum
                 cv.Cv2.Max(accum, gabor(i).dst2, accum)
                 dst3(roi) = gabor(i).gKernel.Normalize(0, 255, cv.NormTypes.MinMax).Resize(New cv.Size(roi.Width, roi.Height))

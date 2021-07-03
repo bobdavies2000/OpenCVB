@@ -101,7 +101,7 @@ Public Class WarpAffine_Basics : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static frm = findfrm("WarpAffine_Basics Radio Options")
 
-        rotateOptions.Run(src)
+        rotateOptions.RunClass(src)
 
         Dim pt = New cv.Point2f(src.Cols / 2, src.Rows / 2)
         Dim angle = sliders.trackbar(0).Value
@@ -138,10 +138,10 @@ Public Class WarpAffine_3Points : Inherits VBparent
         Static M As New cv.Mat
         If task.frameCount Mod 60 = 0 Then
             Dim triangles(1) As cv.Mat
-            triangle.Run(src)
+            triangle.RunClass(src)
             triangles(0) = triangle.triangle.Clone()
             Dim srcPoints1 = triangle.srcPoints.Clone()
-            triangle.Run(src)
+            triangle.RunClass(src)
             triangles(1) = triangle.triangle.Clone()
             Dim srcPoints2 = triangle.srcPoints.Clone()
 
@@ -210,7 +210,7 @@ Public Class WarpAffine_4Points : Inherits VBparent
             Dim roi = New cv.Rect(50, src.Height / 2, src.Width / 6, src.Height / 6)
             Dim smallImage = src.Resize(New cv.Size(roi.Width, roi.Height))
             Dim rectangles(1) As cv.RotatedRect
-            rect.Run(src)
+            rect.RunClass(src)
             rectangles(1) = rect.minRect
             rectangles(1).Center.X = src.Width - rectangles(0).Center.X - roi.Width
 

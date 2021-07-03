@@ -61,7 +61,7 @@ Public Class KAZE_Match_CS : Inherits VBparent
         task.desc = "Match keypoints in the left and right images."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        red.Run(src)
+        red.RunClass(src)
         dst2 = red.dst2
         dst3 = red.dst3
         Dim result = CS_Kaze.Run(dst2, dst3)

@@ -78,7 +78,7 @@ Public Class ProCon_Basics : Inherits VBparent
         pduration = sliders.trackbar(1).Value
         cduration = sliders.trackbar(2).Value
         SyncLock mutex
-            flow.Run(Nothing)
+            flow.RunClass(Nothing)
         End SyncLock
     End Sub
     Public Sub Close()
@@ -109,7 +109,7 @@ Public Class ProCon_Variation : Inherits VBparent
                 frameCount += 1
             End If
         End SyncLock
-        procon.Run(src)
+        procon.RunClass(src)
     End Sub
     Public Sub Close()
         procon.terminateConsumer = True

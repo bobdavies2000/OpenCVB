@@ -47,7 +47,7 @@ Public Class Surf_BasicsVB : Inherits VBparent
         task.desc = "Use left and right views to match points in horizontal slices."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        surf.Run(src)
+        surf.RunClass(src)
         dst2 = surf.dst2
         dst3 = surf.dst3
     End Sub
@@ -69,7 +69,7 @@ Public Class Surf_DrawMatchManual_CS : Inherits VBparent
         task.desc = "Compare 2 images to get a homography but draw the points manually in horizontal slices."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        surf.Run(src)
+        surf.RunClass(src)
         dst2 = surf.srcLeft.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst3 = surf.srcRight.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim keys1 = surf.CS_SurfBasics.keypoints1

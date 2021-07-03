@@ -38,11 +38,11 @@ Public Class Watershed_Basics : Inherits VBparent
             markers *= Math.Truncate(255 / rects.Count)
             Dim tmp As New cv.Mat
             markers.ConvertTo(tmp, cv.MatType.CV_8U)
-            task.palette.Run(tmp)
+            task.palette.RunClass(tmp)
             dst3 = task.palette.dst2
 
             addW.src2 = task.palette.dst2
-            addW.Run(src)
+            addW.RunClass(src)
             dst2 = addW.dst2
         Else
             dst2 = src
@@ -67,10 +67,10 @@ Public Class Watershed_DepthReduction : Inherits VBparent
         task.desc = "Watershed the depth image using shadow, close, and far points."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        reduction.Run(task.RGBDepth)
+        reduction.RunClass(task.RGBDepth)
         dst3 = reduction.dst3
 
-        watershed.Run(dst3)
+        watershed.RunClass(dst3)
         dst2 = watershed.dst2
         labels(2) = watershed.labels(2)
     End Sub
@@ -90,7 +90,7 @@ Public Class Watershed_DepthAuto : Inherits VBparent
         task.desc = "Watershed the four corners of the depth image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        watershed.Run(task.RGBDepth)
+        watershed.RunClass(task.RGBDepth)
         dst2 = watershed.dst2
         labels(2) = watershed.labels(2)
     End Sub

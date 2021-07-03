@@ -109,7 +109,7 @@ Public Class Delaunay_GoodFeatures : Inherits VBparent
         task.desc = "Use Delaunay with the points provided by GoodFeaturesToTrack."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        features.Run(src)
+        features.RunClass(src)
 
         dst2 = src
         Dim active_facet_color = New cv.Scalar(0, 0, 255)
@@ -199,7 +199,7 @@ Public Class Delauney_Coverage : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod sliders.trackbar(0).Value = 0 Then dst2.SetTo(0)
-        delauney.Run(src)
+        delauney.RunClass(src)
         cv.Cv2.BitwiseOr(delauney.dst2, dst2, dst2)
     End Sub
 End Class

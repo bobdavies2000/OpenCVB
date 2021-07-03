@@ -11,7 +11,7 @@ Public Class PointCloud_Basics : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static minSlider = findSlider("FloodFill Minimum Size")
 
-        tView.Run(src)
+        tView.RunClass(src)
         dst2 = tView.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         dst3 = tView.dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
@@ -60,7 +60,7 @@ Public Class PointCloud_Display : Inherits VBparent
         maskTopView.SetTo(0)
         maskSideView.SetTo(0)
 
-        views.Run(src)
+        views.RunClass(src)
 
         If standalone Or task.intermediateName = caller Then
             Dim accMsg1 = "TopView - distances are accurate"
@@ -126,10 +126,10 @@ Public Class PointCloud_Display : Inherits VBparent
             cv.Cv2.InRange(task.depth32f, minDepth * 1000, maxDepth * 1000, maskSideView)
         End If
 
-        setupSide.Run(views.dst2)
+        setupSide.RunClass(views.dst2)
         dst2 = setupSide.dst2
 
-        setupTop.Run(views.dst3)
+        setupTop.RunClass(views.dst3)
         dst3 = setupTop.dst2
     End Sub
 End Class
@@ -361,7 +361,7 @@ Public Class PointCloud_SetupSide : Inherits VBparent
         Dim markerLeft = New cv.Point(marker.X, cam.Y - marker.Y)
         Dim markerRight = New cv.Point(marker.X, cam.Y + marker.Y)
 
-        If standalone Then imu.Run(src)
+        If standalone Then imu.RunClass(src)
 
         Dim offset = Math.Sin(task.angleX) * marker.Y
         If zCheckbox.checked Then
@@ -450,7 +450,7 @@ Public Class PointCloud_SetupTop : Inherits VBparent
 
         Static zCheckbox = findCheckBox("Rotate pointcloud around Z-axis using gravity vector angleX")
         Static zRotateSlider = findSlider("Amount to rotate pointcloud around Z-axis (degrees)")
-        If standalone Then imu.Run(src)
+        If standalone Then imu.RunClass(src)
         Dim offset = Math.Sin(task.angleZ) * topLen
         If zCheckbox.checked Then
             If task.angleZ > 0 Then
@@ -506,7 +506,7 @@ Public Class PointCloud_Raw_CPP : Inherits VBparent
         cPtr = SimpleProjectionOpen()
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
 
         Dim h = src.Height
         Dim w = src.Width
@@ -551,7 +551,7 @@ Public Class PointCloud_Raw : Inherits VBparent
         cPtr = SimpleProjectionOpen()
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
 
         Dim h = src.Height
         Dim w = src.Width
@@ -603,18 +603,18 @@ Public Class PointCloud_BackProject : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.mouseClickFlag Then
-            If task.mousePicTag = RESULT1 Then
+            If task.mousePicTag = RESULT_DST2 Then
                 setMyActiveMat()
                 task.mouseClickFlag = False ' absorb the mouse click here only
             End If
         End If
-        both.Run(src)
+        both.RunClass(src)
 
         mats.mat(0) = both.dst2
         mats.mat(1) = both.dst3
         mats.mat(2) = both.maskSideView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         mats.mat(3) = both.maskTopView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        mats.Run(src)
+        mats.RunClass(src)
         dst2 = mats.dst2
         dst3 = mats.mat(quadrantIndex)
         If quadrantIndex < 2 Then labels(3) = If(quadrantIndex = 0, both.labels(2), both.labels(3)) Else labels(3) = "Click quadrant 0 or 1 to see side/top views"
@@ -642,10 +642,10 @@ Public Class PointCloud_FrustrumTop : Inherits VBparent
         task.desc = "Translate only the frustrum with gravity"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        frustrum.Run(src)
-        topView.Run(frustrum.dst3)
+        frustrum.RunClass(src)
+        topView.RunClass(frustrum.dst3)
 
-        setupTop.Run(topView.dst2)
+        setupTop.RunClass(topView.dst2)
         dst2 = setupTop.dst2
     End Sub
 End Class
@@ -671,10 +671,10 @@ Public Class PointCloud_FrustrumSide : Inherits VBparent
         task.desc = "Translate only the frustrum with gravity"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        frustrum.Run(src)
-        sideView.Run(frustrum.dst3)
+        frustrum.RunClass(src)
+        sideView.RunClass(frustrum.dst3)
 
-        setupSide.Run(sideView.dst2)
+        setupSide.RunClass(sideView.dst2)
         dst2 = setupSide.dst2
     End Sub
 End Class
@@ -696,12 +696,12 @@ Public Class PointCloud_ReducedSideView : Inherits VBparent
         task.desc = "Create a stable side view of the point cloud"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        gCloud.Run(src)
+        gCloud.RunClass(src)
 
         Dim split = gCloud.dst2.Split()
         src = split(2) * 1000
         src.ConvertTo(src, cv.MatType.CV_32S)
-        reduction.Run(src)
+        reduction.RunClass(src)
         reduction.dst2.ConvertTo(split(2), cv.MatType.CV_32F)
         split(2) *= 0.001
         cv.Cv2.Merge(split, dst3)
@@ -729,12 +729,12 @@ Public Class PointCloud_ReducedTopView : Inherits VBparent
         task.desc = "Create a stable side view of the point cloud"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        gCloud.Run(src)
+        gCloud.RunClass(src)
 
         Dim split = gCloud.dst2.Split()
         src = split(2) * 1000
         src.ConvertTo(src, cv.MatType.CV_32S)
-        reduction.Run(src)
+        reduction.RunClass(src)
         reduction.dst2.ConvertTo(split(2), cv.MatType.CV_32F)
         split(2) *= 0.001
         cv.Cv2.Merge(split, dst3)
@@ -765,7 +765,7 @@ End Class
 '        task.desc = "Display only the top view of the depth data and backproject the histogram onto the RGB image."
 '    End Sub
 '    Public Sub Run(src As cv.Mat) ' Rank = 1
-'        view.Run(src)
+'        view.RunClass(src)
 '        dst3 = view.dst2
 
 '        Dim rectList = New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
@@ -799,7 +799,7 @@ End Class
 '                    colorMask.SetTo((i * colorBump) Mod 255, mask)
 '                End If
 '            Next
-'            task.palette.Run(colorMask)
+'            task.palette.RunClass(colorMask)
 '            dst2 = task.palette.dst2
 '        Else
 '            setTrueText("No objects found")
@@ -821,8 +821,8 @@ End Class
 '        task.desc = "Display only the side view of the depth data - with and without the IMU active"
 '    End Sub
 '    Public Sub Run(src As cv.Mat) ' Rank = 1
-'        view.Run(src)
-'        setupSide.Run(view.dst2)
+'        view.RunClass(src)
+'        setupSide.RunClass(view.dst2)
 '        dst3 = setupSide.dst2
 
 '        Dim rectList = New SortedList(Of Single, cv.Rect)(New compareAllowIdenticalSingleInverted)
@@ -857,7 +857,7 @@ End Class
 '                    colorMask.SetTo((i * colorBump) Mod 255, mask)
 '                End If
 '            Next
-'            task.palette.Run(colorMask)
+'            task.palette.RunClass(colorMask)
 '            dst2 = task.palette.dst2
 '        Else
 '            setTrueText("No objects found")
@@ -881,7 +881,7 @@ Public Class PointCloud_Singletons : Inherits VBparent
         Static frameSlider = findSlider("Number of frames to include")
         Dim frameCount = frameSlider.value
 
-        tView.Run(src)
+        tView.RunClass(src)
         dst2 = tView.dst3
 
         cv.Cv2.InRange(tView.topView.originalHistOutput, frameCount, frameCount, dst3)
@@ -909,10 +909,10 @@ Public Class PointCloud_SingletonRegions : Inherits VBparent
         task.desc = "Find floor and ceiling using gravity aligned top-down view and selecting bins with exactly 1 sample"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        topView.Run(src)
+        topView.RunClass(src)
         cv.Cv2.InRange(topView.originalHistOutput, 1, 1, dst3)
         Dim mask = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255)
-        dilate.Run(dst3.Clone)
+        dilate.RunClass(dst3.Clone)
         dst2 = dilate.dst2
     End Sub
 End Class
@@ -933,17 +933,17 @@ Public Class PointCloud_TrackerTop : Inherits VBparent
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 3
-        timeView.Run(src)
+        timeView.RunClass(src)
         src = timeView.dst3
-        flood.Run(src.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255))
+        flood.RunClass(src.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255))
 
         If flood.dst2.Channels = 3 Then src = flood.dst2 Else src = flood.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         pTrack.queryPoints = New List(Of cv.Point2f)(flood.basics.centroids)
         pTrack.queryRects = New List(Of cv.Rect)(flood.basics.rects)
         pTrack.queryMasks = New List(Of cv.Mat)(flood.basics.masks)
-        pTrack.Run(src)
+        pTrack.RunClass(src)
 
-        setupTop.Run(pTrack.dst2)
+        setupTop.RunClass(pTrack.dst2)
         dst2 = setupTop.dst2
         setTrueText(Format(dst2.Height / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters", 10, dst3.Height - 50, 3)
     End Sub
@@ -962,11 +962,11 @@ Public Class PointCloud_Tracker : Inherits VBparent
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 3
-        sideView.Run(sideView.timeView.dst2)
+        sideView.RunClass(sideView.timeView.dst2)
         dst2 = sideView.dst2
         labels(2) = Format(dst2.Width / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
 
-        topView.Run(sideView.timeView.dst3)
+        topView.RunClass(sideView.timeView.dst3)
         dst3 = topView.dst2
         labels(3) = Format(dst2.Height / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters"
     End Sub
@@ -987,18 +987,18 @@ Public Class PointCloud_TrackerSide : Inherits VBparent
         task.desc = "Measure each object found in a Centroids view and provide pixel width as well"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 3
-        timeView.Run(src)
+        timeView.RunClass(src)
         src = timeView.dst2
 
-        flood.Run(src.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255))
+        flood.RunClass(src.Threshold(task.hist3DThreshold, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs(255))
 
         If flood.dst2.Channels = 3 Then src = flood.dst2 Else src = flood.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         pTrack.queryPoints = New List(Of cv.Point2f)(flood.basics.centroids)
         pTrack.queryRects = New List(Of cv.Rect)(flood.basics.rects)
         pTrack.queryMasks = New List(Of cv.Mat)(flood.basics.masks)
-        pTrack.Run(src)
+        pTrack.RunClass(src)
 
-        setupSide.Run(pTrack.dst2)
+        setupSide.RunClass(pTrack.dst2)
         dst2 = setupSide.dst2
         setTrueText(Format(dst2.Width / task.maxZ, "0") + " pixels per meter with maxZ at " + Format(task.maxZ, "0.0") + " meters", 10, 40, 2)
     End Sub
@@ -1029,7 +1029,7 @@ Public Class PointCloud_ObjectsTop : Inherits VBparent
         Static distanceSlider = findSlider("Test Bar Distance from camera in mm")
         Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim drawLines = showRectanglesCheck.checked
-        measureTop.Run(src)
+        measureTop.RunClass(src)
         dst2 = measureTop.dst2
 
         labels(2) = "Pixels/Meter horizontal: " + CStr(CInt(dst2.Width / task.maxZ)) + " vertical: " + CStr(CInt(dst2.Height / task.maxZ))
@@ -1097,7 +1097,7 @@ Public Class PointCloud_ObjectsTop : Inherits VBparent
             viewObjects.Add(vo.rectFront.Width * vo.rectFront.Height, vo)
         Next
         If standalone Or task.intermediateName = caller Or colorizeNeeded Then
-            setupTop.Run(dst2)
+            setupTop.RunClass(dst2)
             dst2 = setupTop.dst2
         End If
     End Sub
@@ -1125,7 +1125,7 @@ Public Class PointCloud_ObjectsSide : Inherits VBparent
         Static distanceSlider = findSlider("Test Bar Distance from camera in mm")
         Static showRectanglesCheck = findCheckBox("Draw rectangle and centroid for each mask")
         Dim drawLines = showRectanglesCheck.checked
-        measureSide.Run(src)
+        measureSide.RunClass(src)
         dst2 = measureSide.dst2
 
         labels(2) = "Pixels/Meter horizontal: " + CStr(CInt(dst2.Width / task.maxZ)) + " vertical: " + CStr(CInt(dst2.Height / task.maxZ))
@@ -1203,7 +1203,7 @@ Public Class PointCloud_ObjectsSide : Inherits VBparent
             viewObjects.Add(vo.rectFront.Width * vo.rectFront.Height, vo)
         Next
         If standalone Or task.intermediateName = caller Then
-            setupSide.Run(dst2)
+            setupSide.RunClass(dst2)
             dst2 = setupSide.dst2
         End If
     End Sub
@@ -1225,7 +1225,7 @@ Public Class PointCloud_SurfaceH_CPP : Inherits VBparent
         task.desc = "Find the horizontal surfaces with a projects of the SideView histogram."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        tView.Run(src)
+        tView.RunClass(src)
         dst2 = tView.dst2
 
         ReDim plot.srcX(dst2.Height - 1)
@@ -1247,7 +1247,7 @@ Public Class PointCloud_SurfaceH_CPP : Inherits VBparent
         For i = plot.srcY.Count - 1 To 0 Step -1
             If botRow = 0 And plot.srcY(i) > 10 Then botRow = i
         Next
-        plot.Run(Nothing)
+        plot.RunClass(Nothing)
         dst3 = plot.dst2.Transpose()
         dst3 = dst3.Flip(cv.FlipMode.Y)
         labels(2) = "Top row = " + CStr(topRow) + " peak row = " + CStr(peakRow) + " bottom row = " + CStr(botRow)
@@ -1270,7 +1270,7 @@ Public Class PointCloud_SurfaceH : Inherits VBparent
         task.desc = "Find the horizontal surfaces with a projects of the SideView histogram."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        tView.Run(src)
+        tView.RunClass(src)
         dst2 = tView.dst2
         plot.hist = New cv.Mat(dst2.Height, 1, cv.MatType.CV_32F, 0)
         Dim indexer = plot.hist.GetGenericIndexer(Of Single)()
@@ -1293,7 +1293,7 @@ Public Class PointCloud_SurfaceH : Inherits VBparent
         For i = plot.hist.Rows - 1 To 0 Step -1
             If botRow = 0 And indexer(i) > 10 Then botRow = i
         Next
-        plot.Run(src)
+        plot.RunClass(src)
         dst3 = plot.dst2.Transpose()
         dst3 = dst3.Flip(cv.FlipMode.Y)
         labels(2) = "Top row = " + CStr(topRow) + " peak row = " + CStr(peakRow) + " bottom row = " + CStr(botRow)
@@ -1490,10 +1490,10 @@ Public Class PointCloud_NeighborIMUH : Inherits VBparent
         task.desc = "Use the IMU adjusted cloud to find horizontals"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        gCloud.Run(src)
+        gCloud.RunClass(src)
 
         Dim split = gCloud.dst2.Split()
-        horiz.Run(split(2) * 1000)
+        horiz.RunClass(split(2) * 1000)
         dst2 = horiz.dst2
         labels(2) = horiz.labels(2)
     End Sub
@@ -1514,10 +1514,10 @@ Public Class PointCloud_NeighborIMUV : Inherits VBparent
         task.desc = "Use the IMU adjusted cloud to find verticals"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        gCloud.Run(src)
+        gCloud.RunClass(src)
 
         Dim split = gCloud.dst2.Split()
-        verticals.Run(split(2) * 1000)
+        verticals.RunClass(split(2) * 1000)
         dst2 = verticals.dst2
         labels(2) = verticals.labels(2)
     End Sub

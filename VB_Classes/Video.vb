@@ -64,10 +64,10 @@ Public Class Video_CarCounting : Inherits VBparent
         task.desc = "Count cars in a video file"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        video.Run(src)
+        video.RunClass(src)
         If video.dst2.Empty() = False And video.image.Empty() = False Then
             dst2.SetTo(0)
-            bgSub.Run(video.image)
+            bgSub.RunClass(video.image)
             Dim videoImage = bgSub.dst2
             dst3 = video.dst2
 
@@ -95,7 +95,7 @@ Public Class Video_CarCounting : Inherits VBparent
             Dim tmp = videoImage.Resize(src.Size())
             If tmp.Channels <> dst2.Channels Then tmp = tmp.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             flow.msgs.Add("  Cars " + CStr(carCount))
-            flow.Run(Nothing)
+            flow.RunClass(Nothing)
             cv.Cv2.BitwiseOr(dst2, tmp, dst2)
         End If
     End Sub
@@ -113,10 +113,10 @@ Public Class Video_CarCComp : Inherits VBparent
         task.desc = "Outline cars with a rectangle"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        video.Run(src)
+        video.RunClass(src)
         If video.dst2.Empty() = False Then
-            bgSub.Run(video.dst2)
-            cc.Run(bgSub.dst2)
+            bgSub.RunClass(video.dst2)
+            cc.RunClass(bgSub.dst2)
             dst2 = cc.dst3
             dst3 = cc.dst2
         End If
@@ -133,13 +133,13 @@ Public Class Video_MinRect : Inherits VBparent
     Public contours As cv.Point()()
     Public Sub New()
         video.srcVideo = task.parms.homeDir + "Data/CarsDrivingUnderBridge.mp4"
-        video.Run(dst2)
+        video.RunClass(dst2)
         task.desc = "Find area of car outline - example of using minAreaRect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        video.Run(src)
+        video.RunClass(src)
         If video.dst2.Empty() = False Then
-            bgSub.Run(video.dst2)
+            bgSub.RunClass(video.dst2)
 
             contours = cv.Cv2.FindContoursAsArray(bgSub.dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
             dst2 = bgSub.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -164,7 +164,7 @@ Public Class Video_MinCircle : Inherits VBparent
         task.desc = "Find area of car outline - example of using MinEnclosingCircle"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        video.Run(src)
+        video.RunClass(src)
         dst2 = video.dst2
         dst3 = video.dst3
 

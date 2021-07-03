@@ -10,7 +10,7 @@ Public Class GrabCut_Basics : Inherits VBparent
         task.desc = "Use grabcut with just a foreground and background definition."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        fgnd.Run(src)
+        fgnd.RunClass(src)
         dst2 = fgnd.dst2
 
         Dim fg = dst2.Threshold(1, cv.GrabCutClasses.FGD, cv.ThresholdTypes.Binary)
@@ -79,12 +79,12 @@ Public Class GrabCut_FineTune : Inherits VBparent
             End If
         End If
 
-        basics.Run(src)
+        basics.RunClass(src)
 
         mats.mat(0) = basics.dst2
         mats.mat(1) = basics.fgFineTune
         mats.mat(2) = basics.bgFineTune
-        mats.Run(src)
+        mats.RunClass(src)
         dst2 = mats.dst2
 
         dst3 = basics.dst3

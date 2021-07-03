@@ -14,7 +14,7 @@ Public Class Properties_Basics : Inherits VBparent
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         task.pointCloud.CopyTo(dst1, src)
 
-        cloud.Run(dst1)
+        cloud.RunClass(dst1)
         dst2 = cloud.dst2
         dst3 = cloud.dst3
 
@@ -41,16 +41,16 @@ Public Class Properties_DepthRegion : Inherits VBparent
         Static radioLUT = findRadio("Use RGB LUT")
         radioLUT.checked = True
 
-        lut.Run(src)
+        lut.RunClass(src)
         dst0 = lut.dst1
         mat.mat(0) = dst0
         mat.mat(1) = lut.dst3
 
-        props.Run(lut.dst3)
+        props.RunClass(lut.dst3)
         mat.mat(2) = props.dst2
         mat.mat(3) = props.dst3
 
-        mat.Run(Nothing)
+        mat.RunClass(Nothing)
         dst2 = mat.dst2
 
     End Sub

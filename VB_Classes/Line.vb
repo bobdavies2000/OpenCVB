@@ -87,9 +87,9 @@ Public Class Line_Reduction : Inherits VBparent
         task.desc = "Use the reduced rgb image as input to the line detector"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        reduction.Run(src)
+        reduction.RunClass(src)
 
-        lines.Run(reduction.dst2)
+        lines.RunClass(reduction.dst2)
         dst2 = lines.dst2
 
         If task.cameraStable = False Then dst3.SetTo(0)
@@ -119,7 +119,7 @@ Public Class Line_InterceptsUI : Inherits VBparent
         Static yellowRadio = findRadio("Show Right intercepts")
         Static blueRadio = findRadio("Show Left intercepts")
 
-        lines.Run(src)
+        lines.RunClass(src)
         Dim searchRange = lines.searchRange
         dst3.SetTo(0)
 
@@ -198,9 +198,9 @@ Public Class Line_Vertical : Inherits VBparent
         toleranceInMMs = errorSlider.value / 1000
         dst2 = src.Clone
 
-        gCloud.Run(src)
+        gCloud.RunClass(src)
         lines.cloudInput = gCloud.dst2
-        lines.Run(src)
+        lines.RunClass(src)
 
         For i = 0 To lines.z1.Count - 1
             Dim p1 = lines.z1(i)
@@ -227,7 +227,7 @@ Public Class Line_Horizontal : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         dst2 = src.Clone
 
-        vLines.Run(src)
+        vLines.RunClass(src)
 
         For i = 0 To vLines.lines.z1.Count - 1
             Dim p1 = vLines.lines.z1(i)
@@ -305,7 +305,7 @@ Public Class Line_Intercepts : Inherits VBparent
         Static searchSlider = findSlider("x- and y-intercept search range in pixels")
         searchRange = searchSlider.value
 
-        lines.Run(src)
+        lines.RunClass(src)
         If lines.sortlines.Count = 0 Then Exit Sub
 
         dst2 = src
@@ -446,13 +446,13 @@ Public Class Line_SideView : Inherits VBparent
         task.desc = "Line in image are projected into the depth image - not yet complete..."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        lines.Run(src)
+        lines.RunClass(src)
         dst3 = lines.dst3
 
         Dim mask = dst3
         ' tView.src = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         'task.pointCloud.CopyTo(tView.src, mask)
-        tView.Run(task.pointCloud)
+        tView.RunClass(task.pointCloud)
         dst2 = tView.dst2
     End Sub
 End Class
@@ -485,19 +485,19 @@ Public Class Line_LeftRightImages : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static rgbCheck = findCheckBox("Show lines from RGB in green")
-        lrPalette.Run(src)
+        lrPalette.RunClass(src)
 
         If task.cameraStable = False Then dst2.SetTo(cv.Scalar.White)
 
-        leftLines.Run(lrPalette.dst2)
+        leftLines.RunClass(lrPalette.dst2)
         dst2.SetTo(cv.Scalar.White)
         dst2.SetTo(cv.Scalar.Red, leftLines.dst3)
 
-        rightLines.Run(lrPalette.dst3)
+        rightLines.RunClass(lrPalette.dst3)
         dst2.SetTo(cv.Scalar.Blue, rightLines.dst3)
 
         If rgbCheck.checked Then
-            rgbLines.Run(src)
+            rgbLines.RunClass(src)
             dst2.SetTo(cv.Scalar.Green, rgbLines.dst3)
         End If
     End Sub
@@ -528,11 +528,11 @@ Public Class Line_RegionsVB : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static verticalCheck = findCheckBox("Show intermediate vertical step results")
         Static noVertCheck = findCheckBox("Run horizontal without vertical step")
-        reduction.Run(src)
+        reduction.RunClass(src)
         dst2 = reduction.dst2
         dst3 = dst2.Clone
 
-        lines.Run(src)
+        lines.RunClass(src)
 
         Dim lineMask = lines.dst3
         dst2.SetTo(lineMatch, lineMask)
@@ -611,11 +611,11 @@ Public Class Line_LUT : Inherits VBparent
         task.desc = "Compare the lines produced with the RGB and those produced after LUT"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        lines.Run(src)
+        lines.RunClass(src)
         dst2 = lines.dst2
 
-        lut.Run(src)
-        lines.Run(lut.dst2)
+        lut.RunClass(src)
+        lines.RunClass(lut.dst2)
         dst3 = lines.dst2
     End Sub
 End Class
@@ -635,7 +635,7 @@ Public Class Line_Longest : Inherits VBparent
         task.desc = "Find the longest line in RGB and use it to validate depth"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        lines.Run(src.Clone)
+        lines.RunClass(src.Clone)
         dst2 = src
         If lines.pt1List.Count > 0 Then
             Static indexSlider = findSlider("Index of line (sorted by length")
@@ -678,7 +678,7 @@ Public Class Line_Longest : Inherits VBparent
             plot.minScale = 0
             plot.maxScale = task.maxZ
             plot.plotData = New cv.Scalar(meanVal, 0, 0)
-            plot.Run(Nothing)
+            plot.RunClass(Nothing)
             dst3 = plot.dst2.Clone
 
             Dim yMean = (1 - meanVal / plot.maxScale) * dst2.Height
@@ -706,9 +706,9 @@ Public Class Line_TimeViewLines : Inherits VBparent
         task.desc = "Find slope and y-intercept of lines over time."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        lines.Run(src)
+        lines.RunClass(src)
         If lines.pixelcount = 0 Then Exit Sub
-        basics.Run(lines.dst3)
+        basics.RunClass(lines.dst3)
 
         Dim sortlines As New SortedList(Of Single, cv.Vec6f)(New compareAllowIdenticalSingleInverted)
         pt1List.Clear()
@@ -761,7 +761,7 @@ Public Class Line_TimeView : Inherits VBparent
         Static frameSlider = findSlider("Detect lines from the last X frames")
         Static lineCount As Integer
 
-        lines.Run(src)
+        lines.RunClass(src)
 
         If lineCount <> frameSlider.value Then
             lineCount = frameSlider.value
@@ -813,7 +813,7 @@ Public Class Line_InDepthAndRGB : Inherits VBparent
         task.desc = "Find the RGB lines and confirm they are present in the cloud data."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        lines.Run(src)
+        lines.RunClass(src)
         dst2 = lines.dst2
 
         If lines.sortlines.Count = 0 Then Exit Sub
@@ -959,12 +959,12 @@ Public Class Line_DupDepthV : Inherits VBparent
         task.desc = "Detect lines in the PointCloud_NeighborV output where linear patterns show where duplicate depth values are neighbors."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        cloud.Run(src)
+        cloud.RunClass(src)
 
-        dOptions.lines.Run(cloud.dst2)
+        dOptions.lines.RunClass(cloud.dst2)
         dOptions.addw.src2 = dOptions.drawLinesV()
 
-        dOptions.addw.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dOptions.addw.RunClass(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = dOptions.addw.dst2
 
         setTrueText(dOptions.showDepthData(), 10, 40, 3)
@@ -987,12 +987,12 @@ Public Class Line_DupDepthH : Inherits VBparent
         task.desc = "Detect lines in the PointCloud_NeighborH output where linear patterns show where duplicate depth values are neighbors."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        cloud.Run(src)
+        cloud.RunClass(src)
 
-        dOptions.lines.Run(cloud.dst2)
+        dOptions.lines.RunClass(cloud.dst2)
         dOptions.addw.src2 = dOptions.drawLinesH()
 
-        dOptions.addw.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dOptions.addw.RunClass(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = dOptions.addw.dst2
 
         setTrueText(dOptions.showDepthData(), 10, 40, 3)
@@ -1015,8 +1015,8 @@ Public Class Line_DupDepth : Inherits VBparent
         task.desc = "Merge the horizontal and vertical lines with duplicate depth"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dupH.Run(src)
-        dupV.Run(src)
+        dupH.RunClass(src)
+        dupV.RunClass(src)
         task.ttTextData.Clear()
         cv.Cv2.BitwiseOr(dupH.dOptions.addw.src2, dupV.dOptions.addw.src2, dst2)
     End Sub
@@ -1038,7 +1038,7 @@ Public Class Line_DupLongestH : Inherits VBparent
         task.desc = "Use the depth along the longest line in Line_DupDepthH to find line in 3D."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dupH.Run(src)
+        dupH.RunClass(src)
         dst2 = dupH.dst2
 
         Dim latest As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -1091,9 +1091,9 @@ Public Class Line_KMeans : Inherits VBparent
         task.desc = "Detect lines in the KMeans output"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        km.Run(src)
+        km.RunClass(src)
         dst2 = km.dst2
-        lines.Run(km.dst2)
+        lines.RunClass(km.dst2)
         dst3 = lines.dst2
     End Sub
 End Class
@@ -1109,9 +1109,9 @@ End Class
 '        task.desc = "Detect lines in the KMeans fuzzy output"
 '    End Sub
 '    Public Sub Run(src As cv.Mat) ' Rank = 1
-'        km.Run(src)
+'        km.RunClass(src)
 '        dst2 = km.dst2
-'        lines.Run(km.dst3)
+'        lines.RunClass(km.dst3)
 '        dst3 = lines.dst2
 '    End Sub
 'End Class

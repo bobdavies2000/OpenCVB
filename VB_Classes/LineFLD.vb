@@ -297,7 +297,7 @@ Public Class LineFLD_LongestLine : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
-        lines.Run(src)
+        lines.RunClass(src)
         src.CopyTo(dst2)
 
         If lines.sortedLines.Count > 0 Then
@@ -328,7 +328,7 @@ Public Class LineFLD_MT : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod sliders.trackbar(1).Value Then Exit Sub
-        lines.Run(src)
+        lines.RunClass(src)
         src.CopyTo(dst2)
 
         ' how big to make the mask that will be used to find the depth data.  Small is more accurate.  Larger will get full length.
@@ -366,7 +366,7 @@ End Class
 '        If task.frameCount Mod sliders.trackbar(2).Value Then Exit Sub
 '        Dim useX As Boolean = check.Box(0).Checked
 '        linesFLD.src = src
-'        linesFLD.Run()
+'        linesFLD.RunClass()
 '        src.CopyTo(dst2)
 
 '        Dim sortedlines As SortedList(Of cv.Vec6f, Integer)

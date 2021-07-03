@@ -85,8 +85,8 @@ Public Class LUT_CustomColor : Inherits VBparent
         task.desc = "Use a palette to provide the lookup table for LUT - Painterly Effect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Or task.intermediateName = caller Then reduction.Run(src)
-        gradMap.Run(src)
+        If standalone Or task.intermediateName = caller Then reduction.RunClass(src)
+        gradMap.RunClass(src)
         colorMap = gradMap.gradientColorMap.Flip(cv.FlipMode.X)
         dst2 = src.LUT(colorMap)
         dst3 = colorMap.Resize(src.Size())
@@ -108,8 +108,8 @@ Public Class LUT_Reduction : Inherits VBparent
         task.desc = "Build and use a custom color palette - Painterly Effect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        task.palette.Run(Nothing)
-        reduction.Run(src)
+        task.palette.RunClass(Nothing)
+        reduction.RunClass(src)
         Dim vector = task.palette.gradientColorMap.Row(0).Clone
         dst2 = reduction.dst3.LUT(vector)
         If standalone Or task.intermediateName = caller Then dst3 = task.palette.gradientColorMap.Resize(src.Size())
@@ -131,7 +131,7 @@ Public Class LUT_RGBDepth : Inherits VBparent
         task.desc = "Use a LUT on the RGBDepth to segregate depth data."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        lut.Run(task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        lut.RunClass(task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = lut.dst2
         labels(2) = lut.labels(2)
     End Sub
@@ -150,7 +150,7 @@ Public Class LUT_Depth32f : Inherits VBparent
         task.desc = "Use a LUT on the 32-bit depth to segregate depth data."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        lut.Run(task.depth32f.Normalize(255).ConvertScaleAbs(255))
+        lut.RunClass(task.depth32f.Normalize(255).ConvertScaleAbs(255))
         dst2 = lut.dst2
         dst2.SetTo(0, task.noDepthMask)
         labels(2) = lut.labels(2)
@@ -178,13 +178,13 @@ Public Class LUT_FloodFill : Inherits VBparent
         task.desc = "Use LUT output with floodfill to identify each segment in the image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 4
-        edges.Run(src)
+        edges.RunClass(src)
         src.SetTo(cv.Scalar.White, edges.dst2)
 
-        lut.Run(src)
+        lut.RunClass(src)
         dst1 = lut.dst2
 
-        flood.Run(lut.dst2)
+        flood.RunClass(lut.dst2)
         dst2 = flood.dst2
         dst3 = flood.dst3
         If flood.rects.Count = 0 Then Exit Sub ' image is likely very dark and nothing is actually seen...
@@ -212,12 +212,12 @@ Public Class LUT_Equalized : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 2
         Static segSlider = findSlider("Number of LUT Segments")
         If standalone Then
-            lut.Run(src.Clone)
+            lut.RunClass(src.Clone)
             dst3 = lut.dst2.Clone
         End If
 
-        eq.Run(src)
-        lut.Run(eq.dst2)
+        eq.RunClass(src)
+        lut.RunClass(eq.dst2)
         dst2 = lut.dst2
 
         If standalone Then
@@ -256,13 +256,13 @@ Public Class LUT_Watershed : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 4
         Static mousePoint = New cv.Point(msRNG.Next(0, dst1.Width), msRNG.Next(0, dst1.Height))
 
-        lut.Run(src)
+        lut.RunClass(src)
         dst1 = lut.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
-        edges.Run(src)
+        edges.RunClass(src)
         dst1.SetTo(cv.Scalar.White, edges.dst2)
 
-        wShed.Run(dst1)
+        wShed.RunClass(dst1)
         dst2 = wShed.dst3
     End Sub
 End Class

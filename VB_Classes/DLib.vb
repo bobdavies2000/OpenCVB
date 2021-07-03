@@ -15,7 +15,7 @@ Public Class Dlib_Sobel_CS : Inherits VBparent
         sobel.Run(input)
 
         d2Mat.dGray = sobel.edgeImage
-        d2Mat.Run(src)
+        d2Mat.RunClass(src)
         dst2 = d2Mat.dst2
     End Sub
 End Class
@@ -42,7 +42,7 @@ Public Class Dlib_GaussianBlur_CS : Inherits VBparent
         blur.Run(input)
 
         d2Mat.dGray = blur.blurredGray
-        d2Mat.Run(src)
+        d2Mat.RunClass(src)
         dst2 = d2Mat.dst2
 
         blur.Run(src) ' now blur the 8uc3 image

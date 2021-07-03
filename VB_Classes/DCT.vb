@@ -119,7 +119,7 @@ Public Class DCT_FeatureLess : Inherits VBparent
         labels(3) = "FeatureLess RGB regions"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dct.Run(src)
+        dct.RunClass(src)
         Dim runLenMin = dct.sliders.trackbar(1).Value
         dst2 = dct.dst2
         dst3 = dct.dst3
@@ -170,12 +170,12 @@ Public Class DCT_Surfaces_debug : Inherits VBparent
         task.desc = "Find plane equation for a featureless surface - debugging one region for now."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
 
         Mats.mat(0) = src.Clone
         Mats.mat(0).SetTo(cv.Scalar.White, grid.gridMask)
 
-        dct.Run(src)
+        dct.RunClass(src)
         Mats.mat(1) = dct.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR).Clone()
         Mats.mat(2) = dct.dst3.Clone()
 
@@ -194,7 +194,7 @@ Public Class DCT_Surfaces_debug : Inherits VBparent
 
         Mats.mat(3) = New cv.Mat(src.Size(), cv.MatType.CV_8UC3, 0)
         src(grid.roiList(maxIndex)).CopyTo(Mats.mat(3)(grid.roiList(maxIndex)), mask(grid.roiList(maxIndex)))
-        mats.Run(src)
+        mats.RunClass(src)
         dst3 = Mats.dst2
 
         Dim world As New cv.Mat(src.Size(), cv.MatType.CV_32FC3, 0)
@@ -222,7 +222,7 @@ Public Class DCT_Surfaces_debug : Inherits VBparent
                 End If
             End If
         End If
-        flow.Run(Nothing)
+        flow.RunClass(Nothing)
     End Sub
 End Class
 
@@ -238,8 +238,8 @@ Public Class DCT_CComponents : Inherits VBparent
         task.desc = "Find surfaces that lack texture with DCT (Discrete Cosine Transform) and use connected components to isolate those surfaces."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dct.Run(src)
-        cc.Run(dct.dst2.Clone())
+        dct.RunClass(src)
+        cc.RunClass(dct.dst2.Clone())
         dst2 = cc.dst2
         dst3 = cc.dst3
     End Sub

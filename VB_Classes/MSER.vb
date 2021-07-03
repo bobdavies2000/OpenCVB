@@ -12,7 +12,7 @@ Public Class MSER_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static minSlider = findSlider("MSER Min Area")
-        options.Run(src)
+        options.RunClass(src)
 
         dst2 = src.Clone
         dst3 = src.Clone
@@ -188,7 +188,7 @@ Public Class MSER_TestSynthetic : Inherits VBparent
     Private Function testSynthetic(img As cv.Mat, pass2Only As Boolean, delta As Integer) As String
         mser.check.Box(0).Checked = pass2Only
         mser.sliders.trackbar(0).Value = delta
-        mser.Run(img)
+        mser.RunClass(img)
 
         Dim pixels As Integer
         Dim regionCount As Integer
@@ -215,7 +215,7 @@ Public Class MSER_TestSynthetic : Inherits VBparent
         task.desc = "Test MSER with the synthetic image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        synth.Run(src)
+        synth.RunClass(src)
         dst2 = synth.dst2.Clone()
         dst3 = synth.dst2
 
@@ -272,7 +272,7 @@ Public Class MSER_Contours : Inherits VBparent
         task.desc = "Use MSER but show the contours of each region."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        mser.Run(src)
+        mser.RunClass(src)
 
         Dim pixels As integer
         dst2 = src

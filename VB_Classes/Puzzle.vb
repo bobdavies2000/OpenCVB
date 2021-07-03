@@ -230,7 +230,7 @@ Public Class Puzzle_Basics : Inherits VBparent
         gridWidthSlider.Value = dst2.Cols / 10
         gridHeightSlider.Value = dst2.Rows / 8
 
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
         task.desc = "Create the puzzle pieces for toy genetic or annealing algorithm."
     End Sub
     Function Shuffle(Of T)(collection As IEnumerable(Of T)) As List(Of T)
@@ -242,7 +242,7 @@ Public Class Puzzle_Basics : Inherits VBparent
         Static height As Integer
         If width <> gridWidthSlider.Value Or height <> gridHeightSlider.Value Or task.frameCount = 0 Or restartRequested Then
             restartRequested = False
-            grid.Run(Nothing)
+            grid.RunClass(Nothing)
             width = grid.roiList(0).Width
             height = grid.roiList(0).Height
 
@@ -381,11 +381,11 @@ Public Class Puzzle_Solver : Inherits VBparent
                 xxOffset = puzzle.grid.sliders.trackbar(0).Value / 4
                 yxOffset = puzzle.grid.sliders.trackbar(0).Value / 2
             End If
-            puzzle.grid.Run(Nothing)
+            puzzle.grid.RunClass(Nothing)
             xyOffset = puzzle.grid.sliders.trackbar(1).Value * 9 / 10
             yyOffset = puzzle.grid.sliders.trackbar(1).Value / 2
             puzzle.restartRequested = True
-            puzzle.Run(src)
+            puzzle.RunClass(src)
             roilist = puzzle.grid.roiList.ToArray
         End If
 

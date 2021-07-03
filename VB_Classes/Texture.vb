@@ -10,13 +10,13 @@ Public Class Texture_Basics : Inherits VBparent
     Public Sub New()
         findSlider("ThreadGrid Width").Value = 64
         findSlider("ThreadGrid Height").Value = 64
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
         task.desc = "Use multi-threading to find the best sample 256x256 texture of a mask"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
         If standalone Or src.Channels <> 1 Then
-            ellipse.Run(src)
+            ellipse.RunClass(src)
             dst2 = ellipse.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst2 = dst2.ConvertScaleAbs(255)
             dst3 = ellipse.dst2.Clone
@@ -90,7 +90,7 @@ Public Class Texture_Flow_Depth : Inherits VBparent
         task.desc = "Display texture flow in the depth data"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        texture.Run(task.RGBDepth)
+        texture.RunClass(task.RGBDepth)
         dst2 = texture.dst2
     End Sub
 End Class
@@ -108,10 +108,10 @@ Public Class Texture_Flow_Reduction : Inherits VBparent
         task.desc = "Display texture flow in the reduced color image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        reduction.Run(task.color)
+        reduction.RunClass(task.color)
         dst2 = reduction.dst2
 
-        texture.Run(reduction.dst2)
+        texture.RunClass(reduction.dst2)
         dst3 = texture.dst2
     End Sub
 End Class
@@ -134,17 +134,17 @@ Public Class Texture_Shuffle : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateName = caller Then
-            floor.plane.Run(src)
+            floor.plane.RunClass(src)
             dst3.SetTo(0)
             src.CopyTo(dst3, floor.plane.sliceMask)
             dst2 = floor.plane.dst2
             src = floor.plane.sliceMask
         End If
 
-        texture.Run(src)
+        texture.RunClass(src)
         dst2 = texture.dst3
         dst3.Rectangle(texture.tRect, cv.Scalar.White, 2)
-        shuffle.Run(texture.texture)
+        shuffle.RunClass(texture.texture)
         tRect = New cv.Rect(0, 0, texture.tRect.Width * 4, texture.tRect.Height * 4)
         dst2(tRect) = shuffle.dst2.Repeat(4, 4)
         Dim split = dst2(tRect).Split()

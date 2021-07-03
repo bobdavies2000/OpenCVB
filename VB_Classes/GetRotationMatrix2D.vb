@@ -13,7 +13,7 @@ Public Class GetRotationMatrix2D_Basics : Inherits VBparent
         task.desc = "Rotate a rectangle of a specified angle"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        rotateOptions.Run(src)
+        rotateOptions.RunClass(src)
         Dim angle = sliders.trackbar(0).Value
         M = cv.Cv2.GetRotationMatrix2D(New cv.Point2f(src.Width / 2, src.Height / 2), angle, 1)
         dst2 = src.WarpAffine(M, src.Size(), rotateOptions.warpFlag)
@@ -35,7 +35,7 @@ Public Class GetRotationMatrix2D_Box : Inherits VBparent
         task.desc = "Track a rectangle no matter how the perspective is warped.  Draw a rectangle anywhere."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        rotation.Run(src)
+        rotation.RunClass(src)
         dst3 = dst2.Clone()
 
         Dim r = task.drawRect

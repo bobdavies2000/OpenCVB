@@ -169,7 +169,7 @@ Public Class GeneticDrawing_Basics : Inherits VBparent
 
             src = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
             mats.mat(0) = src
-            gradient.Run(mats.mat(0))
+            gradient.RunClass(mats.mat(0))
             mats.mat(2) = gradient.magnitude.ConvertScaleAbs(255)
 
             startNewStage(r)
@@ -226,10 +226,10 @@ Public Class GeneticDrawing_Basics : Inherits VBparent
             startNewStage(r)
         End If
 
-        mats.Run(src)
+        mats.RunClass(src)
         dst2 = mats.dst2
         labels(3) = " stage " + CStr(stage) + "/" + CStr(stageTotal) + " Gen " + Format(generation, "00") + " chgs = " + CStr(changes) + " err/1000 = " + CStr(CInt(totalError / 1000))
-        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
+        If task.mouseClickFlag And task.mousePicTag = RESULT_DST2 Then setMyActiveMat()
         dst3 = mats.mat(quadrantIndex)
     End Sub
 End Class
@@ -261,7 +261,7 @@ Public Class GeneticDrawing_Color : Inherits VBparent
         restartCheck.checked = False
         For i = 0 To split.Count - 1
             gDraw(i).restartRequested = restartRequested
-            gDraw(i).Run(split(i))
+            gDraw(i).RunClass(split(i))
             split(i) = gDraw(i).dst3
         Next
 
@@ -332,7 +332,7 @@ Public Class GeneticDrawing_Photo : Inherits VBparent
             SaveSetting("OpenCVB", "PhotoFileName", "PhotoFileName", fileInputName.FullName)
         End If
 
-        gDraw.Run(src)
+        gDraw.RunClass(src)
 
         dst2 = gDraw.dst2
         dst3 = gDraw.dst3

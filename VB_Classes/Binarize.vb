@@ -24,7 +24,7 @@ Public Class Binarize_Basics : Inherits VBparent
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If useBlur Then
-            blur.Run(input)
+            blur.RunClass(input)
             dst2 = blur.dst2.Threshold(meanScalar(0), 255, thresholdType)
         Else
             dst2 = input.Threshold(meanScalar(0), 255, thresholdType)
@@ -76,7 +76,7 @@ Public Class Binarize_OTSU : Inherits VBparent
                 binarize.useBlur = True
                 binarize.thresholdType = cv.ThresholdTypes.Binary + cv.ThresholdTypes.Otsu
         End Select
-        binarize.Run(input)
+        binarize.RunClass(input)
         dst2 = binarize.dst2
     End Sub
 End Class
@@ -197,7 +197,7 @@ Public Class Binarize_Bernson_MT : Inherits VBparent
         Dim bgThreshold = bgSlider.Value
 
         If kernelSize Mod 2 = 0 Then kernelSize += 1
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
 
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -230,10 +230,10 @@ Public Class Binarize_Reduction : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim tmp = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        reduction.Run(tmp)
+        reduction.RunClass(tmp)
         dst2 = reduction.dst2.Threshold(reduction.maskVal / 2, 255, cv.ThresholdTypes.Binary)
 
-        basics.Run(tmp)
+        basics.RunClass(tmp)
         dst3 = basics.dst2
     End Sub
 End Class
@@ -287,19 +287,19 @@ Public Class Binarize_Recurse : Inherits VBparent
         Dim gray = If(src.Channels = 1, src.Clone, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
         binarize.mask = New cv.Mat
-        binarize.Run(gray)
+        binarize.RunClass(gray)
         mats.mat(0) = binarize.dst2.Clone
 
         binarize.mask = mats.mat(0)
-        binarize.Run(gray)
+        binarize.RunClass(gray)
         mats.mat(1) = binarize.dst2.Clone
 
         cv.Cv2.BitwiseNot(mats.mat(0), mats.mat(2))
         binarize.mask = mats.mat(0).Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-        binarize.Run(gray)
+        binarize.RunClass(gray)
         mats.mat(3) = binarize.dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
 
-        mats.Run(src)
+        mats.RunClass(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
         labels(3) = mats.labels(3)

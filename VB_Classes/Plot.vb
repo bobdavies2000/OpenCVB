@@ -13,7 +13,7 @@ Public Class Plot_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         hist.plotColors(0) = cv.Scalar.White
-        hist.Run(src)
+        hist.RunClass(src)
         dst2 = hist.dst2
 
         ReDim plot.srcX(hist.histRaw(0).Rows - 1)
@@ -22,7 +22,7 @@ Public Class Plot_Basics : Inherits VBparent
             plot.srcX(i) = i
             plot.srcY(i) = hist.histRaw(0).Get(Of Single)(i, 0)
         Next
-        plot.Run(Nothing)
+        plot.RunClass(Nothing)
         dst3 = plot.dst2
         labels(2) = hist.labels(2)
     End Sub
@@ -278,14 +278,14 @@ Public Class Plot_Depth : Inherits VBparent
         task.desc = "Show depth using OpenCV's plot format with variable bins."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        hist.Run(src)
+        hist.RunClass(src)
         ReDim plotDepth.srcX(hist.plotHist.hist.Rows - 1)
         ReDim plotDepth.srcY(hist.plotHist.hist.Rows - 1)
         For i = 0 To plotDepth.srcX.Length - 1
             plotDepth.srcX(i) = i * (task.maxDepth - task.minDepth) / plotDepth.srcX.Length
             plotDepth.srcY(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
         Next
-        plotDepth.Run(Nothing)
+        plotDepth.RunClass(Nothing)
         dst2 = plotDepth.dst2
 
         labels(2) = plotDepth.labels(2)

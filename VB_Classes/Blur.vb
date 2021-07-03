@@ -155,16 +155,16 @@ Public Class Blur_PlusHistogram : Inherits VBparent
         task.desc = "Compound algorithms Blur and Histogram"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        myhist.Run(src)
+        myhist.RunClass(src)
 
         mat2to1.mat(0) = myhist.dst2.Clone()
 
-        blur.Run(src)
+        blur.RunClass(src)
 
-        myhist.Run(blur.dst2.Clone)
+        myhist.RunClass(blur.dst2.Clone)
 
         mat2to1.mat(1) = myhist.dst3.Clone()
-        mat2to1.Run(src)
+        mat2to1.RunClass(src)
         dst3 = mat2to1.dst2
         dst2 = blur.dst2
     End Sub
@@ -202,7 +202,7 @@ Public Class Blur_TopoMap : Inherits VBparent
         Dim kernelSize = CInt(nextPercent / 100 * src.Width)
         If kernelSize Mod 2 = 0 Then kernelSize += 1
 
-        gradient.Run(src)
+        gradient.RunClass(src)
         dst2 = gradient.magnitude
 
         If kernelSize > 1 Then cv.Cv2.GaussianBlur(dst2, dst3, New cv.Size(kernelSize, kernelSize), 0, 0)
@@ -212,10 +212,10 @@ Public Class Blur_TopoMap : Inherits VBparent
         dst3 = (dst3 * 1 / reductionSlider.Value).tomat
         dst3 = (dst3 * reductionSlider.Value).toMat
 
-        task.palette.Run(dst3)
+        task.palette.RunClass(dst3)
 
         addw.src2 = task.palette.dst2
-        addw.Run(task.color)
+        addw.RunClass(task.color)
         dst3 = addw.dst2
 
         labels(3) = "Blur = " + CStr(nextPercent) + "% Reduction Factor = " + CStr(reductionSlider.Value)

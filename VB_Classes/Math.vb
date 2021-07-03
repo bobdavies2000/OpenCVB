@@ -86,7 +86,7 @@ Public Class Math_DepthMeanStdev : Inherits VBparent
         task.desc = "This algorithm shows that just using the max depth at each pixel does not improve quality of measurement"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        minMax.Run(src)
+        minMax.RunClass(src)
         Dim mean As Single = 0, stdev As Single = 0
         Dim mask = minMax.dst3 ' the mask for stable depth.
         dst3.SetTo(0)
@@ -115,21 +115,21 @@ Public Class Math_RGBCorrelation : Inherits VBparent
         Dim split = src.Split()
         match.searchArea = split(0)
         match.template = split(1)
-        match.Run(src)
+        match.RunClass(src)
         Dim blueGreenCorrelation = "Blue-Green " + match.labels(2)
 
         match.searchArea = split(2)
         match.template = split(1)
-        match.Run(src)
+        match.RunClass(src)
         Dim redGreenCorrelation = "Red-Green " + match.labels(2)
 
         match.searchArea = split(2)
         match.template = split(0)
-        match.Run(src)
+        match.RunClass(src)
         Dim redBlueCorrelation = "Red-Blue " + match.labels(2)
 
         flow.msgs.Add(blueGreenCorrelation + " " + redGreenCorrelation + " " + redBlueCorrelation)
-        flow.Run(Nothing)
+        flow.RunClass(Nothing)
         labels(2) = "Log of " + match.matchText
     End Sub
 End Class
@@ -214,7 +214,7 @@ Public Class Math_Stdev : Inherits VBparent
         highStdevMask.SetTo(0)
         Dim fsize = task.fontSize / 3
 
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
 
         dst2 = src.Clone
         If dst2.Channels = 3 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -264,7 +264,7 @@ Public Class Math_StdevBoundary : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
-        stdev.Run(src)
+        stdev.RunClass(src)
         dst2 = stdev.dst2
         stdev.saveFrame.CopyTo(dst3)
 

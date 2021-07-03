@@ -121,7 +121,7 @@ Public Class CellAuto_Life : Inherits VBparent
         Static randomSlider = findSlider("Random Pixel Count")
         Static savePointCount As Integer
         If randomSlider.Value <> savePointCount Or generation = 0 Then
-            random.Run(Nothing)
+            random.RunClass(Nothing)
             generation = 0
             savePointCount = randomSlider.Value
             For i = 0 To random.Points.Count - 1
@@ -188,7 +188,7 @@ Public Class CellAuto_LifeColor : Inherits VBparent
         task.desc = "Game of Life but with color added"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        game.Run(src)
+        game.RunClass(src)
         dst2 = game.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Static lastBoard = dst2.Clone
 
@@ -221,11 +221,11 @@ Public Class CellAuto_LifePopulation : Inherits VBparent
         task.desc = "Show Game of Life display with plot of population"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        game.Run(src)
+        game.RunClass(src)
         dst2 = game.dst2
 
         plot.plotData = New cv.Scalar(game.population, 0, 0)
-        plot.Run(Nothing)
+        plot.RunClass(Nothing)
         dst3 = plot.dst2
     End Sub
 End Class
@@ -334,7 +334,7 @@ Public Class CellAuto_MultiPoint : Inherits VBparent
         Static pt2 = tmp.Width / 2
         tmp.Set(0, pt1, 1)
         tmp.Set(0, pt2, 1)
-        cell.Run(tmp)
+        cell.RunClass(tmp)
 
         dst2 = cell.dst2
         pt1 += 1

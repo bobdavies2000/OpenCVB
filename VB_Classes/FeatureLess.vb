@@ -17,9 +17,9 @@ Public Class Featureless_Basics : Inherits VBparent
         task.desc = "Multithread Houghlines to find featureless regions in an image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
 
-        edges.Run(src)
+        edges.RunClass(src)
 
         Dim rhoIn = sliders.trackbar(0).Value
         Dim thetaIn = sliders.trackbar(1).Value / 1000
@@ -33,7 +33,7 @@ Public Class Featureless_Basics : Inherits VBparent
             If segments.Count = 0 Then mask(roi).SetTo(255)
         End Sub)
 
-        flood.Run(mask)
+        flood.RunClass(mask)
         dst2 = flood.dst2
 
         Dim allRegions = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
@@ -56,7 +56,7 @@ Public Class Featureless_DCT_MT : Inherits VBparent
     End Sub
 
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dct.Run(src)
+        dct.RunClass(src)
         dst2 = dct.dst2
         dst3 = dct.dst3
 
@@ -103,7 +103,7 @@ Public Class FeatureLess_Prediction : Inherits VBparent
         task.desc = "Identify the featureless regions, use color and depth to learn the featureless label, and predict depth over the image. - needs more work"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        fLess.Run(src)
+        fLess.RunClass(src)
         dst2 = fLess.dst2
         dst3 = fLess.dst3
         Dim labels = fLess.dst3.Clone()
@@ -184,13 +184,13 @@ Public Class FeatureLess_PointTracker : Inherits VBparent
         task.desc = "Track the featureless regions with point tracker"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        fLess.Run(src)
+        fLess.RunClass(src)
         dst3 = fLess.dst2
 
         pTrack.queryPoints = fLess.flood.basics.centroids
         pTrack.queryRects = fLess.flood.basics.rects
         pTrack.queryMasks = fLess.flood.basics.masks
-        pTrack.Run(src)
+        pTrack.RunClass(src)
         dst2 = pTrack.dst2
     End Sub
 End Class

@@ -13,7 +13,7 @@ Public Class CComp_Basics : Inherits VBparent
             sliders.setupTrackBar(1, "Threshold for grayscale input", 0, 255, 128)
         End If
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        task.palette.Run(task.color)
+        task.palette.RunClass(task.color)
         colorMap = task.palette.gradientColorMap.Row(0).Clone
         task.desc = "Use a threshold slider on the CComp input"
     End Sub
@@ -78,7 +78,7 @@ Public Class CComp_Basics : Inherits VBparent
         Next
 
         cclabels.ConvertTo(cclabels, cv.MatType.CV_8U)
-        task.palette.Run(cclabels)
+        task.palette.RunClass(cclabels)
         dst3 = task.palette.dst2
         labels(3) = CStr(masks.Count) + " Connected Components with size > " + CStr(minSize) + " pixels"
     End Sub
@@ -100,11 +100,11 @@ Public Class CComp_Both : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static thresholdSlider = findSlider("Threshold for grayscale input")
         thresholdSlider.value = 120
-        below.Run(src)
+        below.RunClass(src)
         dst2 = below.dst2
 
         thresholdSlider.value = 130
-        above.Run(src)
+        above.RunClass(src)
         dst3 = above.dst2
     End Sub
 End Class
@@ -188,7 +188,7 @@ Public Class CComp_BasicsOld : Inherits VBparent
             Next
         End If
 
-        mats.Run(src)
+        mats.RunClass(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
         labels(2) = ">Slider, <Slider, rendered >Slider, rendered <slider"
@@ -206,7 +206,7 @@ Public Class CComp_PointTracker : Inherits VBparent
         task.desc = "Track connected componenent centroids and use it to match coloring"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        basics.Run(src)
+        basics.RunClass(src)
 
         If trackPoints Then
             Static topView As New PointCloud_TrackerTop
@@ -214,11 +214,11 @@ Public Class CComp_PointTracker : Inherits VBparent
             topView.pTrack.queryPoints = basics.centroids
             topView.pTrack.queryRects = basics.rects
             topView.pTrack.queryMasks = basics.masks
-            topView.pTrack.Run(src)
+            topView.pTrack.RunClass(src)
             dst2 = topView.pTrack.dst2
 
             highlight.viewObjects = topView.pTrack.drawRC.viewObjects
-            highlight.Run(dst2)
+            highlight.RunClass(dst2)
             dst2 = highlight.dst2
             If highlight.highlightPoint <> New cv.Point Then
                 dst3 = highlight.dst3
@@ -247,12 +247,12 @@ Public Class CComp_DepthEdges : Inherits VBparent
         task.desc = "Use depth edges to isolate connected components in depth"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        depth.Run(src)
+        depth.RunClass(src)
         If standalone Or task.intermediateName = caller Then dst3 = depth.dst3
 
         'If check.Box(0).Checked Then ccomp.basics.edgeMask = depth.dst3 Else ccomp.basics.edgeMask = Nothing
         If check.Box(0).Checked Then src.SetTo(0, depth.dst3)
-        ccomp.Run(src)
+        ccomp.RunClass(src)
         dst2 = ccomp.dst2
         If ccomp.highlight.highlightPoint <> New cv.Point Then dst3 = ccomp.highlight.dst3
     End Sub
@@ -271,10 +271,10 @@ Public Class CComp_EdgeMask : Inherits VBparent
         labels(3) = "Blob Rectangles with centroids (white)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        edges.Run(src)
+        edges.RunClass(src)
         dst2 = edges.dst2
 
-        ccomp.Run(src)
+        ccomp.RunClass(src)
         dst3 = ccomp.dst2
     End Sub
 End Class
@@ -518,9 +518,9 @@ Public Class CComp_Binarized : Inherits VBparent
         task.desc = "Find connected components using an image with binarized edges"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        edges.Run(src)
+        edges.RunClass(src)
         dst2 = edges.dst3
-        ccomp.Run(dst2)
+        ccomp.RunClass(dst2)
         dst3 = ccomp.dst3
     End Sub
 End Class
@@ -541,7 +541,7 @@ Public Class CComp_GrayScaleOld : Inherits VBparent
             vecColors(i) = New cv.Vec3b(msrng.Next(50, 255), msrng.Next(50, 255), msrng.Next(50, 255)) ' note: cannot generate black!
         Next
         If sliders.Setup(caller) Then sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
-        task.palette.Run(task.color)
+        task.palette.RunClass(task.color)
         colorMap = task.palette.gradientColorMap.Row(0).Clone
         task.desc = "Isolate the full image using RGB binarized connected Components"
     End Sub
@@ -582,7 +582,7 @@ Public Class CComp_GrayScaleOld : Inherits VBparent
         Next
 
         cclabels.ConvertTo(cclabels, cv.MatType.CV_8U)
-        task.palette.Run(cclabels)
+        task.palette.RunClass(cclabels)
         dst3 = task.palette.dst2
         labels(3) = CStr(nLabels) + " Connected Components found"
     End Sub
@@ -604,7 +604,7 @@ Public Class CComp_GrayScale : Inherits VBparent
             vecColors(i) = New cv.Vec3b(msrng.Next(50, 255), msrng.Next(50, 255), msrng.Next(50, 255)) ' note: cannot generate black!
         Next
         If sliders.Setup(caller) Then sliders.setupTrackBar(0, "CComp Min Area", 0, 10000, 500)
-        task.palette.Run(task.color)
+        task.palette.RunClass(task.color)
         colorMap = task.palette.gradientColorMap.Row(0).Clone
         task.desc = "Isolate the full image using RGB binarized connected Components"
     End Sub
@@ -643,7 +643,7 @@ Public Class CComp_GrayScale : Inherits VBparent
         Next
 
         Dim maskVal = cclabels.Get(Of Byte)(task.mouseClickPoint.Y, task.mouseClickPoint.X)
-        task.palette.Run(cclabels)
+        task.palette.RunClass(cclabels)
         dst3 = task.palette.dst2
         labels(3) = CStr(nLabels) + " Connected Components found. MaskVal=" + CStr(maskVal)
     End Sub

@@ -484,6 +484,6 @@ def run(dt):
 pyglet.clock.schedule(run)
 
 try:
-    pyglet.app.run()
+    pyglet.app.Run()
 finally:
     pipeline.stop()

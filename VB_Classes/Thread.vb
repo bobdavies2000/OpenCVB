@@ -119,7 +119,7 @@ Public Class Thread_GridTest : Inherits VBparent
         task.desc = "Validation test for thread_grid algorithm"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
         Dim mean = cv.Cv2.Mean(src)
 
         Parallel.For(0, grid.roiList.Count,

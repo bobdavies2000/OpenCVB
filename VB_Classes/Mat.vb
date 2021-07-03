@@ -29,7 +29,7 @@ Public Class Mat_PointToMat : Inherits VBparent
         task.desc = "Convert pointf3 into a mat of points"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        random.Run(Nothing)
+        random.RunClass(Nothing)
         dst2 = random.dst2
         Dim rows = random.Points.Length
         Dim pMat = New cv.Mat(rows, 1, cv.MatType.CV_32SC2, random.Points)
@@ -226,7 +226,7 @@ Public Class Mat_ImageXYZ_MT : Inherits VBparent
         task.desc = "Create a cv.Point3f vector with x, y, and z."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
         Parallel.ForEach(grid.roiList,
           Sub(roi)
               xyzPlanes(2)(roi) = task.depth32f(roi)
@@ -336,7 +336,7 @@ Public Class Mat_MultiplyReview : Inherits VBparent
             flow.msgs.Add(nextLine)
         Next
 
-        flow.Run(Nothing)
+        flow.RunClass(Nothing)
     End Sub
 End Class
 
@@ -413,7 +413,7 @@ Public Class Mat_Inverse : Inherits VBparent
             Next
         End If
 
-        flow.Run(Nothing)
+        flow.RunClass(Nothing)
     End Sub
 End Class
 
@@ -434,10 +434,10 @@ Public Class Mat_4Click : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateName = caller Then mats.defaultMats()
-        mats.Run(src)
+        mats.RunClass(src)
         dst2 = mats.dst2
 
-        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
+        If task.mouseClickFlag And task.mousePicTag = RESULT_DST2 Then setMyActiveMat()
         dst3 = mats.mat(quadrantIndex)
     End Sub
 End Class
@@ -458,11 +458,11 @@ Public Class Mat_2Click : Inherits VBparent
             mats.mat(0) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             cv.Cv2.BitwiseNot(mats.mat(0), mats.mat(1))
         End If
-        mats.Run(src)
+        mats.RunClass(src)
         dst2 = mats.dst2
 
         ' click in dst2 to display the quadrant in dst3
-        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then
+        If task.mouseClickFlag And task.mousePicTag = RESULT_DST2 Then
             If task.mouseClickPoint.Y < dst2.Height / 2 Then dst3 = mats.mat(0) Else dst3 = mats.mat(1)
         End If
     End Sub

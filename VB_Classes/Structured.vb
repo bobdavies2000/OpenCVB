@@ -28,7 +28,7 @@ Public Class Structured_Floor : Inherits VBparent
         task.desc = "Find the floor plane"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        structD.Run(src)
+        structD.RunClass(src)
 
         Dim yCoordinate = dst3.Height
         Dim lastSum = dst3.Row(dst3.Height - 1).Sum()
@@ -39,7 +39,7 @@ Public Class Structured_Floor : Inherits VBparent
         Next
 
         kalman.kInput = yCoordinate
-        kalman.Run(src)
+        kalman.RunClass(src)
 
         ' it settles down quicker...
         If task.frameCount > 30 Then yCoordinate = kalman.kAverage
@@ -67,7 +67,7 @@ Public Class Structured_Ceiling : Inherits VBparent
         task.desc = "Find the ceiling plane"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        structD.Run(src)
+        structD.RunClass(src)
 
         Dim yCoordinate As Integer
         Dim lastSum = dst3.Row(yCoordinate).Sum()
@@ -78,7 +78,7 @@ Public Class Structured_Ceiling : Inherits VBparent
         Next
 
         kalman.kInput(0) = yCoordinate
-        kalman.Run(src)
+        kalman.RunClass(src)
 
         dst2 = structD.dst2
         dst3 = structD.dst3
@@ -101,7 +101,7 @@ Public Class Structured_MultiSliceH : Inherits VBparent
         Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
         Dim stepsize = stepSlider.value
 
-        side2D.Run(src)
+        side2D.RunClass(src)
         dst3 = side2D.dst3
         Dim Split = side2D.gCloud.dst2.Split()
 
@@ -141,7 +141,7 @@ Public Class Structured_MultiSliceV : Inherits VBparent
         Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
         Dim stepsize = stepSlider.value
 
-        top2D.Run(src)
+        top2D.RunClass(src)
         dst3 = top2D.dst3
 
         Dim split = top2D.gCloud.dst2.Split()
@@ -185,8 +185,8 @@ Public Class Structured_MultiSlice : Inherits VBparent
         Static stepSlider = findSlider("Slice step size in pixels (multi-slice option only)")
         Dim stepsize = stepSlider.value
 
-        top2D.Run(src)
-        side2D.Run(src)
+        top2D.RunClass(src)
+        side2D.RunClass(src)
 
         Dim metersPerPixel = task.maxZ / dst3.Height
         Dim thicknessMeters = metersPerPixel ' 1 pixel width...
@@ -238,9 +238,9 @@ Public Class Structured_MultiSliceLines : Inherits VBparent
         task.desc = "Detect lines in the multiSlice output"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        multi.Run(src)
+        multi.RunClass(src)
         cv.Cv2.BitwiseNot(multi.dst3, dst3)
-        ldetect.Run(multi.dst3)
+        ldetect.RunClass(multi.dst3)
         dst2 = ldetect.dst2
     End Sub
 End Class
@@ -266,7 +266,7 @@ Public Class Structured_MultiSlicePolygon : Inherits VBparent
         Static sidesSlider = findSlider("Max number of sides in the identified polygons")
         Dim maxSides = sidesSlider.Value
 
-        multi.Run(src)
+        multi.RunClass(src)
         cv.Cv2.BitwiseNot(multi.dst3, dst2)
 
         Dim rawContours = cv.Cv2.FindContoursAsArray(dst2, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
@@ -297,9 +297,9 @@ Public Class Structured_SliceXPlot : Inherits VBparent
         task.desc = "Find any plane around a peak value in the top-down histogram"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
-        structD.Run(src)
+        structD.RunClass(src)
         dst3 = structD.dst3
-        multi.Run(src)
+        multi.RunClass(src)
 
         Dim col = If(task.mousePoint.X = 0, dst2.Width / 2, task.mousePoint.X)
 
@@ -336,9 +336,9 @@ Public Class Structured_SliceYPlot : Inherits VBparent
         task.desc = "Find any plane around a peak value in the side view histogram"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
-        structD.Run(src)
+        structD.RunClass(src)
         dst3 = structD.dst3
-        multi.Run(src)
+        multi.RunClass(src)
 
         Dim row = If(task.mousePoint.Y = 0, dst2.Height / 2, task.mousePoint.Y)
 
@@ -391,7 +391,7 @@ Public Class Structured_LinearizeFloor : Inherits VBparent
         Static zCheck = findCheckBox("Smooth in Z-direction")
         Dim minLoc As cv.Point, maxLoc As cv.Point
         Static imuPC As cv.Mat
-        floor.Run(src)
+        floor.RunClass(src)
         dst2 = floor.dst2
         dst3 = floor.dst3
         sliceMask = floor.structD.sliceMask
@@ -425,7 +425,7 @@ Public Class Structured_LinearizeFloor : Inherits VBparent
             If yCheck.Checked Then
                 split(1).MinMaxLoc(minVal, maxVal, minLoc, maxLoc, sliceMask)
                 kalman.kInput = (minVal + maxVal) / 2
-                kalman.Run(src)
+                kalman.RunClass(src)
                 floorYPlane = kalman.kAverage
                 split(1).SetTo(floorYPlane, sliceMask)
             End If
@@ -485,7 +485,7 @@ Public Class Structured_SliceH : Inherits VBparent
         task.desc = "Find and isolate planes (floor and ceiling) in a side view histogram."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        tView.Run(src)
+        tView.RunClass(src)
 
         Dim depthShadow = task.noDepthMask
         Dim Split = tView.sideView.gCloud.dst2.Split()
@@ -537,7 +537,7 @@ Public Class Structured_SliceV : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.mousePoint = New cv.Point Then task.mousePoint = New cv.Point(dst2.Width / 2, dst2.Height)
         Dim xCoordinate = If(task.mousePoint.X = 0, dst2.Width / 2, task.mousePoint.X)
-        tView.Run(src)
+        tView.RunClass(src)
 
         Dim split = tView.topView.gCloud.dst2.Split()
 
@@ -586,7 +586,7 @@ Public Class Structured_SliceVStable : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim xCoordinate = If(task.mousePoint.X = 0, dst2.Width / 2, task.mousePoint.X)
-        top2D.Run(src)
+        top2D.RunClass(src)
         dst3 = top2D.dst2
         Dim split = top2D.gCloud.dst2.Split()
 
@@ -630,10 +630,10 @@ Public Class Structured_MouseSlice : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.mousePoint = New cv.Point Then task.mousePoint = New cv.Point(dst2.Width / 2, dst2.Height)
-        vSlice.Run(src)
+        vSlice.RunClass(src)
         dst2 = task.color
 
-        line.Run(vSlice.sliceMask)
+        line.RunClass(vSlice.sliceMask)
         Dim tops As New List(Of Integer)
         Dim bots As New List(Of Integer)
         Dim topsList As New List(Of cv.Point)
@@ -814,7 +814,7 @@ Public Class Structured_Crosshairs : Inherits VBparent
         If indexX > xLines Then indexX = xLines - 1
         If indexY > yLines Then indexY = yLines - 1
 
-        sCloud.Run(src)
+        sCloud.RunClass(src)
         Dim data = sCloud.data
         Dim split = cv.Cv2.Split(data)
         Dim minX As Double, maxX As Double

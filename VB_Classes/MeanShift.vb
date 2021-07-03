@@ -56,16 +56,16 @@ Public Class MeanShift_Depth : Inherits VBparent
             ms.inputRect = New cv.Rect
         End If
         If ms.usingDrawRect Then
-            ms.Run(src)
+            ms.RunClass(src)
             dst2 = ms.dst2
             dst3 = ms.dst3
         Else
-            blob.Run(src)
+            blob.RunClass(src)
             dst2 = blob.dst2
 
             If blob.trustworthy Then
                 ms.inputRect = blob.trustedRect
-                ms.Run(src)
+                ms.RunClass(src)
                 dst3 = ms.dst3
                 dst2 = ms.dst2
             Else
@@ -117,9 +117,9 @@ End Class
 '        task.desc = "Track up to 4 objects with meanshift"
 '    End Sub
 '    Public Sub Run(src As cv.Mat) ' Rank = 1
-'        blob.Run(src)
+'        blob.RunClass(src)
 '        dst2 = blob.dst3
-'        flood.Run(dst2)
+'        flood.RunClass(dst2)
 
 '        Dim updateFrequency = sliders.trackbar(0).Value
 '        Dim trackBoxes As New List(Of cv.Rect)
@@ -130,15 +130,15 @@ End Class
 '                    cams(i).inputRect = flood.rects(camIndex)
 '                End If
 
-'                cams(i).Run(src)
+'                cams(i).RunClass(src)
 '                mats1.mat(i) = cams(i).dst2.Clone()
 '                mats2.mat(i) = cams(i).dst3.Clone()
 '                trackBoxes.Add(cams(i).trackbox)
 '            End If
 '        Next
-'        mats1.Run(Nothing)
+'        mats1.RunClass(Nothing)
 '        dst2 = mats1.dst2
-'        mats2.Run(Nothing)
+'        mats2.RunClass(Nothing)
 '        dst3 = mats2.dst2
 '    End Sub
 'End Class

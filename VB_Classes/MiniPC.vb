@@ -9,8 +9,8 @@ Public Class MiniPC_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
-        gCloud.Run(src)
-        resize.Run(gCloud.dst2)
+        gCloud.RunClass(src)
+        resize.RunClass(gCloud.dst2)
 
         Dim split = resize.dst2.Split()
         split(2).SetTo(0, task.noDepthMask.Resize(split(2).Size))
@@ -45,7 +45,7 @@ Public Class MiniPC_Rotate : Inherits VBparent
 
         Dim input = src
         If standalone Then
-            mini.Run(input)
+            mini.RunClass(input)
             input = mini.dst3 ' the task.pointcloud
             angleY = angleYslider.value
         End If
@@ -107,7 +107,7 @@ Public Class MiniPC_RotateAngle : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Type <> cv.MatType.CV_32FC3 Then
-            peak.mini.Run(src)
+            peak.mini.RunClass(src)
             src = peak.mini.dst3
         Else
             src = src
@@ -115,7 +115,7 @@ Public Class MiniPC_RotateAngle : Inherits VBparent
 
         Dim r = peak.mini.rect
         Dim sz = New cv.Size(r.Width, r.Height)
-        peak.Run(src)
+        peak.RunClass(src)
         peak.angleY += 1
         If peak.angleY > 45 Then peak.angleY = -45
 
@@ -132,13 +132,13 @@ Public Class MiniPC_RotateAngle : Inherits VBparent
             resetCheck.Checked = True
         End If
         plot.plotData = New cv.Scalar(metric)
-        plot.Run(Nothing)
+        plot.RunClass(Nothing)
         dst3 = plot.dst2
         mats.mat(3) = peak.histogram.ConvertScaleAbs(255)
 
         mats.mat(0) = peak.dst2(peak.mini.rect)
         mats.mat(1) = peak.dst3(peak.mini.rect)
-        mats.Run(src)
+        mats.RunClass(src)
         dst2 = mats.dst2
     End Sub
 End Class
@@ -158,7 +158,7 @@ Public Class MiniPC_RotateSinglePass : Inherits VBparent
         task.desc = "Same operation as New MiniPC_RotateAngle but in a single pass."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        peak.mini.Run(src)
+        peak.mini.RunClass(src)
 
         Dim r = peak.mini.rect
         Dim sz = New cv.Size(r.Width, r.Height)
@@ -167,7 +167,7 @@ Public Class MiniPC_RotateSinglePass : Inherits VBparent
         Dim bestAngle As Integer
         Dim bestLoc As cv.Point
         For i = -90 To 90
-            peak.Run(peak.mini.dst3)
+            peak.RunClass(peak.mini.dst3)
             peak.angleY = i
             peak.histogram.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
             If maxVal > maxHist Then
@@ -176,7 +176,7 @@ Public Class MiniPC_RotateSinglePass : Inherits VBparent
                 bestLoc = maxLoc
             End If
         Next
-        peak.Run(peak.mini.dst3)
+        peak.RunClass(peak.mini.dst3)
         peak.angleY = bestAngle
         dst2 = peak.dst2
         dst3 = peak.dst3

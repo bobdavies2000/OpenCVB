@@ -120,8 +120,8 @@ Public Class Fractal_MandelbrotZoomColor : Inherits VBparent
         task.desc = "Classic Mandelbrot in color"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        mandel.Run(src)
-        task.palette.Run(mandel.dst2)
+        mandel.RunClass(src)
+        task.palette.RunClass(mandel.dst2)
         dst2 = task.palette.dst2
         labels(2) = mandel.labels(2)
     End Sub
@@ -158,7 +158,7 @@ Public Class Fractal_Julia : Inherits VBparent
         Static savedMouse = New cv.Point(-1, -1)
         If savedMouse <> task.mousePoint Or mandel.mandel.check.Box(0).Checked Then
             savedMouse = task.mousePoint
-            mandel.Run(src)
+            mandel.RunClass(src)
             dst3 = mandel.dst2.Clone
 
             Dim detail = 1
@@ -176,7 +176,7 @@ Public Class Fractal_Julia : Inherits VBparent
                         julia_point(x, y, r, depth, depth, c, z)
                     Next
                 End Sub)
-            task.palette.Run(dst2)
+            task.palette.RunClass(dst2)
             dst2 = task.palette.dst2
         End If
     End Sub

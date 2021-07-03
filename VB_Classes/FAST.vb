@@ -36,7 +36,7 @@ Public Class FAST_Centroid : Inherits VBparent
         task.desc = "Find interesting points with the FAST and smooth the centroid with kalman"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        fast.Run(src)
+        fast.RunClass(src)
         dst2 = fast.dst2
         dst3.SetTo(0)
         For Each kp As cv.KeyPoint In fast.keypoints
@@ -47,7 +47,7 @@ Public Class FAST_Centroid : Inherits VBparent
         If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
             kalman.kInput(0) = m.M10 / m.M00
             kalman.kInput(1) = m.M01 / m.M00
-            kalman.Run(src)
+            kalman.RunClass(src)
             dst3.Circle(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), 10, cv.Scalar.Red, -1, task.lineType)
         End If
     End Sub

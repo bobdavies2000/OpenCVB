@@ -82,7 +82,7 @@ Public Class Palette_LinearPolar : Inherits VBparent
             dst2.Row(i).SetTo(New cv.Scalar(c, c, c))
         Next
 
-        rotateOptions.Run(src)
+        rotateOptions.RunClass(src)
 
         Static pt = New cv.Point2f(msRNG.Next(0, dst2.Cols - 1), msRNG.Next(0, dst2.Rows - 1))
         dst3.SetTo(0)
@@ -158,7 +158,7 @@ Public Class Palette_Reduction : Inherits VBparent
             reductionSlider.value = 32
             Console.WriteLine("This algorithm gets very slow unless there is lots of reduction.  Resetting reduction slider value to 2^^5")
         End If
-        reduction.Run(src)
+        reduction.RunClass(src)
         dst2 = reduction.dst2
 
         Dim palette As New SortedList(Of Byte, Integer)
@@ -214,8 +214,8 @@ Public Class Palette_DrawTest : Inherits VBparent
         task.desc = "Experiment with palette using a drawn image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        draw.Run(src)
-        task.palette.Run(draw.dst2)
+        draw.RunClass(src)
+        task.palette.RunClass(draw.dst2)
         dst2 = task.palette.dst2
     End Sub
 End Class
@@ -345,7 +345,7 @@ Public Class Palette_ObjectColors : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         src.SetTo(0, task.noDepthMask)
-        reduction.Run(src)
+        reduction.RunClass(src)
         dst3 = reduction.dst3
 
         Dim blobList As New SortedList(Of Single, Integer)
@@ -396,11 +396,11 @@ Public Class Palette_Layout2D : Inherits VBparent
     Public Sub New()
         findSlider("ThreadGrid Width").Value = 40
         Dim heightslider = findSlider("ThreadGrid Height").Value = 24
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
         task.desc = "Layout the available colors in a 2D grid"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
         Dim index As Integer
         For Each r In grid.roiList
             dst2(r).SetTo(task.scalarColors(index Mod 255))
@@ -423,12 +423,12 @@ Public Class Palette_LeftRightImages : Inherits VBparent
         task.desc = "Use a palette with the left image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
-        lrViews.Run(src)
+        lrViews.RunClass(src)
 
-        task.palette.Run(lrViews.dst2)
+        task.palette.RunClass(lrViews.dst2)
         dst2 = task.palette.dst2
 
-        task.palette.Run(lrViews.dst3)
+        task.palette.RunClass(lrViews.dst3)
         dst3 = task.palette.dst2
     End Sub
 End Class

@@ -102,7 +102,7 @@ Public Class Plane_Detect : Inherits VBparent
         labels(3) = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
 
         dst3.SetTo(0)
         task.RGBDepth.CopyTo(dst2)
@@ -169,7 +169,7 @@ Public Class Plane_DetectDebug : Inherits VBparent
         labels(3) = "Blue, green, and red show different planes"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
 
         dst3.SetTo(0)
         task.RGBDepth.CopyTo(dst2)

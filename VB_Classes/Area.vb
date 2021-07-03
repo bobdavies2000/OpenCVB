@@ -120,7 +120,7 @@ Public Class Area_MinMotionRect : Inherits VBparent
         Return gray
     End Function
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        bgSub.Run(src)
+        bgSub.RunClass(src)
         Dim gray As cv.Mat
         If bgSub.dst2.Channels = 1 Then gray = bgSub.dst2 Else gray = bgSub.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = motionRectangles(gray, task.vecColors)
@@ -156,14 +156,14 @@ Public Class Area_FindNonZero : Inherits VBparent
 
         dst3 = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
         ' mark the points so they are visible...
-        For i = 0 To nonzero.Rows - 1
-            dst3.Circle(nonzero.Get(Of cv.Point)(0, i), task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
+        For i = 0 To nonZero.Rows - 1
+            dst3.Circle(nonZero.Get(Of cv.Point)(0, i), task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
         Next
 
         If standalone Then
             Dim outstr As String = "Coordinates of the non-zero points (ordered by row - top to bottom): " + vbCrLf + vbCrLf
-            For i = 0 To nonzero.Rows - 1
-                Dim pt = nonzero.Get(Of cv.Point)(0, i)
+            For i = 0 To nonZero.Rows - 1
+                Dim pt = nonZero.Get(Of cv.Point)(0, i)
                 outstr += "X = " + vbTab + CStr(pt.X) + vbTab + " y = " + vbTab + CStr(pt.Y) + vbCrLf
             Next
             setTrueText(outstr)
@@ -184,10 +184,10 @@ Public Class Area_TimeViewSingletons : Inherits VBparent
         task.desc = "Use FindNonZero to get the coordinates of the nonzero points in the TimeView output"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        tView.run(src)
+        tView.RunClass(src)
         dst2 = tView.dst3
 
-        nZero.Run(dst2)
+        nZero.RunClass(dst2)
         dst3 = nZero.dst3
         labels(3) = CStr(nZero.nonZero.Rows) + " points found"
     End Sub

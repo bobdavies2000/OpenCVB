@@ -108,7 +108,7 @@ Public Class SVM_Basics : Inherits VBparent
     End Sub
 
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        svmOptions.Run(src) ' update any options specified in the interface.
+        svmOptions.RunClass(src) ' update any options specified in the interface.
         dst2 = svmOptions.dst2
 
         Dim dataMat = New cv.Mat(svmOptions.points.Length - 1, 2, cv.MatType.CV_32FC1, svmOptions.points)
@@ -162,7 +162,7 @@ Public Class SVM_Random : Inherits VBparent
         task.desc = "Use SVM to classify random points - testing if height must equal width - needs more work"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        svmOptions.Run(src)
+        svmOptions.RunClass(src)
         dst2.SetTo(cv.Scalar.White)
         dst3.SetTo(cv.Scalar.White)
 
@@ -250,7 +250,7 @@ Public Class SVM_TestCase : Inherits VBparent
         Static granSlider = findSlider("Granularity")
         dst2.SetTo(cv.Scalar.White)
         dst3.SetTo(0)
-        svmOptions.Run(src)
+        svmOptions.RunClass(src)
 
         Dim svmx = svmOptions.createSVM()
         svmx.Train(trainMat, cv.ML.SampleTypes.RowSample, labelsMat)

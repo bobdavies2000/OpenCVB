@@ -12,7 +12,7 @@ Public Class Moments_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Or task.intermediateName = caller Then
-            foreground.Run(src)
+            foreground.RunClass(src)
             dst2 = foreground.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
         Dim m = cv.Cv2.Moments(foreground.dst2, True)
@@ -21,7 +21,7 @@ Public Class Moments_Basics : Inherits VBparent
         If task.useKalman Then
             kalman.kInput(0) = m.M10 / m.M00
             kalman.kInput(1) = m.M01 / m.M00
-            kalman.Run(src)
+            kalman.RunClass(src)
             center = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
         Else
             center = New cv.Point2f(m.M10 / m.M00, m.M01 / m.M00)
@@ -44,13 +44,13 @@ Public Class Moments_CentroidKalman : Inherits VBparent
         task.desc = "Compute the centroid of the foreground depth and smooth with Kalman filter."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        foreground.Run(src)
+        foreground.RunClass(src)
         dst2 = foreground.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim m = cv.Cv2.Moments(foreground.dst2, True)
         If m.M00 > 5000 Then ' if more than x pixels are present (avoiding a zero area!)
             kalman.kInput(0) = m.M10 / m.M00
             kalman.kInput(1) = m.M01 / m.M00
-            kalman.Run(src)
+            kalman.RunClass(src)
             dst2.Circle(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), task.dotSize + 5, cv.Scalar.Red, -1, task.lineType)
         End If
     End Sub

@@ -47,11 +47,11 @@ Public Class Smoothing_Exterior : Inherits VBparent
 		task.desc = "Smoothing the line connecting a series of points."
 	End Sub
 	Public Sub Run(src As cv.Mat) ' Rank = 1
-		smOptions.Run(Nothing)
+		smOptions.RunClass(Nothing)
 		If standalone Or task.intermediateName = caller Then
 			If task.frameCount Mod 30 Then Exit Sub
 			dst2.SetTo(0)
-			hull.Run(src)
+			hull.RunClass(src)
 			Dim nextHull = hull.hull
 			inputPoints = drawPoly(dst2, nextHull, cv.Scalar.White)
 		Else
@@ -120,11 +120,11 @@ Public Class Smoothing_Interior : Inherits VBparent
 		task.desc = "Smoothing the line connecting a series of points staying inside the outline."
 	End Sub
 	Public Sub Run(src As cv.Mat) ' Rank = 1
-		smOptions.Run(Nothing)
+		smOptions.RunClass(Nothing)
 		If standalone Or task.intermediateName = caller Then
 			If task.frameCount Mod 30 Then Exit Sub
 			dst2.SetTo(0)
-			hull.Run(src)
+			hull.RunClass(src)
 			Dim nextHull = hull.hull
 			inputPoints = drawPoly(dst2, nextHull, cv.Scalar.White)
 		Else
@@ -191,9 +191,9 @@ Public Class Smoothing_Contours : Inherits VBparent
 		task.desc = "Use Smoothing exterior or interior to get a smoother representation of a contour"
 	End Sub
 	Public Sub Run(src As cv.Mat) ' Rank = 1
-		smOptions.Run(Nothing)
+		smOptions.RunClass(Nothing)
 
-		outline.Run(src)
+		outline.RunClass(src)
 		dst2 = outline.dst2.Clone
 		dst3 = outline.dst2
 
@@ -215,7 +215,7 @@ Public Class Smoothing_Contours : Inherits VBparent
 			smooth.inputPoints.Add(contours0(maxIndex)(i))
 		Next
 
-		smooth.Run(src)
+		smooth.RunClass(src)
 		If smooth.smoothpoints IsNot Nothing Then
 			If smooth.smoothPoints.Count > 0 Then drawPoly(dst2, smooth.smoothPoints.ToArray, smooth.plotColor)
 			labels(2) = "Smoothing with " + If(radio.check(0).Checked, "Interior", "Exterior") + " lines"

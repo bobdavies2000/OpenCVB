@@ -13,7 +13,7 @@ Public Class ImageSeg_Basics : Inherits VBparent
         task.desc = "Get the image segments and their associated features - centroids, masks, size, and enclosing rectangles"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        flood.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        flood.RunClass(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = flood.dst3
 
         maskSizes = New SortedList(Of Integer, Integer)(flood.maskSizes)
@@ -23,7 +23,7 @@ Public Class ImageSeg_Basics : Inherits VBparent
         floodPoints = New List(Of cv.Point)(flood.floodPoints)
 
         addw.src2 = src
-        addw.Run(dst2)
+        addw.RunClass(dst2)
         dst3 = addw.dst2
 
         For Each pt In floodPoints
@@ -47,7 +47,7 @@ Public Class ImageSeg_InRange : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
-        iSeg.Run(src)
+        iSeg.RunClass(src)
         dst2 = iSeg.dst3
 
         For i = 0 To iSeg.maskSizes.Count - 1
@@ -89,7 +89,7 @@ Public Class ImageSeg_MissingSegments : Inherits VBparent
             saveFillDistance = fill
         End If
 
-        flood.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        flood.RunClass(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = flood.dst3
 
         dst3 = flood.missingSegments
@@ -127,7 +127,7 @@ Public Class ImageSeg_Unstable : Inherits VBparent
         Static segSlider = findSlider("A segment is considered present after this many appearances")
         Dim refreshCount = segSlider.value
 
-        iSeg.Run(src)
+        iSeg.RunClass(src)
         dst2 = iSeg.dst2
 
         Dim tmp = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -138,7 +138,7 @@ Public Class ImageSeg_Unstable : Inherits VBparent
         cv.Cv2.Min(tmp, previousFrame, dst3)
         previousFrame = dst3
 
-        task.palette.Run(dst3)
+        task.palette.RunClass(dst3)
         dst3 = task.palette.dst2
         dst3.SetTo(0, iSeg.flood.mats.mat(1))
     End Sub
@@ -161,7 +161,7 @@ Public Class ImageSeg_CentroidTracker : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
-        iSeg.Run(src)
+        iSeg.RunClass(src)
         dst2 = iSeg.dst2
 
         Dim tmp = If(iSeg.flood.dst2.Channels = 3, iSeg.flood.dst2, iSeg.flood.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
@@ -169,7 +169,7 @@ Public Class ImageSeg_CentroidTracker : Inherits VBparent
         pTrack.queryRects = New List(Of cv.Rect)(iSeg.rects)
         pTrack.queryMasks = New List(Of cv.Mat)(iSeg.masks)
         pTrack.floodPoints = New List(Of cv.Point)(iSeg.floodPoints)
-        pTrack.Run(tmp)
+        pTrack.RunClass(tmp)
         dst3 = dst2.Clone
         For Each vo In pTrack.drawRC.viewObjects
             dst3.Circle(vo.Value.centroid, task.dotSize + 1, cv.Scalar.White, -1, task.lineType)

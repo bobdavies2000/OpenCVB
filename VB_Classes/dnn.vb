@@ -165,7 +165,7 @@ Public Class DNN_Basics : Inherits VBparent
 
                     If minIndex < kalman.Count Then
                         kalman(minIndex).kInput = {rect.X, rect.Y, rect.Width, rect.Height}
-                        kalman(minIndex).Run(src)
+                        kalman(minIndex).RunClass(src)
                         rect = New cv.Rect(kalman(minIndex).kOutput(0), kalman(minIndex).kOutput(1), kalman(minIndex).kOutput(2), kalman(minIndex).kOutput(3))
                     End If
                     dst3.Rectangle(rect, cv.Scalar.Yellow, task.lineWidth + 2, task.lineType)
@@ -204,7 +204,7 @@ Public Class DNN_SuperRes : Inherits VBparent
         task.desc = "Get better super-resolution through a DNN"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        options.Run(Nothing)
+        options.RunClass(Nothing)
         Static saveModelFile = ""
         Static multiplier As Integer
         If saveModelFile <> options.superResModelFileName Then
@@ -246,7 +246,7 @@ Public Class DNN_SuperResize : Inherits VBparent
         task.desc = "Compare superRes reduced to original size"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        super.run(src)
+        super.RunClass(src)
         Dim r = New cv.Rect(0, 0, dst2.Width, dst2.Height)
         Dim tmp As New cv.Mat
         super.dnn.upsample(src, tmp)

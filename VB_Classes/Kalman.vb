@@ -161,18 +161,18 @@ Public Class Kalman_Compare : Inherits VBparent
         End If
 
         plot.plotData = src.Mean()
-        plot.Run(Nothing)
+        plot.RunClass(Nothing)
         dst2 = plot.dst2
 
         For i = 0 To kalman.Count - 1
             kalman(i).inputReal = plot.plotData.Item(i)
-            kalman(i).Run(src)
+            kalman(i).RunClass(src)
         Next
 
         kPlot.maxScale = plot.maxScale ' keep the scale the same for the side-by-side plots.
         kPlot.minScale = plot.minScale
         kPlot.plotData = New cv.Scalar(kalman(0).stateResult, kalman(1).stateResult, kalman(2).stateResult)
-        kplot.Run(Nothing)
+        kplot.RunClass(Nothing)
         dst3 = kPlot.dst2
     End Sub
 End Class
@@ -266,7 +266,7 @@ Public Class Kalman_MousePredict : Inherits VBparent
         kalman.kInput(0) = task.mousePoint.X
         kalman.kInput(1) = task.mousePoint.Y
         Dim lastStateResult = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
-        kalman.Run(src)
+        kalman.RunClass(src)
         dst2.Line(New cv.Point(kalman.kOutput(0), kalman.kOutput(1)), lastStateResult, cv.Scalar.All(255), lineWidth, task.lineType)
         dst2.Line(task.mousePoint, lastRealMouse, New cv.Scalar(0, 0, 255), lineWidth, task.lineType)
         lastRealMouse = task.mousePoint
@@ -359,13 +359,13 @@ Public Class Kalman_ImageSmall : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        resize.Run(src)
+        resize.RunClass(src)
 
         Dim saveOriginal = resize.dst2.Clone()
         Dim gray32f As New cv.Mat
         resize.dst2.ConvertTo(gray32f, cv.MatType.CV_32F)
         kalman.input = gray32f.Reshape(1, gray32f.Width * gray32f.Height)
-        kalman.Run(src)
+        kalman.RunClass(src)
         Dim tmp As New cv.Mat
         kalman.output.ConvertTo(tmp, cv.MatType.CV_8U)
         tmp = tmp.Reshape(1, gray32f.Height)
@@ -388,7 +388,7 @@ Public Class Kalman_DepthSmall : Inherits VBparent
         task.desc = "Use a resized depth Mat to find where depth is decreasing (something getting closer.)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        kalman.Run(task.RGBDepth)
+        kalman.RunClass(task.RGBDepth)
         dst2 = kalman.dst2
         dst3 = kalman.dst3
     End Sub
@@ -412,10 +412,10 @@ Public Class Kalman_Depth32f : Inherits VBparent
         task.desc = "Use a resized depth Mat to find where depth is decreasing (getting closer.)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        resize.Run(task.depth32f)
+        resize.RunClass(task.depth32f)
 
         kalman.input = resize.dst2.Reshape(1, resize.dst2.Width * resize.dst2.Height)
-        kalman.Run(src)
+        kalman.RunClass(src)
         dst2 = kalman.output.Reshape(1, resize.dst2.Height)
         dst2 = dst2.Resize(src.Size())
         cv.Cv2.Subtract(dst2, task.depth32f, dst3)
@@ -462,7 +462,7 @@ Public Class Kalman_Single : Inherits VBparent
         stateResult = kf.Correct(measurement).Get(Of Single)(0, 0)
         If standalone Or task.intermediateName = caller Then
             plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
-            plot.Run(Nothing)
+            plot.RunClass(Nothing)
             dst3 = plot.dst2
             labels(2) = "Mean of the grayscale image is predicted"
             labels(3) = "Mean (blue) = " + Format(inputReal, "0.0") + " predicted (green) = " + Format(stateResult, "0.0")
@@ -719,7 +719,7 @@ Public Class Kalman_VB_Basics : Inherits VBparent
 
         If standalone Or task.intermediateName = caller Then
             plot.plotData = New cv.Scalar(kOutput, kInput, kAverage)
-            plot.Run(Nothing)
+            plot.RunClass(Nothing)
         End If
     End Sub
 End Class

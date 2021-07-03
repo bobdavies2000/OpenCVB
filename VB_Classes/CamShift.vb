@@ -83,8 +83,8 @@ Public Class CamShift_Foreground : Inherits VBparent
         task.desc = "Use depth to isolate foreground for use with camshift demo."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        fore.Run(src)
-        flood.Run(fore.dst3)
+        fore.RunClass(src)
+        flood.RunClass(fore.dst3)
         If flood.masks.Count > 0 Then
             Dim sortedSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
             For i = 0 To flood.maskSizes.Count - 1
@@ -95,7 +95,7 @@ Public Class CamShift_Foreground : Inherits VBparent
                 task.drawRect = flood.rects(index)
             End If
             If camshift.trackBox.Size.Width < 50 Then task.drawRect = flood.rects(index)
-            camshift.Run(src)
+            camshift.RunClass(src)
             dst2 = camshift.dst2
             dst3 = camshift.dst3
         End If
@@ -119,8 +119,8 @@ Public Class Camshift_Object : Inherits VBparent
         task.desc = "Use the blob depth cluster as input to initialize a camshift algorithm."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        blob.Run(src)
-        flood.Run(blob.dst3)
+        blob.RunClass(src)
+        flood.RunClass(blob.dst3)
 
         If flood.masks.Count > 0 Then
             Dim sortedSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
@@ -132,7 +132,7 @@ Public Class Camshift_Object : Inherits VBparent
                 task.drawRect = flood.rects(index)
             End If
             If camshift.trackBox.Size.Width < 50 Then task.drawRect = flood.rects(index)
-            camshift.Run(src)
+            camshift.RunClass(src)
             dst2 = camshift.dst2
             dst3 = camshift.dst3
         End If
@@ -160,9 +160,9 @@ End Class
 '    End Sub
 '    Public Sub Run(src As cv.Mat) ' Rank = 1
 '        Static updateSlider = findSlider("Reinitialize camshift after x frames")
-'        blob.Run(src)
+'        blob.RunClass(src)
 '        dst2 = blob.dst3
-'        flood.Run(dst2)
+'        flood.RunClass(dst2)
 
 '        Dim updateFrequency = updateSlider.Value
 '        Dim trackBoxes As New List(Of cv.RotatedRect)
@@ -173,7 +173,7 @@ End Class
 '                    task.drawRect = flood.rects(camIndex)
 '                End If
 
-'                cams(i).Run(src)
+'                cams(i).RunClass(src)
 '                mats.mat(i) = cams(i).dst2.Clone()
 '                trackBoxes.Add(cams(i).trackBox)
 '            End If
@@ -181,7 +181,7 @@ End Class
 '        For i = 0 To trackBoxes.Count - 1
 '            dst2.Ellipse(trackBoxes(i), cv.Scalar.White, task.lineWidth + 1, task.lineType)
 '        Next
-'        mats.Run(src)
+'        mats.RunClass(src)
 '        dst3 = mats.dst2
 '    End Sub
 'End Class

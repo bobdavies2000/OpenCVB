@@ -39,7 +39,7 @@ Public Class LeftRight_CompareRaw : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static startYSlider = findSlider("Slice Starting Y")
         Static hSlider = findSlider("Slice Height")
-        lrView.Run(src)
+        lrView.RunClass(src)
 
         dst2 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8U, 0)
 
@@ -68,15 +68,15 @@ Public Class LeftRight_Features : Inherits VBparent
         labels(3) = "Right Image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        lrView.Run(src)
+        lrView.RunClass(src)
 
-        features.Run(lrView.dst3)
+        features.RunClass(lrView.dst3)
         lrView.dst3.CopyTo(dst3)
         For i = 0 To features.goodFeatures.Count - 1
             dst3.Circle(features.goodFeatures(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
         Next
 
-        features.Run(lrView.dst2)
+        features.RunClass(lrView.dst2)
         lrView.dst2.CopyTo(dst2)
         For i = 0 To features.goodFeatures.Count - 1
             dst2.Circle(features.goodFeatures(i), task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
@@ -95,12 +95,12 @@ Public Class LeftRight_Palettized : Inherits VBparent
         labels(3) = "Right Image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        lrView.Run(src)
+        lrView.RunClass(src)
 
-        task.palette.Run(lrView.dst2)
+        task.palette.RunClass(lrView.dst2)
         dst2 = task.palette.dst2
 
-        task.palette.Run(lrView.dst3)
+        task.palette.RunClass(lrView.dst3)
         dst3 = task.palette.dst2
     End Sub
 End Class
@@ -118,11 +118,11 @@ Public Class LeftRight_BRISK : Inherits VBparent
         task.desc = "Add color to the 8-bit infrared images."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        lrView.Run(src)
-        brisk.Run(lrView.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+        lrView.RunClass(src)
+        brisk.RunClass(lrView.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
         dst3 = brisk.dst2
 
-        brisk.Run(lrView.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
+        brisk.RunClass(lrView.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR))
         dst2 = brisk.dst2
     End Sub
 End Class

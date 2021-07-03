@@ -12,7 +12,7 @@ Public Class Resize_Basics : Inherits VBparent
         labels(3) = "Difference from Cubic Resize (Best)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        rotateOptions.Run(src)
+        rotateOptions.RunClass(src)
 
         If standalone Or task.intermediateName = caller Then
             Dim roi = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
@@ -45,7 +45,7 @@ Public Class Resize_Percentage : Inherits VBparent
         Dim resizePercent = sliders.trackbar(0).Value / 100
         resizePercent = Math.Sqrt(resizePercent)
         resizeOptions.newSize = New cv.Size(Math.Ceiling(src.Width * resizePercent), Math.Ceiling(src.Height * resizePercent))
-        resizeOptions.Run(src)
+        resizeOptions.RunClass(src)
 
         If standalone or task.intermediateName = caller Then
             Dim roi As New cv.Rect(0, 0, resizeOptions.dst2.Width, resizeOptions.dst2.Height)

@@ -134,10 +134,10 @@ Public Class MotionBlur_Deblur : Inherits VBparent
             check.Box(0).Checked = False
             mblur.sliders.trackbar(0).Value = msRNG.Next(mblur.sliders.trackbar(0).Minimum, mblur.sliders.trackbar(0).Maximum)
             mblur.sliders.trackbar(1).Value = msRNG.Next(mblur.sliders.trackbar(1).Minimum, mblur.sliders.trackbar(1).Maximum)
-            mblur.Run(src)
+            mblur.RunClass(src)
             mblur.showDirection = False
         Else
-            mblur.Run(src) ' the motion blurred image is in result1
+            mblur.RunClass(src) ' the motion blurred image is in result1
         End If
         dst2 = mblur.dst2
 

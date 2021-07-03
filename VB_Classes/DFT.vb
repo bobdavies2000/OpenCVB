@@ -65,7 +65,7 @@ Public Class DFT_Basics : Inherits VBparent
         mats.mat(2) = padded(New cv.Rect(cx, 0, cx, cy)).Clone()
         mats.mat(1) = padded(New cv.Rect(0, cy, cx, cy)).Clone()
         mats.mat(0) = padded(New cv.Rect(cx, cy, cx, cy)).Clone()
-        mats.Run(src)
+        mats.RunClass(src)
         dst3 = mats.dst2
 
         dst2 = inverseDFT(complexImage)
@@ -98,7 +98,7 @@ Public Class DFT_Inverse : Inherits VBparent
         cv.Cv2.Absdiff(src, dst2, diff)
         mats.mat(0) = diff.Threshold(0, 255, cv.ThresholdTypes.Binary)
         mats.mat(1) = (diff * 50).ToMat
-        mats.Run(src)
+        mats.RunClass(src)
         If mats.mat(0).countnonzero() > 0 Then
             dst3 = mats.dst2
             labels(3) = "Mask of difference (top) and relative diff (bot)"
@@ -137,7 +137,7 @@ Public Class DFT_ButterworthFilter_MT : Inherits VBparent
         labels(3) = "Same filter with radius / 2"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dft.Run(src)
+        dft.RunClass(src)
 
         Static radius As Integer
         Static order As Integer
@@ -197,7 +197,7 @@ Public Class DFT_ButterworthDepth : Inherits VBparent
         labels(3) = "Same filter with radius / 2"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        bfilter.Run(task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        bfilter.RunClass(task.RGBDepth.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = bfilter.dst2
         dst3 = bfilter.dst3
     End Sub
@@ -250,25 +250,25 @@ Public Class DFT_Shapes : Inherits VBparent
         Static symShapeRadio = findRadio("Draw Symmetrical Shapes")
         Static pointRadio = findRadio("Draw Point")
 
-        optDraw.Run(Nothing)
+        optDraw.RunClass(Nothing)
 
         If circleRadio.checked Then
-            circle.Run(src)
+            circle.RunClass(src)
             dst2 = circle.dst2
         ElseIf ellipseRadio.checked Then
-            ellipse.Run(src)
+            ellipse.RunClass(src)
             dst2 = ellipse.dst2
         ElseIf rectangleRadio.checked Then
-            rectangle.Run(src)
+            rectangle.RunClass(src)
             dst2 = rectangle.dst2
         ElseIf polygonRadio.checked Then
-            polygon.Run(src)
+            polygon.RunClass(src)
             dst2 = polygon.dst2
         ElseIf symShapeRadio.checked Then
-            symShapes.Run(src)
+            symShapes.RunClass(src)
             dst2 = symShapes.dst2
         ElseIf lineRadio.checked Then
-            lines.Run(src)
+            lines.RunClass(src)
             dst2 = lines.dst2
         ElseIf pointRadio.checked Then
             If task.frameCount Mod optDraw.updateFrequency = 0 Then
@@ -281,7 +281,7 @@ Public Class DFT_Shapes : Inherits VBparent
             End If
         End If
 
-        dft.Run(dst2)
+        dft.RunClass(dst2)
         dst3 = dft.dst3
 
         ' uncomment the following line to view the inverse of the DFT transform.  It is the grayscale image of the input - no surprise.  It works!

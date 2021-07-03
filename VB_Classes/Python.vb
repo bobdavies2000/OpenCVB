@@ -57,7 +57,7 @@ Public Class Python_Run : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If pyStream IsNot Nothing Then
-            pyStream.Run(src)
+            pyStream.RunClass(src)
             dst2 = pyStream.dst2
             dst3 = pyStream.dst3
             labels(2) = "Output of Python Backend"
@@ -141,7 +141,7 @@ End Class
 '            For i = 0 To memMap.memMapValues.Length - 1
 '                memMap.memMapValues(i) = Choose(i + 1, task.frameCount, src.Total * src.ElemSize, 0, src.Rows, src.Cols)
 '            Next
-'            memMap.Run(src)
+'            memMap.RunClass(src)
 
 '            Dim rgb = src.CvtColor(OpenCvSharp.ColorConversionCodes.BGR2RGB)
 '            If rgbBuffer.Length <> rgb.Total * rgb.ElemSize Then ReDim rgbBuffer(rgb.Total * rgb.ElemSize - 1)
@@ -212,7 +212,7 @@ Public Class Python_Stream : Inherits VBparent
                                                 task.depth32f.Total * task.depth32f.ElemSize, src.Rows, src.Cols,
                                                 task.drawRect.X, task.drawRect.Y, task.drawRect.Width, task.drawRect.Height)
             Next
-            memMap.Run(src)
+            memMap.RunClass(src)
 
             If rgbBuffer.Length <> src.Total * src.ElemSize Then ReDim rgbBuffer(src.Total * src.ElemSize - 1)
             If depthBuffer.Length <> task.depth32f.Total * task.depth32f.ElemSize Then ReDim depthBuffer(task.depth32f.Total * task.depth32f.ElemSize - 1)

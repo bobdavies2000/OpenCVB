@@ -36,7 +36,7 @@ Public Class Pyramid_Filter : Inherits VBparent
         task.desc = "Link to Laplacian_PyramidFilter that uses pyrUp and pyrDown extensively"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        laplace.Run(src)
+        laplace.RunClass(src)
         dst2 = laplace.dst2
     End Sub
 End Class

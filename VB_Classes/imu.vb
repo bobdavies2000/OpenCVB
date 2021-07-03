@@ -41,7 +41,7 @@ Public Class IMU_Basics : Inherits VBparent
                                   " Yaw = " + Format(task.IMU_AngularVelocity.Y, "#0.00") + " Roll = " + Format(task.IMU_AngularVelocity.Z, "#0.00"))
         End If
         labels(2) = "theta.x " + Format(theta.X, "#0.000") + " y " + Format(theta.Y, "#0.000") + " z " + Format(theta.Z, "#0.000")
-        flow.Run(Nothing)
+        flow.RunClass(Nothing)
     End Sub
 End Class
 
@@ -68,7 +68,7 @@ Public Class IMU_Stabilizer : Inherits VBparent
         Dim sy = 1 ' assume no scaling is taking place.
 
         kalman.kInput = {dx, dy, da}
-        kalman.Run(src)
+        kalman.RunClass(src)
         dx = kalman.kOutput(0)
         dy = kalman.kOutput(1)
         da = kalman.kOutput(2)
@@ -114,7 +114,7 @@ Public Class IMU_Magnetometer : Inherits VBparent
                                                   "Uncalibrated IMU Magnetometer reading:  y = " + CStr(task.IMU_Magnetometer.Y) + vbCrLf +
                                                   "Uncalibrated IMU Magnetometer reading:  z = " + CStr(task.IMU_Magnetometer.Z))
             plot.plotData = New cv.Scalar(task.IMU_Magnetometer.X, task.IMU_Magnetometer.Y, task.IMU_Magnetometer.Z)
-            plot.Run(Nothing)
+            plot.RunClass(Nothing)
             labels(3) = "x (blue) = " + Format(plot.plotData.Item(0), "#0.00") + " y (green) = " + Format(plot.plotData.Item(1), "#0.00") +
                           " z (red) = " + Format(plot.plotData.Item(2), "#0.00")
         End If
@@ -225,7 +225,7 @@ Public Class IMU_FrameTime : Inherits VBparent
                         "IMU Anchor Frame Time = White (IMU Frame Time that occurs most often" + vbCrLf + vbCrLf + vbCrLf
 
             plot.plotData = New cv.Scalar(task.IMU_FrameTime, task.CPU_FrameTime, IMUtoCaptureEstimate, IMUanchor)
-            plot.Run(Nothing)
+            plot.RunClass(Nothing)
 
             If plot.maxScale - plot.minScale > histogramIMU.Count Then ReDim histogramIMU(plot.maxScale - plot.minScale)
 
@@ -307,7 +307,7 @@ Public Class IMU_HostFrameTimes : Inherits VBparent
                          "White" + vbTab + "Host Anchor Frame Time (Host Frame Time that occurs most often" + vbCrLf + vbCrLf + vbCrLf
 
             plot.plotData = New cv.Scalar(task.IMU_FrameTime, task.CPU_FrameTime, HostInterruptDelayEstimate, CPUanchor)
-            plot.Run(Nothing)
+            plot.RunClass(Nothing)
 
             If plot.maxScale - plot.minScale > hist.Count Then ReDim hist(plot.maxScale - plot.minScale)
 
@@ -347,12 +347,12 @@ Public Class IMU_TotalDelay : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static countSlider = findSlider("Number of Plot Values")
         Dim plotLastX = countSlider.value
-        host.Run(src)
-        imu.Run(src)
+        host.RunClass(src)
+        imu.RunClass(src)
         Dim totaldelay = host.HostInterruptDelayEstimate + imu.IMUtoCaptureEstimate
 
         kalman.inputReal = totaldelay
-        kalman.Run(src)
+        kalman.RunClass(src)
 
         Static sampledCPUDelay = host.HostInterruptDelayEstimate
         Static sampledIMUDelay = imu.IMUtoCaptureEstimate
@@ -375,7 +375,7 @@ Public Class IMU_TotalDelay : Inherits VBparent
                      "White" + vbTab + "Host+IMU Anchor Frame Time (Host Frame Time that occurs most often)" + vbCrLf + vbCrLf + vbCrLf
 
         plot.plotData = New cv.Scalar(imu.IMUtoCaptureEstimate, host.HostInterruptDelayEstimate, totaldelay, kalman.stateResult)
-        plot.Run(Nothing)
+        plot.RunClass(Nothing)
 
         If plot.lastXdelta.Count > plotLastX Then
             For i = 0 To plot.plotCount - 1
@@ -450,7 +450,7 @@ Public Class IMU_GVector : Inherits VBparent
         kalman.kInput = {gx, gy, gz, task.angleX, task.angleY, task.angleZ}
 
         If task.useKalman And manualCheckbox.checked = False Then
-            kalman.Run(src)
+            kalman.RunClass(src)
             gx = kalman.kOutput(0)
             gy = kalman.kOutput(1)
             gz = kalman.kOutput(2)
@@ -555,7 +555,7 @@ Public Class IMU_MotionPlot : Inherits VBparent
         task.desc = "Plot the motion of the camera based on the IMU data"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        camIMU.Run(Nothing)
+        camIMU.RunClass(Nothing)
 
         Static stableCount As Integer
         If task.cameraStable Then
@@ -569,7 +569,7 @@ Public Class IMU_MotionPlot : Inherits VBparent
             If stableCount < 0 Then stableCount = 0
         End If
         plot.plotData = New cv.Scalar(camIMU.yaw * 1000, camIMU.pitch * 1000, camIMU.roll * 1000)
-        plot.Run(Nothing)
+        plot.RunClass(Nothing)
         dst2 = plot.dst2
     End Sub
 End Class

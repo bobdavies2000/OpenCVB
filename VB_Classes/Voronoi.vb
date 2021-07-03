@@ -23,7 +23,7 @@ Public Class Voronoi_Basics : Inherits VBparent
         If task.frameCount = 0 Then
             findSlider("Random Pixel Count").Maximum = 100
         End If
-        random.Run(Nothing)
+        random.RunClass(Nothing)
         inputPoints = New List(Of cv.Point)(random.Points)
 
         vDemo.Run(dst2, inputPoints)
@@ -47,7 +47,7 @@ Public Class Voronoi_Compare : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
-        random.Run(Nothing)
+        random.RunClass(Nothing)
         Dim points = New List(Of cv.Point)(random.Points)
         basics.vDemo.Run(dst2, points, True)
         basics.vDisplay(dst2, points)
@@ -91,7 +91,7 @@ Public Class Voronoi_CPP : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static countSlider = findSlider("Random Pixel Count")
-        vDemo.random.Run(Nothing)
+        vDemo.random.RunClass(Nothing)
         Dim handleSrc = GCHandle.Alloc(vDemo.random.Points, GCHandleType.Pinned)
         Dim imagePtr = VoronoiDemo_Run(vPtr, handleSrc.AddrOfPinnedObject(), countSlider.Value, dst2.Width, dst2.Height)
         handleSrc.Free()

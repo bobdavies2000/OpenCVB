@@ -89,7 +89,7 @@ Public Class KLT_OpticalFlow : Inherits VBparent
         task.desc = "KLT optical flow - needs more work"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        klt.Run(src)
+        klt.RunClass(src)
         If task.frameCount > 0 And lastpoints IsNot Nothing And klt.inputPoints IsNot Nothing Then
             dst2 = klt.dst2
             src.CopyTo(dst3)

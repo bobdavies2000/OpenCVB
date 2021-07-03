@@ -8,7 +8,7 @@ Public Class EMax_Basics : Inherits VBparent
         task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        basics.Run(Nothing)
+        basics.RunClass(Nothing)
         labels(2) = basics.labels(2)
 
         Dim regions = basics.options.regionCount
@@ -35,7 +35,7 @@ Public Class EMax_Basics : Inherits VBparent
                 End If
             Next
         Next
-        task.palette.Run(basics.dst3)
+        task.palette.RunClass(basics.dst3)
         dst2 = task.palette.dst2
     End Sub
 End Class
@@ -58,7 +58,7 @@ Public Class EMax_Raw : Inherits VBparent
         task.desc = "Use EMax - Expectation Maximization - to classify a series of points"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        options.Run(Nothing)
+        options.RunClass(Nothing)
         Dim inCount = options.samples.Rows
         labels(2) = CStr(inCount) + " Random samples in " + CStr(options.regionCount) + " clusters"
         If options.regionCount <= 0 Then Exit Sub
@@ -80,7 +80,7 @@ Public Class EMax_Raw : Inherits VBparent
 
         dst3 = New cv.Mat(dst3.Rows, dst3.Cols, cv.MatType.CV_8U, imagePtr)
 
-        task.palette.Run(dst3 * 255 / options.regionCount)
+        task.palette.RunClass(dst3 * 255 / options.regionCount)
         dst2 = task.palette.dst2
         If standalone Or task.intermediateName = caller Then
             inputDataMask = options.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
@@ -131,8 +131,8 @@ Public Class EMax_Setup : Inherits VBparent
         Static stepSlider = findSlider("EMax Prediction Step Size")
         Static sigmaSlider = findSlider("EMax Sigma (spread)")
 
-        task.palette.Run(Nothing)
-        grid.Run(Nothing)
+        task.palette.RunClass(Nothing)
+        grid.RunClass(Nothing)
         If regionCount <> grid.roiList.Count - 1 Then
             regionCount = grid.roiList.Count - 1
             ReDim regionColors(regionCount - 1)
@@ -198,7 +198,7 @@ Public Class EMax_VB_Failing : Inherits VBparent
 
             Exit Sub ' comment this line to see the bug in the VB.Net version of this Predict2 below.
 
-            options.Run(Nothing)
+            options.RunClass(Nothing)
             Dim em_model = cv.EM.Create()
             em_model.ClustersNumber = options.regionCount
             em_model.CovarianceMatrixType = options.covarianceMatrixType
@@ -256,8 +256,8 @@ Public Class EMax_Centroids : Inherits VBparent
         task.desc = "Get the Emax cluster centroids using floodfill "
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        emaxCPP.Run(src)
-        flood.Run(emaxCPP.dst2.Clone)
+        emaxCPP.RunClass(src)
+        flood.RunClass(emaxCPP.dst2.Clone)
         dst2 = flood.dst2
 
         Static lastCentroids As New List(Of cv.Point2f)
@@ -288,13 +288,13 @@ Public Class EMax_PointTracker : Inherits VBparent
         task.desc = "Use KNN and Kalman to track the EMax Centroids and map consisten colors"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        emax.Run(src)
+        emax.RunClass(src)
         dst2 = emax.dst2
 
         pTrack.queryPoints = emax.flood.centroids
         pTrack.queryMasks = emax.flood.masks
         pTrack.queryRects = emax.flood.rects
-        pTrack.Run(src)
+        pTrack.RunClass(src)
         dst3 = pTrack.dst2
 
         ' this is to verify that the colors are remaining largely consistent (they may change if more centroids appear.)

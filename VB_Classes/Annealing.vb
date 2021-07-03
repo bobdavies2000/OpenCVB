@@ -121,7 +121,7 @@ Public Class Annealing_CPP_MT : Inherits VBparent
     Private Sub setup()
         Static citySlider = findSlider("Anneal Number of Cities")
         random.countSlider.Value = citySlider.value
-        random.Run(Nothing) ' get the city positions (may or may not be used below.)
+        random.RunClass(Nothing) ' get the city positions (may or may not be used below.)
 
         Dim numberofCities = sliders.trackbar(0).Value
         Dim circles = check.Box(2).Checked
@@ -171,7 +171,7 @@ Public Class Annealing_CPP_MT : Inherits VBparent
         Parallel.For(0, anneal.Length,
             Sub(i)
                 If anneal(i).closed = False Then
-                    anneal(i).Run(src)
+                    anneal(i).RunClass(src)
                     allClosed = False
                 End If
             End Sub)
@@ -185,7 +185,7 @@ Public Class Annealing_CPP_MT : Inherits VBparent
             bestList.Add(anneal(i).energy, i)
             flow.msgs.Add("CPU=" + Format(i, "00") + " " + anneal(i).msg)
         Next
-        flow.Run(Nothing)
+        flow.RunClass(Nothing)
 
         ' if the top 4 are all the same energy, then we are done.
         If bestList.Count > 1 Then
@@ -210,7 +210,7 @@ Public Class Annealing_CPP_MT : Inherits VBparent
             mats.mat(2) = anneal(CInt(bestList.ElementAt(bestList.Count - 2).Value)).dst2
             mats.mat(3) = anneal(CInt(bestList.ElementAt(bestList.Count - 1).Value)).dst2
         End If
-        mats.Run(src)
+        mats.RunClass(src)
         dst3 = mats.dst2
 
         ' copy the top half of the solutions to the bottom half (worst solutions)
@@ -232,7 +232,7 @@ Public Class Annealing_Options : Inherits VBparent
     Public anneal As Annealing_Basics_CPP
     Dim flow As New Font_FlowText
     Public Sub New()
-        random.Run(Nothing) ' get the city positions (may or may not be used below.)
+        random.RunClass(Nothing) ' get the city positions (may or may not be used below.)
 
         If check.Setup(caller, 2) Then
             check.Box(0).Text = "Restart TravelingSalesman"
@@ -263,12 +263,12 @@ Public Class Annealing_Options : Inherits VBparent
             check.Box(0).Checked = False
         End If
 
-        anneal.Run(src)
+        anneal.RunClass(src)
         dst3 = anneal.dst2
 
         If anneal.restartComputation Then
             anneal.restartComputation = False
-            random.Run(Nothing) ' get the city positions (may or may not be used below.)
+            random.RunClass(Nothing) ' get the city positions (may or may not be used below.)
             If check.Box(1).Checked = False Then anneal.cityPositions = random.Points2f.Clone()
             anneal.setup()
             anneal.Open()
@@ -279,7 +279,7 @@ Public Class Annealing_Options : Inherits VBparent
         End If
 
         flow.msgs.Add(anneal.msg)
-        flow.Run(Nothing)
+        flow.RunClass(Nothing)
 
     End Sub
 End Class

@@ -13,11 +13,11 @@ Public Class Contours_Basics : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static areaSlider = findSlider("Contour minimum area")
         Static epsilonSlider = findSlider("Contour epsilon (arc length percent)")
-        options.Run(Nothing)
+        options.RunClass(Nothing)
 
         If standalone Then
             Dim imageInput As New cv.Mat
-            rotatedRect.Run(src)
+            rotatedRect.RunClass(src)
             imageInput = rotatedRect.dst2
             If imageInput.Channels = 3 Then
                 dst2 = imageInput.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
@@ -277,19 +277,19 @@ Public Class Contours_Prediction : Inherits VBparent
         task.desc = "Predict the next contour point with Kalman to smooth the outline"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        outline.Run(src)
+        outline.RunClass(src)
         dst2 = outline.dst3
         dst3.SetTo(0)
         Dim stepSize = sliders.trackbar(0).Value
         Dim len = outline.contours.Count
         If len > 0 Then
             kalman.kInput = {outline.contours(0).X, outline.contours(0).Y}
-            kalman.Run(src)
+            kalman.RunClass(src)
             Dim origin = New cv.Point(kalman.kOutput(0), kalman.kOutput(1))
             For i = 0 To outline.contours.Count - 1 Step stepSize
                 Dim pt1 = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
                 kalman.kInput = {outline.contours(i Mod len).X, outline.contours(i Mod len).Y}
-                kalman.Run(src)
+                kalman.RunClass(src)
                 Dim pt2 = New cv.Point2f(kalman.kOutput(0), kalman.kOutput(1))
                 dst3.Line(pt1, pt2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
             Next
@@ -315,7 +315,7 @@ Public Class Contours_FindandDraw : Inherits VBparent
         task.desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        rotatedRect.Run(src)
+        rotatedRect.RunClass(src)
         dst2 = rotatedRect.dst2
         Dim img = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
         Dim tmp As New cv.Mat
@@ -352,10 +352,10 @@ Public Class Contours_Binarized : Inherits VBparent
         task.desc = "Find contours using Edges after image is binarized"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        sobel.Run(src)
+        sobel.RunClass(src)
         dst2 = sobel.dst2
 
-        basics.Run(dst2.Clone)
+        basics.RunClass(dst2.Clone)
 
         Dim cntList = basics.sortedContours
         If cntList.Count = 0 Then Exit Sub ' there were no lines?

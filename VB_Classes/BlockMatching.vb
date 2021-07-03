@@ -50,7 +50,7 @@ Public Class BlockMatching_Basics : Inherits VBparent
         Dim distance = sliders.trackbar(2).Value * 1000
         cv.Cv2.Divide(distance, ctmp(rect), ctmp(rect)) ' this needs much more refinement.  The trackbar3 value is just an approximation.
         ctmp(rect) = ctmp(rect).Threshold(10000, 10000, cv.ThresholdTypes.Trunc)
-        colorizer.Run(ctmp)
+        colorizer.RunClass(ctmp)
         dst2(rect) = colorizer.dst2(rect)
         dst3 = task.rightView.Resize(src.Size())
     End Sub

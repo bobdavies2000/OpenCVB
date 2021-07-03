@@ -45,7 +45,7 @@ Public Class Stabilizer_Basics : Inherits VBparent
             searchRect = New cv.Rect(t.X - pad, t.Y - pad, t.Width + pad * 2, t.Height + pad * 2)
             match.searchArea = lastFrame(searchRect)
             match.template = input(templateRect)
-            match.Run(src)
+            match.RunClass(src)
 
             Dim minVal As Single, maxVal As Single, minLoc As cv.Point, maxLoc As cv.Point
             match.correlationMat.MinMaxLoc(minVal, maxVal, minLoc, maxLoc)
@@ -157,8 +157,8 @@ Public Class Stabilizer_BasicsTest : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
-        random.Run(src)
-        stable.Run(random.dst3.Clone)
+        random.RunClass(src)
+        stable.RunClass(random.dst3.Clone)
 
         dst2 = stable.dst2
         dst3 = stable.dst3
@@ -197,7 +197,7 @@ Public Class Stabilizer_OpticalFlow : Inherits VBparent
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If inputFeat Is Nothing Then
-            good.Run(src)
+            good.RunClass(src)
             inputFeat = good.goodFeatures
         End If
         features1 = New cv.Mat(inputFeat.Count, 1, cv.MatType.CV_32FC2, inputFeat.ToArray)
@@ -297,9 +297,9 @@ Public Class Stabilizer_MotionDetect : Inherits VBparent
         Static offsetSlider = findSlider("Offset of stable rectangle from each side in pixels")
         Dim offset = offsetSlider.value
 
-        stable.Run(src)
+        stable.RunClass(src)
 
-        motion.Run(stable.dst3(stable.templateRect))
+        motion.RunClass(stable.dst3(stable.templateRect))
         dst2 = stable.dst3
         dst2.Rectangle(stable.templateRect, cv.Scalar.White, 1)
         dst3 = motion.dst3

@@ -164,7 +164,7 @@ Public Class PhotoShop_WhiteBalance : Inherits VBparent
         Dim sum32f = New cv.Mat(src.Size(), cv.MatType.CV_32F)
         sum32f = planes(0) + planes(1) + planes(2)
         src = sum32f
-        hist.Run(src)
+        hist.RunClass(src)
         dst3 = hist.dst2
 
         Dim sum As Single
@@ -215,12 +215,12 @@ Public Class PhotoShop_ChangeMask : Inherits VBparent
         countdown -= 1
 
         If whiteFlag Then
-            white.Run(src)
+            white.RunClass(src)
             dst2 = white.dst2
             labels(2) = "White balanced image - VB version"
             labels(3) = "Mask of changed pixels - VB version"
         Else
-            whiteCPP.Run(src)
+            whiteCPP.RunClass(src)
             dst2 = whiteCPP.dst2
             labels(2) = "White balanced image - C++ version"
             labels(3) = "Mask of changed pixels - C++ version"
@@ -244,17 +244,17 @@ Public Class PhotoShop_PlotHist : Inherits VBparent
         task.desc = "Plot the histogram of the before and after white balancing"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        hist1.Run(src)
+        hist1.RunClass(src)
         mat2to1.mat(0) = hist1.dst2
 
-        white.Run(src)
+        white.RunClass(src)
         dst2 = white.dst2
         labels(2) = white.labels(2)
 
-        hist2.Run(dst2)
+        hist2.RunClass(dst2)
         mat2to1.mat(1) = hist2.dst2
 
-        mat2to1.Run(src)
+        mat2to1.RunClass(src)
         dst3 = mat2to1.dst2
         labels(3) = "The top is before white balance"
     End Sub
@@ -392,7 +392,7 @@ Public Class PhotoShop_EmbossAll : Inherits VBparent
             cv.Cv2.BitwiseOr(mats.mat(i), dst2, dst2)
         Next
 
-        mats.Run(src)
+        mats.RunClass(src)
         dst3 = mats.dst2
     End Sub
 End Class

@@ -4,12 +4,20 @@ Imports System.IO.Pipes
 Module Algorithm_Module
     Public task As ActiveTask
     Public aOptions As OptionsContainer
-    Public Const RESULT1 = 2 ' 0=rgb 1=depth 2=result1 3=Result2
-    Public Const RESULT2 = 3 ' 0=rgb 1=depth 2=result1 3=Result2
+    Public Const RESULT_DST0 = 0 ' 0=rgb 1=depth 2=dst1 3=dst2
+    Public Const RESULT_DST1 = 1 ' 0=rgb 1=depth 2=dst1 3=dst2
+    Public Const RESULT_DST2 = 2 ' 0=rgb 1=depth 2=dst1 3=dst2
+    Public Const RESULT_DST3 = 3 ' 0=rgb 1=depth 2=dst1 3=dst2
     Public Const screenDWidth As Integer = 18
     Public Const screenDHeight As Integer = 20
     Public term As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
     Public recordedData As Replay_Play
+
+    Public algorithmTimes As New List(Of Single)
+    Public algorithmNames As New List(Of String)
+    Public algorithmLastTime As DateTime
+    Public algorithmStack As New Stack()
+
     <System.Runtime.CompilerServices.Extension()>
     Public Sub SwapWith(Of T)(ByRef thisObj As T, ByRef withThisObj As T)
         Dim tempObj = thisObj
@@ -89,6 +97,32 @@ Module Algorithm_Module
 
         Return Nothing
     End Function
+    Public Sub startRun(name As String)
+        If algorithmNames.Contains(name) = False Then
+            algorithmNames.Add(name)
+            algorithmTimes.Add(0)
+            algorithmLastTime = Now
+        End If
+        Dim nextTime = Now
+
+        Dim index = If(algorithmStack.Count, algorithmStack.Peek, 0)
+        Dim elapsedTicks = nextTime.Ticks - algorithmLastTime.Ticks
+        Dim span = New TimeSpan(elapsedTicks)
+        algorithmTimes(index) += span.Ticks / TimeSpan.TicksPerMillisecond
+        Console.WriteLine("start: " + algorithmNames(index) + " has " + Format(algorithmTimes(index), "###,##0") + " ms")
+        algorithmStack.Push(algorithmNames.IndexOf(name))
+        algorithmLastTime = nextTime
+    End Sub
+    Public Sub endRun(name As String)
+        Dim nextTime = Now
+        Dim index = algorithmStack.Peek
+        Dim elapsedTicks = nextTime.Ticks - algorithmLastTime.Ticks
+        Dim span = New TimeSpan(elapsedTicks)
+        algorithmTimes(index) += span.Ticks / TimeSpan.TicksPerMillisecond
+        Console.WriteLine("end: " + algorithmNames(index) + " has " + Format(algorithmTimes(index), "###,##0") + " ms")
+        algorithmStack.Pop()
+        algorithmLastTime = nextTime
+    End Sub
 End Module
 
 
@@ -323,6 +357,7 @@ Public Class ActiveTask : Implements IDisposable
         task.pythonTaskName = task.parms.homeDir + "VB_Classes\" + task.algName
 
         aOptions = New OptionsContainer
+
         If task.algName.EndsWith(".py") = False Then
             aOptions.Show()
             If task.paused Then
@@ -330,6 +365,7 @@ Public Class ActiveTask : Implements IDisposable
             Else
                 task.callTrace.Add("OptionsCommon_Histogram") ' so calltrace is not nothing on initial call...
                 viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
+                algorithmLastTime = Now ' this eliminates time spent waiting for buffers
                 inrange = algoList.createAlgorithm("OptionsCommon")
                 IMUStable = algoList.createAlgorithm("IMU_IscameraStable")
                 IMULevel = algoList.createAlgorithm("IMU_IsCameraLevel")
@@ -387,13 +423,13 @@ Public Class ActiveTask : Implements IDisposable
     End Sub
     Public Sub RunAlgorithm()
         Try
-            If task.parms.useRecordedData Then recordedData.Run(task.color.Clone)
+            If task.parms.useRecordedData Then recordedData.RunClass(task.color.Clone)
             If task.intermediateName <> "" Then checkIntermediateResults() Else task.intermediateObject = Nothing
             ' run any global options algorithms here.
             If task.pythonTaskName.EndsWith(".py") = False Then
-                inrange.Run(Nothing) ' updates all the depth info.
-                IMUStable.run(Nothing) ' updates the flag that indicates stability according to the IMU.
-                IMULevel.run(Nothing)  ' updates the flag that indicate the camera is level according to the IMU
+                inrange.RunClass(Nothing) ' updates all the depth info.
+                IMUStable.RunClass(Nothing) ' updates the flag that indicates stability according to the IMU.
+                IMULevel.RunClass(Nothing)  ' updates the flag that indicate the camera is level according to the IMU
             End If
 
             TaskTimer.Enabled = True

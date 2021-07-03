@@ -6,7 +6,7 @@ Public Class Object_Basics : Inherits VBparent
         task.desc = "Identify objects in RGB"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        km.Run(src)
+        km.RunClass(src)
         dst2 = km.dst2
         dst3 = km.dst3
     End Sub

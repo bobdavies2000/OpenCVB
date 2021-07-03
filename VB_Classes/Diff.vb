@@ -43,9 +43,9 @@ Public Class Diff_UnstableDepthAndColor : Inherits VBparent
         task.desc = "Build a mask for any pixels that have either unstable depth or color"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        diff.Run(src)
+        diff.RunClass(src)
         Dim unstableGray = diff.dst3.Clone()
-        depth.Run(task.RGBDepth)
+        depth.RunClass(task.RGBDepth)
         Dim unstableDepth As New cv.Mat
         Dim mask As New cv.Mat
         cv.Cv2.BitwiseNot(depth.dst3, unstableDepth)

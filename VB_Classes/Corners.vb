@@ -65,7 +65,7 @@ Public Class Corners_SubPix : Inherits VBparent
         task.desc = "Use PreCornerDetect to find features in the image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        good.Run(src)
+        good.RunClass(src)
         If good.goodFeatures.Count = 0 Then Exit Sub ' no good features right now...
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim winSize = New cv.Size(sliders.trackbar(0).Value, sliders.trackbar(0).Value)
@@ -101,7 +101,7 @@ Public Class Corners_PreCornerDetect : Inherits VBparent
 
         cv.Cv2.Normalize(prob, prob, 0, 255, cv.NormTypes.MinMax)
         prob.ConvertTo(gray, cv.MatType.CV_8U)
-        median.Run(gray.Clone())
+        median.RunClass(gray.Clone())
         dst2 = gray.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst3 = gray.Threshold(160, 255, cv.ThresholdTypes.BinaryInv).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         labels(3) = "median = " + CStr(median.medianVal)

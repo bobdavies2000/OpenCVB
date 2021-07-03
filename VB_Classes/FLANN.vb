@@ -62,7 +62,7 @@ Public Class FLANN_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim reuseData = check.Box(1).Checked
-        If reuseData = False Or task.frameCount = 0 Then random.Run(Nothing) ' fill result1 with random points in x and y range of the image.
+        If reuseData = False Or task.frameCount = 0 Then random.RunClass(Nothing) ' fill result1 with random points in x and y range of the image.
         Dim features As New cv.Mat(random.Points2f.Length, 2, cv.MatType.CV_32F, random.Points2f)
 
         Dim matchCount = Math.Min(sliders.trackbar(1).Value, random.Points2f.Length - 1)

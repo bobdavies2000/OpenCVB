@@ -56,7 +56,7 @@ Public Class MatchTemplate_Basics : Inherits VBparent
             dst2.SetTo(0)
             labels(2) = matchText + " for " + CStr(searchArea.Cols) + " samples = " + Format(correlation, "#,##0.00")
             flow.msgs.Add(matchText + " = " + Format(correlation, "#,##0.00"))
-            flow.Run(Nothing)
+            flow.RunClass(Nothing)
         End If
     End Sub
 End Class
@@ -76,10 +76,10 @@ Public Class MatchTemplate_RowCorrelation : Inherits VBparent
 
         match.searchArea = src.Row(line1)
         match.template = src.Row(line2 + 1)
-        match.Run(src)
+        match.RunClass(src)
         Dim correlation = match.correlationMat.Get(Of Single)(0, 0)
         flow.msgs.Add(match.matchText + " between lines " + CStr(line1) + " and line " + CStr(line2) + " = " + Format(correlation, "#,##0.00"))
-        flow.Run(Nothing)
+        flow.RunClass(Nothing)
 
         Static minCorrelation As Single
         Static maxCorrelation As Single
@@ -123,7 +123,7 @@ Public Class MatchTemplate_DrawRect : Inherits VBparent
 
         match.searchArea = saveTemplate
         match.template = src
-        match.Run(src)
+        match.RunClass(src)
 
         dst2 = New cv.Mat(src.Size, cv.MatType.CV_32F, 0)
         Dim rect = New cv.Rect(task.drawRect.Width / 2, task.drawRect.Height / 2, src.Width - task.drawRect.Width + 1, src.Height - task.drawRect.Height + 1)
@@ -137,7 +137,7 @@ Public Class MatchTemplate_DrawRect : Inherits VBparent
         Dim mask = dst2.Threshold(thresholdSlider.value / 100, 255, cv.ThresholdTypes.Binary)
         mask.ConvertTo(mask, cv.MatType.CV_8U)
         addw.src2 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        addw.Run(src)
+        addw.RunClass(src)
         dst3 = addw.dst2
 
         dst3.Circle(maxLoc.X, maxLoc.Y, task.dotSize, cv.Scalar.Red, -1, task.lineType)
@@ -164,10 +164,10 @@ Public Class MatchTemplate_BestEntropy_MT : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod 30 = 0 Then
-            entropy.Run(src)
+            entropy.RunClass(src)
             task.drawRect = entropy.eMaxRect
         End If
-        match.Run(src)
+        match.RunClass(src)
         dst2 = match.dst2
         dst3 = match.dst3
     End Sub
@@ -206,7 +206,7 @@ Public Class MatchTemplate_Movement : Inherits VBparent
 
         Dim fsize = task.fontSize / 3
 
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
         dst2 = src.Clone
         If dst2.Channels = 3 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 

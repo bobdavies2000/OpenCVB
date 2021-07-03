@@ -60,7 +60,7 @@ Public Class Concentration_Basics : Inherits VBparent
         ptSide.Clear()
         ptTop.Clear()
 
-        sideview.Run(src)
+        sideview.RunClass(src)
         If standalone Or showHistogram Then dst2 = sideview.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR) Else dst2.SetTo(0)
         plotHighlights(sideview.originalHistOutput, dst2, True)
         If unsorted.Count > 0 Then
@@ -71,7 +71,7 @@ Public Class Concentration_Basics : Inherits VBparent
             End If
         End If
 
-        topview.Run(src)
+        topview.RunClass(src)
         If standalone Or showHistogram Then dst3 = topview.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR) Else dst3.SetTo(0)
         plotHighlights(topview.originalHistOutput, dst3, False)
         If unsorted.Count > 0 Then
@@ -105,7 +105,7 @@ Public Class Concentration_BothViews : Inherits VBparent
         Static histCheck = findCheckBox("Show histogram data (white)")
         histC.drawLines = dotCheck.checked
         histC.showHistogram = histCheck.checked
-        histC.Run(src)
+        histC.RunClass(src)
         dst2 = histC.dst2
         dst3 = histC.dst3
     End Sub
@@ -136,7 +136,7 @@ Public Class Concentration_Peaks : Inherits VBparent
         Static maxAverage As Single
         Static peakRotation As Integer
 
-        dots.Run(src)
+        dots.RunClass(src)
         task.ttTextData.Clear()
 
         mats.mat(0) = dots.dst2
@@ -147,10 +147,10 @@ Public Class Concentration_Peaks : Inherits VBparent
         End If
         plot.plotData = New cv.Scalar(dots.histC.avgSide, 0, 0)
         plot.maxScale = 30
-        plot.Run(Nothing)
+        plot.RunClass(Nothing)
         dst3 = plot.dst2
 
-        mats.Run(Nothing)
+        mats.RunClass(Nothing)
         dst2 = mats.dst2
 
         Static saveRotation = rotateSlider.value
@@ -190,11 +190,11 @@ Public Class Concentration_PeakLines : Inherits VBparent
         Static maxLength As Single
         Static peakRotation As Integer = -91
 
-        histC.Run(src)
+        histC.RunClass(src)
         mats.mat(0) = histC.dst2
         mats.mat(1) = histC.dst3
 
-        lines.Run(histC.dst2)
+        lines.RunClass(histC.dst2)
         dst3 = lines.dst2
 
         If lines.sortlines.Count > 0 Then
@@ -219,7 +219,7 @@ Public Class Concentration_PeakLines : Inherits VBparent
             rotateSlider.value = -90
         End If
 
-        mats.Run(Nothing)
+        mats.RunClass(Nothing)
         dst2 = mats.dst2
     End Sub
 End Class

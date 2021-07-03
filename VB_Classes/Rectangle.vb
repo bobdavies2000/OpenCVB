@@ -7,7 +7,7 @@ Public Class Rectangle_Basics : Inherits VBparent
         task.desc = "Draw the requested number of rectangles."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        optDraw.Run(Nothing)
+        optDraw.RunClass(Nothing)
         Static saveType = optDraw.drawRotated
         If task.frameCount Mod optDraw.updateFrequency = 0 Or saveType <> optDraw.drawRotated Then
             saveType = optDraw.drawRotated
@@ -47,7 +47,7 @@ Public Class Rectangle_Rotated : Inherits VBparent
         task.desc = "Draw the requested number of rectangles."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        rectangle.Run(src)
+        rectangle.RunClass(src)
         dst2 = rectangle.dst2
     End Sub
 End Class
@@ -71,7 +71,7 @@ Public Class Rectangle_Overlap : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static typeCheckBox = findCheckBox("Draw Rotated Rectangles - unchecked will draw ordinary rectangles (unrotated)")
         If standalone Or task.intermediateName = caller Then
-            draw.Run(src)
+            draw.RunClass(src)
             dst2 = draw.dst2
         End If
 
@@ -115,7 +115,7 @@ Public Class Rectangle_Motion : Inherits VBparent
         task.desc = "Motion rectangles often overlap.  This algorithm consolidates those rectangles in the RGB image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        motion.Run(src)
+        motion.RunClass(src)
         dst2 = motion.dst2.Clone
     End Sub
 End Class
@@ -137,7 +137,7 @@ Public Class Rectangle_MotionDepth : Inherits VBparent
         Static lastDepth = task.depth32f
         cv.Cv2.Min(task.depth32f, lastDepth, src)
 
-        motion.Run(src)
+        motion.RunClass(src)
         dst3 = motion.dst3
         If motion.resetAll Then
             lastDepth = task.depth32f
@@ -145,7 +145,7 @@ Public Class Rectangle_MotionDepth : Inherits VBparent
         Else
             lastDepth = src
         End If
-        colorize.Run(src)
+        colorize.RunClass(src)
         dst2 = colorize.dst2
     End Sub
 End Class
@@ -195,7 +195,7 @@ Public Class Rectangle_Intersection : Inherits VBparent
             countSlider.Value = msRNG.Next(2, 10)
             labels(2) = "Input rectangles = " + CStr(countSlider.value)
 
-            draw.Run(src)
+            draw.RunClass(src)
             dst2 = draw.dst2
             inputRects = New List(Of cv.Rect)(draw.rectangles)
         Else
@@ -252,7 +252,7 @@ Public Class Rectangle_Union : Inherits VBparent
             countSlider.Value = msRNG.Next(2, 10)
             labels(2) = "Input rectangles = " + CStr(draw.rectangles.Count)
 
-            draw.Run(src)
+            draw.RunClass(src)
             dst2 = draw.dst2
             inputRects = New List(Of cv.Rect)(draw.rectangles)
         Else
@@ -304,7 +304,7 @@ Public Class Rectangle_MultiOverlap : Inherits VBparent
 
             labels(2) = "Input rectangles = " + CStr(draw.rectangles.Count)
 
-            draw.Run(src)
+            draw.RunClass(src)
             dst2 = draw.dst2
             inputRects = draw.rectangles
         End If

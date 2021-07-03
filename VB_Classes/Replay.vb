@@ -260,9 +260,9 @@ Public Class Replay_OpenGL : Inherits VBparent
         task.desc = "Replay a recorded session with OpenGL"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        replay.Run(src)
+        replay.RunClass(src)
         ogl.pointCloudInput = task.pointCloud
-        ogl.Run(task.color)
+        ogl.RunClass(task.color)
     End Sub
 End Class
 

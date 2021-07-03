@@ -51,7 +51,7 @@ Public Class Clone_ColorChange : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         clone.cloneSpec = 0
         clone.colorChangeValues = New cv.Point3f(sliders.trackbar(0).Value / 10, sliders.trackbar(1).Value / 10, sliders.trackbar(0).Value / 10)
-        clone.Run(src)
+        clone.RunClass(src)
         dst2 = clone.dst2
         dst3 = clone.dst3
     End Sub
@@ -74,7 +74,7 @@ Public Class Clone_IlluminationChange : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         clone.cloneSpec = 1
         clone.illuminationChangeValues = New cv.Vec2f(sliders.trackbar(0).Value / 10, sliders.trackbar(1).Value / 10)
-        clone.Run(src)
+        clone.RunClass(src)
         dst2 = clone.dst2
         dst3 = clone.dst3
     End Sub
@@ -98,7 +98,7 @@ Public Class Clone_TextureFlattening : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         clone.cloneSpec = 2
         clone.textureFlatteningValues = New cv.Vec2f(sliders.trackbar(0).Value, sliders.trackbar(1).Value)
-        clone.Run(src)
+        clone.RunClass(src)
         dst2 = clone.dst2
         dst3 = clone.dst3
     End Sub

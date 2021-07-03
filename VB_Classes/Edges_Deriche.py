@@ -59,4 +59,4 @@ class Filtrage:
             if code==27:
                 break
 if __name__ == '__main__':
-    Filtrage().run()
+    Filtrage().Run()

@@ -7,7 +7,7 @@ Public Class SLR_Basics : Inherits VBparent
     Dim plot As New Plot_Basics_CPP
     Public Sub New()
         If standalone Then
-            input.Run(dst2)
+            input.RunClass(dst2)
             labels(2) = "Sample data input"
         End If
 
@@ -32,12 +32,12 @@ Public Class SLR_Basics : Inherits VBparent
         If resultX.Count > 0 Then
             plot.srcX = input.dataX.ToArray
             plot.srcY = input.dataY.ToArray
-            plot.Run(src)
+            plot.RunClass(src)
             dst2 = plot.dst2.Clone
 
             plot.srcX = resultX.ToArray
             plot.srcY = resultY.ToArray
-            plot.Run(src)
+            plot.RunClass(src)
             dst3 = plot.dst2
         Else
             dst2.SetTo(0)
@@ -79,7 +79,7 @@ Public Class SLR_Data : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         plot.srcX = dataX.ToArray
         plot.srcY = dataY.ToArray
-        plot.Run(src)
+        plot.RunClass(src)
         dst2 = plot.dst2
     End Sub
 End Class
@@ -99,13 +99,13 @@ Public Class SLR_Image : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        hist.Run(src)
+        hist.RunClass(src)
         dst2 = hist.dst2
         For i = 0 To hist.histogram.Rows - 1
             slr.input.dataX.Add(i)
             slr.input.dataY.Add(hist.histogram.Get(Of Single)(i, 0))
         Next
-        slr.Run(src)
+        slr.RunClass(src)
         dst3 = slr.dst3
     End Sub
 End Class
@@ -136,7 +136,7 @@ Public Class SLR_TrendCompare : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         labels(2) = "Histogram with Yellow line showing the trends"
         slr.hist.plothist.backcolor = cv.Scalar.Red
-        slr.Run(src)
+        slr.RunClass(src)
         dst2 = slr.dst2
         dst3 = slr.dst3
 
@@ -188,7 +188,7 @@ Public Class SLR_Trends : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         labels(2) = "Grayscale histogram - yellow line shows trend"
         hist.plotHist.backColor = cv.Scalar.Red
-        hist.Run(src)
+        hist.RunClass(src)
         dst2 = hist.dst2
 
         Dim indexer = hist.histogram.GetGenericIndexer(Of Single)()
@@ -246,12 +246,12 @@ Public Class SLR_TrendImages : Inherits VBparent
             If radio.check(0).Checked Then
                 trends.hist.plotHist.maxRange = task.maxZ * 1000
                 trends.hist.depthNoZero = True ' not interested in the undefined depth areas...
-                trends.Run(task.depth32f)
+                trends.RunClass(task.depth32f)
                 labels(2) = "SLR_TrendImages - Depth32f"
                 Exit For
             End If
             If radio.check(1).Checked Then
-                trends.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+                trends.RunClass(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
                 labels(2) = "SLR_TrendImages - grayscale"
                 Exit For
             End If
@@ -262,7 +262,7 @@ Public Class SLR_TrendImages : Inherits VBparent
                 splitIndex = If(radio.check(3).Checked, 1, 2)
                 labels(2) = "SLR_TrendImages - " + If(radio.check(3).Checked, "Green", "Red") + " channel"
             End If
-            trends.Run(split(splitIndex))
+            trends.RunClass(split(splitIndex))
         Next
 
         dst2 = trends.dst2
@@ -284,7 +284,7 @@ Public Class SLR_SurfaceH : Inherits VBparent
         task.desc = "Use the PointCloud_SurfaceH data to indicate valleys and peaks."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        surface.Run(src)
+        surface.RunClass(src)
         dst2 = surface.dst3
     End Sub
 End Class

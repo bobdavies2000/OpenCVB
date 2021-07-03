@@ -17,8 +17,8 @@ Public Class Fuzzy_Basics : Inherits VBparent
         task.desc = "That which is not solid is fuzzy"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        options.Run(Nothing)
-        reduction.Run(src)
+        options.RunClass(Nothing)
+        reduction.RunClass(src)
         dst2 = reduction.dst2
         If dst2.Channels <> 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -63,7 +63,7 @@ Public Class Fuzzy_Basics : Inherits VBparent
             End If
         Next
 
-        task.palette.Run(gray)
+        task.palette.RunClass(gray)
         dst2 = task.palette.dst2
         dst2.SetTo(0, dst3)
         labels(2) = "There were " + CStr(countContours) + " contour > 100 points."
@@ -91,10 +91,10 @@ Public Class Fuzzy_Filter : Inherits VBparent
         task.desc = "Use a 2D filter to find smooth areas"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        options.Run(Nothing)
+        options.RunClass(Nothing)
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        reduction.Run(src)
+        reduction.RunClass(src)
 
         Dim src32f As New cv.Mat
         reduction.dst2.ConvertTo(src32f, cv.MatType.CV_32F)
@@ -127,7 +127,7 @@ Public Class Fuzzy_Filter : Inherits VBparent
             sortContours.Add(contours(i).Length, New cv.Point(i, maskID))
         Next
 
-        task.palette.Run(reduction.dst2)
+        task.palette.RunClass(reduction.dst2)
         dst2 = task.palette.dst2
         dst2.SetTo(0, dst3)
     End Sub
@@ -165,7 +165,7 @@ Public Class Fuzzy_ContoursDepth : Inherits VBparent
         task.desc = "Use contours to outline solids in the depth data"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        fuzzyD.Run(task.RGBDepth)
+        fuzzyD.RunClass(task.RGBDepth)
         dst2 = fuzzyD.dst2
     End Sub
 End Class
@@ -185,7 +185,7 @@ Public Class Fuzzy_NeighborProof : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static proofFailed As Boolean = False
         If proofFailed Then Exit Sub
-        fuzzy.Run(src)
+        fuzzy.RunClass(src)
         dst2 = fuzzy.gray
         For i = 0 To fuzzy.contours.Length - 1
             Dim len = fuzzy.contours(i).Length
@@ -238,7 +238,7 @@ Public Class Fuzzy_TrackerDepth : Inherits VBparent
         Static displayCheck = findCheckBox("Display centroid and rectangle for each region")
         Static minRectSizeSlider = findSlider("Threshold for rectangle size")
 
-        fuzzy.Run(task.RGBDepth)
+        fuzzy.RunClass(task.RGBDepth)
         dst2 = fuzzy.dst2
 
         centroids.Clear()
@@ -290,7 +290,7 @@ Public Class Fuzzy_TrackerDepthClick : Inherits VBparent
         task.desc = "Create centroids and rect's for solid regions and track them - tracker"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        tracker.Run(src)
+        tracker.RunClass(src)
         dst2 = tracker.dst2
 
         If standalone And highlightRegion < 0 Then setTrueText("Click any color region to get more details and track it", 10, 50, 3)

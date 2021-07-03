@@ -28,11 +28,28 @@ Public Class AddWeighted_Edges : Inherits VBparent
         task.desc = "Add in the edges separating light and dark to the color image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        edges.Run(src)
+        edges.RunClass(src)
         dst2 = edges.dst3
 
         addw.src2 = edges.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        addw.Run(src)
+        addw.RunClass(src)
+        dst3 = addw.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class AddWeighted_Test : Inherits VBparent
+    Dim addw As New AddWeighted_Basics
+    Public Sub New()
+        task.desc = "test timing"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        addw.src2 = task.RGBDepth
+        addw.RunClass(src)
         dst3 = addw.dst2
     End Sub
 End Class
@@ -78,7 +95,7 @@ Public Class AddWeighted_InfraRed : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static rightRadio = findRadio("Use RightView")
-        infra.Run(src)
+        infra.RunClass(src)
 
         Dim leftOrRight As String = "Right"
         If rightRadio.checked Then
@@ -87,10 +104,10 @@ Public Class AddWeighted_InfraRed : Inherits VBparent
             addw.src2 = infra.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             leftOrRight = "Left"
         End If
-        addw.Run(task.RGBDepth)
+        addw.RunClass(task.RGBDepth)
         dst2 = addw.dst2.Clone
 
-        addw.Run(src)
+        addw.RunClass(src)
         dst3 = addw.dst2
         labels(2) = "InfraRed " + leftOrRight + " " + Format(1 - task.AddWeighted, "#0%") + " Depth " + Format(task.AddWeighted, "#0%")
         labels(3) = "InfraRed " + leftOrRight + " " + Format(1 - task.AddWeighted, "#0%") + " RGB " + Format(task.AddWeighted, "#0%")

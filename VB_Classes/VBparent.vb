@@ -52,10 +52,21 @@ Public Class VBparent : Implements IDisposable
         dst2 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
         dst3 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
         task.activeObjects.Add(Me)
+        If standalone Then
+            algorithmStack = New Stack()
+            algorithmNames.Clear()
+            algorithmTimes.Clear()
+            algorithmNames.Add(caller)
+            algorithmTimes.Add(0)
+            algorithmStack.Push(0)
+        End If
     End Sub
     Public Sub NextFrame(src As cv.Mat)
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
-        algorithm.Run(src)
+        'Console.WriteLine("start frame " + CStr(task.frameCount) + vbCrLf)
+        algorithmLastTime = Now ' this eliminates time spent waiting for buffers
+        algorithm.RunClass(src)
+        'Console.WriteLine("end frame " + CStr(task.frameCount) + vbCrLf)
         If standalone Or caller = "Python_Run" Then
             task.dst0Updated = usingdst0
             task.dst1Updated = usingdst1
@@ -93,7 +104,7 @@ Public Class VBparent : Implements IDisposable
             If task.pythonTaskName.EndsWith(".py") = False Then
                 If task.pixelViewerOn Then
                     task.PixelViewer.viewerForm.Show()
-                    task.PixelViewer.Run(src)
+                    task.PixelViewer.RunClass(src)
                 Else
                     If task.PixelViewer.viewerForm.Visible Then task.PixelViewer.viewerForm.Hide()
                 End If
@@ -105,6 +116,11 @@ Public Class VBparent : Implements IDisposable
             task.imgResult(New cv.Rect(task.color.Width, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst3)
             task.frameCount += 1
         End If
+    End Sub
+    Public Sub RunClass(src As cv.Mat)
+        startRun(caller)
+        algorithm.Run(src)
+        endRun(caller)
     End Sub
     Public Sub setTrueText(text As String, Optional x As Integer = 10, Optional y As Integer = 40, Optional picTag As Integer = 2)
         Dim str As New TTtext(text, x, y, picTag)

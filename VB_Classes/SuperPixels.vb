@@ -87,9 +87,9 @@ Public Class SuperPixel_BinarizedImage : Inherits VBparent
         task.desc = "Create SuperPixels from a binary image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        binarize.Run(src)
+        binarize.RunClass(src)
 
-        pixels.Run(binarize.dst2)
+        pixels.RunClass(binarize.dst2)
         dst2 = pixels.dst2
         dst3 = pixels.dst3
         dst3.SetTo(cv.Scalar.White, pixels.wireGrid)
@@ -107,7 +107,7 @@ Public Class SuperPixel_Depth : Inherits VBparent
         task.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        pixels.Run(task.RGBDepth)
+        pixels.RunClass(task.RGBDepth)
         dst2 = pixels.dst2
         dst3 = pixels.dst3
     End Sub
@@ -125,10 +125,10 @@ Public Class SuperPixel_WithCanny : Inherits VBparent
         task.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        edges.Run(src)
+        edges.RunClass(src)
         src = task.color.Clone()
         src.SetTo(cv.Scalar.White, edges.dst2)
-        pixels.Run(src)
+        pixels.RunClass(src)
         dst2 = pixels.dst2
         dst3 = pixels.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst3.SetTo(cv.Scalar.Red, edges.dst2)
@@ -149,9 +149,9 @@ Public Class SuperPixel_WithLineDetector : Inherits VBparent
         task.desc = "Create SuperPixels using RGBDepth image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        lines.Run(src)
+        lines.RunClass(src)
         dst3 = lines.dst2
-        pixels.Run(dst3)
+        pixels.RunClass(dst3)
         dst2 = pixels.dst2
     End Sub
 End Class

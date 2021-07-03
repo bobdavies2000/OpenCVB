@@ -9,10 +9,10 @@ Public Class Blob_Basics : Inherits VBparent
         task.desc = "Isolate and list blobs with specified options"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        options.Run(src)
+        options.RunClass(src)
 
         If standalone Then
-            input.Run(src)
+            input.RunClass(src)
             dst2 = input.dst2
         Else
             dst2 = src
@@ -72,7 +72,7 @@ Public Class Blob_Options : Inherits VBparent
         blobParams.MinRepeatability = 1
 
         If standalone Then
-            blob.Run(src)
+            blob.RunClass(src)
             dst2 = blob.dst2
 
             ' The create method in SimpleBlobDetector is not available in VB.Net.  Not sure why.  To get around this, just use C# where create method works fine.
@@ -106,18 +106,18 @@ Public Class Blob_Input : Inherits VBparent
         task.desc = "Generate data to test Blob Detector."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        rectangles.Run(src)
+        rectangles.RunClass(src)
         Mats.mat(0) = rectangles.dst2
 
-        circles.Run(src)
+        circles.RunClass(src)
         Mats.mat(1) = circles.dst2
 
-        ellipses.Run(src)
+        ellipses.RunClass(src)
         Mats.mat(2) = ellipses.dst2
 
-        poly.Run(src)
+        poly.RunClass(src)
         Mats.mat(3) = poly.dst3
-        mats.Run(src)
+        mats.RunClass(src)
         dst2 = Mats.dst2
         dst3 = Mats.dst3
     End Sub
@@ -135,7 +135,7 @@ Public Class Blob_RenderBlobs : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod input.updateFrequency = 0 Then
-            input.Run(src)
+            input.RunClass(src)
             dst2 = input.dst2
             Dim gray = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             Dim binary = gray.Threshold(0, 255, cv.ThresholdTypes.Otsu Or cv.ThresholdTypes.Binary)
@@ -179,10 +179,10 @@ End Class
 '        task.desc = "Highlight the distinct histogram blobs found with depth clustering."
 '    End Sub
 '    Public Sub Run(src As cv.Mat) ' Rank = 1
-'        histBlobs.Run(task.noDepthMask)
+'        histBlobs.RunClass(task.noDepthMask)
 '        dst2 = histBlobs.dst2
 '        flood.initialMask = task.noDepthMask
-'        flood.Run(histBlobs.dst3)
+'        flood.RunClass(histBlobs.dst3)
 
 '        Static lastFrame = flood.dst3
 '        Static lastCount = flood.rects.Count
@@ -193,7 +193,7 @@ End Class
 '            For i = 0 To 0 ' flood.rects.Count - 1
 '                Dim rect = flood.rects(i)
 '                Dim mask = flood.masks(i)
-'                pixel.Run(lastFrame(rect).Clone.setTo(0, 255 - mask))
+'                pixel.RunClass(lastFrame(rect).Clone.setTo(0, 255 - mask))
 '                dst3(rect).SetTo(pixel.dominantGray, mask)
 '            Next
 '            lastFrame = dst3.Clone
@@ -219,7 +219,7 @@ Public Class Blob_DepthRanges : Inherits VBparent
         task.desc = "Highlight the distinct histogram blobs found with depth clustering."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        histBlobs.Run(src)
+        histBlobs.RunClass(src)
         dst2 = histBlobs.dst2
 
         ranges = New List(Of cv.Point)(histBlobs.valleys.ranges)
@@ -254,7 +254,7 @@ Public Class Blob_Largest : Inherits VBparent
         task.desc = "Gather all the blob data and display the largest."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        blobs.Run(src)
+        blobs.RunClass(src)
         dst3 = blobs.dst3
 
         If blobs.masks.Count > 0 Then

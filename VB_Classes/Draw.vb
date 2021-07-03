@@ -119,7 +119,7 @@ Public Class Draw_Ellipses : Inherits VBparent
         task.desc = "Draw the requested number of ellipses."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        optDraw.Run(Nothing)
+        optDraw.RunClass(Nothing)
         If task.frameCount Mod optDraw.updateFrequency = 0 Then
             dst2.SetTo(cv.Scalar.Black)
             For i = 0 To optDraw.drawCount - 1
@@ -143,7 +143,7 @@ Public Class Draw_Circles : Inherits VBparent
         task.desc = "Draw the requested number of circles."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        optDraw.Run(Nothing)
+        optDraw.RunClass(Nothing)
         If task.frameCount Mod optDraw.updateFrequency = 0 Then
             dst2.SetTo(cv.Scalar.Black)
             For i = 0 To optDraw.drawCount - 1
@@ -169,7 +169,7 @@ Public Class Draw_Line : Inherits VBparent
         task.desc = "Draw the requested number of Lines."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        optDraw.Run(Nothing)
+        optDraw.RunClass(Nothing)
         If task.frameCount Mod optDraw.updateFrequency Then Exit Sub
         dst2.SetTo(cv.Scalar.Black)
         For i = 0 To optDraw.drawCount - 1
@@ -193,7 +193,7 @@ Public Class Draw_Polygon : Inherits VBparent
         labels(3) = "Convex Hull for the same polygon"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        optDraw.Run(Nothing)
+        optDraw.RunClass(Nothing)
 
         If task.frameCount Mod optDraw.updateFrequency Then Exit Sub
         Dim height = src.Height / 8
@@ -388,7 +388,7 @@ Public Class Draw_Arc : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         kalman.kInput = {rect.X, rect.Y, rect.Width, rect.Height, angle, startAngle, endAngle}
-        kalman.Run(src)
+        kalman.RunClass(src)
         Dim r = New cv.Rect(kalman.kOutput(0), kalman.kOutput(1), kalman.kOutput(2), kalman.kOutput(3))
         If r.Width <= 5 Then r.Width = 5
         If r.Height <= 5 Then r.Height = 5
@@ -443,7 +443,7 @@ Public Class Draw_ViewObjects : Inherits VBparent
                 End If
             Next
 
-            task.palette.Run(dst2 * cv.Scalar.All(incr))
+            task.palette.RunClass(dst2 * cv.Scalar.All(incr))
             dst2 = task.palette.dst2
 
             Static drawRectangleCheck = findCheckBox("Draw rectangle and centroid for each mask")
@@ -481,7 +481,7 @@ Public Class Draw_Frustrum : Inherits VBparent
         For i = 0 To task.pointCloud.Height / 2
             dst2(fRect).Rectangle(New cv.Rect(mid - i, mid - i, i * 2, (i + 1) * 2), cv.Scalar.All(i * zIncr), 1)
         Next
-        xyzDepth.Run(dst2)
+        xyzDepth.RunClass(dst2)
         dst3 = xyzDepth.dst3
     End Sub
 End Class
@@ -513,7 +513,7 @@ Public Class Draw_ClipLine : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         dst3 = src
         kalman.kInput = {pt1.X, pt1.Y, pt2.X, pt2.Y, rect.X, rect.Y, rect.Width, rect.Height}
-        kalman.Run(src)
+        kalman.RunClass(src)
         Dim p1 = New cv.Point(CInt(kalman.kOutput(0)), CInt(kalman.kOutput(1)))
         Dim p2 = New cv.Point(CInt(kalman.kOutput(2)), CInt(kalman.kOutput(3)))
 
@@ -534,7 +534,7 @@ Public Class Draw_ClipLine : Inherits VBparent
         setTrueText("There were " + Format(hitCount, "###,##0") + " intersects and " + Format(linenum - hitCount) + " misses",
                      CInt(src.Width / 2), 200)
         If r = rect Then setup()
-        flow.Run(Nothing)
+        flow.RunClass(Nothing)
     End Sub
 End Class
 

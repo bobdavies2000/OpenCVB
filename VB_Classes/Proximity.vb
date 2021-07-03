@@ -12,7 +12,7 @@ Public Class Proximity_Basics : Inherits VBparent
             End If
             input.ConvertTo(input, cv.MatType.CV_32F)
         End If
-        km.Run(src)
+        km.RunClass(src)
         dst2 = km.dst2
         dst2.SetTo(0, task.noDepthMask)
     End Sub
@@ -40,7 +40,7 @@ Public Class Proximity_BasicsDepth : Inherits VBparent
         Dim h = CInt(task.depth32f.Height / resizeFactor)
         Dim depth32f = task.depth32f.Resize(New cv.Size(w, h), 0, 0, cv.InterpolationFlags.Nearest)
         depth32f.SetTo(0, task.noDepthMask.Resize(depth32f.Size))
-        km.Run(depth32f)
+        km.RunClass(depth32f)
         dst2 = km.dst2
     End Sub
 End Class
@@ -66,7 +66,7 @@ Public Class Proximity_BasicsRGB : Inherits VBparent
         Dim w = CInt(task.depth32f.Width / resizeFactor)
         Dim h = CInt(task.depth32f.Height / resizeFactor)
 
-        km.Run(src)
+        km.RunClass(src)
         dst2 = km.dst2
         dst3 = km.dst3
     End Sub
@@ -91,12 +91,12 @@ Public Class Proximity_Valleys : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
-        hist.Run(src)
+        hist.RunClass(src)
         If kalman.kInput.Length <> hist.plotHist.hist.Rows Then ReDim kalman.kInput(hist.plotHist.hist.Rows - 1)
         For i = 0 To hist.plotHist.hist.Rows - 1
             kalman.kInput(i) = hist.plotHist.hist.Get(Of Single)(i, 0)
         Next
-        kalman.Run(src)
+        kalman.RunClass(src)
         Dim histogram = hist.plotHist.hist
         For i = 0 To histogram.Rows - 1
             histogram.Set(Of Single)(i, 0, kalman.kOutput(i))
@@ -161,7 +161,7 @@ Public Class Proximity_Valleys : Inherits VBparent
         End If
 
         Dim spread = 255 / ranges.Count
-        task.palette.Run(dst2 * spread)
+        task.palette.RunClass(dst2 * spread)
         dst2 = task.palette.dst2
     End Sub
 End Class
@@ -186,11 +186,11 @@ Public Class Proximity_ValleysKalman : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         trends.hist.plotHist.maxRange = task.maxZ * 1000
         trends.hist.depthNoZero = True ' not interested in the undefined depth areas...
-        trends.Run(task.depth32f)
+        trends.RunClass(task.depth32f)
 
         If kalman.kInput.Length <> task.histogramBins Then ReDim kalman.kInput(task.histogramBins - 1)
         kalman.kInput = trends.resultingValues.ToArray
-        kalman.Run(src)
+        kalman.RunClass(src)
 
         dst2.SetTo(cv.Scalar.Black)
         Dim barWidth = Int(dst2.Width / trends.resultingValues.Count)
@@ -234,14 +234,14 @@ Public Class Proximity_SLR : Inherits VBparent
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.depth32f
         hist.plotHist.maxRange = task.maxZ * 1000
         hist.depthNoZero = True ' not interested in the undefined depth areas...
-        hist.Run(src)
+        hist.RunClass(src)
         hist.histogram.Set(Of Single)(0, 0, 0)
         dst2 = hist.dst2
         For i = 0 To hist.histogram.Rows - 1
             slr.input.dataX.Add(i)
             slr.input.dataY.Add(hist.histogram.Get(Of Single)(i, 0))
         Next
-        slr.Run(src)
+        slr.RunClass(src)
         dst3 = slr.dst3
     End Sub
 End Class
@@ -263,7 +263,7 @@ Public Class Proximity_Reduction : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         task.depth32f.ConvertTo(src, cv.MatType.CV_32S)
-        reduction.Run(src)
+        reduction.RunClass(src)
         reduction.dst2.ConvertTo(dst3, cv.MatType.CV_32F)
 
         dst2 = dst3.Normalize(0, 255, cv.NormTypes.MinMax)
@@ -279,7 +279,7 @@ Public Class Proximity_Reduction : Inherits VBparent
             Next
         End If
 
-        task.palette.Run(dst2)
+        task.palette.RunClass(dst2)
         dst2 = task.palette.dst2
         labels(2) = reduction.labels(2) + " with " + CStr(counts.Count) + " levels"
     End Sub
@@ -300,13 +300,13 @@ Public Class Proximity_MasksRGB : Inherits VBparent
         task.desc = "Display the top 4 masks from the rgb kmeans output"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        proxy.Run(src)
+        proxy.RunClass(src)
         For i = 0 To proxy.km.masks.Count - 1
             mats.mat(i) = proxy.km.masks(i)
             If i >= 3 Then Exit For
         Next
 
-        mats.Run(Nothing)
+        mats.RunClass(Nothing)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub
@@ -325,7 +325,7 @@ Public Class Proximity_MasksDepth : Inherits VBparent
         task.desc = "Display the top 4 masks from the depth kmeans output"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        proxy.Run(task.depth32f)
+        proxy.RunClass(task.depth32f)
         dst2 = proxy.dst2
         dst3 = proxy.dst3
     End Sub
@@ -345,7 +345,7 @@ Public Class Proximity_Clusters : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Type <> cv.MatType.CV_32F Then src = task.depth32f.Clone
 
-        valleys.Run(src)
+        valleys.RunClass(src)
         dst2 = valleys.dst2
 
         Dim tmp As New cv.Mat
@@ -357,7 +357,7 @@ Public Class Proximity_Clusters : Inherits VBparent
             paletteSrc.SetTo(colorIncr * (i + 1), tmp.ConvertScaleAbs())
         Next
         paletteSrc += 1
-        task.palette.Run(paletteSrc)
+        task.palette.RunClass(paletteSrc)
         dst3 = task.palette.dst2
         If standalone Or task.intermediateName = caller Then
             labels(2) = "Histogram of " + CStr(valleys.ranges.Count) + " Depth Clusters"
@@ -382,13 +382,13 @@ Public Class Proximity_ClustersKalman : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Type <> cv.MatType.CV_32F Then src = task.depth32f.Clone
 
-        valleys.Run(src)
+        valleys.RunClass(src)
 
         If kalman.kInput.Length - 1 <> valleys.hist.plotHist.hist.Rows Then ReDim kalman.kInput(valleys.hist.plotHist.hist.Rows - 1)
         For i = 0 To valleys.hist.plotHist.hist.Rows - 1
             kalman.kInput(i) = valleys.barValues(i)
         Next
-        kalman.Run(src)
+        kalman.RunClass(src)
 
         Dim tmp As New cv.Mat
         Dim colorIncr = 255 / valleys.ranges.Count
@@ -406,9 +406,9 @@ Public Class Proximity_ClustersKalman : Inherits VBparent
             dst3.SetTo(colorIncr * CInt(kalman.kOutput(i)), tmp.ConvertScaleAbs())
         Next
 
-        task.palette.Run(dst2)
+        task.palette.RunClass(dst2)
         dst2 = task.palette.dst2
-        task.palette.Run(dst3)
+        task.palette.RunClass(dst3)
         dst3 = task.palette.dst2
         dst3.SetTo(0, task.noDepthMask)
     End Sub

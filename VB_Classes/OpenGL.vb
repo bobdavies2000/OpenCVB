@@ -189,7 +189,7 @@ Public Class OpenGL_Options : Inherits VBparent
 
         OpenGL.pointCloudInput = pointCloudInput
         If OpenGL.pointCloudInput Is Nothing Then OpenGL.pointCloudInput = task.pointCloud
-        OpenGL.Run(src)
+        OpenGL.RunClass(src)
     End Sub
 End Class
 
@@ -206,7 +206,7 @@ Public Class OpenGL_Callbacks : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Then pointCloudInput = task.pointCloud
         ogl.pointCloudInput = pointCloudInput
-        ogl.Run(src)
+        ogl.RunClass(src)
     End Sub
 End Class
 
@@ -226,9 +226,9 @@ Public Class OpenGL_IMU : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.parms.IMU_Present Then
-            imu.Run(src)
+            imu.RunClass(src)
             ogl.OpenGL.dataInput = New cv.Mat(100, 100, cv.MatType.CV_32F, 0)
-            ogl.Run(src) ' we are not moving any images to OpenGL - just the IMU value which are already in the memory mapped file.
+            ogl.RunClass(src) ' we are not moving any images to OpenGL - just the IMU value which are already in the memory mapped file.
         Else
             setTrueText("The IMU is not working or is unavailable")
         End If
@@ -257,7 +257,7 @@ Public Class OpenGL_3Ddata : Inherits VBparent
 
         colors.color1 = cv.Scalar.Yellow
         colors.color2 = cv.Scalar.Blue
-        colors.Run(dst2)
+        colors.RunClass(dst2)
         ' ogl.OpenGL.src = dst2.Clone() ' only need to set this once.
 
         labels(2) = "Input to Histogram 3D"
@@ -278,7 +278,7 @@ Public Class OpenGL_3Ddata : Inherits VBparent
         histogram = histogram.Normalize(255)
 
         ogl.OpenGL.dataInput = histogram.Clone()
-        ogl.Run(src)
+        ogl.RunClass(src)
     End Sub
 End Class
 
@@ -302,11 +302,11 @@ Public Class OpenGL_Draw3D : Inherits VBparent
         task.desc = "Draw in an image show it in 3D in OpenGL without any explicit math"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        circle.Run(src)
+        circle.RunClass(src)
         dst3 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ogl.OpenGL.dataInput = dst3
         ' ogl.OpenGL.src = New cv.Mat(1, task.vecColors.Length - 1, cv.MatType.CV_8UC3, task.vecColors.ToArray)
-        ogl.Run(src)
+        ogl.RunClass(src)
     End Sub
 End Class
 
@@ -325,14 +325,14 @@ Public Class OpenGL_Voxels : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static intermediateResults = findCheckBox("Display intermediate results")
-        voxels.Run(src)
+        voxels.RunClass(src)
         If intermediateResults.checked Then
             dst2 = voxels.dst2
             dst3 = voxels.dst3
         End If
 
         ogl.dataInput = New cv.Mat(voxels.grid.tilesPerCol, voxels.grid.tilesPerRow, cv.MatType.CV_32F, voxels.voxels)
-        ogl.Run(src)
+        ogl.RunClass(src)
     End Sub
 End Class
 
@@ -352,10 +352,10 @@ Public Class OpenGL_GravityTransform : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.parms.IMU_Present Then
-            gCloud.Run(task.pointCloud)
+            gCloud.RunClass(task.pointCloud)
 
             ogl.pointCloudInput = gCloud.dst2
-            ogl.Run(src)
+            ogl.RunClass(src)
         Else
             setTrueText("The IMU is not working or is unavailable")
         End If
@@ -378,12 +378,12 @@ Public Class OpenGL_Floor : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
         If task.parms.IMU_Present Then
-            plane.Run(src)
+            plane.RunClass(src)
             dst2 = plane.dst2
             dst3 = plane.dst3
 
             ogl.pointCloudInput = plane.imuPointCloud
-            ogl.Run(src)
+            ogl.RunClass(src)
         Else
             setTrueText("The IMU is not working or is unavailable")
         End If
@@ -407,7 +407,7 @@ Public Class OpenGL_FloorPlane : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
         If task.parms.IMU_Present Then
-            plane.Run(src)
+            plane.RunClass(src)
             dst2 = plane.dst2
             dst3 = plane.dst3
 
@@ -419,7 +419,7 @@ Public Class OpenGL_FloorPlane : Inherits VBparent
             data.Set(Of Single)(3, 0, plane.floor.floorYplane)
             ogl.dataInput = data
             ogl.pointCloudInput = plane.imuPointCloud
-            ogl.Run(src)
+            ogl.RunClass(src)
         Else
             setTrueText("The IMU is not working or is unavailable")
         End If
@@ -446,12 +446,12 @@ End Class
 
 '        If task.parms.IMU_Present Then
 '            floor.plane.src = src
-'            floor.plane.Run()
+'            floor.plane.RunClass()
 '            dst2 = floor.plane.dst2
 '            dst3 = floor.plane.dst3
 
 '            shuffle.src = floor.plane.sliceMask
-'            shuffle.Run()
+'            shuffle.RunClass()
 '            floor.ogl.textureInput = shuffle.rgbaTexture
 
 '            Dim data = New cv.Mat(4, 1, cv.MatType.CV_32F, 0)
@@ -463,7 +463,7 @@ End Class
 '            floor.ogl.pointCloudInput = floor.plane.imuPointCloud
 '            floor.ogl.pointCloudInput.SetTo(0, floor.plane.sliceMask)
 '            floor.ogl.src = src
-'            floor.ogl.Run()
+'            floor.ogl.RunClass()
 '        Else
 '            setTrueText("The IMU is not working or not available.")
 '        End If
@@ -484,14 +484,14 @@ Public Class OpenGL_DepthSliceH : Inherits VBparent
         task.desc = "View depth slices in 3D with OpenGL"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        slices.Run(src)
+        slices.RunClass(src)
         dst2 = slices.dst2
         Dim mask As New cv.Mat
         cv.Cv2.BitwiseNot(slices.sliceMask, mask)
 
         ogl.pointCloudInput = slices.side2D.gCloud.dst2.Clone
         ogl.pointCloudInput.SetTo(0, mask)
-        ogl.Run(New cv.Mat(mask.Size, cv.MatType.CV_8UC3, cv.Scalar.White))
+        ogl.RunClass(New cv.Mat(mask.Size, cv.MatType.CV_8UC3, cv.Scalar.White))
     End Sub
 End Class
 
@@ -509,11 +509,11 @@ Public Class OpenGL_StableDepth : Inherits VBparent
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        pcValid.Run(src)
+        pcValid.RunClass(src)
         dst2 = pcValid.dst2
         dst3 = pcValid.dst3
         ogl.pointCloudInput = pcValid.dst3
-        ogl.Run(task.color)
+        ogl.RunClass(task.color)
     End Sub
 End Class
 
@@ -535,13 +535,13 @@ Public Class OpenGL_AverageDepth : Inherits VBparent
 
         If src.Type <> cv.MatType.CV_32F Then src = split(2) * 1000
 
-        stable.Run(src)
+        stable.RunClass(src)
         dst2 = stable.dst3
 
         split(2) = stable.dst3 * 0.001
         cv.Cv2.Merge(split, dst3)
         ogl.pointCloudInput = dst3
-        ogl.Run(task.color)
+        ogl.RunClass(task.color)
     End Sub
 End Class
 
@@ -560,12 +560,12 @@ Public Class OpenGL_StableDepthMouse : Inherits VBparent
         task.desc = "Use the extrema stableDepth as input the an OpenGL display"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        pcValid.Run(src)
+        pcValid.RunClass(src)
         dst2 = pcValid.dst2
         dst3 = pcValid.dst3
 
         ogl.pointCloudInput = pcValid.dst3
-        ogl.Run(task.color)
+        ogl.RunClass(task.color)
     End Sub
 End Class
 
@@ -582,12 +582,12 @@ Public Class OpenGL_Surfaces : Inherits VBparent
         task.desc = "Filter the 3D image to show only smooth surfaces."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        smooth.Run(src)
+        smooth.RunClass(src)
         dst2 = smooth.dst3
 
         smooth.pcValid.dst3.CopyTo(dst3, smooth.dst3)
         ogl.pointCloudInput = dst3
-        ogl.Run(task.color)
+        ogl.RunClass(task.color)
     End Sub
 End Class
 
@@ -604,11 +604,11 @@ Public Class OpenGL_Stable : Inherits VBparent
         task.desc = "Use the Motion_MinMaxPointCloud in 3D"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        stable.Run(src)
+        stable.RunClass(src)
         dst2 = stable.dst2
 
         ogl.pointCloudInput = stable.dst3
-        ogl.Run(task.color)
+        ogl.RunClass(task.color)
 
         labels(3) = stable.labels(3)
     End Sub
@@ -628,11 +628,11 @@ Public Class OpenGL_ReducedXYZ : Inherits VBparent
         task.desc = "Display the pointCloud after reduction in X, Y, or Z dimensions."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        reduction.Run(src)
+        reduction.RunClass(src)
         dst3 = reduction.dst3
 
         ogl.pointCloudInput = reduction.dst3
-        ogl.Run(src)
+        ogl.RunClass(src)
     End Sub
 End Class
 
@@ -650,12 +650,12 @@ Public Class OpenGL_Reduction : Inherits VBparent
         task.desc = "Use the reduced depth pointcloud in OpenGL"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        reduction.Run(src)
+        reduction.RunClass(src)
         dst2 = reduction.dst2
         dst3 = reduction.dst3
 
         ogl.pointCloudInput = reduction.dst3
-        ogl.Run(src)
+        ogl.RunClass(src)
     End Sub
 End Class
 
@@ -672,11 +672,11 @@ Public Class OpenGL_ReducedSideView : Inherits VBparent
         task.desc = "Use the reduced depth pointcloud in 3D but allow it to be rotated in Options_Common"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        reduced.Run(src)
+        reduced.RunClass(src)
         dst2 = reduced.dst2
 
         ogl.pointCloudInput = reduced.dst3
-        ogl.Run(task.color)
+        ogl.RunClass(task.color)
 
         labels(2) = reduced.labels(2)
     End Sub
@@ -695,12 +695,12 @@ Public Class OpenGL_MFD_PointCloud : Inherits VBparent
         task.desc = "Use the MFD_PointCloud in 3D"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        mfd.Run(src)
+        mfd.RunClass(src)
         dst2 = mfd.dst2
         dst3 = mfd.dst3
 
         ogl.pointCloudInput = dst2
-        ogl.Run(task.color)
+        ogl.RunClass(task.color)
 
         labels(3) = mfd.labels(3)
     End Sub
@@ -720,11 +720,11 @@ Public Class OpenGL_Structured_PointCloud : Inherits VBparent
         task.desc = "Visualize the Structured_Cloud"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        sCloud.Run(src)
+        sCloud.RunClass(src)
         dst2 = sCloud.dst2
 
         ogl.pointCloudInput = dst2
-        ogl.Run(New cv.Mat(src.Size, cv.MatType.CV_8UC3, cv.Scalar.White))
+        ogl.RunClass(New cv.Mat(src.Size, cv.MatType.CV_8UC3, cv.Scalar.White))
     End Sub
 End Class
 

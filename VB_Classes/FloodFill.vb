@@ -90,7 +90,7 @@ Public Class FloodFill_Basics : Inherits VBparent
         Next
         dst2 = dst1 * 255 / masks.Count
         If standalone Then
-            task.palette.Run(dst2)
+            task.palette.RunClass(dst2)
             dst3 = task.palette.dst2
             dst2 = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
@@ -112,7 +112,7 @@ Public Class FloodFill_WithDepth : Inherits VBparent
         task.desc = "Floodfill only the areas where there is depth"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        range.Run(src)
+        range.RunClass(src)
         dst3 = task.noDepthMask
         dst2 = range.dst3
         dst2.SetTo(0, dst3)
@@ -196,7 +196,7 @@ End Class
 '        task.desc = "Use floodfill to identify each of the region candidates using only color."
 '    End Sub
 '    Public Sub Run(src As cv.Mat) ' Rank = 1
-'        pFlood.Run(src)
+'        pFlood.RunClass(src)
 '        dst2 = pFlood.dst3.Clone
 
 '        masks = New List(Of cv.Mat)(pFlood.masks)
@@ -223,13 +223,13 @@ End Class
 '        task.desc = "Test the FloodFill output as input into the point tracker"
 '    End Sub
 '    Public Sub Run(src As cv.Mat) ' Rank = 1
-'        flood.Run(src)
+'        flood.RunClass(src)
 '        dst3 = flood.dst2
 
 '        pTrack.queryPoints = flood.basics.centroids
 '        pTrack.queryRects = flood.basics.rects
 '        pTrack.queryMasks = flood.basics.masks
-'        pTrack.Run(src)
+'        pTrack.RunClass(src)
 
 '        labels(3) = CStr(pTrack.drawRC.viewObjects.Count) + " regions were found"
 '        dst2 = pTrack.dst2
@@ -263,7 +263,7 @@ End Class
 
 '        thumbNails = New cv.Mat(src.Size(), cv.MatType.CV_8U, 0)
 '        Dim allSize = New cv.Size(thumbNails.Width / 4, thumbNails.Height / 4) ' show the first 16 masks
-'        flood.Run(src)
+'        flood.RunClass(src)
 
 '        dst2.SetTo(0)
 '        Dim thumbCount As Integer
@@ -337,9 +337,9 @@ End Class
 '            saveFillDistance = fill
 '        End If
 
-'        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
+'        If task.mouseClickFlag And task.mousePicTag = RESULT_DST2 Then setMyActiveMat()
 
-'        motion.Run(task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+'        motion.RunClass(task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 '        mats.mat(0) = motion.dst2
 
 '        masks.Clear()
@@ -351,7 +351,7 @@ End Class
 '        Static zero As New cv.Scalar(0)
 '        Static maskRect = New cv.Rect(1, 1, dst2.Width, dst2.Height)
 
-'        edges.Run(src)
+'        edges.RunClass(src)
 '        dst2 = edges.dst3.Clone
 '        mats.mat(1).SetTo(255, dst2.Clone)
 
@@ -402,7 +402,7 @@ End Class
 
 '        motion.resetAll = False
 '        lastFrame = dst2.Clone
-'        task.palette.Run(dst2)
+'        task.palette.RunClass(dst2)
 '        mats.mat(3) = task.palette.dst2
 '        mats.mat(3).SetTo(0, mats.mat(1)) ' show the pixels that are not assigned (missing)
 '        labels(3) = "Checked " + CStr(testCount) + " locations and used floodfill on " + CStr(floodCount)
@@ -418,7 +418,7 @@ End Class
 '            mats.mat(2).Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
 '        Next
 
-'        mats.Run(src)
+'        mats.RunClass(src)
 '        dst2 = mats.dst2
 '        dst3 = mats.mat(quadrantIndex)
 '    End Sub
@@ -460,7 +460,7 @@ End Class
 '        Dim stepSize = stepSlider.Value
 
 '        If standalone Then
-'            contours.Run(src)
+'            contours.RunClass(src)
 '            contourInput = contours.basics.sortedContours
 '            dst2 = contours.dst2
 '            src = contours.dst3
@@ -604,7 +604,7 @@ End Class
 '        Next
 
 '        Dim spread = If(rangeColors.Count > 0, CInt(255 / rangeColors.Count), 255)
-'        task.palette.Run(dst3 * spread)
+'        task.palette.RunClass(dst3 * spread)
 '        dst2 = task.palette.dst2
 '        labels(3) = CStr(basics.masks.Count) + " regions > " + CStr(minFloodSize) + " pixels"
 '    End Sub
@@ -633,7 +633,7 @@ Public Class FloodFill_RelativeRange : Inherits VBparent
         If check.Box(0).Checked Then fBasics.floodFlag += cv.FloodFillFlags.FixedRange
         If check.Box(1).Checked Then fBasics.floodFlag += cv.FloodFillFlags.Link4 Else fBasics.floodFlag += cv.FloodFillFlags.Link8
         If check.Box(2).Checked Then fBasics.floodFlag += cv.FloodFillFlags.MaskOnly
-        fBasics.Run(src)
+        fBasics.RunClass(src)
         dst2 = fBasics.dst2
     End Sub
 End Class
@@ -665,7 +665,7 @@ Public Class FloodFill_Point : Inherits VBparent
         dst2 = src.Clone()
         If standalone Then
             pt = New cv.Point(msRNG.Next(0, dst2.Width - 1), msRNG.Next(0, dst2.Height - 1))
-            edges.Run(src)
+            edges.RunClass(src)
             dst2 = edges.mats.dst2
             dst3 = edges.mats.mat(quadrantIndex)
         Else
@@ -706,11 +706,11 @@ Public Class FloodFill_Click : Inherits VBparent
             task.mouseClickFlag = False ' preempt any other uses
         End If
 
-        edges.Run(src)
+        edges.RunClass(src)
         dst2 = edges.dst3
 
         If flood.pt.X Or flood.pt.Y Then
-            flood.Run(dst2.Clone)
+            flood.RunClass(dst2.Clone)
             dst2.CopyTo(dst3)
             If flood.pixelCount > 0 Then dst3.SetTo(255, flood.dst3)
         End If
@@ -733,7 +733,7 @@ Public Class FloodFill_Palette : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
-        basics.Run(src)
+        basics.RunClass(src)
 
         dst3.SetTo(0)
         Dim sortedSizes As New SortedList(Of Integer, Integer)(New CompareMaskSize)
@@ -747,7 +747,7 @@ Public Class FloodFill_Palette : Inherits VBparent
             dst3(r).SetTo(cv.Scalar.All((i + 1) Mod 255), basics.masks(maskIndex))
         Next
 
-        task.palette.Run(dst3 * 255 / basics.masks.Count) ' spread the colors 
+        task.palette.RunClass(dst3 * 255 / basics.masks.Count) ' spread the colors 
         dst2 = task.palette.dst2
 
         labels(2) = CStr(basics.masks.Count) + " regions > " + CStr(minSizeSlider.value) + " pixels"

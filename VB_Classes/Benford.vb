@@ -67,17 +67,17 @@ Public Class Benford_Basics : Inherits VBparent
         End If
 
         plotHist.hist = New cv.Mat(counts.Length, 1, cv.MatType.CV_32F, counts)
-        plotHist.Run(src)
+        plotHist.RunClass(src)
         dst3 = plotHist.dst2.Clone
         For i = 0 To counts.Count - 1
             counts(i) = src.Rows * expectedDistribution(i)
         Next
 
         plotHist.hist = New cv.Mat(counts.Length, 1, cv.MatType.CV_32F, counts)
-        plotHist.Run(src)
+        plotHist.RunClass(src)
 
         cv.Cv2.BitwiseNot(plotHist.dst2, addW.src2)
-        addW.Run(dst3)
+        addW.RunClass(dst3)
         dst2 = addW.dst2
 
         labels(2) = "AddWeighted: " + Format(task.AddWeighted, "%0.0") + " actual vs. " + Format(1 - task.AddWeighted, "%0.0") + " Benford distribution"
@@ -100,7 +100,7 @@ Public Class Benford_NormalizedImage : Inherits VBparent
         Dim gray32f As New cv.Mat
         dst2.ConvertTo(gray32f, cv.MatType.CV_32F)
 
-        benford.Run(gray32f.Normalize(1))
+        benford.RunClass(gray32f.Normalize(1))
         dst3 = benford.dst2
         labels(3) = benford.labels(3)
     End Sub
@@ -124,7 +124,7 @@ Public Class Benford_NormalizedImage99 : Inherits VBparent
         Dim gray32f As New cv.Mat
         dst2.ConvertTo(gray32f, cv.MatType.CV_32F)
 
-        benford.Run(gray32f.Normalize(1))
+        benford.RunClass(gray32f.Normalize(1))
         dst3 = benford.dst2
         labels(3) = benford.labels(3)
     End Sub
@@ -150,7 +150,7 @@ Public Class Benford_JPEG : Inherits VBparent
         Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, sliders.trackbar(0).Value})
         Dim tmp = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
         dst2 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
-        benford.Run(tmp)
+        benford.RunClass(tmp)
         dst3 = benford.dst2
         labels(3) = benford.labels(3)
     End Sub
@@ -177,7 +177,7 @@ Public Class Benford_JPEG99 : Inherits VBparent
         Dim jpeg() = src.ImEncode(".jpg", New Integer() {cv.ImwriteFlags.JpegQuality, qualitySlider.Value})
         Dim tmp = New cv.Mat(jpeg.Count, 1, cv.MatType.CV_8U, jpeg)
         dst2 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
-        benford.Run(tmp)
+        benford.RunClass(tmp)
         dst3 = benford.dst2
         labels(3) = benford.labels(3)
     End Sub
@@ -203,7 +203,7 @@ Public Class Benford_PNG : Inherits VBparent
         Dim png = src.ImEncode(".png", New Integer() {cv.ImwriteFlags.PngCompression, compressionSlider.Value})
         Dim tmp = New cv.Mat(png.Count, 1, cv.MatType.CV_8U, png)
         dst2 = cv.Cv2.ImDecode(tmp, cv.ImreadModes.Color)
-        benford.Run(tmp)
+        benford.RunClass(tmp)
         dst3 = benford.dst2
         labels(3) = benford.labels(3)
     End Sub
@@ -220,7 +220,7 @@ Public Class Benford_Depth : Inherits VBparent
         task.desc = "Apply Benford to the depth data"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        benford.Run(task.depth32f)
+        benford.RunClass(task.depth32f)
         dst2 = benford.dst2
         labels(2) = benford.labels(3)
     End Sub
@@ -237,7 +237,7 @@ Public Class Benford_DepthRGB : Inherits VBparent
         task.desc = "Apply Benford to the depth RGB image that is compressed with JPEG"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        benford.Run(task.RGBDepth)
+        benford.RunClass(task.RGBDepth)
         dst2 = benford.dst3
         labels(2) = benford.labels(3)
     End Sub
@@ -259,12 +259,12 @@ Public Class Benford_Primes : Inherits VBparent
         task.desc = "Apply Benford to a list of primes"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If task.frameCount = 0 Then sieve.Run(src) ' only need to compute this once...
+        If task.frameCount = 0 Then sieve.RunClass(src) ' only need to compute this once...
         setTrueText(CStr(sieve.primes.Count) + " primes were found")
 
         Dim tmp = New cv.Mat(sieve.primes.Count, 1, cv.MatType.CV_32S, sieve.primes.ToArray())
         tmp.ConvertTo(tmp, cv.MatType.CV_32F)
-        benford.Run(tmp)
+        benford.RunClass(tmp)
         dst3 = benford.dst2
         labels(3) = benford.labels(3)
     End Sub

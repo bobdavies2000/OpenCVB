@@ -46,7 +46,7 @@ Public Class MatchShapes_Basics : Inherits VBparent
             End If
         Next
 
-        options.Run(Nothing)
+        options.RunClass(Nothing)
 
         If standalone Then
             dst2 = img1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

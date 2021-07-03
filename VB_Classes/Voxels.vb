@@ -24,7 +24,7 @@ Public Class Voxels_Basics_MT : Inherits VBparent
         Dim input = (split(2) * 1000).ToMat
         cv.Cv2.InRange(input, task.minDepth, task.maxDepth, depthMask)
 
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
 
         If voxels.Length <> grid.roiList.Count Then ReDim voxels(grid.roiList.Count - 1)
 

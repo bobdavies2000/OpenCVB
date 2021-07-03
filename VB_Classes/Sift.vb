@@ -19,7 +19,7 @@ Public Class Sift_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
-        lrView.Run(src)
+        lrView.RunClass(src)
 
         Dim doubleSize As New cv.Mat(lrView.dst2.Rows, lrView.dst2.Cols * 2, cv.MatType.CV_8UC3)
 
@@ -48,7 +48,7 @@ Public Class Sift_Basics_MT : Inherits VBparent
         gridWidthSlider.Value = task.color.Cols * 2 ' we are just taking horizontal slices of the image.
         gridHeightSlider.Value = 10
 
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
 
         numPointSlider = findSlider("Points to Match")
         numPointSlider.Value = 1
@@ -56,9 +56,9 @@ Public Class Sift_Basics_MT : Inherits VBparent
         task.desc = "Compare 2 images to get a homography.  We will use left and right images - needs more work"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
 
-        lrView.Run(src)
+        lrView.RunClass(src)
 
         Dim output As New cv.Mat(src.Rows, src.Cols * 2, cv.MatType.CV_8UC3)
         Dim numFeatures = numPointSlider.Value

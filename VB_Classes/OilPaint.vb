@@ -91,7 +91,7 @@ Public Class OilPaint_ColorProbability : Inherits VBparent
         task.desc = "Determine color probabilities on the output of kMeans - Painterly Effect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        km.Run(src)
+        km.RunClass(src)
         dst2 = km.dst2
         ReDim color_probability(kSlider.Value - 1)
         For i = 0 To km.km.masks.Count - 1
@@ -214,10 +214,10 @@ Public Class OilPaint_Cartoon : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim roi = task.drawRect
-        laplacian.Run(src)
+        laplacian.RunClass(src)
         dst3 = laplacian.dst2
 
-        oil.Run(src)
+        oil.RunClass(src)
         dst2 = oil.dst2
 
         Dim threshold = oil.sliders.trackbar(2).Value

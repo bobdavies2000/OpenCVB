@@ -25,7 +25,7 @@ Public Class Etch_ASketch : Inherits VBparent
         task.desc = "Use OpenCV to simulate the Etch-a-Sketch Toy"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        keys.Run(src)
+        keys.RunClass(src)
         Dim Input = New List(Of String)(keys.keyInput)
 
         If check.Box(1).Checked Then

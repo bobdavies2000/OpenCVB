@@ -42,7 +42,7 @@ Public Class PCA_Depth : Inherits VBparent
         task.desc = "Reconstruct a depth stream as a composite of X images."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        pca.Run(task.RGBDepth)
+        pca.RunClass(task.RGBDepth)
         dst2 = pca.dst2
     End Sub
 End Class

@@ -9,4 +9,4 @@ def on_draw():
     window.clear()
     image.blit(0, 0)
 
-pyglet.app.run()
+pyglet.app.Run()

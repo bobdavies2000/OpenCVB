@@ -128,7 +128,7 @@ Public Class OpticalFlow_DenseBasics : Inherits VBparent
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If task.frameCount > 0 Then
-            optFlow.Run(src)
+            optFlow.RunClass(src)
 
             Dim hsv = opticalFlow_Dense(oldGray, src, optFlow.pyrScale, optFlow.levels, optFlow.winSize, optFlow.iterations, optFlow.polyN,
                                         optFlow.polySigma, optFlow.OpticalFlowFlags)
@@ -167,8 +167,8 @@ Public Class OpticalFlow_DenseBasics_MT : Inherits VBparent
         Static oldGray As New cv.Mat
 
         If task.frameCount > 0 Then
-            grid.Run(Nothing)
-            optFlow.Run(src)
+            grid.RunClass(Nothing)
+            optFlow.RunClass(src)
 
             Dim CCthreshold = CSng(thresholdSlider.Value / thresholdSlider.Maximum)
             Parallel.For(0, grid.borderList.Count,
@@ -263,7 +263,7 @@ Public Class OpticalFlow_Sparse : Inherits VBparent
         End If
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        good.Run(src)
+        good.RunClass(src)
         features = good.goodFeatures
         Dim features1 = New cv.Mat(features.Count, 1, cv.MatType.CV_32FC2, features.ToArray)
         Dim features2 = New cv.Mat

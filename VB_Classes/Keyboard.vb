@@ -18,7 +18,7 @@ Public Class Keyboard_Basics : Inherits VBparent
                 inputText += keyInput(i).ToString()
             Next
             If inputText <> "" Then flow.msgs.Add(inputText)
-            flow.Run(Nothing)
+            flow.RunClass(Nothing)
         End If
     End Sub
 End Class

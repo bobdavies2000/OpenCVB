@@ -8,7 +8,7 @@ Public Class Correlation_Basics : Inherits VBparent
         task.desc = "Compute a correlation for src rows (See also: MatchTemplate.vb"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        kFlood.Run(src)
+        kFlood.RunClass(src)
         dst1 = kFlood.dst2
         dst2 = kFlood.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Dim split = task.pointCloud.Split()

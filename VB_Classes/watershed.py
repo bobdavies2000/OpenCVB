@@ -79,4 +79,4 @@ if __name__ == '__main__':
         fn = sys.argv[1]
     except:
         fn = '../Data/fruits.jpg'
-    App(cv.samples.findFile(fn)).run()
+    App(cv.samples.findFile(fn)).Run()

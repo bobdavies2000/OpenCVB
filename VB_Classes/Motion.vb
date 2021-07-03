@@ -26,7 +26,7 @@ Public Class Motion_Basics : Inherits VBparent
 
         src = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
 
-        diff.Run(src)
+        diff.RunClass(src)
         dst3 = diff.dst3
         changedPixels = dst3.CountNonZero()
         cumulativePixels += changedPixels
@@ -37,7 +37,7 @@ Public Class Motion_Basics : Inherits VBparent
             task.depthOptionsChanged = False
         End If
 
-        contours.Run(dst3)
+        contours.RunClass(dst3)
 
         dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         If contours.contourlist.Count Then
@@ -50,7 +50,7 @@ Public Class Motion_Basics : Inherits VBparent
                 If r.Y + r.Height > dst3.Height Then r.Height = dst3.Height - r.Y
                 intersect.inputRects.Add(r)
             Next
-            intersect.Run(src)
+            intersect.RunClass(src)
 
             If dst3.Channels = 1 Then dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             For Each r In intersect.enclosingRects
@@ -94,7 +94,7 @@ Public Class Motion_WithBlurDilate : Inherits VBparent
         Static persistSlider = findSlider("Frames to persist")
 
         dst2 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
-        blur.Run(dst2)
+        blur.RunClass(dst2)
         dst2 = blur.dst2
 
         Static delayCounter = 0
@@ -105,14 +105,14 @@ Public Class Motion_WithBlurDilate : Inherits VBparent
             rectList.Clear()
         End If
 
-        diff.Run(dst2)
+        diff.RunClass(dst2)
         dst3 = diff.dst3
         changedPixels = dst3.CountNonZero()
         cumulativePixels += changedPixels
 
-        dilate.Run(dst3)
+        dilate.RunClass(dst3)
 
-        contours.Run(dilate.dst2)
+        contours.RunClass(dilate.dst2)
 
         For Each c In contours.contourlist
             Dim r = cv.Cv2.BoundingRect(c)
@@ -156,7 +156,7 @@ Public Class Motion_MinMaxDepth : Inherits VBparent
         Dim input = src
         If input.Type <> cv.MatType.CV_32FC1 Then input = task.depth32f.Clone
 
-        motion.Run(task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        motion.RunClass(task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst3 = motion.dst3.Clone
 
         If motion.resetAll Or externalReset Then
@@ -195,7 +195,7 @@ Public Class Motion_MinMaxPointCloud : Inherits VBparent
         Dim input = src.Clone
         If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud
         Dim split = input.Split()
-        stable.Run(split(2) * 1000)
+        stable.RunClass(split(2) * 1000)
 
         dst2 = stable.dst2
         dst3 = stable.dst3
@@ -232,10 +232,10 @@ Public Class Motion_MinMaxDepthColorized : Inherits VBparent
         Static saveMin = task.minDepth
         Static saveMax = task.maxDepth
         If saveMin <> task.minDepth Or saveMax <> task.maxDepth Then stable.externalReset = True
-        stable.Run(src)
+        stable.RunClass(src)
         dst2 = stable.dst2
 
-        colorize.Run(dst2)
+        colorize.RunClass(dst2)
         dst3 = colorize.dst2
     End Sub
 End Class
@@ -266,7 +266,7 @@ Public Class Motion_ThruCorrelation : Inherits VBparent
         Dim ccThreshold = ccSlider.value
         Dim stdevThreshold = stdevSlider.value
 
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
 
         Dim input = src.Clone
         If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -319,7 +319,7 @@ Public Class Motion_CCmerge : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount < 10 Then dst2 = src.Clone
 
-        motionCC.Run(src)
+        motionCC.RunClass(src)
 
         Static lastFrame = src.Clone
         If motionCC.dst3.CountNonZero() > src.Total / 2 Then

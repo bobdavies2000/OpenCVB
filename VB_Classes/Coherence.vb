@@ -87,7 +87,7 @@ Public Class Coherence_Depth : Inherits VBparent
         task.desc = "Find coherent lines in the depth image - Painterly"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        coherent.Run(task.RGBDepth)
+        coherent.RunClass(task.RGBDepth)
         dst2 = coherent.dst2
     End Sub
 End Class

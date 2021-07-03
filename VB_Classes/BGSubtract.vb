@@ -122,7 +122,7 @@ Public Class BGSubtract_Basics_MT : Inherits VBparent
         task.desc = "Detect Motion in the color image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
         Dim input = src
         If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         dst2 = input.EmptyClone.SetTo(0)
@@ -159,7 +159,7 @@ Public Class BGSubtract_Depth_MT : Inherits VBparent
         labels(3) = "Accumulated depth image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        bgsub.Run(task.RGBDepth)
+        bgsub.RunClass(task.RGBDepth)
         dst2 = task.RGBDepth
         dst3 = bgsub.dst3
         dst3.SetTo(0, task.noDepthMask)
@@ -282,8 +282,8 @@ Public Class BGSubtract_MOG_Retina : Inherits VBparent
         task.desc = "Use the bio-inspired retina algorithm to create a background/foreground using depth."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        retina.Run(task.RGBDepth)
-        bgSub.Run(retina.dst3.Clone())
+        retina.RunClass(task.RGBDepth)
+        bgSub.RunClass(retina.dst3.Clone())
         dst2 = bgSub.dst2
         cv.Cv2.Subtract(bgSub.dst2, retina.dst3, dst3)
     End Sub
@@ -298,7 +298,7 @@ Public Class BGSubtract_DepthOrColorMotion : Inherits VBparent
         task.desc = "Detect motion with both depth and color changes"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        motion.Run(src)
+        motion.RunClass(src)
         dst2 = motion.dst2
         dst3 = motion.dst3
         Dim mask = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs()
@@ -347,9 +347,9 @@ Public Class BGSubtract_Video : Inherits VBparent
         task.desc = "Demonstrate all background subtraction algorithms in OpenCV using a video instead of camera."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        video.Run(src)
+        video.RunClass(src)
         dst3 = video.dst2
-        bgfg.Run(dst3)
+        bgfg.RunClass(dst3)
         dst2 = bgfg.dst2
     End Sub
 End Class
@@ -416,9 +416,9 @@ Public Class BGSubtract_Synthetic : Inherits VBparent
         task.desc = "Demonstrate background subtraction algorithms with synthetic images - Painterly"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        synth.Run(src)
+        synth.RunClass(src)
         dst3 = synth.dst2
-        bgfg.Run(dst3)
+        bgfg.RunClass(dst3)
         dst2 = bgfg.dst2
     End Sub
 End Class

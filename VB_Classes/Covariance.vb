@@ -9,7 +9,7 @@ Public Class Covariance_Basics : Inherits VBparent
         Dim covariance As New cv.Mat, mean = New cv.Mat
         dst3.SetTo(0)
         If standalone Or task.intermediateName = caller Then
-            random.Run(Nothing)
+            random.RunClass(Nothing)
             samples = New cv.Mat(random.Points.Length, 2, cv.MatType.CV_32F, random.Points2f)
             For i = 0 To random.Points.Length - 1
                 dst3.Circle(random.Points(i), 3, cv.Scalar.White, -1, task.lineType)
@@ -48,7 +48,7 @@ Public Class Covariance_Test : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim testInput() As Double = {1.5, 2.3, 3.0, 1.7, 1.2, 2.9, 2.1, 2.2, 3.1, 3.1, 1.3, 2.7, 2.0, 1.7, 1.0, 2.0, 0.5, 0.6, 1.0, 0.9}
         covar.samples = New cv.Mat(10, 2, cv.MatType.CV_64F, testInput)
-        covar.Run(src)
+        covar.RunClass(src)
         setTrueText("Results should be a symmetric array with 2.1 and -2.1", 20, 150)
     End Sub
 End Class

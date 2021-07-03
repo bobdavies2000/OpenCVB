@@ -44,7 +44,7 @@ Public Class Features_PointTracker : Inherits VBparent
         task.desc = "Find good features and track them"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        features.Run(src)
+        features.RunClass(src)
         dst2 = features.dst2
 
         pTrack.queryPoints.Clear()
@@ -59,7 +59,7 @@ Public Class Features_PointTracker : Inherits VBparent
             pTrack.queryMasks.Add(New cv.Mat)
         Next
 
-        pTrack.Run(src)
+        pTrack.RunClass(src)
 
         dst3.SetTo(0)
         For Each obj In pTrack.drawRC.viewObjects

@@ -95,7 +95,7 @@ Public Class Retina_Depth : Inherits VBparent
         labels(3) = "Current depth motion result"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        retina.Run(task.RGBDepth)
+        retina.RunClass(task.RGBDepth)
         dst3 = retina.dst3
         Static lastMotion As New cv.Mat
         If lastMotion.Width = 0 Then lastMotion = retina.dst3

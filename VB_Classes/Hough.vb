@@ -47,7 +47,7 @@ Public Class Hough_Circles : Inherits VBparent
         task.desc = "Find circles using HoughCircles."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        circles.Run(src)
+        circles.RunClass(src)
         dst2 = circles.dst2
         Static Dim method As Integer = 3
         cv.Cv2.CvtColor(dst2, dst3, cv.ColorConversionCodes.BGR2GRAY)
@@ -79,7 +79,7 @@ Public Class Hough_Lines : Inherits VBparent
     End Sub
 
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        edges.Run(src)
+        edges.RunClass(src)
 
         Dim rhoIn = sliders.trackbar(0).Value
         Dim thetaIn = sliders.trackbar(1).Value / 1000
@@ -126,9 +126,9 @@ Public Class Hough_Lines_MT : Inherits VBparent
     End Sub
 
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
 
-        edges.Run(src)
+        edges.RunClass(src)
         dst2 = edges.dst2
 
         Dim rhoIn = sliders.trackbar(0).Value

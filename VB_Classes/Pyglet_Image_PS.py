@@ -38,4 +38,4 @@ image = None
 imageReady = False
 pyThread = PyStreamThread()
 pyglet.clock.schedule_interval(update, 1/30) # schedule 30 times per second
-pyglet.app.run()
+pyglet.app.Run()

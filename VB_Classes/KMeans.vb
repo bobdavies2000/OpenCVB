@@ -118,7 +118,7 @@ Public Class KMeans_BasicsFast : Inherits VBparent
         Dim small8uC3 = src.Resize(New cv.Size(CInt(src.Rows / resizeFactor), CInt(src.Cols / resizeFactor)))
         Dim small32fC3 As New cv.Mat
         small8uC3.ConvertTo(small32fC3, cv.MatType.CV_32FC3)
-        km.Run(small32fC3)
+        km.RunClass(small32fC3)
         dst2 = km.dst2.Resize(dst2.Size())
     End Sub
 End Class
@@ -147,7 +147,7 @@ Public Class KMeans_DepthPlusGray : Inherits VBparent
 
         Dim merge As New cv.Mat
         cv.Cv2.Merge(grayPlus, merge)
-        km.Run(merge)
+        km.RunClass(merge)
         dst2 = km.dst2
         dst2.SetTo(0, task.noDepthMask)
     End Sub
@@ -167,7 +167,7 @@ Public Class KMeans_Depth : Inherits VBparent
         Static kSlider = findSlider("kMeans k")
         Dim kMeansK = kSlider.value
 
-        km.Run(task.depth32f)
+        km.RunClass(task.depth32f)
         dst2 = km.dst2
         dst2.SetTo(0, task.noDepthMask)
     End Sub
@@ -196,7 +196,7 @@ Public Class KMeans_DepthPlusColor : Inherits VBparent
 
         Dim merge As New cv.Mat
         cv.Cv2.Merge(split, merge)
-        km.Run(merge)
+        km.RunClass(merge)
         dst2 = km.dst2
         dst2.SetTo(0, task.noDepthMask)
     End Sub
@@ -227,10 +227,10 @@ Public Class KMeans_k2_to_k8 : Inherits VBparent
         For i = 0 To 3
             kSlider.value = Choose(i + 1, 2, 4, 6, 8)
             Dim km = Choose(i + 1, km2, km4, km6, km8)
-            km.Run(rgb32f)
+            km.RunClass(rgb32f)
             Mats.mat(i) = km.dst2.Clone
         Next
-        Mats.Run(src)
+        Mats.RunClass(src)
         dst2 = Mats.dst2
         dst3 = Mats.dst3
     End Sub
@@ -252,7 +252,7 @@ Public Class KMeans_Depth_FG_BG : Inherits VBparent
         task.desc = "Separate foreground and background using Kmeans (with k=2) using the depth value of center point."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        km.Run(task.depth32f)
+        km.RunClass(task.depth32f)
 
         Dim minDistance = Single.MaxValue
         Dim minIndex As Integer
@@ -287,7 +287,7 @@ Public Class KMeans_LAB : Inherits VBparent
         Dim labMat = task.color.CvtColor(cv.ColorConversionCodes.RGB2Lab)
         Dim lab32f As New cv.Mat
         labMat.ConvertTo(lab32f, cv.MatType.CV_32FC3)
-        km.Run(lab32f)
+        km.RunClass(lab32f)
         dst2 = km.dst2
     End Sub
 End Class
@@ -306,9 +306,9 @@ Public Class KMeans_Fuzzy : Inherits VBparent
         task.desc = "Use the KMeans output as input to the Fuzzy detector"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        km.Run(src)
+        km.RunClass(src)
         dst2 = km.dst2
-        fuzzyD.Run(km.dst2)
+        fuzzyD.RunClass(km.dst2)
         dst3 = fuzzyD.dst3
     End Sub
 End Class
@@ -337,12 +337,12 @@ End Class
 '            Next
 '        End If
 
-'        km.Run(src)
+'        km.RunClass(src)
 '        dst2 = km.dst2
 
 '        dst3.SetTo(0)
 '        For i = 0 To k - 1
-'            ccomp(i).Run(km.masks(i))
+'            ccomp(i).RunClass(km.masks(i))
 '            cv.Cv2.BitwiseOr(dst3, ccomp(i).dst3, dst3)
 '        Next
 '    End Sub
@@ -361,7 +361,7 @@ End Class
 '        task.desc = "A second, better attempt at coloring an entire image with connected components.  All masks are available."
 '    End Sub
 '    Public Sub Run(src As cv.Mat) ' Rank = 1
-'        km.Run(src)
+'        km.RunClass(src)
 '        dst2 = km.dst2
 
 '        dst3.SetTo(0)
@@ -372,7 +372,7 @@ End Class
 '            dst3(r).SetTo(cv.Scalar.All((i + 1) * incr), m)
 '        Next
 
-'        task.palette.Run(dst3)
+'        task.palette.RunClass(dst3)
 '        dst3 = task.palette.dst2
 '    End Sub
 'End Class
@@ -424,7 +424,7 @@ End Class
 '            Next
 '        End If
 
-'        km.Run(src)
+'        km.RunClass(src)
 '        dst2 = km.dst2
 
 '        masks.Clear()
@@ -434,12 +434,12 @@ End Class
 '        dst3.SetTo(0)
 '        allElseMask = New cv.Mat(src.Size, cv.MatType.CV_8U, 255)
 '        For i = 0 To k - 1
-'            ccomp(i).Run(km.masks(i))
+'            ccomp(i).RunClass(km.masks(i))
 '            splitKMaskWithCComp(i)
 '        Next
 
 '        If allElseMask.CountNonZero() > 0 Then
-'            ccomp(k).Run(allElseMask)
+'            ccomp(k).RunClass(allElseMask)
 '            splitKMaskWithCComp(k)
 '        End If
 
@@ -485,16 +485,16 @@ End Class
 '        Static ccLabels(k - 1) As cv.Mat
 '        If ccLabels.Length <> k Then ReDim ccLabels(k - 1)
 
-'        km.Run(src)
+'        km.RunClass(src)
 '        dst1 = km.dst2
 
 '        For i = 0 To k - 1
-'            ccomp.Run(km.masks(i))
+'            ccomp.RunClass(km.masks(i))
 '            ccLabels(i) = ccomp.cclabels.Clone
 '            If i < 4 Then mats.mat(i) = ccomp.dst3
 '        Next
 
-'        mats.Run(Nothing)
+'        mats.RunClass(Nothing)
 '        dst2 = mats.dst2
 
 '        If task.mouseClickFlag Then mousePoint = task.mouseClickPoint
@@ -525,13 +525,13 @@ Public Class KMeans_FloodFill : Inherits VBparent
         task.desc = "Use each KMeans mask with floodfill to identify each segment in the image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 4
-        edges.Run(src)
+        edges.RunClass(src)
         src.SetTo(cv.Scalar.White, edges.dst2)
 
-        km.Run(src)
+        km.RunClass(src)
         dst1 = km.dst2
 
-        flood.Run(km.dst2)
+        flood.RunClass(km.dst2)
         If flood.rects.Count = 0 Then Exit Sub ' image is likely very dark and nothing is actually seen...
         dst2 = flood.dst2
 
@@ -556,10 +556,10 @@ Public Class KMeans_FloodFillDepth : Inherits VBparent
         task.desc = "Use KMeans with depth and find masks with floodfill"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 4
-        km.Run(src)
+        km.RunClass(src)
         dst1 = km.dst2
 
-        flood.Run(km.dst2)
+        flood.RunClass(km.dst2)
         If flood.rects.Count = 0 Then Exit Sub ' image is likely very dark and no rects were found
         dst2 = flood.dst2
 

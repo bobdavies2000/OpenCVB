@@ -11,7 +11,7 @@ Public Class Coherent_Basics : Inherits VBparent
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        flood.Run(src)
+        flood.RunClass(src)
 
         Static lastCount = flood.lastPoints.Count
         Static lastFrame = flood.dst2.Clone
@@ -22,7 +22,7 @@ Public Class Coherent_Basics : Inherits VBparent
             For i = 0 To flood.lastRects.Count - 1
                 Dim rect = flood.lastRects(i)
                 Dim mask = flood.lastMasks(i)(rect)
-                pixel.Run(lastFrame(rect).Clone.setto(0, 255 - mask))
+                pixel.RunClass(lastFrame(rect).Clone.setto(0, 255 - mask))
                 dst2(rect).SetTo(pixel.dominantGray, mask)
             Next
             lastFrame = dst2.Clone
@@ -30,7 +30,7 @@ Public Class Coherent_Basics : Inherits VBparent
         lastCount = flood.lastPoints.Count
 
         If standalone Then
-            task.palette.Run(dst2)
+            task.palette.RunClass(dst2)
             dst3 = task.palette.dst2
         End If
         labels(2) = CStr(flood.lastRects.Count) + " regions identified in the last frame"
@@ -58,7 +58,7 @@ Public Class Coherent_FloodFill : Inherits VBparent
         Static minSlider = findSlider("FloodFill Minimum Size")
         Dim threshold = minSlider.value
 
-        basics.Run(src)
+        basics.RunClass(src)
 
         Dim queryPoints = New List(Of cv.Point2f)
         For Each r In basics.rects
@@ -67,7 +67,7 @@ Public Class Coherent_FloodFill : Inherits VBparent
 
         knn.basics.knnQT.queryPoints = New List(Of cv.Point2f)(queryPoints)
         knn.basics.knnQT.trainingPoints = New List(Of cv.Point2f)(lastPoints)
-        knn.Run(src)
+        knn.RunClass(src)
 
         If task.cameraStable = False Or task.frameCount = 0 Then
             dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC1, 0)
@@ -142,9 +142,9 @@ Public Class Coherent_Palette : Inherits VBparent
         task.desc = "Highlight a consistent 8-bit grayscale image regions with a palette"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        flood.Run(src)
+        flood.RunClass(src)
 
-        task.palette.Run(flood.dst2)
+        task.palette.RunClass(flood.dst2)
         dst2 = task.palette.dst2
         labels(2) = flood.labels(2)
     End Sub
@@ -166,7 +166,7 @@ Public Class Coherent_Pixel : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
-        flood.Run(src)
+        flood.RunClass(src)
 
         Static lastFrame As cv.Mat
         If task.cameraStable = False Or task.frameCount = 0 Then
@@ -176,7 +176,7 @@ Public Class Coherent_Pixel : Inherits VBparent
         For i = 0 To flood.rects.Count - 1
             Dim rect = flood.rects(i)
             Dim mask = flood.masks(i)(rect)
-            pixel.Run(lastFrame(rect).Clone.SetTo(0, 255 - mask))
+            pixel.RunClass(lastFrame(rect).Clone.SetTo(0, 255 - mask))
             dst2(rect).SetTo(pixel.dominantGray, mask)
         Next
         labels(2) = CStr(flood.rects.Count) + " regions identified in the last frame"

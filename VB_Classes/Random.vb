@@ -63,10 +63,10 @@ Public Class Random_LUTMask : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static lutMat As cv.Mat
         If lutMat Is Nothing Or task.frameCount Mod 10 = 0 Then
-            random.Run(Nothing)
+            random.RunClass(Nothing)
             lutMat = cv.Mat.Zeros(New cv.Size(1, 256), cv.MatType.CV_8UC3)
             Dim lutIndex = 0
-            km.Run(src)
+            km.RunClass(src)
             dst2 = km.dst2
             For i = 0 To random.Points.Length - 1
                 Dim x = random.Points(i).X
@@ -138,10 +138,10 @@ Public Class Random_CheckUniformSmoothed : Inherits VBparent
         task.desc = "Display the smoothed histogram for a uniform distribution."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        rUniform.Run(src)
+        rUniform.RunClass(src)
         dst2 = rUniform.dst2
         histogram.plotHist.maxRange = 255
-        histogram.Run(dst2)
+        histogram.RunClass(dst2)
         dst3 = histogram.dst2
     End Sub
 End Class
@@ -158,10 +158,10 @@ Public Class Random_CheckUniformDist : Inherits VBparent
         task.desc = "Display the histogram for a uniform distribution."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        rUniform.Run(src)
+        rUniform.RunClass(src)
         dst2 = rUniform.dst2
         histogram.plotRequested = True
-        histogram.Run(dst2)
+        histogram.RunClass(dst2)
         dst3 = histogram.dst2
     End Sub
 End Class
@@ -178,10 +178,10 @@ Public Class Random_CheckNormalDist : Inherits VBparent
         task.desc = "Display the histogram for a Normal distribution."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        normalDist.Run(src)
+        normalDist.RunClass(src)
         dst2 = normalDist.dst2
         histogram.plotRequested = True
-        histogram.Run(dst2)
+        histogram.RunClass(dst2)
         dst3 = histogram.dst2
     End Sub
 End Class
@@ -198,9 +198,9 @@ Public Class Random_CheckNormalDistSmoothed : Inherits VBparent
         task.desc = "Display the histogram for a Normal distribution."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        normalDist.Run(src)
+        normalDist.RunClass(src)
         dst2 = normalDist.dst2
-        histogram.Run(dst2)
+        histogram.RunClass(dst2)
         dst3 = histogram.dst2
     End Sub
 End Class
@@ -300,7 +300,7 @@ Public Class Random_CustomDistribution : Inherits VBparent
 
         If standalone Or task.intermediateName = caller Then
             plotHist.hist = outputHistogram
-            plotHist.Run(src)
+            plotHist.RunClass(src)
             dst2 = plotHist.dst2
         End If
     End Sub
@@ -341,7 +341,7 @@ Public Class Random_MonteCarlo : Inherits VBparent
 
         If standalone Or task.intermediateName = caller Then
             plotHist.hist = histogram
-            plotHist.Run(src)
+            plotHist.RunClass(src)
             dst2 = plotHist.dst2
         End If
     End Sub
@@ -367,17 +367,17 @@ Public Class Random_CustomHistogram : Inherits VBparent
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         hist.plotHist.plotMaxValue = 0 ' we are sharing the plothist with the code below...
-        hist.Run(src)
+        hist.RunClass(src)
         dst2 = hist.dst2.Clone()
         saveHist = hist.plotHist.hist.Clone()
 
         random.inputCDF = saveHist ' it will convert the histogram into a cdf where the last value must be near one.
-        random.Run(src)
+        random.RunClass(src)
 
         If standalone Or task.intermediateName = caller Then
             hist.plotHist.plotMaxValue = 100
             hist.plotHist.hist = random.outputHistogram
-            hist.plotHist.Run(src)
+            hist.plotHist.RunClass(src)
             dst3 = hist.plotHist.dst2
         End If
     End Sub
@@ -442,7 +442,7 @@ Public Class Random_60sTVFaster : Inherits VBparent
 
         dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        random.Run(src)
+        random.RunClass(src)
         mats.mat(0) = random.dst2.Threshold(255 - percentSlider.value * 255 / 100, 255, cv.ThresholdTypes.Binary)
         Dim nochangeMask = random.dst2.Threshold(255 - percentSlider.value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
 
@@ -450,7 +450,7 @@ Public Class Random_60sTVFaster : Inherits VBparent
         cv.Cv2.Randu(valMat, 0, valSlider.value)
         valMat.SetTo(0, nochangeMask)
 
-        random.Run(src)
+        random.RunClass(src)
         Dim plusMask = random.dst2.Threshold(128, 255, cv.ThresholdTypes.Binary)
         Dim minusMask = random.dst2.Threshold(128, 255, cv.ThresholdTypes.BinaryInv)
 
@@ -460,7 +460,7 @@ Public Class Random_60sTVFaster : Inherits VBparent
 
         cv.Cv2.Add(dst2, valMat, dst2, plusMask)
         cv.Cv2.Subtract(dst2, valMat, dst2, minusMask)
-        mats.Run(src)
+        mats.RunClass(src)
         dst3 = mats.dst2
     End Sub
 End Class
@@ -484,7 +484,7 @@ Public Class Random_60sTVFastSimple : Inherits VBparent
 
         dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        random.Run(src)
+        random.RunClass(src)
         Dim nochangeMask = random.dst2.Threshold(255 - percentSlider.value * 255 / 100, 255, cv.ThresholdTypes.BinaryInv)
 
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
@@ -522,9 +522,9 @@ Public Class Random_KalmanPoints : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
         If refreshPoints Then
-            random.Run(Nothing)
+            random.RunClass(Nothing)
             knn.lastSet = New List(Of cv.Point2f)(random.Points2f)
-            random.Run(Nothing) ' now find the new locations.
+            random.RunClass(Nothing) ' now find the new locations.
             knn.currSet = New List(Of cv.Point2f)(random.Points2f)
             refreshPoints = False
 
@@ -540,7 +540,7 @@ Public Class Random_KalmanPoints : Inherits VBparent
             Next
         End If
 
-        kalman.Run(src)
+        kalman.RunClass(src)
         For i = 0 To kalman.kOutput.Count - 1 Step 2
             knn.currSet(i / 2) = New cv.Point2f(kalman.kOutput(i), kalman.kOutput(i + 1))
         Next

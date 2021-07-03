@@ -51,7 +51,7 @@ Public Class InPaint_Noise : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod 100 Then Exit Sub ' give them time to review the inpaint results
-        noise.Run(src) ' create some noise in the result1 image.
+        noise.RunClass(src) ' create some noise in the result1 image.
         dst2 = noise.dst2
         Dim inPaintFlag = If(radio.check(0).Checked, cv.InpaintMethod.Telea, cv.InpaintMethod.NS)
         cv.Cv2.Inpaint(dst2, noise.noiseMask, dst3, noise.maxNoiseWidth, inPaintFlag)

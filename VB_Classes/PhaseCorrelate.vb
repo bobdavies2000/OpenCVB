@@ -84,9 +84,9 @@ Public Class PhaseCorrelate_BasicsTest : Inherits VBparent
         task.desc = "Test the PhaseCorrelate_Basics with random movement"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        random.Run(src)
+        random.RunClass(src)
 
-        stable.Run(random.dst3.Clone)
+        stable.RunClass(random.dst3.Clone)
 
         dst2 = stable.dst2
         dst3 = stable.dst3
@@ -109,7 +109,7 @@ Public Class PhaseCorrelate_Depth : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static lastFrame = task.depth32f.Clone
-        phaseC.Run(task.depth32f)
+        phaseC.RunClass(task.depth32f)
         dst2 = task.depth32f
         Dim tmp = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         If phaseC.resetLastFrame Then task.depth32f.CopyTo(lastFrame)

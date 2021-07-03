@@ -8,7 +8,7 @@ Public Class Entropy_Basics : Inherits VBparent
         task.desc = "Compute the entropy in an image - a measure of contrast(iness)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        simple.run(src)
+        simple.RunClass(src)
         entropy = 0
         Dim entropyChannels As String = ""
         For i = 0 To src.Channels - 1
@@ -19,7 +19,7 @@ Public Class Entropy_Basics : Inherits VBparent
         If standalone Or task.intermediateName = caller Then
             Static flow = New Font_FlowText()
             flow.msgs.Add("Entropy total = " + Format(entropy, "0.00") + " - " + entropyChannels)
-            flow.Run(Nothing)
+            flow.RunClass(Nothing)
         End If
     End Sub
 End Class
@@ -41,14 +41,14 @@ Public Class Entropy_Highest : Inherits VBparent
         task.desc = "Find the highest entropy section of the color image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
 
         Dim entropyMap = New cv.Mat(src.Size(), cv.MatType.CV_32F)
         Dim entropyList(grid.roiList.Count - 1) As Single
         Dim maxEntropy As Single = Single.MinValue
         Dim minEntropy As Single = Single.MaxValue
         For Each roi In grid.roiList
-            entropyCalc.Run(src(roi))
+            entropyCalc.RunClass(src(roi))
             entropyMap(roi).SetTo(entropyCalc.entropy)
 
             If entropyCalc.entropy > maxEntropy Then
@@ -61,7 +61,7 @@ Public Class Entropy_Highest : Inherits VBparent
         dst3 = entropyMap.ConvertScaleAbs(255 / (maxEntropy - minEntropy), minEntropy)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         addw.src2 = src
-        addw.Run(dst3)
+        addw.RunClass(dst3)
         dst3 = addw.dst2
 
         Dim tmp = entropyMap.ConvertScaleAbs(255 / (maxEntropy - minEntropy))
@@ -88,9 +88,9 @@ Public Class Entropy_FAST : Inherits VBparent
         task.desc = "Use FAST markings to add to entropy"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        fast.Run(src)
+        fast.RunClass(src)
 
-        entropy.Run(fast.dst2)
+        entropy.RunClass(fast.dst2)
         dst2 = entropy.dst2
         dst3 = entropy.dst3
         dst3.Rectangle(entropy.eMaxRect, cv.Scalar.Red, 4)

@@ -47,7 +47,7 @@ Public Class Distance_Foreground : Inherits VBparent
         Static cRadio = findRadio("C")
         Static l1Radio = findRadio("L1")
 
-        foreground.Run(src)
+        foreground.RunClass(src)
         dst3 = If(useBackgroundAsInput, foreground.dst2, foreground.dst3)
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -78,7 +78,7 @@ Public Class Distance_Background : Inherits VBparent
         task.desc = "Use distance algorithm on the background"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        dist.Run(src)
+        dist.RunClass(src)
         dst2 = dist.dst2
         dst3 = dist.dst3
         labels(2) = dist.labels(2)

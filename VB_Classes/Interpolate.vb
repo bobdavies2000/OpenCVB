@@ -13,7 +13,7 @@ Public Class Interpolate_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static percentSlider = findSlider("Resize % (Grab to control)")
-        flags.Run(Nothing)
+        flags.RunClass(Nothing)
 
         If standalone Then
             Static userGrab As Boolean
@@ -57,7 +57,7 @@ Public Class Interpolate_Kalman : Inherits VBparent
         Static updatedFrames As Integer
         Static radioSelection As Integer
 
-        inter.Run(src)
+        inter.RunClass(src)
         dst2 = inter.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If dst2.Width * dst2.Height <> kalman.kInput.Length Or radioSelection <> inter.flags.radioIndex Then
             ReDim kalman.kInput(dst2.Width * dst2.Height - 1)
@@ -74,7 +74,7 @@ Public Class Interpolate_Kalman : Inherits VBparent
             Next
         Next
 
-        kalman.Run(Nothing)
+        kalman.RunClass(Nothing)
 
         i = 0
         For y = 0 To dst2.Height - 1
@@ -121,8 +121,8 @@ Public Class Interpolate_Lines : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static thresholdSlider = findSlider("Interpolation threshold")
-        inter.Run(src)
-        lines.Run(inter.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Resize(dst3.Size).Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary))
+        inter.RunClass(src)
+        lines.RunClass(inter.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Resize(dst3.Size).Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary))
         dst2 = lines.dst2
         dst3 = src
         For i = 0 To lines.pt1List.Count - 1

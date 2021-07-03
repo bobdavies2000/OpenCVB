@@ -20,7 +20,7 @@ Public Class FitEllipse_Basics_CPP : Inherits VBparent
         task.desc = "Use FitEllipse to draw around a set of points"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        area.Run(src)  ' get some random clusters of points
+        area.RunClass(src)  ' get some random clusters of points
         dst2.SetTo(0)
         If area.srcPoints.Count >= 5 Then
             Dim box = cv.Cv2.FitEllipse(area.srcPoints)

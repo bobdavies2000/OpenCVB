@@ -17,7 +17,7 @@ Public Class Fitline_Basics : Inherits VBparent
         Static angleSlider = findSlider("Accuracy for the angle X100")
 
         If standalone Or task.intermediateName = caller Then
-            draw.Run(src)
+            draw.RunClass(src)
             dst3 = draw.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
             dst2 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         Else
@@ -54,7 +54,7 @@ Public Class Fitline_3DBasics_MT : Inherits VBparent
         labels(3) = "White is featureless RGB, blue depth shadow"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        hlines.Run(src)
+        hlines.RunClass(src)
         dst3 = hlines.dst3
         Dim mask = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
         dst3 = mask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -199,7 +199,7 @@ Public Class Fitline_EigenFit : Inherits VBparent
             'If noisyLine.sliders.trackbar(0).Value <> noisePointCount Or noisyLine.sliders.trackbar(1).Value <> linePointCount Or
             '    noisyLine.sliders.trackbar(2).Value <> lineNoise Or noisyLine.check.Box(0).Checked <> highlight Or noisyLine.check.Box(1).Checked Then
             noisyLine.check.Box(1).Checked = True
-            noisyLine.Run(src)
+            noisyLine.RunClass(src)
             dst3 = noisyLine.dst2
             dst2.SetTo(0)
             noisyLine.check.Box(1).Checked = False

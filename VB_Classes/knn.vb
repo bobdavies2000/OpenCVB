@@ -15,9 +15,9 @@ Public Class KNN_Basics : Inherits VBparent
         dst2.SetTo(cv.Scalar.Black)
 
         If standalone Then
-            random.Run(Nothing)
+            random.RunClass(Nothing)
             lastSet = New List(Of cv.Point2f)(random.Points2f)
-            random.Run(Nothing)
+            random.RunClass(Nothing)
             currSet = New List(Of cv.Point2f)(random.Points2f)
         End If
 
@@ -66,7 +66,7 @@ Public Class KNN_BasicsQT : Inherits VBparent
         dst2.SetTo(cv.Scalar.Black)
 
         If standalone Or knnQT.useRandomData Then
-            knnQT.Run(src)
+            knnQT.RunClass(src)
             knnQT.trainingPoints = New List(Of cv.Point2f)(knnQT.randomTrain.Points2f)
             knnQT.queryPoints = New List(Of cv.Point2f)(knnQT.randomQuery.Points2f)
         Else
@@ -132,10 +132,10 @@ Public Class KNN_Options : Inherits VBparent
 
         If useRandomData Then
             randomTrain.countSlider.Value = trainSlider.Value
-            randomTrain.Run(Nothing)
+            randomTrain.RunClass(Nothing)
 
             randomQuery.countSlider.Value = querySlider.Value
-            randomQuery.Run(Nothing)
+            randomQuery.RunClass(Nothing)
         End If
 
         ' algorithm does nothing but provide a location for query/train points when not running standalone.
@@ -175,7 +175,7 @@ Public Class KNN_1_to_1 : Inherits VBparent
         task.desc = "Use knn to find the nearest n points but use only the best and no duplicates - 1:1 mapping."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        basics.Run(src)
+        basics.RunClass(src)
         dst2 = basics.dst2
 
         ReDim matchedPoints(basics.knnQT.queryPoints.Count - 1)
@@ -263,15 +263,15 @@ Public Class KNN_Emax : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone And task.frameCount = 0 Then
             emax = New EMax_Centroids()
-            emax.Run(src) ' set the first generation of points.
+            emax.RunClass(src) ' set the first generation of points.
         End If
         If standalone Or task.intermediateName = caller Then
             knn.basics.knnQT.trainingPoints = New List(Of cv.Point2f)(emax.flood.centroids)
-            emax.Run(src)
+            emax.RunClass(src)
             knn.basics.knnQT.queryPoints = New List(Of cv.Point2f)(emax.flood.centroids)
         End If
 
-        knn.Run(src)
+        knn.RunClass(src)
         If standalone Or task.intermediateName = caller Then
             dst2 = emax.dst2 + knn.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst3 = knn.dst2
@@ -306,7 +306,7 @@ Public Class KNN_Test : Inherits VBparent
         task.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
 
         knn.knnQT.queryPoints.Clear()
         For i = 0 To grid.roiList.Count - 1
@@ -315,7 +315,7 @@ Public Class KNN_Test : Inherits VBparent
             knn.knnQT.queryPoints.Add(pt)
         Next
 
-        knn.Run(src)
+        knn.RunClass(src)
         dst2 = knn.dst2
         knn.knnQT.trainingPoints = New List(Of cv.Point2f)(knn.knnQT.queryPoints)
         labels(2) = knn.labels(2)
@@ -344,7 +344,7 @@ Public Class KNN_Test_1_to_1 : Inherits VBparent
         task.desc = "Assign random values inside a thread grid to test that KNN is properly tracking them."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        grid.Run(Nothing)
+        grid.RunClass(Nothing)
 
         knn.basics.knnQT.queryPoints.Clear()
         For i = 0 To grid.roiList.Count - 1
@@ -353,7 +353,7 @@ Public Class KNN_Test_1_to_1 : Inherits VBparent
             knn.basics.knnQT.queryPoints.Add(pt)
         Next
 
-        knn.Run(src)
+        knn.RunClass(src)
         dst2 = knn.dst2
         knn.basics.knnQT.trainingPoints = New List(Of cv.Point2f)(knn.basics.knnQT.queryPoints)
         labels(2) = knn.labels(2)
@@ -452,15 +452,15 @@ Public Class KNN_DepthClusters : Inherits VBparent
         task.desc = "Use KNN to track and color the Blob results from clustering the depth data"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        blobs.Run(src)
+        blobs.RunClass(src)
         dst2 = blobs.dst3
 
-        flood.Run(dst2)
+        flood.RunClass(dst2)
 
         pTrack.queryPoints = flood.basics.centroids
         pTrack.queryMasks = flood.basics.masks
         pTrack.queryRects = flood.basics.rects
-        pTrack.Run(src)
+        pTrack.RunClass(src)
         dst3 = pTrack.dst2
     End Sub
 End Class
@@ -485,7 +485,7 @@ Public Class KNN_SmoothAverage : Inherits VBparent
         task.desc = "Smooth out the abrupt appearance/disappearance of floodfilled regions"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        knn.Run(src)
+        knn.RunClass(src)
 
         Static accum As New cv.Mat
         If task.frameCount = 0 Then accum = knn.dst3.Clone
@@ -516,7 +516,7 @@ Public Class KNN_StabilizeRegions : Inherits VBparent
         task.desc = "Identify major regions that are unstable - appearing and disappearing"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        knn.Run(src)
+        knn.RunClass(src)
         dst2 = knn.dst3
 
         Dim tmp = knn.dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
@@ -538,7 +538,7 @@ Public Class KNN_Contours : Inherits VBparent
         task.desc = "Use KNN to streamline the outline of a contour"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        outline.Run(src)
+        outline.RunClass(src)
         dst2 = outline.dst3
 
         knn.knnQT.trainingPoints.Clear()
@@ -553,7 +553,7 @@ Public Class KNN_Contours : Inherits VBparent
             Next
         End If
 
-        knn.Run(src)
+        knn.RunClass(src)
 
         Dim queries = New cv.Mat(knn.knnQT.queryPoints.Count, 2, cv.MatType.CV_32F, knn.knnQT.queryPoints.ToArray)
         Dim trainData = New cv.Mat(knn.knnQT.trainingPoints.Count, 2, cv.MatType.CV_32F, knn.knnQT.trainingPoints.ToArray)
@@ -649,7 +649,7 @@ Public Class KNN_Cluster2DCities : Inherits VBparent
                 knn.knn.knnQT.trainingPoints.Add(New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y)))
                 knn.knn.knnQT.queryPoints.Add(New cv.Point2f(CSng(cityPositions(i).X), CSng(cityPositions(i).Y)))
             Next
-            knn.Run(src)
+            knn.RunClass(src)
 
             dst2.SetTo(0)
             cluster(dst2, nearestCountSlider.Value)
@@ -687,7 +687,7 @@ Public Class KNN_Point2d : Inherits VBparent
 
         If standalone Or task.intermediateName = caller Then prepareImage(dst2, task.dotSize)
 
-        knn.Run(src)
+        knn.RunClass(src)
 
         ReDim responseSet(knn.knnQT.queryPoints.Count * findXnearest - 1)
         Dim results As New cv.Mat, neighbors As New cv.Mat, query As New cv.Mat(1, 2, cv.MatType.CV_32F)
@@ -737,7 +737,7 @@ Public Class KNN_Learn : Inherits VBparent
             '''''''''' learn = New KNN_Learn
             '''''''''' Dim neighbors As New cv.Mat
             '''''''''' Dim queries = New cv.Mat(1, 2, cv.MatType.CV_32F, {)
-            '''''''''' knn.run()
+            '''''''''' knn.RunClass()
             '''''''''' learn.knn.FindNearest(queries, 1, neighbors)
         End If
 
@@ -833,7 +833,7 @@ Public Class KNN_PointTracker : Inherits VBparent
         newCentroids.Clear()
 
         knn.basics.knnQT.queryPoints = New List(Of cv.Point2f)(queryPoints)
-        knn.Run(src)
+        knn.RunClass(src)
 
         Dim matches As New List(Of cv.Point2f)(knn.matchedPoints)
         If matches IsNot Nothing Then ' first pass condition.
@@ -861,7 +861,7 @@ Public Class KNN_PointTracker : Inherits VBparent
                     inputRect = queryRects(matchIndex)
                     kalman(i).kInput = {queryPoints(matchIndex).X, queryPoints(matchIndex).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}
                     If task.useKalman Then
-                        kalman(i).Run(src)
+                        kalman(i).RunClass(src)
                     Else
                         kalman(i).kOutput = {queryPoints(matchIndex).X, queryPoints(matchIndex).Y, inputRect.X, inputRect.Y, inputRect.Width, inputRect.Height}
                     End If
@@ -900,7 +900,7 @@ Public Class KNN_PointTracker : Inherits VBparent
             Next
 
             If useDrawRC Then
-                drawRC.Run(src)
+                drawRC.RunClass(src)
                 dst2 = drawRC.dst2
             End If
         End If
@@ -928,9 +928,9 @@ Public Class KNN_1_to_1FIFO : Inherits VBparent
         dst2.SetTo(cv.Scalar.Black)
 
         If standalone Then
-            random.Run(Nothing)
+            random.RunClass(Nothing)
             lastSet = New List(Of cv.Point2f)(random.Points2f)
-            random.Run(Nothing)
+            random.RunClass(Nothing)
             currSet = New List(Of cv.Point2f)(random.Points2f)
         End If
 

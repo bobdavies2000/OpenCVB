@@ -40,7 +40,7 @@ Public Class Reduction_Basics : Inherits VBparent
             dst2 = src
             labels(2) = "No reduction requested"
         End If
-        task.palette.Run(dst2.Clone)
+        task.palette.RunClass(dst2.Clone)
         dst3 = task.palette.dst2
     End Sub
 End Class
@@ -56,9 +56,9 @@ Public Class Reduction_Floodfill : Inherits VBparent
         task.desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        reduction.Run(src)
+        reduction.RunClass(src)
         dst2 = reduction.dst2
-        flood.Run(reduction.dst2)
+        flood.RunClass(reduction.dst2)
         dst3 = flood.dst2
         labels(2) = flood.labels(3)
     End Sub
@@ -79,18 +79,18 @@ Public Class Reduction_KNN_Color : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
-        reduction.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        reduction.RunClass(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst3 = reduction.dst2
 
         pTrack.queryPoints = New List(Of cv.Point2f)(reduction.flood.centroids)
         pTrack.queryRects = New List(Of cv.Rect)(reduction.flood.rects)
         pTrack.queryMasks = New List(Of cv.Mat)(reduction.flood.masks)
-        pTrack.Run(src)
+        pTrack.RunClass(src)
         dst2 = pTrack.dst2
 
         If standalone Then
             highlight.viewObjects = pTrack.drawRC.viewObjects
-            highlight.Run(dst2)
+            highlight.RunClass(dst2)
             dst2 = highlight.dst2
         End If
 
@@ -113,10 +113,10 @@ Public Class Reduction_KNN_ColorAndDepth : Inherits VBparent
         task.desc = "Reduction_KNN finds objects with depth.  This algorithm uses only color on the remaining objects."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        reduction.Run(src)
+        reduction.RunClass(src)
         dst2 = reduction.dst2
 
-        depth.Run(src)
+        depth.RunClass(src)
         dst3 = depth.dst2
     End Sub
 End Class
@@ -142,18 +142,18 @@ Public Class Reduction_SideTopLines : Inherits VBparent
         task.desc = "Present both the top and side view to minimize pixel counts."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        reduction.Run(src)
+        reduction.RunClass(src)
 
-        sideView.Run(src)
-        lDetect.Run(sideView.dst2)
+        sideView.RunClass(src)
+        lDetect.RunClass(sideView.dst2)
 
-        setupSide.Run(lDetect.dst2)
+        setupSide.RunClass(lDetect.dst2)
         dst2 = setupSide.dst2
 
-        topView.Run(src)
-        lDetect.Run(topView.dst2)
+        topView.RunClass(src)
+        lDetect.RunClass(topView.dst2)
 
-        setupTop.Run(lDetect.dst2)
+        setupTop.RunClass(lDetect.dst2)
         dst3 = setupTop.dst2
     End Sub
 End Class
@@ -177,7 +177,7 @@ Public Class Reduction_PointCloud : Inherits VBparent
 
         split(2) *= 1000
         split(2).ConvertTo(src, cv.MatType.CV_32S)
-        reduction.Run(src)
+        reduction.RunClass(src)
         reduction.dst2.ConvertTo(dst2, cv.MatType.CV_32F)
         split(2) = dst2 * 0.001
         cv.Cv2.Merge(split, dst3)
@@ -209,7 +209,7 @@ Public Class Reduction_XYZ : Inherits VBparent
                 split(i) += 10
                 split(i) *= 1000
                 split(i).ConvertTo(src, cv.MatType.CV_32S)
-                reduction.Run(src)
+                reduction.RunClass(src)
                 reduction.dst2.ConvertTo(split(i), cv.MatType.CV_32F)
                 split(i) *= 0.001
                 split(i) -= 10
@@ -237,14 +237,14 @@ Public Class Reduction_Edges : Inherits VBparent
         task.desc = "Get the edges after reducing the image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        reduction.Run(src)
+        reduction.RunClass(src)
         dst2 = reduction.dst2.Clone
 
         Dim reductionRequested = False
         If reduction.radio.check(0).Checked Or reduction.radio.check(1).Checked Then reductionRequested = True
         labels(2) = If(reductionRequested, "Reduced image", "Original image")
         labels(3) = If(reductionRequested, "Laplacian edges of reduced image", "Laplacian edges of original image")
-        edges.Run(dst2)
+        edges.RunClass(dst2)
         dst3 = edges.dst2
     End Sub
 End Class
@@ -269,9 +269,9 @@ Public Class Reduction_Depth : Inherits VBparent
             src = task.depth32f
             src.ConvertTo(src, cv.MatType.CV_32S)
         End If
-        reduction.Run(src)
+        reduction.RunClass(src)
         reduction.dst2.ConvertTo(reducedDepth32F, cv.MatType.CV_32F)
-        colorizer.Run(reducedDepth32F)
+        colorizer.RunClass(reducedDepth32F)
         dst2 = colorizer.dst2
         labels(2) = reduction.labels(2)
     End Sub
@@ -296,14 +296,14 @@ Public Class Reduction_DepthMax : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Type <> cv.MatType.CV_32F Then src = task.depth32f
-        dMax.Run(src)
+        dMax.RunClass(src)
         dst2 = dMax.dst3
 
         dst2.ConvertTo(src, cv.MatType.CV_32S)
-        reduction.Run(src)
+        reduction.RunClass(src)
         reduction.dst2.ConvertTo(reducedDepth32F, cv.MatType.CV_32F)
 
-        colorizer.Run(reducedDepth32F)
+        colorizer.RunClass(reducedDepth32F)
         dst3 = colorizer.dst2
     End Sub
 End Class

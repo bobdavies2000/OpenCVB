@@ -44,7 +44,7 @@ End Class
 
 Public Class Font_FlowText : Inherits VBparent
     Public msgs As New List(Of String)
-    Public dst As Integer = RESULT1 ' set to result2 to appear in dst3
+    Public dst As Integer = RESULT_DST2 ' set to result2 to appear in dst3
     Public maxLineCount = 22
     Public Sub New()
         If dst2.Height = 480 Then maxLineCount = 26
@@ -56,7 +56,7 @@ Public Class Font_FlowText : Inherits VBparent
             msgs.Add("To get text to flow across an image in any algorithm, add 'flow = new Font_FlowText()' to the class constructor.")
             msgs.Add("Also optionally indicate if you want result1 or result2 for text (the default is result1.)")
             msgs.Add("Then in your Run method, add a line 'flow.msgs.add('your next line of text')' - for as many msgs as you need on each pass.")
-            msgs.Add("Then at the end of your Run method, invoke flow.Run(Nothing)")
+            msgs.Add("Then at the end of your Run method, invoke flow.RunClass(Nothing)")
         End If
         Static lastCount As Integer
 

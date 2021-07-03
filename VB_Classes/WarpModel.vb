@@ -27,7 +27,7 @@ Public Class WarpModel_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If standalone Then
-            warpInput.Run(src)
+            warpInput.RunClass(src)
 
             If warpInput.check.Box(0).Checked Then
                 src = warpInput.gradient(0)
@@ -146,7 +146,7 @@ Public Class WarpModel_Input : Inherits VBparent
 
         For i = 0 To r.Count - 1
             If gradientCheck.checked Then
-                sobel.Run(img(r(i)))
+                sobel.RunClass(img(r(i)))
                 gradient(i) = sobel.dst2.Clone()
             End If
             rgb(i) = img(r(i))
@@ -198,7 +198,7 @@ Public Class WarpModel_AlignImages : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static gradientCheck = findCheckBox("Use Gradient in WarpInput")
-        If standalone Then ecc.warpInput.Run(src)
+        If standalone Then ecc.warpInput.RunClass(src)
         Dim aligned() = {New cv.Mat, New cv.Mat}
         For i = 0 To 1
             If gradientCheck.Checked Then
@@ -208,7 +208,7 @@ Public Class WarpModel_AlignImages : Inherits VBparent
                 src = ecc.warpInput.rgb(0)
                 ecc.src2 = Choose(i + 1, ecc.warpInput.rgb(1), ecc.warpInput.rgb(2))
             End If
-            ecc.Run(src)
+            ecc.RunClass(src)
             aligned(i) = ecc.aligned.Clone()
         Next
 
@@ -255,7 +255,7 @@ End Class
 '        Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
 
 '        sobel.src = src
-'        sobel.Run()
+'        sobel.RunClass()
 
 '        dst2 = sobel.dst2
 '        If lastFrame Is Nothing Then lastFrame = dst2.Clone
@@ -284,7 +284,7 @@ End Class
 '            If corr < CCthreshold Then
 '                thresholdError = "The correlation is only " + Format(corr, "#0.00") + " which is below the threshold of " + Format(CCthreshold, "#0.00")
 '            End If
-'            wbasics.Run()
+'            wbasics.RunClass()
 '            dst2(wbasics.outputRect) = wbasics.dst2(wbasics.outputRect)
 '            dst3(wbasics.outputRect) = wbasics.dst3(wbasics.outputRect)
 '        Else
@@ -313,13 +313,13 @@ End Class
 '        ' we only need to compute the max entropy every once in a while.  
 '        If task.frameCount Mod 10 = 0 Then
 '            entropy.src = src
-'            entropy.Run()
+'            entropy.RunClass()
 '        End If
 
 '        Dim r = entropy.eMaxRect
 '        warp.src = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
 '        warp.src(r) = src(r)
-'        warp.Run()
+'        warp.RunClass()
 '        'dst2(warp.basics.outputRect) = warp.dst2(warp.basics.outputRect)
 '        'dst3(warp.basics.outputRect) = warp.dst3(warp.basics.outputRect)
 '        dst2 = warp.dst2

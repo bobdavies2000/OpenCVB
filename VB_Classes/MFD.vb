@@ -14,9 +14,9 @@ Public Class MFD_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
-        dMax.Run(src)
+        dMax.RunClass(src)
 
-        motion.Run(task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        motion.RunClass(task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         labels(3) = motion.labels(3)
         dst3 = If(motion.dst3.Channels = 1, motion.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR), motion.dst3.Clone)
 
@@ -50,7 +50,7 @@ Public Class MFD_Depth : Inherits VBparent
         task.desc = "Motion-Filtered Data (MFD) - Stabilize the depth image but update any areas with motion"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        mfd.Run(task.depth32f)
+        mfd.RunClass(task.depth32f)
         dst2 = mfd.dst2
         dst3 = mfd.dst3
         labels(3) = mfd.labels(3)
@@ -69,7 +69,7 @@ Public Class MFD_PointCloud : Inherits VBparent
         task.desc = "Motion-Filtered Data (MFD) - Stabilize the PointCloud but update any areas with motion"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        mfd.Run(task.pointCloud)
+        mfd.RunClass(task.pointCloud)
         dst2 = mfd.dst2
         dst3 = mfd.dst3
         labels(3) = mfd.labels(3)
@@ -96,11 +96,11 @@ Public Class MFD_Sobel : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static thresholdSlider = findSlider("Pixel threshold to zero")
-        mfd.Run(src)
+        mfd.RunClass(src)
         dst3 = mfd.dst3
         labels(3) = mfd.labels(3)
 
-        sobel.Run(mfd.dst2)
+        sobel.RunClass(mfd.dst2)
         dst2 = sobel.dst2.Threshold(thresholdSlider.value, 0, cv.ThresholdTypes.Tozero).Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
@@ -120,9 +120,9 @@ Public Class MFD_BinarizedSobel : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
-        mfd.Run(src)
+        mfd.RunClass(src)
 
-        sobel.Run(mfd.dst2.Clone)
+        sobel.RunClass(mfd.dst2.Clone)
 
         dst2 = sobel.dst2
         dst3 = sobel.dst3
@@ -161,7 +161,7 @@ Public Class MFD_FloodFill : Inherits VBparent
 
         Dim input = src.Clone
         If input.Type <> cv.MatType.CV_8UC1 Then
-            sobel.Run(src)
+            sobel.RunClass(src)
             input = sobel.dst3.Clone
         End If
 
@@ -185,7 +185,7 @@ Public Class MFD_FloodFill : Inherits VBparent
             Next
         End If
 
-        If task.mouseClickFlag And task.mousePicTag = RESULT1 Then setMyActiveMat()
+        If task.mouseClickFlag And task.mousePicTag = RESULT_DST2 Then setMyActiveMat()
 
         masks.Clear()
         maskSizes.Clear()
@@ -224,7 +224,7 @@ Public Class MFD_FloodFill : Inherits VBparent
         Next
 
         lastFrame = dst2.Clone
-        palette.Run(dst2)
+        palette.RunClass(dst2)
         dst2 = palette.dst2
 
         dst3 = input.CvtColor(cv.ColorConversionCodes.GRAY2BGR)

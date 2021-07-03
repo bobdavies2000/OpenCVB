@@ -201,7 +201,7 @@ Public Class Pixel_GetSet : Inherits VBparent
 
         setTrueText(output, src.Width / 2 + 10, src.Height / 2 + 20)
 
-        mats.Run(src)
+        mats.RunClass(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub
@@ -267,7 +267,7 @@ Public Class Pixel_Sampler : Inherits VBparent
         Else
             random.rangeRect = New cv.Rect(0, 0, src.Width, src.Height)
         End If
-        random.Run(Nothing)
+        random.RunClass(Nothing)
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim index As New List(Of cv.Point)
@@ -342,7 +342,7 @@ Public Class Pixel_Unstable : Inherits VBparent
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        km.Run(src)
+        km.RunClass(src)
         If km.dst2.Channels <> 1 Then
             dst2 = km.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Else
