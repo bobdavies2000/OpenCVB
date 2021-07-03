@@ -55,18 +55,16 @@ Public Class VBparent : Implements IDisposable
         If standalone Then
             algorithmStack = New Stack()
             algorithmNames.Clear()
-            algorithmTimes.Clear()
+            algorithm_ms.Clear()
             algorithmNames.Add(caller)
-            algorithmTimes.Add(0)
+            algorithm_ms.Add(0)
+            algorithmTimes.Add(Now)
             algorithmStack.Push(0)
         End If
     End Sub
     Public Sub NextFrame(src As cv.Mat)
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
-        'Console.WriteLine("start frame " + CStr(task.frameCount) + vbCrLf)
-        algorithmLastTime = Now ' this eliminates time spent waiting for buffers
         algorithm.RunClass(src)
-        'Console.WriteLine("end frame " + CStr(task.frameCount) + vbCrLf)
         If standalone Or caller = "Python_Run" Then
             task.dst0Updated = usingdst0
             task.dst1Updated = usingdst1

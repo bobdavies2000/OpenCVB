@@ -13,9 +13,10 @@ Module Algorithm_Module
     Public term As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
     Public recordedData As Replay_Play
 
-    Public algorithmTimes As New List(Of Single)
+    Public algorithm_ms As New List(Of Single)
+    Public algorithmTimes As New List(Of DateTime)
     Public algorithmNames As New List(Of String)
-    Public algorithmLastTime As DateTime
+    'Public algorithmLastTime As DateTime
     Public algorithmStack As New Stack()
 
     <System.Runtime.CompilerServices.Extension()>
@@ -100,28 +101,35 @@ Module Algorithm_Module
     Public Sub startRun(name As String)
         If algorithmNames.Contains(name) = False Then
             algorithmNames.Add(name)
-            algorithmTimes.Add(0)
-            algorithmLastTime = Now
+            algorithm_ms.Add(0)
+            algorithmTimes.Add(Now)
         End If
         Dim nextTime = Now
 
-        Dim index = If(algorithmStack.Count, algorithmStack.Peek, 0)
-        Dim elapsedTicks = nextTime.Ticks - algorithmLastTime.Ticks
-        Dim span = New TimeSpan(elapsedTicks)
-        algorithmTimes(index) += span.Ticks / TimeSpan.TicksPerMillisecond
-        Console.WriteLine("start: " + algorithmNames(index) + " has " + Format(algorithmTimes(index), "###,##0") + " ms")
-        algorithmStack.Push(algorithmNames.IndexOf(name))
-        algorithmLastTime = nextTime
+        Dim index = algorithmStack.Peek
+        If index > 0 Then
+            Dim elapsedTicks = nextTime.Ticks - algorithmTimes(index).Ticks
+            Dim span = New TimeSpan(elapsedTicks)
+            algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
+        End If
+        'Console.WriteLine("starting: " + name + " " + algorithmNames(index) + " has " + Format(algorithm_ms(index), "###,##0") + " ms")
+
+        index = algorithmNames.IndexOf(name)
+        algorithmTimes(index) = nextTime
+        algorithmStack.Push(index)
+        'algorithmLastTime = nextTime
     End Sub
     Public Sub endRun(name As String)
         Dim nextTime = Now
         Dim index = algorithmStack.Peek
-        Dim elapsedTicks = nextTime.Ticks - algorithmLastTime.Ticks
+        Dim elapsedTicks = nextTime.Ticks - algorithmTimes(index).Ticks
         Dim span = New TimeSpan(elapsedTicks)
-        algorithmTimes(index) += span.Ticks / TimeSpan.TicksPerMillisecond
-        Console.WriteLine("end: " + algorithmNames(index) + " has " + Format(algorithmTimes(index), "###,##0") + " ms")
+        algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
+        'Console.WriteLine("end: " + name + " " + algorithmNames(index) + " has " + Format(algorithm_ms(index), "###,##0") + " ms")
         algorithmStack.Pop()
-        algorithmLastTime = nextTime
+
+        algorithmTimes(algorithmStack.Peek) = nextTime
+        'algorithmLastTime = nextTime
     End Sub
 End Module
 
@@ -365,7 +373,6 @@ Public Class ActiveTask : Implements IDisposable
             Else
                 task.callTrace.Add("OptionsCommon_Histogram") ' so calltrace is not nothing on initial call...
                 viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
-                algorithmLastTime = Now ' this eliminates time spent waiting for buffers
                 inrange = algoList.createAlgorithm("OptionsCommon")
                 IMUStable = algoList.createAlgorithm("IMU_IscameraStable")
                 IMULevel = algoList.createAlgorithm("IMU_IsCameraLevel")
