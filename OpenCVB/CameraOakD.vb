@@ -12,9 +12,7 @@ Structure OakIMUdata ' not working - no interface to the IMU available yet.
     Public trackerConfidence As Integer
     Public mapperConfidence As Integer
 End Structure
-Public Class CameraOakD
-    Inherits Camera
-
+Public Class CameraOakD : Inherits Camera
     Dim pipeName As String
     Dim pipeImages As NamedPipeServerStream
     Dim pipeSync As NamedPipeServerStream

@@ -84,8 +84,7 @@ Module Zed2_Interface
     Public Function Zed2RotationVector(cPtr As IntPtr) As IntPtr
     End Function
 End Module
-Public Class CameraZED2
-    Inherits Camera
+Public Class CameraZED2 : Inherits Camera
     Public cameraName As String
     Public cPtr As IntPtr
     Structure intrinsicsLeftZed

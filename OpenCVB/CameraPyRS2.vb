@@ -14,9 +14,7 @@ Structure PyRS2data ' not working - no interface to the IMU available yet.
     Public trackerConfidence As Integer
     Public mapperConfidence As Integer
 End Structure
-Public Class CameraPyRS2
-    Inherits Camera
-
+Public Class CameraPyRS2 : Inherits Camera
     Dim pipeName As String
     Dim pipeImages As NamedPipeServerStream
     Dim pipeSync As NamedPipeServerStream

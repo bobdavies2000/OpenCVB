@@ -63,9 +63,7 @@ Structure RS2IMUdata
     Public trackerConfidence As integer
     Public mapperConfidence As integer
 End Structure
-Public Class CameraRS2
-    Inherits Camera
-
+Public Class CameraRS2 : Inherits Camera
     Dim ctx As New rs.Context
     Public deviceNum As Integer
     Dim intrinsicsLeft As rs.Intrinsics

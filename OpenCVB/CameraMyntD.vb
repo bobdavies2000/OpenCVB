@@ -68,8 +68,7 @@ Module MyntD_Interface
     Public Function MyntDIMU_Magnetometer(cPtr As IntPtr) As IntPtr
     End Function
 End Module
-Public Class CameraMyntD
-    Inherits Camera
+Public Class CameraMyntD : Inherits Camera
     Public cameraName As String
     Public cPtr As IntPtr
     Structure MyntIntrinsics

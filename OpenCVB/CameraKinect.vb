@@ -42,8 +42,7 @@ Module Kinect_Interface
     Public Sub KinectClose(cPtr As IntPtr)
     End Sub
 End Module
-Public Class CameraKinect
-    Inherits Camera
+Public Class CameraKinect : Inherits Camera
     Public cameraName As String
     Public cPtr As IntPtr
     Structure imuData
