@@ -96,32 +96,36 @@ Module Algorithm_Module
         Return Nothing
     End Function
     Public Sub startRun(name As String)
-        If task.algorithmNames.Contains(name) = False Then
-            task.algorithmNames.Add(name)
-            task.algorithm_ms.Add(0)
-            algorithmTimes.Add(Now)
-        End If
-        Dim nextTime = Now
+        SyncLock algorithmStack
+            If task.algorithmNames.Contains(name) = False Then
+                task.algorithmNames.Add(name)
+                task.algorithm_ms.Add(0)
+                algorithmTimes.Add(Now)
+            End If
+            Dim nextTime = Now
 
-        Dim index = algorithmStack.Peek
-        If index > 0 Then
+            Dim index = algorithmStack.Peek
+            If index > 0 Then
+                Dim elapsedTicks = nextTime.Ticks - algorithmTimes(index).Ticks
+                Dim span = New TimeSpan(elapsedTicks)
+                task.algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
+            End If
+
+            index = task.algorithmNames.IndexOf(name)
+            algorithmTimes(index) = nextTime
+            algorithmStack.Push(index)
+        End SyncLock
+    End Sub
+    Public Sub endRun(name As String)
+        SyncLock algorithmStack
+            Dim nextTime = Now
+            Dim index = algorithmStack.Peek
             Dim elapsedTicks = nextTime.Ticks - algorithmTimes(index).Ticks
             Dim span = New TimeSpan(elapsedTicks)
             task.algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
-        End If
-
-        index = task.algorithmNames.IndexOf(name)
-        algorithmTimes(index) = nextTime
-        algorithmStack.Push(index)
-    End Sub
-    Public Sub endRun(name As String)
-        Dim nextTime = Now
-        Dim index = algorithmStack.Peek
-        Dim elapsedTicks = nextTime.Ticks - algorithmTimes(index).Ticks
-        Dim span = New TimeSpan(elapsedTicks)
-        task.algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
-        algorithmStack.Pop()
-        algorithmTimes(algorithmStack.Peek) = nextTime
+            algorithmStack.Pop()
+            algorithmTimes(algorithmStack.Peek) = nextTime
+        End SyncLock
     End Sub
 End Module
 
