@@ -1340,7 +1340,7 @@ Public Class OpenCVB
                         Dim percent = task.algorithm_ms(i) / total
                         If percent > 0 Then
                             If PercentTimes.ContainsKey(percent) Then percent += i * 0.0001
-                            Dim str = Format(percent, "0.0%") + " " + task.algorithmNames(i)
+                            Dim str = Format(percent, "00.0%") + " " + task.algorithmNames(i)
                             PercentTimes.Add(percent, str)
                         End If
                     Next

@@ -18,7 +18,7 @@ Public Class SuperRes_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount = 0 Then
-            setTrueText("The first frame takes a while - adjust the 180 iterations below to speed things up...")
+            setTrueText("The first frame takes a while - adjust the 180 iterations in the code to speed things up...")
             Exit Sub
         End If
         Dim method As String = ""

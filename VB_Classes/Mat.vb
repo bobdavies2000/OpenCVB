@@ -188,13 +188,15 @@ Public Class Mat_2to1 : Inherits VBparent
             mat = {mat1, mat2}
         End If
         dst2.SetTo(0)
-        If dst2.Type <> mat(0).Type Then dst2 = New cv.Mat(dst2.Size(), mat(0).Type)
-        For i = 0 To 1
-            Dim roi = Choose(i + 1, roiTop, roibot)
-            If mat(i).Empty = False Then dst2(roi) = mat(i).Resize(nSize)
-        Next
-        If lineSeparators Then
-            dst2.Line(New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), cv.Scalar.White, task.lineWidth + 1)
+        If mat(0) IsNot Nothing Then
+            If dst2.Type <> mat(0).Type Then dst2 = New cv.Mat(dst2.Size(), mat(0).Type)
+            For i = 0 To 1
+                Dim roi = Choose(i + 1, roiTop, roibot)
+                If mat(i).Empty = False Then dst2(roi) = mat(i).Resize(nSize)
+            Next
+            If lineSeparators Then
+                dst2.Line(New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), cv.Scalar.White, task.lineWidth + 1)
+            End If
         End If
     End Sub
 End Class

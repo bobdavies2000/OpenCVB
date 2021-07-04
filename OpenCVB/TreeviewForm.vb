@@ -2,6 +2,7 @@
 Imports System.Windows.Forms
 Public Class TreeviewForm
     Dim botDistance As Integer
+    Dim addendum As String = ""
     Private Sub OK_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OK_Button.Click
         Me.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.Close()
@@ -12,7 +13,15 @@ Public Class TreeviewForm
     End Sub
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
         Me.TreeViewTimer.Enabled = False
-        OpenCVB.intermediateReview = e.Node.Text
+        Dim algorithm = e.Node.Text
+        If PercentTime.Text.Contains(algorithm) = False Then
+            Dim split = Me.Text.Split(" ")
+            addendum = algorithm + " is not active at this time.  " + split(0) + " output is displayed."
+            OpenCVB.intermediateReview = ""
+        Else
+            OpenCVB.intermediateReview = algorithm
+            addendum = ""
+        End If
     End Sub
     Private Sub TreeviewForm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         Dim split() = Me.Text.Split()
@@ -95,6 +104,7 @@ Public Class TreeviewForm
         If Me.Height > 1000 Then Me.Height = 1000 ' when too big, use the scroll bar.
         tv.HideSelection = False
         tv.SelectedNode = n
+        addendum = ""
     End Sub
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles TreeViewTimer.Tick
         SyncLock callTraceLock
@@ -108,7 +118,6 @@ Public Class TreeviewForm
             End If
         End SyncLock
     End Sub
-
     Private Sub Timer1_Tick_1(sender As Object, e As EventArgs) Handles Timer1.Tick
         SyncLock callTraceLock
             Dim pTimes = OpenCVB.PercentTimes
@@ -117,6 +126,7 @@ Public Class TreeviewForm
                 PercentTime.Text += pTimes.ElementAt(i).Value + vbCrLf
             Next
             PercentTime.Text += vbCrLf + vbCrLf + "Only algorithm time is measured.  User interface and camera task times are not included."
+            PercentTime.Text += vbCrLf + vbCrLf + addendum
         End SyncLock
     End Sub
 End Class

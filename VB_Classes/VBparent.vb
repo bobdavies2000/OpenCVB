@@ -61,14 +61,16 @@ Public Class VBparent : Implements IDisposable
         End If
     End Sub
     Public Sub checkIntermediateResults()
-        task.intermediateObject = Nothing
+        task.intermediateObject = Nothing ' return nothing if there is nothing in dst2
         For Each obj In task.activeObjects
             If obj.caller = task.intermediateName Then
                 Dim tmp = obj.dst2
                 ' there may be several instances of an algorithmobject.  This will find one that is actually active.
                 If obj.dst2.channels = 3 Then tmp = obj.dst2.cvtcolor(cv.ColorConversionCodes.BGR2GRAY)
-                task.intermediateObject = obj
-                Exit For
+                If tmp.countnonzero() > 0 Then
+                    task.intermediateObject = obj
+                    Exit Sub
+                End If
             End If
         Next
     End Sub
@@ -93,10 +95,14 @@ Public Class VBparent : Implements IDisposable
                     task.labels(3) = ""
                 Else
                     checkIntermediateResults()
-                    dst2 = task.intermediateObject.dst2
-                    dst3 = task.intermediateObject.dst3
-                    task.labels(2) = task.intermediateObject.labels(2)
-                    task.labels(3) = task.intermediateObject.labels(3)
+                    If task.intermediateObject Is Nothing Then
+                        setTrueText("The selected algorithm does not appear to be active.")
+                    Else
+                        dst2 = task.intermediateObject.dst2
+                        dst3 = task.intermediateObject.dst3
+                        task.labels(2) = task.intermediateObject.labels(2)
+                        task.labels(3) = task.intermediateObject.labels(3)
+                    End If
                 End If
             End If
             If dst0.Width <> task.color.Width Then dst0 = dst0.Resize(task.color.Size)
