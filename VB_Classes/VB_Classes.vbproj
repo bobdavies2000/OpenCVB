@@ -182,6 +182,7 @@
     <Compile Include="Sieve.vb" />
     <Compile Include="SLR.vb" />
     <Compile Include="Structured.vb" />
+    <Compile Include="SuperRes.vb" />
     <Compile Include="Texture.vb" />
     <Compile Include="TimeView.vb" />
     <Compile Include="..\UI_Generator\AlgorithmList.vb" />

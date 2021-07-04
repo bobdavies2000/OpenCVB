@@ -28,6 +28,8 @@ Partial Class TreeviewForm
         Me.TreeViewTimer = New System.Windows.Forms.Timer(Me.components)
         Me.OK_Button = New System.Windows.Forms.Button()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
+        Me.PercentTime = New System.Windows.Forms.TextBox()
+        Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.TableLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -77,12 +79,26 @@ Partial Class TreeviewForm
         Me.TableLayoutPanel1.Size = New System.Drawing.Size(199, 45)
         Me.TableLayoutPanel1.TabIndex = 0
         '
+        'PercentTime
+        '
+        Me.PercentTime.Location = New System.Drawing.Point(634, 12)
+        Me.PercentTime.Multiline = True
+        Me.PercentTime.Name = "PercentTime"
+        Me.PercentTime.Size = New System.Drawing.Size(252, 67)
+        Me.PercentTime.TabIndex = 3
+        '
+        'Timer1
+        '
+        Me.Timer1.Enabled = True
+        Me.Timer1.Interval = 1000
+        '
         'TreeviewForm
         '
         Me.AcceptButton = Me.OK_Button
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(943, 194)
+        Me.Controls.Add(Me.PercentTime)
         Me.Controls.Add(Me.ClickTreeLabel)
         Me.Controls.Add(Me.TreeView1)
         Me.Controls.Add(Me.TableLayoutPanel1)
@@ -101,4 +117,6 @@ Partial Class TreeviewForm
     Friend WithEvents TreeViewTimer As Timer
     Friend WithEvents OK_Button As Button
     Friend WithEvents TableLayoutPanel1 As TableLayoutPanel
+    Friend WithEvents PercentTime As TextBox
+    Friend WithEvents Timer1 As Timer
 End Class

@@ -308,17 +308,17 @@ Public Class Histogram_EqualizeGray : Inherits VBparent
         histogram.RunClass(src)
         matsrc.mat(0) = src.Clone
         mats.mat(0) = histogram.dst2.Clone
-        cv.Cv2.EqualizeHist(src, dst1)
-        matsrc.mat(1) = dst1.Clone
+        cv.Cv2.EqualizeHist(src, dst2)
+        matsrc.mat(1) = dst2.Clone
         task.useKalman = True
         histogram.RunClass(dst1)
         If standalone Or task.intermediateActive Then
             mats.mat(1) = histogram.dst2
             mats.RunClass(Nothing)
             dst3 = mats.dst2
+            matsrc.RunClass(Nothing)
+            dst2 = matsrc.dst2
         End If
-        matsrc.RunClass(Nothing)
-        dst2 = matsrc.dst2
     End Sub
 End Class
 

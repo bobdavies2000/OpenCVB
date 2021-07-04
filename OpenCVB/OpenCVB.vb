@@ -82,6 +82,7 @@ Public Class OpenCVB
     Private Delegate Sub delegateEvent()
     Dim logAlgorithms As StreamWriter
     Public callTrace As New List(Of String)
+    Public PercentTimes As New SortedList(Of Single, String)
 
     Const MAX_RECENT = 25
     Dim recentList As New List(Of String)
@@ -1329,6 +1330,23 @@ Public Class OpenCVB
                     callTrace = New List(Of String)(task.callTrace)
                 End SyncLock
             End If
+
+            If task.algorithmFrameCount > 10 Then
+                SyncLock callTraceLock
+                    PercentTimes.Clear()
+                    Dim ptimes = New List(Of Single)(task.algorithm_ms)
+                    Dim total = ptimes.Sum()
+                    For i = 0 To task.algorithm_ms.Count - 1
+                        Dim percent = task.algorithm_ms(i) / total
+                        If percent > 0 Then
+                            If PercentTimes.ContainsKey(percent) Then percent += i * 0.0001
+                            Dim str = Format(percent, "0.0%") + " " + task.algorithmNames(i)
+                            PercentTimes.Add(percent, str)
+                        End If
+                    Next
+                End SyncLock
+            End If
+
             frameCount += 1
         End While
     End Sub

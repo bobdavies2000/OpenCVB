@@ -25,6 +25,7 @@ Public Class TreeviewForm
         If botDistance = 0 Then botDistance = Me.Height - ClickTreeLabel.Top
         ClickTreeLabel.Top = Me.Height - botDistance
         TreeView1.Height = ClickTreeLabel.Top - 5
+        PercentTime.Height = TreeView1.Height - 20
     End Sub
     Private Sub TreeviewForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.Left = GetSetting("OpenCVB", "TreeViewLeft", "TreeViewLeft", Me.Left)
@@ -50,6 +51,7 @@ Public Class TreeviewForm
     Dim titleStr = " - Click on any node to review the algorithm's input and output."
     Public Sub updateTree()
         If OpenCVB.callTrace.Count = 0 Then Exit Sub
+
         Dim tv = TreeView1
         tv.Nodes.Clear()
         Dim calltrace = OpenCVB.callTrace
@@ -104,6 +106,17 @@ Public Class TreeviewForm
                     If Me.Text = firstEntry + Me.titleStr = False Then Me.updateTree()
                 End If
             End If
+        End SyncLock
+    End Sub
+
+    Private Sub Timer1_Tick_1(sender As Object, e As EventArgs) Handles Timer1.Tick
+        SyncLock callTraceLock
+            Dim pTimes = OpenCVB.PercentTimes
+            PercentTime.Clear()
+            For i = pTimes.Count - 1 To 0 Step -1
+                PercentTime.Text += pTimes.ElementAt(i).Value + vbCrLf
+            Next
+            PercentTime.Text += vbCrLf + vbCrLf + "Only algorithm time is measured.  User interface and camera task times are not included."
         End SyncLock
     End Sub
 End Class

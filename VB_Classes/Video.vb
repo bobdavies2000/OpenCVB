@@ -5,10 +5,9 @@ Public Class Video_Basics : Inherits VBparent
     Public srcVideo As String
     Public image As New cv.Mat
     Public captureVideo As New cv.VideoCapture
-    Dim fileNameForm As OptionsFileName
+    Public fileNameForm As OptionsFileName
     Dim fileInfo As FileInfo
     Public Sub New()
-
         fileNameForm = New OptionsFileName
         fileNameForm.OpenFileDialog1.InitialDirectory = task.parms.homeDir + "Data\"
         fileNameForm.OpenFileDialog1.FileName = "*.*"
@@ -41,12 +40,12 @@ Public Class Video_Basics : Inherits VBparent
         captureVideo.Read(image)
         If image.Empty() Then
             captureVideo.Dispose()
-            captureVideo = New cv.VideoCapture(fileInfo.FullName)
+            captureVideo = New cv.VideoCapture(fileNameForm.filename.Text)
             captureVideo.Read(image)
         End If
 
         fileNameForm.TrackBar1.Value = 10000 * captureVideo.PosFrames / captureVideo.FrameCount
-        If image.Empty() = False Then dst2 = image.Resize(src.Size())
+        If image.Empty() = False Then dst2 = image.Resize(dst2.Size())
     End Sub
 End Class
 
