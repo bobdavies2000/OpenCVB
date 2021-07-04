@@ -53,14 +53,24 @@ Public Class VBparent : Implements IDisposable
         dst3 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
         task.activeObjects.Add(Me)
         If standalone Then
-            algorithmStack = New Stack()
-            algorithmNames.Clear()
-            algorithm_ms.Clear()
-            algorithmNames.Add(caller)
-            algorithm_ms.Add(0)
+            task.algorithmNames.Add(caller)
+            task.algorithm_ms.Add(0)
             algorithmTimes.Add(Now)
+            algorithmStack = New Stack()
             algorithmStack.Push(0)
         End If
+    End Sub
+    Public Sub checkIntermediateResults()
+        task.intermediateObject = Nothing
+        For Each obj In task.activeObjects
+            If obj.caller = task.intermediateName Then
+                Dim tmp = obj.dst2
+                ' there may be several instances of an algorithmobject.  This will find one that is actually active.
+                If obj.dst2.channels = 3 Then tmp = obj.dst2.cvtcolor(cv.ColorConversionCodes.BGR2GRAY)
+                task.intermediateObject = obj
+                Exit For
+            End If
+        Next
     End Sub
     Public Sub NextFrame(src As cv.Mat)
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
@@ -82,6 +92,7 @@ Public Class VBparent : Implements IDisposable
                     task.labels(2) = ""
                     task.labels(3) = ""
                 Else
+                    checkIntermediateResults()
                     dst2 = task.intermediateObject.dst2
                     dst3 = task.intermediateObject.dst3
                     task.labels(2) = task.intermediateObject.labels(2)

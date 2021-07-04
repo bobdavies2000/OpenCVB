@@ -45,7 +45,7 @@ Public Class OptionsContainer
             indexS += 1 ' adding 1 for the Options_Common form which is always first and in the back.
             For Each title In optionsTitle
                 Dim frm = findfrm(title)
-                If frm IsNot Nothing And title <> "OptionsCommon Slider Options" And title <> "OptionsCommon_Histogram_ViewOptions" Then
+                If frm IsNot Nothing And title <> "OptionsCommon_Depth Slider Options" And title <> "OptionsCommon_Histogram_ViewOptions" Then
                     frm.BringToFront()
                     If title.EndsWith(" Slider Options") Or title.EndsWith(" Keyboard Options") Or title.EndsWith("OptionsAlphaBlend") Then
                         If frm Is Nothing Then Continue For

@@ -1,5 +1,5 @@
 Imports cv = OpenCvSharp
-Public Class OptionsCommon : Inherits VBparent
+Public Class OptionsCommon_Depth : Inherits VBparent
     Public gOptions As New OptionsGlobal
     Public Sub New()
         gOptions = New OptionsGlobal

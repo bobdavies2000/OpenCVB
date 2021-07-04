@@ -36,7 +36,7 @@ Public Class Histogram_Basics : Inherits VBparent
         If depthNoZero Then histogram.Set(Of Single)(0, 0, 0) ' let's not plot the depth at zero...
         plotHist.hist = histogram
         Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
-        If standalone Or task.intermediateName = caller Then plotHist.backColor = splitColors(splitIndex)
+        plotHist.backColor = splitColors(splitIndex)
         plotHist.RunClass(src)
         dst2 = plotHist.dst2
         labels(2) = colorName + " histogram, bins = " + CStr(task.histogramBins)
@@ -294,23 +294,31 @@ End Class
 
 'https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
 Public Class Histogram_EqualizeGray : Inherits VBparent
-    Public histogramEq As New Histogram_Basics
     Public histogram As New Histogram_Basics
     Dim mats As New Mat_2to1
+    Dim matsrc As New Mat_2to1
     Public Sub New()
-        labels(2) = "Input image"
+        labels(2) = "top original image, bottom Equalized image"
         labels(3) = "top is before and bottom is after EqualizeHist"
         task.desc = "Create an equalized histogram of the grayscale image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        task.useKalman = False
         histogram.RunClass(src)
+        matsrc.mat(0) = src.Clone
         mats.mat(0) = histogram.dst2.Clone
-        cv.Cv2.EqualizeHist(src, dst2)
-        histogramEq.RunClass(dst2)
-        mats.mat(1) = histogramEq.dst2
-        mats.RunClass(src)
-        dst3 = mats.dst2
+        cv.Cv2.EqualizeHist(src, dst1)
+        matsrc.mat(1) = dst1.Clone
+        task.useKalman = True
+        histogram.RunClass(dst1)
+        If standalone Or task.intermediateActive Then
+            mats.mat(1) = histogram.dst2
+            mats.RunClass(Nothing)
+            dst3 = mats.dst2
+        End If
+        matsrc.RunClass(Nothing)
+        dst2 = matsrc.dst2
     End Sub
 End Class
 

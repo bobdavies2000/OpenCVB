@@ -13,10 +13,7 @@ Module Algorithm_Module
     Public term As New cv.TermCriteria(cv.CriteriaTypes.Eps + cv.CriteriaTypes.Count, 10, 1.0)
     Public recordedData As Replay_Play
 
-    Public algorithm_ms As New List(Of Single)
     Public algorithmTimes As New List(Of DateTime)
-    Public algorithmNames As New List(Of String)
-    'Public algorithmLastTime As DateTime
     Public algorithmStack As New Stack()
 
     <System.Runtime.CompilerServices.Extension()>
@@ -99,9 +96,9 @@ Module Algorithm_Module
         Return Nothing
     End Function
     Public Sub startRun(name As String)
-        If algorithmNames.Contains(name) = False Then
-            algorithmNames.Add(name)
-            algorithm_ms.Add(0)
+        If task.algorithmNames.Contains(name) = False Then
+            task.algorithmNames.Add(name)
+            task.algorithm_ms.Add(0)
             algorithmTimes.Add(Now)
         End If
         Dim nextTime = Now
@@ -110,26 +107,21 @@ Module Algorithm_Module
         If index > 0 Then
             Dim elapsedTicks = nextTime.Ticks - algorithmTimes(index).Ticks
             Dim span = New TimeSpan(elapsedTicks)
-            algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
+            task.algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
         End If
-        'Console.WriteLine("starting: " + name + " " + algorithmNames(index) + " has " + Format(algorithm_ms(index), "###,##0") + " ms")
 
-        index = algorithmNames.IndexOf(name)
+        index = task.algorithmNames.IndexOf(name)
         algorithmTimes(index) = nextTime
         algorithmStack.Push(index)
-        'algorithmLastTime = nextTime
     End Sub
     Public Sub endRun(name As String)
         Dim nextTime = Now
         Dim index = algorithmStack.Peek
         Dim elapsedTicks = nextTime.Ticks - algorithmTimes(index).Ticks
         Dim span = New TimeSpan(elapsedTicks)
-        algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
-        'Console.WriteLine("end: " + name + " " + algorithmNames(index) + " has " + Format(algorithm_ms(index), "###,##0") + " ms")
+        task.algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
         algorithmStack.Pop()
-
         algorithmTimes(algorithmStack.Peek) = nextTime
-        'algorithmLastTime = nextTime
     End Sub
 End Module
 
@@ -159,7 +151,7 @@ Public Class ActiveTask : Implements IDisposable
     Public IMULevel As Object
 
     ' add any global option algorithms and structures here
-    Public inrange As Object
+    Public depthOptions As Object
     Public noDepthMask As New cv.Mat
     Public depthMask As New cv.Mat
     Public depth32f As New cv.Mat
@@ -260,6 +252,9 @@ Public Class ActiveTask : Implements IDisposable
 
     Public ttTextData As New List(Of TTtext)
     Public callTrace As New List(Of String)
+
+    Public algorithm_ms As New List(Of Single)
+    Public algorithmNames As New List(Of String)
 
     Public Structure Extrinsics_VB
         Public rotation As Single()
@@ -373,7 +368,7 @@ Public Class ActiveTask : Implements IDisposable
             Else
                 task.callTrace.Add("OptionsCommon_Histogram") ' so calltrace is not nothing on initial call...
                 viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
-                inrange = algoList.createAlgorithm("OptionsCommon")
+                depthOptions = algoList.createAlgorithm("OptionsCommon_Depth")
                 IMUStable = algoList.createAlgorithm("IMU_IscameraStable")
                 IMULevel = algoList.createAlgorithm("IMU_IsCameraLevel")
                 PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
@@ -391,8 +386,8 @@ Public Class ActiveTask : Implements IDisposable
                           "If using on the <Rank x> groups, rerun the Survey (takes a while) and then the UIRanking project." + vbCrLf +
                           "Otherwise, there must be a problem in the UIindexer", 10, 200, 3)
 
-            inrange.standalone = True
-            algorithmObject = inrange
+            depthOptions.standalone = True
+            algorithmObject = depthOptions
         End If
         If parms.useRecordedData Then recordedData = New Replay_Play()
 
@@ -412,29 +407,12 @@ Public Class ActiveTask : Implements IDisposable
         If aOptions IsNot Nothing Then aOptions.layoutOptions()
         Application.DoEvents()
     End Sub
-    Public Sub checkIntermediateResults()
-        task.intermediateActive = False
-        task.intermediateObject = Nothing
-        For Each obj In task.activeObjects
-            If obj.caller = task.intermediateName Then
-                Dim tmp = obj.dst2
-                ' there may be several instances of an algorithmobject.  This will find one that is actually active.
-                If obj.dst2.channels = 3 Then tmp = obj.dst2.cvtcolor(cv.ColorConversionCodes.BGR2GRAY)
-                task.intermediateObject = obj
-                If tmp.CountNonZero() > 0 Then
-                    task.intermediateActive = True
-                    Exit For ' if this dst2 has been modified, then it is an active one...
-                End If
-            End If
-        Next
-    End Sub
     Public Sub RunAlgorithm()
         Try
             If task.parms.useRecordedData Then recordedData.RunClass(task.color.Clone)
-            If task.intermediateName <> "" Then checkIntermediateResults() Else task.intermediateObject = Nothing
             ' run any global options algorithms here.
             If task.pythonTaskName.EndsWith(".py") = False Then
-                inrange.RunClass(Nothing) ' updates all the depth info.
+                depthOptions.RunClass(Nothing) ' updates all the depth info.
                 IMUStable.RunClass(Nothing) ' updates the flag that indicates stability according to the IMU.
                 IMULevel.RunClass(Nothing)  ' updates the flag that indicate the camera is level according to the IMU
             End If
