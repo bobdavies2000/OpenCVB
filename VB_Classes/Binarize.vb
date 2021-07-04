@@ -299,7 +299,7 @@ Public Class Binarize_Recurse : Inherits VBparent
         binarize.RunClass(gray)
         mats.mat(3) = binarize.dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
 
-        mats.RunClass(src)
+        If standalone Or task.intermediateActive Then mats.RunClass(src)
         dst2 = mats.dst2
         dst3 = mats.dst3
         labels(3) = mats.labels(3)

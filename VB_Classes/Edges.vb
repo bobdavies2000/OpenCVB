@@ -778,7 +778,7 @@ Public Class Edges_BinarizedSobel : Inherits VBparent
         mats.mat(2) = edges.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         cv.Cv2.BitwiseOr(mats.mat(2), mats.mat(3), mats.mat(3))
 
-        mats.RunClass(src)
+        If standalone Or task.intermediateActive Then mats.RunClass(src)
         dst2 = mats.dst2
         If mats.dst3.Channels = 3 Then
             labels(3) = "BitwiseOr of images 1-3 at left.  Click dst2."

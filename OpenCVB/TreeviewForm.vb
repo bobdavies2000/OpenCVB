@@ -14,8 +14,8 @@ Public Class TreeviewForm
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
         Me.TreeViewTimer.Enabled = False
         Dim algorithm = e.Node.Text
-        If PercentTime.Text.Contains(algorithm) = False Then
-            Dim split = Me.Text.Split(" ")
+        Dim split = Me.Text.Split(" ")
+        If PercentTime.Text.Contains(algorithm) = False And algorithm <> split(0) Then
             addendum = algorithm + " is not active at this time.  " + split(0) + " output is displayed."
             OpenCVB.intermediateReview = ""
         Else
