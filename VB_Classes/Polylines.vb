@@ -32,9 +32,9 @@ End Class
 ' VB.Net implementation of the browse example in OpenCV.
 ' https://github.com/opencv/opencv/blob/master/samples/python/browse.py
 Public Class Polylines_Random : Inherits VBparent
-    Dim zoomFactor = 4
+    Dim zoom As New Pixel_Zoom
     Public Sub New()
-        labels(2) = CStr(zoomFactor) + "X zoom around mouse movement on image"
+        labels(2) = "To zoom move the mouse over the image"
         task.desc = "Create a random procedural image - Painterly Effect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -56,11 +56,8 @@ Public Class Polylines_Random : Inherits VBparent
             dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         End If
 
-        Dim width As Double = dst2.Width / zoomFactor
-        Dim height As Double = dst2.Height / zoomFactor
-        Dim x = Math.Min(task.mousePoint.X, dst2.Width - width)
-        Dim y = Math.Min(task.mousePoint.Y, dst2.Height - height)
-        dst3 = dst2.GetRectSubPix(New cv.Size(width, height), New cv.Point2f(x, y)).Resize(dst3.Size)
+        zoom.RunClass(dst2)
+        dst3 = zoom.dst2
     End Sub
 End Class
 

@@ -374,3 +374,31 @@ Public Class Pixel_Unstable : Inherits VBparent
         lastImage = dst2.Clone
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Pixel_Zoom : Inherits VBparent
+    Public Sub New()
+        If sliders.Setup(caller) Then sliders.setupTrackBar(0, "Zoom Factor", 2, 16, 4)
+        labels(2) = "To zoom move the mouse over the image"
+        task.desc = "Zoom into the pixels under the mouse in dst2"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static mousePoint = New cv.Point(msRNG.Next(0, dst1.Width / 2), msRNG.Next(0, dst1.Height))
+        Static zoomSlider = findSlider("Zoom Factor")
+        Dim zoomArray() = {2, 2, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 8, 16}
+        Dim zoomFactor = zoomArray(zoomSlider.value)
+
+        If task.mousePoint <> New cv.Point Then mousePoint = task.mousePoint
+        Dim width As Double = src.Width / zoomFactor
+        Dim height As Double = src.Height / zoomFactor
+        Dim x = Math.Min(mousePoint.X, src.Width - width)
+        Dim y = Math.Min(mousePoint.Y, src.Height - height)
+        dst1 = src(New cv.Rect(CInt(x), CInt(y), width, height))
+        dst2 = dst1.Resize(dst2.Size, 0, 0, cv.InterpolationFlags.Nearest)
+    End Sub
+End Class
