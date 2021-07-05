@@ -1298,8 +1298,8 @@ Public Class OpenCVB
             pixelViewerRect = task.pixelViewerRect
             pixelViewTag = task.pixelViewTag
 
+            task.algorithmAccumulate = TreeViewDialog.Accumulate.Checked
             If frameCount = 0 Then meActivateNeeded = True
-
 
             If usingDst0 Then picLabels(0) = task.labels(0)
             If usingDst1 Then picLabels(1) = task.labels(1)

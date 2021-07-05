@@ -53,11 +53,17 @@ Public Class VBparent : Implements IDisposable
         dst3 = New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
         task.activeObjects.Add(Me)
         If standalone Then
-            task.algorithmNames.Add(caller)
+            task.algorithmNames.Add("Non-Algorithm Time")
             task.algorithm_ms.Add(0)
             algorithmTimes.Add(Now)
-            algorithmStack = New Stack()
             algorithmStack.Push(0)
+
+            task.algorithmNames.Add(caller)
+            task.algorithm_ms.Add(0)
+
+            algorithmTimes.Add(Now)
+            algorithmStack = New Stack()
+            algorithmStack.Push(1)
         End If
     End Sub
     Public Sub checkIntermediateResults()
@@ -76,7 +82,19 @@ Public Class VBparent : Implements IDisposable
     End Sub
     Public Sub NextFrame(src As cv.Mat)
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
+
+        Static lastTime = Now
+        Dim nextTime = Now
+        Dim elapsedTicks = nextTime.Ticks - lastTime.Ticks
+        Dim span = New TimeSpan(elapsedTicks)
+        task.algorithm_ms(0) += span.Ticks / TimeSpan.TicksPerMillisecond
+
+        startRun("Non-Algorithm Time")
         algorithm.RunClass(src)
+        endRun("Non-Algorithm Time")
+
+        lastTime = Now
+
         If standalone Or caller = "Python_Run" Then
             task.dst0Updated = usingdst0
             task.dst1Updated = usingdst1

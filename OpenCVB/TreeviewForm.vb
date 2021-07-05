@@ -29,17 +29,20 @@ Public Class TreeviewForm
         OpenCVB.AvailableAlgorithms.Text = split(0)
         SaveSetting("OpenCVB", "TreeViewLeft", "TreeViewLeft", Me.Left)
         SaveSetting("OpenCVB", "TreeViewTop", "TreeViewTop", Me.Top)
+        SaveSetting("OpenCVB", "Accumulate", "Accumulate", Accumulate.Checked)
         OpenCVB.TreeButton.Checked = False
     End Sub
     Public Sub TreeviewForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         If botDistance = 0 Then botDistance = Me.Height - ClickTreeLabel.Top
         ClickTreeLabel.Top = Me.Height - botDistance
+        Accumulate.Top = ClickTreeLabel.Top + ClickTreeLabel.Height + 5
         TreeView1.Height = ClickTreeLabel.Top - 5
         PercentTime.Height = TreeView1.Height - 20
     End Sub
     Private Sub TreeviewForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.Left = GetSetting("OpenCVB", "TreeViewLeft", "TreeViewLeft", Me.Left)
         Me.Top = GetSetting("OpenCVB", "TreeViewTop", "TreeViewTop", Me.Top)
+        Accumulate.Checked = GetSetting("OpenCVB", "Accumulate", "Accumulate", True)
     End Sub
     Private Function FindRecursive(ByVal tNode As TreeNode, name As String) As TreeNode
         Dim tn As TreeNode
@@ -142,7 +145,7 @@ Public Class TreeviewForm
             For i = 0 To latestModules.Count - 1
                 PercentTime.Text += latestPercents(i) + " " + latestModules(i) + vbCrLf
             Next
-            PercentTime.Text += vbCrLf + "Only algorithm time is measured.  User interface and camera task times are not included."
+            PercentTime.Text += vbCrLf + "Algorithm/Non-Algorithm time is measured.  UI and camera task are Non-Algorithm." + vbCrLf
             PercentTime.Text += vbCrLf + vbCrLf + addendum
         End SyncLock
     End Sub

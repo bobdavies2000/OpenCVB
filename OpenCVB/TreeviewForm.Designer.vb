@@ -30,6 +30,7 @@ Partial Class TreeviewForm
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.PercentTime = New System.Windows.Forms.TextBox()
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
+        Me.Accumulate = New System.Windows.Forms.CheckBox()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -84,6 +85,7 @@ Partial Class TreeviewForm
         Me.PercentTime.Location = New System.Drawing.Point(634, 12)
         Me.PercentTime.Multiline = True
         Me.PercentTime.Name = "PercentTime"
+        Me.PercentTime.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
         Me.PercentTime.Size = New System.Drawing.Size(252, 67)
         Me.PercentTime.TabIndex = 3
         '
@@ -92,12 +94,23 @@ Partial Class TreeviewForm
         Me.Timer1.Enabled = True
         Me.Timer1.Interval = 1000
         '
+        'Accumulate
+        '
+        Me.Accumulate.AutoSize = True
+        Me.Accumulate.Location = New System.Drawing.Point(31, 175)
+        Me.Accumulate.Name = "Accumulate"
+        Me.Accumulate.Size = New System.Drawing.Size(376, 24)
+        Me.Accumulate.TabIndex = 4
+        Me.Accumulate.Text = "Accumulate time (instead of latest interval times)"
+        Me.Accumulate.UseVisualStyleBackColor = True
+        '
         'TreeviewForm
         '
         Me.AcceptButton = Me.OK_Button
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(943, 194)
+        Me.Controls.Add(Me.Accumulate)
         Me.Controls.Add(Me.PercentTime)
         Me.Controls.Add(Me.ClickTreeLabel)
         Me.Controls.Add(Me.TreeView1)
@@ -119,4 +132,5 @@ Partial Class TreeviewForm
     Friend WithEvents TableLayoutPanel1 As TableLayoutPanel
     Friend WithEvents PercentTime As TextBox
     Friend WithEvents Timer1 As Timer
+    Friend WithEvents Accumulate As CheckBox
 End Class

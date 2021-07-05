@@ -260,6 +260,7 @@ Public Class ActiveTask : Implements IDisposable
     Public algorithm_ms As New List(Of Single)
     Public algorithmNames As New List(Of String)
     Public algorithmFrameCount As Integer
+    Public algorithmAccumulate As Boolean ' accumulate times or use latest interval times.
 
     Public Structure Extrinsics_VB
         Public rotation As Single()
@@ -414,11 +415,15 @@ Public Class ActiveTask : Implements IDisposable
     End Sub
     Public Sub RunAlgorithm()
         Try
-            If task.frameCount Mod 30 = 0 Then
-                For i = 0 To algorithm_ms.Count - 1
-                    algorithm_ms(i) = 0
-                Next
-                algorithmFrameCount = 1
+            If algorithmAccumulate = False Then
+                If task.frameCount Mod 30 = 0 Then
+                    For i = 0 To algorithm_ms.Count - 1
+                        algorithm_ms(i) = 0
+                    Next
+                    algorithmFrameCount = 1
+                Else
+                    algorithmFrameCount += 1
+                End If
             Else
                 algorithmFrameCount += 1
             End If
