@@ -367,19 +367,16 @@ Public Class ActiveTask : Implements IDisposable
 
         aOptions = New OptionsContainer
 
-        If task.algName.EndsWith(".py") = False Then
-            aOptions.Show()
-            If task.paused Then
-                PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
-            Else
-                task.callTrace.Add("OptionsCommon_Histogram") ' so calltrace is not nothing on initial call...
-                viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
-                depthOptions = algoList.createAlgorithm("OptionsCommon_Depth")
-                IMUStable = algoList.createAlgorithm("IMU_IscameraStable")
-                IMULevel = algoList.createAlgorithm("IMU_IsCameraLevel")
-                PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
-            End If
-        End If
+        If task.algName.EndsWith(".py") = False Then aOptions.Show()
+
+        If task.paused Then PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
+
+        task.callTrace.Add("OptionsCommon_Histogram") ' so calltrace is not nothing on initial call...
+        viewOptions = algoList.createAlgorithm("OptionsCommon_Histogram")
+        depthOptions = algoList.createAlgorithm("OptionsCommon_Depth")
+        IMUStable = algoList.createAlgorithm("IMU_IscameraStable")
+        IMULevel = algoList.createAlgorithm("IMU_IsCameraLevel")
+        PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
 
         task.callTrace.Clear()
         task.callTrace.Add(task.algName + "\")
@@ -429,11 +426,9 @@ Public Class ActiveTask : Implements IDisposable
             End If
             If task.parms.useRecordedData Then recordedData.RunClass(task.color.Clone)
             ' run any global options algorithms here.
-            If task.pythonTaskName.EndsWith(".py") = False Then
-                depthOptions.RunClass(Nothing) ' updates all the depth info.
-                IMUStable.RunClass(Nothing) ' updates the flag that indicates stability according to the IMU.
-                IMULevel.RunClass(Nothing)  ' updates the flag that indicate the camera is level according to the IMU
-            End If
+            depthOptions.RunClass(Nothing) ' updates all the depth info.
+            IMUStable.RunClass(Nothing) ' updates the flag that indicates stability according to the IMU.
+            IMULevel.RunClass(Nothing)  ' updates the flag that indicate the camera is level according to the IMU
 
             TaskTimer.Enabled = True
             algorithmObject.NextFrame(task.color.Clone)

@@ -44,6 +44,7 @@ Public Class VBparent : Implements IDisposable
     Dim callStack = ""
     Public Sub initParent()
         standalone = task.callTrace(0) = caller + "\" ' only the first is standalone (the primary algorithm.)
+        If caller = "Python_Run" Then standalone = True
         If standalone = False And task.callTrace.Contains(callStack) = False Then
             task.callTrace.Add(callStack)
         End If
@@ -134,13 +135,11 @@ Public Class VBparent : Implements IDisposable
             If usingdst0 Then task.color = dst0
             If usingdst1 Then task.RGBDepth = dst1
 
-            If task.pythonTaskName.EndsWith(".py") = False Then
-                If task.pixelViewerOn Then
-                    task.PixelViewer.viewerForm.Show()
-                    task.PixelViewer.RunClass(src)
-                Else
-                    If task.PixelViewer.viewerForm.Visible Then task.PixelViewer.viewerForm.Hide()
-                End If
+            If task.pixelViewerOn Then
+                task.PixelViewer.viewerForm.Show()
+                task.PixelViewer.RunClass(src)
+            Else
+                If task.PixelViewer.viewerForm.Visible Then task.PixelViewer.viewerForm.Hide()
             End If
 
             task.color = MakeSureImage8uC3(dst0)
