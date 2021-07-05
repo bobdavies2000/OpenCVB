@@ -201,8 +201,8 @@ Public Class TimeView_Rectangles : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         tflood.RunClass(src)
-        dst2 = tflood.dst3
-        dst3 = tflood.dst2
+        dst2 = tflood.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst3 = tflood.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         mOverLap.inputRects = New List(Of cv.Rect)(tflood.floodTop.rects)
         mOverLap.RunClass(src)
@@ -240,6 +240,7 @@ Public Class TimeView_Frustrum : Inherits VBparent
         tView.RunClass(src)
         mats.mat(0) = tView.dst2.Clone
         mats.mat(1) = tView.dst3.Clone
+        cv.Cv2.ImShow("mats(0)", mats.mat(0))
 
         setupTop.RunClass(tView.dst2)
         mats.mat(2) = setupTop.dst2
@@ -247,7 +248,7 @@ Public Class TimeView_Frustrum : Inherits VBparent
         setupSide.RunClass(tView.dst3)
         mats.mat(3) = setupSide.dst2
 
-        mats.RunClass(src)
+        mats.RunClass(Nothing)
         dst2 = mats.dst2
         dst3 = mats.dst3
     End Sub

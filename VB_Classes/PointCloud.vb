@@ -346,6 +346,8 @@ Public Class PointCloud_SetupSide : Inherits VBparent
         Dim distanceRatio As Single = 1
         Dim fsize = task.fontSize * 1.5
 
+        If src.Channels <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
         If standalone Then dst2.SetTo(0) Else src.CopyTo(dst2)
         dst2.Circle(task.sideCameraPoint, task.dotSize, cv.Scalar.BlueViolet, -1, task.lineType)
         For i = 1 To task.maxZ
@@ -433,6 +435,9 @@ Public Class PointCloud_SetupTop : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 2
         Dim distanceRatio As Single = 1
         Dim fsize = task.fontSize * 1.5
+
+        If src.Channels <> 3 Then src = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+
         If standalone Then dst2.SetTo(0) Else src.CopyTo(dst2)
         dst2.Circle(task.topCameraPoint, task.dotSize, cv.Scalar.BlueViolet, -1, task.lineType)
         For i = 1 To task.maxZ

@@ -112,99 +112,6 @@ End Class
 
 
 
-Public Class Mat_4to1 : Inherits VBparent
-    Dim mat1 As cv.Mat
-    Dim mat2 As cv.Mat
-    Dim mat3 As cv.Mat
-    Dim mat4 As cv.Mat
-    Public mat() As cv.Mat = {mat1, mat2, mat3, mat4}
-    Public lineSeparators = True ' if they want lines or not...
-    Public Sub New()
-        mat1 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC3, 0)
-        mat2 = mat1.Clone()
-        mat3 = mat1.Clone()
-        mat4 = mat1.Clone()
-        mat = {mat1, mat2, mat3, mat4}
-
-        labels(2) = "Combining 4 images into one"
-        labels(3) = "Click any quadrant at left to view it below"
-        task.desc = "Use one Mat for up to 4 images"
-    End Sub
-    Public Sub defaultMats()
-        mat1 = task.color
-        mat2 = task.RGBDepth
-        mat3 = task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        mat4 = task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        mat = {mat1, mat2, mat3, mat4}
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static nSize = New cv.Size(dst2.Width / 2, dst2.Height / 2)
-        Static roiTopLeft = New cv.Rect(0, 0, nSize.Width, nSize.Height)
-        Static roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
-        Static roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
-        Static roibotRight = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
-        If standalone Then defaultMats()
-
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3)
-        For i = 0 To 4 - 1
-            Dim tmp = mat(i).Clone
-            If tmp.Channels = 1 Then tmp = mat(i).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            Dim roi = Choose(i + 1, roiTopLeft, roiTopRight, roibotLeft, roibotRight)
-            dst2(roi) = tmp.Resize(nSize)
-        Next
-        If lineSeparators Then
-            dst2.Line(New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), cv.Scalar.White, task.lineWidth + 1)
-            dst2.Line(New cv.Point(dst2.Width / 2, 0), New cv.Point(dst2.Width / 2, dst2.Height), cv.Scalar.White, task.lineWidth + 1)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Mat_2to1 : Inherits VBparent
-    Dim mat1 As cv.Mat
-    Dim mat2 As cv.Mat
-    Public mat() As cv.Mat = {mat1, mat2}
-    Public lineSeparators = True ' if they want lines or not...
-    Public Sub New()
-        mat1 = New cv.Mat(New cv.Size(dst2.Rows, dst2.Cols), cv.MatType.CV_8UC3, 0)
-        mat2 = mat1.Clone()
-        mat = {mat1, mat2}
-
-        labels(2) = ""
-        task.desc = "Fill a Mat with 2 images"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static nSize = New cv.Size(task.color.Width, task.color.Height / 2)
-        Static roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
-        Static roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
-        If standalone or task.intermediateName = caller Then
-            mat1 = src
-            mat2 = task.RGBDepth
-            mat = {mat1, mat2}
-        End If
-        dst2.SetTo(0)
-        If mat(0) IsNot Nothing Then
-            If dst2.Type <> mat(0).Type Then dst2 = New cv.Mat(dst2.Size(), mat(0).Type)
-            For i = 0 To 1
-                Dim roi = Choose(i + 1, roiTop, roibot)
-                If mat(i).Empty = False Then dst2(roi) = mat(i).Resize(nSize)
-            Next
-            If lineSeparators Then
-                dst2.Line(New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), cv.Scalar.White, task.lineWidth + 1)
-            End If
-        End If
-    End Sub
-End Class
-
-
-
-
 
 
 
@@ -426,57 +333,6 @@ End Class
 
 
 
-
-Public Class Mat_4Click : Inherits VBparent
-    Public mats As New Mat_4to1
-    Public mat() As cv.Mat
-    Public Sub New()
-        mat = mats.mat
-        labels(3) = "Click a quadrant in dst2 to view it in dst3"
-        task.desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst3"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Or task.intermediateName = caller Then mats.defaultMats()
-        mats.RunClass(src)
-        dst2 = mats.dst2
-
-        If task.mouseClickFlag And task.mousePicTag = RESULT_DST2 Then setMyActiveMat()
-        dst3 = mats.mat(quadrantIndex)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Mat_2Click : Inherits VBparent
-    Dim mats As New Mat_2to1
-    Public Sub New()
-        task.desc = "Split an image into 2 segments and allow clicking on each half to open it in dst3"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Then
-            mats.mat(0) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            cv.Cv2.BitwiseNot(mats.mat(0), mats.mat(1))
-        End If
-        mats.RunClass(src)
-        dst2 = mats.dst2
-
-        ' click in dst2 to display the quadrant in dst3
-        If task.mouseClickFlag And task.mousePicTag = RESULT_DST2 Then
-            If task.mouseClickPoint.Y < dst2.Height / 2 Then dst3 = mats.mat(0) Else dst3 = mats.mat(1)
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
 ' https://github.com/takuya-takeuchi/DlibDotNet/tree/master/examples/3rdparty/OpenCVSharp/MatToArray2D
 Public Class Mat_2Dlib : Inherits VBparent
     Public dRGB As Array2D(Of BgrPixel)
@@ -525,5 +381,137 @@ Public Class Mat_Dlib2Mat : Inherits VBparent
             dst3 = New cv.Mat(dRGB.Rows, dRGB.Columns, cv.MatType.CV_8UC3)
             Marshal.Copy(dRGB.ToBytes, 0, dst3.Data, dst3.Total * dst3.ElemSize)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Mat_2to1 : Inherits VBparent
+    Dim mat1 As cv.Mat
+    Dim mat2 As cv.Mat
+    Public mat() As cv.Mat = {mat1, mat2}
+    Public lineSeparators = True ' if they want lines or not...
+    Public Sub New()
+        mat1 = New cv.Mat(New cv.Size(dst2.Rows, dst2.Cols), cv.MatType.CV_8UC3, 0)
+        mat2 = mat1.Clone()
+        mat = {mat1, mat2}
+
+        labels(2) = ""
+        task.desc = "Fill a Mat with 2 images"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static nSize = New cv.Size(task.color.Width, task.color.Height / 2)
+        Static roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
+        Static roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
+        If standalone Or task.intermediateName = caller Then
+            mat1 = src
+            mat2 = task.RGBDepth
+            mat = {mat1, mat2}
+        End If
+        dst2.SetTo(0)
+        If mat(0) IsNot Nothing Then
+            If dst2.Type <> mat(0).Type Then dst2 = New cv.Mat(dst2.Size(), mat(0).Type)
+            For i = 0 To 1
+                Dim roi = Choose(i + 1, roiTop, roibot)
+                If mat(i).Empty = False Then dst2(roi) = mat(i).Resize(nSize)
+            Next
+            If lineSeparators Then
+                dst2.Line(New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), cv.Scalar.White, task.lineWidth + 1)
+            End If
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Mat_2Click : Inherits VBparent
+    Dim mats As New Mat_2to1
+    Public Sub New()
+        task.desc = "Split an image into 2 segments and allow clicking on each half to open it in dst3"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        If standalone Then
+            mats.mat(0) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            cv.Cv2.BitwiseNot(mats.mat(0), mats.mat(1))
+        End If
+        mats.RunClass(src)
+        dst2 = mats.dst2
+
+        ' click in dst2 to display the quadrant in dst3
+        If task.mouseClickFlag And task.mousePicTag = RESULT_DST2 Then
+            If task.mouseClickPoint.Y < dst2.Height / 2 Then dst3 = mats.mat(0) Else dst3 = mats.mat(1)
+        End If
+    End Sub
+End Class
+
+
+
+
+Public Class Mat_4to1 : Inherits VBparent
+    Dim model As New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
+    Public mat() As cv.Mat = {model.Clone, model.Clone, model.Clone, model.Clone}
+    Public lineSeparators = True ' if they want lines or not...
+    Public Sub New()
+        labels(2) = "Combining 4 images into one"
+        labels(3) = "Click any quadrant at left to view it below"
+        task.desc = "Use one Mat for up to 4 images"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static nSize = New cv.Size(dst2.Width / 2, dst2.Height / 2)
+        Static roiTopLeft = New cv.Rect(0, 0, nSize.Width, nSize.Height)
+        Static roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
+        Static roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
+        Static roibotRight = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
+        If standalone Or task.intermediateActive Then
+            mat = {task.color.Clone, task.RGBDepth.Clone, task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)}
+        End If
+
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3)
+        For i = 0 To 4 - 1
+            Dim tmp = mat(i).Clone
+            If tmp.Channels = 1 Then tmp = mat(i).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            Dim roi = Choose(i + 1, roiTopLeft, roiTopRight, roibotLeft, roibotRight)
+            dst2(roi) = tmp.Resize(nSize)
+        Next
+        If lineSeparators Then
+            dst2.Line(New cv.Point(0, dst2.Height / 2), New cv.Point(dst2.Width, dst2.Height / 2), cv.Scalar.White, task.lineWidth + 1)
+            dst2.Line(New cv.Point(dst2.Width / 2, 0), New cv.Point(dst2.Width / 2, dst2.Height), cv.Scalar.White, task.lineWidth + 1)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Mat_4Click : Inherits VBparent
+    Public mats As New Mat_4to1
+    Public mat() As cv.Mat
+    Public Sub New()
+        mat = mats.mat
+        labels(3) = "Click a quadrant in dst2 to view it in dst3"
+        task.desc = "Split an image into 4 segments and allow clicking on a quadrant to open it in dst3"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        mat = mats.mat
+        mats.RunClass(Nothing)
+        dst2 = mats.dst2.Clone
+
+        If task.mouseClickFlag And task.mousePicTag = RESULT_DST2 Then setMyActiveMat()
+        dst3 = mats.mat(quadrantIndex).Clone
     End Sub
 End Class
