@@ -431,32 +431,6 @@ End Class
 
 
 
-
-
-
-Public Class Mat_2Click : Inherits VBparent
-    Dim mats As New Mat_2to1
-    Public Sub New()
-        task.desc = "Split an image into 2 segments and allow clicking on each half to open it in dst3"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Then
-            mats.mat(0) = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            cv.Cv2.BitwiseNot(mats.mat(0), mats.mat(1))
-        End If
-        mats.RunClass(src)
-        dst2 = mats.dst2
-
-        ' click in dst2 to display the quadrant in dst3
-        If task.mouseClickFlag And task.mousePicTag = RESULT_DST2 Then
-            If task.mouseClickPoint.Y < dst2.Height / 2 Then dst3 = mats.mat(0) Else dst3 = mats.mat(1)
-        End If
-    End Sub
-End Class
-
-
-
-
 Public Class Mat_4to1 : Inherits VBparent
     Dim model As New cv.Mat(task.color.Size, cv.MatType.CV_8UC3, 0)
     Public mat() As cv.Mat = {model.Clone, model.Clone, model.Clone, model.Clone}

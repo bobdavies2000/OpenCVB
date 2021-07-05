@@ -646,11 +646,9 @@ Public Class Edges_Sobel : Inherits VBparent
             sliders.setupTrackBar(1, "Threshold to zero pixels below this value", 0, 255, 100)
         End If
 
-        If check.Setup(caller, 2) Then
+        If check.Setup(caller, 1) Then
             check.Box(0).Text = "Threshold Sobel Results"
-            check.Box(1).Text = "Use Sobel Results"
             check.Box(0).Checked = True
-            check.Box(1).Checked = True
         End If
 
         task.desc = "Show Sobel edge detection with varying kernel sizes"
