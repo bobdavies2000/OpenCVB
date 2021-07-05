@@ -1667,12 +1667,14 @@ Public Class Depth_Objects : Inherits VBparent
     Public kDepthFlood As New KMeans_FloodFillDepth
     Public kFlood As New KMeans_FloodFill
     Public lutFlood As New LUT_FloodFill
+    Public reductionFlood As New Reduction_Floodfill
     Public Sub New()
         If findfrm(caller + " Radio Options") Is Nothing Then
-            radio.Setup(caller, 3)
+            radio.Setup(caller, 4)
             radio.check(0).Text = "Use RGB KMeans"
             radio.check(1).Text = "Use Depth KMeans"
             radio.check(2).Text = "Use RGB LUT"
+            radio.check(3).Text = "Use Grayscale Reduction"
             radio.check(2).Checked = True
         End If
 
@@ -1684,10 +1686,13 @@ Public Class Depth_Objects : Inherits VBparent
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
         Static radioDepth = findRadio("Use Depth KMeans")
         Static radioLUT = findRadio("Use RGB LUT")
+        Static radioReduction = findRadio("Use Grayscale Reduction")
 
         Dim flood As Object = kFlood
         Dim rectVal As Integer = 255
         If radioLUT.checked Then flood = lutFlood
+        If radioLUT.checked Then flood = lutFlood
+        If radioReduction.checked Then flood = reductionFlood
         If radioDepth.checked Then
             src = task.depth32f
             flood = kDepthFlood

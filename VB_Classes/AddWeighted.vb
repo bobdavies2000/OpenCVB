@@ -42,22 +42,6 @@ End Class
 
 
 
-Public Class AddWeighted_Test : Inherits VBparent
-    Dim addw As New AddWeighted_Basics
-    Public Sub New()
-        task.desc = "test timing"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        addw.src2 = task.RGBDepth
-        addw.RunClass(src)
-        dst3 = addw.dst2
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class AddWeighted_ImageAccumulate : Inherits VBparent

@@ -3,6 +3,7 @@ Imports System.Windows.Forms
 Public Class TreeviewForm
     Dim botDistance As Integer
     Dim addendum As String = ""
+    Dim moduleList As New List(Of String) ' the list of all active algorithms.
     Private Sub OK_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OK_Button.Click
         Me.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.Close()
@@ -60,6 +61,7 @@ Public Class TreeviewForm
     Dim titleStr = " - Click on any node to review the algorithm's input and output."
     Public Sub updateTree()
         If OpenCVB.callTrace.Count = 0 Then Exit Sub
+        moduleList.Clear()
 
         Dim tv = TreeView1
         tv.Nodes.Clear()
@@ -122,11 +124,26 @@ Public Class TreeviewForm
         SyncLock callTraceLock
             Dim pTimes = OpenCVB.PercentTimes
             PercentTime.Clear()
+            Dim latestPercents As New List(Of String)
+            Dim latestModules As New List(Of String)
             For i = pTimes.Count - 1 To 0 Step -1
-                PercentTime.Text += pTimes.ElementAt(i).Value + vbCrLf
+                Dim nextEntry = pTimes.ElementAt(i).Value
+                Dim split = nextEntry.Split(" ")
+                If moduleList.Contains(split(1)) = False Then moduleList.Add(split(1))
+                latestModules.Add(split(1))
+                latestPercents.Add(split(0))
             Next
-            PercentTime.Text += vbCrLf + vbCrLf + "Only algorithm time is measured.  User interface and camera task times are not included."
-            PercentTime.Text += vbCrLf + vbCrLf + addendum
+            For i = 0 To moduleList.Count - 1
+                If latestModules.Contains(moduleList(i)) = False Then
+                    latestPercents.Add("0.00%")
+                    latestModules.Add(moduleList(i))
+                End If
+            Next
+            For i = 0 To latestModules.Count - 1
+                PercentTime.Text += latestPercents(i) + " " + latestModules(i) + vbCrLf
+            Next
+            PercentTime.Text += vbCrLf + "Only algorithm time is measured.  User interface and camera task times are not included."
+            PercentTime.Text += vbCrLf + addendum
         End SyncLock
     End Sub
 End Class

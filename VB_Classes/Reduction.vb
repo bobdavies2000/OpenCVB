@@ -40,8 +40,10 @@ Public Class Reduction_Basics : Inherits VBparent
             dst2 = src
             labels(2) = "No reduction requested"
         End If
-        task.palette.RunClass(dst2.Clone)
-        dst3 = task.palette.dst2
+        If standalone Or task.intermediateActive Then
+            task.palette.RunClass(dst2.Clone)
+            dst3 = task.palette.dst2
+        End If
     End Sub
 End Class
 
@@ -53,14 +55,16 @@ Public Class Reduction_Floodfill : Inherits VBparent
     Public flood As New FloodFill_Basics
     Public reduction As New Reduction_Basics
     Public Sub New()
-        task.desc = "Use the reduction KMeans with floodfill to get masks and centroids of large masses."
+        labels(2) = "Reduced input to floodfill"
+        findSlider("Reduction factor").Value = 32
+        task.desc = "Use the reduction output as input to floodfill to get masks and centroids of large masses."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         reduction.RunClass(src)
         dst2 = reduction.dst2
         flood.RunClass(reduction.dst2)
-        dst3 = flood.dst2
-        labels(2) = flood.labels(3)
+        dst3 = flood.dst3
+        labels(3) = "Floodfill found " + CStr(flood.masks.Count) + " regions and centroids"
     End Sub
 End Class
 

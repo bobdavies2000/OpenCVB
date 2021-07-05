@@ -54,8 +54,8 @@ Public Class OptionsCommon_Depth : Inherits VBparent
         If task.pointCloud.Size <> task.color.Size Then task.pointCloud = task.pointCloud.Resize(task.color.Size, 0, 0, cv.InterpolationFlags.Nearest)
         cv.Cv2.InRange(task.depth32f, task.minDepth, task.maxDepth, task.depthMask)
         cv.Cv2.BitwiseNot(task.depthMask, task.noDepthMask)
-        dst2 = task.depth32f.SetTo(0, task.noDepthMask)
-        If task.pointCloud.Width = task.noDepthMask.Width Then task.pointCloud.SetTo(0, task.noDepthMask) ' reflect the range bounds into the task.pointcloud as well.
+        task.depth32f.SetTo(0, task.noDepthMask)
+        ' If task.pointCloud.Width = task.noDepthMask.Width Then task.pointCloud.SetTo(0, task.noDepthMask) ' reflect the range bounds into the task.pointcloud as well.
     End Sub
 End Class
 

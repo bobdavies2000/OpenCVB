@@ -550,7 +550,6 @@ Public Class KMeans_FloodFillDepth : Inherits VBparent
     Public flood As New FloodFill_Basics
     Public km As New KMeans_Depth
     Public Sub New()
-        usingdst1 = True
         labels(1) = "Click anywhere to see selected region isolated in dst3"
         labels(2) = "FloodFill Results - click to select another region"
         task.desc = "Use KMeans with depth and find masks with floodfill"
@@ -564,6 +563,7 @@ Public Class KMeans_FloodFillDepth : Inherits VBparent
         dst2 = flood.dst2
 
         dst3 = flood.dst3
-        labels(3) = CStr(flood.masks.Count) + " regions.  Selected region = " + CStr(flood.selectedIndex)
+        'labels(3) = CStr(flood.masks.Count) + " regions.  Selected region = " + CStr(flood.selectedIndex)
+        labels = flood.labels
     End Sub
 End Class
