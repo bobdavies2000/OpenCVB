@@ -39,11 +39,13 @@ Public Class Histogram_Basics : Inherits VBparent
         plotHist.hist = histogram
         Dim splitColors() = {cv.Scalar.Blue, cv.Scalar.Green, cv.Scalar.Red}
         plotHist.backColor = splitColors(splitIndex)
-        plotHist.RunClass(src)
+        plotHist.RunClass(src.Clone)
         dst2 = plotHist.dst2
+
         labels(2) = colorName + " histogram, bins = " + CStr(task.histogramBins)
     End Sub
 End Class
+
 
 
 
@@ -296,6 +298,7 @@ End Class
 
 'https://docs.opencv.org/master/d1/db7/tutorial_py_histogram_begins.html
 Public Class Histogram_EqualizeGray : Inherits VBparent
+    Public histogramEQ As New Histogram_Basics
     Public histogram As New Histogram_Basics
     Dim mats As New Mat_4to1
     Public Sub New()
@@ -305,16 +308,14 @@ Public Class Histogram_EqualizeGray : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        task.useKalman = False
         histogram.RunClass(src)
-        mats.mat(2) = src.Clone
-        mats.mat(0) = histogram.dst2.Clone
         cv.Cv2.EqualizeHist(src, dst2)
-        mats.mat(3) = dst2.Clone
-        task.useKalman = True
-        histogram.RunClass(dst2)
+        histogramEQ.RunClass(dst2)
         If standalone Or task.intermediateActive Then
-            mats.mat(1) = histogram.dst2
+            mats.mat(0) = histogram.dst2.Clone
+            mats.mat(1) = histogramEQ.dst2
+            mats.mat(2) = src
+            mats.mat(3) = dst2
             mats.RunClass(Nothing)
             dst3 = mats.dst2
         End If

@@ -98,8 +98,8 @@ Public Class VBparent : Implements IDisposable
                     If task.intermediateObject Is Nothing Then
                         setTrueText("The selected algorithm does not appear to be active.")
                     Else
-                        dst2 = task.intermediateObject.dst2
-                        dst3 = task.intermediateObject.dst3
+                        dst2 = task.intermediateObject.dst2.Clone
+                        dst3 = task.intermediateObject.dst3.Clone
                         task.labels(2) = task.intermediateObject.labels(2)
                         task.labels(3) = task.intermediateObject.labels(3)
                     End If

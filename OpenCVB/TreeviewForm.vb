@@ -143,7 +143,7 @@ Public Class TreeviewForm
                 PercentTime.Text += latestPercents(i) + " " + latestModules(i) + vbCrLf
             Next
             PercentTime.Text += vbCrLf + "Only algorithm time is measured.  User interface and camera task times are not included."
-            PercentTime.Text += vbCrLf + addendum
+            PercentTime.Text += vbCrLf + vbCrLf + addendum
         End SyncLock
     End Sub
 End Class

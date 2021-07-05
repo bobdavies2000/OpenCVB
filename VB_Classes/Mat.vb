@@ -145,9 +145,10 @@ Public Class Mat_4to1 : Inherits VBparent
         Static roibotRight = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
         If standalone Then defaultMats()
 
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8UC3)
         For i = 0 To 4 - 1
             Dim tmp = mat(i).Clone
-            If tmp.Channels <> dst2.Channels Then tmp = mat(i).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+            If tmp.Channels = 1 Then tmp = mat(i).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             Dim roi = Choose(i + 1, roiTopLeft, roiTopRight, roibotLeft, roibotRight)
             dst2(roi) = tmp.Resize(nSize)
         Next

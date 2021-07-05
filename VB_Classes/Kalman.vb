@@ -28,7 +28,7 @@ Public Class Kalman_Basics : Inherits VBparent
         If task.useKalman Then
             For i = 0 To kalman.Length - 1
                 kalman(i).inputReal = kInput(i)
-                kalman(i).Run(src)
+                kalman(i).Run(Nothing)
                 If Double.IsNaN(kalman(i).stateResult) Then kalman(i).stateResult = kalman(i).inputReal ' kalman failure...
                 kOutput(i) = kalman(i).stateResult
             Next
@@ -36,7 +36,7 @@ Public Class Kalman_Basics : Inherits VBparent
             kOutput = kInput ' do nothing to the input.
         End If
 
-        If standalone Then
+        If standalone Or task.intermediateActive Then
             dst2 = src
             Dim rect = New cv.Rect(CInt(kOutput(0)), CInt(kOutput(1)), CInt(kOutput(2)), CInt(kOutput(3)))
             rect = validateRect(rect)
@@ -102,7 +102,7 @@ Public Class Kalman_Stripped : Inherits VBparent
             kOutput = kInput ' do nothing to the input.
         End If
 
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             dst2 = src.Clone()
             Dim rect = New cv.Rect(CInt(kOutput(0)), CInt(kOutput(1)), CInt(kOutput(2)), CInt(kOutput(3)))
             rect = validateRect(rect)
