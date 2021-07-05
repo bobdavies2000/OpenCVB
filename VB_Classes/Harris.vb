@@ -102,11 +102,11 @@ Public Class Harris_Detector_CPP : Inherits VBparent
             Dim pts((ptCount(0) - 1) * 2 - 1) As integer
             Marshal.Copy(ptPtr, pts, 0, ptCount(0))
             Dim ptMat = New cv.Mat(ptCount(0), 2, cv.MatType.CV_32S, pts)
-            If standalone Or task.intermediateName = caller Then src.CvtColor(cv.ColorConversionCodes.GRAY2BGR).CopyTo(dst2)
+            If standalone Or task.intermediateActive Then src.CvtColor(cv.ColorConversionCodes.GRAY2BGR).CopyTo(dst2)
             FeaturePoints.Clear()
             For i = 0 To ptMat.Rows - 1
                 FeaturePoints.Add(New cv.Point2f(ptMat.Get(of integer)(i, 0), ptMat.Get(of integer)(i, 1)))
-                If standalone Or task.intermediateName = caller Then dst2.Circle(FeaturePoints(i), task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
+                If standalone Or task.intermediateActive Then dst2.Circle(FeaturePoints(i), task.dotSize + 2, cv.Scalar.Yellow, -1, task.lineType)
             Next
         End If
     End Sub

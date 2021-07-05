@@ -88,7 +88,7 @@ Public Class Hough_Lines : Inherits VBparent
         segments = cv.Cv2.HoughLines(edges.dst2, rhoIn, thetaIn, threshold)
         labels(2) = "Found " + CStr(segments.Length) + " Lines"
 
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             src.CopyTo(dst2)
             dst2.SetTo(cv.Scalar.White, edges.dst2)
             src.CopyTo(dst3)

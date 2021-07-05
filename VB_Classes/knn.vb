@@ -126,7 +126,7 @@ Public Class KNN_Options : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static trainSlider = findSlider("KNN Train count")
         Static querySlider = findSlider("KNN Query count")
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             If check.Box(0).Checked = False Then useRandomData = True
         End If
 
@@ -139,7 +139,7 @@ Public Class KNN_Options : Inherits VBparent
         End If
 
         ' algorithm does nothing but provide a location for query/train points when not running standalone.
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             ' query/train points need to be manufactured when standalone
             trainingPoints = New List(Of cv.Point2f)(randomTrain.Points2f)
             queryPoints = New List(Of cv.Point2f)(randomQuery.Points2f)
@@ -265,14 +265,14 @@ Public Class KNN_Emax : Inherits VBparent
             emax = New EMax_Centroids()
             emax.RunClass(src) ' set the first generation of points.
         End If
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             knn.basics.knnQT.trainingPoints = New List(Of cv.Point2f)(emax.flood.centroids)
             emax.RunClass(src)
             knn.basics.knnQT.queryPoints = New List(Of cv.Point2f)(emax.flood.centroids)
         End If
 
         knn.RunClass(src)
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             dst2 = emax.dst2 + knn.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             dst3 = knn.dst2
         Else
@@ -383,7 +383,7 @@ Public Class KNN_Point3d : Inherits VBparent
 
         Dim maxDepth As Integer = 4000 ' this is an arbitrary max depth
         Dim knn = cv.ML.KNearest.Create()
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             ReDim lastSet(countSlider.Value - 1)
             ReDim querySet(lastSet.Count - 1)
             For i = 0 To lastSet.Count - 1
@@ -419,7 +419,7 @@ Public Class KNN_Point3d : Inherits VBparent
             For j = 0 To findXnearest - 1
                 responseSet(i * findXnearest + j) = CInt(neighbors.Get(Of Single)(0, j))
             Next
-            If standalone Or task.intermediateName = caller Then
+            If standalone Or task.intermediateActive Then
                 For j = 0 To findXnearest - 1
                     Dim plast = New cv.Point2f(lastSet(responseSet(i * findXnearest + j)).X, lastSet(responseSet(i * findXnearest + j)).Y)
                     Dim pQ = New cv.Point2f(querySet(i).X, querySet(i).Y)
@@ -685,7 +685,7 @@ Public Class KNN_Point2d : Inherits VBparent
         Static nearestCountSlider = findSlider("KNN k nearest points")
         Dim findXnearest = nearestCountSlider.Value
 
-        If standalone Or task.intermediateName = caller Then prepareImage(dst2, task.dotSize)
+        If standalone Or task.intermediateActive Then prepareImage(dst2, task.dotSize)
 
         knn.RunClass(src)
 
@@ -698,7 +698,7 @@ Public Class KNN_Point2d : Inherits VBparent
                 Dim index = neighbors.Get(Of Single)(0, j)
                 responseSet(i * findXnearest + j) = CInt(index)
             Next
-            If standalone Or task.intermediateName = caller Then
+            If standalone Or task.intermediateActive Then
                 For j = 0 To findXnearest - 1
                     dst2.Line(knn.knnQT.trainingPoints(responseSet(i * findXnearest + j)), knn.knnQT.queryPoints(i), cv.Scalar.White, task.lineWidth, task.lineType)
                     dst2.Circle(knn.knnQT.trainingPoints(responseSet(i * findXnearest + j)), task.dotSize, cv.Scalar.Blue, -1, task.lineType, 0)
@@ -805,7 +805,7 @@ Public Class KNN_PointTracker : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static pixelSlider = findSlider("Minimum size of object in pixels")
         Static drawRCCheck = findCheckBox("Caller will handle any drawing required")
-        If standalone Then
+        If standalone Or task.intermediateActive Then
             setTrueText("KNN_PointTracker running standalone has no output.")
             Exit Sub
         End If

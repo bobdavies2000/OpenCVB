@@ -40,7 +40,7 @@ Public Class MatchTemplate_Basics : Inherits VBparent
     End Function
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static sampleSlider = findSlider("Sample Size")
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             searchArea = New cv.Mat(New cv.Size(CInt(sampleSlider.Value), 1), cv.MatType.CV_32FC1)
             template = New cv.Mat(New cv.Size(CInt(sampleSlider.Value), 1), cv.MatType.CV_32FC1)
             cv.Cv2.Randn(searchArea, 100, 25)
@@ -52,7 +52,7 @@ Public Class MatchTemplate_Basics : Inherits VBparent
         cv.Cv2.MatchTemplate(searchArea, template, correlationMat, matchOption)
         correlation = correlationMat.Get(Of Single)(0, 0)
         labels(2) = "Correlation = " + Format(correlation, "#,##0.000")
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             dst2.SetTo(0)
             labels(2) = matchText + " for " + CStr(searchArea.Cols) + " samples = " + Format(correlation, "#,##0.00")
             flow.msgs.Add(matchText + " = " + Format(correlation, "#,##0.00"))

@@ -105,7 +105,7 @@ Public Class Python_MemMap : Inherits VBparent
         End If
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Or task.intermediateName = caller Then memMapValues(0) = task.frameCount
+        If standalone Or task.intermediateActive Then memMapValues(0) = task.frameCount
         Marshal.Copy(memMapValues, 0, memMapPtr, memMapValues.Length)
         memMapWriter.WriteArray(Of Double)(0, memMapValues, 0, memMapValues.Length - 1)
     End Sub

@@ -40,7 +40,7 @@ Public Class MatrixInverse_Basics_CS : Inherits VBparent
             Exit Sub
         End If
 
-        If standalone or task.intermediateName = caller Then matrix.bVector = defaultBVector
+        If standalone or task.intermediateActive Then matrix.bVector = defaultBVector
 
         Dim result = matrix.Run(input) ' C# class Run - see MatrixInverse.cs file...
 

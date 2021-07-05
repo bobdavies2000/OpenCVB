@@ -36,7 +36,7 @@ Public Class Kalman_Basics : Inherits VBparent
             kOutput = kInput ' do nothing to the input.
         End If
 
-        If standalone Or task.intermediateActive Then
+        If standalone Then
             dst2 = src
             Dim rect = New cv.Rect(CInt(kOutput(0)), CInt(kOutput(1)), CInt(kOutput(2)), CInt(kOutput(3)))
             rect = validateRect(rect)
@@ -49,7 +49,7 @@ Public Class Kalman_Basics : Inherits VBparent
             dst2.Rectangle(rect, cv.Scalar.White, 6)
             dst2.Rectangle(rect, cv.Scalar.Red, 1)
         End If
-        If task.intermediateName = caller Then
+        If task.intermediateActive Then
             Dim str = "The kalman output is: "
             For i = 0 To kOutput.Count - 1
                 str += " " + CStr(kOutput(i))
@@ -172,7 +172,7 @@ Public Class Kalman_Compare : Inherits VBparent
         kPlot.maxScale = plot.maxScale ' keep the scale the same for the side-by-side plots.
         kPlot.minScale = plot.minScale
         kPlot.plotData = New cv.Scalar(kalman(0).stateResult, kalman(1).stateResult, kalman(2).stateResult)
-        kplot.RunClass(Nothing)
+        kPlot.RunClass(Nothing)
         dst3 = kPlot.dst2
     End Sub
 End Class
@@ -319,7 +319,7 @@ Public Class Kalman_CVMat : Inherits VBparent
         End If
 
 
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             Dim rx(input.Rows - 1) As Single
             Dim testrect As New cv.Rect
             For i = 0 To input.Rows - 1
@@ -452,7 +452,7 @@ Public Class Kalman_Single : Inherits VBparent
         task.desc = "Estimate a single value using a Kalman Filter - in the default case, the value of the mean of the grayscale image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 2
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             inputReal = dst2.Mean().Item(0)
         End If
@@ -460,7 +460,7 @@ Public Class Kalman_Single : Inherits VBparent
         Dim prediction = kf.Predict()
         measurement.Set(Of Single)(0, 0, inputReal)
         stateResult = kf.Correct(measurement).Get(Of Single)(0, 0)
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             plot.plotData = New cv.Scalar(inputReal, stateResult, 0, 0)
             plot.RunClass(Nothing)
             dst3 = plot.dst2
@@ -690,7 +690,7 @@ Public Class Kalman_VB_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
 
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             Dim gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             kInput = gray.Mean().Item(0)
         End If
@@ -717,7 +717,7 @@ Public Class Kalman_VB_Basics : Inherits VBparent
             kOutput = kInput
         End If
 
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             plot.plotData = New cv.Scalar(kOutput, kInput, kAverage)
             plot.RunClass(Nothing)
         End If

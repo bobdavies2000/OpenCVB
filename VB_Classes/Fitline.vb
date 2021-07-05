@@ -16,7 +16,7 @@ Public Class Fitline_Basics : Inherits VBparent
         Static radiusSlider = findSlider("Accuracy for the radius X100")
         Static angleSlider = findSlider("Accuracy for the angle X100")
 
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             draw.RunClass(src)
             dst3 = draw.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
             dst2 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
@@ -36,7 +36,7 @@ Public Class Fitline_Basics : Inherits VBparent
             Dim rightY = Math.Round((src.Cols - line2d.X1) * slope + line2d.Y1)
             Dim p1 = New cv.Point(0, leftY)
             Dim p2 = New cv.Point(src.Cols - 1, rightY)
-            If standalone Or task.intermediateName = caller Then
+            If standalone Or task.intermediateActive Then
                 lines.Add(p1)
                 lines.Add(p2)
             End If

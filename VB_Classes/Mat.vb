@@ -143,7 +143,7 @@ Public Class Mat_ImageXYZ_MT : Inherits VBparent
           End Sub)
 
         cv.Cv2.Merge(xyzPlanes, xyDepth)
-        If standalone Or task.intermediateName = caller Then setTrueText("Mat built with X, Y, and Z (Depth)", 10, 125)
+        If standalone Or task.intermediateActive Then setTrueText("Mat built with X, Y, and Z (Depth)", 10, 125)
     End Sub
 End Class
 
@@ -408,7 +408,7 @@ Public Class Mat_2to1 : Inherits VBparent
         Static nSize = New cv.Size(task.color.Width, task.color.Height / 2)
         Static roiTop = New cv.Rect(0, 0, nSize.Width, nSize.Height)
         Static roibot = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
-        If standalone Or task.intermediateName = caller Then
+        If standalone Then
             mat1 = src
             mat2 = task.RGBDepth
             mat = {mat1, mat2}
@@ -446,7 +446,7 @@ Public Class Mat_4to1 : Inherits VBparent
         Static roiTopRight = New cv.Rect(nSize.Width, 0, nSize.Width, nSize.Height)
         Static roibotLeft = New cv.Rect(0, nSize.Height, nSize.Width, nSize.Height)
         Static roibotRight = New cv.Rect(nSize.Width, nSize.Height, nSize.Width, nSize.Height)
-        If standalone Or task.intermediateActive Then
+        If standalone Then
             mat = {task.color.Clone, task.RGBDepth.Clone, task.leftView.CvtColor(cv.ColorConversionCodes.GRAY2BGR), task.rightView.CvtColor(cv.ColorConversionCodes.GRAY2BGR)}
         End If
 

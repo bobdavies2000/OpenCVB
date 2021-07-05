@@ -62,7 +62,7 @@ Public Class PointCloud_Display : Inherits VBparent
 
         views.RunClass(src)
 
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             Dim accMsg1 = "TopView - distances are accurate"
             Dim accMsg2 = "SideView - distances are accurate"
             If xRotateSlider.Value <> 0 Or zRotateSlider.Value <> 0 Then
@@ -1101,7 +1101,7 @@ Public Class PointCloud_ObjectsTop : Inherits VBparent
             vo.rectFront = New cv.Rect(newX, r.Y, newWidth, r.Height)
             viewObjects.Add(vo.rectFront.Width * vo.rectFront.Height, vo)
         Next
-        If standalone Or task.intermediateName = caller Or colorizeNeeded Then
+        If standalone Or task.intermediateActive Or colorizeNeeded Then
             setupTop.RunClass(dst2)
             dst2 = setupTop.dst2
         End If
@@ -1207,7 +1207,7 @@ Public Class PointCloud_ObjectsSide : Inherits VBparent
             vo.rectFront = New cv.Rect(r.X, newY, r.Width, newHeight)
             viewObjects.Add(vo.rectFront.Width * vo.rectFront.Height, vo)
         Next
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             setupSide.RunClass(dst2)
             dst2 = setupSide.dst2
         End If

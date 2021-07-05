@@ -39,7 +39,7 @@ Public Class Plot_Basics_CPP : Inherits VBparent
         task.desc = "Demo the use of the integrated 2D plot available in OpenCV (only accessible in C++)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             ReDim srcX(50 - 1)
             ReDim srcY(50 - 1)
             For i = 0 To srcX.Length - 1
@@ -121,7 +121,7 @@ Public Class Plot_OverTime : Inherits VBparent
             columnIndex = 0
         End If
         dst2.ColRange(columnIndex, columnIndex + pixelWidth).SetTo(backColor)
-        If standalone Or task.intermediateName = caller Then plotData = task.color.Mean()
+        If standalone Or task.intermediateActive Then plotData = task.color.Mean()
 
         For i = 0 To plotCount - 1
             If Math.Floor(plotData.Item(i)) < minScale Or Math.Ceiling(plotData.Item(i)) > maxScale Then
@@ -182,7 +182,7 @@ Public Class Plot_OverTime : Inherits VBparent
 
         columnIndex += pixelWidth
         dst2.Col(columnIndex).SetTo(0)
-        If standalone Or task.intermediateName = caller Then labels(2) = "RGB Means: blue = " + Format(plotData.Item(0), "#0.0") + " green = " + Format(plotData.Item(1), "#0.0") + " red = " + Format(plotData.Item(2), "#0.0")
+        If standalone Or task.intermediateActive Then labels(2) = "RGB Means: blue = " + Format(plotData.Item(0), "#0.0") + " green = " + Format(plotData.Item(1), "#0.0") + " red = " + Format(plotData.Item(2), "#0.0")
         AddPlotScale(dst2, minScale - topBottomPad, maxScale + topBottomPad, task.fontSize * 2)
     End Sub
 End Class
@@ -201,7 +201,7 @@ Public Class Plot_Histogram : Inherits VBparent
         task.desc = "Plot histogram data with a stable scale at the left of the image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             Dim gray = If(src.Channels = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
             Dim dimensions() = New Integer() {task.histogramBins}
             Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}

@@ -16,7 +16,7 @@ Public Class Entropy_Basics : Inherits VBparent
             entropyChannels += "Entropy for " + Choose(i + 1, "Red", "Green", "Blue") + " " + Format(nextEntropy, "0.00") + ", "
             entropy += nextEntropy
         Next
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             Static flow = New Font_FlowText()
             flow.msgs.Add("Entropy total = " + Format(entropy, "0.00") + " - " + entropyChannels)
             flow.RunClass(Nothing)
@@ -69,7 +69,7 @@ Public Class Entropy_Highest : Inherits VBparent
 
         dst2 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        If standalone Or task.intermediateName = caller Then dst2.Rectangle(eMaxRect, cv.Scalar.Red, 4)
+        If standalone Or task.intermediateActive Then dst2.Rectangle(eMaxRect, cv.Scalar.Red, 4)
         labels(3) = "Lighter = higher entropy. Range: " + Format(minEntropy, "0.0") + " to " + Format(maxEntropy, "0.0")
     End Sub
 End Class

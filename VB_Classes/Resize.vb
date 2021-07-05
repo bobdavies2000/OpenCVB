@@ -14,7 +14,7 @@ Public Class Resize_Basics : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         rotateOptions.RunClass(src)
 
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             Dim roi = New cv.Rect(src.Width / 4, src.Height / 4, src.Width / 2, src.Height / 2)
             If task.drawRect.Width <> 0 Then roi = task.drawRect
 
@@ -47,7 +47,7 @@ Public Class Resize_Percentage : Inherits VBparent
         resizeOptions.newSize = New cv.Size(Math.Ceiling(src.Width * resizePercent), Math.Ceiling(src.Height * resizePercent))
         resizeOptions.RunClass(src)
 
-        If standalone or task.intermediateName = caller Then
+        If standalone or task.intermediateActive Then
             Dim roi As New cv.Rect(0, 0, resizeOptions.dst2.Width, resizeOptions.dst2.Height)
             dst2 = resizeOptions.dst2(roi).Resize(resizeOptions.dst2.Size())
             labels(2) = "Image after resizing to " + Format(sliders.trackbar(0).Value, "#0.0") + "% of original size"
@@ -91,6 +91,6 @@ Public Class Resize_Options : Inherits VBparent
             End If
         Next
 
-        If standalone Or task.intermediateName = caller Then setTrueText("No output - just options for Resize and GetRotationMatrix2D")
+        If standalone Or task.intermediateActive Then setTrueText("No output - just options for Resize and GetRotationMatrix2D")
     End Sub
 End Class

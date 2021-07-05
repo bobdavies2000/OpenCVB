@@ -234,7 +234,7 @@ Public Class Palette_Gradient : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If task.frameCount Mod frameModulo = 0 Then
-            If standalone Or task.intermediateName = caller Then
+            If standalone Or task.intermediateActive Then
                 color1 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
                 color2 = New cv.Scalar(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
             End If
@@ -286,7 +286,7 @@ Public Class Palette_RandomColorMap : Inherits VBparent
                 If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
             Next
             gradientColorMap = gradientColorMap.Resize(New cv.Size(256, 1))
-            If standalone Or task.intermediateName = caller Then dst3 = gradientColorMap
+            If standalone Or task.intermediateActive Then dst3 = gradientColorMap
         End If
         gradientColorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b) ' black is black!
         dst2 = Palette_Custom_Apply(src.Clone, gradientColorMap)

@@ -139,7 +139,7 @@ Public Class VBparent : Implements IDisposable
     End Sub
     Public Sub setTrueText(text As String, Optional x As Integer = 10, Optional y As Integer = 40, Optional picTag As Integer = 2)
         Dim str As New TTtext(text, x, y, picTag)
-        If task.intermediateName = caller Or task.intermediateName = "" Then task.ttTextData.Add(str)
+        If task.intermediateActive Or task.intermediateName = "" Then task.ttTextData.Add(str)
     End Sub
     Public Function validateRect(r As cv.Rect) As cv.Rect
         If r.Width < 0 Then r.Width = 1

@@ -82,7 +82,7 @@ Public Class EMax_Raw : Inherits VBparent
 
         task.palette.RunClass(dst3 * 255 / options.regionCount)
         dst2 = task.palette.dst2
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             inputDataMask = options.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(1, 255, cv.ThresholdTypes.Binary)
             dst2.SetTo(cv.Scalar.White, inputDataMask)
         End If
@@ -165,7 +165,7 @@ Public Class EMax_Setup : Inherits VBparent
 
         samples = samples.Reshape(1, 0)
 
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             dst2.SetTo(cv.Scalar.Black)
             ' draw the clustered samples
             For i = 0 To samples.Rows - 1
@@ -192,7 +192,7 @@ Public Class EMax_VB_Failing : Inherits VBparent
         task.desc = "OpenCV expectation maximization example."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             setTrueText("The EMax algorithm fails as a result of a bug in em_model.Predict2.  See code for details." + vbCrLf +
                           "The C++ version works fine (EMax_Raw) and the 2 are functionally identical.", 20, 100)
 

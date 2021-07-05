@@ -135,7 +135,7 @@ Public Class TreeviewForm
             Next
             For i = 0 To moduleList.Count - 1
                 If latestModules.Contains(moduleList(i)) = False Then
-                    latestPercents.Add("0.00%")
+                    latestPercents.Add("00.0%")
                     latestModules.Add(moduleList(i))
                 End If
             Next

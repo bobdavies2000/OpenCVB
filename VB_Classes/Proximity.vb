@@ -359,7 +359,7 @@ Public Class Proximity_Clusters : Inherits VBparent
         paletteSrc += 1
         task.palette.RunClass(paletteSrc)
         dst3 = task.palette.dst2
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             labels(2) = "Histogram of " + CStr(valleys.ranges.Count) + " Depth Clusters"
             labels(3) = "Backprojection of " + CStr(valleys.ranges.Count) + " histogram clusters"
         End If

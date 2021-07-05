@@ -429,7 +429,7 @@ Public Class Draw_ViewObjects : Inherits VBparent
         task.desc = "Draw rectangles and centroids"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             setTrueText("Draw_ViewObjects has no standalone version." + vbCrLf + "It just draws rectangles and centroids for other algorithms.")
         Else
             dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -555,7 +555,7 @@ Public Class Draw_Intersection : Inherits VBparent
         task.desc = "Determine if 2 lines intersect"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             If task.frameCount Mod 100 <> 0 Then Exit Sub
             p1 = New cv.Point(Rnd() * src.Width, Rnd() * src.Height)
             p2 = New cv.Point(Rnd() * src.Width, Rnd() * src.Height)

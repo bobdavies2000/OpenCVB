@@ -67,7 +67,7 @@ Public Class LineFLD_Basics : Inherits VBparent
                 Next
             End If
         End If
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             For j = 0 To lines.Count - 1 Step 4
                 Dim v = lines(j)
                 Dim pt1 = New cv.Point(v(0), v(1))

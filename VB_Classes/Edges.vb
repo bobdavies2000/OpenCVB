@@ -642,7 +642,7 @@ Public Class Edges_Sobel : Inherits VBparent
     Dim addw As New AddWeighted_Basics
     Public Sub New()
         If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Sobel kernel Size", 1, 32, 3)
+            sliders.setupTrackBar(0, "Sobel kernel Size", 1, 32, 4)
             sliders.setupTrackBar(1, "Threshold to zero pixels below this value", 0, 255, 100)
         End If
 

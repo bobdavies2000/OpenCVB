@@ -51,7 +51,7 @@ Public Class Font_FlowText : Inherits VBparent
         task.desc = "Show TrueType text flowing through an image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             msgs.Add("-------------------------------------------------------------------------------------------------------------------")
             msgs.Add("To get text to flow across an image in any algorithm, add 'flow = new Font_FlowText()' to the class constructor.")
             msgs.Add("Also optionally indicate if you want result1 or result2 for text (the default is result1.)")

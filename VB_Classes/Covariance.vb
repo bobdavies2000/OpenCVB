@@ -8,7 +8,7 @@ Public Class Covariance_Basics : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Dim covariance As New cv.Mat, mean = New cv.Mat
         dst3.SetTo(0)
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             random.RunClass(Nothing)
             samples = New cv.Mat(random.Points.Length, 2, cv.MatType.CV_32F, random.Points2f)
             For i = 0 To random.Points.Length - 1
@@ -24,7 +24,7 @@ Public Class Covariance_Basics : Inherits VBparent
                    Format(covariance.Get(Of Double)(1, 1), "#0.0") + vbCrLf
         output += "Mean X, Mean Y" + vbTab + vbTab + Format(overallMean(0), "#0.00") + vbTab + vbTab +
                      Format(overallMean(1), "#0.00") + vbCrLf
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             Dim newCenter = New cv.Point(overallMean(0), overallMean(1))
             Static lastCenter = newCenter
             dst3.Circle(newCenter, 5, cv.Scalar.Red, -1, task.lineType)

@@ -96,7 +96,7 @@ Public Class Thread_Grid : Inherits VBparent
             lastBorder = borderSize
         End If
 
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             task.color.CopyTo(dst2)
             dst2.SetTo(cv.Scalar.All(255), gridMask)
             labels(2) = "Thread_Grid " + CStr(roiList.Count - incompleteRegions) + " (" + CStr(tilesPerRow) + "X" + CStr(tilesPerCol) + ") " +

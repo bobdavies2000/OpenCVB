@@ -34,7 +34,7 @@ Public Class IMU_Basics : Inherits VBparent
             theta.X = theta.X * alpha + accelAngle.X * (1 - alpha)
             theta.Z = theta.Z * alpha + accelAngle.Z * (1 - alpha)
         End If
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             flow.msgs.Add("ts = " + Format(task.IMU_TimeStamp, "#0.00") + " Acceleration (m/sec^2) x = " + Format(task.IMU_Acceleration.X, "#0.00") +
                                   " y = " + Format(task.IMU_Acceleration.Y, "#0.00") + " z = " + Format(task.IMU_Acceleration.Z, "#0.00") + vbTab +
                                   " Motion (rads/sec) pitch = " + Format(task.IMU_AngularVelocity.X, "#0.00") +
@@ -212,7 +212,7 @@ Public Class IMU_FrameTime : Inherits VBparent
 
         histogramIMU(Math.Min(CInt(task.IMU_FrameTime), histogramIMU.Length - 1)) += 1
 
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             Dim output = "IMU_TimeStamp (ms) " + Format(task.IMU_TimeStamp, "00") + vbCrLf +
                         "CPU TimeStamp (ms) " + Format(task.CPU_TimeStamp, "00") + vbCrLf +
                         "IMU Frametime (ms, sampled) " + Format(sampledIMUFrameTime, "000.00") +
@@ -294,7 +294,7 @@ Public Class IMU_HostFrameTimes : Inherits VBparent
 
         hist(Math.Min(CInt(task.CPU_FrameTime), hist.Length - 1)) += 1
 
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             Dim output = "IMU_TimeStamp (ms) " + Format(task.IMU_TimeStamp, "00") + vbCrLf +
                          "CPU TimeStamp (ms) " + Format(task.CPU_TimeStamp, "00") + vbCrLf +
                          "Host Frametime (ms, sampled) " + Format(sampledCPUFrameTime, "000.00") +
@@ -460,7 +460,7 @@ Public Class IMU_GVector : Inherits VBparent
             task.angleZ = kalman.kOutput(5)
         End If
 
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             Dim outStr As String = "Acceleration and their angles are smoothed with a Kalman filters:" + vbCrLf + vbCrLf
             outStr = "IMU Acceleration in X-direction = " + vbTab + vbTab + Format(gx, "#0.0000") + vbCrLf
             outStr += "IMU Acceleration in Y-direction = " + vbTab + vbTab + Format(gy, "#0.0000") + vbCrLf

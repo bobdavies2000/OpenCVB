@@ -71,7 +71,7 @@ Public Class Annealing_Basics_CPP : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         If closed = True Then Exit Sub
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             If task.frameCount = 0 Then
                 setup()
                 Open()
@@ -90,7 +90,7 @@ Public Class Annealing_Basics_CPP : Inherits VBparent
         If restartComputation Or InStr(msg, "temp=0.000") Or InStr(msg, "changesApplied=0 temp") Then
             Annealing_Basics_Close(saPtr)
             restartComputation = False
-            If standalone Or task.intermediateName = caller Then
+            If standalone Or task.intermediateActive Then
                 setup()
                 Open()
             End If
@@ -157,6 +157,7 @@ Public Class Annealing_CPP_MT : Inherits VBparent
         labels(2) = "Log of Annealing progress"
         labels(3) = "Top 2 are best solutions, bottom 2 are worst."
 
+        flow.dst = RESULT_DST3
         task.desc = "Setup and control finding the optimal route for a traveling salesman"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
@@ -211,7 +212,7 @@ Public Class Annealing_CPP_MT : Inherits VBparent
             mats.mat(3) = anneal(CInt(bestList.ElementAt(bestList.Count - 1).Value)).dst2
         End If
         mats.RunClass(src)
-        dst3 = mats.dst2
+        dst2 = mats.dst2
 
         ' copy the top half of the solutions to the bottom half (worst solutions)
         If copyBestCheck.Checked Then

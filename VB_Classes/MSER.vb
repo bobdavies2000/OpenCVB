@@ -128,7 +128,7 @@ Public Class MSER_Options : Inherits VBparent
         If check.Box(1).Checked Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         mser.DetectRegions(input, regions, boxes)
 
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             dst2 = src.Clone
             For Each z In boxes
                 If z.Size.Width * z.Size.Height > minArea Then dst2.Rectangle(z, cv.Scalar.Yellow, 1)

@@ -12,7 +12,7 @@ Public Class Histogram_Basics : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 3
         Static splitIndex = 0
         Static colorName = "Gray"
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             If src.Channels <> 1 Then
                 If task.frameCount Mod 100 = 0 Then splitIndex = If(splitIndex < 2, splitIndex + 1, 0)
                 colorName = Choose(splitIndex + 1, "Blue", "Green", "Red")
@@ -652,7 +652,7 @@ End Class
 '            dst2.Rectangle(r, cv.Scalar.White, 1)
 '            minZ = task.maxZ * r.X / w
 '            maxZ = task.maxZ * (r.X + r.Width) / w
-'            If standalone Or task.intermediateName = caller Then setTrueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset)
+'            If standalone Or task.intermediateActive Then setTrueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset)
 '        Next
 '        labels(2) = CStr(flood.rects.Count) + " objects were identified in the side view"
 
@@ -665,7 +665,7 @@ End Class
 '            dst3.Rectangle(r, cv.Scalar.White, 1)
 '            minZ = task.maxZ * (h - r.Y - r.Height) / h
 '            maxZ = task.maxZ * (h - r.Y) / h
-'            If standalone Or task.intermediateName = caller Then setTrueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset, 3)
+'            If standalone Or task.intermediateActive Then setTrueText(Format(minZ, "0.0") + "m to " + Format(maxZ, "0.0") + "m", r.X, r.Y - offset, 3)
 '        Next
 
 '        labels(3) = CStr(flood.rects.Count) + " objects identified.  Largest is yellow."
@@ -1000,7 +1000,7 @@ Public Class Histogram_Depth : Inherits VBparent
         Dim ranges() = New cv.Rangef() {New cv.Rangef(plotHist.minRange, plotHist.maxRange)}
         cv.Cv2.CalcHist(New cv.Mat() {task.depth32f}, New Integer() {0}, New cv.Mat, plotHist.hist, 1, histSize, ranges)
 
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             plotHist.RunClass(src)
             dst2 = plotHist.dst2
         End If

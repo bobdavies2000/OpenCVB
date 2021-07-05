@@ -298,7 +298,7 @@ Public Class Random_CustomDistribution : Inherits VBparent
             Next
         Next
 
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             plotHist.hist = outputHistogram
             plotHist.RunClass(src)
             dst2 = plotHist.dst2
@@ -339,7 +339,7 @@ Public Class Random_MonteCarlo : Inherits VBparent
             End While
         Next
 
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             plotHist.hist = histogram
             plotHist.RunClass(src)
             dst2 = plotHist.dst2
@@ -374,7 +374,7 @@ Public Class Random_CustomHistogram : Inherits VBparent
         random.inputCDF = saveHist ' it will convert the histogram into a cdf where the last value must be near one.
         random.RunClass(src)
 
-        If standalone Or task.intermediateName = caller Then
+        If standalone Or task.intermediateActive Then
             hist.plotHist.plotMaxValue = 100
             hist.plotHist.hist = random.outputHistogram
             hist.plotHist.RunClass(src)

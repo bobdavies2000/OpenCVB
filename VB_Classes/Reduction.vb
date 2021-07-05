@@ -34,7 +34,7 @@ Public Class Reduction_Basics : Inherits VBparent
         ElseIf simpleCheck.Checked Then
             dst2 = src / reductionVal
             dst2 *= reductionVal
-            If task.intermediateName = caller Then dst2.ConvertTo(dst2, cv.MatType.CV_32F)
+            If task.intermediateActive Then dst2.ConvertTo(dst2, cv.MatType.CV_32F)
             labels(2) = "Reduced image - factor = " + CStr(reductionVal)
         Else
             dst2 = src
