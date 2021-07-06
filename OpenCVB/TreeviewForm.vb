@@ -142,10 +142,11 @@ Public Class TreeviewForm
                     latestModules.Add(moduleList(i))
                 End If
             Next
+            PercentTime.Text = "Algorithm FPS = " + Format(OpenCVB.algorithmFPS, "#0.0") + vbCrLf + vbCrLf
             For i = 0 To latestModules.Count - 1
                 PercentTime.Text += latestPercents(i) + " " + latestModules(i) + vbCrLf
             Next
-            PercentTime.Text += vbCrLf + "Algorithm/Non-Algorithm time is measured.  UI and camera task are Non-Algorithm." + vbCrLf
+            PercentTime.Text += vbCrLf + "Algorithm and Non-Algorithm time are measured.  UI and camera task are Non-Algorithm." + vbCrLf
             PercentTime.Text += vbCrLf + vbCrLf + addendum
         End SyncLock
     End Sub

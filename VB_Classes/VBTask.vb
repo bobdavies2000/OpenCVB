@@ -105,11 +105,9 @@ Module Algorithm_Module
             Dim nextTime = Now
 
             Dim index = algorithmStack.Peek
-            If index > 0 Then
-                Dim elapsedTicks = nextTime.Ticks - algorithmTimes(index).Ticks
-                Dim span = New TimeSpan(elapsedTicks)
-                task.algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
-            End If
+            Dim elapsedTicks = nextTime.Ticks - algorithmTimes(index).Ticks
+            Dim span = New TimeSpan(elapsedTicks)
+            task.algorithm_ms(index) += span.Ticks / TimeSpan.TicksPerMillisecond
 
             index = task.algorithmNames.IndexOf(name)
             algorithmTimes(index) = nextTime
@@ -425,6 +423,14 @@ Public Class ActiveTask : Implements IDisposable
                 algorithmFrameCount += 1
             End If
             If task.parms.useRecordedData Then recordedData.RunClass(task.color.Clone)
+
+            Static lastTime = Now
+            Dim nextTime = Now
+            Dim elapsedTicks = nextTime.Ticks - lastTime.Ticks
+            Dim span = New TimeSpan(elapsedTicks)
+            algorithm_ms(0) += span.Ticks / TimeSpan.TicksPerMillisecond
+            algorithmTimes(1) = nextTime ' starting the main algorithm
+
             ' run any global options algorithms here.
             depthOptions.RunClass(Nothing) ' updates all the depth info.
             IMUStable.RunClass(Nothing) ' updates the flag that indicates stability according to the IMU.
@@ -433,6 +439,8 @@ Public Class ActiveTask : Implements IDisposable
             TaskTimer.Enabled = True
             algorithmObject.NextFrame(task.color.Clone)
             TaskTimer.Enabled = False
+
+            lastTime = Now
 
         Catch ex As Exception
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)

@@ -803,12 +803,13 @@ Public Class KNN_PointTracker : Inherits VBparent
         Next
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static pixelSlider = findSlider("Minimum size of object in pixels")
-        Static drawRCCheck = findCheckBox("Caller will handle any drawing required")
         If standalone Or task.intermediateActive Then
             setTrueText("KNN_PointTracker running standalone has no output.")
             Exit Sub
         End If
+
+        Static pixelSlider = findSlider("Minimum size of object in pixels")
+        Static drawRCCheck = findCheckBox("Caller will handle any drawing required")
 
         ' allocate the kalman filters for each centroid with some additional filters for objects that come and go...
         If kalman.Count < queryPoints.Count + newCentroids.Count Then allocateKalman(queryPoints.Count + newCentroids.Count)

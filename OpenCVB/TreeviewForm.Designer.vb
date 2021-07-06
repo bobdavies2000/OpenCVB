@@ -82,11 +82,11 @@ Partial Class TreeviewForm
         '
         'PercentTime
         '
-        Me.PercentTime.Location = New System.Drawing.Point(634, 12)
+        Me.PercentTime.Location = New System.Drawing.Point(514, 12)
         Me.PercentTime.Multiline = True
         Me.PercentTime.Name = "PercentTime"
         Me.PercentTime.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.PercentTime.Size = New System.Drawing.Size(252, 67)
+        Me.PercentTime.Size = New System.Drawing.Size(372, 67)
         Me.PercentTime.TabIndex = 3
         '
         'Timer1

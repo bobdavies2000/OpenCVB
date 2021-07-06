@@ -71,6 +71,7 @@ Public Class OpenCVB
     Dim openCVKeywords As New List(Of String)
     Public optionsForm As OptionsDialog
     Dim TreeViewDialog As TreeviewForm
+    Public algorithmFPS As Single
     Dim picLabels() = {"RGB", "Depth", "dst2", "dst3"}
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
     Public workingRes As cv.Size
@@ -1049,7 +1050,7 @@ Public Class OpenCVB
 
         Dim countFrames = frameCount - lastAlgorithmFrame
         lastAlgorithmFrame = frameCount
-        Dim algorithmFPS As Single = countFrames / (fpsTimer.Interval / 1000)
+        algorithmFPS = countFrames / (fpsTimer.Interval / 1000)
 
         Dim camFrames = camera.frameCount - lastCameraFrame
         lastCameraFrame = camera.frameCount

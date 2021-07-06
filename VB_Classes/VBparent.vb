@@ -55,15 +55,15 @@ Public Class VBparent : Implements IDisposable
         task.activeObjects.Add(Me)
         If standalone Then
             task.algorithmNames.Add("Non-Algorithm Time")
-            task.algorithm_ms.Add(0)
             algorithmTimes.Add(Now)
-            algorithmStack.Push(0)
+            task.algorithm_ms.Add(0)
 
             task.algorithmNames.Add(caller)
+            algorithmTimes.Add(Now)
             task.algorithm_ms.Add(0)
 
-            algorithmTimes.Add(Now)
             algorithmStack = New Stack()
+            algorithmStack.Push(0)
             algorithmStack.Push(1)
         End If
     End Sub
@@ -84,17 +84,7 @@ Public Class VBparent : Implements IDisposable
     Public Sub NextFrame(src As cv.Mat)
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
 
-        Static lastTime = Now
-        Dim nextTime = Now
-        Dim elapsedTicks = nextTime.Ticks - lastTime.Ticks
-        Dim span = New TimeSpan(elapsedTicks)
-        task.algorithm_ms(0) += span.Ticks / TimeSpan.TicksPerMillisecond
-
-        startRun("Non-Algorithm Time")
         algorithm.RunClass(src)
-        endRun("Non-Algorithm Time")
-
-        lastTime = Now
 
         If standalone Or caller = "Python_Run" Then
             task.dst0Updated = usingdst0
