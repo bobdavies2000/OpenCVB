@@ -211,7 +211,7 @@ Public Class VBparent : Implements IDisposable
         Return outMat
     End Function
     Public Sub Dispose() Implements IDisposable.Dispose
-        If aOptions IsNot Nothing Then aOptions.Close()
+        If allOptions IsNot Nothing Then allOptions.Close()
         If task.pythonTaskName.EndsWith(".py") Then
             Dim proc = Process.GetProcessesByName("python")
             For i = 0 To proc.Count - 1

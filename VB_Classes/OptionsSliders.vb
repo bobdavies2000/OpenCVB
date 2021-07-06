@@ -10,12 +10,12 @@ Public Class OptionsSliders
     Dim algoIndex As Integer
     Public Function Setup(caller As String, Optional count As Integer = 4) As Boolean
         If findfrm(caller + " Slider Options") IsNot Nothing Then Return False
-        If aOptions.Text <> "" Then Me.MdiParent = aOptions
+        If allOptions.Text <> "" Then Me.MdiParent = allOptions
         ReDim trackbar(count - 1)
         ReDim sLabels(count - 1)
         ReDim countLabel(count - 1)
         Me.Text = caller + " Slider Options"
-        aOptions.addTitle(Me)
+        allOptions.addTitle(Me)
         Dim yIncr = 100
         For i = 0 To trackbar.Count - 1
             FlowLayoutPanel1.FlowDirection = FlowDirection.LeftToRight

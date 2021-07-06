@@ -10,7 +10,7 @@ Public Class OptionsGlobal
         maxCount.Text = CStr(MaxRange.Value)
     End Sub
     Private Sub OptionsGlobal_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.MdiParent = aOptions
+        Me.MdiParent = allOptions
         MaxRange.Value = GetSetting("OpenCVB", "MaxRangeDepth", "MaxRangeDepth", 4000)
         HistBinSlider.Value = GetSetting("OpenCVB", "HistogramBins", "HistogramBins", 40)
         ProjectionSlider.Value = GetSetting("OpenCVB", "ProjectionThreshold", "ProjectionThreshold", 2)

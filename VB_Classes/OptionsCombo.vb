@@ -1,9 +1,9 @@
 ﻿Imports cv = OpenCvSharp
 Public Class OptionsCombo
     Public Sub Setup(caller As String, label As String, comboList As List(Of String))
-        Me.MdiParent = aOptions
+        Me.MdiParent = allOptions
         Me.Text = caller + " ComboBox Options"
-        aOptions.addTitle(Me)
+        allOptions.addTitle(Me)
         ComboLabel.Text = label
         For i = 0 To comboList.Count - 1
             Box.Items.Add(comboList.ElementAt(i))

@@ -3,7 +3,7 @@ Imports System.Windows.Forms
 Imports System.IO.Pipes
 Module Algorithm_Module
     Public task As ActiveTask
-    Public aOptions As OptionsContainer
+    Public allOptions As OptionsContainer
     Public Const RESULT_DST0 = 0 ' 0=rgb 1=depth 2=dst1 3=dst2
     Public Const RESULT_DST1 = 1 ' 0=rgb 1=depth 2=dst1 3=dst2
     Public Const RESULT_DST2 = 2 ' 0=rgb 1=depth 2=dst1 3=dst2
@@ -363,9 +363,9 @@ Public Class ActiveTask : Implements IDisposable
         buildColors()
         task.pythonTaskName = task.parms.homeDir + "VB_Classes\" + task.algName
 
-        aOptions = New OptionsContainer
+        allOptions = New OptionsContainer
 
-        If task.algName.EndsWith(".py") = False Then aOptions.Show()
+        If task.algName.EndsWith(".py") = False Then allOptions.Show()
 
         If task.paused Then PixelViewer = algoList.createAlgorithm("Pixel_Viewer")
 
@@ -405,7 +405,7 @@ Public Class ActiveTask : Implements IDisposable
         task.hFov = hFOVangles(parms.cameraName)
         task.vFov = vFOVangles(parms.cameraName)
 
-        If aOptions IsNot Nothing Then aOptions.layoutOptions()
+        If allOptions IsNot Nothing Then allOptions.layoutOptions()
         Application.DoEvents()
     End Sub
     Public Sub RunAlgorithm()

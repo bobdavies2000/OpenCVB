@@ -3,10 +3,10 @@ Public Class OptionsCheckbox
     Public Box() As CheckBox
     Public Function Setup(caller As String, count As Integer) As Boolean
         If findfrm(caller + " CheckBox Options") IsNot Nothing Then Return False
-        Me.MdiParent = aOptions
+        Me.MdiParent = allOptions
         ReDim Box(count - 1)
         Me.Text = caller + " CheckBox Options"
-        aOptions.addTitle(Me)
+        allOptions.addTitle(Me)
         For i = 0 To Box.Count - 1
             Box(i) = New CheckBox
             Box(i).AutoSize = True

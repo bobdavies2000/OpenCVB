@@ -19,8 +19,8 @@ Public Class OptionsFileName
         End Get
     End Property
     Public Sub Setup(caller As String)
-        Me.MdiParent = aOptions
+        Me.MdiParent = allOptions
         Me.Text = caller + " OpenFile Options"
-        aOptions.addTitle(Me)
+        allOptions.addTitle(Me)
     End Sub
 End Class

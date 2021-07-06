@@ -115,32 +115,30 @@ End Class
 Public Class BGSubtract_Basics_MT : Inherits VBparent
     Dim grid As New Thread_Grid
     Public Sub New()
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
-        End If
+        If sliders.Setup(caller) Then sliders.setupTrackBar(0, "Correlation Threshold", 0, 1000, 980)
 
         task.desc = "Detect Motion in the color image"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        grid.RunClass(Nothing)
-        Dim input = src
-        If input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = input.EmptyClone.SetTo(0)
-        dst3 = input.Clone()
         Static correlationSlider = findSlider("Correlation Threshold")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
-        dst2.SetTo(0)
+
+        grid.RunClass(Nothing)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst2 = src.Clone
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         Dim updateCount As Integer
-        Parallel.ForEach(Of cv.Rect)(grid.roiList,
-        Sub(roi)
+        'Parallel.ForEach(Of cv.Rect)(grid.roiList,
+        'Sub(roi)
+        For Each roi In grid.roiList
             Dim correlation As New cv.Mat
-            cv.Cv2.MatchTemplate(input(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+            cv.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
             If correlation.Get(Of Single)(0, 0) < CCthreshold Then
                 Interlocked.Increment(updateCount)
-                input(roi).CopyTo(dst3(roi))
+                src(roi).CopyTo(dst3(roi))
             End If
-            input(roi).CopyTo(dst2(roi))
-        End Sub)
+        Next
+        'End Sub)
         labels(2) = "Motion added to dst3 for " + CStr(updateCount) + " segments out of " + CStr(grid.roiList.Count)
         labels(3) = CStr(grid.roiList.Count - updateCount) + " segments had > " + Format(correlationSlider.value / 1000, "0.0%") + " correlation"
     End Sub

@@ -36,8 +36,8 @@ Public Class SVM_Options : Inherits VBparent
             radio1.check(4).Text = "SVM Type = OneClass"
         End If
         radio1.Text = caller + " SVM Type Radio Options"
-        aOptions.optionsTitle.Add(radio1.Text)
-        aOptions.hiddenOptions.Remove(caller + " Radio Options")
+        allOptions.optionsTitle.Add(radio1.Text)
+        allOptions.hiddenOptions.Remove(caller + " Radio Options")
         radio1.Show()
         labels(2) = "SVM_Options - only options, no output"
         task.desc = "SVM has many options - enough to make a class for it."
