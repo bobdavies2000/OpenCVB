@@ -73,7 +73,7 @@ Public Class SuperRes_Input : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         video.RunClass(Nothing)
-        If video.dst2.Empty() = False And video.image.Empty() = False Then dst2 = video.image
+        dst2 = video.dst2
     End Sub
 End Class
 
@@ -133,11 +133,12 @@ Public Class SuperRes_SubPixelZoom : Inherits VBparent
     Dim video As New SuperRes_Input
     Public Sub New()
         usingdst1 = True
-        zoom.zoom.mousePoint = New cv.Point(100, 100)
         task.desc = "Is SuperRes better than just zoom with sub-pixel accuracy?"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
+        task.mousePoint = New cv.Point(45, 60)
         video.RunClass(Nothing)
+        If video.video.captureVideo.PosFrames > 30 Then Exit Sub
         dst1 = video.dst2
         zoom.RunClass(video.dst2)
         dst2 = zoom.dst2

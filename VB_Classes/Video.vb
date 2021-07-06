@@ -3,7 +3,6 @@ Imports System.IO
 ' https://stackoverflow.com/questions/47706339/car-counting-and-classification-using-emgucv-and-vb-net
 Public Class Video_Basics : Inherits VBparent
     Public srcVideo As String
-    Public image As New cv.Mat
     Public captureVideo As New cv.VideoCapture
     Public fileNameForm As OptionsFileName
     Dim fileInfo As FileInfo
@@ -37,15 +36,16 @@ Public Class Video_Basics : Inherits VBparent
             srcVideo = fileNameForm.filename.Text
             captureVideo = New cv.VideoCapture(fileNameForm.filename.Text)
         End If
-        captureVideo.Read(image)
-        If image.Empty() Then
+        captureVideo.Read(dst1)
+        If dst1.Empty() Then
             captureVideo.Dispose()
             captureVideo = New cv.VideoCapture(fileNameForm.filename.Text)
-            captureVideo.Read(image)
+            captureVideo.Read(dst1)
         End If
 
-        fileNameForm.TrackBar1.Value = 10000 * captureVideo.PosFrames / captureVideo.FrameCount
-        If image.Empty() = False Then dst2 = image.Resize(dst2.Size())
+        fileNameForm.TrackBar1.Maximum = captureVideo.FrameCount
+        fileNameForm.TrackBar1.Value = captureVideo.PosFrames
+        dst2 = dst1.Resize(dst1.Size())
     End Sub
 End Class
 
@@ -64,39 +64,37 @@ Public Class Video_CarCounting : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         video.RunClass(src)
-        If video.dst2.Empty() = False And video.image.Empty() = False Then
-            dst2.SetTo(0)
-            bgSub.RunClass(video.image)
-            Dim videoImage = bgSub.dst2
-            dst3 = video.dst2
+        dst2.SetTo(0)
+        bgSub.RunClass(video.dst1) ' use the original size of the video input - not the dst2 size...
+        Dim videoImage = bgSub.dst2
+        dst3 = video.dst2
 
-            ' there are 5 lanes of traffic so setup 5 regions
-            ' NOTE: if long shadows are present this approach will not work without provision for the width of a car.  Needs more sample data.
-            Dim activeHeight = 30
-            Dim finishLine = bgSub.dst2.Height - activeHeight * 8
-            Static activeState(5) As Boolean
-            Static carCount As Integer
-            For i = 1 To activeState.Length - 1
-                Dim lane = New cv.Rect(Choose(i, 230, 460, 680, 900, 1110), finishLine, 40, activeHeight)
-                Dim cellCount = videoImage(lane).CountNonZero()
-                If cellCount Then
-                    activeState(i) = True
-                    videoImage.Rectangle(lane, cv.Scalar.Red, -1)
-                    dst3.Rectangle(lane, cv.Scalar.Red, -1)
-                End If
-                If cellCount = 0 And activeState(i) = True Then
-                    activeState(i) = False
-                    carCount += 1
-                End If
-                dst3.Rectangle(lane, cv.Scalar.White, 2)
-            Next
+        ' there are 5 lanes of traffic so setup 5 regions
+        ' NOTE: if long shadows are present this approach will not work without provision for the width of a car.  Needs more sample data.
+        Dim activeHeight = 30
+        Dim finishLine = bgSub.dst2.Height - activeHeight * 8
+        Static activeState(5) As Boolean
+        Static carCount As Integer
+        For i = 1 To activeState.Length - 1
+            Dim lane = New cv.Rect(Choose(i, 230, 460, 680, 900, 1110), finishLine, 40, activeHeight)
+            Dim cellCount = videoImage(lane).CountNonZero()
+            If cellCount Then
+                activeState(i) = True
+                videoImage.Rectangle(lane, cv.Scalar.Red, -1)
+                dst3.Rectangle(lane, cv.Scalar.Red, -1)
+            End If
+            If cellCount = 0 And activeState(i) = True Then
+                activeState(i) = False
+                carCount += 1
+            End If
+            dst3.Rectangle(lane, cv.Scalar.White, 2)
+        Next
 
-            Dim tmp = videoImage.Resize(src.Size())
-            If tmp.Channels <> dst2.Channels Then tmp = tmp.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-            flow.msgs.Add("  Cars " + CStr(carCount))
-            flow.RunClass(Nothing)
-            cv.Cv2.BitwiseOr(dst2, tmp, dst2)
-        End If
+        Dim tmp = videoImage.Resize(src.Size())
+        If tmp.Channels <> dst2.Channels Then tmp = tmp.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        flow.msgs.Add("  Cars " + CStr(carCount))
+        flow.RunClass(Nothing)
+        cv.Cv2.BitwiseOr(dst2, tmp, dst2)
     End Sub
 End Class
 
