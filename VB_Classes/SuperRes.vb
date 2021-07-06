@@ -13,7 +13,7 @@ Public Class SuperRes_Basics : Inherits VBparent
         Static superres As cv.SuperResolution
         Static warningMessage As Integer = 10
         If warningMessage > 0 Then
-            setTrueText("The first frame takes a while - adjust the 180 iterations in the code to speed things up...")
+            setTrueText("The first frame takes a while when iterations are over 50 or so")
             warningMessage -= 1
             Exit Sub
         End If
@@ -22,8 +22,6 @@ Public Class SuperRes_Basics : Inherits VBparent
         If options.restartWithNewOptions Then
             warningMessage = 10
             optFlow = Nothing ' start over...
-            'findfrm("SuperRes_Options Radio Options").Visible = False
-            'findfrm("Video_Basics OpenFile Options").Visible = False
             video = New SuperRes_Input
             allOptions.layoutOptions()
             Exit Sub
@@ -119,5 +117,31 @@ Public Class SuperRes_Options : Inherits VBparent
         If lastMethod <> method Or iterSlider.value <> iterations Then restartWithNewOptions = True
         lastMethod = method
         iterations = iterSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class SuperRes_SubPixelZoom : Inherits VBparent
+    Dim zoom As New Pixel_SubPixel
+    Dim video As New SuperRes_Input
+    Public Sub New()
+        usingdst1 = True
+        zoom.zoom.mousePoint = New cv.Point(100, 100)
+        task.desc = "Is SuperRes better than just zoom with sub-pixel accuracy?"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        video.RunClass(Nothing)
+        dst1 = video.dst2
+        zoom.RunClass(video.dst2)
+        dst2 = zoom.dst2
+        dst3 = zoom.dst3
+        labels = zoom.labels
     End Sub
 End Class

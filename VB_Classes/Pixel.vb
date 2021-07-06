@@ -382,14 +382,15 @@ End Class
 
 
 Public Class Pixel_Zoom : Inherits VBparent
+    Public mousePoint = New cv.Point(msRNG.Next(0, dst1.Width / 2), msRNG.Next(0, dst1.Height))
+    Public zoomSlider As Windows.Forms.TrackBar
     Public Sub New()
         If sliders.Setup(caller) Then sliders.setupTrackBar(0, "Zoom Factor", 2, 16, 4)
         labels(2) = "To zoom move the mouse over the image"
+        zoomSlider = findSlider("Zoom Factor")
         task.desc = "Zoom into the pixels under the mouse in dst2"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static mousePoint = New cv.Point(msRNG.Next(0, dst1.Width / 2), msRNG.Next(0, dst1.Height))
-        Static zoomSlider = findSlider("Zoom Factor")
         Dim zoomArray() = {2, 2, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 8, 16}
         Dim zoomFactor = zoomArray(zoomSlider.value)
 
@@ -400,5 +401,35 @@ Public Class Pixel_Zoom : Inherits VBparent
         Dim y = Math.Min(mousePoint.Y, src.Height - height)
         dst1 = src(New cv.Rect(CInt(x), CInt(y), width, height))
         dst2 = dst1.Resize(dst2.Size, 0, 0, cv.InterpolationFlags.Nearest)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Pixel_SubPixel : Inherits VBparent
+    Public zoom As New Pixel_Zoom
+    Public Sub New()
+        task.desc = "Show how to use the GetRectSubPix OpenCV API"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Dim zoomArray() = {2, 2, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 8, 16}
+        Dim zoomFactor = zoomArray(zoom.zoomSlider.Value)
+
+        If task.mousePoint <> New cv.Point Then zoom.mousePoint = task.mousePoint
+        Dim width As Double = src.Width / zoomFactor
+        Dim height As Double = src.Height / zoomFactor
+        Dim x = Math.Min(zoom.mousePoint.X, src.Width - width)
+        Dim y = Math.Min(zoom.mousePoint.Y, src.Height - height)
+        dst3 = src.GetRectSubPix(New cv.Size(width, height), New cv.Point2f(x, y)).Resize(dst2.Size)
+        Dim r = New cv.Rect(x - width \ 2, y - height \ 2, width, height)
+        r = validateRect(r)
+        dst2 = src(r).Resize(dst2.Size)
+        labels(2) = "Pixel_SubPixel: No SubPixel zoom with factor " + CStr(zoomFactor)
+        labels(3) = "Pixel_SubPixel: SubPixel zoom with factor " + CStr(zoomFactor)
     End Sub
 End Class

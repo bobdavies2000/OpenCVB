@@ -149,8 +149,8 @@ Public Class VBparent : Implements IDisposable
         If task.intermediateActive Or task.intermediateName = "" Then task.ttTextData.Add(str)
     End Sub
     Public Function validateRect(r As cv.Rect) As cv.Rect
-        If r.Width < 0 Then r.Width = 1
-        If r.Height < 0 Then r.Height = 1
+        If r.Width <= 0 Then r.Width = 1
+        If r.Height <= 0 Then r.Height = 1
         If r.X < 0 Then r.X = 0
         If r.Y < 0 Then r.Y = 0
         If r.X > dst2.Width Then r.X = dst2.Width
