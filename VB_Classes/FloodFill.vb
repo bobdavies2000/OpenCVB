@@ -62,9 +62,13 @@ Public Class FloodFill_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 5
         Static minSizeSlider = findSlider("FloodFill Minimum Size")
+        Static loDiffSlider = findSlider("FloodFill LoDiff")
+        Static hiDiffSlider = findSlider("FloodFill HiDiff")
         Static stepSlider = findSlider("Step Size")
         Dim minFloodSize = minSizeSlider.Value
         Dim stepSize = stepSlider.Value
+        Dim loDiff = cv.Scalar.All(loDiffSlider.Value)
+        Dim hiDiff = cv.Scalar.All(hiDiffSlider.Value)
 
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
@@ -85,7 +89,7 @@ Public Class FloodFill_Basics : Inherits VBparent
             For x = stepSize To gray.Width - stepSize - 1 Step stepSize
                 If gray.Get(Of Byte)(y, x) > 0 Then
                     Dim pt = New cv.Point(CInt(x), CInt(y))
-                    Dim count = cv.Cv2.FloodFill(gray, maskPlus, pt, cv.Scalar.White, rect, 0, 0, floodFlag)
+                    Dim count = cv.Cv2.FloodFill(gray, maskPlus, pt, cv.Scalar.White, rect, loDiff, hiDiff, floodFlag)
                     If count > minFloodSize Then addRegion(pt, rect, count)
                     ' Mask off any object that is too small or previously identified
                     cv.Cv2.BitwiseOr(alreadyFlooded, maskPlus(maskRect), alreadyFlooded)

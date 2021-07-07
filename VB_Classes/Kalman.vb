@@ -51,8 +51,11 @@ Public Class Kalman_Basics : Inherits VBparent
         End If
         If task.intermediateActive Then
             Dim str = "The kalman output is: "
+            Dim lineWidth As Integer
             For i = 0 To kOutput.Count - 1
                 str += " " + CStr(kOutput(i))
+                If lineWidth Mod 10 = 0 Then str += vbCrLf
+                lineWidth += 1
             Next
             task.ttTextData.Clear()
             task.trueText(str)
