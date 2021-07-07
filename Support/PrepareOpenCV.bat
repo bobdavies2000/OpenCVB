@@ -12,3 +12,4 @@ msbuild.exe OpenCV/Build/OpenCV.sln /p:Configuration=Release
 msbuild.exe VersionOpenCV/VersionOpenCV.sln /p:Configuration=Debug
 cd bin/Debug
 VersionOpenCV.exe
+cd ../../support/
