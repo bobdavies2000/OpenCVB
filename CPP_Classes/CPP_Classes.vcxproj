@@ -35,6 +35,7 @@
     <ClCompile Include="Dither.cpp" />
     <ClCompile Include="Edges.cpp" />
     <ClCompile Include="EMax.cpp" />
+    <ClCompile Include="FeatureDetector.cpp" />
     <ClCompile Include="FitEllipse.cpp" />
     <ClCompile Include="Fuzzy.cpp" />
     <ClCompile Include="Harris.cpp" />

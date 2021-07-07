@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-
 Module Harris_Exports
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Harris_Features_Open() As IntPtr
@@ -9,7 +8,7 @@ Module Harris_Exports
     Public Sub Harris_Features_Close(Harris_FeaturesPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Harris_Features_Run(Harris_FeaturesPtr As IntPtr, inputPtr As IntPtr, rows As integer, cols As integer, threshold As Single,
+    Public Function Harris_Features_Run(Harris_FeaturesPtr As IntPtr, inputPtr As IntPtr, rows As Integer, cols As Integer, threshold As Single,
                                         neighborhood As Int16, aperture As Int16, HarrisParm As Single) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -19,7 +18,7 @@ Module Harris_Exports
     Public Sub Harris_Detector_Close(Harris_FeaturesPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Harris_Detector_Run(Harris_FeaturesPtr As IntPtr, inputPtr As IntPtr, rows As integer, cols As integer, qualityLevel As Double,
+    Public Function Harris_Detector_Run(Harris_FeaturesPtr As IntPtr, inputPtr As IntPtr, rows As Integer, cols As Integer, qualityLevel As Double,
                                         count As IntPtr) As IntPtr
     End Function
 End Module
@@ -31,7 +30,6 @@ Public Class Harris_Features_CPP : Inherits VBparent
     Dim srcData() As Byte
     Dim Harris_Features As IntPtr
     Public Sub New()
-
         If sliders.Setup(caller, 5) Then
             sliders.setupTrackBar(0, "Harris Threshold", 1, 100, 1)
             sliders.setupTrackBar(1, "Harris Neighborhood", 1, 41, 21)
