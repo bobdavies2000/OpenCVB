@@ -122,25 +122,24 @@ Public Class BGSubtract_Basics_MT : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static correlationSlider = findSlider("Correlation Threshold")
         Dim CCthreshold = CSng(correlationSlider.Value / correlationSlider.Maximum)
-
         grid.RunClass(Nothing)
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = src.Clone
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        If task.frameCount < 5 Then dst3 = src.Clone
+
         Dim updateCount As Integer
-        'Parallel.ForEach(Of cv.Rect)(grid.roiList,
-        'Sub(roi)
-        For Each roi In grid.roiList
-            Dim correlation As New cv.Mat
-            cv.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
-            If correlation.Get(Of Single)(0, 0) < CCthreshold Then
-                Interlocked.Increment(updateCount)
-                src(roi).CopyTo(dst3(roi))
-            End If
-        Next
-        'End Sub)
+        Parallel.ForEach(Of cv.Rect)(grid.roiList,
+            Sub(roi)
+                Dim correlation As New cv.Mat
+                cv.Cv2.MatchTemplate(src(roi), dst3(roi), correlation, cv.TemplateMatchModes.CCoeffNormed)
+                If correlation.Get(Of Single)(0, 0) < CCthreshold Then
+                    Interlocked.Increment(updateCount)
+                    src(roi).CopyTo(dst3(roi))
+                End If
+            End Sub)
+        dst2 = src
         labels(2) = "Motion added to dst3 for " + CStr(updateCount) + " segments out of " + CStr(grid.roiList.Count)
-        labels(3) = CStr(grid.roiList.Count - updateCount) + " segments had > " + Format(correlationSlider.value / 1000, "0.0%") + " correlation"
+        labels(3) = CStr(grid.roiList.Count - updateCount) + " segments out of " + CStr(grid.roiList.Count) + " had > " +
+                         Format(correlationSlider.value / 1000, "0.0%") + " correlation"
     End Sub
 End Class
 

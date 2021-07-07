@@ -146,7 +146,7 @@ Public Class TreeviewForm
             For i = 0 To latestModules.Count - 1
                 PercentTime.Text += latestPercents(i) + " " + latestModules(i) + vbCrLf
             Next
-            PercentTime.Text += vbCrLf + "Algorithm and Non-Algorithm time are measured.  UI and camera task are Non-Algorithm." + vbCrLf
+            PercentTime.Text += vbCrLf + "Both Algorithm and Non-Algorithm time are measured.  UI and camera task are Non-Algorithm." + vbCrLf
             PercentTime.Text += vbCrLf + vbCrLf + addendum
         End SyncLock
     End Sub
