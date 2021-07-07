@@ -93,13 +93,21 @@ Public Class VBparent : Implements IDisposable
             task.labels(1) = labels(1)
             task.labels(2) = labels(2)
             task.labels(3) = labels(3)
+
+            If dst0.Width <> task.color.Width Then dst0 = dst0.Resize(task.color.Size)
+            If dst1.Width <> task.color.Width Then dst1 = dst1.Resize(task.color.Size)
+            If dst2.Width <> task.color.Width Then dst2 = dst2.Resize(task.color.Size)
+            If dst3.Width <> task.color.Width Then dst3 = dst3.Resize(task.color.Size)
+
+            Dim tmpDst2 = dst2.Clone
+            Dim tmpDst3 = dst3.Clone
             If task.intermediateName <> "" Then
                 If task.intermediateActive = False And task.ttTextData.Count = 0 Then
                     Dim str As New TTtext("The " + task.intermediateName + " algorithm is not active in this configuration" + vbCrLf +
                                           "or the dst2 output was empty.", 10, 100, 2)
                     task.ttTextData.Add(str)
-                    dst2.SetTo(0)
-                    dst3.SetTo(0)
+                    tmpDst2.SetTo(0)
+                    tmpDst3.SetTo(0)
                     task.labels(2) = ""
                     task.labels(3) = ""
                 Else
@@ -107,17 +115,13 @@ Public Class VBparent : Implements IDisposable
                     If task.intermediateObject Is Nothing Then
                         setTrueText("The selected algorithm does not appear to be active.")
                     Else
-                        dst2 = task.intermediateObject.dst2.Clone
-                        dst3 = task.intermediateObject.dst3.Clone
+                        tmpDst2 = task.intermediateObject.dst2.Clone
+                        tmpDst3 = task.intermediateObject.dst3.Clone
                         task.labels(2) = task.intermediateObject.labels(2)
                         task.labels(3) = task.intermediateObject.labels(3)
                     End If
                 End If
             End If
-            If dst0.Width <> task.color.Width Then dst0 = dst0.Resize(task.color.Size)
-            If dst1.Width <> task.color.Width Then dst1 = dst1.Resize(task.color.Size)
-            If dst2.Width <> task.color.Width Then dst2 = dst2.Resize(task.color.Size)
-            If dst3.Width <> task.color.Width Then dst3 = dst3.Resize(task.color.Size)
             If task.imgResult.Width <> dst2.Width * 2 Or task.imgResult.Height <> dst2.Height Then
                 task.imgResult = New cv.Mat(New cv.Size(dst2.Width * 2, dst2.Height), cv.MatType.CV_8UC3)
             End If
@@ -134,8 +138,8 @@ Public Class VBparent : Implements IDisposable
 
             If usingdst0 Then task.color = MakeSureImage8uC3(dst0)
             If usingdst1 Then task.RGBDepth = MakeSureImage8uC3(dst1)
-            task.imgResult(New cv.Rect(0, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst2)
-            task.imgResult(New cv.Rect(task.color.Width, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst3)
+            task.imgResult(New cv.Rect(0, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(tmpDst2)
+            task.imgResult(New cv.Rect(task.color.Width, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(tmpDst3)
             task.frameCount += 1
         End If
     End Sub

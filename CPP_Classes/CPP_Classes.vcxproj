@@ -31,6 +31,7 @@
     <ClCompile Include="Annealing.cpp" />
     <ClCompile Include="BGSubtract.cpp" />
     <ClCompile Include="Corners.cpp" />
+    <ClCompile Include="Denoise.cpp" />
     <ClCompile Include="Depth.cpp" />
     <ClCompile Include="Dither.cpp" />
     <ClCompile Include="Edges.cpp" />

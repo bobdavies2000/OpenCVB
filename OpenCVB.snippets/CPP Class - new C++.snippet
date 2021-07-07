@@ -83,7 +83,7 @@ Public Class AnyName_CPP : Inherits VBparent
         If imagePtr <> 0 Then
             Dim dstData(input.Total * input.ElemSize - 1) As Byte
             Marshal.Copy(imagePtr, dstData, 0, dstData.Length)
-            dst1 = New cv.Mat(input.Rows, input.Cols, If(input.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), dstData)
+            dst2 = New cv.Mat(input.Rows, input.Cols, If(input.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), dstData)
         End If
     End Sub
     Public Sub Close() 
