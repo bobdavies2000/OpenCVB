@@ -132,8 +132,8 @@ Public Class VBparent : Implements IDisposable
                 If task.PixelViewer.viewerForm.Visible Then task.PixelViewer.viewerForm.Hide()
             End If
 
-            task.color = MakeSureImage8uC3(dst0)
-            task.RGBDepth = MakeSureImage8uC3(dst1)
+            If usingdst0 Then task.color = MakeSureImage8uC3(dst0)
+            If usingdst1 Then task.RGBDepth = MakeSureImage8uC3(dst1)
             task.imgResult(New cv.Rect(0, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst2)
             task.imgResult(New cv.Rect(task.color.Width, 0, task.color.Width, task.color.Height)) = MakeSureImage8uC3(dst3)
             task.frameCount += 1

@@ -422,3 +422,26 @@ Public Class BGSubtract_Synthetic : Inherits VBparent
 End Class
 
 
+
+
+
+
+
+Public Class BGSubtract_Reduction : Inherits VBparent
+    Dim reduction As New Reduction_Basics
+    Dim bgfg As New BGSubtract_Basics_CPP
+    Public Sub New()
+        task.desc = "Use BGSubtract with the output of a reduction"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        reduction.RunClass(src)
+
+        task.palette.RunClass(reduction.dst2.Clone)
+        dst2 = task.palette.dst2
+
+        bgfg.RunClass(dst2)
+        dst3 = bgfg.dst2.Clone
+
+        labels(3) = "Count nonzero = " + CStr(dst3.CountNonZero)
+    End Sub
+End Class
