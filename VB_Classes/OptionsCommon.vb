@@ -55,7 +55,7 @@ Public Class OptionsCommon_Depth : Inherits VBparent
         cv.Cv2.InRange(task.depth32f, task.minDepth, task.maxDepth, task.depthMask)
         cv.Cv2.BitwiseNot(task.depthMask, task.noDepthMask)
         task.depth32f.SetTo(0, task.noDepthMask)
-        ' If task.pointCloud.Width = task.noDepthMask.Width Then task.pointCloud.SetTo(0, task.noDepthMask) ' reflect the range bounds into the task.pointcloud as well.
+        If task.pointCloud.Width = task.noDepthMask.Width Then task.pointCloud.SetTo(0, task.noDepthMask) ' reflect the range bounds into the task.pointcloud as well.
     End Sub
 End Class
 
