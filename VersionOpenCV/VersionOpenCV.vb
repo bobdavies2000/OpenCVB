@@ -8,25 +8,21 @@ Module VersionOpenCV
                 MsgBox("The OpenCV Core library has not been built!" + vbCrLf + "Have you run the 'PrepareTree.bat' file?")
             Else
                 Dim coreLibName = New FileInfo(coreList(0).FullName)
-                Dim currentCore = New FileInfo(GetSetting("OpenCVB", "CoreLibName", "CoreLibName", "NotThereYet"))
-                Dim pragmaLibs As New FileInfo("../../Data/PragmaLibs.h")
-                Dim pragmaLibsD As New FileInfo("../../Data/PragmaLibsD.h")
-                If coreLibName.FullName <> currentCore.FullName Or pragmaLibs.Exists = False Or pragmaLibsD.Exists = False Then
-                    Dim libList = openCVLibDir.GetFiles("*.lib")
-                    Dim sw = New StreamWriter(pragmaLibs.FullName)
-                    Dim swd = New StreamWriter(pragmaLibsD.FullName)
-                    For Each libfile In libList
-                        If libfile.Name.StartsWith("opencv_") And libfile.Name.Contains("python") = False Then
-                            Dim nextName = "OpenCV/Build/lib/Release/" + libfile.Name
-                            sw.WriteLine("#pragma comment(lib, """ + nextName + """)")
-                            nextName = "OpenCV/Build/lib/Debug/" + libfile.Name.Replace(".lib", "d.lib")
-                            swd.WriteLine("#pragma comment(lib, """ + nextName + """)")
-                        End If
-                    Next
-                    sw.Close()
-                    swd.Close()
-                    SaveSetting("OpenCVB", "CoreLibName", "CoreLibName", coreLibName.FullName)
-                End If
+                Dim outPragmaLibs As New FileInfo("../../CPP_Classes/PragmaLibs.h")
+                Dim outPragmaLibsD As New FileInfo("../../CPP_Classes/PragmaLibsD.h")
+                Dim libList = openCVLibDir.GetFiles("*.lib")
+                Dim sw = New StreamWriter(outPragmaLibs.FullName)
+                Dim swd = New StreamWriter(outPragmaLibsD.FullName)
+                For Each libfile In libList
+                    If libfile.Name.StartsWith("opencv_") And libfile.Name.Contains("python") = False Then
+                        Dim nextName = "OpenCV/Build/lib/Release/" + libfile.Name
+                        sw.WriteLine("#pragma comment(lib, """ + nextName + """)")
+                        nextName = "OpenCV/Build/lib/Debug/" + libfile.Name.Replace(".lib", "d.lib")
+                        swd.WriteLine("#pragma comment(lib, """ + nextName + """)")
+                    End If
+                Next
+                sw.Close()
+                swd.Close()
             End If
         Else
             MsgBox("OpenCV directory was not found.  #pragma lib list cannot be prepared.")

@@ -13,9 +13,9 @@
 #include <random>
 #include <intrin.h>
 #ifdef _DEBUG
-#include "../Data/PragmaLibsD.h"
+#include "PragmaLibsD.h"
 #else
-#include "../Data/PragmaLibs.h"
+#include "PragmaLibs.h"
 #endif
 
 using namespace std;
