@@ -25,6 +25,8 @@ New Feature Highlight – TreeView
 
 ![Graphical user interface, text, application Description automatically generated](media/3eb7294b2237579c05882b17d6784b88.png)
 
+Graphical user interface, text, application Description automatically generated
+
 The TreeView now shows the cost of each component in the algorithm, including
 global algorithms, in the right side of the TreeView. In the list of component
 costs above, the “Non-Algorithm” time is the largest individual item.
@@ -34,9 +36,11 @@ data.
 
 The active algorithm at the time this TreeView was captured was
 “TimeView_Basics” – also the top entry in the tree view at the left of the image
-above. TimeView_Basics is the active algorithm but it obtains the histogram of
+above. TimeView_Basics is the active algorithm, but it obtains the histogram of
 both the Side and Top Views (see Histogram_TopView2D and Histogram_SideView2D
 costs) which are projections of the point cloud (see Depth_PointCloud_IMU cost.)
+The point cloud was rotated using the gravity vector in the IMU_GVector
+algorithm at a cost of only 1%.
 
 Some of the algorithms above are executed for all algorithms and will be present
 in every cost analysis. The IMU_IsCameraLevel and IMU_IsCameraStable are
@@ -56,10 +60,10 @@ starting the algorithm.
 With this new TreeView, the cost analysis is available for every algorithm in
 OpenCVB – automatically.
 
-The previous version of TreeView is still fully supported in the new edition.
-The tree view controls what output is shown in the user interface. The default
-output is always the main algorithm – in this case “TimeView_Basics”. Clicking
-on “Histogram_SideView2D” will show the intermediate output from the
+All previous features of the TreeView are still fully supported in the new
+edition. The tree view controls what output is shown in the user interface. The
+default output is always the main algorithm – in this case “TimeView_Basics”.
+Clicking on “Histogram_SideView2D” will show the intermediate output from the
 Histogram_SideView2D component. When building a new algorithm, clicking through
 the TreeView can determine which step in the process did not provide the
 expected output.
@@ -610,6 +614,9 @@ algorithms. Here is a simple algorithm tree view that shows how the
 KNN_PointTracker algorithm was built:
 
 ![Graphical user interface, text, application, email Description automatically generated](media/5f4b6c13e3d0e852b0705339f893603e.png)
+
+Graphical user interface, text, application, email Description automatically
+generated
 
 *The tree above describes how the algorithm calls KNN_1_to_1 and how KNN_1_to_1
 calls KNN_BasicsQT and so on. Clicking on any of the tree entries will show the
