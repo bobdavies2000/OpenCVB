@@ -1,38 +1,68 @@
-Recent Changes – May 2021
-=========================
+Recent Changes – July 2021
+==========================
 
--   980 algorithms – almost all less than a page of code
+-   Over 1000 algorithms – almost all less than a page of code. Average
+    algorithm is 31 lines of code
 
--   Global variables introduced – settings that apply to all algorithms, line
-    width, max depth, font size.
+-   TreeView now shows algorithm cost in addition to algorithm components
 
-    -   Global variables are remembered across runs and can be reset to known
-        working values
+-   Improved intermediate views – click anywhere in TreeView to see intermediate
+    outputs
 
--   Fewer lines of code. Code size dropped about 4000 lines with more
-    algorithms. Average algorithm: 31 lines.
+-   Depth Object algorithm identifies areas of interest 4 different ways with
+    mask and enclosing rectangle
 
--   Algorithms are now ranked by usage (“Reuse Rank”) and “Value Rank”, a graded
-    estimate of algorithm value.
+-   All algorithms can extend their output to all 4 images (only 2 were
+    available before)
 
-    -   Rankings are entries in the Group ComboBox.
+-   Upgraded to the latest versions of OpenCV, librealsense, and Kinect4Azure
+    libraries
 
--   New Survey function to build images of all algorithm output to allow visual
-    searches for desired algorithm.
+-   Framerate for all cameras upgraded to 60 fps
 
--   Global setting for palette control
+New Feature Highlight – TreeView 
+=================================
 
--   Improved regression testing – all algorithms are tested with each attached
-    camera at all supported resolutions.
+![Graphical user interface, text, application Description automatically generated](media/3eb7294b2237579c05882b17d6784b88.png)
 
--   Navigation aids now available – back to previous algorithm, forward to next,
-    and full history.
+The TreeView now shows the cost of each component in the algorithm, including
+global algorithms, in the right side of the TreeView. In the list of component
+costs above, the “Non-Algorithm” time is the largest individual item.
+Non-Algorithm refers to all the other costs in the OpenCVB application which
+includes the user interface and the cost of obtaining the camera images and IMU
+data.
 
--   Image microscope works even when stream is paused, allowing more detailed
-    image analysis.
+The active algorithm at the time this TreeView was captured was
+“TimeView_Basics” – also the top entry in the tree view at the left of the image
+above. TimeView_Basics is the active algorithm but it obtains the histogram of
+both the Side and Top Views (see Histogram_TopView2D and Histogram_SideView2D
+costs) which are projections of the point cloud (see Depth_PointCloud_IMU cost.)
 
--   Improved tree view to study how algorithm was constructed from other
-    algorithms.
+Some of the algorithms above are executed for all algorithms and will be present
+in every cost analysis. The IMU_IsCameraLevel and IMU_IsCameraStable are
+low-cost algorithms that make global variables available that can determine if
+the camera is level or if the camera is moving. OptionsCommon_Depth operates on
+the depth using the maximum specified range (a global setting in the user
+interface.) It is run on every frame regardless of the algorithm because depth
+data is commonly used and an important component in OpenCVB.
+
+At the bottom of the new TreeView form is a checkbox that allows the time to
+accumulate or be refreshed only with the latest time interval (approximately 1
+second.) If the algorithm contains a variety of different approaches, leaving
+this item unchecked will allow quick review of the cost of each algorithm
+variation. Leaving the box checked will accumulate all the time used since
+starting the algorithm.
+
+All algorithms included in OpenCVB have this added description of their cost
+breakdown, enabling early design decisions that improve frame rate.
+
+The previous version of TreeView is still fully supported in the new edition.
+The tree view controls what output is shown in the user interface. The default
+output is always the main algorithm – in this case “TimeView_Basics”. Clicking
+on “Histogram_SideView2D” will show the intermediate output from the
+Histogram_SideView2D component. When building a new algorithm, clicking through
+the TreeView can determine which step in the process did not provide the
+expected output.
 
 Introduction
 ============
@@ -204,6 +234,15 @@ then open and run the OpenCVB.sln file.
 
 -   Build and run OpenCVB.sln – set OpenCVB as the “Startup Project” (GitHub
     seems to forget the startup project.)
+
+-   There are 3 additional .bat files that simplify the process of updating the
+    main external components of OpenCVB. Update_librealsense.bat, for instance,
+    will download, CMake, and build the librealsense library that is essential
+    to OpenCVB. Similarly, the Update_OpenCV.bat will update the OpenCV library
+    with the latest version. Lastly, the Update_Azure4Kinect.bat will update the
+    open source portion of the Kinect4Azure camera. NOTE: the Kinect4Azure
+    camera may also have a binary component update that is a companion to the
+    open source library.
 
 Optionally Install Additional Cameras
 =====================================
@@ -569,6 +608,9 @@ algorithms. Here is a simple algorithm tree view that shows how the
 KNN_PointTracker algorithm was built:
 
 ![Graphical user interface, text, application, email Description automatically generated](media/5f4b6c13e3d0e852b0705339f893603e.png)
+
+Graphical user interface, text, application, email Description automatically
+generated
 
 *The tree above describes how the algorithm calls KNN_1_to_1 and how KNN_1_to_1
 calls KNN_BasicsQT and so on. Clicking on any of the tree entries will show the
@@ -1232,3 +1274,39 @@ Recent Changes – March 2021
 -   Emgu examples removed. LineDetector library removed – it was redundant
 
 -   Version 1.0.0 defined and released
+
+Recent Changes – May 2021
+=========================
+
+-   980 algorithms – almost all less than a page of code
+
+-   Global variables introduced – settings that apply to all algorithms, line
+    width, max depth, font size.
+
+    -   Global variables are remembered across runs and can be reset to known
+        working values
+
+-   Fewer lines of code. Code size dropped about 4000 lines with more
+    algorithms. Average algorithm: 31 lines.
+
+-   Algorithms are now ranked by usage (“Reuse Rank”) and “Value Rank”, a graded
+    estimate of algorithm value.
+
+    -   Rankings are entries in the Group ComboBox.
+
+-   New Survey function to build images of all algorithm output to allow visual
+    searches for desired algorithm.
+
+-   Global setting for palette control
+
+-   Improved regression testing – all algorithms are tested with each attached
+    camera at all supported resolutions.
+
+-   Navigation aids now available – back to previous algorithm, forward to next,
+    and full history.
+
+-   Image microscope works even when stream is paused, allowing more detailed
+    image analysis.
+
+-   Improved tree view to study how algorithm was constructed from other
+    algorithms.
