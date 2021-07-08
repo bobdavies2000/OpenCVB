@@ -12,7 +12,7 @@ Public Class MSER_Basics : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static minSlider = findSlider("MSER Min Area")
-        options.RunClass(src)
+        options.Run(src) ' all the time will then appear in MSER_Basics...The detectregions happens in MSER_Options.
 
         dst2 = src.Clone
         dst3 = src.Clone
@@ -91,6 +91,7 @@ Public Class MSER_Options : Inherits VBparent
             check.Box(0).Text = "Pass2Only"
             check.Box(1).Text = "Use Grayscale, not color input (default)"
             check.Box(2).Text = "Use all default options - ignore all but min and max area"
+            check.Box(1).Checked = True
             check.Box(2).Checked = True
         End If
         ReDim saveParms(sliders.trackbar.Count + check.Box.Count - 1)
