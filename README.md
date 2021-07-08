@@ -20,10 +20,12 @@ Recent Changes – July 2021
 
 -   Framerate for all cameras upgraded to 60 fps
 
-New Feature Highlight – TreeView 
-=================================
+New Feature Highlight – TreeView
+================================
 
 ![Graphical user interface, text, application Description automatically generated](media/3eb7294b2237579c05882b17d6784b88.png)
+
+Graphical user interface, text, application Description automatically generated
 
 The TreeView now shows the cost of each component in the algorithm, including
 global algorithms, in the right side of the TreeView. In the list of component
@@ -47,14 +49,14 @@ interface.) It is run on every frame regardless of the algorithm because depth
 data is commonly used and an important component in OpenCVB.
 
 At the bottom of the new TreeView form is a checkbox that allows the time to
-accumulate or be refreshed only with the latest time interval (approximately 1
+accumulate or be refreshed with only the latest time interval (approximately 1
 second.) If the algorithm contains a variety of different approaches, leaving
 this item unchecked will allow quick review of the cost of each algorithm
 variation. Leaving the box checked will accumulate all the time used since
 starting the algorithm.
 
-All algorithms included in OpenCVB have this added description of their cost
-breakdown, enabling early design decisions that improve frame rate.
+With this new TreeView, the cost analysis is available for every algorithm in
+OpenCVB – automatically.
 
 The previous version of TreeView is still fully supported in the new edition.
 The tree view controls what output is shown in the user interface. The default
@@ -63,6 +65,8 @@ on “Histogram_SideView2D” will show the intermediate output from the
 Histogram_SideView2D component. When building a new algorithm, clicking through
 the TreeView can determine which step in the process did not provide the
 expected output.
+
+\---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Introduction
 ============
@@ -608,6 +612,9 @@ algorithms. Here is a simple algorithm tree view that shows how the
 KNN_PointTracker algorithm was built:
 
 ![Graphical user interface, text, application, email Description automatically generated](media/5f4b6c13e3d0e852b0705339f893603e.png)
+
+Graphical user interface, text, application, email Description automatically
+generated
 
 Graphical user interface, text, application, email Description automatically
 generated
