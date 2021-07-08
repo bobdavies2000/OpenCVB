@@ -72,7 +72,7 @@ Introduction
 ============
 
 There is no better documentation of an algorithm than a working example –
-especially if the output is visual and self-explanatory. Now imagine over 900
+especially if the output is visual and self-explanatory. Now imagine over 1000
 OpenCV examples in a single app where each algorithm is less than a page of code
 and in a familiar language. And each algorithm is *just the algorithm* without
 baggage from a user interface or environment. Each algorithm is designed to be
