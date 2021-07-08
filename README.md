@@ -27,6 +27,8 @@ New Feature Highlight – TreeView
 
 Graphical user interface, text, application Description automatically generated
 
+Graphical user interface, text, application Description automatically generated
+
 The TreeView now shows the cost of each component in the algorithm, including
 global algorithms, in the right side of the TreeView. In the list of component
 costs above, the “Non-Algorithm” time is the largest individual item.
@@ -66,7 +68,7 @@ Histogram_SideView2D component. When building a new algorithm, clicking through
 the TreeView can determine which step in the process did not provide the
 expected output.
 
-\---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+\---------------------------------------------------------------------------------------------------------------------
 
 Introduction
 ============
@@ -612,6 +614,9 @@ algorithms. Here is a simple algorithm tree view that shows how the
 KNN_PointTracker algorithm was built:
 
 ![Graphical user interface, text, application, email Description automatically generated](media/5f4b6c13e3d0e852b0705339f893603e.png)
+
+Graphical user interface, text, application, email Description automatically
+generated
 
 Graphical user interface, text, application, email Description automatically
 generated
