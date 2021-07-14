@@ -30,8 +30,9 @@ Public Class OpenCVB
     Dim camera As Object
     Dim cameraD435i As Object
     Dim cameraD455 As Object
-    Dim cameraOakD As Object
+    Dim cameraOakDPython As Object
     Dim cameraPyRS2 As Object
+    Dim cameraOakD As Object
     Dim cameraKinect As Object
     Dim cameraMyntD As Object
     Dim cameraZed2 As Object
@@ -190,10 +191,10 @@ Public Class OpenCVB
         optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.D455) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 455  RGB")
         optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) = 0 ' USBenumeration("Movidius MyriadX")
 
-        If optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.D435i) +
-                optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.D455) > 0 Then
-            optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.PythonRS2) = 0 ' Turn RealSense 2 Python interface on and off here...
-        End If
+        'If optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.D435i) +
+        '        optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.D455) > 0 Then
+        '    optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.PythonRS2) = 0 ' Turn RealSense 2 Python interface on and off here...
+        'End If
 
         ' Some devices may be present but their opencvb camera interface needs to be present as well.
         optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.MyntD1000) = USBenumeration("MYNT-EYE-D1000")
@@ -269,8 +270,9 @@ Public Class OpenCVB
         cameraZed2 = New CameraZED2
         cameraMyntD = New CameraMyntD
         cameraOakD = New CameraOakD
-        cameraOakD.pythonApp = New FileInfo(HomeDir.FullName + "OpenCVB\CameraOakD.py")
-        cameraOakD.pythonexename = optionsForm.PythonExeName.Text
+        'cameraOakD = New CameraOakDPython
+        'cameraOakD.pythonApp = New FileInfo(HomeDir.FullName + "OpenCVB\CameraOakD.py")
+        'cameraOakD.pythonexename = optionsForm.PythonExeName.Text
 
         If cameraD435i IsNot Nothing Or cameraD455 IsNot Nothing Then
             cameraPyRS2 = New CameraPyRS2
@@ -282,8 +284,6 @@ Public Class OpenCVB
 
         optionsForm.cameraRadioButton(optionsForm.cameraIndex).Checked = True ' make sure any switch is reflected in the UI.
         optionsForm.enableCameras()
-
-        If cameraPyRS2 Is Nothing Then optionsForm.cameraRadioButton(VB_Classes.ActiveTask.algParms.camNames.PythonRS2).Enabled = False
 
         fpsTimer.Enabled = True
         setupCamPics()
@@ -441,7 +441,6 @@ Public Class OpenCVB
             If optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.D435i) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.D435i
             If optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.D455) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.D455
             If optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.OakDCamera
-            If optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.PythonRS2) Then optionsForm.cameraIndex = VB_Classes.ActiveTask.algParms.camNames.PythonRS2
             If optionsForm.cameraCount(optionsForm.cameraIndex) = 0 Then
                 MsgBox("There are no supported cameras present!" + vbCrLf + vbCrLf +
                        "Connect any of these cameras: " + vbCrLf + vbCrLf + "Intel RealSense2 D455" + vbCrLf + "Intel RealSense2 D435i" + vbCrLf +

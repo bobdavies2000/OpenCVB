@@ -37,7 +37,6 @@ Public Class OptionsDialog
         cameraIndex = sender.tag
         If cameraIndex = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Or
             cameraIndex = VB_Classes.ActiveTask.algParms.camNames.MyntD1000 Or
-            cameraIndex = VB_Classes.ActiveTask.algParms.camNames.OakDCamera Or
             cameraIndex = VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2 Then
             resolution640.Enabled = False
             If resolution640.Checked Then resolution1280.Checked = True
@@ -63,7 +62,7 @@ Public Class OptionsDialog
                 cameraRadioButton(i).Tag = i ' this will manage the public type for the camera - see VB_Classes.vb.
                 cameraRadioButton(i).Text = Choose(i + 1, "Microsoft Kinect for Azure Camera", "StereoLabs ZED 2 camera",
                                                           "MyntEyeD 1000 camera", "Intel RealSense D435i", "Intel RealSense D455",
-                                                          "D455/D435i Python Interface (experimental)", "OpenCV Python Oak-D (experimental)")
+                                                          "OpenCV Oak-D camera")
                 AddHandler cameraRadioButton(i).CheckedChanged, AddressOf cameraRadioButton_CheckChanged
             Next
         End If

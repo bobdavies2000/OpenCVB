@@ -1,8 +1,58 @@
-﻿Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
-Imports System.IO.Pipes
-Imports System.IO
-Structure OakIMUdata ' not working - no interface to the IMU available yet.
+﻿Imports System.Runtime.InteropServices
+Imports cv = OpenCvSharp
+
+Module OakD_Module_CPP
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OakDOpen(width As Integer, height As Integer) As IntPtr
+    End Function
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub OakDWaitForFrame(tp As IntPtr)
+    End Sub
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OakDRightRaw(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OakDColor(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OakDLeftRaw(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OakDDisparity(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OakDintrinsicsLeft(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OakDExtrinsics(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OakDPointCloud(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OakDRGBDepth(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OakDRawDepth(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OakDGyro(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OakDIMUTimeStamp(tp As IntPtr) As Double
+    End Function
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OakDAccel(tp As IntPtr) As IntPtr
+    End Function
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OakDDepthScale(tp As IntPtr) As Single
+    End Function
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub OakDStop(tp As IntPtr)
+    End Sub
+End Module
+
+Structure OakDIMUdata
     Public translation As cv.Point3f
     Public acceleration As cv.Point3f
     Public velocity As cv.Point3f
@@ -13,101 +63,70 @@ Structure OakIMUdata ' not working - no interface to the IMU available yet.
     Public mapperConfidence As Integer
 End Structure
 Public Class CameraOakD : Inherits Camera
-    Dim pipeName As String
-    Dim pipeImages As NamedPipeServerStream
-    Dim pipeSync As NamedPipeServerStream
-    Dim rgbBuffer(1) As Byte
-    Dim depthBuffer(1) As Byte
-    Dim depthRGBBuffer(1) As Byte
-    Dim leftBuffer(1) As Byte
-    Dim rightBuffer(1) As Byte
-    Dim pythonReady As Boolean
-
+    Dim ctx As New rs.Context
     Public deviceNum As Integer
+    Dim intrinsicsLeft As rs.Intrinsics
     Public cameraName As String
-    Dim depth8bit As New cv.Mat()
-    Dim OakProcess As Process
-    Dim pipelineClosed As Boolean = True
-    Public pythonApp As FileInfo
-    Public pythonExeName As String
+    Dim depthScale As Single
+    Public cPtr As IntPtr
     Public Sub New()
     End Sub
     Public Function queryDeviceCount() As Integer
-        Return 1
+        Dim Devices = ctx.QueryDevices()
+        Return ctx.QueryDevices().Count
     End Function
     Public Function queryDevice(index As Integer) As String
-        Return "Oak-D"
+        Dim Devices = ctx.QueryDevices()
+        Return Devices(index).Info(0)
     End Function
     Public Function querySerialNumber(index As Integer) As String
-        Return 0
+        Dim Devices = ctx.QueryDevices()
+        Console.WriteLine("Intel RealSense Firmware Version: " + Devices(index).Info(2))
+        Return Devices(index).Info(1)
     End Function
     Public Sub initialize(_width As Integer, _height As Integer, fps As Integer)
         width = _width
         height = _height
-        deviceName = "Oak-D"
+        deviceName = cameraName
+        cPtr = OakDOpen(width, height, deviceIndex)
+        depthScale = OakDDepthScale(cPtr) * 1000
+        Dim intrin = OakDintrinsicsLeft(cPtr)
+        intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)
+        intrinsicsLeft_VB = setintrinsics(intrinsicsLeft)
+        intrinsicsRight_VB = intrinsicsLeft_VB ' need to get the Right lens intrinsics?
 
-        pipeName = "OakDImages"
-        pipeImages = New NamedPipeServerStream(pipeName, PipeDirection.In)
-        pipeSync = New NamedPipeServerStream(pipeName + "in", PipeDirection.Out)
-
-        If pythonApp.Exists Then
-            OakProcess = New Process
-            OakProcess.StartInfo.FileName = pythonExeName
-            OakProcess.StartInfo.WorkingDirectory = pythonApp.DirectoryName
-            OakProcess.StartInfo.Arguments = """" + pythonApp.Name + """" + " --Width=" + CStr(width) + " --Height=" + CStr(height) + " --pipeName=" + pipeName
-            OakProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden
-            If OakProcess.Start() = False Then
-                MsgBox("The Python script for the Oak-D interface failed to start.  Review " + pythonApp.Name)
-            Else
-                pipeImages.WaitForConnection()
-                pipeSync.WaitForConnection()
-            End If
-            OakProcess.PriorityClass = ProcessPriorityClass.High ' this is really just a flag so swithing algorithms doesn't kill our Oak-D python interface
-        Else
-            MsgBox(pythonApp.FullName + " is missing.")
-        End If
-
-        color = New cv.Mat(height, width, cv.MatType.CV_8UC3)
-        RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3)
-        depth16 = New cv.Mat(height, width, cv.MatType.CV_16U)
-        depth8bit = New cv.Mat(height, width, cv.MatType.CV_8U)
-        leftView = New cv.Mat(height, width, cv.MatType.CV_8U)
-        rightView = New cv.Mat(height, width, cv.MatType.CV_8U)
-        pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3)
-        pipelineClosed = False
-        cameraRGBDepth = False
+        Dim extrin = OakDExtrinsics(cPtr)
+        Dim extrinsics As rs.Extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(extrin) ' they are both float's
+        Extrinsics_VB.rotation = extrinsics.rotation
+        Extrinsics_VB.translation = extrinsics.translation
+        leftView = New cv.Mat(height, width, cv.MatType.CV_8U, 0)
+        rightView = New cv.Mat(height, width, cv.MatType.CV_8U, 0)
     End Sub
     Public Sub GetNextFrame()
-        If pipelineClosed Then Exit Sub
-        If rgbBuffer.Length <> color.Total * color.ElemSize Then ReDim rgbBuffer(color.Total * color.ElemSize - 1)
-        If depthBuffer.Length <> depth8bit.Total Then ReDim depthBuffer(depth8bit.Total - 1)
-        If depthRGBBuffer.Length <> RGBDepth.Total * RGBDepth.ElemSize Then ReDim depthRGBBuffer(RGBDepth.Total * RGBDepth.ElemSize - 1)
-        If leftBuffer.Length <> leftView.Total Then ReDim leftBuffer(leftView.Total - 1)
-        If rightBuffer.Length <> rightView.Total Then ReDim rightBuffer(rightView.Total - 1)
-        pipeImages.Read(rgbBuffer, 0, rgbBuffer.Length)
-        pipeImages.Read(leftBuffer, 0, leftBuffer.Length)
-        pipeImages.Read(rightBuffer, 0, rightBuffer.Length)
-        pipeImages.Read(depthBuffer, 0, depthBuffer.Length)
-        pipeImages.Read(depthRGBBuffer, 0, depthRGBBuffer.Length)
+        If cPtr = 0 Then Exit Sub
+        OakDWaitForFrame(cPtr)
+        color = New cv.Mat(height, width, cv.MatType.CV_8UC3, OakDColor(cPtr))
 
-        Dim buff() = {CByte(frameCount Mod 255)}
-        pipeSync.Write(buff, 0, 1)
+        Dim accelFrame = OakDAccel(cPtr)
+        If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
+        IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
 
-        Marshal.Copy(rgbBuffer, 0, color.Data, rgbBuffer.Length)
-        Marshal.Copy(leftBuffer, 0, leftView.Data, leftBuffer.Length)
-        Marshal.Copy(rightBuffer, 0, rightView.Data, rightBuffer.Length)
-        Marshal.Copy(depthBuffer, 0, depth8bit.Data, depthBuffer.Length)
-        Marshal.Copy(depthRGBBuffer, 0, RGBDepth.Data, depthRGBBuffer.Length)
+        Dim gyroFrame = OakDGyro(cPtr)
+        If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
 
-        depth8bit.ConvertTo(depth16, cv.MatType.CV_16U)
-        depth16 *= 100 ' not sure what the units are but this lands approximately on the typical range for depth camera - up to 4 meters.
+        Static imuStartTime = OakDIMUTimeStamp(cPtr)
+        IMU_TimeStamp = OakDIMUTimeStamp(cPtr) - imuStartTime
 
-        cv.Cv2.Flip(leftView, leftView, cv.FlipMode.Y)
-        cv.Cv2.Flip(rightView, rightView, cv.FlipMode.Y)
+        RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, OakDRGBDepth(cPtr))
+        depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, OakDRawDepth(cPtr)) * depthScale
+        leftView = New cv.Mat(height, width, cv.MatType.CV_8U, OakDLeftRaw(cPtr))
+        rightView = New cv.Mat(height, width, cv.MatType.CV_8U, OakDRightRaw(cPtr))
+        pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, OakDPointCloud(cPtr))
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()
-        If OakProcess IsNot Nothing Then OakProcess.Kill()
-        pipelineClosed = True
+        Application.DoEvents()
+        If cPtr <> 0 Then OakDStop(cPtr)
+        cPtr = 0
     End Sub
 End Class
