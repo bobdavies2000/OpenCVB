@@ -1,5 +1,5 @@
 ﻿Imports System.IO
-Module VersionOpenCV
+Module VersionUpdates
     Sub Main()
         Dim openCVLibDir = New DirectoryInfo("../../OpenCV/Build/lib/Release/")
         If openCVLibDir.Exists Then
