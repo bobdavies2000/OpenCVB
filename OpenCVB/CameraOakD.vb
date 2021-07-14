@@ -69,7 +69,6 @@ Public Class CameraOakD : Inherits Camera
     Public gyro As cv.Point3f
     Dim intrinsicsLeft As rs.Intrinsics
     Public cameraName = "OakD"
-    Dim depthScale As Single
     Public cPtr As IntPtr
     Public Sub New()
     End Sub
@@ -87,7 +86,6 @@ Public Class CameraOakD : Inherits Camera
         height = _height
         deviceName = cameraName
         cPtr = OakDOpen(width, height)
-        depthScale = OakDDepthScale(cPtr) * 1000
         Dim intrin = OakDintrinsicsLeft(cPtr)
         intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)
         intrinsicsLeft_VB = setintrinsics(intrinsicsLeft)
@@ -116,7 +114,7 @@ Public Class CameraOakD : Inherits Camera
         IMU_TimeStamp = OakDIMUTimeStamp(cPtr) - imuStartTime
 
         RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, OakDRGBDepth(cPtr))
-        depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, OakDRawDepth(cPtr)) * depthScale
+        depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, OakDRawDepth(cPtr))
         leftView = New cv.Mat(height, width, cv.MatType.CV_8U, OakDLeftRaw(cPtr))
         rightView = New cv.Mat(height, width, cv.MatType.CV_8U, OakDRightRaw(cPtr))
         pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, OakDPointCloud(cPtr))

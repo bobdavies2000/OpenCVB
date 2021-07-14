@@ -23,6 +23,7 @@
 #include "../Data/PragmaLibs.h"
 #endif
 
+
 using namespace std;
 using namespace cv;
 
@@ -38,7 +39,6 @@ class OakDCamera
 private:
 public:
 	dai::Pipeline pipeline;
-	dai::Device device;
 	std::vector<std::string> queueNames;
 	std::unordered_map<std::string, cv::Mat> frame;
 	std::unordered_map<std::string, std::shared_ptr<dai::ImgFrame>> latestPacket;
@@ -46,7 +46,7 @@ public:
 	
 	~OakDCamera(){}
 
-	OakDCamera(int w, int h)
+	OakDCamera()
 	{
 		// Define sources and outputs
 		auto camRgb = pipeline.create<dai::node::ColorCamera>();
@@ -89,19 +89,24 @@ public:
 		right->out.link(stereo->right);
 		stereo->disparity.link(depthOut->input);
 
-		// Connect to device and start pipeline
-		device.startPipeline(pipeline);
-
-		// Sets queues size and behavior
-		for (const auto& name : queueNames) {
-			device.getOutputQueue(name, 4, false);
-		}
-
 		maxDisparity = stereo->getMaxDisparity();
 	}
 
 	void waitForFrame()
 	{
+		// Connect to device and start pipeline
+		static dai::Device device(pipeline);
+
+		static bool initialized = false;
+		if (initialized == false)
+		{
+			// Sets queues size and behavior
+			for (const auto& name : queueNames) {
+				device.getOutputQueue(name, 4, false);
+			}
+			initialized = true;
+		}
+
 		auto queueEvents = device.getQueueEvents(queueNames);
 		for (const auto& name : queueEvents) {
 			auto packets = device.getOutputQueue(name)->tryGetAll<dai::ImgFrame>();
@@ -146,7 +151,7 @@ public:
 extern "C" __declspec(dllexport)
 int *OakDOpen(int w, int h)
 {
-	OakDCamera* tp = new OakDCamera(w, h);
+	OakDCamera* tp = new OakDCamera();
 	return (int *)tp;
 }
 

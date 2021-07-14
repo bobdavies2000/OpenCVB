@@ -140,11 +140,6 @@ Public Class OpenCVB
 
         setupRecentList()
 
-        ' Camera DLL's and OpenGL apps are built in Release mode even when configured for Debug (performance is much better).  
-        ' OpenGL apps cannot be debugged from OpenCVB and the camera interfaces are not likely to need debugging.
-        ' To debug a camera interface: change the Build Configuration and enable "Native Code Debugging" in the OpenCVB project.
-        updatePath(HomeDir.FullName + "bin\Release\", "Release Version of camera DLL's.")
-
         ' check to make sure there are no camera dll's in the Debug directory by mistake!
         For i = 0 To 5
             Dim dllName = Choose(i + 1, "Cam_Kinect4.dll", "Cam_MyntD.dll", "Cam_T265.dll", "Cam_Zed2.dll", "Cam_Oak-D.dll", "Cam_RS2.dll", "CPP_Classes.dll")
@@ -209,6 +204,11 @@ Public Class OpenCVB
         End If
 
         checkCameraDefault()
+
+        ' Camera DLL's and OpenGL apps are built in Release mode even when configured for Debug (performance is much better).  
+        ' OpenGL apps cannot be debugged from OpenCVB and the camera interfaces are not likely to need debugging.
+        ' To debug a camera interface: change the Build Configuration and enable "Native Code Debugging" in the OpenCVB project.
+        updatePath(HomeDir.FullName + "bin\Release\", "Release Version of camera DLL's.")
 
         updatePath(HomeDir.FullName + "bin\Debug\", "Debug Version of any camera DLL's.")
         updatePath(HomeDir.FullName + "librealsense\build\Debug\", "Realsense camera support.")
