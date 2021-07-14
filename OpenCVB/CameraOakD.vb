@@ -1,4 +1,5 @@
-﻿Imports System.Runtime.InteropServices
+﻿Imports rs = Intel.RealSense
+Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 
 Module OakD_Module_CPP
@@ -63,32 +64,29 @@ Structure OakDIMUdata
     Public mapperConfidence As Integer
 End Structure
 Public Class CameraOakD : Inherits Camera
-    Dim ctx As New rs.Context
     Public deviceNum As Integer
+    Public accel As cv.Point3f
+    Public gyro As cv.Point3f
     Dim intrinsicsLeft As rs.Intrinsics
-    Public cameraName As String
+    Public cameraName = "OakD"
     Dim depthScale As Single
     Public cPtr As IntPtr
     Public Sub New()
     End Sub
     Public Function queryDeviceCount() As Integer
-        Dim Devices = ctx.QueryDevices()
-        Return ctx.QueryDevices().Count
+        Return 1
     End Function
     Public Function queryDevice(index As Integer) As String
-        Dim Devices = ctx.QueryDevices()
-        Return Devices(index).Info(0)
+        Return "OakD"
     End Function
     Public Function querySerialNumber(index As Integer) As String
-        Dim Devices = ctx.QueryDevices()
-        Console.WriteLine("Intel RealSense Firmware Version: " + Devices(index).Info(2))
-        Return Devices(index).Info(1)
+        Return "Serial1"
     End Function
     Public Sub initialize(_width As Integer, _height As Integer, fps As Integer)
         width = _width
         height = _height
         deviceName = cameraName
-        cPtr = OakDOpen(width, height, deviceIndex)
+        cPtr = OakDOpen(width, height)
         depthScale = OakDDepthScale(cPtr) * 1000
         Dim intrin = OakDintrinsicsLeft(cPtr)
         intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)

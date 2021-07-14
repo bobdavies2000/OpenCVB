@@ -30,8 +30,6 @@ Public Class OpenCVB
     Dim camera As Object
     Dim cameraD435i As Object
     Dim cameraD455 As Object
-    Dim cameraOakDPython As Object
-    Dim cameraPyRS2 As Object
     Dim cameraOakD As Object
     Dim cameraKinect As Object
     Dim cameraMyntD As Object
@@ -149,7 +147,7 @@ Public Class OpenCVB
 
         ' check to make sure there are no camera dll's in the Debug directory by mistake!
         For i = 0 To 5
-            Dim dllName = Choose(i + 1, "Cam_Kinect4.dll", "Cam_MyntD.dll", "Cam_T265.dll", "Cam_Zed2.dll", "Cam_RS2.dll", "CPP_Classes.dll")
+            Dim dllName = Choose(i + 1, "Cam_Kinect4.dll", "Cam_MyntD.dll", "Cam_T265.dll", "Cam_Zed2.dll", "Cam_Oak-D.dll", "Cam_RS2.dll", "CPP_Classes.dll")
             Dim dllFile = New FileInfo(HomeDir.FullName + "\bin\Debug\" + dllName)
             If dllFile.Exists Then
                 ' if the debug dll exists, then remove the Release version because Release is ahead of Debug in the path for this app.
@@ -159,14 +157,6 @@ Public Class OpenCVB
                 End If
             End If
         Next
-
-        Dim DebugDir = HomeDir.FullName + "bin\Debug\"
-        updatePath(DebugDir, "Debug Version of any camera DLL's.")
-
-        Dim IntelPERC_Lib_Dir = HomeDir.FullName + "librealsense\build\Debug\"
-        updatePath(IntelPERC_Lib_Dir, "Realsense camera support.")
-        Dim Kinect_Dir = HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\"
-        updatePath(Kinect_Dir, "Kinect camera support.")
 
         Dim myntSDKready As Boolean
         Dim zed2SDKready As Boolean
@@ -189,12 +179,7 @@ Public Class OpenCVB
         optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam) = USBenumeration("Azure Kinect 4K Camera")
         optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.D435i) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 435i Depth")
         optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.D455) = USBenumeration("Intel(R) RealSense(TM) Depth Camera 455  RGB")
-        optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) = 0 ' USBenumeration("Movidius MyriadX")
-
-        'If optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.D435i) +
-        '        optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.D455) > 0 Then
-        '    optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.PythonRS2) = 0 ' Turn RealSense 2 Python interface on and off here...
-        'End If
+        optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.OakDCamera) = USBenumeration("Movidius MyriadX")
 
         ' Some devices may be present but their opencvb camera interface needs to be present as well.
         optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.MyntD1000) = USBenumeration("MYNT-EYE-D1000")
@@ -202,12 +187,12 @@ Public Class OpenCVB
             optionsForm.cameraCount(VB_Classes.ActiveTask.algParms.camNames.MyntD1000) = 0 ' hardware is there but dll is not installed yet.
             If GetSetting("OpenCVB", "myntSDKready", "myntSDKready", True) Then
                 MsgBox("A MYNT D 1000 camera is present but OpenCVB's" + vbCrLf +
-                   "Cam_MyntD.dll has not been built with the SDK." + vbCrLf + vbCrLf +
-                   "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
-                   "and rebuild OpenCVB with the MYNT SDK." + vbCrLf + vbCrLf +
-                   "Also, add environmental variable " + vbCrLf +
-                   "MYNTEYE_DEPTHLIB_OUTPUT" + vbCrLf +
-                   "to point to '<MYNT_SDK_DIR>/_output'.")
+                       "Cam_MyntD.dll has not been built with the SDK." + vbCrLf + vbCrLf +
+                       "Edit " + HomeDir.FullName + "CameraDefines.hpp to add support" + vbCrLf +
+                       "and rebuild OpenCVB with the MYNT SDK." + vbCrLf + vbCrLf +
+                       "Also, add environmental variable " + vbCrLf +
+                       "MYNTEYE_DEPTHLIB_OUTPUT" + vbCrLf +
+                       "to point to '<MYNT_SDK_DIR>/_output'.")
                 SaveSetting("OpenCVB", "myntSDKready", "myntSDKready", False)
             End If
         End If
@@ -224,6 +209,10 @@ Public Class OpenCVB
         End If
 
         checkCameraDefault()
+
+        updatePath(HomeDir.FullName + "bin\Debug\", "Debug Version of any camera DLL's.")
+        updatePath(HomeDir.FullName + "librealsense\build\Debug\", "Realsense camera support.")
+        updatePath(HomeDir.FullName + "Azure-Kinect-Sensor-SDK\build\bin\Debug\", "Kinect camera support.")
 
         ' OpenCV needs to be in the path and the librealsense and kinect open source code needs to be in the path.
         updatePath(HomeDir.FullName + "librealsense\build\Release\", "Realsense camera support.")
@@ -270,15 +259,6 @@ Public Class OpenCVB
         cameraZed2 = New CameraZED2
         cameraMyntD = New CameraMyntD
         cameraOakD = New CameraOakD
-        'cameraOakD = New CameraOakDPython
-        'cameraOakD.pythonApp = New FileInfo(HomeDir.FullName + "OpenCVB\CameraOakD.py")
-        'cameraOakD.pythonexename = optionsForm.PythonExeName.Text
-
-        If cameraD435i IsNot Nothing Or cameraD455 IsNot Nothing Then
-            cameraPyRS2 = New CameraPyRS2
-            cameraPyRS2.pythonApp = New FileInfo(HomeDir.FullName + "OpenCVB\CameraPyRS2.py")
-            cameraPyRS2.pythonexename = optionsForm.PythonExeName.Text
-        End If
 
         startCamera()
 
@@ -635,7 +615,7 @@ Public Class OpenCVB
                     If camera IsNot Nothing Then camera.stopCamera()
                     ' order is same as in optionsdialog enum
                     currentCameraIndex = activeCameraIndex
-                    camera = Choose(currentCameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraPyRS2, cameraOakD)
+                    camera = Choose(currentCameraIndex + 1, cameraKinect, cameraZed2, cameraMyntD, cameraD435i, cameraD455, cameraOakD)
                     camera.initialize(workingRes.Width, workingRes.Height, fps)
                     saveCameraName = camera.deviceName + " " + CStr(workingRes.Width)
                 End If
