@@ -15,6 +15,7 @@
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
 #include <map>
+#ifdef OPENCV_OAKD
 #include "utility.hpp"
 #include "depthai/depthai.hpp"
 #ifdef _DEBUG
@@ -22,7 +23,6 @@
 #else
 #include "../Data/PragmaLibs.h"
 #endif
-
 
 using namespace std;
 using namespace cv;
@@ -230,3 +230,4 @@ void OakDStop(OakDCamera * tp)
 {
 	if (tp != 0) delete tp;
 }
+#endif // OPENCV_OAKD
