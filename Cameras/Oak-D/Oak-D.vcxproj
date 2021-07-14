@@ -106,7 +106,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(ProjectDir)../../depthai-core/Build/examples/$(Configuration)\utilityd.lib;$(ProjectDir)../../depthai-core/Build/$(Configuration)\depthai-opencvd.lib;$(ProjectDir)../../depthai-core/Build/$(Configuration)\depthai-cored.lib;$(ProjectDir)../../depthai-core/Build/$(Configuration)\depthai-resourcesd.lib;C:\.hunter\_Base\062a19a\44980ab\819d9a2\Install\lib\XLink.lib;C:\.hunter\_Base\062a19a\44980ab\819d9a2\Install\lib\bz2.lib;C:\.hunter\_Base\062a19a\44980ab\819d9a2\Install\lib\archive_static.lib;C:\.hunter\_Base\062a19a\44980ab\819d9a2\Install\lib\lzma.lib;C:\.hunter\_Base\062a19a\44980ab\819d9a2\Install\lib\spdlog.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)../../depthai-core/Build/examples/$(Configuration)\utilityd.lib;$(ProjectDir)../../depthai-core/Build/$(Configuration)\depthai-opencvd.lib;$(ProjectDir)../../depthai-core/Build/$(Configuration)\depthai-cored.lib;$(ProjectDir)../../depthai-core/Build/$(Configuration)\depthai-resourcesd.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\..\</AdditionalLibraryDirectories>
       <AdditionalOptions>/verbose:lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
