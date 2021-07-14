@@ -4,3 +4,4 @@ if exist Azure-Kinect-Sensor-SDK (rmdir Azure-Kinect-Sensor-SDK /s)
 
 msbuild.exe Azure-Kinect-Sensor-SDK/Build/k4a.sln /p:Configuration=Debug
 msbuild.exe Azure-Kinect-Sensor-SDK/Build/k4a.sln /p:Configuration=Release
+exit
