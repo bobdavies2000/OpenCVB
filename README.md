@@ -25,6 +25,8 @@ New Feature Highlight – TreeView
 
 ![Graphical user interface, text, application Description automatically generated](media/3eb7294b2237579c05882b17d6784b88.png)
 
+Graphical user interface, text, application Description automatically generated
+
 The TreeView now shows the cost of each component in the algorithm, including
 global algorithms, in the right side of the TreeView. In the list of component
 costs above, the “Non-Algorithm” time is the largest individual item.
@@ -79,7 +81,7 @@ baggage from a user interface or environment. Each algorithm is designed to be
 reused in other algorithms so variations can be easily built.
 
 A full installation can take about 30-50 minutes using the 1-step
-“PrepareTree.bat” file discussed below. But there is no obligation to install
+“Update_All.bat” file discussed below. But there is no obligation to install
 needed libraries just to read the code for an algorithm. Open the OpenCVB.sln
 file after download and inspect the code in the C++, C\#, VB.Net or Python. Each
 algorithm gets a standardized presentation of all the data from any of the RGBZ
@@ -208,7 +210,7 @@ downloaded for Windows 10:
     -   Be sure to install the latest Python that comes with Visual Studio
 
     -   Check that MSBuild is in the path. It is needed for the 1-step
-        “PrepareTree.bat” install.
+        “Update_All.bat” install.
 
 -   CMAKE 3.0 or later
 
@@ -224,10 +226,10 @@ Installation
 ============
 
 Installation is not as simple as cloning the GitHub repository and then opening
-the OpenCVB.sln file but it is not much more than just “PrepareTree.bat” and
-then open and run the OpenCVB.sln file.
+the OpenCVB.sln file but it is not much more than just “Update_All.bat” and then
+open and run the OpenCVB.sln file.
 
--   Run the “PrepareTree.bat” script that comes with OpenCVB. It will download
+-   Run the “Update_All.bat” script that comes with OpenCVB. It will download
     and run CMake for needed libraries. After building it will occupy about 18Gb
     of disk space – plan accordingly. The process can take 30-50 minutes to
     download/configure/build on some systems.
@@ -304,10 +306,9 @@ Some typical problems with new installations:
         Studio\\2019\\Community\\MSBuild\\Current\\Bin
 
 -   OpenCV, OpenCV-Contrib, LibRealSense2, Kinect4Azure libraries are all
-    downloaded, configured, and built automatically as part of
-    “PrepareTree.bat”. If the libraries are missing, open the .sln file in the
-    respective Build directory for each and investigate further. The solution
-    files are:
+    downloaded, configured, and built automatically as part of “Update_All.bat”.
+    If the libraries are missing, open the .sln file in the respective Build
+    directory for each and investigate further. The solution files are:
 
     -   \<OpenCVB Dir\>/Azure-Kinect-Sensor-SDK/Build/K4A.sln
 
@@ -612,6 +613,9 @@ algorithms. Here is a simple algorithm tree view that shows how the
 KNN_PointTracker algorithm was built:
 
 ![Graphical user interface, text, application, email Description automatically generated](media/5f4b6c13e3d0e852b0705339f893603e.png)
+
+Graphical user interface, text, application, email Description automatically
+generated
 
 *The tree above describes how the algorithm calls KNN_1_to_1 and how KNN_1_to_1
 calls KNN_BasicsQT and so on. Clicking on any of the tree entries will show the
