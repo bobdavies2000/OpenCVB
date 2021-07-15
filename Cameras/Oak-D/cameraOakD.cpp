@@ -43,9 +43,9 @@ public:
 	std::vector<std::string> queueNames;
 	std::unordered_map<std::string, cv::Mat> frame;
 	std::unordered_map<std::string, std::shared_ptr<dai::ImgFrame>> latestPacket;
-	std::vector<std::vector<float>> intrinsicsLeft;
-	std::vector<std::vector<float>> intrinsicsRight;
-	std::vector<std::vector<float>> intrinsicsRGB;
+	float intrinsicsLeft[9];
+	float intrinsicsRight[9];
+	float intrinsicsRGB[9];
 	float maxDisparity;
 	
 	~OakDCamera(){}
@@ -165,9 +165,17 @@ int* OakDintrinsicsLeft(OakDCamera * tp)
 	dai::Device device;
 	dai::CalibrationHandler calibData = device.readCalibration();
 	cout << "Intrinsics from getCameraIntrinsics function 1280 x 720  ->" << endl;
-	tp->intrinsicsLeft = calibData.getCameraIntrinsics(dai::CameraBoardSocket::LEFT, 1280, 720);
+	std::vector<std::vector<float>> intrin = calibData.getCameraIntrinsics(dai::CameraBoardSocket::LEFT, 1280, 720);
 
-	for (auto row : tp->intrinsicsLeft) {
+	int i = 0;
+	for (auto row : intrin) 
+	{
+		for (auto val : row)
+		{
+			tp->intrinsicsLeft[i++] = val;
+		}
+	}
+	for (auto row : intrin) {
 		for (auto val : row) cout << val << "  ";
 		cout << endl;
 	}
@@ -180,9 +188,18 @@ int* OakDintrinsicsRight(OakDCamera * tp)
 	dai::Device device;
 	dai::CalibrationHandler calibData = device.readCalibration();
 	cout << "Intrinsics from getCameraIntrinsics function 1280 x 720  ->" << endl;
-	tp->intrinsicsRight = calibData.getCameraIntrinsics(dai::CameraBoardSocket::RIGHT, 1280, 720);
+	std::vector<std::vector<float>> intrin = calibData.getCameraIntrinsics(dai::CameraBoardSocket::RIGHT, 1280, 720);
 
-	for (auto row : tp->intrinsicsRight) {
+	int i = 0;
+	for (auto row : intrin)
+	{
+		for (auto val : row)
+		{
+			tp->intrinsicsRight[i++] = val;
+		}
+	}
+
+	for (auto row : intrin) {
 		for (auto val : row) cout << val << "  ";
 		cout << endl;
 	}

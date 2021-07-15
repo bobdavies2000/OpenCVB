@@ -75,7 +75,7 @@ Public Class AddWeighted_InfraRed : Inherits VBparent
             radio.check(1).Text = "Use RightView"
             radio.check(1).Checked = True
         End If
-        task.desc = "Align the depth data with the left or right view.  Oak-D is aligned with the right image."
+        task.desc = "Align the depth data with the left or right view.  Oak-D is aligned with the right image.  Some cameras are not close to aligned."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         Static rightRadio = findRadio("Use RightView")

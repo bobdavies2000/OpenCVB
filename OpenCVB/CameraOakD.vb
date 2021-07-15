@@ -91,8 +91,13 @@ Public Class CameraOakD : Inherits Camera
         height = _height
         deviceName = cameraName
         cPtr = OakDOpen(width, height)
+
         Dim intrin = OakDintrinsicsLeft(cPtr)
+        Marshal.Copy(intrin, intrinsicsLeft, 0, intrinsicsLeft.Length - 1)
+
         intrin = OakDintrinsicsRight(cPtr)
+        Marshal.Copy(intrin, intrinsicsRight, 0, intrinsicsRight.Length - 1)
+
         'intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)
         'intrinsicsLeft_VB = setintrinsics(intrinsicsLeft)
         'intrinsicsRight_VB = intrinsicsLeft_VB ' need to get the Right lens intrinsics?
