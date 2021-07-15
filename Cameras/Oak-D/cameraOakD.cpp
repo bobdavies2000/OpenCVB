@@ -15,6 +15,7 @@
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
 #include <map>
+#include "../CameraDefines.hpp"
 #ifdef OPENCV_OAKD
 #include "utility.hpp"
 #include "depthai/depthai.hpp"

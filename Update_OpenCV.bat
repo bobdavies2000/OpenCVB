@@ -8,4 +8,4 @@ cd ..\
 msbuild.exe OpenCV/Build/OpenCV.sln /p:Configuration=Debug
 msbuild.exe OpenCV/Build/OpenCV.sln /p:Configuration=Release
 msbuild.exe VersionUpdates/VersionUpdates.sln /p:Configuration=Debug
-cd VersionUpdates/bin/Debug/VersionUpdates.exe
+VersionUpdates/bin/Debug/VersionUpdates.exe
