@@ -70,11 +70,10 @@ Public Class OptionsCommon_Histogram : Inherits VBparent
     Public topFrustrumSetting = 57
     Public cameraYSetting = 0
     Public cameraXSetting = 0
-    Dim tweakSettings As Boolean = True
+    Dim tweakSettings As Boolean = False ' set to true to add a new camera.
     Public Sub New()
-
         ' The specification for each camera spells out the FOV angle
-        ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.
+        ' The sliders adjust the depth data histogram to fill the frustrum which is built from the specification FOV
         Select Case task.parms.cameraName
             Case VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam
                 sideFrustrumSetting = 58
@@ -87,6 +86,11 @@ Public Class OptionsCommon_Histogram : Inherits VBparent
                 cameraXSetting = If(task.resolutionIndex = 3, 38, 13)
                 cameraYSetting = -3
             Case VB_Classes.ActiveTask.algParms.camNames.MyntD1000
+                sideFrustrumSetting = 50
+                topFrustrumSetting = 105
+                cameraXSetting = If(task.resolutionIndex = 1, 4, 8)
+                cameraYSetting = If(task.resolutionIndex = 3, -8, -3)
+            Case VB_Classes.ActiveTask.algParms.camNames.OakDCamera
                 sideFrustrumSetting = 50
                 topFrustrumSetting = 105
                 cameraXSetting = If(task.resolutionIndex = 1, 4, 8)
@@ -138,8 +142,8 @@ Public Class OptionsCommon_Histogram : Inherits VBparent
             topFrustrumSetting = topSlider.value
             cameraXSetting = xSlider.value
             cameraYSetting = ySlider.value
-            task.sideCameraPoint = New cv.Point(0, CInt(dst2.Height / 2 + cameraYSetting))
-            task.topCameraPoint = New cv.Point(CInt(dst2.Width / 2 + cameraXSetting), CInt(dst2.Height))
         End If
+        task.sideCameraPoint = New cv.Point(0, CInt(dst2.Height / 2 + cameraYSetting))
+        task.topCameraPoint = New cv.Point(CInt(dst2.Width / 2 + cameraXSetting), CInt(dst2.Height))
     End Sub
 End Class
