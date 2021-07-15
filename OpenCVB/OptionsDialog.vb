@@ -36,6 +36,7 @@ Public Class OptionsDialog
     Private Sub cameraRadioButton_CheckChanged(sender As Object, e As EventArgs)
         cameraIndex = sender.tag
         If cameraIndex = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam Or
+            cameraIndex = VB_Classes.ActiveTask.algParms.camNames.OakDCamera Or
             cameraIndex = VB_Classes.ActiveTask.algParms.camNames.MyntD1000 Or
             cameraIndex = VB_Classes.ActiveTask.algParms.camNames.StereoLabsZED2 Then
             resolution640.Enabled = False

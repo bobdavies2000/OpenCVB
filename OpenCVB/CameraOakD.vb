@@ -24,6 +24,10 @@ Module OakD_Module_CPP
     <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function OakDintrinsicsLeft(tp As IntPtr) As IntPtr
     End Function
+
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function OakDintrinsicsRight(tp As IntPtr) As IntPtr
+    End Function
     <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function OakDExtrinsics(tp As IntPtr) As IntPtr
     End Function
@@ -52,7 +56,6 @@ Module OakD_Module_CPP
     Public Sub OakDStop(tp As IntPtr)
     End Sub
 End Module
-
 Structure OakDIMUdata
     Public translation As cv.Point3f
     Public acceleration As cv.Point3f
@@ -67,7 +70,9 @@ Public Class CameraOakD : Inherits Camera
     Public deviceNum As Integer
     Public accel As cv.Point3f
     Public gyro As cv.Point3f
-    Dim intrinsicsLeft As rs.Intrinsics
+    Dim intrinsicsLeft(9 - 1) As Single
+    Dim intrinsicsRight(9 - 1) As Single
+    Dim intrinsicsRGB(9 - 1) As Single
     Public cameraName = "OakD"
     Public cPtr As IntPtr
     Public Sub New()
@@ -87,9 +92,10 @@ Public Class CameraOakD : Inherits Camera
         deviceName = cameraName
         cPtr = OakDOpen(width, height)
         Dim intrin = OakDintrinsicsLeft(cPtr)
-        intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)
-        intrinsicsLeft_VB = setintrinsics(intrinsicsLeft)
-        intrinsicsRight_VB = intrinsicsLeft_VB ' need to get the Right lens intrinsics?
+        intrin = OakDintrinsicsRight(cPtr)
+        'intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)
+        'intrinsicsLeft_VB = setintrinsics(intrinsicsLeft)
+        'intrinsicsRight_VB = intrinsicsLeft_VB ' need to get the Right lens intrinsics?
 
         Dim extrin = OakDExtrinsics(cPtr)
         Dim extrinsics As rs.Extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(extrin) ' they are both float's
