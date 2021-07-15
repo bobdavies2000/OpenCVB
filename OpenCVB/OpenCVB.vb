@@ -1241,6 +1241,17 @@ Public Class OpenCVB
                             task.intermediateActive = False
                         End If
 
+                        If task.parms.intrinsicsLeft.FOV Is Nothing Then
+                            task.parms.intrinsicsLeft = camera.intrinsicsLeft_VB
+                            task.parms.intrinsicsRight = camera.intrinsicsRight_VB
+                            task.parms.extrinsics = camera.Extrinsics_VB
+                        Else
+                            If task.parms.intrinsicsLeft.FOV(0) <> 0 Then
+                                task.hFov = task.parms.intrinsicsLeft.FOV(0)
+                                task.vFov = task.parms.intrinsicsLeft.FOV(1)
+                            End If
+                        End If
+
                         task.ratioImageToCampic = ratioImageToCampic
                         task.pixelViewerOn = If(testAllRunning Or surveyActive, False, pixelViewerOn)
 

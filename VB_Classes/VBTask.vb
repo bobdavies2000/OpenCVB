@@ -398,11 +398,11 @@ Public Class ActiveTask : Implements IDisposable
         ' https://www.intelrealsense.com/depth-camera-d455/
         ' https://towardsdatascience.com/opinion-26190c7fed1b
         ' order of cameras is the same as the order above...
-        ' Microsoft Kinect4Azure, StereoLabs Zed 2, Mynt EyeD 1000, RealSense D435i, RealSense D455, Python RS2, Oak-D
-        Dim hFOVangles() As Single = {90, 104, 105, 69.4, 86, 86, 72} ' all values from the specification.
-        Dim vFOVangles() As Single = {59, 72, 58, 42.5, 57, 57, 81} ' all values from the specification.
+        ' Microsoft Kinect4Azure, StereoLabs Zed 2, Mynt EyeD 1000, RealSense D435i, RealSense D455, Oak-D
+        Dim hFOVangles() As Single = {90, 104, 105, 69.4, 86, 72} ' all values from the specification - this is usually overridden by calibration data.
+        Dim vFOVangles() As Single = {59, 72, 58, 42.5, 57, 81} ' all values from the specification - this is usually overridden by calibration data.
         task.hFov = hFOVangles(parms.cameraName)
-        task.vFov = vFOVangles(parms.cameraName)
+        task.vFov = vFOVangles(parms.cameraName) ' these are default values in case the calibration data is unavailable
 
         If allOptions IsNot Nothing Then allOptions.layoutOptions()
         Application.DoEvents()
@@ -431,6 +431,7 @@ Public Class ActiveTask : Implements IDisposable
             algorithmTimes(1) = nextTime ' starting the main algorithm
 
             ' run any global options algorithms here.
+            viewOptions.RunClass(Nothing) ' updates any new input from the sliders (when setting up a new camera.)
             depthOptions.RunClass(Nothing) ' updates all the depth info.
             IMUStable.RunClass(Nothing) ' updates the flag that indicates stability according to the IMU.
             IMULevel.RunClass(Nothing)  ' updates the flag that indicate the camera is level according to the IMU

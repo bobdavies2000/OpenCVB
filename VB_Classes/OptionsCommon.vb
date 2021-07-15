@@ -68,9 +68,10 @@ End Class
 Public Class OptionsCommon_Histogram : Inherits VBparent
     Public sideFrustrumSetting = 57
     Public topFrustrumSetting = 57
+    Public cameraYSetting = 0
+    Public cameraXSetting = 0
+    Dim tweakSettings As Boolean = True
     Public Sub New()
-        Dim cameraYSetting = 0
-        Dim cameraXSetting = 0
 
         ' The specification for each camera spells out the FOV angle
         ' The sliders adjust the depth data histogram to fill the frustrum which is built from the spec.
@@ -93,34 +94,52 @@ Public Class OptionsCommon_Histogram : Inherits VBparent
             Case VB_Classes.ActiveTask.algParms.camNames.D435i
                 If dst2.Width = 640 Then
                     sideFrustrumSetting = 76
-                    topFrustrumSetting = 101
+                    topFrustrumSetting = 132
                     cameraXSetting = -3
                     cameraYSetting = 2
                 Else
-                    sideFrustrumSetting = 57
+                    sideFrustrumSetting = 56
                     topFrustrumSetting = 175
                     cameraXSetting = 0
-                    cameraYSetting = 0
+                    cameraYSetting = 4
                 End If
             Case VB_Classes.ActiveTask.algParms.camNames.D455
                 If dst2.Width = 640 Then
-                    sideFrustrumSetting = 84
-                    topFrustrumSetting = 108
+                    sideFrustrumSetting = 74
+                    topFrustrumSetting = 134
                     cameraXSetting = 3
-                    cameraYSetting = -1
+                    cameraYSetting = -4
                 Else
-                    sideFrustrumSetting = 58
+                    sideFrustrumSetting = 55
                     topFrustrumSetting = 180
                     cameraXSetting = 0
                     cameraYSetting = -3
                 End If
         End Select
 
-        task.sideCameraPoint = New cv.Point(0, CInt(dst2.Height / 2 + cameraYSetting))
-        task.topCameraPoint = New cv.Point(CInt(dst2.Width / 2 + cameraXSetting), CInt(dst2.Height))
+        If standalone Or tweakSettings Then
+            If sliders.Setup(caller) Then
+                sliders.setupTrackBar(0, "Adjust the top frustrum angle (hFOV)", 0, 200, topFrustrumSetting)
+                sliders.setupTrackBar(1, "Adjust the side frustrum angle (vFOV)", 0, 100, sideFrustrumSetting)
+                sliders.setupTrackBar(2, "Adjust the top camera X-coordinate", -100, 100, cameraXSetting)
+                sliders.setupTrackBar(3, "Adjust the side camera Y-coordinate", -100, 100, cameraYSetting)
+            End If
+        End If
 
         task.desc = "The options for the side view are shared with this algorithm"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
+        If standalone Or tweakSettings Then
+            Static topSlider = findSlider("Adjust the top frustrum angle (hFOV)")
+            Static sideSlider = findSlider("Adjust the side frustrum angle (vFOV)")
+            Static xSlider = findSlider("Adjust the top camera X-coordinate")
+            Static ySlider = findSlider("Adjust the side camera Y-coordinate")
+            sideFrustrumSetting = sideSlider.value
+            topFrustrumSetting = topSlider.value
+            cameraXSetting = xSlider.value
+            cameraYSetting = ySlider.value
+            task.sideCameraPoint = New cv.Point(0, CInt(dst2.Height / 2 + cameraYSetting))
+            task.topCameraPoint = New cv.Point(CInt(dst2.Width / 2 + cameraXSetting), CInt(dst2.Height))
+        End If
     End Sub
 End Class

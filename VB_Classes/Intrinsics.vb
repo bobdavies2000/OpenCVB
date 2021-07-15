@@ -1,4 +1,6 @@
 Imports cv = OpenCvSharp
+' https://ksimek.github.io/2013/08/13/intrinsic/
+' https://developer.apple.com/documentation/arkit/arcamera/2875730-intrinsics
 Public Class IntrinsicsLeft_Basics : Inherits VBparent
     Public Sub New()
         task.desc = "Show the depth camera intrinsicsLeft."

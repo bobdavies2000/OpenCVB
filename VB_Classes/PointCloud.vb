@@ -409,7 +409,7 @@ Public Class PointCloud_SetupSide : Inherits VBparent
         dst2.Line(cam, markerRight, cv.Scalar.Red, task.lineWidth, task.lineType)
 
         Dim labelLocation = New cv.Point(src.Width * 0.02, src.Height * 7 / 8)
-        cv.Cv2.PutText(dst2, "vFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize,
+        cv.Cv2.PutText(dst2, "vFOV=" + Format(180 - startAngle * 2, "0.0") + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize,
                        cv.Scalar.White, task.lineWidth, task.lineType)
     End Sub
 End Class
@@ -485,7 +485,7 @@ Public Class PointCloud_SetupTop : Inherits VBparent
 
         Dim shift = (src.Width - src.Height) / 2
         Dim labelLocation = New cv.Point(dst2.Width / 2 + shift, dst2.Height * 15 / 16)
-        cv.Cv2.PutText(dst2, "hFOV=" + CStr(180 - startAngle * 2) + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, task.lineWidth, task.lineType)
+        cv.Cv2.PutText(dst2, "hFOV=" + Format(180 - startAngle * 2, "0.0") + " deg.", labelLocation, cv.HersheyFonts.HersheyComplexSmall, fsize, cv.Scalar.White, task.lineWidth, task.lineType)
         dst2.Line(task.topCameraPoint, fovRight, cv.Scalar.White, task.lineWidth, task.lineType)
     End Sub
 End Class
