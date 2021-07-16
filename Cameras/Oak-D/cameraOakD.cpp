@@ -176,38 +176,27 @@ public:
 		auto right = rightQueue->get<dai::ImgFrame>();
 		rightView = right->getFrame().clone();
 
-		//auto imuPackets = imuData->packets;
-		//for (auto& imuPacket : imuPackets) {
-		//	auto& acceleroValues = imuPacket.acceleroMeter;
-		//	auto& gyroValues = imuPacket.gyroscope;
+		auto imuPackets = imuData->packets;
+		for (auto& imuPacket : imuPackets) {
+			auto& acceleroValues = imuPacket.acceleroMeter;
+			auto& gyroValues = imuPacket.gyroscope;
 
-		//	auto acceleroTs1 = acceleroValues.timestamp.get();
-		//	auto gyroTs1 = gyroValues.timestamp.get();
-		//	if (!firstTs) {
-		//		baseTs = std::min(acceleroTs1, gyroTs1);
-		//		firstTs = true;
-		//	}
+			auto acceleroTs1 = acceleroValues.timestamp.get();
+			auto gyroTs1 = gyroValues.timestamp.get();
+			if (!firstTs) {
+				baseTs = std::min(acceleroTs1, gyroTs1);
+				firstTs = true;
+			}
 
-		//	auto acceleroTs = acceleroTs1 - baseTs;
-		//	auto gyroTs = gyroTs1 - baseTs;
+			auto acceleroTs = acceleroTs1 - baseTs;
+			auto gyroTs = gyroTs1 - baseTs;
 
-		//	//printf("Accelerometer timestamp: %ld ms\n", duration_cast<milliseconds>(acceleroTs).count());
-		//	//printf("Accelerometer [m/s^2]: x: %.3f y: %.3f z: %.3f \n", acceleroValues.x, acceleroValues.y, acceleroValues.z);
-		//	//printf("Gyroscope timestamp: %ld ms\n", duration_cast<milliseconds>(gyroTs).count());
-		//	//printf("Gyroscope [rad/s]: x: %.3f y: %.3f z: %.3f \n", gyroValues.x, gyroValues.y, gyroValues.z);
-		//}
+			printf("Accelerometer timestamp: %ld ms\n", duration_cast<milliseconds>(acceleroTs).count());
+			printf("Accelerometer [m/s^2]: x: %.3f y: %.3f z: %.3f \n", acceleroValues.x, acceleroValues.y, acceleroValues.z);
+			printf("Gyroscope timestamp: %ld ms\n", duration_cast<milliseconds>(gyroTs).count());
+			printf("Gyroscope [rad/s]: x: %.3f y: %.3f z: %.3f \n", gyroValues.x, gyroValues.y, gyroValues.z);
+		}
 
-		// Blend when both received
-		//if (frame.find("rgb") != frame.end() && frame.find("depth") != frame.end()) {
-		//	// Need to have both frames in BGR format before blending
-		//	if (frame["depth"].channels() < 3) {
-		//		cv::cvtColor(frame["depth"], frame["depth"], cv::COLOR_GRAY2BGR);
-		//	}
-		//	cv::Mat blended;
-		//	cv::addWeighted(frame["rgb"], 0.6, frame["depth"], 0.4, 0, blended);
-		//	cv::imshow("rgb-depth", blended);
-		//	frame.clear();
-		//}
 		if (close) device.close();
 	}
 };
