@@ -102,33 +102,34 @@ Public Class CameraOakD : Inherits Camera
         'intrinsicsLeft_VB = setintrinsics(intrinsicsLeft)
         'intrinsicsRight_VB = intrinsicsLeft_VB ' need to get the Right lens intrinsics?
 
-        Dim extrin = OakDExtrinsics(cPtr)
-        Dim extrinsics As rs.Extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(extrin) ' they are both float's
-        Extrinsics_VB.rotation = extrinsics.rotation
-        Extrinsics_VB.translation = extrinsics.translation
+        'Dim extrin = OakDExtrinsics(cPtr)
+        'Dim extrinsics As rs.Extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(extrin) ' they are both float's
+        'Extrinsics_VB.rotation = extrinsics.rotation
+        'Extrinsics_VB.translation = extrinsics.translation
         leftView = New cv.Mat(height, width, cv.MatType.CV_8U, 0)
         rightView = New cv.Mat(height, width, cv.MatType.CV_8U, 0)
     End Sub
     Public Sub GetNextFrame()
         If cPtr = 0 Then Exit Sub
         OakDWaitForFrame(cPtr)
+
+        'Dim accelFrame = OakDAccel(cPtr)
+        'If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
+        'IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
+
+        'Dim gyroFrame = OakDGyro(cPtr)
+        'If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
+
+        'Static imuStartTime = OakDIMUTimeStamp(cPtr)
+        'IMU_TimeStamp = OakDIMUTimeStamp(cPtr) - imuStartTime
+
         color = New cv.Mat(height, width, cv.MatType.CV_8UC3, OakDColor(cPtr))
-
-        Dim accelFrame = OakDAccel(cPtr)
-        If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
-        IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
-
-        Dim gyroFrame = OakDGyro(cPtr)
-        If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
-
-        Static imuStartTime = OakDIMUTimeStamp(cPtr)
-        IMU_TimeStamp = OakDIMUTimeStamp(cPtr) - imuStartTime
-
         RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, OakDRGBDepth(cPtr))
-        depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, OakDRawDepth(cPtr))
+        Dim depth8u = New cv.Mat(height, width, cv.MatType.CV_8U, OakDRawDepth(cPtr))
+        depth8u.ConvertTo(depth16, cv.MatType.CV_16U)
         leftView = New cv.Mat(height, width, cv.MatType.CV_8U, OakDLeftRaw(cPtr))
         rightView = New cv.Mat(height, width, cv.MatType.CV_8U, OakDRightRaw(cPtr))
-        pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, OakDPointCloud(cPtr))
+        pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, 0)
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()

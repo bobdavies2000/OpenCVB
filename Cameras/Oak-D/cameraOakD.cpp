@@ -47,11 +47,22 @@ public:
 	float intrinsicsRight[9];
 	float intrinsicsRGB[9];
 	float maxDisparity;
+	Mat depth8u;
+	Mat RGBdepth;
+	Mat rgb;
+	Mat leftView;
+	Mat rightView;
 	
 	~OakDCamera(){}
 
-	OakDCamera()
+	OakDCamera(int cols, int rows)
 	{
+		rgb = Mat(rows, cols, CV_8UC3);
+		RGBdepth = Mat(rows, cols, CV_8UC3);
+		depth8u = Mat(rows, cols, CV_8UC1);
+		leftView = Mat(rows, cols, CV_8UC1);
+		rightView = Mat(rows, cols, CV_8UC1);
+
 		// Define sources and outputs
 		auto camRgb = pipeline.create<dai::node::ColorCamera>();
 		auto left = pipeline.create<dai::node::MonoCamera>();
@@ -60,6 +71,26 @@ public:
 
 		auto rgbOut = pipeline.create<dai::node::XLinkOut>();
 		auto depthOut = pipeline.create<dai::node::XLinkOut>();
+
+		auto monoLeft = pipeline.create<dai::node::MonoCamera>();
+		auto monoRight = pipeline.create<dai::node::MonoCamera>();
+		auto xoutLeft = pipeline.create<dai::node::XLinkOut>();
+		auto xoutRight = pipeline.create<dai::node::XLinkOut>();
+
+		auto imu = pipeline.create<dai::node::IMU>();
+		auto xlinkImu = pipeline.create<dai::node::XLinkOut>();
+		xlinkImu->setStreamName("imu");
+		// enable ACCELEROMETER_RAW and GYROSCOPE_RAW at 500 hz rate
+		imu->enableIMUSensor({ dai::IMUSensor::ACCELEROMETER_RAW, dai::IMUSensor::GYROSCOPE_RAW }, 500);
+		// above this threshold packets will be sent in batch of X, if the host is not blocked and USB bandwidth is available
+		imu->setBatchReportThreshold(1);
+		// maximum number of IMU packets in a batch, if it's reached device will block sending until host can receive it
+		// if lower or equal to batchReportThreshold then the sending is always blocking on device
+		// useful to reduce device's CPU load  and number of lost packets, if CPU load is high on device side due to multiple nodes
+		imu->setMaxBatchReports(10);
+
+		// Link plugins IMU -> XLINK
+		imu->out.link(xlinkImu->input);
 
 		rgbOut->setStreamName("rgb");
 		queueNames.push_back("rgb");
@@ -93,15 +124,29 @@ public:
 		right->out.link(stereo->right);
 		stereo->disparity.link(depthOut->input);
 
+		xoutLeft->setStreamName("left");
+		xoutRight->setStreamName("right");
+
+		// Properties
+		monoLeft->setBoardSocket(dai::CameraBoardSocket::LEFT);
+		monoLeft->setResolution(dai::MonoCameraProperties::SensorResolution::THE_720_P);
+		monoRight->setBoardSocket(dai::CameraBoardSocket::RIGHT);
+		monoRight->setResolution(dai::MonoCameraProperties::SensorResolution::THE_720_P);
+
+		// Linking
+		monoRight->out.link(xoutRight->input);
+		monoLeft->out.link(xoutLeft->input);
+
 		maxDisparity = stereo->getMaxDisparity();
 	}
 
 	void waitForFrame()
 	{
+		using namespace std::chrono;
 		// Connect to device and start pipeline
 		static dai::Device device(pipeline);
-
 		static bool initialized = false;
+		static bool firstTs = false;
 		if (initialized == false)
 		{
 			// Sets queues size and behavior
@@ -110,9 +155,16 @@ public:
 			}
 			initialized = true;
 		}
+		static auto qLeft = device.getOutputQueue("left", 4, false);
+		static auto qRight = device.getOutputQueue("right", 4, false);
+		static auto imuQueue = device.getOutputQueue("imu", 50, false);
+		static auto baseTs = std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration>();
+		static auto imuData = imuQueue->get<dai::IMUData>();
 
+		cout << "Starting the next round of frame collection" << endl;
 		auto queueEvents = device.getQueueEvents(queueNames);
 		for (const auto& name : queueEvents) {
+			cout << name << endl;
 			auto packets = device.getOutputQueue(name)->tryGetAll<dai::ImgFrame>();
 			auto count = packets.size();
 			if (count > 0) {
@@ -121,33 +173,64 @@ public:
 		}
 
 		for (const auto& name : queueNames) {
-			if (latestPacket.find(name) != latestPacket.end()) {
-				if (name == "depth") {
-					frame[name] = latestPacket[name]->getFrame();
-					// Optional, extend range 0..95 -> 0..255, for a better visualisation
-					if (1) frame[name].convertTo(frame[name], CV_8UC1, 255. / maxDisparity);
-					// Optional, apply false colorization
-					if (1) cv::applyColorMap(frame[name], frame[name], cv::COLORMAP_HOT);
+			if (latestPacket.find(name) != latestPacket.end()) 
+			{
+				if (name == "depth")
+				{
+					cout << "Depth 8u encountered max disparity = " << maxDisparity << endl;
+					depth8u = latestPacket[name]->getFrame();
+					depth8u.convertTo(depth8u, CV_8UC1, 255. / maxDisparity);
+					cv::applyColorMap(depth8u, RGBdepth, cv::COLORMAP_HOT);
 				}
-				else {
-					frame[name] = latestPacket[name]->getCvFrame();
-				}
-
-				cv::imshow(name, frame[name]);
+				if (name == "rgb") rgb = latestPacket[name]->getCvFrame();
 			}
 		}
+		auto inLeft = qLeft->tryGet<dai::ImgFrame>();
+		auto inRight = qRight->tryGet<dai::ImgFrame>();
+
+		auto imuPackets = imuData->packets;
+		for (auto& imuPacket : imuPackets) {
+			auto& acceleroValues = imuPacket.acceleroMeter;
+			auto& gyroValues = imuPacket.gyroscope;
+
+			auto acceleroTs1 = acceleroValues.timestamp.get();
+			auto gyroTs1 = gyroValues.timestamp.get();
+			if (!firstTs) {
+				baseTs = std::min(acceleroTs1, gyroTs1);
+				firstTs = true;
+			}
+
+			auto acceleroTs = acceleroTs1 - baseTs;
+			auto gyroTs = gyroTs1 - baseTs;
+
+			printf("Accelerometer timestamp: %ld ms\n", duration_cast<milliseconds>(acceleroTs).count());
+			printf("Accelerometer [m/s^2]: x: %.3f y: %.3f z: %.3f \n", acceleroValues.x, acceleroValues.y, acceleroValues.z);
+			printf("Gyroscope timestamp: %ld ms\n", duration_cast<milliseconds>(gyroTs).count());
+			printf("Gyroscope [rad/s]: x: %.3f y: %.3f z: %.3f \n", gyroValues.x, gyroValues.y, gyroValues.z);
+		}
+
+		if (inLeft) {
+			cout << "left encountered" << endl;
+			leftView = inRight->getCvFrame();
+		}
+
+		if (inRight) {
+			cout << "right encountered" << endl;
+			rightView = inRight->getCvFrame();
+		}
+
 
 		// Blend when both received
-		if (frame.find("rgb") != frame.end() && frame.find("depth") != frame.end()) {
-			// Need to have both frames in BGR format before blending
-			if (frame["depth"].channels() < 3) {
-				cv::cvtColor(frame["depth"], frame["depth"], cv::COLOR_GRAY2BGR);
-			}
-			cv::Mat blended;
-			cv::addWeighted(frame["rgb"], 0.6, frame["depth"], 0.4, 0, blended);
-			cv::imshow("rgb-depth", blended);
-			frame.clear();
-		}
+		//if (frame.find("rgb") != frame.end() && frame.find("depth") != frame.end()) {
+		//	// Need to have both frames in BGR format before blending
+		//	if (frame["depth"].channels() < 3) {
+		//		cv::cvtColor(frame["depth"], frame["depth"], cv::COLOR_GRAY2BGR);
+		//	}
+		//	cv::Mat blended;
+		//	cv::addWeighted(frame["rgb"], 0.6, frame["depth"], 0.4, 0, blended);
+		//	cv::imshow("rgb-depth", blended);
+		//	frame.clear();
+		//}
 	}
 };
 
@@ -155,7 +238,7 @@ public:
 extern "C" __declspec(dllexport)
 int *OakDOpen(int w, int h)
 {
-	OakDCamera* tp = new OakDCamera();
+	OakDCamera* tp = new OakDCamera(w, h);
 	return (int *)tp;
 }
 
@@ -239,29 +322,31 @@ int* OakDPointCloud(OakDCamera * tp)
 extern "C" __declspec(dllexport)
 int* OakDColor(OakDCamera * tp)
 {
-	Mat rgb = tp->latestPacket["rgb"]->getFrame();
-	return (int*)rgb.data;
+	return (int*)tp->rgb.data;
+}
+
+extern "C" __declspec(dllexport)
+int* OakDRGBDepth(OakDCamera * tp)
+{
+	return (int*)tp->RGBdepth.data;
 }
 
 extern "C" __declspec(dllexport)
 int* OakDLeftRaw(OakDCamera * tp)
 {
-	Mat left = tp->latestPacket["rect_left"]->getFrame();
-	return (int*)left.data;
+	return (int*)tp->leftView.data;
 }
 
 extern "C" __declspec(dllexport)
 int* OakDRightRaw(OakDCamera * tp)
 {
-	Mat right = tp->latestPacket["rect_right"]->getFrame();
-	return (int*)right.data;
+	return (int*)tp->rightView.data;
 }
 
 extern "C" __declspec(dllexport)
 int* OakDRawDepth(OakDCamera * tp)
 {
-	Mat depth = tp->latestPacket["depth"]->getFrame();
-	return (int*)depth.data;
+	return (int*)tp->depth8u.data;
 }
 
 extern "C" __declspec(dllexport)
