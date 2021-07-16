@@ -92,11 +92,11 @@ Public Class CameraOakD : Inherits Camera
         deviceName = cameraName
         cPtr = OakDOpen(width, height)
 
-        Dim intrin = OakDintrinsicsLeft(cPtr)
-        Marshal.Copy(intrin, intrinsicsLeft, 0, intrinsicsLeft.Length - 1)
+        'Dim intrin = OakDintrinsicsLeft(cPtr)
+        'Marshal.Copy(intrin, intrinsicsLeft, 0, intrinsicsLeft.Length - 1)
 
-        intrin = OakDintrinsicsRight(cPtr)
-        Marshal.Copy(intrin, intrinsicsRight, 0, intrinsicsRight.Length - 1)
+        'intrin = OakDintrinsicsRight(cPtr)
+        'Marshal.Copy(intrin, intrinsicsRight, 0, intrinsicsRight.Length - 1)
 
         'intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)
         'intrinsicsLeft_VB = setintrinsics(intrinsicsLeft)
@@ -125,15 +125,13 @@ Public Class CameraOakD : Inherits Camera
 
         color = New cv.Mat(height, width, cv.MatType.CV_8UC3, OakDColor(cPtr))
         RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, OakDRGBDepth(cPtr))
-        Dim depth8u = New cv.Mat(height, width, cv.MatType.CV_8U, OakDRawDepth(cPtr))
-        depth8u.ConvertTo(depth16, cv.MatType.CV_16U)
+        depth16 = New cv.Mat(height, width, cv.MatType.CV_8U, OakDRawDepth(cPtr))
         leftView = New cv.Mat(height, width, cv.MatType.CV_8U, OakDLeftRaw(cPtr))
         rightView = New cv.Mat(height, width, cv.MatType.CV_8U, OakDRightRaw(cPtr))
         pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, 0)
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()
-        Application.DoEvents()
         If cPtr <> 0 Then OakDStop(cPtr)
         cPtr = 0
     End Sub
