@@ -108,102 +108,23 @@ public:
 };
 
 
-extern "C" __declspec(dllexport)
-int *RS2Open(int w, int h, int deviceIndex)
-{
-	RealSense2Camera* tp = new RealSense2Camera(w, h, deviceIndex);
-	return (int *)tp;
-}
-
-extern "C" __declspec(dllexport)
-int* RS2intrinsicsLeft(RealSense2Camera * tp)
-{
-	return (int*)&tp->intrinsicsLeft;
-}
-
-extern "C" __declspec(dllexport)
-int* RS2Extrinsics(RealSense2Camera* tp)
-{
-	return (int *) &tp->extrinsics;
-}
-
-extern "C" __declspec(dllexport)
-double RS2IMUTimeStamp(RealSense2Camera* tp)
-{
-	if (tp->gyro == 0) return 0;
-	return tp->gyro.get_timestamp();
-}
-
-extern "C" __declspec(dllexport)
-int* RS2Gyro(RealSense2Camera * tp)
-{
-	if (tp->gyro == 0) return 0;
-	return (int*)tp->gyro.get_data();
-}
-
-extern "C" __declspec(dllexport)
-int * RS2Accel(RealSense2Camera * tp)
-{
-	if (tp->accel == 0) return 0;
-	return (int *)tp->accel.get_data();
-}
-
-extern "C" __declspec(dllexport)
-int* RS2PointCloud(RealSense2Camera * tp)
-{
-	return (int*)tp->pc.process(tp->processedFrames.get_depth_frame()).as<rs2::points>().get_data();
-}
-
-extern "C" __declspec(dllexport)
-int* RS2Color(RealSense2Camera * tp)
+extern "C" __declspec(dllexport) int *RS2Open(int w, int h, int deviceIndex) { RealSense2Camera* tp = new RealSense2Camera(w, h, deviceIndex); return (int *)tp; }
+extern "C" __declspec(dllexport) int* RS2intrinsicsLeft(RealSense2Camera * tp) {return (int*)&tp->intrinsicsLeft;}
+extern "C" __declspec(dllexport) int* RS2Extrinsics(RealSense2Camera* tp) { return (int *) &tp->extrinsics;}
+extern "C" __declspec(dllexport) double RS2IMUTimeStamp(RealSense2Camera* tp) { if (tp->gyro == 0) return 0; return tp->gyro.get_timestamp();}
+extern "C" __declspec(dllexport) int* RS2Gyro(RealSense2Camera * tp) {if (tp->gyro == 0) return 0; return (int*)tp->gyro.get_data();}
+extern "C" __declspec(dllexport) int * RS2Accel(RealSense2Camera * tp) { if (tp->accel == 0) return 0; return (int *)tp->accel.get_data(); }
+extern "C" __declspec(dllexport) int* RS2PointCloud(RealSense2Camera * tp) { return (int*)tp->pc.process(tp->processedFrames.get_depth_frame()).as<rs2::points>().get_data();}
+extern "C" __declspec(dllexport) int* RS2LeftRaw(RealSense2Camera* tp) { return (int*)tp->frames.get_infrared_frame(1).get_data();}
+extern "C" __declspec(dllexport) int* RS2RightRaw(RealSense2Camera * tp) { return (int*)tp->frames.get_infrared_frame(2).get_data();}
+extern "C" __declspec(dllexport) int* RS2RGBDepth(RealSense2Camera * tp) { return (int*)tp->colorizer.process(tp->processedFrames.get_depth_frame()).get_data();}
+extern "C" __declspec(dllexport) int* RS2RawDepth(RealSense2Camera * tp) { return (int*)tp->processedFrames.get_depth_frame().get_data();}
+extern "C" __declspec(dllexport) void RS2WaitForFrame(RealSense2Camera * tp) { tp->waitForFrame();}
+extern "C" __declspec(dllexport) float RS2DepthScale(RealSense2Camera * tp){ return tp->depth_scale; }
+extern "C" __declspec(dllexport) void RS2Stop(RealSense2Camera * tp) { if (tp != 0) { tp->pipeline.stop(); delete tp;}}
+extern "C" __declspec(dllexport) int* RS2Color(RealSense2Camera * tp)
 {
 	tp->processedFrames = tp->colorizer.process(tp->frames);
 	tp->processedFrames = tp->align.process(tp->processedFrames);
 	return (int*)tp->processedFrames.get_color_frame().get_data();
-}
-
-extern "C" __declspec(dllexport)
-int* RS2LeftRaw(RealSense2Camera* tp)
-{
-	return (int*)tp->frames.get_infrared_frame(1).get_data();
-}
-
-extern "C" __declspec(dllexport)
-int* RS2RightRaw(RealSense2Camera * tp)
-{
-	return (int*)tp->frames.get_infrared_frame(2).get_data();
-}
-
-extern "C" __declspec(dllexport)
-int* RS2RGBDepth(RealSense2Camera * tp)
-{
-	return (int*)tp->colorizer.process(tp->processedFrames.get_depth_frame()).get_data();
-}
-
-extern "C" __declspec(dllexport)
-int* RS2RawDepth(RealSense2Camera * tp)
-{
-	return (int*)tp->processedFrames.get_depth_frame().get_data();
-}
-
-extern "C" __declspec(dllexport)
-void RS2WaitForFrame(RealSense2Camera * tp)
-{
-	tp->waitForFrame();
-}
-
-extern "C" __declspec(dllexport)
-float RS2DepthScale(RealSense2Camera * tp)
-{
-	return tp->depth_scale;
-}
-
-extern "C" __declspec(dllexport)
-void RS2Stop(RealSense2Camera * tp)
-{
-	if (tp != 0)
-	{
-		tp->pipeline.stop();
-		delete tp;
-	}
 }

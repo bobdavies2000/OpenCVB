@@ -54,6 +54,11 @@ public:
 	Mat rightView;
 	Mat disparity;
 	dai::CalibrationHandler deviceCalib;
+	double imuTimeStamp;
+
+	dai::IMUReportAccelerometer acceleroMeter;
+	dai::IMUReportGyroscope gyroscope;
+	
 	~OakDCamera(){}
 
 	OakDCamera(int cols, int rows)
@@ -63,8 +68,7 @@ public:
 		depth16u = Mat(rows, cols, CV_16UC1);
 		leftView = Mat(rows, cols, CV_8UC1);
 		rightView = Mat(rows, cols, CV_8UC1);
-		leftView.setTo(255);
-		rightView.setTo(255);
+		disparity = Mat(rows, cols, CV_8UC1);
 
 		// Define sources and outputs
 		static auto camRgb = pipeline.create<dai::node::ColorCamera>();
@@ -76,8 +80,8 @@ public:
 		static auto xoutRight = pipeline.create<dai::node::XLinkOut>();
 		static auto xoutDisp = pipeline.create<dai::node::XLinkOut>();
 		static auto xoutDepth = pipeline.create<dai::node::XLinkOut>();
-		static auto xoutRectifL = pipeline.create<dai::node::XLinkOut>();
-		static auto xoutRectifR = pipeline.create<dai::node::XLinkOut>();
+		//static auto xoutRectifL = pipeline.create<dai::node::XLinkOut>();
+		//static auto xoutRectifR = pipeline.create<dai::node::XLinkOut>();
 		static auto xoutRgb = pipeline.create<dai::node::XLinkOut>();
 
 		// XLinkOut
@@ -85,8 +89,8 @@ public:
 		xoutRight->setStreamName("right");
 		xoutDisp->setStreamName("disparity");
 		xoutDepth->setStreamName("depth");
-		xoutRectifL->setStreamName("rectified_left");
-		xoutRectifR->setStreamName("rectified_right");
+		//xoutRectifL->setStreamName("rectified_left");
+		//xoutRectifR->setStreamName("rectified_right");
 		xoutRgb->setStreamName("rgb");
 		camRgb->setInterleaved(false);
 		camRgb->setColorOrder(dai::ColorCameraProperties::ColorOrder::RGB);
@@ -94,6 +98,7 @@ public:
 		camRgb->setBoardSocket(dai::CameraBoardSocket::RGB);
 		camRgb->preview.link(xoutRgb->input);
 		camRgb->setPreviewSize(1280, 720);
+		camRgb->initialControl.setManualFocus(135);
 
 		// Properties
 		monoLeft->setResolution(dai::MonoCameraProperties::SensorResolution::THE_720_P);
@@ -102,7 +107,7 @@ public:
 		monoRight->setBoardSocket(dai::CameraBoardSocket::RIGHT);
 
 		// StereoDepth
-		stereo->initialConfig.setConfidenceThreshold(200);
+		stereo->initialConfig.setConfidenceThreshold(230);
 		stereo->setRectifyEdgeFillColor(0);  // black, to better see the cutout
 		// stereo->loadCalibrationFile("../../../../depthai/resources/depthai.calib");
 		// stereo->setInputResolution(1280, 720);
@@ -120,9 +125,13 @@ public:
 		stereo->syncedRight.link(xoutRight->input);
 		stereo->disparity.link(xoutDisp->input);
 
-		stereo->rectifiedLeft.link(xoutRectifL->input);
-		stereo->rectifiedRight.link(xoutRectifR->input);
-		stereo->depth.link(xoutDepth->input);
+		//stereo->rectifiedLeft.link(xoutRectifL->input);
+		//stereo->rectifiedRight.link(xoutRectifR->input);
+		//stereo->depth.link(xoutDepth->input);
+
+		// LR-check is required for depth alignment
+		stereo->setLeftRightCheck(true);
+		stereo->setDepthAlign(dai::CameraBoardSocket::RGB);
 
 		static auto imu = pipeline.create<dai::node::IMU>();
 		static auto xlinkImu = pipeline.create<dai::node::XLinkOut>();
@@ -149,7 +158,8 @@ public:
 		using namespace std::chrono;
 		// Connect to device and start pipeline
 		static dai::Device device(pipeline);
-		static bool firstTs = false;
+		if (close) { device.close(); return; }
+		static auto qRgb = device.getOutputQueue("rgb", 4, false);
 		static auto leftQueue = device.getOutputQueue("left", 8, false);
 		static auto rightQueue = device.getOutputQueue("right", 8, false);
 		static auto dispQueue = device.getOutputQueue("disparity", 8, false);
@@ -157,13 +167,10 @@ public:
 		static auto rectifLeftQueue = device.getOutputQueue("rectified_left", 8, false);
 		static auto rectifRightQueue = device.getOutputQueue("rectified_right", 8, false);
 		static auto imuQueue = device.getOutputQueue("imu", 50, false);
-		static auto baseTs = std::chrono::time_point<std::chrono::steady_clock, std::chrono::steady_clock::duration>();
-		static auto imuData = imuQueue->get<dai::IMUData>();
-		static auto qRgb = device.getOutputQueue("rgb", 4, false);
 
 		rgb = qRgb->get<dai::ImgFrame>()->getCvFrame().clone();
 
-		disparity = dispQueue->get<dai::ImgFrame>()->getCvFrame();
+		disparity = dispQueue->get<dai::ImgFrame>()->getCvFrame().clone();
 		disparity.convertTo(disparity, CV_8UC1, maxDisparity);  // Extend disparity range
 		cv::applyColorMap(disparity, RGBdepth, cv::COLORMAP_JET);
 
@@ -176,28 +183,18 @@ public:
 		auto right = rightQueue->get<dai::ImgFrame>();
 		rightView = right->getFrame().clone();
 
-		auto imuPackets = imuData->packets;
+		auto imuData = imuQueue->get<dai::IMUData>();
+		auto imuPackets = imuData->packets; 
 		for (auto& imuPacket : imuPackets) {
 			auto& acceleroValues = imuPacket.acceleroMeter;
 			auto& gyroValues = imuPacket.gyroscope;
+			acceleroMeter = acceleroValues;
+			gyroscope = gyroValues;
 
-			auto acceleroTs1 = acceleroValues.timestamp.get();
-			auto gyroTs1 = gyroValues.timestamp.get();
-			if (!firstTs) {
-				baseTs = std::min(acceleroTs1, gyroTs1);
-				firstTs = true;
-			}
-
-			auto acceleroTs = acceleroTs1 - baseTs;
-			auto gyroTs = gyroTs1 - baseTs;
-
-			//printf("Accelerometer timestamp: %ld ms\n", duration_cast<milliseconds>(acceleroTs).count());
-			//printf("Accelerometer [m/s^2]: x: %.3f y: %.3f z: %.3f \n", acceleroValues.x, acceleroValues.y, acceleroValues.z);
-			//printf("Gyroscope timestamp: %ld ms\n", duration_cast<milliseconds>(gyroTs).count());
-			//printf("Gyroscope [rad/s]: x: %.3f y: %.3f z: %.3f \n", gyroValues.x, gyroValues.y, gyroValues.z);
+			// auto tmp = acceleroValues.timestamp.get().time_since_epoch();
+			auto ms_time = std::chrono::time_point_cast<std::chrono::milliseconds>(acceleroValues.timestamp.get());
+			imuTimeStamp = (double) std::chrono::duration_cast<std::chrono::milliseconds>(ms_time.time_since_epoch()).count();
 		}
-
-		if (close) device.close();
 	}
 };
 
@@ -215,15 +212,8 @@ extern "C" __declspec(dllexport)
 int* OakDintrinsicsLeft(OakDCamera * tp)
 {
 	std::vector<std::vector<float>> intrin = tp->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::LEFT, 1280, 720);
-
 	int i = 0;
-	for (auto row : intrin) 
-	{
-		for (auto val : row)
-		{
-			tp->intrinsicsLeft[i++] = val;
-		}
-	}
+	for (auto row : intrin)  for (auto val : row) tp->intrinsicsLeft[i++] = val;
 	return (int *)&tp->intrinsicsLeft;
 }
 
@@ -231,88 +221,25 @@ extern "C" __declspec(dllexport)
 int* OakDintrinsicsRight(OakDCamera * tp)
 {
 	std::vector<std::vector<float>> intrin = tp->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::RIGHT, 1280, 720);
-
 	int i = 0;
-	for (auto row : intrin)
-	{
-		for (auto val : row)
-		{
-			tp->intrinsicsRight[i++] = val;
-		}
-	}
+	for (auto row : intrin) for (auto val : row) tp->intrinsicsRight[i++] = val; 
 	return (int *)&tp->intrinsicsRight;
 }
 
-extern "C" __declspec(dllexport)
-int* OakDExtrinsics(OakDCamera * tp)
-{
-	return 0;
-}
+//http://graphics.cs.cmu.edu/courses/15-463/2017_fall/lectures/lecture19.pdf
+extern "C" __declspec(dllexport) int* OakDPointCloud(OakDCamera * tp) { return 0; }
 
-extern "C" __declspec(dllexport)
-double OakDIMUTimeStamp(OakDCamera * tp)
-{
-	return 0;
-}
-
-extern "C" __declspec(dllexport)
-int* OakDGyro(OakDCamera * tp)
-{
-	return 0;
-}
-
-extern "C" __declspec(dllexport)
-int * OakDAccel(OakDCamera * tp)
-{
-	return 0;
-}
-
-extern "C" __declspec(dllexport)
-int* OakDPointCloud(OakDCamera * tp)
-{
-	return 0;
-}
-
-extern "C" __declspec(dllexport)
-int* OakDColor(OakDCamera * tp)
-{
-	return (int*)tp->rgb.data;
-}
-
-extern "C" __declspec(dllexport)
-int* OakDRGBDepth(OakDCamera * tp)
-{
-	return (int*)tp->RGBdepth.data;
-}
-
-extern "C" __declspec(dllexport)
-int* OakDLeftRaw(OakDCamera * tp)
-{
-	return (int*)tp->leftView.data;
-}
-
-extern "C" __declspec(dllexport)
-int* OakDRightRaw(OakDCamera * tp)
-{
-	return (int*)tp->rightView.data;
-}
-
-extern "C" __declspec(dllexport)
-int* OakDRawDepth(OakDCamera * tp)
-{
-	return (int*)tp->depth16u.data;
-}
-
-extern "C" __declspec(dllexport)
-void OakDWaitForFrame(OakDCamera * tp)
-{
-	tp->waitForFrame(false);
-}
-
-extern "C" __declspec(dllexport)
-void OakDStop(OakDCamera * tp)
-{
-	tp->waitForFrame(true);
-	if (tp != 0) delete tp;
-}
+extern "C" __declspec(dllexport) int* OakDExtrinsics(OakDCamera * tp) { return 0; }
+extern "C" __declspec(dllexport) double OakDIMUTimeStamp(OakDCamera * tp) { return tp->imuTimeStamp;}
+extern "C" __declspec(dllexport) int* OakDGyro(OakDCamera * tp) { return (int *)&tp->gyroscope.x; }
+extern "C" __declspec(dllexport) int* OakDAccel(OakDCamera * tp) { return (int*)&tp->acceleroMeter.x;}
+extern "C" __declspec(dllexport) int* OakDDisparity(OakDCamera * tp) { return (int*)tp->disparity.data; }
+extern "C" __declspec(dllexport) float OakDMaxDisparity(OakDCamera * tp) { return tp->maxDisparity; }
+extern "C" __declspec(dllexport) int* OakDColor(OakDCamera * tp) { return (int*)tp->rgb.data; }
+extern "C" __declspec(dllexport) int* OakDRGBDepth(OakDCamera * tp){ return (int*)tp->RGBdepth.data; }
+extern "C" __declspec(dllexport) int* OakDLeftRaw(OakDCamera * tp) { return (int*)tp->leftView.data;}
+extern "C" __declspec(dllexport) int* OakDRightRaw(OakDCamera * tp) { return (int*)tp->rightView.data;}
+extern "C" __declspec(dllexport) int* OakDRawDepth(OakDCamera * tp) { return (int*)tp->depth16u.data; }
+extern "C" __declspec(dllexport) void OakDWaitForFrame(OakDCamera * tp) { tp->waitForFrame(false);}
+extern "C" __declspec(dllexport) void OakDStop(OakDCamera * tp) { tp->waitForFrame(true); if (tp != 0) delete tp;}
 #endif // OPENCV_OAKD

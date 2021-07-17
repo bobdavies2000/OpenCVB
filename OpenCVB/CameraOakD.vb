@@ -3,58 +3,42 @@ Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 
 Module OakD_Module_CPP
-    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OakDOpen(width As Integer, height As Integer) As IntPtr
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDOpen(width As Integer, height As Integer) As IntPtr
     End Function
-    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub OakDWaitForFrame(tp As IntPtr)
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Sub OakDWaitForFrame(tp As IntPtr)
     End Sub
-    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OakDRightRaw(tp As IntPtr) As IntPtr
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDRightRaw(tp As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OakDColor(tp As IntPtr) As IntPtr
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDColor(tp As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OakDLeftRaw(tp As IntPtr) As IntPtr
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDLeftRaw(tp As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OakDDisparity(tp As IntPtr) As IntPtr
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDDisparity(tp As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OakDintrinsicsLeft(tp As IntPtr) As IntPtr
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDintrinsicsLeft(tp As IntPtr) As IntPtr
     End Function
-
-    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OakDintrinsicsRight(tp As IntPtr) As IntPtr
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDintrinsicsRight(tp As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OakDExtrinsics(tp As IntPtr) As IntPtr
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDExtrinsics(tp As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OakDPointCloud(tp As IntPtr) As IntPtr
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDPointCloud(tp As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OakDRGBDepth(tp As IntPtr) As IntPtr
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDRGBDepth(tp As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OakDRawDepth(tp As IntPtr) As IntPtr
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDRawDepth(tp As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OakDGyro(tp As IntPtr) As IntPtr
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDGyro(tp As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OakDIMUTimeStamp(tp As IntPtr) As Double
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDIMUTimeStamp(tp As IntPtr) As Double
     End Function
-    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OakDAccel(tp As IntPtr) As IntPtr
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDAccel(tp As IntPtr) As IntPtr
     End Function
-    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OakDDepthScale(tp As IntPtr) As Single
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDDepthScale(tp As IntPtr) As Single
     End Function
-    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub OakDStop(tp As IntPtr)
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Sub OakDStop(tp As IntPtr)
     End Sub
+    <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDMaxDisparity(tp As IntPtr) As Single
+    End Function
 End Module
 Structure OakDIMUdata
     Public translation As cv.Point3f
@@ -75,6 +59,10 @@ Public Class CameraOakD : Inherits Camera
     Dim intrinsicsRGB(9 - 1) As Single
     Public cameraName = "OakD"
     Public cPtr As IntPtr
+    Dim maxDisparity As Single
+    Dim myLut As New cv.Mat(1, 256, cv.MatType.CV_8U)
+    Dim colorMap As New cv.Mat
+    Public palette As cv.ColormapTypes
     Public Sub New()
     End Sub
     Public Function queryDeviceCount() As Integer
@@ -86,6 +74,22 @@ Public Class CameraOakD : Inherits Camera
     Public Function querySerialNumber(index As Integer) As String
         Return "Serial1"
     End Function
+    Private Sub setupLUT()
+        Dim msRNG As New System.Random
+        Dim c1 = cv.Scalar.Yellow
+        Dim c2 = cv.Scalar.Blue
+        Dim gradMat As New cv.Mat
+        Dim gradientColorMap As New cv.Mat
+        Dim prevColor = cv.Scalar.Yellow
+        For i = 0 To 256 - 1
+            Dim t = 255 / (i + 1)
+            Dim nextColor As cv.Scalar = New cv.Scalar(c1.Item(0) * (1 - t) + c2.Item(0) * t, c1.Item(1) * (1 - t) + c2.Item(1) * t, c1.Item(2) * (1 - t) + c2.Item(2) * t)
+            gradMat = colorTransition(prevColor, nextColor, width)
+            If i = 0 Then gradientColorMap = gradMat Else cv.Cv2.HConcat(gradientColorMap, gradMat, gradientColorMap)
+        Next
+        gradientColorMap = gradientColorMap.Resize(New cv.Size(256, 1))
+        colorMap = gradientColorMap.Flip(cv.FlipMode.X)
+    End Sub
     Public Sub initialize(_width As Integer, _height As Integer, fps As Integer)
         width = _width
         height = _height
@@ -114,20 +118,26 @@ Public Class CameraOakD : Inherits Camera
         'Extrinsics_VB.translation = extrinsics.translation
         leftView = New cv.Mat(height, width, cv.MatType.CV_8U, 0)
         rightView = New cv.Mat(height, width, cv.MatType.CV_8U, 0)
+        maxDisparity = OakDMaxDisparity(cPtr)
+        setupLUT()
     End Sub
     Public Sub GetNextFrame()
         If cPtr = 0 Then Exit Sub
         OakDWaitForFrame(cPtr)
 
-        'Dim accelFrame = OakDAccel(cPtr)
-        'If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
-        'IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
+        Dim accelFrame = OakDAccel(cPtr)
+        If accelFrame <> 0 Then IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(accelFrame)
+        IMU_Acceleration.Z *= -1 ' make it consistent that the z-axis positive axis points out from the camera.
 
-        'Dim gyroFrame = OakDGyro(cPtr)
-        'If gyroFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
+        Dim gyroFrame = OakDGyro(cPtr)
+        If accelFrame <> 0 Then IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(gyroFrame)
 
-        'Static imuStartTime = OakDIMUTimeStamp(cPtr)
-        'IMU_TimeStamp = OakDIMUTimeStamp(cPtr) - imuStartTime
+        Static imuStartTime = OakDIMUTimeStamp(cPtr)
+        IMU_TimeStamp = OakDIMUTimeStamp(cPtr) - imuStartTime
+
+        'Dim disparity = New cv.Mat(height, width, cv.MatType.CV_8UC1, OakDDisparity(cPtr))
+        'disparity = disparity.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        'RGBDepth = disparity.LUT(colorMap)
 
         color = New cv.Mat(height, width, cv.MatType.CV_8UC3, OakDColor(cPtr))
         RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, OakDRGBDepth(cPtr))
