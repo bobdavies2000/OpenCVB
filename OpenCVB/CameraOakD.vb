@@ -92,11 +92,17 @@ Public Class CameraOakD : Inherits Camera
         deviceName = cameraName
         cPtr = OakDOpen(width, height)
 
-        'Dim intrin = OakDintrinsicsLeft(cPtr)
-        'Marshal.Copy(intrin, intrinsicsLeft, 0, intrinsicsLeft.Length - 1)
+        Dim intrin = OakDintrinsicsLeft(cPtr)
+        Marshal.Copy(intrin, intrinsicsLeft, 0, intrinsicsLeft.Length - 1)
 
-        'intrin = OakDintrinsicsRight(cPtr)
-        'Marshal.Copy(intrin, intrinsicsRight, 0, intrinsicsRight.Length - 1)
+        intrin = OakDintrinsicsRight(cPtr)
+        Marshal.Copy(intrin, intrinsicsRight, 0, intrinsicsRight.Length - 1)
+        intrinsicsLeft_VB.ppx = intrinsicsLeft(2) ' ppx
+        intrinsicsLeft_VB.ppy = intrinsicsLeft(5) ' ppy
+        intrinsicsLeft_VB.fx = intrinsicsLeft(0) ' fx
+        intrinsicsLeft_VB.fy = intrinsicsLeft(4) ' fy
+        intrinsicsLeft_VB.FOV = {72, 81, 0}
+        intrinsicsLeft_VB.coeffs = {0, 0, 0, 0, 0, 0}
 
         'intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)
         'intrinsicsLeft_VB = setintrinsics(intrinsicsLeft)

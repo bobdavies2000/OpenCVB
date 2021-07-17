@@ -53,7 +53,7 @@ public:
 	Mat leftView;
 	Mat rightView;
 	Mat disparity;
-	
+	dai::CalibrationHandler deviceCalib;
 	~OakDCamera(){}
 
 	OakDCamera(int cols, int rows)
@@ -191,10 +191,10 @@ public:
 			auto acceleroTs = acceleroTs1 - baseTs;
 			auto gyroTs = gyroTs1 - baseTs;
 
-			printf("Accelerometer timestamp: %ld ms\n", duration_cast<milliseconds>(acceleroTs).count());
-			printf("Accelerometer [m/s^2]: x: %.3f y: %.3f z: %.3f \n", acceleroValues.x, acceleroValues.y, acceleroValues.z);
-			printf("Gyroscope timestamp: %ld ms\n", duration_cast<milliseconds>(gyroTs).count());
-			printf("Gyroscope [rad/s]: x: %.3f y: %.3f z: %.3f \n", gyroValues.x, gyroValues.y, gyroValues.z);
+			//printf("Accelerometer timestamp: %ld ms\n", duration_cast<milliseconds>(acceleroTs).count());
+			//printf("Accelerometer [m/s^2]: x: %.3f y: %.3f z: %.3f \n", acceleroValues.x, acceleroValues.y, acceleroValues.z);
+			//printf("Gyroscope timestamp: %ld ms\n", duration_cast<milliseconds>(gyroTs).count());
+			//printf("Gyroscope [rad/s]: x: %.3f y: %.3f z: %.3f \n", gyroValues.x, gyroValues.y, gyroValues.z);
 		}
 
 		if (close) device.close();
@@ -206,16 +206,15 @@ extern "C" __declspec(dllexport)
 int *OakDOpen(int w, int h)
 {
 	OakDCamera* tp = new OakDCamera(w, h);
+	dai::Device device;
+	tp->deviceCalib = device.readCalibration();
 	return (int *)tp;
 }
 
 extern "C" __declspec(dllexport)
 int* OakDintrinsicsLeft(OakDCamera * tp)
 {
-	dai::Device device;
-	dai::CalibrationHandler calibData = device.readCalibration();
-	cout << "Intrinsics from getCameraIntrinsics function 1280 x 720  ->" << endl;
-	std::vector<std::vector<float>> intrin = calibData.getCameraIntrinsics(dai::CameraBoardSocket::LEFT, 1280, 720);
+	std::vector<std::vector<float>> intrin = tp->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::LEFT, 1280, 720);
 
 	int i = 0;
 	for (auto row : intrin) 
@@ -225,20 +224,13 @@ int* OakDintrinsicsLeft(OakDCamera * tp)
 			tp->intrinsicsLeft[i++] = val;
 		}
 	}
-	for (auto row : intrin) {
-		for (auto val : row) cout << val << "  ";
-		cout << endl;
-	}
 	return (int *)&tp->intrinsicsLeft;
 }
 
 extern "C" __declspec(dllexport)
 int* OakDintrinsicsRight(OakDCamera * tp)
 {
-	dai::Device device;
-	dai::CalibrationHandler calibData = device.readCalibration();
-	cout << "Intrinsics from getCameraIntrinsics function 1280 x 720  ->" << endl;
-	std::vector<std::vector<float>> intrin = calibData.getCameraIntrinsics(dai::CameraBoardSocket::RIGHT, 1280, 720);
+	std::vector<std::vector<float>> intrin = tp->deviceCalib.getCameraIntrinsics(dai::CameraBoardSocket::RIGHT, 1280, 720);
 
 	int i = 0;
 	for (auto row : intrin)
@@ -247,11 +239,6 @@ int* OakDintrinsicsRight(OakDCamera * tp)
 		{
 			tp->intrinsicsRight[i++] = val;
 		}
-	}
-
-	for (auto row : intrin) {
-		for (auto val : row) cout << val << "  ";
-		cout << endl;
 	}
 	return (int *)&tp->intrinsicsRight;
 }

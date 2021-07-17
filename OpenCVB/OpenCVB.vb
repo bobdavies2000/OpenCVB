@@ -622,13 +622,14 @@ Public Class OpenCVB
                 camera.GetNextFrame()
             End SyncLock
 
-            paintNewImages = True ' trigger the paint 
-            taskNewImages = True ' trigger the algorithm task
-
             If activeCameraIndex < 0 Then
                 If camera.cameraName = "OakD" Then camera.stopCamera
                 Exit Sub
             End If
+
+            paintNewImages = True ' trigger the paint 
+            taskNewImages = True ' trigger the algorithm task
+
             Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
             totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
         End While
