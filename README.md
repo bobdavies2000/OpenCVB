@@ -25,8 +25,6 @@ New Feature Highlight – TreeView
 
 ![Graphical user interface, text, application Description automatically generated](media/3eb7294b2237579c05882b17d6784b88.png)
 
-Graphical user interface, text, application Description automatically generated
-
 The TreeView now shows the cost of each component in the algorithm, including
 global algorithms, in the right side of the TreeView. In the list of component
 costs above, the “Non-Algorithm” time is the largest individual item.
@@ -613,9 +611,6 @@ algorithms. Here is a simple algorithm tree view that shows how the
 KNN_PointTracker algorithm was built:
 
 ![Graphical user interface, text, application, email Description automatically generated](media/5f4b6c13e3d0e852b0705339f893603e.png)
-
-Graphical user interface, text, application, email Description automatically
-generated
 
 *The tree above describes how the algorithm calls KNN_1_to_1 and how KNN_1_to_1
 calls KNN_BasicsQT and so on. Clicking on any of the tree entries will show the
@@ -1315,3 +1310,71 @@ Recent Changes – May 2021
 
 -   Improved tree view to study how algorithm was constructed from other
     algorithms.
+
+Recent Changes – July 2021
+==========================
+
+-   Over 1000 algorithms – almost all less than a page of code. Average
+    algorithm is 31 lines of code
+
+-   TreeView now shows algorithm cost in addition to algorithm components
+
+-   Improved intermediate views – click anywhere in TreeView to see intermediate
+    outputs
+
+-   Depth Object algorithm identifies areas of interest 4 different ways with
+    mask and enclosing rectangle
+
+-   All algorithms can extend their output to all 4 images (only 2 were
+    available before)
+
+-   Upgraded to the latest versions of OpenCV, librealsense, and Kinect4Azure
+    libraries
+
+-   Framerate for all cameras upgraded to 60 fps
+
+New Feature Highlight – TreeView
+================================
+
+![Graphical user interface, text, application Description automatically generated](media/3eb7294b2237579c05882b17d6784b88.png)
+
+The TreeView now shows the cost of each component in the algorithm, including
+global algorithms, in the right side of the TreeView. In the list of component
+costs above, the “Non-Algorithm” time is the largest individual item.
+Non-Algorithm refers to all the other costs in the OpenCVB application which
+includes the user interface and the cost of obtaining the camera images and IMU
+data.
+
+The active algorithm at the time this TreeView was captured was
+“TimeView_Basics” – also the top entry in the tree view at the left of the image
+above. TimeView_Basics is the active algorithm, but it obtains the histogram of
+both the Side and Top Views (see Histogram_TopView2D and Histogram_SideView2D
+costs) which are projections of the point cloud (see Depth_PointCloud_IMU cost.)
+The point cloud was rotated using the gravity vector in the IMU_GVector
+algorithm at a cost of only 1%.
+
+Some of the algorithms above are executed for all algorithms and will be present
+in every cost analysis. The IMU_IsCameraLevel and IMU_IsCameraStable are
+low-cost algorithms that make global variables available that can determine if
+the camera is level or if the camera is moving. OptionsCommon_Depth operates on
+the depth using the maximum specified range (a global setting in the user
+interface.) It is run on every frame regardless of the algorithm because depth
+data is commonly used and an important component in OpenCVB.
+
+At the bottom of the new TreeView form is a checkbox that allows the time to
+accumulate or be refreshed with only the latest time interval (approximately 1
+second.) If the algorithm contains a variety of different approaches, leaving
+this item unchecked will allow quick review of the cost of each algorithm
+variation. Leaving the box checked will accumulate all the time used since
+starting the algorithm.
+
+With this new TreeView, the cost analysis is available for every algorithm in
+OpenCVB – automatically.
+
+All previous features of the TreeView are still fully supported in the new
+edition. The tree view controls what output is shown in the user interface. The
+default output is always the main algorithm – in this case “TimeView_Basics”.
+Clicking on “Histogram_SideView2D” will show the intermediate output from the
+Histogram_SideView2D component. When building a new algorithm, clicking through
+the TreeView can determine which step in the process did not provide the
+expected output.

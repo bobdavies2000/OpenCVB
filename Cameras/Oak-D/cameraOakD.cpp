@@ -80,8 +80,8 @@ public:
 		static auto xoutRight = pipeline.create<dai::node::XLinkOut>();
 		static auto xoutDisp = pipeline.create<dai::node::XLinkOut>();
 		static auto xoutDepth = pipeline.create<dai::node::XLinkOut>();
-		//static auto xoutRectifL = pipeline.create<dai::node::XLinkOut>();
-		//static auto xoutRectifR = pipeline.create<dai::node::XLinkOut>();
+		static auto xoutRectifL = pipeline.create<dai::node::XLinkOut>();
+		static auto xoutRectifR = pipeline.create<dai::node::XLinkOut>();
 		static auto xoutRgb = pipeline.create<dai::node::XLinkOut>();
 
 		// XLinkOut
@@ -89,8 +89,8 @@ public:
 		xoutRight->setStreamName("right");
 		xoutDisp->setStreamName("disparity");
 		xoutDepth->setStreamName("depth");
-		//xoutRectifL->setStreamName("rectified_left");
-		//xoutRectifR->setStreamName("rectified_right");
+		xoutRectifL->setStreamName("rectified_left");
+		xoutRectifR->setStreamName("rectified_right");
 		xoutRgb->setStreamName("rgb");
 		camRgb->setInterleaved(false);
 		camRgb->setColorOrder(dai::ColorCameraProperties::ColorOrder::RGB);
@@ -109,9 +109,6 @@ public:
 		// StereoDepth
 		stereo->initialConfig.setConfidenceThreshold(230);
 		stereo->setRectifyEdgeFillColor(0);  // black, to better see the cutout
-		// stereo->loadCalibrationFile("../../../../depthai/resources/depthai.calib");
-		// stereo->setInputResolution(1280, 720);
-		// TODO: median filtering is disabled on device with (lrcheck || extended || subpixel)
 		stereo->initialConfig.setMedianFilter(dai::MedianFilter::MEDIAN_OFF);
 		stereo->setLeftRightCheck(true);
 		stereo->setExtendedDisparity(false);
@@ -125,9 +122,9 @@ public:
 		stereo->syncedRight.link(xoutRight->input);
 		stereo->disparity.link(xoutDisp->input);
 
-		//stereo->rectifiedLeft.link(xoutRectifL->input);
-		//stereo->rectifiedRight.link(xoutRectifR->input);
-		//stereo->depth.link(xoutDepth->input);
+		stereo->rectifiedLeft.link(xoutRectifL->input);
+		stereo->rectifiedRight.link(xoutRectifR->input);
+		stereo->depth.link(xoutDepth->input);
 
 		// LR-check is required for depth alignment
 		stereo->setLeftRightCheck(true);
@@ -158,7 +155,6 @@ public:
 		using namespace std::chrono;
 		// Connect to device and start pipeline
 		static dai::Device device(pipeline);
-		if (close) { device.close(); return; }
 		static auto qRgb = device.getOutputQueue("rgb", 4, false);
 		static auto leftQueue = device.getOutputQueue("left", 8, false);
 		static auto rightQueue = device.getOutputQueue("right", 8, false);
@@ -167,6 +163,13 @@ public:
 		static auto rectifLeftQueue = device.getOutputQueue("rectified_left", 8, false);
 		static auto rectifRightQueue = device.getOutputQueue("rectified_right", 8, false);
 		static auto imuQueue = device.getOutputQueue("imu", 50, false);
+
+		if (close) {
+			device.close();
+			while (1)
+				if (device.isClosed()) return;
+			return;
+		}
 
 		rgb = qRgb->get<dai::ImgFrame>()->getCvFrame().clone();
 
@@ -177,11 +180,16 @@ public:
 		static auto depth = depthQueue->get<dai::ImgFrame>();
 		depth16u = cv::Mat(depth->getHeight(), depth->getWidth(), CV_16UC1, depth->getData().data()).clone();
 
-		auto left = leftQueue->get<dai::ImgFrame>();
+		auto left = rectifLeftQueue->get<dai::ImgFrame>();
 		leftView = left->getFrame().clone();
-
-		auto right = rightQueue->get<dai::ImgFrame>();
+		auto right = rectifRightQueue->get<dai::ImgFrame>();
 		rightView = right->getFrame().clone();
+
+		//auto left = leftQueue->get<dai::ImgFrame>();
+		//leftView = left->getFrame().clone();
+
+		//auto right = rightQueue->get<dai::ImgFrame>();
+		//rightView = right->getFrame().clone();
 
 		auto imuData = imuQueue->get<dai::IMUData>();
 		auto imuPackets = imuData->packets; 
@@ -241,5 +249,11 @@ extern "C" __declspec(dllexport) int* OakDLeftRaw(OakDCamera * tp) { return (int
 extern "C" __declspec(dllexport) int* OakDRightRaw(OakDCamera * tp) { return (int*)tp->rightView.data;}
 extern "C" __declspec(dllexport) int* OakDRawDepth(OakDCamera * tp) { return (int*)tp->depth16u.data; }
 extern "C" __declspec(dllexport) void OakDWaitForFrame(OakDCamera * tp) { tp->waitForFrame(false);}
-extern "C" __declspec(dllexport) void OakDStop(OakDCamera * tp) { tp->waitForFrame(true); if (tp != 0) delete tp;}
+extern "C" __declspec(dllexport) void OakDStop(OakDCamera * tp) 
+{ 
+	cout << "stopping the camera" << endl;
+	tp->waitForFrame(true);
+	if (tp != 0) delete tp;
+	cout << "stopped" << endl;
+}
 #endif // OPENCV_OAKD
