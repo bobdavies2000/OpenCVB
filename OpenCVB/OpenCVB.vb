@@ -621,7 +621,7 @@ Public Class OpenCVB
             End SyncLock
 
             If activeCameraIndex < 0 Then
-                If camera.cameraName = "OakD" Then camera.stopCamera
+                camera.stopCamera
                 Exit Sub
             End If
 

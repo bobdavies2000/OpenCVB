@@ -132,8 +132,8 @@ public:
 		camRgb->setColorOrder(dai::ColorCameraProperties::ColorOrder::RGB);
 		camRgb->setResolution(dai::ColorCameraProperties::SensorResolution::THE_1080_P);
 		camRgb->setBoardSocket(dai::CameraBoardSocket::RGB);
-		camRgb->isp.link(xoutRgb->input);
-		camRgb->setPreviewSize(1280, 720);
+		camRgb->isp.link(xoutRgb->input); // If the Oak-D camera is stopped and then restarted, it will fail here.  Need to find out why.  Should be simple.
+		camRgb->setPreviewSize(cols, rows); 
 		camRgb->initialControl.setManualFocus(135);
 
 		// added these 
