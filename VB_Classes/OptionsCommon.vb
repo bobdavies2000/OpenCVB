@@ -130,6 +130,8 @@ Public Class OptionsCommon_Histogram : Inherits VBparent
             End If
         End If
 
+        task.sideCameraPoint = New cv.Point(0, CInt(dst2.Height / 2 + cameraYSetting))
+        task.topCameraPoint = New cv.Point(CInt(dst2.Width / 2 + cameraXSetting), CInt(dst2.Height))
         task.desc = "The options for the side view are shared with this algorithm"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
