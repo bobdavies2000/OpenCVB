@@ -96,7 +96,7 @@ public:
 		camRgb->setColorOrder(dai::ColorCameraProperties::ColorOrder::RGB);
 		camRgb->setResolution(dai::ColorCameraProperties::SensorResolution::THE_1080_P);
 		camRgb->setBoardSocket(dai::CameraBoardSocket::RGB);
-		camRgb->preview.link(xoutRgb->input);
+		camRgb->isp.link(xoutRgb->input);
 		camRgb->setPreviewSize(1280, 720);
 		camRgb->initialControl.setManualFocus(135);
 
