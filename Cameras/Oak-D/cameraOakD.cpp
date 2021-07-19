@@ -70,12 +70,10 @@ public:
 		rightView = Mat(rows, cols, CV_8UC1);
 		disparity = Mat(rows, cols, CV_8UC1);
 
-		// Define sources and outputs
 		static auto camRgb = pipeline.create<dai::node::ColorCamera>();
 		static auto monoLeft = pipeline.create<dai::node::MonoCamera>();
 		static auto monoRight = pipeline.create<dai::node::MonoCamera>();
-		static auto stereo = pipeline.create<dai::node::StereoDepth>();
-		
+		static auto stereo = pipeline.create<dai::node::StereoDepth>() ;
 		static auto xoutLeft = pipeline.create<dai::node::XLinkOut>();
 		static auto xoutRight = pipeline.create<dai::node::XLinkOut>();
 		static auto xoutDisp = pipeline.create<dai::node::XLinkOut>();
@@ -83,6 +81,18 @@ public:
 		static auto xoutRectifL = pipeline.create<dai::node::XLinkOut>();
 		static auto xoutRectifR = pipeline.create<dai::node::XLinkOut>();
 		static auto xoutRgb = pipeline.create<dai::node::XLinkOut>();
+
+		camRgb->setInterleaved(false);
+		camRgb->setColorOrder(dai::ColorCameraProperties::ColorOrder::RGB);
+		camRgb->setResolution(dai::ColorCameraProperties::SensorResolution::THE_1080_P);
+		camRgb->setBoardSocket(dai::CameraBoardSocket::RGB);
+		camRgb->preview.link(xoutRgb->input);
+		camRgb->setPreviewSize(1280, 720);
+		camRgb->initialControl.setManualFocus(135);
+
+		// added these 
+		camRgb->setFps(30);
+		if (downscaleColor) camRgb->setIspScale(2, 3);
 
 		// XLinkOut
 		xoutLeft->setStreamName("left");
@@ -92,13 +102,6 @@ public:
 		xoutRectifL->setStreamName("rectified_left");
 		xoutRectifR->setStreamName("rectified_right");
 		xoutRgb->setStreamName("rgb");
-		camRgb->setInterleaved(false);
-		camRgb->setColorOrder(dai::ColorCameraProperties::ColorOrder::RGB);
-		camRgb->setResolution(dai::ColorCameraProperties::SensorResolution::THE_1080_P);
-		camRgb->setBoardSocket(dai::CameraBoardSocket::RGB);
-		camRgb->isp.link(xoutRgb->input);
-		camRgb->setPreviewSize(1280, 720);
-		camRgb->initialControl.setManualFocus(135);
 
 		// Properties
 		monoLeft->setResolution(dai::MonoCameraProperties::SensorResolution::THE_720_P);
@@ -106,46 +109,39 @@ public:
 		monoRight->setResolution(dai::MonoCameraProperties::SensorResolution::THE_720_P);
 		monoRight->setBoardSocket(dai::CameraBoardSocket::RIGHT);
 
-		// StereoDepth
-		stereo->initialConfig.setConfidenceThreshold(230);
 		stereo->setRectifyEdgeFillColor(0);  // black, to better see the cutout
 		stereo->initialConfig.setMedianFilter(dai::MedianFilter::MEDIAN_OFF);
-		stereo->setLeftRightCheck(true);
-		stereo->setExtendedDisparity(false);
+		stereo->setLeftRightCheck(true); // LR-check is required for depth alignment
 		stereo->setSubpixel(false);
+
+		// added these
+		stereo->initialConfig.setConfidenceThreshold(230);
+		stereo->setDepthAlign(dai::CameraBoardSocket::RGB);
 
 		// Linking
 		monoLeft->out.link(stereo->left);
 		monoRight->out.link(stereo->right);
 
-		stereo->syncedLeft.link(xoutLeft->input);
-		stereo->syncedRight.link(xoutRight->input);
 		stereo->disparity.link(xoutDisp->input);
-
 		stereo->rectifiedLeft.link(xoutRectifL->input);
 		stereo->rectifiedRight.link(xoutRectifR->input);
 		stereo->depth.link(xoutDepth->input);
-
-		// LR-check is required for depth alignment
-		stereo->setLeftRightCheck(true);
-		stereo->setDepthAlign(dai::CameraBoardSocket::RGB);
+		stereo->syncedLeft.link(xoutLeft->input);
+		stereo->syncedRight.link(xoutRight->input);
 
 		static auto imu = pipeline.create<dai::node::IMU>();
 		static auto xlinkImu = pipeline.create<dai::node::XLinkOut>();
 		xlinkImu->setStreamName("imu");
-		// enable ACCELEROMETER_RAW and GYROSCOPE_RAW at 500 hz rate
 		imu->enableIMUSensor({ dai::IMUSensor::ACCELEROMETER_RAW, dai::IMUSensor::GYROSCOPE_RAW }, 500);
+
 		// above this threshold packets will be sent in batch of X, if the host is not blocked and USB bandwidth is available
 		imu->setBatchReportThreshold(1);
+
 		// maximum number of IMU packets in a batch, if it's reached device will block sending until host can receive it
 		// if lower or equal to batchReportThreshold then the sending is always blocking on device
 		// useful to reduce device's CPU load  and number of lost packets, if CPU load is high on device side due to multiple nodes
-		imu->setMaxBatchReports(10);
-
-		// Link plugins IMU -> XLINK
+		imu->setMaxBatchReports(1);
 		imu->out.link(xlinkImu->input);
-
-		monoLeft->out.link(xoutLeft->input);
 
 		maxDisparity = stereo->getMaxDisparity();
 	}
@@ -192,17 +188,12 @@ public:
 		//rightView = right->getFrame().clone();
 
 		auto imuData = imuQueue->get<dai::IMUData>();
-		auto imuPackets = imuData->packets; 
-		for (auto& imuPacket : imuPackets) {
-			auto& acceleroValues = imuPacket.acceleroMeter;
-			auto& gyroValues = imuPacket.gyroscope;
-			acceleroMeter = acceleroValues;
-			gyroscope = gyroValues;
+		acceleroMeter = imuData->packets[0].acceleroMeter;
+		gyroscope = imuData->packets[0].gyroscope;
 
-			// auto tmp = acceleroValues.timestamp.get().time_since_epoch();
-			auto ms_time = std::chrono::time_point_cast<std::chrono::milliseconds>(acceleroValues.timestamp.get());
-			imuTimeStamp = (double) std::chrono::duration_cast<std::chrono::milliseconds>(ms_time.time_since_epoch()).count();
-		}
+		// auto tmp = acceleroValues.timestamp.get().time_since_epoch();
+		auto ms_time = std::chrono::time_point_cast<std::chrono::milliseconds>(acceleroMeter.timestamp.get());
+		imuTimeStamp = (double) std::chrono::duration_cast<std::chrono::milliseconds>(ms_time.time_since_epoch()).count();
 	}
 };
 
