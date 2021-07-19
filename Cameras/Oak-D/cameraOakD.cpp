@@ -203,7 +203,7 @@ public:
 		static auto rectifRightQueue = device.getOutputQueue("rectified_right", 8, false);
 		static auto imuQueue = device.getOutputQueue("imu", 50, false);
 
-		if (close) { device.close(); return; } // this is for the shutdown process only...
+		if (close) { device.close(); while (1) { if (device.isClosed()) return; } } // this is for the shutdown process only...
 
 		rgb = qRgb->get<dai::ImgFrame>()->getCvFrame().clone();
 
@@ -211,16 +211,13 @@ public:
 		depth16u = depth->getCvFrame();
 		RGBdepth = getRGBDepth(depth16u);
 
-		auto left = rectifLeftQueue->get<dai::ImgFrame>();
-		leftView = left->getFrame().clone();
-		auto right = rectifRightQueue->get<dai::ImgFrame>();
-		rightView = right->getFrame().clone();
+		leftView = rectifLeftQueue->get<dai::ImgFrame>()->getFrame().clone();
+		rightView = rectifRightQueue->get<dai::ImgFrame>()->getFrame().clone();
 
 		auto imuData = imuQueue->get<dai::IMUData>();
 		acceleroMeter = imuData->packets[0].acceleroMeter;
 		gyroscope = imuData->packets[0].gyroscope;
 
-		// auto tmp = acceleroValues.timestamp.get().time_since_epoch();
 		auto ms_time = std::chrono::time_point_cast<std::chrono::milliseconds>(acceleroMeter.timestamp.get());
 		imuTimeStamp = (double) std::chrono::duration_cast<std::chrono::milliseconds>(ms_time.time_since_epoch()).count();
 	}
