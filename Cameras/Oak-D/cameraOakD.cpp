@@ -203,12 +203,7 @@ public:
 		static auto rectifRightQueue = device.getOutputQueue("rectified_right", 8, false);
 		static auto imuQueue = device.getOutputQueue("imu", 50, false);
 
-		if (close) {
-			device.close();
-			while (1)
-				if (device.isClosed()) return;
-			return;
-		}
+		if (close) { device.close(); return; } // this is for the shutdown process only...
 
 		rgb = qRgb->get<dai::ImgFrame>()->getCvFrame().clone();
 
@@ -220,12 +215,6 @@ public:
 		leftView = left->getFrame().clone();
 		auto right = rectifRightQueue->get<dai::ImgFrame>();
 		rightView = right->getFrame().clone();
-
-		//auto left = leftQueue->get<dai::ImgFrame>();
-		//leftView = left->getFrame().clone();
-
-		//auto right = rightQueue->get<dai::ImgFrame>();
-		//rightView = right->getFrame().clone();
 
 		auto imuData = imuQueue->get<dai::IMUData>();
 		acceleroMeter = imuData->packets[0].acceleroMeter;
@@ -267,7 +256,6 @@ int* OakDintrinsicsRight(OakDCamera * tp)
 
 //http://graphics.cs.cmu.edu/courses/15-463/2017_fall/lectures/lecture19.pdf
 extern "C" __declspec(dllexport) int* OakDPointCloud(OakDCamera * tp) { return 0; }
-
 extern "C" __declspec(dllexport) int* OakDExtrinsics(OakDCamera * tp) { return 0; }
 extern "C" __declspec(dllexport) double OakDIMUTimeStamp(OakDCamera * tp) { return tp->imuTimeStamp;}
 extern "C" __declspec(dllexport) int* OakDGyro(OakDCamera * tp) { return (int *)&tp->gyroscope.x; }
@@ -280,9 +268,5 @@ extern "C" __declspec(dllexport) int* OakDLeftRaw(OakDCamera * tp) { return (int
 extern "C" __declspec(dllexport) int* OakDRightRaw(OakDCamera * tp) { return (int*)tp->rightView.data;}
 extern "C" __declspec(dllexport) int* OakDRawDepth(OakDCamera * tp) { return (int*)tp->depth16u.data; }
 extern "C" __declspec(dllexport) void OakDWaitForFrame(OakDCamera * tp) { tp->waitForFrame(false);}
-extern "C" __declspec(dllexport) void OakDStop(OakDCamera * tp) 
-{ 
-	tp->waitForFrame(true);
-	if (tp != 0) delete tp;
-}
+extern "C" __declspec(dllexport) void OakDStop(OakDCamera * tp) { tp->waitForFrame(true); if (tp != 0) delete tp; }
 #endif // OPENCV_OAKD

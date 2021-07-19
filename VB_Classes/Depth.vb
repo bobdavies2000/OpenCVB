@@ -894,33 +894,6 @@ End Class
 
 
 
-Public Class Depth_Holes1 : Inherits VBparent
-    Dim holeMask As New cv.Mat
-    Dim element As New cv.Mat
-    Public Sub New()
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Amount of dilation of borderMask", 1, 10, 1)
-            sliders.setupTrackBar(1, "Amount of dilation of holeMask", 0, 10, 0)
-        End If
-        labels(3) = "Shadow Edges (use sliders to expand)"
-        element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(5, 5))
-        task.desc = "Identify holes in the depth image."
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        dst2 = task.depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
-        dst2 = dst2.Dilate(element, Nothing, sliders.trackbar(1).Value)
-        dst3 = dst2.Dilate(element, Nothing, sliders.trackbar(0).Value)
-        cv.Cv2.BitwiseXor(dst3, holeMask, dst3)
-        If standalone Or task.intermediateActive Then task.RGBDepth.CopyTo(dst3, dst3)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 
 
@@ -1702,7 +1675,7 @@ Public Class Depth_Objects : Inherits VBparent
             radio.check(2).Checked = True
         End If
 
-        labels(2) = "Click on any region to isolate that region and measure everything about it."
+        labels(2) = "Click anywhere to get mask and depth value"
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F)
         task.desc = "Create a segmented image with KMeans, select a region, and isolate it for measurement."
     End Sub
@@ -1748,7 +1721,7 @@ Public Class Depth_Objects : Inherits VBparent
                 If meanDepth.Item(0) < 0.2 Then
                     labels(3) = "Region " + CStr(index) + " has no depth"
                 Else
-                    labels(3) = "Region " + CStr(index) + " has depth " + Format(meanDepth.Item(0) / 1000, "0.000") + "m (on average) with stdev " + Format(stdevDepth.Item(0), "0.0")
+                    labels(3) = "Region " + CStr(index) + " depth=" + Format(meanDepth.Item(0) / 1000, "0.000") + "m (avg), stdev=" + Format(stdevDepth.Item(0), "0.0")
                 End If
             End If
         End If
