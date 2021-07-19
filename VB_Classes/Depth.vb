@@ -869,7 +869,6 @@ End Class
 
 
 Public Class Depth_Holes : Inherits VBparent
-    Public holeMask As New cv.Mat
     Dim element As New cv.Mat
     Public Sub New()
         If sliders.Setup(caller) Then
@@ -881,11 +880,36 @@ Public Class Depth_Holes : Inherits VBparent
         task.desc = "Identify holes in the depth image."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        holeMask = task.depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
-        holeMask = holeMask.Dilate(element, Nothing, sliders.trackbar(1).Value)
-        dst2 = holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = task.depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
+        dst2 = dst2.Dilate(element, Nothing, sliders.trackbar(1).Value)
+        dst3 = dst2.Dilate(element, Nothing, sliders.trackbar(0).Value)
+        cv.Cv2.BitwiseXor(dst3, dst2, dst3)
+        If standalone Or task.intermediateActive Then task.RGBDepth.CopyTo(dst3, dst3)
+    End Sub
+End Class
 
-        dst3 = holeMask.Dilate(element, Nothing, sliders.trackbar(0).Value)
+
+
+
+
+
+
+Public Class Depth_Holes1 : Inherits VBparent
+    Dim holeMask As New cv.Mat
+    Dim element As New cv.Mat
+    Public Sub New()
+        If sliders.Setup(caller) Then
+            sliders.setupTrackBar(0, "Amount of dilation of borderMask", 1, 10, 1)
+            sliders.setupTrackBar(1, "Amount of dilation of holeMask", 0, 10, 0)
+        End If
+        labels(3) = "Shadow Edges (use sliders to expand)"
+        element = cv.Cv2.GetStructuringElement(cv.MorphShapes.Rect, New cv.Size(5, 5))
+        task.desc = "Identify holes in the depth image."
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        dst2 = task.depth32f.Threshold(1, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs(255)
+        dst2 = dst2.Dilate(element, Nothing, sliders.trackbar(1).Value)
+        dst3 = dst2.Dilate(element, Nothing, sliders.trackbar(0).Value)
         cv.Cv2.BitwiseXor(dst3, holeMask, dst3)
         If standalone Or task.intermediateActive Then task.RGBDepth.CopyTo(dst3, dst3)
     End Sub

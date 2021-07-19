@@ -57,7 +57,7 @@ Public Class Edges_DepthAndColor : Inherits VBparent
         dst3 += canny.dst2.Threshold(1, 255, cv.ThresholdTypes.Binary)
 
         dilate.RunClass(dst3)
-        dilate.dst2.SetTo(0, shadow.holeMask)
+        dilate.dst2.SetTo(0, shadow.dst2)
         dst2 = dilate.dst2
     End Sub
 End Class

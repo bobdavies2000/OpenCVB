@@ -73,7 +73,7 @@ Public Class ML_FillRGBDepth_MT : Inherits VBparent
         Dim minLearnCount = 5
         Parallel.ForEach(grid.roiList,
             Sub(roi)
-                task.depth32f(roi) = detectAndFillShadow(shadow.holeMask(roi), shadow.dst3(roi), task.depth32f(roi), src(roi), minLearnCount)
+                task.depth32f(roi) = detectAndFillShadow(shadow.dst2(roi), shadow.dst3(roi), task.depth32f(roi), src(roi), minLearnCount)
             End Sub)
 
         colorizer.RunClass(task.depth32f)
@@ -103,7 +103,7 @@ Public Class ML_FillRGBDepth : Inherits VBparent
         shadow.RunClass(src)
         Dim minLearnCount = sliders.trackbar(0).Value
         task.RGBDepth.CopyTo(dst2)
-        task.depth32f = detectAndFillShadow(shadow.holeMask, shadow.dst3, task.depth32f, src, minLearnCount)
+        task.depth32f = detectAndFillShadow(shadow.dst2, shadow.dst3, task.depth32f, src, minLearnCount)
         colorizer.RunClass(task.depth32f)
         dst3 = colorizer.dst2
     End Sub
@@ -188,7 +188,7 @@ Public Class ML_DepthFromColor : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         shadow.RunClass(src)
-        mats.mat(1) = shadow.holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        mats.mat(1) = shadow.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim color32f As New cv.Mat
 
@@ -256,7 +256,7 @@ Public Class ML_DepthFromXYColor : Inherits VBparent
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
         shadow.RunClass(src)
-        mats.mat(0) = shadow.holeMask.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        mats.mat(0) = shadow.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
 
         Dim color32f As New cv.Mat
 
@@ -264,7 +264,7 @@ Public Class ML_DepthFromXYColor : Inherits VBparent
 
         Dim colorROI As New cv.Rect(0, 0, resized.resizeOptions.newSize.Width, resized.resizeOptions.newSize.Height)
         resized.dst2.ConvertTo(color32f, cv.MatType.CV_32FC3)
-        Dim shadowSmall = shadow.holeMask.Resize(color32f.Size()).Clone()
+        Dim shadowSmall = shadow.dst2.Resize(color32f.Size()).Clone()
         color32f.SetTo(cv.Scalar.Black, shadowSmall) ' where depth is unknown, set to black (so we don't learn anything invalid, i.e. good color but missing depth.
         Dim depth32f = task.depth32f.Resize(color32f.Size())
 

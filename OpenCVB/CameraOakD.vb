@@ -1,6 +1,6 @@
-﻿Imports rs = Intel.RealSense
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
+Imports System.Threading
 
 Module OakD_Module_CPP
     <DllImport(("Cam_Oak-D.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function OakDOpen(width As Integer, height As Integer) As IntPtr
@@ -108,10 +108,6 @@ Public Class CameraOakD : Inherits Camera
         intrinsicsLeft_VB.FOV = {72, 81, 0}
         intrinsicsLeft_VB.coeffs = {0, 0, 0, 0, 0, 0}
 
-        'intrinsicsLeft = Marshal.PtrToStructure(Of rs.Intrinsics)(intrin)
-        'intrinsicsLeft_VB = setintrinsics(intrinsicsLeft)
-        'intrinsicsRight_VB = intrinsicsLeft_VB ' need to get the Right lens intrinsics?
-
         'Dim extrin = OakDExtrinsics(cPtr)
         'Dim extrinsics As rs.Extrinsics = Marshal.PtrToStructure(Of rs.Extrinsics)(extrin) ' they are both float's
         'Extrinsics_VB.rotation = extrinsics.rotation
@@ -141,7 +137,7 @@ Public Class CameraOakD : Inherits Camera
 
         color = New cv.Mat(height, width, cv.MatType.CV_8UC3, OakDColor(cPtr))
         RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, OakDRGBDepth(cPtr))
-        depth16 = New cv.Mat(height, width, cv.MatType.CV_8U, OakDRawDepth(cPtr))
+        depth16 = New cv.Mat(height, width, cv.MatType.CV_16U, OakDRawDepth(cPtr))
         leftView = New cv.Mat(height, width, cv.MatType.CV_8U, OakDLeftRaw(cPtr))
         rightView = New cv.Mat(height, width, cv.MatType.CV_8U, OakDRightRaw(cPtr))
         pointCloud = New cv.Mat(height, width, cv.MatType.CV_32FC3, 0)
@@ -149,6 +145,7 @@ Public Class CameraOakD : Inherits Camera
     End Sub
     Public Sub stopCamera()
         If cPtr <> 0 Then OakDStop(cPtr)
+        Thread.Sleep(100)
         cPtr = 0
     End Sub
 End Class

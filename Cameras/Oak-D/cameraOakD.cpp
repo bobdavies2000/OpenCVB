@@ -41,7 +41,7 @@ private:
 public:
 	dai::Pipeline pipeline;
 	std::vector<std::string> queueNames;
-	std::unordered_map<std::string, cv::Mat> frame;
+	std::unordered_map<std::string, Mat> frame;
 	std::unordered_map<std::string, std::shared_ptr<dai::ImgFrame>> latestPacket;
 	float intrinsicsLeft[9];
 	float intrinsicsRight[9];
@@ -60,6 +60,53 @@ public:
 	dai::IMUReportGyroscope gyroscope;
 	
 	~OakDCamera(){}
+	Mat getRGBDepth(Mat depth16) {
+		int histSize = 65535;
+		float nearColor[3] = { 0, 1.0f, 1.0f };
+		float farColor[3] = { 1.0f, 0, 0 };
+		float hRange[] = { 1, float(histSize) };  // ranges are exclusive at the top of the range
+		const float* range[] = { hRange };
+		int hbins[] = { histSize };
+		Mat hist;
+		if (countNonZero(depth16) > 0)
+		{
+			// use OpenCV's histogram rather than binning manually.
+			calcHist(&depth16, 1, 0, Mat(), hist, 1, hbins, range, true, false);
+		}
+
+		float* histogram = (float*)hist.data;
+		// Produce a cumulative histogram of depth values
+		for (int i = 1; i < histSize; i++)
+		{
+			histogram[i] += histogram[i - 1] + 1;
+		}
+
+		Mat output(depth16.size(), CV_8UC3);
+		output.setTo(0);
+		if (histogram[histSize - 1] > 0)
+		{
+			hist *= 1.0f / histogram[histSize - 1];
+
+			// Produce RGB image by using the histogram to interpolate between two colors
+			auto rgb = (unsigned char*)output.data;
+			unsigned short* depthImage = (unsigned short*)depth16.data;
+			for (int i = 0; i < output.cols * output.rows; i++) {
+				auto d = depthImage[i];
+				if (d > 0 && d < histSize) {
+					auto t = histogram[d];  // Use the histogram entry (in the range of 0..1) to interpolate between nearColor and farColor
+					*rgb++ = uchar(((1 - t) * nearColor[0] + t * farColor[0]) * 255);
+					*rgb++ = uchar(((1 - t) * nearColor[1] + t * farColor[1]) * 255);
+					*rgb++ = uchar(((1 - t) * nearColor[2] + t * farColor[2]) * 255);
+				}
+				else {
+					*rgb++ = 0;
+					*rgb++ = 0;
+					*rgb++ = 0;
+				}
+			}
+		}
+		return output;
+	}
 
 	OakDCamera(int cols, int rows)
 	{
@@ -76,7 +123,6 @@ public:
 		static auto stereo = pipeline.create<dai::node::StereoDepth>() ;
 		static auto xoutLeft = pipeline.create<dai::node::XLinkOut>();
 		static auto xoutRight = pipeline.create<dai::node::XLinkOut>();
-		static auto xoutDisp = pipeline.create<dai::node::XLinkOut>();
 		static auto xoutDepth = pipeline.create<dai::node::XLinkOut>();
 		static auto xoutRectifL = pipeline.create<dai::node::XLinkOut>();
 		static auto xoutRectifR = pipeline.create<dai::node::XLinkOut>();
@@ -86,7 +132,7 @@ public:
 		camRgb->setColorOrder(dai::ColorCameraProperties::ColorOrder::RGB);
 		camRgb->setResolution(dai::ColorCameraProperties::SensorResolution::THE_1080_P);
 		camRgb->setBoardSocket(dai::CameraBoardSocket::RGB);
-		camRgb->preview.link(xoutRgb->input);
+		camRgb->isp.link(xoutRgb->input);
 		camRgb->setPreviewSize(1280, 720);
 		camRgb->initialControl.setManualFocus(135);
 
@@ -97,7 +143,6 @@ public:
 		// XLinkOut
 		xoutLeft->setStreamName("left");
 		xoutRight->setStreamName("right");
-		xoutDisp->setStreamName("disparity");
 		xoutDepth->setStreamName("depth");
 		xoutRectifL->setStreamName("rectified_left");
 		xoutRectifR->setStreamName("rectified_right");
@@ -122,7 +167,6 @@ public:
 		monoLeft->out.link(stereo->left);
 		monoRight->out.link(stereo->right);
 
-		stereo->disparity.link(xoutDisp->input);
 		stereo->rectifiedLeft.link(xoutRectifL->input);
 		stereo->rectifiedRight.link(xoutRectifR->input);
 		stereo->depth.link(xoutDepth->input);
@@ -154,7 +198,6 @@ public:
 		static auto qRgb = device.getOutputQueue("rgb", 4, false);
 		static auto leftQueue = device.getOutputQueue("left", 8, false);
 		static auto rightQueue = device.getOutputQueue("right", 8, false);
-		static auto dispQueue = device.getOutputQueue("disparity", 8, false);
 		static auto depthQueue = device.getOutputQueue("depth", 8, false);
 		static auto rectifLeftQueue = device.getOutputQueue("rectified_left", 8, false);
 		static auto rectifRightQueue = device.getOutputQueue("rectified_right", 8, false);
@@ -169,12 +212,9 @@ public:
 
 		rgb = qRgb->get<dai::ImgFrame>()->getCvFrame().clone();
 
-		disparity = dispQueue->get<dai::ImgFrame>()->getCvFrame().clone();
-		disparity.convertTo(disparity, CV_8UC1, maxDisparity);  // Extend disparity range
-		cv::applyColorMap(disparity, RGBdepth, cv::COLORMAP_JET);
-
-		static auto depth = depthQueue->get<dai::ImgFrame>();
-		depth16u = cv::Mat(depth->getHeight(), depth->getWidth(), CV_16UC1, depth->getData().data()).clone();
+		auto depth = depthQueue->get<dai::ImgFrame>();
+		depth16u = depth->getCvFrame();
+		RGBdepth = getRGBDepth(depth16u);
 
 		auto left = rectifLeftQueue->get<dai::ImgFrame>();
 		leftView = left->getFrame().clone();
@@ -242,9 +282,7 @@ extern "C" __declspec(dllexport) int* OakDRawDepth(OakDCamera * tp) { return (in
 extern "C" __declspec(dllexport) void OakDWaitForFrame(OakDCamera * tp) { tp->waitForFrame(false);}
 extern "C" __declspec(dllexport) void OakDStop(OakDCamera * tp) 
 { 
-	cout << "stopping the camera" << endl;
 	tp->waitForFrame(true);
 	if (tp != 0) delete tp;
-	cout << "stopped" << endl;
 }
 #endif // OPENCV_OAKD

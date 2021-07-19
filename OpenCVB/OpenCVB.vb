@@ -576,15 +576,13 @@ Public Class OpenCVB
                "algorithms working together." + vbCrLf)
     End Sub
     Private Sub MainFrm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        activeCameraIndex = -1
+        Thread.Sleep(100) ' wait for the camera to shut down...
         SaveSetting("OpenCVB", "TreeButton", "TreeButton", TreeButton.Checked)
         SaveSetting("OpenCVB", "PixelViewerActive", "PixelViewerActive", PixelViewerButton.Checked)
         If TreeButton.Checked Then TreeViewDialog.Close()
-        Me.Visible = False
-        activeCameraIndex = -1
         saveAlgorithmName = "" ' this will close the current algorithm.
-
         saveLayout()
-        Application.ExitThread()
     End Sub
     Private Sub startCamera()
         activeCameraIndex = optionsForm.cameraIndex
