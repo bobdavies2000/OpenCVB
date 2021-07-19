@@ -1,18 +1,24 @@
 Imports cv = OpenCvSharp
 Public Class LeftRight_Basics : Inherits VBparent
+    Dim betaSlider As Windows.Forms.TrackBar
+    Dim alphaSlider As Windows.Forms.TrackBar
     Public Sub New()
         If sliders.Setup(caller) Then
             Dim kinect = task.parms.cameraName = ActiveTask.algParms.camNames.Kinect4AzureCam
             sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 10000, If(kinect, 600, 2000))
             sliders.setupTrackBar(1, "Brightness Beta (brightness)", -255, 255, If(kinect, 0, -100))
+            betaSlider = findSlider("Brightness Beta (brightness)")
+            alphaSlider = findSlider("Brightness Alpha (contrast)")
+            If task.parms.cameraName = ActiveTask.algParms.camNames.OakDCamera Then
+                alphaSlider.Value = 500
+                betaSlider.Value = 0
+            End If
         End If
         If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Then findSlider("Brightness Alpha (contrast)").Value = 1500
         labels(3) = If(task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam, "No right image", "Right Image")
         task.desc = "Enhance the left/right views with brightness and contrast."
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static betaSlider = findSlider("Brightness Beta (brightness)")
-        Static alphaSlider = findSlider("Brightness Alpha (contrast)")
         dst2 = (task.leftView * cv.Scalar.All(alphaSlider.Value / 500) + betaSlider.Value).ToMat
         dst3 = (task.rightView * cv.Scalar.All(alphaSlider.Value / 500) + betaSlider.Value).ToMat
     End Sub
@@ -102,6 +108,28 @@ Public Class LeftRight_Palettized : Inherits VBparent
 
         task.palette.RunClass(lrView.dst3)
         dst3 = task.palette.dst2
+    End Sub
+End Class
+
+
+
+
+Public Class LeftRight_Edges : Inherits VBparent
+    Dim lrView As New LeftRight_Basics
+    Dim edges As New Edges_Basics
+    Public Sub New()
+        task.desc = "Display the edges in the left and right views"
+        labels(2) = "Left Image"
+        labels(3) = "Right Image"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        lrView.RunClass(src)
+
+        edges.RunClass(lrView.dst2)
+        dst2 = edges.dst2
+
+        edges.RunClass(lrView.dst3)
+        dst3 = edges.dst2
     End Sub
 End Class
 

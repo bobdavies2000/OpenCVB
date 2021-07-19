@@ -403,7 +403,6 @@ Public Class Edges_BinarizedBrightness : Inherits VBparent
     Public Sub Run(src As cv.Mat) ' Rank = 1
         bright.RunClass(src)
         dst2 = bright.dst3
-
         edges.RunClass(bright.dst3)
         dst3 = edges.dst3
     End Sub
@@ -422,10 +421,8 @@ Public Class Edges_BinarizedReduction : Inherits VBparent
         task.desc = "Visualize the impact of reduction on Edges_BinarizeSobel"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-
         reduction.RunClass(src)
         dst2 = reduction.dst2
-
         edges.RunClass(dst2)
         dst3 = edges.dst3
     End Sub
@@ -602,82 +599,6 @@ Public Class Edges_Combo : Inherits VBparent
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Edges_SobelLR : Inherits VBparent
-    Dim red As New LeftRight_Basics
-    Dim sobel As New Edges_Sobel
-    Public Sub New()
-        sobel.sliders.trackbar(0).Value = 5
-
-        task.desc = "Find the edges in the LeftViewimages."
-        labels(2) = "Edges in Left Image"
-        labels(3) = "Edges in Right Image (except on Kinect)"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        red.RunClass(src)
-        Dim leftView = red.dst2
-        sobel.RunClass(red.dst3)
-        dst3 = sobel.dst2.Clone()
-
-        sobel.RunClass(leftView)
-        dst2 = sobel.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
-Public Class Edges_Sobel : Inherits VBparent
-    Public grayX As cv.Mat
-    Public grayY As cv.Mat
-    Public horizontalOnly As Boolean
-    Dim addw As New AddWeighted_Basics
-    Public Sub New()
-        If sliders.Setup(caller) Then
-            sliders.setupTrackBar(0, "Sobel kernel Size", 1, 32, 4)
-            sliders.setupTrackBar(1, "Threshold to zero pixels below this value", 0, 255, 100)
-        End If
-
-        If check.Setup(caller, 1) Then
-            check.Box(0).Text = "Threshold Sobel Results"
-            check.Box(0).Checked = True
-        End If
-
-        task.desc = "Show Sobel edge detection with varying kernel sizes"
-    End Sub
-    Public Sub Run(src As cv.Mat) ' Rank = 1
-        Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
-        Static thresholdCheck = findCheckBox("Threshold Sobel Results")
-        Static ksizeSlider = findSlider("Sobel kernel Size")
-        Dim kernelSize = If(ksizeSlider.Value Mod 2, ksizeSlider.Value, ksizeSlider.Value - 1)
-        dst2 = New cv.Mat(src.Rows, src.Cols, src.Type)
-        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        grayX = src.Sobel(cv.MatType.CV_32F, 1, 0, kernelSize)
-        If horizontalOnly = False Then
-            grayY = src.Sobel(cv.MatType.CV_32F, 0, 1, kernelSize)
-            If standalone Then
-                addw.src2 = grayY
-                addw.RunClass(grayX)
-                dst2 = addw.dst2.ConvertScaleAbs()
-            Else
-                dst2 = (grayY + grayX).ToMat.ConvertScaleAbs()
-            End If
-        Else
-            dst2 = grayX.ConvertScaleAbs()
-        End If
-        If thresholdCheck.checked Then
-            dst2 = dst2.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Tozero).Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
-        End If
-    End Sub
-End Class
 
 
 
@@ -982,5 +903,195 @@ Public Class Edges_HSV : Inherits VBparent
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         edges.RunClass(hsv)
         dst2 = edges.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Edges_SobelLR : Inherits VBparent
+    Dim red As New LeftRight_Basics
+    Dim sobel As New Edges_Sobel
+    Public Sub New()
+        sobel.sliders.trackbar(0).Value = 5
+
+        task.desc = "Find the edges in the LeftViewimages."
+        labels(2) = "Edges in Left Image"
+        labels(3) = "Edges in Right Image (except on Kinect)"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        red.RunClass(src)
+        Dim leftView = red.dst2
+        sobel.RunClass(red.dst3)
+        dst3 = sobel.dst2.Clone()
+
+        sobel.RunClass(leftView)
+        dst2 = sobel.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+'https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/sobel_derivatives/sobel_derivatives.html
+Public Class Edges_Sobel : Inherits VBparent
+    Public grayX As cv.Mat
+    Public grayY As cv.Mat
+    Public horizontalOnly As Boolean
+    Dim addw As New AddWeighted_Basics
+    Public Sub New()
+        If sliders.Setup(caller) Then
+            sliders.setupTrackBar(0, "Sobel kernel Size", 1, 32, 4)
+            sliders.setupTrackBar(1, "Threshold to zero pixels below this value", 0, 255, 100)
+        End If
+
+        If check.Setup(caller, 1) Then
+            check.Box(0).Text = "Threshold Sobel Results"
+            check.Box(0).Checked = True
+        End If
+
+        task.desc = "Show Sobel edge detection with varying kernel sizes"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
+        Static thresholdCheck = findCheckBox("Threshold Sobel Results")
+        Static ksizeSlider = findSlider("Sobel kernel Size")
+        Dim kernelSize = If(ksizeSlider.Value Mod 2, ksizeSlider.Value, ksizeSlider.Value - 1)
+        dst2 = New cv.Mat(src.Rows, src.Cols, src.Type)
+        If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        grayX = src.Sobel(cv.MatType.CV_32F, 1, 0, kernelSize)
+        If horizontalOnly = False Then
+            grayY = src.Sobel(cv.MatType.CV_32F, 0, 1, kernelSize)
+            If standalone Then
+                addw.src2 = grayY
+                addw.RunClass(grayX)
+                dst2 = addw.dst2.ConvertScaleAbs()
+            Else
+                dst2 = (grayY + grayX).ToMat.ConvertScaleAbs()
+            End If
+        Else
+            dst2 = grayX.ConvertScaleAbs()
+        End If
+        If thresholdCheck.checked Then
+            dst2 = dst2.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Tozero).Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Edges_SobelCustomV : Inherits VBparent
+    Public Sub New()
+        labels = {"", "", "Sobel Custom 1", "Sobel Custom 2"}
+        task.desc = "Show Sobel edge detection a custom vertical kernel"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        dst1 = src.Filter2D(cv.MatType.CV_32F, New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {1, 0, -1, 2, 0, -2, 1, 0, -1}))
+        dst1.ConvertTo(dst2, src.Type)
+        dst1 = src.Filter2D(cv.MatType.CV_32F, New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {3, 0, -3, 10, 0, -10, 3, 0, -3}))
+        dst1.ConvertTo(dst3, src.Type)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Edges_SobelCustomH : Inherits VBparent
+    Public Sub New()
+        labels = {"", "", "Sobel Custom 1", "Sobel Custom 2"}
+        task.desc = "Show Sobel edge detection a custom horizontal kernel"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        dst1 = src.Filter2D(cv.MatType.CV_32F, New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {1, 2, 1, 0, 0, 0, -1, -2, -1}))
+        dst1.ConvertTo(dst2, src.Type)
+        dst1 = src.Filter2D(cv.MatType.CV_32F, New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {3, 10, 3, 0, 0, 0, -3, -10, -3}))
+        dst1.ConvertTo(dst3, src.Type)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Edges_SobelCustom : Inherits VBparent
+    Dim addw As New AddWeighted_Basics
+    Dim edgesV As New Edges_SobelCustomV
+    Dim edgesH As New Edges_SobelCustomH
+    Public Sub New()
+        If findfrm(caller + " CheckBox Options") Is Nothing Then
+            check.Setup(caller, 2)
+            check.Box(0).Text = "Horizontal Edges"
+            check.Box(1).Text = "Vertical Edges"
+            check.Box(0).Checked = True
+            check.Box(1).Checked = True
+        End If
+
+        labels = {"", "", "Sobel Custom 1", "Sobel Custom 2"}
+        task.desc = "Show Sobel edge detection with custom horizont and vertical kernels"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        Static horizCheck = findCheckBox("Horizontal Edges")
+        Static vertCheck = findCheckBox("Vertical Edges")
+        If horizCheck.checked Then
+            edgesH.RunClass(src)
+            dst2 = edgesH.dst2
+            dst3 = edgesH.dst3
+        End If
+
+        If vertCheck.checked Then edgesV.RunClass(src)
+
+        If horizCheck.checked And vertCheck.checked Then
+            addw.src2 = edgesV.dst2
+            addw.RunClass(dst2)
+            dst2 = addw.dst2
+
+            addw.src2 = edgesV.dst3
+            addw.RunClass(dst3)
+            dst3 = addw.dst2
+        ElseIf vertCheck.checked Then
+            dst2 = edgesV.dst2.Clone
+            dst3 = edgesV.dst3.Clone
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Edges_SobelCustomLeftRight : Inherits VBparent
+    Dim custom As New Edges_SobelCustom
+    Public Sub New()
+        usingdst0 = True
+        usingdst1 = True
+        labels = {"Left Image Custom 1", "Left Image Custom 2", "Right Image Custom 1", "Right Image Custom 2"}
+        task.desc = "Show Sobel edge detection for both left and right images"
+    End Sub
+    Public Sub Run(src As cv.Mat) ' Rank = 1
+        custom.RunClass(task.leftView)
+        dst0 = custom.dst2.Clone
+        dst1 = custom.dst3.Clone
+
+        custom.RunClass(task.rightView)
+        dst2 = custom.dst2
+        dst3 = custom.dst3
     End Sub
 End Class

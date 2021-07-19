@@ -145,7 +145,7 @@ Public Class CameraOakD : Inherits Camera
     End Sub
     Public Sub stopCamera()
         If cPtr <> 0 Then OakDStop(cPtr)
-        Thread.Sleep(100)
+        Thread.Sleep(500)
         cPtr = 0
     End Sub
 End Class

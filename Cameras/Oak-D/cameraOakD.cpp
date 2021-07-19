@@ -127,6 +127,8 @@ public:
 		static auto xoutRectifL = pipeline.create<dai::node::XLinkOut>();
 		static auto xoutRectifR = pipeline.create<dai::node::XLinkOut>();
 		static auto xoutRgb = pipeline.create<dai::node::XLinkOut>();
+		static auto imu = pipeline.create<dai::node::IMU>();
+		static auto xlinkImu = pipeline.create<dai::node::XLinkOut>();
 
 		camRgb->setInterleaved(false);
 		camRgb->setColorOrder(dai::ColorCameraProperties::ColorOrder::RGB);
@@ -147,6 +149,15 @@ public:
 		xoutRectifL->setStreamName("rectified_left");
 		xoutRectifR->setStreamName("rectified_right");
 		xoutRgb->setStreamName("rgb");
+		xlinkImu->setStreamName("imu");
+
+		queueNames.push_back("left");
+		queueNames.push_back("right");
+		queueNames.push_back("depth");
+		queueNames.push_back("rectified_left");
+		queueNames.push_back("rectified_right");
+		queueNames.push_back("rgb");
+		queueNames.push_back("imu");
 
 		// Properties
 		monoLeft->setResolution(dai::MonoCameraProperties::SensorResolution::THE_720_P);
@@ -173,9 +184,6 @@ public:
 		stereo->syncedLeft.link(xoutLeft->input);
 		stereo->syncedRight.link(xoutRight->input);
 
-		static auto imu = pipeline.create<dai::node::IMU>();
-		static auto xlinkImu = pipeline.create<dai::node::XLinkOut>();
-		xlinkImu->setStreamName("imu");
 		imu->enableIMUSensor({ dai::IMUSensor::ACCELEROMETER_RAW, dai::IMUSensor::GYROSCOPE_RAW }, 500);
 
 		// above this threshold packets will be sent in batch of X, if the host is not blocked and USB bandwidth is available
@@ -192,6 +200,8 @@ public:
 
 	void waitForFrame(bool close)
 	{
+		std::unordered_map<std::string, std::shared_ptr<dai::ImgFrame>> latestPacket;
+
 		using namespace std::chrono;
 		// Connect to device and start pipeline
 		static dai::Device device(pipeline);
@@ -203,23 +213,35 @@ public:
 		static auto rectifRightQueue = device.getOutputQueue("rectified_right", 8, false);
 		static auto imuQueue = device.getOutputQueue("imu", 50, false);
 
-		if (close) { device.close(); while (1) { if (device.isClosed()) return; } } // this is for the shutdown process only...
+		// this is for the shutdown process only...
+		if (close) { device.close();  return; }
 
-		rgb = qRgb->get<dai::ImgFrame>()->getCvFrame().clone();
-
-		auto depth = depthQueue->get<dai::ImgFrame>();
-		depth16u = depth->getCvFrame();
-		RGBdepth = getRGBDepth(depth16u);
-
-		leftView = rectifLeftQueue->get<dai::ImgFrame>()->getFrame().clone();
-		rightView = rectifRightQueue->get<dai::ImgFrame>()->getFrame().clone();
-
-		auto imuData = imuQueue->get<dai::IMUData>();
-		acceleroMeter = imuData->packets[0].acceleroMeter;
-		gyroscope = imuData->packets[0].gyroscope;
-
-		auto ms_time = std::chrono::time_point_cast<std::chrono::milliseconds>(acceleroMeter.timestamp.get());
-		imuTimeStamp = (double) std::chrono::duration_cast<std::chrono::milliseconds>(ms_time.time_since_epoch()).count();
+		auto queueEvents = device.getQueueEvents(queueNames);
+		for (const auto& name : queueEvents) {
+			auto packets = device.getOutputQueue(name)->tryGetAll<dai::ImgFrame>();
+			auto count = packets.size();
+			if (count > 0) latestPacket[name] = packets[count - 1];
+		}
+		
+		for (const auto& name : queueNames) {
+			if (latestPacket.find(name) != latestPacket.end()) {
+				if (name == "depth") {
+					auto depth = depthQueue->get<dai::ImgFrame>();
+					depth16u = depth->getCvFrame();
+					RGBdepth = getRGBDepth(depth16u);
+				}
+				if (name == "rgb") rgb = latestPacket[name]->getCvFrame().clone();
+				if (name == "rectified_left") leftView = latestPacket[name]->getCvFrame().clone();
+				if (name == "rectified_right") rightView = latestPacket[name]->getCvFrame().clone();
+				if (name == "imu") {
+					auto imuData = imuQueue->get<dai::IMUData>();
+					acceleroMeter = imuData->packets[0].acceleroMeter;
+					gyroscope = imuData->packets[0].gyroscope;
+					auto ms_time = std::chrono::time_point_cast<std::chrono::milliseconds>(acceleroMeter.timestamp.get());
+					imuTimeStamp = (double)std::chrono::duration_cast<std::chrono::milliseconds>(ms_time.time_since_epoch()).count();
+				}
+			}
+		}
 	}
 };
 

@@ -7,14 +7,11 @@ Public Class Filter_Laplacian : Inherits VBparent
         labels(3) = "Output of Filter2D (approximated Laplacian)"
     End Sub
     Public Sub Run(src As cv.Mat) ' Rank = 1
-        Dim kernel = New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {1, 1, 1, 1, -8, 1, 1, 1, 1})
-        Dim imgLaplacian = src.Filter2D(cv.MatType.CV_32F, kernel)
-        Dim sharp As New cv.Mat
-        src.ConvertTo(sharp, cv.MatType.CV_32F)
-        Dim imgResult = (sharp - imgLaplacian).ToMat
-        imgResult.ConvertTo(imgResult, cv.MatType.CV_8UC3)
-        imgResult.ConvertTo(dst2, cv.MatType.CV_8UC3)
-        imgLaplacian.ConvertTo(dst3, cv.MatType.CV_8UC3)
+        Dim imgLaplacian = src.Filter2D(cv.MatType.CV_32F, New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {1, 1, 1, 1, -8, 1, 1, 1, 1}))
+        src.ConvertTo(dst1, cv.MatType.CV_32F)
+        dst0 = (dst1 - imgLaplacian).ToMat
+        dst0.ConvertTo(dst2, src.Type)
+        imgLaplacian.ConvertTo(dst3, src.type)
     End Sub
 End Class
 
