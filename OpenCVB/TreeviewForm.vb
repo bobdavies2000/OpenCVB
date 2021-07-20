@@ -38,6 +38,7 @@ Public Class TreeviewForm
         Accumulate.Top = ClickTreeLabel.Top + ClickTreeLabel.Height + 5
         TreeView1.Height = ClickTreeLabel.Top - 5
         PercentTime.Height = TreeView1.Height - 20
+        If Me.Height < 400 Then Me.Height = 400
     End Sub
     Private Sub TreeviewForm_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.Left = GetSetting("OpenCVB", "TreeViewLeft", "TreeViewLeft", Me.Left)

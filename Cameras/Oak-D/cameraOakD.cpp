@@ -128,6 +128,7 @@ public:
 		static auto xoutRectifR = pipeline.create<dai::node::XLinkOut>();
 		static auto xoutRgb = pipeline.create<dai::node::XLinkOut>();
 		static auto imu = pipeline.create<dai::node::IMU>();
+		static auto xoutDisp = pipeline.create<dai::node::XLinkOut>();
 		static auto xlinkImu = pipeline.create<dai::node::XLinkOut>();
 
 		camRgb->setInterleaved(false);
@@ -149,6 +150,7 @@ public:
 		xoutRectifL->setStreamName("rectified_left");
 		xoutRectifR->setStreamName("rectified_right");
 		xoutRgb->setStreamName("rgb");
+		xoutDisp->setStreamName("disparity"); 
 		xlinkImu->setStreamName("imu");
 
 		queueNames.push_back("left");
@@ -157,6 +159,7 @@ public:
 		queueNames.push_back("rectified_left");
 		queueNames.push_back("rectified_right");
 		queueNames.push_back("rgb");
+		queueNames.push_back("disparity");
 		queueNames.push_back("imu");
 
 		// Properties
@@ -183,6 +186,7 @@ public:
 		stereo->depth.link(xoutDepth->input);
 		stereo->syncedLeft.link(xoutLeft->input);
 		stereo->syncedRight.link(xoutRight->input);
+		stereo->disparity.link(xoutDisp->input);
 
 		imu->enableIMUSensor({ dai::IMUSensor::ACCELEROMETER_RAW, dai::IMUSensor::GYROSCOPE_RAW }, 500);
 
@@ -211,6 +215,7 @@ public:
 		static auto depthQueue = device.getOutputQueue("depth", 8, false);
 		static auto rectifLeftQueue = device.getOutputQueue("rectified_left", 8, false);
 		static auto rectifRightQueue = device.getOutputQueue("rectified_right", 8, false);
+		static auto dispQueue = device.getOutputQueue("disparity", 8, false); 
 		static auto imuQueue = device.getOutputQueue("imu", 50, false);
 
 		// this is for the shutdown process only...
@@ -229,6 +234,11 @@ public:
 					auto depth = depthQueue->get<dai::ImgFrame>();
 					depth16u = depth->getCvFrame();
 					RGBdepth = getRGBDepth(depth16u);
+				}
+				if (name == "disparity")
+				{
+					disparity = latestPacket[name]->getCvFrame().clone(); // dispQueue->get<dai::ImgFrame>()->getCvFrame().clone();
+					// disparity.convertTo(disparity, CV_8UC1, maxDisparity);  // Extend disparity range
 				}
 				if (name == "rgb") rgb = latestPacket[name]->getCvFrame().clone();
 				if (name == "rectified_left") leftView = latestPacket[name]->getCvFrame().clone();

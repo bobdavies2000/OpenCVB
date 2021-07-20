@@ -440,7 +440,7 @@ Public Class ActiveTask : Implements IDisposable
             algorithmObject.NextFrame(task.color.Clone)
             TaskTimer.Enabled = False
 
-            lastTime = Now
+            lastTime = nextTime
 
         Catch ex As Exception
             Console.WriteLine("Active Algorithm exception occurred: " + ex.Message)

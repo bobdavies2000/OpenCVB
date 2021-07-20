@@ -132,8 +132,6 @@ Public Class CameraOakD : Inherits Camera
         IMU_TimeStamp = OakDIMUTimeStamp(cPtr) - imuStartTime
 
         'Dim disparity = New cv.Mat(height, width, cv.MatType.CV_8UC1, OakDDisparity(cPtr))
-        'disparity = disparity.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        'RGBDepth = disparity.LUT(colorMap)
 
         color = New cv.Mat(height, width, cv.MatType.CV_8UC3, OakDColor(cPtr))
         RGBDepth = New cv.Mat(height, width, cv.MatType.CV_8UC3, OakDRGBDepth(cPtr))
