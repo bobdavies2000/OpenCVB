@@ -1,99 +1,71 @@
-#!/usr/bin/env python3
-
-import cv2
-import depthai as dai
+import pyrealsense2 as rs
 import numpy as np
+import cv2
+import tensorflow as tf
+titleWindow = 'TensorFlow_Example1_PS.py'
+from PyStream import PyStreamRun
+# https://github.com/IntelRealSense/librealsense/blob/master/wrappers/tensorflow/example1%20-%20object%20detection.py
+def OpenCVCode(color_image, depth32f, frameCount):
+    global image_tensor, detection_boxes, detection_scores, detection_classes, num_detections, colors_hash
+    width = color_image.shape[1]
+    height = color_image.shape[0]
+    # expand image dimensions to have shape: [1, None, None, 3]
+    # i.e. a single-column array, where each item in the column has the pixel RGB value
+    image_expanded = np.expand_dims(color_image, axis=0)
+    # Perform the actual detection by running the model with the image as input
+    (boxes, scores, classes, num) = sess.Run([detection_boxes, detection_scores, detection_classes, num_detections],
+                                                feed_dict={image_tensor: image_expanded})
 
-# Start defining a pipeline
-pipeline = dai.Pipeline()
+    boxes = np.squeeze(boxes)
+    classes = np.squeeze(classes).astype(np.int32)
+    scores = np.squeeze(scores)
 
-# Define a source - two mono (grayscale) cameras
-cam_left = pipeline.createMonoCamera()
-cam_left.setBoardSocket(dai.CameraBoardSocket.LEFT)
-cam_left.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
+    for idx in range(int(num)):
+        class_ = classes[idx]
+        score = scores[idx]
+        box = boxes[idx]
+        
+        if class_ not in colors_hash:
+            colors_hash[class_] = tuple(np.random.choice(range(256), size=3))
+        
+        if score > 0.6:
+            left = int(box[1] * width)
+            top = int(box[0] * height)
+            right = int(box[3] * width)
+            bottom = int(box[2] * height)
+            
+            p1 = (left, top)
+            p2 = (right, bottom)
+            # draw box
+            r, g, b = colors_hash[class_]
+            cv2.rectangle(color_image, p1, p2, (int(r), int(g), int(b)), 2, 1)
 
-cam_right = pipeline.createMonoCamera()
-cam_right.setBoardSocket(dai.CameraBoardSocket.RIGHT)
-cam_right.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
-
-# Create outputs
-xout_left = pipeline.createXLinkOut()
-xout_left.setStreamName('left')
-cam_left.out.link(xout_left.input)
-
-xout_right = pipeline.createXLinkOut()
-xout_right.setStreamName('right')
-cam_right.out.link(xout_right.input)
-
-# Define a source - color camera
-cam_rgb = pipeline.createColorCamera()
-cam_rgb.setPreviewSize(1280, 720)
-cam_rgb.setBoardSocket(dai.CameraBoardSocket.RGB)
-cam_rgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
-cam_rgb.setInterleaved(False)
-
-# Create output
-xout_rgb = pipeline.createXLinkOut()
-xout_rgb.setStreamName("rgb")
-cam_rgb.preview.link(xout_rgb.input)
-
-# Create a node that will produce the depth map
-depth = pipeline.createStereoDepth()
-depth.setConfidenceThreshold(200)
-cam_left.out.link(depth.left)
-cam_right.out.link(depth.right)
-
-# Pipeline defined, now the device is assigned and pipeline is started
-device = dai.Device(pipeline)
-device.startPipeline()
-
-# Output queues will be used to get the grayscale frames from the outputs defined above
-q_left = device.getOutputQueue(name="left", maxSize=4, blocking=False)
-q_right = device.getOutputQueue(name="right", maxSize=4, blocking=False)
-q_rgb = device.getOutputQueue(name="rgb", maxSize=4, blocking=True)
-q = device.getOutputQueue(name="disparity", maxSize=4, blocking=False)
-
-frame_left = None
-frame_right = None
-frame = None
-
-while True:
-    in_rgb = q_rgb.get()  # blocking call, will wait until a new data has arrived
-    #in_depth = q_rgb.get()
-    ## data is originally represented as a flat 1D array, it needs to be converted into HxW form
-    #frame = in_depth.getData().reshape((in_depth.getHeight(), in_depth.getWidth())).astype(np.uint8)
-    #frame = np.ascontiguousarray(frame)
-
-    # instead of get (blocking) used tryGet (nonblocking) which will return the available data or None otherwise
-    in_left = q_left.tryGet()
-    in_right = q_right.tryGet()
-
-    if in_left is not None:
-        # if the data from the left camera is available, transform the 1D data into a frame
-        frame_left = in_left.getData().reshape((in_left.getHeight(), in_left.getWidth())).astype(np.uint8)
-        frame_left = np.ascontiguousarray(frame_left)
-
-    if in_right is not None:
-        # if the data from the right camera is available, transform the 1D data into a frame
-        frame_right = in_right.getData().reshape((in_right.getHeight(), in_right.getWidth())).astype(np.uint8)
-        frame_right = np.ascontiguousarray(frame_right)
-
-    # data is originally represented as a flat 1D array, it needs to be converted into HxWxC form
-    shape = (3, in_rgb.getHeight(), in_rgb.getWidth())
-    frame_rgb = in_rgb.getData().reshape(shape).transpose(1, 2, 0).astype(np.uint8)
-    frame_rgb = np.ascontiguousarray(frame_rgb)
-    # frame is transformed and ready to be shown
-    cv2.imshow("rgb", frame_rgb)
-    
-    if frame is not None:
-        cv2.imshow("disparity", frame)
-
-    # show the frames if available
-    if frame_left is not None:
-        cv2.imshow("left", frame_left)
-    if frame_right is not None:
-        cv2.imshow("right", frame_right)
+    return color_image, None
 
 
-    if cv2.waitKey(1) == ord('q'):
-        break
+# download_Databases automatically downloads the database used here.
+# It is available from https://github.com/opencv/opencv/wiki/TensorFlow-Object-Detection-API#run-network-in-opencv
+# Load the Tensorflow model into memory.
+detection_graph = tf.Graph()
+with detection_graph.as_default():
+    od_graph_def = tf.compat.v1.GraphDef()
+    with tf.compat.v1.gfile.GFile("../Data/faster_rcnn_inception_v2_coco_2018_01_28/frozen_inference_graph.pb" , 'rb') as fid:
+        serialized_graph = fid.read()
+        od_graph_def.ParseFromString(serialized_graph)
+        tf.compat.v1.import_graph_def(od_graph_def, name='')
+    sess = tf.compat.v1.Session(graph=detection_graph)
+
+# Input tensor is the image
+image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
+# Output tensors are the detection boxes, scores, and classes
+# Each box represents a part of the image where a particular object was detected
+detection_boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
+# Each score represents level of confidence for each of the objects.
+# The score is shown on the result image, together with the class label.
+detection_scores = detection_graph.get_tensor_by_name('detection_scores:0')
+detection_classes = detection_graph.get_tensor_by_name('detection_classes:0')
+# Number of objects detected
+num_detections = detection_graph.get_tensor_by_name('num_detections:0')
+# code source of tensorflow model loading: https://www.geeksforgeeks.org/ml-training-image-classifier-using-tensorflow-object-detection-api/
+colors_hash = {}
+PyStreamRun(OpenCVCode, titleWindow)
