@@ -7,12 +7,12 @@ Public Class LeftRight_Basics : Inherits VBparent
             Dim kinect = task.parms.cameraName = ActiveTask.algParms.camNames.Kinect4AzureCam
             sliders.setupTrackBar(0, "Brightness Alpha (contrast)", 0, 10000, If(kinect, 600, 2000))
             sliders.setupTrackBar(1, "Brightness Beta (brightness)", -255, 255, If(kinect, 0, -100))
-            betaSlider = findSlider("Brightness Beta (brightness)")
-            alphaSlider = findSlider("Brightness Alpha (contrast)")
-            If task.parms.cameraName = ActiveTask.algParms.camNames.OakDCamera Then
-                alphaSlider.Value = 500
-                betaSlider.Value = 0
-            End If
+        End If
+        betaSlider = findSlider("Brightness Beta (brightness)")
+        alphaSlider = findSlider("Brightness Alpha (contrast)")
+        If task.parms.cameraName = ActiveTask.algParms.camNames.OakDCamera Then
+            alphaSlider.Value = 500
+            betaSlider.Value = 0
         End If
         If task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.D435i Then findSlider("Brightness Alpha (contrast)").Value = 1500
         labels(3) = If(task.parms.cameraName = VB_Classes.ActiveTask.algParms.camNames.Kinect4AzureCam, "No right image", "Right Image")
