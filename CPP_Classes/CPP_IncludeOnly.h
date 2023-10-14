@@ -1,0 +1,2675 @@
+#pragma once
+#include <string.h>
+#include <Windows.h>
+#include <OleAuto.h>
+#include <cstdlib>
+#include <cstdio>
+#include <iostream>
+#include <algorithm>
+#include <opencv2/core.hpp>
+#include <opencv2/ximgproc.hpp>
+#include <opencv2/highgui.hpp>
+#include "opencv2/core/utility.hpp"
+#include "opencv2/ml/ml.hpp "
+#include "opencv2/imgproc.hpp"
+#include "opencv2/videoio.hpp"
+#include <numeric>
+#include <iomanip>
+#include <sstream>
+#include <iostream>
+#include <memory>
+
+using namespace std;
+using namespace cv;
+using namespace ximgproc;
+
+#include "../CPP_Classes/PragmaLibs.h"
+
+struct rcData {
+    Rect rect;
+    Mat mask;
+    int pixels;
+
+    Scalar depthMean;
+    Scalar depthStdev;
+    double depthMin;
+    Point depthMinLoc;
+    double depthMax;
+    Point depthMaxLoc;
+
+    Point maxDist;
+
+    int index;
+    int indexLast;
+    int indexCurr;// lastCells will link to the redCells with this link.
+
+    Vec3b color;
+    vector<Point> contour;
+    vector<Point> hull;
+
+    Vec4f eq;
+
+    Point2f center;
+};
+
+
+struct mmData
+{
+    double minVal;
+    double maxVal;
+    Point minLoc;
+    Point maxLoc;
+};
+
+// https://stackoverflow.com/questions/1380463/sorting-a-vector-of-custom-objects
+struct sortInt
+{
+    int key;
+    int value;
+
+    sortInt(int key, int value) : key(key), value(value) {}
+
+    // these allows you to sort the struct by the key with std::sort(vec.begin(), vec.end());
+    bool operator < (const sortInt& keyVal)
+    {
+        return (key < keyVal.key);
+    }
+    bool operator > (const sortInt& keyVal)
+    {
+        return (key > keyVal.key);
+    }
+};
+
+#define LINE_WIDTH 1
+#define WHITE Scalar(255, 255, 255)
+#define BLUE Scalar(255, 0, 0)
+#define RED Scalar(0, 0, 255)
+#define GREEN Scalar(0, 255, 0)
+#define YELLOW Scalar(0, 255, 255)
+#define BLACK Scalar(0, 0, 0)
+#define GRAY Scalar(127, 127, 127)
+vector<Scalar> highLightColors = { YELLOW, WHITE, BLUE, GRAY, RED, GREEN };
+
+vector<string> mapNames = { "Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
+                            "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter" };
+enum functions
+{
+fAddWeighted_Basics,
+fFeature_Agast,
+fResize_Basics,
+fDelaunay_Basics,
+fDelaunay_GenerationsNoKNN,
+fKNN_Basics,
+fRandom_Basics,
+fKNN_Lossy,
+fDelaunay_Generations,
+fStable_Basics,
+fFeature_Basics,
+fFPoly_TopFeatures,
+fRemap_Basics,
+fEdge_Canny,
+fEdge_Sobel,
+fEdge_Scharr,
+fMat_4to1,
+fGrid_Basics,
+fDepth_Colorizer,
+fRedCloud_PrepData,
+fRedCloud_Flood,
+fDepth_PointCloud,
+fIMU_GMatrix,
+fIMU_GMatrix_QT,
+fDepth_PointCloud_IMU,
+fBinarize_Simple,
+fPlot_Histogram,
+fHistogram_Basics,
+fBackProject_Basics,
+fRectangle_Basics,
+fRectangle_Rotated,
+fContour_Largest,
+fDiff_Basics,
+fApproxPoly_FindandDraw,
+fApproxPoly_Basics,
+fHull_Basics,
+fApproxPoly_Hull,
+fEdge_Segments,
+fMotion_Basics,
+fEdge_MotionAccum,
+fEdge_MotionFrames,
+fEdgePreserving_Basics,
+fEdgeDraw_Basics,
+fTEE_Basics,
+fRedCloud_Hulls,
+fDistance_Basics,
+fFeatureLess_Basics,
+fFeatureLess_Edge,
+fRedCloud_FeatureLess2,
+fStable_BasicsCount,
+MAX_FUNCTION = fStable_BasicsCount,
+};
+
+
+class algorithmX
+{
+private:
+public:
+    Mat dst0, dst1, dst2, dst3;
+    bool standalone;
+    String desc;
+    string traceName;
+    Vec3b black = Vec3b(0, 0, 0);
+    vector<string> labels{ "", "", "", "" };
+    algorithmX() {}
+    algorithmX(int rows, int cols)
+    {
+        dst0 = Mat(rows, cols, CV_8UC3);
+        dst0.setTo(0);
+        dst1 = Mat(rows, cols, CV_8UC3);
+        dst1.setTo(0);
+        dst2 = Mat(rows, cols, CV_8UC3);
+        dst2.setTo(0);
+        dst3 = Mat(rows, cols, CV_8UC3);
+        dst3.setTo(0);
+    };
+
+    virtual void Run(Mat src) = 0;  // forces the child class to have a void Run function has the same paramters.
+};
+
+
+
+
+
+
+class cppTask
+{
+private:
+public:
+    algorithmX* alg;
+    Mat color, depthRGB, depth32f, pointCloud, gCloud, leftView, rightView; int cppFunction; int lineWidth; int lineType;
+    Mat depthMask, noDepthMask; Mat gridMask; int gridRows; int gridCols;
+    int font; float fontSize; Scalar fontColor;
+    int frameCount;  Point3f accRadians; vector<Rect> roiList;
+
+    bool optionsChanged; double addWeightPercent; bool heartBeat; int dotSize; int gridSize; float maxDepth;
+    int histogramBins; int pixelDiffThreshold; bool gravityPointCloud; bool useKalman;
+    int paletteIndex; int polyCount; bool firstPass; Scalar highLightColor; int frameHistory;
+    Point clickPoint; bool mouseClickFlag; int mousePicTag; Point mouseMovePoint; bool mouseMovePointUpdated;
+    Scalar scalarColors[256]; Vec3b vecColors[256]; Rect drawRect; bool displayDst0; bool displayDst1;
+    Mat gMatrix; vector<Mat> pcSplit;
+    bool paused = false;
+    Mat xdst0, xdst1, xdst2, xdst3;
+    cppTask(int rows, int cols)
+    {
+        leftView = Mat(rows, cols, CV_8UC3);
+        leftView.setTo(0);
+        rightView = Mat(rows, cols, CV_8UC3);
+        rightView.setTo(0);
+        cppFunction = -1;
+        firstPass = true;
+
+        polyCount = 10; // use FPoly_TopFeatures and the slider to double-check this value.  It seems pretty good.
+        buildColors();
+    };
+    void buildColors()
+    {
+        srand(time(0));
+        for (int i = 0; i < 256; i++)
+        {
+            vecColors[i] = Vec3b(rand() % 256, rand() % 256, rand() % 256);
+            scalarColors[i] = Scalar(vecColors[i].val[0], vecColors[i].val[1], vecColors[i].val[2]);
+        }
+    }
+    void drawContour(Mat dst, vector<Point> contour, Scalar color, int lineWidth = -10)
+    {
+        if (lineWidth == -10) lineWidth = this->lineWidth;
+        if (contour.size() < 3) return;
+        vector<vector<Point>> pointList;
+        pointList.push_back(contour);
+        drawContours(dst, pointList, -1, color, lineWidth, this->lineType);
+    }
+    vector<Point> convert2f2i(Mat hull2f)
+    {
+        Mat hull2i = Mat(hull2f.rows, 1, CV_32SC2);
+        hull2f.convertTo(hull2i, CV_32SC2);
+        vector<Point> vec;
+        vec.assign((Point *)hull2i.data, (Point *)hull2i.data + hull2i.total());
+        return vec;
+    }
+    void setText(String text, Mat dst, Point2f pt = Point2f(10, 50))
+    {
+        if (cppFunction < 0) return;
+        putText(dst, text, pt, this->font, this->fontSize, this->fontColor);
+    }
+    mmData getMinMax(Mat mat, Mat mask = Mat())
+    {
+        mmData mm;
+        if (mask.rows == 0)
+        {
+            minMaxLoc(mat, &mm.minVal, &mm.maxVal, &mm.minLoc, &mm.maxLoc);
+        } else {
+            minMaxLoc(mat, &mm.minVal, &mm.maxVal, &mm.minLoc, &mm.maxLoc, mask);
+        }
+        return mm;
+    }
+    void AddPlotScale(Mat dst, double minVal, double maxVal, int lineCount) {
+        auto spacer = int(dst.rows / (lineCount + 1));
+        auto spaceVal = int((maxVal - minVal) / (lineCount + 1));
+        if (spaceVal < 1) spaceVal = 1;
+        if (spaceVal > 10) spaceVal += spaceVal % 10;
+        string strOut = "";
+        for (auto i = 0; i <= lineCount; i++) {
+            auto p1 = Point(0, spacer * i);
+            auto p2 = Point(dst.cols, spacer * i);
+            line(dst, p1, p2, WHITE, 1);
+            if (i == 0) p1.y += 10;
+            auto nextVal = (maxVal - spaceVal * i);
+            if(maxVal > 1000)
+                strOut = to_string(int(nextVal / 1000)) + "k";
+            else
+                strOut = to_string(int(nextVal));
+            setText(strOut, dst, p1);
+        }
+    }
+    Mat normalize32f(Mat input)
+    {
+        Mat outMat;
+        normalize(input, outMat, 255, 0, cv::NormTypes::NORM_MINMAX);
+        outMat.convertTo(outMat, CV_8U);
+        cvtColor(outMat, outMat, COLOR_GRAY2BGR);
+        return outMat;
+    }
+    Point2f getMaxDist(Mat mask, Rect rect)
+    {
+        Mat tmpMask = mask.clone();
+        rectangle(tmpMask, Rect(0, 0, mask.cols - 1, mask.rows - 1), 0, 1);
+        Mat distance32f;
+        distanceTransform(tmpMask, distance32f, DIST_L1, 3);
+        double minVal, maxVal;
+        Point minDistanceLoc, maxDistanceLoc;
+        minMaxLoc(distance32f, &minVal, &maxVal, &minDistanceLoc, &maxDistanceLoc);
+        maxDistanceLoc.x += rect.x;
+        maxDistanceLoc.y += rect.y;
+        return maxDistanceLoc;
+    }
+    float shapeCorrelation(vector<Point> points)
+    {
+        Mat pts = Mat(int(points.size()), 1, CV_32SC2, points.data());
+        Mat pts32f;
+        pts.convertTo(pts32f, CV_32FC2);
+        vector<Mat> splitMat;
+        split(pts32f, splitMat);
+        Mat correlationMat;
+        matchTemplate(splitMat[0], splitMat[1], correlationMat, cv::TemplateMatchModes::TM_CCOEFF_NORMED);
+        return correlationMat.at<float>(0, 0);
+    }
+    Rect validateRect(Rect r, int w, int h)
+    {
+        if (r.width <= 0) r.width = 1;
+        if (r.height <= 0) r.height = 1;
+        if (r.x < 0) r.x = 0;
+        if (r.y < 0) r.y = 0;
+        if (r.x > w) r.x = w - 1;
+        if (r.y > h) r.y = h - 1;
+        if (r.x + r.width >= w) r.width = w - r.x - 1;
+        if (r.y + r.height >= h) r.height = h - r.y - 1;
+        if (r.width <= 0) r.width = 1;
+        if (r.height <= 0) r.height = 1;
+        if (r.x == w) r.x = r.x - 1;
+        if (r.y == h) r.y = r.y - 1;
+        return r;
+    }
+
+    void DrawRotatedRectangle(Mat& image, Point centerPoint, Size rectangleSize, double rotationDegrees, 
+                              Scalar color)
+    {
+        // Create the rotated rectangle
+        RotatedRect rotatedRectangle(centerPoint, rectangleSize, rotationDegrees);
+
+        // We take the edges that OpenCV calculated for us
+        Point2f vertices2f[4];
+        rotatedRectangle.points(vertices2f);
+
+        // Convert them so we can use them in a fillConvexPoly
+        Point vertices[4];
+        for (int i = 0; i < 4; ++i) {
+            vertices[i] = vertices2f[i];
+        }
+
+        // Now we can fill the rotated rectangle with our specified color
+        fillConvexPoly(image, vertices, 4, color, lineType);
+    }
+};
+
+
+
+cppTask* task;
+
+
+
+class CPP_AddWeighted_Basics : public algorithmX
+{
+private:
+public:
+    Mat src2;
+    CPP_AddWeighted_Basics(int rows, int cols) : algorithmX(rows, cols) 
+    {
+        traceName = "CPP_AddWeighted_Basics";
+        desc = "Add 2 images with specified weights.";
+    }
+
+    void Run(Mat src) 
+    {
+        if (standalone) src2 = task->depthRGB;
+        if (src.type() != src2.type()) {
+            if (src.type() == CV_8UC3 || src2.type() == CV_8UC3) {
+                if (src.type() == CV_32FC1) src = task->normalize32f(src);
+                if (src2.type() == CV_32FC1) src2 = task->normalize32f(src2);
+                if (src.type() != CV_8UC3) cvtColor(src, src, COLOR_GRAY2BGR);
+                if (src2.type() != CV_8UC3) cvtColor(src2, src2, COLOR_GRAY2BGR);
+            }
+            else {
+                throw std::invalid_argument("The images must have the same type.");
+            }
+        }
+
+        double wt = task->addWeightPercent / 100.0;
+        addWeighted(src, wt, src2, 1.0 - wt, 0, dst2);
+        labels[2] = "depth " + std::to_string(100 * (1.0 - wt)) + " BGR " + std::to_string(100 * wt);
+    }
+};
+
+
+
+
+
+
+
+class CPP_Random_Basics : public algorithmX
+{
+private:
+public:
+    vector<Point2f> pointList;
+    Rect range;
+    int sizeRequest = 10;
+    CPP_Random_Basics(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_Random_Basics";
+        range = Rect(0, 0, dst2.cols, dst2.rows);
+        desc = "Create a uniform random mask with a specificied number of pixels.";
+    }
+    void Run(Mat src)
+    {
+        pointList.clear();
+        if (task->paused == false)
+        {
+            while (pointList.size() < sizeRequest)
+            {
+                pointList.push_back(Point2f(range.x + float((rand() % range.width)), range.y + float((rand() % range.height))));
+            }
+            dst2.setTo(0);
+            for (Point2f pt : pointList)
+            {
+                circle(dst2, pt, task->dotSize, YELLOW, -1, task->lineType, 0);
+            }
+        }
+    }
+};
+
+
+
+
+
+
+
+
+
+
+class CPP_Feature_Agast : public algorithmX
+{
+private:
+public:
+    vector<KeyPoint> featurePoints;
+    CPP_Feature_Agast(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_Feature_Agast";
+        desc = "Use the Agast Feature Detector in the OpenCV Contrib.";
+    }
+    void Run(Mat src) {
+        featurePoints.clear();
+        static Ptr<AgastFeatureDetector> agastFD = AgastFeatureDetector::create(10, true, AgastFeatureDetector::OAST_9_16);
+        agastFD->detect(src, featurePoints);
+        dst2 = src;
+        for (size_t i = 0; i < featurePoints.size(); i++)
+        {
+            circle(dst2, featurePoints[i].pt, task->dotSize, RED, -1, task->lineType);
+        }
+        labels[2] = "Found " + to_string(featurePoints.size()) + " features";
+    }
+};
+
+
+
+
+
+
+
+
+
+class CPP_Resize_Basics : public algorithmX
+{
+private:
+public:
+    float resizePercent;
+    CPP_Resize_Basics(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_Resize_Basics";
+        resizePercent = 0.5f;
+        labels[2] = "Image resized for display.";
+        labels[3] = "Actual size of the image.";
+        desc = "Resize with different options and compare them";
+    }
+    void Run(Mat src)
+    {
+        if (resizePercent < 0 || resizePercent > 1) resizePercent = 1;
+        dst2 = dst0.clone();
+        resize(src, dst2, Size(int(src.cols * resizePercent), int(src.rows * resizePercent)));
+        Rect r = Rect(0, 0, int(src.cols * resizePercent), int(src.rows * resizePercent));
+        dst3.setTo(0);
+        dst2.copyTo(dst3(r));
+    }
+};
+
+
+
+
+
+
+
+class CPP_Remap_Basics : public algorithmX
+{
+private:
+public:
+    int direction = 0;
+    vector<string> remapLabels = {"Remap_Basics - original", "Remap vertically", "Remap horizontally", "Remap horizontally and vertically"};
+    Mat mapXV, mapYV;
+    Mat mapXH, mapYH;
+    Mat mapXhv, mapYhv;
+    CPP_Remap_Basics(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_Remap_Basics";
+        for (int direction = 1; direction < 4; direction++)
+        {
+            Mat map_x = Mat(dst2.size(), CV_32F);
+            Mat map_y = Mat(dst2.size(), CV_32F);
+            for (auto j = 0; j < map_x.rows; j++)
+            {
+                for (auto i = 0; i < map_x.cols; i++)
+                {
+                    switch (direction)
+                    {
+                    case  1:
+                    {
+                        map_x.at<float>(j, i) = float(i);
+                        map_y.at<float>(j, i) = float(dst2.rows - j);
+                        break;
+                    }
+                    case  2:
+                    {
+                        map_x.at<float>(j, i) = float(dst2.cols - i);
+                        map_y.at<float>(j, i) = float(j);
+                        break;
+                    }
+                    case  3:
+                    {
+                        map_x.at<float>(j, i) = float(dst2.cols - i);
+                        map_y.at<float>(j, i) = float(dst2.rows - j);
+                        break;
+                    }
+                    }
+                }
+            }
+            switch (direction)
+            {
+            case 1:
+            {
+                mapXV = map_x.clone();
+                mapYV = map_y.clone();
+                break;
+            }
+            case 2:
+            {
+                mapXH = map_x.clone();
+                mapYH = map_y.clone();
+                break;
+            }
+            case 3:
+            {
+                mapXhv = map_x.clone();
+                mapYhv = map_y.clone();
+                break;
+            }
+            }
+        }
+        desc = "Use remap to reflect an image in 4 directions.";
+    }
+    void Run(Mat src)
+    {
+        labels[2] = remapLabels[direction % 4];
+        switch (direction % 4)
+        {
+        case 0:
+        {
+            dst2 = src.clone();
+            break;
+        }
+        case 1:
+        {
+            remap(src, dst2, mapXV, mapYV, INTER_LINEAR);
+            break;
+        }
+        case 2:
+        {
+            remap(src, dst2, mapXH, mapYH, INTER_LINEAR);
+            break;
+        }
+        case 3:
+        {
+            remap(src, dst2, mapXhv, mapYhv, INTER_LINEAR);
+            break;
+        }
+        }
+        if (task->heartBeat) direction += 1;
+    }
+};
+
+
+
+
+
+
+
+class CPP_Delaunay_Basics : public algorithmX
+{
+private:
+public:
+    Mat facet32s;
+    vector<Point2f> inputPoints;
+    vector<vector<Point>> facetlist;
+    Subdiv2D subdiv;
+    CPP_Random_Basics* rpt;
+    CPP_Delaunay_Basics(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_Delaunay_Basics";
+        facet32s = Mat(rows, cols, CV_32S);
+        facet32s.setTo(0);
+        rpt = new CPP_Random_Basics(rows, cols);
+        subdiv = Subdiv2D(Rect(0, 0, cols, rows));
+        desc = "Subdivide an image based on the points provided.";
+    }
+    void randomInput(Mat src)
+    {
+        rpt->Run(src);
+        inputPoints = rpt->pointList;
+    }
+    void Run(Mat src) {
+        if (task->heartBeat && standalone) randomInput(src);
+        subdiv.initDelaunay(Rect(0, 0, dst2.cols, dst2.rows));
+        subdiv.insert(inputPoints);
+
+        vector<vector<Point2f>> facets;
+        vector<Point2f> centers;
+        subdiv.getVoronoiFacetList(vector<int>(), facets, centers);
+
+        vector<Vec3b> usedColors;
+        facetlist.clear();
+        dst3 = dst2.clone();
+        for (size_t i = 0; i < facets.size(); i++)
+        {
+            vector<Point> nextFacet;
+            for (size_t j = 0; j < facets[i].size(); j++)
+            {
+                nextFacet.push_back(Point(int(facets[i][j].x), int(facets[i][j].y)));
+            }
+            facetlist.push_back(nextFacet);
+
+            Vec3b nextColor = dst3.at<Vec3b>(int(inputPoints[i].y), int(inputPoints[i].x));
+            if (count(usedColors.begin(), usedColors.end(), nextColor))
+                nextColor = Vec3b(rand() % 255, rand() % 255, rand() % 255);
+            usedColors.push_back(nextColor);
+            fillConvexPoly(dst2, nextFacet, Scalar(nextColor));
+            fillConvexPoly(facet32s, nextFacet, Scalar(i + 1));
+        }
+        labels[2] =  "Delaunay_Basics: " + to_string(inputPoints.size()) + " cells were present.";
+    }
+};
+
+
+
+
+
+
+
+
+
+class CPP_Delaunay_GenerationsNoKNN : public algorithmX
+{
+private:
+public:
+    CPP_Delaunay_Basics* basics;
+    CPP_Delaunay_GenerationsNoKNN(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_Delaunay_GenerationsNoKNN";
+        basics = new CPP_Delaunay_Basics(rows, cols);
+        desc = "Create a region in an image for each point provided without KNN.";
+    }
+    void Run(Mat src) {
+        if (task->heartBeat && standalone) basics->randomInput(src);
+
+        basics->Run(src);
+        dst2 = basics->dst2;
+
+        if (task->firstPass) dst0 = basics->facet32s.clone();
+        Mat generationMap = dst0.clone();
+        vector<int> usedG;
+        for (size_t i = 0; i < basics->inputPoints.size(); i++)
+        {
+            Point2f pt = basics->inputPoints[i];
+            int g = generationMap.at<int>( int(pt.y), int(pt.x)) + 1;
+            while (count(usedG.begin(), usedG.end(), g)) g++;
+            usedG.push_back(g);
+            if (i < int(basics->facetlist.size()))
+            {
+                vector<Point> nextFacet = basics->facetlist[i];
+                fillConvexPoly(dst0, nextFacet, g);
+            }
+            task->setText(to_string(g), dst2, pt);
+        }
+    }
+};
+
+
+
+
+
+
+
+class CPP_Grid_Basics : public algorithmX
+{
+private:
+public:
+    Mat gridToRoiIndex;
+    CPP_Grid_Basics(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_Grid_Basics";
+        task->gridMask = Mat(dst2.size(), CV_8U);
+        gridToRoiIndex = Mat(dst2.size(), CV_32S);
+        desc = "Create a grid for use with parallel.ForEach.";
+    }
+    void Run(Mat src) {
+        if (task->optionsChanged) {
+            task->roiList.clear();
+            task->gridRows = 0;
+            task->gridCols = 0;
+            for (auto y = 0; y < dst2.rows; y += task->gridSize) {
+                for (auto x = 0; x < dst2.cols; x += task->gridSize) {
+                    auto roi = Rect(x, y, task->gridSize, task->gridSize);
+                    if (x + roi.width >= dst2.cols) roi.width = dst2.cols - x;
+                    if (y + roi.height >= dst2.rows) roi.height = dst2.rows - y;
+                    if (roi.width > 0 && roi.height > 0) {
+                        if (x == 0) task->gridRows += 1;
+                        if (y == 0) task->gridCols += 1;
+                        task->roiList.push_back(roi);
+                    }
+                }
+            }
+            task->gridMask.setTo(0);
+            // Review this For Loop >>>> x = task->gridSize To dst2.cols - 1 Step task->gridSize
+            for (auto x = 0; x < dst2.cols; x += task->gridSize) {
+                auto p1 = Point(x, 0), p2 = Point(x, dst2.rows);
+                line(task->gridMask, p1, p2, 255, task->lineWidth);
+            }
+            // Review this For Loop >>>> y = task->gridSize To dst2.rows - 1 Step task->gridSize
+            for (auto y = 0; y < dst2.rows; y += task->gridSize) {
+                auto p1 = Point(0, y), p2 = Point(dst2.cols, y);
+                line(task->gridMask, p1, p2, 255, task->lineWidth);
+            }
+            for (auto i = 0; i < task->roiList.size(); i++) {
+                Rect roi = task->roiList[i];
+                rectangle(gridToRoiIndex, roi, i, -1);
+            }
+        }
+        if (standalone) {
+            task->color.copyTo(dst2);
+            dst2.setTo(WHITE, task->gridMask);
+        }
+    }
+};
+
+
+
+
+
+
+using namespace cv::ml;
+class CPP_KNN_Basics : public algorithmX
+{
+private:
+public:
+    CPP_Random_Basics* rpt;
+    vector<Point2f> queries;
+    vector<Point2f> trainInput;
+    vector<Point2f> neighbors;
+    vector<int> neighborIndexToTrain;
+    Mat neighborResponses;
+    int knnDimension;
+    CPP_KNN_Basics(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_KNN_Basics";
+        rpt = new CPP_Random_Basics(rows, cols);
+        knnDimension = 2; // default dimension...
+        desc = "Train a KNN model and map each query to the nearest training neighbor.";
+    }
+    void generateRandom(Mat src)
+    {
+        rpt->Run(src);
+        queries = rpt->pointList;
+        if (task->heartBeat) 
+            trainInput = queries;
+    }
+    void Run(Mat src)
+    {
+        if (standalone) generateRandom(src);
+        if (queries.size() == 0)
+        {
+            task->setText("No queries were provided", dst2);
+            return;
+        }
+        if (trainInput.size() == 0) trainInput = queries; 
+        Mat trainingData = Mat(int(trainInput.size()), knnDimension, CV_32F, trainInput.data());
+
+        vector<int> resp(int(trainInput.size()));
+        iota(resp.begin(), resp.end(), 0);
+        Mat trainingLabels = Mat(int(trainInput.size()), 1, CV_32S, resp.data());
+
+        Ptr<KNearest> knn = ml::KNearest::create();
+        knn->train(trainingData, ml::SampleTypes::ROW_SAMPLE, trainingLabels);
+        Mat results;
+
+        Mat queryMat = Mat(int(queries.size()), knnDimension, CV_32F, queries.data());
+        knn->findNearest(queryMat, int(trainInput.size()), results, neighborResponses);
+
+        neighbors.clear();
+        neighborIndexToTrain.clear();
+        for (int i = 0; i < results.rows; i++)
+        {
+            int index = int(neighborResponses.at<float>(i, 0));
+            neighbors.push_back(trainInput[index]);
+            neighborIndexToTrain.push_back(index);
+        }
+
+        dst2.setTo(0);
+        for (size_t i = 0; i < queries.size(); i++)
+        {
+            circle(dst2, queries[i], task->dotSize + 3, GREEN, -1, task->lineType);
+            circle(dst2, neighbors[i], task->dotSize + 3, RED, -1, task->lineType);
+            line(dst2, queries[i], neighbors[i], Scalar(255, 255, 0), task->lineWidth, task->lineType);
+        }
+
+        for (Point2f pt : trainInput)
+        {
+            circle(dst2, pt, task->dotSize + 3, RED, -1, task->lineType);
+        }
+        
+        task->setText("KNN - red is training data, green = queries", dst3);
+        if (task->heartBeat) dst3.setTo(0);
+        bitwise_or(dst2, dst3, dst3);
+    }
+};
+ 
+
+
+
+class CPP_KNN_Lossy : public algorithmX
+{
+private:
+public:
+    CPP_KNN_Basics* basics;
+    vector<Point2f> matchp1;
+    vector<Point2f> matchp2;
+    vector<Point2f> noMatch;
+    vector<int>neighbors;
+    CPP_KNN_Lossy(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_KNN_Lossy";
+        basics = new CPP_KNN_Basics(rows, cols);
+        desc = "Map points 1:1 with losses. Toss any farther duplicates.";
+    }
+    void Run(Mat src)
+    {
+        if (standalone) basics->generateRandom(src);
+
+        basics->Run(src);
+        dst2 = basics->dst2;
+
+        neighbors = basics->neighborIndexToTrain;
+        for (auto i = 0; i < neighbors.size(); i++)
+        {
+            int index = neighbors[i];
+            Point2f p1 = basics->queries[i];
+            for (auto j = i + 1; j < neighbors.size(); j++)
+            {
+                int chkIndex = neighbors[j];
+                if (chkIndex == -1) continue;
+                if (index == chkIndex)
+                {
+                    Point2f ptn = basics->trainInput[index];
+                    Point2f p2 = basics->queries[j];
+                    auto d1 = (p1.x - ptn.x) * (p1.x - ptn.x) + (p1.y - ptn.y) * (p1.y - ptn.y);
+                    auto d2 = (p2.x - ptn.x) * (p2.x - ptn.x) + (p2.y - ptn.y) * (p2.y - ptn.y);
+                    if (d1 > d2)
+                    {
+                        neighbors[i] = -1;
+                        break;
+                    }
+                    else neighbors[j] = -1;
+                }
+            }
+        }
+
+        dst3.setTo(0);
+        for (Point2f pt : basics->trainInput)
+        {
+            circle(dst3, pt, task->dotSize + 3, RED, -1, task->lineType);
+        }
+
+        matchp1.clear();
+        matchp2.clear();
+        noMatch.clear();
+        for (auto i = 0; i < neighbors.size(); i++)
+        {
+            Point2f pt = basics->queries[i];
+            circle(dst3, pt, task->dotSize + 3, GREEN, -1, task->lineType);
+            if (neighbors[i] == -1)
+            {
+                noMatch.push_back(pt);
+                matchp1.push_back(Point2f(-1, -1));
+                matchp2.push_back(Point2f(-1, -1));
+            }
+            else {
+                Point2f nn = basics->trainInput[neighbors[i]];
+                matchp1.push_back(pt);
+                matchp2.push_back(nn);
+                line(dst3, nn, pt, Scalar(255, 255, 0), task->lineWidth, task->lineType);
+            }
+        }
+        if (task->cppFunction != fKNN_Lossy) basics->trainInput = basics->queries;
+        task->setText("KNN_Lossy - red is training data, green = queries", dst3);
+    }
+};
+
+
+
+
+
+class CPP_Delaunay_Generations : public algorithmX
+{
+private:
+public:
+    CPP_Delaunay_Basics* basics;
+    CPP_KNN_Lossy* knn;
+    vector<Point2f> inputPoints;
+    CPP_Delaunay_Generations(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_Delaunay_Generations";
+        basics = new CPP_Delaunay_Basics(rows, cols);
+        knn = new CPP_KNN_Lossy(rows, cols);
+        dst0 = Mat(dst0.rows, dst0.cols, CV_32S);
+        dst0.setTo(0);
+        desc = "Create a region in an image for each point provided";
+    }
+    void Run(Mat src) {
+        if (task->heartBeat && standalone)
+        {
+            basics->randomInput(src);
+            inputPoints = basics->inputPoints;
+        }
+
+        knn->basics->queries = inputPoints;
+        knn->Run(src);
+
+        basics->inputPoints = inputPoints;
+        basics->Run(src);
+        dst2 = basics->dst2;
+
+        Mat generationMap = dst0.clone();
+        dst0.setTo(0);
+        int g;
+        for (size_t i = 0; i < knn->neighbors.size(); i++)
+        {
+            if (knn->neighbors[i] == -1) continue;
+            Point2f pt = knn->matchp2[i];
+
+            if (task->firstPass)
+                g = int(i);
+            else
+                g = generationMap.at<int>(int(pt.y), int(pt.x)) + 1;
+
+            if (i < int(basics->facetlist.size()))
+            {
+                vector<Point> nextFacet = basics->facetlist[i];
+                fillConvexPoly(dst0, nextFacet, Scalar(g, g, g));
+                task->setText(to_string(g), dst2, pt);
+            }
+        }
+    }
+};
+
+
+
+
+
+class CPP_Feature_Basics : public algorithmX
+{
+private: 
+public: 
+    vector<Point2f> corners;
+   
+    int numPoints = 20;
+    double qualityLevel = 0.01;
+    double minDistance = 15;
+    int blockSize = 7;
+    int gradientSize = 3;
+    bool useHarris = true;
+    CPP_Feature_Basics(int rows, int cols) : algorithmX(rows, cols) 
+    {
+        traceName = "CPP_Feature_Basics";
+        desc = "Find the good feature points.";
+    }
+	void Run(Mat src)
+	{
+        if (src.channels() == 3) cvtColor(src, dst0, COLOR_BGR2GRAY);
+        vector<Point2f> allCorners; // more than we need...
+        goodFeaturesToTrack(dst0, allCorners, numPoints + 10, qualityLevel, minDistance, Mat(), blockSize, 
+                            gradientSize, useHarris);
+        dst2 = src;
+        dst3.setTo(0);
+        corners.clear();
+        for (Point2f pt : allCorners)
+        {
+            circle(dst2, pt, task->dotSize, YELLOW, -1, task->lineType);
+            circle(dst3, pt, task->dotSize, YELLOW, -1, task->lineType);
+            corners.push_back(pt);
+            if (corners.size() >= numPoints) break;
+        }
+	}
+};
+
+
+
+
+
+class CPP_Stable_Basics : public algorithmX
+{
+private:
+    CPP_Feature_Basics* good;
+public:
+    vector<Point2f> ptList;
+    Point2f anchorPoint;
+    CPP_Delaunay_Generations* facetGen;
+    CPP_Stable_Basics(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_Stable_Basics";
+        facetGen = new CPP_Delaunay_Generations(rows, cols);
+        good = new CPP_Feature_Basics(rows, cols);
+        desc = "Maintain the generation counts around the feature points.";
+    }
+    void Run(Mat src)
+    {
+        if (standalone)
+        {
+            good->Run(src);
+            facetGen->inputPoints = vector<Point2f>(good->corners);
+        }
+
+        facetGen->Run(src);
+        if (facetGen->inputPoints.size() == 0) return; // nothing to work on ...
+        dst2 = facetGen->dst2.clone();
+
+        ptList.clear();
+        vector<int> generations;
+        for (Point2f pt : facetGen->inputPoints)
+        {
+            int fIndex = facetGen->basics->facet32s.at<int>(int(pt.y), int(pt.x));
+            if (fIndex >= facetGen->basics->facetlist.size()) continue; // new point.
+            int g = facetGen->dst0.at<int>(int(pt.y), int(pt.x));
+            generations.push_back(g);
+            vector<Point> nextFacet = facetGen->basics->facetlist[fIndex];
+            ptList.push_back(pt);
+            task->setText(to_string(g), dst2, pt);
+        }
+
+        auto iter = max_element(generations.begin(), generations.end());
+        auto maxGens = *iter;
+        auto index = iter - generations.begin();
+        if (index < int(facetGen->basics->facetlist.size()) && index < int(generations.size()))
+        {
+            anchorPoint = ptList[index];
+            vector<Point> bestFacet = facetGen->basics->facetlist[index];
+            fillConvexPoly(dst2, bestFacet, BLACK, task->lineType);
+            task->drawContour(dst2, bestFacet, YELLOW);
+            task->setText(to_string(generations[index]), dst2, anchorPoint);
+        }
+
+        dst3 = src.clone();
+        for (Point2f pt : ptList)
+        {
+            circle(dst2, pt, task->dotSize, YELLOW, -1, task->lineType);
+            circle(dst3, pt, task->dotSize, YELLOW, -1, task->lineType);
+        }
+    }
+};
+
+
+
+
+class CPP_Stable_BasicsCount : public algorithmX
+{
+private:
+public:
+    CPP_Stable_Basics* basics;
+    CPP_Feature_Basics* good;
+    std::map<int, int, std::greater<float>> goodCounts;
+    CPP_Stable_BasicsCount(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_Stable_BasicsCount";
+        good = new CPP_Feature_Basics(rows, cols);
+        basics = new CPP_Stable_Basics(rows, cols);
+        desc = "Track the stable good features found in the BGR image.";
+    }
+    void Run(Mat src)
+    {
+        good->Run(src);
+        basics->facetGen->inputPoints = good->corners;
+        basics->Run(src);
+        dst2 = basics->dst2;
+        dst3 = basics->dst3;
+
+        goodCounts.clear();
+        int g;
+        for (auto i = 0; i < basics->ptList.size(); i++)
+        {
+            Point2f pt = basics->ptList[i];
+            circle(dst2, pt, task->dotSize, YELLOW, task->lineWidth, task->lineType);
+            g = basics->facetGen->dst0.at<int>(pt.y, pt.x);
+            goodCounts[g] = i;
+            task->setText(to_string(g), dst2, pt);
+        }
+    }
+};
+
+
+
+class CPP_FPoly_TopFeatures : public algorithmX
+{
+private: 
+public: 
+    CPP_Stable_BasicsCount *stable;
+    vector<Point2f> poly;
+	CPP_FPoly_TopFeatures(int rows, int cols) : algorithmX(rows, cols) 
+    {
+        traceName = "CPP_FPoly_TopFeatures";
+        stable = new CPP_Stable_BasicsCount(rows, cols);
+        desc = "Get the top features and validate them";
+    }
+	void Run(Mat src)
+	{
+        stable->Run(src);
+		
+        dst2 = stable->dst2;
+        dst3.setTo(0);
+        poly.clear();
+
+        int i = 0;
+        for (pair<const int, int> index : stable->goodCounts)
+        {
+            Point2f pt = stable->basics->ptList[index.second];
+            int g = stable->basics->facetGen->dst0.at<int>(pt.y, pt.x);
+            task->setText(to_string(g), dst2, pt);
+            if (i++ < task->polyCount) poly.push_back(pt);
+        }
+
+        for (size_t i = 0; i < poly.size() - 1; i++)
+        {
+            line(dst2, poly[i], poly[i + 1], WHITE, task->lineWidth, task->lineType);
+        }
+	}
+};
+
+
+
+// https://docs.opencv.org/4.x/da/d22/tutorial_py_canny.html
+class CPP_Edge_Canny : public algorithmX
+{
+private:
+public:
+    CPP_Edge_Canny(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_Edge_Canny";
+        desc = "Show canny edge detection";
+    }
+    void Run(Mat src) {
+        int threshold1 = 50;
+        int threshold2 = 50;
+        int aperture = 3;
+        if (src.channels() == 3) cvtColor(src, src, COLOR_BGR2GRAY);
+        Canny(src, dst2, threshold1, threshold2, aperture);
+    }
+};
+
+
+
+
+
+
+
+
+
+class CPP_Edge_Scharr : public algorithmX
+{
+private:
+public:
+    CPP_Edge_Scharr(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_Edge_Scharr";
+        desc = "Scharr is most accurate with 3x3 kernel.";
+    }
+    void Run(Mat src) {
+        Mat gray, xField, yField;
+        cvtColor(src, gray, COLOR_BGR2GRAY);
+        Scharr(gray, xField, CV_32FC1, 1, 0);
+        Scharr(gray, yField, CV_32FC1, 0, 1);
+        add(xField, yField, dst3);
+        dst3.convertTo(dst2, CV_8U);
+        normalize(dst3, dst3, 0, 255, NORM_MINMAX);
+        dst3.convertTo(dst3, CV_8U);
+    }
+};
+
+
+
+
+
+
+class CPP_Mat_4to1 : public algorithmX
+{
+private:
+public:
+    Mat mat[4];
+    bool lineSeparators = true;
+    CPP_Mat_4to1(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_Mat_4to1";
+        for (auto i = 0; i < 4; i++) {
+            mat[i] = dst2.clone();
+        }
+        desc = "Use one Mat for up to 4 images";
+    }
+    void Run(Mat src) {
+        auto nSize = Size(dst2.cols / 2, dst2.rows / 2);
+        auto roiTopLeft = Rect(0, 0, nSize.width, nSize.height);
+        auto roiTopRight = Rect(nSize.width, 0, nSize.width, nSize.height);
+        auto roibotLeft = Rect(0, nSize.height, nSize.width, nSize.height);
+        auto roibotRight = Rect(nSize.width, nSize.height, nSize.width, nSize.height);
+        if (standalone) {
+            mat[0] = src.clone();
+            mat[1] = task->depthRGB.clone();
+            mat[2] = task->leftView.clone();
+            mat[3] = task->rightView.clone();
+        }
+        dst2 = Mat(dst2.size(), CV_8UC3);
+        Rect rects[] = { roiTopLeft, roiTopRight, roibotLeft, roibotRight };
+        for (auto i = 0; i < 4; i++) {
+            auto tmp = mat[i].clone();
+            if (tmp.channels() == 1) cvtColor(mat[i], tmp, COLOR_GRAY2BGR);
+
+            resize(tmp, dst2(rects[i]), nSize);
+        }
+        if (lineSeparators) {
+            line(dst2, Point(0, dst2.rows / 2), Point(dst2.cols, dst2.rows / 2), WHITE, task->lineWidth + 1);
+            line(dst2, Point(dst2.cols / 2, 0), Point(dst2.cols / 2, dst2.rows), WHITE, task->lineWidth + 1);
+        }
+    }
+};
+
+
+
+
+
+class CPP_Depth_Colorizer : public algorithmX
+{
+private: 
+public: 
+    int option_MaxDepth = 5000;
+	CPP_Depth_Colorizer(int rows, int cols) : algorithmX(rows, cols) 
+    {
+        traceName = "CPP_Depth_Colorizer";
+        desc = "Colorize the depth with across a range of 2 colors";
+    }
+	void Run(Mat src)
+	{
+        float nearColor[3] = { 0, 1.0f, 1.0f };
+        float farColor[3] = { 1.0f, 0, 0 };
+        auto rgb = (unsigned char*)dst2.data;
+        float* depthImage = (float*)task->depth32f.data;
+            
+        for (int i = 0; i < dst2.cols * dst2.rows; i++)
+        {
+            float t = depthImage[i] / option_MaxDepth;
+            if (t > 0 && t <= 1)
+            {
+                *rgb++ = uchar(((1 - t) * nearColor[0] + t * farColor[0]) * 255);
+                *rgb++ = uchar(((1 - t) * nearColor[1] + t * farColor[1]) * 255);
+                *rgb++ = uchar(((1 - t) * nearColor[2] + t * farColor[2]) * 255);
+            }
+            else {
+                *rgb++ = 0; *rgb++ = 0; *rgb++ = 0;
+            }
+        }
+    }
+};
+
+
+
+
+
+
+class CPP_RedCloud_PrepData : public algorithmX
+{
+private:
+    int option_reduction = 500;
+    int option_selectCase = 3;
+    double minValStable = 0.0;
+    double maxValStable = 0.0;
+public:
+    CPP_RedCloud_PrepData(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_RedCloud_PrepData";
+        desc = "Prepare the reduced point cloud";
+    }
+    void Run(Mat src) {
+        if (src.type() != CV_32FC3)
+        {
+            task->pointCloud.convertTo(dst0, CV_32SC3, 1000.0f / option_reduction);
+        }
+        else {
+            src.convertTo(dst0, CV_32SC3, 1000.0f / option_reduction);
+        }
+
+        Mat msplit[3];
+        split(dst0, msplit);
+        
+        switch (option_selectCase)
+        {
+        case 0:
+        {
+            msplit[0] *= option_reduction;
+            msplit[1].setTo(0);
+            msplit[2].setTo(0);
+            break;
+        }
+        case 1:
+        {
+            msplit[0].setTo(0);
+            msplit[1] *= option_reduction;
+            msplit[2].setTo(0);
+            break;
+        }
+        case 2:
+        {
+            msplit[0].setTo(0);
+            msplit[1].setTo(0);
+            msplit[2] *= option_reduction;
+            break;
+        }
+        case 3:
+        {
+            msplit[0] *= option_reduction;
+            msplit[1] *= option_reduction;
+            msplit[2].setTo(0);
+            break;
+        }
+        case 4:
+        {
+            msplit[0] *= option_reduction;
+            msplit[1].setTo(0);
+            msplit[2] *= option_reduction;
+            break;
+        }
+        case 5:
+        {
+            msplit[0].setTo(0);
+            msplit[1] *= option_reduction;
+            msplit[2] *= option_reduction;
+            break;
+        }
+        case 6:
+        {
+            dst1 *= option_reduction;
+            dst1.convertTo(dst2, CV_32FC3);
+            cvtColor(dst2, dst0, COLOR_BGR2GRAY);
+            dst0.convertTo(dst2, CV_32SC1);
+        }
+        }
+
+        double minVal = 0.0, maxVal = 0.0;
+        if (option_selectCase != 6) {
+            vector<Mat> channels = { msplit[0], msplit[1], msplit[2] };
+            merge(channels, dst1);
+            dst1.convertTo(dst2, CV_32FC3);
+            cvtColor(dst2, dst0, COLOR_BGR2GRAY);
+            dst0.convertTo(dst2, CV_32SC1);
+            minMaxLoc(dst2, &minVal, &maxVal);
+            dst2 += abs(minVal) + 1; // get away from zero value.
+        }
+        if (standalone)
+        {
+            if (minValStable > minVal) minValStable = minVal;
+            if (maxValStable < maxVal) maxValStable = maxVal;
+            convertScaleAbs(dst2, dst2, 255 / ((maxValStable - minValStable)));
+        }
+        minMaxLoc(dst2, &minVal, &maxVal);
+        int x = 0;
+    }
+};
+
+
+
+
+
+class CPP_Depth_PointCloud : public algorithmX
+{
+private: 
+public: 
+	CPP_Depth_PointCloud(int rows, int cols) : algorithmX(rows, cols) 
+    {
+        traceName = "CPP_Depth_PointCloud";
+        desc = "Display the contents of the point cloud as a 2D image";
+    }
+	void Run(Mat src)
+	{
+        if (src.type() != CV_32FC3) src = task->pointCloud.clone();
+        Mat mSplit[3];
+        split(src, mSplit);
+        convertScaleAbs(mSplit[0], mSplit[0], 255);
+        convertScaleAbs(mSplit[1], mSplit[1], 255);
+        convertScaleAbs(mSplit[2], mSplit[2], 255);
+        vector<Mat> channels = { mSplit[0], mSplit[1], mSplit[2] };
+        merge(channels, dst2);
+        dst2.convertTo(dst2, CV_8UC3);
+        dst3 = task->depth32f > 0;
+    }
+};
+
+
+
+
+
+
+class CPP_IMU_GMatrix_QT : public algorithmX
+{
+private:
+public:
+    float cx = 1.0f, sx = 0.0f, cy = 1.0f, sy = 0.0f, cz = 1.0f, sz = 0.0f;
+    bool usingSliders = false;
+    CPP_IMU_GMatrix_QT(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_IMU_GMatrix_QT";
+        desc = "Find the angle of tilt for the camera with respect to gravity without any options_";
+    }
+    void Run(Mat src) {
+        if (usingSliders == false) {
+            cz = cos(task->accRadians.z);
+            sz = sin(task->accRadians.z);
+            cx = cos(task->accRadians.x);
+            sx = sin(task->accRadians.x);
+        }
+        float gMt[3][3] = { {cx * 1 + -sx * 0 + 0 * 0, cx * 0 + -sx * cz + 0 * sz, cx * 0 + -sx * -sz + 0 * cz},
+                            {sx * 1 + cx * 0 + 0 * 0, sx * 0 + cx * cz + 0 * sz, sx * 0 + cx * -sz + 0 * cz}, 
+                            {0 * 1 + 0 * 0 + 1 * 0, 0 * 0 + 0 * cz + 1 * sz, 0 * 0 + 0 * -sz + 1 * cz} };
+
+        float gMatrix[3][3] = {{gMt[0][0] * cy  + gMt[0][1] * 0 + gMt[0][2] * sy,
+                                gMt[0][0] * 0   + gMt[0][1] * 1 + gMt[0][2] * 0,
+                                gMt[0][0] * -sy + gMt[0][1] * 0 + gMt[0][2] * cy},
+                               {gMt[1][0] * cy  + gMt[1][1] * 0 + gMt[1][2] * sy,
+                                gMt[1][0] * 0   + gMt[1][1] * 1 + gMt[1][2] * 0,
+                                gMt[1][0] * -sy + gMt[1][1] * 0 + gMt[1][2] * cy},
+                               {gMt[2][0] * cy  + gMt[2][1] * 0 + gMt[2][2] * sy,
+                                gMt[2][0] * 0   + gMt[2][1] * 1 + gMt[2][2] * 0,
+                                gMt[2][0] * -sy + gMt[2][1] * 0 + gMt[2][2] * cy}};
+        task->gMatrix = Mat(3, 3, CV_32F, gMatrix).clone();
+     }
+};
+
+
+
+
+
+
+
+class CPP_IMU_GMatrix : public algorithmX
+{
+private:
+public:
+    string strOut;
+    CPP_IMU_GMatrix_QT * qt;
+    CPP_IMU_GMatrix(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_IMU_GMatrix";
+        qt = new CPP_IMU_GMatrix_QT(rows, cols);
+        qt->usingSliders = true;
+        desc = "Find the angle of tilt for the camera with respect to gravity.";
+    }
+    void Run(Mat src) {
+        qt->cz = cos(task->accRadians.z);
+        qt->sz = sin(task->accRadians.z);
+        qt->cx = cos(task->accRadians.x);
+        qt->sx = sin(task->accRadians.x);
+        //qt->cy = cos(rotateY * PI / 180);
+        //qt->sy = sin(rotateY * PI / 180);
+        qt->Run(src);
+        task->setText("task->gMatrix is set...", dst2);
+    }
+};
+
+
+
+
+
+
+
+class CPP_Depth_PointCloud_IMU : public algorithmX
+{
+private:
+public:
+    float option_resizeFactor = 1;
+    CPP_IMU_GMatrix_QT* gMatrix;
+    CPP_Depth_PointCloud* cloud;
+    CPP_Depth_PointCloud_IMU(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_Depth_PointCloud_IMU";
+        gMatrix = new CPP_IMU_GMatrix_QT(rows, cols);
+        cloud = new CPP_Depth_PointCloud(rows, cols);
+        desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU.";
+    }
+    void Run(Mat src) {
+        if (src.type() != CV_32FC3) src = task->pointCloud.clone();
+        gMatrix->Run(src);
+        Mat gOutput = src.reshape(1, src.rows * src.cols);
+        gOutput *= task->gMatrix;
+        dst0 = gOutput.reshape(3, src.rows);
+        task->gCloud = dst0;
+        if (option_resizeFactor != 1) {
+            resize(dst0, dst1, Size(int((dst2.cols * option_resizeFactor)), int((dst2.rows * option_resizeFactor))));
+        }
+        task->setText("gCloud is ready for use", dst3);
+
+        cloud->Run(task->gCloud);
+        dst2 = cloud->dst2;
+    }
+};
+
+
+
+
+
+class CPP_Edge_Sobel : public algorithmX
+{
+private:
+public:
+    Mat grayX;
+    Mat grayY;
+    int option_kernelSize = 5;
+    bool horizontalOnly = false;
+    CPP_AddWeighted_Basics* addw;
+    CPP_Edge_Sobel(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_Edge_Sobel";
+        addw = new CPP_AddWeighted_Basics(rows, cols);
+        desc = "Show Sobel edge detection with varying kernel sizes";
+    }
+    void Run(Mat src) {
+        if (src.channels() == 3) cvtColor(src, src, COLOR_BGR2GRAY);
+        Sobel(src, grayX, CV_32F, 1, 0, option_kernelSize);
+        if (horizontalOnly == false) {
+            Sobel(src, grayY, CV_32F, 0, 1, option_kernelSize);
+            if (standalone) {
+                addw->src2 = grayY;
+                addw->Run(grayX);
+                convertScaleAbs(addw->dst2, dst2);
+            }
+            else {
+                convertScaleAbs((grayY + grayX), dst2);
+            }
+        }
+        else {
+            convertScaleAbs(grayX, dst2);
+        }
+    }
+};
+
+
+
+
+
+
+class CPP_Binarize_Simple : public algorithmX
+{
+private:
+public:
+    Scalar meanScalar;
+    Mat mask;
+    int injectVal = 255;
+    CPP_Binarize_Simple(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_Binarize_Simple";
+        mask = Mat(dst2.size(), CV_8U, 255);
+        desc = "Binarize an image using Threshold with OTSU.";
+    }
+    void Run(Mat src) {
+        if (src.channels() == 3) cvtColor(src, src, COLOR_BGR2GRAY);
+        if (mask.rows == 0) {
+            meanScalar = mean(src);
+        }
+        else {
+            Mat tmp = Mat(src.size(), CV_8U, 255);
+            if (mask.type() != CV_8U) mask.convertTo(mask, CV_8U);
+            src.copyTo(tmp, mask);
+            meanScalar = mean(tmp, mask);
+        }
+        threshold(src, dst2, meanScalar(0), injectVal, THRESH_BINARY);
+    }
+};
+
+
+
+
+
+
+
+class CPP_Plot_Histogram : public algorithmX
+{
+private:
+public:
+    Mat hist;
+    float minRange = 0;
+    float maxRange = 255;
+    Scalar backColor = RED;
+    int plotMaxValue;
+    int plotCenter;
+    int barWidth;
+    bool addLabels = true;
+    int labelImage = 2;
+    Mat dst;
+    CPP_Plot_Histogram(int rows, int cols) : algorithmX(rows, cols) {
+        dst = dst2;
+        desc = "Plot histogram data with a stable scale at the left of the image.";
+    }
+    void Run(Mat src) {
+        if (standalone) {
+            if (src.channels() != 1) cvtColor(src, src, COLOR_BGR2GRAY);
+            int chan[] = { 0 };
+            int bins[] = { task->histogramBins };
+            float hRange[] = { minRange, maxRange };
+            const float* range[] = { hRange };
+            calcHist(&src, 1, chan, Mat(), hist, 1, bins, range, true, false);
+        }
+        else {
+            hist = src;
+        }
+        dst.setTo(backColor);
+        barWidth = dst.cols / hist.rows;
+        plotCenter = barWidth * hist.rows / 2 + barWidth / 2;
+        auto mm = task->getMinMax(hist);
+        if (plotMaxValue > 0) mm.maxVal = plotMaxValue;
+        if (mm.maxVal > 0 && hist.rows > 0) {
+            auto incr = int(255 / hist.rows);
+            // Review this For Loop >>>> i = 0 To hist.rows - 1
+            for (auto i = 0; i < hist.rows; i++) {
+                auto offset = hist.at<float>(i);
+                if (isnan(offset)) offset = 0;
+                auto h = int(offset * dst.rows / mm.maxVal);
+                auto sIncr = int((i % 256) * incr);
+                auto color = Scalar(sIncr, sIncr, sIncr);
+                if (hist.rows > 255) color = BLACK;
+                rectangle(dst, Rect(i * barWidth, dst.rows - h, barWidth, h), color, -1);
+            }
+            if (addLabels) task->AddPlotScale(dst, 0, mm.maxVal, 3);
+        }
+
+    }
+};
+
+
+
+
+class CPP_Histogram_Basics : public algorithmX
+{
+private:
+public:
+    Mat histogram;
+    CPP_Plot_Histogram* plot;
+    bool noZeroEntry;
+    double srcMin;
+    double srcMax;
+    Range ranges[1];
+    int splitIndex;
+    CPP_Histogram_Basics(int rows, int cols) : algorithmX(rows, cols) {
+        plot = new CPP_Plot_Histogram(rows, cols);
+        desc = "Create a raw histogram (no Kalman)";
+    }
+    void plotHistogram() {
+        if (noZeroEntry) histogram.at<float>(0, 0) = 0;
+        plot->Run(histogram);
+        dst2 = plot->dst2;
+    }
+    void Run(Mat src) {
+        if (standalone) {
+            if (task->heartBeat) {
+                splitIndex += 1;
+                splitIndex %= 3;
+                switch (splitIndex)
+                {
+                case 0:
+                {
+                    plot->backColor = BLUE;
+                    break;
+                }
+                case 1:
+                {
+                    plot->backColor = GREEN;
+                    break;
+                }
+                case 2:
+                {
+                    plot->backColor = RED;
+                    break;
+                }
+                }
+            }
+            Mat msplit[3];
+            split(src, msplit);
+            src = msplit[splitIndex];
+        }
+        if (src.channels() != 1) cvtColor(src, src, COLOR_BGR2GRAY);
+        auto mm = task->getMinMax(src);
+        srcMin = mm.minVal;
+        srcMax = mm.maxVal;
+        if (mm.minVal == mm.maxVal) {
+            task->setText("The input image is empty - srcMin and srcMax are both zero...", dst2);
+            return;
+        }
+        int chan[] = { 0 };
+        int bins[] = { task->histogramBins };
+        float hRange[] = { float(srcMin), float(srcMax)};
+        const float* range[] = { hRange };
+        calcHist(&src, 1, chan, Mat(), histogram, 1, bins, range, true, false);
+        plotHistogram();
+        // 		labels[2] = Choose(splitIndex + 1, "Blue", "Green", "Red") + " histogram, bins = " + to_string(task->histogramBins) + ", X ranges from " + Format(mm.minVal, "0.0") + " to " + Format(mm.maxVal, "0.0") + ", y is occurances";// <<<<< build an array and index it.
+    }
+};
+
+
+
+
+
+
+
+
+
+class CPP_BackProject_Basics : public algorithmX
+{
+private:
+public:
+    CPP_Histogram_Basics* hist;
+    CPP_BackProject_Basics(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_BackProject_Basics";
+        hist = new CPP_Histogram_Basics(rows, cols);
+        labels[2] = "Move mouse to backproject a histogram column";
+        dst1 = Mat(dst1.size(), CV_8U);
+        desc = "Use the mouse to select what bin in the provided histogram should be backprojected.";
+    }
+    void Run(Mat src) {
+        auto input = src.clone();
+        if (input.channels() != 1) cvtColor(input, input, COLOR_BGR2GRAY);
+        hist->Run(input);
+        if (hist->srcMin == hist->srcMax) {
+            task->setText("The input image is empty - srcMin and srcMax are both zero...", dst2);
+            return;
+        }
+        dst2 = hist->dst2;
+        auto totalPixels = dst2.total();
+        if (hist->noZeroEntry) totalPixels = countNonZero(input);
+        auto barWidth = dst2.cols / task->histogramBins;
+        auto incr = (hist->srcMax - hist->srcMin) / task->histogramBins;
+        int histIndex = task->mouseMovePoint.x / barWidth;
+        auto minRange = Scalar(histIndex * incr);
+        auto maxRange = Scalar((histIndex + 1) * incr);
+        if (histIndex + 1 == task->histogramBins) maxRange = Scalar(255);
+        Mat mask;
+        float bRange[] = { float(minRange.val[0]), float(maxRange.val[0])};
+        const float* ranges[] = { bRange };
+        calcBackProject(&input, 1, 0, hist->histogram, mask, ranges, 1, true);
+        auto actualCount = countNonZero(mask);
+        dst3 = src;
+        dst3.setTo(YELLOW, mask);
+        auto count = hist->histogram.at<float>(int(histIndex), 0);
+        mmData histMax = task->getMinMax(hist->histogram);
+        labels[3] = "Backprojecting " + to_string(int(minRange.val[0])) + " to " + to_string(int(maxRange.val[0])) + " with " +
+            to_string(count) + " of " + to_string(totalPixels) + " samples compared to " + " mask pixels = " + to_string(actualCount) +
+            " Histogram max count = " + to_string(int(histMax.maxVal));
+        rectangle(dst2, Rect(int(histIndex * barWidth), 0, barWidth, dst2.rows), YELLOW, task->lineWidth);
+    }
+};
+
+
+
+
+
+
+class CPP_Rectangle_Basics : public algorithmX
+{
+private:
+public:
+    vector < Rect > rectangles;
+    vector < RotatedRect > rotatedRectangles;
+    bool options_drawRotated = false;
+    bool options_drawFilled = false;
+    int options_drawCount = 5;
+    CPP_Rectangle_Basics(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_Rectangle_Basics";
+        desc = "Draw the requested number of rectangles.";
+    }
+    void Run(Mat src) {
+        if (task->heartBeat) {
+            dst2.setTo(BLACK);
+            rectangles.clear();
+            rotatedRectangles.clear();
+            for (auto i = 0; i < options_drawCount; i++) {
+                Point2f nPoint = Point2f(rand() % src.cols, rand() % src.rows);
+                auto width = rand() % int(src.cols - nPoint.x);
+                auto height = rand() % int(src.rows - nPoint.y);
+                auto eSize = Size2f(float(rand() % src.cols - nPoint.x - 1), float(rand() % src.rows - nPoint.y - 1));
+                auto angle = 180.0F * float(rand() % 1000) / 1000.0f;
+                auto nextColor = Scalar(task->vecColors[i].val[0], task->vecColors[i].val[1], task->vecColors[i].val[2]);
+                auto rr = RotatedRect(nPoint, eSize, angle);
+                Rect r = Rect(nPoint.x, nPoint.y, width, height);
+                if (options_drawRotated) {
+                    task->DrawRotatedRectangle(dst2, nPoint, eSize, angle, 
+                                               task->vecColors[i]);
+                } else {
+                    rectangle(dst2, r, nextColor, task->lineWidth);
+                }
+                rotatedRectangles.push_back(rr);
+                rectangles.push_back(r);
+            }
+        }
+    }
+};
+
+
+
+
+
+class CPP_Rectangle_Rotated : public algorithmX
+{
+private:
+public:
+    CPP_Rectangle_Basics* rRectangle;
+    CPP_Rectangle_Rotated(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_Rectangle_Rotated";
+        rRectangle = new CPP_Rectangle_Basics(rows, cols);
+        rRectangle->options_drawRotated = true;
+        desc = "Draw the requested number of rectangles.";
+    }
+    void Run(Mat src) {
+        rRectangle->Run(src);
+        dst2 = rRectangle->dst2;
+    }
+};
+
+
+
+
+
+class CPP_Contour_Largest : public algorithmX
+{
+private:
+public:
+    vector<Point> bestContour;
+    vector<vector<Point>> allContours;
+    int maxIndex;
+    CPP_Rectangle_Rotated* rotatedRect;
+    CPP_Contour_Largest(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_Contour_Largest";
+        labels = { "", "", "Input to FindContours", "Largest single contour in the input image." };
+        rotatedRect = new CPP_Rectangle_Rotated(rows, cols);
+        desc = "Create a mask from the largest contour of the input.";
+    }
+    void Run(Mat src) {
+        if (standalone) {
+            if (task->heartBeat) {
+                rotatedRect->Run(src);
+                dst2 = rotatedRect->dst2;
+            }
+        }
+        else {
+            dst2 = src;
+        }
+        if (dst2.channels() != 1) cvtColor(dst2, dst2, COLOR_BGR2GRAY);
+        findContours(dst2, allContours, cv::RetrievalModes::RETR_LIST, cv::ContourApproximationModes::CHAIN_APPROX_NONE);
+        auto maxCount = 0;
+        maxIndex = -1;
+        // Review this For Loop >>>> i = 0 To allContours.size() - 1
+        for (auto i = 0; i < allContours.size(); i++) {
+            auto len = int(allContours[i].size());
+            if (len > maxCount) {
+                maxCount = len;
+                maxIndex = i;
+            }
+        }
+        if (maxIndex >= 0 && maxCount >= 2) {
+            dst3.setTo(0);
+            drawContours(dst3, allContours, maxIndex, WHITE, -1, task->lineType);
+            bestContour = allContours[maxIndex];
+        }
+    }
+};
+
+
+
+
+
+
+class CPP_Diff_Basics : public algorithmX
+{
+private:
+public:
+    int changedPixels;
+    Mat lastGray;
+    CPP_Diff_Basics(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_Diff_Basics";
+        labels = { "", "", "Stable gray", "Unstable mask" };
+        desc = "Capture an image and compare it to previous frame using absDiff and threshold";
+    }
+    void Run(Mat src) {
+        if (src.channels() == 3) cvtColor(src, src, COLOR_BGR2GRAY);
+        if(task->firstPass) lastGray = src.clone();
+        if (task->optionsChanged || lastGray.size() != src.size()) {
+            lastGray = src.clone();
+            dst3 = src.clone();
+        }
+        absdiff(src, lastGray, dst0);
+        task->pixelDiffThreshold = 25;  // NOTE: normally this is in the constructor but is overidden if so.
+        threshold(dst0, dst3, task->pixelDiffThreshold, 255, THRESH_BINARY);
+        changedPixels = countNonZero(dst3);
+        if (changedPixels > 0) {
+            threshold(dst0, dst3, task->pixelDiffThreshold, 255, THRESH_BINARY);
+            dst2 = src.clone();
+            dst2.setTo(0, dst3);
+            lastGray = src.clone();
+        }
+    }
+};
+
+
+
+
+
+
+
+class CPP_ApproxPoly_FindandDraw : public algorithmX
+{
+private:
+public:
+    CPP_Rectangle_Rotated* rotatedRect;
+    CPP_ApproxPoly_FindandDraw(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_ApproxPoly_FindandDraw";
+        rotatedRect = new CPP_Rectangle_Rotated(rows, cols);
+        labels[2] = "FindandDraw input";
+        labels[3] = "FindandDraw output - note the change in line width where ApproxPoly differs from DrawContours";
+        desc = "Demo the use of FindContours, ApproxPolyDP, and DrawContours.";
+    }
+    void Run(Mat src) {
+        rotatedRect->Run(src);
+        dst2 = rotatedRect->dst2;
+        cvtColor(dst2, dst0, COLOR_BGR2GRAY);
+        threshold(dst0, dst0, 1, 255, THRESH_BINARY);
+        dst0.convertTo(dst1, CV_32SC1);
+        vector<vector<Point>> allContours;
+        findContours(dst1, allContours, RetrievalModes::RETR_FLOODFILL, ContourApproximationModes::CHAIN_APPROX_SIMPLE);
+        dst3.setTo(0);
+        Mat nextContour;
+        vector<Mat> contours;
+        for (auto i = 0; i < allContours.size(); i++) {
+            approxPolyDP(allContours[i], nextContour, 3, true);
+            if (nextContour.rows > 2) contours.push_back(nextContour);
+        }
+        drawContours(dst3, contours, -1, YELLOW, task->lineWidth, task->lineType);
+    }
+};
+
+
+
+
+
+
+
+class CPP_ApproxPoly_Basics : public algorithmX
+{
+private:
+public:
+    CPP_Contour_Largest* contour;
+    CPP_Rectangle_Rotated* rotatedRect;
+    CPP_ApproxPoly_Basics(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_ApproxPoly_Basics";
+        contour = new CPP_Contour_Largest(rows, cols);
+        rotatedRect = new CPP_Rectangle_Rotated(rows, cols);
+        labels = { "", "", "Input to the ApproxPolyDP", "Output of ApproxPolyDP - note smoother edges." };
+        desc = "Using the input contours, create a list of ApproxPoly output";
+    }
+    void Run(Mat src) {
+        if (standalone) {
+            if (task->heartBeat) rotatedRect->Run(src);
+            src = rotatedRect->dst2;
+        }
+        contour->Run(src);
+        dst2 = contour->dst3;
+        Mat nextContour;
+        approxPolyDP(contour->allContours[contour->maxIndex], nextContour, 3, true);
+        dst3.setTo(0);
+        task->drawContour(dst3, nextContour, YELLOW);
+    }
+};
+
+
+
+
+
+
+class CPP_Hull_Basics : public algorithmX
+{
+private:
+public:
+    CPP_Random_Basics* random;
+    vector<Point2f> inputPoints;
+    vector<Point> hull;
+    bool useRandomPoints;
+    CPP_Hull_Basics(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_Hull_Basics";
+        random = new CPP_Random_Basics(rows, cols);
+        labels = { "", "", "Input Points - draw a rectangle anywhere.  Enclosing rectangle in yellow.", "" };
+        desc = "Given a list of points, create a hull that encloses them.";
+    }
+    void Run(Mat src) {
+        if ((standalone && task->heartBeat) || (useRandomPoints && task->heartBeat)) {
+            random->Run(src);
+            dst2 = random->dst2;
+            inputPoints = random->pointList;
+        }
+        Mat hull2f;
+        convexHull(inputPoints, hull2f, true);
+        hull = task->convert2f2i(hull2f);
+        task->drawContour(dst2, hull, YELLOW);
+    }
+};
+
+
+
+
+
+
+class CPP_ApproxPoly_Hull : public algorithmX
+{
+private:
+public:
+    CPP_Hull_Basics* hull;
+    CPP_ApproxPoly_Basics* aPoly;
+    CPP_ApproxPoly_Hull(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_ApproxPoly_Hull";
+        hull = new CPP_Hull_Basics(rows, cols);
+        aPoly = new CPP_ApproxPoly_Basics(rows, cols);
+        hull->useRandomPoints = true;
+        labels = { "", "", "Original Hull", "Hull after ApproxPoly" };
+        desc = "Use ApproxPolyDP on a hull to show impact of options (which appears to be minimal - what is wrong?)";
+    }
+    void Run(Mat src) {
+        hull->Run(src);
+        dst2 = hull->dst2;
+        aPoly->Run(dst2);
+        dst3 = aPoly->dst2;
+    }
+};
+
+
+
+
+
+
+
+
+
+
+class CPP_RedCloud_Flood : public algorithmX
+{
+private:
+public:
+    Mat inputMask;
+    CPP_RedCloud_PrepData* prepData;
+    int option_loDiff = 0;
+    int option_hiDiff = 0;
+    int option_minSizeCell = 75;
+    int options_historyMax = 10;
+    bool options_highlightCell;
+    int totalCount;
+    vector<Rect>rects;
+    vector<int> sizes;
+    CPP_RedCloud_Flood(int rows, int cols) : algorithmX(rows, cols) {
+        traceName = "CPP_RedCloud_Flood";
+        prepData = new CPP_RedCloud_PrepData(rows, cols);
+        desc = "Perform the RedCloud low level FloodFill";
+    }
+    rcData buildZeroEntry() {
+        rcData rc;
+        Point pt;
+        rc.contour = vector<Point>({ pt, pt, pt, pt });
+        rc.hull = vector<Point>({ pt, pt, pt, pt });
+        rc.rect = Rect(0, 0, 1, 1);
+        rc.mask = Mat(1, 1, CV_8U);
+        return rc;
+    }
+    void Run(Mat src) {
+        if (src.type() != CV_32SC1) {
+            if (task->gravityPointCloud)
+                prepData->Run(task->gCloud);
+            else
+                prepData->Run(task->pointCloud);
+
+            src = prepData->dst2;
+        }
+
+        if (inputMask.rows == 0) dst2 = task->noDepthMask; else dst2 = inputMask;
+        rects.clear();
+        sizes.clear();
+
+        rects.push_back(Rect(0, 0, 1, 1));
+        sizes.push_back(1);
+        int cellCount = 1;
+
+        src = src(Rect(1, 1, src.cols - 2, src.rows - 2)).clone();
+        Rect rect;
+        totalCount = 0;
+        for (int y = 0; y < src.rows; y++)
+        {
+            for (int x = 0; x < src.cols; x++)
+            {
+                if (dst2.at<unsigned char>(y, x) == 0)
+                {
+                    int count = floodFill(src, dst2, Point(x, y), cellCount, &rect, option_loDiff, option_hiDiff,
+                        4 | FLOODFILL_MASK_ONLY | FLOODFILL_FIXED_RANGE | (cellCount << 8));
+                    if (option_minSizeCell < count)
+                    {
+                        rect.height += 1;
+                        rects.push_back(rect);
+                        sizes.push_back(count);
+                        totalCount++;
+                        if (++cellCount == 256) cellCount = 1;
+                    }
+                }
+            }
+        }
+    }
+};
+
+
+
+
+
+
+
+class CPP_Motion_Basics : public algorithmX
+{
+private:
+public:
+    CPP_Diff_Basics* diff;
+    int changedPixels;
+    int cumulativePixels;
+    bool resetAll = true;
+    CPP_Motion_Basics(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_Motion_Basics";
+        diff = new CPP_Diff_Basics(rows, cols);
+        task->pixelDiffThreshold = 25;
+        dst3 = Mat(dst3.size(), CV_8U);
+        dst3.setTo(0);
+        desc = "Detect contours in the motion data and the resulting rectangles";
+    }
+    void Run(Mat src)
+    {
+        auto percentOfImage = float(10.0f / 100.0f);
+        static auto saveFrameCount = task->frameCount;
+        if (saveFrameCount != task->frameCount)
+        {
+            saveFrameCount = task->frameCount;
+            if (src.channels() != 1) cvtColor(src, src, COLOR_BGR2GRAY);
+            diff->Run(src);
+            dst2 = diff->dst3;
+            changedPixels = diff->changedPixels;
+            if (changedPixels > 0)
+            {
+                cumulativePixels += changedPixels;
+                resetAll = cumulativePixels / src.total() > percentOfImage || changedPixels > dst2.total() / 16 || task->optionsChanged;
+                if (resetAll || task->heartBeat)
+                {
+                    dst2.copyTo(dst3);
+                    cumulativePixels = 0;
+                }
+                else
+                {
+                    dst3.setTo(255, dst2);
+                }
+            }
+            auto threshold = src.total() * 10 / 100;
+            auto strOut = "Cumulative threshold = " + to_string(int(threshold / 1000)) + "k";
+            strOut += "Current cumulative pixels changed = " + to_string(int(cumulativePixels / 1000)) + "k" + "/n";
+            labels[2] = strOut;
+        }
+    }
+};
+
+
+
+
+
+
+
+
+class CPP_Edge_MotionAccum : public algorithmX
+{
+private:
+public:
+    CPP_Edge_Canny* edges;
+    CPP_Motion_Basics* motion;
+    float percentMotion;
+    CPP_Edge_MotionAccum(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_Edge_MotionAccum";
+        edges = new CPP_Edge_Canny(rows, cols);
+        motion = new CPP_Motion_Basics(rows, cols);
+        dst2 = Mat(dst2.size(), CV_8U);
+        dst2.setTo(0);
+        labels = { "", "", "Accumulated edges tempered by motion thresholds", "" };
+        desc = "Accumulate edges and use motion to clear";
+    }
+    void Run(Mat src)
+    {
+        if (task->optionsChanged) motion->resetAll = true;
+        motion->Run(src);
+        if (motion->resetAll || task->heartBeat) dst2.setTo(0);
+        edges->Run(src);
+        dst2.setTo(255, edges->dst2);
+        labels[3] = motion->labels[2];
+    }
+};
+
+
+
+
+
+
+
+class CPP_Edge_MotionFrames : public algorithmX
+{
+private:
+public:
+    CPP_Edge_Canny* edges;
+    CPP_Edge_MotionFrames(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_Edge_MotionFrames";
+        edges = new CPP_Edge_Canny(rows, cols);
+        dst2 = Mat(dst2.size(), CV_8U);
+        dst2.setTo(0);
+        labels = { "", "", "The multi-frame edges output", "The Edge_Canny output for the last frame only" };
+        desc = "Collect edges over several frames controlled with global frame history";
+    }
+    void Run(Mat src)
+    {
+        static vector<Mat> frames;
+        auto fCount = task->frameHistory;
+        if (task->optionsChanged) frames.clear();
+        edges->Run(src);
+        threshold(edges->dst2, dst1, 0, 255.0f / fCount, THRESH_BINARY);
+        dst2 += dst1;
+        frames.push_back(dst1);
+        if (frames.size() >= fCount)
+        {
+            dst2 -= frames[0];
+            frames.erase(frames.begin());
+        }
+        dst3 = edges->dst2;
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+class CPP_EdgePreserving_Basics : public algorithmX
+{
+private:
+public:
+    CPP_Diff_Basics* diff;
+    CPP_EdgePreserving_Basics(int rows, int cols) : algorithmX(rows, cols)
+    {
+        diff = new CPP_Diff_Basics(rows, cols);
+        traceName = "CPP_EdgePreserving_Basics";
+        labels[2] = "Output of the EdgePreserving Filter - draw anywhere to test more";
+        task->drawRect = Rect(100, 100, 50, 50);
+        desc = "Example using the OpenCV ximgproc extention for edge preserving filter";
+    }
+    void Run(Mat src)
+    {
+        dst2 = src;
+
+        if (task->drawRect.width == 0) task->drawRect = Rect(100, 100, 50, 50);
+        Mat small = src(task->drawRect);
+
+        ximgproc::edgePreservingFilter(small, dst2(task->drawRect), 9, 20);
+    }
+};
+
+
+
+
+
+
+class CPP_TEE_Basics : public algorithmX
+{
+private:
+public:
+    map<int, int> sizeSorted;
+    vector<rcData> redCells;
+    vector<rcData> lastCells;
+    Mat lastcellMap;
+    Mat cellMap = Mat(dst2.size(), CV_32S);
+    CPP_Contour_Largest* contours;
+    CPP_RedCloud_Flood* redF;
+    CPP_TEE_Basics(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_TEE_Basics";
+        cellMap.setTo(0);
+        contours = new CPP_Contour_Largest(rows, cols);
+        redF = new CPP_RedCloud_Flood(rows, cols);
+        if (standalone) task->displayDst0 = true;
+        task->gravityPointCloud = true;
+        //labels[3] = "Note that the maxDist point does not move until it reaches the boundary of the cell.";
+        desc = "Run floodFill on XY reduced point cloud";
+    }
+    rcData rcSelection(Mat output)
+    {
+        int index = cellMap.at<int>(task->clickPoint.y, task->clickPoint.x);
+        rcData rc = redCells[index];
+        dst0 = task->color;
+        if (redF->options_highlightCell == false) return rc;
+        if (task->displayDst0) task->drawContour(dst0(rc.rect), rc.contour, YELLOW);
+        task->drawContour(output(rc.rect), rc.contour, WHITE, -1);
+        return rc;
+    }
+    void Run(Mat src)
+    {
+        lastCells = vector<rcData>(redCells);
+        lastcellMap = cellMap.clone();
+        if (task->optionsChanged) lastcellMap.setTo(0);
+        redF->Run(src);
+        if (redF->totalCount == 0) return;
+        redCells.clear();
+        auto rc = redF->buildZeroEntry();
+        redCells.push_back(rc);
+        sizeSorted.clear();
+        int count8u = 1;
+        cellMap.setTo(0);
+        dst2.setTo(0);
+        int matchedCells = 0;
+        vector<Vec3b> colors;
+        for (auto i = 1; i < redF->totalCount; i++)
+        {
+            rc.rect = redF->rects[i];
+            rc.rect = task->validateRect(rc.rect, dst2.cols, dst2.rows);
+            rc.pixels = redF->sizes[i];
+            rc.mask = redF->dst2(rc.rect).clone();
+            inRange(rc.mask, count8u, count8u, rc.mask);
+            count8u += 1;
+            if (count8u == 256) count8u = 1;
+            rc.maxDist = task->getMaxDist(rc.mask, rc.rect);
+            rc.center = Point(rc.rect.x + rc.rect.width / 2, rc.rect.y + rc.rect.height / 2);
+            rc.index = i;
+            rc.indexLast = lastcellMap.at<int>(rc.maxDist.y, rc.maxDist.x);
+            if (rc.indexLast > 0)
+            {
+                rcData lrc = lastCells[rc.indexLast];
+                int testIndex = lastcellMap.at<int>(lrc.maxDist.y, lrc.maxDist.x);
+                if (testIndex == rc.indexLast)
+                {
+                    //rc.maxDist = lrc.maxDist;
+                }
+                rc.color = lrc.color;
+                matchedCells += 1;
+                lrc.indexCurr = i;
+                lastCells[rc.indexLast] = lrc;
+            }
+            if (rc.color == black || count(colors.begin(), colors.end(), rc.color))
+            {
+                rc.color = Vec3b(rand() % 240, rand() % 240, rand() % 240);
+            }
+            colors.push_back(rc.color);
+            contours->Run(rc.mask);
+            rc.contour = vector<Point>(contours->bestContour);
+            Mat tmp(rc.mask.rows, rc.mask.cols, CV_32FC1);
+            tmp.setTo(0);
+            task->pcSplit[2](rc.rect).copyTo(tmp, rc.mask);
+            minMaxLoc(tmp, &rc.depthMin, &rc.depthMax, &rc.depthMinLoc, &rc.depthMaxLoc);
+            meanStdDev(task->gCloud(rc.rect), rc.depthMean, rc.depthStdev, rc.mask);
+            if (rc.depthMax > rc.depthMean.val[2] + rc.depthStdev.val[2] * 3) rc.depthMax = rc.depthMean.val[2] + 3 * rc.depthStdev.val[2];
+            dst2(rc.rect).setTo(rc.color, rc.mask);
+            cellMap(rc.rect).setTo(rc.index, rc.mask);
+            sizeSorted.insert(make_pair(rc.pixels, rc.index));
+            redCells.push_back(rc);
+        }
+        labels[2] = to_string(matchedCells) + " of " + to_string(redCells.size()) + " cells matched previous generation. " +
+                    to_string(redCells.size() - matchedCells) + " not matched.";
+        rc = rcSelection(dst2);
+        dst3 = dst2.clone();
+        for (rcData rc : redCells)
+        {
+            circle(dst3, rc.maxDist, task->dotSize, YELLOW, -1, task->lineType);
+        }
+    }
+};
+
+
+
+
+class CPP_RedCloud_Hulls : public algorithmX
+{
+private:
+public:
+    CPP_TEE_Basics* redC;
+    vector<rcData> redCells;
+    Mat cellMap;
+    int selectedIndex;
+    Mat lastcellMap;
+    CPP_RedCloud_Hulls(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_RedCloud_Hulls";
+        redC = new CPP_TEE_Basics(rows, cols);
+        if (standalone) task->displayDst0 = true;
+        lastcellMap = Mat(dst2.size(), CV_32S);
+        labels = { "", "", "RedCloud hulls", "Outline of each RedCloud hull showing overlap" };
+        lastcellMap.setTo(0);
+        cellMap = Mat(dst2.size(), CV_32S);
+        desc = "Add contours and hulls to each RedCloud Cell";
+    }
+    rcData showHull(Mat dstFill)
+    {
+        selectedIndex = cellMap.at<int>(task->clickPoint.y, task->clickPoint.x);
+        rcData rc = redCells[selectedIndex];
+        if (redC->redF->options_highlightCell == false) return rc;
+        task->drawContour(dstFill(rc.rect), rc.hull, WHITE, -1);
+        return rc;
+    }
+    void Run(Mat src)
+    {
+        redC->Run(src);
+        dst3 = src.clone();
+        redCells.clear();
+        dst2.setTo(0);
+        cellMap.setTo(0);
+        for (rcData rc : redC->redCells)
+        {
+            convexHull(rc.contour, rc.hull);
+            rc.index = int(redCells.size());
+            rc.indexLast = lastcellMap.at<int>(rc.maxDist.y, rc.maxDist.x);
+            redCells.push_back(rc);
+            task->drawContour(dst2(rc.rect), rc.hull, rc.color, -1);
+            task->drawContour(cellMap(rc.rect), rc.hull, Scalar(rc.index, rc.index, rc.index), -1);
+            task->drawContour(dst3(rc.rect), rc.hull, YELLOW);
+        }
+        if (redCells.size() == 0) return;
+        auto rcX = showHull(dst2);
+        if (task->displayDst0)
+        {
+            dst0 = task->color.clone();
+            task->drawContour(dst0(rcX.rect), rcX.hull, YELLOW);
+        }
+        lastcellMap = cellMap.clone();
+        labels[2] = to_string(redCells.size()) + " hulls identified below.";
+    }
+};
+
+
+
+
+
+
+
+class CPP_Distance_Basics : public algorithmX
+{
+private:
+public:
+    CPP_Distance_Basics(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_Distance_Basics";
+        labels[2] = "Distance Transform";
+        desc = "Distance algorithmX basics.";
+    }
+    void Run(Mat src)
+    {
+        if (standalone) src = task->depthRGB;
+        if (src.channels() == 3) cvtColor(src, src, COLOR_BGR2GRAY);
+        distanceTransform(src, dst0, DIST_L1, 3);
+        normalize(dst0, dst1, 0, 255, cv::NormTypes::NORM_MINMAX);
+        dst1.convertTo(dst2, CV_8UC1);
+    }
+};
+
+
+
+
+
+
+class CPP_FeatureLess_Basics : public algorithmX
+{
+private:
+public:
+    CPP_Edge_Canny* edges;
+    CPP_Distance_Basics* dist;
+    int options_threshold = 10;
+    CPP_FeatureLess_Basics(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_FeatureLess_Basics";
+        edges = new CPP_Edge_Canny(rows, cols);
+        dist = new CPP_Distance_Basics(rows, cols);
+        desc = "Find the top pixels in the distance algorithmX.";
+    }
+    void Run(Mat src)
+    {
+        edges->Run(src);
+        bitwise_not(edges->dst2, dst0);
+        dist->Run(dst0);
+        threshold(dist->dst2, dst2, options_threshold, 255, THRESH_BINARY);
+    }
+};
+
+
+
+
+
+
+
+
+
+class CPP_Edge_Segments : public algorithmX
+{
+private:
+public:
+    Ptr<EdgeDrawing> ed;
+    CPP_Edge_Segments(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_Edge_Segments";
+        labels[2] = "Lines found with the Edge Drawing Filter";
+        ed = createEdgeDrawing();
+        ed->params.EdgeDetectionOperator = EdgeDrawing::SOBEL;
+        ed->params.GradientThresholdValue = 38;
+        ed->params.AnchorThresholdValue = 8;
+        desc = "Example using the OpenCV ximgproc extention for edge drawing.";
+    }
+    void Run(Mat src)
+    {
+        if (src.channels() == 3)
+        {
+            dst2 = src;
+            cvtColor(src, dst0, COLOR_BGR2GRAY);
+        }
+        else
+        {
+            dst0 = src;
+            cvtColor(src, dst2, COLOR_GRAY2BGR);
+        }
+        ed->detectEdges(dst0);
+
+        vector<Vec4f> lines;
+        ed->detectLines(lines);
+
+        for (size_t i = 0; i < lines.size(); i++)
+        {
+            Point2f p1 = Point2f(lines[i].val[0], lines[i].val[1]);
+            Point2f p2 = Point2f(lines[i].val[2], lines[i].val[3]);
+            line(dst2, p1, p2, YELLOW, task->lineWidth, task->lineType);
+        }
+    }
+};
+
+
+
+
+
+
+
+
+class CPP_EdgeDraw_Basics : public algorithmX
+{
+private:
+public:
+    CPP_Edge_Segments* eDraw;
+    CPP_EdgeDraw_Basics(int rows, int cols) : algorithmX(rows, cols)
+    {
+        eDraw = new CPP_Edge_Segments(rows, cols);
+        traceName = "CPP_EdgeDraw_Basics";
+        dst3 = Mat(dst3.size(), CV_8U);
+        labels[2] = "Line segments of the Edge Drawing Filter - drawn on the src input";
+        labels[3] = "Line segments of the Edge Drawing Filter";
+        desc = "Display segments found with the EdgeDrawing filter in ximgproc";
+    }
+    void Run(Mat src)
+    {
+        dst3 = src;
+        eDraw->Run(src);
+        vector<vector<Point> > segments = eDraw->ed->getSegments();
+
+        dst2.setTo(0);
+        for (size_t i = 0; i < segments.size(); i++)
+        {
+            const Point* pts = &segments[i][0];
+            int n = (int)segments[i].size();
+            float distance = sqrt((pts[0].x - pts[n - 1].x) * (pts[0].x - pts[n - 1].x) + (pts[0].y - pts[n - 1].y) * (pts[0].y - pts[n - 1].y));
+            bool drawClosed = distance < 10;
+            polylines(dst2, &pts, &n, 1, drawClosed, Scalar(255, 255, 255), task->lineWidth, task->lineType);
+            polylines(dst3, &pts, &n, 1, drawClosed, YELLOW, task->lineWidth, task->lineType);
+        }
+
+        rectangle(dst2, Rect(0, 0, dst3.cols, dst3.rows), 255, task->lineWidth, task->lineType);
+        threshold(dst2, dst2, 0, 255, THRESH_BINARY);
+    }
+};
+
+
+
+
+
+
+
+
+class CPP_FeatureLess_Edge : public algorithmX
+{
+private:
+public:
+    CPP_Distance_Basics* dist;
+    CPP_EdgeDraw_Basics* eDraw;
+    CPP_FeatureLess_Edge(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_FeatureLess_Edge";
+        eDraw = new CPP_EdgeDraw_Basics(rows, cols);
+        dist = new CPP_Distance_Basics(rows, cols);
+        labels[2] = "Edges found using the Segments and the distance function";
+        desc = "Floodfill the output of the Edge Drawing filter (C++)";
+    }
+    void Run(Mat src)
+    {
+        eDraw->Run(src);
+        bitwise_not(eDraw->dst2, dst0);
+        dist->Run(dst0);
+        threshold(dist->dst2, dst2, 0, 255, THRESH_BINARY);
+    }
+};
+
+
+
+
+
+
+class CPP_RedCloud_FeatureLess2 : public algorithmX
+{
+private:
+public:
+    CPP_FeatureLess_Edge* fLess;
+    CPP_TEE_Basics* redC;
+    CPP_RedCloud_FeatureLess2(int rows, int cols) : algorithmX(rows, cols)
+    {
+        traceName = "CPP_RedCloud_FeatureLess2";
+        fLess = new CPP_FeatureLess_Edge(rows, cols);
+        redC = new CPP_TEE_Basics(rows, cols);
+        labels[3] = "Mask showing regions that are NOT featureless.";
+        desc = "Identify and track the featureless regions produced with EdgeDrawing2.";
+    }
+    void Run(Mat src)
+    {
+        fLess->Run(src);
+        bitwise_not(fLess->dst2, dst3);
+        dst3.convertTo(dst0, CV_32S);
+        redC->redF->inputMask = fLess->dst2;
+        redC->Run(dst0);
+        dst2 = redC->dst2;
+        labels[2] = "There were " + to_string(redC->redCells.size()) + " featureless regions identified";
+    }
+};
+
+
+
+
+class CPP_Guess_Depth : public algorithmX
+{
+private: 
+public: 
+	CPP_Guess_Depth(int rows, int cols) : algorithmX(rows, cols) 
+{
+	traceName = "CPP_Guess_Depth";
+	}
+	void Run(Mat src)
+	{
+		dst2 = src.clone();
+	}
+};

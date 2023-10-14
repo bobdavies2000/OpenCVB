@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CPP_Externs.h" />
+    <ClInclude Include="CPP_Names.h" />
+    <ClInclude Include="CvHMM.h" />
+    <ClInclude Include="DepthColorizer.hpp" />
+    <ClInclude Include="harrisDetector.h" />
+    <ClInclude Include="CPP_IncludeOnly.h" />
+    <ClInclude Include="ParticleFilter.h" />
+    <ClInclude Include="PointCloudConvert.h" />
+    <ClInclude Include="PragmaLibs.h" />
+    <ClInclude Include="rbf.hpp" />
+    <ClInclude Include="SemiGlobalMatching.h" />
+    <ClInclude Include="videostab.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Agast.cpp" />
+    <ClCompile Include="Annealing.cpp" />
+    <ClCompile Include="BGRPattern.cpp" />
+    <ClCompile Include="BGSubtract.cpp" />
+    <ClCompile Include="Corners.cpp" />
+    <ClCompile Include="CPP_IncludeOnly.cpp" />
+    <ClCompile Include="DCT.cpp" />
+    <ClCompile Include="Denoise.cpp" />
+    <ClCompile Include="Depth.cpp" />
+    <ClCompile Include="Density.cpp" />
+    <ClCompile Include="Dither.cpp" />
+    <ClCompile Include="Edge.cpp" />
+    <ClCompile Include="EdgeDraw.cpp" />
+    <ClCompile Include="EMax.cpp" />
+    <ClCompile Include="FitEllipse.cpp" />
+    <ClCompile Include="FloodCell.cpp" />
+    <ClCompile Include="Fuzzy.cpp" />
+    <ClCompile Include="Guess.cpp" />
+    <ClCompile Include="Harris.cpp" />
+    <ClCompile Include="Histogram.cpp" />
+    <ClCompile Include="Histogram3D.cpp" />
+    <ClCompile Include="HMM.cpp" />
+    <ClCompile Include="imgui.cpp" />
+    <ClCompile Include="Jacobian.cpp" />
+    <ClCompile Include="KMeans.cpp" />
+    <ClCompile Include="KMeansSimple.cpp" />
+    <ClCompile Include="MinTriangle.cpp" />
+    <ClCompile Include="MLPrep.cpp" />
+    <ClCompile Include="Palette.cpp" />
+    <ClCompile Include="ParticleFilter.cpp" />
+    <ClCompile Include="PCA_Prep.cpp" />
+    <ClCompile Include="Plot_OpenCV.cpp" />
+    <ClCompile Include="PointCloud.cpp" />
+    <ClCompile Include="Random_PatternGenerator.cpp" />
+    <ClCompile Include="recursiveBilateralFilter.cpp" />
+    <ClCompile Include="RedCloud.cpp" />
+    <ClCompile Include="Retina.cpp" />
+    <ClCompile Include="Salience.cpp" />
+    <ClCompile Include="SemiGlobalMatching.cpp" />
+    <ClCompile Include="Stabilizer.cpp" />
+    <ClCompile Include="SuperPixels.cpp" />
+    <ClCompile Include="Trace.cpp" />
+    <ClCompile Include="Tracker.cpp" />
+    <ClCompile Include="videostab.cpp" />
+    <ClCompile Include="Vignetting.cpp" />
+    <ClCompile Include="Voronoi.cpp" />
+    <ClCompile Include="WarpModel.cpp" />
+    <ClCompile Include="WhiteBalance.cpp" />
+    <ClCompile Include="xPhoto.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{F867E11C-A392-4EA0-9F32-6CCBE3E753FC}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>CPPAlgorithms</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>CPP_Classes</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;CPPALGORITHMS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../OpenCV/\modules\video\include;$(ProjectDir)/../OpenCV/\modules\photo\include;$(ProjectDir)/../OpenCV/\modules\imgproc\include;$(ProjectDir)/../OpenCV/\modules\core\include;$(ProjectDir)/../OpenCV/\modules\objdetect\include;$(ProjectDir)/../OpenCV/\modules\calib3d\include;$(ProjectDir)/../OpenCV/\modules\imgcodecs\include;$(ProjectDir)/../OpenCV/\modules\features2d\include;$(ProjectDir)/../OpenCV/\modules\flann\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\shape\include;$(ProjectDir)/../OpenCV/\modules\ml\include;$(ProjectDir)/../OpenCV/\modules\videoio\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\datasets\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\text\include;$(ProjectDir)/../OpenCV/\modules\highgui\include;$(ProjectDir)/../OpenCV/\modules\dnn\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\plot\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\optflow\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\ximgproc\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\viz\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\phase_unwrapping\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\xfeatures2d\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\xphoto\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\xobjdetect\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\videostab\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\surface_matching\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\superres\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\structured_light\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\stereo\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\saliency\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\rgbd\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\reg\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\quality\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\line_descriptor\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\img_hash\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\hfs\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\fuzzy\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\face\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\dpm\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\dnn_objdetect\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\ccalib\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\bioinspired\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\bgsegm\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\aruco\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\Tracking\include;$(ProjectDir)/../OpenCV/\modules\stitching\include;$(ProjectDir)/../OpenCV/\modules\gapi\include;$(ProjectDir)/../OpenCV/\build;$(ProjectDir)/../OpenCV/;$(ProjectDir)/../librealsense/third-party/glfw/include;$(ProjectDir)/../librealsense/third-party/imgui/;$(ProjectDir)/../librealsense/examples/;$(ProjectDir)/../librealsense/realsense2;$(ProjectDir)/../librealsense/src;$(ProjectDir)/../librealsense/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OpenMPSupport>true</OpenMPSupport>
+      <LanguageStandard>Default</LanguageStandard>
+      <AdditionalOptions>/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4244;26495;26812;26451;6294;6201;6011</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(ProjectDir)/../librealsense/build/third-party/glfw/src/$(Configuration)/glfw3.lib;$(ProjectDir)/../librealsense/Build/$(Configuration)/realsense2.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
+    </PreBuildEvent>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Message>
+      </Message>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;CPPALGORITHMS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;CPPALGORITHMS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../OpenCV/\modules\video\include;$(ProjectDir)/../OpenCV/\modules\photo\include;$(ProjectDir)/../OpenCV/\modules\imgproc\include;$(ProjectDir)/../OpenCV/\modules\core\include;$(ProjectDir)/../OpenCV/\modules\objdetect\include;$(ProjectDir)/../OpenCV/\modules\calib3d\include;$(ProjectDir)/../OpenCV/\modules\imgcodecs\include;$(ProjectDir)/../OpenCV/\modules\features2d\include;$(ProjectDir)/../OpenCV/\modules\flann\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\shape\include;$(ProjectDir)/../OpenCV/\modules\ml\include;$(ProjectDir)/../OpenCV/\modules\videoio\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\datasets\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\text\include;$(ProjectDir)/../OpenCV/\modules\highgui\include;$(ProjectDir)/../OpenCV/\modules\dnn\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\plot\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\optflow\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\ximgproc\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\viz\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\phase_unwrapping\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\xfeatures2d\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\xphoto\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\xobjdetect\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\videostab\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\surface_matching\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\superres\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\structured_light\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\stereo\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\saliency\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\rgbd\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\reg\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\quality\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\line_descriptor\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\img_hash\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\hfs\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\fuzzy\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\face\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\dpm\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\dnn_objdetect\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\ccalib\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\bioinspired\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\bgsegm\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\aruco\include;$(ProjectDir)/../OpenCV/OpenCV_Contrib/\modules\Tracking\include;$(ProjectDir)/../OpenCV/\modules\stitching\include;$(ProjectDir)/../OpenCV/\modules\gapi\include;$(ProjectDir)/../OpenCV/\build;$(ProjectDir)/../OpenCV/;$(ProjectDir)/../librealsense/third-party/imgui/;$(ProjectDir)/../librealsense/third-party/glfw/include;$(ProjectDir)/../librealsense/examples/;$(ProjectDir)/../librealsense/realsense2;$(ProjectDir)/../librealsense/src;$(ProjectDir)/../librealsense/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OpenMPSupport>true</OpenMPSupport>
+      <LanguageStandard>Default</LanguageStandard>
+      <DisableSpecificWarnings>4244;26451;6294;6201;6011;26495;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <AdditionalOptions>/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
+      <SupportJustMyCode>true</SupportJustMyCode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(ProjectDir)/../librealsense/build/third-party/glfw/src/$(Configuration)/glfw3d.lib;$(ProjectDir)/../librealsense/Build/$(Configuration)/realsense2d.lib;opengl32.lib;glu32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\</AdditionalLibraryDirectories>
+      <AdditionalOptions>/VERBOSE:LIB %(AdditionalOptions)</AdditionalOptions>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>
+      </Message>
+    </PreBuildEvent>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Message>
+      </Message>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;CPPALGORITHMS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

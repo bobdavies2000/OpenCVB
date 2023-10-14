@@ -1,0 +1,1101 @@
+# Recent Changes – October 2023
+
+-   Over 1700 algorithms are included, averaging 30 lines of code per algorithm.
+-   Improvements to image segmentation now classify all pixels in the image.
+-   RedCloud_Motion detects image motion by comparing RedCloud cells.
+    -   Pixel differences identify cells that have changed (as usual).
+    -   The “motionRect” variable is the union of current and previous rect.
+        -   Motion is the combination of where the cell was with where it is now
+-   RedCloud_Motion uses the latest version of RedCloud_Basics to detect motion
+    -   A “motionRect” variable describes the union of the previous and current rect.
+    -   It is not flawless. Test the RGB image quality with RedCloud_MotionTest.
+    -   Option automation is used to define the lowest pixel difference threshold.
+-   Improved PixelViewer support – better form placement and pixel layout.
+-   Plots over time are much more reactive to the changes in the input data.
+-   MSER algorithms were reviewed and improved.
+-   A log of changes is included at the bottom of this document.
+
+![](media/db52b0115273726a6ff2d1aa986c0817.gif)
+
+**RedCloud_Basics:** *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
+
+![A colorful squares and lines Description automatically generated with medium confidence](media/c4eed0d963820c627ec5b94291a36c4d.gif)
+
+**RedCloud_Basics** *(This is the previous version of RedCloud_Basics from September 2023.) This image segmentation algorithm uses both the point cloud and color to identify cells. RedCloud algorithms typically reduce the point cloud resolution in X and Y to produce cells that describe regions in the image. This algorithm also uses the reduced point cloud but has added cells based on color for regions that have no depth. Because both color and the point cloud are used, the whole image is segmented instead of just that portion with depth. When a cell’s color is consistent, it has been matched to a cell in the previous frame.*
+
+# Introduction
+
+There is no better documentation of an algorithm than a working example. This is especially true for computer vision where the output is visual and often self-explanatory. Now imagine well over 1000 OpenCV examples in a single app where each algorithm is less than a page of code and in a familiar language. And each algorithm is *just the algorithm* without baggage from a user interface or environment. Each algorithm is designed to be reused in other algorithms so variations can be easily built.
+
+A full installation can take about 30-50 minutes using the 1-step “Update_All.bat” file discussed in the “Installation” section below. But there is no obligation to install needed libraries just to read the code for an algorithm. Open the OpenCVB.sln file after downloading and inspect the code in the C++, C\#, VB.Net or Python. Each algorithm gets a standardized presentation of all the data from any of the RGBZ cameras listed below.
+
+However, a full installation is recommended. An algorithm may fit in one page of code and reading is one way to review the code but understanding the algorithms is a lot faster and easier when the output is visualized by running it. The output is often self-documenting or a natural representation of the algorithm’s intent.
+
+The basic layout of OpenCVB is shown below. Any of the algorithms can be selected from the first combo box at the top of the form. The second combo box is used to select an algorithm group. The default grouping is “\<All\>”. There are a variety of other special groupings that select, for example, all Python or all C++ algorithms.
+
+![](media/0094dd80a047099af3fa5ecf92dee723.png)
+
+# The Objective
+
+The objective is to solve many small computer vision problems and do so in a way that enables any of the solutions to be reused. The result is a toolkit for solving incrementally bigger problems. The hypothesis behind this approach is that human vision is not computationally intensive but is built on many, usually trivial algorithms working together. Computer vision problems are not huge; there are just an unmanageable number of them. A single app that allows algorithms to be easily created and combined is the primary motivation for the OpenCVB application.
+
+OpenCVB is targeting only RGBZ cameras that produce depth and color and have an IMU to detect gravity and motion. These newer cameras have prompted a review of existing vision algorithms to see how they can be improved if depth and gravity are known. To enable revisiting existing algorithms, this software provides a single application that can run OpenCV algorithms on any of the cameras listed below.
+
+Supporting multiple cameras with the same application adds a further level of generalization. Plus, adding more cameras is a multiplier. If there are 1000 algorithms and 6 supported cameras, testing all of them requires 6000 tests which is the reason for the integrated regression testing. If the different resolutions are added, the multiplier and the need for regression testing is even greater.
+
+There are many computer vision examples on the web but too often something is missing, or setup is difficult. OpenCVB is designed to collect algorithms into a single application and guarantee that each will build and run. In addition, software automation and aids simplify the process of adding variants and experiments. OpenCVB is more work to install than a typical application but it has been reduced to a few steps using standard (and free) packages.
+
+The languages used are those often found in OpenCV projects - C++, C\#, and Python - but also include VB.Net, hence the name OpenCVB. OpenCVB also provides access to multiple libraries - OpenCV, OpenCVSharp, OpenGL, Open3D, MatPlotLib, Dlib, NumPy, NAudio, and OpenMP. And OpenCVB enables many possible image representations - 3D, bitmaps, “ply” format, plots, bar charts, spreadsheets, and text. Examples of all these representations are included in OpenCVB.
+
+Making these languages and libraries available while using the same infrastructure shaped a standardized class for OpenCVB algorithms. Implementing hundreds of examples with the same reusable class structure has confirmed the approach is useful. The result is a starting point to add depth and explore its usage with OpenCV.
+
+There are other objectives. Convolutions combined with neural nets (CNN’s) are a successful approach to computer vision. CNN’s detect differences within a set of images and identify content surprisingly well. OpenCVB is a pathway to search for more and better features than convolutions, features that are measured, objective, and essential. Depth, infrared, gravity, and camera motion are the kind of objective features that can enhance almost any imaging algorithm.
+
+And what if all cameras had depth and an IMU? Making this assumption explains why only a few cameras from StereoLabs, Intel, Microsoft, and others are currently supported. The data from each camera – color, depth, point cloud, and IMU data - is presented to all the algorithms in the same standardized format. More cameras with depth are expected to arrive and integration with OpenCVB is likely to follow. OpenCVB is an opportunity to experiment with the features of these cameras and apply the same algorithm to all of them.
+
+The algorithms are notably short, almost always less than a page of code, labelled reasonably well, easily searched, and easily combined, while often providing links in the code to online documentation and versions for other platforms. Many downloadable algorithms are encumbered by environmental considerations that can obscure the meaning or context of an algorithm. All the algorithms here contain just the algorithm separate from any camera dependencies and will work with each of the supported cameras. Isolating just the algorithm functionality enables easy adaptation to other environments or platforms.
+
+# Before You Start
+
+Here are the pre-install requirements:
+
+-   Windows 10 or Windows 11
+-   Visual Studio Community Edition (free)
+-   Install Python from <https://www.python.org/downloads/>
+    -   Be sure to click the option to add Python to the path.
+-   Any one of the following RGBZ cameras:
+    -   Microsoft Kinect for Azure
+    -   Intel RealSense D435i
+    -   StereoLabs ZED2
+    -   Mynt Eye D 1000
+    -   Intel RealSense D455 – the latest in the series of Intel RealSense cameras
+    -   Luxonis Oak-D Pro or Oak-D Series 2. (Oak-D Lite will work but has no IMU.)
+
+All of the above cameras have an IMU (Inertial Measurement Unit.) The Microsoft Kinect for Azure has the best depth accuracy but requires more power and is not as portable as StereoLabs or Intel cameras. All the cameras use USB-C to provide data to the host platform. A brief comparison of each camera is provided in Addendum 1.
+
+Download and install the following software. Each is free and easily downloaded for Windows 10:
+
+-   Microsoft Visual Studio Community Edition
+    -   Download: <https://visualstudio.microsoft.com/downloads/>
+-   CMAKE 3.3 or later
+    -   <https://cmake.org/download/>
+-   Git and TortoiseGit
+    -   <https://git-scm.com/downloads>
+    -   <https://tortoisegit.org/> (Optional but convenient)
+
+# Installation
+
+Installation is not as simple as opening the OpenCVB.sln file but it is not much more than that.
+
+-   Run the “Update_All.bat” script that comes with OpenCVB. It will download and run CMake for the needed libraries.
+    -   The OpenCVB tree will occupy about 25Gb of disk space – plan accordingly. The process can take 30-50 minutes.
+-   Download the Kinect4Azure proprietary binaries (needed even if you don’t have the Microsoft camera):
+    -   <https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/usage.md>
+-   Open the OpenCVB.sln and set the “OpenCVB” project as the “Startup Project” if not already set.
+-   The “Update_All.bat” script can be used to update each component downloaded by OpenCVB:
+    -   Remove **“\<OpenCVB Dir\>/OakD/Build”** to update the Oak-D camera support
+    -   Remove **“\<OpenCVB Dir\>/librealsense”** to update the Realsense camera support
+    -   Remove **“\<OpenCVB Dir\>/Azure-Kinect-Sensor-SDK”** to update Microsoft Kinect for Azure support
+    -   Remove **“\<OpenCVB Dir\>/opencv”** to update both OpenCV and OpenCV contributions.
+
+Why are there no official releases of OpenCVB? The repository is the release. The infrastructure is solid at this point (the exceptions are rare and transitory.) Any problems that arise are easily avoided because they will be confined to an algorithm. OpenCVB regression tests are continuously running so even individual algorithm problems will be apparent shortly. If any problem is encountered, download the latest and if it is still there, submit a pull request.
+
+# Optionally Install Additional Cameras
+
+Support for some optional cameras can be added.
+
+-   For the StereoLabs ZED 2 and 2i cameras, install the StereoLabs SDK from
+    -   [ZED SDK 3.8 - Download \| Stereolabs](https://www.stereolabs.com/developers/release/3.8/)
+    -   NOTE: StereoLabs requires an NVIDIA card with CUDA.
+-   For the Mynt Eye D 1000 camera, download the SDK from:
+    -   <https://mynt-eye-d-sdk.readthedocs.io/en/latest/sdk/install_win_exe.html>
+
+Edit “Cameras/CameraDefines.hpp” file to add OpenCVB’s support for StereoLabs Zed 2 or Mynt Eye D 1000 support.
+
+# Trouble-Shooting a New Install
+
+Some typical problems with new installations:
+
+-   If OpenCVB installation fails, there are simple ways to determine what needs to be changed.
+    -   Each “Build” directory will have a .sln file. If any of the files below are missing, run CMake-gui to find out why:
+        -   \<OpenCVB Dir\>/Azure-Kinect-Sensor-SDK/Build/K4A.sln
+        -   \<OpenCVB Dir\>/librealsense/Build/librealsense2.sln
+        -   \<OpenCVB Dir\>/opencv/Build/opencv.sln
+    -   Review the “Path” – both global and user values – and remove older Visual Studio installations.
+    -   Figure out which component is failing:
+        -   Review the output of the “Update_All.bat” run. Which component didn’t complete?
+    -   Post any problems encountered. Install problems have the highest priority.
+-   Camera Failure: check the camera installation by testing the examples provided by the camera vendor. Did the Kinect4Azure support get upgraded recently? Post if some configuration problems prevent the camera from working in OpenCVB.
+-   Python Scripts Fail: if any Python scripts fail, open a command line window and run the script. The error messages will indicate which package is missing from your Python installation. Any Python script problem is likely to be a missing package. But the challenge is identifying which package.
+-   Link problems: the C++ code in OpenCVB relies on PragmaLibs.h which is automatically created as part of the build process. “PragmaLibs.h” defines the names of the OpenCV libraries. It should be updated automatically with the current OpenCV version that is in use. If not, run the “VersionUpdates” application included in the OpenCVB.sln file. “VersionUpdates” will update the names of the files from OpenCV to be linked into the OpenCVB interfaces. Open the “PragmaLibs.h” file to see the current version of OpenCV that is expected to be present.
+
+# Building New Experiments with Snippets
+
+OpenCVB is a WinForms application and most of the algorithms were written using Microsoft's managed code, but C++ and Python examples are provided as well. New algorithms can be added using code snippets or the “Blue Plus” button in the user interface.
+
+For C++, C\#, and VB.Net writing a new experiment requires a new class to be added in the “VB_Classes” project. OpenCVB will automatically detect the new class and present it in the user interface. The code is self-aware in this regard – the UI_Generator project is invoked in a pre-compile step for the VB_Classes project. Just add code for a new algorithm and it will automatically appear in the user interface.
+
+Python examples don’t even require a VB.Net wrapper. But they do need to be added to the VB_Classes Project. Python algorithms, once added to the VB_Classes project, will appear in the user interface. Adding Python scripts to VB_Classes also makes it easy to edit the script. (Note that Python examples start with “z_” to isolate them in the VB_Classes project.)
+
+There are several VB.Net examples that demonstrate how to move images to Python and get results back into the OpenCVB user interface (see “z_AddWeighted_PS.py” as an example that is only a few lines of code.)
+
+Code “snippets” are provided to accelerate development of new VB.Net, OpenGL, and C++ algorithms. To use any snippets, first install them in Visual Studio:
+
+-   Click the menu “Tools/Code Snippets Manager”.
+-   Select “Basic” as the Language.
+-   Add the “\<OpenCVB Dir\>/OpenCVB.snippets” directory.
+-   Access the code snippets with a right-click in the VB.Net code, select “Snippet/Insert Snippet” and select “OpenCVB.snippets”.
+-   Even C++ algorithms can use snippets, but each C++ algorithm has a VB.Net entry that includes both the C++ and the VB.Net code in the snippet. The C++ portion is to be cut and pasted anywhere in OpenCVB’s “CPP_Classes” Visual Studio project.
+
+To see the complete list of algorithm types that can be added to OpenCVB, click on the “Blue Plus” button in the user interface. A dialog box will guide the selection of the type of algorithm to be added.
+
+# Experimental Subsets
+
+The complete list of algorithms may be grouped into smaller subsets to study some shared API. Algorithm subsets are selected through the Subset Combo Box in the toolbar (indicated below.) The list of subsets is built from all the OpenCVB algorithm names and all the OpenCV API’s referenced. For instance, selecting “Threshold” in the Subset Combo Box, will update the Algorithm Combo Box with all the algorithms that use the OpenCV “Threshold” API.
+
+![](media/f9431efec6cb8ae1599689669c57c1db.png)
+
+*In the image above, the Subset Combo Box selects all algorithms that use the “Edges_Sobel” algorithm. The Algorithm Combo Box shows the “Gradient_Depth” algorithm, one of the algorithms that uses “Edges_Sobel”. When the Subset Combo Box is set to “\<All\>”, the Algorithm Combo Box will contain all the algorithms in OpenCVB.*
+
+The ability to create subsets from the hundreds of algorithms makes it easier to study examples of an OpenCV API or OpenCVB algorithm usage. In addition, the Subset Combo Box has several higher-level groupings. For example, “\<Python\>” selects all Python algorithms. Or “\<OpenGL\>” selects only the OpenGL algorithms. The “\<All\>” entry in the Subset Combo Box will restore the complete list of algorithms.
+
+# Regression Testing All Experiments
+
+Testing is integrated into OpenCVB. Clicking the icon below runs all the algorithms on all the attached depth cameras on the system at all the supported resolutions. The duration of each test can be selected in the Global Options dialog.
+
+![](media/f54f2d71170e1f23b640f4e07cf295d5.png)
+
+When using a subset of the algorithms, the “Test All” button will test only the algorithms in the subset. This can be useful when changing an algorithm that is reused by other OpenCVB algorithms. For instance, if the Edges_Sobel algorithm is changed, select “Edges_Sobel” in the Subset Combo Box, then click the regression test button to visually review each algorithm using the updated Edges_Sobel.
+
+One side benefit of the “Test All” feature is that it provides a way to visually review all the algorithms. When you can’t remember the name of an algorithm, use the subset feature to search for it. Any OpenCV API or OpenCVB algorithm name can be selected in the Subset Combo Box.
+
+# Why VB.Net?
+
+VB.Net is not a language typically associated with computer vision algorithms. But the abundance of examples in OpenCVB suggests this may be an oversight. Even the seasoned developer should recognize what is obvious to the beginner: VB.Net can keep the code simple to read and write. Papers and articles on software often use pseudo-code to present an algorithm. In many respects, VB.Net code resembles pseudo-code except it is an actual working implementation of the algorithm.
+
+VB.Net provides a full-featured language just like C\# with lambda functions and multi-threading except VB.Net uses only a subset of the special keys available on the keyboard. Contrasted with Python or C++, VB.Net need make no apologies for using real words instead of the keyboard hieroglyphics defined in Python or C++. Using real words makes the VB.Net syntax easier to recall. VB.Net includes user interface tools that are flexible and complete (check boxes, radio buttons, sliders, TrueType fonts, and much more) - options missing from OpenCV's popular HighGUI library. (All existing HighGUI interfaces are still supported in OpenCVB.)
+
+The main caution in using VB.Net is to treat it as a scripting language like Python. Most of the algorithms avoid pixel-by-pixel details – VB.Net can be detailed but it will be slower than optimized C++. Usually, OpenCVB is doing most of the real work in optimized C++ through the OpenCVSharp interface. Most algorithms run reasonably fast even in Debug mode because the release version of OpenCVSharp is active when OpenCVB is in Debug mode.
+
+Critics will point out that a Windows 10 app using VB.Net is not easily portable to other platforms. The entire OpenCVB application does not need to be ported to other platforms. Only individual algorithms are likely to be ported after they are debugged and polished. Most OpenCVB algorithms consist almost entirely of OpenCV APIs which are available everywhere. OpenCVB’s value lies in the ability to experiment and test an OpenCV algorithm. After the prototype is complete the algorithm can be transferred to a different platform.
+
+OpenCVB also includes the ability to translate VB.Net algorithms to C++. A new icon is present in the OpenCVB user interface but invoking the “VB_to_CPP” project in the “OpenCVB.sln” file is more convenient. The translation is a 90% translation where the user must manually replace some VB.Net lines. All of the algorithms that are translated into a C++ include file called “CPP_IncludeOnly.h”. Using an “include-only” approach makes it simpler to include the translated algorithms into a C++ application.
+
+# Camera Interface
+
+All the camera code is organized with the “camera” class – see cameraRS2.vb, cameraKinect.vb, cameraMynt.vb, cameraOakD.vb, or cameraZed2.vb. There are no references to camera interfaces anywhere in the code except for the main user interface form – OpenCVB.vb. Isolating the camera support from the algorithms strips the algorithm code to just the essential OpenCV API’s needed.
+
+For example, the Kinect for Azure camera support is in the cameraKinect.vb class. The C++ interface to the Kinect for Azure camera is in a supporting Kinect4Azure DLL. Since there is likely to be little interest in debugging the Kinect4Azure DLL, the Release version is used even in the Debug configuration. If it is necessary to debug the camera interface, open the Build/Configuration Manager menu and modify the desired camera entry to use the Debug version. Using Release versions naturally enables a higher framerate and as a result, the VB.Net code – which is in Debug mode - is almost as fast as the Release configuration.
+
+# OpenGL Interface
+
+There have been several attempts to provide OpenGL interfaces into managed code, but none is used here. OpenGL is simply run in a separate process. To accommodate running separately, a named-pipe moves the image data to the separate process and a memory-mapped file provides a control interface. The result is both robust and economical leaving the OpenGL C++ code independent of camera hardware specifics. The VB.Net code for the OpenGL interface is less than a page and does not require much memory or CPU usage.
+
+To accommodate building new OpenGL experiments, OpenCVB includes an interface shown below in the section on creating new C++ “IncludeOnly” algorithms. The interface is triggered with one of the “Blue Plus” icon in the OpenCVB main form. The interface can add a variety of algorithms as indicated below.
+
+# Python Interface
+
+OpenCV has numerous examples of Python scripts and Python is often used for computer vision experiments. To add a new Python script for use with OpenCVB, add the Python script to the VB_Classes project so any changes to a Python script will automatically show the new or renamed Python files in the user interface. Python scripts don’t require a VB.Net wrapper – just add a new script to the VB_Classes Project – and it will appear in the user interface.
+
+Python scripts can get a stream of images from the camera and return resulting images. There are numerous examples of how to do this: see z_AddWeighted_PS.py or z_Camshift_PS.py for the simplest examples. The “_PS” suffix is an OpenCVB convention that indicates it is a Python Streaming script that expects a stream of RGB and Depth images and will return images. NOTE: The Python script name MUST end with “_PS.py” to stream images to and from Python code. To see the list of all the Python Streaming scripts, select the pre-defined subset group called “\<PyStream\>”.
+
+Some care is required when first using an OpenCVB “PyStream” script. The algorithm thread is writing to a pipe received by the Python script. However, if the right version of Python is not set in OpenCVB or some of the packages are missing, it will appear to hang the algorithm thread in OpenCVB. The problem is almost always a missing Python package.
+
+# Python Installation
+
+If any of the Python scripts fail, open a command line window and run the script. The error messages will indicate what is wrong. The most likely problem is a missing package. Use Visual Studio’s “Tools/Python” menu to manage your Python packages.
+
+Python scripts are run in a separate address space when invoked by OpenCVB just like OpenGL. Visual Studio’s Python debugging environment is not available directly when running OpenCVB. When a Python script fails in OpenCVB, it will disappear, but it may be tested in a command line window to reveal the error messages.
+
+# Creating C++ “IncludeOnly” Algorithms
+
+There are some tools included with OpenCVB which make it a lot easier to add C++ algorithms. The toolbar includes 2 icons for this purpose:
+
+![](media/6ea4526065a1fa32388a4a5305706527.png)
+
+**Toolbar additions:** *The “Blue Plus” sign is used to add new algorithms. The yellow “*T*” is an interface to the translator to move the current algorithm from VB.Net to C++. The translator is OpenCVB-specific and relies on the patterns and structure of the VB.Net algorithms.*
+
+Adding a new algorithms to OpenCVB can take any of the several forms outlined in the figure below. The last button at the bottom of the dialog box is labeled “Add ‘IncludeOnly’ C++ algorithm”. It use is to incorporate the results of any C++ algorithm translated from VB.Net.
+
+![Graphical user interface, text, application Description automatically generated](media/9fa333328191857e1ec6f8a25e821970.png)
+
+**Building New OpenCVB algorithms:** *The form above is accessed by clicking on the “Blue Plus” sign in the main toolbar for OpenCVB. The bottom button is the most recent addition. It assists in creating the necessary entries to start a new C++ “IncludeOnly” algorithm. All the “IncludeOnly” algorithms can be moved to any C++ application outside of OpenCVB just by adding one include file from OpenCVB – “CPP_IncludeOnly.h”. An imgui application using the include-only file is available in the OpenCVB solution.*
+
+# The quickest way to add a new C++ algorithm is to use the “VB_to_CPP” project included in the “OpenCVB.sln” file.
+
+-   Run OpenCVB, click the “Blue Plus” icon, and click the “Add ‘IncludeOnly’ C++ algorithm” button in the figure above.
+-   Set the “Startup Project” in OpenCVB’s Visual Studio solution to “VB_to_CPP”.
+    -   The output of “VB_to_CPP” includes the VB.Net version on one side and the C++ equivalent on the other side.
+-   Copy the C++ output text to the “CPP_IncludeOnly.h” file included in “CPP_Classes” project in the OpenCVB solution.
+-   The algorithm is translated into C++ but there are usually errors. To fix these errors, there are 2 methods:
+    -   Tweak the VB_to_CPP.vb code to update this and all future VB.Net translations.
+    -   Or: tweak the C++ code in “CPP_IncludeOnly.h” to update only the current algorithm.
+-   Rerun the “VB_to_CPP” application until the C++ code compiles and works.
+-   Currently, there is no support for options for C++ IncludeOnly algorithms.
+    -   Options are dependent on the user interface.
+    -   Variables that are typically options will be marked with “options_\<option_name\>” at the start of the variable name.
+    -   The option values in the VB.Net algorithm can be used to fine-tune and placed in hard-coded values in the C++ code.
+
+There are over 1000 VB.Net algorithms included in OpenCVB and there are currently less than 100 C++ translated algorithms. It is expected that future releases of OpenCVB will include more C++ editions of VB.Net algorithms. Translating any of the VB.Net algorithms to C++ provides an excellent code review of both the VB.Net and C++ code.
+
+# Visual Studio C++ Debugging
+
+The Visual Studio projects can be configured to simultaneously debug both managed and unmanaged code seamlessly. The property “Enable Native Code Debugging” for the managed projects controls whether C\# or VB.Net code will step into C++ code while debugging.
+
+However, leaving that property enabled all the time means that the OpenCVB will take longer to start – approximately 5 seconds vs. 3 seconds on a higher-end system. The default is to leave the “Enable Native Code Debugging” property off so OpenCVB will load faster. Of course, if there is a problem in the C++ code that is best handled with a debug session, turn on the “Enable Native Code Debugging” property in the OpenCVB VB.Net project and invoke the algorithm requiring C++ debugging.
+
+# StereoLabs Zed 2 and 2i Support
+
+The StereoLabs Zed 2 cameras are now installed by default. To install the support manually:
+
+-   Download the StereoLabs SDK from <https://www.stereolabs.com/developers/release/>
+    -   Be sure you have an NVIDIA card – StereoLabs requires one for CUDA.
+-   Edit the CameraDefines.hpp file to turn off Zed 2 camera support.
+    -   Comment out the line that references Stereolabs.
+
+The Zed 2 camera support is always installed in C:\\Program Files (x86)\\ZED SDK (regardless of the version) so no additional changes are required to the supporting C++ project.
+
+# Mynt Eye D 1000 Support
+
+The Mynt Eye D 1000 camera is supported but the support is turned off by default to simplify installation. To enable this support:
+
+-   Download the Mynt SDK:
+    -   <https://mynt-eye-d-sdk.readthedocs.io/en/latest/sdk/install_win_exe.html>
+-   Edit the CameraDefines.hpp file to turn on the interface to the Zed 2 camera.
+
+The Mynt D SDK creates a system environmental variable MYNTEYED_SDK_ROOT that allows the OpenCVB build to locate the Mynt D camera support no matter where it was installed. The Mynt cameras are no longer manufactured but are still available.
+
+# TreeView
+
+The TreeView shows the different layers of the algorithm and how it was built from other OpenCVB algorithms. Here is a simple algorithm tree view that shows how the KNN_PointTracker algorithm was built:
+
+![Graphical user interface, text, application, email Description automatically generated](media/5f4b6c13e3d0e852b0705339f893603e.png)
+
+*The tree above describes how the algorithm calls KNN_1_to_1 and how KNN_1_to_1 calls KNN_BasicsQT and so on. Clicking on any of the tree entries will show the output of the selected algorithm in OpenCVB’s output (if that algorithm is active.) This is useful to understanding the various steps needed to build the output.*
+
+*Play with this when running OpenCVB. It is a fun feature and helps increase understanding of the composition of increasingly complex algorithms.*
+
+# Pixel Viewer
+
+The Pixel Viewer allows detailed inspection of any of the 4 OpenCVB images. The dimensions of the rectangle depend on the window that the user has sized for the Pixel Viewer output – the larger the window, the larger the rectangle. Supported formats include CV_8U, CV_8UC3, CV_32F, and CV_32FC3 but more could be added if needed.
+
+![](media/a6f56e72871b653bdc9c8ede74ed5645.png)
+
+# How to Contribute
+
+Adding more examples is the goal and that is the best way to contribute to this effort. There are plenty of examples to use as a model but there are also snippets that assist in the process of adding new examples (See “Building New Experiments with Snippets” above.) Any pull request that adds an algorithm will be welcome and quickly reviewed. Changing OpenCVB’s infrastructure – not the algorithms – is discouraged but always welcome. It is much more difficult to test infrastructure that can cripple all the algorithms. Adding support for a new camera is a notable exception. New cameras should have depth, point cloud support, and an IMU.
+
+# Future Work
+
+The plan is to continue adding more algorithms. There are numerous published algorithms on the web but there is also the task of combining different algorithms in OpenCVB. The current edition of the code contains examples of compound algorithms, and more will arrive in future releases. The code almost enforces reuse because any algorithm with sliders or check boxes encourages reuse rather than duplicate a similar set of sliders and check boxes. The options for combined algorithms are automatically cascaded for easy selection.
+
+# Acknowledgements
+
+The list of people who have made OpenCVB possible is long but starts with the OpenCV contributors – particularly Intel employees Gary Bradski, Victor Erukhimov, and Vadim Pisarevsky - and Intel’s decision to contribute the code to the open source community. Also, this code would not exist without OpenCVSharp’s managed code interface to OpenCV provided by user “shimat”. There is a further Intel contribution to this software in the form of RealSense cameras – low-cost 3D cameras for the maker community as well as robotics developers and others. RealSense developers Sterling Orsten and Leo Keselman were exceptionally helpful in educating this author. While others may disagree, there is no better platform for developing computer vision software than the one provided by Microsoft Visual Studio and VB.Net. And Microsoft’s Kinect for Azure camera is a valuable addition to the 3D camera effort. And lastly, Google’s contribution to this effort was invaluable. Thanks to all the computer vision developers who posted algorithms where Google could find them. From this author’s perspective, the work of all these individuals and organizations is like catnip and feathers to a kitten.
+
+# MIT License
+
+<https://opensource.org/licenses/mit-license.php> - explicit license statement
+
+# Addendum 1: Change Log
+
+# Recent Changes - September 2020
+
+-   Dropped support for Intel T265 camera (no point cloud) and the Intel RealSense L515 (no IMU). All supported cameras should have a point cloud and IMU.
+-   TreeView – some of the algorithms are a combination of several other algorithms. A TreeView was built to display the hierarchy.
+-   There are now over 750 algorithms implemented.
+
+# Recent Changes – December 2020
+
+-   Over 800 algorithms – almost all less than a page of code.
+-   Depth updates are guided by motion – produces more stable 3D images. See Depth_SmoothMin algorithm.
+-   Recently used algorithms are listed in the menus.
+-   More snippets to help adding options to existing algorithms.
+-   Algorithm options are now collected in a single form – easier usage on laptops or smaller screens.
+-   Intel Realsense cameras are supported in native 640x480 modes (as well as 1280x720.)
+
+# Recent Changes – January 2021
+
+-   Over 870 algorithms – almost all less than a page of code.
+-   The new “Best Of” module contains the best example of common techniques. Need an example of contours, look in the BestOf.vb first.
+-   OpenCV’s new Oak-D camera has arrived. Some python scripts were added for users that have installed it.
+    -   <https://docs.luxonis.com/en/latest/pages/api/> - to get the official support.
+-   Motion detection is easier to use with an “AllRect” cv.rect that encompass all RGB changes.
+-   Image segmentation is more stable and consistent from frame to frame. See ImageSeg.vb.
+-   OptionsCommon.vb defines options common to all algorithms.
+-   StructuredDepth shows promise as a path to exploiting structured light technology.
+-   PythonDebug project is now integrated into the OpenCVB.sln. Python debugging is easier.
+
+# Recent Changes – February 2021
+
+-   Over 900 algorithms – almost all less than a page of code
+-   New pixel viewer to inspect image pixels in 8UC1, 8UC3, 32F, and 32FC3 formats
+-   Versioning policy set - The Repository IS The Release - TRISTR
+-   Improved threading support for switching between camera interfaces
+-   Oak-D camera support is working – still missing IMU and point cloud support
+-   VTK support was improved – still optional (it is a lot to install)
+-   Upgraded to the latest RealSense2, OpenCVSharp, and Kinect4Azure software
+-   Motion Filtered Data series of algorithms – an attempt at reducing data analysis at input
+
+# Recent Changes – March 2021
+
+-   Almost 940 algorithms – almost all less than a page of code
+-   Stream-lined install: no environmental variable, library builds are automated.
+-   Latest version of the OpenCV library - 4.5.2
+-   Improved Python support – now using “requirements.txt”
+-   An experimental Python interface to the LibRealSense2 cameras has been added
+-   VTK support is being dropped – it is too big and cumbersome. Recommended: Python Pyglet
+-   Oak-D camera Python interface is present but turned off pending IMU support from the vendor
+-   “PyStream” support is now a 2-way pipeline. Output can appear in the OpenCVB interface
+-   Tensorflow database downloads are automated with algorithm “Download_Database”
+-   Emgu examples removed. LineDetector library removed – it was redundant
+-   Version 1.0.0 defined and released
+
+# Recent Changes – May 2021
+
+-   980 algorithms – almost all less than a page of code
+-   Global variables introduced – settings that apply to all algorithms, line width, max depth, font size.
+    -   Global variables are remembered across runs and can be reset to known working values
+-   Fewer lines of code. Code size dropped about 4000 lines with more algorithms. Average algorithm: 31 lines.
+-   Algorithms are now ranked by usage (“Reuse Rank”) and “Value Rank”, a graded estimate of algorithm value.
+    -   Rankings are entries in the Group ComboBox.
+-   New Survey function to build images of all algorithm output to allow visual searches for desired algorithm.
+-   Global setting for palette control
+-   Improved regression testing – all algorithms are tested with each attached camera at all supported resolutions.
+-   Navigation aids now available – back to previous algorithm, forward to next, and full history.
+-   Image microscope works even when stream is paused, allowing more detailed image analysis.
+-   Improved tree view to study how algorithm was constructed from other algorithms.
+
+# Recent Changes – July 2021
+
+-   Over 1000 algorithms – almost all less than a page of code. Average algorithm is 31 lines of code
+-   TreeView now shows algorithm cost in addition to algorithm components
+-   Improved intermediate views – click anywhere in TreeView to see intermediate outputs
+-   Depth Object algorithm identifies areas of interest 4 different ways with mask and enclosing rectangle
+-   All algorithms can extend their output to all 4 images (only 2 were available before)
+-   Upgraded to the latest versions of OpenCV, librealsense, and Kinect4Azure libraries
+-   Framerate for all cameras upgraded to 60 fps
+
+# New Feature Highlight – TreeView
+
+![Graphical user interface, text, application Description automatically generated](media/3eb7294b2237579c05882b17d6784b88.png)
+
+The TreeView now shows the cost of each component in the algorithm, including global algorithms, in the right side of the TreeView. In the list of component costs above, the “Non-Algorithm” time is the largest individual item. Non-Algorithm refers to all the other costs in the OpenCVB application which includes the user interface and the cost of obtaining the camera images and IMU data.
+
+The active algorithm at the time this TreeView was captured was “TimeView_Basics” – also the top entry in the tree view at the left of the image above. TimeView_Basics is the active algorithm, but it obtains the histogram of both the Side and Top Views (see Histogram_TopView2D and Histogram_SideView2D costs) which are projections of the point cloud (see Depth_PointCloud_IMU cost.) The point cloud was rotated using the gravity vector in the IMU_GVector algorithm at a cost of only 1%.
+
+Some of the algorithms above are executed for all algorithms and will be present in every cost analysis. The IMU_IsCameraLevel and IMU_IsCameraStable are low-cost algorithms that make global variables available that can determine if the camera is level or if the camera is moving. OptionsCommon_Depth operates on the depth using the maximum specified range (a global setting in the user interface.) It is run on every frame regardless of the algorithm because depth data is commonly used and an important component in OpenCVB.
+
+At the bottom of the new TreeView form is a checkbox that allows the time to accumulate or be refreshed with only the latest time interval (approximately 1 second.) If the algorithm contains a variety of different approaches, leaving this item unchecked will allow quick review of the cost of each algorithm variation. Leaving the box checked will accumulate all the time used since starting the algorithm.
+
+With this new TreeView, the cost analysis is available for every algorithm in OpenCVB – automatically.
+
+All previous features of the TreeView are still fully supported in the new edition. The tree view controls what output is shown in the user interface. The default output is always the main algorithm – in this case “TimeView_Basics”. Clicking on “Histogram_SideView2D” will show the intermediate output from the Histogram_SideView2D component. When building a new algorithm, clicking through the TreeView can determine which step in the process did not provide the expected output.
+
+# Recent Changes – September 2021
+
+-   Almost 1100 algorithms – almost all less than a page of code. Average algorithm is 31 lines of code
+-   Improvements to the TreeView indicate how many cycles are available (see Highlight below.)
+-   The reduced point cloud predictably divides an image for analysis.
+-   “Reuse Rank” in algorithm groups shows all algorithms reused at least twice.
+-   Quarter Resolution option finds bottlenecks without code change.
+-   First example of using low resolution internally while displaying full resolution
+-   RGB Depth can be displayed with numerous different palettes. You can create your own.
+
+# New Feature Highlight – Is my Algorithm Processor-bound?
+
+![Graphical user interface, text, application Description automatically generated](media/86cfe66d9c20f7affbe58f7c35f0d564.png)
+
+*Example 1: Room to grow (at left)*
+
+*Example 2: Saturated processor (at right)*
+
+The key to understanding whether an algorithm is processor-bound is provided in the images above. **Example 1** shows the algorithm spent over 88% of its time in the “inputSyncWait” algorithm. This is the algorithm task function that waits for additional input from the camera task. Note that the frame rate is 66 FPS. In **Example 2**, the “inputSyncWait” algorithm is way down the list at 1.0% indicating that whenever the algorithm task finished a set of buffers, a new set of buffers is almost immediately available. Note that the frame rate is only 20 FPS in Example 2. The second algorithm is processor-bound while the first is not.
+
+# Recent Changes –November 2021
+
+-   Almost 1100 algorithms – almost all less than a page of code. Average algorithm is 31 lines of code
+-   The reduced point cloud predictably divides an image for analysis.
+-   “Reuse Rank” in algorithm groups shows all algorithms reused at least twice.
+
+# Feature Highlight – OpenCVB Algorithm Rank
+
+![Graphical user interface Description automatically generated](media/68cd4fbfec6491a47bd5299edef1a617.png)
+
+*New to OpenCVB: start with the Algorithm Ranks*
+
+With over a thousand algorithms in OpenCVB, it can be overwhelming for a new user to explore. To help, there are 2 kinds of rankings inside OpenCVB. The “Reuse Rank” shows how often algorithms reuse another algorithms. This is a useful measure of how general or useful the algorithm is. The “Value Rank”, on the other hand, is manually inserted in each algorithm. The snippet code automatically assigns a value of 1 to a new algorithm since this is the lowest ranking. There is no upper limit on the Value Rank.
+
+What is the algorithm most often reused in OpenCVB? The “Thread_Grid” which is used to divide up images for use with multi-threading. To see all the algorithms using this algorithm, select “Thread_Grid” in the rightmost combo box. The leftmost combo box will show all the algorithms that use “Thread_Grid”. The second highest “Reuse Rank” has 2 entries – “Kalman_Basics” and “Reduction_Basics”. Both are often used throughout OpenCVB. Setting the rightmost combo box to “Kalman_Basics” will update the leftmost combo box with the list of all algorithms using “Kalman_Basics”. Similarly, setting the rightmost combo box to “Reduction_Basics” will update the leftmost combo box with the list of all the algorithms using “Reduction_Basics”.
+
+The Value Rank is manually updated so there are some lag between an algorithm’s arrival and an update to its value rank.
+
+# Recent Changes –November 2021
+
+-   Almost 1100 algorithms – almost all less than a page of code. Average algorithm is 32 lines of code
+-   This version includes point cloud heat maps (see Highlight below)
+-   All the Structured.vb algorithms were updated to use heat maps
+-   TimeView algorithms were removed now that heat maps are available.
+-   Updated to use the latest RealSense interface.
+
+# Feature Highlight – Point Cloud Heat Maps
+
+![A screenshot of a computer Description automatically generated with low confidence](media/19939738c000ae1e2b5ba1f422a0d0b1.png)
+
+*The bottom left image is a heat map for the side view of the point cloud data while the bottom right image is the same but for the top down view.*
+
+The heat map is a well-known method to display populations – blue is cool or low population while red is hot and high population. The plots are actually just histograms of the point cloud data projected into a plane at the side (bottom left) and top (bottom right) of the point cloud. The field of view of the camera is outlined in the markings and the distances are noted as well. The projection can be rotated to align with gravity. The short red lines emanating from the camera can show the field of view (FOV) after rotation. The snapshot was taken using the low-resolution Intel RealSense D435i.
+
+# Recent Changes –January 2022
+
+-   Oak-D and Oak-D Lite support is now included.
+-   All OpenCVB’s 1100+ algorithms are now accessible using the Oak-D and Oak-D Lite cameras
+-   Oak-D installation automated with “Update_OakD.bat”
+-   Oak-D point cloud is created on the host from the captured depth data
+-   Oak-D cameras are supported through a separate Python process using a pipe to move images to OpenCVB
+    -   Breakpoints do not interfere with camera image capture as it would if depthai-core provided the camera images
+    -   RGB, depth, disparity, and rectified left and right images are provided on every iteration.
+    -   Oak-D Lite has no IMU but IMU data is provided for the original Oak-D camera with every frame
+    -   Calibration data for the RGB camera is available as well (used for the point cloud computation.)
+-   OpenCVB’s “RGB depth” image (upper right) now represents the point cloud data – useful data (not just a pretty picture)
+-   The Python interface for OpenCVB is now built with requirements for Python 3.9. See installation instructions in “Python Installation” below.
+
+# OpenGL View of Oak-D Lite Point Cloud
+
+![A picture containing text Description automatically generated](media/5eeb6559193188b7fd363812509ccf9a.png)
+
+*An OpenGL screen capture shows the output of the point cloud data from an Oak-D Lite camera.*
+
+![A picture containing text, indoor, computer, screenshot Description automatically generated](media/cfc5629359716924e7bb4139f6115a96.png)
+
+*The images above were captured at the same time as the OpenGL image above. The upper left image is the RGB captured from the Oak-D Lite camera and the upper right is the point cloud (computed on the host using the calibration metrics provided by the camera.) The bottom left image is a representation of the depth data used to create the point cloud.*
+
+# Recent Changes –February 2022
+
+-   Switched to Visual Studio 2022! The Community Edition is free and an easy install.
+    -   Post with any problems transitioning to VS 2022. They will be high priority.
+-   Further testing and improvements to the Oak-D interface
+-   Most changes were focused on the RedCloud algorithms to build consistent cells in an image.
+-   Point cloud filtering is available for each frame as an option
+-   Added a heartbeat available to all algorithms for once-a-second activity.
+-   Added a global motion test to update a motion threshold flag available to all algorithms. Redo an image if flag is set.
+
+# Recent Changes – March 2022
+
+-   Reviewed and reworked the RedCloud algorithms for speed and simplicity.
+-   Convex Hull algorithm applied to the RedCloud output (see below)
+-   New ML_Basics example
+-   Simplified KNN interface and added working examples of 3- and 4-dimensional data.
+-   Reviewed and reworked all the FloodFill algorithms. Code structure is now like RedCloud algorithms.
+-   More TrueType text usage throughout.
+
+![Graphical user interface, application Description automatically generated](media/5db655fc1b209508cc62adeeab3f7a2a.png)
+
+*The image in the bottom left is the output of the RedCloud_Basics algorithm where each cell is consistently identified by applying reduction in X and Y to the point cloud image. The bottom right image shows the RedCloud output after processing with OpenCV’s ConvexHull API. The upper left and right images appear with every algorithm – RGB on the left and the point cloud on the right.*
+
+# Recent Changes – April 2022
+
+-   KNN examples now have higher dimensions – 2, 3, 4 and N dimensions.
+-   KNN improvement provides a 1:1 matching of points in a series of images.
+-   Options handling is a key feature of OpenCVB. All algorithms now have a single flag that indicates any options were updated.
+-   OpenCV’s MatchTemplate can be used for tracking. See Match_TrackFeatures and image below.
+-   SVM algorithms were reviewed and simplified with better presentation.
+-   To see previous editions of the “Recent Changes”, see Addendum 3 below
+-   Install problems get high priority. Please notify of any problems with ‘UpdateAll.bat”
+
+![A collage of pictures of a person playing a piano Description automatically generated with low confidence](media/e157d44e1f6726405eba1755fb3e652c.png)
+
+*In this first version of the Match_TrackFeatures algorithm, OpenCV”s MatchTemplate (correlation coefficient calculator) is used to track the output of OpenCV’s GoodFeatures. The points are matched with the previous frame using KNN 1:1 matching. In the lower right image, the blue dots were matched to the previous frame while the yellow dots were not matched. In the lower left frame, the correlation coefficient of the region around the feature is shown using the previous and current frame.*
+
+# Recent Changes – May 2022
+
+-   The first tutorial on OpenCVB is now available in the OpenCVB tree. See “Tutorial – Introduction”
+-   EMax algorithms reviewed – now more general and useful with consistent colors. A new example is provided.
+-   Related algorithms in different series can now be merged and presented simultaneously – see “Related.vb” examples.
+-   Global options are now reset to default values before each algorithm is started.
+-   Updated KNN_One_To_One – simpler to use
+-   Lines in an image can now be identified and tracked
+-   LaneFinder example identifies road lane markers (used for the new tutorial.)
+-   Thread_Grid output now available during all algorithms.
+-   To see previous editions of the “Recent Changes”, see Addendum 3 below
+-   Install problems get high priority. Please notify of any problems with ‘UpdateAll.bat”
+-   OpenCV’s “GoodFeatures” can now be traced as the camera moves – see below.
+
+![A picture containing text, indoor Description automatically generated](media/d6e10c5e6c55c695cf34438913f1142c.png)
+
+*In this example from “Features_GoodFeatureTrace”, the upper left image shows the good features to track in the current image. The lower right image shows a trace of those same points as the camera is rotated. The motion of the camera is more pronounced in the lower left image.*
+
+# Recent Changes – June 2022
+
+-   Over 1200 working algorithms. Average algorithm length is 31 lines of code.
+-   A new tutorial was added describing how to find the longest vertical line:
+    -   <https://github.com/bobdavies2000/OpenCVB/tree/master/Tutorials/(3)%20Longest%20Vertical>
+    -   Several new algorithms were add including one using OpenGL to display the 3D results.
+-   A new tutorial was added describing how to find vertical and horizontal lines in 3D
+    -   https://github.com/bobdavies2000/OpenCVB/tree/master/Tutorials/(2)%20Lines
+    -   Accompanying algorithms were also added to Feature.vb – Feature_Lines_Tutorial1, Feature_Lines_Tutorial2, and Feature_Lines
+-   There is now a global option to use high Brightness/Contrast image input. See Entropy_Highest and toggle the global “Use RGB Filter” checkbox.
+-   Similarly, there are several other global options to sharpen detail or adjust white balance or filter the RGB data.
+    -   Any algorithm can be tested with the altered RGB input.
+    -   Additional RGB filters may be added with a single line of code
+    -   The default is to not use any RGB Filter
+-   Double pendulum algorithm added using GitHub example code.
+-   Highlight color is automatically switched to handle variable backgrounds.
+-   Robust line-tracking is available in the Feature_Line algorithm
+-   Robust point-tracking is available in Feature\_ MatchTemplate (see next image)
+
+![A person sitting at a desk Description automatically generated with medium confidence](media/59cba4a31bb6db590f1854dd0930a298.png)
+
+**Feature_MatchTemplate:** *In this example, the highlighted rectangles in the left image are tracked. The correlation coefficient for each rectangle is in the right image. When a correlation coefficient drops below a threshold value (see “Match_Options”), the tracked point is dropped. If more than a percentage of the tracked points are lost, tracked points are recomputed using OpenCV’s GoodFeatures.*
+
+![A picture containing text Description automatically generated](media/8459e8185e6c564e6817463f2a28defd.png)
+
+**Related_MouseClick:** *In this example, 4 different algorithms are featured. They are “Related” algorithms in the sense that all 4 use the mouse to perform various tricks – the upper left image uses the mouse to highlight an entry in the histogram for back projection, the upper right uses the mouse to slice through the projected side view, the lower left provides the back projection for the mouse selection from the histogram (look at the floor), and finally the lower right uses the mouse for both the x and y coordinates to use in a 2D histogram. The “Related” series of algorithms might be a good place to start looking when the output is remembered but not the name of the algorithm. The Related algorithms are new with the June release of OpenCVB.*
+
+# Recent Changes – July 2022
+
+-   Install tested with the latest Visual Studio 2022 (17.2.6) and OpenCV 4.6 release
+    -   Keep Visual Studio 2019 around – only way to keep the .Net Framework 4.0 (required for librealsense)
+    -   OpenCV needed to be cmake’d and built manually – problem in OpenCVUtils.cmake (?)
+-   Over 1200 working algorithms in a single app with average length 31 lines of code.
+-   4 tutorials describing how to build new algorithms. See the ‘Tutorials’ directory.
+-   “QT” algorithms were introduced to help reduce the clutter in the options presentation. Some options don’t always need to be present.
+    -   Full option versions of the algorithm are available with the same name – without the “QT” on the end.
+    -   Want to see all the QT options? See Global Setting “Show Quiesced (QT) Options”.
+-   Expanded IMU alternatives are available. A tutorial describes how to access and compare the choices.
+-   New icon in the main toolbar –blue with a white plus sign. See the toolbar in the image below. What does it do?
+    -   Clicking “plus” will inject the infrastructure for a new algorithm – better than a snippet.
+    -   Open the dialog and then select the type of new algorithm: VB.Net, C++, OpenGL, C\#, or Python
+    -   Restart OpenCVB and the new algorithm is ready to run!
+-   OpenGL examples were reworked to make it easier to create new OpenGL algorithms and reuse more code.
+-   RGB lines are classified as horizontal or vertical using the point cloud – see image below.
+
+![A picture containing text, indoor, electronics, computer Description automatically generated](media/6b4cff83e9554da8dc0c5c02ca88d50c.png)
+
+**OpenGL_3DLines:** *In the lower left, the horizontal lines are shown in yellow and the vertical lines in blue. In the lower right, the OpenGL output shows the vertical lines in 3D. The OpenGL point cloud is reoriented to gravity so the lines can be verified as vertical or horizontal.*
+
+# Recent Changes – August 2022
+
+-   All the OpenGL algorithms were reviewed and updated with many new features and a simpler interface.
+    -   More code reuse was main objective
+    -   New OpenGL algorithms can be added automatically with the new toolbar button.
+    -   The OpenGL app location is remembered across runs; the OpenGL window will open where it was last used.
+    -   New OpenGL algorithms depict the 3D scene with color-coded triangles and quads.
+    -   Beginner OpenGL algorithms for a colored cube and pyramid were added.
+-   The interfaces for algorithm sliders, checkboxes, and radio buttons are now simpler and easier to use.
+    -   Scrollbars now provide access to overflow options when there are too many to fit in the options form.
+    -   Updated snippets reflect the changes to the algorithm options
+-   RedCloud Hulls improve on cells by creating OpenCV hulls for each cell.
+-   RedCloud cells now have more accurate min and max depth values.
+    -   Depth min is never zero
+    -   Depth max is trimmed using the standard deviation limits
+-   OpenCVB was tested under Windows 11 – no changes required
+-   A complete history of “Recent Changes” is included at the bottom of this document
+
+![](media/0bd64f583dbd5f5c9cbad2fd15a3883e.png)
+
+**OpenGL_QuadMinMax:** *The RedCloud image cells (lower left) are presented in OpenGL (lower right) as OpenGL quads – rectangles with min and max depth. The colors in the RedCloud cells are the same as those in the OpenGL presentation. The highlighted cell shown in white in the lower left is also shown as white in the OpenGL presentation in the lower right.*
+
+# Recent Changes – September 2022
+
+-   Over 1200 algorithms are included with an average of 31 lines of code per algorithm
+-   BackProject_Full builds a histogram and backprojects it into a segmented color image
+    -   A median filter removes most of the textured output
+    -   At low resolution, the BackProject_Full has only a minimal impact on performance.
+-   RedCloud_Hulls output can be input to OpenGL and provide a 3D model of objects in the scene
+    -   The scene is rendered in OpenGL as 3D solids, not just a point cloud
+-   All options were updated to simplify the search for sliders, checkboxes, and radio buttons.
+    -   No more indexed references to any of the option controls
+    -   The options for sliders can now access any number of trackbars using a scroll bar.
+    -   Options are no longer counted in the lines of code or algorithm count
+-   Floor and ceiling are automatically identified using the point cloud and rendered in OpenGL
+    -   See “OpenGL_FlatFloor” and “OpenGL_FlatCeiling”
+-   OpenGL Models include both quads and tiles
+-   Additional improvements to the snippets files for adding Options
+    -   The new “Add Algorithm” button in the main toolbar was also improved
+-   A complete history of “Recent Changes” is included at the bottom of this document
+
+![](media/2e2543648cac643698d4f2cf12b5886f.png)
+
+**RedCloud_ColorAndCloud:** *The output of the “BackProject_Full” can be input into the RedCloud image segmentation and the results are in the lower left image. Previously, the reduced point cloud was the source of all the RedCloud input – it is shown on the lower right image. With the latest version of OpenCVB, both the color data and depth data can be used to segment the image.*
+
+# Recent Changes –November 2022
+
+-   Over 1300 algorithms are included with an average of 31 lines of code per algorithm
+-   A new series of algorithms using the “feature polygon” is available for use in camera stabilization and tracking.
+-   Another new series of algorithms allows C++ algorithms to be constructed and reused the same way as VB.Net algorithms.
+    -   All the C++ algorithms are accessed from VB.Net through the CPP_Basics algorithm.
+    -   All the C++ algorithm output is displayed in the VB.Net interface as is normally done for all algorithms.
+    -   All the CPP_Basics algorithms were modeled on an equivalent VB.Net algorithm.
+    -   All the CPP_Basics algorithms are available to C++ as an “include only” file – just drop it in.
+    -   All the C++ algorithms can be stacked into more complex algorithms just like the VB.Net algorithms
+-   The CPP_Basics algorithms are intended to export any OpenCVB algorithm to other environments.
+    -   A new sample project shows how the “include only” code can be mainstreamed into an imgui C++ application.
+    -   There is a new button in the interface to add algorithms conforming to the CPP_Basics style guide.
+-   There were some improvements to the install process – it is no longer necessary to have MSBuild.exe in the path.
+    -   OpenCVB’s install process assumes Visual Studio 2022 Community Edition is installed in the default location.
+    -   For alternate Visual Studio editions, a change is needed to the “Update_\<package\>.bat” files.
+-   There was no update to this ReadMe.md in October.
+-   Install problems? Pull requests for install problems will get the highest priority.
+    -   NOTE: the current CMake RC 3.25 will fail to install OpenCV. Use the latest release (3.24.3).
+-   A complete history of changes is included at the bottom of this document
+
+![A picture containing text, electronics, display, screenshot Description automatically generated](media/d36c247345b3c413bcfd0838c9c46d1a.png)
+
+**FPoly_Basics:** *The FPoly (Feature Polygon) series of algorithms use the “good” features of the current image to create a vector describing the orientation of the camera. The white double bar line was captured in an earlier frame while the yellow double bar line is the current orientation of the same vector. A rotate and shift allows a rough comparison between frames separated by time. The values in the figure in the bottom left indicate how many generations (or frames) that the Delaunay region has been present in the image. The older the polygon, the more stability the feature polygon will exhibit. In the lower left image, the black region (highlighted with a yellow edge) shows the oldest of the regions.*
+
+# Recent Changes – December 2022
+
+-   Over 1370 algorithms are included with an average of 31 lines of code per algorithm
+-   C++ Translator: an OpenCVB-specific tool translates the VB.Net algorithms to C++
+    -   The patterns used in the VB.Net code translate most of the algorithm to C++
+    -   The translator is specific to the OpenCV API’s and OpenCVB’s structure
+    -   The resulting C++ algorithm is similar in structure to existing VB.Net algorithms
+        -   C++ “IncludeOnly” algorithms can be reused by other C++ algorithms and even VB.Net algorithms.
+    -   OpenCVB’s “Algorithm Starter” tool generates the C++ template (See “Creating C++ ‘IncludeOnly’ Algorithms” section)
+    -   There are now some 50 new C++ algorithms available in an “IncludeOnly” file
+        -   An imgui example shows how to include all 50 algorithms in your C++ application with one include file
+-   FeatureLess regions are mapped and tracked with the RedCloud image segmentation tool (example below)
+-   FloodFill examples now use RedCloud_Basics for image segmentation and tracking (previously they used a similar algorithm.)
+-   ColorMatch algorithms now use RedCloud_Basics as well for image segmentation and tracking.
+-   A monthly history of changes is included at the bottom of this document
+-   OpenCVB’s support for the Oak-D Lite and Oak-D Pro was brought up to date with the latest C++ interface (depthai-core)
+    -   The Python interface is no longer needed as the C++ interface is much more direct.
+    -   The Oak-D cameras are not installed by default – only Kinect for Azure and RealSense are required.
+-   Oak-D testing showed that install problems were present and now resolved.
+    -   Any reported problems with installation get the highest priority.
+-   An excellent overview of the current 3D camera technology and 3D cameras:
+    -   https://www.aivero.com/overview-of-depth-cameras/
+
+![A picture containing text, electronics, screenshot Description automatically generated](media/ba224180471b27b6c66f1caaa140989f.png)
+
+**CPP_RedColor_FeatureLess:** *The scene in the upper left is segmented into different featureless regions using only RGB. The image in the bottom right is the output of the edge-drawing C++ algorithm and is the input to a distance transform. A mask created by the distance transform is used to create the identified regions in the lower left image with RedCloud_Basics.*
+
+# Recent Changes – January 2023
+
+-   Almost 1400 algorithms are included with an average of 31 lines of code per algorithm
+-   Python scripts were all moved to the end of the list of project files in Visual Studio’s Project Explorer
+    -   All the Python scripts begin with “z_” to separate them from the VB.Net algorithms
+    -   The documentation for using OpenCVB with Python scripts was updated (search below for “Python Interface”)
+-   OpenCVB is evolving into a “layered” set of algorithms as more algorithms incorporate other algorithms.
+    -   Use the TreeView button to breakdown the structure of all the contributing algorithms
+    -   Click on the name of an algorithm in TreeView to see the output for that “layer” of the algorithm
+    -   Read the section labelled “TreeView” below for the details and images.
+-   RCR – RedCloud Recursion creates cells within a cell to help isolate surfaces.
+-   A new algorithm group “\<Changed recently\>” for modules that have been recently modified.
+-   A list of core “layered” algorithms is available under the heading “Cortico” (needed something unique)
+-   WarpPerspective_Basics was replaced with a more targeted approach to warping an image
+-   A monthly history of changes is included at the bottom of this document
+
+![A picture containing text, indoor, screenshot, display Description automatically generated](media/20aa54d92af5420755e4f9ff108d0d09.png)
+
+**Profile_Derivative:** *A new series of algorithms was added to work with the contour of RedCloud cells. In this example some key points on the contour of a cell are explored. The upper left image outlines in yellow the selected RedCloud cell in the RGB image. The upper right image shows the RedCloud_Basics output (click to select another cell.) The lower left image shows the derivative of the contour in depth with yellow highlighting where contour points are closest to the camera and blue shows where contour points are farther away from the camera. The information in the lower right image shows the point cloud coordinates of the rightmost, leftmost, highest, lowest, closest and farthest points (see the key in the lower right image for color definitions.)*
+
+# Recent Changes – January 2023
+
+-   Over 1400 algorithms are included with an average of 31 lines of code per algorithm
+-   Oak-D Pro camera support is now installed by default. Oak-D Lite cameras have no IMU but will work as well for most algorithms.
+-   FPoly_LeftRight determines the camera motion in the left and right cameras at the same time.
+-   Camera interfaces no longer need to provide the RGB Depth or Depth 16-bit buffers.
+    -   The point cloud data contains the depth information in all cases but the Oak-D cameras
+    -   Oak-D point cloud is built on each frame from the 16-bit depth data (and camera information)
+-   A monthly history of changes is included at the bottom of this document
+
+![Graphical user interface, website Description automatically generated](media/1090d294fefc86a41b0a05ac277d0b1f.png)
+
+**Flood_LRMatchLargest:** *Using the Oak-D camera’s left and right images (bottom left and bottom right) the RedCloud cells can be identified in one image and matched in the other image. The approach is searching for a way to match objects in the left and right image to determine their distance. The distance will be a single number and won’t identify and variations across the cell.*
+
+# Recent Changes – February 2023
+
+-   Over 1400 algorithms are included with an average of 31 lines of code per algorithm
+-   Oak-D Pro and Oak-D S2 camera support is now installed by default.
+    -   Oak-D Lite cameras will work but have no IMU (supported cameras typically have an IMU)
+    -   Any performance or reliability improvements for the camera interface would be gratefully received.
+    -   Oak-D camera point cloud is built in the host from intrinsics and depth data.
+-   With the addition of the Oak-D camera support, the installation process was reviewed and simplified.
+    -   One script file handles the support for the installation of all components.
+    -   To refresh any of the components, delete the component’s directory and run “Update_All.bat”.
+        -   Remove “\<OpenCVB Dir\>/OakD/Build” to update the Oak-D camera support
+        -   Remove “\<OpenCVB Dir\>/librealsense” to update the Realsense camera support
+        -   Remove “\<OpenCVB Dir\>/Azure-Kinect-Sensor-SDK” to update Microsoft Kinect for Azure support
+        -   Remove “\<OpenCVB Dir\>/opencv” to update both OpenCV and OpenCV contributions.
+-   Depth shadow is a challenging problem and in the example below is the beginning of a solution.
+    -   The RedCloud_Simple algorithm assigns depth based on color and creates depth data for the entire image.
+-   Color_Classify uses 6 methods to classify each pixel in the RGB image.
+-   KMeans algorithms were reviewed and simplified with the KMeans_Basics converted to single channel input only.
+-   Edge Drawing algorithms added – both line segments and edges are included.
+-   A monthly history of changes is included at the bottom of this document.
+
+![A picture containing text, indoor, display, different Description automatically generated](media/72003f6ab495cbb5a6f3f080567d5e97.png)
+
+**RedCloud_Basics:** *Depth shadow is a significant problem – there is no depth data in the shadow of objects close to the camera because one camera cannot see what the other camera can. The depth shadow around the hand is black in the RGB representation of the depth data in the upper right. Note that the RedCloud output in the lower left has identified regions in the depth shadow of the hand. These regions are found with color – not depth. The next step is to …*
+
+# Recent Changes – February 2023
+
+-   Over 1400 algorithms are included with an average of 31 lines of code per algorithm
+-   Adding a new OpenCVB algorithm using the ‘Blue Plus’ button is now expanded and easier.
+-   Depth at the image edges for RealSense cameras have gaps that can be approximated.
+    -   See the Guess_ImageEdge algorithm (RealSense only)
+-   OpenCVB has been tested on Windows 11 without incident.
+-   The current version of OpenCVB introduces heartbeats in 3 flavors:
+    -   Once a second, twice per second, and “almost” heartbeat (just before a heartbeat)
+    -   In addition, a new Grid_FPS allows any algorithm to specify a requested heartbeat frequency.
+-   Backprojection algorithms were reviewed and 2D histogram backprojections now have a separate module.
+-   Plane equations for RedCloud cells are now computed for use in OpenGL.
+-   Post with any problems, especially install problems. They will receive the highest priority.
+-   A monthly history of changes is included at the bottom of this document.
+
+![](media/cc5cb6bf2bee9d442fa760af12a3f764.png)
+
+**Plane_Basics:** *Improvements in the RedCloud cells have made it easier to detect the plane for a cell. Selecting a cell will create a plane equation that can be used to describe the plane to OpenGL. Also included in the display is an estimate of the Root-Mean-Square error. The selected RedCloud cell is outlined in the RGB image in the upper left. In the lower left, the selected cell is highlighted in white.*
+
+# Recent Changes – March 2023
+
+-   Over 1450 algorithms are included with an average of 30 lines of code per algorithm
+    -   Earlier versions of OpenCVB had an average of 31 lines on code.
+    -   The reduction arose from moving algorithm options to Options.vb thus reducing total lines of code.
+    -   The objective is to further reduce the algorithm’s environmental dependencies.
+    -   Algorithm options are explicit or tied to the ‘options’ variable.
+-   OpenCVB has almost 1000 options that fall into 3 categories:
+    -   Global OpenCVB options – options for the OpenCVB application such as working resolution or camera.
+    -   Global Algorithm options – options common to all tasks such as maximum depth or line width.
+    -   Algorithm options – trackbars, check boxes, or radio buttons tailored just for that algorithm.
+-   Options can be easily added to any algorithm using code snippets.
+-   Low use options may be ‘sidelined’ – see the “Show All” menu command in the Options Container.
+    -   All QT algorithms were removed because of the new ability to sideline an algorithm’s options.
+-   The infrastructure for handling options is a major feature of the OpenCVB application.
+-   Lines and Planes are detected using a simple depth test (see example below).
+-   RedCloud now accepts 8-bit or 32-bit images on all RedCloud runs.
+-   The 7 alternative RedCloud inputs are available through the Color_Classify algorithm.
+-   RedCloud now optionally classifies image regions without any depth data (using color.)
+-   All depth data algorithms can toggle the application of gravity with a global algorithm option.
+-   Post with any problems, especially install problems. They will receive the highest priority.
+-   A monthly history of changes is included at the bottom of this document.
+
+![Website Description automatically generated](media/ca51a247fee268009638b097647ef791.png)
+
+**OpenGL_PCLinesAll:** *Vertical and horizontal depth lines are detected in the scene and joined. The grid of lines in the lower left image shows lines and cross-hatching where there is likely to be a plane. The background of the lower left image confirms that the estimate for planes is correct. The lower right image is a snap shot from the OpenGL window with the resulting grid of points. The OpenGL output is normally in a separate window and manipulated with the mouse but can be optionally captured in an OpenCVB image.*
+
+# Recent Changes – March 2023
+
+-   Over 1460 algorithms are included with an average of 30 lines of code per algorithm
+-   Missing depth data is now tracked over multiple frames.
+    -   Use the global option frame history to control how many frames of missing depth are used.
+    -   Removes most of the unstable depth data and blowback from depth edges.
+    -   Use “Depth_Basics” algorithm and toggle the global algorithm option “Use Depth Shadow History”.
+        -   Turn off the impact of depth history by moving the “Frame History” slider to 1.
+    -   Camera motion further separates depth regions for better image segmentation.
+-   Photo images from the Berkeley BSDS500 image segmentation database can be tested with OpenCVB.
+    -   Image segmentation testing is easier and more reproducible with photos.
+    -   Image.vb contains algorithms to load individual images or a series of images.
+    -   Image.vb also contains tests for image segmentation with different OpenCVB algorithms.
+-   The code to prepare images for RedCloud segmentation has been greatly simplified.
+-   Any of the “Color_Classify” output images may be used as input to RedCloud – See “RedCloud_ColorStats”.
+    -   A new global algorithm option labelled “Color Class” controls the input to RedCloud.
+-   A new global algorithm option is an easy way to toggle algorithm behavior without adding any options.
+    -   Use “Fun Checkbox” and test it using the variable “gOptions.FunChecked.checked”.
+    -   It is intended to answer a question: could adding this option be valuable or necessary?
+-   Post with any problems, especially install problems. They will receive the highest priority.
+-   A monthly history of changes is included at the bottom of this document.
+
+![Graphical user interface Description automatically generated with medium confidence](media/e064d9cdab50e85f484ed32f6c5f44a9.png)
+
+**RedCloud_ColorAndCloud:** *This algorithm allows comparison of cells created using the reduced point cloud and cells created using reduced color images. The image in the lower left is segmented using the point cloud and cells don’t penetrate deeply into the scene. The image in the lower right uses color to segment the same scene and some cells will contain foreground and background items. However, there are cells where color segmentation is superior in joining cells that are separated in the point cloud segmentation. Edges in the color image assist with segmentation in the reduced point cloud and may be toggled on an off to see the benefit – see the RedCloud option labelled “Use color edges to better separate RedCloud cells”.*
+
+# Recent Changes – April 2023
+
+-   Over 1510 algorithms are included with an average of 30 lines of code per algorithm
+    -   Algorithms contain only the code for the algorithm – no infrastructure.
+-   Accord algorithms are now available in OpenCVB.
+    -   Accord website with documentation: <http://accord-framework.net/>
+    -   Several classification algorithms are available in classify.vb and Accord.cs.
+    -   Convert Mat structure to Accord bitmap with the ‘ToBitmap’ extension.
+    -   Accord is a NuGet package so installation is invisible.
+-   Classify_Basics surveys how to use 7 OpenCV ML classification algorithms
+    -   Naïve Bayes, SVM, Decision Trees, Random Forest, ANN, Boosted Trees, KNN
+-   Options for all algorithms is the default. Use ‘Show All’ to see all other options.
+-   Excel support is now available – see CSV_Excel for example usage.
+-   TreeView selections now working when multiple copies of an algorithm are present.
+-   New global option to use color and depth to build a RedCloud cells.
+-   New global option to update only RedCloud cells with motion.
+-   K means is a useful classification tool if ‘K’ is known.
+    -   The ‘K’ value is now found using valleys in the depth histogram.
+    -   See below example to examine how depth histogram defines ‘K”.
+
+![A collage of images of a room Description automatically generated with low confidence](media/92e62b4ec302c2d2ea93d597cc035cf6.png)
+
+**Depth_Tiers2** *– The choice of K for K Means is critical. Here the depth ‘valleys’ provide a natural way to find K in the histogram of the depth. The white lines in the upper right indicate valley bottoms and provide K to the K Means algorithm. The K Means output of the depth data is depicted in the bottom images.*
+
+# Recent Changes – May 2023
+
+-   Over 1520 algorithms are included with an average of 30 lines of code per algorithm
+    -   Compile OpenCVB and all algorithms can be selected using a combo box.
+    -   Algorithms contain only the code for the algorithm – separated from infrastructure.
+-   More Accord algorithms were added to OpenCVB.
+    -   Accord website with documentation: <http://accord-framework.net/>
+    -   25 Accord image filters added (see Filter_AccordSuite.)
+    -   Other Accord additions: wavelets, Self-Organizing Maps (SOM).
+-   Motion_Rect algorithm finds and keeps the maximum extent of motion.
+    -   Minimizes the work to update the image.
+    -   Artifacts are present in the motion-updated image but still useful.
+-   TreeView user interface is simplified – intermediate results one click away.
+-   RedCloud reorganization underway – see RC_Basics.
+    -   Simpler interface, neighbors identified, RGB and depth merged.
+
+**![A screenshot of a computer screen Description automatically generated with low confidence](media/f230dfdcb1bde53dd59d720e7b8953d4.png)Motion_Rect** *– Motion in the image is isolated by the Motion_Rect algorithm. The lower left image shows the motion detail while the rectangle in the lower right shows the* **maximum** *extent of this motion. OpenCVB’s heartbeat (roughly once a second) updates the entire image. Artifacts may be produced when the color image is updated only with the data from the motion rectangle. One such artifact is highlighted in yellow in the upper left image. The question: how important is it to avoid artifacts? The motion rectangle is produced with every new image as the cost is low – note the frame rate in the top of the image is 90 fps at 320x240 resolution.*
+
+# Recent Changes – May 2023
+
+\- Over 1520 algorithms are included with an average of 30 lines of code per algorithm
+
+\- Compile OpenCVB and all algorithms can be selected using a combo box.
+
+\- Algorithms contain only the code for the algorithm – separated from infrastructure.
+
+\- More Accord algorithms were added to OpenCVB.
+
+\- Accord website with documentation: \<http://accord-framework.net/\>
+
+\- 25 Accord image filters added (see Filter_AccordSuite.)
+
+\- Other Accord additions: wavelets, Self-Organizing Maps (SOM).
+
+\- Motion_Rect algorithm finds and keeps the maximum extent of motion.
+
+\- Minimizes the work to update the image.
+
+\- Artifacts are present in the motion-updated image but still useful.
+
+\- TreeView user interface is simplified – intermediate results one click away.
+
+\- RedCloud reorganization underway – see RC_Basics.
+
+\- Simpler interface, neighbors identified, RGB and depth merged.
+
+# Recent Changes – May 2023
+
+-   Over 1550 algorithms are included with an average of 30 lines of code per algorithm
+    -   Compile OpenCVB and all algorithms can be selected using a combo box.
+    -   Algorithms contain only the code for the algorithm – separated from infrastructure.
+-   What are the principal design features of OpenCVB?
+    -   Each algorithm can visualize a reliable test case when run standalone.
+    -   Overnight testing of all algorithms is kicked off with one click.
+    -   OpenCVB reads its own code to find the names of all algorithms.
+        -   User interface combo boxes are generated automatically on every run.
+        -   Also generated: algorithm count, total lines of code, lines per algorithm.
+    -   Keep algorithms small – 30 lines of code, easily understood, easily rewritten.
+    -   Visualize both results *and* performance to easily verify and understand.
+    -   Combine algorithms easily – standard connections, easily reconfigured.
+    -   Keep infrastructure separate from the algorithm.
+        -   The environment is abstracted to avoid dependency on Windows.
+        -   Snippets are available to add algorithms, options, sliders, radio buttons, checkboxes.
+        -   3 option groups: general OpenCVB, all algorithms, and algorithm specific.
+    -   Make it simple to add more algorithms.
+        -   Snippets and “Blue Plus” button generate new algorithms easily.
+-   A list of RedCloud neighbor cells was added for each cell.
+-   A Principal Component Analysis (PCA) eigenvector is available for RedCloud cells
+-   A plane equation has been added for each RedCloud cell found.
+-   ChatGPT and Bard both translate VB.Net to C++, C\#, or Python.
+    -   Translating is easier without infrastructure or user interface.
+    -   It is more important than ever to keep algorithms short and direct – just the algorithm.
+-   The Mynt D1000 camera installation and capture were reviewed and improved.
+    -   Installation is now a simple .bat – AddMynt.bat
+    -   Unfortunately, it looks like the Mynt cameras are no longer available.
+-   Json has been introduced and parameters are being converted from registry to json.
+    -   All parameters are vetted in jsonRead() and jsonWrite.
+    -   No more registry entries for OpenCVB.
+    -   If anything goes wrong, just delete the \<OpenCVB HomeDir\>/settings.json.
+    -   Improved testing for a wider range of settings.
+
+![A picture containing text, screenshot, multimedia software, art Description automatically generated](media/195f7fde1649a871e7cb3cab7ca8f4fe.png)**RedCloud_Planes** *– The data for each cell now contains the plane equation for the cell and a list of neighboring cells. The lower left shows the numbered cells with the selected cell shown in white. The selected cell and its neighbors are shown in the upper right image. The upper left image highlights the selected cell in the RGB image. In the lower right are the same cells colored with the direction of the principal axis of the plane equation – red cells are oriented along the Z-axis, blue for X-axis, and green along the Y-axis (floor and ceiling).*
+
+# Recent Changes – June 2023
+
+-   Over 1680 algorithms are included with an average of 30 lines of code per algorithm
+    -   Compile OpenCVB and all algorithms can be selected using a combo box.
+    -   Algorithms contain just code for the algorithm – not infrastructure.
+-   New global algorithm option to toggle multi-threading.
+    -   Review it with HeatMap_Grid to see if multi-threading helps.
+-   New global algorithm option to “Show All” options when opening Options.
+    -   Some prefer the default to be show all available options for the algorithm stack.
+-   All OpenCVB camera interfaces were reviewed and improved.
+    -   Less data movement for every camera.
+-   All the backprojection 2D algorithms were reviewed and new ones added.
+    -   BackProject2D color classify algorithm added to global options.
+-   All the HeatMap algorithms were reviewed and updated.
+-   More json settings were added and tested.
+-   A new set of KWhere algorithms were added.
+    -   The image below shows the typical output
+    -   There is a lot of new material and KWhere needed its own tutorial.
+        -   <https://github.com/bobdavies2000/OpenCVB/tree/master/Tutorials>
+        -   Select “(5) Finding K”
+-   The jump in the count of algorithms is the result of adding Options.vb to the tally
+    -   The options were not included in the algorithm count previously.
+    -   Including options means all algorithms using an options are easily found.
+
+![A screenshot of a computer Description automatically generated with medium confidence](media/39e5ccb9bf9f87faf1b5649e6008b3c5.png)
+
+**KWhere_DoctoredBP** *– The algorithm finds the K objects present in the image and where they are. It is based on a “doctored backprojection” of the top-down view (upper left) and side view (upper right). The result identifies K objects in the lower left image with individual colors. For more information, see the tutorial on “Finding K”.*
+
+# Recent Changes – June 2023
+
+-   StereoLab’s ZED 2 cameras are now required in the default installation.
+    -   “Update_All.bat” asks to install StereoLabs ZED 2/2i camera support.
+    -   StereoLabs requires NVIDIA and CUDA and won’t compile without them.
+    -   If StereoLabs support is troublesome, turn support off in CameraDefines.hpp.
+        -   Comment out CameraDefines.hpp “STEREOLAB_INSTALLED” \#define.
+    -   Left and right views can now contain color images instead of grayscale.
+-   Almost 1700 algorithms are included, averaging of 30 lines of code per algorithm.
+-   New global option to assist in debugging algorithms.
+    -   Screen output is exactly what was just stepped through in the debugger.
+    -   100 millisecond delay allows screen update to happen before next iteration.
+    -   In the “All Algorithm Options” look for “Synchronize output with Debug”.
+-   Why are options now counted as algorithms?
+    -   The algorithm group combo box selects all algorithms using those options.
+    -   Select an option algorithm in the Group combo box (the second combo box.)
+    -   Test all the algorithms that use the changed options with one click.
+-   Support for 1920x1080 input is now an option for Kinect and ZED 2 cameras.
+    -   See OpenCVB Global Options dialog box.
+-   “Temp Slider” added to the “All Algorithm Options” for testing.
+    -   Algorithms can test a slider before adding it as a new option.
+    -   Similar to the “Fun Checkbox” that can toggle a feature.
+-   A log of the monthly changes is included at the bottom of this document.
+
+# Recent Changes – July 2023
+
+-   StereoLabs camera support upgraded to Zed SDK 4.0.
+    -   Camera calibration data moved to “camera_Configuration” structure.
+    -   Zed SDK 4.0 appears to be more efficient than earlier releases.
+-   The default group is now “\<All but Python\>” instead of “\<All\>”.
+    -   All VB, C\#, and C++ algorithms are guaranteed to work.
+    -   Python algorithms may have missing packages on a new installation.
+-   JSON interface is helpful when any algorithm fails.
+    -   Fix any OpenCVB failure to start by removing the settings.json file.
+-   Almost 1700 algorithms are included, averaging 30 lines of code per algorithm.
+-   All the RedCloud algorithms were reviewed and consolidated.
+    -   Point cloud input algorithms are in the RedCloud.vb
+    -   Color image input algorithms are in the RedColor.vb
+    -   RedColor_Basics uses any of the 8 color inputs in the global options.
+    -   Original version of RedCloud is still available – RedCloud_BasicsOriginal.
+-   GIF animation in OpenCVB has been reworked and generalized.
+    -   Create a GIF image for any algorithm in OpenCVB
+    -   Click on the global algorithm checkbox “Create GIF of current algorithm”.
+    -   There is an option to capture dst2, dst3, or the entire application window.
+    -   Example below captures the entire application window.
+-   A log of the monthly changes is included at the bottom of this document.
+
+![A picture containing screenshot, cartoon, purple Description automatically generated](media/18af30fc5898ad34f3817c06087bb161.gif)**RedCloud_ColorCloud:** *An example of using the new GIF interface to capture an OpenCVB algorithm. The top right image is the RedCloud_Basics using the point cloud data, the lower left image is the RedColor_Basics using color instead of the point cloud, and the lower right assigns the RedCloud_Basics cell color from the RedColor_Basics. The result is a fusion of the point cloud and color data.*
+
+# Recent Changes – July 2023
+
+-   Almost 1700 algorithms are included, averaging 30 lines of code per algorithm.
+-   Separators in the list of algorithms make it easier to find algorithms.
+-   Tutorial for lane finding now includes a Gif representation of the results.
+-   StereoLabs Zed 2/2i cameras have 3 new resolutions based on SVGA mode.
+    -   Images (left, right, IMU data, and point cloud) arrive at 100 FPS.
+    -   This is the fastest image retrieval for all supported cameras.
+-   RedColor_Track will track the selected cell from frame to frame.
+    -   Distance in 8 dimensions - BGR Color mean, stdev, and location.
+    -   Must have a threshold of pixels for tracking to work.
+-   OpenCVB now includes another way to detect motion – see below.
+-   RedCloud algorithms are split into 3 groups – RedCloud, RedColor, and RedCommon.
+    -   RedCloud algorithms use a reduced point cloud input.
+    -   RedColor algorithms use a reduced color image,
+    -   RedCommon algorithms can be by either RedCloud or RedColor.
+-   A log of the monthly changes is included at the bottom of this document.
+
+    ![A screenshot of a computer Description automatically generated](media/633cf4eac674ceedd2621d2764796460.gif)
+
+**RedCC_Motion:** *The GIF above shows another way to detect motion in an image. The upper right shows the conventional difference between images – a standard way to detect changes in pixel values by comparing images. The lower left image is the RedColor_Basics output with cells for each reduced color segment. The lower right image shows the RedColor cells that contain pixels that changed. When run with the StereoLabs 2i camera, the algorithm is able to run at 65 FPS with the new 336x188 resolution.*
+
+# Recent Changes – July 2023
+
+-   Almost 1700 algorithms are included, averaging 30 lines of code per algorithm.
+-   A tutorial on the option “Synchronize Debug with Output” is now available.
+    -   It outlines a more WYSIWYG approach to debugging algorithms.
+-   The history cloud contains the point cloud averaged over X frames.
+    -   It also removes pixels that were not present in all X frames.
+    -   Use of the history cloud is toggled with a global algorithm option.
+-   The GIF capture feature now can capture the OpenGL output from OpenCVB
+    -   Examples below compare using the history and raw cloud images.
+-   Algorithm option presentation was improved – fewer algorithm options present.
+-   RedCloud contours now use ApproxNone – better floodfill results.
+-   A log of the monthly changes is included at the bottom of this document.
+
+![A colorful cube with a laser Description automatically generated](media/1e1c632b14491a6493bfa9ba40589995.gif)
+
+**OpenGL_RedCloud:** *The OpenGL_RedCloud algorithm displays the RedCloud output in OpenGL and colors each RedCloud cell. The output above uses the history cloud collected over 10 frames and masks outs pixels that were not present in all 10 frames.*
+
+*![A colorful cube with a line Description automatically generated](media/cc1176c66b58e5a9a131347007d99453.gif)*
+
+**OpenGL_RedCloud:** *The same algorithm as above running with the raw point cloud. The history cloud is different from the raw point cloud because it averages the point cloud over 10 frames and masks out pixels that were not present in all 10 frames.*
+
+# Recent Changes – August 2023
+
+-   Almost 1700 algorithms are included, averaging 30 lines of code per algorithm.
+-   Improvements to tracking RedCloud cells. Below is an example GIF.
+    -   RedColor_Basics and RedCloud_Basics both track all cells.
+    -   Reduced color =RedColor, Reduced point cloud = RedCloud.
+    -   RedCC is an abbreviation for Reduced color and cloud.
+-   FeatureMatch algorithms independently find features in left and right images.
+    -   Both BRISK and GoodFeatures can be used in FeatureMatch algorithms.
+    -   Feature points identify the same object in both left and right images.
+    -   The output is a set of fixed points in 3D space.
+-   Up and down arrows now work to switch between algorithms.
+-   The gravity and the history cloud may now both be active.
+    -   Global algorithm options allow toggling which are active.
+    -   To demo, try toggling the following checked boxes:
+
+![A screenshot of a computer program Description automatically generated](media/02c6ce848cd7de5f5fea7561677395ca.png)
+
+-   OpenCV’s puttext settings were reworked to support the different resolutions.
+    -   Histogram output is much more readable with different resolutions.
+-   The GroupName combo box now uses blank lines to group the selections.
+    -   It is easier to locate an OpenCV API or OpenCVB algorithm group.
+-   A log of the monthly changes is included at the bottom of this document.
+
+![A room with colorful furniture Description automatically generated](media/505f9ca73f5ee142fb9e3879bdae651d.gif)
+
+**RedColor_Basics:** *RedColor_Basics builds cells from a reduced color image (reduced color = RedColor.) All cells are tracked even with camera motion. Note that the highlighted floor cell is tracked despite changing size and shape. A cell will maintain its color (indicating the cell was tracked) if it was present in the previous frame. The black dot in the selected (white) cell represents the point with the maximum distance from surrounding cells and is defined for each cell for use with tracking.*
+
+# Recent Changes – August 2023
+
+-   Over 1700 algorithms are included, averaging 30 lines of code per algorithm.
+-   OpenCVB has moved to OpenCV 4.8 – see “PragmaLibs.h” for the update.
+    -   Delete the “opencv” directory in OpenCVB’s home directory.
+    -   Run OpenCVB’s “Update_All.bat” to update OpenCV.
+    -   Rebuild OpenCVB. Post with any install problems. They are high priority.
+-   Testing install showed that librealsense2.sln is now realsense2.sln
+    -   The “Update_All.bat” file is now updated to reflect that change.
+-   A new “toggle” variable in every algorithm switches on and off about once a second.
+-   GIF support now includes capturing the dst0 and dst1 images independently.
+    -   All 4 images and the OpenGL output may be captured individually.
+-   FeatureMatch_Basics (shown below) now uses color images for left/right images.
+    -   Kinect for Azure has only 1 camera, so it doesn’t produce any matches.
+    -   All other cameras have left and right images and will work properly.
+-   A log of changes is included at the bottom of this document.
+
+![A room with a computer and a desk Description automatically generated](media/6910830262336f25a37fd666645d9382.gif)
+
+**FeatureMatch_Basics:** *OpenCV’s GoodFeatures function is called twice, once with the left image and then with the right image. Features with a high correlation coefficient between left and right images are considered matched and this GIF image confirms that the matches are largely correct. AddWeighted_Basics is used to combine the left and right images and the white line segments connect the points that are confirmed matches. The closer the feature is to the camera the longer the line segment. In this test, there are two line segments that look incorrect. Can you find them? Why is there any variability in the highlighted line segments? GoodFeatures is not precise and will often pick a point above or below the corresponding one in the other image. Points must be in the exact same row, or they are not considered candidates. BRISK features may also be selected for input to this algorithm.*
+
+# Recent Changes – September 2023
+
+-   Over 1700 algorithms are included, averaging 30 lines of code per algorithm.
+-   Guided back projection assists in image segmentation.
+    -   Guided means the histogram is doctored before back projection.
+    -   Updated histogram entries define segments in the back projection.
+    -   See example below for the combined color and cloud results.
+-   Back projection in 2D histograms is now used in more algorithms.
+-   Don’t forget to have some idle fun – AsciiArt.vb
+-   Histogram3D and back projection reviewed and improved.
+-   Improved RedCloud and RedColor algorithms using back projection.
+    -   C++ module FloodCell.cpp replaces 4 reduction algorithms.
+-   Improvements to the display of side and top projections were added.
+    -   Output images no longer clip the side and top view data.
+    -   New global variables XRange and YRange control how projection spreads.
+-   A log of changes is included at the bottom of this document.
+
+![A colorful squares and lines Description automatically generated with medium confidence](media/c4eed0d963820c627ec5b94291a36c4d.gif)
+
+**RedCloud_Color:** *This image segmentation algorithm uses both the point cloud and color to identify cells. RedCloud algorithms typically reduce the point cloud resolution in X and Y to produce cells that describe regions in the image. This algorithm also uses the reduced point cloud but has added cells based on color for regions that have no depth. Because both color and the point cloud are used, the entire image is segmented instead of just that portion with depth. When a cell’s color is consistent, it has been matched to a cell in the previous frame.*
