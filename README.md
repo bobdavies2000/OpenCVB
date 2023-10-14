@@ -13,6 +13,10 @@
 -   Improved PixelViewer support – better form placement and pixel layout.
 -   Plots over time are much more reactive to the changes in the input data.
 -   MSER algorithms were reviewed and improved.
+-   Accord and Dlib algorithms were removed (about 35 algorithms)
+    -   They were not getting reused by other algorithms.
+    -   They added a lot NuGet packages that complicated installation.
+-   The OpenCVB git repository was reset – the repo was bigger than the tree.
 -   A log of changes is included at the bottom of this document.
 
 ![](media/db52b0115273726a6ff2d1aa986c0817.gif)
