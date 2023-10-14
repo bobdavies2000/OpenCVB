@@ -8,7 +8,7 @@ Public Class MSER_Basics : Inherits VB_Algorithm
     Public core As New MSER_Core
     Public classCount As Integer
     Public Sub New()
-        findCheckBox("Use Grayscale, not color input (default)").Checked = False
+        findCheckBox("Use grayscale input").Checked = False
         dst0 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Test MSER (Maximally Stable Extremal Region) with the synthetic image."
     End Sub
@@ -228,7 +228,7 @@ Public Class MSER_TestSynthetic : Inherits VB_Algorithm
     Dim synth As New MSER_SyntheticInput
     Dim core As New MSER_Basics
     Public Sub New()
-        findCheckBox("Use Grayscale, not color input (default)").Checked = True
+        findCheckBox("Use grayscale input").Checked = True
         labels = {"", "", "Synthetic input", "Output from MSER (Maximally Stable Extremal Region)"}
         desc = "Test MSER (Maximally Stable Extremal Region) with the synthetic image."
     End Sub
@@ -274,7 +274,7 @@ Public Class MSER_Grayscale : Inherits VB_Algorithm
     Dim core As New MSER_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        findCheckBox("Use Grayscale, not color input (default)").Checked = True
+        findCheckBox("Use grayscale input").Checked = True
         desc = "Run MSER (Maximally Stable Extremal Region) with grayscale input"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -296,7 +296,7 @@ Public Class MSER_ReducedRGB : Inherits VB_Algorithm
     Dim core As New MSER_Basics
     Dim reduction As New Reduction_RGB
     Public Sub New()
-        findCheckBox("Use Grayscale, not color input (default)").Checked = False
+        findCheckBox("Use grayscale input").Checked = False
         desc = "Run MSER (Maximally Stable Extremal Region) with a reduced RGB input"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -569,25 +569,55 @@ End Class
 
 
 
-Public Class MSER_Fast_CPP : Inherits VB_Algorithm
+Public Class MSER_CPP : Inherits VB_Algorithm
+    Dim Options As New Options_MSER
+    Public boxes As New List(Of cv.Rect)
     Public Sub New()
-        cPtr = MSER_Fast_Open()
-	    labels = {"", "", "Grayscale image of src", "dst3Label"}
-        desc = "description"
-	  End Sub
-    Public Sub RunVB(src as cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        findCheckBox("Use grayscale input").Checked = False
+        Options.RunVB()
+        cPtr = MSER_Open(Options.delta, Options.minArea, Options.maxArea, Options.maxVariation, Options.minDiversity,
+                         Options.maxEvolution, Options.areaThreshold, Options.minMargin, Options.edgeBlurSize)
+        desc = "C++ version of MSER basics."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Options.RunVB()
+        If task.optionsChanged Then
+            MSER_Close(cPtr)
+            cPtr = MSER_Open(Options.delta, Options.minArea, Options.maxArea, Options.maxVariation, Options.minDiversity,
+                             Options.maxEvolution, Options.areaThreshold, Options.minMargin, Options.edgeBlurSize)
+        End If
 
+        dst2 = src.Clone
+
+        If Options.graySetting And src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = MSER_Fast_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
+        Dim imagePtr = MSER_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
         handleSrc.Free()
 
-        dst2 = New cv.Mat(src.Rows, src.Cols, If(src.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), imagePtr).clone
+        dst0 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+
+        Dim count = MSER_Count(cPtr)
+        If count = 0 Then Exit Sub
+
+        Dim rectData = New cv.Mat(count, 1, cv.MatType.CV_32SC4, MSER_Rects(cPtr))
+        boxes.Clear()
+        For i = 0 To count - 1
+            Dim r = rectData.Get(Of cv.Rect)(i, 0)
+            boxes.Add(r)
+        Next
+
+        task.palette.Run(dst0 * 255 / count)
+        dst3 = task.palette.dst2
+
+        For Each r In boxes
+            dst3.Rectangle(r, task.highlightColor, task.lineWidth)
+        Next
+        labels(2) = CStr(count) + " regions identified"
     End Sub
-    Public Sub Close() 
-        MSER_Fast_Close(cPtr)
+    Public Sub Close()
+        MSER_Close(cPtr)
     End Sub
 End Class
 
@@ -597,14 +627,21 @@ End Class
 
 
 
-Module MSER_Fast_CPP_Module
+Module MSER_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MSER_Fast_Open() As IntPtr
+    Public Function MSER_Open(delta As Integer, minArea As Integer, maxArea As Integer, maxVariation As Single, minDiversity As Single,
+                              maxEvolution As Integer, areaThreshold As Single, minMargin As Single, edgeBlurSize As Integer) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub MSER_Fast_Close(cPtr As IntPtr)
+    Public Sub MSER_Close(cPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MSER_Fast_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
+    Public Function MSER_Rects(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function MSER_Count(cPtr As IntPtr) As Integer
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function MSER_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
     End Function
 End Module

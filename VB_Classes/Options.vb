@@ -4258,7 +4258,7 @@ Public Class Options_MSER : Inherits VB_Algorithm
 
         If check.Setup(traceName) Then
             check.addCheckBox("Pass2Only")
-            check.addCheckBox("Use Grayscale, not color input (default)")
+            check.addCheckBox("Use grayscale input")
             check.Box(1).Checked = True
         End If
     End Sub
@@ -4284,7 +4284,7 @@ Public Class Options_MSER : Inherits VB_Algorithm
         edgeBlurSize = blurSlider.Value Or 1
 
         Static pass2Check = findCheckBox("Pass2Only")
-        Static grayCheck = findCheckBox("Use Grayscale, not color input (default)")
+        Static grayCheck = findCheckBox("Use grayscale input")
         pass2Setting = pass2Check.checked
         graySetting = grayCheck.checked
     End Sub
