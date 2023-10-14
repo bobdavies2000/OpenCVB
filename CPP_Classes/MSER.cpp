@@ -19,9 +19,10 @@ public:
     vector<vector<Point>> regions;
     vector<Rect> boxes;
     MSER_Basics(int delta, int minArea, int maxArea, float maxVariation, float minDiversity, int maxEvolution, float areaThreshold,
-                float minMargin, int edgeBlurSize)
+                float minMargin, int edgeBlurSize, int pass2Setting)
     {
         mser = mser->create(delta, minArea, maxArea, maxVariation, minDiversity, maxEvolution, areaThreshold, minMargin, edgeBlurSize);
+        mser->setPass2Only(pass2Setting);
     }
     void RunCPP() {
         mser->detectRegions(src, regions, boxes);
@@ -53,9 +54,10 @@ public:
 };
 extern "C" __declspec(dllexport)
 MSER_Basics *MSER_Open(int delta, int minArea, int maxArea, float maxVariation, float minDiversity, int maxEvolution, float areaThreshold,
-                       float minMargin, int edgeBlurSize) 
+                       float minMargin, int edgeBlurSize, int pass2Setting) 
 {
-    MSER_Basics*cPtr = new MSER_Basics(delta, minArea, maxArea, maxVariation, minDiversity, maxEvolution, areaThreshold, minMargin, edgeBlurSize);
+    MSER_Basics*cPtr = new MSER_Basics(delta, minArea, maxArea, maxVariation, minDiversity, maxEvolution, areaThreshold, minMargin, 
+                                       edgeBlurSize, pass2Setting);
     return cPtr;
 }
 extern "C" __declspec(dllexport)

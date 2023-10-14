@@ -992,6 +992,7 @@ if algorithmName = "MSER_CPPStyle" Then return new MSER_CPPStyle
 if algorithmName = "MSER_Grayscale" Then return new MSER_Grayscale
 if algorithmName = "MSER_Left" Then return new MSER_Left
 if algorithmName = "MSER_LeftRight" Then return new MSER_LeftRight
+if algorithmName = "MSER_MaskAndRect" Then return new MSER_MaskAndRect
 if algorithmName = "MSER_RedCloud" Then return new MSER_RedCloud
 if algorithmName = "MSER_ReducedRGB" Then return new MSER_ReducedRGB
 if algorithmName = "MSER_RegionLeft" Then return new MSER_RegionLeft

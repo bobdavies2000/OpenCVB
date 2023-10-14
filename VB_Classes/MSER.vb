@@ -576,7 +576,7 @@ Public Class MSER_CPP : Inherits VB_Algorithm
         findCheckBox("Use grayscale input").Checked = False
         Options.RunVB()
         cPtr = MSER_Open(Options.delta, Options.minArea, Options.maxArea, Options.maxVariation, Options.minDiversity,
-                         Options.maxEvolution, Options.areaThreshold, Options.minMargin, Options.edgeBlurSize)
+                         Options.maxEvolution, Options.areaThreshold, Options.minMargin, Options.edgeBlurSize, Options.pass2Setting)
         desc = "C++ version of MSER basics."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -584,10 +584,8 @@ Public Class MSER_CPP : Inherits VB_Algorithm
         If task.optionsChanged Then
             MSER_Close(cPtr)
             cPtr = MSER_Open(Options.delta, Options.minArea, Options.maxArea, Options.maxVariation, Options.minDiversity,
-                             Options.maxEvolution, Options.areaThreshold, Options.minMargin, Options.edgeBlurSize)
+                             Options.maxEvolution, Options.areaThreshold, Options.minMargin, Options.edgeBlurSize, Options.pass2Setting)
         End If
-
-        dst2 = src.Clone
 
         If Options.graySetting And src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim cppData(src.Total * src.ElemSize - 1) As Byte
@@ -596,7 +594,7 @@ Public Class MSER_CPP : Inherits VB_Algorithm
         Dim imagePtr = MSER_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
         handleSrc.Free()
 
-        dst0 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
 
         Dim count = MSER_Count(cPtr)
         If count = 0 Then Exit Sub
@@ -608,7 +606,7 @@ Public Class MSER_CPP : Inherits VB_Algorithm
             boxes.Add(r)
         Next
 
-        task.palette.Run(dst0 * 255 / count)
+        task.palette.Run(dst2 * 255 / count)
         dst3 = task.palette.dst2
 
         For Each r In boxes
@@ -630,7 +628,8 @@ End Class
 Module MSER_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MSER_Open(delta As Integer, minArea As Integer, maxArea As Integer, maxVariation As Single, minDiversity As Single,
-                              maxEvolution As Integer, areaThreshold As Single, minMargin As Single, edgeBlurSize As Integer) As IntPtr
+                              maxEvolution As Integer, areaThreshold As Single, minMargin As Single, edgeBlurSize As Integer,
+                              pass2Setting As Integer) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub MSER_Close(cPtr As IntPtr)
@@ -645,3 +644,20 @@ Module MSER_CPP_Module
     Public Function MSER_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
     End Function
 End Module
+
+
+
+
+
+
+
+Public Class MSER_MaskAndRect : Inherits VB_Algorithm
+    Dim regions As New MSER_CPP
+    Public Sub New()
+        desc = "Create rcData cells for each region in MSER output"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        regions.Run(src)
+        dst2 = regions.dst3
+    End Sub
+End Class
