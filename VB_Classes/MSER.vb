@@ -1,4 +1,4 @@
-Imports NAudio.Gui
+Imports System.Runtime.InteropServices
 Imports OpenCvSharp
 Imports System.Drawing
 Imports cv = OpenCvSharp
@@ -474,75 +474,8 @@ End Class
 
 
 
-
 'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_ROI : Inherits VB_Algorithm
-    Dim sortedBoxes As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
-    Dim containers As New List(Of cv.Rect)
-    Public options As New Options_MSEROld
-    Public Sub New()
-        findSlider("MSER Max Area").Value = If(dst2.Width = 1280, 50000, 20000)
-        desc = "Run MSER (Maximally Stable Extremal Region) algorithm with all default options except for maximum area"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static minSlider = findSlider("MSER Min Area")
-        Static maxSlider = findSlider("MSER Max Area")
-        options.RunVB() ' all the time will then appear in MSER_ROI...The detectregions happens in Options_MSER.
-
-        dst2 = src.Clone
-        dst3 = src.Clone
-
-        sortedBoxes.Clear()
-        For Each box In options.boxes
-            sortedBoxes.Add(box.Width * box.Height, box)
-        Next
-
-        Dim maxArea = maxSlider.Value
-        Dim boxList As New List(Of cv.Rect)
-        For i = 0 To sortedBoxes.Count - 1
-            If sortedBoxes.ElementAt(i).Key < maxArea Then boxList.Add(sortedBoxes.ElementAt(i).Value)
-        Next
-
-        containers.Clear()
-        While boxList.Count > 0
-            Dim box = boxList(0)
-            containers.Add(box)
-            Dim removeBoxes As New List(Of Integer)
-            For i = 0 To boxList.Count - 1
-                Dim b = boxList(i)
-                Dim center = New cv.Point(CInt(b.X + b.Width / 2), CInt(b.Y + b.Height / 2))
-                If center.X >= box.X And center.X <= (box.X + box.Width) Then
-                    If center.Y >= box.Y And center.Y <= (box.Y + box.Height) Then
-                        removeBoxes.Add(i)
-                        dst3.Rectangle(b, task.highlightColor, task.lineWidth)
-                    End If
-                End If
-            Next
-
-            For i = removeBoxes.Count - 1 To 0 Step -1
-                boxList.RemoveAt(removeBoxes.ElementAt(i))
-            Next
-        End While
-
-        Dim minArea = minSlider.Value
-        For Each rect In containers
-            If rect.Width * rect.Height > minArea Then dst2.Rectangle(rect, task.highlightColor, task.lineWidth)
-        Next
-
-        labels(2) = CStr(containers.Count) + " consolidated regions of interest located"
-        labels(3) = CStr(sortedBoxes.Count) + " total rectangles found with MSER"
-    End Sub
-End Class
-
-
-
-
-
-
-
-'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class MSER_ROInew : Inherits VB_Algorithm
-    Dim sortedBoxes As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
     Public containers As New List(Of cv.Rect)
     Dim options As New Options_MSER
     Dim core As New MSER_Core
@@ -557,7 +490,7 @@ Public Class MSER_ROInew : Inherits VB_Algorithm
 
         core.Run(src)
 
-        sortedBoxes.Clear()
+        Dim sortedBoxes As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
         For Each box In core.boxes
             sortedBoxes.Add(box.Width * box.Height, box)
         Next
@@ -615,6 +548,8 @@ Public Class MSER_Core : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
+        dst2 = src.Clone
+
         If task.optionsChanged Then
             mser = cv.MSER.Create(options.delta, options.minArea, options.maxArea, options.maxVariation, options.minDiversity,
                                   options.maxEvolution, options.areaThreshold, options.minMargin, options.edgeBlurSize)
@@ -624,11 +559,52 @@ Public Class MSER_Core : Inherits VB_Algorithm
         If options.graySetting And src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         mser.DetectRegions(src, regions, boxes)
 
-        If standalone Then
-            dst2 = src.Clone
-            For Each z In boxes
-                dst2.Rectangle(z, cv.Scalar.Yellow, 1)
-            Next
-        End If
+        For Each z In boxes
+            dst2.Rectangle(z, cv.Scalar.Yellow, 1)
+        Next
     End Sub
 End Class
+
+
+
+
+
+Public Class MSER_Fast_CPP : Inherits VB_Algorithm
+    Public Sub New()
+        cPtr = MSER_Fast_Open()
+	    labels = {"", "", "Grayscale image of src", "dst3Label"}
+        desc = "description"
+	  End Sub
+    Public Sub RunVB(src as cv.Mat)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        Dim cppData(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
+        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
+        Dim imagePtr = MSER_Fast_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, src.Channels)
+        handleSrc.Free()
+
+        dst2 = New cv.Mat(src.Rows, src.Cols, If(src.Channels = 3, cv.MatType.CV_8UC3, cv.MatType.CV_8UC1), imagePtr).clone
+    End Sub
+    Public Sub Close() 
+        MSER_Fast_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Module MSER_Fast_CPP_Module
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function MSER_Fast_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub MSER_Fast_Close(cPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function MSER_Fast_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
+    End Function
+End Module

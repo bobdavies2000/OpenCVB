@@ -4238,8 +4238,8 @@ Public Class Options_MSER : Inherits VB_Algorithm
                 maxDefault = 30000
                 minDefault = 300
             Case 336
-                maxDefault = 10000
-                minDefault = 1000
+                maxDefault = 15000
+                minDefault = 200
             Case 168
                 maxDefault = 2000
                 minDefault = 1
@@ -4248,8 +4248,8 @@ Public Class Options_MSER : Inherits VB_Algorithm
             sliders.setupTrackBar("MSER Delta", 1, 100, 9)
             sliders.setupTrackBar("MSER Min Area", 1, 10000, minDefault)
             sliders.setupTrackBar("MSER Max Area", 1000, 500000, maxDefault)
-            sliders.setupTrackBar("MSER Max Variation", 1, 100, 2)
-            sliders.setupTrackBar("MSER Diversity", 0, 100, 0)
+            sliders.setupTrackBar("MSER Max Variation", 1, 100, 25)
+            sliders.setupTrackBar("MSER Diversity", 0, 100, 20)
             sliders.setupTrackBar("MSER Max Evolution", 1, 1000, 200)
             sliders.setupTrackBar("MSER Area Threshold", 1, 101, 101)
             sliders.setupTrackBar("MSER Min Margin", 1, 100, 3)
@@ -4259,6 +4259,7 @@ Public Class Options_MSER : Inherits VB_Algorithm
         If check.Setup(traceName) Then
             check.addCheckBox("Pass2Only")
             check.addCheckBox("Use Grayscale, not color input (default)")
+            check.Box(1).Checked = True
         End If
     End Sub
     Public Sub RunVB()
@@ -4286,78 +4287,5 @@ Public Class Options_MSER : Inherits VB_Algorithm
         Static grayCheck = findCheckBox("Use Grayscale, not color input (default)")
         pass2Setting = pass2Check.checked
         graySetting = grayCheck.checked
-    End Sub
-End Class
-
-
-
-
-
-
-
-'https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
-Public Class Options_MSEROld : Inherits VB_Algorithm
-    Public boxes() As cv.Rect
-    Public regions()() As cv.Point
-    Dim saveParms As New List(Of Integer)
-    Public mser = cv.MSER.Create
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("MSER Delta", 1, 100, 9)
-            sliders.setupTrackBar("MSER Min Area", 1, 10000, 2500)
-            sliders.setupTrackBar("MSER Max Area", 1000, 100000, 100000)
-            sliders.setupTrackBar("MSER Max Variation", 1, 100, 25)
-            sliders.setupTrackBar("MSER Diversity", 0, 100, 20)
-            sliders.setupTrackBar("MSER Max Evolution", 1, 1000, 200)
-            sliders.setupTrackBar("MSER Area Threshold", 1, 101, 101)
-            sliders.setupTrackBar("MSER Min Margin", 1, 100, 3)
-            sliders.setupTrackBar("MSER Edge BlurSize", 1, 20, 5)
-        End If
-
-        If check.Setup(traceName) Then
-            check.addCheckBox("Pass2Only")
-            check.addCheckBox("Use Grayscale, not color input (default)")
-            check.Box(1).Checked = True
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static deltaSlider = findSlider("MSER Delta")
-        Static minAreaSlider = findSlider("MSER Min Area")
-        Static maxAreaSlider = findSlider("MSER Max Area")
-        Static variationSlider = findSlider("MSER Max Variation")
-        Static diversitySlider = findSlider("MSER Diversity")
-        Static evolutionSlider = findSlider("MSER Max Evolution")
-        Static thresholdSlider = findSlider("MSER Area Threshold")
-        Static marginSlider = findSlider("MSER Min Margin")
-        Static blurSlider = findSlider("MSER Edge BlurSize")
-
-        Dim delta = deltaSlider.Value
-        Dim minArea = minAreaSlider.Value
-        Dim maxArea = maxAreaSlider.Value
-        Dim maxVariation = variationSlider.Value / 100
-        Dim minDiversity = diversitySlider.Value / 100
-        Dim maxEvolution = evolutionSlider.Value
-        Dim areaThreshold = thresholdSlider.Value / 100
-        Dim minMargin = marginSlider.Value / 1000
-        Dim edgeBlurSize = blurSlider.Value Or 1
-
-        Static pass2Check = findCheckBox("Pass2Only")
-        Static grayCheck = findCheckBox("Use Grayscale, not color input (default)")
-
-        If task.optionsChanged Then
-            mser = cv.MSER.Create(delta, minArea, maxArea, maxVariation, minDiversity, maxEvolution, areaThreshold, minMargin, edgeBlurSize)
-            mser.Pass2Only = pass2Check.checked
-        End If
-
-        Dim input = task.color
-        If grayCheck.Checked And input.Channels = 3 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        mser.DetectRegions(input, regions, boxes)
-
-        If standalone Then
-            dst2 = input.Clone
-            For Each z In boxes
-                If z.Size.Width * z.Size.Height > minArea Then dst2.Rectangle(z, cv.Scalar.Yellow, 1)
-            Next
-        End If
     End Sub
 End Class
