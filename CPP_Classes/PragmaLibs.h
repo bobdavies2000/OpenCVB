@@ -1,4 +1,4 @@
-#ifdef _DEBUG
+#ifdef DEBUG
 #pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_aruco480d.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_bgsegm480d.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_bioinspired480d.lib")
@@ -21,6 +21,7 @@
 #pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_imgproc480d.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_img_hash480d.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_intensity_transform480d.lib")
+#pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_java480d.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_line_descriptor480d.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_mcc480d.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_ml480d.lib")
@@ -73,6 +74,7 @@
 #pragma comment(lib, "OpenCV/Build/lib/Release/opencv_imgproc480.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Release/opencv_img_hash480.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Release/opencv_intensity_transform480.lib")
+#pragma comment(lib, "OpenCV/Build/lib/Release/opencv_java480.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Release/opencv_line_descriptor480.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Release/opencv_mcc480.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Release/opencv_ml480.lib")
