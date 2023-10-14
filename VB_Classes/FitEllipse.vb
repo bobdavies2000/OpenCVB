@@ -1,13 +1,10 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp
-Imports DlibDotNet.ImageDatasetMetadata
-Imports System.Runtime.Remoting
 ' https://docs.opencv.org/3.4.2/de/dc7/fitellipse_8cpp-example.html
 Public Class FitEllipse_Basics : Inherits VB_Algorithm
     Dim options As New Options_MinArea
     Public inputPoints As New List(Of cv.Point2f)
-    Public box As RotatedRect
+    Public box As cv.RotatedRect
     Public vertices() As cv.Point2f
     Public Sub New()
         desc = "Use FitEllipse OpenCV API to draw around a set of points"

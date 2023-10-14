@@ -1,9 +1,4 @@
 Imports cv = OpenCvSharp
-Imports  System.IO
-Imports System.Runtime.InteropServices
-Imports  System.IO.MemoryMappedFiles
-Imports  System.IO.Pipes
-
 ' https://docs.opencv.org/3.4.1/d2/dc1/camshiftdemo_8cpp-example.html
 ' https://docs.opencv.org/3.4/d7/d00/tutorial_meanshift.html
 Public Class CamShift_Basics : Inherits VB_Algorithm

@@ -180,7 +180,6 @@
     <Compile Include="Vignetting.vb" />
     <Compile Include="DLib.vb" />
     <Compile Include="Download.vb" />
-    <Compile Include="Fourier.vb" />
     <Compile Include="HeatMap.vb" />
     <Compile Include="ImageForm.Designer.vb" />
     <Compile Include="imShow.vb" />

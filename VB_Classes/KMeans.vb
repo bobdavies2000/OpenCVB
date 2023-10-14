@@ -1,6 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports Accord.MachineLearning
 Public Class KMeans_Basics : Inherits VB_Algorithm
     Public options As New Options_KMeans
     Public colors As New cv.Mat

@@ -1,6 +1,3 @@
-Imports System.Runtime.InteropServices
-Imports DlibDotNet
-Imports OpenCvSharp.Flann
 Imports cv = OpenCvSharp
 Public Class Mat_Repeat : Inherits VB_Algorithm
     Public Sub New()

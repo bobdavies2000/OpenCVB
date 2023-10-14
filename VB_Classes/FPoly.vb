@@ -1,5 +1,4 @@
-﻿Imports OpenCvSharp.Flann
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class FPoly_Basics : Inherits VB_Algorithm
     Public resync As Boolean
     Public resyncCause As String

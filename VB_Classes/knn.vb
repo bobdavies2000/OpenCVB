@@ -1,7 +1,5 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports MathNet.Numerics
-Imports System.Windows.Markup
 
 Public Class KNN_Basics : Inherits VB_Algorithm
     Public knn As cv.ML.KNearest

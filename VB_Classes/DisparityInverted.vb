@@ -1,6 +1,4 @@
-﻿Imports System.IO.Ports
-Imports Accord.Statistics.Kernels
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 'The Function relating() depth To disparity Is
 
 'Z = B * f / disparity

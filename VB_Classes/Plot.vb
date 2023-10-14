@@ -1,7 +1,6 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
-Imports Accord.Math
 
 Public Class Plot_Basics : Inherits VB_Algorithm
     Dim plot As New Plot_Basics_CPP

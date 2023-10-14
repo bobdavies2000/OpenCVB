@@ -2,7 +2,6 @@ Imports  System.IO
 Imports System.Runtime.InteropServices
 Imports  System.IO.MemoryMappedFiles
 Imports  System.IO.Pipes
-Imports DlibDotNet
 Imports cv = OpenCvSharp
 Public Class Python_Basics : Inherits VB_Algorithm
     Public Function StartPython(arguments As String) As Boolean

@@ -1,6 +1,4 @@
-﻿Imports System.Runtime.InteropServices
-Imports Accord.MachineLearning.Boosting.Learners
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class HistPeak2D_Basics : Inherits VB_Algorithm
     Public auto As New OpAuto_Peaks2DGrid
     Dim delaunay As New Delaunay_Basics

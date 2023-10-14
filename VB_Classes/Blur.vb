@@ -1,8 +1,5 @@
 Imports cv = OpenCvSharp
 Imports CS_Classes
-Imports Accord.Imaging.Filters
-Imports System.Drawing
-
 Public Class Blur_Basics : Inherits VB_Algorithm
     Dim options As New Options_Blur
     Public Sub New()

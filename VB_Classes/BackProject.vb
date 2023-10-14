@@ -1,6 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
-Imports MathNet.Numerics.Statistics
 ' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
 Public Class BackProject_Basics : Inherits VB_Algorithm
     Public histK As New Histogram_Kalman
