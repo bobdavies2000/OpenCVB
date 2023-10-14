@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+    <CodeSnippet Format="1.0.0">
+        <Header>
+            <Title>VB_Class - new Class</Title>
+        </Header>
+        <Snippet>
+            <Code Language="VB">
+                <![CDATA[
+Public Class newClass_Basics : Inherits VB_Algorithm
+    Public Sub New()
+	    labels = {"", "", "Grayscale", "dst3Label"}
+        desc = "description"
+    End Sub
+    Public Sub RunVB(src as cv.Mat)
+	    dst2 = src.cvtColor(cv.ColorConversionCodes.BGR2GRAY)
+    End Sub
+End Class
+]]>
+            </Code>
+        </Snippet>
+    </CodeSnippet>
+</CodeSnippets>
