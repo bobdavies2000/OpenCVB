@@ -295,54 +295,54 @@ End Class
 
 
 
-' https://github.com/takuya-takeuchi/DlibDotNet/tree/master/examples/3rdparty/OpenCVSharp/MatToArray2D
-Public Class Mat_2Dlib : Inherits VB_Algorithm
-    Public dRGB As Array2D(Of BgrPixel)
-    Public dGray As Array2D(Of Byte)
-    Public Sub New()
-        desc = "Convert a Mat to the expected Array2D for a DLib API"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Dim array(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, array, 0, array.Length)
+'' https://github.com/takuya-takeuchi/DlibDotNet/tree/master/examples/3rdparty/OpenCVSharp/MatToArray2D
+'Public Class Mat_2Dlib : Inherits VB_Algorithm
+'    Public dRGB As Array2D(Of BgrPixel)
+'    Public dGray As Array2D(Of Byte)
+'    Public Sub New()
+'        desc = "Convert a Mat to the expected Array2D for a DLib API"
+'    End Sub
+'    Public Sub RunVB(src as cv.Mat)
+'        Dim array(src.Total * src.ElemSize - 1) As Byte
+'        Marshal.Copy(src.Data, array, 0, array.Length)
 
-        If src.Type = cv.MatType.CV_8U Then
-            dGray = Dlib.LoadImageData(Of Byte)(array, src.Rows, src.Cols, src.Cols * src.ElemSize)
-        Else
-            dRGB = Dlib.LoadImageData(Of BgrPixel)(array, src.Rows, src.Cols, src.Cols * src.ElemSize)
-        End If
-        setTrueText("OpenCVB Mat converted to an Array2D for use with DlibDotNet")
-    End Sub
-End Class
-
-
+'        If src.Type = cv.MatType.CV_8U Then
+'            dGray = Dlib.LoadImageData(Of Byte)(array, src.Rows, src.Cols, src.Cols * src.ElemSize)
+'        Else
+'            dRGB = Dlib.LoadImageData(Of BgrPixel)(array, src.Rows, src.Cols, src.Cols * src.ElemSize)
+'        End If
+'        setTrueText("OpenCVB Mat converted to an Array2D for use with DlibDotNet")
+'    End Sub
+'End Class
 
 
 
 
 
 
-' https://github.com/takuya-takeuchi/DlibDotNet/tree/master/examples/3rdparty/OpenCVSharp/MatToArray2D
-Public Class Mat_Dlib2Mat : Inherits VB_Algorithm
-    Public dGray As Array2D(Of Byte)
-    Public dRGB As Array2D(Of BgrPixel)
-    Public d32f As Array2D(Of Single)
-    Public Sub New()
-        desc = "Convert a Dlib Array2D to an OpenCV Mat"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
 
-        If dGray IsNot Nothing Then
-            dst2 = New cv.Mat(dGray.Rows, dGray.Columns, cv.MatType.CV_8U, 0)
-            Marshal.Copy(dGray.ToBytes, 0, dst2.Data, dst2.Total)
-        End If
 
-        If dRGB IsNot Nothing Then
-            dst3 = New cv.Mat(dRGB.Rows, dRGB.Columns, cv.MatType.CV_8UC3)
-            Marshal.Copy(dRGB.ToBytes, 0, dst3.Data, dst3.Total * dst3.ElemSize)
-        End If
-    End Sub
-End Class
+'' https://github.com/takuya-takeuchi/DlibDotNet/tree/master/examples/3rdparty/OpenCVSharp/MatToArray2D
+'Public Class Mat_Dlib2Mat : Inherits VB_Algorithm
+'    Public dGray As Array2D(Of Byte)
+'    Public dRGB As Array2D(Of BgrPixel)
+'    Public d32f As Array2D(Of Single)
+'    Public Sub New()
+'        desc = "Convert a Dlib Array2D to an OpenCV Mat"
+'    End Sub
+'    Public Sub RunVB(src as cv.Mat)
+
+'        If dGray IsNot Nothing Then
+'            dst2 = New cv.Mat(dGray.Rows, dGray.Columns, cv.MatType.CV_8U, 0)
+'            Marshal.Copy(dGray.ToBytes, 0, dst2.Data, dst2.Total)
+'        End If
+
+'        If dRGB IsNot Nothing Then
+'            dst3 = New cv.Mat(dRGB.Rows, dRGB.Columns, cv.MatType.CV_8UC3)
+'            Marshal.Copy(dRGB.ToBytes, 0, dst3.Data, dst3.Total * dst3.ElemSize)
+'        End If
+'    End Sub
+'End Class
 
 
 

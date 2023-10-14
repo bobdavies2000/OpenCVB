@@ -189,24 +189,24 @@ End Class
 
 
 ' https://github.com/accord-net/framework/wiki/Imaging
-Public Class Blur_Bitmap : Inherits VB_Algorithm
-    Dim options As New Options_Blur
-    Public Sub New()
-        labels = {"", "", "Accord - Apply method", "Accord - ApplyInPlace method"}
-        desc = "Accord: use the Accord blur interface"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
+'Public Class Blur_Bitmap : Inherits VB_Algorithm
+'    Dim options As New Options_Blur
+'    Public Sub New()
+'        labels = {"", "", "Accord - Apply method", "Accord - ApplyInPlace method"}
+'        desc = "Accord: use the Accord blur interface"
+'    End Sub
+'    Public Sub RunVB(src As cv.Mat)
+'        options.RunVB()
 
-        Dim Bitmap = cv.Extensions.BitmapConverter.ToBitmap(src)
+'        Dim Bitmap = cv.Extensions.BitmapConverter.ToBitmap(src)
 
-        Dim blurImage = New GaussianBlur(options.sigma, options.kernelSize)
-        dst2 = cv.Extensions.BitmapConverter.ToMat(blurImage.Apply(Bitmap))
+'        Dim blurImage = New GaussianBlur(options.sigma, options.kernelSize)
+'        dst2 = cv.Extensions.BitmapConverter.ToMat(blurImage.Apply(Bitmap))
 
-        blurImage.ApplyInPlace(Bitmap)
-        dst3 = cv.Extensions.BitmapConverter.ToMat(Bitmap)
-    End Sub
-End Class
+'        blurImage.ApplyInPlace(Bitmap)
+'        dst3 = cv.Extensions.BitmapConverter.ToMat(Bitmap)
+'    End Sub
+'End Class
 
 
 

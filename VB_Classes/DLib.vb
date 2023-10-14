@@ -2,54 +2,23 @@ Imports cv = OpenCvSharp
 Imports System.IO
 Imports System.Net
 Imports System.Threading
-Public Class Dlib_Sobel_CS : Inherits VB_Algorithm
-    Dim d2Mat as New Mat_Dlib2Mat
-    Dim sobel As New CS_Classes.Dlib_EdgesSobel
-    Public Sub New()
-        desc = "Testing the DLib interface with a simple Sobel example"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Dim input = src
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+'Public Class Dlib_Sobel_CS : Inherits VB_Algorithm
+'    Dim d2Mat as New Mat_Dlib2Mat
+'    Dim sobel As New CS_Classes.Dlib_EdgesSobel
+'    Public Sub New()
+'        desc = "Testing the DLib interface with a simple Sobel example"
+'    End Sub
+'    Public Sub RunVB(src as cv.Mat)
+'        Dim input = src
+'        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        sobel.RunCS(input)
+'        sobel.RunCS(input)
 
-        d2Mat.dGray = sobel.edgeImage
-        d2Mat.Run(src)
-        dst2 = d2Mat.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Dlib_GaussianBlur_CS : Inherits VB_Algorithm
-    Dim blur As New CS_Classes.Dlib_GaussianBlur
-    Dim d2Mat As New Mat_Dlib2Mat
-    Public Sub New()
-        labels(2) = "Gaussian Blur of grayscale image"
-        labels(3) = "Gaussian Blur of BGR image"
-        desc = "Use DlibDotNet to blur an image"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-
-        Dim input = src
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        blur.RunCS(input)
-
-        d2Mat.dGray = blur.blurredGray
-        d2Mat.Run(src)
-        dst2 = d2Mat.dst2
-
-        blur.RunCS(src) ' now blur the 8uc3 image
-        d2Mat.dRGB = blur.blurredRGB
-        dst3 = d2Mat.dst3
-    End Sub
-End Class
+'        d2Mat.dGray = sobel.edgeImage
+'        d2Mat.Run(src)
+'        dst2 = d2Mat.dst2
+'    End Sub
+'End Class
 
 
 
@@ -57,28 +26,59 @@ End Class
 
 
 
-Public Class Dlib_FaceDetectHOG_CS : Inherits VB_Algorithm
-    Dim faces As New CS_Classes.Dlib_FaceDetectHOG
-    Dim d2Mat As New Mat_Dlib2Mat
-    Public Sub New()
-        faces.initialize()
-        desc = "Use DlibDotNet to detect faces using the HOG detector"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
+'Public Class Dlib_GaussianBlur_CS : Inherits VB_Algorithm
+'    Dim blur As New CS_Classes.Dlib_GaussianBlur
+'    Dim d2Mat As New Mat_Dlib2Mat
+'    Public Sub New()
+'        labels(2) = "Gaussian Blur of grayscale image"
+'        labels(3) = "Gaussian Blur of BGR image"
+'        desc = "Use DlibDotNet to blur an image"
+'    End Sub
+'    Public Sub RunVB(src as cv.Mat)
 
-        Dim input = src
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+'        Dim input = src
+'        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        faces.RunCS(input)
+'        blur.RunCS(input)
 
-        dst2 = src
-        For Each r In faces.rects
-            ' why divide by 2?  The algorithm did a pyramidUp to "allow the algorithm to detect more faces".
-            Dim rect = New cv.Rect(r.Left / 2, r.Top / 2, r.Width / 2, r.Height / 2)
-            dst2.Rectangle(rect, cv.Scalar.Yellow, 1)
-        Next
-    End Sub
-End Class
+'        d2Mat.dGray = blur.blurredGray
+'        d2Mat.Run(src)
+'        dst2 = d2Mat.dst2
+
+'        blur.RunCS(src) ' now blur the 8uc3 image
+'        d2Mat.dRGB = blur.blurredRGB
+'        dst3 = d2Mat.dst3
+'    End Sub
+'End Class
+
+
+
+
+
+
+
+'Public Class Dlib_FaceDetectHOG_CS : Inherits VB_Algorithm
+'    Dim faces As New CS_Classes.Dlib_FaceDetectHOG
+'    Dim d2Mat As New Mat_Dlib2Mat
+'    Public Sub New()
+'        faces.initialize()
+'        desc = "Use DlibDotNet to detect faces using the HOG detector"
+'    End Sub
+'    Public Sub RunVB(src as cv.Mat)
+
+'        Dim input = src
+'        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+'        faces.RunCS(input)
+
+'        dst2 = src
+'        For Each r In faces.rects
+'            ' why divide by 2?  The algorithm did a pyramidUp to "allow the algorithm to detect more faces".
+'            Dim rect = New cv.Rect(r.Left / 2, r.Top / 2, r.Width / 2, r.Height / 2)
+'            dst2.Rectangle(rect, cv.Scalar.Yellow, 1)
+'        Next
+'    End Sub
+'End Class
 
 
 

@@ -293,28 +293,28 @@ End Class
 
 
 
-Public Class Hough_Bitmap : Inherits VB_Algorithm
-    Dim hough As New CS_Classes.CS_HoughLines
-    Dim options As New Options_Hough
-    Dim binarize As New Binarize_Niblack_Nick
-    Public Sub New()
-        desc = "Accord: use the Accord interface to find lines with the Hough transform."
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+'Public Class Hough_Bitmap : Inherits VB_Algorithm
+'    Dim hough As New CS_Classes.CS_HoughLines
+'    Dim options As New Options_Hough
+'    Dim binarize As New Binarize_Niblack_Nick
+'    Public Sub New()
+'        desc = "Accord: use the Accord interface to find lines with the Hough transform."
+'    End Sub
+'    Public Sub RunVB(src as cv.Mat)
+'        Options.RunVB()
 
-        binarize.Run(src)
-        dst3 = Not binarize.dst2
+'        binarize.Run(src)
+'        dst3 = Not binarize.dst2
 
-        Dim rect = New cv.Rect(0, 0, dst2.Height, dst2.Height)
-        Dim binaryImage = cv.Extensions.BitmapConverter.ToBitmap(dst3(rect))
-        Dim srcBmp = cv.Extensions.BitmapConverter.ToBitmap(src(rect))
-        srcBmp = hough.RunCS(srcBmp, binaryImage, options.threshold, options.relativeIntensity)
-        Dim tmp = cv.Extensions.BitmapConverter.ToMat(srcBmp)
-        dst2 = src
-        tmp.CopyTo(dst2(rect))
-    End Sub
-End Class
+'        Dim rect = New cv.Rect(0, 0, dst2.Height, dst2.Height)
+'        Dim binaryImage = cv.Extensions.BitmapConverter.ToBitmap(dst3(rect))
+'        Dim srcBmp = cv.Extensions.BitmapConverter.ToBitmap(src(rect))
+'        srcBmp = hough.RunCS(srcBmp, binaryImage, options.threshold, options.relativeIntensity)
+'        Dim tmp = cv.Extensions.BitmapConverter.ToMat(srcBmp)
+'        dst2 = src
+'        tmp.CopyTo(dst2(rect))
+'    End Sub
+'End Class
 
 
 

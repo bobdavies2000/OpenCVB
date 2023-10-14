@@ -1,6 +1,4 @@
-﻿Imports System.Windows.Automation
-Imports Accord.Imaging.Filters
-Imports cv = OpenCvSharp
+﻿Imports cv = OpenCvSharp
 Public Class Color_Basics : Inherits VB_Algorithm
     Public classCount As Integer
     Public CurrentColorClassifier As String

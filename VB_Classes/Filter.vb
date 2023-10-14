@@ -174,17 +174,17 @@ End Class
 
 
 
-Public Class Filter_AccordSuite : Inherits VB_Algorithm
-    Dim options As New options_AccordSuite
-    Dim suite As New CS_AccordSuite
-    Public Sub New()
-        desc = "Accord: a suite of Accord filters"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
-        labels(2) = "Filter selected from the Accord suite is " + options.selection
-        Dim Bitmap = cv.Extensions.BitmapConverter.ToBitmap(src)
-        Bitmap = suite.RunCS(options.selectedIndex, Bitmap)
-        dst2 = cv.Extensions.BitmapConverter.ToMat(Bitmap)
-    End Sub
-End Class
+'Public Class Filter_AccordSuite : Inherits VB_Algorithm
+'    Dim options As New options_AccordSuite
+'    Dim suite As New CS_AccordSuite
+'    Public Sub New()
+'        desc = "Accord: a suite of Accord filters"
+'    End Sub
+'    Public Sub RunVB(src as cv.Mat)
+'        Options.RunVB()
+'        labels(2) = "Filter selected from the Accord suite is " + options.selection
+'        Dim Bitmap = cv.Extensions.BitmapConverter.ToBitmap(src)
+'        Bitmap = suite.RunCS(options.selectedIndex, Bitmap)
+'        dst2 = cv.Extensions.BitmapConverter.ToMat(Bitmap)
+'    End Sub
+'End Class

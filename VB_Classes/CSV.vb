@@ -1,7 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.IO
-Imports ExcelDataReader
-Imports Accord.Math
 
 Public Class CSV_Basics : Inherits VB_Algorithm
     Public inputFile As String
@@ -41,25 +39,25 @@ End Class
 
 
 
-Public Class CSV_Excel : Inherits VB_Algorithm
-    Public inputFile As String
-    Public dataTable As DataTable
-    Public Sub New()
-        inputFile = task.homeDir + "Data\examples.xls" ' default input file when run standalone
-        desc = "Read an Excel file"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Dim reader As IExcelDataReader
-        Dim stream = File.Open(inputFile, FileMode.Open, FileAccess.Read)
-        reader = ExcelDataReader.ExcelReaderFactory.CreateReader(stream)
-        Dim conf = New ExcelDataSetConfiguration
-        Dim configureDataTable = New ExcelDataTableConfiguration
+'Public Class CSV_Excel : Inherits VB_Algorithm
+'    Public inputFile As String
+'    Public dataTable As DataTable
+'    Public Sub New()
+'        inputFile = task.homeDir + "Data\examples.xls" ' default input file when run standalone
+'        desc = "Read an Excel file"
+'    End Sub
+'    Public Sub RunVB(src as cv.Mat)
+'        Dim reader As IExcelDataReader
+'        Dim stream = File.Open(inputFile, FileMode.Open, FileAccess.Read)
+'        reader = ExcelDataReader.ExcelReaderFactory.CreateReader(stream)
+'        Dim conf = New ExcelDataSetConfiguration
+'        Dim configureDataTable = New ExcelDataTableConfiguration
 
-        Dim dataSet = reader.AsDataSet(conf)
-        dataTable = dataSet.Tables(0)
-        If standalone Then Dim array = dataTable.ToJagged(Of Double)("Column0", "Column1")
-        setTrueText("Input file: " + inputFile + vbCrLf + "Can now be read with the following:" + vbCrLf + vbCrLf +
-                    "dim array = excel.dataTable.ToJagged(of Double)(column1 label, column2 label)")
-        reader.Close()
-    End Sub
-End Class
+'        Dim dataSet = reader.AsDataSet(conf)
+'        dataTable = dataSet.Tables(0)
+'        If standalone Then Dim array = dataTable.ToJagged(Of Double)("Column0", "Column1")
+'        setTrueText("Input file: " + inputFile + vbCrLf + "Can now be read with the following:" + vbCrLf + vbCrLf +
+'                    "dim array = excel.dataTable.ToJagged(of Double)(column1 label, column2 label)")
+'        reader.Close()
+'    End Sub
+'End Class
