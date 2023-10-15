@@ -315,107 +315,6 @@ End Class
 
 
 
-Public Class MSER_Regions : Inherits VB_Algorithm
-    Dim core As New MSER_Core
-    Public mserCells As New List(Of rcData)
-    Dim matchCell As New RedCloud_MatchCell
-    Public mserMap As cv.Mat
-    Public opAutoOn As Boolean = True
-    Public Sub New()
-        mserMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "Latest frame only - no accumulation"
-        desc = "Tag and track the MSER (Maximally Stable Extremal Region) regions"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If opAutoOn Then
-            Static opAuto As New OpAuto_MSER
-            opAuto.classCount = mserCells.Count
-            opAuto.Run(src)
-        End If
-        Dim mserLast = 255
-
-        core.Run(src)
-
-        Dim prepCells As New SortedList(Of Integer, rcPrep)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To core.boxes.Count - 1
-            Dim rp As New rcPrep
-            rp.rect = core.boxes(i)
-            rp.mask = New cv.Mat(rp.rect.Height, rp.rect.Width, cv.MatType.CV_8U, 0)
-            rp.floodPoint = core.regions(i)(0)
-            rp.pixels = core.regions(i).Count
-            For Each pt In core.regions(i)
-                rp.mask.Set(Of Byte)(pt.Y - rp.rect.Y, pt.X - rp.rect.X, i Mod 255)
-            Next
-            prepCells.Add(rp.pixels, rp)
-        Next
-
-        If firstPass Then
-            mserMap.SetTo(mserLast)
-            matchCell.lastCells.Clear()
-        End If
-
-        matchCell.lastCellMap = mserMap.Clone
-        matchCell.lastCells = New List(Of rcData)(mserCells)
-        matchCell.usedColors.Clear()
-        matchCell.usedColors.Add(black)
-        matchCell.unMatchedCells = 0
-
-        'Static lastCells As New List(Of rcData)
-        'If heartBeat() Then lastCells = New List(Of rcData) Else lastCells = New List(Of rcData)(mserCells)
-        ' lastCells = New List(Of rcData)(mserCells)
-        mserCells.Clear()
-        mserMap.SetTo(mserLast)
-        Dim lastDst2 = dst2.Clone
-        If heartBeat() Then dst2.SetTo(0)
-        Dim spotsRemoved As Integer
-        dst3.SetTo(0)
-        For Each key In prepCells
-            Dim rp = key.Value
-            rp.maxDist = vbGetMaxDist(rp)
-
-            Dim spotTakenTest = mserMap.Get(Of Byte)(rp.maxDist.Y, rp.maxDist.X)
-            If spotTakenTest <> mserLast Then
-                spotsRemoved += 1
-                Continue For
-            End If
-
-            rp.index = mserCells.Count
-            matchCell.rp = rp
-            matchCell.Run(Nothing)
-
-            Dim rc = matchCell.rc
-
-            If rc.pixels > 0 And rc.pixels < task.minPixels Then Continue For
-            Dim color = lastDst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
-            If color <> black Then rc.color = color
-            mserCells.Add(rc)
-
-            mserMap(rc.rect).SetTo(rc.index, rc.mask)
-            vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
-            vbDrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
-            If mserCells.Count = 254 Then Exit For
-        Next
-
-        'For Each rc In lastCells
-        '    Dim val = mserMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-        '    If val = mserLast Then
-        '        rc.index = mserCells.Count
-        '        mserMap(rc.rect).SetTo(rc.index, rc.mask)
-        '        vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
-        '        mserCells.Add(rc)
-        '    End If
-        'Next
-        labels(2) = "Cells identified " + CStr(mserCells.Count) + "  Overlapping cells removed " + CStr(spotsRemoved)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 
 Public Class MSER_RegionLeft : Inherits VB_Algorithm
     Dim regions As New MSER_Regions
@@ -572,6 +471,8 @@ End Class
 Public Class MSER_CPP : Inherits VB_Algorithm
     Dim Options As New Options_MSER
     Public boxes As New List(Of cv.Rect)
+    Public floodPoints As New List(Of cv.Point)
+    Public maskCounts As New List(Of Integer)
     Public Sub New()
         findCheckBox("Use grayscale input").Checked = False
         Options.RunVB()
@@ -599,11 +500,16 @@ Public Class MSER_CPP : Inherits VB_Algorithm
         Dim count = MSER_Count(cPtr)
         If count = 0 Then Exit Sub
 
+        Dim ptData = New cv.Mat(count, 1, cv.MatType.CV_32SC2, MSER_FloodPoints(cPtr))
+        Dim maskData = New cv.Mat(count, 1, cv.MatType.CV_32S, MSER_MaskCounts(cPtr))
         Dim rectData = New cv.Mat(count, 1, cv.MatType.CV_32SC4, MSER_Rects(cPtr))
         boxes.Clear()
+        floodPoints.Clear()
+        maskCounts.Clear()
         For i = 0 To count - 1
-            Dim r = rectData.Get(Of cv.Rect)(i, 0)
-            boxes.Add(r)
+            boxes.Add(rectData.Get(Of cv.Rect)(i, 0))
+            floodPoints.Add(ptData.Get(Of cv.Point)(i, 0))
+            maskCounts.Add(maskData.Get(Of Integer)(i, 0))
         Next
 
         task.palette.Run(dst2 * 255 / count)
@@ -637,6 +543,13 @@ Module MSER_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MSER_Rects(cPtr As IntPtr) As IntPtr
     End Function
+
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function MSER_FloodPoints(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function MSER_MaskCounts(cPtr As IntPtr) As IntPtr
+    End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function MSER_Count(cPtr As IntPtr) As Integer
     End Function
@@ -651,13 +564,171 @@ End Module
 
 
 
-Public Class MSER_MaskAndRect : Inherits VB_Algorithm
-    Dim regions As New MSER_CPP
+
+Public Class MSER_Regions : Inherits VB_Algorithm
+    Dim core As New MSER_Core
+    Public mserCells As New List(Of rcData)
+    Dim matchCell As New RedCloud_MatchCell
+    Public cellMap As cv.Mat
+    Public useOpAuto As Boolean = True
     Public Sub New()
-        desc = "Create rcData cells for each region in MSER output"
+        cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "Latest frame only - no accumulation"
+        desc = "Tag and track the MSER (Maximally Stable Extremal Region) regions"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        regions.Run(src)
-        dst2 = regions.dst3
+        If useOpAuto Then
+            Static opAuto As New OpAuto_MSER
+            opAuto.classCount = mserCells.Count
+            opAuto.Run(src)
+        End If
+        Dim mserLast = 255
+
+        core.Run(src)
+
+        Dim prepCells As New SortedList(Of Integer, rcPrep)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To core.boxes.Count - 1
+            Dim rp As New rcPrep
+            rp.rect = core.boxes(i)
+            rp.mask = New cv.Mat(rp.rect.Height, rp.rect.Width, cv.MatType.CV_8U, 0)
+            rp.floodPoint = core.regions(i)(0)
+            rp.pixels = core.regions(i).Count
+            For Each pt In core.regions(i)
+                rp.mask.Set(Of Byte)(pt.Y - rp.rect.Y, pt.X - rp.rect.X, i Mod 255)
+            Next
+            prepCells.Add(rp.pixels, rp)
+        Next
+
+        If task.optionsChanged Then
+            cellMap.SetTo(mserLast)
+            matchCell.lastCells.Clear()
+        End If
+
+        matchCell.lastCellMap = cellMap.Clone
+        matchCell.lastCells = New List(Of rcData)(mserCells)
+        matchCell.usedColors.Clear()
+        matchCell.usedColors.Add(black)
+        matchCell.unMatchedCells = 0
+
+        mserCells.Clear()
+        cellMap.SetTo(mserLast)
+        Dim lastDst2 = dst2.Clone
+        If heartBeat() Then dst2.SetTo(0)
+        Dim spotsRemoved As Integer
+        dst3.SetTo(0)
+        For Each key In prepCells
+            Dim rp = key.Value
+            rp.maxDist = vbGetMaxDist(rp)
+
+            Dim spotTakenTest = cellMap.Get(Of Byte)(rp.maxDist.Y, rp.maxDist.X)
+            If spotTakenTest <> mserLast Then
+                spotsRemoved += 1
+                Continue For
+            End If
+
+            rp.index = mserCells.Count
+            matchCell.rp = rp
+            matchCell.Run(Nothing)
+
+            Dim rc = matchCell.rc
+
+            If rc.pixels > 0 And rc.pixels < task.minPixels Then Continue For
+            Dim color = lastDst2.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+            If color <> black Then rc.color = color
+            mserCells.Add(rc)
+
+            cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
+            vbDrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+            If mserCells.Count = 254 Then Exit For
+        Next
+
+        labels(2) = "Cells identified " + CStr(mserCells.Count) + "  Overlapping cells removed " + CStr(spotsRemoved)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class MSER_MaskAndRect : Inherits VB_Algorithm
+    Dim rawCells As New MSER_CPP
+    Dim matchCell As New RedCloud_MatchCell
+    Public cellMap As cv.Mat
+    Public mserCells As New List(Of rcData)
+    Public Sub New()
+        cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Create cells for each region in MSER output"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        rawCells.Run(src)
+        task.redLast = 255
+
+        'Static prepCells As New SortedList(Of Integer, rcPrep)(New compareAllowIdenticalIntegerInverted)
+        'Static lastPrepCells As New SortedList(Of Integer, rcPrep)(New compareAllowIdenticalIntegerInverted)
+        'lastPrepCells = New SortedList(Of Integer, rcPrep)(prepCells)
+
+        'prepCells.Clear()
+        Dim prepCells As New SortedList(Of Integer, rcPrep)(New compareAllowIdenticalIntegerInverted)
+        For i = 0 To rawCells.boxes.Count - 1
+            If i >= 3 Then Exit For
+            Dim rp As New rcPrep
+            rp.rect = rawCells.boxes(i)
+            rp.mask = rawCells.dst2(rp.rect).InRange(i, i)
+            rp.maxDist = vbGetMaxDist(rp.mask)
+            rp.floodPoint = rawCells.floodPoints(i)
+            rp.pixels = rawCells.maskCounts(i)
+            prepCells.Add(rp.pixels, rp)
+        Next
+
+        'If heartBeat() = False Then
+        '    For Each key In lastPrepCells
+        '        Dim rp = key.Value
+        '        If rawCells.dst2.Get(Of Byte)(rp.maxDist.Y, rp.maxDist.X) = task.redLast Then
+        '            If prepCells.Keys.Contains(rp.pixels) = False Then prepCells.Add(rp.pixels, rp)
+        '        End If
+        '    Next
+        'End If
+
+        If task.optionsChanged Then
+            cellMap.SetTo(task.redLast)
+            matchCell.lastCells.Clear()
+        End If
+
+        matchCell.lastCellMap = cellMap.Clone
+        matchCell.lastCells = New List(Of rcData)(mserCells)
+        matchCell.usedColors.Clear()
+        matchCell.usedColors.Add(black)
+        matchCell.unMatchedCells = 0
+
+        mserCells.Clear()
+
+        cellMap.SetTo(task.redLast)
+        dst2.SetTo(0)
+        For Each key In prepCells
+            Dim rp = key.Value
+            rp.maxDist = vbGetMaxDist(rp)
+
+            rp.index = mserCells.Count
+            matchCell.rp = rp
+            matchCell.Run(Nothing)
+
+            Dim rc = matchCell.rc
+
+            mserCells.Add(rc)
+
+            cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
+            If mserCells.Count = 254 Then Exit For
+        Next
+
+        Dim val = cellMap.Get(Of Byte)(65, 99)
+        If val = task.redLast Then Dim k = 0
+        Console.WriteLine(CStr(val))
+
+        If heartBeat() Then labels(2) = CStr(mserCells.Count) + " Cells identified"
     End Sub
 End Class

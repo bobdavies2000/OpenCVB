@@ -16,6 +16,8 @@ public:
     Mat src, dst;
     cv::Ptr<cv::MSER> mser;
     vector<Rect> containers;
+    vector<Point> floodPoints;
+    vector<int> maskCounts;
     vector<vector<Point>> regions;
     vector<Rect> boxes;
     MSER_Basics(int delta, int minArea, int maxArea, float maxVariation, float minDiversity, int maxEvolution, float areaThreshold,
@@ -34,14 +36,18 @@ public:
         }
 
         int index = 0;
+        maskCounts.clear();
         containers.clear();
+        floodPoints.clear();
         for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
         {
             Rect box = boxes[it->second];
             Point center = Point(box.x + box.width / 2, box.y + box.height / 2);
             int val = dst.at<uchar>(center.y, center.x);
-            if (val == 0)
+            if (val == 255)
             {
+                floodPoints.push_back(regions[it->second][0]);
+                maskCounts.push_back(regions[it->second].size());
                 for (Point pt : regions[it->second])
                 {
                     dst.at<uchar>(pt.y, pt.x) = index;
@@ -68,7 +74,17 @@ void MSER_Close(MSER_Basics *cPtr)
 extern "C" __declspec(dllexport)
 int* MSER_Rects(MSER_Basics * cPtr)
 {
-    return (int*) & cPtr->containers[0];
+    return (int*)&cPtr->containers[0];
+}
+extern "C" __declspec(dllexport)
+int* MSER_FloodPoints(MSER_Basics * cPtr)
+{
+    return (int*)&cPtr->floodPoints[0];
+}
+extern "C" __declspec(dllexport)
+int* MSER_MaskCounts(MSER_Basics * cPtr)
+{
+    return (int*)&cPtr->maskCounts[0];
 }
 extern "C" __declspec(dllexport)
 int MSER_Count(MSER_Basics * cPtr)
@@ -80,7 +96,7 @@ int *MSER_RunCPP(MSER_Basics *cPtr, int *dataPtr, int rows, int cols, int channe
 {
 		cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, dataPtr);
         cPtr->dst = Mat(rows, cols, CV_8UC1);
-        cPtr->dst.setTo(0);
+        cPtr->dst.setTo(255);
 		cPtr->RunCPP();
 		return (int *) cPtr->dst.data; 
 }

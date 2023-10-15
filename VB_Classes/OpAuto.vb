@@ -352,7 +352,7 @@ Public Class OpAuto_MSER : Inherits VB_Algorithm
     Dim core As New MSER_Regions
     Public classCount As Integer
     Public Sub New()
-        If standalone Then core.opAutoOn = False
+        If standalone Then core.useOpAuto = False
         desc = "Option Automation: find the best MSER max and min area values"
     End Sub
     Public Sub RunVB(src As cv.Mat)
