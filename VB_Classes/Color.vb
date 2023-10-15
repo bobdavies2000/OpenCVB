@@ -32,8 +32,10 @@ Public Class Color_Basics : Inherits VB_Algorithm
         End If
 
         classifier.run(dst1)
-        classCount = classifier.classcount
-        dst0 = classifier.dst0
+        classCount = classifier.classcount + 1
+        Dim tmp As cv.Mat = classifier.dst0
+        tmp.Set(Of Byte)(0, 0, 0) ' define the "Other" category - zero with one pixel.
+        dst0 = tmp + 1
 
         dst2 = dst0 * 255 / classCount
         dst3 = vbPalette(dst2)

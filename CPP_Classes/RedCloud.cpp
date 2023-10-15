@@ -18,26 +18,22 @@ class RedCloud
 private:
 public:
     Mat src, mask;
-    vector<Point>cellPoints;
+    vector<Point>floodPoints;
     vector<int>cellSizes;
 
     RedCloud() {}
     void RunCPP() {
         vector<Point>points;
-        src = src(Rect(1, 1, src.cols - 2, src.rows - 2));
         Rect rect;
 
         multimap<int, int, greater<int>> sizeSorted;
         int floodFlag = 4 | FLOODFILL_FIXED_RANGE;
-        unsigned char valCurr, valPrev = 0;
-        Point ptPrev = Point(0, 0);
-        Mat tmpMask;
         for (int y = 0; y < src.rows; y++)
         {
             for (int x = 0; x < src.cols; x++)
             {
                 Point pt = Point(x, y);
-                valCurr = src.at<unsigned char>(y, x);
+                uchar valCurr = src.at<unsigned char>(y, x);
                 if (mask.at<unsigned char>(y, x) == 0)
                 {
                     int count = floodFill(src, mask, pt, valCurr, &rect, 0, 0, floodFlag | (255 << 8));
@@ -47,36 +43,42 @@ public:
                         sizeSorted.insert(make_pair(count, sizeSorted.size()));
                     }
                 }
-                ptPrev = pt;
-                valPrev = valCurr;
             }
         }
 
-        cellPoints.clear();
+        floodPoints.clear();
         cellSizes.clear();
         for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
         {
             int index = it->second;
-            cellPoints.push_back(points[index]);
+            floodPoints.push_back(points[index]);
             cellSizes.push_back(it->first);
         }
     }
 };
 
 extern "C" __declspec(dllexport) RedCloud * RedCloud_Open() { RedCloud* cPtr = new RedCloud(); return cPtr; }
-extern "C" __declspec(dllexport) int* RedCloud_Points(RedCloud * cPtr) { return (int*)&cPtr->cellPoints[0]; }
+extern "C" __declspec(dllexport) int* RedCloud_Points(RedCloud * cPtr) { return (int*)&cPtr->floodPoints[0]; }
 extern "C" __declspec(dllexport) int* RedCloud_Sizes(RedCloud * cPtr) { return (int*)&cPtr->cellSizes[0]; }
 extern "C" __declspec(dllexport) int* RedCloud_Close(RedCloud * cPtr) { delete cPtr; return (int*)0; }
 extern "C" __declspec(dllexport) int RedCloud_Run(RedCloud * cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->src = Mat(rows, cols, CV_8U, dataPtr);
 
-    cPtr->mask = Mat(rows, cols, CV_8U);
+    cPtr->mask = Mat(rows + 2, cols + 2, CV_8U);
     cPtr->mask.setTo(0);
 
     cPtr->RunCPP();
-    return (int)cPtr->cellPoints.size();
+    return (int)cPtr->floodPoints.size();
 }
+
+
+
+
+
+
+
+
 class RedCloud_FindCells
 {
 private:
@@ -114,6 +116,8 @@ int* RedCloud_FindCells_RunCPP(RedCloud_FindCells * cPtr, int* dataPtr, int rows
     cPtr->RunCPP(Mat(rows, cols, CV_8UC1, dataPtr));
     return (int*)&cPtr->cellList[0];
 }
+
+
 
 
 

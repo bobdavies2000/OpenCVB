@@ -725,10 +725,6 @@ Public Class MSER_MaskAndRect : Inherits VB_Algorithm
             If mserCells.Count = 254 Then Exit For
         Next
 
-        Dim val = cellMap.Get(Of Byte)(65, 99)
-        If val = task.redLast Then Dim k = 0
-        Console.WriteLine(CStr(val))
-
         If heartBeat() Then labels(2) = CStr(mserCells.Count) + " Cells identified"
     End Sub
 End Class

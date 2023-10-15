@@ -43,7 +43,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Static numSlider = findSlider("Desired number of cells")
         Dim desiredCellCount = Math.Min(numSlider.value, prepCells.Count)
-        task.redLast = 255
+        task.redLast = 0
 
         If standalone Then
             dst0 = src
@@ -72,6 +72,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         task.cellMap.SetTo(task.redLast)
 
         task.redCells.Clear()
+        task.redCells.Add(New rcData)
         Dim spotsRemoved As Integer
         For Each rp In prepCells
             rp.maxDist = vbGetMaxDist(rp)
@@ -85,7 +86,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
             matchCell.rp = rp
             matchCell.Run(Nothing)
 
-            If matchCell.rc.pixels > 0 And matchCell.rc.pixels < task.minPixels Then Continue For
+            If matchCell.rc.pixels < task.minPixels Then Continue For
             task.redCells.Add(matchCell.rc)
 
             task.cellMap(matchCell.rc.rect).SetTo(matchCell.rc.index, matchCell.rc.mask)
@@ -94,28 +95,21 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
             If task.redCells.Count > desiredCellCount - 1 Then Exit For
         Next
 
-        task.cellMap.Rectangle(New cv.Rect(0, 0, src.Width, src.Height), 0, 1)
-        dst2.Rectangle(New cv.Rect(0, 0, src.Width, src.Height), 0, 1)
         If task.drawRect = New cv.Rect Then
-            For Each roi In task.gridList
-                Dim rp As New rcPrep
-                rp.rect = roi
-                rp.mask = task.cellMap(rp.rect).InRange(task.redLast, task.redLast)
-                rp.maxDist = vbGetMaxDist(rp)
-                rp.floodPoint = rp.maxDist
-                rp.pixels = rp.mask.CountNonZero
-                If rp.pixels > 0 Then
-                    rp.index = task.redCells.Count
-                    matchCell.rp = rp
-                    matchCell.Run(Nothing)
-                    task.redCells.Add(matchCell.rc)
+            Dim rp As New rcPrep
+            rp.rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+            rp.mask = task.cellMap(rp.rect).InRange(task.redLast, task.redLast)
+            rp.maxDist = New cv.Point(0, 0)
+            rp.floodPoint = rp.maxDist
+            rp.pixels = rp.mask.CountNonZero
+            rp.index = task.redCells.Count
+            matchCell.rp = rp
+            matchCell.Run(Nothing)
+            task.redCells.Add(matchCell.rc)
 
-                    task.cellMap(matchCell.rc.rect).SetTo(matchCell.rc.index, matchCell.rc.mask)
-                    dst2(matchCell.rc.rect).SetTo(matchCell.rc.color, matchCell.rc.mask)
-                End If
-            Next
+            task.cellMap(matchCell.rc.rect).SetTo(matchCell.rc.index, matchCell.rc.mask)
+            dst2(matchCell.rc.rect).SetTo(matchCell.rc.color, matchCell.rc.mask)
         End If
-        dst2.Rectangle(New cv.Rect(0, 0, src.Width, src.Height), 0, 1)
 
         ' validate each of the maxDStable points
         For i = 0 To task.redCells.Count - 1
@@ -198,8 +192,6 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
 
             Dim stableCheck = lastCellMap.Get(Of Byte)(lrc.maxDStable.Y, lrc.maxDStable.X)
             If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
-        Else
-            Dim k = 0
         End If
 
         If usedColors.Contains(rc.color) Then
@@ -236,74 +228,6 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-Public Class RedCloud_CPP : Inherits VB_Algorithm
-    Public prepCells As New List(Of rcPrep)
-    Public Sub New()
-        cPtr = RedCloud_Open()
-        gOptions.HistBinSlider.Value = 15 ' jumpstart the likely option automation result.
-        desc = "Floodfill every pixel in the prepared input."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then
-            Static guided As New GuidedBP_Depth
-            guided.Run(src)
-            src = guided.backProject
-            src.ConvertTo(src, cv.MatType.CV_8U)
-        End If
-
-        Dim inputData(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
-
-        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
-
-        Dim classCount = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), src.Rows, src.Cols)
-        handleInput.Free()
-
-        Dim ptData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, RedCloud_Points(cPtr))
-        Dim sizes = New cv.Mat(classCount, 1, cv.MatType.CV_32S, RedCloud_Sizes(cPtr))
-
-        Dim points As New List(Of cv.Point)
-        Dim size As New List(Of Integer)
-        For i = 0 To classCount - 1
-            points.Add(ptData.Get(Of cv.Point)(i, 0))
-            size.Add(sizes.Get(Of Integer)(i, 0))
-        Next
-
-        Dim floodFlag = 4 Or cv.FloodFillFlags.FixedRange
-        dst3 = src
-
-        Dim input = dst3(New cv.Rect(1, 1, src.Width - 2, src.Height - 2))
-        dst3.Rectangle(New cv.Rect(0, 0, src.Width, src.Height), 255, 1)
-        prepCells.Clear()
-        Dim mask As New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
-        Dim fill As Integer, rect As cv.Rect
-        For i = 0 To points.Count - 1
-            Dim rp As New rcPrep
-            fill = prepCells.Count
-            If fill > task.redLast - 1 Then fill -= task.redLast - 1
-            rp.floodPoint = points(i)
-            If mask.Get(Of Byte)(rp.floodPoint.Y, rp.floodPoint.X) = 0 Then
-                rp.pixels = input.FloodFill(mask, rp.floodPoint, New cv.Scalar(fill), rect, 0, 0, floodFlag Or fill << 8)
-                If rect.Width = 0 Then Continue For
-                rp.mask = input(rect).InRange(fill, fill)
-                rp.rect = New cv.Rect(rect.X + 1, rect.Y + 1, rect.Width, rect.Height)
-                rp.floodPoint = New cv.Point(rp.floodPoint.X + 1, rp.floodPoint.Y + 1)
-                prepCells.Add(rp)
-            End If
-        Next
-
-        labels(3) = "8-bit version of the output with " + CStr(dst3.InRange(0, 0).CountNonZero) + " zero pixels"
-        dst2 = vbPalette(dst3)
-        If heartBeat() Then labels(2) = CStr(prepCells.Count) + " regions found"
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
-    End Sub
-End Class
 
 
 
@@ -1172,6 +1096,7 @@ Public Class RedCloud_ColorOnly : Inherits VB_Algorithm
 
         colorC.Run(src)
         dst2 = colorC.dst2
+        dst3 = colorC.dst3
 
         colorCells = New List(Of rcData)(task.redCells)
         colorMap = task.cellMap.Clone
@@ -1249,12 +1174,84 @@ Public Class RedCloud_CombineColor : Inherits VB_Algorithm
         dst2 = redP.dst2
 
         prepCells.Clear()
-        For Each rp In redP.prepCells
+        For Each key In redP.prepCells
+            Dim rp = key.Value
             If task.drawRect <> New cv.Rect Then
                 If task.drawRect.Contains(rp.floodPoint) = False Then Continue For
             End If
 
             prepCells.Add(rp)
         Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedCloud_CPP : Inherits VB_Algorithm
+    Public prepCells As New SortedList(Of Integer, rcPrep)(New compareAllowIdenticalIntegerInverted)
+    Public Sub New()
+        cPtr = RedCloud_Open()
+        gOptions.HistBinSlider.Value = 15 ' jumpstart the likely option automation result.
+        desc = "Floodfill every pixel in the prepared input."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels <> 1 Then
+            Static guided As New GuidedBP_Depth
+            guided.Run(src)
+            src = guided.backProject
+            src.ConvertTo(src, cv.MatType.CV_8U)
+        End If
+
+        Dim inputData(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+
+        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+        Dim classCount = RedCloud_Run(cPtr, handleInput.AddrOfPinnedObject(), src.Rows, src.Cols)
+        handleInput.Free()
+
+        Dim ptData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, RedCloud_Points(cPtr))
+        Dim sizes = New cv.Mat(classCount, 1, cv.MatType.CV_32S, RedCloud_Sizes(cPtr))
+
+        Dim floodPoints As New List(Of cv.Point)
+        Dim size As New List(Of Integer)
+        For i = 0 To classCount - 1
+            floodPoints.Add(ptData.Get(Of cv.Point)(i, 0))
+            size.Add(sizes.Get(Of Integer)(i, 0))
+        Next
+
+        Dim floodFlag = 4 Or cv.FloodFillFlags.FixedRange
+        dst3 = src
+
+        prepCells.Clear()
+        Dim other = New rcPrep
+        other.mask = New cv.Mat(1, 1, cv.MatType.CV_8U, 255)
+        other.rect = New cv.Rect(0, 0, 1, 1)
+        other.pixels = 1
+        prepCells.Add(1, other)
+        Dim mask As New cv.Mat(src.Height + 2, src.Width + 2, cv.MatType.CV_8U, 0)
+        Dim fill As Integer, rect As cv.Rect
+        For i = 0 To floodPoints.Count - 1
+            Dim rp As New rcPrep
+            fill = prepCells.Count Mod 255
+            rp.floodPoint = floodPoints(i)
+            If mask.Get(Of Byte)(rp.floodPoint.Y, rp.floodPoint.X) = 0 Then
+                rp.pixels = src.FloodFill(mask, rp.floodPoint, New cv.Scalar(fill), rect, 0, 0, floodFlag Or fill << 8)
+                If rect.Width = 0 Then Continue For
+                rp.mask = src(rect).InRange(fill, fill)
+                rp.rect = New cv.Rect(rect.X, rect.Y, rect.Width, rect.Height)
+                rp.floodPoint = New cv.Point(rp.floodPoint.X, rp.floodPoint.Y)
+                prepCells.Add(rp.pixels, rp)
+            End If
+        Next
+
+        labels(3) = "8-bit version of the output with " + CStr(dst3.InRange(0, 0).CountNonZero) + " zero pixels"
+        dst2 = vbPalette(dst3)
+        If heartBeat() Then labels(2) = CStr(prepCells.Count) + " regions found"
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
     End Sub
 End Class
