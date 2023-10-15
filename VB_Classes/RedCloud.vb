@@ -198,6 +198,8 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
 
             Dim stableCheck = lastCellMap.Get(Of Byte)(lrc.maxDStable.Y, lrc.maxDStable.X)
             If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
+        Else
+            Dim k = 0
         End If
 
         If usedColors.Contains(rc.color) Then
