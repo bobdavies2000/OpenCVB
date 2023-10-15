@@ -107,21 +107,19 @@ Public Class Image_RedCloudColor : Inherits VB_Algorithm
         If standalone Then gOptions.displayDst1.Checked = True
         desc = "Use RedCloud on a photo instead of the video stream."
     End Sub
-    Public Sub displayCell(dst As cv.Mat)
-        Dim rc = task.redCells(task.cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
-        dst.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         images.Run(Nothing)
         dst0 = images.dst2.Clone
         dst1 = images.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         redc.Run(dst0)
         dst2 = redc.dst2
-        dst3 = redc.dst3
 
-        dst2.Rectangle(task.rcSelect.rect, cv.Scalar.Yellow, task.lineWidth)
-        If standalone Then displayCell(dst0)
+        Dim mask = task.cellMap.InRange(task.redOther, task.redOther)
+        dst2.SetTo(cv.Scalar.Black, mask)
+
+        redc.colorC.redSelect(dst0, dst1, dst2)
+
         labels(2) = redc.labels(2)
     End Sub
 End Class
@@ -162,11 +160,11 @@ End Class
 
 Public Class Image_CellStats : Inherits VB_Algorithm
     Dim images As New Image_RedCloudColor
-    Dim stats As New ReductionCloud_CellStats
+    Dim stats As New RedCloud_CellStats
     Public Sub New()
         If standalone Then gOptions.displayDst0.Checked = True
         If standalone Then gOptions.displayDst1.Checked = True
-        stats.redC = New ReductionCloud_Basics
+        stats.redC = New RedCloud_ColorOnly
         desc = "Display the statistics for the selected cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -178,12 +176,8 @@ Public Class Image_CellStats : Inherits VB_Algorithm
         dst1 = images.dst1
         dst2 = images.dst2
 
-        stats.redC.run(images.dst2)
-
-        stats.Run(src)
-
         stats.statsString(src)
-        If standalone Then images.displayCell(dst0)
+
         setTrueText(stats.strOut, 3)
     End Sub
 End Class

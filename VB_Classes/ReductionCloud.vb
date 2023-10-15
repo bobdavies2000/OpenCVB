@@ -105,10 +105,10 @@ Public Class ReductionCloud_Match : Inherits VB_Algorithm
         End If
 
         Dim rc = redCells(index)
-        If index = task.redLast Then
+        If index = task.redOther Then
             rc.gridID = task.gridROIclicked
             rc.rect = task.gridList(rc.gridID)
-            rc.mask = cellMap(rc.rect).InRange(task.redLast, task.redLast)
+            rc.mask = cellMap(rc.rect).InRange(task.redOther, task.redOther)
             rc.pixels = rc.mask.CountNonZero
             buildCell(rc)
         End If
@@ -133,7 +133,7 @@ Public Class ReductionCloud_Match : Inherits VB_Algorithm
                 If rc.indexLast = rc.index Then Exit For
             Next
         End If
-        If rc.indexLast < lastCells.Count And rc.indexLast <> task.redLast Then
+        If rc.indexLast < lastCells.Count And rc.indexLast <> task.redOther Then
             Dim lrc = lastCells(rc.indexLast)
             rc.motionRect = rc.rect.Union(lrc.rect)
             rc.color = lrc.color
@@ -187,12 +187,12 @@ Public Class ReductionCloud_Match : Inherits VB_Algorithm
         End If
 
         If task.optionsChanged Or firstPass Then
-            cellMap.SetTo(task.redLast)
+            cellMap.SetTo(task.redOther)
             lastCells.Clear()
         End If
 
         lastCellMap = cellMap.Clone
-        cellMap.SetTo(task.redLast)
+        cellMap.SetTo(task.redOther)
         redCells.Clear()
         usedColors.Clear()
         usedColors.Add(black)
@@ -225,8 +225,8 @@ Public Class ReductionCloud_Match : Inherits VB_Algorithm
         rcOther.index = redCells.Count
         redCells.Add(rcOther)
 
-        task.redLast = redCells.Count - 1
-        cellMap.SetTo(task.redLast, rcOther.mask)
+        task.redOther = redCells.Count - 1
+        cellMap.SetTo(task.redOther, rcOther.mask)
 
         Dim changed = redCells.Count - matchedCells
         Static changedTotal As Integer

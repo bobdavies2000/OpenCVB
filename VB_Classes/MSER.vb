@@ -665,7 +665,7 @@ Public Class MSER_MaskAndRect : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         rawCells.Run(src)
-        task.redLast = 255
+        task.redOther = 255
 
         'Static prepCells As New SortedList(Of Integer, rcPrep)(New compareAllowIdenticalIntegerInverted)
         'Static lastPrepCells As New SortedList(Of Integer, rcPrep)(New compareAllowIdenticalIntegerInverted)
@@ -687,14 +687,14 @@ Public Class MSER_MaskAndRect : Inherits VB_Algorithm
         'If heartBeat() = False Then
         '    For Each key In lastPrepCells
         '        Dim rp = key.Value
-        '        If rawCells.dst2.Get(Of Byte)(rp.maxDist.Y, rp.maxDist.X) = task.redLast Then
+        '        If rawCells.dst2.Get(Of Byte)(rp.maxDist.Y, rp.maxDist.X) = task.redOther Then
         '            If prepCells.Keys.Contains(rp.pixels) = False Then prepCells.Add(rp.pixels, rp)
         '        End If
         '    Next
         'End If
 
         If task.optionsChanged Then
-            cellMap.SetTo(task.redLast)
+            cellMap.SetTo(task.redOther)
             matchCell.lastCells.Clear()
         End If
 
@@ -706,7 +706,7 @@ Public Class MSER_MaskAndRect : Inherits VB_Algorithm
 
         mserCells.Clear()
 
-        cellMap.SetTo(task.redLast)
+        cellMap.SetTo(task.redOther)
         dst2.SetTo(0)
         For Each key In prepCells
             Dim rp = key.Value

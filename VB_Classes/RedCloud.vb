@@ -9,17 +9,13 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     Public Sub New()
         If standalone Then gOptions.displayDst0.Checked = True
         If standalone Then gOptions.displayDst1.Checked = True
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Desired number of cells", 2, 254, 100)
         desc = "Match cells from the previous generation"
     End Sub
-    Private Function redSelect() As rcData
+    Public Function redSelect(ByRef dstInput0 As cv.Mat, ByRef dstInput1 As cv.Mat, ByRef dstInput2 As cv.Mat) As rcData
         If task.drawRect <> New cv.Rect Then Return New rcData
         If task.redCells.Count = 0 Then Return New rcData
         Dim index = task.cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        If task.clickPoint = New cv.Point Then
-            index = 0
-            task.clickPoint = task.redCells(index).maxDist
-        End If
+        If task.clickPoint = New cv.Point Then index = 1
 
         Dim rc = task.redCells(index)
         If task.mouseClickFlag Then
@@ -27,23 +23,29 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
             task.redCells(index) = rc
         End If
 
-        dst0.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-        vbDrawContour(dst0(rc.rect), rc.contour, cv.Scalar.White, 1)
+        If rc.index = task.redOther Then
+            rc.maxDist = task.clickPoint
+            rc.maxDStable = rc.maxDist
+            rc.gridID = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
+            rc.rect = task.gridList(rc.gridID)
+            rc.mask = task.cellMap(rc.rect).InRange(task.redOther, task.redOther)
+        End If
 
-        dst1.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-        vbDrawContour(dst1(rc.rect), rc.contour, cv.Scalar.White, 1)
+        dstInput0.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+        dstInput0(rc.rect).SetTo(cv.Scalar.White, rc.mask)
 
-        dst2(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-        dst2.Circle(rc.maxDist, task.dotSize, cv.Scalar.Black, -1, task.lineType)
+        dstInput1.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+        dstInput1(rc.rect).SetTo(cv.Scalar.White, rc.mask)
 
-        dst2.Circle(rc.maxDStable, task.dotSize + 2, cv.Scalar.Black, -1, task.lineType)
-        dst2.Circle(rc.maxDStable, task.dotSize, cv.Scalar.White, -1, task.lineType)
+        dstInput2(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+        dstInput2.Circle(rc.maxDist, task.dotSize, cv.Scalar.Black, -1, task.lineType)
+
+        dstInput2.Circle(rc.maxDStable, task.dotSize + 2, cv.Scalar.Black, -1, task.lineType)
+        dstInput2.Circle(rc.maxDStable, task.dotSize, cv.Scalar.White, -1, task.lineType)
         Return rc
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Static numSlider = findSlider("Desired number of cells")
-        Dim desiredCellCount = Math.Min(numSlider.value, prepCells.Count)
-        task.redLast = 0
+        task.redOther = 0
 
         If standalone Then
             dst0 = src
@@ -56,7 +58,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         prepCells = combine.prepCells
 
         If firstPass Then
-            task.cellMap.SetTo(task.redLast)
+            task.cellMap.SetTo(task.redOther)
             matchCell.lastCells.Clear()
         End If
 
@@ -69,7 +71,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         If heartBeat() Then matchCell.dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
 
         If dst2.Size <> src.Size Then dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
-        task.cellMap.SetTo(task.redLast)
+        task.cellMap.SetTo(task.redOther)
 
         task.redCells.Clear()
         task.redCells.Add(New rcData)
@@ -77,7 +79,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         For Each rp In prepCells
             rp.maxDist = vbGetMaxDist(rp)
             Dim spotTakenTest = task.cellMap.Get(Of Byte)(rp.maxDist.Y, rp.maxDist.X)
-            If spotTakenTest <> task.redLast Then
+            If spotTakenTest <> task.redOther Then
                 spotsRemoved += 1
                 Continue For
             End If
@@ -86,41 +88,36 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
             matchCell.rp = rp
             matchCell.Run(Nothing)
 
-            If matchCell.rc.pixels < task.minPixels Then Continue For
+            If matchCell.rc.pixels < task.minPixels Then
+                task.cellMap(matchCell.rc.rect).SetTo(task.redOther, matchCell.rc.mask)
+                Continue For
+            End If
             task.redCells.Add(matchCell.rc)
-
-            task.cellMap(matchCell.rc.rect).SetTo(matchCell.rc.index, matchCell.rc.mask)
-            dst2(matchCell.rc.rect).SetTo(matchCell.rc.color, matchCell.rc.mask)
-
-            If task.redCells.Count > desiredCellCount - 1 Then Exit For
         Next
 
         If task.drawRect = New cv.Rect Then
             Dim rp As New rcPrep
             rp.rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-            rp.mask = task.cellMap(rp.rect).InRange(task.redLast, task.redLast)
+            rp.mask = task.cellMap(rp.rect).InRange(task.redOther, task.redOther)
             rp.maxDist = New cv.Point(0, 0)
             rp.floodPoint = rp.maxDist
             rp.pixels = rp.mask.CountNonZero
-            rp.index = task.redCells.Count
+            rp.index = task.redOther
             matchCell.rp = rp
             matchCell.Run(Nothing)
-            task.redCells.Add(matchCell.rc)
-
+            task.redCells(0) = matchCell.rc
             task.cellMap(matchCell.rc.rect).SetTo(matchCell.rc.index, matchCell.rc.mask)
-            dst2(matchCell.rc.rect).SetTo(matchCell.rc.color, matchCell.rc.mask)
         End If
 
-        ' validate each of the maxDStable points
-        For i = 0 To task.redCells.Count - 1
+        For i = task.redCells.Count - 1 To 0 Step -1
             Dim rc = task.redCells(i)
-            If rc.index <> task.cellMap.Get(Of Byte)(rc.maxDStable.Y, rc.maxDStable.X) Then
-                rc.maxDStable = rc.maxDist
-                task.redCells(i) = rc
-            End If
-        Next
+            Dim valMax = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            ' if the maxdist has been overlaid by another cell, then correct it here.
+            If valMax <> rc.index Then task.cellMap.Set(Of Byte)(rc.maxDist.Y, rc.maxDist.X, rc.index)
 
-        dst3 = matchCell.dst2 ' show the accumulated cells that were unmatched
+            task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+        Next
 
         Static changedTotal As Integer
         changedTotal += matchCell.unMatchedCells
@@ -130,7 +127,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         '"Spots/prep cells = " + CStr(spotsRemoved) + "/" + CStr(prepCells.Count)
         If heartBeat() Then changedTotal = 0
 
-        task.rcSelect = redSelect()
+        task.rcSelect = redSelect(dst0, dst1, dst2)
     End Sub
 End Class
 
@@ -164,7 +161,7 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
             rp.mask = task.depthRGB(rp.rect).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             rp.pixels = rp.mask.CountNonZero
             rp.maxDist = vbGetMaxDist(rp)
-            dst2.SetTo(0)
+            ' dst2.SetTo(0)
         End If
 
         rc = New rcData
@@ -178,13 +175,13 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
 
         rc.maxDStable = rc.maxDist ' assume it has to use the latest.
         rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-        If rc.indexLast = task.redLast Then
+        If rc.indexLast = task.redOther Then
             For i = rc.floodPoint.Y To Math.Min(rc.rect.Y + rc.rect.Height, dst2.Height) - 1
                 rc.indexLast = lastCellMap.Get(Of Byte)(i, rc.floodPoint.X)
                 If rc.indexLast = rc.index Then Exit For
             Next
         End If
-        If rc.indexLast < lastCells.Count And rc.indexLast <> task.redLast Then
+        If rc.indexLast < lastCells.Count And rc.indexLast <> task.redOther Then
             Dim lrc = lastCells(rc.indexLast)
             rc.motionRect = rc.rect.Union(lrc.rect)
             rc.color = lrc.color
@@ -196,7 +193,7 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
 
         If usedColors.Contains(rc.color) Then
             rc.color = New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240))
-            dst2(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+            ' dst2(rc.rect).SetTo(cv.Scalar.White, rc.mask)
             unMatchedCells += 1
         End If
 
@@ -329,7 +326,7 @@ Public Class RedCloud_CellStats : Inherits VB_Algorithm
     Dim plot As New Histogram_Depth
     Dim pca As New PCA_Basics
     Dim eq As New Plane_Equation
-    Public redC As New RedCloud_Basics
+    Public redC As Object
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         dst0 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
@@ -667,7 +664,7 @@ Public Class RedCloud_Corners_CPP : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
 
-        Dim mask = task.cellMap.InRange(task.redLast, task.redLast)
+        Dim mask = task.cellMap.InRange(task.redOther, task.redOther)
         task.cellMap.SetTo(0, mask)
 
         Dim cppData(task.cellMap.Total - 1) As Byte
@@ -1086,6 +1083,8 @@ Public Class RedCloud_ColorOnly : Inherits VB_Algorithm
     Dim colorCells As New List(Of rcData)
     Dim colorMap As New cv.Mat
     Public Sub New()
+        If standalone Then gOptions.displayDst0.Checked = True
+        If standalone Then gOptions.displayDst1.Checked = True
         colorMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         colorC.colorOnly = True
         desc = "Create RedCloud output using only color"
@@ -1097,6 +1096,12 @@ Public Class RedCloud_ColorOnly : Inherits VB_Algorithm
         colorC.Run(src)
         dst2 = colorC.dst2
         dst3 = colorC.dst3
+
+        If standalone Then
+            dst0 = src
+            dst1 = task.depthRGB
+            colorC.redSelect(dst0, dst1, dst2)
+        End If
 
         colorCells = New List(Of rcData)(task.redCells)
         colorMap = task.cellMap.Clone
