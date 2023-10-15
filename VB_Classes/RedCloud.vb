@@ -1260,3 +1260,7 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
         If cPtr <> 0 Then cPtr = RedCloud_Close(cPtr)
     End Sub
 End Class
+
+
+
+

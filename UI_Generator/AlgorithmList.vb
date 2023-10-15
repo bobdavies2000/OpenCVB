@@ -736,6 +736,7 @@ if algorithmName = "Hough_Sudoku" Then return new Hough_Sudoku
 if algorithmName = "Hull_Basics" Then return new Hull_Basics
 if algorithmName = "Image_Basics" Then return new Image_Basics
 if algorithmName = "Image_CellStats" Then return new Image_CellStats
+if algorithmName = "Image_MSER" Then return new Image_MSER
 if algorithmName = "Image_RedCloudColor" Then return new Image_RedCloudColor
 if algorithmName = "Image_RedCloudColorSeries" Then return new Image_RedCloudColorSeries
 if algorithmName = "Image_Series" Then return new Image_Series
