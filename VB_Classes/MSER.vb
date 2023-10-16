@@ -83,7 +83,7 @@ Public Class MSER_Basics : Inherits VB_Algorithm
             setTrueText(CStr(rc.index), rc.maxDist)
         Next
 
-        dst3 = src.Clone
+        If src.Channels = 3 Then dst3 = src.Clone Else dst3 = src.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         For Each r In boxes
             dst3.Rectangle(r, task.highlightColor, task.lineWidth)
         Next
@@ -190,9 +190,11 @@ Public Class MSER_LeftRight : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         left.Run(task.leftView)
         dst2 = left.dst2
+        labels(2) = left.labels(2)
 
         right.Run(task.rightView)
-        dst3 = right.dst2.Clone
+        dst3 = right.dst2
+        labels(3) = right.labels(2)
     End Sub
 End Class
 
@@ -210,7 +212,9 @@ Public Class MSER_Left : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         mBase.Run(task.leftView)
-        dst2 = mBase.dst3
+        dst2 = mBase.dst2
+        dst3 = mBase.dst3
+        labels(2) = mBase.labels(2)
     End Sub
 End Class
 
@@ -229,7 +233,9 @@ Public Class MSER_Right : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         mBase.Run(task.rightView)
-        dst2 = mBase.dst3
+        dst2 = mBase.dst2
+        dst3 = mBase.dst3
+        labels(2) = mBase.labels(2)
     End Sub
 End Class
 

@@ -363,11 +363,11 @@ Public Class OpAuto_MSER : Inherits VB_Algorithm
             src = mBase.dst3
             classCount = mBase.mserCells.Count
         End If
-        dst2 = src
+        dst2 = src.Clone
 
         Static checkOften As Boolean = True
         If heartBeat() Or checkOften Then
-            Dim dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            If src.Channels <> 1 Then dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY) Else dst1 = src
             Dim count = dst1.CountNonZero
             Dim desired = CInt(dst2.Total * 0.6)
             If count < desired Then
@@ -383,7 +383,7 @@ Public Class OpAuto_MSER : Inherits VB_Algorithm
                 End If
             End If
 
-                strOut = "NonZero pixel count = " + CStr(count) + vbCrLf + "Desired pixel count (60% of total) = " + CStr(desired) + vbCrLf
+            strOut = "NonZero pixel count = " + CStr(count) + vbCrLf + "Desired pixel count (60% of total) = " + CStr(desired) + vbCrLf
             strOut += "maxSlider value = " + CStr(maxSlider.value) + vbCrLf
             strOut += "Cells identified = " + CStr(classCount) + vbCrLf
             strOut += "minSlider value = " + CStr(minSlider.value) + vbCrLf
