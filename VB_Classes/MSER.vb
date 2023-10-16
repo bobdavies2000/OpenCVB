@@ -720,7 +720,7 @@ Public Class MSER_MaskAndRect : Inherits VB_Algorithm
 
             cellMap(rc.rect).SetTo(rc.index, rc.mask)
             vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
-            If mserCells.Count = 254 Then Exit For
+            If mserCells.Count = 255 Then Exit For
         Next
 
         If heartBeat() Then labels(2) = CStr(mserCells.Count) + " Cells identified"

@@ -14,11 +14,12 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     Public Function redSelect(ByRef dstInput0 As cv.Mat, ByRef dstInput1 As cv.Mat, ByRef dstInput2 As cv.Mat) As rcData
         If task.drawRect <> New cv.Rect Then Return New rcData
         If task.redCells.Count = 0 Then Return New rcData
+        If task.clickPoint = New cv.Point(0, 0) Then Return New rcData
         Dim index = task.cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        If task.clickPoint = New cv.Point Then index = 1
+        'If task.clickPoint = New cv.Point Then index = 1
 
         Dim rc = task.redCells(index)
-        If task.mouseClickFlag Then
+        If task.mouseClickFlag Or heartBeat() Then
             rc.maxDStable = rc.maxDist
             task.redCells(index) = rc
         End If
@@ -92,6 +93,8 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
                 Continue For
             End If
             task.redCells.Add(matchCell.rc)
+
+            If task.redCells.Count >= 255 Then Exit For ' we are going to handle only the largest 255 cells - "Other" (zero) for the rest.
         Next
 
         If task.drawRect = New cv.Rect Then
