@@ -128,7 +128,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         changedTotal += unMatchedCells
         labels(3) = CStr(changedTotal) + " new/moved cells in the last second " +
                     Format(changedTotal / (task.frameCount - task.toggleFrame), fmt1) + " unmatched per frame"
-        labels(2) = CStr(task.redCells.Count) + " cells " + CStr(unMatchedCells) + " did not match the previous frame "
+        labels(2) = CStr(task.redCells.Count) + " cells " + CStr(unMatchedCells) + " did not match the previous frame. Click a cell to see more."
         If heartBeat() Then changedTotal = 0
 
         task.rcSelect = redSelect(dst0, dst1, dst2)
@@ -1143,7 +1143,7 @@ Public Class RedCloud_DepthOnly : Inherits VB_Algorithm
 
         depthCells = New List(Of rcData)(task.redCells)
         depthMap = task.cellMap.Clone
-        labels(2) = CStr(depthCells.Count) + " cells in depthCells"
+        labels(2) = redC.labels(2)
     End Sub
 End Class
 
