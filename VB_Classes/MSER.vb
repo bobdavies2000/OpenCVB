@@ -608,7 +608,6 @@ Public Class MSER_Regions : Inherits VB_Algorithm
         matchCell.lastCells = New List(Of rcData)(mserCells)
         matchCell.usedColors.Clear()
         matchCell.usedColors.Add(black)
-        matchCell.unMatchedCells = 0
 
         mserCells.Clear()
         cellMap.SetTo(mserLast)
@@ -702,7 +701,6 @@ Public Class MSER_MaskAndRect : Inherits VB_Algorithm
         matchCell.lastCells = New List(Of rcData)(mserCells)
         matchCell.usedColors.Clear()
         matchCell.usedColors.Add(black)
-        matchCell.unMatchedCells = 0
 
         mserCells.Clear()
 

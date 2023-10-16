@@ -511,7 +511,7 @@ Public Class ReductionCloud_BProject3D : Inherits VB_Algorithm
     Dim colorC As New ReductionCloud_Basics
     Dim bp3d As New Histogram3D_BP
     Public Sub New()
-        desc = "Run RedColor_Basics on the output of the RGB 3D backprojection"
+        desc = "Run ReductionCloud_Basics on the output of the RGB 3D backprojection"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         bp3d.Run(src)
@@ -685,7 +685,7 @@ Public Class ReductionCloud_HistValley : Inherits VB_Algorithm
     Dim dValley As New HistValley_Depth
     Dim canny As New Edge_Canny
     Public Sub New()
-        desc = "Use RedColor_Basics with the output of HistValley_Basics."
+        desc = "Use ReductionCloud_Basics with the output of HistValley_Basics."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         valley.Run(src)
@@ -702,28 +702,6 @@ Public Class ReductionCloud_HistValley : Inherits VB_Algorithm
         dst2 = colorC.dst2
     End Sub
 End Class
-
-
-
-
-
-Public Class RedColor_CellStats : Inherits VB_Algorithm
-    Dim stats As New ReductionCloud_CellStats
-    Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        If standalone Then stats.redC = New ReductionCloud_Basics
-        labels = {"", "RedColor_Basics input", "RedColor_Basics output", ""}
-        desc = "Display cells stats for a floodfill RedColor run"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        stats.Run(src)
-        dst1 = stats.dst1
-        dst2 = stats.dst2
-        labels = stats.labels
-        setTrueText(stats.strOut, 3)
-    End Sub
-End Class
-
 
 
 
@@ -1058,7 +1036,7 @@ Public Class ReductionCloud_ContourCorners : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
-            Static colorC As New ReductionCloud_Basics
+            Static colorC As New RedCloud_Basics
             colorC.Run(src)
             dst2 = colorC.dst2
             labels(2) = colorC.labels(2)
@@ -1106,7 +1084,7 @@ Public Class ReductionCloud_KMeans : Inherits VB_Algorithm
     Dim km As New KMeans_MultiChannel
     Dim colorC As New ReductionCloud_Basics
     Public Sub New()
-        labels = {"", "", "KMeans_MultiChannel output", "RedColor_Basics output"}
+        labels = {"", "", "KMeans_MultiChannel output", "ReductionCloud_Basics output"}
         desc = "Use RedCloud to identify the regions created by kMeans"
     End Sub
     Public Sub RunVB(src As cv.Mat)

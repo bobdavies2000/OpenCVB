@@ -66,7 +66,6 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         matchCell.lastCells = New List(Of rcData)(task.redCells)
         matchCell.usedColors.Clear()
         matchCell.usedColors.Add(black)
-        matchCell.unMatchedCells = 0
 
         If heartBeat() Then matchCell.dst2 = New cv.Mat(src.Size, cv.MatType.CV_8UC3, 0)
 
@@ -109,6 +108,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
             task.cellMap(matchCell.rc.rect).SetTo(matchCell.rc.index, matchCell.rc.mask)
         End If
 
+        Dim unMatchedCells As Integer
         For i = task.redCells.Count - 1 To 0 Step -1
             Dim rc = task.redCells(i)
             Dim valMax = task.cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
@@ -117,14 +117,15 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
 
             task.cellMap(rc.rect).SetTo(rc.index, rc.mask)
             dst2(rc.rect).SetTo(rc.color, rc.mask)
+
+            If rc.indexLast = 0 Then unMatchedCells += 1
         Next
 
         Static changedTotal As Integer
-        changedTotal += matchCell.unMatchedCells
+        changedTotal += unMatchedCells
         labels(3) = CStr(changedTotal) + " new/moved cells in the last second " +
                     Format(changedTotal / (task.frameCount - task.toggleFrame), fmt1) + " unmatched per frame"
-        labels(2) = CStr(task.redCells.Count) + " cells " + CStr(matchCell.unMatchedCells) + " did not match the previous frame "
-        '"Spots/prep cells = " + CStr(spotsRemoved) + "/" + CStr(prepCells.Count)
+        labels(2) = CStr(task.redCells.Count) + " cells " + CStr(unMatchedCells) + " did not match the previous frame "
         If heartBeat() Then changedTotal = 0
 
         task.rcSelect = redSelect(dst0, dst1, dst2)
@@ -144,7 +145,6 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
     Public rc As New rcData
     Public lastCells As New List(Of rcData)
     Public lastCellMap As New cv.Mat
-    Public unMatchedCells As Integer
     Public usedColors As New List(Of cv.Vec3b)
     Public Sub New()
         task.cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -194,7 +194,7 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
         If usedColors.Contains(rc.color) Then
             rc.color = New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240))
             If standalone Then dst2(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-            unMatchedCells += 1
+            rc.indexLast = 0
         End If
 
         usedColors.Add(rc.color)

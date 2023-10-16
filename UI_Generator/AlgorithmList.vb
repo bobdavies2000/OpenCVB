@@ -1412,7 +1412,6 @@ if algorithmName = "RedCloudY_StructuredH" Then return new RedCloudY_StructuredH
 if algorithmName = "RedCloudY_StructuredV" Then return new RedCloudY_StructuredV
 if algorithmName = "RedCloudY_TrackFeatures" Then return new RedCloudY_TrackFeatures
 if algorithmName = "RedCloudY_World" Then return new RedCloudY_World
-if algorithmName = "RedColor_CellStats" Then return new RedColor_CellStats
 if algorithmName = "RedColor_UnstableHulls" Then return new RedColor_UnstableHulls
 if algorithmName = "RedTrack_Basics" Then return new RedTrack_Basics
 if algorithmName = "RedTrack_Core" Then return new RedTrack_Core

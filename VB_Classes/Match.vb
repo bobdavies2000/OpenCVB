@@ -649,51 +649,6 @@ End Class
 
 
 
-
-'Public Class Match_FeatureTrace : Inherits VB_Algorithm
-'    Dim gfKNN As New Match_GoodFeatureKNN
-'    Dim match As New Match_Basics
-'    Dim redC As New RedColor_Basics
-'    Public Sub New()
-'        gOptions.useMotion.Checked = False
-'        labels = {"", "", "Features identfied in Match_GoodFeaturesKNN - rectangle finds the largest", ""}
-'        desc = "Identify and match the paths of good features"
-'    End Sub
-'    Public Sub RunVB(src as cv.Mat)
-'        gfKNN.Run(src)
-
-'        dst0 = gfKNN.dst2.Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-'        dst0.ConvertTo(dst1, cv.MatType.CV_8U)
-
-'        redC.Run(dst1)
-'        dst2 = gfKNN.dst2
-'        dst2.SetTo(0, dst0)
-
-'        Dim rcBest As rcData
-'        For Each rc In task.redCells
-'            If rc.rect.Width > dst2.Width / 2 Or rc.rect.Height > dst2.Height / 2 Then Continue For
-'            If rc.matchCount > rcBest.matchCount Then rcBest = rc
-'        Next
-
-'        If rcBest.rect.Width = 0 Or rcBest.rect.Height = 0 Then Exit Sub
-
-'        match.template = src(rcBest.rect).Clone
-'        match.Run(src)
-'        Dim r = New cv.Rect(rcBest.rect.X - 20, rcBest.rect.Y - 20, 40, 40)
-'        dst2.Rectangle(r, cv.Scalar.White, task.lineWidth)
-'        setTrueText("Move camera to see feature trails.", 3)
-'    End Sub
-'End Class
-
-
-
-
-
-
-
-
-
-
 Public Class Match_GoodFeatureKNN : Inherits VB_Algorithm
     Public knn As New KNN_Lossy
     Public good As New Feature_Basics
