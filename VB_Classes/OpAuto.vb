@@ -349,19 +349,19 @@ End Class
 
 
 Public Class OpAuto_MSER : Inherits VB_Algorithm
-    Dim core As New MSER_Regions
+    Dim mBase As New MSER_Basics
     Public classCount As Integer
     Public Sub New()
-        If standalone Then core.useOpAuto = False
+        If standalone Then mBase.useOpAuto = False
         desc = "Option Automation: find the best MSER max and min area values"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static minSlider = findSlider("MSER Min Area")
         Static maxSlider = findSlider("MSER Max Area")
         If standalone Then
-            core.Run(src)
-            src = core.dst3
-            classCount = core.mserCells.Count
+            mBase.Run(src)
+            src = mBase.dst3
+            classCount = mBase.mserCells.Count
         End If
         dst2 = src
 

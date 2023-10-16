@@ -202,7 +202,7 @@ End Module
 
 Public Class Image_MSER : Inherits VB_Algorithm
     Public images As New Image_Series
-    Dim core As New MSER_Basics
+    Dim core As New MSER_Detect
     Public Sub New()
         If standalone Then gOptions.displayDst0.Checked = True
         If findfrm(traceName + " CheckBox Options") Is Nothing Then
