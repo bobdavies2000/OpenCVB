@@ -27,8 +27,8 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         If rc.index = task.redOther Then
             rc.maxDist = task.clickPoint
             rc.maxDStable = rc.maxDist
-            rc.gridID = task.gridToRoiIndex.Get(Of Integer)(task.clickPoint.Y, task.clickPoint.X)
-            rc.rect = task.gridList(rc.gridID)
+            Dim gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+            rc.rect = task.gridList(gridID)
             rc.mask = task.cellMap(rc.rect).InRange(task.redOther, task.redOther)
         End If
 
@@ -192,6 +192,8 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
 
             Dim stableCheck = lastCellMap.Get(Of Byte)(lrc.maxDStable.Y, lrc.maxDStable.X)
             If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
+        Else
+            Dim k = 0
         End If
 
         If usedColors.Contains(rc.color) Then
@@ -222,7 +224,6 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
         rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
 
         cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-        rc.gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
 
         If standalone Then setTrueText(strOut, 3)
     End Sub
@@ -351,14 +352,14 @@ Public Class RedCloud_CellStats : Inherits VB_Algorithm
 
         Dim rcSelect = task.rcSelect
         strOut = "rc.index = " + CStr(rcSelect.index) + " of " + CStr(task.redCells.Count) + vbTab
-        strOut += " rc.gridID = " + CStr(rcSelect.gridID) + vbCrLf
+        Dim gridID = task.gridToRoiIndex.Get(Of Integer)(rcSelect.maxDist.Y, rcSelect.maxDist.X)
+        strOut += " gridID = " + CStr(gridID) + vbCrLf
         strOut += "rc.rect: " + CStr(rcSelect.rect.X) + ", " + CStr(rcSelect.rect.Y) + ", "
         strOut += CStr(rcSelect.rect.Width) + ", " + CStr(rcSelect.rect.Height) + vbTab
 
         strOut += "rc.pixels " + CStr(rcSelect.pixels) + vbTab + "rc.color = " + rcSelect.color.ToString() + vbCrLf
 
         strOut += "rc.maxDist = " + CStr(rcSelect.maxDist.X) + ", " + CStr(rcSelect.maxDist.Y) + vbCrLf
-        strOut += "rc.centroid = " + CStr(rcSelect.centroid.X) + ", " + CStr(rcSelect.centroid.Y) + vbCrLf
 
         strOut += "Min/Max/Range: X = " + Format(rcSelect.minVec.X, fmt1) + "/" + Format(rcSelect.maxVec.X, fmt1)
         strOut += "/" + Format(rcSelect.maxVec.X - rcSelect.minVec.X, fmt1) + vbTab

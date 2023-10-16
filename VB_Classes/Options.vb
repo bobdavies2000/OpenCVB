@@ -4242,7 +4242,7 @@ Public Class Options_MSER : Inherits VB_Algorithm
                 minDefault = 200
             Case 168
                 maxDefault = 2000
-                minDefault = 1
+                minDefault = 10
         End Select
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("MSER Delta", 1, 100, 9)

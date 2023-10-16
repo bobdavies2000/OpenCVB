@@ -6,8 +6,8 @@ Public Class TreeviewForm
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
         Me.TreeViewTimer.Enabled = False
         Dim algorithm = e.Node.Text
-        Dim split = Me.Text.Split(" ")
-        OpenCVB.intermediateReview = algorithm
+        Dim split = e.Node.Text.Split(" ")
+        OpenCVB.intermediateReview = split(0)
     End Sub
     Private Sub TreeviewForm_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
         Dim split() = Me.Text.Split()
@@ -41,7 +41,7 @@ Public Class TreeviewForm
         Next
         Return Nothing
     End Function
-    Dim titleStr = " - Click on any node to review the algorithm's input and output."
+    Dim titleStr = " - Click on any node to review the algorithm's output."
     Public Sub updateTree()
         If OpenCVB.callTrace.Count = 0 Then Exit Sub
         moduleList.Clear()
@@ -66,13 +66,13 @@ Public Class TreeviewForm
                     Dim node = getNode(tv, fullname)
                     If node Is Nothing Then
                         If nodeLevel = 0 Then
-                            node = tv.Nodes(nodeLevel).Nodes.Add(split(nodeLevel + 1))
+                            node = tv.Nodes(nodeLevel).Nodes.Add(split(nodeLevel + 1) + " x")
                         Else
                             Dim parent = Mid(fullname, 1, Len(fullname) - Len(split(nodeLevel + 1)) - 1)
                             If parent <> rootcall Then
                                 node = getNode(tv, parent)
                                 If node Is Nothing Then Continue For
-                                node = node.Nodes.Add(split(nodeLevel + 1))
+                                node = node.Nodes.Add(split(nodeLevel + 1) + " x")
                             End If
                         End If
                     Else

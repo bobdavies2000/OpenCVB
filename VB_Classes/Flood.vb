@@ -567,9 +567,6 @@ Public Class Flood_PointList : Inherits VB_Algorithm
                 rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone)
                 rc.maxDist = vbGetMaxDist(rc)
 
-                Dim m = cv.Cv2.Moments(rc.mask, True)
-                If m.M00 <> 0 Then rc.centroid = New cv.Point(CInt(m.M10 / m.M00 + rc.rect.X), CInt(m.M01 / m.M00 + rc.rect.Y))
-
                 totalPixels += rc.pixels
                 SizeSorted.Add(rc.pixels, rc)
             End If

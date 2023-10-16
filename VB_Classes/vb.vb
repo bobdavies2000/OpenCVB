@@ -244,10 +244,11 @@ Module VB
     Public Function findClosest5(redCells As List(Of rcData), rc As rcData, minPixels As Integer) As rcData
         Dim v1 = New vec5f(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2), rc.maxDist.X, rc.maxDist.Y)
         Dim distances As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
-        Dim gridlist = task.gridNeighbors.ElementAt(rc.gridID)
+        Dim gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+        Dim gridlist = task.gridNeighbors.ElementAt(gridID)
         For Each rc In redCells
             If rc.pixels < minPixels Then Continue For
-            If gridlist.Contains(rc.gridID) Then
+            If gridlist.Contains(gridID) Then
                 Dim v2 = New vec5f(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2), rc.maxDist.X, rc.maxDist.Y)
                 distances.Add(distanceVec5f(v1, v2), rc.index)
             End If
@@ -259,10 +260,12 @@ Module VB
         Dim v1 = New vec8f(rc.depthMean.X, rc.depthMean.Y, rc.depthMean.Z,
                            rc.rect.X, rc.rect.Y, rc.pixels, rc.minVec.Z, rc.maxVec.Z)
         Dim distances As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
-        Dim gridlist = task.gridNeighbors.ElementAt(rc.gridID)
+        Dim gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+        Dim gridlist = task.gridNeighbors.ElementAt(gridID)
         For Each lrc In lastCells
+            Dim lastGridID = task.gridToRoiIndex.Get(Of Integer)(lrc.maxDist.Y, lrc.maxDist.X)
             If lrc.pixels < minPixels Then Continue For
-            If gridlist.Contains(lrc.gridID) Then
+            If gridlist.Contains(lastGridID) Then
                 Dim v2 = New vec8f(lrc.depthMean.X, lrc.depthMean.Y, lrc.depthMean.Z,
                                    lrc.rect.X, lrc.rect.Y, lrc.pixels, lrc.minVec.Z, lrc.maxVec.Z)
                 distances.Add(distanceVec8f(v1, v2), lrc.index)
@@ -780,8 +783,6 @@ Public Class rcData
     Public maxDist As cv.Point
     Public floodPoint As cv.Point
     Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.
-    Public gridID As Integer
-    Public centroid As cv.Point
 
     Public index As Integer
     Public indexLast As Integer

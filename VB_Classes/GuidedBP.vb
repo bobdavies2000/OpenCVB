@@ -1262,7 +1262,6 @@ Public Class GuidedBP_FloodCells : Inherits VB_Algorithm
             rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
 
             cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-            rc.gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
 
             rc.eq = build3PointEquation(rc)
             Dim pcaPoints As New List(Of cv.Point3f)

@@ -9,7 +9,7 @@
 #include <map>
 using namespace std;
 using namespace  cv;
-class MSER_Basics
+class MSER_Interface
 {
 private:
 public:
@@ -20,7 +20,7 @@ public:
     vector<int> maskCounts;
     vector<vector<Point>> regions;
     vector<Rect> boxes;
-    MSER_Basics(int delta, int minArea, int maxArea, float maxVariation, float minDiversity, int maxEvolution, float areaThreshold,
+    MSER_Interface(int delta, int minArea, int maxArea, float maxVariation, float minDiversity, int maxEvolution, float areaThreshold,
                 float minMargin, int edgeBlurSize, int pass2Setting)
     {
         mser = mser->create(delta, minArea, maxArea, maxVariation, minDiversity, maxEvolution, areaThreshold, minMargin, edgeBlurSize);
@@ -59,40 +59,40 @@ public:
     }
 };
 extern "C" __declspec(dllexport)
-MSER_Basics *MSER_Open(int delta, int minArea, int maxArea, float maxVariation, float minDiversity, int maxEvolution, float areaThreshold,
+MSER_Interface *MSER_Open(int delta, int minArea, int maxArea, float maxVariation, float minDiversity, int maxEvolution, float areaThreshold,
                        float minMargin, int edgeBlurSize, int pass2Setting) 
 {
-    MSER_Basics*cPtr = new MSER_Basics(delta, minArea, maxArea, maxVariation, minDiversity, maxEvolution, areaThreshold, minMargin, 
+    MSER_Interface*cPtr = new MSER_Interface(delta, minArea, maxArea, maxVariation, minDiversity, maxEvolution, areaThreshold, minMargin, 
                                        edgeBlurSize, pass2Setting);
     return cPtr;
 }
 extern "C" __declspec(dllexport)
-void MSER_Close(MSER_Basics *cPtr)
+void MSER_Close(MSER_Interface *cPtr)
 {
     delete cPtr;
 }
 extern "C" __declspec(dllexport)
-int* MSER_Rects(MSER_Basics * cPtr)
+int* MSER_Rects(MSER_Interface * cPtr)
 {
     return (int*)&cPtr->containers[0];
 }
 extern "C" __declspec(dllexport)
-int* MSER_FloodPoints(MSER_Basics * cPtr)
+int* MSER_FloodPoints(MSER_Interface * cPtr)
 {
     return (int*)&cPtr->floodPoints[0];
 }
 extern "C" __declspec(dllexport)
-int* MSER_MaskCounts(MSER_Basics * cPtr)
+int* MSER_MaskCounts(MSER_Interface * cPtr)
 {
     return (int*)&cPtr->maskCounts[0];
 }
 extern "C" __declspec(dllexport)
-int MSER_Count(MSER_Basics * cPtr)
+int MSER_Count(MSER_Interface * cPtr)
 {
     return (int)cPtr->containers.size();
 }
 extern "C" __declspec(dllexport)
-int *MSER_RunCPP(MSER_Basics *cPtr, int *dataPtr, int rows, int cols, int channels)
+int *MSER_RunCPP(MSER_Interface *cPtr, int *dataPtr, int rows, int cols, int channels)
 {
 		cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, dataPtr);
         cPtr->dst = Mat(rows, cols, CV_8UC1);

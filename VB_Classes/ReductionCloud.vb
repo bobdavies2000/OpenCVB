@@ -106,8 +106,8 @@ Public Class ReductionCloud_Match : Inherits VB_Algorithm
 
         Dim rc = redCells(index)
         If index = task.redOther Then
-            rc.gridID = task.gridROIclicked
-            rc.rect = task.gridList(rc.gridID)
+            Dim gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+            rc.rect = task.gridList(gridID)
             rc.mask = cellMap(rc.rect).InRange(task.redOther, task.redOther)
             rc.pixels = rc.mask.CountNonZero
             buildCell(rc)
@@ -171,7 +171,6 @@ Public Class ReductionCloud_Match : Inherits VB_Algorithm
         rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
 
         cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-        rc.gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
     End Sub
     Public Sub RunVB(src As cv.Mat)
         numBigCells = 100 ' Math.Min(numSlider.value, inputCells.Count)
@@ -735,7 +734,9 @@ Public Class ReductionCloud_CellStats : Inherits VB_Algorithm
 
         strOut = "rc.index = " + CStr(rc.index) + " of " + CStr(task.redCells.Count) + vbTab
         strOut += "rc.indexlast = " + CStr(rc.indexLast) + " of " + CStr(redC.lastCells.Count) + vbTab
-        strOut += " rc.gridID = " + CStr(rc.gridID) + vbTab + "lrc.gridID = " + CStr(lrc.gridID) + vbCrLf
+        Dim gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+        Dim lastGridID = task.gridToRoiIndex.Get(Of Integer)(lrc.maxDist.Y, lrc.maxDist.X)
+        strOut += " gridID = " + CStr(gridID) + vbTab + "lastGridID = " + CStr(lastGridID) + vbCrLf
         strOut += "rc.rect: " + CStr(rc.rect.X) + ", " + CStr(rc.rect.Y) + ", "
         strOut += CStr(rc.rect.Width) + ", " + CStr(rc.rect.Height) + vbTab
 
@@ -746,8 +747,6 @@ Public Class ReductionCloud_CellStats : Inherits VB_Algorithm
 
         strOut += "rc.maxDist = " + CStr(rc.maxDist.X) + ", " + CStr(rc.maxDist.Y) + vbTab
         strOut += "lrc.maxDist = " + CStr(lrc.maxDist.X) + ", " + CStr(lrc.maxDist.Y) + vbCrLf
-        strOut += "rc.centroid = " + CStr(rc.centroid.X) + ", " + CStr(rc.centroid.Y) + vbTab
-        strOut += "lrc.centroid = " + CStr(lrc.centroid.X) + ", " + CStr(lrc.centroid.Y) + vbCrLf
 
         strOut += "Min/Max/Range: X = " + Format(rc.minVec.X, fmt1) + "/" + Format(rc.maxVec.X, fmt1)
         strOut += "/" + Format(rc.maxVec.X - rc.minVec.X, fmt1) + vbTab
