@@ -161,7 +161,7 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
             rp.mask = task.depthRGB(rp.rect).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
             rp.pixels = rp.mask.CountNonZero
             rp.maxDist = vbGetMaxDist(rp)
-            ' dst2.SetTo(0)
+            dst2.SetTo(0)
         End If
 
         rc = New rcData
@@ -193,7 +193,7 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
 
         If usedColors.Contains(rc.color) Then
             rc.color = New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240))
-            ' dst2(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+            If standalone Then dst2(rc.rect).SetTo(cv.Scalar.White, rc.mask)
             unMatchedCells += 1
         End If
 
@@ -329,6 +329,7 @@ Public Class RedCloud_CellStats : Inherits VB_Algorithm
     Public redC As Object
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
+        If standalone Then redC = New RedCloud_Basics
         dst0 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
         desc = "Display the statistics for the selected cell."
     End Sub

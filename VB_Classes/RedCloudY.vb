@@ -590,7 +590,7 @@ Public Class RedCloudY_StructuredH : Inherits VB_Algorithm
 
         motion.Run(sliceMask)
 
-        dst1 = motion.dst1
+        If heartBeat() Then dst1.SetTo(0)
         dst1.SetTo(cv.Scalar.White, sliceMask)
         labels = motion.labels
 
@@ -630,7 +630,7 @@ Public Class RedCloudY_StructuredV : Inherits VB_Algorithm
 
         motion.Run(sliceMask)
 
-        dst1 = motion.dst1
+        If heartBeat() Then dst1.SetTo(0)
         dst1.SetTo(cv.Scalar.White, sliceMask)
         labels = motion.labels
         setTrueText("Move mouse in image to see impact.", 3)
@@ -659,15 +659,17 @@ End Class
 
 
 Public Class RedCloudY_SliceH : Inherits VB_Algorithm
-    Dim stats As New ReductionCloud_CellStats
+    Dim stats As New RedCloud_CellStats
     Public Sub New()
         stats.redC = New RedCloud_Basics
         findRadio("Channels 1 and 2").Checked = True
         desc = "Build horizontal RedCloud cells"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        stats.redC.run(src)
+
         stats.Run(src)
-        dst2 = stats.dst2
+        dst2 = stats.redC.dst2
         setTrueText(stats.strOut, 3)
     End Sub
 End Class
@@ -678,42 +680,20 @@ End Class
 
 
 Public Class RedCloudY_SliceV : Inherits VB_Algorithm
-    Dim stats As New ReductionCloud_CellStats
+    Dim stats As New RedCloud_CellStats
     Public Sub New()
         stats.redC = New RedCloud_Basics
         findRadio("Channels 0 and 2").Checked = True
         desc = "Build vertical RedCloud cells."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        stats.redC.run(src)
+
         stats.Run(src)
-        dst2 = stats.dst2
+        dst2 = stats.redC.dst2
         setTrueText(stats.strOut, 3)
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class RedCloudY_History : Inherits VB_Algorithm
-    Dim hCloud As New History_Cloud
-    Dim stats As New ReductionCloud_CellStats
-    Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        stats.redC = New RedCloud_Basics
-        desc = "Use the point cloud history instead of the raw pointcloud as input to RedCloud_Basics.  Note better PCA."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        hCloud.Run(src)
-
-        stats.Run(hCloud.dst2)
-        dst1 = stats.dst1
-        dst2 = stats.dst2
-        labels(2) = stats.redC.labels(2)
-        setTrueText(stats.strOut, 3)
-    End Sub
-End Class
 
 

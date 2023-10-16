@@ -1398,7 +1398,6 @@ if algorithmName = "RedCloudY_DistancePoint" Then return new RedCloudY_DistanceP
 if algorithmName = "RedCloudY_Features" Then return new RedCloudY_Features
 if algorithmName = "RedCloudY_FlatSurfaces" Then return new RedCloudY_FlatSurfaces
 if algorithmName = "RedCloudY_FPS" Then return new RedCloudY_FPS
-if algorithmName = "RedCloudY_History" Then return new RedCloudY_History
 if algorithmName = "RedCloudY_KNN_Join" Then return new RedCloudY_KNN_Join
 if algorithmName = "RedCloudY_MinMaxNone" Then return new RedCloudY_MinMaxNone
 if algorithmName = "RedCloudY_NearestStableCell" Then return new RedCloudY_NearestStableCell
