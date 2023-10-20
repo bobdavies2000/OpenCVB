@@ -1009,6 +1009,7 @@ if algorithmName = "OilPaint_Manual" Then return new OilPaint_Manual
 if algorithmName = "OilPaint_ManualVB" Then return new OilPaint_ManualVB
 if algorithmName = "OilPaint_Pointilism" Then return new OilPaint_Pointilism
 if algorithmName = "OpAuto_FloorCeiling" Then return new OpAuto_FloorCeiling
+if algorithmName = "opAuto_GuidedBP" Then return new opAuto_GuidedBP
 if algorithmName = "OpAuto_MSER" Then return new OpAuto_MSER
 if algorithmName = "OpAuto_Peaks2D" Then return new OpAuto_Peaks2D
 if algorithmName = "OpAuto_Peaks2DGrid" Then return new OpAuto_Peaks2DGrid

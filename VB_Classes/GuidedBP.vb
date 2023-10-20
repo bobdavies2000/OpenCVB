@@ -1117,7 +1117,7 @@ End Class
 Public Class GuidedBP_Depth : Inherits VB_Algorithm
     Public hist2d As New Histogram2D_PointCloud
     Public backProject As New cv.Mat
-    Public nonzeroSamples As Integer
+    Dim opAuto As New opAuto_GuidedBP
     Public Sub New()
         gOptions.HistBinSlider.Value = 15
         desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
@@ -1133,19 +1133,16 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
         Dim histList = samples.ToList
         samples(histList.IndexOf(histList.Max)) = 0
 
-        nonzeroSamples = 0
+        opAuto.nonzeroSamples = 0
         For i = 0 To samples.Count - 1
             If samples(i) > 0 Then
-                nonzeroSamples += 1
-                samples(i) = If(nonzeroSamples <= 255, 255 - nonzeroSamples, 0)
+                opAuto.nonZeroSamples += 1
+                ' this is where the histogram is doctored to create the different regions
+                samples(i) = If(opAuto.nonzeroSamples <= 255, 255 - opAuto.nonzeroSamples, 0)
             End If
         Next
 
-        ' A practical use of optionAutomation.  Any image with more regions is quite complex.
-        Dim saveit = task.optionsChanged
-        If nonzeroSamples > 120 Then gOptions.HistBinSlider.Value -= 1
-        If nonzeroSamples < 90 Then gOptions.HistBinSlider.Value += 1
-        task.optionsChanged = saveit
+        opAuto.runvb(Nothing)
 
         Marshal.Copy(samples, 0, hist2d.histogram.Data, samples.Length)
 

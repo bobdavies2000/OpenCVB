@@ -97,20 +97,6 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
             If task.redCells.Count >= 255 Then Exit For ' we are going to handle only the largest 255 cells - "Other" (zero) for the rest.
         Next
 
-        'If task.drawRect = New cv.Rect Then
-        '    Dim rp As New rcPrep
-        '    rp.rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-        '    rp.mask = task.cellMap(rp.rect).InRange(task.redOther, task.redOther)
-        '    rp.maxDist = New cv.Point(0, 0)
-        '    rp.floodPoint = rp.maxDist
-        '    rp.pixels = rp.mask.CountNonZero
-        '    rp.index = task.redOther
-        '    matchCell.rp = rp
-        '    matchCell.Run(Nothing)
-        '    task.redCells(0) = matchCell.rc
-        '    task.cellMap(matchCell.rc.rect).SetTo(matchCell.rc.index, matchCell.rc.mask)
-        'End If
-
         Dim unMatchedCells As Integer
         For i = task.redCells.Count - 1 To 0 Step -1
             Dim rc = task.redCells(i)
