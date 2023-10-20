@@ -97,19 +97,19 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
             If task.redCells.Count >= 255 Then Exit For ' we are going to handle only the largest 255 cells - "Other" (zero) for the rest.
         Next
 
-        If task.drawRect = New cv.Rect Then
-            Dim rp As New rcPrep
-            rp.rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-            rp.mask = task.cellMap(rp.rect).InRange(task.redOther, task.redOther)
-            rp.maxDist = New cv.Point(0, 0)
-            rp.floodPoint = rp.maxDist
-            rp.pixels = rp.mask.CountNonZero
-            rp.index = task.redOther
-            matchCell.rp = rp
-            matchCell.Run(Nothing)
-            task.redCells(0) = matchCell.rc
-            task.cellMap(matchCell.rc.rect).SetTo(matchCell.rc.index, matchCell.rc.mask)
-        End If
+        'If task.drawRect = New cv.Rect Then
+        '    Dim rp As New rcPrep
+        '    rp.rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+        '    rp.mask = task.cellMap(rp.rect).InRange(task.redOther, task.redOther)
+        '    rp.maxDist = New cv.Point(0, 0)
+        '    rp.floodPoint = rp.maxDist
+        '    rp.pixels = rp.mask.CountNonZero
+        '    rp.index = task.redOther
+        '    matchCell.rp = rp
+        '    matchCell.Run(Nothing)
+        '    task.redCells(0) = matchCell.rc
+        '    task.cellMap(matchCell.rc.rect).SetTo(matchCell.rc.index, matchCell.rc.mask)
+        'End If
 
         Dim unMatchedCells As Integer
         For i = task.redCells.Count - 1 To 0 Step -1
@@ -192,8 +192,6 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
 
             Dim stableCheck = lastCellMap.Get(Of Byte)(lrc.maxDStable.Y, lrc.maxDStable.X)
             If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
-        Else
-            Dim k = 0
         End If
 
         If usedColors.Contains(rc.color) Then
@@ -1269,3 +1267,128 @@ End Class
 
 
 
+
+
+
+
+
+
+
+
+Public Class RedCloud_CellsAtDepth : Inherits VB_Algorithm
+    Dim plot As New Plot_Histogram
+    Dim kalman As New Kalman_Basics
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        plot.noZeroEntry = False
+        labels(3) = "Histogram of depth weighted by the size of the cell."
+        desc = "Create a histogram of depth using RedCloud cells"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        Dim slotList(task.histogramBins) As List(Of Integer)
+        For i = 0 To slotList.Count - 1
+            slotList(i) = New List(Of Integer)
+        Next
+        Dim hist(task.histogramBins - 1) As Single
+        For Each rc In task.redCells
+            Dim slot As Integer
+            If rc.depthMean.Z > task.maxZmeters Then rc.depthMean.Z = task.maxZmeters
+            slot = CInt((rc.depthMean.Z / task.maxZmeters) * task.histogramBins)
+            If slot >= hist.Length Then slot = hist.Length - 1
+            slotList(slot).Add(rc.index)
+            If rc.pixels > dst2.Total / 2 Then Dim k = 0
+            hist(slot) += rc.pixels
+        Next
+
+        kalman.kInput = hist
+        kalman.Run(src)
+
+        Dim histMat = New cv.Mat(task.histogramBins, 1, cv.MatType.CV_32F, kalman.kOutput)
+        plot.Run(histMat)
+        dst3 = plot.dst2
+
+        Dim barWidth = dst3.Width / task.histogramBins
+        Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
+        dst3.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst3.Height), cv.Scalar.Yellow, task.lineWidth)
+        For i = 0 To slotList(histIndex).Count - 1
+            Dim rc = task.redCells(slotList(histIndex)(i))
+            vbDrawContour(dst2(rc.rect), rc.contour, cv.Scalar.Yellow)
+            vbDrawContour(task.color(rc.rect), rc.contour, cv.Scalar.Yellow)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class RedCloud_Features : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        If findfrm(traceName + " Radio Buttons") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("MaxDist Location")
+            radio.addRadio("Depth mean")
+            radio.addRadio("Correlation X to Z")
+            radio.addRadio("Correlation Y to Z")
+            radio.check(3).Checked = True
+        End If
+
+        desc = "Display And validate the keyPoints for each RedCloud cell"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static frm = findfrm(traceName + " Radio Buttons")
+        Dim selection As Integer
+        Dim labelName As String
+        For selection = 0 To frm.check.Count - 1
+            If frm.check(selection).Checked Then
+                labelName = frm.check(selection).text
+                Exit For
+            End If
+        Next
+
+        redC.Run(src)
+        dst2 = redC.dst2
+
+        Dim rc = task.rcSelect
+
+        dst0 = task.color
+        Dim correlationMat As New cv.Mat, correlationXtoZ As Single, correlationYtoZ As Single
+        dst3.SetTo(0)
+        Select Case selection
+            Case 0
+                Dim pt = rc.maxDist
+                labels(3) += "maxDist Is at (" + CStr(pt.X) + ", " + CStr(pt.Y) + ")"
+                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, cv.LineTypes.AntiAlias)
+            Case 1
+                dst3(rc.rect).SetTo(vbNearFar((rc.depthMean.Z) / task.maxZmeters), rc.mask)
+                labels(3) = "rc.depthMean.Z Is highlighted in dst2"
+                labels(3) = "Mean depth for the cell Is " + Format(rc.depthMean.Z, fmt3)
+            Case 2
+                cv.Cv2.MatchTemplate(task.pcSplit(0)(rc.rect), task.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
+                correlationXtoZ = correlationMat.Get(Of Single)(0, 0)
+                labels(3) = "High correlation X to Z Is yellow, low correlation X to Z Is blue"
+            Case 3
+                cv.Cv2.MatchTemplate(task.pcSplit(1)(rc.rect), task.pcSplit(2)(rc.rect), correlationMat, cv.TemplateMatchModes.CCoeffNormed, rc.mask)
+                correlationYtoZ = correlationMat.Get(Of Single)(0, 0)
+                labels(3) = "High correlation Y to Z Is yellow, low correlation Y to Z Is blue"
+        End Select
+        If selection = 3 Or selection = 4 Then
+            dst3(rc.rect).SetTo(vbNearFar(If(selection = 3, correlationXtoZ, correlationYtoZ) + 1), rc.mask)
+            setTrueText("(" + Format(correlationXtoZ, fmt3) + ", " + Format(correlationYtoZ, fmt3) + ")", New cv.Point(rc.rect.X, rc.rect.Y), 3)
+        End If
+        vbDrawContour(dst0(rc.rect), rc.contour, cv.Scalar.Yellow)
+        setTrueText(labels(3), 3)
+        labels(2) = "Highlighted feature = " + labelName
+    End Sub
+End Class
