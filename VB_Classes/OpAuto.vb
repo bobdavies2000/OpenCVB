@@ -400,7 +400,7 @@ End Class
 
 
 
-Public Class opAuto_GuidedBP : Inherits VB_Algorithm
+Public Class OpAuto_GuidedBP : Inherits VB_Algorithm
     Public nonZeroSamples As Integer
     Public Sub New()
         If sliders.Setup(traceName) Then
