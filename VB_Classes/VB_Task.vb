@@ -44,7 +44,6 @@ Public Class VBtask : Implements IDisposable
     Public disparityAdjustment As Single ' adjusts for resolution and some hidden elements.
 
     ' add any global algorithms here
-    Public colorReductionDefault As Integer
     Public motionRect As cv.Rect
     Public motionMask As cv.Mat
     Public mfiBasics As MFI_Basics

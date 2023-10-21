@@ -3505,28 +3505,6 @@ End Class
 
 
 
-Public Class Options_Reduction : Inherits VB_Algorithm
-    Public reductionVal As Integer
-    Public bitsliderVal As Integer
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Bits to remove in bitwise reduction", 0, 7, 5)
-            sliders.setupTrackBar("Color Reduction", 1, 255, task.colorReductionDefault)
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static reductionSlider = findSlider("Color Reduction")
-        Static bitSlider = findSlider("Bits to remove in bitwise reduction")
-
-        reductionVal = CInt(reductionSlider.Value)
-        bitsliderVal = bitSlider.value
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class Options_LUT : Inherits VB_Algorithm

@@ -141,7 +141,6 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         reduction = simpleReduce
     End Sub
-
     Private Sub BitwiseReduction_CheckedChanged(sender As Object, e As EventArgs) Handles BitwiseReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         reduction = bitwiseReduce
@@ -149,5 +148,13 @@ Public Class OptionsRedCloud
     Private Sub NoReduction_CheckedChanged(sender As Object, e As EventArgs) Handles NoReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         reduction = noReduce
+    End Sub
+    Private Sub ColorReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles ColorReductionSlider.ValueChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        ColorLabel.Text = CStr(ColorReductionSlider.Value)
+    End Sub
+    Private Sub BitwiseReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles BitwiseReductionSlider.ValueChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        bitwiseLabel.Text = CStr(BitwiseReductionSlider.Value)
     End Sub
 End Class

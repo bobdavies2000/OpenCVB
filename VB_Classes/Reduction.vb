@@ -1,29 +1,26 @@
 Imports cv = OpenCvSharp
 Public Class Reduction_Basics : Inherits VB_Algorithm
-    Public options As New Options_Reduction
     Public classCount As Integer
     Public Sub New()
         desc = "Reduction: a simpler way to KMeans by reducing color resolution"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         If redOptions.reduction = OptionsRedCloud.bitwiseReduce Then
-            Dim bits = options.bitsliderVal
+            Dim bits = redOptions.BitwiseReductionSlider.Value
             classCount = 255 / Math.Pow(2, bits)
             Dim zeroBits = Math.Pow(2, bits) - 1
             If task.optionsChanged Then dst1 = New cv.Mat(src.Size, src.Type, cv.Scalar.All(255 - zeroBits))
             dst1 = src And dst1
             dst0 = dst1 / zeroBits
         ElseIf redOptions.reduction = OptionsRedCloud.simpleReduce Then
-            Dim reductionVal = options.reductionVal
+            Dim reductionVal = redOptions.ColorReductionSlider.Value
             classCount = Math.Ceiling(255 / reductionVal)
 
             dst0 = src / reductionVal
             dst1 = dst0 * reductionVal
-            labels(2) = "Reduced image - factor = " + CStr(options.reductionVal)
+            labels(2) = "Reduced image - factor = " + CStr(redOptions.ColorReductionSlider.Value)
         Else
             dst1 = src
             labels(2) = "No reduction requested"

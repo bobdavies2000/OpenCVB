@@ -93,7 +93,7 @@ Public Class BackProject_Reduction : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Dim backP As New BackProject_Basics
     Public Sub New()
-        redOptions.BitwiseReduction.Checked = True
+        redOptions.SimpleReduction.Checked = True
         labels(3) = "Backprojection of highlighted histogram bin"
         desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image."
     End Sub

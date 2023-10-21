@@ -54,16 +54,18 @@ Public Class OptionsAllAlgorithm
 
         ShowAllOptions.Checked = GetSetting("OpenCVB1", "ShowAllOptions", "ShowAllOptions", False)
 
-        task.colorReductionDefault = 40
+        redOptions.ColorReductionSlider.Value = 40
         Select Case task.cameraName
             Case "Azure Kinect 4K"
             Case "Intel(R) RealSense(TM) Depth Camera 435i"
             Case "Intel(R) RealSense(TM) Depth Camera 455"
             Case "Oak-D camera"
-                task.colorReductionDefault = 80
+                redOptions.ColorReductionSlider.Value = 80
             Case "StereoLabs ZED 2/2i"
             Case "MYNT-EYE-D1000"
         End Select
+
+        redOptions.BitwiseReductionSlider.Value = 5
 
         task.dotSize = 1
         task.cvFontThickness = 1

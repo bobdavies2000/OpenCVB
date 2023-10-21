@@ -1171,7 +1171,6 @@ if algorithmName = "Options_ProCon" Then return new Options_ProCon
 if algorithmName = "Options_Quaternion" Then return new Options_Quaternion
 if algorithmName = "Options_Random" Then return new Options_Random
 if algorithmName = "Options_RedCloud" Then return new Options_RedCloud
-if algorithmName = "Options_Reduction" Then return new Options_Reduction
 if algorithmName = "Options_Resize" Then return new Options_Resize
 if algorithmName = "Options_RotatePoly" Then return new Options_RotatePoly
 if algorithmName = "Options_SepFilter2D" Then return new Options_SepFilter2D
