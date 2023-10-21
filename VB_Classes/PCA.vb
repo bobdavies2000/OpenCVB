@@ -308,7 +308,7 @@ Public Class PCA_Plane : Inherits VB_Algorithm
                 vbDrawContour(dst3(rc.rect), rc.contour, color, -1)
             Next
         End If
-        stats.rc = showSelection(dst3, task.redCells, task.cellMap)
+        stats.rc = showSelection(dst3)
         stats.Run(src)
         dst2 = stats.dst2
         labels(2) = stats.redC.labels(2)

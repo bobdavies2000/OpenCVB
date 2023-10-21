@@ -94,7 +94,7 @@ Public Class ReductionCloud_Match : Inherits VB_Algorithm
         desc = "Match cells from the previous generation"
     End Sub
     Public Function showSelect() As rcData
-        Return showSelection(dst2, redCells, cellMap)
+        Return showSelection(dst2)
     End Function
     Public Function redSelect() As rcData
         If task.drawRect <> New cv.Rect Then Return New rcData
@@ -405,7 +405,7 @@ Public Class ReductionCloud_Track8D : Inherits VB_Algorithm
         dst2 = colorC.dst2
         labels(2) = colorC.labels(2)
 
-        Dim rc = showSelection(dst2, colorC.redCells, colorC.rcMatch.cellMap)
+        Dim rc = showSelection(dst2)
 
         Static saveRC As rcData
         If task.mouseClickFlag Or firstPass Then saveRC = rc
@@ -729,11 +729,10 @@ Public Class ReductionCloud_CellStats : Inherits VB_Algorithm
             dst1 = plot.dst2
         End If
 
-        Dim lrc = If(redC.lastCells.count > 0 And redC.lastcells.count > rc.indexLast,
-        redC.lastCells(rc.indexLast), New rcData)
+        Dim lrc = If(task.lastCells.Count > 0 And task.lastCells.Count > rc.indexLast, task.lastCells(rc.indexLast), New rcData)
 
         strOut = "rc.index = " + CStr(rc.index) + " of " + CStr(task.redCells.Count) + vbTab
-        strOut += "rc.indexlast = " + CStr(rc.indexLast) + " of " + CStr(redC.lastCells.Count) + vbTab
+        strOut += "rc.indexlast = " + CStr(rc.indexLast) + " of " + CStr(task.lastCells.Count) + vbTab
         Dim gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
         Dim lastGridID = task.gridToRoiIndex.Get(Of Integer)(lrc.maxDist.Y, lrc.maxDist.X)
         strOut += " gridID = " + CStr(gridID) + vbTab + "lastGridID = " + CStr(lastGridID) + vbCrLf
@@ -831,7 +830,7 @@ Public Class ReductionCloud_Hulls : Inherits VB_Algorithm
             If standalone Then dst3.Circle(rc.maxDist, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
         Next
 
-        showSelection(dst3, redCells, cellMap)
+        showSelection(dst3)
         labels(2) = CStr(redCells.Count) + " hulls identified below.  " + CStr(defectCount) + " hulls failed to build the defect list."
     End Sub
 End Class

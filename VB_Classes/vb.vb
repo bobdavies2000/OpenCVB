@@ -192,11 +192,11 @@ Module VB
         dst.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
         dst.Circle(pt, task.dotSize, cv.Scalar.Black, -1, task.lineType)
     End Sub
-    Public Function showSelection(dstFill As cv.Mat, redCells As List(Of rcData), cellMap As cv.Mat) As rcData
-        If redCells.Count <= 1 Then Return New rcData
-        Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+    Public Function showSelection(dstFill As cv.Mat) As rcData
+        If task.redCells.Count <= 1 Then Return New rcData
+        Dim index = task.cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
 
-        Dim rc = redCells(index)
+        Dim rc = task.redCells(index)
         If rc.index > 0 And rc.rect.Contains(task.clickPoint) Then
             task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
             vbDrawContour(task.color(rc.rect), rc.contour, cv.Scalar.White, 1)

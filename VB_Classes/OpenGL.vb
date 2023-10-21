@@ -1866,29 +1866,6 @@ End Class
 
 
 
-Public Class OpenGL_RedCloudStable : Inherits VB_Algorithm
-    Dim redC As New RedCloudY_MinMaxNone
-    Public Sub New()
-        task.ogl.oglFunction = oCase.pointCloudAndRGB
-        desc = "Using MinMaxNone as source for RedCloud instead of point cloud"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        dst3 = redC.dst3
-        labels = redC.labels
-
-        cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), dst2}, task.ogl.pointCloudInput)
-        task.ogl.Run(redC.dst3)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class OpenGL_RedCloud : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public Sub New()

@@ -343,7 +343,7 @@ Public Class GuidedBP_kCellStats : Inherits VB_Algorithm
         stats.redC.buildCells.inputMask = dst2.InRange(0, 0)
         stats.Run(dst2)
 
-        showSelection(dst2, task.redCells, task.cellMap)
+        showSelection(dst2)
         setTrueText(stats.strOut, 3)
     End Sub
 End Class

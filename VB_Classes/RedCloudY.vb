@@ -91,60 +91,6 @@ End Class
 
 
 
-Public Class RedCloudY_MinMaxNone : Inherits VB_Algorithm
-    Dim depth As New Depth_MinMaxNone
-    Dim hulls As New RedCloud_Hulls
-    Public Sub New()
-        labels = {"", "", "MinMaxNone point cloud", "RedCloud output with MinMaxNone input"}
-        desc = "Use the MinMaxNone point cloud as input to RedCloud"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        depth.Run(src)
-        dst2 = depth.dst3
-        dst2.ConvertTo(dst0, cv.MatType.CV_8U)
-        hulls.Run(dst0)
-        dst3 = hulls.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class RedCloudY_ShapeCorrelation : Inherits VB_Algorithm
-    Dim hulls As New RedCloud_Hulls
-    Public Sub New()
-        desc = "A shape correlation is a correlation between each x and y in list of contours points.  It allows easy classification."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        hulls.Run(src)
-        dst2 = hulls.dst3
-        labels(2) = hulls.labels(2)
-
-        Dim rc = task.rcSelect
-        If rc.contour.Count > 0 Then
-            Dim shape = shapeCorrelation(rc.contour)
-            strOut = "Contour correlation for selected cell contour X to Y = " + Format(shape, fmt3) + vbCrLf + vbCrLf +
-                     "Select different cells and notice the pattern for the correlation of the contour.X to contour.Y values:" + vbCrLf +
-                     "(The contour correlation - contour.x to contour.y - Is computed above.)" + vbCrLf + vbCrLf +
-                     "If shape leans left, correlation Is positive And proportional to the lean." + vbCrLf +
-                     "If shape leans right, correlation Is negative And proportional to the lean. " + vbCrLf +
-                     "If shape Is symmetric (i.e. rectangle Or circle), correlation Is near zero." + vbCrLf +
-                     "(Remember that Y increases from the top of the image to the bottom.)"
-        End If
-
-        showSelection(dst2, task.redCells, task.cellMap)
-        setTrueText(strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class RedCloudY_NearestStableCell : Inherits VB_Algorithm
     Public knn As New KNN_Basics
     Dim hulls As New RedCloud_Hulls
@@ -182,26 +128,6 @@ Public Class RedCloudY_NearestStableCell : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-Public Class RedCloudY_FPS : Inherits VB_Algorithm
-    Dim fps As New Grid_FPS
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        desc = "Display RedCloud output at a fixed frame rate"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        fps.Run(Nothing)
-
-        If fps.heartBeat Then
-            redC.Run(src)
-            dst2 = redC.dst2.Clone
-        End If
-        labels(2) = redC.labels(2) + " " + fps.strOut
-    End Sub
-End Class
 
 
 

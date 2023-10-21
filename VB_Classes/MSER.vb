@@ -39,11 +39,11 @@ Public Class MSER_Basics : Inherits VB_Algorithm
 
         If task.optionsChanged Then
             cellMap.SetTo(task.redOther)
-            matchCell.lastCells.Clear()
+            task.lastCells.Clear()
         End If
 
         matchCell.lastCellMap = cellMap.Clone
-        matchCell.lastCells = New List(Of rcData)(mserCells)
+        task.lastCells = New List(Of rcData)(mserCells)
         matchCell.usedColors.Clear()
         matchCell.usedColors.Add(black)
 
@@ -68,7 +68,7 @@ Public Class MSER_Basics : Inherits VB_Algorithm
         Next
 
         If task.paused = False Then
-            For Each rc In matchCell.lastCells
+            For Each rc In task.lastCells
                 Dim val = detect.dst0.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
                 If val = task.redOther And rc.index <> task.redOther Then
                     rc.index = mserCells.Count
@@ -560,11 +560,11 @@ Public Class MSER_Regions : Inherits VB_Algorithm
 
         If task.optionsChanged Then
             cellMap.SetTo(mserLast)
-            matchCell.lastCells.Clear()
+            task.lastCells.Clear()
         End If
 
         matchCell.lastCellMap = cellMap.Clone
-        matchCell.lastCells = New List(Of rcData)(mserCells)
+        task.lastCells = New List(Of rcData)(mserCells)
         matchCell.usedColors.Clear()
         matchCell.usedColors.Add(black)
 

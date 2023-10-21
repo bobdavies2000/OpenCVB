@@ -57,11 +57,11 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
 
         If firstPass Then
             task.cellMap.SetTo(task.redOther)
-            matchCell.lastCells.Clear()
+            task.lastCells.Clear()
         End If
 
         matchCell.lastCellMap = task.cellMap.Clone
-        matchCell.lastCells = New List(Of rcData)(task.redCells)
+        task.lastCells = New List(Of rcData)(task.redCells)
         matchCell.usedColors.Clear()
         matchCell.usedColors.Add(black)
 
@@ -132,7 +132,6 @@ End Class
 Public Class RedCloud_MatchCell : Inherits VB_Algorithm
     Public rp As New rcPrep
     Public rc As New rcData
-    Public lastCells As New List(Of rcData)
     Public lastCellMap As New cv.Mat
     Public usedColors As New List(Of cv.Vec3b)
     Public Sub New()
@@ -171,8 +170,8 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
                 If rc.indexLast = rc.index Then Exit For
             Next
         End If
-        If rc.indexLast < lastCells.Count And rc.indexLast <> task.redOther Then
-            Dim lrc = lastCells(rc.indexLast)
+        If rc.indexLast < task.lastCells.Count And rc.indexLast <> task.redOther Then
+            Dim lrc = task.lastCells(rc.indexLast)
             rc.motionRect = rc.rect.Union(lrc.rect)
             rc.color = lrc.color
             rc.maxDStable = lrc.maxDStable
@@ -1376,5 +1375,104 @@ Public Class RedCloud_Features : Inherits VB_Algorithm
         vbDrawContour(dst0(rc.rect), rc.contour, cv.Scalar.Yellow)
         setTrueText(labels(3), 3)
         labels(2) = "Highlighted feature = " + labelName
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_ShapeCorrelation : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        desc = "A shape correlation is between each x and y in list of contours points.  It allows classification based on angle and shape."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        Dim rc = task.rcSelect
+        If rc.contour.Count > 0 Then
+            Dim shape = shapeCorrelation(rc.contour)
+            strOut = "Contour correlation for selected cell contour X to Y = " + Format(shape, fmt3) + vbCrLf + vbCrLf +
+                     "Select different cells and notice the pattern for the correlation of the contour.X to contour.Y values:" + vbCrLf +
+                     "(The contour correlation - contour.x to contour.y - Is computed above.)" + vbCrLf + vbCrLf +
+                     "If shape leans left, correlation Is positive And proportional to the lean." + vbCrLf +
+                     "If shape leans right, correlation Is negative And proportional to the lean. " + vbCrLf +
+                     "If shape Is symmetric (i.e. rectangle Or circle), correlation Is near zero." + vbCrLf +
+                     "(Remember that Y increases from the top of the image to the bottom.)"
+        End If
+
+        setTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedCloud_FPS : Inherits VB_Algorithm
+    Dim fps As New Grid_FPS
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        desc = "Display RedCloud output at a fixed frame rate"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        fps.Run(Nothing)
+
+        If fps.heartBeat Then
+            redC.Run(src)
+            dst2 = redC.dst2.Clone
+        End If
+        labels(2) = redC.labels(2) + " " + fps.strOut
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_MinMaxNone : Inherits VB_Algorithm
+    Dim depth As New Depth_MinMaxNone
+    Dim hulls As New RedCloud_Hulls
+    Public Sub New()
+        labels = {"", "", "MinMaxNone point cloud", "RedCloud output with MinMaxNone input"}
+        desc = "Use the MinMaxNone point cloud as input to RedCloud"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        depth.Run(src)
+        dst2 = depth.dst3
+        dst2.ConvertTo(dst0, cv.MatType.CV_8U)
+        hulls.Run(dst0)
+        dst3 = hulls.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class OpenGL_RedCloudStable : Inherits VB_Algorithm
+    Dim redC As New RedCloud_MinMaxNone
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        desc = "Using MinMaxNone as source for RedCloud instead of point cloud"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        dst3 = redC.dst3
+        labels = redC.labels
+
+        cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), dst2}, task.ogl.pointCloudInput)
+        task.ogl.Run(redC.dst3)
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
     End Sub
 End Class
