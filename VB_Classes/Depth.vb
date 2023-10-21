@@ -581,7 +581,7 @@ Public Class Depth_Smoothing : Inherits VB_Algorithm
     Public mats As New Mat_4to1
     Public colorize As New Depth_ColorMap
     Public Sub New()
-        findRadio("Use bitwise reduction").Checked = True
+        redOptions.BitwiseReduction.Checked = True
         labels(3) = "Mask of depth that is smooth"
         desc = "This attempt to get the depth data to 'calm' down is not working well enough to be useful - needs more work"
     End Sub

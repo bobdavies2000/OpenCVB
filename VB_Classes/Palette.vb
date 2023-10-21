@@ -124,8 +124,7 @@ End Module
 Public Class Palette_Reduction : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        findRadio("Use simple reduction").Checked = True
-        findRadio("No reduction").Enabled = False ' must have some reduction for this to work...
+        redOptions.SimpleReduction.Checked = True
         desc = "Map colors to different palette - Painterly Effect."
         labels(2) = "Reduced Colors"
     End Sub

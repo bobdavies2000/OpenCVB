@@ -93,7 +93,7 @@ Public Class BackProject_Reduction : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Dim backP As New BackProject_Basics
     Public Sub New()
-        findRadio("Use bitwise reduction").Checked = True
+        redOptions.BitwiseReduction.Checked = True
         labels(3) = "Backprojection of highlighted histogram bin"
         desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image."
     End Sub
@@ -119,7 +119,7 @@ Public Class BackProject_FeatureLess : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Dim edges As New Edge_ColorGap_CPP
     Public Sub New()
-        findRadio("Use bitwise reduction").Checked = True
+        redOptions.BitwiseReduction.Checked = True
         labels = {"", "", "Histogram of the grayscale image at right",
                   "Move mouse over the histogram to backproject a column"}
         desc = "Create a histogram of the featureless regions"
@@ -274,7 +274,7 @@ Public Class BackProject_ReductionLines : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Dim lines As New Line_Basics
     Public Sub New()
-        findRadio("Use bitwise reduction").Checked = True
+        redOptions.BitwiseReduction.Checked = True
 
         labels(3) = "Backprojection of highlighted histogram bin"
         desc = "Use the histogram of a reduced BGR image to isolate featureless portions of an image."

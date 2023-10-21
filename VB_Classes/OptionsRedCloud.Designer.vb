@@ -57,6 +57,10 @@ Partial Class OptionsRedCloud
         Me.UpperLabel = New System.Windows.Forms.Label()
         Me.UpperSlider = New System.Windows.Forms.TrackBar()
         Me.Label18 = New System.Windows.Forms.Label()
+        Me.GroupReduction = New System.Windows.Forms.GroupBox()
+        Me.BitwiseReduction = New System.Windows.Forms.RadioButton()
+        Me.NoReduction = New System.Windows.Forms.RadioButton()
+        Me.SimpleReduction = New System.Windows.Forms.RadioButton()
         Me.RedCloudSliders.SuspendLayout()
         CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TopViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -69,6 +73,7 @@ Partial Class OptionsRedCloud
         Me.GroupBox2.SuspendLayout()
         CType(Me.LowerSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.UpperSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupReduction.SuspendLayout()
         Me.SuspendLayout()
         '
         'RedCloudSliders
@@ -441,11 +446,57 @@ Partial Class OptionsRedCloud
         Me.Label18.TabIndex = 6
         Me.Label18.Text = "Region Upper Limit"
         '
+        'GroupReduction
+        '
+        Me.GroupReduction.Controls.Add(Me.BitwiseReduction)
+        Me.GroupReduction.Controls.Add(Me.NoReduction)
+        Me.GroupReduction.Controls.Add(Me.SimpleReduction)
+        Me.GroupReduction.Location = New System.Drawing.Point(1117, 211)
+        Me.GroupReduction.Name = "GroupReduction"
+        Me.GroupReduction.Size = New System.Drawing.Size(250, 141)
+        Me.GroupReduction.TabIndex = 5
+        Me.GroupReduction.TabStop = False
+        Me.GroupReduction.Text = "Reduction Options"
+        '
+        'BitwiseReduction
+        '
+        Me.BitwiseReduction.AutoSize = True
+        Me.BitwiseReduction.Location = New System.Drawing.Point(28, 67)
+        Me.BitwiseReduction.Name = "BitwiseReduction"
+        Me.BitwiseReduction.Size = New System.Drawing.Size(194, 24)
+        Me.BitwiseReduction.TabIndex = 3
+        Me.BitwiseReduction.TabStop = True
+        Me.BitwiseReduction.Text = "Use Bitwise Reduction"
+        Me.BitwiseReduction.UseVisualStyleBackColor = True
+        '
+        'NoReduction
+        '
+        Me.NoReduction.AutoSize = True
+        Me.NoReduction.Location = New System.Drawing.Point(28, 97)
+        Me.NoReduction.Name = "NoReduction"
+        Me.NoReduction.Size = New System.Drawing.Size(131, 24)
+        Me.NoReduction.TabIndex = 2
+        Me.NoReduction.TabStop = True
+        Me.NoReduction.Text = "No Reduction"
+        Me.NoReduction.UseVisualStyleBackColor = True
+        '
+        'SimpleReduction
+        '
+        Me.SimpleReduction.AutoSize = True
+        Me.SimpleReduction.Location = New System.Drawing.Point(28, 37)
+        Me.SimpleReduction.Name = "SimpleReduction"
+        Me.SimpleReduction.Size = New System.Drawing.Size(192, 24)
+        Me.SimpleReduction.TabIndex = 0
+        Me.SimpleReduction.TabStop = True
+        Me.SimpleReduction.Text = "Use Simple Reduction"
+        Me.SimpleReduction.UseVisualStyleBackColor = True
+        '
         'OptionsRedCloud
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1690, 521)
+        Me.Controls.Add(Me.GroupReduction)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.RGBSource)
@@ -468,6 +519,8 @@ Partial Class OptionsRedCloud
         Me.GroupBox2.PerformLayout()
         CType(Me.LowerSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.UpperSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupReduction.ResumeLayout(False)
+        Me.GroupReduction.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -506,4 +559,8 @@ Partial Class OptionsRedCloud
     Friend WithEvents UpperLabel As Windows.Forms.Label
     Friend WithEvents UpperSlider As Windows.Forms.TrackBar
     Friend WithEvents Label18 As Windows.Forms.Label
+    Friend WithEvents GroupReduction As Windows.Forms.GroupBox
+    Friend WithEvents BitwiseReduction As Windows.Forms.RadioButton
+    Friend WithEvents NoReduction As Windows.Forms.RadioButton
+    Friend WithEvents SimpleReduction As Windows.Forms.RadioButton
 End Class

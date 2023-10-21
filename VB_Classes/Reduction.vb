@@ -10,14 +10,14 @@ Public Class Reduction_Basics : Inherits VB_Algorithm
 
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        If options.bitwiseChecked Then
+        If redOptions.reduction = OptionsRedCloud.bitwiseReduce Then
             Dim bits = options.bitsliderVal
             classCount = 255 / Math.Pow(2, bits)
             Dim zeroBits = Math.Pow(2, bits) - 1
             If task.optionsChanged Then dst1 = New cv.Mat(src.Size, src.Type, cv.Scalar.All(255 - zeroBits))
             dst1 = src And dst1
             dst0 = dst1 / zeroBits
-        ElseIf options.simpleChecked Then
+        ElseIf redOptions.reduction = OptionsRedCloud.simpleReduce Then
             Dim reductionVal = options.reductionVal
             classCount = Math.Ceiling(255 / reductionVal)
 
@@ -103,7 +103,7 @@ End Class
 Public Class Reduction_PointCloud : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        findRadio("Use simple reduction").Checked = True
+        redOptions.SimpleReduction.Checked = True
         labels(2) = "Reduced depth"
         labels(3) = "Pointcloud with reduced z-Depth"
         desc = "Use reduction to smooth depth data"
@@ -170,17 +170,15 @@ Public Class Reduction_Edges : Inherits VB_Algorithm
     Dim edges As New Edge_Laplacian
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        findRadio("Use simple reduction").Checked = True
+        redOptions.SimpleReduction.Checked = True
         desc = "Get the edges after reducing the image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static simpleCheck = findRadio("Use simple reduction")
-        Static bitCheck = findRadio("Use bitwise reduction")
         reduction.Run(src)
         dst2 = reduction.dst2.Clone
 
-        Dim reductionRequested = False
-        If simpleCheck.Checked Or bitCheck.Checked Then reductionRequested = True
+        Dim reductionRequested = True
+        If redOptions.reduction = OptionsRedCloud.noReduce Then reductionRequested = False
         labels(2) = If(reductionRequested, "Reduced image", "Original image")
         labels(3) = If(reductionRequested, "Laplacian edges of reduced image", "Laplacian edges of original image")
         edges.Run(dst2)

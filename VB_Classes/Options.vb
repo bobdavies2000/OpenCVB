@@ -3506,8 +3506,6 @@ End Class
 
 
 Public Class Options_Reduction : Inherits VB_Algorithm
-    Public bitwiseChecked As Boolean
-    Public simpleChecked As Boolean
     Public reductionVal As Integer
     Public bitsliderVal As Integer
     Public Sub New()
@@ -3515,21 +3513,11 @@ Public Class Options_Reduction : Inherits VB_Algorithm
             sliders.setupTrackBar("Bits to remove in bitwise reduction", 0, 7, 5)
             sliders.setupTrackBar("Color Reduction", 1, 255, task.colorReductionDefault)
         End If
-        If radio.Setup(traceName) Then
-            radio.addRadio("Use simple reduction")
-            radio.addRadio("Use bitwise reduction")
-            radio.addRadio("No reduction")
-            radio.check(0).Checked = True
-        End If
     End Sub
     Public Sub RunVB()
-        Static bitwiseCheck = findRadio("Use bitwise reduction")
-        Static simpleCheck = findRadio("Use simple reduction")
         Static reductionSlider = findSlider("Color Reduction")
         Static bitSlider = findSlider("Bits to remove in bitwise reduction")
 
-        simpleChecked = simpleCheck.checked
-        bitwiseChecked = bitwiseCheck.checked
         reductionVal = CInt(reductionSlider.Value)
         bitsliderVal = bitSlider.value
     End Sub

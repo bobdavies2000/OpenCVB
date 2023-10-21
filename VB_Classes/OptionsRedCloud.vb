@@ -3,6 +3,10 @@ Imports cv = OpenCvSharp
 Public Class OptionsRedCloud
     Public radioText As String = "Reduction_Basics"
     Public channels() As Integer = {0, 1}
+    Public reduction As Integer ' 0 = simple, 1 = bitwise, 2 = none
+    Public Const simpleReduce As Integer = 0
+    Public Const bitwiseReduce As Integer = 1
+    Public Const noReduce As Integer = 2
     Private Sub OptionsRedCloud_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
         Me.Text = "Options mostly for RedCloud_Basics but other related algorithms too."
@@ -56,6 +60,7 @@ Public Class OptionsRedCloud
 
         Channels01.Checked = True
         RadioButton2.Checked = True ' Reduction_basics is the default.
+        SimpleReduction.Checked = True
 
         Me.Left = 0
         Me.Top = 0
@@ -131,5 +136,18 @@ Public Class OptionsRedCloud
     Private Sub LowerSliderr_ValueChanged(sender As Object, e As EventArgs) Handles LowerSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
         LowerLabel.Text = CStr(LowerSlider.Value)
+    End Sub
+    Private Sub SimpleReduction_CheckedChanged(sender As Object, e As EventArgs) Handles SimpleReduction.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        reduction = simpleReduce
+    End Sub
+
+    Private Sub BitwiseReduction_CheckedChanged(sender As Object, e As EventArgs) Handles BitwiseReduction.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        reduction = bitwiseReduce
+    End Sub
+    Private Sub NoReduction_CheckedChanged(sender As Object, e As EventArgs) Handles NoReduction.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        reduction = noReduce
     End Sub
 End Class

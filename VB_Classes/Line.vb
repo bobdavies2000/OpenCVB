@@ -235,7 +235,7 @@ Public Class Line_Reduction : Inherits VB_Algorithm
     Dim lines As New Line_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        findRadio("Use simple reduction").Checked = True
+        'redOptions.SimpleReduction.Checked = True
 
         labels(2) = "Yellow > length threshold, red < length threshold"
         labels(3) = "Input image after reduction"
@@ -310,7 +310,7 @@ Public Class Line_RegionsVB : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Const lineMatch = 254
     Public Sub New()
-        findRadio("Use bitwise reduction").Checked = True
+        redOptions.BitwiseReduction.Checked = True
         findSlider("Bits to remove in bitwise reduction").Value = 6
 
         If findfrm(traceName + " CheckBoxes") Is Nothing Then
