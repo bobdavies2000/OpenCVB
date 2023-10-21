@@ -1,6 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Public Class OptionsAllAlgorithm
-    ' 1Dim check() As RadioButton
     Public mapNames As New List(Of String)({"Autumn", "Bone", "Cividis", "Cool", "Hot", "Hsv", "Inferno", "Jet", "Magma", "Ocean", "Parula", "Pink",
                                 "Plasma", "Rainbow", "Spring", "Summer", "Twilight", "Twilight_Shifted", "Viridis", "Winter"})
     Public heartBeatSeconds = 1
@@ -163,7 +162,18 @@ Public Class OptionsAllAlgorithm
         DotSizeLabel.Text = CStr(dotSizeSlider.Value)
 
         Me.Left = 0
-        Me.Top = 0
+        Me.Top = 30
+    End Sub
+    Private Sub LineType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LineType.SelectedIndexChanged
+        task.optionsChanged = True
+        Select Case LineType.Text
+            Case "AntiAlias"
+                task.lineType = cv.LineTypes.AntiAlias
+            Case "Link4"
+                task.lineType = cv.LineTypes.Link4
+            Case "Link8"
+                task.lineType = cv.LineTypes.Link8
+        End Select
     End Sub
     Private Sub LineWidth_Scroll(sender As Object, e As EventArgs) Handles LineWidth.Scroll
         LineThicknessAmount.Text = CStr(LineWidth.Value)
@@ -193,17 +203,6 @@ Public Class OptionsAllAlgorithm
         maxCount.Text = CStr(MaxDepth.Value)
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
-    Private Sub LineType_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LineType.SelectedIndexChanged
-        task.optionsChanged = True
-        Select Case LineType.Text
-            Case "AntiAlias"
-                task.lineType = cv.LineTypes.AntiAlias
-            Case "Link4"
-                task.lineType = cv.LineTypes.Link4
-            Case "Link8"
-                task.lineType = cv.LineTypes.Link8
-        End Select
-    End Sub
     Private Sub OptionsAllAlgorithm_Click(sender As Object, e As EventArgs) Handles Me.Click
         Me.BringToFront()
     End Sub
@@ -229,7 +228,6 @@ Public Class OptionsAllAlgorithm
         AddWeighted.Text = CStr(AddWeightedSlider.Value)
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
-
     Private Sub useFilter_CheckedChanged(sender As Object, e As EventArgs) Handles useFilter.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub
@@ -273,7 +271,6 @@ Public Class OptionsAllAlgorithm
         If task IsNot Nothing Then task.optionsChanged = True
         MinPixels.Text = CStr(minPixelsSlider.Value)
     End Sub
-
     Private Sub useCloudHistory_CheckedChanged(sender As Object, e As EventArgs) Handles useHistoryCloud.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
     End Sub

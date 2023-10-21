@@ -34,6 +34,7 @@ Module vbUtilities
     End Function
 
     Public gOptions As New OptionsAllAlgorithm
+    Public redOptions As New OptionsRedCloud
     Public task As VBtask
 
     Public pipeCount As Integer

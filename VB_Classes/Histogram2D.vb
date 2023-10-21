@@ -45,7 +45,7 @@ Public Class Histogram2D_PointCloud : Inherits VB_Algorithm
         ranges = New cv.Rangef() {New cv.Rangef(r1.Item0, r1.Item1),
                                   New cv.Rangef(r2.Item0, r2.Item1)}
         cv.Cv2.CalcHist({task.pointCloud}, options.channels, New cv.Mat(),
-                        histogram, 2, {task.histogramBins, task.histogramBins}, ranges)
+                        histogram, 2, {redOptions.HistBinSlider.Value, redOptions.HistBinSlider.Value}, ranges)
 
         plot2D.Run(histogram)
         dst2 = plot2D.dst2

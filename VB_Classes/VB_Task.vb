@@ -44,7 +44,6 @@ Public Class VBtask : Implements IDisposable
     Public disparityAdjustment As Single ' adjusts for resolution and some hidden elements.
 
     ' add any global algorithms here
-    Public xyRanges As Options_XYRanges
     Public colorReductionDefault As Integer
     Public motionRect As cv.Rect
     Public motionMask As cv.Mat
@@ -338,12 +337,13 @@ Public Class VBtask : Implements IDisposable
 
         callTrace.Add("Options_XYRanges") ' so calltrace is not nothing on initial call...
         gOptions = New OptionsAllAlgorithm
+        redOptions = New OptionsRedCloud
 
-        xyRanges = New Options_XYRanges
         grid = New Grid_Basics
         PixelViewer = New Pixel_Viewer
 
         depthBasics = New Depth_Basics
+        redOptions.Show()
         gOptions.Show()
         updateSettings()
         task.toggleFrame = -1
@@ -409,7 +409,8 @@ Public Class VBtask : Implements IDisposable
             End If
             If task.useRecordedData Then recordedData.Run(task.color.Clone)
 
-            xyRanges.RunVB()
+            redOptions.Sync()
+            task.bins2D = {dst2.Height, dst2.Width}
 
             If task.pointCloud.Width > 0 Then
                 ' If the workingRes changes, the previous generation of images needs to be reset.

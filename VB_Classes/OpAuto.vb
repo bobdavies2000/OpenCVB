@@ -415,10 +415,12 @@ Public Class OpAuto_GuidedBP : Inherits VB_Algorithm
         Static lowerSlider = findSlider("Lower limit of regions")
         If lowerSlider.value > upperSlider.value - 10 Then lowerSlider.value = upperSlider.value - 10
 
+        If nonZeroSamples = 0 Then Exit Sub
+
         ' A practical use of optionAutomation.  Any image with more regions is quite complex.
         Dim saveit = task.optionsChanged
-        If nonZeroSamples > upperSlider.value Then gOptions.HistBinSlider.Value -= 1
-        If nonZeroSamples < lowerSlider.value Then gOptions.HistBinSlider.Value += 1
+        If nonZeroSamples > upperSlider.value Then redOptions.HistBinSlider.Value -= 1
+        If nonZeroSamples < lowerSlider.value Then redOptions.HistBinSlider.Value += 1
         task.optionsChanged = saveit
     End Sub
 End Class

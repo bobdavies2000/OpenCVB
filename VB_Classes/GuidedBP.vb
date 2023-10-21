@@ -1119,7 +1119,7 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
     Public backProject As New cv.Mat
     Dim opAuto As New opAuto_GuidedBP
     Public Sub New()
-        gOptions.HistBinSlider.Value = 15
+        redOptions.HistBinSlider.Value = 15
         desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
     End Sub
     Public Sub RunVB(src As cv.Mat)

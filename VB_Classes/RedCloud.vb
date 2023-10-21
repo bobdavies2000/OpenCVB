@@ -1276,15 +1276,16 @@ Public Class RedCloud_CellsAtDepth : Inherits VB_Algorithm
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        Dim slotList(task.histogramBins) As List(Of Integer)
+        Dim histBins = redOptions.HistBinSlider.Value
+        Dim slotList(histBins) As List(Of Integer)
         For i = 0 To slotList.Count - 1
             slotList(i) = New List(Of Integer)
         Next
-        Dim hist(task.histogramBins - 1) As Single
+        Dim hist(histBins - 1) As Single
         For Each rc In task.redCells
             Dim slot As Integer
             If rc.depthMean.Z > task.maxZmeters Then rc.depthMean.Z = task.maxZmeters
-            slot = CInt((rc.depthMean.Z / task.maxZmeters) * task.histogramBins)
+            slot = CInt((rc.depthMean.Z / task.maxZmeters) * histBins)
             If slot >= hist.Length Then slot = hist.Length - 1
             slotList(slot).Add(rc.index)
             If rc.pixels > dst2.Total / 2 Then Dim k = 0
@@ -1294,11 +1295,11 @@ Public Class RedCloud_CellsAtDepth : Inherits VB_Algorithm
         kalman.kInput = hist
         kalman.Run(src)
 
-        Dim histMat = New cv.Mat(task.histogramBins, 1, cv.MatType.CV_32F, kalman.kOutput)
+        Dim histMat = New cv.Mat(histBins, 1, cv.MatType.CV_32F, kalman.kOutput)
         plot.Run(histMat)
         dst3 = plot.dst2
 
-        Dim barWidth = dst3.Width / task.histogramBins
+        Dim barWidth = dst3.Width / histBins
         Dim histIndex = Math.Floor(task.mouseMovePoint.X / barWidth)
         dst3.Rectangle(New cv.Rect(CInt(histIndex * barWidth), 0, barWidth, dst3.Height), cv.Scalar.Yellow, task.lineWidth)
         For i = 0 To slotList(histIndex).Count - 1

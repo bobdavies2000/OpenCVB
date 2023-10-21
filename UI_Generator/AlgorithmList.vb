@@ -1196,7 +1196,6 @@ if algorithmName = "Options_WarpModel" Then return new Options_WarpModel
 if algorithmName = "Options_WarpModel2" Then return new Options_WarpModel2
 if algorithmName = "Options_Wavelet" Then return new Options_Wavelet
 if algorithmName = "Options_XPhoto" Then return new Options_XPhoto
-if algorithmName = "Options_XYRanges" Then return new Options_XYRanges
 if algorithmName = "ORB_Basics" Then return new ORB_Basics
 if algorithmName = "ORB_Match" Then return new ORB_Match
 if algorithmName = "Palette_Basics" Then return new Palette_Basics

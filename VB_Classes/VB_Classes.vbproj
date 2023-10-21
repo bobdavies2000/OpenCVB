@@ -146,6 +146,12 @@
     <Compile Include="OptionsKeyboardInput.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="OptionsRedCloud.Designer.vb">
+      <DependentUpon>OptionsRedCloud.vb</DependentUpon>
+    </Compile>
+    <Compile Include="OptionsRedCloud.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Projection.vb" />
     <Compile Include="PyrFilter.vb" />
     <Compile Include="RedCloud.vb" />
@@ -435,6 +441,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsRadioButtons.resx">
       <DependentUpon>OptionsRadioButtons.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OptionsRedCloud.resx">
+      <DependentUpon>OptionsRedCloud.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsSliders.resx">
       <DependentUpon>OptionsSliders.vb</DependentUpon>
