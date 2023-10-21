@@ -379,7 +379,6 @@ Public Class RedCloud_CellStats : Inherits VB_Algorithm
             redC.Run(src)
             dst0 = redC.dst0
             dst2 = redC.dst2
-            dst3 = redC.dst3
             labels(2) = redC.labels(2)
         End If
 

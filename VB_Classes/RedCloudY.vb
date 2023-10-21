@@ -538,7 +538,7 @@ Public Class RedCloudY_SliceH : Inherits VB_Algorithm
     Dim stats As New RedCloud_CellStats
     Public Sub New()
         stats.redC = New RedCloud_Basics
-        findRadio("Channels 1 and 2").Checked = True
+        redOptions.Channels12.Checked = True
         desc = "Build horizontal RedCloud cells"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -559,7 +559,7 @@ Public Class RedCloudY_SliceV : Inherits VB_Algorithm
     Dim stats As New RedCloud_CellStats
     Public Sub New()
         stats.redC = New RedCloud_Basics
-        findRadio("Channels 0 and 2").Checked = True
+        redOptions.Channels02.Checked = True
         desc = "Build vertical RedCloud cells."
     End Sub
     Public Sub RunVB(src As cv.Mat)

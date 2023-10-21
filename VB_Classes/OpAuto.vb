@@ -31,13 +31,12 @@ Public Class OpAuto_XRange : Inherits VB_Algorithm
 
         If task.useXYRange Then
             Dim saveOptionState = task.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
-            Static xRangeSlider = findSlider("X-Range X100")
             Dim leftGap = histogram.Col(0).CountNonZero
             Dim rightGap = histogram.Col(histogram.Width - 1).CountNonZero
-            If leftGap = 0 And rightGap = 0 And xRangeSlider.value > 1 Then
-                xRangeSlider.value -= 1
+            If leftGap = 0 And rightGap = 0 And redOptions.XRangeSlider.Value > 1 Then
+                redOptions.XRangeSlider.Value -= 1
             Else
-                If adjustedCount < expectedCount Then xRangeSlider.value += 1 Else xRangeSlider.value -= 1
+                If adjustedCount < expectedCount Then redOptions.XRangeSlider.Value += 1 Else redOptions.XRangeSlider.Value -= 1
             End If
             task.optionsChanged = saveOptionState
         End If
@@ -81,13 +80,12 @@ Public Class OpAuto_YRange : Inherits VB_Algorithm
 
         If task.useXYRange Then
             Dim saveOptionState = task.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
-            Static yRangeSlider = findSlider("Y-Range X100")
             Dim topGap = histogram.Row(0).CountNonZero
             Dim botGap = histogram.Row(histogram.Height - 1).CountNonZero
-            If topGap = 0 And botGap = 0 And yRangeSlider.value > 1 Then
-                yRangeSlider.value -= 1
+            If topGap = 0 And botGap = 0 And redOptions.YRangeSlider.Value > 1 Then
+                redOptions.YRangeSlider.Value -= 1
             Else
-                If adjustedCount < expectedCount Then yRangeSlider.value += 1 Else yRangeSlider.value -= 1
+                If adjustedCount < expectedCount Then redOptions.YRangeSlider.Value += 1 Else redOptions.YRangeSlider.Value -= 1
             End If
             task.optionsChanged = saveOptionState
         End If
