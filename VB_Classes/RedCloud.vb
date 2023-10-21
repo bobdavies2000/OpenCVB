@@ -16,7 +16,6 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         If task.redCells.Count = 0 Then Return New rcData
         If task.clickPoint = New cv.Point(0, 0) Then Return New rcData
         Dim index = task.cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        'If task.clickPoint = New cv.Point Then index = 1
 
         Dim rc = task.redCells(index)
         If task.mouseClickFlag Or heartBeat() Then
@@ -48,10 +47,8 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         task.redOther = 0
 
-        If standalone Then
-            dst0 = src
-            dst1 = task.depthRGB.Resize(src.Size)
-        End If
+        dst0 = src
+        If standalone Then dst1 = task.depthRGB.Resize(src.Size)
 
         combine.colorOnly = colorOnly
         combine.depthOnly = depthOnly
@@ -114,10 +111,13 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         changedTotal += unMatchedCells
         labels(3) = CStr(changedTotal) + " new/moved cells in the last second " +
                     Format(changedTotal / (task.frameCount - task.toggleFrame), fmt1) + " unmatched per frame"
-        labels(2) = CStr(task.redCells.Count) + " cells " + CStr(unMatchedCells) + " did not match the previous frame. Click a cell to see more."
-        If heartBeat() Then changedTotal = 0
+        If heartBeat() Then
+            labels(2) = CStr(task.redCells.Count) + " cells " + CStr(unMatchedCells) + " did not match the previous frame. Click a cell to see more."
+            changedTotal = 0
+        End If
 
         task.rcSelect = redSelect(dst0, dst1, dst2)
+        dst3 = matchCell.dst3
     End Sub
 End Class
 
@@ -138,6 +138,7 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
     Public Sub New()
         task.cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         lastCellMap = task.cellMap.Clone
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         strOut = "RedCloud_MatchCell takes an rcPrep cell and builds an rcData cell." + vbCrLf +
                  "When standalone, it just build a fake rcPrep cell and displays the rcData equivalent."
         desc = "Build a RedCloud cell from the rcPrep input"
@@ -184,6 +185,8 @@ Public Class RedCloud_MatchCell : Inherits VB_Algorithm
             rc.color = New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240))
             If standalone Then dst2(rc.rect).SetTo(cv.Scalar.White, rc.mask)
             rc.indexLast = 0
+            If heartBeat() Then dst3.SetTo(0)
+            dst3(rc.rect).SetTo(255, rc.mask)
         End If
 
         usedColors.Add(rc.color)
@@ -316,18 +319,14 @@ Public Class RedCloud_CellStats : Inherits VB_Algorithm
     Dim eq As New Plane_Equation
     Public redC As Object
     Public Sub New()
+        If standalone Then gOptions.displayDst0.Checked = True
         If standalone Then gOptions.displayDst1.Checked = True
         If standalone Then redC = New RedCloud_Basics
-        dst0 = New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
+        If standalone Then gOptions.HistBinSlider.Value = 20
+
         desc = "Display the statistics for the selected cell."
     End Sub
     Public Sub statsString(src As cv.Mat)
-        If standalone Then
-            redC.Run(src)
-            dst2 = redC.dst2
-            dst3 = redC.dst3
-        End If
-
         Dim tmp = New cv.Mat(task.rcSelect.mask.Rows, task.rcSelect.mask.Cols, cv.MatType.CV_32F, 0)
         task.pcSplit(2)(task.rcSelect.rect).CopyTo(tmp, task.rcSelect.mask)
         plot.rc = task.rcSelect
@@ -376,16 +375,17 @@ Public Class RedCloud_CellStats : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
-            Static redP As New RedCloud_Basics
-            redP.Run(src)
-            dst2 = redP.dst2
-            labels(2) = redP.labels(2)
+            If firstPass Then redC = New RedCloud_Basics
+            redC.Run(src)
+            dst0 = redC.dst0
+            dst2 = redC.dst2
+            dst3 = redC.dst3
+            labels(2) = redC.labels(2)
         End If
 
-        If heartBeat() Or task.mouseClickFlag Then statsString(src)
+        If task.mouseClickFlag Then statsString(src) Else setTrueText("Click any RedCloud cell to see depth histogram here.", 1)
 
         setTrueText(strOut, 3)
-
         labels(1) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.maxZmeters)) + " meters"
     End Sub
 End Class

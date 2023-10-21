@@ -2,24 +2,20 @@
 Public Class Color_Basics : Inherits VB_Algorithm
     Public classCount As Integer
     Public CurrentColorClassifier As String
-    Dim options As New Options_Color
     Dim backP As New BackProject_Full
     Dim km As New KMeans_Basics
     Dim lut As New LUT_Basics
     Dim reduction As New Reduction_Basics
-    Dim classifier As Object
+    Dim classifier As Object = reduction
     Public Sub New()
         classifier = reduction
         desc = "Classify pixels by color using a variety of techniques"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-        Static frmSrc = findfrm("Options_Color Radio Buttons")
-
         dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
 
         If task.optionsChanged Then
-            Select Case options.radioText
+            Select Case redOptions.radioText
                 Case "BackProject_Full"
                     classifier = backP
                 Case "KMeans_Basics"
@@ -40,8 +36,8 @@ Public Class Color_Basics : Inherits VB_Algorithm
         dst2 = dst0 * 255 / classCount
         dst3 = vbPalette(dst2)
 
-        setTrueText(options.radioText)
-        labels(2) = "Color_Basics: method = " + options.radioText + " produced " + CStr(classCount) + " pixel classifications"
+        setTrueText(redOptions.radioText)
+        labels(2) = "Color_Basics: method = " + redOptions.radioText + " produced " + CStr(classCount) + " pixel classifications"
     End Sub
 End Class
 

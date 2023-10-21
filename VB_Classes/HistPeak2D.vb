@@ -2,7 +2,6 @@
 Public Class HistPeak2D_Basics : Inherits VB_Algorithm
     Public auto As New OpAuto_Peaks2DGrid
     Dim delaunay As New Delaunay_Basics
-    Public options As New Options_Histogram2D
     Public histogram As New cv.Mat
     Public ranges() As cv.Rangef
     Public Sub New()
@@ -26,12 +25,11 @@ Public Class HistPeak2D_Basics : Inherits VB_Algorithm
         histogram.SetTo(0, Not mask)
 
         If ranges Is Nothing Or task.optionsChanged Then
-            options.RunVB()
-            ranges = vbHist2Dminmax(src, options.channels(0), options.channels(1))
+            ranges = vbHist2Dminmax(src, redOptions.channels(0), redOptions.channels(1))
         End If
 
         Dim backProjection As New cv.Mat
-        cv.Cv2.CalcBackProject({src}, options.channels, histogram, backProjection, ranges)
+        cv.Cv2.CalcBackProject({src}, redOptions.channels, histogram, backProjection, ranges)
         dst2 = vbPalette(backProjection * 255 / delaunay.inputPoints.Count)
     End Sub
 End Class
@@ -61,7 +59,7 @@ Public Class HistPeak2D_HotSide : Inherits VB_Algorithm
 
         peak.histogram = hist2d.histogram
         peak.ranges = task.rangesSide
-        peak.options.channels = task.channelsSide
+        redOptions.channels = task.channelsSide
         peak.Run(task.pointCloud)
         dst2 = peak.dst2
         dst2.SetTo(0, task.noDepthMask)
@@ -93,7 +91,7 @@ Public Class HistPeak2D_HotTop : Inherits VB_Algorithm
 
         peak.histogram = hist2d.histogram
         peak.ranges = task.rangesTop
-        peak.options.channels = task.channelsTop
+        redOptions.channels = task.channelsTop
         peak.Run(task.pointCloud)
         dst2 = peak.dst2
         dst2.SetTo(0, task.noDepthMask)
@@ -118,11 +116,11 @@ Public Class HistPeak2D_TopAndSide : Inherits VB_Algorithm
         If task.toggleEverySecond Then
             histSide.Run(src)
             peak.ranges = task.rangesSide
-            peak.options.channels = task.channelsSide
+            redOptions.channels = task.channelsSide
             peak.histogram = histSide.histogram
         Else
             histTop.Run(src)
-            peak.options.channels = task.channelsTop
+            redOptions.channels = task.channelsTop
             peak.ranges = task.rangesTop
             peak.histogram = histTop.histogram
         End If

@@ -34,7 +34,7 @@ Public Class BackProject2D_Basics : Inherits VB_Algorithm
         maxY = (bpCol + 1) * yRange / dimension
 
         Dim ranges() = New cv.Rangef() {New cv.Rangef(minX, maxX), New cv.Rangef(minY, maxY)}
-        cv.Cv2.CalcBackProject({src}, hist2d.options.channels, histogram, dst0, ranges)
+        cv.Cv2.CalcBackProject({src}, redOptions.channels, histogram, dst0, ranges)
         Dim bpCount = histogram.Get(Of Single)(bpRow, bpCol)
 
         dst3.SetTo(0)
@@ -119,7 +119,7 @@ Public Class BackProject2D_RowCol : Inherits VB_Algorithm
         Static rowRadio = findRadio("BackProject Row")
         If task.mouseClickFlag Then rowRadio.checked = Not rowRadio.checked
         Dim selection = If(rowRadio.checked, "Col", "Row")
-        labels = {"", "", "Histogram 2D of " + backp.options.colorFormat + " with Backprojection by " + selection, ""}
+        labels = {"", "", "Histogram 2D with Backprojection by " + selection, ""}
 
         backp.Run(src)
         dst2 = backp.dst2
@@ -127,7 +127,7 @@ Public Class BackProject2D_RowCol : Inherits VB_Algorithm
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, 255), New cv.Rangef(backp.minY, backp.maxY)}
         If rowRadio.checked Then ranges = New cv.Rangef() {New cv.Rangef(backp.minX, backp.maxX), New cv.Rangef(0, 255)}
 
-        cv.Cv2.CalcBackProject({src}, backp.hist2d.options.channels, backp.histogram, dst1, ranges)
+        cv.Cv2.CalcBackProject({src}, redOptions.channels, backp.histogram, dst1, ranges)
 
         dst3.SetTo(0)
         dst3.SetTo(cv.Scalar.Yellow, dst1)
@@ -186,7 +186,7 @@ Public Class BackProject2D_FullImage : Inherits VB_Algorithm
                 If count > 100 Then
                     Dim ranges() = New cv.Rangef() {New cv.Rangef(row * 255 / gOptions.GridSize.Value, (row + 1) * 255 / gOptions.GridSize.Value),
                                                     New cv.Rangef(col * 255 / gOptions.GridSize.Value, (col + 1) * 255 / gOptions.GridSize.Value)}
-                    cv.Cv2.CalcBackProject({backp.options.dst2}, backp.hist2d.options.channels,
+                    cv.Cv2.CalcBackProject({backp.options.dst2}, redOptions.channels,
                                            backp.histogram, dst1, ranges)
                     If dst1.CountNonZero > 100 Then
                         classCount += 1

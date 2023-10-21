@@ -3468,43 +3468,6 @@ End Class
 
 
 
-
-
-
-Public Class Options_Histogram2D : Inherits VB_Algorithm
-    Public channels() As Integer = {0, 1}
-    Public Sub New()
-        If findfrm(traceName + " Radio Options") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Channels 0 and 1")
-            radio.addRadio("Channels 0 and 2")
-            radio.addRadio("Channels 1 and 2")
-            radio.check(0).Checked = True
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static channel01Radio = findRadio("Channels 0 and 1")
-        Static channel02Radio = findRadio("Channels 0 and 2")
-        Static channel12Radio = findRadio("Channels 1 and 2")
-
-        If channel01Radio.checked Then channels = {0, 1}
-        If channel02Radio.checked Then channels = {0, 2}
-        If channel12Radio.checked Then channels = {1, 2}
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
-
-
 Public Class Options_KMeans : Inherits VB_Algorithm
     Public kMeansFlag As cv.KMeansFlags
     Public kMeansK As Integer
@@ -4057,35 +4020,6 @@ Public Class Options_Boundary : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class Options_Color : Inherits VB_Algorithm
-    Public radioText As String
-    Public Sub New()
-        If findfrm(traceName + " Radio Options") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("BackProject_Full")
-            radio.addRadio("KMeans_Basics")
-            radio.addRadio("LUT_Basics")
-            radio.addRadio("Reduction_Basics")
-            radio.check(3).Checked = True
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static frmRadio = findfrm("Options_Color Radio Buttons")
-        For i = 0 To frmRadio.check.count - 1
-            If frmRadio.check(i).checked Then radioText = frmRadio.check(i).text
-        Next
-        If task.optionsChanged Then
-            frmRadio.Left = gOptions.Width / 2
-            frmRadio.Top = gOptions.Height / 2
-        End If
-    End Sub
-End Class
 
 
 

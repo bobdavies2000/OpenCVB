@@ -1,9 +1,11 @@
 ﻿Imports System.Windows.Controls
 Imports cv = OpenCvSharp
 Public Class OptionsRedCloud
+    Public radioText As String = "Reduction_Basics"
+    Public channels() As Integer = {0, 1}
     Private Sub OptionsRedCloud_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
-        Me.Text = "Options for RedCloud_Basics and related algorithms."
+        Me.Text = "Options mostly for RedCloud_Basics but other related algorithms too."
 
         ' The following lines control the pointcloud histograms for X and Y, and the camera location.
 
@@ -52,14 +54,17 @@ Public Class OptionsRedCloud
         task.channelsTop = {2, 0}
         task.channelsSide = {1, 2}
 
+        Channels01.Checked = True
+        RadioButton2.Checked = True ' Reduction_basics is the default.
+
         Me.Left = 0
         Me.Top = 0
     End Sub
     Private Sub HistBinSlider_ValueChanged(sender As Object, e As EventArgs) Handles HistBinSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
+        histBins.Text = CStr(HistBinSlider.Value)
     End Sub
     Public Sub Sync()
-        histBins.Text = CStr(HistBinSlider.Value)
 
         task.maxZmeters = gOptions.MaxDepth.Value + 0.01 ' why add a cm?  Because histograms are exclusive on ranges.
 
@@ -70,21 +75,53 @@ Public Class OptionsRedCloud
         task.topCameraPoint = New cv.Point(CInt(task.workingRes.Width / 2), 0)
 
         task.xRange = XRangeSlider.Value / 100 + 0.01 ' why add a cm?  Because histograms are exclusive on ranges.
-        task.xRange = YRangeSlider.Value / 100 + 0.01 ' why add a cm?  Because histograms are exclusive on ranges.
+        task.yRange = YRangeSlider.Value / 100 + 0.01 ' why add a cm?  Because histograms are exclusive on ranges.
 
         task.redThresholdSide = SideViewThreshold.Value
         task.redThresholdTop = TopViewThreshold.Value
     End Sub
     Private Sub XRangeSlider_ValueChanged(sender As Object, e As EventArgs) Handles XRangeSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
+        XLabel.Text = CStr(XRangeSlider.Value)
     End Sub
-    Private Sub YRangeSlider_ValueChanged(sender As Object, e As EventArgs) Handles XRangeSlider.ValueChanged
+    Private Sub YRangeSlider_ValueChanged(sender As Object, e As EventArgs) Handles YRangeSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
+        YLabel.Text = CStr(YRangeSlider.Value)
     End Sub
     Private Sub SideViewThreshold_ValueChanged(sender As Object, e As EventArgs) Handles SideViewThreshold.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
+        SideLabel.Text = CStr(SideViewThreshold.Value)
     End Sub
-    Private Sub TopViewThreshold_ValueChanged(sender As Object, e As EventArgs) Handles SideViewThreshold.ValueChanged
+    Private Sub TopViewThreshold_ValueChanged(sender As Object, e As EventArgs) Handles TopViewThreshold.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
+        TopLabel.Text = CStr(TopViewThreshold.Value)
+    End Sub
+    Private Sub RadioButton1_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton1.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        radioText = RadioButton1.Text
+    End Sub
+    Private Sub RadioButton4_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton4.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        radioText = RadioButton4.Text
+    End Sub
+    Private Sub RadioButton3_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton3.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        radioText = RadioButton3.Text
+    End Sub
+    Private Sub RadioButton2_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton2.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        radioText = RadioButton2.Text
+    End Sub
+    Private Sub Channels01_CheckedChanged(sender As Object, e As EventArgs) Handles Channels01.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        channels = {0, 1}
+    End Sub
+    Private Sub Channels02_CheckedChanged(sender As Object, e As EventArgs) Handles Channels02.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        channels = {0, 2}
+    End Sub
+    Private Sub Channels12_CheckedChanged(sender As Object, e As EventArgs) Handles Channels12.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        channels = {1, 2}
     End Sub
 End Class

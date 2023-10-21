@@ -58,7 +58,7 @@ End Class
 Public Class BackProject_Full : Inherits VB_Algorithm
     Public classCount As Integer
     Public Sub New()
-        gOptions.HistBinSlider.Value = 5
+        If standalone Then gOptions.HistBinSlider.Value = 5
         desc = "Create a color histogram, normalize it, and backproject it with a palette."
     End Sub
     Public Sub RunVB(src As cv.Mat)

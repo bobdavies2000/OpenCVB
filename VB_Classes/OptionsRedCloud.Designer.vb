@@ -43,6 +43,13 @@ Partial Class OptionsRedCloud
         Me.RadioButton3 = New System.Windows.Forms.RadioButton()
         Me.RadioButton2 = New System.Windows.Forms.RadioButton()
         Me.RadioButton1 = New System.Windows.Forms.RadioButton()
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.Channels02 = New System.Windows.Forms.RadioButton()
+        Me.Channels12 = New System.Windows.Forms.RadioButton()
+        Me.Channels01 = New System.Windows.Forms.RadioButton()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.TrackBar1 = New System.Windows.Forms.TrackBar()
+        Me.Label3 = New System.Windows.Forms.Label()
         Me.RedCloudSliders.SuspendLayout()
         CType(Me.TopViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SideViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -50,10 +57,15 @@ Partial Class OptionsRedCloud
         CType(Me.XRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.RGBSource.SuspendLayout()
+        Me.GroupBox1.SuspendLayout()
+        CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'RedCloudSliders
         '
+        Me.RedCloudSliders.Controls.Add(Me.Label1)
+        Me.RedCloudSliders.Controls.Add(Me.TrackBar1)
+        Me.RedCloudSliders.Controls.Add(Me.Label3)
         Me.RedCloudSliders.Controls.Add(Me.TopLabel)
         Me.RedCloudSliders.Controls.Add(Me.TopViewThreshold)
         Me.RedCloudSliders.Controls.Add(Me.Label6)
@@ -93,14 +105,13 @@ Partial Class OptionsRedCloud
         Me.TopViewThreshold.Size = New System.Drawing.Size(506, 69)
         Me.TopViewThreshold.TabIndex = 19
         Me.TopViewThreshold.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.TopViewThreshold.Value = 5
+        Me.TopViewThreshold.Value = 10
         '
         'Label6
         '
-        Me.Label6.AutoSize = True
         Me.Label6.Location = New System.Drawing.Point(8, 305)
         Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(182, 20)
+        Me.Label6.Size = New System.Drawing.Size(151, 48)
         Me.Label6.TabIndex = 18
         Me.Label6.Text = "Top View Red Threshold"
         '
@@ -122,14 +133,13 @@ Partial Class OptionsRedCloud
         Me.SideViewThreshold.Size = New System.Drawing.Size(506, 69)
         Me.SideViewThreshold.TabIndex = 16
         Me.SideViewThreshold.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.SideViewThreshold.Value = 5
+        Me.SideViewThreshold.Value = 10
         '
         'Label8
         '
-        Me.Label8.AutoSize = True
         Me.Label8.Location = New System.Drawing.Point(8, 230)
         Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(187, 20)
+        Me.Label8.Size = New System.Drawing.Size(151, 43)
         Me.Label8.TabIndex = 15
         Me.Label8.Text = "Side View Red Threshold"
         '
@@ -213,12 +223,11 @@ Partial Class OptionsRedCloud
         '
         'RedCloudHistBins
         '
-        Me.RedCloudHistBins.AutoSize = True
         Me.RedCloudHistBins.Location = New System.Drawing.Point(8, 24)
         Me.RedCloudHistBins.Name = "RedCloudHistBins"
-        Me.RedCloudHistBins.Size = New System.Drawing.Size(147, 20)
+        Me.RedCloudHistBins.Size = New System.Drawing.Size(151, 45)
         Me.RedCloudHistBins.TabIndex = 6
-        Me.RedCloudHistBins.Text = "RedCloud Hist Bins"
+        Me.RedCloudHistBins.Text = "RedCloud Histogram Bins"
         '
         'RGBSource
         '
@@ -277,11 +286,85 @@ Partial Class OptionsRedCloud
         Me.RadioButton1.Text = "BackProject_Full"
         Me.RadioButton1.UseVisualStyleBackColor = True
         '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.Channels02)
+        Me.GroupBox1.Controls.Add(Me.Channels12)
+        Me.GroupBox1.Controls.Add(Me.Channels01)
+        Me.GroupBox1.Location = New System.Drawing.Point(849, 211)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(250, 141)
+        Me.GroupBox1.TabIndex = 4
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Histogram 2D Channels"
+        '
+        'Channels02
+        '
+        Me.Channels02.AutoSize = True
+        Me.Channels02.Location = New System.Drawing.Point(28, 67)
+        Me.Channels02.Name = "Channels02"
+        Me.Channels02.Size = New System.Drawing.Size(158, 24)
+        Me.Channels02.TabIndex = 3
+        Me.Channels02.TabStop = True
+        Me.Channels02.Text = "Channels 0 and 2"
+        Me.Channels02.UseVisualStyleBackColor = True
+        '
+        'Channels12
+        '
+        Me.Channels12.AutoSize = True
+        Me.Channels12.Location = New System.Drawing.Point(28, 97)
+        Me.Channels12.Name = "Channels12"
+        Me.Channels12.Size = New System.Drawing.Size(158, 24)
+        Me.Channels12.TabIndex = 2
+        Me.Channels12.TabStop = True
+        Me.Channels12.Text = "Channels 1 and 2"
+        Me.Channels12.UseVisualStyleBackColor = True
+        '
+        'Channels01
+        '
+        Me.Channels01.AutoSize = True
+        Me.Channels01.Location = New System.Drawing.Point(28, 37)
+        Me.Channels01.Name = "Channels01"
+        Me.Channels01.Size = New System.Drawing.Size(158, 24)
+        Me.Channels01.TabIndex = 0
+        Me.Channels01.TabStop = True
+        Me.Channels01.Text = "Channels 0 and 1"
+        Me.Channels01.UseVisualStyleBackColor = True
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(667, 380)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(57, 20)
+        Me.Label1.TabIndex = 23
+        Me.Label1.Text = "Label5"
+        '
+        'TrackBar1
+        '
+        Me.TrackBar1.Location = New System.Drawing.Point(156, 374)
+        Me.TrackBar1.Maximum = 200
+        Me.TrackBar1.Minimum = 3
+        Me.TrackBar1.Name = "TrackBar1"
+        Me.TrackBar1.Size = New System.Drawing.Size(506, 69)
+        Me.TrackBar1.TabIndex = 22
+        Me.TrackBar1.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.TrackBar1.Value = 10
+        '
+        'Label3
+        '
+        Me.Label3.Location = New System.Drawing.Point(8, 380)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(151, 48)
+        Me.Label3.TabIndex = 21
+        Me.Label3.Text = "BackProjection Grid Size"
+        '
         'OptionsRedCloud
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1670, 556)
+        Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.RGBSource)
         Me.Controls.Add(Me.RedCloudSliders)
         Me.Name = "OptionsRedCloud"
@@ -295,6 +378,9 @@ Partial Class OptionsRedCloud
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.RGBSource.ResumeLayout(False)
         Me.RGBSource.PerformLayout()
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
+        CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -319,4 +405,11 @@ Partial Class OptionsRedCloud
     Friend WithEvents SideLabel As Windows.Forms.Label
     Friend WithEvents SideViewThreshold As Windows.Forms.TrackBar
     Friend WithEvents Label8 As Windows.Forms.Label
+    Friend WithEvents GroupBox1 As Windows.Forms.GroupBox
+    Friend WithEvents Channels02 As Windows.Forms.RadioButton
+    Friend WithEvents Channels12 As Windows.Forms.RadioButton
+    Friend WithEvents Channels01 As Windows.Forms.RadioButton
+    Friend WithEvents Label1 As Windows.Forms.Label
+    Friend WithEvents TrackBar1 As Windows.Forms.TrackBar
+    Friend WithEvents Label3 As Windows.Forms.Label
 End Class
