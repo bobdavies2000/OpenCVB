@@ -1218,10 +1218,6 @@ Public Class GuidedBP_FloodCells : Inherits VB_Algorithm
             src = guided.dst2
         End If
 
-        ' this rectangle insures that the maxDist calculation will avoid the edge of the shrunken src input to floodCell.
-        ' The floodFill mask is one pixel larger than the src.
-        src.Rectangle(New cv.Rect(0, 0, dst2.Width, dst2.Height), 0, 1)
-
         If inputMask.Width > 0 Then
             floodCell.inputMask = inputMask
             floodCell.Run(src)

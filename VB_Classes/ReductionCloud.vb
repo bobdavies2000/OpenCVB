@@ -227,13 +227,15 @@ Public Class ReductionCloud_Match : Inherits VB_Algorithm
         task.redOther = redCells.Count - 1
         cellMap.SetTo(task.redOther, rcOther.mask)
 
-        Dim changed = redCells.Count - matchedCells
-        Static changedTotal As Integer
-        changedTotal += changed
-        labels(3) = CStr(changedTotal) + " unmatched cells changed in the last second " +
-                    Format(changedTotal / (task.frameCount - task.toggleFrame), fmt2) + " unmatched per frame"
-        labels(2) = CStr(redCells.Count) + " cells (including other) " + CStr(matchedCells) + " matched to previous generation "
-        If heartBeat() Then changedTotal = 0
+        Static changedTotal As Integer = 0
+        changedTotal += redCells.Count - matchedCells
+        labels(3) = CStr(changedTotal) + " new/moved cells in the last second " +
+                    Format(changedTotal / (task.frameCount - task.toggleFrame), fmt1) + " unmatched per frame"
+        If heartBeat() Then
+            labels(2) = CStr(redCells.Count) + " cells " + CStr(redCells.Count - matchedCells) + " did not match the previous frame. Click a cell to see more."
+            changedTotal = 0
+        End If
+
         lastCells = New List(Of rcData)(redCells)
     End Sub
 End Class

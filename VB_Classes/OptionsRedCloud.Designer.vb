@@ -23,6 +23,9 @@ Partial Class OptionsRedCloud
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.RedCloudSliders = New System.Windows.Forms.GroupBox()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.TrackBar1 = New System.Windows.Forms.TrackBar()
+        Me.Label3 = New System.Windows.Forms.Label()
         Me.TopLabel = New System.Windows.Forms.Label()
         Me.TopViewThreshold = New System.Windows.Forms.TrackBar()
         Me.Label6 = New System.Windows.Forms.Label()
@@ -47,10 +50,15 @@ Partial Class OptionsRedCloud
         Me.Channels02 = New System.Windows.Forms.RadioButton()
         Me.Channels12 = New System.Windows.Forms.RadioButton()
         Me.Channels01 = New System.Windows.Forms.RadioButton()
-        Me.Label1 = New System.Windows.Forms.Label()
-        Me.TrackBar1 = New System.Windows.Forms.TrackBar()
-        Me.Label3 = New System.Windows.Forms.Label()
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.LowerLabel = New System.Windows.Forms.Label()
+        Me.LowerSlider = New System.Windows.Forms.TrackBar()
+        Me.Label16 = New System.Windows.Forms.Label()
+        Me.UpperLabel = New System.Windows.Forms.Label()
+        Me.UpperSlider = New System.Windows.Forms.TrackBar()
+        Me.Label18 = New System.Windows.Forms.Label()
         Me.RedCloudSliders.SuspendLayout()
+        CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TopViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SideViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -58,7 +66,9 @@ Partial Class OptionsRedCloud
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.RGBSource.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
-        CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox2.SuspendLayout()
+        CType(Me.LowerSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.UpperSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'RedCloudSliders
@@ -83,9 +93,37 @@ Partial Class OptionsRedCloud
         Me.RedCloudSliders.Controls.Add(Me.RedCloudHistBins)
         Me.RedCloudSliders.Location = New System.Drawing.Point(12, 12)
         Me.RedCloudSliders.Name = "RedCloudSliders"
-        Me.RedCloudSliders.Size = New System.Drawing.Size(831, 493)
+        Me.RedCloudSliders.Size = New System.Drawing.Size(831, 432)
         Me.RedCloudSliders.TabIndex = 2
         Me.RedCloudSliders.TabStop = False
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(667, 380)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(57, 20)
+        Me.Label1.TabIndex = 23
+        Me.Label1.Text = "Label5"
+        '
+        'TrackBar1
+        '
+        Me.TrackBar1.Location = New System.Drawing.Point(156, 374)
+        Me.TrackBar1.Maximum = 200
+        Me.TrackBar1.Minimum = 3
+        Me.TrackBar1.Name = "TrackBar1"
+        Me.TrackBar1.Size = New System.Drawing.Size(506, 69)
+        Me.TrackBar1.TabIndex = 22
+        Me.TrackBar1.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.TrackBar1.Value = 10
+        '
+        'Label3
+        '
+        Me.Label3.Location = New System.Drawing.Point(8, 380)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(151, 48)
+        Me.Label3.TabIndex = 21
+        Me.Label3.Text = "BackProjection Grid Size"
         '
         'TopLabel
         '
@@ -331,39 +369,84 @@ Partial Class OptionsRedCloud
         Me.Channels01.Text = "Channels 0 and 1"
         Me.Channels01.UseVisualStyleBackColor = True
         '
-        'Label1
+        'GroupBox2
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(667, 380)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(57, 20)
-        Me.Label1.TabIndex = 23
-        Me.Label1.Text = "Label5"
+        Me.GroupBox2.Controls.Add(Me.LowerLabel)
+        Me.GroupBox2.Controls.Add(Me.LowerSlider)
+        Me.GroupBox2.Controls.Add(Me.Label16)
+        Me.GroupBox2.Controls.Add(Me.UpperLabel)
+        Me.GroupBox2.Controls.Add(Me.UpperSlider)
+        Me.GroupBox2.Controls.Add(Me.Label18)
+        Me.GroupBox2.Location = New System.Drawing.Point(849, 358)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(831, 150)
+        Me.GroupBox2.TabIndex = 5
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "Guided Backprojection Region Controls"
         '
-        'TrackBar1
+        'LowerLabel
         '
-        Me.TrackBar1.Location = New System.Drawing.Point(156, 374)
-        Me.TrackBar1.Maximum = 200
-        Me.TrackBar1.Minimum = 3
-        Me.TrackBar1.Name = "TrackBar1"
-        Me.TrackBar1.Size = New System.Drawing.Size(506, 69)
-        Me.TrackBar1.TabIndex = 22
-        Me.TrackBar1.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.TrackBar1.Value = 10
+        Me.LowerLabel.AutoSize = True
+        Me.LowerLabel.Location = New System.Drawing.Point(667, 91)
+        Me.LowerLabel.Name = "LowerLabel"
+        Me.LowerLabel.Size = New System.Drawing.Size(91, 20)
+        Me.LowerLabel.TabIndex = 11
+        Me.LowerLabel.Text = "LowerLabel"
         '
-        'Label3
+        'LowerSlider
         '
-        Me.Label3.Location = New System.Drawing.Point(8, 380)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(151, 48)
-        Me.Label3.TabIndex = 21
-        Me.Label3.Text = "BackProjection Grid Size"
+        Me.LowerSlider.Location = New System.Drawing.Point(156, 85)
+        Me.LowerSlider.Maximum = 500
+        Me.LowerSlider.Minimum = 10
+        Me.LowerSlider.Name = "LowerSlider"
+        Me.LowerSlider.Size = New System.Drawing.Size(506, 69)
+        Me.LowerSlider.TabIndex = 10
+        Me.LowerSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.LowerSlider.Value = 50
+        '
+        'Label16
+        '
+        Me.Label16.AutoSize = True
+        Me.Label16.Location = New System.Drawing.Point(8, 91)
+        Me.Label16.Name = "Label16"
+        Me.Label16.Size = New System.Drawing.Size(144, 20)
+        Me.Label16.TabIndex = 9
+        Me.Label16.Text = "Region Lower Limit"
+        '
+        'UpperLabel
+        '
+        Me.UpperLabel.AutoSize = True
+        Me.UpperLabel.Location = New System.Drawing.Point(667, 24)
+        Me.UpperLabel.Name = "UpperLabel"
+        Me.UpperLabel.Size = New System.Drawing.Size(92, 20)
+        Me.UpperLabel.TabIndex = 8
+        Me.UpperLabel.Text = "UpperLabel"
+        '
+        'UpperSlider
+        '
+        Me.UpperSlider.Location = New System.Drawing.Point(156, 18)
+        Me.UpperSlider.Maximum = 500
+        Me.UpperSlider.Minimum = 20
+        Me.UpperSlider.Name = "UpperSlider"
+        Me.UpperSlider.Size = New System.Drawing.Size(506, 69)
+        Me.UpperSlider.TabIndex = 7
+        Me.UpperSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.UpperSlider.Value = 80
+        '
+        'Label18
+        '
+        Me.Label18.Location = New System.Drawing.Point(8, 24)
+        Me.Label18.Name = "Label18"
+        Me.Label18.Size = New System.Drawing.Size(151, 45)
+        Me.Label18.TabIndex = 6
+        Me.Label18.Text = "Region Upper Limit"
         '
         'OptionsRedCloud
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1670, 556)
+        Me.ClientSize = New System.Drawing.Size(1690, 521)
+        Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.RGBSource)
         Me.Controls.Add(Me.RedCloudSliders)
@@ -371,6 +454,7 @@ Partial Class OptionsRedCloud
         Me.Text = "OptionsRedCloud"
         Me.RedCloudSliders.ResumeLayout(False)
         Me.RedCloudSliders.PerformLayout()
+        CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TopViewThreshold, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.SideViewThreshold, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).EndInit()
@@ -380,7 +464,10 @@ Partial Class OptionsRedCloud
         Me.RGBSource.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
-        CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox2.ResumeLayout(False)
+        Me.GroupBox2.PerformLayout()
+        CType(Me.LowerSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.UpperSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -412,4 +499,11 @@ Partial Class OptionsRedCloud
     Friend WithEvents Label1 As Windows.Forms.Label
     Friend WithEvents TrackBar1 As Windows.Forms.TrackBar
     Friend WithEvents Label3 As Windows.Forms.Label
+    Friend WithEvents GroupBox2 As Windows.Forms.GroupBox
+    Friend WithEvents LowerLabel As Windows.Forms.Label
+    Friend WithEvents LowerSlider As Windows.Forms.TrackBar
+    Friend WithEvents Label16 As Windows.Forms.Label
+    Friend WithEvents UpperLabel As Windows.Forms.Label
+    Friend WithEvents UpperSlider As Windows.Forms.TrackBar
+    Friend WithEvents Label18 As Windows.Forms.Label
 End Class

@@ -124,4 +124,12 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         channels = {1, 2}
     End Sub
+    Private Sub UpperSlider_ValueChanged(sender As Object, e As EventArgs) Handles UpperSlider.ValueChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        UpperLabel.Text = CStr(UpperSlider.Value)
+    End Sub
+    Private Sub LowerSliderr_ValueChanged(sender As Object, e As EventArgs) Handles LowerSlider.ValueChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        LowerLabel.Text = CStr(LowerSlider.Value)
+    End Sub
 End Class

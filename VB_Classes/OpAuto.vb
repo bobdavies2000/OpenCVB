@@ -401,24 +401,17 @@ End Class
 Public Class OpAuto_GuidedBP : Inherits VB_Algorithm
     Public nonZeroSamples As Integer
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Upper limit of regions", 20, 500, 80)
-            sliders.setupTrackBar("Lower limit of regions", 10, 500, 50)
-        End If
-
         desc = "This algorihm is intended to control how many cells RedCloud will find with a 2D backprojection"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static upperSlider = findSlider("Upper limit of regions")
-        Static lowerSlider = findSlider("Lower limit of regions")
-        If lowerSlider.value > upperSlider.value - 10 Then lowerSlider.value = upperSlider.value - 10
+        If redOptions.LowerSlider.Value > redOptions.UpperSlider.Value - 10 Then redOptions.LowerSlider.Value = redOptions.UpperSlider.Value - 10
 
         If nonZeroSamples = 0 Then Exit Sub
 
         ' A practical use of optionAutomation.  Any image with more regions is quite complex.
         Dim saveit = task.optionsChanged
-        If nonZeroSamples > upperSlider.value Then redOptions.HistBinSlider.Value -= 1
-        If nonZeroSamples < lowerSlider.value Then redOptions.HistBinSlider.Value += 1
+        If nonZeroSamples > redOptions.UpperSlider.Value Then redOptions.HistBinSlider.Value -= 1
+        If nonZeroSamples < redOptions.LowerSlider.Value Then redOptions.HistBinSlider.Value += 1
         task.optionsChanged = saveit
     End Sub
 End Class
