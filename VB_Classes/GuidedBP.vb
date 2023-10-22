@@ -1224,7 +1224,9 @@ Public Class GuidedBP_FloodCells : Inherits VB_Algorithm
         Else
             floodCell.Run(src)
         End If
-        dst2 = floodCell.dst3
+        dst0 = floodCell.dst3
+        dst2 = dst0 * 255 / floodCell.classCount
+
         labels(2) = traceName + " found " + CStr(floodCell.rects.Count) + " rectangles and masks."
 
         redCells.Clear()

@@ -3,7 +3,6 @@ Imports System.Runtime.InteropServices
 Imports System.Threading
 
 Public Class FloodCell_Basics : Inherits VB_Algorithm
-    Public diff As Integer ' The difference between the lower and upper bound of the floodfill (put it here if nonzero)
     Public classCount As Integer
     Public sizes As New List(Of Integer)
     Public rects As New List(Of cv.Rect)
@@ -11,8 +10,9 @@ Public Class FloodCell_Basics : Inherits VB_Algorithm
     Public inputMask As cv.Mat
     Public Sub New()
         cPtr = FloodCell_Open()
+        If standalone Then gOptions.PixelDiffThreshold.Value = 0
         gOptions.HistBinSlider.Value = 20 ' adjust histogram bins lower if regions are > 255
-        desc = "Floodfill the cells in the prepared input."
+        desc = "Floodfill an image so each cell can be tracked."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
@@ -35,7 +35,7 @@ Public Class FloodCell_Basics : Inherits VB_Algorithm
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
         Dim imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), maskPtr, src.Rows, src.Cols, src.Type,
-                                     task.minPixels, diff)
+                                     task.minPixels, gOptions.PixelDiffThreshold.Value)
         handleInput.Free()
         If maskPtr <> 0 Then handlemask.Free()
 
@@ -66,10 +66,8 @@ Public Class FloodCell_Basics : Inherits VB_Algorithm
             masks.Add(mask)
         Next
 
-        If standalone Or testIntermediate(traceName) Then
-            dst2 = vbPalette(dst3 * 255 / classCount)
-            dst2.SetTo(0, task.noDepthMask)
-        End If
+        dst2 = vbPalette(dst3 * 255 / classCount)
+        If standalone Then dst2.SetTo(0, task.noDepthMask)
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = FloodCell_Close(cPtr)
@@ -97,3 +95,23 @@ Module GuidedBP_Cell_CPP_Module
                 type As Integer, minPixels As Integer, diff As Integer) As IntPtr
     End Function
 End Module
+
+
+
+
+
+
+Public Class FloodCell_Color : Inherits VB_Algorithm
+    Dim fCell As New FloodCell_Basics
+    Public Sub New()
+        desc = "Floodfill an image so each cell can be tracked."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static reduction As New Reduction_Basics
+        reduction.Run(src)
+        fCell.Run(reduction.dst2)
+
+        dst2 = fCell.dst2
+        dst3 = fCell.dst3
+    End Sub
+End Class

@@ -5,14 +5,13 @@ Public Class Flood_Basics : Inherits VB_Algorithm
     Public floodCell As New FloodCell_Basics
     Public Sub New()
         gOptions.PixelDiffThreshold.Value = 7
-        labels = {"", "", "", "Palette output of image at left"}
-        desc = "FloodFill the input and paint it with LUT"
+        labels = {"", "", "", "Palettized output of image at left"}
+        desc = "FloodFill the input and paint it"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim dataSrc(src.Total * src.ElemSize) As Byte
 
-        floodCell.diff = gOptions.PixelDiffThreshold.Value
         floodCell.Run(src)
         dst2 = floodCell.dst3 * 255 / classCount
         classCount = floodCell.rects.Count
