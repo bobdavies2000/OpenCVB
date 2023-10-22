@@ -340,7 +340,7 @@ End Class
 
 Public Class Binarize_KmeansRedColor : Inherits VB_Algorithm
     Dim binarize As New Binarize_KMeansMasks
-    Dim redC As New ReductionCloud_Basics
+    Dim redC As New RedCloudY_Basics
     Public Sub New()
         labels(3) = "A 4-way split of the input grayscale image based on the amount of light"
         desc = "Use RedCloud on a 4-way split of the image based on light"

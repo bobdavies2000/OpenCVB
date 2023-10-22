@@ -128,7 +128,7 @@ End Class
 
 Public Class CComp_Hulls : Inherits VB_Algorithm
     Dim ccomp As New CComp_Both
-    Dim hulls As New ReductionCloud_Hulls
+    Dim hulls As New RedCloudY_Hulls
     Public Sub New()
         desc = "Create connected components using RedCloud Hulls"
     End Sub

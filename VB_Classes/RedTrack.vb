@@ -289,7 +289,7 @@ End Class
 
 
 Public Class RedTrack_Core : Inherits VB_Algorithm
-    Public redC As New ReductionCloud_Basics
+    Public redC As New RedCloudY_Basics
     Public Sub New()
         labels = {"", "", "Points tracked with RedCloud", ""}
         desc = "Show feature location history"
@@ -320,7 +320,7 @@ End Class
 Public Class RedCloudY_TrackFeatures : Inherits VB_Algorithm
     Dim options As New Options_Flood
     Dim good As New Feature_Basics
-    Dim redC As New ReductionCloud_Basics
+    Dim redC As New RedCloudY_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels = {"", "", "Output of Feature_Basics - input to RedCloud",

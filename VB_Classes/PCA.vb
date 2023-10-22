@@ -290,7 +290,7 @@ End Module
 
 
 Public Class PCA_Plane : Inherits VB_Algorithm
-    Dim stats As New ReductionCloud_CellStats
+    Dim stats As New RedCloudY_CellStats
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         If standalone Then stats.redC = New RedCloud_Basics

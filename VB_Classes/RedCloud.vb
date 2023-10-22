@@ -686,7 +686,7 @@ Public Class RedCloudY_Color : Inherits VB_Algorithm
     Public guided As New GuidedBP_Depth
     Public buildCells As New GuidedBP_FloodCells
     Public redCells As New List(Of rcData)
-    Dim rcMatch As New ReductionCloud_Match
+    Dim rcMatch As New RedCloudY_Match
     Public showSelected As Boolean = True
     Dim reduction As New Reduction_Basics
     Public Sub New()

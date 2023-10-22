@@ -157,7 +157,6 @@
     <Compile Include="RedCloud.vb" />
     <Compile Include="RedCloudY.vb" />
     <Compile Include="RedTrack.vb" />
-    <Compile Include="ReductionCloud.vb" />
     <Compile Include="ROI.vb" />
     <Compile Include="BackProject.vb" />
     <Compile Include="BGSubtract.vb" />

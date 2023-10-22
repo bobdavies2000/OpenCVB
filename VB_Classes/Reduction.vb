@@ -253,7 +253,7 @@ End Class
 
 
 Public Class Reduction_Depth : Inherits VB_Algorithm
-    Dim redCore As New ReductionCloud_Core
+    Dim redCore As New RedCloudY_Core
     Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
         desc = "Use reduction to smooth depth data"

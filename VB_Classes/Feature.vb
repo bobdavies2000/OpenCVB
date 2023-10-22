@@ -1624,9 +1624,9 @@ End Class
 
 
 
-Public Class ReductionCloud_Features : Inherits VB_Algorithm
+Public Class RedCloudY_Features : Inherits VB_Algorithm
     Dim features As New Feature_PointsDelaunay
-    Dim colorC As New ReductionCloud_Basics
+    Dim colorC As New RedCloudY_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         labels = {"Latest GoodFeatures highlighted", "Format CV_32S of Delaunay data", "Stable points tracked - Colors from dst3", "RedCloud Output of Delaunay data"}

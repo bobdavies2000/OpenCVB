@@ -25,10 +25,10 @@ End Class
 
 Public Class PyrFilter_RedCloud : Inherits VB_Algorithm
     Dim pyr As New PyrFilter_Basics
-    Dim colorC As New ReductionCloud_Basics
+    Dim colorC As New RedCloudY_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        labels = {"", "", "ReductionCloud_Basics output", "PyrFilter output before reduction"}
+        labels = {"", "", "RedCloudY_Basics output", "PyrFilter output before reduction"}
         desc = "Use RedColor to segment the output of PyrFilter"
     End Sub
     Public Sub RunVB(src As cv.Mat)

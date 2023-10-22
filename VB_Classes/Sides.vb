@@ -2,7 +2,7 @@
 ' this module is somewhat redundant but it consolidates the algorithms that locate extrema in RedCloud cell contour.
 Public Class Sides_Basics : Inherits VB_Algorithm
     Public sides As New Profile_Basics
-    Public corners As New ReductionCloud_ContourCorners
+    Public corners As New RedCloudY_ContourCorners
     Public rc As New rcData
     Public Sub New()
         sides.redCold = New RedCloud_Basics
@@ -61,7 +61,7 @@ End Class
 
 
 Public Class Sides_Corner : Inherits VB_Algorithm
-    Dim sides As New ReductionCloud_ContourCorners
+    Dim sides As New RedCloudY_ContourCorners
     Dim redC As New RedCloud_Basics
     Public Sub New()
         labels = {"", "", "RedCloud_Basics output", ""}
@@ -85,7 +85,7 @@ End Class
 
 
 Public Class Sides_ColorC : Inherits VB_Algorithm
-    Dim colorC As New ReductionCloud_Basics
+    Dim colorC As New RedCloudY_Basics
     Dim sides As New Sides_Basics
     Dim kalman As New Kalman_Basics
     Public Sub New()
