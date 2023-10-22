@@ -45,7 +45,7 @@ Public Class Reduction_Floodfill : Inherits VB_Algorithm
     Public flood As New Flood_RedColor
     Public Sub New()
         labels(2) = "Reduced input to floodfill"
-        findSlider("Color Reduction").Value = 32
+        redOptions.ColorReductionSlider.Value = 32
         desc = "Use the reduction output as input to floodfill to get masks and centroids of large masses."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -101,20 +101,21 @@ Public Class Reduction_PointCloud : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Public Sub New()
         redOptions.SimpleReduction.Checked = True
+        redOptions.ColorReductionSlider.Value = 20
         labels(2) = "Reduced depth"
-        labels(3) = "Pointcloud with reduced z-Depth"
+        labels(3) = "Palettized output of the different depth levels found"
         desc = "Use reduction to smooth depth data"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud.Clone
-        Dim split() = src.Split()
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pcSplit(2)
 
-        split(2) *= 1000
-        split(2).ConvertTo(src, cv.MatType.CV_32S)
-        reduction.Run(src)
+        src *= 255 / task.maxZmeters
+        src.ConvertTo(dst0, cv.MatType.CV_32S)
+        reduction.Run(dst0)
         reduction.dst2.ConvertTo(dst2, cv.MatType.CV_32F)
-        split(2) = dst2 * 0.001
-        cv.Cv2.Merge(split, dst3)
+
+        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst3 = vbPalette(dst2)
     End Sub
 End Class
 

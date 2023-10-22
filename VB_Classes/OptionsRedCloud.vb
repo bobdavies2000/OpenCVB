@@ -61,6 +61,7 @@ Public Class OptionsRedCloud
         Channels01.Checked = True
         RadioButton2.Checked = True ' Reduction_basics is the default.
         SimpleReduction.Checked = True
+        GridSizeSlider.Value = 10
 
         Me.Left = 0
         Me.Top = 0
@@ -156,5 +157,9 @@ Public Class OptionsRedCloud
     Private Sub BitwiseReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles BitwiseReductionSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
         bitwiseLabel.Text = CStr(BitwiseReductionSlider.Value)
+    End Sub
+    Private Sub GridSizeBP_ValueChanged(sender As Object, e As EventArgs) Handles GridSizeSlider.ValueChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        GridsizeLabel.Text = CStr(GridSizeSlider.Value)
     End Sub
 End Class

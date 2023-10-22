@@ -656,8 +656,7 @@ Public Class MSER_CPP : Inherits VB_Algorithm
         Next
 
         If standalone Or testIntermediate(traceName) Then
-            task.palette.Run(dst0 * 255 / count)
-            dst2 = task.palette.dst2
+            dst2 = vbPalette(dst0 * 255 / count)
 
             dst3 = src
             For Each r In boxes

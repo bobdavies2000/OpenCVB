@@ -23,8 +23,8 @@ Partial Class OptionsRedCloud
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.RedCloudSliders = New System.Windows.Forms.GroupBox()
-        Me.Label1 = New System.Windows.Forms.Label()
-        Me.TrackBar1 = New System.Windows.Forms.TrackBar()
+        Me.GridsizeLabel = New System.Windows.Forms.Label()
+        Me.GridSizeSlider = New System.Windows.Forms.TrackBar()
         Me.Label3 = New System.Windows.Forms.Label()
         Me.TopLabel = New System.Windows.Forms.Label()
         Me.TopViewThreshold = New System.Windows.Forms.TrackBar()
@@ -69,7 +69,7 @@ Partial Class OptionsRedCloud
         Me.ColorReductionSlider = New System.Windows.Forms.TrackBar()
         Me.ColorReduce = New System.Windows.Forms.Label()
         Me.RedCloudSliders.SuspendLayout()
-        CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.GridSizeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TopViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SideViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -88,8 +88,8 @@ Partial Class OptionsRedCloud
         '
         'RedCloudSliders
         '
-        Me.RedCloudSliders.Controls.Add(Me.Label1)
-        Me.RedCloudSliders.Controls.Add(Me.TrackBar1)
+        Me.RedCloudSliders.Controls.Add(Me.GridsizeLabel)
+        Me.RedCloudSliders.Controls.Add(Me.GridSizeSlider)
         Me.RedCloudSliders.Controls.Add(Me.Label3)
         Me.RedCloudSliders.Controls.Add(Me.TopLabel)
         Me.RedCloudSliders.Controls.Add(Me.TopViewThreshold)
@@ -112,25 +112,25 @@ Partial Class OptionsRedCloud
         Me.RedCloudSliders.TabIndex = 2
         Me.RedCloudSliders.TabStop = False
         '
-        'Label1
+        'GridsizeLabel
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(667, 380)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(57, 20)
-        Me.Label1.TabIndex = 23
-        Me.Label1.Text = "Label5"
+        Me.GridsizeLabel.AutoSize = True
+        Me.GridsizeLabel.Location = New System.Drawing.Point(667, 380)
+        Me.GridsizeLabel.Name = "GridsizeLabel"
+        Me.GridsizeLabel.Size = New System.Drawing.Size(57, 20)
+        Me.GridsizeLabel.TabIndex = 23
+        Me.GridsizeLabel.Text = "Label5"
         '
-        'TrackBar1
+        'GridSizeSlider
         '
-        Me.TrackBar1.Location = New System.Drawing.Point(156, 374)
-        Me.TrackBar1.Maximum = 200
-        Me.TrackBar1.Minimum = 3
-        Me.TrackBar1.Name = "TrackBar1"
-        Me.TrackBar1.Size = New System.Drawing.Size(506, 69)
-        Me.TrackBar1.TabIndex = 22
-        Me.TrackBar1.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.TrackBar1.Value = 10
+        Me.GridSizeSlider.Location = New System.Drawing.Point(156, 374)
+        Me.GridSizeSlider.Maximum = 200
+        Me.GridSizeSlider.Minimum = 3
+        Me.GridSizeSlider.Name = "GridSizeSlider"
+        Me.GridSizeSlider.Size = New System.Drawing.Size(506, 69)
+        Me.GridSizeSlider.TabIndex = 22
+        Me.GridSizeSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.GridSizeSlider.Value = 10
         '
         'Label3
         '
@@ -587,7 +587,7 @@ Partial Class OptionsRedCloud
         Me.Text = "OptionsRedCloud"
         Me.RedCloudSliders.ResumeLayout(False)
         Me.RedCloudSliders.PerformLayout()
-        CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.GridSizeSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TopViewThreshold, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.SideViewThreshold, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).EndInit()
@@ -635,8 +635,8 @@ Partial Class OptionsRedCloud
     Friend WithEvents Channels02 As Windows.Forms.RadioButton
     Friend WithEvents Channels12 As Windows.Forms.RadioButton
     Friend WithEvents Channels01 As Windows.Forms.RadioButton
-    Friend WithEvents Label1 As Windows.Forms.Label
-    Friend WithEvents TrackBar1 As Windows.Forms.TrackBar
+    Friend WithEvents GridsizeLabel As Windows.Forms.Label
+    Friend WithEvents GridSizeSlider As Windows.Forms.TrackBar
     Friend WithEvents Label3 As Windows.Forms.Label
     Friend WithEvents GroupBox2 As Windows.Forms.GroupBox
     Friend WithEvents LowerLabel As Windows.Forms.Label
