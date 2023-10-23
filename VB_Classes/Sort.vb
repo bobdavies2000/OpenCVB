@@ -250,61 +250,36 @@ End Class
 
 
 
-Public Class Sort_FeatureLess : Inherits VB_Algorithm
-    Public fLess As New FeatureLess_Rects
-    Public sort As New Sort_1Channel
-    Public Sub New()
-        findSlider("Threshold for sort input").Value = 0
-        desc = "Sort all the featureless grayscale pixels."
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+'Public Class Sort_FeatureLess : Inherits VB_Algorithm
+'    Public fLess As New FeatureLess_Rects
+'    Public sort As New Sort_1Channel
+'    Public Sub New()
+'        findSlider("Threshold for sort input").Value = 0
+'        desc = "Sort all the featureless grayscale pixels."
+'    End Sub
+'    Public Sub RunVB(src as cv.Mat)
+'        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        fLess.Run(src)
+'        fLess.Run(src)
 
-        dst2.SetTo(0)
-        src += 1 ' pull darkest regions away from zero
-        src.CopyTo(dst2, fLess.dst2)
+'        dst2.SetTo(0)
+'        src += 1 ' pull darkest regions away from zero
+'        src.CopyTo(dst2, fLess.dst2)
 
-        sort.Run(dst2)
-        dst3 = sort.dst3
+'        sort.Run(dst2)
+'        dst3 = sort.dst3
 
-        dst3(New cv.Rect(0, dst2.Height / 2, dst2.Width, dst2.Height / 2)).SetTo(0)
-        If heartBeat() Then
-            strOut = ""
-            For i = sort.rangeStart.Count - 1 To 0 Step -1
-                strOut += "Range " + CStr(sort.rangeStart.Count - i) + " from " + CStr(sort.rangeEnd(i)) + " to " + CStr(sort.rangeStart(i)) + vbCrLf
-            Next
-            labels(3) = sort.labels(3)
-        End If
-        setTrueText(strOut, New cv.Point(5, dst2.Height / 2 + 5), 3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Sort_Blur : Inherits VB_Algorithm
-    Dim sort As New Sort_FeatureLess
-    Dim blur As New Blur_Basics
-    Public Sub New()
-        desc = "Use Sort_FeatureLess with a blur as well"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        blur.Run(src)
-
-        sort.Run(blur.dst2)
-
-        dst2 = sort.dst2
-        dst3 = sort.dst3
-        setTrueText(sort.strOut, New cv.Point(5, dst2.Height / 2 + 5), 3)
-        labels = sort.labels
-    End Sub
-End Class
+'        dst3(New cv.Rect(0, dst2.Height / 2, dst2.Width, dst2.Height / 2)).SetTo(0)
+'        If heartBeat() Then
+'            strOut = ""
+'            For i = sort.rangeStart.Count - 1 To 0 Step -1
+'                strOut += "Range " + CStr(sort.rangeStart.Count - i) + " from " + CStr(sort.rangeEnd(i)) + " to " + CStr(sort.rangeStart(i)) + vbCrLf
+'            Next
+'            labels(3) = sort.labels(3)
+'        End If
+'        setTrueText(strOut, New cv.Point(5, dst2.Height / 2 + 5), 3)
+'    End Sub
+'End Class
 
 
 
@@ -313,35 +288,23 @@ End Class
 
 
 
-Public Class Sort_Reduction : Inherits VB_Algorithm
-    Public sort As New Sort_FeatureLess
-    Public reduction As New Reduction_Basics
-    Dim addw As New AddWeighted_Basics
-    Public Sub New()
-        dst2 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        desc = "Use Sort_FeatureLess with Reduction"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        addw.src2 = src.Clone
+'Public Class Sort_Blur : Inherits VB_Algorithm
+'    Dim sort As New Sort_FeatureLess
+'    Dim blur As New Blur_Basics
+'    Public Sub New()
+'        desc = "Use Sort_FeatureLess with a blur as well"
+'    End Sub
+'    Public Sub RunVB(src as cv.Mat)
+'        blur.Run(src)
 
-        reduction.Run(src)
+'        sort.Run(blur.dst2)
 
-        sort.Run(reduction.dst2)
-
-        dst3 = reduction.dst2
-        dst2 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
-        Dim incr = CInt(255 / sort.fLess.rects.Count)
-        For i = 0 To sort.fLess.rects.Count - 1
-            Dim r = sort.fLess.rects(i)
-            Dim tmp = dst3(r).InRange(sort.fLess.rectColor(i) - 1, sort.fLess.rectColor(i))
-            dst2(r).SetTo(i * incr + 1, tmp)
-        Next
-        addw.Run(vbPalette(dst2))
-        dst2 = addw.dst2
-
-        labels(2) = "There were " + CStr(sort.fLess.rects.Count) + " regions"
-    End Sub
-End Class
+'        dst2 = sort.dst2
+'        dst3 = sort.dst3
+'        setTrueText(sort.strOut, New cv.Point(5, dst2.Height / 2 + 5), 3)
+'        labels = sort.labels
+'    End Sub
+'End Class
 
 
 
@@ -350,29 +313,66 @@ End Class
 
 
 
-Public Class Sort_Inrange : Inherits VB_Algorithm
-    Dim sReduce As New Sort_Reduction
-    Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("Selected Range", 0, 10, 1)
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Use Inrange with the Sort_Reduction ranges"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Static rangeSlider = findSlider("Selected Range")
-        Dim rangeIndex = rangeSlider.value
+'Public Class Sort_Reduction : Inherits VB_Algorithm
+'    Public sort As New Sort_FeatureLess
+'    Public reduction As New Reduction_Basics
+'    Dim addw As New AddWeighted_Basics
+'    Public Sub New()
+'        dst2 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+'        desc = "Use Sort_FeatureLess with Reduction"
+'    End Sub
+'    Public Sub RunVB(src as cv.Mat)
+'        addw.src2 = src.Clone
 
-        sReduce.Run(src)
-        dst3 = sReduce.dst3
-        labels = sReduce.labels
+'        reduction.Run(src)
 
-        Dim rStart = sReduce.sort.sort.rangeStart
-        Dim rEnd = sReduce.sort.sort.rangeEnd
-        If rangeIndex < rStart.Count Then
-            Dim lo = rStart(rangeIndex)
-            Dim hi = rEnd(rangeIndex)
-            dst2 = sReduce.reduction.dst2.InRange(lo - 1, hi)
-        End If
-        setTrueText(sReduce.sort.strOut, New cv.Point(5, dst2.Height / 2 + 5), 3)
-    End Sub
-End Class
+'        sort.Run(reduction.dst2)
+
+'        dst3 = reduction.dst2
+'        dst2 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+'        Dim incr = CInt(255 / sort.fLess.rects.Count)
+'        For i = 0 To sort.fLess.rects.Count - 1
+'            Dim r = sort.fLess.rects(i)
+'            Dim tmp = dst3(r).InRange(sort.fLess.rectColor(i) - 1, sort.fLess.rectColor(i))
+'            dst2(r).SetTo(i * incr + 1, tmp)
+'        Next
+'        addw.Run(vbPalette(dst2))
+'        dst2 = addw.dst2
+
+'        labels(2) = "There were " + CStr(sort.fLess.rects.Count) + " regions"
+'    End Sub
+'End Class
+
+
+
+
+
+
+
+
+'Public Class Sort_Inrange : Inherits VB_Algorithm
+'    Dim sReduce As New Sort_Reduction
+'    Public Sub New()
+'        If sliders.Setup(traceName) Then sliders.setupTrackBar("Selected Range", 0, 10, 1)
+'        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+'        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+'        desc = "Use Inrange with the Sort_Reduction ranges"
+'    End Sub
+'    Public Sub RunVB(src as cv.Mat)
+'        Static rangeSlider = findSlider("Selected Range")
+'        Dim rangeIndex = rangeSlider.value
+
+'        sReduce.Run(src)
+'        dst3 = sReduce.dst3
+'        labels = sReduce.labels
+
+'        Dim rStart = sReduce.sort.sort.rangeStart
+'        Dim rEnd = sReduce.sort.sort.rangeEnd
+'        If rangeIndex < rStart.Count Then
+'            Dim lo = rStart(rangeIndex)
+'            Dim hi = rEnd(rangeIndex)
+'            dst2 = sReduce.reduction.dst2.InRange(lo - 1, hi)
+'        End If
+'        setTrueText(sReduce.sort.strOut, New cv.Point(5, dst2.Height / 2 + 5), 3)
+'    End Sub
+'End Class

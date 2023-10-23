@@ -292,6 +292,26 @@ Module RedCloud_CPP_Module
 
 
 
+
+
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodEx_Open(width As Integer, height As Integer) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodEx_Close(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodEx_Count(cPtr As IntPtr) As Integer
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodEx_CellRects(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodEx_CellSizes(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodEx_Run(cPtr As IntPtr,
+               grayPtr As IntPtr, diff As Integer) As IntPtr
+    End Function
+
+
+
+
+
     Public Function shapeCorrelation(points As List(Of cv.Point)) As Single
         Dim pts As New cv.Mat(points.Count, 1, cv.MatType.CV_32SC2, points.ToArray)
         Dim pts32f As New cv.Mat
@@ -676,40 +696,6 @@ Public Class RedCloud_Corners_CPP : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class RedCloudY_Color : Inherits VB_Algorithm
-    Public guided As New GuidedBP_Depth
-    Public buildCells As New GuidedBP_FloodCells
-    Public redCells As New List(Of rcData)
-    Dim rcMatch As New RedCloudY_Match
-    Public showSelected As Boolean = True
-    Dim reduction As New Reduction_Basics
-    Public Sub New()
-        gOptions.HistBinSlider.Value = 15
-        desc = "Segment the image based on both the reduced point cloud and color"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        guided.Run(src)
-
-        reduction.Run(src)
-        Dim combined = reduction.dst2.Clone
-        guided.backProject.CopyTo(combined, task.depthMask)
-        buildCells.Run(combined)
-
-        rcMatch.redCells = buildCells.redCells
-        rcMatch.Run(src)
-        redCells = New List(Of rcData)(rcMatch.redCells)
-        dst2 = rcMatch.dst2
-
-        If showSelected Then task.rcSelect = rcMatch.showSelect()
-        If heartBeat() Then labels(2) = rcMatch.labels(2)
-    End Sub
-End Class
 
 
 
@@ -1474,5 +1460,36 @@ Public Class OpenGL_RedCloudStable : Inherits VB_Algorithm
         cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), dst2}, task.ogl.pointCloudInput)
         task.ogl.Run(redC.dst3)
         If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_ColorAndCloud : Inherits VB_Algorithm
+    Public redCells As New List(Of rcData)
+    Dim guided As New GuidedBP_Depth
+    Public fCells As New FloodCell_Basics
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        gOptions.HistBinSlider.Value = 20
+        desc = "Segment the image based on both the reduced point cloud and color"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        guided.Run(src)
+
+        reduction.Run(src)
+        Dim combined = reduction.dst2.Clone
+        guided.backProject.CopyTo(combined, task.depthMask)
+        fCells.Run(combined)
+
+        dst2 = fCells.dst2
+        dst3 = fCells.dst3
+
+        If heartBeat() Then labels(2) = CStr(fCells.redCells.Count) + " regions identified"
     End Sub
 End Class

@@ -4,19 +4,16 @@ Public Class Flood_Basics : Inherits VB_Algorithm
     Public classCount As Integer
     Public floodCell As New FloodCell_Basics
     Public Sub New()
-        gOptions.PixelDiffThreshold.Value = 7
         labels = {"", "", "", "Palettized output of image at left"}
         desc = "FloodFill the input and paint it"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Dim dataSrc(src.Total * src.ElemSize) As Byte
-
+        floodCell.inputMask = task.noDepthMask
         floodCell.Run(src)
-        dst2 = floodCell.dst3 * 255 / classCount
-        classCount = floodCell.rects.Count
+        dst2 = floodCell.dst2
+        dst3 = floodCell.dst3
+        classCount = floodCell.redCells.Count
 
-        dst3 = vbPalette(dst2)
         labels(2) = CStr(classCount) + " regions were identified"
     End Sub
 End Class
@@ -205,30 +202,6 @@ Public Class Flood_TopX : Inherits VB_Algorithm
         labels(2) = CStr(rcCount) + " regions were found.  Use the nearby slider to increase."
     End Sub
 End Class
-
-
-
-
-
-
-
-
-Module Flood_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodEx_Open(width As Integer, height As Integer) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodEx_Close(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodEx_Count(cPtr As IntPtr) As Integer
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodEx_CellRects(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodEx_CellSizes(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodEx_Run(cPtr As IntPtr,
-               grayPtr As IntPtr, diff As Integer) As IntPtr
-    End Function
-End Module
-
 
 
 
@@ -626,46 +599,36 @@ End Class
 
 
 
-Public Class Flood_Hulls_CPP : Inherits VB_Algorithm
+Public Class Flood_Featureless : Inherits VB_Algorithm
     Public classCount As Integer
-    Dim floodCell As New FloodCell_Basics
+    Dim fCell As New FloodCell_Basics
+    Public redCells As New List(Of rcData)
     Public Sub New()
-        gOptions.PixelDiffThreshold.Value = 7
         labels = {"", "", "", "Palette output of image at left"}
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "FloodFill the input and paint it with LUT"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
             Static fless As New FeatureLess_Basics
             fless.Run(src)
-            dst2 = fless.dst2
-        Else
-            dst2 = src
+            src = fless.dst2
         End If
 
-        If dst2.Channels <> 1 Then dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        task.minPixels = gOptions.minPixelsSlider.Value
-        floodCell.Run(dst2)
-        dst0 = floodCell.dst3
-        classCount = floodCell.rects.Count
+        If standalone Then fCell.inputMask = src.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        fCell.Run(src)
+        classCount = fCell.redCells.Count
 
         Dim index As Integer = 1
-        For i = 0 To floodCell.rects.Count - 1
-            Dim r = floodCell.rects(i)
-            Dim mask = floodCell.masks(i)
-            Dim contour = contourBuild(mask, cv.ContourApproximationModes.ApproxNone)
-
-            Dim hull = cv.Cv2.ConvexHull(contour, True).ToList
-            vbDrawContour(dst0(r), hull, index, -1)
-            index += 1
+        dst2.SetTo(0)
+        redCells.Clear()
+        For Each rc In fCell.redCells
+            rc.hull = cv.Cv2.ConvexHull(rc.contour, True).ToList
+            vbDrawContour(dst2(rc.rect), rc.hull, rc.index + 1, -1)
+            redCells.Add(rc)
         Next
 
-        labels(2) = CStr(floodCell.rects.Count) + " regions were identified"
-
-        dst3 = vbPalette(dst0)
-    End Sub
-    Public Sub Close()
-        If cPtr <> 0 Then cPtr = FloodEx_Close(cPtr)
+        labels(2) = "Hulls were added for each of the " + CStr(redCells.Count) + " regions identified"
+        dst3 = vbPalette(dst2 * 255 / redCells.Count)
     End Sub
 End Class

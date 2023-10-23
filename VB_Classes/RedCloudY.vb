@@ -1,5 +1,32 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Public Class RedCloudY_Basics : Inherits VB_Algorithm
+    Public redCore As New RedCloudY_Core
+    Public fCells As New FloodCell_Basics
+    Public redCells As New List(Of rcData)
+    Public lastCells As New List(Of rcData)
+    Public showSelected As Boolean = True
+    Public Sub New()
+        gOptions.HistBinSlider.Value = 15
+        desc = "Segment the image based only on the reduced point cloud (as opposed to back projection)"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        lastCells = New List(Of rcData)(redCells)
+        dst0 = task.color.Clone
+        redCore.Run(src)
+        fCells.inputMask = task.noDepthMask
+        fCells.Run(redCore.dst0)
+
+        If heartBeat() Then labels(2) = CStr(fCells.redCells.Count) + " regions were identified."
+    End Sub
+End Class
+
+
+
+
+
+
+
 '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
 Public Class RedCloudY_PlaneFromContour : Inherits VB_Algorithm
@@ -501,36 +528,6 @@ End Class
 
 
 
-Public Class RedCloudY_Basics : Inherits VB_Algorithm
-    Public redCore As New RedCloudY_Core
-    Public buildCells As New GuidedBP_FloodCells
-    Public redCells As New List(Of rcData)
-    Public lastCells As New List(Of rcData)
-    Public rcMatch As New RedCloudY_Match
-    Public showSelected As Boolean = True
-    Public Sub New()
-        gOptions.HistBinSlider.Value = 15
-        desc = "Segment the image based only on the reduced point cloud (as opposed to back projection)"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        lastCells = New List(Of rcData)(redCells)
-        dst0 = task.color.Clone
-        redCore.Run(src)
-        buildCells.inputMask = task.noDepthMask
-        buildCells.Run(redCore.dst0)
-
-        rcMatch.inputCells = buildCells.redCells
-        rcMatch.Run(src)
-        redCells = New List(Of rcData)(rcMatch.redCells)
-        dst2 = rcMatch.dst2
-
-        If showSelected Then task.rcSelect = rcMatch.showSelect()
-        If heartBeat() Then labels(2) = rcMatch.labels(2)
-    End Sub
-End Class
-
-
-
 
 
 
@@ -581,165 +578,165 @@ End Class
 
 
 
-Public Class RedCloudY_Match : Inherits VB_Algorithm
-    Public inputCells As New List(Of rcData)
-    Public redCells As New List(Of rcData)
-    Public lastCells As New List(Of rcData)
-    Public cellMap As New cv.Mat
+'Public Class RedCloudY_Match : Inherits VB_Algorithm
+'    Public inputCells As New List(Of rcData)
+'    Public redCells As New List(Of rcData)
+'    Public lastCells As New List(Of rcData)
+'    Public cellMap As New cv.Mat
 
-    Dim lastCellMap As New cv.Mat
-    Dim usedColors As New List(Of cv.Vec3b)({New cv.Vec3b(0, 0, 0)})
-    Dim matchedCells As Integer
-    Dim numBigCells As Integer
-    Public Sub New()
-        desc = "Match cells from the previous generation"
-    End Sub
-    Public Function showSelect() As rcData
-        Return showSelection(dst2)
-    End Function
-    Public Function redSelect() As rcData
-        If task.drawRect <> New cv.Rect Then Return New rcData
-        Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        If task.clickPoint = New cv.Point Then
-            index = 0
-            task.clickPoint = redCells(index).maxDist
-        End If
+'    Dim lastCellMap As New cv.Mat
+'    Dim usedColors As New List(Of cv.Vec3b)({New cv.Vec3b(0, 0, 0)})
+'    Dim matchedCells As Integer
+'    Dim numBigCells As Integer
+'    Public Sub New()
+'        desc = "Match cells from the previous generation"
+'    End Sub
+'    Public Function showSelect() As rcData
+'        Return showSelection(dst2)
+'    End Function
+'    Public Function redSelect() As rcData
+'        If task.drawRect <> New cv.Rect Then Return New rcData
+'        Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+'        If task.clickPoint = New cv.Point Then
+'            index = 0
+'            task.clickPoint = redCells(index).maxDist
+'        End If
 
-        Dim rc = redCells(index)
-        If index = task.redOther Then
-            Dim gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-            rc.rect = task.gridList(gridID)
-            rc.mask = cellMap(rc.rect).InRange(task.redOther, task.redOther)
-            rc.pixels = rc.mask.CountNonZero
-            buildCell(rc)
-        End If
+'        Dim rc = redCells(index)
+'        If index = task.redOther Then
+'            Dim gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
+'            rc.rect = task.gridList(gridID)
+'            rc.mask = cellMap(rc.rect).InRange(task.redOther, task.redOther)
+'            rc.pixels = rc.mask.CountNonZero
+'            buildCell(rc)
+'        End If
 
-        task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-        vbDrawContour(task.color(rc.rect), rc.contour, cv.Scalar.White, 1)
+'        task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+'        vbDrawContour(task.color(rc.rect), rc.contour, cv.Scalar.White, 1)
 
-        task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-        vbDrawContour(task.depthRGB(rc.rect), rc.contour, cv.Scalar.White, 1)
+'        task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
+'        vbDrawContour(task.depthRGB(rc.rect), rc.contour, cv.Scalar.White, 1)
 
-        dst2(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-        dst2.Circle(rc.maxDist, task.dotSize, cv.Scalar.Black, -1, task.lineType)
-        Return rc
-    End Function
-    Private Sub buildCell(ByRef rc As rcData)
-        rc.maxDStable = rc.maxDist ' assume it has to use the latest.
-        rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-        rc.motionRect = rc.rect
-        If rc.indexLast = numBigCells Then
-            For i = rc.floodPoint.Y To Math.Min(rc.rect.Y + rc.rect.Height, dst2.Height) - 1
-                rc.indexLast = lastCellMap.Get(Of Byte)(i, rc.floodPoint.X)
-                If rc.indexLast = rc.index Then Exit For
-            Next
-        End If
-        If rc.indexLast < lastCells.Count And rc.indexLast <> task.redOther Then
-            Dim lrc = lastCells(rc.indexLast)
-            rc.motionRect = rc.rect.Union(lrc.rect)
-            rc.color = lrc.color
+'        dst2(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+'        dst2.Circle(rc.maxDist, task.dotSize, cv.Scalar.Black, -1, task.lineType)
+'        Return rc
+'    End Function
+'    Private Sub buildCell(ByRef rc As rcData)
+'        rc.maxDStable = rc.maxDist ' assume it has to use the latest.
+'        rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+'        rc.motionRect = rc.rect
+'        If rc.indexLast = numBigCells Then
+'            For i = rc.floodPoint.Y To Math.Min(rc.rect.Y + rc.rect.Height, dst2.Height) - 1
+'                rc.indexLast = lastCellMap.Get(Of Byte)(i, rc.floodPoint.X)
+'                If rc.indexLast = rc.index Then Exit For
+'            Next
+'        End If
+'        If rc.indexLast < lastCells.Count And rc.indexLast <> task.redOther Then
+'            Dim lrc = lastCells(rc.indexLast)
+'            rc.motionRect = rc.rect.Union(lrc.rect)
+'            rc.color = lrc.color
 
-            Dim stableCheck = cellMap.Get(Of Byte)(lrc.maxDStable.Y, lrc.maxDStable.X)
-            If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
-            matchedCells += 1
-        Else
-            dst3(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-        End If
+'            Dim stableCheck = cellMap.Get(Of Byte)(lrc.maxDStable.Y, lrc.maxDStable.X)
+'            If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
+'            matchedCells += 1
+'        Else
+'            dst3(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+'        End If
 
-        If usedColors.Contains(rc.color) Then
-            rc.color = New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240))
-        End If
+'        If usedColors.Contains(rc.color) Then
+'            rc.color = New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240))
+'        End If
 
-        usedColors.Add(rc.color)
+'        usedColors.Add(rc.color)
 
-        rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-        If rc.index <> 0 Then vbDrawContour(rc.mask, rc.contour, rc.index, -1)
+'        rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+'        If rc.index <> 0 Then vbDrawContour(rc.mask, rc.contour, rc.index, -1)
 
-        Dim minLoc As cv.Point, maxLoc As cv.Point
-        task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, minLoc, maxLoc, rc.mask)
-        task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, minLoc, maxLoc, rc.mask)
-        task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, minLoc, maxLoc, rc.mask)
+'        Dim minLoc As cv.Point, maxLoc As cv.Point
+'        task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, minLoc, maxLoc, rc.mask)
+'        task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, minLoc, maxLoc, rc.mask)
+'        task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, minLoc, maxLoc, rc.mask)
 
-        Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
-        cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.mask)
+'        Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
+'        cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.mask)
 
-        ' If there Is no Then depth within the mask, estimate this color only cell Using rc.rect instead!
-        If depthMean(2) = 0 Then
-            rc.colorOnly = True
-            cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev)
-        End If
-        rc.depthMean = New cv.Point3f(depthMean(0), depthMean(1), depthMean(2))
-        rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
+'        ' If there Is no Then depth within the mask, estimate this color only cell Using rc.rect instead!
+'        If depthMean(2) = 0 Then
+'            rc.colorOnly = True
+'            cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev)
+'        End If
+'        rc.depthMean = New cv.Point3f(depthMean(0), depthMean(1), depthMean(2))
+'        rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
 
-        cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        numBigCells = 100 ' Math.Min(numSlider.value, inputCells.Count)
+'        cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+'    End Sub
+'    Public Sub RunVB(src As cv.Mat)
+'        numBigCells = 100 ' Math.Min(numSlider.value, inputCells.Count)
 
-        If cellMap.Width <> src.Width Then cellMap = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
-        If standalone Then
-            Static guided As New GuidedBP_Depth
-            Static buildCells As New GuidedBP_FloodCells
-            guided.Run(src)
-            buildCells.inputMask = task.noDepthMask
-            buildCells.Run(guided.backProject)
-            inputCells = New List(Of rcData)(buildCells.redCells)
-        End If
+'        If cellMap.Width <> src.Width Then cellMap = New cv.Mat(src.Size, cv.MatType.CV_8U, 0)
+'        If standalone Then
+'            Static guided As New GuidedBP_Depth
+'            Static buildCells As New GuidedBP_FloodCells
+'            guided.Run(src)
+'            buildCells.inputMask = task.noDepthMask
+'            buildCells.Run(guided.backProject)
+'            inputCells = New List(Of rcData)(buildCells.redCells)
+'        End If
 
-        If task.optionsChanged Or firstPass Then
-            cellMap.SetTo(task.redOther)
-            lastCells.Clear()
-        End If
+'        If task.optionsChanged Or firstPass Then
+'            cellMap.SetTo(task.redOther)
+'            lastCells.Clear()
+'        End If
 
-        lastCellMap = cellMap.Clone
-        cellMap.SetTo(task.redOther)
-        redCells.Clear()
-        usedColors.Clear()
-        usedColors.Add(black)
-        matchedCells = 0
+'        lastCellMap = cellMap.Clone
+'        cellMap.SetTo(task.redOther)
+'        redCells.Clear()
+'        usedColors.Clear()
+'        usedColors.Add(black)
+'        matchedCells = 0
 
-        If heartBeat() Then dst3.SetTo(0)
-        cellMap.SetTo(numBigCells)
-        dst2.SetTo(0)
+'        If heartBeat() Then dst3.SetTo(0)
+'        cellMap.SetTo(numBigCells)
+'        dst2.SetTo(0)
 
-        For Each rc In inputCells
-            rc.index = redCells.Count
-            rc.maxDist = vbGetMaxDist(rc)
-            Dim spotTakenTest = cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-            If spotTakenTest <> numBigCells Then Continue For
-            If rc.pixels > 0 And rc.pixels < task.minPixels Then Continue For
-            buildCell(rc)
-            redCells.Add(rc)
+'        For Each rc In inputCells
+'            rc.index = redCells.Count
+'            rc.maxDist = vbGetMaxDist(rc)
+'            Dim spotTakenTest = cellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+'            If spotTakenTest <> numBigCells Then Continue For
+'            If rc.pixels > 0 And rc.pixels < task.minPixels Then Continue For
+'            buildCell(rc)
+'            redCells.Add(rc)
 
-            cellMap(rc.rect).SetTo(rc.index, rc.mask)
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
+'            cellMap(rc.rect).SetTo(rc.index, rc.mask)
+'            dst2(rc.rect).SetTo(rc.color, rc.mask)
 
-            If redCells.Count >= numBigCells - 1 Then Exit For
-        Next
+'            If redCells.Count >= numBigCells - 1 Then Exit For
+'        Next
 
-        Dim rcOther As New rcData
-        rcOther.rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
-        rcOther.floodPoint = New cv.Point(0, 0)
-        rcOther.mask = cellMap.InRange(numBigCells, numBigCells)
-        rcOther.pixels = rcOther.mask.CountNonZero
-        rcOther.index = redCells.Count
-        redCells.Add(rcOther)
+'        Dim rcOther As New rcData
+'        rcOther.rect = New cv.Rect(0, 0, dst2.Width, dst2.Height)
+'        rcOther.floodPoint = New cv.Point(0, 0)
+'        rcOther.mask = cellMap.InRange(numBigCells, numBigCells)
+'        rcOther.pixels = rcOther.mask.CountNonZero
+'        rcOther.index = redCells.Count
+'        redCells.Add(rcOther)
 
-        task.redOther = redCells.Count - 1
-        cellMap.SetTo(task.redOther, rcOther.mask)
+'        task.redOther = redCells.Count - 1
+'        cellMap.SetTo(task.redOther, rcOther.mask)
 
-        Static changedTotal As Integer = 0
-        changedTotal += redCells.Count - matchedCells
-        labels(3) = CStr(changedTotal) + " new/moved cells in the last second " +
-                    Format(changedTotal / (task.frameCount - task.toggleFrame), fmt1) + " unmatched per frame"
-        If heartBeat() Then
-            labels(2) = CStr(redCells.Count) + " cells " + CStr(redCells.Count - matchedCells) + " did not match the previous frame. Click a cell to see more."
-            changedTotal = 0
-        End If
+'        Static changedTotal As Integer = 0
+'        changedTotal += redCells.Count - matchedCells
+'        labels(3) = CStr(changedTotal) + " new/moved cells in the last second " +
+'                    Format(changedTotal / (task.frameCount - task.toggleFrame), fmt1) + " unmatched per frame"
+'        If heartBeat() Then
+'            labels(2) = CStr(redCells.Count) + " cells " + CStr(redCells.Count - matchedCells) + " did not match the previous frame. Click a cell to see more."
+'            changedTotal = 0
+'        End If
 
-        lastCells = New List(Of rcData)(redCells)
-    End Sub
-End Class
+'        lastCells = New List(Of rcData)(redCells)
+'    End Sub
+'End Class
 
 
 
@@ -818,8 +815,8 @@ End Class
 
 
 
-Public Class RedCloudY_ByIndex : Inherits VB_Algorithm
-    Dim colorC As New RedCloudY_Basics
+Public Class RedCloud_ByIndex : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst0.Checked = True
         If sliders.Setup(traceName) Then sliders.setupTrackBar("RedColor cell index", 1, 100, 1)
@@ -829,16 +826,15 @@ Public Class RedCloudY_ByIndex : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Static indexSlider = findSlider("RedColor cell index")
 
-        colorC.Run(src)
-        dst2 = colorC.dst2
-        indexSlider.maximum = colorC.redCells.Count - 1
+        redC.Run(src)
+        dst0 = redC.dst0
+        dst2 = redC.dst2
 
-        Dim rc = colorC.redCells(indexSlider.value)
-        dst0 = task.color.Clone
-        dst0.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-        vbDrawContour(dst0(rc.rect), rc.contour, cv.Scalar.White, 1)
-        vbDrawContour(dst2(rc.rect), rc.contour, cv.Scalar.White, -1)
-        labels(2) = colorC.labels(2)
+        indexSlider.value = 0
+        indexSlider.maximum = task.redCells.Count - 1
+        Dim rc = task.redCells(indexSlider.value)
+
+        labels(2) = redC.labels(2)
     End Sub
 End Class
 

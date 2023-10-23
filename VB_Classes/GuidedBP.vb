@@ -18,7 +18,7 @@ Public Class GuidedBP_Basics : Inherits VB_Algorithm
 
         Dim doctoredHist32f As New cv.Mat
         floodCells.dst3.ConvertTo(doctoredHist32f, cv.MatType.CV_32F)
-        classCount = floodCells.classCount
+        classCount = floodCells.redCells.Count
 
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, doctoredHist32f, dst1, task.rangesTop)
         dst1 = dst1.ConvertScaleAbs()
@@ -214,12 +214,11 @@ End Class
 
 Public Class GuidedBP_kTop : Inherits VB_Algorithm
     Dim autoX As New OpAuto_XRange
-    Public colorC As New RedCloudY_Basics
+    Public colorC As New RedCloud_ColorAndCloud
     Dim contours As New Contour_Largest
     Dim hist2d As New Histogram2D_Top
     Public Sub New()
         gOptions.useHistoryCloud.Checked = False
-        colorC.showSelected = False
         labels(3) = "Back projection of the top view"
         desc = "Subdivide the OpAuto_XRange output using RedCloud_Basics"
     End Sub
@@ -229,7 +228,7 @@ Public Class GuidedBP_kTop : Inherits VB_Algorithm
         autoX.Run(hist2d.histogram)
 
         dst1 = autoX.histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        colorC.buildCells.inputMask = Not dst1
+        colorC.fCells.inputMask = Not dst1
         colorC.Run(dst1)
         dst2 = colorC.dst2
 
@@ -261,11 +260,10 @@ End Class
 Public Class GuidedBP_kSide : Inherits VB_Algorithm
     Dim autoY As New OpAuto_YRange
     Public hist2d As New Histogram2D_Side
-    Public colorC As New RedCloudY_Basics
+    Public colorC As New RedCloud_ColorAndCloud
     Dim contours As New Contour_Largest
     Public Sub New()
         gOptions.useHistoryCloud.Checked = False
-        colorC.showSelected = False
         labels(3) = "Back projection of the top view"
         desc = "Subdivide the GuidedBP_HistogramSide output using RedCloud_Basics"
     End Sub
@@ -274,7 +272,7 @@ Public Class GuidedBP_kSide : Inherits VB_Algorithm
         autoY.Run(hist2d.histogram)
 
         dst1 = autoY.histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        colorC.buildCells.inputMask = Not dst1
+        colorC.fCells.inputMask = Not dst1
         colorC.Run(dst1)
         dst2 = colorC.dst2
 
@@ -1197,129 +1195,3 @@ Public Class GuidedBP_DepthOriginal : Inherits VB_Algorithm
         dst2 = vbPalette(backProject.ConvertScaleAbs)
     End Sub
 End Class
-
-
-
-
-
-Public Class GuidedBP_BuildCells : Inherits VB_Algorithm
-    Dim guided As New GuidedBP_Depth
-    Dim buildCells As New GuidedBP_FloodCells
-    Public rcMatch As New RedCloudY_Match
-    Public redCells As New List(Of rcData)
-    Public lastCells As New List(Of rcData)
-    Public Sub New()
-        gOptions.HistBinSlider.Value = 15
-        desc = "Segment the image based only on the reduced point cloud"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        guided.Run(src)
-        buildCells.inputMask = task.noDepthMask
-        buildCells.Run(guided.backProject)
-
-        rcMatch.redCells = buildCells.redCells
-        rcMatch.Run(src)
-        redCells = New List(Of rcData)(rcMatch.redCells)
-        lastCells = New List(Of rcData)(rcMatch.lastCells)
-        dst2 = rcMatch.dst2
-
-        If heartBeat() Then labels(2) = rcMatch.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class GuidedBP_FloodCells : Inherits VB_Algorithm
-    Public redCells As New List(Of rcData)
-    Public inputMask As New cv.Mat
-    Public floodCell As New FloodCell_Basics
-    Dim pcaAnalysis As cv.PCA
-    Public Sub New()
-        desc = "Perform the RedCloud FloodFill with either 8uC1 or 32fC3 data"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standalone Then
-            Static guided As New GuidedBP_Depth
-            guided.Run(src)
-            src = guided.dst2
-        End If
-
-        If inputMask.Width > 0 Then
-            floodCell.inputMask = inputMask
-            floodCell.Run(src)
-        Else
-            floodCell.Run(src)
-        End If
-        dst0 = floodCell.dst3
-        dst2 = dst0 * 255 / floodCell.classCount
-
-        labels(2) = traceName + " found " + CStr(floodCell.rects.Count) + " rectangles and masks."
-
-        redCells.Clear()
-        Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
-        For i = 0 To floodCell.rects.Count - 1
-            Dim rc As New rcData
-            rc.rect = floodCell.rects(i)
-            rc.pixels = floodCell.sizes(i)
-            rc.mask = floodCell.masks(i)
-
-            rc.maxDist = vbGetMaxDist(rc)
-            rc.maxDStable = rc.maxDist ' assume it has to use the latest.
-
-            rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-
-            Dim minLoc As cv.Point, maxLoc As cv.Point
-            task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, minLoc, maxLoc, rc.mask)
-            task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, minLoc, maxLoc, rc.mask)
-            task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, minLoc, maxLoc, rc.mask)
-            cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.mask)
-
-            ' if there is no depth within the mask, then estimate this color only cell with depth in the rect.
-            If depthMean(2) = 0 Then
-                rc.colorOnly = True
-                cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev)
-            End If
-            rc.depthMean = New cv.Point3f(depthMean(0), depthMean(1), depthMean(2))
-            rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
-
-            cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-
-            rc.eq = build3PointEquation(rc)
-            Dim pcaPoints As New List(Of cv.Point3f)
-            Dim ePoints As New List(Of cv.Point2f)
-            For Each pt In rc.contour
-                ePoints.Add(New cv.Point2f(rc.rect.X + pt.X, rc.rect.Y + pt.Y))
-                Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
-                If vec.Z > 0 Then pcaPoints.Add(vec)
-            Next
-            If ePoints.Count > 5 Then rc.box = cv.Cv2.FitEllipse(ePoints)
-
-            If pcaPoints.Count >= 3 Then
-                Dim inputMat = New cv.Mat(pcaPoints.Count, 3, cv.MatType.CV_32F, pcaPoints.ToArray)
-                pcaAnalysis = New cv.PCA(inputMat, New cv.Mat, cv.PCA.Flags.DataAsRow)
-
-                Dim valList As New List(Of Single)
-                For j = 0 To 3 - 1
-                    Dim val = pcaAnalysis.Eigenvalues.Get(Of Single)(0, j)
-                    valList.Add(val)
-                Next
-
-                Dim bestIndex = valList.IndexOf(valList.Min)
-                rc.pcaVec = New cv.Point3f()
-                For j = 0 To 3 - 1
-                    rc.pcaVec(j) = pcaAnalysis.Eigenvectors.Get(Of Single)(bestIndex, j)
-                Next
-            End If
-
-            redCells.Add(rc)
-        Next
-        If standalone Or testIntermediate(traceName) Then dst3 = vbPalette(dst2)
-    End Sub
-End Class
-
-

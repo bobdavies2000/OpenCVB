@@ -286,53 +286,6 @@ End Class
 
 
 
-Public Class FeatureLess_Rects : Inherits VB_Algorithm
-    Dim fLess As New FeatureLess_MotionAccum
-    Dim prep As New GuidedBP_FloodCells
-    Public rects As New List(Of cv.Rect)
-    Public rectColor As New List(Of Byte)
-    Public Sub New()
-        desc = "Find the rect for each featureless region - started in VB.Net but finished in C++."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        fLess.Run(src)
-        dst2 = fLess.dst2
-
-        prep.dst3 = Not dst2
-        prep.dst3.ConvertTo(dst1, cv.MatType.CV_32S)
-        prep.Run(dst1)
-
-        Dim w = task.gridList(0).Width
-        Dim h = task.gridList(0).Height
-        rects.Clear()
-        rectColor.Clear()
-        prep.floodCell.rects.RemoveAt(0) ' eliminate the 0, 0 rect.
-        If src.Channels = 1 Then dst0 = src Else dst0 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        For Each r In prep.floodCell.rects
-            rectColor.Add(dst0.Get(Of Byte)(r.Y + r.Height / 2, r.X + r.Width / 2))
-            If r.X - w >= 0 Then r.X -= w
-            If r.Y - h >= 0 Then r.Y -= h
-            If r.X + r.Width + 2 * w < dst2.Width Then r.Width += 2 * w
-            If r.Y + r.Height + 2 * h < dst2.Height Then r.Height += 2 * h
-            rects.Add(r)
-        Next
-
-        dst3 = dst0.Clone
-        For i = 0 To prep.floodCell.rects.Count - 1
-            Dim r = prep.floodCell.rects(i)
-            dst3.Rectangle(r, 255, task.lineWidth, task.lineType)
-            Dim tmp = New cv.Mat(r.Height, r.Width, cv.MatType.CV_8U, 0)
-            dst0(r).CopyTo(tmp, dst2(r))
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class FeatureLess_LeftRight : Inherits VB_Algorithm
     Dim fLess As New FeatureLess_Basics

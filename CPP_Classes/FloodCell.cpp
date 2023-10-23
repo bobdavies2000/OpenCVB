@@ -14,7 +14,7 @@ class FloodCell
 {
 private:
 public:
-    Mat src, mask, maskCopy;
+    Mat src, mask, maskCopy, result;
     vector<Rect>cellRects;
     vector<int> cellSizes;
 
@@ -91,9 +91,9 @@ extern "C" __declspec(dllexport) int* FloodCell_Run(FloodCell * cPtr, int* dataP
     cPtr->maskCopy = cPtr->mask.clone();
     cPtr->RunCPP(minPixels, diff);
     if (maskPtr != 0) cPtr->maskCopy(r).setTo(0, mask);
-    Mat tmp;
-    cPtr->maskCopy(r).copyTo(tmp);
-    return (int*)tmp.data;
+
+    cPtr->maskCopy(r).copyTo(cPtr->result);
+    return (int*)cPtr->result.data;
 }
 
 
