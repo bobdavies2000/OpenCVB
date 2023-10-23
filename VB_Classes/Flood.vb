@@ -2,16 +2,16 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Flood_Basics : Inherits VB_Algorithm
     Public classCount As Integer
-    Public floodCell As New FloodCell_Basics
+    Public floodCells As New FloodCell_Basics
     Public Sub New()
         labels = {"", "", "", "Palettized output of image at left"}
         desc = "FloodFill the input and paint it"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        floodCell.inputMask = task.noDepthMask
-        floodCell.Run(src)
-        dst2 = floodCell.dst2
-        dst3 = floodCell.dst3
+        floodCells.inputMask = task.noDepthMask
+        floodCells.Run(src)
+        dst2 = floodCells.dst2
+        dst3 = floodCells.dst3
         classCount = task.fCells.Count
 
         labels(2) = CStr(classCount) + " regions were identified"

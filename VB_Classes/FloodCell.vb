@@ -81,8 +81,8 @@ End Class
 
 
 
-Public Class FloodCell_Color : Inherits VB_Algorithm
-    Dim fBuild As New FloodCell_Basics
+Public Class FloodCell_Reduction : Inherits VB_Algorithm
+    Dim floodCells As New FloodCell_Basics
     Public Sub New()
         desc = "Floodfill an image so each cell can be tracked."
     End Sub
@@ -90,13 +90,41 @@ Public Class FloodCell_Color : Inherits VB_Algorithm
         Static reduction As New Reduction_Basics
         reduction.Run(src)
 
-        fBuild.Run(reduction.dst2)
+        floodCells.Run(reduction.dst2)
 
-        dst2 = fBuild.dst2
-        dst3 = fBuild.dst3
+        dst2 = floodCells.dst2
+        dst3 = floodCells.dst3
+        labels(2) = floodCells.labels(2)
     End Sub
 End Class
 
+
+
+
+
+
+Public Class FloodCell_ReductionLR : Inherits VB_Algorithm
+    Dim fCellsLeft As New FloodCell_Reduction
+    Dim fCellsRight As New FloodCell_Reduction
+    Public leftCells As New List(Of fcData)
+    Public rightCells As New List(Of fcData)
+    Public Sub New()
+        desc = "Floodfill the featureless left and right images so each cell can be tracked."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        fCellsLeft.Run(task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        leftCells = New List(Of fcData)(task.fCells)
+        labels(2) = fCellsLeft.labels(2)
+
+        dst2 = fCellsLeft.dst2
+
+        fCellsRight.Run(task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        rightCells = New List(Of fcData)(task.fCells)
+        labels(3) = fCellsRight.labels(2)
+
+        dst3 = fCellsRight.dst2
+    End Sub
+End Class
 
 
 
@@ -125,7 +153,7 @@ End Class
 
 
 
-Public Class FloodCell_LeftRight : Inherits VB_Algorithm
+Public Class FloodCell_FeatureLessLR : Inherits VB_Algorithm
     Dim fCellsLeft As New FloodCell_Basics
     Dim fCellsRight As New FloodCell_Basics
     Public leftCells As New List(Of fcData)
