@@ -83,11 +83,11 @@ End Class
 
 Public Class FloodCell_Reduction : Inherits VB_Algorithm
     Dim floodCells As New FloodCell_Basics
+    Dim reduction As New Reduction_Basics
     Public Sub New()
-        desc = "Floodfill an image so each cell can be tracked."
+        desc = "Floodfill a reduced image so each cell can be tracked."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static reduction As New Reduction_Basics
         reduction.Run(src)
 
         floodCells.Run(reduction.dst2)
@@ -109,7 +109,7 @@ Public Class FloodCell_ReductionLR : Inherits VB_Algorithm
     Public leftCells As New List(Of fcData)
     Public rightCells As New List(Of fcData)
     Public Sub New()
-        desc = "Floodfill the featureless left and right images so each cell can be tracked."
+        desc = "Floodfill the reduced left and right images so each cell can be tracked."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         fCellsLeft.Run(task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
@@ -176,6 +176,108 @@ Public Class FloodCell_FeatureLessLR : Inherits VB_Algorithm
 
         fCellsRight.inputMask = fless.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         fCellsRight.Run(fless.dst2)
+        rightCells = New List(Of fcData)(task.fCells)
+        labels(3) = fCellsRight.labels(2)
+
+        dst3 = fCellsRight.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FloodCell_LUT : Inherits VB_Algorithm
+    Dim floodCells As New FloodCell_Basics
+    Dim lut As New LUT_Basics
+    Public Sub New()
+        desc = "Floodfill the LUT image so each cell can be tracked."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        lut.Run(src)
+
+        floodCells.Run(lut.dst2)
+
+        dst2 = floodCells.dst2
+        dst3 = floodCells.dst3
+        labels(2) = floodCells.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FloodCell_LUTLeftRight : Inherits VB_Algorithm
+    Dim fCellsLeft As New FloodCell_LUT
+    Dim fCellsRight As New FloodCell_LUT
+    Public leftCells As New List(Of fcData)
+    Public rightCells As New List(Of fcData)
+    Public Sub New()
+        desc = "Floodfill the LUT image for left and right views so each cell can be tracked."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        fCellsLeft.Run(task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        leftCells = New List(Of fcData)(task.fCells)
+        labels(2) = fCellsLeft.labels(2)
+
+        dst2 = fCellsLeft.dst2
+
+        fCellsRight.Run(task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        rightCells = New List(Of fcData)(task.fCells)
+        labels(3) = fCellsRight.labels(2)
+
+        dst3 = fCellsRight.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FloodCell_BP : Inherits VB_Algorithm
+    Dim floodCells As New FloodCell_Basics
+    Dim bpDoctor As New BackProject_Full
+    Public Sub New()
+        desc = "Floodfill the FloodCell_Basics image so each cell can be tracked."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        bpDoctor.Run(src)
+
+        floodCells.Run(bpDoctor.dst2)
+
+        dst2 = floodCells.dst2
+        dst3 = floodCells.dst3
+        labels(2) = floodCells.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class FloodCell_BPLeftRight : Inherits VB_Algorithm
+    Dim fCellsLeft As New FloodCell_BP
+    Dim fCellsRight As New FloodCell_BP
+    Public leftCells As New List(Of fcData)
+    Public rightCells As New List(Of fcData)
+    Public Sub New()
+        desc = "Floodfill the FloodCell_Basics output image for left and right views so each cell can be tracked."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        fCellsLeft.Run(task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        leftCells = New List(Of fcData)(task.fCells)
+        labels(2) = fCellsLeft.labels(2)
+
+        dst2 = fCellsLeft.dst2
+
+        fCellsRight.Run(task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         rightCells = New List(Of fcData)(task.fCells)
         labels(3) = fCellsRight.labels(2)
 

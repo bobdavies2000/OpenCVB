@@ -312,11 +312,11 @@ Public Class GuidedBP_kTopSide : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         kTop.Run(src)
-        dst3 = kTop.dst3
+        dst3 = kTop.dst2
 
         task.pointCloud.SetTo(0, dst3)
         kSide.Run(task.pointCloud)
-        dst2 = kSide.dst3
+        dst2 = kSide.dst2
     End Sub
 End Class
 
@@ -328,20 +328,17 @@ End Class
 
 Public Class GuidedBP_kCellStats : Inherits VB_Algorithm
     Dim kTopSide As New GuidedBP_kTopSide
-    Dim stats As New RedCloudY_CellStats
+    Dim stats As New RedCloud_CellStats
     Public Sub New()
-        stats.redC = New RedCloudY_Basics
-        stats.redC.showSelected = False
+        stats.redC = New RedCloud_Basics
         desc = "Display all the stats for a RedColor cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         kTopSide.Run(src)
         dst2 = kTopSide.dst2
 
-        stats.redC.buildCells.inputMask = dst2.InRange(0, 0)
         stats.Run(dst2)
 
-        showSelection(dst2)
         setTrueText(stats.strOut, 3)
     End Sub
 End Class
@@ -354,10 +351,10 @@ End Class
 Public Class GuidedBP_DelaunayStats : Inherits VB_Algorithm
     Dim delaunay As New GuidedBP_Delaunay
     Dim reduction As New Reduction_Basics
-    Dim stats As New RedCloudY_CellStats
+    Dim stats As New RedCloud_CellStats
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        stats.redC = New RedCloudY_Basics
+        stats.redC = New RedCloud_Basics
         labels(1) = "Compartments for each object"
         desc = "Compartmentalize the RedCloud_Basics cells so they stay near the objects detected."
     End Sub
@@ -365,11 +362,11 @@ Public Class GuidedBP_DelaunayStats : Inherits VB_Algorithm
         reduction.Run(src)
 
         delaunay.Run(src)
+        dst2 = delaunay.dst2
 
         dst0 = reduction.dst0 + delaunay.dst3
 
         stats.Run(dst0)
-        dst2 = stats.dst2
         dst1 = stats.dst1
         labels(2) = stats.labels(2)
         setTrueText(stats.strOut, 3)
@@ -386,7 +383,7 @@ Public Class GuidedBP_Delaunay : Inherits VB_Algorithm
     Public kWare As New GuidedBP_Hulls
     Dim delaunay As New Delaunay_Basics
     Public kCells As New List(Of kwData)
-    Dim colorC As New RedCloudY_Basics
+    Dim colorC As New RedCloud_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Use Delaunay to create regions from objects"
@@ -416,18 +413,18 @@ End Class
 
 Public Class GuidedBP_ObjectStats : Inherits VB_Algorithm
     Dim kObj As New GuidedBP_Objects
-    Dim stats As New RedCloudY_CellStats
+    Dim stats As New RedCloud_CellStats
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        stats.redC = New RedCloudY_Basics
+        stats.redC = New RedCloud_Basics
         labels(1) = "Compartments for each object"
         desc = "Compartmentalize the RedCloud_Basics cells so they stay near the objects detected."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         kObj.Run(src)
+        dst2 = kObj.dst2
 
         stats.Run(kObj.dst1)
-        dst2 = stats.dst2
         dst1 = stats.dst1
         labels(2) = stats.labels(2)
         setTrueText(stats.strOut, 3)
@@ -554,17 +551,16 @@ End Class
 
 
 Public Class GuidedBP_RedColorCloud : Inherits VB_Algorithm
-    Dim docBP As New GuidedBP_Basics
-    Dim stats As New RedCloudY_CellStats
+    Dim bpDoctor As New GuidedBP_Basics
+    Dim stats As New RedCloud_CellStats
     Public Sub New()
-        stats.redC = New RedCloudY_Basics
+        stats.redC = New RedCloud_Basics
         labels = {"", "", "GuidedBP_Basics output", ""}
         desc = "Run RedCloudY_CellStats on the output of GuidedBP_Points"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        docBP.Run(src)
-        stats.redC.buildCells.inputMask = task.noDepthMask
-        stats.Run(docBP.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        bpDoctor.Run(src)
+        stats.Run(bpDoctor.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = stats.dst2
 
         setTrueText(stats.strOut, 3)
@@ -580,23 +576,23 @@ End Class
 
 
 Public Class GuidedBP_RedColor : Inherits VB_Algorithm
-    Dim docBP As New GuidedBP_Cells
-    Dim stats As New RedCloudY_CellStats
+    Dim bpDoctor As New GuidedBP_Cells
+    Dim stats As New RedCloud_CellStats
     Dim colorClass As New Color_Basics
     Public Sub New()
-        stats.redC = New RedCloudY_Basics
+        stats.redC = New RedCloud_Basics
         labels = {"", "", "RedCloudY_CellStats output", ""}
         desc = "Run RedCloudY_CellStats on the output of GuidedBP_Basics after merging with task.color"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        docBP.Run(src)
+        bpDoctor.Run(src)
+        dst2 = bpDoctor.dst2
 
         colorClass.Run(src)
-        dst1 = docBP.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        dst1 = bpDoctor.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         colorClass.dst2.CopyTo(dst1, task.noDepthMask)
 
         stats.Run(dst1)
-        dst2 = stats.dst2
 
         setTrueText(stats.strOut, 3)
     End Sub
@@ -782,8 +778,6 @@ Public Class GuidedBP_HotPoints : Inherits VB_Algorithm
         Return viewList
     End Function
     Public Sub RunVB(src As cv.Mat)
-        Static sideSlider = findSlider("Side View Red Threshold")
-        Static topSlider = findSlider("Top View Red Threshold")
         hotTop.Run(src)
         Dim topList = hotPoints(hotTop.dst3)
 
@@ -798,10 +792,10 @@ Public Class GuidedBP_HotPoints : Inherits VB_Algorithm
 
         sideRects = New List(Of cv.Rect)(rectList)
 
-        If topList.Count < 8 And topSlider.value > topSlider.minimum Then topSlider.value -= 1
-        If topList.Count > 15 And topSlider.value < topSlider.maximum Then topSlider.value += 1
-        If sideList.Count < 8 And sideSlider.value > sideSlider.minimum Then sideSlider.value -= 1
-        If sideList.Count > 15 And sideSlider.value < sideSlider.maximum Then sideSlider.value += 1
+        If topList.Count < 8 And redOptions.TopViewThreshold.Value > redOptions.TopViewThreshold.Minimum Then redOptions.TopViewThreshold.Value -= 1
+        If topList.Count > 15 And redOptions.TopViewThreshold.Value < redOptions.TopViewThreshold.Maximum Then redOptions.TopViewThreshold.Value += 1
+        If sideList.Count < 8 And redOptions.SideViewThreshold.Value > redOptions.SideViewThreshold.Minimum Then redOptions.SideViewThreshold.Value -= 1
+        If sideList.Count > 15 And redOptions.SideViewThreshold.Value < redOptions.SideViewThreshold.Maximum Then redOptions.SideViewThreshold.Value += 1
 
         If heartBeat() Then labels(2) = CStr(topList.Count) + " objects were identified in the top view."
         If heartBeat() Then labels(3) = CStr(sideList.Count) + " objects were identified in the side view."

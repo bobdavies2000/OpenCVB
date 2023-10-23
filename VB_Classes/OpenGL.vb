@@ -1934,7 +1934,7 @@ End Class
 
 
 Public Class OpenGL_ViewObjects : Inherits VB_Algorithm
-    Dim view As New GuidedBP_Basics
+    Dim bpDoctor As New GuidedBP_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Identify the objects in the scene and display them in OpenGL with their respective colors."
@@ -1942,8 +1942,8 @@ Public Class OpenGL_ViewObjects : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         dst1 = task.pointCloud.Clone
 
-        view.Run(src)
-        dst2 = view.dst2
+        bpDoctor.Run(src)
+        dst2 = bpDoctor.dst2
 
         dst0 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
         dst1.SetTo(0, Not dst0)
