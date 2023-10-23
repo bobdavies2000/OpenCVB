@@ -82,7 +82,7 @@ End Class
 
 
 Public Class FloodCell_Reduction : Inherits VB_Algorithm
-    Dim floodCells As New FloodCell_Basics
+    Dim floodCell As New FloodCell_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
         desc = "Floodfill a reduced image so each cell can be tracked."
@@ -90,11 +90,11 @@ Public Class FloodCell_Reduction : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
 
-        floodCells.Run(reduction.dst2)
+        floodCell.Run(reduction.dst2)
 
-        dst2 = floodCells.dst2
-        dst3 = floodCells.dst3
-        labels(2) = floodCells.labels(2)
+        dst2 = floodCell.dst2
+        dst3 = floodCell.dst3
+        labels(2) = floodCell.labels(2)
     End Sub
 End Class
 
@@ -131,7 +131,7 @@ End Class
 
 
 Public Class FloodCell_Featureless : Inherits VB_Algorithm
-    Dim floodCells As New FloodCell_Basics
+    Dim floodCell As New FloodCell_Basics
     Public Sub New()
         desc = "Floodfill the featureless image so each cell can be tracked."
     End Sub
@@ -139,12 +139,12 @@ Public Class FloodCell_Featureless : Inherits VB_Algorithm
         Static fless As New FeatureLess_Basics
         fless.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
-        floodCells.inputMask = fless.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        floodCells.Run(fless.dst2)
+        floodCell.inputMask = fless.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        floodCell.Run(fless.dst2)
 
-        dst2 = floodCells.dst2
-        dst3 = floodCells.dst3
-        labels(2) = floodCells.labels(2)
+        dst2 = floodCell.dst2
+        dst3 = floodCell.dst3
+        labels(2) = floodCell.labels(2)
     End Sub
 End Class
 
@@ -190,7 +190,7 @@ End Class
 
 
 Public Class FloodCell_LUT : Inherits VB_Algorithm
-    Dim floodCells As New FloodCell_Basics
+    Dim floodCell As New FloodCell_Basics
     Dim lut As New LUT_Basics
     Public Sub New()
         desc = "Floodfill the LUT image so each cell can be tracked."
@@ -198,11 +198,11 @@ Public Class FloodCell_LUT : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         lut.Run(src)
 
-        floodCells.Run(lut.dst2)
+        floodCell.Run(lut.dst2)
 
-        dst2 = floodCells.dst2
-        dst3 = floodCells.dst3
-        labels(2) = floodCells.labels(2)
+        dst2 = floodCell.dst2
+        dst3 = floodCell.dst3
+        labels(2) = floodCell.labels(2)
     End Sub
 End Class
 
@@ -241,7 +241,7 @@ End Class
 
 
 Public Class FloodCell_BP : Inherits VB_Algorithm
-    Dim floodCells As New FloodCell_Basics
+    Dim floodCell As New FloodCell_Basics
     Dim bpDoctor As New BackProject_Full
     Public Sub New()
         desc = "Floodfill the FloodCell_Basics image so each cell can be tracked."
@@ -249,11 +249,11 @@ Public Class FloodCell_BP : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         bpDoctor.Run(src)
 
-        floodCells.Run(bpDoctor.dst2)
+        floodCell.Run(bpDoctor.dst2)
 
-        dst2 = floodCells.dst2
-        dst3 = floodCells.dst3
-        labels(2) = floodCells.labels(2)
+        dst2 = floodCell.dst2
+        dst3 = floodCell.dst3
+        labels(2) = floodCell.labels(2)
     End Sub
 End Class
 
@@ -282,5 +282,20 @@ Public Class FloodCell_BPLeftRight : Inherits VB_Algorithm
         labels(3) = fCellsRight.labels(2)
 
         dst3 = fCellsRight.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FloodCell_Match : Inherits VB_Algorithm
+    Dim floodCell As New FloodCell_Basics
+    Public Sub New()
+        desc = "Match fCells from the current generation to the last."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
     End Sub
 End Class

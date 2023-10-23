@@ -902,48 +902,6 @@ End Class
 
 
 
-'  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
-' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
-Public Class RedCloud_PlaneColor : Inherits VB_Algorithm
-    Public options As New Options_Plane
-    Public redC As New RedCloud_Basics
-    Dim planeMask As New RedCloudY_PlaneFromMask
-    Dim planeContour As New RedCloudY_PlaneFromContour
-    Public Sub New()
-        labels(3) = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"
-        desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        dst3.SetTo(0)
-        Dim fitPoints As New List(Of cv.Point3f)
-        For Each rc In task.redCells
-            If options.useMaskPoints Then
-                planeMask.rc = rc
-                planeMask.Run(Nothing)
-                rc = planeMask.rc
-            ElseIf options.useContourPoints Then
-                planeContour.rc = rc
-                planeContour.Run(Nothing)
-                rc = planeContour.rc
-            ElseIf options.use3Points Then
-                If rc.contour.Count > 3 Then rc.eq = build3PointEquation(rc)
-            End If
-            dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)), Math.Abs(255 * rc.eq(1)), Math.Abs(255 * rc.eq(2))), rc.mask)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class RedCloud_Equations : Inherits VB_Algorithm
     Dim eq As New Plane_Equation
@@ -1490,7 +1448,7 @@ End Class
 Public Class RedCloud_ColorAndCloud : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Dim guided As New GuidedBP_Depth
-    Public floodCells As New FloodCell_Basics
+    Public floodCell As New FloodCell_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
         gOptions.HistBinSlider.Value = 20
@@ -1502,11 +1460,107 @@ Public Class RedCloud_ColorAndCloud : Inherits VB_Algorithm
         reduction.Run(src)
         Dim combined = reduction.dst2.Clone
         guided.backProject.CopyTo(combined, task.depthMask)
-        floodCells.Run(combined)
+        floodCell.Run(combined)
 
-        dst2 = floodCells.dst2
-        dst3 = floodCells.dst3
+        dst2 = floodCell.dst2
+        dst3 = floodCell.dst3
 
         If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions identified"
+    End Sub
+End Class
+
+
+
+
+
+
+
+'  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
+' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
+Public Class RedCloud_PlaneColor : Inherits VB_Algorithm
+    Public options As New Options_Plane
+    Public redC As New RedCloud_Basics
+    Dim planeMask As New RedCloud_PlaneFromMask
+    Dim planeContour As New RedCloud_PlaneFromContour
+    Public Sub New()
+        labels(3) = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"
+        desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        dst3.SetTo(0)
+        Dim fitPoints As New List(Of cv.Point3f)
+        For Each rc In task.redCells
+            If options.useMaskPoints Then
+                planeMask.rc = rc
+                planeMask.Run(Nothing)
+                rc = planeMask.rc
+            ElseIf options.useContourPoints Then
+                planeContour.rc = rc
+                planeContour.Run(Nothing)
+                rc = planeContour.rc
+            ElseIf options.use3Points Then
+                If rc.contour.Count > 3 Then rc.eq = build3PointEquation(rc)
+            End If
+            dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)), Math.Abs(255 * rc.eq(1)), Math.Abs(255 * rc.eq(2))), rc.mask)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+'  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
+' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
+Public Class RedCloud_PlaneFromContour : Inherits VB_Algorithm
+    Public rc As New rcData
+    Public Sub New()
+        labels(3) = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"
+        desc = "Create a plane equation each cell's contour"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Then setTrueText("Provide cell data to compute plane equation")
+        If rc.contour Is Nothing Then Exit Sub
+        Dim fitPoints As New List(Of cv.Point3f)
+        For Each pt In rc.contour
+            If pt.X >= rc.rect.Width Or pt.Y >= rc.rect.Height Then Continue For
+            If rc.mask.Get(Of Byte)(pt.Y, pt.X) = 0 Then Continue For
+            fitPoints.Add(task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X))
+        Next
+        rc.eq = fitDepthPlane(fitPoints)
+    End Sub
+End Class
+
+
+
+
+
+
+
+'  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
+' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
+Public Class RedCloud_PlaneFromMask : Inherits VB_Algorithm
+    Public rc As New rcData
+    Public Sub New()
+        labels(3) = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"
+        desc = "Create a plane equation from the pointcloud samples in a RedCloud cell"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Then setTrueText("Provide cell data to compute plane equation")
+        If rc.contour Is Nothing Then Exit Sub
+        Dim fitPoints As New List(Of cv.Point3f)
+        For y = 0 To rc.rect.Height - 1
+            For x = 0 To rc.rect.Width - 1
+                If rc.mask.Get(Of Byte)(y, x) Then fitPoints.Add(task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x))
+            Next
+        Next
+        rc.eq = fitDepthPlane(fitPoints)
     End Sub
 End Class

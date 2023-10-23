@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Public Class RedCloudY_Basics : Inherits VB_Algorithm
     Public redCore As New RedCloudY_Core
-    Public floodCells As New FloodCell_Basics
+    Public floodCell As New FloodCell_Basics
     Public redCells As New List(Of rcData)
     Public lastCells As New List(Of rcData)
     Public showSelected As Boolean = True
@@ -14,68 +14,14 @@ Public Class RedCloudY_Basics : Inherits VB_Algorithm
         lastCells = New List(Of rcData)(redCells)
         dst0 = task.color.Clone
         redCore.Run(src)
-        floodCells.inputMask = task.noDepthMask
+        floodCell.inputMask = task.noDepthMask
         redCore.dst0.ConvertTo(dst1, cv.MatType.CV_8U)
 
-        floodCells.Run(dst1)
-        dst2 = floodCells.dst2
-        dst3 = floodCells.dst3
+        floodCell.Run(dst1)
+        dst2 = floodCell.dst2
+        dst3 = floodCell.dst3
 
         If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions were identified."
-    End Sub
-End Class
-
-
-
-
-
-
-
-'  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
-' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
-Public Class RedCloudY_PlaneFromContour : Inherits VB_Algorithm
-    Public rc As New rcData
-    Public Sub New()
-        labels(3) = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"
-        desc = "Create a plane equation each cell's contour"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standalone Then setTrueText("Provide cell data to compute plane equation")
-        If rc.contour Is Nothing Then Exit Sub
-        Dim fitPoints As New List(Of cv.Point3f)
-        For Each pt In rc.contour
-            If pt.X >= rc.rect.Width Or pt.Y >= rc.rect.Height Then Continue For
-            If rc.mask.Get(Of Byte)(pt.Y, pt.X) = 0 Then Continue For
-            fitPoints.Add(task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X))
-        Next
-        rc.eq = fitDepthPlane(fitPoints)
-    End Sub
-End Class
-
-
-
-
-
-
-
-'  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
-' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
-Public Class RedCloudY_PlaneFromMask : Inherits VB_Algorithm
-    Public rc As New rcData
-    Public Sub New()
-        labels(3) = "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"
-        desc = "Create a plane equation from the pointcloud samples in a RedCloud cell"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standalone Then setTrueText("Provide cell data to compute plane equation")
-        If rc.contour Is Nothing Then Exit Sub
-        Dim fitPoints As New List(Of cv.Point3f)
-        For y = 0 To rc.rect.Height - 1
-            For x = 0 To rc.rect.Width - 1
-                If rc.mask.Get(Of Byte)(y, x) Then fitPoints.Add(task.pointCloud(rc.rect).Get(Of cv.Point3f)(y, x))
-            Next
-        Next
-        rc.eq = fitDepthPlane(fitPoints)
     End Sub
 End Class
 

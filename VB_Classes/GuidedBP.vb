@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Public Class GuidedBP_Basics : Inherits VB_Algorithm
     Dim heatTop As New Histogram2D_Top
     Public classCount As Integer
-    Public floodCells As New FloodCell_Basics
+    Public floodCell As New FloodCell_Basics
     Public Sub New()
         labels(3) = "Threshold of Top View"
         desc = "Use floodfill to identify all the objects in the selected view then build a backprojection that identifies k objects in the image view."
@@ -13,11 +13,11 @@ Public Class GuidedBP_Basics : Inherits VB_Algorithm
 
         dst3 = heatTop.histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         task.minPixels = 1
-        floodCells.inputMask = Not dst3
-        floodCells.Run(dst3)
+        floodCell.inputMask = Not dst3
+        floodCell.Run(dst3)
 
         Dim doctoredHist32f As New cv.Mat
-        floodCells.dst3.ConvertTo(doctoredHist32f, cv.MatType.CV_32F)
+        floodCell.dst3.ConvertTo(doctoredHist32f, cv.MatType.CV_32F)
         classCount = task.fCells.Count
 
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, doctoredHist32f, dst1, task.rangesTop)
@@ -228,7 +228,7 @@ Public Class GuidedBP_kTop : Inherits VB_Algorithm
         autoX.Run(hist2d.histogram)
 
         dst1 = autoX.histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        colorC.floodCells.inputMask = Not dst1
+        colorC.floodCell.inputMask = Not dst1
         colorC.Run(dst1)
         dst2 = colorC.dst2
 
@@ -272,7 +272,7 @@ Public Class GuidedBP_kSide : Inherits VB_Algorithm
         autoY.Run(hist2d.histogram)
 
         dst1 = autoY.histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        colorC.floodCells.inputMask = Not dst1
+        colorC.floodCell.inputMask = Not dst1
         colorC.Run(dst1)
         dst2 = colorC.dst2
 
@@ -556,7 +556,7 @@ Public Class GuidedBP_RedColorCloud : Inherits VB_Algorithm
     Public Sub New()
         stats.redC = New RedCloud_Basics
         labels = {"", "", "GuidedBP_Basics output", ""}
-        desc = "Run RedCloudY_CellStats on the output of GuidedBP_Points"
+        desc = "Run RedCloud_CellStats on the output of GuidedBP_Points"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         bpDoctor.Run(src)
@@ -581,8 +581,8 @@ Public Class GuidedBP_RedColor : Inherits VB_Algorithm
     Dim colorClass As New Color_Basics
     Public Sub New()
         stats.redC = New RedCloud_Basics
-        labels = {"", "", "RedCloudY_CellStats output", ""}
-        desc = "Run RedCloudY_CellStats on the output of GuidedBP_Basics after merging with task.color"
+        labels = {"", "", "RedCloud_CellStats output", ""}
+        desc = "Run RedCloud_CellStats on the output of GuidedBP_Basics after merging with task.color"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         bpDoctor.Run(src)
