@@ -18,7 +18,7 @@ Public Class GuidedBP_Basics : Inherits VB_Algorithm
 
         Dim doctoredHist32f As New cv.Mat
         floodCells.dst3.ConvertTo(doctoredHist32f, cv.MatType.CV_32F)
-        classCount = floodCells.redCells.Count
+        classCount = task.fCells.Count
 
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, doctoredHist32f, dst1, task.rangesTop)
         dst1 = dst1.ConvertScaleAbs()
@@ -228,7 +228,7 @@ Public Class GuidedBP_kTop : Inherits VB_Algorithm
         autoX.Run(hist2d.histogram)
 
         dst1 = autoX.histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        colorC.fCells.inputMask = Not dst1
+        colorC.floodCells.inputMask = Not dst1
         colorC.Run(dst1)
         dst2 = colorC.dst2
 
@@ -272,7 +272,7 @@ Public Class GuidedBP_kSide : Inherits VB_Algorithm
         autoY.Run(hist2d.histogram)
 
         dst1 = autoY.histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        colorC.fCells.inputMask = Not dst1
+        colorC.floodCells.inputMask = Not dst1
         colorC.Run(dst1)
         dst2 = colorC.dst2
 

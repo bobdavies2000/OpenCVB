@@ -1490,7 +1490,7 @@ End Class
 Public Class RedCloud_ColorAndCloud : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
     Dim guided As New GuidedBP_Depth
-    Public fCells As New FloodCell_Basics
+    Public floodCells As New FloodCell_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
         gOptions.HistBinSlider.Value = 20
@@ -1502,11 +1502,11 @@ Public Class RedCloud_ColorAndCloud : Inherits VB_Algorithm
         reduction.Run(src)
         Dim combined = reduction.dst2.Clone
         guided.backProject.CopyTo(combined, task.depthMask)
-        fCells.Run(combined)
+        floodCells.Run(combined)
 
-        dst2 = fCells.dst2
-        dst3 = fCells.dst3
+        dst2 = floodCells.dst2
+        dst3 = floodCells.dst3
 
-        If heartBeat() Then labels(2) = CStr(fCells.redCells.Count) + " regions identified"
+        If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions identified"
     End Sub
 End Class

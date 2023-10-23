@@ -208,6 +208,9 @@ Public Class VBtask : Implements IDisposable
 
     Public redThresholdSide As Integer ' In heatmap side view, this defines the boundary between red and blue
     Public redThresholdTop As Integer ' In heatmap top view, this defines the boundary between red and blue
+
+    Public fCells As New List(Of fcData)
+
     Public redOther As Integer
     Public redCells As New List(Of rcData)
     Public lastCells As New List(Of rcData)

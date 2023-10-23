@@ -1,7 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class FloodCell_Basics : Inherits VB_Algorithm
-    Public redCells As New List(Of fcData)
     Public inputMask As cv.Mat
     Public Sub New()
         cPtr = FloodCell_Open()
@@ -10,9 +9,9 @@ Public Class FloodCell_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
-            Static guided As New GuidedBP_Depth
-            guided.Run(src)
-            src = guided.backProject
+            Static fless As New FeatureLess_Basics
+            fless.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            src = fless.dst2
         End If
 
         Dim handlemask As GCHandle
@@ -42,17 +41,17 @@ Public Class FloodCell_Basics : Inherits VB_Algorithm
         Dim sizeData = New cv.Mat(classCount, 1, cv.MatType.CV_32S, FloodCell_Sizes(cPtr))
         Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, FloodCell_Rects(cPtr))
         Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
-        redCells.Clear()
+        task.fCells.Clear()
         For i = 0 To classCount - 1
             Dim fc As New fcData
             fc.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
             fc.pixels = sizeData.Get(Of Integer)(i, 0)
             fc.index = i + 1
             fc.mask = dst3(fc.rect).InRange(fc.index, fc.index)
-
             fc.maxDist = vbGetMaxDist(fc)
 
             fc.contour = contourBuild(fc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            vbDrawContour(fc.mask, fc.contour, fc.index, -1)
 
             Dim minLoc As cv.Point, maxLoc As cv.Point
             task.pcSplit(0)(fc.rect).MinMaxLoc(fc.minVec.X, fc.maxVec.X, minLoc, maxLoc, fc.mask)
@@ -60,20 +59,16 @@ Public Class FloodCell_Basics : Inherits VB_Algorithm
             task.pcSplit(2)(fc.rect).MinMaxLoc(fc.minVec.Z, fc.maxVec.Z, minLoc, maxLoc, fc.mask)
             cv.Cv2.MeanStdDev(task.pointCloud(fc.rect), depthMean, depthStdev, fc.mask)
 
-            ' if there is no depth within the mask, then estimate this color only cell with depth in the rect.
-            If depthMean(2) = 0 Then
-                cv.Cv2.MeanStdDev(task.pointCloud(fc.rect), depthMean, depthStdev)
-            End If
             fc.depthMean = New cv.Point3f(depthMean(0), depthMean(1), depthMean(2))
             fc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
 
             cv.Cv2.MeanStdDev(task.color(fc.rect), fc.colorMean, fc.colorStdev, fc.mask)
 
-            redCells.Add(fc)
+            task.fCells.Add(fc)
         Next
 
         dst2 = vbPalette(dst3 * 255 / classCount)
-        If standalone Then dst2.SetTo(0, task.noDepthMask)
+        If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions were identified."
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = FloodCell_Close(cPtr)
@@ -108,19 +103,20 @@ End Class
 
 
 Public Class FloodCell_Featureless : Inherits VB_Algorithm
-    Dim fCells As New FloodCell_Basics
+    Dim floodCells As New FloodCell_Basics
     Public Sub New()
         desc = "Floodfill the featureless image so each cell can be tracked."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static fless As New FeatureLess_Basics
-        fless.Run(src)
+        fless.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
-        fCells.inputMask = fless.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        fCells.Run(fless.dst2)
+        floodCells.inputMask = fless.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        floodCells.Run(fless.dst2)
 
-        dst2 = fCells.dst2
-        dst3 = fCells.dst3
+        dst2 = floodCells.dst2
+        dst3 = floodCells.dst3
+        labels(2) = floodCells.labels(2)
     End Sub
 End Class
 
@@ -132,22 +128,28 @@ End Class
 Public Class FloodCell_LeftRight : Inherits VB_Algorithm
     Dim fCellsLeft As New FloodCell_Basics
     Dim fCellsRight As New FloodCell_Basics
+    Public leftCells As New List(Of fcData)
+    Public rightCells As New List(Of fcData)
+    Dim fless As New FeatureLess_Basics
     Public Sub New()
         desc = "Floodfill the featureless left and right images so each cell can be tracked."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static fless As New FeatureLess_Basics
-        fless.Run(task.leftView)
+        fless.Run(task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
         fCellsLeft.inputMask = fless.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         fCellsLeft.Run(fless.dst2)
+        leftCells = New List(Of fcData)(task.fCells)
+        labels(2) = fCellsLeft.labels(2)
 
         dst2 = fCellsLeft.dst2
 
-        fless.Run(task.rightView)
+        fless.Run(task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
         fCellsRight.inputMask = fless.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         fCellsRight.Run(fless.dst2)
+        rightCells = New List(Of fcData)(task.fCells)
+        labels(3) = fCellsRight.labels(2)
 
         dst3 = fCellsRight.dst2
     End Sub

@@ -267,7 +267,7 @@ End Class
 
 
 Public Class Feature_CellFinder : Inherits VB_Algorithm
-    Dim fCells As New Feature_CellGrid
+    Dim floodCells As New Feature_CellGrid
     Public bestCells As New List(Of cv.Rect)
     Public bestLeftCell As cv.Rect
     Public bestRightCell As cv.Rect
@@ -276,16 +276,16 @@ Public Class Feature_CellFinder : Inherits VB_Algorithm
         desc = "Find 2 cells with the most features but not on the edge (too likely impacted with camera motion)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        fCells.Run(src)
-        dst2 = fCells.dst2
+        floodCells.Run(src)
+        dst2 = floodCells.dst2
 
         Static popSort As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
         popSort.Clear()
-        For i = 0 To fCells.cellPopulation.Count - 1
+        For i = 0 To floodCells.cellPopulation.Count - 1
             Dim roi = task.gridList(i)
             If roi.X > 0 And (roi.X + roi.Width) < dst2.Width And roi.Y > 0 And (roi.Y + roi.Height) < dst2.Height Then
-                setTrueText(CStr(fCells.cellPopulation(i)), New cv.Point(roi.X, roi.Y), 3)
-                popSort.Add(fCells.cellPopulation(i), roi)
+                setTrueText(CStr(floodCells.cellPopulation(i)), New cv.Point(roi.X, roi.Y), 3)
+                popSort.Add(floodCells.cellPopulation(i), roi)
             End If
         Next
 

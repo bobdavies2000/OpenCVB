@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Public Class RedCloudY_Basics : Inherits VB_Algorithm
     Public redCore As New RedCloudY_Core
-    Public fCells As New FloodCell_Basics
+    Public floodCells As New FloodCell_Basics
     Public redCells As New List(Of rcData)
     Public lastCells As New List(Of rcData)
     Public showSelected As Boolean = True
@@ -14,10 +14,14 @@ Public Class RedCloudY_Basics : Inherits VB_Algorithm
         lastCells = New List(Of rcData)(redCells)
         dst0 = task.color.Clone
         redCore.Run(src)
-        fCells.inputMask = task.noDepthMask
-        fCells.Run(redCore.dst0)
+        floodCells.inputMask = task.noDepthMask
+        redCore.dst0.ConvertTo(dst1, cv.MatType.CV_8U)
 
-        If heartBeat() Then labels(2) = CStr(fCells.redCells.Count) + " regions were identified."
+        floodCells.Run(dst1)
+        dst2 = floodCells.dst2
+        dst3 = floodCells.dst3
+
+        If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions were identified."
     End Sub
 End Class
 
