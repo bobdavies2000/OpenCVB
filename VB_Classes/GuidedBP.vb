@@ -1202,6 +1202,37 @@ End Class
 
 
 
+Public Class GuidedBP_BuildCells : Inherits VB_Algorithm
+    Dim guided As New GuidedBP_Depth
+    Dim buildCells As New GuidedBP_FloodCells
+    Public rcMatch As New RedCloudY_Match
+    Public redCells As New List(Of rcData)
+    Public lastCells As New List(Of rcData)
+    Public Sub New()
+        gOptions.HistBinSlider.Value = 15
+        desc = "Segment the image based only on the reduced point cloud"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        guided.Run(src)
+        buildCells.inputMask = task.noDepthMask
+        buildCells.Run(guided.backProject)
+
+        rcMatch.redCells = buildCells.redCells
+        rcMatch.Run(src)
+        redCells = New List(Of rcData)(rcMatch.redCells)
+        lastCells = New List(Of rcData)(rcMatch.lastCells)
+        dst2 = rcMatch.dst2
+
+        If heartBeat() Then labels(2) = rcMatch.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
 
 Public Class GuidedBP_FloodCells : Inherits VB_Algorithm
     Public redCells As New List(Of rcData)
@@ -1291,33 +1322,4 @@ Public Class GuidedBP_FloodCells : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-Public Class GuidedBP_BuildCells : Inherits VB_Algorithm
-    Dim guided As New GuidedBP_Depth
-    Dim buildCells As New GuidedBP_FloodCells
-    Public rcMatch As New RedCloudY_Match
-    Public redCells As New List(Of rcData)
-    Public lastCells As New List(Of rcData)
-    Public showSelected As Boolean = True
-    Public Sub New()
-        gOptions.HistBinSlider.Value = 15
-        desc = "Segment the image based only on the reduced point cloud"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        guided.Run(src)
-        buildCells.inputMask = task.noDepthMask
-        buildCells.Run(guided.backProject)
-
-        rcMatch.redCells = buildCells.redCells
-        rcMatch.Run(src)
-        redCells = New List(Of rcData)(rcMatch.redCells)
-        lastCells = New List(Of rcData)(rcMatch.lastCells)
-        dst2 = rcMatch.dst2
-
-        If showSelected Then task.rcSelect = rcMatch.showSelect()
-        If heartBeat() Then labels(2) = rcMatch.labels(2)
-    End Sub
-End Class
 

@@ -15,13 +15,11 @@ class FloodCell
 private:
 public:
     Mat src, mask, maskCopy;
-    int classCount;
     vector<Rect>cellRects;
     vector<int> cellSizes;
 
     FloodCell() {}
     void RunCPP(int minPixels, int diff) {
-        src = src(Rect(1, 1, src.cols - 2, src.rows - 2));
         Rect rect;
 
         multimap<int, Point, greater<int>> sizeSorted;
@@ -34,7 +32,7 @@ public:
                 if (mask.at<unsigned char>(y, x) == 0)
                 {
                     pt = Point(x, y);
-                    count = floodFill(src, mask, pt, 255, &rect, diff, diff, floodFlag | (255 << 8));
+                    int count = floodFill(src, mask, pt, 255, &rect, diff, diff, floodFlag | (255 << 8));
                     if (count > minPixels)
                         sizeSorted.insert(make_pair(count, pt));
                 }
@@ -43,20 +41,18 @@ public:
 
         cellRects.clear();
         cellSizes.clear();
-        classCount = 1;
+        int fill = 1;
             
         for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
         {
-            int count = floodFill(src, maskCopy, it->second, classCount, &rect, diff, diff, floodFlag | (classCount << 8));
+            count = floodFill(src, maskCopy, it->second, fill, &rect, diff, diff, floodFlag | (fill << 8));
             if (count >= 1)
             {
-                Rect r = Rect(rect.x - 1, rect.y - 1, rect.width + 2, rect.height + 2);  // mask is 1 pixel larger all around.
-
-                cellRects.push_back(r);
+                cellRects.push_back(rect);
                 cellSizes.push_back(count);
 
-                if (classCount >= 255) break; // just taking the top 255 objects found.
-                classCount++;
+                if (fill >= 255) break; // just taking the top 255 largest objects found.
+                fill++;
             }
         }
     }
@@ -65,7 +61,7 @@ public:
 extern "C" __declspec(dllexport) FloodCell * FloodCell_Open() { FloodCell* cPtr = new FloodCell(); return cPtr; }
 extern "C" __declspec(dllexport) int FloodCell_Count(FloodCell * cPtr)
 {
-    return cPtr->classCount;
+    return (int)cPtr->cellRects.size();
 }
 
 extern "C" __declspec(dllexport) int* FloodCell_Rects(FloodCell * cPtr)
@@ -83,21 +79,47 @@ extern "C" __declspec(dllexport) int* FloodCell_Run(FloodCell * cPtr, int* dataP
     int rows, int cols, int type, int minPixels, int diff)
 {
     cPtr->src = Mat(rows, cols, type, dataPtr);
+    cPtr->mask = Mat(rows + 2, cols + 2, CV_8U);
+    cPtr->mask.setTo(0);
+    Rect r = Rect(1, 1, cols, rows);
     Mat mask;
     if (maskPtr != 0)
     {
-        mask = Mat(rows, cols, CV_8U, maskPtr);
-        cPtr->mask = mask.clone(); // point cloud runs can use a mask to avoid flooding areas.
-        cPtr->mask.copyTo(cPtr->maskCopy);
+        mask = Mat(rows, cols, type, maskPtr);
+        mask.copyTo(cPtr->mask(r));
     }
-    else
-    {
-        cPtr->mask     = Mat(rows, cols, CV_8U); // color runs don't use the mask
-        cPtr->maskCopy = Mat(rows, cols, CV_8U);
-        cPtr->mask.setTo(0);
-        cPtr->maskCopy.setTo(0);
-    }
+    cPtr->maskCopy = cPtr->mask.clone();
     cPtr->RunCPP(minPixels, diff);
-    if (maskPtr != 0) cPtr->maskCopy.setTo(0, mask);
-    return (int*)cPtr->maskCopy.data;
+    if (maskPtr != 0) cPtr->maskCopy(r).setTo(0, mask);
+    Mat tmp;
+    cPtr->maskCopy(r).copyTo(tmp);
+    return (int*)tmp.data;
 }
+
+
+
+
+
+//extern "C" __declspec(dllexport) int* FloodCell_Close(FloodCell * cPtr) { delete cPtr; return (int*)0; }
+//extern "C" __declspec(dllexport) int* FloodCell_Run(FloodCell * cPtr, int* dataPtr, unsigned char* maskPtr,
+//    int rows, int cols, int type, int minPixels, int diff)
+//{
+//    cPtr->src = Mat(rows, cols, type, dataPtr);
+//    Mat mask;
+//    if (maskPtr != 0)
+//    {
+//        mask = Mat(rows, cols, CV_8U, maskPtr);
+//        cPtr->mask = mask.clone(); // point cloud runs can use a mask to avoid flooding areas.
+//        cPtr->mask.copyTo(cPtr->maskCopy);
+//    }
+//    else
+//    {
+//        cPtr->mask = Mat(rows, cols, CV_8U); // color runs don't use the mask
+//        cPtr->maskCopy = Mat(rows, cols, CV_8U);
+//        cPtr->mask.setTo(0);
+//        cPtr->maskCopy.setTo(0);
+//    }
+//    cPtr->RunCPP(minPixels, diff);
+//    if (maskPtr != 0) cPtr->maskCopy.setTo(0, mask);
+//    return (int*)cPtr->maskCopy.data;
+//}

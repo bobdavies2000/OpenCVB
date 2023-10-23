@@ -547,6 +547,7 @@ if algorithmName = "Flood_RedColor" Then return new Flood_RedColor
 if algorithmName = "Flood_Right" Then return new Flood_Right
 if algorithmName = "Flood_TopX" Then return new Flood_TopX
 if algorithmName = "FloodCell_Basics" Then return new FloodCell_Basics
+if algorithmName = "FloodCell_BuildData" Then return new FloodCell_BuildData
 if algorithmName = "FloodCell_Color" Then return new FloodCell_Color
 if algorithmName = "Font_FlowText" Then return new Font_FlowText
 if algorithmName = "Font_OpenCV" Then return new Font_OpenCV
