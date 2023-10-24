@@ -384,3 +384,24 @@ Public Class FeatureLess_MotionAccum : Inherits VB_Algorithm
         labels(3) = "FeatureLess Regions = " + CStr(regionCount)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class FeatureLess_History : Inherits VB_Algorithm
+    Dim fLess As New FeatureLess_Basics
+    Dim sum8u As New History_Sum8u
+    Public Sub New()
+        desc = "Accumulate the edges over a span of X images."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        fLess.Run(src)
+        dst2 = fLess.dst2
+
+        sum8u.Run(dst2)
+        dst3 = sum8u.dst2
+    End Sub
+End Class

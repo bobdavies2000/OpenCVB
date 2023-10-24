@@ -125,13 +125,12 @@ Public Class BackProject_FeatureLess : Inherits VB_Algorithm
         desc = "Create a histogram of the featureless regions"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static reductionSlider = findSlider("Color Reduction")
         edges.Run(src)
         reduction.Run(edges.dst3)
         backP.Run(reduction.dst2)
         dst2 = backP.dst2
         dst3 = backP.dst3
-        labels(2) = "Reduction = " + CStr(reductionSlider.Value) + " and bins = " + CStr(task.histogramBins)
+        labels(2) = "Reduction = " + CStr(redOptions.ColorReductionSlider.Value) + " and bins = " + CStr(task.histogramBins)
     End Sub
 End Class
 

@@ -48,6 +48,7 @@ public:
             count = floodFill(src, maskCopy, it->second, fill, &rect, diff, diff, floodFlag | (fill << 8));
             if (count >= 1)
             {
+                if (rect.width == src.cols && rect.height == src.rows) continue;
                 cellRects.push_back(rect);
                 cellSizes.push_back(count);
 

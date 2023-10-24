@@ -2,6 +2,7 @@
 Imports System.Runtime.InteropServices
 Public Class FloodCell_Basics : Inherits VB_Algorithm
     Public inputMask As cv.Mat
+    Dim fLess As New FeatureLess_Basics
     Public Sub New()
         cPtr = FloodCell_Open()
         gOptions.PixelDiffThreshold.Value = 0
@@ -9,9 +10,8 @@ Public Class FloodCell_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
-            Static fless As New FeatureLess_Basics
-            fless.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            src = fless.dst2
+            fLess.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            src = fLess.dst2
         End If
 
         Dim handlemask As GCHandle
@@ -42,12 +42,14 @@ Public Class FloodCell_Basics : Inherits VB_Algorithm
         Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, FloodCell_Rects(cPtr))
         Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
         task.fCells.Clear()
+        If standalone Or testIntermediate(traceName) Then dst2.SetTo(0)
         For i = 0 To classCount - 1
             Dim fc As New fcData
             fc.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
             fc.pixels = sizeData.Get(Of Integer)(i, 0)
             fc.index = i + 1
             fc.mask = dst3(fc.rect).InRange(fc.index, fc.index)
+            fc.color = task.vecColors(i) ' never more than 255...
             fc.maxDist = vbGetMaxDist(fc)
 
             fc.contour = contourBuild(fc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
@@ -65,9 +67,10 @@ Public Class FloodCell_Basics : Inherits VB_Algorithm
             cv.Cv2.MeanStdDev(task.color(fc.rect), fc.colorMean, fc.colorStdev, fc.mask)
 
             task.fCells.Add(fc)
+
+            If standalone Or testIntermediate(traceName) Then dst2(fc.rect).SetTo(fc.color, fc.mask)
         Next
 
-        dst2 = vbPalette(dst3 * 255 / classCount)
         If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions were identified."
     End Sub
     Public Sub Close()
@@ -293,9 +296,70 @@ End Class
 
 Public Class FloodCell_Match : Inherits VB_Algorithm
     Dim floodCell As New FloodCell_Basics
+    Dim lastMap As cv.Mat
     Public Sub New()
+        lastMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Match fCells from the current generation to the last."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        Dim lastf As New List(Of fcData)(task.fCells)
+        Dim lastMap = dst3.Clone
+
+        floodCell.Run(src)
+        dst3 = floodCell.dst3
+
+        Dim fCells As New List(Of fcData)
+        Dim lfc As fcData
+        Dim usedColors1 As New List(Of cv.Vec3b)
+        For Each fc In task.fCells
+            Dim prev = lastMap.Get(Of Byte)(fc.maxDist.Y, fc.maxDist.X)
+            If prev < lastf.Count And prev <> 0 Then
+                lfc = lastf(prev - 1)
+                fc.indexLast = lfc.index
+                fc.color = lfc.color
+            End If
+            If usedColors1.Contains(fc.color) Then
+                fc.color = New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240))
+            End If
+            usedColors1.Add(fc.color)
+            fCells.Add(fc)
+        Next
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        Dim usedColors2 As New List(Of cv.Vec3b)
+        For Each fc In fCells
+            If usedColors2.Contains(fc.color) Then
+                fc.color = New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240))
+            End If
+            dst2(fc.rect).SetTo(fc.color, fc.mask)
+            dst3(fc.rect).SetTo(fc.index, fc.mask)
+        Next
+
+        task.fCells = New List(Of fcData)(fCells)
+
+        labels(2) = floodCell.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class FloodCell_MatchReduction : Inherits VB_Algorithm
+    Dim match As New FloodCell_Match
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        desc = "Use the reduction output as input to FloodCell_Basics instead of FeatureLess_Basics output"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        reduction.Run(src)
+
+        match.Run(reduction.dst2)
+        dst2 = match.dst2
+        labels(2) = match.labels(2)
     End Sub
 End Class

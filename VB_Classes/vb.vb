@@ -933,5 +933,6 @@ Public Class fcData
         hull = New List(Of cv.Point)
         mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
         rect = New cv.Rect(0, 0, 1, 1)
+        color = New cv.Vec3b()
     End Sub
 End Class

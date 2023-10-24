@@ -13,10 +13,6 @@ Public Class PixelViewerForm
         Me.Width = GetSetting("OpenCVB1", "PixelViewerWidth", "PixelViewerWidth", 1280)
         Me.Height = GetSetting("OpenCVB1", "PixelViewerHeight", "PixelViewerHeight", 720)
         PixelViewerForm_ResizeEnd(sender, e)
-        UpdateFrequency.Items.Add("As often as possible")
-        UpdateFrequency.Items.Add("Once a second")
-
-        UpdateFrequency.SelectedIndex = 1
         Timer1.Enabled = True
     End Sub
     Private Sub PixelViewerForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
@@ -27,18 +23,7 @@ Public Class PixelViewerForm
         SaveSetting("OpenCVB1", "PixelViewerWidth", "PixelViewerWidth", Me.Width)
         SaveSetting("OpenCVB1", "PixelViewerHeight", "PixelViewerHeight", Me.Height)
     End Sub
-    Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
-        mousePoint.X -= 1
-    End Sub
-    Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
-        mousePoint.Y -= 1
-    End Sub
-    Private Sub ToolStripButton3_Click(sender As Object, e As EventArgs) Handles ToolStripButton3.Click
-        mousePoint.Y += 1
-    End Sub
-    Private Sub ToolStripButton4_Click(sender As Object, e As EventArgs) Handles ToolStripButton4.Click
-        mousePoint.X += 1
-    End Sub
+
     Private Sub PixelViewerForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
         Select Case e.KeyCode
             Case Keys.Left
@@ -52,13 +37,24 @@ Public Class PixelViewerForm
         End Select
     End Sub
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        If UpdateFrequency.SelectedIndex = 1 Then rtb.Text = saveText
-    End Sub
-    Private Sub ToolStripButton5_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton5.Click
-        secondCount = 0
         rtb.Text = saveText
     End Sub
     Private Sub PixelViewerForm_Closed(sender As Object, e As EventArgs) Handles Me.Closed
         Timer1.Enabled = False
     End Sub
+    Private Sub ToolStripButton1_Click_1(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+        mousePoint.X -= 1
+    End Sub
+    'Private Sub ToolStripButton1_Click(sender As Object, e As EventArgs) Handles ToolStripButton1.Click
+    '    mousePoint.X -= 1
+    'End Sub
+    'Private Sub ToolStripButton2_Click(sender As Object, e As EventArgs) Handles ToolStripButton2.Click
+    '    mousePoint.Y -= 1
+    'End Sub
+    'Private Sub ToolStripButton3_Click(sender As Object, e As EventArgs) Handles ToolStripButton3.Click
+    '    mousePoint.Y += 1
+    'End Sub
+    'Private Sub ToolStripButton4_Click(sender As Object, e As EventArgs) Handles ToolStripButton4.Click
+    '    mousePoint.X += 1
+    'End Sub
 End Class

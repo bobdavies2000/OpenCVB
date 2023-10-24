@@ -145,7 +145,7 @@ Public Class Pixel_Viewer : Inherits VB_Algorithm
         task.pixelViewerRect = dw
 
         If viewerForm.rtb.Text <> imgText Then
-            If viewerForm.UpdateFrequency.SelectedIndex = 0 Or firstUpdate Then viewerForm.rtb.Text = imgText Else viewerForm.saveText = imgText
+            If firstUpdate Then viewerForm.rtb.Text = imgText Else viewerForm.saveText = imgText
             firstUpdate = False
         End If
 
