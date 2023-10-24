@@ -723,7 +723,7 @@ Public Class RedCloud_ByIndex : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst0.Checked = True
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("RedColor cell index", 1, 100, 1)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("RedColor cell index", 0, 100, 1)
         labels = {"", "", "RedColor Output", ""}
         desc = "Select a RedColor cell using a slider."
     End Sub
@@ -734,10 +734,10 @@ Public Class RedCloud_ByIndex : Inherits VB_Algorithm
         dst0 = redC.dst0
         dst2 = redC.dst2
 
-        indexSlider.value = 0
         indexSlider.maximum = task.redCells.Count - 1
         Dim rc = task.redCells(indexSlider.value)
-
+        task.clickPoint = rc.maxDist
+        redC.redSelect(dst0, dst1, dst2)
         labels(2) = redC.labels(2)
     End Sub
 End Class
