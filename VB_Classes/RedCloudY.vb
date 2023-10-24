@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class RedCloudY_Basics : Inherits VB_Algorithm
-    Public redCore As New RedCloudY_Core
+    Public prep As New RedCloud_PrepPointCloud
     Public floodCell As New FloodCell_Basics
     Public redCells As New List(Of rcData)
     Public lastCells As New List(Of rcData)
@@ -13,9 +13,8 @@ Public Class RedCloudY_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         lastCells = New List(Of rcData)(redCells)
         dst0 = task.color.Clone
-        redCore.Run(src)
-        floodCell.inputMask = task.noDepthMask
-        redCore.dst0.ConvertTo(dst1, cv.MatType.CV_8U)
+        prep.Run(Nothing)
+        prep.dst0.ConvertTo(dst1, cv.MatType.CV_8U)
 
         floodCell.Run(dst1)
         dst2 = floodCell.dst2
@@ -475,51 +474,6 @@ Public Class RedCloudY_SliceV : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class RedCloudY_Core : Inherits VB_Algorithm
-    Dim options As New Options_RedCloud
-    Public Sub New()
-        desc = "Reduction transform for the point cloud"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        Dim reduceAmt = options.reduction
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-        src.ConvertTo(dst0, cv.MatType.CV_32S, 1000 / reduceAmt)
-
-        Dim split = dst0.Split()
-        Select Case options.prepDataCase
-            Case 0
-                dst0 = split(0) * reduceAmt
-            Case 1
-                dst0 = split(1) * reduceAmt
-            Case 2
-                dst0 = split(2) * reduceAmt
-            Case 3
-                dst0 = split(0) * reduceAmt + split(1) * reduceAmt
-            Case 4
-                dst0 = split(0) * reduceAmt + split(2) * reduceAmt
-            Case 5
-                dst0 = split(1) * reduceAmt + split(2) * reduceAmt
-            Case 6
-                dst0 = split(0) * reduceAmt + split(1) * reduceAmt + split(2) * reduceAmt
-        End Select
-
-        Dim mm = vbMinMax(dst0)
-        dst2 = (dst0 - mm.minVal)
-
-        dst2.SetTo(mm.maxVal - mm.minVal, task.maxDepthMask)
-        dst2.SetTo(0, task.noDepthMask)
-
-        labels(2) = "Reduced Pointcloud - reduction factor = " + CStr(reduceAmt)
-    End Sub
-End Class
 
 
 

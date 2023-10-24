@@ -25,10 +25,7 @@ Public Class Reduction_Basics : Inherits VB_Algorithm
             labels(2) = "No reduction requested"
         End If
 
-        If standalone Or testIntermediate(traceName) Then
-            dst2 = vbPalette(dst2)
-            dst3 = task.palette.dst2
-        End If
+        If standalone Or testIntermediate(traceName) Then dst3 = vbPalette(dst2)
         labels(2) = CStr(classCount) + " colors after reduction"
     End Sub
 End Class
@@ -43,14 +40,14 @@ Public Class Reduction_Floodfill : Inherits VB_Algorithm
     Public Sub New()
         labels(2) = "Reduced input to floodfill"
         redOptions.ColorReductionSlider.Value = 32
-        desc = "Use the reduction output as input to floodfill to get masks and centroids of large masses."
+        desc = "Use the reduction output as input to floodfill to get masks of large masses."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
         dst2 = vbPalette(reduction.dst2)
         flood.Run(reduction.dst2)
         dst3 = flood.dst2
-        labels(3) = "Floodfill found " + CStr(task.redCells.Count) + " regions and centroids"
+        labels(3) = "Floodfill found " + CStr(task.fCells.Count) + " regions"
     End Sub
 End Class
 
@@ -250,7 +247,7 @@ End Class
 
 
 Public Class Reduction_Depth : Inherits VB_Algorithm
-    Dim redCore As New RedCloudY_Core
+    Dim prep As New RedCloud_PrepPointCloud
     Dim colorizer As New Depth_Colorizer_CPP
     Public Sub New()
         desc = "Use reduction to smooth depth data"
@@ -260,11 +257,11 @@ Public Class Reduction_Depth : Inherits VB_Algorithm
             src = task.pcSplit(2) * 1000
             src.ConvertTo(src, cv.MatType.CV_32S)
         End If
-        redCore.Run(src)
-        dst2 = redCore.dst2
+        prep.Run(Nothing)
+        dst2 = prep.dst2
         dst2.ConvertTo(dst1, cv.MatType.CV_32F)
         colorizer.Run(dst1 / 1000)
         dst3 = colorizer.dst2
-        labels(2) = redCore.labels(2)
+        labels(2) = prep.labels(2)
     End Sub
 End Class

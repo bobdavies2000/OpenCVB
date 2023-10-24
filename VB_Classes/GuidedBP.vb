@@ -13,7 +13,6 @@ Public Class GuidedBP_Basics : Inherits VB_Algorithm
 
         dst3 = heatTop.histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         task.minPixels = 1
-        floodCell.inputMask = Not dst3
         floodCell.Run(dst3)
 
         Dim doctoredHist32f As New cv.Mat
@@ -228,7 +227,6 @@ Public Class GuidedBP_kTop : Inherits VB_Algorithm
         autoX.Run(hist2d.histogram)
 
         dst1 = autoX.histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        colorC.floodCell.inputMask = Not dst1
         colorC.Run(dst1)
         dst2 = colorC.dst2
 
@@ -271,7 +269,6 @@ Public Class GuidedBP_kSide : Inherits VB_Algorithm
         autoY.Run(hist2d.histogram)
 
         dst1 = autoY.histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        colorC.floodCell.inputMask = Not dst1
         colorC.Run(dst1)
         dst2 = colorC.dst2
 

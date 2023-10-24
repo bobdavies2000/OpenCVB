@@ -994,38 +994,6 @@ End Class
 
 
 
-
-
-Public Class RedCloud_BothColorAndCloud : Inherits VB_Algorithm
-    Dim redC As New RedCloud_DepthOnly
-    Dim colorC As New RedCloud_ColorOnly
-    Public Sub New()
-        desc = "Compare the RedCloud results for the point cloud and color."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        colorC.Run(src)
-        dst3 = colorC.dst2
-        labels(3) = colorC.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 Public Class RedCloud_ColorOnly : Inherits VB_Algorithm
     Public colorC As New RedCloud_Basics
     Dim colorCells As New List(Of rcData)
@@ -1445,35 +1413,6 @@ End Class
 
 
 
-Public Class RedCloud_ColorAndCloud : Inherits VB_Algorithm
-    Dim guided As New GuidedBP_Depth
-    Public floodCell As New FloodCell_Basics
-    Dim reduction As New Reduction_Basics
-    Public Sub New()
-        gOptions.HistBinSlider.Value = 20
-        desc = "Segment the image based on both the reduced point cloud and color"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        guided.Run(src)
-
-        reduction.Run(src)
-        Dim combined = reduction.dst2.Clone
-        guided.backProject.CopyTo(combined, task.depthMask)
-        floodCell.Run(combined)
-
-        dst2 = floodCell.dst2
-        dst3 = floodCell.dst3
-
-        If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions identified"
-    End Sub
-End Class
-
-
-
-
-
-
-
 '  http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
 Public Class RedCloud_PlaneColor : Inherits VB_Algorithm
@@ -1561,5 +1500,135 @@ Public Class RedCloud_PlaneFromMask : Inherits VB_Algorithm
             Next
         Next
         rc.eq = fitDepthPlane(fitPoints)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_ColorAndCloudSeparate : Inherits VB_Algorithm
+    Dim redC As New RedCloud_DepthOnly
+    Dim colorC As New RedCloud_ColorOnly
+    Public Sub New()
+        desc = "Compare the RedCloud results for the point cloud and color."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        colorC.Run(src)
+        dst3 = colorC.dst2
+        labels(3) = colorC.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_ColorAndCloud : Inherits VB_Algorithm
+    Dim guided As New GuidedBP_Depth
+    Public floodCell As New FloodCell_Basics
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        gOptions.HistBinSlider.Value = 20
+        desc = "Segment the image based on both the reduced point cloud and color"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        guided.Run(src)
+
+        reduction.Run(src)
+        Dim combined = reduction.dst2.Clone
+        guided.backProject.CopyTo(combined, task.depthMask)
+        floodCell.Run(combined)
+
+        dst2 = floodCell.dst2
+        dst3 = floodCell.dst3
+
+        If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions identified"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_PrepPointCloud : Inherits VB_Algorithm
+    Dim options As New Options_RedCloud
+    Public Sub New()
+        desc = "Reduction transform for the point cloud"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        Dim reduceAmt = options.reduction
+        task.pointCloud.ConvertTo(dst0, cv.MatType.CV_32S, 1000 / reduceAmt)
+
+        Dim split = dst0.Split()
+        Select Case options.prepDataCase
+            Case 0
+                dst0 = split(0) * reduceAmt
+            Case 1
+                dst0 = split(1) * reduceAmt
+            Case 2
+                dst0 = split(2) * reduceAmt
+            Case 3
+                dst0 = split(0) * reduceAmt + split(1) * reduceAmt
+            Case 4
+                dst0 = split(0) * reduceAmt + split(2) * reduceAmt
+            Case 5
+                dst0 = split(1) * reduceAmt + split(2) * reduceAmt
+            Case 6
+                dst0 = split(0) * reduceAmt + split(1) * reduceAmt + split(2) * reduceAmt
+        End Select
+
+        Dim mm = vbMinMax(dst0)
+        dst2 = (dst0 - mm.minVal)
+
+        dst2.SetTo(mm.maxVal - mm.minVal, task.maxDepthMask)
+        dst2.SetTo(0, task.noDepthMask)
+        mm = vbMinMax(dst2)
+        dst2 *= 254 / mm.maxVal
+        dst2 += 1
+
+        labels(2) = "Reduced Pointcloud - reduction factor = " + CStr(reduceAmt)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_PrepTest : Inherits VB_Algorithm
+    Dim prep As New RedCloud_PrepPointCloud
+    Public floodCell As New FloodCell_Basics
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        gOptions.HistBinSlider.Value = 20
+        desc = "Segment the image based on both the reduced point cloud and color"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        reduction.Run(src)
+
+        prep.Run(Nothing)
+        prep.dst2.ConvertScaleAbs().CopyTo(reduction.dst2, task.depthMask)
+
+        floodCell.Run(reduction.dst2)
+
+        dst2 = floodCell.dst2
+        dst3 = floodCell.dst3
+
+        If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions identified"
     End Sub
 End Class

@@ -4,11 +4,10 @@ Public Class Flood_Basics : Inherits VB_Algorithm
     Public classCount As Integer
     Public floodCell As New FloodCell_Basics
     Public Sub New()
-        labels = {"", "", "", "Palettized output of image at left"}
+        labels(3) = "The flooded cells numbered from largest (1) to smallast (x < 255)"
         desc = "FloodFill the input and paint it"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        floodCell.inputMask = task.noDepthMask
         floodCell.Run(src)
         dst2 = floodCell.dst2
         dst3 = floodCell.dst3
@@ -602,7 +601,7 @@ End Class
 Public Class Flood_Featureless : Inherits VB_Algorithm
     Public classCount As Integer
     Dim floodCell As New FloodCell_Basics
-    Public redCells As New List(Of fcData)
+    Public fCells As New List(Of fcData)
     Public Sub New()
         labels = {"", "", "", "Palette output of image at left"}
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -615,20 +614,19 @@ Public Class Flood_Featureless : Inherits VB_Algorithm
             src = fless.dst2
         End If
 
-        If standalone Then floodCell.inputMask = src.Threshold(0, 255, cv.ThresholdTypes.Binary)
         floodCell.Run(src)
         classCount = task.fCells.Count
 
         Dim index As Integer = 1
         dst2.SetTo(0)
-        redCells.Clear()
+        fCells.Clear()
         For Each fc In task.fCells
             fc.hull = cv.Cv2.ConvexHull(fc.contour, True).ToList
             vbDrawContour(dst2(fc.rect), fc.hull, fc.index, -1)
-            redCells.Add(fc)
+            fCells.Add(fc)
         Next
 
-        labels(2) = "Hulls were added for each of the " + CStr(redCells.Count) + " regions identified"
-        dst3 = vbPalette(dst2 * 255 / redCells.Count)
+        labels(2) = "Hulls were added for each of the " + CStr(fCells.Count) + " regions identified"
+        dst3 = vbPalette(dst2 * 255 / fCells.Count)
     End Sub
 End Class
