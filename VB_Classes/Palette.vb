@@ -129,10 +129,9 @@ Public Class Palette_Reduction : Inherits VB_Algorithm
         labels(2) = "Reduced Colors"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static reductionSlider = findSlider("Color Reduction")
-        If reductionSlider.Value < 32 Then
-            reductionSlider.Value = 32
-            Console.WriteLine("This algorithm gets very slow unless there is lots of reduction.  Resetting reduction slider value to 2^^5")
+        If redOptions.ColorReductionSlider.Value < 32 Then
+            redOptions.ColorReductionSlider.Value = 32
+            Console.WriteLine("This algorithm gets very slow unless there is lots of reduction.  Resetting reduction slider value to 32")
         End If
         reduction.Run(src)
         dst2 = reduction.dst2

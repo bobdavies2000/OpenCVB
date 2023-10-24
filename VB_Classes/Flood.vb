@@ -249,8 +249,8 @@ Public Class Flood_Objects : Inherits VB_Algorithm
                 lutFlood.Run(src)
                 myFlood = lutFlood.flood
             Case 3
-                reductionFlood.Run(src)
-                myFlood = reductionFlood.flood
+                'reductionFlood.Run(src)
+                'myFlood = reductionFlood.flood
         End Select
 
         dst2 = vbPalette(myFlood.dst2)

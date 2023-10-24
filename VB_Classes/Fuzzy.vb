@@ -9,7 +9,7 @@ Public Class Fuzzy_Basics : Inherits VB_Algorithm
     Public Sub New()
         Dim floodRadio = findRadio("FloodFill")
         If floodRadio.Enabled Then floodRadio.Enabled = False ' too much special handling - cv_32SC1 image 
-        findSlider("Color Reduction").Value = 32
+        redOptions.ColorReductionSlider.Value = 32
         cPtr = Fuzzy_Open()
         labels(2) = "Solid regions"
         labels(3) = "Fuzzy pixels - not solid"

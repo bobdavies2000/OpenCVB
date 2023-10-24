@@ -278,7 +278,7 @@ Public Class Histogram3D_BP : Inherits VB_Algorithm
     Public classCount As Integer
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        findSlider("Color Reduction").Value = 20
+        redOptions.ColorReductionSlider.Value = 20
         desc = "Backproject the 3D histogram for RGB"
     End Sub
     Public Sub RunVB(src As cv.Mat)

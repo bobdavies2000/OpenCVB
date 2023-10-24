@@ -311,7 +311,7 @@ Public Class Line_RegionsVB : Inherits VB_Algorithm
     Const lineMatch = 254
     Public Sub New()
         redOptions.BitwiseReduction.Checked = True
-        findSlider("Bits to remove in bitwise reduction").Value = 6
+        redOptions.BitwiseReductionSlider.Value = 6
 
         If findfrm(traceName + " CheckBoxes") Is Nothing Then
             check.Setup(traceName)

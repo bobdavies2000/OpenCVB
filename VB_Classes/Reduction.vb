@@ -11,26 +11,23 @@ Public Class Reduction_Basics : Inherits VB_Algorithm
             Dim bits = redOptions.BitwiseReductionSlider.Value
             classCount = 255 / Math.Pow(2, bits)
             Dim zeroBits = Math.Pow(2, bits) - 1
-            If task.optionsChanged Then dst1 = New cv.Mat(src.Size, src.Type, cv.Scalar.All(255 - zeroBits))
-            dst1 = src And dst1
-            dst0 = dst1 / zeroBits
+            dst0 = src And New cv.Mat(src.Size, src.Type, cv.Scalar.All(255 - zeroBits))
+            dst2 = dst0 / zeroBits
         ElseIf redOptions.reduction = OptionsRedCloud.simpleReduce Then
             Dim reductionVal = redOptions.ColorReductionSlider.Value
             classCount = Math.Ceiling(255 / reductionVal)
 
             dst0 = src / reductionVal
-            dst1 = dst0 * reductionVal
+            dst2 = dst0 * reductionVal
             labels(2) = "Reduced image - factor = " + CStr(redOptions.ColorReductionSlider.Value)
         Else
-            dst1 = src
+            dst2 = src
             labels(2) = "No reduction requested"
         End If
 
         If standalone Or testIntermediate(traceName) Then
-            dst2 = vbPalette(dst1)
+            dst2 = vbPalette(dst2)
             dst3 = task.palette.dst2
-        Else
-            dst2 = dst1
         End If
         labels(2) = CStr(classCount) + " colors after reduction"
     End Sub
@@ -42,7 +39,7 @@ End Class
 
 Public Class Reduction_Floodfill : Inherits VB_Algorithm
     Public reduction As New Reduction_Basics
-    Public flood As New Flood_RedColor
+    Public flood As New FloodCell_Basics
     Public Sub New()
         labels(2) = "Reduced input to floodfill"
         redOptions.ColorReductionSlider.Value = 32
@@ -134,8 +131,8 @@ Public Class Reduction_XYZ : Inherits VB_Algorithm
             check.Box(0).Checked = True
             check.Box(1).Checked = True
         End If
-        findSlider("Color Reduction").Maximum = 1000
-        findSlider("Color Reduction").Value = 400
+        redOptions.ColorReductionSlider.Maximum = 1000
+        redOptions.ColorReductionSlider.Value = 400
         desc = "Use reduction to slice the point cloud in 3 dimensions"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -222,7 +219,7 @@ Public Class Reduction_RGB : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Dim mats As New Mat_4Click
     Public Sub New()
-        findSlider("Color Reduction").Value = 200
+        redOptions.ColorReductionSlider.Value = 200
         desc = "Reduce RGB in parallel"
     End Sub
     Public Sub RunVB(src As cv.Mat)

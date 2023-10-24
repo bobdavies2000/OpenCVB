@@ -68,7 +68,7 @@ Public Class FloodCell_Basics : Inherits VB_Algorithm
 
             task.fCells.Add(fc)
 
-            If standalone Or testIntermediate(traceName) Then dst2(fc.rect).SetTo(fc.color, fc.mask)
+            dst2(fc.rect).SetTo(fc.color, fc.mask)
         Next
 
         If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions were identified."

@@ -233,15 +233,14 @@ Public Class GuidedBP_kTop : Inherits VB_Algorithm
         dst2 = colorC.dst2
 
         dst3.SetTo(0)
-        For Each rc In colorC.redCells
-            If rc.index = 0 Then Continue For
+        For Each fc In task.fCells
             Dim histogram As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-            autoX.histogram(rc.rect).CopyTo(histogram(rc.rect), rc.mask)
+            autoX.histogram(fc.rect).CopyTo(histogram(fc.rect), fc.mask)
             cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histogram, dst0, task.rangesTop)
             Dim mask = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
             contours.Run(mask)
-            setTrueText(CStr(rc.index), rc.maxDist)
-            vbDrawContour(dst3, contours.bestContour, rc.color, -1)
+            setTrueText(CStr(fc.index), fc.maxDist)
+            vbDrawContour(dst3, contours.bestContour, fc.color, -1)
         Next
 
         Static saveTrueData As List(Of trueText)
@@ -277,15 +276,14 @@ Public Class GuidedBP_kSide : Inherits VB_Algorithm
         dst2 = colorC.dst2
 
         dst3.SetTo(0)
-        For Each rc In colorC.redCells
-            If rc.index = 0 Then Continue For
+        For Each fc In task.fCells
             Dim histogram As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
-            autoY.histogram(rc.rect).CopyTo(histogram(rc.rect), rc.mask)
+            autoY.histogram(fc.rect).CopyTo(histogram(fc.rect), fc.mask)
             cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogram, dst0, task.rangesSide)
             Dim mask = dst0.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
             contours.Run(mask)
-            setTrueText(CStr(rc.index), rc.maxDist)
-            vbDrawContour(dst3, contours.bestContour, rc.color, -1)
+            setTrueText(CStr(fc.index), fc.maxDist)
+            vbDrawContour(dst3, contours.bestContour, fc.color, -1)
         Next
 
         Static saveTrueData As List(Of trueText)

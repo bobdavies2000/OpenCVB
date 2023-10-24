@@ -72,6 +72,7 @@ Public Class Watershed_DepthReduction : Inherits VB_Algorithm
         watershed.Run(dst3)
         dst2 = watershed.dst2
         labels(2) = watershed.labels(2)
+        setTrueText("Draw anywhere in dst2 to add regions.", 3)
     End Sub
 End Class
 

@@ -1446,7 +1446,6 @@ End Class
 
 
 Public Class RedCloud_ColorAndCloud : Inherits VB_Algorithm
-    Public redCells As New List(Of rcData)
     Dim guided As New GuidedBP_Depth
     Public floodCell As New FloodCell_Basics
     Dim reduction As New Reduction_Basics
