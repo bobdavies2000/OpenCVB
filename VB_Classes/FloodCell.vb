@@ -364,3 +364,104 @@ Public Class FloodCell_BasicsReduction : Inherits VB_Algorithm
         labels(2) = match.labels(2)
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class FloodCell_Binarize : Inherits VB_Algorithm
+    Dim binarize As New Binarize_RecurseAdd
+    Dim fCell As New FloodCell_Basics
+    Public Sub New()
+        labels(3) = "A 4-way split of the input grayscale image based on the amount of light"
+        desc = "Use RedCloud on a 4-way split based on light to dark in the image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        binarize.Run(src)
+        dst3 = vbPalette(binarize.dst1 * 255 / 4)
+
+        fCell.Run(binarize.dst1)
+        dst2 = fCell.dst2
+        labels(2) = fCell.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+' https://docs.opencv.org/master/de/d01/samples_2cpp_2connected_components_8cpp-example.html
+Public Class FloodCell_CComp : Inherits VB_Algorithm
+    Dim ccomp As New CComp_Both
+    Dim fCell As New FloodCell_Basics
+    Public Sub New()
+        desc = "Identify each Connected component as a RedCloud Cell."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        ccomp.Run(src)
+        dst3 = vbNormalize32f(ccomp.dst1)
+        fCell.Run(dst3)
+        dst2 = fCell.dst2
+        labels(2) = fCell.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FloodCell_HistValley : Inherits VB_Algorithm
+    Dim fCell As New FloodCell_Binarize
+    Dim valley As New HistValley_Basics
+    Dim dValley As New HistValley_Depth
+    Dim canny As New Edge_Canny
+    Public Sub New()
+        desc = "Use RedCloudY_Basics with the output of HistValley_Basics."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        valley.Run(src)
+        dst1 = valley.dst1.Clone
+
+        dValley.Run(src)
+        canny.Run(dValley.dst1)
+        dst1.SetTo(0, canny.dst2)
+
+        canny.Run(valley.dst1)
+        dst1.SetTo(0, canny.dst2)
+
+        fCell.Run(dst1)
+        dst2 = fCell.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FloodCell_KMeans : Inherits VB_Algorithm
+    Dim floodCell As New FloodCell_Basics
+    Dim km As New KMeans_MultiChannel
+    Public Sub New()
+        labels(3) = "The flooded cells numbered from largest (1) to smallast (x < 255)"
+        desc = "Floodfill the KMeans output so each cell can be tracked."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        km.Run(src)
+
+        floodCell.Run(km.dst2)
+
+        dst2 = floodCell.dst2
+        dst3 = floodCell.dst3
+        labels(2) = floodCell.labels(2)
+    End Sub
+End Class

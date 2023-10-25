@@ -1632,3 +1632,49 @@ Public Class RedCloud_PrepTest : Inherits VB_Algorithm
         If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions identified"
     End Sub
 End Class
+
+
+
+
+
+
+
+
+' https://docs.opencv.org/master/de/d01/samples_2cpp_2connected_components_8cpp-example.html
+Public Class RedCloud_CComp : Inherits VB_Algorithm
+    Dim ccomp As New CComp_Both
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        desc = "Identify each Connected component as a RedCloud Cell."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        ccomp.Run(src)
+        dst3 = vbNormalize32f(ccomp.dst1)
+        redC.Run(dst3)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_BProject3D : Inherits VB_Algorithm
+    Dim colorC As New RedCloud_Basics
+    Dim bp3d As New Histogram3D_BP
+    Public Sub New()
+        desc = "Run RedCloudY_Basics on the output of the RGB 3D backprojection"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        bp3d.Run(src)
+        dst3 = bp3d.dst2
+
+        colorC.Run(dst3)
+        dst2 = colorC.dst2
+    End Sub
+End Class

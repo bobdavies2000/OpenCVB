@@ -128,7 +128,7 @@ End Class
 
 Public Class CComp_Hulls : Inherits VB_Algorithm
     Dim ccomp As New CComp_Both
-    Dim hulls As New RedCloudY_Hulls
+    Dim hulls As New RedCloud_Hulls
     Public Sub New()
         desc = "Create connected components using RedCloud Hulls"
     End Sub
@@ -137,8 +137,8 @@ Public Class CComp_Hulls : Inherits VB_Algorithm
         dst2 = ccomp.dst3
         ccomp.dst1.ConvertTo(dst1, cv.MatType.CV_8U)
         hulls.Run(dst1)
-        dst2 = hulls.dst2
-        labels(2) = hulls.labels(2)
+        dst2 = hulls.dst3
+        labels(2) = hulls.labels(3)
     End Sub
 End Class
 

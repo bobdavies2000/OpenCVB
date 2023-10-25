@@ -1,5 +1,4 @@
 ﻿Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
 Public Class RedCloudY_Basics : Inherits VB_Algorithm
     Public prep As New RedCloud_PrepPointCloud
     Public floodCell As New FloodCell_Basics
@@ -719,35 +718,6 @@ End Class
 
 
 
-Public Class RedCloud_ByIndex : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("RedColor cell index", 0, 100, 1)
-        labels = {"", "", "RedColor Output", ""}
-        desc = "Select a RedColor cell using a slider."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static indexSlider = findSlider("RedColor cell index")
-
-        redC.Run(src)
-        dst0 = redC.dst0
-        dst2 = redC.dst2
-
-        indexSlider.maximum = task.redCells.Count - 1
-        Dim rc = task.redCells(indexSlider.value)
-        task.clickPoint = rc.maxDist
-        redC.redSelect(dst0, dst1, dst2)
-        labels(2) = redC.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class RedCloudY_Track5D : Inherits VB_Algorithm
     Dim colorC As New RedCloudY_Basics
     Public Sub New()
@@ -908,27 +878,6 @@ End Class
 
 
 
-
-Public Class RedCloudY_BProject3D : Inherits VB_Algorithm
-    Dim colorC As New RedCloudY_Basics
-    Dim bp3d As New Histogram3D_BP
-    Public Sub New()
-        desc = "Run RedCloudY_Basics on the output of the RGB 3D backprojection"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        bp3d.Run(src)
-        dst3 = bp3d.dst2
-
-        colorC.Run(dst3)
-        dst2 = colorC.dst2
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class RedCloudY_ByDepth : Inherits VB_Algorithm
     Dim colorC As New RedCloudY_Basics
     Dim depth As New Depth_Tiers
@@ -984,32 +933,10 @@ End Class
 
 
 
-Public Class RedCloudY_Binarize : Inherits VB_Algorithm
-    Dim binarize As New Binarize_RecurseAdd
-    Dim redC As New RedCloudY_Basics
-    Public Sub New()
-        labels(3) = "A 4-way split of the input grayscale image based on the amount of light"
-        desc = "Use RedCloud on a 4-way split of the image based on light"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        binarize.Run(src)
-        dst3 = vbPalette(binarize.dst1 * 255 / 4)
-
-        redC.Run(binarize.dst1)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class RedCloudY_CCompBinarized : Inherits VB_Algorithm
     Dim edges As New Edge_BinarizedSobel
-    Dim ccomp As New RedCloudY_Binarize
+    Dim ccomp As New FloodCell_Binarize
     Public Sub New()
         labels(3) = "Binarized Sobel output"
         desc = "Use the binarized edges to find the different blobs in the image"
@@ -1024,28 +951,6 @@ Public Class RedCloudY_CCompBinarized : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-' https://docs.opencv.org/master/de/d01/samples_2cpp_2connected_components_8cpp-example.html
-Public Class RedCloudY_CComp : Inherits VB_Algorithm
-    Dim ccomp As New CComp_Both
-    Dim redC As New RedCloudY_Basics
-    Public Sub New()
-        desc = "Identify each Connected component as a RedCloud Cell."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        ccomp.Run(src)
-        dst3 = ccomp.dst1.Clone
-        redC.Run(dst3)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-    End Sub
-End Class
 
 
 
@@ -1074,36 +979,6 @@ Public Class RedCloudY_Diff : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class RedCloudY_HistValley : Inherits VB_Algorithm
-    Dim colorC As New RedCloudY_Binarize
-    Dim valley As New HistValley_Basics
-    Dim dValley As New HistValley_Depth
-    Dim canny As New Edge_Canny
-    Public Sub New()
-        desc = "Use RedCloudY_Basics with the output of HistValley_Basics."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        valley.Run(src)
-        dst1 = valley.dst1.Clone
-
-        dValley.Run(src)
-        canny.Run(dValley.dst1)
-        dst1.SetTo(0, canny.dst2)
-
-        canny.Run(valley.dst1)
-        dst1.SetTo(0, canny.dst2)
-
-        colorC.Run(dst1)
-        dst2 = colorC.dst2
-    End Sub
-End Class
 
 
 
@@ -1193,50 +1068,6 @@ Public Class RedCloudY_CellStats : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class RedCloudY_Hulls : Inherits VB_Algorithm
-    Dim convex As New Convex_RedCloudDefects
-    Dim colorC As New RedCloudY_Basics
-    Public redCells As New List(Of rcData)
-    Public cellMap As New cv.Mat
-    Public Sub New()
-        cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "Improved contour results using OpenCV's ConvexityDefects"
-        desc = "Add hulls and improved contours using ConvexityDefects to each RedColor cell"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        colorC.Run(src)
-        dst2 = colorC.dst2
-
-        dst3.SetTo(0)
-        redCells.Clear()
-        Dim defectCount As Integer
-        For Each rc In colorC.redCells
-            rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
-            Dim hullIndices = cv.Cv2.ConvexHullIndices(rc.hull.ToArray, False)
-            Try
-                Dim defects = cv.Cv2.ConvexityDefects(rc.contour, hullIndices)
-                rc.contour = convex.betterContour(rc.contour, defects)
-            Catch ex As Exception
-                Console.WriteLine("Defect encountered in the rc.contour - see 'RedColor_Hulls' defectCount")
-                defectCount += 1
-            End Try
-            redCells.Add(rc)
-
-            vbDrawContour(cellMap(rc.rect), rc.hull, rc.index, -1)
-            vbDrawContour(dst3(rc.rect), rc.hull, rc.color, -1)
-            If standalone Then dst3.Circle(rc.maxDist, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
-        Next
-
-        showSelection(dst3)
-        labels(2) = CStr(redCells.Count) + " hulls identified below.  " + CStr(defectCount) + " hulls failed to build the defect list."
-    End Sub
-End Class
 
 
 
