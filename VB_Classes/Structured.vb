@@ -1285,7 +1285,7 @@ Public Class Structured_CountSideSum : Inherits VB_Algorithm
     Public maxCountIndex As Integer
     Public yValues As New List(Of Single)
     Public Sub New()
-        findSlider("Y-Range X100").Value += 50 ' to get the point cloud into the histogram.
+        redOptions.TopViewThreshold.Value += 50 ' to get the point cloud into the histogram.
         labels = {"", "Max Slice output - likely flat surface", "Structured Slice heatmap input - red line is max", "Histogram of pixel counts in each slice"}
         desc = "Count the number of points found in each slice of the point cloud data."
     End Sub
@@ -1305,6 +1305,8 @@ Public Class Structured_CountSideSum : Inherits VB_Algorithm
         dst2 = dst2.Threshold(0, cv.Scalar.White, cv.ThresholdTypes.Binary)
 
         Dim max = counts.Max
+        If max = 0 Then Exit Sub
+
         Dim surfaces As New List(Of Single)
         For i = 0 To counts.Count - 1
             If counts(i) >= max / 2 Then
