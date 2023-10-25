@@ -1564,31 +1564,29 @@ End Class
 
 
 Public Class RedCloud_PrepPointCloud : Inherits VB_Algorithm
-    Dim options As New Options_RedCloud
     Public Sub New()
         desc = "Reduction transform for the point cloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        Dim reduceAmt = options.reduction
+        Dim reduceAmt = redOptions.PCreductionSlider.Value
         task.pointCloud.ConvertTo(dst0, cv.MatType.CV_32S, 1000 / reduceAmt)
 
         Dim split = dst0.Split()
-        Select Case options.prepDataCase
-            Case 0
+
+        Select Case redOptions.PCReduction
+            Case OptionsRedCloud.reduceX
                 dst0 = split(0) * reduceAmt
-            Case 1
+            Case OptionsRedCloud.reduceY
                 dst0 = split(1) * reduceAmt
-            Case 2
+            Case OptionsRedCloud.reduceZ
                 dst0 = split(2) * reduceAmt
-            Case 3
+            Case OptionsRedCloud.reduceXY
                 dst0 = split(0) * reduceAmt + split(1) * reduceAmt
-            Case 4
+            Case OptionsRedCloud.reduceXZ
                 dst0 = split(0) * reduceAmt + split(2) * reduceAmt
-            Case 5
+            Case OptionsRedCloud.reduceYZ
                 dst0 = split(1) * reduceAmt + split(2) * reduceAmt
-            Case 6
+            Case OptionsRedCloud.reduceXYZ
                 dst0 = split(0) * reduceAmt + split(1) * reduceAmt + split(2) * reduceAmt
         End Select
 
@@ -1631,30 +1629,6 @@ Public Class RedCloud_PrepTest : Inherits VB_Algorithm
         dst3 = fCell.dst3
 
         If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions identified"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-' https://docs.opencv.org/master/de/d01/samples_2cpp_2connected_components_8cpp-example.html
-Public Class RedCloud_CComp : Inherits VB_Algorithm
-    Dim ccomp As New CComp_Both
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        desc = "Identify each Connected component as a RedCloud Cell."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        ccomp.Run(src)
-        dst3 = vbNormalize32f(ccomp.dst1)
-        redC.Run(dst3)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
     End Sub
 End Class
 

@@ -58,16 +58,27 @@ Partial Class OptionsRedCloud
         Me.UpperSlider = New System.Windows.Forms.TrackBar()
         Me.Label18 = New System.Windows.Forms.Label()
         Me.GroupReduction = New System.Windows.Forms.GroupBox()
-        Me.BitwiseReduction = New System.Windows.Forms.RadioButton()
         Me.NoReduction = New System.Windows.Forms.RadioButton()
+        Me.BitwiseReduction = New System.Windows.Forms.RadioButton()
         Me.SimpleReduction = New System.Windows.Forms.RadioButton()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
+        Me.PCreductionLabel = New System.Windows.Forms.Label()
+        Me.PCreductionSlider = New System.Windows.Forms.TrackBar()
+        Me.Label5 = New System.Windows.Forms.Label()
         Me.bitwiseLabel = New System.Windows.Forms.Label()
         Me.BitwiseReductionSlider = New System.Windows.Forms.TrackBar()
         Me.reduceXbits = New System.Windows.Forms.Label()
         Me.ColorLabel = New System.Windows.Forms.Label()
         Me.ColorReductionSlider = New System.Windows.Forms.TrackBar()
         Me.ColorReduce = New System.Windows.Forms.Label()
+        Me.GroupBox4 = New System.Windows.Forms.GroupBox()
+        Me.RadioButton11 = New System.Windows.Forms.RadioButton()
+        Me.RadioButton10 = New System.Windows.Forms.RadioButton()
+        Me.RadioButton9 = New System.Windows.Forms.RadioButton()
+        Me.ReductionXY = New System.Windows.Forms.RadioButton()
+        Me.RadioButton7 = New System.Windows.Forms.RadioButton()
+        Me.RadioButton5 = New System.Windows.Forms.RadioButton()
+        Me.RadioButton6 = New System.Windows.Forms.RadioButton()
         Me.RedCloudSliders.SuspendLayout()
         CType(Me.GridSizeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TopViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -82,8 +93,10 @@ Partial Class OptionsRedCloud
         CType(Me.UpperSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupReduction.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
+        CType(Me.PCreductionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.BitwiseReductionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.ColorReductionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox4.SuspendLayout()
         Me.SuspendLayout()
         '
         'RedCloudSliders
@@ -392,9 +405,9 @@ Partial Class OptionsRedCloud
         Me.GroupBox2.Controls.Add(Me.UpperLabel)
         Me.GroupBox2.Controls.Add(Me.UpperSlider)
         Me.GroupBox2.Controls.Add(Me.Label18)
-        Me.GroupBox2.Location = New System.Drawing.Point(849, 358)
+        Me.GroupBox2.Location = New System.Drawing.Point(12, 470)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(831, 150)
+        Me.GroupBox2.Size = New System.Drawing.Size(819, 150)
         Me.GroupBox2.TabIndex = 5
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Guided Backprojection Region Controls"
@@ -458,15 +471,26 @@ Partial Class OptionsRedCloud
         '
         'GroupReduction
         '
-        Me.GroupReduction.Controls.Add(Me.BitwiseReduction)
         Me.GroupReduction.Controls.Add(Me.NoReduction)
+        Me.GroupReduction.Controls.Add(Me.BitwiseReduction)
         Me.GroupReduction.Controls.Add(Me.SimpleReduction)
-        Me.GroupReduction.Location = New System.Drawing.Point(1117, 211)
+        Me.GroupReduction.Location = New System.Drawing.Point(1119, 36)
         Me.GroupReduction.Name = "GroupReduction"
-        Me.GroupReduction.Size = New System.Drawing.Size(250, 141)
+        Me.GroupReduction.Size = New System.Drawing.Size(250, 130)
         Me.GroupReduction.TabIndex = 5
         Me.GroupReduction.TabStop = False
         Me.GroupReduction.Text = "Reduction Options"
+        '
+        'NoReduction
+        '
+        Me.NoReduction.AutoSize = True
+        Me.NoReduction.Location = New System.Drawing.Point(28, 97)
+        Me.NoReduction.Name = "NoReduction"
+        Me.NoReduction.Size = New System.Drawing.Size(131, 24)
+        Me.NoReduction.TabIndex = 4
+        Me.NoReduction.TabStop = True
+        Me.NoReduction.Text = "No Reduction"
+        Me.NoReduction.UseVisualStyleBackColor = True
         '
         'BitwiseReduction
         '
@@ -478,17 +502,6 @@ Partial Class OptionsRedCloud
         Me.BitwiseReduction.TabStop = True
         Me.BitwiseReduction.Text = "Use Bitwise Reduction"
         Me.BitwiseReduction.UseVisualStyleBackColor = True
-        '
-        'NoReduction
-        '
-        Me.NoReduction.AutoSize = True
-        Me.NoReduction.Location = New System.Drawing.Point(28, 97)
-        Me.NoReduction.Name = "NoReduction"
-        Me.NoReduction.Size = New System.Drawing.Size(131, 24)
-        Me.NoReduction.TabIndex = 2
-        Me.NoReduction.TabStop = True
-        Me.NoReduction.Text = "No Reduction"
-        Me.NoReduction.UseVisualStyleBackColor = True
         '
         'SimpleReduction
         '
@@ -503,18 +516,50 @@ Partial Class OptionsRedCloud
         '
         'GroupBox3
         '
+        Me.GroupBox3.Controls.Add(Me.PCreductionLabel)
+        Me.GroupBox3.Controls.Add(Me.PCreductionSlider)
+        Me.GroupBox3.Controls.Add(Me.Label5)
         Me.GroupBox3.Controls.Add(Me.bitwiseLabel)
         Me.GroupBox3.Controls.Add(Me.BitwiseReductionSlider)
         Me.GroupBox3.Controls.Add(Me.reduceXbits)
         Me.GroupBox3.Controls.Add(Me.ColorLabel)
         Me.GroupBox3.Controls.Add(Me.ColorReductionSlider)
         Me.GroupBox3.Controls.Add(Me.ColorReduce)
-        Me.GroupBox3.Location = New System.Drawing.Point(12, 450)
+        Me.GroupBox3.Location = New System.Drawing.Point(849, 384)
         Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(831, 150)
+        Me.GroupBox3.Size = New System.Drawing.Size(831, 236)
         Me.GroupBox3.TabIndex = 6
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "Reduction Sliders"
+        '
+        'PCreductionLabel
+        '
+        Me.PCreductionLabel.AutoSize = True
+        Me.PCreductionLabel.Location = New System.Drawing.Point(667, 161)
+        Me.PCreductionLabel.Name = "PCreductionLabel"
+        Me.PCreductionLabel.Size = New System.Drawing.Size(98, 20)
+        Me.PCreductionLabel.TabIndex = 14
+        Me.PCreductionLabel.Text = "BitwiseLabel"
+        '
+        'PCreductionSlider
+        '
+        Me.PCreductionSlider.Location = New System.Drawing.Point(156, 155)
+        Me.PCreductionSlider.Maximum = 2500
+        Me.PCreductionSlider.Minimum = 1
+        Me.PCreductionSlider.Name = "PCreductionSlider"
+        Me.PCreductionSlider.Size = New System.Drawing.Size(506, 69)
+        Me.PCreductionSlider.TabIndex = 13
+        Me.PCreductionSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.PCreductionSlider.Value = 250
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(8, 161)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(153, 20)
+        Me.Label5.TabIndex = 12
+        Me.Label5.Text = "Pointcloud reduction"
         '
         'bitwiseLabel
         '
@@ -572,11 +617,105 @@ Partial Class OptionsRedCloud
         Me.ColorReduce.TabIndex = 6
         Me.ColorReduce.Text = "Color Reduction"
         '
+        'GroupBox4
+        '
+        Me.GroupBox4.Controls.Add(Me.RadioButton11)
+        Me.GroupBox4.Controls.Add(Me.RadioButton10)
+        Me.GroupBox4.Controls.Add(Me.RadioButton9)
+        Me.GroupBox4.Controls.Add(Me.ReductionXY)
+        Me.GroupBox4.Controls.Add(Me.RadioButton7)
+        Me.GroupBox4.Controls.Add(Me.RadioButton5)
+        Me.GroupBox4.Controls.Add(Me.RadioButton6)
+        Me.GroupBox4.Location = New System.Drawing.Point(1119, 178)
+        Me.GroupBox4.Name = "GroupBox4"
+        Me.GroupBox4.Size = New System.Drawing.Size(495, 174)
+        Me.GroupBox4.TabIndex = 7
+        Me.GroupBox4.TabStop = False
+        Me.GroupBox4.Text = "PointCloud Reduction"
+        '
+        'RadioButton11
+        '
+        Me.RadioButton11.AutoSize = True
+        Me.RadioButton11.Location = New System.Drawing.Point(242, 103)
+        Me.RadioButton11.Name = "RadioButton11"
+        Me.RadioButton11.Size = New System.Drawing.Size(167, 24)
+        Me.RadioButton11.TabIndex = 8
+        Me.RadioButton11.TabStop = True
+        Me.RadioButton11.Text = "Reduce PC in XYZ"
+        Me.RadioButton11.UseVisualStyleBackColor = True
+        '
+        'RadioButton10
+        '
+        Me.RadioButton10.AutoSize = True
+        Me.RadioButton10.Location = New System.Drawing.Point(242, 71)
+        Me.RadioButton10.Name = "RadioButton10"
+        Me.RadioButton10.Size = New System.Drawing.Size(156, 24)
+        Me.RadioButton10.TabIndex = 7
+        Me.RadioButton10.TabStop = True
+        Me.RadioButton10.Text = "Reduce PC in YZ"
+        Me.RadioButton10.UseVisualStyleBackColor = True
+        '
+        'RadioButton9
+        '
+        Me.RadioButton9.AutoSize = True
+        Me.RadioButton9.Location = New System.Drawing.Point(242, 39)
+        Me.RadioButton9.Name = "RadioButton9"
+        Me.RadioButton9.Size = New System.Drawing.Size(156, 24)
+        Me.RadioButton9.TabIndex = 6
+        Me.RadioButton9.TabStop = True
+        Me.RadioButton9.Text = "Reduce PC in XZ"
+        Me.RadioButton9.UseVisualStyleBackColor = True
+        '
+        'ReductionXY
+        '
+        Me.ReductionXY.AutoSize = True
+        Me.ReductionXY.Location = New System.Drawing.Point(28, 139)
+        Me.ReductionXY.Name = "ReductionXY"
+        Me.ReductionXY.Size = New System.Drawing.Size(157, 24)
+        Me.ReductionXY.TabIndex = 5
+        Me.ReductionXY.TabStop = True
+        Me.ReductionXY.Text = "Reduce PC in XY"
+        Me.ReductionXY.UseVisualStyleBackColor = True
+        '
+        'RadioButton7
+        '
+        Me.RadioButton7.AutoSize = True
+        Me.RadioButton7.Location = New System.Drawing.Point(28, 105)
+        Me.RadioButton7.Name = "RadioButton7"
+        Me.RadioButton7.Size = New System.Drawing.Size(145, 24)
+        Me.RadioButton7.TabIndex = 4
+        Me.RadioButton7.TabStop = True
+        Me.RadioButton7.Text = "Reduce PC in Z"
+        Me.RadioButton7.UseVisualStyleBackColor = True
+        '
+        'RadioButton5
+        '
+        Me.RadioButton5.AutoSize = True
+        Me.RadioButton5.Location = New System.Drawing.Point(28, 71)
+        Me.RadioButton5.Name = "RadioButton5"
+        Me.RadioButton5.Size = New System.Drawing.Size(146, 24)
+        Me.RadioButton5.TabIndex = 3
+        Me.RadioButton5.TabStop = True
+        Me.RadioButton5.Text = "Reduce PC in Y"
+        Me.RadioButton5.UseVisualStyleBackColor = True
+        '
+        'RadioButton6
+        '
+        Me.RadioButton6.AutoSize = True
+        Me.RadioButton6.Location = New System.Drawing.Point(28, 37)
+        Me.RadioButton6.Name = "RadioButton6"
+        Me.RadioButton6.Size = New System.Drawing.Size(146, 24)
+        Me.RadioButton6.TabIndex = 0
+        Me.RadioButton6.TabStop = True
+        Me.RadioButton6.Text = "Reduce PC in X"
+        Me.RadioButton6.UseVisualStyleBackColor = True
+        '
         'OptionsRedCloud
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1690, 616)
+        Me.ClientSize = New System.Drawing.Size(1690, 632)
+        Me.Controls.Add(Me.GroupBox4)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.GroupReduction)
         Me.Controls.Add(Me.GroupBox2)
@@ -605,8 +744,11 @@ Partial Class OptionsRedCloud
         Me.GroupReduction.PerformLayout()
         Me.GroupBox3.ResumeLayout(False)
         Me.GroupBox3.PerformLayout()
+        CType(Me.PCreductionSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.BitwiseReductionSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.ColorReductionSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox4.ResumeLayout(False)
+        Me.GroupBox4.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -647,7 +789,6 @@ Partial Class OptionsRedCloud
     Friend WithEvents Label18 As Windows.Forms.Label
     Friend WithEvents GroupReduction As Windows.Forms.GroupBox
     Friend WithEvents BitwiseReduction As Windows.Forms.RadioButton
-    Friend WithEvents NoReduction As Windows.Forms.RadioButton
     Friend WithEvents SimpleReduction As Windows.Forms.RadioButton
     Friend WithEvents GroupBox3 As Windows.Forms.GroupBox
     Friend WithEvents bitwiseLabel As Windows.Forms.Label
@@ -656,4 +797,16 @@ Partial Class OptionsRedCloud
     Friend WithEvents ColorLabel As Windows.Forms.Label
     Friend WithEvents ColorReductionSlider As Windows.Forms.TrackBar
     Friend WithEvents ColorReduce As Windows.Forms.Label
+    Friend WithEvents PCreductionLabel As Windows.Forms.Label
+    Friend WithEvents PCreductionSlider As Windows.Forms.TrackBar
+    Friend WithEvents Label5 As Windows.Forms.Label
+    Friend WithEvents GroupBox4 As Windows.Forms.GroupBox
+    Friend WithEvents RadioButton9 As Windows.Forms.RadioButton
+    Friend WithEvents ReductionXY As Windows.Forms.RadioButton
+    Friend WithEvents RadioButton7 As Windows.Forms.RadioButton
+    Friend WithEvents RadioButton5 As Windows.Forms.RadioButton
+    Friend WithEvents RadioButton6 As Windows.Forms.RadioButton
+    Friend WithEvents RadioButton11 As Windows.Forms.RadioButton
+    Friend WithEvents RadioButton10 As Windows.Forms.RadioButton
+    Friend WithEvents NoReduction As Windows.Forms.RadioButton
 End Class

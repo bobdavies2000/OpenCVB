@@ -3042,46 +3042,6 @@ End Class
 
 
 
-Public Class Options_RedCloud : Inherits VB_Algorithm
-    Public reduction As Integer
-    Public prepDataCase As Integer
-    Public planeCoefficientThreshold As Single
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("PointCloud Reduction", 1, 2500, 250)
-            sliders.setupTrackBar("Plane Coefficient threshold", 1, 100, 95)
-        End If
-
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Reduce point cloud in X")
-            radio.addRadio("Reduce point cloud in Y")
-            radio.addRadio("Reduce point cloud in Z")
-            radio.addRadio("Reduce point cloud in XY")
-            radio.addRadio("Reduce point cloud in XZ")
-            radio.addRadio("Reduce point cloud in YZ")
-            radio.addRadio("Reduce point cloud in XYZ")
-            radio.check(3).Checked = True
-        End If
-    End Sub
-    Public Sub RunVB()
-        Static frm = findfrm(traceName + " Radio Buttons")
-        For prepDataCase = 0 To frm.check.count - 1
-            If frm.check(prepDataCase).Checked Then Exit For
-        Next
-
-        Static reduceSlider = findSlider("PointCloud Reduction")
-        Static planeSlider = findSlider("Plane Coefficient threshold")
-
-        reduction = reduceSlider.Value
-        planeCoefficientThreshold = planeSlider.Value / 100
-    End Sub
-End Class
-
-
-
-
-
 
 
 
