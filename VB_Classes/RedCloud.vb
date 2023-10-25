@@ -353,6 +353,7 @@ Public Class RedCloud_CellStats : Inherits VB_Algorithm
     Dim plot As New Histogram_Depth
     Dim pca As New PCA_Basics
     Dim eq As New Plane_Equation
+    Public runRedCloud As Boolean
     Public redC As Object
     Public Sub New()
         If standalone Then gOptions.displayDst0.Checked = True
@@ -410,7 +411,7 @@ Public Class RedCloud_CellStats : Inherits VB_Algorithm
         End If
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If standalone Then
+        If standalone Or runRedCloud Then
             If firstPass Then redC = New RedCloud_Basics
             redC.Run(src)
             dst0 = redC.dst0
@@ -1676,5 +1677,410 @@ Public Class RedCloud_BProject3D : Inherits VB_Algorithm
 
         colorC.Run(dst3)
         dst2 = colorC.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class RedCloud_SliceH : Inherits VB_Algorithm
+    Dim stats As New RedCloud_CellStats
+    Public Sub New()
+        stats.redC = New RedCloud_Basics
+        redOptions.Channels12.Checked = True
+        desc = "Build horizontal RedCloud cells"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        stats.redC.run(src)
+
+        stats.Run(src)
+        dst2 = stats.redC.dst2
+        setTrueText(stats.strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_SliceV : Inherits VB_Algorithm
+    Dim stats As New RedCloud_CellStats
+    Public Sub New()
+        stats.redC = New RedCloud_Basics
+        redOptions.Channels02.Checked = True
+        desc = "Build vertical RedCloud cells."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        stats.redC.run(src)
+
+        stats.Run(src)
+        dst2 = stats.redC.dst2
+        setTrueText(stats.strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_World : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Dim world As New Depth_World
+    Public Sub New()
+        labels = {"", "", "RedCloud reduction of generated point cloud", "Generated pointcloud"}
+        desc = "Display the output of a generated pointcloud as RedCloud cells"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        world.Run(src)
+        task.pointCloud = world.dst2
+
+        redC.Run(src)
+        dst2 = redC.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_ByDepth : Inherits VB_Algorithm
+    Dim colorC As New RedCloud_Basics
+    Dim depth As New Depth_Tiers
+    Public Sub New()
+        desc = "Run RedCloud with depth layers - a reduced image view"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        depth.Run(src)
+        dst3 = depth.dst2
+
+        colorC.Run(dst3)
+        dst2 = colorC.dst2
+        labels = colorC.labels
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_UnstableCells : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Dim diff As New Diff_Basics
+    Public Sub New()
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Identify cells that were not the same color in the previous generation"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        diff.Run(redC.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+
+        Static history As New List(Of cv.Mat)
+        history.Add(diff.dst3)
+
+        dst3.SetTo(0)
+        For Each m In history
+            dst3 = dst3 Or m
+        Next
+        If history.Count >= task.historyCount Then history.RemoveAt(0)
+
+        dst2.SetTo(0, dst3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+Public Class RedCloud_ContourCorners : Inherits VB_Algorithm
+    Public corners(4 - 1) As cv.Point
+    Public rc As New rcData
+    Public Sub New()
+        labels(2) = "The RedCloud Output with the highlighted contour to smooth"
+        desc = "Find the point farthest from the center in each cell."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Then
+            Static redC As New RedCloud_Basics
+            redC.Run(src)
+            dst2 = redC.dst2
+            labels(2) = redC.labels(2)
+            rc = task.rcSelect
+        End If
+
+        dst3.SetTo(0)
+        dst3.Circle(rc.maxDist, task.dotSize, cv.Scalar.White, task.lineWidth)
+        Dim center As New cv.Point(rc.maxDist.X - rc.rect.X, rc.maxDist.Y - rc.rect.Y)
+        Dim maxDistance(4 - 1) As Single
+        For i = 0 To corners.Length - 1
+            corners(i) = center ' default is the center - a triangle shape can omit a corner
+        Next
+        If rc.contour Is Nothing Then Exit Sub
+        For Each pt In rc.contour
+            Dim quad As Integer
+            If pt.X - center.X >= 0 And pt.Y - center.Y <= 0 Then quad = 0 ' upper right quadrant
+            If pt.X - center.X >= 0 And pt.Y - center.Y >= 0 Then quad = 1 ' lower right quadrant
+            If pt.X - center.X <= 0 And pt.Y - center.Y >= 0 Then quad = 2 ' lower left quadrant
+            If pt.X - center.X <= 0 And pt.Y - center.Y <= 0 Then quad = 3 ' upper left quadrant
+            Dim dist = center.DistanceTo(pt)
+            If dist > maxDistance(quad) Then
+                maxDistance(quad) = dist
+                corners(quad) = pt
+            End If
+        Next
+
+        vbDrawContour(dst3(rc.rect), rc.contour, cv.Scalar.White)
+        For i = 0 To corners.Count - 1
+            dst3(rc.rect).Line(center, corners(i), cv.Scalar.White, task.lineWidth, task.lineType)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_KMeans : Inherits VB_Algorithm
+    Dim km As New KMeans_MultiChannel
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        labels = {"", "", "KMeans_MultiChannel output", "RedCloudY_Basics output"}
+        desc = "Use RedCloud to identify the regions created by kMeans"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        km.Run(src)
+        dst2 = km.dst2
+
+        redC.Run(km.dst3)
+        dst3 = redC.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class RedCloud_Diff : Inherits VB_Algorithm
+    Dim diff As New Diff_RGBAccum
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        labels = {"", "", "Diff output, RedCloud input", "RedCloud output"}
+        desc = "Isolate blobs in the diff output with RedCloud"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        setTrueText("Wave at the camera to see the segmentation of the motion.", 3)
+        diff.Run(src)
+        dst2 = diff.dst2
+        redC.Run(dst2)
+
+        dst3.SetTo(0)
+        redC.dst2.CopyTo(dst3, dst2)
+
+        labels(3) = CStr(task.redCells.Count) + " objects identified in the diff output"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+Public Class RedCloud_LineID : Inherits VB_Algorithm
+    Public lines As New Line_Basics
+    Public rCells As New List(Of rcData)
+    Dim p1list As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
+    Dim p2list As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
+    Dim rectList As New List(Of cv.Point)
+    Dim maxDistance As Integer
+    Public redC As New RedCloud_Basics
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Width of line detected in the image", 1, 10, 2)
+            sliders.setupTrackBar("Width of Isolating line", 2, 10, 5)
+            sliders.setupTrackBar("Max distance between point and rect", 1, 20, 10)
+        End If
+
+        gOptions.useMotion.Checked = False
+        labels(3) = "Input to RedCloud"
+        desc = "Identify and isolate each line in the current image"
+    End Sub
+    Private Function connectDistance(rpt As cv.Point) As Integer
+        For i = 0 To p1list.Count - 1
+            Dim dist = p1list.ElementAt(i).Value.DistanceTo(rpt)
+            If dist < maxDistance Then Return i
+        Next
+        Return -1
+    End Function
+    Public Sub RunVB(src As cv.Mat)
+        Static lineSlider = findSlider("Width of line detected in the image")
+        Static isoSlider = findSlider("Width of Isolating line")
+        Static distSlider = findSlider("Max distance between point and rect")
+        Dim lineWidth = lineSlider.Value
+        Dim isolineWidth = isoSlider.Value
+        maxDistance = distSlider.Value
+
+        lines.Run(src)
+        If lines.sortLength.Count = 0 Then Exit Sub
+
+        Static rInput = New cv.Mat(dst2.Size, cv.MatType.CV_32S, 0)
+        rInput.setto(0)
+        p1list.Clear()
+        For i = lines.sortLength.Count - 1 To 0 Step -1
+            Dim mps = lines.mpList(lines.sortLength.ElementAt(i).Value)
+            rInput.Line(mps.p1, mps.p2, 0, isolineWidth, cv.LineTypes.Link4)
+            rInput.Line(mps.p1, mps.p2, 255, lineWidth, cv.LineTypes.Link4)
+            p1list.Add(mps.p1.Y, mps.p1)
+        Next
+
+        If rInput.Type = cv.MatType.CV_32SC1 Then rInput.convertto(rInput, cv.MatType.CV_8U)
+
+        redC.Run(rInput)
+        dst2.SetTo(0)
+        For Each rc In task.redCells
+            If rc.rect.Width = 0 Or rc.rect.Height = 0 Then Continue For
+            If rc.rect.Width < dst2.Width / 2 Or rc.rect.Height < dst2.Height / 2 Then dst2(rc.rect).SetTo(rc.color, rc.mask)
+        Next
+
+        If task.redCells.Count < 3 Then Exit Sub ' dark room - no cells.
+
+        Dim rcLargest As New rcData
+        For Each rc In task.redCells
+            If rc.rect.Width > dst2.Width / 2 And rc.rect.Height > dst2.Height / 2 Then Continue For
+            If rc.pixels > rcLargest.pixels Then rcLargest = rc
+        Next
+
+        dst2.Rectangle(rcLargest.rect, cv.Scalar.Yellow, task.lineWidth + 1, task.lineType)
+        labels(2) = CStr(task.redCells.Count) + " lines were identified.  Largest line detected is highlighted in yellow"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class RedCloud_KNNCenters : Inherits VB_Algorithm
+    Dim lines As New RedCloud_LineID
+    Dim knn As New KNN_Lossy
+    Dim ptTrace As New List(Of List(Of cv.Point))
+    Public Sub New()
+        labels = {"", "", "Line_ID output", "KNN_Basics output"}
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "use the mid-points in each line with KNN and identify the movement in each line"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        lines.Run(src)
+        dst2 = lines.dst2
+
+        knn.queries.Clear()
+        For Each rc In task.redCells
+            knn.queries.Add(rc.maxDist)
+        Next
+
+        knn.Run(Nothing)
+
+        Dim trace As New List(Of cv.Point2f)
+        Static regularPt As New List(Of cv.Point2f)
+        dst3.SetTo(0)
+        regularPt.Clear()
+        Dim preciseCount As Integer
+
+        For i = 0 To knn.matches.Count - 1
+            Dim mps = knn.matches(i)
+            Dim distance = mps.p1.DistanceTo(mps.p2)
+            If distance <= 2 Then
+                regularPt.Add(mps.p1)
+                dst3.Set(Of Byte)(mps.p2.Y, mps.p2.X, 255)
+                preciseCount += 1
+            End If
+        Next
+        labels(3) = CStr(preciseCount) + " of " + CStr(knn.matches.Count) + " KNN_One_To_One matches"
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_ProjectCell : Inherits VB_Algorithm
+    Dim topView As New Histogram_ShapeTop
+    Dim sideView As New Histogram_ShapeSide
+    Dim mats As New Mat_4Click
+    Dim colorC As New RedCloud_Basics
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "Top: XZ values and mask, Bottom: ZY values and mask"
+        desc = "Visualize the top and side projection of a RedCloud cell"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        colorC.Run(src)
+        dst1 = colorC.dst2
+
+        labels(2) = colorC.labels(2)
+
+        Dim rc = task.rcSelect
+
+        Dim pc = New cv.Mat(rc.rect.Height, rc.rect.Width, cv.MatType.CV_32FC3, 0)
+        task.pointCloud(rc.rect).CopyTo(pc, rc.mask)
+
+        topView.rc = rc
+        topView.Run(pc)
+
+        sideView.rc = rc
+        sideView.Run(pc)
+
+        mats.mat(0) = topView.dst2
+        mats.mat(1) = topView.dst3
+        mats.mat(2) = sideView.dst2
+        mats.mat(3) = sideView.dst3
+        mats.Run(Nothing)
+        dst2 = mats.dst2
+        dst3 = mats.dst3
+
+        Dim padX = dst2.Width / 15
+        Dim padY = dst2.Height / 20
+        strOut = "Top" + vbTab + "Top Mask" + vbCrLf + vbCrLf + "Side" + vbTab + "Side Mask"
+        setTrueText(strOut, New cv.Point(dst2.Width / 2 - padX, dst2.Height / 2 - padY), 2)
+        setTrueText("Select a RedCloud cell above to project it into the top and side views at left.", 3)
     End Sub
 End Class

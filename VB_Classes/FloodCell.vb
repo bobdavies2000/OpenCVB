@@ -449,7 +449,7 @@ End Class
 
 
 Public Class FloodCell_KMeans : Inherits VB_Algorithm
-    Dim floodCell As New FloodCell_Basics
+    Dim fCell As New FloodCell_Basics
     Dim km As New KMeans_MultiChannel
     Public Sub New()
         labels(3) = "The flooded cells numbered from largest (1) to smallast (x < 255)"
@@ -458,10 +458,63 @@ Public Class FloodCell_KMeans : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         km.Run(src)
 
-        floodCell.Run(km.dst2)
+        fCell.Run(km.dst2)
 
-        dst2 = floodCell.dst2
-        dst3 = floodCell.dst3
-        labels(2) = floodCell.labels(2)
+        dst2 = fCell.dst2
+        dst3 = fCell.dst3
+        labels(2) = fCell.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class FloodCell_CCompBinarized : Inherits VB_Algorithm
+    Dim edges As New Edge_BinarizedSobel
+    Dim ccomp As New FloodCell_Binarize
+    Public Sub New()
+        labels(3) = "Binarized Sobel output"
+        desc = "Use the binarized edges to find the different blobs in the image"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        edges.Run(src)
+        dst3 = edges.dst2
+
+        ccomp.Run(dst3)
+        dst2 = ccomp.dst2
+        labels(2) = ccomp.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class FloodCell_PrepCloud : Inherits VB_Algorithm
+    Dim fCell As New FloodCell_Basics
+    Dim prep As New RedCloud_PrepPointCloud
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        gOptions.useHistoryCloud.Checked = False ' no artifacts.
+        labels(3) = "The flooded cells numbered from largest (1) to smallast (x < 255)"
+        desc = "Floodfill the prep'd pointcloud output so each cell can be tracked."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        reduction.Run(src.Clone)
+        dst3 = reduction.dst2
+
+        prep.Run(Nothing)
+        prep.dst2.ConvertScaleAbs().CopyTo(dst3, task.depthMask)
+
+        fCell.Run(dst3)
+
+        dst2 = fCell.dst2
+        labels(2) = fCell.labels(2)
     End Sub
 End Class

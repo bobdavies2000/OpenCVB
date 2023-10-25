@@ -290,10 +290,10 @@ End Module
 
 
 Public Class PCA_Plane : Inherits VB_Algorithm
-    Dim stats As New RedCloudY_CellStats
+    Dim stats As New RedCloud_CellStats
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        If standalone Then stats.redC = New RedCloud_Basics
+        stats.runRedCloud = True
         desc = "Identify cells with similar plane equations"
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -308,7 +308,6 @@ Public Class PCA_Plane : Inherits VB_Algorithm
                 vbDrawContour(dst3(rc.rect), rc.contour, color, -1)
             Next
         End If
-        stats.rc = showSelection(dst3)
         stats.Run(src)
         dst2 = stats.dst2
         labels(2) = stats.redC.labels(2)
