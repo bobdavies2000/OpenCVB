@@ -36,7 +36,7 @@ End Class
 
 Public Class Reduction_Floodfill : Inherits VB_Algorithm
     Public reduction As New Reduction_Basics
-    Public flood As New FloodCell_Basics
+    Public flood As New RedCell_Basics
     Public Sub New()
         labels(2) = "Reduced input to floodfill"
         redOptions.ColorReductionSlider.Value = 32

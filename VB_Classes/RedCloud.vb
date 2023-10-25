@@ -223,17 +223,17 @@ End Class
 
 
 Module RedCloud_CPP_Module
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodCell_Open() As IntPtr
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FCell_Open() As IntPtr
     End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodCell_Close(cPtr As IntPtr) As IntPtr
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FCell_Close(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodCell_Rects(cPtr As IntPtr) As IntPtr
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FCell_Rects(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodCell_Sizes(cPtr As IntPtr) As IntPtr
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FCell_Sizes(cPtr As IntPtr) As IntPtr
     End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodCell_Count(cPtr As IntPtr) As Integer
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FCell_Count(cPtr As IntPtr) As Integer
     End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodCell_Run(
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FCell_Run(
                 cPtr As IntPtr, dataPtr As IntPtr, maskPtr As IntPtr, rows As Integer, cols As Integer,
                 type As Integer, minPixels As Integer, diff As Integer) As IntPtr
     End Function
@@ -1535,7 +1535,7 @@ End Class
 
 Public Class RedCloud_ColorAndCloud : Inherits VB_Algorithm
     Dim guided As New GuidedBP_Depth
-    Public floodCell As New FloodCell_Basics
+    Public fCell As New RedCell_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
         gOptions.HistBinSlider.Value = 20
@@ -1547,10 +1547,10 @@ Public Class RedCloud_ColorAndCloud : Inherits VB_Algorithm
         reduction.Run(src)
         Dim combined = reduction.dst2.Clone
         guided.backProject.CopyTo(combined, task.depthMask)
-        floodCell.Run(combined)
+        fCell.Run(combined)
 
-        dst2 = floodCell.dst2
-        dst3 = floodCell.dst3
+        dst2 = fCell.dst2
+        dst3 = fCell.dst3
 
         If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions identified"
     End Sub
@@ -1613,7 +1613,7 @@ End Class
 
 Public Class RedCloud_PrepTest : Inherits VB_Algorithm
     Dim prep As New RedCloud_PrepPointCloud
-    Public floodCell As New FloodCell_Basics
+    Public fCell As New RedCell_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
         gOptions.HistBinSlider.Value = 20
@@ -1625,10 +1625,10 @@ Public Class RedCloud_PrepTest : Inherits VB_Algorithm
         prep.Run(Nothing)
         prep.dst2.ConvertScaleAbs().CopyTo(reduction.dst2, task.depthMask)
 
-        floodCell.Run(reduction.dst2)
+        fCell.Run(reduction.dst2)
 
-        dst2 = floodCell.dst2
-        dst3 = floodCell.dst3
+        dst2 = fCell.dst2
+        dst3 = fCell.dst3
 
         If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions identified"
     End Sub

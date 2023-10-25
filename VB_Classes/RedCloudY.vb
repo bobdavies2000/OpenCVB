@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedCloudY_Basics : Inherits VB_Algorithm
     Public prep As New RedCloud_PrepPointCloud
-    Public floodCell As New FloodCell_Basics
+    Public fCell As New RedCell_Basics
     Public redCells As New List(Of rcData)
     Public lastCells As New List(Of rcData)
     Public showSelected As Boolean = True
@@ -15,9 +15,9 @@ Public Class RedCloudY_Basics : Inherits VB_Algorithm
         prep.Run(Nothing)
         prep.dst0.ConvertTo(dst1, cv.MatType.CV_8U)
 
-        floodCell.Run(dst1)
-        dst2 = floodCell.dst2
-        dst3 = floodCell.dst3
+        fCell.Run(dst1)
+        dst2 = fCell.dst2
+        dst3 = fCell.dst3
 
         If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions were identified."
     End Sub

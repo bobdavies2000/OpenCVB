@@ -2,15 +2,15 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Flood_Basics : Inherits VB_Algorithm
     Public classCount As Integer
-    Public floodCell As New FloodCell_Basics
+    Public fCell As New RedCell_Basics
     Public Sub New()
         labels(3) = "The flooded cells numbered from largest (1) to smallast (x < 255)"
         desc = "FloodFill the input and paint it"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        floodCell.Run(src)
-        dst2 = floodCell.dst2
-        dst3 = floodCell.dst3
+        fCell.Run(src)
+        dst2 = fCell.dst2
+        dst3 = fCell.dst3
         classCount = task.fCells.Count
 
         labels(2) = CStr(classCount) + " regions were identified"
@@ -600,7 +600,7 @@ End Class
 
 Public Class Flood_Featureless : Inherits VB_Algorithm
     Public classCount As Integer
-    Dim floodCell As New FloodCell_Basics
+    Dim fCell As New RedCell_Basics
     Public fCells As New List(Of fcData)
     Public Sub New()
         labels = {"", "", "", "Palette output of image at left"}
@@ -614,7 +614,7 @@ Public Class Flood_Featureless : Inherits VB_Algorithm
             src = fless.dst2
         End If
 
-        floodCell.Run(src)
+        fCell.Run(src)
         classCount = task.fCells.Count
 
         Dim index As Integer = 1

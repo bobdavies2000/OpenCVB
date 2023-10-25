@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Public Class GuidedBP_Basics : Inherits VB_Algorithm
     Dim heatTop As New Histogram2D_Top
     Public classCount As Integer
-    Public floodCell As New FloodCell_Basics
+    Public fCell As New RedCell_Basics
     Public Sub New()
         labels(3) = "Threshold of Top View"
         desc = "Use floodfill to identify all the objects in the selected view then build a backprojection that identifies k objects in the image view."
@@ -13,10 +13,10 @@ Public Class GuidedBP_Basics : Inherits VB_Algorithm
 
         dst3 = heatTop.histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         task.minPixels = 1
-        floodCell.Run(dst3)
+        fCell.Run(dst3)
 
         Dim doctoredHist32f As New cv.Mat
-        floodCell.dst3.ConvertTo(doctoredHist32f, cv.MatType.CV_32F)
+        fCell.dst3.ConvertTo(doctoredHist32f, cv.MatType.CV_32F)
         classCount = task.fCells.Count
 
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, doctoredHist32f, dst1, task.rangesTop)

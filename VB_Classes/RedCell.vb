@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class FloodCell_Basics : Inherits VB_Algorithm
-    Dim floodCell As New FloodCell_CPP
+Public Class RedCell_Basics : Inherits VB_Algorithm
+    Dim fCell As New RedCell_CPP
     Dim lastMap As cv.Mat
     Public Sub New()
         lastMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -11,8 +11,8 @@ Public Class FloodCell_Basics : Inherits VB_Algorithm
         Dim lastf As New List(Of fcData)(task.fCells)
         Dim lastMap = dst3.Clone
 
-        floodCell.Run(src)
-        dst3 = floodCell.dst3
+        fCell.Run(src)
+        dst3 = fCell.dst3
 
         Dim fCells As New List(Of fcData)
         Dim lfc As fcData
@@ -44,7 +44,7 @@ Public Class FloodCell_Basics : Inherits VB_Algorithm
 
         task.fCells = New List(Of fcData)(fCells)
 
-        labels(2) = floodCell.labels(2)
+        labels(2) = fCell.labels(2)
     End Sub
 End Class
 
@@ -54,11 +54,11 @@ End Class
 
 
 
-Public Class FloodCell_CPP : Inherits VB_Algorithm
+Public Class RedCell_CPP : Inherits VB_Algorithm
     Public inputMask As cv.Mat
     Dim fLess As New FeatureLess_Basics
     Public Sub New()
-        cPtr = FloodCell_Open()
+        cPtr = FCell_Open()
         gOptions.PixelDiffThreshold.Value = 0
         desc = "Floodfill an image so each cell can be tracked."
     End Sub
@@ -81,19 +81,19 @@ Public Class FloodCell_CPP : Inherits VB_Algorithm
         Marshal.Copy(src.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        Dim imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), maskPtr, src.Rows, src.Cols, src.Type,
+        Dim imagePtr = FCell_Run(cPtr, handleInput.AddrOfPinnedObject(), maskPtr, src.Rows, src.Cols, src.Type,
                                      task.minPixels, gOptions.PixelDiffThreshold.Value)
         handleInput.Free()
         If maskPtr <> 0 Then handlemask.Free()
 
         dst3 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr)
 
-        Dim classCount = FloodCell_Count(cPtr)
+        Dim classCount = FCell_Count(cPtr)
         If heartBeat() Then labels(3) = CStr(classCount) + " regions found"
         If classCount <= 1 Then Exit Sub
 
-        Dim sizeData = New cv.Mat(classCount, 1, cv.MatType.CV_32S, FloodCell_Sizes(cPtr))
-        Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, FloodCell_Rects(cPtr))
+        Dim sizeData = New cv.Mat(classCount, 1, cv.MatType.CV_32S, FCell_Sizes(cPtr))
+        Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, FCell_Rects(cPtr))
         Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
         task.fCells.Clear()
         If standalone Or testIntermediate(traceName) Then dst2.SetTo(0)
@@ -128,7 +128,7 @@ Public Class FloodCell_CPP : Inherits VB_Algorithm
         If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions were identified."
     End Sub
     Public Sub Close()
-        If cPtr <> 0 Then cPtr = FloodCell_Close(cPtr)
+        If cPtr <> 0 Then cPtr = FCell_Close(cPtr)
     End Sub
 End Class
 
@@ -138,8 +138,8 @@ End Class
 
 
 
-Public Class FloodCell_Reduction : Inherits VB_Algorithm
-    Dim floodCell As New FloodCell_Basics
+Public Class RedCell_Reduction : Inherits VB_Algorithm
+    Dim fCell As New RedCell_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
         desc = "Floodfill a reduced image so each cell can be tracked."
@@ -147,11 +147,11 @@ Public Class FloodCell_Reduction : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
 
-        floodCell.Run(reduction.dst2)
+        fCell.Run(reduction.dst2)
 
-        dst2 = floodCell.dst2
-        dst3 = floodCell.dst3
-        labels(2) = floodCell.labels(2)
+        dst2 = fCell.dst2
+        dst3 = fCell.dst3
+        labels(2) = fCell.labels(2)
     End Sub
 End Class
 
@@ -160,9 +160,9 @@ End Class
 
 
 
-Public Class FloodCell_ReductionLR : Inherits VB_Algorithm
-    Dim fCellsLeft As New FloodCell_Reduction
-    Dim fCellsRight As New FloodCell_Reduction
+Public Class RedCell_ReductionLR : Inherits VB_Algorithm
+    Dim fCellsLeft As New RedCell_Reduction
+    Dim fCellsRight As New RedCell_Reduction
     Public leftCells As New List(Of fcData)
     Public rightCells As New List(Of fcData)
     Public Sub New()
@@ -189,8 +189,8 @@ End Class
 
 
 
-Public Class FloodCell_Featureless : Inherits VB_Algorithm
-    Dim floodCell As New FloodCell_Basics
+Public Class RedCell_Featureless : Inherits VB_Algorithm
+    Dim fCell As New RedCell_Basics
     Public Sub New()
         desc = "Floodfill the featureless image so each cell can be tracked."
     End Sub
@@ -198,11 +198,11 @@ Public Class FloodCell_Featureless : Inherits VB_Algorithm
         Static fless As New FeatureLess_Basics
         fless.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
-        floodCell.Run(fless.dst2)
+        fCell.Run(fless.dst2)
 
-        dst2 = floodCell.dst2
-        dst3 = floodCell.dst3
-        labels(2) = floodCell.labels(2)
+        dst2 = fCell.dst2
+        dst3 = fCell.dst3
+        labels(2) = fCell.labels(2)
     End Sub
 End Class
 
@@ -211,9 +211,9 @@ End Class
 
 
 
-Public Class FloodCell_FeatureLessLR : Inherits VB_Algorithm
-    Dim fCellsLeft As New FloodCell_Featureless
-    Dim fCellsRight As New FloodCell_Featureless
+Public Class RedCell_FeatureLessLR : Inherits VB_Algorithm
+    Dim fCellsLeft As New RedCell_Featureless
+    Dim fCellsRight As New RedCell_Featureless
     Public leftCells As New List(Of fcData)
     Public rightCells As New List(Of fcData)
     Public Sub New()
@@ -221,14 +221,14 @@ Public Class FloodCell_FeatureLessLR : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         task.fCells = New List(Of fcData)(leftCells)
-        fCellsLeft.Run(src)
+        fCellsLeft.Run(task.leftView)
         leftCells = New List(Of fcData)(task.fCells)
         labels(2) = fCellsLeft.labels(2)
 
         dst2 = fCellsLeft.dst2
 
         task.fCells = New List(Of fcData)(rightCells)
-        fCellsRight.Run(src)
+        fCellsRight.Run(task.rightView)
         rightCells = New List(Of fcData)(task.fCells)
         labels(3) = fCellsRight.labels(2)
 
@@ -242,20 +242,20 @@ End Class
 
 
 
-Public Class FloodCell_LUT : Inherits VB_Algorithm
-    Dim floodCell As New FloodCell_Basics
+Public Class RedCell_LUT : Inherits VB_Algorithm
+    Dim fCell As New RedCell_Basics
     Dim lut As New LUT_Basics
     Public Sub New()
         desc = "Floodfill the LUT image so each cell can be tracked."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        lut.Run(src)
+        lut.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
 
-        floodCell.Run(lut.dst2)
+        fCell.Run(lut.dst2)
 
-        dst2 = floodCell.dst2
-        dst3 = floodCell.dst3
-        labels(2) = floodCell.labels(2)
+        dst2 = fCell.dst2
+        dst3 = fCell.dst3
+        labels(2) = fCell.labels(2)
     End Sub
 End Class
 
@@ -264,9 +264,9 @@ End Class
 
 
 
-Public Class FloodCell_LUTLeftRight : Inherits VB_Algorithm
-    Dim fCellsLeft As New FloodCell_LUT
-    Dim fCellsRight As New FloodCell_LUT
+Public Class RedCell_LUTLeftRight : Inherits VB_Algorithm
+    Dim fCellsLeft As New RedCell_LUT
+    Dim fCellsRight As New RedCell_LUT
     Public leftCells As New List(Of fcData)
     Public rightCells As New List(Of fcData)
     Public Sub New()
@@ -274,14 +274,14 @@ Public Class FloodCell_LUTLeftRight : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         task.fCells = New List(Of fcData)(leftCells)
-        fCellsLeft.Run(task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        fCellsLeft.Run(task.leftView)
         leftCells = New List(Of fcData)(task.fCells)
         labels(2) = fCellsLeft.labels(2)
 
         dst2 = fCellsLeft.dst2
 
         task.fCells = New List(Of fcData)(rightCells)
-        fCellsRight.Run(task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        fCellsRight.Run(task.rightView)
         rightCells = New List(Of fcData)(task.fCells)
         labels(3) = fCellsRight.labels(2)
 
@@ -295,21 +295,21 @@ End Class
 
 
 
-Public Class FloodCell_BP : Inherits VB_Algorithm
-    Dim floodCell As New FloodCell_Basics
+Public Class RedCell_BP : Inherits VB_Algorithm
+    Dim fCell As New RedCell_Basics
     Dim bpDoctor As New BackProject_Full
     Public Sub New()
         labels(3) = "The flooded cells numbered from largest (1) to smallast (x < 255)"
-        desc = "Floodfill the FloodCell_Basics image so each cell can be tracked."
+        desc = "Floodfill the RedCell_Basics image so each cell can be tracked."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         bpDoctor.Run(src)
 
-        floodCell.Run(bpDoctor.dst2)
+        fCell.Run(bpDoctor.dst2)
 
-        dst2 = floodCell.dst2
-        dst3 = floodCell.dst3
-        labels(2) = floodCell.labels(2)
+        dst2 = fCell.dst2
+        dst3 = fCell.dst3
+        labels(2) = fCell.labels(2)
     End Sub
 End Class
 
@@ -318,13 +318,13 @@ End Class
 
 
 
-Public Class FloodCell_BPLeftRight : Inherits VB_Algorithm
-    Dim fCellsLeft As New FloodCell_BP
-    Dim fCellsRight As New FloodCell_BP
+Public Class RedCell_BPLeftRight : Inherits VB_Algorithm
+    Dim fCellsLeft As New RedCell_BP
+    Dim fCellsRight As New RedCell_BP
     Public leftCells As New List(Of fcData)
     Public rightCells As New List(Of fcData)
     Public Sub New()
-        desc = "Floodfill the FloodCell_Basics output image for left and right views so each cell can be tracked."
+        desc = "Floodfill the RedCell_Basics output image for left and right views so each cell can be tracked."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         task.fCells = New List(Of fcData)(leftCells)
@@ -350,11 +350,11 @@ End Class
 
 
 
-Public Class FloodCell_BasicsReduction : Inherits VB_Algorithm
-    Dim match As New FloodCell_Basics
+Public Class RedCell_BasicsReduction : Inherits VB_Algorithm
+    Dim match As New RedCell_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
-        desc = "Use the reduction output as input to FloodCell_Basics instead of FeatureLess_Basics output"
+        desc = "Use the reduction output as input to RedCell_Basics instead of FeatureLess_Basics output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
@@ -372,9 +372,9 @@ End Class
 
 
 
-Public Class FloodCell_Binarize : Inherits VB_Algorithm
+Public Class RedCell_Binarize : Inherits VB_Algorithm
     Dim binarize As New Binarize_RecurseAdd
-    Dim fCell As New FloodCell_Basics
+    Dim fCell As New RedCell_Basics
     Public Sub New()
         labels(3) = "A 4-way split of the input grayscale image based on the amount of light"
         desc = "Use RedCloud on a 4-way split based on light to dark in the image."
@@ -396,9 +396,9 @@ End Class
 
 
 ' https://docs.opencv.org/master/de/d01/samples_2cpp_2connected_components_8cpp-example.html
-Public Class FloodCell_CComp : Inherits VB_Algorithm
+Public Class RedCell_CComp : Inherits VB_Algorithm
     Dim ccomp As New CComp_Both
-    Dim fCell As New FloodCell_Basics
+    Dim fCell As New RedCell_Basics
     Public Sub New()
         desc = "Identify each Connected component as a RedCloud Cell."
     End Sub
@@ -418,8 +418,8 @@ End Class
 
 
 
-Public Class FloodCell_HistValley : Inherits VB_Algorithm
-    Dim fCell As New FloodCell_Binarize
+Public Class RedCell_HistValley : Inherits VB_Algorithm
+    Dim fCell As New RedCell_Binarize
     Dim valley As New HistValley_Basics
     Dim dValley As New HistValley_Depth
     Dim canny As New Edge_Canny
@@ -448,8 +448,8 @@ End Class
 
 
 
-Public Class FloodCell_KMeans : Inherits VB_Algorithm
-    Dim fCell As New FloodCell_Basics
+Public Class RedCell_KMeans : Inherits VB_Algorithm
+    Dim fCell As New RedCell_Basics
     Dim km As New KMeans_MultiChannel
     Public Sub New()
         labels(3) = "The flooded cells numbered from largest (1) to smallast (x < 255)"
@@ -473,9 +473,9 @@ End Class
 
 
 
-Public Class FloodCell_CCompBinarized : Inherits VB_Algorithm
+Public Class RedCell_CCompBinarized : Inherits VB_Algorithm
     Dim edges As New Edge_BinarizedSobel
-    Dim ccomp As New FloodCell_Binarize
+    Dim ccomp As New RedCell_Binarize
     Public Sub New()
         labels(3) = "Binarized Sobel output"
         desc = "Use the binarized edges to find the different blobs in the image"
@@ -496,8 +496,8 @@ End Class
 
 
 
-Public Class FloodCell_PrepCloud : Inherits VB_Algorithm
-    Dim fCell As New FloodCell_Basics
+Public Class RedCell_PrepCloud : Inherits VB_Algorithm
+    Dim fCell As New RedCell_Basics
     Dim prep As New RedCloud_PrepPointCloud
     Dim reduction As New Reduction_Basics
     Public Sub New()
