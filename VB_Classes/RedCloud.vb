@@ -2058,3 +2058,465 @@ Public Class RedCloud_ProjectCell : Inherits VB_Algorithm
         setTrueText("Select a RedCloud cell above to project it into the top and side views at left.", 3)
     End Sub
 End Class
+
+
+
+
+
+
+
+
+
+Public Class RedCloud_PointTracker : Inherits VB_Algorithm
+    Dim hulls As New RedCloud_Hulls
+    Public matchedCells As New List(Of rcData)
+    Dim knn As New KNN_Lossy
+    Public Sub New()
+        desc = "Connect each cell to previous generation with KNN"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        hulls.Run(src)
+        dst2 = hulls.dst2
+
+        knn.queries.Clear()
+        For Each rc In task.redCells
+            knn.queries.Add(rc.maxDist)
+        Next
+
+        knn.Run(Nothing)
+        dst3 = knn.dst2
+        matchedCells.Clear()
+        Static lastQueries As New List(Of cv.Point2f)(knn.queries)
+        For Each mps In knn.matches
+            Dim index = knn.queries.IndexOf(mps.p1)
+            Dim rc = task.redCells(index)
+            rc.indexLast = lastQueries.IndexOf(mps.p2)
+            matchedCells.Add(rc)
+        Next
+        labels(3) = CStr(matchedCells.Count) + " cells of " + CStr(task.redCells.Count) + " matched.  MaxDist Is used so any changes are yellow."
+        lastQueries = New List(Of cv.Point2f)(knn.queries)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_NearestStableCell : Inherits VB_Algorithm
+    Public knn As New KNN_Basics
+    Dim hulls As New RedCloud_Hulls
+    Public Sub New()
+        labels(3) = "Line connects current maxDist point to nearest neighbor using KNN."
+        desc = "Find the nearest stable cell and connect them with a line."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        hulls.Run(src)
+        dst2 = hulls.dst2
+        labels(2) = hulls.labels(2)
+
+        knn.queries.Clear()
+        For Each rc In task.redCells
+            knn.queries.Add(New cv.Point2f(rc.maxDist.X, rc.maxDist.Y))
+        Next
+        knn.trainInput = New List(Of cv.Point2f)(knn.queries)
+
+        knn.Run(Nothing)
+
+        dst3.SetTo(0)
+        For i = 1 To knn.result.GetUpperBound(0)
+            Dim rc1 = task.redCells(knn.result(i, 0))
+            If rc1.indexLast = 0 Then Continue For
+            For j = 1 To knn.result.GetUpperBound(1)
+                Dim rc2 = task.redCells(knn.result(i, j))
+                If rc2.indexLast > 0 Then
+                    dst3.Circle(rc1.maxDist, task.dotSize, rc1.color, -1, task.lineType)
+                    dst3.Circle(rc2.maxDist, task.dotSize, rc2.color, -1, task.lineType)
+                    dst3.Line(rc1.maxDist, rc2.maxDist, rc1.color, task.lineWidth, task.lineType)
+                    Exit For
+                End If
+            Next
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_NoDepth : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("Minimum pixels %", 0, 100, 25)
+
+        labels = {"", "", "Cells with depth percentage that is less than the threshold specified.", ""}
+        desc = "Find RedColor cells only for areas with insufficient depth"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static minSlider = findSlider("Minimum pixels %")
+        Dim minPixelPercent = minSlider.value
+
+        redC.Run(src)
+        dst3 = redC.dst2
+        labels(3) = redC.labels(2)
+
+        Dim redCells As New List(Of rcData)
+        For Each rc In task.redCells
+            rc.mask.SetTo(0, task.depthMask(rc.rect))
+            If rc.mask.CountNonZero / rc.pixels > minPixelPercent Then
+                rc.mask.SetTo(0)
+            Else
+                rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxTC89L1)
+                If rc.contour.Count > 0 Then vbDrawContour(rc.mask, rc.contour, 255, -1)
+            End If
+            redCells.Add(rc)
+        Next
+
+        task.redCells = New List(Of rcData)(redCells)
+
+        dst2.SetTo(0)
+        For Each rc In redCells
+            vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_StructuredH : Inherits VB_Algorithm
+    Dim motion As New RedCloud_Motion
+    Dim transform As New Structured_TransformH
+    Dim topView As New Histogram2D_Top
+    Public Sub New()
+        If standalone Then gOptions.displayDst0.Checked = True
+        If standalone Then gOptions.displayDst1.Checked = True
+        desc = "Display the RedCloud cells found with a horizontal slice through the cellMap."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim sliceMask = transform.createSliceMaskH()
+        dst0 = src
+
+        motion.Run(sliceMask)
+
+        If heartBeat() Then dst1.SetTo(0)
+        dst1.SetTo(cv.Scalar.White, sliceMask)
+        labels = motion.labels
+
+        dst2.SetTo(0)
+        For Each index In motion.motionList
+            Dim rc As rcData = task.redCells(index)
+            vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
+        Next
+
+        Dim pc As New cv.Mat(task.pointCloud.Size, cv.MatType.CV_32FC3, 0)
+        task.pointCloud.CopyTo(pc, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        topView.Run(pc)
+        dst3 = topView.dst2
+
+        dst2.SetTo(cv.Scalar.White, sliceMask)
+        dst0.SetTo(cv.Scalar.White, sliceMask)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedCloud_StructuredV : Inherits VB_Algorithm
+    Dim motion As New RedCloud_Motion
+    Dim transform As New Structured_TransformV
+    Dim sideView As New Histogram2D_Side
+    Public Sub New()
+        If standalone Then gOptions.displayDst0.Checked = True
+        If standalone Then gOptions.displayDst1.Checked = True
+        desc = "Display the RedCloud cells found with a vertical slice through the cellMap."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim sliceMask = transform.createSliceMaskV()
+        dst0 = src
+
+        motion.Run(sliceMask)
+
+        If heartBeat() Then dst1.SetTo(0)
+        dst1.SetTo(cv.Scalar.White, sliceMask)
+        labels = motion.labels
+        setTrueText("Move mouse in image to see impact.", 3)
+
+        dst2.SetTo(0)
+        For Each index In motion.motionList
+            Dim rc As rcData = task.redCells(index)
+            vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
+        Next
+
+        Dim pc As New cv.Mat(task.pointCloud.Size, cv.MatType.CV_32FC3, 0)
+        task.pointCloud.CopyTo(pc, dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        sideView.Run(pc)
+        dst3 = sideView.dst2
+
+        dst2.SetTo(cv.Scalar.White, sliceMask)
+        dst0.SetTo(cv.Scalar.White, sliceMask)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class RedCloud_LikelyFlatSurfaces : Inherits VB_Algorithm
+    Dim verts As New Plane_Basics
+    Dim redC As New RedCloud_Basics
+    Public vCells As New List(Of rcData)
+    Public hCells As New List(Of rcData)
+    Public Sub New()
+        desc = "Use the mask for vertical surfaces to identify RedCloud cells that appear to be flat."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        verts.Run(src)
+        dst2.SetTo(255, verts.dst2)
+
+        redC.Run(src)
+        dst1 = redC.dst2
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        vCells.Clear()
+        hCells.Clear()
+        For Each rc In task.redCells
+            If rc.depthMean.Z >= task.maxZmeters Then Continue For
+            Dim tmp As cv.Mat = verts.dst2(rc.rect) And rc.mask
+            If tmp.CountNonZero / rc.pixels > 0.5 Then
+                vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
+                vCells.Add(rc)
+            End If
+            tmp = verts.dst3(rc.rect) And rc.mask
+            Dim count = tmp.CountNonZero
+            If count / rc.pixels > 0.5 Then
+                vbDrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+                hCells.Add(rc)
+            End If
+        Next
+
+        Dim rcX = task.rcSelect
+        setTrueText("mean depth = " + Format(rcX.depthMean.Z, "0.0"), 3)
+        labels(2) = redC.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+Public Class RedCloud_Track5D : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        If standalone And dst2.Width > 1000 Then gOptions.LineWidth.Value = 3
+        desc = "Track all cells using color and location and a distance calculation in 5 dimensions."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static lastdst2 = dst3.Clone
+        dst3 = lastdst2
+        Dim lastCells = New List(Of rcData)(task.redCells)
+
+        redC.Run(src)
+        dst2 = redC.dst2.Clone
+        labels(2) = redC.labels(2) + " - Lines connect cells that were matched incorrectly."
+
+        Dim doubleSize As New cv.Mat, unMatched As Integer
+        cv.Cv2.HConcat(dst2, dst3, doubleSize)
+        Dim minPixels As Integer = task.minPixels * 2
+        For i = 1 To task.redCells.Count - 1
+            Dim rc = task.redCells(i)
+            If rc.pixels < minPixels Then Continue For
+            Dim lrc = findClosest5(lastCells, rc, minPixels)
+            If lrc.index > 0 Then
+                If rc.color <> lrc.color Then
+                    lrc.maxDist.X += dst2.Width
+                    doubleSize.Line(rc.maxDist, lrc.maxDist, cv.Scalar.Yellow, task.lineWidth, task.lineType)
+                    unMatched += 1
+                End If
+            End If
+        Next
+        lastdst2 = dst2.Clone
+        doubleSize(New cv.Rect(0, 0, dst2.Width, dst2.Height)).CopyTo(dst2)
+        doubleSize(New cv.Rect(dst2.Width, 0, dst2.Width, dst2.Height)).CopyTo(dst3)
+        Dim rcx = task.rcSelect
+        task.clickPoint = rcx.maxDist
+
+        If heartBeat() Then
+            labels(3) = CStr(unMatched) + " cells were matched incorrectly out of " + CStr(task.redCells.Count) + " or " +
+                        Format(unMatched / task.redCells.Count, "0%") + " - Yellow line shows where."
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_Track8D : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        desc = "Track a cell using its color and location - a distance calculation in 8 dimensions."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        Dim rc = showSelection(dst2)
+
+        Static saveRC As rcData
+        If task.mouseClickFlag Or firstPass Then saveRC = rc
+
+        Dim m = saveRC.colorMean
+        setTrueText("Looking for:" + vbCrLf + "Cell color mean B/G/R" + vbTab + Format(m(0), fmt2) + vbTab +
+                    Format(m(1), fmt2) + vbTab + Format(m(2), fmt2) + vbCrLf +
+                    "near " + saveRC.maxDist.ToString + vbCrLf + "With size about " + CStr(saveRC.pixels) + " pixels", 3)
+
+        Dim rcClosest = findClosest8(task.redCells, saveRC, task.minPixels)
+
+        dst3.SetTo(0)
+        If rcClosest.index <> 0 Then
+            saveRC = rcClosest
+            task.clickPoint = rcClosest.maxDist
+        End If
+        vbDrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_UnstableHulls : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        labels = {"", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDist changing (when maxDist hits the boundary of a cell)"}
+        desc = "Use maxDist to identify unstable cells - cells which were NOT present in the previous generation."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        If heartBeat() Or task.frameCount = 2 Then
+            dst1 = dst2.Clone
+            dst3.SetTo(0)
+        End If
+
+        Dim currList As New List(Of cv.Point)
+        Static prevList As New List(Of cv.Point)
+
+        For Each rc In task.redCells
+            rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
+            If prevList.Contains(rc.maxDist) = False Then
+                vbDrawContour(dst1(rc.rect), rc.hull, cv.Scalar.White, -1)
+                vbDrawContour(dst1(rc.rect), rc.hull, cv.Scalar.Black)
+                vbDrawContour(dst3(rc.rect), rc.hull, cv.Scalar.White, -1)
+            End If
+            currList.Add(rc.maxDist)
+        Next
+
+        prevList = New List(Of cv.Point)(currList)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_PlaneEq3D : Inherits VB_Algorithm
+    Dim colorC As New RedCloud_Basics
+    Dim eq As New Plane_Equation
+    Public Sub New()
+        desc = "If a RedColor cell contains depth then build a plane equation"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        colorC.Run(src)
+        dst2 = colorC.dst2
+        labels(2) = colorC.labels(2)
+
+        Dim rc = task.rcSelect
+        If rc.maxVec.Z Then
+            eq.rc = rc
+            eq.Run(Nothing)
+            rc = eq.rc
+        End If
+
+        dst3.SetTo(0)
+        vbDrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
+
+        setTrueText(eq.strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+
+
+Public Class RedCloud_DelaunayGuidedFeatures : Inherits VB_Algorithm
+    Dim features As New Feature_PointsDelaunay
+    Dim colorC As New RedCloud_Basics
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        labels = {"Latest GoodFeatures highlighted", "Format CV_32S of Delaunay data", "Stable points tracked - Colors from dst3", "RedCloud Output of Delaunay data"}
+        desc = "Track the GoodFeatures points using RedCloud."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        features.Run(src)
+        dst1 = features.dst3
+
+        colorC.Run(dst1)
+        dst2 = colorC.dst2
+
+        Static goodList As New List(Of List(Of cv.Point2f))
+        If heartBeat() Then goodList.Clear()
+
+        Dim nextGood As New List(Of cv.Point2f)(features.good.corners)
+        goodList.Add(nextGood)
+
+        If goodList.Count >= task.historyCount Then goodList.RemoveAt(0)
+
+        dst3.SetTo(0)
+        For Each ptList In goodList
+            For Each pt In ptList
+                Dim c = dst2.Get(Of cv.Vec3b)(pt.Y, pt.X)
+                dst3.Circle(pt, task.dotSize, c, -1, task.lineType)
+            Next
+        Next
+    End Sub
+End Class

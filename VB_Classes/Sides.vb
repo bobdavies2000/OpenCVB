@@ -85,7 +85,7 @@ End Class
 
 
 Public Class Sides_ColorC : Inherits VB_Algorithm
-    Dim colorC As New RedCloudY_Basics
+    Dim redC As New RedCloud_Basics
     Dim sides As New Sides_Basics
     Dim kalman As New Kalman_Basics
     Public Sub New()
@@ -93,8 +93,8 @@ Public Class Sides_ColorC : Inherits VB_Algorithm
         desc = "Find the extrema - top/bottom, left/right, near/far - points for a RedColor Cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        colorC.Run(src)
-        dst2 = colorC.dst2
+        redC.Run(src)
+        dst2 = redC.dst2
 
         sides.rc = task.rcSelect
         sides.Run(src)

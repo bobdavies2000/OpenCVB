@@ -1532,7 +1532,7 @@ End Class
 
 
 Public Class OpenGL_FlatSurfaces : Inherits VB_Algorithm
-    Dim flat As New RedCloudY_FlatSurfaces
+    Dim flat As New RedCloud_LikelyFlatSurfaces
     Public Sub New()
         labels(2) = "Display the point cloud pixels that appear to be vertical and horizontal regions."
         task.ogl.oglFunction = oCase.pointCloudAndRGB

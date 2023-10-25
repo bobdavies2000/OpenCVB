@@ -289,7 +289,7 @@ End Class
 
 
 Public Class RedTrack_Core : Inherits VB_Algorithm
-    Public redC As New RedCloudY_Basics
+    Public redC As New RedCloud_Basics
     Public Sub New()
         labels = {"", "", "Points tracked with RedCloud", ""}
         desc = "Show feature location history"
@@ -317,10 +317,10 @@ End Class
 
 
 
-Public Class RedCloudY_TrackFeatures : Inherits VB_Algorithm
+Public Class RedTrack_Features : Inherits VB_Algorithm
     Dim options As New Options_Flood
     Dim good As New Feature_Basics
-    Dim redC As New RedCloudY_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels = {"", "", "Output of Feature_Basics - input to RedCloud",
@@ -341,7 +341,7 @@ Public Class RedCloudY_TrackFeatures : Inherits VB_Algorithm
         dst3.SetTo(0)
         For Each rc In task.redCells
             If rc.rect.X = 0 And rc.rect.Y = 0 Then Continue For
-            vbDrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Blue, -1)
+            vbDrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
             If rc.contour.Count > 0 Then setTrueText(Format(shapeCorrelation(rc.contour), fmt3), New cv.Point(rc.rect.X, rc.rect.Y), 3)
         Next
         setTrueText("Move camera to see the value of this algorithm", 2)

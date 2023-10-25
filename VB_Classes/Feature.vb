@@ -375,12 +375,13 @@ Public Class Feature_PointsDelaunay : Inherits VB_Algorithm
 
         Dim facets = New cv.Point2f()() {Nothing}
         subdiv.GetVoronoiFacetList(New List(Of Integer)(), facets, Nothing)
+        If facets.Count = 0 Then Exit Sub
 
         Dim ifacet() As cv.Point
-        Dim incr As Integer = 255 / facets.Length
+        Dim incr As Integer = 255 / facets.Count
         For i = 0 To facets.Length - 1
-            ReDim ifacet(facets(i).Length - 1)
-            For j = 0 To facets(i).Length - 1
+            ReDim ifacet(facets(i).Count - 1)
+            For j = 0 To facets(i).Count - 1
                 ifacet(j) = New cv.Point(Math.Round(facets(i)(j).X), Math.Round(facets(i)(j).Y))
             Next
 
@@ -1611,48 +1612,5 @@ Public Class Feature_History : Inherits VB_Algorithm
 
         labels(2) = "Found " + CStr(corners.Count) + " points with quality = " + CStr(good.options.quality) +
                     " and minimum distance = " + CStr(good.options.minDistance)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
-Public Class RedCloudY_Features : Inherits VB_Algorithm
-    Dim features As New Feature_PointsDelaunay
-    Dim colorC As New RedCloudY_Basics
-    Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        labels = {"Latest GoodFeatures highlighted", "Format CV_32S of Delaunay data", "Stable points tracked - Colors from dst3", "RedCloud Output of Delaunay data"}
-        desc = "Track the GoodFeatures points using RedCloud."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        features.Run(src)
-        dst1 = features.dst3
-
-        colorC.Run(dst1)
-        dst2 = colorC.dst2
-
-        Static goodList As New List(Of List(Of cv.Point2f))
-        If task.optionsChanged Then goodList.Clear()
-
-        Dim nextGood As New List(Of cv.Point2f)(features.good.corners)
-        goodList.Add(nextGood)
-
-        If goodList.Count >= task.historyCount Then goodList.RemoveAt(0)
-
-        dst3.SetTo(0)
-        For Each ptList In goodList
-            For Each pt In ptList
-                Dim c = dst2.Get(Of cv.Vec3b)(pt.Y, pt.X)
-                dst3.Circle(pt, task.dotSize, c, -1, task.lineType)
-            Next
-        Next
     End Sub
 End Class
