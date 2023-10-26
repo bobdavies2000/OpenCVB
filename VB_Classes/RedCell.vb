@@ -538,81 +538,34 @@ End Class
 
 
 
-
-
-
-Public Class RedCell_NeighborsVB : Inherits VB_Algorithm
+Public Class RedCell_Neighbors : Inherits VB_Algorithm
+    Dim nabs As New Neighbors_Basics
     Dim fCell As New RedCell_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        desc = "Find neighbors for each cell"
+        desc = "Find all the neighbors for a RedCell cellmap"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         fCell.Run(src)
-        dst1 = fCell.dst3
         dst2 = fCell.dst2
 
-        Dim samples(dst1.Total - 1) As Byte
-        Marshal.Copy(dst1.Data, samples, 0, samples.Length)
+        nabs.cellCount = task.fCells.Count
+        nabs.Run(fCell.dst3)
 
-        Dim nPoints As New List(Of cv.Point)
-        Dim w = dst2.Width
-        Dim cellData As New List(Of String)
-        Dim kSize As Integer = 2
-        For y = 0 To dst1.Height - kSize
-            For x = 0 To dst1.Width - kSize
-                Dim nabs As New SortedList(Of Byte, Byte)
-                For yy = y To y + kSize - 1
-                    For xx = x To x + kSize - 1
-                        Dim val = samples(yy * w + xx)
-                        If val > 1 Then If nabs.ContainsKey(val) = False Then nabs.Add(val, 0)
-                    Next
-                Next
-                If nabs.Count >= 2 Then
-                    Dim series As String = ""
-                    For Each ele In nabs
-                        series += CStr(ele.Key) + " "
-                    Next
-                    If cellData.Contains(series) = False Then
-                        cellData.Add(series)
-                        nPoints.Add(New cv.Point(x + 1, y + 1))
-                    End If
-                End If
-            Next
-        Next
-
-        For Each n In cellData
-            Dim split = Trim(n).Split(" ")
-            For i = 0 To split.Length - 1
-                Dim index = CInt(split(0))
-                Dim fc = task.fCells(index)
-                For j = i + 1 To split.Length - 1
-                    Dim jIndex = CInt(split(j))
-                    If fc.neighbors.Contains(jIndex) = False Then fc.neighbors.Add(jIndex)
-                Next
-                task.fCells(index) = fc
-            Next
-        Next
-
-        dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        strOut = "At click point = " + task.clickPoint.ToString + ":" + vbCrLf
-        For i = 0 To nPoints.Count - 1
-            Dim pt = nPoints(i)
-            dst1.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-            If pt.DistanceTo(task.clickPoint) < 5 Then
-                strOut += cellData(i)
-                strOut += vbCrLf
-            End If
+        For i = 0 To task.fCells.Count - 1
+            task.fCells(i).neighbors = New List(Of Byte)(nabs.nabList(i))
         Next
 
         dst3.SetTo(0)
         dst3(task.fcSelect.rect).SetTo(task.fcSelect.color, task.fcSelect.mask)
         For Each index In task.fcSelect.neighbors
             If index >= task.fCells.Count Then Continue For
-            Dim fc = task.fCells(index)
-            dst3(fc.rect).SetTo(fc.color, fc.mask)
+            Dim rc = task.fCells(index)
+            dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
+
+        task.color(task.fcSelect.rect).SetTo(white, task.fcSelect.mask)
+
         setTrueText(strOut, 3)
-        labels(2) = CStr(nPoints.Count) + " region intersection points were identified."
+        labels(2) = CStr(task.redCells.Count) + " regions identified."
     End Sub
 End Class

@@ -1,5 +1,4 @@
 ﻿Imports System.Runtime.InteropServices
-Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits VB_Algorithm
     Public prepCells As New List(Of rcPrep)
@@ -767,7 +766,7 @@ Public Class RedCloud_NeighborRect : Inherits VB_Algorithm
             Dim rect = expandRect(rc.rect)
             Dim minDepth = rc.minVec.Z
             Dim maxDepth = rc.maxVec.Z
-            rc.neighbors = New List(Of Integer)
+            rc.neighbors = New List(Of Byte)
             rc.neighbors.Add(rc.index)
             For Each rcN In task.redCells
                 If rcN.rect.IntersectsWith(rect) Then
@@ -2529,62 +2528,21 @@ End Class
 
 
 
-
-
-
-Public Class RedCloud_NeighborsVB : Inherits VB_Algorithm
+Public Class RedCloud_Neighbors : Inherits VB_Algorithm
+    Dim nabs As New Neighbors_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        desc = "Find neighbors for each cell"
+        desc = "Find all the neighbors for a RedCloud cellmap"
     End Sub
-    Public Function findPoints(cellMap As cv.Mat) As List(Of cv.Point)
-
-    End Function
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
         dst2 = redC.dst2
 
-        Dim samples(task.cellMap.Total - 1) As Byte
-        Marshal.Copy(task.cellMap.Data, samples, 0, samples.Length)
+        nabs.cellCount = task.redCells.Count
+        nabs.Run(task.cellMap)
 
-        Dim nPoints As New List(Of cv.Point)
-        Dim w = dst2.Width
-        Dim cellData As New List(Of String)
-        Dim kSize As Integer = 2
-        For y = 0 To dst1.Height - kSize
-            For x = 0 To dst1.Width - kSize
-                Dim nabs As New SortedList(Of Byte, Byte)
-                For yy = y To y + kSize - 1
-                    For xx = x To x + kSize - 1
-                        Dim val = samples(yy * w + xx)
-                        If val >= 1 Then If nabs.ContainsKey(val) = False Then nabs.Add(val, 0)
-                    Next
-                Next
-                If nabs.Count >= 2 Then
-                    Dim series As String = ""
-                    For Each ele In nabs
-                        series += CStr(ele.Key) + " "
-                    Next
-                    If cellData.Contains(series) = False Then
-                        cellData.Add(series)
-                        nPoints.Add(New cv.Point(x + 1, y + 1))
-                    End If
-                End If
-            Next
-        Next
-
-        For Each n In cellData
-            Dim split = Trim(n).Split(" ")
-            For i = 0 To split.Length - 1
-                Dim index = CInt(split(0))
-                For j = i + 1 To split.Length - 1
-                    Dim jIndex = CInt(split(j))
-                    If task.redCells(index).neighbors.Contains(jIndex) = False Then
-                        task.redCells(index).neighbors.Add(jIndex)
-                        task.redCells(jIndex).neighbors.Add(index)
-                    End If
-                Next
-            Next
+        For i = 0 To task.redCells.Count - 1
+            task.redCells(i).neighbors = New List(Of Byte)(nabs.nabList(i))
         Next
 
         dst3.SetTo(0)
@@ -2596,7 +2554,8 @@ Public Class RedCloud_NeighborsVB : Inherits VB_Algorithm
         Next
 
         task.color(task.rcSelect.rect).SetTo(white, task.rcSelect.mask)
+
         setTrueText(strOut, 3)
-        labels(2) = CStr(nPoints.Count) + " region intersection points were identified."
+        labels(2) = CStr(task.redCells.Count) + " regions identified."
     End Sub
 End Class

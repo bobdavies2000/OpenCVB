@@ -17,7 +17,7 @@ End Class
 
 
 Public Class Magnify_Example : Inherits VB_Algorithm
-    Dim prep As New RedCell_NeighborsVB
+    Dim prep As New RedCell_Neighbors
     Dim zoom As New Magnify_Basics
     Public Sub New()
         desc = "Magnify the output of the algorithm above."

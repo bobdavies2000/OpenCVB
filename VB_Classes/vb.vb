@@ -825,7 +825,7 @@ Public Class rcData
     Public indexLast As Integer
 
     Public color As cv.Vec3b
-    Public neighbors As New List(Of Integer)
+    Public neighbors As New List(Of Byte)
 
     Public contour As New List(Of cv.Point)
     Public contour3D As New List(Of cv.Point3f)
