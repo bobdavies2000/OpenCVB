@@ -20,7 +20,7 @@ Public Class RedCell_Basics : Inherits VB_Algorithm
         For Each fc In task.fCells
             Dim prev = lastMap.Get(Of Byte)(fc.maxDist.Y, fc.maxDist.X)
             If prev < lastf.Count And prev <> 0 Then
-                lfc = lastf(prev - 1)
+                lfc = lastf(prev)
                 fc.indexLast = lfc.index
                 fc.color = lfc.color
             End If
@@ -43,6 +43,13 @@ Public Class RedCell_Basics : Inherits VB_Algorithm
         Next
 
         task.fCells = New List(Of fcData)(fCells)
+        Dim index = dst3.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+        If index < task.fCells.Count Then
+            task.fcSelect = task.fCells(index)
+            Dim fc = task.fcSelect
+            dst2(fc.rect).SetTo(white, fc.mask)
+            task.color(fc.rect).SetTo(white, fc.mask)
+        End If
 
         labels(2) = fCell.labels(2)
     End Sub
@@ -96,12 +103,13 @@ Public Class RedCell_CPP : Inherits VB_Algorithm
         Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, FCell_Rects(cPtr))
         Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
         task.fCells.Clear()
+        task.fCells.Add(New fcData) ' placeholder so index aligns with offset.
         If standalone Or testIntermediate(traceName) Then dst2.SetTo(0)
         For i = 0 To classCount - 1
             Dim fc As New fcData
             fc.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
             fc.pixels = sizeData.Get(Of Integer)(i, 0)
-            fc.index = i + 1
+            fc.index = task.fCells.Count
             fc.mask = dst3(fc.rect).InRange(fc.index, fc.index)
             fc.color = task.vecColors(i) ' never more than 255...
             fc.maxDist = vbGetMaxDist(fc)
@@ -532,35 +540,37 @@ End Class
 
 
 
-Public Class RedCell_PrepNeighborsVB : Inherits VB_Algorithm
-    Dim prep As New RedCloud_PrepPointCloud
+
+Public Class RedCell_NeighborsVB : Inherits VB_Algorithm
+    Dim fCell As New RedCell_Basics
     Public Sub New()
-        desc = "Find neighbors using the output of the RedCloud_PrepPointCloud"
+        If standalone Then gOptions.displayDst1.Checked = True
+        desc = "Find neighbors for each cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        prep.Run(Nothing)
-        dst2 = prep.dst2
-        dst3 = prep.dst2.Clone
+        fCell.Run(src)
+        dst1 = fCell.dst3
+        dst2 = fCell.dst2
 
-        Dim samples(dst2.Total - 1) As Byte
-        Marshal.Copy(dst2.Data, samples, 0, samples.Length)
+        Dim samples(dst1.Total - 1) As Byte
+        Marshal.Copy(dst1.Data, samples, 0, samples.Length)
 
         Dim nPoints As New List(Of cv.Point)
         Dim w = dst2.Width
         Dim cellData As New List(Of String)
-        Dim kSize As Integer = 3
-        For y = 0 To dst2.Height - kSize
-            For x = 0 To dst2.Width - kSize
-                Dim neighbors As New SortedList(Of Byte, Byte)
+        Dim kSize As Integer = 2
+        For y = 0 To dst1.Height - kSize
+            For x = 0 To dst1.Width - kSize
+                Dim nabs As New SortedList(Of Byte, Byte)
                 For yy = y To y + kSize - 1
                     For xx = x To x + kSize - 1
                         Dim val = samples(yy * w + xx)
-                        If val > 1 Then If neighbors.ContainsKey(val) = False Then neighbors.Add(val, 0)
+                        If val > 1 Then If nabs.ContainsKey(val) = False Then nabs.Add(val, 0)
                     Next
                 Next
-                If neighbors.Count > 2 Then
+                If nabs.Count >= 2 Then
                     Dim series As String = ""
-                    For Each ele In neighbors
+                    For Each ele In nabs
                         series += CStr(ele.Key) + " "
                     Next
                     If cellData.Contains(series) = False Then
@@ -571,17 +581,37 @@ Public Class RedCell_PrepNeighborsVB : Inherits VB_Algorithm
             Next
         Next
 
-        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        For Each n In cellData
+            Dim split = Trim(n).Split(" ")
+            For i = 0 To split.Length - 1
+                Dim index = CInt(split(0))
+                Dim fc = task.fCells(index)
+                For j = i + 1 To split.Length - 1
+                    Dim jIndex = CInt(split(j))
+                    If fc.neighbors.Contains(jIndex) = False Then fc.neighbors.Add(jIndex)
+                Next
+                task.fCells(index) = fc
+            Next
+        Next
+
+        dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
         strOut = "At click point = " + task.clickPoint.ToString + ":" + vbCrLf
         For i = 0 To nPoints.Count - 1
             Dim pt = nPoints(i)
-            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            dst1.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
             If pt.DistanceTo(task.clickPoint) < 5 Then
                 strOut += cellData(i)
                 strOut += vbCrLf
             End If
         Next
 
+        dst3.SetTo(0)
+        dst3(task.fcSelect.rect).SetTo(task.fcSelect.color, task.fcSelect.mask)
+        For Each index In task.fcSelect.neighbors
+            If index >= task.fCells.Count Then Continue For
+            Dim fc = task.fCells(index)
+            dst3(fc.rect).SetTo(fc.color, fc.mask)
+        Next
         setTrueText(strOut, 3)
         labels(2) = CStr(nPoints.Count) + " region intersection points were identified."
     End Sub

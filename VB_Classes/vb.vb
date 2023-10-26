@@ -825,11 +825,11 @@ Public Class rcData
     Public indexLast As Integer
 
     Public color As cv.Vec3b
-    Public neighbors As List(Of Integer)
+    Public neighbors As New List(Of Integer)
 
-    Public contour As List(Of cv.Point)
-    Public contour3D As List(Of cv.Point3f)
-    Public hull As List(Of cv.Point)
+    Public contour As New List(Of cv.Point)
+    Public contour3D As New List(Of cv.Point3f)
+    Public hull As New List(Of cv.Point)
 
     Public eq As cv.Vec4f ' plane equation
     Public dotAverage As Single
@@ -841,12 +841,8 @@ Public Class rcData
     Public pcaVec As cv.Vec3f
     Public Sub New()
         index = 0
-        contour = New List(Of cv.Point)
         mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
         rect = New cv.Rect(0, 0, 1, 1)
-        hull = New List(Of cv.Point)
-        neighbors = New List(Of Integer)
-        contour3D = New List(Of cv.Point3f)
     End Sub
 End Class
 
@@ -922,15 +918,15 @@ Public Class fcData
     Public minVec As cv.Point3f
     Public maxVec As cv.Point3f
 
-    Public contour As List(Of cv.Point)
-    Public hull As List(Of cv.Point)
+    Public contour As New List(Of cv.Point)
+    Public hull As New List(Of cv.Point)
 
     Public colorMean As cv.Scalar
     Public colorStdev As cv.Scalar
+
+    Public neighbors As New List(Of Byte)
     Public Sub New()
         index = 0
-        contour = New List(Of cv.Point)
-        hull = New List(Of cv.Point)
         mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
         rect = New cv.Rect(0, 0, 1, 1)
         color = New cv.Vec3b()
