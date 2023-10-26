@@ -3,6 +3,15 @@ Imports System.Runtime.InteropServices
 Public Class Pixel_Viewer : Inherits VB_Algorithm
     Dim firstUpdate = True
     Public viewerForm As New PixelViewerForm
+    Enum displayTypes
+        noType = -1
+        type8uC3 = 0
+        type8u = 1
+        type32F = 2
+        type32FC3 = 3
+        type32SC1 = 4
+        type32SC3 = 5
+    End Enum
     Public Sub New()
         task.dst1 = dst2.Clone
         task.dst2 = dst2.Clone
@@ -13,13 +22,13 @@ Public Class Pixel_Viewer : Inherits VB_Algorithm
         If task.dst0 Is Nothing Then task.dst0 = task.color
         Dim dst = Choose(task.mousePicTag + 1, task.dst0, task.dst1, task.dst2, task.dst3)
 
-        Dim displayType = -1
-        If dst.Type = cv.MatType.CV_8UC3 Then displayType = 0
-        If dst.Type = cv.MatType.CV_8U Then displayType = 1
-        If dst.Type = cv.MatType.CV_32F Then displayType = 2
-        If dst.Type = cv.MatType.CV_32FC3 Then displayType = 3
-        If dst.Type = cv.MatType.CV_32SC1 Then displayType = 4
-        If dst.Type = cv.MatType.CV_32SC3 Then displayType = 5
+        Dim displayType = displayTypes.noType
+        If dst.Type = cv.MatType.CV_8UC3 Then displayType = displayTypes.type8uC3
+        If dst.Type = cv.MatType.CV_8U Then displayType = displayTypes.type8u
+        If dst.Type = cv.MatType.CV_32F Then displayType = displayTypes.type32F
+        If dst.Type = cv.MatType.CV_32FC3 Then displayType = displayTypes.type32FC3
+        If dst.Type = cv.MatType.CV_32SC1 Then displayType = displayTypes.type32SC1
+        If dst.Type = cv.MatType.CV_32SC3 Then displayType = displayTypes.type32SC3
         If displayType < 0 Or dst.Channels > 3 Then
             setTrueText("The pixel Viewer does not support this cv.Mat!  Please add support.")
             Exit Sub
@@ -78,9 +87,10 @@ Public Class Pixel_Viewer : Inherits VB_Algorithm
         End If
 
         Dim imgText = ""
+        Dim clickPoint = New cv.Point(task.clickPoint.X - dw.X, task.clickPoint.Y - dw.Y)
         Select Case displayType
 
-            Case 0
+            Case displayTypes.type8uC3
                 imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth - 1)) + vbLf
                 For y = 0 To img.Height - 1
                     imgText += "r" + Format(dw.Y + y, "000") + "   "
@@ -91,17 +101,21 @@ Public Class Pixel_Viewer : Inherits VB_Algorithm
                     imgText += vbLf
                 Next
 
-            Case 1
+            Case displayTypes.type8u
                 imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth - 1)) + vbLf
                 For y = 0 To img.Height - 1
                     imgText += "r" + Format(dw.Y + y, "000") + "   "
                     For x = 0 To img.Width - 1
-                        imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "   ", " ")
+                        If (task.toggleEverySecond And y = clickPoint.Y) And (x = clickPoint.X - 1 Or x = clickPoint.X) Then
+                            imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "***", "*")
+                        Else
+                            imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "   ", " ")
+                        End If
                     Next
                     imgText += vbLf
                 Next
 
-            Case 2
+            Case displayTypes.type32F
                 imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth - 1)) + vbLf
                 For y = 0 To img.Height - 1
                     imgText += "r" + Format(dw.Y + y, "000") + "   "
@@ -111,7 +125,7 @@ Public Class Pixel_Viewer : Inherits VB_Algorithm
                     imgText += vbLf
                 Next
 
-            Case 3
+            Case displayTypes.type32FC3
                 imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth - 1)) + vbLf
                 For y = 0 To img.Height - 1
                     imgText += "r" + Format(dw.Y + y, "000") + "   "
@@ -122,7 +136,7 @@ Public Class Pixel_Viewer : Inherits VB_Algorithm
                     imgText += vbLf
                 Next
 
-            Case 4
+            Case displayTypes.type32SC1
                 imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth - 1)) + vbLf
                 For y = 0 To img.Height - 1
                     imgText += "r" + Format(dw.Y + y, "000") + "   "
@@ -131,7 +145,7 @@ Public Class Pixel_Viewer : Inherits VB_Algorithm
                     Next
                     imgText += vbLf
                 Next
-            Case 5
+            Case displayTypes.type32SC3
                 imgText += If(dw.X + drWidth > 1000, " col    ", " col    ") + CStr(dw.X) + " through " + CStr(CInt(dw.X + drWidth - 1)) + vbLf
                 For y = 0 To img.Height - 1
                     imgText += "r" + Format(dw.Y + y, "000") + "   "

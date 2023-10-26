@@ -555,7 +555,7 @@ Public Class RedCell_PrepNeighborsVB : Inherits VB_Algorithm
                 For yy = y To y + kSize - 1
                     For xx = x To x + kSize - 1
                         Dim val = samples(yy * w + xx)
-                        If val > 1 And val < 255 Then If neighbors.ContainsKey(val) = False Then neighbors.Add(val, 0)
+                        If val > 1 Then If neighbors.ContainsKey(val) = False Then neighbors.Add(val, 0)
                     Next
                 Next
                 If neighbors.Count > 2 Then
@@ -572,7 +572,7 @@ Public Class RedCell_PrepNeighborsVB : Inherits VB_Algorithm
         Next
 
         dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-        strOut = ""
+        strOut = "At click point = " + task.clickPoint.ToString + ":" + vbCrLf
         For i = 0 To nPoints.Count - 1
             Dim pt = nPoints(i)
             dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)

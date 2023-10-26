@@ -149,7 +149,7 @@ End Class
 
 Public Class Histogram2D_Zoom : Inherits VB_Algorithm
     Dim hist2d As New Histogram2D_Basics
-    Dim zoom As New Zoom_Basics
+    Dim zoom As New Magnify_Basics
     Public Sub New()
         labels = {"", "", "Mask of histogram", "DrawRect area from the histogram"}
         desc = "Draw a rectangle on an area to zoom in on..."

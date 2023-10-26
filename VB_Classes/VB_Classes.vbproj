@@ -410,7 +410,7 @@
     <Compile Include="WarpAffine.vb" />
     <Compile Include="Watershed.vb" />
     <Compile Include="XPhoto.vb" />
-    <Compile Include="Zoom.vb" />
+    <Compile Include="Magnify.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="OptionsCombo.resx">

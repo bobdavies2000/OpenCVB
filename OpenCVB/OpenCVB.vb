@@ -826,7 +826,7 @@ Public Class OpenCVB
             mousePoint.X = e.X
             mousePoint.Y = e.Y
             mousePoint *= settings.workingRes.Width / camPic(0).Width
-            XYloc.Text = mousePoint.ToString
+            XYloc.Text = mousePoint.ToString + " last click point at: " + clickPoint.ToString
         Catch ex As Exception
             Console.WriteLine("Error in camPic_MouseMove: " + ex.Message)
         End Try
@@ -1195,6 +1195,7 @@ Public Class OpenCVB
                     If mouseClickFlag Then
                         task.mouseClickFlag = mouseClickFlag
                         task.clickPoint = mousePoint
+                        clickPoint = task.clickPoint
                         mouseClickFlag = False
                     End If
                 End SyncLock

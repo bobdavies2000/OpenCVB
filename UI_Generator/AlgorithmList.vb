@@ -889,6 +889,8 @@ if algorithmName = "LUT_Reduction" Then return new LUT_Reduction
 if algorithmName = "LUT_RGBDepth" Then return new LUT_RGBDepth
 if algorithmName = "LUT_Sliders" Then return new LUT_Sliders
 if algorithmName = "LUT_Watershed" Then return new LUT_Watershed
+if algorithmName = "Magnify_Basics" Then return new Magnify_Basics
+if algorithmName = "Magnify_Example" Then return new Magnify_Example
 if algorithmName = "Mat_2to1" Then return new Mat_2to1
 if algorithmName = "Mat_4Click" Then return new Mat_4Click
 if algorithmName = "Mat_4to1" Then return new Mat_4to1
@@ -1620,7 +1622,6 @@ if algorithmName = "XPhoto_Bm3dDenoiseDepthImage" Then return new XPhoto_Bm3dDen
 if algorithmName = "XPhoto_Inpaint" Then return new XPhoto_Inpaint
 if algorithmName = "XPhoto_Inpaint_CPP" Then return new XPhoto_Inpaint_CPP
 if algorithmName = "XPhoto_OilPaint_CPP" Then return new XPhoto_OilPaint_CPP
-if algorithmName = "Zoom_Basics" Then return new Zoom_Basics
 return nothing
 End Function
 End Class
