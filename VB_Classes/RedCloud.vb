@@ -1598,6 +1598,7 @@ Public Class RedCloud_PrepPointCloud : Inherits VB_Algorithm
         mm = vbMinMax(dst2)
         dst2 *= 254 / mm.maxVal
         dst2 += 1
+        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
         labels(2) = "Reduced Pointcloud - reduction factor = " + CStr(reduceAmt)
     End Sub

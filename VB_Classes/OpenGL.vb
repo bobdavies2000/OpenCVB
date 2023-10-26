@@ -1367,8 +1367,6 @@ Public Class OpenGL_PlaneClusters3D : Inherits VB_Algorithm
         desc = "Cluster the plane equations to find major planes in the image and display the clusters in OpenGL"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static planeSlider = findSlider("Plane Coefficient threshold")
-        Dim planeThreshold = planeSlider.value / 100
         redC.Run(src)
         dst2 = redC.dst2
         dst3 = redC.dst3
@@ -1382,8 +1380,6 @@ Public Class OpenGL_PlaneClusters3D : Inherits VB_Algorithm
                 rc = eq.rc
             End If
             If rc.eq = New cv.Vec4f Then Continue For
-            If Math.Abs(rc.eq.Item0) < planeThreshold And Math.Abs(rc.eq.Item1) < planeThreshold And
-               Math.Abs(rc.eq.Item2) < planeThreshold Then Continue For
 
             If rc.eq.Item0 > rc.eq.Item1 And rc.eq.Item0 > rc.eq.Item2 Then pcPoints.Add(red)
             If rc.eq.Item1 > rc.eq.Item0 And rc.eq.Item1 > rc.eq.Item2 Then pcPoints.Add(green)

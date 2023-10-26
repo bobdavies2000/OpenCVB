@@ -82,7 +82,7 @@ Public Class OpAuto_YRange : Inherits VB_Algorithm
             Dim saveOptionState = task.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
             Dim topGap = histogram.Row(0).CountNonZero
             Dim botGap = histogram.Row(histogram.Height - 1).CountNonZero
-            If topGap = 0 And botGap = 0 And redOptions.YRangeSlider.Value > 1 Then
+            If topGap = 0 And botGap = 0 And redOptions.YRangeSlider.Value > 3 Then
                 redOptions.YRangeSlider.Value -= 1
             Else
                 If adjustedCount < expectedCount Then redOptions.YRangeSlider.Value += 1 Else redOptions.YRangeSlider.Value -= 1

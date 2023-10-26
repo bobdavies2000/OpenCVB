@@ -237,31 +237,3 @@ Public Class Reduction_RGB : Inherits VB_Algorithm
         cv.Cv2.Merge(split, dst2)
     End Sub
 End Class
-
-
-
-
-
-
-
-
-
-Public Class Reduction_Depth : Inherits VB_Algorithm
-    Dim prep As New RedCloud_PrepPointCloud
-    Dim colorizer As New Depth_Colorizer_CPP
-    Public Sub New()
-        desc = "Use reduction to smooth depth data"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32S Then
-            src = task.pcSplit(2) * 1000
-            src.ConvertTo(src, cv.MatType.CV_32S)
-        End If
-        prep.Run(Nothing)
-        dst2 = prep.dst2
-        dst2.ConvertTo(dst1, cv.MatType.CV_32F)
-        colorizer.Run(dst1 / 1000)
-        dst3 = colorizer.dst2
-        labels(2) = prep.labels(2)
-    End Sub
-End Class

@@ -56,7 +56,7 @@ End Class
 
 Public Class RedCell_CPP : Inherits VB_Algorithm
     Public inputMask As cv.Mat
-    Dim fLess As New FeatureLess_Basics
+    Dim reduction As New Reduction_Basics
     Public Sub New()
         cPtr = FCell_Open()
         gOptions.PixelDiffThreshold.Value = 0
@@ -64,8 +64,8 @@ Public Class RedCell_CPP : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
-            fLess.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            src = fLess.dst2
+            reduction.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            src = reduction.dst2
         End If
 
         Dim handlemask As GCHandle
@@ -350,27 +350,6 @@ End Class
 
 
 
-Public Class RedCell_BasicsReduction : Inherits VB_Algorithm
-    Dim match As New RedCell_Basics
-    Dim reduction As New Reduction_Basics
-    Public Sub New()
-        desc = "Use the reduction output as input to RedCell_Basics instead of FeatureLess_Basics output"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        reduction.Run(src)
-
-        match.Run(reduction.dst2)
-        dst2 = match.dst2
-        labels(2) = match.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class RedCell_Binarize : Inherits VB_Algorithm
     Dim binarize As New Binarize_RecurseAdd
@@ -516,5 +495,94 @@ Public Class RedCell_PrepCloud : Inherits VB_Algorithm
 
         dst2 = fCell.dst2
         labels(2) = fCell.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class RedCell_PrepDataOnly : Inherits VB_Algorithm
+    Dim fCell As New RedCell_Basics
+    Dim prep As New RedCloud_PrepPointCloud
+    Public Sub New()
+        gOptions.useHistoryCloud.Checked = False ' no artifacts.
+        desc = "Run RedCell_Basics only on the prep'd data"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        prep.Run(Nothing)
+
+        fCell.Run(prep.dst2)
+
+        dst2 = fCell.dst2
+        dst2.SetTo(0, task.noDepthMask)
+        labels(2) = fCell.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class RedCell_PrepNeighborsVB : Inherits VB_Algorithm
+    Dim prep As New RedCloud_PrepPointCloud
+    Public Sub New()
+        desc = "Find neighbors using the output of the RedCloud_PrepPointCloud"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        prep.Run(Nothing)
+        dst2 = prep.dst2
+        dst3 = prep.dst2.Clone
+
+        Dim samples(dst2.Total - 1) As Byte
+        Marshal.Copy(dst2.Data, samples, 0, samples.Length)
+
+        Dim nPoints As New List(Of cv.Point)
+        Dim w = dst2.Width
+        Dim cellData As New List(Of String)
+        Dim kSize As Integer = 3
+        For y = 0 To dst2.Height - kSize
+            For x = 0 To dst2.Width - kSize
+                Dim neighbors As New SortedList(Of Byte, Byte)
+                For yy = y To y + kSize - 1
+                    For xx = x To x + kSize - 1
+                        Dim val = samples(yy * w + xx)
+                        If val > 1 And val < 255 Then If neighbors.ContainsKey(val) = False Then neighbors.Add(val, 0)
+                    Next
+                Next
+                If neighbors.Count > 2 Then
+                    Dim series As String = ""
+                    For Each ele In neighbors
+                        series += CStr(ele.Key) + " "
+                    Next
+                    If cellData.Contains(series) = False Then
+                        cellData.Add(series)
+                        nPoints.Add(New cv.Point(x + 1, y + 1))
+                    End If
+                End If
+            Next
+        Next
+
+        dst2 = dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        strOut = ""
+        For i = 0 To nPoints.Count - 1
+            Dim pt = nPoints(i)
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            If pt.DistanceTo(task.clickPoint) < 5 Then
+                strOut += cellData(i)
+                strOut += vbCrLf
+            End If
+        Next
+
+        setTrueText(strOut, 3)
+        labels(2) = CStr(nPoints.Count) + " region intersection points were identified."
     End Sub
 End Class

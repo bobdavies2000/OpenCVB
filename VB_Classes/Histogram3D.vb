@@ -110,19 +110,15 @@ Public Class Histogram3D_DepthSplit : Inherits VB_Algorithm
         mats.Run(Nothing)
         dst2 = mats.dst2.Clone
 
-        Static channel01Radio = findRadio("Channels 0 and 1")
-        Static channel02Radio = findRadio("Channels 0 and 2")
-        Static channel12Radio = findRadio("Channels 1 and 2")
-
-        channel01Radio.checked = True
+        redOptions.Channels01.Checked = True
         hist2d.Run(task.pointCloud)
         mats.mat(0) = hist2d.histogram.ConvertScaleAbs
 
-        channel02Radio.checked = True
+        redOptions.Channels02.Checked = True
         hist2d.Run(task.pointCloud)
         mats.mat(1) = hist2d.histogram.ConvertScaleAbs
 
-        channel12Radio.checked = True
+        redOptions.Channels12.Checked = True
         hist2d.Run(task.pointCloud)
         mats.mat(2) = hist2d.histogram.ConvertScaleAbs
 
