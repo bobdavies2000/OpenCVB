@@ -138,10 +138,64 @@ End Module
 
 Public Class Neighbor_Corner : Inherits VB_Algorithm
     Public Sub New()
-        labels = {"", "", "Grayscale", "dst3Label"}
-        desc = "description"
+        desc = "Find the corner points where multiple cells intersect."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        Static redC As New RedCloud_Basics
+        redC.Run(task.color)
+        dst2 = redC.dst2
+        src = task.cellMap.Clone
+
+        Dim samples(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, samples, 0, samples.Length)
+
+        Dim w = dst2.Width
+        Dim nPoints As New List(Of cv.Point)
+        Dim kSize As Integer = 2
+        For y = 0 To dst1.Height - kSize
+            For x = 0 To dst1.Width - kSize
+                Dim nabs As New SortedList(Of Byte, Byte)
+                For yy = y To y + kSize - 1
+                    For xx = x To x + kSize - 1
+                        Dim val = samples(yy * w + xx)
+                        If val >= 1 Then If nabs.ContainsKey(val) = False Then nabs.Add(val, 0)
+                    Next
+                Next
+                If nabs.Count > 2 Then
+                    nPoints.Add(New cv.Point(x, y))
+                End If
+            Next
+        Next
+
+        ' on the edges of the image, the presence of 2 cells is a key point.
+        For i = 0 To 3
+            Dim rowCol As cv.Mat = Choose(i + 1, src.Row(0).Clone, src.Row(dst2.Height - 1).Clone, src.Col(0).Clone, src.Col(dst2.Width - 1).Clone)
+            Dim data(rowCol.Total - 1) As Byte
+            Marshal.Copy(rowCol.Data, data, 0, data.Length)
+            Select Case i
+                Case 0
+                    For j = 2 To data.Count - 1
+                        If data(j) <> data(j - 1) And data(j) <> 0 Then nPoints.Add(New cv.Point(j, 0))
+                    Next
+                Case 1
+                    For j = 1 To data.Count - 1
+                        If data(j) <> data(j - 1) And data(j) <> 0 Then nPoints.Add(New cv.Point(j, dst2.Height - 1))
+                    Next
+                Case 2
+                    For j = 2 To data.Count - 1
+                        If data(j) <> data(j - 1) And data(j) <> 0 Then nPoints.Add(New cv.Point(1, j))
+                    Next
+                Case 3
+                    For j = 1 To data.Count - 1
+                        If data(j) <> data(j - 1) And data(j) <> 0 Then nPoints.Add(New cv.Point(dst2.Width - 2, j))
+                    Next
+            End Select
+        Next
+
+        For Each pt In nPoints
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+        Next
+
+        labels(2) = CStr(nPoints.Count) + " intersections with 3 or more cells were found"
     End Sub
 End Class
