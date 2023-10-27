@@ -61,7 +61,12 @@ Public Class Pixel_Viewer : Inherits VB_Algorithm
         Dim dw = New cv.Rect(mouseLoc.x, mouseLoc.y, drWidth, drHeight)
         dw = validateRect(dw)
 
-        Dim img = dst(dw).Clone
+        Dim img As cv.Mat
+        Try
+            img = dst(dw).Clone
+        Catch ex As Exception
+            Exit Sub
+        End Try
 
         Dim mm As mmData
         Dim format32f = "0000.0"

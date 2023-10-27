@@ -559,6 +559,8 @@ Public Class RedCloud_FindCells : Inherits VB_Algorithm
         handleSrc.Free()
 
         Dim count = RedCloud_FindCells_TotalCount(cPtr)
+        If count = 0 Then Exit Sub
+
         Dim cellsFound(count - 1) As Integer
         Marshal.Copy(imagePtr, cellsFound, 0, cellsFound.Length)
 

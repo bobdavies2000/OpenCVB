@@ -158,7 +158,7 @@ Public Class Neighbor_Corner : Inherits VB_Algorithm
                 For yy = y To y + kSize - 1
                     For xx = x To x + kSize - 1
                         Dim val = samples(yy * w + xx)
-                        If val >= 1 Then If nabs.ContainsKey(val) = False Then nabs.Add(val, 0)
+                        If nabs.ContainsKey(val) = False Then nabs.Add(val, 0)
                     Next
                 Next
                 If nabs.Count > 2 Then
@@ -183,11 +183,11 @@ Public Class Neighbor_Corner : Inherits VB_Algorithm
                     Next
                 Case 2
                     For j = 2 To data.Count - 1
-                        If data(j) <> data(j - 1) And data(j) <> 0 Then nPoints.Add(New cv.Point(1, j))
+                        If data(j) <> data(j - 1) And data(j) <> 0 Then nPoints.Add(New cv.Point(0, j))
                     Next
                 Case 3
                     For j = 1 To data.Count - 1
-                        If data(j) <> data(j - 1) And data(j) <> 0 Then nPoints.Add(New cv.Point(dst2.Width - 2, j))
+                        If data(j) <> data(j - 1) And data(j) <> 0 Then nPoints.Add(New cv.Point(dst2.Width - 1, j))
                     Next
             End Select
         Next
