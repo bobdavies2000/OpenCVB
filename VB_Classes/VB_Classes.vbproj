@@ -118,7 +118,7 @@
     <Compile Include="AsciiArt.vb" />
     <Compile Include="BGRPattern.vb" />
     <Compile Include="FrameRate.vb" />
-    <Compile Include="Neighbors.vb" />
+    <Compile Include="Neighbor.vb" />
     <Compile Include="OpAuto.vb" />
     <Compile Include="BackProject2D.vb" />
     <Compile Include="Classify.vb" />

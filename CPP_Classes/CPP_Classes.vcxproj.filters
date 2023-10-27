@@ -203,5 +203,8 @@
     <ClCompile Include="MSER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Neighbor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

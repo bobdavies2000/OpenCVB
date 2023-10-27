@@ -260,41 +260,6 @@ Module RedCloud_CPP_Module
 
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedCloud_Neighbors_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub RedCloud_Neighbors_Close(cPtr As IntPtr)
-    End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedCloud_Neighbors_List(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedCloud_Neighbors_Count(cPtr As IntPtr) As Integer
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedCloud_Neighbors_RunCPP(cPtr As IntPtr, dataPtr As IntPtr,
-                                              rows As Integer, cols As Integer,
-                                              contourPtr As IntPtr, contourCount As Integer,
-                                              cellIndex As Integer) As Integer
-    End Function
-
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedCloud_Corners_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub RedCloud_Corners_Close(cPtr As IntPtr)
-    End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedCloud_Corners_List(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function RedCloud_Corners_RunCPP(cPtr As IntPtr, dataPtr As IntPtr,
-                                            rows As Integer, cols As Integer,
-                                            distance As Integer) As Integer
-    End Function
-
-
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function RedCloud_FindCells_Open() As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
@@ -324,6 +289,7 @@ Module RedCloud_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FloodEx_Run(cPtr As IntPtr,
                grayPtr As IntPtr, diff As Integer) As IntPtr
     End Function
+
 
 
 
@@ -616,111 +582,6 @@ End Class
 
 
 
-Public Class RedCloud_Neighbors_CPP : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        cPtr = RedCloud_Neighbors_Open()
-        desc = "Find the list of neighbors for a cell using the cell contour and cellmap"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-
-        Dim rc = task.rcSelect
-        If rc.contour.Count = 0 Then
-            setTrueText("The selected cell has no contour", 3)
-            Exit Sub
-        End If
-
-        Dim r = New cv.Rect(rc.rect.X - 1, rc.rect.Y - 1, rc.rect.Width + 2,
-                            rc.rect.Height + 2)
-        r = validateRect(r)
-
-        Dim input = task.cellMap(r).Clone
-        Dim cppData(input.Total - 1) As Byte
-        Marshal.Copy(input.Data, cppData, 0, cppData.Length - 1)
-        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-
-        Dim contour As New cv.Mat(rc.contour.Count, 1, cv.MatType.CV_32S, rc.contour.ToArray)
-        Dim contourData(contour.Total * 2 - 1) As Integer
-        Marshal.Copy(contour.Data, contourData, 0, contourData.Length - 1)
-        Dim handleContour = GCHandle.Alloc(contourData, GCHandleType.Pinned)
-
-        Dim imagePtr = RedCloud_Neighbors_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(),
-                                                 input.Rows, input.Cols,
-                                                 handleContour.AddrOfPinnedObject(),
-                                                 rc.contour.Count, rc.index)
-        handleContour.Free()
-        handleSrc.Free()
-
-        dst3.SetTo(0)
-        Dim count = RedCloud_Neighbors_Count(cPtr)
-        If count > 0 Then
-            Dim idList = New cv.Mat(count, 1, cv.MatType.CV_32S, RedCloud_Neighbors_List(cPtr))
-            For i = 0 To count - 1
-                Dim rcX = task.redCells(idList.Get(Of Integer)(i, 0))
-                vbDrawContour(dst3(rcX.rect), rcX.contour, rcX.color, -1)
-            Next
-        End If
-        labels(2) = redC.labels(2)
-        labels(3) = CStr(count) + " neighbors for the cell"
-    End Sub
-    Public Sub Close()
-        RedCloud_Neighbors_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-Public Class RedCloud_Corners_CPP : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Min distance to nearby point", 0, 100, 5)
-        End If
-
-        cPtr = RedCloud_Corners_Open()
-        desc = "Find all the corners in the RedCloud cellmap"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static distanceSlider = findSlider("Min distance to nearby point")
-
-        redC.Run(src)
-        dst2 = redC.dst2
-
-        Dim mask = task.cellMap.InRange(task.redOther, task.redOther)
-        task.cellMap.SetTo(0, mask)
-
-        Dim cppData(task.cellMap.Total - 1) As Byte
-        Marshal.Copy(task.cellMap.Data, cppData, 0, cppData.Length - 1)
-        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim count = RedCloud_Corners_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(),
-                                            task.cellMap.Rows, task.cellMap.Cols,
-                                            distanceSlider.value)
-        handleSrc.Free()
-
-        If count > 0 Then
-            Dim tmp = New cv.Mat(count, 1, cv.MatType.CV_32SC2, RedCloud_Corners_List(cPtr))
-            For i = 0 To count - 1
-                Dim pt = tmp.Get(Of cv.Point)(i, 0)
-                dst2.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1)
-            Next
-        End If
-        labels(3) = CStr(count) + " corners were found"
-    End Sub
-    Public Sub Close()
-        RedCloud_Corners_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 
 
 Public Class RedCloud_FeatureLess : Inherits VB_Algorithm
@@ -741,59 +602,6 @@ Public Class RedCloud_FeatureLess : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-Public Class RedCloud_NeighborRect : Inherits VB_Algorithm
-    Public redC As New RedCloud_Basics
-    Public redCells As New List(Of rcData)
-    Public Sub New()
-        desc = "Use an expanded rc.rect to determine neighbors for each RedCloud cell"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static rcx As New rcData
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        redCells.Clear()
-        For Each rc In task.redCells
-            Dim rect = expandRect(rc.rect)
-            Dim minDepth = rc.minVec.Z
-            Dim maxDepth = rc.maxVec.Z
-            rc.neighbors = New List(Of Byte)
-            rc.neighbors.Add(rc.index)
-            For Each rcN In task.redCells
-                If rcN.rect.IntersectsWith(rect) Then
-                    If maxDepth = 0 Or rcN.maxVec.Z = 0 Then
-                        rc.neighbors.Add(rcN.index)
-                    Else
-                        If rcN.depthMean.Z >= minDepth And rcN.depthMean.Z <= maxDepth Then
-                            rc.neighbors.Add(rcN.index)
-                        End If
-                    End If
-                End If
-            Next
-            redCells.Add(rc)
-            ' setTrueText(CStr(rc.index), rc.maxDist)
-        Next
-
-        rcx = task.rcSelect
-        dst2.Rectangle(expandRect(rcx.rect), cv.Scalar.Yellow, task.lineWidth, task.lineType)
-
-        If rcx.neighbors Is Nothing Then Exit Sub
-        dst3.SetTo(0)
-        For Each index In rcx.neighbors
-            Dim rc = redCells(index)
-            vbDrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
-        Next
-    End Sub
-End Class
 
 
 
@@ -2529,7 +2337,7 @@ End Class
 
 
 Public Class RedCloud_Neighbors : Inherits VB_Algorithm
-    Dim nabs As New Neighbors_Basics
+    Dim nabs As New Neighbor_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Find all the neighbors for a RedCloud cellmap"

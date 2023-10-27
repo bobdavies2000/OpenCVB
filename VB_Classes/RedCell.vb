@@ -539,7 +539,7 @@ End Class
 
 
 Public Class RedCell_Neighbors : Inherits VB_Algorithm
-    Dim nabs As New Neighbors_Basics
+    Dim nabs As New Neighbor_Basics
     Dim fCell As New RedCell_Basics
     Public Sub New()
         desc = "Find all the neighbors for a RedCell cellmap"
@@ -566,6 +566,6 @@ Public Class RedCell_Neighbors : Inherits VB_Algorithm
         task.color(task.fcSelect.rect).SetTo(white, task.fcSelect.mask)
 
         setTrueText(strOut, 3)
-        labels(2) = CStr(task.redCells.Count) + " regions identified."
+        If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions identified."
     End Sub
 End Class

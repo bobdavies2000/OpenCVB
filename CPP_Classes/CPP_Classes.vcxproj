@@ -62,6 +62,7 @@
     <ClCompile Include="MinTriangle.cpp" />
     <ClCompile Include="MLPrep.cpp" />
     <ClCompile Include="MSER.cpp" />
+    <ClCompile Include="Neighbor.cpp" />
     <ClCompile Include="Palette.cpp" />
     <ClCompile Include="ParticleFilter.cpp" />
     <ClCompile Include="PCA_Prep.cpp" />
