@@ -1375,7 +1375,6 @@ if algorithmName = "RedCell_CCompBinarized" Then return new RedCell_CCompBinariz
 if algorithmName = "RedCell_CPP" Then return new RedCell_CPP
 if algorithmName = "RedCell_Featureless" Then return new RedCell_Featureless
 if algorithmName = "RedCell_FeatureLessLR" Then return new RedCell_FeatureLessLR
-if algorithmName = "RedCell_HistValley" Then return new RedCell_HistValley
 if algorithmName = "RedCell_KMeans" Then return new RedCell_KMeans
 if algorithmName = "RedCell_LUT" Then return new RedCell_LUT
 if algorithmName = "RedCell_LUTLeftRight" Then return new RedCell_LUTLeftRight

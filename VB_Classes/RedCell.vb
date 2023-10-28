@@ -43,12 +43,14 @@ Public Class RedCell_Basics : Inherits VB_Algorithm
         Next
 
         task.fCells = New List(Of fcData)(fCells)
-        Dim index = dst3.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        If index < task.fCells.Count Then
-            task.fcSelect = task.fCells(index)
-            Dim fc = task.fcSelect
-            dst2(fc.rect).SetTo(white, fc.mask)
-            task.color(fc.rect).SetTo(white, fc.mask)
+        If task.clickPoint <> New cv.Point Then
+            Dim index = dst3.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+            If index < task.fCells.Count Then
+                task.fcSelect = task.fCells(index)
+                Dim fc = task.fcSelect
+                dst2(fc.rect).SetTo(white, fc.mask)
+                task.color(fc.rect).SetTo(white, fc.mask)
+            End If
         End If
 
         labels(2) = fCell.labels(2)
@@ -396,36 +398,6 @@ Public Class RedCell_CComp : Inherits VB_Algorithm
         fCell.Run(dst3)
         dst2 = fCell.dst2
         labels(2) = fCell.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class RedCell_HistValley : Inherits VB_Algorithm
-    Dim fCell As New RedCell_Binarize
-    Dim valley As New HistValley_Basics
-    Dim dValley As New HistValley_Depth
-    Dim canny As New Edge_Canny
-    Public Sub New()
-        desc = "Use RedCloudY_Basics with the output of HistValley_Basics."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        valley.Run(src)
-        dst1 = valley.dst1.Clone
-
-        dValley.Run(src)
-        canny.Run(dValley.dst1)
-        dst1.SetTo(0, canny.dst2)
-
-        canny.Run(valley.dst1)
-        dst1.SetTo(0, canny.dst2)
-
-        fCell.Run(dst1)
-        dst2 = fCell.dst2
     End Sub
 End Class
 

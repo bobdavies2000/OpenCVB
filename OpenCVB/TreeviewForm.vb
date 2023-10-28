@@ -153,11 +153,7 @@ Public Class TreeviewForm
 
                 PercentTime.Text += "---------------- Tree order display: " + vbCrLf
                 For Each sn In timeDataTree
-                    If sn.Contains("%") Then
-                        PercentTime.Text += sn + vbCrLf
-                        'Else
-                        '    PercentTime.Text += vbTab + sn + vbCrLf
-                    End If
+                    If sn.Contains("%") Then PercentTime.Text += sn + vbCrLf
                 Next
 
             End If

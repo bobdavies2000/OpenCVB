@@ -1454,7 +1454,7 @@ Public Class RedCloud_BProject3D : Inherits VB_Algorithm
     Dim colorC As New RedCloud_Basics
     Dim bp3d As New Histogram3D_BP
     Public Sub New()
-        desc = "Run RedCloudY_Basics on the output of the RGB 3D backprojection"
+        desc = "Run RedCloud_Basics on the output of the RGB 3D backprojection"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         bp3d.Run(src)
@@ -1651,7 +1651,7 @@ Public Class RedCloud_KMeans : Inherits VB_Algorithm
     Dim km As New KMeans_MultiChannel
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        labels = {"", "", "KMeans_MultiChannel output", "RedCloudY_Basics output"}
+        labels = {"", "", "KMeans_MultiChannel output", "RedCloud_Basics output"}
         desc = "Use RedCloud to identify the regions created by kMeans"
     End Sub
     Public Sub RunVB(src As cv.Mat)
