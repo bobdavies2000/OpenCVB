@@ -15,10 +15,8 @@ Public Class HistValley_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         kalman.Run(src)
         dst2 = kalman.dst2
-        If firstPass Or task.optionsChanged Then
-            histogram = kalman.hist.histogram.Clone
-            auto.Run(histogram)
-        End If
+        histogram = kalman.hist.histogram.Clone
+        auto.Run(histogram)
 
         If auto.valleyOrder.Count = 0 Then Exit Sub
 

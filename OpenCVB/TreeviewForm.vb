@@ -155,8 +155,8 @@ Public Class TreeviewForm
                 For Each sn In timeDataTree
                     If sn.Contains("%") Then
                         PercentTime.Text += sn + vbCrLf
-                    Else
-                        PercentTime.Text += vbTab + sn + vbCrLf
+                        'Else
+                        '    PercentTime.Text += vbTab + sn + vbCrLf
                     End If
                 Next
 
