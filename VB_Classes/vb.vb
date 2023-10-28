@@ -828,6 +828,7 @@ Public Class rcData
     Public neighbors As New List(Of Byte)
 
     Public contour As New List(Of cv.Point)
+    Public corners As New List(Of cv.Point)
     Public contour3D As New List(Of cv.Point3f)
     Public hull As New List(Of cv.Point)
 

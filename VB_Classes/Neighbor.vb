@@ -88,16 +88,30 @@ Public Class Neighbor_CPP : Inherits VB_Algorithm
         Dim cppData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim imagePtr = Neighbor_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.redCells.Count)
+        Dim count = Neighbor_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
         handleSrc.Free()
 
-        Dim count = Neighbor_Count(cPtr)
         If count > 0 Then
-            Dim idList = New cv.Mat(count, 1, cv.MatType.CV_32S, Neighbor_List(cPtr))
+            Dim cellData = New cv.Mat(count, 4, cv.MatType.CV_8U, Neighbor_CellData(cPtr))
+            Dim nPoints = New cv.Mat(count, 2, cv.MatType.CV_32S, Neighbor_Points(cPtr))
             For i = 0 To count - 1
-                Dim rcX = task.redCells(idList.Get(Of Integer)(i, 0))
-                vbDrawContour(dst3(rcX.rect), rcX.contour, rcX.color, -1)
+                Dim pt = nPoints.Get(Of cv.Point)(i, 0)
+                For j = 0 To cellData.Cols - 1
+                    Dim id = cellData.Get(Of Byte)(i, 0)
+                    If id = 0 Then Continue For
+                    Dim rcX = task.redCells(id)
+                    If rcX.corners.Contains(pt) Then Continue For
+                    rcX.corners.Add(pt)
+                    task.redCells(id) = rcX
+                Next
             Next
+
+            If task.rcSelect.index <> 0 Then
+                dst3.SetTo(0)
+                For Each c In task.rcSelect.corners
+                    dst3.Circle(c, task.dotSize, task.highlightColor, -1, task.lineType)
+                Next
+            End If
         End If
     End Sub
     Public Sub Close()
@@ -118,13 +132,13 @@ Module Neighbor_Module
     Public Sub Neighbor_Close(cPtr As IntPtr)
     End Sub
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Neighbor_List(cPtr As IntPtr) As IntPtr
+    Public Function Neighbor_CellData(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Neighbor_Count(cPtr As IntPtr) As Integer
+    Public Function Neighbor_Points(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Neighbor_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer, cellCount As Integer) As Integer
+    Public Function Neighbor_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As Integer
     End Function
 
 End Module

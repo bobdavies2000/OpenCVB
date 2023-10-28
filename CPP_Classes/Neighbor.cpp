@@ -13,26 +13,41 @@ using namespace  cv;
 class Neighbors
 {
 private:
-    void testCellMap(Point pt)
-    {
-        if (pt.y < 0) pt.y = 0;
-        if (pt.y >= src.rows) pt.y = src.rows - 1;
-        if (pt.x < 0) pt.x = 0;
-        if (pt.x >= src.cols) pt.x = src.cols - 1;
-        int id = src.at<uchar>(pt.y, pt.x);
-        if (id == 0) return;
-        if (count(neighbors.begin(), neighbors.end(), id) == 0)
-            neighbors.push_back(id);
-    }
 public:
     Mat src, contour;
-    vector<int> neighbors;
-    Neighbors() {}
-    void RunCPP(int cellIndex)
+    vector<Point> nPoints;
+    vector<uchar> cellData;
+    void RunCPP()
     {
-        vector<Point> nPoints; vector<string> cellData;
-        neighbors.clear();
-
+        nPoints.clear();
+        cellData.clear();
+        for (int y = 1; y < src.rows - 3; y++)
+            for (int x = 1; x < src.cols - 3; x++)
+            {
+                vector<uchar> nabs;
+                vector<uchar> ids = { 0, 0, 0, 0 };
+                int index = 0;
+                for (int yy = y; yy < y + 2; yy++)
+                {
+                    for (int xx = x; xx < x + 2; xx++)
+                    {
+                        uchar val = src.at<uchar>(yy, xx);
+                        if (count(nabs.begin(), nabs.end(), val) == 0)
+                        {
+                            nabs.push_back(val);
+                        }
+                        ids[index++] = val;
+                    }
+                }
+                if (nabs.size() > 2)
+                {
+                    nPoints.push_back(Point(x, y));
+                    cellData.push_back(ids[0]);
+                    cellData.push_back(ids[1]);
+                    cellData.push_back(ids[2]);
+                    cellData.push_back(ids[3]);
+                }
+            }
     }
 };
 
@@ -48,21 +63,21 @@ void Neighbor_Close(Neighbors * cPtr)
 }
 
 extern "C" __declspec(dllexport)
-int* Neighbor_List(Neighbors * cPtr)
+int* Neighbor_CellData(Neighbors * cPtr)
 {
-    return (int*)&cPtr->neighbors[0];
+    return (int*)&cPtr->cellData[0];
 }
 
 extern "C" __declspec(dllexport)
-int Neighbor_Count(Neighbors * cPtr)
+int* Neighbor_Points(Neighbors * cPtr)
 {
-    return (int)cPtr->neighbors.size();
+    return (int*)&cPtr->nPoints[0];
 }
 
 extern "C" __declspec(dllexport)
-int Neighbor_RunCPP(Neighbors * cPtr, int* dataPtr, int rows, int cols, int cellCount)
+int Neighbor_RunCPP(Neighbors * cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
-    cPtr->RunCPP(cellCount);
-    return (int)cPtr->neighbors.size();
+    cPtr->RunCPP();
+    return (int)cPtr->nPoints.size();
 }
