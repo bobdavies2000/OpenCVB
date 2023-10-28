@@ -326,7 +326,7 @@ Public Class VB_Algorithm : Implements IDisposable
             task.dst3 = MakeSureImage8uC3(dst3)
         End If
 
-        If task.gifCreator IsNot Nothing Then task.gifCreator.createNextGifImage(task.dst0, task.dst1, task.dst2, task.dst3)
+        If task.gifCreator IsNot Nothing Then task.gifCreator.createNextGifImage()
 
         If task.dst2.Width = task.workingRes.Width And task.dst2.Height = task.workingRes.Height Then
             If gOptions.ShowGrid.Checked Then task.dst2.SetTo(cv.Scalar.White, task.gridMask)

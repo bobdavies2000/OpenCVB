@@ -3731,12 +3731,12 @@ Public Class Options_Gif : Inherits VB_Algorithm
             frmRadio.top = gOptions.Height * 2 / 3
         End If
 
-        If dst2Radio.Checked Then task.gifCaptureIndex = 0
-        If dst3Radio.Checked Then task.gifCaptureIndex = 1
-        If OpenCVBwindow.Checked Then task.gifCaptureIndex = 2
-        If OpenGLwindow.Checked Then task.gifCaptureIndex = 3
-        If dst0Radio.Checked Then task.gifCaptureIndex = 4
-        If dst1Radio.Checked Then task.gifCaptureIndex = 5
+        If dst0Radio.Checked Then task.gifCaptureIndex = 0
+        If dst1Radio.Checked Then task.gifCaptureIndex = 1
+        If dst2Radio.Checked Then task.gifCaptureIndex = 2
+        If dst3Radio.Checked Then task.gifCaptureIndex = 3
+        If OpenCVBwindow.Checked Then task.gifCaptureIndex = 4
+        If OpenGLwindow.Checked Then task.gifCaptureIndex = 5
 
         task.gifBuild = buildCheck.Checked
 

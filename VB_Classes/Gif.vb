@@ -3,6 +3,7 @@ Imports System.Drawing
 Imports cvext = OpenCvSharp.Extensions
 Imports System.IO
 Imports System.Windows.Media.Media3D
+Imports VB_Classes.VBtask
 
 ' https://stackoverflow.com/questions/1196322/how-to-create-an-animated-gif-in-net
 ' https://stackoverflow.com/questions/18719302/net-creating-a-looping-gif-using-gifbitmapencoder
@@ -117,27 +118,35 @@ Public Class Gif_OpenCVB : Inherits VB_Algorithm
     Public Sub New()
         desc = "Create a GIF of the OpenCVB main screen for any algorithm."
     End Sub
-    Public Sub createNextGifImage(dst0 As cv.Mat, dst1 As cv.Mat, tmpDst2 As cv.Mat, tmpDst3 As cv.Mat)
+    Public Sub createNextGifImage()
         Static snapCheck = findCheckBox("Check this box when Gif_Basics dst2 contains the desired snapshot.")
         If snapCheck.checked Then
             Dim nextBMP As Bitmap
             Select Case task.gifCaptureIndex
-                Case 0
-                    If tmpDst2.Channels = 1 Then tmpDst2 = tmpDst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-                    nextBMP = New Bitmap(tmpDst2.Width, tmpDst2.Height, Imaging.PixelFormat.Format24bppRgb)
-                    cvext.BitmapConverter.ToBitmap(tmpDst2, nextBMP)
-                Case 1
-                    If tmpDst3.Channels = 1 Then tmpDst3 = tmpDst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-                    nextBMP = New Bitmap(tmpDst3.Width, tmpDst3.Height, Imaging.PixelFormat.Format24bppRgb)
-                    cvext.BitmapConverter.ToBitmap(tmpDst3, nextBMP)
-                Case 2 ' OpenCVB window
+                Case gifTypes.gifdst0
+                    If task.dst0.Channels = 1 Then task.dst0 = task.dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                    nextBMP = New Bitmap(task.dst0.Width, task.dst0.Height, Imaging.PixelFormat.Format24bppRgb)
+                    cvext.BitmapConverter.ToBitmap(task.dst0, nextBMP)
+                Case gifTypes.gifdst1
+                    If task.dst1.Channels = 1 Then task.dst1 = task.dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                    nextBMP = New Bitmap(task.dst1.Width, task.dst1.Height, Imaging.PixelFormat.Format24bppRgb)
+                    cvext.BitmapConverter.ToBitmap(task.dst1, nextBMP)
+                Case gifTypes.gifdst2
+                    If task.dst2.Channels = 1 Then task.dst2 = task.dst2.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                    nextBMP = New Bitmap(task.dst2.Width, task.dst2.Height, Imaging.PixelFormat.Format24bppRgb)
+                    cvext.BitmapConverter.ToBitmap(task.dst2, nextBMP)
+                Case gifTypes.gifdst3
+                    If task.dst3.Channels = 1 Then task.dst3 = task.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                    nextBMP = New Bitmap(task.dst3.Width, task.dst3.Height, Imaging.PixelFormat.Format24bppRgb)
+                    cvext.BitmapConverter.ToBitmap(task.dst3, nextBMP)
+                Case gifTypes.openCVBwindow
                     Dim r = New cv.Rect(0, 0, task.mainFormLocation.Width - 20, task.mainFormLocation.Height - 40)
                     nextBMP = New Bitmap(r.Width, r.Height, Imaging.PixelFormat.Format24bppRgb)
                     Dim snapshot As Bitmap = GetWindowImage(task.main_hwnd, r)
                     Dim snap = cvext.BitmapConverter.ToMat(snapshot)
                     snap = snap.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
                     cvext.BitmapConverter.ToBitmap(snap, nextBMP)
-                Case 3 ' OpenGL window
+                Case gifTypes.openGLwindow
                     Dim rect As RECT
                     GetWindowRect(openGL_hwnd, rect)
                     Dim r = New cv.Rect(0, 0, rect.Right - rect.Left + 330, rect.Bottom - rect.Top + 200)
@@ -146,14 +155,6 @@ Public Class Gif_OpenCVB : Inherits VB_Algorithm
                     Dim snap = cvext.BitmapConverter.ToMat(snapshot)
                     snap = snap.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
                     cvext.BitmapConverter.ToBitmap(snap, nextBMP)
-                Case 4
-                    If dst0.Channels = 1 Then dst0 = dst0.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-                    nextBMP = New Bitmap(dst0.Width, dst0.Height, Imaging.PixelFormat.Format24bppRgb)
-                    cvext.BitmapConverter.ToBitmap(dst0, nextBMP)
-                Case 5
-                    If dst1.Channels = 1 Then dst1 = dst1.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-                    nextBMP = New Bitmap(dst1.Width, dst1.Height, Imaging.PixelFormat.Format24bppRgb)
-                    cvext.BitmapConverter.ToBitmap(dst1, nextBMP)
             End Select
             task.gifImages.Add(nextBMP)
             snapCheck.checked = False

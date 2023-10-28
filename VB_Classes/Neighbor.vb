@@ -138,6 +138,7 @@ End Module
 
 Public Class Neighbor_Corner : Inherits VB_Algorithm
     Public Sub New()
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Find the corner points where multiple cells intersect."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -192,10 +193,45 @@ Public Class Neighbor_Corner : Inherits VB_Algorithm
             End Select
         Next
 
+        dst3.SetTo(0)
         For Each pt In nPoints
             dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            dst3.Set(Of Byte)(pt.Y, pt.X, 255)
         Next
 
         labels(2) = CStr(nPoints.Count) + " intersections with 3 or more cells were found"
+        labels(3) = CStr(nPoints.Count) + " key points in the image"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Neighbor_CornerFind : Inherits VB_Algorithm
+    Dim corners As New Neighbor_Corner
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        desc = "Find the corners that belong to a cell"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        corners.Run(src)
+        dst2 = corners.dst2
+        dst3 = corners.dst3
+
+        Dim rc = task.rcSelect
+        dst1.SetTo(0)
+        Dim count As Integer = 0
+        For Each pt In rc.contour
+            Dim val = dst3(rc.rect).Get(Of Byte)(pt.Y, pt.X)
+            If val > 0 Then
+                dst1(rc.rect).Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+                count += 1
+            End If
+        Next
+        labels(3) = CStr(count) + " points were found in the contour for cell " + CStr(rc.index)
     End Sub
 End Class

@@ -1248,7 +1248,6 @@ Public Class OpenCVB
                 End SyncLock
             End If
 
-            ' when using a recorded video, task.color is the contents of the video.
             ' If task.dst0 was requested, task.color will contain dst0.
             SyncLock paintLock
                 dst(0) = task.dst0.Clone

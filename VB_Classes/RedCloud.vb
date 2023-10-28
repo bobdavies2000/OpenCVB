@@ -2369,3 +2369,25 @@ Public Class RedCloud_Neighbors : Inherits VB_Algorithm
         labels(2) = CStr(task.redCells.Count) + " regions identified."
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class RedCloud_Contours : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        desc = "Show all the contours found in the RedCloud output"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+
+        dst3.SetTo(0)
+        For Each rc In task.redCells
+            vbDrawContour(dst3(rc.rect), rc.contour, rc.color, task.lineWidth)
+        Next
+    End Sub
+End Class

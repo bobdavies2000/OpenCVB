@@ -195,6 +195,14 @@ Public Class VBtask : Implements IDisposable
     Public gifImages As New List(Of Bitmap)
     Public gifBuild As Boolean
     Public gifCaptureIndex As Integer
+    Public Enum gifTypes
+        gifdst0 = 0
+        gifdst1 = 1
+        gifdst2 = 2
+        gifdst3 = 3
+        openCVBwindow = 4
+        openGLwindow = 5
+    End Enum
     Public cvFontSize As Single = 0.8
     Public cvFontThickness As Integer = 1
 
@@ -463,8 +471,12 @@ Public Class VBtask : Implements IDisposable
                         Next
                         task.gifBuild = False
                         task.gifImages.Clear()
+                        Dim gifName As New FileInfo(task.homeDir + "\GifBuilder\bin\x64\Release\net6.0-windows10.0.22621.0\GifBuilder.exe")
+                        If gifName.Exists = False Then
+                            gifName = New FileInfo(task.homeDir + "\GifBuilder\bin\x64\Release\net7.0-windows10.0.22621.0\GifBuilder.exe")
+                        End If
                         Dim gifProcess As New Process
-                        gifProcess.StartInfo.FileName = task.homeDir + "\GifBuilder\bin\x64\Release\net7.0-windows\GifBuilder.exe"
+                        gifProcess.StartInfo.FileName = gifName.FullName
                         gifProcess.StartInfo.WorkingDirectory = task.homeDir + "Temp/"
                         gifProcess.Start()
                     End If
