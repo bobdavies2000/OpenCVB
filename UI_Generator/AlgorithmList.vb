@@ -1005,6 +1005,7 @@ if algorithmName = "MultiDimensionScaling_Cities" Then return new MultiDimension
 if algorithmName = "Neighbor_Basics" Then return new Neighbor_Basics
 if algorithmName = "Neighbor_Corner" Then return new Neighbor_Corner
 if algorithmName = "Neighbor_CornerFind" Then return new Neighbor_CornerFind
+if algorithmName = "Neighbor_CornerFind2" Then return new Neighbor_CornerFind2
 if algorithmName = "Neighbor_CPP" Then return new Neighbor_CPP
 if algorithmName = "OilPaint_Cartoon" Then return new OilPaint_Cartoon
 if algorithmName = "OilPaint_Manual" Then return new OilPaint_Manual
