@@ -2,6 +2,7 @@
 Imports cv = OpenCvSharp
 Public Class TreeviewForm
     Dim botDistance As Integer
+    Dim treeData As New List(Of String)
     Dim moduleList As New List(Of String) ' the list of all active algorithms.
     Private Sub TreeView1_AfterSelect(sender As Object, e As TreeViewEventArgs) Handles TreeView1.AfterSelect
         Me.TreeViewTimer.Enabled = False
@@ -48,8 +49,8 @@ Public Class TreeviewForm
 
         Dim tv = TreeView1
         tv.Nodes.Clear()
-        Dim calltrace = OpenCVB.callTrace
-        Dim rootcall = Trim(calltrace(0))
+        Dim callTrace = OpenCVB.callTrace
+        Dim rootcall = Trim(callTrace(0))
         Dim title = Mid(rootcall, 1, Len(rootcall) - 1)
         Me.Text = title + titleStr
         Dim n = tv.Nodes.Add(title)
@@ -58,21 +59,22 @@ Public Class TreeviewForm
         Dim entryCount = 1
         For nodeLevel = 0 To 100 ' this loop will terminate after the depth of the nesting.  100 is excessive insurance deep nesting may occur.
             Dim alldone = True
-            For i = 1 To calltrace.Count - 1
-                Dim fullname = calltrace(i)
+
+            For i = 1 To callTrace.Count - 1
+                Dim fullname = callTrace(i)
                 Dim split() = fullname.Split("\")
                 If split.Count = nodeLevel + 3 Then
                     alldone = False
                     Dim node = getNode(tv, fullname)
                     If node Is Nothing Then
                         If nodeLevel = 0 Then
-                            node = tv.Nodes(nodeLevel).Nodes.Add(split(nodeLevel + 1) + " x")
+                            node = tv.Nodes(nodeLevel).Nodes.Add(split(nodeLevel + 1))
                         Else
                             Dim parent = Mid(fullname, 1, Len(fullname) - Len(split(nodeLevel + 1)) - 1)
                             If parent <> rootcall Then
                                 node = getNode(tv, parent)
                                 If node Is Nothing Then Continue For
-                                node = node.Nodes.Add(split(nodeLevel + 1) + " x")
+                                node = node.Nodes.Add(split(nodeLevel + 1))
                             End If
                         End If
                     Else
@@ -84,6 +86,12 @@ Public Class TreeviewForm
             Next
             If alldone Then Exit For ' we didn't find any more nodes to add.
         Next
+
+        For Each sn In callTrace
+            Dim split() = sn.Split("\")
+            treeData.Add(split(split.Length - 2))
+        Next
+
         tv.ExpandAll()
         tv.HideSelection = False
         tv.SelectedNode = n
@@ -130,15 +138,28 @@ Public Class TreeviewForm
                 Next
 
                 PercentTime.Text = ""
-                PercentTime.Text = "Algorithm FPS = " + Format(OpenCVB.algorithmFPS, "0.0") + vbCrLf + vbCrLf
+                PercentTime.Text = "Algorithm FPS = " + Format(OpenCVB.algorithmFPS, "0.0") + vbCrLf
+                PercentTime.Text += "% = function times for algorithm task only." + vbCrLf + vbCrLf
                 Static boldFont = New Font(PercentTime.Font, FontStyle.Bold)
                 Static regularFont = New Font(PercentTime.Font, FontStyle.Regular)
 
+                Dim timeDataTree As New List(Of String)(treeData)
                 For i = 0 To PercentTimes.Count - 1
                     Dim str = PercentTimes.ElementAt(i).Value
+                    Dim index = treeData.IndexOf(str.Substring(6))
                     PercentTime.Text += str + vbCrLf
+                    If index >= 0 Then timeDataTree(index) = str.Substring(0, 5) + " " + timeDataTree(index)
                 Next
-                PercentTime.Text += vbCrLf + vbCrLf + "% = function times for algorithm task only."
+
+                PercentTime.Text += "---------------- Tree order display: " + vbCrLf
+                For Each sn In timeDataTree
+                    If sn.Contains("%") Then
+                        PercentTime.Text += sn + vbCrLf
+                    Else
+                        PercentTime.Text += vbTab + sn + vbCrLf
+                    End If
+                Next
+
             End If
         End SyncLock
     End Sub
