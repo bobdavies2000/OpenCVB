@@ -600,8 +600,8 @@ End Class
 
 Public Class Flood_Featureless : Inherits VB_Algorithm
     Public classCount As Integer
-    Dim fCell As New RedCell_Basics
-    Public fCells As New List(Of fcData)
+    Dim fCell As New RedCell_BasicsNew
+    Dim fCells As New List(Of rcData)
     Public Sub New()
         labels = {"", "", "", "Palette output of image at left"}
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -615,15 +615,15 @@ Public Class Flood_Featureless : Inherits VB_Algorithm
         End If
 
         fCell.Run(src)
-        classCount = task.fCells.Count
+        classCount = task.fNewCells.Count
 
         Dim index As Integer = 1
         dst2.SetTo(0)
         fCells.Clear()
-        For Each fc In task.fCells
-            fc.hull = cv.Cv2.ConvexHull(fc.contour, True).ToList
-            vbDrawContour(dst2(fc.rect), fc.hull, fc.index, -1)
-            fCells.Add(fc)
+        For Each rc In task.fNewCells
+            rc.hull = cv.Cv2.ConvexHull(rc.contour, True).ToList
+            vbDrawContour(dst2(rc.rect), rc.hull, rc.index, -1)
+            fCells.Add(rc)
         Next
 
         labels(2) = "Hulls were added for each of the " + CStr(fCells.Count) + " regions identified"

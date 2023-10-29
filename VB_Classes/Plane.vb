@@ -609,7 +609,6 @@ Public Class Plane_Equation : Inherits VB_Algorithm
             rc.eq = New cv.Vec4f(xList(dotIndex), yList(dotIndex), zList(dotIndex), kList(dotIndex))
         End If
         If dotlist.Count Then
-            rc.dotAverage = dotlist.Average
             If heartBeat() Then
                 justEquation = Format(rc.eq(0), fmt3) + "*X + " + Format(rc.eq(1), fmt3) + "*Y + "
                 justEquation += Format(rc.eq(2), fmt3) + "*Z + " + Format(rc.eq(3), fmt3) + vbCrLf
@@ -623,7 +622,7 @@ Public Class Plane_Equation : Inherits VB_Algorithm
                     End If
                 End If
                 strOut += CStr(xList.Count) + " 3D plane equations were tested with an average dot product = " +
-                              Format(rc.dotAverage, "0.00")
+                              Format(dotlist.Average, "0.00")
             End If
         End If
         If standalone Or testIntermediate(traceName) Then

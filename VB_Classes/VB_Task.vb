@@ -220,6 +220,9 @@ Public Class VBtask : Implements IDisposable
     Public fCells As New List(Of fcData)
     Public fcSelect As New fcData
 
+    Public fNewCells As New List(Of rcData)
+    Public fcNewSelect As New rcData
+
     Public redOther As Integer
     Public redCells As New List(Of rcData)
     Public lastCells As New List(Of rcData)

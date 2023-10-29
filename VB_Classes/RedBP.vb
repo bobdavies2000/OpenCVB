@@ -193,7 +193,7 @@ Public Class RedBP_MatchCell : Inherits VB_Algorithm
         Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
         cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.mask)
 
-        ' If there Is no Then depth within the mask, estimate this color only cell Using rc.rect instead!
+        ' If there is no Then depth within the mask, estimate this color only cell Using rc.rect instead!
         If depthMean(2) = 0 Then
             rc.colorOnly = True
             cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev)

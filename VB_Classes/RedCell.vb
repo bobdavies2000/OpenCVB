@@ -65,6 +65,147 @@ End Class
 
 
 
+Public Class RedCell_BasicsNew : Inherits VB_Algorithm
+    Dim fCell As New RedCell_NewCPP
+    Dim lastMap As cv.Mat
+    Public Sub New()
+        lastMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Match fCells from the current generation to the last."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim lastCells As New List(Of rcData)(task.fNewCells)
+        Dim lastMap = dst3.Clone
+
+        fCell.Run(src)
+        dst3 = fCell.dst3
+
+        Dim fCells As New List(Of rcData)
+        Dim lrc As rcData
+        Dim usedColors1 As New List(Of cv.Vec3b)
+        For Each rc In task.fNewCells
+            Dim prev = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+            If prev < lastCells.Count And prev <> 0 Then
+                lrc = lastCells(prev)
+                rc.indexLast = lrc.index
+                rc.color = lrc.color
+                rc.maxDStable = lrc.maxDStable
+                Dim stableCheck = lastMap.Get(Of Byte)(lrc.maxDStable.Y, lrc.maxDStable.X)
+                If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
+            End If
+            If usedColors1.Contains(rc.color) Then
+                rc.color = New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240))
+            End If
+            usedColors1.Add(rc.color)
+            fCells.Add(rc)
+        Next
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        Dim usedColors2 As New List(Of cv.Vec3b)
+        For Each fc In fCells
+            If usedColors2.Contains(fc.color) Then
+                fc.color = New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240))
+            End If
+            dst2(fc.rect).SetTo(fc.color, fc.mask)
+            dst3(fc.rect).SetTo(fc.index, fc.mask)
+        Next
+
+        task.fNewCells = New List(Of rcData)(fCells)
+        If task.clickPoint <> New cv.Point Then
+            Dim index = dst3.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+            If index < task.fNewCells.Count Then
+                task.fcNewSelect = task.fNewCells(index)
+                Dim fc = task.fcSelect
+                dst2(fc.rect).SetTo(white, fc.mask)
+                task.color(fc.rect).SetTo(white, fc.mask)
+            End If
+        End If
+
+        labels(2) = fCell.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCell_NewCPP : Inherits VB_Algorithm
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        cPtr = FCell_Open()
+        gOptions.PixelDiffThreshold.Value = 0
+        desc = "Floodfill an image so each cell can be tracked.  NOTE: cells are not matched to previous image.  Use RedCell_Basics for matching."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels <> 1 Then
+            reduction.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+            src = reduction.dst2
+        End If
+
+        Dim inputData(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+        Dim imagePtr = FCell_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols, src.Type,
+                                 task.minPixels, gOptions.PixelDiffThreshold.Value)
+        handleInput.Free()
+
+        dst3 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr)
+
+        Dim classCount = FCell_Count(cPtr)
+        If heartBeat() Then labels(3) = CStr(classCount) + " regions found"
+        If classCount <= 1 Then Exit Sub
+
+        Dim sizeData = New cv.Mat(classCount, 1, cv.MatType.CV_32S, FCell_Sizes(cPtr))
+        Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, FCell_Rects(cPtr))
+        Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
+        task.fNewCells.Clear()
+        task.fNewCells.Add(New rcData) ' placeholder so index aligns with offset.
+        If standalone Or testIntermediate(traceName) Then dst2.SetTo(0)
+        For i = 0 To classCount - 1
+            Dim rc As New rcData
+            rc.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
+            rc.pixels = sizeData.Get(Of Integer)(i, 0)
+            rc.index = task.fNewCells.Count
+            rc.mask = dst3(rc.rect).InRange(rc.index, rc.index)
+            rc.color = task.vecColors(i) ' never more than 255...
+            rc.maxDist = vbGetMaxDist(rc)
+            rc.maxDStable = rc.maxDist ' assume it has to use the latest.
+
+            rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            vbDrawContour(rc.mask, rc.contour, rc.index, -1)
+
+            Dim minLoc As cv.Point, maxLoc As cv.Point
+            task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, minLoc, maxLoc, rc.mask)
+            task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, minLoc, maxLoc, rc.mask)
+            task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, minLoc, maxLoc, rc.mask)
+            cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.mask)
+
+            rc.depthMean = New cv.Point3f(depthMean(0), depthMean(1), depthMean(2))
+            rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
+
+            cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+
+            task.fNewCells.Add(rc)
+
+            dst2(rc.rect).SetTo(rc.color, rc.mask)
+        Next
+
+        If heartBeat() Then labels(2) = CStr(task.fNewCells.Count) + " regions were identified - use RedCell_Basics to match to the previous image."
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = FCell_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
 
 Public Class RedCell_CPP : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
