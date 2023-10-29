@@ -64,12 +64,11 @@ End Class
 
 
 Public Class RedCell_CPP : Inherits VB_Algorithm
-    Public inputMask As cv.Mat
     Dim reduction As New Reduction_Basics
     Public Sub New()
         cPtr = FCell_Open()
         gOptions.PixelDiffThreshold.Value = 0
-        desc = "Floodfill an image so each cell can be tracked."
+        desc = "Floodfill an image so each cell can be tracked.  NOTE: cells are not matched to previous image.  Use RedCell_Basics for matching."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
@@ -77,23 +76,13 @@ Public Class RedCell_CPP : Inherits VB_Algorithm
             src = reduction.dst2
         End If
 
-        Dim handlemask As GCHandle
-        Dim maskPtr As IntPtr
-        If inputMask IsNot Nothing Then
-            Dim MaskData(inputMask.Total - 1) As Byte
-            handlemask = GCHandle.Alloc(MaskData, GCHandleType.Pinned)
-            Marshal.Copy(inputMask.Data, MaskData, 0, MaskData.Length)
-            maskPtr = handlemask.AddrOfPinnedObject()
-        End If
-
         Dim inputData(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        Dim imagePtr = FCell_Run(cPtr, handleInput.AddrOfPinnedObject(), maskPtr, src.Rows, src.Cols, src.Type,
-                                     task.minPixels, gOptions.PixelDiffThreshold.Value)
+        Dim imagePtr = FCell_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols, src.Type,
+                                 task.minPixels, gOptions.PixelDiffThreshold.Value)
         handleInput.Free()
-        If maskPtr <> 0 Then handlemask.Free()
 
         dst3 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr)
 
@@ -135,7 +124,7 @@ Public Class RedCell_CPP : Inherits VB_Algorithm
             dst2(fc.rect).SetTo(fc.color, fc.mask)
         Next
 
-        If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions were identified."
+        If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions were identified - use RedCell_Basics to match to the previous image."
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = FCell_Close(cPtr)
