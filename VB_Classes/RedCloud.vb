@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedCloud_Basics : Inherits VB_Algorithm
     Dim fCell As New RedCell_Basics
-    Dim prep As New RedCloud_PointCloud
+    Dim prep As New RedCloud_Core
     Dim reduction As New Reduction_Basics
     Public Sub New()
         gOptions.useHistoryCloud.Checked = False ' no artifacts.
@@ -32,7 +32,7 @@ End Class
 
 Public Class RedCloud_CloudOnly : Inherits VB_Algorithm
     Dim fCell As New RedCell_Basics
-    Dim prep As New RedCloud_PointCloud
+    Dim prep As New RedCloud_Core
     Public Sub New()
         gOptions.useHistoryCloud.Checked = False ' no artifacts.
         desc = "Run RedCell_Basics only on the prep'd data"
@@ -55,8 +55,9 @@ End Class
 
 
 
-Public Class RedCloud_PointCloud : Inherits VB_Algorithm
+Public Class RedCloud_Core : Inherits VB_Algorithm
     Public Sub New()
+        redOptions.RedCloudOnly.Enabled = True
         desc = "Reduction transform for the point cloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -103,7 +104,7 @@ End Class
 
 
 Public Class RedCloud_Test : Inherits VB_Algorithm
-    Dim prep As New RedCloud_PointCloud
+    Dim prep As New RedCloud_Core
     Public fCell As New RedCell_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()

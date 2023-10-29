@@ -46,7 +46,7 @@ Partial Class OptionsRedCloud
         Me.RadioButton3 = New System.Windows.Forms.RadioButton()
         Me.RadioButton2 = New System.Windows.Forms.RadioButton()
         Me.RadioButton1 = New System.Windows.Forms.RadioButton()
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.RedBPonly = New System.Windows.Forms.GroupBox()
         Me.Channels02 = New System.Windows.Forms.RadioButton()
         Me.Channels12 = New System.Windows.Forms.RadioButton()
         Me.Channels01 = New System.Windows.Forms.RadioButton()
@@ -71,7 +71,7 @@ Partial Class OptionsRedCloud
         Me.ColorLabel = New System.Windows.Forms.Label()
         Me.ColorReductionSlider = New System.Windows.Forms.TrackBar()
         Me.ColorReduce = New System.Windows.Forms.Label()
-        Me.GroupBox4 = New System.Windows.Forms.GroupBox()
+        Me.RedCloudOnly = New System.Windows.Forms.GroupBox()
         Me.RadioButton11 = New System.Windows.Forms.RadioButton()
         Me.RadioButton10 = New System.Windows.Forms.RadioButton()
         Me.RadioButton9 = New System.Windows.Forms.RadioButton()
@@ -87,7 +87,7 @@ Partial Class OptionsRedCloud
         CType(Me.XRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.RGBSource.SuspendLayout()
-        Me.GroupBox1.SuspendLayout()
+        Me.RedBPonly.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         CType(Me.LowerSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.UpperSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -96,7 +96,7 @@ Partial Class OptionsRedCloud
         CType(Me.PCreductionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.BitwiseReductionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.ColorReductionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.GroupBox4.SuspendLayout()
+        Me.RedCloudOnly.SuspendLayout()
         Me.SuspendLayout()
         '
         'RedCloudSliders
@@ -301,7 +301,7 @@ Partial Class OptionsRedCloud
         Me.RGBSource.Controls.Add(Me.RadioButton3)
         Me.RGBSource.Controls.Add(Me.RadioButton2)
         Me.RGBSource.Controls.Add(Me.RadioButton1)
-        Me.RGBSource.Location = New System.Drawing.Point(849, 30)
+        Me.RGBSource.Location = New System.Drawing.Point(1103, 180)
         Me.RGBSource.Name = "RGBSource"
         Me.RGBSource.Size = New System.Drawing.Size(250, 175)
         Me.RGBSource.TabIndex = 3
@@ -352,17 +352,18 @@ Partial Class OptionsRedCloud
         Me.RadioButton1.Text = "BackProject_Full"
         Me.RadioButton1.UseVisualStyleBackColor = True
         '
-        'GroupBox1
+        'RedBPonly
         '
-        Me.GroupBox1.Controls.Add(Me.Channels02)
-        Me.GroupBox1.Controls.Add(Me.Channels12)
-        Me.GroupBox1.Controls.Add(Me.Channels01)
-        Me.GroupBox1.Location = New System.Drawing.Point(849, 211)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(250, 141)
-        Me.GroupBox1.TabIndex = 4
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Histogram 2D Channels"
+        Me.RedBPonly.Controls.Add(Me.Channels02)
+        Me.RedBPonly.Controls.Add(Me.Channels12)
+        Me.RedBPonly.Controls.Add(Me.Channels01)
+        Me.RedBPonly.Enabled = False
+        Me.RedBPonly.Location = New System.Drawing.Point(1103, 33)
+        Me.RedBPonly.Name = "RedBPonly"
+        Me.RedBPonly.Size = New System.Drawing.Size(250, 141)
+        Me.RedBPonly.TabIndex = 4
+        Me.RedBPonly.TabStop = False
+        Me.RedBPonly.Text = "RedBP Only"
         '
         'Channels02
         '
@@ -474,7 +475,7 @@ Partial Class OptionsRedCloud
         Me.GroupReduction.Controls.Add(Me.NoReduction)
         Me.GroupReduction.Controls.Add(Me.BitwiseReduction)
         Me.GroupReduction.Controls.Add(Me.SimpleReduction)
-        Me.GroupReduction.Location = New System.Drawing.Point(1119, 36)
+        Me.GroupReduction.Location = New System.Drawing.Point(1364, 44)
         Me.GroupReduction.Name = "GroupReduction"
         Me.GroupReduction.Size = New System.Drawing.Size(250, 130)
         Me.GroupReduction.TabIndex = 5
@@ -617,26 +618,27 @@ Partial Class OptionsRedCloud
         Me.ColorReduce.TabIndex = 6
         Me.ColorReduce.Text = "Color Reduction"
         '
-        'GroupBox4
+        'RedCloudOnly
         '
-        Me.GroupBox4.Controls.Add(Me.RadioButton11)
-        Me.GroupBox4.Controls.Add(Me.RadioButton10)
-        Me.GroupBox4.Controls.Add(Me.RadioButton9)
-        Me.GroupBox4.Controls.Add(Me.ReductionXY)
-        Me.GroupBox4.Controls.Add(Me.RadioButton7)
-        Me.GroupBox4.Controls.Add(Me.RadioButton5)
-        Me.GroupBox4.Controls.Add(Me.RadioButton6)
-        Me.GroupBox4.Location = New System.Drawing.Point(1119, 178)
-        Me.GroupBox4.Name = "GroupBox4"
-        Me.GroupBox4.Size = New System.Drawing.Size(495, 174)
-        Me.GroupBox4.TabIndex = 7
-        Me.GroupBox4.TabStop = False
-        Me.GroupBox4.Text = "PointCloud Reduction"
+        Me.RedCloudOnly.Controls.Add(Me.RadioButton11)
+        Me.RedCloudOnly.Controls.Add(Me.RadioButton10)
+        Me.RedCloudOnly.Controls.Add(Me.RadioButton9)
+        Me.RedCloudOnly.Controls.Add(Me.ReductionXY)
+        Me.RedCloudOnly.Controls.Add(Me.RadioButton7)
+        Me.RedCloudOnly.Controls.Add(Me.RadioButton5)
+        Me.RedCloudOnly.Controls.Add(Me.RadioButton6)
+        Me.RedCloudOnly.Enabled = False
+        Me.RedCloudOnly.Location = New System.Drawing.Point(861, 23)
+        Me.RedCloudOnly.Name = "RedCloudOnly"
+        Me.RedCloudOnly.Size = New System.Drawing.Size(221, 282)
+        Me.RedCloudOnly.TabIndex = 7
+        Me.RedCloudOnly.TabStop = False
+        Me.RedCloudOnly.Text = "RedCloud Only "
         '
         'RadioButton11
         '
         Me.RadioButton11.AutoSize = True
-        Me.RadioButton11.Location = New System.Drawing.Point(242, 103)
+        Me.RadioButton11.Location = New System.Drawing.Point(28, 241)
         Me.RadioButton11.Name = "RadioButton11"
         Me.RadioButton11.Size = New System.Drawing.Size(167, 24)
         Me.RadioButton11.TabIndex = 8
@@ -647,7 +649,7 @@ Partial Class OptionsRedCloud
         'RadioButton10
         '
         Me.RadioButton10.AutoSize = True
-        Me.RadioButton10.Location = New System.Drawing.Point(242, 71)
+        Me.RadioButton10.Location = New System.Drawing.Point(28, 207)
         Me.RadioButton10.Name = "RadioButton10"
         Me.RadioButton10.Size = New System.Drawing.Size(156, 24)
         Me.RadioButton10.TabIndex = 7
@@ -658,7 +660,7 @@ Partial Class OptionsRedCloud
         'RadioButton9
         '
         Me.RadioButton9.AutoSize = True
-        Me.RadioButton9.Location = New System.Drawing.Point(242, 39)
+        Me.RadioButton9.Location = New System.Drawing.Point(29, 173)
         Me.RadioButton9.Name = "RadioButton9"
         Me.RadioButton9.Size = New System.Drawing.Size(156, 24)
         Me.RadioButton9.TabIndex = 6
@@ -715,11 +717,11 @@ Partial Class OptionsRedCloud
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1690, 632)
-        Me.Controls.Add(Me.GroupBox4)
+        Me.Controls.Add(Me.RedCloudOnly)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.GroupReduction)
         Me.Controls.Add(Me.GroupBox2)
-        Me.Controls.Add(Me.GroupBox1)
+        Me.Controls.Add(Me.RedBPonly)
         Me.Controls.Add(Me.RGBSource)
         Me.Controls.Add(Me.RedCloudSliders)
         Me.Name = "OptionsRedCloud"
@@ -734,8 +736,8 @@ Partial Class OptionsRedCloud
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.RGBSource.ResumeLayout(False)
         Me.RGBSource.PerformLayout()
-        Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
+        Me.RedBPonly.ResumeLayout(False)
+        Me.RedBPonly.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         CType(Me.LowerSlider, System.ComponentModel.ISupportInitialize).EndInit()
@@ -747,8 +749,8 @@ Partial Class OptionsRedCloud
         CType(Me.PCreductionSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.BitwiseReductionSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.ColorReductionSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.GroupBox4.ResumeLayout(False)
-        Me.GroupBox4.PerformLayout()
+        Me.RedCloudOnly.ResumeLayout(False)
+        Me.RedCloudOnly.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -773,7 +775,7 @@ Partial Class OptionsRedCloud
     Friend WithEvents SideLabel As Windows.Forms.Label
     Friend WithEvents SideViewThreshold As Windows.Forms.TrackBar
     Friend WithEvents Label8 As Windows.Forms.Label
-    Friend WithEvents GroupBox1 As Windows.Forms.GroupBox
+    Friend WithEvents RedBPonly As Windows.Forms.GroupBox
     Friend WithEvents Channels02 As Windows.Forms.RadioButton
     Friend WithEvents Channels12 As Windows.Forms.RadioButton
     Friend WithEvents Channels01 As Windows.Forms.RadioButton
@@ -800,7 +802,7 @@ Partial Class OptionsRedCloud
     Friend WithEvents PCreductionLabel As Windows.Forms.Label
     Friend WithEvents PCreductionSlider As Windows.Forms.TrackBar
     Friend WithEvents Label5 As Windows.Forms.Label
-    Friend WithEvents GroupBox4 As Windows.Forms.GroupBox
+    Friend WithEvents RedCloudOnly As Windows.Forms.GroupBox
     Friend WithEvents RadioButton9 As Windows.Forms.RadioButton
     Friend WithEvents ReductionXY As Windows.Forms.RadioButton
     Friend WithEvents RadioButton7 As Windows.Forms.RadioButton

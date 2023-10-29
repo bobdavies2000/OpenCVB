@@ -9,6 +9,7 @@ Public Class RedBP_Basics : Inherits VB_Algorithm
     Public Sub New()
         If standalone Then gOptions.displayDst0.Checked = True
         If standalone Then gOptions.displayDst1.Checked = True
+        redOptions.RedBPonly.Enabled = True
         desc = "Match cells from the previous generation"
     End Sub
     Public Function redSelect(ByRef dstInput0 As cv.Mat, ByRef dstInput1 As cv.Mat, ByRef dstInput2 As cv.Mat) As rcData
@@ -137,6 +138,7 @@ Public Class RedBP_MatchCell : Inherits VB_Algorithm
     Public Sub New()
         task.cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         lastCellMap = task.cellMap.Clone
+        redOptions.RedBPonly.Enabled = True
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         strOut = "RedBP_MatchCell takes an rcPrep cell and builds an rcData cell." + vbCrLf +
                  "When standalone, it just build a fake rcPrep cell and displays the rcData equivalent."
