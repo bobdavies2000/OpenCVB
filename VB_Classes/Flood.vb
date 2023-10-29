@@ -600,7 +600,7 @@ End Class
 
 Public Class Flood_Featureless : Inherits VB_Algorithm
     Public classCount As Integer
-    Dim fCell As New RedCell_BasicsNew
+    Dim fCell As New RedCell_Basics
     Dim fCells As New List(Of rcData)
     Public Sub New()
         labels = {"", "", "", "Palette output of image at left"}
@@ -615,12 +615,12 @@ Public Class Flood_Featureless : Inherits VB_Algorithm
         End If
 
         fCell.Run(src)
-        classCount = task.fNewCells.Count
+        classCount = task.fCells.Count
 
         Dim index As Integer = 1
         dst2.SetTo(0)
         fCells.Clear()
-        For Each rc In task.fNewCells
+        For Each rc In task.fCells
             rc.hull = cv.Cv2.ConvexHull(rc.contour, True).ToList
             vbDrawContour(dst2(rc.rect), rc.hull, rc.index, -1)
             fCells.Add(rc)

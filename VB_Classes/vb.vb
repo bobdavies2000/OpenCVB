@@ -24,15 +24,6 @@ Module VB
         Next
         Return New cv.Point
     End Function
-    Public Function validContourPoint(fc As fcData, pt As cv.Point, offset As Integer) As cv.Point
-        If pt.X < fc.rect.Width And pt.Y < fc.rect.Height Then Return pt
-        Dim count = fc.contour.Count
-        For i = offset + 1 To fc.contour.Count - 1
-            pt = fc.contour(i Mod count)
-            If pt.X < fc.rect.Width And pt.Y < fc.rect.Height Then Return pt
-        Next
-        Return New cv.Point
-    End Function
     Public Function build3PointEquation(rc As rcData) As cv.Vec4f
         If rc.contour.Count < 3 Then Return New cv.Vec4f
         Dim offset = rc.contour.Count / 3
@@ -43,21 +34,6 @@ Module VB
         Dim v1 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p1.Y, p1.X)
         Dim v2 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p2.Y, p2.X)
         Dim v3 = task.pointCloud(rc.rect).Get(Of cv.Point3f)(p3.Y, p3.X)
-
-        Dim cross = crossProduct(v1 - v2, v2 - v3)
-        Dim k = -(v1.X * cross.X + v1.Y * cross.Y + v1.Z * cross.Z)
-        Return New cv.Vec4f(cross.X, cross.Y, cross.Z, k)
-    End Function
-    Public Function build3PointEquation(fc As fcData) As cv.Vec4f
-        If fc.contour.Count < 3 Then Return New cv.Vec4f
-        Dim offset = fc.contour.Count / 3
-        Dim p1 = validContourPoint(fc, fc.contour(offset * 0), offset * 0)
-        Dim p2 = validContourPoint(fc, fc.contour(offset * 1), offset * 1)
-        Dim p3 = validContourPoint(fc, fc.contour(offset * 2), offset * 2)
-
-        Dim v1 = task.pointCloud(fc.rect).Get(Of cv.Point3f)(p1.Y, p1.X)
-        Dim v2 = task.pointCloud(fc.rect).Get(Of cv.Point3f)(p2.Y, p2.X)
-        Dim v3 = task.pointCloud(fc.rect).Get(Of cv.Point3f)(p3.Y, p3.X)
 
         Dim cross = crossProduct(v1 - v2, v2 - v3)
         Dim k = -(v1.X * cross.X + v1.Y * cross.Y + v1.Z * cross.Z)
@@ -362,19 +338,6 @@ Module VB
 
         maxDistanceLoc.X += rp.rect.X
         maxDistanceLoc.Y += rp.rect.Y
-
-        Return maxDistanceLoc
-    End Function
-    Public Function vbGetMaxDist(ByRef fc As fcData) As cv.Point
-        Dim minVal As Double, maxVal As Double, minDistanceLoc As cv.Point, maxDistanceLoc As cv.Point
-
-        Dim mask = fc.mask.Clone
-        mask.Rectangle(New cv.Rect(0, 0, mask.Width - 1, mask.Height - 1), 0, 1)
-        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
-        distance32f.MinMaxLoc(minVal, maxVal, minDistanceLoc, maxDistanceLoc)
-
-        maxDistanceLoc.X += fc.rect.X
-        maxDistanceLoc.Y += fc.rect.Y
 
         Return maxDistanceLoc
     End Function
@@ -842,50 +805,6 @@ Public Class rcPrep
     Public index As Integer
     Public maxDist As cv.Point
     Public Sub New()
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class fcData
-    Public rect As cv.Rect
-    Public motionRect As cv.Rect ' the union of the previous rect with the current rect.
-    Public mask As cv.Mat
-    Public pixels As Integer
-    Public color As New cv.Vec3b
-
-    Public depthMean As cv.Point3f
-    Public depthStdev As cv.Point3f
-
-    Public minVec As cv.Point3f
-    Public maxVec As cv.Point3f
-
-    Public maxDist As cv.Point
-    Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.
-
-    Public index As Integer
-    Public indexLast As Integer
-
-    Public neighbors As New List(Of Byte)
-
-    Public contour As New List(Of cv.Point)
-    Public corners As New List(Of cv.Point)
-    Public hull As New List(Of cv.Point)
-
-    Public colorMean As cv.Scalar
-    Public colorStdev As cv.Scalar
-
-    Public motionDetected As Boolean
-    Public Sub New()
-        index = 0
-        mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
-        rect = New cv.Rect(0, 0, 1, 1)
     End Sub
 End Class
 
