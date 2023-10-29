@@ -2,10 +2,10 @@
 ' this module is somewhat redundant but it consolidates the algorithms that locate extrema in RedCloud cell contour.
 Public Class Sides_Basics : Inherits VB_Algorithm
     Public sides As New Profile_Basics
-    Public corners As New RedCloud_ContourCorners
+    Public corners As New RedBP_ContourCorners
     Public rc As New rcData
     Public Sub New()
-        sides.redCold = New RedCloud_Basics
+        sides.redCold = New RedBP_Basics
         labels = {"", "", "RedCloud output", "Selected Cell showing the various extrema."}
         desc = "Find the 6 extrema and the 4 farthest points in each quadrant for the selected RedCloud cell"
     End Sub
@@ -37,9 +37,9 @@ End Class
 
 Public Class Sides_Profile : Inherits VB_Algorithm
     Dim sides As New Contour_SidePoints
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedBP_Basics
     Public Sub New()
-        labels = {"", "", "RedCloud_Basics Output", "Selected Cell"}
+        labels = {"", "", "RedBP_Basics Output", "Selected Cell"}
         desc = "Find the 6 corners - left/right, top/bottom, front/back - of a RedCloud cell"
     End Sub
     Public Sub RunVB(src as cv.Mat)
@@ -61,10 +61,10 @@ End Class
 
 
 Public Class Sides_Corner : Inherits VB_Algorithm
-    Dim sides As New RedCloud_ContourCorners
-    Dim redC As New RedCloud_Basics
+    Dim sides As New RedBP_ContourCorners
+    Dim redC As New RedBP_Basics
     Public Sub New()
-        labels = {"", "", "RedCloud_Basics output", ""}
+        labels = {"", "", "RedBP_Basics output", ""}
         desc = "Find the 4 points farthest from the center in each quadrant of the selected RedCloud cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -85,7 +85,7 @@ End Class
 
 
 Public Class Sides_ColorC : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedBP_Basics
     Dim sides As New Sides_Basics
     Dim kalman As New Kalman_Basics
     Public Sub New()

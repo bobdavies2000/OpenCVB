@@ -60,7 +60,7 @@ Public Class PCA_Basics : Inherits VB_Algorithm
     End Function
     Public Sub RunVB(src As cv.Mat)
         If standalone Or runRedCloud Then
-            Static redC As New RedCloud_Basics
+            Static redC As New RedBP_Basics
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
@@ -290,7 +290,7 @@ End Module
 
 
 Public Class PCA_Plane : Inherits VB_Algorithm
-    Dim stats As New RedCloud_CellStats
+    Dim stats As New RedBP_CellStats
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         stats.runRedCloud = True

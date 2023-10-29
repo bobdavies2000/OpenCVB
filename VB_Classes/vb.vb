@@ -804,55 +804,6 @@ End Structure
 
 
 
-Public Class rcData
-    Public rect As cv.Rect
-    Public motionRect As cv.Rect ' the union of the previous rect with the current rect.
-    Public box As cv.RotatedRect
-    Public mask As cv.Mat
-    Public pixels As Integer
-
-    Public depthMean As cv.Point3f
-    Public depthStdev As cv.Point3f
-
-    Public minVec As cv.Point3f
-    Public maxVec As cv.Point3f
-
-    Public maxDist As cv.Point
-    Public floodPoint As cv.Point
-    Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.
-
-    Public index As Integer
-    Public indexLast As Integer
-
-    Public color As cv.Vec3b
-    Public neighbors As New List(Of Byte)
-
-    Public contour As New List(Of cv.Point)
-    Public corners As New List(Of cv.Point)
-    Public contour3D As New List(Of cv.Point3f)
-    Public hull As New List(Of cv.Point)
-
-    Public eq As cv.Vec4f ' plane equation
-    Public dotAverage As Single
-    Public motionDetected As Boolean
-    Public colorOnly As Boolean ' Cell mask has no depth but cell rect may.  If true, depthmean is an estimate.
-
-    Public colorMean As cv.Scalar
-    Public colorStdev As cv.Scalar
-    Public pcaVec As cv.Vec3f
-    Public Sub New()
-        index = 0
-        mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
-        rect = New cv.Rect(0, 0, 1, 1)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class kwData
     Public mask As cv.Mat
     Public hull As List(Of cv.Point)
@@ -913,6 +864,8 @@ Public Class fcData
     Public depthStdev As cv.Point3f
 
     Public maxDist As cv.Point
+    Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.
+
     Public index As Integer
     Public indexLast As Integer
 
@@ -931,5 +884,53 @@ Public Class fcData
         mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
         rect = New cv.Rect(0, 0, 1, 1)
         color = New cv.Vec3b()
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class rcData
+    Public rect As cv.Rect
+    Public motionRect As cv.Rect ' the union of the previous rect with the current rect.
+    Public mask As cv.Mat
+    Public pixels As Integer
+    Public color As cv.Vec3b
+
+    Public depthMean As cv.Point3f
+    Public depthStdev As cv.Point3f
+
+    Public minVec As cv.Point3f
+    Public maxVec As cv.Point3f
+
+    Public maxDist As cv.Point
+    Public maxDStable As cv.Point ' keep maxDist the same if it is still on the cell.
+
+    Public index As Integer
+    Public indexLast As Integer
+
+    Public neighbors As New List(Of Byte)
+
+    Public contour As New List(Of cv.Point)
+    Public corners As New List(Of cv.Point)
+    Public contour3D As New List(Of cv.Point3f)
+    Public hull As New List(Of cv.Point)
+
+    Public eq As cv.Vec4f ' plane equation
+    Public dotAverage As Single
+    Public motionDetected As Boolean
+    Public colorOnly As Boolean ' Cell mask has no depth but cell rect may.  If true, depthmean is an estimate.
+
+    Public colorMean As cv.Scalar
+    Public colorStdev As cv.Scalar
+    Public pcaVec As cv.Vec3f
+    Public Sub New()
+        index = 0
+        mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
+        rect = New cv.Rect(0, 0, 1, 1)
     End Sub
 End Class

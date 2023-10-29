@@ -4,7 +4,7 @@ Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Basics : Inherits VB_Algorithm
     Dim detect As New MSER_CPP
-    Dim matchCell As New RedCloud_MatchCell
+    Dim matchCell As New RedBP_MatchCell
     Public cellMap As cv.Mat
     Public mserCells As New List(Of rcData)
     Public boxes As New List(Of cv.Rect)
@@ -306,9 +306,9 @@ End Class
 
 Public Class MSER_RedCloud : Inherits VB_Algorithm
     Dim mBase As New MSER_Basics
-    Dim colorC As New RedCloud_ColorOnly
+    Dim colorC As New RedBP_ColorOnly
     Public Sub New()
-        desc = "Use the MSER_Basics output as input to RedCloud_Color"
+        desc = "Use the MSER_Basics output as input to RedBP_Color"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         mBase.Run(src)
@@ -527,7 +527,7 @@ End Module
 Public Class MSER_Regions : Inherits VB_Algorithm
     Dim core As New MSER_Detect
     Public mserCells As New List(Of rcData)
-    Dim matchCell As New RedCloud_MatchCell
+    Dim matchCell As New RedBP_MatchCell
     Public cellMap As cv.Mat
     Public useOpAuto As Boolean = True
     Public Sub New()

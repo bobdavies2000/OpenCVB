@@ -382,7 +382,7 @@ End Class
 
 
 Public Class Match_TraceRedC : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedBP_Basics
     Public Sub New()
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32S, 0)
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32S, 0)

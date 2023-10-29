@@ -213,13 +213,13 @@ End Class
 
 Public Class GuidedBP_kTop : Inherits VB_Algorithm
     Dim autoX As New OpAuto_XRange
-    Public colorC As New RedCloud_ColorAndCloud
+    Public colorC As New RedBP_ColorAndCloud
     Dim contours As New Contour_Largest
     Dim hist2d As New Histogram2D_Top
     Public Sub New()
         gOptions.useHistoryCloud.Checked = False
         labels(3) = "Back projection of the top view"
-        desc = "Subdivide the OpAuto_XRange output using RedCloud_Basics"
+        desc = "Subdivide the OpAuto_XRange output using RedBP_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         hist2d.Run(src)
@@ -257,12 +257,12 @@ End Class
 Public Class GuidedBP_kSide : Inherits VB_Algorithm
     Dim autoY As New OpAuto_YRange
     Public hist2d As New Histogram2D_Side
-    Public colorC As New RedCloud_ColorAndCloud
+    Public colorC As New RedBP_ColorAndCloud
     Dim contours As New Contour_Largest
     Public Sub New()
         gOptions.useHistoryCloud.Checked = False
         labels(3) = "Back projection of the top view"
-        desc = "Subdivide the GuidedBP_HistogramSide output using RedCloud_Basics"
+        desc = "Subdivide the GuidedBP_HistogramSide output using RedBP_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         hist2d.Run(src)
@@ -323,9 +323,9 @@ End Class
 
 Public Class GuidedBP_kCellStats : Inherits VB_Algorithm
     Dim kTopSide As New GuidedBP_kTopSide
-    Dim stats As New RedCloud_CellStats
+    Dim stats As New RedBP_CellStats
     Public Sub New()
-        stats.redC = New RedCloud_Basics
+        stats.redC = New RedBP_Basics
         desc = "Display all the stats for a RedColor cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -346,12 +346,12 @@ End Class
 Public Class GuidedBP_DelaunayStats : Inherits VB_Algorithm
     Dim delaunay As New GuidedBP_Delaunay
     Dim reduction As New Reduction_Basics
-    Dim stats As New RedCloud_CellStats
+    Dim stats As New RedBP_CellStats
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        stats.redC = New RedCloud_Basics
+        stats.redC = New RedBP_Basics
         labels(1) = "Compartments for each object"
-        desc = "Compartmentalize the RedCloud_Basics cells so they stay near the objects detected."
+        desc = "Compartmentalize the RedBP_Basics cells so they stay near the objects detected."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
@@ -378,7 +378,7 @@ Public Class GuidedBP_Delaunay : Inherits VB_Algorithm
     Public kWare As New GuidedBP_Hulls
     Dim delaunay As New Delaunay_Basics
     Public kCells As New List(Of kwData)
-    Dim colorC As New RedCloud_Basics
+    Dim colorC As New RedBP_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Use Delaunay to create regions from objects"
@@ -408,12 +408,12 @@ End Class
 
 Public Class GuidedBP_ObjectStats : Inherits VB_Algorithm
     Dim kObj As New GuidedBP_Objects
-    Dim stats As New RedCloud_CellStats
+    Dim stats As New RedBP_CellStats
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        stats.redC = New RedCloud_Basics
+        stats.redC = New RedBP_Basics
         labels(1) = "Compartments for each object"
-        desc = "Compartmentalize the RedCloud_Basics cells so they stay near the objects detected."
+        desc = "Compartmentalize the RedBP_Basics cells so they stay near the objects detected."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         kObj.Run(src)
@@ -436,7 +436,7 @@ Public Class GuidedBP_Objects : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Create the input to RedCloud_Basics combining color and GuidedBP_Hulls output"
+        desc = "Create the input to RedBP_Basics combining color and GuidedBP_Hulls output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         kHist.Run(src)
@@ -547,11 +547,11 @@ End Class
 
 Public Class GuidedBP_RedColorCloud : Inherits VB_Algorithm
     Dim bpDoctor As New GuidedBP_Basics
-    Dim stats As New RedCloud_CellStats
+    Dim stats As New RedBP_CellStats
     Public Sub New()
-        stats.redC = New RedCloud_Basics
+        stats.redC = New RedBP_Basics
         labels = {"", "", "GuidedBP_Basics output", ""}
-        desc = "Run RedCloud_CellStats on the output of GuidedBP_Points"
+        desc = "Run RedBP_CellStats on the output of GuidedBP_Points"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         bpDoctor.Run(src)
@@ -572,12 +572,12 @@ End Class
 
 Public Class GuidedBP_RedColor : Inherits VB_Algorithm
     Dim bpDoctor As New GuidedBP_Cells
-    Dim stats As New RedCloud_CellStats
+    Dim stats As New RedBP_CellStats
     Dim colorClass As New Color_Basics
     Public Sub New()
-        stats.redC = New RedCloud_Basics
-        labels = {"", "", "RedCloud_CellStats output", ""}
-        desc = "Run RedCloud_CellStats on the output of GuidedBP_Basics after merging with task.color"
+        stats.redC = New RedBP_Basics
+        labels = {"", "", "RedBP_CellStats output", ""}
+        desc = "Run RedBP_CellStats on the output of GuidedBP_Basics after merging with task.color"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         bpDoctor.Run(src)

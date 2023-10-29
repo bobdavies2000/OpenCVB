@@ -9,7 +9,7 @@ Public Class Profile_Basics : Inherits VB_Algorithm
     Public corners3D As New List(Of cv.Point3f)
     Public corners As New List(Of cv.Point)
     Public cornersRaw As New List(Of cv.Point)
-    Public redC As New RedCloud_Basics
+    Public redC As New RedBP_Basics
     Public redCold As Object
     Public Sub New()
         desc = "Find the left/right, top/bottom, and near/far sides of a cell"
@@ -99,7 +99,7 @@ Public Class Profile_Kalman : Inherits VB_Algorithm
     Dim kalman As New Kalman_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        If standalone Then sides.redCold = New RedCloud_Basics
+        If standalone Then sides.redCold = New RedBP_Basics
         ReDim kalman.kInput(12 - 1)
         labels = {"", "", "Profile_Basics output without Kalman", "Profile_Basics output with Kalman"}
         desc = "Use Kalman to smooth the results of the contour key points"
@@ -179,7 +179,7 @@ Public Class Profile_Derivative : Inherits VB_Algorithm
     Public sides As New Profile_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        If standalone Then sides.redCold = New RedCloud_Basics
+        If standalone Then sides.redCold = New RedBP_Basics
         labels = {"", "", "Select a cell to analyze its contour", "Selected cell:  yellow = closer, blue = farther, white = no depth"}
         desc = "Visualize the derivative of X, Y, and Z in the contour of a RedCloud cell"
     End Sub
@@ -247,7 +247,7 @@ End Class
 Public Class Profile_ConcentrationSide : Inherits VB_Algorithm
     Dim profile As New Profile_ConcentrationTop
     Public Sub New()
-        If standalone Then profile.sides.redCold = New RedCloud_Basics
+        If standalone Then profile.sides.redCold = New RedBP_Basics
         findCheckBox("Top View (Unchecked Side View)").Checked = False
         labels = {"", "The outline of the selected RedCloud cell", traceName + " - click any RedCloud cell to visualize it's side view in the upper right image.", ""}
         desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
@@ -275,7 +275,7 @@ Public Class Profile_ConcentrationTop : Inherits VB_Algorithm
     Dim heat As New HeatMap_Basics
     Dim options As New Options_HeatMap
     Public Sub New()
-        If standalone Then sides.redCold = New RedCloud_Basics
+        If standalone Then sides.redCold = New RedBP_Basics
         gOptions.gravityPointCloud.Checked = False
         gOptions.displayDst1.Checked = True
         desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
@@ -339,7 +339,7 @@ Public Class Profile_OpenGL : Inherits VB_Algorithm
     Public rotate As New Profile_Rotation
     Dim heat As New HeatMap_Basics
     Public Sub New()
-        If standalone Then sides.redCold = New RedCloud_Basics
+        If standalone Then sides.redCold = New RedBP_Basics
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32FC3, 0)
         If standalone Then gOptions.gravityPointCloud.Checked = False
         task.ogl.options.PointSizeSlider.Value = 10

@@ -18,9 +18,9 @@ Public Class OptionsRedCloud
     Public Const reduceYZ As Integer = 5
     Public Const reduceXYZ As Integer = 6
 
-    Private Sub OptionsRedCloud_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub OptionsRedBP_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
-        Me.Text = "Options mostly for RedCloud_Basics but other related algorithms too."
+        Me.Text = "Options mostly for RedBP_Basics but other related algorithms too."
 
         ' The following lines control the pointcloud histograms for X and Y, and the camera location.
 

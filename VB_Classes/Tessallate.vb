@@ -3,7 +3,7 @@ Public Class Tessallate_Basics : Inherits VB_Algorithm
     Public points As New List(Of cv.Point3f)
     Public colors As New List(Of cv.Scalar)
     Public oglOptions As New Options_OpenGLFunctions
-    Public hulls As New RedCloud_Hulls
+    Public hulls As New RedBP_Hulls
     Public Sub New()
         gOptions.GridSize.Value = 30
         desc = "Prepare the list of 2D triangles"
@@ -100,7 +100,7 @@ End Class
 Public Class Tessallate_QuadSimple : Inherits VB_Algorithm
     Public oglData As New List(Of cv.Point3f)
     Public oglOptions As New Options_OpenGLFunctions
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedBP_Basics
     Public Sub New()
         gOptions.GridSize.Value = 20
         desc = "Prepare to tessellate the point cloud with RedCloud data"
@@ -149,7 +149,7 @@ Public Class Tessallate_QuadHulls : Inherits VB_Algorithm
     Public depthList As New List(Of List(Of Single))
     Public colorList As New List(Of cv.Vec3b)
     Public oglOptions As New Options_OpenGLFunctions
-    Dim hulls As New RedCloud_Hulls
+    Dim hulls As New RedBP_Hulls
     Public Sub New()
         gOptions.GridSize.Value = 20
         desc = "Prepare to tessellate the point cloud with RedCloud data"
@@ -224,7 +224,7 @@ Public Class Tessallate_QuadMinMax : Inherits VB_Algorithm
     Public depthList2 As New List(Of List(Of Single))
     Public colorList As New List(Of cv.Vec3b)
     Public oglOptions As New Options_OpenGLFunctions
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedBP_Basics
     Public Sub New()
         gOptions.GridSize.Value = 20
         desc = "Prepare to tessellate the point cloud with RedCloud data"
@@ -316,7 +316,7 @@ Public Class Tessallate_Bricks : Inherits VB_Algorithm
     Public oglData As New List(Of cv.Point3f)
     Public depths As New List(Of Single)
     Public options As New Options_OpenGLFunctions
-    Public hulls As New RedCloud_Hulls
+    Public hulls As New RedBP_Hulls
     Public Sub New()
         gOptions.GridSize.Value = 20
         desc = "Tessellate each quad in point cloud"

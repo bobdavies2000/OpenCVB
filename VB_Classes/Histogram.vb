@@ -1311,7 +1311,7 @@ End Class
 
 Public Class Histogram_Cell : Inherits VB_Algorithm
     Dim hist As New Histogram_Depth
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedBP_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         labels = {"", "", "RedCloud cells", "Histogram of the depth for the selected cell."}

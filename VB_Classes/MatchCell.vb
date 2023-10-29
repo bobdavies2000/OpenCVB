@@ -60,7 +60,7 @@ Public Class MatchCell_PrepareData : Inherits VB_Algorithm
     Public rgbCells As New List(Of rcData)
     Public cellMap As cv.Mat
     Public rgbcellMap As cv.Mat
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedBP_Basics
     Public Sub New()
         redC.depthOnly = True
         cellMap = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
@@ -99,7 +99,7 @@ End Class
 Public Class MatchCell_Shape : Inherits VB_Algorithm
     Dim options As New Options_MatchShapes
     Dim lastHulls As New List(Of rcData)
-    Dim hulls As New RedCloud_Hulls
+    Dim hulls As New RedBP_Hulls
     Public Sub New()
         labels(2) = "Highlighted cells matched the previous generation cell in the same area."
         desc = "Use OpenCV's MatchShape API to validate that stable and current contours agree"

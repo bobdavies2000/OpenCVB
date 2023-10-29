@@ -561,7 +561,7 @@ End Class
 
 Public Class Structured_Tiles : Inherits VB_Algorithm
     Public oglData As New List(Of cv.Vec3f)
-    Dim hulls As New RedCloud_Hulls
+    Dim hulls As New RedBP_Hulls
     Public Sub New()
         gOptions.GridSize.Value = 10
         desc = "Use the OpenGL point size to represent the point cloud as data"
@@ -595,7 +595,7 @@ End Class
 Public Class Structured_TilesQuad : Inherits VB_Algorithm
     Public oglData As New List(Of cv.Vec3f)
     Dim options As New Options_OpenGLFunctions
-    Dim hulls As New RedCloud_Hulls
+    Dim hulls As New RedBP_Hulls
     Public Sub New()
         gOptions.GridSize.Value = 10
         If standalone Then gOptions.displayDst1.Checked = True

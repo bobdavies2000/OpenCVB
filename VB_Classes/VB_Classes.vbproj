@@ -155,6 +155,7 @@
     </Compile>
     <Compile Include="Projection.vb" />
     <Compile Include="PyrFilter.vb" />
+    <Compile Include="RedBP.vb" />
     <Compile Include="RedCloud.vb" />
     <Compile Include="RedTrack.vb" />
     <Compile Include="ROI.vb" />

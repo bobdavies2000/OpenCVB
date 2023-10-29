@@ -101,7 +101,7 @@ End Class
 
 Public Class Image_RedCloudColor : Inherits VB_Algorithm
     Public images As New Image_Series
-    Public redc As New RedCloud_ColorOnly
+    Public redc As New RedBP_ColorOnly
     Public Sub New()
         If standalone Then gOptions.displayDst0.Checked = True
         If standalone Then gOptions.displayDst1.Checked = True
@@ -164,11 +164,11 @@ End Class
 
 Public Class Image_CellStats : Inherits VB_Algorithm
     Dim images As New Image_RedCloudColor
-    Dim stats As New RedCloud_CellStats
+    Dim stats As New RedBP_CellStats
     Public Sub New()
         If standalone Then gOptions.displayDst0.Checked = True
         If standalone Then gOptions.displayDst1.Checked = True
-        stats.redC = New RedCloud_ColorOnly
+        stats.redC = New RedBP_ColorOnly
         desc = "Display the statistics for the selected cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)

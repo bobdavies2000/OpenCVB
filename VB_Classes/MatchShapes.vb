@@ -68,9 +68,9 @@ Public Class MatchShapes_NearbyHull : Inherits VB_Algorithm
     Public bestCell As Integer
     Public rcX As New rcData
     Dim options As New Options_MatchShapes
-    Dim hulls As New RedCloud_Hulls
+    Dim hulls As New RedBP_Hulls
     Public Sub New()
-        labels = {"", "", "Output of RedCloud_Hulls", "Cells similar to selected cell"}
+        labels = {"", "", "Output of RedBP_Hulls", "Cells similar to selected cell"}
         desc = "MatchShapes: Find all the reasonable matches (< 1.0 for matchVal)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -121,7 +121,7 @@ Public Class MatchShapes_Nearby : Inherits VB_Algorithm
     Public rcX As New rcData
     Dim options As New Options_MatchShapes
     Public runStandalone As Boolean = False
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedBP_Basics
     Public Sub New()
         If standalone Then findSlider("Min Size % of image size").Value = 1
         labels = {"Left floodfill image", "Right floodfill image", "Left image of identified cells", "Right image with identified cells"}
@@ -254,10 +254,10 @@ End Class
 
 Public Class MatchShapes_Hulls : Inherits VB_Algorithm
     Dim options As New Options_MatchShapes
-    Dim hulls As New RedCloud_Hulls
+    Dim hulls As New RedBP_Hulls
     Public Sub New()
         findSlider("Match Threshold %").Value = 3
-        labels = {"", "", "Output of RedCloud_Hulls", "All RedCloud cells that matched the selected cell with the current settings are below."}
+        labels = {"", "", "Output of RedBP_Hulls", "All RedCloud cells that matched the selected cell with the current settings are below."}
         desc = "Find all RedCloud hull shapes similar to the one selected.  Use sliders and radio buttons to see impact."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -289,10 +289,10 @@ End Class
 
 Public Class MatchShapes_Contours : Inherits VB_Algorithm
     Dim options As New Options_MatchShapes
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedBP_Basics
     Public Sub New()
         findSlider("Match Threshold %").Value = 3
-        labels = {"", "", "Output of RedCloud_Basics", "All RedCloud cells that matched the selected cell with the current settings are below."}
+        labels = {"", "", "Output of RedBP_Basics", "All RedCloud cells that matched the selected cell with the current settings are below."}
         desc = "Find all RedCloud contours similar to the one selected.  Use sliders and radio buttons to see impact."
     End Sub
     Public Sub RunVB(src As cv.Mat)

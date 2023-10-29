@@ -143,7 +143,7 @@ End Class
 
 
 Public Class FitEllipse_RedCloud : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedBP_Basics
     Dim fitE As New FitEllipse_Basics
     Public Sub New()
         desc = "Create an ellipse from a contour"

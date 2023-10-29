@@ -194,7 +194,7 @@
     <ClCompile Include="Histogram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RedCloud.cpp">
+    <ClCompile Include="RedBP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BGRPattern.cpp">

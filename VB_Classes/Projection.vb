@@ -1,10 +1,10 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Projection_Basics : Inherits VB_Algorithm
     Dim heat As New HeatMap_Basics
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedBP_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        labels = {"", "Top View projection of the selected cell", "RedCloud_Basics output - select a cell to project at right and above", "Side projection of the selected cell"}
+        labels = {"", "Top View projection of the selected cell", "RedBP_Basics output - select a cell to project at right and above", "Side projection of the selected cell"}
         desc = "Create a top and side projection of the selected cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)

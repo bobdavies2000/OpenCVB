@@ -180,10 +180,10 @@ End Class
 
 ' https://github.com/brian-xu/FractalDimension/blob/master/FractalDimension.py
 Public Class Fractal_Dimension : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedBP_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        labels = {"", "", "RedCloud_Basics output - select any region.", "The selected region (as a square)"}
+        labels = {"", "", "RedBP_Basics output - select any region.", "The selected region (as a square)"}
         desc = "Compute the fractal dimension of the provided (square) image.  Algorithm is incomplete."
     End Sub
     Public Function dimension(Input As cv.Mat) As Double

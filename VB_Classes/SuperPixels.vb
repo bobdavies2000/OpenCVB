@@ -1,7 +1,7 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class SuperPixel_Basics : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
+    Dim redC As New RedBP_Basics
     Public Sub New()
         labels(2) = "Super Pixel cells"
         desc = "A Better superpixel algorithm"

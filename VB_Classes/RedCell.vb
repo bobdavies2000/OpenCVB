@@ -23,6 +23,9 @@ Public Class RedCell_Basics : Inherits VB_Algorithm
                 lfc = lastf(prev)
                 fc.indexLast = lfc.index
                 fc.color = lfc.color
+                fc.maxDStable = lfc.maxDStable
+                Dim stableCheck = lastMap.Get(Of Byte)(lfc.maxDStable.Y, lfc.maxDStable.X)
+                If stableCheck = fc.indexLast Then fc.maxDStable = lfc.maxDStable ' keep maxDStable if cell matched to previous
             End If
             If usedColors1.Contains(fc.color) Then
                 fc.color = New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240))
@@ -104,6 +107,7 @@ Public Class RedCell_CPP : Inherits VB_Algorithm
             fc.mask = dst3(fc.rect).InRange(fc.index, fc.index)
             fc.color = task.vecColors(i) ' never more than 255...
             fc.maxDist = vbGetMaxDist(fc)
+            fc.maxDStable = fc.maxDist ' assume it has to use the latest.
 
             fc.contour = contourBuild(fc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
             vbDrawContour(fc.mask, fc.contour, fc.index, -1)
@@ -435,61 +439,6 @@ Public Class RedCell_CCompBinarized : Inherits VB_Algorithm
         ccomp.Run(dst3)
         dst2 = ccomp.dst2
         labels(2) = ccomp.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class RedCell_PrepCloud : Inherits VB_Algorithm
-    Dim fCell As New RedCell_Basics
-    Dim prep As New RedCloud_PrepPointCloud
-    Dim reduction As New Reduction_Basics
-    Public Sub New()
-        gOptions.useHistoryCloud.Checked = False ' no artifacts.
-        labels(3) = "The flooded cells numbered from largest (1) to smallast (x < 255)"
-        desc = "Floodfill the prep'd pointcloud output so each cell can be tracked."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        reduction.Run(src.Clone)
-        dst3 = reduction.dst2
-
-        prep.Run(Nothing)
-        prep.dst2.ConvertScaleAbs().CopyTo(dst3, task.depthMask)
-
-        fCell.Run(dst3)
-
-        dst2 = fCell.dst2
-        labels(2) = fCell.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class RedCell_PrepDataOnly : Inherits VB_Algorithm
-    Dim fCell As New RedCell_Basics
-    Dim prep As New RedCloud_PrepPointCloud
-    Public Sub New()
-        gOptions.useHistoryCloud.Checked = False ' no artifacts.
-        desc = "Run RedCell_Basics only on the prep'd data"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        prep.Run(Nothing)
-
-        fCell.Run(prep.dst2)
-
-        dst2 = fCell.dst2
-        dst2.SetTo(0, task.noDepthMask)
-        labels(2) = fCell.labels(2)
     End Sub
 End Class
 
