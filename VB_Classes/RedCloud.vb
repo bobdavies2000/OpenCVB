@@ -133,7 +133,7 @@ End Class
 
 
 
-Public Class RedCloud_ColorInput : Inherits VB_Algorithm
+Public Class RedCloud_InputColor : Inherits VB_Algorithm
     Dim fCell As New RedCell_Basics
     Dim km As New KMeans_Basics
     Dim reduction As New Reduction_Basics
@@ -141,11 +141,10 @@ Public Class RedCloud_ColorInput : Inherits VB_Algorithm
     Dim lut As New LUT_Basics
     Dim backP As New BackProject_Full
     Public Sub New()
-        labels(3) = "The flooded cells numbered from largest (1) to smallast (x < 255)"
         desc = "Floodfill the KMeans output so each cell can be tracked."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Select Case redOptions.radioText
+        Select Case redOptions.colorInput
             Case "BackProject_Full"
                 backP.Run(src)
                 dst1 = backP.dst2
@@ -168,5 +167,57 @@ Public Class RedCloud_ColorInput : Inherits VB_Algorithm
         dst2 = fCell.dst2
         dst3 = fCell.dst3
         labels(2) = fCell.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_InputCloud : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Core
+    Public guided As New GuidedBP_Depth
+    Public Sub New()
+        desc = "Build the reduced pointcloud or doctored back projection input to RedCloud/RedCell"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Select Case redOptions.depthInput
+            Case "GuidedBP_Depth"
+                guided.Run(src)
+                Dim maskOfDepth = guided.backProject.Threshold(0, 255, cv.ThresholdTypes.Binary)
+                dst2 = guided.dst2
+            Case "RedCloud_Core"
+                redC.Run(src)
+                dst2 = redC.dst2
+        End Select
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_InputCombined : Inherits VB_Algorithm
+    Dim color As New RedCloud_InputColor
+    Dim cloud As New RedCloud_InputCloud
+    Public Sub New()
+        desc = "Combined the color and cloud as indicated in the RedOptions panel."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        'Select Case redOptions.depthInput
+        '    Case "GuidedBP_Depth"
+        '        guided.Run(src)
+        '        Dim maskOfDepth = guided.backProject.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        '        dst2 = guided.dst2
+        '    Case "RedCloud_Core"
+        '        redC.Run(src)
+        '        dst2 = redC.dst2
+        'End Select
     End Sub
 End Class

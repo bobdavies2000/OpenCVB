@@ -42,6 +42,7 @@ Partial Class OptionsRedCloud
         Me.HistBinSlider = New System.Windows.Forms.TrackBar()
         Me.RedCloudHistBins = New System.Windows.Forms.Label()
         Me.RGBSource = New System.Windows.Forms.GroupBox()
+        Me.FeatureLess_Basics = New System.Windows.Forms.RadioButton()
         Me.KMeans_Basics = New System.Windows.Forms.RadioButton()
         Me.LUT_Basics = New System.Windows.Forms.RadioButton()
         Me.Reduction_Basics = New System.Windows.Forms.RadioButton()
@@ -79,7 +80,9 @@ Partial Class OptionsRedCloud
         Me.RadioButton7 = New System.Windows.Forms.RadioButton()
         Me.RadioButton5 = New System.Windows.Forms.RadioButton()
         Me.RadioButton6 = New System.Windows.Forms.RadioButton()
-        Me.FeatureLess_Basics = New System.Windows.Forms.RadioButton()
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.RedCloud_Core = New System.Windows.Forms.RadioButton()
+        Me.GuidedBP_Depth = New System.Windows.Forms.RadioButton()
         Me.RedCloudSliders.SuspendLayout()
         CType(Me.GridSizeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TopViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -98,6 +101,7 @@ Partial Class OptionsRedCloud
         CType(Me.BitwiseReductionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.ColorReductionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.RedCloudOnly.SuspendLayout()
+        Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
         'RedCloudSliders
@@ -309,6 +313,17 @@ Partial Class OptionsRedCloud
         Me.RGBSource.TabIndex = 3
         Me.RGBSource.TabStop = False
         Me.RGBSource.Text = "RedCloud Color Source"
+        '
+        'FeatureLess_Basics
+        '
+        Me.FeatureLess_Basics.AutoSize = True
+        Me.FeatureLess_Basics.Location = New System.Drawing.Point(28, 161)
+        Me.FeatureLess_Basics.Name = "FeatureLess_Basics"
+        Me.FeatureLess_Basics.Size = New System.Drawing.Size(180, 24)
+        Me.FeatureLess_Basics.TabIndex = 4
+        Me.FeatureLess_Basics.TabStop = True
+        Me.FeatureLess_Basics.Text = "FeatureLess_Basics"
+        Me.FeatureLess_Basics.UseVisualStyleBackColor = True
         '
         'KMeans_Basics
         '
@@ -714,22 +729,45 @@ Partial Class OptionsRedCloud
         Me.RadioButton6.Text = "Reduce PC in X"
         Me.RadioButton6.UseVisualStyleBackColor = True
         '
-        'FeatureLess_Basics
+        'GroupBox1
         '
-        Me.FeatureLess_Basics.AutoSize = True
-        Me.FeatureLess_Basics.Location = New System.Drawing.Point(28, 161)
-        Me.FeatureLess_Basics.Name = "FeatureLess_Basics"
-        Me.FeatureLess_Basics.Size = New System.Drawing.Size(180, 24)
-        Me.FeatureLess_Basics.TabIndex = 4
-        Me.FeatureLess_Basics.TabStop = True
-        Me.FeatureLess_Basics.Text = "FeatureLess_Basics"
-        Me.FeatureLess_Basics.UseVisualStyleBackColor = True
+        Me.GroupBox1.Controls.Add(Me.RedCloud_Core)
+        Me.GroupBox1.Controls.Add(Me.GuidedBP_Depth)
+        Me.GroupBox1.Location = New System.Drawing.Point(1364, 272)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(250, 108)
+        Me.GroupBox1.TabIndex = 5
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "RedCloud Depth Source"
+        '
+        'RedCloud_Core
+        '
+        Me.RedCloud_Core.AutoSize = True
+        Me.RedCloud_Core.Location = New System.Drawing.Point(28, 67)
+        Me.RedCloud_Core.Name = "RedCloud_Core"
+        Me.RedCloud_Core.Size = New System.Drawing.Size(148, 24)
+        Me.RedCloud_Core.TabIndex = 3
+        Me.RedCloud_Core.TabStop = True
+        Me.RedCloud_Core.Text = "RedCloud_Core"
+        Me.RedCloud_Core.UseVisualStyleBackColor = True
+        '
+        'GuidedBP_Depth
+        '
+        Me.GuidedBP_Depth.AutoSize = True
+        Me.GuidedBP_Depth.Location = New System.Drawing.Point(28, 37)
+        Me.GuidedBP_Depth.Name = "GuidedBP_Depth"
+        Me.GuidedBP_Depth.Size = New System.Drawing.Size(160, 24)
+        Me.GuidedBP_Depth.TabIndex = 0
+        Me.GuidedBP_Depth.TabStop = True
+        Me.GuidedBP_Depth.Text = "GuidedBP_Depth"
+        Me.GuidedBP_Depth.UseVisualStyleBackColor = True
         '
         'OptionsRedCloud
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1690, 632)
+        Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.RedCloudOnly)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.GroupReduction)
@@ -764,6 +802,8 @@ Partial Class OptionsRedCloud
         CType(Me.ColorReductionSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.RedCloudOnly.ResumeLayout(False)
         Me.RedCloudOnly.PerformLayout()
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -825,4 +865,7 @@ Partial Class OptionsRedCloud
     Friend WithEvents RadioButton10 As Windows.Forms.RadioButton
     Friend WithEvents NoReduction As Windows.Forms.RadioButton
     Friend WithEvents FeatureLess_Basics As Windows.Forms.RadioButton
+    Friend WithEvents GroupBox1 As Windows.Forms.GroupBox
+    Friend WithEvents RedCloud_Core As Windows.Forms.RadioButton
+    Friend WithEvents GuidedBP_Depth As Windows.Forms.RadioButton
 End Class

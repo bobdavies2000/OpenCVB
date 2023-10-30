@@ -250,11 +250,9 @@ End Class
 
 
 
-
-
 Public Class RedCell_LeftRight : Inherits VB_Algorithm
-    Dim fCellsLeft As New RedCloud_ColorInput
-    Dim fCellsRight As New RedCloud_ColorInput
+    Dim fCellsLeft As New RedCloud_InputColor
+    Dim fCellsRight As New RedCloud_InputColor
     Public leftCells As New List(Of rcData)
     Public rightCells As New List(Of rcData)
     Public Sub New()

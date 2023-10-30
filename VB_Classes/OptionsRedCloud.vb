@@ -1,7 +1,8 @@
 ﻿Imports System.Windows.Controls
 Imports cv = OpenCvSharp
 Public Class OptionsRedCloud
-    Public radioText As String = "Reduction_Basics"
+    Public colorInput As String = "Reduction_Basics"
+    Public depthInput As String = "RedCloud_Core"
     Public channels() As Integer = {0, 1}
 
     Public reduction As Integer ' 0 = simple, 1 = bitwise, 2 = none
@@ -75,6 +76,7 @@ Public Class OptionsRedCloud
         GridSizeSlider.Value = 10
         PCReduction = reduceXY
         ReductionXY.Checked = True
+        RedCloud_Core.Checked = True
 
         Me.Left = 0
         Me.Top = 0
@@ -117,23 +119,23 @@ Public Class OptionsRedCloud
     End Sub
     Private Sub RadioButton1_CheckedChanged(sender As Object, e As EventArgs) Handles BackProject_Full.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        radioText = BackProject_Full.Text
+        colorInput = BackProject_Full.Text
     End Sub
     Private Sub RadioButton4_CheckedChanged(sender As Object, e As EventArgs) Handles KMeans_Basics.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        radioText = KMeans_Basics.Text
+        colorInput = KMeans_Basics.Text
     End Sub
     Private Sub RadioButton3_CheckedChanged(sender As Object, e As EventArgs) Handles LUT_Basics.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        radioText = LUT_Basics.Text
+        colorInput = LUT_Basics.Text
     End Sub
     Private Sub RadioButton2_CheckedChanged(sender As Object, e As EventArgs) Handles Reduction_Basics.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        radioText = Reduction_Basics.Text
+        colorInput = Reduction_Basics.Text
     End Sub
     Private Sub RadioButton8_CheckedChanged(sender As Object, e As EventArgs) Handles FeatureLess_Basics.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        radioText = BackProject_Full.Text
+        colorInput = BackProject_Full.Text
     End Sub
     Private Sub Channels01_CheckedChanged(sender As Object, e As EventArgs) Handles Channels01.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
@@ -210,5 +212,15 @@ Public Class OptionsRedCloud
     Private Sub RadioButton11_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton11.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = reduceXYZ
+    End Sub
+
+    Private Sub GuidedBP_Depth_CheckedChanged(sender As Object, e As EventArgs) Handles GuidedBP_Depth.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        depthInput = GuidedBP_Depth.Text
+    End Sub
+
+    Private Sub RedCloud_Core_CheckedChanged(sender As Object, e As EventArgs) Handles RedCloud_Core.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        depthInput = RedCloud_Core.Text
     End Sub
 End Class

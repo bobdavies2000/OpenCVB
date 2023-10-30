@@ -15,7 +15,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
         dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
 
         If task.optionsChanged Then
-            Select Case redOptions.radioText
+            Select Case redOptions.colorInput
                 Case "BackProject_Full"
                     classifier = backP
                 Case "KMeans_Basics"
@@ -36,8 +36,8 @@ Public Class Color_Basics : Inherits VB_Algorithm
         dst2 = dst0 * 255 / classCount
         dst3 = vbPalette(dst2)
 
-        setTrueText(redOptions.radioText)
-        labels(2) = "Color_Basics: method = " + redOptions.radioText + " produced " + CStr(classCount) + " pixel classifications"
+        setTrueText(redOptions.colorInput)
+        labels(2) = "Color_Basics: method = " + redOptions.colorInput + " produced " + CStr(classCount) + " pixel classifications"
     End Sub
 End Class
 
