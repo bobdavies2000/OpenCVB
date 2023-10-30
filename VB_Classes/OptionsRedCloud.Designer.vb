@@ -42,10 +42,10 @@ Partial Class OptionsRedCloud
         Me.HistBinSlider = New System.Windows.Forms.TrackBar()
         Me.RedCloudHistBins = New System.Windows.Forms.Label()
         Me.RGBSource = New System.Windows.Forms.GroupBox()
-        Me.RadioButton4 = New System.Windows.Forms.RadioButton()
-        Me.RadioButton3 = New System.Windows.Forms.RadioButton()
-        Me.RadioButton2 = New System.Windows.Forms.RadioButton()
-        Me.RadioButton1 = New System.Windows.Forms.RadioButton()
+        Me.KMeans_Basics = New System.Windows.Forms.RadioButton()
+        Me.LUT_Basics = New System.Windows.Forms.RadioButton()
+        Me.Reduction_Basics = New System.Windows.Forms.RadioButton()
+        Me.BackProject_Full = New System.Windows.Forms.RadioButton()
         Me.RedBPonly = New System.Windows.Forms.GroupBox()
         Me.Channels02 = New System.Windows.Forms.RadioButton()
         Me.Channels12 = New System.Windows.Forms.RadioButton()
@@ -79,6 +79,7 @@ Partial Class OptionsRedCloud
         Me.RadioButton7 = New System.Windows.Forms.RadioButton()
         Me.RadioButton5 = New System.Windows.Forms.RadioButton()
         Me.RadioButton6 = New System.Windows.Forms.RadioButton()
+        Me.FeatureLess_Basics = New System.Windows.Forms.RadioButton()
         Me.RedCloudSliders.SuspendLayout()
         CType(Me.GridSizeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TopViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -297,60 +298,61 @@ Partial Class OptionsRedCloud
         '
         'RGBSource
         '
-        Me.RGBSource.Controls.Add(Me.RadioButton4)
-        Me.RGBSource.Controls.Add(Me.RadioButton3)
-        Me.RGBSource.Controls.Add(Me.RadioButton2)
-        Me.RGBSource.Controls.Add(Me.RadioButton1)
+        Me.RGBSource.Controls.Add(Me.FeatureLess_Basics)
+        Me.RGBSource.Controls.Add(Me.KMeans_Basics)
+        Me.RGBSource.Controls.Add(Me.LUT_Basics)
+        Me.RGBSource.Controls.Add(Me.Reduction_Basics)
+        Me.RGBSource.Controls.Add(Me.BackProject_Full)
         Me.RGBSource.Location = New System.Drawing.Point(1103, 180)
         Me.RGBSource.Name = "RGBSource"
-        Me.RGBSource.Size = New System.Drawing.Size(250, 175)
+        Me.RGBSource.Size = New System.Drawing.Size(250, 200)
         Me.RGBSource.TabIndex = 3
         Me.RGBSource.TabStop = False
-        Me.RGBSource.Text = "RGB Color Source"
+        Me.RGBSource.Text = "RedCloud Color Source"
         '
-        'RadioButton4
+        'KMeans_Basics
         '
-        Me.RadioButton4.AutoSize = True
-        Me.RadioButton4.Location = New System.Drawing.Point(28, 67)
-        Me.RadioButton4.Name = "RadioButton4"
-        Me.RadioButton4.Size = New System.Drawing.Size(148, 24)
-        Me.RadioButton4.TabIndex = 3
-        Me.RadioButton4.TabStop = True
-        Me.RadioButton4.Text = "KMeans_Basics"
-        Me.RadioButton4.UseVisualStyleBackColor = True
+        Me.KMeans_Basics.AutoSize = True
+        Me.KMeans_Basics.Location = New System.Drawing.Point(28, 67)
+        Me.KMeans_Basics.Name = "KMeans_Basics"
+        Me.KMeans_Basics.Size = New System.Drawing.Size(148, 24)
+        Me.KMeans_Basics.TabIndex = 3
+        Me.KMeans_Basics.TabStop = True
+        Me.KMeans_Basics.Text = "KMeans_Basics"
+        Me.KMeans_Basics.UseVisualStyleBackColor = True
         '
-        'RadioButton3
+        'LUT_Basics
         '
-        Me.RadioButton3.AutoSize = True
-        Me.RadioButton3.Location = New System.Drawing.Point(28, 97)
-        Me.RadioButton3.Name = "RadioButton3"
-        Me.RadioButton3.Size = New System.Drawing.Size(120, 24)
-        Me.RadioButton3.TabIndex = 2
-        Me.RadioButton3.TabStop = True
-        Me.RadioButton3.Text = "LUT_Basics"
-        Me.RadioButton3.UseVisualStyleBackColor = True
+        Me.LUT_Basics.AutoSize = True
+        Me.LUT_Basics.Location = New System.Drawing.Point(28, 97)
+        Me.LUT_Basics.Name = "LUT_Basics"
+        Me.LUT_Basics.Size = New System.Drawing.Size(120, 24)
+        Me.LUT_Basics.TabIndex = 2
+        Me.LUT_Basics.TabStop = True
+        Me.LUT_Basics.Text = "LUT_Basics"
+        Me.LUT_Basics.UseVisualStyleBackColor = True
         '
-        'RadioButton2
+        'Reduction_Basics
         '
-        Me.RadioButton2.AutoSize = True
-        Me.RadioButton2.Location = New System.Drawing.Point(28, 127)
-        Me.RadioButton2.Name = "RadioButton2"
-        Me.RadioButton2.Size = New System.Drawing.Size(163, 24)
-        Me.RadioButton2.TabIndex = 1
-        Me.RadioButton2.TabStop = True
-        Me.RadioButton2.Text = "Reduction_Basics"
-        Me.RadioButton2.UseVisualStyleBackColor = True
+        Me.Reduction_Basics.AutoSize = True
+        Me.Reduction_Basics.Location = New System.Drawing.Point(28, 127)
+        Me.Reduction_Basics.Name = "Reduction_Basics"
+        Me.Reduction_Basics.Size = New System.Drawing.Size(163, 24)
+        Me.Reduction_Basics.TabIndex = 1
+        Me.Reduction_Basics.TabStop = True
+        Me.Reduction_Basics.Text = "Reduction_Basics"
+        Me.Reduction_Basics.UseVisualStyleBackColor = True
         '
-        'RadioButton1
+        'BackProject_Full
         '
-        Me.RadioButton1.AutoSize = True
-        Me.RadioButton1.Location = New System.Drawing.Point(28, 37)
-        Me.RadioButton1.Name = "RadioButton1"
-        Me.RadioButton1.Size = New System.Drawing.Size(153, 24)
-        Me.RadioButton1.TabIndex = 0
-        Me.RadioButton1.TabStop = True
-        Me.RadioButton1.Text = "BackProject_Full"
-        Me.RadioButton1.UseVisualStyleBackColor = True
+        Me.BackProject_Full.AutoSize = True
+        Me.BackProject_Full.Location = New System.Drawing.Point(28, 37)
+        Me.BackProject_Full.Name = "BackProject_Full"
+        Me.BackProject_Full.Size = New System.Drawing.Size(153, 24)
+        Me.BackProject_Full.TabIndex = 0
+        Me.BackProject_Full.TabStop = True
+        Me.BackProject_Full.Text = "BackProject_Full"
+        Me.BackProject_Full.UseVisualStyleBackColor = True
         '
         'RedBPonly
         '
@@ -712,6 +714,17 @@ Partial Class OptionsRedCloud
         Me.RadioButton6.Text = "Reduce PC in X"
         Me.RadioButton6.UseVisualStyleBackColor = True
         '
+        'FeatureLess_Basics
+        '
+        Me.FeatureLess_Basics.AutoSize = True
+        Me.FeatureLess_Basics.Location = New System.Drawing.Point(28, 161)
+        Me.FeatureLess_Basics.Name = "FeatureLess_Basics"
+        Me.FeatureLess_Basics.Size = New System.Drawing.Size(180, 24)
+        Me.FeatureLess_Basics.TabIndex = 4
+        Me.FeatureLess_Basics.TabStop = True
+        Me.FeatureLess_Basics.Text = "FeatureLess_Basics"
+        Me.FeatureLess_Basics.UseVisualStyleBackColor = True
+        '
         'OptionsRedCloud
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -759,10 +772,10 @@ Partial Class OptionsRedCloud
     Friend WithEvents HistBinSlider As Windows.Forms.TrackBar
     Friend WithEvents RedCloudHistBins As Windows.Forms.Label
     Friend WithEvents RGBSource As Windows.Forms.GroupBox
-    Friend WithEvents RadioButton4 As Windows.Forms.RadioButton
-    Friend WithEvents RadioButton3 As Windows.Forms.RadioButton
-    Friend WithEvents RadioButton2 As Windows.Forms.RadioButton
-    Friend WithEvents RadioButton1 As Windows.Forms.RadioButton
+    Friend WithEvents KMeans_Basics As Windows.Forms.RadioButton
+    Friend WithEvents LUT_Basics As Windows.Forms.RadioButton
+    Friend WithEvents Reduction_Basics As Windows.Forms.RadioButton
+    Friend WithEvents BackProject_Full As Windows.Forms.RadioButton
     Friend WithEvents YLabel As Windows.Forms.Label
     Friend WithEvents YRangeSlider As Windows.Forms.TrackBar
     Friend WithEvents Label4 As Windows.Forms.Label
@@ -811,4 +824,5 @@ Partial Class OptionsRedCloud
     Friend WithEvents RadioButton11 As Windows.Forms.RadioButton
     Friend WithEvents RadioButton10 As Windows.Forms.RadioButton
     Friend WithEvents NoReduction As Windows.Forms.RadioButton
+    Friend WithEvents FeatureLess_Basics As Windows.Forms.RadioButton
 End Class

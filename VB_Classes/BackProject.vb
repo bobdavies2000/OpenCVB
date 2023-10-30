@@ -358,15 +358,15 @@ End Class
 
 
 Public Class BackProject_Display : Inherits VB_Algorithm
-    Dim bp As New BackProject_Full
+    Dim backP As New BackProject_Full
     Public Sub New()
         labels = {"", "", "Back projection", ""}
         desc = "Display the back projected color image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        bp.Run(src)
-        dst2 = bp.dst2
-        dst3 = bp.dst3
+        backP.Run(src)
+        dst2 = backP.dst2
+        dst3 = backP.dst3
     End Sub
 End Class
 

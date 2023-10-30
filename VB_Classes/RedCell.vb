@@ -142,220 +142,6 @@ End Class
 
 
 
-
-Public Class RedCell_Reduction : Inherits VB_Algorithm
-    Dim fCell As New RedCell_Basics
-    Dim reduction As New Reduction_Basics
-    Public Sub New()
-        desc = "Floodfill a reduced image so each cell can be tracked."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        reduction.Run(src)
-
-        fCell.Run(reduction.dst2)
-
-        dst2 = fCell.dst2
-        dst3 = fCell.dst3
-        labels(2) = fCell.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class RedCell_ReductionLR : Inherits VB_Algorithm
-    Dim fCellsLeft As New RedCell_Reduction
-    Dim fCellsRight As New RedCell_Reduction
-    Public leftCells As New List(Of rcData)
-    Public rightCells As New List(Of rcData)
-    Public Sub New()
-        desc = "Floodfill the reduced left and right images so each cell can be tracked."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        task.fCells = New List(Of rcData)(leftCells)
-        fCellsLeft.Run(task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        leftCells = New List(Of rcData)(task.fCells)
-        labels(2) = fCellsLeft.labels(2)
-
-        dst2 = fCellsLeft.dst2
-
-        task.fCells = New List(Of rcData)(rightCells)
-        fCellsRight.Run(task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        rightCells = New List(Of rcData)(task.fCells)
-        labels(3) = fCellsRight.labels(2)
-
-        dst3 = fCellsRight.dst2
-    End Sub
-End Class
-
-
-
-
-
-Public Class RedCell_Featureless : Inherits VB_Algorithm
-    Dim fCell As New RedCell_Basics
-    Public Sub New()
-        desc = "Floodfill the featureless image so each cell can be tracked."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static fless As New FeatureLess_Basics
-        fless.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
-        fCell.Run(fless.dst2)
-
-        dst2 = fCell.dst2
-        dst3 = fCell.dst3
-        labels(2) = fCell.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class RedCell_FeatureLessLR : Inherits VB_Algorithm
-    Dim fCellsLeft As New RedCell_Featureless
-    Dim fCellsRight As New RedCell_Featureless
-    Public leftCells As New List(Of rcData)
-    Public rightCells As New List(Of rcData)
-    Public Sub New()
-        desc = "Floodfill the featureless left and right images so each cell can be tracked."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        task.fCells = New List(Of rcData)(leftCells)
-        fCellsLeft.Run(task.leftView)
-        leftCells = New List(Of rcData)(task.fCells)
-        labels(2) = fCellsLeft.labels(2)
-
-        dst2 = fCellsLeft.dst2
-
-        task.fCells = New List(Of rcData)(rightCells)
-        fCellsRight.Run(task.rightView)
-        rightCells = New List(Of rcData)(task.fCells)
-        labels(3) = fCellsRight.labels(2)
-
-        dst3 = fCellsRight.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class RedCell_LUT : Inherits VB_Algorithm
-    Dim fCell As New RedCell_Basics
-    Dim lut As New LUT_Basics
-    Public Sub New()
-        desc = "Floodfill the LUT image so each cell can be tracked."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        lut.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-
-        fCell.Run(lut.dst2)
-
-        dst2 = fCell.dst2
-        dst3 = fCell.dst3
-        labels(2) = fCell.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class RedCell_LUTLeftRight : Inherits VB_Algorithm
-    Dim fCellsLeft As New RedCell_LUT
-    Dim fCellsRight As New RedCell_LUT
-    Public leftCells As New List(Of rcData)
-    Public rightCells As New List(Of rcData)
-    Public Sub New()
-        desc = "Floodfill the LUT image for left and right views so each cell can be tracked."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        task.fCells = New List(Of rcData)(leftCells)
-        fCellsLeft.Run(task.leftView)
-        leftCells = New List(Of rcData)(task.fCells)
-        labels(2) = fCellsLeft.labels(2)
-
-        dst2 = fCellsLeft.dst2
-
-        task.fCells = New List(Of rcData)(rightCells)
-        fCellsRight.Run(task.rightView)
-        rightCells = New List(Of rcData)(task.fCells)
-        labels(3) = fCellsRight.labels(2)
-
-        dst3 = fCellsRight.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class RedCell_BP : Inherits VB_Algorithm
-    Dim fCell As New RedCell_Basics
-    Dim bpDoctor As New BackProject_Full
-    Public Sub New()
-        labels(3) = "The flooded cells numbered from largest (1) to smallast (x < 255)"
-        desc = "Floodfill the RedCell_Basics image so each cell can be tracked."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        bpDoctor.Run(src)
-
-        fCell.Run(bpDoctor.dst2)
-
-        dst2 = fCell.dst2
-        dst3 = fCell.dst3
-        labels(2) = fCell.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class RedCell_BPLeftRight : Inherits VB_Algorithm
-    Dim fCellsLeft As New RedCell_BP
-    Dim fCellsRight As New RedCell_BP
-    Public leftCells As New List(Of rcData)
-    Public rightCells As New List(Of rcData)
-    Public Sub New()
-        desc = "Floodfill the RedCell_Basics output image for left and right views so each cell can be tracked."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        task.fCells = New List(Of rcData)(leftCells)
-        fCellsLeft.Run(task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        leftCells = New List(Of rcData)(task.fCells)
-        labels(2) = fCellsLeft.labels(2)
-
-        dst2 = fCellsLeft.dst2
-
-        task.fCells = New List(Of rcData)(rightCells)
-        fCellsRight.Run(task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        rightCells = New List(Of rcData)(task.fCells)
-        labels(3) = fCellsRight.labels(2)
-
-        dst3 = fCellsRight.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
 Public Class RedCell_Binarize : Inherits VB_Algorithm
     Dim binarize As New Binarize_RecurseAdd
     Dim fCell As New RedCell_Basics
@@ -396,29 +182,6 @@ Public Class RedCell_CComp : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class RedCell_KMeans : Inherits VB_Algorithm
-    Dim fCell As New RedCell_Basics
-    Dim km As New KMeans_MultiChannel
-    Public Sub New()
-        labels(3) = "The flooded cells numbered from largest (1) to smallast (x < 255)"
-        desc = "Floodfill the KMeans output so each cell can be tracked."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        km.Run(src)
-
-        fCell.Run(km.dst2)
-
-        dst2 = fCell.dst2
-        dst3 = fCell.dst3
-        labels(2) = fCell.labels(2)
-    End Sub
-End Class
 
 
 
@@ -479,5 +242,38 @@ Public Class RedCell_Neighbors : Inherits VB_Algorithm
 
         setTrueText(strOut, 3)
         If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions identified."
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedCell_LeftRight : Inherits VB_Algorithm
+    Dim fCellsLeft As New RedCloud_ColorInput
+    Dim fCellsRight As New RedCloud_ColorInput
+    Public leftCells As New List(Of rcData)
+    Public rightCells As New List(Of rcData)
+    Public Sub New()
+        redOptions.Reduction_Basics.Checked = True
+        desc = "Floodfill left and right images after RedCloud color input reduction."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        task.fCells = New List(Of rcData)(leftCells)
+        fCellsLeft.Run(task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        leftCells = New List(Of rcData)(task.fCells)
+        labels(2) = fCellsLeft.labels(2)
+
+        dst2 = fCellsLeft.dst2
+
+        task.fCells = New List(Of rcData)(rightCells)
+        fCellsRight.Run(task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        rightCells = New List(Of rcData)(task.fCells)
+        labels(3) = fCellsRight.labels(2)
+
+        dst3 = fCellsRight.dst2
     End Sub
 End Class

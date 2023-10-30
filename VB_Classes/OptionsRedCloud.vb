@@ -70,7 +70,7 @@ Public Class OptionsRedCloud
         task.channelsSide = {1, 2}
 
         Channels01.Checked = True
-        RadioButton2.Checked = True ' Reduction_basics is the default.
+        Reduction_Basics.Checked = True ' Reduction_basics is the default.
         SimpleReduction.Checked = True
         GridSizeSlider.Value = 10
         PCReduction = reduceXY
@@ -115,21 +115,25 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         TopLabel.Text = CStr(TopViewThreshold.Value)
     End Sub
-    Private Sub RadioButton1_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton1.CheckedChanged
+    Private Sub RadioButton1_CheckedChanged(sender As Object, e As EventArgs) Handles BackProject_Full.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        radioText = RadioButton1.Text
+        radioText = BackProject_Full.Text
     End Sub
-    Private Sub RadioButton4_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton4.CheckedChanged
+    Private Sub RadioButton4_CheckedChanged(sender As Object, e As EventArgs) Handles KMeans_Basics.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        radioText = RadioButton4.Text
+        radioText = KMeans_Basics.Text
     End Sub
-    Private Sub RadioButton3_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton3.CheckedChanged
+    Private Sub RadioButton3_CheckedChanged(sender As Object, e As EventArgs) Handles LUT_Basics.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        radioText = RadioButton3.Text
+        radioText = LUT_Basics.Text
     End Sub
-    Private Sub RadioButton2_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton2.CheckedChanged
+    Private Sub RadioButton2_CheckedChanged(sender As Object, e As EventArgs) Handles Reduction_Basics.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        radioText = RadioButton2.Text
+        radioText = Reduction_Basics.Text
+    End Sub
+    Private Sub RadioButton8_CheckedChanged(sender As Object, e As EventArgs) Handles FeatureLess_Basics.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        radioText = BackProject_Full.Text
     End Sub
     Private Sub Channels01_CheckedChanged(sender As Object, e As EventArgs) Handles Channels01.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True

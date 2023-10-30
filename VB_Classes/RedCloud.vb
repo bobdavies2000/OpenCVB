@@ -125,3 +125,48 @@ Public Class RedCloud_Test : Inherits VB_Algorithm
         If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions identified"
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class RedCloud_ColorInput : Inherits VB_Algorithm
+    Dim fCell As New RedCell_Basics
+    Dim km As New KMeans_Basics
+    Dim reduction As New Reduction_Basics
+    Dim fless As New FeatureLess_Basics
+    Dim lut As New LUT_Basics
+    Dim backP As New BackProject_Full
+    Public Sub New()
+        labels(3) = "The flooded cells numbered from largest (1) to smallast (x < 255)"
+        desc = "Floodfill the KMeans output so each cell can be tracked."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Select Case redOptions.radioText
+            Case "BackProject_Full"
+                backP.Run(src)
+                dst1 = backP.dst2
+            Case "KMeans_Basics"
+                km.Run(src)
+                dst1 = km.dst2
+            Case "LUT_Basics"
+                lut.Run(src)
+                dst1 = lut.dst2
+            Case "Reduction_Basics"
+                reduction.Run(src)
+                dst1 = reduction.dst2
+            Case "FeatureLess_Basics"
+                fless.Run(src)
+                dst1 = fless.dst2
+        End Select
+
+        fCell.Run(dst1)
+
+        dst2 = fCell.dst2
+        dst3 = fCell.dst3
+        labels(2) = fCell.labels(2)
+    End Sub
+End Class
