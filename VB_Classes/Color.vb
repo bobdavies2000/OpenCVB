@@ -6,6 +6,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
     Dim km As New KMeans_Basics
     Dim lut As New LUT_Basics
     Dim reduction As New Reduction_Basics
+    Dim fLess As New FeatureLess_Basics
     Dim classifier As Object = reduction
     Public Sub New()
         classifier = reduction
@@ -24,6 +25,8 @@ Public Class Color_Basics : Inherits VB_Algorithm
                     classifier = lut
                 Case "Reduction_Basics"
                     classifier = reduction
+                Case "FeatureLess_Basics"
+                    classifier = fLess
             End Select
         End If
 

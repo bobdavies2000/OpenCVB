@@ -851,58 +851,6 @@ End Class
 
 
 
-Public Class RedBP_CombineColor : Inherits VB_Algorithm
-    Public guided As New GuidedBP_Depth
-    Public redP As New RedBP_Flood_CPP
-    Public prepCells As New List(Of rcPrep)
-    Dim color As New Color_Basics
-    Public colorOnly As Boolean = False
-    Public depthOnly As Boolean = False
-    Public Sub New()
-        desc = "Segment the image on based both the reduced point cloud and color"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim combined As New cv.Mat
-        If colorOnly Then
-            color.Run(src)
-            combined = color.dst2
-        Else
-            guided.Run(src)
-            Dim maskOfDepth = guided.backProject.Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-            If depthOnly = False Then
-                color.Run(task.color.Resize(src.Size))
-                color.dst2.ConvertTo(combined, cv.MatType.CV_32F)
-            End If
-
-            guided.dst0.CopyTo(combined, maskOfDepth)
-            combined.ConvertTo(combined, cv.MatType.CV_8U)
-        End If
-        redP.Run(combined)
-        dst2 = redP.dst2
-
-        prepCells.Clear()
-        For Each key In redP.prepCells
-            Dim rp = key.Value
-            If task.drawRect <> New cv.Rect Then
-                If task.drawRect.Contains(rp.floodPoint) = False Then Continue For
-            End If
-
-            prepCells.Add(rp)
-        Next
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
 
 
 Public Class RedBP_CellsAtDepth : Inherits VB_Algorithm
@@ -1262,7 +1210,7 @@ Public Class RedBP_ColorAndCloud : Inherits VB_Algorithm
 
         reduction.Run(src)
         Dim combined = reduction.dst2.Clone
-        guided.backProject.CopyTo(combined, task.depthMask)
+        guided.dst2.CopyTo(combined, task.depthMask)
         fCell.Run(combined)
 
         dst2 = fCell.dst2
@@ -2238,7 +2186,7 @@ Public Class RedBP_Flood_CPP : Inherits VB_Algorithm
         If src.Channels <> 1 Then
             Static guided As New GuidedBP_Depth
             guided.Run(src)
-            src = guided.backProject
+            src = guided.dst2
             src.ConvertTo(src, cv.MatType.CV_8U)
         End If
 
@@ -2315,7 +2263,7 @@ Public Class RedBP_CPP : Inherits VB_Algorithm
         If src.Channels <> 1 Then
             Static guided As New GuidedBP_Depth
             guided.Run(src)
-            src = guided.backProject
+            src = guided.dst2
             src.ConvertTo(src, cv.MatType.CV_8U)
         End If
 

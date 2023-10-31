@@ -250,9 +250,31 @@ End Class
 
 
 
+
+
+Public Class RedCell_InputColor : Inherits VB_Algorithm
+    Dim fCell As New RedCell_Basics
+    Dim color As New Color_Basics
+    Public Sub New()
+        desc = "Floodfill the transformed color output and create cells to be tracked."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        color.Run(src)
+        fCell.Run(color.dst0)
+
+        dst2 = fCell.dst2
+        dst3 = fCell.dst3
+        labels(2) = fCell.labels(2)
+    End Sub
+End Class
+
+
+
+
+
 Public Class RedCell_LeftRight : Inherits VB_Algorithm
-    Dim fCellsLeft As New RedCloud_InputColor
-    Dim fCellsRight As New RedCloud_InputColor
+    Dim fCellsLeft As New RedCell_InputColor
+    Dim fCellsRight As New RedCell_InputColor
     Public leftCells As New List(Of rcData)
     Public rightCells As New List(Of rcData)
     Public Sub New()

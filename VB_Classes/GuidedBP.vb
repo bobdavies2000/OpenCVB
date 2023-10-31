@@ -1103,10 +1103,10 @@ End Class
 
 Public Class GuidedBP_Depth : Inherits VB_Algorithm
     Public hist2d As New Histogram2D_PointCloud
-    Public backProject As New cv.Mat
-    Dim opAuto As New opAuto_GuidedBP
+    Dim opAuto As New OpAuto_GuidedBP
     Public Sub New()
         redOptions.HistBinSlider.Value = 15
+        redOptions.RedBPonly.Enabled = True
         desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1133,10 +1133,10 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
 
         Marshal.Copy(samples, 0, hist2d.histogram.Data, samples.Length)
 
-        cv.Cv2.CalcBackProject({src}, hist2d.channels, hist2d.histogram, dst0, hist2d.ranges)
-        dst0.ConvertTo(backProject, cv.MatType.CV_8U)
+        cv.Cv2.CalcBackProject({src}, hist2d.channels, hist2d.histogram, dst2, hist2d.ranges)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        dst2 = vbPalette(backProject)
+        dst3 = vbPalette(dst2)
     End Sub
 End Class
 

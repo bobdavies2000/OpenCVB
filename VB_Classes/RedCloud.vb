@@ -133,49 +133,6 @@ End Class
 
 
 
-Public Class RedCloud_InputColor : Inherits VB_Algorithm
-    Dim fCell As New RedCell_Basics
-    Dim km As New KMeans_Basics
-    Dim reduction As New Reduction_Basics
-    Dim fless As New FeatureLess_Basics
-    Dim lut As New LUT_Basics
-    Dim backP As New BackProject_Full
-    Public Sub New()
-        desc = "Floodfill the KMeans output so each cell can be tracked."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Select Case redOptions.colorInput
-            Case "BackProject_Full"
-                backP.Run(src)
-                dst1 = backP.dst2
-            Case "KMeans_Basics"
-                km.Run(src)
-                dst1 = km.dst2
-            Case "LUT_Basics"
-                lut.Run(src)
-                dst1 = lut.dst2
-            Case "Reduction_Basics"
-                reduction.Run(src)
-                dst1 = reduction.dst2
-            Case "FeatureLess_Basics"
-                fless.Run(src)
-                dst1 = fless.dst2
-        End Select
-
-        fCell.Run(dst1)
-
-        dst2 = fCell.dst2
-        dst3 = fCell.dst3
-        labels(2) = fCell.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class RedCloud_InputCloud : Inherits VB_Algorithm
     Dim redC As New RedCloud_Core
@@ -187,7 +144,7 @@ Public Class RedCloud_InputCloud : Inherits VB_Algorithm
         Select Case redOptions.depthInput
             Case "GuidedBP_Depth"
                 guided.Run(src)
-                Dim maskOfDepth = guided.backProject.Threshold(0, 255, cv.ThresholdTypes.Binary)
+                Dim maskOfDepth = guided.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
                 dst2 = guided.dst2
             Case "RedCloud_Core"
                 redC.Run(src)
@@ -204,7 +161,7 @@ End Class
 
 
 Public Class RedCloud_InputCombined : Inherits VB_Algorithm
-    Dim color As New RedCloud_InputColor
+    Dim color As New Color_Basics
     Dim cloud As New RedCloud_InputCloud
     Public Sub New()
         desc = "Combined the color and cloud as indicated in the RedOptions panel."
@@ -213,11 +170,55 @@ Public Class RedCloud_InputCombined : Inherits VB_Algorithm
         'Select Case redOptions.depthInput
         '    Case "GuidedBP_Depth"
         '        guided.Run(src)
-        '        Dim maskOfDepth = guided.backProject.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        '        Dim maskOfDepth = guided.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
         '        dst2 = guided.dst2
         '    Case "RedCloud_Core"
         '        redC.Run(src)
         '        dst2 = redC.dst2
         'End Select
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedBP_CombineColor : Inherits VB_Algorithm
+    Public guided As New GuidedBP_Depth
+    Public redP As New RedBP_Flood_CPP
+    Public prepCells As New List(Of rcPrep)
+    Dim color As New Color_Basics
+    Public colorOnly As Boolean = False
+    Public depthOnly As Boolean = False
+    Public Sub New()
+        desc = "Segment the image on based both the reduced point cloud and color"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim combined As New cv.Mat
+        If colorOnly Then
+            color.Run(src)
+            combined = color.dst2
+        Else
+            guided.Run(src)
+            Dim maskOfDepth = guided.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+            If depthOnly = False Then color.Run(src)
+
+            guided.dst2.CopyTo(color.dst2, maskOfDepth)
+        End If
+
+        redP.Run(color.dst2)
+        dst2 = redP.dst2
+
+        prepCells.Clear()
+        For Each key In redP.prepCells
+            Dim rp = key.Value
+            If task.drawRect <> New cv.Rect Then
+                If task.drawRect.Contains(rp.floodPoint) = False Then Continue For
+            End If
+
+            prepCells.Add(rp)
+        Next
     End Sub
 End Class
