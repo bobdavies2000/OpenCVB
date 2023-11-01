@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class RedCell_Basics : Inherits VB_Algorithm
-    Dim fCell As New RedCell_CPP
+Public Class RedColor_Basics : Inherits VB_Algorithm
+    Dim fCell As New RedColor_CPP
     Dim lastMap As cv.Mat
     Public Sub New()
         lastMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -67,12 +67,12 @@ End Class
 
 
 
-Public Class RedCell_CPP : Inherits VB_Algorithm
+Public Class RedColor_CPP : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Public Sub New()
         cPtr = FCell_Open()
         gOptions.PixelDiffThreshold.Value = 0
-        desc = "Floodfill an image so each cell can be tracked.  NOTE: cells are not matched to previous image.  Use RedCell_Basics for matching."
+        desc = "Floodfill an image so each cell can be tracked.  NOTE: cells are not matched to previous image.  Use RedColor_Basics for matching."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
@@ -129,7 +129,7 @@ Public Class RedCell_CPP : Inherits VB_Algorithm
             dst2(rc.rect).SetTo(rc.color, rc.mask)
         Next
 
-        If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions were identified - use RedCell_Basics to match to the previous image."
+        If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions were identified - use RedColor_Basics to match to the previous image."
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = FCell_Close(cPtr)
@@ -142,9 +142,9 @@ End Class
 
 
 
-Public Class RedCell_Binarize : Inherits VB_Algorithm
+Public Class RedColor_Binarize : Inherits VB_Algorithm
     Dim binarize As New Binarize_RecurseAdd
-    Dim fCell As New RedCell_Basics
+    Dim fCell As New RedColor_Basics
     Public Sub New()
         labels(3) = "A 4-way split of the input grayscale image based on the amount of light"
         desc = "Use RedCloud on a 4-way split based on light to dark in the image."
@@ -166,9 +166,9 @@ End Class
 
 
 ' https://docs.opencv.org/master/de/d01/samples_2cpp_2connected_components_8cpp-example.html
-Public Class RedCell_CComp : Inherits VB_Algorithm
+Public Class RedColor_CComp : Inherits VB_Algorithm
     Dim ccomp As New CComp_Both
-    Dim fCell As New RedCell_Basics
+    Dim fCell As New RedColor_Basics
     Public Sub New()
         desc = "Identify each Connected component as a RedCloud Cell."
     End Sub
@@ -190,9 +190,9 @@ End Class
 
 
 
-Public Class RedCell_CCompBinarized : Inherits VB_Algorithm
+Public Class RedColor_CCompBinarized : Inherits VB_Algorithm
     Dim edges As New Edge_BinarizedSobel
-    Dim ccomp As New RedCell_Binarize
+    Dim ccomp As New RedColor_Binarize
     Public Sub New()
         labels(3) = "Binarized Sobel output"
         desc = "Use the binarized edges to find the different blobs in the image"
@@ -213,9 +213,9 @@ End Class
 
 
 
-Public Class RedCell_Neighbors : Inherits VB_Algorithm
+Public Class RedColor_Neighbors : Inherits VB_Algorithm
     Dim nabs As New Neighbor_Basics
-    Dim fCell As New RedCell_Basics
+    Dim fCell As New RedColor_Basics
     Public Sub New()
         desc = "Find all the neighbors for a RedCell cellmap"
     End Sub
@@ -252,8 +252,8 @@ End Class
 
 
 
-Public Class RedCell_InputColor : Inherits VB_Algorithm
-    Dim fCell As New RedCell_Basics
+Public Class RedColor_InputColor : Inherits VB_Algorithm
+    Dim fCell As New RedColor_Basics
     Dim color As New Color_Basics
     Public Sub New()
         desc = "Floodfill the transformed color output and create cells to be tracked."
@@ -272,9 +272,9 @@ End Class
 
 
 
-Public Class RedCell_LeftRight : Inherits VB_Algorithm
-    Dim fCellsLeft As New RedCell_InputColor
-    Dim fCellsRight As New RedCell_InputColor
+Public Class RedColor_LeftRight : Inherits VB_Algorithm
+    Dim fCellsLeft As New RedColor_InputColor
+    Dim fCellsRight As New RedColor_InputColor
     Public leftCells As New List(Of rcData)
     Public rightCells As New List(Of rcData)
     Public Sub New()
@@ -295,5 +295,28 @@ Public Class RedCell_LeftRight : Inherits VB_Algorithm
         labels(3) = fCellsRight.labels(2)
 
         dst3 = fCellsRight.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedColor_Histogram3DBP : Inherits VB_Algorithm
+    Dim fCell As New RedColor_Basics
+    Dim color As New Histogram3D_BP
+    Public Sub New()
+        desc = "Use the backprojection of the 3D RGB histogram as input to RedColor_Basics."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        color.Run(src)
+        dst2 = color.dst3
+        labels(2) = color.labels(3)
+
+        fCell.Run(dst2)
+        dst3 = fCell.dst2
+        labels(3) = fCell.labels(2)
     End Sub
 End Class

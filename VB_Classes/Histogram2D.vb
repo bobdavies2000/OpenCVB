@@ -26,6 +26,7 @@ Public Class Histogram2D_PointCloud : Inherits VB_Algorithm
     Public ranges() As cv.Rangef
     Public histogram As New cv.Mat
     Public Sub New()
+        redOptions.EnableXYChannels()
         labels = {"", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram"}
         desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options."
     End Sub

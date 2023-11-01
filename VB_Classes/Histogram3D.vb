@@ -110,15 +110,15 @@ Public Class Histogram3D_DepthSplit : Inherits VB_Algorithm
         mats.Run(Nothing)
         dst2 = mats.dst2.Clone
 
-        redOptions.Channels01.Checked = True
+        redOptions.XYReduction.Checked = True
         hist2d.Run(task.pointCloud)
         mats.mat(0) = hist2d.histogram.ConvertScaleAbs
 
-        redOptions.Channels02.Checked = True
+        redOptions.XZReduction.Checked = True
         hist2d.Run(task.pointCloud)
         mats.mat(1) = hist2d.histogram.ConvertScaleAbs
 
-        redOptions.Channels12.Checked = True
+        redOptions.YZReduction.Checked = True
         hist2d.Run(task.pointCloud)
         mats.mat(2) = hist2d.histogram.ConvertScaleAbs
 

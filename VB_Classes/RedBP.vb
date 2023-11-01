@@ -9,7 +9,6 @@ Public Class RedBP_Basics : Inherits VB_Algorithm
     Public Sub New()
         If standalone Then gOptions.displayDst0.Checked = True
         If standalone Then gOptions.displayDst1.Checked = True
-        redOptions.RedBPonly.Enabled = True
         desc = "Match cells from the previous generation"
     End Sub
     Public Function redSelect(ByRef dstInput0 As cv.Mat, ByRef dstInput1 As cv.Mat, ByRef dstInput2 As cv.Mat) As rcData
@@ -138,7 +137,6 @@ Public Class RedBP_MatchCell : Inherits VB_Algorithm
     Public Sub New()
         task.cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         lastCellMap = task.cellMap.Clone
-        redOptions.RedBPonly.Enabled = True
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         strOut = "RedBP_MatchCell takes an rcPrep cell and builds an rcData cell." + vbCrLf +
                  "When standalone, it just build a fake rcPrep cell and displays the rcData equivalent."
@@ -1199,7 +1197,7 @@ End Class
 
 Public Class RedBP_ColorAndCloud : Inherits VB_Algorithm
     Dim guided As New GuidedBP_Depth
-    Public fCell As New RedCell_Basics
+    Public fCell As New RedColor_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
         gOptions.HistBinSlider.Value = 20
@@ -1255,7 +1253,7 @@ Public Class RedBP_SliceH : Inherits VB_Algorithm
     Dim stats As New RedBP_CellStats
     Public Sub New()
         stats.redC = New RedBP_Basics
-        redOptions.Channels12.Checked = True
+        redOptions.YZReduction.Checked = True
         desc = "Build horizontal RedCloud cells"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1276,7 +1274,7 @@ Public Class RedBP_SliceV : Inherits VB_Algorithm
     Dim stats As New RedBP_CellStats
     Public Sub New()
         stats.redC = New RedBP_Basics
-        redOptions.Channels02.Checked = True
+        redOptions.XZReduction.Checked = True
         desc = "Build vertical RedCloud cells."
     End Sub
     Public Sub RunVB(src As cv.Mat)

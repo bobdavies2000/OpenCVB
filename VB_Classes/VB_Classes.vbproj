@@ -130,7 +130,7 @@
     <Compile Include="EdgeDraw.vb" />
     <Compile Include="Erode.vb" />
     <Compile Include="FeatureMatch.vb" />
-    <Compile Include="RedCell.vb" />
+    <Compile Include="RedColor.vb" />
     <Compile Include="History.vb" />
     <Compile Include="GuidedBP.vb" />
     <Compile Include="Guess.vb" />

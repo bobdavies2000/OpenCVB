@@ -62,16 +62,31 @@ Public Class OptionsRedCloud
         task.channelsTop = {2, 0}
         task.channelsSide = {1, 2}
 
-        Channels01.Checked = True
         Reduction_Basics.Checked = True ' Reduction_basics is the default.
         SimpleReduction.Checked = True
         GridSizeSlider.Value = 10
         PCReduction = "XY Reduction"
-        ReductionXY.Checked = True
+        XYReduction.Checked = True
         GuidedBP_Depth.Checked = True
 
         Me.Left = 0
         Me.Top = 0
+    End Sub
+    Public Sub EnableXYChannels()
+        EnableAllChannels(False)
+        XYReduction.Enabled = True
+        XZReduction.Enabled = True
+        YZReduction.Enabled = True
+        XYReduction.Checked = True
+    End Sub
+    Public Sub EnableAllChannels(TrueFalse As Boolean)
+        XReduction.Enabled = TrueFalse
+        YReduction.Enabled = TrueFalse
+        ZReduction.Enabled = TrueFalse
+        XYReduction.Enabled = TrueFalse
+        XZReduction.Enabled = TrueFalse
+        YZReduction.Enabled = TrueFalse
+        XYZReduction.Enabled = TrueFalse
     End Sub
     Private Sub HistBinSlider_ValueChanged(sender As Object, e As EventArgs) Handles HistBinSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
@@ -128,18 +143,6 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         colorInput = noColor_Input.Text
     End Sub
-    Private Sub Channels01_CheckedChanged(sender As Object, e As EventArgs) Handles Channels01.CheckedChanged
-        If task IsNot Nothing Then task.optionsChanged = True
-        channels = {0, 1}
-    End Sub
-    Private Sub Channels02_CheckedChanged(sender As Object, e As EventArgs) Handles Channels02.CheckedChanged
-        If task IsNot Nothing Then task.optionsChanged = True
-        channels = {0, 2}
-    End Sub
-    Private Sub Channels12_CheckedChanged(sender As Object, e As EventArgs) Handles Channels12.CheckedChanged
-        If task IsNot Nothing Then task.optionsChanged = True
-        channels = {1, 2}
-    End Sub
     Private Sub UpperSlider_ValueChanged(sender As Object, e As EventArgs) Handles UpperSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
         UpperLabel.Text = CStr(UpperSlider.Value)
@@ -176,33 +179,36 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         PCreductionLabel.Text = CStr(PCreductionSlider.Value)
     End Sub
-    Private Sub ReductionXY_CheckedChanged(sender As Object, e As EventArgs) Handles ReductionXY.CheckedChanged
+    Private Sub ReductionXY_CheckedChanged(sender As Object, e As EventArgs) Handles XYReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = ReductionXY.Text
+        channels = {0, 1}
+        PCReduction = XYReduction.Text
     End Sub
-    Private Sub RadioButton6_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton6.CheckedChanged
+    Private Sub XReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = RadioButton6.Text
+        PCReduction = XReduction.Text
     End Sub
-    Private Sub RadioButton5_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton5.CheckedChanged
+    Private Sub YReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = RadioButton5.Text
+        PCReduction = YReduction.Text
     End Sub
-    Private Sub RadioButton7_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton7.CheckedChanged
+    Private Sub ZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles ZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = RadioButton7.Text
+        PCReduction = ZReduction.Text
     End Sub
-    Private Sub RadioButton9_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton9.CheckedChanged
+    Private Sub XZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = RadioButton9.Text
+        PCReduction = XZReduction.Text
+        channels = {0, 2}
     End Sub
-    Private Sub RadioButton10_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton10.CheckedChanged
+    Private Sub YZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = RadioButton10.Text
+        PCReduction = YZReduction.Text
+        channels = {1, 2}
     End Sub
-    Private Sub RadioButton11_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton11.CheckedChanged
+    Private Sub XYZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XYZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = RadioButton11.Text
+        PCReduction = XYZReduction.Text
     End Sub
     Private Sub GuidedBP_Depth_CheckedChanged(sender As Object, e As EventArgs) Handles GuidedBP_Depth.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True

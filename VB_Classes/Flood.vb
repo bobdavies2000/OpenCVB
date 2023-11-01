@@ -2,7 +2,7 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Flood_Basics : Inherits VB_Algorithm
     Public classCount As Integer
-    Public fCell As New RedCell_Basics
+    Public fCell As New RedColor_Basics
     Public Sub New()
         labels(3) = "The flooded cells numbered from largest (1) to smallast (x < 255)"
         desc = "FloodFill the input and paint it"
@@ -600,7 +600,7 @@ End Class
 
 Public Class Flood_Featureless : Inherits VB_Algorithm
     Public classCount As Integer
-    Dim fCell As New RedCell_Basics
+    Dim fCell As New RedColor_Basics
     Dim fCells As New List(Of rcData)
     Public Sub New()
         labels = {"", "", "", "Palette output of image at left"}

@@ -414,7 +414,7 @@ End Class
 
 
 Public Class FeatureLess_RedCell : Inherits VB_Algorithm
-    Dim fCell As New RedCell_Basics
+    Dim fCell As New RedColor_Basics
     Dim fless As New FeatureLess_Basics
     Public Sub New()
         desc = "Floodfill the FeatureLess output so each cell can be tracked."
