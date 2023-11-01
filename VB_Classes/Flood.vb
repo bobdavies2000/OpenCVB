@@ -100,77 +100,6 @@ End Class
 
 
 
-Public Class Flood_Palette : Inherits VB_Algorithm
-    Public flood As New Flood_RedColor
-    Dim options As New Options_Flood
-    Public Sub New()
-        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
-        desc = "Create a floodfill image that is only 8-bit for use with a palette"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
-        flood.Run(src)
-        dst2 = flood.redC.dst2
-        labels(2) = "The color scheme below is controlled with the Global Option for Palette.  " +
-                    Str(task.redCells.Count) + " regions > " + CStr(task.minPixels) + " pixels"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Flood_LastXImages : Inherits VB_Algorithm
-    Dim flood As New Flood_RedColor
-    Dim rgbX As New Color_Smoothing
-    Public Sub New()
-        labels(2) = "Results from running Flood_RedColor using the last X BGR images."
-        desc = "Run Flood_RedColor with an image that is the average of the last X frames.  Not much different..."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        rgbX.Run(src)
-        dst3 = rgbX.dst2
-        labels(3) = rgbX.labels(2)
-
-        flood.Run(rgbX.dst2)
-        dst2 = flood.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Flood_MotionRect : Inherits VB_Algorithm
-    Dim motion As New Motion_Rect
-    Dim flood As New Flood_RedColor
-    Public Sub New()
-        labels = {"", "", "Output of Flood_RedColor using the BGR constructed image", ""}
-        desc = "Perform floodfill on the BGR image constructed from a heartbeat image and the motion rectangle."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        motion.Run(src)
-        dst3 = motion.dst3
-
-        flood.Run(motion.dst2)
-        dst2 = flood.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Flood_TopX : Inherits VB_Algorithm
     Dim flood As New Flood_PointList
     Public Sub New()
@@ -202,94 +131,6 @@ Public Class Flood_TopX : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-
-Public Class Flood_Left : Inherits VB_Algorithm
-    Dim options As New Options_LeftRight
-    Public flood As New Flood_RedColor
-    Public Sub New()
-        labels = {"", "", "Left Image", "Floodfill of left image"}
-        desc = "Floodfill the left image"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-        If task.cameraName.Contains("StereoLabs") = False Then
-            dst3 = (task.leftView * cv.Scalar.All(options.alpha) + options.beta).ToMat
-            flood.Run(dst3)
-        Else
-            flood.Run(task.leftView)
-        End If
-        dst2 = flood.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Flood_Right : Inherits VB_Algorithm
-    Dim Options As New Options_LeftRight
-    Public flood As New Flood_RedColor
-    Public Sub New()
-        labels = {"", "", "Right Image", "Floodfill of right image"}
-        desc = "Floodfill the right image"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Options.RunVB()
-        If task.cameraName.Contains("StereoLabs") = False Then
-            dst3 = (task.rightView * cv.Scalar.All(Options.alpha) + Options.beta).ToMat
-            flood.Run(dst3)
-        Else
-            flood.Run(task.rightView)
-        End If
-        dst2 = flood.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class Flood_FLessAndColor : Inherits VB_Algorithm
-    Dim fLess As New FeatureLess_MotionAccum
-    Public flood As New Flood_RedColor
-    Dim addw As New AddWeighted_Basics
-    Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        labels = {"", "", "Output of Flood_RedColor", "Below are the cells that contain featureless areas"}
-        desc = "Classify each cell as featureless or not."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        addw.src2 = src.Clone
-        fLess.Run(src)
-
-        flood.Run(src)
-        dst2 = flood.dst2
-
-        dst3.SetTo(0)
-        For Each rc In task.redCells
-            Dim tmp As New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
-            fLess.dst2(rc.rect).CopyTo(tmp, rc.mask)
-            If tmp.CountNonZero Then dst3(rc.rect).SetTo(rc.color, rc.mask)
-        Next
-        addw.Run(dst3)
-        dst1 = addw.dst2
-    End Sub
-End Class
 
 
 
@@ -383,29 +224,6 @@ Public Class Flood_PointList : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-Public Class Flood_RedColor : Inherits VB_Algorithm
-    Public redC As New RedCloud_Basics
-    Dim color As New Color_Basics
-    Dim fLess As New FeatureLess_Basics
-    Public Sub New()
-        redOptions.KMeans_Basics.Checked = True
-        redOptions.NoPointcloudData.Checked = True
-        desc = "Floodfill an image and track each cell from image to image"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        color.Run(src)
-        fLess.Run(color.dst2)
-        redC.Run(fLess.dst2)
-        dst2 = redC.dst2
-        dst3 = redC.dst3
-
-        labels = redC.labels
-    End Sub
-End Class
 
 
 

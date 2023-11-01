@@ -4,7 +4,7 @@ Public Class Triangle_Basics : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
-        labels = {"", "", "RedBP_Hulls output", "Selected contour - each pixel has depth"}
+        labels = {"", "", "RedCloud_Hulls output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -42,10 +42,10 @@ End Class
 
 
 Public Class Triangle_HullContour : Inherits VB_Algorithm
-    Dim hulls As New RedBP_Hulls
+    Dim hulls As New RedCloud_Hulls
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        labels = {"", "Selected hull", "RedBP_Hulls output", "Selected contour"}
+        labels = {"", "Selected hull", "RedCloud_Hulls output", "Selected contour"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -80,7 +80,7 @@ Public Class Triangle_RedCloud : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
-        labels = {"", "", "RedBP_Hulls output", "Selected contour - each pixel has depth"}
+        labels = {"", "", "RedCloud_Hulls output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -121,7 +121,7 @@ Public Class Triangle_Cell : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
-        labels = {"", "", "RedBP_Hulls output", "Selected contour - each pixel has depth"}
+        labels = {"", "", "RedCloud_Hulls output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
 
@@ -177,7 +177,7 @@ Public Class Triangle_Mask : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
-        labels = {"", "", "RedBP_Hulls output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
+        labels = {"", "", "RedCloud_Hulls output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
         desc = "Given a RedCloud cell, resize it and show the points with depth."
     End Sub
 

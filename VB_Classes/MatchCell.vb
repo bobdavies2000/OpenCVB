@@ -55,7 +55,7 @@ End Class
 
 
 Public Class MatchCell_PrepareData : Inherits VB_Algorithm
-    Public flood As New Flood_RedColor
+    'Public flood As New Flood_RedColor
     Public redCells As New List(Of rcData)
     Public rgbCells As New List(Of rcData)
     Public cellMap As cv.Mat
@@ -81,8 +81,8 @@ Public Class MatchCell_PrepareData : Inherits VB_Algorithm
         task.redCells = New List(Of rcData)(rgbCells)
         rgbcellMap.CopyTo(task.cellMap)
 
-        flood.Run(src)
-        dst3 = flood.dst2
+        'flood.Run(src)
+        'dst3 = flood.dst2
 
         rgbCells = New List(Of rcData)(task.redCells)
         rgbcellMap = task.cellMap.Clone
@@ -99,7 +99,7 @@ End Class
 Public Class MatchCell_Shape : Inherits VB_Algorithm
     Dim options As New Options_MatchShapes
     Dim lastHulls As New List(Of rcData)
-    Dim hulls As New RedBP_Hulls
+    Dim hulls As New RedCloud_Hulls
     Public Sub New()
         labels(2) = "Highlighted cells matched the previous generation cell in the same area."
         desc = "Use OpenCV's MatchShape API to validate that stable and current contours agree"

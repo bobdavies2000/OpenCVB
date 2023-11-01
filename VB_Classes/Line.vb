@@ -1277,9 +1277,9 @@ End Class
 
 Public Class Line_CellsVertHoriz : Inherits VB_Algorithm
     Dim lines As New Feature_Lines
-    Dim hulls As New RedBP_Hulls
+    Dim hulls As New RedCloud_Hulls
     Public Sub New()
-        labels(2) = "RedBP_Hulls output with lines highlighted"
+        labels(2) = "RedCloud_Hulls output with lines highlighted"
         desc = "Identify the lines created by the RedCloud Cells and separate vertical from horizontal"
     End Sub
     Public Sub RunVB(src as cv.Mat)

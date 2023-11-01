@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedTrack_Basics : Inherits VB_Algorithm
-    Dim stats As New RedBP_CellStats
+    Dim stats As New RedCloud_CellStats
     Public redC As New RedCloud_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
@@ -160,7 +160,7 @@ End Class
 
 Public Class RedTrack_GoodCell : Inherits VB_Algorithm
     Dim good As New RedTrack_GoodCellInput
-    Dim hulls As New RedBP_Hulls
+    Dim hulls As New RedCloud_Hulls
     Public Sub New()
         findSlider("Sample Size").Value = 100
         findSlider("Distance").Value = 3
@@ -187,7 +187,7 @@ End Class
 
 Public Class RedTrack_GoodCells : Inherits VB_Algorithm
     Dim good As New RedTrack_GoodCellInput
-    Dim hulls As New RedBP_Hulls
+    Dim hulls As New RedCloud_Hulls
     Public Sub New()
         desc = "Track the cells that have good features"
     End Sub

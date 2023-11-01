@@ -41,35 +41,6 @@ End Class
 
 
 
-
-
-Public Class LUT_FloodFill : Inherits VB_Algorithm
-    Dim edges As New Edge_Canny
-    Public flood As New Flood_RedColor
-    Public lut As New LUT_Equalized
-    Public Sub New()
-        findSlider("Canny threshold1").Value = 170
-        desc = "Use LUT output with floodfill to identify each segment in the image"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        edges.Run(src)
-        src.SetTo(cv.Scalar.White, edges.dst2)
-
-        lut.Run(src)
-
-        flood.Run(lut.dst3)
-        dst2 = flood.dst2
-
-        labels(2) = "FloodFill Results - click to select another region. " + CStr(task.redCells.Count) + " regions."
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class LUT_Sliders : Inherits VB_Algorithm
     Dim options As New Options_LUT
     Public Sub New()

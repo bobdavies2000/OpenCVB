@@ -11,7 +11,7 @@ Public Class OptionsRedCloud
     Public Const noReduce As Integer = 2
 
     Public PCReduction As String
-    Private Sub OptionsRedBP_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub OptionsRedCloud_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
         Me.Text = "Options mostly for RedCloud_Basics but other related algorithms too."
 

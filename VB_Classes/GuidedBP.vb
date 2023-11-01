@@ -213,7 +213,7 @@ End Class
 
 Public Class GuidedBP_kTop : Inherits VB_Algorithm
     Dim autoX As New OpAuto_XRange
-    Public colorC As New RedBP_ColorAndCloud
+    Public colorC As New RedCloud_ColorAndCloud
     Dim contours As New Contour_Largest
     Dim hist2d As New Histogram2D_Top
     Public Sub New()
@@ -257,7 +257,7 @@ End Class
 Public Class GuidedBP_kSide : Inherits VB_Algorithm
     Dim autoY As New OpAuto_YRange
     Public hist2d As New Histogram2D_Side
-    Public colorC As New RedBP_ColorAndCloud
+    Public colorC As New RedCloud_ColorAndCloud
     Dim contours As New Contour_Largest
     Public Sub New()
         gOptions.useHistoryCloud.Checked = False
@@ -323,7 +323,7 @@ End Class
 
 Public Class GuidedBP_kCellStats : Inherits VB_Algorithm
     Dim kTopSide As New GuidedBP_kTopSide
-    Dim stats As New RedBP_CellStats
+    Dim stats As New RedCloud_CellStats
     Public Sub New()
         stats.redC = New RedCloud_Basics
         desc = "Display all the stats for a RedColor cell"
@@ -346,7 +346,7 @@ End Class
 Public Class GuidedBP_DelaunayStats : Inherits VB_Algorithm
     Dim delaunay As New GuidedBP_Delaunay
     Dim reduction As New Reduction_Basics
-    Dim stats As New RedBP_CellStats
+    Dim stats As New RedCloud_CellStats
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         stats.redC = New RedCloud_Basics
@@ -408,7 +408,7 @@ End Class
 
 Public Class GuidedBP_ObjectStats : Inherits VB_Algorithm
     Dim kObj As New GuidedBP_Objects
-    Dim stats As New RedBP_CellStats
+    Dim stats As New RedCloud_CellStats
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         stats.redC = New RedCloud_Basics
@@ -547,12 +547,12 @@ End Class
 
 Public Class GuidedBP_RedColor : Inherits VB_Algorithm
     Dim bpDoctor As New GuidedBP_Cells
-    Dim stats As New RedBP_CellStats
+    Dim stats As New RedCloud_CellStats
     Dim colorClass As New Color_Basics
     Public Sub New()
         stats.redC = New RedCloud_Basics
-        labels = {"", "", "RedBP_CellStats output", ""}
-        desc = "Run RedBP_CellStats on the output of GuidedBP_Basics after merging with task.color"
+        labels = {"", "", "RedCloud_CellStats output", ""}
+        desc = "Run RedCloud_CellStats on the output of GuidedBP_Basics after merging with task.color"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         bpDoctor.Run(src)

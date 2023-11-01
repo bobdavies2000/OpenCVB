@@ -124,45 +124,6 @@ End Class
 
 
 
-
-
-Public Class LeftRight_FloodFill : Inherits VB_Algorithm
-    Dim flood As New Flood_RedColor
-    Public Sub New()
-        desc = "Use floodfill on both the left and right images"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static leftCells As New List(Of rcData)
-        Static rightCells As New List(Of rcData)
-        Static leftMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        Static rightMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-
-        task.redCells = New List(Of rcData)(leftCells)
-        task.cellMap = leftMap.Clone
-
-        flood.Run(task.leftview)
-        dst2 = flood.dst2.Clone
-
-        leftCells = New List(Of rcData)(task.redCells)
-        leftMap = task.cellMap.Clone
-
-        task.redCells = New List(Of rcData)(rightCells)
-        task.cellMap = rightMap.Clone
-
-        flood.Run(task.rightview)
-        dst3 = flood.dst2.Clone
-
-        rightCells = New List(Of rcData)(task.redCells)
-        rightMap = task.cellMap.Clone
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class LeftRight_Edges : Inherits VB_Algorithm
     Dim edges As New Edge_Canny
     Public Sub New()

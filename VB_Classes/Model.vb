@@ -126,7 +126,7 @@ Public Class Model_CellZoom : Inherits VB_Algorithm
     Dim oglData As New Model_RedCloud
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        labels = {"", "", "RedBP_Hull output", "Selected cell in 3D"}
+        labels = {"", "", "RedCloud_Hull output", "Selected cell in 3D"}
         desc = "Zoom in on the selected RedCloud cell in the OpenGL output"
     End Sub
     Public Sub RunVB(src As cv.Mat)

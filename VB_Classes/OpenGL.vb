@@ -841,7 +841,7 @@ End Class
 
 
 Public Class OpenGL_DrawHull : Inherits VB_Algorithm
-    Dim hulls As New RedBP_Hulls
+    Dim hulls As New RedCloud_Hulls
     Public Sub New()
         task.ogl.oglFunction = oCase.drawCell
         task.OpenGLTitle = "OpenGL_Functions"
@@ -934,7 +934,7 @@ End Class
 
 Public Class OpenGL_DrawHulls : Inherits VB_Algorithm
     Public options As New Options_OpenGLFunctions
-    Public hulls As New RedBP_Hulls
+    Public hulls As New RedCloud_Hulls
     Dim ogl As New OpenGL_Basics
     Public Sub New()
         ogl.oglFunction = oCase.drawCells
@@ -1528,7 +1528,7 @@ End Class
 
 
 Public Class OpenGL_FlatSurfaces : Inherits VB_Algorithm
-    Dim flat As New RedBP_LikelyFlatSurfaces
+    Dim flat As New RedCloud_LikelyFlatSurfaces
     Public Sub New()
         labels(2) = "Display the point cloud pixels that appear to be vertical and horizontal regions."
         task.ogl.oglFunction = oCase.pointCloudAndRGB

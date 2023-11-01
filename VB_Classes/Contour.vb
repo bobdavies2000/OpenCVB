@@ -535,7 +535,7 @@ End Class
 
 Public Class Contour_Smoothing : Inherits VB_Algorithm
     Dim options As New Options_Contours2
-    Dim redC As New RedBP_FeatureLess
+    Dim redC As New RedCloud_FeatureLess
     Public Sub New()
         labels(2) = "Use the options to change how the contour is smoothed."
         desc = "Create a simplified contour of the selected cell"

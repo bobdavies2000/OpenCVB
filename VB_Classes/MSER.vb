@@ -4,7 +4,7 @@ Imports cv = OpenCvSharp
 ' https://github.com/opencv/opencv/blob/master/samples/cpp/detect_mser.cpp
 Public Class MSER_Basics : Inherits VB_Algorithm
     Dim detect As New MSER_CPP
-    Dim matchCell As New RedBP_MatchCell
+    Dim matchCell As New RedCloud_MatchCell
     Public cellMap As cv.Mat
     Public mserCells As New List(Of rcData)
     Public boxes As New List(Of cv.Rect)
@@ -184,7 +184,7 @@ Public Class MSER_LeftRight : Inherits VB_Algorithm
     Dim left As New MSER_Left
     Dim right As New MSER_Right
     Public Sub New()
-        labels = {"", "", "Flood_RedColor output for left camera", "Flood_RedColor output for right camera"}
+        labels = {"", "", "MSER_Basics output for left camera", "MSER_Basics output for right camera"}
         desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -207,7 +207,7 @@ End Class
 Public Class MSER_Left : Inherits VB_Algorithm
     Dim mBase As New MSER_Basics
     Public Sub New()
-        labels = {"", "", "Flood_RedColor output for left camera", "Flood_RedColor output for right camera"}
+        labels = {"", "", "MSER_Basics output for left camera", "MSER_Basics rectangles found"}
         desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -228,7 +228,7 @@ End Class
 Public Class MSER_Right : Inherits VB_Algorithm
     Dim mBase As New MSER_Basics
     Public Sub New()
-        labels = {"", "", "Flood_RedColor output for left camera", "Flood_RedColor output for right camera"}
+        labels = {"", "", "MSER_Basics output for right camera", "MSER_Basics rectangles found"}
         desc = "Test MSER (Maximally Stable Extremal Region) algorithm on the left and right views."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -306,9 +306,9 @@ End Class
 
 Public Class MSER_RedCloud : Inherits VB_Algorithm
     Dim mBase As New MSER_Basics
-    Dim colorC As New RedBP_ColorOnly
+    Dim colorC As New RedCloud_ColorOnly
     Public Sub New()
-        desc = "Use the MSER_Basics output as input to RedBP_Color"
+        desc = "Use the MSER_Basics output as input to RedCloud_Color"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         mBase.Run(src)
@@ -527,7 +527,7 @@ End Module
 Public Class MSER_Regions : Inherits VB_Algorithm
     Dim core As New MSER_Detect
     Public mserCells As New List(Of rcData)
-    Dim matchCell As New RedBP_MatchCell
+    Dim matchCell As New RedCloud_MatchCell
     Public cellMap As cv.Mat
     Public useOpAuto As Boolean = True
     Public Sub New()

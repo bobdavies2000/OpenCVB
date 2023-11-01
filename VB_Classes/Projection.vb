@@ -29,33 +29,6 @@ End Class
 
 
 
-
-Public Class Projection_FeatureLess : Inherits VB_Algorithm
-    Public fLess As New Flood_RedColor
-    Dim heat As New HeatMap_Basics
-    Public Sub New()
-        labels = {"", "", "FeatureLess cells identified by RedCloud", "Click on any FeatureLess cell to see projection below"}
-        desc = "Use projection for RedCloud FeatureLess cells"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        fLess.Run(src)
-        dst2 = fLess.dst2
-        labels(2) = fLess.labels(2)
-
-        Dim rc = task.rcSelect
-        Dim input = task.pointCloud(rc.rect)
-        input.SetTo(0, Not rc.mask)
-        heat.Run(input)
-        dst3 = heat.dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class Projection_Lines : Inherits VB_Algorithm
     Dim heat As New HeatMap_Basics
     Dim lines As New Line_Basics
