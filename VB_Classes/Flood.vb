@@ -208,105 +208,6 @@ End Class
 
 
 
-Public Class Flood_Objects : Inherits VB_Algorithm
-    Public kFlood As New KMeans_FloodFill
-    Public lutFlood As New LUT_FloodFill
-    Public reductionFlood As New Reduction_Floodfill
-    Public myFlood As Flood_RedColor
-    Public Sub New()
-        If findfrm(traceName + " Radio Buttons") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Use BGR KMeans")
-            radio.addRadio("Use Depth KMeans")
-            radio.addRadio("Use BGR LUT")
-            radio.addRadio("Use Grayscale Reduction")
-            radio.check(2).Checked = True
-        End If
-
-        labels(2) = "Click anywhere to get mask and depth value"
-        desc = "Create a segmented image with KMeans, select a region, and isolate it for measurement."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static radioDepth = findRadio("Use Depth KMeans")
-        Static radioLUT = findRadio("Use BGR LUT")
-        Static radioReduction = findRadio("Use Grayscale Reduction")
-
-        Dim fIndex = 0
-        If radioLUT.checked Then fIndex = 2
-        If radioReduction.checked Then fIndex = 2
-        If radioDepth.checked Then
-            src = task.pcSplit(2)
-            fIndex = 1
-        End If
-
-        Select Case fIndex
-            Case 0, 1
-                If src.Type = cv.MatType.CV_32FC1 Then src = vbNormalize32f(src)
-                kFlood.Run(src)
-                myFlood = kFlood.flood
-            Case 2
-                lutFlood.Run(src)
-                myFlood = lutFlood.flood
-            Case 3
-                'reductionFlood.Run(src)
-                'myFlood = reductionFlood.flood
-        End Select
-
-        dst2 = vbPalette(myFlood.dst2)
-
-        Dim meanDepth As cv.Scalar, stdevDepth As cv.Scalar
-        labels(3) = "Selected area is an unstable region"
-
-        If task.redCells.Count > 0 Then
-            Dim rc = task.rcSelect
-            Dim pt = task.clickPoint
-
-            Dim input As cv.Mat = task.pcSplit(2)(rc.rect)
-            cv.Cv2.MeanStdDev(input, meanDepth, stdevDepth, rc.mask)
-            If meanDepth(0) < 0.2 Then
-                labels(3) = "Region " + CStr(rc.index) + " has no depth"
-            Else
-                labels(3) = "Region " + CStr(rc.index) + " depth=" + Format(meanDepth(0) / 1000, fmt3) + "m (avg), stdev=" + Format(stdevDepth(0), "0.0")
-            End If
-            dst3.SetTo(0)
-            dst2(rc.rect).CopyTo(dst3(rc.rect), rc.mask)
-            Dim r = rc.rect
-            If pt.X < r.X Or pt.X > r.X + r.Width Or pt.Y < r.Y Or pt.Y > r.Y + r.Height Then
-                labels(3) = "The selected region does not have stable depth"
-            End If
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Flood_DepthAdd : Inherits VB_Algorithm
-    Dim flood As New Flood_Objects
-    Dim redCells As New List(Of rcData)
-    Public Sub New()
-        desc = "Use floodfill to enhance sparse depth data using pixels connected by color"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        flood.Run(src)
-        dst2 = flood.dst2
-
-        dst3 = New cv.Mat(task.pcSplit(2).Size, cv.MatType.CV_32F, 0)
-        For Each rc In task.redCells
-            Dim mean = task.pcSplit(2)(rc.rect).Mean(rc.mask)
-            dst3(rc.rect).SetTo(mean.Val0, rc.mask)
-            rc.depthMean.Z = mean(2)
-            redCells.Add(rc)
-        Next
-    End Sub
-End Class
-
-
-
-
-
 
 
 
@@ -355,95 +256,6 @@ Public Class Flood_Right : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-
-
-'Public Class Flood_LeftRight : Inherits VB_Algorithm
-'    Public left As New Flood_Left
-'    Public right As New Flood_Right
-'    Public leftCells As List(Of rcData)
-'    Public rightCells As List(Of rcData)
-'    Public Sub New()
-'        If standalone Then gOptions.displayDst0.Checked = True
-'        If standalone Then gOptions.displayDst1.Checked = True
-'        labels = {"Right raw image", "Right Flood_RedColor output", "Left raw image", "Left Flood_RedColor output"}
-'        desc = "Use floodfill on the left and right images to look for matchable shapes."
-'    End Sub
-'    Public Sub showLeftRight(rc As rcData, ByRef lrDst As cv.Mat, ByRef dst As cv.Mat)
-'        vbDrawContour(lrDst(rc.rect), rc.contour, cv.Scalar.White, 3)
-'        vbDrawContour(lrDst(rc.rect), rc.contour, cv.Scalar.Black, 1)
-'        vbDrawContour(dst(rc.rect), rc.contour, cv.Scalar.White, -1)
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        left.Run(Nothing)
-'        dst2 = task.leftview
-'        dst3 = left.dst2
-'        Dim rc = task.redCells(task.rcMatch.cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
-'        showLeftRight(rc, dst2, dst3)
-'        leftCells = New List(Of rcData)(task.redCells)
-
-'        right.Run(Nothing)
-'        dst0 = task.rightview
-'        dst1 = right.dst2
-'        rc = task.redCells(right.flood.colorC.rcMatch.cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X))
-'        showLeftRight(rc, dst0, dst1)
-'        rightCells = New List(Of rcData)(task.redCells)
-'    End Sub
-'End Class
-
-
-
-
-
-
-
-
-
-
-'Public Class Flood_LeftRightKNN : Inherits VB_Algorithm
-'    Dim lrFlood As New Flood_LeftRight
-'    Dim knn As New KNN_Basics
-'    Public Sub New()
-'        If standalone Then gOptions.displayDst0.Checked = True
-'        If standalone Then gOptions.displayDst1.Checked = True
-'        labels = {"Left Flood_RedColor cells", "Right Flood_RedColor cells", "Cell centers - White is a LeftView cell, Red is a RightView cell - click to identify above", ""}
-'        desc = "Use KNN to match cells in the left and right image output from Flood_RedColor"
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        lrFlood.Run(src)
-'        dst0 = lrFlood.dst1
-'        dst1 = lrFlood.dst3
-
-'        dst2.SetTo(0)
-'        knn.queries.Clear()
-
-'        For Each rc In lrFlood.leftCells
-'            dst2.Circle(rc.maxDist, task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
-'            knn.queries.Add(rc.maxDist)
-'        Next
-
-'        knn.trainInput.Clear()
-'        For Each rc In lrFlood.rightCells
-'            dst2.Circle(rc.maxDist, task.dotSize + 1, cv.Scalar.Red, -1, task.lineType)
-'            knn.trainInput.Add(rc.maxDist)
-'        Next
-
-'        knn.Run(Nothing)
-
-'        For i = 0 To knn.neighbors.Count - 1
-'            Dim index = knn.neighbors(i)(0)
-
-'            Dim p1 = lrFlood.leftCells(i).maxDist
-'            Dim p2 = lrFlood.rightCells(index).maxDist
-'            dst2.Line(p1, p2, cv.Scalar.Yellow, task.lineWidth, task.lineType)
-'        Next
-'    End Sub
-'End Class
 
 
 
@@ -571,6 +383,29 @@ Public Class Flood_PointList : Inherits VB_Algorithm
     End Sub
 End Class
 
+
+
+
+
+Public Class Flood_RedColor : Inherits VB_Algorithm
+    Public redC As New RedBP_Basics
+    Dim color As New Color_Basics
+    Dim fLess As New FeatureLess_Basics
+    Public Sub New()
+        redOptions.KMeans_Basics.Checked = True
+        redOptions.NoPointcloudData.Checked = True
+        desc = "Floodfill an image and track each cell from image to image"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        color.Run(src)
+        fLess.Run(color.dst2)
+        redC.Run(fLess.dst2)
+        dst2 = redC.dst2
+        dst3 = redC.dst3
+
+        labels = redC.labels
+    End Sub
+End Class
 
 
 

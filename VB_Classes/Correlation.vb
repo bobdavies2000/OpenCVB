@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Correlation_Basics : Inherits VB_Algorithm
-    Dim kFlood As New KMeans_FloodFill
+    Dim kFlood As New KMeans_Edges
     Dim options As New Options_FeatureMatch
     Public Sub New()
         labels(3) = "Plot of z (vertical scale) to x with ranges shown on the plot."

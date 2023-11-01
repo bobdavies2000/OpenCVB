@@ -334,14 +334,14 @@ End Class
 
 
 
-Public Class KMeans_FloodFill : Inherits VB_Algorithm
+Public Class KMeans_Edges : Inherits VB_Algorithm
     Dim edges As New Edge_Canny
-    Public flood As New Flood_RedColor
     Public km As New KMeans_Image
     Public classCount As Integer
+    Dim colorC As New RedColor_Basics
     Public Sub New()
-        labels(2) = "FloodFill Results - click to select another region"
-        desc = "Use each KMeans mask with floodfill to identify each segment in the image"
+        labels(3) = "KMeans with edges output"
+        desc = "Use KMeans output with floodfill to identify each segment in the image"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         edges.Run(src)
@@ -351,11 +351,9 @@ Public Class KMeans_FloodFill : Inherits VB_Algorithm
         dst3 = km.dst2
         classCount = km.classCount
 
-        flood.Run(km.dst2)
-        If task.redCells.Count = 0 Then Exit Sub ' image is likely very dark and nothing is actually seen...
-        dst2 = flood.dst2
-
-        labels(3) = CStr(task.redCells.Count) + " regions"
+        colorC.Run(dst3)
+        dst2 = colorC.dst2
+        labels(2) = CStr(task.fCells.Count) + " regions were identified in RedColor_Basics"
     End Sub
 End Class
 
