@@ -18,6 +18,7 @@ Public Class OptionsRedCloud
     Public Const reduceXZ As Integer = 4
     Public Const reduceYZ As Integer = 5
     Public Const reduceXYZ As Integer = 6
+    Public Const noDepthData As Integer = 7
 
     Private Sub OptionsRedBP_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
@@ -133,9 +134,9 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         colorInput = Reduction_Basics.Text
     End Sub
-    Private Sub RadioButton8_CheckedChanged(sender As Object, e As EventArgs) Handles FeatureLess_Basics.CheckedChanged
+    Private Sub noColor_Input_CheckedChanged(sender As Object, e As EventArgs) Handles noColor_Input.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        colorInput = BackProject_Full.Text
+        colorInput = noColor_Input.Text
     End Sub
     Private Sub Channels01_CheckedChanged(sender As Object, e As EventArgs) Handles Channels01.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
@@ -213,14 +214,16 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = reduceXYZ
     End Sub
-
     Private Sub GuidedBP_Depth_CheckedChanged(sender As Object, e As EventArgs) Handles GuidedBP_Depth.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         depthInput = GuidedBP_Depth.Text
     End Sub
-
     Private Sub RedCloud_Core_CheckedChanged(sender As Object, e As EventArgs) Handles RedCloud_Core.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         depthInput = RedCloud_Core.Text
+    End Sub
+    Private Sub NoPointcloudData_CheckedChanged_1(sender As Object, e As EventArgs) Handles NoPointcloudData.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        depthInput = NoPointcloudData.Text
     End Sub
 End Class

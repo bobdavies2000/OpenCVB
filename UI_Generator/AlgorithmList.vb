@@ -506,6 +506,7 @@ if algorithmName = "FeatureLess_History" Then return new FeatureLess_History
 if algorithmName = "FeatureLess_LeftRight" Then return new FeatureLess_LeftRight
 if algorithmName = "FeatureLess_MotionAccum" Then return new FeatureLess_MotionAccum
 if algorithmName = "FeatureLess_Prediction" Then return new FeatureLess_Prediction
+if algorithmName = "FeatureLess_RedCell" Then return new FeatureLess_RedCell
 if algorithmName = "FeatureLess_Sobel" Then return new FeatureLess_Sobel
 if algorithmName = "FeatureLess_Unique3Pixels" Then return new FeatureLess_Unique3Pixels
 if algorithmName = "FeatureLess_UniquePixels" Then return new FeatureLess_UniquePixels

@@ -6,7 +6,6 @@ Public Class Color_Basics : Inherits VB_Algorithm
     Dim km As New KMeans_Basics
     Dim lut As New LUT_Basics
     Dim reduction As New Reduction_Basics
-    Dim fLess As New FeatureLess_Basics
     Dim classifier As Object = reduction
     Public Sub New()
         classifier = reduction
@@ -25,8 +24,8 @@ Public Class Color_Basics : Inherits VB_Algorithm
                     classifier = lut
                 Case "Reduction_Basics"
                     classifier = reduction
-                Case "FeatureLess_Basics"
-                    classifier = fLess
+                Case "No Color Input" ' No Color Input is not used by Color_Basics - reset to default
+                    classifier = reduction
             End Select
         End If
 
@@ -322,7 +321,7 @@ Public Class Color_Smoothing : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         frames.Run(src)
         dst2 = frames.dst2
-        labels(2) = "The image below is composed of " + CStr(frames.saveFrames.Count) + " BGR frames"
+        labels(2) = "The image below is the average of " + CStr(frames.saveFrames.Count) + " the last BGR frames"
     End Sub
 End Class
 

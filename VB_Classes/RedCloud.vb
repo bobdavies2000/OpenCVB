@@ -149,6 +149,9 @@ Public Class RedCloud_InputCloud : Inherits VB_Algorithm
             Case "RedCloud_Core"
                 redC.Run(src)
                 dst2 = redC.dst2
+            Case "N"
+                redC.Run(src)
+                dst2 = redC.dst2
         End Select
     End Sub
 End Class
@@ -167,17 +170,21 @@ Public Class RedCloud_InputCombined : Inherits VB_Algorithm
         desc = "Combined the color and cloud as indicated in the RedOptions panel."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        'Select Case redOptions.depthInput
-        '    Case "GuidedBP_Depth"
-        '        guided.Run(src)
-        '        Dim maskOfDepth = guided.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        '        dst2 = guided.dst2
-        '    Case "RedCloud_Core"
-        '        redC.Run(src)
-        '        dst2 = redC.dst2
-        'End Select
+        If redOptions.colorInput = "No Color Input" Then
+            dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        Else
+            color.Run(src)
+            dst2 = color.dst2
+        End If
+
+        If redOptions.depthInput <> "No Pointcloud Data" Then
+            cloud.Run(src)
+            cloud.dst2.CopyTo(dst2, task.depthMask)
+        End If
     End Sub
 End Class
+
+
 
 
 

@@ -405,3 +405,26 @@ Public Class FeatureLess_History : Inherits VB_Algorithm
         dst3 = sum8u.dst2
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class FeatureLess_RedCell : Inherits VB_Algorithm
+    Dim fCell As New RedCell_Basics
+    Dim fless As New FeatureLess_Basics
+    Public Sub New()
+        desc = "Floodfill the FeatureLess output so each cell can be tracked."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        fless.Run(src)
+        fCell.Run(fless.dst2)
+
+        dst2 = fCell.dst2
+        dst3 = fCell.dst3
+        labels(2) = fCell.labels(2)
+    End Sub
+End Class
