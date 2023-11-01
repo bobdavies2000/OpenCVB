@@ -62,7 +62,7 @@ Public Class MatchCell_PrepareData : Inherits VB_Algorithm
     Public rgbcellMap As cv.Mat
     Dim redC As New RedBP_Basics
     Public Sub New()
-        redC.depthOnly = True
+        redOptions.noColor_Input.Checked = True
         cellMap = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
         rgbcellMap = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
         labels = {"", "", "RedCloud output for depth", "RedCloud output for BGR"}

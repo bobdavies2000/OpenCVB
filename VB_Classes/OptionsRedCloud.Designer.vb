@@ -303,12 +303,12 @@ Partial Class OptionsRedCloud
         Me.RGBSource.Controls.Add(Me.LUT_Basics)
         Me.RGBSource.Controls.Add(Me.Reduction_Basics)
         Me.RGBSource.Controls.Add(Me.BackProject_Full)
-        Me.RGBSource.Location = New System.Drawing.Point(1103, 180)
+        Me.RGBSource.Location = New System.Drawing.Point(1088, 30)
         Me.RGBSource.Name = "RGBSource"
         Me.RGBSource.Size = New System.Drawing.Size(250, 200)
         Me.RGBSource.TabIndex = 3
         Me.RGBSource.TabStop = False
-        Me.RGBSource.Text = "RedCloud Color Source"
+        Me.RGBSource.Text = "Color Source"
         '
         'noColor_Input
         '
@@ -599,7 +599,7 @@ Partial Class OptionsRedCloud
         Me.RedCloudOnly.Size = New System.Drawing.Size(221, 290)
         Me.RedCloudOnly.TabIndex = 7
         Me.RedCloudOnly.TabStop = False
-        Me.RedCloudOnly.Text = "PointCloud Histogram Input"
+        Me.RedCloudOnly.Text = "PC Histogram Inputs"
         '
         'XYZReduction
         '
@@ -683,7 +683,7 @@ Partial Class OptionsRedCloud
         Me.GroupBox1.Controls.Add(Me.NoPointcloudData)
         Me.GroupBox1.Controls.Add(Me.RedCloud_Core)
         Me.GroupBox1.Controls.Add(Me.GuidedBP_Depth)
-        Me.GroupBox1.Location = New System.Drawing.Point(1364, 236)
+        Me.GroupBox1.Location = New System.Drawing.Point(1088, 242)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(250, 144)
         Me.GroupBox1.TabIndex = 5

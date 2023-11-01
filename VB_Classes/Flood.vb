@@ -575,26 +575,6 @@ End Class
 
 
 
-Public Class Flood_RedColor : Inherits VB_Algorithm
-    Public redC As New RedBP_Basics
-    Dim fLess As New FeatureLess_Basics
-    Public Sub New()
-        redC.colorOnly = True
-        desc = "Floodfill an image and track each cell from image to image"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        fLess.Run(src)
-        redC.Run(fLess.dst2)
-        dst2 = redC.dst2
-        dst3 = redC.dst3
-
-        labels = redC.labels
-    End Sub
-End Class
-
-
-
-
 
 
 

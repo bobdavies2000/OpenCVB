@@ -2,6 +2,7 @@
 Imports System.Runtime.InteropServices
 Public Class RedColor_Basics : Inherits VB_Algorithm
     Dim fCell As New RedColor_CPP
+    Dim color As New Color_Basics
     Dim lastMap As cv.Mat
     Public Sub New()
         lastMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -11,7 +12,12 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
         Dim lastCells As New List(Of rcData)(task.fCells)
         Dim lastMap = dst3.Clone
 
-        fCell.Run(src)
+        If src.Type = cv.MatType.CV_8UC3 Then
+            color.Run(src)
+            fCell.Run(color.dst2)
+        Else
+            fCell.Run(src)
+        End If
         dst3 = fCell.dst3
 
         Dim fCells As New List(Of rcData)
