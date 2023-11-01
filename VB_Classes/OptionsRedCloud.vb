@@ -10,16 +10,7 @@ Public Class OptionsRedCloud
     Public Const bitwiseReduce As Integer = 1
     Public Const noReduce As Integer = 2
 
-    Public PCReduction As Integer
-    Public Const reduceX As Integer = 0
-    Public Const reduceY As Integer = 1
-    Public Const reduceZ As Integer = 2
-    Public Const reduceXY As Integer = 3
-    Public Const reduceXZ As Integer = 4
-    Public Const reduceYZ As Integer = 5
-    Public Const reduceXYZ As Integer = 6
-    Public Const noDepthData As Integer = 7
-
+    Public PCReduction As String
     Private Sub OptionsRedBP_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
         Me.Text = "Options mostly for RedBP_Basics but other related algorithms too."
@@ -75,9 +66,9 @@ Public Class OptionsRedCloud
         Reduction_Basics.Checked = True ' Reduction_basics is the default.
         SimpleReduction.Checked = True
         GridSizeSlider.Value = 10
-        PCReduction = reduceXY
+        PCReduction = "XY Reduction"
         ReductionXY.Checked = True
-        RedCloud_Core.Checked = True
+        GuidedBP_Depth.Checked = True
 
         Me.Left = 0
         Me.Top = 0
@@ -188,31 +179,31 @@ Public Class OptionsRedCloud
     End Sub
     Private Sub ReductionXY_CheckedChanged(sender As Object, e As EventArgs) Handles ReductionXY.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = reduceXY
+        PCReduction = ReductionXY.Text
     End Sub
     Private Sub RadioButton6_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton6.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = reduceX
+        PCReduction = RadioButton6.Text
     End Sub
     Private Sub RadioButton5_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton5.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = reduceY
+        PCReduction = RadioButton5.Text
     End Sub
     Private Sub RadioButton7_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton7.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = reduceZ
+        PCReduction = RadioButton7.Text
     End Sub
     Private Sub RadioButton9_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton9.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = reduceXZ
+        PCReduction = RadioButton9.Text
     End Sub
     Private Sub RadioButton10_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton10.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = reduceYZ
+        PCReduction = RadioButton10.Text
     End Sub
     Private Sub RadioButton11_CheckedChanged(sender As Object, e As EventArgs) Handles RadioButton11.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        PCReduction = reduceXYZ
+        PCReduction = RadioButton11.Text
     End Sub
     Private Sub GuidedBP_Depth_CheckedChanged(sender As Object, e As EventArgs) Handles GuidedBP_Depth.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True

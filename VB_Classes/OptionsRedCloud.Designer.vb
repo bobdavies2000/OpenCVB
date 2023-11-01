@@ -658,10 +658,10 @@ Partial Class OptionsRedCloud
         Me.RadioButton11.AutoSize = True
         Me.RadioButton11.Location = New System.Drawing.Point(28, 247)
         Me.RadioButton11.Name = "RadioButton11"
-        Me.RadioButton11.Size = New System.Drawing.Size(167, 24)
+        Me.RadioButton11.Size = New System.Drawing.Size(143, 24)
         Me.RadioButton11.TabIndex = 8
         Me.RadioButton11.TabStop = True
-        Me.RadioButton11.Text = "Reduce PC in XYZ"
+        Me.RadioButton11.Text = "XYZ Reduction"
         Me.RadioButton11.UseVisualStyleBackColor = True
         '
         'RadioButton10
@@ -669,10 +669,10 @@ Partial Class OptionsRedCloud
         Me.RadioButton10.AutoSize = True
         Me.RadioButton10.Location = New System.Drawing.Point(28, 212)
         Me.RadioButton10.Name = "RadioButton10"
-        Me.RadioButton10.Size = New System.Drawing.Size(156, 24)
+        Me.RadioButton10.Size = New System.Drawing.Size(132, 24)
         Me.RadioButton10.TabIndex = 7
         Me.RadioButton10.TabStop = True
-        Me.RadioButton10.Text = "Reduce PC in YZ"
+        Me.RadioButton10.Text = "YZ Reduction"
         Me.RadioButton10.UseVisualStyleBackColor = True
         '
         'RadioButton9
@@ -680,10 +680,10 @@ Partial Class OptionsRedCloud
         Me.RadioButton9.AutoSize = True
         Me.RadioButton9.Location = New System.Drawing.Point(29, 177)
         Me.RadioButton9.Name = "RadioButton9"
-        Me.RadioButton9.Size = New System.Drawing.Size(156, 24)
+        Me.RadioButton9.Size = New System.Drawing.Size(132, 24)
         Me.RadioButton9.TabIndex = 6
         Me.RadioButton9.TabStop = True
-        Me.RadioButton9.Text = "Reduce PC in XZ"
+        Me.RadioButton9.Text = "XZ Reduction"
         Me.RadioButton9.UseVisualStyleBackColor = True
         '
         'ReductionXY
@@ -691,10 +691,10 @@ Partial Class OptionsRedCloud
         Me.ReductionXY.AutoSize = True
         Me.ReductionXY.Location = New System.Drawing.Point(28, 142)
         Me.ReductionXY.Name = "ReductionXY"
-        Me.ReductionXY.Size = New System.Drawing.Size(157, 24)
+        Me.ReductionXY.Size = New System.Drawing.Size(133, 24)
         Me.ReductionXY.TabIndex = 5
         Me.ReductionXY.TabStop = True
-        Me.ReductionXY.Text = "Reduce PC in XY"
+        Me.ReductionXY.Text = "XY Reduction"
         Me.ReductionXY.UseVisualStyleBackColor = True
         '
         'RadioButton7
@@ -702,10 +702,10 @@ Partial Class OptionsRedCloud
         Me.RadioButton7.AutoSize = True
         Me.RadioButton7.Location = New System.Drawing.Point(28, 107)
         Me.RadioButton7.Name = "RadioButton7"
-        Me.RadioButton7.Size = New System.Drawing.Size(145, 24)
+        Me.RadioButton7.Size = New System.Drawing.Size(121, 24)
         Me.RadioButton7.TabIndex = 4
         Me.RadioButton7.TabStop = True
-        Me.RadioButton7.Text = "Reduce PC in Z"
+        Me.RadioButton7.Text = "Z Reduction"
         Me.RadioButton7.UseVisualStyleBackColor = True
         '
         'RadioButton5
@@ -713,10 +713,10 @@ Partial Class OptionsRedCloud
         Me.RadioButton5.AutoSize = True
         Me.RadioButton5.Location = New System.Drawing.Point(28, 72)
         Me.RadioButton5.Name = "RadioButton5"
-        Me.RadioButton5.Size = New System.Drawing.Size(146, 24)
+        Me.RadioButton5.Size = New System.Drawing.Size(122, 24)
         Me.RadioButton5.TabIndex = 3
         Me.RadioButton5.TabStop = True
-        Me.RadioButton5.Text = "Reduce PC in Y"
+        Me.RadioButton5.Text = "Y Reduction"
         Me.RadioButton5.UseVisualStyleBackColor = True
         '
         'RadioButton6
@@ -724,10 +724,10 @@ Partial Class OptionsRedCloud
         Me.RadioButton6.AutoSize = True
         Me.RadioButton6.Location = New System.Drawing.Point(28, 37)
         Me.RadioButton6.Name = "RadioButton6"
-        Me.RadioButton6.Size = New System.Drawing.Size(146, 24)
+        Me.RadioButton6.Size = New System.Drawing.Size(122, 24)
         Me.RadioButton6.TabIndex = 0
         Me.RadioButton6.TabStop = True
-        Me.RadioButton6.Text = "Reduce PC in X"
+        Me.RadioButton6.Text = "X Reduction"
         Me.RadioButton6.UseVisualStyleBackColor = True
         '
         'GroupBox1

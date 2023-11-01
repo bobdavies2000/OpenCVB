@@ -1125,7 +1125,11 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
             If samples(i) > 0 Then
                 opAuto.nonZeroSamples += 1
                 ' this is where the histogram is doctored to create the different regions
-                samples(i) = If(opAuto.nonzeroSamples <= 255, 255 - opAuto.nonzeroSamples, 0)
+                If i Mod 2 = 0 Then
+                    samples(i) = If(opAuto.nonZeroSamples <= 255, 255 - opAuto.nonZeroSamples, 0)
+                Else
+                    samples(i) = If(opAuto.nonZeroSamples <= 255, opAuto.nonZeroSamples, 0)
+                End If
             End If
         Next
 
