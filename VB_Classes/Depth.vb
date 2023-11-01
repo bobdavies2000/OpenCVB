@@ -1641,3 +1641,4 @@ Public Class Depth_PunchBlobNew : Inherits VB_Algorithm
         lastColor = task.color.Clone
     End Sub
 End Class
+

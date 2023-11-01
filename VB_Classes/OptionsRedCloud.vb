@@ -78,7 +78,6 @@ Public Class OptionsRedCloud
         histBins.Text = CStr(HistBinSlider.Value)
     End Sub
     Public Sub Sync()
-
         task.maxZmeters = gOptions.MaxDepth.Value + 0.01 ' why add a cm?  Because histograms are exclusive on ranges.
 
         task.rangesTop = New cv.Rangef() {New cv.Rangef(0.1, task.maxZmeters), New cv.Rangef(-task.xRange, task.xRange)}

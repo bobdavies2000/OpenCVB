@@ -1104,6 +1104,7 @@ End Class
 Public Class GuidedBP_Depth : Inherits VB_Algorithm
     Public hist2d As New Histogram2D_PointCloud
     Dim opAuto As New OpAuto_GuidedBP
+    Dim myPalette As New Palette_Random
     Public Sub New()
         redOptions.HistBinSlider.Value = 15
         redOptions.RedBPonly.Enabled = True
@@ -1125,11 +1126,7 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
             If samples(i) > 0 Then
                 opAuto.nonZeroSamples += 1
                 ' this is where the histogram is doctored to create the different regions
-                If i Mod 2 = 0 Then
-                    samples(i) = If(opAuto.nonZeroSamples <= 255, 255 - opAuto.nonZeroSamples, 0)
-                Else
-                    samples(i) = If(opAuto.nonZeroSamples <= 255, opAuto.nonZeroSamples, 0)
-                End If
+                samples(i) = If(opAuto.nonZeroSamples <= 255, 255 - opAuto.nonZeroSamples, 0)
             End If
         Next
 
@@ -1140,7 +1137,10 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
         cv.Cv2.CalcBackProject({src}, hist2d.channels, hist2d.histogram, dst2, hist2d.ranges)
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        dst3 = vbPalette(dst2)
+        If standalone Or testIntermediate(traceName) Then
+            myPalette.Run(dst2)
+            dst3 = myPalette.dst2
+        End If
     End Sub
 End Class
 

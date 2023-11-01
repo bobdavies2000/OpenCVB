@@ -522,7 +522,7 @@ Public Class Palette_Variable : Inherits VB_Algorithm
         originalColorMap = colorMap.Clone
         desc = "Build a new palette for every frame."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         For i = 0 To colors.Count - 1
             colorMap.Set(Of cv.Vec3b)(0, i, colors(i))
         Next
