@@ -680,12 +680,12 @@ End Class
 
 
 'Public Class KMeans_PlaneClusters : Inherits VB_Algorithm
-'    Public rcc As New RedBP_Basics
+'    Public rcc As New RedCloud_Basics
 '    Public km As New KMeans_Accord
 '    Public classCount As Integer
 '    Public Sub New()
 '        km.dimension = 4
-'        labels = {"", "Input data to KMeans", "Output of RedBP_Basics", ""}
+'        labels = {"", "Input data to KMeans", "Output of RedCloud_Basics", ""}
 '        desc = "Accord: Cluster the plane equations to find major planes in the image"
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)

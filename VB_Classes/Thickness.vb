@@ -2,7 +2,7 @@
 Public Class Thickness_Basics : Inherits VB_Algorithm
     Public rc As New rcData
     Public volZ As New Volume_Basics
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Determine the thickness of a RedCloud cell"
     End Sub

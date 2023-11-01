@@ -1,7 +1,7 @@
 ﻿Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class Triangle_Basics : Inherits VB_Algorithm
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
         labels = {"", "", "RedBP_Hulls output", "Selected contour - each pixel has depth"}
@@ -77,7 +77,7 @@ End Class
 
 
 Public Class Triangle_RedCloud : Inherits VB_Algorithm
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
         labels = {"", "", "RedBP_Hulls output", "Selected contour - each pixel has depth"}
@@ -118,7 +118,7 @@ End Class
 
 
 Public Class Triangle_Cell : Inherits VB_Algorithm
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
         labels = {"", "", "RedBP_Hulls output", "Selected contour - each pixel has depth"}
@@ -174,7 +174,7 @@ End Class
 
 
 Public Class Triangle_Mask : Inherits VB_Algorithm
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
         labels = {"", "", "RedBP_Hulls output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}

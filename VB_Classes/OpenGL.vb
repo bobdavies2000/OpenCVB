@@ -581,7 +581,7 @@ End Class
 
 Public Class OpenGL_StructuredCloud : Inherits VB_Algorithm
     Dim sCloud As New Structured_Cloud
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         labels(2) = "Structured cloud 32fC3 data"
@@ -993,7 +993,7 @@ End Class
 Public Class OpenGL_Contours : Inherits VB_Algorithm
     Dim options2 As New Options_OpenGL_Contours
     Public options As New Options_OpenGLFunctions
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.drawCells
         task.OpenGLTitle = "OpenGL_Functions"
@@ -1358,7 +1358,7 @@ End Class
 
 
 Public Class OpenGL_PlaneClusters3D : Inherits VB_Algorithm
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Dim eq As New Plane_Equation
     Public Sub New()
         task.ogl.oglFunction = oCase.pcPoints
@@ -1431,7 +1431,7 @@ Public Class OpenGL_Profile : Inherits VB_Algorithm
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         If standalone Then gOptions.gravityPointCloud.Checked = False
-        sides.redCold = New RedBP_Basics
+        sides.redCold = New RedCloud_Basics
         ogl.oglFunction = oCase.pcPointsAlone
         labels(3) = "Contour of selected cell is shown below.  Blue dot represents the minimum X (leftmost) point and red the maximum X (rightmost)"
         desc = "Visualize a RedCloud Cell and rotate it using the Options_IMU Sliders"
@@ -1836,7 +1836,7 @@ End Class
 
 
 Public Class OpenGL_RedCloudCell : Inherits VB_Algorithm
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = " Isolate a RedCloud cell in an OpenGL display"
@@ -1862,7 +1862,7 @@ End Class
 
 
 Public Class OpenGL_RedCloud : Inherits VB_Algorithm
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Display all the RedCloud cells in OpenGL"

@@ -60,7 +60,7 @@ Public Class MatchCell_PrepareData : Inherits VB_Algorithm
     Public rgbCells As New List(Of rcData)
     Public cellMap As cv.Mat
     Public rgbcellMap As cv.Mat
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         redOptions.noColor_Input.Checked = True
         cellMap = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)

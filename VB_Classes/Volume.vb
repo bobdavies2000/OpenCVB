@@ -2,7 +2,7 @@
 Public Class Volume_Basics : Inherits VB_Algorithm
     Public rc As New rcData
     Public volume As Single
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Build a box containing all the 3D points of a RedCloud cell"
     End Sub

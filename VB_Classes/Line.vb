@@ -1309,9 +1309,9 @@ End Class
 
 Public Class Line_Cells : Inherits VB_Algorithm
     Dim lines As New Line_Basics
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
-        desc = "Identify all lines in the RedBP_Basics cell boundaries"
+        desc = "Identify all lines in the RedCloud_Basics cell boundaries"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)

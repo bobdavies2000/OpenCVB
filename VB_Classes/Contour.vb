@@ -180,7 +180,7 @@ Public Class Contour_SidePoints : Inherits VB_Algorithm
     Public ptLeft As cv.Point, ptRight As cv.Point, ptTop As cv.Point, ptBot As cv.Point
     Public sides As New Profile_Basics
     Public Sub New()
-        sides.redCold = New RedBP_Basics
+        sides.redCold = New RedCloud_Basics
         desc = "Find the left/right and top/bottom sides of a contour"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -370,7 +370,7 @@ End Class
 
 Public Class Contour_Outline : Inherits VB_Algorithm
     Public rc As New rcData
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Create a simplified contour of the selected cell"
     End Sub
@@ -413,7 +413,7 @@ Public Class Contour_SelfIntersect : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
-            Static redC As New RedBP_Basics
+            Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
             rc = task.rcSelect
@@ -504,7 +504,7 @@ End Class
 
 
 Public Class Contour_Compare : Inherits VB_Algorithm
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public options As New Options_Contours
     Public Sub New()
         desc = "Compare findContours options - ApproxSimple, ApproxNone, etc."

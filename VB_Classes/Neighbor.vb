@@ -8,7 +8,7 @@ Public Class Neighbor_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
-            Static redC As New RedBP_Basics
+            Static redC As New RedCloud_Basics
             redC.Run(task.color)
             dst2 = redC.dst2
             src = task.cellMap
@@ -78,7 +78,7 @@ Public Class Neighbor_CPP : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Or src.Type <> cv.MatType.CV_8U Then
-            Static redC As New RedBP_Basics
+            Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
             src = task.cellMap
@@ -156,7 +156,7 @@ Public Class Neighbor_Corner : Inherits VB_Algorithm
         desc = "Find the corner points where multiple cells intersect."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static redC As New RedBP_Basics
+        Static redC As New RedCloud_Basics
         redC.Run(task.color)
         dst2 = redC.dst2
         src = task.cellMap.Clone

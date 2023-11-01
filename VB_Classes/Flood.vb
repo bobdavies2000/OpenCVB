@@ -388,7 +388,7 @@ End Class
 
 
 Public Class Flood_RedColor : Inherits VB_Algorithm
-    Public redC As New RedBP_Basics
+    Public redC As New RedCloud_Basics
     Dim color As New Color_Basics
     Dim fLess As New FeatureLess_Basics
     Public Sub New()

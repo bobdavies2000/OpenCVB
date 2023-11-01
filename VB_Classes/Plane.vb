@@ -77,7 +77,7 @@ Public Class Plane_FlatSurfaces : Inherits VB_Algorithm
     Public Sub New()
         labels = {"RedCloud Cell contours", "", "RedCloud cells", ""}
         addW.src2 = dst2.Clone
-        desc = "Find all the cells from a RedBP_Basics output that are likely to be flat"
+        desc = "Find all the cells from a RedCloud_Basics output that are likely to be flat"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         plane.Run(src)
@@ -282,7 +282,7 @@ End Class
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
 Public Class Plane_CellColor : Inherits VB_Algorithm
     Public options As New Options_Plane
-    Public redC As New RedBP_Basics
+    Public redC As New RedCloud_Basics
     Public Sub New()
         labels = {"", "", "RedCloud Cells", "Blue - normal is closest to the X-axis, green - to the Y-axis, and Red - to the Z-axis"}
         desc = "Create a plane equation from the points in each RedCloud cell and color the cell with the direction of the normal"
@@ -342,7 +342,7 @@ Public Class Plane_Points : Inherits VB_Algorithm
     Public equations As New List(Of cv.Vec4f)
     Public ptList As New List(Of cv.Point3f)
     Public ptList2D As New List(Of List(Of cv.Point))
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         labels = {"", "", "RedCloud Basics output - click to highlight a cell", ""}
         desc = "Detect if a some or all points in a RedCloud cell are in a plane."
@@ -569,7 +569,7 @@ Public Class Plane_Equation : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
-            Static redC As New RedBP_Basics
+            Static redC As New RedCloud_Basics
             redC.Run(src)
             rc = task.rcSelect
             dst2 = redC.dst2

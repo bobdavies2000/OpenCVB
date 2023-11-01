@@ -1,5 +1,5 @@
 ﻿Imports cv = OpenCvSharp
-Public Class RedBP_Basics : Inherits VB_Algorithm
+Public Class RedCloud_Basics : Inherits VB_Algorithm
     Public prepCells As New List(Of rcPrep)
     Dim matchCell As New RedBP_MatchCell
     Public combine As New RedCloud_InputCombined

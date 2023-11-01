@@ -51,10 +51,10 @@ End Class
 
 Public Class Convex_RedCloud : Inherits VB_Algorithm
     Dim convex As New Convex_Basics
-    Public redC As New RedBP_Basics
+    Public redC As New RedCloud_Basics
     Public Sub New()
-        labels = {"", "", "Selected contour - yellow is hull, white is contour.  Click to select another contour.", "RedCloud cells"}
-        desc = "Get lots of odd shapes from the RedBP_Basics output and use ConvexHull to simplify them."
+        labels = {"", "", "Selected contour - line shows hull with white is contour.  Click to select another contour.", "RedCloud cells"}
+        desc = "Get lots of odd shapes from the RedCloud_Basics output and use ConvexHull to simplify them."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
@@ -115,7 +115,7 @@ Public Class Convex_RedCloudDefects : Inherits VB_Algorithm
     Dim contours As New Contour_Largest
     Dim resize As New Resize_Preserve
     Public Sub New()
-        labels = {"", "", "Hull outline in green, lines show defects.", "Output of RedBP_Basics"}
+        labels = {"", "", "Hull outline in green, lines show defects.", "Output of RedCloud_Basics"}
         desc = "Find the convexityDefects in the selected RedCloud cell"
     End Sub
     Public Function betterContour(c As List(Of cv.Point), defects() As cv.Vec4i) As List(Of cv.Point)

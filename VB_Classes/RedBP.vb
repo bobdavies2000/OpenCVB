@@ -178,7 +178,7 @@ Public Class RedBP_CellStats : Inherits VB_Algorithm
     Public Sub New()
         If standalone Then gOptions.displayDst0.Checked = True
         If standalone Then gOptions.displayDst1.Checked = True
-        If standalone Then redC = New RedBP_Basics
+        If standalone Then redC = New RedCloud_Basics
         If standalone Then gOptions.HistBinSlider.Value = 20
 
         desc = "Display the statistics for the selected cell."
@@ -232,7 +232,7 @@ Public Class RedBP_CellStats : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Or runRedCloud Then
-            If firstPass Then redC = New RedBP_Basics
+            If firstPass Then redC = New RedCloud_Basics
             redC.Run(src)
             dst0 = redC.dst0
             dst2 = redC.dst2
@@ -255,7 +255,7 @@ End Class
 
 
 Public Class RedBP_Motion : Inherits VB_Algorithm
-    Dim redP As New RedBP_Basics
+    Dim redP As New RedCloud_Basics
     Dim diff As New Diff_Basics
     Public rect As New cv.Rect
     Public motionList As New List(Of Integer)
@@ -315,10 +315,10 @@ End Class
 
 
 'Public Class RedBP_MinRes : Inherits VB_Algorithm
-'    Public redC As New RedBP_Basics
+'    Public redC As New RedCloud_Basics
 '    Dim grid As New Grid_Basics
 '    Public Sub New()
-'        desc = "Compute the RedBP_Basics cells at minimum resolution."
+'        desc = "Compute the RedCloud_Basics cells at minimum resolution."
 '    End Sub
 '    Public Sub RunVB(src As cv.Mat)
 '        dst1 = vbMinResize(task.pointCloud)
@@ -341,7 +341,7 @@ End Class
 
 Public Class RedBP_Hulls : Inherits VB_Algorithm
     Dim convex As New Convex_RedCloudDefects
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         labels = {"", "Cells where convexity defects failed", "", "Improved contour results using OpenCV's ConvexityDefects"}
         desc = "Add hulls and improved contours using ConvexityDefects to each RedCloud cell"
@@ -393,7 +393,7 @@ Public Class RedBP_FindCells : Inherits VB_Algorithm
         cellList = New List(Of Integer)
 
         If standalone Then
-            Static redC As New RedBP_Basics
+            Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
@@ -441,7 +441,7 @@ End Class
 
 
 Public Class RedBP_FeatureLess : Inherits VB_Algorithm
-    Public colorC As New RedBP_Basics
+    Public colorC As New RedCloud_Basics
     Dim fLess As New FeatureLess_Basics
     Public lastCells As New List(Of rcData)
     Public Sub New()
@@ -466,7 +466,7 @@ End Class
 
 
 Public Class RedBP_ViewRight : Inherits VB_Algorithm
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public rightCells As New List(Of rcData)
     Public rightMap As New cv.Mat
     Public Sub New()
@@ -494,7 +494,7 @@ End Class
 
 
 Public Class RedBP_ViewLeft : Inherits VB_Algorithm
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public leftCells As New List(Of rcData)
     Public leftMap As New cv.Mat
     Public Sub New()
@@ -577,7 +577,7 @@ Public Class RedBP_Equations : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
-            Static redC As New RedBP_Basics
+            Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
             redCells = New List(Of rcData)(task.redCells)
@@ -622,7 +622,7 @@ End Class
 Public Class RedBP_CellChanges : Inherits VB_Algorithm
     Dim redC As Object
     Public Sub New()
-        If standalone Then redC = New RedBP_Basics
+        If standalone Then redC = New RedCloud_Basics
         desc = "Count the cells that have changed in a RedCloud generation"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -660,7 +660,7 @@ End Class
 
 
 Public Class RedBP_ColorOnly : Inherits VB_Algorithm
-    Public colorC As New RedBP_Basics
+    Public colorC As New RedCloud_Basics
     Dim colorCells As New List(Of rcData)
     Dim colorMap As New cv.Mat
     Public Sub New()
@@ -702,7 +702,7 @@ End Class
 
 
 Public Class RedBP_DepthOnly : Inherits VB_Algorithm
-    Public redC As New RedBP_Basics
+    Public redC As New RedCloud_Basics
     Dim depthCells As New List(Of rcData)
     Dim depthMap As New cv.Mat
     Public Sub New()
@@ -733,7 +733,7 @@ End Class
 Public Class RedBP_CellsAtDepth : Inherits VB_Algorithm
     Dim plot As New Plot_Histogram
     Dim kalman As New Kalman_Basics
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         plot.noZeroEntry = False
         labels(3) = "Histogram of depth weighted by the size of the cell."
@@ -789,7 +789,7 @@ End Class
 
 
 Public Class RedBP_Features : Inherits VB_Algorithm
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -856,7 +856,7 @@ End Class
 
 
 Public Class RedBP_ShapeCorrelation : Inherits VB_Algorithm
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "A shape correlation is between each x and y in list of contours points.  It allows classification based on angle and shape."
     End Sub
@@ -887,7 +887,7 @@ End Class
 
 Public Class RedBP_FPS : Inherits VB_Algorithm
     Dim fps As New Grid_FPS
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Display RedCloud output at a fixed frame rate"
     End Sub
@@ -959,7 +959,7 @@ End Class
 ' pyransac-3d on Github - https://github.com/leomariga/pyRANSAC-3D
 Public Class RedBP_PlaneColor : Inherits VB_Algorithm
     Public options As New Options_Plane
-    Public redC As New RedBP_Basics
+    Public redC As New RedCloud_Basics
     Dim planeMask As New RedBP_PlaneFromMask
     Dim planeContour As New RedBP_PlaneFromContour
     Public Sub New()
@@ -1106,10 +1106,10 @@ End Class
 
 
 Public Class RedBP_BProject3D : Inherits VB_Algorithm
-    Dim colorC As New RedBP_Basics
+    Dim colorC As New RedCloud_Basics
     Dim bp3d As New Histogram3D_BP
     Public Sub New()
-        desc = "Run RedBP_Basics on the output of the RGB 3D backprojection"
+        desc = "Run RedCloud_Basics on the output of the RGB 3D backprojection"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         bp3d.Run(src)
@@ -1131,7 +1131,7 @@ End Class
 Public Class RedBP_SliceH : Inherits VB_Algorithm
     Dim stats As New RedBP_CellStats
     Public Sub New()
-        stats.redC = New RedBP_Basics
+        stats.redC = New RedCloud_Basics
         redOptions.YZReduction.Checked = True
         desc = "Build horizontal RedCloud cells"
     End Sub
@@ -1152,7 +1152,7 @@ End Class
 Public Class RedBP_SliceV : Inherits VB_Algorithm
     Dim stats As New RedBP_CellStats
     Public Sub New()
-        stats.redC = New RedBP_Basics
+        stats.redC = New RedCloud_Basics
         redOptions.XZReduction.Checked = True
         desc = "Build vertical RedCloud cells."
     End Sub
@@ -1171,7 +1171,7 @@ End Class
 
 
 Public Class RedBP_World : Inherits VB_Algorithm
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Dim world As New Depth_World
     Public Sub New()
         labels = {"", "", "RedCloud reduction of generated point cloud", "Generated pointcloud"}
@@ -1193,7 +1193,7 @@ End Class
 
 
 Public Class RedBP_ByDepth : Inherits VB_Algorithm
-    Dim colorC As New RedBP_Basics
+    Dim colorC As New RedCloud_Basics
     Dim depth As New Depth_Tiers
     Public Sub New()
         desc = "Run RedCloud with depth layers - a reduced image view"
@@ -1216,7 +1216,7 @@ End Class
 
 
 Public Class RedBP_UnstableCells : Inherits VB_Algorithm
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Dim diff As New Diff_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -1261,7 +1261,7 @@ Public Class RedBP_ContourCorners : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
-            Static redC As New RedBP_Basics
+            Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
             labels(2) = redC.labels(2)
@@ -1304,9 +1304,9 @@ End Class
 
 Public Class RedBP_KMeans : Inherits VB_Algorithm
     Dim km As New KMeans_MultiChannel
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
-        labels = {"", "", "KMeans_MultiChannel output", "RedBP_Basics output"}
+        labels = {"", "", "KMeans_MultiChannel output", "RedCloud_Basics output"}
         desc = "Use RedCloud to identify the regions created by kMeans"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1329,7 +1329,7 @@ End Class
 
 Public Class RedBP_Diff : Inherits VB_Algorithm
     Dim diff As New Diff_RGBAccum
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         labels = {"", "", "Diff output, RedCloud input", "RedCloud output"}
         desc = "Isolate blobs in the diff output with RedCloud"
@@ -1364,7 +1364,7 @@ Public Class RedBP_LineID : Inherits VB_Algorithm
     Dim p2list As New SortedList(Of Integer, cv.Point)(New compareAllowIdenticalInteger)
     Dim rectList As New List(Of cv.Point)
     Dim maxDistance As Integer
-    Public redC As New RedBP_Basics
+    Public redC As New RedCloud_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Width of line detected in the image", 1, 10, 2)
@@ -1484,7 +1484,7 @@ Public Class RedBP_ProjectCell : Inherits VB_Algorithm
     Dim topView As New Histogram_ShapeTop
     Dim sideView As New Histogram_ShapeSide
     Dim mats As New Mat_4Click
-    Dim colorC As New RedBP_Basics
+    Dim colorC As New RedCloud_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -1615,7 +1615,7 @@ End Class
 
 
 Public Class RedBP_NoDepth : Inherits VB_Algorithm
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Minimum pixels %", 0, 100, 25)
 
@@ -1743,7 +1743,7 @@ End Class
 
 Public Class RedBP_LikelyFlatSurfaces : Inherits VB_Algorithm
     Dim verts As New Plane_Basics
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public vCells As New List(Of rcData)
     Public hCells As New List(Of rcData)
     Public Sub New()
@@ -1791,7 +1791,7 @@ End Class
 
 
 Public Class RedBP_Track5D : Inherits VB_Algorithm
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         If standalone And dst2.Width > 1000 Then gOptions.LineWidth.Value = 3
         desc = "Track all cells using color and location and a distance calculation in 5 dimensions."
@@ -1841,7 +1841,7 @@ End Class
 
 
 Public Class RedBP_Track8D : Inherits VB_Algorithm
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Track a cell using its color and location - a distance calculation in 8 dimensions."
     End Sub
@@ -1879,7 +1879,7 @@ End Class
 
 
 Public Class RedBP_UnstableHulls : Inherits VB_Algorithm
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         labels = {"", "", "Current generation of cells", "Recently changed cells highlighted - indicated by rc.maxDist changing (when maxDist hits the boundary of a cell)"}
@@ -1920,7 +1920,7 @@ End Class
 
 
 Public Class RedBP_PlaneEq3D : Inherits VB_Algorithm
-    Dim colorC As New RedBP_Basics
+    Dim colorC As New RedCloud_Basics
     Dim eq As New Plane_Equation
     Public Sub New()
         desc = "If a RedColor cell contains depth then build a plane equation"
@@ -1956,7 +1956,7 @@ End Class
 
 Public Class RedBP_DelaunayGuidedFeatures : Inherits VB_Algorithm
     Dim features As New Feature_PointsDelaunay
-    Dim colorC As New RedBP_Basics
+    Dim colorC As New RedCloud_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         labels = {"Latest GoodFeatures highlighted", "Format CV_32S of Delaunay data", "Stable points tracked - Colors from dst3", "RedCloud Output of Delaunay data"}
@@ -1995,7 +1995,7 @@ End Class
 
 Public Class RedBP_Neighbors : Inherits VB_Algorithm
     Dim nabs As New Neighbor_Basics
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Find all the neighbors for a RedCloud cellmap"
     End Sub
@@ -2032,7 +2032,7 @@ End Class
 
 
 Public Class RedBP_Contours : Inherits VB_Algorithm
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         desc = "Show all the contours found in the RedCloud output"
     End Sub

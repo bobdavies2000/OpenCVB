@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedTrack_Basics : Inherits VB_Algorithm
     Dim stats As New RedBP_CellStats
-    Public redC As New RedBP_Basics
+    Public redC As New RedCloud_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         If task.workingRes <> New cv.Size(168, 94) Then task.historyCount = 1
@@ -289,7 +289,7 @@ End Class
 
 
 Public Class RedTrack_Core : Inherits VB_Algorithm
-    Public redC As New RedBP_Basics
+    Public redC As New RedCloud_Basics
     Public Sub New()
         labels = {"", "", "Points tracked with RedCloud", ""}
         desc = "Show feature location history"
@@ -320,7 +320,7 @@ End Class
 Public Class RedTrack_Features : Inherits VB_Algorithm
     Dim options As New Options_Flood
     Dim good As New Feature_Basics
-    Dim redC As New RedBP_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels = {"", "", "Output of Feature_Basics - input to RedCloud",
