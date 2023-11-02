@@ -3,7 +3,6 @@ Imports cv = OpenCvSharp
 Public Class OptionsRedCloud
     Public colorInput As String = "Reduction_Basics"
     Public depthInput As String = "RedCloud_Core"
-    Public channels() As Integer = {0, 1}
 
     Public reduction As Integer ' 0 = simple, 1 = bitwise, 2 = none
     Public Const simpleReduce As Integer = 0
@@ -11,6 +10,10 @@ Public Class OptionsRedCloud
     Public Const noReduce As Integer = 2
 
     Public PCReduction As String
+    Public channels() As Integer = {0, 1}
+    Public ranges() As cv.Rangef
+    Public channelCount As Integer
+    Public histBinList() As Integer
     Private Sub OptionsRedCloud_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
         Me.Text = "Options mostly for RedCloud_Basics but other related algorithms too."
@@ -179,37 +182,73 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         PCreductionLabel.Text = CStr(PCreductionSlider.Value)
     End Sub
-    Private Sub ReductionXY_CheckedChanged(sender As Object, e As EventArgs) Handles XYReduction.CheckedChanged
-        If task IsNot Nothing Then task.optionsChanged = True
-        channels = {0, 1}
-        PCReduction = XYReduction.Text
-    End Sub
+
+
+
     Private Sub XReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = XReduction.Text
+        ranges = New cv.Rangef() {New cv.Rangef(-task.xRangeDefault, task.xRangeDefault)}
+        channelCount = 1
+        histBinList = {HistBinSlider.Value}
     End Sub
     Private Sub YReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = YReduction.Text
+        ranges = New cv.Rangef() {New cv.Rangef(-task.yRangeDefault, task.yRangeDefault)}
+        channelCount = 1
+        histBinList = {HistBinSlider.Value}
     End Sub
     Private Sub ZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles ZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = ZReduction.Text
+        ranges = New cv.Rangef() {New cv.Rangef(0, task.maxZmeters)}
+        channelCount = 1
+        histBinList = {HistBinSlider.Value}
+    End Sub
+    Private Sub ReductionXY_CheckedChanged(sender As Object, e As EventArgs) Handles XYReduction.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        channels = {0, 1}
+        PCReduction = XYReduction.Text
+        Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
+        Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
+        ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1)}
+        channelCount = 2
+        histBinList = {HistBinSlider.Value, HistBinSlider.Value}
     End Sub
     Private Sub XZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = XZReduction.Text
         channels = {0, 2}
+        Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
+        Dim rz = New cv.Vec2f(0, task.maxZmeters)
+        ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+        channelCount = 2
+        histBinList = {HistBinSlider.Value, HistBinSlider.Value}
     End Sub
     Private Sub YZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = YZReduction.Text
         channels = {1, 2}
+        Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
+        Dim rz = New cv.Vec2f(0, task.maxZmeters)
+        ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+        channelCount = 2
+        histBinList = {HistBinSlider.Value, HistBinSlider.Value}
     End Sub
     Private Sub XYZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XYZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = XYZReduction.Text
+        Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
+        Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
+        Dim rz = New cv.Vec2f(0, task.maxZmeters)
+        ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+        channelCount = 3
+        histBinList = {HistBinSlider.Value, HistBinSlider.Value, HistBinSlider.Value}
     End Sub
+
+
+
     Private Sub GuidedBP_Depth_CheckedChanged(sender As Object, e As EventArgs) Handles GuidedBP_Depth.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         depthInput = GuidedBP_Depth.Text

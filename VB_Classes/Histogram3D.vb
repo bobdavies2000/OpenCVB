@@ -7,6 +7,7 @@ Public Class Histogram3D_Basics : Inherits VB_Algorithm
     Public ranges() As cv.Rangef
     Public Sub New()
         gOptions.HistBinSlider.Value = 6
+        ranges = New cv.Rangef() {New cv.Rangef(0, 255), New cv.Rangef(0, 255), New cv.Rangef(0, 255)}
         desc = "Build a 3D histogram from the BGR image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -16,15 +17,13 @@ Public Class Histogram3D_Basics : Inherits VB_Algorithm
         Dim histInput(src.Total * src.ElemSize - 1) As Byte
         Marshal.Copy(src.Data, histInput, 0, histInput.Length)
 
-        ranges = New cv.Rangef() {New cv.Rangef(0, 255), New cv.Rangef(0, 255), New cv.Rangef(0, 255)}
-
-        Dim handleRGB = GCHandle.Alloc(histInput, GCHandleType.Pinned)
-        Dim dstPtr = Histogram3D_RGB(handleRGB.AddrOfPinnedObject(), src.Rows, src.Cols, bins)
-        handleRGB.Free()
+        Dim handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned)
+        Dim dstPtr = Histogram3D_RGB(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins)
+        handleInput.Free()
 
         histogram = New cv.Mat(bins * bins * bins, 1, cv.MatType.CV_32F, dstPtr)
         dst2 = histogram.Reshape(3, bins)
-        setTrueText("A 3D histogram of the BGR image has been prepared in histogram.", 3)
+        setTrueText("A 3D histogram of the input image has been prepared in histogram.", 3)
     End Sub
 End Class
 

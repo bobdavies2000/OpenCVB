@@ -1108,7 +1108,7 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
 
         Marshal.Copy(samples, 0, hist2d.histogram.Data, samples.Length)
 
-        cv.Cv2.CalcBackProject({src}, hist2d.channels, hist2d.histogram, dst2, hist2d.ranges)
+        cv.Cv2.CalcBackProject({src}, redOptions.channels, hist2d.histogram, dst2, hist2d.ranges)
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
         If standalone Or testIntermediate(traceName) Then
@@ -1125,40 +1125,44 @@ End Class
 
 
 
-Public Class GuidedBP_DepthOriginal : Inherits VB_Algorithm
-    Public hist2d As New Histogram2D_PointCloud
-    Public backProject As New cv.Mat
+Public Class GuidedBP_DepthNew : Inherits VB_Algorithm
+    Public hist As New Histogram_PointCloudNew
+    Dim opAuto As New OpAuto_GuidedBP
+    Dim myPalette As New Palette_Random
     Public Sub New()
+        redOptions.HistBinSlider.Value = 15
         desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        hist2d.Run(task.pointCloud)
-        dst3 = hist2d.dst2
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
-        Dim samples(hist2d.histogram.Total - 1) As Single
-        Marshal.Copy(hist2d.histogram.Data, samples, 0, samples.Length)
+        hist.Run(src)
 
-        Dim index As Integer
+        Dim samples(hist.histogram.Total - 1) As Single
+        Marshal.Copy(hist.histogram.Data, samples, 0, samples.Length)
+
+        Dim histList = samples.ToList
+        samples(histList.IndexOf(histList.Max)) = 0
+
+        opAuto.nonZeroSamples = 0
         For i = 0 To samples.Count - 1
-            If samples(i) > dst2.Total * 0.0001 Then
-                samples(i) = index
-                index += 1
-            Else
-                samples(i) = 0
+            If samples(i) > 0 Then
+                opAuto.nonZeroSamples += 1
+                ' this is where the histogram is doctored to create the different regions
+                samples(i) = If(opAuto.nonZeroSamples <= 255, 255 - opAuto.nonZeroSamples, 0)
             End If
         Next
 
-        ' A practical use of optionAutomation.  Any image with more regions is quite complex.
-        Dim saveit = task.optionsChanged
-        If index > 150 Then gOptions.HistBinSlider.Value -= 1
-        If index < 100 Then gOptions.HistBinSlider.Value += 1
-        task.optionsChanged = saveit
+        opAuto.RunVB(Nothing)
 
-        Marshal.Copy(samples, 0, hist2d.histogram.Data, samples.Length)
+        Marshal.Copy(samples, 0, hist.histogram.Data, samples.Length)
 
-        cv.Cv2.CalcBackProject({task.pointCloud}, hist2d.channels, hist2d.histogram, backProject, hist2d.ranges)
-        backProject.SetTo(0, task.noDepthMask)
+        cv.Cv2.CalcBackProject({src}, redOptions.channels, hist.histogram, dst2, redOptions.ranges)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        dst2 = vbPalette(backProject.ConvertScaleAbs)
+        If standalone Or testIntermediate(traceName) Then
+            myPalette.Run(dst2)
+            dst3 = myPalette.dst2
+        End If
     End Sub
 End Class

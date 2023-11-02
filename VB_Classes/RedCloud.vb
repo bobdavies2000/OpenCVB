@@ -123,6 +123,88 @@ End Class
 
 
 
+Public Class RedCloud_MatchCell : Inherits VB_Algorithm
+    Public rp As New rcPrep
+    Public rc As New rcData
+    Public lastCellMap As New cv.Mat
+    Public usedColors As New List(Of cv.Vec3b)
+    Public Sub New()
+        task.cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        lastCellMap = task.cellMap.Clone
+        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        strOut = "RedCloud_MatchCell takes an rcPrep cell and builds an rcData cell." + vbCrLf +
+                 "When standalone, it just build a fake rcPrep cell and displays the rcData equivalent."
+        desc = "Build a RedCloud cell from the rcPrep input"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone And heartBeat() Then
+            rp.floodPoint = New cv.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2))
+            Dim w = msRNG.Next(1, dst2.Width / 2), h = msRNG.Next(1, dst2.Height / 2)
+            rp.rect = New cv.Rect(rp.floodPoint.X, rp.floodPoint.Y, w, h)
+            rp.mask = task.depthRGB(rp.rect).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+            rp.pixels = rp.mask.CountNonZero
+            rp.maxDist = vbGetMaxDist(rp)
+            dst2.SetTo(0)
+        End If
+
+        rc = New rcData
+        rc.index = rp.index
+        rc.rect = rp.rect
+        rc.motionRect = rc.rect
+        rc.mask = rp.mask
+        rc.pixels = rp.pixels
+        rc.maxDist = rp.maxDist
+
+        rc.maxDStable = rc.maxDist ' assume it has to use the latest.
+        rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
+        If rc.indexLast < task.lastCells.Count And rc.indexLast <> task.redOther Then
+            Dim lrc = task.lastCells(rc.indexLast)
+            rc.motionRect = rc.rect.Union(lrc.rect)
+            rc.color = lrc.color
+
+            Dim stableCheck = lastCellMap.Get(Of Byte)(lrc.maxDStable.Y, lrc.maxDStable.X)
+            If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
+        End If
+
+        If usedColors.Contains(rc.color) Then
+            rc.color = New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240))
+            If standalone Then dst2(rc.rect).SetTo(cv.Scalar.White, rc.mask)
+            rc.indexLast = 0
+            If heartBeat() Then dst3.SetTo(0)
+            dst3(rc.rect).SetTo(255, rc.mask)
+        End If
+
+        usedColors.Add(rc.color)
+
+        rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+        vbDrawContour(rc.mask, rc.contour, rc.index, -1)
+
+        Dim minLoc As cv.Point, maxLoc As cv.Point
+        task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, minLoc, maxLoc, rc.mask)
+        task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, minLoc, maxLoc, rc.mask)
+        task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, minLoc, maxLoc, rc.mask)
+
+        Dim tmp = New cv.Mat(rc.mask.Size, cv.MatType.CV_8U, 0)
+        task.depthMask(rc.rect).CopyTo(tmp, rc.mask)
+        If tmp.CountNonZero / rc.pixels > 0.1 Then
+            Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
+            cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.mask)
+
+            rc.depthMean = New cv.Point3f(depthMean(0), depthMean(1), depthMean(2))
+            rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
+        End If
+        cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+
+        If standalone Then setTrueText(strOut, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
 
 
 Public Class RedCloud_CloudOnly : Inherits VB_Algorithm
@@ -300,90 +382,6 @@ End Class
 
 
 
-Public Class RedCloud_MatchCell : Inherits VB_Algorithm
-    Public rp As New rcPrep
-    Public rc As New rcData
-    Public lastCellMap As New cv.Mat
-    Public usedColors As New List(Of cv.Vec3b)
-    Public Sub New()
-        task.cellMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        lastCellMap = task.cellMap.Clone
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        strOut = "RedCloud_MatchCell takes an rcPrep cell and builds an rcData cell." + vbCrLf +
-                 "When standalone, it just build a fake rcPrep cell and displays the rcData equivalent."
-        desc = "Build a RedCloud cell from the rcPrep input"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standalone And heartBeat() Then
-            rp.floodPoint = New cv.Point(msRNG.Next(0, dst2.Width / 2), msRNG.Next(0, dst2.Height / 2))
-            Dim w = msRNG.Next(1, dst2.Width / 2), h = msRNG.Next(1, dst2.Height / 2)
-            rp.rect = New cv.Rect(rp.floodPoint.X, rp.floodPoint.Y, w, h)
-            rp.mask = task.depthRGB(rp.rect).CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            rp.pixels = rp.mask.CountNonZero
-            rp.maxDist = vbGetMaxDist(rp)
-            dst2.SetTo(0)
-        End If
-
-        rc = New rcData
-        rc.index = rp.index
-        rc.rect = rp.rect
-        rc.motionRect = rc.rect
-        rc.mask = rp.mask
-        rc.pixels = rp.pixels
-        rc.maxDist = rp.maxDist
-
-        rc.maxDStable = rc.maxDist ' assume it has to use the latest.
-        rc.indexLast = lastCellMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
-        If rc.indexLast < task.lastCells.Count And rc.indexLast <> task.redOther Then
-            Dim lrc = task.lastCells(rc.indexLast)
-            rc.motionRect = rc.rect.Union(lrc.rect)
-            rc.color = lrc.color
-
-            Dim stableCheck = lastCellMap.Get(Of Byte)(lrc.maxDStable.Y, lrc.maxDStable.X)
-            If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
-        End If
-
-        If usedColors.Contains(rc.color) Then
-            rc.color = New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240))
-            If standalone Then dst2(rc.rect).SetTo(cv.Scalar.White, rc.mask)
-            rc.indexLast = 0
-            If heartBeat() Then dst3.SetTo(0)
-            dst3(rc.rect).SetTo(255, rc.mask)
-        End If
-
-        usedColors.Add(rc.color)
-
-        rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-        vbDrawContour(rc.mask, rc.contour, rc.index, -1)
-
-        Dim minLoc As cv.Point, maxLoc As cv.Point
-        task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, minLoc, maxLoc, rc.mask)
-        task.pcSplit(1)(rc.rect).MinMaxLoc(rc.minVec.Y, rc.maxVec.Y, minLoc, maxLoc, rc.mask)
-        task.pcSplit(2)(rc.rect).MinMaxLoc(rc.minVec.Z, rc.maxVec.Z, minLoc, maxLoc, rc.mask)
-
-        Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
-        cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev, rc.mask)
-
-        ' If there is no Then depth within the mask, estimate this color only cell Using rc.rect instead!
-        If depthMean(2) = 0 Then
-            rc.colorOnly = True
-            cv.Cv2.MeanStdDev(task.pointCloud(rc.rect), depthMean, depthStdev)
-        End If
-        rc.depthMean = New cv.Point3f(depthMean(0), depthMean(1), depthMean(2))
-        rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
-
-        cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
-
-        If standalone Then setTrueText(strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Module Red_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function FCell_Open() As IntPtr
@@ -510,7 +508,9 @@ Public Class RedCloud_CellStats : Inherits VB_Algorithm
         strOut += "Cell color stdev B/G/R " + vbTab + Format(rcSelect.colorStdev(0), fmt2) + vbTab
         strOut += Format(rcSelect.colorStdev(1), fmt2) + vbTab + Format(rcSelect.colorStdev(2), fmt2) + vbCrLf
 
-        If rcSelect.colorOnly = False Then
+        If rcSelect.depthMean.Z = 0 Then
+            strOut += vbCrLf + "Insufficient depth data is available for that cell. "
+        Else
             eq.rc = rcSelect
             eq.Run(src)
             rcSelect = eq.rc
@@ -1048,7 +1048,6 @@ Public Class RedCloud_CellsAtDepth : Inherits VB_Algorithm
             slot = CInt((rc.depthMean.Z / task.maxZmeters) * histBins)
             If slot >= hist.Length Then slot = hist.Length - 1
             slotList(slot).Add(rc.index)
-            If rc.pixels > dst2.Total / 2 Then Dim k = 0
             hist(slot) += rc.pixels
         Next
 
@@ -1495,6 +1494,7 @@ Public Class RedCloud_ByDepth : Inherits VB_Algorithm
 
         colorC.Run(dst3)
         dst2 = colorC.dst2
+        dst2.SetTo(0, task.noDepthMask)
         labels = colorC.labels
     End Sub
 End Class

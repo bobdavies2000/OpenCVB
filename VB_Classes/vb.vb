@@ -820,6 +820,7 @@ Public Class rcData
     Public motionRect As cv.Rect ' the union of the previous rect with the current rect.
     Public mask As cv.Mat
     Public pixels As Integer
+    Public depthPixels As Integer
     Public color As New cv.Vec3b
 
     Public depthMean As cv.Point3f
@@ -845,7 +846,6 @@ Public Class rcData
     Public colorStdev As cv.Scalar
 
     Public motionDetected As Boolean
-    Public colorOnly As Boolean ' Cell mask has no depth but cell rect may.  If true, depthmean is an estimate.
 
     Public eq As cv.Vec4f ' plane equation
     Public pcaVec As cv.Vec3f

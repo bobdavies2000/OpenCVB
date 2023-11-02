@@ -22,7 +22,7 @@ End Class
 
 Public Class Histogram2D_PointCloud : Inherits VB_Algorithm
     Dim plot2D As New Plot_Histogram2D
-    Public channels() As Integer
+    Dim channels() As Integer
     Public ranges() As cv.Rangef
     Public histogram As New cv.Mat
     Public Sub New()

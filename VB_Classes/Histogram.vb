@@ -807,63 +807,6 @@ End Class
 
 
 
-Public Class Histogram_PointCloud : Inherits VB_Algorithm
-    Public rangesX() As cv.Rangef
-    Public rangesY() As cv.Rangef
-    Public thresholdSlider As Windows.Forms.TrackBar
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Histogram X bins", 1, dst2.Cols, 30)
-            sliders.setupTrackBar("Histogram Y bins", 1, dst2.Rows, 30)
-            sliders.setupTrackBar("Histogram Z bins", 1, 200, 100)
-            sliders.setupTrackBar("Histogram threshold", 0, 1000, 500)
-        End If
-
-        thresholdSlider = findSlider("Histogram threshold")
-        Select Case dst2.Width
-            Case 640
-                thresholdSlider.Value = 200
-            Case 320
-                thresholdSlider.Value = 60
-            Case 160
-                thresholdSlider.Value = 25
-        End Select
-        labels = {"", "", "Histogram of XZ - X on the Y-Axis and Z on the X-Axis", "Histogram of YZ with Y on the Y-Axis and Z on the X-Axis"}
-        desc = "Create a 2D histogram for the pointcloud in XZ and YZ."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static xSlider = findSlider("Histogram X bins")
-        Static ySlider = findSlider("Histogram Y bins")
-        Static zSlider = findSlider("Histogram Z bins")
-        Dim xbins = xSlider.Value
-        Dim ybins = ySlider.Value
-        Dim zbins = zSlider.Value
-
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-        rangesX = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange), New cv.Rangef(0, task.maxZmeters)}
-        rangesY = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.maxZmeters)}
-
-        Dim sizesX() As Integer = {xbins, zbins}
-        cv.Cv2.CalcHist({src}, {0, 2}, New cv.Mat(), dst2, 2, sizesX, rangesX)
-        dst2.Set(Of cv.Point3f)(dst2.Height / 2, 0, New cv.Point3f)
-
-        Dim sizesY() As Integer = {ybins, zbins}
-        cv.Cv2.CalcHist({src}, {1, 2}, New cv.Mat(), dst3, 2, sizesY, rangesY)
-        dst3.Set(Of cv.Point3f)(dst3.Height / 2, 0, New cv.Point3f)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-
-
 Public Class Histogram_PointCloudXYZ : Inherits VB_Algorithm
     Public plot As New Plot_Histogram
     Public Sub New()
@@ -1186,7 +1129,6 @@ End Class
 Public Class Histogram_Xdimension : Inherits VB_Algorithm
     Dim plot As New Histogram_Depth
     Public Sub New()
-        plot.useCellData = False
         desc = "Plot the histogram of the X layer of the point cloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1207,7 +1149,6 @@ End Class
 Public Class Histogram_Ydimension : Inherits VB_Algorithm
     Dim plot As New Histogram_Depth
     Public Sub New()
-        plot.useCellData = False
         desc = "Plot the histogram of the X layer of the point cloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1228,7 +1169,6 @@ End Class
 Public Class Histogram_Zdimension : Inherits VB_Algorithm
     Dim plot As New Histogram_Depth
     Public Sub New()
-        plot.useCellData = False
         desc = "Plot the histogram of the X layer of the point cloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1250,23 +1190,16 @@ Public Class Histogram_Depth : Inherits VB_Algorithm
     Public plot As New Plot_Histogram
     Public rc As rcData
     Public kw As New kwData
-    Public useCellData = True
     Public mm As mmData
     Public Sub New()
-        If standalone Then useCellData = False
         desc = "Show depth data as a histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         plot.minRange = 0
         plot.maxRange = task.maxZmeters
-        If useCellData Then
-            If rc IsNot Nothing Then
-                If rc.index = 0 Then Exit Sub
-                src = task.pcSplit(2)(rc.rect).Clone
-            Else
-                If kw.index = 0 Then Exit Sub
-                task.pcSplit(2).SetTo(0, Not kw.mask)
-            End If
+        If rc IsNot Nothing Then
+            If rc.index = 0 Then Exit Sub
+            src = task.pcSplit(2)(rc.rect).Clone
         Else
             If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
             mm = vbMinMax(src)
@@ -1358,5 +1291,108 @@ Public Class Histogram_Kalman : Inherits VB_Algorithm
         hist.histogram = New cv.Mat(kalman.kOutput.Length, 1, cv.MatType.CV_32FC1, kalman.kOutput)
         hist.plot.Run(hist.histogram)
         dst2 = hist.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Histogram_PointCloud : Inherits VB_Algorithm
+    Public rangesX() As cv.Rangef
+    Public rangesY() As cv.Rangef
+    Public thresholdSlider As Windows.Forms.TrackBar
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Histogram X bins", 1, dst2.Cols, 30)
+            sliders.setupTrackBar("Histogram Y bins", 1, dst2.Rows, 30)
+            sliders.setupTrackBar("Histogram Z bins", 1, 200, 100)
+            sliders.setupTrackBar("Histogram threshold", 0, 1000, 500)
+        End If
+
+        thresholdSlider = findSlider("Histogram threshold")
+        Select Case dst2.Width
+            Case 640
+                thresholdSlider.Value = 200
+            Case 320
+                thresholdSlider.Value = 60
+            Case 160
+                thresholdSlider.Value = 25
+        End Select
+        labels = {"", "", "Histogram of XZ - X on the Y-Axis and Z on the X-Axis", "Histogram of YZ with Y on the Y-Axis and Z on the X-Axis"}
+        desc = "Create a 2D histogram for the pointcloud in XZ and YZ."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static xSlider = findSlider("Histogram X bins")
+        Static ySlider = findSlider("Histogram Y bins")
+        Static zSlider = findSlider("Histogram Z bins")
+        Dim xbins = xSlider.Value
+        Dim ybins = ySlider.Value
+        Dim zbins = zSlider.Value
+
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        rangesX = New cv.Rangef() {New cv.Rangef(-task.xRange, task.xRange), New cv.Rangef(0, task.maxZmeters)}
+        rangesY = New cv.Rangef() {New cv.Rangef(-task.yRange, task.yRange), New cv.Rangef(0, task.maxZmeters)}
+
+        Dim sizesX() As Integer = {xbins, zbins}
+        cv.Cv2.CalcHist({src}, {0, 2}, New cv.Mat(), dst2, 2, sizesX, rangesX)
+        dst2.Set(Of cv.Point3f)(dst2.Height / 2, 0, New cv.Point3f)
+
+        Dim sizesY() As Integer = {ybins, zbins}
+        cv.Cv2.CalcHist({src}, {1, 2}, New cv.Mat(), dst3, 2, sizesY, rangesY)
+        dst3.Set(Of cv.Point3f)(dst3.Height / 2, 0, New cv.Point3f)
+    End Sub
+End Class
+
+
+
+
+Public Class Histogram_PointCloudNew : Inherits VB_Algorithm
+    Dim plot2D As New Plot_Histogram2D
+    Dim plot As New Plot_Histogram
+    Dim hist3d As New Histogram3D_Basics
+    Dim grid As New Grid_Basics
+    Public histogram As New cv.Mat
+    Public Sub New()
+        labels = {"", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram"}
+        desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        cv.Cv2.CalcHist({task.pointCloud}, redOptions.channels, New cv.Mat(),
+                        histogram, redOptions.channelCount, redOptions.histBinList, redOptions.ranges)
+
+        Select Case redOptions.PCReduction
+            Case "X Reduction", "Y Reduction", "Z Reduction"
+                plot.Run(histogram)
+                dst2 = plot.dst2
+            Case "XY Reduction", "XZ Reduction", "YZ Reduction"
+                plot2D.Run(histogram)
+                dst2 = plot2D.dst2
+            Case "XYZ Reduction"
+                If dst2.Type <> cv.MatType.CV_8U Then dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+                hist3d.ranges = redOptions.ranges
+                hist3d.Run(task.pointCloud)
+
+                histogram = hist3d.histogram
+                histogram.Set(Of Single)(0, 0, 0)
+                Dim histData(histogram.Total * histogram.ElemSize - 1) As Byte
+                Marshal.Copy(src.Data, histData, 0, histData.Length - 1)
+
+                If task.gridList.Count < histData.Length Then
+                    gOptions.GridSize.Value -= 1
+                    grid.Run(src)
+                    dst2.SetTo(0)
+                End If
+                Dim maxVal = histData.ToList.Max
+                For i = 0 To task.gridList.Count - 1
+                    If i >= histData.Length Then Exit For
+                    Dim roi = task.gridList(i)
+                    dst2(roi).SetTo(255 * histData(i) / maxVal)
+                Next
+                Console.WriteLine("gridlist length = " + CStr(task.gridList.Count))
+        End Select
     End Sub
 End Class
