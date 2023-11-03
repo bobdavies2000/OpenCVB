@@ -238,7 +238,7 @@ End Class
 
 
 Public Class Color_TopX_VB : Inherits VB_Algorithm
-    Dim topX As New Histogram3D_TopXColors
+    Dim topX As New Hist3DRGB_TopXColors
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Top X pixels", 2, 32, 16)
         desc = "Classify every BGR pixel into some common colors"

@@ -68,7 +68,7 @@
     <ClCompile Include="Harris.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Histogram3D.cpp">
+    <ClCompile Include="Hist3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MinTriangle.cpp">

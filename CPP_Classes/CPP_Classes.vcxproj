@@ -53,7 +53,7 @@
     <ClCompile Include="Guess.cpp" />
     <ClCompile Include="Harris.cpp" />
     <ClCompile Include="Histogram.cpp" />
-    <ClCompile Include="Histogram3D.cpp" />
+    <ClCompile Include="Hist3D.cpp" />
     <ClCompile Include="HMM.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="Jacobian.cpp" />

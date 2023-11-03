@@ -4,20 +4,22 @@ Imports System.IO
 Public Class Palette_Basics : Inherits VB_Algorithm
     Public whitebackground As Boolean
     Public gradientColorMap As New cv.Mat
+    Dim cMapDir As New DirectoryInfo(task.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
     Public Sub New()
+        buildColorMap()
         desc = "Apply the different color maps in OpenCV - Painterly Effect"
+    End Sub
+    Private Sub buildColorMap()
+        Dim str = cMapDir.FullName + "/colorscale_" + gOptions.Palettes.Text + ".jpg"
+        Dim mapFile As New FileInfo(str)
+        gradientColorMap = cv.Cv2.ImRead(mapFile.FullName)
+        gradientColorMap.Col(0).SetTo(If(whitebackground, cv.Scalar.White, cv.Scalar.Black))
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src Is Nothing Then Exit Sub
         labels(2) = "ColorMap = " + gOptions.Palettes.Text
 
-        Static cMapDir As New DirectoryInfo(task.homeDir + "opencv/modules/imgproc/doc/pics/colormaps")
-        If task.optionsChanged Or gradientColorMap.Rows = 0 Then
-            Dim str = cMapDir.FullName + "/colorscale_" + gOptions.Palettes.Text + ".jpg"
-            Dim mapFile As New FileInfo(str)
-            gradientColorMap = cv.Cv2.ImRead(mapFile.FullName)
-            gradientColorMap.Col(0).SetTo(If(whitebackground, cv.Scalar.White, cv.Scalar.Black))
-        End If
+        If task.optionsChanged Then buildColorMap()
 
         If src.Type = cv.MatType.CV_32F Then
             src = vbNormalize32f(src)

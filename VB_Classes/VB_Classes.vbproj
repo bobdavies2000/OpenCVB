@@ -118,6 +118,7 @@
     <Compile Include="AsciiArt.vb" />
     <Compile Include="BGRPattern.vb" />
     <Compile Include="FrameRate.vb" />
+    <Compile Include="Hist3DCloud.vb" />
     <Compile Include="Neighbor.vb" />
     <Compile Include="OpAuto.vb" />
     <Compile Include="BackProject2D.vb" />
@@ -135,7 +136,7 @@
     <Compile Include="GuidedBP.vb" />
     <Compile Include="Guess.vb" />
     <Compile Include="Histogram2D.vb" />
-    <Compile Include="Histogram3D.vb" />
+    <Compile Include="Hist3DRGB.vb" />
     <Compile Include="HistPeak2D.vb" />
     <Compile Include="HistValley.vb" />
     <Compile Include="Hull.vb" />

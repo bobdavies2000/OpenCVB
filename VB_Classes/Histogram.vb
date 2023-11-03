@@ -1092,6 +1092,41 @@ Module Histogram_1D_CPP_Module
         Return {New cv.Rangef(mmX.minVal - histDelta, mmX.maxVal + histDelta),
                 New cv.Rangef(mmY.minVal - histDelta, mmY.maxVal + histDelta)}
     End Function
+
+
+
+
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Hist3DRGB_Run(rgbPtr As IntPtr, rows As Integer, cols As Integer, bins As Integer) As IntPtr
+    End Function
+
+
+
+
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Hist3DCloud_Run(pcPtr As IntPtr, rows As Integer, cols As Integer, xbins As Integer, ybins As Integer, zbins As Integer,
+                                    minX As Single, minY As Single, minZ As Single,
+                                    maxX As Single, maxY As Single, maxZ As Single) As IntPtr
+    End Function
+
+
+
+    Public Function Show_HSV_Hist(hist As cv.Mat) As cv.Mat
+        Dim img As New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
+        Dim binCount = hist.Height
+        Dim binWidth = img.Width / hist.Height
+        Dim mm = vbMinMax(hist)
+        img.SetTo(0)
+        If mm.maxVal > 0 Then
+            For i = 0 To binCount - 2
+                Dim h = img.Height * (hist.Get(Of Single)(i, 0)) / mm.maxVal
+                If h = 0 Then h = 5 ' show the color range in the plot
+                cv.Cv2.Rectangle(img, New cv.Rect(i * binWidth, img.Height - h, binWidth, h),
+                                 New cv.Scalar(CInt(180.0 * i / binCount), 255, 255), -1)
+            Next
+        End If
+        Return img
+    End Function
 End Module
 
 

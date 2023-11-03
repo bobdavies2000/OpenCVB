@@ -1397,7 +1397,7 @@ End Class
 
 Public Class RedCloud_BProject3D : Inherits VB_Algorithm
     Dim colorC As New RedCloud_Basics
-    Dim bp3d As New Histogram3D_BP
+    Dim bp3d As New Hist3DCloud_BP
     Public Sub New()
         desc = "Run RedCloud_Basics on the output of the RGB 3D backprojection"
     End Sub
