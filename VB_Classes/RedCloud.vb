@@ -313,7 +313,7 @@ End Class
 
 Public Class RedCloud_InputCloud : Inherits VB_Algorithm
     Dim redC As New RedCloud_Core
-    Public guided As New GuidedBP_Depth
+    Public guided As New GuidedBP_DepthNew
     Public Sub New()
         desc = "Build the reduced pointcloud or doctored back projection input to RedCloud/RedCell"
     End Sub
@@ -1365,7 +1365,7 @@ End Class
 
 
 Public Class RedCloud_ColorAndCloud : Inherits VB_Algorithm
-    Dim guided As New GuidedBP_Depth
+    Dim guided As New GuidedBP_DepthNew
     Public fCell As New RedColor_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
@@ -2352,7 +2352,7 @@ Public Class RedCloud_Flood_CPP : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
-            Static guided As New GuidedBP_Depth
+            Static guided As New GuidedBP_DepthNew
             guided.Run(src)
             src = guided.dst2
             src.ConvertTo(src, cv.MatType.CV_8U)
@@ -2426,7 +2426,7 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
-            Static guided As New GuidedBP_Depth
+            Static guided As New GuidedBP_DepthNew
             guided.Run(src)
             src = guided.dst2
             src.ConvertTo(src, cv.MatType.CV_8U)

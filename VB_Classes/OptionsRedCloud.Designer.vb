@@ -47,13 +47,6 @@ Partial Class OptionsRedCloud
         Me.LUT_Basics = New System.Windows.Forms.RadioButton()
         Me.Reduction_Basics = New System.Windows.Forms.RadioButton()
         Me.BackProject_Full = New System.Windows.Forms.RadioButton()
-        Me.GroupBox2 = New System.Windows.Forms.GroupBox()
-        Me.LowerLabel = New System.Windows.Forms.Label()
-        Me.LowerSlider = New System.Windows.Forms.TrackBar()
-        Me.Label16 = New System.Windows.Forms.Label()
-        Me.UpperLabel = New System.Windows.Forms.Label()
-        Me.UpperSlider = New System.Windows.Forms.TrackBar()
-        Me.Label18 = New System.Windows.Forms.Label()
         Me.GroupReduction = New System.Windows.Forms.GroupBox()
         Me.NoReduction = New System.Windows.Forms.RadioButton()
         Me.BitwiseReduction = New System.Windows.Forms.RadioButton()
@@ -88,9 +81,6 @@ Partial Class OptionsRedCloud
         CType(Me.XRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.RGBSource.SuspendLayout()
-        Me.GroupBox2.SuspendLayout()
-        CType(Me.LowerSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.UpperSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupReduction.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
         CType(Me.PCreductionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -364,78 +354,6 @@ Partial Class OptionsRedCloud
         Me.BackProject_Full.TabStop = True
         Me.BackProject_Full.Text = "BackProject_Full"
         Me.BackProject_Full.UseVisualStyleBackColor = True
-        '
-        'GroupBox2
-        '
-        Me.GroupBox2.Controls.Add(Me.LowerLabel)
-        Me.GroupBox2.Controls.Add(Me.LowerSlider)
-        Me.GroupBox2.Controls.Add(Me.Label16)
-        Me.GroupBox2.Controls.Add(Me.UpperLabel)
-        Me.GroupBox2.Controls.Add(Me.UpperSlider)
-        Me.GroupBox2.Controls.Add(Me.Label18)
-        Me.GroupBox2.Location = New System.Drawing.Point(12, 470)
-        Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(819, 150)
-        Me.GroupBox2.TabIndex = 5
-        Me.GroupBox2.TabStop = False
-        Me.GroupBox2.Text = "Guided Backprojection Region Controls"
-        '
-        'LowerLabel
-        '
-        Me.LowerLabel.AutoSize = True
-        Me.LowerLabel.Location = New System.Drawing.Point(667, 91)
-        Me.LowerLabel.Name = "LowerLabel"
-        Me.LowerLabel.Size = New System.Drawing.Size(91, 20)
-        Me.LowerLabel.TabIndex = 11
-        Me.LowerLabel.Text = "LowerLabel"
-        '
-        'LowerSlider
-        '
-        Me.LowerSlider.Location = New System.Drawing.Point(156, 85)
-        Me.LowerSlider.Maximum = 500
-        Me.LowerSlider.Minimum = 10
-        Me.LowerSlider.Name = "LowerSlider"
-        Me.LowerSlider.Size = New System.Drawing.Size(506, 69)
-        Me.LowerSlider.TabIndex = 10
-        Me.LowerSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.LowerSlider.Value = 50
-        '
-        'Label16
-        '
-        Me.Label16.AutoSize = True
-        Me.Label16.Location = New System.Drawing.Point(8, 91)
-        Me.Label16.Name = "Label16"
-        Me.Label16.Size = New System.Drawing.Size(144, 20)
-        Me.Label16.TabIndex = 9
-        Me.Label16.Text = "Region Lower Limit"
-        '
-        'UpperLabel
-        '
-        Me.UpperLabel.AutoSize = True
-        Me.UpperLabel.Location = New System.Drawing.Point(667, 24)
-        Me.UpperLabel.Name = "UpperLabel"
-        Me.UpperLabel.Size = New System.Drawing.Size(92, 20)
-        Me.UpperLabel.TabIndex = 8
-        Me.UpperLabel.Text = "UpperLabel"
-        '
-        'UpperSlider
-        '
-        Me.UpperSlider.Location = New System.Drawing.Point(156, 18)
-        Me.UpperSlider.Maximum = 500
-        Me.UpperSlider.Minimum = 20
-        Me.UpperSlider.Name = "UpperSlider"
-        Me.UpperSlider.Size = New System.Drawing.Size(506, 69)
-        Me.UpperSlider.TabIndex = 7
-        Me.UpperSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.UpperSlider.Value = 80
-        '
-        'Label18
-        '
-        Me.Label18.Location = New System.Drawing.Point(8, 24)
-        Me.Label18.Name = "Label18"
-        Me.Label18.Size = New System.Drawing.Size(151, 45)
-        Me.Label18.TabIndex = 6
-        Me.Label18.Text = "Region Upper Limit"
         '
         'GroupReduction
         '
@@ -732,7 +650,6 @@ Partial Class OptionsRedCloud
         Me.Controls.Add(Me.RedCloudOnly)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.GroupReduction)
-        Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.RGBSource)
         Me.Controls.Add(Me.RedCloudSliders)
         Me.Name = "OptionsRedCloud"
@@ -747,10 +664,6 @@ Partial Class OptionsRedCloud
         CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.RGBSource.ResumeLayout(False)
         Me.RGBSource.PerformLayout()
-        Me.GroupBox2.ResumeLayout(False)
-        Me.GroupBox2.PerformLayout()
-        CType(Me.LowerSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.UpperSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupReduction.ResumeLayout(False)
         Me.GroupReduction.PerformLayout()
         Me.GroupBox3.ResumeLayout(False)
@@ -789,13 +702,6 @@ Partial Class OptionsRedCloud
     Friend WithEvents GridsizeLabel As Windows.Forms.Label
     Friend WithEvents GridSizeSlider As Windows.Forms.TrackBar
     Friend WithEvents Label3 As Windows.Forms.Label
-    Friend WithEvents GroupBox2 As Windows.Forms.GroupBox
-    Friend WithEvents LowerLabel As Windows.Forms.Label
-    Friend WithEvents LowerSlider As Windows.Forms.TrackBar
-    Friend WithEvents Label16 As Windows.Forms.Label
-    Friend WithEvents UpperLabel As Windows.Forms.Label
-    Friend WithEvents UpperSlider As Windows.Forms.TrackBar
-    Friend WithEvents Label18 As Windows.Forms.Label
     Friend WithEvents GroupReduction As Windows.Forms.GroupBox
     Friend WithEvents BitwiseReduction As Windows.Forms.RadioButton
     Friend WithEvents SimpleReduction As Windows.Forms.RadioButton

@@ -1032,3 +1032,66 @@ Public Class PointCloud_YRangeTest : Inherits VB_Algorithm
         dst1.ConvertTo(dst2, cv.MatType.CV_8UC1)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class PointCloud_Histograms : Inherits VB_Algorithm
+    Dim plot2D As New Plot_Histogram2D
+    Dim plot As New Plot_Histogram
+    Dim hist3d As New Histogram3D_DepthNew
+    Dim grid As New Grid_Basics
+    Public histogram As New cv.Mat
+    Public Sub New()
+        redOptions.HistBinSlider.Value = 9
+        redOptions.XYZReduction.Checked = True
+        labels = {"", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram"}
+        desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        cv.Cv2.CalcHist({task.pointCloud}, redOptions.channels, New cv.Mat(),
+                        histogram, redOptions.channelCount, redOptions.histBinList, redOptions.ranges)
+
+        Select Case redOptions.PCReduction
+            Case "X Reduction", "Y Reduction", "Z Reduction"
+                plot.Run(histogram)
+                dst2 = plot.dst2
+                labels(2) = plot.labels(2)
+            Case "XY Reduction", "XZ Reduction", "YZ Reduction"
+                plot2D.Run(histogram)
+                dst2 = plot2D.dst2
+            Case "XYZ Reduction"
+                If dst2.Type <> cv.MatType.CV_8U Then dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
+
+                hist3d.ranges = redOptions.ranges
+                hist3d.Run(task.pointCloud)
+
+                histogram = hist3d.histogram
+                Dim histData(histogram.Total - 1) As Single
+                Marshal.Copy(histogram.Data, histData, 0, histData.Length - 1)
+
+                If histData.Count > 255 And redOptions.HistBinSlider.Value > 3 Then
+                    redOptions.HistBinSlider.Value -= 1
+                End If
+                If histData.Count < 128 And redOptions.HistBinSlider.Value < redOptions.HistBinSlider.Maximum Then
+                    redOptions.HistBinSlider.Value += 1
+                End If
+                If task.gridList.Count < histData.Length And gOptions.GridSize.Value > 2 Then
+                    gOptions.GridSize.Value -= 1
+                    grid.Run(src)
+                    dst2.SetTo(0)
+                End If
+                histData(0) = 0 ' count of zero pixels - distorts results..
+                Dim maxVal = histData.ToList.Max
+                For i = 0 To task.gridList.Count - 1
+                    If i >= histData.Length Then Exit For
+                    Dim roi = task.gridList(i)
+                    dst2(roi).SetTo(255 * histData(i) / maxVal)
+                Next
+                labels(2) = "2D plot of the resulting 3D histogram."
+        End Select
+    End Sub
+End Class

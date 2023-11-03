@@ -1076,47 +1076,47 @@ End Class
 
 
 
-Public Class GuidedBP_Depth : Inherits VB_Algorithm
-    Public hist2d As New Histogram2D_PointCloud
-    Dim opAuto As New OpAuto_GuidedBP
-    Dim myPalette As New Palette_Random
-    Public Sub New()
-        redOptions.HistBinSlider.Value = 15
-        desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+'Public Class GuidedBP_Depth : Inherits VB_Algorithm
+'    Public hist2d As New Histogram2D_PointCloud
+'    Dim opAuto As New OpAuto_GuidedBP
+'    Dim myPalette As New Palette_Random
+'    Public Sub New()
+'        redOptions.HistBinSlider.Value = 15
+'        desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
+'    End Sub
+'    Public Sub RunVB(src As cv.Mat)
+'        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
-        hist2d.Run(src)
+'        hist2d.Run(src)
 
-        Dim samples(hist2d.histogram.Total - 1) As Single
-        Marshal.Copy(hist2d.histogram.Data, samples, 0, samples.Length)
+'        Dim samples(hist2d.histogram.Total - 1) As Single
+'        Marshal.Copy(hist2d.histogram.Data, samples, 0, samples.Length)
 
-        Dim histList = samples.ToList
-        samples(histList.IndexOf(histList.Max)) = 0
+'        Dim histList = samples.ToList
+'        samples(histList.IndexOf(histList.Max)) = 0
 
-        opAuto.nonzeroSamples = 0
-        For i = 0 To samples.Count - 1
-            If samples(i) > 0 Then
-                opAuto.nonZeroSamples += 1
-                ' this is where the histogram is doctored to create the different regions
-                samples(i) = If(opAuto.nonZeroSamples <= 255, 255 - opAuto.nonZeroSamples, 0)
-            End If
-        Next
+'        opAuto.nonzeroSamples = 0
+'        For i = 0 To samples.Count - 1
+'            If samples(i) > 0 Then
+'                opAuto.nonZeroSamples += 1
+'                ' this is where the histogram is doctored to create the different regions
+'                samples(i) = If(opAuto.nonZeroSamples <= 255, 255 - opAuto.nonZeroSamples, 0)
+'            End If
+'        Next
 
-        opAuto.runvb(Nothing)
+'        opAuto.runvb(Nothing)
 
-        Marshal.Copy(samples, 0, hist2d.histogram.Data, samples.Length)
+'        Marshal.Copy(samples, 0, hist2d.histogram.Data, samples.Length)
 
-        cv.Cv2.CalcBackProject({src}, redOptions.channels, hist2d.histogram, dst2, hist2d.ranges)
-        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+'        cv.Cv2.CalcBackProject({src}, redOptions.channels, hist2d.histogram, dst2, hist2d.ranges)
+'        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        If standalone Or testIntermediate(traceName) Then
-            myPalette.Run(dst2)
-            dst3 = myPalette.dst2
-        End If
-    End Sub
-End Class
+'        If standalone Or testIntermediate(traceName) Then
+'            myPalette.Run(dst2)
+'            dst3 = myPalette.dst2
+'        End If
+'    End Sub
+'End Class
 
 
 
@@ -1126,8 +1126,7 @@ End Class
 
 
 Public Class GuidedBP_DepthNew : Inherits VB_Algorithm
-    Public hist As New Histogram_PointCloudNew
-    Dim opAuto As New OpAuto_GuidedBP
+    Public hist As New PointCloud_Histograms
     Dim myPalette As New Palette_Random
     Public Sub New()
         redOptions.HistBinSlider.Value = 15
@@ -1144,16 +1143,14 @@ Public Class GuidedBP_DepthNew : Inherits VB_Algorithm
         Dim histList = samples.ToList
         samples(histList.IndexOf(histList.Max)) = 0
 
-        opAuto.nonZeroSamples = 0
+        Dim nonZeroSamples = 0
         For i = 0 To samples.Count - 1
             If samples(i) > 0 Then
-                opAuto.nonZeroSamples += 1
+                nonZeroSamples += 1
                 ' this is where the histogram is doctored to create the different regions
-                samples(i) = If(opAuto.nonZeroSamples <= 255, 255 - opAuto.nonZeroSamples, 0)
+                samples(i) = If(nonZeroSamples <= 255, 255 - nonZeroSamples, 0)
             End If
         Next
-
-        opAuto.RunVB(Nothing)
 
         Marshal.Copy(samples, 0, hist.histogram.Data, samples.Length)
 

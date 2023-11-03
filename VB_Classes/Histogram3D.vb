@@ -132,7 +132,7 @@ End Class
 
 
 
-Public Class Histogram3D_UniquePixels : Inherits VB_Algorithm
+Public Class Histogram3D_UniqueRGBPixels : Inherits VB_Algorithm
     Dim hist3D As New Histogram3D_Basics
     Public pixels As New List(Of cv.Point3f)
     Public counts As New List(Of Integer)
@@ -167,8 +167,8 @@ End Class
 
 
 
-Public Class Histogram3D_TopXColors : Inherits VB_Algorithm
-    Dim unique As New Histogram3D_UniquePixels
+Public Class Histogram3D_TopXRGBColors : Inherits VB_Algorithm
+    Dim unique As New Histogram3D_UniqueRGBPixels
     Public topXPixels As New List(Of cv.Point3i)
     Public mapTopX As Integer = 16
     Public Sub New()
@@ -189,75 +189,6 @@ Public Class Histogram3D_TopXColors : Inherits VB_Algorithm
             If topXPixels.Count >= mapTopX Then Exit For
         Next
         setTrueText("There are " + CStr(sortedPixels.Count) + " non-zero entries in the 3D histogram " + vbCrLf + "The top " + CStr(mapTopX) + " pixels are in topXPixels", 2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Histogram3D_Depth : Inherits VB_Algorithm
-    Public histogram As New cv.Mat
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("X histogram bins", 2, 50, 4)
-            sliders.setupTrackBar("Y histogram bins", 2, 50, 4)
-            sliders.setupTrackBar("Z histogram bins", 2, 50, 4)
-            sliders.setupTrackBar("Selected bin", 0, 10, 0)
-        End If
-        If standalone Then gOptions.displayDst1.Checked = True
-        gOptions.useHistoryCloud.Checked = True
-        desc = "Plot the 3D histogram of the depth data"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static xSlider = findSlider("X histogram bins")
-        Static ySlider = findSlider("Y histogram bins")
-        Static zSlider = findSlider("Z histogram bins")
-        Static binSlider = findSlider("Selected bin")
-        Dim xBins = xSlider.value
-        Dim yBins = ySlider.value
-        Dim zBins = zSlider.value
-        If task.optionsChanged Then binSlider.maximum = xBins * yBins * zBins - 1
-        If binSlider.value = 0 Then binSlider.value = binSlider.maximum / 2
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-
-        Static saveMin As New cv.Vec3f(-3, -3, 0)
-        Static saveMax As New cv.Vec3f(3, 3, task.maxZmeters)
-
-        Dim histInput(src.Total * src.ElemSize - 1) As Byte
-        Marshal.Copy(src.Data, histInput, 0, histInput.Length)
-
-        Dim handle32F = GCHandle.Alloc(histInput, GCHandleType.Pinned)
-        Dim dstPtr = Histogram3D_32FC3(handle32F.AddrOfPinnedObject(), src.Rows, src.Cols,
-                                       xBins, yBins, zBins,
-                                       saveMin(0), saveMin(1), saveMin(2),
-                                       saveMax(0), saveMax(1), saveMax(2))
-        handle32F.Free()
-
-        histogram = New cv.Mat(xBins * yBins * zBins, 1, cv.MatType.CV_32F, dstPtr)
-
-        Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(saveMin(0), saveMax(0)),
-                                                     New cv.Rangef(saveMin(1), saveMax(1)),
-                                                     New cv.Rangef(saveMin(2), saveMax(2))}
-
-        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, ranges)
-
-        setTrueText("A 3D histogram of the depth data has been created in histogram." + vbCrLf +
-                    "The image below left is the back projection of the selected bin." + vbCrLf +
-                    "Use the slider option to select which bin - one of " + CStr(binSlider.maximum + 1), 1)
-
-        Dim sampleCounts As New List(Of Integer)
-        For i = 0 To histogram.Rows - 1
-            sampleCounts.Add(histogram.Get(Of Single)(i, 0))
-        Next
-
-        Dim maskval = sampleCounts(binSlider.value)
-        dst3 = dst2.InRange(maskval, maskval)
-        labels(3) = "There were " + CStr(dst3.CountNonZero) + " samples in the selected bin.  Samplecount = " +
-                    Format(maskval, fmt0)
-        If maskval > 0 Then task.color.SetTo(cv.Scalar.White, dst3)
     End Sub
 End Class
 
@@ -431,5 +362,123 @@ Public Class Histogram3D_Depth3Slider : Inherits VB_Algorithm
         dst2.SetTo(0, task.noDepthMask)
         dst3 = vbPalette(dst2 * 255 / classCount)
         labels(3) = "There were " + CStr(classCount) + " histogram classes found."
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Histogram3D_Depth : Inherits VB_Algorithm
+    Public histogram As New cv.Mat
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("X histogram bins", 2, 50, 4)
+            sliders.setupTrackBar("Y histogram bins", 2, 50, 4)
+            sliders.setupTrackBar("Z histogram bins", 2, 50, 4)
+            sliders.setupTrackBar("Selected bin", 0, 10, 0)
+        End If
+        If standalone Then gOptions.displayDst1.Checked = True
+        gOptions.useHistoryCloud.Checked = True
+        desc = "Plot the 3D histogram of the depth data"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static xSlider = findSlider("X histogram bins")
+        Static ySlider = findSlider("Y histogram bins")
+        Static zSlider = findSlider("Z histogram bins")
+        Static binSlider = findSlider("Selected bin")
+        Dim xBins = xSlider.value
+        Dim yBins = ySlider.value
+        Dim zBins = zSlider.value
+        If task.optionsChanged Then binSlider.maximum = xBins * yBins * zBins - 1
+        If binSlider.value = 0 Then binSlider.value = binSlider.maximum / 2
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+
+        Static saveMin As New cv.Vec3f(-3, -3, 0)
+        Static saveMax As New cv.Vec3f(3, 3, task.maxZmeters)
+
+        Dim histInput(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, histInput, 0, histInput.Length)
+
+        Dim handle32F = GCHandle.Alloc(histInput, GCHandleType.Pinned)
+        Dim dstPtr = Histogram3D_32FC3(handle32F.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                       xBins, yBins, zBins,
+                                       saveMin(0), saveMin(1), saveMin(2),
+                                       saveMax(0), saveMax(1), saveMax(2))
+        handle32F.Free()
+
+        histogram = New cv.Mat(xBins * yBins * zBins, 1, cv.MatType.CV_32F, dstPtr)
+
+        Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(saveMin(0), saveMax(0)),
+                                                     New cv.Rangef(saveMin(1), saveMax(1)),
+                                                     New cv.Rangef(saveMin(2), saveMax(2))}
+
+        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, ranges)
+
+        setTrueText("A 3D histogram of the depth data has been created in histogram." + vbCrLf +
+                    "The image below left is the back projection of the selected bin." + vbCrLf +
+                    "Use the slider option to select which bin - one of " + CStr(binSlider.maximum + 1), 1)
+
+        Dim sampleCounts As New List(Of Integer)
+        For i = 0 To histogram.Rows - 1
+            sampleCounts.Add(histogram.Get(Of Single)(i, 0))
+        Next
+
+        Dim maskval = sampleCounts(binSlider.value)
+        dst3 = dst2.InRange(maskval, maskval)
+        labels(3) = "There were " + CStr(dst3.CountNonZero) + " samples in the selected bin.  Samplecount = " +
+                    Format(maskval, fmt0)
+        If maskval > 0 Then task.color.SetTo(cv.Scalar.White, dst3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Histogram3D_DepthNew : Inherits VB_Algorithm
+    Public histogram As New cv.Mat
+    Public ranges() As cv.Rangef
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        gOptions.useHistoryCloud.Checked = True
+        desc = "Plot the 3D histogram of the depth data"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim bins = gOptions.HistBinSlider.Value
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+
+        Static saveMin As New cv.Vec3f(-3, -3, 0)
+        Static saveMax As New cv.Vec3f(3, 3, task.maxZmeters)
+
+        Dim histInput(src.Total * src.ElemSize - 1) As Byte
+        Marshal.Copy(src.Data, histInput, 0, histInput.Length)
+
+        Dim handle32F = GCHandle.Alloc(histInput, GCHandleType.Pinned)
+        Dim dstPtr = Histogram3D_32FC3(handle32F.AddrOfPinnedObject(), src.Rows, src.Cols, bins, bins, bins,
+                                       saveMin(0), saveMin(1), saveMin(2),
+                                       saveMax(0), saveMax(1), saveMax(2))
+        handle32F.Free()
+
+        histogram = New cv.Mat(bins * bins * bins, 1, cv.MatType.CV_32F, dstPtr)
+
+        ranges = New cv.Rangef() {New cv.Rangef(saveMin(0), saveMax(0)),
+                                  New cv.Rangef(saveMin(1), saveMax(1)),
+                                  New cv.Rangef(saveMin(2), saveMax(2))}
+
+        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, ranges)
+
+        Dim sampleCounts As New List(Of Integer)
+        For i = 0 To histogram.Rows - 1
+            sampleCounts.Add(histogram.Get(Of Single)(i, 0))
+        Next
+
+        'Dim maskval = sampleCounts(binSlider.value)
+        'dst3 = dst2.InRange(maskval, maskval)
+        'labels(3) = "There were " + CStr(dst3.CountNonZero) + " samples in the selected bin.  Samplecount = " +
+        '            Format(maskval, fmt0)
+        'If maskval > 0 Then task.color.SetTo(cv.Scalar.White, dst3)
     End Sub
 End Class
