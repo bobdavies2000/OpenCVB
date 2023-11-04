@@ -1,17 +1,21 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-
 Public Class Hist3DCloud_Basics : Inherits VB_Algorithm
     Public histogram As New cv.Mat
-    Public ranges() As cv.Rangef
+    Public classCount As Integer
+    Public runBackProject As Boolean
     Public Sub New()
-        desc = "Build a 3D histogram from the BGR image."
+        redOptions.XYZReduction.Checked = True
+        gOptions.HistBinSlider.Value = 3
+        labels(2) = "dst2 = backprojection of pointcloud (8UC1 format). The 3D histogram is in histogram."
+        desc = "Build a 3D histogram from the pointcloud."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim bins = task.histogramBins - task.histogramBins Mod 3
-        If bins = 0 Then bins = 3
+        Dim bins = gOptions.HistBinSlider.Value
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        If redOptions.XYZReduction.Checked = False Then redOptions.XYZReduction.Checked = True
 
-        Dim histInput(src.Total - 1) As Single
+        Dim histInput(src.Total * 3 - 1) As Single
         Marshal.Copy(src.Data, histInput, 0, histInput.Length)
 
         Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
@@ -25,32 +29,35 @@ Public Class Hist3DCloud_Basics : Inherits VB_Algorithm
         handleInput.Free()
 
         histogram = New cv.Mat(bins * bins * bins, 1, cv.MatType.CV_32F, dstPtr)
-        dst2 = histogram.Reshape(3, bins)
-        setTrueText("A 3D histogram of the input image has been prepared in histogram.", 3)
+        If standalone Or runBackProject Then
+            Dim samples(histogram.Total - 1) As Single
+            Marshal.Copy(histogram.Data, samples, 0, samples.Length)
+
+            Dim sortedHist As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
+
+            For i = 0 To samples.Count - 1
+                sortedHist.Add(samples(i), i)
+            Next
+
+            For i = 0 To sortedHist.Count - 1
+                Dim key = sortedHist.ElementAt(i)
+                Dim index = key.Value
+                samples(index) = i + 1
+            Next
+
+            Marshal.Copy(samples, 0, histogram.Data, samples.Length)
+
+            cv.Cv2.CalcBackProject({src}, redOptions.channels, histogram, dst2, redOptions.ranges)
+            dst2.SetTo(0, task.noDepthMask)
+
+            Dim mm = vbMinMax(dst2)
+            classCount = CInt(mm.maxVal)
+
+            dst3 = vbPalette(dst2 * 255 / classCount)
+            labels(3) = CStr(classCount) + " different levels in the backprojection."
+        End If
     End Sub
 End Class
-
-
-
-
-
-
-
-Public Class Hist3DCloud_VB : Inherits VB_Algorithm
-    Dim histogram As New cv.Mat
-    Public Sub New()
-        desc = "Build a 3D histogram from the BGR image in VB.Net (not C++)"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 256), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
-        Dim hBins() As Integer = {task.histogramBins, task.histogramBins, task.histogramBins}
-        cv.Cv2.CalcHist({src}, {2, 1, 0}, New cv.Mat, histogram, 3, hBins, ranges)
-        setTrueText("The 3D histogram from the BGR image is a null Mat." + vbCrLf +
-                    "Hopefully, someone can someday explain what is wrong.")
-    End Sub
-End Class
-
-
 
 
 
@@ -101,104 +108,24 @@ End Class
 
 
 
-Public Class Hist3DCloud_UniqueRGBPixels : Inherits VB_Algorithm
-    Dim hist3D As New Hist3DCloud_Basics
-    Public pixels As New List(Of cv.Point3f)
-    Public counts As New List(Of Integer)
-    Public Sub New()
-        desc = "Get the number of non-zero BGR elements in the 3D color histogram of the current image and their BGR values"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        hist3D.Run(src)
-
-        pixels.Clear()
-        counts.Clear()
-        Dim bins As Integer = gOptions.HistBinSlider.Value
-        For z = 0 To bins - 1
-            For y = 0 To bins - 1
-                For x = 0 To bins - 1
-                    Dim val = CInt(hist3D.histogram.Get(Of Single)(x * bins * bins + y * bins + z, 0))
-                    If val > 0 Then
-                        pixels.Add(New cv.Point3f(CInt(255 * x / bins), CInt(255 * y / bins), CInt(255 * z / bins)))
-                        counts.Add(val)
-                    End If
-                Next
-            Next
-        Next
-        setTrueText("There are " + CStr(pixels.Count) + " non-zero entries in the 3D histogram " + vbCrLf + "See uniquePixels list in Hist3DCloud_UniquePixels", 2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Hist3DCloud_TopXRGBColors : Inherits VB_Algorithm
-    Dim unique As New Hist3DCloud_UniqueRGBPixels
-    Public topXPixels As New List(Of cv.Point3i)
-    Public mapTopX As Integer = 16
-    Public Sub New()
-        desc = "Get the top 256 of non-zero BGR elements in the 3D color histogram of the current image and their BGR values"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        unique.Run(src)
-
-        Dim sortedPixels As New SortedList(Of Integer, cv.Point3f)(New compareAllowIdenticalIntegerInverted)
-        For i = 0 To unique.pixels.Count - 1
-            sortedPixels.Add(unique.counts(i), unique.pixels(i))
-        Next
-
-        topXPixels.Clear()
-
-        For i = 0 To sortedPixels.Count - 1
-            topXPixels.Add(sortedPixels.ElementAt(i).Value.ToPoint3i)
-            If topXPixels.Count >= mapTopX Then Exit For
-        Next
-        setTrueText("There are " + CStr(sortedPixels.Count) + " non-zero entries in the 3D histogram " + vbCrLf + "The top " + CStr(mapTopX) + " pixels are in topXPixels", 2)
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Hist3DCloud_BP : Inherits VB_Algorithm
     Dim hist3d As New Hist3DCloud_Basics
-    Dim reduction As New Reduction_RGB
-    Public classCount As Integer
+    Dim reduction As New Reduction_XYZ
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        redOptions.ColorReductionSlider.Value = 20
+        redOptions.ColorReductionSlider.Value = 254
+        hist3d.runBackProject = True
         desc = "Backproject the 3D histogram for RGB"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
         reduction.Run(src)
+        dst3 = reduction.dst3
 
-        hist3d.Run(reduction.dst2)
-        dst1 = reduction.dst2
-
-        Dim samples(hist3d.histogram.Total - 1) As Single
-        Marshal.Copy(hist3d.histogram.Data, samples, 0, samples.Length)
-
-        classCount = 0
-        For i = 0 To samples.Count - 1
-            classCount += 1
-            samples(i) = classCount
-        Next
-
-        Marshal.Copy(samples, 0, hist3d.histogram.Data, samples.Length)
-
-        cv.Cv2.CalcBackProject({reduction.dst2}, {0, 1, 2}, hist3d.histogram, dst2, hist3d.ranges)
-
-        dst3 = vbPalette(dst2 * 255 / classCount)
-        labels(3) = "There were " + CStr(classCount) + " histogram classes found."
+        hist3d.Run(dst3)
+        dst2 = hist3d.dst2
+        labels = hist3d.labels
     End Sub
 End Class
 
