@@ -3,12 +3,12 @@ Imports System.Runtime.InteropServices
 
 Public Class Hist3DRGB_Basics : Inherits VB_Algorithm
     Public histogram As New cv.Mat
-    Public ranges() As cv.Rangef
+    Public ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 256), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
+    Public channels() As Integer = {0, 1, 2}
     Public Sub New()
         gOptions.HistBinSlider.Value = 3
-        ranges = New cv.Rangef() {New cv.Rangef(0, 256), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
+        labels(2) = "dst2 = backprojection (8UC1 format). The 3D histogram is in histogram."
         desc = "Build a 3D histogram from the BGR image."
-        gOptions.DebugSlider.Maximum = 16
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Dim bins = gOptions.HistBinSlider.Value
@@ -27,29 +27,24 @@ Public Class Hist3DRGB_Basics : Inherits VB_Algorithm
 
             Dim sortedHist As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
 
-            Dim classCount = 0
             For i = 0 To samples.Count - 1
-                sortedHist.Add(samples.Count, i)
-                If samples(i) > 0 Then classCount += 1
+                sortedHist.Add(samples(i), i)
             Next
             For i = 0 To sortedHist.Count - 1
                 Dim key = sortedHist.ElementAt(i)
                 Dim index = key.Value
-                task.palette.gradientColorMap.Col(index Mod 255).SetTo(task.vecColors(i Mod 255))
                 samples(index) = i + 1
             Next
 
             Marshal.Copy(samples, 0, histogram.Data, samples.Length)
 
-            cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst0, ranges)
+            cv.Cv2.CalcBackProject({src}, channels, histogram, dst2, ranges)
 
-            Dim test = gOptions.DebugSlider.Value
-            dst3 = dst0.InRange(test, test)
+            Dim mm = vbMinMax(dst2)
 
-            dst2 = vbPalette(dst0)
-            labels(2) = CStr(classCount) + " entries in the histogram were non-zero."
+            dst3 = vbPalette(dst2 * 255 / mm.maxVal)
+            labels(3) = CStr(mm.maxVal) + " different levels in the backprojection."
         End If
-        setTrueText("A 3D histogram of the input image has been prepared in histogram.", 3)
     End Sub
 End Class
 
@@ -73,48 +68,6 @@ Public Class Hist3DRGB_VB : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class Hist3DRGB_DepthSplit : Inherits VB_Algorithm
-    Dim hist As List(Of Histogram_Kalman)
-    Dim hist2d As New Histogram2D_PointCloud
-    Dim mats As New Mat_4Click
-    Public Sub New()
-        hist = New List(Of Histogram_Kalman)({New Histogram_Kalman, New Histogram_Kalman, New Histogram_Kalman})
-        labels(2) = "Histograms (Kalman) for X (upper left), Y (upper right) and Z.  UseZeroDepth removes 0 (no depth) entries."
-        labels(3) = "X to Y histogram (upper left), X to Z (upper right), and Y to Z (bottom)."
-        desc = "Plot the 3 histograms of the depth data dimensions"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        For i = 0 To 2
-            hist(i).Run(task.pcSplit(i))
-            mats.mat(i) = hist(i).dst2.Clone
-        Next
-
-        mats.Run(Nothing)
-        dst2 = mats.dst2.Clone
-
-        redOptions.XYReduction.Checked = True
-        hist2d.Run(task.pointCloud)
-        mats.mat(0) = hist2d.histogram.ConvertScaleAbs
-
-        redOptions.XZReduction.Checked = True
-        hist2d.Run(task.pointCloud)
-        mats.mat(1) = hist2d.histogram.ConvertScaleAbs
-
-        redOptions.YZReduction.Checked = True
-        hist2d.Run(task.pointCloud)
-        mats.mat(2) = hist2d.histogram.ConvertScaleAbs
-
-        mats.Run(Nothing)
-        dst3 = mats.dst2.Clone
-    End Sub
-End Class
 
 
 
@@ -188,14 +141,14 @@ End Class
 
 
 
-Public Class Hist3DRGB_BP : Inherits VB_Algorithm
+Public Class Hist3DRGB_Reduction : Inherits VB_Algorithm
     Dim hist3d As New Hist3DRGB_Basics
     Dim reduction As New Reduction_RGB
     Public classCount As Integer
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         redOptions.ColorReductionSlider.Value = 45
-        desc = "Backproject the 3D histogram for RGB"
+        desc = "Backproject the 3D histogram for RGB after reduction"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
@@ -206,19 +159,48 @@ Public Class Hist3DRGB_BP : Inherits VB_Algorithm
         Dim samples(hist3d.histogram.Total - 1) As Single
         Marshal.Copy(hist3d.histogram.Data, samples, 0, samples.Length)
 
-        classCount = 0
+        Dim sortedHist As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
+
         For i = 0 To samples.Count - 1
-            If samples(i) > 0 Then classCount += 1
+            sortedHist.Add(samples(i), i)
         Next
-        For i = 0 To samples.Count - 1
-            samples(i) = i + 1
+        For i = 0 To sortedHist.Count - 1
+            Dim key = sortedHist.ElementAt(i)
+            Dim index = key.Value
+            samples(index) = i + 1
         Next
 
         Marshal.Copy(samples, 0, hist3d.histogram.Data, samples.Length)
 
-        cv.Cv2.CalcBackProject({reduction.dst2}, redOptions.channels, hist3d.histogram, dst2, hist3d.ranges)
-        dst3 = vbPalette(dst2)
-        labels(2) = "The 3D RGB histogram is backprojected below into the image format with " + CStr(classCount) + " non-zero histogram entries"
+        cv.Cv2.CalcBackProject({dst1}, {0, 1, 2}, hist3d.histogram, dst2, hist3d.ranges)
+
+        Dim mm = vbMinMax(dst2)
+        classCount = mm.maxVal
+
+        dst3 = vbPalette(dst2 * 255 / mm.maxVal)
+        labels(2) = "The histogram of the reduced RGB image is backprojected below with " + CStr(classCount) + " non-zero histogram entries"
         labels(3) = "There were " + CStr(classCount) + " histogram classes found."
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Hist3DRGB_RedColor : Inherits VB_Algorithm
+    Dim hist3d As New Hist3DRGB_Reduction
+    Dim colorC As New RedColor_Basics
+    Public Sub New()
+        desc = "Use the output of Hist3DRGB_Reduction as input to RedColor_Basics"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        hist3d.Run(src)
+
+        colorC.Run(hist3d.dst2)
+        dst2 = colorC.dst2
     End Sub
 End Class
