@@ -22,13 +22,13 @@ Public Class BackProject_Basics : Inherits VB_Algorithm
         Dim totalPixels = dst2.Total ' assume we are including zeros.
         If histK.hist.plot.noZeroEntry Then totalPixels = input.CountNonZero
 
-        Dim brickWidth = dst2.Width / redOptions.HistBinSlider.Value
-        Dim incr = (histK.hist.mm.maxVal - histK.hist.mm.minVal) / redOptions.HistBinSlider.Value
+        Dim brickWidth = dst2.Width / gOptions.HistBinSlider.Value
+        Dim incr = (histK.hist.mm.maxVal - histK.hist.mm.minVal) / gOptions.HistBinSlider.Value
         Dim histIndex = Math.Floor(task.mouseMovePoint.X / brickWidth)
 
         minRange = New cv.Scalar(histIndex * incr)
         maxRange = New cv.Scalar((histIndex + 1) * incr)
-        If histIndex + 1 = redOptions.HistBinSlider.Value Then maxRange = New cv.Scalar(255)
+        If histIndex + 1 = gOptions.HistBinSlider.Value Then maxRange = New cv.Scalar(255)
 
         '     Dim ranges() = New cv.Rangef() {New cv.Rangef(minRange, maxRange)}
         '     cv.Cv2.CalcBackProject({input}, {0}, histK.hist.histogram, dst0, ranges)

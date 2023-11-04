@@ -355,9 +355,9 @@ Public Class VBtask : Implements IDisposable
         PixelViewer = New Pixel_Viewer
 
         depthBasics = New Depth_Basics
+        updateSettings()
         redOptions.Show()
         gOptions.Show()
-        updateSettings()
         task.toggleFrame = -1
         palette = New Palette_Basics
         If algName.StartsWith("OpenGL_") Or algName.EndsWith("_OpenGL") Or algName.StartsWith("Model_") Then

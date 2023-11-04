@@ -1046,8 +1046,8 @@ Public Class PointCloud_Histograms : Inherits VB_Algorithm
     Dim grid As New Grid_Basics
     Public histogram As New cv.Mat
     Public Sub New()
-        redOptions.HistBinSlider.Value = 9
-        redOptions.XYZReduction.Checked = True
+        gOptions.HistBinSlider.Value = 9
+        redOptions.XYReduction.Checked = True
         labels = {"", "", "Plot of 2D histogram", "All non-zero entries in the 2D histogram"}
         desc = "Create a 2D histogram of the point cloud data - which 2D inputs is in options."
     End Sub
@@ -1073,11 +1073,11 @@ Public Class PointCloud_Histograms : Inherits VB_Algorithm
                 Dim histData(histogram.Total - 1) As Single
                 Marshal.Copy(histogram.Data, histData, 0, histData.Length - 1)
 
-                If histData.Count > 255 And redOptions.HistBinSlider.Value > 3 Then
-                    redOptions.HistBinSlider.Value -= 1
+                If histData.Count > 255 And gOptions.HistBinSlider.Value > 3 Then
+                    gOptions.HistBinSlider.Value -= 1
                 End If
-                If histData.Count < 128 And redOptions.HistBinSlider.Value < redOptions.HistBinSlider.Maximum Then
-                    redOptions.HistBinSlider.Value += 1
+                If histData.Count < 128 And gOptions.HistBinSlider.Value < gOptions.HistBinSlider.Maximum Then
+                    gOptions.HistBinSlider.Value += 1
                 End If
                 If task.gridList.Count < histData.Length And gOptions.GridSize.Value > 2 Then
                     gOptions.GridSize.Value -= 1

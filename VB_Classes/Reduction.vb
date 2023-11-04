@@ -122,31 +122,33 @@ Public Class Reduction_XYZ : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Public Sub New()
         If check.Setup(traceName) Then
-            check.addCheckBox("Slice point cloud in X direction")
-            check.addCheckBox("Slice point cloud in Y direction")
-            check.addCheckBox("Slice point cloud in Z direction")
+            check.addCheckBox("Reduce point cloud in X direction")
+            check.addCheckBox("Reduce point cloud in Y direction")
+            check.addCheckBox("Reduce point cloud in Z direction")
             check.Box(0).Checked = True
             check.Box(1).Checked = True
+            check.Box(2).Checked = True
         End If
         redOptions.ColorReductionSlider.Maximum = 1000
         redOptions.ColorReductionSlider.Value = 400
         desc = "Use reduction to slice the point cloud in 3 dimensions"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim input = src.Clone
-        If input.Type <> cv.MatType.CV_32FC3 Then input = task.pointCloud.Clone
-        For i = 0 To task.pcSplit.Length - 1
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        Dim split = src.Split()
+        For i = 0 To split.Length - 1
             If check.Box(i).Checked Then
-                task.pcSplit(i) *= 1000
-                task.pcSplit(i).ConvertTo(input, cv.MatType.CV_32S)
-                reduction.Run(input)
-                reduction.dst2.ConvertTo(task.pcSplit(i), cv.MatType.CV_32F)
-                task.pcSplit(i) *= 0.001
+                split(i) *= 1000
+                split(i).ConvertTo(dst0, cv.MatType.CV_32S)
+                reduction.Run(dst0)
+                Dim mm = vbMinMax(reduction.dst2)
+                reduction.dst2.ConvertTo(split(i), cv.MatType.CV_32F, 1, -mm.minVal)
+                split(i) *= 0.001
             End If
         Next
 
-        cv.Cv2.Merge(task.pcSplit, dst3)
-        setTrueText("Task.PointCloud has been reduced and is in dst3")
+        cv.Cv2.Merge(split, dst3)
+        setTrueText("Task.PointCloud (or 32fc3 input) has been reduced and is in dst3")
     End Sub
 End Class
 

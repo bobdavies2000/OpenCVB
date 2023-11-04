@@ -234,7 +234,6 @@ End Class
 
 Public Class RedCloud_Core : Inherits VB_Algorithm
     Public Sub New()
-        redOptions.EnableAllChannels(True)
         desc = "Reduction transform for the point cloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -530,7 +529,13 @@ Public Class RedCloud_CellStats : Inherits VB_Algorithm
             labels(2) = redC.labels(2)
         End If
 
-        If task.mouseClickFlag Then statsString(src) Else setTrueText("Click any RedCloud cell to see depth histogram here.", 1)
+        Static mouseclicked As Boolean
+        If task.mouseClickFlag Then mouseclicked = True
+        If mouseclicked Then
+            If heartBeat() Then statsString(src)
+        Else
+            setTrueText("Click any RedCloud cell to see depth histogram here.", 1)
+        End If
 
         setTrueText(strOut, 3)
         labels(1) = "Histogram plot for the cell's depth data - X-axis varies from 0 to " + CStr(CInt(task.maxZmeters)) + " meters"
@@ -1036,7 +1041,7 @@ Public Class RedCloud_CellsAtDepth : Inherits VB_Algorithm
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
 
-        Dim histBins = redOptions.HistBinSlider.Value
+        Dim histBins = gOptions.HistBinSlider.Value
         Dim slotList(histBins) As List(Of Integer)
         For i = 0 To slotList.Count - 1
             slotList(i) = New List(Of Integer)
@@ -1397,7 +1402,7 @@ End Class
 
 Public Class RedCloud_BProject3D : Inherits VB_Algorithm
     Dim colorC As New RedCloud_Basics
-    Dim bp3d As New Hist3DCloud_BP
+    Dim bp3d As New Hist3DCloud_Reduction
     Public Sub New()
         desc = "Run RedCloud_Basics on the output of the RGB 3D backprojection"
     End Sub

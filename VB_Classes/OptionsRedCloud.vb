@@ -1,4 +1,6 @@
-﻿Imports System.Windows.Controls
+﻿Imports System.Runtime.InteropServices
+Imports System.Windows.Controls
+Imports NAudio.Gui
 Imports cv = OpenCvSharp
 Public Class OptionsRedCloud
     Public colorInput As String = "Reduction_Basics"
@@ -71,29 +73,10 @@ Public Class OptionsRedCloud
         PCReduction = "XY Reduction"
         XYReduction.Checked = True
         GuidedBP_Depth.Checked = True
+        histBinList = {task.histogramBins, task.histogramBins}
 
         Me.Left = 0
         Me.Top = 0
-    End Sub
-    Public Sub EnableXYChannels()
-        EnableAllChannels(False)
-        XYReduction.Enabled = True
-        XZReduction.Enabled = True
-        YZReduction.Enabled = True
-        XYReduction.Checked = True
-    End Sub
-    Public Sub EnableAllChannels(TrueFalse As Boolean)
-        XReduction.Enabled = TrueFalse
-        YReduction.Enabled = TrueFalse
-        ZReduction.Enabled = TrueFalse
-        XYReduction.Enabled = TrueFalse
-        XZReduction.Enabled = TrueFalse
-        YZReduction.Enabled = TrueFalse
-        XYZReduction.Enabled = TrueFalse
-    End Sub
-    Private Sub HistBinSlider_ValueChanged(sender As Object, e As EventArgs) Handles HistBinSlider.ValueChanged
-        If task IsNot Nothing Then task.optionsChanged = True
-        histBins.Text = CStr(HistBinSlider.Value)
     End Sub
     Public Sub Sync()
         task.maxZmeters = gOptions.MaxDepth.Value + 0.01 ' why add a cm?  Because histograms are exclusive on ranges.
@@ -109,7 +92,51 @@ Public Class OptionsRedCloud
 
         task.redThresholdSide = SideViewThreshold.Value
         task.redThresholdTop = TopViewThreshold.Value
+
+        Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
+        Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
+        Dim rz = New cv.Vec2f(0, task.maxZmeters)
+        channelCount = 1
+
+        Select Case redOptions.PCReduction
+            Case "X Reduction"
+                ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1)}
+                channels = {0}
+                histBinList = {task.histogramBins}
+            Case "Y Reduction"
+                ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1)}
+                channels = {1}
+                histBinList = {task.histogramBins}
+            Case "Z Reduction"
+                ranges = New cv.Rangef() {New cv.Rangef(rz.Item0, rz.Item1)}
+                channels = {2}
+                histBinList = {task.histogramBins}
+            Case "XY Reduction"
+                ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1)}
+                channelCount = 2
+                channels = {0, 1}
+                histBinList = {task.histogramBins, task.histogramBins}
+            Case "XZ Reduction"
+                ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+                channelCount = 2
+                channels = {0, 2}
+                histBinList = {task.histogramBins, task.histogramBins}
+            Case "YZ Reduction"
+                ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+                channelCount = 2
+                channels = {1, 2}
+                histBinList = {task.histogramBins, task.histogramBins}
+            Case "XYZ Reduction"
+                ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+                channelCount = 3
+                channels = {0, 1, 2}
+                histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
+        End Select
     End Sub
+
+
+
+
     Private Sub XRangeSlider_ValueChanged(sender As Object, e As EventArgs) Handles XRangeSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
         XLabel.Text = CStr(XRangeSlider.Value)
@@ -142,6 +169,10 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         colorInput = Reduction_Basics.Text
     End Sub
+
+
+
+
     Private Sub noColor_Input_CheckedChanged(sender As Object, e As EventArgs) Handles noColor_Input.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         colorInput = noColor_Input.Text
@@ -162,6 +193,10 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         ColorLabel.Text = CStr(ColorReductionSlider.Value)
     End Sub
+
+
+
+
     Private Sub BitwiseReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles BitwiseReductionSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
         bitwiseLabel.Text = CStr(BitwiseReductionSlider.Value)
@@ -180,63 +215,30 @@ Public Class OptionsRedCloud
     Private Sub XReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = XReduction.Text
-        ranges = New cv.Rangef() {New cv.Rangef(-task.xRangeDefault, task.xRangeDefault)}
-        channelCount = 1
-        histBinList = {HistBinSlider.Value}
     End Sub
     Private Sub YReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = YReduction.Text
-        ranges = New cv.Rangef() {New cv.Rangef(-task.yRangeDefault, task.yRangeDefault)}
-        channelCount = 1
-        histBinList = {HistBinSlider.Value}
     End Sub
     Private Sub ZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles ZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = ZReduction.Text
-        ranges = New cv.Rangef() {New cv.Rangef(0, task.maxZmeters)}
-        channelCount = 1
-        histBinList = {HistBinSlider.Value}
     End Sub
     Private Sub ReductionXY_CheckedChanged(sender As Object, e As EventArgs) Handles XYReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        channels = {0, 1}
         PCReduction = XYReduction.Text
-        Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
-        Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
-        ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1)}
-        channelCount = 2
-        histBinList = {HistBinSlider.Value, HistBinSlider.Value}
     End Sub
     Private Sub XZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = XZReduction.Text
-        channels = {0, 2}
-        Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
-        Dim rz = New cv.Vec2f(0, task.maxZmeters)
-        ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
-        channelCount = 2
-        histBinList = {HistBinSlider.Value, HistBinSlider.Value}
     End Sub
     Private Sub YZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = YZReduction.Text
-        channels = {1, 2}
-        Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
-        Dim rz = New cv.Vec2f(0, task.maxZmeters)
-        ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
-        channelCount = 2
-        histBinList = {HistBinSlider.Value, HistBinSlider.Value}
     End Sub
-    Private Sub XYZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XYZReduction.CheckedChanged
+    Public Sub XYZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XYZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = XYZReduction.Text
-        Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
-        Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
-        Dim rz = New cv.Vec2f(0, task.maxZmeters)
-        ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
-        channelCount = 3
-        histBinList = {HistBinSlider.Value, HistBinSlider.Value, HistBinSlider.Value}
     End Sub
 
 

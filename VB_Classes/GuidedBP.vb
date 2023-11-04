@@ -1129,7 +1129,7 @@ Public Class GuidedBP_DepthNew : Inherits VB_Algorithm
     Public hist As New PointCloud_Histograms
     Dim myPalette As New Palette_Random
     Public Sub New()
-        redOptions.HistBinSlider.Value = 15
+        gOptions.HistBinSlider.Value = 15
         desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
     End Sub
     Public Sub RunVB(src As cv.Mat)

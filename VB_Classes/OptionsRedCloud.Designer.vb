@@ -38,9 +38,6 @@ Partial Class OptionsRedCloud
         Me.XLabel = New System.Windows.Forms.Label()
         Me.XRangeSlider = New System.Windows.Forms.TrackBar()
         Me.Label2 = New System.Windows.Forms.Label()
-        Me.histBins = New System.Windows.Forms.Label()
-        Me.HistBinSlider = New System.Windows.Forms.TrackBar()
-        Me.RedCloudHistBins = New System.Windows.Forms.Label()
         Me.RGBSource = New System.Windows.Forms.GroupBox()
         Me.noColor_Input = New System.Windows.Forms.RadioButton()
         Me.KMeans_Basics = New System.Windows.Forms.RadioButton()
@@ -79,7 +76,6 @@ Partial Class OptionsRedCloud
         CType(Me.SideViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.XRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.RGBSource.SuspendLayout()
         Me.GroupReduction.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -107,19 +103,16 @@ Partial Class OptionsRedCloud
         Me.RedCloudSliders.Controls.Add(Me.XLabel)
         Me.RedCloudSliders.Controls.Add(Me.XRangeSlider)
         Me.RedCloudSliders.Controls.Add(Me.Label2)
-        Me.RedCloudSliders.Controls.Add(Me.histBins)
-        Me.RedCloudSliders.Controls.Add(Me.HistBinSlider)
-        Me.RedCloudSliders.Controls.Add(Me.RedCloudHistBins)
         Me.RedCloudSliders.Location = New System.Drawing.Point(12, 12)
         Me.RedCloudSliders.Name = "RedCloudSliders"
-        Me.RedCloudSliders.Size = New System.Drawing.Size(831, 432)
+        Me.RedCloudSliders.Size = New System.Drawing.Size(831, 380)
         Me.RedCloudSliders.TabIndex = 2
         Me.RedCloudSliders.TabStop = False
         '
         'GridsizeLabel
         '
         Me.GridsizeLabel.AutoSize = True
-        Me.GridsizeLabel.Location = New System.Drawing.Point(667, 380)
+        Me.GridsizeLabel.Location = New System.Drawing.Point(667, 319)
         Me.GridsizeLabel.Name = "GridsizeLabel"
         Me.GridsizeLabel.Size = New System.Drawing.Size(57, 20)
         Me.GridsizeLabel.TabIndex = 23
@@ -127,7 +120,7 @@ Partial Class OptionsRedCloud
         '
         'GridSizeSlider
         '
-        Me.GridSizeSlider.Location = New System.Drawing.Point(156, 374)
+        Me.GridSizeSlider.Location = New System.Drawing.Point(156, 313)
         Me.GridSizeSlider.Maximum = 200
         Me.GridSizeSlider.Minimum = 3
         Me.GridSizeSlider.Name = "GridSizeSlider"
@@ -138,7 +131,7 @@ Partial Class OptionsRedCloud
         '
         'Label3
         '
-        Me.Label3.Location = New System.Drawing.Point(8, 380)
+        Me.Label3.Location = New System.Drawing.Point(8, 319)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(151, 48)
         Me.Label3.TabIndex = 21
@@ -147,7 +140,7 @@ Partial Class OptionsRedCloud
         'TopLabel
         '
         Me.TopLabel.AutoSize = True
-        Me.TopLabel.Location = New System.Drawing.Point(667, 305)
+        Me.TopLabel.Location = New System.Drawing.Point(667, 244)
         Me.TopLabel.Name = "TopLabel"
         Me.TopLabel.Size = New System.Drawing.Size(57, 20)
         Me.TopLabel.TabIndex = 20
@@ -155,7 +148,7 @@ Partial Class OptionsRedCloud
         '
         'TopViewThreshold
         '
-        Me.TopViewThreshold.Location = New System.Drawing.Point(156, 299)
+        Me.TopViewThreshold.Location = New System.Drawing.Point(156, 238)
         Me.TopViewThreshold.Maximum = 200
         Me.TopViewThreshold.Minimum = 3
         Me.TopViewThreshold.Name = "TopViewThreshold"
@@ -166,7 +159,7 @@ Partial Class OptionsRedCloud
         '
         'Label6
         '
-        Me.Label6.Location = New System.Drawing.Point(8, 305)
+        Me.Label6.Location = New System.Drawing.Point(8, 244)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(151, 48)
         Me.Label6.TabIndex = 18
@@ -175,7 +168,7 @@ Partial Class OptionsRedCloud
         'SideLabel
         '
         Me.SideLabel.AutoSize = True
-        Me.SideLabel.Location = New System.Drawing.Point(667, 230)
+        Me.SideLabel.Location = New System.Drawing.Point(667, 169)
         Me.SideLabel.Name = "SideLabel"
         Me.SideLabel.Size = New System.Drawing.Size(57, 20)
         Me.SideLabel.TabIndex = 17
@@ -183,7 +176,7 @@ Partial Class OptionsRedCloud
         '
         'SideViewThreshold
         '
-        Me.SideViewThreshold.Location = New System.Drawing.Point(156, 224)
+        Me.SideViewThreshold.Location = New System.Drawing.Point(156, 163)
         Me.SideViewThreshold.Maximum = 200
         Me.SideViewThreshold.Minimum = 3
         Me.SideViewThreshold.Name = "SideViewThreshold"
@@ -194,7 +187,7 @@ Partial Class OptionsRedCloud
         '
         'Label8
         '
-        Me.Label8.Location = New System.Drawing.Point(8, 230)
+        Me.Label8.Location = New System.Drawing.Point(8, 169)
         Me.Label8.Name = "Label8"
         Me.Label8.Size = New System.Drawing.Size(151, 43)
         Me.Label8.TabIndex = 15
@@ -203,7 +196,7 @@ Partial Class OptionsRedCloud
         'YLabel
         '
         Me.YLabel.AutoSize = True
-        Me.YLabel.Location = New System.Drawing.Point(667, 166)
+        Me.YLabel.Location = New System.Drawing.Point(667, 105)
         Me.YLabel.Name = "YLabel"
         Me.YLabel.Size = New System.Drawing.Size(57, 20)
         Me.YLabel.TabIndex = 14
@@ -211,7 +204,7 @@ Partial Class OptionsRedCloud
         '
         'YRangeSlider
         '
-        Me.YRangeSlider.Location = New System.Drawing.Point(156, 160)
+        Me.YRangeSlider.Location = New System.Drawing.Point(156, 99)
         Me.YRangeSlider.Maximum = 1000
         Me.YRangeSlider.Minimum = 3
         Me.YRangeSlider.Name = "YRangeSlider"
@@ -223,7 +216,7 @@ Partial Class OptionsRedCloud
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(8, 166)
+        Me.Label4.Location = New System.Drawing.Point(8, 105)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(115, 20)
         Me.Label4.TabIndex = 12
@@ -232,7 +225,7 @@ Partial Class OptionsRedCloud
         'XLabel
         '
         Me.XLabel.AutoSize = True
-        Me.XLabel.Location = New System.Drawing.Point(667, 91)
+        Me.XLabel.Location = New System.Drawing.Point(667, 30)
         Me.XLabel.Name = "XLabel"
         Me.XLabel.Size = New System.Drawing.Size(57, 20)
         Me.XLabel.TabIndex = 11
@@ -240,7 +233,7 @@ Partial Class OptionsRedCloud
         '
         'XRangeSlider
         '
-        Me.XRangeSlider.Location = New System.Drawing.Point(156, 85)
+        Me.XRangeSlider.Location = New System.Drawing.Point(156, 24)
         Me.XRangeSlider.Maximum = 1000
         Me.XRangeSlider.Minimum = 3
         Me.XRangeSlider.Name = "XRangeSlider"
@@ -252,39 +245,11 @@ Partial Class OptionsRedCloud
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(8, 91)
+        Me.Label2.Location = New System.Drawing.Point(8, 30)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(115, 20)
         Me.Label2.TabIndex = 9
         Me.Label2.Text = "X-Range X100"
-        '
-        'histBins
-        '
-        Me.histBins.AutoSize = True
-        Me.histBins.Location = New System.Drawing.Point(667, 24)
-        Me.histBins.Name = "histBins"
-        Me.histBins.Size = New System.Drawing.Size(65, 20)
-        Me.histBins.TabIndex = 8
-        Me.histBins.Text = "histBins"
-        '
-        'HistBinSlider
-        '
-        Me.HistBinSlider.Location = New System.Drawing.Point(156, 18)
-        Me.HistBinSlider.Maximum = 200
-        Me.HistBinSlider.Minimum = 3
-        Me.HistBinSlider.Name = "HistBinSlider"
-        Me.HistBinSlider.Size = New System.Drawing.Size(506, 69)
-        Me.HistBinSlider.TabIndex = 7
-        Me.HistBinSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.HistBinSlider.Value = 5
-        '
-        'RedCloudHistBins
-        '
-        Me.RedCloudHistBins.Location = New System.Drawing.Point(8, 24)
-        Me.RedCloudHistBins.Name = "RedCloudHistBins"
-        Me.RedCloudHistBins.Size = New System.Drawing.Size(151, 45)
-        Me.RedCloudHistBins.TabIndex = 6
-        Me.RedCloudHistBins.Text = "RedCloud Histogram Bins"
         '
         'RGBSource
         '
@@ -360,7 +325,7 @@ Partial Class OptionsRedCloud
         Me.GroupReduction.Controls.Add(Me.NoReduction)
         Me.GroupReduction.Controls.Add(Me.BitwiseReduction)
         Me.GroupReduction.Controls.Add(Me.SimpleReduction)
-        Me.GroupReduction.Location = New System.Drawing.Point(1364, 44)
+        Me.GroupReduction.Location = New System.Drawing.Point(1088, 250)
         Me.GroupReduction.Name = "GroupReduction"
         Me.GroupReduction.Size = New System.Drawing.Size(250, 130)
         Me.GroupReduction.TabIndex = 5
@@ -411,7 +376,7 @@ Partial Class OptionsRedCloud
         Me.GroupBox3.Controls.Add(Me.ColorLabel)
         Me.GroupBox3.Controls.Add(Me.ColorReductionSlider)
         Me.GroupBox3.Controls.Add(Me.ColorReduce)
-        Me.GroupBox3.Location = New System.Drawing.Point(849, 384)
+        Me.GroupBox3.Location = New System.Drawing.Point(12, 398)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Size = New System.Drawing.Size(831, 236)
         Me.GroupBox3.TabIndex = 6
@@ -601,9 +566,9 @@ Partial Class OptionsRedCloud
         Me.GroupBox1.Controls.Add(Me.NoPointcloudData)
         Me.GroupBox1.Controls.Add(Me.RedCloud_Core)
         Me.GroupBox1.Controls.Add(Me.GuidedBP_Depth)
-        Me.GroupBox1.Location = New System.Drawing.Point(1088, 242)
+        Me.GroupBox1.Location = New System.Drawing.Point(861, 341)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(250, 144)
+        Me.GroupBox1.Size = New System.Drawing.Size(221, 144)
         Me.GroupBox1.TabIndex = 5
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "RedCloud Depth Source"
@@ -645,7 +610,7 @@ Partial Class OptionsRedCloud
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1690, 632)
+        Me.ClientSize = New System.Drawing.Size(1690, 642)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.RedCloudOnly)
         Me.Controls.Add(Me.GroupBox3)
@@ -661,7 +626,6 @@ Partial Class OptionsRedCloud
         CType(Me.SideViewThreshold, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.XRangeSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.RGBSource.ResumeLayout(False)
         Me.RGBSource.PerformLayout()
         Me.GroupReduction.ResumeLayout(False)
@@ -679,9 +643,6 @@ Partial Class OptionsRedCloud
 
     End Sub
     Friend WithEvents RedCloudSliders As Windows.Forms.GroupBox
-    Friend WithEvents histBins As Windows.Forms.Label
-    Friend WithEvents HistBinSlider As Windows.Forms.TrackBar
-    Friend WithEvents RedCloudHistBins As Windows.Forms.Label
     Friend WithEvents RGBSource As Windows.Forms.GroupBox
     Friend WithEvents KMeans_Basics As Windows.Forms.RadioButton
     Friend WithEvents LUT_Basics As Windows.Forms.RadioButton

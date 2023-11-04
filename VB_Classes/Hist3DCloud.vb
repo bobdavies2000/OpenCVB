@@ -13,7 +13,6 @@ Public Class Hist3DCloud_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Dim bins = gOptions.HistBinSlider.Value
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-        If redOptions.XYZReduction.Checked = False Then redOptions.XYZReduction.Checked = True
 
         Dim histInput(src.Total * 3 - 1) As Single
         Marshal.Copy(src.Data, histInput, 0, histInput.Length)
@@ -109,7 +108,7 @@ End Class
 
 
 
-Public Class Hist3DCloud_BP : Inherits VB_Algorithm
+Public Class Hist3DCloud_Reduction : Inherits VB_Algorithm
     Dim hist3d As New Hist3DCloud_Basics
     Dim reduction As New Reduction_XYZ
     Public Sub New()

@@ -312,7 +312,7 @@ End Class
 
 Public Class RedColor_Histogram3DBP : Inherits VB_Algorithm
     Dim fCell As New RedColor_Basics
-    Dim color As New Hist3DCloud_BP
+    Dim color As New Hist3DCloud_Reduction
     Public Sub New()
         desc = "Use the backprojection of the 3D RGB histogram as input to RedColor_Basics."
     End Sub
@@ -323,6 +323,7 @@ Public Class RedColor_Histogram3DBP : Inherits VB_Algorithm
 
         fCell.Run(dst2)
         dst3 = fCell.dst2
+        dst3.SetTo(0, task.noDepthMask)
         labels(3) = fCell.labels(2)
     End Sub
 End Class
