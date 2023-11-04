@@ -101,7 +101,7 @@ End Class
 
 Public Class Image_RedCloudColor : Inherits VB_Algorithm
     Public images As New Image_Series
-    Public redc As New RedCloud_ColorOnly
+    Public redC As New RedCloud_ColorOnly
     Public Sub New()
         If standalone Then gOptions.displayDst0.Checked = True
         If standalone Then gOptions.displayDst1.Checked = True
@@ -112,15 +112,15 @@ Public Class Image_RedCloudColor : Inherits VB_Algorithm
         dst0 = images.dst2.Clone
         dst1 = images.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        redc.Run(dst0)
-        dst2 = redc.dst2
+        redC.Run(dst0)
+        dst2 = redC.dst2
 
         Dim mask = task.cellMap.InRange(task.redOther, task.redOther)
         dst2.SetTo(cv.Scalar.Black, mask)
 
-        redc.colorC.redSelect(dst0, dst1, dst2)
+        redC.redC.redSelect(dst0, dst1, dst2)
 
-        labels(2) = redc.labels(2)
+        labels(2) = redC.labels(2)
     End Sub
 End Class
 

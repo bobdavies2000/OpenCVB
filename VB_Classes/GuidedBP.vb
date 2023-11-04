@@ -378,7 +378,6 @@ Public Class GuidedBP_Delaunay : Inherits VB_Algorithm
     Public kWare As New GuidedBP_Hulls
     Dim delaunay As New Delaunay_Basics
     Public kCells As New List(Of kwData)
-    Dim colorC As New RedCloud_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Use Delaunay to create regions from objects"
@@ -1075,57 +1074,7 @@ End Class
 
 
 
-
-'Public Class GuidedBP_Depth : Inherits VB_Algorithm
-'    Public hist2d As New Histogram2D_PointCloud
-'    Dim opAuto As New OpAuto_GuidedBP
-'    Dim myPalette As New Palette_Random
-'    Public Sub New()
-'        redOptions.HistBinSlider.Value = 15
-'        desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-
-'        hist2d.Run(src)
-
-'        Dim samples(hist2d.histogram.Total - 1) As Single
-'        Marshal.Copy(hist2d.histogram.Data, samples, 0, samples.Length)
-
-'        Dim histList = samples.ToList
-'        samples(histList.IndexOf(histList.Max)) = 0
-
-'        opAuto.nonzeroSamples = 0
-'        For i = 0 To samples.Count - 1
-'            If samples(i) > 0 Then
-'                opAuto.nonZeroSamples += 1
-'                ' this is where the histogram is doctored to create the different regions
-'                samples(i) = If(opAuto.nonZeroSamples <= 255, 255 - opAuto.nonZeroSamples, 0)
-'            End If
-'        Next
-
-'        opAuto.runvb(Nothing)
-
-'        Marshal.Copy(samples, 0, hist2d.histogram.Data, samples.Length)
-
-'        cv.Cv2.CalcBackProject({src}, redOptions.channels, hist2d.histogram, dst2, hist2d.ranges)
-'        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-
-'        If standalone Or testIntermediate(traceName) Then
-'            myPalette.Run(dst2)
-'            dst3 = myPalette.dst2
-'        End If
-'    End Sub
-'End Class
-
-
-
-
-
-
-
-
-Public Class GuidedBP_DepthNew : Inherits VB_Algorithm
+Public Class GuidedBP_Depth : Inherits VB_Algorithm
     Public hist As New PointCloud_Histograms
     Dim myPalette As New Palette_Random
     Public Sub New()
@@ -1154,12 +1103,17 @@ Public Class GuidedBP_DepthNew : Inherits VB_Algorithm
 
         Marshal.Copy(samples, 0, hist.histogram.Data, samples.Length)
 
-        cv.Cv2.CalcBackProject({src}, redOptions.channels, hist.histogram, dst2, redOptions.ranges)
-        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        If redOptions.PCReduction = "XYZReduction" And redOptions.channelCount <> 3 Then
+            dst2.SetTo(0)
+            setTrueText("3D histogram requested but channels and ranges are not set correctly.", 2)
+        Else
+            cv.Cv2.CalcBackProject({src}, redOptions.channels, hist.histogram, dst2, redOptions.ranges)
+            dst2.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        If standalone Or testIntermediate(traceName) Then
-            myPalette.Run(dst2)
-            dst3 = myPalette.dst2
+            If standalone Or testIntermediate(traceName) Then
+                myPalette.Run(dst2)
+                dst3 = myPalette.dst2
+            End If
         End If
     End Sub
 End Class

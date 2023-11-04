@@ -512,31 +512,6 @@ End Class
 
 
 
-'Public Class RedCloud_MinRes : Inherits VB_Algorithm
-'    Public redC As New RedCloud_Basics
-'    Dim grid As New Grid_Basics
-'    Public Sub New()
-'        desc = "Compute the RedCloud_Basics cells at minimum resolution."
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        dst1 = vbMinResize(task.pointCloud)
-'        grid.Run(dst1)
-
-'        redC.Run(dst1)
-'        dst2 = redC.dst2
-'        If heartBeat() Then labels(2) = redC.labels(2)
-'    End Sub
-'End Class
-
-
-
-
-
-
-
-
-
-
 Public Class RedCloud_Hulls : Inherits VB_Algorithm
     Dim convex As New Convex_RedCloudDefects
     Dim redC As New RedCloud_Basics
@@ -639,7 +614,7 @@ End Class
 
 
 Public Class RedCloud_FeatureLess : Inherits VB_Algorithm
-    Public colorC As New RedCloud_Basics
+    Public redC As New RedCloud_Basics
     Dim fLess As New FeatureLess_Basics
     Public lastCells As New List(Of rcData)
     Public Sub New()
@@ -648,8 +623,8 @@ Public Class RedCloud_FeatureLess : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         fLess.Run(src)
-        colorC.Run(fLess.dst2)
-        dst2 = colorC.dst2
+        redC.Run(fLess.dst2)
+        dst2 = redC.dst2
 
         lastCells = task.redCells
         labels(2) = CStr(task.redCells.Count) + " cells detected by " + traceName
@@ -858,7 +833,7 @@ End Class
 
 
 Public Class RedCloud_ColorOnly : Inherits VB_Algorithm
-    Public colorC As New RedCloud_Basics
+    Public redC As New RedCloud_Basics
     Dim colorCells As New List(Of rcData)
     Dim colorMap As New cv.Mat
     Public Sub New()
@@ -872,14 +847,14 @@ Public Class RedCloud_ColorOnly : Inherits VB_Algorithm
         task.redCells = New List(Of rcData)(colorCells)
         task.cellMap = colorMap.Clone
 
-        colorC.Run(src)
-        dst2 = colorC.dst2
-        dst3 = colorC.dst3
+        redC.Run(src)
+        dst2 = redC.dst2
+        dst3 = redC.dst3
 
         If standalone Then
             dst0 = src
             dst1 = task.depthRGB
-            colorC.redSelect(dst0, dst1, dst2)
+            redC.redSelect(dst0, dst1, dst2)
         End If
 
         colorCells = New List(Of rcData)(task.redCells)
@@ -1272,7 +1247,7 @@ End Class
 
 
 Public Class RedCloud_ColorAndCloud : Inherits VB_Algorithm
-    Dim guided As New GuidedBP_DepthNew
+    Dim guided As New GuidedBP_Depth
     Public fCell As New RedColor_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
@@ -1303,17 +1278,19 @@ End Class
 
 
 Public Class RedCloud_BProject3D : Inherits VB_Algorithm
-    Dim colorC As New RedCloud_Basics
-    Dim bp3d As New Hist3DCloud_Reduction
+    Dim redC As New RedCloud_Basics
+    Dim hist3D As New Hist3DCloud_Basics
     Public Sub New()
+        hist3D.runBackProject = True
         desc = "Run RedCloud_Basics on the output of the RGB 3D backprojection"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        bp3d.Run(src)
-        dst3 = bp3d.dst2
+        hist3D.Run(src)
+        dst3 = hist3D.dst2
 
-        colorC.Run(dst3)
-        dst2 = colorC.dst2
+        dst3.ConvertTo(dst0, cv.MatType.CV_8U)
+        redC.Run(dst0)
+        dst2 = redC.dst2
     End Sub
 End Class
 
@@ -1390,7 +1367,7 @@ End Class
 
 
 Public Class RedCloud_ByDepth : Inherits VB_Algorithm
-    Dim colorC As New RedCloud_Basics
+    Dim redC As New RedCloud_Basics
     Dim depth As New Depth_Tiers
     Public Sub New()
         desc = "Run RedCloud with depth layers - a reduced image view"
@@ -1399,10 +1376,10 @@ Public Class RedCloud_ByDepth : Inherits VB_Algorithm
         depth.Run(src)
         dst3 = depth.dst2
 
-        colorC.Run(dst3)
-        dst2 = colorC.dst2
+        redC.Run(dst3)
+        dst2 = redC.dst2
         dst2.SetTo(0, task.noDepthMask)
-        labels = colorC.labels
+        labels = redC.labels
     End Sub
 End Class
 
@@ -1682,7 +1659,7 @@ Public Class RedCloud_ProjectCell : Inherits VB_Algorithm
     Dim topView As New Histogram_ShapeTop
     Dim sideView As New Histogram_ShapeSide
     Dim mats As New Mat_4Click
-    Dim colorC As New RedCloud_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
@@ -1691,10 +1668,10 @@ Public Class RedCloud_ProjectCell : Inherits VB_Algorithm
         desc = "Visualize the top and side projection of a RedCloud cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        colorC.Run(src)
-        dst1 = colorC.dst2
+        redC.Run(src)
+        dst1 = redC.dst2
 
-        labels(2) = colorC.labels(2)
+        labels(2) = redC.labels(2)
 
         Dim rc = task.rcSelect
 
@@ -2118,15 +2095,15 @@ End Class
 
 
 Public Class RedCloud_PlaneEq3D : Inherits VB_Algorithm
-    Dim colorC As New RedCloud_Basics
+    Dim redC As New RedCloud_Basics
     Dim eq As New Plane_Equation
     Public Sub New()
         desc = "If a RedColor cell contains depth then build a plane equation"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        colorC.Run(src)
-        dst2 = colorC.dst2
-        labels(2) = colorC.labels(2)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
 
         Dim rc = task.rcSelect
         If rc.maxVec.Z Then
@@ -2154,7 +2131,7 @@ End Class
 
 Public Class RedCloud_DelaunayGuidedFeatures : Inherits VB_Algorithm
     Dim features As New Feature_PointsDelaunay
-    Dim colorC As New RedCloud_Basics
+    Dim redC As New RedCloud_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         labels = {"Latest GoodFeatures highlighted", "Format CV_32S of Delaunay data", "Stable points tracked - Colors from dst3", "RedCloud Output of Delaunay data"}
@@ -2164,8 +2141,8 @@ Public Class RedCloud_DelaunayGuidedFeatures : Inherits VB_Algorithm
         features.Run(src)
         dst1 = features.dst3
 
-        colorC.Run(dst1)
-        dst2 = colorC.dst2
+        redC.Run(dst1)
+        dst2 = redC.dst2
 
         Static goodList As New List(Of List(Of cv.Point2f))
         If heartBeat() Then goodList.Clear()
@@ -2262,7 +2239,7 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
-            Static guided As New GuidedBP_DepthNew
+            Static guided As New GuidedBP_Depth
             guided.Run(src)
             src = guided.dst2
             src.ConvertTo(src, cv.MatType.CV_8U)
@@ -2334,7 +2311,7 @@ Public Class RedCloud_Flood_CPP : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
-            Static guided As New GuidedBP_DepthNew
+            Static guided As New GuidedBP_Depth
             guided.Run(src)
             src = guided.dst2
             src.ConvertTo(src, cv.MatType.CV_8U)
@@ -2402,7 +2379,7 @@ End Class
 
 Public Class RedCloud_InputCloud : Inherits VB_Algorithm
     Dim prep As New RedCloud_Core
-    Public guided As New GuidedBP_DepthNew
+    Public guided As New GuidedBP_Depth
     Public Sub New()
         desc = "Build the reduced pointcloud or doctored back projection input to RedCloud/RedCell"
     End Sub
@@ -2410,7 +2387,6 @@ Public Class RedCloud_InputCloud : Inherits VB_Algorithm
         Select Case redOptions.depthInput
             Case "GuidedBP_Depth"
                 guided.Run(src)
-                Dim maskOfDepth = guided.dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
                 dst2 = guided.dst2
             Case "RedCloud_Core"
                 prep.Run(src)
