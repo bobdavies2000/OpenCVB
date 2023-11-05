@@ -37,7 +37,7 @@ Public Class Depth_Basics : Inherits VB_Algorithm
             If gOptions.useHistoryCloud.Checked Then
                 task.historyCount = gOptions.FrameHistory.Value
                 hCloud.Run(task.pointCloud)
-                task.pointCloud = hCloud.dst2
+                If task.frameCount >= task.historyCount Then task.pointCloud = hCloud.dst2
 
                 task.pcSplit = task.pointCloud.Split
                 task.maxDepthMask = task.pcSplit(2).Threshold(maxD, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()

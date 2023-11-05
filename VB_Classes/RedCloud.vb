@@ -209,12 +209,12 @@ End Class
 
 Public Class RedCloud_Core : Inherits VB_Algorithm
     Public Sub New()
-        redOptions.SimpleReductionSlider.Maximum = 2500
-        redOptions.SimpleReductionSlider.Value = 250
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("RedCloud Reduction", 1, 2500, 250)
         desc = "Reduction transform for the point cloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim reduceAmt = redOptions.SimpleReductionSlider.Value
+        Static reductionSlider = findSlider("RedCloud Reduction")
+        Dim reduceAmt = reductionSlider.value
         task.pointCloud.ConvertTo(dst0, cv.MatType.CV_32S, 1000 / reduceAmt)
 
         Dim split = dst0.Split()
@@ -2380,7 +2380,6 @@ End Class
 
 
 Public Class RedCloud_InputCloud : Inherits VB_Algorithm
-    Dim prep As New RedCloud_Core
     Public guided As New GuidedBP_Depth
     Public Sub New()
         desc = "Build the reduced pointcloud or doctored back projection input to RedCloud/RedCell"
@@ -2390,10 +2389,8 @@ Public Class RedCloud_InputCloud : Inherits VB_Algorithm
             Case "GuidedBP_Depth"
                 guided.Run(src)
                 dst2 = guided.dst2
-            Case "RedCloud_Core"
-                prep.Run(src)
-                dst2 = prep.dst2
-            Case "No Pointcloud Data"
+            Case "RedCloud_Core", "No Pointcloud Data"
+                Static prep As New RedCloud_Core
                 prep.Run(src)
                 dst2 = prep.dst2
         End Select

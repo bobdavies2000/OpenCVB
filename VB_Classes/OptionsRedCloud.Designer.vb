@@ -23,9 +23,6 @@ Partial Class OptionsRedCloud
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.RedCloudSliders = New System.Windows.Forms.GroupBox()
-        Me.GridsizeLabel = New System.Windows.Forms.Label()
-        Me.GridSizeSlider = New System.Windows.Forms.TrackBar()
-        Me.Label3 = New System.Windows.Forms.Label()
         Me.TopLabel = New System.Windows.Forms.Label()
         Me.TopViewThreshold = New System.Windows.Forms.TrackBar()
         Me.Label6 = New System.Windows.Forms.Label()
@@ -68,7 +65,6 @@ Partial Class OptionsRedCloud
         Me.RedCloud_Core = New System.Windows.Forms.RadioButton()
         Me.GuidedBP_Depth = New System.Windows.Forms.RadioButton()
         Me.RedCloudSliders.SuspendLayout()
-        CType(Me.GridSizeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TopViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SideViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -84,9 +80,6 @@ Partial Class OptionsRedCloud
         '
         'RedCloudSliders
         '
-        Me.RedCloudSliders.Controls.Add(Me.GridsizeLabel)
-        Me.RedCloudSliders.Controls.Add(Me.GridSizeSlider)
-        Me.RedCloudSliders.Controls.Add(Me.Label3)
         Me.RedCloudSliders.Controls.Add(Me.TopLabel)
         Me.RedCloudSliders.Controls.Add(Me.TopViewThreshold)
         Me.RedCloudSliders.Controls.Add(Me.Label6)
@@ -101,37 +94,9 @@ Partial Class OptionsRedCloud
         Me.RedCloudSliders.Controls.Add(Me.Label2)
         Me.RedCloudSliders.Location = New System.Drawing.Point(12, 12)
         Me.RedCloudSliders.Name = "RedCloudSliders"
-        Me.RedCloudSliders.Size = New System.Drawing.Size(831, 390)
+        Me.RedCloudSliders.Size = New System.Drawing.Size(831, 315)
         Me.RedCloudSliders.TabIndex = 2
         Me.RedCloudSliders.TabStop = False
-        '
-        'GridsizeLabel
-        '
-        Me.GridsizeLabel.AutoSize = True
-        Me.GridsizeLabel.Location = New System.Drawing.Point(667, 319)
-        Me.GridsizeLabel.Name = "GridsizeLabel"
-        Me.GridsizeLabel.Size = New System.Drawing.Size(57, 20)
-        Me.GridsizeLabel.TabIndex = 23
-        Me.GridsizeLabel.Text = "Label5"
-        '
-        'GridSizeSlider
-        '
-        Me.GridSizeSlider.Location = New System.Drawing.Point(156, 313)
-        Me.GridSizeSlider.Maximum = 200
-        Me.GridSizeSlider.Minimum = 3
-        Me.GridSizeSlider.Name = "GridSizeSlider"
-        Me.GridSizeSlider.Size = New System.Drawing.Size(506, 69)
-        Me.GridSizeSlider.TabIndex = 22
-        Me.GridSizeSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.GridSizeSlider.Value = 10
-        '
-        'Label3
-        '
-        Me.Label3.Location = New System.Drawing.Point(8, 319)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(151, 48)
-        Me.Label3.TabIndex = 21
-        Me.Label3.Text = "BackProjection Grid Size"
         '
         'TopLabel
         '
@@ -585,7 +550,6 @@ Partial Class OptionsRedCloud
         Me.Text = "OptionsRedCloud"
         Me.RedCloudSliders.ResumeLayout(False)
         Me.RedCloudSliders.PerformLayout()
-        CType(Me.GridSizeSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TopViewThreshold, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.SideViewThreshold, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.YRangeSlider, System.ComponentModel.ISupportInitialize).EndInit()
@@ -623,9 +587,6 @@ Partial Class OptionsRedCloud
     Friend WithEvents SideLabel As Windows.Forms.Label
     Friend WithEvents SideViewThreshold As Windows.Forms.TrackBar
     Friend WithEvents Label8 As Windows.Forms.Label
-    Friend WithEvents GridsizeLabel As Windows.Forms.Label
-    Friend WithEvents GridSizeSlider As Windows.Forms.TrackBar
-    Friend WithEvents Label3 As Windows.Forms.Label
     Friend WithEvents ReductionTypeGroup As Windows.Forms.GroupBox
     Friend WithEvents BitwiseReduction As Windows.Forms.RadioButton
     Friend WithEvents SimpleReduction As Windows.Forms.RadioButton

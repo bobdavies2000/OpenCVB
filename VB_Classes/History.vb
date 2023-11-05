@@ -196,7 +196,6 @@ End Class
 
 
 Public Class History_Cloud : Inherits VB_Algorithm
-    Public sum8u As New History_Sum8uNoSaturation
     Public Sub New()
         desc = "Create a frame history and sum the last X task.pointcloud's"
     End Sub
@@ -218,8 +217,5 @@ Public Class History_Cloud : Inherits VB_Algorithm
         saveFrames.Add(src)
         dst3 = src + dst3
         dst2 = dst3 / saveFrames.Count
-
-        sum8u.Run(task.depthMask)
-        dst2.SetTo(0, Not sum8u.dst2)
     End Sub
 End Class
