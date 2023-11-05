@@ -129,11 +129,13 @@ Public Class OptionsRedCloud
                 histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
         End Select
 
-        ReductionSliders.Enabled = colorInput = "Reduction_Basics"
-        ReductionTypeGroup.Enabled = ReductionSliders.Enabled
-
-        SimpleReductionSlider.Enabled = reductionType = "Use Simple Reduction"
-        BitwiseReductionSlider.Enabled = reductionType = "Use Bitwise Reduction"
+        Dim testVal = colorInput = "Reduction_Basics" Or depthInput = "RedCloud_Core"
+        ReductionSliders.Enabled = testVal
+        ReductionTypeGroup.Enabled = testVal
+        If testVal Then
+            SimpleReductionSlider.Enabled = reductionType = "Use Simple Reduction"
+            BitwiseReductionSlider.Enabled = reductionType = "Use Bitwise Reduction"
+        End If
     End Sub
 
 
