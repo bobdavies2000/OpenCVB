@@ -45,7 +45,7 @@ Public Class Photon_Test : Inherits VB_Algorithm
         desc = ""
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        redOptions.ColorReductionSlider.Value = 64 ' for now...
+        redOptions.SimpleReductionSlider.Value = 64 ' for now...
         Dim reduce = 64
 
         reduction.Run(src)

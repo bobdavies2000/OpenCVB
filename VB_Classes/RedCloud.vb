@@ -209,10 +209,12 @@ End Class
 
 Public Class RedCloud_Core : Inherits VB_Algorithm
     Public Sub New()
+        redOptions.SimpleReductionSlider.Maximum = 2500
+        redOptions.SimpleReductionSlider.Value = 250
         desc = "Reduction transform for the point cloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim reduceAmt = redOptions.PCreductionSlider.Value
+        Dim reduceAmt = redOptions.SimpleReductionSlider.Value
         task.pointCloud.ConvertTo(dst0, cv.MatType.CV_32S, 1000 / reduceAmt)
 
         Dim split = dst0.Split()

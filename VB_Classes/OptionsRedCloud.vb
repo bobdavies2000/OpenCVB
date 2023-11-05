@@ -4,12 +4,8 @@ Imports NAudio.Gui
 Imports cv = OpenCvSharp
 Public Class OptionsRedCloud
     Public colorInput As String = "Reduction_Basics"
+    Public reductionType As String = "Use Simple Reduction"
     Public depthInput As String = "RedCloud_Core"
-
-    Public reduction As Integer ' 0 = simple, 1 = bitwise, 2 = none
-    Public Const simpleReduce As Integer = 0
-    Public Const bitwiseReduce As Integer = 1
-    Public Const noReduce As Integer = 2
 
     Public PCReduction As String
     Public channels() As Integer = {0, 1}
@@ -132,6 +128,12 @@ Public Class OptionsRedCloud
                 channels = {0, 1, 2}
                 histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
         End Select
+
+        ReductionSliders.Enabled = colorInput = "Reduction_Basics"
+        ReductionTypeGroup.Enabled = ReductionSliders.Enabled
+
+        SimpleReductionSlider.Enabled = reductionType = "Use Simple Reduction"
+        BitwiseReductionSlider.Enabled = reductionType = "Use Bitwise Reduction"
     End Sub
 
 
@@ -153,6 +155,10 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         TopLabel.Text = CStr(TopViewThreshold.Value)
     End Sub
+
+
+
+
     Private Sub RadioButton1_CheckedChanged(sender As Object, e As EventArgs) Handles BackProject_Full.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         colorInput = BackProject_Full.Text
@@ -169,45 +175,44 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         colorInput = Reduction_Basics.Text
     End Sub
-
-
-
-
     Private Sub noColor_Input_CheckedChanged(sender As Object, e As EventArgs) Handles noColor_Input.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         colorInput = noColor_Input.Text
     End Sub
+
+
+
+
     Private Sub SimpleReduction_CheckedChanged(sender As Object, e As EventArgs) Handles SimpleReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        reduction = simpleReduce
+        reductionType = SimpleReduction.Text
     End Sub
     Private Sub BitwiseReduction_CheckedChanged(sender As Object, e As EventArgs) Handles BitwiseReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        reduction = bitwiseReduce
+        reductionType = BitwiseReduction.Text
     End Sub
     Private Sub NoReduction_CheckedChanged(sender As Object, e As EventArgs) Handles NoReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        reduction = noReduce
+        reductionType = NoReduction.Text
     End Sub
-    Private Sub ColorReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles ColorReductionSlider.ValueChanged
+
+
+
+
+    Private Sub ColorReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles SimpleReductionSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        ColorLabel.Text = CStr(ColorReductionSlider.Value)
+        ColorLabel.Text = CStr(SimpleReductionSlider.Value)
     End Sub
-
-
-
-
     Private Sub BitwiseReductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles BitwiseReductionSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
         bitwiseLabel.Text = CStr(BitwiseReductionSlider.Value)
     End Sub
+
+
+
     Private Sub GridSizeBP_ValueChanged(sender As Object, e As EventArgs) Handles GridSizeSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
         GridsizeLabel.Text = CStr(GridSizeSlider.Value)
-    End Sub
-    Private Sub PCreductionSlider_ValueChanged(sender As Object, e As EventArgs) Handles PCreductionSlider.ValueChanged
-        If task IsNot Nothing Then task.optionsChanged = True
-        PCreductionLabel.Text = CStr(PCreductionSlider.Value)
     End Sub
 
 

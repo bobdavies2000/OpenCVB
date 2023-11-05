@@ -7,19 +7,19 @@ Public Class Reduction_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
-        If redOptions.reduction = OptionsRedCloud.bitwiseReduce Then
+        If redOptions.reductionType = "Use Bitwise Reduction" Then
             Dim bits = redOptions.BitwiseReductionSlider.Value
             classCount = 255 / Math.Pow(2, bits)
             Dim zeroBits = Math.Pow(2, bits) - 1
             dst0 = src And New cv.Mat(src.Size, src.Type, cv.Scalar.All(255 - zeroBits))
             dst2 = dst0 / zeroBits
-        ElseIf redOptions.reduction = OptionsRedCloud.simpleReduce Then
-            Dim reductionVal = redOptions.ColorReductionSlider.Value
+        ElseIf redOptions.reductionType = "Use Simple Reduction" Then
+            Dim reductionVal = redOptions.SimpleReductionSlider.Value
             classCount = Math.Ceiling(255 / reductionVal)
 
             dst0 = src / reductionVal
             dst2 = dst0 * reductionVal
-            labels(2) = "Reduced image - factor = " + CStr(redOptions.ColorReductionSlider.Value)
+            labels(2) = "Reduced image - factor = " + CStr(redOptions.SimpleReductionSlider.Value)
         Else
             dst2 = src
             labels(2) = "No reduction requested"
@@ -39,7 +39,7 @@ Public Class Reduction_Floodfill : Inherits VB_Algorithm
     Public flood As New RedColor_Basics
     Public Sub New()
         labels(2) = "Reduced input to floodfill"
-        redOptions.ColorReductionSlider.Value = 32
+        redOptions.SimpleReductionSlider.Value = 32
         desc = "Use the reduction output as input to floodfill to get masks of large masses."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -95,7 +95,7 @@ Public Class Reduction_PointCloud : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Public Sub New()
         redOptions.SimpleReduction.Checked = True
-        redOptions.ColorReductionSlider.Value = 20
+        redOptions.SimpleReductionSlider.Value = 20
         labels(2) = "Reduced depth"
         labels(3) = "Palettized output of the different depth levels found"
         desc = "Use reduction to smooth depth data"
@@ -129,8 +129,8 @@ Public Class Reduction_XYZ : Inherits VB_Algorithm
             check.Box(1).Checked = True
             check.Box(2).Checked = True
         End If
-        redOptions.ColorReductionSlider.Maximum = 1000
-        redOptions.ColorReductionSlider.Value = 400
+        redOptions.SimpleReductionSlider.Maximum = 1000
+        redOptions.SimpleReductionSlider.Value = 400
         desc = "Use reduction to slice the point cloud in 3 dimensions"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -172,7 +172,7 @@ Public Class Reduction_Edges : Inherits VB_Algorithm
         dst2 = reduction.dst2.Clone
 
         Dim reductionRequested = True
-        If redOptions.reduction = OptionsRedCloud.noReduce Then reductionRequested = False
+        If redOptions.reductionType = "No Reduction" Then reductionRequested = False
         labels(2) = If(reductionRequested, "Reduced image", "Original image")
         labels(3) = If(reductionRequested, "Laplacian edges of reduced image", "Laplacian edges of original image")
         edges.Run(dst2)
@@ -218,7 +218,7 @@ Public Class Reduction_RGB : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Dim mats As New Mat_4Click
     Public Sub New()
-        redOptions.ColorReductionSlider.Value = 200
+        redOptions.SimpleReductionSlider.Value = 200
         desc = "Reduce RGB in parallel"
     End Sub
     Public Sub RunVB(src As cv.Mat)

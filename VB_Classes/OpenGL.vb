@@ -1125,7 +1125,7 @@ End Class
 
 
 Public Class OpenGL_3DRGB : Inherits VB_Algorithm
-    Dim hist3d As New Hist3DCloud_Basics
+    Dim hist3d As New Hist3DRGB_Basics
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.Histogram3D
@@ -1149,7 +1149,7 @@ End Class
 
 ' https://docs.opencv.org/3.4/d1/d1d/tutorial_histo3D.html
 Public Class OpenGL_3Ddepth : Inherits VB_Algorithm
-    Dim hist3d As New Hist3DCloud_Depth
+    Dim hist3d As New Hist3DCloud_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.Histogram3D
         task.OpenGLTitle = "OpenGL_Functions"

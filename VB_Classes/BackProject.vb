@@ -103,7 +103,7 @@ Public Class BackProject_Reduction : Inherits VB_Algorithm
         backP.Run(reduction.dst2)
         dst2 = backP.dst2
         dst3 = backP.dst3
-        labels(2) = "Reduction = " + CStr(redOptions.ColorReductionSlider.Value) + " and bins = " + CStr(task.histogramBins)
+        labels(2) = "Reduction = " + CStr(redOptions.SimpleReductionSlider.Value) + " and bins = " + CStr(task.histogramBins)
     End Sub
 End Class
 
@@ -129,7 +129,7 @@ Public Class BackProject_FeatureLess : Inherits VB_Algorithm
         backP.Run(reduction.dst2)
         dst2 = backP.dst2
         dst3 = backP.dst3
-        labels(2) = "Reduction = " + CStr(redOptions.ColorReductionSlider.Value) + " and bins = " + CStr(task.histogramBins)
+        labels(2) = "Reduction = " + CStr(redOptions.SimpleReductionSlider.Value) + " and bins = " + CStr(task.histogramBins)
     End Sub
 End Class
 
@@ -290,7 +290,7 @@ Public Class BackProject_ReductionLines : Inherits VB_Algorithm
         Next
         labels(3) = CStr(lines.mpList.Count) + " lines were found"
 
-        labels(2) = "Reduction = " + CStr(redOptions.ColorReductionSlider.Value) + " and bins = " + CStr(task.histogramBins)
+        labels(2) = "Reduction = " + CStr(redOptions.SimpleReductionSlider.Value) + " and bins = " + CStr(task.histogramBins)
     End Sub
 End Class
 
