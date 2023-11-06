@@ -209,11 +209,12 @@ End Class
 
 Public Class RedCloud_Core : Inherits VB_Algorithm
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("RedCloud Reduction", 1, 2500, 250)
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("RedCloud_Core Reduction", 1, 2500, 250)
+        If standalone Then redOptions.RedCloud_Core.Checked = True
         desc = "Reduction transform for the point cloud"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static reductionSlider = findSlider("RedCloud Reduction")
+        Static reductionSlider = findSlider("RedCloud_Core Reduction")
         Dim reduceAmt = reductionSlider.value
         task.pointCloud.ConvertTo(dst0, cv.MatType.CV_32S, 1000 / reduceAmt)
 
@@ -221,26 +222,26 @@ Public Class RedCloud_Core : Inherits VB_Algorithm
 
         Select Case redOptions.PCReduction
             Case "X Reduction"
-                dst0 = split(0) * reduceAmt
+                dst0 = (split(0) * reduceAmt).toMat
             Case "Y Reduction"
-                dst0 = split(1) * reduceAmt
+                dst0 = (split(1) * reduceAmt).toMat
             Case "Z Reduction"
-                dst0 = split(2) * reduceAmt
+                dst0 = (split(2) * reduceAmt).toMat
             Case "XY Reduction"
-                dst0 = split(0) * reduceAmt + split(1) * reduceAmt
+                dst0 = (split(0) * reduceAmt + split(1) * reduceAmt).toMat
             Case "XZ Reduction"
-                dst0 = split(0) * reduceAmt + split(2) * reduceAmt
+                dst0 = (split(0) * reduceAmt + split(2) * reduceAmt).toMat
             Case "YZ Reduction"
-                dst0 = split(1) * reduceAmt + split(2) * reduceAmt
+                dst0 = (split(1) * reduceAmt + split(2) * reduceAmt).toMat
             Case "XYZ Reduction"
-                dst0 = split(0) * reduceAmt + split(1) * reduceAmt + split(2) * reduceAmt
+                dst0 = (split(0) * reduceAmt + split(1) * reduceAmt + split(2) * reduceAmt).toMat
         End Select
 
         Dim mm = vbMinMax(dst0)
+        ' If mm.minVal = Integer.MinValue Then mm.minVal = -3000 ' Mat will occasionally get a bogus integer.minvalue.  Not sure how to fix this...
         dst2 = (dst0 - mm.minVal)
 
         dst2.SetTo(mm.maxVal - mm.minVal, task.maxDepthMask)
-        dst2.SetTo(0, task.noDepthMask)
         mm = vbMinMax(dst2)
         dst2 *= 254 / mm.maxVal
         dst2 += 1
@@ -2391,7 +2392,7 @@ Public Class RedCloud_InputCloud : Inherits VB_Algorithm
                 dst2 = guided.dst2
             Case "RedCloud_Core", "No Pointcloud Data"
                 Static prep As New RedCloud_Core
-                prep.Run(src)
+                prep.Run(task.pointCloud)
                 dst2 = prep.dst2
         End Select
     End Sub

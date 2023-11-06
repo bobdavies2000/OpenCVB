@@ -128,7 +128,7 @@ Public Class OptionsRedCloud
                 histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}
         End Select
 
-        Dim testVal = colorInput = "Reduction_Basics" Or depthInput = "RedCloud_Core"
+        Dim testVal = colorInput = "Reduction_Basics"
         ReductionSliders.Enabled = testVal
         ReductionTypeGroup.Enabled = testVal
         If testVal Then

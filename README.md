@@ -1,31 +1,28 @@
-# Recent Changes – October 2023
+# Recent Changes – November 2023
 
--   Over 1700 algorithms are included, averaging 30 lines of code per algorithm.
--   Improvements to image segmentation now classify all pixels in the image.
--   RedCloud_Motion detects image motion by comparing RedCloud cells.
-    -   Pixel differences identify cells that have changed (as usual).
-    -   The “motionRect” variable is the union of current and previous rect.
-        -   Motion is the combination of where the cell was with where it is now
--   RedCloud_Motion uses the latest version of RedCloud_Basics to detect motion
-    -   A “motionRect” variable describes the union of the previous and current rect.
-    -   It is not flawless. Test the RGB image quality with RedCloud_MotionTest.
-    -   Option automation is used to define the lowest pixel difference threshold.
--   Improved PixelViewer support – better form placement and pixel layout.
--   Plots over time are much more reactive to the changes in the input data.
--   MSER algorithms were reviewed and improved.
--   Accord and Dlib algorithms were removed (about 35 algorithms)
-    -   They were not getting reused by other algorithms.
-    -   They added a lot NuGet packages that complicated installation.
--   The OpenCVB git repository was reset – the repo was bigger than the tree.
+-   Over 1700 algorithms are included, averaging 31 lines of code per algorithm.
+-   RedCloud and RedColor algorithms were reorganized and reviewed.
+    -   RedCloud/RedColor algorithms include depth and color by default.
+    -   RedCloud algorithms needed a custom options form – OptionsRedCloud.vb.
+    -   “redOptions” includes RedCloud and related options and is always present.
+-   RedCloud algorithms were consolidated and are now all in RedCloud.vb.
+    -   Each algorithm can use guided backprojection or reduction to create cells.
+    -   Pointcloud reduction is now controlled by the slider in RedCloud_Core.
+        -   Needed to be separate from reduction slider.
+    -   Each algorithm can use different color sources for cells with no depth.
+-   RedColor algorithms now supplement RedCloud algorithms with color data.
+    -   Color source is defined in the RedCloud options form.
+-   MSER algorithms were improved with better image segmentation.
+    -   It provides an alternative segmentation method for color images.
+-   Neighbor cells are now easily accessible to RedCloud and RedColor algorithms.
+    -   Core technique to find neighbors (example below) is in Neighbors.vb.
+-   The TreeView display of performance times now shows the data in tree order.
+    -   Easier to identify where the overhead is in the algorithm.
 -   A log of changes is included at the bottom of this document.
 
-![](media/db52b0115273726a6ff2d1aa986c0817.gif)
+![](media/aa767d146879de432a3a0208b65b6eca.gif)
 
-**RedCloud_Basics:** *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
-
-![A colorful squares and lines Description automatically generated with medium confidence](media/c4eed0d963820c627ec5b94291a36c4d.gif)
-
-**RedCloud_Basics** *(This is the previous version of RedCloud_Basics from September 2023.) This image segmentation algorithm uses both the point cloud and color to identify cells. RedCloud algorithms typically reduce the point cloud resolution in X and Y to produce cells that describe regions in the image. This algorithm also uses the reduced point cloud but has added cells based on color for regions that have no depth. Because both color and the point cloud are used, the whole image is segmented instead of just that portion with depth. When a cell’s color is consistent, it has been matched to a cell in the previous frame.*
+**RedCloud_Neighbors:** *The neighbors for each cell can be included in the cell information. Here the neighbors of the highlighted cell were requested and are shown in the lower right image.*
 
 # Introduction
 
@@ -1103,3 +1100,32 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A colorful squares and lines Description automatically generated with medium confidence](media/c4eed0d963820c627ec5b94291a36c4d.gif)
 
 **RedCloud_Color:** *This image segmentation algorithm uses both the point cloud and color to identify cells. RedCloud algorithms typically reduce the point cloud resolution in X and Y to produce cells that describe regions in the image. This algorithm also uses the reduced point cloud but has added cells based on color for regions that have no depth. Because both color and the point cloud are used, the entire image is segmented instead of just that portion with depth. When a cell’s color is consistent, it has been matched to a cell in the previous frame.*
+
+# Recent Changes – October 2023
+
+-   Over 1700 algorithms are included, averaging 30 lines of code per algorithm.
+-   Improvements to image segmentation now classify all pixels in the image.
+-   RedCloud_Motion detects image motion by comparing RedCloud cells.
+    -   Pixel differences identify cells that have changed (as usual).
+    -   The “motionRect” variable is the union of current and previous rect.
+        -   Motion is the combination of where the cell was with where it is now
+-   RedCloud_Motion uses the latest version of RedCloud_Basics to detect motion
+    -   A “motionRect” variable describes the union of the previous and current rect.
+    -   It is not flawless. Test the RGB image quality with RedCloud_MotionTest.
+    -   Option automation is used to define the lowest pixel difference threshold.
+-   Improved PixelViewer support – better form placement and pixel layout.
+-   Plots over time are much more reactive to the changes in the input data.
+-   MSER algorithms were reviewed and improved.
+-   Accord and Dlib algorithms were removed (about 35 algorithms)
+    -   They were not getting reused by other algorithms.
+    -   They added a lot NuGet packages that complicated installation.
+-   The OpenCVB git repository was reset – the repo was bigger than the tree.
+-   A log of changes is included at the bottom of this document.
+
+![A colorful pattern with dots Description automatically generated with medium confidence](media/db52b0115273726a6ff2d1aa986c0817.gif)
+
+**RedCloud_Basics:** *What’s different? The latest version of the image segmentation algorithm is similar to the previous version below but has classified* **ALL** *of the pixels. Small cells were tossed in the example below yielding holes (represented as black segments below) while here the small cells are consolidated using a grid that covers the entire image. As before, if a cell’s color is consistent, it has been matched with a cell from the previous frame.*
+
+![A colorful squares and lines Description automatically generated with medium confidence](media/c4eed0d963820c627ec5b94291a36c4d.gif)
+
+**RedCloud_Basics** *(This is the previous version of RedCloud_Basics from September 2023.) This image segmentation algorithm uses both the point cloud and color to identify cells. RedCloud algorithms typically reduce the point cloud resolution in X and Y to produce cells that describe regions in the image. This algorithm also uses the reduced point cloud but has added cells based on color for regions that have no depth. Because both color and the point cloud are used, the whole image is segmented instead of just that portion with depth. When a cell’s color is consistent, it has been matched to a cell in the previous frame.*
