@@ -1,8 +1,10 @@
 ﻿Imports  System.IO
 Module UIranking
     Sub Main()
-        Dim rankingInput As New FileInfo("../../Data/AlgorithmMapToOpenCV.txt")
-        Dim rankList As New FileInfo("../../Data/RankList.txt")
+        Dim dataDir As New DirectoryInfo("../../../../Data")
+        If dataDir.Exists = False Then dataDir = New DirectoryInfo("../../Data")
+        Dim rankingInput As New FileInfo(dataDir.FullName + "/AlgorithmMapToOpenCV.txt")
+        Dim rankList As New FileInfo(dataDir.FullName + "/RankList.txt")
         Dim sr = New StreamReader(rankingInput.FullName)
         Dim code As String = sr.ReadToEnd
         sr.Close()

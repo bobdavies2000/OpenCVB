@@ -269,6 +269,20 @@ Module PointCloud
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Sub SimpleProjectionClose(cPtr As IntPtr)
     End Sub
+    Public Class compareAllowIdenticalDoubleInverted : Implements IComparer(Of Double)
+        Public Function Compare(ByVal a As Double, ByVal b As Double) As Integer Implements IComparer(Of Double).Compare
+            ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
+            If a <= b Then Return 1
+            Return -1
+        End Function
+    End Class
+    Public Class compareAllowIdenticalDouble : Implements IComparer(Of Double)
+        Public Function Compare(ByVal a As Double, ByVal b As Double) As Integer Implements IComparer(Of Double).Compare
+            ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
+            If a >= b Then Return 1
+            Return -1
+        End Function
+    End Class
     Public Class compareAllowIdenticalSingleInverted : Implements IComparer(Of Single)
         Public Function Compare(ByVal a As Single, ByVal b As Single) As Integer Implements IComparer(Of Single).Compare
             ' why have compare for just unequal?  So we can get duplicates.  Nothing below returns a zero (equal)
@@ -551,7 +565,6 @@ Public Class PointCloud_Solo : Inherits VB_Algorithm
     Public heat As New HeatMap_Basics
     Public Sub New()
         findCheckBox("Top View (Unchecked Side View)").Checked = True
-        findCheckBox("Show Frustrum").Checked = False
         labels(2) = "Top down view after inrange sampling"
         labels(3) = "Histogram after filtering For Single-only histogram bins"
         desc = "Find floor And ceiling Using gravity aligned top-down view And selecting bins With exactly 1 sample"
@@ -599,22 +612,19 @@ Public Class PointCloud_SurfaceH_CPP : Inherits VB_Algorithm
     Public botRow As Integer
     Public peakRow As Integer
     Public Sub New()
-        findCheckBox("Show Frustrum").Checked = False
         desc = "Find the horizontal surfaces With a projects Of the SideView histogram."
     End Sub
     Public Sub RunVB(src as cv.Mat)
         heat.Run(src)
         dst2 = heat.dst3
 
-        ReDim plot.srcX(dst2.Height - 1)
-        ReDim plot.srcY(dst2.Height - 1)
         topRow = 0
         botRow = 0
         peakRow = 0
         Dim peakVal As Integer
         For i = 0 To dst2.Height - 1
-            plot.srcX(i) = i
-            If dst2.Channels = 1 Then plot.srcY(i) = dst2.Row(i).CountNonZero Else plot.srcY(i) = dst2.Row(i).CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero
+            plot.srcX.Add(i)
+            If dst2.Channels = 1 Then plot.srcY.Add(dst2.Row(i).CountNonZero) Else plot.srcY.Add(dst2.Row(i).CvtColor(cv.ColorConversionCodes.BGR2GRAY).CountNonZero)
             If peakVal < plot.srcY(i) Then
                 peakVal = plot.srcY(i)
                 peakRow = i

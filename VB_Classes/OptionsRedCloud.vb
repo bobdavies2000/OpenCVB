@@ -12,6 +12,7 @@ Public Class OptionsRedCloud
     Public ranges() As cv.Rangef
     Public channelCount As Integer
     Public histBinList() As Integer
+    Public imageThresholdPercent As Single
     Private Sub OptionsRedCloud_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
         Me.Text = "Options mostly for RedCloud_Basics but other related algorithms too."
@@ -69,6 +70,7 @@ Public Class OptionsRedCloud
         XYReduction.Checked = True
         GuidedBP_Depth.Checked = True
         histBinList = {task.histogramBins, task.histogramBins}
+        UseDepthAndColor.Checked = True
 
         Me.Left = 0
         Me.Top = 0
@@ -87,6 +89,8 @@ Public Class OptionsRedCloud
 
         task.redThresholdSide = SideViewThreshold.Value
         task.redThresholdTop = TopViewThreshold.Value
+
+        imageThresholdPercent = imageSizeThresholdSlider.Value / 100
 
         Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
         Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
@@ -176,11 +180,14 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         colorInput = Reduction_Basics.Text
     End Sub
-    Private Sub noColor_Input_CheckedChanged(sender As Object, e As EventArgs) Handles noColor_Input.CheckedChanged
+    Private Sub BackProject3D_CheckedChanged(sender As Object, e As EventArgs) Handles BackProject3D.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        colorInput = noColor_Input.Text
+        colorInput = BackProject3D.Text
     End Sub
-
+    Private Sub FeatureLessRadio_CheckedChanged(sender As Object, e As EventArgs) Handles FeatureLessRadio.CheckedChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        colorInput = FeatureLessRadio.Text
+    End Sub
 
 
 
@@ -214,30 +221,37 @@ Public Class OptionsRedCloud
     Private Sub XReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = XReduction.Text
+        gOptions.HistBinSlider.Value = 16
     End Sub
     Private Sub YReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = YReduction.Text
+        gOptions.HistBinSlider.Value = 16
     End Sub
     Private Sub ZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles ZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = ZReduction.Text
+        gOptions.HistBinSlider.Value = 16
     End Sub
     Private Sub ReductionXY_CheckedChanged(sender As Object, e As EventArgs) Handles XYReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = XYReduction.Text
+        gOptions.HistBinSlider.Value = 16
     End Sub
     Private Sub XZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = XZReduction.Text
+        gOptions.HistBinSlider.Value = 16
     End Sub
     Private Sub YZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles YZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = YZReduction.Text
+        gOptions.HistBinSlider.Value = 16
     End Sub
     Public Sub XYZReduction_CheckedChanged(sender As Object, e As EventArgs) Handles XYZReduction.CheckedChanged
         If task IsNot Nothing Then task.optionsChanged = True
         PCReduction = XYZReduction.Text
+        gOptions.HistBinSlider.Value = 6
     End Sub
 
 
@@ -250,8 +264,18 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         depthInput = RedCloud_Core.Text
     End Sub
-    Private Sub NoPointcloudData_CheckedChanged_1(sender As Object, e As EventArgs) Handles NoPointcloudData.CheckedChanged
+
+    Private Sub imageSizeThresholdSlider_ValueChanged(sender As Object, e As EventArgs) Handles imageSizeThresholdSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        depthInput = NoPointcloudData.Text
+        LabelimageSizePercent.Text = Format(imageSizeThresholdSlider.Value / 100, "0%")
+        imageThresholdPercent = imageSizeThresholdSlider.Value / 100
+    End Sub
+    Private Sub desiredCellSlider_ValueChanged(sender As Object, e As EventArgs) Handles DesiredCellSlider.ValueChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        LabelDesiredCell.Text = CStr(DesiredCellSlider.Value)
+    End Sub
+    Private Sub hist3dBinsSlider_ValueChanged(sender As Object, e As EventArgs) Handles hist3dBinsSlider.ValueChanged
+        If task IsNot Nothing Then task.optionsChanged = True
+        LabelHistogramBins.Text = CStr(Hist3DBinsSlider.Value)
     End Sub
 End Class

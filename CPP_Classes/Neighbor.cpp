@@ -52,32 +52,132 @@ public:
 };
 
 extern "C" __declspec(dllexport)
-Neighbors * Neighbor_Open() {
+Neighbors * Neighbors_Open() {
     Neighbors* cPtr = new Neighbors();
     return cPtr;
 }
 extern "C" __declspec(dllexport)
-void Neighbor_Close(Neighbors * cPtr)
+void Neighbors_Close(Neighbors * cPtr)
 {
     delete cPtr;
 }
 
 extern "C" __declspec(dllexport)
-int* Neighbor_CellData(Neighbors * cPtr)
+int* Neighbors_CellData(Neighbors * cPtr)
 {
     return (int*)&cPtr->cellData[0];
 }
 
 extern "C" __declspec(dllexport)
-int* Neighbor_Points(Neighbors * cPtr)
+int* Neighbors_Points(Neighbors * cPtr)
 {
     return (int*)&cPtr->nPoints[0];
 }
 
 extern "C" __declspec(dllexport)
-int Neighbor_RunCPP(Neighbors * cPtr, int* dataPtr, int rows, int cols)
+int Neighbors_RunCPP(Neighbors * cPtr, int* dataPtr, int rows, int cols)
 {
     cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
     cPtr->RunCPP();
     return (int)cPtr->nPoints.size();
+}
+
+
+
+
+
+
+
+
+class Neighbor2
+{
+private:
+public:
+    Mat src, contour;
+    vector<Point> nPoints;
+    void RunCPP()
+    {
+        nPoints.clear();
+        for (int y = 1; y < src.rows - 2; y++)
+            for (int x = 1; x < src.cols - 2; x++)
+            {
+                Point pt = Point(src.at<uchar>(y, x), src.at<uchar>(y, x - 1));
+                if (pt.x == pt.y) continue;
+                if (pt.x == 0 || pt.y == 0) continue;
+                if (count(nPoints.begin(), nPoints.end(), pt) == 0)
+                {
+                    pt = Point(src.at<uchar>(y, x - 1), src.at<uchar>(y, x));
+                    if (count(nPoints.begin(), nPoints.end(), pt) == 0) nPoints.push_back(pt);
+                }
+            }
+    }
+};
+
+extern "C" __declspec(dllexport)
+Neighbor2 * Neighbor2_Open() {
+    Neighbor2* cPtr = new Neighbor2();
+    return cPtr;
+}
+extern "C" __declspec(dllexport)
+void Neighbor2_Close(Neighbor2 * cPtr)
+{
+    delete cPtr;
+}
+
+extern "C" __declspec(dllexport)
+int* Neighbor2_Points(Neighbor2 * cPtr)
+{
+    return (int*)&cPtr->nPoints[0];
+}
+
+extern "C" __declspec(dllexport)
+int Neighbor2_RunCPP(Neighbor2 * cPtr, int* dataPtr, int rows, int cols)
+{
+    cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
+    cPtr->RunCPP();
+    return (int)cPtr->nPoints.size();
+}
+
+
+
+
+
+
+class Neighbor_Map
+{
+private:
+public:
+    Mat src;
+    vector <Point> nabList;
+
+    Neighbor_Map() {}
+    void checkPoint(Point pt)
+    {
+        if (pt.x != pt.y)
+        {
+            if (pt.x > pt.y) pt = Point(pt.y, pt.x);
+            std::vector<Point>::iterator it = std::find(nabList.begin(), nabList.end(), pt);
+            if (it == nabList.end()) nabList.push_back(pt);
+        }
+    }
+    void RunCPP() {
+        nabList.clear();
+        for (int y = 1; y < src.rows; y++)
+            for (int x = 1; x < src.cols; x++)
+            {
+                uchar val = src.at<uchar>(y, x);
+                checkPoint(Point(src.at<uchar>(y, x - 1), val));
+                checkPoint(Point(src.at<uchar>(y - 1, x), val));
+            }
+    }
+};
+extern "C" __declspec(dllexport) Neighbor_Map * Neighbor_Map_Open() { Neighbor_Map* cPtr = new Neighbor_Map(); return cPtr; }
+extern "C" __declspec(dllexport) void Neighbor_Map_Close(Neighbor_Map * cPtr){delete cPtr;}
+extern "C" __declspec(dllexport) int* Neighbor_NabList(Neighbor_Map * cPtr) { return (int*)&cPtr->nabList[0]; }
+extern "C" __declspec(dllexport)
+int Neighbor_Map_RunCPP(Neighbor_Map * cPtr, int* dataPtr, int rows, int cols)
+{
+    cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
+    cPtr->RunCPP();
+    return (int)cPtr->nabList.size();
 }

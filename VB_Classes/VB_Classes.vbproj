@@ -117,6 +117,8 @@
     <Compile Include="ApproxPoly.vb" />
     <Compile Include="AsciiArt.vb" />
     <Compile Include="BGRPattern.vb" />
+    <Compile Include="Cell.vb" />
+    <Compile Include="Complexity.vb" />
     <Compile Include="FrameRate.vb" />
     <Compile Include="Hist3DCloud.vb" />
     <Compile Include="Neighbor.vb" />
@@ -136,7 +138,7 @@
     <Compile Include="GuidedBP.vb" />
     <Compile Include="Guess.vb" />
     <Compile Include="Histogram2D.vb" />
-    <Compile Include="Hist3DRGB.vb" />
+    <Compile Include="Hist3DBGR.vb" />
     <Compile Include="HistPeak2D.vb" />
     <Compile Include="HistValley.vb" />
     <Compile Include="Hull.vb" />
@@ -157,6 +159,7 @@
     <Compile Include="Projection.vb" />
     <Compile Include="PyrFilter.vb" />
     <Compile Include="RedCloud.vb" />
+    <Compile Include="RedMin.vb" />
     <Compile Include="RedTrack.vb" />
     <Compile Include="ROI.vb" />
     <Compile Include="BackProject.vb" />
@@ -177,6 +180,7 @@
     <Compile Include="ShapeDetect.vb" />
     <Compile Include="Sides.vb" />
     <Compile Include="SOM.vb" />
+    <Compile Include="Spectrum.vb" />
     <Compile Include="Tessallate.vb" />
     <Compile Include="Thickness.vb" />
     <Compile Include="Threading.vb" />
@@ -218,10 +222,10 @@
     <Compile Include="OptionsFileName.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OptionsAllAlgorithm.Designer.vb">
-      <DependentUpon>OptionsAllAlgorithm.vb</DependentUpon>
+    <Compile Include="OptionsGlobal.Designer.vb">
+      <DependentUpon>OptionsGlobal.vb</DependentUpon>
     </Compile>
-    <Compile Include="OptionsAllAlgorithm.vb">
+    <Compile Include="OptionsGlobal.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="OptionsRadioButtons.Designer.vb">
@@ -268,7 +272,7 @@
     <Compile Include="Fractal.vb" />
     <Compile Include="FREAK.vb" />
     <Compile Include="Gabor.vb" />
-    <Compile Include="CellAuto.vb" />
+    <Compile Include="CellularAutomata.vb" />
     <Compile Include="GeneticDrawing.vb" />
     <Compile Include="Rotate.vb" />
     <Compile Include="Area.vb" />
@@ -423,8 +427,8 @@
     <EmbeddedResource Include="OptionsFileName.resx">
       <DependentUpon>OptionsFileName.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="OptionsAllAlgorithm.resx">
-      <DependentUpon>OptionsAllAlgorithm.vb</DependentUpon>
+    <EmbeddedResource Include="OptionsGlobal.resx">
+      <DependentUpon>OptionsGlobal.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
@@ -640,7 +644,7 @@
       <Version>4.5.1</Version>
     </PackageReference>
     <PackageReference Include="System.Drawing.Common">
-      <Version>8.0.0-rc.2.23479.14</Version>
+      <Version>8.0.0</Version>
     </PackageReference>
     <PackageReference Include="System.Memory">
       <Version>4.5.5</Version>

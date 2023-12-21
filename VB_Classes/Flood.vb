@@ -1,17 +1,16 @@
 Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
 Public Class Flood_Basics : Inherits VB_Algorithm
     Public classCount As Integer
-    Public fCell As New RedColor_Basics
+    Public colorC As New RedColor_Basics
     Public Sub New()
         labels(3) = "The flooded cells numbered from largest (1) to smallast (x < 255)"
         desc = "FloodFill the input and paint it"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        fCell.Run(src)
-        dst2 = fCell.dst2
-        dst3 = fCell.dst3
-        classCount = task.fCells.Count
+        colorC.Run(src)
+        dst2 = colorC.dst2
+        dst3 = colorC.dst3
+        classCount = colorC.fCells.Count
 
         labels(2) = CStr(classCount) + " regions were identified"
     End Sub
@@ -180,11 +179,12 @@ Public Class Flood_PointList : Inherits VB_Algorithm
         Dim SizeSorted As New SortedList(Of Integer, rcData)(New compareAllowIdenticalIntegerInverted)
         Dim maskPlus = New cv.Mat(New cv.Size(dst2.Width + 2, dst2.Height + 2), cv.MatType.CV_8UC1, 0)
         Dim index = 1
+        Dim minPixels = gOptions.minPixelsSlider.Value
         For Each pt In pointList
             Dim floodFlag = cv.FloodFillFlags.FixedRange Or (index << 8)
             Dim rc = New rcData
             rc.pixels = cv.Cv2.FloodFill(dst0, maskPlus, pt, 255, rc.rect, 0, 0, floodFlag)
-            If rc.pixels >= task.minPixels And rc.rect.Width < dst2.Width And rc.rect.Height < dst2.Height And
+            If rc.pixels >= minPixels And rc.rect.Width < dst2.Width And rc.rect.Height < dst2.Height And
                rc.rect.Width > 0 And rc.rect.Height > 0 Then
                 rc.mask = maskPlus(rc.rect).InRange(index, index)
 
@@ -212,7 +212,7 @@ Public Class Flood_PointList : Inherits VB_Algorithm
             rc.indexLast = lrc.index
             rc.color = lrc.color
             If usedColors.Contains(rc.color) Then
-                rc.color = New cv.Vec3b(msRNG.Next(10, 240), msRNG.Next(10, 240), msRNG.Next(10, 240)) ' trying to avoid extreme colors... 
+                rc.color = randomCellColor()
             End If
 
             vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
@@ -233,7 +233,7 @@ End Class
 
 Public Class Flood_Featureless : Inherits VB_Algorithm
     Public classCount As Integer
-    Dim fCell As New RedColor_Basics
+    Dim colorC As New RedColor_Basics
     Dim fCells As New List(Of rcData)
     Public Sub New()
         labels = {"", "", "", "Palette output of image at left"}
@@ -247,19 +247,19 @@ Public Class Flood_Featureless : Inherits VB_Algorithm
             src = fless.dst2
         End If
 
-        fCell.Run(src)
-        classCount = task.fCells.Count
+        colorC.Run(src)
+        classCount = colorC.fCells.Count
 
         Dim index As Integer = 1
         dst2.SetTo(0)
         fCells.Clear()
-        For Each rc In task.fCells
+        For Each rc In colorC.fCells
             rc.hull = cv.Cv2.ConvexHull(rc.contour, True).ToList
             vbDrawContour(dst2(rc.rect), rc.hull, rc.index, -1)
             fCells.Add(rc)
         Next
 
-        labels(2) = "Hulls were added for each of the " + CStr(fCells.Count) + " regions identified"
+        labels(2) = "Hulls were added for each of the " + CStr(fCells.Count) + " cells identified"
         dst3 = vbPalette(dst2 * 255 / fCells.Count)
     End Sub
 End Class

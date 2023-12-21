@@ -33,7 +33,8 @@ Partial Class OpenCVB
         Me.TreeButton = New System.Windows.Forms.ToolStripButton()
         Me.PixelViewerButton = New System.Windows.Forms.ToolStripButton()
         Me.ToolStripButton3 = New System.Windows.Forms.ToolStripButton()
-        Me.ToolStripButton4 = New System.Windows.Forms.ToolStripButton()
+        Me.ComplexityButton = New System.Windows.Forms.ToolStripButton()
+        Me.TranslateButton = New System.Windows.Forms.ToolStripButton()
         Me.TestAllTimer = New System.Windows.Forms.Timer(Me.components)
         Me.fpsTimer = New System.Windows.Forms.Timer(Me.components)
         Me.AlgorithmDesc = New System.Windows.Forms.Label()
@@ -48,6 +49,7 @@ Partial Class OpenCVB
         Me.RefreshTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ValidateTreeView = New System.Windows.Forms.Timer(Me.components)
         Me.XYloc = New System.Windows.Forms.Label()
+        Me.ComplexityTimer = New System.Windows.Forms.Timer(Me.components)
         Me.ToolStrip1.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -56,7 +58,7 @@ Partial Class OpenCVB
         '
         Me.ToolStrip1.AutoSize = False
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.TreeButton, Me.PixelViewerButton, Me.ToolStripButton3, Me.ToolStripButton4})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.TreeButton, Me.PixelViewerButton, Me.ToolStripButton3, Me.ComplexityButton, Me.TranslateButton})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 31)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
@@ -145,14 +147,23 @@ Partial Class OpenCVB
         Me.ToolStripButton3.Text = "ToolStripButton3"
         Me.ToolStripButton3.ToolTipText = "Add a new OpenGL, C++, C#, PyStream, or VB.Net algorithm"
         '
-        'ToolStripButton4
+        'ComplexityButton
         '
-        Me.ToolStripButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.ToolStripButton4.Image = CType(resources.GetObject("ToolStripButton4.Image"), System.Drawing.Image)
-        Me.ToolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta
-        Me.ToolStripButton4.Name = "ToolStripButton4"
-        Me.ToolStripButton4.Size = New System.Drawing.Size(34, 54)
-        Me.ToolStripButton4.Text = "ToolStripButton4"
+        Me.ComplexityButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ComplexityButton.Image = CType(resources.GetObject("ComplexityButton.Image"), System.Drawing.Image)
+        Me.ComplexityButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ComplexityButton.Name = "ComplexityButton"
+        Me.ComplexityButton.Size = New System.Drawing.Size(34, 54)
+        Me.ComplexityButton.Text = "ToolStripButton5"
+        '
+        'TranslateButton
+        '
+        Me.TranslateButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.TranslateButton.Image = CType(resources.GetObject("TranslateButton.Image"), System.Drawing.Image)
+        Me.TranslateButton.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.TranslateButton.Name = "TranslateButton"
+        Me.TranslateButton.Size = New System.Drawing.Size(34, 54)
+        Me.TranslateButton.Text = "ToolStripButton4"
         '
         'TestAllTimer
         '
@@ -165,9 +176,9 @@ Partial Class OpenCVB
         'AlgorithmDesc
         '
         Me.AlgorithmDesc.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.AlgorithmDesc.Location = New System.Drawing.Point(1142, 35)
+        Me.AlgorithmDesc.Location = New System.Drawing.Point(1169, 38)
         Me.AlgorithmDesc.Name = "AlgorithmDesc"
-        Me.AlgorithmDesc.Size = New System.Drawing.Size(633, 51)
+        Me.AlgorithmDesc.Size = New System.Drawing.Size(605, 51)
         Me.AlgorithmDesc.TabIndex = 0
         Me.AlgorithmDesc.Text = "Algorithm Desc"
         '
@@ -176,7 +187,7 @@ Partial Class OpenCVB
         Me.GroupName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.GroupName.Font = New System.Drawing.Font("Microsoft Sans Serif", 11.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.GroupName.FormattingEnabled = True
-        Me.GroupName.Location = New System.Drawing.Point(765, 38)
+        Me.GroupName.Location = New System.Drawing.Point(800, 38)
         Me.GroupName.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.GroupName.Name = "GroupName"
         Me.GroupName.Size = New System.Drawing.Size(363, 34)
@@ -188,7 +199,7 @@ Partial Class OpenCVB
         Me.AvailableAlgorithms.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.AvailableAlgorithms.Font = New System.Drawing.Font("Microsoft Sans Serif", 11.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.AvailableAlgorithms.FormattingEnabled = True
-        Me.AvailableAlgorithms.Location = New System.Drawing.Point(395, 39)
+        Me.AvailableAlgorithms.Location = New System.Drawing.Point(431, 38)
         Me.AvailableAlgorithms.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.AvailableAlgorithms.MaxDropDownItems = 25
         Me.AvailableAlgorithms.Name = "AvailableAlgorithms"
@@ -250,6 +261,10 @@ Partial Class OpenCVB
         Me.XYloc.TabIndex = 3
         Me.XYloc.Text = "XYloc"
         '
+        'ComplexityTimer
+        '
+        Me.ComplexityTimer.Interval = 30000
+        '
         'OpenCVB
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -299,5 +314,7 @@ Partial Class OpenCVB
     Friend WithEvents ValidateTreeView As Timer
     Friend WithEvents XYloc As Label
     Friend WithEvents ToolStripButton3 As ToolStripButton
-    Friend WithEvents ToolStripButton4 As ToolStripButton
+    Friend WithEvents TranslateButton As ToolStripButton
+    Friend WithEvents ComplexityButton As ToolStripButton
+    Friend WithEvents ComplexityTimer As Timer
 End Class

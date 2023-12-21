@@ -75,7 +75,7 @@ Module MLPrep_CPP_Module
     Public Function MLPrepLearn_GetInputCount(cPtr As IntPtr) As Integer
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function MLPrepLearn_Run(cPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
+    Public Function MLPrepLearn_Run(cPtr As IntPtr, bgrPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
     End Function
 
 
@@ -87,7 +87,7 @@ Module MLPrep_CPP_Module
     Public Function Sort_MLPrepTest_Close(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Sort_MLPrepTest_Run(cPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
+    Public Function Sort_MLPrepTest_Run(cPtr As IntPtr, bgrPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
     End Function
 
 
@@ -103,7 +103,7 @@ Module MLPrep_CPP_Module
     End Function
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function FLess_Range_Run(cPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
+    Public Function FLess_Range_Run(cPtr As IntPtr, bgrPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
     End Function
 End Module
 

@@ -239,3 +239,66 @@ Public Class LeftRight_Lines : Inherits VB_Algorithm
         dst3 = lines.dst2
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class LeftRight_RedCloudRight : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        redOptions.UseColor.Checked = True
+        desc = "Segment the right view image with RedCloud"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(task.rightView)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class LeftRight_RedCloudLeft : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        redOptions.UseColor.Checked = True
+        desc = "Segment the left view image with RedCloud"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(task.leftView)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class LeftRight_RedCloudBoth : Inherits VB_Algorithm
+    Dim stLeft As New LeftRight_RedCloudRight
+    Dim stRight As New LeftRight_RedCloudLeft
+    Public Sub New()
+        desc = "Match cells in the left view to the right view - something is flipped here..."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        stRight.Run(Nothing)
+        dst2 = stRight.dst2
+        labels(2) = "Left view - " + stRight.labels(2)
+
+        stLeft.Run(Nothing)
+        dst3 = stLeft.dst2
+        labels(3) = "Right view - " + stLeft.labels(2)
+    End Sub
+End Class

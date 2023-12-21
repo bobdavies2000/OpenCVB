@@ -1,0 +1,348 @@
+﻿Imports cv = OpenCvSharp
+Imports System.Runtime.InteropServices
+Public Class RedMin_Basics : Inherits VB_Algorithm
+    Dim rMin As New RedMin_Core
+    Public minCells As New List(Of rcPrep)
+    Dim rMotion As New RedMin_Motion
+    Public Sub New()
+        rMotion.rMin = rMin
+        redOptions.DesiredCellSlider.Value = 30
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels = {"", "Mask of active RedMin cells", "CV_8U representation of minCells", ""}
+        desc = "Collect the occasional cells found in Redmin and age them out."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        rMin.Run(src)
+        rMotion.Run(src)
+
+        Dim lastColors = dst3.Clone
+        If heartBeat() Then minCells.Clear()
+
+        For Each rp In rMin.minCells
+            minCells.Add(rp)
+        Next
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        Dim usedColors = New List(Of cv.Vec3b)({black})
+        Dim motionCount As Integer
+        Dim newCells As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        Dim allCells = New List(Of rcPrep)(minCells)
+        For i = minCells.Count - 1 To 0 Step -1
+            Dim rp = minCells(i)
+            Dim motionVal = rMotion.dst3.Get(Of Byte)(rp.maxDist.Y, rp.maxDist.X)
+            If motionVal <> 0 And rp.frameCount <> task.frameCount Then
+                motionCount += 1
+                Continue For
+            End If
+
+            Dim alreadySeen = dst2.Get(Of Byte)(rp.maxDist.Y, rp.maxDist.X)
+            If alreadySeen = 0 Then
+                newCells.Add(rp.rect.Width * rp.rect.Height, i)
+                dst2(rp.rect).SetTo(rp.index, rp.mask)
+            End If
+        Next
+
+        minCells.Clear()
+        dst2.SetTo(0)
+        For Each el In newCells
+            Dim rp = allCells(el.Value)
+            rp.index = minCells.Count + 1
+
+            rp.color = lastColors.Get(Of cv.Vec3b)(rp.maxDist.Y, rp.maxDist.X)
+            If rp.color = black Then
+                rp.color = rMin.dst3.Get(Of cv.Vec3b)(rp.maxDist.Y, rp.maxDist.X)
+            End If
+
+            If usedColors.Contains(rp.color) Then rp.color = randomCellColor()
+            usedColors.Add(rp.color)
+            minCells.Add(rp)
+            dst3(rp.rect).SetTo(rp.color, rp.mask)
+            dst2(rp.rect).SetTo(rp.index, rp.mask)
+
+            setTrueText(CStr(rp.index), rp.maxDist, 2)
+            setTrueText(CStr(rp.index), rp.maxDist, 3)
+        Next
+
+        labels(3) = "There were " + CStr(minCells.Count) + " collected cells and " + CStr(motionCount) +
+                    " cells removed because of motion.  "
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedMin_Core : Inherits VB_Algorithm
+    Public minCells As New List(Of rcPrep)
+    Public minL2D As New List(Of rcPrep)
+    Public Sub New()
+        cPtr = FloodCell_Open()
+        desc = "Another minimalist approach to building RedCloud cells."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels <> 1 Then
+            Static fLess As New FeatureLess_Basics
+            fLess.Run(src)
+            src = fLess.dst2
+        End If
+
+        Dim inputData(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+        Dim imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols,
+                                 src.Type, redOptions.imageThresholdPercent, redOptions.DesiredCellSlider.Value, 0)
+        handleInput.Free()
+
+        Dim classCount = FloodCell_Count(cPtr)
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
+        dst3 = vbPalette(dst2 * 255 / classCount)
+
+        If heartBeat() Then labels(3) = CStr(classCount) + " cells found"
+        If classCount <= 1 Then Exit Sub
+
+        Dim sizeData = New cv.Mat(classCount, 1, cv.MatType.CV_32S, FloodCell_Sizes(cPtr))
+        Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, FloodCell_Rects(cPtr))
+        Dim floodPointData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC2, FloodCell_FloodPoints(cPtr))
+        minCells.Clear()
+        For i = 0 To classCount - 1
+            Dim rp As New rcPrep
+            rp.index = i + 1
+            rp.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
+            rp.mask = dst2(rp.rect).InRange(rp.index, rp.index)
+            rp.pixels = sizeData.Get(Of Integer)(i, 0)
+            rp.floodPoint = floodPointData.Get(Of cv.Point)(i, 0)
+            rp.mask.Rectangle(New cv.Rect(0, 0, rp.mask.Width, rp.mask.Height), 0, 1)
+            Dim pt = vbGetMaxDist(rp.mask)
+            rp.maxDist = New cv.Point(pt.X + rp.rect.X, pt.Y + rp.rect.Y)
+            rp.gray = task.gray.Get(Of Byte)(rp.maxDist.Y, rp.maxDist.X)
+            rp.frameCount = task.frameCount
+            minCells.Add(rp)
+        Next
+
+        Dim tmpL2D As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
+        For Each rp In minCells
+            tmpL2D.Add(task.gray.Get(Of Byte)(rp.maxDist.Y, rp.maxDist.X), rp.index - 1)
+        Next
+
+        minL2D.Clear()
+        For Each el In tmpL2D
+            Dim rp = minCells(el.Value)
+            rp.index = minL2D.Count + 1
+            minL2D.Add(rp)
+            setTrueText(CStr(rp.index), rp.maxDist, 2)
+            setTrueText(CStr(rp.index), rp.maxDist, 3)
+        Next
+
+        If heartBeat() Then labels(2) = "CV_8U format - " + CStr(classCount) + " cells were identified."
+    End Sub
+    Public Sub Close()
+        If cPtr <> 0 Then cPtr = FloodCell_Close(cPtr)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedMin_ContourVsFeatureLess : Inherits VB_Algorithm
+    Dim redMin As New RedMin_Core
+    Dim contour As New Contour_WholeImage
+    Dim fLess As New FeatureLess_Basics
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        labels = {"", "Contour_WholeImage Input", "Redmin_Core - toggling between Contour and Featureless inputs",
+                  "FeatureLess_Basics Input"}
+        desc = "Compare Contour_WholeImage and FeatureLess_Basics as input to RedMin_Core"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static useContours = findRadio("Use Contour_WholeImage")
+
+        contour.Run(src)
+        dst1 = contour.dst2
+
+        fLess.Run(src)
+        dst3 = fLess.dst2
+
+        If task.toggleOn Then redMin.Run(dst3) Else redMin.Run(dst1)
+        dst2 = redMin.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedMin_Hist3DBackProject : Inherits VB_Algorithm
+    Dim rMin As New RedMin_Basics
+    Dim hist3d As New Hist3DBGR_SortedHistogram
+    Public Sub New()
+        desc = "For the largest cell, use the histogram 3D results from a previous frame to backproject onto the current frame"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static lastHist As cv.Mat, lastCell As rcPrep
+        Dim bins = redOptions.Hist3DBinsSlider.Value
+        Static lastHist3d As New cv.Mat(bins * bins * bins, 1, cv.MatType.CV_32F, 0)
+        rMin.Run(src)
+        dst2 = rMin.dst3
+        If rMin.minCells.Count = 0 Then Exit Sub
+
+        Dim rp = rMin.minCells(0)
+        Dim input = New cv.Mat(rp.mask.Size, cv.MatType.CV_8UC3, 0)
+        task.color(rp.rect).CopyTo(input, rp.mask)
+        hist3d.Run(input)
+
+        'If lastCell.rect.Width > 0 And lastCell.rect.Height > 0 Then
+        '    dst3.SetTo(0)
+        '    cv.Cv2.CalcBackProject({src(lastCell.rect)}, {0, 1, 2}, lastHist, dst1, hist3d.options.rangesBGR)
+        '    dst3(lastCell.rect) = vbPalette(dst1 * 255 / redOptions.DesiredCellSlider.Value)
+        'End If
+        lastHist = hist3d.histogram
+        lastCell = rp
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedMin_PixelVector3D : Inherits VB_Algorithm
+    Dim rMin As New RedMin_Basics
+    Dim hist3d As New Hist3DBGR_SortedHistogram
+    Public pixelVector As New List(Of List(Of Single))
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        redOptions.Hist3DBinsSlider.Value = 2
+        hist3d.sortHistList = False
+        labels = {"", "3D Histogram counts for each of the cells at left", "Cells after matching color", ""}
+        desc = "Identify RedMin cells and create a vector for each cell's 3D histogram."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        rMin.Run(src)
+
+        Static distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
+        pixelVector.Clear()
+        strOut = "3D histogram counts for each cell" + vbCrLf
+        For Each rp In rMin.minCells
+            hist3d.maskInput = rp.mask
+            hist3d.Run(src(rp.rect))
+            pixelVector.Add(hist3d.histList.ToList)
+            For Each count In hist3d.histList
+                strOut += CStr(count) + ","
+            Next
+            strOut += vbCrLf
+        Next
+
+        dst3.SetTo(0)
+        For Each rp In rMin.minCells
+            task.color(rp.rect).CopyTo(dst3(rp.rect), rp.mask)
+            setTrueText(CStr(rp.index), rp.maxDist, 3)
+            setTrueText(CStr(rp.index), rp.maxDist, 2)
+        Next
+        setTrueText(strOut, 1)
+        labels(3) = rMin.labels(3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class RedMin_Motion : Inherits VB_Algorithm
+    Public rMin As New RedMin_Core
+    Dim diff As New Diff_Basics
+    Public Sub New()
+        gOptions.PixelDiffThreshold.Value = 25
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        desc = "Use absDiff to build a mask of cells that changed."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        diff.Run(src)
+
+        If standalone Then
+            rMin.Run(src)
+            dst2 = rMin.dst2
+        End If
+
+        Dim minPixels = gOptions.minPixelsSlider.Value
+        Dim rect As cv.Rect
+        For Each rp In rMin.minCells
+            Dim tmp As cv.Mat = rp.mask And diff.dst3(rp.rect)
+            If tmp.CountNonZero Then
+                If rect.Width = 0 Then rect = rp.rect Else rect = rect.Union(rp.rect)
+            End If
+        Next
+
+        If task.quarterBeat Then dst3.SetTo(0)
+        If rect.Width > 0 Then dst3(rect).SetTo(255)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class RedMin_Blobs : Inherits VB_Algorithm
+    Dim rMin As New RedMin_Basics
+    Public Sub New()
+        gOptions.DebugSlider.Value = 0
+        desc = "Select blobs by size using the DebugSlider in the global options"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        rMin.Run(src)
+        dst2 = rMin.dst3
+        labels(2) = rMin.labels(3)
+
+        Dim index = gOptions.DebugSlider.Value
+        If index < rMin.minCells.Count Then
+            dst3.SetTo(0)
+            Dim rp = rMin.minCells(index)
+            dst3(rp.rect).SetTo(rp.color, rp.mask)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedMin_Select : Inherits VB_Algorithm
+    Dim rMin As New RedMin_Basics
+    Public Sub New()
+        desc = "Click on a cell to isolate it."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        rMin.Run(src)
+        dst2 = rMin.dst3
+        labels(2) = rMin.labels(3)
+
+        task.cellSelect = New rcPrep
+        If task.clickPoint = New cv.Point(0, 0) Then
+            If rMin.minCells.Count > 2 Then
+                task.clickPoint = rMin.minCells(0).maxDist
+                task.cellSelect = rMin.minCells(0)
+            Else
+                Exit Sub
+            End If
+        Else
+            Dim index = rMin.dst2.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+            task.cellSelect = rMin.minCells(index - 1)
+        End If
+
+        dst3.SetTo(0)
+        dst3(task.cellSelect.rect).SetTo(task.cellSelect.color, task.cellSelect.mask)
+        labels(3) = "Selected cell: index = " + CStr(task.cellSelect.index)
+    End Sub
+End Class

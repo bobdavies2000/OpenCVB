@@ -2,8 +2,181 @@
 Imports System.Runtime.InteropServices
 Imports NAudio.Gui
 Imports System.Windows.Documents
+Imports OpenCvSharp.Flann
 
 Public Class HistValley_Basics : Inherits VB_Algorithm
+    Public peak As New HistValley_Peaks
+    Public peaks As New List(Of Integer)
+    Public valleys As New List(Of Integer)
+    Public histList As New List(Of Single)
+    Public Sub New()
+        findSlider("Desired boundary count").Value = 5
+        desc = "Use the peaks identified in HistValley_Peaks to find the valleys between the peaks."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Then src = task.pcSplit(2)
+        peak.Run(src)
+        dst2 = peak.hist.dst2
+        labels(2) = peak.labels(2)
+
+        histList = peak.histarray.ToList
+        valleys.Clear()
+        peaks = New List(Of Integer)(peak.peaks)
+        For i = 0 To peaks.Count - 2
+            Dim start = peaks(i)
+            Dim finish = peaks(i + 1)
+
+            Dim testList As New List(Of Single)
+            For j = start To finish
+                testList.Add(histList(j))
+            Next
+
+            Dim nextVal = start + testList.IndexOf(testList.Min)
+            valleys.Add(nextVal)
+            Dim col = dst2.Width * nextVal / task.histogramBins
+            dst2.Line(New cv.Point(col, dst2.Height), New cv.Point(col, dst2.Height * 9 / 10), cv.Scalar.White, task.lineWidth)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class HistValley_Depth : Inherits VB_Algorithm
+    Public valley As New HistValley_Basics
+    Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+    Public Sub New()
+        labels = {"", "", "Top markerstop = peaks, bottom markers = valleys", "Guided backprojection of kalmanized depth valleys"}
+        desc = "Find the valleys in the depth histogram."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+
+        Static histogram As cv.Mat
+        If heartBeat() Then
+            valley.Run(src)
+            dst2 = valley.dst2
+
+            Dim vList = New List(Of Integer)(valley.valleys)
+
+            Dim histArray(valley.histList.Count - 1) As Single
+            For i = 0 To vList.Count - 2
+                Dim start = vList(i)
+                Dim finish = vList(i + 1)
+                For j = start To finish
+                    histArray(j) = i + 1
+                Next
+            Next
+
+            histogram = valley.peak.hist.histogram
+            Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
+            histogram += 1 ' shift away from 0
+        End If
+        cv.Cv2.CalcBackProject({src}, {0}, histogram, dst1, valley.peak.hist.ranges)
+        If dst1.Type <> cv.MatType.CV_8U Then
+            dst1.SetTo(0, task.noDepthMask)
+            dst1.ConvertTo(dst1, cv.MatType.CV_8U)
+            dst3 = vbPalette(dst1 * 255 / valley.valleys.Count)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class HistValley_DepthOld : Inherits VB_Algorithm
+    Public valley As New HistValley_BasicsOptionAuto
+    Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+    Public Sub New()
+        desc = "Find the valleys in the depth histogram."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
+        valley.Run(src)
+        dst1 = valley.dst1
+        dst2 = valley.dst2
+        dst3 = valley.dst3
+        valleyOrder = valley.auto.valleyOrder
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class HistValley_Test : Inherits VB_Algorithm
+    Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+    Public options As New Options_Boundary
+    Public Sub New()
+        If standalone Then gOptions.HistBinSlider.Value = 256
+        desc = "Get the top X highest quality valley points in the histogram."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        Dim desiredBoundaries = options.desiredBoundaries
+
+        ' input should be a histogram.  If not, get one...
+        If standalone Then
+            Static kalmanHist As New Histogram_Kalman
+            kalmanHist.Run(src)
+            dst2 = kalmanHist.dst2
+            src = kalmanHist.hist.histogram.Clone
+        End If
+
+        Dim samples(src.Total - 1) As Single
+        Marshal.Copy(src.Data, samples, 0, samples.Length)
+
+        Dim histList = samples.ToList
+
+        Dim valleys As New List(Of Single)
+        Dim incr = histList.Count / desiredBoundaries
+        For i = 0 To desiredBoundaries - 1
+            Dim nextList As New List(Of Single)
+            For j = i * incr To (i + 1) * incr - 1
+                If i = 0 And j < 5 Then
+                    nextList.Add(dst2.Total) ' there are typically some gaps near zero.
+                Else
+                    If histList(j) = 0 Then nextList.Add(dst2.Total) Else nextList.Add(histList(j))
+                End If
+            Next
+            Dim index = nextList.IndexOf(nextList.Min())
+            valleys.Add(index + i * incr)
+        Next
+
+        valleyOrder.Clear()
+        Dim lastEntry As Integer
+        For i = 0 To desiredBoundaries - 1
+            valleyOrder.Add(lastEntry, valleys(i) - 1)
+            lastEntry = valleys(i)
+        Next
+        If valleys(desiredBoundaries - 1) <> histList.Count - 1 Then
+            valleyOrder.Add(valleys(desiredBoundaries - 1), 256)
+        End If
+
+        If standalone Then
+            For Each entry In valleyOrder
+                Dim col = entry.Value * dst2.Width / task.histogramBins
+                dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White, task.lineWidth)
+            Next
+            setTrueText(CStr(valleys.Count) + " valleys in histogram", 3)
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class HistValley_BasicsOptionAuto : Inherits VB_Algorithm
     Dim kalman As New Histogram_Kalman
     Public histogram As New cv.Mat
     Public auto As New OpAuto_Valley
@@ -49,30 +222,6 @@ End Class
 
 
 
-Public Class HistValley_Depth : Inherits VB_Algorithm
-    Public valley As New HistValley_Basics
-    Public valleyOrder As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
-    Public Sub New()
-        gOptions.HistBinSlider.Value = 500
-        desc = "Find the valleys in the depth histogram."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
-        task.pcSplit(2).SetTo(task.maxZmeters, task.maxDepthMask)
-        valley.Run(src)
-        dst1 = valley.dst1
-        dst2 = valley.dst2
-        dst3 = valley.dst3
-        valleyOrder = valley.auto.valleyOrder
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class HistValley_LeftRight : Inherits VB_Algorithm
     Dim valley As New HistValley_Lines
     Public Sub New()
@@ -82,7 +231,7 @@ Public Class HistValley_LeftRight : Inherits VB_Algorithm
         desc = "Use the same list of histogram valleys on the left and right images"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        valley.Run(task.leftview)
+        valley.Run(task.leftView)
         dst2 = valley.dst3
         dst0 = valley.dst2
 
@@ -154,12 +303,11 @@ Public Class HistValley_EdgeDraw : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         edges.Run(src)
 
-        dst1 = src
-        dst1.SetTo(cv.Scalar.Black, edges.dst2)
+        dst3 = src
+        dst3.SetTo(cv.Scalar.Black, edges.dst2)
 
-        valley.Run(dst1)
+        valley.Run(dst3)
         dst2 = valley.dst2
-        dst3 = valley.dst3
     End Sub
 End Class
 
@@ -248,5 +396,79 @@ Public Class HistValley_Simple : Inherits VB_Algorithm
             lastPoint = p1
         Next
         labels(2) = "Depth regions between 0 and " + CStr(CInt(task.maxZmeters + 1)) + " meters"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class HistValley_Peaks : Inherits VB_Algorithm
+    Public hist As New Histogram_Basics
+    Public options As New Options_Boundary
+    Public peaks As New List(Of Integer)
+    Public histArray() As Single
+    Public Sub New()
+        gOptions.HistBinSlider.Value = 100
+        findSlider("Desired boundary count").Value = 5
+        labels(2) = "Histogram - white lines are peaks"
+        desc = "Find the requested number of peaks in the histogram "
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        Dim desiredBoundaries = options.desiredBoundaries
+
+        If standalone Then src = task.pcSplit(2)
+        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+
+        hist.Run(src)
+        dst2 = hist.dst2
+        ReDim histArray(hist.histogram.Rows - 1)
+        Marshal.Copy(hist.histogram.Data, histArray, 0, histArray.Length)
+        Dim histList = histArray.ToList
+
+        Dim sortPeaks As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
+        For i = 0 To histlist.Count - 1
+            If histlist(i) <> 0 Then
+                sortPeaks.Add(i, i)
+                Exit For
+            End If
+        Next
+        For i = histlist.Count - 1 To 0 Step -1
+            If histlist(i) <> 0 Then
+                sortPeaks.Add(i, i)
+                Exit For
+            End If
+        Next
+        For i = 0 To desiredBoundaries - 1
+            Dim index = histlist.IndexOf(histlist.Max)
+            Dim lastCount = histlist(index)
+            sortPeaks.Add(index, index)
+            For j = index - 1 To 0 Step -1
+                Dim count = histlist(j)
+                If lastCount > count Then histlist(j) = 0 Else Exit For
+                lastCount = count
+            Next
+
+            lastCount = histlist(index)
+            histlist(index) = 0
+            For j = index + 1 To histlist.Count - 1
+                Dim count = histlist(j)
+                If lastCount > count Then histlist(j) = 0 Else Exit For
+                lastCount = count
+            Next
+        Next
+
+        Dim mm = vbMinMax(src)
+        Dim incr = (mm.maxVal - mm.minVal) / task.histogramBins
+        peaks.clear()
+        For Each el In sortPeaks
+            Dim index = el.Key
+            Dim col = dst2.Width * index / task.histogramBins
+            peaks.Add(index)
+            dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height / 10), cv.Scalar.White, task.lineWidth)
+        Next
+        labels(2) = CStr(peaks.Count - 2) + " peaks were found in the histogram"
     End Sub
 End Class

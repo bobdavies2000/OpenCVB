@@ -38,7 +38,7 @@ Module OpticalFlowModule_Exports
     Public Function OpticalFlow_CPP_Close(sPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function OpticalFlow_CPP_Run(sPtr As IntPtr, rgbPtr As IntPtr, rows As integer, cols As integer) As IntPtr
+    Public Function OpticalFlow_CPP_Run(sPtr As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer) As IntPtr
     End Function
     Public Sub calcOpticalFlowPyrLK_Native(gray1 As cv.Mat, gray2 As cv.Mat, features1 As cv.Mat, features2 As cv.Mat)
         Dim hGray1 As GCHandle

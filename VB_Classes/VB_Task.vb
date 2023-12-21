@@ -12,9 +12,14 @@ Public Class VBtask : Implements IDisposable
     Public algorithmObject As Object
     Public frameCount As Integer = 0
     Public heartBeat As Boolean
+    Public quarterBeat As Boolean
     Public midHeartBeat As Boolean
     Public almostHeartBeat As Boolean
-    Public toggleEverySecond As Boolean ' toggles on the heartbeat.
+    Public myStopWatch As Stopwatch
+    Public msWatch As Integer
+    Public msLast As Integer
+
+    Public toggleOn As Boolean ' toggles on the heartbeat.
     Public toggleFrame As Integer
     Public optionsChanged As Boolean ' global options change, or local options change.
     Public paused As Boolean
@@ -29,6 +34,7 @@ Public Class VBtask : Implements IDisposable
     Public mbIndex As Integer
 
     Public color As cv.Mat
+    Public gray As cv.Mat
     Public leftView As cv.Mat
     Public rightView As cv.Mat
     Public pointCloud As cv.Mat
@@ -56,6 +62,10 @@ Public Class VBtask : Implements IDisposable
 
     Public noDepthMask As New cv.Mat
     Public depthMask As New cv.Mat
+
+    Public depthContours As New cv.Mat
+    Public depthOutline As New cv.Mat
+
     Public maxDepthMask As New cv.Mat
     Public depthRGB As New cv.Mat
     Public srcThread As cv.Mat
@@ -74,9 +84,6 @@ Public Class VBtask : Implements IDisposable
     Public gridToRoiIndex As New cv.Mat
     Public gridNeighbors As New List(Of List(Of Integer))
     Public gridROIclicked As Integer
-
-    Public minPixels As Integer
-    Public minPixelPercent As Single
 
     Public ogl As OpenGL_Basics
 
@@ -217,14 +224,10 @@ Public Class VBtask : Implements IDisposable
     Public redThresholdSide As Integer ' In heatmap side view, this defines the boundary between red and blue
     Public redThresholdTop As Integer ' In heatmap top view, this defines the boundary between red and blue
 
-    Public fCells As New List(Of rcData)
-    Public fcSelect As New rcData
-
-    Public redOther As Integer
-    Public redCells As New List(Of rcData)
-    Public lastCells As New List(Of rcData)
-    Public cellMap As New cv.Mat
+    Public redOther As Integer = 0
     Public rcSelect As New rcData
+    Public cellSelect As New rcPrep
+    Public rcMatchMax As Integer
 
     Public useXYRange As Boolean ' OpenGL applications don't need to adjust the ranges.
     Public xRange As Single
@@ -281,6 +284,7 @@ Public Class VBtask : Implements IDisposable
         Public displayRes As cv.Size
 
         Public algName As String
+
         Public cameraInfo As cameraInfo
     End Structure
     Private Sub buildColors()
@@ -348,7 +352,7 @@ Public Class VBtask : Implements IDisposable
         allOptions.Show()
 
         callTrace.Add("Options_XYRanges") ' so calltrace is not nothing on initial call...
-        gOptions = New OptionsAllAlgorithm
+        gOptions = New OptionsGlobal
         redOptions = New OptionsRedCloud
 
         grid = New Grid_Basics
@@ -395,6 +399,7 @@ Public Class VBtask : Implements IDisposable
         focalLength = focalLengths(parms.cameraIndex)
         baseline = baseLines(parms.cameraIndex)
 
+        task.myStopWatch = Stopwatch.StartNew()
         optionsChanged = True
         Application.DoEvents()
     End Sub
@@ -426,7 +431,7 @@ Public Class VBtask : Implements IDisposable
 
             If task.pointCloud.Width > 0 Then
                 ' If the workingRes changes, the previous generation of images needs to be reset.
-                If task.pointCloud.Size <> task.workingRes Then
+                If task.pointCloud.Size <> task.workingRes Or task.color.Size <> task.workingRes Then
                     task.color = New cv.Mat(task.workingRes, cv.MatType.CV_8UC3, 0)
                     task.pointCloud = New cv.Mat(task.workingRes, cv.MatType.CV_32FC3, 0)
                     task.noDepthMask = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
@@ -442,6 +447,7 @@ Public Class VBtask : Implements IDisposable
                 task.IMU_RawAcceleration = task.IMU_Acceleration
                 task.IMU_RawAngularVelocity = task.IMU_AngularVelocity
                 grid.Run(task.color)
+                task.gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
                 If task.algName.StartsWith("CPP_") = False Then
                     task.motionFlag = True
@@ -465,20 +471,28 @@ Public Class VBtask : Implements IDisposable
                     If task.gifCreator Is Nothing Then task.gifCreator = New Gif_OpenCVB
                     gifCreator.Run(src)
                     If task.gifBuild Then
-                        For i = 0 To task.gifImages.Count - 1
-                            Dim fileName As New FileInfo(task.homeDir + "Temp/image" + Format(i, "000") + ".bmp")
-                            task.gifImages(i).Save(fileName.FullName)
-                        Next
                         task.gifBuild = False
-                        task.gifImages.Clear()
-                        Dim gifName As New FileInfo(task.homeDir + "\GifBuilder\bin\x64\Release\net6.0-windows10.0.22621.0\GifBuilder.exe")
-                        If gifName.Exists = False Then
-                            gifName = New FileInfo(task.homeDir + "\GifBuilder\bin\x64\Release\net7.0-windows10.0.22621.0\GifBuilder.exe")
+                        If task.gifImages.Count = 0 Then
+                            MsgBox("Collect images first and then click 'Build GIF...'")
+                        Else
+                            For i = 0 To task.gifImages.Count - 1
+                                Dim fileName As New FileInfo(task.homeDir + "Temp/image" + Format(i, "000") + ".bmp")
+                                task.gifImages(i).Save(fileName.FullName)
+                            Next
+
+                            task.gifImages.Clear()
+                            Dim dirInfo As New DirectoryInfo(task.homeDir + "\GifBuilder\bin\Release\")
+                            Dim dirData = dirInfo.GetDirectories()
+                            Dim gifExe As New FileInfo(dirInfo.FullName + "\" + dirData(0).ToString + "\GifBuilder.exe")
+                            If gifExe.Exists = False Then
+                                MsgBox("GifBuilder.exe was not found!")
+                            Else
+                                Dim gifProcess As New Process
+                                gifProcess.StartInfo.FileName = gifExe.FullName
+                                gifProcess.StartInfo.WorkingDirectory = task.homeDir + "Temp/"
+                                gifProcess.Start()
+                            End If
                         End If
-                        Dim gifProcess As New Process
-                        gifProcess.StartInfo.FileName = gifName.FullName
-                        gifProcess.StartInfo.WorkingDirectory = task.homeDir + "Temp/"
-                        gifProcess.Start()
                     End If
                 End If
 

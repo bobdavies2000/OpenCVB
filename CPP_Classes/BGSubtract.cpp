@@ -44,9 +44,9 @@ int * BGSubtract_BGFG_Close(BGSubtract_BGFG *bgfs)
 }
 
 extern "C" __declspec(dllexport)
-int *BGSubtract_BGFG_Run(BGSubtract_BGFG *bgfs, int *rgbPtr, int rows, int cols, int channels)
+int *BGSubtract_BGFG_Run(BGSubtract_BGFG *bgfs, int *bgrPtr, int rows, int cols, int channels)
 {
-	bgfs->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, rgbPtr);
+	bgfs->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, bgrPtr);
 	bgfs->Run();
     return (int *) bgfs->fgMask.data; 
 }
@@ -67,11 +67,11 @@ public:
 };
 
 extern "C" __declspec(dllexport)
-BGSubtract_Synthetic *BGSubtract_Synthetic_Open(int* rgbPtr, int rows, int cols, LPSTR fgFilename, double amplitude, double magnitude,
+BGSubtract_Synthetic *BGSubtract_Synthetic_Open(int* bgrPtr, int rows, int cols, LPSTR fgFilename, double amplitude, double magnitude,
 												double wavespeed, double objectspeed) 
 {
 	BGSubtract_Synthetic* cPtr = new BGSubtract_Synthetic();
-	Mat bg = Mat(rows, cols, CV_8UC3, rgbPtr);
+	Mat bg = Mat(rows, cols, CV_8UC3, bgrPtr);
 	Mat fg = imread(fgFilename, IMREAD_COLOR);
 	resize(fg, fg, Size(10, 10)); // adjust the object size here...
 	cPtr->gen = bgsegm::createSyntheticSequenceGenerator(bg, fg, amplitude, magnitude, wavespeed, objectspeed);

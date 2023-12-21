@@ -568,10 +568,7 @@ Public Class Kalman_VB_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src as cv.Mat)
 
-        If standalone Then
-            Dim gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-            kInput = gray.Mean()(0)
-        End If
+        If standalone Then kInput = task.gray.Mean()(0)
 
         Static avgSlider = findSlider("Average input count")
         Static saveAvgCount As Integer

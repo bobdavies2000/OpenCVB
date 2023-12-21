@@ -27,8 +27,7 @@ int * Depth_Colorizer_Close(Depth_Colorizer * cPtr)
 extern "C" __declspec(dllexport)
 int* Depth_Colorizer_Run(Depth_Colorizer * cPtr, int* depthPtr, int rows, int cols, float maxDepth)
 {
-	cPtr->maxDepth = maxDepth;
 	cPtr->depth32f = Mat(rows, cols, CV_32F, depthPtr);
-	cPtr->Run();
+	cPtr->Run(maxDepth);
 	return (int*)cPtr->output.data;
 }

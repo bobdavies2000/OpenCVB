@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Public Class RedTrack_Basics : Inherits VB_Algorithm
-    Dim stats As New RedCloud_CellStats
+    Dim stats As New Cell_Basics
     Public redC As New RedCloud_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
@@ -9,11 +9,10 @@ Public Class RedTrack_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
-
         stats.Run(src)
         labels = stats.labels
         dst2.SetTo(0)
-        For Each rc As rcData In task.redCells
+        For Each rc As rcData In redC.redCells
             vbDrawContour(dst2(rc.rect), rc.contour, rc.color, -1)
             If rc.index = task.rcSelect.index Then vbDrawContour(dst2(rc.rect), rc.contour, cv.Scalar.White, -1)
         Next
@@ -46,6 +45,8 @@ Public Class RedTrack_Lines : Inherits VB_Algorithm
         Next
 
         track.Run(dst3.Clone)
+        dst0 = track.redC.dst0
+        dst1 = track.redC.dst1
         dst2 = track.dst2
     End Sub
 End Class
@@ -67,7 +68,7 @@ Public Class RedTrack_LineSingle : Inherits VB_Algorithm
     Private Function findNearest(pt As cv.Point) As Integer
         Dim bestDistance As Single = Single.MaxValue
         Dim bestIndex As Integer
-        For Each rc In task.redCells
+        For Each rc In track.redC.redCells
             Dim d = pt.DistanceTo(rc.maxDist)
             If d < bestDistance Then
                 bestDistance = d
@@ -78,13 +79,15 @@ Public Class RedTrack_LineSingle : Inherits VB_Algorithm
     End Function
     Public Sub RunVB(src As cv.Mat)
         track.Run(src)
+        dst0 = track.redC.dst0
+        dst1 = track.redC.dst1
         dst2 = track.dst2
-        If task.redCells.Count = 0 Then
+        If track.redC.redCells.Count = 0 Then
             setTrueText("No lines found to track.", 3)
             Exit Sub
         End If
         Dim xList As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
-        For Each rc In task.redCells
+        For Each rc In track.redC.redCells
             If rc.index = 0 Then Continue For
             xList.Add(rc.rect.X, rc.index)
         Next
@@ -100,18 +103,18 @@ Public Class RedTrack_LineSingle : Inherits VB_Algorithm
             While leftCenter.DistanceTo(rightCenter) < dst2.Width / 4
                 leftMost = msRNG.Next(minLeft, minRight)
                 rightmost = msRNG.Next(minLeft, minRight)
-                leftCenter = task.redCells(leftMost).maxDist
-                rightCenter = task.redCells(rightmost).maxDist
+                leftCenter = track.redC.redCells(leftMost).maxDist
+                rightCenter = track.redC.redCells(rightmost).maxDist
                 iterations += 1
                 If iterations > 10 Then Exit Sub
             End While
         End If
 
         leftMost = findNearest(leftCenter)
-        leftCenter = task.redCells(leftMost).maxDist
+        leftCenter = track.redC.redCells(leftMost).maxDist
 
         rightmost = findNearest(rightCenter)
-        rightCenter = task.redCells(rightmost).maxDist
+        rightCenter = track.redC.redCells(rightmost).maxDist
 
         dst2.Line(leftCenter, rightCenter, cv.Scalar.White, task.lineWidth, task.lineType)
         labels(2) = track.redC.labels(2)
@@ -201,9 +204,9 @@ Public Class RedTrack_GoodCells : Inherits VB_Algorithm
         Dim trackCells As New List(Of rcData)
         Dim trackIndex As New List(Of Integer)
         For Each pt In good.featureList
-            Dim index = task.cellMap.Get(Of Byte)(pt.Y, pt.X)
+            Dim index = hulls.redC.cellMap.Get(Of Byte)(pt.Y, pt.X)
             If trackIndex.Contains(index) = False Then
-                Dim rc = task.redCells(index)
+                Dim rc = hulls.redC.redCells(index)
                 If rc.hull Is Nothing Then Continue For
                 vbDrawContour(dst2(rc.rect), rc.hull, cv.Scalar.White, -1)
                 trackIndex.Add(index)
@@ -278,39 +281,12 @@ Public Class RedTrack_Points : Inherits VB_Algorithm
         Next
 
         track.Run(dst3)
+        dst0 = track.redC.dst0
+        dst1 = track.redC.dst1
         dst2 = track.dst2
     End Sub
 End Class
 
-
-
-
-
-
-
-Public Class RedTrack_Core : Inherits VB_Algorithm
-    Public redC As New RedCloud_Basics
-    Public Sub New()
-        labels = {"", "", "Points tracked with RedCloud", ""}
-        desc = "Show feature location history"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_8U Then
-            setTrueText("Input to " + traceName + " should be points, circles, lines, or rectangles")
-            Exit Sub
-        End If
-        dst0 = Not src.Threshold(0, 255, cv.ThresholdTypes.Binary)
-        redC.Run(dst0)
-
-        dst2.SetTo(0)
-        For Each rc In task.redCells
-            If rc.rect.Width < dst2.Width / 2 Or rc.rect.Height < dst2.Height / 2 Then
-                dst2(rc.rect).SetTo(rc.color, rc.mask)
-                dst2.Rectangle(rc.rect, rc.color, -1)
-            End If
-        Next
-    End Sub
-End Class
 
 
 
@@ -336,10 +312,8 @@ Public Class RedTrack_Features : Inherits VB_Algorithm
         Next
 
         redC.Run(dst2)
-        task.color = src
-
         dst3.SetTo(0)
-        For Each rc In task.redCells
+        For Each rc In redC.redCells
             If rc.rect.X = 0 And rc.rect.Y = 0 Then Continue For
             vbDrawContour(dst3(rc.rect), rc.contour, rc.color, -1)
             If rc.contour.Count > 0 Then setTrueText(Format(shapeCorrelation(rc.contour), fmt3), New cv.Point(rc.rect.X, rc.rect.Y), 3)

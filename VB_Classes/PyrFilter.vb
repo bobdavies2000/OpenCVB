@@ -24,7 +24,7 @@ End Class
 
 
 Public Class PyrFilter_RedCloud : Inherits VB_Algorithm
-    Dim colorC As New RedCloud_Basics
+    Dim redC As New RedCloud_Basics
     Dim reduction As New Reduction_Basics
     Dim pyr As New PyrFilter_Basics
     Public Sub New()
@@ -37,8 +37,8 @@ Public Class PyrFilter_RedCloud : Inherits VB_Algorithm
 
         reduction.Run(dst3)
 
-        colorC.Run(reduction.dst2)
-        dst2 = colorC.dst2
-        labels(2) = colorC.labels(2)
+        redC.Run(reduction.dst2)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
     End Sub
 End Class

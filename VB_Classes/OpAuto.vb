@@ -33,7 +33,7 @@ Public Class OpAuto_XRange : Inherits VB_Algorithm
             Dim saveOptionState = task.optionsChanged ' the xRange and yRange change frequently.  It is safe to ignore it.
             Dim leftGap = histogram.Col(0).CountNonZero
             Dim rightGap = histogram.Col(histogram.Width - 1).CountNonZero
-            If leftGap = 0 And rightGap = 0 And redOptions.XRangeSlider.Value > 1 Then
+            If leftGap = 0 And rightGap = 0 And redOptions.XRangeSlider.Value > 3 Then
                 redOptions.XRangeSlider.Value -= 1
             Else
                 If adjustedCount < expectedCount Then redOptions.XRangeSlider.Value += 1 Else redOptions.XRangeSlider.Value -= 1
@@ -231,10 +231,9 @@ Public Class OpAuto_Peaks2D : Inherits VB_Algorithm
         ' input should be a 2D histogram.  If standalone, get one...
         If standalone Then
             Static heatmap As New HeatMap_Basics
-            If firstPass Then findCheckBox("Show Frustrum").Checked = False
             heatmap.Run(src)
-            dst2 = If(task.toggleEverySecond, heatmap.dst2, heatmap.dst3)
-            src = If(task.toggleEverySecond, heatmap.dst0.Clone, heatmap.dst1.Clone)
+            dst2 = If(task.toggleOn, heatmap.dst2, heatmap.dst3)
+            src = If(task.toggleOn, heatmap.dst0.Clone, heatmap.dst1.Clone)
         End If
 
         clusterPoints.Clear()

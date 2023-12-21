@@ -40,9 +40,9 @@ int *RecursiveBilateralFilter_Close(recursiveBilateralFilter * cPtr)
 }
 
 extern "C" __declspec(dllexport)
-int *RecursiveBilateralFilter_Run(recursiveBilateralFilter * cPtr, int *rgbPtr, int rows, int cols, int recursions)
+int *RecursiveBilateralFilter_Run(recursiveBilateralFilter * cPtr, int *bgrPtr, int rows, int cols, int recursions)
 {
-	cPtr->src = Mat(rows, cols, CV_8U, rgbPtr);
+	cPtr->src = Mat(rows, cols, CV_8U, bgrPtr);
 	cPtr->recursions = recursions;
 	cPtr->RecursiveBilateralFilter_Run();
 	return (int *)cPtr->src.data;

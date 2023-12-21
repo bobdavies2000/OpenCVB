@@ -11,21 +11,20 @@ Public Class Reduction_Basics : Inherits VB_Algorithm
             Dim bits = redOptions.BitwiseReductionSlider.Value
             classCount = 255 / Math.Pow(2, bits)
             Dim zeroBits = Math.Pow(2, bits) - 1
-            dst0 = src And New cv.Mat(src.Size, src.Type, cv.Scalar.All(255 - zeroBits))
-            dst2 = dst0 / zeroBits
+            dst2 = src And New cv.Mat(src.Size, src.Type, cv.Scalar.All(255 - zeroBits))
+            dst2 = dst2 / zeroBits
         ElseIf redOptions.reductionType = "Use Simple Reduction" Then
             Dim reductionVal = redOptions.SimpleReductionSlider.Value
             classCount = Math.Ceiling(255 / reductionVal)
 
-            dst0 = src / reductionVal
-            dst2 = dst0 * reductionVal
+            dst2 = src / reductionVal
             labels(2) = "Reduced image - factor = " + CStr(redOptions.SimpleReductionSlider.Value)
         Else
             dst2 = src
             labels(2) = "No reduction requested"
         End If
 
-        If standalone Or testIntermediate(traceName) Then dst3 = vbPalette(dst2)
+        If standalone Or testIntermediate(traceName) Then dst3 = vbPalette(dst2 * 255 / classCount)
         labels(2) = CStr(classCount) + " colors after reduction"
     End Sub
 End Class
@@ -36,7 +35,7 @@ End Class
 
 Public Class Reduction_Floodfill : Inherits VB_Algorithm
     Public reduction As New Reduction_Basics
-    Public flood As New RedColor_Basics
+    Public colorC As New RedColor_Basics
     Public Sub New()
         labels(2) = "Reduced input to floodfill"
         redOptions.SimpleReductionSlider.Value = 32
@@ -44,10 +43,10 @@ Public Class Reduction_Floodfill : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
-        dst2 = vbPalette(reduction.dst2)
-        flood.Run(reduction.dst2)
-        dst3 = flood.dst2
-        labels(3) = "Floodfill found " + CStr(task.fCells.Count) + " regions"
+        dst2 = vbPalette(reduction.dst2 * 255 / reduction.classCount)
+        colorC.Run(reduction.dst2)
+        dst3 = colorC.dst2
+        labels(3) = "Floodfill found " + CStr(colorC.fCells.Count) + " regions"
     End Sub
 End Class
 
@@ -96,8 +95,7 @@ Public Class Reduction_PointCloud : Inherits VB_Algorithm
     Public Sub New()
         redOptions.SimpleReduction.Checked = True
         redOptions.SimpleReductionSlider.Value = 20
-        labels(2) = "Reduced depth"
-        labels(3) = "Palettized output of the different depth levels found"
+        labels = {"", "", "8-bit reduced depth", "Palettized output of the different depth levels found"}
         desc = "Use reduction to smooth depth data"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -109,7 +107,7 @@ Public Class Reduction_PointCloud : Inherits VB_Algorithm
         reduction.dst2.ConvertTo(dst2, cv.MatType.CV_32F)
 
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-        dst3 = vbPalette(dst2)
+        dst3 = vbPalette(dst2 * 255 / reduction.classCount)
     End Sub
 End Class
 
@@ -142,12 +140,12 @@ Public Class Reduction_XYZ : Inherits VB_Algorithm
                 split(i).ConvertTo(dst0, cv.MatType.CV_32S)
                 reduction.Run(dst0)
                 Dim mm = vbMinMax(reduction.dst2)
-                reduction.dst2.ConvertTo(split(i), cv.MatType.CV_32F, 1, -mm.minVal)
-                split(i) *= 0.001
+                reduction.dst2.ConvertTo(split(i), cv.MatType.CV_32F)
             End If
         Next
 
         cv.Cv2.Merge(split, dst3)
+        dst3.SetTo(0, task.noDepthMask)
         setTrueText("Task.PointCloud (or 32fc3 input) has been reduced and is in dst3")
     End Sub
 End Class
@@ -169,7 +167,7 @@ Public Class Reduction_Edges : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
-        dst2 = reduction.dst2.Clone
+        dst2 = reduction.dst2 * 255 / reduction.classCount
 
         Dim reductionRequested = True
         If redOptions.reductionType = "No Reduction" Then reductionRequested = False
@@ -200,7 +198,7 @@ Public Class Reduction_Histogram : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
-        dst2 = reduction.dst2
+        dst2 = reduction.dst2 * 255 / reduction.classCount
 
         plot.Run(dst2)
         dst3 = plot.dst2
@@ -213,12 +211,10 @@ End Class
 
 
 
-
-Public Class Reduction_RGB : Inherits VB_Algorithm
+Public Class Reduction_BGR : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Dim mats As New Mat_4Click
     Public Sub New()
-        redOptions.SimpleReductionSlider.Value = 200
         desc = "Reduce RGB in parallel"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -226,7 +222,7 @@ Public Class Reduction_RGB : Inherits VB_Algorithm
 
         For i = 0 To 2
             reduction.Run(split(i))
-            If standalone Then mats.mat(i) = vbPalette(reduction.dst2)
+            If standalone Then mats.mat(i) = vbPalette(reduction.dst2 * 255 / reduction.classCount)
             split(0) = reduction.dst2.Clone
         Next
 

@@ -8,12 +8,15 @@ Public Class Depth_Basics : Inherits VB_Algorithm
     Public IMUBasics As New IMU_Basics
     Public IMUOptions As New Options_IMU
     Dim hCloud As New History_Cloud
+    Dim outline As New Depth_Outline
+    Dim maxMask As New Depth_MaxMask
     Public Sub New()
         desc = "Rotate the PointCloud around the X-axis and the Z-axis using the gravity vector from the IMU (but quietly)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
             dst2 = task.pcSplit(2)
+            dst3 = task.maxDepthMask
             setTrueText(gMatrixToStr(task.gMatrix), 3)
         Else
             IMUOptions.RunVB()
@@ -23,30 +26,26 @@ Public Class Depth_Basics : Inherits VB_Algorithm
             task.gMatrix = gMat.gMatrix
 
             If gOptions.gravityPointCloud.Checked Then
-                task.pointCloud = (task.pointCloud.Reshape(1, src.Rows * src.Cols) * task.gMatrix).ToMat.Reshape(3, src.Rows) '<<<<< this is the rotation
+                '******* this is the rotation *******
+                task.pointCloud = (task.pointCloud.Reshape(1, src.Rows * src.Cols) * task.gMatrix).ToMat.Reshape(3, src.Rows)
             End If
 
-            Dim maxD = gOptions.MaxDepth.Value - 0.1
             task.pcSplit = task.pointCloud.Split
-            task.maxDepthMask = task.pcSplit(2).Threshold(maxD, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-
             task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-            task.noDepthMask = Not task.depthMask
-
-            cv.Cv2.Merge(task.pcSplit, task.pointCloud)
             If gOptions.useHistoryCloud.Checked Then
                 task.historyCount = gOptions.FrameHistory.Value
                 hCloud.Run(task.pointCloud)
-                If task.frameCount >= task.historyCount Then task.pointCloud = hCloud.dst2
+                task.pointCloud = hCloud.dst2
 
                 task.pcSplit = task.pointCloud.Split
-                task.maxDepthMask = task.pcSplit(2).Threshold(maxD, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-
-                task.noDepthMask = task.pcSplit(2).InRange(0, 0)
-                task.depthMask = Not task.noDepthMask
+                task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
             Else
                 task.historyCount = 1
             End If
+            task.noDepthMask = Not task.depthMask
+
+            Dim maxD = gOptions.MaxDepth.Value - 0.1 ' why -0.1?  Because histograms are inclusive at boundaries.
+            task.maxDepthMask = task.pcSplit(2).Threshold(maxD, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
 
             If task.xRange <> task.xRangeDefault Or task.yRange <> task.yRangeDefault Then
                 Dim xRatio = task.xRangeDefault / task.xRange
@@ -56,9 +55,16 @@ Public Class Depth_Basics : Inherits VB_Algorithm
                 cv.Cv2.Merge(task.pcSplit, task.pointCloud)
             End If
 
+            task.pcSplit(2) = task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
             task.metersPerPixel = task.maxZmeters / dst3.Height ' meters per pixel in projections - side and top.
-            colorizer.Run(task.pcSplit(2))
+            colorizer.Run(task.pcSplit(2).Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc))
             task.depthRGB = colorizer.dst2
+
+            outline.Run(task.depthMask)
+            task.depthOutline = outline.dst2
+
+            maxMask.Run(task.maxDepthMask)
+            task.maxDepthMask = maxMask.dst2 ' Use the contour of the mask
         End If
     End Sub
 End Class
@@ -154,10 +160,11 @@ Public Class Depth_HolesRect : Inherits VB_Algorithm
         contours = cv.Cv2.FindContoursAsArray(shadow.dst3, cv.RetrievalModes.Tree, cv.ContourApproximationModes.ApproxSimple)
 
         Dim minEllipse(contours.Length - 1) As cv.RotatedRect
+        Dim minPixels = gOptions.minPixelsSlider.Value
         For i = 0 To contours.Length - 1
             Dim minRect = cv.Cv2.MinAreaRect(contours(i))
             Dim size = minRect.Size.Width * minRect.Size.Height
-            If size > task.minPixels Then
+            If size > minPixels Then
                 Dim nextColor = New cv.Scalar(task.vecColors(i Mod 256)(0), task.vecColors(i Mod 256)(1), task.vecColors(i Mod 256)(2))
                 drawRotatedRectangle(minRect, dst2, nextColor)
                 If contours(i).Length >= 5 Then
@@ -326,7 +333,7 @@ Module Depth_Colorizer_CPP_Module
     Public Function Depth_Colorizer_Close(Depth_ColorizerPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Depth_Colorizer_Run(Depth_ColorizerPtr As IntPtr, rgbPtr As IntPtr, rows As Integer, cols As Integer,
+    Public Function Depth_Colorizer_Run(Depth_ColorizerPtr As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer,
                                         maxDepth As Single) As IntPtr
     End Function
 End Module
@@ -920,7 +927,7 @@ Public Class Depth_StableMin : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
 
-        motion.Run(task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        motion.Run(task.gray)
 
         If task.motionReset Or resetAll Then
             stableMin = src.Clone
@@ -969,7 +976,7 @@ Public Class Depth_StableMax : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC1 Then src = task.pcSplit(2)
 
-        motion.Run(task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        motion.Run(task.gray)
 
         If task.motionReset Or resetAll Then
             stableMax = src.Clone
@@ -1430,26 +1437,17 @@ Public Class Depth_Tiers : Inherits VB_Algorithm
     Dim reduction As New Reduction_Basics
     Public classCount As Integer
     Public Sub New()
-        desc = "Create a reduced image of the X, Y, or depth point cloud data defining tiers of similar values"
+        desc = "Create a reduced image of the depth data to define tiers of similar values"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Or src.Type = cv.MatType.CV_8UC3 Then src = task.pcSplit(2)
         dst1 = src.Threshold(task.maxZmeters, task.maxZmeters, cv.ThresholdTypes.Trunc)
+        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
 
-        Dim mm = vbMinMax(dst1, task.depthMask)
-        dst1.SetTo(mm.minVal, task.noDepthMask)
-
-        dst0 = dst1 * 255 / mm.maxVal
-        dst0.ConvertTo(dst0, cv.MatType.CV_8U)
-        reduction.Run(dst0)
-
-        classCount = reduction.classCount + 1
-        Dim incr = Math.Ceiling(255 / classCount)
-        dst2 = reduction.dst2 + incr
+        classCount = task.maxZmeters
         dst2.SetTo(0, task.noDepthMask)
-        dst0 = dst2 / incr ' save the 8-bit version that has not been spread out.
 
-        If standalone Or testIntermediate(traceName) Then dst3 = vbPalette(dst2)
+        If standalone Or testIntermediate(traceName) Then dst3 = vbPalette(dst2 * 255 / classCount)
     End Sub
 End Class
 
@@ -1459,10 +1457,8 @@ End Class
 
 
 
-
-
 Public Class Depth_TierCount : Inherits VB_Algorithm
-    Public valley As New HistValley_Depth
+    Public valley As New HistValley_DepthOld
     Public classCount As Integer
     Public Sub New()
         labels = {"", "Histogram of the depth data with instantaneous valley lines", "", ""}
@@ -1642,3 +1638,81 @@ Public Class Depth_PunchBlobNew : Inherits VB_Algorithm
     End Sub
 End Class
 
+
+
+
+
+
+
+
+Public Class Depth_Contour : Inherits VB_Algorithm
+    Dim contour As New Contour_Basics
+    Public Sub New()
+        task.depthContours = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels = {"", "", "task.depthContour", "task.noDepthContour"}
+        desc = "Create and display the task.depthContours."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        contour.Run(task.depthMask)
+
+        task.depthContours.SetTo(0)
+        For Each tour In contour.contourlist
+            vbDrawContour(task.depthContours, tour.ToList, 255, -1)
+        Next
+        If standalone Then dst2 = task.depthContours
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Depth_Outline : Inherits VB_Algorithm
+    Dim contour As New Contour_Basics
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        labels(2) = "Contour separating depth from no depth"
+        desc = "Provide a line that separates depth from no depth throughout the image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Then src = task.depthMask
+        contour.Run(src)
+
+        dst2.SetTo(0)
+        For Each tour In contour.contourlist
+            vbDrawContour(dst2, tour.ToList, 255, task.lineWidth)
+        Next
+
+        If standalone Then
+            If heartBeat() Then dst3.SetTo(0)
+            dst3 = dst3 Or dst2
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Depth_MaxMask : Inherits VB_Algorithm
+    Dim contour As New Contour_Basics
+    Public Sub New()
+        labels = {"", "", "task.maxDepthMask", "Contour for task.maxDepthMask"}
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Display the task.maxDepthMask and its contour"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        contour.Run(task.maxDepthMask)
+
+        dst2.SetTo(0)
+        For Each tour In contour.contourlist
+            vbDrawContour(dst2, tour.ToList, 255, -1)
+        Next
+    End Sub
+End Class

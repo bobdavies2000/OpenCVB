@@ -74,7 +74,7 @@ Module Tracker_Basics_CPP_Module
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function Tracker_Basics_Close(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Tracker_Basics_Run(cPtr As IntPtr, rgbPtr As IntPtr, rows As Integer, cols As Integer,
+    Public Function Tracker_Basics_Run(cPtr As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer,
                                        x As Integer, y As Integer, w As Integer, h As Integer) As IntPtr
     End Function
 End Module

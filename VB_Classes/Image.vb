@@ -74,7 +74,7 @@ Public Class Image_Series : Inherits VB_Algorithm
         desc = "Display a new image from the directory every heartbeat"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        If task.optionsChanged Then
+        If task.optionsChanged Or loadNextImage Then
             If loadNextImage Then fileIndex += 1
             loadNextImage = False
             If fileIndex >= fileNameList.Count Then fileIndex = 0
@@ -101,10 +101,9 @@ End Class
 
 Public Class Image_RedCloudColor : Inherits VB_Algorithm
     Public images As New Image_Series
-    Public redC As New RedCloud_ColorOnly
+    Public redC As New RedCloud_ColorCells
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
+        gOptions.displayDst0.Checked = True
         desc = "Use RedCloud on a photo instead of the video stream."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -115,10 +114,8 @@ Public Class Image_RedCloudColor : Inherits VB_Algorithm
         redC.Run(dst0)
         dst2 = redC.dst2
 
-        Dim mask = task.cellMap.InRange(task.redOther, task.redOther)
+        Dim mask = redC.redC.cellMap.InRange(task.redOther, task.redOther)
         dst2.SetTo(cv.Scalar.Black, mask)
-
-        redC.redC.redSelect(dst0, dst1, dst2)
 
         labels(2) = redC.labels(2)
     End Sub
@@ -137,16 +134,10 @@ End Class
 Public Class Image_RedCloudColorSeries : Inherits VB_Algorithm
     Dim images As New Image_RedCloudColor
     Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
         desc = "Use RedCloud on a series of photos instead of the video stream."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static heartBeatCount As Integer
-        If heartBeat() Then
-            heartBeatCount += 1
-            If heartBeatCount Mod 5 = 0 Then loadNextImage = True
-        End If
+        If heartBeat() Then loadNextImage = True
         images.Run(Nothing)
         dst0 = images.dst0
         dst1 = images.dst1
@@ -164,11 +155,11 @@ End Class
 
 Public Class Image_CellStats : Inherits VB_Algorithm
     Dim images As New Image_RedCloudColor
-    Dim stats As New RedCloud_CellStats
+    Dim stats As New Cell_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst0.Checked = True
         If standalone Then gOptions.displayDst1.Checked = True
-        stats.redC = New RedCloud_ColorOnly
+        redOptions.UseColor.Checked = True
         desc = "Display the statistics for the selected cell"
     End Sub
     Public Sub RunVB(src As cv.Mat)

@@ -66,7 +66,7 @@ Public Class MFI_BasicsOld : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         dMax.Run(src)
 
-        motion.Run(task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        motion.Run(task.gray)
         labels(3) = motion.labels(3)
         dst3 = If(motion.dst3.Channels = 1, motion.dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR), motion.dst3.Clone)
 

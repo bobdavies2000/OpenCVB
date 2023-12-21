@@ -41,9 +41,6 @@ Namespace jsonClass
         Public defaultFontName As String
 
         Public treeButton As Boolean
-        Public TreeLocX As Integer
-        Public TreeLocY As Integer
-        Public TreeLocHeight As Integer
 
         Public PixelViewerButton As Boolean
 
@@ -78,7 +75,6 @@ Namespace jsonClass
             emptyApp.testAllDuration = 5
             emptyApp.showConsoleLog = False
             emptyApp.treeButton = True
-            emptyApp.TreeLocHeight = 500
             emptyApp.algorithmGroup = "<All but Python>"
             SaveSetting("OpenCVB1", "PixelViewerLeft", "PixelViewerLeft", 0)
             SaveSetting("OpenCVB1", "PixelViewerTop", "PixelViewerTop", 0)

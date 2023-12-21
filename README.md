@@ -1,28 +1,33 @@
-# Recent Changes – November 2023
+# Recent Changes – December 2023
 
 -   Over 1700 algorithms are included, averaging 31 lines of code per algorithm.
--   RedCloud and RedColor algorithms were reorganized and reviewed.
-    -   RedCloud/RedColor algorithms include depth and color by default.
-    -   RedCloud algorithms needed a custom options form – OptionsRedCloud.vb.
-    -   “redOptions” includes RedCloud and related options and is always present.
--   RedCloud algorithms were consolidated and are now all in RedCloud.vb.
-    -   Each algorithm can use guided backprojection or reduction to create cells.
-    -   Pointcloud reduction is now controlled by the slider in RedCloud_Core.
-        -   Needed to be separate from reduction slider.
-    -   Each algorithm can use different color sources for cells with no depth.
--   RedColor algorithms now supplement RedCloud algorithms with color data.
-    -   Color source is defined in the RedCloud options form.
--   MSER algorithms were improved with better image segmentation.
-    -   It provides an alternative segmentation method for color images.
--   Neighbor cells are now easily accessible to RedCloud and RedColor algorithms.
-    -   Core technique to find neighbors (example below) is in Neighbors.vb.
--   The TreeView display of performance times now shows the data in tree order.
-    -   Easier to identify where the overhead is in the algorithm.
+-   The 3D histogram improves the point cloud “blowback” pixels.
+    -   See the OpenGL_Filtered3D algorithm and images below.
+-   All stable RedCloud cells are identified in color and depth.
+    -   See Cell_Stable for an alternative way to match cells.
+-   This version introduces the concept of spectrum range for a cell.
+    -   Spectrum: values for depth or color that form a continuous range.
+-   Spectrum algorithms will find the ranges of color/depth in RedCloud cells.
+    -   RedCloud cells already cluster color and depth samples.
+    -   Spectrum isolates outliers in color and depth to facilitate their removal.
+    -   Spectrum options define the gap sizes for depth and color.
+-   Is there a simple way to define foreground and background automatically?
+    -   Use KMeans with depth input and k=2. See KMeans_Depth algorithm.
+    -   To see how to use foreground/background with GrabCut: GrabCut_Basics.
+-   GifBuilder WPF warnings now gone – reworked it as a Windows Form application.
+-   RedCloud depth ranges are more accurate thanks to the new rc.depthMask.
+-   Contour masks for depth and ‘no depth’ were added to task structure.
+    -   Depth contour defines a boundary between depth and ‘no depth’.
+-   New heartbeats were added at quarter second intervals.
+    -   All heartbeats are now time-based only (not FPS based.)
+-   HistValley_Depth finds histogram valleys and separates depth into tiers.
+-   Added RedMin algorithms to find a minimalist approach to RedCloud cells.
+    -   No requirement for a dummy cell at location 0, 0.
 -   A log of changes is included at the bottom of this document.
 
-![](media/aa767d146879de432a3a0208b65b6eca.gif)
+![](media/7e883a32a7ee8faaf76107f24eea917a.gif)
 
-**RedCloud_Neighbors:** *The neighbors for each cell can be included in the cell information. Here the neighbors of the highlighted cell were requested and are shown in the lower right image.*
+**OpenGL_Filtered3D:** *The histogram interface in OpenCV supports 3D point clouds where the bins can be thought of as 3D bricks in the 3D point cloud.  The ‘Histogram Bins’ slider controls a threshold that is used to zero out bricks that have fewer samples than the threshold. When the slider is set to zero, all the blowback pixels appear and extend behind the wall in this side angle view in OpenGL. Bins with less than the specified threshold are set to zero and the backprojection creates a mask that reduces the blowback. The camera used in this example is the Intel D455. The Microsoft Kinect for Azure camera is more accurate and does not have much blowback.*
 
 # Introduction
 
@@ -1129,3 +1134,29 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A colorful squares and lines Description automatically generated with medium confidence](media/c4eed0d963820c627ec5b94291a36c4d.gif)
 
 **RedCloud_Basics** *(This is the previous version of RedCloud_Basics from September 2023.) This image segmentation algorithm uses both the point cloud and color to identify cells. RedCloud algorithms typically reduce the point cloud resolution in X and Y to produce cells that describe regions in the image. This algorithm also uses the reduced point cloud but has added cells based on color for regions that have no depth. Because both color and the point cloud are used, the whole image is segmented instead of just that portion with depth. When a cell’s color is consistent, it has been matched to a cell in the previous frame.*
+
+# Recent Changes – November 2023
+
+-   Over 1700 algorithms are included, averaging 31 lines of code per algorithm.
+-   RedCloud and RedColor algorithms were reorganized and reviewed.
+    -   RedCloud/RedColor algorithms include depth and color by default.
+    -   RedCloud algorithms needed a custom options form – OptionsRedCloud.vb.
+    -   “redOptions” includes RedCloud and related options and is always present.
+-   RedCloud algorithms were consolidated and are now all in RedCloud.vb.
+    -   Each algorithm can use guided backprojection or reduction to create cells.
+    -   Pointcloud reduction is now controlled by the slider in RedCloud_Core.
+        -   Needed to be separate from reduction slider.
+    -   Each algorithm can use different color sources for cells with no depth.
+-   RedColor algorithms now supplement RedCloud algorithms with color data.
+    -   Color source is defined in the RedCloud options form.
+-   MSER algorithms were improved with better image segmentation.
+    -   It provides an alternative segmentation method for color images.
+-   Neighbor cells are now easily accessible to RedCloud and RedColor algorithms.
+    -   Core technique to find neighbors (example below) is in Neighbors.vb.
+-   The TreeView display of performance times now shows the data in tree order.
+    -   Easier to identify where the overhead is in the algorithm.
+-   A log of changes is included at the bottom of this document.
+
+![A collage of images of different colors Description automatically generated](media/aa767d146879de432a3a0208b65b6eca.gif)
+
+**RedCloud_Neighbors:** *The neighbors for each cell can be included in the cell information. Here the neighbors of the highlighted cell were requested and are shown in the lower right image.*

@@ -263,10 +263,10 @@ Module BGSubtract_BGFG_CPP_Module
     Public Function BGSubtract_BGFG_Close(bgfs As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_BGFG_Run(bgfs As IntPtr, rgbPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
+    Public Function BGSubtract_BGFG_Run(bgfs As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function BGSubtract_Synthetic_Open(rgbPtr As IntPtr, rows As Integer, cols As Integer, fgFilename As String, amplitude As Double,
+    Public Function BGSubtract_Synthetic_Open(bgrPtr As IntPtr, rows As Integer, cols As Integer, fgFilename As String, amplitude As Double,
                                           magnitude As Double, wavespeed As Double, objectspeed As Double) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>

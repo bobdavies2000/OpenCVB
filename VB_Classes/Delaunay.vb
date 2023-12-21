@@ -1,4 +1,3 @@
-Imports OpenCvSharp
 Imports cv = OpenCvSharp
 Public Class Delaunay_Basics : Inherits VB_Algorithm
     Public inputPoints As New List(Of cv.Point2f)
@@ -34,7 +33,7 @@ Public Class Delaunay_Basics : Inherits VB_Algorithm
 
             Dim pt = inputPoints(i)
             Dim nextColor = lastColor.Get(Of cv.Vec3b)(pt.Y, pt.X)
-            If usedColors.Contains(nextColor) Then nextColor = New cv.Vec3b(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255))
+            If usedColors.Contains(nextColor) Then nextColor = randomCellColor()
             usedColors.Add(nextColor)
 
             dst2.FillConvexPoly(nextFacet, vecToScalar(nextColor))

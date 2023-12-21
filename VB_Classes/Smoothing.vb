@@ -50,10 +50,10 @@ Public Class Smoothing_Exterior : Inherits VB_Algorithm
         smOptions.RunVB()
         If standalone Then
             If heartBeat() And Not task.paused Then
-                hull.buildRandomHullPoints()
+                Dim hullList = hull.buildRandomHullPoints()
                 dst2.SetTo(0)
                 hull.Run(src)
-                Dim nextHull = hull.hull
+                Dim nextHull = cv.Cv2.ConvexHull(hullList.ToArray, True)
                 inputPoints = drawPoly(dst2, nextHull.ToList, cv.Scalar.White)
             Else
                 Exit Sub
@@ -127,10 +127,10 @@ Public Class Smoothing_Interior : Inherits VB_Algorithm
         smOptions.RunVB()
         If standalone Then
             If heartBeat() And task.paused = False Then
-                hull.buildRandomHullPoints()
+                Dim hullList = hull.buildRandomHullPoints()
                 dst2.SetTo(0)
                 hull.Run(src)
-                Dim nextHull = hull.hull
+                Dim nextHull = cv.Cv2.ConvexHull(hullList.ToArray, True)
                 inputPoints = drawPoly(dst2, nextHull.ToList, cv.Scalar.White)
             Else
                 Exit Sub

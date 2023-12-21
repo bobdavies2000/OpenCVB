@@ -12,7 +12,7 @@ Public Class HistPeak2D_Basics : Inherits VB_Algorithm
         If standalone Then
             Static bgr As New Histogram2D_BGR
             bgr.Run(src)
-            histogram = bgr.histogram
+            histogram = bgr.histogram02
         End If
         If firstPass Or task.optionsChanged Or (heartBeat() And src.Type = cv.MatType.CV_32FC3) Then
             auto.Run(histogram)
@@ -41,69 +41,6 @@ End Class
 
 
 
-Public Class HistPeak2D_HotSide : Inherits VB_Algorithm
-    Dim peak As New HistPeak2D_Basics
-    Dim hist2d As New Histogram2D_Side
-    Public Sub New()
-        labels = {"", "", "Backprojection of Side View hotspots", "Side view with highlighted hot spots"}
-        desc = "Find the top X peaks in the 2D histogram of the side view and backproject it."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        hist2d.Run(src)
-        dst3 = hist2d.histogram
-
-        For i = 0 To peak.auto.clusterPoints.Count - 1
-            Dim pt = peak.auto.clusterPoints(i)
-            dst3.Circle(pt, task.dotSize * 3, cv.Scalar.White, -1, task.lineType)
-        Next
-
-        peak.histogram = hist2d.histogram
-        peak.ranges = task.rangesSide
-        redOptions.channels = task.channelsSide
-        peak.Run(task.pointCloud)
-        dst2 = peak.dst2
-        dst2.SetTo(0, task.noDepthMask)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class HistPeak2D_HotTop : Inherits VB_Algorithm
-    Dim peak As New HistPeak2D_Basics
-    Dim hist2d As New Histogram2D_Top
-    Public Sub New()
-        labels = {"", "", "Backprojection of Top View hotspots", "Top view with highlighted hot spots"}
-        desc = "Find the top X peaks in the 2D histogram of the top view and backproject it."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        hist2d.Run(src)
-        dst3 = hist2d.histogram
-
-        For i = 0 To peak.auto.clusterPoints.Count - 1
-            Dim pt = peak.auto.clusterPoints(i)
-            dst3.Circle(pt, task.dotSize * 3, cv.Scalar.White, -1, task.lineType)
-        Next
-
-        peak.histogram = hist2d.histogram
-        peak.ranges = task.rangesTop
-        redOptions.channels = task.channelsTop
-        peak.Run(task.pointCloud)
-        dst2 = peak.dst2
-        dst2.SetTo(0, task.noDepthMask)
-    End Sub
-End Class
-
-
-
-
-
-
-
 
 Public Class HistPeak2D_TopAndSide : Inherits VB_Algorithm
     Dim peak As New HistPeak2D_Basics
@@ -113,7 +50,7 @@ Public Class HistPeak2D_TopAndSide : Inherits VB_Algorithm
         desc = "Find the top X peaks in the 2D histogram of the top and side views and backproject them."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.toggleEverySecond Then
+        If task.toggleOn Then
             histSide.Run(src)
             peak.ranges = task.rangesSide
             redOptions.channels = task.channelsSide
@@ -200,7 +137,7 @@ Public Class HistPeak2D_HSV : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         hsv.Run(src)
-        peak.histogram = hsv.histogram
+        peak.histogram = hsv.histogram01
         peak.Run(hsv.dst1)
         dst2 = peak.dst2
         dst3 = peak.auto.dst2
@@ -223,7 +160,7 @@ Public Class HistPeak2D_BGR : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         bgr.Run(src)
 
-        peak.histogram = bgr.histogram
+        peak.histogram = bgr.histogram02
         peak.Run(src)
         dst2 = peak.dst2
         dst3 = peak.auto.dst2
@@ -249,5 +186,66 @@ Public Class HistPeak2D_RGB : Inherits VB_Algorithm
         dst3 = peak.dst3
 
         labels(3) = peak.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class HistPeak2D_HotSide : Inherits VB_Algorithm
+    Dim peak As New HistPeak2D_Basics
+    Dim hist2d As New Histogram2D_Side
+    Public Sub New()
+        labels = {"", "", "Backprojection of Side View hotspots", "Side view with highlighted hot spots"}
+        desc = "Find the top X peaks in the 2D histogram of the side view and backproject it."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        hist2d.Run(src)
+        dst3 = hist2d.histogram
+
+        For i = 0 To peak.auto.clusterPoints.Count - 1
+            Dim pt = peak.auto.clusterPoints(i)
+            dst3.Circle(pt, task.dotSize * 3, cv.Scalar.White, -1, task.lineType)
+        Next
+
+        peak.histogram = hist2d.histogram
+        peak.ranges = task.rangesSide
+        redOptions.channels = task.channelsSide
+        peak.Run(task.pointCloud)
+        dst2 = peak.dst2
+        dst2.SetTo(0, task.noDepthMask)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class HistPeak2D_HotTop : Inherits VB_Algorithm
+    Dim peak As New HistPeak2D_Basics
+    Dim hist2d As New Histogram2D_Top
+    Public Sub New()
+        labels = {"", "", "Backprojection of Top View hotspots", "Top view with highlighted hot spots"}
+        desc = "Find the top X peaks in the 2D histogram of the top view and backproject it."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        hist2d.Run(src)
+        dst3 = hist2d.histogram
+
+        For i = 0 To peak.auto.clusterPoints.Count - 1
+            Dim pt = peak.auto.clusterPoints(i)
+            dst3.Circle(pt, task.dotSize * 3, cv.Scalar.White, -1, task.lineType)
+        Next
+
+        peak.histogram = hist2d.histogram
+        peak.ranges = task.rangesTop
+        redOptions.channels = task.channelsTop
+        peak.Run(task.pointCloud)
+        dst2 = peak.dst2
+        dst2.SetTo(0, task.noDepthMask)
     End Sub
 End Class

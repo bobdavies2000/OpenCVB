@@ -3,7 +3,7 @@ Imports cv = OpenCvSharp
 Public Class GuidedBP_Basics : Inherits VB_Algorithm
     Dim heatTop As New Histogram2D_Top
     Public classCount As Integer
-    Public fCell As New RedColor_Basics
+    Public colorC As New RedColor_Basics
     Public Sub New()
         labels(3) = "Threshold of Top View"
         desc = "Use floodfill to identify all the objects in the selected view then build a backprojection that identifies k objects in the image view."
@@ -12,12 +12,11 @@ Public Class GuidedBP_Basics : Inherits VB_Algorithm
         heatTop.Run(src)
 
         dst3 = heatTop.histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        task.minPixels = 1
-        fCell.Run(dst3)
+        colorC.Run(dst3)
 
         Dim doctoredHist32f As New cv.Mat
-        fCell.dst3.ConvertTo(doctoredHist32f, cv.MatType.CV_32F)
-        classCount = task.fCells.Count
+        colorC.dst3.ConvertTo(doctoredHist32f, cv.MatType.CV_32F)
+        classCount = colorC.fCells.Count
 
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, doctoredHist32f, dst1, task.rangesTop)
         dst1 = dst1.ConvertScaleAbs()
@@ -75,7 +74,7 @@ Public Class GuidedBP_Cells : Inherits VB_Algorithm
             Dim kw = newCells.ElementAt(i).Value
             kw.color = lastDst2.Get(Of cv.Vec3b)(kw.maxDist.Y, kw.maxDist.X)
             If kw.color = black Then
-                kw.color = New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240))
+                kw.color = randomCellColor()
             End If
             kw.index = kCells.Count
 
@@ -127,7 +126,7 @@ Public Class GuidedBP_CellHistograms : Inherits VB_Algorithm
 
         Dim kw = kWare.kwShowSelected(kWare.kCells, kWare.kMap, dst3)
 
-        If heartBeat() Or task.mouseClickFlag Then
+        If heartBeat() Then
             If kw.index <> 0 Then
                 Dim zeroMat = Not kw.mask
                 labels(2) = "Histograms for "
@@ -231,7 +230,7 @@ Public Class GuidedBP_kTop : Inherits VB_Algorithm
         dst2 = colorC.dst2
 
         dst3.SetTo(0)
-        For Each fc In task.fCells
+        For Each fc In colorC.colorC.fCells
             Dim histogram As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
             autoX.histogram(fc.rect).CopyTo(histogram(fc.rect), fc.mask)
             cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histogram, dst0, task.rangesTop)
@@ -273,7 +272,7 @@ Public Class GuidedBP_kSide : Inherits VB_Algorithm
         dst2 = colorC.dst2
 
         dst3.SetTo(0)
-        For Each fc In task.fCells
+        For Each fc In colorC.colorC.fCells
             Dim histogram As New cv.Mat(dst2.Size, cv.MatType.CV_32F, 0)
             autoY.histogram(fc.rect).CopyTo(histogram(fc.rect), fc.mask)
             cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogram, dst0, task.rangesSide)
@@ -321,35 +320,12 @@ End Class
 
 
 
-Public Class GuidedBP_kCellStats : Inherits VB_Algorithm
-    Dim kTopSide As New GuidedBP_kTopSide
-    Dim stats As New RedCloud_CellStats
-    Public Sub New()
-        stats.redC = New RedCloud_Basics
-        desc = "Display all the stats for a RedColor cell"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        kTopSide.Run(src)
-        dst2 = kTopSide.dst2
-
-        stats.Run(dst2)
-
-        setTrueText(stats.strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class GuidedBP_DelaunayStats : Inherits VB_Algorithm
     Dim delaunay As New GuidedBP_Delaunay
     Dim reduction As New Reduction_Basics
-    Dim stats As New RedCloud_CellStats
+    Dim stats As New Cell_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        stats.redC = New RedCloud_Basics
         labels(1) = "Compartments for each object"
         desc = "Compartmentalize the RedCloud_Basics cells so they stay near the objects detected."
     End Sub
@@ -359,7 +335,7 @@ Public Class GuidedBP_DelaunayStats : Inherits VB_Algorithm
         delaunay.Run(src)
         dst2 = delaunay.dst2
 
-        dst0 = reduction.dst0 + delaunay.dst3
+        dst0 = reduction.dst2 + delaunay.dst3
 
         stats.Run(dst0)
         dst1 = stats.dst1
@@ -407,10 +383,9 @@ End Class
 
 Public Class GuidedBP_ObjectStats : Inherits VB_Algorithm
     Dim kObj As New GuidedBP_Objects
-    Dim stats As New RedCloud_CellStats
+    Dim stats As New Cell_Basics
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        stats.redC = New RedCloud_Basics
+        stats.runRedCloud = True
         labels(1) = "Compartments for each object"
         desc = "Compartmentalize the RedCloud_Basics cells so they stay near the objects detected."
     End Sub
@@ -419,6 +394,7 @@ Public Class GuidedBP_ObjectStats : Inherits VB_Algorithm
         dst2 = kObj.dst2
 
         stats.Run(kObj.dst1)
+        dst0 = stats.dst0
         dst1 = stats.dst1
         labels(2) = stats.labels(2)
         setTrueText(stats.strOut, 3)
@@ -453,8 +429,8 @@ Public Class GuidedBP_Objects : Inherits VB_Algorithm
 
         Dim kwX = kHist.kWare.kwShowSelected(kHist.kCells, kHist.kMap, dst2)
         vbDrawContour(dst2, kwX.hull, cv.Scalar.White, task.lineWidth)
-        reduction.dst0.SetTo(0, dst1)
-        dst1 += reduction.dst0
+        reduction.dst2.SetTo(0, dst1)
+        dst1 += reduction.dst2
 
         labels(2) = CStr(kHist.kCells.Count) + " objects found"
     End Sub
@@ -546,12 +522,11 @@ End Class
 
 Public Class GuidedBP_RedColor : Inherits VB_Algorithm
     Dim bpDoctor As New GuidedBP_Cells
-    Dim stats As New RedCloud_CellStats
+    Dim stats As New Cell_Basics
     Dim colorClass As New Color_Basics
     Public Sub New()
-        stats.redC = New RedCloud_Basics
-        labels = {"", "", "RedCloud_CellStats output", ""}
-        desc = "Run RedCloud_CellStats on the output of GuidedBP_Basics after merging with task.color"
+        labels = {"", "", "Cell_Basics output", ""}
+        desc = "Run Cell_Basics on the output of GuidedBP_Basics after merging with task.color"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         bpDoctor.Run(src)
@@ -562,6 +537,7 @@ Public Class GuidedBP_RedColor : Inherits VB_Algorithm
         colorClass.dst2.CopyTo(dst1, task.noDepthMask)
 
         stats.Run(dst1)
+        dst0 = stats.dst0
 
         setTrueText(stats.strOut, 3)
     End Sub
@@ -724,10 +700,11 @@ Public Class GuidedBP_HotPoints : Inherits VB_Algorithm
         rectList.Clear()
         ptList.Clear()
         mask.SetTo(0)
+        Dim minPixels = gOptions.minPixelsSlider.Value
         For i = 0 To points.Rows - 1
             Dim pt = points.Get(Of cv.Point)(i, 0)
             Dim count = input.FloodFill(mask, pt, 255, rect, 0, 0, 4 Or cv.FloodFillFlags.MaskOnly Or (255 << 8))
-            If count >= task.minPixels Then
+            If count >= minPixels Then
                 viewList.Add(count, rectList.Count)
                 rectList.Add(New cv.Rect(rect.X + 1, rect.Y + 1, rect.Width + 1, rect.Height + 1))
                 ptList.Add(pt)
@@ -916,7 +893,7 @@ Public Class GuidedBP_Hulls : Inherits VB_Algorithm
                 kw.size = kw.mask.CountNonZero()
                 newCells.Add(kw.size, kw)
 
-                kw.color = New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240))
+                kw.color = randomCellColor()
                 vbDrawContour(dst2, kw.contour, kw.color, -1)
             Next
             dst0 = task.color.Clone
@@ -940,9 +917,7 @@ Public Class GuidedBP_Hulls : Inherits VB_Algorithm
                     kw.color = lkw.color
                 End If
 
-                If usedColors.Contains(kw.color) Then
-                    kw.color = New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240))
-                End If
+                If usedColors.Contains(kw.color) Then kw.color = randomCellColor()
 
                 vbDrawContour(kMap, kw.hull, kw.index, -1)
                 vbDrawContour(dst2, kw.contour, kw.color, -1)
@@ -1030,9 +1005,7 @@ Public Class GuidedBP_Map : Inherits VB_Algorithm
                     kw.color = dst2.Get(Of cv.Vec3b)(kw.maxDist.Y, kw.maxDist.X)
                 End If
 
-                If usedColors.Contains(kw.color) Then
-                    kw.color = New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240))
-                End If
+                If usedColors.Contains(kw.color) Then kw.color = randomCellColor()
 
                 kCells.Add(kw)
                 usedColors.Add(kw.color)
@@ -1074,11 +1047,11 @@ End Class
 
 
 
-Public Class GuidedBP_Depth : Inherits VB_Algorithm
+Public Class GuidedBP_Depth255 : Inherits VB_Algorithm
     Public hist As New PointCloud_Histograms
     Dim myPalette As New Palette_Random
     Public Sub New()
-        gOptions.HistBinSlider.Value = 15
+        gOptions.HistBinSlider.Value = 16
         desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1092,7 +1065,7 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
         Dim histList = samples.ToList
         samples(histList.IndexOf(histList.Max)) = 0
 
-        Dim nonZeroSamples = 0
+        Dim nonZeroSamples As Integer
         For i = 0 To samples.Count - 1
             If samples(i) > 0 Then
                 nonZeroSamples += 1
@@ -1115,5 +1088,69 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
                 dst3 = myPalette.dst2
             End If
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class GuidedBP_Depth : Inherits VB_Algorithm
+    Public hist As New PointCloud_Histograms
+    Dim myPalette As New Palette_Random
+    Public classCount As Integer
+    Public givenClassCount As Integer
+    Public Sub New()
+        gOptions.HistBinSlider.Value = 16
+        desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+
+        hist.Run(src)
+
+        Dim samples(hist.histogram.Total - 1) As Single
+        Marshal.Copy(hist.histogram.Data, samples, 0, samples.Length)
+
+        Dim histList = samples.ToList
+        samples(histList.IndexOf(histList.Max)) = 0
+
+        Dim sortedHist As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
+
+        For i = 0 To samples.Count - 1
+            sortedHist.Add(samples(i), i)
+        Next
+
+        classCount = 0
+        Dim count As Integer
+        Dim newSamples(samples.Count - 1) As Single
+        Dim minPixels = gOptions.minPixelsSlider.Value
+        Dim maxClassCount = 255 - givenClassCount - 1
+        For i = 0 To sortedHist.Count - 1
+            Dim index = sortedHist.ElementAt(i).Value
+            count += sortedHist.ElementAt(i).Key
+            newSamples(index) = classCount
+            classCount += 1
+            ' if we have 95% of the pixels, good enough...
+            ' But leave room for the color classcount (usually < 10)
+            If count / src.Total > redOptions.imageThresholdPercent Or classCount >= maxClassCount Then Exit For
+        Next
+
+        Marshal.Copy(newSamples, 0, hist.histogram.Data, newSamples.Length)
+
+        cv.Cv2.CalcBackProject({src}, redOptions.channels, hist.histogram, dst2, redOptions.ranges)
+        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        ' dst2.SetTo(254, task.depthOutline)
+        If standalone Or testIntermediate(traceName) Then
+            labels(3) = "Note that colors are shifting because this is before RedCloud matching."
+            dst2 += 1
+            dst2.SetTo(0, task.noDepthMask)
+            myPalette.Run(dst2)
+            dst3 = myPalette.dst2
+        End If
+
+        labels(2) = CStr(classCount) + " regions detected in the backprojection - " + Format(count / src.Total, "0%")
     End Sub
 End Class

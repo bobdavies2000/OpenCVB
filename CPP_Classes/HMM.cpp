@@ -135,9 +135,9 @@ int * HMM_Close(HMM* cPtr)
 }
 
 extern "C" __declspec(dllexport)
-int* HMM_Run(HMM* cPtr, int* rgbPtr, int rows, int cols, int channels)
+int* HMM_Run(HMM* cPtr, int* bgrPtr, int rows, int cols, int channels)
 {
-	cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, rgbPtr);
+	cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, bgrPtr);
 	cPtr->Run();
 	return (int*)cPtr->output.data;
 }

@@ -185,31 +185,6 @@ End Class
 
 
 
-' https://github.com/accord-net/framework/wiki/Imaging
-'Public Class Blur_Bitmap : Inherits VB_Algorithm
-'    Dim options As New Options_Blur
-'    Public Sub New()
-'        labels = {"", "", "Accord - Apply method", "Accord - ApplyInPlace method"}
-'        desc = "Accord: use the Accord blur interface"
-'    End Sub
-'    Public Sub RunVB(src As cv.Mat)
-'        options.RunVB()
-
-'        Dim Bitmap = cv.Extensions.BitmapConverter.ToBitmap(src)
-
-'        Dim blurImage = New GaussianBlur(options.sigma, options.kernelSize)
-'        dst2 = cv.Extensions.BitmapConverter.ToMat(blurImage.Apply(Bitmap))
-
-'        blurImage.ApplyInPlace(Bitmap)
-'        dst3 = cv.Extensions.BitmapConverter.ToMat(Bitmap)
-'    End Sub
-'End Class
-
-
-
-
-
-
 
 Public Class Blur_Detection : Inherits VB_Algorithm
     Dim laplace As New Laplacian_Basics
@@ -240,5 +215,24 @@ Public Class Blur_Detection : Inherits VB_Algorithm
         setTrueText("Blur variance is " + Format(stdev * stdev, fmt3), 3)
 
         If standalone Then dst2.Rectangle(r, cv.Scalar.White, task.lineWidth)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Blur_Depth : Inherits VB_Algorithm
+    Dim blur As New Blur_Basics
+    Public Sub New()
+        desc = "Blur the depth results to help find the boundaries to large depth regions"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst3 = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        blur.Run(dst3)
+        dst2 = blur.dst2
     End Sub
 End Class

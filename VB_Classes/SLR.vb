@@ -30,13 +30,13 @@ Public Class SLR_Basics : Inherits VB_Algorithm
 
         labels(2) = "Tolerance = " + CStr(tolerance) + " and moving average window = " + CStr(halfLength)
         If resultX.Count > 0 Then
-            plot.srcX = input.dataX.ToArray
-            plot.srcY = input.dataY.ToArray
+            plot.srcX = input.dataX
+            plot.srcY = input.dataY
             plot.Run(src)
             dst2 = plot.dst2.Clone
 
-            plot.srcX = resultX.ToArray
-            plot.srcY = resultY.ToArray
+            plot.srcX = resultX
+            plot.srcY = resultY
             plot.Run(src)
             dst3 = plot.dst2
         Else
@@ -77,8 +77,8 @@ Public Class SLR_Data : Inherits VB_Algorithm
         desc = "Plot the data used in SLR_Basics"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        plot.srcX = dataX.ToArray
-        plot.srcY = dataY.ToArray
+        plot.srcX = dataX
+        plot.srcY = dataY
         plot.Run(src)
         dst2 = plot.dst2
     End Sub

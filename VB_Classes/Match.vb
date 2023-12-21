@@ -390,11 +390,7 @@ Public Class Match_TraceRedC : Inherits VB_Algorithm
         desc = "Track each RedCloud cell center to highlight zones of RedCloud cell instability.  Look for clusters of points in dst2."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Or task.cameraStable = False Then
-            dst0.SetTo(0)
-            dst1.SetTo(0)
-            dst2.SetTo(0)
-        End If
+        If heartBeat() Or task.cameraStable = False Then dst2.SetTo(0)
         redC.Run(src)
 
         Static frameList As New List(Of cv.Mat)
@@ -403,10 +399,10 @@ Public Class Match_TraceRedC : Inherits VB_Algorithm
         dst0.SetTo(0)
         Dim points As New List(Of cv.Point)
 
-        For Each rc In task.redCells
+        For Each rc In redC.redCells
             dst0.Set(Of Byte)(rc.maxDist.Y, rc.maxDist.X, 1)
         Next
-        labels(2) = CStr(task.redCells.Count) + " cells added"
+        labels(2) = CStr(redC.redCells.Count) + " cells added"
 
         frameList.Add(dst0.Clone)
         If frameList.Count >= task.historyCount Then

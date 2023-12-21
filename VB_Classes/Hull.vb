@@ -21,3 +21,38 @@ Public Class Hull_Basics : Inherits VB_Algorithm
         vbDrawContour(dst2, hull, cv.Scalar.Yellow)
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class Hull_Contour : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        desc = "Compare the hull to the contour of a RedCloud cell"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        dst3.SetTo(0)
+        Dim rc = task.rcSelect
+
+        Dim jumpList As New List(Of cv.Point)
+        For i = 1 To rc.contour.Count - 1
+            Dim p1 = rc.contour(i - 1)
+            Dim p2 = rc.contour(i)
+            If p1.DistanceTo(p2) > 1 Then
+                If jumpList.Contains(p2) = False Then jumpList.Add(p2)
+            End If
+        Next
+        rc.hull = cv.Cv2.ConvexHull(rc.contour.ToArray, True).ToList
+        vbDrawContour(dst3, rc.contour, cv.Scalar.LightBlue, task.lineWidth)
+        If rc.hull.Count > 0 Then rc.hull.RemoveAt(rc.hull.Count - 1)
+        vbDrawContour(dst3, rc.hull, cv.Scalar.White, task.lineWidth)
+    End Sub
+End Class

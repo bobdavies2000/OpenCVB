@@ -1,4 +1,4 @@
-#ifdef _DEBUG
+#ifdef DEBUG
 #pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_aruco480d.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_bgsegm480d.lib")
 #pragma comment(lib, "OpenCV/Build/lib/Debug/opencv_bioinspired480d.lib")

@@ -390,7 +390,7 @@ int main(int argc, char* argv[])
 			glBegin(GL_POINTS);
 
 			int points = int(dataBufferSize / sizeof(float));
-			float histogramBins = float(cbrt(points)); // the length is bins * bins * bins so find bins first.
+			float histogramBins = float(cbrt(points)); // length=bins*bins*bins so find cube root of bins first.
 			float* data = (float*)dataBuffer;
 			float scale = 1;
 			float shiftY = -1;

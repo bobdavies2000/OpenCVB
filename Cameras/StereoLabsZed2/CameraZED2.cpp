@@ -43,21 +43,18 @@ public:
 	float imuTemperature = 0;
 	double imuTimeStamp = 0;
 	Pose zed_pose;
-	sl::Camera zed;
+	Camera zed;
 	cv::Mat color, rightView, pointCloud;
-	int wResWidth, wResHeight;
-	int width, height;
+	int captureWidth, captureHeight;
 private:
-	sl::InitParameters init_params;
+	InitParameters init_params;
 	float imuData = 0;
-	long long pixelCount;
 public:
 	~StereoLabsZed2() {}
 	StereoLabsZed2(int w, int h)
 	{
-		width = w;
-		height = h;
-		pixelCount = (long long)width * height;
+		captureWidth = w;
+		captureHeight = h;
 
 		init_params.sensors_required = true;
 		init_params.depth_mode = DEPTH_MODE::ULTRA;
@@ -73,7 +70,7 @@ public:
 
 		CameraInformation camera_info = zed.getCameraInformation();
 		cameraData[0] = camera_info.camera_configuration.calibration_parameters.left_cam.fx;
-		cameraData[1] = camera_info.camera_configuration.calibration_parameters.left_cam.fy; 
+		cameraData[1] = camera_info.camera_configuration.calibration_parameters.left_cam.fy;
 		cameraData[2] = camera_info.camera_configuration.calibration_parameters.left_cam.cx;
 		cameraData[3] = camera_info.camera_configuration.calibration_parameters.left_cam.cy;
 		cameraData[4] = camera_info.camera_configuration.calibration_parameters.left_cam.v_fov;
@@ -91,78 +88,102 @@ public:
 
 	void waitForFrame()
 	{
-		zed.grab();
+		while(1)
+			if (zed.grab() == ERROR_CODE::SUCCESS) return;
 	}
 
-	cv::Mat getMat(void* dataPtr)
+	cv::Mat getMat(void* dataPtr, int w, int h)
 	{
 		cv::Mat tmp;
 		if (dataPtr != 0)
 		{
-			tmp = cv::Mat(height, width, CV_8UC4, dataPtr);
+			tmp = cv::Mat(captureHeight, captureWidth, CV_8UC4, dataPtr);
 			cv::cvtColor(tmp, tmp, cv::ColorConversionCodes::COLOR_BGRA2BGR);
 		}
 		else {
-			tmp = cv::Mat(height, width, CV_8UC3);
+			tmp = cv::Mat(captureHeight, captureWidth, CV_8UC3);
 			tmp.setTo(0);
 			float scale = 0.6;
 			int thickness = 2;
 			int y = 20, incr = 20;
 			int font = FONT_HERSHEY_SIMPLEX;
 			cv::putText(tmp, "Buffers from StereoLabs ZED driver are 0", cv::Point(20, y), font, scale,
-						cv::Scalar::all(255), thickness);
-			cv::putText(tmp, "Recommendation: install the latest CUDA and StereoLabs SDK", 
-						cv::Point(20, y + incr), font, scale, cv::Scalar::all(255), thickness);
-			cv::putText(tmp, "A working version of CUDA is required for StereoLabs cameras.", 
-						cv::Point(20, y + incr * 2), font, scale, cv::Scalar::all(255), thickness);
+				cv::Scalar::all(255), thickness);
+			cv::putText(tmp, "Recommendation: install the latest CUDA and StereoLabs SDK",
+				cv::Point(20, y + incr), font, scale, cv::Scalar::all(255), thickness);
+			cv::putText(tmp, "A working version of CUDA is required for StereoLabs cameras.",
+				cv::Point(20, y + incr * 2), font, scale, cv::Scalar::all(255), thickness);
 			cv::putText(tmp, "And make sure that the latest CUDA installed properly.",
-						cv::Point(20, y + incr * 3), font, scale, cv::Scalar::all(255), thickness);
+				cv::Point(20, y + incr * 3), font, scale, cv::Scalar::all(255), thickness);
 			cv::putText(tmp, "The NSight Visual Studio Edition can fail and is not essential.",
-						cv::Point(20, y + incr * 4), font, scale, cv::Scalar::all(255), thickness);
+				cv::Point(20, y + incr * 4), font, scale, cv::Scalar::all(255), thickness);
 			cv::putText(tmp, "Use the 'Custom' install to remove NSight.",
-						cv::Point(20, y + incr * 5), font, scale, cv::Scalar::all(255), thickness);
+				cv::Point(20, y + incr * 5), font, scale, cv::Scalar::all(255), thickness);
 		}
-		if (wResWidth != width) resize(tmp, tmp, Size(wResWidth, wResHeight), INTER_NEAREST_EXACT);
+		if (w != captureWidth) resize(tmp, tmp, Size(w, h), INTER_NEAREST_EXACT);
 		return tmp;
 	}
 
 	void GetData(int w, int h)
 	{
-		wResWidth = w;
-		wResHeight = h;
 		sl::Mat colorSL, rightViewSL, pcMatSL;
-		
+
 		zed.retrieveImage(colorSL, VIEW::LEFT);
-		color = getMat((void*)colorSL.getPtr<sl::uchar1>(sl::MEM::CPU));
+		color = getMat((void*)colorSL.getPtr<sl::uchar1>(), w, h);
 
-		zed.retrieveImage(colorSL, VIEW::RIGHT);
-		rightView = getMat((void*)colorSL.getPtr<sl::uchar1>(sl::MEM::CPU));
+		zed.retrieveImage(rightViewSL, VIEW::RIGHT);
+		rightView = getMat((void*)rightViewSL.getPtr<sl::uchar1>(), w, h);
 
-		zed.retrieveMeasure(pcMatSL, MEASURE::XYZ, MEM::CPU); // XYZ has an extra byte!
-		float* pc = (float*)pcMatSL.getPtr<sl::uchar1>(sl::MEM::CPU);
+		zed.retrieveMeasure(pcMatSL, MEASURE::XYZBGRA); // XYZ has an extra float!
+		float* pc = (float*)pcMatSL.getPtr<sl::uchar1>();
+		if (pc == 0) return;
 
-		pointCloud = cv::Mat(height, width, CV_32FC3);
-		if (pc != 0)
-		{
-			float* pcXYZ = (float*)pointCloud.data;
-			// 4 bytes per pixel to 3 bytes per pixel
-			for (int i = 2; i < pixelCount * 4; i += 4)
+		if (pointCloud.rows != captureHeight) 
+			pointCloud = cv::Mat(h, w, CV_32FC3);
+
+		pointCloud.setTo(0);
+
+		float* pc32fC3 = (float*)pointCloud.data;
+		int incr = 4;
+		if (captureWidth / w >= 4)
+			incr = 16;
+		else
+			if (captureWidth / w >= 2) incr = 8;
+
+		for (int y = 0; y < h; y++)
+			for (int x = 0; x < w; x++)
 			{
-				if (isnan(pc[i]) or isinf(pc[i])) // checking the Z value...
-				{
-					pcXYZ[0] = 0;
-					pcXYZ[1] = 0;
-					pcXYZ[2] = 0;
-				}
-				else {
-					pcXYZ[0] = pc[i - 2];
-					pcXYZ[1] = -pc[i - 1];
-					pcXYZ[2] = -pc[i];
-				}
-				pcXYZ += 3;
+				int offset = (y * captureWidth + x) * incr;
+				if (isnan(pc[offset + 2]) || isinf(pc[offset + 2])) // checking the Z value...
+					continue;
+				int index = (y * w + x) * 3;
+				pc32fC3[index    ] =  pc[offset    ];
+				pc32fC3[index + 1] = -pc[offset + 1];
+				pc32fC3[index + 2] = -pc[offset + 2];
 			}
-			if (w != width) resize(pointCloud, pointCloud, Size(w, h), INTER_NEAREST);
-		}
+
+		//cv::Mat splitMats[3]{};
+		//split(pointCloud, splitMats);
+		//auto test = countNonZero(splitMats[2]);
+		//double maxVal;
+		//cv::Mat testMat;
+		//splitMats[2].convertTo(testMat, CV_8UC1);
+		//minMaxLoc(testMat, NULL, &maxVal);
+		//imshow("testMat", testMat * 255 / 8);
+		//waitKey(1);
+
+		//if (sl_get_sensors_data(camera_id, &sensor_data, SL_TIME_REFERENCE_CURRENT) == SL_ERROR_CODE_SUCCESS) {
+
+		//	printf("Sample %i \n", n++);
+		//	printf(" - IMU:\n");
+		//	printf(" \t Orientation: {%f,%f,%f,%f} \n", sensor_data.imu.orientation.x, sensor_data.imu.orientation.y, sensor_data.imu.orientation.z, sensor_data.imu.orientation.w);
+		//	printf(" \t Acceleration: {%f,%f,%f} [m/sec^2] \n", sensor_data.imu.linear_acceleration.x, sensor_data.imu.linear_acceleration.y, sensor_data.imu.linear_acceleration.z);
+		//	printf(" \t Angular Velocity: {%f,%f,%f} [deg/sec] \n", sensor_data.imu.angular_velocity.x, sensor_data.imu.angular_velocity.y, sensor_data.imu.angular_velocity.z);
+
+		//	printf(" - Magnetometer \n \t Magnetic Field: {%f,%f,%f} [uT] \n", sensor_data.magnetometer.magnetic_field_c.x, sensor_data.magnetometer.magnetic_field_c.y, sensor_data.magnetometer.magnetic_field_c.z);
+
+		//	printf(" - Barometer \n \t Atmospheric pressure: %f [hPa] \n", sensor_data.barometer.pressure);
+		//}
 
 		zed.getPosition(zed_pose, REFERENCE_FRAME::WORLD);
 		RotationMatrix = zed_pose.getRotationMatrix();
@@ -171,13 +192,13 @@ public:
 
 		zed.getSensorsData(sensordata, TIME_REFERENCE::CURRENT);
 		imuTimeStamp = static_cast<double>(zed_pose.timestamp.getMilliseconds());
-	}
-};
+		}
+	};
 
 
-extern "C" __declspec(dllexport) int* Zed2Open(int w, int h) {StereoLabsZed2* cPtr = new StereoLabsZed2(w, h); return (int*)cPtr;}
+extern "C" __declspec(dllexport) int* Zed2Open(int w, int h) { StereoLabsZed2* cPtr = new StereoLabsZed2(w, h); return (int*)cPtr; }
 extern "C" __declspec(dllexport) void Zed2Close(StereoLabsZed2 * cPtr) { cPtr->zed.close(); }
-extern "C" __declspec(dllexport) int* Zed2Acceleration(StereoLabsZed2 * cPtr) { return (int*)&cPtr->sensordata.imu.linear_acceleration;}
+extern "C" __declspec(dllexport) int* Zed2Acceleration(StereoLabsZed2 * cPtr) { return (int*)&cPtr->sensordata.imu.linear_acceleration; }
 extern "C" __declspec(dllexport) int* Zed2AngularVelocity(StereoLabsZed2 * cPtr) { return (int*)&cPtr->sensordata.imu.angular_velocity; }
 extern "C" __declspec(dllexport) int Zed2SerialNumber(StereoLabsZed2 * cPtr) { return cPtr->serialNumber; }
 extern "C" __declspec(dllexport) void Zed2WaitForFrame(StereoLabsZed2 * cPtr) { cPtr->waitForFrame(); }

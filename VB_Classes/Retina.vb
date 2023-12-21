@@ -10,7 +10,7 @@ Module Retina_CPP_Module
     Public Function Retina_Basics_Close(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Retina_Basics_Run(RetinaPtr As IntPtr, rgbPtr As IntPtr, rows As integer, cols As integer, magno As IntPtr, useLogSampling As integer) As IntPtr
+    Public Function Retina_Basics_Run(RetinaPtr As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer, magno As IntPtr, useLogSampling As Integer) As IntPtr
     End Function
 End Module
 

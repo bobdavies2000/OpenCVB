@@ -1,13 +1,15 @@
 Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Imports System.IO
+Imports System.Windows
+
 Public Class Edge_All : Inherits VB_Algorithm
     Dim options As New Options_Edges_All
     Public Sub New()
         desc = "Use Radio Buttons to select the different edge algorithms."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
 
         options.edges.run(src)
         dst2 = If(options.edges.dst2.channels = 1, options.edges.dst2, options.edges.dst2.cvtcolor(cv.ColorConversionCodes.BGR2GRAY))
@@ -35,7 +37,7 @@ Public Class Edge_DepthAndColor : Inherits VB_Algorithm
         labels(2) = "Edges in color and depth after dilate"
         labels(3) = "Edges in color and depth no dilate"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         canny.Run(src)
         shadow.Run(src)
 
@@ -58,7 +60,7 @@ Public Class Edge_Scharr : Inherits VB_Algorithm
         labels(3) = "x field + y field in CV_32F format"
         desc = "Scharr is most accurate with 3x3 kernel."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static multSlider = findSlider("Scharr multiplier X100")
         Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         Dim xField = gray.Scharr(cv.MatType.CV_32FC1, 1, 0)
@@ -89,7 +91,7 @@ Public Class Edge_Preserving : Inherits VB_Algorithm
         labels(3) = "Edge preserving blur for BGR depth image above"
         desc = "OpenCV's edge preserving filter."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static sigmaSSlider = findSlider("Edge Sigma_s")
         Static sigmaRSlider = findSlider("Edge Sigma_r")
         Static recurseCheck = findRadio("Edge RecurseFilter")
@@ -131,7 +133,7 @@ Module Edge_Exports
     Public Function Edge_Deriche_Close(Edges_DerichePtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edge_Deriche_Run(Edges_DerichePtr As IntPtr, rgbPtr As IntPtr, rows As Integer, cols As Integer, alpha As Single, omega As Single) As IntPtr
+    Public Function Edge_Deriche_Run(Edges_DerichePtr As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer, alpha As Single, omega As Single) As IntPtr
     End Function
 End Module
 
@@ -150,7 +152,7 @@ Public Class Edge_RandomForest_CPP : Inherits VB_Algorithm
         ReDim rgbData(dst2.Total * dst2.ElemSize - 1)
         labels(3) = "Thresholded Edge Mask (use slider to adjust)"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static rfSlider = findSlider("Edges RF Threshold")
         If task.frameCount < 100 Then setTrueText("On the first call only, it takes a few seconds to load the randomForest model.", New cv.Point(10, 100))
 
@@ -190,7 +192,7 @@ Public Class Edge_DCTfrequency : Inherits VB_Algorithm
         labels(3) = "Mask for the isolated frequencies"
         desc = "Find edges by removing all the highest frequencies."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static freqSlider = findSlider("Remove Frequencies < x")
         Static thresholdSlider = findSlider("Threshold after Removal")
         Dim gray = task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -226,7 +228,7 @@ Public Class Edge_Deriche_CPP : Inherits VB_Algorithm
         labels(3) = "Image enhanced with Deriche results"
         desc = "Edge detection using the Deriche X and Y gradients - Painterly"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static alphaSlider = findSlider("Deriche Alpha X100")
         Static omegaSlider = findSlider("Deriche Omega X1000")
         Dim dataSrc(src.Total * src.ElemSize - 1) As Byte
@@ -261,7 +263,7 @@ Public Class Edge_DCTinput : Inherits VB_Algorithm
         labels(3) = "Edges produced with featureless regions cleared"
         desc = "Use the featureless regions to enhance the edge detection"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
 
         edges.Run(src)
         dst2 = edges.dst2.Clone
@@ -289,7 +291,7 @@ Public Class Edge_BinarizedCanny : Inherits VB_Algorithm
         labels(2) = "Edges between halves, lightest, darkest, and the combo"
         desc = "Collect edges from binarized images"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
 
         binarize.Run(src)
 
@@ -329,7 +331,7 @@ Public Class Edge_BinarizedBrightness : Inherits VB_Algorithm
         findRadio("Binarized Sobel").Checked = True
         desc = "Visualize the impact of brightness on Edge_BinarizeSobel"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         bright.Run(src)
         dst2 = bright.dst3
         edges.Run(bright.dst3)
@@ -350,7 +352,7 @@ Public Class Edge_BinarizedReduction : Inherits VB_Algorithm
     Public Sub New()
         desc = "Visualize the impact of reduction on Edge_BinarizeSobel"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
         dst3 = reduction.dst2
         edges.Run(dst3)
@@ -377,7 +379,7 @@ Public Class Edge_Features : Inherits VB_Algorithm
         labels(3) = "dst2 with featureless areas removed."
         desc = "Removing the featureless regions after a binarized sobel"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         task.mouseClickFlag = False ' edges calls a mat_4clicks algorithm.
         edges.Run(src)
         dst2 = edges.dst2
@@ -401,7 +403,7 @@ Public Class Edge_ConsistentExplore : Inherits VB_Algorithm
     Public Sub New()
         desc = "Edges that are consistent for x number of frames"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static saveFrames As New List(Of cv.Mat)
         If task.optionsChanged Then saveFrames = New List(Of cv.Mat)
 
@@ -435,7 +437,7 @@ Public Class Edge_Consistent : Inherits VB_Algorithm
         findSlider("Sobel kernel Size").Value = 5
         desc = "Edges that are consistent for x number of frames"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static saveFrames As New List(Of cv.Mat)
         If task.optionsChanged Then saveFrames = New List(Of cv.Mat)
 
@@ -472,7 +474,7 @@ Public Class Edge_Stdev : Inherits VB_Algorithm
         labels(3) = "Mask of low stdev areas"
         desc = "Edges where stdev is above a threshold"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         stdev.Run(src)
         edges.Run(src)
         dst2 = edges.dst3
@@ -494,7 +496,7 @@ Public Class Edge_Combo : Inherits VB_Algorithm
         labels(2) = "Sobel = red, Canny = yellow - they are identical"
         desc = "Combine the results of binarized canny and sobel"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
 
         edges1.Run(src)
         edges2.Run(src)
@@ -520,22 +522,22 @@ Public Class Edge_SobelLRBinarized : Inherits VB_Algorithm
         labels = {"", "", "Horizontal Sobel - Left View", "Horizontal Sobel - Right View"}
         desc = "Isolate edges in the left and right views."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If task.mouseClickFlag Then task.mouseClickFlag = False ' preempt use of quadrants.
 
-        edges.Run(task.rightview)
+        edges.Run(task.rightView)
         If standalone Then
             addw.src2 = edges.dst3
-            addw.Run(task.rightview)
+            addw.Run(task.rightView)
             dst3 = addw.dst2.Clone
         Else
             dst3 = edges.dst3.Clone
         End If
 
-        edges.Run(task.leftview)
+        edges.Run(task.leftView)
         If standalone Then
             addw.src2 = edges.dst3
-            addw.Run(task.leftview)
+            addw.Run(task.leftView)
             dst2 = addw.dst2
         Else
             dst2 = edges.dst3
@@ -562,7 +564,7 @@ Public Class Edge_BinarizedSobel : Inherits VB_Algorithm
         labels(3) = "Click any quadrant in dst3 to enlarge it in dst2"
         desc = "Collect Sobel edges from binarized images"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If task.mouseClickFlag And task.mousePicTag = RESULT_DST2 Then setMyActiveMat()
 
         binarize.Run(src)
@@ -611,7 +613,7 @@ Public Class Edge_Matching : Inherits VB_Algorithm
 
         desc = "Match edges in the left and right views to determine distance"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static overlayCheck = findCheckBox("Overlay thread grid")
         Static highlightCheck = findCheckBox("Highlight all grid entries above threshold")
         Static clearCheck = findCheckBox("Clear selected highlights (if Highlight all grid entries is unchecked)")
@@ -620,9 +622,8 @@ Public Class Edge_Matching : Inherits VB_Algorithm
         Static searchSlider = findSlider("Search depth in pixels")
         Dim threshold = thresholdSlider.Value / 100
         Dim searchDepth = searchSlider.Value
-
-        dst2 = task.leftview
-        dst3 = task.rightview
+        dst2 = task.leftView
+        dst3 = task.rightView
 
         Dim maxLocs(task.gridList.Count - 1) As Integer
         Dim highlights As New List(Of Integer)
@@ -697,7 +698,7 @@ Public Class Edge_MotionOverlay : Inherits VB_Algorithm
         labels(3) = "AbsDiff output of offset with original"
         desc = "Find edges by displacing the current BGR image in any direction and diff it with the original."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static xSlider = findSlider("Displacement in the X direction (in pixels)")
         Static ySlider = findSlider("Displacement in the Y direction (in pixels)")
         Dim xDisp = xSlider.Value
@@ -730,7 +731,7 @@ Public Class Edge_RGB : Inherits VB_Algorithm
     Public Sub New()
         desc = "Combine the edges from all 3 channels.  Painterly"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim img32f As New cv.Mat
         src.ConvertTo(img32f, cv.MatType.CV_32FC3)
         Dim split = img32f.Split()
@@ -759,7 +760,7 @@ Public Class Edge_HSV : Inherits VB_Algorithm
     Public Sub New()
         desc = "Combine the edges from all 3 HSV channels.  Painterly"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim hsv = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
         edges.Run(hsv)
         dst2 = edges.dst2
@@ -780,11 +781,11 @@ Public Class Edge_SobelLR : Inherits VB_Algorithm
         desc = "Find the edges in the LeftViewimages."
         labels = {"", "", "Edges in Left Image", "Edges in Right Image (except on Kinect 4 Azure)"}
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        sobel.Run(task.rightview)
+    Public Sub RunVB(src As cv.Mat)
+        sobel.Run(task.rightView)
         dst3 = sobel.dst2.Clone()
 
-        sobel.Run(task.leftview)
+        sobel.Run(task.leftView)
         dst2 = sobel.dst2
     End Sub
 End Class
@@ -807,7 +808,7 @@ Module Edge_ColorGap_CPP_Module
     Public Function Edge_ColorGap_Close(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Edge_ColorGap_Run(cPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32, distance As Int32, diff As Int32) As IntPtr
+    Public Function Edge_ColorGap_Run(cPtr As IntPtr, bgrPtr As IntPtr, rows As Int32, cols As Int32, distance As Int32, diff As Int32) As IntPtr
     End Function
 End Module
 
@@ -823,7 +824,7 @@ Public Class Edge_ColorGap_CPP : Inherits VB_Algorithm
         cPtr = Edge_ColorGap_Open()
         desc = "Using grayscale image to identify color gaps which imply an edge - C++ version"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static distanceSlider = findSlider("Input pixel distance")
         Static diffSlider = findSlider("Input pixel difference")
         Dim diff = diffSlider.Value
@@ -867,7 +868,7 @@ Public Class Edge_ColorGap_VB : Inherits VB_Algorithm
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Using grayscale image to identify color gaps which imply an edge - VB edition"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static distanceSlider = findSlider("Input pixel distance")
         Static diffSlider = findSlider("Input pixel difference")
         Dim distance = distanceSlider.Value And 254
@@ -915,7 +916,7 @@ Public Class Edge_Laplacian : Inherits VB_Algorithm
         labels(3) = "Laplacian of Depth Image"
         desc = "Show Laplacian edge detection with varying kernel sizes"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static gaussSlider = findSlider("Gaussian Kernel")
         Static laplacianSlider = findSlider("Laplacian Kernel")
         Dim gaussiankernelSize = gaussSlider.Value Or 1
@@ -944,7 +945,7 @@ Public Class Edge_LaplacianDepth : Inherits VB_Algorithm
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Threshold for depth difference", 0, 255, 200)
         desc = "Find edges in depth data"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static diffSlider = findSlider("Threshold for depth difference")
         edges.Run(src)
         dst2 = edges.dst3
@@ -970,7 +971,7 @@ Public Class Edge_DepthEdgeTest : Inherits VB_Algorithm
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_32F, 0)
         desc = "Find edges in depth data"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static diffSlider = findSlider("Threshold for depth difference")
         Static rectSlider = findSlider("cv.rect offset")
         Dim offset = rectSlider.Value
@@ -1009,7 +1010,7 @@ Public Class Edge_DepthGap_VB : Inherits VB_Algorithm
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         desc = "Using dpeth image to identify gaps which imply an edge"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static distanceSlider = findSlider("Input depth distance")
         Static diffSlider = findSlider("Input depth difference in mm's")
         Dim distance = distanceSlider.Value And 254
@@ -1072,7 +1073,7 @@ Public Class Edge_DepthGap_CPP : Inherits VB_Algorithm
         cPtr = Edge_DepthGap_Open()
         desc = "Create edges wherever depth differences are greater than x"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static diffSlider = findSlider("Input depth difference in mm's")
         Dim minDiff = diffSlider.Value / 1000
 
@@ -1104,7 +1105,7 @@ Public Class Edge_MotionFrames : Inherits VB_Algorithm
         labels = {"", "", "The multi-frame edges output", "The Edge_Canny output for the last frame only"}
         desc = "Collect edges over several frames controlled with global frame history"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static frames As New List(Of cv.Mat)
         If task.optionsChanged Then frames.Clear()
 
@@ -1136,7 +1137,7 @@ Public Class Edge_MotionAccum : Inherits VB_Algorithm
         labels = {"", "", "Accumulated edges tempered by motion thresholds", ""}
         desc = "Accumulate edges and use motion to clear"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         If task.optionsChanged Then task.motionReset = True
         motion.Run(src)
 
@@ -1166,7 +1167,7 @@ Public Class Edge_CannyMin : Inherits VB_Algorithm
         desc = "Set the max thresholds for Canny to get the minimum number of edge pixels"
         labels(2) = "Essential lines in the image - minimum number of pixels in Canny output"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         canny.Run(src)
         dst2 = canny.dst2
     End Sub
@@ -1191,10 +1192,10 @@ Public Class Edge_CannyLeftRight : Inherits VB_Algorithm
         desc = "Set the max thresholds for Canny to get the minimum number of edge pixels for the left and right images."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        canny.Run(task.leftview)
+        canny.Run(task.leftView)
         dst2 = canny.dst2.Clone
 
-        canny.Run(task.rightview)
+        canny.Run(task.rightView)
         dst3 = canny.dst2
     End Sub
 End Class
@@ -1213,7 +1214,7 @@ Public Class Edge_Reduction : Inherits VB_Algorithm
         labels = {"", "", "Edges in the Reduction output", "Reduction_Basics output"}
         desc = "Find edges in the reduction image."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
         dst3 = reduction.dst2
 
@@ -1236,7 +1237,7 @@ Public Class Edge_DepthRegions : Inherits VB_Algorithm
         labels = {"", "", "Edge_Canny output for the depth regions", "Identified regions "}
         desc = "Find the edges for the depth regions."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         regions.Run(src)
         dst3 = regions.dst2
 
@@ -1259,8 +1260,8 @@ Public Class Edge_Canny : Inherits VB_Algorithm
         labels = {"", "", "Canny using L1 Norm", "Canny using L2 Norm"}
         desc = "Show canny edge detection with varying thresholds"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         If src.Channels <> cv.MatType.CV_8U Then src.ConvertTo(src, cv.MatType.CV_8U)
         dst2 = src.Canny(options.threshold1, options.threshold2, options.aperture, True)
@@ -1284,8 +1285,8 @@ Public Class Edge_CannyHistory : Inherits VB_Algorithm
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Show canny edge over the last X frame (see global option 'FrameHistory')"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
         If src.Channels = 3 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
 
         dst2 = src.Canny(options.threshold1, options.threshold2, options.aperture, True)
@@ -1315,7 +1316,7 @@ Public Class Edge_ResizeAdd : Inherits VB_Algorithm
         labels(2) = "Edges found with just resizing"
         labels(3) = "Found edges added to grayscale image source."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static vertSlider = findSlider("Border Vertical in Pixels")
         Static horizSlider = findSlider("Border Horizontal in Pixels")
         Dim gray = src
@@ -1341,7 +1342,7 @@ Public Class Edge_CannyCombined : Inherits VB_Algorithm
     Public Sub New()
         desc = "Combine the results of Edge_ResizeAdd and Canny"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         canny.Run(src)
         edges.Run(canny.dst2)
         dst2 = canny.dst2 Or edges.dst2
@@ -1366,7 +1367,7 @@ Public Class Edge_SobelHorizontal : Inherits VB_Algorithm
         findCheckBox("Horizontal Derivative").Checked = True
         desc = "Find edges with Sobel only in the horizontal direction"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static thresholdSlider = findSlider("Threshold to zero pixels below this value")
         edges.Run(src)
 
@@ -1384,7 +1385,7 @@ Public Class Edge_SobelCustomV : Inherits VB_Algorithm
         labels = {"", "", "Sobel Custom 1", "Sobel Custom 2"}
         desc = "Show Sobel edge detection a custom vertical kernel"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         dst1 = src.Filter2D(cv.MatType.CV_32F, New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {1, 0, -1, 2, 0, -2, 1, 0, -1}))
         dst1.ConvertTo(dst2, src.Type)
         dst1 = src.Filter2D(cv.MatType.CV_32F, New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {3, 0, -3, 10, 0, -10, 3, 0, -3}))
@@ -1403,7 +1404,7 @@ Public Class Edge_SobelCustomH : Inherits VB_Algorithm
         labels = {"", "", "Sobel Custom 1", "Sobel Custom 2"}
         desc = "Show Sobel edge detection a custom horizontal kernel"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         dst1 = src.Filter2D(cv.MatType.CV_32F, New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {1, 2, 1, 0, 0, 0, -1, -2, -1}))
         dst1.ConvertTo(dst2, src.Type)
         dst1 = src.Filter2D(cv.MatType.CV_32F, New cv.Mat(3, 3, cv.MatType.CV_32FC1, New Single() {3, 10, 3, 0, 0, 0, -3, -10, -3}))
@@ -1434,7 +1435,7 @@ Public Class Edge_SobelCustom : Inherits VB_Algorithm
         labels = {"", "", "Sobel Custom 1", "Sobel Custom 2"}
         desc = "Show Sobel edge detection with custom horizont and vertical kernels"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Static horizCheck = findCheckBox("Horizontal Edges")
         Static vertCheck = findCheckBox("Vertical Edges")
         If horizCheck.checked Then
@@ -1475,8 +1476,8 @@ Public Class Edge_SobelCustomLeftRight : Inherits VB_Algorithm
         labels = {"Left Image Custom 1", "Left Image Custom 2", "Right Image Custom 1", "Right Image Custom 2"}
         desc = "Show Sobel edge detection for both left and right images"
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        custom.Run(task.leftview)
+    Public Sub RunVB(src As cv.Mat)
+        custom.Run(task.leftView)
         dst0 = custom.dst2.Clone
         dst1 = custom.dst3.Clone
 
@@ -1547,58 +1548,10 @@ End Class
 
 
 
-Public Class Edge_DepthDilated : Inherits VB_Algorithm
-    Dim dilate As New Dilate_Basics
-    Dim canny As New Edge_Canny
-    Dim tiers As New Depth_Tiers
-    Public Sub New()
-        findSlider("Dilate Kernel").Value = 5
-        findSlider("Dilate Iterations").Value = 2
-        findRadio("Dilate shape: Ellipse").Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
-        labels = {"", "", "Depth edges", "Smoothed depth input"}
-        desc = "Erode depth and then find edges"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        tiers.Run(src)
-        dst3 = tiers.dst2
-
-        dilate.Run(tiers.dst2)
-        dst1 = dilate.dst2
-
-        canny.Run(dst1)
-        dst2 = canny.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Edge_Depth : Inherits VB_Algorithm
-    Dim tiers As New Depth_Tiers
-    Dim canny As New Edge_Canny
-    Public Sub New()
-        desc = "Find edges in the output of Depth_Tiers"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        tiers.Run(src)
-        dst2 = tiers.dst2
-
-        canny.Run(dst2)
-        dst3 = canny.dst2
-    End Sub
-End Class
-
-
-
-
 
 
 Public Class Edge_BackProjection : Inherits VB_Algorithm
-    Dim valley As New HistValley_Basics
+    Dim valley As New HistValley_BasicsOptionAuto
     Dim canny As New Edge_Canny
     Public Sub New()
         labels(3) = "Canny edges in grayscale (red) and edges in back projection (blue)"

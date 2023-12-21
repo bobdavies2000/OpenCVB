@@ -1,29 +1,26 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class RedColor_Basics : Inherits VB_Algorithm
-    Dim fCell As New RedColor_CPP
-    Dim color As New Color_Basics
+    Dim fLess As New RedColor_FeatureLess
+    Public fCells As New List(Of rcData)
     Dim lastMap As cv.Mat
     Public Sub New()
+        redOptions.FeatureLessRadio.Checked = True
+        dst2 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         lastMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "The colors are unstable because there is no cell matching to the previous generation."
         desc = "Match fCells from the current generation to the last."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim lastCells As New List(Of rcData)(task.fCells)
+        Dim lastCells As New List(Of rcData)(fLess.fCells)
         Dim lastMap = dst3.Clone
 
-        If src.Type = cv.MatType.CV_8UC3 Then
-            color.Run(src)
-            fCell.Run(color.dst2)
-        Else
-            fCell.Run(src)
-        End If
-        dst3 = fCell.dst3
+        fLess.Run(src)
 
-        Dim fCells As New List(Of rcData)
+        Dim ftmp As New List(Of rcData)
         Dim lrc As rcData
         Dim usedColors1 As New List(Of cv.Vec3b)
-        For Each rc In task.fCells
+        For Each rc In fLess.fCells
             Dim prev = lastMap.Get(Of Byte)(rc.maxDist.Y, rc.maxDist.X)
             If prev < lastCells.Count And prev <> 0 Then
                 lrc = lastCells(prev)
@@ -34,35 +31,35 @@ Public Class RedColor_Basics : Inherits VB_Algorithm
                 If stableCheck = rc.indexLast Then rc.maxDStable = lrc.maxDStable ' keep maxDStable if cell matched to previous
             End If
             If usedColors1.Contains(rc.color) Then
-                rc.color = New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240))
+                rc.color = randomCellColor()
             End If
             usedColors1.Add(rc.color)
-            fCells.Add(rc)
+            ftmp.Add(rc)
         Next
 
         dst2.SetTo(0)
         dst3.SetTo(0)
         Dim usedColors2 As New List(Of cv.Vec3b)
-        For Each rc In fCells
+        For Each rc In ftmp
             If usedColors2.Contains(rc.color) Then
-                rc.color = New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240))
+                rc.color = randomCellColor()
             End If
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
-            dst3(rc.rect).SetTo(rc.index, rc.mask)
+            dst3(rc.rect).SetTo(rc.color, rc.mask)
+            dst2(rc.rect).SetTo(rc.index, rc.mask)
         Next
 
-        task.fCells = New List(Of rcData)(fCells)
+        fCells = New List(Of rcData)(ftmp)
         If task.clickPoint <> New cv.Point Then
             Dim index = dst3.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-            If index < task.fCells.Count Then
-                task.fcSelect = task.fCells(index)
-                Dim fc = task.fcSelect
-                dst2(fc.rect).SetTo(white, fc.mask)
+            If index < fCells.Count Then
+                fLess.fcSelect = fCells(index)
+                Dim fc = fLess.fcSelect
+                dst3(fc.rect).SetTo(white, fc.mask)
                 task.color(fc.rect).SetTo(white, fc.mask)
             End If
         End If
 
-        labels(2) = fCell.labels(2)
+        labels(2) = fLess.labels(2)
     End Sub
 End Class
 
@@ -73,51 +70,54 @@ End Class
 
 
 
-Public Class RedColor_CPP : Inherits VB_Algorithm
-    Dim reduction As New Reduction_Basics
+Public Class RedColor_FeatureLess : Inherits VB_Algorithm
+    Public classCount As Integer
+    Public fCells As New List(Of rcData)
+    Public fcSelect As New rcData
+    Dim fLess As New FeatureLess_Basics
     Public Sub New()
-        cPtr = FCell_Open()
+        cPtr = FloodCell_Open()
         gOptions.PixelDiffThreshold.Value = 0
         desc = "Floodfill an image so each cell can be tracked.  NOTE: cells are not matched to previous image.  Use RedColor_Basics for matching."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Channels <> 1 Then
-            reduction.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-            src = reduction.dst2
-        End If
+        If redOptions.colorInput <> "FeatureLess" Then redOptions.FeatureLessRadio.Checked = True
+        fLess.Run(src)
+        src = fLess.dst2
 
-        Dim inputData(src.Total * src.ElemSize - 1) As Byte
+        Dim inputData(src.Total - 1) As Byte
         Marshal.Copy(src.Data, inputData, 0, inputData.Length)
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        Dim imagePtr = FCell_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols, src.Type,
-                                 task.minPixels, gOptions.PixelDiffThreshold.Value)
+        Dim imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols, src.Type,
+                                 redOptions.imageThresholdPercent, redOptions.DesiredCellSlider.Value,
+                                 gOptions.PixelDiffThreshold.Value)
         handleInput.Free()
 
-        dst3 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr)
+        dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr)
 
-        Dim classCount = FCell_Count(cPtr)
-        If heartBeat() Then labels(3) = CStr(classCount) + " regions found"
+        classCount = FloodCell_Count(cPtr)
+        If heartBeat() Then labels(3) = CStr(classCount) + " cells found"
         If classCount <= 1 Then Exit Sub
 
-        Dim sizeData = New cv.Mat(classCount, 1, cv.MatType.CV_32S, FCell_Sizes(cPtr))
-        Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, FCell_Rects(cPtr))
+        Dim sizeData = New cv.Mat(classCount, 1, cv.MatType.CV_32S, FloodCell_Sizes(cPtr))
+        Dim rectData = New cv.Mat(classCount, 1, cv.MatType.CV_32SC4, FloodCell_Rects(cPtr))
         Dim depthMean As cv.Scalar, depthStdev As cv.Scalar
-        task.fCells.Clear()
-        task.fCells.Add(New rcData) ' placeholder so index aligns with offset.
-        If standalone Or testIntermediate(traceName) Then dst2.SetTo(0)
+        fCells.Clear()
+        fCells.Add(New rcData) ' placeholder so index aligns with offset.
+        If standalone Or testIntermediate(traceName) Then dst3.SetTo(0)
         For i = 0 To classCount - 1
             Dim rc As New rcData
             rc.rect = validateRect(rectData.Get(Of cv.Rect)(i, 0))
             rc.pixels = sizeData.Get(Of Integer)(i, 0)
-            rc.index = task.fCells.Count
-            rc.mask = dst3(rc.rect).InRange(rc.index, rc.index)
+            rc.index = fCells.Count
+            rc.mask = dst2(rc.rect).InRange(rc.index, rc.index)
             rc.color = task.vecColors(i) ' never more than 255...
             rc.maxDist = vbGetMaxDist(rc)
             rc.maxDStable = rc.maxDist ' assume it has to use the latest.
 
             rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
-            vbDrawContour(rc.mask, rc.contour, rc.index, -1)
+            vbDrawContour(rc.mask, rc.contour, 255, -1)
 
             Dim minLoc As cv.Point, maxLoc As cv.Point
             task.pcSplit(0)(rc.rect).MinMaxLoc(rc.minVec.X, rc.maxVec.X, minLoc, maxLoc, rc.mask)
@@ -128,17 +128,14 @@ Public Class RedColor_CPP : Inherits VB_Algorithm
             rc.depthMean = New cv.Point3f(depthMean(0), depthMean(1), depthMean(2))
             rc.depthStdev = New cv.Point3f(depthStdev(0), depthStdev(1), depthStdev(2))
 
-            cv.Cv2.MeanStdDev(task.color(rc.rect), rc.colorMean, rc.colorStdev, rc.mask)
+            fCells.Add(rc)
 
-            task.fCells.Add(rc)
-
-            dst2(rc.rect).SetTo(rc.color, rc.mask)
+            dst3(rc.rect).SetTo(rc.color, rc.mask)
         Next
-
-        If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions were identified - use RedColor_Basics to match to the previous image."
+        If heartBeat() Then labels(2) = CStr(classCount) + " cells were identified."
     End Sub
     Public Sub Close()
-        If cPtr <> 0 Then cPtr = FCell_Close(cPtr)
+        If cPtr <> 0 Then cPtr = FloodCell_Close(cPtr)
     End Sub
 End Class
 
@@ -150,7 +147,7 @@ End Class
 
 Public Class RedColor_Binarize : Inherits VB_Algorithm
     Dim binarize As New Binarize_RecurseAdd
-    Dim fCell As New RedColor_Basics
+    Dim colorC As New RedColor_Basics
     Public Sub New()
         labels(3) = "A 4-way split of the input grayscale image based on the amount of light"
         desc = "Use RedCloud on a 4-way split based on light to dark in the image."
@@ -159,9 +156,9 @@ Public Class RedColor_Binarize : Inherits VB_Algorithm
         binarize.Run(src)
         dst3 = vbPalette(binarize.dst1 * 255 / 4)
 
-        fCell.Run(binarize.dst1)
-        dst2 = fCell.dst2
-        labels(2) = fCell.labels(2)
+        colorC.Run(binarize.dst1)
+        dst2 = colorC.dst2
+        labels(2) = colorC.labels(2)
     End Sub
 End Class
 
@@ -174,7 +171,7 @@ End Class
 ' https://docs.opencv.org/master/de/d01/samples_2cpp_2connected_components_8cpp-example.html
 Public Class RedColor_CComp : Inherits VB_Algorithm
     Dim ccomp As New CComp_Both
-    Dim fCell As New RedColor_Basics
+    Dim colorC As New RedColor_Basics
     Public Sub New()
         desc = "Identify each Connected component as a RedCloud Cell."
     End Sub
@@ -182,9 +179,9 @@ Public Class RedColor_CComp : Inherits VB_Algorithm
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ccomp.Run(src)
         dst3 = vbNormalize32f(ccomp.dst1)
-        fCell.Run(dst3)
-        dst2 = fCell.dst2
-        labels(2) = fCell.labels(2)
+        colorC.Run(dst3)
+        dst2 = colorC.dst2
+        labels(2) = colorC.labels(2)
     End Sub
 End Class
 
@@ -219,58 +216,21 @@ End Class
 
 
 
-Public Class RedColor_Neighbors : Inherits VB_Algorithm
-    Dim nabs As New Neighbor_Basics
-    Dim fCell As New RedColor_Basics
-    Public Sub New()
-        desc = "Find all the neighbors for a RedCell cellmap"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        fCell.Run(src)
-        dst2 = fCell.dst2
-
-        nabs.cellCount = task.fCells.Count
-        nabs.Run(fCell.dst3)
-
-        For i = 0 To task.fCells.Count - 1
-            task.fCells(i).neighbors = New List(Of Byte)(nabs.nabList(i))
-        Next
-
-        dst3.SetTo(0)
-        dst3(task.fcSelect.rect).SetTo(task.fcSelect.color, task.fcSelect.mask)
-        For Each index In task.fcSelect.neighbors
-            If index >= task.fCells.Count Then Continue For
-            Dim rc = task.fCells(index)
-            dst3(rc.rect).SetTo(rc.color, rc.mask)
-        Next
-
-        task.color(task.fcSelect.rect).SetTo(white, task.fcSelect.mask)
-
-        setTrueText(strOut, 3)
-        If heartBeat() Then labels(2) = CStr(task.fCells.Count) + " regions identified."
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class RedColor_InputColor : Inherits VB_Algorithm
-    Dim fCell As New RedColor_Basics
+    Public colorC As New RedColor_Basics
     Dim color As New Color_Basics
     Public Sub New()
         desc = "Floodfill the transformed color output and create cells to be tracked."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         color.Run(src)
-        fCell.Run(color.dst0)
+        colorC.Run(color.dst2)
 
-        dst2 = fCell.dst2
-        dst3 = fCell.dst3
-        labels(2) = fCell.labels(2)
+        dst2 = colorC.dst2
+        dst3 = colorC.dst3
+        labels(2) = colorC.labels(2)
     End Sub
 End Class
 
@@ -288,16 +248,16 @@ Public Class RedColor_LeftRight : Inherits VB_Algorithm
         desc = "Floodfill left and right images after RedCloud color input reduction."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        task.fCells = New List(Of rcData)(leftCells)
+        fCellsLeft.colorC.fCells = New List(Of rcData)(leftCells)
         fCellsLeft.Run(task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        leftCells = New List(Of rcData)(task.fCells)
+        leftCells = New List(Of rcData)(fCellsLeft.colorC.fCells)
         labels(2) = fCellsLeft.labels(2)
 
         dst2 = fCellsLeft.dst2
 
-        task.fCells = New List(Of rcData)(rightCells)
+        fCellsRight.colorC.fCells = New List(Of rcData)(rightCells)
         fCellsRight.Run(task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        rightCells = New List(Of rcData)(task.fCells)
+        rightCells = New List(Of rcData)(fCellsRight.colorC.fCells)
         labels(3) = fCellsRight.labels(2)
 
         dst3 = fCellsRight.dst2
@@ -311,7 +271,7 @@ End Class
 
 
 Public Class RedColor_Histogram3DBP : Inherits VB_Algorithm
-    Dim fCell As New RedColor_Basics
+    Dim colorC As New RedColor_Basics
     Dim color As New Hist3DCloud_Reduction
     Public Sub New()
         desc = "Use the backprojection of the 3D RGB histogram as input to RedColor_Basics."
@@ -321,9 +281,9 @@ Public Class RedColor_Histogram3DBP : Inherits VB_Algorithm
         dst2 = color.dst3
         labels(2) = color.labels(3)
 
-        fCell.Run(dst2)
-        dst3 = fCell.dst2
+        colorC.Run(dst2)
+        dst3 = colorC.dst2
         dst3.SetTo(0, task.noDepthMask)
-        labels(3) = fCell.labels(2)
+        labels(3) = colorC.labels(2)
     End Sub
 End Class

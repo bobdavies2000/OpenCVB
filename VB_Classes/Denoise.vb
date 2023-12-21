@@ -1,10 +1,11 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Denoise_Basics_CPP : Inherits VB_Algorithm
+    Dim diff As New Diff_Basics
     Public Sub New()
         cPtr = Denoise_Basics_Open(3)
-        labels = {"", "", "Input image", "Output: Use PixelViewer (above) to see changes"}
-        desc = "Denoise example is not working properly.  Not sure why output is blank."
+        labels = {"", "", "Input image", "Output: Use PixelViewer to see changes"}
+        desc = "Denoise example."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         dst2 = src
@@ -15,7 +16,13 @@ Public Class Denoise_Basics_CPP : Inherits VB_Algorithm
         Dim imagePtr = Denoise_Basics_Run(cPtr, handleSrc.AddrOfPinnedObject(), dst2.Rows, dst2.Cols)
         handleSrc.Free()
 
-        If imagePtr <> 0 Then dst3 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+        If imagePtr <> 0 Then
+            dst3 = New cv.Mat(dst2.Rows, dst2.Cols, cv.MatType.CV_8UC1, imagePtr).Clone
+            diff.lastGray = dst2
+            diff.Run(dst3)
+            dst3 = diff.dst2
+            setTrueText("Denoise C++ code does not seem to be working.  More work needed", 3)
+        End If
     End Sub
     Public Sub Close()
         If cPtr <> 0 Then cPtr = Denoise_Basics_Close(cPtr)
@@ -41,7 +48,7 @@ Public Class Denoise_Pixels : Inherits VB_Algorithm
         If standalone Then
             Static reduction As New Reduction_Basics
             reduction.Run(src)
-            src = reduction.dst0
+            src = reduction.dst2
             classCount = reduction.classCount
         End If
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
@@ -81,7 +88,7 @@ Module Denoise_Pixels_CPP_Module
     Public Function Denoise_Basics_Close(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Denoise_Basics_Run(cPtr As IntPtr, rgbPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
+    Public Function Denoise_Basics_Run(cPtr As IntPtr, bgrPtr As IntPtr, rows As Int32, cols As Int32) As IntPtr
     End Function
 
 

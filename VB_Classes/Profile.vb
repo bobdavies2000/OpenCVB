@@ -1,6 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Profile_Basics : Inherits VB_Algorithm
-    Public rc As New rcData
     Public ptLeft As cv.Point3f, ptRight As cv.Point3f, ptTop As cv.Point3f, ptBot As cv.Point3f, ptFront As cv.Point3f, ptBack As cv.Point3f
     Public cornerNames As New List(Of String)({"   First (white)", "   Left (light blue)", "   Right (red)", "   Top (green)",
                                                "   Bottom (white)", "   Front (yellow)", "   Back (blue)"})
@@ -10,7 +9,6 @@ Public Class Profile_Basics : Inherits VB_Algorithm
     Public corners As New List(Of cv.Point)
     Public cornersRaw As New List(Of cv.Point)
     Public redC As New RedCloud_Basics
-    Public redCold As Object
     Public Sub New()
         desc = "Find the left/right, top/bottom, and near/far sides of a cell"
     End Sub
@@ -18,8 +16,11 @@ Public Class Profile_Basics : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
-        rc = task.rcSelect
-
+        Dim rc = task.rcSelect
+        If rc.depthPixels = 0 Then
+            strOut = "There is no depth data for that cell."
+            Exit Sub
+        End If
         If rc.contour.Count < 4 Then Exit Sub
 
         dst3.SetTo(0)
@@ -32,7 +33,7 @@ Public Class Profile_Basics : Inherits VB_Algorithm
         Dim sort2Dtop As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
         rc.contour3D = New List(Of cv.Point3f)
         For i = 0 To rc.contour.Count - 1
-            Dim pt = rc.contour.ElementAt(i)
+            Dim pt = rc.contour(i)
             Dim vec = task.pointCloud(rc.rect).Get(Of cv.Point3f)(pt.Y, pt.X)
             If Single.IsNaN(vec.Z) Or Single.IsInfinity(vec.Z) Then Continue For
             If vec.Z Then
@@ -74,60 +75,16 @@ Public Class Profile_Basics : Inherits VB_Algorithm
             dst3.Circle(corners(i), task.dotSize + 2, cornerColors(i), -1, task.lineType)
         Next
 
-        strOut = "X     " + vbTab + "Y     " + vbTab + "Z " + vbTab + "units=meters" + vbCrLf
-        Dim w = gOptions.GridSize.Value
-        For i = 0 To corners.Count - 1
-            strOut += point3fToString(corners3D(i)) + vbTab + cornerNames(i) + vbCrLf
-        Next
-        strOut += vbCrLf + "The contour may show points further away but they don't have depth."
-        If sortFront.Count = 0 Then strOut += vbCrLf + "None of the contour points had depth."
-
-        setTrueText(strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class Profile_Kalman : Inherits VB_Algorithm
-    Dim sides As New Profile_Basics
-    Dim kalman As New Kalman_Basics
-    Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        If standalone Then sides.redCold = New RedCloud_Basics
-        ReDim kalman.kInput(12 - 1)
-        labels = {"", "", "Profile_Basics output without Kalman", "Profile_Basics output with Kalman"}
-        desc = "Use Kalman to smooth the results of the contour key points"
-    End Sub
-    Public Sub RunVB(src as cv.Mat)
-        sides.Run(src)
-        dst1 = sides.dst2
-        dst2 = sides.dst3
-        Dim rc = sides.rc
-
-        If kalman.kInput.Count <> sides.corners.Count * 2 Then ReDim kalman.kInput(sides.corners.Count * 2 - 1)
-        For i = 0 To sides.corners.Count - 1
-            kalman.kInput(i * 2) = sides.corners(i).X
-            kalman.kInput(i * 2 + 1) = sides.corners(i).Y
-        Next
-
-        kalman.Run(Nothing)
-
-        If rc.index > 0 Then
-            dst3.SetTo(0)
-            vbDrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
-            For i = 0 To sides.corners.Count - 1
-                Dim pt = New cv.Point(CInt(kalman.kOutput(i * 2)), CInt(kalman.kOutput(i * 2 + 1)))
-                dst3.Circle(pt, task.dotSize + 2, sides.cornerColors(i), -1, task.lineType)
+        If heartBeat() Then
+            strOut = "X     " + vbTab + "Y     " + vbTab + "Z " + vbTab + "units=meters" + vbCrLf
+            Dim w = gOptions.GridSize.Value
+            For i = 0 To corners.Count - 1
+                strOut += point3fToString(corners3D(i)) + vbTab + cornerNames(i) + vbCrLf
             Next
+            strOut += vbCrLf + "The contour may show points further away but they don't have depth."
+            If sortFront.Count = 0 Then strOut += vbCrLf + "None of the contour points had depth."
         End If
-        setTrueText(sides.strOut, 3)
-        setTrueText("Select a cell in the upper right image", 2)
+        setTrueText(strOut, 3)
     End Sub
 End Class
 
@@ -179,7 +136,6 @@ Public Class Profile_Derivative : Inherits VB_Algorithm
     Public sides As New Profile_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        If standalone Then sides.redCold = New RedCloud_Basics
         labels = {"", "", "Select a cell to analyze its contour", "Selected cell:  yellow = closer, blue = farther, white = no depth"}
         desc = "Visualize the derivative of X, Y, and Z in the contour of a RedCloud cell"
     End Sub
@@ -187,11 +143,11 @@ Public Class Profile_Derivative : Inherits VB_Algorithm
         Static saveTrueText As New List(Of trueText)
         sides.Run(src)
         dst2 = sides.dst2
-        Dim rc = sides.rc
+        Dim rc = task.rcSelect
 
         Dim offset As Integer = 30
-        Dim rsizeX = (dst2.Width - offset * 2) / sides.rc.rect.Width
-        Dim rsizeY = (dst2.Height - offset * 2) / sides.rc.rect.Height
+        Dim rsizeX = (dst2.Width - offset * 2) / rc.rect.Width
+        Dim rsizeY = (dst2.Height - offset * 2) / rc.rect.Height
         saveTrueText.Clear()
         trueData.Clear()
         dst3.SetTo(0)
@@ -247,7 +203,6 @@ End Class
 Public Class Profile_ConcentrationSide : Inherits VB_Algorithm
     Dim profile As New Profile_ConcentrationTop
     Public Sub New()
-        If standalone Then profile.sides.redCold = New RedCloud_Basics
         findCheckBox("Top View (Unchecked Side View)").Checked = False
         labels = {"", "The outline of the selected RedCloud cell", traceName + " - click any RedCloud cell to visualize it's side view in the upper right image.", ""}
         desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
@@ -275,7 +230,6 @@ Public Class Profile_ConcentrationTop : Inherits VB_Algorithm
     Dim heat As New HeatMap_Basics
     Dim options As New Options_HeatMap
     Public Sub New()
-        If standalone Then sides.redCold = New RedCloud_Basics
         gOptions.gravityPointCloud.Checked = False
         gOptions.displayDst1.Checked = True
         desc = "Rotate around Y-axis to find peaks - this algorithm fails to find the optimal rotation to find walls"
@@ -339,7 +293,6 @@ Public Class Profile_OpenGL : Inherits VB_Algorithm
     Public rotate As New Profile_Rotation
     Dim heat As New HeatMap_Basics
     Public Sub New()
-        If standalone Then sides.redCold = New RedCloud_Basics
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_32FC3, 0)
         If standalone Then gOptions.gravityPointCloud.Checked = False
         task.ogl.options.PointSizeSlider.Value = 10
@@ -350,7 +303,7 @@ Public Class Profile_OpenGL : Inherits VB_Algorithm
         sides.Run(src)
         dst2 = sides.dst2
         dst3 = sides.dst3
-        Dim rc = sides.rc
+        Dim rc = task.rcSelect
 
         If rc.contour3D.Count > 0 Then
             Dim vecMat As New cv.Mat(rc.contour3D.Count, 1, cv.MatType.CV_32FC3, rc.contour3D.ToArray)
@@ -364,5 +317,50 @@ Public Class Profile_OpenGL : Inherits VB_Algorithm
             dst1 = heat.dst0.Threshold(0, 255, cv.ThresholdTypes.Binary)
         End If
         setTrueText("Select a RedCloud Cell to display the contour in OpenGL." + vbCrLf + rotate.strMsg, 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class Profile_Kalman : Inherits VB_Algorithm
+    Dim sides As New Profile_Basics
+    Dim kalman As New Kalman_Basics
+    Public Sub New()
+        ReDim kalman.kInput(12 - 1)
+        If standalone Then gOptions.displayDst1.Checked = True
+        labels = {"", "", "Profile_Basics output without Kalman", "Profile_Basics output with Kalman"}
+        desc = "Use Kalman to smooth the results of the contour key points"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        sides.Run(src)
+        dst0 = sides.redC.dst0
+        dst1 = sides.dst2
+        dst2 = sides.dst3
+        Dim rc = task.rcSelect
+
+        If kalman.kInput.Count <> sides.corners.Count * 2 Then ReDim kalman.kInput(sides.corners.Count * 2 - 1)
+        For i = 0 To sides.corners.Count - 1
+            kalman.kInput(i * 2) = sides.corners(i).X
+            kalman.kInput(i * 2 + 1) = sides.corners(i).Y
+        Next
+
+        kalman.Run(Nothing)
+
+        If rc.index > 0 Then
+            dst3.SetTo(0)
+            vbDrawContour(dst3(rc.rect), rc.contour, cv.Scalar.Yellow)
+            For i = 0 To sides.corners.Count - 1
+                Dim pt = New cv.Point(CInt(kalman.kOutput(i * 2)), CInt(kalman.kOutput(i * 2 + 1)))
+                dst3.Circle(pt, task.dotSize + 2, sides.cornerColors(i), -1, task.lineType)
+            Next
+        End If
+        setTrueText(sides.strOut, 3)
+        setTrueText("Select a cell in the upper right image", 2)
     End Sub
 End Class

@@ -149,7 +149,7 @@
     <ClCompile Include="imgui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FCell.cpp">
+    <ClCompile Include="FloodCell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MLPrep.cpp">
@@ -194,7 +194,7 @@
     <ClCompile Include="Histogram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RedBP.cpp">
+    <ClCompile Include="RedCloud.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BGRPattern.cpp">

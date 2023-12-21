@@ -6,14 +6,14 @@ Public Class Color_Basics : Inherits VB_Algorithm
     Dim km As New KMeans_Basics
     Dim lut As New LUT_Basics
     Dim reduction As New Reduction_Basics
+    Dim bp3D As New Hist3DBGR_Basics
+    Dim fLess As New RedColor_FeatureLess
     Dim classifier As Object = reduction
     Public Sub New()
         classifier = reduction
         desc = "Classify pixels by color using a variety of techniques"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
-
         If task.optionsChanged Then
             Select Case redOptions.colorInput
                 Case "BackProject_Full"
@@ -24,19 +24,19 @@ Public Class Color_Basics : Inherits VB_Algorithm
                     classifier = lut
                 Case "Reduction_Basics"
                     classifier = reduction
-                Case "No Color Input" ' No Color Input is not used by Color_Basics - reset to default
-                    classifier = reduction
+                Case "3D BackProjection"
+                    classifier = bp3D
+                Case "FeatureLess"
+                    classifier = fLess
             End Select
         End If
 
+        dst1 = If(src.Channels = 3, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY), src)
         classifier.run(dst1)
-        classCount = classifier.classcount + 1
-        Dim tmp As cv.Mat = classifier.dst0
-        tmp.Set(Of Byte)(0, 0, 0) ' define the "Other" category - zero with one pixel.
-        dst0 = tmp + 1
+        classCount = classifier.classcount
 
-        dst2 = dst0 * 255 / classCount
-        dst3 = vbPalette(dst2)
+        dst2 = classifier.dst2
+        dst3 = vbPalette(dst2 * 255 / classCount)
 
         setTrueText(redOptions.colorInput)
         labels(2) = "Color_Basics: method = " + redOptions.colorInput + " produced " + CStr(classCount) + " pixel classifications"
@@ -125,13 +125,13 @@ Public Class Color_KMeans : Inherits VB_Algorithm
         Dim split = dst0.Split()
 
         km0.Run(split(0))
-        dst1 = km0.dst2.Clone
+        dst1 = km0.dst2 * 255 / km0.classCount
 
         km1.Run(split(1))
-        dst2 = km1.dst2.Clone
+        dst2 = km1.dst2 * 255 / km0.classCount
 
         km2.Run(split(2))
-        dst3 = km2.dst2.Clone
+        dst3 = km2.dst2 * 255 / km0.classCount
 
         For i = 1 To 3
             labels(i) = options.colorFormat + " channel " + CStr(i - 1)
@@ -238,7 +238,7 @@ End Class
 
 
 Public Class Color_TopX_VB : Inherits VB_Algorithm
-    Dim topX As New Hist3DRGB_TopXColors
+    Dim topX As New Hist3DBGR_TopXColors
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Top X pixels", 2, 32, 16)
         desc = "Classify every BGR pixel into some common colors"

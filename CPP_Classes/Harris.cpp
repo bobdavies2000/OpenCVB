@@ -41,13 +41,13 @@ int * Harris_Features_Close(Harris_Features *Harris_FeaturesPtr)
 }
 
 extern "C" __declspec(dllexport)
-int *Harris_Features_Run(Harris_Features *Harris_FeaturesPtr, int *rgbPtr, int rows, int cols, float threshold, int neighborhood, int aperture, float HarrisParm)
+int *Harris_Features_Run(Harris_Features *Harris_FeaturesPtr, int *bgrPtr, int rows, int cols, float threshold, int neighborhood, int aperture, float HarrisParm)
 {
 	Harris_FeaturesPtr->threshold = threshold;
 	Harris_FeaturesPtr->neighborhood = neighborhood;
 	Harris_FeaturesPtr->aperture = aperture;
 	Harris_FeaturesPtr->HarrisParm = HarrisParm;
-	Harris_FeaturesPtr->src = Mat(rows, cols, CV_8U, rgbPtr);
+	Harris_FeaturesPtr->src = Mat(rows, cols, CV_8U, bgrPtr);
 	Harris_FeaturesPtr->Run();
 	return (int *) Harris_FeaturesPtr->dst.data; 
 }
@@ -85,10 +85,10 @@ int * Harris_Detector_Close(Harris_Detector * cPtr)
 }
 
 extern "C" __declspec(dllexport)
-int *Harris_Detector_Run(Harris_Detector * cPtr, int *rgbPtr, int rows, int cols, double qualityLevel, int *count)
+int *Harris_Detector_Run(Harris_Detector * cPtr, int *bgrPtr, int rows, int cols, double qualityLevel, int *count)
 { 
 	cPtr->qualityLevel = qualityLevel;
-	cPtr->src = Mat(rows, cols, CV_8U, rgbPtr);
+	cPtr->src = Mat(rows, cols, CV_8U, bgrPtr);
 	cPtr->pts.clear();
 	cPtr->Run();
 	count[0] = int(cPtr->pts.size());

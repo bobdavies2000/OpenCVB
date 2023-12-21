@@ -3018,7 +3018,32 @@
         wLQsTBfV7x3xc2lL+/MgiIj8fxVsGa9pLv6oAAAAAElFTkSuQmCC
 </value>
   </data>
-  <data name="ToolStripButton4.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="ComplexityButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABIAAAAXCAYAAAAGAx/kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAAFiUAABYlAUlSJPAAAAR3SURBVDhPPVVbbFRVFJ1vjSEIkg7DvGlpSy3SKInEhMRH
+        jF8qsfFDP0g06r98oT8mxGjiI0YSRQMkRGkM9hGNYtSxQDVpoQ2tYoeSKsijL6a0M3PuPY/7WK59i05y
+        OnPO2WfttfdeezflWQdlNEzsoIMQfhMIfC4L+ArwPIAmMDZKljZRslc6hAl572Jwi5QWozBC0ygaBrB8
+        6AhkuCzBgoB7LuVZRPHabzn3bQyPoPKdAAmq4oVxFr4vCEDML0+5xLPnBxBnspr87fHep73sBURWQAcp
+        xUdNriCMobVGTOBQB4iI4owlI4bEs6aASigEEcc0hSGoNTHiiEAhNyGNVNPwQYBVutSWh5rJ8lYQ2gaU
+        c1iis1U+aNwBDbisH9EZDwUoYE40k0p29ObgB5rsfFyt/o6ejq0o5Dcjk88hU+rCGwc/Ro1AK8xTg4gx
+        mUWaf8IQKZBiQAINj6EJE7uME0c/QsuWLFqKbUjniigW82hNp5HPlvDgUy9ils4l3Ejik9KSTSpgBIYg
+        Uo3AeZioDKA9cy/SbV34YbyKBmn7XhML1Uns6uzExmIPXn/nCBRDMFJafZuMamuhCcWATJyawyvPP4Py
+        5iyO9f+IRYa7zJJoyweUx80/p9Fd3on27btxcaGOGpMzevYbAt1AKmLSjBIVLuDG7Bh2dGzHo48/i0W+
+        XaSDOu+1cWRPj0rhtb3PoavcjlMXZjBPR6MjgwT6i4KkNmClQlcwOfItNmQ7sPflA1iREjMPIj4nRWQ6
+        Ys/H0OF30ZFdj08GfsZNAo2N9BNoGilLNcM1CPQ3xocHsX7rQ9j/QR9WROE6hiWAJjsnyTUevj96EF3Z
+        u3DoZAVzBBo/c5JAUwRir8S6TuurOFfpxz2Fndj/3omkKpIan2xEyYYKjtQtfHfkLdyfuxufDf2GeRZi
+        QoCCCwyNHkMR0n+h5R7A0/vexG1hQrLSEtJv1iNrFmTo87dRalmHwwNnUCPQ5OmvSJdAlp6NFmFcw+Ls
+        ODpbH8Yjj+3DP8Re4p0ikGOSYZeIPI+XenvRVqY0xmbQpAT+GP6CdwQS6o4JiM0S7Mp17NmxG9tKu3Dq
+        3AwWmANf2sEXNgsYqwwik27DnidewByPfOZs+pfjvGOO2EacOewZ9pljb3396ftM5iZsae3GT+cvQ5G+
+        MJ67dB7d2/JYV+hhfkbhMVxRdbUijC4yR7SUBpSuDkXeq9fwau+TbIsiNmXL2JgpIl8ooZC5Lzk78OFx
+        XJf80V6atDrcx5AusdciTkXFCUkMfiGUWHUDfccOoZTbgGI5hxYCpQud+JUtU5O63LGNqPapypeM/bIo
+        20Oz3oBjCHXmXJSejEfFDOlbLLtK+ko6XlQufZ3oi4XQDG3qLAUZXOGE9AnNT90PkwkYcn4Lo6QZHccv
+        H8j8kZUonaMxWfwdUBcTp4fodJaM6I0zHTxPZhL4T4DzgQdMAi+FqeRV7uLEYO0jYzgZ4hHFHC2REfdi
+        GMq8lDEu40DGppxxie2aA1nh//tIzOWlIfNoGf8COFmm6J2lmBUAAAAASUVORK5CYII=
+</value>
+  </data>
+  <data name="TranslateButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAGIAAABXCAYAAAD/EpAQAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
         YQUAAAAJcEhZcwAAFiUAABYlAUlSJPAAAAMaSURBVHhe7ZVNbhNBEEZ9Aq4L7HIAFo4AwUnYZ5kQg5AQ
@@ -3055,5 +3080,8 @@
   </metadata>
   <metadata name="ValidateTreeView.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>1434, 25</value>
+  </metadata>
+  <metadata name="ComplexityTimer.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>1696, 25</value>
   </metadata>
 </root>

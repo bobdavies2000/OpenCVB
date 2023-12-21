@@ -86,7 +86,7 @@ Public Class Plane_FlatSurfaces : Inherits VB_Algorithm
         If task.cameraStable = False Or heartBeat() Then addW.src2.SetTo(0)
 
         Dim flatCount = 0
-        For Each rc In task.redCells
+        For Each rc In plane.redC.redCells
             If rc.depthMean.Z < 1.0 Then Continue For ' close objects look like planes.
             Dim RMSerror As Double = 0
             Dim pixelCount = 0
@@ -198,7 +198,7 @@ Public Class Plane_OnlyPlanes : Inherits VB_Algorithm
         dst2 = plane.dst2
 
         dst3.SetTo(0)
-        For Each rc In task.redCells
+        For Each rc In plane.redC.redCells
             If plane.options.reuseRawDepthData = False Then buildCloudPlane(rc)
         Next
         If plane.options.reuseRawDepthData Then dst3 = task.pointCloud
@@ -314,7 +314,7 @@ Public Class Plane_CellColor : Inherits VB_Algorithm
         dst3.SetTo(0)
         Dim newCells As New List(Of rcData)
         Dim rcX = task.rcSelect
-        For Each rc In task.redCells
+        For Each rc In redC.redCells
             rc.eq = New cv.Vec4f
             If options.useMaskPoints Then
                 rc.eq = fitDepthPlane(buildMaskPointEq(rc))
@@ -326,7 +326,7 @@ Public Class Plane_CellColor : Inherits VB_Algorithm
             newCells.Add(rc)
             dst3(rc.rect).SetTo(New cv.Scalar(Math.Abs(255 * rc.eq(0)), Math.Abs(255 * rc.eq(1)), Math.Abs(255 * rc.eq(2))), rc.mask)
         Next
-        task.redCells = New List(Of rcData)(newCells)
+        redC.redCells = New List(Of rcData)(newCells)
     End Sub
 End Class
 
@@ -571,8 +571,8 @@ Public Class Plane_Equation : Inherits VB_Algorithm
         If standalone Then
             Static redC As New RedCloud_Basics
             redC.Run(src)
-            rc = task.rcSelect
             dst2 = redC.dst2
+            rc = task.rcSelect
             If rc.index = 0 Then setTrueText("Select a cell in the image at left.")
         End If
 

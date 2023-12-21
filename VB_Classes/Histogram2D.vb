@@ -4,14 +4,15 @@ Public Class Histogram2D_Basics : Inherits VB_Algorithm
     Public histRowsCols() As Integer
     Public ranges() As cv.Rangef
     Public histogram As New cv.Mat
+    Public channels() As Integer = {0, 2}
     Public Sub New()
         histRowsCols = {dst2.Height, dst2.Width}
         labels = {"", "", "Plot of 2D histogram (32F format)", "All non-zero entries in the 2D histogram"}
         desc = "Create a 2D histogram from the input."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        ranges = vbHist2Dminmax(src, redOptions.channels(0), redOptions.channels(1))
-        cv.Cv2.CalcHist({src}, redOptions.channels, New cv.Mat(), histogram, 2, histRowsCols, ranges)
+        ranges = vbHist2Dminmax(src, channels(0), channels(1))
+        cv.Cv2.CalcHist({src}, channels, New cv.Mat(), histogram, 2, histRowsCols, ranges)
         dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
@@ -75,70 +76,6 @@ Public Class Histogram2D_Depth : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-' https://docs.opencv.org/2.4/modules/imgproc/doc/histograms.html
-Public Class Histogram2D_HSV : Inherits VB_Algorithm
-    Public hist2D As New Histogram2D_Basics
-    Public histogram As New cv.Mat
-    Public ranges() As cv.Rangef
-    Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        gOptions.HistBinSlider.Value = 256
-        labels = {"", "HSV image", "", ""}
-        desc = "Create a 2D histogram from an hsv input Mat."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
-        hist2D.Run(dst1)
-        dst2 = hist2D.histogram
-        dst3 = hist2D.dst3
-
-        histogram = dst2
-        ranges = hist2D.ranges
-
-        labels(3) = ""
-        If redOptions.channels(0) = 0 Then labels(2) += "Hue is on the X-Axis (0-180), "
-        If redOptions.channels(0) = 1 Then labels(2) += "Saturation is on the X-Axis (0-255), "
-        If redOptions.channels(1) = 1 Then labels(2) += "Saturation is on the Y-Axis (0-255)"
-        If redOptions.channels(1) = 2 Then labels(2) += "Value is on the Y-Axis (0-255)"
-        labels(2) = labels(2) + " (in 32F format)"
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Histogram2D_BGR : Inherits VB_Algorithm
-    Dim hist2D As New Histogram2D_Basics
-    Public histogram As New cv.Mat
-    Public ranges() As cv.Rangef
-    Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        gOptions.HistBinSlider.Value = 256
-        desc = "Create a 2D histogram from an BGR input Mat."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        hist2D.Run(src)
-        dst2 = hist2D.histogram
-        dst3 = hist2D.dst3
-
-        histogram = dst2
-        ranges = hist2D.ranges
-
-        labels(2) = ""
-        If redOptions.channels(0) = 0 Then labels(2) += "Blue is on the X-Axis, "
-        If redOptions.channels(0) = 1 Then labels(2) += "Green is on the X-Axis, "
-        If redOptions.channels(1) = 1 Then labels(2) += "Green is on the Y-Axis"
-        If redOptions.channels(1) = 2 Then labels(2) += "Red is on the Y-Axis"
-        labels(3) = labels(2)
-    End Sub
-End Class
 
 
 
@@ -215,46 +152,68 @@ End Class
 
 
 
-Public Class Histogram2D_DepthOld : Inherits VB_Algorithm
-    Dim hist2d As New Histogram2D_Basics
-    Public channels() As Integer
-    Public ranges() As cv.Rangef
-    Public histogram As New cv.Mat
+
+' https://docs.opencv.org/2.4/modules/imgproc/doc/histograms.html
+Public Class Histogram2D_HSV : Inherits VB_Algorithm
+    Public hist2D As New Histogram2D_Basics
+    Public histogram01 As New cv.Mat
+    Public histogram02 As New cv.Mat
+    Public ranges01() As cv.Rangef
+    Public ranges02() As cv.Rangef
     Public Sub New()
-        desc = "Create 2D histogram from the 3D pointcloud - use options to select dimensions."
+        gOptions.HistBinSlider.Value = 256
+        labels = {"", "HSV image", "", ""}
+        desc = "Create a 2D histogram from an hsv input Mat."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim xInput = task.pcSplit(redOptions.channels(0))
-        Dim yInput = task.pcSplit(redOptions.channels(1))
+        dst1 = src.CvtColor(cv.ColorConversionCodes.BGR2HSV)
+        hist2D.channels = {0, 2}
+        hist2D.Run(dst1)
+        ranges02 = hist2D.ranges
+        dst2 = hist2D.histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        histogram02 = hist2D.histogram
 
-        Dim mmX As mmData, mmY As mmData
-        xInput.MinMaxLoc(mmX.minVal, mmX.maxVal, mmX.minLoc, mmX.maxLoc, task.depthMask)
-        Static maxX = mmX.maxVal, minX = mmX.minVal
+        hist2D.channels = {0, 1}
+        hist2D.Run(dst1)
+        histogram01 = hist2D.histogram
+        ranges01 = hist2D.ranges
+        dst3 = hist2D.histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
 
-        yInput.MinMaxLoc(mmY.minVal, mmY.maxVal, mmY.minLoc, mmY.maxLoc, task.depthMask)
-        Static maxY = mmY.maxVal, minY = mmY.minVal
-        If task.heartBeat Then
-            maxX = mmX.maxVal
-            minX = mmX.minVal
-            maxY = mmX.maxVal
-            minY = mmX.minVal
-        End If
-
-        maxX = 2 'Math.Max(maxX, mmX.maxVal)
-        minX = -2 ' Math.Min(minX, mmX.minVal)
-
-        maxY = 2 ' Math.Max(maxY, mmY.maxVal)
-        minY = -2 ' Math.Min(minY, mmY.minVal)
-
-        ranges = New cv.Rangef() {New cv.Rangef(minX, maxX), New cv.Rangef(minY, maxY)}
-        cv.Cv2.CalcHist({task.pointCloud}, redOptions.channels, New cv.Mat(), histogram, 2,
-                        {task.histogramBins, task.histogramBins}, ranges)
-
-        dst2 = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        dst3 = histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-
-        labels = {"", "", "Mask of the 2D histogram for selected channels", "Mask of 2D histogram after thresholding"}
-        channels = redOptions.channels
+        labels(2) = "Value is on the X-Axis and Hue is on the Y-Axis"
+        labels(3) = "Saturation is on the X-Axis and Hue is on the Y-Axis"
     End Sub
 End Class
 
+
+
+
+
+
+
+Public Class Histogram2D_BGR : Inherits VB_Algorithm
+    Dim hist2D As New Histogram2D_Basics
+    Public histogram01 As New cv.Mat
+    Public histogram02 As New cv.Mat
+    Public ranges01() As cv.Rangef
+    Public ranges02() As cv.Rangef
+    Public Sub New()
+        gOptions.HistBinSlider.Value = 256
+        desc = "Create a 2D histogram for blue to red and blue to green."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        hist2D.channels = {0, 2}
+        hist2D.Run(src)
+        ranges02 = hist2D.ranges
+        dst2 = hist2D.histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        histogram02 = hist2D.histogram
+
+        hist2D.channels = {0, 1}
+        hist2D.Run(src)
+        histogram01 = hist2D.histogram
+        ranges01 = hist2D.ranges
+        dst3 = hist2D.histogram.Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+        labels(2) = "Red is on the X-Axis and Blue is on the X-Axis"
+        labels(3) = "Green is on the X-Axis and Blue is on the X-Axis"
+    End Sub
+End Class

@@ -10,7 +10,7 @@ Module HMM_CPP_Module
     Public Function HMM_Close(cPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function HMM_Run(HMMPtr As IntPtr, rgbPtr As IntPtr, rows As integer, cols As integer, channels As integer) As IntPtr
+    Public Function HMM_Run(HMMPtr As IntPtr, bgrPtr As IntPtr, rows As Integer, cols As Integer, channels As Integer) As IntPtr
     End Function
 End Module
 

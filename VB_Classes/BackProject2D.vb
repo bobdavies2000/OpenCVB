@@ -1,4 +1,5 @@
 ﻿Imports System.Runtime.InteropServices
+Imports OpenCvSharp.XImgProc
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
 Public Class BackProject2D_Basics : Inherits VB_Algorithm
@@ -14,7 +15,7 @@ Public Class BackProject2D_Basics : Inherits VB_Algorithm
         If standalone Then hist2d.histRowsCols = {gOptions.GridSize.Value, gOptions.GridSize.Value}
         desc = "A 2D histogram is built from 2 channels of any 3-channel input and the results are displayed and explored."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         Dim dimension = gOptions.GridSize.Value
         brickW = task.gridCols
         brickH = task.gridRows
@@ -212,7 +213,6 @@ End Class
 Public Class BackProject2D_Top : Inherits VB_Algorithm
     Dim heat As New HeatMap_Basics
     Public Sub New()
-        findCheckBox("Show Frustrum").Checked = False
         labels = {"", "", "Top Down HeatMap", "BackProject2D for the top-down view"}
         desc = "Backproject the output of the Top View."
     End Sub
@@ -235,7 +235,6 @@ End Class
 Public Class BackProject2D_Side : Inherits VB_Algorithm
     Dim heat As New HeatMap_Basics
     Public Sub New()
-        findCheckBox("Show Frustrum").Checked = False
         labels = {"", "", "Side View HeatMap", "BackProject2D for the side view"}
         desc = "Backproject the output of the Side View."
     End Sub
@@ -250,3 +249,113 @@ Public Class BackProject2D_Side : Inherits VB_Algorithm
     End Sub
 End Class
 
+
+
+
+
+
+
+
+Public Class BackProject2D_Filter : Inherits VB_Algorithm
+    Public options As New Options_HistXD
+    Public threshold As Integer
+    Public Sub New()
+        dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
+        gOptions.HistBinSlider.Value = 100 ' extra bins to help isolate the stragglers.
+        desc = "Filter a 2D histogram for the backprojection."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        If standalone Then
+            cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, src, 2, task.bins2D, task.rangesSide)
+        End If
+        src.Col(0).SetTo(0)
+
+        Dim hSamples(src.Total - 1) As Single
+        Marshal.Copy(src.Data, hSamples, 0, hSamples.Length)
+
+        For i = 0 To hSamples.Count - 1
+            If hSamples(i) < threshold Then hSamples(i) = 0 Else hSamples(i) = 255
+        Next
+
+        dst2 = New cv.Mat(src.Size, cv.MatType.CV_32F, 0)
+        Marshal.Copy(hSamples, 0, dst2.Data, hSamples.Length)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class BackProject2D_FilterSide : Inherits VB_Algorithm
+    Public filter As New BackProject2D_Filter
+    Public Sub New()
+        desc = "Backproject the output of the Side View after removing low sample bins."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim input As New cv.Mat
+        cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, input, 2, task.bins2D, task.rangesSide)
+
+        filter.threshold = filter.options.sideThreshold
+        filter.Run(input)
+
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, filter.dst2, dst1, task.rangesSide)
+        dst1.ConvertTo(dst1, cv.MatType.CV_8U)
+
+        dst2.SetTo(0)
+        task.pointCloud.CopyTo(dst2, dst1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class BackProject2D_FilterTop : Inherits VB_Algorithm
+    Dim filter As New BackProject2D_Filter
+    Public Sub New()
+        desc = "Backproject the output of the Side View after removing low sample bins."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim histogram As New cv.Mat
+        cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
+
+        filter.threshold = filter.options.topThreshold
+        filter.Run(histogram)
+
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, filter.dst2, dst1, task.rangesTop)
+        dst1.ConvertTo(dst1, cv.MatType.CV_8U)
+
+        dst2.SetTo(0)
+        task.pointCloud.CopyTo(dst2, dst1)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class BackProject2D_FilterBoth : Inherits VB_Algorithm
+    Dim filterSide As New BackProject2D_FilterSide
+    Dim filterTop As New BackProject2D_FilterTop
+    Public Sub New()
+        desc = "Backproject the output of the both the top and side views after removing low sample bins."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        filterSide.Run(src)
+        filterTop.Run(src)
+
+        dst2.SetTo(0)
+        task.pointCloud.CopyTo(dst2, filterSide.dst1)
+        task.pointCloud.CopyTo(dst2, filterTop.dst1)
+    End Sub
+End Class

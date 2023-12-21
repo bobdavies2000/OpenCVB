@@ -36,7 +36,8 @@ Partial Class OptionsRedCloud
         Me.XRangeSlider = New System.Windows.Forms.TrackBar()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.RGBSource = New System.Windows.Forms.GroupBox()
-        Me.noColor_Input = New System.Windows.Forms.RadioButton()
+        Me.FeatureLessRadio = New System.Windows.Forms.RadioButton()
+        Me.BackProject3D = New System.Windows.Forms.RadioButton()
         Me.KMeans_Basics = New System.Windows.Forms.RadioButton()
         Me.LUT_Basics = New System.Windows.Forms.RadioButton()
         Me.Reduction_Basics = New System.Windows.Forms.RadioButton()
@@ -61,9 +62,22 @@ Partial Class OptionsRedCloud
         Me.YReduction = New System.Windows.Forms.RadioButton()
         Me.XReduction = New System.Windows.Forms.RadioButton()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
-        Me.NoPointcloudData = New System.Windows.Forms.RadioButton()
         Me.RedCloud_Core = New System.Windows.Forms.RadioButton()
         Me.GuidedBP_Depth = New System.Windows.Forms.RadioButton()
+        Me.RedCloudType = New System.Windows.Forms.GroupBox()
+        Me.UseDepthAndColor = New System.Windows.Forms.RadioButton()
+        Me.UseDepth = New System.Windows.Forms.RadioButton()
+        Me.UseColor = New System.Windows.Forms.RadioButton()
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.LabelDesiredCell = New System.Windows.Forms.Label()
+        Me.DesiredCellSlider = New System.Windows.Forms.TrackBar()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.LabelimageSizePercent = New System.Windows.Forms.Label()
+        Me.imageSizeThresholdSlider = New System.Windows.Forms.TrackBar()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.LabelHistogramBins = New System.Windows.Forms.Label()
+        Me.Hist3DBinsSlider = New System.Windows.Forms.TrackBar()
+        Me.Label7 = New System.Windows.Forms.Label()
         Me.RedCloudSliders.SuspendLayout()
         CType(Me.TopViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SideViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -76,6 +90,11 @@ Partial Class OptionsRedCloud
         CType(Me.SimpleReductionSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.RedCloudOnly.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
+        Me.RedCloudType.SuspendLayout()
+        Me.GroupBox2.SuspendLayout()
+        CType(Me.DesiredCellSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.imageSizeThresholdSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.Hist3DBinsSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'RedCloudSliders
@@ -92,16 +111,16 @@ Partial Class OptionsRedCloud
         Me.RedCloudSliders.Controls.Add(Me.XLabel)
         Me.RedCloudSliders.Controls.Add(Me.XRangeSlider)
         Me.RedCloudSliders.Controls.Add(Me.Label2)
-        Me.RedCloudSliders.Location = New System.Drawing.Point(12, 12)
+        Me.RedCloudSliders.Location = New System.Drawing.Point(12, 257)
         Me.RedCloudSliders.Name = "RedCloudSliders"
-        Me.RedCloudSliders.Size = New System.Drawing.Size(831, 315)
+        Me.RedCloudSliders.Size = New System.Drawing.Size(831, 300)
         Me.RedCloudSliders.TabIndex = 2
         Me.RedCloudSliders.TabStop = False
         '
         'TopLabel
         '
         Me.TopLabel.AutoSize = True
-        Me.TopLabel.Location = New System.Drawing.Point(667, 244)
+        Me.TopLabel.Location = New System.Drawing.Point(668, 245)
         Me.TopLabel.Name = "TopLabel"
         Me.TopLabel.Size = New System.Drawing.Size(57, 20)
         Me.TopLabel.TabIndex = 20
@@ -120,16 +139,16 @@ Partial Class OptionsRedCloud
         '
         'Label6
         '
-        Me.Label6.Location = New System.Drawing.Point(8, 244)
+        Me.Label6.Location = New System.Drawing.Point(8, 245)
         Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(151, 48)
+        Me.Label6.Size = New System.Drawing.Size(152, 48)
         Me.Label6.TabIndex = 18
         Me.Label6.Text = "Top View Red Threshold"
         '
         'SideLabel
         '
         Me.SideLabel.AutoSize = True
-        Me.SideLabel.Location = New System.Drawing.Point(667, 169)
+        Me.SideLabel.Location = New System.Drawing.Point(668, 169)
         Me.SideLabel.Name = "SideLabel"
         Me.SideLabel.Size = New System.Drawing.Size(57, 20)
         Me.SideLabel.TabIndex = 17
@@ -150,14 +169,14 @@ Partial Class OptionsRedCloud
         '
         Me.Label8.Location = New System.Drawing.Point(8, 169)
         Me.Label8.Name = "Label8"
-        Me.Label8.Size = New System.Drawing.Size(151, 43)
+        Me.Label8.Size = New System.Drawing.Size(152, 43)
         Me.Label8.TabIndex = 15
         Me.Label8.Text = "Side View Red Threshold"
         '
         'YLabel
         '
         Me.YLabel.AutoSize = True
-        Me.YLabel.Location = New System.Drawing.Point(667, 105)
+        Me.YLabel.Location = New System.Drawing.Point(668, 105)
         Me.YLabel.Name = "YLabel"
         Me.YLabel.Size = New System.Drawing.Size(57, 20)
         Me.YLabel.TabIndex = 14
@@ -165,7 +184,7 @@ Partial Class OptionsRedCloud
         '
         'YRangeSlider
         '
-        Me.YRangeSlider.Location = New System.Drawing.Point(156, 99)
+        Me.YRangeSlider.Location = New System.Drawing.Point(156, 98)
         Me.YRangeSlider.Maximum = 1000
         Me.YRangeSlider.Minimum = 3
         Me.YRangeSlider.Name = "YRangeSlider"
@@ -186,7 +205,7 @@ Partial Class OptionsRedCloud
         'XLabel
         '
         Me.XLabel.AutoSize = True
-        Me.XLabel.Location = New System.Drawing.Point(667, 30)
+        Me.XLabel.Location = New System.Drawing.Point(668, 31)
         Me.XLabel.Name = "XLabel"
         Me.XLabel.Size = New System.Drawing.Size(57, 20)
         Me.XLabel.TabIndex = 11
@@ -194,7 +213,7 @@ Partial Class OptionsRedCloud
         '
         'XRangeSlider
         '
-        Me.XRangeSlider.Location = New System.Drawing.Point(156, 24)
+        Me.XRangeSlider.Location = New System.Drawing.Point(156, 25)
         Me.XRangeSlider.Maximum = 1000
         Me.XRangeSlider.Minimum = 3
         Me.XRangeSlider.Name = "XRangeSlider"
@@ -206,7 +225,7 @@ Partial Class OptionsRedCloud
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(8, 30)
+        Me.Label2.Location = New System.Drawing.Point(8, 31)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(115, 20)
         Me.Label2.TabIndex = 9
@@ -214,33 +233,45 @@ Partial Class OptionsRedCloud
         '
         'RGBSource
         '
-        Me.RGBSource.Controls.Add(Me.noColor_Input)
+        Me.RGBSource.Controls.Add(Me.FeatureLessRadio)
+        Me.RGBSource.Controls.Add(Me.BackProject3D)
         Me.RGBSource.Controls.Add(Me.KMeans_Basics)
         Me.RGBSource.Controls.Add(Me.LUT_Basics)
         Me.RGBSource.Controls.Add(Me.Reduction_Basics)
         Me.RGBSource.Controls.Add(Me.BackProject_Full)
-        Me.RGBSource.Location = New System.Drawing.Point(1088, 30)
+        Me.RGBSource.Location = New System.Drawing.Point(1088, 31)
         Me.RGBSource.Name = "RGBSource"
-        Me.RGBSource.Size = New System.Drawing.Size(250, 200)
+        Me.RGBSource.Size = New System.Drawing.Size(250, 220)
         Me.RGBSource.TabIndex = 3
         Me.RGBSource.TabStop = False
         Me.RGBSource.Text = "Color Source"
         '
-        'noColor_Input
+        'FeatureLessRadio
         '
-        Me.noColor_Input.AutoSize = True
-        Me.noColor_Input.Location = New System.Drawing.Point(28, 161)
-        Me.noColor_Input.Name = "noColor_Input"
-        Me.noColor_Input.Size = New System.Drawing.Size(136, 24)
-        Me.noColor_Input.TabIndex = 4
-        Me.noColor_Input.TabStop = True
-        Me.noColor_Input.Text = "No Color Input"
-        Me.noColor_Input.UseVisualStyleBackColor = True
+        Me.FeatureLessRadio.AutoSize = True
+        Me.FeatureLessRadio.Location = New System.Drawing.Point(28, 100)
+        Me.FeatureLessRadio.Name = "FeatureLessRadio"
+        Me.FeatureLessRadio.Size = New System.Drawing.Size(124, 24)
+        Me.FeatureLessRadio.TabIndex = 6
+        Me.FeatureLessRadio.TabStop = True
+        Me.FeatureLessRadio.Text = "FeatureLess"
+        Me.FeatureLessRadio.UseVisualStyleBackColor = True
+        '
+        'BackProject3D
+        '
+        Me.BackProject3D.AutoSize = True
+        Me.BackProject3D.Location = New System.Drawing.Point(28, 29)
+        Me.BackProject3D.Name = "BackProject3D"
+        Me.BackProject3D.Size = New System.Drawing.Size(165, 24)
+        Me.BackProject3D.TabIndex = 5
+        Me.BackProject3D.TabStop = True
+        Me.BackProject3D.Text = "3D BackProjection"
+        Me.BackProject3D.UseVisualStyleBackColor = True
         '
         'KMeans_Basics
         '
         Me.KMeans_Basics.AutoSize = True
-        Me.KMeans_Basics.Location = New System.Drawing.Point(28, 67)
+        Me.KMeans_Basics.Location = New System.Drawing.Point(28, 129)
         Me.KMeans_Basics.Name = "KMeans_Basics"
         Me.KMeans_Basics.Size = New System.Drawing.Size(148, 24)
         Me.KMeans_Basics.TabIndex = 3
@@ -251,7 +282,7 @@ Partial Class OptionsRedCloud
         'LUT_Basics
         '
         Me.LUT_Basics.AutoSize = True
-        Me.LUT_Basics.Location = New System.Drawing.Point(28, 97)
+        Me.LUT_Basics.Location = New System.Drawing.Point(28, 159)
         Me.LUT_Basics.Name = "LUT_Basics"
         Me.LUT_Basics.Size = New System.Drawing.Size(120, 24)
         Me.LUT_Basics.TabIndex = 2
@@ -262,7 +293,7 @@ Partial Class OptionsRedCloud
         'Reduction_Basics
         '
         Me.Reduction_Basics.AutoSize = True
-        Me.Reduction_Basics.Location = New System.Drawing.Point(28, 127)
+        Me.Reduction_Basics.Location = New System.Drawing.Point(28, 189)
         Me.Reduction_Basics.Name = "Reduction_Basics"
         Me.Reduction_Basics.Size = New System.Drawing.Size(163, 24)
         Me.Reduction_Basics.TabIndex = 1
@@ -273,7 +304,7 @@ Partial Class OptionsRedCloud
         'BackProject_Full
         '
         Me.BackProject_Full.AutoSize = True
-        Me.BackProject_Full.Location = New System.Drawing.Point(28, 37)
+        Me.BackProject_Full.Location = New System.Drawing.Point(28, 64)
         Me.BackProject_Full.Name = "BackProject_Full"
         Me.BackProject_Full.Size = New System.Drawing.Size(153, 24)
         Me.BackProject_Full.TabIndex = 0
@@ -286,9 +317,9 @@ Partial Class OptionsRedCloud
         Me.ReductionTypeGroup.Controls.Add(Me.NoReduction)
         Me.ReductionTypeGroup.Controls.Add(Me.BitwiseReduction)
         Me.ReductionTypeGroup.Controls.Add(Me.SimpleReduction)
-        Me.ReductionTypeGroup.Location = New System.Drawing.Point(1088, 250)
+        Me.ReductionTypeGroup.Location = New System.Drawing.Point(1088, 257)
         Me.ReductionTypeGroup.Name = "ReductionTypeGroup"
-        Me.ReductionTypeGroup.Size = New System.Drawing.Size(250, 130)
+        Me.ReductionTypeGroup.Size = New System.Drawing.Size(250, 129)
         Me.ReductionTypeGroup.TabIndex = 5
         Me.ReductionTypeGroup.TabStop = False
         Me.ReductionTypeGroup.Text = "Reduction Options"
@@ -307,7 +338,7 @@ Partial Class OptionsRedCloud
         'BitwiseReduction
         '
         Me.BitwiseReduction.AutoSize = True
-        Me.BitwiseReduction.Location = New System.Drawing.Point(28, 67)
+        Me.BitwiseReduction.Location = New System.Drawing.Point(28, 68)
         Me.BitwiseReduction.Name = "BitwiseReduction"
         Me.BitwiseReduction.Size = New System.Drawing.Size(194, 24)
         Me.BitwiseReduction.TabIndex = 3
@@ -334,7 +365,7 @@ Partial Class OptionsRedCloud
         Me.ReductionSliders.Controls.Add(Me.ColorLabel)
         Me.ReductionSliders.Controls.Add(Me.SimpleReductionSlider)
         Me.ReductionSliders.Controls.Add(Me.ColorReduce)
-        Me.ReductionSliders.Location = New System.Drawing.Point(12, 490)
+        Me.ReductionSliders.Location = New System.Drawing.Point(861, 490)
         Me.ReductionSliders.Name = "ReductionSliders"
         Me.ReductionSliders.Size = New System.Drawing.Size(831, 140)
         Me.ReductionSliders.TabIndex = 6
@@ -344,7 +375,7 @@ Partial Class OptionsRedCloud
         'bitwiseLabel
         '
         Me.bitwiseLabel.AutoSize = True
-        Me.bitwiseLabel.Location = New System.Drawing.Point(667, 91)
+        Me.bitwiseLabel.Location = New System.Drawing.Point(668, 91)
         Me.bitwiseLabel.Name = "bitwiseLabel"
         Me.bitwiseLabel.Size = New System.Drawing.Size(98, 20)
         Me.bitwiseLabel.TabIndex = 11
@@ -372,7 +403,7 @@ Partial Class OptionsRedCloud
         'ColorLabel
         '
         Me.ColorLabel.AutoSize = True
-        Me.ColorLabel.Location = New System.Drawing.Point(667, 24)
+        Me.ColorLabel.Location = New System.Drawing.Point(668, 25)
         Me.ColorLabel.Name = "ColorLabel"
         Me.ColorLabel.Size = New System.Drawing.Size(85, 20)
         Me.ColorLabel.TabIndex = 8
@@ -391,9 +422,9 @@ Partial Class OptionsRedCloud
         '
         'ColorReduce
         '
-        Me.ColorReduce.Location = New System.Drawing.Point(8, 24)
+        Me.ColorReduce.Location = New System.Drawing.Point(8, 25)
         Me.ColorReduce.Name = "ColorReduce"
-        Me.ColorReduce.Size = New System.Drawing.Size(151, 45)
+        Me.ColorReduce.Size = New System.Drawing.Size(152, 45)
         Me.ColorReduce.TabIndex = 6
         Me.ColorReduce.Text = "Simple Reduction"
         '
@@ -408,7 +439,7 @@ Partial Class OptionsRedCloud
         Me.RedCloudOnly.Controls.Add(Me.XReduction)
         Me.RedCloudOnly.Location = New System.Drawing.Point(861, 23)
         Me.RedCloudOnly.Name = "RedCloudOnly"
-        Me.RedCloudOnly.Size = New System.Drawing.Size(221, 290)
+        Me.RedCloudOnly.Size = New System.Drawing.Size(220, 289)
         Me.RedCloudOnly.TabIndex = 7
         Me.RedCloudOnly.TabStop = False
         Me.RedCloudOnly.Text = "PC Histogram Inputs"
@@ -416,7 +447,7 @@ Partial Class OptionsRedCloud
         'XYZReduction
         '
         Me.XYZReduction.AutoSize = True
-        Me.XYZReduction.Location = New System.Drawing.Point(28, 247)
+        Me.XYZReduction.Location = New System.Drawing.Point(28, 248)
         Me.XYZReduction.Name = "XYZReduction"
         Me.XYZReduction.Size = New System.Drawing.Size(143, 24)
         Me.XYZReduction.TabIndex = 8
@@ -438,7 +469,7 @@ Partial Class OptionsRedCloud
         'XZReduction
         '
         Me.XZReduction.AutoSize = True
-        Me.XZReduction.Location = New System.Drawing.Point(29, 177)
+        Me.XZReduction.Location = New System.Drawing.Point(28, 177)
         Me.XZReduction.Name = "XZReduction"
         Me.XZReduction.Size = New System.Drawing.Size(132, 24)
         Me.XZReduction.TabIndex = 6
@@ -460,7 +491,7 @@ Partial Class OptionsRedCloud
         'ZReduction
         '
         Me.ZReduction.AutoSize = True
-        Me.ZReduction.Location = New System.Drawing.Point(28, 107)
+        Me.ZReduction.Location = New System.Drawing.Point(28, 108)
         Me.ZReduction.Name = "ZReduction"
         Me.ZReduction.Size = New System.Drawing.Size(121, 24)
         Me.ZReduction.TabIndex = 4
@@ -492,26 +523,14 @@ Partial Class OptionsRedCloud
         '
         'GroupBox1
         '
-        Me.GroupBox1.Controls.Add(Me.NoPointcloudData)
         Me.GroupBox1.Controls.Add(Me.RedCloud_Core)
         Me.GroupBox1.Controls.Add(Me.GuidedBP_Depth)
-        Me.GroupBox1.Location = New System.Drawing.Point(861, 341)
+        Me.GroupBox1.Location = New System.Drawing.Point(861, 340)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(221, 144)
+        Me.GroupBox1.Size = New System.Drawing.Size(220, 112)
         Me.GroupBox1.TabIndex = 5
         Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "RedCloud Depth Source"
-        '
-        'NoPointcloudData
-        '
-        Me.NoPointcloudData.AutoSize = True
-        Me.NoPointcloudData.Location = New System.Drawing.Point(28, 99)
-        Me.NoPointcloudData.Name = "NoPointcloudData"
-        Me.NoPointcloudData.Size = New System.Drawing.Size(171, 24)
-        Me.NoPointcloudData.TabIndex = 10
-        Me.NoPointcloudData.TabStop = True
-        Me.NoPointcloudData.Text = "No Pointcloud Data"
-        Me.NoPointcloudData.UseVisualStyleBackColor = True
+        Me.GroupBox1.Text = "RedCloud Data Source"
         '
         'RedCloud_Core
         '
@@ -535,11 +554,160 @@ Partial Class OptionsRedCloud
         Me.GuidedBP_Depth.Text = "GuidedBP_Depth"
         Me.GuidedBP_Depth.UseVisualStyleBackColor = True
         '
+        'RedCloudType
+        '
+        Me.RedCloudType.Controls.Add(Me.UseDepthAndColor)
+        Me.RedCloudType.Controls.Add(Me.UseDepth)
+        Me.RedCloudType.Controls.Add(Me.UseColor)
+        Me.RedCloudType.Location = New System.Drawing.Point(1366, 38)
+        Me.RedCloudType.Name = "RedCloudType"
+        Me.RedCloudType.Size = New System.Drawing.Size(220, 135)
+        Me.RedCloudType.TabIndex = 8
+        Me.RedCloudType.TabStop = False
+        Me.RedCloudType.Text = "RedCloud Run Type"
+        '
+        'UseDepthAndColor
+        '
+        Me.UseDepthAndColor.AutoSize = True
+        Me.UseDepthAndColor.Location = New System.Drawing.Point(28, 100)
+        Me.UseDepthAndColor.Name = "UseDepthAndColor"
+        Me.UseDepthAndColor.Size = New System.Drawing.Size(183, 24)
+        Me.UseDepthAndColor.TabIndex = 4
+        Me.UseDepthAndColor.TabStop = True
+        Me.UseDepthAndColor.Text = "Use Depth and Color"
+        Me.UseDepthAndColor.UseVisualStyleBackColor = True
+        '
+        'UseDepth
+        '
+        Me.UseDepth.AutoSize = True
+        Me.UseDepth.Location = New System.Drawing.Point(28, 68)
+        Me.UseDepth.Name = "UseDepth"
+        Me.UseDepth.Size = New System.Drawing.Size(152, 24)
+        Me.UseDepth.TabIndex = 3
+        Me.UseDepth.TabStop = True
+        Me.UseDepth.Text = "Use Depth Input"
+        Me.UseDepth.UseVisualStyleBackColor = True
+        '
+        'UseColor
+        '
+        Me.UseColor.AutoSize = True
+        Me.UseColor.Location = New System.Drawing.Point(28, 37)
+        Me.UseColor.Name = "UseColor"
+        Me.UseColor.Size = New System.Drawing.Size(145, 24)
+        Me.UseColor.TabIndex = 0
+        Me.UseColor.TabStop = True
+        Me.UseColor.Text = "Use Color Input"
+        Me.UseColor.UseVisualStyleBackColor = True
+        '
+        'GroupBox2
+        '
+        Me.GroupBox2.Controls.Add(Me.LabelHistogramBins)
+        Me.GroupBox2.Controls.Add(Me.Hist3DBinsSlider)
+        Me.GroupBox2.Controls.Add(Me.Label7)
+        Me.GroupBox2.Controls.Add(Me.LabelDesiredCell)
+        Me.GroupBox2.Controls.Add(Me.DesiredCellSlider)
+        Me.GroupBox2.Controls.Add(Me.Label5)
+        Me.GroupBox2.Controls.Add(Me.LabelimageSizePercent)
+        Me.GroupBox2.Controls.Add(Me.imageSizeThresholdSlider)
+        Me.GroupBox2.Controls.Add(Me.Label3)
+        Me.GroupBox2.Location = New System.Drawing.Point(12, 4)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(831, 255)
+        Me.GroupBox2.TabIndex = 9
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "Histogram 3D Options"
+        '
+        'LabelDesiredCell
+        '
+        Me.LabelDesiredCell.AutoSize = True
+        Me.LabelDesiredCell.Location = New System.Drawing.Point(668, 98)
+        Me.LabelDesiredCell.Name = "LabelDesiredCell"
+        Me.LabelDesiredCell.Size = New System.Drawing.Size(57, 20)
+        Me.LabelDesiredCell.TabIndex = 29
+        Me.LabelDesiredCell.Text = "Label5"
+        '
+        'DesiredCellSlider
+        '
+        Me.DesiredCellSlider.Location = New System.Drawing.Point(156, 91)
+        Me.DesiredCellSlider.Maximum = 100
+        Me.DesiredCellSlider.Minimum = 1
+        Me.DesiredCellSlider.Name = "DesiredCellSlider"
+        Me.DesiredCellSlider.Size = New System.Drawing.Size(506, 69)
+        Me.DesiredCellSlider.TabIndex = 28
+        Me.DesiredCellSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.DesiredCellSlider.Value = 8
+        '
+        'Label5
+        '
+        Me.Label5.Location = New System.Drawing.Point(8, 98)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(152, 48)
+        Me.Label5.TabIndex = 27
+        Me.Label5.Text = "Desired Cell Count"
+        '
+        'LabelimageSizePercent
+        '
+        Me.LabelimageSizePercent.AutoSize = True
+        Me.LabelimageSizePercent.Location = New System.Drawing.Point(668, 34)
+        Me.LabelimageSizePercent.Name = "LabelimageSizePercent"
+        Me.LabelimageSizePercent.Size = New System.Drawing.Size(57, 20)
+        Me.LabelimageSizePercent.TabIndex = 26
+        Me.LabelimageSizePercent.Text = "Label5"
+        '
+        'imageSizeThresholdSlider
+        '
+        Me.imageSizeThresholdSlider.Location = New System.Drawing.Point(156, 27)
+        Me.imageSizeThresholdSlider.Maximum = 100
+        Me.imageSizeThresholdSlider.Minimum = 1
+        Me.imageSizeThresholdSlider.Name = "imageSizeThresholdSlider"
+        Me.imageSizeThresholdSlider.Size = New System.Drawing.Size(506, 69)
+        Me.imageSizeThresholdSlider.TabIndex = 25
+        Me.imageSizeThresholdSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.imageSizeThresholdSlider.Value = 95
+        '
+        'Label3
+        '
+        Me.Label3.Location = New System.Drawing.Point(8, 34)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(152, 48)
+        Me.Label3.TabIndex = 24
+        Me.Label3.Text = "Image Threshold %"
+        '
+        'LabelHistogramBins
+        '
+        Me.LabelHistogramBins.AutoSize = True
+        Me.LabelHistogramBins.Location = New System.Drawing.Point(668, 163)
+        Me.LabelHistogramBins.Name = "LabelHistogramBins"
+        Me.LabelHistogramBins.Size = New System.Drawing.Size(57, 20)
+        Me.LabelHistogramBins.TabIndex = 32
+        Me.LabelHistogramBins.Text = "Label5"
+        '
+        'Hist3DBinsSlider
+        '
+        Me.Hist3DBinsSlider.Location = New System.Drawing.Point(156, 156)
+        Me.Hist3DBinsSlider.Maximum = 256
+        Me.Hist3DBinsSlider.Minimum = 2
+        Me.Hist3DBinsSlider.Name = "Hist3DBinsSlider"
+        Me.Hist3DBinsSlider.Size = New System.Drawing.Size(506, 69)
+        Me.Hist3DBinsSlider.TabIndex = 31
+        Me.Hist3DBinsSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.Hist3DBinsSlider.Value = 4
+        '
+        'Label7
+        '
+        Me.Label7.Location = New System.Drawing.Point(8, 163)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(152, 48)
+        Me.Label7.TabIndex = 30
+        Me.Label7.Text = "3D Histogram Bins"
+        '
         'OptionsRedCloud
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1690, 642)
+        Me.ClientSize = New System.Drawing.Size(1700, 642)
+        Me.Controls.Add(Me.GroupBox2)
+        Me.Controls.Add(Me.RedCloudType)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.RedCloudOnly)
         Me.Controls.Add(Me.ReductionSliders)
@@ -566,6 +734,13 @@ Partial Class OptionsRedCloud
         Me.RedCloudOnly.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
+        Me.RedCloudType.ResumeLayout(False)
+        Me.RedCloudType.PerformLayout()
+        Me.GroupBox2.ResumeLayout(False)
+        Me.GroupBox2.PerformLayout()
+        CType(Me.DesiredCellSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.imageSizeThresholdSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.Hist3DBinsSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -606,9 +781,23 @@ Partial Class OptionsRedCloud
     Friend WithEvents XYZReduction As Windows.Forms.RadioButton
     Friend WithEvents YZReduction As Windows.Forms.RadioButton
     Friend WithEvents NoReduction As Windows.Forms.RadioButton
-    Friend WithEvents noColor_Input As Windows.Forms.RadioButton
     Friend WithEvents GroupBox1 As Windows.Forms.GroupBox
     Friend WithEvents RedCloud_Core As Windows.Forms.RadioButton
     Friend WithEvents GuidedBP_Depth As Windows.Forms.RadioButton
-    Friend WithEvents NoPointcloudData As Windows.Forms.RadioButton
+    Friend WithEvents BackProject3D As Windows.Forms.RadioButton
+    Friend WithEvents RedCloudType As Windows.Forms.GroupBox
+    Friend WithEvents UseDepth As Windows.Forms.RadioButton
+    Friend WithEvents UseColor As Windows.Forms.RadioButton
+    Friend WithEvents UseDepthAndColor As Windows.Forms.RadioButton
+    Friend WithEvents FeatureLessRadio As Windows.Forms.RadioButton
+    Friend WithEvents GroupBox2 As Windows.Forms.GroupBox
+    Friend WithEvents LabelDesiredCell As Windows.Forms.Label
+    Friend WithEvents DesiredCellSlider As Windows.Forms.TrackBar
+    Friend WithEvents Label5 As Windows.Forms.Label
+    Friend WithEvents LabelimageSizePercent As Windows.Forms.Label
+    Friend WithEvents imageSizeThresholdSlider As Windows.Forms.TrackBar
+    Friend WithEvents Label3 As Windows.Forms.Label
+    Friend WithEvents LabelHistogramBins As Windows.Forms.Label
+    Friend WithEvents Hist3DBinsSlider As Windows.Forms.TrackBar
+    Friend WithEvents Label7 As Windows.Forms.Label
 End Class

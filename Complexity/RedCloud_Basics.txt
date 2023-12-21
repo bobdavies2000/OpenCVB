@@ -1,0 +1,107 @@
+-------------------
+Image	168	94
+Ending 	2118	29.997 seconds
+-------------------
+Image	336	188
+Ending 	1985	30.003 seconds
+-------------------
+Image	672	376
+Ending 	782	29.997 seconds
+-------------------
+Image	320	180
+Ending 	1016	30.006 seconds
+-------------------
+Image	640	360
+Ending 	693	29.996 seconds
+-------------------
+Image	1280	720
+Ending 	161	30.009 seconds
+-------------------
+Image	480	270
+Ending 	561	30.002 seconds
+-------------------
+Image	960	540
+Ending 	296	30.002 seconds
+-------------------
+Image	1920	1080
+Ending 	71	29.998 seconds
+-------------------
+Image	168	94
+Ending 	2108	29.989 seconds
+-------------------
+Image	336	188
+Ending 	2011	30.000 seconds
+-------------------
+Image	672	376
+Ending 	811	30.003 seconds
+-------------------
+Image	320	180
+Ending 	995	29.997 seconds
+-------------------
+Image	640	360
+Ending 	770	30.000 seconds
+-------------------
+Image	1280	720
+Ending 	200	30.004 seconds
+-------------------
+Image	480	270
+Ending 	563	29.992 seconds
+-------------------
+Image	960	540
+Ending 	375	30.012 seconds
+-------------------
+Image	1920	1080
+Ending 	91	30.003 seconds
+-------------------
+Image	168	94
+Ending 	2101	29.991 seconds
+-------------------
+Image	336	188
+Ending 	1994	29.997 seconds
+-------------------
+Image	672	376
+Ending 	804	29.999 seconds
+-------------------
+Image	320	180
+Ending 	978	30.000 seconds
+-------------------
+Image	640	360
+Ending 	764	30.002 seconds
+-------------------
+Image	1280	720
+Ending 	188	29.999 seconds
+-------------------
+Image	480	270
+Ending 	565	30.008 seconds
+-------------------
+Image	960	540
+Ending 	326	29.993 seconds
+-------------------
+Image	1920	1080
+Ending 	65	29.999 seconds
+-------------------
+Image	168	94
+Ending 	2119	29.997 seconds
+-------------------
+Image	336	188
+Ending 	2015	30.000 seconds
+-------------------
+Image	672	376
+Ending 	755	30.017 seconds
+-------------------
+Image	320	180
+Ending 	992	29.989 seconds
+-------------------
+Image	640	360
+Ending 	734	30.003 seconds
+-------------------
+Image	1280	720
+Ending 	169	29.995 seconds
+-------------------
+Image	480	270
+Ending 	572	30.000 seconds
+-------------------
+Image	960	540
+Ending 	293	29.998 seconds
+-------------------
+Image	1920	1080

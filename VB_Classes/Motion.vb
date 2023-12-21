@@ -220,7 +220,7 @@ Public Class Motion_PixelDiff : Inherits VB_Algorithm
                     "To get the Options Slider, use " + traceName + "QT"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        src = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        src = task.gray
 
         Static lastFrame As cv.Mat = src
         cv.Cv2.Absdiff(src, lastFrame, dst2)
@@ -422,7 +422,7 @@ Public Class Motion_Contours : Inherits VB_Algorithm
                 If dst3.Channels = 1 Then dst3 = dst3.CvtColor(cv.ColorConversionCodes.GRAY2BGR)
                 labels(3) = "Motion detected"
             Else
-                labels(3) = "No motion detected with contours > " + CStr(task.minPixels)
+                labels(3) = "No motion detected with contours > " + CStr(gOptions.minPixelsSlider.Value)
             End If
         End If
 

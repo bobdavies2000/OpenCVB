@@ -7,15 +7,12 @@ Imports cv = OpenCvSharp
 Imports cvext = OpenCvSharp.Extensions
 Imports System.Management
 Imports System.Runtime.InteropServices
-Imports NAudio
-
 Module opencv_module
     ' Public bufferLock As New Mutex(True, "bufferLock") ' this is a global lock on the camera buffers.
     Public callTraceLock As New Mutex(True, "callTraceLock")
     Public mouseLock As New Mutex(True, "mouseLock") ' global lock for use with mouse clicks.
     Public algorithmThreadLock As New Mutex(True, "AlgorithmThreadLock")
     Public cameraLock As New Mutex(True, "cameraLock")
-    Public paintLock As New Mutex(True, "paintLock")
     Public Declare Function GetWindowRect Lib "user32" (ByVal HWND As Integer, ByRef lpRect As RECT) As Integer
     <StructLayout(LayoutKind.Sequential)> Public Structure RECT
         Dim Left As Integer
@@ -102,6 +99,10 @@ Public Class OpenCVB
     Dim PausePlay As Bitmap
     Dim runPlay As Bitmap
     Dim stopTest As Bitmap
+    Dim complexityTest As Bitmap
+    Dim complexityResults As New List(Of String)
+    Dim complexityStartTime As DateTime
+
     Dim testAllToolbarBitmap As Bitmap
 
     Public testAllRunning As Boolean
@@ -212,7 +213,8 @@ Public Class OpenCVB
             End Select
 
             Dim wh = .workingRes.Height
-            If .snap320 = False And .snap640 = False And .snapCustom = False Then .snap640 = True ' desktop style is the default
+            ' desktop style is the default
+            If .snap320 = False And .snap640 = False And .snapCustom = False Then .snap640 = True
             If .snap640 Then
                 .locationMain.Item2 = 1321
                 .locationMain.Item3 = 858
@@ -264,11 +266,6 @@ Public Class OpenCVB
         settings.locationMain = New cv.Vec4f(Me.Left, Me.Top, Me.Width, Me.Height)
         settings.treeButton = TreeButton.Checked
         settings.PixelViewerButton = PixelViewerButton.Checked
-        If TreeViewDialog IsNot Nothing Then
-            OpenCVB.settings.TreeLocX = TreeViewDialog.Left
-            OpenCVB.settings.TreeLocY = TreeViewDialog.Top
-            OpenCVB.settings.TreeLocHeight = TreeViewDialog.Height
-        End If
         settings.displayRes = New cv.Size(camPic(0).Width, camPic(0).Height) ' used only when .snapCustom is true
 
         Dim setlist = New List(Of jsonClass.ApplicationStorage)
@@ -300,6 +297,7 @@ Public Class OpenCVB
 
         PausePlay = New Bitmap(HomeDir.FullName + "OpenCVB/Data/PauseButton.png")
         stopTest = New Bitmap(HomeDir.FullName + "OpenCVB/Data/StopTest.png")
+        complexityTest = New Bitmap(HomeDir.FullName + "OpenCVB/Data/complexity.jpg")
         testAllToolbarBitmap = New Bitmap(HomeDir.FullName + "OpenCVB/Data/testall.png")
         runPlay = New Bitmap(HomeDir.FullName + "OpenCVB/Data/PauseButtonRun.png")
 
@@ -377,7 +375,6 @@ Public Class OpenCVB
         If settings.PixelViewerButton Then PixelViewerButton_Click(sender, e)
 
         loadAlgorithmComboBoxes()
-        XYloc.Text = ""
 
         GroupName.Text = settings.algorithmGroup
         If AvailableAlgorithms.Items.Count = 0 Then GroupName.Text = "<All but Python>"
@@ -394,6 +391,7 @@ Public Class OpenCVB
 
         setWindowsVersion()
         fpsTimer.Enabled = True
+        XYloc.Text = "(x:0, y:0) last click point at: (x:0, y:0)"
     End Sub
     Private Sub campic_Paint(sender As Object, e As PaintEventArgs)
         Dim g As Graphics = e.Graphics
@@ -423,17 +421,17 @@ Public Class OpenCVB
         If paintNewImages Then
             paintNewImages = False
             Try
-                If camera.mbuf(mbIndex).color IsNot Nothing Then
-                    If camera.mbuf(mbIndex).color.width > 0 And dst(0) IsNot Nothing Then
-                        SyncLock paintLock
+                SyncLock cameraLock
+                    If camera.mbuf(mbIndex).color IsNot Nothing Then
+                        If camera.mbuf(mbIndex).color.width > 0 And dst(0) IsNot Nothing Then
                             Dim camSize = New cv.Size(camPic(0).Size.Width, camPic(0).Size.Height)
                             For i = 0 To dst.Count - 1
                                 Dim tmp = dst(i).Resize(camSize)
                                 cvext.BitmapConverter.ToBitmap(tmp, camPic(i).Image)
                             Next
-                        End SyncLock
+                        End If
                     End If
-                End If
+                End SyncLock
             Catch ex As Exception
                 Console.WriteLine("OpenCVB: Error in campic_Paint: " + ex.Message)
             End Try
@@ -983,7 +981,7 @@ Public Class OpenCVB
             If TreeViewDialog IsNot Nothing Then TreeViewDialog.Close()
         End If
     End Sub
-    Private Sub ToolStripButton4_Click(sender As Object, e As EventArgs) Handles ToolStripButton4.Click
+    Private Sub TranslateButton_Click(sender As Object, e As EventArgs) Handles TranslateButton.Click
         Shell(HomeDir.FullName + "bin/Debug/VB_to_CPP.exe", AppWinStyle.NormalFocus)
     End Sub
     Private Sub StartAlgorithmTask()
@@ -1045,16 +1043,17 @@ Public Class OpenCVB
             textDesc = task.desc
             intermediateReview = ""
 
-            Console.WriteLine(CStr(Now))
-            Console.WriteLine(vbCrLf + vbCrLf + vbTab + parms.algName + " - " + textDesc + vbCrLf + vbTab +
-                              CStr(AlgorithmTestAllCount) + vbTab + "Algorithms tested")
-            Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " +
-                              parms.algName + " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
+            If ComplexityTimer.Enabled = False Then
+                Console.WriteLine(CStr(Now))
+                Console.WriteLine(vbCrLf + vbCrLf + vbTab + parms.algName + " - " + textDesc + vbCrLf + vbTab +
+                                  CStr(AlgorithmTestAllCount) + vbTab + "Algorithms tested")
+                Console.WriteLine(vbTab + Format(totalBytesOfMemoryUsed, "#,##0") + "Mb working set before running " +
+                                  parms.algName + " with " + CStr(Process.GetCurrentProcess().Threads.Count) + " threads")
 
-            Console.WriteLine(vbTab + "Active camera = " + camera.cameraName + ", Input resolution " +
-                              CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) + " and working resolution of " +
-                              CStr(settings.workingRes.Width) + "x" + CStr(settings.workingRes.Height) + vbCrLf)
-
+                Console.WriteLine(vbTab + "Active camera = " + camera.cameraName + ", Input resolution " +
+                                  CStr(settings.captureRes.Width) + "x" + CStr(settings.captureRes.Height) + " and working resolution of " +
+                                  CStr(settings.workingRes.Width) + "x" + CStr(settings.workingRes.Height) + vbCrLf)
+            End If
             ' Adjust drawrect for the ratio of the actual size and workingRes.
             If task.drawRect <> New cv.Rect Then
                 ' relative size of algorithm size image to displayed image
@@ -1075,6 +1074,292 @@ Public Class OpenCVB
             task.Dispose()
         End SyncLock
         frameCount = 0
+    End Sub
+    Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
+        If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
+        Dim saveCameraIndex = settings.cameraIndex
+
+        optionsForm.OptionsDialog_Load(sender, e)
+        optionsForm.cameraRadioButton(settings.cameraIndex).Checked = True
+        Dim resStr = CStr(settings.workingRes.Width) + "x" + CStr(settings.workingRes.Height)
+        For i = 0 To OptionsDialog.resolutionList.Count - 1
+            If OptionsDialog.resolutionList(i).StartsWith(resStr) Then
+                optionsForm.workingResRadio(i).Checked = True
+            End If
+        Next
+
+        Dim OKcancel = optionsForm.ShowDialog()
+
+        If OKcancel = DialogResult.OK Then
+            If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e)
+            restartCameraRequest = True
+            saveAlgorithmName = ""
+            settings.workingRes = optionsForm.cameraWorkingRes
+            settings.displayRes = optionsForm.cameraDisplayRes
+            settings.cameraName = optionsForm.cameraName
+            settings.cameraIndex = optionsForm.cameraIndex
+            settings.testAllDuration = optionsForm.testDuration
+
+            setupCamPics()
+
+            jsonWrite()
+            jsonRead() ' this will apply all the changes...
+
+            StartAlgorithmTask()
+        Else
+            settings.cameraIndex = saveCameraIndex
+        End If
+    End Sub
+    Public Function USBenumeration(searchName As String) As Boolean
+        Static usblist As New List(Of String)
+        Dim info As ManagementObject
+        Dim search As ManagementObjectSearcher
+        search = New ManagementObjectSearcher("SELECT * From Win32_PnPEntity")
+        If usblist.Count = 0 Then
+            For Each info In search.Get()
+                Dim Name = CType(info("Caption"), String)
+                If Name IsNot Nothing Then
+                    usblist.Add(Name)
+                    ' why do this?  So enumeration can tell us about the cameras present in a short list.
+                    If InStr(Name, "Xeon") Or InStr(Name, "Chipset") Or InStr(Name, "Generic") Or InStr(Name, "Bluetooth") Or
+                        InStr(Name, "Monitor") Or InStr(Name, "Mouse") Or InStr(Name, "NVIDIA") Or InStr(Name, "HID-compliant") Or
+                        InStr(Name, " CPU ") Or InStr(Name, "PCI Express") Or Name.StartsWith("USB ") Or
+                        Name.StartsWith("Microsoft") Or Name.StartsWith("Motherboard") Or InStr(Name, "SATA") Or
+                        InStr(Name, "Volume") Or Name.StartsWith("WAN") Or InStr(Name, "ACPI") Or
+                        Name.StartsWith("HID") Or InStr(Name, "OneNote") Or Name.StartsWith("Samsung") Or
+                        Name.StartsWith("System ") Or Name.StartsWith("HP") Or InStr(Name, "Wireless") Or
+                        Name.StartsWith("SanDisk") Or InStr(Name, "Wi-Fi") Or Name.StartsWith("Media ") Or
+                        Name.StartsWith("High precision") Or Name.StartsWith("High Definition ") Or
+                        InStr(Name, "Remote") Or InStr(Name, "Numeric") Or InStr(Name, "UMBus ") Or
+                        Name.StartsWith("Plug or Play") Or InStr(Name, "Print") Or Name.StartsWith("Direct memory") Or
+                        InStr(Name, "interrupt controller") Or Name.StartsWith("NVVHCI") Or Name.StartsWith("Plug and Play") Or
+                        Name.StartsWith("ASMedia") Or Name = "Fax" Or Name.StartsWith("Speakers") Or
+                        InStr(Name, "Host Controller") Or InStr(Name, "Management Engine") Or InStr(Name, "Legacy") Or
+                        Name.StartsWith("NDIS") Or Name.StartsWith("Logitech USB Input Device") Or
+                        Name.StartsWith("Simple Device") Or InStr(Name, "Ethernet") Or Name.StartsWith("WD ") Or
+                        InStr(Name, "Composite Bus Enumerator") Or InStr(Name, "Turbo Boost") Or Name.StartsWith("Realtek") Or
+                        Name.StartsWith("PCI-to-PCI") Or Name.StartsWith("Network Controller") Or Name.StartsWith("ATAPI ") Or
+                        Name.Contains("Gen Intel(R) ") Then
+                    Else
+                        Console.WriteLine(Name) ' looking for new cameras 
+                    End If
+                End If
+            Next
+        End If
+        For Each usbDevice In usblist
+            If usbDevice.Contains(searchName) Then Return True
+        Next
+        Return False
+    End Function
+    Private Sub startCamera()
+        paintNewImages = False
+        newCameraImages = False
+        If cameraTaskHandle Is Nothing Then
+            cameraTaskHandle = New Thread(AddressOf CameraTask)
+            cameraTaskHandle.Name = "Camera Task"
+            cameraTaskHandle.Start()
+        End If
+    End Sub
+    Private Function getCamera() As Object
+        Select Case settings.cameraIndex
+            Case 0
+                Return New CameraKinect(settings.workingRes, settings.captureRes, settings.cameraName)
+            Case 1
+                Return New CameraRS2(settings.workingRes, settings.captureRes, "Intel RealSense D435I")
+            Case 2
+                Return New CameraRS2(settings.workingRes, settings.captureRes, "Intel RealSense D455")
+            Case 3
+                Return Nothing ' special handling required.  See CameraTask...
+            Case 4
+                Return New CameraZED2(settings.workingRes, settings.captureRes, settings.cameraName)
+            Case 5
+                Return New CameraMyntD(settings.workingRes, settings.captureRes, settings.cameraName)
+        End Select
+        Return New CameraKinect(settings.workingRes, settings.captureRes, settings.cameraName)
+    End Function
+    Private Sub CameraTask()
+        restartCameraRequest = True
+        Static saveWorkingRes As cv.Size
+        For i = 0 To mbuf.Count - 1
+            mbuf(i).color = New cv.Mat(settings.workingRes, cv.MatType.CV_8UC3)
+            mbuf(i).leftView = New cv.Mat(settings.workingRes, cv.MatType.CV_8UC3)
+            mbuf(i).rightView = New cv.Mat(settings.workingRes, cv.MatType.CV_8UC3)
+            mbuf(i).pointCloud = New cv.Mat(settings.workingRes, cv.MatType.CV_32FC3)
+        Next
+
+        While 1
+            If restartCameraRequest Or settings.workingRes <> saveWorkingRes Then
+                restartCameraRequest = False
+                saveWorkingRes = settings.workingRes
+                If settings.cameraIndex = 3 Then
+                    ' special handling for the Oak-D camera as it cannot be restarted.
+                    ' It is my problem but I don't see how to fix it.
+                    ' The Oak-D interface cannot run any resolution other than 1280x720 in OpenCVB.
+                    ' Changing the working res is not a problem so just leave it open.
+                    ' Oak-D camera cannot be restarted without restarting OpenCVB.
+                    ' Leave it alone once it is started...
+                    settings.captureRes = New cv.Size(1280, 720)
+                    camera = New CameraOakD(settings.workingRes, settings.captureRes, settings.cameraName)
+                Else
+                    If camera IsNot Nothing Then camera.stopCamera()
+                    camera = getCamera()
+                    newCameraImages = False
+                End If
+            End If
+            If camera Is Nothing Then Continue While ' transition from one camera to another.  Problem showed up once.
+            camera.GetNextFrame(settings.workingRes)
+
+            SyncLock cameraLock
+                mbuf(mbIndex) = camera.mbuf(camera.mbIndex)
+                camera.mbindex += 1
+                If camera.mbindex >= mbuf.Count Then camera.mbindex = 0
+
+                Try
+                    If camera.mbuf(mbIndex).color.width > 0 Then
+                        paintNewImages = True ' trigger the paint 
+                        newCameraImages = True
+                    End If
+                Catch ex As Exception
+                    Console.WriteLine(ex.Message + " in CameraTask - very unusual but recoverable.  Switching buffers.")
+                End Try
+            End SyncLock
+
+            If cameraTaskHandle Is Nothing Then
+                camera.stopCamera()
+                Exit Sub
+            End If
+
+            Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
+            totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
+        End While
+    End Sub
+    Private Sub setupTestAll()
+        testAllResolutionCount = 0
+        testAllStartingRes = -1
+        For i = 0 To settings.resolutionsSupported.Count - 1
+            If settings.resolutionsSupported(i) Then testAllResolutionCount += 1
+            If testAllStartingRes < 0 And settings.resolutionsSupported(i) Then testAllStartingRes = i
+            If settings.resolutionsSupported(i) Then testAllEndingRes = i
+        Next
+    End Sub
+    Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
+        TestAllButton.Image = If(TestAllButton.Text = "Test All", stopTest, testAllToolbarBitmap)
+        If TestAllButton.Text = "Test All" Then
+            AlgorithmTestAllCount = 0
+
+            setupTestAll()
+            AlgorithmTestAllCount = 1
+
+            TestAllButton.Text = "Stop Test"
+            AvailableAlgorithms.Enabled = False  ' the algorithm will be started in the testAllTimer event.
+            jsonWrite()
+            jsonRead()
+            TestAllTimer.Interval = 1
+            TestAllTimer.Enabled = True
+        Else
+            AvailableAlgorithms.Enabled = True
+            TestAllTimer.Enabled = False
+            TestAllButton.Text = "Test All"
+        End If
+    End Sub
+    Private Sub setWorkingRes()
+        Select Case settings.workingResIndex
+            Case 0
+                settings.workingRes = New cv.Size(1920, 1080)
+                settings.captureRes = New cv.Size(1920, 1080)
+            Case 1
+                settings.workingRes = New cv.Size(960, 540)
+                settings.captureRes = New cv.Size(1920, 1080)
+            Case 2
+                settings.workingRes = New cv.Size(480, 270)
+                settings.captureRes = New cv.Size(1920, 1080)
+            Case 3
+                settings.workingRes = New cv.Size(1280, 720)
+                settings.captureRes = New cv.Size(1280, 720)
+            Case 4
+                settings.workingRes = New cv.Size(640, 360)
+                settings.captureRes = New cv.Size(1280, 720)
+            Case 5
+                settings.workingRes = New cv.Size(320, 180)
+                settings.captureRes = New cv.Size(1280, 720)
+            Case 6
+                settings.workingRes = New cv.Size(640, 480)
+                settings.captureRes = New cv.Size(640, 480)
+            Case 7
+                settings.workingRes = New cv.Size(320, 240)
+                settings.captureRes = New cv.Size(640, 480)
+            Case 8
+                settings.workingRes = New cv.Size(160, 120)
+                settings.captureRes = New cv.Size(640, 480)
+            Case 9
+                settings.workingRes = New cv.Size(672, 376)
+                settings.captureRes = New cv.Size(672, 376)
+            Case 10
+                settings.workingRes = New cv.Size(336, 188)
+                settings.captureRes = New cv.Size(672, 376)
+            Case 11
+                settings.workingRes = New cv.Size(168, 94)
+                settings.captureRes = New cv.Size(672, 376)
+        End Select
+    End Sub
+    Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
+        ' don't start another test all algorithm until the current one has finished.
+        If algorithmQueueCount <> 0 Then
+            Console.WriteLine("Can't start the next algorithm because previous algorithm has not completed.")
+            While 1
+                If algorithmQueueCount = 0 Then Exit While
+                Console.Write(".")
+                Application.DoEvents()
+            End While
+        End If
+
+        If AvailableAlgorithms.SelectedIndex + 1 >= AvailableAlgorithms.Items.Count Then
+            AvailableAlgorithms.SelectedIndex = 0
+        Else
+            If AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1) = "" Then
+                AvailableAlgorithms.SelectedIndex += 2
+            Else
+                AvailableAlgorithms.SelectedIndex += 1
+            End If
+        End If
+
+        TestAllTimer.Interval = settings.testAllDuration * 1000
+        Static startingAlgorithm = AvailableAlgorithms.Text
+        If AvailableAlgorithms.Text = startingAlgorithm And AlgorithmTestAllCount > 1 Then
+            If settings.workingResIndex > testAllEndingRes Then
+                While 1
+                    settings.cameraIndex += 1
+                    settings.cameraName = cameraNames(settings.cameraIndex)
+                    If settings.cameraIndex >= cameraNames.Count - 1 Then settings.cameraIndex = 0
+                    If settings.cameraPresent(settings.cameraIndex) Then
+                        OptionsDialog.defineCameraResolutions(settings.cameraIndex)
+                        setupTestAll()
+                        settings.workingResIndex = testAllStartingRes
+                        Exit While
+                    End If
+                End While
+                ' extra time for the camera to restart...
+                TestAllTimer.Interval = settings.testAllDuration * 1000 * 3
+            End If
+
+            setWorkingRes()
+
+            jsonWrite()
+            jsonRead()
+            LineUpCamPics()
+
+            ' when switching resolution, best to reset these as the move from higher to lower res
+            ' could mean the point is no longer valid.
+            clickPoint = New cv.Point
+            mousePoint = New cv.Point
+        End If
+
+        Static saveLastAlgorithm = AvailableAlgorithms.Text
+        If saveLastAlgorithm <> AvailableAlgorithms.Text Then
+            settings.workingResIndex += 1
+            saveLastAlgorithm = AvailableAlgorithms.Text
+        End If
+        StartAlgorithmTask()
     End Sub
     Private Sub RunTask(task As VB_Classes.VBtask)
         Dim saveWorkingRes = settings.workingRes
@@ -1248,12 +1533,14 @@ Public Class OpenCVB
                 End SyncLock
             End If
 
-            ' If task.dst0 was requested, task.color will contain dst0.
-            SyncLock paintLock
-                dst(0) = task.dst0.Clone
-                dst(1) = task.dst1.Clone
-                dst(2) = task.dst2.Clone
-                dst(3) = task.dst3.Clone
+            SyncLock cameraLock
+                Try
+                    dst(0) = task.dst0.Clone
+                    dst(1) = task.dst1.Clone
+                    dst(2) = task.dst2.Clone
+                    dst(3) = task.dst3.Clone
+                Catch ex As Exception
+                End Try
             End SyncLock
             algorithmRefresh = True
 
@@ -1271,278 +1558,75 @@ Public Class OpenCVB
 
             task.mouseClickFlag = False
             frameCount += 1
-            ' this can be very useful.  When debugging your algorithm turned this on to sync output to debug.
+            ' this can be very useful.  When debugging your algorithm, turn this global option on to sync output to debug.
             ' Each image will represent the one just finished by the algorithm.
             If task.SyncOutput Then Thread.Sleep(100)
         End While
     End Sub
-    Private Sub Options_Click(sender As Object, e As EventArgs) Handles OptionsButton.Click
-        If TestAllTimer.Enabled Then testAllButton_Click(sender, e)
-        Dim saveCameraIndex = settings.cameraIndex
 
-        optionsForm.OptionsDialog_Load(sender, e)
-        optionsForm.cameraRadioButton(settings.cameraIndex).Checked = True
-        Dim resStr = CStr(settings.workingRes.Width) + "x" + CStr(settings.workingRes.Height)
-        For i = 0 To OptionsDialog.resolutionList.Count - 1
-            If OptionsDialog.resolutionList(i).StartsWith(resStr) Then
-                optionsForm.workingResRadio(i).Checked = True
-            End If
-        Next
-
-        Dim OKcancel = optionsForm.ShowDialog()
-
-        If OKcancel = DialogResult.OK Then
-            If PausePlayButton.Text = "Run" Then PausePlayButton_Click(sender, e)
-            restartCameraRequest = True
-            saveAlgorithmName = ""
-            settings.workingRes = optionsForm.cameraWorkingRes
-            settings.displayRes = optionsForm.cameraDisplayRes
-            settings.cameraName = optionsForm.cameraName
-            settings.cameraIndex = optionsForm.cameraIndex
-            settings.testAllDuration = optionsForm.testDuration
-
-            setupCamPics()
-
-            jsonWrite()
-            jsonRead() ' this will apply all the changes...
-
-            StartAlgorithmTask()
-        Else
-            settings.cameraIndex = saveCameraIndex
-        End If
-    End Sub
-    Public Function USBenumeration(searchName As String) As Boolean
-        Static usblist As New List(Of String)
-        Dim info As ManagementObject
-        Dim search As ManagementObjectSearcher
-        search = New ManagementObjectSearcher("SELECT * From Win32_PnPEntity")
-        If usblist.Count = 0 Then
-            For Each info In search.Get()
-                Dim Name = CType(info("Caption"), String)
-                If Name IsNot Nothing Then
-                    usblist.Add(Name)
-                    ' why do this?  So enumeration can tell us about the cameras present in a short list.
-                    If InStr(Name, "Xeon") Or InStr(Name, "Chipset") Or InStr(Name, "Generic") Or InStr(Name, "Bluetooth") Or
-                        InStr(Name, "Monitor") Or InStr(Name, "Mouse") Or InStr(Name, "NVIDIA") Or InStr(Name, "HID-compliant") Or
-                        InStr(Name, " CPU ") Or InStr(Name, "PCI Express") Or Name.StartsWith("USB ") Or
-                        Name.StartsWith("Microsoft") Or Name.StartsWith("Motherboard") Or InStr(Name, "SATA") Or
-                        InStr(Name, "Volume") Or Name.StartsWith("WAN") Or InStr(Name, "ACPI") Or
-                        Name.StartsWith("HID") Or InStr(Name, "OneNote") Or Name.StartsWith("Samsung") Or
-                        Name.StartsWith("System ") Or Name.StartsWith("HP") Or InStr(Name, "Wireless") Or
-                        Name.StartsWith("SanDisk") Or InStr(Name, "Wi-Fi") Or Name.StartsWith("Media ") Or
-                        Name.StartsWith("High precision") Or Name.StartsWith("High Definition ") Or
-                        InStr(Name, "Remote") Or InStr(Name, "Numeric") Or InStr(Name, "UMBus ") Or
-                        Name.StartsWith("Plug or Play") Or InStr(Name, "Print") Or Name.StartsWith("Direct memory") Or
-                        InStr(Name, "interrupt controller") Or Name.StartsWith("NVVHCI") Or Name.StartsWith("Plug and Play") Or
-                        Name.StartsWith("ASMedia") Or Name = "Fax" Or Name.StartsWith("Speakers") Or
-                        InStr(Name, "Host Controller") Or InStr(Name, "Management Engine") Or InStr(Name, "Legacy") Or
-                        Name.StartsWith("NDIS") Or Name.StartsWith("Logitech USB Input Device") Or
-                        Name.StartsWith("Simple Device") Or InStr(Name, "Ethernet") Or Name.StartsWith("WD ") Or
-                        InStr(Name, "Composite Bus Enumerator") Or InStr(Name, "Turbo Boost") Or Name.StartsWith("Realtek") Or
-                        Name.StartsWith("PCI-to-PCI") Or Name.StartsWith("Network Controller") Or Name.StartsWith("ATAPI ") Or
-                        Name.Contains("Gen Intel(R) ") Then
-                    Else
-                        Console.WriteLine(Name) ' looking for new cameras 
-                    End If
-                End If
-            Next
-        End If
-        For Each usbDevice In usblist
-            If usbDevice.Contains(searchName) Then Return True
-        Next
-        Return False
-    End Function
-    Private Sub startCamera()
-        paintNewImages = False
-        newCameraImages = False
-        If cameraTaskHandle Is Nothing Then
-            cameraTaskHandle = New Thread(AddressOf CameraTask)
-            cameraTaskHandle.Name = "Camera Task"
-            cameraTaskHandle.Start()
-        End If
-    End Sub
-    Private Function getCamera() As Object
-        Select Case settings.cameraIndex
-            Case 0
-                Return New CameraKinect(settings.workingRes, settings.captureRes, settings.cameraName)
-            Case 1
-                Return New CameraRS2(settings.workingRes, settings.captureRes, "Intel RealSense D435I")
-            Case 2
-                Return New CameraRS2(settings.workingRes, settings.captureRes, "Intel RealSense D455")
-            Case 3
-                Return Nothing ' special handling required.  See CameraTask...
-            Case 4
-                Return New CameraZED2(settings.workingRes, settings.captureRes, settings.cameraName)
-            Case 5
-                Return New CameraMyntD(settings.workingRes, settings.captureRes, settings.cameraName)
-        End Select
-        Return New CameraKinect(settings.workingRes, settings.captureRes, settings.cameraName)
-    End Function
-    Private Sub CameraTask()
-        restartCameraRequest = True
-        For i = 0 To mbuf.Count - 1
-            mbuf(i).color = New cv.Mat(settings.workingRes, cv.MatType.CV_8UC3)
-            mbuf(i).leftView = New cv.Mat(settings.workingRes, cv.MatType.CV_8UC3)
-            mbuf(i).rightView = New cv.Mat(settings.workingRes, cv.MatType.CV_8UC3)
-            mbuf(i).pointCloud = New cv.Mat(settings.workingRes, cv.MatType.CV_32FC3)
-        Next
-
+    Private Sub ComplexityTimer_Tick(sender As Object, e As EventArgs) Handles ComplexityTimer.Tick
         While 1
-            If restartCameraRequest Then
-                restartCameraRequest = False
-                If settings.cameraIndex = 3 Then
-                    ' special handling for the Oak-D camera as it cannot be restarted.
-                    ' It is my problem but I don't see how to fix it.
-                    ' The Oak-D interface cannot run any resolution other than 1280x720 in OpenCVB.
-                    ' Changing the working res is not a problem so just leave it open.
-                    ' Oak-D camera cannot be restarted without restarting OpenCVB.
-                    ' Leave it alone once it is started...
-                    settings.captureRes = New cv.Size(1280, 720)
-                    camera = New CameraOakD(settings.workingRes, settings.captureRes, settings.cameraName)
-                Else
-                    If camera IsNot Nothing Then camera.stopCamera()
-                    camera = getCamera()
-                    newCameraImages = False
+            If OpenCVB.settings.resolutionsSupported(settings.workingResIndex) Then
+                setWorkingRes()
+                Exit While
+            Else
+                settings.workingResIndex -= 1
+                If settings.workingResIndex < 0 Then
+                    settings.workingResIndex = OpenCVB.settings.resolutionsSupported.Count - 1
                 End If
             End If
-
-            camera.GetNextFrame(settings.workingRes)
-
-            SyncLock cameraLock
-                mbuf(mbIndex) = camera.mbuf(camera.mbIndex)
-                camera.mbindex += 1
-                If camera.mbindex >= mbuf.Count Then camera.mbindex = 0
-            End SyncLock
-
-            If cameraTaskHandle Is Nothing Then
-                camera.stopCamera()
-                Exit Sub
-            End If
-
-            If camera.mbuf(mbIndex).color.width > 0 Then
-                paintNewImages = True ' trigger the paint 
-                newCameraImages = True
-            End If
-
-            Dim currentProcess = System.Diagnostics.Process.GetCurrentProcess()
-            totalBytesOfMemoryUsed = currentProcess.WorkingSet64 / (1024 * 1024)
         End While
-    End Sub
-    Private Sub setupTestAll()
-        testAllResolutionCount = 0
-        testAllStartingRes = -1
-        For i = 0 To settings.resolutionsSupported.Count - 1
-            If settings.resolutionsSupported(i) Then testAllResolutionCount += 1
-            If testAllStartingRes < 0 And settings.resolutionsSupported(i) Then testAllStartingRes = i
-            If settings.resolutionsSupported(i) Then testAllEndingRes = i
-        Next
-    End Sub
-    Private Sub testAllButton_Click(sender As Object, e As EventArgs) Handles TestAllButton.Click
-        TestAllButton.Image = If(TestAllButton.Text = "Test All", stopTest, testAllToolbarBitmap)
-        If TestAllButton.Text = "Test All" Then
-            AlgorithmTestAllCount = 0
 
-            setupTestAll()
-            AlgorithmTestAllCount = 1
-
-            TestAllButton.Text = "Stop Test"
-            AvailableAlgorithms.Enabled = False  ' the algorithm will be started in the testAllTimer event.
-            jsonWrite()
-            jsonRead()
-            TestAllTimer.Interval = 1
-            TestAllTimer.Enabled = True
-        Else
-            AvailableAlgorithms.Enabled = True
-            TestAllTimer.Enabled = False
-            TestAllButton.Text = "Test All"
+        If complexityResults.Count > 0 Then
+            Dim endTime = Now
+            Dim span As TimeSpan = endTime - complexityStartTime
+            complexityResults.Add("Ending " + vbTab + CStr(frameCount) + vbTab +
+                                  Format(span.TotalMilliseconds / 1000, "0.000") + " seconds")
+            complexityStartTime = Now
         End If
-    End Sub
-    Private Sub TestAllTimer_Tick(sender As Object, e As EventArgs) Handles TestAllTimer.Tick
-        ' don't start another test all algorithm until the current one has finished.
-        If algorithmQueueCount <> 0 Then
-            Console.WriteLine("Can't start the next algorithm because previous algorithm has not completed.")
-            While 1
-                If algorithmQueueCount = 0 Then Exit While
-                Console.Write(".")
-                Application.DoEvents()
-            End While
-        End If
+        complexityResults.Add("-------------------")
+        complexityResults.Add("Image" + vbTab + CStr(settings.workingRes.Width) + vbTab +
+                                      CStr(settings.workingRes.Height))
+        jsonWrite()
+        jsonRead()
+        LineUpCamPics()
 
-        If AvailableAlgorithms.SelectedIndex + 1 >= AvailableAlgorithms.Items.Count Then
-            AvailableAlgorithms.SelectedIndex = 0
-        Else
-            If AvailableAlgorithms.Items(AvailableAlgorithms.SelectedIndex + 1) = "" Then
-                AvailableAlgorithms.SelectedIndex += 2
-            Else
-                AvailableAlgorithms.SelectedIndex += 1
-            End If
-        End If
+        ' when switching resolution, best to reset these as the move from higher to lower res
+        ' could mean the point is no longer valid.
+        clickPoint = New cv.Point
+        mousePoint = New cv.Point
 
-        TestAllTimer.Interval = settings.testAllDuration * 1000
-        Static startingAlgorithm = AvailableAlgorithms.Text
-        If AvailableAlgorithms.Text = startingAlgorithm And AlgorithmTestAllCount > 1 Then
-            If settings.workingResIndex > testAllEndingRes Then
-                While 1
-                    settings.cameraIndex += 1
-                    settings.cameraName = cameraNames(settings.cameraIndex)
-                    If settings.cameraIndex >= cameraNames.Count - 1 Then settings.cameraIndex = 0
-                    If settings.cameraPresent(settings.cameraIndex) Then
-                        OptionsDialog.defineCameraResolutions(settings.cameraIndex)
-                        setupTestAll()
-                        settings.workingResIndex = testAllStartingRes
-                        Exit While
-                    End If
-                End While
-                ' extra time for the camera to restart...
-                TestAllTimer.Interval = settings.testAllDuration * 1000 * 3
-            End If
-
-            Select Case settings.workingResIndex
-                Case 0
-                    settings.workingRes = New cv.Size(1920, 1080)
-                    settings.captureRes = New cv.Size(1920, 1080)
-                Case 1
-                    settings.workingRes = New cv.Size(960, 540)
-                    settings.captureRes = New cv.Size(1920, 1080)
-                Case 2
-                    settings.workingRes = New cv.Size(480, 270)
-                    settings.captureRes = New cv.Size(1920, 1080)
-                Case 3
-                    settings.workingRes = New cv.Size(1280, 720)
-                    settings.captureRes = New cv.Size(1280, 720)
-                Case 4
-                    settings.workingRes = New cv.Size(640, 360)
-                    settings.captureRes = New cv.Size(1280, 720)
-                Case 5
-                    settings.workingRes = New cv.Size(320, 180)
-                    settings.captureRes = New cv.Size(1280, 720)
-                Case 6
-                    settings.workingRes = New cv.Size(640, 480)
-                    settings.captureRes = New cv.Size(640, 480)
-                Case 7
-                    settings.workingRes = New cv.Size(320, 240)
-                    settings.captureRes = New cv.Size(640, 480)
-                Case 8
-                    settings.workingRes = New cv.Size(160, 120)
-                    settings.captureRes = New cv.Size(640, 480)
-            End Select
-
-            jsonWrite()
-            jsonRead()
-            LineUpCamPics()
-
-            ' when switching resolution, best to reset these as the move from higher to lower res
-            ' could mean the point is no longer valid.
-            clickPoint = New cv.Point
-            mousePoint = New cv.Point
-        End If
-
-        Static saveLastAlgorithm = AvailableAlgorithms.Text
-        If saveLastAlgorithm <> AvailableAlgorithms.Text Then
-            settings.workingResIndex += 1
-            saveLastAlgorithm = AvailableAlgorithms.Text
-        End If
         StartAlgorithmTask()
+
+        settings.workingResIndex -= 1
+        If settings.workingResIndex < 0 Then
+            settings.workingResIndex = OpenCVB.settings.resolutionsSupported.Count - 1
+        End If
+    End Sub
+    Private Sub ToolStripButton5_Click(sender As Object, e As EventArgs) Handles ComplexityButton.Click
+        If ComplexityTimer.Enabled = False Then
+            Dim ret = MsgBox("Do you want to test the complexity of the current algorithm?" + vbCrLf +
+                             "Algorithm will run at all available resolutions until you stop it.", MsgBoxStyle.OkCancel,
+                         "Test algorithm at all resolutions.")
+            If ret = MsgBoxResult.Ok Then
+                complexityResults.Clear()
+                ComplexityTimer.Interval = 30000
+                complexityStartTime = Now
+                ComplexityTimer.Enabled = True
+                settings.workingResIndex = OpenCVB.settings.resolutionsSupported.Count - 1 ' start smallest resolution
+                ComplexityButton.Image = stopTest
+                ComplexityTimer_Tick(sender, e)
+            End If
+        Else
+            Dim sw = New StreamWriter(HomeDir.FullName + "Complexity/" + saveAlgorithmName + ".txt")
+            For Each line In complexityResults
+                sw.WriteLine(line)
+            Next
+            sw.Close()
+
+            ComplexityButton.Image = complexityTest
+            ComplexityTimer.Enabled = False
+            complexityResults.Clear()
+        End If
     End Sub
 End Class
-

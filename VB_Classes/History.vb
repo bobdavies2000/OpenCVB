@@ -215,7 +215,7 @@ Public Class History_Cloud : Inherits VB_Algorithm
             saveFrames.RemoveAt(0)
         End If
 
-        saveFrames.Add(src)
+        saveFrames.Add(src.Clone)
         dst3 = src + dst3
         dst2 = dst3 / saveFrames.Count
 

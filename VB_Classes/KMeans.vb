@@ -25,10 +25,6 @@ Public Class KMeans_Basics : Inherits VB_Algorithm
 
         If columnVector.ElemSize Mod 4 <> 0 Or columnVector.Type = cv.MatType.CV_32S Then columnVector.ConvertTo(columnVector, cv.MatType.CV_32F)
         Try
-
-
-
-
             ' some samples are NAN and breaks the kmeans call.  The following lines were helpful to debug this problem.
             'Dim samples(columnVector.Total - 1) As Single
             'Marshal.Copy(columnVector.Data, samples, 0, samples.Length)
@@ -41,9 +37,6 @@ Public Class KMeans_Basics : Inherits VB_Algorithm
             '    End If
             'Next
             'If updated Then Marshal.Copy(samples, columnVector.Data, 0, samples.Length)
-
-
-
             If colors.Width = 0 Or colors.Height = 0 Then options.kMeansFlag = cv.KMeansFlags.PpCenters
             cv.Cv2.Kmeans(columnVector, classCount, dst2, term, 1, options.kMeansFlag, colors)
         Catch ex As Exception
@@ -55,9 +48,8 @@ Public Class KMeans_Basics : Inherits VB_Algorithm
 
         saveLabels = dst2.Clone
 
-        dst2.Reshape(1, src.Height).ConvertTo(dst0, cv.MatType.CV_8U)
-        dst2 = dst0 * 255 / classCount
-        dst3 = vbPalette(dst2)
+        dst2.Reshape(1, src.Height).ConvertTo(dst2, cv.MatType.CV_8U)
+        If standalone Or testIntermediate(traceName) Then dst3 = vbPalette(dst2 * 255 / classCount)
         lastK = classCount
         labels(2) = "KMeans labels 0-" + CStr(lastK) + " spread out across 255 values."
     End Sub
@@ -69,11 +61,12 @@ End Class
 
 
 
+
 Public Class KMeans_MultiChannel : Inherits VB_Algorithm
     Public colors As New cv.Mat
     Dim km As New KMeans_Basics
     Public Sub New()
-        labels = {"", "", "KMeans_Basics output with just BGR input", "dst3 contains the labels spread across the palette (dst0 contains the exact labels)"}
+        labels = {"", "", "KMeans_Basics output with BGR input", "dst3 contains the labels spread across the palette (dst0 contains the exact labels)"}
         desc = "Cluster the input using kMeans."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -83,33 +76,9 @@ Public Class KMeans_MultiChannel : Inherits VB_Algorithm
         km.Run(src)
         dst3 = km.dst2
 
-        dst2 = vbPalette(dst3)
+        dst2 = vbPalette(dst3 * 255 / km.classCount)
     End Sub
 End Class
-
-
-
-
-
-
-
-
-
-Public Class KMeans_BasicsFast : Inherits VB_Algorithm
-    Public km As New KMeans_Basics
-    Public Sub New()
-        desc = "Speed up the KMeans_Basics with a resize factor"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static resizeSlider = findSlider("Resize Factor")
-        dst3 = src.Resize(New cv.Size(CInt(src.Rows / resizeSlider.Value), CInt(src.Cols / resizeSlider.Value)))
-        If dst3.Channels <> 1 Then dst3 = dst3.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        km.Run(dst3)
-        dst2 = km.dst2.Resize(dst2.Size())
-    End Sub
-End Class
-
-
 
 
 
@@ -135,9 +104,9 @@ Public Class KMeans_k2_to_k8 : Inherits VB_Algorithm
 
         kSlider.Value = Choose(kmIndex + 1, 2, 4, 6, 8)
         km.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        Mats.mat(kmIndex) = km.dst2
+        Mats.mat(kmIndex) = km.dst2 * 255 / km.classCount
 
-        mats.Run(Nothing)
+        Mats.Run(Nothing)
         dst2 = Mats.dst2
         dst3 = Mats.dst3
     End Sub
@@ -271,7 +240,7 @@ Public Class KMeans_CustomData : Inherits VB_Algorithm
         End If
 
         km.Run(dst0)
-        dst2 = km.dst2.Clone
+        dst2 = vbPalette(km.dst2 * 255 / km.classCount)
     End Sub
 End Class
 
@@ -301,7 +270,7 @@ End Module
 
 
 
-Public Class Kmeans_Simple_CPP : Inherits VB_Algorithm
+Public Class KMeans_Simple_CPP : Inherits VB_Algorithm
     Public Sub New()
         cPtr = Kmeans_Simple_Open()
         gOptions.MaxDepth.Value = 4
@@ -341,19 +310,19 @@ Public Class KMeans_Edges : Inherits VB_Algorithm
     Dim colorC As New RedColor_Basics
     Public Sub New()
         labels(3) = "KMeans with edges output"
-        desc = "Use KMeans output with floodfill to identify each segment in the image"
+        desc = "Use edges to isolate regions in the KMeans output - not much different from KMeans_Basics."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         edges.Run(src)
         src.SetTo(cv.Scalar.White, edges.dst2)
 
         km.Run(src)
-        dst3 = km.dst2
+        dst3 = km.dst2 + 1
         classCount = km.classCount
 
         colorC.Run(dst3)
         dst2 = colorC.dst2
-        labels(2) = CStr(task.fCells.Count) + " regions were identified in RedColor_Basics"
+        labels(2) = colorC.labels(2)
     End Sub
 End Class
 
@@ -406,10 +375,9 @@ Public Class KMeans_TierCount : Inherits VB_Algorithm
         classCount = kCount.classCount
 
         km.Run(task.pcSplit(2))
-        dst2 = km.dst2
+        dst2 = km.dst2 * 255 / km.classCount
         dst2.SetTo(0, task.noDepthMask)
         dst3 = vbPalette(dst2)
-        dst0 = dst2 * kCount.classCount / 255
         labels(2) = "There were " + CStr(classCount) + " tiers (on average) found in the depth valleys histogram."
     End Sub
 End Class
@@ -432,14 +400,14 @@ Public Class KMeans_Image : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         km.Run(src)
-        dst2 = vbPalette(km.dst2)
+        dst2 = vbPalette(km.dst2 * 255 / km.classCount)
         classCount = km.options.kMeansK
 
         masks.Clear()
         counts.Clear()
         Dim k = km.options.kMeansK
         For i = 0 To k - 1
-            Dim mask = km.dst0.InRange(i, i)
+            Dim mask = km.dst2.InRange(i, i)
             masks.Add(mask)
             counts.Add(mask.CountNonZero)
         Next
@@ -458,36 +426,6 @@ End Class
 
 
 
-
-Public Class KMeans_Depth : Inherits VB_Algorithm
-    Dim km As New KMeans_Basics
-    Dim tiers As New KMeans_TierCount
-    Public Sub New()
-        labels(2) = "task.pcSplit(2) with no clustering."
-        desc = "Cluster depth using kMeans - use KMeans_TierCount to determine 'K'"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        tiers.Run(src)
-
-        Static kSlider = findSlider("KMeans k")
-        kSlider.value = tiers.classCount
-        Dim kMeansK = kSlider.Value
-
-        km.Run(task.pcSplit(2))
-        dst2 = km.dst2
-        dst2.SetTo(0, task.noDepthMask)
-
-        dst3 = vbPalette(km.dst0 * 255 / tiers.classCount)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class KMeans_DepthPlusGray : Inherits VB_Algorithm
     Dim km As New KMeans_Basics
     Dim grayPlus(2 - 1) As cv.Mat
@@ -498,8 +436,7 @@ Public Class KMeans_DepthPlusGray : Inherits VB_Algorithm
         desc = "Cluster the rgb+depth image pixels using kMeans"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim gray = task.color.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        gray.ConvertTo(grayPlus(0), cv.MatType.CV_32F)
+        task.gray.ConvertTo(grayPlus(0), cv.MatType.CV_32F)
         grayPlus(0).SetTo(0, task.noDepthMask)
         grayPlus(1) = task.pcSplit(2)
 
@@ -511,58 +448,7 @@ Public Class KMeans_DepthPlusGray : Inherits VB_Algorithm
         dst3 = km.dst2
         dst3.SetTo(0, task.noDepthMask)
 
-        If standalone Then dst2 = vbPalette(km.dst0 * 255 / k)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class KMeans_Direct : Inherits VB_Algorithm
-    Public colors As New cv.Mat
-    Public buildPaletteOutput As Boolean = True
-    Public options As New Options_KMeans
-    Public classCount As Integer
-    Public Sub New()
-        labels = {"", "", "Kmeans labels for the input image", "Palette output for the kMeans labels"}
-        desc = "Cluster the input using kMeans - but set the options directly.  NOTE: no options above"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standalone And src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-
-        options.RunVB()
-        classCount = options.kMeansK
-        Static lastK = classCount
-        Static saveLabels As New cv.Mat
-        Dim kMeansflag = cv.KMeansFlags.UseInitialLabels
-        If task.optionsChanged Or lastK <> classCount Then
-            kMeansflag = cv.KMeansFlags.PpCenters
-            saveLabels = New cv.Mat
-        End If
-
-        Dim columnVector = src.Reshape(src.Channels, src.Height * src.Width)
-        dst2 = saveLabels
-
-        If columnVector.ElemSize Mod 4 <> 0 Or columnVector.Type = cv.MatType.CV_32S Then columnVector.ConvertTo(columnVector, cv.MatType.CV_32F)
-        Try
-            cv.Cv2.Kmeans(columnVector, classCount, dst2, term, 1, kMeansflag, colors)
-        Catch ex As Exception
-            columnVector.SetTo(0)
-            cv.Cv2.Kmeans(columnVector, classCount, dst2, term, 1, kMeansflag, colors)
-            Console.WriteLine("Huge or NaN values in the input... Can happen on an initial useInitialValues run... It is corrected here...")
-        End Try
-
-        saveLabels = dst2
-
-        dst3 = dst2.Clone
-        dst2.Reshape(1, src.Height).ConvertTo(dst0, cv.MatType.CV_8U)
-        dst2 = dst0 * 255 / classCount
-        dst3 = vbPalette(dst2)
-        lastK = classCount
+        If standalone Then dst2 = vbPalette(km.dst2 * 255 / k)
     End Sub
 End Class
 
@@ -587,39 +473,84 @@ Public Class KMeans_Dimensions : Inherits VB_Algorithm
         Dim merge As New cv.Mat
         Select Case dimSlider.value
             Case 1 ' grayscale
-                Dim gray = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-                gray.ConvertTo(gray, cv.MatType.CV_32F)
-                km.Run(gray)
+                src.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertTo(merge, cv.MatType.CV_32F)
             Case 2 ' pointcloud x and y
                 cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1)}, merge)
-                km.Run(merge)
             Case 3 ' pointcloud dimensions
-                cv.Cv2.Merge({task.pcSplit(0), task.pcSplit(1), task.pcSplit(2)}, merge)
-                km.Run(merge)
+                merge = task.pointCloud
             Case 4 ' color + depth
                 src.ConvertTo(src, cv.MatType.CV_32F)
                 task.pcSplit(2) = task.pcSplit(2).Normalize(0, 255, cv.NormTypes.MinMax)
                 cv.Cv2.Merge({src, task.pcSplit(2)}, merge)
-                km.Run(merge)
             Case 5 ' color + pcSplit(0) and pcSplit(1)
                 src.ConvertTo(src, cv.MatType.CV_32F)
                 task.pcSplit(0) = task.pcSplit(0).Normalize(0, 255, cv.NormTypes.MinMax)
                 task.pcSplit(1) = task.pcSplit(1).Normalize(0, 255, cv.NormTypes.MinMax)
                 cv.Cv2.Merge({src, task.pcSplit(0), task.pcSplit(1)}, merge)
-                km.Run(merge)
             Case 6 ' color + pointcloud
                 src.ConvertTo(src, cv.MatType.CV_32F)
                 Dim tmp1 = task.pcSplit(0).Normalize(0, 255, cv.NormTypes.MinMax)
                 Dim tmp2 = task.pcSplit(1).Normalize(0, 255, cv.NormTypes.MinMax)
                 Dim tmp3 = task.pcSplit(2).Normalize(0, 255, cv.NormTypes.MinMax)
                 cv.Cv2.Merge({src, tmp1, tmp2, tmp3}, merge)
-                km.Run(merge)
         End Select
+
+        km.Run(merge)
 
         labels(2) = "Dimension = " + CStr(dimSlider.value)
         labels(3) = labels(2)
 
-        dst2 = km.dst2
-        dst3 = vbPalette(dst2)
+        dst2 = km.dst2 + 1
+        dst3 = vbPalette(dst2 * 255 / km.classCount)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class KMeans_Valleys : Inherits VB_Algorithm
+    Dim km As New KMeans_Basics
+    Dim tiers As New KMeans_TierCount
+    Public Sub New()
+        labels(2) = "8-Bit input to vbPalette output in dst3"
+        desc = "Cluster depth using kMeans - use KMeans_TierCount to determine 'K'"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        tiers.Run(src)
+
+        Static kSlider = findSlider("KMeans k")
+        kSlider.value = tiers.classCount
+        Dim kMeansK = kSlider.Value
+
+        km.Run(task.pcSplit(2))
+        dst2 = km.dst2 + 1
+
+        dst3 = vbPalette(dst2 * 255 / tiers.classCount)
+        dst3.SetTo(0, task.noDepthMask)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class KMeans_Depth : Inherits VB_Algorithm
+    Dim km As New KMeans_Basics
+    Public Sub New()
+        findSlider("KMeans k").Value = 2
+        labels(2) = "dst2 is 8uC1 with 0 (no depth), 1 (foreground), and 2 (background)"
+        desc = "Cluster depth using kMeans - useful to split foreground and background with k = 2."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        km.Run(task.pcSplit(2))
+        dst2 = km.dst2 + 1
+        dst2.SetTo(0, task.noDepthMask)
+
+        dst3 = vbPalette(dst2 * 255 / km.classCount)
     End Sub
 End Class

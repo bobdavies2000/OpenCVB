@@ -723,7 +723,7 @@ Public Class Histogram_CompareEMD_hsv : Inherits VB_Algorithm
 
         Dim hBins = 30, sBins = 32
         Dim histA As New cv.Mat, histB As New cv.Mat
-        Dim ranges = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(0, 255)}
+        Dim ranges = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(0, 256)}
 
         cv.Cv2.CalcHist({hsv}, {0, 1}, New cv.Mat, histA, 2, {hBins, sBins}, ranges)
         Dim histNormA As cv.Mat = histA.Normalize(0, 1, cv.NormTypes.MinMax)
@@ -965,7 +965,7 @@ Public Class Histogram_Gotcha2D : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         Dim expected = task.pcSplit(2).CountNonZero
         Dim ranges = task.rangesSide
-        If task.toggleEverySecond Then
+        If task.toggleOn Then
             ranges = New cv.Rangef() {New cv.Rangef(-10, +10), New cv.Rangef(-1, 20)}
         End If
         cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
@@ -1097,17 +1097,36 @@ Module Histogram_1D_CPP_Module
 
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Hist3DRGB_Run(rgbPtr As IntPtr, rows As Integer, cols As Integer, bins As Integer) As IntPtr
+    Public Function Hist3DBGR_Run(bgrPtr As IntPtr, rows As Integer, cols As Integer, bins As Integer) As IntPtr
     End Function
 
 
 
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Hist3DCloud_Run(pcPtr As IntPtr, rows As Integer, cols As Integer, xbins As Integer, ybins As Integer, zbins As Integer,
+    Public Function BackProjectBGR_Run(bgrPtr As IntPtr, rows As Integer, cols As Integer, bins As Integer,
+                                       threshold As Single) As IntPtr
+    End Function
+
+
+
+
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Hist3DCloud_Run(pcPtr As IntPtr, rows As Integer, cols As Integer, bins As Integer,
                                     minX As Single, minY As Single, minZ As Single,
                                     maxX As Single, maxY As Single, maxZ As Single) As IntPtr
     End Function
+
+
+
+
+
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function BackProjectCloud_Run(pcPtr As IntPtr, rows As Integer, cols As Integer, bins As Integer, threshold As Single,
+                                         minX As Single, minY As Single, minZ As Single,
+                                         maxX As Single, maxY As Single, maxZ As Single) As IntPtr
+    End Function
+
 
 
 
@@ -1135,6 +1154,7 @@ End Module
 
 
 Public Class Histogram_Byte_CPP : Inherits VB_Algorithm
+    Public plot As New Plot_Histogram
     Public Sub New()
         cPtr = Histogram_1D_Open()
         desc = "For Byte histograms, the C++ code works but the .Net interface doesn't honor exclusive ranges."
@@ -1147,6 +1167,10 @@ Public Class Histogram_Byte_CPP : Inherits VB_Algorithm
         Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
         Dim imagePtr = Histogram_1D_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols, task.histogramBins)
         handleSrc.Free()
+
+        Dim histogram = New cv.Mat(task.histogramBins, 1, cv.MatType.CV_32F, imagePtr)
+        plot.Run(histogram)
+        dst2 = plot.dst2
 
         setTrueText(strOut, 2)
     End Sub
@@ -1169,8 +1193,8 @@ Public Class Histogram_Xdimension : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         plot.Run(task.pcSplit(0))
         dst2 = plot.dst2
-        setTrueText("Chart left = " + CStr(CInt(plot.mm.minVal)) + vbCrLf +
-                    "Chart right = " + CStr(CInt(plot.mm.maxVal + 1)), 2)
+        setTrueText("Chart left = " + Format(plot.mm.minVal, fmt0) + vbCrLf +
+                    "Chart right = " + Format(plot.mm.maxVal, fmt0), 2)
     End Sub
 End Class
 
@@ -1189,8 +1213,8 @@ Public Class Histogram_Ydimension : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         plot.Run(task.pcSplit(1))
         dst2 = plot.dst2
-        setTrueText("Chart left = " + CStr(CInt(plot.mm.minVal)) + vbCrLf +
-                    "Chart right = " + CStr(CInt(plot.mm.maxVal + 1)), 2)
+        setTrueText("Chart left = " + Format(plot.mm.minVal, fmt0) + vbCrLf +
+                    "Chart right = " + Format(plot.mm.maxVal, fmt0), 2)
     End Sub
 End Class
 
@@ -1209,8 +1233,8 @@ Public Class Histogram_Zdimension : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         plot.Run(task.pcSplit(2))
         dst2 = plot.dst2
-        setTrueText("Chart left = " + CStr(CInt(plot.mm.minVal)) + vbCrLf +
-                    "Chart right = " + CStr(CInt(plot.mm.maxVal)), 2)
+        setTrueText("Chart left = " + Format(plot.mm.minVal, fmt0) + vbCrLf +
+                    "Chart right = " + Format(plot.mm.maxVal, fmt0), 2)
     End Sub
 End Class
 

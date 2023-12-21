@@ -46,9 +46,9 @@ int * Edge_RandomForest_Close(Edge_RandomForest *Edge_RandomForestPtr)
 }
 
 extern "C" __declspec(dllexport)
-int *Edge_RandomForest_Run(Edge_RandomForest *Edge_RandomForestPtr, int *rgbPtr, int rows, int cols)
+int *Edge_RandomForest_Run(Edge_RandomForest *Edge_RandomForestPtr, int *bgrPtr, int rows, int cols)
 {
-	Edge_RandomForestPtr->Run(Mat(rows, cols, CV_8UC3, rgbPtr));
+	Edge_RandomForestPtr->Run(Mat(rows, cols, CV_8UC3, bgrPtr));
 	return (int *) Edge_RandomForestPtr->gray8u.data; 
 }
 
@@ -91,9 +91,9 @@ int * Edge_Deriche_Close(Edge_Deriche * dPtr)
 }
 
 extern "C" __declspec(dllexport)
-int* Edge_Deriche_Run(Edge_Deriche * dPtr, int* rgbPtr, int rows, int cols, float alpha, float omega)
+int* Edge_Deriche_Run(Edge_Deriche * dPtr, int* bgrPtr, int rows, int cols, float alpha, float omega)
 {
-	dPtr->src = Mat(rows, cols, CV_8UC3, rgbPtr);
+	dPtr->src = Mat(rows, cols, CV_8UC3, bgrPtr);
 	dPtr->Run(alpha, omega);
 	return (int*)dPtr->dst.data; 
 }

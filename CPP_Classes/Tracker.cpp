@@ -76,9 +76,9 @@ int *Tracker_Basics_Close(Tracker_Basics * cPtr)
 }
 
 extern "C" __declspec(dllexport)
-int *Tracker_Basics_Run(Tracker_Basics *cPtr, int *rgbPtr, int rows, int cols, int x, int y, int w, int h)
+int *Tracker_Basics_Run(Tracker_Basics *cPtr, int *bgrPtr, int rows, int cols, int x, int y, int w, int h)
 {
-	cPtr->src = Mat(rows, cols, CV_8UC1, rgbPtr);
+	cPtr->src = Mat(rows, cols, CV_8UC1, bgrPtr);
     Rect bbox(x, y, w, h);
 	cPtr->Run(bbox);
 	return (int*)&cPtr->tRect; 

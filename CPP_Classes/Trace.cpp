@@ -39,10 +39,10 @@ int * Trace_OpenCV_Close(Trace_OpenCV * cPtr)
 }
 
 extern "C" __declspec(dllexport)
-int* Trace_OpenCV_Run(Trace_OpenCV * cPtr, int* rgbPtr, int rows, int cols, int channels)
+int* Trace_OpenCV_Run(Trace_OpenCV * cPtr, int* bgrPtr, int rows, int cols, int channels)
 {
 	CV_TRACE_REGION_NEXT("process");
-	cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, rgbPtr);
+	cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, bgrPtr);
 	cPtr->Run();
 
 	CV_TRACE_REGION("read"); // we are off to read the next frame...

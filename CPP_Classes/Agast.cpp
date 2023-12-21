@@ -41,9 +41,9 @@ int * Agast_Close(Agast * cPtr)
 }
 
 extern "C" __declspec(dllexport)
-int* Agast_Run(Agast * cPtr, int* rgbPtr, int rows, int cols, int* count)
+int* Agast_Run(Agast * cPtr, int* bgrPtr, int rows, int cols, int* count)
 {
-	cPtr->src = Mat(rows, cols, CV_8UC3, rgbPtr);
+	cPtr->src = Mat(rows, cols, CV_8UC3, bgrPtr);
 	cPtr->Run();
 	count[0] = int(cPtr->keypoints.size());
 	if (count[0] == 0) return 0;

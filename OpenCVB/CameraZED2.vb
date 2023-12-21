@@ -2,6 +2,7 @@
 Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Imports System.Runtime
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 
 Module Zed2_Interface
     <DllImport(("Cam_Zed2.dll"), CallingConvention:=CallingConvention.Cdecl)> Public Function Zed2Open(width As Integer, height As Integer) As IntPtr
@@ -68,33 +69,35 @@ Public Class CameraZED2 : Inherits Camera
         Zed2GetData(cPtr, workingRes.Width, workingRes.Height)
 
         SyncLock cameraLock
-            mbuf(mbIndex).color = New cv.Mat(workingRes.Height, workingRes.Width, cv.MatType.CV_8UC3, Zed2Color(cPtr)).Clone
+            mbuf(mbIndex).color = New cv.Mat(workingRes.Height, workingRes.Width, cv.MatType.CV_8UC3,
+                                             Zed2Color(cPtr)).Clone
+            mbuf(mbIndex).rightView = New cv.Mat(workingRes.Height, workingRes.Width, cv.MatType.CV_8UC3,
+                                                 Zed2RightView(cPtr)).Clone
             mbuf(mbIndex).leftView = mbuf(mbIndex).color
-            mbuf(mbIndex).rightView = New cv.Mat(workingRes.Height, workingRes.Width, cv.MatType.CV_8UC3, Zed2RightView(cPtr)).Clone
-            mbuf(mbIndex).pointCloud = New cv.Mat(workingRes.Height, workingRes.Width, cv.MatType.CV_32FC3, Zed2PointCloud(cPtr)).Clone
+
+            mbuf(mbIndex).pointCloud = New cv.Mat(workingRes.Height, workingRes.Width, cv.MatType.CV_32FC3,
+                                                  Zed2PointCloud(cPtr)).Clone
+            Dim acc = Zed2Acceleration(cPtr)
+            IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)
+            IMU_Acceleration.Y *= -1 ' make it consistent with the other cameras.
+
+            Dim ang = Zed2AngularVelocity(cPtr)
+            IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
+            IMU_AngularVelocity *= 0.0174533 ' Zed 2 gyro is in degrees/sec
+            IMU_AngularVelocity.Z *= -1 ' make it consistent with the other cameras.
+
+            'Dim rt = Marshal.PtrToStructure(Of imuDataStruct)(imuFrame)
+            'Dim t = New cv.Point3f(rt.tx, rt.ty, rt.tz)
+            'Dim mat() As Single = {-rt.r00, rt.r01, -rt.r02, 0.0,
+            '                       -rt.r10, rt.r11, rt.r12, 0.0,
+            '                       -rt.r20, rt.r21, -rt.r22, 0.0,
+            '                       t.X, t.Y, t.Z, 1.0}
+            'transformationMatrix = mat
+
+            IMU_TimeStamp = Zed2IMU_TimeStamp(cPtr)
+            Static imuStartTime = IMU_TimeStamp
+            IMU_TimeStamp -= imuStartTime
         End SyncLock
-
-        ' Dim imuFrame = Zed2GetPoseData(cPtr)
-        Dim acc = Zed2Acceleration(cPtr)
-        IMU_Acceleration = Marshal.PtrToStructure(Of cv.Point3f)(acc)
-        IMU_Acceleration.Y *= -1 ' make it consistent with the other cameras.
-
-        Dim ang = Zed2AngularVelocity(cPtr)
-        IMU_AngularVelocity = Marshal.PtrToStructure(Of cv.Point3f)(ang)
-        IMU_AngularVelocity *= 0.0174533 ' Zed 2 gyro is in degrees/sec
-        IMU_AngularVelocity.Z *= -1 ' make it consistent with the other cameras.
-
-        'Dim rt = Marshal.PtrToStructure(Of imuDataStruct)(imuFrame)
-        'Dim t = New cv.Point3f(rt.tx, rt.ty, rt.tz)
-        'Dim mat() As Single = {-rt.r00, rt.r01, -rt.r02, 0.0,
-        '                       -rt.r10, rt.r11, rt.r12, 0.0,
-        '                       -rt.r20, rt.r21, -rt.r22, 0.0,
-        '                       t.X, t.Y, t.Z, 1.0}
-        'transformationMatrix = mat
-
-        IMU_TimeStamp = Zed2IMU_TimeStamp(cPtr)
-        Static imuStartTime = IMU_TimeStamp
-        IMU_TimeStamp -= imuStartTime
         MyBase.GetNextFrameCounts(IMU_FrameTime)
     End Sub
     Public Sub stopCamera()

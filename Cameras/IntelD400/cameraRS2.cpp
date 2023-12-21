@@ -46,7 +46,7 @@ class RealSense2Camera
 public:
 	rs2_intrinsics intrinsics;
 	rs2::pipeline_profile profiles;
-	rs2::pipeline pipeline;
+	rs2::pipeline pipe;
 	rs2::frameset frames;
 	rs2::frameset processedFrames;
 	rs2::colorizer colorizer;
@@ -60,7 +60,6 @@ public:
 	int frameRate = 0;
 	string serialNumber;
 	Mat color, leftView, rightView, pointCloud;
-
 private:
 
 
@@ -83,12 +82,12 @@ public:
 	RealSense2Camera() {}
 	RealSense2Camera(int w, int h, string _serialNumber)
 	{
-		rs2::config cfg;
 		width = w;
 		height = h;
-		serialNumber = _serialNumber;
+		
+		rs2::config cfg;
+		cfg.enable_device(_serialNumber);
 
-		cfg.enable_device(serialNumber);
 		cfg.enable_stream(RS2_STREAM_COLOR, width, height, RS2_FORMAT_BGR8);
 		cfg.enable_stream(RS2_STREAM_DEPTH, width, height, RS2_FORMAT_Z16);
 		cfg.enable_stream(RS2_STREAM_INFRARED, 1, width, height, RS2_FORMAT_Y8);
@@ -97,7 +96,7 @@ public:
 		cfg.enable_stream(RS2_STREAM_GYRO);
 		cfg.enable_stream(RS2_STREAM_ACCEL);
 
-		profiles = pipeline.start(cfg);
+		profiles = pipe.start(cfg);
 
 		depth_scale = get_depth_scale(profiles.get_device());
 		auto stream = profiles.get_stream(RS2_STREAM_COLOR);
@@ -106,7 +105,8 @@ public:
 
 	void waitForFrame()
 	{
-		frames = pipeline.wait_for_frames(10000);
+		static rs2::align align_to_color(RS2_STREAM_COLOR);
+		frames = pipe.wait_for_frames(10000);
 		gyro = frames.first_or_default(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
 		accel = frames.first_or_default(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
 	}
@@ -119,7 +119,6 @@ extern "C" __declspec(dllexport) int* RS2LeftRaw(RealSense2Camera* cPtr) { retur
 extern "C" __declspec(dllexport) int* RS2RightRaw(RealSense2Camera * cPtr) { return (int*)cPtr->rightView.data; }
 extern "C" __declspec(dllexport) int* RS2intrinsics(RealSense2Camera * cPtr) { return (int*)&cPtr->intrinsics.ppx; }
 extern "C" __declspec(dllexport) int* RS2Color(RealSense2Camera * cPtr) { return (int*)cPtr->color.data; }
-//extern "C" __declspec(dllexport) int* RS2PointCloud(RealSense2Camera * cPtr) { return (int*)cPtr->pointCloud.data; }
 extern "C" __declspec(dllexport) int* RS2PointCloud(RealSense2Camera * cPtr)
 {
 	return (int*)cPtr->pc.process(cPtr->processedFrames.get_depth_frame()).as<rs2::points>().get_data();
@@ -138,16 +137,13 @@ extern "C" __declspec(dllexport) void RS2WaitForFrame(RealSense2Camera * cPtr, i
 
 	tmp = Mat(cPtr->height, cPtr->width, CV_8UC1, (int*)cPtr->frames.get_infrared_frame(2).get_data());
 	resize(tmp, cPtr->rightView, Size(w, h), INTER_NEAREST);
-
-	//tmp = Mat(cPtr->height, cPtr->width, CV_32FC3, (int*)cPtr->pc.process(cPtr->processedFrames.get_depth_frame()).as<rs2::points>().get_data());
-	//resize(tmp, cPtr->pointCloud, Size(w, h), INTER_NEAREST);
 }
 extern "C" __declspec(dllexport) 
 void RS2Stop(RealSense2Camera * cPtr) { 
 	if (cPtr != 0) 
 	{ 
 		cPtr->ctx.unload_device(cPtr->serialNumber);
-		cPtr->pipeline.stop(); 
+		cPtr->pipe.stop(); 
 		delete cPtr; 
 	} 
 }

@@ -57,13 +57,10 @@ if not exist OakD\Build (
 	msbuild.exe OakD/Build/Cam_Oak-D.sln /p:Configuration=Release
 )
 
-if not exist zed-sdk (
-	"c:\Program Files\Git\bin\git.exe" clone "https://github.com/stereolabs/zed-sdk.git"
-	echo "Goto: https://www.stereolabs.com/developers/release/3.8/ and download the .exe"
-	echo "Install the StereoLabs SDK - it may also download and install CUDA if not already present."
-	echo "Set CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7"
-	set /p ok="And hit enter when install is complete:"
-)
+echo "Goto: https://www.stereolabs.com/developers/release/4.0/ and install Stereolabs SDK"
+echo "StereoLabs SDK install may also download and install CUDA if not already present."
+echo "Set CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.3" <<< or whatever version was downloaded.
+set /p ok="And hit enter after reading the above messages."
 
 :: Once done, exit the batch file -- skips executing the errorNoPython section
 goto:eof

@@ -2,9 +2,9 @@
 Public Class HeatMap_Basics : Inherits VB_Algorithm
     Public topSum As New History_Sum32f
     Public sideSum As New History_Sum32f
-    Dim options As New Options_HeatMap
     Public histogramTop As New cv.Mat
     Public histogramSide As New cv.Mat
+    Dim options As New Options_HeatMap
     Public Sub New()
         desc = "Highlight concentrations of depth pixels in the side view"
     End Sub
@@ -19,26 +19,18 @@ Public Class HeatMap_Basics : Inherits VB_Algorithm
         cv.Cv2.CalcHist({src}, task.channelsSide, New cv.Mat, histogramSide, 2, task.bins2D, task.rangesSide)
         histogramSide.Col(0).SetTo(0)
 
-        If options.showHistory Then
-            topSum.Run(histogramTop)
-            dst0 = topSum.dst2
+        topSum.Run(histogramTop)
+        dst0 = topSum.dst2
 
-            sideSum.Run(histogramSide)
-            dst1 = sideSum.dst2
+        sideSum.Run(histogramSide)
+        dst1 = sideSum.dst2
 
-            dst2 = vbPalette(dst0.ConvertScaleAbs())
-            dst3 = vbPalette(dst1.ConvertScaleAbs())
-            labels(2) = "Top view of heat map with the last " + CStr(task.historyCount) + " frames"
-            labels(3) = "Side view of heat map with the last " + CStr(task.historyCount) + " frames"
-        Else
-            dst2 = vbPalette(histogramTop.ConvertScaleAbs())
-            dst3 = vbPalette(histogramSide.ConvertScaleAbs())
-            labels(2) = "Top view of heat map"
-            labels(3) = "Side view of heat map"
-        End If
+        dst2 = vbPalette(dst0.ConvertScaleAbs())
+        dst3 = vbPalette(dst1.ConvertScaleAbs())
+        labels(2) = "Top view of heat map with the last " + CStr(task.historyCount) + " frames"
+        labels(3) = "Side view of heat map with the last " + CStr(task.historyCount) + " frames"
     End Sub
 End Class
-
 
 
 
@@ -50,7 +42,6 @@ End Class
 Public Class HeatMap_Grid : Inherits VB_Algorithm
     Dim heat As New HeatMap_Basics
     Public Sub New()
-        findCheckBox("Show Frustrum").Checked = False
         gOptions.GridSize.Value = 5
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -77,7 +68,7 @@ Public Class HeatMap_Grid : Inherits VB_Algorithm
                     End SyncLock
                 End If
 
-                Dim count2 = heat.histogramTop(roi).CountNonZero
+                Dim count2 = heat.histogramSide(roi).CountNonZero
                 dst3(roi).SetTo(count2)
                 If count2 > maxCount2 Then
                     SyncLock sync2
@@ -87,7 +78,7 @@ Public Class HeatMap_Grid : Inherits VB_Algorithm
             End Sub)
         Else
             For Each roi In task.gridList
-                Dim count1 = heat.histogramSide(roi).CountNonZero
+                Dim count1 = heat.histogramTop(roi).CountNonZero
                 dst2(roi).SetTo(count1)
                 If count1 > maxCount1 Then maxCount1 = count1
 
@@ -100,7 +91,6 @@ Public Class HeatMap_Grid : Inherits VB_Algorithm
         dst3 *= 255 / maxCount2
     End Sub
 End Class
-
 
 
 

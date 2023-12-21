@@ -358,7 +358,7 @@ End Class
 
 
 Public Class Feature_PointsDelaunay : Inherits VB_Algorithm
-    Public good As New Feature_BasicsKNN
+    Public good As New Feature_Basics
     Public Sub New()
         labels = {"Good features highlighted", "", "", "Delaunay map of good features - format CV_8U"}
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)

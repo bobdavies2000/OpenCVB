@@ -43,9 +43,9 @@ int *Stabilizer_Basics_Close(Stabilizer_Basics_CPP * cPtr)
 
 // https://github.com/Lakshya-Kejriwal/Real-Time-Video-Stabilization
 extern "C" __declspec(dllexport)
-int *Stabilizer_Basics_Run(Stabilizer_Basics_CPP * cPtr, int *rgbPtr, int rows, int cols)
+int *Stabilizer_Basics_Run(Stabilizer_Basics_CPP * cPtr, int *bgrPtr, int rows, int cols)
 {
-	cPtr->rgb = Mat(rows, cols, CV_8UC3, rgbPtr);
+	cPtr->rgb = Mat(rows, cols, CV_8UC3, bgrPtr);
 	cvtColor(cPtr->rgb, cPtr->stab.gray, COLOR_BGR2GRAY);
 	if (cPtr->stab.lastFrame.rows > 0) cPtr->Run(); // skips the first pass while the frames get loaded.
 	cPtr->stab.gray.copyTo(cPtr->stab.lastFrame);

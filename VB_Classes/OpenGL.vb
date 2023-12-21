@@ -11,7 +11,7 @@ Public Class OpenGL_Basics : Inherits VB_Algorithm
     ReadOnly startInfo As New ProcessStartInfo
     Dim memMapPtr As IntPtr
     Public dataInput As New cv.Mat
-    Public pointCloudInput As New cv.Mat
+    Public pointCloudInput As cv.Mat
     Public oglFunction As Integer = 0 ' the default function is to display a point cloud.
     Public options As New Options_OpenGLFunctions
     Dim rgbBuffer(0) As Byte
@@ -19,6 +19,7 @@ Public Class OpenGL_Basics : Inherits VB_Algorithm
     Dim pointCloudBuffer(0) As Byte
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
+        pointCloudInput = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
         gOptions.useHistoryCloud.Checked = True
         desc = "Create an OpenGL window and update it with images"
     End Sub
@@ -132,10 +133,10 @@ Public Class OpenGL_Basics : Inherits VB_Algorithm
 
             ' lose a lot of performance doing this!
             If gOptions.OpenGLCapture.Checked Then
-                Dim snapshot As Bitmap = GetWindowImage(openGL_hwnd, New cv.Rect(0, 0, task.oglRect.Width * 2, task.oglRect.Height * 2))
+                Dim snapshot As Bitmap = GetWindowImage(openGL_hwnd, New cv.Rect(0, 0, task.oglRect.Width * 1.4, task.oglRect.Height * 1.4))
                 Dim snap = cvext.BitmapConverter.ToMat(snapshot)
                 snap = snap.CvtColor(cv.ColorConversionCodes.BGRA2BGR)
-                dst3 = snap.Resize(New cv.Size(dst2.Width, dst2.Height)) ', 0, 0, cv.InterpolationFlags.Nearest)
+                dst3 = snap.Resize(New cv.Size(dst2.Width, dst2.Height), cv.InterpolationFlags.Nearest)
             End If
         Catch ex As Exception
             ' OpenGL window was likely closed.  
@@ -176,7 +177,7 @@ Public Class OpenGL_BasicsSliders : Inherits VB_Algorithm
         task.ogl.options.eye = options.eye
         task.ogl.options.scaleXYZ = options.scaleXYZ
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -196,7 +197,7 @@ Public Class OpenGL_BasicsMouse : Inherits VB_Algorithm
         If task.testAllRunning Then Exit Sub ' seems to not like it when running overnight but it runs fine.
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -220,7 +221,7 @@ Public Class OpenGL_ReducedXYZ : Inherits VB_Algorithm
 
         task.ogl.pointCloudInput = reduction.dst3
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -241,7 +242,7 @@ Public Class OpenGL_Reduction : Inherits VB_Algorithm
         dst2 = reduction.dst2
         task.ogl.pointCloudInput = reduction.dst3
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -262,7 +263,7 @@ Public Class OpenGL_ReducedSideView : Inherits VB_Algorithm
         dst2 = sideView.dst2
         task.ogl.pointCloudInput = sideView.dst3
         task.ogl.Run(task.color)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
         labels(2) = sideView.labels(2)
     End Sub
 End Class
@@ -318,7 +319,7 @@ Public Class OpenGL_Rebuilt : Inherits VB_Algorithm
         dst2 = rebuild.dst2
         task.ogl.pointCloudInput = rebuild.pointcloud
         task.ogl.Run(task.color)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -352,7 +353,7 @@ Public Class OpenGL_World : Inherits VB_Algorithm
         End If
 
         task.ogl.Run(task.color)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -380,7 +381,7 @@ Public Class OpenGL_VerticalSingle : Inherits VB_Algorithm
 
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(task.color)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -423,7 +424,7 @@ Public Class OpenGL_VerticalOrHorizontal : Inherits VB_Algorithm
         Next
         task.ogl.dataInput = New cv.Mat(lines3D.Count, 1, cv.MatType.CV_32FC3, lines3D.ToArray)
         task.ogl.Run(task.color)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -441,7 +442,7 @@ Public Class OpenGL_Pyramid : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         task.ogl.pointCloudInput = New cv.Mat
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -459,7 +460,7 @@ Public Class OpenGL_DrawCube : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -485,7 +486,7 @@ Public Class OpenGL_QuadSimple : Inherits VB_Algorithm
 
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(dst3)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -511,7 +512,7 @@ Public Class OpenGL_QuadHulls : Inherits VB_Algorithm
 
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(dst3)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -537,7 +538,7 @@ Public Class OpenGL_QuadMinMax : Inherits VB_Algorithm
 
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(dst3)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -568,7 +569,7 @@ Public Class OpenGL_Bricks : Inherits VB_Algorithm
 
         task.ogl.pointCloudInput = New cv.Mat()
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -596,7 +597,7 @@ Public Class OpenGL_StructuredCloud : Inherits VB_Algorithm
         task.ogl.pointCloudInput = sCloud.dst2
         task.ogl.Run(dst2)
         task.ogl.options.PointSizeSlider.Value = gOptions.GridSize.Value
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -619,7 +620,7 @@ Public Class OpenGL_Tiles : Inherits VB_Algorithm
 
         task.ogl.dataInput = New cv.Mat(sCloud.oglData.Count, 1, cv.MatType.CV_32FC3, sCloud.oglData.ToArray)
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
         task.ogl.options.PointSizeSlider.Value = gOptions.GridSize.Value
     End Sub
 End Class
@@ -642,7 +643,7 @@ Public Class OpenGL_TilesQuad : Inherits VB_Algorithm
 
         task.ogl.dataInput = New cv.Mat(sCloud.oglData.Count, 1, cv.MatType.CV_32FC3, sCloud.oglData.ToArray)
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -669,7 +670,7 @@ Public Class OpenGL_OnlyPlanes : Inherits VB_Algorithm
         dst3 = planes.dst3
         task.ogl.pointCloudInput = planes.dst3
         task.ogl.Run(task.color)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -693,7 +694,7 @@ Public Class OpenGL_FlatStudy1 : Inherits VB_Algorithm
         dst2 = plane.dst3
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(plane.dst2)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -723,7 +724,7 @@ Public Class OpenGL_FlatStudy2 : Inherits VB_Algorithm
         task.ogl.dataInput = New cv.Mat(4, 1, cv.MatType.CV_32F, oglData.ToArray)
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(plane.dst2)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -750,7 +751,7 @@ Public Class OpenGL_FlatStudy3 : Inherits VB_Algorithm
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.dataInput = New cv.Mat(1, 1, cv.MatType.CV_32F, {plane.planeY})
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -773,7 +774,7 @@ Public Class OpenGL_FlatFloor : Inherits VB_Algorithm
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.dataInput = New cv.Mat(1, 1, cv.MatType.CV_32F, {task.pcFloor})
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
         labels(2) = flatness.labels(2)
         labels(3) = flatness.labels(3)
     End Sub
@@ -798,7 +799,7 @@ Public Class OpenGL_FlatCeiling : Inherits VB_Algorithm
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.dataInput = New cv.Mat(1, 1, cv.MatType.CV_32F, {task.pcCeiling})
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
         labels(2) = flatness.labels(2)
         labels(3) = flatness.labels(3)
     End Sub
@@ -831,7 +832,7 @@ Public Class OpenGL_PeakFlat : Inherits VB_Algorithm
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.dataInput = New cv.Mat(2, 1, cv.MatType.CV_32F, {kalman.kOutput(0), kalman.kOutput(1)})
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -869,7 +870,7 @@ Public Class OpenGL_DrawHull : Inherits VB_Algorithm
 
         task.ogl.dataInput = New cv.Mat(oglData.Count, 1, cv.MatType.CV_32FC3, oglData.ToArray)
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -900,7 +901,7 @@ Public Class OpenGL_FPolyCloud : Inherits VB_Algorithm
 
         task.ogl.pointCloudInput = fpolyPC.fPolyCloud
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -922,7 +923,7 @@ Public Class OpenGL_Sierpinski : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -953,7 +954,7 @@ Public Class OpenGL_DrawHulls : Inherits VB_Algorithm
         Dim oglData As New List(Of cv.Point3f)
         oglData.Add(New cv.Point3f)
         Dim polygonCount As Integer
-        For Each rc In task.redCells
+        For Each rc In hulls.redC.redCells
             If rc.hull Is Nothing Then Continue For
             Dim hullIndex = oglData.Count
             oglData.Add(New cv.Point3f(rc.hull.Count, 0, 0))
@@ -1015,7 +1016,7 @@ Public Class OpenGL_Contours : Inherits VB_Algorithm
         Dim oglData As New List(Of cv.Point3f)
         Dim lastDepth As cv.Scalar
         oglData.Add(New cv.Point3f)
-        For Each rc In task.redCells
+        For Each rc In redC.redCells
             Dim d = rc.depthMean.Z
             If d = 0 Then Continue For
 
@@ -1047,7 +1048,7 @@ Public Class OpenGL_Contours : Inherits VB_Algorithm
         oglData(0) = New cv.Point3f(polygonCount, 0, 0)
         task.ogl.dataInput = New cv.Mat(oglData.Count, 1, cv.MatType.CV_32FC3, oglData.ToArray)
         task.ogl.Run(New cv.Mat)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -1072,7 +1073,7 @@ Public Class OpenGL_3DColorShape : Inherits VB_Algorithm
         task.ogl.dataInput = dst1.Normalize(0, 1, cv.NormTypes.MinMax)
         task.ogl.pointCloudInput = New cv.Mat
         task.ogl.Run(New cv.Mat)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -1092,7 +1093,7 @@ Public Class OpenGL_3D : Inherits VB_Algorithm
         src.ConvertTo(src, cv.MatType.CV_32FC3)
         task.ogl.pointCloudInput = src.Normalize(0, 1, cv.NormTypes.MinMax)
         task.ogl.Run(New cv.Mat)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -1105,42 +1106,20 @@ Public Class OpenGL_3DColors : Inherits VB_Algorithm
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB
+        findSlider("OpenGL Point Size").Value = 20
         desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         colorClass.Run(src)
         dst2 = colorClass.dst3
         dst2.ConvertTo(dst1, cv.MatType.CV_32FC3)
+        labels(2) = "There are " + CStr(colorClass.classCount) + " classes for " + redOptions.colorInput
         task.ogl.pointCloudInput = dst1.Normalize(0, 1, cv.NormTypes.MinMax)
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
-
-
-
-
-
-
-
-Public Class OpenGL_3DRGB : Inherits VB_Algorithm
-    Dim hist3d As New Hist3DRGB_Basics
-    Public Sub New()
-        task.OpenGLTitle = "OpenGL_Functions"
-        task.ogl.oglFunction = oCase.Histogram3D
-        task.ogl.options.PointSizeSlider.Value = 10
-        desc = "Plot the results of a 3D histogram of the BGR data "
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        hist3d.Run(src)
-
-        task.ogl.dataInput = hist3d.dst2
-        task.ogl.pointCloudInput = New cv.Mat
-        task.ogl.Run(New cv.Mat)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
-    End Sub
-End Class
 
 
 
@@ -1161,7 +1140,7 @@ Public Class OpenGL_3Ddepth : Inherits VB_Algorithm
         task.ogl.dataInput = hist3d.histogram
         task.ogl.pointCloudInput = New cv.Mat
         task.ogl.Run(New cv.Mat)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
         setTrueText("Use the sliders for X/Y/Z histogram bins to add more points")
     End Sub
 End Class
@@ -1190,7 +1169,7 @@ Public Class OpenGL_PCLineCandidates : Inherits VB_Algorithm
 
         task.ogl.dataInput = New cv.Mat(pts.allPointsH.Count, 1, cv.MatType.CV_32FC3, pts.allPointsH.ToArray)
         task.ogl.Run(New cv.Mat)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
         labels(2) = "Point cloud points found = " + CStr(pts.actualCount / 2)
     End Sub
 End Class
@@ -1215,7 +1194,7 @@ Public Class OpenGL_PClinesFirstLast : Inherits VB_Algorithm
 
         If lines.pcLinesMat.Rows = 0 Then task.ogl.dataInput = New cv.Mat Else task.ogl.dataInput = lines.pcLinesMat
         task.ogl.Run(New cv.Mat)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
         labels(2) = "OpenGL_PClines found " + CStr(lines.pcLinesMat.Rows / 3) + " lines"
     End Sub
 End Class
@@ -1240,7 +1219,7 @@ Public Class OpenGL_PClinesAll : Inherits VB_Algorithm
 
         If lines.pcLinesMat.Rows = 0 Then task.ogl.dataInput = New cv.Mat Else task.ogl.dataInput = lines.pcLinesMat
         task.ogl.Run(New cv.Mat)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
         labels(2) = "OpenGL_PClines found " + CStr(lines.pcLinesMat.Rows / 3) + " lines"
     End Sub
 End Class
@@ -1264,7 +1243,7 @@ Public Class OpenGL_PatchHorizontal : Inherits VB_Algorithm
         dst2 = patch.dst3
         task.ogl.pointCloudInput = dst2
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -1290,7 +1269,7 @@ Public Class OpenGL_PCpoints : Inherits VB_Algorithm
 
         task.ogl.dataInput = New cv.Mat(pts.pcPoints.Count, 1, cv.MatType.CV_32FC3, pts.pcPoints.ToArray)
         task.ogl.Run(New cv.Mat)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
         labels(2) = "Point cloud points found = " + CStr(pts.pcPoints.Count / 2)
     End Sub
 End Class
@@ -1316,7 +1295,7 @@ Public Class OpenGL_PCpointsPlane : Inherits VB_Algorithm
 
         task.ogl.dataInput = New cv.Mat(pts.pcPoints.Count, 1, cv.MatType.CV_32FC3, pts.pcPoints.ToArray)
         task.ogl.Run(New cv.Mat)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
         labels(2) = "Point cloud points found = " + CStr(pts.pcPoints.Count / 2)
     End Sub
 End Class
@@ -1344,7 +1323,7 @@ Public Class OpenGL_DepthAverage : Inherits VB_Algorithm
         cv.Cv2.Merge(task.pcSplit, dst1)
         task.ogl.pointCloudInput = dst1
         task.ogl.Run(task.color)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -1373,7 +1352,7 @@ Public Class OpenGL_PlaneClusters3D : Inherits VB_Algorithm
 
         Dim pcPoints As New List(Of cv.Point3f)
         Dim blue As New cv.Point3f(0, 0, 1), red As New cv.Point3f(1, 0, 0), green As New cv.Point3f(0, 1, 0) ' NOTE: RGB, not BGR...
-        For Each rc In task.redCells
+        For Each rc In redC.redCells
             If rc.maxVec.Z > 0 Then
                 eq.rc = rc
                 eq.Run(src)
@@ -1431,7 +1410,6 @@ Public Class OpenGL_Profile : Inherits VB_Algorithm
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         If standalone Then gOptions.gravityPointCloud.Checked = False
-        sides.redCold = New RedCloud_Basics
         ogl.oglFunction = oCase.pcPointsAlone
         labels(3) = "Contour of selected cell is shown below.  Blue dot represents the minimum X (leftmost) point and red the maximum X (rightmost)"
         desc = "Visualize a RedCloud Cell and rotate it using the Options_IMU Sliders"
@@ -1440,7 +1418,7 @@ Public Class OpenGL_Profile : Inherits VB_Algorithm
         sides.Run(src)
         dst2 = sides.dst2
 
-        Dim rc = sides.rc
+        Dim rc = task.rcSelect
         Dim contourMat As New cv.Mat(rc.contour.Count, 1, cv.MatType.CV_32SC2, rc.contour.ToArray)
         If rc.contour.Count = 0 Then Exit Sub
 
@@ -1582,7 +1560,7 @@ Public Class OpenGL_GravityTransform : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class
 
@@ -1615,7 +1593,7 @@ Public Class OpenGL_GravityAverage : Inherits VB_Algorithm
 
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
         setTrueText(strOut, 3)
     End Sub
 End Class
@@ -1652,7 +1630,7 @@ Public Class OpenGL_GravityKalman : Inherits VB_Algorithm
         task.IMU_Acceleration = task.kalmanIMUacc
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
         setTrueText(strOut, 3)
     End Sub
 End Class
@@ -1678,7 +1656,7 @@ Public Class OpenGL_StableMinMaxNone : Inherits VB_Algorithm
 
         If depth.options.useMax Or depth.options.useMin Then task.ogl.pointCloudInput = dst2 Else task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(task.color)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
         labels(2) = depth.labels(2)
     End Sub
 End Class
@@ -1834,53 +1812,6 @@ End Class
 
 
 
-
-Public Class OpenGL_RedCloudCell : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        task.ogl.oglFunction = oCase.pointCloudAndRGB
-        desc = " Isolate a RedCloud cell in an OpenGL display"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        setTrueText("Select a RedCloud cell to see it in the OpenGL window", 3)
-        redC.Run(src)
-        dst2 = redC.dst2
-
-        If task.optionsChanged Or task.frameCount = 0 Then task.ogl.pointCloudInput = task.pointCloud.EmptyClone
-        task.ogl.pointCloudInput.SetTo(0)
-
-        task.pointCloud(task.rcSelect.rect).CopyTo(task.ogl.pointCloudInput(task.rcSelect.rect), task.rcSelect.mask)
-        task.ogl.Run(dst2)
-        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class OpenGL_RedCloud : Inherits VB_Algorithm
-    Dim redC As New RedCloud_Basics
-    Public Sub New()
-        task.ogl.oglFunction = oCase.pointCloudAndRGB
-        desc = "Display all the RedCloud cells in OpenGL"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-
-        task.ogl.pointCloudInput = task.pointCloud
-        task.ogl.Run(dst2)
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class OpenGL_RedTrack : Inherits VB_Algorithm
     Dim redCC As New RedTrack_Basics
     Public Sub New()
@@ -1974,5 +1905,192 @@ Public Class OpenGL_NoSolo : Inherits VB_Algorithm
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(src)
         setTrueText("Toggle the solo points on and off using the 'DebugCheckBox' global option.", 3)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class OpenGL_RedCloud : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        desc = "Display all the RedCloud cells in OpenGL"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+
+        task.ogl.pointCloudInput = task.pointCloud
+        task.ogl.Run(dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class OpenGL_RedCloudSpectrum : Inherits VB_Algorithm
+    Dim redS As New Spectrum_RedCloud
+    Public Sub New()
+        redOptions.UseDepth.Checked = True
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        desc = "Display all the RedCloud cells after Spectrum filtering."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redS.Run(src)
+        dst2 = redS.dst3
+        task.pointCloud.SetTo(0, dst2.InRange(0, 0))
+
+        task.ogl.pointCloudInput = task.pointCloud
+        task.ogl.Run(dst2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class OpenGL_RedCloudCell : Inherits VB_Algorithm
+    Dim specZ As New Spectrum_Z
+    Dim breakdown As New Spectrum_Breakdown
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        desc = " Isolate a RedCloud cell - after filtering by Spectrum_Depth - in an OpenGL display"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst2 = specZ.options.runRedCloud(labels(2))
+
+        specZ.Run(src)
+        setTrueText(specZ.strOut, 3)
+
+        breakdown.Run(src)
+
+        task.ogl.pointCloudInput.SetTo(0)
+
+        task.pointCloud(task.rcSelect.rect).CopyTo(task.ogl.pointCloudInput(task.rcSelect.rect), task.rcSelect.mask)
+        task.ogl.Run(dst2)
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OpenGL_FilteredSideView : Inherits VB_Algorithm
+    Dim filter As New BackProject2D_FilterSide
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        desc = "Use the BackProject2D_FilterSide to remove low sample bins and trim the loose fragments in 3D"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        filter.Run(src)
+        dst2 = filter.dst2
+
+        task.ogl.pointCloudInput = dst2
+        task.ogl.Run(src)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OpenGL_FilteredTopView : Inherits VB_Algorithm
+    Dim filter As New BackProject2D_FilterTop
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        desc = "Use the BackProject2D_FilterSide to remove low sample bins and trim the loose fragments in 3D"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        filter.Run(src)
+        dst2 = filter.dst2
+
+        task.ogl.pointCloudInput = dst2
+        task.ogl.Run(src)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OpenGL_FilteredBoth : Inherits VB_Algorithm
+    Dim filter As New BackProject2D_FilterBoth
+    Public Sub New()
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        desc = "Use the BackProject2D_FilterSide/Top to remove low sample bins and trim the loose fragments in 3D"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        filter.Run(src)
+        dst2 = filter.dst2
+
+        task.ogl.pointCloudInput = dst2
+        task.ogl.Run(src)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class OpenGL_Filtered3D : Inherits VB_Algorithm
+    Dim filter As New Hist3DCloud_BP_Filter
+    Public Sub New()
+        gOptions.OpenGLCapture.Checked = True
+        task.ogl.oglFunction = oCase.pointCloudAndRGB
+        desc = "Use the BackProject2D_FilterSide/Top to remove low sample bins and trim the loose fragments in 3D"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        filter.Run(src)
+        dst2 = filter.dst3
+
+        task.ogl.pointCloudInput = dst2
+        task.ogl.Run(src)
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+
+Public Class OpenGL_3DRGB : Inherits VB_Algorithm
+    Dim hist3d As New Hist3DBGR_Basics_CPP
+    Public Sub New()
+        task.OpenGLTitle = "OpenGL_Functions"
+        task.ogl.oglFunction = oCase.Histogram3D
+        task.ogl.options.PointSizeSlider.Value = 10
+        desc = "Plot the results of a 3D histogram of the BGR data "
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        hist3d.Run(src)
+        dst2 = hist3d.dst3
+
+        task.ogl.dataInput = hist3d.dst2
+        task.ogl.pointCloudInput = New cv.Mat
+        task.ogl.Run(New cv.Mat)
+        If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
     End Sub
 End Class

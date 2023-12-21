@@ -10,7 +10,8 @@ Public Class Triangle_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
         dst2 = redC.dst2
-        If task.redCells.Count <= 1 Then Exit Sub
+
+        If redC.redCells.Count <= 1 Then Exit Sub
         Dim rc = task.rcSelect
         If rc.index = 0 Then Exit Sub
 
@@ -44,14 +45,14 @@ End Class
 Public Class Triangle_HullContour : Inherits VB_Algorithm
     Dim hulls As New RedCloud_Hulls
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        labels = {"", "Selected hull", "RedCloud_Hulls output", "Selected contour"}
+        gOptions.displayDst1.Checked = True
+        labels = {"", "Selected cell", "RedCloud_Basics output", "Selected contour"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         hulls.Run(src)
         dst2 = hulls.dst2
-        If task.redCells.Count <= 1 Then Exit Sub
+        If hulls.redC.redCells.Count <= 1 Then Exit Sub
         Dim rc = task.rcSelect
 
         rc.contour = contourBuild(rc.mask, cv.ContourApproximationModes.ApproxTC89L1)
@@ -80,18 +81,21 @@ Public Class Triangle_RedCloud : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
-        labels = {"", "", "RedCloud_Hulls output", "Selected contour - each pixel has depth"}
+        labels = {"", "", "RedCloud_Basics output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
+        dst0 = redC.dst0
+        dst1 = redC.dst1
         dst2 = redC.dst2
-        If task.redCells.Count <= 1 Then Exit Sub
+
+        If redC.redCells.Count <= 1 Then Exit Sub
         Dim rc = task.rcSelect
         If rc.index = 0 Then Exit Sub
 
         triangles.Clear()
-        For Each rc In task.redCells
+        For Each rc In redC.redCells
             Dim pt3D As New List(Of cv.Point3f)
             For Each pt In rc.contour
                 pt = New cv.Point(pt.X + rc.rect.X, pt.Y + rc.rect.Y)
@@ -121,14 +125,13 @@ Public Class Triangle_Cell : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
-        labels = {"", "", "RedCloud_Hulls output", "Selected contour - each pixel has depth"}
+        labels = {"", "", "RedCloud_Basics output", "Selected contour - each pixel has depth"}
         desc = "Given a contour, convert that contour to a series of triangles"
     End Sub
-
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
         dst2 = redC.dst2
-        If task.redCells.Count <= 1 Then Exit Sub
+        If redC.redCells.Count <= 1 Then Exit Sub
         Dim rc = task.rcSelect
         If rc.index = 0 Then Exit Sub
 
@@ -177,14 +180,14 @@ Public Class Triangle_Mask : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Public triangles As New List(Of cv.Point3f)
     Public Sub New()
-        labels = {"", "", "RedCloud_Hulls output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
+        labels = {"", "", "RedCloud_Basics output", "Selected rc.mask - each pixel has depth. Red dot is maxDist."}
         desc = "Given a RedCloud cell, resize it and show the points with depth."
     End Sub
 
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
         dst2 = redC.dst2
-        If task.redCells.Count <= 1 Then Exit Sub
+        If redC.redCells.Count <= 1 Then Exit Sub
         Dim rc = task.rcSelect
         If rc.index = 0 Then Exit Sub
 

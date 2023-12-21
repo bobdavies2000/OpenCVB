@@ -3432,10 +3432,7 @@ Public Class Options_KMeans : Inherits VB_Algorithm
     Public kMeansFlag As cv.KMeansFlags
     Public kMeansK As Integer
     Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("KMeans k", 2, 32, 5)
-            sliders.setupTrackBar("Resize Factor", 1, 8, 2)
-        End If
+        If sliders.Setup(traceName) Then sliders.setupTrackBar("KMeans k", 2, 32, 5)
 
         If findfrm(traceName + " Radio Buttons") Is Nothing Then
             radio.Setup(traceName)
@@ -3885,7 +3882,6 @@ End Class
 
 
 Public Class Options_HeatMap : Inherits VB_Algorithm
-    Public showFrustrum As Boolean
     Public redThreshold As Integer
     Public viewName As String = "vertical"
     Public showHistory As Boolean
@@ -3896,10 +3892,7 @@ Public Class Options_HeatMap : Inherits VB_Algorithm
             check.Setup(traceName)
             check.addCheckBox("Top View (Unchecked Side View)")
             check.addCheckBox("Slice Vertically (Unchecked Slice Horizontally)")
-            check.addCheckBox("Show Frustrum")
-            check.addCheckBox("Turn off history")
             check.Box(0).Checked = True
-            check.Box(2).Checked = True
         End If
 
         If sliders.Setup(traceName) Then
@@ -3909,8 +3902,6 @@ Public Class Options_HeatMap : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB()
         Static topCheck = findCheckBox("Top View (Unchecked Side View)")
-        Static frustrumCheck = findCheckBox("Show Frustrum")
-        Static noHistoryCheck = findCheckBox("Turn off history")
         Static redSlider = findSlider("Threshold for Red channel")
 
         redThreshold = redSlider.value
@@ -3918,9 +3909,6 @@ Public Class Options_HeatMap : Inherits VB_Algorithm
         topView = topCheck.checked
         sideView = Not topView
         If sideView Then viewName = "horizontal"
-
-        showFrustrum = frustrumCheck.checked
-        showHistory = Not noHistoryCheck.checked
     End Sub
 End Class
 
@@ -4064,5 +4052,258 @@ Public Class Options_MSER : Inherits VB_Algorithm
         Static grayCheck = findCheckBox("Use grayscale input")
         pass2Setting = pass2Check.checked
         graySetting = grayCheck.checked
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Spectrum : Inherits VB_Algorithm
+    Public gapDepth As Integer
+    Public gapGray As Integer
+    Public sampleThreshold As Integer
+    Public redC As New RedCloud_Basics
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Gap in depth spectrum (cm's)", 1, 50, 1)
+            sliders.setupTrackBar("Gap in gray spectrum", 1, 50, 1)
+            sliders.setupTrackBar("Sample count threshold", 1, 50, 10)
+        End If
+    End Sub
+    Public Function runRedCloud(ByRef label As String) As cv.Mat
+        redC.Run(task.color)
+        label = redC.labels(2)
+        Return redC.dst2
+    End Function
+    Public Function buildDepthRanges(input As cv.Mat, typeSpec As String)
+        Dim ranges As New List(Of rangeData)
+        Dim sorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger) ' the spectrum of the values 
+        Dim pixels As New List(Of Integer)
+        Dim counts As New List(Of Integer)
+
+        Dim rc = task.rcSelect
+        Dim mask = rc.mask.Clone
+        mask.SetTo(0, task.noDepthMask(rc.rect))
+        For y = 0 To input.Height - 1
+            For x = 0 To input.Width - 1
+                If mask.Get(Of Byte)(y, x) > 0 Then
+                    Dim val = input.Get(Of Single)(y, x)
+                    If val > 0 And val < 100 Then
+                        Dim nextVal = CInt(val * 100) ' * 100 to convert to integer and cm's
+                        Dim index = pixels.IndexOf(nextVal)
+                        If index >= 0 Then
+                            counts(index) += 1
+                        Else
+                            pixels.Add(nextVal)
+                            counts.Add(1)
+                        End If
+                    End If
+                End If
+            Next
+        Next
+
+        Dim totalCount As Integer
+        For i = 0 To pixels.Count - 1
+            sorted.Add(pixels(i), counts(i))
+            totalCount += counts(i)
+        Next
+
+        strOut = "For the selected " + typeSpec + " cell:" + vbCrLf
+
+        If sorted.Count = 0 Then
+            strOut = "There is no depth data for that cell."
+            Return ranges
+        End If
+
+        Dim rStart As Integer = sorted.ElementAt(0).Key
+        Dim rEnd As Integer = rStart
+        Dim count As Integer = sorted.ElementAt(0).Value
+        Dim trimCount As Integer
+        For i = 0 To sorted.Count - 2
+            If sorted.ElementAt(i + 1).Key - sorted.ElementAt(i).Key > gapDepth Then
+                rEnd = sorted.ElementAt(i).Key
+                If count > sampleThreshold Then
+                    ranges.Add(New rangeData(rc.index, rStart, rEnd, count))
+                    strOut += "From " + Format(rStart / 100, fmt2) + "m to " + Format(rEnd / 100, fmt2) + "m = " + CStr(count) + " samples" + vbCrLf
+                Else
+                    trimCount += count
+                End If
+                rStart = sorted.ElementAt(i + 1).Key
+                count = sorted.ElementAt(i + 1).Value
+            Else
+                count += sorted.ElementAt(i + 1).Value
+            End If
+        Next
+
+        If count > sampleThreshold Then
+            If rEnd <> sorted.ElementAt(sorted.Count - 1).Key Then
+                If count > sampleThreshold Then
+                    rEnd = sorted.ElementAt(sorted.Count - 1).Key
+                    ranges.Add(New rangeData(rc.index, rStart, rEnd, count))
+                    strOut += "From " + Format(rStart / 100, fmt2) + "m to " + Format(rEnd / 100, fmt2) + "m = " + CStr(count) + " samples" + vbCrLf
+                End If
+            End If
+        End If
+
+        strOut += CStr(ranges.Count) + " " + typeSpec
+        If ranges.Count > 1 Then strOut += " ranges were " Else strOut += " range was "
+        strOut += " found while " + CStr(trimCount) + " pixels were tossed as they were in clusters with size < " + CStr(sampleThreshold) + vbCrLf
+        Return ranges
+    End Function
+    Public Function buildColorRanges(input As cv.Mat, typespec As String)
+        Dim ranges As New List(Of rangeData)
+        Dim sorted As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger) ' the spectrum of the values 
+        Dim pixels As New List(Of Integer)
+        Dim counts As New List(Of Integer)
+
+        Dim rc = task.rcSelect
+        For y = 0 To input.Height - 1
+            For x = 0 To input.Width - 1
+                If rc.mask.Get(Of Byte)(y, x) > 0 Then
+                    Dim val = input.Get(Of Byte)(y, x)
+                    If val <> 0 Then
+                        Dim index = pixels.IndexOf(val)
+                        If index >= 0 Then
+                            counts(index) += 1
+                        Else
+                            pixels.Add(val)
+                            counts.Add(1)
+                        End If
+                    End If
+                End If
+            Next
+        Next
+
+        If pixels.Count = 0 Then
+            strOut = typespec + " data is missing."
+            Return ranges
+        End If
+
+        Dim totalCount As Integer
+        For i = 0 To pixels.Count - 1
+            sorted.Add(pixels(i), counts(i))
+            totalCount += counts(i)
+        Next
+
+        strOut = "For the selected " + typespec + " cell:" + vbCrLf
+
+        Dim rStart As Integer = sorted.ElementAt(0).Key
+        Dim rEnd As Integer = rStart
+        Dim count As Integer = sorted.ElementAt(0).Value
+        Dim trimCount As Integer
+        For i = 0 To sorted.Count - 2
+            If sorted.ElementAt(i + 1).Key - sorted.ElementAt(i).Key > gapGray Then
+                rEnd = sorted.ElementAt(i).Key
+                If count > sampleThreshold Then
+                    ranges.Add(New rangeData(rc.index, rStart, rEnd, count))
+                    strOut += "From " + CStr(rStart) + " to " + CStr(rEnd) + " = " + CStr(count) + " samples" + vbCrLf
+                Else
+                    trimCount += count
+                End If
+                rStart = sorted.ElementAt(i + 1).Key
+                count = sorted.ElementAt(i + 1).Value
+            Else
+                count += sorted.ElementAt(i + 1).Value
+            End If
+        Next
+
+        If count > sampleThreshold Then
+            If rEnd <> sorted.ElementAt(sorted.Count - 1).Key Then
+                If count > sampleThreshold Then
+                    rEnd = sorted.ElementAt(sorted.Count - 1).Key
+                    ranges.Add(New rangeData(rc.index, rStart, rEnd, count))
+                    strOut += "From " + CStr(rStart) + " to " + CStr(rEnd) + " = " + CStr(count) + " samples" + vbCrLf
+                End If
+            End If
+        End If
+
+        strOut += CStr(ranges.Count) + typespec + " cells:" + vbCrLf
+        If ranges.Count > 1 Then strOut += " ranges were " Else strOut += " range was "
+        strOut += " found while " + CStr(trimCount) + " pixels were tossed as they were in clusters with size < " + CStr(sampleThreshold) + vbCrLf
+        Return ranges
+    End Function
+    Public Sub RunVB()
+        Static frmSliders = findfrm("Options_Spectrum Sliders")
+        Static gapDSlider = findSlider("Gap in depth spectrum (cm's)")
+        Static gapGSlider = findSlider("Gap in gray spectrum")
+        Static countSlider = findSlider("Sample count threshold")
+        gapDepth = gapDSlider.value
+        gapGray = gapGSlider.value
+        sampleThreshold = countSlider.value
+
+        If firstPass Then
+            frmSliders.Left = gOptions.Width / 2
+            frmSliders.top = gOptions.Height / 2
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_HistXD : Inherits VB_Algorithm
+    Public sideThreshold As Integer
+    Public topThreshold As Integer
+    Public threshold3D As Integer
+    Public selectedBin As Integer
+    Public rangesBGR() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 256), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
+    Public rangesHSV() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Min side bin samples", 0, 100, 5) ' for 2D histograms
+            sliders.setupTrackBar("Min top bin samples", 0, 100, 15) ' for 2D histograms
+            sliders.setupTrackBar("Min samples per bin", 0, 500, 40) ' for 3D histograms
+            sliders.setupTrackBar("Selected bin", 0, 4096, 0) ' select a bin for backprojection in a 3D histograms
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static topSlider = findSlider("Min top bin samples")
+        Static sideSlider = findSlider("Min side bin samples")
+        Static bothSlider = findSlider("Min samples per bin")
+        Static bins3DSlider = findSlider("3D Histogram Bins")
+        Static selectSlider = findSlider("Selected bin")
+        topThreshold = topSlider.value
+        sideThreshold = sideSlider.value
+        threshold3D = bothSlider.value
+        selectedBin = selectSlider.value
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Options_Complexity : Inherits VB_Algorithm
+    Public filename As FileInfo
+    Public filenames() As String
+    Public Sub New()
+        filenames = Directory.GetFiles(task.homeDir + "Complexity")
+        Dim latestFile = Directory.GetFiles(task.homeDir + "Complexity").OrderByDescending(
+                     Function(f) New FileInfo(f).LastWriteTime).First()
+        If findfrm(traceName + " Radio Options") Is Nothing Then
+            radio.Setup(traceName)
+
+            Dim saveIndex As Integer
+            For i = 0 To filenames.Count - 1
+                Dim filename = New FileInfo(filenames(i))
+                If filename.FullName = latestFile Then saveIndex = i
+                radio.addRadio(filename.Name)
+            Next
+            radio.check(saveIndex).Checked = True
+        End If
+    End Sub
+    Public Sub RunVB()
+        Static frm = findfrm(traceName + " Radio Buttons")
+        For Each chk In frm.check
+            If chk.checked Then
+                filename = New FileInfo(task.homeDir + "Complexity/" + chk.text)
+                Exit For
+            End If
+        Next
     End Sub
 End Class

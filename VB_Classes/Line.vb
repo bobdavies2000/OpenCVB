@@ -1260,7 +1260,7 @@ Public Class Line_ColorClass : Inherits VB_Algorithm
         colorClass.Run(src)
         dst1 = colorClass.dst2
 
-        lines.Run(dst1)
+        lines.Run(dst1 * 255 / colorClass.classCount)
         dst2 = lines.dst2
         dst3 = lines.dst3
 

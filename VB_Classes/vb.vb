@@ -156,6 +156,10 @@ Module VB
             Marshal.Copy(tmp.Data, samples, 0, samples.Length)
         End If
     End Sub
+    Public Function randomCellColor() As cv.Vec3b
+        Static msRNG As New System.Random
+        Return New cv.Vec3b(msRNG.Next(50, 240), msRNG.Next(50, 240), msRNG.Next(50, 240)) ' trying to avoid extreme colors... 
+    End Function
     Public Function gMatrixToStr(gMatrix As cv.Mat) As String
         Dim outStr = "Gravity transform matrix - identity matrix if gravity transform is off." + vbCrLf
         For i = 0 To gMatrix.Rows - 1
@@ -192,23 +196,20 @@ Module VB
         dst.Circle(pt, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
         dst.Circle(pt, task.dotSize, cv.Scalar.Black, -1, task.lineType)
     End Sub
-    Public Function showSelection(dstFill As cv.Mat) As rcData
-        If task.redCells.Count <= 1 Then Return New rcData
-        Dim index = task.cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-
-        Dim rc = task.redCells(index)
-        If rc.index > 0 And rc.rect.Contains(task.clickPoint) Then
-            task.color.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-            vbDrawContour(task.color(rc.rect), rc.contour, cv.Scalar.White, 1)
-
-            task.depthRGB.Rectangle(rc.rect, cv.Scalar.Yellow, task.lineWidth)
-            vbDrawContour(task.depthRGB(rc.rect), rc.contour, cv.Scalar.White, 1)
-
-            vbDrawContour(dstFill(rc.rect), rc.contour, cv.Scalar.White, -1)
-            dstFill.Circle(rc.maxDist, task.dotSize, cv.Scalar.Black, -1, task.lineType)
+    Public Sub showSelection(ByRef redCells As List(Of rcData), ByRef cellMap As cv.Mat)
+        task.rcSelect = New rcData
+        If task.clickPoint = New cv.Point(0, 0) Then
+            If redCells.Count > 2 Then
+                task.clickPoint = redCells(1).maxDist
+                task.rcSelect = redCells(1)
+            Else
+                Exit Sub
+            End If
+        Else
+            Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+            task.rcSelect = redCells(index)
         End If
-        Return rc
-    End Function
+    End Sub
     Public Function contourBuild(mask As cv.Mat, approxMode As cv.ContourApproximationModes) As List(Of cv.Point)
         Dim allContours As cv.Point()()
         cv.Cv2.FindContours(mask, allContours, Nothing, cv.RetrievalModes.External, approxMode)
@@ -224,55 +225,12 @@ Module VB
         If allContours.Count > 0 Then Return New List(Of cv.Point)(allContours(maxIndex).ToList)
         Return New List(Of cv.Point)
     End Function
-    Public Function distanceVec5f(v1 As vec5f, v2 As vec5f) As Single
-        Return Math.Sqrt((v1.f1 - v2.f1) * (v1.f1 - v2.f1) +
-                         (v1.f2 - v2.f2) * (v1.f2 - v2.f2) +
-                         (v1.f3 - v2.f3) * (v1.f3 - v2.f3) +
-                         (v1.f4 - v2.f4) * (v1.f4 - v2.f4) +
-                         (v1.f5 - v2.f5) * (v1.f5 - v2.f5))
-    End Function
-    Public Function distanceVec8f(v1 As vec8f, v2 As vec8f) As Single
-        Return Math.Sqrt((v1.f1 - v2.f1) * (v1.f1 - v2.f1) +
-                         (v1.f2 - v2.f2) * (v1.f2 - v2.f2) +
-                         (v1.f3 - v2.f3) * (v1.f3 - v2.f3) +
-                         (v1.f4 - v2.f4) * (v1.f4 - v2.f4) +
-                         (v1.f5 - v2.f5) * (v1.f5 - v2.f5) +
-                         (v1.f6 - v2.f6) * (v1.f6 - v2.f6) +
-                         (v1.f7 - v2.f7) * (v1.f7 - v2.f7) +
-                         (v1.f8 - v2.f8) * (v1.f8 - v2.f8))
-    End Function
-    Public Function findClosest5(redCells As List(Of rcData), rc As rcData, minPixels As Integer) As rcData
-        Dim v1 = New vec5f(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2), rc.maxDist.X, rc.maxDist.Y)
-        Dim distances As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
-        Dim gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-        Dim gridlist = task.gridNeighbors.ElementAt(gridID)
-        For Each rc In redCells
-            If rc.pixels < minPixels Then Continue For
-            If gridlist.Contains(gridID) Then
-                Dim v2 = New vec5f(rc.colorMean(0), rc.colorMean(1), rc.colorMean(2), rc.maxDist.X, rc.maxDist.Y)
-                distances.Add(distanceVec5f(v1, v2), rc.index)
-            End If
+    Public Function distanceN(vec1 As List(Of Single), vec2 As List(Of Single)) As Double
+        Dim accum As Double
+        For i = 0 To vec1.Count - 1
+            accum += (vec1(i) - vec2(i)) * (vec1(i) - vec2(i))
         Next
-        If distances.Count = 0 Then Return New rcData
-        Return redCells(distances.ElementAt(0).Value)
-    End Function
-    Public Function findClosest8(lastCells As List(Of rcData), rc As rcData, minPixels As Integer) As rcData
-        Dim v1 = New vec8f(rc.depthMean.X, rc.depthMean.Y, rc.depthMean.Z,
-                           rc.rect.X, rc.rect.Y, rc.pixels, rc.minVec.Z, rc.maxVec.Z)
-        Dim distances As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
-        Dim gridID = task.gridToRoiIndex.Get(Of Integer)(rc.maxDist.Y, rc.maxDist.X)
-        Dim gridlist = task.gridNeighbors.ElementAt(gridID)
-        For Each lrc In lastCells
-            Dim lastGridID = task.gridToRoiIndex.Get(Of Integer)(lrc.maxDist.Y, lrc.maxDist.X)
-            If lrc.pixels < minPixels Then Continue For
-            If gridlist.Contains(lastGridID) Then
-                Dim v2 = New vec8f(lrc.depthMean.X, lrc.depthMean.Y, lrc.depthMean.Z,
-                                   lrc.rect.X, lrc.rect.Y, lrc.pixels, lrc.minVec.Z, lrc.maxVec.Z)
-                distances.Add(distanceVec8f(v1, v2), lrc.index)
-            End If
-        Next
-        If distances.Count = 0 Then Return New rcData
-        Return lastCells(distances.ElementAt(0).Value)
+        Return accum
     End Function
     Public Sub vbDrawContour(ByRef dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -10)
         If lineWidth = -10 Then lineWidth = task.lineWidth ' VB.Net only allows constants for optional parameter.
@@ -282,9 +240,25 @@ Module VB
         cv.Cv2.DrawContours(dst, listOfPoints, -1, color, lineWidth, task.lineType)
     End Sub
     Public Function heartBeat() As Boolean
-        If task.heartBeat Or task.SyncOutput Or task.optionsChanged Then Return True
+        If task.heartBeat Or task.SyncOutput Or task.optionsChanged Or task.mouseClickFlag Then Return True
         Return False
     End Function
+    Public Sub quarterBeat()
+        Static quarter(4) As Boolean
+        task.quarterBeat = False
+        task.midHeartBeat = False
+        task.heartBeat = False
+        Dim ms = (task.msWatch - task.msLast) / 1000
+        For i = 0 To quarter.Count - 1
+            If quarter(i) = False And ms > Choose(i + 1, 0.25, 0.5, 0.75, 1.0) Then
+                task.quarterBeat = True
+                If i = 1 Then task.midHeartBeat = True
+                If i = 3 Then task.heartBeat = True
+                quarter(i) = True
+            End If
+        Next
+        If task.heartBeat Then ReDim quarter(4)
+    End Sub
     Public Function vec3fAdd(v1 As cv.Vec3f, v2 As cv.Vec3f) As cv.Vec3f
         Return New cv.Vec3f(v1(0) + v2(0), v1(1) + v2(1), v1(2) + v2(2))
     End Function
@@ -318,41 +292,30 @@ Module VB
     Public Function convertVec3bToScalar(vec As cv.Vec3b) As cv.Scalar
         Return New cv.Scalar(vec(0), vec(1), vec(2))
     End Function
-    Public Function vbGetMaxDist(mask As cv.Mat, rect As cv.Rect) As cv.Point
-        Dim minVal As Double, maxVal As Double, minDistanceLoc As cv.Point, maxDistanceLoc As cv.Point
-        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
-        distance32f.MinMaxLoc(minVal, maxVal, minDistanceLoc, maxDistanceLoc)
-
-        maxDistanceLoc.X += rect.X
-        maxDistanceLoc.Y += rect.Y
-
-        Return maxDistanceLoc
-    End Function
     Public Function vbGetMaxDist(ByRef rp As rcPrep) As cv.Point
-        Dim minVal As Double, maxVal As Double, minDistanceLoc As cv.Point, maxDistanceLoc As cv.Point
-
         Dim mask = rp.mask.Clone
-        mask.Rectangle(New cv.Rect(0, 0, mask.Width - 1, mask.Height - 1), 0, 1)
+        mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
         Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
-        distance32f.MinMaxLoc(minVal, maxVal, minDistanceLoc, maxDistanceLoc)
+        Dim mm = vbMinMax(distance32f)
+        mm.maxLoc.X += rp.rect.X
+        mm.maxLoc.Y += rp.rect.Y
 
-        maxDistanceLoc.X += rp.rect.X
-        maxDistanceLoc.Y += rp.rect.Y
-
-        Return maxDistanceLoc
+        Return mm.maxLoc
     End Function
     Public Function vbGetMaxDist(ByRef rc As rcData) As cv.Point
-        Dim minVal As Double, maxVal As Double, minDistanceLoc As cv.Point, maxDistanceLoc As cv.Point
-
         Dim mask = rc.mask.Clone
-        mask.Rectangle(New cv.Rect(0, 0, mask.Width - 1, mask.Height - 1), 0, 1)
+        mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
         Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
-        distance32f.MinMaxLoc(minVal, maxVal, minDistanceLoc, maxDistanceLoc)
+        Dim mm = vbMinMax(distance32f)
+        mm.maxLoc.X += rc.rect.X
+        mm.maxLoc.Y += rc.rect.Y
 
-        maxDistanceLoc.X += rc.rect.X
-        maxDistanceLoc.Y += rc.rect.Y
-
-        Return maxDistanceLoc
+        Return mm.maxLoc
+    End Function
+    Public Function vbGetMaxDist(mask As cv.Mat) As cv.Point
+        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
+        Dim mm = vbMinMax(distance32f)
+        Return mm.maxLoc
     End Function
     Public Function vbContourToRect(contour As List(Of cv.Point)) As cv.Rect
         Dim minX As Integer = Integer.MaxValue, minY As Integer = Integer.MaxValue, maxX As Integer, maxY As Integer
@@ -397,11 +360,6 @@ Module VB
             End If
         Next
         Return New cv.Point(maxCol, maxRow)
-    End Function
-    Public Function vbGetMaxDist(mask As cv.Mat) As cv.Point
-        Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
-        Dim mm = vbMinMax(distance32f)
-        Return mm.maxLoc
     End Function
     Public Function vbHullCenter(hull As List(Of cv.Point)) As cv.Point
         Dim ptX As New List(Of Integer), ptY As New List(Of Integer)
@@ -800,10 +758,13 @@ End Class
 Public Class rcPrep
     Public rect As cv.Rect
     Public mask As cv.Mat
-    Public pixels As Integer
     Public floodPoint As cv.Point
     Public index As Integer
+    Public pixels As Integer
     Public maxDist As cv.Point
+    Public gray As Integer
+    Public frameCount As Integer
+    Public color As cv.Vec3b
     Public Sub New()
     End Sub
 End Class
@@ -819,12 +780,20 @@ Public Class rcData
     Public rect As cv.Rect
     Public motionRect As cv.Rect ' the union of the previous rect with the current rect.
     Public mask As cv.Mat
+    Public depthMask As cv.Mat
+
     Public pixels As Integer
     Public depthPixels As Integer
+
     Public color As New cv.Vec3b
+    Public colorMean As New cv.Scalar
+    Public colorStdev As New cv.Scalar
+    Public colorDistance As Integer
+    Public grayMean As Integer
 
     Public depthMean As cv.Point3f
     Public depthStdev As cv.Point3f
+    Public depthDistance As Single
 
     Public minVec As cv.Point3f
     Public maxVec As cv.Point3f
@@ -834,24 +803,42 @@ Public Class rcData
 
     Public index As Integer
     Public indexLast As Integer
-
-    Public neighbors As New List(Of Byte)
+    Public matchCount As Integer
 
     Public contour As New List(Of cv.Point)
     Public corners As New List(Of cv.Point)
     Public contour3D As New List(Of cv.Point3f)
     Public hull As New List(Of cv.Point)
 
-    Public colorMean As cv.Scalar
-    Public colorStdev As cv.Scalar
-
     Public motionDetected As Boolean
+
+    Public floodPoint As cv.Point
+    Public depthCell As Boolean ' true if no depth.
 
     Public eq As cv.Vec4f ' plane equation
     Public pcaVec As cv.Vec3f
+    Public specG As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted) ' the spectrum of grayscale bytes 
+    Public specD As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted) ' the spectrum of the depth values (cm accuracy) 
     Public Sub New()
         index = 0
         mask = New cv.Mat(1, 1, cv.MatType.CV_8U)
         rect = New cv.Rect(0, 0, 1, 1)
+        depthCell = True
+    End Sub
+End Class
+
+
+
+
+Public Class rangeData
+    Public index As Integer
+    Public pixels As Integer
+    Public start As Integer
+    Public ending As Integer
+    Public Sub New(_index As Integer, _start As Integer, _ending As Integer, _pixels As Integer)
+        index = _index
+        pixels = _pixels
+        start = _start
+        ending = _ending
     End Sub
 End Class

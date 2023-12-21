@@ -33,7 +33,7 @@ Module vbUtilities
                                   ByVal cx As Integer, ByVal cy As Integer, ByVal uFlags As UInteger) As Boolean
     End Function
 
-    Public gOptions As New OptionsAllAlgorithm
+    Public gOptions As New OptionsGlobal
     Public redOptions As New OptionsRedCloud
     Public task As VBtask
 
@@ -60,25 +60,21 @@ Module vbUtilities
     Public pythonPipeIndex As Integer ' increment this for each algorithm to avoid any conflicts with other Python apps.
     Public Sub updateSettings()
         task.fpsRate = If(task.frameCount < 30, 30, task.fpsRate)
-        Static saveLastTime As DateTime = Now
-        Dim span As System.TimeSpan = DateTime.Now.TimeOfDay - saveLastTime.TimeOfDay
-        If span.Seconds >= gOptions.heartBeatSeconds Then
-            saveLastTime = Now
-            task.heartBeat = True
-            task.toggleEverySecond = Not task.toggleEverySecond
+        If task.myStopWatch Is Nothing Then task.myStopWatch = Stopwatch.StartNew()
+
+        ' update the time measures
+        task.msWatch = task.myStopWatch.ElapsedMilliseconds
+        quarterBeat()
+        Dim frameDuration = 1000 / task.fpsRate
+        task.almostHeartBeat = If(task.msWatch - task.msLast + frameDuration * 1.5 > 1000, True, False)
+
+        If (task.msWatch - task.msLast) > 1000 Then
+            task.msLast = task.msWatch
+            task.toggleOn = Not task.toggleOn
             task.toggleFrame = task.frameCount - 1
-        Else
-            task.heartBeat = False
         End If
 
-        task.midHeartBeat = (task.frameCount Mod task.fpsRate - CInt(task.fpsRate / 2)) = 0
-
-        Static lastFPSrate As Integer = task.fpsRate
-        task.almostHeartBeat = If(lastFPSrate - (task.frameCount Mod task.fpsRate) <= 1, True, False)
-        lastFPSrate = task.fpsRate
-
         If task.paused Then
-            task.heartBeat = False ' messages often depend on the heartbeat and if paused, simply run with the existing configuration.
             task.midHeartBeat = False
             task.almostHeartBeat = False
         End If
@@ -90,7 +86,6 @@ Module vbUtilities
 
         task.maxZmeters = gOptions.MaxDepth.Value
         task.SyncOutput = gOptions.SyncOutput.Checked
-        task.minPixels = gOptions.minPixelsSlider.Value
     End Sub
     Public Function GetWindowImage(ByVal WindowHandle As IntPtr, ByVal rect As cv.Rect) As Bitmap
         Dim b As New Bitmap(rect.Width, rect.Height, Imaging.PixelFormat.Format24bppRgb)

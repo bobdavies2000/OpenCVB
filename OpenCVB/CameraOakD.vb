@@ -111,9 +111,9 @@ Public Class CameraOakD : Inherits Camera
                 tmp = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, OakDRightImage(cPtr))
                 mbuf(mbIndex).rightView = tmp.Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             Else
-                mbuf(mbIndex).color = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8UC3, OakDColor(cPtr)).Clone
-                mbuf(mbIndex).leftView = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, OakDLeftImage(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
-                mbuf(mbIndex).rightView = New cv.Mat(captureRes.Height, captureRes.Width, cv.MatType.CV_8U, OakDRightImage(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                mbuf(mbIndex).color = New cv.Mat(workingRes.Height, workingRes.Width, cv.MatType.CV_8UC3, OakDColor(cPtr)).Clone
+                mbuf(mbIndex).leftView = New cv.Mat(workingRes.Height, workingRes.Width, cv.MatType.CV_8U, OakDLeftImage(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+                mbuf(mbIndex).rightView = New cv.Mat(workingRes.Height, workingRes.Width, cv.MatType.CV_8U, OakDRightImage(cPtr)).CvtColor(cv.ColorConversionCodes.GRAY2BGR)
             End If
             ' the Oak-D cameras do not produce a point cloud - update if that changes.
             Dim d32f As cv.Mat = depth32f * 0.001
@@ -125,9 +125,12 @@ Public Class CameraOakD : Inherits Camera
             cv.Cv2.Multiply(templateY, d32f, worldY)
             worldY *= 1 / cameraInfo.fy
 
-            cv.Cv2.Merge({worldX, worldY, d32f}, mbuf(mbIndex).pointCloud)
-            If workingRes <> captureRes Then
-                mbuf(mbIndex).pointCloud = mbuf(mbIndex).pointCloud.Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
+            Dim pc As New cv.Mat
+            cv.Cv2.Merge({worldX, worldY, d32f}, pc)
+            If workingRes = captureRes Then
+                mbuf(mbIndex).pointCloud = pc.Clone
+            Else
+                mbuf(mbIndex).pointCloud = pc.Resize(workingRes, 0, 0, cv.InterpolationFlags.Nearest)
             End If
         End SyncLock
         MyBase.GetNextFrameCounts(IMU_FrameTime)

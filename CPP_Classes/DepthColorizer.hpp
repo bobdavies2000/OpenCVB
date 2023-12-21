@@ -9,9 +9,8 @@ private:
 public:
 	Mat depth32f, output;
 	int histSize = 255;
-	float maxDepth = 6.0f;
 	Depth_Colorizer() {}
-	void Run()
+	void Run(float maxDepth)
 	{
 		float nearColor[3] = { 0, 1.0f, 1.0f };
 		float farColor[3] = { 1.0f, 0, 0 };

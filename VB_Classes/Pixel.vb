@@ -111,7 +111,7 @@ Public Class Pixel_Viewer : Inherits VB_Algorithm
                 For y = 0 To img.Height - 1
                     imgText += "r" + Format(dw.Y + y, "000") + "   "
                     For x = 0 To img.Width - 1
-                        If (task.toggleEverySecond And y = clickPoint.Y) And (x = clickPoint.X - 1 Or x = clickPoint.X) Then
+                        If (task.toggleOn And y = clickPoint.Y) And (x = clickPoint.X - 1 Or x = clickPoint.X) Then
                             imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "***", "*")
                         Else
                             imgText += Format(img.Get(Of Byte)(y, x), "000") + If((dw.X + x) Mod 5 = 4, "   ", " ")
@@ -400,15 +400,13 @@ End Class
 
 
 Public Class Pixel_Unstable : Inherits VB_Algorithm
-    Dim km As New KMeans_BasicsFast
+    Dim km As New KMeans_Basics
     Public unstablePixels As New cv.Mat
     Public Sub New()
-        If sliders.Setup(traceName) Then sliders.setupTrackBar("KMeans clustered difference threshold", 1, 50, 5)
         labels(2) = "KMeans_Basics output"
         desc = "Detect where pixels are unstable"
     End Sub
     Public Sub RunVB(src as cv.Mat)
-        Static diffSlider = findSlider("KMeans clustered difference threshold")
         Static kSlider = findSlider("KMeans k")
         Static pixelCounts As New List(Of Integer)
         Static k As Integer = -1
@@ -420,15 +418,11 @@ Public Class Pixel_Unstable : Inherits VB_Algorithm
         End If
 
         km.Run(src)
-        If km.dst2.Channels <> 1 Then
-            dst2 = km.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        Else
-            dst2 = km.dst2
-        End If
+        dst2 = km.dst2
         dst2.ConvertTo(dst2, cv.MatType.CV_32F)
         Static lastImage As cv.Mat = dst2
         cv.Cv2.Subtract(dst2, lastImage, dst3)
-        dst3 = dst3.Threshold(diffSlider.Value, 255, cv.ThresholdTypes.Binary)
+        dst3 = dst3.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
 
         unstable.Add(dst3)
         If unstable.Count > task.historyCount Then unstable.RemoveAt(0)

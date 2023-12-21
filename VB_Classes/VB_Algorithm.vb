@@ -119,9 +119,7 @@ Public Class VB_Algorithm : Implements IDisposable
     End Sub
     Public Sub Run(src As cv.Mat)
         If task.testAllRunning = False Then measureStartRun(traceName)
-        If src IsNot Nothing And standalone Then
-            If src.Width <> task.workingRes.Width Or src.Height <> task.workingRes.Height Then src = src.Resize(task.workingRes)
-        End If
+
         trueData.Clear()
         algorithm.RunVB(src)
         firstPass = False
@@ -282,15 +280,16 @@ Public Class VB_Algorithm : Implements IDisposable
     End Sub
     Public Sub NextFrame(src As cv.Mat)
         If task.drawRect.Width <> 0 Then task.drawRect = validateRect(task.drawRect)
+        task.pcSplit(2).SetTo(task.maxZmeters, task.maxDepthMask)
         algorithm.Run(src)
 
         task.labels = labels
 
-        ' make sure that any outputs from the algorithm are the right size.
-        If dst0.Size <> task.workingRes And dst0.Width > 0 Then dst0 = dst0.Resize(task.workingRes)
-        If dst1.Size <> task.workingRes And dst1.Width > 0 Then dst1 = dst1.Resize(task.workingRes)
-        If dst2.Size <> task.workingRes And dst2.Width > 0 Then dst2 = dst2.Resize(task.workingRes)
-        If dst3.Size <> task.workingRes And dst3.Width > 0 Then dst3 = dst3.Resize(task.workingRes)
+        ' make sure that any outputs from the algorithm are the right size.nearest
+        If dst0.Size <> task.workingRes And dst0.Width > 0 Then dst0 = dst0.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
+        If dst1.Size <> task.workingRes And dst1.Width > 0 Then dst1 = dst1.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
+        If dst2.Size <> task.workingRes And dst2.Width > 0 Then dst2 = dst2.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
+        If dst3.Size <> task.workingRes And dst3.Width > 0 Then dst3 = dst3.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
 
         If task.pixelViewerOn Then
             If task.intermediateObject IsNot Nothing Then
@@ -331,10 +330,10 @@ Public Class VB_Algorithm : Implements IDisposable
         If task.dst2.Width = task.workingRes.Width And task.dst2.Height = task.workingRes.Height Then
             If gOptions.ShowGrid.Checked Then task.dst2.SetTo(cv.Scalar.White, task.gridMask)
             If task.dst2.Width <> task.workingRes.Width Or task.dst2.Height <> task.workingRes.Height Then
-                task.dst2 = task.dst2.Resize(task.workingRes)
+                task.dst2 = task.dst2.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
             End If
             If task.dst3.Width <> task.workingRes.Width Or task.dst3.Height <> task.workingRes.Height Then
-                task.dst3 = task.dst3.Resize(task.workingRes)
+                task.dst3 = task.dst3.Resize(task.workingRes, cv.InterpolationFlags.Nearest)
             End If
             task.frameCount += 1
         End If

@@ -35,10 +35,11 @@ public:
             sizeSorted.insert(make_pair(regions[i].size(), i));
         }
 
-        int index = 0;
+        int index = 1;
         maskCounts.clear();
         containers.clear();
         floodPoints.clear();
+        dst.setTo(255);
         for (auto it = sizeSorted.begin(); it != sizeSorted.end(); it++)
         {
             Rect box = boxes[it->second];
@@ -47,7 +48,7 @@ public:
             if (val == 255)
             {
                 floodPoints.push_back(regions[it->second][0]);
-                maskCounts.push_back(regions[it->second].size());
+                maskCounts.push_back((int)regions[it->second].size());
                 for (Point pt : regions[it->second])
                 {
                     dst.at<uchar>(pt.y, pt.x) = index;
@@ -96,7 +97,6 @@ int *MSER_RunCPP(MSER_Interface *cPtr, int *dataPtr, int rows, int cols, int cha
 {
 		cPtr->src = Mat(rows, cols, (channels == 3) ? CV_8UC3 : CV_8UC1, dataPtr);
         cPtr->dst = Mat(rows, cols, CV_8UC1);
-        cPtr->dst.setTo(255);
 		cPtr->RunCPP();
 		return (int *) cPtr->dst.data; 
 }

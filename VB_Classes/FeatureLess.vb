@@ -1,21 +1,13 @@
 Imports cv = OpenCvSharp
-Imports System.Runtime.InteropServices
-Imports OpenCvSharp.Flann
-
 Public Class FeatureLess_Basics : Inherits VB_Algorithm
     Dim edgeD As New EdgeDraw_Basics
-    Dim edges As New Edge_Canny
     Public Sub New()
         labels = {"", "", "EdgeDraw_Basics output", ""}
-        desc = "Access the EdgeDraw_Basics algorithm directly rather than through to CPP_Basics interface - more efficient"
+        desc = "Access the EdgeDraw_Basics algorithm directly rather than through the CPP_Basics interface - more efficient"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        edges.Run(src)
-        dst1 = edges.dst2
-
         edgeD.Run(src)
         dst2 = edgeD.dst2
-        dst0 = edgeD.dst2
         If standalone Or testIntermediate(traceName) Then
             dst3 = src.Clone
             dst3.SetTo(cv.Scalar.Yellow, dst2)
@@ -326,7 +318,7 @@ Public Class FeatureLess_Density : Inherits VB_Algorithm
         dst2 = flood.dst2
 
         labels(2) = CStr(flood.pointList.Count) + " points found " + CStr(flood.redCells.Count) + " regions > " +
-                    CStr(task.minPixels) + " pixels"
+                    CStr(gOptions.minPixelsSlider.Value) + " pixels"
     End Sub
 End Class
 
@@ -413,18 +405,18 @@ End Class
 
 
 
-Public Class FeatureLess_RedCell : Inherits VB_Algorithm
-    Dim fCell As New RedColor_Basics
+Public Class FeatureLess_RedCloud : Inherits VB_Algorithm
+    Public colorC As New RedColor_Basics
     Dim fless As New FeatureLess_Basics
     Public Sub New()
         desc = "Floodfill the FeatureLess output so each cell can be tracked."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         fless.Run(src)
-        fCell.Run(fless.dst2)
+        colorC.Run(fless.dst2)
 
-        dst2 = fCell.dst2
-        dst3 = fCell.dst3
-        labels(2) = fCell.labels(2)
+        dst2 = colorC.dst2
+        dst3 = colorC.dst3
+        labels(2) = colorC.labels(2)
     End Sub
 End Class

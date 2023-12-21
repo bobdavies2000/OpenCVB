@@ -1,63 +1,67 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class Neighbor_Basics : Inherits VB_Algorithm
-    Public cellCount As Integer
-    Public nabList() As List(Of Byte)
+    Public nabList As New List(Of List(Of Byte))
+    Dim stats As New Cell_Basics
+    Public redCells As List(Of rcData)
     Public Sub New()
-        desc = "Find neighbors for each cell"
+        cPtr = Neighbor_Map_Open()
+        If standalone Then gOptions.displayDst1.Checked = True
+        desc = "Find all the neighbors in a RedCloud cellmap"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Then
             Static redC As New RedCloud_Basics
-            redC.Run(task.color)
+            redC.Run(src)
             dst2 = redC.dst2
-            src = task.cellMap
-            cellCount = task.redCells.Count
+            labels(2) = redC.labels(2)
+
+            src = redC.cellMap
+            redCells = redC.redCells
         End If
 
-        Dim samples(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, samples, 0, samples.Length)
+        Dim mapData(src.Total - 1) As Byte
+        Marshal.Copy(src.Data, mapData, 0, mapData.Length - 1)
+        Dim handleSrc = GCHandle.Alloc(mapData, GCHandleType.Pinned)
+        Dim nabCount = Neighbor_Map_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
+        handleSrc.Free()
 
-        Dim w = dst2.Width
-        Dim cellData As New List(Of String)
-        Dim kSize As Integer = 2
-        For y = 0 To dst1.Height - kSize
-            For x = 0 To dst1.Width - kSize
-                Dim nabs As New SortedList(Of Byte, Byte)
-                For yy = y To y + kSize - 1
-                    For xx = x To x + kSize - 1
-                        Dim val = samples(yy * w + xx)
-                        If val >= 1 Then If nabs.ContainsKey(val) = False Then nabs.Add(val, 0)
+        If nabCount > 0 Then
+            Dim nabData = New cv.Mat(nabCount, 1, cv.MatType.CV_32SC2, Neighbor_NabList(cPtr))
+            nabList.Clear()
+            For i = 0 To redCells.Count - 1
+                nabList.Add(New List(Of Byte))
+            Next
+            For i = 0 To nabCount - 1
+                Dim pt = nabData.Get(Of cv.Point)(i, 0)
+                If nabList(pt.X).Contains(pt.Y) = False Then nabList(pt.X).Add(pt.Y)
+                If nabList(pt.Y).Contains(pt.X) = False Then nabList(pt.Y).Add(pt.X)
+            Next
+            nabList(0).Clear()
+
+            If heartBeat() And standalone Then
+                stats.Run(task.color)
+
+                strOut = stats.strOut
+                If nabList(task.rcSelect.index).Count > 0 Then
+                    strOut += "Neighbors: "
+                    dst1.SetTo(0)
+                    dst1(task.rcSelect.rect).SetTo(task.rcSelect.color, task.rcSelect.mask)
+                    For Each index In nabList(task.rcSelect.index)
+                        Dim rc = redCells(index)
+                        dst1(rc.rect).SetTo(rc.color, rc.mask)
+                        strOut += CStr(index) + ","
                     Next
-                Next
-                If nabs.Count >= 2 Then
-                    Dim series As String = ""
-                    For Each ele In nabs
-                        series += CStr(ele.Key) + " "
-                    Next
-                    If cellData.Contains(series) = False Then cellData.Add(series)
+                    strOut += vbCrLf
                 End If
-            Next
-        Next
+            End If
+            setTrueText(strOut, 3)
+        End If
 
-        ReDim nabList(cellCount)
-        For i = 0 To nabList.Count - 1
-            nabList(i) = New List(Of Byte)
-        Next
-
-        For Each n In cellData
-            Dim split = Trim(n).Split(" ")
-            For i = 0 To split.Length - 1
-                Dim index = CInt(split(0))
-                For j = i + 1 To split.Length - 1
-                    Dim jIndex = CInt(split(j))
-                    If nabList(index).Contains(jIndex) = False Then nabList(index).Add(jIndex)
-                    If nabList(jIndex).Contains(index) = False Then nabList(jIndex).Add(index)
-                Next
-            Next
-        Next
-
-        labels(2) = CStr(cellCount) + " regions presents."
+        labels(3) = CStr(nabCount) + " neighbor pairs were found."
+    End Sub
+    Public Sub Close()
+        Neighbor_Map_Close(cPtr)
     End Sub
 End Class
 
@@ -66,106 +70,26 @@ End Class
 
 
 
-
-
-
-Public Class Neighbor_CPP : Inherits VB_Algorithm
-    Public cellCount As Integer
-    Public nabList() As List(Of Byte)
+Public Class Neighbor_Corners : Inherits VB_Algorithm
+    Public nPoints As New List(Of cv.Point)
+    Dim ePoints As New Neighbor_ImageEdges
     Public Sub New()
-        cPtr = Neighbor_Open()
-        desc = "Find the list of neighbors for a cell using the cellmap in C++"
+        desc = "Find the corner points where multiple cells intersect."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Or src.Type <> cv.MatType.CV_8U Then
             Static redC As New RedCloud_Basics
             redC.Run(src)
             dst2 = redC.dst2
-            src = task.cellMap
+            src = redC.cellMap
             labels(2) = redC.labels(2)
         End If
-
-        Dim cppData(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, cppData, 0, cppData.Length - 1)
-        Dim handleSrc = GCHandle.Alloc(cppData, GCHandleType.Pinned)
-        Dim count = Neighbor_RunCPP(cPtr, handleSrc.AddrOfPinnedObject(), src.Rows, src.Cols)
-        handleSrc.Free()
-
-        If count > 0 Then
-            Dim cellData = New cv.Mat(count, 4, cv.MatType.CV_8U, Neighbor_CellData(cPtr))
-            Dim nPoints = New cv.Mat(count, 2, cv.MatType.CV_32S, Neighbor_Points(cPtr))
-            For i = 0 To count - 1
-                Dim pt = nPoints.Get(Of cv.Point)(i, 0)
-                For j = 0 To cellData.Cols - 1
-                    Dim id = cellData.Get(Of Byte)(i, 0)
-                    If id = 0 Then Continue For
-                    Dim rcX = task.redCells(id)
-                    If rcX.corners.Contains(pt) Then Continue For
-                    rcX.corners.Add(pt)
-                    task.redCells(id) = rcX
-                Next
-            Next
-
-            If task.rcSelect.index <> 0 Then
-                dst3.SetTo(0)
-                For Each c In task.rcSelect.corners
-                    dst3.Circle(c, task.dotSize, task.highlightColor, -1, task.lineType)
-                Next
-            End If
-        End If
-    End Sub
-    Public Sub Close()
-        Neighbor_Close(cPtr)
-    End Sub
-End Class
-
-
-
-
-
-Module Neighbor_Module
-
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Neighbor_Open() As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Sub Neighbor_Close(cPtr As IntPtr)
-    End Sub
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Neighbor_CellData(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Neighbor_Points(cPtr As IntPtr) As IntPtr
-    End Function
-    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Neighbor_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As Integer
-    End Function
-
-End Module
-
-
-
-
-
-
-
-
-Public Class Neighbor_Corner : Inherits VB_Algorithm
-    Public Sub New()
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Find the corner points where multiple cells intersect."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static redC As New RedCloud_Basics
-        redC.Run(task.color)
-        dst2 = redC.dst2
-        src = task.cellMap.Clone
 
         Dim samples(src.Total - 1) As Byte
         Marshal.Copy(src.Data, samples, 0, samples.Length)
 
         Dim w = dst2.Width
-        Dim nPoints As New List(Of cv.Point)
+        nPoints.Clear()
         Dim kSize As Integer = 2
         For y = 0 To dst1.Height - kSize
             For x = 0 To dst1.Width - kSize
@@ -173,6 +97,7 @@ Public Class Neighbor_Corner : Inherits VB_Algorithm
                 For yy = y To y + kSize - 1
                     For xx = x To x + kSize - 1
                         Dim val = samples(yy * w + xx)
+                        If val = 0 And removeZeroNeighbors Then Continue For
                         If nabs.ContainsKey(val) = False Then nabs.Add(val, 0)
                     Next
                 Next
@@ -182,39 +107,108 @@ Public Class Neighbor_Corner : Inherits VB_Algorithm
             Next
         Next
 
-        ' on the edges of the image, the presence of 2 cells is a key point.
+        ePoints.Run(src)
+        For Each pt In ePoints.nPoints
+            nPoints.Add(pt)
+        Next
+
+        If standalone Then
+            dst3 = task.color.Clone
+            For Each pt In nPoints
+                dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+                dst3.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+            Next
+        End If
+
+        labels(3) = CStr(nPoints.Count) + " intersections with 3 or more cells were found"
+    End Sub
+End Class
+
+
+
+
+
+
+Module Neighbor_Module
+    Public removeZeroNeighbors As Boolean = True
+
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Neighbors_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub Neighbors_Close(cPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Neighbors_CellData(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Neighbors_Points(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Neighbors_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As Integer
+    End Function
+
+
+
+
+
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Neighbor2_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub Neighbor2_Close(cPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Neighbor2_Points(cPtr As IntPtr) As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function Neighbor2_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As Integer
+    End Function
+
+End Module
+
+
+
+
+
+
+Public Class Neighbor_ImageEdges : Inherits VB_Algorithm
+    Public nPoints As New List(Of cv.Point)
+    Public Sub New()
+        desc = "Find the cell boundaries at the edge of the image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If standalone Then
+            Static redC As New RedCloud_Basics
+            redC.Run(src)
+            dst2 = redC.dst2
+            src = redC.cellMap
+            labels(2) = redC.labels(2)
+        End If
+
+        nPoints.Clear()
         For i = 0 To 3
             Dim rowCol As cv.Mat = Choose(i + 1, src.Row(0).Clone, src.Row(dst2.Height - 1).Clone, src.Col(0).Clone, src.Col(dst2.Width - 1).Clone)
             Dim data(rowCol.Total - 1) As Byte
             Marshal.Copy(rowCol.Data, data, 0, data.Length)
-            Select Case i
-                Case 0
-                    For j = 2 To data.Count - 1
-                        If data(j) <> data(j - 1) And data(j) <> 0 Then nPoints.Add(New cv.Point(j, 0))
-                    Next
-                Case 1
-                    For j = 1 To data.Count - 1
-                        If data(j) <> data(j - 1) And data(j) <> 0 Then nPoints.Add(New cv.Point(j, dst2.Height - 1))
-                    Next
-                Case 2
-                    For j = 2 To data.Count - 1
-                        If data(j) <> data(j - 1) And data(j) <> 0 Then nPoints.Add(New cv.Point(0, j))
-                    Next
-                Case 3
-                    For j = 1 To data.Count - 1
-                        If data(j) <> data(j - 1) And data(j) <> 0 Then nPoints.Add(New cv.Point(dst2.Width - 1, j))
-                    Next
-            End Select
+
+            Dim ptBase As cv.Point, pt As cv.Point
+            ptBase.X = Choose(i + 1, -1, -1, 0, dst2.Width - 1)
+            ptBase.Y = Choose(i + 1, 0, dst2.Height - 1, -1, -1)
+            For j = 1 To data.Count - 1
+                If (data(j) = 0 Or data(j - 1) = 0) And removeZeroNeighbors Then Continue For
+                If data(j) <> data(j - 1) Then
+                    pt.X = If(ptBase.X = -1, j, ptBase.X)
+                    pt.Y = If(ptBase.Y = -1, j, ptBase.Y)
+                    nPoints.Add(pt)
+                End If
+            Next
         Next
 
-        dst3.SetTo(0)
+        dst2.SetTo(0)
         For Each pt In nPoints
             dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-            dst3.Circle(pt, task.dotSize, 255, -1, task.lineType)
         Next
-
-        labels(2) = CStr(nPoints.Count) + " intersections with 3 or more cells were found"
-        labels(3) = CStr(nPoints.Count) + " key points in the image"
     End Sub
 End Class
 
@@ -225,28 +219,22 @@ End Class
 
 
 
-Public Class Neighbor_CornerFind : Inherits VB_Algorithm
-    Dim corners As New Neighbor_Corner
+Public Class Neighbor_ColorOnly : Inherits VB_Algorithm
+    Dim corners As New Neighbor_Corners
+    Dim redC As New RedCloud_ColorCells
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        desc = "Find the corners that belong to a cell"
+        desc = "Find neighbors in a color only RedCloud cellMap"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        corners.Run(src)
-        dst2 = corners.dst2
-        dst3 = corners.dst3
+        redC.Run(src)
+        dst2 = redC.dst2
 
-        Dim rc = task.rcSelect
-        dst1.SetTo(0)
-        Dim count As Integer = 0
-        For Each pt In rc.contour
-            Dim val = dst3(rc.rect).Get(Of Byte)(pt.Y, pt.X)
-            If val > 0 Then
-                dst1(rc.rect).Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
-                count += 1
-            End If
+        corners.Run(redC.redC.cellMap.Clone())
+        For Each pt In corners.nPoints
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
         Next
-        labels(3) = CStr(count) + " points were found in the contour for cell " + CStr(rc.index)
+
+        labels(2) = redC.labels(2) + " and " + CStr(corners.nPoints.Count) + " cell intersections"
     End Sub
 End Class
 
@@ -258,22 +246,80 @@ End Class
 
 
 
-Public Class Neighbor_CornerFind2 : Inherits VB_Algorithm
-    Dim corners As New Neighbor_Corner
+Public Class Neighbor_StableMax : Inherits VB_Algorithm
+    Dim stable As New Cell_StableMax
+    Dim corners As New Neighbor_Corners
     Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Find the corners that belong to a cell"
+        desc = "Find neighbors in the RedCloud_StableMax redCloud cells."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        corners.Run(src)
-        dst2 = corners.dst2
-        dst3 = corners.dst3
+        stable.Run(src)
+        dst2 = stable.dst2
+        labels(2) = stable.labels(2)
 
-        dst1.SetTo(0)
-        Dim rc = task.rcSelect
-        dst3(rc.rect).CopyTo(dst1(rc.rect))
-        dst3.Rectangle(rc.rect, white, task.lineWidth, task.lineType)
-        ' labels(3) = CStr(count) + " points were found in the contour for cell " + CStr(rc.index)
+        corners.Run(stable.cellMap)
+
+        dst3 = task.color.Clone
+        For Each pt In corners.nPoints
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            dst3.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+        Next
+
+        labels(3) = corners.labels(3)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Neighbor_Flood : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Public Sub New()
+        desc = "Identify the floodPoint Neighbor of the selected cell - NOTE: this does not provide a consistent neighbor"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        Dim rc = task.rcSelect
+        If rc.floodPoint.X > 0 Then
+            Dim rcNeighbor = redC.redCells(redC.cellMap.Get(Of Byte)(rc.floodPoint.Y, rc.floodPoint.X - 1))
+            vbDrawContour(dst2(rcNeighbor.rect), rcNeighbor.contour, cv.Scalar.White, task.lineWidth)
+        End If
+        setTrueText("This does not provide a consistent neighbor value.  See Neighbor_Map_CPP", 3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Neighbor_BasicsTest : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Dim nabs As New Neighbor_Basics
+    Public Sub New()
+        desc = "Test Neighbor_Basics to show how to use it."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+        If redC.redCells.Count <= 1 Then Exit Sub
+
+        nabs.redCells = redC.redCells
+        nabs.Run(redC.cellMap)
+
+        dst3.SetTo(0)
+        dst3(task.rcSelect.rect).SetTo(task.rcSelect.color, task.rcSelect.mask)
+        For Each index In nabs.nabList(task.rcSelect.index)
+            Dim rc = redC.redCells(index)
+            dst3(rc.rect).SetTo(rc.color, rc.mask)
+        Next
+    End Sub
+End Class
+

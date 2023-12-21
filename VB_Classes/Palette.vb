@@ -497,7 +497,7 @@ Public Class Palette_Random : Inherits VB_Algorithm
     Public Sub New()
         colorMap = New cv.Mat(1, 256, cv.MatType.CV_8UC3, 0)
         For i = 0 To 255
-            colorMap.Set(Of cv.Vec3b)(0, i, New cv.Vec3b(msRNG.Next(0, 255), msRNG.Next(0, 255), msRNG.Next(0, 255)))
+            colorMap.Set(Of cv.Vec3b)(0, i, randomCellColor())
         Next
         colorMap.Set(Of cv.Vec3b)(0, 0, New cv.Vec3b(0, 0, 0)) ' set 0th entry to black...
 
@@ -519,7 +519,7 @@ Public Class Palette_Variable : Inherits VB_Algorithm
     Public Sub New()
         colorMap = New cv.Mat(1, 256, cv.MatType.CV_8UC3, 0)
         For i = 0 To 255
-            colorMap.Set(Of cv.Vec3b)(0, i, New cv.Vec3b(msRNG.Next(20, 200), msRNG.Next(20, 200), msRNG.Next(20, 200)))
+            colorMap.Set(Of cv.Vec3b)(0, i, randomCellColor())
         Next
         originalColorMap = colorMap.Clone
         desc = "Build a new palette for every frame."

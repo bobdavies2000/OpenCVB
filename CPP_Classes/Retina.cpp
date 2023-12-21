@@ -72,9 +72,9 @@ int *Retina_Basics_Close(Retina * cPtr)
 }
 
 extern "C" __declspec(dllexport)
-int *Retina_Basics_Run(Retina * cPtr, int *rgbPtr, int rows, int cols, int *magno)
+int *Retina_Basics_Run(Retina * cPtr, int *bgrPtr, int rows, int cols, int *magno)
 {
-	cPtr->src = Mat(rows, cols, CV_8UC3, rgbPtr);
+	cPtr->src = Mat(rows, cols, CV_8UC3, bgrPtr);
 	cPtr->Run();
 	if (cPtr->useLogSampling)
 		memcpy(magno, cPtr->retinaOutput_magno.data, int((rows * cols / (cPtr->samplingFactor * cPtr->samplingFactor))));

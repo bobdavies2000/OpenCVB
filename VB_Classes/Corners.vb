@@ -480,3 +480,25 @@ End Class
 
 
 
+
+Public Class Corners_RedCloud : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Dim corners As New Neighbor_Corners
+    Public Sub New()
+        labels = {"", "", "Grayscale", "dst3Label"}
+        desc = "Find the corners for each RedCloud cell."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        corners.Run(redC.cellMap)
+
+        dst3 = task.color.Clone
+        For Each pt In corners.nPoints
+            dst2.Circle(pt, task.dotSize, task.highlightColor, -1, task.lineType)
+            dst3.Circle(pt, task.dotSize, cv.Scalar.Yellow, -1, task.lineType)
+        Next
+    End Sub
+End Class

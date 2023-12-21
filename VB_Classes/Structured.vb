@@ -255,7 +255,6 @@ Public Class Structured_Rebuild : Inherits VB_Algorithm
             radio.check(1).Checked = True
         End If
 
-        findCheckBox("Show Frustrum").Checked = False
         labels = {"", "", "X values in point cloud", "Y values in point cloud"}
         desc = "Rebuild the point cloud using inrange - not useful yet"
     End Sub

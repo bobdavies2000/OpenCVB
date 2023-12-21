@@ -33,7 +33,7 @@ Public Class Tessallate_Basics : Inherits VB_Algorithm
         points.Clear()
         colors.Clear()
         Dim listOfPoints = New List(Of List(Of cv.Point))
-        For Each rc In task.redCells
+        For Each rc In hulls.redC.redCells
             If rc.contour Is Nothing Then Continue For
             If rc.contour.Count < 5 Then Continue For
             Dim corners(4 - 1) As cv.Point
@@ -56,7 +56,7 @@ Public Class Tessallate_Basics : Inherits VB_Algorithm
         For i = 0 To colors.Count - 1
             cv.Cv2.DrawContours(dst3, listOfPoints, i, colors(i), -1)
         Next
-        labels(2) = CStr(colors.Count) + " triangles from " + CStr(task.redCells.Count) + " RedCloud cells"
+        labels(2) = CStr(colors.Count) + " triangles from " + CStr(hulls.redC.redCells.Count) + " RedCloud cells"
     End Sub
 End Class
 
@@ -118,10 +118,10 @@ Public Class Tessallate_QuadSimple : Inherits VB_Algorithm
             Dim roi = task.gridList(i)
 
             Dim center = New cv.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
-            Dim index = task.cellMap.Get(Of Byte)(center.Y, center.X)
+            Dim index = redC.cellMap.Get(Of Byte)(center.Y, center.X)
 
             If index <= 0 Then Continue For
-            Dim rc = task.redCells(index)
+            Dim rc = redC.redCells(index)
 
             dst3(roi).SetTo(rc.color)
             setTrueText(Format(rc.depthMean.Z, fmt1), New cv.Point(roi.X, roi.Y))
@@ -159,6 +159,7 @@ Public Class Tessallate_QuadHulls : Inherits VB_Algorithm
         Dim shift = oglOptions.moveAmount
 
         hulls.Run(src)
+        dst2 = hulls.dst2
 
         If task.optionsChanged Then
             depthList = New List(Of List(Of Single))
@@ -168,7 +169,6 @@ Public Class Tessallate_QuadHulls : Inherits VB_Algorithm
             Next
         End If
 
-        dst2 = hulls.dst2
         oglData.Clear()
         dst3.SetTo(0)
 
@@ -176,7 +176,7 @@ Public Class Tessallate_QuadHulls : Inherits VB_Algorithm
             Dim roi = task.gridList(i)
 
             Dim center = New cv.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
-            Dim index = task.cellMap.Get(Of Byte)(center.Y, center.X)
+            Dim index = hulls.redC.cellMap.Get(Of Byte)(center.Y, center.X)
 
             If index <= 0 Then
                 depthList(i).Clear()
@@ -184,7 +184,7 @@ Public Class Tessallate_QuadHulls : Inherits VB_Algorithm
                 Continue For
             End If
 
-            Dim rc = task.redCells(index)
+            Dim rc = hulls.redC.redCells(index)
             If rc.depthMean.Z = 0 Then Continue For
 
             If colorList(i) <> rc.color Then depthList(i).Clear()
@@ -231,6 +231,7 @@ Public Class Tessallate_QuadMinMax : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
+        dst2 = redC.dst2
 
         oglOptions.RunVB()
         Dim shift = oglOptions.moveAmount
@@ -245,7 +246,6 @@ Public Class Tessallate_QuadMinMax : Inherits VB_Algorithm
             Next
         End If
 
-        dst2 = redC.dst2
         oglData.Clear()
         dst3.SetTo(0)
 
@@ -255,7 +255,7 @@ Public Class Tessallate_QuadMinMax : Inherits VB_Algorithm
             Dim roi = task.gridList(i)
 
             Dim center = New cv.Point(CInt(roi.X + roi.Width / 2), CInt(roi.Y + roi.Height / 2))
-            Dim index = task.cellMap.Get(Of Byte)(center.Y, center.X)
+            Dim index = redC.cellMap.Get(Of Byte)(center.Y, center.X)
 
             If index <= 0 Then
                 depthList1(i).Clear()
@@ -264,7 +264,7 @@ Public Class Tessallate_QuadMinMax : Inherits VB_Algorithm
                 Continue For
             End If
 
-            Dim rc = task.redCells(index)
+            Dim rc = redC.redCells(index)
             If rc.depthMean.Z = 0 Then Continue For
 
             If colorList(i) <> rc.color Then
@@ -347,11 +347,11 @@ Public Class Tessallate_Bricks : Inherits VB_Algorithm
         For i = 0 To task.gridList.Count - 1
             Dim roi = task.gridList(i)
             Dim center = New cv.Point(roi.X + roi.Width / 2, roi.Y + roi.Height / 2)
-            Dim index = task.cellMap.Get(Of Byte)(center.Y, center.X)
+            Dim index = hulls.redC.cellMap.Get(Of Byte)(center.Y, center.X)
             Dim depthMin As Single = 0, depthMax As Single = 0, minLoc As cv.Point, maxLoc As cv.Point
             If index >= 0 Then
                 task.pcSplit(2)(roi).MinMaxLoc(depthMin, depthMax, minLoc, maxLoc, task.depthMask(roi))
-                Dim rc = task.redCells(index)
+                Dim rc = hulls.redC.redCells(index)
                 depthMin = If(depthMax > rc.depthMean.Z, rc.depthMean.Z, depthMin)
                 Dim test = depthMin + rc.depthStdev.Z * 3
                 If test < depthMax Then depthMax = test

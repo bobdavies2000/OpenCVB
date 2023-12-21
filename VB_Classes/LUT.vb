@@ -27,10 +27,9 @@ Public Class LUT_Basics : Inherits VB_Algorithm
             myLut = New cv.Mat(1, 256, cv.MatType.CV_8U, segment)
         End If
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        dst2 = src.LUT(myLut)
-        dst0 = dst2 * classCount / 255
+        dst2 = src.LUT(myLut) * classCount / 255
 
-        If standalone Or testIntermediate(traceName) Then dst3 = vbPalette(dst2)
+        If standalone Or testIntermediate(traceName) Then dst3 = vbPalette(dst2 * 255 / classCount)
         labels(2) = "Image segmented into " + CStr(classCount + 1) + " divisions (0-" + CStr(classCount) + ")"
     End Sub
 End Class
@@ -102,7 +101,7 @@ Public Class LUT_Reduction : Inherits VB_Algorithm
     Dim vector = New cv.Mat(256, 1, cv.MatType.CV_8UC3, 0)
     Public Sub New()
         For i = 0 To 255
-            vector.Set(Of cv.Vec3b)(i, 0, New cv.Vec3b(msRNG.Next(30, 240), msRNG.Next(30, 240), msRNG.Next(30, 240)))
+            vector.Set(Of cv.Vec3b)(i, 0, randomCellColor())
         Next
         labels(3) = "Custom Color Lookup Table"
         desc = "Build and use a custom color palette - Painterly Effect"
@@ -129,7 +128,7 @@ Public Class LUT_RGBDepth : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         lut.Run(task.depthRGB.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        dst2 = lut.dst2
+        dst2 = lut.dst2 * 255 / lut.classCount
         labels(2) = lut.labels(2)
     End Sub
 End Class
@@ -148,7 +147,7 @@ Public Class LUT_Depth32f : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         lut.Run(task.pcSplit(2).Normalize(255).ConvertScaleAbs(255))
-        dst2 = lut.dst2
+        dst2 = lut.dst2 * 255 / lut.classCount
         dst2.SetTo(0, task.noDepthMask)
         labels(2) = lut.labels(2)
     End Sub
@@ -172,12 +171,12 @@ Public Class LUT_Equalized : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         lut.Run(src)
-        dst3 = lut.dst2
+        dst3 = lut.dst2 * 255 / lut.classCount
 
         eq.dst3.SetTo(0)
         eq.Run(src)
         lut.Run(eq.dst2)
-        dst2 = lut.dst2
+        dst2 = lut.dst2 * 255 / lut.classCount
     End Sub
 End Class
 

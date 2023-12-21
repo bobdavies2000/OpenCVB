@@ -9,6 +9,11 @@ Public Class SuperPixel_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         redC.Run(src)
         dst2 = redC.dst2
+
+        dst3 = src
+        For Each rc In redC.redCells
+            vbDrawContour(dst3(rc.rect), rc.contour, cv.Scalar.White, task.lineWidth)
+        Next
     End Sub
 End Class
 
@@ -29,7 +34,7 @@ Module SuperPixel_CPP_Module
     Public Function SuperPixel_GetLabels(spPtr As IntPtr) As IntPtr
     End Function
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function SuperPixel_Run(spPtr As IntPtr, rgbPtr As IntPtr) As IntPtr
+    Public Function SuperPixel_Run(spPtr As IntPtr, bgrPtr As IntPtr) As IntPtr
     End Function
 End Module
 

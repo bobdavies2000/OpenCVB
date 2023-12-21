@@ -1,28 +1,29 @@
 ﻿Imports cv = OpenCvSharp
 Public Class Convex_Basics : Inherits VB_Algorithm
     Public hull() As cv.Point
-    Public hullList As New List(Of cv.Point)
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Hull random points", 4, 20, 10)
         desc = "Surround a set of random points with a convex hull"
         labels = {"", "", "Convex Hull - red dot is center and the black dots are the input points", ""}
     End Sub
-    Public Sub buildRandomHullPoints()
+    Public Function buildRandomHullPoints() As List(Of cv.Point)
         Static hullSlider = findSlider("Hull random points")
         Dim Count = hullSlider.Value
         Dim pad = 4
         Dim w = dst2.Width - dst2.Width / pad
         Dim h = dst2.Height - dst2.Height / pad
-        hullList.Clear()
 
+        Dim hullList As New List(Of cv.Point)
         For i = 0 To Count - 1
             hullList.Add(New cv.Point2f(msRNG.Next(dst2.Width / pad, w), msRNG.Next(dst2.Height / pad, h)))
         Next
-    End Sub
+        Return hullList
+    End Function
     Public Sub RunVB(src As cv.Mat)
+        Dim hullList = task.rcSelect.contour
         If standalone Then
             If heartBeat() = False Then Exit Sub
-            buildRandomHullPoints()
+            hullList = buildRandomHullPoints()
         End If
 
         If hullList.Count = 0 Then
@@ -58,15 +59,14 @@ Public Class Convex_RedCloud : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redC.Run(src)
-        dst3 = redC.dst2
+        dst2 = redC.dst2
 
-        convex.hullList = task.rcSelect.contour
-        If convex.hullList IsNot Nothing Then
+        If task.rcSelect.contour IsNot Nothing Then
             convex.Run(src)
 
-            dst2.SetTo(0)
-            dst2(task.rcSelect.rect) = convex.dst2(New cv.Rect(0, 0, task.rcSelect.rect.Width, task.rcSelect.rect.Height))
-            dst2.Circle(task.rcSelect.maxDist, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            dst3.SetTo(0)
+            dst3(task.rcSelect.rect) = convex.dst2(New cv.Rect(0, 0, task.rcSelect.rect.Width, task.rcSelect.rect.Height))
+            dst3.Circle(task.rcSelect.maxDist, task.dotSize, cv.Scalar.White, -1, task.lineType)
         End If
     End Sub
 End Class
@@ -115,6 +115,7 @@ Public Class Convex_RedCloudDefects : Inherits VB_Algorithm
     Dim contours As New Contour_Largest
     Dim resize As New Resize_Preserve
     Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
         labels = {"", "", "Hull outline in green, lines show defects.", "Output of RedCloud_Basics"}
         desc = "Find the convexityDefects in the selected RedCloud cell"
     End Sub
@@ -149,7 +150,10 @@ Public Class Convex_RedCloudDefects : Inherits VB_Algorithm
         Dim rect = New cv.Rect(dst2.Width * percentOffset, dst2.Height * percentOffset, dst2.Width * percent, dst2.Height * percent)
 
         convex.Run(src)
+        dst0 = convex.redC.dst0
+        dst1 = convex.redC.dst2
         dst3 = convex.dst3
+        labels(1) = convex.redC.labels(2)
 
         Dim rc = task.rcSelect
         If rc.mask Is Nothing Then Exit Sub

@@ -58,26 +58,20 @@ End Class
 Public Class BackProject_Full : Inherits VB_Algorithm
     Public classCount As Integer
     Public Sub New()
-        gOptions.HistBinSlider.Value = 5
         desc = "Create a color histogram, normalize it, and backproject it with a palette."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         classCount = task.histogramBins
-        Dim gray = If(src.Channels = 1, src, src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        gray.ConvertTo(dst1, cv.MatType.CV_32F)
+        task.gray.ConvertTo(dst1, cv.MatType.CV_32F)
         Dim histogram As New cv.Mat
         Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 255)}
         cv.Cv2.CalcHist({dst1}, {0}, New cv.Mat, histogram, 1, {classCount}, ranges)
-        histogram = histogram.Normalize(0, 255, cv.NormTypes.MinMax)
+        histogram = histogram.Normalize(0, classCount, cv.NormTypes.MinMax)
 
         cv.Cv2.CalcBackProject({dst1}, {0}, histogram, dst2, ranges)
 
-        dst2.ConvertTo(dst0, cv.MatType.CV_8U)
-        dst0 = dst0 * classCount / 255
-        If standalone Or testIntermediate(traceName) Then
-            dst2 = dst0 * 255 / classCount
-            dst3 = vbPalette(dst2)
-        End If
+        dst2.ConvertTo(dst2, cv.MatType.CV_8U)
+        If standalone Or testIntermediate(traceName) Then dst3 = vbPalette(dst2 * 255 / classCount)
     End Sub
 End Class
 

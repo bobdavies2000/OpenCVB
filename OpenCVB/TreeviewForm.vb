@@ -19,11 +19,10 @@ Public Class TreeviewForm
         PercentTime.Height = TreeView1.Height
     End Sub
     Private Sub TreeviewForm_Load(sender As Object, e As EventArgs) Handles Me.Load
-        Me.Left = OpenCVB.settings.TreeLocX
-        Me.Top = OpenCVB.settings.TreeLocY
-        If Me.Left < 0 Or Me.Left > Screen.PrimaryScreen.Bounds.Width Then Me.Left = 0
-        If Me.Top < 0 Or Me.Top > Screen.PrimaryScreen.Bounds.Height Then Me.Top = 0
-        Me.Height = OpenCVB.settings.TreeLocHeight
+        Me.Left = GetSetting("OpenCVB1", "treeViewLeft", "treeViewLeft", Me.Left)
+        Me.Top = GetSetting("OpenCVB1", "treeViewTop", "treeViewTop", Me.Top)
+        Me.Width = GetSetting("OpenCVB1", "treeViewWidth", "treeViewWidth", Me.Width)
+        Me.Height = GetSetting("OpenCVB1", "treeViewHeight", "treeViewHeight", Me.Height)
     End Sub
     Private Function FindRecursive(ByVal tNode As TreeNode, name As String) As TreeNode
         Dim tn As TreeNode
@@ -34,6 +33,12 @@ Public Class TreeviewForm
         Next
         Return Nothing
     End Function
+    Private Sub Options_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        SaveSetting("OpenCVB1", "treeViewLeft", "treeViewLeft", Me.Left)
+        SaveSetting("OpenCVB1", "treeViewTop", "treeViewTop", Me.Top)
+        SaveSetting("OpenCVB1", "treeViewWidth", "treeViewWidth", Me.Width)
+        SaveSetting("OpenCVB1", "treeViewHeight", "treeViewHeight", Me.Height)
+    End Sub
     Private Function getNode(tv As TreeView, name As String) As TreeNode
         For Each n In tv.Nodes
             If n.tag = name Then Return n
@@ -129,11 +134,17 @@ Public Class TreeviewForm
                 For i = 0 To algorithm_ms.Count - 1
                     sumTime += algorithm_ms(i)
                 Next
+
+                Dim saveWaitTime As String = ""
+
                 For i = 0 To algorithm_ms.Count - 1
                     Dim percent = algorithm_ms(i) / sumTime
                     If percent < 0 Then percent = 0
                     Dim str = Format(percent, "00.0%") + " " + OpenCVB.algorithmNames(i)
-                    If OpenCVB.algorithmNames(i).Contains("waitingForInput") Then str += "  <<<<<<<<<< "
+                    If OpenCVB.algorithmNames(i).Contains("waitingForInput") Then
+                        str += "  <<<<<<<<<< "
+                        saveWaitTime = str
+                    End If
                     PercentTimes.Add(percent, str)
                 Next
 
@@ -152,6 +163,7 @@ Public Class TreeviewForm
                 Next
 
                 PercentTime.Text += "---------------- Tree order display: " + vbCrLf
+                PercentTime.Text += saveWaitTime + vbCrLf
                 For Each sn In timeDataTree
                     If sn.Contains("%") Then PercentTime.Text += sn + vbCrLf
                 Next

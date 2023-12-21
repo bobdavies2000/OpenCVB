@@ -10,13 +10,13 @@ using namespace std;
 using namespace  cv;
 
 //extern "C" __declspec(dllexport)
-//float* Histogram_1DBug(int* rgbPtr, int rows, int cols, int bins)
+//float* Histogram_1DBug(int* bgrPtr, int rows, int cols, int bins)
 //{
 //	float hRange[] = { 0, 256 }; // ranges are exclusive in the top of the range, hence 256
 //	const float* range[] = { hRange, hRange, hRange };
 //	int hbins[] = { bins, bins, bins };
 //	int channel[] = { 0, 1, 2 };
-//	Mat src = Mat(rows, cols, CV_8UC3, rgbPtr);
+//	Mat src = Mat(rows, cols, CV_8UC3, bgrPtr);
 //
 //	static Mat histogram;
 //	calcHist(&src, 1, channel, Mat(), histogram, 3, hbins, range, true, false); // for 3D histograms, all 3 bins must be equal.
@@ -28,11 +28,11 @@ class Histogram_1D
 {
 private:
 public:
-    Mat src, dst;
+    Mat src;
 	Mat histogram;
 	Histogram_1D(){}
     void RunCPP(int bins) {
-		float hRange[] = { -1, 256 }; 
+		float hRange[] = { 0, 256 }; 
 		int hbins[] = { bins };
 		const float* range[] = { hRange };
 		calcHist(&src, 1, { 0 }, Mat(), histogram, 1, hbins, range, true, false);
@@ -58,5 +58,5 @@ int *Histogram_1D_RunCPP(Histogram_1D *cPtr, int *dataPtr, int rows, int cols, i
 {
 		cPtr->src = Mat(rows, cols, CV_8UC1, dataPtr);
 		cPtr->RunCPP(bins);
-		return (int *) cPtr->dst.data; 
+		return (int *) cPtr->histogram.data;
 }
