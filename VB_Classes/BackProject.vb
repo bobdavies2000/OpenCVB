@@ -131,90 +131,6 @@ End Class
 
 
 
-' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
-Public Class BackProject_Image : Inherits VB_Algorithm
-    Public hist As New Histogram_Basics
-    Public mask As New cv.Mat
-    Dim kalman As New Kalman_Basics
-    Public useInrange As Boolean
-    Public Sub New()
-        labels(2) = "Move mouse to backproject each histogram column"
-        desc = "Explore Backprojection of each element of a grayscale histogram."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim input = src
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        hist.Run(input)
-        If hist.mm.minVal = hist.mm.maxVal Then
-            setTrueText("The input image is empty - mm.minval and mm.maxVal are both zero...")
-            Exit Sub ' the input image is empty...
-        End If
-        dst2 = hist.dst2
-
-        If kalman.kInput.Length <> 2 Then ReDim kalman.kInput(2 - 1)
-        kalman.kInput(0) = hist.mm.minVal
-        kalman.kInput(1) = hist.mm.maxVal
-        kalman.Run(Nothing)
-        hist.mm.minVal = Math.Min(kalman.kOutput(0), kalman.kOutput(1))
-        hist.mm.maxVal = Math.Max(kalman.kOutput(0), kalman.kOutput(1))
-
-        Dim totalPixels = dst2.Total ' assume we are including zeros.
-        If hist.plot.noZeroEntry Then totalPixels = input.CountNonZero
-
-        Dim brickWidth = dst2.Width / task.histogramBins
-        Dim incr = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins
-        Dim histIndex = Math.Round(task.mouseMovePoint.X / brickWidth)
-
-        Dim minRange = New cv.Scalar(histIndex * incr)
-        Dim maxRange = New cv.Scalar((histIndex + 1) * incr + 1)
-        If histIndex + 1 = task.histogramBins Then
-            minRange = New cv.Scalar(254)
-            maxRange = New cv.Scalar(255)
-        End If
-        If useInrange Then
-            If histIndex = 0 And hist.plot.noZeroEntry Then mask = New cv.Mat(input.Size, cv.MatType.CV_8U, 0) Else mask = input.InRange(minRange, maxRange)
-        Else
-            Dim bRange = New cv.Rangef(minRange(0), maxRange(0))
-            Dim ranges() = New cv.Rangef() {bRange}
-            cv.Cv2.CalcBackProject({input}, {0}, hist.histogram, mask, ranges)
-        End If
-        dst3 = src
-        If mask.Type <> cv.MatType.CV_8U Then mask.ConvertTo(mask, cv.MatType.CV_8U)
-        dst3.SetTo(cv.Scalar.Yellow, mask)
-        Dim actualCount = mask.CountNonZero
-        Dim count = hist.histogram.Get(Of Single)(histIndex, 0)
-        Dim histMax As mmData = vbMinMax(hist.histogram)
-        labels(3) = "Backprojecting " + CStr(CInt(minRange(0))) + " to " + CStr(CInt(maxRange(0))) + " with " +
-                     CStr(count) + " histogram samples and " + CStr(actualCount) + " mask count.  Histogram max count = " +
-                     CStr(CInt(histMax.maxVal))
-        dst2.Rectangle(New cv.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-Public Class BackProject_Mouse : Inherits VB_Algorithm
-    Dim backP As New BackProject_Image
-    Public Sub New()
-        labels(2) = "Use the mouse to select what should be shown in the backprojection of the depth histogram"
-        desc = "Use the mouse to select what should be shown in the backprojection of the depth histogram"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        backP.Run(src)
-        dst2 = backP.dst2
-        dst3 = backP.dst3
-    End Sub
-End Class
-
-
-
-
 
 
 
@@ -450,30 +366,6 @@ Public Class BackProject_MaskLines : Inherits VB_Algorithm
         dst3.SetTo(task.highlightColor, dst1)
     End Sub
 End Class
-
-
-
-
-
-
-
-
-
-
-Public Class BackProject_Depth : Inherits VB_Algorithm
-    Dim backp As New BackProject_Image
-    Public Sub New()
-        desc = "Allow review of the depth backprojection"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim depth = task.pcSplit(2).Threshold(task.maxZmeters, 255, cv.ThresholdTypes.TozeroInv)
-        backp.Run(depth * 1000)
-        dst2 = backp.dst2
-        dst3 = src
-        dst3.SetTo(cv.Scalar.White, backp.mask)
-    End Sub
-End Class
-
 
 
 
@@ -726,5 +618,128 @@ Public Class BackProject_LineSide : Inherits VB_Algorithm
         dst1 = dst1.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         dst3 = src
         dst3.SetTo(cv.Scalar.White, dst1)
+    End Sub
+End Class
+
+
+
+
+
+' https://docs.opencv.org/3.4/dc/df6/tutorial_py_histogram_backprojection.html
+Public Class BackProject_Image : Inherits VB_Algorithm
+    Public hist As New Histogram_Basics
+    Public mask As New cv.Mat
+    Dim kalman As New Kalman_Basics
+    Public useInrange As Boolean
+    Public Sub New()
+        labels(2) = "Move mouse to backproject each histogram column"
+        desc = "Explore Backprojection of each element of a grayscale histogram."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim input = src
+        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        hist.Run(input)
+        If hist.mm.minVal = hist.mm.maxVal Then
+            setTrueText("The input image is empty - mm.minval and mm.maxVal are both zero...")
+            Exit Sub ' the input image is empty...
+        End If
+        dst2 = hist.dst2
+
+        If kalman.kInput.Length <> 2 Then ReDim kalman.kInput(2 - 1)
+        kalman.kInput(0) = hist.mm.minVal
+        kalman.kInput(1) = hist.mm.maxVal
+        kalman.Run(Nothing)
+        hist.mm.minVal = Math.Min(kalman.kOutput(0), kalman.kOutput(1))
+        hist.mm.maxVal = Math.Max(kalman.kOutput(0), kalman.kOutput(1))
+
+        Dim totalPixels = dst2.Total ' assume we are including zeros.
+        If hist.plot.noZeroEntry Then totalPixels = input.CountNonZero
+
+        Dim brickWidth = dst2.Width / task.histogramBins
+        Dim incr = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins
+        Dim histIndex = Math.Round(task.mouseMovePoint.X / brickWidth)
+
+        Dim minRange = New cv.Scalar(histIndex * incr)
+        Dim maxRange = New cv.Scalar((histIndex + 1) * incr + 1)
+        If histIndex + 1 = task.histogramBins Then
+            minRange = New cv.Scalar(254)
+            maxRange = New cv.Scalar(255)
+        End If
+        If useInrange Then
+            If histIndex = 0 And hist.plot.noZeroEntry Then mask = New cv.Mat(input.Size, cv.MatType.CV_8U, 0) Else mask = input.InRange(minRange, maxRange)
+        Else
+            Dim bRange = New cv.Rangef(minRange(0), maxRange(0))
+            Dim ranges() = New cv.Rangef() {bRange}
+            cv.Cv2.CalcBackProject({input}, {0}, hist.histogram, mask, ranges)
+        End If
+        dst3 = src
+        If mask.Type <> cv.MatType.CV_8U Then mask.ConvertTo(mask, cv.MatType.CV_8U)
+        dst3.SetTo(cv.Scalar.Yellow, mask)
+        Dim actualCount = mask.CountNonZero
+        Dim count = hist.histogram.Get(Of Single)(histIndex, 0)
+        Dim histMax As mmData = vbMinMax(hist.histogram)
+        labels(3) = "Backprojecting " + CStr(CInt(minRange(0))) + " to " + CStr(CInt(maxRange(0))) + " with " +
+                     CStr(count) + " histogram samples and " + CStr(actualCount) + " mask count.  Histogram max count = " +
+                     CStr(CInt(histMax.maxVal))
+        dst2.Rectangle(New cv.Rect(CInt(histIndex * brickWidth), 0, brickWidth, dst2.Height), cv.Scalar.Yellow, task.lineWidth)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class BackProject_Mouse : Inherits VB_Algorithm
+    Dim backP As New BackProject_Image
+    Public Sub New()
+        labels(2) = "Use the mouse to select what should be shown in the backprojection of the depth histogram"
+        desc = "Use the mouse to select what should be shown in the backprojection of the depth histogram"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        backP.Run(src)
+        dst2 = backP.dst2
+        dst3 = backP.dst3
+    End Sub
+End Class
+
+
+
+
+Public Class BackProject_Depth : Inherits VB_Algorithm
+    Dim backp As New BackProject_Image
+    Public Sub New()
+        desc = "Allow review of the depth backprojection"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim depth = task.pcSplit(2).Threshold(task.maxZmeters, 255, cv.ThresholdTypes.TozeroInv)
+        backp.Run(depth * 1000)
+        dst2 = backp.dst2
+        dst3 = src
+        dst3.SetTo(cv.Scalar.White, backp.mask)
+    End Sub
+End Class
+
+
+
+
+Public Class BackProject_MeterByMeter : Inherits VB_Algorithm
+    Dim histogram As New cv.Mat
+    Public Sub New()
+        desc = "Backproject the depth data at 1 meter intervals WITHOUT A HISTOGRAM."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If task.optionsChanged Then
+            Dim incr = task.maxZmeters / task.histogramBins
+            Dim histData As New List(Of Single)
+            For i = 0 To task.histogramBins - 1
+                histData.Add(Math.Round(i * incr))
+            Next
+
+            histogram = New cv.Mat(task.histogramBins, 1, cv.MatType.CV_32F, histData.ToArray)
+        End If
+        Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZmeters)}
+        cv.Cv2.CalcBackProject({task.pcSplit(2)}, {0}, histogram, dst2, ranges)
+        dst3 = vbPalette(dst2)
     End Sub
 End Class

@@ -86,6 +86,7 @@ if algorithmName = "BackProject_LineSide" Then return new BackProject_LineSide
 if algorithmName = "BackProject_LineTop" Then return new BackProject_LineTop
 if algorithmName = "BackProject_MaskLines" Then return new BackProject_MaskLines
 if algorithmName = "BackProject_Masks" Then return new BackProject_Masks
+if algorithmName = "BackProject_MeterByMeter" Then return new BackProject_MeterByMeter
 if algorithmName = "BackProject_Mouse" Then return new BackProject_Mouse
 if algorithmName = "BackProject_PointCloud" Then return new BackProject_PointCloud
 if algorithmName = "BackProject_Reduction" Then return new BackProject_Reduction
