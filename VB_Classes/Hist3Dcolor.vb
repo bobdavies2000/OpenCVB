@@ -98,28 +98,6 @@ End Class
 
 
 
-
-Public Class Hist3Dcolor_RedColor : Inherits VB_Algorithm
-    Dim colorC As New RedCloud_Basics
-    Public Sub New()
-        redOptions.UseColor.Checked = True
-        redOptions.BackProject3D.Checked = True
-        desc = "Use the output of Hist3Dcolor_Reduction as input to RedColor_Basics"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        colorC.Run(src)
-        dst2 = colorC.dst2
-        labels(2) = colorC.labels(2)
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class Hist3Dcolor_Distribution : Inherits VB_Algorithm
     Dim plot As New Plot_Histogram
     Dim hist As New Histogram_Basics

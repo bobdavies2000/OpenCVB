@@ -78,7 +78,7 @@ Public Class RedColor_FeatureLess : Inherits VB_Algorithm
     Public Sub New()
         cPtr = FloodCell_Open()
         gOptions.PixelDiffThreshold.Value = 0
-        desc = "Floodfill an image so each cell can be tracked.  NOTE: cells are not matched to previous image.  Use RedColor_Basics for matching."
+        desc = "Floodfill an image so each cell can be tracked.  NOTE: cells are not matched to previous image.  Use RedMin_Basics for matching."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If redOptions.colorInput <> "FeatureLess" Then redOptions.FeatureLessRadio.Checked = True
@@ -147,7 +147,7 @@ End Class
 
 Public Class RedColor_Binarize : Inherits VB_Algorithm
     Dim binarize As New Binarize_RecurseAdd
-    Dim colorC As New RedColor_Basics
+    Dim rMin As New RedMin_Basics
     Public Sub New()
         labels(3) = "A 4-way split of the input grayscale image based on the amount of light"
         desc = "Use RedCloud on a 4-way split based on light to dark in the image."
@@ -156,9 +156,9 @@ Public Class RedColor_Binarize : Inherits VB_Algorithm
         binarize.Run(src)
         dst3 = vbPalette(binarize.dst1 * 255 / 4)
 
-        colorC.Run(binarize.dst1)
-        dst2 = colorC.dst2
-        labels(2) = colorC.labels(2)
+        rMin.Run(binarize.dst1)
+        dst2 = rMin.dst3
+        labels(2) = rMin.labels(3)
     End Sub
 End Class
 
@@ -171,7 +171,7 @@ End Class
 ' https://docs.opencv.org/master/de/d01/samples_2cpp_2connected_components_8cpp-example.html
 Public Class RedColor_CComp : Inherits VB_Algorithm
     Dim ccomp As New CComp_Both
-    Dim colorC As New RedColor_Basics
+    Dim rMin As New RedMin_Basics
     Public Sub New()
         desc = "Identify each Connected component as a RedCloud Cell."
     End Sub
@@ -179,9 +179,11 @@ Public Class RedColor_CComp : Inherits VB_Algorithm
         If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
         ccomp.Run(src)
         dst3 = vbNormalize32f(ccomp.dst1)
-        colorC.Run(dst3)
-        dst2 = colorC.dst2
-        labels(2) = colorC.labels(2)
+        labels(3) = ccomp.labels(2)
+
+        rMin.Run(dst3)
+        dst2 = rMin.dst3
+        labels(2) = rMin.labels(3)
     End Sub
 End Class
 
@@ -219,7 +221,7 @@ End Class
 
 
 Public Class RedColor_InputColor : Inherits VB_Algorithm
-    Public colorC As New RedColor_Basics
+    Public colorC As New RedMin_Basics
     Dim color As New Color_Basics
     Public Sub New()
         desc = "Floodfill the transformed color output and create cells to be tracked."
@@ -241,26 +243,18 @@ End Class
 Public Class RedColor_LeftRight : Inherits VB_Algorithm
     Dim fCellsLeft As New RedColor_InputColor
     Dim fCellsRight As New RedColor_InputColor
-    Public leftCells As New List(Of rcData)
-    Public rightCells As New List(Of rcData)
     Public Sub New()
         redOptions.Reduction_Basics.Checked = True
         desc = "Floodfill left and right images after RedCloud color input reduction."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        fCellsLeft.colorC.fCells = New List(Of rcData)(leftCells)
         fCellsLeft.Run(task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        leftCells = New List(Of rcData)(fCellsLeft.colorC.fCells)
-        labels(2) = fCellsLeft.labels(2)
+        dst2 = fCellsLeft.dst3
+        labels(2) = fCellsLeft.colorC.labels(3)
 
-        dst2 = fCellsLeft.dst2
-
-        fCellsRight.colorC.fCells = New List(Of rcData)(rightCells)
         fCellsRight.Run(task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
-        rightCells = New List(Of rcData)(fCellsRight.colorC.fCells)
-        labels(3) = fCellsRight.labels(2)
-
-        dst3 = fCellsRight.dst2
+        dst3 = fCellsRight.dst3
+        labels(3) = fCellsRight.colorC.labels(3)
     End Sub
 End Class
 

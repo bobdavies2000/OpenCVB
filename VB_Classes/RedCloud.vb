@@ -455,7 +455,7 @@ End Class
 
 Public Class RedCloud_CoreTest : Inherits VB_Algorithm
     Dim prep As New RedCloud_Core
-    Public colorC As New RedColor_Basics
+    Public rMin As New RedMin_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
         gOptions.HistBinSlider.Value = 20
@@ -467,12 +467,11 @@ Public Class RedCloud_CoreTest : Inherits VB_Algorithm
         prep.Run(Nothing)
         prep.dst2.ConvertScaleAbs().CopyTo(reduction.dst2, task.depthMask)
 
-        colorC.Run(reduction.dst2)
+        rMin.Run(reduction.dst2)
 
-        dst2 = colorC.dst2
-        dst3 = colorC.dst3
-
-        If heartBeat() Then labels(2) = CStr(colorC.fCells.Count) + " regions identified"
+        dst2 = rMin.dst2
+        dst3 = rMin.dst3
+        labels = rMin.labels
     End Sub
 End Class
 
@@ -1569,7 +1568,7 @@ End Class
 
 Public Class RedCloud_ColorAndCloud : Inherits VB_Algorithm
     Dim guided As New GuidedBP_Depth
-    Public colorC As New RedColor_Basics
+    Public rMin As New RedMin_Basics
     Dim reduction As New Reduction_Basics
     Public Sub New()
         desc = "Segment the image based on both the reduced point cloud and color"
@@ -1580,12 +1579,13 @@ Public Class RedCloud_ColorAndCloud : Inherits VB_Algorithm
         reduction.Run(src)
         Dim combined = reduction.dst2.Clone
         guided.dst2.CopyTo(combined, task.depthMask)
-        colorC.Run(combined)
+        rMin.Run(combined)
 
-        dst2 = colorC.dst2
-        dst3 = colorC.dst3
+        dst2 = rMin.dst2
+        dst3 = rMin.dst3
+        labels = rMin.labels
 
-        If heartBeat() Then labels(2) = CStr(colorC.fCells.Count) + " regions identified"
+        If heartBeat() Then labels(2) = CStr(rMin.minCells.Count) + " regions identified"
     End Sub
 End Class
 
@@ -2279,5 +2279,26 @@ Public Class RedCloud_OnlyColor : Inherits VB_Algorithm
         redC.Run(src)
         dst2 = redC.dst2
         labels(2) = redC.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class RedCloud_MeterByMeter : Inherits VB_Algorithm
+    Dim meter As New BackProject_MeterByMeter
+    Public Sub New()
+        desc = "Run RedCloud meter by meter"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        meter.Run(src)
+        dst1 = meter.dst2
+
+        For i = 0 To task.maxZmeters
+
+        Next
     End Sub
 End Class

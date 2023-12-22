@@ -307,7 +307,7 @@ Public Class KMeans_Edges : Inherits VB_Algorithm
     Dim edges As New Edge_Canny
     Public km As New KMeans_Image
     Public classCount As Integer
-    Dim colorC As New RedColor_Basics
+    Dim rMin As New RedMin_Basics
     Public Sub New()
         labels(3) = "KMeans with edges output"
         desc = "Use edges to isolate regions in the KMeans output - not much different from KMeans_Basics."
@@ -320,9 +320,9 @@ Public Class KMeans_Edges : Inherits VB_Algorithm
         dst3 = km.dst2 + 1
         classCount = km.classCount
 
-        colorC.Run(dst3)
-        dst2 = colorC.dst2
-        labels(2) = colorC.labels(2)
+        rMin.Run(dst3)
+        dst2 = rMin.dst3
+        labels(2) = rMin.labels(3)
     End Sub
 End Class
 

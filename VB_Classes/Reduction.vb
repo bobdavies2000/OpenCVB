@@ -35,7 +35,7 @@ End Class
 
 Public Class Reduction_Floodfill : Inherits VB_Algorithm
     Public reduction As New Reduction_Basics
-    Public colorC As New RedColor_Basics
+    Public rMin As New RedMin_Basics
     Public Sub New()
         labels(2) = "Reduced input to floodfill"
         redOptions.SimpleReductionSlider.Value = 32
@@ -44,9 +44,9 @@ Public Class Reduction_Floodfill : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         reduction.Run(src)
         dst2 = vbPalette(reduction.dst2 * 255 / reduction.classCount)
-        colorC.Run(reduction.dst2)
-        dst3 = colorC.dst2
-        labels(3) = "Floodfill found " + CStr(colorC.fCells.Count) + " regions"
+        rMin.Run(reduction.dst2)
+        dst3 = rMin.dst3
+        labels(3) = rMin.labels(3)
     End Sub
 End Class
 

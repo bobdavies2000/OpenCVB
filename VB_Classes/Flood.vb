@@ -1,18 +1,17 @@
 Imports cv = OpenCvSharp
 Public Class Flood_Basics : Inherits VB_Algorithm
     Public classCount As Integer
-    Public colorC As New RedColor_Basics
+    Public rMin As New RedMin_Basics
     Public Sub New()
         labels(3) = "The flooded cells numbered from largest (1) to smallast (x < 255)"
         desc = "FloodFill the input and paint it"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        colorC.Run(src)
-        dst2 = colorC.dst2
-        dst3 = colorC.dst3
-        classCount = colorC.fCells.Count
-
-        labels(2) = CStr(classCount) + " regions were identified"
+        rMin.Run(src)
+        dst2 = rMin.dst2
+        dst3 = rMin.dst3
+        labels(2) = rMin.labels(2)
+        classCount = rMin.minCells.Count
     End Sub
 End Class
 
@@ -233,8 +232,9 @@ End Class
 
 Public Class Flood_Featureless : Inherits VB_Algorithm
     Public classCount As Integer
-    Dim colorC As New RedColor_Basics
-    Dim fCells As New List(Of rcData)
+    Dim rMin As New RedMin_Basics
+    Dim minCells As New List(Of rcPrep)
+    Dim contour As New Contour_Basics
     Public Sub New()
         labels = {"", "", "", "Palette output of image at left"}
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -247,19 +247,19 @@ Public Class Flood_Featureless : Inherits VB_Algorithm
             src = fless.dst2
         End If
 
-        colorC.Run(src)
-        classCount = colorC.fCells.Count
+        rMin.Run(src)
+        classCount = rMin.minCells.Count
 
-        Dim index As Integer = 1
         dst2.SetTo(0)
-        fCells.Clear()
-        For Each rc In colorC.fCells
-            rc.hull = cv.Cv2.ConvexHull(rc.contour, True).ToList
-            vbDrawContour(dst2(rc.rect), rc.hull, rc.index, -1)
-            fCells.Add(rc)
+        minCells.Clear()
+        For Each rp In rMin.minCells
+            Dim contour = contourBuild(rp.mask, cv.ContourApproximationModes.ApproxNone) ' .ApproxTC89L1
+            Dim hull = cv.Cv2.ConvexHull(contour, True).ToList
+            vbDrawContour(dst2(rp.rect), hull, rp.index, -1)
+            minCells.Add(rp)
         Next
 
-        labels(2) = "Hulls were added for each of the " + CStr(fCells.Count) + " cells identified"
-        dst3 = vbPalette(dst2 * 255 / fCells.Count)
+        labels(2) = "Hulls were added for each of the " + CStr(minCells.Count) + " cells identified"
+        dst3 = vbPalette(dst2 * 255 / minCells.Count)
     End Sub
 End Class

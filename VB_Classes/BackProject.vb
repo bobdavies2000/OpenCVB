@@ -729,6 +729,7 @@ Public Class BackProject_MeterByMeter : Inherits VB_Algorithm
         desc = "Backproject the depth data at 1 meter intervals WITHOUT A HISTOGRAM."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        If gOptions.HistBinSlider.Value < task.maxZmeters Then gOptions.HistBinSlider.Value = task.maxZmeters + 1
         If task.optionsChanged Then
             Dim incr = task.maxZmeters / task.histogramBins
             Dim histData As New List(Of Single)
@@ -739,7 +740,9 @@ Public Class BackProject_MeterByMeter : Inherits VB_Algorithm
             histogram = New cv.Mat(task.histogramBins, 1, cv.MatType.CV_32F, histData.ToArray)
         End If
         Dim ranges() = New cv.Rangef() {New cv.Rangef(0, task.maxZmeters)}
-        cv.Cv2.CalcBackProject({task.pcSplit(2)}, {0}, histogram, dst2, ranges)
-        dst3 = vbPalette(dst2)
+        cv.Cv2.CalcBackProject({task.pcSplit(2)}, {0}, histogram, dst1, ranges)
+        dst1.SetTo(task.maxZmeters, task.maxDepthMask)
+        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
+        dst3 = vbPalette(dst1)
     End Sub
 End Class
