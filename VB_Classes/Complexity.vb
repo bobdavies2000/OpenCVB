@@ -170,7 +170,7 @@ Public Class Complexity_Dots : Inherits VB_Algorithm
 
         Dim maxX = srcX.Max
         Dim pointSet As New List(Of cv.Point)
-        Static dst As New cv.Mat(640, 480, cv.MatType.CV_8UC3, 0)
+        Static dst As New cv.Mat(New cv.Size(task.minRes.Width * 2, task.minRes.Height * 2), cv.MatType.CV_8UC3, 0)
         If initialize Then dst.SetTo(0)
         For i = 0 To sortData.Count - 1
             Dim pt = New cv.Point(dst.Width * sortData.ElementAt(i).Key / maxX,
