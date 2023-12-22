@@ -1,7 +1,55 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.IO
-Imports NAudio.Gui
-Imports NAudio.Wave
+' https://www.codeproject.com/Articles/5373108/Understanding-Time-Complexity-on-Simple-Examples
+Public Class Complexity_Basics : Inherits VB_Algorithm
+    Dim complex As New Complexity_Dots
+    Public Sub New()
+        desc = "Plot all the available complexity runs."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        complex.options.RunVB()
+
+        Dim saveLatestFile = complex.options.filename.FullName
+
+        complex.maxTime = 0
+        For i = 0 To complex.options.filenames.Count - 1
+            complex.fileName = complex.options.filenames(i)
+            complex.Run(src)
+        Next
+
+        complex.initialize = True
+        For i = 0 To complex.options.filenames.Count - 1
+            complex.fileName = complex.options.filenames(i)
+            complex.plotColor = complex.options.setPlotColor()
+            complex.Run(src)
+            complex.initialize = False
+        Next
+
+        dst3 = complex.dst2.Clone
+
+        setTrueText(">>>>>> Increasing input data >>>>>>" + vbCrLf + "All available complexity runs",
+                    New cv.Point(dst2.Width / 4, 10), 3)
+        setTrueText(" TIME " + "(Max = " + Format(complex.maxTime, fmt0) + ")", New cv.Point(0, dst2.Height / 2), 3)
+
+        complex.initialize = True
+        complex.fileName = saveLatestFile
+        complex.plotColor = complex.options.setPlotColor()
+        complex.Run(src)
+        dst2 = complex.dst2
+
+        setTrueText(" >>>>>> Increasing input data >>>>>>" + vbCrLf + complex.options.filename.Name,
+                    New cv.Point(dst2.Width / 4, 10))
+        setTrueText(" TIME " + "(Max = " + Format(complex.maxTime, fmt0) + ")", New cv.Point(0, dst2.Height / 2))
+        labels(2) = complex.labels(2)
+        labels(3) = "Plots For all available complexity runs"
+    End Sub
+End Class
+
+
+
+
+
+
 ' https://www.codeproject.com/Articles/5373108/Understanding-Time-Complexity-on-Simple-Examples
 Public Class Complexity_PlotOpenCV : Inherits VB_Algorithm
     Public plot As New Plot_Basics_CPP
@@ -70,63 +118,11 @@ End Class
 
 
 
-
-' https://www.codeproject.com/Articles/5373108/Understanding-Time-Complexity-on-Simple-Examples
-Public Class Complexity_Basics : Inherits VB_Algorithm
-    Dim complex As New Complexity_Dots
-    Public Sub New()
-        desc = "Plot all the available complexity runs."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        complex.options.RunVB()
-
-        Dim saveLatestFile = complex.options.filename.FullName
-
-        complex.maxTime = 0
-        For Each name In complex.options.filenames
-            complex.fileName = name
-            complex.Run(src)
-        Next
-
-        complex.initialize = True
-        For i = 0 To complex.options.filenames.Count - 1
-            complex.fileName = complex.options.filenames(i)
-            complex.Run(src)
-            complex.initialize = False
-            complex.plotColor = Choose((i + 1) Mod 4, cv.Scalar.White, cv.Scalar.Red, cv.Scalar.Green, cv.Scalar.Yellow)
-        Next
-
-        dst3 = complex.dst2.Clone
-
-        setTrueText(">>>>>> Increasing input data >>>>>>", New cv.Point(dst2.Width / 4, 10), 3)
-        setTrueText(" TIME " + "(Max = " + Format(complex.maxTime, fmt0) + ")", New cv.Point(0, dst2.Height / 2), 3)
-
-        complex.fileName = saveLatestFile
-        complex.initialize = True
-        complex.plotColor = cv.Scalar.Yellow
-        complex.Run(src)
-        dst2 = complex.dst2.Clone
-
-        setTrueText(">>>>>> Increasing input data >>>>>>", New cv.Point(dst2.Width / 4, 10))
-        setTrueText(" TIME " + "(Max = " + Format(complex.maxTime, fmt0) + ")", New cv.Point(0, dst2.Height / 2))
-
-        labels(2) = complex.labels(2)
-        labels(3) = "Plots for all available complexity runs"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 ' https://www.codeproject.com/Articles/5373108/Understanding-Time-Complexity-on-Simple-Examples
 Public Class Complexity_Dots : Inherits VB_Algorithm
     Public options As New Options_Complexity
-    Public plotColor As cv.Scalar = cv.Scalar.Yellow
     Public initialize As Boolean = True, maxTime As Single, fileName As String
+    Public plotColor As cv.Scalar
     Public Sub New()
         desc = "Plot the results of multiple runs at various resolutions."
     End Sub
@@ -186,7 +182,8 @@ Public Class Complexity_Dots : Inherits VB_Algorithm
             dst2.Line(pointSet(i - 1), pointSet(i), plotColor, task.lineWidth, task.lineType)
         Next
 
-        setTrueText(">>>>>> Increasing input data >>>>>>", New cv.Point(dst2.Width / 4, 10))
+        setTrueText(">>>>>> Increasing input data >>>>>>" + vbCrLf + options.filename.Name,
+                    New cv.Point(dst2.Width / 4, 10))
         setTrueText(" TIME " + "(Max = " + Format(maxTime, fmt0) + ")", New cv.Point(0, dst2.Height / 2))
         labels(2) = "Complexity plot for " + options.filename.Name.Substring(0, Len(options.filename.Name) - 4)
     End Sub

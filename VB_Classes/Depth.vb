@@ -19,28 +19,34 @@ Public Class Depth_Basics : Inherits VB_Algorithm
             dst3 = task.maxDepthMask
             setTrueText(gMatrixToStr(task.gMatrix), 3)
         Else
+
             IMUOptions.RunVB()
             IMUBasics.Run(Nothing)
 
             gMat.Run(Nothing)
             task.gMatrix = gMat.gMatrix
+            If gOptions.useHistoryCloud.Checked Or gOptions.gravityPointCloud.Checked Then
 
-            If gOptions.gravityPointCloud.Checked Then
-                '******* this is the rotation *******
-                task.pointCloud = (task.pointCloud.Reshape(1, src.Rows * src.Cols) * task.gMatrix).ToMat.Reshape(3, src.Rows)
-            End If
-
-            task.pcSplit = task.pointCloud.Split
-            task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-            If gOptions.useHistoryCloud.Checked Then
-                task.historyCount = gOptions.FrameHistory.Value
-                hCloud.Run(task.pointCloud)
-                task.pointCloud = hCloud.dst2
+                If gOptions.gravityPointCloud.Checked Then
+                    '******* this is the rotation *******
+                    task.pointCloud = (task.pointCloud.Reshape(1, src.Rows * src.Cols) * task.gMatrix).ToMat.Reshape(3, src.Rows)
+                End If
 
                 task.pcSplit = task.pointCloud.Split
                 task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+                If gOptions.useHistoryCloud.Checked Then
+                    task.historyCount = gOptions.FrameHistory.Value
+                    hCloud.Run(task.pointCloud)
+                    task.pointCloud = hCloud.dst2
+
+                    task.pcSplit = task.pointCloud.Split
+                    task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
+                Else
+                    task.historyCount = 1
+                End If
             Else
-                task.historyCount = 1
+                task.pcSplit = task.pointCloud.Split
+                task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
             End If
             task.noDepthMask = Not task.depthMask
 

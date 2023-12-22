@@ -6,7 +6,7 @@ Public Class Color_Basics : Inherits VB_Algorithm
     Dim km As New KMeans_Basics
     Dim lut As New LUT_Basics
     Dim reduction As New Reduction_Basics
-    Dim bp3D As New Hist3DBGR_Basics
+    Dim bp3D As New Hist3Dcolor_Basics
     Dim fLess As New RedColor_FeatureLess
     Dim classifier As Object = reduction
     Public Sub New()
@@ -238,7 +238,7 @@ End Class
 
 
 Public Class Color_TopX_VB : Inherits VB_Algorithm
-    Dim topX As New Hist3DBGR_TopXColors
+    Dim topX As New Hist3Dcolor_TopXColors
     Public Sub New()
         If sliders.Setup(traceName) Then sliders.setupTrackBar("Top X pixels", 2, 32, 16)
         desc = "Classify every BGR pixel into some common colors"

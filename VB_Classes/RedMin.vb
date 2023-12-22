@@ -181,7 +181,7 @@ End Class
 
 Public Class RedMin_Hist3DBackProject : Inherits VB_Algorithm
     Dim rMin As New RedMin_Basics
-    Dim hist3d As New Hist3DBGR_SortedHistogram
+    Dim hist3d As New Hist3Dcolor_SortedHistogram
     Public Sub New()
         desc = "For the largest cell, use the histogram 3D results from a previous frame to backproject onto the current frame"
     End Sub
@@ -214,7 +214,7 @@ End Class
 
 Public Class RedMin_PixelVector3D : Inherits VB_Algorithm
     Dim rMin As New RedMin_Basics
-    Dim hist3d As New Hist3DBGR_SortedHistogram
+    Dim hist3d As New Hist3Dcolor_SortedHistogram
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True

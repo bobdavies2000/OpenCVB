@@ -16,7 +16,7 @@ using namespace  cv;
 // The rows and cols are both -1 so I had assumed there was a bug but the data is accessible with the at method.
 // If you attempt the same access to the data in managed code, it does not work (AFAIK).
 extern "C" __declspec(dllexport)
-float* Hist3DBGR_Run(int* bgrPtr, int rows, int cols, int bins)
+float* Hist3Dcolor_Run(int* bgrPtr, int rows, int cols, int bins)
 {
 	float hRange[] = { 0, 256 }; // ranges are exclusive in the top of the range, hence 256
 	const float* range[] = { hRange, hRange, hRange };

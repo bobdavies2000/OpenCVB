@@ -4280,9 +4280,11 @@ End Class
 
 Public Class Options_Complexity : Inherits VB_Algorithm
     Public filename As FileInfo
-    Public filenames() As String
+    Public filenames As List(Of String)
+    Public plotColor As cv.Scalar = cv.Scalar.Yellow
     Public Sub New()
-        filenames = Directory.GetFiles(task.homeDir + "Complexity")
+        Dim fnames = Directory.GetFiles(task.homeDir + "Complexity")
+        filenames = fnames.ToList
         Dim latestFile = Directory.GetFiles(task.homeDir + "Complexity").OrderByDescending(
                      Function(f) New FileInfo(f).LastWriteTime).First()
         If findfrm(traceName + " Radio Options") Is Nothing Then
@@ -4297,11 +4299,21 @@ Public Class Options_Complexity : Inherits VB_Algorithm
             radio.check(saveIndex).Checked = True
         End If
     End Sub
+    Public Function setPlotColor() As cv.Scalar
+        Static frm = findfrm(traceName + " Radio Buttons")
+        Dim index As Integer
+        For index = 0 To filenames.Count - 1
+            If filename.FullName = filenames(index) Then Exit For
+        Next
+        plotColor = Choose(index Mod 4 + 1, cv.Scalar.White, cv.Scalar.Red, cv.Scalar.Green, cv.Scalar.Yellow)
+        Return plotColor
+    End Function
     Public Sub RunVB()
         Static frm = findfrm(traceName + " Radio Buttons")
-        For Each chk In frm.check
-            If chk.checked Then
-                filename = New FileInfo(task.homeDir + "Complexity/" + chk.text)
+        For i = 0 To frm.check.count - 1
+            If frm.check(i).checked Then
+                filename = New FileInfo(task.homeDir + "Complexity/" + frm.check(i).text)
+                plotColor = Choose((i + 1) Mod 4, cv.Scalar.White, cv.Scalar.Red, cv.Scalar.Green, cv.Scalar.Yellow)
                 Exit For
             End If
         Next

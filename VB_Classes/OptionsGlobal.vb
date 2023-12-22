@@ -55,19 +55,6 @@ Public Class OptionsGlobal
 
         ShowAllOptions.Checked = GetSetting("OpenCVB1", "ShowAllOptions", "ShowAllOptions", False)
 
-        redOptions.SimpleReductionSlider.Value = 40
-        Select Case task.cameraName
-            Case "Azure Kinect 4K"
-            Case "Intel(R) RealSense(TM) Depth Camera 435i"
-            Case "Intel(R) RealSense(TM) Depth Camera 455"
-            Case "Oak-D camera"
-                redOptions.SimpleReductionSlider.Value = 80
-            Case "StereoLabs ZED 2/2i"
-            Case "MYNT-EYE-D1000"
-        End Select
-
-        redOptions.BitwiseReductionSlider.Value = 5
-
         task.dotSize = 1
         task.cvFontThickness = 1
         Select Case task.workingRes.Width
@@ -80,6 +67,8 @@ Public Class OptionsGlobal
                 task.minRes = New cv.Size(240, 135)
                 task.quarterRes = New cv.Size(480, 270)
                 task.densityMetric = 40
+                gravityPointCloud.Checked = False ' too expensive at this resolution
+                useHistoryCloud.Checked = False ' too expensive at this resolution
             Case 960
                 GridSize.Value = 96
                 task.cvFontSize = 2.0
@@ -105,6 +94,8 @@ Public Class OptionsGlobal
                 task.minRes = New cv.Size(320, 180)
                 task.quarterRes = New cv.Size(320, 180)
                 task.densityMetric = 150
+                gravityPointCloud.Checked = False ' too expensive at this resolution
+                useHistoryCloud.Checked = False ' too expensive at this resolution
             Case 640
                 GridSize.Value = 64
                 task.cvFontSize = 1.5

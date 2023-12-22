@@ -72,6 +72,19 @@ Public Class OptionsRedCloud
         histBinList = {task.histogramBins, task.histogramBins}
         UseDepthAndColor.Checked = True
 
+        redOptions.SimpleReductionSlider.Value = 40
+        Select Case task.cameraName
+            Case "Azure Kinect 4K"
+            Case "Intel(R) RealSense(TM) Depth Camera 435i"
+            Case "Intel(R) RealSense(TM) Depth Camera 455"
+            Case "Oak-D camera"
+                redOptions.SimpleReductionSlider.Value = 80
+            Case "StereoLabs ZED 2/2i"
+            Case "MYNT-EYE-D1000"
+        End Select
+
+        redOptions.BitwiseReductionSlider.Value = 5
+
         Me.Left = 0
         Me.Top = 0
     End Sub

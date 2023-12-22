@@ -1097,7 +1097,7 @@ Module Histogram_1D_CPP_Module
 
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Hist3DBGR_Run(bgrPtr As IntPtr, rows As Integer, cols As Integer, bins As Integer) As IntPtr
+    Public Function Hist3Dcolor_Run(bgrPtr As IntPtr, rows As Integer, cols As Integer, bins As Integer) As IntPtr
     End Function
 
 
