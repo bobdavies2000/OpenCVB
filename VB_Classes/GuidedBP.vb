@@ -11,7 +11,7 @@ Public Class GuidedBP_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         heatTop.Run(src)
 
-        dst3 = heatTop.histogram.Threshold(task.redThresholdSide, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
+        dst3 = heatTop.histogram.Threshold(task.redThresholdTop, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
         colorC.Run(dst3)
 
         Dim doctoredHist32f As New cv.Mat

@@ -170,21 +170,23 @@ Public Class Complexity_Dots : Inherits VB_Algorithm
 
         Dim maxX = srcX.Max
         Dim pointSet As New List(Of cv.Point)
-        If initialize Then dst2.SetTo(0)
+        Static dst As New cv.Mat(640, 480, cv.MatType.CV_8UC3, 0)
+        If initialize Then dst.SetTo(0)
         For i = 0 To sortData.Count - 1
-            Dim pt = New cv.Point(dst2.Width * sortData.ElementAt(i).Key / maxX,
-                                  dst2.Height - dst2.Height * sortData.ElementAt(i).Value / maxTime)
-            dst2.Circle(pt, task.dotSize, plotColor, -1, task.lineType)
+            Dim pt = New cv.Point(dst.Width * sortData.ElementAt(i).Key / maxX,
+                                  dst.Height - dst.Height * sortData.ElementAt(i).Value / maxTime)
+            dst.Circle(pt, task.dotSize, plotColor, -1, task.lineType)
             pointSet.Add(pt)
         Next
 
         For i = 1 To pointSet.Count - 1
-            dst2.Line(pointSet(i - 1), pointSet(i), plotColor, task.lineWidth, task.lineType)
+            dst.Line(pointSet(i - 1), pointSet(i), plotColor, task.lineWidth, task.lineType)
         Next
 
         setTrueText(">>>>>> Increasing input data >>>>>>" + vbCrLf + options.filename.Name,
                     New cv.Point(dst2.Width / 4, 10))
         setTrueText(" TIME " + "(Max = " + Format(maxTime, fmt0) + ")", New cv.Point(0, dst2.Height / 2))
         labels(2) = "Complexity plot for " + options.filename.Name.Substring(0, Len(options.filename.Name) - 4)
+        dst2 = dst.Resize(dst2.Size)
     End Sub
 End Class
