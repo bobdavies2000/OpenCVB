@@ -41,8 +41,6 @@ Public Class Depth_Basics : Inherits VB_Algorithm
 
                     task.pcSplit = task.pointCloud.Split
                     task.depthMask = task.pcSplit(2).Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs()
-                Else
-                    task.historyCount = 1
                 End If
             Else
                 task.pcSplit = task.pointCloud.Split
@@ -72,6 +70,7 @@ Public Class Depth_Basics : Inherits VB_Algorithm
             maxMask.Run(task.maxDepthMask)
             task.maxDepthMask = maxMask.dst2 ' Use the contour of the mask
         End If
+        If task.historyCount = 0 Then task.historyCount = 1
     End Sub
 End Class
 
@@ -705,6 +704,7 @@ Public Class Depth_Fusion : Inherits VB_Algorithm
         fuseFrames.Add(src.Clone)
         If fuseFrames.Count > task.historyCount Then fuseFrames.RemoveAt(0)
 
+        If fuseFrames.Count = 0 Then Exit Sub
         dst2 = fuseFrames(0).Clone
         For i = 1 To fuseFrames.Count - 1
             cv.Cv2.Max(fuseFrames(i), dst2, dst2)
