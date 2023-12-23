@@ -89,8 +89,8 @@ extern "C" __declspec(dllexport) int*
 
 
 
-FloodCell_Run(FloodCell * cPtr, int* dataPtr, unsigned char* maskPtr,
-    int rows, int cols, int type, float sizeThreshold, int maxClassCount, int diff)
+FloodCell_Run(FloodCell * cPtr, int* dataPtr, unsigned char* maskPtr, int rows, int cols, int type, 
+              float sizeThreshold, int maxClassCount, int diff)
 {
     cPtr->src = Mat(rows, cols, type, dataPtr);
     cPtr->mask = Mat(rows + 2, cols + 2, CV_8U);

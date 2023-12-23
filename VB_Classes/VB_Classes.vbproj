@@ -179,7 +179,6 @@
     <Compile Include="Profile.vb" />
     <Compile Include="ShapeDetect.vb" />
     <Compile Include="Sides.vb" />
-    <Compile Include="SOM.vb" />
     <Compile Include="Spectrum.vb" />
     <Compile Include="Tessallate.vb" />
     <Compile Include="Thickness.vb" />

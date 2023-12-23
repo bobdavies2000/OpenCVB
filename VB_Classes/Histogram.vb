@@ -417,7 +417,6 @@ Public Class Histogram_PeaksRGB : Inherits VB_Algorithm
         If task.optionsChanged Then
             task.mouseClickFlag = True
             task.mousePicTag = RESULT_DST2
-            task.clickPoint = New cv.Point(10, 10) ' upper left image is the default
         End If
 
         mats.Run(Nothing)
@@ -1248,7 +1247,7 @@ End Class
 Public Class Histogram_Depth : Inherits VB_Algorithm
     Public plot As New Plot_Histogram
     Public rc As rcData
-    Public kw As New kwData
+    Public gbp As New gbpData
     Public mm As mmData
     Public Sub New()
         desc = "Show depth data as a histogram."
@@ -1268,7 +1267,7 @@ Public Class Histogram_Depth : Inherits VB_Algorithm
 
         cv.Cv2.CalcHist({src}, {0}, New cv.Mat, plot.histogram, 1, {task.histogramBins},
                         {New cv.Rangef(plot.minRange, plot.maxRange)})
-        plot.histogram.Row(0).Set(Of Single)(0, 0, 0)
+        ' plot.histogram.Row(0).Set(Of Single)(0, 0, 0)
 
         plot.Run(plot.histogram)
         dst2 = plot.dst2
@@ -1282,9 +1281,10 @@ Public Class Histogram_Depth : Inherits VB_Algorithm
             If heartBeat() Then
                 Dim expected = src.CountNonZero
                 Dim actual = CInt(plot.histogram.Sum(0))
-                strOut = "Expected sample count:" + vbTab + CStr(expected) + vbCrLf +
-                         "Actual sample count:" + vbTab + CStr(actual) + vbCrLf +
-                         "Difference:" + vbTab + vbTab + CStr(Math.Abs(actual - expected))
+                strOut = "Expected sample count (non-zero task.pcSplit(2) entries):" + vbTab + CStr(expected) + vbCrLf
+                strOut += "Actual sample count from histogram sum:" + vbTab + vbTab + vbTab + CStr(actual) + vbCrLf
+                strOut += "Difference:" + vbTab + vbTab + vbTab + vbTab + vbTab + vbTab + CStr(Math.Abs(actual - expected)) + vbCrLf
+                strOut += "Count nonzero entries in task.maxDepthMask: " + vbTab + vbTab + CStr(task.maxDepthMask.CountNonZero)
             End If
             setTrueText(strOut, 3)
         End If

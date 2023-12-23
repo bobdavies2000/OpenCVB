@@ -210,6 +210,14 @@ Module VB
             task.rcSelect = redCells(index)
         End If
     End Sub
+    Public Function showSelectionGBP(ByRef gbpCells As List(Of gbpData), ByRef cellMap As cv.Mat) As gbpData
+        If task.clickPoint = New cv.Point(0, 0) Then
+            task.clickPoint = gbpCells(1).maxDist
+            Return gbpCells(1)
+        End If
+        Dim index = cellMap.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+        Return gbpCells(index)
+    End Function
     Public Function contourBuild(mask As cv.Mat, approxMode As cv.ContourApproximationModes) As List(Of cv.Point)
         Dim allContours As cv.Point()()
         cv.Cv2.FindContours(mask, allContours, Nothing, cv.RetrievalModes.External, approxMode)
@@ -725,7 +733,7 @@ End Structure
 
 
 
-Public Class kwData
+Public Class gbpData
     Public mask As cv.Mat
     Public hull As List(Of cv.Point)
     Public contour As List(Of cv.Point)

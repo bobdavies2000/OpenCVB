@@ -1,24 +1,25 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class RedMin_Basics : Inherits VB_Algorithm
-    Dim rMin As New RedMin_Core
+    Public minCore As New RedMin_Core
     Public minCells As New List(Of rcPrep)
     Dim rMotion As New RedMin_Motion
+    Public useMotion As Boolean = True
     Public Sub New()
-        rMotion.rMin = rMin
+        rMotion.minCore = minCore
         redOptions.DesiredCellSlider.Value = 30
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels = {"", "Mask of active RedMin cells", "CV_8U representation of minCells", ""}
         desc = "Collect the occasional cells found in RedMin_Basics and age them out."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        rMin.Run(src)
-        rMotion.Run(src)
+        minCore.Run(src)
+        If useMotion Then rMotion.Run(src)
 
         Dim lastColors = dst3.Clone
         If heartBeat() Then minCells.Clear()
 
-        For Each rp In rMin.minCells
+        For Each rp In minCore.minCells
             minCells.Add(rp)
         Next
 
@@ -30,10 +31,12 @@ Public Class RedMin_Basics : Inherits VB_Algorithm
         Dim allCells = New List(Of rcPrep)(minCells)
         For i = minCells.Count - 1 To 0 Step -1
             Dim rp = minCells(i)
-            Dim motionVal = rMotion.dst3.Get(Of Byte)(rp.maxDist.Y, rp.maxDist.X)
-            If motionVal <> 0 And rp.frameCount <> task.frameCount Then
-                motionCount += 1
-                Continue For
+            If useMotion Then
+                Dim motionVal = rMotion.dst3.Get(Of Byte)(rp.maxDist.Y, rp.maxDist.X)
+                If motionVal <> 0 And rp.frameCount <> task.frameCount Then
+                    motionCount += 1
+                    Continue For
+                End If
             End If
 
             Dim alreadySeen = dst2.Get(Of Byte)(rp.maxDist.Y, rp.maxDist.X)
@@ -51,7 +54,7 @@ Public Class RedMin_Basics : Inherits VB_Algorithm
 
             rp.color = lastColors.Get(Of cv.Vec3b)(rp.maxDist.Y, rp.maxDist.X)
             If rp.color = black Then
-                rp.color = rMin.dst3.Get(Of cv.Vec3b)(rp.maxDist.Y, rp.maxDist.X)
+                rp.color = minCore.dst3.Get(Of cv.Vec3b)(rp.maxDist.Y, rp.maxDist.X)
             End If
 
             If usedColors.Contains(rp.color) Then rp.color = randomCellColor()
@@ -77,6 +80,7 @@ End Class
 Public Class RedMin_Core : Inherits VB_Algorithm
     Public minCells As New List(Of rcPrep)
     Public minL2D As New List(Of rcPrep)
+    Public maskInput As cv.Mat
     Public Sub New()
         cPtr = FloodCell_Open()
         desc = "Another minimalist approach to building RedCloud cells."
@@ -88,13 +92,29 @@ Public Class RedMin_Core : Inherits VB_Algorithm
             src = fLess.dst2
         End If
 
-        Dim inputData(src.Total - 1) As Byte
-        Marshal.Copy(src.Data, inputData, 0, inputData.Length)
-        Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+        Dim imagePtr As IntPtr
+        If maskInput Is Nothing Then
+            Dim inputData(src.Total - 1) As Byte
+            Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-        Dim imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols,
-                                 src.Type, redOptions.imageThresholdPercent, redOptions.DesiredCellSlider.Value, 0)
-        handleInput.Free()
+            imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols,
+                                     src.Type, redOptions.imageThresholdPercent, redOptions.DesiredCellSlider.Value, 0)
+            handleInput.Free()
+        Else
+            Dim inputData(src.Total - 1) As Byte
+            Marshal.Copy(src.Data, inputData, 0, inputData.Length)
+            Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
+
+            Dim maskData(maskInput.Total - 1) As Byte
+            Marshal.Copy(maskInput.Data, maskData, 0, maskData.Length)
+            Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
+
+            imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols,
+                                     src.Type, redOptions.imageThresholdPercent, redOptions.DesiredCellSlider.Value, 0)
+            handleMask.Free()
+            handleInput.Free()
+        End If
 
         Dim classCount = FloodCell_Count(cPtr)
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr).Clone
@@ -258,7 +278,7 @@ End Class
 
 
 Public Class RedMin_Motion : Inherits VB_Algorithm
-    Public rMin As New RedMin_Core
+    Public minCore As New RedMin_Core
     Dim diff As New Diff_Basics
     Public Sub New()
         gOptions.PixelDiffThreshold.Value = 25
@@ -269,13 +289,13 @@ Public Class RedMin_Motion : Inherits VB_Algorithm
         diff.Run(src)
 
         If standalone Then
-            rMin.Run(src)
-            dst2 = rMin.dst2
+            minCore.Run(src)
+            dst2 = minCore.dst2
         End If
 
         Dim minPixels = gOptions.minPixelsSlider.Value
         Dim rect As cv.Rect
-        For Each rp In rMin.minCells
+        For Each rp In minCore.minCells
             Dim tmp As cv.Mat = rp.mask And diff.dst3(rp.rect)
             If tmp.CountNonZero Then
                 If rect.Width = 0 Then rect = rp.rect Else rect = rect.Union(rp.rect)

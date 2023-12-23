@@ -4,8 +4,6 @@ Imports System.IO.MemoryMappedFiles
 Imports System.IO.Pipes
 Imports System.Drawing
 Imports cvext = OpenCvSharp.Extensions
-Imports OpenCvSharp
-
 Public Class OpenGL_Basics : Inherits VB_Algorithm
     Dim memMapWriter As MemoryMappedViewAccessor
     ReadOnly startInfo As New ProcessStartInfo
@@ -1380,14 +1378,14 @@ End Class
 
 
 Public Class OpenGL_KWhere : Inherits VB_Algorithm
-    Dim kWare As New GuidedBP_Hulls
+    Dim gpbWare As New GuidedBP_Hulls
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Show the KWhere output in OpenGL"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        kWare.Run(src)
-        dst2 = kWare.dst2
+        gpbWare.Run(src)
+        dst2 = gpbWare.dst2
 
         task.ogl.pointCloudInput = task.pointCloud
         task.ogl.Run(dst2)
@@ -1860,7 +1858,7 @@ End Class
 
 
 Public Class OpenGL_ViewObjects : Inherits VB_Algorithm
-    Dim bpDoctor As New GuidedBP_Basics
+    Dim bpDoctor As New GuidedBP_Points
     Public Sub New()
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         desc = "Identify the objects in the scene and display them in OpenGL with their respective colors."

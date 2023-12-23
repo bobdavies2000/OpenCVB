@@ -1,103 +1,51 @@
 ﻿Imports System.Runtime.InteropServices
 Imports cv = OpenCvSharp
 Public Class GuidedBP_Basics : Inherits VB_Algorithm
-    Dim heatTop As New Histogram2D_Top
-    Public classCount As Integer
-    Public colorC As New RedColor_Basics
+    Public ptHot As New GuidedBP_HotPoints
+    Dim topMap As New cv.Mat, sideMap As New cv.Mat
     Public Sub New()
-        labels(3) = "Threshold of Top View"
-        desc = "Use floodfill to identify all the objects in the selected view then build a backprojection that identifies k objects in the image view."
+        topMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        sideMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Correlate the hot points with the previous generation using a Map"
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        heatTop.Run(src)
-
-        dst3 = heatTop.histogram.Threshold(task.redThresholdTop, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs
-        colorC.Run(dst3)
-
-        Dim doctoredHist32f As New cv.Mat
-        colorC.dst3.ConvertTo(doctoredHist32f, cv.MatType.CV_32F)
-        classCount = colorC.fCells.Count
-
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, doctoredHist32f, dst1, task.rangesTop)
-        dst1 = dst1.ConvertScaleAbs()
-
-        dst2 = vbPalette(dst1 * 255 / classCount)
-
-        labels(2) = "Backprojection of both top and side views contains " + CStr(classCount) + " objects"
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class GuidedBP_Cells : Inherits VB_Algorithm
-    Dim bpDoctor As New GuidedBP_Basics
-    Public kCells As New List(Of kwData)
-    Dim contours As New Contour_Largest
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        desc = "Build the kCells for the current point cloud"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        bpDoctor.Run(src)
-
-        Dim newCells As New SortedList(Of Integer, kwData)(New compareAllowIdenticalIntegerInverted)
-        For i = 1 To bpDoctor.classCount
-            Dim kw As New kwData
-            kw.mask = bpDoctor.dst1.InRange(i, i).Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-            contours.Run(kw.mask)
-            kw.contour = contours.bestContour
-            kw.hull = cv.Cv2.ConvexHull(kw.contour.ToArray, True).ToList
-
-            kw.mask.SetTo(0)
-            vbDrawContour(kw.mask, kw.contour, 255, -1)
-            kw.maxDist = vbGetMaxDist(kw.mask)
-
-            kw.mmX = vbMinMax(task.pcSplit(0), kw.mask)
-            kw.mmY = vbMinMax(task.pcSplit(1), kw.mask)
-            kw.mmZ = vbMinMax(task.pcSplit(2), kw.mask)
-            kw.size = kw.mask.CountNonZero()
-
-            ' only keep the object if it is larger that one half of 1% of the image.
-            If kw.size >= dst2.Total * 0.005 Then newCells.Add(kw.size, kw)
+    Private Sub runMap(rectList As List(Of cv.Rect), dstindex As Integer, map As cv.Mat)
+        Dim sortRects As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
+        For Each r In rectList
+            sortRects.Add(r.Width * r.Height, r)
         Next
 
-        kCells.Clear()
-        kCells.Add(New kwData)
-        dst1.SetTo(0)
-        Dim lastDst2 = dst2.Clone
-        dst2.SetTo(0)
-        For i = 0 To newCells.Count - 1
-            Dim kw = newCells.ElementAt(i).Value
-            kw.color = lastDst2.Get(Of cv.Vec3b)(kw.maxDist.Y, kw.maxDist.X)
-            If kw.color = black Then
-                kw.color = randomCellColor()
+        Dim ptList As New List(Of cv.Point)
+        Dim indices As New List(Of Integer)
+        For Each entry In sortRects
+            Dim r = entry.Value
+            Dim pt = New cv.Point(CInt(r.X + r.Width / 2), CInt(r.Y + r.Height / 2))
+            Dim index = map.Get(Of Byte)(pt.Y, pt.X)
+            If index = 0 Or indices.Contains(index) Then
+                If index = ptList.Count Then index = ptList.Count + 1 Else index = ptList.Count
             End If
-            kw.index = kCells.Count
-
-            kCells.Add(kw)
-            vbDrawContour(dst1, kw.contour, kw.index, -1)
-            vbDrawContour(dst2, kw.contour, kw.color, -1)
-            dst3.Circle(kw.maxDist, task.dotSize + 2, cv.Scalar.White, -1, task.lineType)
-            dst3.Circle(kw.maxDist, task.dotSize, cv.Scalar.Black, -1, task.lineType)
-            setTrueText(CStr(kw.index), kw.maxDist, 2)
+            ptList.Add(pt)
+            indices.Add(index)
         Next
 
-        Dim index = dst1.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        Dim kwx = kCells(index)
-        labels(3) = "Selected cell = " + CStr(kwx.index)
-
-        dst3 = src
-        If kwx.index > 0 Then dst3.SetTo(cv.Scalar.White, kwx.mask)
-
-        For Each kw In kCells
-            dst3.Circle(kw.maxDist, task.dotSize + 1, cv.Scalar.White, -1, task.lineType)
-            dst3.Circle(kw.maxDist, task.dotSize, cv.Scalar.Black, -1, task.lineType)
+        map.SetTo(0)
+        For Each entry In sortRects
+            Dim r = entry.Value
+            Dim pt = New cv.Point(CInt(r.X + r.Width / 2), CInt(r.Y + r.Height / 2))
+            Dim index = indices(ptList.IndexOf(pt))
+            map.Rectangle(r, index, -1)
+            setTrueText(CStr(index), pt, dstindex)
         Next
-        labels(2) = traceName + " identified " + CStr(kCells.Count) + " cells"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        ptHot.Run(src)
+        dst2 = ptHot.dst2
+        dst3 = ptHot.dst3
+
+        runMap(ptHot.topRects, 2, topMap)
+        runMap(ptHot.sideRects, 3, sideMap)
+
+        labels(2) = CStr(ptHot.topRects.Count) + " objects found in the top view"
+        labels(3) = CStr(ptHot.sideRects.Count) + " objects found in the Side view"
     End Sub
 End Class
 
@@ -107,7 +55,7 @@ End Class
 
 
 Public Class GuidedBP_CellHistograms : Inherits VB_Algorithm
-    Dim kWare As New GuidedBP_Hulls
+    Dim gpbWare As New GuidedBP_Hulls
     Dim mats As New Mat_4Click
     Dim plot As New Plot_Histogram
     Public Sub New()
@@ -121,20 +69,24 @@ Public Class GuidedBP_CellHistograms : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         dst0 = src
-        kWare.Run(src)
-        dst3 = kWare.dst2
+        gpbWare.Run(src)
+        dst3 = gpbWare.dst2
 
-        Dim kw = kWare.kwShowSelected(kWare.kCells, kWare.kMap, dst3)
+        Dim gbp As New gbpData
+        If gpbWare.gbpCells.Count > 1 Then
+            gbp = showSelectionGBP(gpbWare.gbpCells, gpbWare.kMap)
+            vbDrawContour(dst3, gbp.contour, gbp.color)
+        End If
 
         If heartBeat() Then
-            If kw.index <> 0 Then
-                Dim zeroMat = Not kw.mask
+            If gbp.index <> 0 Then
+                Dim zeroMat = Not gbp.mask
                 labels(2) = "Histograms for "
                 For i = 0 To 2
                     plot.minRange = Choose(i + 1, -task.xRange, -task.yRange, 0)
                     plot.maxRange = Choose(i + 1, task.xRange, task.yRange, task.maxZmeters)
                     Dim prefix = Choose(i + 1, "X ", "Y ", "Z ")
-                    labels(2) += prefix + " (" + Format(plot.minRange, fmt1) + ", " + Format(plot.maxRange, fmt1) + ")"
+                    labels(2) += " " + prefix + " (" + Format(plot.minRange, fmt1) + ", " + Format(plot.maxRange, fmt1) + ")"
                     If i = task.quadrantIndex Then
                         labels(1) = "histogram range (" + Format(plot.minRange, fmt1) + ", " + Format(plot.maxRange, fmt1) + ")"
                     End If
@@ -142,24 +94,24 @@ Public Class GuidedBP_CellHistograms : Inherits VB_Algorithm
                     plot.Run(task.pcSplit(i))
                     mats.mat(i) = plot.dst2.Clone
                 Next
-                mats.mat(3) = kw.mask
+                dst3.SetTo(cv.Scalar.White, gbp.mask)
             End If
         End If
 
-        If kw.index <> 0 Then
-            vbDrawContour(dst0, kw.contour, cv.Scalar.Yellow, task.lineWidth)
+        If gbp.index <> 0 Then
+            vbDrawContour(dst0, gbp.contour, cv.Scalar.Yellow, task.lineWidth)
         End If
 
         mats.Run(Nothing)
         dst2 = mats.dst2
         dst1 = mats.dst3
 
-        labels(3) = CStr(kWare.kCells.Count) + " objects detected - click to highlight"
-        If heartBeat() And kw.index <> 0 Then
+        labels(3) = CStr(gpbWare.gbpCells.Count) + " objects detected - click to highlight"
+        If heartBeat() And gbp.index <> 0 Then
             strOut = "Select a cell in image at right to see actual ranges " + vbCrLf +
-                     "X min = " + Format(kw.mmX.minVal, fmt1) + " X max = " + Format(kw.mmX.maxVal, fmt1) + vbCrLf +
-                     "Y min = " + Format(kw.mmY.minVal, fmt1) + " Y max = " + Format(kw.mmY.maxVal, fmt1) + vbCrLf +
-                     "Z min = " + Format(kw.mmZ.minVal, fmt1) + " Z max = " + Format(kw.mmZ.maxVal, fmt1)
+                     "X min = " + Format(gbp.mmX.minVal, fmt1) + " X max = " + Format(gbp.mmX.maxVal, fmt1) + vbCrLf +
+                     "Y min = " + Format(gbp.mmY.minVal, fmt1) + " Y max = " + Format(gbp.mmY.maxVal, fmt1) + vbCrLf +
+                     "Z min = " + Format(gbp.mmZ.minVal, fmt1) + " Z max = " + Format(gbp.mmZ.maxVal, fmt1)
         End If
 
         Dim picTag = 2
@@ -180,27 +132,30 @@ End Class
 
 
 
-Public Class GuidedBP_CellRanges : Inherits VB_Algorithm
-    Dim kWare As New GuidedBP_Hulls
+Public Class GuidedBP_Cells : Inherits VB_Algorithm
+    Dim gpbWare As New GuidedBP_Hulls
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         labels = {"", "", "Output of GuidedBP_Hulls", "Ranges for the point cloud data"}
         desc = "Display ranges for X, Y, and Z for the selected KWhere cell."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        kWare.Run(src)
-        dst2 = kWare.dst2
+        gpbWare.Run(src)
+        dst2 = gpbWare.dst2
 
-        Dim kw As kwData
-        If heartBeat() Then kw = kWare.kwShowSelected(kWare.kCells, kWare.dst3, dst1)
+        Dim gbp As New gbpData
+        If gpbWare.gbpCells.Count > 1 Then
+            gbp = showSelectionGBP(gpbWare.gbpCells, gpbWare.kMap)
+            vbDrawContour(dst2, gbp.contour, gbp.color)
+        End If
 
         Static strOut As String
         If heartBeat() Then
-            strOut = "Range for X min/max" + vbTab + Format(kw.mmX.minVal, fmt1) + "/" + Format(kw.mmX.maxVal, fmt1) + vbCrLf
-            strOut += "Range for Y min/max" + vbTab + Format(kw.mmY.minVal, fmt1) + "/" + Format(kw.mmY.maxVal, fmt1) + vbCrLf
-            strOut += "Range for Z min/max" + vbTab + Format(kw.mmZ.minVal, fmt1) + "/" + Format(kw.mmZ.maxVal, fmt1) + vbCrLf
+            strOut = "Range for X min/max" + vbTab + Format(gbp.mmX.minVal, fmt1) + "/" + Format(gbp.mmX.maxVal, fmt1) + vbCrLf
+            strOut += "Range for Y min/max" + vbTab + Format(gbp.mmY.minVal, fmt1) + "/" + Format(gbp.mmY.maxVal, fmt1) + vbCrLf
+            strOut += "Range for Z min/max" + vbTab + Format(gbp.mmZ.minVal, fmt1) + "/" + Format(gbp.mmZ.maxVal, fmt1) + vbCrLf
 
-            dst1 = kw.mask
+            dst1 = gbp.mask
         End If
         setTrueText(strOut, 3)
     End Sub
@@ -318,69 +273,6 @@ End Class
 
 
 
-
-
-Public Class GuidedBP_DelaunayStats : Inherits VB_Algorithm
-    Dim delaunay As New GuidedBP_Delaunay
-    Dim reduction As New Reduction_Basics
-    Dim stats As New Cell_Basics
-    Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        labels(1) = "Compartments for each object"
-        desc = "Compartmentalize the RedCloud_Basics cells so they stay near the objects detected."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        reduction.Run(src)
-
-        delaunay.Run(src)
-        dst2 = delaunay.dst2
-
-        dst0 = reduction.dst2 + delaunay.dst3
-
-        stats.Run(dst0)
-        dst1 = stats.dst1
-        labels(2) = stats.labels(2)
-        setTrueText(stats.strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class GuidedBP_Delaunay : Inherits VB_Algorithm
-    Public kWare As New GuidedBP_Hulls
-    Dim delaunay As New Delaunay_Basics
-    Public kCells As New List(Of kwData)
-    Public Sub New()
-        dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Use Delaunay to create regions from objects"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Then
-            kWare.Run(src)
-            dst2 = kWare.dst2
-
-            Dim usedColors As New List(Of cv.Vec3b)
-            kCells.Clear()
-            delaunay.inputPoints.Clear()
-            usedColors.Clear()
-            For Each kw In kWare.kCells
-                delaunay.inputPoints.Add(kw.maxDist)
-                kCells.Add(kw)
-            Next
-            delaunay.Run(Nothing)
-            dst3 = delaunay.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        End If
-    End Sub
-End Class
-
-
-
-
-
 Public Class GuidedBP_ObjectStats : Inherits VB_Algorithm
     Dim kObj As New GuidedBP_Objects
     Dim stats As New Cell_Basics
@@ -397,148 +289,6 @@ Public Class GuidedBP_ObjectStats : Inherits VB_Algorithm
         dst0 = stats.dst0
         dst1 = stats.dst1
         labels(2) = stats.labels(2)
-        setTrueText(stats.strOut, 3)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class GuidedBP_Objects : Inherits VB_Algorithm
-    Dim kHist As New GuidedBP_History
-    Dim reduction As New Reduction_Basics
-    Public Sub New()
-        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Create the input to RedCloud_Basics combining color and GuidedBP_Hulls output"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        kHist.Run(src)
-        dst2 = kHist.kWare.dst2
-        setTrueText(kHist.strOut, 3)
-
-        reduction.Run(src)
-
-        dst1.SetTo(0)
-        For Each kw In kHist.kCells
-            If kw.index = 0 Then Continue For
-            vbDrawContour(dst1, kw.contour, kw.index + reduction.classCount, -1)
-            setTrueText(CStr(kw.index), kw.maxDist, 2)
-        Next
-
-        Dim kwX = kHist.kWare.kwShowSelected(kHist.kCells, kHist.kMap, dst2)
-        vbDrawContour(dst2, kwX.hull, cv.Scalar.White, task.lineWidth)
-        reduction.dst2.SetTo(0, dst1)
-        dst1 += reduction.dst2
-
-        labels(2) = CStr(kHist.kCells.Count) + " objects found"
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class GuidedBP_History : Inherits VB_Algorithm
-    Public kWare As New GuidedBP_Hulls
-    Dim kCellList As New List(Of List(Of kwData))
-    Public kCells As New List(Of kwData)
-    Public kMap As New cv.Mat
-    Public Sub New()
-        If sliders.Setup(traceName) Then
-            sliders.setupTrackBar("Minimum distance between cells (cm)", 10, 100, 50)
-            sliders.setupTrackBar("Minimum size kCell", 1, dst2.Total / 10, dst2.Total / 100)
-        End If
-
-        kMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Find the cells that are consistently present over time."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static minSlider = findSlider("Minimum size kCell")
-        Static distSlider = findSlider("Minimum distance between cells (cm)")
-        Dim minSize = minSlider.value
-        Dim distanceMin = distSlider.value / 100
-
-        If task.optionsChanged Then kCellList.Clear()
-
-        kWare.Run(src)
-
-        kCellList.Add(New List(Of kwData)(kWare.kCells))
-
-        Dim sortCells As New SortedList(Of Integer, kwData)(New compareAllowIdenticalIntegerInverted)
-        For Each cellList In kCellList
-            For i = 1 To cellList.Count - 1
-                sortCells.Add(cellList(i).size, cellList(i))
-            Next
-        Next
-
-        kMap.SetTo(0)
-        kCells.Clear()
-        kCells.Add(New kwData)
-        Dim lastDst2 = dst2.Clone
-        Dim usedColors As New List(Of cv.Vec3b)({black})
-        For Each entry In sortCells
-            Dim kw = entry.Value
-            Dim index = kMap.Get(Of Byte)(kw.maxDist.Y, kw.maxDist.X)
-            Dim lkw = kCells(index)
-            If Math.Abs((kw.mmZ.minVal + kw.mmZ.maxVal) / 2 - (lkw.mmZ.minVal + lkw.mmZ.maxVal) / 2) > distanceMin Then
-                If kw.size >= minSize Then
-                    kw.index = kCells.Count
-                    Dim color = lastDst2.Get(Of cv.Vec3b)(kw.maxDist.Y, kw.maxDist.X)
-                    If usedColors.Contains(color) = False Then kw.color = color
-                    vbDrawContour(kMap, kw.contour, kw.index, -1)
-                    kCells.Add(kw)
-                    usedColors.Add(kw.color)
-                End If
-            End If
-        Next
-
-        dst2.SetTo(0)
-        For Each kw In kCells
-            vbDrawContour(dst2, kw.contour, kw.color, -1)
-            setTrueText(CStr(kw.index), kw.maxDist, 2)
-        Next
-
-        setTrueText(kWare.strOut, 3)
-
-        Dim kwS = kWare.kwShowSelected(kCells, kMap, dst2)
-        vbDrawContour(task.color, kwS.contour, cv.Scalar.Yellow)
-
-        If kCellList.Count >= task.historyCount Then kCellList.RemoveAt(0)
-        If heartBeat() Then labels(2) = CStr(kCells.Count) + " objects were consistently present"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
-Public Class GuidedBP_RedColor : Inherits VB_Algorithm
-    Dim bpDoctor As New GuidedBP_Cells
-    Dim stats As New Cell_Basics
-    Dim colorClass As New Color_Basics
-    Public Sub New()
-        labels = {"", "", "Cell_Basics output", ""}
-        desc = "Run Cell_Basics on the output of GuidedBP_Basics after merging with task.color"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        bpDoctor.Run(src)
-        dst2 = bpDoctor.dst2
-
-        colorClass.Run(src)
-        dst1 = bpDoctor.dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        colorClass.dst2.CopyTo(dst1, task.noDepthMask)
-
-        stats.Run(dst1)
-        dst0 = stats.dst0
-
         setTrueText(stats.strOut, 3)
     End Sub
 End Class
@@ -593,83 +343,6 @@ Public Class GuidedBP_HotPointsKNN : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-Public Class GuidedBP_HotPointsMap : Inherits VB_Algorithm
-    Public ptHot As New GuidedBP_HotPoints
-    Dim topMap As New cv.Mat, sideMap As New cv.Mat
-    Public Sub New()
-        topMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        sideMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        desc = "Correlate the hot points with the previous generation using a Map"
-    End Sub
-    Private Sub runMap(rectList As List(Of cv.Rect), dstindex As Integer, map As cv.Mat)
-        Dim sortRects As New SortedList(Of Integer, cv.Rect)(New compareAllowIdenticalIntegerInverted)
-        For Each r In rectList
-            sortRects.Add(r.Width * r.Height, r)
-        Next
-
-        Dim ptList As New List(Of cv.Point)
-        Dim indices As New List(Of Integer)
-        For Each entry In sortRects
-            Dim r = entry.Value
-            Dim pt = New cv.Point(CInt(r.X + r.Width / 2), CInt(r.Y + r.Height / 2))
-            Dim index = map.Get(Of Byte)(pt.Y, pt.X)
-            If index = 0 Or indices.Contains(index) Then
-                If index = ptList.Count Then index = ptList.Count + 1 Else index = ptList.Count
-            End If
-            ptList.Add(pt)
-            indices.Add(index)
-        Next
-
-        map.SetTo(0)
-        For Each entry In sortRects
-            Dim r = entry.Value
-            Dim pt = New cv.Point(CInt(r.X + r.Width / 2), CInt(r.Y + r.Height / 2))
-            Dim index = indices(ptList.IndexOf(pt))
-            map.Rectangle(r, index, -1)
-            setTrueText(CStr(index), pt, dstindex)
-        Next
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        ptHot.Run(src)
-        dst2 = ptHot.dst2
-        dst3 = ptHot.dst3
-
-        runMap(ptHot.topRects, 2, topMap)
-        runMap(ptHot.sideRects, 3, sideMap)
-
-        labels(2) = CStr(ptHot.topRects.Count) + " objects found in the top view"
-        labels(3) = CStr(ptHot.sideRects.Count) + " objects found in the Side view"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class GuidedBP_Duplicates : Inherits VB_Algorithm
-    Public hotPoints As New GuidedBP_HotPoints
-    Dim topRects As New List(Of cv.Rect)
-    Dim sideRects As New List(Of cv.Rect)
-    Public Sub New()
-        desc = "Find those objects that are in both the top view and the side view."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        hotPoints.Run(src)
-        topRects = New List(Of cv.Rect)(hotPoints.topRects)
-        sideRects = New List(Of cv.Rect)(hotPoints.sideRects)
-
-        dst2 = hotPoints.dst2
-        dst3 = hotPoints.dst3
-    End Sub
-End Class
 
 
 
@@ -801,302 +474,6 @@ End Class
 
 
 
-
-Public Class GuidedBP_Points : Inherits VB_Algorithm
-    Public hotPoints As New GuidedBP_HotPointsMap
-    Public classCount As Integer
-    Public selectedPoint As cv.Point
-    Public topRects As New List(Of cv.Rect)
-    Public sideRects As New List(Of cv.Rect)
-    Public histogramTop As New cv.Mat
-    Public histogramSide As New cv.Mat
-    Public backP As New cv.Mat
-    Public Sub New()
-        desc = "Use floodfill to identify all the objects in the selected view then build a backprojection that identifies k objects in the image view."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        hotPoints.Run(src)
-
-        hotPoints.ptHot.hotTop.dst3.ConvertTo(histogramTop, cv.MatType.CV_32F)
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histogramTop, backP, task.rangesTop)
-
-        topRects = New List(Of cv.Rect)(hotPoints.ptHot.topRects)
-        sideRects = New List(Of cv.Rect)(hotPoints.ptHot.sideRects)
-
-        dst2 = vbPalette(backP * 255 / topRects.Count)
-
-        hotPoints.ptHot.hotSide.dst3.ConvertTo(histogramSide, cv.MatType.CV_32F)
-        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogramSide, dst3, task.rangesSide)
-
-        dst3 = vbPalette(dst3 * 255 / sideRects.Count)
-
-        classCount = topRects.Count + sideRects.Count
-
-        If task.mouseClickFlag Then selectedPoint = task.clickPoint
-        If heartBeat() Then labels(2) = CStr(topRects.Count) + " objects were identified in the top view."
-        If heartBeat() Then labels(3) = CStr(sideRects.Count) + " objects were identified in the side view."
-    End Sub
-End Class
-
-
-
-
-
-Public Class GuidedBP_Hulls : Inherits VB_Algorithm
-    Dim bpDoctor As New GuidedBP_Points
-    Public kCells As New List(Of kwData)
-    Public kCellsLast As New List(Of kwData)
-    Public kMap As New cv.Mat
-    Dim contours As New Contour_Largest
-    Dim plot As New Histogram_Depth
-    Public Sub New()
-        kMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "Top X identified objects."
-        desc = "Find and display k objects using doctored back projection."
-    End Sub
-    Public Function kwShowSelected(cells As List(Of kwData), mapMat As cv.Mat, dst As cv.Mat) As kwData
-        Dim index = mapMat.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
-        If index = 0 Then Return New kwData
-        Dim kw = cells(index)
-        If index > 0 Then vbDrawContour(dst, kw.contour, cv.Scalar.White, -1)
-        Return kw
-    End Function
-    Public Sub RunVB(src As cv.Mat)
-        Static saveTtext As List(Of trueText)
-        If task.paused Then Exit Sub
-
-        ' Use the DebugCheckBox box and it will rerun the exact same input.
-        If gOptions.DebugCheckBox.Checked = False Then bpDoctor.Run(src)
-
-        Dim newCells As New SortedList(Of Integer, kwData)(New compareAllowIdenticalIntegerInverted)
-        Dim kMapLast = kMap.Clone
-        If heartBeat() Then
-            kMap.SetTo(0)
-            dst2.SetTo(0)
-            For i = 1 To bpDoctor.classCount
-                Dim kw As New kwData
-                kw.mask = bpDoctor.backP.InRange(i, i).Threshold(0, 255, cv.ThresholdTypes.Binary)
-
-                contours.Run(kw.mask)
-                kw.contour = contours.bestContour
-                kw.hull = cv.Cv2.ConvexHull(kw.contour.ToArray, True).ToList
-
-                vbDrawContour(kw.mask, kw.contour, 255, -1)
-                kw.maxDist = vbHullCenter(kw.hull)
-                Dim validate = kw.mask.Get(Of Byte)(kw.maxDist.Y, kw.maxDist.X)
-                If validate = 0 Then kw.maxDist = vbGetMaxDist(kw.mask)
-
-                Dim mask = kw.mask And task.depthMask
-                kw.mmX = vbMinMax(task.pcSplit(0), mask)
-                kw.mmY = vbMinMax(task.pcSplit(1), mask)
-                kw.mmZ = vbMinMax(task.pcSplit(2), mask)
-                kw.size = kw.mask.CountNonZero()
-                newCells.Add(kw.size, kw)
-
-                kw.color = randomCellColor()
-                vbDrawContour(dst2, kw.contour, kw.color, -1)
-            Next
-            dst0 = task.color.Clone
-            kCellsLast = New List(Of kwData)(kCells)
-            kCells.Clear()
-            kCells.Add(New kwData)
-
-            Dim cellUpdates As New List(Of kwData)
-            Dim usedColors As New List(Of cv.Vec3b)({black})
-            For Each entry In newCells
-                Dim kw As New kwData
-                kw = entry.Value
-
-                kw.index = kCells.Count
-                Dim index = kMapLast.Get(Of Byte)(kw.maxDist.Y, kw.maxDist.X)
-                Dim lkw As kwData
-                If index <> 0 Then
-                    lkw = kCellsLast(index)
-                    kw.indexLast = lkw.index
-                    lkw.index = kCells.Count
-                    kw.color = lkw.color
-                End If
-
-                If usedColors.Contains(kw.color) Then kw.color = randomCellColor()
-
-                vbDrawContour(kMap, kw.hull, kw.index, -1)
-                vbDrawContour(dst2, kw.contour, kw.color, -1)
-
-                kCells.Add(kw)
-                usedColors.Add(kw.color)
-                If kCells.Count > 20 Then Exit For ' more than 20 objects?  Likely small artifacts...
-            Next
-            strOut = "Index" + vbTab + "Size" + vbTab + "Depth Range" + vbTab
-            strOut += "Hull" + vbTab + vbTab + vbTab + vbCrLf
-            For Each kw In kCells
-                If kw.index = 0 Then Continue For
-                strOut += CStr(kw.index) + vbTab + Format(kw.size, fmt0) + vbTab
-                strOut += Format(kw.mmZ.minVal, fmt2) + "/" + Format(kw.mmZ.maxVal, fmt2) + vbTab
-                strOut += hullStr(kw.hull) + vbCrLf
-            Next
-
-            For Each kw In kCells
-                If kw.index = 0 Then Continue For
-                setTrueText(CStr(kw.index), kw.maxDist, 2)
-                dst2.Circle(kw.maxDist, task.dotSize, cv.Scalar.White, -1, task.lineType)
-            Next
-            setTrueText(strOut, 3)
-
-            saveTtext = New List(Of trueText)(trueData)
-        End If
-
-        plot.kw = kwShowSelected(kCells, kMap, dst0)
-        plot.Run(task.pcSplit(2))
-        dst1 = plot.dst2
-
-        trueData = New List(Of trueText)(saveTtext)
-        labels(2) = "There were " + CStr(kCells.Count) + " objects identified in the image."
-    End Sub
-End Class
-
-
-
-
-
-Public Class GuidedBP_Map : Inherits VB_Algorithm
-    Dim bpDoctor As New GuidedBP_Points
-    Public kCells As New List(Of kwData)
-    Public kCellsLast As New List(Of kwData)
-    Public kMap As New cv.Mat
-    Public Sub New()
-        kMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "Top X identified objects."
-        desc = "Find and display k objects using doctored back projection."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Static saveTtext As List(Of trueText)
-        If task.paused Then Exit Sub
-
-        ' Use the DebugCheckBox box and it will rerun the exact same input.
-        If gOptions.DebugCheckBox.Checked = False Then bpDoctor.Run(src)
-
-        Dim newCells As New SortedList(Of Integer, kwData)(New compareAllowIdenticalIntegerInverted)
-        Dim kMapLast = kMap.Clone
-        If heartBeat() Then
-            kMap.SetTo(0)
-            For i = 0 To bpDoctor.topRects.Count - 1
-                Dim kw As New kwData
-                Dim index = i + 1
-                kw.mask = bpDoctor.histogramTop.InRange(index, index).Threshold(0, 255, cv.ThresholdTypes.Binary)
-                kw.rect = bpDoctor.topRects(i)
-                kw.maxDist = vbGetMaxDist(kw.mask)
-                kMap(kw.rect).SetTo(index)
-                kw.size = bpDoctor.histogramTop(kw.rect).Sum()
-                newCells.Add(kw.size, kw)
-            Next
-
-            Dim usedColors As New List(Of cv.Vec3b)({black})
-            kCellsLast = New List(Of kwData)(kCells)
-            kCells.Clear()
-            kCells.Add(New kwData)
-            For Each kw In newCells.Values
-                kw.index = kCells.Count
-                Dim index = kMap.Get(Of Byte)(kw.maxDist.Y, kw.maxDist.X)
-                Dim lkw As kwData
-                If index <> 0 And index < kCellsLast.Count Then
-                    lkw = kCellsLast(index)
-                    kw.indexLast = lkw.index
-                    lkw.index = kCells.Count
-                    kw.color = dst2.Get(Of cv.Vec3b)(kw.maxDist.Y, kw.maxDist.X)
-                End If
-
-                If usedColors.Contains(kw.color) Then kw.color = randomCellColor()
-
-                kCells.Add(kw)
-                usedColors.Add(kw.color)
-                If kCells.Count > 20 Then Exit For ' more than 20 objects?  Likely small artifacts...
-            Next
-
-            dst2.SetTo(0)
-            For Each kw In kCells
-                If kw.index > 0 Then dst2(kw.rect).SetTo(kw.color)
-            Next
-
-            strOut = "Index" + vbTab + "Size" + vbTab + "Depth Range" + vbTab
-            strOut += "Hull" + vbTab + vbTab + vbTab + vbCrLf
-            For Each kw In kCells
-                If kw.index = 0 Then Continue For
-                strOut += CStr(kw.index) + vbTab + Format(kw.size, fmt0) + vbTab
-                strOut += Format(kw.mmZ.minVal, fmt2) + "/" + Format(kw.mmZ.maxVal, fmt2) + vbTab
-                strOut += hullStr(kw.hull) + vbCrLf
-            Next
-
-            For Each kw In kCells
-                If kw.index = 0 Then Continue For
-                setTrueText(CStr(kw.index), kw.maxDist, 2)
-                dst2.Circle(kw.maxDist, task.dotSize, cv.Scalar.White, -1, task.lineType)
-            Next
-            setTrueText(strOut, 3)
-
-            saveTtext = New List(Of trueText)(trueData)
-        End If
-
-        trueData = New List(Of trueText)(saveTtext)
-        labels(2) = "There were " + CStr(kCells.Count) + " objects identified in the image."
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class GuidedBP_Depth255 : Inherits VB_Algorithm
-    Public hist As New PointCloud_Histograms
-    Dim myPalette As New Palette_Random
-    Public Sub New()
-        gOptions.HistBinSlider.Value = 16
-        desc = "Backproject the 2D histogram of depth for selected channels to discretize the depth data."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-
-        hist.Run(src)
-
-        Dim samples(hist.histogram.Total - 1) As Single
-        Marshal.Copy(hist.histogram.Data, samples, 0, samples.Length)
-
-        Dim histList = samples.ToList
-        samples(histList.IndexOf(histList.Max)) = 0
-
-        Dim nonZeroSamples As Integer
-        For i = 0 To samples.Count - 1
-            If samples(i) > 0 Then
-                nonZeroSamples += 1
-                ' this is where the histogram is doctored to create the different regions
-                samples(i) = If(nonZeroSamples <= 255, 255 - nonZeroSamples, 0)
-            End If
-        Next
-
-        Marshal.Copy(samples, 0, hist.histogram.Data, samples.Length)
-
-        If redOptions.PCReduction = "XYZReduction" And redOptions.channelCount <> 3 Then
-            dst2.SetTo(0)
-            setTrueText("3D histogram requested but channels and ranges are not set correctly.", 2)
-        Else
-            cv.Cv2.CalcBackProject({src}, redOptions.channels, hist.histogram, dst2, redOptions.ranges)
-            dst2.ConvertTo(dst2, cv.MatType.CV_8U)
-
-            If standalone Or testIntermediate(traceName) Then
-                myPalette.Run(dst2)
-                dst3 = myPalette.dst2
-            End If
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-
 Public Class GuidedBP_Depth : Inherits VB_Algorithm
     Public hist As New PointCloud_Histograms
     Dim myPalette As New Palette_Random
@@ -1152,5 +529,279 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
         End If
 
         labels(2) = CStr(classCount) + " regions detected in the backprojection - " + Format(count / src.Total, "0%")
+    End Sub
+End Class
+
+
+
+
+
+Public Class GuidedBP_Hulls : Inherits VB_Algorithm
+    Dim bpDoctor As New GuidedBP_Points
+    Public gbpCells As New List(Of gbpData)
+    Public gbpCellsLast As New List(Of gbpData)
+    Public kMap As New cv.Mat
+    Dim contours As New Contour_Largest
+    Dim plot As New Histogram_Depth
+    Public Sub New()
+        kMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "Top X identified objects."
+        desc = "Find and display k objects using doctored back projection."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static saveTtext As List(Of trueText)
+        If task.paused Then Exit Sub
+
+        ' Use the DebugCheckBox box and it will rerun the exact same input.
+        If gOptions.DebugCheckBox.Checked = False Then bpDoctor.Run(src)
+
+        Dim newCells As New SortedList(Of Integer, gbpData)(New compareAllowIdenticalIntegerInverted)
+        Dim kMapLast = kMap.Clone
+        If heartBeat() Then
+            kMap.SetTo(0)
+            dst2.SetTo(0)
+            Dim sizes As New List(Of Integer)
+            For i = 1 To bpDoctor.classCount
+                Dim kw As New gbpData
+                kw.mask = bpDoctor.backP.InRange(i, i).Threshold(0, 255, cv.ThresholdTypes.Binary)
+
+                contours.Run(kw.mask)
+                kw.contour = contours.bestContour
+                kw.hull = cv.Cv2.ConvexHull(kw.contour.ToArray, True).ToList
+
+                vbDrawContour(kw.mask, kw.contour, 255, -1)
+                kw.maxDist = vbHullCenter(kw.hull)
+                Dim validate = kw.mask.Get(Of Byte)(kw.maxDist.Y, kw.maxDist.X)
+                If validate = 0 Then kw.maxDist = vbGetMaxDist(kw.mask)
+
+                Dim mask = kw.mask And task.depthMask
+                kw.mmX = vbMinMax(task.pcSplit(0), mask)
+                kw.mmY = vbMinMax(task.pcSplit(1), mask)
+                kw.mmZ = vbMinMax(task.pcSplit(2), mask)
+                kw.size = kw.mask.CountNonZero()
+                If sizes.Contains(kw.size) = False Then
+                    newCells.Add(kw.size, kw)
+                    sizes.Add(kw.size)
+                End If
+                kw.color = randomCellColor()
+                vbDrawContour(dst2, kw.contour, kw.color, -1)
+            Next
+            dst0 = task.color.Clone
+            gbpCellsLast = New List(Of gbpData)(gbpCells)
+            gbpCells.Clear()
+            gbpCells.Add(New gbpData)
+
+            Dim cellUpdates As New List(Of gbpData)
+            Dim usedColors As New List(Of cv.Vec3b)({black})
+            For Each entry In newCells
+                Dim kw As New gbpData
+                kw = entry.Value
+
+                kw.index = gbpCells.Count
+                Dim index = kMapLast.Get(Of Byte)(kw.maxDist.Y, kw.maxDist.X)
+                Dim lkw As gbpData
+                If index <> 0 Then
+                    lkw = gbpCellsLast(index)
+                    kw.indexLast = lkw.index
+                    lkw.index = gbpCells.Count
+                    kw.color = lkw.color
+                End If
+
+                If usedColors.Contains(kw.color) Then kw.color = randomCellColor()
+
+                vbDrawContour(kMap, kw.hull, kw.index, -1)
+                vbDrawContour(dst2, kw.contour, kw.color, -1)
+
+                gbpCells.Add(kw)
+                usedColors.Add(kw.color)
+                If gbpCells.Count > 20 Then Exit For ' more than 20 objects?  Likely small artifacts...
+            Next
+            strOut = "Index" + vbTab + "Size" + vbTab + "Depth Range" + vbTab
+            strOut += "Hull" + vbTab + vbTab + vbTab + vbCrLf
+            For Each kw In gbpCells
+                If kw.index = 0 Then Continue For
+                strOut += CStr(kw.index) + vbTab + Format(kw.size, fmt0) + vbTab
+                strOut += Format(kw.mmZ.minVal, fmt2) + "/" + Format(kw.mmZ.maxVal, fmt2) + vbTab
+                strOut += hullStr(kw.hull) + vbCrLf
+            Next
+            setTrueText(strOut, 3)
+
+            For Each kw In gbpCells
+                If kw.index = 0 Then Continue For
+                setTrueText(CStr(kw.index), kw.maxDist, 2)
+                dst2.Circle(kw.maxDist, task.dotSize, cv.Scalar.White, -1, task.lineType)
+            Next
+
+            saveTtext = New List(Of trueText)(trueData)
+        End If
+
+        Dim gbp As New gbpData
+        If gbpCells.Count > 1 Then
+            plot.gbp = showSelectionGBP(gbpCells, kMap)
+            vbDrawContour(dst2, gbp.contour, gbp.color)
+        End If
+
+        plot.Run(task.pcSplit(2))
+        dst1 = plot.dst2
+
+        trueData = New List(Of trueText)(saveTtext)
+        labels(2) = "There were " + CStr(gbpCells.Count) + " objects identified in the image."
+    End Sub
+End Class
+
+
+
+
+
+Public Class GuidedBP_Objects : Inherits VB_Algorithm
+    Dim kHist As New GuidedBP_History
+    Dim reduction As New Reduction_Basics
+    Public Sub New()
+        dst1 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Create the input to RedCloud_Basics combining color and GuidedBP_Hulls output"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        kHist.Run(src)
+        dst2 = kHist.gpbWare.dst2
+        setTrueText(kHist.strOut, 3)
+
+        reduction.Run(src)
+
+        dst1.SetTo(0)
+        For Each kw In kHist.gbpCells
+            If kw.index = 0 Then Continue For
+            vbDrawContour(dst1, kw.contour, kw.index + reduction.classCount, -1)
+            setTrueText(CStr(kw.index), kw.maxDist, 2)
+        Next
+
+        If kHist.gpbWare.gbpCells.Count > 1 Then
+            Dim gbp = showSelectionGBP(kHist.gpbWare.gbpCells, kHist.gpbWare.kMap)
+            vbDrawContour(dst2, gbp.hull, cv.Scalar.White, task.lineWidth)
+        End If
+
+        reduction.dst2.SetTo(0, dst1)
+        dst1 += reduction.dst2
+
+        labels(2) = CStr(kHist.gbpCells.Count) + " objects found"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GuidedBP_History : Inherits VB_Algorithm
+    Public gpbWare As New GuidedBP_Hulls
+    Dim kCellList As New List(Of List(Of gbpData))
+    Public gbpCells As New List(Of gbpData)
+    Public kMap As New cv.Mat
+    Public Sub New()
+        If sliders.Setup(traceName) Then
+            sliders.setupTrackBar("Minimum distance between cells (cm)", 10, 100, 50)
+            sliders.setupTrackBar("Minimum size kCell", 1, dst2.Total / 10, dst2.Total / 100)
+        End If
+
+        kMap = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
+        desc = "Find the cells that are consistently present over time."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Static minSlider = findSlider("Minimum size kCell")
+        Static distSlider = findSlider("Minimum distance between cells (cm)")
+        Dim minSize = minSlider.value
+        Dim distanceMin = distSlider.value / 100
+
+        If task.optionsChanged Then kCellList.Clear()
+
+        gpbWare.Run(src)
+
+        kCellList.Add(New List(Of gbpData)(gpbWare.gbpCells))
+
+        Dim sortCells As New SortedList(Of Integer, gbpData)(New compareAllowIdenticalIntegerInverted)
+        For Each cellList In kCellList
+            For i = 1 To cellList.Count - 1
+                sortCells.Add(cellList(i).size, cellList(i))
+            Next
+        Next
+
+        kMap.SetTo(0)
+        gbpCells.Clear()
+        gbpCells.Add(New gbpData)
+        Dim lastDst2 = dst2.Clone
+        Dim usedColors As New List(Of cv.Vec3b)({black})
+        For Each entry In sortCells
+            Dim kw = entry.Value
+            Dim index = kMap.Get(Of Byte)(kw.maxDist.Y, kw.maxDist.X)
+            Dim lkw = gbpCells(index)
+            If Math.Abs((kw.mmZ.minVal + kw.mmZ.maxVal) / 2 - (lkw.mmZ.minVal + lkw.mmZ.maxVal) / 2) > distanceMin Then
+                If kw.size >= minSize Then
+                    kw.index = gbpCells.Count
+                    Dim color = lastDst2.Get(Of cv.Vec3b)(kw.maxDist.Y, kw.maxDist.X)
+                    If usedColors.Contains(color) = False Then kw.color = color
+                    vbDrawContour(kMap, kw.contour, kw.index, -1)
+                    gbpCells.Add(kw)
+                    usedColors.Add(kw.color)
+                End If
+            End If
+        Next
+
+        dst2.SetTo(0)
+        For Each kw In gbpCells
+            vbDrawContour(dst2, kw.contour, kw.color, -1)
+            setTrueText(CStr(kw.index), kw.maxDist, 2)
+        Next
+
+        setTrueText(gpbWare.strOut, 3)
+
+        If gbpCells.Count > 1 Then
+            Dim gbp = showSelectionGBP(gbpCells, kMap)
+            vbDrawContour(dst2, gbp.hull, cv.Scalar.White, task.lineWidth)
+            vbDrawContour(task.color, gbp.contour, cv.Scalar.Yellow)
+        End If
+
+
+        If kCellList.Count >= task.historyCount Then kCellList.RemoveAt(0)
+        If heartBeat() Then labels(2) = CStr(gbpCells.Count) + " objects were consistently present"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class GuidedBP_Points : Inherits VB_Algorithm
+    Public hotPoints As New GuidedBP_Basics
+    Public classCount As Integer
+    Public selectedPoint As cv.Point
+    Public topRects As New List(Of cv.Rect)
+    Public sideRects As New List(Of cv.Rect)
+    Public histogramTop As New cv.Mat
+    Public histogramSide As New cv.Mat
+    Public backP As New cv.Mat
+    Public Sub New()
+        desc = "Use floodfill to identify all the objects in the selected view then build a backprojection that identifies k objects in the image view."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        hotPoints.Run(src)
+
+        hotPoints.ptHot.hotTop.dst3.ConvertTo(histogramTop, cv.MatType.CV_32F)
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, histogramTop, backP, task.rangesTop)
+
+        topRects = New List(Of cv.Rect)(hotPoints.ptHot.topRects)
+        sideRects = New List(Of cv.Rect)(hotPoints.ptHot.sideRects)
+
+        dst2 = vbPalette(backP * 255 / topRects.Count)
+
+        hotPoints.ptHot.hotSide.dst3.ConvertTo(histogramSide, cv.MatType.CV_32F)
+        cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, histogramSide, dst3, task.rangesSide)
+
+        dst3 = vbPalette(dst3 * 255 / sideRects.Count)
+
+        classCount = topRects.Count + sideRects.Count
+
+        If task.mouseClickFlag Then selectedPoint = task.clickPoint
+        If heartBeat() Then labels(2) = CStr(topRects.Count) + " objects were identified in the top view."
+        If heartBeat() Then labels(3) = CStr(sideRects.Count) + " objects were identified in the side view."
     End Sub
 End Class

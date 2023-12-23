@@ -1,13 +1,11 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports System.Windows.Ink
-
 Public Class Sort_Basics : Inherits VB_Algorithm
     Dim options As New Options_Sort
     Public Sub New()
         desc = "Sort the pixels of a grayscale image."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
+    Public Sub RunVB(src As cv.Mat)
         options.RunVB()
         If options.radio5.Checked Then
             src = src.Reshape(1, src.Rows * src.Cols)

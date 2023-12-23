@@ -415,7 +415,7 @@ Public Class Mat_4Click : Inherits VB_Algorithm
         If (task.mouseClickFlag And task.mousePicTag) = RESULT_DST2 Or firstPass Then
             If firstPass Then
                 task.mouseClickFlag = True
-                task.clickPoint = New cv.Point(1, 1)
+                task.clickPoint = New cv.Point(0, 0)
                 task.mousePicTag = RESULT_DST2
             End If
             setMyActiveMat()
