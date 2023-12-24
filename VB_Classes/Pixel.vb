@@ -13,13 +13,14 @@ Public Class Pixel_Viewer : Inherits VB_Algorithm
         type32SC3 = 5
     End Enum
     Public Sub New()
-        task.dst1 = dst2.Clone
-        task.dst2 = dst2.Clone
-        task.dst3 = dst2.Clone
         desc = "Display pixels under the cursor"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If task.dst0 Is Nothing Then task.dst0 = task.color
+        If standalone Then
+            task.dst0 = task.color.Clone
+            task.dst1 = task.depthRGB.Clone
+        End If
+
         Dim dst = Choose(task.mousePicTag + 1, task.dst0, task.dst1, task.dst2, task.dst3)
 
         Dim displayType = displayTypes.noType
@@ -61,12 +62,7 @@ Public Class Pixel_Viewer : Inherits VB_Algorithm
         Dim dw = New cv.Rect(mouseLoc.x, mouseLoc.y, drWidth, drHeight)
         dw = validateRect(dw)
 
-        Dim img As cv.Mat
-        Try
-            img = dst(dw).Clone
-        Catch ex As Exception
-            Exit Sub
-        End Try
+        Dim img = dst(dw).Clone
 
         Dim mm As mmData
         Dim format32f = "0000.0"

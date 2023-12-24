@@ -427,7 +427,7 @@ Public Class VBtask : Implements IDisposable
             If task.useRecordedData Then recordedData.Run(task.color.Clone)
 
             redOptions.Sync()
-            task.bins2D = {dst2.Height, dst2.Width}
+            task.bins2D = {task.workingRes.Height, task.workingRes.Width}
 
             If task.pointCloud.Width > 0 Then
                 ' If the workingRes changes, the previous generation of images needs to be reset.
