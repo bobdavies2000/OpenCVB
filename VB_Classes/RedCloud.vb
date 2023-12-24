@@ -813,7 +813,7 @@ Public Class RedCloud_CellsAtDepth : Inherits VB_Algorithm
     Dim kalman As New Kalman_Basics
     Dim redC As New RedCloud_Basics
     Public Sub New()
-        plot.noZeroEntry = False
+        plot.removeZeroEntry = False
         labels(3) = "Histogram of depth weighted by the size of the cell."
         desc = "Create a histogram of depth using RedCloud cells"
     End Sub

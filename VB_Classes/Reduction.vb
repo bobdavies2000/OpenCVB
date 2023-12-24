@@ -192,7 +192,7 @@ Public Class Reduction_Histogram : Inherits VB_Algorithm
     Dim plot As New Plot_Histogram
     Public Sub New()
         plot.createHistogram = True
-        plot.noZeroEntry = False
+        plot.removeZeroEntry = False
         labels = {"", "", "Reduction image", "Histogram of the reduction"}
         desc = "Visualize a reduction with a histogram"
     End Sub

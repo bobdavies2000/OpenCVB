@@ -42,7 +42,7 @@ Public Class Plot_Histogram : Inherits VB_Algorithm
     Public plotCenter As Single
     Public barWidth As Single
     Public addLabels As Boolean = True
-    Public noZeroEntry As Boolean = True
+    Public removeZeroEntry As Boolean = True
     Public createHistogram As Boolean = False
     Public Sub New()
         desc = "Plot histogram data with a stable scale at the left of the image."
@@ -55,7 +55,7 @@ Public Class Plot_Histogram : Inherits VB_Algorithm
             histogram = src
         End If
 
-        If noZeroEntry Then histogram.Set(Of Single)(0, 0, 0) ' let's not plot the values at zero...i.e. Depth at 0, for instance, needs to be removed.
+        If removeZeroEntry Then histogram.Set(Of Single)(0, 0, 0) ' let's not plot the values at zero...i.e. Depth at 0, for instance, needs to be removed.
 
         dst2.SetTo(backColor)
         barWidth = dst2.Width / histogram.Rows

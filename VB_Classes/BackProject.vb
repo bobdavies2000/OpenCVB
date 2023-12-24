@@ -20,7 +20,7 @@ Public Class BackProject_Basics : Inherits VB_Algorithm
         dst2 = histK.dst2
 
         Dim totalPixels = dst2.Total ' assume we are including zeros.
-        If histK.hist.plot.noZeroEntry Then totalPixels = input.CountNonZero
+        If histK.hist.plot.removeZeroEntry Then totalPixels = input.CountNonZero
 
         Dim brickWidth = dst2.Width / gOptions.HistBinSlider.Value
         Dim incr = (histK.hist.mm.maxVal - histK.hist.mm.minVal) / gOptions.HistBinSlider.Value
@@ -653,7 +653,7 @@ Public Class BackProject_Image : Inherits VB_Algorithm
         hist.mm.maxVal = Math.Max(kalman.kOutput(0), kalman.kOutput(1))
 
         Dim totalPixels = dst2.Total ' assume we are including zeros.
-        If hist.plot.noZeroEntry Then totalPixels = input.CountNonZero
+        If hist.plot.removeZeroEntry Then totalPixels = input.CountNonZero
 
         Dim brickWidth = dst2.Width / task.histogramBins
         Dim incr = (hist.mm.maxVal - hist.mm.minVal) / task.histogramBins
@@ -666,7 +666,7 @@ Public Class BackProject_Image : Inherits VB_Algorithm
             maxRange = New cv.Scalar(255)
         End If
         If useInrange Then
-            If histIndex = 0 And hist.plot.noZeroEntry Then mask = New cv.Mat(input.Size, cv.MatType.CV_8U, 0) Else mask = input.InRange(minRange, maxRange)
+            If histIndex = 0 And hist.plot.removeZeroEntry Then mask = New cv.Mat(input.Size, cv.MatType.CV_8U, 0) Else mask = input.InRange(minRange, maxRange)
         Else
             Dim bRange = New cv.Rangef(minRange(0), maxRange(0))
             Dim ranges() = New cv.Rangef() {bRange}

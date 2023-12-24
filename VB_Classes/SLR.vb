@@ -186,14 +186,14 @@ Public Class SLR_TrendImages : Inherits VB_Algorithm
     Public Sub RunVB(src as cv.Mat)
         Dim split = src.Split()
         trends.hist.plot.maxRange = 255
-        trends.hist.plot.noZeroEntry = False ' default is to look at element 0....
+        trends.hist.plot.removeZeroEntry = False ' default is to look at element 0....
 
         Dim splitIndex = 0
         Static frm = findfrm(traceName + " Radio Buttons")
         Select Case findRadioText(frm.check)
             Case "pcSplit(2) input"
                 trends.hist.plot.maxRange = task.maxZmeters
-                trends.hist.plot.noZeroEntry = True ' not interested in the undefined depth areas...
+                trends.hist.plot.removeZeroEntry = True ' not interested in the undefined depth areas...
                 trends.Run(task.pcSplit(2))
                 labels(2) = "SLR_TrendImages - pcSplit(2)"
             Case "Grayscale input"

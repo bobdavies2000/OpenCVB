@@ -364,7 +364,7 @@ Public Class FPoly_Plot : Inherits VB_Algorithm
     Public distDiff As New List(Of Single)
     Public Sub New()
         plot.minRange = 0
-        plot.noZeroEntry = False
+        plot.removeZeroEntry = False
         labels = {"", "", "", "anchor and companions - input to distance difference"}
         desc = "Feature Grid: compute distances between good features from frame to frame and plot the distribution"
     End Sub
@@ -420,7 +420,7 @@ Public Class FPoly_PlotWeighted : Inherits VB_Algorithm
     Dim kalman As New Kalman_Basics
     Public Sub New()
         plot.minRange = 0
-        plot.noZeroEntry = False
+        plot.removeZeroEntry = False
         labels = {"", "Distance change from previous frame", "", "anchor and companions - input to distance difference"}
         desc = "Feature Grid: compute distances between good features from frame to frame and plot with weighting and Kalman to smooth results"
     End Sub

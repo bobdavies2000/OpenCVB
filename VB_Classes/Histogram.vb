@@ -822,15 +822,15 @@ Public Class Histogram_PointCloudXYZ : Inherits VB_Algorithm
 
             Select Case i
                 Case 0
-                    plot.noZeroEntry = False
+                    plot.removeZeroEntry = False
                     plot.minRange = -task.xRange
                     plot.maxRange = task.xRange
                 Case 1
-                    plot.noZeroEntry = False
+                    plot.removeZeroEntry = False
                     plot.minRange = -task.yRange
                     plot.maxRange = task.yRange
                 Case 2
-                    plot.noZeroEntry = True
+                    plot.removeZeroEntry = True
                     plot.minRange = 0
                     plot.maxRange = task.maxZmeters
             End Select

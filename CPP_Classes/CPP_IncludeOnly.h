@@ -1647,7 +1647,7 @@ private:
 public:
     Mat histogram;
     CPP_Plot_Histogram* plot;
-    bool noZeroEntry;
+    bool removeZeroEntry;
     double srcMin;
     double srcMax;
     Range ranges[1];
@@ -1657,7 +1657,7 @@ public:
         desc = "Create a raw histogram (no Kalman)";
     }
     void plotHistogram() {
-        if (noZeroEntry) histogram.at<float>(0, 0) = 0;
+        if (removeZeroEntry) histogram.at<float>(0, 0) = 0;
         plot->Run(histogram);
         dst2 = plot->dst2;
     }
@@ -1737,7 +1737,7 @@ public:
         }
         dst2 = hist->dst2;
         auto totalPixels = dst2.total();
-        if (hist->noZeroEntry) totalPixels = countNonZero(input);
+        if (hist->removeZeroEntry) totalPixels = countNonZero(input);
         auto barWidth = dst2.cols / task->histogramBins;
         auto incr = (hist->srcMax - hist->srcMin) / task->histogramBins;
         int histIndex = task->mouseMovePoint.x / barWidth;

@@ -1,9 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports NAudio.Gui
-Imports System.Windows.Documents
-Imports OpenCvSharp.Flann
-
 Public Class HistValley_Basics : Inherits VB_Algorithm
     Public peak As New HistValley_Peaks
     Public peaks As New List(Of Integer)
@@ -13,15 +9,7 @@ Public Class HistValley_Basics : Inherits VB_Algorithm
         findSlider("Desired boundary count").Value = 5
         desc = "Use the peaks identified in HistValley_Peaks to find the valleys between the peaks."
     End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If standalone Then src = task.pcSplit(2)
-        peak.Run(src)
-        dst2 = peak.hist.dst2
-        labels(2) = peak.labels(2)
-
-        histList = peak.histarray.ToList
-        valleys.Clear()
-        peaks = New List(Of Integer)(peak.peaks)
+    Public Function updatePlot(dst As cv.Mat, bins As Integer) As cv.Mat
         For i = 0 To peaks.Count - 2
             Dim start = peaks(i)
             Dim finish = peaks(i + 1)
@@ -33,9 +21,21 @@ Public Class HistValley_Basics : Inherits VB_Algorithm
 
             Dim nextVal = start + testList.IndexOf(testList.Min)
             valleys.Add(nextVal)
-            Dim col = dst2.Width * nextVal / task.histogramBins
-            dst2.Line(New cv.Point(col, dst2.Height), New cv.Point(col, dst2.Height * 9 / 10), cv.Scalar.White, task.lineWidth)
+            Dim col = dst.Width * nextVal / bins
+            dst.Line(New cv.Point(col, dst.Height), New cv.Point(col, dst.Height * 9 / 10), cv.Scalar.White, task.lineWidth)
         Next
+        Return dst
+    End Function
+    Public Sub RunVB(src As cv.Mat)
+        If heartBeat() Then
+            peak.Run(src)
+            dst2 = peak.hist.dst2
+            labels(2) = peak.labels(2) + " and " + CStr(valleys.Count) + " valleys (marked at bottom)"
+        End If
+        histList = peak.histArray.ToList
+        valleys.Clear()
+        peaks = New List(Of Integer)(peak.peaks)
+        If standalone Then updatePlot(dst2, task.histogramBins)
     End Sub
 End Class
 
@@ -420,12 +420,17 @@ Public Class HistValley_Peaks : Inherits VB_Algorithm
         Dim desiredBoundaries = options.desiredBoundaries
 
         If standalone Then src = task.pcSplit(2)
-        If src.Channels <> 1 Then src = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If src.Type <> cv.MatType.CV_32FC1 Then
+            src = task.pcSplit(2)
+            hist.Run(src)
+            dst2 = hist.dst2
+            ReDim histArray(hist.histogram.Rows - 1)
+            Marshal.Copy(hist.histogram.Data, histArray, 0, histArray.Length)
+        Else
+            ReDim histArray(src.Rows - 1)
+            Marshal.Copy(src.Data, histArray, 0, histArray.Length)
+        End If
 
-        hist.Run(src)
-        dst2 = hist.dst2
-        ReDim histArray(hist.histogram.Rows - 1)
-        Marshal.Copy(hist.histogram.Data, histArray, 0, histArray.Length)
         Dim histList = histArray.ToList
 
         Dim sortPeaks As New SortedList(Of Integer, Integer)(New compareAllowIdenticalInteger)
@@ -469,6 +474,6 @@ Public Class HistValley_Peaks : Inherits VB_Algorithm
             peaks.Add(index)
             dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height / 10), cv.Scalar.White, task.lineWidth)
         Next
-        labels(2) = CStr(peaks.Count - 2) + " peaks were found in the histogram"
+        labels(2) = CStr(peaks.Count - 2) + " peaks (marked at top) were found in the histogram"
     End Sub
 End Class

@@ -238,35 +238,41 @@ Public Class RedMin_PixelVector3D : Inherits VB_Algorithm
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        redOptions.Hist3DBinsSlider.Value = 2
+        redOptions.Hist3DBinsSlider.Value = 3
         hist3d.sortHistList = False
-        labels = {"", "3D Histogram counts for each of the cells at left", "Cells after matching color", ""}
+        labels(3) = "3D Histogram counts for each of the cells at left"
         desc = "Identify RedMin cells and create a vector for each cell's 3D histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         rMin.Run(src)
+        Dim maxRegion = 10
 
         Static distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
-        pixelVector.Clear()
-        strOut = "3D histogram counts for each cell" + vbCrLf
-        For Each rp In rMin.minCells
-            hist3d.maskInput = rp.mask
-            hist3d.Run(src(rp.rect))
-            pixelVector.Add(hist3d.histList.ToList)
-            For Each count In hist3d.histList
-                strOut += CStr(count) + ","
+        If heartBeat() Then
+            pixelVector.Clear()
+            strOut = "3D histogram counts for each cell - 10 largest only for readability..." + vbCrLf
+            For Each rp In rMin.minCells
+                hist3d.maskInput = rp.mask
+                hist3d.Run(src(rp.rect))
+                pixelVector.Add(hist3d.histList.ToList)
+                strOut += "(" + CStr(rp.index) + ") "
+                For Each count In hist3d.histList
+                    strOut += CStr(count) + ","
+                Next
+                strOut += vbCrLf
+                If rp.index >= maxRegion Then Exit For
             Next
-            strOut += vbCrLf
-        Next
+        End If
+        setTrueText(strOut, 3)
 
-        dst3.SetTo(0)
+        dst1.SetTo(0)
+        dst2.SetTo(0)
         For Each rp In rMin.minCells
-            task.color(rp.rect).CopyTo(dst3(rp.rect), rp.mask)
-            setTrueText(CStr(rp.index), rp.maxDist, 3)
-            setTrueText(CStr(rp.index), rp.maxDist, 2)
+            task.color(rp.rect).CopyTo(dst2(rp.rect), rp.mask)
+            dst1(rp.rect).SetTo(rp.color, rp.mask)
+            If rp.index <= maxRegion Then setTrueText(CStr(rp.index), rp.maxDist, 2)
         Next
-        setTrueText(strOut, 1)
-        labels(3) = rMin.labels(3)
+        labels(2) = rMin.labels(3)
     End Sub
 End Class
 

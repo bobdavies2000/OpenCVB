@@ -658,6 +658,7 @@ if algorithmName = "Hist3DCloud_Basics" Then return new Hist3DCloud_Basics
 if algorithmName = "Hist3DCloud_BP_Filter" Then return new Hist3DCloud_BP_Filter
 if algorithmName = "Hist3DCloud_DepthSplit" Then return new Hist3DCloud_DepthSplit
 if algorithmName = "Hist3DCloud_Highlights" Then return new Hist3DCloud_Highlights
+if algorithmName = "Hist3DCloud_Plot3D" Then return new Hist3DCloud_Plot3D
 if algorithmName = "Hist3DCloud_Reduction" Then return new Hist3DCloud_Reduction
 if algorithmName = "Hist3Dcolor_Basics" Then return new Hist3Dcolor_Basics
 if algorithmName = "Hist3Dcolor_Basics_CPP" Then return new Hist3Dcolor_Basics_CPP

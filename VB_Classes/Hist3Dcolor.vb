@@ -1,7 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports OpenCvSharp.ML
-
 Public Class Hist3Dcolor_Basics : Inherits VB_Algorithm
     Dim hist3d As New Hist3Dcolor_SortedHistogram
     Public classCount As Integer
