@@ -27,11 +27,9 @@ Public Class HistValley_Basics : Inherits VB_Algorithm
         Return dst
     End Function
     Public Sub RunVB(src As cv.Mat)
-        If heartBeat() Then
-            peak.Run(src)
-            dst2 = peak.hist.dst2
-            labels(2) = peak.labels(2) + " and " + CStr(valleys.Count) + " valleys (marked at bottom)"
-        End If
+        peak.Run(src)
+        dst2 = peak.hist.dst2
+        labels(2) = peak.labels(2) + " and " + CStr(valleys.Count) + " valleys (marked at bottom)"
         histList = peak.histArray.ToList
         valleys.Clear()
         peaks = New List(Of Integer)(peak.peaks)
@@ -53,8 +51,6 @@ Public Class HistValley_Depth : Inherits VB_Algorithm
         desc = "Find the valleys in the depth histogram."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32F Then src = task.pcSplit(2)
-
         Static histogram As cv.Mat
         If heartBeat() Then
             valley.Run(src)
@@ -72,6 +68,7 @@ Public Class HistValley_Depth : Inherits VB_Algorithm
             Next
 
             histogram = valley.peak.hist.histogram
+
             Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
             histogram += 1 ' shift away from 0
         End If
@@ -81,6 +78,7 @@ Public Class HistValley_Depth : Inherits VB_Algorithm
             dst1.ConvertTo(dst1, cv.MatType.CV_8U)
             dst3 = vbPalette(dst1 * 255 / valley.valleys.Count)
         End If
+        If standalone Then valley.updatePlot(dst2, task.histogramBins)
     End Sub
 End Class
 
@@ -186,25 +184,28 @@ Public Class HistValley_BasicsOptionAuto : Inherits VB_Algorithm
         desc = "Isolate the different levels of gray using the histogram valleys."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        kalman.Run(src)
-        dst2 = kalman.dst2
-        histogram = kalman.hist.histogram.Clone
-        auto.Run(histogram)
+        If heartBeat() Then
+            kalman.Run(src)
+            dst2 = kalman.dst2
+            histogram = kalman.hist.histogram.Clone
+            auto.Run(histogram)
 
-        If auto.valleyOrder.Count = 0 Then Exit Sub
+            If auto.valleyOrder.Count = 0 Then Exit Sub
 
-        For i = 0 To auto.valleyOrder.Count - 1
-            Dim entry = auto.valleyOrder.ElementAt(i)
-            Dim cClass = CSng(CInt(255 / (i + 1)))
-            Dim index = If(i Mod 2, cClass, 255 - cClass)
-            For j = entry.Key To entry.Value
-                histogram.Set(Of Single)(j, 0, index)
+            For i = 0 To auto.valleyOrder.Count - 1
+                Dim entry = auto.valleyOrder.ElementAt(i)
+                Dim cClass = CSng(CInt(255 / (i + 1)))
+                Dim index = If(i Mod 2, cClass, 255 - cClass)
+                For j = entry.Key To entry.Value
+                    histogram.Set(Of Single)(j, 0, index)
+                Next
+                Dim col = dst2.Width * entry.Value / task.histogramBins
+                dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White, task.lineWidth)
             Next
-            Dim col = dst2.Width * entry.Value / task.histogramBins
-            dst2.Line(New cv.Point(col, 0), New cv.Point(col, dst2.Height), cv.Scalar.White, task.lineWidth)
-        Next
+        End If
 
         If src.Type = cv.MatType.CV_32F Then histogram += 1
+
         cv.Cv2.CalcBackProject({src}, {0}, histogram, dst1, kalman.hist.ranges)
         If dst1.Type <> cv.MatType.CV_8U Then
             dst1.SetTo(0, task.noDepthMask)
