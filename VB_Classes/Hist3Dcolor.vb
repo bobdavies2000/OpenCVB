@@ -1,7 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 Public Class Hist3Dcolor_Basics : Inherits VB_Algorithm
-    Dim hist3d As New Hist3Dcolor_SortedHistogram
+    Dim hist3d As New Hist3Dcolor_Core
     Public classCount As Integer
     Public Sub New()
         desc = "Build a 3D histogram from the BGR image on each heartbeat.  Backproject each frame."
@@ -10,13 +10,14 @@ Public Class Hist3Dcolor_Basics : Inherits VB_Algorithm
         If src.Channels <> 3 Then src = task.color
 
         If heartBeat() Then hist3d.Run(src)
-        classCount = hist3d.classCount
+        classCount = hist3d.classCount + 1
 
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, hist3d.histogram, dst2, hist3d.options.rangesBGR)
-        dst3 = vbPalette((dst2 + 1) * 255 / classCount)
+        dst2 += 1
+        dst3 = vbPalette(dst2 * 255 / classCount)
 
-        Dim sum = hist3d.histogram.Sum()
-        labels(2) = CStr(sum) + " pixels (" + Format(sum(0) / src.Total, "0%") + ") classified into bins 0-" +
+        Dim sum = hist3d.histogramList.Sum
+        labels(2) = CStr(sum) + " pixels (" + Format(sum / src.Total, "0%") + ") classified into bins 1-" +
                     CStr(classCount)
         labels(3) = "Backprojection of the top " + CStr(classCount) + " histogram entries."
     End Sub
@@ -130,7 +131,7 @@ End Class
 Public Class Hist3Dcolor_BP_Filter : Inherits VB_Algorithm
     Dim plot As New Plot_Histogram
     Dim hist As New Histogram_Basics
-    Dim hist3d As New Hist3Dcolor_SortedHistogram
+    Dim hist3d As New Hist3Dcolor_Core
     Public Sub New()
         desc = "Build a 3D histogram from the BGR image, backproject it, and plot the histogram of the backprojection."
     End Sub
@@ -170,7 +171,7 @@ End Class
 
 
 Public Class Hist3Dcolor_SortedSelect : Inherits VB_Algorithm
-    Dim hist3d As New Hist3Dcolor_SortedHistogram
+    Dim hist3d As New Hist3Dcolor_Core
     Public Sub New()
         labels(3) = "The highlighted pixels are in the selected bin"
         desc = "Build a 3D histogram from the BGR image and backproject the 'Selected bin' (in options_HistXD sliders)."
@@ -287,59 +288,6 @@ End Class
 
 
 
-Public Class Hist3Dcolor_SortedHistogram : Inherits VB_Algorithm
-    Public histogram As New cv.Mat
-    Public histList() As Single
-    Public classCount As Integer
-    Public options As New Options_HistXD
-    Public sortedHist As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
-    Public sortHistList As Boolean = True
-    Public maskInput As New cv.Mat
-    Public Sub New()
-        desc = "Build a 3D histogram from the BGR image and sorted it by histogram entry size."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-        If src.Channels <> 3 Then src = task.color
-
-        Dim bins = redOptions.Hist3DBinsSlider.Value
-        Dim hBins() As Integer = {bins, bins, bins}
-        cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, hBins, options.rangesBGR)
-
-        ReDim histList(histogram.Total - 1)
-        Marshal.Copy(histogram.Data, histList, 0, histList.Length)
-
-        If sortHistList Then
-            sortedHist.Clear()
-            For i = 0 To histList.Count - 1
-                sortedHist.Add(histList(i), i)
-            Next
-
-            classCount = 0
-            Dim sum = 0
-            For Each el In sortedHist
-                histList(el.Value) = classCount
-                classCount += 1
-                sum += el.Key
-                If sum > src.Total * redOptions.imageThresholdPercent Or
-                    classCount = redOptions.DesiredCellSlider.Value Then Exit For
-            Next
-
-            For i = classCount To histList.Count - 1
-                Dim index = sortedHist.ElementAt(i).Value
-                histList(index) = classCount
-            Next
-            Marshal.Copy(histList, 0, histogram.Data, histList.Length)
-        End If
-        If standalone Then setTrueText("There is no output when standalone.  Use Hist3Dcolor_Basics to test.")
-    End Sub
-End Class
-
-
-
-
-
-
 
 Public Class Hist3Dcolor_ZeroGroups : Inherits VB_Algorithm
     Public options As New Options_HistXD
@@ -402,18 +350,96 @@ End Class
 
 Public Class Hist3Dcolor_Dominant : Inherits VB_Algorithm
     Dim rMin As New RedMin_Basics
-    Dim hist3d As New Hist3Dcolor_SortedHistogram
+    Dim hist3d As New Hist3Dcolor_Core
     Public Sub New()
+        hist3d.sortHistogramData = False
         desc = "Find the dominant color in a 3D color histogram and backProject it."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         rMin.Run(src)
-        dst2 = rMin.dst2
+        dst2 = rMin.dst3
         labels(2) = rMin.labels(2)
 
+        Dim bins = redOptions.Hist3DBinsSlider.Value
+        Dim guidedHist(bins * bins * bins - 1) As Single
+        Dim guidedCounts(bins * bins * bins - 1) As Single
         For Each rp In rMin.minCells
             hist3d.maskInput = rp.mask
             hist3d.Run(src(rp.rect))
+            Dim maxVal = hist3d.histogramList.Max
+            Dim index = hist3d.histogramList.IndexOf(maxVal)
+            guidedHist(index) += rp.index
+            guidedCounts(index) += maxVal
         Next
+
+        Dim histogram = hist3d.histogram.Clone
+        If histogram.Rows <> 0 Then
+            guidedHist(0) = 0
+            Marshal.Copy(guidedHist, 0, histogram.Data, guidedHist.Length)
+            Dim classCount = histogram.CountNonZero
+            cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst1, hist3d.options.rangesBGR)
+            dst3 = vbPalette(dst1 * 255 / classCount)
+            If heartBeat() Then
+                labels(3) = "Back projection of the dominant color entries.  ClassCount = " + CStr(classCount) +
+                            " or " + Format(guidedCounts.Sum / src.Total, "0%") + " of the image."
+            End If
+        End If
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Hist3Dcolor_Core : Inherits VB_Algorithm
+    Public histogram As New cv.Mat
+    Public histogramList As New List(Of Single)
+    Public histList() As Single
+    Public classCount As Integer
+    Public options As New Options_HistXD
+    Public sortedHist As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
+    Public sortHistogramData As Boolean = True
+    Public maskInput As New cv.Mat
+    Public Sub New()
+        desc = "Build a 3D histogram from the BGR image and sorted it by histogram entry size."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+        If src.Channels <> 3 Then src = task.color
+
+        Dim bins = redOptions.Hist3DBinsSlider.Value
+        Dim hBins() As Integer = {bins, bins, bins}
+        cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, hBins, options.rangesBGR)
+
+        ReDim histList(histogram.Total - 1)
+        Marshal.Copy(histogram.Data, histList, 0, histList.Length)
+        histogramList = histList.ToList
+
+        If sortHistogramData Then
+            sortedHist.Clear()
+            For i = 0 To histList.Count - 1
+                sortedHist.Add(histList(i), i)
+            Next
+
+            classCount = 0
+            Dim sum = 0
+            For Each el In sortedHist
+                histList(el.Value) = classCount
+                classCount += 1
+                sum += el.Key
+                If sum > src.Total * redOptions.imageThresholdPercent Or
+                    classCount = redOptions.DesiredCellSlider.Value Then Exit For
+            Next
+
+            For i = classCount To histList.Count - 1
+                Dim index = sortedHist.ElementAt(i).Value
+                histList(index) = classCount
+            Next
+            Marshal.Copy(histList, 0, histogram.Data, histList.Length)
+        End If
+        If standalone Then setTrueText("There is no output when standalone.  Use Hist3Dcolor_Basics to test.")
     End Sub
 End Class

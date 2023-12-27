@@ -205,12 +205,12 @@ End Class
 
 Public Class Distance_RedMin : Inherits VB_Algorithm
     Dim rMin As New RedMin_Basics
-    Dim hist3d As New Hist3Dcolor_SortedHistogram
+    Dim hist3d As New Hist3Dcolor_Core
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         redOptions.Hist3DBinsSlider.Value = 5
-        hist3d.sortHistList = False
+        hist3d.sortHistogramData = False
         labels(3) = "3D Histogram distance for each of the cells at left"
         desc = "Identify RedMin cells using each cell's 3D histogram distance from zero"
     End Sub
@@ -298,13 +298,13 @@ End Class
 
 Public Class Distance_D3Cells : Inherits VB_Algorithm
     Dim rMin As New RedMin_Basics
-    Dim hist3d As New Hist3Dcolor_SortedHistogram
+    Dim hist3d As New Hist3Dcolor_Core
     Dim valleys As New HistValley_Basics
     Public d3Cells As New List(Of rMinData)
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         redOptions.Hist3DBinsSlider.Value = 5
-        hist3d.sortHistList = False
+        hist3d.sortHistogramData = False
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         labels(3) = "CV_8U format of the backprojected cells - before vbPalette."
         desc = "Experiment that failed - backprojecting each cell from RedMin_Basics"

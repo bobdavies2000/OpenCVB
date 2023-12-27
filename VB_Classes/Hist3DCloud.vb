@@ -29,7 +29,7 @@ Public Class Hist3DCloud_Basics : Inherits VB_Algorithm
         handleInput.Free()
 
         histogram = New cv.Mat(bins * bins * bins, 1, cv.MatType.CV_32F, dstPtr)
-        ReDim histList(bins * bins * bins)
+        ReDim histList(bins * bins * bins - 1)
         Marshal.Copy(histogram.Data, histList, 0, histList.Length)
         If standalone Or runBackProject Then
             Dim samples(histogram.Total - 1) As Single
