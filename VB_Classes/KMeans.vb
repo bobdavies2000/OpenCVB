@@ -554,3 +554,27 @@ Public Class KMeans_Depth : Inherits VB_Algorithm
         dst3 = vbPalette(dst2 * 255 / km.classCount)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class KMeans_Histogram3Dcolor : Inherits VB_Algorithm
+    Dim hist3d As New Hist3Dcloud_Histogram1D
+    Public Sub New()
+        desc = "Use the gaps in the 3D histogram of the color image to find 'k' and backproject the results."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        hist3d.Run(src)
+        dst3 = hist3d.dst2
+        labels(3) = hist3d.labels(2)
+
+        Dim histArray = buildHistogram3D(hist3d.histArray.Count, hist3d.histArray)
+
+        Marshal.Copy(histArray, 0, hist3d.histogram.Data, histArray.Length)
+        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, hist3d.histogram, dst1, redOptions.rangesBGR)
+
+    End Sub
+End Class

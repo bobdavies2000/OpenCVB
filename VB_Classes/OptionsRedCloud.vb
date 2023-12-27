@@ -9,7 +9,9 @@ Public Class OptionsRedCloud
 
     Public PCReduction As String
     Public channels() As Integer = {0, 1}
-    Public ranges() As cv.Rangef
+    Public rangesBGR() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 256), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
+    Public rangesHSV() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
+    Public rangesCloud() As cv.Rangef
     Public channelCount As Integer
     Public histBinList() As Integer
     Public imageThresholdPercent As Single
@@ -112,34 +114,34 @@ Public Class OptionsRedCloud
 
         Select Case redOptions.PCReduction
             Case "X Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1)}
+                rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1)}
                 channels = {0}
                 histBinList = {task.histogramBins}
             Case "Y Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1)}
+                rangesCloud = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1)}
                 channels = {1}
                 histBinList = {task.histogramBins}
             Case "Z Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(rz.Item0, rz.Item1)}
+                rangesCloud = New cv.Rangef() {New cv.Rangef(rz.Item0, rz.Item1)}
                 channels = {2}
                 histBinList = {task.histogramBins}
             Case "XY Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1)}
+                rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1)}
                 channelCount = 2
                 channels = {0, 1}
                 histBinList = {task.histogramBins, task.histogramBins}
             Case "XZ Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+                rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
                 channelCount = 2
                 channels = {0, 2}
                 histBinList = {task.histogramBins, task.histogramBins}
             Case "YZ Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+                rangesCloud = New cv.Rangef() {New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
                 channelCount = 2
                 channels = {1, 2}
                 histBinList = {task.histogramBins, task.histogramBins}
             Case "XYZ Reduction"
-                ranges = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
+                rangesCloud = New cv.Rangef() {New cv.Rangef(rx.Item0, rx.Item1), New cv.Rangef(ry.Item0, ry.Item1), New cv.Rangef(rz.Item0, rz.Item1)}
                 channelCount = 3
                 channels = {0, 1, 2}
                 histBinList = {task.histogramBins, task.histogramBins, task.histogramBins}

@@ -49,7 +49,7 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
 
             Marshal.Copy(samples, 0, histogram.Data, samples.Length)
 
-            cv.Cv2.CalcBackProject({src}, redOptions.channels, histogram, dst2, redOptions.ranges)
+            cv.Cv2.CalcBackProject({src}, redOptions.channels, histogram, dst2, redOptions.rangesCloud)
             dst2.SetTo(0, task.noDepthMask)
 
             Dim mm = vbMinMax(dst2)
@@ -219,8 +219,8 @@ Public Class Hist3Dcloud_BP_Filter : Inherits VB_Algorithm
 
         Dim handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned)
         Dim imagePtr = BackProjectCloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins, options.threshold3D,
-                                          rx.Item(0), ry.Item(0), rz.Item(0),
-                                          rx.Item(1), ry.Item(1), rz.Item(1))
+                                            rx.Item(0), ry.Item(0), rz.Item(0),
+                                            rx.Item(1), ry.Item(1), rz.Item(1))
         handleInput.Free()
 
         dst2 = New cv.Mat(dst2.Height, dst2.Width, cv.MatType.CV_8U, imagePtr)
@@ -257,7 +257,7 @@ Public Class Hist3Dcloud_Plot3D : Inherits VB_Algorithm
         Dim histList = buildHistogram(hist3d.histList.Count, valleys.valleys)
 
         Marshal.Copy(histList, 0, hist3d.histogram.Data, histList.Length)
-        cv.Cv2.CalcBackProject({task.pointCloud}, {0, 1, 2}, hist3d.histogram, dst1, redOptions.ranges)
+        cv.Cv2.CalcBackProject({task.pointCloud}, {0, 1, 2}, hist3d.histogram, dst1, redOptions.rangesCloud)
         dst1 = dst1.ConvertScaleAbs()
         dst3 = vbPalette((dst1 * 255 / desiredCountSlider.value).toMat)
         dst3.SetTo(0, task.noDepthMask)
@@ -274,7 +274,7 @@ Public Class Hist3Dcloud_Histogram1D : Inherits VB_Algorithm
     Dim hist3d As New Hist3Dcloud_Basics
     Dim plot As New Plot_Histogram
     Public histogram As cv.Mat
-    Public histList() As Single
+    Public histArray() As Single
     Public Sub New()
         hist3d.runBackProject = False
         labels(2) = "The 3D histogram of the pointcloud data stream - note the number of gaps"
@@ -283,10 +283,10 @@ Public Class Hist3Dcloud_Histogram1D : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
         hist3d.Run(src)
-        ReDim histList(hist3d.histogram.Total - 1)
-        Marshal.Copy(hist3d.histogram.Data, histList, 0, histList.Length)
+        ReDim histArray(hist3d.histogram.Total - 1)
+        Marshal.Copy(hist3d.histogram.Data, histArray, 0, histArray.Length)
 
-        histogram = New cv.Mat(histList.Count, 1, cv.MatType.CV_32F, histList)
+        histogram = New cv.Mat(histArray.Count, 1, cv.MatType.CV_32F, histArray)
         plot.Run(histogram)
         dst2 = plot.dst2
     End Sub

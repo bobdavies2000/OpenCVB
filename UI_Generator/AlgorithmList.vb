@@ -823,6 +823,7 @@ if algorithmName = "KMeans_Dimensions" Then return new KMeans_Dimensions
 if algorithmName = "KMeans_Edges" Then return new KMeans_Edges
 if algorithmName = "KMeans_Foreground" Then return new KMeans_Foreground
 if algorithmName = "KMeans_Fuzzy" Then return new KMeans_Fuzzy
+if algorithmName = "KMeans_Histogram3Dcolor" Then return new KMeans_Histogram3Dcolor
 if algorithmName = "KMeans_Image" Then return new KMeans_Image
 if algorithmName = "KMeans_k2_to_k8" Then return new KMeans_k2_to_k8
 if algorithmName = "KMeans_MultiChannel" Then return new KMeans_MultiChannel

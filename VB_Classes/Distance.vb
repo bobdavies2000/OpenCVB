@@ -336,7 +336,7 @@ Public Class Distance_D3Cells : Inherits VB_Algorithm
             Next
             Marshal.Copy(rm.histList.ToArray, 0, rm.histogram.Data, rm.histList.Count)
 
-            cv.Cv2.CalcBackProject({src(rm.rect)}, {0, 1, 2}, rm.histogram, tmp, hist3d.options.rangesBGR)
+            cv.Cv2.CalcBackProject({src(rm.rect)}, {0, 1, 2}, rm.histogram, tmp, redOptions.rangesBGR)
             tmp.CopyTo(dst3(rm.rect), rm.mask)
         Next
         dst2 = vbPalette(dst3 * 255 / d3Cells.Count)

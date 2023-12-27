@@ -4250,8 +4250,6 @@ Public Class Options_HistXD : Inherits VB_Algorithm
     Public topThreshold As Integer
     Public threshold3D As Integer
     Public selectedBin As Integer
-    Public rangesBGR() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 256), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
-    Public rangesHSV() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 180), New cv.Rangef(0, 256), New cv.Rangef(0, 256)}
     Public Sub New()
         If sliders.Setup(traceName) Then
             sliders.setupTrackBar("Min side bin samples", 0, 100, 5) ' for 2D histograms
