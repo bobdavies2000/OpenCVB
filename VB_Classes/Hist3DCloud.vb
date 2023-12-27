@@ -1,6 +1,6 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Public Class Hist3DCloud_Basics : Inherits VB_Algorithm
+Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
     Public histogram As New cv.Mat
     Public histList() As Single
     Public classCount As Integer
@@ -23,7 +23,7 @@ Public Class Hist3DCloud_Basics : Inherits VB_Algorithm
         Dim rz = New cv.Vec2f(0, task.maxZmeters)
 
         Dim handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned)
-        Dim dstPtr = Hist3DCloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins,
+        Dim dstPtr = Hist3Dcloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins,
                                      rx.Item(0), ry.Item(0), rz.Item(0),
                                      rx.Item(1), ry.Item(1), rz.Item(1))
         handleInput.Free()
@@ -68,7 +68,7 @@ End Class
 
 
 
-Public Class Hist3DCloud_DepthSplit : Inherits VB_Algorithm
+Public Class Hist3Dcloud_DepthSplit : Inherits VB_Algorithm
     Dim hist As List(Of Histogram_Kalman)
     Dim hist2d As List(Of Histogram2D_PointCloud)
     Dim mats1 As New Mat_4Click
@@ -107,8 +107,8 @@ End Class
 
 
 
-Public Class Hist3DCloud_Reduction : Inherits VB_Algorithm
-    Dim hist3d As New Hist3DCloud_Basics
+Public Class Hist3Dcloud_Reduction : Inherits VB_Algorithm
+    Dim hist3d As New Hist3Dcloud_Basics
     Dim reduction As New Reduction_XYZ
     Public Sub New()
         redOptions.SimpleReductionSlider.Value = 254
@@ -133,7 +133,7 @@ End Class
 
 
 
-Public Class Hist3DCloud_Highlights : Inherits VB_Algorithm
+Public Class Hist3Dcloud_Highlights : Inherits VB_Algorithm
     Public histogram As New cv.Mat
     Public ranges() As cv.Rangef
     Public Sub New()
@@ -152,7 +152,7 @@ Public Class Hist3DCloud_Highlights : Inherits VB_Algorithm
         Dim rz = New cv.Vec2f(0, task.maxZmeters)
 
         Dim handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned)
-        Dim dstPtr = Hist3DCloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins,
+        Dim dstPtr = Hist3Dcloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins,
                                      rx.Item(0), ry.Item(0), rz.Item(0),
                                      rx.Item(1), ry.Item(1), rz.Item(1))
         handleInput.Free()
@@ -194,7 +194,7 @@ End Class
 
 
 
-Public Class Hist3DCloud_BP_Filter : Inherits VB_Algorithm
+Public Class Hist3Dcloud_BP_Filter : Inherits VB_Algorithm
     Public histogram As New cv.Mat
     Dim options As New Options_HistXD
     Public Sub New()
@@ -235,14 +235,8 @@ End Class
 
 
 
-
-
-
-
-
-
-Public Class Hist3DCloud_Plot3D : Inherits VB_Algorithm
-    Dim hist3d As New Hist3DCloud_Basics
+Public Class Hist3Dcloud_Plot3D : Inherits VB_Algorithm
+    Dim hist3d As New Hist3Dcloud_Basics
     Dim plotHist As New Plot_Histogram
     Dim valleys As New HistValley_Basics
     Public Sub New()
@@ -262,10 +256,38 @@ Public Class Hist3DCloud_Plot3D : Inherits VB_Algorithm
 
         Dim histList = buildHistogram(hist3d.histList.Count, valleys.valleys)
 
-        Marshal.Copy(histList, 0, hist3d.histogram.Data, histList.length)
+        Marshal.Copy(histList, 0, hist3d.histogram.Data, histList.Length)
         cv.Cv2.CalcBackProject({task.pointCloud}, {0, 1, 2}, hist3d.histogram, dst1, redOptions.ranges)
         dst1 = dst1.ConvertScaleAbs()
         dst3 = vbPalette((dst1 * 255 / desiredCountSlider.value).toMat)
         dst3.SetTo(0, task.noDepthMask)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Hist3Dcloud_Histogram1D : Inherits VB_Algorithm
+    Dim hist3d As New Hist3Dcloud_Basics
+    Dim plot As New Plot_Histogram
+    Public histogram As cv.Mat
+    Public histList() As Single
+    Public Sub New()
+        hist3d.runBackProject = False
+        labels(2) = "The 3D histogram of the pointcloud data stream - note the number of gaps"
+        desc = "Present the 3D histogram as a typical histogram bar chart."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        hist3d.Run(src)
+        ReDim histList(hist3d.histogram.Total - 1)
+        Marshal.Copy(hist3d.histogram.Data, histList, 0, histList.Length)
+
+        histogram = New cv.Mat(histList.Count, 1, cv.MatType.CV_32F, histList)
+        plot.Run(histogram)
+        dst2 = plot.dst2
     End Sub
 End Class

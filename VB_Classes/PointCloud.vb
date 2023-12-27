@@ -1052,7 +1052,7 @@ End Class
 Public Class PointCloud_Histograms : Inherits VB_Algorithm
     Dim plot2D As New Plot_Histogram2D
     Dim plot As New Plot_Histogram
-    Dim hist3d As New Hist3DCloud_Basics
+    Dim hist3d As New Hist3Dcloud_Basics
     Dim grid As New Grid_Basics
     Public histogram As New cv.Mat
     Public Sub New()

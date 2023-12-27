@@ -1111,7 +1111,7 @@ Module Histogram_1D_CPP_Module
 
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
-    Public Function Hist3DCloud_Run(pcPtr As IntPtr, rows As Integer, cols As Integer, bins As Integer,
+    Public Function Hist3Dcloud_Run(pcPtr As IntPtr, rows As Integer, cols As Integer, bins As Integer,
                                     minX As Single, minY As Single, minZ As Single,
                                     maxX As Single, maxY As Single, maxZ As Single) As IntPtr
     End Function

@@ -70,7 +70,7 @@ uchar * BackProjectBGR_Run(int* bgrPtr, int rows, int cols, int bins, float thre
 
 
 extern "C" __declspec(dllexport)
-uchar * Hist3DCloud_Run(int* inputPtr, int rows, int cols, int bins,
+uchar * Hist3Dcloud_Run(int* inputPtr, int rows, int cols, int bins,
 					   float minX, float minY, float minZ,
 					   float maxX, float maxY, float maxZ)
 {

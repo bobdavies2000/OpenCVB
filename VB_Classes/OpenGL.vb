@@ -1126,7 +1126,7 @@ End Class
 
 ' https://docs.opencv.org/3.4/d1/d1d/tutorial_histo3D.html
 Public Class OpenGL_3Ddepth : Inherits VB_Algorithm
-    Dim hist3d As New Hist3DCloud_Basics
+    Dim hist3d As New Hist3Dcloud_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.Histogram3D
         task.OpenGLTitle = "OpenGL_Functions"
@@ -2050,7 +2050,7 @@ End Class
 
 
 Public Class OpenGL_Filtered3D : Inherits VB_Algorithm
-    Dim filter As New Hist3DCloud_BP_Filter
+    Dim filter As New Hist3Dcloud_BP_Filter
     Public Sub New()
         gOptions.OpenGLCapture.Checked = True
         task.ogl.oglFunction = oCase.pointCloudAndRGB

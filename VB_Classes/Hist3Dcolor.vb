@@ -443,3 +443,29 @@ Public Class Hist3Dcolor_Core : Inherits VB_Algorithm
         If standalone Then setTrueText("There is no output when standalone.  Use Hist3Dcolor_Basics to test.")
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Hist3Dcolor_Histogram1D : Inherits VB_Algorithm
+    Dim hist3d As New Hist3Dcolor_Core
+    Dim plot As New Plot_Histogram
+    Public histogram As cv.Mat
+    Public histList() As Single
+    Public Sub New()
+        hist3d.sortHistogramData = False
+        labels(2) = "The 3D histogram of the RGB image stream - note the number of gaps"
+        desc = "Present the 3D histogram as a typical histogram bar chart."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        hist3d.Run(src)
+        redim histList(hist3d.histogram.Total - 1) 
+        Marshal.Copy(hist3d.histogram.Data, histList, 0, histList.Length)
+
+        histogram = New cv.Mat(histList.Count, 1, cv.MatType.CV_32F, histList)
+        plot.Run(histogram)
+        dst2 = plot.dst2
+    End Sub
+End Class
