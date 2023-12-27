@@ -1058,7 +1058,6 @@ End Class
 
 
 Module Histogram_1D_CPP_Module
-    Public histDelta = 0.00001
 
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Histogram_1D_Open() As IntPtr
@@ -1075,10 +1074,12 @@ Module Histogram_1D_CPP_Module
     Public Function Histogram_1D_Sum(cPtr As IntPtr) As Single
     End Function
 
+    Public histDelta = 0.00001
     Public Function vbHist2Dminmax(input As cv.Mat, chan1 As Integer, chan2 As Integer) As cv.Rangef()
         If input.Type = cv.MatType.CV_8UC3 Then
-            Return {New cv.Rangef(-histDelta, 255 + histDelta),
-                    New cv.Rangef(-histDelta, 255 + histDelta)}
+            ' ranges are exclusive in OpenCV 
+            Return {New cv.Rangef(-histDelta, 256),
+                    New cv.Rangef(-histDelta, 256)}
         End If
 
         Dim xInput = input.ExtractChannel(chan1)

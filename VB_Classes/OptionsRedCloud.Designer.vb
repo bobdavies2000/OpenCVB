@@ -69,15 +69,15 @@ Partial Class OptionsRedCloud
         Me.UseDepth = New System.Windows.Forms.RadioButton()
         Me.UseColor = New System.Windows.Forms.RadioButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.LabelHistogramBins = New System.Windows.Forms.Label()
+        Me.Hist3DBinsSlider = New System.Windows.Forms.TrackBar()
+        Me.Label7 = New System.Windows.Forms.Label()
         Me.LabelDesiredCell = New System.Windows.Forms.Label()
         Me.DesiredCellSlider = New System.Windows.Forms.TrackBar()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.LabelimageSizePercent = New System.Windows.Forms.Label()
         Me.imageSizeThresholdSlider = New System.Windows.Forms.TrackBar()
         Me.Label3 = New System.Windows.Forms.Label()
-        Me.LabelHistogramBins = New System.Windows.Forms.Label()
-        Me.Hist3DBinsSlider = New System.Windows.Forms.TrackBar()
-        Me.Label7 = New System.Windows.Forms.Label()
         Me.RedCloudSliders.SuspendLayout()
         CType(Me.TopViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SideViewThreshold, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -92,9 +92,9 @@ Partial Class OptionsRedCloud
         Me.GroupBox1.SuspendLayout()
         Me.RedCloudType.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
+        CType(Me.Hist3DBinsSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DesiredCellSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.imageSizeThresholdSlider, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.Hist3DBinsSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'RedCloudSliders
@@ -442,7 +442,7 @@ Partial Class OptionsRedCloud
         Me.RedCloudOnly.Size = New System.Drawing.Size(220, 289)
         Me.RedCloudOnly.TabIndex = 7
         Me.RedCloudOnly.TabStop = False
-        Me.RedCloudOnly.Text = "PC Histogram Inputs"
+        Me.RedCloudOnly.Text = "Histogram Channels"
         '
         'XYZReduction
         '
@@ -617,6 +617,34 @@ Partial Class OptionsRedCloud
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Histogram 3D Options"
         '
+        'LabelHistogramBins
+        '
+        Me.LabelHistogramBins.AutoSize = True
+        Me.LabelHistogramBins.Location = New System.Drawing.Point(668, 163)
+        Me.LabelHistogramBins.Name = "LabelHistogramBins"
+        Me.LabelHistogramBins.Size = New System.Drawing.Size(57, 20)
+        Me.LabelHistogramBins.TabIndex = 32
+        Me.LabelHistogramBins.Text = "Label5"
+        '
+        'Hist3DBinsSlider
+        '
+        Me.Hist3DBinsSlider.Location = New System.Drawing.Point(156, 156)
+        Me.Hist3DBinsSlider.Maximum = 256
+        Me.Hist3DBinsSlider.Minimum = 2
+        Me.Hist3DBinsSlider.Name = "Hist3DBinsSlider"
+        Me.Hist3DBinsSlider.Size = New System.Drawing.Size(506, 69)
+        Me.Hist3DBinsSlider.TabIndex = 31
+        Me.Hist3DBinsSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.Hist3DBinsSlider.Value = 4
+        '
+        'Label7
+        '
+        Me.Label7.Location = New System.Drawing.Point(8, 163)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(152, 48)
+        Me.Label7.TabIndex = 30
+        Me.Label7.Text = "3D Histogram Bins"
+        '
         'LabelDesiredCell
         '
         Me.LabelDesiredCell.AutoSize = True
@@ -673,34 +701,6 @@ Partial Class OptionsRedCloud
         Me.Label3.TabIndex = 24
         Me.Label3.Text = "Image Threshold %"
         '
-        'LabelHistogramBins
-        '
-        Me.LabelHistogramBins.AutoSize = True
-        Me.LabelHistogramBins.Location = New System.Drawing.Point(668, 163)
-        Me.LabelHistogramBins.Name = "LabelHistogramBins"
-        Me.LabelHistogramBins.Size = New System.Drawing.Size(57, 20)
-        Me.LabelHistogramBins.TabIndex = 32
-        Me.LabelHistogramBins.Text = "Label5"
-        '
-        'Hist3DBinsSlider
-        '
-        Me.Hist3DBinsSlider.Location = New System.Drawing.Point(156, 156)
-        Me.Hist3DBinsSlider.Maximum = 256
-        Me.Hist3DBinsSlider.Minimum = 2
-        Me.Hist3DBinsSlider.Name = "Hist3DBinsSlider"
-        Me.Hist3DBinsSlider.Size = New System.Drawing.Size(506, 69)
-        Me.Hist3DBinsSlider.TabIndex = 31
-        Me.Hist3DBinsSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.Hist3DBinsSlider.Value = 4
-        '
-        'Label7
-        '
-        Me.Label7.Location = New System.Drawing.Point(8, 163)
-        Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(152, 48)
-        Me.Label7.TabIndex = 30
-        Me.Label7.Text = "3D Histogram Bins"
-        '
         'OptionsRedCloud
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -738,9 +738,9 @@ Partial Class OptionsRedCloud
         Me.RedCloudType.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
+        CType(Me.Hist3DBinsSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DesiredCellSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.imageSizeThresholdSlider, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.Hist3DBinsSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub

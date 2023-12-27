@@ -440,7 +440,7 @@ End Class
 
 
 
-Public Class Hist3Dcolor_Histogram1D : Inherits VB_Algorithm
+Public Class Hist3Dcolor_PlotHist1D : Inherits VB_Algorithm
     Dim hist3d As New Hist3Dcolor_Core
     Dim plot As New Plot_Histogram
     Public histogram As cv.Mat

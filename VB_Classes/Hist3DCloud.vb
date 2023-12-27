@@ -70,12 +70,12 @@ End Class
 
 Public Class Hist3Dcloud_DepthSplit : Inherits VB_Algorithm
     Dim hist As List(Of Histogram_Kalman)
-    Dim hist2d As List(Of Histogram2D_PointCloud)
+    Dim hist2d As List(Of Histogram2D_Cloud)
     Dim mats1 As New Mat_4Click
     Dim mats2 As New Mat_4Click
     Public Sub New()
         hist = New List(Of Histogram_Kalman)({New Histogram_Kalman, New Histogram_Kalman, New Histogram_Kalman})
-        hist2d = New List(Of Histogram2D_PointCloud)({New Histogram2D_PointCloud, New Histogram2D_PointCloud, New Histogram2D_PointCloud})
+        hist2d = New List(Of Histogram2D_Cloud)({New Histogram2D_Cloud, New Histogram2D_Cloud, New Histogram2D_Cloud})
         labels(2) = "Histograms (Kalman) for X (upper left), Y (upper right) and Z.  UseZeroDepth removes 0 (no depth) entries."
         labels(3) = "X to Y histogram (upper left), X to Z (upper right), and Y to Z (bottom)."
         desc = "Plot the 3 histograms of the depth data dimensions"
@@ -270,7 +270,7 @@ End Class
 
 
 
-Public Class Hist3Dcloud_Histogram1D : Inherits VB_Algorithm
+Public Class Hist3Dcloud_PlotHist1D : Inherits VB_Algorithm
     Dim hist3d As New Hist3Dcloud_Basics
     Dim plot As New Plot_Histogram
     Public histogram As cv.Mat

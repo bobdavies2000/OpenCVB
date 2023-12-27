@@ -1,23 +1,26 @@
 ﻿Imports cv = OpenCvSharp
 Public Class HistPeak2D_Basics : Inherits VB_Algorithm
     Public auto As New OpAuto_Peaks2DGrid
+    Dim bgr As New Histogram2D_BGR
     Dim delaunay As New Delaunay_Basics
     Public histogram As New cv.Mat
     Public ranges() As cv.Rangef
     Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
         desc = "Find the top X peaks in a 2D histogram and use Delaunay to setup the backprojection"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         ' if standalone, go get a histogram for input.  Src is the 3-channel input to the histogram.
         If standalone Then
-            Static bgr As New Histogram2D_BGR
             bgr.Run(src)
             histogram = bgr.histogram02
         End If
-        If firstPass Or task.optionsChanged Or (heartBeat() And src.Type = cv.MatType.CV_32FC3) Then
+        If heartBeat() Then
             auto.Run(histogram)
             delaunay.inputPoints = New List(Of cv.Point2f)(auto.clusterPoints)
             delaunay.Run(src)
+            dst1 = auto.dst2
+            dst3 = delaunay.dst2
         End If
 
         Dim mask = histogram.Threshold(0, 255, cv.ThresholdTypes.Binary).ConvertScaleAbs

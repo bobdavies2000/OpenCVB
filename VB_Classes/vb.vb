@@ -498,11 +498,12 @@ Module VB
         Next
         Return histList
     End Function
-    Public Function buildHistogram3D(count As Integer, histList() As Single) As Single()
-        Dim classCount As Integer
+    Public Function buildHistogram3D(count As Integer, ByRef histList() As Single) As Integer
+        Dim classCount = 1
         Dim index As Integer
         For index = 0 To histList.Count - 1
             If histList(index) <> 0 Then Exit For
+            histList(index) = classCount
         Next
 
         For i = index To histList.Count - 1
@@ -515,8 +516,9 @@ Module VB
                 If histList(index) <> 0 Then Exit For
                 histList(index) = classCount
             Next
+            If index >= histList.Count Then Exit For
         Next
-        Return histList
+        Return classCount
     End Function
 End Module
 
