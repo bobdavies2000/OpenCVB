@@ -2295,7 +2295,8 @@ Public Class RedCloud_MeterByMeter : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         meter.Run(src)
-        dst1 = meter.dst2
+        dst2 = meter.dst3
+        labels(2) = meter.labels(3)
 
         For i = 0 To task.maxZmeters
 

@@ -7,16 +7,16 @@ Public Class Hist3Dcolor_Basics : Inherits VB_Algorithm
         desc = "Build a 3D histogram from the BGR image on each heartbeat.  Backproject each frame."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static sum As Integer
         If src.Channels <> 3 Then src = task.color
 
         If heartBeat() Then hist3d.Run(src)
         classCount = hist3d.classCount
 
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, hist3d.histogram, dst2, hist3d.options.rangesBGR)
-        dst3 = vbPalette(dst2 * 255 / classCount)
+        dst3 = vbPalette((dst2 + 1) * 255 / classCount)
 
-        labels(2) = CStr(sum) + " pixels (" + Format(sum / src.Total, "0%") + ") classified into bins 0-" +
+        Dim sum = hist3d.histogram.Sum()
+        labels(2) = CStr(sum) + " pixels (" + Format(sum(0) / src.Total, "0%") + ") classified into bins 0-" +
                     CStr(classCount)
         labels(3) = "Backprojection of the top " + CStr(classCount) + " histogram entries."
     End Sub
@@ -391,5 +391,29 @@ Public Class Hist3Dcolor_ZeroGroups : Inherits VB_Algorithm
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, options.rangesBGR)
         dst3 = vbPalette(dst2 * 255 / classCount)
         labels(2) = "Hist3Dcolor_ZeroGroups classCount = " + CStr(classCount)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Hist3Dcolor_Dominant : Inherits VB_Algorithm
+    Dim rMin As New RedMin_Basics
+    Dim hist3d As New Hist3Dcolor_SortedHistogram
+    Public Sub New()
+        desc = "Find the dominant color in a 3D color histogram and backProject it."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        rMin.Run(src)
+        dst2 = rMin.dst2
+        labels(2) = rMin.labels(2)
+
+        For Each rp In rMin.minCells
+            hist3d.maskInput = rp.mask
+            hist3d.Run(src(rp.rect))
+        Next
     End Sub
 End Class

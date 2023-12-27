@@ -10,7 +10,7 @@ Public Class RedMin_Basics : Inherits VB_Algorithm
         redOptions.DesiredCellSlider.Value = 30
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels = {"", "Mask of active RedMin cells", "CV_8U representation of minCells", ""}
-        desc = "Collect the occasional cells found in RedMin_Basics and age them out."
+        desc = "Collect cells found in RedMin_Basics and age them out."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         minCore.Run(src)
@@ -364,6 +364,7 @@ Public Class RedMin_Select : Inherits VB_Algorithm
             End If
         Else
             Dim index = rMin.dst2.Get(Of Byte)(task.clickPoint.Y, task.clickPoint.X)
+            If index = 0 Then index = 1
             task.cellSelect = rMin.minCells(index - 1)
         End If
 

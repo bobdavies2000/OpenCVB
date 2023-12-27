@@ -196,3 +196,151 @@ Public Class Distance_Threshold : Inherits VB_Algorithm
         dst3 = dst2.Threshold(thresholdSlider.value, 255, cv.ThresholdTypes.Binary)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Distance_RedMin : Inherits VB_Algorithm
+    Dim rMin As New RedMin_Basics
+    Dim hist3d As New Hist3Dcolor_SortedHistogram
+    Public pixelVector As New List(Of List(Of Single))
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        redOptions.Hist3DBinsSlider.Value = 5
+        hist3d.sortHistList = False
+        labels(3) = "3D Histogram distance for each of the cells at left"
+        desc = "Identify RedMin cells using each cell's 3D histogram distance from zero"
+    End Sub
+    Private Function distanceFromZero(histlist As List(Of Single)) As Double
+        Dim result As Double
+        For Each d In histlist
+            result += d * d
+        Next
+        Return Math.Sqrt(result)
+    End Function
+    Public Sub RunVB(src As cv.Mat)
+        rMin.Run(src)
+
+        Static distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
+        Static lastDistances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
+        Static lastMinCells As New List(Of rcPrep)
+        pixelVector.Clear()
+        distances.Clear()
+        For i = 0 To rMin.minCells.Count - 1
+            Dim rp = rMin.minCells(i)
+            hist3d.maskInput = rp.mask
+            hist3d.Run(src(rp.rect))
+
+            Dim nextD = distanceFromZero(hist3d.histList.ToList)
+            distances.Add(nextD, i)
+        Next
+
+        If heartBeat() Then
+            strOut = "3D histogram distances from zero for each cell" + vbCrLf
+            Dim index As Integer
+            For Each el In distances
+                strOut += "(" + CStr(el.Value) + ") "
+                strOut += Format(el.Key, fmt1) + vbTab
+                If index Mod 6 = 5 Then strOut += vbCrLf
+                index += 1
+
+                Dim rp = rMin.minCells(el.Value)
+                setTrueText(CStr(el.Value), rp.maxDist)
+            Next
+
+            strOut += "----------------------" + vbCrLf
+            index = 0
+            For Each el In lastDistances
+                strOut += "(" + CStr(el.Value) + ") "
+                strOut += Format(el.Key, fmt1) + vbTab
+                If index Mod 6 = 5 Then strOut += vbCrLf
+                index += 1
+                Dim rp = lastMinCells(el.Value)
+                setTrueText(el.Value, New cv.Point(rp.maxDist.X, rp.maxDist.Y + 10))
+            Next
+
+            lastDistances.Clear()
+            For Each el In distances
+                lastDistances.Add(el.Key, el.Value)
+            Next
+        End If
+
+        For Each el In distances
+            Dim rp = rMin.minCells(el.Value)
+            setTrueText(CStr(el.Value), rp.maxDist)
+        Next
+
+        For Each el In lastDistances
+            Dim rp = lastMinCells(el.Value)
+            setTrueText(el.Value, New cv.Point(rp.maxDist.X, rp.maxDist.Y + 10))
+        Next
+
+        setTrueText(strOut, 1)
+
+        dst2.SetTo(0)
+        dst3.SetTo(0)
+        For i = 0 To distances.Count - 1
+            Dim rp = rMin.minCells(distances.ElementAt(i).Value)
+            task.color(rp.rect).CopyTo(dst2(rp.rect), rp.mask)
+            dst3(rp.rect).SetTo(task.scalarColors(i), rp.mask)
+        Next
+        labels(2) = rMin.labels(3)
+        lastMinCells = New List(Of rcPrep)(rMin.minCells)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Distance_D3Cells : Inherits VB_Algorithm
+    Dim rMin As New RedMin_Basics
+    Dim hist3d As New Hist3Dcolor_SortedHistogram
+    Dim valleys As New HistValley_Basics
+    Public d3Cells As New List(Of rMinData)
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        redOptions.Hist3DBinsSlider.Value = 5
+        hist3d.sortHistList = False
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "CV_8U format of the backprojected cells - before vbPalette."
+        desc = "Experiment that failed - backprojecting each cell from RedMin_Basics"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        rMin.Run(src)
+
+        d3Cells.Clear()
+        For i = 0 To rMin.minCells.Count - 1
+            Dim rm As New rMinData
+            Dim rp = rMin.minCells(i)
+            rm.mask = rp.mask
+            rm.rect = rp.rect
+            rm.index = i + 1
+
+            hist3d.maskInput = rp.mask
+            hist3d.Run(src(rp.rect))
+            rm.histogram = hist3d.histogram.Clone
+            rm.histList = New List(Of Single)(hist3d.histList)
+
+            d3Cells.Add(rm)
+        Next
+
+        Dim tmp As New cv.Mat
+        dst3.SetTo(0)
+        For Each rm In d3Cells
+            For i = 0 To rm.histList.Count - 1
+                If rm.histList(i) <> 0 Then rm.histList(i) = rm.index
+            Next
+            Marshal.Copy(rm.histList.ToArray, 0, rm.histogram.Data, rm.histList.Count)
+
+            cv.Cv2.CalcBackProject({src(rm.rect)}, {0, 1, 2}, rm.histogram, tmp, hist3d.options.rangesBGR)
+            tmp.CopyTo(dst3(rm.rect), rm.mask)
+        Next
+        dst2 = vbPalette(dst3 * 255 / d3Cells.Count)
+
+        labels(2) = rMin.labels(3)
+    End Sub
+End Class

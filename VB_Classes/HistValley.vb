@@ -10,18 +10,8 @@ Public Class HistValley_Basics : Inherits VB_Algorithm
         desc = "Use the peaks identified in HistValley_Peaks to find the valleys between the peaks."
     End Sub
     Public Function updatePlot(dst As cv.Mat, bins As Integer) As cv.Mat
-        For i = 0 To peaks.Count - 2
-            Dim start = peaks(i)
-            Dim finish = peaks(i + 1)
-
-            Dim testList As New List(Of Single)
-            For j = start To finish
-                testList.Add(histList(j))
-            Next
-
-            Dim nextVal = start + testList.IndexOf(testList.Min)
-            valleys.Add(nextVal)
-            Dim col = dst.Width * nextVal / bins
+        For Each valley In valleys
+            Dim col = dst.Width * valley / bins
             dst.Line(New cv.Point(col, dst.Height), New cv.Point(col, dst.Height * 9 / 10), cv.Scalar.White, task.lineWidth)
         Next
         Return dst
@@ -33,6 +23,18 @@ Public Class HistValley_Basics : Inherits VB_Algorithm
         histList = peak.histArray.ToList
         valleys.Clear()
         peaks = New List(Of Integer)(peak.peaks)
+        For i = 0 To peaks.Count - 2
+            Dim start = peaks(i)
+            Dim finish = peaks(i + 1)
+
+            Dim testList As New List(Of Single)
+            For j = start To finish
+                testList.Add(histList(j))
+            Next
+
+            Dim nextVal = start + testList.IndexOf(testList.Min)
+            valleys.Add(nextVal)
+        Next
         If standalone Then updatePlot(dst2, task.histogramBins)
     End Sub
 End Class

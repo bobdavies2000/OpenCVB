@@ -260,25 +260,9 @@ Public Class Hist3DCloud_Plot3D : Inherits VB_Algorithm
             dst2 = valleys.updatePlot(plotHist.dst2, hist3d.histogram.Rows)
         End If
 
-        Dim index As Integer
-        Dim histList = hist3d.histList
-        Dim start = valleys.valleys(0)
-        For i = 0 To start - 1
-            histList(i) = index
-        Next
-        For i = 1 To valleys.valleys.Count - 1
-            index += 1
-            Dim finish = valleys.valleys(i)
-            For j = start To finish
-                histList(j) = index
-            Next
-            start = finish + 1
-        Next
-        For j = start To histList.Count - 1
-            histList(j) = index
-        Next
+        Dim histList = buildHistogram(hist3d.histList.Count, valleys.valleys)
 
-        Marshal.Copy(histList, 0, hist3d.histogram.Data, histList.Length)
+        Marshal.Copy(histList, 0, hist3d.histogram.Data, histList.length)
         cv.Cv2.CalcBackProject({task.pointCloud}, {0, 1, 2}, hist3d.histogram, dst1, redOptions.ranges)
         dst1 = dst1.ConvertScaleAbs()
         dst3 = vbPalette((dst1 * 255 / desiredCountSlider.value).toMat)
