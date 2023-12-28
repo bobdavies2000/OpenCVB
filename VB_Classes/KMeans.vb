@@ -540,6 +540,32 @@ End Class
 
 
 
+Public Class KMeans_Depth : Inherits VB_Algorithm
+    Public km As New KMeans_Basics
+    Public classCount As Integer
+    Public Sub New()
+        findSlider("KMeans k").Value = 10
+        labels(2) =
+        desc = "Cluster depth using kMeans - useful to split foreground and background"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        km.Run(task.pcSplit(2))
+        dst2 = km.dst2 + 1
+        dst2.SetTo(0, task.noDepthMask)
+
+        classCount = km.classCount
+        dst3 = vbPalette(dst2 * 255 / classCount)
+        labels(2) = "Palettized version of the " + CStr(classCount) + " 8UC1 classes"
+    End Sub
+End Class
+
+
+
+
+
+
+
+
 Public Class KMeans_SimKColor : Inherits VB_Algorithm
     Dim hist3d As New Hist3Dcolor_PlotHist1D
     Public classCount As Integer
@@ -561,32 +587,6 @@ Public Class KMeans_SimKColor : Inherits VB_Algorithm
         labels(2) = "Simulated KMeans with k = " + CStr(classCount)
     End Sub
 End Class
-
-
-
-
-
-
-
-Public Class KMeans_SimKDepth : Inherits VB_Algorithm
-    Public km As New KMeans_Basics
-    Public classCount As Integer
-    Public Sub New()
-        findSlider("KMeans k").Value = 10
-        labels(2) =
-        desc = "Cluster depth using kMeans - useful to split foreground and background"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        km.Run(task.pcSplit(2))
-        dst2 = km.dst2 + 1
-        dst2.SetTo(0, task.noDepthMask)
-
-        classCount = km.classCount
-        dst3 = vbPalette(dst2 * 255 / classCount)
-        labels(2) = "Palettized version of the " + CStr(classCount) + " 8UC1 classes"
-    End Sub
-End Class
-
 
 
 

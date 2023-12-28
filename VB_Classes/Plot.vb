@@ -67,21 +67,15 @@ Public Class Plot_Histogram : Inherits VB_Algorithm
         Dim mm = vbMinMax(histogram)
 
         If mm.maxVal > 0 And histogram.Rows > 0 Then
-            Dim count As Integer
-            Dim incr = CInt(255 / histogram.Rows)
+            Dim incr = 255 / histogram.Rows
             For i = 0 To histArray.Count - 1
                 If Single.IsNaN(histArray(i)) Then histArray(i) = 0
                 If histArray(i) > 0 Then
                     Dim h = CInt(histArray(i) * dst2.Height / mm.maxVal)
-                    Dim sIncr = CInt((i Mod 256) * incr)
+                    Dim sIncr = (i Mod 256) * incr
                     Dim color = New cv.Scalar(sIncr, sIncr, sIncr)
                     If histogram.Rows > 255 Then color = cv.Scalar.Black
-                    If barWidth < 1 Then
-                        cv.Cv2.Rectangle(dst2, New cv.Rect(i, dst2.Height - h, 1, h), color, -1)
-                    Else
-                        cv.Cv2.Rectangle(dst2, New cv.Rect(i * barWidth, dst2.Height - h, barWidth, h), color, -1)
-                    End If
-                    count += 1
+                    cv.Cv2.Rectangle(dst2, New cv.Rect(i * barWidth, dst2.Height - h, 1, h), color, -1)
                 End If
             Next
             If addLabels Then AddPlotScale(dst2, mm.minVal, mm.maxVal)

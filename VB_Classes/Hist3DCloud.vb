@@ -277,6 +277,7 @@ Public Class Hist3Dcloud_PlotHist1D : Inherits VB_Algorithm
     Public histArray() As Single
     Public Sub New()
         hist3d.runBackProject = False
+        plot.removeZeroEntry = False
         labels(2) = "The 3D histogram of the pointcloud data stream - note the number of gaps"
         desc = "Present the 3D histogram as a typical histogram bar chart."
     End Sub

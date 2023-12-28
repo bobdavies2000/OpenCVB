@@ -119,6 +119,7 @@
     <Compile Include="BGRPattern.vb" />
     <Compile Include="Cell.vb" />
     <Compile Include="Complexity.vb" />
+    <Compile Include="Foreground.vb" />
     <Compile Include="FrameRate.vb" />
     <Compile Include="Hist3Dcloud.vb" />
     <Compile Include="Neighbor.vb" />
