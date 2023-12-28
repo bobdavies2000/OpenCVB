@@ -2,52 +2,65 @@ Imports System.IO
 Imports cv = OpenCvSharp
 ' https://docs.opencv.org/3.3.1/de/dd0/grabcut_8cpp-example.html
 Public Class GrabCut_Basics : Inherits VB_Algorithm
-    Dim km As New KMeans_Depth
+    Dim simK As New KMeans_SimKDepth
     Public fgFineTune As cv.Mat
     Public bgFineTune As cv.Mat
     Public Sub New()
-        labels(2) = "KMeans output defining background and foreground (K = 2)."
         labels(3) = "Foreground after GrabCut using mask in dst0"
-        desc = "Use grabcut with just a foreground and background definition."
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        desc = "Use the first KMeans class with depth over 1 meter to define foreground"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static bgModel As New cv.Mat(1, 65, cv.MatType.CV_64F, 0), fgModel As New cv.Mat(1, 65, cv.MatType.CV_64F, 0)
         Static fg As New cv.Mat, bg As New cv.Mat
+        Static fgDepth As Single
         If heartBeat() Then
-            km.Run(src)
-            dst2 = km.dst3
+            simK.Run(src)
 
-            ' kmeans does not know foreground from background so use depth determine which is which.
-            fg = km.dst2.InRange(1, 1)
-            bg = km.dst2.InRange(2, 2)
+            ' kmeans output is not ordered from foreground from background so use depth determine which is fg.
+            Dim depthMats As New List(Of cv.Mat)
+            Dim sortedMats As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingle)
+            For i = 0 To simK.classCount - 1
+                Dim tmp = simK.dst2.InRange(i, i)
+                depthMats.Add(tmp.Clone)
+                Dim depth = task.pcSplit(2).Mean(tmp)(0)
+                sortedMats.Add(depth, i)
+            Next
 
-            If fg.CountNonZero > 0 Then
-                Dim meanFG = task.pcSplit(2).Mean(fg)
-                Dim meanBG = task.pcSplit(2).Mean(bg)
+            fgDepth = 0
+            For Each el In sortedMats
+                fgDepth = el.Key
+                If fgDepth >= 1 Then Exit For ' find all the regions closer than a meter (inclusive)
+            Next
+            fg = task.pcSplit(2).Threshold(fgDepth, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
 
-                If meanFG(0) > meanBG(0) Then
-                    Dim tmp = fg
-                    fg = bg
-                    bg = tmp
-                End If
-
-                dst0 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, cv.GrabCutClasses.PR_BGD)
-                dst0.SetTo(cv.GrabCutClasses.FGD, fg)
-                dst0.SetTo(cv.GrabCutClasses.BGD, bg)
-
-                ' cv.Cv2.GrabCut(src, dst0, New cv.Rect, bgModel, fgModel, 1, cv.GrabCutModes.InitWithMask)
-            End If
+            For Each el In sortedMats
+                Dim tmp = depthMats(el.Value)
+                dst1.SetTo(el.Value + 1, tmp)
+            Next
+            dst2 = vbPalette(dst1 * 255 / depthMats.Count)
+        Else
+            fg = task.pcSplit(2).Threshold(fgDepth, 255, cv.ThresholdTypes.BinaryInv).ConvertScaleAbs()
         End If
 
-        If fg.CountNonZero > 0 Then
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, cv.GrabCutClasses.PR_BGD)
+        dst0.SetTo(cv.GrabCutClasses.FGD, fg)
+        dst0.SetTo(cv.GrabCutClasses.BGD, bg)
+
+        ' cv.Cv2.GrabCut(src, dst0, New cv.Rect, bgModel, fgModel, 1, cv.GrabCutModes.InitWithMask)
+
+        fg.SetTo(0, task.noDepthMask)
+        bg = Not fg
+
+        If fg.CountNonZero Then
             If fgFineTune IsNot Nothing Then dst0.SetTo(cv.GrabCutClasses.FGD, fgFineTune)
             If bgFineTune IsNot Nothing Then dst0.SetTo(cv.GrabCutClasses.BGD, bgFineTune)
 
             cv.Cv2.GrabCut(src, dst0, New cv.Rect, bgModel, fgModel, 1, cv.GrabCutModes.Eval)
-
-            dst3.SetTo(0)
-            src.CopyTo(dst3, dst0)
         End If
+        dst3.SetTo(0)
+        src.CopyTo(dst3, dst0)
+        labels(2) = "KMeans output defining the " + CStr(simK.classCount) + " classes."
     End Sub
 End Class
 

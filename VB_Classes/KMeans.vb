@@ -539,29 +539,8 @@ End Class
 
 
 
-Public Class KMeans_Depth : Inherits VB_Algorithm
-    Dim km As New KMeans_Basics
-    Public Sub New()
-        findSlider("KMeans k").Value = 2
-        labels(2) = "dst2 is 8uC1 with 0 (no depth), 1 (foreground), and 2 (background)"
-        desc = "Cluster depth using kMeans - useful to split foreground and background with k = 2."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        km.Run(task.pcSplit(2))
-        dst2 = km.dst2 + 1
-        dst2.SetTo(0, task.noDepthMask)
 
-        dst3 = vbPalette(dst2 * 255 / km.classCount)
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class KMeans_SimulatedColor : Inherits VB_Algorithm
+Public Class KMeans_SimKColor : Inherits VB_Algorithm
     Dim hist3d As New Hist3Dcolor_PlotHist1D
     Public classCount As Integer
     Public Sub New()
@@ -589,7 +568,31 @@ End Class
 
 
 
-Public Class KMeans_SimulatedCloud : Inherits VB_Algorithm
+Public Class KMeans_SimKDepth : Inherits VB_Algorithm
+    Public km As New KMeans_Basics
+    Public classCount As Integer
+    Public Sub New()
+        findSlider("KMeans k").Value = 10
+        labels(2) =
+        desc = "Cluster depth using kMeans - useful to split foreground and background"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        km.Run(task.pcSplit(2))
+        dst2 = km.dst2 + 1
+        dst2.SetTo(0, task.noDepthMask)
+
+        classCount = km.classCount
+        dst3 = vbPalette(dst2 * 255 / classCount)
+        labels(2) = "Palettized version of the " + CStr(classCount) + " 8UC1 classes"
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class KMeans_SimKCloud : Inherits VB_Algorithm
     Dim hist3d As New Hist3Dcloud_PlotHist1D
     Public classCount As Integer
     Public Sub New()
@@ -603,11 +606,42 @@ Public Class KMeans_SimulatedCloud : Inherits VB_Algorithm
             labels(3) = hist3d.labels(2)
 
             classCount = buildHistogram3D(hist3d.histArray.Count, hist3d.histArray)
+            Marshal.Copy(hist3d.histArray, 0, hist3d.histogram.Data, hist3d.histArray.Length)
         End If
-        Marshal.Copy(hist3d.histArray, 0, hist3d.histogram.Data, hist3d.histArray.Length)
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, hist3d.histogram, dst1, redOptions.rangesCloud)
+        dst1 = dst1.ConvertScaleAbs
 
         dst2 = vbPalette(dst1 * 255 / classCount)
         labels(2) = "Simulated KMeans with k = " + CStr(classCount)
+        Console.WriteLine(CStr(classCount))
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class KMeans_SimKfindK : Inherits VB_Algorithm
+    Dim hist3d As New Hist3Dcloud_PlotHist1D
+    Public classCount As Integer
+    Public Sub New()
+        desc = "Use the gaps in the 3D histogram of the pointcloud to find 'k' and backproject the results."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
+        If heartBeat() Then
+            hist3d.Run(src)
+            dst3 = hist3d.dst2
+            labels(3) = hist3d.labels(2)
+
+            classCount = buildHistogram3D(hist3d.histArray.Count, hist3d.histArray)
+            Marshal.Copy(hist3d.histArray, 0, hist3d.histogram.Data, hist3d.histArray.Length)
+        End If
+        Dim ranges() As cv.Rangef = {redOptions.rangesCloud(2)}
+        cv.Cv2.CalcBackProject({src}, {2}, hist3d.histogram, dst1, ranges)
+        dst2 = vbPalette(dst1 * 255 / classCount)
+        labels(2) = "KMeans_SimulatedDepth found k = " + CStr(classCount)
     End Sub
 End Class
