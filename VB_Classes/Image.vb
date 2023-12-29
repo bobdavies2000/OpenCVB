@@ -101,7 +101,7 @@ End Class
 
 Public Class Image_RedCloudColor : Inherits VB_Algorithm
     Public images As New Image_Series
-    Public redC As New RedCloud_ColorCells
+    Public redC As New RedColor_Cells
     Public Sub New()
         gOptions.displayDst0.Checked = True
         desc = "Use RedCloud on a photo instead of the video stream."

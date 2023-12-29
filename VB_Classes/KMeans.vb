@@ -568,6 +568,7 @@ End Class
 
 Public Class KMeans_SimKColor : Inherits VB_Algorithm
     Dim plot2D As New Hist3Dcolor_PlotHist1D
+    Dim simK As New Hist3Dcolor_BuildHistogram
     Public classCount As Integer
     Public Sub New()
         desc = "Use the gaps in the 3D histogram of the color image to find 'k' and backproject the results."
@@ -578,7 +579,9 @@ Public Class KMeans_SimKColor : Inherits VB_Algorithm
             dst3 = plot2D.dst2
             labels(3) = "The 3D histogram of the RGB image stream in 1D - note the number of gaps"
 
-            classCount = buildHistogram3D(plot2D.histArray.Count, plot2D.histArray, 0)
+            simK.Run(plot2D.histogram)
+            plot2D.histogram = simK.dst2
+            classCount = simK.classCount
         End If
         Marshal.Copy(plot2D.histArray, 0, plot2D.histogram.Data, plot2D.histArray.Length)
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, plot2D.histogram, dst1, redOptions.rangesBGR)
@@ -596,6 +599,7 @@ End Class
 
 Public Class KMeans_SimKDepth : Inherits VB_Algorithm
     Dim plot2D As New Hist3Dcloud_PlotHist1D
+    Dim simK As New Hist3Dcolor_BuildHistogram
     Public classCount As Integer
     Public Sub New()
         desc = "Use the gaps in the 3D histogram of depth to find simK and backproject the results."
@@ -607,8 +611,9 @@ Public Class KMeans_SimKDepth : Inherits VB_Algorithm
             dst3 = plot2D.dst2
             labels(3) = "The 3D histogram of the depth stream in 1D - note the number of gaps"
 
-            classCount = buildHistogram3D(plot2D.histArray.Count, plot2D.histArray, 0)
-            Marshal.Copy(plot2D.histArray, 0, plot2D.histogram.Data, plot2D.histArray.Length)
+            simK.Run(plot2D.histogram)
+            plot2D.histogram = simK.dst2
+            classCount = simK.classCount
         End If
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, plot2D.histogram, dst1, redOptions.rangesCloud)
         dst1 = dst1.ConvertScaleAbs
@@ -629,6 +634,7 @@ End Class
 
 Public Class KMeans_SimKfindK : Inherits VB_Algorithm
     Dim plot2D As New Hist3Dcloud_PlotHist1D
+    Dim simK As New Hist3Dcolor_BuildHistogram
     Public classCount As Integer
     Public Sub New()
         desc = "Use the gaps in the 3D histogram of depth to find simK and backproject the results."
@@ -640,8 +646,9 @@ Public Class KMeans_SimKfindK : Inherits VB_Algorithm
             dst3 = plot2D.dst2
             labels(3) = "The 3D histogram of the depth stream in 1D - note the number of gaps"
 
-            classCount = buildHistogram3D(plot2D.histArray.Count, plot2D.histArray, 0)
-            Marshal.Copy(plot2D.histArray, 0, plot2D.histogram.Data, plot2D.histArray.Length)
+            simK.Run(plot2D.histogram)
+            plot2D.histogram = simK.dst2
+            classCount = simK.classCount
         End If
         Dim ranges() As cv.Rangef = {redOptions.rangesCloud(2)}
         cv.Cv2.CalcBackProject({src}, {2}, plot2D.histogram, dst1, ranges)

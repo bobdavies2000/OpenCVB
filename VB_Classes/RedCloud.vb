@@ -1941,37 +1941,12 @@ End Class
 
 
 
-Public Class RedCloud_ColorCells : Inherits VB_Algorithm
-    Public redC As New RedCloud_Basics
-    Public cellmap As New cv.Mat
-    Public redCells As New List(Of rcData)
-    Public Sub New()
-        redOptions.UseColor.Checked = True
-        desc = "Create RedCloud output using only color"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        redC.Run(src)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
-
-        cellmap = redC.cellMap
-        redCells = redC.redCells
-    End Sub
-End Class
-
-
-
-
-
-
-
-
 Public Class RedCloud_Combine2Runs : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
-    Public colorOnly As New RedCloud_ColorCells
+    Public colorOnly As New RedColor_Cells
     Public Sub New()
         redC.displaySelectedCell = False
-        desc = "Run RedCloud_ColorCells and RedCloud_OnlyDepth and then combine."
+        desc = "Run RedColor_Cells and RedCloud_OnlyDepth and then combine."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         redOptions.UseDepth.Checked = True

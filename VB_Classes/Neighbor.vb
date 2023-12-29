@@ -221,7 +221,7 @@ End Class
 
 Public Class Neighbor_ColorOnly : Inherits VB_Algorithm
     Dim corners As New Neighbor_Corners
-    Dim redC As New RedCloud_ColorCells
+    Dim redC As New RedColor_Cells
     Public Sub New()
         desc = "Find neighbors in a color only RedCloud cellMap"
     End Sub

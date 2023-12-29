@@ -578,7 +578,7 @@ End Class
 
 
 Public Class Contour_RedCloudEdges : Inherits VB_Algorithm
-    Dim redC As New RedCloud_ColorCells
+    Dim redC As New RedColor_Cells
     Dim edges As New EdgeDraw_Basics
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True

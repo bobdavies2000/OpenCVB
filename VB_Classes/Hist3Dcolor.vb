@@ -460,3 +460,68 @@ Public Class Hist3Dcolor_PlotHist1D : Inherits VB_Algorithm
         dst2 = plot.dst2
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Hist3Dcolor_Diff : Inherits VB_Algorithm
+    Dim hist3d As New Hist3Dcolor_Basics
+    Dim diff As New Diff_Basics
+    Public Sub New()
+        gOptions.PixelDiffThreshold.Value = 0
+        desc = "Create a mask for the pixels that are changing with every frame. Can the color cells be merged?"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        hist3d.Run(src)
+        dst2 = hist3d.dst3
+        labels(2) = hist3d.labels(3)
+
+        diff.Run(hist3d.dst2)
+        dst3 = diff.dst3
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Hist3Dcolor_BuildHistogram : Inherits VB_Algorithm
+    Public threshold As Integer
+    Public classCount As Integer
+    Public Sub New()
+        desc = "Build a simulated 3D histogram from the read 3D histogram."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC1 Then
+            Static plot2D As New Hist3Dcloud_PlotHist1D
+            plot2D.Run(src)
+            src = plot2D.histogram
+        End If
+
+        Dim histArray(src.Total - 1) As Single
+        Marshal.Copy(src.Data, histArray, 0, histArray.Length)
+
+        classCount = 1
+        Dim index As Integer
+        For i = index To histArray.Count - 1
+            For index = index To histArray.Count - 1
+                If histArray(index) > threshold Then Exit For
+                histArray(index) = classCount
+            Next
+            classCount += 1
+            For index = index To histArray.Count - 1
+                If histArray(index) <= threshold Then Exit For
+                histArray(index) = classCount
+            Next
+            If index >= histArray.Count Then Exit For
+        Next
+
+        Marshal.Copy(histArray, 0, src.Data, histArray.Length)
+        dst2 = src.Clone
+    End Sub
+End Class

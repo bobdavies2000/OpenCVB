@@ -281,3 +281,28 @@ Public Class RedColor_Histogram3DBP : Inherits VB_Algorithm
         labels(3) = colorC.labels(2)
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class RedColor_Cells : Inherits VB_Algorithm
+    Public redC As New RedCloud_Basics
+    Public cellmap As New cv.Mat
+    Public redCells As New List(Of rcData)
+    Public Sub New()
+        redOptions.UseColor.Checked = True
+        desc = "Create RedCloud output using only color"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        cellmap = redC.cellMap
+        redCells = redC.redCells
+    End Sub
+End Class

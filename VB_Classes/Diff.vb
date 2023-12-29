@@ -14,12 +14,11 @@ Public Class Diff_Basics : Inherits VB_Algorithm
             dst3 = src.Clone
         End If
 
-        Dim threshold = gOptions.PixelDiffThreshold.Value
         cv.Cv2.Absdiff(src, lastGray, dst0)
-        dst3 = dst0.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
+        dst3 = dst0.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
         changedPixels = dst3.CountNonZero
         If changedPixels > 0 Then
-            dst3 = dst0.Threshold(threshold, 255, cv.ThresholdTypes.Binary)
+            dst3 = dst0.Threshold(gOptions.PixelDiffThreshold.Value, 255, cv.ThresholdTypes.Binary)
             dst2 = src.Clone
             dst2.SetTo(0, dst3)
             lastGray = src.Clone

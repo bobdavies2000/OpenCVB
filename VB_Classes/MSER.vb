@@ -719,7 +719,7 @@ End Class
 
 Public Class MSER_Mask_CPP : Inherits VB_Algorithm
     Dim options As New Options_MSER
-    Dim redC As New RedCloud_ColorCells
+    Dim redC As New RedColor_Cells
     Public classCount As Integer
     Public Sub New()
         redOptions.UseColor.Checked = True

@@ -197,7 +197,6 @@ Public Class Hist3Dcloud_BP_Filter : Inherits VB_Algorithm
     Dim options As New Options_HistXD
     Public Sub New()
         redOptions.HistBinSlider.Value = 16
-
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
         labels(2) = "Mask of the pointcloud image after backprojection that removes 'blowback' pixels"
         desc = "Backproject a 3D pointcloud histogram after thresholding the bins with the small samples."

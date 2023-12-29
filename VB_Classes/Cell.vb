@@ -576,7 +576,7 @@ End Class
 
 Public Class Cell_DistanceDepth : Inherits VB_Algorithm
     Public redC As New RedCloud_Basics
-    Public colorOnly As New RedCloud_ColorCells
+    Public colorOnly As New RedColor_Cells
     Public Sub New()
         redC.displaySelectedCell = False
         colorOnly.redC.displaySelectedCell = False
