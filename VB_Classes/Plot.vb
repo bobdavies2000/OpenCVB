@@ -75,7 +75,7 @@ Public Class Plot_Histogram : Inherits VB_Algorithm
                     Dim sIncr = (i Mod 256) * incr
                     Dim color = New cv.Scalar(sIncr, sIncr, sIncr)
                     If histogram.Rows > 255 Then color = cv.Scalar.Black
-                    cv.Cv2.Rectangle(dst2, New cv.Rect(i * barWidth, dst2.Height - h, 1, h), color, -1)
+                    cv.Cv2.Rectangle(dst2, New cv.Rect(i * barWidth, dst2.Height - h, Math.Max(1, barWidth), h), color, -1)
                 End If
             Next
             If addLabels Then AddPlotScale(dst2, mm.minVal, mm.maxVal)

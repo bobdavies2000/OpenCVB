@@ -262,16 +262,11 @@ Public Class Distance_RedMin : Inherits VB_Algorithm
                 setTrueText(el.Value, New cv.Point(rp.maxDist.X, rp.maxDist.Y + 10))
             Next
 
-            lastDistances.Clear()
             For Each el In distances
-                lastDistances.Add(el.Key, el.Value)
+                Dim rp = rMin.minCells(el.Value)
+                setTrueText(CStr(el.Value), rp.maxDist)
             Next
         End If
-
-        For Each el In distances
-            Dim rp = rMin.minCells(el.Value)
-            setTrueText(CStr(el.Value), rp.maxDist)
-        Next
 
         For Each el In lastDistances
             Dim rp = lastMinCells(el.Value)
@@ -288,6 +283,12 @@ Public Class Distance_RedMin : Inherits VB_Algorithm
             dst3(rp.rect).SetTo(task.scalarColors(i), rp.mask)
         Next
         labels(2) = rMin.labels(3)
+
+        lastDistances.Clear()
+        For Each el In distances
+            lastDistances.Add(el.Key, el.Value)
+        Next
+
         lastMinCells = New List(Of rcPrep)(rMin.minCells)
     End Sub
 End Class

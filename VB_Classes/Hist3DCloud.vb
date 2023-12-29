@@ -7,12 +7,11 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
     Public runBackProject As Boolean
     Public Sub New()
         redOptions.XYZReduction.Checked = True
-        gOptions.HistBinSlider.Value = 3
         labels(2) = "dst2 = backprojection of pointcloud (8UC1 format). The 3D histogram is in histogram."
         desc = "Build a 3D histogram from the pointcloud."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim bins = gOptions.HistBinSlider.Value
+        Dim bins = redOptions.Hist3DBinsSlider.Value
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim histInput(src.Total * 3 - 1) As Single

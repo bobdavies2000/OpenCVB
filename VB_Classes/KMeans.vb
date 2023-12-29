@@ -567,24 +567,26 @@ End Class
 
 
 Public Class KMeans_SimKColor : Inherits VB_Algorithm
-    Dim hist3d As New Hist3Dcolor_PlotHist1D
+    Dim plot1D As New Hist3Dcolor_PlotHist1D
     Public classCount As Integer
     Public Sub New()
         desc = "Use the gaps in the 3D histogram of the color image to find 'k' and backproject the results."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If heartBeat() Then
-            hist3d.Run(src)
-            dst3 = hist3d.dst2
-            labels(3) = hist3d.labels(2)
+            plot1D.Run(src)
+            dst3 = plot1D.dst2
+            labels(3) = "The 3D histogram of the RGB image stream in 1D - note the number of gaps"
 
-            classCount = buildHistogram3D(hist3d.histArray.Count, hist3d.histArray)
+            classCount = buildHistogram3D(plot1D.histArray.Count, plot1D.histArray, 0)
         End If
-        Marshal.Copy(hist3d.histArray, 0, hist3d.histogram.Data, hist3d.histArray.Length)
-        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, hist3d.histogram, dst1, redOptions.rangesBGR)
+        Marshal.Copy(plot1D.histArray, 0, plot1D.histogram.Data, plot1D.histArray.Length)
+        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, plot1D.histogram, dst1, redOptions.rangesBGR)
 
         dst2 = vbPalette(dst1 * 255 / classCount)
-        labels(2) = "Simulated KMeans with k = " + CStr(classCount)
+        Dim bins = redOptions.Hist3DBinsSlider.Value
+        labels(2) = "Simulated KMeans with simK = " + CStr(classCount - 1) +
+                    " with " + CStr(bins * bins * bins) + " histogram bins" ' classCount starts at 1
     End Sub
 End Class
 
@@ -592,28 +594,30 @@ End Class
 
 
 
-Public Class KMeans_SimKCloud : Inherits VB_Algorithm
-    Dim hist3d As New Hist3Dcloud_PlotHist1D
+Public Class KMeans_SimKDepth : Inherits VB_Algorithm
+    Dim plot1D As New Hist3Dcloud_PlotHist1D
     Public classCount As Integer
     Public Sub New()
-        desc = "Use the gaps in the 3D histogram of the pointcloud to find 'k' and backproject the results."
+        desc = "Use the gaps in the 3D histogram of depth to find simK and backproject the results."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
         If heartBeat() Then
-            hist3d.Run(src)
-            dst3 = hist3d.dst2
-            labels(3) = hist3d.labels(2)
+            plot1D.Run(src)
+            dst3 = plot1D.dst2
+            labels(3) = "The 3D histogram of the depth stream in 1D - note the number of gaps"
 
-            classCount = buildHistogram3D(hist3d.histArray.Count, hist3d.histArray)
-            Marshal.Copy(hist3d.histArray, 0, hist3d.histogram.Data, hist3d.histArray.Length)
+            classCount = buildHistogram3D(plot1D.histArray.Count, plot1D.histArray, 0)
+            Marshal.Copy(plot1D.histArray, 0, plot1D.histogram.Data, plot1D.histArray.Length)
         End If
-        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, hist3d.histogram, dst1, redOptions.rangesCloud)
+        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, plot1D.histogram, dst1, redOptions.rangesCloud)
         dst1 = dst1.ConvertScaleAbs
 
         dst2 = vbPalette(dst1 * 255 / classCount)
-        labels(2) = "Simulated KMeans with k = " + CStr(classCount)
-        Console.WriteLine(CStr(classCount))
+
+        Dim bins = redOptions.Hist3DBinsSlider.Value
+        labels(2) = "Simulated KMeans with k = " + CStr(classCount) +
+                    " with " + CStr(bins * bins * bins) + " histogram bins"
     End Sub
 End Class
 
@@ -624,24 +628,27 @@ End Class
 
 
 Public Class KMeans_SimKfindK : Inherits VB_Algorithm
-    Dim hist3d As New Hist3Dcloud_PlotHist1D
+    Dim plot1D As New Hist3Dcloud_PlotHist1D
     Public classCount As Integer
     Public Sub New()
-        desc = "Use the gaps in the 3D histogram of the pointcloud to find 'k' and backproject the results."
+        desc = "Use the gaps in the 3D histogram of depth to find simK and backproject the results."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
         If heartBeat() Then
-            hist3d.Run(src)
-            dst3 = hist3d.dst2
-            labels(3) = hist3d.labels(2)
+            plot1D.Run(src)
+            dst3 = plot1D.dst2
+            labels(3) = "The 3D histogram of the depth stream in 1D - note the number of gaps"
 
-            classCount = buildHistogram3D(hist3d.histArray.Count, hist3d.histArray)
-            Marshal.Copy(hist3d.histArray, 0, hist3d.histogram.Data, hist3d.histArray.Length)
+            classCount = buildHistogram3D(plot1D.histArray.Count, plot1D.histArray, 0)
+            Marshal.Copy(plot1D.histArray, 0, plot1D.histogram.Data, plot1D.histArray.Length)
         End If
         Dim ranges() As cv.Rangef = {redOptions.rangesCloud(2)}
-        cv.Cv2.CalcBackProject({src}, {2}, hist3d.histogram, dst1, ranges)
+        cv.Cv2.CalcBackProject({src}, {2}, plot1D.histogram, dst1, ranges)
         dst2 = vbPalette(dst1 * 255 / classCount)
-        labels(2) = "KMeans_SimulatedDepth found k = " + CStr(classCount)
+
+        Dim bins = redOptions.Hist3DBinsSlider.Value
+        labels(2) = "KMeans_SimulatedDepth found simK = " + CStr(classCount) +
+                    " with " + CStr(bins * bins * bins) + " histogram bins"
     End Sub
 End Class
