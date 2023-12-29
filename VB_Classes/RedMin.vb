@@ -373,3 +373,34 @@ Public Class RedMin_Select : Inherits VB_Algorithm
         labels(3) = "Selected cell: index = " + CStr(task.cellSelect.index)
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class RedMin_RedCloud : Inherits VB_Algorithm
+    Dim redC As New RedCloud_Basics
+    Dim rMin As New RedMin_Basics
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        redOptions.UseDepth.Checked = True
+        desc = "Use the RedMin output to combine the RedCloud output"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        rMin.Run(src)
+        dst1 = rMin.dst3
+        labels(1) = rMin.labels(2)
+
+        redC.Run(src)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+
+        dst3.SetTo(0)
+        For Each rc In redC.redCells
+            Dim color = dst1.Get(Of cv.Vec3b)(rc.maxDist.Y, rc.maxDist.X)
+            dst3(rc.rect).SetTo(color, rc.mask)
+        Next
+    End Sub
+End Class

@@ -385,7 +385,6 @@
     <Compile Include="Sound.vb" />
     <Compile Include="Stitch.vb" />
     <Compile Include="SuperPixels.vb" />
-    <Compile Include="Trace.vb" />
     <Compile Include="Tracker.vb" />
     <Compile Include="TransformationMatrix.vb" />
     <Compile Include="VB_Algorithm.vb" />

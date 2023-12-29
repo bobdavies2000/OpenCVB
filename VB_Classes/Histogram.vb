@@ -1022,7 +1022,7 @@ End Class
 
 
 
-Public Class Histogram_GotchFixed_CPP : Inherits VB_Algorithm
+Public Class Histogram_GotchaFixed_CPP : Inherits VB_Algorithm
     Public Sub New()
         cPtr = Histogram_1D_Open()
         desc = "Testing the C++ CalcHist to investigate gotcha with sample counts"
