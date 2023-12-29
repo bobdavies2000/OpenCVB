@@ -289,8 +289,8 @@ Public Class OptionsRedCloud
         If task IsNot Nothing Then task.optionsChanged = True
         LabelDesiredCell.Text = CStr(DesiredCellSlider.Value)
     End Sub
-    Private Sub hist3dBinsSlider_ValueChanged(sender As Object, e As EventArgs) Handles hist3dBinsSlider.ValueChanged
+    Private Sub HistBinSlider_ValueChanged(sender As Object, e As EventArgs) Handles HistBinSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
-        LabelHistogramBins.Text = CStr(Hist3DBinsSlider.Value)
+        LabelHistogramBins.Text = CStr(HistBinSlider.Value)
     End Sub
 End Class

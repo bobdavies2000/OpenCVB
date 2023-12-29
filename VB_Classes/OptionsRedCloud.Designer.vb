@@ -70,7 +70,7 @@ Partial Class OptionsRedCloud
         Me.UseColor = New System.Windows.Forms.RadioButton()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.LabelHistogramBins = New System.Windows.Forms.Label()
-        Me.Hist3DBinsSlider = New System.Windows.Forms.TrackBar()
+        Me.HistBinSlider = New System.Windows.Forms.TrackBar()
         Me.Label7 = New System.Windows.Forms.Label()
         Me.LabelDesiredCell = New System.Windows.Forms.Label()
         Me.DesiredCellSlider = New System.Windows.Forms.TrackBar()
@@ -92,7 +92,7 @@ Partial Class OptionsRedCloud
         Me.GroupBox1.SuspendLayout()
         Me.RedCloudType.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
-        CType(Me.Hist3DBinsSlider, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DesiredCellSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.imageSizeThresholdSlider, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -602,7 +602,7 @@ Partial Class OptionsRedCloud
         'GroupBox2
         '
         Me.GroupBox2.Controls.Add(Me.LabelHistogramBins)
-        Me.GroupBox2.Controls.Add(Me.Hist3DBinsSlider)
+        Me.GroupBox2.Controls.Add(Me.HistBinSlider)
         Me.GroupBox2.Controls.Add(Me.Label7)
         Me.GroupBox2.Controls.Add(Me.LabelDesiredCell)
         Me.GroupBox2.Controls.Add(Me.DesiredCellSlider)
@@ -626,16 +626,16 @@ Partial Class OptionsRedCloud
         Me.LabelHistogramBins.TabIndex = 32
         Me.LabelHistogramBins.Text = "Label5"
         '
-        'Hist3DBinsSlider
+        'HistBinSlider
         '
-        Me.Hist3DBinsSlider.Location = New System.Drawing.Point(156, 156)
-        Me.Hist3DBinsSlider.Maximum = 256
-        Me.Hist3DBinsSlider.Minimum = 2
-        Me.Hist3DBinsSlider.Name = "Hist3DBinsSlider"
-        Me.Hist3DBinsSlider.Size = New System.Drawing.Size(506, 69)
-        Me.Hist3DBinsSlider.TabIndex = 31
-        Me.Hist3DBinsSlider.TickStyle = System.Windows.Forms.TickStyle.None
-        Me.Hist3DBinsSlider.Value = 4
+        Me.HistBinSlider.Location = New System.Drawing.Point(156, 156)
+        Me.HistBinSlider.Maximum = 256
+        Me.HistBinSlider.Minimum = 2
+        Me.HistBinSlider.Name = "HistBinSlider"
+        Me.HistBinSlider.Size = New System.Drawing.Size(506, 69)
+        Me.HistBinSlider.TabIndex = 31
+        Me.HistBinSlider.TickStyle = System.Windows.Forms.TickStyle.None
+        Me.HistBinSlider.Value = 4
         '
         'Label7
         '
@@ -738,7 +738,7 @@ Partial Class OptionsRedCloud
         Me.RedCloudType.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
-        CType(Me.Hist3DBinsSlider, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.HistBinSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DesiredCellSlider, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.imageSizeThresholdSlider, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
@@ -798,6 +798,6 @@ Partial Class OptionsRedCloud
     Friend WithEvents imageSizeThresholdSlider As Windows.Forms.TrackBar
     Friend WithEvents Label3 As Windows.Forms.Label
     Friend WithEvents LabelHistogramBins As Windows.Forms.Label
-    Friend WithEvents Hist3DBinsSlider As Windows.Forms.TrackBar
+    Friend WithEvents HistBinSlider As Windows.Forms.TrackBar
     Friend WithEvents Label7 As Windows.Forms.Label
 End Class

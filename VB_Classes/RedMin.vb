@@ -207,7 +207,7 @@ Public Class RedMin_Hist3DBackProject : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static lastHist As cv.Mat, lastCell As rcPrep
-        Dim bins = redOptions.Hist3DBinsSlider.Value
+        Dim bins = redOptions.HistBinSlider.Value
         Static lastHist3d As New cv.Mat(bins * bins * bins, 1, cv.MatType.CV_32F, 0)
         rMin.Run(src)
         dst2 = rMin.dst3
@@ -238,7 +238,7 @@ Public Class RedMin_PixelVector3D : Inherits VB_Algorithm
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
-        redOptions.Hist3DBinsSlider.Value = 3
+        redOptions.HistBinSlider.Value = 3
         hist3d.sortHistogramData = False
         labels(3) = "3D Histogram counts for each of the cells at left"
         desc = "Identify RedMin cells and create a vector for each cell's 3D histogram."

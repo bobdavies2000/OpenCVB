@@ -42,7 +42,7 @@ Public Class Hist3Dcolor_UniqueRGBPixels : Inherits VB_Algorithm
 
         pixels.Clear()
         counts.Clear()
-        Dim bins As Integer = gOptions.HistBinSlider.Value
+        Dim bins As Integer = redOptions.HistBinSlider.Value
         For z = 0 To bins - 1
             For y = 0 To bins - 1
                 For x = 0 To bins - 1
@@ -105,7 +105,7 @@ Public Class Hist3Dcolor_Distribution : Inherits VB_Algorithm
         desc = "Build a 3D histogram from the BGR image, backproject it, and plot the histogram of the backprojection."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim bins = redOptions.Hist3DBinsSlider.Value
+        Dim bins = redOptions.HistBinSlider.Value
         Dim hBins() As Integer = {bins, bins, bins}
         cv.Cv2.CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, hBins, redOptions.rangesBGR)
 
@@ -234,7 +234,6 @@ Public Class Hist3Dcolor_Basics_CPP : Inherits VB_Algorithm
     Public histogram As New cv.Mat
     Public prepareImage As Boolean = True
     Public Sub New()
-        gOptions.HistBinSlider.Value = 3
         labels(2) = "dst2 = backprojection (8UC1 format). The 3D histogram is in histogram."
         desc = "Build a 3D histogram from the BGR image and sort it by histogram entry size."
     End Sub
@@ -243,7 +242,7 @@ Public Class Hist3Dcolor_Basics_CPP : Inherits VB_Algorithm
         Marshal.Copy(src.Data, histInput, 0, histInput.Length)
 
         Dim handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned)
-        Dim bins = redOptions.Hist3DBinsSlider.Value
+        Dim bins = redOptions.HistBinSlider.Value
         Dim imagePtr = Hist3Dcolor_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins)
         handleInput.Free()
 
@@ -293,7 +292,7 @@ Public Class Hist3Dcolor_ZeroGroups : Inherits VB_Algorithm
         If src.Channels <> 3 Then src = task.color
 
         If task.optionsChanged Then
-            Dim bins = redOptions.Hist3DBinsSlider.Value
+            Dim bins = redOptions.HistBinSlider.Value
             Dim hBins() As Integer = {bins, bins, bins}
             cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, hBins, redOptions.rangesBGR)
 
@@ -351,7 +350,7 @@ Public Class Hist3Dcolor_Dominant : Inherits VB_Algorithm
         dst2 = rMin.dst3
         labels(2) = rMin.labels(2)
 
-        Dim bins = redOptions.Hist3DBinsSlider.Value
+        Dim bins = redOptions.HistBinSlider.Value
         Dim guidedHist(bins * bins * bins - 1) As Single
         Dim guidedCounts(bins * bins * bins - 1) As Single
         For Each rp In rMin.minCells
@@ -401,7 +400,7 @@ Public Class Hist3Dcolor_Core : Inherits VB_Algorithm
         options.RunVB()
         If src.Channels <> 3 Then src = task.color
 
-        Dim bins = redOptions.Hist3DBinsSlider.Value
+        Dim bins = redOptions.HistBinSlider.Value
         Dim hBins() As Integer = {bins, bins, bins}
         cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, hBins, redOptions.rangesBGR)
 

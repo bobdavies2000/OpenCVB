@@ -11,7 +11,7 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
         desc = "Build a 3D histogram from the pointcloud."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim bins = redOptions.Hist3DBinsSlider.Value
+        Dim bins = redOptions.HistBinSlider.Value
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim histInput(src.Total * 3 - 1) As Single
@@ -136,11 +136,10 @@ Public Class Hist3Dcloud_Highlights : Inherits VB_Algorithm
     Public histogram As New cv.Mat
     Public ranges() As cv.Rangef
     Public Sub New()
-        gOptions.HistBinSlider.Value = 3
         desc = "Plot the 3D histogram of the depth data"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim bins = gOptions.HistBinSlider.Value
+        Dim bins = redOptions.HistBinSlider.Value
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim histInput(src.Total * src.ElemSize - 1) As Byte
@@ -197,7 +196,7 @@ Public Class Hist3Dcloud_BP_Filter : Inherits VB_Algorithm
     Public histogram As New cv.Mat
     Dim options As New Options_HistXD
     Public Sub New()
-        gOptions.HistBinSlider.Value = 16
+        redOptions.HistBinSlider.Value = 16
 
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
         labels(2) = "Mask of the pointcloud image after backprojection that removes 'blowback' pixels"
@@ -206,7 +205,7 @@ Public Class Hist3Dcloud_BP_Filter : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         options.RunVB()
 
-        Dim bins = gOptions.HistBinSlider.Value
+        Dim bins = redOptions.HistBinSlider.Value
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim histInput(src.Total * 3 - 1) As Single
@@ -239,7 +238,7 @@ Public Class Hist3Dcloud_Plot3D : Inherits VB_Algorithm
     Dim plotHist As New Plot_Histogram
     Dim valleys As New HistValley_Basics
     Public Sub New()
-        gOptions.HistBinSlider.Value = 7
+        redOptions.HistBinSlider.Value = 7
         findSlider("Desired boundary count").Value = 15
         labels = {"", "", "3D histogram shown in 2D with valleys marked by vertical lines.", "Guided backprojection of pointcloud"}
         desc = "Display the pointcloud 3D Histogram in 2D, find peaks and valleys, and then backproject it."
