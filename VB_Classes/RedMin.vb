@@ -10,7 +10,7 @@ Public Class RedMin_Basics : Inherits VB_Algorithm
         redOptions.DesiredCellSlider.Value = 30
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
         labels = {"", "Mask of active RedMin cells", "CV_8U representation of minCells", ""}
-        desc = "Collect cells found in RedMin_Basics and age them out."
+        desc = "Track the color cells from floodfill - trying a minimalist approach to build cells."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         minCore.Run(src)
@@ -83,7 +83,7 @@ Public Class RedMin_Core : Inherits VB_Algorithm
     Public maskInput As cv.Mat
     Public Sub New()
         cPtr = FloodCell_Open()
-        desc = "Another minimalist approach to building RedCloud cells."
+        desc = "Another minimalist approach to building RedCloud color-based cells."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 1 Then
@@ -201,7 +201,7 @@ End Class
 
 Public Class RedMin_Hist3DBackProject : Inherits VB_Algorithm
     Dim rMin As New RedMin_Basics
-    Dim hist3d As New Hist3Dcolor_BasicsNew
+    Dim hist3d As New Hist3Dcolor_Basics
     Public Sub New()
         desc = "For the largest cell, use the histogram 3D results from a previous frame to backproject onto the current frame"
     End Sub
@@ -234,7 +234,7 @@ End Class
 
 Public Class RedMin_PixelVector3D : Inherits VB_Algorithm
     Dim rMin As New RedMin_Basics
-    Dim hist3d As New Hist3Dcolor_BasicsNew
+    Dim hist3d As New Hist3Dcolor_Basics
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True

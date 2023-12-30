@@ -205,7 +205,7 @@ End Class
 
 Public Class Distance_RedMin : Inherits VB_Algorithm
     Dim rMin As New RedMin_Basics
-    Dim hist3d As New Hist3Dcolor_BasicsNew
+    Dim hist3d As New Hist3Dcolor_Basics
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
@@ -298,7 +298,7 @@ End Class
 
 Public Class Distance_D3Cells : Inherits VB_Algorithm
     Dim rMin As New RedMin_Basics
-    Dim hist3d As New Hist3Dcolor_BasicsNew
+    Dim hist3d As New Hist3Dcolor_Basics
     Dim valleys As New HistValley_Basics
     Public d3Cells As New List(Of rMinData)
     Public Sub New()
