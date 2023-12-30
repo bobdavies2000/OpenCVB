@@ -1050,7 +1050,7 @@ End Class
 
 
 Public Class PointCloud_Histograms : Inherits VB_Algorithm
-    Dim plot2D As New Plot_Histogram2D
+    Dim plot1D As New Plot_Histogram2D
     Dim plot As New Plot_Histogram
     Dim hist3d As New Hist3Dcloud_Basics
     Dim grid As New Grid_Basics
@@ -1073,8 +1073,8 @@ Public Class PointCloud_Histograms : Inherits VB_Algorithm
                 dst2 = plot.dst2
                 labels(2) = plot.labels(2)
             Case "XY Reduction", "XZ Reduction", "YZ Reduction"
-                plot2D.Run(histogram)
-                dst2 = plot2D.dst2
+                plot1D.Run(histogram)
+                dst2 = plot1D.dst2
             Case "XYZ Reduction"
                 If dst2.Type <> cv.MatType.CV_8U Then dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U)
 

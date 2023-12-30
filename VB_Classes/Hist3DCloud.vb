@@ -234,7 +234,7 @@ End Class
 
 Public Class Hist3Dcloud_Plot3D : Inherits VB_Algorithm
     Dim hist3d As New Hist3Dcloud_Basics
-    Dim plot2D As New Hist3Dcloud_PlotHist1D
+    Dim plot1D As New Hist3Dcloud_PlotHist1D
     Dim simK As New Hist3Dcolor_BuildHistogram
     Dim valleys As New HistValley_Basics
     Public classCount As Integer
@@ -248,19 +248,18 @@ Public Class Hist3Dcloud_Plot3D : Inherits VB_Algorithm
         Static desiredCountSlider = findSlider("Desired boundary count")
         If heartBeat() Then
             hist3d.Run(src)
-            plot2D.Run(hist3d.histogram)
+            plot1D.Run(hist3d.histogram)
             valleys.Run(hist3d.histogram)
-            dst2 = valleys.updatePlot(plot2D.dst2, hist3d.histogram.Rows)
+            dst2 = valleys.updatePlot(plot1D.dst2, hist3d.histogram.Rows)
 
-            simK.Run(plot2D.histogram)
-            plot2D.histogram = simK.dst2
+            simK.Run(plot1D.histogram)
+            plot1D.histogram = simK.dst2
             classCount = simK.classCount
         End If
 
-        cv.Cv2.CalcBackProject({task.pointCloud}, {0, 1, 2}, plot2D.histogram, dst1, redOptions.rangesCloud)
+        cv.Cv2.CalcBackProject({task.pointCloud}, {0, 1, 2}, plot1D.histogram, dst1, redOptions.rangesCloud)
         dst1 = dst1.ConvertScaleAbs()
         dst3 = vbPalette(dst1 * 255 / classCount)
-        dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class
 

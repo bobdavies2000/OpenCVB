@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Imports  System.IO
 Public Class ParticleFilter_Basics : Inherits VB_Algorithm
     Dim trace As New Feature_TraceKNN
-    Dim plot2D As New Plot_Histogram2D
+    Dim plot1D As New Plot_Histogram2D
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         labels = {"", "", "Particle traffic", "Largest count in 2D Histogram"}
@@ -32,8 +32,8 @@ Public Class ParticleFilter_Basics : Inherits VB_Algorithm
             Dim val = histogram.Get(Of Single)(y, x)
             histogram.Set(Of Single)(y, x, val + 1)
         Next
-        plot2D.Run(histogram)
-        dst3 = plot2D.dst2
+        plot1D.Run(histogram)
+        dst3 = plot1D.dst2
 
         Dim mm = vbMinMax(histogram)
 

@@ -23,7 +23,7 @@ End Class
 
 
 Public Class Histogram2D_Cloud : Inherits VB_Algorithm
-    Dim plot2D As New Plot_Histogram2D
+    Dim plot1D As New Plot_Histogram2D
     Dim channels() As Integer
     Public ranges() As cv.Rangef
     Public histogram As New cv.Mat
@@ -44,8 +44,8 @@ Public Class Histogram2D_Cloud : Inherits VB_Algorithm
         cv.Cv2.CalcHist({task.pointCloud}, redOptions.channels, New cv.Mat(),
                         histogram, 2, {gOptions.HistBinSlider.Value, gOptions.HistBinSlider.Value}, ranges)
 
-        plot2D.Run(histogram)
-        dst2 = plot2D.dst2
+        plot1D.Run(histogram)
+        dst2 = plot1D.dst2
         channels = redOptions.channels
     End Sub
 End Class
