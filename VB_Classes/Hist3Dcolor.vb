@@ -379,46 +379,8 @@ Public Class Hist3Dcolor_Dominant : Inherits VB_Algorithm
     Dim rMin As New RedMin_Basics
     Dim hist3d As New Hist3Dcolor_Basics
     Public Sub New()
-        desc = "Find the dominant color in a 3D color histogram and backProject it."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        rMin.Run(src)
-        dst2 = rMin.dst3
-        labels(2) = rMin.labels(2)
-
-        Dim guidedHist(redOptions.bins3D - 1) As Single
-        For Each rp In rMin.minCells
-            hist3d.maskInput = rp.mask
-            hist3d.Run(src(rp.rect))
-            Dim maxVal = hist3d.histArray.Max
-            Dim index = hist3d.histArray.ToList.IndexOf(maxVal)
-            guidedHist(index) += rp.index
-        Next
-
-        Dim histogram = hist3d.histogram.Clone
-        If histogram.Rows <> 0 Then
-            guidedHist(0) = 0
-            Marshal.Copy(guidedHist, 0, histogram.Data, guidedHist.Length)
-            Dim classCount = histogram.CountNonZero
-            cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst1, redOptions.rangesBGR)
-            dst3 = vbPalette(dst1 * 255 / classCount)
-            If heartBeat() Then
-                labels(3) = "Back projection of the dominant color entries.  ClassCount = " + CStr(classCount)
-            End If
-        End If
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Hist3Dcolor_DominantNew : Inherits VB_Algorithm
-    Dim rMin As New RedMin_Basics
-    Dim hist3d As New Hist3Dcolor_Basics
-    Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "Dominant colors in each cell backprojected with the each cell's index."
         desc = "Find the dominant color in a 3D color histogram and backProject it."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -428,19 +390,16 @@ Public Class Hist3Dcolor_DominantNew : Inherits VB_Algorithm
 
         Dim bins3D =
         dst1.SetTo(0)
-        Dim cellCount As Integer
         For Each rp In rMin.minCells
             hist3d.maskInput = rp.mask
             hist3d.Run(src(rp.rect))
-            Dim maxVal = hist3d.histArray.Max
-            Dim index = hist3d.histArray.ToList.IndexOf(maxVal)
-            cellCount = hist3d.histArray(index)
+            Dim index = hist3d.histArray.ToList.IndexOf(hist3d.histArray.Max)
+
             Dim guidedHist(redOptions.bins3D - 1) As Single
             guidedHist(index) = rp.index
-            Dim histogram = New cv.Mat(redOptions.bins3D, 1, cv.MatType.CV_32F, guidedHist)
 
-            cv.Cv2.CalcBackProject({src(rp.rect)}, {0, 1, 2}, histogram, dst1(rp.rect), redOptions.rangesBGR)
-            Exit For
+            Marshal.Copy(guidedHist, 0, hist3d.histogram.Data, guidedHist.Length)
+            cv.Cv2.CalcBackProject({src(rp.rect)}, {0, 1, 2}, hist3d.histogram, dst1(rp.rect), redOptions.rangesBGR)
         Next
         dst3 = vbPalette(dst1 * 255 / rMin.minCells.Count)
     End Sub

@@ -671,7 +671,6 @@ if algorithmName = "Hist3Dcolor_Basics_CPP" Then return new Hist3Dcolor_Basics_C
 if algorithmName = "Hist3Dcolor_BuildHistogram" Then return new Hist3Dcolor_BuildHistogram
 if algorithmName = "Hist3Dcolor_Diff" Then return new Hist3Dcolor_Diff
 if algorithmName = "Hist3Dcolor_Dominant" Then return new Hist3Dcolor_Dominant
-if algorithmName = "Hist3Dcolor_DominantNew" Then return new Hist3Dcolor_DominantNew
 if algorithmName = "Hist3Dcolor_PlotHist1D" Then return new Hist3Dcolor_PlotHist1D
 if algorithmName = "Hist3Dcolor_Reduction" Then return new Hist3Dcolor_Reduction
 if algorithmName = "Hist3Dcolor_Select" Then return new Hist3Dcolor_Select
