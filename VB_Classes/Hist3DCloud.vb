@@ -291,3 +291,39 @@ Public Class Hist3Dcloud_PlotHist1D : Inherits VB_Algorithm
         dst2 = plot.dst2
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Hist3Dcloud_Dominant : Inherits VB_Algorithm
+    Dim rMin As New RedMin_Basics
+    Dim hist3d As New Hist3Dcolor_Basics
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        labels(3) = "Dominant colors in each cell backprojected with the each cell's index."
+        desc = "Find the dominant color in a 3D color histogram and backProject it."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        rMin.Run(src)
+        dst2 = rMin.dst3
+        labels(2) = rMin.labels(2)
+
+        Dim bins3D =
+        dst1.SetTo(0)
+        For Each rp In rMin.minCells
+            hist3d.maskInput = rp.mask
+            hist3d.Run(src(rp.rect))
+            Dim index = hist3d.histArray.ToList.IndexOf(hist3d.histArray.Max)
+
+            Dim guidedHist(redOptions.bins3D - 1) As Single
+            guidedHist(index) = rp.index
+
+            Marshal.Copy(guidedHist, 0, hist3d.histogram.Data, guidedHist.Length)
+            cv.Cv2.CalcBackProject({src(rp.rect)}, {0, 1, 2}, hist3d.histogram, dst1(rp.rect), redOptions.rangesBGR)
+        Next
+        dst3 = vbPalette(dst1 * 255 / rMin.minCells.Count)
+    End Sub
+End Class

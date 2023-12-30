@@ -662,6 +662,7 @@ if algorithmName = "HeatMap_NotHotSpots" Then return new HeatMap_NotHotSpots
 if algorithmName = "Hist3Dcloud_Basics" Then return new Hist3Dcloud_Basics
 if algorithmName = "Hist3Dcloud_BP_Filter" Then return new Hist3Dcloud_BP_Filter
 if algorithmName = "Hist3Dcloud_DepthSplit" Then return new Hist3Dcloud_DepthSplit
+if algorithmName = "Hist3Dcloud_Dominant" Then return new Hist3Dcloud_Dominant
 if algorithmName = "Hist3Dcloud_Highlights" Then return new Hist3Dcloud_Highlights
 if algorithmName = "Hist3Dcloud_Plot3D" Then return new Hist3Dcloud_Plot3D
 if algorithmName = "Hist3Dcloud_PlotHist1D" Then return new Hist3Dcloud_PlotHist1D
