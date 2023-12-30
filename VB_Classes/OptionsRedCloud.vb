@@ -14,6 +14,7 @@ Public Class OptionsRedCloud
     Public rangesCloud() As cv.Rangef
     Public channelCount As Integer
     Public histBinList() As Integer
+    Public bins3D As Integer
     Public imageThresholdPercent As Single
     Private Sub OptionsRedCloud_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.MdiParent = allOptions
@@ -292,5 +293,6 @@ Public Class OptionsRedCloud
     Private Sub HistBinSlider_ValueChanged(sender As Object, e As EventArgs) Handles HistBinSlider.ValueChanged
         If task IsNot Nothing Then task.optionsChanged = True
         LabelHistogramBins.Text = CStr(HistBinSlider.Value)
+        bins3D = HistBinSlider.Value * HistBinSlider.Value * HistBinSlider.Value
     End Sub
 End Class

@@ -27,8 +27,8 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
                                      rx.Item(1), ry.Item(1), rz.Item(1))
         handleInput.Free()
 
-        histogram = New cv.Mat(bins * bins * bins, 1, cv.MatType.CV_32F, dstPtr)
-        ReDim histArray(bins * bins * bins - 1)
+        histogram = New cv.Mat(redOptions.bins3D, 1, cv.MatType.CV_32F, dstPtr)
+        ReDim histArray(redOptions.bins3D - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
         If standalone Or runBackProject Then
             Dim samples(histogram.Total - 1) As Single
@@ -155,7 +155,7 @@ Public Class Hist3Dcloud_Highlights : Inherits VB_Algorithm
                                      rx.Item(1), ry.Item(1), rz.Item(1))
         handleInput.Free()
 
-        histogram = New cv.Mat(bins * bins * bins, 1, cv.MatType.CV_32F, dstPtr)
+        histogram = New cv.Mat(redOptions.bins3D, 1, cv.MatType.CV_32F, dstPtr)
 
         ranges = New cv.Rangef() {New cv.Rangef(rx(0), rx(1)), New cv.Rangef(ry(0), ry(1)), New cv.Rangef(rz(0), rz(1))}
 

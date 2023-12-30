@@ -325,7 +325,7 @@ Public Class Hist3Dcolor_Basics_CPP : Inherits VB_Algorithm
         Dim imagePtr = Hist3Dcolor_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins)
         handleInput.Free()
 
-        histogram = New cv.Mat(bins * bins * bins, 1, cv.MatType.CV_32F, imagePtr)
+        histogram = New cv.Mat(redOptions.bins3D, 1, cv.MatType.CV_32F, imagePtr)
         If prepareImage Then
             Dim histArray(histogram.Total - 1) As Single
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -386,8 +386,7 @@ Public Class Hist3Dcolor_Dominant : Inherits VB_Algorithm
         dst2 = rMin.dst3
         labels(2) = rMin.labels(2)
 
-        Dim bins = redOptions.HistBinSlider.Value
-        Dim guidedHist(bins * bins * bins - 1) As Single
+        Dim guidedHist(redOptions.bins3D - 1) As Single
         For Each rp In rMin.minCells
             hist3d.maskInput = rp.mask
             hist3d.Run(src(rp.rect))
@@ -427,8 +426,7 @@ Public Class Hist3Dcolor_DominantNew : Inherits VB_Algorithm
         dst2 = rMin.dst3
         labels(2) = rMin.labels(2)
 
-        Dim bins = redOptions.HistBinSlider.Value
-        Dim histogram = New cv.Mat(bins * bins * bins, 1, cv.MatType.CV_32F, 0)
+        Dim bins3D =
         dst1.SetTo(0)
         Dim cellCount As Integer
         For Each rp In rMin.minCells
@@ -437,9 +435,10 @@ Public Class Hist3Dcolor_DominantNew : Inherits VB_Algorithm
             Dim maxVal = hist3d.histArray.Max
             Dim index = hist3d.histArray.ToList.IndexOf(maxVal)
             cellCount = hist3d.histArray(index)
-            Dim guidedHist(bins * bins * bins - 1) As Single
-            guidedHist(index) += rp.index
-            Marshal.Copy(guidedHist, 0, histogram.Data, guidedHist.Length)
+            Dim guidedHist(redOptions.bins3D - 1) As Single
+            guidedHist(index) = rp.index
+            Dim histogram = New cv.Mat(redOptions.bins3D, 1, cv.MatType.CV_32F, guidedHist)
+
             cv.Cv2.CalcBackProject({src(rp.rect)}, {0, 1, 2}, histogram, dst1(rp.rect), redOptions.rangesBGR)
             Exit For
         Next

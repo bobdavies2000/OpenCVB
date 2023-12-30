@@ -553,8 +553,7 @@ Public Class KMeans_SimKColor : Inherits VB_Algorithm
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst1, redOptions.rangesBGR)
 
         dst2 = vbPalette(dst1 * 255 / classCount)
-        Dim bins = redOptions.HistBinSlider.Value
-        labels(2) = simK.labels(2) + " with " + CStr(bins * bins * bins) + " histogram bins"
+        labels(2) = simK.labels(2) + " with " + CStr(redOptions.bins3D) + " histogram bins"
     End Sub
 End Class
 
@@ -586,7 +585,6 @@ Public Class KMeans_SimKDepth : Inherits VB_Algorithm
 
         dst2 = vbPalette(dst1 * 255 / classCount)
 
-        Dim bins = redOptions.HistBinSlider.Value
-        labels(2) = simK.labels(2) + " with " + CStr(bins * bins * bins) + " histogram bins"
+        labels(2) = simK.labels(2) + " with " + CStr(redOptions.bins3D) + " histogram bins"
     End Sub
 End Class

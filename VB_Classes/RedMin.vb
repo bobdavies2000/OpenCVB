@@ -207,8 +207,7 @@ Public Class RedMin_Hist3DBackProject : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static lastHist As cv.Mat, lastCell As rcPrep
-        Dim bins = redOptions.HistBinSlider.Value
-        Static lastHist3d As New cv.Mat(bins * bins * bins, 1, cv.MatType.CV_32F, 0)
+        Static lastHist3d As New cv.Mat(redOptions.bins3D, 1, cv.MatType.CV_32F, 0)
         rMin.Run(src)
         dst2 = rMin.dst3
         If rMin.minCells.Count = 0 Then Exit Sub
