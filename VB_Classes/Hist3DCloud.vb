@@ -2,60 +2,35 @@
 Imports System.Runtime.InteropServices
 Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
     Public histogram As New cv.Mat
+    Public histogram1D As New cv.Mat
     Public histArray() As Single
     Public classCount As Integer
     Public runBackProject As Boolean
+    Public maskInput As New cv.Mat
+    Public simK As New Hist3Dcolor_BuildHistogram
     Public Sub New()
         redOptions.XYZReduction.Checked = True
-        labels(2) = "dst2 = backprojection of pointcloud (8UC1 format). The 3D histogram is in histogram."
-        desc = "Build a 3D histogram from the pointcloud."
+        labels(2) = "dst2 = backprojection of pointcloud (8UC1 format)."
+        desc = "Build a 3D histogram from the pointcloud and backproject it to segment the image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Dim bins = redOptions.HistBinSlider.Value
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
-        Dim histInput(src.Total * 3 - 1) As Single
-        Marshal.Copy(src.Data, histInput, 0, histInput.Length)
+        Dim bins = redOptions.HistBinSlider.Value
+        cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, {bins, bins, bins}, redOptions.rangesCloud)
 
-        Dim rx = New cv.Vec2f(-task.xRangeDefault, task.xRangeDefault)
-        Dim ry = New cv.Vec2f(-task.yRangeDefault, task.yRangeDefault)
-        Dim rz = New cv.Vec2f(0, task.maxZmeters)
-
-        Dim handleInput = GCHandle.Alloc(histInput, GCHandleType.Pinned)
-        Dim dstPtr = Hist3Dcloud_Run(handleInput.AddrOfPinnedObject(), src.Rows, src.Cols, bins,
-                                     rx.Item(0), ry.Item(0), rz.Item(0),
-                                     rx.Item(1), ry.Item(1), rz.Item(1))
-        handleInput.Free()
-
-        histogram = New cv.Mat(redOptions.bins3D, 1, cv.MatType.CV_32F, dstPtr)
         ReDim histArray(redOptions.bins3D - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
         If standalone Or runBackProject Then
-            Dim samples(histogram.Total - 1) As Single
-            Marshal.Copy(histogram.Data, samples, 0, samples.Length)
+            simK.Run(histogram)
+            histogram = New cv.Mat(histArray.Count, 1, cv.MatType.CV_32F, simK.histArray)
+            classCount = simK.classCount
 
-            Dim sortedHist As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
-
-            For i = 0 To samples.Count - 1
-                sortedHist.Add(samples(i), i)
-            Next
-
-            For i = 0 To sortedHist.Count - 1
-                Dim key = sortedHist.ElementAt(i)
-                Dim index = key.Value
-                samples(index) = i + 1
-            Next
-
-            Marshal.Copy(samples, 0, histogram.Data, samples.Length)
-
-            cv.Cv2.CalcBackProject({src}, redOptions.channels, histogram, dst2, redOptions.rangesCloud)
-            dst2.SetTo(0, task.noDepthMask)
-
-            Dim mm = vbMinMax(dst2)
-            classCount = CInt(mm.maxVal)
-
+            cv.Cv2.CalcBackProject({src}, {2}, histogram, dst2, {redOptions.rangesCloud(2)})
+            dst2 = dst2.ConvertScaleAbs
             dst3 = vbPalette(dst2 * 255 / classCount)
-            labels(3) = CStr(classCount) + " different levels in the backprojection."
+
+            labels(2) = simK.labels(2) + " with " + CStr(redOptions.bins3D) + " histogram bins"
         End If
     End Sub
 End Class
@@ -96,33 +71,6 @@ Public Class Hist3Dcloud_DepthSplit : Inherits VB_Algorithm
 
         mats2.Run(Nothing)
         dst3 = mats2.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-Public Class Hist3Dcloud_Reduction : Inherits VB_Algorithm
-    Dim hist3d As New Hist3Dcloud_Basics
-    Dim reduction As New Reduction_XYZ
-    Public Sub New()
-        redOptions.SimpleReductionSlider.Value = 254
-        hist3d.runBackProject = True
-        desc = "Backproject the 3D histogram for RGB"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-
-        reduction.Run(src)
-        dst3 = reduction.dst3
-
-        hist3d.Run(dst3)
-        dst2 = hist3d.dst2
-        labels = hist3d.labels
     End Sub
 End Class
 
@@ -245,21 +193,21 @@ Public Class Hist3Dcloud_Plot3D : Inherits VB_Algorithm
         desc = "Display the pointcloud 3D Histogram in 1D, find peaks and valleys, and then backproject it."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static desiredCountSlider = findSlider("Desired boundary count")
-        If heartBeat() Then
-            hist3d.Run(src)
-            plot1D.Run(hist3d.histogram)
-            valleys.Run(hist3d.histogram)
-            dst2 = valleys.updatePlot(plot1D.dst2, hist3d.histogram.Rows)
+        'Static desiredCountSlider = findSlider("Desired boundary count")
+        'If heartBeat() Then
+        '    hist3d.Run(src)
+        '    plot1D.Run(hist3d.histogram)
+        '    valleys.Run(hist3d.histogram)
+        '    dst2 = valleys.updatePlot(plot1D.dst2, hist3d.histogram.Rows)
 
-            simK.Run(plot1D.histogram)
-            plot1D.histogram = simK.dst2
-            classCount = simK.classCount
-        End If
+        '    simK.Run(plot1D.histogram)
+        '    plot1D.histogram = simK.dst2
+        '    classCount = simK.classCount
+        'End If
 
-        cv.Cv2.CalcBackProject({task.pointCloud}, {0, 1, 2}, plot1D.histogram, dst1, redOptions.rangesCloud)
-        dst1 = dst1.ConvertScaleAbs()
-        dst3 = vbPalette(dst1 * 255 / classCount)
+        'cv.Cv2.CalcBackProject({task.pointCloud}, {0, 1, 2}, plot1D.histogram, dst1, redOptions.rangesCloud)
+        'dst1 = dst1.ConvertScaleAbs()
+        'dst3 = vbPalette(dst1 * 255 / classCount)
     End Sub
 End Class
 
@@ -304,7 +252,7 @@ Public Class Hist3Dcloud_Dominant : Inherits VB_Algorithm
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Dominant colors in each cell backprojected with the each cell's index."
-        desc = "Find the dominant color in a 3D color histogram and backProject it."
+        desc = "Find the  in a 3D color histogram and backProject it."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         rMin.Run(src)

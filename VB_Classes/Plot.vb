@@ -139,14 +139,11 @@ Public Class Plot_Histogram2D : Inherits VB_Algorithm
             options.RunVB()
             src = options.dst2
             Dim ranges() As cv.Rangef = New cv.Rangef() {New cv.Rangef(0, 255), New cv.Rangef(0, 255)}
-            cv.Cv2.CalcHist({src}, {0, 1}, New cv.Mat(), histogram, 2,
-                            {task.histogramBins, task.histogramBins}, ranges)
+            Dim bins = task.histogramBins
+            cv.Cv2.CalcHist({src}, {0, 1}, New cv.Mat(), histogram, 2, {bins, bins}, redOptions.rangesBGR)
         End If
 
-        Dim mm = vbMinMax(histogram)
-        histogram = 255 * (histogram - mm.minVal) / (mm.maxVal - mm.minVal)
-        dst2 = histogram.Resize(dst2.Size, 0, 0,
-                                cv.InterpolationFlags.Nearest).ConvertScaleAbs().CvtColor(cv.ColorConversionCodes.GRAY2BGR)
+        dst2 = histogram.Resize(dst2.Size, 0, 0, cv.InterpolationFlags.Nearest)
 
         If standalone Then dst3 = dst2.Threshold(0, 255, cv.ThresholdTypes.Binary)
     End Sub

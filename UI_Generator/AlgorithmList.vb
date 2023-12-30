@@ -666,7 +666,6 @@ if algorithmName = "Hist3Dcloud_Dominant" Then return new Hist3Dcloud_Dominant
 if algorithmName = "Hist3Dcloud_Highlights" Then return new Hist3Dcloud_Highlights
 if algorithmName = "Hist3Dcloud_Plot3D" Then return new Hist3Dcloud_Plot3D
 if algorithmName = "Hist3Dcloud_PlotHist1D" Then return new Hist3Dcloud_PlotHist1D
-if algorithmName = "Hist3Dcloud_Reduction" Then return new Hist3Dcloud_Reduction
 if algorithmName = "Hist3Dcolor_Basics" Then return new Hist3Dcolor_Basics
 if algorithmName = "Hist3Dcolor_Basics_CPP" Then return new Hist3Dcolor_Basics_CPP
 if algorithmName = "Hist3Dcolor_BuildHistogram" Then return new Hist3Dcolor_BuildHistogram
