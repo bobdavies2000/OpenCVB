@@ -488,21 +488,21 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
 
         hist.Run(src)
 
-        Dim samples(hist.histogram.Total - 1) As Single
-        Marshal.Copy(hist.histogram.Data, samples, 0, samples.Length)
+        Dim histArray(hist.histogram.Total - 1) As Single
+        Marshal.Copy(hist.histogram.Data, histArray, 0, histArray.Length)
 
-        Dim histList = samples.ToList
-        samples(histList.IndexOf(histList.Max)) = 0
+        Dim histList = histArray.ToList
+        histArray(histList.IndexOf(histList.Max)) = 0
 
         Dim sortedHist As New SortedList(Of Single, Integer)(New compareAllowIdenticalSingleInverted)
 
-        For i = 0 To samples.Count - 1
-            sortedHist.Add(samples(i), i)
+        For i = 0 To histArray.Count - 1
+            sortedHist.Add(histArray(i), i)
         Next
 
         classCount = 0
         Dim count As Integer
-        Dim newSamples(samples.Count - 1) As Single
+        Dim newSamples(histArray.Count - 1) As Single
         Dim minPixels = gOptions.minPixelsSlider.Value
         Dim maxClassCount = 255 - givenClassCount - 1
         For i = 0 To sortedHist.Count - 1

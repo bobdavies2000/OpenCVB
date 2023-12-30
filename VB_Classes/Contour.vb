@@ -222,7 +222,7 @@ End Class
 
 
 Public Class Contour_Foreground : Inherits VB_Algorithm
-    Dim km As New KMeans_Foreground
+    Dim km As New Foreground_KMeans2
     Dim contour As New Contour_Basics
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)

@@ -4,26 +4,26 @@ Imports cv = OpenCvSharp
 Public Class GrabCut_Basics : Inherits VB_Algorithm
     Public fgFineTune As cv.Mat
     Public bgFineTune As cv.Mat
-    Public findFore As New Foreground_Basics
+    Public fore As New Foreground_Basics
     Public Sub New()
         desc = "Use Foreground_Basics to define the foreground for use in GrabCut."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static bgModel As New cv.Mat(1, 65, cv.MatType.CV_64F, 0), fgModel As New cv.Mat(1, 65, cv.MatType.CV_64F, 0)
         Static fgFineTune As cv.Mat, bgFineTune As cv.Mat
-        findFore.Run(src)
-        dst2 = findFore.dst2
-        dst3 = findFore.dst3
+        fore.Run(src)
+        dst2 = fore.dst2
+        dst3 = fore.dst3
 
         dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, cv.GrabCutClasses.PR_BGD)
-        dst0.SetTo(cv.GrabCutClasses.FGD, findFore.fg)
-        dst0.SetTo(cv.GrabCutClasses.BGD, findFore.bg)
+        dst0.SetTo(cv.GrabCutClasses.FGD, fore.fg)
+        dst0.SetTo(cv.GrabCutClasses.BGD, fore.bg)
 
         ' cv.Cv2.GrabCut(src, dst0, New cv.Rect, bgModel, fgModel, 1, cv.GrabCutModes.InitWithMask)
 
-        findFore.bg = Not findFore.fg
+        fore.bg = Not fore.fg
 
-        If findFore.fg.CountNonZero Then
+        If fore.fg.CountNonZero Then
             If fgFineTune IsNot Nothing Then dst0.SetTo(cv.GrabCutClasses.FGD, fgFineTune)
             If bgFineTune IsNot Nothing Then dst0.SetTo(cv.GrabCutClasses.BGD, bgFineTune)
 
@@ -31,7 +31,7 @@ Public Class GrabCut_Basics : Inherits VB_Algorithm
         End If
         dst3.SetTo(0)
         src.CopyTo(dst3, dst0)
-        labels(2) = "KMeans output defining the " + CStr(findFore.classCount) + " classes."
+        labels(2) = "KMeans output defining the " + CStr(fore.classCount) + " classes."
     End Sub
 End Class
 

@@ -51,7 +51,7 @@ End Class
 
 Public Class Distance_Foreground : Inherits VB_Algorithm
     Dim dist As New Distance_Basics
-    Dim foreground As New KMeans_Foreground
+    Dim foreground As New Foreground_KMeans2
     Public useBackgroundAsInput As Boolean
     Public Sub New()
         labels(2) = "Distance results"
@@ -234,7 +234,7 @@ Public Class Distance_RedMin : Inherits VB_Algorithm
             hist3d.maskInput = rp.mask
             hist3d.Run(src(rp.rect))
 
-            Dim nextD = distanceFromZero(hist3d.histList.ToList)
+            Dim nextD = distanceFromZero(hist3d.histArray.ToList)
             distances.Add(nextD, i)
         Next
 
@@ -324,7 +324,7 @@ Public Class Distance_D3Cells : Inherits VB_Algorithm
             hist3d.maskInput = rp.mask
             hist3d.Run(src(rp.rect))
             rm.histogram = hist3d.histogram.Clone
-            rm.histList = New List(Of Single)(hist3d.histList)
+            rm.histList = hist3d.histArray.ToList
 
             d3Cells.Add(rm)
         Next

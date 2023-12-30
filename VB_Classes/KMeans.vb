@@ -117,41 +117,6 @@ End Class
 
 
 
-Public Class KMeans_Foreground : Inherits VB_Algorithm
-    Dim km As New KMeans_Image
-    Public Sub New()
-        findSlider("KMeans k").Value = 2
-        labels = {"", "", "Foreground Mask", "Background Mask"}
-        dst2 = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
-        dst3 = New cv.Mat(task.workingRes, cv.MatType.CV_8U, 0)
-        desc = "Separate foreground and background using Kmeans (with k=2) using the depth value of center point."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        km.Run(task.pcSplit(2))
-
-        Dim minDistance = Single.MaxValue
-        Dim minIndex As Integer
-        For i = 0 To km.km.colors.Rows - 1
-            Dim distance = km.km.colors.Get(Of Single)(i, 0)
-            If minDistance > distance And distance > 0 Then
-                minDistance = distance
-                minIndex = i
-            End If
-        Next
-        dst2.SetTo(0)
-        dst2.SetTo(255, km.masks(minIndex))
-        dst2.SetTo(0, task.noDepthMask)
-
-        dst3 = Not dst2
-        dst3.SetTo(0, task.noDepthMask)
-    End Sub
-End Class
-
-
-
-
-
-
 
 
 Public Class KMeans_Fuzzy : Inherits VB_Algorithm

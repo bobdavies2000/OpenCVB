@@ -465,7 +465,6 @@ Public Class Histogram_Color : Inherits VB_Algorithm
     Public Sub New()
         desc = "Create a histogram of green and red."
     End Sub
-
     Public Sub RunVB(src As cv.Mat)
         ranges = New cv.Rangef() {New cv.Rangef(0, 255), New cv.Rangef(0, 255)}
         cv.Cv2.CalcHist({src}, {1, 2}, New cv.Mat, histogram, 1, {task.histogramBins, task.histogramBins}, ranges)
@@ -1404,5 +1403,25 @@ Public Class Histogram_PointCloud : Inherits VB_Algorithm
         Dim sizesY() As Integer = {ybins, zbins}
         cv.Cv2.CalcHist({src}, {1, 2}, New cv.Mat(), dst3, 2, sizesY, rangesY)
         dst3.Set(Of cv.Point3f)(dst3.Height / 2, 0, New cv.Point3f)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Histogram_Gray : Inherits VB_Algorithm
+    Public histogram As New cv.Mat
+    Public plot As New Plot_Histogram
+    Public Sub New()
+        gOptions.HistBinSlider.Value = 255
+        plot.createHistogram = True
+        desc = "Create a histogram of the grayscale image"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        plot.Run(src.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
+        dst2 = plot.dst2
     End Sub
 End Class

@@ -478,26 +478,6 @@ Module VB
         ' If pt.X >= rect.Width Or pt.Y >= rect.Height Then Return New cv.Point2f
         Return pt
     End Function
-    Public Function buildHistogram(count As Integer, valleys As List(Of Integer)) As Single()
-        Dim start As Integer = (0)
-        Dim histList(count - 1) As Single
-        For i = 0 To start - 1
-            histList(i) = 0
-        Next
-        Dim index As Integer
-        For i = 1 To valleys.Count - 1
-            index += 1
-            Dim finish As Integer = valleys(i)
-            For j = start To finish
-                histList(j) = index
-            Next
-            start = finish + 1
-        Next
-        For j = start To histList.Count - 1
-            histList(j) = index
-        Next
-        Return histList
-    End Function
 End Module
 
 

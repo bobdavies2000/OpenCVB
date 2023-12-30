@@ -2,7 +2,7 @@
 Imports System.Runtime.InteropServices
 Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
     Public histogram As New cv.Mat
-    Public histList() As Single
+    Public histArray() As Single
     Public classCount As Integer
     Public runBackProject As Boolean
     Public Sub New()
@@ -28,8 +28,8 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
         handleInput.Free()
 
         histogram = New cv.Mat(bins * bins * bins, 1, cv.MatType.CV_32F, dstPtr)
-        ReDim histList(bins * bins * bins - 1)
-        Marshal.Copy(histogram.Data, histList, 0, histList.Length)
+        ReDim histArray(bins * bins * bins - 1)
+        Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
         If standalone Or runBackProject Then
             Dim samples(histogram.Total - 1) As Single
             Marshal.Copy(histogram.Data, samples, 0, samples.Length)
@@ -234,29 +234,32 @@ End Class
 
 Public Class Hist3Dcloud_Plot3D : Inherits VB_Algorithm
     Dim hist3d As New Hist3Dcloud_Basics
-    Dim plotHist As New Plot_Histogram
+    Dim plot2D As New Hist3Dcloud_PlotHist1D
+    Dim simK As New Hist3Dcolor_BuildHistogram
     Dim valleys As New HistValley_Basics
+    Public classCount As Integer
     Public Sub New()
         redOptions.HistBinSlider.Value = 7
         findSlider("Desired boundary count").Value = 15
-        labels = {"", "", "3D histogram shown in 2D with valleys marked by vertical lines.", "Guided backprojection of pointcloud"}
-        desc = "Display the pointcloud 3D Histogram in 2D, find peaks and valleys, and then backproject it."
+        labels = {"", "", "3D histogram shown in 1D with valleys marked by vertical lines.", "Guided backprojection of pointcloud"}
+        desc = "Display the pointcloud 3D Histogram in 1D, find peaks and valleys, and then backproject it."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         Static desiredCountSlider = findSlider("Desired boundary count")
         If heartBeat() Then
             hist3d.Run(src)
-            plotHist.Run(hist3d.histogram)
+            plot2D.Run(hist3d.histogram)
             valleys.Run(hist3d.histogram)
-            dst2 = valleys.updatePlot(plotHist.dst2, hist3d.histogram.Rows)
+            dst2 = valleys.updatePlot(plot2D.dst2, hist3d.histogram.Rows)
+
+            simK.Run(plot2D.histogram)
+            plot2D.histogram = simK.dst2
+            classCount = simK.classCount
         End If
 
-        Dim histList = buildHistogram(hist3d.histList.Count, valleys.valleys)
-
-        Marshal.Copy(histList, 0, hist3d.histogram.Data, histList.Length)
-        cv.Cv2.CalcBackProject({task.pointCloud}, {0, 1, 2}, hist3d.histogram, dst1, redOptions.rangesCloud)
+        cv.Cv2.CalcBackProject({task.pointCloud}, {0, 1, 2}, plot2D.histogram, dst1, redOptions.rangesCloud)
         dst1 = dst1.ConvertScaleAbs()
-        dst3 = vbPalette((dst1 * 255 / desiredCountSlider.value).toMat)
+        dst3 = vbPalette(dst1 * 255 / classCount)
         dst3.SetTo(0, task.noDepthMask)
     End Sub
 End Class

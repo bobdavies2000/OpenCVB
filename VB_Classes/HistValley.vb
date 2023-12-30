@@ -130,10 +130,10 @@ Public Class HistValley_Test : Inherits VB_Algorithm
             src = kalmanHist.hist.histogram.Clone
         End If
 
-        Dim samples(src.Total - 1) As Single
-        Marshal.Copy(src.Data, samples, 0, samples.Length)
+        Dim histArray(src.Total - 1) As Single
+        Marshal.Copy(src.Data, histArray, 0, histArray.Length)
 
-        Dim histList = samples.ToList
+        Dim histList = histArray.ToList
 
         Dim valleys As New List(Of Single)
         Dim incr = histList.Count / desiredBoundaries

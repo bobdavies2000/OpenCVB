@@ -916,7 +916,6 @@ Public Class IMU_PlotHostFrameScalar : Inherits VB_Algorithm
         options.RunVB()
 
         Static CPUanchor As Integer = task.CPU_FrameTime
-        Static histList As New List(Of Integer)
 
         Dim cpuFrameTime = CInt(task.CPU_FrameTime)
         If CPUanchor <> 0 Then cpuFrameTime = cpuFrameTime Mod CPUanchor
@@ -926,8 +925,6 @@ Public Class IMU_PlotHostFrameScalar : Inherits VB_Algorithm
 
         Static sampledCPUFrameTime = task.CPU_FrameTime
         If heartBeat() Then sampledCPUFrameTime = task.CPU_FrameTime
-
-        histList.Add(cpuFrameTime)
 
         If standalone Then
             strOut = "IMU_TimeStamp (ms) " + Format(task.IMU_TimeStamp, "00") + vbCrLf +

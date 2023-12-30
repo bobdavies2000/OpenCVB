@@ -254,9 +254,9 @@ Public Class RedMin_PixelVector3D : Inherits VB_Algorithm
             For Each rp In rMin.minCells
                 hist3d.maskInput = rp.mask
                 hist3d.Run(src(rp.rect))
-                pixelVector.Add(hist3d.histList.ToList)
+                pixelVector.Add(hist3d.histArray.ToList)
                 strOut += "(" + CStr(rp.index) + ") "
-                For Each count In hist3d.histList
+                For Each count In hist3d.histArray
                     strOut += CStr(count) + ","
                 Next
                 strOut += vbCrLf
