@@ -533,7 +533,7 @@ End Class
 
 Public Class KMeans_SimKColor : Inherits VB_Algorithm
     Dim plot1D As New Hist3Dcolor_PlotHist1D
-    Dim simK As New Hist3Dcolor_BuildHistogram
+    Dim simK As New Hist3D_BuildHistogram
     Public classCount As Integer
     Dim histogram As New cv.Mat
     Public Sub New()
@@ -563,7 +563,7 @@ End Class
 
 Public Class KMeans_SimKDepth : Inherits VB_Algorithm
     Dim plot1D As New Hist3Dcloud_PlotHist1D
-    Dim simK As New Hist3Dcolor_BuildHistogram
+    Dim simK As New Hist3D_BuildHistogram
     Public classCount As Integer
     Public Sub New()
         desc = "Use the gaps in the 3D histogram of depth to find simK and backproject the results."

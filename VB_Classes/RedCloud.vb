@@ -1105,7 +1105,6 @@ Public Class RedCloud_BProject3D : Inherits VB_Algorithm
     Dim redC As New RedCloud_Basics
     Dim hist3D As New Hist3Dcloud_Basics
     Public Sub New()
-        hist3D.runBackProject = True
         desc = "Run RedCloud_Basics on the output of the RGB 3D backprojection"
     End Sub
     Public Sub RunVB(src As cv.Mat)

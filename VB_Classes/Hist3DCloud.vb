@@ -5,13 +5,12 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
     Public histogram1D As New cv.Mat
     Public histArray() As Single
     Public classCount As Integer
-    Public runBackProject As Boolean
     Public maskInput As New cv.Mat
-    Public simK As New Hist3Dcolor_BuildHistogram
+    Public simK As New Hist3D_BuildHistogram
     Public Sub New()
         redOptions.XYZReduction.Checked = True
         labels(2) = "dst2 = backprojection of pointcloud (8UC1 format)."
-        advice = "Primary: redOptions '3D Histogram Bins' slider" + vbCrLf + "redOptions - Histogram Channels"
+        advice = "Primary: redOptions '3D Histogram Bins'" + vbCrLf + "redOptions - Histogram Channels"
         desc = "Build a 3D histogram from the pointcloud and backproject it to segment the image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -31,22 +30,20 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
         Next
         histogram = New cv.Mat(histArray.Count, 1, cv.MatType.CV_32F, histArray)
 
-        If standalone Or runBackProject Then
-            simK.Run(histogram)
-            histogram = New cv.Mat(histArray.Count, 1, cv.MatType.CV_32F, simK.histArray)
-            classCount = simK.classCount
+        simK.Run(histogram)
+        histogram = New cv.Mat(histArray.Count, 1, cv.MatType.CV_32F, simK.histArray)
+        classCount = simK.classCount
 
-            cv.Cv2.CalcBackProject({src}, {redOptions.channelIndex}, histogram, dst2,
+        cv.Cv2.CalcBackProject({src}, {redOptions.channelIndex}, histogram, dst2,
                                    {redOptions.ranges(redOptions.ranges.Count - 1)})
-            dst2 = dst2.ConvertScaleAbs
+        dst2 = dst2.ConvertScaleAbs
 
-            dst2.SetTo(0, task.noDepthMask)
-            dst2.SetTo(classCount, task.maxDepthMask)
-            dst3 = vbPalette(dst2 * 255 / classCount)
+        dst2.SetTo(0, task.noDepthMask)
+        dst2.SetTo(classCount, task.maxDepthMask)
+        dst3 = vbPalette(dst2 * 255 / classCount)
 
-            labels(2) = simK.labels(2) + " with " + CStr(redOptions.bins3D) + " histogram bins"
-            labels(3) = "LastClassCount/classCount = " + CStr(classCount) + "/" + CStr(classCount)
-        End If
+        labels(2) = simK.labels(2) + " with " + CStr(redOptions.bins3D) + " histogram bins"
+        labels(3) = "LastClassCount/classCount = " + CStr(classCount) + "/" + CStr(classCount)
     End Sub
 End Class
 
@@ -67,7 +64,7 @@ Public Class Hist3Dcloud_DepthSplit : Inherits VB_Algorithm
         hist2d = New List(Of Histogram2D_Cloud)({New Histogram2D_Cloud, New Histogram2D_Cloud, New Histogram2D_Cloud})
         labels(2) = "Histograms (Kalman) for X (upper left), Y (upper right) and Z.  UseZeroDepth removes 0 (no depth) entries."
         labels(3) = "X to Y histogram (upper left), X to Z (upper right), and Y to Z (bottom)."
-        advice = "Primary: redOptions '3D Histogram Bins' slider" + vbCrLf + "redOptions - Histogram Channels"
+        advice = "Primary: redOptions '3D Histogram Bins'" + vbCrLf + "redOptions - Histogram Channels"
         desc = "Plot the 3 histograms of the depth data dimensions"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -100,7 +97,7 @@ Public Class Hist3Dcloud_Highlights : Inherits VB_Algorithm
     Public histogram As New cv.Mat
     Public ranges() As cv.Rangef
     Public Sub New()
-        advice = "Primary: redOptions '3D Histogram Bins' slider" + vbCrLf + "redOptions - Histogram Channels"
+        advice = "Primary: redOptions '3D Histogram Bins'" + vbCrLf + "redOptions - Histogram Channels"
         desc = "Plot the 3D histogram of the depth data"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -164,7 +161,7 @@ Public Class Hist3Dcloud_BP_Filter : Inherits VB_Algorithm
         redOptions.HistBinSlider.Value = 16
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_32FC3, 0)
         labels(2) = "Mask of the pointcloud image after backprojection that removes 'blowback' pixels"
-        advice = "Primary: redOptions '3D Histogram Bins' slider" + vbCrLf + "redOptions - Histogram Channels"
+        advice = "Primary: redOptions '3D Histogram Bins'" + vbCrLf + "redOptions - Histogram Channels"
         desc = "Backproject a 3D pointcloud histogram after thresholding the bins with the small samples."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -203,14 +200,13 @@ End Class
 Public Class Hist3Dcloud_PlotHist1D : Inherits VB_Algorithm
     Dim hist3d As New Hist3Dcloud_Basics
     Dim plot As New Plot_Histogram
-    Dim simK As New Hist3Dcolor_BuildHistogram
+    Dim simK As New Hist3D_BuildHistogram
     Public histogram As cv.Mat
     Public histArray() As Single
     Public Sub New()
-        hist3d.runBackProject = False
         plot.removeZeroEntry = False
         labels(2) = "The 3D histogram of the pointcloud data stream - note the number of gaps"
-        advice = "Primary: redOptions '3D Histogram Bins' slider" + vbCrLf + "redOptions - Histogram Channels"
+        advice = "Primary: redOptions '3D Histogram Bins'" + vbCrLf + "redOptions - Histogram Channels"
         desc = "Present the 3D histogram as a typical histogram bar chart."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -240,7 +236,7 @@ Public Class Hist3Dcloud_Dominant : Inherits VB_Algorithm
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Dominant colors in each cell backprojected with the each cell's index."
-        advice = "Primary: redOptions '3D Histogram Bins' slider" + vbCrLf + "redOptions - Histogram Channels"
+        advice = "Primary: redOptions '3D Histogram Bins'" + vbCrLf + "redOptions - Histogram Channels"
         desc = "Find the  in a 3D color histogram and backProject it."
     End Sub
     Public Sub RunVB(src As cv.Mat)

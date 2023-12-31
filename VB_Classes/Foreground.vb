@@ -109,7 +109,6 @@ End Class
 Public Class Foreground_Hist3D : Inherits VB_Algorithm
     Dim hist3d As New Hist3Dcloud_Basics
     Public Sub New()
-        hist3d.runBackProject = True
         hist3d.maskInput = task.noDepthMask
 
         labels = {"", "", "Foreground", "Background"}
