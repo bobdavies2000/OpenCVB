@@ -205,7 +205,7 @@ End Class
 
 Public Class Distance_RedMin : Inherits VB_Algorithm
     Dim rMin As New RedMin_Basics
-    Dim hist3d As New Hist3Dcolor_Basics
+    Dim hColor As New Hist3Dcolor_Basics
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
@@ -230,10 +230,10 @@ Public Class Distance_RedMin : Inherits VB_Algorithm
         distances.Clear()
         For i = 0 To rMin.minCells.Count - 1
             Dim rp = rMin.minCells(i)
-            hist3d.maskInput = rp.mask
-            hist3d.Run(src(rp.rect))
+            hColor.maskInput = rp.mask
+            hColor.Run(src(rp.rect))
 
-            Dim nextD = distanceFromZero(hist3d.histArray.ToList)
+            Dim nextD = distanceFromZero(hColor.histArray.ToList)
             distances.Add(nextD, i)
         Next
 
@@ -298,7 +298,7 @@ End Class
 
 Public Class Distance_D3Cells : Inherits VB_Algorithm
     Dim rMin As New RedMin_Basics
-    Dim hist3d As New Hist3Dcolor_Basics
+    Dim hColor As New Hist3Dcolor_Basics
     Dim valleys As New HistValley_Basics
     Public d3Cells As New List(Of rMinData)
     Public Sub New()
@@ -319,10 +319,10 @@ Public Class Distance_D3Cells : Inherits VB_Algorithm
             rm.rect = rp.rect
             rm.index = i + 1
 
-            hist3d.maskInput = rp.mask
-            hist3d.Run(src(rp.rect))
-            rm.histogram = hist3d.histogram.Clone
-            rm.histList = hist3d.histArray.ToList
+            hColor.maskInput = rp.mask
+            hColor.Run(src(rp.rect))
+            rm.histogram = hColor.histogram.Clone
+            rm.histList = hColor.histArray.ToList
 
             d3Cells.Add(rm)
         Next

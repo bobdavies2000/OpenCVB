@@ -182,7 +182,6 @@ Public Class Options_Contours : Inherits VB_Algorithm
     Public retrievalMode As cv.RetrievalModes
     Public ApproximationMode As cv.ContourApproximationModes
     Public epsilon As Single
-    Public minLength = 4 ' use any contour with enough points to make a contour!
     Dim options2 As New Options_Contours2
     Public Sub New()
         If radio.Setup(traceName) Then

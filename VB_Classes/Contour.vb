@@ -2,7 +2,51 @@ Imports cv = OpenCvSharp
 Public Class Contour_Basics : Inherits VB_Algorithm
     Public contourlist As New List(Of cv.Point())
     Public allContours As cv.Point()()
-    Dim rotatedRect As New Rectangle_Rotated
+    Public Sub New()
+        labels = {"", "", "FindContour input", "Draw contour output"}
+        desc = "General purpose contour finder"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        dst2 = src.Clone
+        If standalone Then
+
+            Static rotatedRect As New Rectangle_Rotated
+            If heartBeat() = False Then Exit Sub
+            rotatedRect.Run(src)
+            dst2 = rotatedRect.dst2
+            If dst2.Channels = 3 Then
+                dst2 = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).ConvertScaleAbs(255)
+            Else
+                dst2 = dst2.ConvertScaleAbs(255)
+            End If
+        Else
+            If src.Channels = 3 Then dst2 = src.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        End If
+
+        cv.Cv2.FindContours(dst2, allContours, Nothing, cv.RetrievalModes.External,
+                            cv.ContourApproximationModes.ApproxTC89KCOS)
+
+        contourlist.Clear()
+        Dim minPixels = gOptions.minPixelsSlider.Value
+        For Each c In allContours
+            Dim area = cv.Cv2.ContourArea(c)
+            If area >= minPixels And c.Length >= minLengthContour Then contourlist.Add(c)
+        Next
+
+        dst3.SetTo(0)
+        For Each ctr In allContours.ToArray
+            vbDrawContour(dst3, ctr.ToList, cv.Scalar.Yellow)
+        Next
+    End Sub
+End Class
+
+
+
+
+
+Public Class Contour_BasicsWithOptions : Inherits VB_Algorithm
+    Public contourlist As New List(Of cv.Point())
+    Public allContours As cv.Point()()
     Public options As New Options_Contours
     Public Sub New()
         labels = {"", "", "FindContour input", "Draw contour output"}
@@ -13,6 +57,8 @@ Public Class Contour_Basics : Inherits VB_Algorithm
 
         dst2 = src.Clone
         If standalone Then
+
+            Static rotatedRect As New Rectangle_Rotated
             If heartBeat() = False Then Exit Sub
             rotatedRect.Run(src)
             dst2 = rotatedRect.dst2
@@ -32,7 +78,7 @@ Public Class Contour_Basics : Inherits VB_Algorithm
         Dim minPixels = gOptions.minPixelsSlider.Value
         For Each c In allContours
             Dim area = cv.Cv2.ContourArea(c)
-            If area >= minPixels And c.Length >= options.minLength Then contourlist.Add(c)
+            If area >= minPixels And c.Length >= minLengthContour Then contourlist.Add(c)
         Next
 
         dst3.SetTo(0)
@@ -149,7 +195,7 @@ Public Class Contour_Edges : Inherits VB_Algorithm
         Dim colors As New List(Of cv.Vec3b)
         Dim color As cv.Scalar
         For Each c In contour.allContours
-            If c.Count > contour.options.minLength Then
+            If c.Count > minLengthContour Then
                 Dim vec = lastImage.Get(Of cv.Vec3b)(c(0).Y, c(0).X)
                 If vec = black Or colors.Contains(vec) Then
                     color = New cv.Scalar(msRNG.Next(10, 240), msRNG.Next(10, 240), msRNG.Next(10, 240)) ' trying to avoid extreme colors... 
@@ -275,7 +321,7 @@ End Class
 
 
 Public Class Contour_Sorted : Inherits VB_Algorithm
-    Dim contours As New Contour_Basics
+    Dim contours As New Contour_BasicsWithOptions
     Dim sortedContours As New SortedList(Of Integer, cv.Point())(New compareAllowIdenticalIntegerInverted)
     Dim sortedByArea As New SortedList(Of Integer, Integer)(New compareAllowIdenticalIntegerInverted)
     Dim diff As New Diff_Basics
@@ -302,7 +348,7 @@ Public Class Contour_Sorted : Inherits VB_Algorithm
         Dim minPixels = gOptions.minPixelsSlider.Value
         For i = 0 To contours.contourlist.Count - 1
             Dim area = cv.Cv2.ContourArea(contours.contourlist(i))
-            If area > minPixels And contours.contourlist(i).Length > contours.options.minLength Then
+            If area > minPixels And contours.contourlist(i).Length > minLengthContour Then
                 sortedByArea.Add(area, i)
                 sortedContours.Add(area, cv.Cv2.ApproxPolyDP(contours.contourlist(i), contours.options.epsilon, True))
                 vbDrawContour(dst3, contours.contourlist(i).ToList, cv.Scalar.White, -1)
@@ -657,7 +703,7 @@ Public Class Contour_Image : Inherits VB_Algorithm
         contourlist.Clear()
         For Each ctr In allContours.ToArray
             contourlist.Add(ctr)
-            If ctr.Length > options.minLength Then vbDrawContour(dst3, ctr.ToList, cv.Scalar.White)
+            If ctr.Length > minLengthContour Then vbDrawContour(dst3, ctr.ToList, cv.Scalar.White)
         Next
 
         If standalone Or testIntermediate(traceName) Then

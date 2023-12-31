@@ -266,14 +266,14 @@ End Class
 
 Public Class RedColor_Histogram3DBP : Inherits VB_Algorithm
     Dim colorC As New RedColor_Basics
-    Dim color As New Hist3Dcolor_Basics
+    Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
         desc = "Use the backprojection of the 3D RGB histogram as input to RedColor_Basics."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        color.Run(src)
-        dst2 = color.dst3
-        labels(2) = color.labels(3)
+        hColor.Run(src)
+        dst2 = hColor.dst3
+        labels(2) = hColor.labels(3)
 
         colorC.Run(dst2)
         dst3 = colorC.dst2

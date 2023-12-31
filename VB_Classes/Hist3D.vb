@@ -5,16 +5,29 @@ Public Class Hist3D_Basics : Inherits VB_Algorithm
     Dim hCloud As New Hist3Dcloud_Basics
     Public classCount As Integer
     Public Sub New()
+        If findfrm(traceName + " Radio Options") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Add color and cloud 8UC1")
+            radio.addRadio("Copy cloud into color 8UC1")
+            radio.check(0).Checked = True
+        End If
+
         labels = {"", "", "Sum of 8UC1 outputs of Hist3Dcolor_Basics and Hist3Dcloud_basics", ""}
         advice = "Primary: redOptions '3D Histogram Bins' "
         desc = "Build an 8UC1 image by adding Hist3Dcolor_Basics and Hist3Dcloud_Basics output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        hColor.Run(src)
-        hCloud.Run(src)
+        Static addRadio = findRadio("Add color and cloud 8UC1")
+        Dim addCloud = addRadio.checked
 
+        hColor.Run(src)
+        dst2 = hColor.dst2
+
+        hCloud.Run(src)
         hCloud.dst2 += hColor.classCount + 1
-        dst2 = hColor.dst2 + hCloud.dst2
+        hCloud.dst2.SetTo(0, task.noDepthMask)
+
+        If addCloud Then dst2 += hCloud.dst2 Else hCloud.dst2.CopyTo(dst2, task.depthMask)
         classCount = hColor.classCount + hCloud.classCount
 
         dst3 = vbPalette(dst2 * 255 / classCount)
@@ -22,34 +35,6 @@ Public Class Hist3D_Basics : Inherits VB_Algorithm
     End Sub
 End Class
 
-
-
-
-
-
-Public Class Hist3D_BasicsCopy : Inherits VB_Algorithm
-    Dim hColor As New Hist3Dcolor_Basics
-    Dim hCloud As New Hist3Dcloud_Basics
-    Public classCount As Integer
-    Public Sub New()
-        labels = {"", "", "Merge of 8UC1 outputs of Hist3Dcolor_Basics and Hist3Dcloud_basics", ""}
-        advice = "Primary: redOptions '3D Histogram Bins' "
-        desc = "Build an 8UC1 image by adding Hist3Dcolor_Basics and Hist3Dcloud_Basics output"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        hColor.Run(src)
-        dst2 = hColor.dst2
-
-        hCloud.Run(src)
-        hCloud.dst2 += hColor.classCount + 1
-
-        hCloud.dst2.CopyTo(dst2, task.depthMask)
-        classCount = hColor.classCount + hCloud.classCount + 1
-
-        dst3 = vbPalette(dst2 * 255 / classCount)
-        labels(3) = CStr(classCount) + " classes "
-    End Sub
-End Class
 
 
 
@@ -128,5 +113,67 @@ Public Class Hist3D_RedCloud : Inherits VB_Algorithm
         redC.Run(hist3D.dst2)
         dst3 = redC.dst2
         labels(3) = redC.labels(2)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Hist3D_RedMin : Inherits VB_Algorithm
+    Dim rMin As New RedMin_Basics
+    Dim hColor As New Hist3Dcolor_Basics
+    Dim cellSelect As New RedMin_Select
+    Public Sub New()
+        redOptions.UseColor.Checked = True
+        advice = "Primary: redOptions '3D Histogram Bins' "
+        desc = "Run RedMin_Basics on the Hist3D color output."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        hColor.Run(src)
+        dst3 = hColor.dst3
+        labels(3) = hColor.labels(3)
+
+        rMin.Run(hColor.dst2)
+        dst2 = rMin.dst3
+        labels(2) = rMin.labels(3)
+
+        cellSelect.Run(src)
+        Dim rp = task.cellSelect
+        If rp.index <> 0 Then dst2(rp.rect).SetTo(cv.Scalar.White, rp.mask)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Hist3D_DepthTier : Inherits VB_Algorithm
+    Dim fore As New Foreground_Hist3D
+    Dim hColor As New Hist3Dcolor_Basics
+    Public Sub New()
+        advice = ""
+        desc = "Isolate the foreground and no depth in the image and run it through Hist3D_Basics"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        fore.Run(src)
+        dst1 = fore.fg Or task.noDepthMask
+        hColor.maskInput = dst1
+        dst0 = Not dst1
+
+        src.SetTo(0, dst0)
+
+        hColor.Run(src)
+        dst2 = hColor.dst2
+        dst2.SetTo(0, dst0)
+
+        dst3 = hColor.dst3
+        dst3.SetTo(0, dst0)
+        labels = hColor.labels
     End Sub
 End Class

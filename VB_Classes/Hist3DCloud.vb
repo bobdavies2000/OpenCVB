@@ -198,7 +198,7 @@ End Class
 
 
 Public Class Hist3Dcloud_PlotHist1D : Inherits VB_Algorithm
-    Dim hist3d As New Hist3Dcloud_Basics
+    Dim hcloud As New Hist3Dcloud_Basics
     Dim plot As New Plot_Histogram
     Dim simK As New Hist3D_BuildHistogram
     Public histogram As cv.Mat
@@ -211,9 +211,9 @@ Public Class Hist3Dcloud_PlotHist1D : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
-        hist3d.Run(src)
-        ReDim histArray(hist3d.histogram.Total - 1)
-        Marshal.Copy(hist3d.histogram.Data, histArray, 0, histArray.Length)
+        hcloud.Run(src)
+        ReDim histArray(hcloud.histogram.Total - 1)
+        Marshal.Copy(hcloud.histogram.Data, histArray, 0, histArray.Length)
 
         histogram = New cv.Mat(histArray.Count, 1, cv.MatType.CV_32F, histArray)
         plot.Run(histogram)
@@ -232,7 +232,7 @@ End Class
 
 Public Class Hist3Dcloud_Dominant : Inherits VB_Algorithm
     Dim rMin As New RedMin_Basics
-    Dim hist3d As New Hist3Dcolor_Basics
+    Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
         dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
         labels(3) = "Dominant colors in each cell backprojected with the each cell's index."
@@ -247,15 +247,15 @@ Public Class Hist3Dcloud_Dominant : Inherits VB_Algorithm
         Dim bins3D =
         dst1.SetTo(0)
         For Each rp In rMin.minCells
-            hist3d.maskInput = rp.mask
-            hist3d.Run(src(rp.rect))
-            Dim index = hist3d.histArray.ToList.IndexOf(hist3d.histArray.Max)
+            hColor.maskInput = rp.mask
+            hColor.Run(src(rp.rect))
+            Dim index = hColor.histArray.ToList.IndexOf(hColor.histArray.Max)
 
             Dim guidedHist(redOptions.bins3D - 1) As Single
             guidedHist(index) = rp.index
 
-            Marshal.Copy(guidedHist, 0, hist3d.histogram.Data, guidedHist.Length)
-            cv.Cv2.CalcBackProject({src(rp.rect)}, {0, 1, 2}, hist3d.histogram, dst1(rp.rect), redOptions.rangesBGR)
+            Marshal.Copy(guidedHist, 0, hColor.histogram.Data, guidedHist.Length)
+            cv.Cv2.CalcBackProject({src(rp.rect)}, {0, 1, 2}, hColor.histogram, dst1(rp.rect), redOptions.rangesBGR)
         Next
         dst3 = vbPalette(dst1 * 255 / rMin.minCells.Count)
     End Sub

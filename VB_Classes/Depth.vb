@@ -331,6 +331,8 @@ End Class
 
 
 Module Depth_Colorizer_CPP_Module
+    Public minLengthContour = 4 ' use any contour with enough points to make a contour!
+
     <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
     Public Function Depth_Colorizer_Open() As IntPtr
     End Function

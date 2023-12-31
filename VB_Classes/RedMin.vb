@@ -201,7 +201,7 @@ End Class
 
 Public Class RedMin_Hist3DBackProject : Inherits VB_Algorithm
     Dim rMin As New RedMin_Basics
-    Dim hist3d As New Hist3Dcolor_Basics
+    Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
         desc = "For the largest cell, use the histogram 3D results from a previous frame to backproject onto the current frame"
     End Sub
@@ -215,14 +215,14 @@ Public Class RedMin_Hist3DBackProject : Inherits VB_Algorithm
         Dim rp = rMin.minCells(0)
         Dim input = New cv.Mat(rp.mask.Size, cv.MatType.CV_8UC3, 0)
         task.color(rp.rect).CopyTo(input, rp.mask)
-        hist3d.Run(input)
+        hColor.Run(input)
 
         'If lastCell.rect.Width > 0 And lastCell.rect.Height > 0 Then
         '    dst3.SetTo(0)
         '    cv.Cv2.CalcBackProject({src(lastCell.rect)}, {0, 1, 2}, lastHist, dst1, hist3d.options.rangesBGR)
         '    dst3(lastCell.rect) = vbPalette(dst1 * 255 / redOptions.DesiredCellSlider.Value)
         'End If
-        lastHist = hist3d.histogram
+        lastHist = hColor.histogram
         lastCell = rp
     End Sub
 End Class
@@ -233,7 +233,7 @@ End Class
 
 Public Class RedMin_PixelVector3D : Inherits VB_Algorithm
     Dim rMin As New RedMin_Basics
-    Dim hist3d As New Hist3Dcolor_Basics
+    Dim hColor As New Hist3Dcolor_Basics
     Public pixelVector As New List(Of List(Of Single))
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
@@ -250,11 +250,11 @@ Public Class RedMin_PixelVector3D : Inherits VB_Algorithm
             pixelVector.Clear()
             strOut = "3D histogram counts for each cell - 10 largest only for readability..." + vbCrLf
             For Each rp In rMin.minCells
-                hist3d.maskInput = rp.mask
-                hist3d.Run(src(rp.rect))
-                pixelVector.Add(hist3d.histArray.ToList)
+                hColor.maskInput = rp.mask
+                hColor.Run(src(rp.rect))
+                pixelVector.Add(hColor.histArray.ToList)
                 strOut += "(" + CStr(rp.index) + ") "
-                For Each count In hist3d.histArray
+                For Each count In hColor.histArray
                     strOut += CStr(count) + ","
                 Next
                 strOut += vbCrLf

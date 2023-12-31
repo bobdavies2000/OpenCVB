@@ -1127,7 +1127,7 @@ End Class
 
 ' https://docs.opencv.org/3.4/d1/d1d/tutorial_histo3D.html
 Public Class OpenGL_3Ddepth : Inherits VB_Algorithm
-    Dim hist3d As New Hist3Dcloud_Basics
+    Dim hcloud As New Hist3Dcloud_Basics
     Public Sub New()
         task.ogl.oglFunction = oCase.Histogram3D
         task.OpenGLTitle = "OpenGL_Functions"
@@ -1135,8 +1135,8 @@ Public Class OpenGL_3Ddepth : Inherits VB_Algorithm
         desc = "Display the 3D histogram of the depth in OpenGL"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        hist3d.Run(src)
-        Dim histogram = New cv.Mat(redOptions.bins3D, 1, cv.MatType.CV_32F, hist3d.histogram.Data)
+        hcloud.Run(src)
+        Dim histogram = New cv.Mat(redOptions.bins3D, 1, cv.MatType.CV_32F, hcloud.histogram.Data)
         task.ogl.dataInput = histogram
         task.ogl.pointCloudInput = New cv.Mat
         task.ogl.Run(New cv.Mat)
@@ -2077,7 +2077,7 @@ End Class
 
 
 Public Class OpenGL_3DRGB : Inherits VB_Algorithm
-    Dim hist3d As New Hist3Dcolor_Basics
+    Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.Histogram3D
@@ -2085,10 +2085,10 @@ Public Class OpenGL_3DRGB : Inherits VB_Algorithm
         desc = "Plot the results of a 3D histogram of the BGR data "
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        hist3d.Run(src)
-        dst2 = hist3d.dst3
+        hColor.Run(src)
+        dst2 = hColor.dst3
 
-        task.ogl.dataInput = hist3d.dst2
+        task.ogl.dataInput = hColor.dst2
         task.ogl.pointCloudInput = New cv.Mat
         task.ogl.Run(New cv.Mat)
         If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3
