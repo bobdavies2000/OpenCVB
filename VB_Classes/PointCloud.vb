@@ -1065,7 +1065,7 @@ Public Class PointCloud_Histograms : Inherits VB_Algorithm
         redOptions.Sync() ' make sure settings are consistent
 
         cv.Cv2.CalcHist({task.pointCloud}, redOptions.channels, New cv.Mat(),
-                        histogram, redOptions.channelCount, redOptions.histBinList, redOptions.rangesCloud)
+                        histogram, redOptions.channelCount, redOptions.histBinList, redOptions.ranges)
 
         Select Case redOptions.PCReduction
             Case "X Reduction", "Y Reduction", "Z Reduction"

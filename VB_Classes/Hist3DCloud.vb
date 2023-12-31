@@ -11,13 +11,15 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
     Public Sub New()
         redOptions.XYZReduction.Checked = True
         labels(2) = "dst2 = backprojection of pointcloud (8UC1 format)."
+        advice = "Primary: redOptions '3D Histogram Bins' slider" + vbCrLf + "redOptions - Histogram Channels"
         desc = "Build a 3D histogram from the pointcloud and backproject it to segment the image."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Type <> cv.MatType.CV_32FC3 Then src = task.pointCloud
 
         Dim bins = redOptions.HistBinSlider.Value
-        cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, {bins, bins, bins}, redOptions.rangesCloud)
+        cv.Cv2.CalcHist({src}, redOptions.channels, maskInput, histogram, redOptions.channels.Count,
+                        {bins, bins, bins}, redOptions.ranges)
 
         ReDim histArray(redOptions.bins3D - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -26,7 +28,8 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
             histogram = New cv.Mat(histArray.Count, 1, cv.MatType.CV_32F, simK.histArray)
             classCount = simK.classCount
 
-            cv.Cv2.CalcBackProject({src}, {2}, histogram, dst2, {redOptions.rangesCloud(2)})
+            cv.Cv2.CalcBackProject({src}, {redOptions.channelIndex}, histogram, dst2,
+                                   {redOptions.ranges(redOptions.ranges.Count - 1)})
             dst2 = dst2.ConvertScaleAbs
             dst3 = vbPalette(dst2 * 255 / classCount)
 

@@ -517,7 +517,7 @@ Public Class GuidedBP_Depth : Inherits VB_Algorithm
 
         Marshal.Copy(newSamples, 0, hist.histogram.Data, newSamples.Length)
 
-        cv.Cv2.CalcBackProject({src}, redOptions.channels, hist.histogram, dst2, redOptions.rangesCloud)
+        cv.Cv2.CalcBackProject({src}, redOptions.channels, hist.histogram, dst2, redOptions.ranges)
         dst2.ConvertTo(dst2, cv.MatType.CV_8U)
         ' dst2.SetTo(254, task.depthOutline)
         If standalone Or testIntermediate(traceName) Then

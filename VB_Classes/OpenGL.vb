@@ -1105,6 +1105,7 @@ Public Class OpenGL_3DColors : Inherits VB_Algorithm
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.pointCloudAndRGB
         findSlider("OpenGL Point Size").Value = 20
+        advice = "Use the redOptions.reduction slider to see pattern."
         desc = "Connect the 3D representation of the different color formats with colors in that format (see dst2)"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -1135,7 +1136,8 @@ Public Class OpenGL_3Ddepth : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         hist3d.Run(src)
-        task.ogl.dataInput = hist3d.histogram
+        Dim histogram = New cv.Mat(redOptions.bins3D, 1, cv.MatType.CV_32F, hist3d.histogram.Data)
+        task.ogl.dataInput = histogram
         task.ogl.pointCloudInput = New cv.Mat
         task.ogl.Run(New cv.Mat)
         If gOptions.OpenGLCapture.Checked Then dst3 = task.ogl.dst3

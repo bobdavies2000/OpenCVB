@@ -76,6 +76,7 @@ Public Class OpenCVB
     Dim picLabels() = {"", "", "", ""}
     Dim resizeForDisplay = 2 ' indicates how much we have to resize to fit on the screen
     Dim textDesc As String = ""
+    Dim textAdvice As String = ""
     Dim totalBytesOfMemoryUsed As Integer
     Dim trueData As List(Of VB_Classes.trueText)
 
@@ -1041,6 +1042,7 @@ Public Class OpenCVB
             drawRect = New cv.Rect
             Dim task = New VB_Classes.VBtask(parms)
             textDesc = task.desc
+            textAdvice = task.advice
             intermediateReview = ""
 
             If ComplexityTimer.Enabled = False Then
@@ -1603,6 +1605,11 @@ Public Class OpenCVB
             settings.workingResIndex = OpenCVB.settings.resolutionsSupported.Count - 1
         End If
     End Sub
+
+    Private Sub Advice_Click(sender As Object, e As EventArgs) Handles Advice.Click
+        MsgBox(textAdvice)
+    End Sub
+
     Private Sub ToolStripButton5_Click(sender As Object, e As EventArgs) Handles ComplexityButton.Click
         If ComplexityTimer.Enabled = False Then
             Dim ret = MsgBox("Do you want to test the complexity of the current algorithm?" + vbCrLf +

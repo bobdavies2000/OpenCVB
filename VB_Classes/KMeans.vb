@@ -579,7 +579,7 @@ Public Class KMeans_SimKDepth : Inherits VB_Algorithm
             plot1D.histogram = simK.dst2
             classCount = simK.classCount
         End If
-        Dim ranges() As cv.Rangef = {redOptions.rangesCloud(2)}
+        Dim ranges() As cv.Rangef = {redOptions.ranges(2)}
         cv.Cv2.CalcBackProject({src}, {2}, plot1D.histogram, dst1, ranges)
         dst1 = dst1.ConvertScaleAbs
 

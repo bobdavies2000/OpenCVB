@@ -132,6 +132,7 @@ Public Class VBtask : Implements IDisposable
 
     Public labels(4 - 1) As String
     Public desc As String
+    Public advice As String
     Public intermediateName As String
     Public intermediateObject As VB_Algorithm
     Public activeObjects As New List(Of Object)
@@ -372,7 +373,14 @@ Public Class VBtask : Implements IDisposable
         callTrace.Add(algName + "\")
         activeObjects.Clear()
         algorithmObject = algoList.createAlgorithm(algName)
-        If algorithmObject Is Nothing Then desc = algName Else desc = algorithmObject.desc
+        If algorithmObject Is Nothing Then
+            desc = algName
+        Else
+            desc = algorithmObject.desc
+            advice = algorithmObject.advice
+        End If
+        If advice = "" Then advice = "No advice for " + algName + " yet." + vbCrLf +
+                    "Please update 'advice' variable (near 'desc' in the constructor)."
 
         If parms.useRecordedData Then recordedData = New Replay_Play()
 

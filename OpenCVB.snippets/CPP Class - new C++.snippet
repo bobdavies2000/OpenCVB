@@ -53,6 +53,7 @@ Public Class Anyname_CPP : Inherits VB_Algorithm
     Public Sub New()
         cPtr = Anyname_Open()
 	    labels = {"", "", "Grayscale image of src", "dst3Label"}
+        advice = "" 
         desc = "description"
 	  End Sub
     Public Sub RunVB(src as cv.Mat)

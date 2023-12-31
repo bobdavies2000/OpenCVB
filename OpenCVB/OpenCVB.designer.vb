@@ -50,6 +50,7 @@ Partial Class OpenCVB
         Me.ValidateTreeView = New System.Windows.Forms.Timer(Me.components)
         Me.XYloc = New System.Windows.Forms.Label()
         Me.ComplexityTimer = New System.Windows.Forms.Timer(Me.components)
+        Me.Advice = New System.Windows.Forms.ToolStripButton()
         Me.ToolStrip1.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -58,7 +59,7 @@ Partial Class OpenCVB
         '
         Me.ToolStrip1.AutoSize = False
         Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.TreeButton, Me.PixelViewerButton, Me.ToolStripButton3, Me.ComplexityButton, Me.TranslateButton})
+        Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripButton1, Me.ToolStripButton2, Me.PausePlayButton, Me.OptionsButton, Me.TestAllButton, Me.TreeButton, Me.PixelViewerButton, Me.ToolStripButton3, Me.ComplexityButton, Me.TranslateButton, Me.Advice})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 31)
         Me.ToolStrip1.Name = "ToolStrip1"
         Me.ToolStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 3, 0)
@@ -176,9 +177,9 @@ Partial Class OpenCVB
         'AlgorithmDesc
         '
         Me.AlgorithmDesc.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.AlgorithmDesc.Location = New System.Drawing.Point(1169, 38)
+        Me.AlgorithmDesc.Location = New System.Drawing.Point(1218, 38)
         Me.AlgorithmDesc.Name = "AlgorithmDesc"
-        Me.AlgorithmDesc.Size = New System.Drawing.Size(605, 51)
+        Me.AlgorithmDesc.Size = New System.Drawing.Size(556, 51)
         Me.AlgorithmDesc.TabIndex = 0
         Me.AlgorithmDesc.Text = "Algorithm Desc"
         '
@@ -187,7 +188,7 @@ Partial Class OpenCVB
         Me.GroupName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.GroupName.Font = New System.Drawing.Font("Microsoft Sans Serif", 11.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.GroupName.FormattingEnabled = True
-        Me.GroupName.Location = New System.Drawing.Point(800, 38)
+        Me.GroupName.Location = New System.Drawing.Point(849, 38)
         Me.GroupName.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.GroupName.Name = "GroupName"
         Me.GroupName.Size = New System.Drawing.Size(363, 34)
@@ -199,7 +200,7 @@ Partial Class OpenCVB
         Me.AvailableAlgorithms.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.AvailableAlgorithms.Font = New System.Drawing.Font("Microsoft Sans Serif", 11.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.AvailableAlgorithms.FormattingEnabled = True
-        Me.AvailableAlgorithms.Location = New System.Drawing.Point(431, 38)
+        Me.AvailableAlgorithms.Location = New System.Drawing.Point(480, 38)
         Me.AvailableAlgorithms.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.AvailableAlgorithms.MaxDropDownItems = 25
         Me.AvailableAlgorithms.Name = "AvailableAlgorithms"
@@ -265,6 +266,16 @@ Partial Class OpenCVB
         '
         Me.ComplexityTimer.Interval = 30000
         '
+        'Advice
+        '
+        Me.Advice.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.Advice.Image = CType(resources.GetObject("Advice.Image"), System.Drawing.Image)
+        Me.Advice.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.Advice.Name = "Advice"
+        Me.Advice.Size = New System.Drawing.Size(34, 54)
+        Me.Advice.Text = "ToolStripButton4"
+        Me.Advice.ToolTipText = "Get advice on adjustments available for this algorithm."
+        '
         'OpenCVB
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -317,4 +328,5 @@ Partial Class OpenCVB
     Friend WithEvents TranslateButton As ToolStripButton
     Friend WithEvents ComplexityButton As ToolStripButton
     Friend WithEvents ComplexityTimer As Timer
+    Friend WithEvents Advice As ToolStripButton
 End Class

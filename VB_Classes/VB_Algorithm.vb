@@ -33,6 +33,7 @@ Public Class VB_Algorithm : Implements IDisposable
     Public algorithm As Object
     Public traceName As String
     Public desc As String
+    Public advice As String
     Dim callStack = ""
     Public nearColor = cv.Scalar.Yellow
     Public farColor = cv.Scalar.Blue
