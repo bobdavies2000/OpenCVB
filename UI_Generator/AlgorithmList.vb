@@ -574,6 +574,7 @@ if algorithmName = "Font_OpenCV" Then return new Font_OpenCV
 if algorithmName = "Font_TrueType" Then return new Font_TrueType
 if algorithmName = "Foreground_Basics" Then return new Foreground_Basics
 if algorithmName = "Foreground_Contours" Then return new Foreground_Contours
+if algorithmName = "Foreground_Hist3D" Then return new Foreground_Hist3D
 if algorithmName = "Foreground_KMeans2" Then return new Foreground_KMeans2
 if algorithmName = "FPoly_Basics" Then return new FPoly_Basics
 if algorithmName = "FPoly_BasicsOriginal" Then return new FPoly_BasicsOriginal

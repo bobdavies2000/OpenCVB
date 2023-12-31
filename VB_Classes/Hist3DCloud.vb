@@ -24,6 +24,13 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
         ReDim histArray(redOptions.bins3D - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
 
+        Dim threshold = src.Total * 0.001
+        For i = 0 To histArray.Count - 1
+            If histArray(i) > threshold Then Exit For
+            histArray(i) = 0
+        Next
+        histogram = New cv.Mat(histArray.Count, 1, cv.MatType.CV_32F, histArray)
+
         If standalone Or runBackProject Then
             simK.Run(histogram)
             histogram = New cv.Mat(histArray.Count, 1, cv.MatType.CV_32F, simK.histArray)
@@ -33,8 +40,9 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
                                    {redOptions.ranges(redOptions.ranges.Count - 1)})
             dst2 = dst2.ConvertScaleAbs
 
+            dst2.SetTo(0, task.noDepthMask)
+            dst2.SetTo(classCount, task.maxDepthMask)
             dst3 = vbPalette(dst2 * 255 / classCount)
-            dst3.SetTo(0, task.noDepthMask)
 
             labels(2) = simK.labels(2) + " with " + CStr(redOptions.bins3D) + " histogram bins"
             labels(3) = "LastClassCount/classCount = " + CStr(classCount) + "/" + CStr(classCount)

@@ -228,63 +228,6 @@ End Class
 
 
 
-Public Class Hist3Dcolor_BuildHistogram : Inherits VB_Algorithm
-    Public threshold As Integer
-    Public classCount As Integer
-    Public histArray() As Single
-    Public Sub New()
-        advice = "Primary: redOptions '3D Histogram Bins' slider" + vbCrLf
-        desc = "Build a simulated (guided) 3D histogram from the 3D histogram supplied in src."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If src.Type <> cv.MatType.CV_32FC1 Then
-            Static plot1D As New Hist3Dcloud_PlotHist1D
-            plot1D.Run(src)
-            src = plot1D.histogram
-        End If
-
-        ReDim histArray(src.Total - 1)
-        Marshal.Copy(src.Data, histArray, 0, histArray.Length)
-
-        classCount = 1
-        Dim index As Integer
-        For i = index To histArray.Count - 1
-            For index = index To histArray.Count - 1
-                If histArray(index) > threshold Then Exit For
-                histArray(index) = classCount
-            Next
-            classCount += 1
-            For index = index To histArray.Count - 1
-                If histArray(index) <= threshold Then Exit For
-                histArray(index) = classCount
-            Next
-
-            If index >= histArray.Count Then Exit For
-        Next
-
-        Dim minClass = histArray.Min - 1
-        If minClass <> 0 Then
-            src -= minClass
-            For i = 0 To histArray.Count - 1
-                histArray(i) -= minClass
-            Next
-            classCount -= minClass
-        End If
-        dst2 = src.Clone
-        Marshal.Copy(histArray, 0, dst2.Data, histArray.Length)
-        labels(2) = "Histogram entries vary from " + CStr(histArray.Min) + " to " + CStr(classCount) + " inclusive"
-    End Sub
-End Class
-
-
-
-
-
-
-
-
-
-
 Public Class Hist3Dcolor_Select : Inherits VB_Algorithm
     Dim hist3d As New Hist3Dcolor_Basics
     Public Sub New()
@@ -413,5 +356,59 @@ Public Class Hist3Dcolor_Dominant : Inherits VB_Algorithm
             cv.Cv2.CalcBackProject({src(rp.rect)}, {0, 1, 2}, hist3d.histogram, dst1(rp.rect), redOptions.rangesBGR)
         Next
         dst3 = vbPalette(dst1 * 255 / rMin.minCells.Count)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Hist3Dcolor_BuildHistogram : Inherits VB_Algorithm
+    Public threshold As Integer
+    Public classCount As Integer
+    Public histArray() As Single
+    Public Sub New()
+        advice = "Primary: redOptions '3D Histogram Bins' slider" + vbCrLf
+        desc = "Build a simulated (guided) 3D histogram from the 3D histogram supplied in src."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Type <> cv.MatType.CV_32FC1 Then
+            Static plot1D As New Hist3Dcloud_PlotHist1D
+            plot1D.Run(src)
+            src = plot1D.histogram
+        End If
+
+        ReDim histArray(src.Total - 1)
+        Marshal.Copy(src.Data, histArray, 0, histArray.Length)
+
+        classCount = 1
+        Dim index As Integer
+        For i = index To histArray.Count - 1
+            For index = index To histArray.Count - 1
+                If histArray(index) > threshold Then Exit For
+                histArray(index) = classCount
+            Next
+            classCount += 1
+            For index = index To histArray.Count - 1
+                If histArray(index) <= threshold Then Exit For
+                histArray(index) = classCount
+            Next
+
+            If index >= histArray.Count Then Exit For
+        Next
+
+        Dim minClass = histArray.Min - 1
+        If minClass <> 0 Then
+            src -= minClass
+            For i = 0 To histArray.Count - 1
+                histArray(i) -= minClass
+            Next
+            classCount -= minClass
+        End If
+        dst2 = src.Clone
+        Marshal.Copy(histArray, 0, dst2.Data, histArray.Length)
+        labels(2) = "Histogram entries vary from " + CStr(histArray.Min) + " to " + CStr(classCount) + " inclusive"
     End Sub
 End Class

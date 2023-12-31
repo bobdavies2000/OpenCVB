@@ -100,3 +100,31 @@ Public Class Foreground_Contours : Inherits VB_Algorithm
         dst2 = contours.dst2
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Foreground_Hist3D : Inherits VB_Algorithm
+    Dim hist3d As New Hist3Dcloud_Basics
+    Public Sub New()
+        hist3d.runBackProject = True
+        hist3d.maskInput = task.noDepthMask
+
+        labels = {"", "", "Foreground", "Background"}
+        advice = hist3d.advice
+        desc = "Use the first class of hist3Dcloud_Basics as the definition of foreground"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        hist3d.Run(src)
+
+        dst2.SetTo(0)
+        dst1 = hist3d.dst2.InRange(1, 1)
+        src.CopyTo(dst2, dst1)
+        If standalone Or testIntermediate(traceName) Then
+            dst3.SetTo(0)
+            src.CopyTo(dst3, Not dst1)
+        End If
+    End Sub
+End Class
