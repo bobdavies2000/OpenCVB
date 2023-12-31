@@ -2077,7 +2077,7 @@ End Class
 
 
 Public Class OpenGL_3DRGB : Inherits VB_Algorithm
-    Dim hist3d As New Hist3Dcolor_Basics_CPP
+    Dim hist3d As New Hist3Dcolor_Basics
     Public Sub New()
         task.OpenGLTitle = "OpenGL_Functions"
         task.ogl.oglFunction = oCase.Histogram3D

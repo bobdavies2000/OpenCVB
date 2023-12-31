@@ -4255,7 +4255,6 @@ Public Class Options_HistXD : Inherits VB_Algorithm
             sliders.setupTrackBar("Min side bin samples", 0, 100, 5) ' for 2D histograms
             sliders.setupTrackBar("Min top bin samples", 0, 100, 15) ' for 2D histograms
             sliders.setupTrackBar("Min samples per bin", 0, 500, 40) ' for 3D histograms
-            sliders.setupTrackBar("Selected bin", 0, 4096, 1) ' select a bin for backprojection in a 3D histograms
         End If
     End Sub
     Public Sub RunVB()
@@ -4263,11 +4262,9 @@ Public Class Options_HistXD : Inherits VB_Algorithm
         Static sideSlider = findSlider("Min side bin samples")
         Static bothSlider = findSlider("Min samples per bin")
         Static bins3DSlider = findSlider("3D Histogram Bins")
-        Static selectSlider = findSlider("Selected bin")
         topThreshold = topSlider.value
         sideThreshold = sideSlider.value
         threshold3D = bothSlider.value
-        selectedBin = selectSlider.value
     End Sub
 End Class
 

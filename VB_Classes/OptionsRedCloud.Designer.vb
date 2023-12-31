@@ -629,7 +629,7 @@ Partial Class OptionsRedCloud
         'HistBinSlider
         '
         Me.HistBinSlider.Location = New System.Drawing.Point(156, 156)
-        Me.HistBinSlider.Maximum = 256
+        Me.HistBinSlider.Maximum = 16
         Me.HistBinSlider.Minimum = 2
         Me.HistBinSlider.Name = "HistBinSlider"
         Me.HistBinSlider.Size = New System.Drawing.Size(506, 69)
