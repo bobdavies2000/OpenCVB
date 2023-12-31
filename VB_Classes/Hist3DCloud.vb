@@ -23,6 +23,7 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
 
         ReDim histArray(redOptions.bins3D - 1)
         Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
         If standalone Or runBackProject Then
             simK.Run(histogram)
             histogram = New cv.Mat(histArray.Count, 1, cv.MatType.CV_32F, simK.histArray)
@@ -31,9 +32,12 @@ Public Class Hist3Dcloud_Basics : Inherits VB_Algorithm
             cv.Cv2.CalcBackProject({src}, {redOptions.channelIndex}, histogram, dst2,
                                    {redOptions.ranges(redOptions.ranges.Count - 1)})
             dst2 = dst2.ConvertScaleAbs
+
             dst3 = vbPalette(dst2 * 255 / classCount)
+            dst3.SetTo(0, task.noDepthMask)
 
             labels(2) = simK.labels(2) + " with " + CStr(redOptions.bins3D) + " histogram bins"
+            labels(3) = "LastClassCount/classCount = " + CStr(classCount) + "/" + CStr(classCount)
         End If
     End Sub
 End Class
@@ -191,6 +195,7 @@ End Class
 Public Class Hist3Dcloud_PlotHist1D : Inherits VB_Algorithm
     Dim hist3d As New Hist3Dcloud_Basics
     Dim plot As New Plot_Histogram
+    Dim simK As New Hist3Dcolor_BuildHistogram
     Public histogram As cv.Mat
     Public histArray() As Single
     Public Sub New()
@@ -209,6 +214,9 @@ Public Class Hist3Dcloud_PlotHist1D : Inherits VB_Algorithm
         histogram = New cv.Mat(histArray.Count, 1, cv.MatType.CV_32F, histArray)
         plot.Run(histogram)
         dst2 = plot.dst2
+
+        simK.Run(histogram)
+        labels(3) = simK.labels(2)
     End Sub
 End Class
 

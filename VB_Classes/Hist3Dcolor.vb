@@ -246,12 +246,6 @@ Public Class Hist3Dcolor_BuildHistogram : Inherits VB_Algorithm
         ReDim histArray(src.Total - 1)
         Marshal.Copy(src.Data, histArray, 0, histArray.Length)
 
-        Dim firstClass2 As Boolean = True
-        For i = 0 To histArray.Count - 1
-            If histArray(i) > threshold Then Exit For
-            firstClass2 = False
-        Next
-
         classCount = 1
         Dim index As Integer
         For i = index To histArray.Count - 1
@@ -264,20 +258,21 @@ Public Class Hist3Dcolor_BuildHistogram : Inherits VB_Algorithm
                 If histArray(index) <= threshold Then Exit For
                 histArray(index) = classCount
             Next
-            If index >= histArray.Count Then
-                classCount -= 1
-                Exit For
-            End If
-        Next
-        If firstClass2 Then
-            For i = 0 To histArray.Count - 1
-                histArray(i) -= 1
-            Next
-        End If
 
+            If index >= histArray.Count Then Exit For
+        Next
+
+        Dim minClass = histArray.Min - 1
+        If minClass <> 0 Then
+            src -= minClass
+            For i = 0 To histArray.Count - 1
+                histArray(i) -= minClass
+            Next
+            classCount -= minClass
+        End If
         dst2 = src.Clone
         Marshal.Copy(histArray, 0, dst2.Data, histArray.Length)
-        labels(2) = "Histogram entries vary from 1 to " + CStr(classCount) + " inclusive"
+        labels(2) = "Histogram entries vary from " + CStr(histArray.Min) + " to " + CStr(classCount) + " inclusive"
     End Sub
 End Class
 
