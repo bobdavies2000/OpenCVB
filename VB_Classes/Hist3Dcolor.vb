@@ -118,7 +118,7 @@ Public Class Hist3Dcolor_Reduction : Inherits VB_Algorithm
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         redOptions.SimpleReductionSlider.Value = 45
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf + "Secondary: redOptions 'Simple Reduction'"
+        advice = "redOptions '3D Histogram Bins'" + vbCrLf + "redOptions 'Simple Reduction'"
         desc = "Backproject the 3D histogram for RGB after reduction"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -229,7 +229,7 @@ Public Class Hist3Dcolor_Select : Inherits VB_Algorithm
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
         labels(3) = "The highlighted pixels are in the selected bin"
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf + "Secondary: goptions 'DebugSlider'"
+        advice = "redOptions '3D Histogram Bins'" + vbCrLf + "goptions 'DebugSlider'"
         desc = "Build a 3D histogram from the BGR image and backproject the 'Selected bin' (in options_HistXD sliders)."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -306,7 +306,7 @@ Public Class Hist3Dcolor_Diff : Inherits VB_Algorithm
     Dim diff As New Diff_Basics
     Public Sub New()
         gOptions.PixelDiffThreshold.Value = 0
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf + "Secondary: goptions 'Pixel Difference'"
+        advice = "redOptions '3D Histogram Bins'" + vbCrLf + "goptions 'Pixel Difference'"
         desc = "Create a mask for the color pixels that are changing with every frame of the Hist3Dcolor_basics."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -316,42 +316,5 @@ Public Class Hist3Dcolor_Diff : Inherits VB_Algorithm
 
         diff.Run(hColor.dst2)
         dst3 = diff.dst3
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class Hist3Dcolor_Dominant : Inherits VB_Algorithm
-    Dim rMin As New RedMin_Basics
-    Dim hColor As New Hist3Dcolor_Basics
-    Public Sub New()
-        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
-        labels(3) = "Dominant colors in each cell backprojected with the each cell's index."
-        advice = "redOptions '3D Histogram Bins'" + vbCrLf
-        desc = "Find the dominant color in a 3D color histogram and backProject it."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        rMin.Run(src)
-        dst2 = rMin.dst3
-        labels(2) = rMin.labels(2)
-
-        Dim bins3D =
-        dst1.SetTo(0)
-        For Each rp In rMin.minCells
-            hColor.inputMask = rp.mask
-            hColor.Run(src(rp.rect))
-            Dim index = hColor.histArray.ToList.IndexOf(hColor.histArray.Max)
-
-            Dim guidedHist(redOptions.bins3D - 1) As Single
-            guidedHist(index) = rp.index
-
-            Marshal.Copy(guidedHist, 0, hColor.histogram.Data, guidedHist.Length)
-            cv.Cv2.CalcBackProject({src(rp.rect)}, {0, 1, 2}, hColor.histogram, dst1(rp.rect), redOptions.rangesBGR)
-        Next
-        dst3 = vbPalette(dst1 * 255 / rMin.minCells.Count)
     End Sub
 End Class

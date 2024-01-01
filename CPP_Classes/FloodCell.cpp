@@ -56,7 +56,7 @@ public:
                 totalCount += count;
 
                 if (totalCount / srcTotal > sizeThreshold || fill >= maxClassCount) 
-                    break; // just taking up to the top 255 largest objects found.
+                    break; // just taking up to the top X largest objects found.
                 fill++;
             }
         }

@@ -113,7 +113,7 @@ Partial Class OptionsRedCloud
         Me.RedCloudSliders.Controls.Add(Me.Label2)
         Me.RedCloudSliders.Location = New System.Drawing.Point(12, 257)
         Me.RedCloudSliders.Name = "RedCloudSliders"
-        Me.RedCloudSliders.Size = New System.Drawing.Size(831, 300)
+        Me.RedCloudSliders.Size = New System.Drawing.Size(763, 300)
         Me.RedCloudSliders.TabIndex = 2
         Me.RedCloudSliders.TabStop = False
         '
@@ -239,7 +239,7 @@ Partial Class OptionsRedCloud
         Me.RGBSource.Controls.Add(Me.LUT_Basics)
         Me.RGBSource.Controls.Add(Me.Reduction_Basics)
         Me.RGBSource.Controls.Add(Me.BackProject_Full)
-        Me.RGBSource.Location = New System.Drawing.Point(1088, 31)
+        Me.RGBSource.Location = New System.Drawing.Point(1019, 31)
         Me.RGBSource.Name = "RGBSource"
         Me.RGBSource.Size = New System.Drawing.Size(250, 220)
         Me.RGBSource.TabIndex = 3
@@ -317,7 +317,7 @@ Partial Class OptionsRedCloud
         Me.ReductionTypeGroup.Controls.Add(Me.NoReduction)
         Me.ReductionTypeGroup.Controls.Add(Me.BitwiseReduction)
         Me.ReductionTypeGroup.Controls.Add(Me.SimpleReduction)
-        Me.ReductionTypeGroup.Location = New System.Drawing.Point(1088, 257)
+        Me.ReductionTypeGroup.Location = New System.Drawing.Point(1019, 257)
         Me.ReductionTypeGroup.Name = "ReductionTypeGroup"
         Me.ReductionTypeGroup.Size = New System.Drawing.Size(250, 129)
         Me.ReductionTypeGroup.TabIndex = 5
@@ -365,9 +365,9 @@ Partial Class OptionsRedCloud
         Me.ReductionSliders.Controls.Add(Me.ColorLabel)
         Me.ReductionSliders.Controls.Add(Me.SimpleReductionSlider)
         Me.ReductionSliders.Controls.Add(Me.ColorReduce)
-        Me.ReductionSliders.Location = New System.Drawing.Point(861, 490)
+        Me.ReductionSliders.Location = New System.Drawing.Point(792, 490)
         Me.ReductionSliders.Name = "ReductionSliders"
-        Me.ReductionSliders.Size = New System.Drawing.Size(831, 140)
+        Me.ReductionSliders.Size = New System.Drawing.Size(779, 140)
         Me.ReductionSliders.TabIndex = 6
         Me.ReductionSliders.TabStop = False
         Me.ReductionSliders.Text = "Reduction Sliders"
@@ -437,7 +437,7 @@ Partial Class OptionsRedCloud
         Me.RedCloudOnly.Controls.Add(Me.ZReduction)
         Me.RedCloudOnly.Controls.Add(Me.YReduction)
         Me.RedCloudOnly.Controls.Add(Me.XReduction)
-        Me.RedCloudOnly.Location = New System.Drawing.Point(861, 23)
+        Me.RedCloudOnly.Location = New System.Drawing.Point(792, 23)
         Me.RedCloudOnly.Name = "RedCloudOnly"
         Me.RedCloudOnly.Size = New System.Drawing.Size(220, 289)
         Me.RedCloudOnly.TabIndex = 7
@@ -525,7 +525,7 @@ Partial Class OptionsRedCloud
         '
         Me.GroupBox1.Controls.Add(Me.RedCloud_Core)
         Me.GroupBox1.Controls.Add(Me.GuidedBP_Depth)
-        Me.GroupBox1.Location = New System.Drawing.Point(861, 340)
+        Me.GroupBox1.Location = New System.Drawing.Point(792, 340)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(220, 112)
         Me.GroupBox1.TabIndex = 5
@@ -559,7 +559,7 @@ Partial Class OptionsRedCloud
         Me.RedCloudType.Controls.Add(Me.UseDepthAndColor)
         Me.RedCloudType.Controls.Add(Me.UseDepth)
         Me.RedCloudType.Controls.Add(Me.UseColor)
-        Me.RedCloudType.Location = New System.Drawing.Point(1366, 38)
+        Me.RedCloudType.Location = New System.Drawing.Point(1297, 38)
         Me.RedCloudType.Name = "RedCloudType"
         Me.RedCloudType.Size = New System.Drawing.Size(220, 135)
         Me.RedCloudType.TabIndex = 8
@@ -612,7 +612,7 @@ Partial Class OptionsRedCloud
         Me.GroupBox2.Controls.Add(Me.Label3)
         Me.GroupBox2.Location = New System.Drawing.Point(12, 4)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(831, 255)
+        Me.GroupBox2.Size = New System.Drawing.Size(763, 255)
         Me.GroupBox2.TabIndex = 9
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Histogram 3D Options"
@@ -671,7 +671,7 @@ Partial Class OptionsRedCloud
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(152, 48)
         Me.Label5.TabIndex = 27
-        Me.Label5.Text = "Desired Cell Count"
+        Me.Label5.Text = "Desired RedMin Cells"
         '
         'LabelimageSizePercent
         '
@@ -699,13 +699,13 @@ Partial Class OptionsRedCloud
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(152, 48)
         Me.Label3.TabIndex = 24
-        Me.Label3.Text = "Image Threshold %"
+        Me.Label3.Text = "RedMin Image %"
         '
         'OptionsRedCloud
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1700, 642)
+        Me.ClientSize = New System.Drawing.Size(1585, 642)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.RedCloudType)
         Me.Controls.Add(Me.GroupBox1)

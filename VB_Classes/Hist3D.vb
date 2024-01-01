@@ -126,7 +126,6 @@ End Class
 Public Class Hist3D_RedMin : Inherits VB_Algorithm
     Dim rMin As New RedMin_Basics
     Dim hColor As New Hist3Dcolor_Basics
-    Dim cellSelect As New RedMin_Select
     Public Sub New()
         redOptions.UseColor.Checked = True
         advice = "redOptions '3D Histogram Bins' "
@@ -141,9 +140,7 @@ Public Class Hist3D_RedMin : Inherits VB_Algorithm
         dst2 = rMin.dst3
         labels(2) = rMin.labels(3)
 
-        cellSelect.Run(src)
-        Dim rp = task.cellSelect
-        If rp.index <> 0 Then dst2(rp.rect).SetTo(cv.Scalar.White, rp.mask)
+        If task.cellSelect.index <> 0 Then dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
     End Sub
 End Class
 

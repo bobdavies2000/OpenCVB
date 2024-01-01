@@ -90,8 +90,8 @@ Public Class RedColor_FeatureLess : Inherits VB_Algorithm
         Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
         Dim imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), 0, src.Rows, src.Cols, src.Type,
-                                 redOptions.imageThresholdPercent, redOptions.DesiredCellSlider.Value,
-                                 gOptions.PixelDiffThreshold.Value)
+                                     redOptions.imageThresholdPercent, redOptions.DesiredCellSlider.Value,
+                                     gOptions.PixelDiffThreshold.Value)
         handleInput.Free()
 
         dst2 = New cv.Mat(src.Rows, src.Cols, cv.MatType.CV_8U, imagePtr)
@@ -221,18 +221,19 @@ End Class
 
 
 Public Class RedColor_InputColor : Inherits VB_Algorithm
-    Public colorC As New RedMin_Basics
+    Public rMin As New RedMin_Basics
     Dim color As New Color_Basics
     Public Sub New()
         desc = "Floodfill the transformed color output and create cells to be tracked."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         color.Run(src)
-        colorC.Run(color.dst2)
+        rMin.Run(color.dst2)
 
-        dst2 = colorC.dst2
-        dst3 = colorC.dst3
-        labels(2) = colorC.labels(2)
+        dst2 = rMin.dst2
+        dst3 = rMin.dst3
+        labels(2) = rMin.labels(2)
+        labels(3) = rMin.labels(3)
     End Sub
 End Class
 
@@ -250,11 +251,11 @@ Public Class RedColor_LeftRight : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         fCellsLeft.Run(task.leftView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst2 = fCellsLeft.dst3
-        labels(2) = fCellsLeft.colorC.labels(3)
+        labels(2) = fCellsLeft.rMin.labels(3)
 
         fCellsRight.Run(task.rightView.CvtColor(cv.ColorConversionCodes.BGR2GRAY))
         dst3 = fCellsRight.dst3
-        labels(3) = fCellsRight.colorC.labels(3)
+        labels(3) = fCellsRight.rMin.labels(3)
     End Sub
 End Class
 
