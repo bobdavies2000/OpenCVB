@@ -14,7 +14,7 @@ Public Class RedMin_Basics : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         minCore.Run(src)
-        If useMotion Then rMotion.Run(src)
+        If useMotion Then rMotion.Run(task.color.Clone)
 
         Dim lastColors = dst3.Clone
         If heartBeat() Then minCells.Clear()

@@ -136,8 +136,8 @@ End Class
 
 
 
-Public Class Foreground_RedCloud : Inherits VB_Algorithm
-    Dim redC As New RedMin_Basics
+Public Class Foreground_RedMin : Inherits VB_Algorithm
+    Dim rMin As New RedMin_Basics
     Dim hist3D As New Hist3D_DepthTier
     Public Sub New()
         redOptions.UseColor.Checked = True
@@ -148,9 +148,9 @@ Public Class Foreground_RedCloud : Inherits VB_Algorithm
         hist3D.Run(src)
         dst3 = hist3D.dst3
 
-        redC.minCore.inputMask = hist3D.dst1
-        redC.Run(hist3D.dst2)
-        dst2 = redC.dst2
-        labels(2) = redC.labels(2)
+        rMin.minCore.inputMask = hist3D.dst0
+        rMin.Run(hist3D.dst2)
+        dst2 = rMin.dst3
+        labels(2) = rMin.labels(3)
     End Sub
 End Class
