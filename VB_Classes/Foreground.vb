@@ -141,7 +141,8 @@ Public Class Foreground_RedMin : Inherits VB_Algorithm
     Dim hist3D As New Hist3D_DepthTier
     Public Sub New()
         redOptions.UseColor.Checked = True
-        advice = ""
+        labels(3) = "Output of Hist3D_DepthTier, input to RedMin_Basics"
+        advice = "redOptions '3D Histogram Bins' " + vbCrLf + "redOptions other 'Histogram 3D Options'"
         desc = "Run the foreground through RedCloud_Basics "
     End Sub
     Public Sub RunVB(src As cv.Mat)

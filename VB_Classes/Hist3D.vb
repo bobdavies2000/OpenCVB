@@ -13,7 +13,7 @@ Public Class Hist3D_Basics : Inherits VB_Algorithm
         End If
 
         labels = {"", "", "Sum of 8UC1 outputs of Hist3Dcolor_Basics and Hist3Dcloud_basics", ""}
-        advice = "Primary: redOptions '3D Histogram Bins' "
+        advice = "redOptions '3D Histogram Bins' "
         desc = "Build an 8UC1 image by adding Hist3Dcolor_Basics and Hist3Dcloud_Basics output"
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -46,7 +46,7 @@ Public Class Hist3D_BuildHistogram : Inherits VB_Algorithm
     Public classCount As Integer
     Public histArray() As Single
     Public Sub New()
-        advice = "Primary: redOptions '3D Histogram Bins'" + vbCrLf
+        advice = "redOptions '3D Histogram Bins'" + vbCrLf
         desc = "Build a simulated (guided) 3D histogram from the 3D histogram supplied in src."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -102,7 +102,7 @@ Public Class Hist3D_RedCloud : Inherits VB_Algorithm
     Public Sub New()
         redOptions.UseColor.Checked = True
         labels = {"", "", "Grayscale", "dst3Label"}
-        advice = "Primary: redOptions '3D Histogram Bins' "
+        advice = "redOptions '3D Histogram Bins' "
         desc = "Run RedCloud_Basics on the combined Hist3D color/cloud output."
     End Sub
     Public Sub RunVB(src As cv.Mat)
@@ -129,7 +129,7 @@ Public Class Hist3D_RedMin : Inherits VB_Algorithm
     Dim cellSelect As New RedMin_Select
     Public Sub New()
         redOptions.UseColor.Checked = True
-        advice = "Primary: redOptions '3D Histogram Bins' "
+        advice = "redOptions '3D Histogram Bins' "
         desc = "Run RedMin_Basics on the Hist3D color output."
     End Sub
     Public Sub RunVB(src As cv.Mat)
