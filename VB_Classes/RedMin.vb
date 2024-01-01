@@ -80,7 +80,7 @@ End Class
 Public Class RedMin_Core : Inherits VB_Algorithm
     Public minCells As New List(Of rcPrep)
     Public minL2D As New List(Of rcPrep)
-    Public maskInput As cv.Mat
+    Public inputMask As cv.Mat
     Public Sub New()
         cPtr = FloodCell_Open()
         desc = "Another minimalist approach to building RedCloud color-based cells."
@@ -93,7 +93,7 @@ Public Class RedMin_Core : Inherits VB_Algorithm
         End If
 
         Dim imagePtr As IntPtr
-        If maskInput Is Nothing Then
+        If inputMask Is Nothing Then
             Dim inputData(src.Total - 1) As Byte
             Marshal.Copy(src.Data, inputData, 0, inputData.Length)
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
@@ -106,8 +106,8 @@ Public Class RedMin_Core : Inherits VB_Algorithm
             Marshal.Copy(src.Data, inputData, 0, inputData.Length)
             Dim handleInput = GCHandle.Alloc(inputData, GCHandleType.Pinned)
 
-            Dim maskData(maskInput.Total - 1) As Byte
-            Marshal.Copy(maskInput.Data, maskData, 0, maskData.Length)
+            Dim maskData(inputMask.Total - 1) As Byte
+            Marshal.Copy(inputMask.Data, maskData, 0, maskData.Length)
             Dim handleMask = GCHandle.Alloc(maskData, GCHandleType.Pinned)
 
             imagePtr = FloodCell_Run(cPtr, handleInput.AddrOfPinnedObject(), handleMask.AddrOfPinnedObject(), src.Rows, src.Cols,
@@ -250,7 +250,7 @@ Public Class RedMin_PixelVector3D : Inherits VB_Algorithm
             pixelVector.Clear()
             strOut = "3D histogram counts for each cell - 10 largest only for readability..." + vbCrLf
             For Each rp In rMin.minCells
-                hColor.maskInput = rp.mask
+                hColor.inputMask = rp.mask
                 hColor.Run(src(rp.rect))
                 pixelVector.Add(hColor.histArray.ToList)
                 strOut += "(" + CStr(rp.index) + ") "

@@ -1456,6 +1456,7 @@ End Class
 
 Public Class OpenGL_ProfileSweep : Inherits VB_Algorithm
     Dim visuals As New OpenGL_Profile
+    Dim options As New Options_IMU
     Public Sub New()
         If standalone Then gOptions.displayDst1.Checked = True
         gOptions.gravityPointCloud.Checked = False
@@ -1466,9 +1467,10 @@ Public Class OpenGL_ProfileSweep : Inherits VB_Algorithm
         If task.frameCount Mod 100 = 0 Then
             testCase += 1
             If testCase >= 3 Then testCase = 0
-            task.depthBasics.IMUOptions.rotateX = -45
-            task.depthBasics.IMUOptions.rotateY = -45
-            task.depthBasics.IMUOptions.rotateZ = -45
+            options.RunVB()
+            options.rotateX = -45
+            options.rotateY = -45
+            options.rotateZ = -45
         End If
 
         Dim bump = 1

@@ -4,8 +4,7 @@ Public Class Hist3Dcolor_Basics : Inherits VB_Algorithm
     Public histogram As New cv.Mat
     Public histogram1D As New cv.Mat
     Public classCount As Integer
-    Public options As New Options_HistXD
-    Public maskInput As New cv.Mat
+    Public inputMask As New cv.Mat
     Public histArray() As Single
     Public simK As New Hist3D_BuildHistogram
     Public alwaysRun As Boolean
@@ -14,12 +13,10 @@ Public Class Hist3Dcolor_Basics : Inherits VB_Algorithm
         desc = "Capture a 3D color histogram, find the gaps, and backproject the clusters found."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
         If heartBeat() Or alwaysRun Then
             If src.Channels <> 3 Then src = task.color
             Dim bins = redOptions.HistBinSlider.Value
-            cv.Cv2.CalcHist({src}, {0, 1, 2}, maskInput, histogram, 3, {bins, bins, bins}, redOptions.rangesBGR)
+            cv.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, {bins, bins, bins}, redOptions.rangesBGR)
 
             ReDim histArray(histogram.Total - 1)
             Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
@@ -345,7 +342,7 @@ Public Class Hist3Dcolor_Dominant : Inherits VB_Algorithm
         Dim bins3D =
         dst1.SetTo(0)
         For Each rp In rMin.minCells
-            hColor.maskInput = rp.mask
+            hColor.inputMask = rp.mask
             hColor.Run(src(rp.rect))
             Dim index = hColor.histArray.ToList.IndexOf(hColor.histArray.Max)
 

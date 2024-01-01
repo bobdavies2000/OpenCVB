@@ -257,7 +257,6 @@ End Class
 
 
 Public Class BackProject2D_Filter : Inherits VB_Algorithm
-    Public options As New Options_HistXD
     Public threshold As Integer
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_32FC3, 0)
@@ -265,8 +264,6 @@ Public Class BackProject2D_Filter : Inherits VB_Algorithm
         desc = "Filter a 2D histogram for the backprojection."
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
         If standalone Then
             cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, src, 2, task.bins2D, task.rangesSide)
         End If
@@ -292,14 +289,17 @@ End Class
 
 Public Class BackProject2D_FilterSide : Inherits VB_Algorithm
     Public filter As New BackProject2D_Filter
+    Dim options As New Options_HistXD
     Public Sub New()
         desc = "Backproject the output of the Side View after removing low sample bins."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
         Dim input As New cv.Mat
         cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, input, 2, task.bins2D, task.rangesSide)
 
-        filter.threshold = filter.options.sideThreshold
+        filter.threshold = options.sideThreshold
         filter.Run(input)
 
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsSide, filter.dst2, dst1, task.rangesSide)
@@ -319,14 +319,17 @@ End Class
 
 Public Class BackProject2D_FilterTop : Inherits VB_Algorithm
     Dim filter As New BackProject2D_Filter
+    Dim options As New Options_HistXD
     Public Sub New()
         desc = "Backproject the output of the Side View after removing low sample bins."
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
         Dim histogram As New cv.Mat
         cv.Cv2.CalcHist({task.pointCloud}, task.channelsSide, New cv.Mat, histogram, 2, task.bins2D, task.rangesSide)
 
-        filter.threshold = filter.options.topThreshold
+        filter.threshold = options.topThreshold
         filter.Run(histogram)
 
         cv.Cv2.CalcBackProject({task.pointCloud}, task.channelsTop, filter.dst2, dst1, task.rangesTop)

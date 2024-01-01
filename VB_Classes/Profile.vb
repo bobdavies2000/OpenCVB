@@ -98,6 +98,7 @@ Public Class Profile_Rotation : Inherits VB_Algorithm
     Public gMat As New IMU_GMatrix
     Public strMsg As String = "Then use the 'Options_IMU' sliders to rotate the cell" + vbCrLf +
                               "It is a common mistake to the OpenGL sliders to try to move cell but they don't - use 'Options_IMU' sliders"
+    Dim options As New Options_IMU
     Public Sub New()
         If standalone Then gOptions.gravityPointCloud.Checked = False
         labels(2) = "Top matrix is the current gMatrix while the bottom one includes the Y-axis rotation."
@@ -114,13 +115,14 @@ Public Class Profile_Rotation : Inherits VB_Algorithm
         gMat.Run(src)
 
         If standalone Then
+            options.RunVB()
             strOut = "Gravity-oriented gMatrix" + vbCrLf
             strOut += gMatrixToStr(task.gMatrix) + vbCrLf
             strOut += vbCrLf + "New gMatrix from sliders" + vbCrLf
             strOut += gMatrixToStr(gMat.gMatrix) + vbCrLf + vbCrLf
-            strOut += "Angle X = " + Format(task.depthBasics.IMUOptions.rotateX, fmt1) + vbCrLf
-            strOut += "Angle Y = " + Format(task.depthBasics.IMUOptions.rotateY, fmt1) + vbCrLf
-            strOut += "Angle Z = " + Format(task.depthBasics.IMUOptions.rotateZ, fmt1) + vbCrLf
+            strOut += "Angle X = " + Format(options.rotateX, fmt1) + vbCrLf
+            strOut += "Angle Y = " + Format(options.rotateY, fmt1) + vbCrLf
+            strOut += "Angle Z = " + Format(options.rotateZ, fmt1) + vbCrLf
             setTrueText(strOut + vbCrLf + vbCrLf + strMsg)
         End If
     End Sub

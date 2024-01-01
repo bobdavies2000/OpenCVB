@@ -6,7 +6,6 @@ Public Class Depth_Basics : Inherits VB_Algorithm
     Public gMat As New IMU_GMatrix
     Public colorizer As New Depth_Colorizer_CPP
     Public IMUBasics As New IMU_Basics
-    Public IMUOptions As New Options_IMU
     Dim hCloud As New History_Cloud
     Dim outline As New Depth_Outline
     Dim maxMask As New Depth_MaxMask
@@ -19,8 +18,6 @@ Public Class Depth_Basics : Inherits VB_Algorithm
             dst3 = task.maxDepthMask
             setTrueText(gMatrixToStr(task.gMatrix), 3)
         Else
-
-            IMUOptions.RunVB()
             IMUBasics.Run(Nothing)
 
             gMat.Run(Nothing)

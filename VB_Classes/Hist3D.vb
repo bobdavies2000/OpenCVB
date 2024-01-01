@@ -163,7 +163,7 @@ Public Class Hist3D_DepthTier : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         fore.Run(src)
         dst1 = fore.fg Or task.noDepthMask
-        hColor.maskInput = dst1
+        hColor.inputMask = dst1
         dst0 = Not dst1
 
         src.SetTo(0, dst0)

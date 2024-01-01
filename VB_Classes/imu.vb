@@ -1,19 +1,13 @@
-Imports System.Windows.Controls
-Imports System.Windows.Ink
-Imports System.Windows.Media.Imaging
-Imports OpenCvSharp
 Imports cv = OpenCvSharp
 ' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
 Public Class IMU_Basics : Inherits VB_Algorithm
     Dim lastTimeStamp As Double
     Public alpha As Double = 0.5
-    Dim options As New Options_IMU
     Public Sub New()
         desc = "Read and display the IMU coordinates"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        options.RunVB()
-
+        Dim optionsAlpha As Single = 0.98 ' use options_IMU to get flexible values - here we want to avoid options.
         Dim gyroAngle As cv.Point3f
         If task.optionsChanged Then
             lastTimeStamp = task.IMU_TimeStamp
@@ -37,9 +31,9 @@ Public Class IMU_Basics : Inherits VB_Algorithm
             ' Apply the Complementary Filter:
             '  - high-pass filter = theta * alpha: allows short-duration signals to pass while filtering steady signals (trying to cancel drift)
             '  - low-pass filter = accel * (1 - alpha): lets the long-term changes through, filtering out short term fluctuations
-            task.theta.X = task.theta.X * options.alpha + task.accRadians.X * (1 - options.alpha)
+            task.theta.X = task.theta.X * optionsAlpha + task.accRadians.X * (1 - optionsAlpha)
             task.theta.Y = task.accRadians.Y
-            task.theta.Z = task.theta.Z * options.alpha + task.accRadians.Z * (1 - options.alpha)
+            task.theta.Z = task.theta.Z * optionsAlpha + task.accRadians.Z * (1 - optionsAlpha)
         End If
 
         Dim x1 = -(90 + task.accRadians.X * 57.2958)
@@ -944,5 +938,67 @@ Public Class IMU_PlotHostFrameScalar : Inherits VB_Algorithm
             dst3 = plot.dst3
             setTrueText(strOut, 1)
         End If
+    End Sub
+End Class
+
+
+
+
+
+
+' https://github.com/IntelRealSense/librealsense/tree/master/examples/motion
+Public Class IMU_BasicsWithOptions : Inherits VB_Algorithm
+    Dim lastTimeStamp As Double
+    Public alpha As Double = 0.5
+    Dim options As New Options_IMU
+    Public Sub New()
+        desc = "Read and display the IMU coordinates"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
+
+        Dim gyroAngle As cv.Point3f
+        If task.optionsChanged Then
+            lastTimeStamp = task.IMU_TimeStamp
+        Else
+            gyroAngle = task.IMU_AngularVelocity
+            Dim dt_gyro = (task.IMU_TimeStamp - lastTimeStamp) / 1000
+            If task.cameraName <> "Intel(R) RealSense(TM) Depth Camera 435i" Then dt_gyro /= 1000 ' different units in the timestamp?
+            gyroAngle = gyroAngle * dt_gyro
+            task.theta += New cv.Point3f(-gyroAngle.Z, -gyroAngle.Y, gyroAngle.X)
+            lastTimeStamp = task.IMU_TimeStamp
+        End If
+
+        ' NOTE: Initialize the angle around the y-axis to zero.
+        Dim g = task.IMU_RawAcceleration
+        task.accRadians = New cv.Point3f(Math.Atan2(g.X, Math.Sqrt(g.Y * g.Y + g.Z * g.Z)),
+                                         Math.Abs(Math.Atan2(g.X, g.Y)), Math.Atan2(g.Y, g.Z))
+
+        If task.optionsChanged Then
+            task.theta = task.accRadians
+        Else
+            ' Apply the Complementary Filter:
+            '  - high-pass filter = theta * alpha: allows short-duration signals to pass while filtering steady signals (trying to cancel drift)
+            '  - low-pass filter = accel * (1 - alpha): lets the long-term changes through, filtering out short term fluctuations
+            task.theta.X = task.theta.X * options.alpha + task.accRadians.X * (1 - options.alpha)
+            task.theta.Y = task.accRadians.Y
+            task.theta.Z = task.theta.Z * options.alpha + task.accRadians.Z * (1 - options.alpha)
+        End If
+
+        Dim x1 = -(90 + task.accRadians.X * 57.2958)
+        Dim x2 = -(90 + task.theta.X * 57.2958)
+        Dim y1 = task.accRadians.Y - cv.Cv2.PI
+        If task.accRadians.X < 0 Then y1 *= -1
+        strOut = "Angles in degree to gravity (before velocity filter)" + vbCrLf +
+                 Format(x1, fmt1) + vbTab + Format(y1 * 57.2958, fmt1) + vbTab + Format(task.accRadians.Z * 57.2958, fmt1) + vbCrLf +
+                 "Velocity-Filtered Angles to gravity in degrees" + vbCrLf +
+                 Format(x2, fmt1) + vbTab + Format(y1 * 57.2958, fmt1) + vbTab + Format(task.theta.Z * 57.2958, fmt1) + vbCrLf
+        setTrueText(strOut)
+
+        task.accRadians = task.theta
+        If task.accRadians.Y > cv.Cv2.PI / 2 Then task.accRadians.Y -= cv.Cv2.PI / 2
+        task.accRadians.Z += cv.Cv2.PI / 2
+
+        setTrueText(strOut)
     End Sub
 End Class

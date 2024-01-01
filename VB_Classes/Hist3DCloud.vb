@@ -247,7 +247,7 @@ Public Class Hist3Dcloud_Dominant : Inherits VB_Algorithm
         Dim bins3D =
         dst1.SetTo(0)
         For Each rp In rMin.minCells
-            hColor.maskInput = rp.mask
+            hColor.inputMask = rp.mask
             hColor.Run(src(rp.rect))
             Dim index = hColor.histArray.ToList.IndexOf(hColor.histArray.Max)
 

@@ -230,7 +230,7 @@ Public Class Distance_RedMin : Inherits VB_Algorithm
         distances.Clear()
         For i = 0 To rMin.minCells.Count - 1
             Dim rp = rMin.minCells(i)
-            hColor.maskInput = rp.mask
+            hColor.inputMask = rp.mask
             hColor.Run(src(rp.rect))
 
             Dim nextD = distanceFromZero(hColor.histArray.ToList)
@@ -319,7 +319,7 @@ Public Class Distance_D3Cells : Inherits VB_Algorithm
             rm.rect = rp.rect
             rm.index = i + 1
 
-            hColor.maskInput = rp.mask
+            hColor.inputMask = rp.mask
             hColor.Run(src(rp.rect))
             rm.histogram = hColor.histogram.Clone
             rm.histList = hColor.histArray.ToList

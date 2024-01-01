@@ -128,3 +128,29 @@ Public Class Foreground_Hist3D : Inherits VB_Algorithm
         End If
     End Sub
 End Class
+
+
+
+
+
+
+
+
+Public Class Foreground_RedCloud : Inherits VB_Algorithm
+    Dim redC As New RedMin_Basics
+    Dim hist3D As New Hist3D_DepthTier
+    Public Sub New()
+        redOptions.UseColor.Checked = True
+        advice = ""
+        desc = "Run the foreground through RedCloud_Basics "
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        hist3D.Run(src)
+        dst3 = hist3D.dst3
+
+        redC.minCore.inputMask = hist3D.dst1
+        redC.Run(hist3D.dst2)
+        dst2 = redC.dst2
+        labels(2) = redC.labels(2)
+    End Sub
+End Class
