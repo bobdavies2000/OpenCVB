@@ -154,12 +154,21 @@ Public Class Hist3D_DepthTier : Inherits VB_Algorithm
     Dim fore As New Foreground_Hist3D
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
+        If findfrm(traceName + " Radio Options") Is Nothing Then
+            radio.Setup(traceName)
+            radio.addRadio("Process Foreground")
+            radio.addRadio("Process Background")
+            radio.check(0).Checked = True
+        End If
+
         advice = ""
         desc = "Isolate the foreground and no depth in the image and run it through Hist3D_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        Static fgRadio = findRadio("Process Foreground")
+
         fore.Run(src)
-        dst1 = fore.fg Or task.noDepthMask
+        dst1 = If(fgRadio.Checked, fore.dst2, fore.dst3) Or task.noDepthMask
         hColor.inputMask = dst1
         dst0 = Not dst1
 

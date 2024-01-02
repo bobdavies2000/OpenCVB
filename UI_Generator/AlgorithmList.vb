@@ -72,6 +72,7 @@ if algorithmName = "Area_SoloPoints" Then return new Area_SoloPoints
 if algorithmName = "AsciiArt_Basics" Then return new AsciiArt_Basics
 if algorithmName = "AsciiArt_Diff" Then return new AsciiArt_Diff
 if algorithmName = "AsciiArt_Gray" Then return new AsciiArt_Gray
+if algorithmName = "Background_RedMin" Then return new Background_RedMin
 if algorithmName = "BackProject_Basics" Then return new BackProject_Basics
 if algorithmName = "BackProject_BasicsKeyboard" Then return new BackProject_BasicsKeyboard
 if algorithmName = "BackProject_Depth" Then return new BackProject_Depth

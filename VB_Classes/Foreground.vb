@@ -88,7 +88,7 @@ End Class
 
 
 Public Class Foreground_Contours : Inherits VB_Algorithm
-    Public fore As New Foreground_Basics
+    Public fore As New Foreground_Hist3D
     Dim contours As New Contour_Basics
     Public Sub New()
         desc = "Create contours for the foreground mask"
@@ -96,7 +96,7 @@ Public Class Foreground_Contours : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         fore.Run(src)
 
-        contours.Run(fore.fg)
+        contours.Run(fore.dst2)
         dst2 = contours.dst2
     End Sub
 End Class
@@ -108,7 +108,6 @@ End Class
 
 Public Class Foreground_Hist3D : Inherits VB_Algorithm
     Dim hcloud As New Hist3Dcloud_Basics
-    Public fg As New cv.Mat
     Public Sub New()
         hcloud.maskInput = task.noDepthMask
 
@@ -120,12 +119,8 @@ Public Class Foreground_Hist3D : Inherits VB_Algorithm
         hcloud.Run(src)
 
         dst2.SetTo(0)
-        fg = hcloud.dst2.InRange(1, 1)
-        src.CopyTo(dst2, fg)
-        If standalone Or testIntermediate(traceName) Then
-            dst3.SetTo(0)
-            src.CopyTo(dst3, Not fg)
-        End If
+        dst2 = hcloud.dst2.InRange(1, 1) Or task.noDepthMask
+        dst3 = Not dst2
     End Sub
 End Class
 
@@ -142,7 +137,7 @@ Public Class Foreground_RedMin : Inherits VB_Algorithm
     Public minCells As New List(Of rcPrep)
     Public Sub New()
         redOptions.UseColor.Checked = True
-        labels(3) = "Output of Hist3D_DepthTier, input to RedMin_Basics"
+        labels = {"", "", "Foreground mask", "Background mask"}
         advice = "redOptions '3D Histogram Bins' " + vbCrLf + "redOptions other 'Histogram 3D Options'"
         desc = "Run the foreground through RedCloud_Basics "
     End Sub
