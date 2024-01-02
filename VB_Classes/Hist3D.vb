@@ -150,25 +150,42 @@ End Class
 
 
 
-Public Class Hist3D_DepthTier : Inherits VB_Algorithm
-    Dim fore As New Foreground_Hist3D
+Public Class Hist3D_DepthMask : Inherits VB_Algorithm
     Dim hColor As New Hist3Dcolor_Basics
     Public Sub New()
-        If findfrm(traceName + " Radio Options") Is Nothing Then
-            radio.Setup(traceName)
-            radio.addRadio("Process Foreground")
-            radio.addRadio("Process Background")
-            radio.check(0).Checked = True
-        End If
-
         advice = ""
         desc = "Isolate the foreground and no depth in the image and run it through Hist3D_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        Static fgRadio = findRadio("Process Foreground")
+        hColor.inputMask = src
+        hColor.Run(src)
+        dst2 = hColor.dst2
 
+        dst2.SetTo(0, Not src)
+
+        dst3 = hColor.dst3
+        dst3.SetTo(0, dst0)
+        labels = hColor.labels
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class Hist3D_DepthFore : Inherits VB_Algorithm
+    Dim fore As New Foreground_Hist3D
+    Dim hColor As New Hist3Dcolor_Basics
+    Public depthMask As New cv.Mat
+    Public Sub New()
+        advice = ""
+        desc = "Isolate the foreground and no depth in the image and run it through Hist3D_Basics"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
         fore.Run(src)
-        dst1 = If(fgRadio.Checked, fore.dst2, fore.dst3) Or task.noDepthMask
+        dst1 = fore.dst2 Or task.noDepthMask
         hColor.inputMask = dst1
         dst0 = Not dst1
 
