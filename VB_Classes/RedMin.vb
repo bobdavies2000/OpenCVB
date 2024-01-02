@@ -4,6 +4,8 @@ Public Class RedMin_Basics : Inherits VB_Algorithm
     Public minCore As New RedMin_Core
     Public minCells As New List(Of rcPrep)
     Public rMotion As New RedMin_Motion
+    Dim lastColors = dst3.Clone
+    Dim lastMap As cv.Mat = dst2.Clone
     Public Sub New()
         redOptions.DesiredCellSlider.Value = 30
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -17,14 +19,13 @@ Public Class RedMin_Basics : Inherits VB_Algorithm
         rMotion.Run(task.color.Clone)
 
         Dim lastCells As New List(Of rcPrep)(minCells)
-        Static lastColors = dst3.Clone
-        Static lastMap As cv.Mat = dst2.Clone
 
         minCells.Clear()
         dst2.SetTo(0)
         dst3.SetTo(0)
         Dim usedColors = New List(Of cv.Vec3b)({black})
         Dim motionCount As Integer
+        rMotion.dst3.SetTo(255)
         For Each cell In minCore.minCells
             Dim rp = cell.Value
             Dim index = lastMap.Get(Of Byte)(rp.maxDist.Y, rp.maxDist.X)

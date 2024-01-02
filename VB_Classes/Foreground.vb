@@ -1,4 +1,5 @@
-﻿Imports cv = OpenCvSharp
+﻿Imports System.Windows.Forms
+Imports cv = OpenCvSharp
 Public Class Foreground_Basics : Inherits VB_Algorithm
     Dim simK As New KMeans_Depth
     Public fgDepth As Single
@@ -110,8 +111,7 @@ Public Class Foreground_Hist3D : Inherits VB_Algorithm
     Dim hcloud As New Hist3Dcloud_Basics
     Public Sub New()
         hcloud.maskInput = task.noDepthMask
-
-        labels = {"", "", "Foreground - use fore.fg", "Background"}
+        labels = {"", "", "Foreground", "Background"}
         advice = hcloud.advice
         desc = "Use the first class of hist3Dcloud_Basics as the definition of foreground"
     End Sub
@@ -128,60 +128,82 @@ End Class
 
 
 
-Public Class Foreground_RedMin : Inherits VB_Algorithm
-    Dim rMin As New RedMin_Basics
-    Dim hFG As New Hist3D_DepthFore
-    Public minCells As New List(Of rcPrep)
-    Public Sub New()
-        redOptions.UseColor.Checked = True
-        labels = {"", "", "Foreground mask", "Background mask"}
-        advice = "redOptions '3D Histogram Bins' " + vbCrLf + "redOptions other 'Histogram 3D Options'"
-        desc = "Run the foreground through RedCloud_Basics "
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        hFG.Run(src)
-        dst3 = hFG.dst3
-
-        rMin.minCore.inputMask = hFG.dst0
-        rMin.Run(hFG.dst2)
-        dst2 = rMin.dst3
-
-        Dim bg = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
-
-        If task.cellSelect.index <> 0 Then dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
-        labels(2) = rMin.labels(3)
-    End Sub
-End Class
-
-
-
-
-
-
-Public Class Foreground_RedMinNew : Inherits VB_Algorithm
-    Dim rMin As New RedMin_Basics
-    Dim hist3D As New Hist3D_DepthMask
-    Public minCells As New List(Of rcPrep)
+Public Class Foreground_RedMinFront : Inherits VB_Algorithm
     Dim fore As New Foreground_Hist3D
+    Public rMin As New RedMin_Basics
+    Dim hist3D As New Hist3D_DepthWithMask
+    Public minCells As New List(Of rcPrep)
     Public Sub New()
         redOptions.UseColor.Checked = True
-        labels = {"", "", "Foreground mask", "Background mask"}
         advice = "redOptions '3D Histogram Bins' " + vbCrLf + "redOptions other 'Histogram 3D Options'"
         desc = "Run the foreground through RedCloud_Basics "
     End Sub
     Public Sub RunVB(src As cv.Mat)
-        'fore.Run(src)
-        'hist3D.Run(fore.dst2 Or task.noDepthMask)
-        'dst3 = hist3D.dst3
+        fore.Run(src)
 
-        'rMin.minCore.inputMask = hist3D.dst0
-        'rMin.Run(hist3D.dst2)
-        'dst2 = rMin.dst3
+        hist3D.depthMask = fore.dst2 Or task.noDepthMask
+        hist3D.Run(src)
 
-        'Dim bg = dst2.CvtColor(cv.ColorConversionCodes.BGR2GRAY).Threshold(0, 255, cv.ThresholdTypes.BinaryInv)
+        rMin.minCore.inputMask = Not hist3D.depthMask
+        rMin.Run(hist3D.dst2)
 
-        'If task.cellSelect.index <> 0 Then dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
-
-        'labels(2) = rMin.labels(3)
+        dst2 = rMin.dst3.Clone
+        labels(2) = rMin.labels(3)
+        If task.cellSelect.index <> 0 Then dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
     End Sub
 End Class
+
+
+
+
+
+Public Class Foreground_RedMinBack : Inherits VB_Algorithm
+    Dim fore As New Foreground_Hist3D
+    Public rMin As New RedMin_Basics
+    Dim hist3D As New Hist3D_DepthWithMask
+    Public minCells As New List(Of rcPrep)
+    Public Sub New()
+        redOptions.UseColor.Checked = True
+        advice = "redOptions '3D Histogram Bins' " + vbCrLf + "redOptions other 'Histogram 3D Options'"
+        desc = "Run the foreground through RedCloud_Basics "
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        fore.Run(src)
+
+        hist3D.depthMask = fore.dst3 Or task.noDepthMask
+        hist3D.Run(src)
+
+        rMin.minCore.inputMask = Not hist3D.depthMask
+        rMin.Run(hist3D.dst2)
+
+        dst2 = rMin.dst3.Clone
+        dst2.SetTo(0, fore.dst2)
+
+        labels(2) = rMin.labels(3)
+        If task.cellSelect.index <> 0 Then dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
+    End Sub
+End Class
+
+
+
+
+
+Public Class Foreground_RedMin : Inherits VB_Algorithm
+    Dim fore As New Foreground_RedMinFront
+    Dim back As New Foreground_RedMinBack
+    Public Sub New()
+        advice = "redOptions '3D Histogram Bins' " + vbCrLf + "redOptions other 'Histogram 3D Options'"
+        desc = "Isolate foreground from background, then segment each with RedMin"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        fore.Run(src)
+        dst2 = fore.dst2
+        labels(2) = fore.labels(2)
+
+        back.Run(src)
+        dst3 = back.dst2
+        labels(3) = back.labels(2)
+        If task.cellSelect.index <> 0 Then dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
+    End Sub
+End Class
+
