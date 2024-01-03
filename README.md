@@ -1,33 +1,29 @@
-# Recent Changes – December 2023
+# Recent Changes – January 2024
 
 -   Over 1700 algorithms are included, averaging 31 lines of code per algorithm.
--   The 3D histogram improves the point cloud “blowback” pixels.
-    -   See the OpenGL_Filtered3D algorithm and images below.
--   All stable RedCloud cells are identified in color and depth.
-    -   See Cell_Stable for an alternative way to match cells.
--   This version introduces the concept of spectrum range for a cell.
-    -   Spectrum: values for depth or color that form a continuous range.
--   Spectrum algorithms will find the ranges of color/depth in RedCloud cells.
-    -   RedCloud cells already cluster color and depth samples.
-    -   Spectrum isolates outliers in color and depth to facilitate their removal.
-    -   Spectrum options define the gap sizes for depth and color.
--   Is there a simple way to define foreground and background automatically?
-    -   Use KMeans with depth input and k=2. See KMeans_Depth algorithm.
-    -   To see how to use foreground/background with GrabCut: GrabCut_Basics.
--   GifBuilder WPF warnings now gone – reworked it as a Windows Form application.
--   RedCloud depth ranges are more accurate thanks to the new rc.depthMask.
--   Contour masks for depth and ‘no depth’ were added to task structure.
-    -   Depth contour defines a boundary between depth and ‘no depth’.
--   New heartbeats were added at quarter second intervals.
-    -   All heartbeats are now time-based only (not FPS based.)
--   HistValley_Depth finds histogram valleys and separates depth into tiers.
--   Added RedMin algorithms to find a minimalist approach to RedCloud cells.
-    -   No requirement for a dummy cell at location 0, 0.
+-   Algorithm complexity can now be visualized with OpenCVB.
+    -   A new button will collect algorithm performance at all available resolutions.
+    -   The new button is shorthand for O(n), typically used to represent complexity.
+    -   The sample output below shows how complexity is exhibited in OpenCVB.
+
+![](media/23d812caee1e862dc86e2f5c3ebda343.png)
+
+![](media/9db905729a3de9758bbe122ad5b5a283.png)
+
+-   Also, note the presence of another new icon to the right of the Complexity icon.
+    -   The ‘Advice’ icon will display any advice associated with the algorithm.
+    -   Advice is usually just a list of options that impact the current algorithm.
+-   Reduced the default option presentations – overloaded and too detailed.
+    -   Algorithms that need all options use \<Algorithm Name\>WithOptions.
+-   Complementary problem with hidden important algorithm-specific options
+    -   Options can override the default to hide the option form at the side.
+    -   See Gif_Basics for an example of overriding the default to hide the form.
+-   Foreground in depth can be found using several methods in Foreground.vb.
 -   A log of changes is included at the bottom of this document.
 
-![](media/7e883a32a7ee8faaf76107f24eea917a.gif)
+![](media/bf94edf2ee5f261622a2e31f34db3d51.png)
 
-**OpenGL_Filtered3D:** *The histogram interface in OpenCV supports 3D point clouds where the bins can be thought of as 3D bricks in the 3D point cloud.  The ‘Histogram Bins’ slider controls a threshold that is used to zero out bricks that have fewer samples than the threshold. When the slider is set to zero, all the blowback pixels appear and extend behind the wall in this side angle view in OpenGL. Bins with less than the specified threshold are set to zero and the backprojection creates a mask that reduces the blowback. The camera used in this example is the Intel D455. The Microsoft Kinect for Azure camera is more accurate and does not have much blowback.*
+**Complexity_Basics:** *To collect complexity data, select any OpenCVB algorithm and click the ‘O’ button in the toolbar. This will run the algorithm for 30 seconds at each of the available resolutions – click the same button to stop data collection. After the data has been collected, use the “Complexity_Basics” algorithm to review the data. The right side of the image above shows all the algorithms that have data in the directory. The plot on the left side shows the plot for the algorithm selected in the options using the same scale. By default, the selected algorithm is the last one collected but a set of radio buttons in the options allows the data for other algorithms to be selected.*
 
 # Introduction
 
@@ -1160,3 +1156,34 @@ The heat map is a well-known method to display populations – blue is cool or l
 ![A collage of images of different colors Description automatically generated](media/aa767d146879de432a3a0208b65b6eca.gif)
 
 **RedCloud_Neighbors:** *The neighbors for each cell can be included in the cell information. Here the neighbors of the highlighted cell were requested and are shown in the lower right image.*
+
+# Recent Changes – December 2023
+
+-   Over 1700 algorithms are included, averaging 31 lines of code per algorithm.
+-   The 3D histogram improves the point cloud “blowback” pixels.
+    -   See the OpenGL_Filtered3D algorithm and images below.
+-   All stable RedCloud cells are identified in color and depth.
+    -   See Cell_Stable for an alternative way to match cells.
+-   This version introduces the concept of spectrum range for a cell.
+    -   Spectrum: values for depth or color that form a continuous range.
+-   Spectrum algorithms will find the ranges of color/depth in RedCloud cells.
+    -   RedCloud cells already cluster color and depth samples.
+    -   Spectrum isolates outliers in color and depth to facilitate their removal.
+    -   Spectrum options define the gap sizes for depth and color.
+-   Is there a simple way to define foreground and background automatically?
+    -   Use KMeans with depth input and k=2. See KMeans_Depth algorithm.
+    -   To see how to use foreground/background with GrabCut: GrabCut_Basics.
+-   GifBuilder WPF warnings now gone – reworked it as a Windows Form application.
+-   RedCloud depth ranges are more accurate thanks to the new rc.depthMask.
+-   Contour masks for depth and ‘no depth’ were added to task structure.
+    -   Depth contour defines a boundary between depth and ‘no depth’.
+-   New heartbeats were added at quarter second intervals.
+    -   All heartbeats are now time-based only (not FPS based.)
+-   HistValley_Depth finds histogram valleys and separates depth into tiers.
+-   Added RedMin algorithms to find a minimalist approach to RedCloud cells.
+    -   No requirement for a dummy cell at location 0, 0.
+-   A log of changes is included at the bottom of this document.
+
+![A computer generated image of a building Description automatically generated](media/7e883a32a7ee8faaf76107f24eea917a.gif)
+
+**OpenGL_Filtered3D:** *The histogram interface in OpenCV supports 3D point clouds where the bins can be thought of as 3D bricks in the 3D point cloud. The ‘Histogram Bins’ slider controls a threshold that is used to zero out bricks that have fewer samples than the threshold. When the slider is set to zero, all the blowback pixels appear and extend behind the wall in this side angle view in OpenGL. Bins with less than the specified threshold are set to zero and the backprojection creates a mask that reduces the blowback. The camera used in this example is the Intel D455. The Microsoft Kinect for Azure camera is more accurate and does not have much blowback.*
