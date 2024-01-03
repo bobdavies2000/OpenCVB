@@ -225,7 +225,7 @@ Public Class Distance_RedMin : Inherits VB_Algorithm
 
         Static distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
         Static lastDistances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDoubleInverted)
-        Static lastMinCells As New List(Of rcPrep)
+        Static lastMinCells As New List(Of segCell)
         pixelVector.Clear()
         distances.Clear()
         For i = 0 To rMin.minCells.Count - 1
@@ -288,7 +288,7 @@ Public Class Distance_RedMin : Inherits VB_Algorithm
             lastDistances.Add(el.Key, el.Value)
         Next
 
-        lastMinCells = New List(Of rcPrep)(rMin.minCells)
+        lastMinCells = New List(Of segCell)(rMin.minCells)
     End Sub
 End Class
 

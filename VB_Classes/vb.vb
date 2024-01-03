@@ -300,7 +300,7 @@ Module VB
     Public Function convertVec3bToScalar(vec As cv.Vec3b) As cv.Scalar
         Return New cv.Scalar(vec(0), vec(1), vec(2))
     End Function
-    Public Function vbGetMaxDist(ByRef rp As rcPrep) As cv.Point
+    Public Function vbGetMaxDist(ByRef rp As segCell) As cv.Point
         Dim mask = rp.mask.Clone
         mask.Rectangle(New cv.Rect(0, 0, mask.Width, mask.Height), 0, 1)
         Dim distance32f = mask.DistanceTransform(cv.DistanceTypes.L1, 0)
@@ -763,16 +763,14 @@ End Class
 
 
 
-Public Class rcPrep
+Public Class segCell
     Public rect As cv.Rect
     Public mask As cv.Mat
     Public floodPoint As cv.Point
     Public index As Integer
     Public pixels As Integer
     Public maxDist As cv.Point
-    Public gray As Integer
-    Public frameCount As Integer
-    Public motion As Boolean
+    Public motionFlag As Boolean
     Public color As cv.Vec3b
     Public Sub New()
     End Sub

@@ -25,9 +25,9 @@ Public Class MSER_Basics : Inherits VB_Algorithm
         boxes = New List(Of cv.Rect)(detect.boxes)
         floodPoints = New List(Of cv.Point)(detect.floodPoints)
 
-        Dim minCells As New SortedList(Of Integer, rcPrep)(New compareAllowIdenticalIntegerInverted)
+        Dim minCells As New SortedList(Of Integer, segCell)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To detect.boxes.Count - 1
-            Dim rp As New rcPrep
+            Dim rp As New segCell
             rp.rect = detect.boxes(i)
             rp.mask = detect.dst0(rp.rect).InRange(i, i)
             rp.floodPoint = floodPoints(i)
@@ -521,9 +521,9 @@ Public Class MSER_Regions : Inherits VB_Algorithm
 
         core.Run(src)
 
-        Dim minCells As New SortedList(Of Integer, rcPrep)(New compareAllowIdenticalIntegerInverted)
+        Dim minCells As New SortedList(Of Integer, segCell)(New compareAllowIdenticalIntegerInverted)
         For i = 0 To core.boxes.Count - 1
-            Dim rp As New rcPrep
+            Dim rp As New segCell
             rp.rect = core.boxes(i)
             rp.mask = New cv.Mat(rp.rect.Height, rp.rect.Width, cv.MatType.CV_8U, 0)
             rp.floodPoint = core.regions(i)(0)

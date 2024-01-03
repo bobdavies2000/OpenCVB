@@ -2,6 +2,28 @@ Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
 Public Class Motion_Basics : Inherits VB_Algorithm
+    Public motionCore As New Motion_Core
+    Dim sum8u As New History_Sum8u
+    Public Sub New()
+        gOptions.FrameHistory.Value = 10
+        desc = "Accumulate differences from the previous BGR images."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        motionCore.Run(src)
+        dst2 = motionCore.dst2
+
+        sum8u.Run(dst2)
+        dst3 = sum8u.dst2
+    End Sub
+End Class
+
+
+
+
+
+
+'  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
+Public Class Motion_Core : Inherits VB_Algorithm
     Public diff As New Diff_Basics
     Public cumulativePixels As Integer
     Public options As New Options_Motion
@@ -11,8 +33,8 @@ Public Class Motion_Basics : Inherits VB_Algorithm
         labels(3) = "Accumulated changed pixels from the last heartbeat"
         desc = "Accumulate differences from the previous BGR image."
     End Sub
-    Public Sub RunVB(src as cv.Mat)
-        Options.RunVB()
+    Public Sub RunVB(src As cv.Mat)
+        options.RunVB()
 
         diff.Run(src)
         dst2 = diff.dst3
@@ -401,7 +423,7 @@ Public Class Motion_Contours : Inherits VB_Algorithm
 
         motion.Run(src)
         dst3 = motion.dst2
-        changedPixels = motion.diff.changedPixels
+        changedPixels = motion.motionCore.diff.changedPixels
 
         If changedPixels > 0 Then
             cumulativePixels += changedPixels

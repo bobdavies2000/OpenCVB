@@ -227,7 +227,7 @@ Public Class VBtask : Implements IDisposable
 
     Public redOther As Integer = 0
     Public rcSelect As New rcData
-    Public cellSelect As New rcPrep
+    Public cellSelect As New segCell
     Public rcMatchMax As Integer
 
     Public useXYRange As Boolean ' OpenGL applications don't need to adjust the ranges.

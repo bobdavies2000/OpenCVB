@@ -6,7 +6,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
     Public overlappingCells As New List(Of Integer)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
 
-    Dim minCells As New List(Of rcPrep)
+    Dim minCells As New List(Of segCell)
     Dim combine As New RedCloud_Combine
 
     Dim lastCellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -33,7 +33,7 @@ Public Class RedCloud_Basics : Inherits VB_Algorithm
         dst.Circle(rc.maxDStable, task.dotSize + 2, cv.Scalar.Black, -1, task.lineType)
         dst.Circle(rc.maxDStable, task.dotSize, cv.Scalar.White, -1, task.lineType)
     End Sub
-    Private Function matchPreviousCell(rp As rcPrep) As rcData
+    Private Function matchPreviousCell(rp As segCell) As rcData
         Dim rc = New rcData, lrc As New rcData
         rc.rect = rp.rect
         rc.motionRect = rc.rect
@@ -204,7 +204,7 @@ Public Class RedCloud_BasicsOld : Inherits VB_Algorithm
     Public overlappingCells As New List(Of rcData)
     Public cellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
 
-    Dim minCells As New List(Of rcPrep)
+    Dim minCells As New List(Of segCell)
     Dim combine As New RedCloud_Combine
 
     Dim lastCellMap As New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
@@ -214,7 +214,7 @@ Public Class RedCloud_BasicsOld : Inherits VB_Algorithm
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         desc = "Match cells from the previous generation"
     End Sub
-    Private Function matchPreviousCell(rp As rcPrep) As rcData
+    Private Function matchPreviousCell(rp As segCell) As rcData
         Dim rc = New rcData, lrc As New rcData
         rc.index = rp.index
         rc.rect = rp.rect
@@ -376,16 +376,16 @@ End Class
 
 
 Public Class RedCloud_MatchCell : Inherits VB_Algorithm
-    Public rp As New rcPrep
+    Public rp As New segCell
     Public rc As New rcData
     Public lastCellMap As New cv.Mat
     Public lastCells As New List(Of rcData)
     Public usedColors As New List(Of cv.Vec3b)
     Public Sub New()
         dst3 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)
-        strOut = "RedCloud_MatchCell takes an rcPrep cell and builds an rcData cell." + vbCrLf +
-                 "When standalone, it just build a fake rcPrep cell and displays the rcData equivalent."
-        desc = "Build a RedCloud cell from the rcPrep input"
+        strOut = "RedCloud_MatchCell takes an segCell cell and builds an rcData cell." + vbCrLf +
+                 "When standalone, it just build a fake segCell cell and displays the rcData equivalent."
+        desc = "Build a RedCloud cell from the segCell input"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone And heartBeat() Then
@@ -2078,7 +2078,7 @@ Public Class RedCloud_Combine : Inherits VB_Algorithm
     Dim color As New Color_Basics
     Public guided As New GuidedBP_Depth
     Dim redP As New RedCloud_CPP
-    Public minCells As New List(Of rcPrep)
+    Public minCells As New List(Of segCell)
     Public Sub New()
         desc = "Combined the color and cloud as indicated in the RedOptions panel."
     End Sub
@@ -2131,7 +2131,7 @@ End Class
 
 
 Public Class RedCloud_CPP : Inherits VB_Algorithm
-    Public minCells As New List(Of rcPrep)
+    Public minCells As New List(Of segCell)
     Public classCount As Integer
     Public Sub New()
         cPtr = RedCloud_Open()
@@ -2176,7 +2176,7 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
         Dim floodFlag = 4 Or cv.FloodFillFlags.FixedRange
 
         minCells.Clear()
-        Dim other = New rcPrep
+        Dim other = New segCell
         other.mask = New cv.Mat(1, 1, cv.MatType.CV_8U, 255)
         other.rect = New cv.Rect(0, 0, 1, 1)
         minCells.Add(other)
@@ -2190,7 +2190,7 @@ Public Class RedCloud_CPP : Inherits VB_Algorithm
         classCount = 1
         Dim colorRun = redOptions.UseColor.Checked
         For i = 0 To floodPoints.Count - 1
-            Dim rp As New rcPrep
+            Dim rp As New segCell
             fill = classCount
             rp.floodPoint = floodPoints(i)
             If mask.Get(Of Byte)(rp.floodPoint.Y, rp.floodPoint.X) = 0 Then
