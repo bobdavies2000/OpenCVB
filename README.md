@@ -6,12 +6,13 @@
     -   The new button is shorthand for O(n), typically used to represent complexity.
     -   The sample output below highlights the complexity icon in OpenCVB.
 
-![](media/c1b13edc9034591b22cc25f3041c5aa5.png)
+![](media/11e21246b61a18500926fa8d55db2d0b.png)
 
 -   Also, note the presence of another new icon to the right of the Complexity icon.
     -   The ‘Advice’ icon will display any advice associated with the algorithm.
     -   Advice is usually just a list of options that impact the current algorithm.
--   Reduced the default option presentations – overloaded and too detailed.
+    -   Only a few algorithms include the advice feature but more are coming.
+-   Default options were reduced – overloaded and too detailed.
     -   Algorithms that need all options use \<Algorithm Name\>WithOptions.
 -   Complementary problem with hidden important algorithm-specific options
     -   Options can override the default to hide the option form at the side.
