@@ -772,6 +772,7 @@ Public Class rcPrep
     Public maxDist As cv.Point
     Public gray As Integer
     Public frameCount As Integer
+    Public motion As Boolean
     Public color As cv.Vec3b
     Public Sub New()
     End Sub

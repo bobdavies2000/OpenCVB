@@ -475,7 +475,7 @@ End Class
 
 
 Public Class Motion_MinRect : Inherits VB_Algorithm
-    Public motion As New Motion_BasicsNew
+    Public motion As New Motion_BasicsTest
     Dim mRect As New Area_MinRect
     Public Sub New()
         dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
@@ -518,7 +518,7 @@ End Class
 
 
 '  https://github.com/methylDragon/opencv-motion-detector/blob/master/Motion%20Detector.py
-Public Class Motion_BasicsNew : Inherits VB_Algorithm
+Public Class Motion_BasicsTest : Inherits VB_Algorithm
     Public cumulativePixels As Integer
     Public Sub New()
         dst2 = New cv.Mat(dst2.Size, cv.MatType.CV_8U, 0)

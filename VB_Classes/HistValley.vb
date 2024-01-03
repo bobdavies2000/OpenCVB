@@ -35,7 +35,10 @@ Public Class HistValley_Basics : Inherits VB_Algorithm
             Dim nextVal = start + testList.IndexOf(testList.Min)
             valleys.Add(nextVal)
         Next
-        If standalone Then updatePlot(dst2, task.histogramBins)
+        If standalone Then
+            updatePlot(dst2, task.histogramBins)
+            setTrueText("Input data used by default is the color image", 3)
+        End If
     End Sub
 End Class
 
@@ -225,53 +228,6 @@ End Class
 
 
 
-Public Class HistValley_LeftRight : Inherits VB_Algorithm
-    Dim valley As New HistValley_Lines
-    Public Sub New()
-        If standalone Then gOptions.displayDst0.Checked = True
-        If standalone Then gOptions.displayDst1.Checked = True
-        labels = {"Left view histogram", "Right view histogram", "Backprojection left view", "BackProjection right view"}
-        desc = "Use the same list of histogram valleys on the left and right images"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        valley.Run(task.leftView)
-        dst2 = valley.dst3
-        dst0 = valley.dst2
-
-        valley.Run(task.rightview)
-        dst3 = valley.dst3
-        dst1 = valley.dst2
-    End Sub
-End Class
-
-
-
-
-
-
-
-Public Class HistValley_Lines : Inherits VB_Algorithm
-    Dim lines As New Line_Basics
-    Dim valley As New HistValley_Basics
-    Public Sub New()
-        gOptions.LineType.SelectedItem = "Link4"
-        desc = "Insert lines in the color image to help isolate color boundaries"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        If task.paused = False Then lines.Run(src)
-
-        src.SetTo(cv.Scalar.Black, lines.dst3)
-        valley.Run(src)
-        dst2 = valley.dst2
-        dst3 = valley.dst3
-    End Sub
-End Class
-
-
-
-
-
-
 Public Class HistValley_Diff : Inherits VB_Algorithm
     Dim diff As New Diff_Basics
     Dim valley As New HistValley_Basics
@@ -283,7 +239,7 @@ Public Class HistValley_Diff : Inherits VB_Algorithm
         valley.Run(src)
         dst2 = valley.dst2
 
-        diff.Run(valley.dst3)
+        diff.Run(valley.dst2)
         dst3 = diff.dst2
         dst1 = diff.dst3
     End Sub
@@ -422,8 +378,11 @@ Public Class HistValley_Peaks : Inherits VB_Algorithm
         options.RunVB()
         Dim desiredBoundaries = options.desiredBoundaries
 
-        If standalone Then src = task.pcSplit(2)
-        If src.Type <> cv.MatType.CV_32FC1 Then
+        If standalone Then
+            src = task.pcSplit(2)
+            setTrueText("Default input when running standalone is the depth data.", 3)
+        End If
+        If src.Type <> cv.MatType.CV_32FC1 Or standalone Then
             src = task.pcSplit(2)
             hist.Run(src)
             dst2 = hist.dst2
@@ -480,3 +439,4 @@ Public Class HistValley_Peaks : Inherits VB_Algorithm
         labels(2) = CStr(peaks.Count - 2) + " peaks (marked at top) were found in the histogram"
     End Sub
 End Class
+

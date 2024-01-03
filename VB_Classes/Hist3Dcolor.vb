@@ -306,6 +306,7 @@ Public Class Hist3Dcolor_Diff : Inherits VB_Algorithm
     Dim diff As New Diff_Basics
     Public Sub New()
         gOptions.PixelDiffThreshold.Value = 0
+        dst3 = New cv.Mat(dst3.Size, cv.MatType.CV_8U, 0)
         advice = "redOptions '3D Histogram Bins'" + vbCrLf + "goptions 'Pixel Difference'"
         desc = "Create a mask for the color pixels that are changing with every frame of the Hist3Dcolor_basics."
     End Sub
@@ -315,6 +316,8 @@ Public Class Hist3Dcolor_Diff : Inherits VB_Algorithm
         labels(2) = hColor.labels(3)
 
         diff.Run(hColor.dst2)
-        dst3 = diff.dst3
+
+        If heartBeat() Then dst3.SetTo(0)
+        dst3 = dst3 Or diff.dst3
     End Sub
 End Class
