@@ -4,11 +4,9 @@
 -   Algorithm complexity can now be visualized with OpenCVB.
     -   A new button will collect algorithm performance at all available resolutions.
     -   The new button is shorthand for O(n), typically used to represent complexity.
-    -   The sample output below shows how complexity is exhibited in OpenCVB.
+    -   The sample output below highlights the complexity icon in OpenCVB.
 
-![](media/23d812caee1e862dc86e2f5c3ebda343.png)
-
-![](media/9db905729a3de9758bbe122ad5b5a283.png)
+![](media/c1b13edc9034591b22cc25f3041c5aa5.png)
 
 -   Also, note the presence of another new icon to the right of the Complexity icon.
     -   The ‘Advice’ icon will display any advice associated with the algorithm.
