@@ -71,6 +71,7 @@
     <ClCompile Include="Random_PatternGenerator.cpp" />
     <ClCompile Include="recursiveBilateralFilter.cpp" />
     <ClCompile Include="RedCloud.cpp" />
+    <ClCompile Include="RedMin.cpp" />
     <ClCompile Include="Retina.cpp" />
     <ClCompile Include="Salience.cpp" />
     <ClCompile Include="SemiGlobalMatching.cpp" />

@@ -172,3 +172,36 @@ Public Class Hist3D_DepthWithMask : Inherits VB_Algorithm
         labels = hColor.labels
     End Sub
 End Class
+
+
+
+
+
+
+Public Class Hist3D_Learn1 : Inherits VB_Algorithm
+    Dim histogram As New cv.Mat
+    Dim histArray() As Single
+    Public classCount As Integer
+    Public Sub New()
+        advice = ""
+        desc = "Learn what pixels are in the largest RedMin cell and find all of them in the image."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels <> 3 Then src = task.color
+        Dim bins = redOptions.HistBinSlider.Value
+        cv.Cv2.CalcHist({src}, {0, 1, 2}, New cv.Mat, histogram, 3, {bins, bins, bins}, redOptions.rangesBGR)
+
+        ReDim histArray(histogram.Total - 1)
+        Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+
+        For i = 0 To histArray.Count - 1
+            histArray(i) = i + 1
+        Next
+
+        classCount = redOptions.bins3D
+        Marshal.Copy(histArray, 0, histogram.Data, histArray.Length)
+
+        cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, redOptions.rangesBGR)
+        dst3 = If(classCount < 256, vbPalette(dst2 * 255 / classCount), vbPalette(dst2))
+    End Sub
+End Class

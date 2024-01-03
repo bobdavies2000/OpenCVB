@@ -91,9 +91,11 @@ private:
 public:
     vector <int> cellList;
     RedCloud_FindCells() {}
-    void RunCPP(Mat src) {
+    void RunCPP(Mat src) 
+    {
         cellList.clear();
         for (int y = 0; y < src.rows; y++)
+        {
             for (int x = 0; x < src.cols; x++)
             {
                 auto val = src.at<unsigned char>(y, x);
@@ -103,6 +105,7 @@ public:
                         cellList.push_back(val);
                 }
             }
+        }
     }
 };
 extern "C" __declspec(dllexport)

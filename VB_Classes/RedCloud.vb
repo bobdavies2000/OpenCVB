@@ -576,6 +576,23 @@ Module Red_Module
 
 
 
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedMin_FindPixels_Open() As IntPtr
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Sub RedMin_FindPixels_Close(cPtr As IntPtr)
+    End Sub
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedMin_FindPixels_RunCPP(cPtr As IntPtr, dataPtr As IntPtr, rows As Integer, cols As Integer) As Integer
+    End Function
+    <DllImport(("CPP_Classes.dll"), CallingConvention:=CallingConvention.Cdecl)>
+    Public Function RedMin_FindPixels_Sizes(cPtr As IntPtr) As IntPtr
+    End Function
+
+
+
+
+
     Public Function shapeCorrelation(points As List(Of cv.Point)) As Single
         Dim pts As New cv.Mat(points.Count, 1, cv.MatType.CV_32SC2, points.ToArray)
         Dim pts32f As New cv.Mat
