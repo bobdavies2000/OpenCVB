@@ -3721,6 +3721,7 @@ Public Class Options_Gif : Inherits VB_Algorithm
         Static frmCheck = findfrm("Options_Gif CheckBoxes")
         Static frmRadio = findfrm("Options_Gif Radio Buttons")
         If firstPass Then
+            firstPass = False
             frmCheck.Left = gOptions.Width / 2
             frmCheck.top = gOptions.Height / 2
             frmRadio.left = gOptions.Width * 2 / 3
@@ -4233,6 +4234,7 @@ Public Class Options_Spectrum : Inherits VB_Algorithm
         sampleThreshold = countSlider.value
 
         If firstPass Then
+            firstPass = False
             frmSliders.Left = gOptions.Width / 2
             frmSliders.top = gOptions.Height / 2
         End If
@@ -4311,5 +4313,10 @@ Public Class Options_Complexity : Inherits VB_Algorithm
                 Exit For
             End If
         Next
+        If firstpass Then
+            firstpass = False
+            frm.Left = gOptions.Width / 2
+            frm.top = gOptions.Height / 2
+        End If
     End Sub
 End Class
