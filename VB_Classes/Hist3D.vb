@@ -178,13 +178,13 @@ End Class
 
 
 
-Public Class Hist3D_Learn1 : Inherits VB_Algorithm
-    Dim histogram As New cv.Mat
-    Dim histArray() As Single
+Public Class Hist3D_Pixel : Inherits VB_Algorithm
+    Public histogram As New cv.Mat
+    Public histArray() As Single
     Public classCount As Integer
     Public Sub New()
-        advice = ""
-        desc = "Learn what pixels are in the largest RedMin cell and find all of them in the image."
+        advice = "redOptions '3D Histogram Bins' "
+        desc = "Classify each pixel using a 3D histogram backprojection."
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If src.Channels <> 3 Then src = task.color
@@ -203,5 +203,63 @@ Public Class Hist3D_Learn1 : Inherits VB_Algorithm
 
         cv.Cv2.CalcBackProject({src}, {0, 1, 2}, histogram, dst2, redOptions.rangesBGR)
         dst3 = If(classCount < 256, vbPalette(dst2 * 255 / classCount), vbPalette(dst2))
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Hist3D_PixelCells : Inherits VB_Algorithm
+    Dim pixel As New Hist3D_Pixel
+    Dim rMin As New RedMin_Basics
+    Public Sub New()
+        dst1 = New cv.Mat(dst1.Size, cv.MatType.CV_8U, 0)
+        dst0 = New cv.Mat(dst0.Size, cv.MatType.CV_8U, 0)
+        advice = ""
+        desc = "After classifying each pixel, backproject each RedMin cell using the same 3D histogram."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        rMin.Run(src)
+        dst2 = rMin.dst2
+        labels(2) = rMin.labels(3)
+
+        pixel.Run(src)
+
+        dst0.SetTo(0)
+        For Each cell In rMin.minCells
+            cv.Cv2.CalcBackProject({src(cell.rect)}, {0, 1, 2}, pixel.histogram, dst1(cell.rect), redOptions.rangesBGR)
+            dst1(cell.rect).CopyTo(dst0(cell.rect), cell.mask)
+        Next
+
+        dst3 = vbPalette(dst0 * 255 / redOptions.bins3D)
+    End Sub
+End Class
+
+
+
+
+
+
+
+
+Public Class Hist3D_PixelClassify : Inherits VB_Algorithm
+    Dim pixel As New Hist3D_Pixel
+    Dim rMin As New RedMin_Basics
+    Public Sub New()
+        advice = ""
+        desc = "Classify each pixel with a 3D histogram backprojection and run RedMin_Basics on the output."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        pixel.Run(src)
+
+        rMin.Run(pixel.dst2)
+        dst2 = rMin.dst3
+        labels(2) = rMin.labels(3)
+
+        If task.cellSelect.index <> 0 Then dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
     End Sub
 End Class
