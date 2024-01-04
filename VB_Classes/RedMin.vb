@@ -464,3 +464,26 @@ Public Class RedMin_FindPixels_CPP : Inherits VB_Algorithm
         RedMin_FindPixels_Close(cPtr)
     End Sub
 End Class
+
+
+
+
+
+
+Public Class RedMin_PixelClassifier : Inherits VB_Algorithm
+    Dim pixel As New Hist3D_Pixel
+    Dim rMin As New RedMin_Basics
+    Public Sub New()
+        advice = ""
+        desc = "Speed up RedMin_Basics by using the backprojection of the 3D color histogram."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        pixel.Run(src)
+
+        rMin.Run(pixel.dst2)
+        dst2 = rMin.dst3
+        labels(2) = rMin.labels(3)
+
+        If task.cellSelect.index <> 0 Then dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
+    End Sub
+End Class

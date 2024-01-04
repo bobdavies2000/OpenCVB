@@ -1,5 +1,7 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
+Imports System.Windows.Forms
+
 Public Class Hist3D_Basics : Inherits VB_Algorithm
     Dim hColor As New Hist3Dcolor_Basics
     Dim hCloud As New Hist3Dcloud_Basics
@@ -158,6 +160,11 @@ Public Class Hist3D_DepthWithMask : Inherits VB_Algorithm
         desc = "Isolate the foreground and no depth in the image and run it through Hist3D_Basics"
     End Sub
     Public Sub RunVB(src As cv.Mat)
+        If standalone Or testIntermediate(traceName) Then
+            Static fore As New Foreground_Hist3D
+            fore.Run(src)
+            depthMask = fore.dst2 Or task.noDepthMask
+        End If
         hColor.inputMask = depthMask
         dst0 = Not depthMask
 
@@ -261,5 +268,29 @@ Public Class Hist3D_PixelClassify : Inherits VB_Algorithm
         labels(2) = rMin.labels(3)
 
         If task.cellSelect.index <> 0 Then dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Hist3D_PixelSum : Inherits VB_Algorithm
+    Dim pixel As New Hist3D_Pixel
+    Dim sum8u As New History_Sum8uNoSaturation
+    Dim rMin As New RedMin_Basics
+    Public Sub New()
+        advice = ""
+        desc = "Build a more consistent pixel classifier using the sum8u history."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        pixel.Run(src)
+
+        sum8u.Run(pixel.dst2)
+
+        rMin.Run(sum8u.dst2)
+        dst2 = rMin.dst3
+        labels(2) = rMin.labels(3)
     End Sub
 End Class
