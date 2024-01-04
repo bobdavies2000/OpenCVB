@@ -161,7 +161,7 @@ Public Class Hist3D_DepthWithMask : Inherits VB_Algorithm
     End Sub
     Public Sub RunVB(src As cv.Mat)
         If standalone Or testIntermediate(traceName) Then
-            Static fore As New Foreground_Hist3D
+            Static fore As New Foreground_KMeans2
             fore.Run(src)
             depthMask = fore.dst2 Or task.noDepthMask
         End If
