@@ -36,39 +36,6 @@ End Class
 
 
 
-Public Class History_Sum8uNoSaturation : Inherits VB_Algorithm
-    Public saveFrames As New List(Of cv.Mat)
-    Public Sub New()
-        desc = "Create a frame history and sum the last X frames (without saturation!)"
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        Dim input = src.Clone
-        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
-        If input.Type <> cv.MatType.CV_32F Then input.ConvertTo(input, cv.MatType.CV_32F)
-        If dst3.Type <> input.Type Or dst3.Channels <> input.Channels Then dst3 = New cv.Mat(input.Size, input.Type, 0)
-        input.ConvertTo(input, cv.MatType.CV_32F)
-        input /= 255 ' input is all zeros or ones.
-
-        If task.optionsChanged Then
-            saveFrames.Clear()
-            dst3.SetTo(0)
-        End If
-
-        If saveFrames.Count >= task.historyCount Then
-            dst3 = dst3.Subtract(saveFrames.ElementAt(0))
-            saveFrames.RemoveAt(0)
-        End If
-
-        saveFrames.Add(input)
-        dst3 += input
-        dst1 = 255 * dst3 / saveFrames.Count
-        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
-    End Sub
-End Class
-
-
-
-
 
 
 
@@ -221,5 +188,61 @@ Public Class History_Cloud : Inherits VB_Algorithm
 
         sum8u.Run(task.depthMask)
         dst2.SetTo(0, Not sum8u.dst2)
+    End Sub
+End Class
+
+
+
+
+
+Public Class History_Sum8uNoSaturation : Inherits VB_Algorithm
+    Public saveFrames As New List(Of cv.Mat)
+    Public Sub New()
+        desc = "Create a frame history and sum the last X frames (without saturation!)"
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        Dim input = src.Clone
+        If input.Channels <> 1 Then input = input.CvtColor(cv.ColorConversionCodes.BGR2GRAY)
+        If input.Type <> cv.MatType.CV_32F Then input.ConvertTo(input, cv.MatType.CV_32F)
+        If dst3.Type <> input.Type Or dst3.Channels <> input.Channels Then dst3 = New cv.Mat(input.Size, input.Type, 0)
+        input /= 255 ' input is all zeros or ones.
+
+        If task.optionsChanged Then
+            saveFrames.Clear()
+            dst3.SetTo(0)
+        End If
+
+        If saveFrames.Count >= task.historyCount Then
+            dst3 = dst3.Subtract(saveFrames.ElementAt(0))
+            saveFrames.RemoveAt(0)
+        End If
+
+        saveFrames.Add(input)
+        dst3 += input
+        dst1 = 255 * dst3 / saveFrames.Count
+        dst1.ConvertTo(dst2, cv.MatType.CV_8U)
+    End Sub
+End Class
+
+
+
+
+
+
+
+Public Class History_Sum8uDiff : Inherits VB_Algorithm
+    Dim sum8u As New History_Sum8uNoSaturation
+    Dim diff As New Diff_Basics
+    Public Sub New()
+        gOptions.PixelDiffThreshold.Value = 0
+        advice = ""
+        desc = "Find the floodfill trouble spots."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        sum8u.Run(src)
+        dst2 = vbPalette(sum8u.dst2)
+
+        diff.Run(sum8u.dst2)
+        dst3 = diff.dst2
     End Sub
 End Class

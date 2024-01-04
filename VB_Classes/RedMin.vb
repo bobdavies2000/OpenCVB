@@ -3,7 +3,7 @@ Imports System.Runtime.InteropServices
 Public Class RedMin_Basics : Inherits VB_Algorithm
     Public minCore As New RedMin_Core
     Public minCells As New List(Of segCell)
-    Dim lastColors = dst3.Clone
+    Dim lastColors As cv.Mat
     Dim lastMap As cv.Mat = dst2.Clone
     Public Sub New()
         redOptions.DesiredCellSlider.Value = 30
@@ -14,6 +14,7 @@ Public Class RedMin_Basics : Inherits VB_Algorithm
     Public Sub RunVB(src As cv.Mat)
         minCore.Run(src)
         Dim lastCells As New List(Of segCell)(minCells)
+        If firstPass Then lastColors = dst3.Clone
 
         minCells.Clear()
         dst2.SetTo(0)

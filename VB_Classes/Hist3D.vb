@@ -276,21 +276,24 @@ End Class
 
 
 
-Public Class Hist3D_PixelSum : Inherits VB_Algorithm
+Public Class Hist3D_PixelDiffMask : Inherits VB_Algorithm
     Dim pixel As New Hist3D_Pixel
     Dim sum8u As New History_Sum8uNoSaturation
     Dim rMin As New RedMin_Basics
     Public Sub New()
         advice = ""
-        desc = "Build a more consistent pixel classifier using the sum8u history."
+        desc = "Build better image segmentation - remove unstable pixels from 3D color histogram backprojection"
     End Sub
     Public Sub RunVB(src As cv.Mat)
         pixel.Run(src)
+        Static lastImage As cv.Mat = pixel.dst2.Clone
+        cv.Cv2.Absdiff(lastImage, pixel.dst2, dst3)
+        dst2 = dst3.Threshold(0, 255, cv.ThresholdTypes.Binary)
+        lastImage = pixel.dst2.Clone
 
-        sum8u.Run(pixel.dst2)
-
-        rMin.Run(sum8u.dst2)
-        dst2 = rMin.dst3
-        labels(2) = rMin.labels(3)
+        rMin.minCore.inputMask = dst2
+        rMin.Run(pixel.dst2)
+        dst3 = rMin.dst3.Clone
+        labels(3) = rMin.labels(3)
     End Sub
 End Class

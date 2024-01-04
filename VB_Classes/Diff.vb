@@ -52,7 +52,6 @@ End Class
 Public Class Diff_UnstableDepthAndColor : Inherits VB_Algorithm
     Public diff As New Diff_Basics
     Public depth As New Depth_NotMissing
-    Dim lastFrames() As cv.Mat
     Public Sub New()
         labels = {"", "", "Stable depth and color", "Unstable depth/color mask"}
         desc = "Build a mask for any pixels that have either unstable depth or color"
