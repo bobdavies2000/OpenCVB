@@ -1,7 +1,5 @@
 ﻿Imports cv = OpenCvSharp
 Imports System.Runtime.InteropServices
-Imports System.Windows.Forms
-
 Public Class Hist3D_Basics : Inherits VB_Algorithm
     Dim hColor As New Hist3Dcolor_Basics
     Dim hCloud As New Hist3Dcloud_Basics
@@ -295,5 +293,56 @@ Public Class Hist3D_PixelDiffMask : Inherits VB_Algorithm
         rMin.Run(pixel.dst2)
         dst3 = rMin.dst3.Clone
         labels(3) = rMin.labels(3)
+    End Sub
+End Class
+
+
+
+
+
+
+Public Class Hist3D_RedMinGrid : Inherits VB_Algorithm
+    Dim rMin As New RedMin_PixelVectors
+    Dim hVector As New Hist3Dcolor_Vector
+    Public Sub New()
+        gOptions.GridSize.Value = 8
+        advice = ""
+        desc = "Build RedMin pixel vectors and then measure each grid element's distance to those vectors."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        rMin.Run(src)
+        dst2 = rMin.dst2
+        dst3 = dst2.InRange(0, 0)
+        If rMin.pixelVector.Count = 0 Then Exit Sub
+        dst1.SetTo(0)
+        dst0 = rMin.rMin.dst2
+        For Each roi In task.gridList
+            If dst3(roi).CountNonZero Then
+                Dim candidates As New List(Of Integer)
+                For y = 0 To roi.Height - 1
+                    For x = 0 To roi.Width - 1
+                        Dim val = dst0(roi).Get(Of Byte)(y, x)
+                        If val = 0 Then Continue For
+                        If candidates.Contains(val) = False Then candidates.Add(val)
+                    Next
+                Next
+                If candidates.Count > 1 Then
+                    hVector.inputMask = dst3(roi)
+                    hVector.Run(src(roi))
+                    Dim distances As New List(Of Double)
+                    For Each index In candidates
+                        Dim vec = rMin.pixelVector(index - 1)
+                        distances.Add(distanceN(vec, hVector.histArray))
+                    Next
+                    Dim cell = rMin.minCells(candidates(distances.IndexOf(distances.Min)) - 1)
+                    dst1(roi).SetTo(cell.color, dst3(roi))
+                    dst2(roi).SetTo(cell.color, dst3(roi))
+                ElseIf candidates.Count = 1 Then
+                    Dim cell = rMin.minCells(candidates(0) - 1)
+                    dst1(roi).SetTo(cell.color, dst3(roi))
+                    dst2(roi).SetTo(cell.color, dst3(roi))
+                End If
+            End If
+        Next
     End Sub
 End Class

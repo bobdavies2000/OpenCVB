@@ -265,53 +265,6 @@ End Class
 
 
 
-Public Class RedMin_PixelVector3D : Inherits VB_Algorithm
-    Dim rMin As New RedMin_Basics
-    Dim hColor As New Hist3Dcolor_Basics
-    Public pixelVector As New List(Of List(Of Single))
-    Public Sub New()
-        If standalone Then gOptions.displayDst1.Checked = True
-        redOptions.HistBinSlider.Value = 3
-        labels = {"", "RedMin_Basics output", "3D Histogram counts for each of the cells at left", ""}
-        desc = "Identify RedMin cells and create a vector for each cell's 3D histogram."
-    End Sub
-    Public Sub RunVB(src As cv.Mat)
-        rMin.Run(src)
-        Dim maxRegion = 20
-
-        Static distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
-        If heartBeat() Then
-            pixelVector.Clear()
-            strOut = "3D histogram counts for each cell - " + CStr(maxRegion) + " largest only for readability..." + vbCrLf
-            For Each cell In rMin.minCells
-                hColor.inputMask = cell.mask
-                hColor.Run(src(cell.rect))
-                pixelVector.Add(hColor.histArray.ToList)
-                strOut += "(" + CStr(cell.index) + ") "
-                For Each count In hColor.histArray
-                    strOut += CStr(count) + ","
-                Next
-                strOut += vbCrLf
-                If cell.index >= maxRegion Then Exit For
-            Next
-        End If
-        setTrueText(strOut, 3)
-
-        dst1.SetTo(0)
-        dst2.SetTo(0)
-        For Each cell In rMin.minCells
-            task.color(cell.rect).CopyTo(dst2(cell.rect), cell.mask)
-            dst1(cell.rect).SetTo(cell.color, cell.mask)
-            If cell.index <= maxRegion Then setTrueText(CStr(cell.index), cell.maxDist, 2)
-        Next
-        labels(2) = rMin.labels(3)
-    End Sub
-End Class
-
-
-
-
-
 
 
 Public Class RedMin_Blobs : Inherits VB_Algorithm
@@ -486,5 +439,83 @@ Public Class RedMin_PixelClassifier : Inherits VB_Algorithm
         labels(2) = rMin.labels(3)
 
         If task.cellSelect.index <> 0 Then dst2(task.cellSelect.rect).SetTo(cv.Scalar.White, task.cellSelect.mask)
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedMin_PixelVector3D : Inherits VB_Algorithm
+    Dim rMin As New RedMin_Basics
+    Dim hColor As New Hist3Dcolor_Basics
+    Public pixelVector As New List(Of List(Of Single))
+    Public Sub New()
+        If standalone Then gOptions.displayDst1.Checked = True
+        redOptions.HistBinSlider.Value = 3
+        labels = {"", "RedMin_Basics output", "3D Histogram counts for each of the cells at left", ""}
+        desc = "Identify RedMin cells and create a vector for each cell's 3D histogram."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        rMin.Run(src)
+        Dim maxRegion = 20
+
+        Static distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
+        If heartBeat() Then
+            pixelVector.Clear()
+            strOut = "3D histogram counts for each cell - " + CStr(maxRegion) + " largest only for readability..." + vbCrLf
+            For Each cell In rMin.minCells
+                hColor.inputMask = cell.mask
+                hColor.Run(src(cell.rect))
+                pixelVector.Add(hColor.histArray.ToList)
+                strOut += "(" + CStr(cell.index) + ") "
+                For Each count In hColor.histArray
+                    strOut += CStr(count) + ","
+                Next
+                strOut += vbCrLf
+                If cell.index >= maxRegion Then Exit For
+            Next
+        End If
+        setTrueText(strOut, 3)
+
+        dst1.SetTo(0)
+        dst2.SetTo(0)
+        For Each cell In rMin.minCells
+            task.color(cell.rect).CopyTo(dst2(cell.rect), cell.mask)
+            dst1(cell.rect).SetTo(cell.color, cell.mask)
+            If cell.index <= maxRegion Then setTrueText(CStr(cell.index), cell.maxDist, 2)
+        Next
+        labels(2) = rMin.labels(3)
+    End Sub
+End Class
+
+
+
+
+
+Public Class RedMin_PixelVectors : Inherits VB_Algorithm
+    Public rMin As New RedMin_Basics
+    Dim hVector As New Hist3Dcolor_Vector
+    Public pixelVector As New List(Of Single())
+    Public minCells As New List(Of segCell)
+    Public Sub New()
+        labels = {"", "", "RedMin_Basics output", ""}
+        desc = "Create a vector for each cell's 3D histogram."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        rMin.Run(src)
+        dst2 = rMin.dst3
+        labels(2) = rMin.labels(3)
+
+        Static distances As New SortedList(Of Double, Integer)(New compareAllowIdenticalDouble)
+        pixelVector.Clear()
+        For Each cell In rMin.minCells
+            hVector.inputMask = cell.mask
+            hVector.Run(src(cell.rect))
+            pixelVector.Add(hVector.histArray)
+        Next
+        minCells = rMin.minCells
+
+        setTrueText("3D color histograms were created for " + CStr(pixelVector.Count) + " cells", 3)
     End Sub
 End Class

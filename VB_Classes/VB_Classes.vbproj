@@ -116,6 +116,7 @@
     <Compile Include="AddWeighted.vb" />
     <Compile Include="ApproxPoly.vb" />
     <Compile Include="AsciiArt.vb" />
+    <Compile Include="Bezier.vb" />
     <Compile Include="BGRPattern.vb" />
     <Compile Include="Cell.vb" />
     <Compile Include="Complexity.vb" />

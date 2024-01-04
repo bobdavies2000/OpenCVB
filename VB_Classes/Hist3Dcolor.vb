@@ -321,3 +321,36 @@ Public Class Hist3Dcolor_Diff : Inherits VB_Algorithm
         dst3 = dst3 Or diff.dst3
     End Sub
 End Class
+
+
+
+
+
+
+
+Public Class Hist3Dcolor_Vector : Inherits VB_Algorithm
+    Public histogram As New cv.Mat
+    Public inputMask As New cv.Mat
+    Public histArray() As Single
+    Public simK As New Hist3D_BuildHistogram
+    Dim binArray() As Integer
+    Public Sub New()
+        Dim bins = redOptions.HistBinSlider.Value
+        binArray = {bins, bins, bins}
+        advice = "redOptions '3D Histogram Bins'" + vbCrLf
+        desc = "Capture a 3D color histogram for input src - likely to be src(rect)."
+    End Sub
+    Public Sub RunVB(src As cv.Mat)
+        If src.Channels <> 3 Then src = task.color
+        If task.optionsChanged Then
+            Dim bins = redOptions.HistBinSlider.Value
+            binArray = {bins, bins, bins}
+        End If
+
+        cv.Cv2.CalcHist({src}, {0, 1, 2}, inputMask, histogram, 3, binArray, redOptions.rangesBGR)
+
+        ReDim histArray(histogram.Total - 1)
+        Marshal.Copy(histogram.Data, histArray, 0, histArray.Length)
+        If standalone Then setTrueText("Vector prepared in histArray")
+    End Sub
+End Class

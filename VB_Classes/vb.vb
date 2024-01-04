@@ -238,7 +238,14 @@ Module VB
         For i = 0 To vec1.Count - 1
             accum += (vec1(i) - vec2(i)) * (vec1(i) - vec2(i))
         Next
-        Return accum
+        Return Math.Sqrt(accum)
+    End Function
+    Public Function distanceN(vec1() As Single, vec2() As Single) As Double
+        Dim accum As Double
+        For i = 0 To vec1.Count - 1
+            accum += (vec1(i) - vec2(i)) * (vec1(i) - vec2(i))
+        Next
+        Return Math.Sqrt(accum)
     End Function
     Public Sub vbDrawContour(ByRef dst As cv.Mat, contour As List(Of cv.Point), color As cv.Scalar, Optional lineWidth As Integer = -10)
         If lineWidth = -10 Then lineWidth = task.lineWidth ' VB.Net only allows constants for optional parameter.
